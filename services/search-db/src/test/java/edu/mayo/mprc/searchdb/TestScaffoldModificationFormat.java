@@ -109,6 +109,17 @@ public final class TestScaffoldModificationFormat {
 	}
 
 	/**
+	 * Apparently, X!Tandem considers Q and Z amino acids to be the same thing. So there can be
+	 * Pyro-cmC on Z as well.
+	 */
+	@Test
+	public void shouldResolveZPyroCmc() {
+		checkSingleMod(
+				format.parseModifications("zSPSSLSASVGBR", "n-term: Pyro-cmC (-17.03)", ""),
+				"Gln->pyro-Glu", -17.03, 0, 'Z');
+	}
+
+	/**
 	 * Scaffold tends to report Hydroxylation(interim name) instead of preferred Oxidation.
 	 */
 	@Test

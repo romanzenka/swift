@@ -85,11 +85,11 @@ public final class ScaffoldModificationFormat {
 			final int position;
 			final Terminus terminus;
 			if (positionGroup.equalsIgnoreCase("n-term")) {
-				residue = sequence.charAt(0);
+				residue = Character.toUpperCase(sequence.charAt(0));
 				terminus = Terminus.Nterm;
 				position = 0;
 			} else if (positionGroup.equalsIgnoreCase("c-term")) {
-				residue = sequence.charAt(sequence.length() - 1);
+				residue = Character.toUpperCase(sequence.charAt(sequence.length() - 1));
 				terminus = Terminus.Cterm;
 				position = sequence.length() - 1;
 			} else {
@@ -171,13 +171,13 @@ public final class ScaffoldModificationFormat {
 		final String effectiveTitle = fixTandemPyro(title, residue, terminus);
 
 		final ModSpecificity match = findMatch(matchingModSpecificities, effectiveTitle);
-		if(match!=null) {
+		if (match != null) {
 			return match;
 		}
 
 		// We failed. One last try, fixing hydroxylation
 		final ModSpecificity hydroxyMatch = findMatch(matchingModSpecificities, fixHydroxylation(effectiveTitle));
-		if(hydroxyMatch!=null) {
+		if (hydroxyMatch != null) {
 			return hydroxyMatch;
 		}
 
@@ -214,7 +214,7 @@ public final class ScaffoldModificationFormat {
 	private String fixTandemPyro(final String title, final char residue, final Terminus terminus) {
 		String effectiveTitle = title;
 		if (PYRO_CMC.equalsIgnoreCase(title)) {
-			if (residue == 'Q') {
+			if (residue == 'Q' || residue == 'Z') {
 				if (checkPyroCmcBroken()) {
 					effectiveTitle = "Pyro-glu";
 				}
