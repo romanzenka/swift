@@ -2,6 +2,7 @@ package edu.mayo.mprc.searchdb.builder;
 
 import com.google.common.base.Function;
 import com.google.common.collect.Lists;
+import edu.mayo.mprc.MprcException;
 import edu.mayo.mprc.fastadb.PeptideSequence;
 import edu.mayo.mprc.fastadb.ProteinSequence;
 import edu.mayo.mprc.fastadb.ProteinSequenceTranslator;
@@ -96,6 +97,9 @@ public class AnalysisBuilder implements Builder<Analysis> {
 		final ProteinSequence proteinSequence = proteinSequences.get(accessionNumber);
 		if (proteinSequence == null) {
 			final ProteinSequence newProteinSequence = translator.getProteinSequence(accessionNumber, databaseSources);
+			if (newProteinSequence == null) {
+				throw new MprcException("Could not find sequence with accession number [" + accessionNumber + "] within FASTA databases [" + databaseSources + "]. This is most likely a programmer error.");
+			}
 			proteinSequences.put(accessionNumber, newProteinSequence);
 			return newProteinSequence;
 		}
