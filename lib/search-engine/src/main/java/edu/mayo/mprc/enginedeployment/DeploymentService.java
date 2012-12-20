@@ -266,13 +266,13 @@ public abstract class DeploymentService<T extends DeploymentResult> implements W
 
 		for (final File file : deletedFiles) {
 			deleted.append("\t").append((file.isDirectory() ? "Directory: " : "File: "))
-					.append(file.getName())
+					.append(file.getAbsolutePath())
 					.append("\n");
 		}
 
 		for (final File file : notDeletedFiles) {
 			notDeleted.append("\t").append((file.isDirectory() ? "Directory: " : "File: "))
-					.append(file.getName())
+					.append(file.getAbsolutePath())
 					.append("\n");
 		}
 
@@ -280,7 +280,7 @@ public abstract class DeploymentService<T extends DeploymentResult> implements W
 			reportResult.addMessage(deleted.toString());
 
 			reportResult.setUndeployedFiles(deletedFiles);
-			reportResult.addMessage("There were more files than expected in deployment folder, or some files failed to be deleted. Only the following files were not removed:\n"
+			reportResult.addMessage("There were more files than expected in deployment folder, or some files failed to be deleted. The following files were not removed:\n"
 					+ notDeleted.toString());
 		} else {
 			FileUtilities.deleteNow(deploymentFolder);

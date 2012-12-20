@@ -314,7 +314,7 @@ public final class DatabaseUndeployerWorker implements Worker {
 					.reference("scaffold3Deployer", UiBuilder.NONE_TYPE)
 
 					.property(MASCOT_DEPLOYER, "Mascot Database Deployer", "Database deployer must provide database undeployment functionality.")
-					.reference("mascotDeployer", UiBuilder.NONE_TYPE);
+					.reference("mascotDeployer", "mockMascotDeployer", UiBuilder.NONE_TYPE);
 		}
 	}
 }
