@@ -10,6 +10,7 @@ import org.apache.log4j.Logger;
 import java.io.*;
 import java.util.HashSet;
 import java.util.Locale;
+import java.util.regex.Pattern;
 import java.util.zip.GZIPInputStream;
 
 /**
@@ -59,6 +60,11 @@ public final class FASTAInputStream implements DBInputStream {
 	 * the header that comes next and will become the currentHeader when next is called
 	 */
 	private String nextHeader;
+
+	private static final long MAX_ACCNUM_LENGTH = 34;
+	private static final long MAX_HEADER_LENGTH = 200;
+	private static final String VALID_CHARACTERS = "a-z A-Z 0-9 _-.*+|";
+	private static final Pattern VALID_ACCNUM = Pattern.compile("[a-zA-Z0-9_\\-.*+|]+");
 
 	private static final Logger LOGGER = Logger.getLogger(FASTAInputStream.class);
 
@@ -143,7 +149,7 @@ public final class FASTAInputStream implements DBInputStream {
 
 		//set the current sequence to the concatenation of all strings
 		// If the sequence ends with an * signalizing end codon, quietly drop it
-		if (sequenceBuilder.length()>0 && sequenceBuilder.charAt(sequenceBuilder.length() - 1) == '*') {
+		if (sequenceBuilder.length() > 0 && sequenceBuilder.charAt(sequenceBuilder.length() - 1) == '*') {
 			currentSequence = sequenceBuilder.substring(0, sequenceBuilder.length() - 1);
 		} else {
 			currentSequence = sequenceBuilder.toString();
@@ -220,12 +226,10 @@ public final class FASTAInputStream implements DBInputStream {
 				final String header = in.getHeader();
 				if (isHeader(header)) {
 					sequenceCount++;
-					final int spacePos = header.indexOf(' ');
-					String accNum;
-					if (spacePos >= 0) {
-						accNum = header.substring(1, spacePos);
-					} else {
-						accNum = header.substring(1);
+					String accNum = getAccNum(header);
+					final String error = checkHeader(header, accNum);
+					if (error != null) {
+						return error;
 					}
 					if (!accessionNumbers.add(accNum)) {
 						return "Duplicate accession number: [" + accNum + "]";
@@ -244,5 +248,30 @@ public final class FASTAInputStream implements DBInputStream {
 			FileUtilities.closeQuietly(in);
 		}
 		return null;
+	}
+
+	/**
+	 * Get accession number part of the FASTA sequence header.
+	 *
+	 * @param header Header to process (with >)
+	 * @return The accession number.
+	 */
+	static String getAccNum(final String header) {
+		final int spacePos = header.indexOf(' ');
+		return spacePos >= 0 ? header.substring(1, spacePos) : header.substring(1);
+	}
+
+	static String checkHeader(String header, String accNum) {
+		String error = null;
+		if (accNum.length() > MAX_ACCNUM_LENGTH) {
+			error = "Accession number too long: [" + accNum + "]. Length: " + accNum.length() + ", max: " + MAX_ACCNUM_LENGTH;
+		}
+		if (header != null && header.length() - 1 > MAX_HEADER_LENGTH) {
+			error = "Sequence header for accession number: [" + accNum + "] too long: " + header.length() + ", max: " + MAX_HEADER_LENGTH;
+		}
+		if (!VALID_ACCNUM.matcher(accNum).matches()) {
+			error = "Invalid accession number: [" + accNum + "], allowed characters: " + VALID_CHARACTERS;
+		}
+		return error;
 	}
 }
