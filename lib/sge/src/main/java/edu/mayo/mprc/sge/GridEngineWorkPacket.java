@@ -11,9 +11,9 @@ import org.ggf.drmaa.JobInfo;
  * - parameter string
  */
 public final class GridEngineWorkPacket extends GridWorkPacket {
-	private JobInfo jobInfo = null;
+	private JobInfo jobInfo;
 
-	protected GridEngineWorkPacket(final GridWorkPacket packet) {
+	public GridEngineWorkPacket(final GridWorkPacket packet) {
 		super(packet);
 	}
 
@@ -22,7 +22,7 @@ public final class GridEngineWorkPacket extends GridWorkPacket {
 	}
 
 	public JobInfo getJobInfo() {
-		return this.jobInfo;
+		return jobInfo;
 	}
 
 

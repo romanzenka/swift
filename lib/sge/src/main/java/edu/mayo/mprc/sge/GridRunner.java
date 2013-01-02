@@ -68,6 +68,9 @@ public final class GridRunner extends AbstractRunner {
 		super.stop();
 		// Disables message processing
 		enabled = false;
+		if (manager != null) {
+			manager.close();
+		}
 	}
 
 	@Override
@@ -244,15 +247,9 @@ public final class GridRunner extends AbstractRunner {
 	private GridWorkPacket getBaseGridWorkPacket(final String command) {
 		final GridWorkPacket gridWorkPacket = new GridWorkPacket(command, null);
 
-		if (nativeSpecification != null) {
-			gridWorkPacket.setNativeSpecification(nativeSpecification);
-		}
-		if (queueName != null) {
-			gridWorkPacket.setJobQueue(queueName);
-		}
-		if (memoryRequirement != null) {
-			gridWorkPacket.setForcedMemoryRequirement(memoryRequirement);
-		}
+		gridWorkPacket.setNativeSpecification(nativeSpecification);
+		gridWorkPacket.setQueueName(queueName);
+		gridWorkPacket.setMemoryRequirement(memoryRequirement);
 
 		gridWorkPacket.setWorkingFolder(sharedWorkingDirectory.getAbsolutePath());
 		gridWorkPacket.setLogFolder(FileUtilities.getDateBasedDirectory(sharedLogDirectory, new Date()).getAbsolutePath());
