@@ -27,7 +27,7 @@ public final class DatabaseManagerTest {
 
 	@BeforeTest
 	public void setup() {
-		manager = new DatabaseManager("http://mascot");
+		manager = new DatabaseManager("http://mascot.mayo.edu");
 	}
 
 	@Test
