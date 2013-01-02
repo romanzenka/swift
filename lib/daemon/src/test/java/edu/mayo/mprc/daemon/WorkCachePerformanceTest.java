@@ -99,7 +99,8 @@ public final class WorkCachePerformanceTest {
 		final DirectDaemonConnection directConnection = new DirectDaemonConnection(service, fileTokenFactory);
 		final SimpleRunner runner = new SimpleRunner();
 		runner.setLogOutputFolder(logFolder);
-		runner.setWorker(worker);
+		runner.setFactory(new TestWorkerFactory(worker));
+		runner.setExecutorService(new SimpleThreadPoolExecutor(1, worker.getClass().getSimpleName() + "-runner", true));
 		runner.setDaemonConnection(directConnection);
 		return runner;
 	}

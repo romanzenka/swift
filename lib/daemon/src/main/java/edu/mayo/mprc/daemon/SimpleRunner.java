@@ -13,12 +13,9 @@ import java.util.TreeMap;
 import java.util.concurrent.ExecutorService;
 
 /**
- * Runs {@link edu.mayo.mprc.daemon.Worker} instances either
- * <ul>
- * <li>using specified {@link java.util.concurrent.ExecutorService} and
- * {@link WorkerFactory}</li>
- * <li>in a single thread when {@link #setWorker(edu.mayo.mprc.daemon.Worker)} method is used.</li>
- * </ul>
+ * Runs {@link Worker} instances using specified {@link ExecutorService} and
+ * {@link WorkerFactory}.
+ * A new worker is created for each request.
  */
 public final class SimpleRunner extends AbstractRunner {
 	private static final Logger LOGGER = Logger.getLogger(SimpleRunner.class);
@@ -96,37 +93,6 @@ public final class SimpleRunner extends AbstractRunner {
 
 	public void setDaemonConnection(final DaemonConnection daemonConnection) {
 		this.daemonConnection = daemonConnection;
-	}
-
-	/**
-	 * Special case - we have only a single worker, so we will be running in a single thread.
-	 * In this case the user does not have to specify (@link #factory} - we will create a trivial one for them.
-	 *
-	 * @param worker Worker to execute in the single thread.
-	 */
-	public void setWorker(final Worker worker) {
-		this.executorService = new SimpleThreadPoolExecutor(1,
-				(daemonConnection != null ? daemonConnection.getConnectionName() : worker.getClass().getSimpleName()) + "-runner", true);
-		this.factory = new MyWorkerFactory(worker);
-	}
-
-	/**
-	 * Fake factory - single worker in a single thread has the same worker object recycled all the time
-	 */
-	private static final class MyWorkerFactory implements WorkerFactory {
-		private final Worker finalWorker;
-
-		public MyWorkerFactory(final Worker finalWorker) {
-			this.finalWorker = finalWorker;
-		}
-
-		public Worker createWorker() {
-			return finalWorker;
-		}
-
-		public String getDescription() {
-			return finalWorker.toString();
-		}
 	}
 
 	private final class MyProgressReporter implements ProgressReporter {
@@ -210,7 +176,7 @@ public final class SimpleRunner extends AbstractRunner {
 		}
 	}
 
-	public static final class SimpleDaemonRunnerFactory extends FactoryBase<Config, SimpleRunner> {
+	public static final class Factory extends FactoryBase<Config, SimpleRunner> {
 		private MultiFactory table;
 
 		@Override

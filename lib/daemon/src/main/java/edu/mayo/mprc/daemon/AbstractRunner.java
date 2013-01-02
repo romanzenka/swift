@@ -17,8 +17,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  * are sent when the request starts and when it finishes being processed.
  * <p/>
  * Daemon thread runs a {@link Worker}. The worker has {@link Worker#processRequest} method,
- * that gets executed over and over, until it either throws an exception or indicates it is done with processing. Then the
- * daemon starts processing the next request.
+ * that gets executed. Then the daemon starts processing the next request.
  * <p/>
  * In case a task being run fails to be executed, the runner will produce an entry in {@link #failedTasksDirectory} so
  * the developer can reproduce the error by having Swift process only that one single task.
