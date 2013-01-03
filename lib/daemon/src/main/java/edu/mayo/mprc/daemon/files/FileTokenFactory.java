@@ -16,21 +16,21 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 /**
- * Key class for handling {@link edu.mayo.mprc.daemon.files.FileToken} classes. A {@link edu.mayo.mprc.daemon.files.FileToken} is basically path to a file + information about the daemon
+ * Key class for handling {@link FileToken} classes. A {@link FileToken} is basically path to a file + information about the daemon
  * where the file resides. These tokens are needed when sharing files over shared filesystem between daemons.
  * <p/>
- * <code>FileTokenFactory</code> not only creates {@link edu.mayo.mprc.daemon.files.FileToken} classes, it also performs translations of the paths
+ * <code>FileTokenFactory</code> not only creates {@link FileToken} classes, it also performs translations of the paths
  * contained in them. The usage is following:
  * <p/>
  * <ol>
  * <li>{@link #createAnonymousFileToken} - makes a new token that does not yet know about where it came from.
  * This is a static method you can call anytime.</li>
- * <li>Before the token gets sent over the wire, {@link #translateBeforeTransfer(edu.mayo.mprc.daemon.files.FileToken)}
+ * <li>Before the token gets sent over the wire, {@link #translateBeforeTransfer(FileToken)}
  * is called, which gives the tokens information about who is the actual sender.</li>
- * <li>When the token is received, {@link #getFile(edu.mayo.mprc.daemon.files.FileToken)}
+ * <li>When the token is received, {@link #getFile(FileToken)}
  * is called to turn it into a file.
  * <li>Because tokens can refer to objects that will be created in the future (e.g. "put my files here"), there is last
- * step - calling either {@link #uploadAndWait(edu.mayo.mprc.daemon.files.FileToken)} or other {@link edu.mayo.mprc.daemon.files.FileTokenSynchronizer} methods.
+ * step - calling either {@link #uploadAndWait(FileToken)} or other {@link FileTokenSynchronizer} methods.
  * </li>
  * </ol>
  */
@@ -154,6 +154,21 @@ public final class FileTokenFactory implements SenderTokenTranslator, ReceiverTo
 		}
 	}
 
+	/**
+	 * We have an object that holds a file token that we are about to send.
+	 * This token can be:
+	 * <dl>
+	 * <dt><c>null</c></dt>
+	 * <dd>Return a null token.</dd>
+	 * <dt>Anonymous</dt>
+	 * <dd>Set the source daemon to be us</dd>
+	 * <dt>From another daemon</dt>
+	 * <dd>Keep the token as-is - we are only passing it along</dd>
+	 * </dl>
+	 *
+	 * @param fileToken Token to be translated.
+	 * @return Translated token - it's source daemon is properly filled in if it was not previously
+	 */
 	public FileToken translateBeforeTransfer(final FileToken fileToken) {
 		if (fileToken == null) {
 			return null;
@@ -166,8 +181,13 @@ public final class FileTokenFactory implements SenderTokenTranslator, ReceiverTo
 				throw new MprcException("FileToken object could not be regenerated.", e);
 			}
 		} else {
-			return getFileToken(getFile(fileToken));
+			return fileToken;
 		}
+	}
+
+	@Override
+	public FileToken translateBeforeTransfer(File file) {
+		return translateBeforeTransfer(createAnonymousFileToken(file));
 	}
 
 	/**
@@ -209,10 +229,6 @@ public final class FileTokenFactory implements SenderTokenTranslator, ReceiverTo
 		} else {
 			throw new MprcException("Database DaemonConfigInfo object is not set. Can not translate file to database String token.");
 		}
-	}
-
-	public String getDatabaseToken(final FileToken fileToken) {
-		return translateFileToken(fileToken, databaseDaemonConfigInfo).getTokenPath();
 	}
 
 	public File databaseTokenToFile(final String tokenPath) {
@@ -441,26 +457,6 @@ public final class FileTokenFactory implements SenderTokenTranslator, ReceiverTo
 			if (fileTransfer.getErrorException() != null) {
 				throw new MprcException("File synchronization failed. FileToken: " + theirToken.toString(), fileTransfer.getErrorException());
 			}
-		}
-	}
-
-	/**
-	 * Returns the corresponding local token for the given remote FileToken. If
-	 * the remote daemon and this daemon do not have a common shared file space,
-	 * the local token is created within the defined log folder in this daemon.
-	 *
-	 * @param remoteFileToken
-	 * @return
-	 */
-	public FileToken getLogFileTokenForRemoteToken(final FileToken remoteFileToken) {
-		if (isFileTokenShared(remoteFileToken)) {
-			//Shared file space.
-			return new SharedToken(daemonConfigInfo, remoteFileToken.getTokenPath(), remoteFileToken.existsOnSourceDaemon());
-		} else if (isFileTokenLocal(remoteFileToken)) {
-			//Do not replicate data if in same system.
-			return remoteFileToken;
-		} else {
-			return getFileToken(getLocalFileForRemoteToken(remoteFileToken));
 		}
 	}
 

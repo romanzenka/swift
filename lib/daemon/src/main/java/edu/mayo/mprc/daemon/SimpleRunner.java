@@ -107,10 +107,7 @@ public final class SimpleRunner extends AbstractRunner {
 		@Override
 		public void reportStart() {
 			sendResponse(request, new DaemonProgressMessage(DaemonProgress.RequestProcessingStarted), false);
-			if (loggingSetup != null) {
-				sendResponse(request, new DaemonProgressMessage(DaemonProgress.UserSpecificProgressInfo,
-						new AssignedTaskData(loggingSetup.getStandardOutFile(), loggingSetup.getStandardErrorFile())), false);
-			}
+			reportLogFiles();
 		}
 
 		public void reportProgress(final ProgressInfo progressInfo) {
@@ -118,11 +115,20 @@ public final class SimpleRunner extends AbstractRunner {
 		}
 
 		public void reportSuccess() {
+			reportLogFiles();
 			sendResponse(request, new DaemonProgressMessage(DaemonProgress.RequestCompleted), true);
 		}
 
 		public void reportFailure(final Throwable t) {
+			reportLogFiles();
 			sendResponse(request, t, true);
+		}
+
+		private void reportLogFiles() {
+			if (loggingSetup != null) {
+				sendResponse(request, new DaemonProgressMessage(DaemonProgress.UserSpecificProgressInfo,
+						new AssignedTaskData(loggingSetup.getStandardOutFile(), loggingSetup.getStandardErrorFile())), false);
+			}
 		}
 	}
 

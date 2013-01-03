@@ -104,13 +104,20 @@ public final class GridRunner extends AbstractRunner {
 			gridWorkPacket.setParameters(parameters);
 
 			// Set our own listener to the work packet progress. When the packet returns, the execution will be resumed
-			gridWorkPacket.setListener(new MyWorkPacketStateListener(request, daemonWorkerAllocatorInputFile, boundMessenger, allocatorListener));
+			final MyWorkPacketStateListener listener = new MyWorkPacketStateListener(request, daemonWorkerAllocatorInputFile, boundMessenger, allocatorListener);
+			gridWorkPacket.setListener(listener);
 			// Run the job
 			final String requestId = manager.passToGridEngine(gridWorkPacket);
-			// Report the assigned ID
-			sendResponse(request,
-					new DaemonProgressMessage(DaemonProgress.UserSpecificProgressInfo, new AssignedTaskData(requestId, gridWorkPacket.getOutputLogFilePath(), gridWorkPacket.getErrorLogFilePath())),
-					false);
+
+			// Report the information about the running task to the caller, making sure they get the task id and the logs
+			final AssignedTaskData data = new AssignedTaskData(requestId, gridWorkPacket.getOutputLogFilePath(), gridWorkPacket.getErrorLogFilePath());
+
+			// The listener will report the task information on failure/success so the logs have a chance to get
+			// transferred.
+			listener.setTaskData(data);
+
+			// Report the assigned ID and log files. Since the logs are not filled in yet, they would be available on the caller only if it shares disk space
+			reportTaskData(request, data);
 
 			// We are not done yet! The grid work packet's progress listener will get called when the state of the task changes,
 			// and either mark the task failed or successful.
@@ -120,6 +127,14 @@ public final class GridRunner extends AbstractRunner {
 			sendResponse(request, daemonException, true);
 			throw daemonException;
 		}
+	}
+
+	void reportTaskData(final DaemonRequest request, final AssignedTaskData data) {
+		// Clone the data object to make sure the file tokens get updated (files might come into existence that
+		// did not exist before).
+		final AssignedTaskData clonedTaskData = new AssignedTaskData(data.getAssignedId(), data.getOutputLogFile(), data.getErrorLogFile());
+		sendResponse(request, new DaemonProgressMessage(DaemonProgress.UserSpecificProgressInfo,
+				clonedTaskData), false);
 	}
 
 	private static void writeWorkerAllocatorInputObject(File file, SgePacket object) throws IOException {
@@ -173,10 +188,15 @@ public final class GridRunner extends AbstractRunner {
 	 */
 	private class MyWorkPacketStateListener implements GridWorkPacketStateListener {
 		private boolean reported;
-		private DaemonRequest request;
-		private File sgePacketFile;
-		private BoundMessenger boundMessenger;
-		private SgeMessageListener allocatorListener;
+		private final DaemonRequest request;
+		private final File sgePacketFile;
+		private final BoundMessenger boundMessenger;
+		private final SgeMessageListener allocatorListener;
+
+		/**
+		 * Needs to be synchronized - being set from different thread
+		 */
+		private AssignedTaskData taskData;
 
 		/**
 		 * @param allocatorListener The listener for the RMI messages. We use it so we can send an exception that was cached when SGE terminates.
@@ -202,6 +222,13 @@ public final class GridRunner extends AbstractRunner {
 			// We report state change just once.
 			if (!reported) {
 				try {
+					// First, re-report the output and error logs.
+					// If we are running on a different machine, the logs are now complete
+					// and need to be uploaded to the caller.
+					final AssignedTaskData toReport = getTaskData();
+					if (toReport != null) {
+						reportTaskData(request, toReport);
+					}
 					if (w.getPassed()) {
 						// This is the last response we will send - request is completed.
 						// There might have been an error from RMI, check that
@@ -233,6 +260,14 @@ public final class GridRunner extends AbstractRunner {
 					}
 				}
 			}
+		}
+
+		public synchronized AssignedTaskData getTaskData() {
+			return taskData;
+		}
+
+		public synchronized void setTaskData(AssignedTaskData taskData) {
+			this.taskData = taskData;
 		}
 	}
 

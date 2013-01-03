@@ -530,8 +530,8 @@ public final class SwiftDaoHibernate extends DaoBase implements SwiftDao {
 	public void storeAssignedTaskData(final TaskData taskData, final AssignedTaskData assignedTaskData) {
 		try {
 			taskData.setGridJobId(assignedTaskData.getAssignedId());
-			taskData.setOutputLogDatabaseToken(fileTokenFactory.getDatabaseToken(fileTokenFactory.getLogFileTokenForRemoteToken(assignedTaskData.getOutputLogFileToken())));
-			taskData.setErrorLogDatabaseToken(fileTokenFactory.getDatabaseToken(fileTokenFactory.getLogFileTokenForRemoteToken(assignedTaskData.getErrorLogFileToken())));
+			taskData.setOutputLogDatabaseToken(fileTokenFactory.fileToDatabaseToken(assignedTaskData.getOutputLogFile()));
+			taskData.setErrorLogDatabaseToken(fileTokenFactory.fileToDatabaseToken(assignedTaskData.getErrorLogFile()));
 		} catch (Exception t) {
 			throw new MprcException("Cannot store task grid request id " + assignedTaskData.getAssignedId() + " for task " + taskData, t);
 		}

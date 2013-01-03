@@ -1,21 +1,21 @@
 package edu.mayo.mprc.daemon;
 
-import edu.mayo.mprc.daemon.files.*;
+import edu.mayo.mprc.daemon.files.FileHolder;
 import edu.mayo.mprc.utilities.progress.ProgressInfo;
 
 import java.io.File;
-import java.util.Set;
 
 /**
  * Progress report sent after task is submitted for execution.
  */
-public final class AssignedTaskData implements ProgressInfo, FileTokenHolder {
+public final class AssignedTaskData extends FileHolder implements ProgressInfo {
 	private static final long serialVersionUID = 20071220L;
-	private FileToken errorLogFile;
-	private FileToken outputLogFile;
-	private final String jobId;
+	private File errorLogFile;
+	private File outputLogFile;
+	private String jobId;
 
-	private transient ReceiverTokenTranslator receiverTokenTranslator;
+	public AssignedTaskData() {
+	}
 
 	public AssignedTaskData(final File outputLogFile, final File errorLogFile) {
 		this(null, outputLogFile, errorLogFile);
@@ -25,10 +25,10 @@ public final class AssignedTaskData implements ProgressInfo, FileTokenHolder {
 		this(id, new File(outputLogFilePath), new File(errorLogFilePath));
 	}
 
-	private AssignedTaskData(final String id, final File outputLogFile, final File errorLogFile) {
-		this.outputLogFile = FileTokenFactory.createAnonymousFileToken(outputLogFile);
-		this.errorLogFile = FileTokenFactory.createAnonymousFileToken(errorLogFile);
-		this.jobId = id;
+	public AssignedTaskData(final String jobId, final File outputLogFile, final File errorLogFile) {
+		this.outputLogFile = outputLogFile;
+		this.errorLogFile = errorLogFile;
+		this.jobId = jobId;
 	}
 
 	public String getAssignedId() {
@@ -36,36 +36,14 @@ public final class AssignedTaskData implements ProgressInfo, FileTokenHolder {
 	}
 
 	public File getErrorLogFile() {
-		return receiverTokenTranslator.getFile(errorLogFile);
-	}
-
-	public FileToken getErrorLogFileToken() {
 		return errorLogFile;
 	}
 
 	public File getOutputLogFile() {
-		return receiverTokenTranslator.getFile(outputLogFile);
-	}
-
-	public FileToken getOutputLogFileToken() {
 		return outputLogFile;
 	}
 
 	public String toString() {
 		return "SGE task id: " + (jobId != null ? jobId : "None") + " | Standard Out: " + outputLogFile.toString() + " | Error Out: " + errorLogFile.toString();
-	}
-
-	public void translateOnSender(final SenderTokenTranslator translator) {
-		errorLogFile = translator.translateBeforeTransfer(errorLogFile);
-		outputLogFile = translator.translateBeforeTransfer(outputLogFile);
-	}
-
-	public void translateOnReceiver(final ReceiverTokenTranslator translator, final FileTokenSynchronizer synchronizer, final Set<File> filesThatShouldExist) {
-		this.receiverTokenTranslator = translator;
-	}
-
-	@Override
-	public void synchronizeFileTokensOnReceiver() {
-		//Do nothing, no file needs synchronization.
 	}
 }

@@ -319,7 +319,7 @@ public class FileHolder implements FileTokenHolder {
 	}
 
 	private FileToken token(final SenderTokenTranslator translator, final File file) {
-		return translator.translateBeforeTransfer(FileTokenFactory.createAnonymousFileToken(file));
+		return translator.translateBeforeTransfer(file);
 	}
 
 	private void callTranslateOnSender(final SenderTokenTranslator translator, final Field field) {
