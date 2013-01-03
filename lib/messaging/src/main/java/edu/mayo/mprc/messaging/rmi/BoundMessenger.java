@@ -8,6 +8,8 @@ import java.rmi.RemoteException;
 /**
  * Object contains a Messenger object information and the Messenger itself. The Messenger
  * object is assume to be bound to a RMI Registry object.
+ *
+ * @deprecated This would not work in firewalled environment.
  */
 public final class BoundMessenger<T> {
 

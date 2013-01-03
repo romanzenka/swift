@@ -5,6 +5,9 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.rmi.server.RMISocketFactory;
 
+/**
+ * @deprecated This would not work in firewalled environment.
+ */
 class AnonymousRMISocketFactory extends RMISocketFactory {
 
 	private int lastUsedPort;

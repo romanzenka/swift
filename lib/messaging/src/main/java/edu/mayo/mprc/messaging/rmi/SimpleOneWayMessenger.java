@@ -5,6 +5,9 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
+/**
+ * @deprecated This would not work in firewalled environment.
+ */
 public final class SimpleOneWayMessenger implements OneWayMessenger {
 	private static final long serialVersionUID = 20090324L;
 	private final List<MessageListener> messageListeners;

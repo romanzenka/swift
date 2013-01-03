@@ -13,8 +13,9 @@ import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
 
 /**
- * Class handles the registering of remotes object to an local RMI resgistry
+ * Class handles the registering of remotes object to an local RMI registry
  * and getting remote object from remote registries.
+ * @deprecated This would not work in firewalled environment.
  */
 public final class RemoteObjectHandler {
 	private static final Logger LOGGER = Logger.getLogger(RemoteObjectHandler.class);
