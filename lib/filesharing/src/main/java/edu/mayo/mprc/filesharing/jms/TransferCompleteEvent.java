@@ -1,4 +1,4 @@
-package edu.mayo.mprc.filesharing;
+package edu.mayo.mprc.filesharing.jms;
 
 import java.io.File;
 
@@ -7,7 +7,7 @@ import java.io.File;
  * is successful, exception is null. Otherwise, exception object should
  * reference error exception.
  */
-public final class TransferCompleteEvent {
+final class TransferCompleteEvent {
 
 	private Exception exception;
 	private File file;

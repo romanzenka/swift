@@ -1,4 +1,4 @@
-package edu.mayo.mprc.filesharing;
+package edu.mayo.mprc.filesharing.jms;
 
 import java.io.Serializable;
 import java.net.InetSocketAddress;
@@ -10,7 +10,7 @@ import java.util.List;
  * existing files and not existing files in receiver. The response may contain server socket information
  * if transfer is to be initiated by requester.
  */
-public final class MultiFileTransferResponse implements Serializable {
+final class MultiFileTransferResponse implements Serializable {
 	private static final long serialVersionUID = 20111119L;
 
 	private long requestId;

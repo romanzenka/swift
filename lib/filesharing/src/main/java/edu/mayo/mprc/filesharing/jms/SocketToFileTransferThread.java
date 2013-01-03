@@ -1,4 +1,4 @@
-package edu.mayo.mprc.filesharing;
+package edu.mayo.mprc.filesharing.jms;
 
 import edu.mayo.mprc.MprcException;
 import edu.mayo.mprc.utilities.FileUtilities;
@@ -13,7 +13,7 @@ import java.util.concurrent.atomic.AtomicLong;
 /**
  * Class writes data streaming from socket to file. Once transfer is completed, socket is closed.
  */
-public final class SocketToFileTransferThread extends FileTransferThread {
+final class SocketToFileTransferThread extends FileTransferThread {
 
 	private static AtomicLong lastUniqueId = new AtomicLong(0);
 

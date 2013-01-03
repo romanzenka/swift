@@ -3,7 +3,6 @@ package edu.mayo.mprc.filesharing.jms;
 import edu.mayo.mprc.MprcException;
 import edu.mayo.mprc.filesharing.FileTransfer;
 import edu.mayo.mprc.filesharing.FileTransferHandler;
-import edu.mayo.mprc.filesharing.MultiFileTransferRequest;
 import edu.mayo.mprc.messaging.ActiveMQConnectionPool;
 import org.apache.activemq.ActiveMQSession;
 import org.apache.log4j.Logger;

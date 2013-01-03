@@ -1,4 +1,4 @@
-package edu.mayo.mprc.filesharing;
+package edu.mayo.mprc.filesharing.jms;
 
 import com.google.common.io.ByteStreams;
 import com.google.common.io.Files;
@@ -15,7 +15,7 @@ import java.util.concurrent.atomic.AtomicLong;
 /**
  * Class writes file content to socket. Once transfer is completed, socket is closed.
  */
-public final class FileToSocketTransferThread extends FileTransferThread {
+final class FileToSocketTransferThread extends FileTransferThread {
 
 	private static final Logger LOGGER = Logger.getLogger(FileToSocketTransferThread.class);
 

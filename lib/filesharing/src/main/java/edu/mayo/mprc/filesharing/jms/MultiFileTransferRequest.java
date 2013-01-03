@@ -1,4 +1,4 @@
-package edu.mayo.mprc.filesharing;
+package edu.mayo.mprc.filesharing.jms;
 
 import java.io.Serializable;
 import java.net.InetSocketAddress;
@@ -10,7 +10,7 @@ import java.util.List;
  * this receiving system if boolean isSource variable is false. Otherwise, file transfer
  * happens from request receiving system to system requesting transfer.
  */
-public final class MultiFileTransferRequest implements Serializable {
+final class MultiFileTransferRequest implements Serializable {
 	private static final long serialVersionUID = 20110212L;
 
 	private long requestId;
