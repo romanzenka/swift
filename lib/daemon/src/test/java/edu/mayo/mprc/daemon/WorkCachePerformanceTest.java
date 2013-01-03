@@ -86,7 +86,7 @@ public final class WorkCachePerformanceTest {
 			Assert.assertEquals(workSuccessCount, TOTAL_MESSAGES, "Wrong amount of successfully processed work packets");
 		}
 
-		Assert.assertEquals(listener.getProgressInfos().size(), TOTAL_MESSAGES);
+		Assert.assertEquals(listener.getProgressInfos().size(), TOTAL_MESSAGES*2); /* Each task sends two progress messages to make sure logs are updated */
 
 		FileUtilities.cleanupTempFile(logFolder);
 		FileUtilities.cleanupTempFile(cacheFolder);
