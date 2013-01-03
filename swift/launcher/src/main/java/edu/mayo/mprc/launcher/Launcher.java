@@ -237,7 +237,7 @@ public final class Launcher implements FileListener {
 		try {
 			tempFolder = new File(getDaemonConfigValue(configFile, daemonId, "/tempFolderPath"));
 		} catch (Exception ignore) {
-			tempFolder = new File(System.getProperty("java.io.tmpdir"));
+			tempFolder = FileUtilities.getDefaultTempDirectory();
 			LOGGER.warn("Could not parse the config file " + configFile.getPath() + " to temporary daemon folder. Using default " + tempFolder);
 		}
 		return tempFolder;

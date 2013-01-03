@@ -21,10 +21,13 @@ public final class TestPvmUtilities {
 	private static final String PVM_DAEMON = "pvmd3";
 
 	private File hostsFile;
+	private String userName;
 
 	@BeforeClass
 	public void init() {
 		hostsFile = new File("/etc/pvmhosts");
+		userName = System.getProperty("user.name");
+		LOGGER.debug("userName=" + userName);
 	}
 
 	/**
@@ -132,8 +135,6 @@ public final class TestPvmUtilities {
 		}
 
 		LOGGER.debug("first slave=" + hostName);
-		final String userName = System.getProperty("user.name");
-		LOGGER.debug("userName=" + userName);
 		final List<String> lines = pvm.getSshResult(hostName, "ls -AlL /");
 		if (lines == null) {
 			Assert.fail("no result from ssh " + hostName + " ls /");
@@ -160,8 +161,6 @@ public final class TestPvmUtilities {
 			return;
 		}
 
-		final String userName = System.getProperty("user.name");
-		LOGGER.debug("userName=" + userName);
 		final PvmUtilities pvm = new PvmUtilities();
 		final List<String> args = Arrays.asList("ls", "-AlL", "/");
 
@@ -177,8 +176,6 @@ public final class TestPvmUtilities {
 	public void testKillPVMonNode() {
 		try {
 			LOGGER.debug("in testKillPVMonNode");
-			final String userName = System.getProperty("user.name");
-			LOGGER.debug("userName=" + userName);
 			final PvmUtilities pvm = new PvmUtilities();
 			final List<String> nodes = pvm.getSlaveNodes(hostsFile);
 			if (nodes == null || nodes.size() == 0) {
@@ -205,8 +202,6 @@ public final class TestPvmUtilities {
 	public void testKillPVMonSlaveNodes() {
 		try {
 			LOGGER.debug("in testKillPVMonNodes");
-			final String userName = System.getProperty("user.name");
-			LOGGER.debug("userName=" + userName);
 			final PvmUtilities pvm = new PvmUtilities();
 			final List<String> nodes = pvm.getSlaveNodes(hostsFile);
 			if (nodes == null || nodes.size() == 0) {
@@ -235,8 +230,6 @@ public final class TestPvmUtilities {
 			() {
 		try {
 			LOGGER.debug("in testKillPVMonMaster");
-			final String userName = System.getProperty("user.name");
-			LOGGER.debug("userName=" + userName);
 			final PvmUtilities pvm = new PvmUtilities();
 
 			final long pid = pvm.findProcessIDforExe(userName, "pvmd");
@@ -257,8 +250,6 @@ public final class TestPvmUtilities {
 	public void testIsPvmRunningCorrectly() {
 		LOGGER.debug("in testIsPVMRunning");
 		try {
-			final String userName = System.getProperty("user.name");
-			LOGGER.debug("userName=" + userName);
 			final PvmUtilities pvm = new PvmUtilities();
 
 			final File pFile = hostsFile;
@@ -278,8 +269,6 @@ public final class TestPvmUtilities {
 	public void testPVMRestartForcedbySlaveFailure() {
 		LOGGER.debug("in testPVMRestartForcedbySlaveFailure");
 		PvmUtilities pvm = null;
-		final String userName = System.getProperty("user.name");
-		LOGGER.debug("userName=" + userName);
 		boolean running = false;
 		try {
 			pvm = new PvmUtilities();
@@ -342,7 +331,6 @@ public final class TestPvmUtilities {
 	@Test(enabled = false, groups = {"linux", "pvm"})
 	public void testIsPvmRunning() {
 		final PvmUtilities pvm = new PvmUtilities();
-		final String userName = System.getProperty("user.name");
 		final long pid = pvm.isPVMRunning(userName);
 		LOGGER.debug("pvm process id = " + pid);
 	}
@@ -350,7 +338,6 @@ public final class TestPvmUtilities {
 	@Test(enabled = false, groups = {"linux", "pvm"})
 	public void testIsPvmRunningOk() {
 		final PvmUtilities pvm = new PvmUtilities();
-		final String userName = System.getProperty("user.name");
 		final boolean running = pvm.isPVMRunningCorrectly(userName, "/Users/m039201/pvm/pvmhosts");
 		String rest = "";
 		if (!running) {
@@ -364,8 +351,6 @@ public final class TestPvmUtilities {
 	public void testPVMRestartForcedbyMasterFailure() {
 		LOGGER.debug("in testPVMRestartForcedbyMasterFailure");
 		PvmUtilities pvm = null;
-		final String userName = System.getProperty("user.name");
-		LOGGER.debug("userName=" + userName);
 		boolean running = false;
 		try {
 			pvm = new PvmUtilities();
@@ -421,16 +406,12 @@ public final class TestPvmUtilities {
 	@Test(enabled = true, groups = {"linux", "pvm"})
 	public void testGetFilenames
 			() {
-		final String userName = System.getProperty("user.name");
-		LOGGER.debug("userName=" + userName);
 		final PvmUtilities pvm = new PvmUtilities();
 		pvm.getPvmTempFileNames("/tmp", userName);
 	}
 
 	@Test(enabled = false, groups = {"linux", "pvm"})
 	public void testMakeSurePVMOk() {
-		final String userName = System.getProperty("user.name");
-		LOGGER.debug("userName=" + userName);
 		final PvmUtilities pvm = new PvmUtilities();
 		pvm.makeSurePVMOk(userName, hostsFile.getAbsolutePath(), PVM_DAEMON, "/tmp");
 	}
