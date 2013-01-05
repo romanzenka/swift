@@ -870,6 +870,7 @@ public final class FileUtilities {
 
 	/**
 	 * Just like {@link #waitForFile(java.io.File, int)} with default timeout of {@link #NFS_FILE_TIMEOUT_MILLIS}.
+	 *
 	 * @param toWaitFor Set of files to wait for.
 	 */
 	public static void waitForFiles(final Set<File> toWaitFor) {
@@ -1706,7 +1707,7 @@ public final class FileUtilities {
 
 		@Override
 		public boolean apply(@Nullable final File input) {
-			return input.exists();
+			return input == null ? null : input.exists();
 		}
 	}
 

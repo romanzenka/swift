@@ -18,7 +18,7 @@ import java.util.Locale;
  * @author Roman Zenka
  */
 public class InfoFileParser {
-	public static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US);
+	private final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US);
 
 	/**
 	 * Parse .RAW.info file
@@ -46,7 +46,7 @@ public class InfoFileParser {
 				final String value = values.size() > 1 ? values.get(1).trim() : "";
 				if ("Creation Date".equals(key)) {
 					try {
-						data.setStartTime(new DateTime(DATE_FORMAT.parse(value)));
+						data.setStartTime(new DateTime(dateFormat.parse(value)));
 					} catch (ParseException e) {
 						throw new MprcException("Malformed .RAW file start date: " + value, e);
 					}

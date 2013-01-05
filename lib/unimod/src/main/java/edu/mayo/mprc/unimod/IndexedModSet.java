@@ -258,7 +258,7 @@ public class IndexedModSet implements Set<Mod> {
 		public static final Function<ModSpecificityMatch, ModSpecificity> GET_MOD_SPECIFICITY = new Function<ModSpecificityMatch, ModSpecificity>() {
 			@Override
 			public ModSpecificity apply(final ModSpecificityMatch from) {
-				return from.getMatchingModSpecificity();
+				return from == null ? null : from.getMatchingModSpecificity();
 			}
 		};
 

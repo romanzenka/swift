@@ -114,7 +114,7 @@ public final class MascotWorker implements Worker {
 		if (mascotUrl == null) {
 			throw new MprcException("The mascot url must not be null");
 		}
-		boundary = ("--------" + RANDOM.nextLong()) + Math.abs(RANDOM.nextLong());
+		boundary = ("--------" + RANDOM.nextLong()) + Math.abs(RANDOM.nextLong() % Long.MAX_VALUE);
 		baseUrl = mascotUrl;
 		datFileBaseUrl = mascotCgiUrl(mascotUrl);
 	}

@@ -45,7 +45,7 @@ public final class AminoAcid {
 	public static final class GetCode implements Function<AminoAcid, Character> {
 		@Override
 		public Character apply(final AminoAcid from) {
-			return from.getCode();
+			return from == null ? null : from.getCode();
 		}
 	}
 }
