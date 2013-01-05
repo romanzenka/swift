@@ -266,6 +266,8 @@ public class ConfigurationData {
 		daemonModel.setOsName(daemon.getOsName());
 		daemonModel.setSharedFileSpacePath(daemon.getSharedFileSpacePath());
 		daemonModel.setTempFolderPath(daemon.getTempFolderPath());
+		daemonModel.setDumpErrors(daemon.isDumpErrors());
+		daemonModel.setDumpFolderPath(daemon.getDumpFolderPath());
 		for (final ServiceConfig service : daemon.getServices()) {
 			final ResourceTable table = getResourceTable();
 			final String type = table.getId(service.getRunner().getWorkerConfiguration().getClass());

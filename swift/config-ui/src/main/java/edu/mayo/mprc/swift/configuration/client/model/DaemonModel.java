@@ -11,6 +11,8 @@ public final class DaemonModel extends ResourceModel {
 	public static final String OS_NAME = "osName";
 	public static final String SHARED_FILE_SPACE_PATH = "sharedFileSpacePath";
 	public static final String TEMP_FOLDER_PATH = "tempFolderPath";
+	public static final String DUMP_ERRORS = "dumpErrors";
+	public static final String DUMP_FOLDER_PATH = "dumpFolderPath";
 	private static final long serialVersionUID = -3470019100042087509L;
 
 	public DaemonModel() {
@@ -55,6 +57,22 @@ public final class DaemonModel extends ResourceModel {
 
 	public void setTempFolderPath(final String tempFolderPath) {
 		setProperty(TEMP_FOLDER_PATH, tempFolderPath);
+	}
+
+	public boolean isDumpErrors() {
+		return Boolean.parseBoolean(getProperty(DUMP_ERRORS));
+	}
+
+	public void setDumpErrors(final boolean dumpErrors) {
+		setProperty(DUMP_ERRORS, Boolean.toString(dumpErrors));
+	}
+
+	public String getDumpFolderPath() {
+		return getProperty(DUMP_FOLDER_PATH);
+	}
+
+	public void setDumpFolderPath(final String dumpFolderPath) {
+		setProperty(DUMP_FOLDER_PATH, dumpFolderPath);
 	}
 
 	/**
