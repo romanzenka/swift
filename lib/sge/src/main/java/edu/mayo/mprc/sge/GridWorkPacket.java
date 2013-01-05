@@ -128,16 +128,16 @@ public class GridWorkPacket {
 		return nativeSpecification;
 	}
 
-	public void setNativeSpecification(final String nativespecification) {
-		nativeSpecification = nativespecification;
+	public void setNativeSpecification(final String nativeSpecification) {
+		this.nativeSpecification = nativeSpecification;
 	}
 
 	public String getMemoryRequirement() {
 		return this.minMemoryRequirement;
 	}
 
-	public void setMemoryRequirement(final String memoryrequirement) {
-		minMemoryRequirement = memoryrequirement;
+	public void setMemoryRequirement(final String memoryRequirement) {
+		this.minMemoryRequirement = memoryRequirement;
 	}
 
 	public String getApplicationName() {

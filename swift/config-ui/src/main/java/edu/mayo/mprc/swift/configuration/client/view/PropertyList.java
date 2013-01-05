@@ -20,6 +20,12 @@ public final class PropertyList extends FlexTable implements ModuleView {
 			final String value = values.get(prop.name);
 			if (value != null) {
 				setEditorValue(prop.editor, value);
+			} else {
+				// Value was not provided. Take the default, if any, and use it.
+				String def = getEditorValue(prop.editor);
+				if (def != null) {
+					prop.validator.validate(def);
+				}
 			}
 		}
 	}
@@ -42,7 +48,7 @@ public final class PropertyList extends FlexTable implements ModuleView {
 		if (editor instanceof TextBox) {
 			((TextBox) editor).setText(value);
 		} else if (editor instanceof CheckBox) {
-			((CheckBox) editor).setChecked("true".equals(value));
+			((CheckBox) editor).setValue("true".equals(value));
 		} else if (editor instanceof ReferenceListBox) {
 			((ReferenceListBox) editor).setValue(value);
 		} else {

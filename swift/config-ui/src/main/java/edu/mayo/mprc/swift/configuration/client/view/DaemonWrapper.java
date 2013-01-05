@@ -84,7 +84,8 @@ public final class DaemonWrapper extends SimplePanel {
 		moduleAdding.add(newModuleButton);
 		panel.add(moduleAdding);
 
-		for (final ResourceModel resource : daemonModel.getChildren()) {
+		final ArrayList<ResourceModel> resources = new ArrayList<ResourceModel>(this.daemonModel.getChildren());
+		for (final ResourceModel resource : resources) {
 			addUiForResource(resource);
 		}
 		this.setWidget(panel);

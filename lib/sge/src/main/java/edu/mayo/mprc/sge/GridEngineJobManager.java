@@ -1,5 +1,6 @@
 package edu.mayo.mprc.sge;
 
+import com.google.common.base.Strings;
 import edu.mayo.mprc.MprcException;
 import org.apache.log4j.Logger;
 import org.ggf.drmaa.*;
@@ -179,18 +180,18 @@ public final class GridEngineJobManager implements Closeable {
 		}
 
 		String spec = "";
-		if (pPacket.getNativeSpecification() != null) {
+		if (!Strings.isNullOrEmpty(pPacket.getNativeSpecification())) {
 			spec += pPacket.getNativeSpecification();
 			LOGGER.debug("Task has native specification: " + pPacket.getNativeSpecification());
 		}
-		if (pPacket.getQueueName() != null) {
+		if (!Strings.isNullOrEmpty(pPacket.getQueueName())) {
 			if (spec.length() > 0) {
 				spec += " ";
 			}
 			spec += QUEUE_SPEC_OPTION + " " + pPacket.getQueueName();
 			LOGGER.debug("Task forces a job queue: " + pPacket.getQueueName());
 		}
-		if (pPacket.getMemoryRequirement() != null) {
+		if (!Strings.isNullOrEmpty(pPacket.getMemoryRequirement())) {
 			if (spec.length() > 0) {
 				spec += " ";
 			}

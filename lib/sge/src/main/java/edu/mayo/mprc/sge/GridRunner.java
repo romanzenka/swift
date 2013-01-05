@@ -35,6 +35,15 @@ public final class GridRunner extends AbstractRunner {
 
 	public static final String TYPE = "sgeRunner";
 	public static final String NAME = "Sun Grid Engine Runner";
+
+	private static final String WRAPPER_SCRIPT = "wrapperScript";
+	private static final String SHARED_LOG_DIRECTORY = "sharedLogDirectory";
+	private static final String SHARED_TEMP_DIRECTORY = "sharedTempDirectory";
+	private static final String SHARED_WORKING_DIRECTORY = "sharedWorkingDirectory";
+	private static final String NATIVE_SPECIFICATION = "nativeSpecification";
+	private static final String MEMORY_REQUIREMENT = "memoryRequirement";
+	private static final String QUEUE_NAME = "queueName";
+
 	private boolean enabled;
 	private boolean operational;
 	private DaemonConnection daemonConnection;
@@ -487,24 +496,24 @@ public final class GridRunner extends AbstractRunner {
 
 		public Map<String, String> save(final DependencyResolver resolver) {
 			final TreeMap<String, String> map = new TreeMap<String, String>();
-			map.put("queueName", queueName);
-			map.put("memoryRequirement", memoryRequirement);
-			map.put("nativeSpecification", nativeSpecification);
-			map.put("sharedWorkingDirectory", sharedWorkingDirectory);
-			map.put("sharedTempDirectory", sharedTempDirectory);
-			map.put("sharedLogDirectory", sharedLogDirectory);
-			map.put("wrapperScript", wrapperScript);
+			map.put(QUEUE_NAME, queueName);
+			map.put(MEMORY_REQUIREMENT, memoryRequirement);
+			map.put(NATIVE_SPECIFICATION, nativeSpecification);
+			map.put(SHARED_WORKING_DIRECTORY, sharedWorkingDirectory);
+			map.put(SHARED_TEMP_DIRECTORY, sharedTempDirectory);
+			map.put(SHARED_LOG_DIRECTORY, sharedLogDirectory);
+			map.put(WRAPPER_SCRIPT, wrapperScript);
 			return map;
 		}
 
 		public void load(final Map<String, String> values, final DependencyResolver resolver) {
-			queueName = values.get("queueName");
-			memoryRequirement = values.get("memoryRequirement");
-			nativeSpecification = values.get("nativeSpecification");
-			sharedWorkingDirectory = values.get("sharedWorkingDirectory");
-			sharedTempDirectory = values.get("sharedTempDirectory");
-			sharedLogDirectory = values.get("sharedLogDirectory");
-			wrapperScript = values.get("wrapperScript");
+			queueName = values.get(QUEUE_NAME);
+			memoryRequirement = values.get(MEMORY_REQUIREMENT);
+			nativeSpecification = values.get(NATIVE_SPECIFICATION);
+			sharedWorkingDirectory = values.get(SHARED_WORKING_DIRECTORY);
+			sharedTempDirectory = values.get(SHARED_TEMP_DIRECTORY);
+			sharedLogDirectory = values.get(SHARED_LOG_DIRECTORY);
+			wrapperScript = values.get(WRAPPER_SCRIPT);
 		}
 
 		@Override
