@@ -25,6 +25,7 @@ public final class MgfCleanup {
 	private static final int BUFFER_SIZE = 100 * 1024;
 	private static final Pattern VALID_TITLE = Pattern.compile("\\([^)]*\\.dta\\s*\\)");
 	private static final Pattern CHARGE = Pattern.compile("CHARGE=.*?(\\d+)");
+	private static final Pattern SCANS = Pattern.compile("SCANS=.*?(\\d+)");
 
 	private File inputMgf;
 
@@ -102,7 +103,9 @@ public final class MgfCleanup {
 		int invalidTitleId = 0;
 		boolean insideParamSection = false;
 		String title = null;
+		final StringBuilder headerBuilder = new StringBuilder(500);
 		int charge = 0;
+		int scans = 0;
 		// We assume (according to MGF specification), that search parameters must
 		// follow BEGIN IONS section. Once the param section is over (queries start),
 		// there must be NO parameters until we encounter another BEGIN IONS section.
@@ -116,37 +119,59 @@ public final class MgfCleanup {
 					insideParamSection = true;
 					title = null;
 					charge = 0;
+					scans = -1;
+					headerBuilder.setLength(0);
 				}
+				writer.append(line).append('\n');
 			} else { // Inside param section
+				// We gobble the params up, will write them out all at once when the entire header is over.
 				if (!line.contains("=")) {
 					insideParamSection = false;
+					// Dump the header we have collected so far
 					if (title == null) {
-						// We found missing title!
-						invalidTitleId++;
-						line = "TITLE=missing title" + getTitleDtaIdentification(-1, prefix, charge, invalidTitleId) + "\n" + line;
+						title = "TITLE=missing title";
 					}
-				} else if (title == null && line.startsWith("TITLE=")) {
-					title = line;
-					if (!VALID_TITLE.matcher(line).find()) {
-						// We found invalid title!
+					writer.append(title);
+					if (!VALID_TITLE.matcher(title).find()) {
+						// Title is invalid
 						invalidTitleId++;
-						line += getTitleDtaIdentification(-1, prefix, charge, invalidTitleId);
+						writer.append(getTitleDtaIdentification(scans, prefix, charge, invalidTitleId));
 					}
-				} else if (charge == 0 && line.startsWith("CHARGE=")) {
-					charge = parseCharge(line);
+					writer.append('\n');
+					writer.append(headerBuilder.toString());
+					writer.append(line).append('\n');
+				} else {
+					if (title == null && line.startsWith("TITLE=")) {
+						title = line;
+						line = null;
+					} else if (charge == 0 && line.startsWith("CHARGE=")) {
+						charge = parseCharge(line);
+					} else if (scans == -1 && line.startsWith("SCANS=")) {
+						scans = parseScans(line);
+					}
+					if (line != null) {
+						headerBuilder.append(line).append('\n');
+					}
 				}
 			}
-			writer.append(line).append('\n');
 		}
 		writer.flush();
 	}
 
 	static int parseCharge(final String line) {
-		final Matcher m = CHARGE.matcher(line);
-		if (m.find()) {
-			return Integer.parseInt(m.group(1).intern());
+		final Matcher matcher = CHARGE.matcher(line);
+		if (matcher.find()) {
+			return Integer.parseInt(matcher.group(1).intern());
 		}
 		return 0;
+	}
+
+	static int parseScans(final String line) {
+		final Matcher matcher = SCANS.matcher(line);
+		if (matcher.find()) {
+			return Integer.parseInt(matcher.group(1).intern());
+		}
+		return -1;
 	}
 
 	static String getTitleDtaIdentification(final int runNumber, final String prefix, final int charge, final int uniqueId) {
