@@ -81,7 +81,7 @@ public class GridWorkPacket {
 	}
 
 	public void setParameters(final List<String> parameters) {
-		this.parameters = new ArrayList<String>(parameters);
+		this.parameters = parameters == null ? null : new ArrayList<String>(parameters);
 	}
 
 	public void setListener(final GridWorkPacketStateListener listener) {
