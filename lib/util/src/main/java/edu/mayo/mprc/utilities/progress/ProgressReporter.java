@@ -1,26 +1,20 @@
 package edu.mayo.mprc.utilities.progress;
 
 /**
- * Interface allowing the user to report progress of a {@link edu.mayo.mprc.daemon.Worker}.
+ * Interface allowing the user to report progress of a daemon worker.
  * <p/>
  * Use this interface separately when you only want to give your method the
  * progress reporting capabilities, nothing else.
+ * <p/>
+ * You may want to use {@link UserProgressReporter} if you are taking care of the big reports
+ * (work started/succeeded/failed) and you only want the implementer to send additional information.
  */
-public interface ProgressReporter {
+public interface ProgressReporter extends UserProgressReporter {
 	/**
 	 * Reports that the worker has started processing. This is implemented so e.g. a worker cache can
 	 * postpone this report until it hears from its child worker.
 	 */
 	void reportStart();
-
-	/**
-	 * Reports progress of the worker. The progress can be anything serializable, for instance an Integer containing
-	 * amount of percent. The grid engine daemon implementation for instance sends back the assigned grid engine number as a specific
-	 * progress report.
-	 *
-	 * @param progressInfo Information about the progress, e.g. an Integer containing the amount of percent done.
-	 */
-	void reportProgress(ProgressInfo progressInfo);
 
 	/**
 	 * Reports success. There must be no more reports after this one.

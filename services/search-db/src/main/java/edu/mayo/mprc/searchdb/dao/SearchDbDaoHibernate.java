@@ -8,7 +8,7 @@ import edu.mayo.mprc.fastadb.ProteinSequence;
 import edu.mayo.mprc.swift.db.SwiftDao;
 import edu.mayo.mprc.swift.dbmapping.ReportData;
 import edu.mayo.mprc.utilities.progress.PercentDoneReporter;
-import edu.mayo.mprc.utilities.progress.ProgressReporter;
+import edu.mayo.mprc.utilities.progress.UserProgressReporter;
 import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.Restrictions;
 
@@ -300,7 +300,7 @@ public final class SearchDbDaoHibernate extends DaoBase implements RuntimeInitia
 	}
 
 	@Override
-	public Analysis addAnalysis(final Analysis analysis, final ReportData reportData, ProgressReporter reporter) {
+	public Analysis addAnalysis(final Analysis analysis, final ReportData reportData, UserProgressReporter reporter) {
 
 		if (analysis.getId() == null) {
 			final BiologicalSampleList originalList = analysis.getBiologicalSamples();

@@ -6,6 +6,7 @@ import edu.mayo.mprc.utilities.BufferedEofReader;
 import edu.mayo.mprc.utilities.FileUtilities;
 import edu.mayo.mprc.utilities.progress.PercentDoneReporter;
 import edu.mayo.mprc.utilities.progress.ProgressReporter;
+import edu.mayo.mprc.utilities.progress.UserProgressReporter;
 
 import java.io.*;
 import java.util.regex.Pattern;
@@ -129,7 +130,7 @@ public abstract class ScaffoldSpectraReader {
 	 * @param scaffoldSpectraFile Spectrum file to load.
 	 * @param scaffoldVersion     {@link #scaffoldVersion}
 	 */
-	public void load(final File scaffoldSpectraFile, final String scaffoldVersion, final ProgressReporter reporter) {
+	public void load(final File scaffoldSpectraFile, final String scaffoldVersion, final UserProgressReporter reporter) {
 		dataSourceName = scaffoldSpectraFile.getAbsolutePath();
 		this.scaffoldVersion = scaffoldVersion;
 		try {
@@ -161,7 +162,7 @@ public abstract class ScaffoldSpectraReader {
 		}
 	}
 
-	private void processStream(final InputStream stream, final ProgressReporter reporter) throws IOException {
+	private void processStream(final InputStream stream, final UserProgressReporter reporter) throws IOException {
 		final Reader reader;
 		if (totalBytesToRead > 0 && reporter != null) {
 			countingInputStream = new CountingInputStream(stream);

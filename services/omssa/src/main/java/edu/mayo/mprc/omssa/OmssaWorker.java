@@ -15,7 +15,7 @@ import edu.mayo.mprc.utilities.FileUtilities;
 import edu.mayo.mprc.utilities.GZipUtilities;
 import edu.mayo.mprc.utilities.ProcessCaller;
 import edu.mayo.mprc.utilities.StreamRegExMatcher;
-import edu.mayo.mprc.utilities.progress.ProgressReporter;
+import edu.mayo.mprc.utilities.progress.UserProgressReporter;
 import org.apache.log4j.Logger;
 
 import java.io.File;
@@ -30,7 +30,7 @@ import java.util.regex.Pattern;
  * params file at ${MGF_PATH}, ${DB[_PATH]:...}, and ${OUT_PATH}.  These placeholder MUST be in place in the correct positions
  * for a successful search to complete.
  */
-public final class OmssaWorker implements Worker {
+public final class OmssaWorker extends WorkeßrBase {
 	private static final Logger LOGGER = Logger.getLogger(OmssaWorker.class);
 	public static final String TYPE = "omssa";
 	public static final String NAME = "Omssa";
@@ -45,18 +45,8 @@ public final class OmssaWorker implements Worker {
 		this.omssaUserModsWriter = omssaUserModsWriter;
 	}
 
-	public void processRequest(final WorkPacket workPacket, final ProgressReporter progressReporter) {
-		try {
-			progressReporter.reportStart();
-			process(workPacket);
-			workPacket.synchronizeFileTokensOnReceiver();
-			progressReporter.reportSuccess();
-		} catch (Exception t) {
-			progressReporter.reportFailure(t);
-		}
-	}
-
-	private void process(final WorkPacket workPacket) {
+	@Override
+	public void process(final WorkPacket workPacket, final UserProgressReporter progressReporter) {
 		final OmssaWorkPacket omssaWorkPacket = (OmssaWorkPacket) workPacket;
 		LOGGER.info("Starting OMSSA search: " + omssaWorkPacket.toString());
 

@@ -7,10 +7,11 @@ import edu.mayo.mprc.config.ui.ServiceUiFactory;
 import edu.mayo.mprc.config.ui.UiBuilder;
 import edu.mayo.mprc.daemon.WorkPacket;
 import edu.mayo.mprc.daemon.Worker;
+import edu.mayo.mprc.daemon.WorkerBase;
 import edu.mayo.mprc.daemon.WorkerFactoryBase;
 import edu.mayo.mprc.daemon.exception.DaemonException;
 import edu.mayo.mprc.utilities.ProcessCaller;
-import edu.mayo.mprc.utilities.progress.ProgressReporter;
+import edu.mayo.mprc.utilities.progress.UserProgressReporter;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -19,23 +20,13 @@ import java.util.Map;
 /**
  * Simple worker that accepts a string with grid engine id and sends back a String with results of the qstat call.
  */
-public final class QstatDaemonWorker implements Worker {
+public final class QstatDaemonWorker extends WorkerBase {
 	public static final String TYPE = "qstat";
 	public static final String NAME = "Qstat";
 	public static final String DESC = "A trivial daemon running <tt>qstat</tt> command to retrieve status of a job running in Sun Grid Engine. This is used only in the web interface and is provided for convenience only. The module has to be enabled on a computer that is Sun Grid Engine submit host.";
 
-	public void processRequest(final WorkPacket workPacket, final ProgressReporter progressReporter) {
-		try {
-			progressReporter.reportStart();
-			process(workPacket, progressReporter);
-			workPacket.synchronizeFileTokensOnReceiver();
-			progressReporter.reportSuccess();
-		} catch (Exception t) {
-			progressReporter.reportFailure(t);
-		}
-	}
-
-	private void process(final WorkPacket workPacket, final ProgressReporter reporter) {
+	@Override
+	public void process(final WorkPacket workPacket, final UserProgressReporter reporter) {
 		if (!(workPacket instanceof QstatWorkPacket)) {
 			throw new DaemonException("Unknown input format: " + workPacket.getClass().getName() + " expected string");
 		}

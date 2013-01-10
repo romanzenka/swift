@@ -1,7 +1,8 @@
 package edu.mayo.mprc.fastadb;
 
 import edu.mayo.mprc.dbcurator.model.Curation;
-import edu.mayo.mprc.utilities.progress.ProgressReporter;
+import edu.mayo.mprc.utilities.progress.PercentDone;
+import edu.mayo.mprc.utilities.progress.UserProgressReporter;
 
 /**
  * Can load .FASTA file into a database for easy lookups of protein sequences.
@@ -65,8 +66,8 @@ public interface FastaDbDao {
 	 * Add data from a given FASTA file into the database.
 	 *
 	 * @param database         Database to load data for.
-	 * @param progressReporter The {@link edu.mayo.mprc.utilities.progress.PercentDone} message will be set periodically using {@link ProgressReporter#reportProgress}. If null, no progress is reported.
+	 * @param progressReporter The {@link PercentDone} message will be set periodically using {@link UserProgressReporter#reportProgress}. If null, no progress is reported.
 	 */
-	void addFastaDatabase(Curation database, ProgressReporter progressReporter);
+	void addFastaDatabase(Curation database, UserProgressReporter progressReporter);
 
 }

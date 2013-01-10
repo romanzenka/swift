@@ -33,7 +33,7 @@ public final class PercentDoneReporter {
 	/**
 	 * Where to report progress.
 	 */
-	private ProgressReporter progressReporter;
+	private UserProgressReporter progressReporter;
 
 	/**
 	 * Message to prepend the percent report with.
@@ -41,12 +41,12 @@ public final class PercentDoneReporter {
 	private String progressMessage;
 
 	/**
-	 * See {@link #PercentDoneReporter(ProgressReporter, String, long)}. Will report once a second.
+	 * See {@link #PercentDoneReporter(UserProgressReporter, String, long)}. Will report once a second.
 	 *
 	 * @param progressReporter Reporter to report to.
 	 * @param progressMessage  Message to prepend each report with in the log.
 	 */
-	public PercentDoneReporter(final ProgressReporter progressReporter, final String progressMessage) {
+	public PercentDoneReporter(final UserProgressReporter progressReporter, final String progressMessage) {
 		this(progressReporter, progressMessage, ONE_SECOND);
 	}
 
@@ -57,7 +57,7 @@ public final class PercentDoneReporter {
 	 * @param progressMessage  Message to prepend each report with in the log.
 	 * @param reportEachMillis How far are the reports to be spaced (1000=report once a second).
 	 */
-	public PercentDoneReporter(final ProgressReporter progressReporter, final String progressMessage, final long reportEachMillis) {
+	public PercentDoneReporter(final UserProgressReporter progressReporter, final String progressMessage, final long reportEachMillis) {
 		// Make sure we report instantly the first time
 		lastReportTimestamp = System.currentTimeMillis() - reportEachMillis;
 

@@ -7,32 +7,22 @@ import edu.mayo.mprc.config.ui.ServiceUiFactory;
 import edu.mayo.mprc.config.ui.UiBuilder;
 import edu.mayo.mprc.daemon.WorkPacket;
 import edu.mayo.mprc.daemon.Worker;
+import edu.mayo.mprc.daemon.WorkerBase;
 import edu.mayo.mprc.daemon.WorkerFactoryBase;
 import edu.mayo.mprc.io.mgf.MgfCleanup;
-import edu.mayo.mprc.utilities.progress.ProgressReporter;
+import edu.mayo.mprc.utilities.progress.UserProgressReporter;
 
 import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 
-public final class MgfToMgfWorker implements Worker {
+public final class MgfToMgfWorker extends WorkerBase {
 
 	public static final String TYPE = "mgf2mgf";
 	public static final String NAME = "Mgf Cleanup";
 	public static final String DESC = "Swift expects <tt>.mgf</tt> headers to be in certain format (indicate the spectrum), so the results of the search engines can be more easily pieced together. If you want to search .mgf files directly, the cleaner has to check that the headers are okay and modify them if they are not. Without this module, Swift cannot process <tt>.mgf</tt> files.";
 
-	public void processRequest(final WorkPacket workPacket, final ProgressReporter progressReporter) {
-		try {
-			progressReporter.reportStart();
-			process(workPacket, progressReporter);
-			workPacket.synchronizeFileTokensOnReceiver();
-			progressReporter.reportSuccess();
-		} catch (Exception t) {
-			progressReporter.reportFailure(t);
-		}
-	}
-
-	private void process(final WorkPacket wp, final ProgressReporter reporter) {
+	public void process(final WorkPacket wp, final UserProgressReporter reporter) {
 		final MgfTitleCleanupWorkPacket workPacket = (MgfTitleCleanupWorkPacket) wp;
 		final File mgfFile = workPacket.getMgfToCleanup();
 		final File cleanedMgf = workPacket.getCleanedMgf();

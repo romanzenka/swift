@@ -8,11 +8,12 @@ import edu.mayo.mprc.config.ui.ServiceUiFactory;
 import edu.mayo.mprc.config.ui.UiBuilder;
 import edu.mayo.mprc.daemon.WorkPacket;
 import edu.mayo.mprc.daemon.Worker;
+import edu.mayo.mprc.daemon.WorkerBase;
 import edu.mayo.mprc.daemon.WorkerFactoryBase;
 import edu.mayo.mprc.daemon.exception.DaemonException;
 import edu.mayo.mprc.utilities.FileUtilities;
 import edu.mayo.mprc.utilities.ProcessCaller;
-import edu.mayo.mprc.utilities.progress.ProgressReporter;
+import edu.mayo.mprc.utilities.progress.UserProgressReporter;
 import org.apache.log4j.Logger;
 
 import java.io.File;
@@ -21,7 +22,7 @@ import java.util.*;
 /**
  * Runs scaffold search directly (without grid engine).
  */
-public final class ScaffoldWorker implements Worker {
+public final class ScaffoldWorker extends WorkerBase {
 	private static final Logger LOGGER = Logger.getLogger(ScaffoldWorker.class);
 	private static final String SCAFFOLD_DIR = "scaffoldDir";
 	private static final String SCAFFOLD_JAVA_VM_PATH = "scaffoldJavaVmPath";
@@ -71,18 +72,8 @@ public final class ScaffoldWorker implements Worker {
 		this.memoryLimit = memoryLimit;
 	}
 
-	public void processRequest(final WorkPacket workPacket, final ProgressReporter progressReporter) {
-		try {
-			progressReporter.reportStart();
-			process(workPacket, progressReporter);
-			workPacket.synchronizeFileTokensOnReceiver();
-			progressReporter.reportSuccess();
-		} catch (Exception t) {
-			progressReporter.reportFailure(t);
-		}
-	}
-
-	private void process(final WorkPacket workPacket, final ProgressReporter progressReporter) {
+	@Override
+	public void process(final WorkPacket workPacket, final UserProgressReporter progressReporter) {
 		if (args == null) {
 			initialize();
 		}

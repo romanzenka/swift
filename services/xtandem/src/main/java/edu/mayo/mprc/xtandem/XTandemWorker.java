@@ -11,12 +11,13 @@ import edu.mayo.mprc.config.ui.UiBuilder;
 import edu.mayo.mprc.config.ui.UiResponse;
 import edu.mayo.mprc.daemon.WorkPacket;
 import edu.mayo.mprc.daemon.Worker;
+import edu.mayo.mprc.daemon.WorkerBase;
 import edu.mayo.mprc.daemon.WorkerFactoryBase;
 import edu.mayo.mprc.daemon.exception.DaemonException;
 import edu.mayo.mprc.utilities.FileUtilities;
 import edu.mayo.mprc.utilities.ProcessCaller;
 import edu.mayo.mprc.utilities.StreamRegExMatcher;
-import edu.mayo.mprc.utilities.progress.ProgressReporter;
+import edu.mayo.mprc.utilities.progress.UserProgressReporter;
 import org.apache.log4j.Logger;
 
 import java.io.File;
@@ -25,7 +26,7 @@ import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public final class XTandemWorker implements Worker {
+public final class XTandemWorker extends WorkerBase {
 	private static final Logger LOGGER = Logger.getLogger(XTandemWorker.class);
 	public static final String TYPE = "tandem";
 	public static final String NAME = "X!Tandem";
@@ -39,17 +40,8 @@ public final class XTandemWorker implements Worker {
 		this.tandemExecutable = tandemExecutable;
 	}
 
-	public File getTandemExecutable() {
-		return tandemExecutable;
-	}
-
-	public void setTandemExecutable(final File tandemExecutable) {
-		this.tandemExecutable = tandemExecutable;
-	}
-
-	public void processRequest(final WorkPacket workPacket, final ProgressReporter progressReporter) {
-		progressReporter.reportStart();
-
+	@Override
+	public void process(final WorkPacket workPacket, final UserProgressReporter progressReporter) {
 		if (!(workPacket instanceof XTandemWorkPacket)) {
 			throw new DaemonException("Unexpected packet type " + workPacket.getClass().getName() + ", expected " + XTandemWorkPacket.class.getName());
 		}
@@ -74,14 +66,9 @@ public final class XTandemWorker implements Worker {
 			}
 
 			if (processCaller.getExitValue() != 0) {
-				progressReporter.reportFailure(new MprcException("Execution of tandem search engine failed. Error: " + processCaller.getFailedCallDescription()));
-			} else {
-				workPacket.synchronizeFileTokensOnReceiver();
-				progressReporter.reportSuccess();
-				LOGGER.info("Tandem search, " + packet.toString() + ", has been successfully completed.");
+				throw new MprcException("Execution of tandem search engine failed. Error: " + processCaller.getFailedCallDescription());
 			}
-		} catch (Exception t) {
-			progressReporter.reportFailure(t);
+			LOGGER.info("Tandem search, " + packet.toString() + ", has been successfully completed.");
 		} finally {
 			cleanUp(packet);
 		}

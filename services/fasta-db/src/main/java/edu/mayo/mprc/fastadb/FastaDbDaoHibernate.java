@@ -8,7 +8,7 @@ import edu.mayo.mprc.dbcurator.model.Curation;
 import edu.mayo.mprc.fasta.FASTAInputStream;
 import edu.mayo.mprc.utilities.FileUtilities;
 import edu.mayo.mprc.utilities.progress.PercentDoneReporter;
-import edu.mayo.mprc.utilities.progress.ProgressReporter;
+import edu.mayo.mprc.utilities.progress.UserProgressReporter;
 import org.apache.log4j.Logger;
 import org.hibernate.Query;
 import org.hibernate.StatelessSession;
@@ -95,7 +95,7 @@ public final class FastaDbDaoHibernate extends DaoBase implements FastaDbDao {
 	 * @param database Database to load data for.
 	 */
 	@Override
-	public void addFastaDatabase(final Curation database, @Nullable final ProgressReporter progressReporter) {
+	public void addFastaDatabase(final Curation database, @Nullable final UserProgressReporter progressReporter) {
 		final StatelessSession session = getDatabasePlaceholder().getSessionFactory().openStatelessSession();
 		final Query entryCount = session.createQuery("select count(*) from ProteinDatabaseEntry p where p.database=:database").setEntity("database", database);
 		if (0L != ((Long) entryCount.uniqueResult()).longValue()) {

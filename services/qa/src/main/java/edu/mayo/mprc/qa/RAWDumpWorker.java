@@ -9,10 +9,11 @@ import edu.mayo.mprc.config.ui.UiBuilder;
 import edu.mayo.mprc.config.ui.WrapperScriptSwitcher;
 import edu.mayo.mprc.daemon.WorkPacket;
 import edu.mayo.mprc.daemon.Worker;
+import edu.mayo.mprc.daemon.WorkerBase;
 import edu.mayo.mprc.daemon.WorkerFactoryBase;
 import edu.mayo.mprc.utilities.FileUtilities;
 import edu.mayo.mprc.utilities.ProcessCaller;
-import edu.mayo.mprc.utilities.progress.ProgressReporter;
+import edu.mayo.mprc.utilities.progress.UserProgressReporter;
 import org.apache.log4j.Logger;
 
 import java.io.BufferedWriter;
@@ -24,7 +25,7 @@ import java.util.*;
 /**
  * Worker extracts data from given raw file.
  */
-public final class RAWDumpWorker implements Worker {
+public final class RAWDumpWorker extends WorkerBase {
 
 	private static final Logger LOGGER = Logger.getLogger(RAWDumpWorker.class);
 
@@ -58,59 +59,57 @@ public final class RAWDumpWorker implements Worker {
 	}
 
 	@Override
-	public void processRequest(final WorkPacket workPacket, final ProgressReporter progressReporter) {
+	public void process(final WorkPacket workPacket, UserProgressReporter progressReporter) {
 		try {
-			progressReporter.reportStart();
-			processLocal(workPacket);
-			workPacket.synchronizeFileTokensOnReceiver();
-			progressReporter.reportSuccess();
-		} catch (Exception t) {
-			progressReporter.reportFailure(t);
+			final RAWDumpWorkPacket rawDumpWorkPacket = (RAWDumpWorkPacket) workPacket;
+
+			final File rawInfo = rawDumpWorkPacket.getRawInfoFile();
+			final File rawSpectra = rawDumpWorkPacket.getRawSpectraFile();
+			final File rawFile = rawDumpWorkPacket.getRawFile();
+			final File chromatogramFile = rawDumpWorkPacket.getChromatogramFile();
+			final File tuneFile = rawDumpWorkPacket.getTuneMethodFile();
+			final File instrumentMethodFile = rawDumpWorkPacket.getInstrumentMethodFile();
+			final File sampleInformationFile = rawDumpWorkPacket.getSampleInformationFile();
+			final File errorLogFile = rawDumpWorkPacket.getErrorLogFile();
+
+			FileUtilities.ensureFolderExists(rawInfo.getParentFile());
+			FileUtilities.ensureFolderExists(rawSpectra.getParentFile());
+
+			File shortenedRawFile = null;
+			if (rawFile.getAbsolutePath().length() > MAX_UNSHORTENED_PATH_LENGTH) {
+				try {
+					shortenedRawFile = FileUtilities.shortenFilePath(rawFile);
+				} catch (Exception ignore) {
+					// SWALLOWED: Failed shortening does not necessarily mean a problem
+					shortenedRawFile = null;
+				}
+			}
+
+			final List<String> commandLine = getCommandLine(shortenedRawFile != null ? shortenedRawFile : rawFile,
+					rawInfo, rawSpectra, chromatogramFile, tuneFile, instrumentMethodFile, sampleInformationFile, errorLogFile);
+			final ProcessCaller caller = process(commandLine, true/*windows executable*/, wrapperScript, windowsExecWrapperScript);
+
+			if (shortenedRawFile != null) {
+				FileUtilities.cleanupShortenedPath(shortenedRawFile);
+			}
+
+			if (!isFileOk(rawInfo)) {
+				throw new MprcException("Raw dump has failed to create raw info file: " + rawInfo.getAbsolutePath() + "\n" + caller.getFailedCallDescription());
+			}
+			if (!isFileOk(rawSpectra)) {
+				throw new MprcException("Raw dump has failed to create raw spectra file: " + rawSpectra.getAbsolutePath() + "\n" + caller.getFailedCallDescription());
+			}
 		} finally {
 			FileUtilities.deleteNow(tempParamFile);
 		}
 	}
 
-	protected void processLocal(final WorkPacket workPacket) throws IOException {
-		final RAWDumpWorkPacket rawDumpWorkPacket = (RAWDumpWorkPacket) workPacket;
-
-		final File rawInfo = rawDumpWorkPacket.getRawInfoFile();
-		final File rawSpectra = rawDumpWorkPacket.getRawSpectraFile();
-		final File rawFile = rawDumpWorkPacket.getRawFile();
-		final File chromatogramFile = rawDumpWorkPacket.getChromatogramFile();
-		final File tuneFile = rawDumpWorkPacket.getTuneMethodFile();
-		final File instrumentMethodFile = rawDumpWorkPacket.getInstrumentMethodFile();
-		final File sampleInformationFile = rawDumpWorkPacket.getSampleInformationFile();
-		final File errorLogFile = rawDumpWorkPacket.getErrorLogFile();
-
-		FileUtilities.ensureFolderExists(rawInfo.getParentFile());
-		FileUtilities.ensureFolderExists(rawSpectra.getParentFile());
-
-		File shortenedRawFile = null;
-		if (rawFile.getAbsolutePath().length() > MAX_UNSHORTENED_PATH_LENGTH) {
-			try {
-				shortenedRawFile = FileUtilities.shortenFilePath(rawFile);
-			} catch (Exception ignore) {
-				// SWALLOWED: Failed shortening does not necessarily mean a problem
-				shortenedRawFile = null;
-			}
-		}
-
-		final List<String> commandLine = getCommandLine(shortenedRawFile != null ? shortenedRawFile : rawFile,
-				rawInfo, rawSpectra, chromatogramFile, tuneFile, instrumentMethodFile, sampleInformationFile, errorLogFile);
-		final ProcessCaller caller = process(commandLine, true/*windows executable*/, wrapperScript, windowsExecWrapperScript);
-
-		if (shortenedRawFile != null) {
-			FileUtilities.cleanupShortenedPath(shortenedRawFile);
-		}
-
-		if (!rawInfo.exists() || rawInfo.length() == 0 || !rawSpectra.exists() || rawSpectra.length() == 0) {
-			throw new MprcException("Raw dump has failed to create output files, " + rawInfo.getAbsolutePath() + " and " + rawSpectra.getAbsolutePath() + ".\n" + caller.getFailedCallDescription());
-		}
+	private static boolean isFileOk(final File file) {
+		return file.exists() && file.isFile() && file.length() > 0;
 	}
 
 	private List<String> getCommandLine(final File rawFile, final File rawInfo, final File rawSpectra, final File chromatogramFile,
-	                                    final File tuneFile, final File instrumentMethodFile, final File sampleInformationFile, final File errorLogFile) throws IOException {
+	                                    final File tuneFile, final File instrumentMethodFile, final File sampleInformationFile, final File errorLogFile) {
 
 		createParamFile(rawFile, rawInfo, rawSpectra, chromatogramFile, tuneFile, instrumentMethodFile, sampleInformationFile, errorLogFile);
 
@@ -123,8 +122,12 @@ public final class RAWDumpWorker implements Worker {
 	}
 
 	private void createParamFile(final File rawFile, final File rawInfo, final File rawSpectra, final File chromatogramFile,
-	                             final File tuneFile, final File instrumentMethodFile, final File sampleInformationFile, final File errorLogFile) throws IOException {
-		tempParamFile = File.createTempFile("inputParamFile", null);
+	                             final File tuneFile, final File instrumentMethodFile, final File sampleInformationFile, final File errorLogFile) {
+		try {
+			tempParamFile = File.createTempFile("inputParamFile", null);
+		} catch (IOException e) {
+			throw new MprcException("Could not create temporary file for RawDump parameters", e);
+		}
 
 		LOGGER.info("Creating parameter file: " + tempParamFile.getAbsolutePath() + ".");
 

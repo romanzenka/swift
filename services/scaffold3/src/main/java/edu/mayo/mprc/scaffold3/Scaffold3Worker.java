@@ -9,13 +9,14 @@ import edu.mayo.mprc.config.ui.ServiceUiFactory;
 import edu.mayo.mprc.config.ui.UiBuilder;
 import edu.mayo.mprc.daemon.WorkPacket;
 import edu.mayo.mprc.daemon.Worker;
+import edu.mayo.mprc.daemon.WorkerBase;
 import edu.mayo.mprc.daemon.WorkerFactoryBase;
 import edu.mayo.mprc.daemon.exception.DaemonException;
 import edu.mayo.mprc.scaffold.ScaffoldLogMonitor;
 import edu.mayo.mprc.scaffoldparser.spectra.ScaffoldSpectraVersion;
 import edu.mayo.mprc.utilities.FileUtilities;
 import edu.mayo.mprc.utilities.ProcessCaller;
-import edu.mayo.mprc.utilities.progress.ProgressReporter;
+import edu.mayo.mprc.utilities.progress.UserProgressReporter;
 import org.apache.log4j.Logger;
 
 import javax.xml.transform.OutputKeys;
@@ -25,7 +26,7 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.TreeMap;
 
-public final class Scaffold3Worker implements Worker {
+public final class Scaffold3Worker extends WorkerBase {
 	private static final Logger LOGGER = Logger.getLogger(Scaffold3Worker.class);
 	private static final String SCAFFOLD_BATCH_SCRIPT = "scaffoldBatchScript";
 	public static final String TYPE = "scaffold3";
@@ -39,20 +40,13 @@ public final class Scaffold3Worker implements Worker {
 	}
 
 	@Override
-	public final void processRequest(final WorkPacket workPacket, final ProgressReporter progressReporter) {
-		try {
-			progressReporter.reportStart();
-			if (workPacket instanceof Scaffold3WorkPacket) {
-				processSearch((Scaffold3WorkPacket) workPacket, progressReporter);
-			} else if (workPacket instanceof Scaffold3SpectrumExportWorkPacket) {
-				processSpectrumExport((Scaffold3SpectrumExportWorkPacket) workPacket, progressReporter);
-			} else {
-				throw new DaemonException("Unexpected packet type " + workPacket.getClass().getName() + ", expected " + Scaffold3WorkPacket.class.getName() + " or " + Scaffold3SpectrumExportWorkPacket.class.getName());
-			}
-			workPacket.synchronizeFileTokensOnReceiver();
-			progressReporter.reportSuccess();
-		} catch (Exception t) {
-			progressReporter.reportFailure(t);
+	public void process(WorkPacket workPacket, UserProgressReporter progressReporter) {
+		if (workPacket instanceof Scaffold3WorkPacket) {
+			processSearch((Scaffold3WorkPacket) workPacket, progressReporter);
+		} else if (workPacket instanceof Scaffold3SpectrumExportWorkPacket) {
+			processSpectrumExport((Scaffold3SpectrumExportWorkPacket) workPacket, progressReporter);
+		} else {
+			throw new DaemonException("Unexpected packet type " + workPacket.getClass().getName() + ", expected " + Scaffold3WorkPacket.class.getName() + " or " + Scaffold3SpectrumExportWorkPacket.class.getName());
 		}
 	}
 
@@ -62,7 +56,7 @@ public final class Scaffold3Worker implements Worker {
 	 * @param scaffoldWorkPacket Work to do.
 	 * @param progressReporter   Where to report progress.
 	 */
-	private void processSearch(final Scaffold3WorkPacket scaffoldWorkPacket, final ProgressReporter progressReporter) {
+	private void processSearch(final Scaffold3WorkPacket scaffoldWorkPacket, final UserProgressReporter progressReporter) {
 		LOGGER.debug("Scaffold 3 search processing request");
 
 		final File outputFolder = scaffoldWorkPacket.getOutputFolder();
@@ -70,7 +64,7 @@ public final class Scaffold3Worker implements Worker {
 		FileUtilities.ensureFolderExists(outputFolder);
 
 		final File scaffoldWorkFolder = getScaffoldBatchScript().getParentFile();
-		final File scafmlFile = createScafmlFile(scaffoldWorkPacket, outputFolder);
+		final File scafmlFile = createScafmlFile(scaffoldWorkPacket);
 
 		runScaffold(progressReporter, scafmlFile, scaffoldWorkFolder, outputFolder);
 	}
@@ -81,7 +75,7 @@ public final class Scaffold3Worker implements Worker {
 	 * @param scaffoldWorkPacket Work to do.
 	 * @param progressReporter   Where to report progress.
 	 */
-	private void processSpectrumExport(final Scaffold3SpectrumExportWorkPacket scaffoldWorkPacket, final ProgressReporter progressReporter) {
+	private void processSpectrumExport(final Scaffold3SpectrumExportWorkPacket scaffoldWorkPacket, final UserProgressReporter progressReporter) {
 		LOGGER.debug("Scaffold 3 spectrum export request");
 
 		final File result = scaffoldWorkPacket.getSpectrumExportFile();
@@ -129,7 +123,7 @@ public final class Scaffold3Worker implements Worker {
 	 * @param scaffoldWorkFolder Where should Scaffold run (usually the Scaffold install folder)
 	 * @param outputFolder       Where do the Scaffold outputs go.
 	 */
-	private void runScaffold(final ProgressReporter progressReporter, final File scafmlFile, final File scaffoldWorkFolder, final File outputFolder) {
+	private void runScaffold(final UserProgressReporter progressReporter, final File scafmlFile, final File scaffoldWorkFolder, final File outputFolder) {
 		final ProcessBuilder processBuilder = new ProcessBuilder(getScaffoldBatchScript().getAbsolutePath(), scafmlFile.getAbsolutePath())
 				.directory(scaffoldWorkFolder);
 
@@ -148,11 +142,10 @@ public final class Scaffold3Worker implements Worker {
 	/**
 	 * Make a scafml file for running Scaffold search.
 	 *
-	 * @param workPacket   Description of work to do.
-	 * @param outputFolder Where should the file be created.
+	 * @param workPacket Description of work to do.
 	 * @return Created scafml file.
 	 */
-	private File createScafmlFile(final Scaffold3WorkPacket workPacket, final File outputFolder) {
+	private File createScafmlFile(final Scaffold3WorkPacket workPacket) {
 		// Create the .scafml file
 		final String scafmlDocument = workPacket.getScafmlFile().getDocument();
 		final File scafmlFile = workPacket.getScafmlFileLocation();

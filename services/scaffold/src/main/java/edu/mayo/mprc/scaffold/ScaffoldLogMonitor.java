@@ -2,15 +2,15 @@ package edu.mayo.mprc.scaffold;
 
 import edu.mayo.mprc.utilities.LogMonitor;
 import edu.mayo.mprc.utilities.progress.PercentDone;
-import edu.mayo.mprc.utilities.progress.ProgressReporter;
+import edu.mayo.mprc.utilities.progress.UserProgressReporter;
 
 public class ScaffoldLogMonitor implements LogMonitor {
 	private static final int TIME_BETWEEN_UPDATES_MS = 1000;
-	private final ProgressReporter progressReporter;
+	private final UserProgressReporter progressReporter;
 	private long lastTimeMs = System.currentTimeMillis();
 
 
-	public ScaffoldLogMonitor(final ProgressReporter progressReporter) {
+	public ScaffoldLogMonitor(final UserProgressReporter progressReporter) {
 		this.progressReporter = progressReporter;
 	}
 

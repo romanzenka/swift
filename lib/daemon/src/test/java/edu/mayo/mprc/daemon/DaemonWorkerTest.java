@@ -1,7 +1,7 @@
 package edu.mayo.mprc.daemon;
 
 import edu.mayo.mprc.daemon.exception.DaemonException;
-import edu.mayo.mprc.utilities.progress.ProgressReporter;
+import edu.mayo.mprc.utilities.progress.UserProgressReporter;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
@@ -47,21 +47,10 @@ public final class DaemonWorkerTest {
 	}
 
 	private static Worker createSimpleWorker() {
-		return new Worker() {
+		return new WorkerBase() {
 			private AtomicInteger concurrentRequests = new AtomicInteger(0);
 
-			public void processRequest(final WorkPacket workPacket, final ProgressReporter progressReporter) {
-				try {
-					progressReporter.reportStart();
-					process(workPacket);
-					workPacket.synchronizeFileTokensOnReceiver();
-					progressReporter.reportSuccess();
-				} catch (Exception t) {
-					progressReporter.reportFailure(t);
-				}
-			}
-
-			private void process(final WorkPacket wp) {
+			public void process(final WorkPacket wp, final UserProgressReporter progressReporter) {
 				Assert.assertEquals(concurrentRequests.incrementAndGet(), 1, "The amount of requests must start at 1. The worker calls are not serialized.");
 				try {
 					Thread.sleep(1);

@@ -9,13 +9,14 @@ import edu.mayo.mprc.config.ui.ServiceUiFactory;
 import edu.mayo.mprc.config.ui.UiBuilder;
 import edu.mayo.mprc.daemon.WorkPacket;
 import edu.mayo.mprc.daemon.Worker;
+import edu.mayo.mprc.daemon.WorkerBase;
 import edu.mayo.mprc.daemon.WorkerFactoryBase;
 import edu.mayo.mprc.daemon.exception.DaemonException;
 import edu.mayo.mprc.utilities.FilePathShortener;
 import edu.mayo.mprc.utilities.FileUtilities;
 import edu.mayo.mprc.utilities.ProcessCaller;
 import edu.mayo.mprc.utilities.exceptions.ExceptionUtilities;
-import edu.mayo.mprc.utilities.progress.ProgressReporter;
+import edu.mayo.mprc.utilities.progress.UserProgressReporter;
 import org.apache.log4j.Logger;
 
 import java.io.File;
@@ -29,7 +30,7 @@ import java.util.TreeMap;
  * Calls <tt>msaccess.exe</tt> to determine whether peak picking should be enabled.
  * Then calls <tt>msconvert.exe</tt>.
  */
-public final class MsconvertWorker implements Worker {
+public final class MsconvertWorker extends WorkerBase {
 	private static final Logger LOGGER = Logger.getLogger(MsconvertWorker.class);
 	public static final String TYPE = "msconvert";
 	public static final String NAME = "Msconvert";
@@ -52,19 +53,8 @@ public final class MsconvertWorker implements Worker {
 	// Format in which we expect the .mgf titles to be done
 	private static final String TITLE_FILTER = "titleMaker %FILENAME% scan <ScanNumber> <ScanNumber> (%FILENAME%.<ScanNumber>.<ScanNumber>.<ChargeState>.dta)";
 
-
-	public void processRequest(final WorkPacket workPacket, final ProgressReporter progressReporter) {
-		try {
-			progressReporter.reportStart();
-			process(workPacket);
-			workPacket.synchronizeFileTokensOnReceiver();
-			progressReporter.reportSuccess();
-		} catch (Exception t) {
-			progressReporter.reportFailure(t);
-		}
-	}
-
-	private void process(final WorkPacket workPacket) {
+	@Override
+	public void process(final WorkPacket workPacket, final UserProgressReporter progressReporter) {
 		if (!(workPacket instanceof MsconvertWorkPacket)) {
 			ExceptionUtilities.throwCastException(workPacket, MsconvertWorkPacket.class);
 			return;
