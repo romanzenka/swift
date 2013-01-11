@@ -2,7 +2,7 @@ package edu.mayo.mprc.searchdb.dao;
 
 import edu.mayo.mprc.database.QueryCallback;
 import edu.mayo.mprc.swift.dbmapping.ReportData;
-import edu.mayo.mprc.utilities.progress.ProgressReporter;
+import edu.mayo.mprc.utilities.progress.UserProgressReporter;
 
 import java.util.List;
 
@@ -12,7 +12,7 @@ import java.util.List;
  */
 public class SearchDbDaoBlank implements SearchDbDao {
 	@Override
-	public Analysis addAnalysis(Analysis analysis, ReportData reportData, ProgressReporter reporter) {
+	public Analysis addAnalysis(Analysis analysis, ReportData reportData, UserProgressReporter reporter) {
 		throw new UnsupportedOperationException();
 	}
 

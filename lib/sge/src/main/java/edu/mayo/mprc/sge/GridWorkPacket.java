@@ -4,6 +4,7 @@ import com.google.common.base.Joiner;
 import edu.mayo.mprc.MprcException;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -21,23 +22,19 @@ public class GridWorkPacket {
 
 	private final String applicationName;
 	private List<String> parameters;
-	private boolean forceQueue;
-	private String jobQueueName;
-	private boolean hasMemoryRequirement;
+	private String queueName;
 	private String minMemoryRequirement;
-	private boolean hasNativeSpecification;
 	private String nativeSpecification;
 	private String workingFolder;
 	private String logFolder;
-	private boolean hasWorkingFolder;
-	private boolean success = false;
-	private boolean failure = false;
+	private boolean success;
+	private boolean failure;
 	private String errorMessage;
 
-	private static AtomicLong workPacketUniqueIdBase;
+	private static final AtomicLong workPacketUniqueIdBase;
 
 	//This id is used to composed the output and error log files of the SGE.
-	private long workPacketUniqueId;
+	private final long workPacketUniqueId;
 
 	private GridWorkPacketStateListener listener;
 
@@ -56,7 +53,7 @@ public class GridWorkPacket {
 
 		this.applicationName = applicationName;
 		setParameters(parameters);
-		jobQueueName = "none";
+		queueName = "none";
 		minMemoryRequirement = "0";
 		nativeSpecification = "none";
 		workingFolder = "none";
@@ -66,19 +63,15 @@ public class GridWorkPacket {
 	}
 
 	public GridWorkPacket(final GridWorkPacket packet) {
-		this.parameters = packet.parameters;
-		this.applicationName = packet.applicationName;
-		this.forceQueue = packet.forceQueue;
-		this.jobQueueName = packet.jobQueueName;
-		this.hasMemoryRequirement = packet.hasMemoryRequirement;
-		this.minMemoryRequirement = packet.minMemoryRequirement;
-		this.hasNativeSpecification = packet.hasNativeSpecification;
-		this.nativeSpecification = packet.nativeSpecification;
-		this.workingFolder = packet.workingFolder;
-		this.logFolder = packet.logFolder;
-		this.hasWorkingFolder = packet.hasWorkingFolder;
-		this.persistentRequestId = packet.getPersistentRequestId();
-		this.listener = packet.listener;
+		parameters = packet.getParameters();
+		applicationName = packet.getApplicationName();
+		queueName = packet.getQueueName();
+		minMemoryRequirement = packet.getMemoryRequirement();
+		nativeSpecification = packet.getNativeSpecification();
+		workingFolder = packet.getWorkingFolder();
+		logFolder = packet.getLogFolder();
+		persistentRequestId = packet.getPersistentRequestId();
+		listener = packet.getListener();
 
 		workPacketUniqueId = packet.getWorkPacketUniqueId();
 	}
@@ -88,29 +81,27 @@ public class GridWorkPacket {
 	}
 
 	public void setParameters(final List<String> parameters) {
-		this.parameters = parameters;
+		this.parameters = parameters == null ? null : new ArrayList<String>(parameters);
 	}
 
 	public void setListener(final GridWorkPacketStateListener listener) {
 		this.listener = listener;
 	}
 
-	public boolean forcequeue() {
-		return forceQueue;
+	public GridWorkPacketStateListener getListener() {
+		return listener;
 	}
 
-	public String getForcedJobQueue() {
-		return jobQueueName;
+	public String getQueueName() {
+		return queueName;
 	}
 
-	public void setJobQueue(final String queueName) {
-		forceQueue = true;
-		jobQueueName = queueName;
+	public void setQueueName(final String queueName) {
+		this.queueName = queueName;
 	}
 
 	public void setWorkingFolder(final String workingFolder) {
 		this.workingFolder = workingFolder;
-		this.hasWorkingFolder = true;
 	}
 
 	public String getWorkingFolder() {
@@ -133,35 +124,20 @@ public class GridWorkPacket {
 		return getOutputFileName(true);
 	}
 
-	public boolean hasWorkingFolder() {
-		return this.hasWorkingFolder;
-	}
-
-	public boolean hasNativeSpecification() {
-		return hasNativeSpecification;
-	}
-
 	public String getNativeSpecification() {
 		return nativeSpecification;
 	}
 
-	public void setNativeSpecification(final String nativespecification) {
-		hasNativeSpecification = true;
-		nativeSpecification = nativespecification;
+	public void setNativeSpecification(final String nativeSpecification) {
+		this.nativeSpecification = nativeSpecification;
 	}
 
-
-	public boolean forceMemoryRequirement() {
-		return this.hasMemoryRequirement;
-	}
-
-	public String getForcedMemoryRequirement() {
+	public String getMemoryRequirement() {
 		return this.minMemoryRequirement;
 	}
 
-	public void setForcedMemoryRequirement(final String memoryrequirement) {
-		this.hasMemoryRequirement = true;
-		minMemoryRequirement = memoryrequirement;
+	public void setMemoryRequirement(final String memoryRequirement) {
+		this.minMemoryRequirement = memoryRequirement;
 	}
 
 	public String getApplicationName() {
@@ -215,7 +191,7 @@ public class GridWorkPacket {
 	}
 
 	public String toString() {
-		return "GridWorkPacket: " + applicationName + " " + getParametersAsCallString() + " (queue=" + jobQueueName + ")";
+		return "GridWorkPacket: " + applicationName + " " + getParametersAsCallString() + " (queue=" + queueName + ")";
 	}
 
 	/**

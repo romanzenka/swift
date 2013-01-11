@@ -8,13 +8,14 @@ import edu.mayo.mprc.config.ui.ServiceUiFactory;
 import edu.mayo.mprc.config.ui.UiBuilder;
 import edu.mayo.mprc.daemon.WorkPacket;
 import edu.mayo.mprc.daemon.Worker;
+import edu.mayo.mprc.daemon.WorkerBase;
 import edu.mayo.mprc.daemon.WorkerFactoryBase;
 import edu.mayo.mprc.daemon.exception.DaemonException;
 import edu.mayo.mprc.utilities.FileUtilities;
 import edu.mayo.mprc.utilities.FormScraper;
 import edu.mayo.mprc.utilities.StreamRegExMatcher;
 import edu.mayo.mprc.utilities.progress.PercentDone;
-import edu.mayo.mprc.utilities.progress.ProgressReporter;
+import edu.mayo.mprc.utilities.progress.UserProgressReporter;
 import org.apache.log4j.Logger;
 
 import java.io.*;
@@ -35,7 +36,7 @@ import java.util.regex.Pattern;
 /**
  * Daemon worker for Mascot.
  */
-public final class MascotWorker implements Worker {
+public final class MascotWorker extends WorkerBase {
 	private static final Logger LOGGER = Logger.getLogger(MascotWorker.class);
 
 	private static final int BUFFER_SIZE = 8192;
@@ -68,18 +69,7 @@ public final class MascotWorker implements Worker {
 	 */
 	public static final String MASCOT_CGI = "cgi/nph-mascot.exe?1";
 
-	public void processRequest(final WorkPacket workPacket, final ProgressReporter progressReporter) {
-		try {
-			progressReporter.reportStart();
-			process(workPacket, progressReporter);
-			workPacket.synchronizeFileTokensOnReceiver();
-			progressReporter.reportSuccess();
-		} catch (Exception t) {
-			progressReporter.reportFailure(t);
-		}
-	}
-
-	private void process(final WorkPacket workPacket, final ProgressReporter progressReporter) {
+	public void process(final WorkPacket workPacket, final UserProgressReporter progressReporter) {
 		final MascotWorkPacket mascotWorkPacket = (MascotWorkPacket) workPacket;
 		assert mascotWorkPacket.getInputFile() != null : "Mascot search failed: mgf file not specified";
 		assert mascotWorkPacket.getSearchParamsFile() != null : "Mascot search failed: param file not specified";
@@ -114,7 +104,7 @@ public final class MascotWorker implements Worker {
 		if (mascotUrl == null) {
 			throw new MprcException("The mascot url must not be null");
 		}
-		boundary = ("--------" + RANDOM.nextLong()) + Math.abs(RANDOM.nextLong());
+		boundary = ("--------" + RANDOM.nextLong()) + Math.abs(RANDOM.nextLong() % Long.MAX_VALUE);
 		baseUrl = mascotUrl;
 		datFileBaseUrl = mascotCgiUrl(mascotUrl);
 	}
@@ -189,7 +179,7 @@ public final class MascotWorker implements Worker {
 	/**
 	 * @return Returns the path to the resulting Mascot .dat file
 	 */
-	private String getPOSTResponse(final ProgressReporter progressReporter) {
+	private String getPOSTResponse(final UserProgressReporter progressReporter) {
 		final StringBuilder completePage = new StringBuilder();
 		BufferedReader rreader = null;
 		try {
@@ -228,7 +218,7 @@ public final class MascotWorker implements Worker {
 		throw new DaemonException("no data URL for the mascot result\nHere is the returned page source:\n" + completePage.toString());
 	}
 
-	private void extractReportPercentDone(final ProgressReporter progressReporter, final String logLine) {
+	private void extractReportPercentDone(final UserProgressReporter progressReporter, final String logLine) {
 		final Matcher percentMatcher = PERCENT_DONE.matcher(logLine);
 		if (percentMatcher.matches()) {
 			try {
@@ -273,7 +263,7 @@ public final class MascotWorker implements Worker {
 		return mascotOutputFile;
 	}
 
-	public void search(final String parameters, final String data, final ProgressReporter progressReporter) {
+	public void search(final String parameters, final String data, final UserProgressReporter progressReporter) {
 		if (!new File(parameters.trim()).exists()) {
 			throw new MprcException("parameters file does not exist: " + parameters.trim());
 		}

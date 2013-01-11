@@ -130,8 +130,6 @@ final class MgfIonsModeller implements IonsModellerInterface {
 		this.outFilePrefix = null;
 	}
 
-	public static final Pattern KEY_PATTERN = Pattern.compile("^([^=]+)=");
-
 	public static String matchPattern(final Pattern p, final String seq) {
 		final Matcher k = p.matcher(seq);
 		if (k.matches()) {
@@ -328,36 +326,13 @@ final class MgfIonsModeller implements IonsModellerInterface {
 					this.parsetitle(sTITLE.toString());
 					return;
 				}
-				// unrecognized key
-				final String item = matchPattern(KEY_PATTERN, new String(left));
-
-				if (item != null) {
-					this.parseunknownkey(item);
-					return;
-				}
-
-				// no match
-				if (left != null) {
-					LOGGER.warn("Could not match line=" + new String(left));
-				}
-
 			}
 		}
 
 	}
 
-
 	public void forceSubmit() {
 		sequestSubmitter.forceSubmit();
-	}
-
-
-	/**
-	 * check if key is in the ignore list, if so ignore it otherwise
-	 * log a warning
-	 */
-	private void parseunknownkey(final String key) {
-
 	}
 
 	public static final Pattern CYCLE_PATTERN = Pattern.compile("Cycle\\(s\\): (\\d+)");

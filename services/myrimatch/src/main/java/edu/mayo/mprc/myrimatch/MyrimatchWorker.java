@@ -10,17 +10,19 @@ import edu.mayo.mprc.config.ui.ServiceUiFactory;
 import edu.mayo.mprc.config.ui.UiBuilder;
 import edu.mayo.mprc.daemon.WorkPacket;
 import edu.mayo.mprc.daemon.Worker;
+import edu.mayo.mprc.daemon.WorkerBase;
 import edu.mayo.mprc.daemon.WorkerFactoryBase;
 import edu.mayo.mprc.daemon.exception.DaemonException;
 import edu.mayo.mprc.utilities.FileUtilities;
 import edu.mayo.mprc.utilities.ProcessCaller;
-import edu.mayo.mprc.utilities.progress.ProgressReporter;
+import edu.mayo.mprc.utilities.progress.UserProgressReporter;
 import org.apache.log4j.Logger;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.*;
 
-public final class MyrimatchWorker implements Worker {
+public final class MyrimatchWorker extends WorkerBase {
 	private static final Logger LOGGER = Logger.getLogger(MyrimatchWorker.class);
 	public static final String TYPE = "myrimatch";
 	public static final String NAME = "Myrimatch";
@@ -42,68 +44,63 @@ public final class MyrimatchWorker implements Worker {
 		this.executable = executable;
 	}
 
-	public void processRequest(final WorkPacket workPacket, final ProgressReporter progressReporter) {
-		progressReporter.reportStart();
-
+	@Override
+	public void process(WorkPacket workPacket, UserProgressReporter progressReporter) {
 		if (!(workPacket instanceof MyrimatchWorkPacket)) {
 			throw new DaemonException("Unexpected packet type " + workPacket.getClass().getName() + ", expected " + MyrimatchWorkPacket.class.getName());
 		}
 
 		final MyrimatchWorkPacket packet = (MyrimatchWorkPacket) workPacket;
 
+		checkPacketCorrectness(packet);
+
+		FileUtilities.ensureFolderExists(packet.getWorkFolder());
+
+		final File fastaFile = packet.getDatabaseFile();
+
+		final File inputFile = packet.getInputFile();
+		final File paramsFile = packet.getSearchParamsFile();
+		final File resultFile = packet.getOutputFile();
+
+		if (resultFile.exists() && inputFile.exists() && resultFile.lastModified() >= inputFile.lastModified()) {
+			return;
+		}
+
+		LOGGER.debug("Fasta file " + fastaFile.getAbsolutePath() + " does" + (fastaFile.exists() && fastaFile.length() > 0 ? " " : " not ") + "exist.");
+		LOGGER.debug("Input file " + inputFile.getAbsolutePath() + " does" + (inputFile.exists() && inputFile.length() > 0 ? " " : " not ") + "exist.");
+		LOGGER.debug("Parameter file " + paramsFile.getAbsolutePath() + " does" + (paramsFile.exists() && paramsFile.length() > 0 ? " " : " not ") + "exist.");
+
 		try {
-			checkPacketCorrectness(packet);
-
-			FileUtilities.ensureFolderExists(packet.getWorkFolder());
-
-			final File fastaFile = packet.getDatabaseFile();
-
-			final File inputFile = packet.getInputFile();
-			final File paramsFile = packet.getSearchParamsFile();
-			final File resultFile = packet.getOutputFile();
-
-			if (resultFile.exists() && inputFile.exists() && resultFile.lastModified() >= inputFile.lastModified()) {
-				progressReporter.reportSuccess();
-				return;
-			}
-
-			LOGGER.info("Fasta file " + fastaFile.getAbsolutePath() + " does" + (fastaFile.exists() && fastaFile.length() > 0 ? " " : " not ") + "exist.");
-			LOGGER.info("Input file " + inputFile.getAbsolutePath() + " does" + (inputFile.exists() && inputFile.length() > 0 ? " " : " not ") + "exist.");
-			LOGGER.info("Parameter file " + paramsFile.getAbsolutePath() + " does" + (paramsFile.exists() && paramsFile.length() > 0 ? " " : " not ") + "exist.");
-
 			Files.append("\n# Decoy sequence prefix is appended to all decoy matches" +
 					"\nDecoyPrefix = " + packet.getDecoySequencePrefix(),
 					paramsFile, Charsets.US_ASCII);
-
-			final List<String> parameters = new LinkedList<String>();
-			parameters.add(executable.getPath());
-			parameters.add("-cfg");
-			parameters.add(paramsFile.getAbsolutePath());
-			parameters.add("-ProteinDatabase");
-			parameters.add(fastaFile.getAbsolutePath());
-			parameters.add("-DEndProteinIndex=" + packet.getNumForwardEntries());
-			parameters.add(inputFile.getAbsolutePath());
-
-			final ProcessBuilder processBuilder = new ProcessBuilder(parameters);
-			processBuilder.directory(packet.getWorkFolder());
-
-			final ProcessCaller processCaller = new ProcessCaller(processBuilder);
-
-			LOGGER.info("Myrimatch search, " + packet.toString() + ", has been submitted.");
-			processCaller.setOutputMonitor(new MyrimatchLogMonitor(progressReporter));
-			processCaller.runAndCheck("myrimatch");
-
-			final File createdResultFile = new File(packet.getWorkFolder(), FileUtilities.stripExtension(packet.getInputFile().getName()) + ".pepXML");
-			if (!createdResultFile.equals(resultFile)) {
-				FileUtilities.rename(createdResultFile, resultFile);
-			}
-
-			workPacket.synchronizeFileTokensOnReceiver();
-			progressReporter.reportSuccess();
-			LOGGER.info("Myrimatch search, " + packet.toString() + ", has been successfully completed.");
-		} catch (Exception t) {
-			progressReporter.reportFailure(t);
+		} catch (IOException e) {
+			throw new MprcException("Could not append information to parameter file " + paramsFile.getAbsolutePath(), e);
 		}
+
+		final List<String> parameters = new LinkedList<String>();
+		parameters.add(executable.getPath());
+		parameters.add("-cfg");
+		parameters.add(paramsFile.getAbsolutePath());
+		parameters.add("-ProteinDatabase");
+		parameters.add(fastaFile.getAbsolutePath());
+		parameters.add("-DEndProteinIndex=" + packet.getNumForwardEntries());
+		parameters.add(inputFile.getAbsolutePath());
+
+		final ProcessBuilder processBuilder = new ProcessBuilder(parameters);
+		processBuilder.directory(packet.getWorkFolder());
+
+		final ProcessCaller processCaller = new ProcessCaller(processBuilder);
+
+		LOGGER.info("Myrimatch search, " + packet.toString() + ", has been submitted.");
+		processCaller.setOutputMonitor(new MyrimatchLogMonitor(progressReporter));
+		processCaller.runAndCheck("myrimatch");
+
+		final File createdResultFile = new File(packet.getWorkFolder(), FileUtilities.stripExtension(packet.getInputFile().getName()) + ".pepXML");
+		if (!createdResultFile.equals(resultFile)) {
+			FileUtilities.rename(createdResultFile, resultFile);
+		}
+		LOGGER.info("Myrimatch search, " + packet.toString() + ", has been successfully completed.");
 	}
 
 	private void checkPacketCorrectness(final MyrimatchWorkPacket packet) {

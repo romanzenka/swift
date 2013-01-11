@@ -35,6 +35,15 @@ public final class GridRunner extends AbstractRunner {
 
 	public static final String TYPE = "sgeRunner";
 	public static final String NAME = "Sun Grid Engine Runner";
+
+	private static final String WRAPPER_SCRIPT = "wrapperScript";
+	private static final String SHARED_LOG_DIRECTORY = "sharedLogDirectory";
+	private static final String SHARED_TEMP_DIRECTORY = "sharedTempDirectory";
+	private static final String SHARED_WORKING_DIRECTORY = "sharedWorkingDirectory";
+	private static final String NATIVE_SPECIFICATION = "nativeSpecification";
+	private static final String MEMORY_REQUIREMENT = "memoryRequirement";
+	private static final String QUEUE_NAME = "queueName";
+
 	private boolean enabled;
 	private boolean operational;
 	private DaemonConnection daemonConnection;
@@ -68,6 +77,9 @@ public final class GridRunner extends AbstractRunner {
 		super.stop();
 		// Disables message processing
 		enabled = false;
+		if (manager != null) {
+			manager.close();
+		}
 	}
 
 	@Override
@@ -101,13 +113,20 @@ public final class GridRunner extends AbstractRunner {
 			gridWorkPacket.setParameters(parameters);
 
 			// Set our own listener to the work packet progress. When the packet returns, the execution will be resumed
-			gridWorkPacket.setListener(new MyWorkPacketStateListener(request, daemonWorkerAllocatorInputFile, boundMessenger, allocatorListener));
+			final MyWorkPacketStateListener listener = new MyWorkPacketStateListener(request, daemonWorkerAllocatorInputFile, boundMessenger, allocatorListener);
+			gridWorkPacket.setListener(listener);
 			// Run the job
 			final String requestId = manager.passToGridEngine(gridWorkPacket);
-			// Report the assigned ID
-			sendResponse(request,
-					new DaemonProgressMessage(DaemonProgress.UserSpecificProgressInfo, new AssignedTaskData(requestId, gridWorkPacket.getOutputLogFilePath(), gridWorkPacket.getErrorLogFilePath())),
-					false);
+
+			// Report the information about the running task to the caller, making sure they get the task id and the logs
+			final AssignedTaskData data = new AssignedTaskData(requestId, gridWorkPacket.getOutputLogFilePath(), gridWorkPacket.getErrorLogFilePath());
+
+			// The listener will report the task information on failure/success so the logs have a chance to get
+			// transferred.
+			listener.setTaskData(data);
+
+			// Report the assigned ID and log files. Since the logs are not filled in yet, they would be available on the caller only if it shares disk space
+			reportTaskData(request, data);
 
 			// We are not done yet! The grid work packet's progress listener will get called when the state of the task changes,
 			// and either mark the task failed or successful.
@@ -117,6 +136,14 @@ public final class GridRunner extends AbstractRunner {
 			sendResponse(request, daemonException, true);
 			throw daemonException;
 		}
+	}
+
+	void reportTaskData(final DaemonRequest request, final AssignedTaskData data) {
+		// Clone the data object to make sure the file tokens get updated (files might come into existence that
+		// did not exist before).
+		final AssignedTaskData clonedTaskData = new AssignedTaskData(data.getAssignedId(), data.getOutputLogFile(), data.getErrorLogFile());
+		sendResponse(request, new DaemonProgressMessage(DaemonProgress.UserSpecificProgressInfo,
+				clonedTaskData), false);
 	}
 
 	private static void writeWorkerAllocatorInputObject(File file, SgePacket object) throws IOException {
@@ -170,10 +197,15 @@ public final class GridRunner extends AbstractRunner {
 	 */
 	private class MyWorkPacketStateListener implements GridWorkPacketStateListener {
 		private boolean reported;
-		private DaemonRequest request;
-		private File sgePacketFile;
-		private BoundMessenger boundMessenger;
-		private SgeMessageListener allocatorListener;
+		private final DaemonRequest request;
+		private final File sgePacketFile;
+		private final BoundMessenger boundMessenger;
+		private final SgeMessageListener allocatorListener;
+
+		/**
+		 * Needs to be synchronized - being set from different thread
+		 */
+		private AssignedTaskData taskData;
 
 		/**
 		 * @param allocatorListener The listener for the RMI messages. We use it so we can send an exception that was cached when SGE terminates.
@@ -199,6 +231,13 @@ public final class GridRunner extends AbstractRunner {
 			// We report state change just once.
 			if (!reported) {
 				try {
+					// First, re-report the output and error logs.
+					// If we are running on a different machine, the logs are now complete
+					// and need to be uploaded to the caller.
+					final AssignedTaskData toReport = getTaskData();
+					if (toReport != null) {
+						reportTaskData(request, toReport);
+					}
 					if (w.getPassed()) {
 						// This is the last response we will send - request is completed.
 						// There might have been an error from RMI, check that
@@ -231,6 +270,14 @@ public final class GridRunner extends AbstractRunner {
 				}
 			}
 		}
+
+		public synchronized AssignedTaskData getTaskData() {
+			return taskData;
+		}
+
+		public synchronized void setTaskData(AssignedTaskData taskData) {
+			this.taskData = taskData;
+		}
 	}
 
 	public boolean isOperational() {
@@ -244,15 +291,9 @@ public final class GridRunner extends AbstractRunner {
 	private GridWorkPacket getBaseGridWorkPacket(final String command) {
 		final GridWorkPacket gridWorkPacket = new GridWorkPacket(command, null);
 
-		if (nativeSpecification != null) {
-			gridWorkPacket.setNativeSpecification(nativeSpecification);
-		}
-		if (queueName != null) {
-			gridWorkPacket.setJobQueue(queueName);
-		}
-		if (memoryRequirement != null) {
-			gridWorkPacket.setForcedMemoryRequirement(memoryRequirement);
-		}
+		gridWorkPacket.setNativeSpecification(nativeSpecification);
+		gridWorkPacket.setQueueName(queueName);
+		gridWorkPacket.setMemoryRequirement(memoryRequirement);
 
 		gridWorkPacket.setWorkingFolder(sharedWorkingDirectory.getAbsolutePath());
 		gridWorkPacket.setLogFolder(FileUtilities.getDateBasedDirectory(sharedLogDirectory, new Date()).getAbsolutePath());
@@ -455,24 +496,24 @@ public final class GridRunner extends AbstractRunner {
 
 		public Map<String, String> save(final DependencyResolver resolver) {
 			final TreeMap<String, String> map = new TreeMap<String, String>();
-			map.put("queueName", queueName);
-			map.put("memoryRequirement", memoryRequirement);
-			map.put("nativeSpecification", nativeSpecification);
-			map.put("sharedWorkingDirectory", sharedWorkingDirectory);
-			map.put("sharedTempDirectory", sharedTempDirectory);
-			map.put("sharedLogDirectory", sharedLogDirectory);
-			map.put("wrapperScript", wrapperScript);
+			map.put(QUEUE_NAME, queueName);
+			map.put(MEMORY_REQUIREMENT, memoryRequirement);
+			map.put(NATIVE_SPECIFICATION, nativeSpecification);
+			map.put(SHARED_WORKING_DIRECTORY, sharedWorkingDirectory);
+			map.put(SHARED_TEMP_DIRECTORY, sharedTempDirectory);
+			map.put(SHARED_LOG_DIRECTORY, sharedLogDirectory);
+			map.put(WRAPPER_SCRIPT, wrapperScript);
 			return map;
 		}
 
 		public void load(final Map<String, String> values, final DependencyResolver resolver) {
-			queueName = values.get("queueName");
-			memoryRequirement = values.get("memoryRequirement");
-			nativeSpecification = values.get("nativeSpecification");
-			sharedWorkingDirectory = values.get("sharedWorkingDirectory");
-			sharedTempDirectory = values.get("sharedTempDirectory");
-			sharedLogDirectory = values.get("sharedLogDirectory");
-			wrapperScript = values.get("wrapperScript");
+			queueName = values.get(QUEUE_NAME);
+			memoryRequirement = values.get(MEMORY_REQUIREMENT);
+			nativeSpecification = values.get(NATIVE_SPECIFICATION);
+			sharedWorkingDirectory = values.get(SHARED_WORKING_DIRECTORY);
+			sharedTempDirectory = values.get(SHARED_TEMP_DIRECTORY);
+			sharedLogDirectory = values.get(SHARED_LOG_DIRECTORY);
+			wrapperScript = values.get(WRAPPER_SCRIPT);
 		}
 
 		@Override

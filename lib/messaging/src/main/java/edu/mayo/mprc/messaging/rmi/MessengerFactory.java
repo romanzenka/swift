@@ -10,6 +10,8 @@ import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * Class provide functionality to create local and get remote BoundMessenger object.
+ *
+ * @deprecated This would not work in firewalled environment.
  */
 public final class MessengerFactory {
 

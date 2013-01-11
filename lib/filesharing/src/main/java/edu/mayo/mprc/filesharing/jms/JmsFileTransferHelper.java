@@ -1,7 +1,7 @@
 package edu.mayo.mprc.filesharing.jms;
 
 import edu.mayo.mprc.MprcException;
-import edu.mayo.mprc.filesharing.*;
+import edu.mayo.mprc.filesharing.FileTransfer;
 import edu.mayo.mprc.utilities.FileUtilities;
 import edu.mayo.mprc.utilities.exceptions.ExceptionUtilities;
 import org.apache.log4j.Logger;
@@ -19,7 +19,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 
 /**
- * Helper class.
+ * Helper class. Actually opens sockets to transfer files around.
  */
 public final class JmsFileTransferHelper {
 	private static AtomicLong lastRequestId = new AtomicLong(System.currentTimeMillis());

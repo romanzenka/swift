@@ -7,11 +7,12 @@ import edu.mayo.mprc.config.ui.ServiceUiFactory;
 import edu.mayo.mprc.config.ui.UiBuilder;
 import edu.mayo.mprc.daemon.WorkPacket;
 import edu.mayo.mprc.daemon.Worker;
+import edu.mayo.mprc.daemon.WorkerBase;
 import edu.mayo.mprc.daemon.WorkerFactoryBase;
 import edu.mayo.mprc.daemon.exception.DaemonException;
 import edu.mayo.mprc.sequest.core.Mgf2SequestCaller;
 import edu.mayo.mprc.utilities.FileUtilities;
-import edu.mayo.mprc.utilities.progress.ProgressReporter;
+import edu.mayo.mprc.utilities.progress.UserProgressReporter;
 import org.apache.log4j.Logger;
 
 import java.io.File;
@@ -20,7 +21,7 @@ import java.util.Map;
 import java.util.TreeMap;
 
 
-public final class SequestWorker implements Worker {
+public final class SequestWorker extends WorkerBase {
 	private static final Logger LOGGER = Logger.getLogger(SequestWorker.class);
 	public static final String TYPE = "sequest";
 	public static final String NAME = "Sequest";
@@ -32,18 +33,8 @@ public final class SequestWorker implements Worker {
 	private static final String PVM_HOSTS = "pvmHosts";
 	private static final String SEQUEST_COMMAND = "sequestCommand";
 
-	public void processRequest(final WorkPacket workPacket, final ProgressReporter progressReporter) {
-		try {
-			progressReporter.reportStart();
-			process(workPacket);
-			workPacket.synchronizeFileTokensOnReceiver();
-			progressReporter.reportSuccess();
-		} catch (Exception t) {
-			progressReporter.reportFailure(t);
-		}
-	}
-
-	private void process(final WorkPacket workPacket) {
+	@Override
+	public void process(final WorkPacket workPacket, final UserProgressReporter progressReporter) {
 		SequestMGFWorkPacket sequestWorkPacket = null;
 		if (workPacket instanceof SequestMGFWorkPacket) {
 			sequestWorkPacket = (SequestMGFWorkPacket) workPacket;

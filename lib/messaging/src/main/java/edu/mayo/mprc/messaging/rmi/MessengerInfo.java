@@ -5,6 +5,8 @@ import java.net.InetSocketAddress;
 
 /**
  * Class holder of Messenger object information and bound to registry information.
+ *
+ * @deprecated This would not work in firewalled environment.
  */
 public final class MessengerInfo implements Serializable {
 	private static final long serialVersionUID = 20090324L;

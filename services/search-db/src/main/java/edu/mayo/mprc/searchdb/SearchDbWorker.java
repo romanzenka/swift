@@ -8,6 +8,7 @@ import edu.mayo.mprc.config.ui.ServiceUiFactory;
 import edu.mayo.mprc.config.ui.UiBuilder;
 import edu.mayo.mprc.daemon.WorkPacket;
 import edu.mayo.mprc.daemon.Worker;
+import edu.mayo.mprc.daemon.WorkerBase;
 import edu.mayo.mprc.daemon.WorkerFactoryBase;
 import edu.mayo.mprc.database.DatabaseFactory;
 import edu.mayo.mprc.dbcurator.model.persistence.CurationDao;
@@ -20,7 +21,7 @@ import edu.mayo.mprc.swift.dbmapping.ReportData;
 import edu.mayo.mprc.unimod.Unimod;
 import edu.mayo.mprc.unimod.UnimodDao;
 import edu.mayo.mprc.utilities.FileUtilities;
-import edu.mayo.mprc.utilities.progress.ProgressReporter;
+import edu.mayo.mprc.utilities.progress.UserProgressReporter;
 
 import java.io.File;
 import java.util.Map;
@@ -29,7 +30,7 @@ import java.util.TreeMap;
 /**
  * Loads search results from a given Swift experiment into the database.
  */
-public final class SearchDbWorker implements Worker {
+public final class SearchDbWorker extends WorkerBase {
 	private DatabaseFactory.Config database;
 	private SearchDbDao dao;
 	private FastaDbDao fastaDbDao;
@@ -75,18 +76,7 @@ public final class SearchDbWorker implements Worker {
 	}
 
 	@Override
-	public void processRequest(final WorkPacket workPacket, final ProgressReporter progressReporter) {
-		try {
-			progressReporter.reportStart();
-			process(workPacket, progressReporter);
-			workPacket.synchronizeFileTokensOnReceiver();
-			progressReporter.reportSuccess();
-		} catch (Exception t) {
-			progressReporter.reportFailure(t);
-		}
-	}
-
-	private void process(final WorkPacket wp, final ProgressReporter reporter) {
+	public void process(final WorkPacket wp, final UserProgressReporter reporter) {
 		final SearchDbWorkPacket workPacket = (SearchDbWorkPacket) wp;
 		dao.begin();
 		try {

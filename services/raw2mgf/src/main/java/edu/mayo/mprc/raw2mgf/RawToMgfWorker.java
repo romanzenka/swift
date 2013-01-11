@@ -11,11 +11,12 @@ import edu.mayo.mprc.config.ui.UiBuilder;
 import edu.mayo.mprc.config.ui.WrapperScriptSwitcher;
 import edu.mayo.mprc.daemon.WorkPacket;
 import edu.mayo.mprc.daemon.Worker;
+import edu.mayo.mprc.daemon.WorkerBase;
 import edu.mayo.mprc.daemon.WorkerFactoryBase;
 import edu.mayo.mprc.daemon.exception.DaemonException;
 import edu.mayo.mprc.utilities.FilePathShortener;
 import edu.mayo.mprc.utilities.FileUtilities;
-import edu.mayo.mprc.utilities.progress.ProgressReporter;
+import edu.mayo.mprc.utilities.progress.UserProgressReporter;
 import org.apache.log4j.Logger;
 
 import java.io.File;
@@ -36,7 +37,7 @@ import static java.util.Arrays.sort;
  * We filter out the -F and -L parameters out in {@link #cleanupFromToParams} (they specify first and last spectrum) and we substitute our
  * own limits, running extract_msn in multiple passes. We combine the resulting spectra into a .mgf file.
  */
-public final class RawToMgfWorker implements Worker {
+public final class RawToMgfWorker extends WorkerBase {
 	private static final Logger LOGGER = Logger.getLogger(RawToMgfWorker.class);
 	public static final String TYPE = "raw2mgf";
 	public static final String NAME = "Extract_msn";
@@ -72,18 +73,8 @@ public final class RawToMgfWorker implements Worker {
 		return files;
 	}
 
-	public void processRequest(final WorkPacket workPacket, final ProgressReporter progressReporter) {
-		try {
-			progressReporter.reportStart();
-			process(workPacket);
-			workPacket.synchronizeFileTokensOnReceiver();
-			progressReporter.reportSuccess();
-		} catch (Exception t) {
-			progressReporter.reportFailure(t);
-		}
-	}
-
-	private void process(final WorkPacket workPacket) {
+	@Override
+	public void process(final WorkPacket workPacket, final UserProgressReporter progressReporter) {
 		if (!(workPacket instanceof RawToMgfWorkPacket)) {
 			throw new DaemonException("Unknown request type: " + workPacket.getClass().getName());
 		}
@@ -101,7 +92,7 @@ public final class RawToMgfWorker implements Worker {
 		final Long lastSpectrum = getParamValue("-L", origParams);
 		final String params = cleanupFromToParams(origParams);
 
-		LOGGER.debug("Raw2mgf: starting conversion " + batchWorkPacket.getInputFile() + " -> " + mgfFile + " (params: " + params + ")");
+		LOGGER.info("Raw2mgf: starting conversion " + batchWorkPacket.getInputFile() + " -> " + mgfFile + " (params: " + params + ")");
 
 		File rawFile = getRawFile(batchWorkPacket);
 
@@ -159,6 +150,7 @@ public final class RawToMgfWorker implements Worker {
 		} finally {
 			shortener.cleanup();
 		}
+		LOGGER.info("Raw2mgf: conversion ended: " + batchWorkPacket.getInputFile() + " -> " + mgfFile + " (params: " + params + ")");
 	}
 
 	static Long getParamValue(final String paramName, final String params) {

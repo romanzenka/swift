@@ -105,9 +105,9 @@ public final class DatabaseManager implements Closeable {
 
 	private HtmlForm clickNewDatabase(HtmlPage page) throws IOException {
 		final HtmlAnchor newLink = page.getAnchorByText("Create new");
-		final HtmlPage newDbPage = (HtmlPage)newLink.click();
-		if(!DB_MANAGER_TITLE.equals(newDbPage.getTitleText())) {
-			throw new MprcException("The 'Create new' link in Mascot Deployer did not open a proper page.\nExpected "+DB_MANAGER_TITLE+"\nActual:"+newDbPage.getTitleText());
+		final HtmlPage newDbPage = (HtmlPage) newLink.click();
+		if (!DB_MANAGER_TITLE.equals(newDbPage.getTitleText())) {
+			throw new MprcException("The 'Create new' link in Mascot Deployer did not open a proper page.\nExpected " + DB_MANAGER_TITLE + "\nActual:" + newDbPage.getTitleText());
 		}
 		return getSingleForm(newDbPage);
 	}
@@ -121,16 +121,16 @@ public final class DatabaseManager implements Closeable {
 	}
 
 	private HtmlForm getSingleForm(final HtmlPage page) {
-		if(page.getForms().size()!=1) {
-			throw new MprcException("There should be only one form on the page "+ page.getUrl()+" available, found "+ page.getForms().size());
+		if (page.getForms().size() != 1) {
+			throw new MprcException("There should be only one form on the page " + page.getUrl() + " available, found " + page.getForms().size());
 		}
 		return page.getForms().get(0);
 	}
 
 	private void checkRadioButton(HtmlForm dbForm, String radioName, String radioValue) {
 		final List<HtmlRadioButtonInput> radioButtonsByName = dbForm.getRadioButtonsByName(radioName);
-		for(HtmlRadioButtonInput radio : radioButtonsByName) {
-			if(radioValue==radio.getValueAttribute()) {
+		for (HtmlRadioButtonInput radio : radioButtonsByName) {
+			if (radioValue == radio.getValueAttribute()) {
 				radio.setChecked(true);
 			}
 		}
@@ -204,7 +204,7 @@ public final class DatabaseManager implements Closeable {
 	private static class ToLowerFunction implements Function<String, String> {
 		@Override
 		public String apply(@Nullable final String from) {
-			return from.toLowerCase();
+			return from == null ? null : from.toLowerCase();
 		}
 	}
 }

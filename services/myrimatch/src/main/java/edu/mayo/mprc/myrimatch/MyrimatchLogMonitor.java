@@ -2,7 +2,7 @@ package edu.mayo.mprc.myrimatch;
 
 import edu.mayo.mprc.utilities.LogMonitor;
 import edu.mayo.mprc.utilities.progress.PercentDone;
-import edu.mayo.mprc.utilities.progress.ProgressReporter;
+import edu.mayo.mprc.utilities.progress.UserProgressReporter;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -10,12 +10,12 @@ import java.util.regex.Pattern;
 final class MyrimatchLogMonitor implements LogMonitor {
 
 	private static final int TIME_BETWEEN_UPDATES_MS = 1000;
-	private final ProgressReporter progressReporter;
+	private final UserProgressReporter progressReporter;
 	private long lastTimeMs = System.currentTimeMillis();
 	private static final Pattern PATTERN = Pattern.compile("Searched (\\d+) of (\\d+) proteins; \\d+ per second, .* elapsed, .* remaining.");
 
 
-	public MyrimatchLogMonitor(final ProgressReporter progressReporter) {
+	public MyrimatchLogMonitor(final UserProgressReporter progressReporter) {
 		this.progressReporter = progressReporter;
 	}
 

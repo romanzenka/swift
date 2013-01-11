@@ -15,7 +15,7 @@
         <property name="ignoreUnresolvablePlaceholders" value="true"/>
     </bean>
 
-    <bean id="simpleDaemonRunnerFactory" class="edu.mayo.mprc.daemon.SimpleRunner$SimpleDaemonRunnerFactory">
+    <bean id="simpleDaemonRunnerFactory" class="edu.mayo.mprc.daemon.SimpleRunner$Factory">
         <property name="table" ref="resourceTable"/>
     </bean>
 

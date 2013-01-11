@@ -1,5 +1,6 @@
 package edu.mayo.mprc.fasta;
 
+import com.google.common.base.Strings;
 import edu.mayo.mprc.integration.Installer;
 import edu.mayo.mprc.utilities.FileUtilities;
 import edu.mayo.mprc.utilities.TestingUtilities;
@@ -38,7 +39,7 @@ public final class FastaTest {
 		final File inFile = new File(fastaFileFolder, "test_in.fasta");
 		final File outFile = File.createTempFile("test_out", ".fasta");
 
-		Assert.assertNull(FASTAInputStream.isFASTAFileValid(inFile));
+		Assert.assertEquals(FASTAInputStream.isFASTAFileValid(inFile), null, "No error should be detected");
 
 		final DBInputStream in = new FASTAInputStream(inFile);
 		final DBOutputStream out = new FASTAOutputStream(outFile);
@@ -69,7 +70,7 @@ public final class FastaTest {
 	@Test
 	public void testInputAndOutputZipped() throws IOException {
 		final File inFile = new File(fastaFileFolder, "test_in.fasta.gz");
-		Assert.assertNull(FASTAInputStream.isFASTAFileValid(inFile));
+		Assert.assertEquals(FASTAInputStream.isFASTAFileValid(inFile), null, "No errors should be found");
 		assertTrue(inFile.exists());
 
 		final File outFile = File.createTempFile("test_out", ".fasta");
@@ -96,5 +97,39 @@ public final class FastaTest {
 		final String errorMessage = FASTAInputStream.isFASTAFileValid(inFile);
 		Assert.assertTrue(errorMessage.contains("Q4U9M9|104K_THEAN"), "Message [" + errorMessage + "] must mention duplicate accnum");
 		Assert.assertTrue(errorMessage.toLowerCase(Locale.US).contains("duplicate"), "Must mention duplicity: " + errorMessage);
+	}
+
+	@Test
+	public void shouldDetectLongAccnum() {
+		final File inFile = new File(fastaFileFolder, "test_in_dups.fasta");
+		final String errorMessage = FASTAInputStream.isFASTAFileValid(inFile);
+		Assert.assertTrue(errorMessage.contains("Q4U9M9|104K_THEAN"), "Message [" + errorMessage + "] must mention duplicate accnum");
+		Assert.assertTrue(errorMessage.toLowerCase(Locale.US).contains("duplicate"), "Must mention duplicity: " + errorMessage);
+	}
+
+	@Test
+	public void shouldGetAccnum() {
+		Assert.assertEquals(FASTAInputStream.getAccNum(">hello world"), "hello");
+		Assert.assertEquals(FASTAInputStream.getAccNum(">hello_world"), "hello_world");
+	}
+
+	@Test
+	public void shouldCheckHeaders() {
+		assertErrorContains(">HELLO_123456789012345678901234567890 Too long accnum", "too long");
+		assertErrorContains(">12345678901234567890123456789012345 Too long accnum", "too long");
+		assertErrorContains(">strange<>*/chars Not-supported characters", "invalid");
+		assertErrorContains(">abcABC0129|_+*. Ok", null);
+		assertErrorContains(">LONG_DESC "+ Strings.repeat("0123456789", 20), "too long");
+		assertErrorContains(">LONG_DESC "+ Strings.repeat("X", 1+200-">LONG_DESC ".length()), null);
+		assertErrorContains(">LONG_DESC "+ Strings.repeat("X", 1+200-">LONG_DESC ".length()+1), "too long");
+	}
+
+	private void assertErrorContains(String sequence, String error) {
+		final String actualError = FASTAInputStream.checkHeader(sequence, FASTAInputStream.getAccNum(sequence));
+		if (actualError == null) {
+			Assert.assertNull(error, "No error was produced while expected '" + error + "'");
+			return;
+		}
+		Assert.assertTrue(error != null && actualError.toLowerCase().contains(error.toLowerCase()), "error must mention '" + error + "', was '"+actualError+"'");
 	}
 }

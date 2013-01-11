@@ -1,9 +1,9 @@
-package edu.mayo.mprc.filesharing;
+package edu.mayo.mprc.filesharing.jms;
 
 import java.io.Serializable;
 import java.util.Date;
 
-public final class FileInfo implements Serializable {
+final class FileInfo implements Serializable {
 	private static final long serialVersionUID = 20111119L;
 
 	private String filePath;

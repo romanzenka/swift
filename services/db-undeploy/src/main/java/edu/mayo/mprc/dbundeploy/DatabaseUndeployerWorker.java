@@ -6,15 +6,12 @@ import edu.mayo.mprc.config.ResourceConfig;
 import edu.mayo.mprc.config.ServiceConfig;
 import edu.mayo.mprc.config.ui.ServiceUiFactory;
 import edu.mayo.mprc.config.ui.UiBuilder;
-import edu.mayo.mprc.daemon.DaemonConnection;
-import edu.mayo.mprc.daemon.WorkPacket;
-import edu.mayo.mprc.daemon.Worker;
-import edu.mayo.mprc.daemon.WorkerFactoryBase;
+import edu.mayo.mprc.daemon.*;
 import edu.mayo.mprc.daemon.files.FileTokenFactory;
 import edu.mayo.mprc.database.Change;
 import edu.mayo.mprc.dbcurator.model.Curation;
 import edu.mayo.mprc.dbcurator.model.persistence.CurationDao;
-import edu.mayo.mprc.utilities.progress.ProgressReporter;
+import edu.mayo.mprc.utilities.progress.UserProgressReporter;
 import org.apache.log4j.Logger;
 import org.joda.time.DateTime;
 
@@ -25,7 +22,7 @@ import java.util.TreeMap;
  * Worker that processes database undeployment request. Given a request, it processes
  * by creating a DatabaseUndeployerRunner object and executing its run() method.
  */
-public final class DatabaseUndeployerWorker implements Worker {
+public final class DatabaseUndeployerWorker extends WorkerBase {
 	private static final Logger LOGGER = Logger.getLogger(DatabaseUndeployerWorker.class);
 
 	public static final String TYPE = "databaseUndeployer";
@@ -102,18 +99,7 @@ public final class DatabaseUndeployerWorker implements Worker {
 	}
 
 	@Override
-	public void processRequest(final WorkPacket workPacket, final ProgressReporter progressReporter) {
-		try {
-			progressReporter.reportStart();
-			process(workPacket, progressReporter);
-			workPacket.synchronizeFileTokensOnReceiver();
-			progressReporter.reportSuccess();
-		} catch (Exception t) {
-			progressReporter.reportFailure(t);
-		}
-	}
-
-	protected void process(final WorkPacket workPacket, final ProgressReporter progressReporter) {
+	public void process(final WorkPacket workPacket, final UserProgressReporter progressReporter) {
 		final DatabaseUndeployerWorkPacket undeployerWorkPacket = (DatabaseUndeployerWorkPacket) workPacket;
 
 		final DatabaseUndeployerRunner undeployerRunner = new DatabaseUndeployerRunner(undeployerWorkPacket
@@ -314,7 +300,7 @@ public final class DatabaseUndeployerWorker implements Worker {
 					.reference("scaffold3Deployer", UiBuilder.NONE_TYPE)
 
 					.property(MASCOT_DEPLOYER, "Mascot Database Deployer", "Database deployer must provide database undeployment functionality.")
-					.reference("mascotDeployer", UiBuilder.NONE_TYPE);
+					.reference("mascotDeployer", "mockMascotDeployer", UiBuilder.NONE_TYPE);
 		}
 	}
 }

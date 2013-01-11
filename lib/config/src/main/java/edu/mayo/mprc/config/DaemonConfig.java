@@ -23,6 +23,8 @@ public final class DaemonConfig implements ResourceConfig {
 	public static final String OS_ARCH = "osArch";
 	public static final String SHARED_FILE_SPACE_PATH = "sharedFileSpacePath";
 	public static final String TEMP_FOLDER_PATH = "tempFolderPath";
+	public static final String DUMP_ERRORS = "dumpErrors";
+	public static final String DUMP_FOLDER_PATH = "dumpFolderPath";
 
 	@XStreamAlias(NAME)
 	@XStreamAsAttribute
@@ -42,6 +44,19 @@ public final class DaemonConfig implements ResourceConfig {
 
 	@XStreamAlias(TEMP_FOLDER_PATH)
 	private String tempFolderPath;
+
+	/**
+	 * When enabled, the daemon would dump a file on every error. This dump contains
+	 * the work packet + information about the environment and machine where the error occurred +
+	 */
+	@XStreamAlias(DUMP_ERRORS)
+	private boolean dumpErrors;
+
+	/**
+	 * Where should the daemon dump files when an error occurs. If not set, the tempFolderPath is used.
+	 */
+	@XStreamAlias(DUMP_FOLDER_PATH)
+	private String dumpFolderPath;
 
 	// Services this daemon provides
 	@XStreamAlias("services")
@@ -73,6 +88,8 @@ public final class DaemonConfig implements ResourceConfig {
 		daemon.setOsName(System.getProperty("os.name"));
 		daemon.setOsArch(System.getProperty("os.arch"));
 		daemon.setTempFolderPath("var/tmp");
+		daemon.setDumpErrors(false);
+		daemon.setDumpFolderPath("var/tmp/dump");
 		daemon.setSharedFileSpacePath("/");
 
 		if (local) {
@@ -136,6 +153,22 @@ public final class DaemonConfig implements ResourceConfig {
 
 	public void setTempFolderPath(final String tempFolderPath) {
 		this.tempFolderPath = tempFolderPath;
+	}
+
+	public boolean isDumpErrors() {
+		return dumpErrors;
+	}
+
+	public void setDumpErrors(final boolean dumpErrors) {
+		this.dumpErrors = dumpErrors;
+	}
+
+	public String getDumpFolderPath() {
+		return dumpFolderPath;
+	}
+
+	public void setDumpFolderPath(final String dumpFolderPath) {
+		this.dumpFolderPath = dumpFolderPath;
 	}
 
 	public List<ServiceConfig> getServices() {
@@ -220,6 +253,8 @@ public final class DaemonConfig implements ResourceConfig {
 		map.put(OS_ARCH, osArch);
 		map.put(SHARED_FILE_SPACE_PATH, sharedFileSpacePath);
 		map.put(TEMP_FOLDER_PATH, tempFolderPath);
+		map.put(DUMP_ERRORS, Boolean.toString(dumpErrors));
+		map.put(DUMP_FOLDER_PATH, dumpFolderPath);
 		return map;
 	}
 
@@ -230,6 +265,8 @@ public final class DaemonConfig implements ResourceConfig {
 		osArch = values.get(OS_ARCH);
 		sharedFileSpacePath = values.get(SHARED_FILE_SPACE_PATH);
 		tempFolderPath = values.get(TEMP_FOLDER_PATH);
+		dumpErrors = Boolean.parseBoolean(values.get(DUMP_ERRORS));
+		dumpFolderPath = values.get(DUMP_FOLDER_PATH);
 	}
 
 	public DaemonConfigInfo createDaemonConfigInfo() {

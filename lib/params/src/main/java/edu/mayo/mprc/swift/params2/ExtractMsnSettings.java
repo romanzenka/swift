@@ -51,11 +51,9 @@ public class ExtractMsnSettings extends PersistableBase {
 		if (getCommandLineSwitches() != null ? !getCommandLineSwitches().equals(that.getCommandLineSwitches()) : that.getCommandLineSwitches() != null) {
 			return false;
 		}
-		if (getCommand() != null ? !getCommand().equals(that.getCommand()) : that.getCommand() != null) {
+		if (!getCommand().equals(that.getCommand())) {
 			return false;
 		}
-
-
 		return true;
 	}
 

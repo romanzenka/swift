@@ -2,8 +2,6 @@ package edu.mayo.mprc.enginedeployment;
 
 import edu.mayo.mprc.daemon.WorkPacketBase;
 import edu.mayo.mprc.daemon.files.FileToken;
-import edu.mayo.mprc.daemon.files.FileTokenFactory;
-import edu.mayo.mprc.daemon.files.SenderTokenTranslator;
 import edu.mayo.mprc.fasta.DatabaseAnnotation;
 import edu.mayo.mprc.fasta.FastaFile;
 
@@ -95,26 +93,10 @@ public final class DeploymentRequest extends WorkPacketBase {
 			this.properties = new HashMap<String, Serializable>();
 		}
 
-		if (value instanceof File) {
-			value = FileTokenFactory.createAnonymousFileToken((File) value);
-		}
-
 		properties.put(key, value);
 	}
 
 	public File getCurationFile() {
 		return fastaFile.getFile();
-	}
-
-	public void translateOnSender(final SenderTokenTranslator translator) {
-		super.translateOnSender(translator);
-		// We need to translate all the extra properties that are not picked up automatically
-		if (properties != null) {
-			for (final Map.Entry<String, Serializable> property : properties.entrySet()) {
-				if (property.getValue() instanceof FileToken) {
-					properties.put(property.getKey(), translator.translateBeforeTransfer((FileToken) property.getValue()));
-				}
-			}
-		}
 	}
 }

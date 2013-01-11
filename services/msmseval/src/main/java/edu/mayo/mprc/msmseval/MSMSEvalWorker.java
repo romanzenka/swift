@@ -8,11 +8,12 @@ import edu.mayo.mprc.config.ui.ServiceUiFactory;
 import edu.mayo.mprc.config.ui.UiBuilder;
 import edu.mayo.mprc.daemon.WorkPacket;
 import edu.mayo.mprc.daemon.Worker;
+import edu.mayo.mprc.daemon.WorkerBase;
 import edu.mayo.mprc.daemon.WorkerFactoryBase;
 import edu.mayo.mprc.daemon.exception.DaemonException;
 import edu.mayo.mprc.io.mgf.MGF2MzXMLConverter;
 import edu.mayo.mprc.utilities.FileUtilities;
-import edu.mayo.mprc.utilities.progress.ProgressReporter;
+import edu.mayo.mprc.utilities.progress.UserProgressReporter;
 import org.apache.log4j.Logger;
 
 import java.io.File;
@@ -20,7 +21,7 @@ import java.util.Arrays;
 import java.util.Map;
 import java.util.TreeMap;
 
-public final class MSMSEvalWorker implements Worker {
+public final class MSMSEvalWorker extends WorkerBase {
 
 	public static final String SCORE_FILE_SUFFIX = "_eval.csv";
 	public static final String EM_FILE_SUFFIX = "_em.csv";
@@ -46,18 +47,8 @@ public final class MSMSEvalWorker implements Worker {
 		skippedExecution = false;
 	}
 
-	public void processRequest(final WorkPacket workPacket, final ProgressReporter progressReporter) {
-		try {
-			progressReporter.reportStart();
-			process(workPacket);
-			workPacket.synchronizeFileTokensOnReceiver();
-			progressReporter.reportSuccess();
-		} catch (Exception t) {
-			progressReporter.reportFailure(t);
-		}
-	}
-
-	private void process(final WorkPacket workPacket) {
+	@Override
+	public void process(final WorkPacket workPacket, final UserProgressReporter reporter) {
 		if (!MSMSEvalWorkPacket.class.isInstance(workPacket)) {
 			throw new DaemonException("Unknown request type [" + workPacket.getClass().getName() + "] expecting [" + MSMSEvalWorkPacket.class.getName() + "]");
 		}

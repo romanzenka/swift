@@ -85,38 +85,46 @@ public class FileHolder implements FileTokenHolder {
 		this.translator = translator;
 		this.synchronizer = synchronizer;
 
-		// Set all directly accessible fields
+		// Set all directly accessible fields from our token map
 		for (final Map.Entry<FieldIndex, FileToken> entry : tokenMap.entrySet()) {
-			final File file = translator.getFile(entry.getValue());
-			if(entry.getValue()!=null && entry.getValue().existsOnSourceDaemon()) {
-				filesThatShouldExist.add(file);
-			}
-			if (entry.getKey().getIndex() == null) {
-				setFileField(entry.getKey().getField(), file);
-			} else {
-				setFileIndexedField(entry.getKey(), file);
-			}
+			translateEntry(translator, filesThatShouldExist, entry);
 		}
-		// Set all the file token holder fields
+		// Recursively set all the file token holder fields
 		for (final Field field : getFields()) {
-			if (serializableFileTokenField(field)) {
-				final FileTokenHolder fileTokenHolder = getFileTokenHolder(field);
-				if (fileTokenHolder != null) {
-					fileTokenHolder.translateOnReceiver(translator, synchronizer, filesThatShouldExist);
+			translateTokenHolderField(translator, synchronizer, filesThatShouldExist, field);
+		}
+	}
+
+	private void translateEntry(ReceiverTokenTranslator translator, Set<File> filesThatShouldExist, Map.Entry<FieldIndex, FileToken> entry) {
+		final File file = translator.getFile(entry.getValue());
+		if(entry.getValue()!=null && entry.getValue().existsOnSourceDaemon()) {
+			filesThatShouldExist.add(file);
+		}
+		if (entry.getKey().getIndex() == null) {
+			setFileField(entry.getKey().getField(), file);
+		} else {
+			setFileIndexedField(entry.getKey(), file);
+		}
+	}
+
+	private void translateTokenHolderField(ReceiverTokenTranslator translator, FileTokenSynchronizer synchronizer, Set<File> filesThatShouldExist, Field field) {
+		if (serializableFileTokenField(field)) {
+			final FileTokenHolder fileTokenHolder = getFileTokenHolder(field);
+			if (fileTokenHolder != null) {
+				fileTokenHolder.translateOnReceiver(translator, synchronizer, filesThatShouldExist);
+			}
+		} else if (serializableFileListField(field)) {
+			for (final Object o : getFieldList(field)) {
+				if (o instanceof FileTokenHolder) {
+					((FileTokenHolder) o).translateOnReceiver(translator, synchronizer, filesThatShouldExist);
 				}
-			} else if (serializableFileListField(field)) {
-				for (final Object o : getFieldList(field)) {
-					if (o instanceof FileTokenHolder) {
-						((FileTokenHolder) o).translateOnReceiver(translator, synchronizer, filesThatShouldExist);
-					}
-				}
-			} else if (serializableFileMapField(field)) {
-				for (final Object o : getFieldMap(field).entrySet()) {
-					if (o instanceof Map.Entry) {
-						Map.Entry e = (Map.Entry) o;
-						if (e.getValue() instanceof FileTokenHolder) {
-							((FileTokenHolder) e.getValue()).translateOnReceiver(translator, synchronizer, filesThatShouldExist);
-						}
+			}
+		} else if (serializableFileMapField(field)) {
+			for (final Object o : getFieldMap(field).entrySet()) {
+				if (o instanceof Map.Entry) {
+					Map.Entry e = (Map.Entry) o;
+					if (e.getValue() instanceof FileTokenHolder) {
+						((FileTokenHolder) e.getValue()).translateOnReceiver(translator, synchronizer, filesThatShouldExist);
 					}
 				}
 			}
@@ -319,7 +327,7 @@ public class FileHolder implements FileTokenHolder {
 	}
 
 	private FileToken token(final SenderTokenTranslator translator, final File file) {
-		return translator.translateBeforeTransfer(FileTokenFactory.createAnonymousFileToken(file));
+		return translator.translateBeforeTransfer(file);
 	}
 
 	private void callTranslateOnSender(final SenderTokenTranslator translator, final Field field) {

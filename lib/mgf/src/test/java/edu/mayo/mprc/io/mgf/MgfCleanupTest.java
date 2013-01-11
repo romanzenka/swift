@@ -80,9 +80,9 @@ public final class MgfCleanupTest {
 				"END IONS\n" +
 				"\n" +
 				"BEGIN IONS\n" +
+				"TITLE=File: q03100602.wiff, Sample: ms0281-F  fx1 (sample number 1), Elution: 31.89 min, Period: 1, Cycle(s): 1820 (Experiment 2)\n" +
 				"PEPMASS=450.74861007249\n" +
 				"CHARGE=2+\n" +
-				"TITLE=File: q03100602.wiff, Sample: ms0281-F  fx1 (sample number 1), Elution: 31.89 min, Period: 1, Cycle(s): 1820 (Experiment 2)\n" +
 				"70.0623 0.0942\n" +
 				"114.1108 0.1243\n" +
 				"615.3107 0.1303\n" +
@@ -144,13 +144,13 @@ public final class MgfCleanupTest {
 				+ "END IONS\n", ""
 
 				+ "BEGIN IONS\n"
-				+ "CHARGE=2+\n"
 				+ "TITLE=missing title (filenameprefix.1.1.2.dta)\n"
+				+ "CHARGE=2+\n"
 				+ "10.5\n"
 				+ "END IONS\n"
 				+ "BEGIN IONS\n"
-				+ "CHARGE=3-\n"
 				+ "TITLE=missing title (filenameprefix.2.2.3.dta)\n"
+				+ "CHARGE=3-\n"
 				+ "10.6\n"
 				+ "END IONS\n"
 		);
@@ -171,8 +171,8 @@ public final class MgfCleanupTest {
 				+ "10.5\n"
 				+ "END IONS\n"
 				+ "BEGIN IONS\n"
-				+ "CHARGE=3-\n"
 				+ "TITLE=missing title (filenameprefix.1.1.3.dta)\n"
+				+ "CHARGE=3-\n"
 				+ "10.6\n"
 				+ "END IONS\n"
 		);
@@ -199,29 +199,79 @@ public final class MgfCleanupTest {
 				"70.0623 0.0942\n" +
 				"114.1108 0.1243\n" +
 				"615.3107 0.1303\n" +
-				"END IONS\n", "" +
-
+				"END IONS\n",
+				/////////////////////////
+				"" +
 				"SEARCH=MIS\n" +
 				"REPTYPE=Peptide\n" +
 				"BEGIN IONS\n" +
+				"TITLE=File: q03100602.wiff, Sample: ms0281-F  fx1 (sample number 1), Elution: 31.29 min, Period: 1, Cycle(s): 1788 (Experiment 2) (filenameprefix.1.1.2.dta)\n" +
 				"PEPMASS=450.75060209751\n" +
 				"CHARGE=2+\n" +
-				"TITLE=File: q03100602.wiff, Sample: ms0281-F  fx1 (sample number 1), Elution: 31.29 min, Period: 1, Cycle(s): 1788 (Experiment 2) (filenameprefix.1.1.2.dta)\n" +
 				"70.0615 0.0911\n" +
 				"114.1078 0.0962\n" +
 				"115.1062 0.153\n" +
 				"END IONS\n" +
 				"\n" +
 				"BEGIN IONS\n" +
+				"TITLE=File: q03100602.wiff, Sample: ms0281-F  fx1 (sample number 1), Elution: 31.89 min, Period: 1, Cycle(s): 1820 (Experiment 2) (filenameprefix.2.2.2.dta)\n" +
 				"PEPMASS=450.74861007249\n" +
 				"CHARGE=2+\n" +
-				"TITLE=File: q03100602.wiff, Sample: ms0281-F  fx1 (sample number 1), Elution: 31.89 min, Period: 1, Cycle(s): 1820 (Experiment 2) (filenameprefix.2.2.2.dta)\n" +
 				"70.0623 0.0942\n" +
 				"114.1108 0.1243\n" +
 				"615.3107 0.1303\n" +
 				"END IONS\n"
 		);
 	}
+
+	@Test
+	public void shouldCleanupProteomeDiscoverer() throws IOException {
+		testCorrectCleanup("MASS=Monoisotopic\n" +
+				"BEGIN IONS\n" +
+				"PEPMASS=419.31540 0.00000\n" +
+				"CHARGE=2+\n" +
+				"TITLE=File1134 Spectrum1 scans: 228\n" +
+				"RTINSECONDS=103\n" +
+				"SCANS=228\n" +
+				"127.160 53.0741\n" +
+				"128.168 5.71123\n" +
+				"129.022 14.5373\n" +
+				"END IONS\n" +
+				"\n" +
+				"BEGIN IONS\n" +
+				"TITLE=File1134 Spectrum2 scans: 441\n" +
+				"PEPMASS=1031.06702 10570.94922\n" +
+				"CHARGE=3+\n" +
+				"RTINSECONDS=198\n" +
+				"SCANS=441\n" +
+				"339.192 15.6759\n" +
+				"507.531 4.06305\n" +
+				"END IONS",
+				///////////////
+				"MASS=Monoisotopic\n" +
+				"BEGIN IONS\n" +
+				"TITLE=File1134 Spectrum1 scans: 228 (filenameprefix.228.228.2.dta)\n" +
+				"PEPMASS=419.31540 0.00000\n" +
+				"CHARGE=2+\n" +
+				"RTINSECONDS=103\n" +
+				"SCANS=228\n" +
+				"127.160 53.0741\n" +
+				"128.168 5.71123\n" +
+				"129.022 14.5373\n" +
+				"END IONS\n" +
+				"\n" +
+				"BEGIN IONS\n" +
+				"TITLE=File1134 Spectrum2 scans: 441 (filenameprefix.441.441.3.dta)\n" +
+				"PEPMASS=1031.06702 10570.94922\n" +
+				"CHARGE=3+\n" +
+				"RTINSECONDS=198\n" +
+				"SCANS=441\n" +
+				"339.192 15.6759\n" +
+				"507.531 4.06305\n" +
+				"END IONS\n"
+		);
+	}
+
 
 	private static void testCorrectCleanup(final String mgfIn, final String mgfOut) throws IOException {
 		BufferedReader reader = null;

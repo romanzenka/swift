@@ -8,8 +8,9 @@ import edu.mayo.mprc.config.ui.ServiceUiFactory;
 import edu.mayo.mprc.config.ui.UiBuilder;
 import edu.mayo.mprc.daemon.WorkPacket;
 import edu.mayo.mprc.daemon.Worker;
+import edu.mayo.mprc.daemon.WorkerBase;
 import edu.mayo.mprc.daemon.WorkerFactoryBase;
-import edu.mayo.mprc.utilities.progress.ProgressReporter;
+import edu.mayo.mprc.utilities.progress.UserProgressReporter;
 import org.apache.log4j.Logger;
 
 import java.io.File;
@@ -19,7 +20,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
-public final class ScaffoldReportWorker implements Worker {
+public final class ScaffoldReportWorker extends WorkerBase {
 	private static final Logger LOGGER = Logger.getLogger(ScaffoldReportWorker.class);
 	public static final String TYPE = "scaffoldReport";
 	public static final String NAME = "Scaffold Report";
@@ -31,28 +32,8 @@ public final class ScaffoldReportWorker implements Worker {
 	public ScaffoldReportWorker() {
 	}
 
-	/**
-	 * Processes given request data.
-	 * The is responsible for a call {@link edu.mayo.mprc.utilities.progress.ProgressReporter#reportSuccess()} or {@link edu.mayo.mprc.utilities.progress.ProgressReporter#reportFailure(Throwable)}
-	 * to signalize whether it succeeded or failed. This call can be performed after the method is done executing,
-	 * e.g. be scheduled for later time. You can also report failure or success and keep executing, as long as you do not
-	 * report success or failure twice in a row.
-	 *
-	 * @param workPacket       Work packet to be processed.
-	 * @param progressReporter To report progress, success or failures.
-	 */
-	public void processRequest(final WorkPacket workPacket, final ProgressReporter progressReporter) {
-		try {
-			progressReporter.reportStart();
-			process(workPacket);
-			workPacket.synchronizeFileTokensOnReceiver();
-			progressReporter.reportSuccess();
-		} catch (Exception t) {
-			progressReporter.reportFailure(t);
-		}
-	}
-
-	private void process(final WorkPacket workPacket) {
+	@Override
+	public void process(final WorkPacket workPacket, final UserProgressReporter progressReporter) {
 		if (workPacket instanceof ScaffoldReportWorkPacket) {
 
 			final ScaffoldReportWorkPacket scaffoldReportWorkPacket = ScaffoldReportWorkPacket.class.cast(workPacket);

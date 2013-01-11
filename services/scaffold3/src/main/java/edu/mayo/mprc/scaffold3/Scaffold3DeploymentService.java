@@ -80,7 +80,7 @@ public final class Scaffold3DeploymentService extends DeploymentService<Deployme
 	protected void validateAndDeleteDeploymentRelatedFiles(final File deployedFastaFile, final File deploymentFolder, final List<File> deletedFiles, final List<File> notDeletedFiles) {
 		final File[] deploymentFiles = deploymentFolder.listFiles();
 
-		final Pattern pattern = Pattern.compile(deployedFastaFile.getName() + "\\.\\d+\\.index");
+		final Pattern pattern = Pattern.compile(deployedFastaFile.getName() + "\\.\\[0-9.]+\\.index");
 
 		for (final File deploymentFile : deploymentFiles) {
 			if (isDeploymentRelatedFile(deployedFastaFile, pattern, deploymentFile) && FileUtilities.deleteNow(deploymentFile)) {

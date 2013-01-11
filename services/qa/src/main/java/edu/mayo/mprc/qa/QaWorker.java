@@ -8,6 +8,7 @@ import edu.mayo.mprc.config.ui.ServiceUiFactory;
 import edu.mayo.mprc.config.ui.UiBuilder;
 import edu.mayo.mprc.daemon.WorkPacket;
 import edu.mayo.mprc.daemon.Worker;
+import edu.mayo.mprc.daemon.WorkerBase;
 import edu.mayo.mprc.daemon.WorkerFactoryBase;
 import edu.mayo.mprc.msmseval.MSMSEvalOutputReader;
 import edu.mayo.mprc.myrimatch.MyrimatchPepXmlReader;
@@ -16,6 +17,7 @@ import edu.mayo.mprc.utilities.FileUtilities;
 import edu.mayo.mprc.utilities.ProcessCaller;
 import edu.mayo.mprc.utilities.progress.PercentDone;
 import edu.mayo.mprc.utilities.progress.ProgressReporter;
+import edu.mayo.mprc.utilities.progress.UserProgressReporter;
 import org.apache.log4j.Logger;
 
 import java.io.File;
@@ -26,7 +28,7 @@ import java.util.*;
 /**
  * Generates data files and image files representing QA data.
  */
-public final class QaWorker implements Worker {
+public final class QaWorker extends WorkerBase {
 
 	private static final Logger LOGGER = Logger.getLogger(QaWorker.class);
 	public static final String TYPE = "qa";
@@ -48,18 +50,7 @@ public final class QaWorker implements Worker {
 	private static final String R_EXECUTABLE = "rExecutable";
 
 	@Override
-	public void processRequest(final WorkPacket workPacket, final ProgressReporter progressReporter) {
-		try {
-			progressReporter.reportStart();
-			process(workPacket, progressReporter);
-			workPacket.synchronizeFileTokensOnReceiver();
-			progressReporter.reportSuccess();
-		} catch (Exception t) {
-			progressReporter.reportFailure(t);
-		}
-	}
-
-	private void process(final WorkPacket workPacket, final ProgressReporter progressReporter) {
+	public void process(final WorkPacket workPacket, final UserProgressReporter progressReporter) {
 		final QaWorkPacket qaWorkPacket = (QaWorkPacket) workPacket;
 
 		final File reportFile = qaWorkPacket.getReportFile();

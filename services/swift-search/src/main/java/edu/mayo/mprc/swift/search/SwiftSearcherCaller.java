@@ -131,7 +131,7 @@ public final class SwiftSearcherCaller {
 					searchId = ((AssignedSearchRunId) progressInfo).getSearchRunId();
 				}
 
-				//First ProgressInfo object must be the AssignedTaskData
+				// First ProgressInfo object must be the AssignedTaskData
 				if (progressInfo instanceof AssignedTaskData) {
 					return;
 				}

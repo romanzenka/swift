@@ -1,9 +1,9 @@
-package edu.mayo.mprc.filesharing;
+package edu.mayo.mprc.filesharing.jms;
 
 /**
  * Super class for
  */
-public abstract class FileTransferThread extends Thread {
+abstract class FileTransferThread extends Thread {
 
 	protected TransferCompleteListener listener;
 

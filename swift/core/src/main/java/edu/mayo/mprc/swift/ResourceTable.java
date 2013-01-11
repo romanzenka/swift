@@ -75,7 +75,7 @@ public final class ResourceTable extends FactoryBase<ResourceConfig, Object> imp
 	private MascotDeploymentService.Factory mascotDeployerWorkerFactory;
 	private SearchDbWorker.Factory searchDbWorkerFactory;
 	private FastaDbWorker.Factory fastaDbWorkerFactory;
-	private SimpleRunner.SimpleDaemonRunnerFactory simpleDaemonRunnerFactory;
+	private SimpleRunner.Factory simpleDaemonRunnerFactory;
 	private OmssaWorker.Factory omssaWorkerFactory;
 	private SequestDeploymentService.Factory sequestDeployerWorkerFactory;
 	private SwiftSearcher.Factory swiftSearcherFactory;
@@ -191,11 +191,11 @@ public final class ResourceTable extends FactoryBase<ResourceConfig, Object> imp
 		this.fastaDbWorkerFactory = fastaDbWorkerFactory;
 	}
 
-	public void setSimpleDaemonRunnerFactory(final SimpleRunner.SimpleDaemonRunnerFactory simpleDaemonRunnerFactory) {
-		this.simpleDaemonRunnerFactory = simpleDaemonRunnerFactory;
+	public void setSimpleDaemonRunnerFactory(final SimpleRunner.Factory factory) {
+		this.simpleDaemonRunnerFactory = factory;
 	}
 
-	public SimpleRunner.SimpleDaemonRunnerFactory getSimpleDaemonRunnerFactory() {
+	public SimpleRunner.Factory getSimpleDaemonRunnerFactory() {
 		return simpleDaemonRunnerFactory;
 	}
 

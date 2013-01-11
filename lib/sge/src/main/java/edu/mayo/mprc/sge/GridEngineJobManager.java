@@ -1,9 +1,11 @@
 package edu.mayo.mprc.sge;
 
+import com.google.common.base.Strings;
 import edu.mayo.mprc.MprcException;
 import org.apache.log4j.Logger;
 import org.ggf.drmaa.*;
 
+import java.io.Closeable;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.HashMap;
@@ -14,7 +16,7 @@ import java.util.concurrent.Semaphore;
 /**
  * this supports submission and handling of results for grid engine jobs
  */
-public final class GridEngineJobManager {
+public final class GridEngineJobManager implements Closeable {
 	private static final Logger LOGGER = Logger.getLogger(GridEngineJobManager.class);
 
 	private static final String QUEUE_SPEC_OPTION = "-q";
@@ -55,13 +57,7 @@ public final class GridEngineJobManager {
 		return gridEngineSession;
 	}
 
-	@Override
-	protected void finalize() throws Throwable {
-		destroy();
-		super.finalize();
-	}
-
-	private void destroy() {
+	public void close() {
 		if (getGridEngineSession() != null) {
 			try {
 				getGridEngineSession().exit();
@@ -173,7 +169,7 @@ public final class GridEngineJobManager {
 	private void setupJobTemplate(final JobTemplate jt, final GridEngineWorkPacket pPacket) throws DrmaaException {
 		// for now are assuming will not force a queue and memory
 		// may need to consider making these options pass through
-		if (pPacket.hasWorkingFolder()) {
+		if (pPacket.getWorkingFolder() != null) {
 			jt.setWorkingDirectory(pPacket.getWorkingFolder());
 			try {
 				jt.setOutputPath(InetAddress.getLocalHost().getHostName() + ":" + pPacket.getOutputLogFilePath());
@@ -184,22 +180,23 @@ public final class GridEngineJobManager {
 		}
 
 		String spec = "";
-		if (pPacket.hasNativeSpecification()) {
+		if (!Strings.isNullOrEmpty(pPacket.getNativeSpecification())) {
 			spec += pPacket.getNativeSpecification();
 			LOGGER.debug("Task has native specification: " + pPacket.getNativeSpecification());
 		}
-		if (pPacket.forcequeue()) {
+		if (!Strings.isNullOrEmpty(pPacket.getQueueName())) {
 			if (spec.length() > 0) {
 				spec += " ";
 			}
-			spec += QUEUE_SPEC_OPTION + " " + pPacket.getForcedJobQueue();
-			LOGGER.debug("Task forces a job queue: " + pPacket.getForcedJobQueue());
-		} else if (pPacket.forceMemoryRequirement()) {
+			spec += QUEUE_SPEC_OPTION + " " + pPacket.getQueueName();
+			LOGGER.debug("Task forces a job queue: " + pPacket.getQueueName());
+		}
+		if (!Strings.isNullOrEmpty(pPacket.getMemoryRequirement())) {
 			if (spec.length() > 0) {
 				spec += " ";
 			}
-			spec += MEMORY_SPEC_OPTION + pPacket.getForcedMemoryRequirement() + MEMORY_SPEC_OPTION_MB_UNIT;
-			LOGGER.warn("Task forces memory requirement: " + pPacket.getForcedMemoryRequirement());
+			spec += MEMORY_SPEC_OPTION + pPacket.getMemoryRequirement() + MEMORY_SPEC_OPTION_MB_UNIT;
+			LOGGER.warn("Task forces memory requirement: " + pPacket.getMemoryRequirement());
 		}
 		LOGGER.debug("Resulting native specification passed to grid engine:\n" + spec);
 		jt.setNativeSpecification(spec);

@@ -1,4 +1,4 @@
-package edu.mayo.mprc.filesharing;
+package edu.mayo.mprc.filesharing.jms;
 
 import java.io.Serializable;
 import java.util.List;
@@ -8,7 +8,7 @@ import java.util.List;
  * is successful, exception is null. Otherwise, exception object should
  * reference error exception.
  */
-public final class RemoteTransferCompleteEvent implements Serializable {
+final class RemoteTransferCompleteEvent implements Serializable {
 	private static final long serialVersionUID = 20111119L;
 	private long requestId;
 	private Exception exception;

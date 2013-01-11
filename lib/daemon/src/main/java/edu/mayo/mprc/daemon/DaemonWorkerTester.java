@@ -12,6 +12,7 @@ import org.apache.log4j.Logger;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
@@ -34,7 +35,8 @@ public final class DaemonWorkerTester {
 			final URI uri = new URI("jms.vm://broker1?simplequeue=test_" + String.valueOf(testId.incrementAndGet()));
 			initializeFromUri(uri);
 			this.runner = new SimpleRunner();
-			this.runner.setWorker(worker);
+			this.runner.setFactory(new TestWorkerFactory(worker));
+			this.runner.setExecutorService(getSingleThreadExecutor(worker));
 			this.runner.setDaemonConnection(this.daemonConnection);
 			this.runner.setEnabled(true);
 			this.runner.setLogOutputFolder(FileUtilities.createTempFolder());
@@ -43,6 +45,10 @@ public final class DaemonWorkerTester {
 		}
 		this.runner.start();
 		waitUntilReady(this.runner);
+	}
+
+	private static ExecutorService getSingleThreadExecutor(Worker worker) {
+		return new SimpleThreadPoolExecutor(1, worker.getClass().getSimpleName() + "-runner", true);
 	}
 
 	private void initializeFromUri(final URI uri) {

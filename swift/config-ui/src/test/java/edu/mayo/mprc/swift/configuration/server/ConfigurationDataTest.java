@@ -39,6 +39,8 @@ public final class ConfigurationDataTest {
 		Assert.assertEquals(daemon.getName(), "main", "The daemon is called 'main'");
 
 		Assert.assertEquals(daemon.getTempFolderPath(), "var/tmp", "Default temp folder is in var/tmp");
+		Assert.assertEquals(daemon.getDumpFolderPath(), "var/tmp/dump", "Default dump folder is in var/tmp/dump");
+		Assert.assertEquals(daemon.isDumpErrors(), false, "By default do not dump errors");
 
 		Assert.assertEquals(daemon.getChildren().size(), 4, "Daemon has Swift, Database, WebUI and Messenger modules by default");
 

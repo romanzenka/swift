@@ -4,13 +4,13 @@ import edu.mayo.mprc.MprcException;
 import edu.mayo.mprc.utilities.FileUtilities;
 import org.apache.log4j.Logger;
 import org.testng.Assert;
+import org.testng.annotations.AfterClass;
+import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.io.Serializable;
+import java.util.*;
 
 public class FileHolderTest {
 	private static final Logger LOGGER = Logger.getLogger(FileHolderTest.class);
@@ -97,14 +97,36 @@ public class FileHolderTest {
 		}
 	}
 
+	static class TestClass3 extends FileHolder {
+		private static final long serialVersionUID = 2126683581748560990L;
+		private Map<String, Serializable> map = new HashMap<String, Serializable>();
 
-	int translatedTokens;
+		public void addToMap(final String key, final Serializable value) {
+			map.put(key, value);
+		}
+
+		public Map<String, Serializable> getMap() {
+			return map;
+		}
+	}
+
+	private int translatedTokens;
+	private File temp;
+
+	@BeforeClass
+	public void setup() {
+		temp = FileUtilities.createTempFolder();
+		Assert.assertFalse(temp.getAbsolutePath().contains("src"), "The temp folder cannot contain 'src': " + temp.getAbsolutePath());
+	}
+
+	@AfterClass
+	public void teardown() {
+		FileUtilities.cleanupTempFile(temp);
+	}
 
 	@Test
 	public void testSerialization() {
 		final TestClass test = new TestClass();
-		final File temp = FileUtilities.createTempFolder();
-		Assert.assertFalse(temp.getAbsolutePath().contains("src"), "The temp folder cannot contain 'src': " + temp.getAbsolutePath());
 
 		test.setFile(new File(temp, "src/test.txt"));
 		test.addFile(new File(temp, "src/test1.txt"));
@@ -122,25 +144,10 @@ public class FileHolderTest {
 		test.setChild(test2);
 
 		translatedTokens = 0;
-		test.translateOnSender(new SenderTokenTranslator() {
-			// We change all "src" to "dest" to simulate translation
-			@Override
-			public FileToken translateBeforeTransfer(final FileToken fileToken) {
-				LOGGER.debug(fileToken.getTokenPath());
-				translatedTokens++;
-				String tokenPath = getFilePathFromToken(fileToken);
-				tokenPath = tokenPath.replace("src", "dest");
-				return FileTokenFactory.createAnonymousFileToken(new File(tokenPath));
-			}
-		});
+		test.translateOnSender(new MySenderTokenTranslator());
 
-		final MyFileTokenSynchronizer synchronizer = new MyFileTokenSynchronizer();
-		test.translateOnReceiver(new ReceiverTokenTranslator() {
-			@Override
-			public File getFile(final FileToken fileToken) {
-				return new File(getFilePathFromToken(fileToken));
-			}
-		}, synchronizer, null);
+		final SingleFileTokenSynchronizer synchronizer = new SingleFileTokenSynchronizer();
+		test.translateOnReceiver(new MyReceiverTokenTranslator(), synchronizer, null);
 
 		Assert.assertEquals(translatedTokens, 7);
 		assertFilesTranslated(test.getFile(), "dest/test.txt", temp);
@@ -158,15 +165,68 @@ public class FileHolderTest {
 		Assert.assertNotNull(synchronizer.getUploadedToken());
 	}
 
-	private void assertFilesTranslated(final File file, final String expected, final File temp) {
+	@Test
+	public void testSerializationWithDifficultMap() {
+		final TestClass3 test = new TestClass3();
+		test.addToMap("hello", "world");
+		test.addToMap("hello1", "world1");
+		test.addToMap("hello2", "world2");
+		test.addToMap("file", new File(temp, "src/test.txt"));
+
+		translatedTokens = 0;
+		test.translateOnSender(new MySenderTokenTranslator());
+
+		final SingleFileTokenSynchronizer synchronizer = new SingleFileTokenSynchronizer();
+		test.translateOnReceiver(new MyReceiverTokenTranslator(), synchronizer, null);
+
+		Assert.assertEquals(translatedTokens, 1);
+		assertFilesTranslated((File) test.getMap().get("file"), "dest/test.txt", temp);
+	}
+
+
+	private static void assertFilesTranslated(final File file, final String expected, final File temp) {
 		Assert.assertEquals(file.getAbsolutePath(), new File(temp, expected).getAbsolutePath());
 	}
 
-	private String getFilePathFromToken(final FileToken fileToken) {
+	private static String getFilePathFromToken(final FileToken fileToken) {
 		return fileToken.getTokenPath().substring("file:".length());
 	}
 
-	private static class MyFileTokenSynchronizer implements FileTokenSynchronizer {
+	/**
+	 *  We change all "src" to "dest" to simulate translation
+ 	 */
+	private class MySenderTokenTranslator implements SenderTokenTranslator {
+		@Override
+		public FileToken translateBeforeTransfer(final FileToken fileToken) {
+			return translateBeforeTransfer(new File(getFilePathFromToken(fileToken)));
+		}
+
+		@Override
+		public FileToken translateBeforeTransfer(File file) {
+			LOGGER.debug(file.getAbsolutePath());
+			translatedTokens++;
+			String path = file.getAbsolutePath().replace("src", "dest");
+			return FileTokenFactory.createAnonymousFileToken(new File(path));
+		}
+	}
+
+	/**
+	 * We simply peel the token, taking its path verbatim.
+	 */
+	private class MyReceiverTokenTranslator implements ReceiverTokenTranslator {
+		@Override
+		public File getFile(final FileToken fileToken) {
+			return new File(getFilePathFromToken(fileToken));
+		}
+	}
+
+	/**
+	 * A mock {@link FileTokenSynchronizer} implementation that allows its uploadAndWait method to be called once,
+	 * then it provides the parameter it was called with.
+	 *
+	 * @author Roman Zenka
+	 */
+	public static class SingleFileTokenSynchronizer implements FileTokenSynchronizer {
 		private FileToken uploadedToken;
 
 		public FileToken getUploadedToken() {

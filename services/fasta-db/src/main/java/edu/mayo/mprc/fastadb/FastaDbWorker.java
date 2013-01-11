@@ -8,11 +8,12 @@ import edu.mayo.mprc.config.ui.ServiceUiFactory;
 import edu.mayo.mprc.config.ui.UiBuilder;
 import edu.mayo.mprc.daemon.WorkPacket;
 import edu.mayo.mprc.daemon.Worker;
+import edu.mayo.mprc.daemon.WorkerBase;
 import edu.mayo.mprc.daemon.WorkerFactoryBase;
 import edu.mayo.mprc.database.DatabaseFactory;
 import edu.mayo.mprc.dbcurator.model.Curation;
 import edu.mayo.mprc.dbcurator.model.persistence.CurationDao;
-import edu.mayo.mprc.utilities.progress.ProgressReporter;
+import edu.mayo.mprc.utilities.progress.UserProgressReporter;
 
 import java.util.Map;
 import java.util.TreeMap;
@@ -28,7 +29,7 @@ import java.util.TreeMap;
  *
  * @author Roman Zenka
  */
-public class FastaDbWorker implements Worker {
+public class FastaDbWorker extends WorkerBase {
 	public static final String TYPE = "fasta-db";
 	public static final String NAME = "Database of FASTA entries";
 	public static final String DESC = "Loads the FASTA files into a database for easier management.";
@@ -43,18 +44,7 @@ public class FastaDbWorker implements Worker {
 		this.curationDao = curationDao;
 	}
 
-	public void processRequest(final WorkPacket workPacket, final ProgressReporter progressReporter) {
-		try {
-			progressReporter.reportStart();
-			process(workPacket, progressReporter);
-			workPacket.synchronizeFileTokensOnReceiver();
-			progressReporter.reportSuccess();
-		} catch (Exception t) {
-			progressReporter.reportFailure(t);
-		}
-	}
-
-	private void process(final WorkPacket wp, final ProgressReporter reporter) {
+	public void process(final WorkPacket wp, final UserProgressReporter reporter) {
 		final FastaDbWorkPacket workPacket = (FastaDbWorkPacket) wp;
 		curationDao.begin();
 		try {

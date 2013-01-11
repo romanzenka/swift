@@ -29,7 +29,7 @@ public final class TestMascotDaemonWorker {
 	private File mascotTemp;
 	private File inputMgfFile;
 	private File inputMgfFolder;
-	private static final String MASCOT_URL = "http://mascot";
+	private static final String MASCOT_URL = "http://mascot.mayo.edu";
 	private static final String TEST_MASCOT_DB = "Current_SP";
 
 	@BeforeClass
@@ -48,8 +48,8 @@ public final class TestMascotDaemonWorker {
 	@Test
 	public void shouldProvideCorrectCgiUrl() throws MalformedURLException {
 		Assert.assertEquals(MascotWorker.mascotCgiUrl(
-				new URL("http://mascot/")),
-				new URL("http://mascot/" + MascotWorker.MASCOT_CGI),
+				new URL("http://mascot.mayo.edu/")),
+				new URL("http://mascot.mayo.edu/" + MascotWorker.MASCOT_CGI),
 				"Mascot CGI script path generated incorrectly");
 		Assert.assertEquals(MascotWorker.mascotCgiUrl(
 				new URL("http://crick4.mayo.edu:2080/mascot/")),
