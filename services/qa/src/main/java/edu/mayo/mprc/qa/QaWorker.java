@@ -16,7 +16,6 @@ import edu.mayo.mprc.scaffoldparser.spectra.ScaffoldQaSpectraReader;
 import edu.mayo.mprc.utilities.FileUtilities;
 import edu.mayo.mprc.utilities.ProcessCaller;
 import edu.mayo.mprc.utilities.progress.PercentDone;
-import edu.mayo.mprc.utilities.progress.ProgressReporter;
 import edu.mayo.mprc.utilities.progress.UserProgressReporter;
 import org.apache.log4j.Logger;
 
@@ -261,7 +260,7 @@ public final class QaWorker extends WorkerBase {
 		return numFilesTotal;
 	}
 
-	private void reportProgress(final float percentDone, final ProgressReporter progressReporter) {
+	private void reportProgress(final float percentDone, final UserProgressReporter progressReporter) {
 		progressReporter.reportProgress(new PercentDone(percentDone));
 	}
 

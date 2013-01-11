@@ -9,6 +9,7 @@ import edu.mayo.mprc.config.ui.ServiceUiFactory;
 import edu.mayo.mprc.config.ui.UiBuilder;
 import edu.mayo.mprc.daemon.WorkPacket;
 import edu.mayo.mprc.daemon.Worker;
+import edu.mayo.mprc.daemon.WorkerBase;
 import edu.mayo.mprc.daemon.WorkerFactoryBase;
 import edu.mayo.mprc.daemon.exception.DaemonException;
 import edu.mayo.mprc.utilities.FileUtilities;
@@ -30,7 +31,7 @@ import java.util.regex.Pattern;
  * params file at ${MGF_PATH}, ${DB[_PATH]:...}, and ${OUT_PATH}.  These placeholder MUST be in place in the correct positions
  * for a successful search to complete.
  */
-public final class OmssaWorker extends WorkeßrBase {
+public final class OmssaWorker extends WorkerBase {
 	private static final Logger LOGGER = Logger.getLogger(OmssaWorker.class);
 	public static final String TYPE = "omssa";
 	public static final String NAME = "Omssa";
