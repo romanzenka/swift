@@ -12,6 +12,7 @@ import edu.mayo.mprc.database.DatabaseFactory;
 import edu.mayo.mprc.dbundeploy.DatabaseUndeployerWorker;
 import edu.mayo.mprc.fastadb.FastaDbWorker;
 import edu.mayo.mprc.idpicker.IdpickerCache;
+import edu.mayo.mprc.idpicker.IdpickerDeploymentService;
 import edu.mayo.mprc.idpicker.IdpickerWorker;
 import edu.mayo.mprc.mascot.MascotCache;
 import edu.mayo.mprc.mascot.MascotDeploymentService;
@@ -98,9 +99,9 @@ public final class ResourceTable extends FactoryBase<ResourceConfig, Object> imp
 		addWorkerByReflection(XTandemWorker.class);
 		addWorker(OmssaWorker.TYPE, OmssaWorker.NAME, OmssaWorker.Config.class, getOmssaWorkerFactory(), new OmssaWorker.Ui(), OmssaWorker.DESC);
 		addWorkerByReflection(MyrimatchWorker.class);
+		addWorkerByReflection(IdpickerWorker.class);
 		addWorkerByReflection(ScaffoldWorker.class);
 		addWorkerByReflection(Scaffold3Worker.class);
-		addWorkerByReflection(IdpickerWorker.class);
 
 		// DB deployers
 		addWorker(MascotDeploymentService.TYPE, MascotDeploymentService.NAME, MascotDeploymentService.Config.class, getMascotDeployerWorkerFactory(), new MascotDeploymentService.Ui(), MascotDeploymentService.DESC);
@@ -109,6 +110,7 @@ public final class ResourceTable extends FactoryBase<ResourceConfig, Object> imp
 		addWorkerByReflection(XTandemDeploymentService.class);
 		addWorkerByReflection(OmssaDeploymentService.class);
 		addWorkerByReflection(MyrimatchDeploymentService.class);
+		addWorkerByReflection(IdpickerDeploymentService.class);
 		addWorker(ScaffoldDeploymentService.TYPE, ScaffoldDeploymentService.NAME, ScaffoldDeploymentService.Config.class, getScaffoldDeployerWorkerFactory(), new ScaffoldDeploymentService.Ui(), ScaffoldDeploymentService.DESC);
 		addWorkerByReflection(Scaffold3DeploymentService.class);
 
