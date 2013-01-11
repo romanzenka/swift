@@ -9,11 +9,12 @@ import edu.mayo.mprc.config.ui.ServiceUiFactory;
 import edu.mayo.mprc.config.ui.UiBuilder;
 import edu.mayo.mprc.daemon.WorkPacket;
 import edu.mayo.mprc.daemon.Worker;
+import edu.mayo.mprc.daemon.WorkerBase;
 import edu.mayo.mprc.daemon.WorkerFactoryBase;
 import edu.mayo.mprc.utilities.FileUtilities;
 import edu.mayo.mprc.utilities.ProcessCaller;
 import edu.mayo.mprc.utilities.exceptions.ExceptionUtilities;
-import edu.mayo.mprc.utilities.progress.ProgressReporter;
+import edu.mayo.mprc.utilities.progress.UserProgressReporter;
 import org.apache.log4j.Logger;
 
 import java.io.File;
@@ -27,7 +28,7 @@ import java.util.TreeMap;
  * Calls <tt>msaccess.exe</tt> to determine whether peak picking should be enabled.
  * Then calls <tt>msconvert.exe</tt>.
  */
-public final class IdpickerWorker implements Worker {
+public final class IdpickerWorker extends WorkerBase {
 	private static final Logger LOGGER = Logger.getLogger(IdpickerWorker.class);
 	public static final String TYPE = "idpicker";
 	public static final String NAME = "IDPicker";
@@ -39,18 +40,7 @@ public final class IdpickerWorker implements Worker {
 
 	private File idpQonvertExecutable;
 
-	public void processRequest(final WorkPacket workPacket, final ProgressReporter progressReporter) {
-		try {
-			progressReporter.reportStart();
-			process(workPacket);
-			workPacket.synchronizeFileTokensOnReceiver();
-			progressReporter.reportSuccess();
-		} catch (Exception t) {
-			progressReporter.reportFailure(t);
-		}
-	}
-
-	private void process(final WorkPacket workPacket) {
+	public void process(final WorkPacket workPacket, final UserProgressReporter progressReporter) {
 		if (!(workPacket instanceof IdpickerWorkPacket)) {
 			ExceptionUtilities.throwCastException(workPacket, IdpickerWorkPacket.class);
 			return;
@@ -65,17 +55,17 @@ public final class IdpickerWorker implements Worker {
 			return;
 		}
 
-		List<String> commandLine = new ArrayList<String>();
+		final List<String> commandLine = new ArrayList<String>();
 		commandLine.add(FileUtilities.getAbsoluteFileForExecutables(getIdpQonvertExecutable()).getPath());
 		commandLine.addAll(batchWorkPacket.getSettings().toCommandLine());
 		commandLine.addAll(batchWorkPacket.getInputFilePaths());
 
-		ProcessBuilder builder = new ProcessBuilder(commandLine);
+		final ProcessBuilder builder = new ProcessBuilder(commandLine);
 		builder.directory(idpQonvertExecutable.getParentFile());
-		ProcessCaller caller = new ProcessCaller(builder);
+		final ProcessCaller caller = new ProcessCaller(builder);
 		caller.runAndCheck("idpQonvert");
 		if (!batchWorkPacket.getOutputFile().exists() || !batchWorkPacket.getOutputFile().canRead() || !batchWorkPacket.getOutputFile().isFile()) {
-			throw new MprcException("idpicker failed to create file: " + batchWorkPacket.getOutputFile().getAbsolutePath());
+			throw new MprcException("idpQonvert failed to create file: " + batchWorkPacket.getOutputFile().getAbsolutePath());
 		}
 	}
 
@@ -83,7 +73,7 @@ public final class IdpickerWorker implements Worker {
 		final File resultFile = batchWorkPacket.getOutputFile();
 		if (resultFile.exists()) {
 			final long resultModified = resultFile.lastModified();
-			for (File inputFile : batchWorkPacket.getInputFiles()) {
+			for (final File inputFile : batchWorkPacket.getInputFiles()) {
 				if (inputFile.lastModified() > resultModified) {
 					LOGGER.info("The input file [" + inputFile.getAbsolutePath() + "] is newer than [" + resultFile.getAbsolutePath() + "]");
 					return false;
@@ -103,7 +93,7 @@ public final class IdpickerWorker implements Worker {
 		return idpQonvertExecutable;
 	}
 
-	public void setIdpQonvertExecutable(File idpQonvertExecutable) {
+	public void setIdpQonvertExecutable(final File idpQonvertExecutable) {
 		this.idpQonvertExecutable = idpQonvertExecutable;
 	}
 
