@@ -30,7 +30,7 @@ public class TestOmssaWorker {
 	private static final String SWIFT_INSTALL_ROOT_PATH = "../swift";
 	private static final String DATABASE_DEPLOYMENT_DIR = SWIFT_INSTALL_ROOT_PATH + "/install/swift/var/fasta/";
 
-	private static final String DATABASE_SHORT_NAME = "SprotYeast080226A";
+	private static final String DATABASE_SHORT_NAME = "SprotYeast";
 
 	//Omssa
 	private File omssaTemp;

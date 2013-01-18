@@ -141,7 +141,7 @@ public class Installer {
 	);
 
 	private static final List<String> FASTA_YEAST = Arrays.asList(
-			"/SprotYeast080226A.fasta"
+			"/SprotYeast.fasta"
 	);
 
 	private static final List<String> MGF_TEST = Arrays.asList(
@@ -150,6 +150,10 @@ public class Installer {
 
 	private static final List<String> RAW_FILES = Arrays.asList(
 			"/test.RAW"
+	);
+
+	private static final List<String> PEPXML_FILES = Arrays.asList(
+			"/test.pepXML"
 	);
 
 	private static final int EXECUTABLE = 0x1ed; // 0755
@@ -270,9 +274,13 @@ public class Installer {
 		return processList(folder, "raw", RAW_FILES, action);
 	}
 
+	public static File pepXmlFiles(final File folder, final Action action) {
+		return processList(folder, "pepxml", PEPXML_FILES, action);
+	}
+
 	private static List<String> getTandemFiles() {
 		if (FileUtilities.isMacPlatform()) {
-			return null;
+			throw new MprcException("Tandem testing not supported on Mac OS X");
 		}
 		return FileUtilities.isWindowsPlatform() ? TANDEM_WINDOWS : TANDEM_LINUX;
 	}

@@ -33,7 +33,7 @@ public class TestTandem {
 
 	private File tandemTemp;
 
-	private static final String DATABASE_SHORT_NAME = "SprotYeast080226A";
+	private static final String DATABASE_SHORT_NAME = "SprotYeast";
 	private File inputMgfFolder;
 	private File inputMgfFile;
 	private File fastaFolder;
