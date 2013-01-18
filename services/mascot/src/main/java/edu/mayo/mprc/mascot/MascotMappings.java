@@ -22,8 +22,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public final class MascotMappings implements Mappings {
-	private Map<String, Protease> enzymesByMascotName;
-	private Map<Protease, String> mascotNamesByEnzyme;
+	private final Map<Protease, String> mascotNamesByEnzyme;
 	private static final String PEP_TOL_VALUE = "TOL";
 	private static final String PEP_TOL_UNIT = "TOLU";
 	private static final String FRAG_TOL_VALUE = "ITOL";
@@ -81,7 +80,6 @@ public final class MascotMappings implements Mappings {
 		for (final Protease protease : info.getEnzymeAllowedValues()) {
 			allowedH.put(protease.getName(), protease);
 		}
-		enzymesByMascotName = getEnzymesByName(allowedH, enzymeNames);
 		mascotNamesByEnzyme = getNamesByEnzyme(allowedH, enzymeNames);
 	}
 
