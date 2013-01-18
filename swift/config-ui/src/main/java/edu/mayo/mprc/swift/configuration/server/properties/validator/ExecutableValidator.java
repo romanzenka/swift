@@ -27,6 +27,9 @@ public final class ExecutableValidator implements PropertyChangeListener {
 		if (validationRequested) {
 			final ProcessBuilder builder = new ProcessBuilder();
 			final File executable = FileUtilities.getAbsoluteFileForExecutables(new File(newValue));
+			if(executable.isAbsolute()) {
+				builder.directory(executable.getParentFile());
+			}
 			final List<String> command = new ArrayList<String>(commandLineParams.size() + 1);
 			command.add(executable.getPath());
 			command.addAll(commandLineParams);

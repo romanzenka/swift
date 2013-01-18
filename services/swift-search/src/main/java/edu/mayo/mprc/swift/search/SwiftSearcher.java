@@ -966,7 +966,7 @@ public final class SwiftSearcher implements Worker {
 					.reference(IdpickerWorker.TYPE, IdpickerCache.TYPE, UiBuilder.NONE_TYPE)
 
 					.property(IDPICKER_DEPLOYER, IdpickerDeploymentService.NAME, "If you want to use IDPicker, you have to have a database deployer set up. This deployer does virtually nothing, so it can be installed even on a very loaded machine.")
-					.reference(MyrimatchDeploymentService.TYPE, UiBuilder.NONE_TYPE)
+					.reference(IdpickerDeploymentService.TYPE, UiBuilder.NONE_TYPE)
 
 					.property(SCAFFOLD, ScaffoldWorker.NAME, "Scaffold 2 batch searcher by Proteome Software")
 					.reference(ScaffoldWorker.TYPE, UiBuilder.NONE_TYPE)

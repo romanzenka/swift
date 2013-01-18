@@ -220,7 +220,7 @@ public final class MyrimatchTest {
 
 			final File resultFile = new File(tempFolder, "result.pepXML");
 
-			final MyrimatchWorkPacket work = new MyrimatchWorkPacket(mgfFile, configFile, resultFile, tempFolder, fastaFile, 2, "Rev_", false, "Test Myrimatch run", false);
+			final MyrimatchWorkPacket work = new MyrimatchWorkPacket(resultFile, configFile, mgfFile, tempFolder, fastaFile, 2, "Rev_", false, "Test Myrimatch run", false);
 
 			final MyrimatchWorker worker = new MyrimatchWorker(myrimatchExecutable);
 

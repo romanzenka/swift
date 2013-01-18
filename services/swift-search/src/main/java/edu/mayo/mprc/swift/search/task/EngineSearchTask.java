@@ -110,9 +110,7 @@ final class EngineSearchTask extends AsyncTaskBase implements FileProducingTask 
 		} else if ("MYRIMATCH".equalsIgnoreCase(engine.getCode())) {
 			final MyrimatchDeploymentResult myrimatchDeploymentResult = (MyrimatchDeploymentResult) deploymentResult.getDeploymentResult();
 			workPacket = new MyrimatchWorkPacket(
-					inputFile.getResultingFile(),
-					paramsFile,
-					outputFile,
+					outputFile, paramsFile, inputFile.getResultingFile(),
 					outputFile.getParentFile(),
 					deploymentResult.getFastaFile(),
 					myrimatchDeploymentResult.getNumForwardEntries(),

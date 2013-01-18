@@ -1,6 +1,7 @@
 package edu.mayo.mprc.swift.search.task;
 
 import com.google.common.base.Preconditions;
+import com.google.common.collect.Maps;
 import edu.mayo.mprc.MprcException;
 import edu.mayo.mprc.daemon.DaemonConnection;
 import edu.mayo.mprc.daemon.files.FileTokenFactory;
@@ -105,6 +106,12 @@ public final class SearchRunner implements Runnable {
 	 * Value: Scaffold caller task
 	 */
 	private Map<ScaffoldCall, ScaffoldTaskI> scaffoldCalls = new HashMap<ScaffoldCall, ScaffoldTaskI>();
+
+	/**
+	 * Key: input file for IdPicker<br/>
+	 * Value: Idpicker caller task
+	 */
+	private Map<String, IdpickerTask> idpickerCalls = Maps.newHashMap();
 
 	/**
 	 * Key: Curation ID
@@ -266,6 +273,7 @@ public final class SearchRunner implements Runnable {
 							spectrumQaTasks.size() +
 							engineSearches.size() +
 							scaffoldCalls.size() +
+							idpickerCalls.size() +
 							fastaDbCalls.size() +
 							reportCalls.size() +
 							searchDbCalls.size() +
@@ -282,6 +290,7 @@ public final class SearchRunner implements Runnable {
 		workflowEngine.addAllTasks(spectrumQaTasks.values());
 		workflowEngine.addAllTasks(engineSearches.values());
 		workflowEngine.addAllTasks(scaffoldCalls.values());
+		workflowEngine.addAllTasks(idpickerCalls.values());
 		workflowEngine.addAllTasks(fastaDbCalls.values());
 		workflowEngine.addAllTasks(reportCalls);
 		workflowEngine.addAllTasks(searchDbCalls.values());
@@ -381,6 +390,12 @@ public final class SearchRunner implements Runnable {
 							searchDefinition.getSearchParameters().getDatabase());
 		}
 		final SearchEngine idpicker = getIdpickerEngine();
+		DatabaseDeployment idpickerDeployment = null;
+		if (idpicker != null && searchWithIdpicker(inputFile)) {
+			idpickerDeployment =
+					addDatabaseDeployment(idpicker, null/*idpicker has no param file*/,
+							searchDefinition.getSearchParameters().getDatabase());
+		}
 
 		ScaffoldTask scaffoldTask = null;
 		Scaffold3Task scaffold3Task = null;
@@ -427,14 +442,11 @@ public final class SearchRunner implements Runnable {
 				// If IDPIcker is on, we chain an IDPicker call to the output of the previous search engine.
 				// We support Myrimatch only for now
 				if (searchWithIdpicker(inputFile) && "MYRIMATCH".equals(engine.getCode())) {
-					addEngineSearch(
+					addIdpickerCall(
 							idpicker,
-							getParamFile(idpicker),
-							search.getOutputFile(),
 							getOutputFolderForSearchEngine(idpicker),
 							search,
-							null,
-							true);
+							idpickerDeployment);
 				}
 			}
 		}
@@ -816,7 +828,7 @@ public final class SearchRunner implements Runnable {
 		final String experiment = inputFile.getExperiment();
 		final ScaffoldCall key = new ScaffoldCall(experiment, "2");
 
-		ScaffoldTaskI scaffoldTaskI = scaffoldCalls.get(key);
+		final ScaffoldTaskI scaffoldTaskI = scaffoldCalls.get(key);
 		if (scaffoldTaskI != null && !(scaffoldTaskI instanceof ScaffoldTask)) {
 			ExceptionUtilities.throwCastException(scaffoldTaskI, ScaffoldTask.class);
 			return null;
@@ -850,7 +862,7 @@ public final class SearchRunner implements Runnable {
 	private Scaffold3Task addScaffold3Call(final FileSearch inputFile, final EngineSearchTask search, final DatabaseDeployment scaffoldDbDeployment) {
 		final String experiment = inputFile.getExperiment();
 		final ScaffoldCall key = new ScaffoldCall(experiment, "3");
-		ScaffoldTaskI scaffoldTaskI = scaffoldCalls.get(key);
+		final ScaffoldTaskI scaffoldTaskI = scaffoldCalls.get(key);
 		if (scaffoldTaskI != null && !(scaffoldTaskI instanceof Scaffold3Task)) {
 			ExceptionUtilities.throwCastException(scaffoldTaskI, Scaffold3Task.class);
 			return null;
@@ -877,6 +889,20 @@ public final class SearchRunner implements Runnable {
 
 		return scaffoldTask;
 	}
+
+	private IdpickerTask addIdpickerCall(final SearchEngine idpicker, final File outputFolder,
+	                             final EngineSearchTask search, final DatabaseDeployment idpickerDeployment) {
+		final String key = search.getOutputFile().getAbsolutePath();
+		if(idpickerCalls.containsKey(key)) {
+			return idpickerCalls.get(key);
+		}
+		final IdpickerTask task = new IdpickerTask(null, idpicker.getSearchDaemon(),
+				search, idpickerDeployment, outputFolder, fileTokenFactory, isFromScratch());
+		idpickerCalls.put(key, task);
+		task.addDependency(search);
+		return task;
+	}
+
 
 	private FastaDbTask addFastaDbCall(final Curation curation) {
 		if (fastaDbDaemon != null) {

@@ -48,17 +48,21 @@ public final class IdpickerWorker extends WorkerBase {
 
 		final IdpickerWorkPacket batchWorkPacket = (IdpickerWorkPacket) workPacket;
 
-		LOGGER.debug("Running IDPicker: [" + batchWorkPacket.getInputPathsAsString("], [") + "] -> " + batchWorkPacket.getOutputFile());
+		LOGGER.debug("Running IDPicker: [" + batchWorkPacket.getInputFile().getAbsolutePath() + "] -> " + batchWorkPacket.getOutputFile());
 
 		//  check if already exists (skip condition)
 		if (isConversionDone(batchWorkPacket)) {
 			return;
 		}
 
+		// Make sure the database is set properly
+		batchWorkPacket.getParams().setProteinDatabase(batchWorkPacket.getFastaFile().getAbsolutePath());
 		final List<String> commandLine = new ArrayList<String>();
 		commandLine.add(FileUtilities.getAbsoluteFileForExecutables(getIdpQonvertExecutable()).getPath());
-		commandLine.addAll(batchWorkPacket.getSettings().toCommandLine());
-		commandLine.addAll(batchWorkPacket.getInputFilePaths());
+		commandLine.add("-workdir");
+		commandLine.add(batchWorkPacket.getInputFile().getParentFile().getAbsolutePath());
+		commandLine.addAll(batchWorkPacket.getParams().toCommandLine());
+		commandLine.add(batchWorkPacket.getInputFile().getName());
 
 		final ProcessBuilder builder = new ProcessBuilder(commandLine);
 		builder.directory(idpQonvertExecutable.getParentFile());
@@ -73,11 +77,11 @@ public final class IdpickerWorker extends WorkerBase {
 		final File resultFile = batchWorkPacket.getOutputFile();
 		if (resultFile.exists()) {
 			final long resultModified = resultFile.lastModified();
-			for (final File inputFile : batchWorkPacket.getInputFiles()) {
-				if (inputFile.lastModified() > resultModified) {
-					LOGGER.info("The input file [" + inputFile.getAbsolutePath() + "] is newer than [" + resultFile.getAbsolutePath() + "]");
-					return false;
-				}
+			final File inputFile = batchWorkPacket.getInputFile();
+			if (inputFile.lastModified() > resultModified) {
+				LOGGER.info("The input file [" + inputFile.getAbsolutePath() + "] is newer than [" + resultFile.getAbsolutePath() + "]");
+				return false;
+
 			}
 			LOGGER.info(resultFile.getAbsolutePath() + " already exists and sufficiently recent.");
 			return true;
@@ -155,7 +159,7 @@ public final class IdpickerWorker extends WorkerBase {
 					.property(IDPQONVERT_EXECUTABLE, "<tt>idpQonvert</tt> path", "Location of IDPicker ver. 3 <tt>idpQonvert</tt>." +
 							"<p><a href=\"http://teamcity.fenchurch.mc.vanderbilt.edu/project.html?projectId=project9&tab=projectOverview\">TeamCity download from Vanderbilt</a></p>")
 					.required()
-					.executable(Lists.<String>newArrayList())
+					.executable(Lists.<String>newArrayList("-dump"))
 					.defaultValue("idpQonvert");
 		}
 	}

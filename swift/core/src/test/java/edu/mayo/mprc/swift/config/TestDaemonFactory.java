@@ -231,7 +231,7 @@ public final class TestDaemonFactory {
 		final SwiftSearcher.Config searcherConfig = new SwiftSearcher.Config(
 				"fastaPath", "fastaArchivePath",
 				"fastaUploadPath", raw2mgf, msconvert, mgfToMgf, rawDump, mascot, mascotDeployer, sequest,
-				sequestDeployer, tandem, tandemDeployer, omssa, omssaDeployer, null, null, scaffold, scaffoldDeployer, null, null, scaffoldReport, qa, null, null, msmsEval, null);
+				sequestDeployer, tandem, tandemDeployer, omssa, omssaDeployer, null, null, null, null, scaffold, scaffoldDeployer, null, null, scaffoldReport, qa, null, null, msmsEval, null);
 		final SimpleRunner.Config runner76 = new SimpleRunner.Config();
 		runner76.setNumThreads(1);
 		runner76.setWorkerConfiguration(searcherConfig);

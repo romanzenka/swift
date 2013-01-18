@@ -1,13 +1,8 @@
 package edu.mayo.mprc.idpicker;
 
-import com.google.common.base.Joiner;
-import com.google.common.base.Predicates;
-import com.google.common.collect.Iterables;
-import com.google.common.collect.Ordering;
 import edu.mayo.mprc.daemon.CachableWorkPacket;
 import edu.mayo.mprc.daemon.WorkPacket;
 import edu.mayo.mprc.daemon.WorkPacketBase;
-import edu.mayo.mprc.utilities.FileUtilities;
 import edu.mayo.mprc.utilities.progress.ProgressReporter;
 
 import java.io.File;
@@ -21,9 +16,9 @@ public final class IdpickerWorkPacket extends WorkPacketBase implements Cachable
 	private static final long serialVersionUID = 20121109;
 
 	/**
-	 * Input .pepXML files
+	 * Input .pepXML file
 	 */
-	private List<File> inputFiles;
+	private File inputFile;
 	/**
 	 * Output .idp file
 	 */
@@ -31,29 +26,34 @@ public final class IdpickerWorkPacket extends WorkPacketBase implements Cachable
 	/**
 	 * Settings for idpQonvert.
 	 */
-	private IdpQonvertSettings settings;
+	private IdpQonvertSettings params;
+
+	/**
+	 * The FASTA file to be used.
+	 */
+	private File fastaFile;
 
 	public IdpickerWorkPacket(final String taskId, final boolean fromScratch) {
 		super(taskId, fromScratch);
 	}
 
 	/**
-	 * Request to convert a .pepXML file into
+	 * Request to convert a .pepXML file into .idp file
 	 *
 	 * @param outputFile This is the desired target of the output. The cache can overwrite this to anything it sees fit.
 	 *                   If that happens, a {@link IdpickerResult} class is sent back
 	 *                   as progress report.
 	 */
-	public IdpickerWorkPacket(final File outputFile,
-	                          final List<File> inputFiles,
-	                          final IdpQonvertSettings settings,
+	public IdpickerWorkPacket(final File outputFile, final IdpQonvertSettings params, final File inputFile,
+	                          final File fastaFile,
 	                          final String taskId,
 	                          final boolean fromScratch) {
 		super(taskId, fromScratch);
 
-		this.inputFiles = inputFiles;
+		this.inputFile = inputFile;
+		this.params = params;
 		this.outputFile = outputFile;
-		this.settings = settings;
+		this.fastaFile = fastaFile;
 	}
 
 	@Override
@@ -61,8 +61,8 @@ public final class IdpickerWorkPacket extends WorkPacketBase implements Cachable
 		return true;
 	}
 
-	public List<File> getInputFiles() {
-		return inputFiles;
+	public File getInputFile() {
+		return inputFile;
 	}
 
 	@Override
@@ -70,8 +70,12 @@ public final class IdpickerWorkPacket extends WorkPacketBase implements Cachable
 		return outputFile;
 	}
 
-	public IdpQonvertSettings getSettings() {
-		return settings;
+	public IdpQonvertSettings getParams() {
+		return params;
+	}
+
+	public File getFastaFile() {
+		return fastaFile;
 	}
 
 	@Override
@@ -82,25 +86,18 @@ public final class IdpickerWorkPacket extends WorkPacketBase implements Cachable
 
 	@Override
 	public String getStringDescriptionOfTask() {
-		return "Inputs:\n" + getInputPathsAsString("\n") + "\n\nOutput:\n" + outputFile.getAbsolutePath()
-				+ "\n\nParameters:\n'" + Joiner.on("', '").join(getSettings().toCommandLine()) + "'";
-	}
+		final String paramString = getParams().toConfigFile();
 
-	public String getInputPathsAsString(String delimiter) {
-		return Joiner.on(delimiter).join(getInputFilePaths());
-	}
-
-	public List<String> getInputFilePaths() {
-		return Ordering.natural().sortedCopy(
-					Iterables.transform(
-							Iterables.filter(inputFiles, Predicates.<Object>notNull()),
-							new FileUtilities.AbsolutePath()));
+		return "Inputs:\n" + getInputFile().getAbsolutePath() + "\n\n" +
+				"Output:\n" + outputFile.getAbsolutePath() + "\n\n" +
+				"Fasta:\n" + fastaFile.getAbsolutePath() + "\n\n" +
+				"Parameters:\n" + paramString + "\n\n";
 	}
 
 	@Override
 	public WorkPacket translateToWorkInProgressPacket(final File wipFolder) {
-		return new IdpickerWorkPacket(new File(wipFolder, getOutputFile().getName()),
-				inputFiles, settings, getTaskId(), isFromScratch());
+		return new IdpickerWorkPacket(new File(wipFolder, getOutputFile().getName()), getParams(), inputFile,
+				fastaFile, getTaskId(), isFromScratch());
 	}
 
 	@Override
@@ -111,10 +108,8 @@ public final class IdpickerWorkPacket extends WorkPacketBase implements Cachable
 	@Override
 	public boolean cacheIsStale(final File subFolder, final List<String> outputFiles) {
 		final long outputModifiedTime = new File(subFolder, outputFiles.get(0)).lastModified();
-		for (final File inputFile : inputFiles) {
-			if (inputFile.lastModified() > outputModifiedTime) {
-				return true;
-			}
+		if (inputFile.lastModified() > outputModifiedTime || fastaFile.lastModified() > outputModifiedTime) {
+			return true;
 		}
 		return false;
 	}

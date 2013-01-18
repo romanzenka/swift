@@ -107,7 +107,7 @@ public class TestSearchRunner {
 				+ 1 /* QA Task */
 				+ 1 /* Scaffold report */
 
-				+ numEngines-1 /* DB deploys (no idpicker) */
+				+ numEngines /* DB deploys */
 				+ 1 /* Scaffold */
 				+ 1 /* Scaffold 3 */;
 
@@ -171,7 +171,7 @@ public class TestSearchRunner {
 				+ 1 /* QA Task */
 				+ 1 /* Scaffold report */
 
-				+ numEngines-1 /* DB Deploys - idpicker */;
+				+ numEngines /* DB Deploys */;
 
 		int expectedNumTasks = inputFiles.size() * tasksPerFile + tasksPerSearch;
 

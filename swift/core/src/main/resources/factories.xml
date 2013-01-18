@@ -291,14 +291,12 @@
     </bean>
 
     <bean id="idpickerSearchEngine" class="edu.mayo.mprc.swift.db.SearchEngine">
-        <property name="code" value="IDPICKER"/>
         <property name="friendlyName" value="ID Picker"/>
         <property name="resultExtension" value=".idp"/>
         <property name="doSearchXmlAttribute" value="searchIdpicker"/>
         <property name="outputDirName" value="idpicker"/>
         <property name="onByDefault" value="false"/>
-        <property name="mappingFactory" ref="idpickerMappingFactory"/>
-        <property name="paramsInfo" value="paramsInfo"/>
+        <property name="paramsInfo" ref="paramsInfo"/>
     </bean>
 
     <bean id="scaffoldSearchEngine" class="edu.mayo.mprc.swift.db.SearchEngine">

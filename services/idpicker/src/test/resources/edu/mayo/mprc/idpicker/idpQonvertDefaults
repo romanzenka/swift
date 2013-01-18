@@ -1,5 +1,5 @@
  ChargeStateHandling: "Partition"
-                DecoyPrefix: "Reversed_"
+                DecoyPrefix: "rev_"
      EmbedSpectrumScanTimes: "0"
        EmbedSpectrumSources: "0"
                       Gamma: "5"
