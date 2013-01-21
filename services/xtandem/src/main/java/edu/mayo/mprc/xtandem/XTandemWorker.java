@@ -202,7 +202,7 @@ public final class XTandemWorker extends WorkerBase {
 	/**
 	 * @return How many threads can X!Tandem utilize on this computer.
 	 */
-	public int getNumThreads() {
+	public static int getNumThreads() {
 		return Math.max(1, Runtime.getRuntime().availableProcessors());
 	}
 
