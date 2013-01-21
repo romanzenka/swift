@@ -20,8 +20,6 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.*;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /**
  * Myrimatch only supports forward databases.
@@ -41,7 +39,6 @@ public final class MyrimatchDeploymentService extends DeploymentService<Deployme
 			"The deployment determines if a database has reverse sequences.";
 
 	public static final String DEFAULT_SEQUENCE_PREFIX = "Reversed_";
-	private static final Pattern REVERSED_SEQUENCE = Pattern.compile("^>(" + DEFAULT_SEQUENCE_PREFIX + "|Rev_|rev_|REVERSED_)");
 	public static final String NUM_FORWARD_ENTRIES = "numForwardEntries";
 	public static final String DECOY_SEQUENCE_PREFIX = "decoySequencePrefix";
 
@@ -103,8 +100,10 @@ public final class MyrimatchDeploymentService extends DeploymentService<Deployme
 		// Go through all database entries and see when they turn into reverse ones.
 		// Reverse sequences must have matching accession number
 		int numSequences = 0;
-		String reversePrefix = DEFAULT_SEQUENCE_PREFIX;
+
+		String reversePrefix = request.getAnnotation().getDecoyRegex();
 		final BufferedReader reader = FileUtilities.getReader(curationFile);
+		final String reversePrefixStart = ">" + reversePrefix;
 		try {
 			while (true) {
 				final String line = reader.readLine();
@@ -112,9 +111,8 @@ public final class MyrimatchDeploymentService extends DeploymentService<Deployme
 					break;
 				}
 				if (line.startsWith(">")) {
-					final Matcher matcher = REVERSED_SEQUENCE.matcher(line);
-					if (matcher.find()) {
-						reversePrefix = matcher.group(1);
+					if (line.startsWith(reversePrefixStart))
+					{
 						break;
 					}
 					numSequences++;

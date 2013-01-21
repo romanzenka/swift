@@ -23,6 +23,6 @@ public final class MyrimatchMappingFactory implements MappingFactory {
 	 */
 	@Override
 	public String getCanonicalParamFileName() {
-		return "myrimatch.cfg";
+		return "myrimatch.template.cfg";
 	}
 }
