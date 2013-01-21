@@ -59,6 +59,8 @@ public final class IdpickerWorker extends WorkerBase {
 		batchWorkPacket.getParams().setProteinDatabase(batchWorkPacket.getFastaFile().getAbsolutePath());
 		final List<String> commandLine = new ArrayList<String>();
 		commandLine.add(FileUtilities.getAbsoluteFileForExecutables(getIdpQonvertExecutable()).getPath());
+		commandLine.add("-cpus");
+		commandLine.add(String.valueOf(getNumThreads()));
 		commandLine.add("-workdir");
 		commandLine.add(batchWorkPacket.getInputFile().getParentFile().getAbsolutePath());
 		commandLine.addAll(batchWorkPacket.getParams().toCommandLine());
@@ -71,6 +73,10 @@ public final class IdpickerWorker extends WorkerBase {
 		if (!batchWorkPacket.getOutputFile().exists() || !batchWorkPacket.getOutputFile().canRead() || !batchWorkPacket.getOutputFile().isFile()) {
 			throw new MprcException("idpQonvert failed to create file: " + batchWorkPacket.getOutputFile().getAbsolutePath());
 		}
+	}
+
+	private static int getNumThreads() {
+		return Math.max(1, Runtime.getRuntime().availableProcessors());
 	}
 
 	private static boolean isConversionDone(final IdpickerWorkPacket batchWorkPacket) {

@@ -68,6 +68,7 @@ public final class TestIdpicker {
 		final File outputFile = tempFile("out.idp");
 		final File inputFile = pepXmlFile;
 		final IdpQonvertSettings params = new IdpQonvertSettings();
+		params.setDecoyPrefix("REVERSE_");
 
 		final IdpickerWorkPacket workPacket = new IdpickerWorkPacket(outputFile, params, inputFile, fastaFile, "idp-test", true);
 		worker.process(workPacket, new UserProgressReporter() {

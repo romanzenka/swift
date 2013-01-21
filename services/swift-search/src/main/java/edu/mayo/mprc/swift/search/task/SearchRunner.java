@@ -896,7 +896,7 @@ public final class SearchRunner implements Runnable {
 		if(idpickerCalls.containsKey(key)) {
 			return idpickerCalls.get(key);
 		}
-		final IdpickerTask task = new IdpickerTask(null, idpicker.getSearchDaemon(),
+		final IdpickerTask task = new IdpickerTask(getSearchDefinition(), idpicker.getSearchDaemon(),
 				search, idpickerDeployment, outputFolder, fileTokenFactory, isFromScratch());
 		idpickerCalls.put(key, task);
 		task.addDependency(search);

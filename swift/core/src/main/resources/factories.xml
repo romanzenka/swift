@@ -179,7 +179,6 @@
     <bean id="tandemMappingFactory" class="edu.mayo.mprc.xtandem.XTandemMappingFactory"/>
     <bean id="omssaMappingFactory" class="edu.mayo.mprc.omssa.OmssaMappingFactory"/>
     <bean id="myrimatchMappingFactory" class="edu.mayo.mprc.myrimatch.MyrimatchMappingFactory"/>
-    <bean id="idpickerMappingFactory" class="edu.mayo.mprc.idpicker.IdpickerMappingFactory"/>
 
     <bean id="unimodDao" class="edu.mayo.mprc.unimod.UnimodDaoHibernate">
         <constructor-arg index="0" ref="databasePlaceholder"/>
@@ -291,6 +290,7 @@
     </bean>
 
     <bean id="idpickerSearchEngine" class="edu.mayo.mprc.swift.db.SearchEngine">
+        <property name="code" value="IDPICKER"/>
         <property name="friendlyName" value="ID Picker"/>
         <property name="resultExtension" value=".idp"/>
         <property name="doSearchXmlAttribute" value="searchIdpicker"/>
