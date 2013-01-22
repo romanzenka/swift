@@ -47,6 +47,7 @@ public final class IdpickerTask extends AsyncTaskBase {
 		IdpQonvertSettings params = new IdpQonvertSettings();
 		// Max FDR is set to 1- Scaffolds protein probability
 		params.setMaxFDR(1.0 - swiftSearchDefinition.getSearchParameters().getScaffoldSettings().getProteinProbability());
+		params.setDecoyPrefix(swiftSearchDefinition.getSearchParameters().getDatabase().getDatabaseAnnotation().getDecoyRegex());
 		return new IdpickerWorkPacket(getResultingFile(), params, searchTask.getResultingFile(), dbDeployment.getFastaFile(),
 				getFullId(), isFromScratch());
 	}
@@ -59,8 +60,8 @@ public final class IdpickerTask extends AsyncTaskBase {
 	}
 
 	public File getResultingFile() {
-		final String pepXmlFileName = FileUtilities.getFileNameWithoutExtension(searchTask.getResultingFile()) + ".pepXML";
-		return new File(outputFolder, pepXmlFileName);
+		final String idpDbFileName = FileUtilities.getFileNameWithoutExtension(searchTask.getResultingFile()) + ".idpDB";
+		return new File(outputFolder, idpDbFileName);
 	}
 }
 

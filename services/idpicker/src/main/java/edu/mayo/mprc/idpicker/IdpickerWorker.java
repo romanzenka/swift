@@ -1,6 +1,7 @@
 package edu.mayo.mprc.idpicker;
 
 import com.google.common.collect.Lists;
+import com.google.common.io.Files;
 import edu.mayo.mprc.MprcException;
 import edu.mayo.mprc.config.DaemonConfig;
 import edu.mayo.mprc.config.DependencyResolver;
@@ -70,6 +71,17 @@ public final class IdpickerWorker extends WorkerBase {
 		builder.directory(idpQonvertExecutable.getParentFile());
 		final ProcessCaller caller = new ProcessCaller(builder);
 		caller.runAndCheck("idpQonvert");
+		final File from = new File(batchWorkPacket.getInputFile().getParentFile(),
+				FileUtilities.stripExtension(batchWorkPacket.getInputFile().getName()) + ".idpDB");
+
+		try {
+			FileUtilities.ensureFolderExists(batchWorkPacket.getOutputFile().getParentFile());
+			Files.move(
+					from,
+				batchWorkPacket.getOutputFile());
+		} catch(Throwable t) {
+			throw new MprcException("Failed to move the resulting file from ["+from.getAbsolutePath()+"] to ["+batchWorkPacket.getOutputFile()+"]", t);
+		}
 		if (!batchWorkPacket.getOutputFile().exists() || !batchWorkPacket.getOutputFile().canRead() || !batchWorkPacket.getOutputFile().isFile()) {
 			throw new MprcException("idpQonvert failed to create file: " + batchWorkPacket.getOutputFile().getAbsolutePath());
 		}
