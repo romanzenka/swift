@@ -1,10 +1,13 @@
 package edu.mayo.mprc.swift.search.task;
 
+import edu.mayo.mprc.MprcException;
 import edu.mayo.mprc.daemon.DaemonConnection;
 import edu.mayo.mprc.daemon.WorkPacket;
 import edu.mayo.mprc.daemon.files.FileTokenFactory;
 import edu.mayo.mprc.idpicker.IdpQonvertSettings;
 import edu.mayo.mprc.idpicker.IdpickerWorkPacket;
+import edu.mayo.mprc.swift.db.SwiftDao;
+import edu.mayo.mprc.swift.dbmapping.SearchRun;
 import edu.mayo.mprc.swift.dbmapping.SwiftSearchDefinition;
 import edu.mayo.mprc.utilities.FileUtilities;
 import edu.mayo.mprc.utilities.progress.ProgressInfo;
@@ -24,13 +27,19 @@ public final class IdpickerTask extends AsyncTaskBase {
 	private DatabaseDeployment dbDeployment;
 	private final File outputFolder;
 	private final SwiftSearchDefinition swiftSearchDefinition;
+	private final SwiftDao swiftDao;
+	private final SearchRun searchRun;
 
-	public IdpickerTask(final SwiftSearchDefinition definition,
+	public IdpickerTask(final SwiftDao swiftDao,
+	                    final SearchRun searchRun,
+	                    final SwiftSearchDefinition definition,
 	                    final DaemonConnection idpickerDaemon,
 	                    final EngineSearchTask searchTask,
 	                    final DatabaseDeployment dbDeployment,
 	                    final File outputFolder, final FileTokenFactory fileTokenFactory, final boolean fromScratch) {
 		super(idpickerDaemon, fileTokenFactory, fromScratch);
+		this.swiftDao = swiftDao;
+		this.searchRun = searchRun;
 		this.swiftSearchDefinition = definition;
 		this.outputFolder = outputFolder;
 		this.searchTask = searchTask;
@@ -53,8 +62,28 @@ public final class IdpickerTask extends AsyncTaskBase {
 	}
 
 	public void onSuccess() {
+		FileUtilities.waitForFile(getResultingFile());
+		storeReportFile();
 		completeWhenFilesAppear(getResultingFile());
 	}
+
+	/**
+	 * Store information into the database that we produced a particular report file.
+	 * This has to happen whenever Scaffold successfully finished (be it because it ran,
+	 * or if it was done previously).
+	 */
+	private void storeReportFile() {
+		swiftDao.begin();
+		try {
+			// Scaffold finished. Store the resulting file.
+			swiftDao.storeReport(searchRun.getId(), getResultingFile());
+			swiftDao.commit();
+		} catch (Exception t) {
+			swiftDao.rollback();
+			throw new MprcException("Could not store change in task information", t);
+		}
+	}
+
 
 	public void onProgress(final ProgressInfo progressInfo) {
 	}

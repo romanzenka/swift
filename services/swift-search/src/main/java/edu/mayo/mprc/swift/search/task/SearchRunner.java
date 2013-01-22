@@ -891,12 +891,13 @@ public final class SearchRunner implements Runnable {
 	}
 
 	private IdpickerTask addIdpickerCall(final SearchEngine idpicker, final File outputFolder,
-	                             final EngineSearchTask search, final DatabaseDeployment idpickerDeployment) {
+	                                     final EngineSearchTask search, final DatabaseDeployment idpickerDeployment) {
 		final String key = search.getOutputFile().getAbsolutePath();
-		if(idpickerCalls.containsKey(key)) {
+		if (idpickerCalls.containsKey(key)) {
 			return idpickerCalls.get(key);
 		}
-		final IdpickerTask task = new IdpickerTask(getSearchDefinition(), idpicker.getSearchDaemon(),
+		final IdpickerTask task = new IdpickerTask(swiftDao, searchRun,
+				getSearchDefinition(), idpicker.getSearchDaemon(),
 				search, idpickerDeployment, outputFolder, fileTokenFactory, isFromScratch());
 		idpickerCalls.put(key, task);
 		task.addDependency(search);
