@@ -251,6 +251,7 @@ public final class WebUi {
 						fillEngineDaemons(engine, clonedSearchEngines, XTandemMappingFactory.TANDEM, searcherConfig.getTandem(), searcherConfig.getTandemDeployer(), dependencies);
 						fillEngineDaemons(engine, clonedSearchEngines, OmssaMappingFactory.OMSSA, searcherConfig.getOmssa(), searcherConfig.getOmssaDeployer(), dependencies);
 						fillEngineDaemons(engine, clonedSearchEngines, MyrimatchMappingFactory.MYRIMATCH, searcherConfig.getMyrimatch(), searcherConfig.getMyrimatchDeployer(), dependencies);
+						fillEngineDaemons(engine, clonedSearchEngines, "IDPICKER", searcherConfig.getIdpicker(), searcherConfig.getIdpickerDeployer(), dependencies);
 						fillEngineDaemons(engine, clonedSearchEngines, "SCAFFOLD", searcherConfig.getScaffold(), searcherConfig.getScaffoldDeployer(), dependencies);
 						fillEngineDaemons(engine, clonedSearchEngines, "SCAFFOLD3", searcherConfig.getScaffold3(), searcherConfig.getScaffold3Deployer(), dependencies);
 					}

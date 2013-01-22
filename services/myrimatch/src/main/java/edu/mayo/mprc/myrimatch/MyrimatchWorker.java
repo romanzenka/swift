@@ -1,6 +1,7 @@
 package edu.mayo.mprc.myrimatch;
 
 import com.google.common.base.Charsets;
+import com.google.common.base.Joiner;
 import com.google.common.io.Files;
 import edu.mayo.mprc.MprcException;
 import edu.mayo.mprc.config.DaemonConfig;
@@ -70,21 +71,42 @@ public final class MyrimatchWorker extends WorkerBase {
 		LOGGER.debug("Input file " + inputFile.getAbsolutePath() + " does" + (inputFile.exists() && inputFile.length() > 0 ? " " : " not ") + "exist.");
 		LOGGER.debug("Parameter file " + paramsFile.getAbsolutePath() + " does" + (paramsFile.exists() && paramsFile.length() > 0 ? " " : " not ") + "exist.");
 
-		try {
-			Files.append("\n# Decoy sequence prefix is appended to all decoy matches" +
-					"\nDecoyPrefix = " + packet.getDecoySequencePrefix(),
-					paramsFile, Charsets.US_ASCII);
-		} catch (IOException e) {
-			throw new MprcException("Could not append information to parameter file " + paramsFile.getAbsolutePath(), e);
+		File modifiedParamsFile = new File(paramsFile.getParent(), "myrimatch.cfg");
+		if (!modifiedParamsFile.exists()) {
+
+			try {
+				final List<String> lines = Files.readLines(paramsFile, Charsets.US_ASCII);
+				int i = 0;
+				boolean wasDecoyPrefix = false;
+				for (final String line : lines) {
+					if (line.startsWith("EndProteinIndex")) {
+						lines.set(i, "EndProteinIndex = " + packet.getNumForwardEntries());
+					} else if (line.startsWith("DecoyPrefix")) {
+						wasDecoyPrefix = true;
+						lines.set(i, "DecoyPrefix = " + packet.getDecoySequencePrefix());
+					}
+
+					i++;
+				}
+				if (!wasDecoyPrefix) {
+					lines.add("");
+					lines.add("# Decoy sequence prefix is appended to all decoy matches");
+					lines.add("DecoyPrefix = " + packet.getDecoySequencePrefix());
+				}
+
+				Files.write(Joiner.on('\n').join(lines), modifiedParamsFile, Charsets.US_ASCII);
+
+			} catch (IOException e) {
+				throw new MprcException("Could not append information to parameter file " + paramsFile.getAbsolutePath(), e);
+			}
 		}
 
 		final List<String> parameters = new LinkedList<String>();
 		parameters.add(executable.getPath());
 		parameters.add("-cfg");
-		parameters.add(paramsFile.getAbsolutePath());
+		parameters.add(modifiedParamsFile.getAbsolutePath());
 		parameters.add("-ProteinDatabase");
 		parameters.add(fastaFile.getAbsolutePath());
-		parameters.add("-DEndProteinIndex=" + packet.getNumForwardEntries());
 		parameters.add(inputFile.getAbsolutePath());
 
 		final ProcessBuilder processBuilder = new ProcessBuilder(parameters);
@@ -93,13 +115,20 @@ public final class MyrimatchWorker extends WorkerBase {
 		final ProcessCaller processCaller = new ProcessCaller(processBuilder);
 
 		LOGGER.info("Myrimatch search, " + packet.toString() + ", has been submitted.");
-		processCaller.setOutputMonitor(new MyrimatchLogMonitor(progressReporter));
+		processCaller.setOutputMonitor(new
+
+				MyrimatchLogMonitor(progressReporter)
+
+		);
 		processCaller.runAndCheck("myrimatch");
 
 		final File createdResultFile = new File(packet.getWorkFolder(), FileUtilities.stripExtension(packet.getInputFile().getName()) + ".pepXML");
-		if (!createdResultFile.equals(resultFile)) {
+		if (!createdResultFile.equals(resultFile))
+
+		{
 			FileUtilities.rename(createdResultFile, resultFile);
 		}
+
 		LOGGER.info("Myrimatch search, " + packet.toString() + ", has been successfully completed.");
 	}
 

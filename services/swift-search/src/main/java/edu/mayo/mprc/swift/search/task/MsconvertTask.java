@@ -10,7 +10,7 @@ import org.apache.log4j.Logger;
 
 import java.io.File;
 
-final class MsconvertTask extends AsyncTaskBase implements MgfOutput {
+final class MsconvertTask extends AsyncTaskBase implements FileProducingTask {
 	private static final Logger LOGGER = Logger.getLogger(MsconvertTask.class);
 
 	private File inputFile;
@@ -50,7 +50,7 @@ final class MsconvertTask extends AsyncTaskBase implements MgfOutput {
 		return getFileReference(this.inputFile);
 	}
 
-	public File getFilteredMgfFile() {
+	public File getResultingFile() {
 		return mgfFile;
 	}
 

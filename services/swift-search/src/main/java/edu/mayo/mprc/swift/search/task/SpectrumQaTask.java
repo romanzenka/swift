@@ -15,7 +15,7 @@ final class SpectrumQaTask extends AsyncTaskBase {
 
 	private static final Logger LOGGER = Logger.getLogger(SpectrumQaTask.class);
 
-	private MgfOutput sourceMGFFile;
+	private FileProducingTask sourceMGFFile;
 	private File msmsEvalParamFile;
 	private File outputDirectory;
 	private File outputFile;
@@ -23,13 +23,13 @@ final class SpectrumQaTask extends AsyncTaskBase {
 
 	public static final String TASK_NAME = "MSMSEval Filter";
 
-	public SpectrumQaTask(final DaemonConnection daemon, final MgfOutput sourceMGFFile, final File msmsEvalParamFile, final File outputDirectory, final FileTokenFactory fileTokenFactory, final boolean fromScratch) {
+	public SpectrumQaTask(final DaemonConnection daemon, final FileProducingTask sourceMGFFile, final File msmsEvalParamFile, final File outputDirectory, final FileTokenFactory fileTokenFactory, final boolean fromScratch) {
 		super(daemon, fileTokenFactory, fromScratch);
 		this.outputDirectory = outputDirectory;
 		this.sourceMGFFile = sourceMGFFile;
 		this.msmsEvalParamFile = msmsEvalParamFile;
-		outputFile = MSMSEvalWorker.getExpectedResultFileName(sourceMGFFile.getFilteredMgfFile(), outputDirectory);
-		emFile = MSMSEvalWorker.getExpectedEmOutputFileName(sourceMGFFile.getFilteredMgfFile(), outputDirectory);
+		outputFile = MSMSEvalWorker.getExpectedResultFileName(sourceMGFFile.getResultingFile(), outputDirectory);
+		emFile = MSMSEvalWorker.getExpectedEmOutputFileName(sourceMGFFile.getResultingFile(), outputDirectory);
 
 		setName(TASK_NAME);
 
@@ -38,7 +38,7 @@ final class SpectrumQaTask extends AsyncTaskBase {
 
 	private void updateDescription() {
 		setDescription("Analyzing mgf file: "
-				+ getFileTokenFactory().fileToTaggedDatabaseToken(this.sourceMGFFile.getFilteredMgfFile())
+				+ getFileTokenFactory().fileToTaggedDatabaseToken(this.sourceMGFFile.getResultingFile())
 				+ " using msmsEval parameter file: "
 				+ getFileTokenFactory().fileToTaggedDatabaseToken(this.msmsEvalParamFile));
 	}
@@ -54,7 +54,7 @@ final class SpectrumQaTask extends AsyncTaskBase {
 			return null;
 		}
 
-		return new MSMSEvalWorkPacket(sourceMGFFile.getFilteredMgfFile(), msmsEvalParamFile, outputDirectory, getFullId());
+		return new MSMSEvalWorkPacket(sourceMGFFile.getResultingFile(), msmsEvalParamFile, outputDirectory, getFullId());
 	}
 
 	public void onSuccess() {

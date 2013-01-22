@@ -5,8 +5,8 @@ import edu.mayo.mprc.workflow.engine.Task;
 import java.io.File;
 
 /**
- * Any task that produces an mgf file.
+ * Any task that produces a a file.
  */
-interface MgfOutput extends Task {
-	File getFilteredMgfFile();
+interface FileProducingTask extends Task {
+	File getResultingFile();
 }

@@ -234,6 +234,7 @@
                 <ref bean="myrimatchSearchEngine"/>
                 <ref bean="scaffoldSearchEngine"/>
                 <ref bean="scaffold3SearchEngine"/>
+                <ref bean="idpickerSearchEngine"/>
             </list>
         </constructor-arg>
     </bean>
@@ -285,6 +286,16 @@
         <property name="outputDirName" value="myrimatch"/>
         <property name="onByDefault" value="false"/>
         <property name="mappingFactory" ref="myrimatchMappingFactory"/>
+        <property name="paramsInfo" ref="paramsInfo"/>
+    </bean>
+
+    <bean id="idpickerSearchEngine" class="edu.mayo.mprc.swift.db.SearchEngine">
+        <property name="code" value="IDPICKER"/>
+        <property name="friendlyName" value="ID Picker"/>
+        <property name="resultExtension" value=".idp"/>
+        <property name="doSearchXmlAttribute" value="searchIdpicker"/>
+        <property name="outputDirName" value="idpicker"/>
+        <property name="onByDefault" value="false"/>
         <property name="paramsInfo" ref="paramsInfo"/>
     </bean>
 

@@ -20,9 +20,9 @@ import java.io.File;
 /**
  * A search on one of the saerch engines.
  */
-final class EngineSearchTask extends AsyncTaskBase {
+final class EngineSearchTask extends AsyncTaskBase implements FileProducingTask {
 	private SearchEngine engine;
-	private MgfOutput mgfOutput;
+	private FileProducingTask inputFile;
 	private DatabaseDeploymentResult deploymentResult;
 	private File outputFile;
 	private File paramsFile;
@@ -36,7 +36,7 @@ final class EngineSearchTask extends AsyncTaskBase {
 	public EngineSearchTask(
 			final SearchEngine engine,
 			final String searchId,
-			final MgfOutput mgfOutput,
+			final FileProducingTask inputFile,
 			final DatabaseDeploymentResult deploymentResult,
 			final File outputFile,
 			final File paramsFile,
@@ -46,7 +46,7 @@ final class EngineSearchTask extends AsyncTaskBase {
 		this.engine = engine;
 		this.outputFile = outputFile;
 		this.paramsFile = paramsFile;
-		this.mgfOutput = mgfOutput;
+		this.inputFile = inputFile;
 		this.deploymentResult = deploymentResult;
 		this.publicSearchFiles = publicSearchFiles;
 		setName(engine.getFriendlyName() + " search");
@@ -73,7 +73,7 @@ final class EngineSearchTask extends AsyncTaskBase {
 			workPacket = new MascotWorkPacket(
 					outputFile,
 					paramsFile,
-					mgfOutput.getFilteredMgfFile(),
+					inputFile.getResultingFile(),
 					deploymentResult.getShortDbName(),
 					this.getFullId(),
 					isFromScratch(),
@@ -82,14 +82,14 @@ final class EngineSearchTask extends AsyncTaskBase {
 			workPacket = new SequestMGFWorkPacket(
 					outputFile,
 					paramsFile,
-					mgfOutput.getFilteredMgfFile(),
+					inputFile.getResultingFile(),
 					getSequestDatabase(),
 					publicSearchFiles,
 					this.getFullId(),
 					isFromScratch());
 		} else if ("TANDEM".equalsIgnoreCase(engine.getCode())) {
 			workPacket = new XTandemWorkPacket(
-					mgfOutput.getFilteredMgfFile(),
+					inputFile.getResultingFile(),
 					paramsFile,
 					outputFile,
 					outputFile.getParentFile(),
@@ -101,7 +101,7 @@ final class EngineSearchTask extends AsyncTaskBase {
 			workPacket = new OmssaWorkPacket(
 					outputFile,
 					paramsFile,
-					mgfOutput.getFilteredMgfFile(),
+					inputFile.getResultingFile(),
 					deploymentResult.getFastaFile(),
 					deploymentResult.getGeneratedFiles(),
 					publicSearchFiles,
@@ -110,9 +110,7 @@ final class EngineSearchTask extends AsyncTaskBase {
 		} else if ("MYRIMATCH".equalsIgnoreCase(engine.getCode())) {
 			final MyrimatchDeploymentResult myrimatchDeploymentResult = (MyrimatchDeploymentResult) deploymentResult.getDeploymentResult();
 			workPacket = new MyrimatchWorkPacket(
-					mgfOutput.getFilteredMgfFile(),
-					paramsFile,
-					outputFile,
+					outputFile, paramsFile, inputFile.getResultingFile(),
 					outputFile.getParentFile(),
 					deploymentResult.getFastaFile(),
 					myrimatchDeploymentResult.getNumForwardEntries(),
@@ -135,7 +133,7 @@ final class EngineSearchTask extends AsyncTaskBase {
 
 	private void updateDescription(final String mascotResultLink) {
 		setDescription(engine.getFriendlyName() + " search: "
-				+ fileTokenFactory.fileToTaggedDatabaseToken(mgfOutput.getFilteredMgfFile())
+				+ fileTokenFactory.fileToTaggedDatabaseToken(inputFile.getResultingFile())
 				+ " params: " + fileTokenFactory.fileToTaggedDatabaseToken(paramsFile)
 				+ " db: " + getDeployedDatabaseFile(engine, deploymentResult)
 				+ (mascotResultLink != null ? " <a href=\"" + mascotResultLink + "\">Open in Mascot</a>" : ""));
@@ -172,5 +170,10 @@ final class EngineSearchTask extends AsyncTaskBase {
 			updateDescription(mascotResultUrl.getMascotUrl());
 		}
 
+	}
+
+	@Override
+	public File getResultingFile() {
+		return outputFile;
 	}
 }

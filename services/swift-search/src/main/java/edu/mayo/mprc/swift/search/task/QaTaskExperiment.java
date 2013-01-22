@@ -10,7 +10,7 @@ class QaTaskExperiment implements Comparable<QaTaskExperiment> {
 	// Scaffold spectrum report in .tsv format
 	private final File spectraFile;
 	// Map from each .mgf file to a set of data files with more detailed information about that .mgf
-	private final LinkedHashMap<MgfOutput, QaTaskInputFiles> mgfToQaMap = new LinkedHashMap<MgfOutput, QaTaskInputFiles>();
+	private final LinkedHashMap<FileProducingTask, QaTaskInputFiles> mgfToQaMap = new LinkedHashMap<FileProducingTask, QaTaskInputFiles>();
 	// Scaffold version
 	private final String scaffoldVersion;
 
@@ -24,11 +24,11 @@ class QaTaskExperiment implements Comparable<QaTaskExperiment> {
 		return spectraFile;
 	}
 
-	public LinkedHashMap<MgfOutput, QaTaskInputFiles> getMgfToQaMap() {
+	public LinkedHashMap<FileProducingTask, QaTaskInputFiles> getMgfToQaMap() {
 		return mgfToQaMap;
 	}
 
-	public void addMgfToRawEntry(final MgfOutput mgfFile, final File rawFile, final RAWDumpTask rawDumpTask) {
+	public void addMgfToRawEntry(final FileProducingTask mgfFile, final File rawFile, final RAWDumpTask rawDumpTask) {
 		synchronized (mgfToQaMap) {
 
 			QaTaskInputFiles qaInputFiles = null;
@@ -43,7 +43,7 @@ class QaTaskExperiment implements Comparable<QaTaskExperiment> {
 		}
 	}
 
-	public void addMgfToMsmsEvalEntry(final MgfOutput mgfFile, final SpectrumQaTask spectrumQaTask) {
+	public void addMgfToMsmsEvalEntry(final FileProducingTask mgfFile, final SpectrumQaTask spectrumQaTask) {
 		synchronized (mgfToQaMap) {
 
 			QaTaskInputFiles qaInputFiles = null;
@@ -57,7 +57,7 @@ class QaTaskExperiment implements Comparable<QaTaskExperiment> {
 		}
 	}
 
-	public void addAdditionalSearchEntry(final MgfOutput mgfFile, final EngineSearchTask engineSearchTask) {
+	public void addAdditionalSearchEntry(final FileProducingTask mgfFile, final EngineSearchTask engineSearchTask) {
 		synchronized (mgfToQaMap) {
 
 			QaTaskInputFiles qaInputFiles = null;

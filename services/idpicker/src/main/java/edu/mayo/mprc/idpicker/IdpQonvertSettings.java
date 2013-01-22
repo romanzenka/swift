@@ -1,5 +1,7 @@
 package edu.mayo.mprc.idpicker;
 
+import edu.mayo.mprc.MprcException;
+
 import java.io.Serializable;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
@@ -11,8 +13,59 @@ import java.util.List;
 public final class IdpQonvertSettings implements Serializable {
 	private static final long serialVersionUID = 2585921464603786125L;
 
+	public enum Option {
+		CHARGE_STATE_HANDLING("ChargeStateHandling"),
+		DECOY_PREFIX("DecoyPrefix"),
+		EMBED_SPECTRUM_SCAN_TIMES("EmbedSpectrumScanTimes"),
+		EMBED_SPECTRUM_SOURCES("EmbedSpectrumSources"),
+		GAMMA("Gamma"),
+		IGNORE_UNMAPPED_PEPTIDES("IgnoreUnmappedPeptides"),
+		KERNEL("Kernel"),
+		MASS_ERROR_HANDLING("MassErrorHandling"),
+		MAX_FDR("MaxFDR"),
+		MAX_IMPORT_FDR("MaxImportFDR"),
+		MAX_RESULT_RANK("MaxResultRank"),
+		MAX_TRAINING_RANK("MaxTrainingRank"),
+		MIN_PARTITION_SIZE("MinPartitionSize"),
+		MISSED_CLEAVAGES_HANDLING("MissedCleavagesHandling"),
+		NU("Nu"),
+		OUTPUT_SUFFIX("OutputSuffix"),
+		OVERWRITE_EXISTING_FILES("OverwriteExistingFiles"),
+		POLYNOMIAL_DEGREE("PolynomialDegree"),
+		PREDICT_PROBABILITY("PredictProbability"),
+		PROTEIN_DATABASE("ProteinDatabase"),
+		QONVERTER_METHOD("QonverterMethod"),
+		RERANK_MATCHES("RerankMatches"),
+		SVMTYPE("SVMType"),
+		SCORE_INFO("ScoreInfo"),
+		SOURCE_SEARCH_PATH("SourceSearchPath"),
+		TERMINAL_SPECIFICITY_HANDLING("TerminalSpecificityHandling"),
+		TRUE_POSITIVE_THRESHOLD("TruePositiveThreshold"),
+		WRITE_QONVERSION_DETAILS("WriteQonversionDetails");
+
+
+		private final String key;
+
+		Option(String key) {
+			this.key = key;
+		}
+
+		public String getKey() {
+			return key;
+		}
+
+		public static Option forKey(final String key) {
+			for (final Option option : Option.values()) {
+				if (option.getKey().equalsIgnoreCase(key)) {
+					return option;
+				}
+			}
+			throw new MprcException("Unknown idpQonvert option " + key);
+		}
+	}
+
 	private String chargeStateHandling = "Partition";
-	private String decoyPrefix = "Reversed_";
+	private String decoyPrefix = "rev_";
 	private boolean embedSpectrumScanTimes = false;
 	private boolean embedSpectrumSources = false;
 	private double gamma = 5.0;
@@ -48,69 +101,104 @@ public final class IdpQonvertSettings implements Serializable {
 	}
 
 	private static DecimalFormat FORMAT = new DecimalFormat("0.########");
+
 	private static String dbl(final double value) {
 		return FORMAT.format(value);
 	}
 
+	/**
+	 * @return The list of settings as a big string to be written into a config file.
+	 *         The settings should have the same effect as if specified on the command line.
+	 */
+	public String toConfigFile() {
+		final StringBuilder builder = new StringBuilder(2000);
+
+		for (final Option option : Option.values()) {
+			builder.append(option.getKey());
+			builder.append("=\"");
+			builder.append(getValue(option));
+			builder.append("\"\n");
+		}
+
+		return builder.toString();
+	}
+
+	private static void ra(final List<String> result, final Option key, final String value) {
+		result.add('-' + key.getKey());
+		result.add(value);
+	}
+
 	public List<String> toCommandLine() {
-		List<String> result = new ArrayList<String>(28 * 2);
-		result.add("-ChargeStateHandling");
-		result.add(getChargeStateHandling());
-		result.add("-DecoyPrefix");
-		result.add(getDecoyPrefix());
-		result.add("-EmbedSpectrumScanTimes");
-		result.add(toggle(isEmbedSpectrumScanTimes()));
-		result.add("-EmbedSpectrumSources");
-		result.add(toggle(isEmbedSpectrumSources()));
-		result.add("-Gamma");
-		result.add(dbl(getGamma()));
-		result.add("-IgnoreUnmappedPeptides");
-		result.add(toggle(isIgnoreUnmappedPeptides()));
-		result.add("-Kernel");
-		result.add(getKernel());
-		result.add("-MassErrorHandling");
-		result.add(getMassErrorHandling());
-		result.add("-MaxFDR");
-		result.add(dbl(getMaxFDR()));
-		result.add("-MaxImportFDR");
-		result.add(dbl(getMaxImportFDR()));
-		result.add("-MaxResultRank");
-		result.add(Integer.toString(getMaxResultRank()));
-		result.add("-MaxTrainingRank");
-		result.add(Integer.toString(getMaxTrainingRank()));
-		result.add("-MinPartitionSize");
-		result.add(Integer.toString(getMinPartitionSize()));
-		result.add("-MissedCleavagesHandling");
-		result.add(getMissedCleavagesHandling());
-		result.add("-Nu");
-		result.add(dbl(getNu()));
-		result.add("-OutputSuffix");
-		result.add(getOutputSuffix());
-		result.add("-OverwriteExistingFiles");
-		result.add(toggle(isOverwriteExistingFiles()));
-		result.add("-PolynomialDegree");
-		result.add(Integer.toString(getPolynomialDegree()));
-		result.add("-PredictProbability");
-		result.add(toggle(isPredictProbability()));
-		result.add("-ProteinDatabase");
-		result.add(getProteinDatabase());
-		result.add("-QonverterMethod");
-		result.add(getQonverterMethod());
-		result.add("-RerankMatches");
-		result.add(toggle(isRerankMatches()));
-		result.add("-SVMType");
-		result.add(getSvmType());
-		result.add("-ScoreInfo");
-		result.add(getScoreInfo());
-		result.add("-SourceSearchPath");
-		result.add(getSourceSearchPath());
-		result.add("-TerminalSpecificityHandling");
-		result.add(getTerminalSpecificityHandling());
-		result.add("-TruePositiveThreshold");
-		result.add(dbl(getTruePositiveThreshold()));
-		result.add("-WriteQonversionDetails");
-		result.add(toggle(isWriteQonversionDetails()));
+		List<String> result = new ArrayList<String>(Option.values().length * 2);
+
+		for (final Option option : Option.values()) {
+			ra(result, option, getValue(option));
+		}
 		return result;
+	}
+
+	public String getValue(final Option option) {
+		switch (option) {
+
+			case CHARGE_STATE_HANDLING:
+				return getChargeStateHandling();
+			case DECOY_PREFIX:
+				return getDecoyPrefix();
+			case EMBED_SPECTRUM_SCAN_TIMES:
+				return toggle(isEmbedSpectrumScanTimes());
+			case EMBED_SPECTRUM_SOURCES:
+				return toggle(isEmbedSpectrumSources());
+			case GAMMA:
+				return dbl(getGamma());
+			case IGNORE_UNMAPPED_PEPTIDES:
+				return toggle(isIgnoreUnmappedPeptides());
+			case KERNEL:
+				return getKernel();
+			case MASS_ERROR_HANDLING:
+				return getMassErrorHandling();
+			case MAX_FDR:
+				return dbl(getMaxFDR());
+			case MAX_IMPORT_FDR:
+				return dbl(getMaxImportFDR());
+			case MAX_RESULT_RANK:
+				return Integer.toString(getMaxResultRank());
+			case MAX_TRAINING_RANK:
+				return Integer.toString(getMaxTrainingRank());
+			case MIN_PARTITION_SIZE:
+				return Integer.toString(getMinPartitionSize());
+			case MISSED_CLEAVAGES_HANDLING:
+				return getMissedCleavagesHandling();
+			case NU:
+				return dbl(getNu());
+			case OUTPUT_SUFFIX:
+				return getOutputSuffix();
+			case OVERWRITE_EXISTING_FILES:
+				return toggle(isOverwriteExistingFiles());
+			case POLYNOMIAL_DEGREE:
+				return Integer.toString(getPolynomialDegree());
+			case PREDICT_PROBABILITY:
+				return toggle(isPredictProbability());
+			case PROTEIN_DATABASE:
+				return getProteinDatabase();
+			case QONVERTER_METHOD:
+				return getQonverterMethod();
+			case RERANK_MATCHES:
+				return toggle(isRerankMatches());
+			case SVMTYPE:
+				return getSvmType();
+			case SCORE_INFO:
+				return getScoreInfo();
+			case SOURCE_SEARCH_PATH:
+				return getSourceSearchPath();
+			case TERMINAL_SPECIFICITY_HANDLING:
+				return getTerminalSpecificityHandling();
+			case TRUE_POSITIVE_THRESHOLD:
+				return dbl(getTruePositiveThreshold());
+			case WRITE_QONVERSION_DETAILS:
+				return toggle(isWriteQonversionDetails());
+			default:
+				throw new MprcException("Unsupported IdPicker option: " + option.getKey());
+		}
 	}
 
 	public String getChargeStateHandling() {

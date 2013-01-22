@@ -204,7 +204,7 @@ public final class ServiceImpl extends RemoteServiceServlet implements Service {
 	public List<ClientSearchEngine> listSearchEngines() throws GWTServiceException {
 		final List<ClientSearchEngine> infos = new ArrayList<ClientSearchEngine>();
 		for (final SearchEngine engine : getSearchEngines()) {
-			if (engine.isEnabled()) {
+				if (engine.isEnabled()) {
 				infos.add(new ClientSearchEngine(engine.getCode(), engine.getFriendlyName(), engine.isOnByDefault()));
 			}
 		}

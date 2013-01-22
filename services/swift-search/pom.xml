@@ -47,6 +47,11 @@
             <version>3.0-SNAPSHOT</version>
         </dependency>
         <dependency>
+            <groupId>edu.mayo.mprc</groupId>
+            <artifactId>idpicker</artifactId>
+            <version>3.0-SNAPSHOT</version>
+        </dependency>
+        <dependency>
             <groupId>org.testng</groupId>
             <artifactId>testng</artifactId>
             <classifier>jdk15</classifier>

@@ -94,7 +94,27 @@ public class TestSearchRunner {
 				false);
 
 		runner.initialize();
-		Assert.assertEquals(runner.getWorkflowEngine().getNumTasks(), 23);
+
+		final int numEngines = enabledEngines().toEngineCodeList().size();
+		final int tasksPerFile = (numEngines - 2) /* 1 for each engine except Scaffolds */
+				+ 1 /* Raw->mgf */
+				+ 1 /* RawDump */
+				+ 1 /* msmsEval */;
+
+		final int tasksPerSearch = 0
+				+ 1 /* Fasta DB load */
+				+ 1 /* Search DB load */
+				+ 1 /* QA Task */
+				+ 1 /* Scaffold report */
+
+				+ numEngines /* DB deploys */
+				+ 1 /* Scaffold */
+				+ 1 /* Scaffold 3 */;
+
+		int expectedNumTasks = inputFiles.size() * tasksPerFile + tasksPerSearch;
+
+		// 23 + 2 * 5 + 1
+		Assert.assertEquals(runner.getWorkflowEngine().getNumTasks(), expectedNumTasks);
 	}
 
 	@Test
@@ -138,8 +158,24 @@ public class TestSearchRunner {
 				false);
 
 		runner.initialize();
-		// final String dot = runner.getWorkflowEngine().dumpDot();
-		Assert.assertEquals(runner.getWorkflowEngine().getNumTasks(), 23 + 2 /* Scaffold+Scaffold3 */ + 1 /* Db load */);
+
+		final int numEngines = enabledEngines().toEngineCodeList().size();
+		final int tasksPerFile = numEngines /* 1 for each engine */
+				+ 1 /* Raw->mgf */
+				+ 1 /* RawDump */
+				+ 1 /* msmsEval */
+				+ 1 /* Search DB load */;
+
+		final int tasksPerSearch = 0
+				+ 1 /* Fasta DB load */
+				+ 1 /* QA Task */
+				+ 1 /* Scaffold report */
+
+				+ numEngines /* DB Deploys */;
+
+		int expectedNumTasks = inputFiles.size() * tasksPerFile + tasksPerSearch;
+
+		Assert.assertEquals(runner.getWorkflowEngine().getNumTasks(), expectedNumTasks);
 	}
 
 	private SwiftSearchDefinition defaultSearchDefinition(final List<FileSearch> inputFiles) {
@@ -163,16 +199,13 @@ public class TestSearchRunner {
 
 	private Collection<SearchEngine> searchEngines() {
 		final Collection<SearchEngine> searchEngines = new ArrayList<SearchEngine>();
-		final SearchEngine mascot = searchEngine("MASCOT");
-		final SearchEngine sequest = searchEngine("SEQUEST");
-		final SearchEngine tandem = searchEngine("TANDEM");
-		final SearchEngine scaffold = searchEngine("SCAFFOLD");
-		final SearchEngine scaffold3 = searchEngine("SCAFFOLD3");
-		searchEngines.add(mascot);
-		searchEngines.add(sequest);
-		searchEngines.add(tandem);
-		searchEngines.add(scaffold);
-		searchEngines.add(scaffold3);
+		searchEngines.add(searchEngine("MASCOT"));
+		searchEngines.add(searchEngine("SEQUEST"));
+		searchEngines.add(searchEngine("TANDEM"));
+		searchEngines.add(searchEngine("MYRIMATCH"));
+		searchEngines.add(searchEngine("SCAFFOLD"));
+		searchEngines.add(searchEngine("SCAFFOLD3"));
+		searchEngines.add(searchEngine("IDPICKER"));
 		return searchEngines;
 	}
 
@@ -181,8 +214,10 @@ public class TestSearchRunner {
 		engines.add(createSearchEngineConfig("MASCOT"));
 		engines.add(createSearchEngineConfig("SEQUEST"));
 		engines.add(createSearchEngineConfig("TANDEM"));
+		engines.add(createSearchEngineConfig("MYRIMATCH"));
 		engines.add(createSearchEngineConfig("SCAFFOLD"));
 		engines.add(createSearchEngineConfig("SCAFFOLD3"));
+		engines.add(createSearchEngineConfig("IDPICKER"));
 		return engines;
 	}
 

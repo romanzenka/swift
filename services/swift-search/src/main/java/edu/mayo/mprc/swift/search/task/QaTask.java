@@ -60,15 +60,15 @@ public final class QaTask extends AsyncTaskBase {
 		return new File(scaffoldXmlFile.getParentFile().getParentFile(), QA_SUBDIRECTORY);
 	}
 
-	public void addMgfToRawEntry(final MgfOutput mgfFile, final File rawFile, final RAWDumpTask rawDumpTask) {
+	public void addMgfToRawEntry(final FileProducingTask mgfFile, final File rawFile, final RAWDumpTask rawDumpTask) {
 		currentExperiment.addMgfToRawEntry(mgfFile, rawFile, rawDumpTask);
 	}
 
-	public void addMgfToMsmsEvalEntry(final MgfOutput mgfFile, final SpectrumQaTask spectrumQaTask) {
+	public void addMgfToMsmsEvalEntry(final FileProducingTask mgfFile, final SpectrumQaTask spectrumQaTask) {
 		currentExperiment.addMgfToMsmsEvalEntry(mgfFile, spectrumQaTask);
 	}
 
-	public void addMgfToAdditionalSearchEngineEntry(final MgfOutput mgfFile, final EngineSearchTask engineSearchTask) {
+	public void addMgfToAdditionalSearchEngineEntry(final FileProducingTask mgfFile, final EngineSearchTask engineSearchTask) {
 		currentExperiment.addAdditionalSearchEntry(mgfFile, engineSearchTask);
 	}
 
@@ -86,10 +86,10 @@ public final class QaTask extends AsyncTaskBase {
 		for (final QaTaskExperiment experiment : experimentList) {
 			final List<MgfQaFiles> mgfInputFilePairs = new ArrayList<MgfQaFiles>();
 
-			for (final Map.Entry<MgfOutput, QaTaskInputFiles> me : experiment.getMgfToQaMap().entrySet()) {
+			for (final Map.Entry<FileProducingTask, QaTaskInputFiles> me : experiment.getMgfToQaMap().entrySet()) {
 				final QaTaskInputFiles value = me.getValue();
 				final MgfQaFiles files = new MgfQaFiles();
-				files.setMgfFile(me.getKey().getFilteredMgfFile());
+				files.setMgfFile(me.getKey().getResultingFile());
 				files.setRawInputFile(value.getRawInputFile());
 				if (value.getSpectrumQa() != null) {
 					files.setMsmsEvalOutputFile(value.getSpectrumQa().getMsmsEvalOutputFile());

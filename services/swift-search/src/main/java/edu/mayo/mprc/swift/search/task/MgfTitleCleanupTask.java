@@ -10,7 +10,7 @@ import edu.mayo.mprc.utilities.progress.ProgressInfo;
 import java.io.File;
 import java.util.concurrent.atomic.AtomicInteger;
 
-final class MgfTitleCleanupTask extends AsyncTaskBase implements MgfOutput {
+final class MgfTitleCleanupTask extends AsyncTaskBase implements FileProducingTask {
 
 	private boolean cleanupPerformed;
 	private final File mgfToCleanup;
@@ -46,7 +46,7 @@ final class MgfTitleCleanupTask extends AsyncTaskBase implements MgfOutput {
 		}
 	}
 
-	public synchronized File getFilteredMgfFile() {
+	public synchronized File getResultingFile() {
 		if (cleanupPerformed) {
 			return cleanedMgf;
 		} else {

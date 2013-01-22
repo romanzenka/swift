@@ -16,6 +16,9 @@ import edu.mayo.mprc.daemon.files.FileTokenFactory;
 import edu.mayo.mprc.database.DatabaseFactory;
 import edu.mayo.mprc.dbcurator.model.persistence.CurationDao;
 import edu.mayo.mprc.fastadb.FastaDbWorker;
+import edu.mayo.mprc.idpicker.IdpickerCache;
+import edu.mayo.mprc.idpicker.IdpickerDeploymentService;
+import edu.mayo.mprc.idpicker.IdpickerWorker;
 import edu.mayo.mprc.mascot.MascotCache;
 import edu.mayo.mprc.mascot.MascotDeploymentService;
 import edu.mayo.mprc.mascot.MascotWorker;
@@ -113,6 +116,8 @@ public final class SwiftSearcher implements Worker {
 	private static final String OMSSA_DEPLOYER = "omssaDeployer";
 	private static final String MYRIMATCH = "myrimatch";
 	private static final String MYRIMATCH_DEPLOYER = "myrimatchDeployer";
+	private static final String IDPICKER = "idpicker";
+	private static final String IDPICKER_DEPLOYER = "idpickerDeployer";
 	private static final String SCAFFOLD = "scaffold";
 	private static final String SCAFFOLD_DEPLOYER = "scaffoldDeployer";
 	private static final String SCAFFOLD3 = "scaffold3";
@@ -474,6 +479,7 @@ public final class SwiftSearcher implements Worker {
 				fillEngineDaemons(engine, connectedSearchEngines, "TANDEM", config.tandem, config.tandemDeployer, dependencies);
 				fillEngineDaemons(engine, connectedSearchEngines, "OMSSA", config.omssa, config.omssaDeployer, dependencies);
 				fillEngineDaemons(engine, connectedSearchEngines, "MYRIMATCH", config.myrimatch, config.myrimatchDeployer, dependencies);
+				fillEngineDaemons(engine, connectedSearchEngines, "IDPICKER", config.idpicker, config.idpickerDeployer, dependencies);
 				fillEngineDaemons(engine, connectedSearchEngines, "SCAFFOLD", config.scaffold, config.scaffoldDeployer, dependencies);
 				fillEngineDaemons(engine, connectedSearchEngines, "SCAFFOLD3", config.scaffold3, config.scaffold3Deployer, dependencies);
 			}
@@ -591,6 +597,8 @@ public final class SwiftSearcher implements Worker {
 		private ServiceConfig omssaDeployer;
 		private ServiceConfig myrimatch;
 		private ServiceConfig myrimatchDeployer;
+		private ServiceConfig idpicker;
+		private ServiceConfig idpickerDeployer;
 		private ServiceConfig scaffold;
 		private ServiceConfig scaffoldDeployer;
 		private ServiceConfig scaffoldReport;
@@ -610,7 +618,9 @@ public final class SwiftSearcher implements Worker {
 				      final ServiceConfig mgf2mgf, final ServiceConfig rawdump, final ServiceConfig mascot, final ServiceConfig mascotDeployer
 				, final ServiceConfig sequest, final ServiceConfig sequestDeployer, final ServiceConfig tandem, final ServiceConfig tandemDeployer
 				, final ServiceConfig omssa, final ServiceConfig omssaDeployer
-				, final ServiceConfig myrimatch, final ServiceConfig myrimatchDeployer, final ServiceConfig scaffold, final ServiceConfig scaffoldDeployer
+				, final ServiceConfig myrimatch, final ServiceConfig myrimatchDeployer
+				, final ServiceConfig idpicker, final ServiceConfig idpickerDeployer
+				, final ServiceConfig scaffold, final ServiceConfig scaffoldDeployer
 				, final ServiceConfig scaffold3, final ServiceConfig scaffold3Deployer
 				, final ServiceConfig scaffoldReport, final ServiceConfig qa
 				, final ServiceConfig fastaDb, final ServiceConfig searchDb
@@ -633,6 +643,8 @@ public final class SwiftSearcher implements Worker {
 			this.omssaDeployer = omssaDeployer;
 			this.myrimatch = myrimatch;
 			this.myrimatchDeployer = myrimatchDeployer;
+			this.idpicker = idpicker;
+			this.idpickerDeployer = idpickerDeployer;
 			this.scaffold = scaffold;
 			this.scaffoldDeployer = scaffoldDeployer;
 			this.scaffold3 = scaffold3;
@@ -718,6 +730,14 @@ public final class SwiftSearcher implements Worker {
 			return myrimatchDeployer;
 		}
 
+		public ServiceConfig getIdpicker() {
+			return idpicker;
+		}
+
+		public ServiceConfig getIdpickerDeployer() {
+			return idpickerDeployer;
+		}
+
 		public ServiceConfig getScaffold() {
 			return scaffold;
 		}
@@ -778,6 +798,8 @@ public final class SwiftSearcher implements Worker {
 			map.put(OMSSA_DEPLOYER, resolver.getIdFromConfig(omssaDeployer));
 			map.put(MYRIMATCH, resolver.getIdFromConfig(myrimatch));
 			map.put(MYRIMATCH_DEPLOYER, resolver.getIdFromConfig(myrimatchDeployer));
+			map.put(IDPICKER, resolver.getIdFromConfig(idpicker));
+			map.put(IDPICKER_DEPLOYER, resolver.getIdFromConfig(idpickerDeployer));
 			map.put(SCAFFOLD, resolver.getIdFromConfig(scaffold));
 			map.put(SCAFFOLD_DEPLOYER, resolver.getIdFromConfig(scaffoldDeployer));
 			map.put(SCAFFOLD3, resolver.getIdFromConfig(scaffold3));
@@ -810,6 +832,8 @@ public final class SwiftSearcher implements Worker {
 			omssaDeployer = (ServiceConfig) resolver.getConfigFromId(values.get(OMSSA_DEPLOYER));
 			myrimatch = (ServiceConfig) resolver.getConfigFromId(values.get(MYRIMATCH));
 			myrimatchDeployer = (ServiceConfig) resolver.getConfigFromId(values.get(MYRIMATCH_DEPLOYER));
+			idpicker = (ServiceConfig) resolver.getConfigFromId(values.get(IDPICKER));
+			idpickerDeployer = (ServiceConfig) resolver.getConfigFromId(values.get(IDPICKER_DEPLOYER));
 			scaffold = (ServiceConfig) resolver.getConfigFromId(values.get(SCAFFOLD));
 			scaffoldDeployer = (ServiceConfig) resolver.getConfigFromId(values.get(SCAFFOLD_DEPLOYER));
 			scaffold3 = (ServiceConfig) resolver.getConfigFromId(values.get(SCAFFOLD3));
@@ -937,6 +961,12 @@ public final class SwiftSearcher implements Worker {
 
 					.property(MYRIMATCH_DEPLOYER, MyrimatchDeploymentService.NAME, "If you want to use Myrimatch, you have to have a database deployer set up. Myrimatch deployment detects the prefix of decoy sequences.")
 					.reference(MyrimatchDeploymentService.TYPE, UiBuilder.NONE_TYPE)
+
+					.property(IDPICKER, IdpickerWorker.NAME, "Idpicker is roughly equivalent to Scaffold. At the moment it can process Myrimatch files.")
+					.reference(IdpickerWorker.TYPE, IdpickerCache.TYPE, UiBuilder.NONE_TYPE)
+
+					.property(IDPICKER_DEPLOYER, IdpickerDeploymentService.NAME, "If you want to use IDPicker, you have to have a database deployer set up. This deployer does virtually nothing, so it can be installed even on a very loaded machine.")
+					.reference(IdpickerDeploymentService.TYPE, UiBuilder.NONE_TYPE)
 
 					.property(SCAFFOLD, ScaffoldWorker.NAME, "Scaffold 2 batch searcher by Proteome Software")
 					.reference(ScaffoldWorker.TYPE, UiBuilder.NONE_TYPE)

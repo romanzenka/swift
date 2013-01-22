@@ -220,7 +220,7 @@ public final class MyrimatchTest {
 
 			final File resultFile = new File(tempFolder, "result.pepXML");
 
-			final MyrimatchWorkPacket work = new MyrimatchWorkPacket(mgfFile, configFile, resultFile, tempFolder, fastaFile, 2, "Rev_", false, "Test Myrimatch run", false);
+			final MyrimatchWorkPacket work = new MyrimatchWorkPacket(resultFile, configFile, mgfFile, tempFolder, fastaFile, 2, "Rev_", false, "Test Myrimatch run", false);
 
 			final MyrimatchWorker worker = new MyrimatchWorker(myrimatchExecutable);
 
@@ -304,8 +304,9 @@ public final class MyrimatchTest {
 		config.setDeployableDbFolder(tempFolder.getAbsolutePath());
 		final MyrimatchDeploymentService.Factory factory = new MyrimatchDeploymentService.Factory();
 		final MyrimatchDeploymentService deployer = (MyrimatchDeploymentService) factory.create(config, new DependencyResolver(null));
+		final DatabaseAnnotation annotation = new DatabaseAnnotation("Rev_");
 		final DeploymentRequest request = new DeploymentRequest("test deployment",
-				new FastaFile("database", "test database for Myrimatch", databaseFile, new DatabaseAnnotation()));
+				new FastaFile("database", "test database for Myrimatch", databaseFile, annotation));
 		deployCheckResult(deployer, request);
 		deployCheckResult(deployer, request);
 
@@ -319,7 +320,7 @@ public final class MyrimatchTest {
 	private void deployCheckResult(final MyrimatchDeploymentService deployer, final DeploymentRequest request) {
 		final DeploymentResult result = deployer.performDeployment(request);
 		final MyrimatchDeploymentResult myrimatchResult = (MyrimatchDeploymentResult) result;
-		Assert.assertEquals(myrimatchResult.getDecoySequencePrefix(), "Rev_", "Determined prefix does not match");
+		Assert.assertEquals(myrimatchResult.getDecoySequencePrefix(), request.getAnnotation().getDecoyRegex(), "Determined prefix does not match");
 		Assert.assertEquals(myrimatchResult.getNumForwardEntries(), 2, "Different amount of forward entries");
 	}
 
@@ -427,7 +428,7 @@ public final class MyrimatchTest {
 
 	private MyrimatchMappings createMappings() {
 		final MyrimatchMappingFactory factory = new MyrimatchMappingFactory();
-		Assert.assertEquals(factory.getCanonicalParamFileName(), "myrimatch.cfg");
+		Assert.assertEquals(factory.getCanonicalParamFileName(), "myrimatch.template.cfg");
 		final MyrimatchMappings mapping = (MyrimatchMappings) factory.createMapping();
 		return mapping;
 	}
