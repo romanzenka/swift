@@ -52,7 +52,7 @@ public final class IdpickerTask extends AsyncTaskBase {
 	 *         to send a work packet.
 	 */
 	public WorkPacket createWorkPacket() {
-		setDescription("IdpQonvert conversion of " + searchTask.getOutputFile().getAbsolutePath());
+		setDescription("IdpQonvert conversion of " + fileTokenFactory.fileToTaggedDatabaseToken(searchTask.getOutputFile()));
 		IdpQonvertSettings params = new IdpQonvertSettings();
 		// Max FDR is set to 1- Scaffolds protein probability
 		params.setMaxFDR(1.0 - swiftSearchDefinition.getSearchParameters().getScaffoldSettings().getProteinProbability());
