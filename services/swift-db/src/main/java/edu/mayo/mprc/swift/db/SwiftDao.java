@@ -118,6 +118,13 @@ public interface SwiftDao extends Dao, RuntimeInitializer {
 	 */
 	TaskStateData getTaskState(TaskState state);
 
+	/**
+	 * Add a new task state (if it does not exist already in the database).
+	 * Flushes the task state cache (for now).
+	 * @param state State to be added.
+	 */
+	void addTaskState(final TaskState state);
+
 	TaskData createTask(int searchRunId, String name, String descriptionLong, TaskState taskState);
 
 	ReportData storeReport(int searchRunId, File resultFile);

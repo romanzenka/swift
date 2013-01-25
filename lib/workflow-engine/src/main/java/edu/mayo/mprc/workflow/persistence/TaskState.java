@@ -14,6 +14,10 @@ public enum TaskState {
 	 */
 	RUNNING("Running"),
 	/**
+	 * We are running in a warning state.
+	 */
+	RUNNING_WARN("Running Warning"),
+	/**
 	 * The execution failed.
 	 */
 	RUN_FAILED("Run Failed"),
@@ -21,6 +25,10 @@ public enum TaskState {
 	 * Success!
 	 */
 	COMPLETED_SUCCESFULLY("Completed Successfully"),
+	/**
+	 * Success with warnings.
+	 */
+	COMPLETED_WARNING("Completed with Warning"),
 	/**
 	 * Could not even start running, because inputs failed.
 	 */

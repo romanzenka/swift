@@ -25,6 +25,7 @@ public class TaskData {
 	private String gridJobId;
 	private String host;
 	private String exceptionString;
+	private String warningMessage;
 	private Float percentDone;
 
 	public TaskData() {
@@ -200,6 +201,14 @@ public class TaskData {
 		}
 	}
 
+	public String getWarningMessage() {
+		return warningMessage;
+	}
+
+	public void setWarningMessage(String warningMessage) {
+		this.warningMessage = warningMessage;
+	}
+
 	public boolean equals(final Object obj) {
 		if (this == obj) {
 			return true;
@@ -227,7 +236,8 @@ public class TaskData {
 				getErrorCode(),
 				getDescriptionLong(),
 				getHost(),
-				getPercentDone());
+				getPercentDone(),
+				getWarningMessage());
 	}
 
 	public String toString() {
@@ -248,6 +258,7 @@ public class TaskData {
 				", host='" + getHost() + '\'' +
 				", exceptionString='" + getExceptionString() + '\'' +
 				", percentDone='" + getPercentDone() + '\'' +
+				", warningMessage='" + getWarningMessage() + '\'' +
 				'}';
 	}
 }

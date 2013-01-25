@@ -2,6 +2,7 @@ package edu.mayo.mprc.swift.search;
 
 import edu.mayo.mprc.MprcException;
 import edu.mayo.mprc.daemon.AssignedTaskData;
+import edu.mayo.mprc.daemon.TaskWarning;
 import edu.mayo.mprc.swift.db.SwiftDao;
 import edu.mayo.mprc.swift.dbmapping.TaskData;
 import edu.mayo.mprc.swift.search.task.AsyncTaskBase;
@@ -96,6 +97,16 @@ public final class PersistenceMonitor implements SearchMonitor {
 					LOGGER.error("Could not store " + task.getName() + " assigned task data into the database (" + t.getMessage() + ").", t);
 					swiftDao.rollback();
 				}
+			} else if(progressInfo instanceof TaskWarning) {
+				final TaskData data = syncTaskBase(task, task.getState());
+				try {
+					data.setWarningMessage(((TaskWarning) progressInfo).getWarningMessage());
+					swiftDao.commit();
+				} catch (Exception t) {
+					// SWALLOWED: just log
+					LOGGER.error("Could not store " + task.getName() + " assigned task data into the database (" + t.getMessage() + ").", t);
+					swiftDao.rollback();
+				}
 			} else {
 				// No matter what happened, we just update the task
 				swiftDao.begin();
@@ -129,6 +140,9 @@ public final class PersistenceMonitor implements SearchMonitor {
 		if (task.getLastError() != null) {
 			data.setException(task.getLastError());
 			data.setErrorCode(1);
+		}
+		if(task.getLastWarning()!=null) {
+			data.setWarningMessage(task.getLastWarning());
 		}
 		data.setTaskState(swiftDao.getTaskState(task.getState()));
 		data.setTaskName(task.getName());

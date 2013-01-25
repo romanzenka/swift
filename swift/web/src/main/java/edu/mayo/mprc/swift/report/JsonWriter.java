@@ -225,6 +225,7 @@ public final class JsonWriter {
 		appendKeyNumber(builder, "startstamp", start.getTime());
 		appendKeyNumber(builder, "endstamp", end.getTime());
 		appendKeyString(builder, "errormsg", status.getErrorMessage());
+		appendKeyString(builder, "warningmsg", status.getWarningMessage());
 		appendKeyString(builder, "jobid", status.getGridJobId());
 		appendKeyString(builder, "host", status.getHostString());
 		appendKeyNumberNull(builder, "percentDone", status.getPercentDone());

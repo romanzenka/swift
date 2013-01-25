@@ -30,7 +30,7 @@ public final class JsonCommunicationTest {
 	private SearchRun searchRun;
 	private static final String SEARCH_RUN_JSON =
 			"{\"_\":0, \"id\":null, \"title\":\"Transaction title\", \"user\":\"Roman Zenka\", " +
-					"\"submitted\":\"5/6/05 10:22 AM\", \"duration\":\"397 days, 13:11:11\", \"ranTooLong\":1, \"subtasks\":123, " +
+					"\"submitted\":\"5/6/05 10:22 AM\", \"duration\":\"397 days, 13:11:11\", \"subtasks\":123, " +
 					"\"search\":0, " +
 					"\"errormsg\":\"Transaction error message\", " +
 					"\"ok\":13, \"failures\":14, \"warnings\":15, \"running\":3, " +
@@ -39,7 +39,7 @@ public final class JsonCommunicationTest {
 
 	private TaskData status;
 	private static final String STATUS_JSON =
-			"{\"_\":0, \"taskid\":123, \"title\":\"'Mascot Search'\", \"status\":\"Completed Successfully\", \"time\":\"Actual time: 0:00:01 after 0:00:02 spent in queue\", \"queuestamp\":1182963939000, \"startstamp\":1182963941000, \"endstamp\":1182963942000, \"errormsg\":\"error\\nmessage\", \"jobid\":\"12345\", \"host\":\"foo\", \"percentDone\":null, " +
+			"{\"_\":0, \"taskid\":123, \"title\":\"'Mascot Search'\", \"status\":\"Completed Successfully\", \"time\":\"Actual time: 0:00:01 after 0:00:02 spent in queue\", \"queuestamp\":1182963939000, \"startstamp\":1182963941000, \"endstamp\":1182963942000, \"errormsg\":\"error\\nmessage\", \"warningmsg\":\"warning message\", \"jobid\":\"12345\", \"host\":\"foo\", \"percentDone\":null, " +
 					"\"logs\":[{\"type\":\"" + LogInfo.STD_OUT_LOG_TYPE + "\", \"longname\":\"<file>shared:/out.txt</file>\"}, {\"type\":\"" + LogInfo.STD_ERR_LOG_TYPE + "\", \"longname\":\"<file>shared:/err.txt</file>\"}]}";
 
 	@BeforeMethod
@@ -62,6 +62,7 @@ public final class JsonCommunicationTest {
 		status.setEndTimestamp(new Date(1182963942000L));
 		status.setExceptionString("exception text");
 		status.setErrorMessage("error\nmessage");
+		status.setWarningMessage("warning message");
 		status.setGridJobId("12345");
 		status.setHostString("foo");
 		status.setOutputLogDatabaseToken("shared:/out.txt");

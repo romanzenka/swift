@@ -43,9 +43,10 @@ public abstract class TaskBase implements Task {
 
 	private String executedOnHost = null; // host enqueued on
 	private Throwable lastError;
+	private String lastWarning;
 
 	/**
-	 * Set to true by {@link #completeWhenFileAppears(File)}.
+	 * Set to true by {@link #completeWhenFilesAppear}
 	 */
 	protected AtomicBoolean waitingForFileToAppear = new AtomicBoolean(false);
 
@@ -151,22 +152,28 @@ public abstract class TaskBase implements Task {
 		} else {
 			switch (oldState) {
 				case COMPLETED_SUCCESFULLY:
+				case COMPLETED_WARNING:
 				case RUN_FAILED:
 				case INIT_FAILED:
 					assert false : currentTransition + " once task succeeds or fails, it must not change its state";
 					break;
 				case READY:
-					assert newState == TaskState.RUNNING || newState == TaskState.RUN_FAILED
+					assert newState == TaskState.RUNNING || newState == TaskState.RUN_FAILED || newState == TaskState.RUNNING_WARN
 							: currentTransition + " ready task can only start running or fail before the packet gets even sent";
 					break;
 				case RUNNING:
 					assert newState == TaskState.COMPLETED_SUCCESFULLY ||
+							newState == TaskState.RUNNING_WARN ||
+							newState == TaskState.COMPLETED_WARNING ||
 							newState == TaskState.RUN_FAILED
 							: currentTransition + " running task can only succeed or fail";
 					break;
 				case UNINITIALIZED:
 					assert newState == TaskState.INIT_FAILED || newState == TaskState.READY :
 							currentTransition + " uninitialized task can only fail initialization or become ready";
+					break;
+				case RUNNING_WARN:
+					assert newState == TaskState.COMPLETED_WARNING || newState==TaskState.RUN_FAILED : currentTransition + " running warn task can only complete with warning or fail";
 					break;
 				default:
 					assert false : "State not supported " + oldState.getText();
@@ -215,13 +222,15 @@ public abstract class TaskBase implements Task {
 
 	public boolean isSuccessful() {
 		synchronized (stateLock) {
-			return TaskState.COMPLETED_SUCCESFULLY == state;
+			return TaskState.COMPLETED_SUCCESFULLY == state ||
+					TaskState.COMPLETED_WARNING == state;
 		}
 	}
 
 	public boolean isDone() {
 		synchronized (stateLock) {
 			return TaskState.COMPLETED_SUCCESFULLY == state ||
+					TaskState.COMPLETED_WARNING == state ||
 					TaskState.INIT_FAILED == state ||
 					TaskState.RUN_FAILED == state;
 		}
@@ -240,9 +249,24 @@ public abstract class TaskBase implements Task {
 		}
 	}
 
+	public void setWarning(final String warning) {
+		synchronized (stateLock) {
+			this.lastWarning = warning;
+			if(state==TaskState.RUNNING) {
+				setState(TaskState.RUNNING_WARN);
+			}
+		}
+	}
+
 	public Throwable getLastError() {
 		synchronized (stateLock) {
 			return lastError;
+		}
+	}
+
+	public String getLastWarning() {
+		synchronized (stateLock) {
+			return lastWarning;
 		}
 	}
 
@@ -250,10 +274,14 @@ public abstract class TaskBase implements Task {
 		waitingForFileToAppear.set(true);
 		try {
 			FileUtilities.waitForFiles(Sets.<File>newHashSet(files));
-			setState(TaskState.COMPLETED_SUCCESFULLY);
+			setComplete();
 		} catch (MprcException e) {
 			setError(new MprcException("The files [" + Joiner.on("], [").join(files) + "] did not appear even after 2 minutes."));
 		}
+	}
+
+	private void setComplete() {
+		setState(TaskState.COMPLETED_SUCCESFULLY);
 	}
 
 	public void addDependency(final Task task) {

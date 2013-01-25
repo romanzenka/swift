@@ -389,6 +389,7 @@ public final class SwiftDaoHibernate extends DaoBase implements SwiftDao {
 			searchRun.setNumTasks(progress.getTotal());
 			searchRun.setTasksCompleted(progress.getSucceeded());
 			searchRun.setTasksFailed(progress.getFailed() - progress.getInitFailed());
+			searchRun.setTasksWithWarning(progress.getWarning());
 		} catch (Exception t) {
 			throw new MprcException("Cannot persist search run progress", t);
 		}
@@ -456,6 +457,24 @@ public final class SwiftDaoHibernate extends DaoBase implements SwiftDao {
 				taskStates.put(TaskState.fromText(stateData.getDescription()), stateData);
 			}
 		}
+	}
+
+	@Override
+	public void addTaskState(final TaskState state) {
+		final TaskStateData taskState = getTaskState(state);
+		if (taskState != null) {
+			return;
+		}
+		final TaskStateData taskStateData = new TaskStateData(state.getText());
+		save(taskStateData, getTaskStateDataEqualityCriteria(taskStateData), true);
+		synchronized (taskStatesLock) {
+			// Flush the cache
+			taskStates = null;
+		}
+	}
+
+	private Criterion getTaskStateDataEqualityCriteria(TaskStateData taskStateData) {
+		return DaoBase.nullSafeEq("description", taskStateData.getDescription());
 	}
 
 	@Override
@@ -559,7 +578,7 @@ public final class SwiftDaoHibernate extends DaoBase implements SwiftDao {
 
 		final List list = getSession().createQuery("select f.id, f." + field + " from " + table + " as f").list();
 		LOGGER.info("\tChecking " + list.size() + " entries");
-		long totalMoves=0;
+		long totalMoves = 0;
 		for (final Object o : list) {
 			final Object[] array = (Object[]) o;
 			final Number id = (Number) array[0];
@@ -577,7 +596,7 @@ public final class SwiftDaoHibernate extends DaoBase implements SwiftDao {
 				}
 			}
 		}
-		LOGGER.info("\tMove complete, total items updated: "+totalMoves);
+		LOGGER.info("\tMove complete, total items updated: " + totalMoves);
 	}
 
 	public FileTokenFactory getFileTokenFactory() {
@@ -596,7 +615,7 @@ public final class SwiftDaoHibernate extends DaoBase implements SwiftDao {
 			return workspaceCheck;
 		}
 
-		if (rowCount(TaskStateData.class) != (long)TaskState.values().length) {
+		if (rowCount(TaskStateData.class) != (long) TaskState.values().length) {
 			return "The task state enumeration is not up to date";
 		}
 		if (rowCount(SearchRun.class) == 0) {
@@ -617,10 +636,10 @@ public final class SwiftDaoHibernate extends DaoBase implements SwiftDao {
 		// Initialize the dependent DAO
 		workspaceDao.initialize(params);
 
-		if (rowCount(TaskStateData.class) != (long)TaskState.values().length) {
+		if (rowCount(TaskStateData.class) != (long) TaskState.values().length) {
 			LOGGER.info("Initializing task state enumeration");
 			for (final TaskState state : TaskState.values()) {
-				getSession().saveOrUpdate(new TaskStateData(state.getText()));
+				addTaskState(state);
 			}
 		}
 

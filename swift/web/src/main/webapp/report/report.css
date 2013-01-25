@@ -244,6 +244,16 @@ table.reportList td {
     background-repeat: no-repeat;
 }
 
+.status-running-warning {
+    background-image: url(task_running_warning.gif);
+    background-repeat: no-repeat;
+}
+
+.status-completed-warning {
+    background-image: url(task_ok_warning.gif);
+    background-repeat: no-repeat;
+}
+
 .ran-too-long {
     color: #ff0000;
 }

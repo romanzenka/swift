@@ -1,7 +1,8 @@
 package edu.mayo.mprc.swift.dbmapping;
 
-public class TaskStateData {
-	private Long id;
+import edu.mayo.mprc.database.PersistableBase;
+
+public class TaskStateData extends PersistableBase {
 	private String description;
 
 	public TaskStateData() {
@@ -9,14 +10,6 @@ public class TaskStateData {
 
 	public TaskStateData(final String description) {
 		this.description = description;
-	}
-
-	public void setId(final Long id) {
-		this.id = id;
-	}
-
-	public Long getId() {
-		return id;
 	}
 
 	public void setDescription(final String description) {

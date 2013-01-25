@@ -16,6 +16,7 @@ public final class ProgressReport implements Serializable {
 	private final int queued;             // In queue right now
 	private final int executing;          // Executing right now
 	private final int succeeded;          // Ended successfully
+	private final int warning;            // Either running or finished with a warning set
 	private final int failed;             // Failed - either by themselves or because they did not start
 
 	private final int initFailed;         // Portion of subtasks that did not even start
@@ -30,16 +31,18 @@ public final class ProgressReport implements Serializable {
 	 * @param executing         Being executed right now
 	 * @param fromExecutingDone Out of all the currently executing tasks, which portion of work is done already
 	 * @param succeeded         Ended successfully
+	 * @param warning           Either ended or still running, but there was a warning
 	 * @param failed            Failed - either by themselves or because their initialization failed
 	 * @param initFailed        Out of failed how many did not even start (failed because dependency failed)
 	 */
-	public ProgressReport(final int total, final int sent, final int queued, final int executing, final double fromExecutingDone, final int succeeded, final int failed, final int initFailed) {
+	public ProgressReport(final int total, final int sent, final int queued, final int executing, final double fromExecutingDone, final int succeeded, final int warning, final int failed, final int initFailed) {
 		this.total = total;
 		this.sent = sent;
 		this.queued = queued;
 		this.executing = executing;
 		this.fromExecutingDone = fromExecutingDone;
 		this.succeeded = succeeded;
+		this.warning = warning;
 		this.failed = failed;
 		this.initFailed = initFailed;
 	}
@@ -68,6 +71,10 @@ public final class ProgressReport implements Serializable {
 		return succeeded;
 	}
 
+	public int getWarning() {
+		return warning;
+	}
+
 	public int getFailed() {
 		return failed;
 	}
@@ -77,10 +84,10 @@ public final class ProgressReport implements Serializable {
 	}
 
 	public String toString() {
-		if (failed > 0) {
+		if (failed > 0 || warning > 0) {
 			return MessageFormat.format(
-					"Progress: Out of {0} subtasks: {1} sent, {2} queued, {3} executing, {4} succeeded, {5} failed (out of which {6} failed because their dependency failed)",
-					total, sent, queued, executing, succeeded, failed, initFailed);
+					"Progress: Out of {0} subtasks: {1} sent, {2} queued, {3} executing, {4} succeeded, {5} warning, {6} failed (out of which {7} failed because their dependency failed)",
+					total, sent, queued, executing, succeeded, warning, failed, initFailed);
 		} else {
 			return MessageFormat.format(
 					"Progress: Out of {0} subtasks: {1} sent, {2} queued, {3} executing, {4} succeeded, none failed",
@@ -100,6 +107,7 @@ public final class ProgressReport implements Serializable {
 					queued == report.getQueued() &&
 					executing == report.getExecuting() &&
 					fromExecutingDone == report.getFromExecutingDone() &&
+					warning == report.getWarning() &&
 					succeeded == report.getSucceeded() &&
 					failed == report.getFailed() &&
 					initFailed == report.getInitFailed();
@@ -110,6 +118,6 @@ public final class ProgressReport implements Serializable {
 
 	@Override
 	public int hashCode() {
-		return total + sent + queued + executing + succeeded + failed + initFailed + Double.valueOf(fromExecutingDone).hashCode();
+		return total + sent + queued + executing + succeeded + warning + failed + initFailed + Double.valueOf(fromExecutingDone).hashCode();
 	}
 }

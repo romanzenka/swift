@@ -457,6 +457,14 @@ TaskItemVisualizer.prototype.fillWithContents = function(element, id, object) {
                 text = object.title;
                 item.className = "status-warnings";
                 break;
+            case "Running Warning":
+                text = object.title;
+                item.className = "status-running-warning";
+                break;
+            case "Completed with Warning":
+                text = object.title;
+                item.className = "status-completed-warning";
+                break;
             default:
                 text = this.unknownStatusTemplate.evaluate(object);
                 break;

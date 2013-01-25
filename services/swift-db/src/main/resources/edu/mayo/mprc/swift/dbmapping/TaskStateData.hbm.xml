@@ -6,7 +6,7 @@
 <hibernate-mapping>
 
     <class name="edu.mayo.mprc.swift.dbmapping.TaskStateData" table="task_state" lazy="false">
-        <id name="id" column="task_state_id" type="long">
+        <id name="id" column="task_state_id" type="int">
             <generator class="native"/>
         </id>
         <property name="description" column="description" length="60"/>

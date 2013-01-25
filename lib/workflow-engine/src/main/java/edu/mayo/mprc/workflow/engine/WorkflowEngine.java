@@ -25,8 +25,9 @@ public final class WorkflowEngine {
 	private ProgressReport previousProgressReport;
 	private final CombinedMonitor monitor = new CombinedMonitor();
 	private Resumer resumer;
-	private AtomicInteger succeededTasks = new AtomicInteger(0);
-	private AtomicInteger failedTasks = new AtomicInteger(0);
+	private AtomicInteger succeededTasks = new AtomicInteger(0);  // How many tasks succeeded (including with warning)
+	private AtomicInteger warningTasks = new AtomicInteger(0); // How many have warning (when they fail, they are no longer warning, they are in error)
+	private AtomicInteger failedTasks = new AtomicInteger(0); // Failed with our without warning
 	private AtomicInteger initFailedTasks = new AtomicInteger(0);
 	private AtomicInteger runningTasks = new AtomicInteger(0);
 	private boolean done;
@@ -97,6 +98,12 @@ public final class WorkflowEngine {
 					break;
 				case UNINITIALIZED:
 					color = "grey";
+					break;
+				case RUNNING_WARN:
+					color = "orange";
+					break;
+				case COMPLETED_WARNING:
+					color = "green";
 					break;
 				default:
 					throw new MprcException("Unsupported task state: " + task.getState().name());
@@ -287,6 +294,7 @@ public final class WorkflowEngine {
 				runningTasks.get(),
 				0,
 				succeededTasks.get(),
+				warningTasks.get(),
 				failedTasks.get(),
 				initFailedTasks.get());
 
@@ -342,6 +350,13 @@ public final class WorkflowEngine {
 				break;
 			case READY:
 			case UNINITIALIZED:
+				break;
+			case RUNNING_WARN:
+				warningTasks.incrementAndGet();
+				break;
+			case COMPLETED_WARNING:
+				runningTasks.decrementAndGet();
+				succeededTasks.incrementAndGet();
 				break;
 			default:
 				throw new MprcException("Unknown task state " + currentState.getText());

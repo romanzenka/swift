@@ -15,6 +15,7 @@
         <property name="endTimestamp" column="end_timestamp"/>
         <property name="errorCode" column="error_code"/>
         <property name="errorMessage" column="error_message" type="text"/> <!-- TODO: Make binary -->
+        <property name="warningMessage" column="warning_message" type="text"/> <!-- TODO: Make binary -->
         <property name="exceptionString" column="exception" type="text"/> <!-- TODO: Make binary -->
         <many-to-one name="searchRun" class="edu.mayo.mprc.swift.dbmapping.SearchRun" column="transaction_id"
                      index="task_transaction_index"/>
