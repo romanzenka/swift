@@ -419,7 +419,7 @@ TaskItemVisualizer.prototype.fillWithContents = function(element, id, object) {
         var row = document.createElement("tr");
         var item = document.createElement("td");
         row.appendChild(item);
-        item.title = object.time;
+        item.title = object.time + ' ' + object.warningmsg;
         if (object.errormsg != null && object.errormsg != "") {
             var errorLink = document.createElement("a");
             errorLink.href = "taskerror.jsp?id=" + object.taskid;
