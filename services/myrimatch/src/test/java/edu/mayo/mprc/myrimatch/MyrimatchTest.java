@@ -145,12 +145,10 @@ public final class MyrimatchTest {
 		final MappingContext mappingContext = createMappingContext();
 
 		mappings.setPeptideTolerance(mappingContext, new Tolerance("2.3 Da"));
-		Assert.assertEquals(mappings.getNativeParam(MyrimatchMappings.PRECURSOR_MZ_TOLERANCE), "2.3");
-		Assert.assertEquals(mappings.getNativeParam(MyrimatchMappings.PRECURSOR_MZ_TOLERANCE_UNITS), "daltons");
+		Assert.assertEquals(mappings.getNativeParam(MyrimatchMappings.PRECURSOR_MZ_TOLERANCE), "2.3daltons");
 
 		mappings.setPeptideTolerance(mappingContext, new Tolerance("10 ppm"));
-		Assert.assertEquals(mappings.getNativeParam(MyrimatchMappings.PRECURSOR_MZ_TOLERANCE), "10.0");
-		Assert.assertEquals(mappings.getNativeParam(MyrimatchMappings.PRECURSOR_MZ_TOLERANCE_UNITS), "ppm");
+		Assert.assertEquals(mappings.getNativeParam(MyrimatchMappings.PRECURSOR_MZ_TOLERANCE), "10.0ppm");
 	}
 
 	@Test
@@ -159,12 +157,10 @@ public final class MyrimatchTest {
 		final MappingContext mappingContext = createMappingContext();
 
 		mappings.setFragmentTolerance(mappingContext, new Tolerance("10.37 Da"));
-		Assert.assertEquals(mappings.getNativeParam(MyrimatchMappings.FRAGMENT_MZ_TOLERANCE), "10.37 daltons");
-		Assert.assertEquals(mappings.getNativeParam(MyrimatchMappings.FRAGMENT_MZ_TOLERANCE_UNITS), "daltons");
+		Assert.assertEquals(mappings.getNativeParam(MyrimatchMappings.FRAGMENT_MZ_TOLERANCE), "10.37daltons");
 
 		mappings.setFragmentTolerance(mappingContext, new Tolerance("0.12 ppm"));
-		Assert.assertEquals(mappings.getNativeParam(MyrimatchMappings.FRAGMENT_MZ_TOLERANCE), "0.12 ppm");
-		Assert.assertEquals(mappings.getNativeParam(MyrimatchMappings.FRAGMENT_MZ_TOLERANCE_UNITS), "ppm");
+		Assert.assertEquals(mappings.getNativeParam(MyrimatchMappings.FRAGMENT_MZ_TOLERANCE), "0.12ppm");
 	}
 
 	@Test
@@ -173,7 +169,8 @@ public final class MyrimatchTest {
 		final MappingContext mappingContext = createMappingContext();
 
 		mappings.setInstrument(mappingContext, Instrument.ORBITRAP);
-		Assert.assertEquals(mappings.getNativeParam(MyrimatchMappings.USE_AVG_MASS_OF_SEQUENCES), "false", "Orbitrap uses monoisotopic mass");
+		Assert.assertEquals(mappings.getNativeParam(MyrimatchMappings.PRECURSOR_MZ_TOLERANCE_RULE), "mono", "Orbitrap uses monoisotopic mass");
+		Assert.assertEquals(mappings.getNativeParam(MyrimatchMappings.FRAGMENTATION_RULE), "manual:b,y", "Orbitrap produces b and y ions");
 	}
 
 	@Test
@@ -378,7 +375,10 @@ public final class MyrimatchTest {
 			oldString = oldString.replaceAll(toReplaceInBase, replaceWith);
 		}
 
-		Assert.assertEquals(newString.replaceAll("\\s+", " "), oldString.replaceAll("\\s+", " "), "No change must be presented");
+		Assert.assertEquals(
+				newString.replaceAll("\\s+", " ").trim(),
+				oldString.replaceAll("\\s+", " ").trim(),
+				"No change must be presented");
 	}
 
 	private MappingContext createMappingContext() {

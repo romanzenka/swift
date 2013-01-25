@@ -1,5 +1,6 @@
 package edu.mayo.mprc.myrimatch;
 
+import edu.mayo.mprc.daemon.TaskWarning;
 import edu.mayo.mprc.utilities.LogMonitor;
 import edu.mayo.mprc.utilities.progress.PercentDone;
 import edu.mayo.mprc.utilities.progress.UserProgressReporter;
@@ -13,6 +14,8 @@ final class MyrimatchLogMonitor implements LogMonitor {
 	private final UserProgressReporter progressReporter;
 	private long lastTimeMs = System.currentTimeMillis();
 	private static final Pattern PATTERN = Pattern.compile("Searched (\\d+) of (\\d+) proteins; \\d+ per second, .* elapsed, .* remaining.");
+	private static final Pattern WARNING = Pattern.compile("warning", Pattern.CASE_INSENSITIVE);
+	private boolean warningReported = false;
 
 
 	public MyrimatchLogMonitor(final UserProgressReporter progressReporter) {
@@ -38,6 +41,9 @@ final class MyrimatchLogMonitor implements LogMonitor {
 					// SWALLOWED: We ignore these exceptions - we will just not be able to report progress
 				}
 			}
+		} else if (!warningReported && WARNING.matcher(line).find()) {
+			progressReporter.reportProgress(new TaskWarning(line));
+			warningReported = true;
 		}
 	}
 }

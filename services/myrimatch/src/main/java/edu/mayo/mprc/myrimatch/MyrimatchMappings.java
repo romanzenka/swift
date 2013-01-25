@@ -1,11 +1,10 @@
 package edu.mayo.mprc.myrimatch;
 
+import com.google.common.base.Joiner;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Sets;
 import edu.mayo.mprc.MprcException;
-import edu.mayo.mprc.swift.params2.Instrument;
-import edu.mayo.mprc.swift.params2.MassUnit;
-import edu.mayo.mprc.swift.params2.Protease;
-import edu.mayo.mprc.swift.params2.Tolerance;
+import edu.mayo.mprc.swift.params2.*;
 import edu.mayo.mprc.swift.params2.mapping.MappingContext;
 import edu.mayo.mprc.swift.params2.mapping.Mappings;
 import edu.mayo.mprc.unimod.ModSet;
@@ -19,22 +18,24 @@ import java.io.Reader;
 import java.io.Writer;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 public final class MyrimatchMappings implements Mappings {
 
 	public static final String STATIC_MODS = "StaticMods";
 	public static final String DYNAMIC_MODS = "DynamicMods";
 	public static final String CLEAVAGE_RULES = "CleavageRules";
+	public static final String FRAGMENTATION_RULE = "FragmentationRule";
 	public static final String NUM_MIN_TERMINI_CLEAVAGES = "NumMinTerminiCleavages";
 	public static final String NUM_MAX_MISSED_CLEAVAGES = "NumMaxMissedCleavages";
-	public static final String USE_AVG_MASS_OF_SEQUENCES = "UseAvgMassOfSequences";
 	public static final String PRECURSOR_MZ_TOLERANCE = "PrecursorMzTolerance";
-	public static final String PRECURSOR_MZ_TOLERANCE_UNITS = "PrecursorMzToleranceUnits";
 	public static final String FRAGMENT_MZ_TOLERANCE = "FragmentMzTolerance";
-	public static final String FRAGMENT_MZ_TOLERANCE_UNITS = "FragmentMzToleranceUnits";
+	public static final String PRECURSOR_MZ_TOLERANCE_RULE = "PrecursorMzToleranceRule";
+
 
 	private Map<String, String> nativeParams;
 	private static final String VARIABLE_MODS_MARKERS = "*^@%~&?!:;|+-/";
+	private static final Pattern INTEGER = Pattern.compile("^[0-9]+$");
 
 	public MyrimatchMappings() {
 		nativeParams = initNativeParams();
@@ -99,11 +100,9 @@ public final class MyrimatchMappings implements Mappings {
 		map.put(CLEAVAGE_RULES, null);
 		map.put(NUM_MIN_TERMINI_CLEAVAGES, null);
 		map.put(NUM_MAX_MISSED_CLEAVAGES, null);
-		map.put(USE_AVG_MASS_OF_SEQUENCES, null);
 		map.put(PRECURSOR_MZ_TOLERANCE, null);
-		map.put(PRECURSOR_MZ_TOLERANCE_UNITS, null);
 		map.put(FRAGMENT_MZ_TOLERANCE, null);
-		map.put(FRAGMENT_MZ_TOLERANCE_UNITS, null);
+		map.put(FRAGMENTATION_RULE, null);
 		return map;
 	}
 
@@ -132,7 +131,10 @@ public final class MyrimatchMappings implements Mappings {
 				if (equalsSign < lastPart && equalsSign >= 0) {
 					final String key = line.substring(0, equalsSign).trim();
 					final String oldValue = line.substring(equalsSign + 1, lastPart).trim();
-					final String newValue = nativeParams.get(key);
+					final String value = nativeParams.get(key);
+					// We escape strings
+					final String newValue = value==null || INTEGER.matcher(value).matches() ? value : '"' + value + '"';
+
 					if (null != newValue && !oldValue.equals(newValue)) {
 						processed = true;
 						result.setLength(0);
@@ -160,8 +162,7 @@ public final class MyrimatchMappings implements Mappings {
 
 	@Override
 	public void setPeptideTolerance(final MappingContext context, final Tolerance peptideTolerance) {
-		nativeParams.put(PRECURSOR_MZ_TOLERANCE, String.valueOf(peptideTolerance.getValue()));
-		nativeParams.put(PRECURSOR_MZ_TOLERANCE_UNITS, massUnitToMyrimatch(peptideTolerance));
+		nativeParams.put(PRECURSOR_MZ_TOLERANCE, String.valueOf(peptideTolerance.getValue())+massUnitToMyrimatch(peptideTolerance));
 	}
 
 	private String massUnitToMyrimatch(final Tolerance peptideTolerance) {
@@ -177,8 +178,7 @@ public final class MyrimatchMappings implements Mappings {
 	@Override
 	public void setFragmentTolerance(final MappingContext context, final Tolerance fragmentTolerance) {
 		final String tolerance = massUnitToMyrimatch(fragmentTolerance);
-		nativeParams.put(FRAGMENT_MZ_TOLERANCE, fragmentTolerance.getValue() + " " + tolerance);
-		nativeParams.put(FRAGMENT_MZ_TOLERANCE_UNITS, tolerance);
+		nativeParams.put(FRAGMENT_MZ_TOLERANCE, fragmentTolerance.getValue() + "" + tolerance);
 	}
 
 	@Override
@@ -317,9 +317,10 @@ public final class MyrimatchMappings implements Mappings {
 
 	@Override
 	public void setInstrument(final MappingContext context, final Instrument instrument) {
-		// Only Orbitrap is precise enough to use the monoisotopic mass
-		// Is that true?
-		nativeParams.put(USE_AVG_MASS_OF_SEQUENCES, Instrument.ORBITRAP.equals(instrument) ? "false" : "true");
+		// Orbis use a monoisotopic precursor
+		nativeParams.put(PRECURSOR_MZ_TOLERANCE_RULE, Instrument.ORBITRAP.equals(instrument) ? "mono" : "avg");
+		final String series = Joiner.on(",").join(Sets.<IonSeries>newTreeSet(instrument.getSeries()));
+		nativeParams.put(FRAGMENTATION_RULE, "manual:"+series);
 	}
 
 	@Override

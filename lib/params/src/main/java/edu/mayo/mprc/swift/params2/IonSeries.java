@@ -13,7 +13,7 @@ import java.util.List;
  * <p/>
  * This is an immutable class. Do not get fooled by presence of setters - these are for Hibernate use only.
  */
-public class IonSeries extends EvolvableBase {
+public class IonSeries extends EvolvableBase implements Comparable<IonSeries> {
 
 	private String name;
 
@@ -75,5 +75,10 @@ public class IonSeries extends EvolvableBase {
 
 	public static List<IonSeries> getInitial() {
 		return DEFAULT_SERIES;
+	}
+
+	@Override
+	public int compareTo(IonSeries o) {
+		return String.CASE_INSENSITIVE_ORDER.compare(this.getName(), o.getName());
 	}
 }
