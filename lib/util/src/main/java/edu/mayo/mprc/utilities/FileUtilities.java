@@ -307,7 +307,9 @@ public final class FileUtilities {
 				.directory(target.getParentFile())
 				.command(command);
 
-		return new ProcessCaller(pb);
+		final ProcessCaller caller = new ProcessCaller(pb);
+		caller.setLogToConsole(false);
+		return caller;
 	}
 
 	private static String getOsNameLowerCase() {
@@ -1242,6 +1244,7 @@ public final class FileUtilities {
 			builder = new ProcessBuilder("chmod", chmodString, file.getAbsolutePath());
 		}
 		final ProcessCaller caller = new ProcessCaller(builder);
+		caller.setLogToConsole(false);
 		caller.run();
 		if (caller.getExitValue() != 0) {
 			LOGGER.info("Could not change permissions:" + caller.getFailedCallDescription());
@@ -1300,6 +1303,7 @@ public final class FileUtilities {
 		try {
 			final ProcessBuilder builder = new ProcessBuilder("bash", "-c", "umask");
 			caller = new ProcessCaller(builder);
+			caller.setLogToConsole(false);
 			caller.run();
 			if (caller.getExitValue() != 0) {
 				throw new MprcException("Umask call failed:" + caller.getFailedCallDescription());
@@ -1471,6 +1475,7 @@ public final class FileUtilities {
 					new ProcessBuilder("/bin/ls", "-p1L", "--", folder.getAbsolutePath())
 							.directory(folder);
 			final ProcessCaller caller = new ProcessCaller(builder);
+			caller.setLogToConsole(false);
 			caller.setKillTimeout(FOLDER_LIST_TIMEOUT);
 			caller.setOutputMonitor(new LogMonitor() {
 				@Override
