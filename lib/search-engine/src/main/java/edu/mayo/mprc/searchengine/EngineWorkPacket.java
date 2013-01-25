@@ -172,7 +172,7 @@ public abstract class EngineWorkPacket extends WorkPacketBase implements Cachabl
 
 	public String toString() {
 		return "\n\tinput file: " + getInputFile()
-				+ "\n\thdr file: " + getDatabaseFile()
+				+ "\n\tfasta file: " + getDatabaseFile()
 				+ "\n\toutput file: " + getOutputFile()
 				+ "\n\tsearch params: " + getSearchParamsFile();
 	}
