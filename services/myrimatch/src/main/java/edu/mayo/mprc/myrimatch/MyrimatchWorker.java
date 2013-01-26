@@ -72,20 +72,16 @@ public final class MyrimatchWorker extends WorkerBase {
 		LOGGER.debug("Parameter file " + paramsFile.getAbsolutePath() + " does" + (paramsFile.exists() && paramsFile.length() > 0 ? " " : " not ") + "exist.");
 
 		File modifiedParamsFile = new File(paramsFile.getParent(), "myrimatch.cfg");
-		if (!modifiedParamsFile.exists()) {
+		if (!modifiedParamsFile.exists() || modifiedParamsFile.lastModified() < paramsFile.lastModified()) {
 
 			try {
 				final List<String> lines = Files.readLines(paramsFile, Charsets.US_ASCII);
 				int i = 0;
 				boolean wasDecoyPrefix = false;
-				boolean wasDatabase = false;
 				for (final String line : lines) {
 					if (line.startsWith("DecoyPrefix")) {
 						wasDecoyPrefix = true;
 						lines.set(i, "DecoyPrefix = \"" + packet.getDecoySequencePrefix() + "\"");
-					} else if (line.startsWith("ProteinDatabase")) {
-						wasDatabase=true;
-						lines.set(i, "ProteinDatabase = \"" + fastaFile.getAbsolutePath() + "\"");
 					}
 
 					i++;
@@ -94,11 +90,6 @@ public final class MyrimatchWorker extends WorkerBase {
 					lines.add("");
 					lines.add("# Decoy sequence prefix is appended to all decoy matches");
 					lines.add("DecoyPrefix = " + packet.getDecoySequencePrefix());
-				}
-
-				if(!wasDatabase) {
-					lines.add("");
-					lines.add("ProteinDatabase = \"" + fastaFile.getAbsolutePath() + "\"");
 				}
 
 				Files.write(Joiner.on('\n').join(lines), modifiedParamsFile, Charsets.US_ASCII);
@@ -110,6 +101,8 @@ public final class MyrimatchWorker extends WorkerBase {
 
 		final List<String> parameters = new LinkedList<String>();
 		parameters.add(executable.getPath());
+		parameters.add("-ProteinDatabase");
+		parameters.add(fastaFile.getAbsolutePath());
 		parameters.add("-cfg");
 		parameters.add(modifiedParamsFile.getAbsolutePath());
 		parameters.add(inputFile.getAbsolutePath());
