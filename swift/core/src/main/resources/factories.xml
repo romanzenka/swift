@@ -112,6 +112,10 @@
         <property name="searchDbWorkerFactory" ref="searchDbFactory"/>
     </bean>
 
+    <bean id="dependencyResolver" class="edu.mayo.mprc.config.DependencyResolver">
+        <constructor-arg index="0" ref="resourceTable"/>
+    </bean>
+
     <bean id="databaseValidator"
           class="edu.mayo.mprc.swift.search.DatabaseValidator">
         <property name="daoList" ref="daoList"/>
@@ -123,6 +127,7 @@
 
     <bean id="daemonFactory" class="edu.mayo.mprc.daemon.Daemon$Factory">
         <property name="multiFactory" ref="resourceTable"/>
+        <property name="dependencies" ref="dependencyResolver"/>
     </bean>
 
     <bean id="omssaUserModsWriter" class="edu.mayo.mprc.omssa.OmssaUserModsWriter">
@@ -144,6 +149,7 @@
         <property name="abstractParamsInfo" ref="paramsInfo"/>
         <property name="searchEngines" ref="searchEngines"/>
         <property name="fileTokenFactory" ref="fileTokenFactory"/>
+        <property name="swiftMonitor" ref="swiftMonitor"/>
     </bean>
 
     <!-- Hibernate properties -->
@@ -350,6 +356,7 @@
         <property name="fileTokenFactory" ref="fileTokenFactory"/>
         <property name="daemonFactory" ref="daemonFactory"/>
         <property name="swiftFactory" ref="resourceTable"/>
+        <property name="monitor" ref="swiftMonitor"/>
         <property name="commands">
             <list>
                 <bean id="helpCommand" class="edu.mayo.mprc.swift.commands.DisplayHelp"/>
@@ -398,5 +405,10 @@
                 <ref bean="searchDbDao"/>
             </list>
         </constructor-arg>
+    </bean>
+
+    <bean id="swiftMonitor" class="edu.mayo.mprc.swift.SwiftMonitor">
+        <property name="factory" ref="resourceTable"/>
+        <property name="dependencies" ref="dependencyResolver"/>
     </bean>
 </beans>

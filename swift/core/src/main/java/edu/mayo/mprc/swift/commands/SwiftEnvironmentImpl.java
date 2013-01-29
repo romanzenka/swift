@@ -7,6 +7,7 @@ import edu.mayo.mprc.daemon.DaemonConnection;
 import edu.mayo.mprc.daemon.files.FileTokenFactory;
 import edu.mayo.mprc.swift.ExitCode;
 import edu.mayo.mprc.swift.SwiftConfig;
+import edu.mayo.mprc.swift.SwiftMonitor;
 import edu.mayo.mprc.swift.search.SwiftSearcher;
 import edu.mayo.mprc.utilities.FileUtilities;
 import edu.mayo.mprc.utilities.exceptions.ExceptionUtilities;
@@ -31,6 +32,7 @@ public final class SwiftEnvironmentImpl implements SwiftEnvironment {
 	private DependencyResolver dependencyResolver;
 	private File configXmlFile;
 	private SwiftCommandLine commandLine;
+	private SwiftMonitor monitor;
 
 	public SwiftEnvironmentImpl() {
 	}
@@ -152,10 +154,15 @@ public final class SwiftEnvironmentImpl implements SwiftEnvironment {
 		return daemonConfig;
 	}
 
+	private void setApplicationConfig(ApplicationConfig applicationConfig) {
+		this.applicationConfig = applicationConfig;
+		monitor.initialize(applicationConfig);
+	}
+
 	@Override
 	public ApplicationConfig getApplicationConfig() {
 		if (applicationConfig == null) {
-			applicationConfig = loadSwiftConfig(configXmlFile, getSwiftFactory());
+			setApplicationConfig(loadSwiftConfig(configXmlFile, getSwiftFactory()));
 		}
 		return applicationConfig;
 	}
@@ -199,5 +206,13 @@ public final class SwiftEnvironmentImpl implements SwiftEnvironment {
 			throw new MprcException("More than one Swift Searcher defined in this Swift install");
 		}
 		return (SwiftSearcher.Config) searchers.get(0);
+	}
+
+	public SwiftMonitor getMonitor() {
+		return monitor;
+	}
+
+	public void setMonitor(SwiftMonitor monitor) {
+		this.monitor = monitor;
 	}
 }

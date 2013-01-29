@@ -9,6 +9,7 @@ import edu.mayo.mprc.daemon.DaemonConnection;
 import edu.mayo.mprc.daemon.files.FileTokenFactory;
 import edu.mayo.mprc.swift.ExitCode;
 import edu.mayo.mprc.swift.Swift;
+import edu.mayo.mprc.swift.SwiftMonitor;
 import edu.mayo.mprc.swift.search.SwiftSearcher;
 import joptsimple.OptionParser;
 
@@ -88,4 +89,10 @@ public interface SwiftEnvironment {
 	 * @return Configuration for the Swift Searcher (core Swift module).
 	 */
 	SwiftSearcher.Config getSwiftSearcher();
+
+	/**
+	 * Creates a Swift monitor instance on demand (returns an existing one if one exists).
+	 * @return Swift monitor (periodically pings all daemon services, captures their responses in a status report).
+	 */
+	SwiftMonitor getMonitor();
 }
