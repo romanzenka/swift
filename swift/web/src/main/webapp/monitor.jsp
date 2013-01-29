@@ -28,7 +28,7 @@
             out.print(status != null ? (status.isOk() && !status.isTooOld(SwiftMonitor.MONITOR_PERIOD_SECONDS)) : "?");
             out.print("</td><td>");
             out.print(connection.getConnectionName());
-            out.print("<td/><td>");
+            out.print("</td><td>");
             out.print(status != null ? new Date(status.getLastResponse()).toString() : "?");
             out.print("</td><td>");
             out.print(status != null ? status.getMessage() : "?");
