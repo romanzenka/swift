@@ -3,6 +3,7 @@ package edu.mayo.mprc.daemon;
 import com.google.common.base.Joiner;
 import edu.mayo.mprc.MprcException;
 import edu.mayo.mprc.config.*;
+import edu.mayo.mprc.daemon.monitor.PingDaemonWorker;
 import org.apache.log4j.Logger;
 
 import java.io.Serializable;
@@ -30,6 +31,12 @@ public final class Daemon {
 	 */
 	public void start() {
 		for (final AbstractRunner runner : runners) {
+			startRunner(runner);
+		}
+	}
+
+	private static void startRunner(final AbstractRunner runner) {
+		if (runner != null) {
 			try {
 				runner.start();
 			} catch (Exception t) {
@@ -87,6 +94,14 @@ public final class Daemon {
 			final List<AbstractRunner> runners = new ArrayList<AbstractRunner>(config.getServices().size());
 			addRunnersToList(runners, config.getServices(), getDependencies());
 
+			// Create extra runner for the ping service
+
+			final ServiceConfig pingServiceConfig = PingDaemonWorker.getPingServiceConfig(config);
+			if (pingServiceConfig != null) {
+				final AbstractRunner pingRunner = createRunner(pingServiceConfig, getDependencies());
+				runners.add(pingRunner);
+			}
+
 			return new Daemon(runners, resources);
 		}
 
@@ -108,12 +123,17 @@ public final class Daemon {
 					}
 					throw new MprcException("Programmer error: service configuration was null.");
 				}
-				final DaemonConnection daemonConnection = (DaemonConnection) factory.createSingleton(serviceConfig, dependencies);
-				final RunnerConfig runnerConfig = serviceConfig.getRunner();
-				final AbstractRunner runner = (AbstractRunner) factory.createSingleton(runnerConfig, dependencies);
-				runner.setDaemonConnection(daemonConnection);
+				final AbstractRunner runner = createRunner(serviceConfig, dependencies);
 				runners.add(runner);
 			}
+		}
+
+		private AbstractRunner createRunner(final ServiceConfig serviceConfig, final DependencyResolver dependencies) {
+			final DaemonConnection daemonConnection = (DaemonConnection) factory.createSingleton(serviceConfig, dependencies);
+			final RunnerConfig runnerConfig = serviceConfig.getRunner();
+			final AbstractRunner runner = (AbstractRunner) factory.createSingleton(runnerConfig, dependencies);
+			runner.setDaemonConnection(daemonConnection);
+			return runner;
 		}
 
 		public MultiFactory getMultiFactory() {

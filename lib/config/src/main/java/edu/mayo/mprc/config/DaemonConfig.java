@@ -25,6 +25,7 @@ public final class DaemonConfig implements ResourceConfig {
 	public static final String TEMP_FOLDER_PATH = "tempFolderPath";
 	public static final String DUMP_ERRORS = "dumpErrors";
 	public static final String DUMP_FOLDER_PATH = "dumpFolderPath";
+	private static final String PING_QUEUE_URL = "pingQueueUrl";
 
 	@XStreamAlias(NAME)
 	@XStreamAsAttribute
@@ -57,6 +58,9 @@ public final class DaemonConfig implements ResourceConfig {
 	 */
 	@XStreamAlias(DUMP_FOLDER_PATH)
 	private String dumpFolderPath;
+
+	@XStreamAlias(PING_QUEUE_URL)
+	private String pingQueueUrl;
 
 	// Services this daemon provides
 	@XStreamAlias("services")
@@ -294,5 +298,13 @@ public final class DaemonConfig implements ResourceConfig {
 			}
 		}
 		return null;
+	}
+
+	public void setPingQueueUrl(String pingQueueUrl) {
+		this.pingQueueUrl = pingQueueUrl;
+	}
+
+	public String getPingQueueUrl() {
+		return pingQueueUrl;
 	}
 }

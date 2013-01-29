@@ -4,6 +4,7 @@
 <%@ page import="edu.mayo.mprc.swift.SwiftMonitor" %>
 <%@ page import="edu.mayo.mprc.swift.SwiftWebContext" %>
 <%@ page import="java.util.Date" %>
+<%@ page import="java.util.Map" %>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
@@ -22,12 +23,12 @@
         <th>Message</th>
     </tr>
     <%
-        for (final DaemonConnection connection : SwiftWebContext.getServletConfig().getSwiftMonitor().getMonitoredConnections()) {
-            final DaemonStatus status = connection.getStatus();
+        for (final Map.Entry<DaemonConnection, DaemonStatus> entry : SwiftWebContext.getServletConfig().getSwiftMonitor().getMonitoredConnections().entrySet()) {
+            final DaemonStatus status = entry.getValue();
             out.print("<tr><td>");
             out.print(status != null ? (status.isOk() && !status.isTooOld(SwiftMonitor.MONITOR_PERIOD_SECONDS)) : "?");
             out.print("</td><td>");
-            out.print(connection.getConnectionName());
+            out.print(entry.getKey().getConnectionName());
             out.print("</td><td>");
             out.print(status != null ? new Date(status.getLastResponse()).toString() : "?");
             out.print("</td><td>");

@@ -8,6 +8,7 @@ import edu.mayo.mprc.daemon.DaemonConnectionFactory;
 import edu.mayo.mprc.daemon.MessageBroker;
 import edu.mayo.mprc.daemon.SimpleRunner;
 import edu.mayo.mprc.daemon.WorkerFactoryBase;
+import edu.mayo.mprc.daemon.monitor.PingDaemonWorker;
 import edu.mayo.mprc.database.DatabaseFactory;
 import edu.mayo.mprc.dbundeploy.DatabaseUndeployerWorker;
 import edu.mayo.mprc.fastadb.FastaDbWorker;
@@ -129,6 +130,7 @@ public final class ResourceTable extends FactoryBase<ResourceConfig, Object> imp
 		addWorkerByReflection(ScaffoldReportWorker.class);
 		addWorker(SearchDbWorker.TYPE, SearchDbWorker.NAME, SearchDbWorker.Config.class, getSearchDbWorkerFactory(), new SearchDbWorker.Ui(), SearchDbWorker.DESC);
 		addWorker(FastaDbWorker.TYPE, FastaDbWorker.NAME, FastaDbWorker.Config.class, getFastaDbWorkerFactory(), new FastaDbWorker.Ui(), FastaDbWorker.DESC);
+		addWorkerByReflection(PingDaemonWorker.class);
 
 		// Caches
 		addWorkerByReflection(RawToMgfCache.class);
