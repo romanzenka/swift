@@ -93,10 +93,13 @@ public final class SwiftWebContext {
 							FileUtilities.createTempFolder());
 
 					daemon.start();
+					webUi.getSwiftMonitor().initialize(swiftConfig);
+					webUi.getSwiftMonitor().start();
 
 					initializedDaemon = daemonId;
 				} catch (Exception t) {
 					LOGGER.fatal("Swift web application should be terminated", t);
+					webUi.getSwiftMonitor().stop();
 					System.exit(1);
 					throw new MprcException(t);
 				}

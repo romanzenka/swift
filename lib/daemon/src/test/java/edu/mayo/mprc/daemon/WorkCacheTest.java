@@ -158,6 +158,17 @@ public final class WorkCacheTest {
 		}
 
 		@Override
+		public void ping() {
+			// Do nothing.
+		}
+
+		@Override
+		public DaemonStatus getStatus() {
+			// No status reported
+			return null;
+		}
+
+		@Override
 		public void close() {
 		}
 	}

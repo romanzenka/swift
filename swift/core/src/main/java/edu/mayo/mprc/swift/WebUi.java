@@ -61,6 +61,7 @@ public final class WebUi {
 	private String title;
 	private ParamsInfo paramsInfo;
 	private FileTokenFactory fileTokenFactory;
+	private SwiftMonitor swiftMonitor;
 
 	public static final String SEARCHER = "searcher";
 	public static final String TITLE = "title";
@@ -176,6 +177,10 @@ public final class WebUi {
 		return USER_MESSAGE;
 	}
 
+	public SwiftMonitor getSwiftMonitor() {
+		return swiftMonitor;
+	}
+
 	/**
 	 * A factory capable of creating the web ui class.
 	 */
@@ -190,6 +195,7 @@ public final class WebUi {
 		private ParamsInfo paramsInfo;
 		private Collection<SearchEngine> searchEngines;
 		private FileTokenFactory fileTokenFactory;
+		private SwiftMonitor swiftMonitor;
 
 		@Override
 		public WebUi create(final Config config, final DependencyResolver dependencies) {
@@ -205,6 +211,8 @@ public final class WebUi {
 				ui.paramsDao = getParamsDao();
 				ui.unimodDao = getUnimodDao();
 				ui.searchDbDao = getSearchDbDao();
+				ui.swiftMonitor = getSwiftMonitor();
+
 				if (config.getQstat() != null) {
 					ui.qstatDaemonConnection = (DaemonConnection) dependencies.createSingleton(config.getQstat());
 				}
@@ -359,6 +367,14 @@ public final class WebUi {
 
 		public void setSearchDbDao(final SearchDbDao searchDbDao) {
 			this.searchDbDao = searchDbDao;
+		}
+
+		public SwiftMonitor getSwiftMonitor() {
+			return swiftMonitor;
+		}
+
+		public void setSwiftMonitor(final SwiftMonitor swiftMonitor) {
+			this.swiftMonitor = swiftMonitor;
 		}
 	}
 

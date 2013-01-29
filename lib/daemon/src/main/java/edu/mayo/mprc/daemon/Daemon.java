@@ -76,18 +76,16 @@ public final class Daemon {
 	public static final class Factory {
 		/* Factory for the particular daemon components */
 		private MultiFactory factory;
+		private DependencyResolver dependencies;
 
 		public Daemon createDaemon(final DaemonConfig config) {
-
-			final DependencyResolver dependencies = new DependencyResolver(factory);
-
 			// Create daemon resources
 			final List<Object> resources = new ArrayList<Object>(config.getResources().size());
-			addResourcesToList(resources, config.getResources(), dependencies);
+			addResourcesToList(resources, config.getResources(), getDependencies());
 
 			// Create runners
 			final List<AbstractRunner> runners = new ArrayList<AbstractRunner>(config.getServices().size());
-			addRunnersToList(runners, config.getServices(), dependencies);
+			addRunnersToList(runners, config.getServices(), getDependencies());
 
 			return new Daemon(runners, resources);
 		}
@@ -124,6 +122,14 @@ public final class Daemon {
 
 		public void setMultiFactory(final MultiFactory factory) {
 			this.factory = factory;
+		}
+
+		public DependencyResolver getDependencies() {
+			return dependencies;
+		}
+
+		public void setDependencies(DependencyResolver dependencies) {
+			this.dependencies = dependencies;
 		}
 	}
 

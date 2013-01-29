@@ -76,6 +76,11 @@ public final class GridRunner extends AbstractRunner {
 	}
 
 	protected void processRequest(final DaemonRequest request) {
+		if(request.getWorkPacket() instanceof PingPacket) {
+			request.sendResponse(new PingResponse(), true);
+			return;
+		}
+
 		final GridWorkPacket gridWorkPacket = getBaseGridWorkPacket(gridScriptFactory.getApplicationName(wrapperScript));
 		final File daemonWorkerAllocatorInputFile = new File(sharedTempDirectory, queueName + "_" + uniqueId.incrementAndGet());
 
