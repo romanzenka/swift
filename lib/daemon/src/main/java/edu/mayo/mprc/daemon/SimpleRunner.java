@@ -42,10 +42,6 @@ public final class SimpleRunner extends AbstractRunner {
 
 	protected void processRequest(final DaemonRequest request) {
 		final Worker worker = factory.createWorker();
-		if (request.getWorkPacket() instanceof PingPacket) {
-			request.sendResponse(new PingResponse(), true);
-			return;
-		}
 		executorService.execute(new RequestProcessor(worker, request));
 	}
 

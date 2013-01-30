@@ -54,17 +54,6 @@ public interface DaemonConnection {
 	DaemonRequest receiveDaemonRequest(long timeout);
 
 	/**
-	 * Ask for daemon status to be updated. The daemon needs to send a response that can then be gathered using
-	 * {@link #getStatus}. Internally sends a PingPacket.
-	 */
-	void ping();
-
-	/**
-	 * @return Status of the daemon (last time we heard from it)
-	 */
-	DaemonStatus getStatus();
-
-	/**
 	 * When you no longer want to receive messages.
 	 */
 	void close();

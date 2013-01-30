@@ -1,5 +1,6 @@
-package edu.mayo.mprc.daemon;
+package edu.mayo.mprc.daemon.monitor;
 
+import edu.mayo.mprc.daemon.WorkPacket;
 import edu.mayo.mprc.daemon.files.FileTokenSynchronizer;
 import edu.mayo.mprc.daemon.files.ReceiverTokenTranslator;
 import edu.mayo.mprc.daemon.files.SenderTokenTranslator;
@@ -11,7 +12,7 @@ import java.util.Set;
 /**
  * @author Roman Zenka
  */
-public final class PingPacket implements WorkPacket {
+public final class PingWorkPacket implements WorkPacket {
 	@Override
 	public String getTaskId() {
 		return "ping";

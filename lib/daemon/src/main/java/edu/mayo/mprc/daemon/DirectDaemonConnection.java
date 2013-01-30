@@ -5,7 +5,6 @@ import edu.mayo.mprc.daemon.exception.DaemonException;
 import edu.mayo.mprc.daemon.files.FileTokenFactory;
 import edu.mayo.mprc.daemon.files.FileTokenHolder;
 import edu.mayo.mprc.messaging.Request;
-import edu.mayo.mprc.messaging.ResponseListener;
 import edu.mayo.mprc.messaging.Service;
 import edu.mayo.mprc.utilities.progress.ProgressListener;
 
@@ -26,13 +25,10 @@ import java.io.Serializable;
  */
 final class DirectDaemonConnection implements DaemonConnection {
 	public static final int NORMAL_PRIORITY = 5;
-	public static final int PING_PRIORITY = 6;
 
 	private Service service = null;
 	private static int listenerNumber = 0;
 	private FileTokenFactory fileTokenFactory;
-	private DaemonStatus lastStatus = new DaemonStatus("No communication so far");
-	private final Object statusLock = new Object();
 
 	public DirectDaemonConnection(final Service service, final FileTokenFactory fileTokenFactory) {
 		if (service == null) {
@@ -80,18 +76,6 @@ final class DirectDaemonConnection implements DaemonConnection {
 	}
 
 	@Override
-	public void ping() {
-		service.sendRequest(new PingPacket(), PING_PRIORITY, new PingProgressListener());
-	}
-
-	@Override
-	public DaemonStatus getStatus() {
-		synchronized (statusLock) {
-			return lastStatus;
-		}
-	}
-
-	@Override
 	public void close() {
 		service.stopReceiving();
 	}
@@ -125,17 +109,6 @@ final class DirectDaemonConnection implements DaemonConnection {
 		@Override
 		public void processed() {
 			request.processed();
-		}
-	}
-
-	private class PingProgressListener implements ResponseListener {
-		@Override
-		public void responseReceived(Serializable response, boolean isLast) {
-			if (response instanceof PingResponse) {
-				synchronized (statusLock) {
-					lastStatus = ((PingResponse) response).getStatus();
-				}
-			}
 		}
 	}
 }

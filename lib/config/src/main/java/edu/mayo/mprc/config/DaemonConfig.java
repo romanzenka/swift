@@ -23,6 +23,7 @@ public final class DaemonConfig implements ResourceConfig {
 	public static final String OS_ARCH = "osArch";
 	public static final String SHARED_FILE_SPACE_PATH = "sharedFileSpacePath";
 	public static final String TEMP_FOLDER_PATH = "tempFolderPath";
+	private static final String PING_QUEUE_URL = "pingQueueUrl";
 
 	@XStreamAlias(NAME)
 	@XStreamAsAttribute
@@ -43,6 +44,8 @@ public final class DaemonConfig implements ResourceConfig {
 	@XStreamAlias(TEMP_FOLDER_PATH)
 	private String tempFolderPath;
 
+	@XStreamAlias(PING_QUEUE_URL)
+	private String pingQueueUrl;
 	// Services this daemon provides
 	@XStreamAlias("services")
 	private List<ServiceConfig> services = new ArrayList<ServiceConfig>();
@@ -257,5 +260,13 @@ public final class DaemonConfig implements ResourceConfig {
 			}
 		}
 		return null;
+	}
+
+	public void setPingQueueUrl(String pingQueueUrl) {
+		this.pingQueueUrl = pingQueueUrl;
+	}
+
+	public String getPingQueueUrl() {
+		return pingQueueUrl;
 	}
 }
