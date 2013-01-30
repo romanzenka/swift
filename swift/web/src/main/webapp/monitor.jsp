@@ -5,17 +5,19 @@
 <%@ page import="edu.mayo.mprc.swift.SwiftWebContext" %>
 <%@ page import="java.util.Date" %>
 <%@ page import="java.util.Map" %>
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
-<html>
+<!DOCTYPE HTML>
+<html lang="en">
 <head>
     <% if (ServletIntialization.redirectToConfig(getServletConfig(), response)) {
         return;
     } %>
     <title>Swift Monitor</title>
+    <link href="common/bootstrap/css/bootstrap.min.css" rel="stylesheet" media="screen">
 </head>
 <body>
+<div class="container">
 <h1>Swift Monitor</h1>
-<table>
+<table class="table">
     <tr>
         <th>Ok</th>
         <th>Connection</th>
@@ -38,5 +40,8 @@
         }
     %>
 </table>
+    </div>
+<script src="common/bootstrap/js/jquery_1.9.0.min.js"></script>
+<script src="common/bootstrap/js/bootstrap.min.js"></script>
 </body>
 </html>
