@@ -407,10 +407,12 @@ public class ConfigurationData {
 		for (final String error : errorList) {
 			uiChanges.displayPropertyError(applicationConfig, null, error);
 		}
+		for (final DaemonConfig daemon : applicationConfig.getDaemons()) {
+			// Set daemon's ping URL before saving
+			daemon.setPingQueueUrl(getServiceBrokerUri(getMessageBrokerUrl(), daemon.getName() + "-ping"));
+		}
 		applicationConfig.save(configFile, getResourceTable());
 		for (final DaemonConfig daemon : applicationConfig.getDaemons()) {
-			// Set daemon's ping URL when saving
-			daemon.setPingQueueUrl(getServiceBrokerUri(getMessageBrokerUrl(), daemon.getName() + "-ping"));
 			final String scriptName = daemon.getName().replaceAll("[^a-zA-Z0-9-_+]", "_") + "-run";
 			boolean hasWeb = false;
 			for (final ResourceConfig resource : daemon.getResources()) {

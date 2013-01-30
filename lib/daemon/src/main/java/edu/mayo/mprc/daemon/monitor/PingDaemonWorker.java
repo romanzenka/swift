@@ -8,7 +8,7 @@ import edu.mayo.mprc.config.ui.ServiceUiFactory;
 import edu.mayo.mprc.config.ui.UiBuilder;
 import edu.mayo.mprc.daemon.*;
 import edu.mayo.mprc.daemon.exception.DaemonException;
-import edu.mayo.mprc.utilities.progress.UserProgressReporter;
+import edu.mayo.mprc.utilities.progress.ProgressReporter;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -18,13 +18,24 @@ import java.util.Map;
  *
  * @author Roman Zenka
  */
-public final class PingDaemonWorker extends WorkerBase implements NoLoggingWorker {
+public final class PingDaemonWorker implements Worker, NoLoggingWorker {
 	public static final String TYPE = "ping";
 	public static final String NAME = "Ping";
 	public static final String DESC = "A daemon that responds to pings with status information.";
 
 	@Override
-	public void process(final WorkPacket workPacket, final UserProgressReporter reporter) {
+	public void processRequest(final WorkPacket workPacket, final ProgressReporter progressReporter) {
+		try {
+			progressReporter.reportStart();
+			process(workPacket, progressReporter);
+			workPacket.synchronizeFileTokensOnReceiver();
+			progressReporter.reportSuccess();
+		} catch (Exception t) {
+			progressReporter.reportFailure(t);
+		}
+	}
+
+	private void process(final WorkPacket workPacket, final ProgressReporter reporter) {
 		if (!(workPacket instanceof PingWorkPacket)) {
 			throw new DaemonException("Unknown input format: " + workPacket.getClass().getName() + " expected string");
 		}
