@@ -31,6 +31,13 @@ public final class FASTAOutputStream implements DBOutputStream {
 	private static final int LINE_WIDTH = 80;
 
 	/**
+	 * How to shorten the headers when too long.
+	 */
+	public static final String ELLIPSIS = "...";
+
+	private boolean cleanupHeaders;
+
+	/**
 	 * create a new output stream from a file
 	 *
 	 * @param file the file that should be used as on output stream
@@ -41,6 +48,13 @@ public final class FASTAOutputStream implements DBOutputStream {
 		this.out = new FileWriter(this.file);
 	}
 
+	public boolean isCleanupHeaders() {
+		return cleanupHeaders;
+	}
+
+	public void setCleanupHeaders(final boolean cleanupHeaders) {
+		this.cleanupHeaders = cleanupHeaders;
+	}
 
 	/**
 	 * Appends a given header and sequence to the output file.  This method may attempt to perform some ironing of the
@@ -52,14 +66,20 @@ public final class FASTAOutputStream implements DBOutputStream {
 	 * @throws java.io.IOException if there was a problem performing the output
 	 */
 	public void appendSequence(final String header, final String sequence) throws IOException {
+		final String cleanHeader;
+		if(isCleanupHeaders()) {
+			cleanHeader = cleanupHeader(header, FASTAInputStream.MAX_HEADER_LENGTH);
+		} else {
+			cleanHeader = header;
+		}
 		final String cleanSequence = cleanupProteinSequence(sequence);
 
 		//check to make sure the header contains a > since this is what denotes a header
-		if (header.length() == 0 || header.charAt(0) != '>') {
+		if (cleanHeader.length() == 0 || cleanHeader.charAt(0) != '>') {
 			this.out.write('>');
 		}
 		//write out the header on a single line
-		this.out.write(header);
+		this.out.write(cleanHeader);
 		this.out.write("\n");
 
 		//find out how many lines there eare and print out each but the last line in a loop
@@ -96,6 +116,23 @@ public final class FASTAOutputStream implements DBOutputStream {
 			}
 		}
 		return result.toString();
+	}
+
+	/**
+	 * Make sure that the header length is maxLength tops (excluding the initial > sign)
+	 * Take all the excess characters from the header (the middle of it) and replace them with {@link #ELLIPSIS}
+	 */
+	static String cleanupHeader(final String header, final int maxLength) {
+		if (header == null) {
+			return "";
+		}
+		int lenSansFirst = header.length() - 1;
+		if (lenSansFirst > maxLength) {
+			final int extraChars = lenSansFirst - maxLength + ELLIPSIS.length();
+			final int removeIndex = 1 + (lenSansFirst - extraChars + 1) / 2;
+			return header.substring(0, removeIndex) + ELLIPSIS + header.substring(removeIndex + extraChars);
+		}
+		return header;
 	}
 
 	/**

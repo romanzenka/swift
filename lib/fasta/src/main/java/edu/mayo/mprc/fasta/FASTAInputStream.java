@@ -25,7 +25,6 @@ import java.util.zip.GZIPInputStream;
 public final class FASTAInputStream implements DBInputStream {
 	private static final char FASTA_HEADER = '>';
 	public static final long AVERAGE_FASTA_RECORD = 500L /*Avg protein sequence size in bytes*/ + 100L /* AVG header size in bytes */;
-	public static final String ELLIPSIS = "...";
 
 	/**
 	 * The file that we are using as input
@@ -63,7 +62,7 @@ public final class FASTAInputStream implements DBInputStream {
 	private String nextHeader;
 
 	private static final int MAX_ACCNUM_LENGTH = 34;
-	private static final int MAX_HEADER_LENGTH = 200;
+	public static final int MAX_HEADER_LENGTH = 200;
 	private static final String VALID_CHARACTERS = "a-z A-Z 0-9 _-.*+|";
 	private static final Pattern VALID_ACCNUM = Pattern.compile("[a-zA-Z0-9_\\-.*+|]+");
 
@@ -191,13 +190,8 @@ public final class FASTAInputStream implements DBInputStream {
 		return this.currentHeader;
 	}
 
-	/**
-	 * Cleanup the header to match the max length on load.
-	 *
-	 * @param header Header to set.
-	 */
 	private void setHeader(final String header) {
-		currentHeader = cleanHeader(header, MAX_HEADER_LENGTH);
+		currentHeader = header;
 	}
 
 	/**
@@ -225,7 +219,7 @@ public final class FASTAInputStream implements DBInputStream {
 	 * @param toCheck the file you want to see is a valid FASTA file
 	 * @return null if the file is a valid fasta file. Error description otherwise.
 	 */
-	public static String isFASTAFileValid(final File toCheck) {
+	public static String isFASTAFileValid(final File toCheck, final boolean checkHeaderLength) {
 		final HashSet<String> accessionNumbers = new HashSet<String>((int) (toCheck.length() / AVERAGE_FASTA_RECORD));
 		DBInputStream in = null;
 		try {
@@ -236,8 +230,8 @@ public final class FASTAInputStream implements DBInputStream {
 				final String header = in.getHeader();
 				if (isHeader(header)) {
 					sequenceCount++;
-					String accNum = getAccNum(header);
-					final String error = checkHeader(header, accNum);
+					final String accNum = getAccNum(header);
+					final String error = checkHeader(header, accNum, checkHeaderLength);
 					if (error != null) {
 						return error;
 					}
@@ -271,29 +265,12 @@ public final class FASTAInputStream implements DBInputStream {
 		return spacePos >= 0 ? header.substring(1, spacePos) : header.substring(1);
 	}
 
-	/**
-	 * Make sure that the header length is maxLength tops (excluding the initial > sign)
-	 * Take all the excess characters from the header (the middle of it) and replace them with {@link #ELLIPSIS}
-	 */
-	static String cleanHeader(final String header, final int maxLength) {
-		if (header == null) {
-			return "";
-		}
-		int lenSansFirst = header.length() - 1;
-		if (lenSansFirst > maxLength) {
-			final int extraChars = lenSansFirst - maxLength + ELLIPSIS.length();
-			final int removeIndex = 1 + (lenSansFirst - extraChars + 1) / 2;
-			return header.substring(0, removeIndex) + ELLIPSIS + header.substring(removeIndex + extraChars);
-		}
-		return header;
-	}
-
-	static String checkHeader(String header, String accNum) {
+	static String checkHeader(final String header, final String accNum, final boolean checkHeaderLength) {
 		String error = null;
 		if (accNum.length() > MAX_ACCNUM_LENGTH) {
 			error = "Accession number too long: [" + accNum + "]. Length: " + accNum.length() + ", max: " + MAX_ACCNUM_LENGTH;
 		}
-		if (header != null && header.length() - 1 > MAX_HEADER_LENGTH) {
+		if (checkHeaderLength && header != null && header.length() - 1 > MAX_HEADER_LENGTH) {
 			error = "Sequence header for accession number: [" + accNum + "] too long: " + header.length() + ", max: " + MAX_HEADER_LENGTH;
 		}
 		if (!VALID_ACCNUM.matcher(accNum).matches()) {

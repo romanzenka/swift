@@ -39,7 +39,7 @@ public final class FastaTest {
 		final File inFile = new File(fastaFileFolder, "test_in.fasta");
 		final File outFile = File.createTempFile("test_out", ".fasta");
 
-		Assert.assertEquals(FASTAInputStream.isFASTAFileValid(inFile), null, "No error should be detected");
+		Assert.assertEquals(FASTAInputStream.isFASTAFileValid(inFile, true), null, "No error should be detected");
 
 		final DBInputStream in = new FASTAInputStream(inFile);
 		final DBOutputStream out = new FASTAOutputStream(outFile);
@@ -70,7 +70,7 @@ public final class FastaTest {
 	@Test
 	public void testInputAndOutputZipped() throws IOException {
 		final File inFile = new File(fastaFileFolder, "test_in.fasta.gz");
-		Assert.assertEquals(FASTAInputStream.isFASTAFileValid(inFile), null, "No errors should be found");
+		Assert.assertEquals(FASTAInputStream.isFASTAFileValid(inFile, true), null, "No errors should be found");
 		assertTrue(inFile.exists());
 
 		final File outFile = File.createTempFile("test_out", ".fasta");
@@ -94,7 +94,7 @@ public final class FastaTest {
 	@Test
 	public void shouldDetectDuplicateAccnums() throws IOException {
 		final File inFile = new File(fastaFileFolder, "test_in_dups.fasta");
-		final String errorMessage = FASTAInputStream.isFASTAFileValid(inFile);
+		final String errorMessage = FASTAInputStream.isFASTAFileValid(inFile, true);
 		Assert.assertTrue(errorMessage.contains("Q4U9M9|104K_THEAN"), "Message [" + errorMessage + "] must mention duplicate accnum");
 		Assert.assertTrue(errorMessage.toLowerCase(Locale.US).contains("duplicate"), "Must mention duplicity: " + errorMessage);
 	}
@@ -102,7 +102,7 @@ public final class FastaTest {
 	@Test
 	public void shouldDetectLongAccnum() {
 		final File inFile = new File(fastaFileFolder, "test_in_dups.fasta");
-		final String errorMessage = FASTAInputStream.isFASTAFileValid(inFile);
+		final String errorMessage = FASTAInputStream.isFASTAFileValid(inFile, true);
 		Assert.assertTrue(errorMessage.contains("Q4U9M9|104K_THEAN"), "Message [" + errorMessage + "] must mention duplicate accnum");
 		Assert.assertTrue(errorMessage.toLowerCase(Locale.US).contains("duplicate"), "Must mention duplicity: " + errorMessage);
 	}
@@ -126,18 +126,18 @@ public final class FastaTest {
 
 	@Test
 	public void shouldCleanHeaders() {
-		Assert.assertEquals(FASTAInputStream.cleanHeader(null, 5), "");
-		Assert.assertEquals(FASTAInputStream.cleanHeader(">abcde", 5), ">abcde");
-		Assert.assertEquals(FASTAInputStream.cleanHeader(">abcdef", 5), ">a...f");
-		Assert.assertEquals(FASTAInputStream.cleanHeader(">abcdefg", 5), ">a...g");
-		Assert.assertEquals(FASTAInputStream.cleanHeader(">abcdefgh", 5), ">a...h");
-		Assert.assertEquals(FASTAInputStream.cleanHeader(">abcdefgh", 6), ">ab...h");
-		Assert.assertEquals(FASTAInputStream.cleanHeader(">abcdefgh", 7), ">ab...gh");
-		Assert.assertEquals(FASTAInputStream.cleanHeader(">abcdefghi", 8), ">abc...hi");
+		Assert.assertEquals(FASTAOutputStream.cleanupHeader(null, 5), "");
+		Assert.assertEquals(FASTAOutputStream.cleanupHeader(">abcde", 5), ">abcde");
+		Assert.assertEquals(FASTAOutputStream.cleanupHeader(">abcdef", 5), ">a...f");
+		Assert.assertEquals(FASTAOutputStream.cleanupHeader(">abcdefg", 5), ">a...g");
+		Assert.assertEquals(FASTAOutputStream.cleanupHeader(">abcdefgh", 5), ">a...h");
+		Assert.assertEquals(FASTAOutputStream.cleanupHeader(">abcdefgh", 6), ">ab...h");
+		Assert.assertEquals(FASTAOutputStream.cleanupHeader(">abcdefgh", 7), ">ab...gh");
+		Assert.assertEquals(FASTAOutputStream.cleanupHeader(">abcdefghi", 8), ">abc...hi");
 	}
 
 	private void assertErrorContains(String sequence, String error) {
-		final String actualError = FASTAInputStream.checkHeader(sequence, FASTAInputStream.getAccNum(sequence));
+		final String actualError = FASTAInputStream.checkHeader(sequence, FASTAInputStream.getAccNum(sequence), true);
 		if (actualError == null) {
 			Assert.assertNull(error, "No error was produced while expected '" + error + "'");
 			return;

@@ -69,7 +69,7 @@ public final class FASTAFileUploadServlet extends HttpServlet {
 				toSave = saveFile(item);
 
 				//if it was a file then just go on else we want to delete the file that was just created
-				final String errorMessage = FASTAInputStream.isFASTAFileValid(toSave);
+				final String errorMessage = FASTAInputStream.isFASTAFileValid(toSave, false);
 				if (errorMessage==null) {
 					break; //we only need to worry about the first file
 				} else {

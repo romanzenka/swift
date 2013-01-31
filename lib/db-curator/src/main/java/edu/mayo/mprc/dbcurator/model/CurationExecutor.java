@@ -117,7 +117,7 @@ public final class CurationExecutor implements Runnable {
 			LOGGER.error(t);
 		} finally {
 			FileUtilities.deleteNow(tempDirectory);
-			this.status.setToDone();
+			status.setToDone();
 		}
 	}
 
@@ -133,18 +133,18 @@ public final class CurationExecutor implements Runnable {
 		final List<CurationStep> steps = getCuration().getCurationSteps();
 
 		//if we are performing the first step create a temporary fold based on the current time
-		if (this.status.getCurrentStepNumber() < 1) {
+		if (status.getCurrentStepNumber() < 1) {
 			final File resultFolder = localTempFolder;
 			do {
-				this.tempDirectory = new File(resultFolder
+				tempDirectory = new File(resultFolder
 						, "curationRun_" + new SimpleDateFormat("yyyyMMdd-hhmmss").format(new Date()));
-			} while (this.tempDirectory.exists());
+			} while (tempDirectory.exists());
 
 			try {
-				FileUtilities.ensureFolderExists(this.tempDirectory);
+				FileUtilities.ensureFolderExists(tempDirectory);
 			} catch (Exception t) {
-				this.status.setToDone(); //make sure that listening loops break.
-				throw new MprcException("Could not create a temporary folder for running the curation: " + this.tempDirectory.getAbsolutePath(), t);
+				status.setToDone(); //make sure that listening loops break.
+				throw new MprcException("Could not create a temporary folder for running the curation: " + tempDirectory.getAbsolutePath(), t);
 			}
 		}
 
@@ -153,15 +153,15 @@ public final class CurationExecutor implements Runnable {
 		for (final CurationStep step : steps) {
 			//if we have been interupted then exit.  This is pretty course grained interuption
 			//but it would take a lot more work to make it finer grained.
-			if (this.status.isInterrupted()) {
-				this.status.addMessage("User interrupted");
+			if (status.isInterrupted()) {
+				status.addMessage("User interrupted");
 				break;
 			}
 
 			//increment the step counter
-			this.status.incrementStep();
+			status.incrementStep();
 
-			this.status.addMessage("Step " + this.status.getCurrentStepNumber() + " has begun");
+			status.addMessage("Step " + status.getCurrentStepNumber() + " has begun");
 
 			//set the inStream to be the same file as the previous outStream file
 			try {
@@ -174,14 +174,16 @@ public final class CurationExecutor implements Runnable {
 				//if we couldn't find the output stream file object then it must have been deleted on us
 			} catch (Exception e) {
 				inStream = null; //this shouldn't happen unless there wasn't an outstream
-				this.status.addMessage("Error setting up an output stream on step change");
+				status.addMessage("Error setting up an output stream on step change");
 				break; //break out of the step loop
 			}
 
 			//create a new outstream using the same test
-			final File newOutFile = new File(this.tempDirectory.getPath(), String.valueOf(this.status.getCurrentStepNumber()));
+			final File newOutFile = new File(tempDirectory.getPath(), String.valueOf(status.getCurrentStepNumber()));
 			try {
-				this.outStream = new FASTAOutputStream(newOutFile);
+				final FASTAOutputStream fastaOutputStream = new FASTAOutputStream(newOutFile);
+				fastaOutputStream.setCleanupHeaders(step.equals(lastStep));
+				outStream = fastaOutputStream;
 			} catch (IOException e) {
 				status.addMessage("Error setting up the next output file after step " + newOutFile);
 				LOGGER.error(e);
@@ -189,62 +191,62 @@ public final class CurationExecutor implements Runnable {
 			//have the step perform itself
 			final StepValidation postValidation = step.performStep(this);
 			//close the streams that were previously open
-			if (this.inStream != null) {
-				this.inStream.close();
+			if (inStream != null) {
+				inStream.close();
 			}
-			if (this.outStream != null) {
-				this.outStream.close();
+			if (outStream != null) {
+				outStream.close();
 			}
 			// On the last curation step we also validate the resulting FASTA file
 			if (step.equals(lastStep)) {
 				// if the resulting fasta file is not valid then we want to say something in the status but we should probably just complete anyway
-				if (this.outStream == null) {
+				if (outStream == null) {
 					postValidation.setMessage("Error: The resulting .fasta file is not valid!");
 				} else {
-					final String message = FASTAInputStream.isFASTAFileValid(this.outStream.getFile());
+					final String message = FASTAInputStream.isFASTAFileValid(outStream.getFile(), false);
 					if (message != null) {
 						postValidation.setMessage(message);
 					}
 				}
 			}
 			if (postValidation.isOK()) {
-				this.status.addCompletedStepValidation(postValidation);
+				status.addCompletedStepValidation(postValidation);
 			} else {
 				for (final String msg : postValidation.getMessages()) {
-					this.status.addMessage("Step failed: " + msg);
+					status.addMessage("Step failed: " + msg);
 				}
-				this.status.addFailedStepValidation(postValidation);
-				this.status.setToDone(); //break out of the step loop
+				status.addFailedStepValidation(postValidation);
+				status.setToDone(); //break out of the step loop
 				return true;
 			}
-			this.status.addMessage("Step " + this.status.getCurrentStepNumber() + " completed with " +
+			status.addMessage("Step " + status.getCurrentStepNumber() + " completed with " +
 					postValidation.getCompletionCount() + " sequences");
 		}
 
 		if (retainArtifacts) {
 			//if we want to keep artifacts then move them to a safe place and update the curation to indicate that it has been run
-			File finalPlace = getFastaFileName(this.curation);
+			File finalPlace = getFastaFileName(curation);
 
 			File substitutableFile = null;
 
-			this.status.addMessage("Determining if there is an identical file already (may take a moment)");
-			substitutableFile = FileUtilities.findSingleSimilarFile(this.outStream.getFile(), finalPlace.getParentFile());
+			status.addMessage("Determining if there is an identical file already (may take a moment)");
+			substitutableFile = FileUtilities.findSingleSimilarFile(outStream.getFile(), finalPlace.getParentFile());
 
 			if (substitutableFile != null) {
 				LOGGER.info("There already was an identical file so we will use it: " + substitutableFile.getAbsolutePath());
 				finalPlace = substitutableFile;
 				//just leave the original final place in the disposable folder it will be deleted.
-				this.status.addMessage("There already was an identical file so we will use that " + finalPlace);
+				status.addMessage("There already was an identical file so we will use that " + finalPlace);
 			} else {
-				if (!this.outStream.getFile().renameTo(finalPlace)) {
-					this.status.addMessage("Copying result file to final place (may take a few moments): " + finalPlace);
-					FileUtilities.copyFile(this.outStream.getFile(), finalPlace, false);
+				if (!outStream.getFile().renameTo(finalPlace)) {
+					status.addMessage("Copying result file to final place (may take a few moments): " + finalPlace);
+					FileUtilities.copyFile(outStream.getFile(), finalPlace, false);
 				} else {
-					this.status.addMessage("Moving result file to final place: " + finalPlace);
+					status.addMessage("Moving result file to final place: " + finalPlace);
 				}
 			}
 
-			this.curation.setCurationFile(finalPlace);
+			curation.setCurationFile(finalPlace);
 
 			//set the rundate of the just ran curation
 			curation.setRunDate(new DateTime());
@@ -266,7 +268,7 @@ public final class CurationExecutor implements Runnable {
 	 * @return the CurationStatus object that is permenantly associated with this object
 	 */
 	public CurationStatus getStatusObject() {
-		return this.status;
+		return status;
 	}
 
 	/**
@@ -373,10 +375,10 @@ public final class CurationExecutor implements Runnable {
 		 */
 		public synchronized List<String> getMessages() {
 			final List<String> retMessages = new ArrayList<String>();
-			for (final String s : this.messages) {
+			for (final String s : messages) {
 				retMessages.add(s);
 			}
-			this.messages.clear();
+			messages.clear();
 			return retMessages;
 		}
 
@@ -386,7 +388,7 @@ public final class CurationExecutor implements Runnable {
 		 * @param toAdd message to add
 		 */
 		public synchronized void addMessage(final String toAdd) {
-			this.messages.add(toAdd);
+			messages.add(toAdd);
 		}
 
 		/**
@@ -395,7 +397,7 @@ public final class CurationExecutor implements Runnable {
 		 * @return the progress of the currently executing step
 		 */
 		public synchronized float getCurrentStepProgress() {
-			return this.currentStepProgress;
+			return currentStepProgress;
 		}
 
 		/**
@@ -410,7 +412,7 @@ public final class CurationExecutor implements Runnable {
 			if (progress < 0f) {
 				progress = 0f;
 			}
-			this.currentStepProgress = progress;
+			currentStepProgress = progress;
 
 		}
 
@@ -431,10 +433,10 @@ public final class CurationExecutor implements Runnable {
 		 * @param toAdd the step that was completed successfully (it is up to caller to check)
 		 */
 		public synchronized void addCompletedStepValidation(final StepValidation toAdd) {
-			if (this.completedStepValidations == null) {
-				this.completedStepValidations = new ArrayList<StepValidation>();
+			if (completedStepValidations == null) {
+				completedStepValidations = new ArrayList<StepValidation>();
 			}
-			this.completedStepValidations.add(toAdd);
+			completedStepValidations.add(toAdd);
 		}
 
 		/**
@@ -443,10 +445,10 @@ public final class CurationExecutor implements Runnable {
 		 * @param toAdd - the step that was failed
 		 */
 		public synchronized void addFailedStepValidation(final StepValidation toAdd) {
-			if (this.failedStepValidations == null) {
-				this.failedStepValidations = new ArrayList<StepValidation>();
+			if (failedStepValidations == null) {
+				failedStepValidations = new ArrayList<StepValidation>();
 			}
-			this.failedStepValidations.add(toAdd);
+			failedStepValidations.add(toAdd);
 		}
 
 		/**
@@ -463,23 +465,23 @@ public final class CurationExecutor implements Runnable {
 		 * @return true if the executor is still running else false
 		 */
 		public synchronized boolean isInProgress() {
-			return !this.executionComplete && !this.interrupt;
+			return !executionComplete && !interrupt;
 		}
 
 		/**
 		 * Sets the executor to a done state.
 		 */
 		public synchronized void setToDone() {
-			this.executionComplete = true;
-			this.notifyAll();
+			executionComplete = true;
+			notifyAll();
 		}
 
 		/**
 		 * call this to interrupt execution of the curation
 		 */
 		public synchronized void causeInterrupt() {
-			this.interrupt = true;
-			this.notifyAll();
+			interrupt = true;
+			notifyAll();
 		}
 
 		/**
@@ -488,15 +490,15 @@ public final class CurationExecutor implements Runnable {
 		 * @return true if an interrupt has been asked for
 		 */
 		public synchronized boolean isInterrupted() {
-			return this.interrupt;
+			return interrupt;
 		}
 
 		/**
 		 * increment the counter which indicates which step we are currently on
 		 */
 		public synchronized void incrementStep() {
-			this.currentStepProgress = 0;
-			this.whichStep++;
+			currentStepProgress = 0;
+			whichStep++;
 		}
 
 		/**
@@ -505,7 +507,7 @@ public final class CurationExecutor implements Runnable {
 		 * @return the step that is currently being executed
 		 */
 		public synchronized int getCurrentStepNumber() {
-			return this.whichStep;
+			return whichStep;
 		}
 
 		/**
@@ -514,10 +516,10 @@ public final class CurationExecutor implements Runnable {
 		 * @return
 		 */
 		public synchronized int getLastStepSequenceCount() {
-			if (this.completedStepValidations.size() == 0) {
+			if (completedStepValidations.size() == 0) {
 				return -1;
 			}
-			return this.completedStepValidations.get(this.completedStepValidations.size() - 1).getCompletionCount();
+			return completedStepValidations.get(completedStepValidations.size() - 1).getCompletionCount();
 		}
 	}
 
