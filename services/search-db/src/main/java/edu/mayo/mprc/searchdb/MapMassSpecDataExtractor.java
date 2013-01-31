@@ -22,7 +22,7 @@ public class MapMassSpecDataExtractor implements MassSpecDataExtractor {
 	public TandemMassSpectrometrySample getTandemMassSpectrometrySample(final String biologicalSampleName, final String msmsSampleName) {
 		final RawFileMetaData rawFileMetaData = getMetadata(msmsSampleName);
 		if (rawFileMetaData == null) {
-			return new TandemMassSpectrometrySample(null, null, 0, 0, 0, null, null, null, 0.0, null, null, null, null, null);
+			return null;
 		} else {
 			return rawFileMetaData.parse();
 		}
