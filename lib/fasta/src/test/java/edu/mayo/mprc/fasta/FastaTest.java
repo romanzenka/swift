@@ -124,6 +124,18 @@ public final class FastaTest {
 		assertErrorContains(">LONG_DESC "+ Strings.repeat("X", 1+200-">LONG_DESC ".length()+1), "too long");
 	}
 
+	@Test
+	public void shouldCleanHeaders() {
+		Assert.assertEquals(FASTAInputStream.cleanHeader(null, 5), "");
+		Assert.assertEquals(FASTAInputStream.cleanHeader(">abcde", 5), ">abcde");
+		Assert.assertEquals(FASTAInputStream.cleanHeader(">abcdef", 5), ">a...f");
+		Assert.assertEquals(FASTAInputStream.cleanHeader(">abcdefg", 5), ">a...g");
+		Assert.assertEquals(FASTAInputStream.cleanHeader(">abcdefgh", 5), ">a...h");
+		Assert.assertEquals(FASTAInputStream.cleanHeader(">abcdefgh", 6), ">ab...h");
+		Assert.assertEquals(FASTAInputStream.cleanHeader(">abcdefgh", 7), ">ab...gh");
+		Assert.assertEquals(FASTAInputStream.cleanHeader(">abcdefghi", 8), ">abc...hi");
+	}
+
 	private void assertErrorContains(String sequence, String error) {
 		final String actualError = FASTAInputStream.checkHeader(sequence, FASTAInputStream.getAccNum(sequence));
 		if (actualError == null) {

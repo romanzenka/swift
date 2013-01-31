@@ -25,6 +25,7 @@ import java.util.zip.GZIPInputStream;
 public final class FASTAInputStream implements DBInputStream {
 	private static final char FASTA_HEADER = '>';
 	public static final long AVERAGE_FASTA_RECORD = 500L /*Avg protein sequence size in bytes*/ + 100L /* AVG header size in bytes */;
+	public static final String ELLIPSIS = "...";
 
 	/**
 	 * The file that we are using as input
@@ -61,8 +62,8 @@ public final class FASTAInputStream implements DBInputStream {
 	 */
 	private String nextHeader;
 
-	private static final long MAX_ACCNUM_LENGTH = 34;
-	private static final long MAX_HEADER_LENGTH = 200;
+	private static final int MAX_ACCNUM_LENGTH = 34;
+	private static final int MAX_HEADER_LENGTH = 200;
 	private static final String VALID_CHARACTERS = "a-z A-Z 0-9 _-.*+|";
 	private static final Pattern VALID_ACCNUM = Pattern.compile("[a-zA-Z0-9_\\-.*+|]+");
 
@@ -117,7 +118,7 @@ public final class FASTAInputStream implements DBInputStream {
 		if (nextHeader == null) {
 			return false;
 		}
-		this.currentHeader = nextHeader;
+		setHeader(nextHeader);
 
 		//read in lines until we reach the next header
 		final StringBuilder sequenceBuilder = new StringBuilder();
@@ -191,6 +192,15 @@ public final class FASTAInputStream implements DBInputStream {
 	}
 
 	/**
+	 * Cleanup the header to match the max length on load.
+	 *
+	 * @param header Header to set.
+	 */
+	private void setHeader(final String header) {
+		currentHeader = cleanHeader(header, MAX_HEADER_LENGTH);
+	}
+
+	/**
 	 * gets the sequence portion of the curent sequence in the file
 	 *
 	 * @return the current sequence
@@ -259,6 +269,23 @@ public final class FASTAInputStream implements DBInputStream {
 	static String getAccNum(final String header) {
 		final int spacePos = header.indexOf(' ');
 		return spacePos >= 0 ? header.substring(1, spacePos) : header.substring(1);
+	}
+
+	/**
+	 * Make sure that the header length is maxLength tops (excluding the initial > sign)
+	 * Take all the excess characters from the header (the middle of it) and replace them with {@link #ELLIPSIS}
+	 */
+	static String cleanHeader(final String header, final int maxLength) {
+		if (header == null) {
+			return "";
+		}
+		int lenSansFirst = header.length() - 1;
+		if (lenSansFirst > maxLength) {
+			final int extraChars = lenSansFirst - maxLength + ELLIPSIS.length();
+			final int removeIndex = 1 + (lenSansFirst - extraChars + 1) / 2;
+			return header.substring(0, removeIndex) + ELLIPSIS + header.substring(removeIndex + extraChars);
+		}
+		return header;
 	}
 
 	static String checkHeader(String header, String accNum) {
