@@ -45,12 +45,11 @@ public class TestInstaller {
 
 	@Test
 	public static void shouldInstallTandem() {
-		final File folder = Installer.tandem(null, Installer.Action.INSTALL);
 		if (FileUtilities.isMacPlatform()) {
 			// Not supported on mac
-			Assert.assertNull(folder);
 			return;
 		}
+		final File folder = Installer.tandem(null, Installer.Action.INSTALL);
 		Assert.assertTrue(folder.exists(), "Tandem folder does not exist");
 		final File tandemExecutable;
 		if (FileUtilities.isMacPlatform()) {
