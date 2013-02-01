@@ -166,7 +166,10 @@ public final class ServiceImpl extends RemoteServiceServlet implements Service {
 			final String batchName = swiftSearch.getTitle();
 			final int previousSearchRunId = previousSearchRun == null ? 0 : previousSearchRun.getId();
 			getSwiftDao().commit(); // We must commit here before we send the search over (it is loaded from the database)
-			final SwiftSearcherCaller.SearchProgressListener listener = SwiftSearcherCaller.startSearch(searchId, batchName, def.isFromScratch(), previousSearchRunId, getSwiftSearcherDaemonConnection());
+			final SwiftSearcherCaller.SearchProgressListener listener =
+					SwiftSearcherCaller.startSearch(
+							searchId, batchName, def.isFromScratch(), def.isLowPriority()?-1:0,
+							previousSearchRunId, getSwiftSearcherDaemonConnection());
 			listener.waitForSearchReady(SEARCH_TIMEOUT);
 			if (listener.getException() != null) {
 				throw listener.getException();

@@ -362,7 +362,8 @@ public final class SwiftSearcher implements Worker {
 					swiftDao,
 					fileTokenFactory,
 					searchRun,
-					reportDecoyHits);
+					reportDecoyHits,
+					swiftSearchWorkPacket.getPriority());
 
 			searchRunner.initialize();
 

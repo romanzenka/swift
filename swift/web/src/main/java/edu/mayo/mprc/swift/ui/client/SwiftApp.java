@@ -619,6 +619,7 @@ public final class SwiftApp implements EntryPoint, HidesPageContentsWhileLoading
 						previousSearchRunId
 				);
 				def.setFromScratch(additionalSettingsPanel.isFromScratch());
+				def.setLowPriority(additionalSettingsPanel.isLowPriority());
 
 				ServiceConnection.instance().startSearch(new Service.Token(true), def, new AsyncCallback<Void>() {
 					public void onFailure(final Throwable throwable) {

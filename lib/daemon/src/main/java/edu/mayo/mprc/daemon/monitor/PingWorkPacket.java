@@ -13,6 +13,13 @@ import java.util.Set;
  * @author Roman Zenka
  */
 public final class PingWorkPacket implements WorkPacket {
+	private static final long serialVersionUID = 4327500764702975292L;
+
+	/**
+	 * Low ping priority.
+	 */
+	private int priority = -1;
+
 	@Override
 	public String getTaskId() {
 		return "ping";
@@ -24,17 +31,27 @@ public final class PingWorkPacket implements WorkPacket {
 	}
 
 	@Override
-	public void translateOnSender(SenderTokenTranslator translator) {
+	public void translateOnSender(final SenderTokenTranslator translator) {
 		// Nothing needs to be done - no files moved
 	}
 
 	@Override
-	public void translateOnReceiver(ReceiverTokenTranslator translator, FileTokenSynchronizer synchronizer, @Nullable Set<File> filesThatShouldExist) {
+	public void translateOnReceiver(final ReceiverTokenTranslator translator, final FileTokenSynchronizer synchronizer, @Nullable final Set<File> filesThatShouldExist) {
 		// Nothing needs to be done - no files moved
 	}
 
 	@Override
 	public void synchronizeFileTokensOnReceiver() {
 		// Nothing needs to be done - no files moved
+	}
+
+	@Override
+	public void setPriority(final int priority) {
+		this.priority = priority;
+	}
+
+	@Override
+	public int getPriority() {
+		return priority;
 	}
 }

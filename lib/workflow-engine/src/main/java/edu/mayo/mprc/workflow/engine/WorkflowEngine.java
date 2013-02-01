@@ -33,6 +33,7 @@ public final class WorkflowEngine {
 	private boolean done;
 	private String id;
 	private AtomicInteger taskId = new AtomicInteger(0);
+	private int priority;
 
 	// We use this lock to check the size of the queue and add a new element atomically
 	private final Object resumeLock = new Object();
@@ -54,11 +55,15 @@ public final class WorkflowEngine {
 
 	/**
 	 * Add new task to be executed.
+	 * Task's priority is modified, taking the engine priority into account.
 	 *
 	 * @param task Task to be executed.
 	 */
 	public void addTask(final Task task) {
-		allTasks.add(task);
+		if (!allTasks.contains(task)) {
+			allTasks.add(task);
+			task.setPriority(task.getPriority() + getPriority());
+		}
 	}
 
 	/**
@@ -67,7 +72,9 @@ public final class WorkflowEngine {
 	 * @param tasks Tasks to be executed.
 	 */
 	public void addAllTasks(final Collection<? extends Task> tasks) {
-		allTasks.addAll(tasks);
+		for (final Task task : tasks) {
+			addTask(task);
+		}
 	}
 
 	/**
@@ -430,5 +437,18 @@ public final class WorkflowEngine {
 			LOGGER.debug("Engine monitor error", e);
 			// SWALLOWED: Monitor failure does not count
 		}
+	}
+
+	public int getPriority() {
+		return priority;
+	}
+
+	/**
+	 * Every task added to this engine will get this priority added to its own priority.
+	 *
+	 * @param priority Priority to add to all tasks.
+	 */
+	public void setPriority(int priority) {
+		this.priority = priority;
 	}
 }

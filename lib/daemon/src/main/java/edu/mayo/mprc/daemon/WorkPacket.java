@@ -1,6 +1,7 @@
 package edu.mayo.mprc.daemon;
 
 import edu.mayo.mprc.daemon.files.FileTokenHolder;
+import edu.mayo.mprc.messaging.PrioritizedData;
 
 /**
  * Any work packet sent to the daemon has to implement this interface.
@@ -8,7 +9,7 @@ import edu.mayo.mprc.daemon.files.FileTokenHolder;
  * <code>private static final long serialVersionUID = yyyymmdd;</code>
  * ... where <code>yyyymmdd</code> is the date of last modification.
  */
-public interface WorkPacket extends FileTokenHolder {
+public interface WorkPacket extends FileTokenHolder, PrioritizedData {
 	String getTaskId();
 
 	/**

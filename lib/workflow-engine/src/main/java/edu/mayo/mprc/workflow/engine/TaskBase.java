@@ -45,6 +45,8 @@ public abstract class TaskBase implements Task {
 	private Throwable lastError;
 	private String lastWarning;
 
+	private int priority;
+
 	/**
 	 * Set to true by {@link #completeWhenFilesAppear}
 	 */
@@ -173,7 +175,7 @@ public abstract class TaskBase implements Task {
 							currentTransition + " uninitialized task can only fail initialization or become ready";
 					break;
 				case RUNNING_WARN:
-					assert newState == TaskState.COMPLETED_WARNING || newState==TaskState.RUN_FAILED : currentTransition + " running warn task can only complete with warning or fail";
+					assert newState == TaskState.COMPLETED_WARNING || newState == TaskState.RUN_FAILED : currentTransition + " running warn task can only complete with warning or fail";
 					break;
 				default:
 					assert false : "State not supported " + oldState.getText();
@@ -252,10 +254,18 @@ public abstract class TaskBase implements Task {
 	public void setWarning(final String warning) {
 		synchronized (stateLock) {
 			this.lastWarning = warning;
-			if(state==TaskState.RUNNING) {
+			if (state == TaskState.RUNNING) {
 				setState(TaskState.RUNNING_WARN);
 			}
 		}
+	}
+
+	public int getPriority() {
+		return priority;
+	}
+
+	public void setPriority(final int priority) {
+		this.priority = priority;
 	}
 
 	public Throwable getLastError() {

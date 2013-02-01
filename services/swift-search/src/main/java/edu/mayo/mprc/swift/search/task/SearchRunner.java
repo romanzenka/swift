@@ -50,6 +50,7 @@ public final class SearchRunner implements Runnable {
 
 	private SwiftSearchWorkPacket packet;
 	private SwiftSearchDefinition searchDefinition;
+	private int priority;
 
 	private CurationDao curationDao;
 	private SwiftDao swiftDao;
@@ -183,7 +184,8 @@ public final class SearchRunner implements Runnable {
 			final SwiftDao swiftDao,
 			final FileTokenFactory fileTokenFactory,
 			final SearchRun searchRun,
-			final boolean reportDecoyHits) {
+			final boolean reportDecoyHits,
+			final int priority) {
 		this.searchDefinition = searchDefinition;
 		this.packet = packet;
 		this.raw2mgfDaemon = raw2mgfDaemon;
@@ -195,7 +197,6 @@ public final class SearchRunner implements Runnable {
 		this.qaDaemon = qaDaemon;
 		this.fastaDbDaemon = fastaDbDaemon;
 		this.searchDbDaemon = searchDbDaemon;
-		this.workflowEngine = new WorkflowEngine(packet.getTaskId());
 		this.searchEngines = searchEngines;
 		this.reporter = reporter;
 		this.service = service;
@@ -204,6 +205,9 @@ public final class SearchRunner implements Runnable {
 		this.fileTokenFactory = fileTokenFactory;
 		this.searchRun = searchRun;
 		this.reportDecoyHits = reportDecoyHits;
+		this.priority = priority;
+		this.workflowEngine = new WorkflowEngine(packet.getTaskId());
+		this.workflowEngine.setPriority(priority);
 		assertValid();
 	}
 

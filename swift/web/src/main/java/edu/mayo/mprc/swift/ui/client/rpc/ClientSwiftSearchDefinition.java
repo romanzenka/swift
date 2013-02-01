@@ -28,6 +28,7 @@ public final class ClientSwiftSearchDefinition implements Serializable {
 
 	// Search run id in case this search was previously run
 	private int previousSearchRunId;
+	private boolean lowPriority;
 
 	public ClientSwiftSearchDefinition() {
 	}
@@ -109,6 +110,14 @@ public final class ClientSwiftSearchDefinition implements Serializable {
 
 	public void setFromScratch(final boolean fromScratch) {
 		this.fromScratch = fromScratch;
+	}
+
+	public boolean isLowPriority() {
+		return lowPriority;
+	}
+
+	public void setLowPriority(final boolean lowPriority) {
+		this.lowPriority = lowPriority;
 	}
 }
 

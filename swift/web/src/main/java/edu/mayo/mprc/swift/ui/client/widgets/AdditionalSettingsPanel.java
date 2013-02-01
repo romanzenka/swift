@@ -7,6 +7,7 @@ public class AdditionalSettingsPanel extends HorizontalPanel {
 	private final CheckBox publicMgfs;
 	private final CheckBox publicSearchFiles;
 	private final CheckBox fromScratch;
+	private final CheckBox lowPriority;
 
 	/**
 	 * Null Constructor
@@ -33,6 +34,10 @@ public class AdditionalSettingsPanel extends HorizontalPanel {
 		this.fromScratch = new CheckBox("From scratch (no cache)");
 		this.fromScratch.setChecked(false);
 		this.add(this.fromScratch);
+
+		this.lowPriority = new CheckBox("Low priority");
+		this.lowPriority.setChecked(false);
+		this.add(this.lowPriority);
 	}
 
 	/**
@@ -63,5 +68,13 @@ public class AdditionalSettingsPanel extends HorizontalPanel {
 
 	public boolean isFromScratch() {
 		return fromScratch.isChecked();
+	}
+
+	public void setLowPriority(final boolean lowPriority) {
+		this.lowPriority.setChecked(lowPriority);
+	}
+
+	public boolean isLowPriority() {
+		return lowPriority.isChecked();
 	}
 }

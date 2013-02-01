@@ -30,6 +30,7 @@ public class GridWorkPacket {
 	private boolean success;
 	private boolean failure;
 	private String errorMessage;
+	private int priority;
 
 	private static final AtomicLong workPacketUniqueIdBase;
 
@@ -72,6 +73,7 @@ public class GridWorkPacket {
 		logFolder = packet.getLogFolder();
 		persistentRequestId = packet.getPersistentRequestId();
 		listener = packet.getListener();
+		priority = packet.getPriority();
 
 		workPacketUniqueId = packet.getWorkPacketUniqueId();
 	}
@@ -188,6 +190,14 @@ public class GridWorkPacket {
 		failure = true;
 		errorMessage = message;
 		fireStateChanged();
+	}
+
+	public int getPriority() {
+		return priority;
+	}
+
+	public void setPriority(int priority) {
+		this.priority = priority;
 	}
 
 	public String toString() {

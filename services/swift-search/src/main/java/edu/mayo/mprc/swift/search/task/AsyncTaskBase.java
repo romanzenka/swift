@@ -74,8 +74,8 @@ public abstract class AsyncTaskBase extends TaskBase {
 	}
 
 	/**
-	 * @return Will be called until the task fails or succeeds through changing its status. If you do neither,
-	 *         you must use the resumer otherwise you might not run again.
+	 * Will be called until the task fails or succeeds through changing its status. If you do neither,
+	 * you must use the resumer otherwise you might not run again.
 	 */
 	public void run() {
 		if (!wasSubmitted) {
@@ -84,6 +84,7 @@ public abstract class AsyncTaskBase extends TaskBase {
 			}
 			wasSubmitted = true;
 			final WorkPacket workPacket = createWorkPacket();
+			workPacket.setPriority(getPriority());
 			if (workPacket == null) {
 				// We are already done.
 				setState(TaskState.COMPLETED_SUCCESFULLY);

@@ -70,8 +70,8 @@ final class SimpleQueueService implements Service {
 	 * Each link consists of two JMS queues - one for sending request and a temporary response queue
 	 * for each of the requests.
 	 *
-	 * @param broker Broker the queue lives on.
-	 * @param name   Name of the queue.
+	 * @param broker   Broker the queue lives on.
+	 * @param name     Name of the queue.
 	 * @param userName User for logging to the message broker.
 	 * @param password Password for logging to the message broker.
 	 */
@@ -116,10 +116,10 @@ final class SimpleQueueService implements Service {
 				objectMessage.setJMSReplyTo(responseQueue);
 				// Correlation ID matches the responses with the response listener
 				objectMessage.setJMSCorrelationID(correlationId);
-				// Default priority is 5
-				objectMessage.setJMSPriority(priority);
+				final int extraPriority = request instanceof PrioritizedData ? ((PrioritizedData) request).getPriority() : 0;
+				objectMessage.setJMSPriority(priority + extraPriority);
 			}
-			LOGGER.debug("Sending message to ["+queueName + "] with content [" + objectMessage.toString() + "] id: [" + objectMessage.getJMSMessageID() + "]");
+			LOGGER.debug("Sending message to [" + queueName + "] with content [" + objectMessage.toString() + "] id: [" + objectMessage.getJMSMessageID() + "]");
 			messageProducer().send(requestDestination, objectMessage);
 		} catch (JMSException e) {
 			throw new MprcException("Could not send message", e);

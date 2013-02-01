@@ -91,7 +91,8 @@ public class TestSearchRunner {
 				mock(SwiftDao.class),
 				dummyFileTokenFactory(),
 				searchRun,
-				false);
+				false,
+				0);
 
 		runner.initialize();
 
@@ -155,7 +156,8 @@ public class TestSearchRunner {
 				mock(SwiftDao.class),
 				dummyFileTokenFactory(),
 				searchRun,
-				false);
+				false,
+				0);
 
 		runner.initialize();
 

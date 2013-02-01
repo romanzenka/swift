@@ -23,6 +23,7 @@ public final class GridEngineJobManager implements Closeable {
 	private static final String MEMORY_SPEC_OPTION = "-l s_vmem=";
 	private static final String MEMORY_SPEC_OPTION_MB_UNIT = "M";
 	private static final int MAX_GRID_ENGINE_COMMAND = 1024;
+	private static final String PRIORITY_SPEC_OPTION = "-p";
 
 	private Session gridEngineSession;
 
@@ -185,19 +186,30 @@ public final class GridEngineJobManager implements Closeable {
 			LOGGER.debug("Task has native specification: " + pPacket.getNativeSpecification());
 		}
 		if (!Strings.isNullOrEmpty(pPacket.getQueueName())) {
-			if (spec.length() > 0) {
+			if (!spec.isEmpty()) {
 				spec += " ";
 			}
 			spec += QUEUE_SPEC_OPTION + " " + pPacket.getQueueName();
 			LOGGER.debug("Task forces a job queue: " + pPacket.getQueueName());
 		}
 		if (!Strings.isNullOrEmpty(pPacket.getMemoryRequirement())) {
-			if (spec.length() > 0) {
+			if (!spec.isEmpty()) {
 				spec += " ";
 			}
 			spec += MEMORY_SPEC_OPTION + pPacket.getMemoryRequirement() + MEMORY_SPEC_OPTION_MB_UNIT;
 			LOGGER.warn("Task forces memory requirement: " + pPacket.getMemoryRequirement());
 		}
+
+		// SGE allows only decreasing priority. If that is the case, use native specification to pass
+		// the priority decrease
+		if(pPacket.getPriority()<0) {
+			if (!spec.isEmpty()) {
+				spec += " ";
+			}
+
+			spec += PRIORITY_SPEC_OPTION + " " + pPacket.getPriority();
+		}
+
 		LOGGER.debug("Resulting native specification passed to grid engine:\n" + spec);
 		jt.setNativeSpecification(spec);
 

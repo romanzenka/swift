@@ -24,7 +24,7 @@ import java.io.Serializable;
  * round robin connections or failover connections implemented as well.
  */
 final class DirectDaemonConnection implements DaemonConnection {
-	public static final int NORMAL_PRIORITY = 5;
+	public static final int NORMAL_PRIORITY = 4;
 
 	private Service service = null;
 	private static int listenerNumber = 0;

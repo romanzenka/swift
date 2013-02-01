@@ -115,6 +115,7 @@ public final class GridRunner extends AbstractRunner {
 			// Set our own listener to the work packet progress. When the packet returns, the execution will be resumed
 			final MyWorkPacketStateListener listener = new MyWorkPacketStateListener(request, daemonWorkerAllocatorInputFile, boundMessenger, allocatorListener);
 			gridWorkPacket.setListener(listener);
+			gridWorkPacket.setPriority(request.getWorkPacket().getPriority());
 			// Run the job
 			final String requestId = manager.passToGridEngine(gridWorkPacket);
 

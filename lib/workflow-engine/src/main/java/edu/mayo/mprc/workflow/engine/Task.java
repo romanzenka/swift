@@ -1,5 +1,6 @@
 package edu.mayo.mprc.workflow.engine;
 
+import edu.mayo.mprc.messaging.PrioritizedData;
 import edu.mayo.mprc.workflow.persistence.TaskState;
 
 import java.io.File;
@@ -98,4 +99,13 @@ public interface Task {
 	 * @return &lt;engine_id&gt;.&lt;task_id&gt;
 	 */
 	String getFullId();
+
+
+	/**
+	 * See {@link PrioritizedData}.
+	 * The priority will be transferred to the work packets created.
+	 */
+	void setPriority(int priority);
+
+	int getPriority();
 }

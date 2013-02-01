@@ -12,6 +12,7 @@ import edu.mayo.mprc.daemon.files.FileTokenHolder;
 public abstract class WorkPacketBase extends FileHolder implements WorkPacket {
 	private static final long serialVersionUID = 20071228L;
 	private String taskId;
+	private int priority;
 	private boolean fromScratch;
 
 	/**
@@ -27,6 +28,17 @@ public abstract class WorkPacketBase extends FileHolder implements WorkPacket {
 	public WorkPacketBase(final String taskId, final boolean fromScratch) {
 		this.taskId = taskId;
 		this.fromScratch = fromScratch;
+	}
+
+	public int getPriority() {
+		return priority;
+	}
+
+	/**
+	 * @param priority Priority for this work packet. +1 - high, -1 low, 0 - normal
+	 */
+	public void setPriority(final int priority) {
+		this.priority = priority;
 	}
 
 	public String getTaskId() {
