@@ -79,6 +79,7 @@ public final class SwiftWebContext {
 					if (webUi == null) {
 						throw new MprcException("The daemon " + daemonId + " does not define any web interface module.");
 					}
+					webUi.setMainDaemon(daemon);
 
 					SwiftConfig.setupFileTokenFactory(swiftConfig, daemonConfig, webUi.getFileTokenFactory());
 
@@ -106,6 +107,18 @@ public final class SwiftWebContext {
 			}
 		}
 	}
+
+	public static void destroy() {
+		if (webUi != null) {
+			if (webUi.getMainDaemon() != null) {
+				webUi.getMainDaemon().stop();
+			}
+			if (webUi.getSwiftMonitor() != null) {
+				webUi.getSwiftMonitor().stop();
+			}
+		}
+	}
+
 
 	public static boolean isInitialized(final String daemonId) {
 		synchronized (SwiftWebContext.class) {

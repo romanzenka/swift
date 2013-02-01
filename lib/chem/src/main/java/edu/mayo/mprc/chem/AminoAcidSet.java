@@ -118,7 +118,7 @@ public final class AminoAcidSet {
 	 */
 	public String report() {
 		final StringBuilder result = new StringBuilder(AA_REPORT_SIZE);
-		result.append("<table>\n<tr><th>Code</th><th>Three letter code</th><th>Monoisotopic mass</th><th>Average mass</th><th>Formula</th></tr>\n");
+		result.append("<table class=\"table\">\n<tr><th>Code</th><th>Three letter code</th><th>Monoisotopic mass</th><th>Average mass</th><th>Formula</th></tr>\n");
 		for (final AminoAcid acid : data.values()) {
 			result
 					.append("<tr><td>")

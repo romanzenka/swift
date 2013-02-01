@@ -68,6 +68,12 @@
         <servlet-name>SampleReport</servlet-name>
         <servlet-class>edu.mayo.mprc.swift.report.SampleReport</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>Extras</servlet-name>
+        <display-name>Extras</display-name>
+        <description>Extra Swift features</description>
+        <jsp-file>/extras.jsp</jsp-file>
+    </servlet>
     <!--inserted manually -->
     <servlet-mapping>
         <servlet-name>SwiftAppService</servlet-name>
@@ -129,7 +135,10 @@
         <servlet-name>SampleReport</servlet-name>
         <url-pattern>/sample-report</url-pattern>
     </servlet-mapping>
-
+    <servlet-mapping>
+        <servlet-name>Extras</servlet-name>
+        <url-pattern>/extras</url-pattern>
+    </servlet-mapping>
 
     <servlet-mapping>
         <servlet-name>jsp</servlet-name>

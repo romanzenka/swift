@@ -4,8 +4,10 @@ import com.google.common.base.Joiner;
 import edu.mayo.mprc.MprcException;
 import edu.mayo.mprc.config.*;
 import edu.mayo.mprc.daemon.monitor.PingDaemonWorker;
+import edu.mayo.mprc.utilities.FileUtilities;
 import org.apache.log4j.Logger;
 
+import java.io.Closeable;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -51,6 +53,11 @@ public final class Daemon {
 	public void stop() {
 		for (final AbstractRunner runner : runners) {
 			runner.stop();
+		}
+		for(Object resource : resources) {
+			if(resource instanceof Closeable) {
+				FileUtilities.closeQuietly((Closeable)resource);
+			}
 		}
 	}
 

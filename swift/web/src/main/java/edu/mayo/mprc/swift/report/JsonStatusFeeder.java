@@ -32,6 +32,12 @@ public class JsonStatusFeeder extends HttpServlet {
 		}
 	}
 
+	@Override
+	public void destroy() {
+		super.destroy();
+		ServletIntialization.destroy();
+	}
+
 	protected void doPost(final HttpServletRequest req, final HttpServletResponse resp) throws ServletException {
 		this.doGet(req, resp);
 	}

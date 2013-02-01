@@ -17,6 +17,8 @@ import org.apache.log4j.Logger;
 import javax.jms.Connection;
 import javax.jms.ConnectionFactory;
 import javax.jms.JMSException;
+import java.io.Closeable;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -26,7 +28,7 @@ import java.util.Map;
  * The broker is being set as non-persistent so we do not have to deal with the broker creating temporary
  * files. If the user wants permanent broker, they can install standalone ActiveMQ and configure it separately.
  */
-public final class MessageBroker {
+public final class MessageBroker implements Closeable {
 	private static final Logger LOGGER = Logger.getLogger(MessageBroker.class);
 	public static final String TYPE = "messageBroker";
 	public static final String NAME = "Message Broker";
@@ -88,6 +90,22 @@ public final class MessageBroker {
 		} catch (Exception e) {
 			throw new MprcException("The message broker failed to start", e);
 		}
+	}
+
+	public void stop() {
+		if (broker != null) {
+			try {
+				broker.stop();
+			} catch (Exception e) {
+				// SWALLOWED: failing to stop the broker is not a life/death problem
+				LOGGER.error("Could not stop the embedded message broker", e);
+			}
+		}
+	}
+
+	@Override
+	public void close() throws IOException {
+		stop();
 	}
 
 	/**

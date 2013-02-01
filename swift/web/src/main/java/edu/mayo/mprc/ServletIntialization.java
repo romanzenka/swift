@@ -136,4 +136,7 @@ public final class ServletIntialization {
 		return false;
 	}
 
+	public static void destroy() {
+		SwiftWebContext.destroy();
+	}
 }

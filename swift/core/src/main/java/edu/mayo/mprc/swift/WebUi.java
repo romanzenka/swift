@@ -6,6 +6,7 @@ import edu.mayo.mprc.config.ui.PropertyChangeListener;
 import edu.mayo.mprc.config.ui.ServiceUiFactory;
 import edu.mayo.mprc.config.ui.UiBuilder;
 import edu.mayo.mprc.config.ui.UiResponse;
+import edu.mayo.mprc.daemon.Daemon;
 import edu.mayo.mprc.daemon.DaemonConnection;
 import edu.mayo.mprc.daemon.files.FileTokenFactory;
 import edu.mayo.mprc.database.DatabasePlaceholder;
@@ -62,6 +63,7 @@ public final class WebUi {
 	private ParamsInfo paramsInfo;
 	private FileTokenFactory fileTokenFactory;
 	private SwiftMonitor swiftMonitor;
+	private Daemon mainDaemon;
 
 	public static final String SEARCHER = "searcher";
 	public static final String TITLE = "title";
@@ -179,6 +181,14 @@ public final class WebUi {
 
 	public SwiftMonitor getSwiftMonitor() {
 		return swiftMonitor;
+	}
+
+	public Daemon getMainDaemon() {
+		return mainDaemon;
+	}
+
+	public void setMainDaemon(Daemon mainDaemon) {
+		this.mainDaemon = mainDaemon;
 	}
 
 	/**
