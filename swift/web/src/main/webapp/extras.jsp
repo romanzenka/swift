@@ -33,13 +33,17 @@
     <h3>Monitoring</h3>
 
     <p>
-        To be notified of successfully finished searches or errors, subscribe to Swift's RSS feeds:
+        To be notified of successfully finished searches or errors, subscribe to Swift's RSS feeds.
+        The swift monitor periodically pings Swift daemons to make sure all components are ok.
     </p>
 
     <p>
         <a class="btn" href="/feed">RSS Feed</a>
         <a class="btn" href="/feed?showSuccess=false">RSS Feed (Errors Only)</a>
+        <br/>
         <a class="btn" href="/iphone">iPhone interface</a>
+        <br/>
+        <a class="btn" href="/monitor.jsp">Component Monitor</a>
     </p>
 
     <h3>Queries</h3>
