@@ -84,12 +84,12 @@ public abstract class AsyncTaskBase extends TaskBase {
 			}
 			wasSubmitted = true;
 			final WorkPacket workPacket = createWorkPacket();
-			workPacket.setPriority(getPriority());
 			if (workPacket == null) {
 				// We are already done.
 				setState(TaskState.COMPLETED_SUCCESFULLY);
 				return;
 			}
+			workPacket.setPriority(getPriority());
 			daemon.sendWork(workPacket, new TaskProgressListener(this) {
 				public void requestProcessingFinished() {
 					try {
