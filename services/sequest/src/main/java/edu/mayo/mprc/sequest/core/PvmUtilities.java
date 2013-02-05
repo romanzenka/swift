@@ -163,6 +163,7 @@ final class PvmUtilities {
 	public static List<String> getCmdResult(final List<String> cmd) {
 		final ProcessBuilder builder = new ProcessBuilder(cmd);
 		final ProcessCaller caller = new ProcessCaller(builder);
+		caller.setLogToConsole(false);
 		final CollectingLogMonitor outputMonitor = new CollectingLogMonitor();
 		caller.setOutputMonitor(outputMonitor);
 		caller.run();
@@ -685,6 +686,7 @@ final class PvmUtilities {
 	private static List<String> processCommandwithPipe(final List<String> cmd, final BufferedInputStream input) {
 		final ProcessBuilder builder = new ProcessBuilder(cmd);
 		final ProcessCaller caller = new ProcessCaller(builder);
+		caller.setLogToConsole(false);
 		final CollectingLogMonitor outputMonitor = new CollectingLogMonitor();
 		caller.setOutputMonitor(outputMonitor);
 		caller.setInputStream(input);
