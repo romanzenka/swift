@@ -43,20 +43,35 @@ public final class MonitorUtilities {
 	 * Return a string identifiying this host/user/JVM.
 	 */
 	public static String getHostInformation() {
+		final String hostname = getShortHostname();
+
+		// find the user name
+		final String userName = System.getProperty("user.name");
+		// and add these to the message
+		return userName + "@" + hostname + " " + (getPid() != -1 ? "(" + getPid() + ")" : "");
+	}
+
+	/**
+	 * @return Hostname of this machine (without the fulld domain info)
+	 */
+	public static String getShortHostname() {
+		return getFullHostname().replaceAll("\\..*", "");
+	}
+
+	/**
+	 * @return Full hostname of this machine.
+	 */
+	public static String getFullHostname() {
 		// find the hostname
 		String hostname = "unknown";
 		final InetAddress host;
 		try {
 			host = InetAddress.getLocalHost();
 			hostname = host.getHostName();
-			hostname = hostname.replaceAll("\\..*", "");
 		} catch (Exception ignore) {
 			// SWALLOWED
 		}
-		// find the user name
-		final String userName = System.getProperty("user.name");
-		// and add these to the message
-		return userName + "@" + hostname + " " + (getPid() != -1 ? "(" + getPid() + ")" : "");
+		return hostname;
 	}
 
 }

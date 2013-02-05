@@ -2,6 +2,7 @@ package edu.mayo.mprc.sequest.core;
 
 import com.google.common.base.Joiner;
 import edu.mayo.mprc.MprcException;
+import edu.mayo.mprc.daemon.monitor.MonitorUtilities;
 import edu.mayo.mprc.utilities.CollectingLogMonitor;
 import edu.mayo.mprc.utilities.FileUtilities;
 import edu.mayo.mprc.utilities.ProcessCaller;
@@ -365,7 +366,7 @@ final class PvmUtilities {
 		}
 		// now see is numhosts same as  in hostfile
 		final List<String> slaves = getSlaveNodes(hostFileName);
-		final int numReqHosts = slaves.size() + 1;
+		final int numReqHosts = slaves.size() + (localhostInList(slaves) ? 0 : 1);
 
 		final boolean running_properly = (numHosts == numReqHosts);
 
@@ -381,6 +382,24 @@ final class PvmUtilities {
 			}
 			return false;
 		}
+	}
+
+	/**
+	 * Is the localhost contained in the list of slaves?
+	 *
+	 * @param slaves Names of slave servers.
+	 * @return True if localhost is one of the slaves.
+	 */
+	private static boolean localhostInList(List<String> slaves) {
+		boolean containsLocalhost = false;
+		final String hostname = MonitorUtilities.getFullHostname();
+		for (final String slave : slaves) {
+			if (slave.equalsIgnoreCase(hostname)) {
+				containsLocalhost = true;
+				break;
+			}
+		}
+		return containsLocalhost;
 	}
 
 
