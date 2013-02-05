@@ -28,12 +28,10 @@ public final class PingDaemonWorker extends WorkerBase implements NoLoggingWorke
 		if (!(workPacket instanceof PingWorkPacket)) {
 			throw new DaemonException("Unknown input format: " + workPacket.getClass().getName() + " expected string");
 		}
-		final PingWorkPacket pingWorkPacket = (PingWorkPacket) workPacket;
-
 		reporter.reportProgress(new PingResponse());
 	}
 
-	public static ServiceConfig getPingServiceConfig(DaemonConfig config) {
+	public static ServiceConfig getPingServiceConfig(final DaemonConfig config) {
 		if(config.getPingQueueUrl()==null) {
 			return null;
 		}
