@@ -41,7 +41,9 @@ public final class FastaDbDaoHibernate extends DaoBase implements FastaDbDao {
 	public ProteinSequence getProteinSequence(final Curation database, final String accessionNumber) {
 		Preconditions.checkNotNull(database, "Database has to be specified");
 		return (ProteinSequence) getSession()
-				.createQuery("select e.sequence from ProteinDatabaseEntry e where e.database=:database and e.accessionNumber=:accessionNumber")
+				.createQuery("select e.sequence from " +
+						"ProteinEntry e " +
+						"where e.database=:database and e.accessionNumber.accnum=:accessionNumber")
 				.setEntity("database", database)
 				.setString("accessionNumber", accessionNumber)
 				.uniqueResult();
@@ -60,6 +62,20 @@ public final class FastaDbDaoHibernate extends DaoBase implements FastaDbDao {
 			return saveStateless(session, proteinSequence, nullSafeEq("sequence", proteinSequence.getSequence()), false);
 		}
 		return proteinSequence;
+	}
+
+	private ProteinAccnum addAccessionNumber(final StatelessSession session, final ProteinAccnum accessionNumber) {
+		if (null == accessionNumber.getId()) {
+			return saveStateless(session, accessionNumber, nullSafeEq("accnum", accessionNumber.getAccnum()), false);
+		}
+		return accessionNumber;
+	}
+
+	private ProteinDescription addDescription(final StatelessSession session, final ProteinDescription description) {
+		if (null == description.getId()) {
+			return saveStateless(session, description, nullSafeEq("description", description.getDescription()), false);
+		}
+		return description;
 	}
 
 	@Override
@@ -82,7 +98,7 @@ public final class FastaDbDaoHibernate extends DaoBase implements FastaDbDao {
 
 	@Override
 	public long countDatabaseEntries(final Curation database) {
-		return (Long) getSession().createQuery("select count(*) from ProteinDatabaseEntry p where p.database=:database").setEntity("database", database)
+		return (Long) getSession().createQuery("select count(*) from ProteinEntry p where p.database=:database").setEntity("database", database)
 				.uniqueResult();
 	}
 
@@ -97,7 +113,7 @@ public final class FastaDbDaoHibernate extends DaoBase implements FastaDbDao {
 	@Override
 	public void addFastaDatabase(final Curation database, @Nullable final UserProgressReporter progressReporter) {
 		final StatelessSession session = getDatabasePlaceholder().getSessionFactory().openStatelessSession();
-		final Query entryCount = session.createQuery("select count(*) from ProteinDatabaseEntry p where p.database=:database").setEntity("database", database);
+		final Query entryCount = session.createQuery("select count(*) from ProteinEntry p where p.database=:database").setEntity("database", database);
 		if (0L != ((Long) entryCount.uniqueResult()).longValue()) {
 			// We have loaded the database already
 			return;
@@ -128,7 +144,7 @@ public final class FastaDbDaoHibernate extends DaoBase implements FastaDbDao {
 					description = "";
 				}
 				final ProteinSequence proteinSequence = addProteinSequence(session, new ProteinSequence(sequence));
-				final ProteinDatabaseEntry entry = new ProteinDatabaseEntry(database, accessionNumber, description, proteinSequence);
+				final ProteinEntry entry = new ProteinEntry(database, addAccessionNumber(session, new ProteinAccnum(accessionNumber)), addDescription(session, new ProteinDescription(description)), proteinSequence);
 				// We know that we will never save two identical entries (fasta has each entry unique and we have not
 				// loaded the database yet. So no need to check)
 				saveStateless(session, entry, null, false);
@@ -151,8 +167,10 @@ public final class FastaDbDaoHibernate extends DaoBase implements FastaDbDao {
 	public Collection<String> getHibernateMappings() {
 		return Arrays.asList(
 				HBM_HOME + "PeptideSequence.hbm.xml",
-				HBM_HOME + "ProteinDatabaseEntry.hbm.xml",
-				HBM_HOME + "ProteinSequence.hbm.xml"
+				HBM_HOME + "ProteinSequence.hbm.xml",
+				HBM_HOME + "ProteinEntry.hbm.xml",
+				HBM_HOME + "ProteinAccnum.hbm.xml",
+				HBM_HOME + "ProteinDescription.hbm.xml"
 		);
 	}
 }

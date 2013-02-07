@@ -4,11 +4,9 @@ import edu.mayo.mprc.database.PersistableBase;
 import edu.mayo.mprc.dbcurator.model.Curation;
 
 /**
- * One entry in a particular protein database.
- *
  * @author Roman Zenka
  */
-public final class ProteinDatabaseEntry extends PersistableBase {
+public final class ProteinEntry extends PersistableBase {
 	/**
 	 * Database this entry belongs to.
 	 */
@@ -17,22 +15,22 @@ public final class ProteinDatabaseEntry extends PersistableBase {
 	/**
 	 * Accession number the entry belongs to.
 	 */
-	private String accessionNumber;
+	private ProteinAccnum accessionNumber;
 
 	/**
 	 * Description of the database entry.
 	 */
-	private String description;
+	private ProteinDescription description;
 
 	/**
 	 * The protein sequence of the entry.
 	 */
 	private ProteinSequence sequence;
 
-	public ProteinDatabaseEntry() {
+	public ProteinEntry() {
 	}
 
-	public ProteinDatabaseEntry(final Curation database, final String accessionNumber, final String description, final ProteinSequence sequence) {
+	public ProteinEntry(final Curation database, final ProteinAccnum accessionNumber, final ProteinDescription description, final ProteinSequence sequence) {
 		setDatabase(database);
 		setAccessionNumber(accessionNumber);
 		setDescription(description);
@@ -47,19 +45,19 @@ public final class ProteinDatabaseEntry extends PersistableBase {
 		this.database = database;
 	}
 
-	public String getAccessionNumber() {
+	public ProteinAccnum getAccessionNumber() {
 		return accessionNumber;
 	}
 
-	void setAccessionNumber(final String accessionNumber) {
+	void setAccessionNumber(ProteinAccnum accessionNumber) {
 		this.accessionNumber = accessionNumber;
 	}
 
-	public String getDescription() {
+	public ProteinDescription getDescription() {
 		return description;
 	}
 
-	public void setDescription(final String description) {
+	void setDescription(ProteinDescription description) {
 		this.description = description;
 	}
 
@@ -76,11 +74,11 @@ public final class ProteinDatabaseEntry extends PersistableBase {
 		if (this == o) {
 			return true;
 		}
-		if (null == o || !(o instanceof ProteinDatabaseEntry)) {
+		if (null == o || !(o instanceof ProteinEntry)) {
 			return false;
 		}
 
-		final ProteinDatabaseEntry that = (ProteinDatabaseEntry) o;
+		final ProteinEntry that = (ProteinEntry) o;
 
 		if (null != getAccessionNumber() ? !getAccessionNumber().equals(that.getAccessionNumber()) : null != that.getAccessionNumber()) {
 			return false;
@@ -106,4 +104,5 @@ public final class ProteinDatabaseEntry extends PersistableBase {
 		result = 31 * result + (null != getSequence() ? getSequence().hashCode() : 0);
 		return result;
 	}
+
 }

@@ -16,7 +16,9 @@
         <mapping resource="edu/mayo/mprc/searchdb/dao/LocalizedModList.hbm.xml"/>
         <mapping resource="edu/mayo/mprc/fastadb/PeptideSequence.hbm.xml"/>
         <mapping resource="edu/mayo/mprc/searchdb/dao/PeptideSpectrumMatch.hbm.xml"/>
-        <mapping resource="edu/mayo/mprc/fastadb/ProteinDatabaseEntry.hbm.xml"/>
+        <mapping resource="edu/mayo/mprc/fastadb/ProteinEntry.hbm.xml"/>
+        <mapping resource="edu/mayo/mprc/fastadb/ProteinAccnum.hbm.xml"/>
+        <mapping resource="edu/mayo/mprc/fastadb/ProteinDescription.hbm.xml"/>
         <mapping resource="edu/mayo/mprc/searchdb/dao/ProteinGroup.hbm.xml"/>
         <mapping resource="edu/mayo/mprc/searchdb/dao/ProteinGroupList.hbm.xml"/>
         <mapping resource="edu/mayo/mprc/fastadb/ProteinSequence.hbm.xml"/>

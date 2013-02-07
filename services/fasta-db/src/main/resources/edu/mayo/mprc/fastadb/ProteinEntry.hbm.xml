@@ -2,13 +2,13 @@
 <!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
         "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
 <hibernate-mapping package="edu.mayo.mprc.fastadb">
-    <class name="ProteinDatabaseEntry" table="protein_database_entry" mutable="false">
-        <id name="id" type="integer" column="protein_database_entry_id">
+    <class name="ProteinEntry" table="protein_entry" mutable="false">
+        <id name="id" type="integer" column="protein_entry_id">
             <generator class="native"/>
         </id>
         <many-to-one name="database" class="edu.mayo.mprc.dbcurator.model.Curation" column="curation_id" lazy="proxy"/>
-        <property name="accessionNumber" type="string" length="80" column="accession_number" not-null="true"/>
-        <property name="description" type="string" length="300" column="description" not-null="false"/>
+        <many-to-one name="accessionNumber" class="ProteinAccnum" column="protein_accnum_id" not-null="true" lazy="proxy"/>
+        <many-to-one name="description" class="ProteinDescription" column="protein_description_id" not-null="false" lazy="proxy"/>
         <many-to-one name="sequence" class="ProteinSequence" column="protein_sequence_id" not-null="true" lazy="proxy"/>
     </class>
 </hibernate-mapping>
