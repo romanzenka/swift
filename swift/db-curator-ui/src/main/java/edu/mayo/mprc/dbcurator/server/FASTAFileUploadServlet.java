@@ -32,7 +32,7 @@ public final class FASTAFileUploadServlet extends HttpServlet {
 
 	public void service(final HttpServletRequest request, final HttpServletResponse response) throws ServletException, IOException {
 
-		response.setContentType("text/plain;charset=UTF-8");
+		response.setContentType("text/html;charset=UTF-8");
 
 		final Writer responseWriter = response.getWriter();
 
