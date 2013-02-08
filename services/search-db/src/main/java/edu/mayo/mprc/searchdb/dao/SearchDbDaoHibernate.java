@@ -354,9 +354,9 @@ public final class SearchDbDaoHibernate extends DaoBase implements RuntimeInitia
 						" inner join psl.list as ps" +
 						" inner join a.reportData as rd," +
 						" ProteinEntry as pe" +
-						" inner join ProteinAccnum as pac" +
+						" inner join pe.accessionNumber as pac" +
 						" where pe.sequence = ps " +
-						" and pac.accession_number = :accessionNumber" +
+						" and pac.accnum = :accessionNumber" +
 						" order by rd.searchRun")
 				.setParameter("accessionNumber", accessionNumber)
 				.list();
