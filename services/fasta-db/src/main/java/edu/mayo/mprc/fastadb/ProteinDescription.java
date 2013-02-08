@@ -22,10 +22,11 @@ public final class ProteinDescription extends PersistableBase {
 	}
 
 	void setDescription(final String description) {
-		if (description.length() > MAX_DESCRIPTION_LENGTH) {
-			this.description = description.substring(0, MAX_DESCRIPTION_LENGTH);
+		final String trimmed = description.trim();
+		if (trimmed.length() > MAX_DESCRIPTION_LENGTH) {
+			this.description = trimmed.substring(0, MAX_DESCRIPTION_LENGTH);
 		} else {
-			this.description = description;
+			this.description = trimmed;
 		}
 	}
 
