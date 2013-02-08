@@ -144,7 +144,9 @@ public final class FastaDbDaoHibernate extends DaoBase implements FastaDbDao {
 					description = "";
 				}
 				final ProteinSequence proteinSequence = addProteinSequence(session, new ProteinSequence(sequence));
-				final ProteinEntry entry = new ProteinEntry(database, addAccessionNumber(session, new ProteinAccnum(accessionNumber)), addDescription(session, new ProteinDescription(description)), proteinSequence);
+				final ProteinAccnum accnum = addAccessionNumber(session, new ProteinAccnum(accessionNumber));
+				final ProteinDescription desc = addDescription(session, new ProteinDescription(description));
+				final ProteinEntry entry = new ProteinEntry(database, accnum, desc, proteinSequence);
 				// We know that we will never save two identical entries (fasta has each entry unique and we have not
 				// loaded the database yet. So no need to check)
 				saveStateless(session, entry, null, false);
