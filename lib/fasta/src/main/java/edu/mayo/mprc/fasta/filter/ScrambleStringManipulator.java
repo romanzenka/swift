@@ -10,7 +10,7 @@ public final class ScrambleStringManipulator implements StringManipulator {
 	/**
 	 * Random number generator. Settable for reproducibility in tests.
 	 */
-	private Random random;
+	private Random random = new Random();
 
 	public Random getRandom() {
 		return random;
