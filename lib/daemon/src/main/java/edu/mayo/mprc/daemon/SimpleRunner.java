@@ -38,7 +38,13 @@ public final class SimpleRunner extends AbstractRunner {
 	}
 
 	protected void processRequest(final DaemonRequest request) {
-		final Worker worker = factory.createWorker();
+		final Worker worker;
+		try {
+			worker = factory.createWorker();
+		} catch (Exception e) {
+			request.sendResponse(e, true);
+			return;
+		}
 		executorService.execute(new RequestProcessor(worker, request));
 	}
 
