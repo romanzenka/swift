@@ -9,6 +9,7 @@ import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.TreeMap;
 
 /**
@@ -246,8 +247,10 @@ public final class Analysis extends PersistableBase {
 		r.nextRow(); // ---------------
 
 		final StringBuilder accNums = new StringBuilder(50);
+		final Map<Integer/*protein sequence id*/, List<String>/* accession numbers for the protein sequence  */> accnumMap
+				= searchDbDao.getAccessionNumbersMapForAnalysis(this);
 		for (final ProteinSequenceList proteinSequences : allProteinGroups.values()) {
-			final List<String> proteinAccessionNumbers = searchDbDao.getProteinAccessionNumbers(proteinSequences);
+			final List<String> proteinAccessionNumbers = accnumMap.get(proteinSequences.getId());
 			accNums.setLength(0);
 			for (final String accNum : proteinAccessionNumbers) {
 				if (accNum.equalsIgnoreCase(highlight)) {

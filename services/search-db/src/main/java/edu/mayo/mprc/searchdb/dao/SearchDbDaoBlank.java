@@ -4,10 +4,13 @@ import edu.mayo.mprc.database.QueryCallback;
 import edu.mayo.mprc.swift.dbmapping.ReportData;
 import edu.mayo.mprc.utilities.progress.UserProgressReporter;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * A blank implementation of {@link SearchDbDao} that makes all methods throw an exception.
+ *
  * @author Roman Zenka
  */
 public class SearchDbDaoBlank implements SearchDbDao {
@@ -49,6 +52,11 @@ public class SearchDbDaoBlank implements SearchDbDao {
 	@Override
 	public TandemMassSpectrometrySample updateTandemMassSpectrometrySample(TandemMassSpectrometrySample sample) {
 		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public Map<Integer, List<String>> getAccessionNumbersMapForAnalysis(Analysis analysis) {
+		return new HashMap<Integer, List<String>>(0);
 	}
 
 	@Override

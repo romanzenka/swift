@@ -6,6 +6,7 @@ import edu.mayo.mprc.swift.dbmapping.ReportData;
 import edu.mayo.mprc.utilities.progress.UserProgressReporter;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * This dao should be implemented in an efficient manner. Typically a large amount of queries (10000x per input file)
@@ -13,7 +14,6 @@ import java.util.List;
  */
 public interface SearchDbDao extends Dao {
 	/**
-	 *
 	 * @param analysis   Analysis to add.
 	 * @param reportData The analysis is bound to this Scaffold data report (.sf3 file)
 	 * @return Added analysis properly linked into Hibernate.
@@ -50,12 +50,13 @@ public interface SearchDbDao extends Dao {
 
 	/**
 	 * @return List of all report ids  that do not have the analysis object attached. Only reports with defined search
-	 * parameters are listed (does not make sense to list them otherwise, as results cannot be loaded in that case).
+	 *         parameters are listed (does not make sense to list them otherwise, as results cannot be loaded in that case).
 	 */
 	List<Long> getReportIdsWithoutAnalysis();
 
 	/**
 	 * Go through the list of all mass spectrometry samples, calling the given callback on each.
+	 *
 	 * @param callback Callback to be called once per each sample.
 	 */
 	void getTandemMassSpectrometrySamples(QueryCallback callback);
@@ -63,7 +64,17 @@ public interface SearchDbDao extends Dao {
 	/**
 	 * Used for fixing a problem with badly parsed .RAW file information.
 	 * Looks up file information in the table based on the file name and date last modified, updates all other data.
+	 *
 	 * @param sample Sample data to update.
 	 */
 	TandemMassSpectrometrySample updateTandemMassSpectrometrySample(TandemMassSpectrometrySample sample);
+
+	/**
+	 * Look at all protein groups for a given analysis. For each protein sequence list
+	 * load all accession numbers associated with it and put them in a list.
+	 *
+	 * @param analysis Analysis to load the data for.
+	 * @return Map from {@link ProteinSequenceList} id to list of accession numbers for that group.
+	 */
+	Map<Integer, List<String>> getAccessionNumbersMapForAnalysis(Analysis analysis);
 }

@@ -1,5 +1,7 @@
 package edu.mayo.mprc.searchdb.dao;
 
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import edu.mayo.mprc.MprcException;
 import edu.mayo.mprc.config.RuntimeInitializer;
 import edu.mayo.mprc.database.*;
@@ -12,10 +14,7 @@ import edu.mayo.mprc.utilities.progress.UserProgressReporter;
 import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.Restrictions;
 
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * DAO for the search results stored in the database.
@@ -146,9 +145,9 @@ public final class SearchDbDaoHibernate extends DaoBase implements RuntimeInitia
 
 	}
 
-	public ProteinGroup addProteinGroup(final ProteinGroup group, PercentRangeReporter reporter) {
+	public ProteinGroup addProteinGroup(final ProteinGroup group, final PercentRangeReporter reporter) {
 		if (group.getId() == null) {
-			final int size = group.getProteinSequences().size()+group.getPeptideSpectrumMatches().size();
+			final int size = group.getProteinSequences().size() + group.getPeptideSpectrumMatches().size();
 			int itemsSaved = 0;
 			{
 				final ProteinSequenceList originalList = group.getProteinSequences();
@@ -272,7 +271,7 @@ public final class SearchDbDaoHibernate extends DaoBase implements RuntimeInitia
 		private final float percentFrom;
 		private final float percentTo;
 
-		PercentRangeReporter(PercentDoneReporter reporter, float percentFrom, float percentTo) {
+		PercentRangeReporter(final PercentDoneReporter reporter, final float percentFrom, final float percentTo) {
 			this.reporter = reporter;
 			this.percentFrom = percentFrom;
 			this.percentTo = percentTo;
@@ -282,8 +281,8 @@ public final class SearchDbDaoHibernate extends DaoBase implements RuntimeInitia
 			reporter.reportProgress(percentTo);
 		}
 
-		public void reportDone(int totalChunks, int chunkNumber) {
-			reporter.reportProgress(percentFrom+(percentTo-percentFrom)/totalChunks*chunkNumber);
+		public void reportDone(final int totalChunks, final int chunkNumber) {
+			reporter.reportProgress(percentFrom + (percentTo - percentFrom) / totalChunks * chunkNumber);
 		}
 
 		/**
@@ -293,14 +292,14 @@ public final class SearchDbDaoHibernate extends DaoBase implements RuntimeInitia
 		 * @param chunkNumber Which chunk we want range for.
 		 * @return a reporter going over the specified chunk
 		 */
-		public PercentRangeReporter getSubset(int totalChunks, int chunkNumber) {
+		public PercentRangeReporter getSubset(final int totalChunks, final int chunkNumber) {
 			final float chunkPercent = (percentTo - percentFrom) / totalChunks;
 			return new PercentRangeReporter(reporter, percentFrom + chunkPercent * chunkNumber, percentFrom + chunkPercent * (chunkNumber + 1));
 		}
 	}
 
 	@Override
-	public Analysis addAnalysis(final Analysis analysis, final ReportData reportData, UserProgressReporter reporter) {
+	public Analysis addAnalysis(final Analysis analysis, final ReportData reportData, final UserProgressReporter reporter) {
 
 		if (analysis.getId() == null) {
 			final BiologicalSampleList originalList = analysis.getBiologicalSamples();
@@ -371,14 +370,58 @@ public final class SearchDbDaoHibernate extends DaoBase implements RuntimeInitia
 	}
 
 	@Override
-	public void getTandemMassSpectrometrySamples(QueryCallback queryCallback) {
+	public void getTandemMassSpectrometrySamples(final QueryCallback queryCallback) {
 		scrollQuery("from TandemMassSpectrometrySample", queryCallback);
 	}
 
 	@Override
-	public TandemMassSpectrometrySample updateTandemMassSpectrometrySample(TandemMassSpectrometrySample sample) {
+	public TandemMassSpectrometrySample updateTandemMassSpectrometrySample(final TandemMassSpectrometrySample sample) {
 		// Our adding function happens to do exactly what we need
 		return addTandemMassSpectrometrySample(sample);
+	}
+
+	@Override
+	public Map<Integer, List<String>> getAccessionNumbersMapForAnalysis(final Analysis analysis) {
+		final HashMap<Integer, List<String>> result = Maps.newHashMap();
+		final List list = getSession().createQuery("select psl.id, pe.accessionNumber.accnum from" +
+				" Analysis a" +
+				" inner join a.biologicalSamples as bsl" +
+				" inner join bsl.list as b" +
+				" inner join b.searchResults as srl" +
+				" inner join srl.list as r" +
+				" inner join r.proteinGroups as pgl" +
+				" inner join pgl.list as pg" +
+				" inner join pg.proteinSequences as psl" +
+				" inner join psl.list as ps," +
+				" ProteinEntry as pe," +
+				" ProteinAccnum as pa" +
+				" where pe.sequence = ps" +
+				" and pe.accessionNumber = pa" +
+				" and a=:a")
+				.setParameter("a", analysis)
+				.list();
+
+		int lastGroup = -1;
+		final Collection<String> numbers = new ArrayList<String>(20);
+		for (final Object o : list) {
+			final Object[] array = (Object[]) o;
+			final int pgId = ((Integer) array[0]).intValue();
+			if (lastGroup == -1) {
+				lastGroup = pgId;
+			}
+			final String accNum = (String) array[1];
+			if (pgId != lastGroup) {
+				result.put(lastGroup, Lists.newArrayList(numbers));
+				numbers.clear();
+				lastGroup = pgId;
+			}
+			numbers.add(accNum);
+		}
+		if (!list.isEmpty()) {
+			result.put(lastGroup, Lists.newArrayList(numbers));
+			numbers.clear();
+		}
+		return result;
 	}
 
 	private Criterion analysisEqualityCriteria(final Analysis analysis) {
