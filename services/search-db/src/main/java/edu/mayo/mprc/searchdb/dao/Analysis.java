@@ -7,10 +7,7 @@ import org.joda.time.DateTime;
 
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.TreeMap;
+import java.util.*;
 
 /**
  * Extracted information about how the analysis was performed that should get stored into the LIMS.
@@ -215,20 +212,22 @@ public final class Analysis extends PersistableBase {
 	public void htmlReport(final Report r, final SearchDbDao searchDbDao, final String highlight) {
 		r
 				.startTable("Scaffold run")
-				.addKeyValueTable("Date", getAnalysisDate())
+				.addKeyValueTable("Date", getAnalysisDate().toString("YYYY-MM-dd"))
 				.addKeyValueTable("Scaffold Version", getScaffoldVersion())
 				.endTable();
 
 		r.startTable("Results") // -- Results
-				.cell("", 1);
+				.cell("", 1, null);
 
 		final TreeMap<Integer, ProteinSequenceList> allProteinGroups = new TreeMap<Integer, ProteinSequenceList>();
 
 		// List biological samples
+		int totalColumns = 0;
 		for (final BiologicalSample sample : getBiologicalSamples()) {
-			r.cell(sample.getSampleName(), sample.getSearchResults().size());
+			r.cell(sample.getSampleName(), sample.getSearchResults().size(), null);
 
 			for (final SearchResult result : sample.getSearchResults()) {
+				totalColumns++;
 				for (final ProteinGroup group : result.getProteinGroups()) {
 					allProteinGroups.put(group.getProteinSequences().getId(), group.getProteinSequences());
 				}
@@ -246,22 +245,78 @@ public final class Analysis extends PersistableBase {
 		}
 		r.nextRow(); // ---------------
 
-		final StringBuilder accNums = new StringBuilder(50);
-		final Map<Integer/*protein sequence id*/, List<String>/* accession numbers for the protein sequence  */> accnumMap
-				= searchDbDao.getAccessionNumbersMapForAnalysis(this);
-		for (final ProteinSequenceList proteinSequences : allProteinGroups.values()) {
-			final List<String> proteinAccessionNumbers = accnumMap.get(proteinSequences.getId());
-			accNums.setLength(0);
-			for (final String accNum : proteinAccessionNumbers) {
-				if (accNum.equalsIgnoreCase(highlight)) {
-					accNums.append("<span class=\"highlight\">" + r.esc(accNum) + "</span>, ");
-				} else {
-					accNums.append(r.esc(accNum)).append(", ");
+		final Map<
+				Integer/*protein sequence id*/,
+				List<String>/* accession numbers for the protein sequence  */
+				>
+				accnumMap = searchDbDao.getAccessionNumbersMapForAnalysis(this);
 
+
+		final List<TableRow> tableRows = collectTableRows(allProteinGroups, totalColumns, accnumMap);
+		Collections.sort(tableRows);
+
+		final StringBuilder accNums = new StringBuilder(50);
+		final StringBuilder accNumsExtra = new StringBuilder(50);
+
+		for (final TableRow row : tableRows) {
+			accNums.setLength(0);
+			accNumsExtra.setLength(0);
+			boolean first = true;
+			boolean hi = false;
+			for (final String accNum : row.accnums) {
+				if (accNum.equalsIgnoreCase(highlight)) {
+					hi = true;
 				}
 			}
-			r.hCellRaw(accNums.substring(0, 2 <= accNums.length() ? accNums.length() - 2 : accNums.length()));
+			for (final String accNum : row.accnums) {
+				if (first) {
+					accNums.append(r.esc(accNum));
+				}
+				accNumsExtra.append(", ");
+				accNumsExtra.append(r.esc(accNum));
+				first = false;
+			}
 
+			String code;
+			if(accNumsExtra.length()>0) {
+				code = "<span title=\"" + accNumsExtra.substring(2) + "\">"
+						+ accNums.toString() + "</span>";
+			} else {
+				code = accNums.toString();
+			}
+
+			if (hi) {
+				r.hCellRaw(code, "highlight");
+			} else {
+				r.hCellRaw(code);
+			}
+
+			for (int i = 0; i < totalColumns; i++) {
+				if (row.spectra[i] > 0) {
+					r.cell(String.valueOf(row.spectra[i]), "data");
+				} else {
+					r.cell("");
+				}
+			}
+
+			r.nextRow();
+		}
+
+
+		r.endTable();
+	}
+
+	private List<TableRow> collectTableRows(final TreeMap<Integer, ProteinSequenceList> allProteinGroups, final int totalColumns, final Map<Integer, List<String>> accnumMap) {
+		final List<TableRow> tableRows = new ArrayList<TableRow>(allProteinGroups.size());
+
+		for (final ProteinSequenceList proteinSequences : allProteinGroups.values()) {
+			final TableRow row = new TableRow();
+			row.accnums = accnumMap.get(proteinSequences.getId());
+			Collections.sort(row.accnums, new AccnumComparator());
+			row.spectra = new int[totalColumns];
+			row.totalSpectra = 0;
+
+			int column = 0;
 			for (final BiologicalSample sample : getBiologicalSamples()) {
 				for (final SearchResult result : sample.getSearchResults()) {
 					ProteinGroup matchingGroup = null;
@@ -272,17 +327,66 @@ public final class Analysis extends PersistableBase {
 						}
 					}
 					if (matchingGroup != null) {
-						r.cell(String.valueOf(matchingGroup.getNumberOfTotalSpectra()));
+						final int spectra = matchingGroup.getNumberOfTotalSpectra();
+						row.spectra[column] = spectra;
+						row.totalSpectra += spectra;
 					} else {
-						r.cell("");
+						row.spectra[column] = 0;
 					}
+					column++;
 				}
 			}
 
-			r.nextRow();
+			tableRows.add(row);
 		}
+		return tableRows;
+	}
 
+	static int compare(final int a, final int b) {
+		return a < b ? -1 : a == b ? 0 : 1;
+	}
 
-		r.endTable();
+	/**
+	 * Rows compare this way: more spectra go before less spectra, if same spectra,
+	 * compare by the first column, if same, compare by first accession number
+	 */
+	static final class TableRow implements Comparable<TableRow> {
+		public List<String> accnums;
+		public int[] spectra;
+		public int totalSpectra;
+
+		@Override
+		public int compareTo(final TableRow o) {
+			if (this.totalSpectra == o.totalSpectra) {
+				if (this.spectra[0] == o.spectra[0]) {
+					final String s1 = this.accnums.get(0);
+					final String s2 = o.accnums.get(0);
+					return s1.compareTo(s2);
+				} else {
+					return compare(this.spectra[0], o.spectra[0]);
+				}
+			}
+			return compare(o.totalSpectra, this.totalSpectra);
+		}
+	}
+
+	private static class AccnumComparator implements Comparator<String> {
+		@Override
+		public int compare(String o1, String o2) {
+			String reverse1 = o1.startsWith("Rev") || o1.startsWith("Random") ? "b" : "a";
+			String reverse2 = o2.startsWith("Rev") || o2.startsWith("Random") ? "b" : "a";
+
+			String human1 = o1.contains("_HUMAN") ? "a" : "b";
+			String human2 = o2.contains("_HUMAN") ? "a" : "b";
+
+			int result = reverse1.compareTo(reverse2);
+			if (result == 0) {
+				result = human1.compareTo(human2);
+				if (result == 0) {
+					result = o1.compareTo(o2);
+				}
+			}
+			return result;
+		}
 	}
 }

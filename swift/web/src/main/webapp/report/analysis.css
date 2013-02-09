@@ -3,13 +3,26 @@ body, th, td {
 }
 
 table {
-    border-collapse: collapse
+    border-collapse: collapse;
 }
 
 table td, table th {
-    border: 1px solid black
+    border: 1px solid #bbb;
+    padding: 2px;
+}
+
+table th {
+    text-align: left;
+}
+
+table td {
+    text-align: center;
 }
 
 .highlight {
     background-color: #f9f500;
+}
+
+.data {
+    background-color: #ddffdd;
 }

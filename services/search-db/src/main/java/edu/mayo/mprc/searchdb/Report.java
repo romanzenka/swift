@@ -56,15 +56,20 @@ public class Report {
 	}
 
 	public Report cell(final String text) {
-		return cell(text, 1);
+		return cell(text, 1, null);
 	}
 
-	public Report cell(final String text, final int colspan) {
+	public Report cell(final String text, final String clazz) {
+		return cell(text, 1, clazz);
+	}
+
+	public Report cell(final String text, final int colspan, final String clazz) {
 		checkRow();
+		String classString = clazz==null ? "" : " class=\""+clazz+"\"";
 		if (colspan == 1) {
-			write("<td>");
+			write("<td"+classString+">");
 		} else {
-			write("<td colspan=\"" + colspan + "\">");
+			write("<td"+classString+" colspan=\"" + colspan + "\">");
 		}
 		if (Strings.isNullOrEmpty(text)) {
 			write("&nbsp;");
@@ -91,6 +96,12 @@ public class Report {
 	public Report hCellRaw(final String text) {
 		checkRow();
 		write("<th>" + text + "</th>\n");
+		return this;
+	}
+
+	public Report hCellRaw(final String text, final String clazz) {
+		checkRow();
+		write("<th class=\""+clazz+"\">" + text + "</th>\n");
 		return this;
 	}
 
