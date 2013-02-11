@@ -101,7 +101,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-site-plugin</artifactId>
-                    <version>3.1</version>
+                    <version>3.2</version>
                     <dependencies>
                         <dependency>
                             <groupId>org.apache.maven.wagon</groupId>
@@ -109,12 +109,6 @@
                             <version>1.0</version>
                         </dependency>
                     </dependencies>
-                </plugin>
-
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-project-info-reports-plugin</artifactId>
-                    <version>2.4</version>
                 </plugin>
             </plugins>
         </pluginManagement>
