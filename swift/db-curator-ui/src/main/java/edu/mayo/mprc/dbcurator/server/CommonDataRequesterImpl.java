@@ -168,47 +168,6 @@ public final class CommonDataRequesterImpl extends RemoteServiceServlet implemen
 	}
 
 	/**
-	 * Takes a CurationStub and returns a list of curations stubs that at least match the stub that was passed in.  So the properties
-	 * of the returned CurationStubs will be equal to the set properties in the passed in stub.
-	 *
-	 * @param toMatch the CurationStub that you want to find matches for
-	 * @return a list of matching CurationStubs
-	 */
-	public List<CurationStub> getMatches(final CurationStub toMatch) {
-		curationDao.begin();
-		try {
-			final List<CurationStub> list = this.getMatches(toMatch, null, null);
-			curationDao.commit();
-			return list;
-		} catch (Exception t) {
-			curationDao.rollback();
-			throw new MprcException(t);
-		}
-	}
-
-	/**
-	 * Does the same as the getMatches(CurationStub) but also allows bracketing of the run date property so only run dates
-	 * between certain dates will be returned.
-	 *
-	 * @param toMatch     the curationstub you want to match
-	 * @param earliestRun the earliest run date you want returned
-	 * @param latestRun   the latest run date you want returned
-	 * @return a list of CurationStubs that meet the criteria
-	 */
-	public List<CurationStub> getMatches(final CurationStub toMatch, final Date earliestRun, final Date latestRun) {
-		curationDao.begin();
-		try {
-			final CurationHandler handler = CurationHandler.getInstance(getThreadLocalRequest().getSession());
-			final List<CurationStub> curations = handler.getMatchingCurations(toMatch, earliestRun, latestRun);
-			curationDao.commit();
-			return curations;
-		} catch (Exception t) {
-			curationDao.rollback();
-			throw new MprcException(t);
-		}
-	}
-
-	/**
 	 * Runs a curation on the server.  This will execute a curation.  If you want to get the status of a curation call getStatus()
 	 *
 	 * @param toRun the curation you want to have run

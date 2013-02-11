@@ -9,13 +9,12 @@ import edu.mayo.mprc.dbcurator.model.HeaderTransform;
 import edu.mayo.mprc.dbcurator.model.SourceDatabaseArchive;
 import org.joda.time.DateTime;
 
-import java.util.Date;
 import java.util.List;
 
 public interface CurationDao extends Dao {
 	/**
 	 * gets a curation with the given ID.  This also loads all associated objects.
-	 *
+	 * <p/>
 	 * The curation will be returned even if it was previously deleted, as we go by ID.
 	 *
 	 * @param curationID the id of the curation that you want (this is probably too low of level for the public to use...
@@ -47,19 +46,9 @@ public interface CurationDao extends Dao {
 	HeaderTransform getHeaderTransformByName(String name);
 
 	/**
-	 * Gets a list of Curations that seems to match the given templateCuration.  If you passed a curation.  You can use this
-	 * as a query by example.
-	 * If you want all curations you can just pass in all null values.
-	 * <p/>
-	 * There is an optimization for queries returing all curations. If that is the case, a count(Curation) query is ran
-	 * against the database to figure out whether the amount of curations changed. If not, cached value is used.
-	 *
-	 * @param templateCuration the curation that has the properties that you want to match in the set of returned curations
-	 * @param earliestRunDate  the earliest run date you want returned or null if
-	 * @param latestRunDate    latest run date you want returned
-	 * @return the set of curations that have the same parameters as the curation passed in.
+	 * @return All curations.
 	 */
-	List<Curation> getMatchingCurations(Curation templateCuration, Date earliestRunDate, Date latestRunDate);
+	List<Curation> getAllCurations();
 
 	/**
 	 * Takes a name that was supplied and tries to find a Curation for it.
@@ -73,7 +62,6 @@ public interface CurationDao extends Dao {
 	/**
 	 * gets the curation by a short name
 	 *
-	 *
 	 * @param uniqueName the name that we can look up by
 	 * @return the curation with that short name
 	 */
@@ -83,6 +71,7 @@ public interface CurationDao extends Dao {
 	 * Just like {@link #getCurationByShortName(String)}, but if a curation cannot be found,
 	 * it looks through the list of the deleted curations of matching name, finds one that was deleted
 	 * the latest and returns that information. This is used for matching legacy data.
+	 *
 	 * @param uniqueName Name of the curation.
 	 * @return the curation with the short name, including potentially deleted ones. If none found, returns null.
 	 */

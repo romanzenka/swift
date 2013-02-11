@@ -8,7 +8,6 @@ import edu.mayo.mprc.dbcurator.model.HeaderTransform;
 import edu.mayo.mprc.dbcurator.model.SourceDatabaseArchive;
 import org.joda.time.DateTime;
 
-import java.util.Date;
 import java.util.List;
 
 public final class MockCurationDao implements CurationDao {
@@ -71,8 +70,8 @@ public final class MockCurationDao implements CurationDao {
 	}
 
 	@Override
-	public List<Curation> getMatchingCurations(final Curation templateCuration, final Date earliestRunDate, final Date latestRunDate) {
-		return null;
+	public List<Curation> getAllCurations() {
+		return null;  //To change body of implemented methods use File | Settings | File Templates.
 	}
 
 	@Override

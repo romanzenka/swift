@@ -62,21 +62,18 @@ public final class CurationDaoImpl extends DaoBase implements CurationDao {
 	}
 
 	@Override
-	public Curation getCurationByShortName(final String shortName) {
-		final Curation example = new Curation();
-		example.setShortName(shortName);
-		final List<Curation> matches = this.getMatchingCurations(example, null, null);
-		if (matches == null || matches.size() == 0) {
-			return null;
-		} else {
-			return matches.get(0);
+	public Curation getCurationByShortName(final String uniqueName) {
+		final List<Curation> curationsByShortname = getCurationsByShortname(uniqueName);
+		if(curationsByShortname!=null && !curationsByShortname.isEmpty()) {
+			return curationsByShortname.get(0);
 		}
+		return null;
 	}
 
 	@Override
 	public Curation getLegacyCuration(final String uniqueName) {
 		final Curation result = getCurationByShortName(uniqueName);
-		if(result!=null) {
+		if (result != null) {
 			return result;
 		}
 		// We failed. Let us look at all the deleted ones.
@@ -212,11 +209,8 @@ public final class CurationDaoImpl extends DaoBase implements CurationDao {
 	}
 
 	@Override
-	public List<Curation> getMatchingCurations(final Curation templateCuration, final Date earliestRunDate, final Date latestRunDate) {
-		if (templateCuration == null && earliestRunDate == null && latestRunDate == null) {
-			return allCurations();
-		}
-		return getMatchingCurationsFromDb(templateCuration, earliestRunDate, latestRunDate);
+	public List<Curation> getAllCurations() {
+		return allCurations();
 	}
 
 	/**

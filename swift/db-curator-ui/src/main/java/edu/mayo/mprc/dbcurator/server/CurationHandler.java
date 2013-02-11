@@ -14,7 +14,6 @@ import org.joda.time.format.DateTimeFormatter;
 import javax.servlet.http.HttpSession;
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 /**
@@ -429,43 +428,6 @@ public final class CurationHandler {
 		}
 
 		return stub;
-	}
-
-	/**
-	 * takes a curation stub with fields in it and returns an array of CurationStubs that match the given stubs and exist
-	 * in persistent store.  The fields that can be used in a search include.  * can be used as a wild card for any of these fields.
-	 * - owner email
-	 * - short name
-	 * - run date (within range)
-	 *
-	 * @param stub            the stub you want to at least match with returned stubs
-	 * @param earliestRunDate the earliest run date (inclusive) for curations you want returned (or null for unbounded)
-	 * @param latestRunDate   the latest run date (inclusive) for curations you want returned (or null for unbounded)
-	 * @return the matching curation stubs or null if there were no matches or if the sample was overly vague.
-	 */
-	public List<CurationStub> getMatchingCurations(final CurationStub stub, final Date earliestRunDate, final Date latestRunDate) {
-		//this.syncCuration(stub);
-		//Curation sample = this.getCachedCuration();
-		this.lastRunStatus = null;
-		final Curation sample = new Curation();
-		sample.setId(stub.getId());
-		sample.setNotes(null);
-
-
-		final List<Curation> matchingCurations = curationDao.getMatchingCurations(sample, earliestRunDate, latestRunDate);
-
-		if (matchingCurations == null || matchingCurations.size() == 0) {
-			return new ArrayList<CurationStub>();
-		}
-
-		final List<CurationStub> stubs = new ArrayList<CurationStub>();
-
-		for (final Curation curation : matchingCurations) {
-			stubs.add(this.createStub(curation));
-		}
-
-		this.lastRunStatus = null;
-		return stubs;
 	}
 
 	public CurationStub getCurationByID(final Integer id) {
