@@ -1,7 +1,6 @@
 package edu.mayo.mprc.swift.report;
 
 import edu.mayo.mprc.MprcException;
-import edu.mayo.mprc.ServletIntialization;
 import edu.mayo.mprc.daemon.DaemonConnection;
 import edu.mayo.mprc.daemon.files.FileTokenFactory;
 import edu.mayo.mprc.qstat.QstatOutput;
@@ -17,10 +16,10 @@ import edu.mayo.mprc.swift.search.SwiftSearcherCaller;
 import edu.mayo.mprc.utilities.progress.ProgressInfo;
 import edu.mayo.mprc.utilities.progress.ProgressListener;
 import org.apache.log4j.Logger;
+import org.springframework.web.HttpRequestHandler;
 
 import javax.servlet.ServletException;
 import javax.servlet.ServletOutputStream;
-import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -32,8 +31,7 @@ import java.util.List;
 
 // TODO: Ideally refactor into RESTful interface - would provide clean access to Swift
 
-public final class ReportUpdate extends HttpServlet {
-	private static final long serialVersionUID = 20071220L;
+public final class ReportUpdate implements HttpRequestHandler {
 	private static final String CONTENT_TYPE = "application/javascript; charset=utf-8";
 	private static final Logger LOGGER = Logger.getLogger(ReportUpdate.class);
 	private transient SwiftDao swiftDao;
@@ -44,20 +42,6 @@ public final class ReportUpdate extends HttpServlet {
 	 */
 	private static final int QSTAT_TIMEOUT = 30 * 1000;
 
-	public void init() throws ServletException {
-		if (ServletIntialization.initServletConfiguration(getServletConfig())) {
-			if (SwiftWebContext.getServletConfig() != null) {
-				swiftDao = SwiftWebContext.getServletConfig().getSwiftDao();
-				searchDbDao = SwiftWebContext.getServletConfig().getSearchDbDao();
-				fileTokenFactory = SwiftWebContext.getServletConfig().getFileTokenFactory();
-			}
-		}
-	}
-
-	protected void doPost(final HttpServletRequest req, final HttpServletResponse resp) throws ServletException {
-		this.doGet(req, resp);
-	}
-
 	private void printError(final PrintWriter output, final String message, final Throwable t) {
 		LOGGER.error(message, t);
 		output.println(message);
@@ -66,7 +50,8 @@ public final class ReportUpdate extends HttpServlet {
 		}
 	}
 
-	protected void doGet(final HttpServletRequest req, final HttpServletResponse resp) throws ServletException {
+	@Override
+	public void handleRequest(HttpServletRequest req, HttpServletResponse resp) throws ServletException {
 		resp.setHeader("Cache-Control", "no-cache");
 
 		// If there is a rerun parameter, we want to rerun the given search run, otherwise we produce data
@@ -316,6 +301,30 @@ public final class ReportUpdate extends HttpServlet {
 			out.processSearchRun(i, searchRun, runningTasks, reports, doInsert ? "insert" : "update");
 		}
 		out.setTimestamp(newTimestamp);
+	}
+
+	public SwiftDao getSwiftDao() {
+		return swiftDao;
+	}
+
+	public void setSwiftDao(SwiftDao swiftDao) {
+		this.swiftDao = swiftDao;
+	}
+
+	public SearchDbDao getSearchDbDao() {
+		return searchDbDao;
+	}
+
+	public void setSearchDbDao(SearchDbDao searchDbDao) {
+		this.searchDbDao = searchDbDao;
+	}
+
+	public FileTokenFactory getFileTokenFactory() {
+		return fileTokenFactory;
+	}
+
+	public void setFileTokenFactory(FileTokenFactory fileTokenFactory) {
+		this.fileTokenFactory = fileTokenFactory;
 	}
 
 	private static final class SgeStatusProgressListener implements ProgressListener {

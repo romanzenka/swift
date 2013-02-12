@@ -1,36 +1,30 @@
 package edu.mayo.mprc.swift.report;
 
 import edu.mayo.mprc.MprcException;
-import edu.mayo.mprc.ServletIntialization;
 import edu.mayo.mprc.swift.ReportUtils;
-import edu.mayo.mprc.swift.SwiftWebContext;
 import edu.mayo.mprc.swift.db.SearchRunFilter;
 import edu.mayo.mprc.swift.db.SwiftDao;
 import edu.mayo.mprc.swift.db.TimeReport;
 import edu.mayo.mprc.swift.dbmapping.SearchRun;
 import edu.mayo.mprc.swift.dbmapping.TaskData;
 import org.joda.time.DateTime;
+import org.springframework.web.HttpRequestHandler;
 
-import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.ServletOutputStream;
-import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.List;
 
-public final class TimeReportServlet extends HttpServlet {
-
-	private static final long serialVersionUID = 20110921L;
-
+public final class TimeReportServlet implements HttpRequestHandler {
 	private transient SwiftDao swiftDao;
 
 	public TimeReportServlet() {
 	}
 
 	@Override
-	protected void doGet(final HttpServletRequest req, final HttpServletResponse resp) throws ServletException, IOException {
+	public void handleRequest(final HttpServletRequest req, final HttpServletResponse resp) throws ServletException, IOException {
 		final SearchRunFilter filter;
 		final boolean screen;
 		try {
@@ -98,23 +92,11 @@ public final class TimeReportServlet extends HttpServlet {
 		}
 	}
 
-	@Override
-	protected void doPost
-			(final HttpServletRequest
-					 req, final HttpServletResponse
-					resp) throws ServletException, IOException {
-		doGet(req, resp);
+	public SwiftDao getSwiftDao() {
+		return swiftDao;
 	}
 
-	@Override
-	public void init
-			(final ServletConfig
-					 config) throws ServletException {
-		super.init(config);
-		if (ServletIntialization.initServletConfiguration(config)) {
-			if (SwiftWebContext.getServletConfig() != null) {
-				swiftDao = SwiftWebContext.getServletConfig().getSwiftDao();
-			}
-		}
+	public void setSwiftDao(SwiftDao swiftDao) {
+		this.swiftDao = swiftDao;
 	}
 }

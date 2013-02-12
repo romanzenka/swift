@@ -6,9 +6,8 @@ import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
+import org.springframework.web.HttpRequestHandler;
 
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.File;
@@ -21,16 +20,14 @@ import java.util.List;
 /**
  * @author Eric Winter
  */
-public final class FASTAFileUploadServlet extends HttpServlet {
-	private static final long serialVersionUID = 20071220L;
-
+public final class FASTAFileUploadServlet implements HttpRequestHandler {
 	protected static final int MAX_FILE_SIZE = 1000000000;
 
 	private File getUploadFolder() {
 		return CurationWebContext.getFastaUploadFolder();
 	}
 
-	public void service(final HttpServletRequest request, final HttpServletResponse response) throws ServletException, IOException {
+	public void handleRequest(final HttpServletRequest request, final HttpServletResponse response) throws IOException {
 
 		response.setContentType("text/html;charset=UTF-8");
 

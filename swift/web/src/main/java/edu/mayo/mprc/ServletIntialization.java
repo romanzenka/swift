@@ -1,5 +1,6 @@
 package edu.mayo.mprc;
 
+import edu.mayo.mprc.swift.Swift;
 import edu.mayo.mprc.swift.SwiftWebContext;
 import edu.mayo.mprc.utilities.FileUtilities;
 import org.apache.log4j.Logger;
@@ -18,7 +19,7 @@ public final class ServletIntialization {
 	private static volatile boolean wasInitialized = false;
 	private static final String SWIFT_INSTALL = "SWIFT_INSTALL";
 	private static final String SWIFT_HOME = "SWIFT_HOME";
-	private static final String SWIFT_CONF_RELATIVE_PATH = "conf/swift.xml";
+	private static final String SWIFT_CONF_RELATIVE_PATH = Swift.CONFIG_FILE_NAME;
 
 	private ServletIntialization() {
 	}

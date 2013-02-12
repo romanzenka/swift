@@ -1,9 +1,9 @@
 package edu.mayo.mprc.dbcurator.server;
 
-import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 import edu.mayo.mprc.GWTServiceExceptionFactory;
 import edu.mayo.mprc.MprcException;
 import edu.mayo.mprc.common.client.GWTServiceException;
+import edu.mayo.mprc.common.server.SpringGwtServlet;
 import edu.mayo.mprc.dbcurator.client.curatorstubs.CurationStub;
 import edu.mayo.mprc.dbcurator.client.curatorstubs.HeaderTransformStub;
 import edu.mayo.mprc.dbcurator.client.services.CommonDataRequester;
@@ -23,12 +23,12 @@ import java.util.regex.PatternSyntaxException;
 /**
  * @author Eric Winter
  */
-public final class CommonDataRequesterImpl extends RemoteServiceServlet implements CommonDataRequester {
+public final class CommonDataRequesterImpl extends SpringGwtServlet implements CommonDataRequester {
 	private static final long serialVersionUID = 20071220L;
 
 	private static final Logger LOGGER = Logger.getLogger(CommonDataRequesterImpl.class);
 
-	private static CurationDao curationDao = CurationWebContext.getCurationDAO();
+	private CurationDao curationDao;
 
 	public CommonDataRequesterImpl() {
 	}
@@ -98,7 +98,7 @@ public final class CommonDataRequesterImpl extends RemoteServiceServlet implemen
 		}
 	}
 
-	private static Boolean isShortnameUniqueBody(final String toCheck) {
+	private Boolean isShortnameUniqueBody(final String toCheck) {
 		return (0 == curationDao.getCurationsByShortname(toCheck, /*ignoreCase*/true).size());
 	}
 
@@ -376,5 +376,13 @@ public final class CommonDataRequesterImpl extends RemoteServiceServlet implemen
 			this.getThreadLocalRequest().getSession().setAttribute("FileLineMap", positionMap);
 		}
 		return positionMap;
+	}
+
+	public CurationDao getCurationDao() {
+		return curationDao;
+	}
+
+	public void setCurationDao(CurationDao curationDao) {
+		this.curationDao = curationDao;
 	}
 }

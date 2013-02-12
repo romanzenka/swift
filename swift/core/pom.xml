@@ -16,19 +16,7 @@
     <dependencies>
         <dependency>
             <groupId>edu.mayo.mprc</groupId>
-            <artifactId>daemon</artifactId>
-            <version>3.0-SNAPSHOT</version>
-        </dependency>
-
-        <dependency>
-            <groupId>edu.mayo.mprc</groupId>
             <artifactId>sge</artifactId>
-            <version>3.0-SNAPSHOT</version>
-        </dependency>
-
-        <dependency>
-            <groupId>edu.mayo.mprc</groupId>
-            <artifactId>config</artifactId>
             <version>3.0-SNAPSHOT</version>
         </dependency>
 
@@ -42,36 +30,6 @@
         <dependency>
             <groupId>edu.mayo.mprc</groupId>
             <artifactId>commandline</artifactId>
-            <version>3.0-SNAPSHOT</version>
-        </dependency>
-
-        <dependency>
-            <groupId>edu.mayo.mprc</groupId>
-            <artifactId>workflow-engine</artifactId>
-            <version>3.0-SNAPSHOT</version>
-        </dependency>
-
-        <dependency>
-            <groupId>edu.mayo.mprc</groupId>
-            <artifactId>scafml</artifactId>
-            <version>3.0-SNAPSHOT</version>
-        </dependency>
-
-        <dependency>
-            <groupId>edu.mayo.mprc</groupId>
-            <artifactId>database</artifactId>
-            <version>3.0-SNAPSHOT</version>
-        </dependency>
-
-        <dependency>
-            <groupId>edu.mayo.mprc</groupId>
-            <artifactId>db-curator</artifactId>
-            <version>3.0-SNAPSHOT</version>
-        </dependency>
-
-        <dependency>
-            <groupId>edu.mayo.mprc</groupId>
-            <artifactId>params</artifactId>
             <version>3.0-SNAPSHOT</version>
         </dependency>
 
@@ -91,17 +49,6 @@
             <groupId>edu.mayo.mprc</groupId>
             <artifactId>swift-search</artifactId>
             <version>3.0-SNAPSHOT</version>
-        </dependency>
-
-        <dependency>
-            <groupId>edu.mayo.mprc</groupId>
-            <artifactId>search-db</artifactId>
-            <version>3.0-SNAPSHOT</version>
-        </dependency>
-
-        <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring</artifactId>
         </dependency>
 
         <!-- Database drivers bundled in -->

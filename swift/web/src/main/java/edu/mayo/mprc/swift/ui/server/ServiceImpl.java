@@ -1,10 +1,10 @@
 package edu.mayo.mprc.swift.ui.server;
 
-import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 import edu.mayo.mprc.GWTServiceExceptionFactory;
 import edu.mayo.mprc.MprcException;
 import edu.mayo.mprc.ServletIntialization;
 import edu.mayo.mprc.common.client.GWTServiceException;
+import edu.mayo.mprc.common.server.SpringGwtServlet;
 import edu.mayo.mprc.daemon.DaemonConnection;
 import edu.mayo.mprc.database.Change;
 import edu.mayo.mprc.dbcurator.model.Curation;
@@ -12,7 +12,9 @@ import edu.mayo.mprc.dbcurator.model.persistence.CurationDao;
 import edu.mayo.mprc.dbundeploy.DatabaseUndeployerCaller;
 import edu.mayo.mprc.dbundeploy.DatabaseUndeployerProgress;
 import edu.mayo.mprc.msmseval.MSMSEvalParamFile;
-import edu.mayo.mprc.swift.SwiftWebContext;
+import edu.mayo.mprc.swift.MainFactoryContext;
+import edu.mayo.mprc.swift.WebUi;
+import edu.mayo.mprc.swift.WebUiHolder;
 import edu.mayo.mprc.swift.db.SearchEngine;
 import edu.mayo.mprc.swift.db.SwiftDao;
 import edu.mayo.mprc.swift.dbmapping.SearchRun;
@@ -27,12 +29,16 @@ import edu.mayo.mprc.swift.search.SwiftSearcherCaller;
 import edu.mayo.mprc.swift.ui.client.Service;
 import edu.mayo.mprc.swift.ui.client.rpc.*;
 import edu.mayo.mprc.swift.ui.client.rpc.files.*;
+import edu.mayo.mprc.unimod.UnimodDao;
 import edu.mayo.mprc.utilities.NotHiddenFilter;
 import edu.mayo.mprc.utilities.exceptions.ExceptionUtilities;
 import edu.mayo.mprc.workspace.User;
 import edu.mayo.mprc.workspace.WorkspaceDao;
 import org.apache.log4j.Logger;
 import org.joda.time.DateTime;
+import org.springframework.beans.BeansException;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
 
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
@@ -50,7 +56,7 @@ import java.util.regex.Pattern;
  * Supports the concept of "expanded paths" - those paths are recursed and returned fully,
  * otherwise the result of a single call lists just contents of a single directory without recursion.
  */
-public final class ServiceImpl extends RemoteServiceServlet implements Service {
+public final class ServiceImpl extends SpringGwtServlet implements Service, ApplicationContextAware {
 	private static final long serialVersionUID = 20071220L;
 	private static final Logger LOGGER = Logger.getLogger(ServiceImpl.class);
 
@@ -64,15 +70,18 @@ public final class ServiceImpl extends RemoteServiceServlet implements Service {
 	private static final ClientUser[] EMPTY_USER_LIST = new ClientUser[0];
 	private static final Pattern BAD_TITLE_CHARACTER = Pattern.compile("[^a-zA-Z0-9-+._()[\\\\]{}=# ]");
 
+	private WebUiHolder webUiHolder;
+
+	private Collection<SearchEngine> searchEngines;
+	private SwiftDao swiftDao;
+	private CurationDao curationDao;
+	private ParamsDao paramsDao;
+	private ParamsInfo paramsInfo;
+	private UnimodDao unimodDao;
+	private WorkspaceDao workspaceDao;
+
 	public ServiceImpl() {
 	}
-
-	@Override
-	public void init(final ServletConfig config) throws ServletException {
-		super.init(config);
-		ServletIntialization.initServletConfiguration(config);
-	}
-
 
 	public Entry listFiles(final String relativePath, final String[] expandedPaths) throws GWTServiceException {
 		try {
@@ -168,7 +177,7 @@ public final class ServiceImpl extends RemoteServiceServlet implements Service {
 			getSwiftDao().commit(); // We must commit here before we send the search over (it is loaded from the database)
 			final SwiftSearcherCaller.SearchProgressListener listener =
 					SwiftSearcherCaller.startSearch(
-							searchId, batchName, def.isFromScratch(), def.isLowPriority()?-1:0,
+							searchId, batchName, def.isFromScratch(), def.isLowPriority() ? -1 : 0,
 							previousSearchRunId, getSwiftSearcherDaemonConnection());
 			listener.waitForSearchReady(SEARCH_TIMEOUT);
 			if (listener.getException() != null) {
@@ -207,7 +216,7 @@ public final class ServiceImpl extends RemoteServiceServlet implements Service {
 	public List<ClientSearchEngine> listSearchEngines() throws GWTServiceException {
 		final List<ClientSearchEngine> infos = new ArrayList<ClientSearchEngine>();
 		for (final SearchEngine engine : getSearchEngines()) {
-				if (engine.isEnabled()) {
+			if (engine.isEnabled()) {
 				infos.add(new ClientSearchEngine(engine.getCode(), engine.getFriendlyName(), engine.isOnByDefault()));
 			}
 		}
@@ -217,8 +226,8 @@ public final class ServiceImpl extends RemoteServiceServlet implements Service {
 	public List<SpectrumQaParamFileInfo> listSpectrumQaParamFiles() throws GWTServiceException {
 
 		final List<SpectrumQaParamFileInfo> paramFiles = new ArrayList<SpectrumQaParamFileInfo>();
-		if (SwiftWebContext.getServletConfig().isMsmsEval()) {
-			for (final MSMSEvalParamFile paramFile : SwiftWebContext.getServletConfig().getSpectrumQaParamFiles()) {
+		if (isMsmsEval()) {
+			for (final MSMSEvalParamFile paramFile : getSpectrumQaParamFiles()) {
 				paramFiles.add(new SpectrumQaParamFileInfo(paramFile.getPath(), paramFile.getDescription()));
 			}
 		}
@@ -226,11 +235,7 @@ public final class ServiceImpl extends RemoteServiceServlet implements Service {
 	}
 
 	public boolean isScaffoldReportEnabled() throws GWTServiceException {
-		return SwiftWebContext.getServletConfig().isScaffoldReport();
-	}
-
-	public boolean isQaEnabled() throws GWTServiceException {
-		return SwiftWebContext.getServletConfig().isQa();
+		return isScaffoldReport();
 	}
 
 	public String getUserMessage() throws GWTServiceException {
@@ -581,7 +586,7 @@ public final class ServiceImpl extends RemoteServiceServlet implements Service {
 
 	@Override
 	public boolean isDatabaseUndeployerEnabled() throws GWTServiceException {
-		return SwiftWebContext.getServletConfig().isDatabaseUndeployerEnabled();
+		return getWebUi().isDatabaseUndeployerEnabled();
 	}
 
 	/**
@@ -600,44 +605,111 @@ public final class ServiceImpl extends RemoteServiceServlet implements Service {
 		return new ClientDatabaseUndeployerProgress(progressMessage.getDatabaseUndeployerTaskId(), progressMessage.getProgressMessage(), progressMessage.isLast());
 	}
 
+	public WebUiHolder getWebUiHolder() {
+		return webUiHolder;
+	}
+
+	public void setWebUiHolder(WebUiHolder webUiHolder) {
+		this.webUiHolder = webUiHolder;
+	}
+
+	public WebUi getWebUi() {
+		return webUiHolder.getWebUi();
+	}
+
+	public void setSearchEngines(Collection<SearchEngine> searchEngines) {
+		this.searchEngines = searchEngines;
+	}
+
 	public Collection<SearchEngine> getSearchEngines() {
-		return new ArrayList<SearchEngine>(SwiftWebContext.getServletConfig().getSearchEngines());
+		return searchEngines;
 	}
 
 	public File getBrowseRoot() {
-		return SwiftWebContext.getServletConfig().getBrowseRoot();
+		return getWebUi().getBrowseRoot();
 	}
 
 	public DaemonConnection getSwiftSearcherDaemonConnection() {
-		return SwiftWebContext.getServletConfig().getSwiftSearcherDaemonConnection();
+		return getWebUi().getSwiftSearcherDaemonConnection();
+	}
+
+	public void setSwiftDao(SwiftDao swiftDao) {
+		this.swiftDao = swiftDao;
 	}
 
 	public SwiftDao getSwiftDao() {
-		return SwiftWebContext.getServletConfig().getSwiftDao();
+		return swiftDao;
+	}
+
+	public void setWorkspaceDao(WorkspaceDao workspaceDao) {
+		this.workspaceDao = workspaceDao;
 	}
 
 	public WorkspaceDao getWorkspaceDao() {
-		return SwiftWebContext.getServletConfig().getWorkspaceDao();
+		return workspaceDao;
+	}
+
+	public void setCurationDao(CurationDao curationDao) {
+		this.curationDao = curationDao;
 	}
 
 	public CurationDao getCurationDao() {
-		return SwiftWebContext.getServletConfig().getCurationDao();
+		return curationDao;
+	}
+
+	public void setParamsDao(ParamsDao paramsDao) {
+		this.paramsDao = paramsDao;
 	}
 
 	public ParamsDao getParamsDao() {
-		return SwiftWebContext.getServletConfig().getParamsDao();
+		return paramsDao;
+	}
+
+	public void setParamsInfo(ParamsInfo paramsInfo) {
+		this.paramsInfo = paramsInfo;
 	}
 
 	public ParamsInfo getParamsInfo() {
-		return SwiftWebContext.getServletConfig().getParamsInfo();
+		return paramsInfo;
 	}
 
 	public DaemonConnection getDatabaseUndeployerDaemonConnection() {
-		return SwiftWebContext.getServletConfig().getDatabaseUndeployerDaemonConnection();
+		return getWebUi().getDatabaseUndeployerDaemonConnection();
 	}
 
 	public ClientProxyGenerator getClientProxyGenerator() {
-		return new ClientProxyGenerator(SwiftWebContext.getServletConfig().getUnimodDao(), getWorkspaceDao(), getSwiftDao(), getBrowseRoot());
+		return new ClientProxyGenerator(getUnimodDao(), getWorkspaceDao(), getSwiftDao(), getBrowseRoot());
+	}
+
+	public List<MSMSEvalParamFile> getSpectrumQaParamFiles() {
+		return getWebUi().getSpectrumQaParamFiles();
+	}
+
+	public boolean isMsmsEval() {
+		return getWebUi().isMsmsEval();
+	}
+
+	public boolean isScaffoldReport() {
+		return getWebUi().isScaffoldReport();
+	}
+
+	public void setUnimodDao(UnimodDao unimodDao) {
+		this.unimodDao = unimodDao;
+	}
+
+	public UnimodDao getUnimodDao() {
+		return unimodDao;
+	}
+
+	@Override
+	public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+		MainFactoryContext.setContext(applicationContext);
+	}
+
+	@Override
+	public void init(ServletConfig config) throws ServletException {
+		super.init(config);
+		ServletIntialization.initServletConfiguration(config);
 	}
 
 	private class Resolver implements ClientParamSetResolver {

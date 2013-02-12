@@ -21,6 +21,10 @@ public final class MainFactoryContext {
 		return context;
 	}
 
+	public static synchronized void setContext(final ApplicationContext c) {
+		context = c;
+	}
+
 	/**
 	 * Initialize the context.
 	 */
@@ -58,5 +62,9 @@ public final class MainFactoryContext {
 
 	public static SwiftEnvironment getSwiftEnvironment() {
 		return (SwiftEnvironment) getBean("swiftEnvironment");
+	}
+
+	public static WebUiHolder getWebUiHolder() {
+		return (WebUiHolder)getBean("webUiHolder");
 	}
 }

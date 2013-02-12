@@ -30,6 +30,12 @@
             <artifactId>testng</artifactId>
             <classifier>jdk15</classifier>
         </dependency>
+
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-web</artifactId>
+        </dependency>
+
         <!-- Log4j dependency -->
         <dependency>
             <artifactId>log4j</artifactId>

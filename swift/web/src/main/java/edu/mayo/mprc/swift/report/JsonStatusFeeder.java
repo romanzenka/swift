@@ -1,15 +1,13 @@
 package edu.mayo.mprc.swift.report;
 
 import edu.mayo.mprc.MprcException;
-import edu.mayo.mprc.ServletIntialization;
-import edu.mayo.mprc.swift.SwiftWebContext;
 import edu.mayo.mprc.swift.db.SearchRunFilter;
 import edu.mayo.mprc.swift.db.SwiftDao;
 import edu.mayo.mprc.swift.dbmapping.SearchRun;
 import edu.mayo.mprc.utilities.FileUtilities;
+import org.springframework.web.HttpRequestHandler;
 
 import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.PrintWriter;
@@ -18,34 +16,20 @@ import java.util.List;
 /**
  * Provides status of several last searches in JSON format, including the task information.
  */
-public class JsonStatusFeeder extends HttpServlet {
-	private static final long serialVersionUID = 20101215L;
-
+public class JsonStatusFeeder implements HttpRequestHandler {
 	private SwiftDao swiftDao;
 	private static final int TYPICAL_RESPONSE_SIZE = 1024;
 
-	public void init() throws ServletException {
-		if (ServletIntialization.initServletConfiguration(getServletConfig())) {
-			if (SwiftWebContext.getServletConfig() != null) {
-				swiftDao = SwiftWebContext.getServletConfig().getSwiftDao();
-			}
-		}
+	public SwiftDao getSwiftDao() {
+		return swiftDao;
+	}
+
+	public void setSwiftDao(SwiftDao swiftDao) {
+		this.swiftDao = swiftDao;
 	}
 
 	@Override
-	public void destroy() {
-		super.destroy();
-		ServletIntialization.destroy();
-	}
-
-	protected void doPost(final HttpServletRequest req, final HttpServletResponse resp) throws ServletException {
-		this.doGet(req, resp);
-	}
-
-
-	@Override
-	protected void doGet(final HttpServletRequest req, final HttpServletResponse resp) throws ServletException {
-
+	public void handleRequest(HttpServletRequest req, HttpServletResponse resp) throws ServletException {
 		PrintWriter out = null;
 		try {
 

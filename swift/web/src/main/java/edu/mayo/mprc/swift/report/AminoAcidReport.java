@@ -3,9 +3,8 @@ package edu.mayo.mprc.swift.report;
 import com.google.common.base.Charsets;
 import edu.mayo.mprc.chem.AminoAcidSet;
 import edu.mayo.mprc.utilities.FileUtilities;
+import org.springframework.web.HttpRequestHandler;
 
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -16,11 +15,11 @@ import java.io.OutputStreamWriter;
  *
  * @author Roman Zenka
  */
-public final class AminoAcidReport extends HttpServlet {
-	private static final long serialVersionUID = 6164359787369648483L;
+public final class AminoAcidReport implements HttpRequestHandler {
+	private AminoAcidSet aminoAcidSet;
 
 	@Override
-	protected void doGet(final HttpServletRequest req, final HttpServletResponse resp) throws ServletException, IOException {
+	public void handleRequest(final HttpServletRequest req, final HttpServletResponse resp) throws IOException {
 		resp.setContentType("text/html");
 		OutputStreamWriter writer = null;
 		try {
@@ -32,10 +31,18 @@ public final class AminoAcidReport extends HttpServlet {
 					"</style>" +
 					"</head><body>");
 			writer.write("<h1>Amino acids defined in Swift</h1>");
-			writer.write(AminoAcidSet.DEFAULT.report());
+			writer.write(aminoAcidSet.report());
 			writer.write("</body></html>");
 		} finally {
 			FileUtilities.closeQuietly(writer);
 		}
+	}
+
+	public AminoAcidSet getAminoAcidSet() {
+		return aminoAcidSet;
+	}
+
+	public void setAminoAcidSet(AminoAcidSet aminoAcidSet) {
+		this.aminoAcidSet = aminoAcidSet;
 	}
 }

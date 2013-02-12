@@ -1,18 +1,14 @@
 package edu.mayo.mprc.swift.benchmark;
 
 import edu.mayo.mprc.MprcException;
-import edu.mayo.mprc.ServletIntialization;
 import edu.mayo.mprc.common.client.StringUtilities;
-import edu.mayo.mprc.swift.SwiftWebContext;
 import edu.mayo.mprc.swift.db.SwiftDao;
 import edu.mayo.mprc.swift.dbmapping.TaskData;
 import edu.mayo.mprc.utilities.FileUtilities;
 import edu.mayo.mprc.workflow.persistence.TaskState;
+import org.springframework.web.HttpRequestHandler;
 
-import javax.servlet.ServletConfig;
-import javax.servlet.ServletException;
 import javax.servlet.ServletOutputStream;
-import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -21,26 +17,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public final class Benchmark extends HttpServlet {
-
-	private static final long serialVersionUID = -7751412622582020119L;
+public final class Benchmark implements HttpRequestHandler {
 	private transient SwiftDao swiftDao;
 
 	public Benchmark() {
 	}
 
 	@Override
-	public void init(final ServletConfig config) throws ServletException {
-		super.init(config);
-		if (ServletIntialization.initServletConfiguration(getServletConfig())) {
-			if (SwiftWebContext.getServletConfig() != null) {
-				swiftDao = SwiftWebContext.getServletConfig().getSwiftDao();
-			}
-		}
-	}
-
-	@Override
-	protected void doGet(final HttpServletRequest req, final HttpServletResponse resp) throws ServletException, IOException {
+	public void handleRequest(final HttpServletRequest req, final HttpServletResponse resp) {
 		final String idString = req.getParameter("id");
 		final int searchId = Integer.parseInt(idString);
 		if (idString != null) {
@@ -152,5 +136,13 @@ public final class Benchmark extends HttpServlet {
 			value = String.valueOf((data.getEndTimestamp().getTime() - data.getStartTimestamp().getTime()) / 1000.0);
 		}
 		return value;
+	}
+
+	public SwiftDao getSwiftDao() {
+		return swiftDao;
+	}
+
+	public void setSwiftDao(SwiftDao swiftDao) {
+		this.swiftDao = swiftDao;
 	}
 }

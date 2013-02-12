@@ -2,22 +2,18 @@ package edu.mayo.mprc.swift.report;
 
 import com.sun.syndication.feed.synd.*;
 import com.sun.syndication.io.SyndFeedOutput;
-import edu.mayo.mprc.ServletIntialization;
-import edu.mayo.mprc.swift.SwiftWebContext;
 import edu.mayo.mprc.swift.db.SwiftDao;
 import edu.mayo.mprc.swift.dbmapping.SearchRun;
 import org.apache.log4j.Logger;
+import org.springframework.web.HttpRequestHandler;
 
 import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpUtils;
 import java.util.*;
 
-public final class RssStatusFeeder extends HttpServlet {
-	private static final long serialVersionUID = 20071220L;
-
+public final class RssStatusFeeder implements HttpRequestHandler {
 	private static final Logger LOGGER = Logger.getLogger(RssStatusFeeder.class);
 	/**
 	 * will not contain entries older than 96 hours
@@ -37,10 +33,12 @@ public final class RssStatusFeeder extends HttpServlet {
 	 */
 	private static transient volatile Map<String, SyndFeed> cachedFeeds = null;
 
-	public void init() throws ServletException {
-		if (ServletIntialization.initServletConfiguration(getServletConfig())) {
-			swiftDao = SwiftWebContext.getServletConfig().getSwiftDao();
-		}
+	public SwiftDao getSwiftDao() {
+		return swiftDao;
+	}
+
+	public void setSwiftDao(SwiftDao swiftDao) {
+		this.swiftDao = swiftDao;
 	}
 
 	private static SyndFeed getCachedFeed(final String id) {
@@ -60,11 +58,8 @@ public final class RssStatusFeeder extends HttpServlet {
 		return cachedFeed;
 	}
 
-	protected void doPost(final HttpServletRequest req, final HttpServletResponse resp) throws ServletException {
-		this.doGet(req, resp);
-	}
-
-	protected void doGet(final HttpServletRequest req, final HttpServletResponse resp) throws ServletException {
+	@Override
+	public void handleRequest(HttpServletRequest req, HttpServletResponse resp) throws ServletException {
 		swiftDao.begin(); // Transaction-per-request
 		try {
 			Boolean showSuccess = true;

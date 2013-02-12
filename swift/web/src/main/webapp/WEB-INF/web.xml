@@ -4,69 +4,79 @@
 
 <web-app>
     <display-name>Swift</display-name>
+    
+    <context-param>
+        <param-name>contextConfigLocation</param-name>
+        <param-value>/WEB-INF/applicationContext.xml</param-value>
+    </context-param>
+    
+    <listener>
+        <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
+    </listener>
+    
     <servlet>
         <servlet-name>SwiftAppService</servlet-name>
-        <servlet-class>edu.mayo.mprc.swift.ui.server.ServiceImpl</servlet-class>
-        <load-on-startup>1</load-on-startup>
+        <servlet-class>org.springframework.web.context.support.HttpRequestHandlerServlet</servlet-class>
+        <load-on-startup>0</load-on-startup>
     </servlet>
     <servlet>
         <servlet-name>ReportUpdate</servlet-name>
-        <servlet-class>edu.mayo.mprc.swift.report.ReportUpdate</servlet-class>
+        <servlet-class>org.springframework.web.context.support.HttpRequestHandlerServlet</servlet-class>
         <load-on-startup>2</load-on-startup>
     </servlet>
     <servlet>
         <servlet-name>ConfigurationService</servlet-name>
-        <servlet-class>edu.mayo.mprc.swift.configuration.server.ConfigurationServiceImpl</servlet-class>
+        <servlet-class>org.springframework.web.context.support.HttpRequestHandlerServlet</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>FileUploadServlet</servlet-name>
-        <servlet-class>edu.mayo.mprc.dbcurator.server.FASTAFileUploadServlet</servlet-class>
+        <servlet-class>org.springframework.web.context.support.HttpRequestHandlerServlet</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>CommonDataRequester</servlet-name>
-        <servlet-class>edu.mayo.mprc.dbcurator.server.CommonDataRequesterImpl</servlet-class>
+        <servlet-class>org.springframework.web.context.support.HttpRequestHandlerServlet</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>Feed</servlet-name>
-        <servlet-class>edu.mayo.mprc.swift.report.RssStatusFeeder</servlet-class>
+        <servlet-class>org.springframework.web.context.support.HttpRequestHandlerServlet</servlet-class>
         <load-on-startup>0</load-on-startup>
     </servlet>
     <servlet>
         <servlet-name>Status</servlet-name>
-        <servlet-class>edu.mayo.mprc.swift.report.JsonStatusFeeder</servlet-class>
+        <servlet-class>org.springframework.web.context.support.HttpRequestHandlerServlet</servlet-class>
         <load-on-startup>0</load-on-startup>
     </servlet>
     <servlet>
         <servlet-name>DirectoryService</servlet-name>
-        <servlet-class>edu.mayo.mprc.swift.ui.server.FileDirectoryServiceServlet</servlet-class>
+        <servlet-class>org.springframework.web.context.support.HttpRequestHandlerServlet</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>TimeReport</servlet-name>
-        <servlet-class>edu.mayo.mprc.swift.report.TimeReportServlet</servlet-class>
+        <servlet-class>org.springframework.web.context.support.HttpRequestHandlerServlet</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>Benchmark</servlet-name>
-        <servlet-class>edu.mayo.mprc.swift.benchmark.Benchmark</servlet-class>
+        <servlet-class>org.springframework.web.context.support.HttpRequestHandlerServlet</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>AminoAcidReport</servlet-name>
-        <servlet-class>edu.mayo.mprc.swift.report.AminoAcidReport</servlet-class>
+        <servlet-class>org.springframework.web.context.support.HttpRequestHandlerServlet</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>ModificationReport</servlet-name>
-        <servlet-class>edu.mayo.mprc.swift.report.ModificationReport</servlet-class>
+        <servlet-class>org.springframework.web.context.support.HttpRequestHandlerServlet</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>AnalysisReport</servlet-name>
-        <servlet-class>edu.mayo.mprc.swift.report.AnalysisReport</servlet-class>
+        <servlet-class>org.springframework.web.context.support.HttpRequestHandlerServlet</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>FindProtein</servlet-name>
-        <servlet-class>edu.mayo.mprc.swift.report.FindProtein</servlet-class>
+        <servlet-class>org.springframework.web.context.support.HttpRequestHandlerServlet</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>SampleReport</servlet-name>
-        <servlet-class>edu.mayo.mprc.swift.report.SampleReport</servlet-class>
+        <servlet-class>org.springframework.web.context.support.HttpRequestHandlerServlet</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>Extras</servlet-name>
@@ -74,6 +84,7 @@
         <description>Extra Swift features</description>
         <jsp-file>/extras.jsp</jsp-file>
     </servlet>
+
     <!--inserted manually -->
     <servlet-mapping>
         <servlet-name>SwiftAppService</servlet-name>

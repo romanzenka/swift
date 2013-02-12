@@ -1,41 +1,26 @@
 package edu.mayo.mprc.swift.ui.server;
 
 import edu.mayo.mprc.MprcException;
-import edu.mayo.mprc.swift.SwiftWebContext;
+import edu.mayo.mprc.swift.WebUiHolder;
 import org.apache.log4j.Logger;
+import org.springframework.web.HttpRequestHandler;
 
-import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 
-public final class FileDirectoryServiceServlet extends HttpServlet {
+public final class FileDirectoryServiceServlet implements HttpRequestHandler {
 	private static final Logger LOGGER = Logger.getLogger(FileDirectoryServiceServlet.class);
 
-	private File basePath;
-	private static final long serialVersionUID = 1557269803152490571L;
+	private WebUiHolder webUiHolder;
 	public static final String DIRECTORY_PATH_ATTRIBUTE_NAME = "d";
 	public static final String EXPANDED_PATHS_ATTRIBUTE_NAME = "e";
 
 	@Override
-	public void init(final ServletConfig config) throws ServletException {
-		super.init();
-		try {
-			basePath = SwiftWebContext.getServletConfig().getBrowseRoot();
-		} catch (Exception t) {
-			throw new ServletException("Failed to initialize " + this.getClass().getSimpleName() + " - cannot retrieve base path", t);
-		}
-		if (basePath == null) {
-			throw new ServletException("No base-path specified");
-		}
-	}
-
-	@Override
-	public void doGet(final HttpServletRequest req, final HttpServletResponse resp) throws
+	public void handleRequest(final HttpServletRequest req, final HttpServletResponse resp) throws
 			ServletException, IOException {
 
 		resp.setContentType("text/xml");
@@ -55,7 +40,7 @@ public final class FileDirectoryServiceServlet extends HttpServlet {
 				expanded_paths = "";
 			}
 
-			final FileSearchBean fileBean = new FileSearchBean(basePath.getAbsolutePath());
+			final FileSearchBean fileBean = new FileSearchBean(getBaseFolder().getAbsolutePath());
 			fileBean.setPath(fixFileSeparators(directory_path));
 			fileBean.setExpandedPaths(expanded_paths);
 			fileBean.writeFolderContent(out);
@@ -68,11 +53,16 @@ public final class FileDirectoryServiceServlet extends HttpServlet {
 		}
 	}  // end doGet
 
+	public WebUiHolder getWebUiHolder() {
+		return webUiHolder;
+	}
 
-	@Override
-	public void doPost(final HttpServletRequest req, final HttpServletResponse resp) throws
-			ServletException, IOException {
-		doGet(req, resp);
+	public void setWebUiHolder(WebUiHolder webUiHolder) {
+		this.webUiHolder = webUiHolder;
+	}
+
+	public File getBaseFolder() {
+		return webUiHolder.getWebUi().getBrowseRoot();
 	}
 
 	/**

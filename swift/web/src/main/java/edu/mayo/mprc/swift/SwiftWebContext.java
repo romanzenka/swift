@@ -21,7 +21,7 @@ import java.util.Map;
  * effort (too large?) to decouple Swift enough to make full Spring wiring possible.
  */
 public final class SwiftWebContext {
-	private static WebUi webUi;
+	private static WebUiHolder webUiHolder;
 	private static String initializedDaemon;
 	private static boolean initializationRan = false;
 
@@ -37,6 +37,7 @@ public final class SwiftWebContext {
 				try {
 					System.setProperty("SWIFT_INSTALL", installPropertyFile.getAbsolutePath());
 					MainFactoryContext.initialize();
+					webUiHolder = MainFactoryContext.getWebUiHolder();
 					final Daemon.Factory daemonFactory = MainFactoryContext.getDaemonFactory();
 					final MultiFactory factoryTable = MainFactoryContext.getResourceTable();
 
@@ -72,35 +73,35 @@ public final class SwiftWebContext {
 
 					for (final Object obj : daemon.getResources()) {
 						if (obj instanceof WebUi) {
-							webUi = (WebUi) obj;
+							webUiHolder.setWebUi((WebUi) obj);
 							break;
 						}
 					}
-					if (webUi == null) {
+					if (webUiHolder.getWebUi() == null) {
 						throw new MprcException("The daemon " + daemonId + " does not define any web interface module.");
 					}
-					webUi.setMainDaemon(daemon);
+					webUiHolder.getWebUi().setMainDaemon(daemon);
 
-					SwiftConfig.setupFileTokenFactory(swiftConfig, daemonConfig, webUi.getFileTokenFactory());
+					SwiftConfig.setupFileTokenFactory(swiftConfig, daemonConfig, webUiHolder.getWebUi().getFileTokenFactory());
 
 					// Initialize DB curator
 					CurationWebContext.initialize(
-							webUi.getCurationDao(),
-							webUi.getFastaFolder(),
-							webUi.getFastaUploadFolder(),
-							webUi.getFastaArchiveFolder(),
+							webUiHolder.getWebUi().getCurationDao(),
+							webUiHolder.getWebUi().getFastaFolder(),
+							webUiHolder.getWebUi().getFastaUploadFolder(),
+							webUiHolder.getWebUi().getFastaArchiveFolder(),
 							// TODO: Fix this - the curator will keep creating temp folders and never deleting them
 							// TODO: Also, the user should be able to specify where the temp files should go
 							FileUtilities.createTempFolder());
 
 					daemon.start();
-					webUi.getSwiftMonitor().initialize(swiftConfig);
-					webUi.getSwiftMonitor().start();
+					webUiHolder.getWebUi().getSwiftMonitor().initialize(swiftConfig);
+					webUiHolder.getWebUi().getSwiftMonitor().start();
 
 					initializedDaemon = daemonId;
 				} catch (Exception t) {
 					LOGGER.fatal("Swift web application should be terminated", t);
-					webUi.getSwiftMonitor().stop();
+					webUiHolder.getWebUi().getSwiftMonitor().stop();
 					System.exit(1);
 					throw new MprcException(t);
 				}
@@ -109,12 +110,12 @@ public final class SwiftWebContext {
 	}
 
 	public static void destroy() {
-		if (webUi != null) {
-			if (webUi.getMainDaemon() != null) {
-				webUi.getMainDaemon().stop();
+		if (webUiHolder.getWebUi() != null) {
+			if (webUiHolder.getWebUi().getMainDaemon() != null) {
+				webUiHolder.getWebUi().getMainDaemon().stop();
 			}
-			if (webUi.getSwiftMonitor() != null) {
-				webUi.getSwiftMonitor().stop();
+			if (webUiHolder.getWebUi().getSwiftMonitor() != null) {
+				webUiHolder.getWebUi().getSwiftMonitor().stop();
 			}
 		}
 	}
@@ -146,7 +147,7 @@ public final class SwiftWebContext {
 	 */
 	public static WebUi getServletConfig() {
 		synchronized (SwiftWebContext.class) {
-			return webUi;
+			return webUiHolder.getWebUi();
 		}
 	}
 
@@ -169,7 +170,8 @@ public final class SwiftWebContext {
 			final Map<String, String> map = new HashMap<String, String>(1);
 			map.put(WebUi.BROWSE_ROOT, "/");
 			config.load(map, dependencies);
-			webUi = (WebUi) MainFactoryContext.getResourceTable().createSingleton(config, dependencies);
+			webUiHolder = MainFactoryContext.getWebUiHolder();
+			webUiHolder.setWebUi((WebUi)MainFactoryContext.getResourceTable().createSingleton(config, dependencies));
 		}
 	}
 }

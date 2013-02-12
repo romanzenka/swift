@@ -37,6 +37,10 @@
             <artifactId>jetty-embedded</artifactId>
             <version>6.1.14</version>
         </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-web</artifactId>
+        </dependency>
         <!-- Logging facade for Jetty -->
         <dependency>
             <groupId>org.slf4j</groupId>

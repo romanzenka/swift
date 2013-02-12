@@ -1,9 +1,9 @@
 package edu.mayo.mprc.swift.configuration.server;
 
-import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 import edu.mayo.mprc.GWTServiceExceptionFactory;
 import edu.mayo.mprc.MprcException;
 import edu.mayo.mprc.common.client.GWTServiceException;
+import edu.mayo.mprc.common.server.SpringGwtServlet;
 import edu.mayo.mprc.config.ApplicationConfig;
 import edu.mayo.mprc.config.ResourceConfig;
 import edu.mayo.mprc.config.RunnerConfig;
@@ -25,7 +25,7 @@ import java.io.File;
  * <p/>
  * Note: The implementation must never throw a runtime exception. Runtime exceptions are not transfered properly by GWT.
  */
-public final class ConfigurationServiceImpl extends RemoteServiceServlet implements ConfigurationService {
+public final class ConfigurationServiceImpl extends SpringGwtServlet implements ConfigurationService {
 	private static final long serialVersionUID = 20101221L;
 
 	/**

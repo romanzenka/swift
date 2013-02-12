@@ -2,15 +2,13 @@ package edu.mayo.mprc.swift.report;
 
 import com.google.common.base.Charsets;
 import edu.mayo.mprc.MprcException;
-import edu.mayo.mprc.ServletIntialization;
 import edu.mayo.mprc.searchdb.Report;
 import edu.mayo.mprc.searchdb.dao.Analysis;
 import edu.mayo.mprc.searchdb.dao.SearchDbDao;
-import edu.mayo.mprc.swift.SwiftWebContext;
 import edu.mayo.mprc.utilities.FileUtilities;
+import org.springframework.web.HttpRequestHandler;
 
 import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -21,21 +19,11 @@ import java.io.OutputStreamWriter;
  *
  * @author Roman Zenka
  */
-public class AnalysisReport extends HttpServlet {
-	private static final long serialVersionUID = -4840590656774162819L;
+public class AnalysisReport implements HttpRequestHandler {
 	private SearchDbDao searchDbDao;
 
-	public void init() throws ServletException {
-		if (ServletIntialization.initServletConfiguration(getServletConfig())) {
-			if (SwiftWebContext.getServletConfig() != null) {
-				searchDbDao = SwiftWebContext.getServletConfig().getSearchDbDao();
-			}
-		}
-	}
-
-
 	@Override
-	protected void doGet(final HttpServletRequest req, final HttpServletResponse resp) throws ServletException, IOException {
+	public void handleRequest(final HttpServletRequest req, final HttpServletResponse resp) throws ServletException, IOException {
 		resp.setContentType("text/html");
 		OutputStreamWriter writer = null;
 		try {
@@ -72,6 +60,14 @@ public class AnalysisReport extends HttpServlet {
 		} finally {
 			FileUtilities.closeQuietly(writer);
 		}
+	}
+
+	public SearchDbDao getSearchDbDao() {
+		return searchDbDao;
+	}
+
+	public void setSearchDbDao(SearchDbDao searchDbDao) {
+		this.searchDbDao = searchDbDao;
 	}
 }
 

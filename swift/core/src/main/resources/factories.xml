@@ -42,6 +42,9 @@
     <bean id="scaffoldDeployerWorkerFactory" class="edu.mayo.mprc.scaffold.ScaffoldDeploymentService$Factory">
     </bean>
 
+    <bean id="aminoAcidSet" class="edu.mayo.mprc.chem.AminoAcidSet">
+    </bean>
+
     <bean id="daoList" class="java.util.ArrayList">
         <constructor-arg index="0">
             <list value-type="edu.mayo.mprc.database.DaoBase">
@@ -136,6 +139,11 @@
     <bean id="sequestToMakeDbConverter" class="edu.mayo.mprc.sequest.SequestToMakeDBConverter"/>
 
     <bean id="fileTokenFactory" class="edu.mayo.mprc.daemon.files.FileTokenFactory">
+    </bean>
+
+    <!-- Provides a WebUi interface after it gets configured -->
+    <bean id="webUiHolder" class="edu.mayo.mprc.swift.WebUiHolder">
+
     </bean>
 
     <bean id="webUiFactory" class="edu.mayo.mprc.swift.WebUi$Factory">

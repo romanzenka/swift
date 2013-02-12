@@ -1,14 +1,11 @@
 package edu.mayo.mprc.swift.report;
 
 import com.google.common.base.Charsets;
-import edu.mayo.mprc.ServletIntialization;
-import edu.mayo.mprc.swift.SwiftWebContext;
 import edu.mayo.mprc.unimod.Unimod;
 import edu.mayo.mprc.unimod.UnimodDao;
 import edu.mayo.mprc.utilities.FileUtilities;
+import org.springframework.web.HttpRequestHandler;
 
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -19,21 +16,12 @@ import java.io.OutputStreamWriter;
  *
  * @author Roman Zenka
  */
-public final class ModificationReport extends HttpServlet {
-	private static final long serialVersionUID = -7725592285967200178L;
+public final class ModificationReport implements HttpRequestHandler {
 	private static final String TITLE = "Modifications defined in Swift";
 	private transient UnimodDao unimodDao;
 
-	public void init() throws ServletException {
-		if (ServletIntialization.initServletConfiguration(getServletConfig())) {
-			if (SwiftWebContext.getServletConfig() != null) {
-				unimodDao = SwiftWebContext.getServletConfig().getUnimodDao();
-			}
-		}
-	}
-
 	@Override
-	protected void doGet(final HttpServletRequest req, final HttpServletResponse resp) throws ServletException, IOException {
+	public void handleRequest(final HttpServletRequest req, final HttpServletResponse resp) throws IOException {
 		resp.setContentType("text/html");
 		OutputStreamWriter writer = null;
 		try {
@@ -56,5 +44,13 @@ public final class ModificationReport extends HttpServlet {
 		} finally {
 			FileUtilities.closeQuietly(writer);
 		}
+	}
+
+	public UnimodDao getUnimodDao() {
+		return unimodDao;
+	}
+
+	public void setUnimodDao(UnimodDao unimodDao) {
+		this.unimodDao = unimodDao;
 	}
 }
