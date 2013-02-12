@@ -60,7 +60,7 @@ public final class SgeJobRunner {
 		}
 
 		try {
-			LOGGER.debug(ReleaseInfoCore.infoString());
+			LOGGER.debug(ReleaseInfoCore.buildVersion());
 			LOGGER.info("Parsing xml file: " + workPacketXmlFile.getAbsolutePath());
 
 			final XStream xStream = new XStream(new DomDriver());

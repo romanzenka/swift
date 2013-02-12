@@ -187,12 +187,31 @@
                     </execution>
                 </executions>
             </plugin>
+
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>buildnumber-maven-plugin</artifactId>
+                <version>1.1</version>
+                <executions>
+                    <execution>
+                        <phase>validate</phase>
+                        <goals>
+                            <goal>create</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <doCheck>false</doCheck>
+                    <doUpdate>false</doUpdate>
+                    <timestampFormat>{0,date,yyyy-MM-dd HH:mm:ss}</timestampFormat>
+                </configuration>
+            </plugin>
         </plugins>
     </build>
 
     <scm>
-        <connection>scm:svn:https://bsisvn.mayo.edu/mprc/trunk/java/swift/core</connection>
-        <developerConnection>scm:svn:https://bsisvn.mayo.edu/mprc/trunk/java/swift/core</developerConnection>
-        <url>http://delphi.mayo.edu/wiki/trac.cgi/browser/trunk/java/swift/core</url>
+        <connection>scm:git:git://github.com/romanzenka/swift.git</connection>
+        <developerConnection>scm:git:ssh://git@github.com/romanzenka/swift.git</developerConnection>
+        <url>${scm.url.base}/swift/tree/master/${project.artifactId}</url>
     </scm>
 </project>

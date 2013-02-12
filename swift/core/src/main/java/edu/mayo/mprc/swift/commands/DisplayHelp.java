@@ -25,7 +25,7 @@ public class DisplayHelp implements SwiftCommand {
 	@Override
 	public ExitCode run(final SwiftEnvironment environment) {
 		try {
-			FileUtilities.out(ReleaseInfoCore.infoString());
+			FileUtilities.out(ReleaseInfoCore.buildVersion());
 			FileUtilities.out("");
 			FileUtilities.out("This command starts Swift with the provided configuration parameters.");
 			FileUtilities.out("If you do not have a configuration file yet, please run Swift's web configuration first.");

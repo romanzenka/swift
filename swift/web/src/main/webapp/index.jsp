@@ -9,7 +9,7 @@
     } %>
     <title>Swift - search using multiple engines</title>
     <!--
-    <%=ReleaseInfoCore.infoString()%>
+    <%=ReleaseInfoCore.buildVersion()%>
     -->
     <link rel="stylesheet" href="/common/topbar.css" media="all">
     <style type="text/css">

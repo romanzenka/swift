@@ -234,10 +234,8 @@
         <li><a href="/start">New search</a></li>
         <li class="active-tab"><a href="/report/report.jsp">Existing searches</a></li>
         <li><a href="/">About Swift</a></li>
+        <li><a href="/extras">Extras</a></li>
     </ul>
-
-    <iframe width="250px" height="30px" src="/status.jsp" scrolling="no" frameborder="0"
-            class="status-window"></iframe>
 </div>
 <% if (SwiftWebContext.getServletConfig().getUserMessage().messageDefined()) { %>
 <div class="user-message">

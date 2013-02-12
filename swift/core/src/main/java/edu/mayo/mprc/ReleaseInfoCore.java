@@ -10,14 +10,31 @@ import java.util.ResourceBundle;
 public final class ReleaseInfoCore implements Serializable {
 	private static final long serialVersionUID = 20080128;
 
-	public static String infoString() {
+	public static String buildVersion() {
+		return getProperty("build.version");
+	}
+
+	public static String buildTimestamp() {
+		return getProperty("build.timestamp");
+	}
+
+	public static String buildRevision() {
+		return getProperty("build.revision");
+	}
+
+	public static String buildLink() {
+		return getProperty("build.link");
+	}
+
+	private static String getProperty(final String key) {
 		final ResourceBundle bundle = ResourceBundle.getBundle("build");
-		final String buildNumber = bundle.getString("build.number");
+		final String buildNumber = bundle.getString(key);
 		return buildNumber;
 	}
 
+
 	public static void main(final String[] args) {
-		System.out.println(ReleaseInfoCore.infoString());
+		System.out.println(ReleaseInfoCore.buildVersion());
 	}
 
 }

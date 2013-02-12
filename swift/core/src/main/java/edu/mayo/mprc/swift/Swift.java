@@ -40,7 +40,7 @@ public final class Swift {
 	static ExitCode runSwift(final String... args) {
 		MainFactoryContext.initialize();
 
-		LOGGER.info(ReleaseInfoCore.infoString());
+		LOGGER.info(ReleaseInfoCore.buildVersion());
 		final CommandLineParser parser = new CommandLineParser(args);
 		final SwiftCommandLine commandLine = parser.getCommandLine();
 		if (commandLine.getError() != null) {

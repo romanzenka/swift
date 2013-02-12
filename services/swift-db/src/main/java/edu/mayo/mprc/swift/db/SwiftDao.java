@@ -64,13 +64,6 @@ public interface SwiftDao extends Dao, RuntimeInitializer {
 	SearchRun getSearchRunForId(int searchRunId);
 
 	/**
-	 * Returns an HTML string representing status information for current user's searches.
-	 *
-	 * @param userName
-	 */
-	String getSearchRunStatusForUser(String userName);
-
-	/**
 	 * Adds a search engine config. If the config already exists, the object gets updated.
 	 *
 	 * @param config Search engine config.

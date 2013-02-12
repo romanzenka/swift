@@ -186,43 +186,6 @@ public final class SwiftDaoHibernate extends DaoBase implements SwiftDao {
 		}
 	}
 
-	@Override
-	public String getSearchRunStatusForUser(final String userName) {
-		if (userName == null) {
-			return "";
-		}
-		final Session session = getSession();
-		try {
-			final User user = (User) session.createQuery("from edu.mayo.mprc.workspace.User d where d.userName = :name and d.deletion=null")
-					.setParameter("name", userName)
-					.uniqueResult();
-
-			String result = "";
-			if (user != null) {
-				result = "<span class=\"user-name\">" + user.getFirstName() + " " + user.getLastName() + "</span>";
-
-				final SearchRun searchRun = (SearchRun) session.createQuery("from SearchRun t where t.submittingUser=:user order by startTimestamp desc")
-						.setParameter("user", user)
-						.setMaxResults(1).uniqueResult();
-
-				if (searchRun != null) {
-					if (searchRun.getTasksFailed() > 0 || (searchRun.getErrorMessage() != null && searchRun.getErrorMessage().length() == 0)) {
-						result += " <span class=\"error\">Error</span>";
-					} else if (searchRun.getTasksCompleted() == searchRun.getNumTasks()) {
-						result += " <span class=\"success\">Success</span>";
-					} else {
-						result += " <span class=\"running\">Running</span>";
-					}
-				}
-			}
-
-			return result;
-		} catch (Exception ignore) {
-			// Swallowed. If anything went wrong, the status is empty
-			return "";
-		}
-	}
-
 	private static Criterion getSearchEngineEqualityCriteria(final SearchEngineConfig searchEngineConfig) {
 		return DaoBase.nullSafeEq("code", searchEngineConfig.getCode());
 	}
