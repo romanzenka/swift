@@ -381,24 +381,17 @@ public final class SearchDbDaoHibernate extends DaoBase implements RuntimeInitia
 	}
 
 	@Override
-	public Map<Integer, List<String>> getAccessionNumbersMapForAnalysis(final Analysis analysis) {
+	public Map<Integer, List<String>> getAccessionNumbersMapForProteinSequences(Set<Integer> proteinSequenceLists) {
 		final HashMap<Integer, List<String>> result = Maps.newHashMap();
-		final List list = getSession().createQuery("select psl.id, pe.accessionNumber.accnum from" +
-				" Analysis a" +
-				" inner join a.biologicalSamples as bsl" +
-				" inner join bsl.list as b" +
-				" inner join b.searchResults as srl" +
-				" inner join srl.list as r" +
-				" inner join r.proteinGroups as pgl" +
-				" inner join pgl.list as pg" +
-				" inner join pg.proteinSequences as psl" +
+		final List list = getSession().createQuery("select distinct psl.id, pa.accnum from" +
+				" ProteinSequenceList as psl" +
 				" inner join psl.list as ps," +
 				" ProteinEntry as pe," +
 				" ProteinAccnum as pa" +
 				" where pe.sequence = ps" +
 				" and pe.accessionNumber = pa" +
-				" and a=:a")
-				.setParameter("a", analysis)
+				" and psl.id in (:ids)")
+				.setParameterList("ids", proteinSequenceLists.toArray())
 				.list();
 
 		int lastGroup = -1;
@@ -422,6 +415,28 @@ public final class SearchDbDaoHibernate extends DaoBase implements RuntimeInitia
 			numbers.clear();
 		}
 		return result;
+	}
+
+	@Override
+	public TreeMap<Integer, ProteinSequenceList> getAllProteinSequences(Analysis analysis) {
+
+		final List list = getSession().createQuery("select distinct psl from" +
+				" Analysis a" +
+				" inner join a.biologicalSamples as bsl" +
+				" inner join bsl.list as b" +
+				" inner join b.searchResults as srl" +
+				" inner join srl.list as r" +
+				" inner join r.proteinGroups as pgl" +
+				" inner join pgl.list as pg" +
+				" inner join pg.proteinSequences as psl" +
+				" where a=:a").setParameter("a", analysis).list();
+
+		final TreeMap<Integer, ProteinSequenceList> allProteinGroups = new TreeMap<Integer, ProteinSequenceList>();
+		for (final Object o : list) {
+			final ProteinSequenceList psl = (ProteinSequenceList) o;
+			allProteinGroups.put(psl.getId(), psl);
+		}
+		return allProteinGroups;
 	}
 
 	private Criterion analysisEqualityCriteria(final Analysis analysis) {

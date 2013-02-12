@@ -7,6 +7,8 @@ import edu.mayo.mprc.utilities.progress.UserProgressReporter;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.TreeMap;
 
 /**
  * This dao should be implemented in an efficient manner. Typically a large amount of queries (10000x per input file)
@@ -69,12 +71,14 @@ public interface SearchDbDao extends Dao {
 	 */
 	TandemMassSpectrometrySample updateTandemMassSpectrometrySample(TandemMassSpectrometrySample sample);
 
+	TreeMap<Integer, ProteinSequenceList> getAllProteinSequences(Analysis analysis);
+
 	/**
-	 * Look at all protein groups for a given analysis. For each protein sequence list
-	 * load all accession numbers associated with it and put them in a list.
+	 * Look at all protein given {@link ProteinSequenceList} ids. For each protein sequence list
+	 * load all accession numbers associated with it and put them in a map keyed by their id.
 	 *
-	 * @param analysis Analysis to load the data for.
+	 * @param proteinSequenceLists Ids of protein sequence lists to load the ids for.
 	 * @return Map from {@link ProteinSequenceList} id to list of accession numbers for that group.
 	 */
-	Map<Integer, List<String>> getAccessionNumbersMapForAnalysis(Analysis analysis);
+	Map<Integer, List<String>> getAccessionNumbersMapForProteinSequences(Set<Integer> proteinSequenceLists);
 }

@@ -219,19 +219,11 @@ public final class Analysis extends PersistableBase {
 		r.startTable("Results") // -- Results
 				.cell("", 1, null);
 
-		final TreeMap<Integer, ProteinSequenceList> allProteinGroups = new TreeMap<Integer, ProteinSequenceList>();
-
 		// List biological samples
 		int totalColumns = 0;
 		for (final BiologicalSample sample : getBiologicalSamples()) {
 			r.cell(sample.getSampleName(), sample.getSearchResults().size(), null);
-
-			for (final SearchResult result : sample.getSearchResults()) {
-				totalColumns++;
-				for (final ProteinGroup group : result.getProteinGroups()) {
-					allProteinGroups.put(group.getProteinSequences().getId(), group.getProteinSequences());
-				}
-			}
+			totalColumns += sample.getSearchResults().size();
 		}
 		r.nextRow(); // ---------------
 
@@ -245,12 +237,14 @@ public final class Analysis extends PersistableBase {
 		}
 		r.nextRow(); // ---------------
 
+		/** Load all protein sequence lists */
+		final TreeMap<Integer, ProteinSequenceList> allProteinGroups = searchDbDao.getAllProteinSequences(this);
+
 		final Map<
 				Integer/*protein sequence id*/,
 				List<String>/* accession numbers for the protein sequence  */
 				>
-				accnumMap = searchDbDao.getAccessionNumbersMapForAnalysis(this);
-
+				accnumMap = searchDbDao.getAccessionNumbersMapForProteinSequences(allProteinGroups.keySet());
 
 		final List<TableRow> tableRows = collectTableRows(allProteinGroups, totalColumns, accnumMap);
 		Collections.sort(tableRows);
@@ -278,7 +272,7 @@ public final class Analysis extends PersistableBase {
 			}
 
 			String code;
-			if(accNumsExtra.length()>0) {
+			if (accNumsExtra.length() > 0) {
 				code = "<span title=\"" + accNumsExtra.substring(2) + "\">"
 						+ accNums.toString() + "</span>";
 			} else {

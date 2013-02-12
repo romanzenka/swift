@@ -4,7 +4,6 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import edu.mayo.mprc.dbcurator.client.curatorstubs.CurationStub;
 import edu.mayo.mprc.dbcurator.client.curatorstubs.HeaderTransformStub;
 
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -54,26 +53,6 @@ public interface CommonDataRequesterAsync {
 	 * @return a stub for the copy
 	 */
 	void copyCurationStub(CurationStub toCopy, AsyncCallback<CurationStub> async);
-
-	/**
-	 * Takes a CurationStub and returns a list of curations stubs that at least match the stub that was passed in.  So the properties
-	 * of the returned CurationStubs will be equal to the set properties in the passed in stub.
-	 *
-	 * @param toMatch the CurationStub that you want to find matches for
-	 * @return a list of matching CurationStubs
-	 */
-	void getMatches(CurationStub toMatch, AsyncCallback<List<CurationStub>> async);
-
-	/**
-	 * Does the same as the getMatches(CurationStub) but also allows bracketing of the run date property so only run dates
-	 * between certain dates will be returned.
-	 *
-	 * @param toMatch     the curationstub you want to match
-	 * @param earliestRun the earliest run date you want returned
-	 * @param latestRun   the latest run date you want returned
-	 * @return a list of CurationStubs that meet the criteria
-	 */
-	void getMatches(CurationStub toMatch, Date earliestRun, Date latestRun, AsyncCallback<List<CurationStub>> async);
 
 	/**
 	 * Runs a curation on the server.  This will execute a curation.  If you want to get the status of a curation call getStatus()

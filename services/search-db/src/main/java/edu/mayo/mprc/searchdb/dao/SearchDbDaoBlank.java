@@ -4,9 +4,10 @@ import edu.mayo.mprc.database.QueryCallback;
 import edu.mayo.mprc.swift.dbmapping.ReportData;
 import edu.mayo.mprc.utilities.progress.UserProgressReporter;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.TreeMap;
 
 /**
  * A blank implementation of {@link SearchDbDao} that makes all methods throw an exception.
@@ -55,8 +56,13 @@ public class SearchDbDaoBlank implements SearchDbDao {
 	}
 
 	@Override
-	public Map<Integer, List<String>> getAccessionNumbersMapForAnalysis(Analysis analysis) {
-		return new HashMap<Integer, List<String>>(0);
+	public TreeMap<Integer, ProteinSequenceList> getAllProteinSequences(Analysis analysis) {
+		return null;
+	}
+
+	@Override
+	public Map<Integer, List<String>> getAccessionNumbersMapForProteinSequences(Set<Integer> proteinSequenceLists) {
+		return null;
 	}
 
 	@Override

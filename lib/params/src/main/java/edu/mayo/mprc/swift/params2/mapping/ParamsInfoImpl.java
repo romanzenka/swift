@@ -44,7 +44,7 @@ public final class ParamsInfoImpl extends ParamsInfo {
 
 	@Override
 	public List<Curation> getDatabaseAllowedValues() {
-		final List<Curation> matchingCurations = curationDao.getMatchingCurations(null, null, null);
+		final List<Curation> matchingCurations = curationDao.getAllCurations();
 		if (matchingCurations == null || matchingCurations.size() == 0) {
 			throw new MprcException("No curations found. Did you initialize the database with curations?");
 		}
