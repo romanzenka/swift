@@ -4,8 +4,9 @@ import org.testng.Assert;
 import org.testng.annotations.Test;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
-public class StringUtilitiesTest {
+public final class StringUtilitiesTest {
 
 	@Test
 	public void shouldAppendTabBeforeLines() {
@@ -113,5 +114,14 @@ public class StringUtilitiesTest {
 		Assert.assertEquals(StringUtilities.toHex(new byte[]{(byte) 0x01, (byte) 0xca, (byte) 0x02, (byte) 0xba, (byte) 0x34}, ""), "01ca02ba34");
 		Assert.assertEquals(StringUtilities.toHex(new byte[]{(byte) 0x01, (byte) 0xca, (byte) 0x02, (byte) 0xba, (byte) 0x34}, "-"), "01-ca-02-ba-34");
 		Assert.assertEquals(StringUtilities.toHex(new byte[]{}, ":"), "");
+	}
+
+	@Test
+	public void shouldFindPrefixes() {
+		Assert.assertEquals(StringUtilities.longestPrefix(Arrays.asList("hello", "hero")), "he");
+		Assert.assertEquals(StringUtilities.longestPrefix(new ArrayList<String>(0)), "");
+		Assert.assertEquals(StringUtilities.longestPrefix(Arrays.asList("hello")), "hello");
+		Assert.assertEquals(StringUtilities.longestPrefix(Arrays.asList("hello", "hello")), "hello");
+		Assert.assertEquals(StringUtilities.longestPrefix(Arrays.asList("", "hello", "hell", "her", "he", "h")), "");
 	}
 }

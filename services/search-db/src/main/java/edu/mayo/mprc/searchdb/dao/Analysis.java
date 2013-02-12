@@ -3,6 +3,7 @@ package edu.mayo.mprc.searchdb.dao;
 import edu.mayo.mprc.database.PersistableBase;
 import edu.mayo.mprc.searchdb.Report;
 import edu.mayo.mprc.swift.dbmapping.ReportData;
+import edu.mayo.mprc.utilities.StringUtilities;
 import org.joda.time.DateTime;
 
 import java.text.DecimalFormat;
@@ -216,23 +217,40 @@ public final class Analysis extends PersistableBase {
 				.addKeyValueTable("Scaffold Version", getScaffoldVersion())
 				.endTable();
 
-		r.startTable("Results") // -- Results
-				.cell("", 1, null);
+		r.startTable("Results"); // -- Results
 
 		// List biological samples
 		int totalColumns = 0;
+		final ArrayList<String> bioSampleNames = new ArrayList<String>(getBiologicalSamples().size());
 		for (final BiologicalSample sample : getBiologicalSamples()) {
-			r.cell(sample.getSampleName(), sample.getSearchResults().size(), null);
+			bioSampleNames.add(sample.getSampleName());
 			totalColumns += sample.getSearchResults().size();
+		}
+		final String bioSamplePrefix = StringUtilities.longestPrefix(bioSampleNames);
+		r.cell(bioSamplePrefix, 1, null);
+		final int bioSamplePrefixLength = bioSamplePrefix.length();
+
+		for (final BiologicalSample sample : getBiologicalSamples()) {
+			r.cell(sample.getSampleName().substring(bioSamplePrefixLength), sample.getSearchResults().size(), null);
 		}
 		r.nextRow(); // ---------------
 
-		r.cell("");
-
 		// List all mass-spec samples within the biological samples
+		final ArrayList<String> massSpectSampleFileNames = new ArrayList<String>(20);
 		for (final BiologicalSample sample : getBiologicalSamples()) {
 			for (final SearchResult result : sample.getSearchResults()) {
-				r.cell(result.getMassSpecSample() != null ? result.getMassSpecSample().getFile().getName() : "<null>");
+				massSpectSampleFileNames.add(result.getMassSpecSample() != null ? result.getMassSpecSample().getFile().getName() : "<null>");
+			}
+		}
+		final String massSpecSamplePrefix = StringUtilities.longestPrefix(massSpectSampleFileNames);
+		r.cell(massSpecSamplePrefix);
+		final int massSpecSamplePrefixLength = massSpecSamplePrefix.length();
+
+		final Iterator<String> iterator = massSpectSampleFileNames.iterator();
+		for (final BiologicalSample sample : getBiologicalSamples()) {
+			for (final SearchResult ignore : sample.getSearchResults()) {
+				final String fileName = iterator.next();
+				r.cell(fileName.substring(massSpecSamplePrefixLength));
 			}
 		}
 		r.nextRow(); // ---------------

@@ -2,6 +2,8 @@ package edu.mayo.mprc.utilities;
 
 import com.google.common.base.Strings;
 
+import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.regex.Pattern;
@@ -170,5 +172,31 @@ public final class StringUtilities {
 			}
 			start = end + 1;
 		}
+	}
+
+	/**
+	 * @param strings A collection of strings.
+	 * @return Longest prefix common to all the strings.
+	 */
+	public static String longestPrefix(final Collection<String> strings) {
+		final Iterator<String> iterator = strings.iterator();
+		if (!iterator.hasNext()) {
+			return "";
+		}
+		String previous = iterator.next();
+		int maxPrefixSoFar = previous.length();
+
+		while (iterator.hasNext() && maxPrefixSoFar > 0) {
+			final String current = iterator.next();
+			maxPrefixSoFar = Math.min(maxPrefixSoFar, current.length());
+			for (int i = 0; i < maxPrefixSoFar; i++) {
+				if ((int) previous.charAt(i) != (int) current.charAt(i)) {
+					maxPrefixSoFar = i;
+					break;
+				}
+			}
+			previous = current;
+		}
+		return previous.substring(0, maxPrefixSoFar);
 	}
 }
