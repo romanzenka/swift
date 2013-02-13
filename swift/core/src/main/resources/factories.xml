@@ -147,17 +147,11 @@
     </bean>
 
     <bean id="webUiFactory" class="edu.mayo.mprc.swift.WebUi$Factory">
-        <property name="swiftDao" ref="swiftDao"/>
-        <property name="curationDao" ref="curationDao"/>
-        <property name="workspaceDao" ref="workspaceDao"/>
-        <property name="paramsDao" ref="paramsDao"/>
-        <property name="unimodDao" ref="unimodDao"/>
-        <property name="searchDbDao" ref="searchDbDao"/>
-        <property name="databasePlaceholder" ref="databasePlaceholder"/>
-        <property name="abstractParamsInfo" ref="paramsInfo"/>
         <property name="searchEngines" ref="searchEngines"/>
-        <property name="fileTokenFactory" ref="fileTokenFactory"/>
         <property name="swiftMonitor" ref="swiftMonitor"/>
+        <property name="fileTokenFactory" ref="fileTokenFactory"/>
+        <property name="swiftDao" ref="swiftDao"/>
+        <property name="workspaceDao" ref="workspaceDao"/>
     </bean>
 
     <!-- Hibernate properties -->

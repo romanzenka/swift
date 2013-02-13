@@ -33,7 +33,7 @@ public final class CurationHandler {
 	 * @param session the HttpSession that we want to look for the CurationHandler on
 	 * @return the curation handler that was on the session or a new one that has been put on the session
 	 */
-	public static CurationHandler getInstance(final HttpSession session) {
+	public static CurationHandler getInstance(final HttpSession session, CurationDao curationDao, CurationWebContext context) {
 
 		CurationHandler perSession = null;
 		try {
@@ -47,6 +47,8 @@ public final class CurationHandler {
 			perSession = new CurationHandler();
 			session.setAttribute("curationHandler", perSession);
 		}
+		perSession.setCurationDao(curationDao);
+		perSession.setCurationWebContext(context);
 		return perSession;
 	}
 
@@ -61,10 +63,9 @@ public final class CurationHandler {
 	 */
 	private CurationStatus lastRunStatus = null;
 
-	private CurationDao curationDao = CurationWebContext.getCurationDAO();
-	private File fastaFolder = CurationWebContext.getFastaFolder();
-	private File localTempFolder = CurationWebContext.getLocalTempFolder();
-	private File fastaArchiveFolder = CurationWebContext.getFastaArchiveFolder();
+	private CurationDao curationDao;
+
+	private CurationWebContext curationWebContext;
 
 	/**
 	 * protect the constructor to ensure ThreadLocal access to instances
@@ -465,7 +466,10 @@ public final class CurationHandler {
 		// the cache is now set to curation matching our stub
 		final Curation curation = this.cache;
 
-		final CurationExecutor curationExecutor = new CurationExecutor(curation, true, curationDao, fastaFolder, localTempFolder, fastaArchiveFolder);
+		final CurationExecutor curationExecutor = new CurationExecutor(curation, true, curationDao,
+				curationWebContext.getFastaFolder(),
+				curationWebContext.getLocalTempFolder(),
+				curationWebContext.getFastaArchiveFolder());
 		this.lastRunStatus = curationExecutor.execute();
 
 		while (this.lastRunStatus.isInProgress()) {
@@ -510,5 +514,21 @@ public final class CurationHandler {
 	 */
 	public Curation getCachedCuration() {
 		return this.cache;
+	}
+
+	public CurationDao getCurationDao() {
+		return curationDao;
+	}
+
+	public void setCurationDao(CurationDao curationDao) {
+		this.curationDao = curationDao;
+	}
+
+	public CurationWebContext getCurationWebContext() {
+		return curationWebContext;
+	}
+
+	public void setCurationWebContext(CurationWebContext curationWebContext) {
+		this.curationWebContext = curationWebContext;
 	}
 }

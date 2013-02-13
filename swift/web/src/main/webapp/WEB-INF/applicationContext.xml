@@ -11,7 +11,6 @@
         <property name="curationDao" ref="curationDao"/>
         <property name="paramsDao" ref="paramsDao"/>
         <property name="paramsInfo" ref="paramsInfo"/>
-        <property name="searchEngines" ref="searchEngines"/>
         <property name="unimodDao" ref="unimodDao"/>
         <property name="swiftDao" ref="swiftDao"/>
         <property name="webUiHolder" ref="webUiHolder"/>
@@ -21,16 +20,21 @@
         <property name="fileTokenFactory" ref="fileTokenFactory"/>
         <property name="searchDbDao" ref="searchDbDao"/>
         <property name="swiftDao" ref="swiftDao"/>
+        <property name="webUiHolder" ref="webUiHolder"/>
     </bean>
 
     <bean id="ConfigurationService" class="edu.mayo.mprc.swift.configuration.server.ConfigurationServiceImpl">
     </bean>
 
+    <bean id="curationWebContext" class="edu.mayo.mprc.dbcurator.server.CurationWebContext"></bean>
+
     <bean id="FileUploadServlet" class="edu.mayo.mprc.dbcurator.server.FASTAFileUploadServlet">
+        <property name="curationWebContext" ref="curationWebContext"/>
     </bean>
 
     <bean id="CommonDataRequester" class="edu.mayo.mprc.dbcurator.server.CommonDataRequesterImpl">
         <property name="curationDao" ref="curationDao"/>
+        <property name="curationWebContext" ref="curationWebContext"/>
     </bean>
 
     <bean id="Feed" class="edu.mayo.mprc.swift.report.RssStatusFeeder">

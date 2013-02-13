@@ -72,7 +72,6 @@ public final class ServiceImpl extends SpringGwtServlet implements Service, Appl
 
 	private WebUiHolder webUiHolder;
 
-	private Collection<SearchEngine> searchEngines;
 	private SwiftDao swiftDao;
 	private CurationDao curationDao;
 	private ParamsDao paramsDao;
@@ -617,12 +616,8 @@ public final class ServiceImpl extends SpringGwtServlet implements Service, Appl
 		return webUiHolder.getWebUi();
 	}
 
-	public void setSearchEngines(Collection<SearchEngine> searchEngines) {
-		this.searchEngines = searchEngines;
-	}
-
 	public Collection<SearchEngine> getSearchEngines() {
-		return searchEngines;
+		return getWebUi().getSearchEngines();
 	}
 
 	public File getBrowseRoot() {

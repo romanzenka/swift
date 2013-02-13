@@ -85,8 +85,8 @@ public final class SwiftWebContext {
 					SwiftConfig.setupFileTokenFactory(swiftConfig, daemonConfig, webUiHolder.getWebUi().getFileTokenFactory());
 
 					// Initialize DB curator
-					CurationWebContext.initialize(
-							webUiHolder.getWebUi().getCurationDao(),
+					final CurationWebContext curationWebContext = (CurationWebContext)MainFactoryContext.getContext().getBean("curationWebContext");
+					curationWebContext.initialize(
 							webUiHolder.getWebUi().getFastaFolder(),
 							webUiHolder.getWebUi().getFastaUploadFolder(),
 							webUiHolder.getWebUi().getFastaArchiveFolder(),

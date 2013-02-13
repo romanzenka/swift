@@ -23,8 +23,10 @@ import java.util.List;
 public final class FASTAFileUploadServlet implements HttpRequestHandler {
 	protected static final int MAX_FILE_SIZE = 1000000000;
 
+	private CurationWebContext curationWebContext;
+
 	private File getUploadFolder() {
-		return CurationWebContext.getFastaUploadFolder();
+		return curationWebContext.getFastaUploadFolder();
 	}
 
 	public void handleRequest(final HttpServletRequest request, final HttpServletResponse response) throws IOException {
@@ -134,5 +136,13 @@ public final class FASTAFileUploadServlet implements HttpRequestHandler {
 			}
 			return subFile;
 		}
+	}
+
+	public CurationWebContext getCurationWebContext() {
+		return curationWebContext;
+	}
+
+	public void setCurationWebContext(CurationWebContext curationWebContext) {
+		this.curationWebContext = curationWebContext;
 	}
 }

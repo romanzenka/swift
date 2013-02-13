@@ -28,7 +28,8 @@ public final class CommonDataRequesterImpl extends SpringGwtServlet implements C
 
 	private static final Logger LOGGER = Logger.getLogger(CommonDataRequesterImpl.class);
 
-	private CurationDao curationDao;
+	private transient CurationDao curationDao;
+	private transient CurationWebContext curationWebContext;
 
 	public CommonDataRequesterImpl() {
 	}
@@ -113,7 +114,7 @@ public final class CommonDataRequesterImpl extends SpringGwtServlet implements C
 	public CurationStub performUpdate(final CurationStub toUpdate) {
 		curationDao.begin();
 		try {
-			final CurationHandler handler = CurationHandler.getInstance(getThreadLocalRequest().getSession());
+			final CurationHandler handler = getHandler();
 			final CurationStub curationStub = handler.syncCuration(toUpdate);
 			curationDao.commit();
 			return curationStub;
@@ -164,7 +165,7 @@ public final class CommonDataRequesterImpl extends SpringGwtServlet implements C
 	}
 
 	private CurationHandler getHandler() {
-		return CurationHandler.getInstance(getThreadLocalRequest().getSession());
+		return CurationHandler.getInstance(getThreadLocalRequest().getSession(), curationDao, curationWebContext);
 	}
 
 	/**
@@ -183,7 +184,7 @@ public final class CommonDataRequesterImpl extends SpringGwtServlet implements C
 				return toRun;
 			}
 
-			final CurationHandler handler = CurationHandler.getInstance(getThreadLocalRequest().getSession());
+			final CurationHandler handler = getHandler();
 			final CurationStub curationStub = handler.executeCuration(toRun);
 			curationDao.commit();
 			return curationStub;
@@ -382,7 +383,15 @@ public final class CommonDataRequesterImpl extends SpringGwtServlet implements C
 		return curationDao;
 	}
 
-	public void setCurationDao(CurationDao curationDao) {
+	public void setCurationDao(final CurationDao curationDao) {
 		this.curationDao = curationDao;
+	}
+
+	public CurationWebContext getCurationWebContext() {
+		return curationWebContext;
+	}
+
+	public void setCurationWebContext(final CurationWebContext curationWebContext) {
+		this.curationWebContext = curationWebContext;
 	}
 }

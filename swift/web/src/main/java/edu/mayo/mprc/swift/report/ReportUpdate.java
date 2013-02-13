@@ -6,7 +6,8 @@ import edu.mayo.mprc.daemon.files.FileTokenFactory;
 import edu.mayo.mprc.qstat.QstatOutput;
 import edu.mayo.mprc.qstat.QstatWorkPacket;
 import edu.mayo.mprc.searchdb.dao.SearchDbDao;
-import edu.mayo.mprc.swift.SwiftWebContext;
+import edu.mayo.mprc.swift.WebUi;
+import edu.mayo.mprc.swift.WebUiHolder;
 import edu.mayo.mprc.swift.db.SearchRunFilter;
 import edu.mayo.mprc.swift.db.SwiftDao;
 import edu.mayo.mprc.swift.dbmapping.ReportData;
@@ -37,6 +38,7 @@ public final class ReportUpdate implements HttpRequestHandler {
 	private transient SwiftDao swiftDao;
 	private transient SearchDbDao searchDbDao;
 	private transient FileTokenFactory fileTokenFactory;
+	private transient WebUiHolder webUiHolder;
 	/**
 	 * How many milliseconds to wait till qstat considered down.
 	 */
@@ -75,7 +77,7 @@ public final class ReportUpdate implements HttpRequestHandler {
 		// Qstat causes qstat daemon info to be printed out
 		final String qstatJobId = req.getParameter("qstat");
 		if (qstatJobId != null) {
-			final DaemonConnection connection = SwiftWebContext.getServletConfig().getQstatDaemonConnection();
+			final DaemonConnection connection = getWebUi().getQstatDaemonConnection();
 			resp.setContentType("text/plain");
 			final SgeStatusProgressListener listener = new SgeStatusProgressListener(resp);
 			connection.sendWork(new QstatWorkPacket(Integer.parseInt(qstatJobId)), listener);
@@ -93,7 +95,7 @@ public final class ReportUpdate implements HttpRequestHandler {
 		// This action does not make much sense, not sure if it is actually used
 		if ("open".equals(action)) {
 			String file = req.getParameter("file");
-			file = SwiftWebContext.getServletConfig().getBrowseWebRoot() + file.substring(SwiftWebContext.getServletConfig().getBrowseRoot().getAbsolutePath().length());
+			file = getWebUi().getBrowseWebRoot() + file.substring(getWebUi().getBrowseRoot().getAbsolutePath().length());
 			try {
 				resp.sendRedirect(file);
 			} catch (IOException e) {
@@ -163,6 +165,10 @@ public final class ReportUpdate implements HttpRequestHandler {
 		}
 	}
 
+	private WebUi getWebUi() {
+		return webUiHolder.getWebUi();
+	}
+
 	private void rerunSearch(final HttpServletRequest req, final HttpServletResponse resp, final String rerun) throws ServletException {
 		PrintWriter output;
 		try {
@@ -176,7 +182,7 @@ public final class ReportUpdate implements HttpRequestHandler {
 		final ResubmitProgressListener listener = new ResubmitProgressListener();
 
 		try {
-			SwiftSearcherCaller.resubmitSearchRun(td, SwiftWebContext.getServletConfig().getSwiftSearcherDaemonConnection(), listener);
+			SwiftSearcherCaller.resubmitSearchRun(td, getWebUi().getSwiftSearcherDaemonConnection(), listener);
 		} catch (Exception t) {
 			throw new ServletException(t);
 		}
@@ -387,6 +393,14 @@ public final class ReportUpdate implements HttpRequestHandler {
 				}
 			}
 		}
+	}
+
+	public WebUiHolder getWebUiHolder() {
+		return webUiHolder;
+	}
+
+	public void setWebUiHolder(WebUiHolder webUiHolder) {
+		this.webUiHolder = webUiHolder;
 	}
 
 	private class ResubmitProgressListener implements ProgressListener {

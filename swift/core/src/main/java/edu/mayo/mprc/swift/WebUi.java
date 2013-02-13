@@ -9,22 +9,16 @@ import edu.mayo.mprc.config.ui.UiResponse;
 import edu.mayo.mprc.daemon.Daemon;
 import edu.mayo.mprc.daemon.DaemonConnection;
 import edu.mayo.mprc.daemon.files.FileTokenFactory;
-import edu.mayo.mprc.database.DatabasePlaceholder;
-import edu.mayo.mprc.dbcurator.model.persistence.CurationDao;
 import edu.mayo.mprc.mascot.MascotMappingFactory;
 import edu.mayo.mprc.msmseval.MSMSEvalParamFile;
 import edu.mayo.mprc.msmseval.MSMSEvalWorker;
 import edu.mayo.mprc.msmseval.MsmsEvalCache;
 import edu.mayo.mprc.myrimatch.MyrimatchMappingFactory;
 import edu.mayo.mprc.omssa.OmssaMappingFactory;
-import edu.mayo.mprc.searchdb.dao.SearchDbDao;
 import edu.mayo.mprc.sequest.SequestMappingFactory;
 import edu.mayo.mprc.swift.db.SearchEngine;
 import edu.mayo.mprc.swift.db.SwiftDao;
-import edu.mayo.mprc.swift.params2.ParamsDao;
-import edu.mayo.mprc.swift.params2.mapping.ParamsInfo;
 import edu.mayo.mprc.swift.search.SwiftSearcher;
-import edu.mayo.mprc.unimod.UnimodDao;
 import edu.mayo.mprc.workspace.WorkspaceDao;
 import edu.mayo.mprc.xtandem.XTandemMappingFactory;
 
@@ -40,17 +34,11 @@ public final class WebUi {
 	public static final String NAME = "Swift Website";
 	public static final String DESC = "Swift's web user interface.<p>The daemon that contains the web interface will run within a web server.</p>";
 	public static final UserMessage USER_MESSAGE = new UserMessage();
-	private SwiftDao swiftDao;
 	private File browseRoot;
 	private DaemonConnection databaseUndeployerDaemonConnection;
 	private DaemonConnection qstatDaemonConnection;
 	private String browseWebRoot;
 	private DaemonConnection swiftSearcherDaemonConnection;
-	private CurationDao curationDao;
-	private ParamsDao paramsDao;
-	private WorkspaceDao workspaceDao;
-	private UnimodDao unimodDao;
-	private SearchDbDao searchDbDao;
 	private Collection<SearchEngine> searchEngines;
 	private boolean scaffoldReport;
 	private boolean qa;
@@ -60,10 +48,11 @@ public final class WebUi {
 	private File fastaFolder;
 	private File fastaArchiveFolder;
 	private String title;
-	private ParamsInfo paramsInfo;
 	private FileTokenFactory fileTokenFactory;
 	private SwiftMonitor swiftMonitor;
 	private Daemon mainDaemon;
+	private SwiftDao swiftDao;
+	private WorkspaceDao workspaceDao;
 
 	public static final String SEARCHER = "searcher";
 	public static final String TITLE = "title";
@@ -76,22 +65,6 @@ public final class WebUi {
 
 	public WebUi() {
 		USER_MESSAGE.setMessage("Swift's new database deployment has been temporarily disabled. Swift needs to be upgraded to support Mascot's Database Manager. If you need a new database, please ask Roman.");
-	}
-
-	public SwiftDao getSwiftDao() {
-		return swiftDao;
-	}
-
-	public WorkspaceDao getWorkspaceDao() {
-		return workspaceDao;
-	}
-
-	public UnimodDao getUnimodDao() {
-		return unimodDao;
-	}
-
-	public SearchDbDao getSearchDbDao() {
-		return searchDbDao;
 	}
 
 	public File getFastaUploadFolder() {
@@ -118,14 +91,6 @@ public final class WebUi {
 		return swiftSearcherDaemonConnection;
 	}
 
-	public CurationDao getCurationDao() {
-		return curationDao;
-	}
-
-	public ParamsDao getParamsDao() {
-		return paramsDao;
-	}
-
 	public Collection<SearchEngine> getSearchEngines() {
 		return searchEngines;
 	}
@@ -136,10 +101,6 @@ public final class WebUi {
 
 	public boolean isScaffoldReport() {
 		return scaffoldReport;
-	}
-
-	public boolean isQa() {
-		return qa;
 	}
 
 	public boolean isDatabaseUndeployerEnabled() {
@@ -162,12 +123,12 @@ public final class WebUi {
 		return title;
 	}
 
-	public ParamsInfo getParamsInfo() {
-		return paramsInfo;
-	}
-
 	public FileTokenFactory getFileTokenFactory() {
 		return fileTokenFactory;
+	}
+
+	public void setFileTokenFactory(FileTokenFactory fileTokenFactory) {
+		this.fileTokenFactory = fileTokenFactory;
 	}
 
 	public DaemonConnection getDatabaseUndeployerDaemonConnection() {
@@ -191,21 +152,31 @@ public final class WebUi {
 		this.mainDaemon = mainDaemon;
 	}
 
+	public SwiftDao getSwiftDao() {
+		return swiftDao;
+	}
+
+	public void setSwiftDao(SwiftDao swiftDao) {
+		this.swiftDao = swiftDao;
+	}
+
+	public WorkspaceDao getWorkspaceDao() {
+		return workspaceDao;
+	}
+
+	public void setWorkspaceDao(WorkspaceDao workspaceDao) {
+		this.workspaceDao = workspaceDao;
+	}
+
 	/**
 	 * A factory capable of creating the web ui class.
 	 */
 	public static final class Factory extends FactoryBase<Config, WebUi> {
-		private SwiftDao swiftDao;
-		private CurationDao curationDao;
-		private WorkspaceDao workspaceDao;
-		private ParamsDao paramsDao;
-		private UnimodDao unimodDao;
-		private SearchDbDao searchDbDao;
-		private DatabasePlaceholder databasePlaceholder;
-		private ParamsInfo paramsInfo;
 		private Collection<SearchEngine> searchEngines;
-		private FileTokenFactory fileTokenFactory;
 		private SwiftMonitor swiftMonitor;
+		private FileTokenFactory fileTokenFactory;
+		private SwiftDao swiftDao;
+		private WorkspaceDao workspaceDao;
 
 		@Override
 		public WebUi create(final Config config, final DependencyResolver dependencies) {
@@ -215,19 +186,14 @@ public final class WebUi {
 				ui.title = config.getTitle();
 				ui.browseRoot = new File(config.getBrowseRoot());
 				ui.browseWebRoot = config.getBrowseWebRoot();
-				ui.swiftDao = getSwiftDao();
-				ui.curationDao = getCurationDao();
-				ui.workspaceDao = getWorkspaceDao();
-				ui.paramsDao = getParamsDao();
-				ui.unimodDao = getUnimodDao();
-				ui.searchDbDao = getSearchDbDao();
 				ui.swiftMonitor = getSwiftMonitor();
+				ui.setFileTokenFactory(getFileTokenFactory());
+				ui.setSwiftDao(getSwiftDao());
+				ui.setWorkspaceDao(getWorkspaceDao());
 
 				if (config.getQstat() != null) {
 					ui.qstatDaemonConnection = (DaemonConnection) dependencies.createSingleton(config.getQstat());
 				}
-				ui.paramsInfo = paramsInfo;
-				ui.fileTokenFactory = fileTokenFactory;
 
 				// Harvest the param files from searcher config
 				if (config.getSearcher() != null) {
@@ -300,54 +266,6 @@ public final class WebUi {
 			}
 		}
 
-		public SwiftDao getSwiftDao() {
-			return swiftDao;
-		}
-
-		public void setSwiftDao(final SwiftDao swiftDao) {
-			this.swiftDao = swiftDao;
-		}
-
-		public CurationDao getCurationDao() {
-			return curationDao;
-		}
-
-		public ParamsDao getParamsDao() {
-			return paramsDao;
-		}
-
-		public void setParamsDao(final ParamsDao paramsDao) {
-			this.paramsDao = paramsDao;
-		}
-
-		public void setCurationDao(final CurationDao curationDao) {
-			this.curationDao = curationDao;
-		}
-
-		public WorkspaceDao getWorkspaceDao() {
-			return workspaceDao;
-		}
-
-		public void setWorkspaceDao(final WorkspaceDao workspaceDao) {
-			this.workspaceDao = workspaceDao;
-		}
-
-		public DatabasePlaceholder getDatabasePlaceholder() {
-			return databasePlaceholder;
-		}
-
-		public void setDatabasePlaceholder(final DatabasePlaceholder databasePlaceholder) {
-			this.databasePlaceholder = databasePlaceholder;
-		}
-
-		public ParamsInfo getAbstractParamsInfo() {
-			return paramsInfo;
-		}
-
-		public void setAbstractParamsInfo(final ParamsInfo paramsInfo) {
-			this.paramsInfo = paramsInfo;
-		}
-
 		public Collection<SearchEngine> getSearchEngines() {
 			return searchEngines;
 		}
@@ -356,36 +274,36 @@ public final class WebUi {
 			this.searchEngines = searchEngines;
 		}
 
-		public FileTokenFactory getFileTokenFactory() {
-			return fileTokenFactory;
-		}
-
-		public void setFileTokenFactory(final FileTokenFactory fileTokenFactory) {
-			this.fileTokenFactory = fileTokenFactory;
-		}
-
-		public UnimodDao getUnimodDao() {
-			return unimodDao;
-		}
-
-		public void setUnimodDao(final UnimodDao unimodDao) {
-			this.unimodDao = unimodDao;
-		}
-
-		public SearchDbDao getSearchDbDao() {
-			return searchDbDao;
-		}
-
-		public void setSearchDbDao(final SearchDbDao searchDbDao) {
-			this.searchDbDao = searchDbDao;
-		}
-
 		public SwiftMonitor getSwiftMonitor() {
 			return swiftMonitor;
 		}
 
 		public void setSwiftMonitor(final SwiftMonitor swiftMonitor) {
 			this.swiftMonitor = swiftMonitor;
+		}
+
+		public FileTokenFactory getFileTokenFactory() {
+			return fileTokenFactory;
+		}
+
+		public void setFileTokenFactory(FileTokenFactory fileTokenFactory) {
+			this.fileTokenFactory = fileTokenFactory;
+		}
+
+		public SwiftDao getSwiftDao() {
+			return swiftDao;
+		}
+
+		public void setSwiftDao(SwiftDao swiftDao) {
+			this.swiftDao = swiftDao;
+		}
+
+		public WorkspaceDao getWorkspaceDao() {
+			return workspaceDao;
+		}
+
+		public void setWorkspaceDao(WorkspaceDao workspaceDao) {
+			this.workspaceDao = workspaceDao;
 		}
 	}
 

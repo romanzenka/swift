@@ -16,7 +16,7 @@ public final class MainFactoryContext {
 	private MainFactoryContext() {
 	}
 
-	private static synchronized ApplicationContext getContext() {
+	public static synchronized ApplicationContext getContext() {
 		initialize();
 		return context;
 	}
