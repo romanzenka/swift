@@ -2,26 +2,36 @@ package edu.mayo.mprc.mascot;
 
 import edu.mayo.mprc.dbcurator.model.persistence.CurationDao;
 import edu.mayo.mprc.dbcurator.model.persistence.MockCurationDao;
+import edu.mayo.mprc.swift.params2.MassUnit;
 import edu.mayo.mprc.swift.params2.MockParamsDao;
 import edu.mayo.mprc.swift.params2.ParamsDao;
+import edu.mayo.mprc.swift.params2.Tolerance;
 import edu.mayo.mprc.swift.params2.mapping.*;
 import edu.mayo.mprc.unimod.*;
 import edu.mayo.mprc.utilities.ResourceUtilities;
 import org.testng.Assert;
+import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Test;
 
 import java.io.Reader;
 import java.io.StringWriter;
 
 public final class TestMascotMappings {
+	private ParamsInfo abstractParamsInfo;
+	private MascotMappingFactory mappingFactory;
+	private Mappings mapping;
+	private Unimod unimod;
+
+	@BeforeTest
+	public void startup() {
+		abstractParamsInfo = getAbstractParamsInfo();
+		mappingFactory = new MascotMappingFactory(abstractParamsInfo);
+		mapping = mappingFactory.createMapping();
+		unimod = abstractParamsInfo.getUnimod();
+	}
 
 	@Test
 	public void shouldSupportPhosphoST() {
-		final ParamsInfo abstractParamsInfo = getAbstractParamsInfo();
-		final MascotMappingFactory mappingFactory = new MascotMappingFactory(abstractParamsInfo);
-		final Mappings mapping = mappingFactory.createMapping();
-		final Unimod unimod = abstractParamsInfo.getUnimod();
-
 		final MappingContext context = new PhosphoStContext(abstractParamsInfo);
 
 		final ModSpecificity phosphoS = unimod.getSpecificitiesByMascotName("Phospho (S)").get(0);
@@ -40,11 +50,6 @@ public final class TestMascotMappings {
 
 	@Test
 	public void shouldSupportDeamidatedNTerm() {
-		final ParamsInfo abstractParamsInfo = getAbstractParamsInfo();
-		final MascotMappingFactory mappingFactory = new MascotMappingFactory(abstractParamsInfo);
-		final Mappings mapping = mappingFactory.createMapping();
-		final Unimod unimod = abstractParamsInfo.getUnimod();
-
 		final MappingContext context = new PhosphoStContext(abstractParamsInfo);
 
 		final ModSpecificity deamidated = unimod.getSpecificitiesByMascotName("Deamidated (Protein N-term F)").get(0);
@@ -55,6 +60,14 @@ public final class TestMascotMappings {
 		final String output = mappingsToString(mapping);
 
 		Assert.assertTrue(output.contains("MODS=Deamidated (Protein N-term F)\n"), "The mods do not match");
+	}
+
+	@Test
+	public void shouldSupportPeptidePpm() {
+		final MappingContext context = new PpmContext(abstractParamsInfo);
+		mapping.setPeptideTolerance(context, new Tolerance(10.0, MassUnit.Ppm));
+		Assert.assertEquals(mapping.getNativeParam("TOL"), "0.01");
+		Assert.assertEquals(mapping.getNativeParam("TOLU"), "Da");
 	}
 
 	public static ParamsInfo getAbstractParamsInfo() {
@@ -82,6 +95,17 @@ public final class TestMascotMappings {
 		@Override
 		public void reportWarning(final String message) {
 			Assert.assertTrue(message.matches("Mascot will search additional site \\([ST]\\) for modification Phospho \\([ST]\\)"), "Unexpected warning");
+		}
+	}
+
+	private static final class PpmContext extends TestMappingContextBase {
+		public PpmContext(final ParamsInfo paramsInfo) {
+			super(paramsInfo);
+		}
+
+		@Override
+		public void reportWarning(final String message) {
+			Assert.assertTrue(message.matches("Mascot does not support 'ppm' fragment tolerances; using \\d+\\.\\d* Da instead."));
 		}
 	}
 }

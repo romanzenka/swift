@@ -3,6 +3,7 @@ package edu.mayo.mprc.mascot;
 import com.google.common.collect.ImmutableMap;
 import edu.mayo.mprc.MprcException;
 import edu.mayo.mprc.swift.params2.Instrument;
+import edu.mayo.mprc.swift.params2.MassUnit;
 import edu.mayo.mprc.swift.params2.Protease;
 import edu.mayo.mprc.swift.params2.Tolerance;
 import edu.mayo.mprc.swift.params2.mapping.MappingContext;
@@ -22,6 +23,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public final class MascotMappings implements Mappings {
+	public static final double PPM_TO_DALTON = 1000.0;
 	private final Map<Protease, String> mascotNamesByEnzyme;
 	private static final String PEP_TOL_VALUE = "TOL";
 	private static final String PEP_TOL_UNIT = "TOLU";
@@ -192,7 +194,14 @@ public final class MascotMappings implements Mappings {
 	}
 
 	public void setPeptideTolerance(final MappingContext context, final Tolerance peptideTolerance) {
-		mapToleranceToNative(context, peptideTolerance, PEP_TOL_VALUE, PEP_TOL_UNIT);
+		if (peptideTolerance.getUnit() == MassUnit.Ppm) {
+			final double value = peptideTolerance.getValue() / PPM_TO_DALTON;
+			final Tolerance newTolerance = new Tolerance(value, MassUnit.Da);
+			context.reportWarning("Mascot does not support '" + peptideTolerance.getUnit() + "' fragment tolerances; using " + newTolerance.getValue() + " " + newTolerance.getUnit().getCode() + " instead.");
+			mapToleranceToNative(context, newTolerance, PEP_TOL_VALUE, PEP_TOL_UNIT);
+		} else {
+			mapToleranceToNative(context, peptideTolerance, PEP_TOL_VALUE, PEP_TOL_UNIT);
+		}
 	}
 
 	public void setFragmentTolerance(final MappingContext context, final Tolerance fragmentTolerance) {
