@@ -68,19 +68,14 @@ public final class SwiftApp implements EntryPoint, HidesPageContentsWhileLoading
 			DOM.setStyleAttribute(DOM.getElementById("hidden_while_loading"), "display", "none");
 			hidePageContentsWhileLoading();
 
-			initFileTable();
-			initSpectrumQa();
-			initReport();
+			final String searchDefinitionId = getQueryString(LOAD_SEARCH_DEFINITION_ID);
 			initPublicMgfs();
 			initTitleEditor();
-			initParamsEditor();
 			initEditorToggle();
-			initUserList();
 			initAddFilesButton();
 			initOutputLocation();
 			initRunButton();
-			initMessage();
-			loadPreviousSearch();
+			initPage(searchDefinitionId == null ? null : Integer.parseInt(searchDefinitionId));
 		} catch (Exception t) {
 			throw new RuntimeException(t);
 		} finally {
@@ -111,19 +106,32 @@ public final class SwiftApp implements EntryPoint, HidesPageContentsWhileLoading
 		this.addFileButton.setEnabled(true);
 	}
 
-	private void initFileTable() {
+	private void initPage(Integer previousSearchId) {
 		hidePageContentsWhileLoading();
-		ServiceConnection.instance().listSearchEngines(
-				new AsyncCallback<List<ClientSearchEngine>>() {
-					public void onFailure(final Throwable throwable) {
-						// SWALLOWED: No search engines. We just create filetable that does not let user to enable any search engine
-						finalizeFileTableInit(new ArrayList<ClientSearchEngine>());
-					}
+		ServiceConnection.instance().getInitialPageData(previousSearchId, new AsyncCallback<InitialPageData>() {
+			@Override
+			public void onFailure(Throwable caught) {
+				// SWALLOWED: Fail
+				finalizeFileTableInit(new ArrayList<ClientSearchEngine>());
+				finalizeSpectrumQa(null);
+				// InitReport fail
+				DOM.setStyleAttribute(DOM.getElementById("reportingRow"), "display", "none");
+				showPageContentsAfterLoad();
+			}
 
-					public void onSuccess(final List<ClientSearchEngine> o) {
-						finalizeFileTableInit(o);
-					}
-				});
+			@Override
+			public void onSuccess(final InitialPageData result) {
+				previousSearchRunId = result.loadedSearch() == null ? -1 : result.loadedSearch().getSearchId();
+				initParamsEditor(result);
+				finalizeFileTableInit(result.getSearchEngines());
+				finalizeSpectrumQa(result.getSpectrumQaParamFileInfo());
+				finalizeInitReport(result.isScaffoldReportEnabled());
+				initUserList(result.listUsers());
+				showPageContentsAfterLoad();
+				initMessage(result.getUserMessage());
+				loadPreviousSearch(result.loadedSearch());
+			}
+		});
 	}
 
 	private void finalizeFileTableInit(final List<ClientSearchEngine> o) {
@@ -131,29 +139,12 @@ public final class SwiftApp implements EntryPoint, HidesPageContentsWhileLoading
 		final RootPanel filePanel = RootPanel.get("fileTable");
 		filePanel.add(files);
 		connectOutputLocationAndFileTable();
-		showPageContentsAfterLoad();
-	}
-
-	private void initSpectrumQa() {
-		hidePageContentsWhileLoading();
-		ServiceConnection.instance().listSpectrumQaParamFiles(new AsyncCallback<List<SpectrumQaParamFileInfo>>() {
-			public void onFailure(final Throwable throwable) {
-				// SWALLOWED: No msmsEval available. Do not even create the spectrum QA UI
-				finalizeSpectrumQa(null);
-			}
-
-			public void onSuccess(final List<SpectrumQaParamFileInfo> o) {
-				finalizeSpectrumQa(o);
-			}
-		});
 	}
 
 	private void initPublicMgfs() {
-		hidePageContentsWhileLoading();
 		additionalSettingsPanel = new AdditionalSettingsPanel();
 		final RootPanel panel = RootPanel.get("publicResults");
 		panel.add(additionalSettingsPanel);
-		showPageContentsAfterLoad();
 	}
 
 	private void finalizeSpectrumQa(final List<SpectrumQaParamFileInfo> list) {
@@ -182,27 +173,19 @@ public final class SwiftApp implements EntryPoint, HidesPageContentsWhileLoading
 		title.addChangeListener(titleChangeListener);
 	}
 
-	private void initReport() {
-		ServiceConnection.instance().isScaffoldReportEnabled(new AsyncCallback<Boolean>() {
-			public void onFailure(final Throwable throwable) {
-				DOM.setStyleAttribute(DOM.getElementById("reportingRow"), "display", "none");
-			}
-
-			public void onSuccess(final Boolean reportEnabled) {
-				if (reportEnabled) {
-					DOM.setStyleAttribute(DOM.getElementById("reportingRow"), "display", "");
-					reportSetupPanel = new ReportSetupPanel();
-					final RootPanel rootPanel = RootPanel.get("report");
-					rootPanel.add(reportSetupPanel);
-				} else {
-					DOM.setStyleAttribute(DOM.getElementById("reportingRow"), "display", "none");
-				}
-			}
-		});
+	private void finalizeInitReport(Boolean reportEnabled) {
+		if (reportEnabled) {
+			DOM.setStyleAttribute(DOM.getElementById("reportingRow"), "display", "");
+			reportSetupPanel = new ReportSetupPanel();
+			final RootPanel rootPanel = RootPanel.get("report");
+			rootPanel.add(reportSetupPanel);
+		} else {
+			DOM.setStyleAttribute(DOM.getElementById("reportingRow"), "display", "none");
+		}
 	}
 
-	private void initParamsEditor() {
-		ParamsEditorApp.onModuleLoad(this, userInfo);
+	private void initParamsEditor(InitialPageData pageData) {
+		ParamsEditorApp.onModuleLoad(pageData);
 		paramsEditor = ParamsEditorApp.getPanel();
 	}
 
@@ -258,11 +241,11 @@ public final class SwiftApp implements EntryPoint, HidesPageContentsWhileLoading
 		return "<div class=\"user-message\">" + message + "</div>";
 	}
 
-	private void initMessage() {
+	private void initMessage(final String message) {
 		final RootPanel messagePanel = RootPanel.get("messagePlaceholder");
 		messageDisplay.setVisible(false);
 		messagePanel.add(messageDisplay);
-		updateUserMessage();
+		displayMessage(message);
 	}
 
 	/**
@@ -278,80 +261,59 @@ public final class SwiftApp implements EntryPoint, HidesPageContentsWhileLoading
 	/**
 	 * Check query string to see if the user wants to load previous search data into the forms.
 	 */
-	private void loadPreviousSearch() {
-		hidePageContentsWhileLoading();
-		final String searchRunIdString = getQueryString(LOAD_SEARCH_DEFINITION_ID);
-		if (searchRunIdString == null) {
-			showPageContentsAfterLoad();
+	private void loadPreviousSearch(final ClientLoadedSearch result) {
+		if (result == null) {
 			return;
 		}
-		int searchRunId = -1;
-		try {
-			searchRunId = Integer.parseInt(searchRunIdString);
-			previousSearchRunId = searchRunId;
-			ServiceConnection.instance().loadSearch(new Service.Token(true), searchRunId, new AsyncCallback<ClientLoadedSearch>() {
-				public void onFailure(final Throwable caught) {
-					// SWALLOWED: not a big deal when a load fails
-					// Clear the search run id - load did not work
-					previousSearchRunId = 0;
-					showPageContentsAfterLoad();
-				}
+		final ClientSwiftSearchDefinition definition = result.getDefinition();
+		displayMessage("Loaded previous search " + definition.getSearchTitle());
 
-				public void onSuccess(final ClientLoadedSearch result) {
-					final ClientSwiftSearchDefinition definition = result.getDefinition();
-					displayMessage("Loaded previous search " + definition.getSearchTitle());
-
-					if (result.getClientParamSetList() != null) {
-						// We transfered a new parameter set list together with search definition
-						// Update the parameter editor.
-						paramsEditor.setParamSetList(result.getClientParamSetList());
-					}
-
-					paramsEditor.setSelectedParamSet(result.getDefinition().getParamSet());
-
-					// Determine search type
-					SearchType searchType = null;
-					for (final ClientFileSearch clientFileSearch : definition.getInputFiles()) {
-						final String fileNamefileNameWithoutExtension = FilePathWidget.getFileNameWithoutExtension(clientFileSearch.getPath());
-						final SearchType newSearchType = SearchTypeList.getSearchTypeFromSetup(
-								definition.getSearchTitle(),
-								fileNamefileNameWithoutExtension,
-								clientFileSearch.getExperiment(),
-								clientFileSearch.getBiologicalSample());
-						if (searchType == null) {
-							searchType = newSearchType;
-						} else {
-							if (!searchType.equals(newSearchType)) {
-								searchType = SearchType.Custom;
-								break;
-							}
-						}
-					}
-
-					final String title = definition.getSearchTitle();
-					setTitleText(title);
-					if (spectrumQaSetupPanel != null) {
-						spectrumQaSetupPanel.setParameters(definition.getSpectrumQa());
-					}
-					if (reportSetupPanel != null) {
-						reportSetupPanel.setParameters(definition.getPeptideReport());
-					}
-					final List<ClientFileSearch> inputFiles = definition.getInputFiles();
-
-					files.setFiles(inputFiles, searchType);
-
-					output.setText(definition.getOutputFolder());
-					selectUser(definition.getUser().getEmail());
-
-					additionalSettingsPanel.setPublicMgfs(definition.isPublicMgfFiles());
-					additionalSettingsPanel.setPublicSearchFiles(definition.isPublicSearchFiles());
-
-					showPageContentsAfterLoad();
-				}
-			});
-		} catch (Exception t) {
-			throw new RuntimeException("Invalid search definition id: " + searchRunId, t);
+		if (result.getClientParamSetList() != null) {
+			// We transfered a new parameter set list together with search definition
+			// Update the parameter editor.
+			paramsEditor.setParamSetList(result.getClientParamSetList());
 		}
+
+		paramsEditor.setSelectedParamSet(result.getDefinition().getParamSet());
+
+		// Determine search type
+		SearchType searchType = null;
+		for (final ClientFileSearch clientFileSearch : definition.getInputFiles()) {
+			final String fileNamefileNameWithoutExtension = FilePathWidget.getFileNameWithoutExtension(clientFileSearch.getPath());
+			final SearchType newSearchType = SearchTypeList.getSearchTypeFromSetup(
+					definition.getSearchTitle(),
+					fileNamefileNameWithoutExtension,
+					clientFileSearch.getExperiment(),
+					clientFileSearch.getBiologicalSample());
+			if (searchType == null) {
+				searchType = newSearchType;
+			} else {
+				if (!searchType.equals(newSearchType)) {
+					searchType = SearchType.Custom;
+					break;
+				}
+			}
+		}
+
+		final String title = definition.getSearchTitle();
+		setTitleText(title);
+		if (spectrumQaSetupPanel != null) {
+			spectrumQaSetupPanel.setParameters(definition.getSpectrumQa());
+		}
+		if (reportSetupPanel != null) {
+			reportSetupPanel.setParameters(definition.getPeptideReport());
+		}
+		final List<ClientFileSearch> inputFiles = definition.getInputFiles();
+
+		files.setFiles(inputFiles, searchType);
+
+		output.setText(definition.getOutputFolder());
+		selectUser(definition.getUser().getEmail());
+
+		additionalSettingsPanel.setPublicMgfs(definition.isPublicMgfFiles());
+		additionalSettingsPanel.setPublicSearchFiles(definition.isPublicSearchFiles());
+
+		showPageContentsAfterLoad();
 	}
 
 	private void updateUserMessage() {
@@ -375,7 +337,7 @@ public final class SwiftApp implements EntryPoint, HidesPageContentsWhileLoading
 		}
 	}
 
-	private void initUserList() {
+	private void initUserList(ClientUser[] list) {
 		// The user listing is downloaded by an async call.
 		final RootPanel userPanel = RootPanel.get("email");
 		userPanel.add(users);
@@ -384,27 +346,16 @@ public final class SwiftApp implements EntryPoint, HidesPageContentsWhileLoading
 				userChanged();
 			}
 		});
-		hidePageContentsWhileLoading();
-		ServiceConnection.instance().listUsers(new AsyncCallback<ClientUser[]>() {
-			public void onFailure(final Throwable throwable) {
-				showPageContents();
-			}
+		users.addItem(SELECT_USER_STRING, "");
+		userInfo.clear();
+		for (final ClientUser user : list) {
+			users.addItem(user.getName(), user.getEmail());
+			userInfo.put(user.getEmail(), user);
+		}
 
-			public void onSuccess(final ClientUser[] list) {
-				users.addItem(SELECT_USER_STRING, "");
-				userInfo.clear();
-				for (final ClientUser user : list) {
-					users.addItem(user.getName(), user.getEmail());
-					userInfo.put(user.getEmail(), user);
-				}
-
-				// Select the user according to the cookie stored
-				final String userEmail = Cookies.getCookie("email");
-				selectUser(userEmail);
-
-				showPageContentsAfterLoad();
-			}
-		});
+		// Select the user according to the cookie stored
+		final String userEmail = Cookies.getCookie("email");
+		selectUser(userEmail);
 	}
 
 	private void selectUser(final String userEmail) {
@@ -436,13 +387,7 @@ public final class SwiftApp implements EntryPoint, HidesPageContentsWhileLoading
 						files.addFiles(info);
 					}
 				});
-//				try {
-//					LightBox lightBox = new LightBox(dialog);
-//					lightBox.show();
-//				} catch (Exception ignore) {
-				// The lightbox failed.
 				dialog.show();
-//				}
 			}
 		});
 		addFileButton.setEnabled(false);
@@ -569,8 +514,8 @@ public final class SwiftApp implements EntryPoint, HidesPageContentsWhileLoading
 	//redirect the browser to the given url
 
 	public static native void redirect(String url)/*-{
-		$wnd.location = url;
-	}-*/;
+        $wnd.location = url;
+    }-*/;
 
 	private class RunClickListener implements ClickListener {
 		private final SwiftApp swiftApp;
@@ -621,7 +566,7 @@ public final class SwiftApp implements EntryPoint, HidesPageContentsWhileLoading
 				def.setFromScratch(additionalSettingsPanel.isFromScratch());
 				def.setLowPriority(additionalSettingsPanel.isLowPriority());
 
-				ServiceConnection.instance().startSearch(new Service.Token(true), def, new AsyncCallback<Void>() {
+				ServiceConnection.instance().startSearch(def, new AsyncCallback<Void>() {
 					public void onFailure(final Throwable throwable) {
 						dialog.hide();
 						SimpleParamsEditorPanel.handleGlobalError(throwable);

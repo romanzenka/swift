@@ -2,8 +2,7 @@ package edu.mayo.mprc.swift.ui.client.widgets.validation;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.*;
-import edu.mayo.mprc.swift.ui.client.HidesPageContentsWhileLoading;
-import edu.mayo.mprc.swift.ui.client.Service;
+import edu.mayo.mprc.swift.ui.client.InitialPageData;
 import edu.mayo.mprc.swift.ui.client.ServiceAsync;
 import edu.mayo.mprc.swift.ui.client.SimpleParamsEditorPanel;
 import edu.mayo.mprc.swift.ui.client.rpc.*;
@@ -24,9 +23,8 @@ public final class ValidationController implements ChangeListener, SourcesChange
 
 	private ClientParamSet paramSet;
 	private ClientParamSetValues values;
-	private ServiceAsync s;
+	private ServiceAsync serviceAsync;
 	private ParamSetSelectionController selector;
-	private HidesPageContentsWhileLoading contentsHiding;
 
 	/**
 	 * Maps parameter id strings one-to-one onto registrations.
@@ -47,6 +45,8 @@ public final class ValidationController implements ChangeListener, SourcesChange
 	private ChangeListenerCollection listeners = new ChangeListenerCollection();
 	private Registration awaitingUpdate = null;
 	private ClientValue awaitingUpdateValue = null;
+	// Cached list of allowed values
+	private HashMap<String, List<ClientValue>> allowedValues = new HashMap<String, List<ClientValue>>(10);
 
 	/**
 	 * Each widget has a registration that associates the various pieces together.
@@ -56,8 +56,7 @@ public final class ValidationController implements ChangeListener, SourcesChange
 		private ValidationPanel validationPanel;
 		private ClientValidationList cv;
 		private String param;
-		private String mappingData; // mappingData that was passed to AbstractParam in order to get below allowedValues
-		private List<? extends ClientValue> allowedValues;
+		private List<ClientValue> allowedValues;
 
 		private Registration(final Validatable v, final String param, final ValidationPanel validationPanel) {
 			this.v = v;
@@ -81,28 +80,17 @@ public final class ValidationController implements ChangeListener, SourcesChange
 			return param;
 		}
 
-		public String getMappingData() {
-			return mappingData;
-		}
-
-		public List<? extends ClientValue> getAllowedValues() {
+		public List<ClientValue> getAllowedValues() {
 			return allowedValues;
 		}
 	}
 
 
-	public ValidationController(final ServiceAsync serviceAsync, final ParamSetSelectionController selector) {
-		this.s = serviceAsync;
+	public ValidationController(final ServiceAsync serviceAsync, final ParamSetSelectionController selector, final InitialPageData pageData) {
+		this.serviceAsync = serviceAsync;
 		this.selector = selector;
+		this.allowedValues = pageData.getAllowedValues();
 		selector.addParamSetSelectionListener(this);
-	}
-
-	public HidesPageContentsWhileLoading getContentsHiding() {
-		return contentsHiding;
-	}
-
-	public void setContentsHiding(final HidesPageContentsWhileLoading contentsHiding) {
-		this.contentsHiding = contentsHiding;
 	}
 
 	/**
@@ -222,36 +210,20 @@ public final class ValidationController implements ChangeListener, SourcesChange
 	}
 
 	private void createTemporary(final Registration r, final ClientValue value) {
-		s.save(new Service.Token(true), paramSet, null, null, null,
+		serviceAsync.save(paramSet, null, null, null,
 				false, new AsyncCallback<ClientParamSet>() {
 			public void onFailure(final Throwable throwable) {
 				SimpleParamsEditorPanel.handleGlobalError(throwable);
 			}
 
 			public void onSuccess(final ClientParamSet newParamSet) {
-				selector.refresh(new ParamSetSelectionController.Callback() {
-					public void refreshed() {
-						// we match ClientParamSets by pointer, so always use the one from the list.
-						ClientParamSet selectme = null;
-						final List<ClientParamSet> list = selector.getClientParamSets();
-						for (final ClientParamSet aList : list) {
-							if (aList.equals(newParamSet)) {
-								selectme = aList;
-								break;
-							}
-						}
-						if (selectme == null) {
-							throw new RuntimeException("Temporary param set isn't in list");
-						}
-						selector.select(selectme);
-					}
-				});
+				selector.refresh();
 			}
 		});
 	}
 
 	private void doUpdate(final Registration r, final ClientValue value) {
-		s.update(new Service.Token(true), paramSet, r.getParam(), value, new UpdateCallback(r));
+		serviceAsync.update(paramSet, r.getParam(), value, new UpdateCallback(r));
 	}
 
 	private class UpdateCallback implements AsyncCallback<ClientParamsValidations> {
@@ -288,8 +260,7 @@ public final class ValidationController implements ChangeListener, SourcesChange
 	}
 
 	public void updateDependent(final Callback cb) {
-
-		fetchAllowedValues(new Callback() {
+		fetchAllowedValues(byWidget.keySet(), new Callback() {
 
 			public void done() {
 				final List<ClientParam> vals = values.getValues();
@@ -298,7 +269,9 @@ public final class ValidationController implements ChangeListener, SourcesChange
 					update(val.getParamId(), val.getValue(), val.getValidationList(), visited);
 				}
 				finishedUpdating();
-				cb.done();
+				if (cb != null) {
+					cb.done();
+				}
 			}
 		});
 
@@ -309,85 +282,89 @@ public final class ValidationController implements ChangeListener, SourcesChange
 	}
 
 	public void getAllowedValuesForValidatable(final Validatable v, final Callback cb) {
-		final Registration r = byWidget.get(v);
-		s.getAllowedValues(new Service.Token(true),
-				paramSet,
-				new String[]{r.getParam()},
-				new String[]{null}, new AsyncCallback<List<List<ClientValue>>>() {
-
-			public void onFailure(final Throwable throwable) {
-				SimpleParamsEditorPanel.handleGlobalError(throwable);
-			}
-
-			public void onSuccess(final List<List<ClientValue>> allowedValues) {
-				if (allowedValues.size() != 1) {
-					throw new RuntimeException("Incorrect number of allowed values returned.");
-				}
-				r.allowedValues = allowedValues.get(0);
-				final HashSet<Validatable> visited = new HashSet<Validatable>();
-				update(r.getParam(), null, r.getCv(), visited);
-				if (cb != null) {
-					cb.done();
-				}
-			}
-		});
-
+		fetchAllowedValues(Arrays.asList(v), cb);
 	}
 
-	private void fetchAllowedValues(final Callback cb) {
+	/**
+	 * Fetches a list of allowed values for a list of widgets.
+	 * Consults a local cache not to go back to the server.
+	 * If you want to bypass the caching, call {@link #cleanAllowedValues} for the widgets to refetch values for.
+	 *
+	 * @param widgets List of {@link Validatable} to fetch allowed values for.
+	 * @param cb      Callback to call when done.
+	 */
+	private void fetchAllowedValues(Collection<Validatable> widgets, final Callback cb) {
 		final List<String> params = new ArrayList<String>();
-		final List<String> mappingDatas = new ArrayList<String>();
-		for (final Object o : byWidget.values()) {
-			final Registration r = (Registration) o;
-			final String newMappingData = r.getV().getAllowedValuesParam();
-			if (newMappingData != null && ((!newMappingData.equals(r.getMappingData())) || r.getAllowedValues() == null)) {
+		final List<String> paramsToFetch = new ArrayList<String>();
+		final List<List<ClientValue>> cachedValues = new ArrayList<List<ClientValue>>();
+
+		for (final Validatable widget : widgets) {
+			final Registration r = byWidget.get(widget);
+			// We do not have this value cached, so it will be set to change
+			if (widget.needsAllowedValues() && r.getAllowedValues() == null && !allowedValues.containsKey(r.getParam())) {
+				paramsToFetch.add(r.getParam());
+			} else {
 				params.add(r.getParam());
-				mappingDatas.add(newMappingData);
+				cachedValues.add(allowedValues.get(r.getParam()));
 			}
 		}
 
-		if (params.size() == 0) {
+		if (params.size() + paramsToFetch.size() == 0) {
 			if (cb != null) {
 				cb.done();
 			}
 			return;
 		}
 
-		s.getAllowedValues(new Service.Token(true),
-				paramSet,
-				params.toArray(new String[params.size()]),
-				mappingDatas.toArray(new String[mappingDatas.size()]), new AsyncCallback<List<List<ClientValue>>>() {
+		if (paramsToFetch.size() > 0) {
+			serviceAsync.getAllowedValues(
+					paramsToFetch.toArray(new String[paramsToFetch.size()]),
+					new AsyncCallback<List<List<ClientValue>>>() {
 
-			public void onFailure(final Throwable throwable) {
-				SimpleParamsEditorPanel.handleGlobalError(throwable);
-			}
+						public void onFailure(final Throwable throwable) {
+							SimpleParamsEditorPanel.handleGlobalError(throwable);
+						}
 
-			public void onSuccess(final List<List<ClientValue>> allowedValues) {
-				if (allowedValues.size() != params.size()) {
-					throw new RuntimeException("Incorrect number of allowed values returned.");
-				}
-				final HashSet<Validatable> visited = new HashSet<Validatable>();
-				for (int i = 0; i < params.size(); ++i) {
-					final Registration r = byParam.get(params.get(i));
-					r.allowedValues = allowedValues.get(i);
-					r.mappingData = mappingDatas.get(i);
-					update(r.getParam(), null, r.getCv(), visited);
-				}
+						public void onSuccess(final List<List<ClientValue>> allowedValues) {
+							allowedValues.addAll(cachedValues);
+							paramsToFetch.addAll(params);
+							allowedValuesArrived(allowedValues, paramsToFetch, cb);
+						}
+					});
+		} else {
+			allowedValuesArrived(cachedValues, params, cb);
+		}
+	}
 
-				if (cb != null) {
-					cb.done();
-				}
-			}
-		});
+	private void allowedValuesArrived(List<List<ClientValue>> allowedValues, List<String> params, Callback cb) {
+		if (allowedValues.size() != params.size()) {
+			throw new RuntimeException("Incorrect number of allowed values returned.");
+		}
+		final HashSet<Validatable> visited = new HashSet<Validatable>();
+		for (int i = 0; i < params.size(); ++i) {
+			final Registration r = byParam.get(params.get(i));
+			r.allowedValues = allowedValues.get(i);
+			this.allowedValues.put(r.getParam(), r.allowedValues);
+			update(r.getParam(), null, r.getCv(), visited);
+		}
+
+		if (cb != null) {
+			cb.done();
+		}
 	}
 
 	/**
 	 * Forces the refetch of given allowed values.
 	 */
 	public void getAllowedValues(final Validatable v, final Callback cb) {
+		cleanAllowedValues(v);
+		fetchAllowedValues(Arrays.asList(v), cb);
+	}
+
+	public void cleanAllowedValues(Validatable v) {
 		final Registration r = byWidget.get(v);
 		r.allowedValues = null;
-		fetchAllowedValues(cb);
+		allowedValues.remove(r.getParam());
 	}
 
 	public void addChangeListener(final ChangeListener changeListener) {
@@ -447,35 +424,18 @@ public final class ValidationController implements ChangeListener, SourcesChange
 
 			} else {
 
-				if (contentsHiding != null) {
-					contentsHiding.hidePageContentsWhileLoading();
-				}
-				s.getParamSetValues(new Service.Token(true), sel, new AsyncCallback<ClientParamSetValues>() {
+				serviceAsync.getParamSetValues(sel, new AsyncCallback<ClientParamSetValues>() {
 					public void onFailure(final Throwable throwable) {
-						contentsHiding.showPageContents();
 						SimpleParamsEditorPanel.handleGlobalError(throwable);
 					}
 
 					public void onSuccess(final ClientParamSetValues newValues) {
-						try {
-							if (newValues == null) {
-								throw new RuntimeException("Didn't get a ClientParamSet");
-							}
-							values = newValues;
-							paramSet = sel;
-							updateDependent(new Callback() {
-								public void done() {
-									if (contentsHiding != null) {
-										contentsHiding.showPageContentsAfterLoad();
-									}
-								}
-							}
-							);
-						} catch (Exception ignore) {
-							if (contentsHiding != null) {
-								contentsHiding.showPageContents();
-							}
+						if (newValues == null) {
+							throw new RuntimeException("Didn't get a ClientParamSet");
 						}
+						values = newValues;
+						paramSet = sel;
+						updateDependent(null);
 					}
 				});
 			}

@@ -121,8 +121,8 @@ public final class ScaffoldSettingsEditor extends Composite implements Validatab
 		ValidationController.setValidationSeverity(validationSeverity, this);
 	}
 
-	public String getAllowedValuesParam() {
-		return null; // No such thing
+	public boolean needsAllowedValues() {
+		return false;
 	}
 
 	public void setAllowedValues(final List<? extends ClientValue> values) {

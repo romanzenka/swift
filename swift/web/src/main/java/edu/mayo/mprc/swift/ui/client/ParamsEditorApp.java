@@ -2,9 +2,6 @@ package edu.mayo.mprc.swift.ui.client;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.rpc.ServiceDefTarget;
-import edu.mayo.mprc.swift.ui.client.rpc.ClientUser;
-
-import java.util.Map;
 
 /**
  * Hosts SimpleParamsEditorPanel for testing.
@@ -30,7 +27,7 @@ public final class ParamsEditorApp {
 	/**
 	 * * This is the entry point method.
 	 */
-	public static void onModuleLoad(final HidesPageContentsWhileLoading contentHiding, final Map<String, ClientUser> userInfo) {
+	public static void onModuleLoad(InitialPageData pageData) {
 		GWT.setUncaughtExceptionHandler(new GWT.UncaughtExceptionHandler() {
 			public void onUncaughtException(final Throwable throwable) {
 				SimpleParamsEditorPanel.handleGlobalError(throwable);
@@ -39,7 +36,7 @@ public final class ParamsEditorApp {
 
 		initConnection();
 
-		panel = new SimpleParamsEditorPanel(serviceAsync, contentHiding, userInfo);
+		panel = new SimpleParamsEditorPanel(serviceAsync, pageData);
 
 	}
 

@@ -4,8 +4,6 @@ import com.google.gwt.user.client.Cookies;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.ChangeListener;
 import com.google.gwt.user.client.ui.Widget;
-import edu.mayo.mprc.swift.ui.client.HidesPageContentsWhileLoading;
-import edu.mayo.mprc.swift.ui.client.Service;
 import edu.mayo.mprc.swift.ui.client.ServiceAsync;
 import edu.mayo.mprc.swift.ui.client.SimpleParamsEditorPanel;
 import edu.mayo.mprc.swift.ui.client.rpc.ClientParamSet;
@@ -19,7 +17,6 @@ import java.util.*;
 public final class ParamSetSelectionController implements ChangeListener {
 	private ClientParamSetList list;
 	private ServiceAsync service;
-	private HidesPageContentsWhileLoading contentsHiding;
 
 	private ParamsSelector selector;
 
@@ -42,14 +39,6 @@ public final class ParamSetSelectionController implements ChangeListener {
 		this.service = service;
 	}
 
-	public HidesPageContentsWhileLoading getContentsHiding() {
-		return contentsHiding;
-	}
-
-	public void setContentsHiding(final HidesPageContentsWhileLoading contentsHiding) {
-		this.contentsHiding = contentsHiding;
-	}
-
 	public void setSelector(final ParamsSelector selector) {
 		this.selector = selector;
 		if (list != null) {
@@ -66,10 +55,6 @@ public final class ParamSetSelectionController implements ChangeListener {
 		return list.getList();
 	}
 
-	public void refresh() {
-		refresh(null);
-	}
-
 	public static Date getCookieExpirationDate() {
 		final Date expires = new Date();
 		long expiresLong = expires.getTime();
@@ -78,33 +63,14 @@ public final class ParamSetSelectionController implements ChangeListener {
 		return expires;
 	}
 
-	public interface Callback {
-		void refreshed();
-	}
-
-	public void refresh(final Callback cb) {
-		if (null != contentsHiding) {
-			contentsHiding.hidePageContentsWhileLoading();
-		}
-		service.getParamSetList(new Service.Token(true), new AsyncCallback<ClientParamSetList>() {
+	public void refresh() {
+		service.getParamSetList(new AsyncCallback<ClientParamSetList>() {
 			public void onFailure(final Throwable throwable) {
-				if (null != contentsHiding) {
-					contentsHiding.showPageContents();
-				}
 				SimpleParamsEditorPanel.handleGlobalError(throwable);
 			}
 
 			public void onSuccess(final ClientParamSetList o) {
-				try {
-					setParamSetList(o);
-					if (cb != null) {
-						cb.refreshed();
-					}
-				} finally {
-					if (null != contentsHiding) {
-						contentsHiding.showPageContentsAfterLoad();
-					}
-				}
+				setParamSetList(o);
 			}
 		});
 	}

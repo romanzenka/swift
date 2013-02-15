@@ -9,15 +9,21 @@ package edu.mayo.mprc.swift.ui.client.rpc;
  */
 public final class ClientLoadedSearch implements ClientValue {
 	private static final long serialVersionUID = 20101221L;
+	private int searchId;
 	private ClientSwiftSearchDefinition definition;
 	private ClientParamSetList clientParamSetList;
 
 	public ClientLoadedSearch() {
 	}
 
-	public ClientLoadedSearch(final ClientSwiftSearchDefinition definition, final ClientParamSetList clientParamSetList) {
+	public ClientLoadedSearch(final int searchId, final ClientSwiftSearchDefinition definition, final ClientParamSetList clientParamSetList) {
+		this.searchId =searchId;
 		this.definition = definition;
 		this.clientParamSetList = clientParamSetList;
+	}
+
+	public int getSearchId() {
+		return searchId;
 	}
 
 	public ClientSwiftSearchDefinition getDefinition() {

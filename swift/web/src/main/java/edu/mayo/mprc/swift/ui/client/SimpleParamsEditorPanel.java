@@ -17,10 +17,7 @@ import edu.mayo.mprc.swift.ui.client.widgets.ParamSetSelectionController;
 import edu.mayo.mprc.swift.ui.client.widgets.ParamsSelector;
 import edu.mayo.mprc.swift.ui.client.widgets.validation.*;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
+import java.util.*;
 
 /**
  * Allow users to edit parameter sets directly on the swift submit page.
@@ -87,27 +84,15 @@ public final class SimpleParamsEditorPanel implements SourcesChangeEvents {
 	private DatabaseListBox dlb;
 
 
-	public SimpleParamsEditorPanel(final ServiceAsync serviceAsync, final HidesPageContentsWhileLoading contentsHiding, final Map<String, ClientUser> userInfo) {
+	public SimpleParamsEditorPanel(final ServiceAsync serviceAsync, final InitialPageData pageData) {
 		this.serviceAsync = serviceAsync;
-		this.userInfo = userInfo;
+		userInfo = new HashMap<String, ClientUser>();
+		for (ClientUser clientUser : pageData.listUsers()) {
+			userInfo.put(clientUser.getEmail(), clientUser);
+		}
 		selectionController = new ParamSetSelectionController(serviceAsync);
-		selectionController.setContentsHiding(contentsHiding);
-		validationController = new ValidationController(serviceAsync, selectionController);
-		validationController.setContentsHiding(contentsHiding);
+		validationController = new ValidationController(serviceAsync, selectionController, pageData);
 		editorElements = new ArrayList();
-
-		contentsHiding.hidePageContentsWhileLoading();
-		serviceAsync.login("", "", new AsyncCallback<Boolean>() { // TODO: real login
-
-			public void onFailure(final Throwable caught) {
-				contentsHiding.showPageContents();
-				handleGlobalError(caught);
-			}
-
-			public void onSuccess(final Boolean result) {
-				contentsHiding.showPageContentsAfterLoad();
-			}
-		});
 
 		final HorizontalPanel hp = new HorizontalPanel();
 		final RootPanel paramsSelectorPanel = RootPanel.get("paramsSelector");
@@ -115,7 +100,7 @@ public final class SimpleParamsEditorPanel implements SourcesChangeEvents {
 
 		selector = new ParamsSelector();
 		selectionController.setSelector(selector);
-		selectionController.refresh();
+		selectionController.setParamSetList(pageData.getParamSetList());
 		hp.add(selector);
 
 		// save buttons //////////////////////////////////////////////////////////
@@ -193,23 +178,13 @@ public final class SimpleParamsEditorPanel implements SourcesChangeEvents {
 			p.add(pb);
 
 			//Add undeployer link if enabled.
-			serviceAsync.isDatabaseUndeployerEnabled(new AsyncCallback<Boolean>() {
-
-				public void onFailure(final Throwable caught) {
-					//Do nothing, do not add undeploy link.
-					throw new RuntimeException("Can not determine if database undeployer is enabled", caught);
-				}
-
-				public void onSuccess(final Boolean result) {
-					if (result.booleanValue()) {
-						final PushButton du = new PushButton("Undeploy Database");
-						du.addStyleName(ACTION_LINK);
-						du.setTitle("Click here to undeploy database from search engines.");
-						du.addClickListener(new DatabaseUndeploymentAction(serviceAsync, dlb));
-						p.add(du);
-					}
-				}
-			});
+			if(pageData.isDatabaseUndeployerEnabled()) {
+				final PushButton du = new PushButton("Undeploy Database");
+				du.addStyleName(ACTION_LINK);
+				du.setTitle("Click here to undeploy database from search engines.");
+				du.addClickListener(new DatabaseUndeploymentAction(serviceAsync, dlb));
+				p.add(du);
+			}
 
 			editorElements.add(dbrow.append("database", "paramDbEntry", p, editorVisible));
 
@@ -261,8 +236,8 @@ public final class SimpleParamsEditorPanel implements SourcesChangeEvents {
 					// unused.
 				}
 
-				public String getAllowedValuesParam() {
-					return null; // no allowed values.
+				public boolean needsAllowedValues() {
+					return false;
 				}
 			};
 			tdb.setVisibleLength(5);
@@ -381,7 +356,7 @@ public final class SimpleParamsEditorPanel implements SourcesChangeEvents {
 		}
 
 		validationController.setEnabled(false);
-		selectionController.refresh();
+		selectionController.setParamSetList(pageData.getParamSetList());
 
 		validationController.addChangeListener(new ChangeListener() {
 			public void onChange(final Widget widget) {
@@ -503,11 +478,7 @@ public final class SimpleParamsEditorPanel implements SourcesChangeEvents {
 		new SaveDialog(selector.getSelectedParamSet(), serviceAsync, user,
 				new SaveDialog.Callback() {
 					public void saveCompleted(final ClientParamSet paramSet) {
-						selectionController.refresh(new ParamSetSelectionController.Callback() {
-							public void refreshed() {
-								selectionController.select(paramSet);
-							}
-						});
+						selectionController.refresh();
 
 					}
 				});
@@ -523,19 +494,14 @@ public final class SimpleParamsEditorPanel implements SourcesChangeEvents {
 			Window.alert("Cannot delete all parameter sets - at least one must remain.");
 		} else {
 			if (Window.confirm("Do you really want to delete parameter set " + setToDelete.getName() + "?")) {
-				serviceAsync.delete(new Service.Token(true),
+				serviceAsync.delete(
 						selector.getSelectedParamSet(), new AsyncCallback<Void>() {
 					public void onFailure(final Throwable throwable) {
 						handleGlobalError(throwable);
 					}
 
 					public void onSuccess(final Void aVoid) {
-						selectionController.refresh(new ParamSetSelectionController.Callback() {
-							public void refreshed() {
-								final List<ClientParamSet> paramSets = selectionController.getClientParamSets();
-								selectionController.select(paramSets.get(0));
-							}
-						});
+						selectionController.refresh();
 					}
 				});
 			}
@@ -578,9 +544,5 @@ public final class SimpleParamsEditorPanel implements SourcesChangeEvents {
 		dialogBox.show();
 //		}
 		dialogBox.center();
-	}
-
-	public ServiceAsync getServiceAsync() {
-		return serviceAsync;
 	}
 }

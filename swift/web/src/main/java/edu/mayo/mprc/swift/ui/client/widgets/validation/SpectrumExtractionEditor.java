@@ -107,8 +107,8 @@ public final class SpectrumExtractionEditor extends Composite implements Validat
 		ValidationController.setValidationSeverity(validationSeverity, this);
 	}
 
-	public String getAllowedValuesParam() {
-		return null;
+	public boolean needsAllowedValues() {
+		return false;
 	}
 
 	public void setAllowedValues(final List<? extends ClientValue> values) {

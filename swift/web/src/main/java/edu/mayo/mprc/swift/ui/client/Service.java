@@ -1,13 +1,12 @@
 package edu.mayo.mprc.swift.ui.client;
 
-import com.google.gwt.user.client.Cookies;
 import com.google.gwt.user.client.rpc.RemoteService;
 import edu.mayo.mprc.common.client.GWTServiceException;
 import edu.mayo.mprc.swift.ui.client.rpc.*;
 import edu.mayo.mprc.swift.ui.client.rpc.files.Entry;
+import edu.mayo.mprc.swift.ui.client.rpc.files.ErrorEntry;
 import edu.mayo.mprc.swift.ui.client.rpc.files.FileInfo;
 
-import java.io.Serializable;
 import java.util.List;
 
 /**
@@ -44,7 +43,7 @@ public interface Service extends RemoteService {
 	 *
 	 * @param relativePath  Path to directory that is to be listed. The path is relative to system setting for the RAW file root.
 	 * @param expandedPaths Listing of paths to be expanded in the output. The paths are relative to the relativePath argument.
-	 * @return Virtual root of the listing, to be discarded on the client. The function can also return an {@link edu.mayo.mprc.swift.ui.client.rpc.files.ErrorEntry} object.
+	 * @return Virtual root of the listing, to be discarded on the client. The function can also return an {@link ErrorEntry} object.
 	 */
 	Entry listFiles(String relativePath, String[] expandedPaths) throws GWTServiceException;
 
@@ -66,33 +65,33 @@ public interface Service extends RemoteService {
 	/**
 	 * Starts search for given definition.
 	 *
+	 *
 	 * @param def Search definition.
-	 * @throws edu.mayo.mprc.common.client.GWTServiceException
-	 *          When anything fails.
+	 * @throws GWTServiceException When anything fails.
 	 */
-	void startSearch(Token t, ClientSwiftSearchDefinition def) throws GWTServiceException;
+	void startSearch(ClientSwiftSearchDefinition def) throws GWTServiceException;
 
 	/**
 	 * Return search definition for a previous search with given search id.
+	 *
 	 *
 	 * @param searchRunId Id of a search to load.
 	 * @return Search definition
 	 * @throws GWTServiceException Typically when the given search definition does not exist.
 	 */
-	ClientLoadedSearch loadSearch(Token t, int searchRunId) throws GWTServiceException;
+	ClientLoadedSearch loadSearch(int searchRunId) throws GWTServiceException;
 
 	/**
-	 * Returns a list of {@link edu.mayo.mprc.swift.ui.client.rpc.ClientSearchEngine} classes that describe the search engines in sufficient detail for the
+	 * Returns a list of {@link ClientSearchEngine} classes that describe the search engines in sufficient detail for the
 	 * UI.
 	 *
-	 * @return List of {@link edu.mayo.mprc.swift.ui.client.rpc.ClientSearchEngine}
-	 * @throws edu.mayo.mprc.common.client.GWTServiceException
-	 *
+	 * @return List of {@link ClientSearchEngine}
+	 * @throws GWTServiceException
 	 */
 	List<ClientSearchEngine> listSearchEngines() throws GWTServiceException;
 
 	/**
-	 * @return A list of {@link edu.mayo.mprc.swift.ui.client.rpc.SpectrumQaParamFileInfo} objects defining the spectrum QA parameter files.
+	 * @return A list of {@link SpectrumQaParamFileInfo} objects defining the spectrum QA parameter files.
 	 *         The returned list can be empty, in which case the spectrum QA service should be disabled.
 	 * @throws GWTServiceException
 	 */
@@ -101,7 +100,6 @@ public interface Service extends RemoteService {
 	/**
 	 * Returns true if swift configuration has scaffold report enabled.
 	 *
-	 * @return
 	 * @throws GWTServiceException
 	 */
 	boolean isScaffoldReportEnabled() throws GWTServiceException;
@@ -115,7 +113,7 @@ public interface Service extends RemoteService {
 	/**
 	 * Save a copy of the given parameter set (either as a temporary or as a permanent).
 	 *
-	 * @param t             returned by login().
+	 *
 	 * @param toCopy        the existing ClientParamSet to save a copy of.
 	 * @param newName       name to give the new param set; ignored if permanent is false
 	 * @param ownerEmail    email of owner of new param set; ignored if permanent is false.
@@ -123,24 +121,8 @@ public interface Service extends RemoteService {
 	 * @param permanent     if false, a temporary paramset is created and stored in the users's session.
 	 * @return the new ClientParamSet
 	 */
-	ClientParamSet save(Token t, ClientParamSet toCopy, String newName, String ownerEmail, String ownerInitials,
+	ClientParamSet save(ClientParamSet toCopy, String newName, String ownerEmail, String ownerInitials,
 	                    boolean permanent) throws GWTServiceException;
-
-	/**
-	 * Prevent CSRF attacks by embedding a cookie value in each request.
-	 */
-	class Token implements ClientValue, Serializable {
-		private static final long serialVersionUID = 20101221L;
-		private static final String COOKIE_NAME = "PARAMS";
-		private String token;
-
-		public Token() {
-		}
-
-		public Token(final boolean ignore) {  // TODO this is a hack to prevent this from being used as the no-arg constructor server-side.
-			token = Cookies.getCookie(COOKIE_NAME);
-		}
-	}
 
 	/**
 	 * Logins in to the Service, which sets a random session cookie that is used later to
@@ -156,42 +138,40 @@ public interface Service extends RemoteService {
 	/**
 	 * Fetch list of available ParamSets, along with selected ParamSet.
 	 */
-	ClientParamSetList getParamSetList(Token t) throws GWTServiceException;
+	ClientParamSetList getParamSetList() throws GWTServiceException;
 
 	/**
 	 * Fetch contents of ParamSet.
 	 */
-	ClientParamSetValues getParamSetValues(Token t, ClientParamSet paramSet) throws GWTServiceException;
+	ClientParamSetValues getParamSetValues(ClientParamSet paramSet) throws GWTServiceException;
 
 	/**
 	 * Fetch an updated list of allowedValues for the given list of Params, passing the mappingData through to the
 	 * abstract param (may be null).
 	 */
-	List<List<ClientValue>> getAllowedValues(Token t, ClientParamSet paramSet, String[] params, String[] mappingDatas) throws GWTServiceException;
+	List<List<ClientValue>> getAllowedValues(String[] params) throws GWTServiceException;
 
 	/**
 	 * Push value change for Param and receive Validation list back. Since a change of a single parameter can invalidate other parameters,
 	 * we are forced to return full validation for everything in the form.
 	 */
-	ClientParamsValidations update(Token t, ClientParamSet paramSet, String param, ClientValue value) throws GWTServiceException;
+	ClientParamsValidations update(ClientParamSet paramSet, String param, ClientValue value) throws GWTServiceException;
 
 	/**
 	 * Deletes given parameter set.
 	 *
-	 * @param t        returned by login()
 	 * @param paramSet the {@link ClientParamSet} object to delete
 	 * @throws GWTServiceException
 	 */
-	void delete(Token t, ClientParamSet paramSet) throws GWTServiceException;
+	void delete(ClientParamSet paramSet) throws GWTServiceException;
 
 	/**
 	 * Fetch generated params files for display to user.
 	 *
-	 * @param t        returned by login().
 	 * @param paramSet the clientParamSet to obtain files from
 	 * @return array of client param files
 	 */
-	ClientParamFile[] getFiles(Token t, ClientParamSet paramSet) throws GWTServiceException;
+	ClientParamFile[] getFiles(ClientParamSet paramSet) throws GWTServiceException;
 
 	/**
 	 * Undeploys database idenfify by given dbToUndeploy paramater.
@@ -210,15 +190,11 @@ public interface Service extends RemoteService {
 	 * to start a undeployment task.
 	 *
 	 * @param taskId
-	 * @return
 	 * @throws GWTServiceException
 	 */
 	ClientDatabaseUndeployerProgress getProgressMessageForDatabaseUndeployment(Long taskId) throws GWTServiceException;
 
-	/**
-	 * @return
-	 * @throws GWTServiceException
-	 */
 	boolean isDatabaseUndeployerEnabled() throws GWTServiceException;
 
+	InitialPageData getInitialPageData(Integer previousSearchId) throws GWTServiceException;
 }

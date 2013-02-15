@@ -525,8 +525,8 @@ public final class ModificationSelectionEditor extends Composite implements Sour
 		this.modsAvailable.setValidationSeverity(validationSeverity);
 	}
 
-	public String getAllowedValuesParam() {
-		return "all";
+	public boolean needsAllowedValues() {
+		return true;
 	}
 
 	public void setAllowedValues(final List<? extends ClientValue> values) {

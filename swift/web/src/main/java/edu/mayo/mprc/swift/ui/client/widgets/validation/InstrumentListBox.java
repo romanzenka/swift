@@ -40,11 +40,7 @@ public final class InstrumentListBox extends ValidatableListBox {
 	 *
 	 * @return null if we do not want new list of allowed values (instruments).
 	 */
-	public String getAllowedValuesParam() {
-		if (allowedValues == null || allowedValues.size() == 0) {
-			return ""; // has unparameterized allowed values;
-		} else {
-			return null;
-		}
+	public boolean needsAllowedValues() {
+		return allowedValues == null || allowedValues.isEmpty();
 	}
 }

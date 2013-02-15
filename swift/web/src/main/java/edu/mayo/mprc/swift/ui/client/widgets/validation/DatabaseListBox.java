@@ -67,7 +67,7 @@ public final class DatabaseListBox extends ValidatableListBox {
 		return EMPTY_VALUES; // unused
 	}
 
-	public String getAllowedValuesParam() {
-		return "all";
+	public boolean needsAllowedValues() {
+		return true;
 	}
 }

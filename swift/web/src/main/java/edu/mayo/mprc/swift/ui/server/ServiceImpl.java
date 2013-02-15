@@ -26,6 +26,7 @@ import edu.mayo.mprc.swift.params2.SearchEngineParameters;
 import edu.mayo.mprc.swift.params2.mapping.ParamsInfo;
 import edu.mayo.mprc.swift.params2.mapping.ParamsValidations;
 import edu.mayo.mprc.swift.search.SwiftSearcherCaller;
+import edu.mayo.mprc.swift.ui.client.InitialPageData;
 import edu.mayo.mprc.swift.ui.client.Service;
 import edu.mayo.mprc.swift.ui.client.rpc.*;
 import edu.mayo.mprc.swift.ui.client.rpc.files.*;
@@ -126,9 +127,9 @@ public final class ServiceImpl extends SpringGwtServlet implements Service, Appl
 		}
 	}
 
-	public void startSearch(final Service.Token t, final ClientSwiftSearchDefinition def) throws GWTServiceException {
+	public void startSearch(final ClientSwiftSearchDefinition def) throws GWTServiceException {
 		try {
-			final HttpSession session = compareToken(t);
+			final HttpSession session = getSession();
 			getSwiftDao().begin();
 			final ParameterSetCache cache = new ParameterSetCache(session, getParamsDao());
 
@@ -193,16 +194,16 @@ public final class ServiceImpl extends SpringGwtServlet implements Service, Appl
 		}
 	}
 
-	public ClientLoadedSearch loadSearch(final Service.Token t, final int searchRunId) throws GWTServiceException {
+	public ClientLoadedSearch loadSearch(final int searchRunId) throws GWTServiceException {
 		try {
-			final HttpSession session = compareToken(t);
+			final HttpSession session = getSession();
 			getSwiftDao().begin();
 			final ParameterSetCache cache = new ParameterSetCache(session, getParamsDao());
 			final SearchRun searchRun = getSwiftDao().getSearchRunForId(searchRunId);
 			final SwiftSearchDefinition original = getSwiftDao().getSwiftSearchDefinition(searchRun.getSwiftSearch());
 			final Resolver resolver = new Resolver(cache);
 			final ClientSwiftSearchDefinition proxy = getClientProxyGenerator().convertTo(original, resolver);
-			final ClientLoadedSearch result = new ClientLoadedSearch(proxy, resolver.isClientParamSetListChanged() ? makeParamSetList(cache) : null);
+			final ClientLoadedSearch result = new ClientLoadedSearch(searchRunId, proxy, resolver.isClientParamSetListChanged() ? makeParamSetList(cache) : null);
 			getSwiftDao().commit();
 			return result;
 		} catch (Exception e) {
@@ -379,11 +380,11 @@ public final class ServiceImpl extends SpringGwtServlet implements Service, Appl
 		return true;
 	}
 
-	public synchronized ClientParamSet save(final Service.Token t, final ClientParamSet toCopy, final String newName, final String ownerEmail,
+	public synchronized ClientParamSet save(final ClientParamSet toCopy, final String newName, final String ownerEmail,
 	                                        final String ownerInitials,
 	                                        final boolean permanent) throws GWTServiceException {
 		try {
-			final HttpSession session = compareToken(t);
+			final HttpSession session = getSession();
 			getParamsDao().begin();
 			final ParameterSetCache cache = new ParameterSetCache(session, getParamsDao());
 			SearchEngineParameters ps = cache.getFromCacheHibernate(toCopy);
@@ -422,9 +423,9 @@ public final class ServiceImpl extends SpringGwtServlet implements Service, Appl
 	}
 
 
-	public ClientParamFile[] getFiles(final Service.Token t, final ClientParamSet paramSet) throws GWTServiceException {
+	public ClientParamFile[] getFiles(final ClientParamSet paramSet) throws GWTServiceException {
 		try {
-			final HttpSession session = compareToken(t);
+			final HttpSession session = getSession();
 			getParamsDao().begin();
 			final ParameterSetCache cache = new ParameterSetCache(session, getParamsDao());
 			final SearchEngineParameters ps = cache.getFromCache(paramSet);
@@ -444,9 +445,9 @@ public final class ServiceImpl extends SpringGwtServlet implements Service, Appl
 		}
 	}
 
-	public ClientParamSetValues getParamSetValues(final Service.Token t, final ClientParamSet paramSet) throws GWTServiceException {
+	public ClientParamSetValues getParamSetValues(final ClientParamSet paramSet) throws GWTServiceException {
 		try {
-			final HttpSession session = compareToken(t);
+			final HttpSession session = getSession();
 			getParamsDao().begin();
 			final ParameterSetCache cache = new ParameterSetCache(session, getParamsDao());
 			final SearchEngineParameters ps = cache.getFromCache(paramSet);
@@ -461,9 +462,9 @@ public final class ServiceImpl extends SpringGwtServlet implements Service, Appl
 		}
 	}
 
-	public synchronized ClientParamSetList getParamSetList(final Service.Token t) throws GWTServiceException {
+	public synchronized ClientParamSetList getParamSetList() throws GWTServiceException {
 		try {
-			final HttpSession session = compareToken(t);
+			final HttpSession session = getSession();
 			getParamsDao().begin();
 			final ParameterSetCache cache = new ParameterSetCache(session, getParamsDao());
 			final ClientParamSetList paramSetList = makeParamSetList(cache);
@@ -481,13 +482,9 @@ public final class ServiceImpl extends SpringGwtServlet implements Service, Appl
 		return ClientProxyGenerator.getClientParamSetList(engineParametersList, cache.getTemporaryClientParamList());
 	}
 
-	public List<List<ClientValue>> getAllowedValues(final Service.Token t, final ClientParamSet paramSet, final String[] params, final String[] mappingDatas) throws GWTServiceException {
+	public List<List<ClientValue>> getAllowedValues(final String[] params) throws GWTServiceException {
 		try {
 			getParamsDao().begin();
-
-			if (params.length != mappingDatas.length) {
-				throw new MprcException("params must match mappingDatas");
-			}
 
 			final List<List<ClientValue>> values = new ArrayList<List<ClientValue>>();
 			for (final String param : params) {
@@ -503,9 +500,9 @@ public final class ServiceImpl extends SpringGwtServlet implements Service, Appl
 		}
 	}
 
-	public ClientParamsValidations update(final Service.Token t, final ClientParamSet paramSet, final String param, final ClientValue value) throws GWTServiceException {
+	public ClientParamsValidations update(final ClientParamSet paramSet, final String param, final ClientValue value) throws GWTServiceException {
 		try {
-			final HttpSession session = compareToken(t);
+			final HttpSession session = getSession();
 			getParamsDao().begin();
 			final ParameterSetCache cache = new ParameterSetCache(session, getParamsDao());
 
@@ -529,9 +526,9 @@ public final class ServiceImpl extends SpringGwtServlet implements Service, Appl
 		}
 	}
 
-	public void delete(final Service.Token t, final ClientParamSet paramSet) throws GWTServiceException {
+	public void delete(final ClientParamSet paramSet) throws GWTServiceException {
 		try {
-			final HttpSession session = compareToken(t);
+			final HttpSession session = getSession();
 			getParamsDao().begin();
 			final SavedSearchEngineParameters savedSearchEngineParameters = getParamsDao().findSavedSearchEngineParameters(paramSet.getName());
 			if (savedSearchEngineParameters != null) {
@@ -588,16 +585,48 @@ public final class ServiceImpl extends SpringGwtServlet implements Service, Appl
 		return getWebUi().isDatabaseUndeployerEnabled();
 	}
 
+	@Override
+	public InitialPageData getInitialPageData(Integer previousSearchId) throws GWTServiceException {
+		final String[] params = {
+				"sequence.database",
+				"sequence.enzyme",
+				"sequence.missed_cleavages",
+				"modifications.fixed",
+				"modifications.variable",
+				"tolerance.peptide",
+				"tolerance.fragment",
+				"instrument",
+				"extractMsnSettings",
+				"scaffoldSettings",
+		};
+		final List<List<ClientValue>> allowedValues = getAllowedValues(params);
+		final HashMap<String, List<ClientValue>> map = new HashMap<String, List<ClientValue>>(params.length);
+
+		final Iterator<List<ClientValue>> iterator = allowedValues.iterator();
+		for (final String param : params) {
+			map.put(param, iterator.next());
+		}
+
+		return new InitialPageData(
+				listUsers(),
+				previousSearchId==null ? null : loadSearch(previousSearchId),
+				getUserMessage(),
+				getParamSetList(),
+				map,
+				isDatabaseUndeployerEnabled(),
+				listSearchEngines(),
+				listSpectrumQaParamFiles(),
+				isScaffoldReportEnabled());
+	}
+
 	/**
 	 * Compare session id from Cookie with passed in token to prevent CSRF.
 	 *
 	 * @see <a href="http://groups.google.com/group/Google-Web-Toolkit/web/security-for-gwt-applications">Security for GWT applications</a>
 	 * @see <a href="http://en.wikipedia.org/wiki/Cross-site_request_forgery">Cross-site request forgery</a>
 	 */
-	protected synchronized HttpSession compareToken(final Service.Token t) {
+	private HttpSession getSession() {
 		return getThreadLocalRequest().getSession();
-		//String sessionId = session.getId();
-		//assert(t.getToken().equals(sessionId);
 	}
 
 	private ClientDatabaseUndeployerProgress getDbUndeployerProgressMessageProxy(final DatabaseUndeployerProgress progressMessage) {

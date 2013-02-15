@@ -80,56 +80,56 @@ public interface ServiceAsync {
 	/**
 	 * Fetch list of available ParamSets, along with selected ParamSet.
 	 */
-	void getParamSetList(Service.Token t, AsyncCallback<ClientParamSetList> async);
+	void getParamSetList(AsyncCallback<ClientParamSetList> async);
 
 	/**
 	 * Fetch contents of ParamSet.
 	 */
-	void getParamSetValues(Service.Token t, ClientParamSet paramSet, AsyncCallback<ClientParamSetValues> async);
+	void getParamSetValues(ClientParamSet paramSet, AsyncCallback<ClientParamSetValues> async);
 
 	/**
 	 * Fetch an updated list of allowedValues for the given list of Params, passing the mappingData through to the
 	 * abstract param (may be null).
 	 */
-	void getAllowedValues(Service.Token t, ClientParamSet paramSet, String[] params, String[] mappingDatas, AsyncCallback<List<List<ClientValue>>> async);
+	void getAllowedValues(String[] params, AsyncCallback<List<List<ClientValue>>> async);
 
 	/**
 	 * Push value change for Param and receive Validation list back. Since a change of a single parameter can invalidate other parameters,
 	 * we are forced to return full validation for everything in the form.
 	 */
-	void update(Service.Token t, ClientParamSet paramSet, String param, ClientValue value, AsyncCallback<ClientParamsValidations> async);
+	void update(ClientParamSet paramSet, String param, ClientValue value, AsyncCallback<ClientParamsValidations> async);
 
 	/**
 	 * Save a copy of the given parameter set (either as a temporary or as a permanent).
 	 *
-	 * @param t          returned by login().
+	 *
 	 * @param toCopy     the existing ClientParamSet to save a copy of.
 	 * @param newName    name to give the new param set; ignored if permanent is false
 	 * @param ownerEmail email of owner of new param set; ignored if permanent is false.
 	 * @param permanent  if false, a temporary paramset is created and stored in the users's session.
 	 * @return the new ClientParamSet
 	 */
-	void save(Service.Token t, ClientParamSet toCopy, String newName, String ownerEmail, String ownerInitials,
+	void save(ClientParamSet toCopy, String newName, String ownerEmail, String ownerInitials,
 	          boolean permanent, AsyncCallback<ClientParamSet> async);
 
 	/**
 	 * Deletes given parameter set.
 	 *
-	 * @param t        returned by login()
+	 *
 	 * @param paramSet the {@link edu.mayo.mprc.swift.ui.client.rpc.ClientParamSet} object to delete
 	 * @throws edu.mayo.mprc.common.client.GWTServiceException
 	 *
 	 */
-	void delete(Service.Token t, ClientParamSet paramSet, AsyncCallback<Void> async);
+	void delete(ClientParamSet paramSet, AsyncCallback<Void> async);
 
 	/**
 	 * Fetch generated params files for display to user.
 	 *
-	 * @param t        returned by login().
+	 *
 	 * @param paramSet the clientParamSet to obtain files from
 	 * @return array of client param files
 	 */
-	void getFiles(Service.Token t, ClientParamSet paramSet, AsyncCallback<ClientParamFile[]> async);
+	void getFiles(ClientParamSet paramSet, AsyncCallback<ClientParamFile[]> async);
 
 	/**
 	 * Undeploys database idenfify by given dbToUndeploy paramater.
@@ -165,19 +165,23 @@ public interface ServiceAsync {
 	/**
 	 * Starts search for given definition.
 	 *
+	 *
 	 * @param def Search definition.
 	 * @throws edu.mayo.mprc.common.client.GWTServiceException
 	 *          When anything fails.
 	 */
-	void startSearch(Service.Token t, ClientSwiftSearchDefinition def, AsyncCallback<Void> async);
+	void startSearch(ClientSwiftSearchDefinition def, AsyncCallback<Void> async);
 
 	/**
 	 * Return search definition for a previous search with given search id.
+	 *
 	 *
 	 * @param searchRunId Id of a search run to load
 	 * @return Search definition
 	 * @throws edu.mayo.mprc.common.client.GWTServiceException
 	 *          Typically when the given search definition does not exist.
 	 */
-	void loadSearch(Service.Token t, int searchRunId, AsyncCallback<ClientLoadedSearch> async);
+	void loadSearch(int searchRunId, AsyncCallback<ClientLoadedSearch> async);
+
+	void getInitialPageData(Integer previousSearchId, AsyncCallback<InitialPageData> async);
 }

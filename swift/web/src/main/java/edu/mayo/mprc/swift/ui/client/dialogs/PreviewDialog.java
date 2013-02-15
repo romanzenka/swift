@@ -5,7 +5,6 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.TabPanel;
-import edu.mayo.mprc.swift.ui.client.Service;
 import edu.mayo.mprc.swift.ui.client.ServiceAsync;
 import edu.mayo.mprc.swift.ui.client.SimpleParamsEditorPanel;
 import edu.mayo.mprc.swift.ui.client.rpc.ClientParamFile;
@@ -23,7 +22,7 @@ public final class PreviewDialog extends FrameDialog {
 
 		setContent(label);
 
-		service.getFiles(new Service.Token(true), paramSet, new AsyncCallback<ClientParamFile[]>() {
+		service.getFiles(paramSet, new AsyncCallback<ClientParamFile[]>() {
 			public void onFailure(final Throwable throwable) {
 				hide();
 				SimpleParamsEditorPanel.handleGlobalError(throwable);

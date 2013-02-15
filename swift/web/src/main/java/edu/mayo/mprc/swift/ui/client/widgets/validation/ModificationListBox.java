@@ -35,7 +35,7 @@ public final class ModificationListBox extends ValidatableListBox {
 	 * @return We have our own mechanism of fetching allowed values, because there are many modifications and they never change.
 	 *         We never request update of allowed values.
 	 */
-	public String getAllowedValuesParam() {
-		return null;
+	public boolean needsAllowedValues() {
+		return false;
 	}
 }

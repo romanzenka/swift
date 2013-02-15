@@ -2,7 +2,6 @@ package edu.mayo.mprc.swift.ui.client.dialogs;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.*;
-import edu.mayo.mprc.swift.ui.client.Service;
 import edu.mayo.mprc.swift.ui.client.ServiceAsync;
 import edu.mayo.mprc.swift.ui.client.SimpleParamsEditorPanel;
 import edu.mayo.mprc.swift.ui.client.rpc.ClientParamSet;
@@ -98,7 +97,7 @@ public final class SaveDialog extends FrameDialog {
 			return; // TODO need better validation.
 		}
 
-		service.save(new Service.Token(true),
+		service.save(
 				paramSet,
 				newName.getText(),
 				user.getEmail(),

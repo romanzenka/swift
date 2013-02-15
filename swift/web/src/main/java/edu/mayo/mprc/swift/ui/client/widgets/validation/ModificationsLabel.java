@@ -205,8 +205,8 @@ public final class ModificationsLabel extends Composite implements Validatable {
 	/**
 	 * @return null - we will get the allowed values fetched by an independent mechanism
 	 */
-	public String getAllowedValuesParam() {
-		return null;
+	public boolean needsAllowedValues() {
+		return false;
 	}
 
 	public void addChangeListener(final ChangeListener changeListener) {

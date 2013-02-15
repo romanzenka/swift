@@ -36,7 +36,7 @@ public final class ToleranceBox extends ValidatableTextBox {
 		// ignore.
 	}
 
-	public String getAllowedValuesParam() {
-		return null; // no allowed values.
+	public boolean needsAllowedValues() {
+		return false;
 	}
 }

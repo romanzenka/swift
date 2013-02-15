@@ -146,7 +146,7 @@ public final class EngineTest {
 
 	private static WorkflowEngine fillEngineWithTasks(final FailMode failMode, final boolean pause, final Random random) {
 		final WorkflowEngine engine = new WorkflowEngine("engine test");
-		final List<SimpleTask> tasks = new ArrayList<SimpleTask>();
+		final List<Task> tasks = new ArrayList<Task>();
 		for (int i = 0; i < NUM_TASKS; i++) {
 			boolean fail = false;
 			switch (failMode) {
@@ -174,7 +174,7 @@ public final class EngineTest {
 		return engine;
 	}
 
-	private static void addRandomDependencies(final Random random, final List<SimpleTask> tasks, final SimpleTask newTask) {
+	private static void addRandomDependencies(final Random random, final List<Task> tasks, final SimpleTask newTask) {
 		final int deps = random.nextInt(Math.max(Math.min(MAX_DEPENDENCIES, tasks.size()), 1));
 		for (int j = 0; j < deps; j++) {
 			final int k = random.nextInt(tasks.size());

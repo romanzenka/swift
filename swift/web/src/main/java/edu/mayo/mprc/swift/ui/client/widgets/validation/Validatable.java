@@ -29,13 +29,9 @@ public interface Validatable extends SourcesChangeEvents {
 	void setValidationSeverity(int validationSeverity);
 
 	/**
-	 * If this control needs allowed values, then this method should return a string that will be
-	 * passed to the params mapping (this string could be ""); if no allowed values are required,
-	 * then this method should return null;
-	 *
-	 * @return a string that's passed to the mapping's getAllowedValues() method for this param, or null.
+	 * @return True if the control wants allowed values.
 	 */
-	String getAllowedValuesParam();
+	boolean needsAllowedValues();
 
 	/**
 	 * Set the list of allowed values, if any, that this Validatable widget should display.
