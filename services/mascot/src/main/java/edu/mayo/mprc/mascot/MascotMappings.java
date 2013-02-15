@@ -194,18 +194,18 @@ public final class MascotMappings implements Mappings {
 	}
 
 	public void setPeptideTolerance(final MappingContext context, final Tolerance peptideTolerance) {
-		if (peptideTolerance.getUnit() == MassUnit.Ppm) {
-			final double value = peptideTolerance.getValue() / PPM_TO_DALTON;
-			final Tolerance newTolerance = new Tolerance(value, MassUnit.Da);
-			context.reportWarning("Mascot does not support '" + peptideTolerance.getUnit() + "' fragment tolerances; using " + newTolerance.getValue() + " " + newTolerance.getUnit().getCode() + " instead.");
-			mapToleranceToNative(context, newTolerance, PEP_TOL_VALUE, PEP_TOL_UNIT);
-		} else {
-			mapToleranceToNative(context, peptideTolerance, PEP_TOL_VALUE, PEP_TOL_UNIT);
-		}
+		mapToleranceToNative(context, peptideTolerance, PEP_TOL_VALUE, PEP_TOL_UNIT);
 	}
 
 	public void setFragmentTolerance(final MappingContext context, final Tolerance fragmentTolerance) {
-		mapToleranceToNative(context, fragmentTolerance, FRAG_TOL_VALUE, FRAG_TOL_UNIT);
+		if (fragmentTolerance.getUnit() == MassUnit.Ppm) {
+			final double value = fragmentTolerance.getValue() / PPM_TO_DALTON;
+			final Tolerance newTolerance = new Tolerance(value, MassUnit.Da);
+			context.reportWarning("Mascot does not support '" + fragmentTolerance.getUnit() + "' fragment tolerances; using " + newTolerance.getValue() + " " + newTolerance.getUnit().getCode() + " instead.");
+			mapToleranceToNative(context, newTolerance, FRAG_TOL_VALUE, FRAG_TOL_UNIT);
+		} else {
+			mapToleranceToNative(context, fragmentTolerance, FRAG_TOL_VALUE, FRAG_TOL_UNIT);
+		}
 	}
 
 	public void setVariableMods(final MappingContext context, final ModSet variableMods) {

@@ -63,11 +63,11 @@ public final class TestMascotMappings {
 	}
 
 	@Test
-	public void shouldSupportPeptidePpm() {
+	public void shouldSupportFragmentPpm() {
 		final MappingContext context = new PpmContext(abstractParamsInfo);
-		mapping.setPeptideTolerance(context, new Tolerance(10.0, MassUnit.Ppm));
-		Assert.assertEquals(mapping.getNativeParam("TOL"), "0.01");
-		Assert.assertEquals(mapping.getNativeParam("TOLU"), "Da");
+		mapping.setFragmentTolerance(context, new Tolerance(10.0, MassUnit.Ppm));
+		Assert.assertEquals(mapping.getNativeParam("ITOL"), "0.01");
+		Assert.assertEquals(mapping.getNativeParam("ITOLU"), "Da");
 	}
 
 	public static ParamsInfo getAbstractParamsInfo() {
