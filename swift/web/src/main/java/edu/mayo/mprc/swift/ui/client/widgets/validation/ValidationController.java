@@ -220,6 +220,7 @@ public final class ValidationController implements ChangeListener, SourcesChange
 				selector.refresh(new Callback() {
 					@Override
 					public void done() {
+						selector.select(newParamSet);
 						finishedUpdating();
 					}
 				});
