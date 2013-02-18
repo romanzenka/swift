@@ -64,6 +64,10 @@ public final class ParamSetSelectionController implements ChangeListener {
 	}
 
 	public void refresh() {
+		refresh(null);
+	}
+
+	public void refresh(final Callback cb) {
 		service.getParamSetList(new AsyncCallback<ClientParamSetList>() {
 			public void onFailure(final Throwable throwable) {
 				SimpleParamsEditorPanel.handleGlobalError(throwable);
@@ -71,6 +75,9 @@ public final class ParamSetSelectionController implements ChangeListener {
 
 			public void onSuccess(final ClientParamSetList o) {
 				setParamSetList(o);
+				if(cb!=null) {
+					cb.done();
+				}
 			}
 		});
 	}

@@ -217,7 +217,12 @@ public final class ValidationController implements ChangeListener, SourcesChange
 			}
 
 			public void onSuccess(final ClientParamSet newParamSet) {
-				selector.refresh();
+				selector.refresh(new Callback() {
+					@Override
+					public void done() {
+						finishedUpdating();
+					}
+				});
 			}
 		});
 	}
