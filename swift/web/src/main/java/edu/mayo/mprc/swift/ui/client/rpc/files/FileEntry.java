@@ -23,10 +23,13 @@ public final class FileEntry extends Entry {
 		final TreeCheckBox checkBox = new TreeCheckBox(getName(), false);
 		final TreeItem newItem = new TreeItem(checkBox);
 		checkBox.setTreeItem(newItem);
-		if (StringUtilities.toUpperCase(getName()).endsWith(".RAW")) {
+		final String upperCaseName = StringUtilities.toUpperCase(getName());
+		if (upperCaseName.endsWith(".RAW")) {
 			newItem.addStyleName("file-raw");
 		} else if (getName().endsWith(".mgf")) {
 			newItem.addStyleName("file-mgf");
+		} else if(upperCaseName.endsWith(".d")) {
+			newItem.addStyleName("file-d");
 		}
 		return newItem;
 	}

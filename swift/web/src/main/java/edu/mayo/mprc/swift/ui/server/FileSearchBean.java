@@ -195,6 +195,7 @@ public final class FileSearchBean {
 		final List<File> files = new ArrayList<File>(100);
 
 		FileUtilities.listFolderContents(root, ServiceImpl.FILTER, dirs, files);
+		moveDirsToFiles(dirs, files);
 		final AttributesImpl atts = new AttributesImpl();
 		try {
 			Collections.sort(dirs, new SimpleFileComparator());
@@ -220,6 +221,31 @@ public final class FileSearchBean {
 		} catch (SAXException e) {
 			throw new MprcException("Failed writing out folder " + root.getPath(), e);
 		}
+	}
+
+	/**
+	 * We have a special case - some directories should actually be treated as
+	 * 'files'. This is the case with Agilent's .d directories. We detect these,
+	 * remove them from the list of dirs, add them to the list of files.
+	 *
+	 * @param dirs List of dirs to take Agilent dirs from from.
+	 * @param files Files to add the .d dirs to.
+	 */
+	static void moveDirsToFiles(List<File> dirs, List<File> files) {
+		List<File> newDirs = new ArrayList<File>(dirs.size());
+		for(File dir : dirs) {
+			if(isAgilentDir(dir)) {
+				files.add(dir);
+			} else {
+				newDirs.add(dir);
+			}
+		}
+		dirs.clear();
+		dirs.addAll(newDirs);
+	}
+
+	private static boolean isAgilentDir(final File dir) {
+		return dir.getName().endsWith(".d");
 	}
 
 	private static final class SimpleFileComparator implements Comparator<File>, Serializable {

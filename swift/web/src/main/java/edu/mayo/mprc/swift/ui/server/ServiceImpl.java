@@ -63,13 +63,14 @@ public final class ServiceImpl extends SpringGwtServlet implements Service, Appl
 
 	// String of allowed extensions, separated by | signs. The extensions are case insensitive.
 	private static final String ALLOWED_EXTENSIONS = ".RAW|.raw|.mgf";
-	public static final InputFileFilter FILTER = new InputFileFilter(ALLOWED_EXTENSIONS, false);
-	private static final InputFileFilter FILTER_DIRS = new InputFileFilter(ALLOWED_EXTENSIONS, true);
+	public static final InputFileFilter FILTER = new InputFileFilter(ALLOWED_EXTENSIONS, ".d", true);
+	private static final InputFileFilter FILTER_DIRS = new InputFileFilter(ALLOWED_EXTENSIONS, "", true);
 	// After 10 seconds without hearing from the other side the search attempt timeouts
 	private static final int SEARCH_TIMEOUT = 10 * 1000;
 
 	private static final ClientUser[] EMPTY_USER_LIST = new ClientUser[0];
 	private static final Pattern BAD_TITLE_CHARACTER = Pattern.compile("[^a-zA-Z0-9-+._()[\\\\]{}=# ]");
+	public static final String AGILENT_FOLDER_SUFFIX = ".d";
 
 	private WebUiHolder webUiHolder;
 
@@ -279,7 +280,7 @@ public final class ServiceImpl extends SpringGwtServlet implements Service, Appl
 		if (!file.exists() || file.isHidden()) {
 			return;
 		}
-		if (file.isDirectory()) {
+		if (file.isDirectory() && !isDirectoryTreatedAsFile(file)) {
 			// Recursively add the contents
 			// TODO: Limit the running time
 			final File[] files = file.listFiles(FILTER_DIRS);
@@ -295,6 +296,10 @@ public final class ServiceImpl extends SpringGwtServlet implements Service, Appl
 				list.add(new FileInfo(path, file.length()));
 			}
 		}
+	}
+
+	private boolean isDirectoryTreatedAsFile(final File file) {
+	    return file.getName().endsWith(AGILENT_FOLDER_SUFFIX);
 	}
 
 	/**

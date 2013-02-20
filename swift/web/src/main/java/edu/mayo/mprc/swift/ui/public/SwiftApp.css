@@ -118,7 +118,7 @@ body {
     color: #000;
 }
 
-.file-raw, .file-mgf {
+.file-raw, .file-mgf, .file-d {
     background: no-repeat 4px 2px;
     padding-left: 0;
 }
@@ -129,6 +129,10 @@ body {
 
 .file-mgf {
     background-image: url(images/mgf.png);
+}
+
+.file-d {
+    background-image: url(images/d.png);
 }
 
 body, td, th {

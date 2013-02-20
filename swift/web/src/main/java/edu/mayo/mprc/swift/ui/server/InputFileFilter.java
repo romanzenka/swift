@@ -13,18 +13,28 @@ public final class InputFileFilter implements FilenameFilter, Serializable {
 	private static final long serialVersionUID = 20101221L;
 
 	private final Pattern filePattern;
+	private final Pattern dirPattern;
 	private static final int PATTERN_BUILDER_CAPACITY = 20;
 	private boolean dirsToo;
 
 	public InputFileFilter() {
 		filePattern = Pattern.compile(".*");
+		dirPattern = Pattern.compile("^$");
 	}
 
 	/**
-	 * @param allowedExtensions Allowed extensions, including the dot (such as ".RAW" or ".mgf")
+	 * @param allowedExtensions    Allowed extensions, including the dot (such as ".RAW" or ".mgf")
+	 * @param allowedDirExtensions Which directory extensions make the directories be treated as files
+	 * @param dirsToo              consider directories too
 	 */
-	public InputFileFilter(final String allowedExtensions, final boolean dirsToo) {
-		final String[] extensions = allowedExtensions.split("\\|");
+	public InputFileFilter(final String allowedExtensions, final String allowedDirExtensions, final boolean dirsToo) {
+		filePattern = getPattern(allowedExtensions);
+		dirPattern = getPattern(allowedDirExtensions);
+		this.dirsToo = dirsToo;
+	}
+
+	private Pattern getPattern(final String e) {
+		final String[] extensions = e.split("\\|");
 		final StringBuilder pattern = new StringBuilder(PATTERN_BUILDER_CAPACITY);
 		// We build a pattern like this: .*\\.ext$|.*\\.ext2$|...
 		// It should match any file name that ENDS in given extension.
@@ -33,15 +43,15 @@ public final class InputFileFilter implements FilenameFilter, Serializable {
 			pattern.append(Pattern.quote(extension));
 			pattern.append('$');
 		}
-		filePattern = Pattern.compile(pattern.substring(1));
-		this.dirsToo = dirsToo;
+
+		return Pattern.compile(pattern.substring(1));
 	}
 
 	public boolean accept(final File dir, final String name) {
 		boolean result = false;
 		final File file = new File(dir, name);
 		if (!file.isHidden()) {
-			if (this.dirsToo && file.isDirectory()) {
+			if (this.dirsToo && file.isDirectory() && (dirPattern == null || dirPattern.matcher(name).matches())) {
 				result = true;
 			} else if (file.isFile()) {
 				final Matcher match = filePattern.matcher(name);

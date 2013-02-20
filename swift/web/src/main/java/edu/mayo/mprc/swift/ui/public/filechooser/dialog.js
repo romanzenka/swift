@@ -11,6 +11,7 @@ var unfoldIcon = "filechooser/unfold.png"
 var fileIcon = "filechooser/file.png";
 var rawFileIcon = "filechooser/raw.png";
 var mgfFileIcon = "filechooser/mgf.png";
+var agilentFileIcon = "filechooser/d.png";
 
 var folderWidth = 16;
 var folderHeight = 16;
@@ -428,6 +429,8 @@ function getIconImage(text) {
         return rawFileIcon;
     } else if (/\.mgf$/i.test(text)) {
         return mgfFileIcon;
+    } else if (/\.d$/i.test(text)) {
+        return agilentFileIcon;
     } else
         return fileIcon;
 }
