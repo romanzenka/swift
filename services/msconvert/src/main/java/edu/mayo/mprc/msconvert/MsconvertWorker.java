@@ -116,6 +116,11 @@ public final class MsconvertWorker extends WorkerBase {
 		command.add("--filter"); // Charge state predictor
 		command.add("chargeStatePredictor false 4 2 0.9");
 
+		if(rawFile.getName().endsWith(".d")) {
+			command.add("--filter");
+			command.add("peakPicking true 1-");
+		}
+
 		if (ms2Profile) {
 			command.add("--filter");
 			command.add("peakPicking true 2-"); // Do peak picking on MS2 and higher
@@ -186,7 +191,7 @@ public final class MsconvertWorker extends WorkerBase {
 
 	private static void checkRawFile(final File pFile) {
 		if (pFile.exists()) {
-			if (pFile.isDirectory()) {
+			if (pFile.isDirectory() && !pFile.getName().endsWith(".d")) {
 				throw new DaemonException("Raw to MGF convertor cannot convert a directory");
 			}
 		} else {
