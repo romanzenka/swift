@@ -196,14 +196,14 @@ public final class ProcessCaller implements Runnable {
 
 	private void runProcess() throws InterruptedException {
 		if (outputLogger != null) {
-			LOGGER.debug("Running process:" + getCallDescription());
+			LOGGER.info("Running process:" + getCallDescription());
 		}
 		Thread outputPipe = null;
 		Thread errorPipe = null;
 		try {
 			process = builder.start();
 
-			outputStreamDrainer = new StreamDrainer(process.getInputStream(), outputLogger, Level.INFO,
+			outputStreamDrainer = new StreamDrainer(process.getInputStream(), outputLogger, Level.DEBUG,
 					retainedLogLines(), outputMonitor);
 			outputPipe = new Thread(outputStreamDrainer, "Process stdout drain");
 			outputPipe.start();
