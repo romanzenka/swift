@@ -241,7 +241,7 @@ public final class Test_UnimodToOmssaParamsConverter {
 	 */
 	private static Unimod getFixedandVariableSpecificities(final List<ModSpecificity> fixedModsList, final List<ModSpecificity> varModsList, final boolean fixed, final boolean variable) {
 
-		final InputStream umodStream = new Test_UnimodToOmssaParamsConverter().getClass().getResourceAsStream("/edu/mayo/mprc/swift/params/unimod.xml");
+		final InputStream umodStream = new Test_UnimodToOmssaParamsConverter().getClass().getResourceAsStream("/edu/mayo/mprc/unimod/unimod.xml");
 		final Unimod umodSet = new Unimod();
 		umodSet.parseUnimodXML(umodStream);
 

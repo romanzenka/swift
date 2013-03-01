@@ -8815,6 +8815,8 @@
             <umod:specificity hidden="1" site="N-term" position="Any N-term"
                               classification="Chemical derivative"
                               spec_group="1"/>
+            <umod:specificity hidden="1" site="K" position="Anywhere" classification="Chemical derivative"
+                              spec_group="2"/>
             <umod:delta mono_mass="119.037114" avge_mass="119.1207" composition="H(5) C(7) N O">
                 <umod:element symbol="H" number="5"/>
                 <umod:element symbol="C" number="7"/>
