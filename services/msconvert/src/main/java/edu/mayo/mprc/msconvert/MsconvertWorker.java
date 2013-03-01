@@ -150,8 +150,8 @@ public final class MsconvertWorker extends WorkerBase {
 	 * @param tempFolder Where to put temporary data.
 	 */
 	private boolean ms2SpectraInProfileMode(final File rawFile, final File tempFolder) {
-		final ProcessBuilder builder = new ProcessBuilder(msaccessExecutable.getPath(), "-x", "metadata", "-o", tempFolder.getAbsolutePath(), rawFile.getAbsolutePath());
-		builder.directory(msaccessExecutable.getParentFile());
+		final ProcessBuilder builder = new ProcessBuilder(msaccessExecutable.getPath(), "-x", "metadata", "-o", tempFolder.getAbsolutePath(), rawFile.getName());
+		builder.directory(rawFile.getParentFile().getAbsoluteFile());
 		final ProcessCaller caller = new ProcessCaller(builder);
 		caller.runAndCheck("msaccess");
 
