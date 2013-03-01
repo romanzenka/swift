@@ -35,7 +35,7 @@ public final class UnimodTest {
 			}
 			defaultUnimod = new Unimod();
 			try {
-				defaultUnimod.parseUnimodXML(ResourceUtilities.getStream("classpath:edu/mayo/mprc/unimod/unimod.xml", Unimod.class));
+				defaultUnimod.parseUnimodXML(ResourceUtilities.getStream("classpath:edu/mayo/mprc/unimod/unimod_test.xml", Unimod.class));
 				return defaultUnimod;
 			} catch (Exception t) {
 				throw new MprcException("Unable to parse default unimod set", t);

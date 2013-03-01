@@ -33,7 +33,7 @@ public final class UnimodDaoTest extends DaoTest {
 	public void shouldDoInitialInstall() {
 		// Get fresh unimod
 		final Unimod unimod = new Unimod();
-		unimod.parseUnimodXML(ResourceUtilities.getStream("classpath:edu/mayo/mprc/unimod/unimod.xml", UnimodDaoTest.class));
+		unimod.parseUnimodXML(ResourceUtilities.getStream("classpath:edu/mayo/mprc/unimod/unimod_test.xml", UnimodDaoTest.class));
 
 		// Save it to database
 		final Change change = new Change("Initial Unimod Install", new DateTime());
@@ -77,7 +77,7 @@ public final class UnimodDaoTest extends DaoTest {
 	public void shouldStoreUpdates() {
 		// Get fresh unimod
 		final Unimod unimod = new Unimod();
-		unimod.parseUnimodXML(ResourceUtilities.getStream("classpath:edu/mayo/mprc/unimod/unimod.xml", UnimodDaoTest.class));
+		unimod.parseUnimodXML(ResourceUtilities.getStream("classpath:edu/mayo/mprc/unimod/unimod_test.xml", UnimodDaoTest.class));
 
 		// Save it to database
 		final Change change = new Change("Initial Unimod Install", new DateTime());
