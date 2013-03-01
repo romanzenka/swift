@@ -18,6 +18,14 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public final class SequestMappings implements Mappings, Cloneable {
+
+	/**
+	 * Sequest tends to slow down considerably as fragment tolernace goes down.
+	 * This value is a reasonable compromise between speed and precision.
+	 */
+	private static final double MIN_FRAGMENT_TOLERANCE = 0.1;
+	private static final double PPM_TO_DALTON = 1000.0;
+
 	private static final String PEP_TOL_UNIT = "peptide_mass_units";
 	private static final String PEP_TOL_VALUE = "peptide_mass_tolerance";
 	private static final String FRAG_TOL_VALUE = "fragment_ion_tolerance";
@@ -231,11 +239,23 @@ public final class SequestMappings implements Mappings, Cloneable {
 	}
 
 	public void setFragmentTolerance(final MappingContext context, final Tolerance fragmentTolerance) {
-		if (!MassUnit.Da.equals(fragmentTolerance.getUnit())) {
-			setNativeParam(FRAG_TOL_VALUE, "1");
-			context.reportWarning("Sequest does not support '" + fragmentTolerance.getUnit() + "' fragment tolerances; using 1 Da instead.");
+		final Tolerance newTolerance;
+		if (fragmentTolerance.getUnit() == MassUnit.Ppm) {
+			final double value = fragmentTolerance.getValue() / PPM_TO_DALTON;
+			newTolerance = new Tolerance(value, MassUnit.Da);
+			context.reportWarning("Sequest does not support '" + fragmentTolerance.getUnit() + "' fragment tolerances; using " + newTolerance.getValue() + " " + newTolerance.getUnit().getCode() + " instead.");
+			setNativeParam(FRAG_TOL_VALUE, String.valueOf(newTolerance.getValue()));
+		} else {
+			newTolerance = fragmentTolerance;
 		}
-		setNativeParam(FRAG_TOL_VALUE, String.valueOf(fragmentTolerance.getValue()));
+		final Tolerance clampedTolerance;
+		if(newTolerance.getValue() < MIN_FRAGMENT_TOLERANCE) {
+		 	clampedTolerance = new Tolerance(MIN_FRAGMENT_TOLERANCE, MassUnit.Da);
+			context.reportWarning("Sequest runs too slow with fragment tolerance below "+MIN_FRAGMENT_TOLERANCE+" Da, using "+MIN_FRAGMENT_TOLERANCE+" Da instead.");
+		} else {
+			clampedTolerance = newTolerance;
+		}
+		setNativeParam(FRAG_TOL_VALUE, String.valueOf(clampedTolerance.getValue()));
 	}
 
 	public void setVariableMods(final MappingContext context, final ModSet variableMods) {
