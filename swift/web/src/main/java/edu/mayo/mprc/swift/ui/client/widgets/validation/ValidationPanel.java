@@ -15,7 +15,6 @@ import java.util.*;
  * associated with one or more other Widgets.  This widget reserves space in
  * the UI for a fixed number of possible Validation displays, and then
  * either scrolls, or pops up as necessary to show validations that don't fit.
- * TODO this actually does neither of the above, it just displays the first validation.
  */
 public final class ValidationPanel extends Composite {
 	public interface SeverityImageBundle extends ImageBundle {
@@ -140,7 +139,7 @@ public final class ValidationPanel extends Composite {
 		Collections.sort(currentValidations, new ValidationComparator());
 		vp.clear();  // TODO lame!
 		int i = 0;
-		for (int slotsLeft = numLines; slotsLeft > 1 && i < currentValidations.size(); --slotsLeft) {
+		for (int slotsLeft = numLines; slotsLeft >= 1 && i < currentValidations.size(); --slotsLeft) {
 			final ClientValidation cv = currentValidations.get(i);
 			vp.add(new ValidationWidget(cv));
 			++i;

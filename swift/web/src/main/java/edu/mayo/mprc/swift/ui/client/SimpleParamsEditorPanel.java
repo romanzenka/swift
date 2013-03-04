@@ -158,7 +158,7 @@ public final class SimpleParamsEditorPanel implements SourcesChangeEvents {
 			label.setStyleName(PARAMS_LABEL);
 			editorElements.add(dbrow.append("database", "paramDbLabel", label, editorVisible));
 
-			final ValidationPanel vp = new ValidationPanel(2);
+			final ValidationPanel vp = new ValidationPanel(10);
 
 			dlb = new DatabaseListBox("sequence.database", userInfo);
 
@@ -201,7 +201,7 @@ public final class SimpleParamsEditorPanel implements SourcesChangeEvents {
 			label.setStyleName(PARAMS_LABEL);
 			editorElements.add(edp.append("enzyme", LABEL1, label, editorVisible));
 
-			final ValidationPanel vp = new ValidationPanel(2);
+			final ValidationPanel vp = new ValidationPanel(10);
 
 			final ProteaseListBox tb;
 			validationController.add(tb = new ProteaseListBox("sequence.enzyme"), "sequence.enzyme", vp);
@@ -253,7 +253,7 @@ public final class SimpleParamsEditorPanel implements SourcesChangeEvents {
 
 		{
 
-			final ValidationPanel vp = new ValidationPanel(2);
+			final ValidationPanel vp = new ValidationPanel(10);
 
 			final Label label = new Label("Fixed Modifications:");
 			label.setStyleName(PARAMS_LABEL);
@@ -296,7 +296,7 @@ public final class SimpleParamsEditorPanel implements SourcesChangeEvents {
 			editorElements.add(edp.append(TOLERANCES, LABEL1, label, editorVisible));
 
 
-			final ValidationPanel vp = new ValidationPanel(2);
+			final ValidationPanel vp = new ValidationPanel(10);
 
 			final ToleranceBox peptideTolerance;
 			validationController.add(peptideTolerance = new ToleranceBox("tolerance.peptide"), "tolerance.peptide", vp);
@@ -322,7 +322,7 @@ public final class SimpleParamsEditorPanel implements SourcesChangeEvents {
 			editorElements.add(edp.append(INSTRUMENT, LABEL1, label, editorVisible));
 			label.setHorizontalAlignment(HasHorizontalAlignment.ALIGN_RIGHT);
 			label.setStyleName(PARAMS_LABEL);
-			instrumentVp = new ValidationPanel(2);
+			instrumentVp = new ValidationPanel(10);
 			final InstrumentListBox lb;
 			validationController.add(lb = new InstrumentListBox(INSTRUMENT), INSTRUMENT, instrumentVp);
 			editorElements.add(edp.append(INSTRUMENT, ENTRY1, lb, editorVisible));
@@ -348,7 +348,7 @@ public final class SimpleParamsEditorPanel implements SourcesChangeEvents {
 			editorElements.add(row.append(SCAFFOLD_SETTINGS, "scaffoldLabel", label, editorVisible));
 			label.setHorizontalAlignment(HasHorizontalAlignment.ALIGN_RIGHT);
 			label.setStyleName(PARAMS_LABEL);
-			final ValidationPanel vp = new ValidationPanel(2);
+			final ValidationPanel vp = new ValidationPanel(10);
 			final ScaffoldSettingsEditor ed = new ScaffoldSettingsEditor();
 			validationController.add(ed, SCAFFOLD_SETTINGS, vp);
 			editorElements.add(row.append(SCAFFOLD_SETTINGS, "scaffoldEntry", ed, editorVisible));

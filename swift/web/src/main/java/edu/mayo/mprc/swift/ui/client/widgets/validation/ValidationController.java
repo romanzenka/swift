@@ -248,12 +248,7 @@ public final class ValidationController implements ChangeListener, SourcesChange
 			// Update all validations to clear them
 			for (final Registration r : byWidget.values()) {
 				final String paramId = r.getParam();
-				final ClientValidationList cv = o.getValidationMap().get(paramId);
-				if (cv == null) {
-					update(paramId, null);
-				} else {
-					update(paramId, cv.getValue(), cv, visited);
-				}
+				update(paramId, null);
 			}
 			// Update all others
 			for (final Map.Entry<String, ClientValidationList> entry : o.getValidationMap().entrySet()) {
