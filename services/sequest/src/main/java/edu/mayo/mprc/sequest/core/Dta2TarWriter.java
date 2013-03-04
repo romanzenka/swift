@@ -64,6 +64,10 @@ final class Dta2TarWriter {
 		if (allFiles.size() > 0) {
 			tarWriter.addFiles(allFiles);
 		}
+		// And since we added them all, we can delete them now
+		for(final File file : allFiles) {
+			FileUtilities.quietDelete(file);
+		}
 
 	}
 
