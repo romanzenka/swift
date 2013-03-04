@@ -132,10 +132,21 @@ final class EngineSearchTask extends AsyncTaskBase implements FileProducingTask 
 	}
 
 	private void updateDescription(final String mascotResultLink) {
+		// If the string looks like a path to a file, wrap it in proper tags
+		// Otherwise we just use it as-is
+		final String deployedFileString = getDeployedDatabaseFile(engine, deploymentResult);
+		final String deployedFileDbString;
+		if(deployedFileString.contains(File.separator)) {
+			File deployedFile = new File(deployedFileString);
+			deployedFileDbString = fileTokenFactory.fileToTaggedDatabaseToken(deployedFile);
+		} else {
+			deployedFileDbString = deployedFileString;
+		}
+
 		setDescription(engine.getFriendlyName() + " search: "
 				+ fileTokenFactory.fileToTaggedDatabaseToken(inputFile.getResultingFile())
 				+ " params: " + fileTokenFactory.fileToTaggedDatabaseToken(paramsFile)
-				+ " db: " + getDeployedDatabaseFile(engine, deploymentResult)
+				+ " db: " + deployedFileDbString
 				+ (mascotResultLink != null ? " <a href=\"" + mascotResultLink + "\">Open in Mascot</a>" : ""));
 	}
 
