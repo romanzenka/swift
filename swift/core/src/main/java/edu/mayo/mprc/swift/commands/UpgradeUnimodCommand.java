@@ -1,5 +1,6 @@
 package edu.mayo.mprc.swift.commands;
 
+import edu.mayo.mprc.MprcException;
 import edu.mayo.mprc.database.Change;
 import edu.mayo.mprc.swift.ExitCode;
 import edu.mayo.mprc.unimod.UnimodDao;
@@ -34,8 +35,15 @@ public final class UpgradeUnimodCommand implements SwiftCommand {
 
 	@Override
 	public ExitCode run(final SwiftEnvironment environment) {
-		final UnimodUpgrade upgrade = getUnimodDao().upgrade(getUnimodDao().getDefaultUnimod(), new Change("Upgrading unimod", new DateTime()));
-		LOGGER.info(upgrade.toString());
+		getUnimodDao().begin();
+		try {
+			final UnimodUpgrade upgrade = getUnimodDao().upgrade(getUnimodDao().getDefaultUnimod(), new Change("Upgrading unimod", new DateTime()));
+			LOGGER.info(upgrade.toString());
+			getUnimodDao().commit();
+		} catch (Exception e) {
+			getUnimodDao().rollback();
+			throw new MprcException("Unimod upgrade failed", e);
+		}
 		return ExitCode.Ok;
 	}
 }
