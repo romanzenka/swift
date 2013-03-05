@@ -3,6 +3,7 @@ package edu.mayo.mprc.swift.commands;
 import edu.mayo.mprc.MprcException;
 import edu.mayo.mprc.database.Change;
 import edu.mayo.mprc.swift.ExitCode;
+import edu.mayo.mprc.swift.search.SwiftSearcher;
 import edu.mayo.mprc.unimod.UnimodDao;
 import edu.mayo.mprc.unimod.UnimodUpgrade;
 import org.apache.log4j.Logger;
@@ -35,6 +36,7 @@ public final class UpgradeUnimodCommand implements SwiftCommand {
 
 	@Override
 	public ExitCode run(final SwiftEnvironment environment) {
+		initializeDatabase(environment, environment.getSwiftSearcher());
 		getUnimodDao().begin();
 		try {
 			final UnimodUpgrade upgrade = getUnimodDao().upgrade(getUnimodDao().getDefaultUnimod(), new Change("Upgrading unimod", new DateTime()));
@@ -46,4 +48,17 @@ public final class UpgradeUnimodCommand implements SwiftCommand {
 		}
 		return ExitCode.Ok;
 	}
+
+	/**
+	 * Initialize the database referenced by given Swift searcher.
+	 *
+	 * @param environment Swift environment.
+	 * @param config      The configuration of the Swift searcher.
+	 */
+	public static void initializeDatabase(SwiftEnvironment environment, SwiftSearcher.Config config) {
+		LOGGER.info("Initializing database");
+		final Object database = environment.createResource(config.getDatabase());
+		LOGGER.info("Database initialized");
+	}
+
 }
