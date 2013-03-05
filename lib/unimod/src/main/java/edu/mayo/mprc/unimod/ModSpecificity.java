@@ -1,6 +1,7 @@
 package edu.mayo.mprc.unimod;
 
 import com.google.common.base.Objects;
+import com.google.common.base.Strings;
 import edu.mayo.mprc.database.PersistableBase;
 import edu.mayo.mprc.utilities.ComparisonChain;
 
@@ -239,13 +240,13 @@ public class ModSpecificity extends PersistableBase implements Comparable<ModSpe
 		if (getClassification() != null ? !getClassification().equals(other.getClassification()) : other.getClassification() != null) {
 			return false;
 		}
-		if (getComments() != null ? !getComments().equals(other.getComments()) : other.getComments() != null) {
+		if (!Strings.nullToEmpty(getComments()).equals(Strings.nullToEmpty(other.getComments()))) {
 			return false;
 		}
 		if (getHidden() != null ? !getHidden().equals(other.getHidden()) : other.getHidden() != null) {
 			return false;
 		}
-		if (!getModification().getTitle().equals(other.getModification().getTitle())) {
+		if (!Strings.nullToEmpty(getModification().getTitle()).equals(Strings.nullToEmpty(other.getModification().getTitle()))) {
 			return false;
 		}
 		if (isProteinOnly() != null ? !isProteinOnly().equals(other.isProteinOnly()) : other.isProteinOnly() != null) {

@@ -1,5 +1,6 @@
 package edu.mayo.mprc.unimod;
 
+import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableSet;
 import edu.mayo.mprc.MprcException;
 import edu.mayo.mprc.database.EvolvableBase;
@@ -178,10 +179,10 @@ public class Mod extends EvolvableBase implements Comparable<Mod> {
 		if (getAltNames() != null ? !getAltNames().equals(mod.getAltNames()) : mod.getAltNames() != null) {
 			return false;
 		}
-		if (getComposition() != null ? !getComposition().equals(mod.getComposition()) : mod.getComposition() != null) {
+		if (!Strings.nullToEmpty(getComposition()).equals(Strings.nullToEmpty(mod.getComposition()))) {
 			return false;
 		}
-		if (getFullName() != null ? !getFullName().equals(mod.getFullName()) : mod.getFullName() != null) {
+		if (!Strings.nullToEmpty(getFullName()).equals(Strings.nullToEmpty(mod.getFullName()))) {
 			return false;
 		}
 		if (getMassAverage() != null ? !getMassAverage().equals(mod.getMassAverage()) : mod.getMassAverage() != null) {
@@ -196,11 +197,10 @@ public class Mod extends EvolvableBase implements Comparable<Mod> {
 		if (getModSpecificities() != null ? !getModSpecificities().equals(mod.getModSpecificities()) : mod.getModSpecificities() != null) {
 			return false;
 		}
-		if (!(getTitle() != null ? !getTitle().equals(mod.getTitle()) : mod.getTitle() != null)) {
-			return true;
+		if (!Strings.nullToEmpty(getTitle()).equals(Strings.nullToEmpty(mod.getTitle()))) {
+			return false;
 		}
-		return false;
-
+		return true;
 	}
 
 	public Mod copy() {
