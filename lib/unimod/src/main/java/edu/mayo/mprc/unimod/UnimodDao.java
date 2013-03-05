@@ -20,4 +20,11 @@ public interface UnimodDao extends Dao, RuntimeInitializer {
 	 * @param request Change request.
 	 */
 	UnimodUpgrade upgrade(Unimod unimod, Change request);
+
+	/**
+	 * TODO: This needs to be a config file outside of Swift.
+	 *
+	 * @return Default, initial version of unimod, as embedded in Swift.
+	 */
+	Unimod getDefaultUnimod();
 }

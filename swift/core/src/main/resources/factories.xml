@@ -367,6 +367,7 @@
                 <ref bean="loadToSearchDbCommand"/>
                 <ref bean="loadRawMetadataCommand"/>
                 <ref bean="fileMoveCommand"/>
+                <ref bean="upgradeUnimodCommand"/>
             </list>
         </property>
     </bean>
@@ -390,7 +391,11 @@
         <property name="swiftSge" ref="swiftSge"/>
     </bean>
 
-    <bean id="serviceFactory" class="edu.mayo.mprc.messaging.ServiceFactory"></bean>
+    <bean class="edu.mayo.mprc.swift.commands.UpgradeUnimodCommand" id="upgradeUnimodCommand">
+        <property name="unimodDao" ref="unimodDao"/>
+    </bean>
+
+    <bean id="serviceFactory" class="edu.mayo.mprc.messaging.ServiceFactory"/>
 
     <bean id="curationInitializer" class="edu.mayo.mprc.swift.search.CurationInitializer">
         <property name="curationDao" ref="curationDao"/>

@@ -92,7 +92,7 @@ public final class UnimodDaoHibernate extends DaoBase implements UnimodDao {
 		}
 	}
 
-	private static Unimod getDefaultUnimod() {
+	public Unimod getDefaultUnimod() {
 		final Unimod unimod = new Unimod();
 		try {
 			unimod.parseUnimodXML(ResourceUtilities.getStream("classpath:edu/mayo/mprc/unimod/unimod.xml", Unimod.class));
