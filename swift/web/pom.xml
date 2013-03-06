@@ -40,6 +40,12 @@
             <version>0.9</version>
         </dependency>
 
+        <!-- Spring MVC for web services -->
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-webmvc</artifactId>
+        </dependency>
+
         <!--  GWT deps (from central repo) -->
         <dependency>
             <groupId>com.google.gwt</groupId>
