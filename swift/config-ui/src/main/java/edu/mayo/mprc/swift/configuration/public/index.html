@@ -1,82 +1,85 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<title>Swift Configuration</title>
-	<link rel="stylesheet" href="Configuration.css">
+    <title>Swift Configuration</title>
+    <link rel="stylesheet" href="Configuration.css">
 </head>
 <body>
 <script language="javascript" src="configuration.nocache.js"></script>
 <iframe src="javascript:''" id='__gwt_historyFrame' style='position:absolute;width:0;height:0;border:0'></iframe>
 <div id="header">
-	<img src="/common/logo_swift_32.png" style="vertical-align: middle; margin: 0 auto;"/>
+    <div style="height: 130px; overflow: hidden">
+        <h1 style="text-align: center;" class="logo reflected">Swift</h1>
+    </div>
 
-	<h1>Configuration Instructions</h1>
+    <h1>Configuration Instructions</h1>
 </div>
 
 <div id="content" style="">
-	<p>
-		Welcome to Swift configuration screen. In order for Swift to work, you need to configure its components.
-	</p>
+    <p>
+        Welcome to Swift configuration screen. In order for Swift to work, you need to configure its components.
+    </p>
 
-	<p>
-		Swift can run multiple search engines (Mascot, Sequest, Tandem, Omssa and Myrimatch) and combine their results into a single Scaffold file. Swift can run on a single computer,
-		multiple computers or an entire cluster. This page lets you set that all up.
-	</p>
+    <p>
+        Swift can run multiple search engines (Mascot, Sequest, Tandem, Omssa and Myrimatch) and combine their results
+        into a single Scaffold file. Swift can run on a single computer,
+        multiple computers or an entire cluster. This page lets you set that all up.
+    </p>
 
-	<p>
-		We recommend going through the items in the tree below, one by one.
-	<ol>
-		<li>Create all the daemons you plan to run Swift on</li>
-		<li>Configure these daemons
-			<ol>
-				<li>provide host name and OS type, this helps setting up the modules</li>
-				<li>for multi-module setup, do not forget to configure the shared disk space for each of the daemons
-				</li>
-			</ol>
-		</li>
-		<li>Configure the database - the database is created and tested by the containing Swift Searcher</li>
-		<li>Configure the message broker</li>
-		<li>Configure the Swift Searcher.
-			<ul>
-				<li>As you go through the searcher configuration, create modules for services you want
-					to use.
-				</li>
-				<li>
-					Configure the <code>.fasta</code> directories for the searcher
-				</li>
-				<li>Test the database. The test will fail the first time, giving you an option to initialize the
-					database.
-				</li>
-			</ul>
-		</li>
-		<li>Configure all the remaining Swift modules</li>
-	</ol>
+    <p>
+        We recommend going through the items in the tree below, one by one.
+    <ol>
+        <li>Create all the daemons you plan to run Swift on</li>
+        <li>Configure these daemons
+            <ol>
+                <li>provide host name and OS type, this helps setting up the modules</li>
+                <li>for multi-module setup, do not forget to configure the shared disk space for each of the daemons
+                </li>
+            </ol>
+        </li>
+        <li>Configure the database - the database is created and tested by the containing Swift Searcher</li>
+        <li>Configure the message broker</li>
+        <li>Configure the Swift Searcher.
+            <ul>
+                <li>As you go through the searcher configuration, create modules for services you want
+                    to use.
+                </li>
+                <li>
+                    Configure the <code>.fasta</code> directories for the searcher
+                </li>
+                <li>Test the database. The test will fail the first time, giving you an option to initialize the
+                    database.
+                </li>
+            </ul>
+        </li>
+        <li>Configure all the remaining Swift modules</li>
+    </ol>
 
-	<p>
-		The installation will:
-	<ol>
-		<li>create config file at <code>conf/swift.xml</code> - defines what services should Swift run, how and where
-		</li>
-		<li>create <code>[daemon name]-run</code> - startup script(s). This will start Swift once the configuration is
-			all
-			set up. Simply run these scripts on the respective machines.
-		</li>
-		<li>Seed the provided database with initial data. Alternatively, create a simple file database if you do not
-			have a database server ready.
-		</li>
-	</ol>
+    <p>
+        The installation will:
+    <ol>
+        <li>create config file at <code>conf/swift.xml</code> - defines what services should Swift run, how and where
+        </li>
+        <li>create <code>[daemon name]-run</code> - startup script(s). This will start Swift once the configuration is
+            all
+            set up. Simply run these scripts on the respective machines.
+        </li>
+        <li>Seed the provided database with initial data. Alternatively, create a simple file database if you do not
+            have a database server ready.
+        </li>
+    </ol>
 
-	<p>
-		When you are done configuring, press the <b>Save configuration</b> button below, kill the configuration script
-		and start the provided
-		run scripts.
-		Keep in mind that the daemon containing the embedded Message Broker module has to start first, so other modules
-		can use it to communicate.
-	</p>
+    <p>
+        When you are done configuring, press the <b>Save configuration</b> button below, kill the configuration script
+        and start the provided
+        run scripts.
+        Keep in mind that the daemon containing the embedded Message Broker module has to start first, so other modules
+        can use it to communicate.
+    </p>
 </div>
 
 <h1>Swift Configuration
-	<div id="saveButtonPlaceholder" style="display: inline;"></div>
+    <div id="saveButtonPlaceholder" style="display: inline;"></div>
 </h1>
 
 <div id="progress">

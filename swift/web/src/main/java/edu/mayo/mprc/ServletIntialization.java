@@ -131,7 +131,7 @@ public final class ServletIntialization {
 
 	public static boolean redirectToConfig(final ServletConfig config, final HttpServletResponse response) throws IOException {
 		if ("config".equals(getAction(config))) {
-			response.sendRedirect("/configuration/index.html");
+			response.sendRedirect("/configuration");
 			return true;
 		}
 		return false;

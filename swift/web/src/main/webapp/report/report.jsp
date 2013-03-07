@@ -230,6 +230,7 @@
 </head>
 <body id="body">
 <div class="topbar">
+    <span class="logo-small"><%=SwiftWebContext.getServletConfig().getTitle()%></span>
     <ul class="locations">
         <li><a href="/start">New search</a></li>
         <li class="active-tab"><a href="/report/report.jsp">Existing searches</a></li>

@@ -57,10 +57,49 @@
         ul.locations li.active-tab a {
             border-bottom-color: #fff;
         }
+
+        .logo {
+            font-family: Verdana, sans-serif;
+            font-weight: 100;
+            color: #44aaee;
+            font-size: 60px;
+        }
+
+        /* CSS code */
+
+        .reflected {
+            position: relative;
+        }
+        .reflected:before, .reflected:after {
+            display: block;
+            position: absolute;
+            bottom: -.84em; /* You should change this value to fit your font */
+            left: 0;
+            right: 0;
+        }
+        .reflected:before {
+            content: '<%=SwiftWebContext.getServletConfig().getTitle()%>';
+            opacity: .3;
+            /* This is how the text is flipped vertically */
+            -webkit-transform: scaleY(-1);
+            -moz-transform: scaleY(-1);
+            -o-transform: scaleY(-1);
+        }
+        .reflected:after {
+            /* Fading using CSS gradient */
+            /* Don't forget to change the colors to your background color */
+            background: -webkit-gradient(linear, left top, left center, from(rgba(255,255,255,0)), to(rgb(255,255,255)));
+            background: -moz-linear-gradient(top, rgba(255,255,255,0), rgb(255,255,255));
+            /* I left out the `filter` property,
+               because IE doesn't know `:before` and `:after` pseudo-elements anyway */
+            content: ' ';
+            height: 1em;
+        }
     </style>
 </head>
 <body>
 <div class="topbar">
+    <span class="logo-small"><%=SwiftWebContext.getServletConfig().getTitle()%></span>
     <ul class="locations">
         <li><a href="/start">New search</a></li>
         <li><a href="/report/report.jsp">Existing searches</a></li>
@@ -75,11 +114,8 @@
         <%=SwiftWebContext.getServletConfig().getUserMessage().getMessage()%>
     </div>
     <% } %>
-    <div style="height: 120px; overflow: hidden">
-        <h1 style="text-align: center;">
-            <img src="/common/logo_swift_32.png" style="vertical-align: middle; margin: 0 auto;"
-                 alt="<%=SwiftWebContext.getServletConfig().getTitle()%>"/>
-        </h1>
+    <div style="height: 130px; overflow: hidden">
+        <h1 style="text-align: center;" class="logo reflected"><%=SwiftWebContext.getServletConfig().getTitle()%></h1>
     </div>
 
     <p>Search multiple tandem mass spec. datafiles using <b>multiple search engines at once</b>: Mascot, Sequest,
