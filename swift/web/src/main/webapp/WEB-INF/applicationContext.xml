@@ -5,7 +5,6 @@
 
     <import resource="classpath*:/factories.xml"/>
 
-
     <bean id="SwiftAppService" class="edu.mayo.mprc.swift.ui.server.ServiceImpl">
         <property name="workspaceDao" ref="workspaceDao"/>
         <property name="curationDao" ref="curationDao"/>

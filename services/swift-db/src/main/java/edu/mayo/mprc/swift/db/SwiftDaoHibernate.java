@@ -195,6 +195,11 @@ public final class SwiftDaoHibernate extends DaoBase implements SwiftDao {
 	}
 
 	@Override
+	public List<SearchEngineConfig> listSearchEngines() {
+		return (List<SearchEngineConfig>) listAll(SearchEngineConfig.class);
+	}
+
+	@Override
 	public void addSearchEngineConfig(final SearchEngineConfig config, final Change change) {
 		try {
 			save(config, change, getSearchEngineEqualityCriteria(config), false);

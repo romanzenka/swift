@@ -64,6 +64,11 @@ public interface SwiftDao extends Dao, RuntimeInitializer {
 	SearchRun getSearchRunForId(int searchRunId);
 
 	/**
+	 * @return List of all configured search engines.
+	 */
+	List<SearchEngineConfig> listSearchEngines();
+
+	/**
 	 * Adds a search engine config. If the config already exists, the object gets updated.
 	 *
 	 * @param config Search engine config.
@@ -114,6 +119,7 @@ public interface SwiftDao extends Dao, RuntimeInitializer {
 	/**
 	 * Add a new task state (if it does not exist already in the database).
 	 * Flushes the task state cache (for now).
+	 *
 	 * @param state State to be added.
 	 */
 	void addTaskState(final TaskState state);
@@ -138,8 +144,9 @@ public interface SwiftDao extends Dao, RuntimeInitializer {
 	/**
 	 * Go through the database. Find every reference to a file within {@code from} directory.
 	 * If the file does not exist, but it does exist in {@code to} directory, update the reference.
+	 *
 	 * @param from From where did the files move.
-	 * @param to To where did the files move.
+	 * @param to   To where did the files move.
 	 */
 	void renameAllFileReferences(File from, File to);
 }

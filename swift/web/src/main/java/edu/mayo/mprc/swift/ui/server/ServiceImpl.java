@@ -17,8 +17,7 @@ import edu.mayo.mprc.swift.WebUi;
 import edu.mayo.mprc.swift.WebUiHolder;
 import edu.mayo.mprc.swift.db.SearchEngine;
 import edu.mayo.mprc.swift.db.SwiftDao;
-import edu.mayo.mprc.swift.dbmapping.SearchRun;
-import edu.mayo.mprc.swift.dbmapping.SwiftSearchDefinition;
+import edu.mayo.mprc.swift.dbmapping.*;
 import edu.mayo.mprc.swift.params2.ParamName;
 import edu.mayo.mprc.swift.params2.ParamsDao;
 import edu.mayo.mprc.swift.params2.SavedSearchEngineParameters;
@@ -140,58 +139,147 @@ public final class ServiceImpl extends SpringGwtServlet implements Service, Appl
 			}
 
 			SwiftSearchDefinition swiftSearch = getClientProxyGenerator().convertFrom(def, parameters);
-			final Matcher badTitleMatcher = BAD_TITLE_CHARACTER.matcher(swiftSearch.getTitle());
-			if (swiftSearch.getTitle().length() == 0) {
-				throw new MprcException("Cannot run Swift search with an empty title");
-			}
-			if (badTitleMatcher.find()) {
-				throw new MprcException("Search title must not contain '" + badTitleMatcher.group() + "'");
-			}
-			boolean rerunPreviousSearch = false;
-			SearchRun previousSearchRun;
-			if (def.getPreviousSearchRunId() > 0) {
-				// We already ran the search before.
-				previousSearchRun = getSwiftDao().getSearchRunForId(def.getPreviousSearchRunId());
-				if (previousSearchRun.getTitle().equals(swiftSearch.getTitle())) {
-					// The titles match, output folders match, but since this is a reload, it is okay
-					rerunPreviousSearch = true;
-					final Integer searchId = previousSearchRun.getSwiftSearch();
-					final SwiftSearchDefinition searchDefinition = getSwiftDao().getSwiftSearchDefinition(searchId);
-					if (searchDefinition == null || !searchDefinition.getOutputFolder().equals(swiftSearch.getOutputFolder())) {
-						previousSearchRun = null;
-						// Since the folders do not match, we will rerun, but will not hide the previous search run
-						// from the list
-					}
-				} else {
-					previousSearchRun = null;
-				}
-			} else {
-				previousSearchRun = null;
-			}
-			if (!rerunPreviousSearch && getSwiftDao().isExistingTitle(swiftSearch.getTitle(), swiftSearch.getUser())) {
-				throw new MprcException("There is already a search titled " + swiftSearch.getTitle() + ".");
-			}
-			swiftSearch = getSwiftDao().addSwiftSearchDefinition(swiftSearch);
-			final int searchId = swiftSearch.getId();
-			final String batchName = swiftSearch.getTitle();
-			final int previousSearchRunId = previousSearchRun == null ? 0 : previousSearchRun.getId();
-			getSwiftDao().commit(); // We must commit here before we send the search over (it is loaded from the database)
-			final SwiftSearcherCaller.SearchProgressListener listener =
-					SwiftSearcherCaller.startSearch(
-							searchId, batchName, def.isFromScratch(), def.isLowPriority() ? -1 : 0,
-							previousSearchRunId, getSwiftSearcherDaemonConnection());
-			listener.waitForSearchReady(SEARCH_TIMEOUT);
-			if (listener.getException() != null) {
-				throw listener.getException();
-			}
+			validateSearch(swiftSearch);
 
-			if (listener.getSearchRunId() == 0) {
-				throw new MprcException("The search was not started within timeout.");
-			}
+			final SearchRun previousSearchRun = getPreviousSearchRun(def, swiftSearch);
+
+			swiftSearch = getSwiftDao().addSwiftSearchDefinition(swiftSearch);
+			getSwiftDao().commit(); // We must commit here before we send the search over (it is loaded from the database)
+
+			submitSearch(swiftSearch.getId(),
+					swiftSearch.getTitle(),
+					previousSearchRun == null ? 0 : previousSearchRun.getId(),
+					def.isFromScratch(),
+					def.isLowPriority() ? -1 : 0);
 		} catch (Exception e) {
 			getSwiftDao().rollback();
 			LOGGER.error("Search could not be started", e);
 			throw GWTServiceExceptionFactory.createException("Search could not be started", e);
+		}
+	}
+
+	/**
+	 * Start a new Swift search.
+	 */
+	public SwiftSearchDefinition startNewSearch(final SearchInput searchInput) {
+		try {
+			swiftDao.begin();
+			final SwiftSearchDefinition swiftSearch = createSwiftSearchDefinition(searchInput);
+			validateSearch(swiftSearch);
+			checkSearchTitleUnique(swiftSearch);
+			final SwiftSearchDefinition newSwiftSearch = getSwiftDao().addSwiftSearchDefinition(swiftSearch);
+			swiftDao.commit();
+			submitSearch(newSwiftSearch.getId(),
+					newSwiftSearch.getTitle(),
+					0,
+					searchInput.isFromScratch(),
+					searchInput.isLowPriority() ? -1 : 0);
+			return newSwiftSearch;
+		} catch (Exception e) {
+			swiftDao.rollback();
+			throw new MprcException("New Swift search could not be started", e);
+		}
+	}
+
+	private SwiftSearchDefinition createSwiftSearchDefinition(SearchInput searchInput) {
+		final User user = workspaceDao.getUserByEmail(searchInput.getUserEmail());
+		final File outputFolder = new File(getBrowseRoot(), searchInput.getOutputFolderName());
+		// TODO: This needs to be passed as a parameter
+		final SpectrumQa qa = new SpectrumQa("conf/msmseval/msmsEval-orbi.params", SpectrumQa.DEFAULT_ENGINE);
+		final PeptideReport report = searchInput.isPeptideReport() ? new PeptideReport() : null;
+
+		final SavedSearchEngineParameters searchParameters = paramsDao.getSavedSearchEngineParameters(searchInput.getParamSetId());
+		if(searchParameters==null) {
+			throw new MprcException("Could not find saved search parameters for ID: "+searchInput.getParamSetId());
+		}
+		final List<FileSearch> inputFiles = new ArrayList<FileSearch>(searchInput.getInputFilePaths().length);
+		final EnabledEngines enabledEngines = getEnabledEngines(searchInput.getEnabledEngineCodes());
+
+		for (int i = 0; i < searchInput.getInputFilePaths().length; i++) {
+			final String inputFilePath = searchInput.getInputFilePaths()[i];
+			final File inputFile = new File(getBrowseRoot(), inputFilePath);
+			final String biologicalSample = searchInput.getBiologicalSamples()[i];
+			final String categoryName = searchInput.getCategoryNames()[i];
+			final String experiment = searchInput.getExperiments()[i];
+			inputFiles.add(new FileSearch(inputFile, biologicalSample, categoryName, experiment, enabledEngines));
+		}
+
+		return new SwiftSearchDefinition(searchInput.getTitle(),
+				user, outputFolder, qa, report, searchParameters.getParameters(), inputFiles, searchInput.isPublicMgfFiles(),
+				searchInput.isPublicSearchFiles());
+	}
+
+	/**
+	 * Convert a list of codes to enabled engines.
+	 *
+	 * @param enabledEngineCodes Codes to convert.
+	 * @return List of enabled engines.
+	 */
+	private EnabledEngines getEnabledEngines(final String[] enabledEngineCodes) {
+		final EnabledEngines enabledEngines = new EnabledEngines();
+		for (final String code : enabledEngineCodes) {
+			final SearchEngineConfig config = getSwiftDao().getSearchEngineConfig(code);
+			enabledEngines.add(config);
+		}
+		return enabledEngines;
+	}
+
+	private SearchRun getPreviousSearchRun(final ClientSwiftSearchDefinition def, final SwiftSearchDefinition swiftSearch) {
+		boolean rerunPreviousSearch = false;
+		SearchRun previousSearchRun;
+		if (def.getPreviousSearchRunId() > 0) {
+			// We already ran the search before.
+			previousSearchRun = getSwiftDao().getSearchRunForId(def.getPreviousSearchRunId());
+			if (previousSearchRun.getTitle().equals(swiftSearch.getTitle())) {
+				// The titles match, output folders match, but since this is a reload, it is okay
+				rerunPreviousSearch = true;
+				final Integer searchId = previousSearchRun.getSwiftSearch();
+				final SwiftSearchDefinition searchDefinition = getSwiftDao().getSwiftSearchDefinition(searchId);
+				if (searchDefinition == null || !searchDefinition.getOutputFolder().equals(swiftSearch.getOutputFolder())) {
+					previousSearchRun = null;
+					// Since the folders do not match, we will rerun, but will not hide the previous search run
+					// from the list
+				}
+			} else {
+				previousSearchRun = null;
+			}
+		} else {
+			previousSearchRun = null;
+		}
+		if (!rerunPreviousSearch) {
+			checkSearchTitleUnique(swiftSearch);
+		}
+		return previousSearchRun;
+	}
+
+	private void checkSearchTitleUnique(final SwiftSearchDefinition swiftSearch) {
+		if (getSwiftDao().isExistingTitle(swiftSearch.getTitle(), swiftSearch.getUser())) {
+			throw new MprcException("There is already a search titled " + swiftSearch.getTitle() + ".");
+		}
+	}
+
+	private void validateSearch(final SwiftSearchDefinition swiftSearch) {
+		final Matcher badTitleMatcher = BAD_TITLE_CHARACTER.matcher(swiftSearch.getTitle());
+		if (swiftSearch.getTitle().length() == 0) {
+			throw new MprcException("Cannot run Swift search with an empty title");
+		}
+		if (badTitleMatcher.find()) {
+			throw new MprcException("Search title must not contain '" + badTitleMatcher.group() + "'");
+		}
+	}
+
+	private void submitSearch(final int searchId, final String batchName, final int previousSearchRunId, final boolean fromScratch, final int priority) throws InterruptedException {
+		final SwiftSearcherCaller.SearchProgressListener listener =
+				SwiftSearcherCaller.startSearch(
+						searchId, batchName, fromScratch, priority,
+						previousSearchRunId, getSwiftSearcherDaemonConnection());
+		listener.waitForSearchReady(SEARCH_TIMEOUT);
+		if (listener.getException() != null) {
+			throw new MprcException(listener.getException());
+		}
+
+		if (listener.getSearchRunId() == 0) {
+			throw new MprcException("The search was not started within timeout.");
 		}
 	}
 
@@ -299,7 +387,7 @@ public final class ServiceImpl extends SpringGwtServlet implements Service, Appl
 	}
 
 	private boolean isDirectoryTreatedAsFile(final File file) {
-	    return file.getName().endsWith(AGILENT_FOLDER_SUFFIX);
+		return file.getName().endsWith(AGILENT_FOLDER_SUFFIX);
 	}
 
 	/**
@@ -591,7 +679,7 @@ public final class ServiceImpl extends SpringGwtServlet implements Service, Appl
 	}
 
 	@Override
-	public InitialPageData getInitialPageData(Integer previousSearchId) throws GWTServiceException {
+	public InitialPageData getInitialPageData(final Integer previousSearchId) throws GWTServiceException {
 		final String[] params = {
 				"sequence.database",
 				"sequence.enzyme",
@@ -614,7 +702,7 @@ public final class ServiceImpl extends SpringGwtServlet implements Service, Appl
 
 		return new InitialPageData(
 				listUsers(),
-				previousSearchId==null ? null : loadSearch(previousSearchId),
+				previousSearchId == null ? null : loadSearch(previousSearchId),
 				getUserMessage(),
 				getParamSetList(),
 				map,
@@ -642,7 +730,7 @@ public final class ServiceImpl extends SpringGwtServlet implements Service, Appl
 		return webUiHolder;
 	}
 
-	public void setWebUiHolder(WebUiHolder webUiHolder) {
+	public void setWebUiHolder(final WebUiHolder webUiHolder) {
 		this.webUiHolder = webUiHolder;
 	}
 
@@ -662,7 +750,7 @@ public final class ServiceImpl extends SpringGwtServlet implements Service, Appl
 		return getWebUi().getSwiftSearcherDaemonConnection();
 	}
 
-	public void setSwiftDao(SwiftDao swiftDao) {
+	public void setSwiftDao(final SwiftDao swiftDao) {
 		this.swiftDao = swiftDao;
 	}
 
@@ -670,7 +758,7 @@ public final class ServiceImpl extends SpringGwtServlet implements Service, Appl
 		return swiftDao;
 	}
 
-	public void setWorkspaceDao(WorkspaceDao workspaceDao) {
+	public void setWorkspaceDao(final WorkspaceDao workspaceDao) {
 		this.workspaceDao = workspaceDao;
 	}
 
@@ -678,7 +766,7 @@ public final class ServiceImpl extends SpringGwtServlet implements Service, Appl
 		return workspaceDao;
 	}
 
-	public void setCurationDao(CurationDao curationDao) {
+	public void setCurationDao(final CurationDao curationDao) {
 		this.curationDao = curationDao;
 	}
 
@@ -686,7 +774,7 @@ public final class ServiceImpl extends SpringGwtServlet implements Service, Appl
 		return curationDao;
 	}
 
-	public void setParamsDao(ParamsDao paramsDao) {
+	public void setParamsDao(final ParamsDao paramsDao) {
 		this.paramsDao = paramsDao;
 	}
 
@@ -694,7 +782,7 @@ public final class ServiceImpl extends SpringGwtServlet implements Service, Appl
 		return paramsDao;
 	}
 
-	public void setParamsInfo(ParamsInfo paramsInfo) {
+	public void setParamsInfo(final ParamsInfo paramsInfo) {
 		this.paramsInfo = paramsInfo;
 	}
 
@@ -722,7 +810,7 @@ public final class ServiceImpl extends SpringGwtServlet implements Service, Appl
 		return getWebUi().isScaffoldReport();
 	}
 
-	public void setUnimodDao(UnimodDao unimodDao) {
+	public void setUnimodDao(final UnimodDao unimodDao) {
 		this.unimodDao = unimodDao;
 	}
 
@@ -731,12 +819,12 @@ public final class ServiceImpl extends SpringGwtServlet implements Service, Appl
 	}
 
 	@Override
-	public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+	public void setApplicationContext(final ApplicationContext applicationContext) throws BeansException {
 		MainFactoryContext.setContext(applicationContext);
 	}
 
 	@Override
-	public void init(ServletConfig config) throws ServletException {
+	public void init(final ServletConfig config) throws ServletException {
 		super.init(config);
 		ServletIntialization.initServletConfiguration(config);
 	}
