@@ -13,4 +13,5 @@ Modules
 * gwt-common - common files for the Google Web Toolkit
 * launcher - runs embedded Jetty server for the Swift web application
 * web - Swift's web user interface
+* installer - a module that generates Swift install package
 

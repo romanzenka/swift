@@ -60,8 +60,10 @@ public final class GridScriptFactory {
 			params.add("-D" + SWIFT_HOME + "=" + System.getProperty(SWIFT_HOME));
 		}
 
-		params.add("-jar");
-		params.add(new File(swiftJar).getAbsolutePath());
+		params.add("-cp");
+		params.add(new File(swiftJar).getParentFile().getAbsolutePath() + "/*");
+
+		params.add("edu.mayo.mprc.swift.Swift");
 
 		params.add("--sge");
 		params.add(serializedWorkPacket.getAbsolutePath());

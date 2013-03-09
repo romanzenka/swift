@@ -1,5 +1,6 @@
 #!/bin/bash
 
+VER=3.0-SNAPSHOT
 echo Starting Swift configuration
 
 # Absolute path to this script
@@ -7,4 +8,4 @@ SCRIPT=`readlink -f $0`
 # Absolute path to directory this script is in
 SCRIPTPATH=`dirname $SCRIPT`
 
-java  -Dswift.home="${SCRIPTPATH}" -Dswift.daemon=config -jar bin/swift/launcher.jar --config --war ./bin/swift/swift.war  $*
+java  -Dswift.home="${SCRIPTPATH}" -Dswift.daemon=config -cp "bin/swift/*" edu.mayo.mprc.launcher.Launcher --config --war ./bin/swift/swift-${VER}.war  $*
