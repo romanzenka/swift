@@ -134,7 +134,7 @@ class Unimod1Handler extends DefaultHandler {
 					// Do nothing
 					break;
 				default:
-					throw new MprcException("Unknown state")
+					throw new MprcException("Unknown state");
 			}
 		}
 	}
