@@ -10,5 +10,5 @@ public interface MprcFileCallback {
 	 * @param rs ResultSet to process.
 	 * @return Any object, will be returned from {@link MprcFile#processResultSet}.
 	 */
-	Object processResultSet(ResultSet rs) throws Exception;
+	Object processResultSet(ResultSet rs);
 }

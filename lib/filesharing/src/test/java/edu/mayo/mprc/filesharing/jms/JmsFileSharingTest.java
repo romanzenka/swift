@@ -13,6 +13,7 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import java.io.File;
+import java.io.IOException;
 import java.net.URI;
 import java.util.List;
 
@@ -67,7 +68,7 @@ public final class JmsFileSharingTest {
 	private File destinationFile11;
 
 	@Test
-	public void transferFileSuccessfullyTest() throws Exception {
+	public void transferFileSuccessfullyTest() throws IOException {
 		LOGGER.debug("Starting test");
 
 		sourceTempFile11 = TestingUtilities.getTempFileFromResource(sourceFileResourcePath1, false, tempFolder);
@@ -85,7 +86,7 @@ public final class JmsFileSharingTest {
 	}
 
 	@Test(dependsOnMethods = {"transferFileSuccessfullyTest"})
-	public void transferFileRetrialSuccessfullyTest() throws Exception {
+	public void transferFileRetrialSuccessfullyTest() {
 		LOGGER.debug("Starting test");
 
 		final FileTransfer fileTransfer = fileSharing.getFile("test", sourceTempFile11.getAbsolutePath(), destinationFile11);
@@ -101,7 +102,7 @@ public final class JmsFileSharingTest {
 
 
 	@Test(dependsOnMethods = {"transferFileRetrialSuccessfullyTest"})
-	public void transferFileDeletionSuccessfullyTest() throws Exception {
+	public void transferFileDeletionSuccessfullyTest() {
 		LOGGER.debug("Starting test");
 
 		final String sourcePath = sourceTempFile11.getAbsolutePath();
@@ -117,7 +118,7 @@ public final class JmsFileSharingTest {
 	}
 
 	@Test
-	public void transferFolderSuccessfullyTest() throws Exception {
+	public void transferFolderSuccessfullyTest() {
 		LOGGER.debug("Starting test");
 
 		final File destinationFolder = new File(tempFolder, "destination");
@@ -133,7 +134,7 @@ public final class JmsFileSharingTest {
 	}
 
 	@Test
-	public void transferFileFailedTest() throws Exception {
+	public void transferFileFailedTest() {
 		LOGGER.debug("Starting test");
 
 		final File destinationFile = new File(tempFolder, "destination2.test");
@@ -148,7 +149,7 @@ public final class JmsFileSharingTest {
 	}
 
 	@Test
-	public void synchronizedRemoteFileTest() throws Exception {
+	public void synchronizedRemoteFileTest() throws IOException {
 		LOGGER.debug("Starting test");
 
 		final File sourceTempFile = TestingUtilities.getTempFileFromResource(sourceFileResourcePath1, false, tempFolder);
@@ -174,7 +175,7 @@ public final class JmsFileSharingTest {
 	private File destinationFile4;
 
 	@Test
-	public void synchronizedRemoteFolderTest() throws Exception {
+	public void synchronizedRemoteFolderTest() throws IOException {
 		LOGGER.debug("Starting test");
 
 		final File tempSourceSynchFolder = new File(tempFolder, "synchSource");
@@ -212,7 +213,7 @@ public final class JmsFileSharingTest {
 	}
 
 	@Test(dependsOnMethods = {"synchronizedRemoteFolderTest"})
-	public void synchronizedRemoteFolderRetrialTest() throws Exception {
+	public void synchronizedRemoteFolderRetrialTest() {
 		LOGGER.debug("Starting test");
 
 		final File tempSourceSynchFolder = new File(tempFolder, "synchSource");
@@ -238,7 +239,7 @@ public final class JmsFileSharingTest {
 	}
 
 	@Test(dependsOnMethods = {"synchronizedRemoteFolderRetrialTest"})
-	public void synchronizedRemoteFolderRetrialChangeTest() throws Exception {
+	public void synchronizedRemoteFolderRetrialChangeTest() {
 		LOGGER.debug("Starting test");
 
 		final File tempSourceSynchFolder = new File(tempFolder, "synchSource");
@@ -270,7 +271,7 @@ public final class JmsFileSharingTest {
 	private File destinationFile44;
 
 	@Test
-	public void synchronizedLocalFileTest() throws Exception {
+	public void synchronizedLocalFileTest() throws IOException {
 		LOGGER.debug("Starting test");
 
 		sourceTempFile44 = TestingUtilities.getTempFileFromResource(sourceFileResourcePath1, false, tempFolder);
@@ -290,7 +291,7 @@ public final class JmsFileSharingTest {
 	}
 
 	@Test(dependsOnMethods = {"synchronizedLocalFileTest"})
-	public void synchronizedLocalFileRetrialTest() throws Exception {
+	public void synchronizedLocalFileRetrialTest() {
 		LOGGER.debug("Starting test");
 
 		final FileTransfer fileTransfer = fileSharingClient.downloadFile("server", destinationFile44, sourceTempFile44.getAbsolutePath());
@@ -305,7 +306,7 @@ public final class JmsFileSharingTest {
 	}
 
 	@Test
-	public void synchronizedLocalFileFailedTest() throws Exception {
+	public void synchronizedLocalFileFailedTest() {
 		LOGGER.debug("Starting test");
 
 		final File sourceTempFile = new File(tempFolder, "synchronizedLocal145785ABCD.test");

@@ -25,7 +25,7 @@ public final class ServiceTest {
 	private static final String PREFERRED_FOLDER_NAME = "test";
 
 	@BeforeClass
-	protected void init() throws Exception {
+	protected void init() {
 		LOGGER.debug("Starting up service");
 		SwiftWebContext.setupTest();
 		_service = new ServiceImpl();
@@ -35,7 +35,7 @@ public final class ServiceTest {
 	}
 
 	@AfterClass
-	protected void done() throws Exception {
+	protected void done() {
 		_service = null;
 	}
 

@@ -8,7 +8,7 @@ import org.testng.annotations.Test;
  */
 public final class StarMatcherTest {
 	@Test
-	public void testRegex() throws Exception {
+	public void testRegex() {
 		final StarMatcher m = new StarMatcher("\\bADH1_YEAST\\b\n" +
 				"\\bOVAL_CHICK\\b\n" +
 				"\\bBGAL_ECOLI\\b\n" +
@@ -23,7 +23,7 @@ public final class StarMatcherTest {
 	}
 
 	@Test
-	public void testDirect() throws Exception {
+	public void testDirect() {
 		final StarMatcher m = new StarMatcher("ADH1_YEAST OVAL_CHICK  LACB_BOVIN  BGAL_ECOLI",
 				" ",
 				false,

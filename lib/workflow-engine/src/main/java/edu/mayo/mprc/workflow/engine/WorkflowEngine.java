@@ -6,7 +6,6 @@ import edu.mayo.mprc.utilities.progress.ProgressReport;
 import edu.mayo.mprc.workflow.persistence.TaskState;
 import org.apache.log4j.Logger;
 
-import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -75,76 +74,6 @@ public final class WorkflowEngine {
 		for (final Task task : tasks) {
 			addTask(task);
 		}
-	}
-
-	/**
-	 * @return Dump of all the current tasks, their dependencies and states in the form of a .dot file.
-	 */
-	public String dumpDot() {
-		final StringBuilder dot = new StringBuilder();
-		dot.append("digraph template { \n");
-
-		for (int i = 0; i < allTasks.size(); i++) {
-			final Task task = allTasks.get(i);
-			String color = "white";
-			switch (task.getState()) {
-				case COMPLETED_SUCCESFULLY:
-					color = "green";
-					break;
-				case INIT_FAILED:
-					color = "darkorange1";
-					break;
-				case READY:
-					color = "beige";
-					break;
-				case RUNNING:
-					color = "greenyellow";
-					break;
-				case RUN_FAILED:
-					color = "red";
-					break;
-				case UNINITIALIZED:
-					color = "grey";
-					break;
-				case RUNNING_WARN:
-					color = "orange";
-					break;
-				case COMPLETED_WARNING:
-					color = "green";
-					break;
-				default:
-					throw new MprcException("Unsupported task state: " + task.getState().name());
-			}
-			dot.append(
-					MessageFormat.format(
-							"\"node_{0}\" [label=\"{1}\\n{2}\\n{3}\", color={4}, style=filled, shape=box, fontsize=14];\n",
-							i,
-							task.getName(),
-							task.getDescription(),
-							task.getState().getText(),
-							color));
-		}
-
-		for (int i = 0; i < allTasks.size(); i++) {
-			final Task task = allTasks.get(i);
-			for (final Task output : task.getOutputs()) {
-				int index = -1;
-				for (int j = 0; j < allTasks.size(); j++) {
-					if (allTasks.get(j).equals(output)) {
-						index = j;
-						break;
-					}
-				}
-				if (index != -1) {
-					dot.append(
-							MessageFormat.format("\"node_{0}\" -> \"node_{1}\"\n",
-									i, index));
-				}
-			}
-		}
-
-		dot.append("}\n");
-		return dot.toString();
 	}
 
 	/**

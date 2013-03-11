@@ -117,7 +117,7 @@ public final class JmsFileTransferHandler implements FileTransferHandler {
 		}
 	}
 
-	public FileTransfer getFile(final String sourceId, final String sourcefilePath, final File localDestinationFile) throws Exception {
+	public FileTransfer getFile(final String sourceId, final String sourcefilePath, final File localDestinationFile) {
 		if (runningSemaphore.availablePermits() == 0) {
 			return JmsFileTransferHelper.download(session, getMessageProducer(sourceId), sourcefilePath, localDestinationFile);
 		}
@@ -126,7 +126,7 @@ public final class JmsFileTransferHandler implements FileTransferHandler {
 	}
 
 	@Override
-	public FileTransfer uploadFile(final String destinationId, final File localSourceFile, final String destinationFilePath) throws Exception {
+	public FileTransfer uploadFile(final String destinationId, final File localSourceFile, final String destinationFilePath) {
 		if (localSourceFile.exists() && !localSourceFile.isDirectory()) {
 			final Map<File, String> localFileRemoteFilePathPairs = new TreeMap<File, String>();
 			localFileRemoteFilePathPairs.put(localSourceFile, destinationFilePath);
@@ -140,7 +140,7 @@ public final class JmsFileTransferHandler implements FileTransferHandler {
 	}
 
 	@Override
-	public FileTransfer uploadFolder(final String destinationId, final File localSourceFolder, final String destinationFolderPath) throws Exception {
+	public FileTransfer uploadFolder(final String destinationId, final File localSourceFolder, final String destinationFolderPath) {
 		final Map<File, String> localFileRemoteFilePathPairs = new TreeMap<File, String>();
 
 		getFilesFromFolder(localSourceFolder, normalizedFolderPath(localSourceFolder.getAbsolutePath()), normalizedFolderPath(destinationFolderPath), localFileRemoteFilePathPairs);
@@ -149,7 +149,7 @@ public final class JmsFileTransferHandler implements FileTransferHandler {
 	}
 
 	@Override
-	public FileTransfer downloadFile(final String sourceId, final File localDestinationFile, final String sourceFilePath) throws Exception {
+	public FileTransfer downloadFile(final String sourceId, final File localDestinationFile, final String sourceFilePath) {
 		final Map<File, String> localFileRemoteFilePathPairs = new TreeMap<File, String>();
 		localFileRemoteFilePathPairs.put(localDestinationFile, sourceFilePath);
 
@@ -174,7 +174,7 @@ public final class JmsFileTransferHandler implements FileTransferHandler {
 		}
 	}
 
-	private FileTransfer synchronizeRemoteFiles(final String remoteId, final Map<File, String> localFileRemoteFilePathPairs) throws Exception {
+	private FileTransfer synchronizeRemoteFiles(final String remoteId, final Map<File, String> localFileRemoteFilePathPairs) {
 		if (runningSemaphore.availablePermits() == 0) {
 			return JmsFileTransferHelper.upload(session, getMessageProducer(remoteId), localFileRemoteFilePathPairs);
 		}
@@ -182,7 +182,7 @@ public final class JmsFileTransferHandler implements FileTransferHandler {
 		return null;
 	}
 
-	private FileTransfer synchronizeLocalFiles(final String remoteId, final Map<File, String> localFileRemoteFilePathPairs) throws Exception {
+	private FileTransfer synchronizeLocalFiles(final String remoteId, final Map<File, String> localFileRemoteFilePathPairs)  {
 		if (runningSemaphore.availablePermits() == 0) {
 			return JmsFileTransferHelper.download(session, getMessageProducer(remoteId), localFileRemoteFilePathPairs);
 		}
@@ -208,9 +208,13 @@ public final class JmsFileTransferHandler implements FileTransferHandler {
 		}
 	}
 
-	private MessageConsumer getMessageConsumer() throws JMSException {
+	private MessageConsumer getMessageConsumer() {
 		if (consumer == null) {
-			consumer = session.createConsumer(destination);
+			try {
+				consumer = session.createConsumer(destination);
+			} catch (JMSException e) {
+				throw new MprcException("Cannot create consumer for destination [" + destination + "]", e);
+			}
 		}
 
 		return consumer;
@@ -224,14 +228,18 @@ public final class JmsFileTransferHandler implements FileTransferHandler {
 		}
 	}
 
-	private synchronized MessageProducer getMessageProducer(final String sourceId) throws JMSException {
-		MessageProducer producer = null;
+	private synchronized MessageProducer getMessageProducer(final String sourceId) {
+		try {
+			MessageProducer producer = null;
 
-		if ((producer = messageProducers.get(sourceId)) == null) {
-			producer = session.createProducer(session.createQueue(QUEUE_PREFIX + sourceId));
-			messageProducers.put(sourceId, producer);
+			if ((producer = messageProducers.get(sourceId)) == null) {
+				producer = session.createProducer(session.createQueue(QUEUE_PREFIX + sourceId));
+				messageProducers.put(sourceId, producer);
+			}
+
+			return producer;
+		} catch (JMSException e) {
+			throw new MprcException("Cannot obtain message producer for queue [" + QUEUE_PREFIX + sourceId + "]", e);
 		}
-
-		return producer;
 	}
 }

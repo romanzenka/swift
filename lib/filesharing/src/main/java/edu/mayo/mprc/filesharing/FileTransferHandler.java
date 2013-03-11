@@ -12,7 +12,7 @@ public interface FileTransferHandler extends FileSynchronizer {
 	 * @param localDestinationFile File copy of given remote file.
 	 * @return
 	 */
-	FileTransfer getFile(String sourceId, String sourcefilePath, File localDestinationFile) throws Exception;
+	FileTransfer getFile(String sourceId, String sourcefilePath, File localDestinationFile);
 
 	/**
 	 * Starts file sharing.

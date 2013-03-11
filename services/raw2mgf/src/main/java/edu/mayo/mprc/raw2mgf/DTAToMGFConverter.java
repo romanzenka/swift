@@ -32,9 +32,11 @@ public final class DTAToMGFConverter {
 		this.wineCleanup = wineCleanup;
 	}
 
-	public void run() throws Exception {
+	public void run() {
 		try {
 			convert(resultFile, dtaFiles, this.wineCleanup);
+		} catch (IOException e) {
+			throw new MprcException("Conversion of dta files to [" + (resultFile == null ? "null" : resultFile.getAbsolutePath()) + "] failed", e);
 		} finally {
 			// now remove the dta files as no longer need them
 			for (final File file : dtaFiles) {

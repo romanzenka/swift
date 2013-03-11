@@ -279,9 +279,8 @@ public final class TestingUtilities {
 	 * @param firstFile
 	 * @param secondFile
 	 * @return null if files are equal.
-	 * @throws IOException
 	 */
-	public static String compareFilesByLine(final File firstFile, final File secondFile) throws IOException {
+	public static String compareFilesByLine(final File firstFile, final File secondFile) {
 		return compareFilesByLine(firstFile, secondFile, false);
 	}
 

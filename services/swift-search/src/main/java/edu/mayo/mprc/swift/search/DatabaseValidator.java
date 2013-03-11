@@ -123,7 +123,7 @@ public final class DatabaseValidator implements RuntimeInitializer {
 
 		final Future<String> future = EXECUTOR.submit(new Callable<String>() {
 			@Override
-			public String call() throws Exception {
+			public String call() {
 				String errors = "";
 				try {
 					// Before checking, update the schema

@@ -36,7 +36,7 @@ public final class SendReceiveTest extends MessagingTestBase {
 		LOGGER.debug("Broker restarted");
 	}
 
-	private void init() throws Exception {
+	private void init() {
 		startBroker();
 		numRequests.set(0);
 		numResponses.set(0);
@@ -44,11 +44,15 @@ public final class SendReceiveTest extends MessagingTestBase {
 		expectedNumResponses = 0;
 	}
 
-	private void cleanup() throws Exception {
+	private void cleanup() {
 		int totalSleep = 0;
 		while (numRequests.get() != expectedNumRequests || numResponses.get() != expectedNumResponses) {
 			logChatty("Waiting for messages to be delivered. Requests :" + numRequests.get() + "/" + expectedNumRequests + " Responses: " + numResponses.get() + "/" + expectedNumResponses);
-			Thread.sleep(100);
+			try {
+				Thread.sleep(100);
+			} catch (InterruptedException e) {
+				throw new MprcException("Sleep interrupted", e);
+			}
 			totalSleep += 100;
 			if (totalSleep >= MAX_WAIT_FOR_MESSAGES_TO_ARRIVE) {
 				Assert.fail("Slept for " + MAX_WAIT_FOR_MESSAGES_TO_ARRIVE + " and yet the expected amount of messages was not received: "
@@ -63,7 +67,7 @@ public final class SendReceiveTest extends MessagingTestBase {
 	}
 
 	@Test(enabled = true, groups = {"unit", "fast"})
-	public void testJmsRequestOnly() throws Exception {
+	public void testJmsRequestOnly() {
 		init();
 		expectedNumRequests = 1;
 		expectedNumResponses = 0;
@@ -106,7 +110,7 @@ public final class SendReceiveTest extends MessagingTestBase {
 	}
 
 	@Test(enabled = true, groups = {"unit", "fast"}, dependsOnMethods = {"testJmsRequestOnly"})
-	public void testJmsRequestResponse() throws Exception {
+	public void testJmsRequestResponse() {
 		init();
 		expectedNumRequests = 1;
 		expectedNumResponses = 1;
@@ -135,7 +139,7 @@ public final class SendReceiveTest extends MessagingTestBase {
 	}
 
 	@Test(enabled = true, groups = {"unit", "fast"})
-	public void testMultipleMessages() throws Exception {
+	public void testMultipleMessages() {
 		init();
 		expectedNumRequests = TOTAL_REQUESTS;
 		expectedNumResponses = TOTAL_REQUESTS;
@@ -189,12 +193,16 @@ public final class SendReceiveTest extends MessagingTestBase {
 			service.sendRequest("request " + Integer.toString(i), PRIORITY, listener);
 		}
 
-		thread.join(10000);
+		try {
+			thread.join(10000);
+		} catch (InterruptedException e) {
+			throw new MprcException("Interrupted join", e);
+		}
 		cleanup();
 	}
 
 	@Test(enabled = true, groups = {"unit", "fast"})
-	public void testMultipleMessagesWithRestart() throws Exception {
+	public void testMultipleMessagesWithRestart() {
 		init();
 		restartBroker();
 		testMultipleMessages();
@@ -202,7 +210,7 @@ public final class SendReceiveTest extends MessagingTestBase {
 	}
 
 	@Test(dependsOnMethods = {"testMultipleMessagesWithRestart"})
-	public void shouldContinueProcessingWhenInterrupted() throws Exception {
+	public void shouldContinueProcessingWhenInterrupted() {
 		init();
 
 		// Send two messages

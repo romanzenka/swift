@@ -13,9 +13,8 @@ public interface FileSynchronizer {
 	 * @param localSourceFile
 	 * @param destinationFilePath
 	 * @return
-	 * @throws Exception
 	 */
-	FileTransfer uploadFile(String destinationId, File localSourceFile, String destinationFilePath) throws Exception;
+	FileTransfer uploadFile(String destinationId, File localSourceFile, String destinationFilePath);
 
 	/**
 	 * Synchronizes content of folder in remote system, identified by the destinationId value, with content of local source folder.
@@ -24,9 +23,8 @@ public interface FileSynchronizer {
 	 * @param localSourceFolder
 	 * @param destinationFolderPath
 	 * @return
-	 * @throws Exception
 	 */
-	FileTransfer uploadFolder(String destinationId, File localSourceFolder, String destinationFolderPath) throws Exception;
+	FileTransfer uploadFolder(String destinationId, File localSourceFolder, String destinationFolderPath);
 
 	/**
 	 * Synchronizes local file with remote source file in system, identified by the sourceId value.
@@ -35,7 +33,6 @@ public interface FileSynchronizer {
 	 * @param localDestinationFile local file to be synchronized
 	 * @param sourceFilePath       source file
 	 * @return
-	 * @throws Exception
 	 */
-	FileTransfer downloadFile(String sourceId, File localDestinationFile, String sourceFilePath) throws Exception;
+	FileTransfer downloadFile(String sourceId, File localDestinationFile, String sourceFilePath);
 }

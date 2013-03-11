@@ -1,11 +1,13 @@
 package edu.mayo.mprc.filesharing.jms;
 
+import edu.mayo.mprc.MprcException;
 import edu.mayo.mprc.filesharing.FileTransfer;
 import edu.mayo.mprc.filesharing.FileTransferHandler;
 import edu.mayo.mprc.utilities.FileUtilities;
 
 import java.io.File;
 import java.net.URI;
+import java.net.URISyntaxException;
 
 /**
  * Test class.
@@ -14,13 +16,19 @@ public final class JmsFileTransferClient {
 	private JmsFileTransferClient() {
 	}
 
-	public static void main(final String[] args) throws Exception {
+	public static void main(final String[] args) {
 		if (args.length >= 3) {
 			final String brokerURl = args[0];
 			final String remoteFilePath = args[1];
 			final File localFile = new File(args[2]);
 
-			final JmsFileTransferHandlerFactory factory = new JmsFileTransferHandlerFactory(new URI(brokerURl), null, null);
+			final URI brokerUri;
+			try {
+				brokerUri = new URI(brokerURl);
+			} catch (URISyntaxException e) {
+				throw new MprcException("Cannot parse broker URL ["+brokerURl+"]", e);
+			}
+			final JmsFileTransferHandlerFactory factory = new JmsFileTransferHandlerFactory(brokerUri, null, null);
 			final FileTransferHandler fileSharing = factory.createFileSharing("client");
 			fileSharing.startProcessingRequests();
 

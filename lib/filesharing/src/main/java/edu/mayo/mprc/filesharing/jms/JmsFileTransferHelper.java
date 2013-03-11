@@ -8,10 +8,8 @@ import org.apache.log4j.Logger;
 
 import javax.jms.*;
 import java.io.File;
-import java.net.InetAddress;
-import java.net.InetSocketAddress;
-import java.net.ServerSocket;
-import java.net.Socket;
+import java.io.IOException;
+import java.net.*;
 import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -54,9 +52,8 @@ public final class JmsFileTransferHelper {
 	 * @param producer JMS producer for remote system.
 	 * @param fromTo   Pairs of corresponding local files and remote files.
 	 * @return
-	 * @throws Exception
 	 */
-	public static FileTransfer upload(final Session session, final MessageProducer producer, final Map<File, String> fromTo) throws Exception {
+	public static FileTransfer upload(final Session session, final MessageProducer producer, final Map<File, String> fromTo) {
 		return transferFiles(session, producer, fromTo, false);
 	}
 
@@ -68,9 +65,8 @@ public final class JmsFileTransferHelper {
 	 * @param from
 	 * @param to
 	 * @return
-	 * @throws Exception
 	 */
-	public static FileTransfer download(final Session session, final MessageProducer producer, final String from, final File to) throws Exception {
+	public static FileTransfer download(final Session session, final MessageProducer producer, final String from, final File to) {
 
 		final Map<File, String> toFrom = new TreeMap<File, String>();
 		toFrom.put(to, from);
@@ -85,13 +81,12 @@ public final class JmsFileTransferHelper {
 	 * @param producer JMS producer for remote system.
 	 * @param toFrom   Pairs of corresponding local files and remote files.
 	 * @return
-	 * @throws Exception
 	 */
-	public static FileTransfer download(final Session session, final MessageProducer producer, final Map<File, String> toFrom) throws Exception {
+	public static FileTransfer download(final Session session, final MessageProducer producer, final Map<File, String> toFrom) {
 		return transferFiles(session, producer, toFrom, true);
 	}
 
-	private static FileTransfer transferFiles(final Session session, final MessageProducer producer, final Map<File, String> localRemote, final boolean remoteToLocal) throws Exception {
+	private static FileTransfer transferFiles(final Session session, final MessageProducer producer, final Map<File, String> localRemote, final boolean remoteToLocal) {
 		//Create reversed map of file paths and files. This will be used ahead in the code.
 		final Map<String, File> remoteFilePathLocalFilePairs = reverseMap(localRemote);
 
@@ -99,16 +94,29 @@ public final class JmsFileTransferHelper {
 		MultiFileTransferRequest fileTransferRequest = null;
 
 		if (remoteToLocal) {
-			serverSocket = new ServerSocket(0);
-			fileTransferRequest = new MultiFileTransferRequest(lastRequestId.incrementAndGet(), getFileInfos(localRemote), new InetSocketAddress(InetAddress.getLocalHost().getHostAddress(), serverSocket.getLocalPort()));
+			try {
+				serverSocket = new ServerSocket(0);
+			} catch (IOException e) {
+				throw new MprcException("Could not open a server socket on any free port", e);
+			}
+			fileTransferRequest = new MultiFileTransferRequest(lastRequestId.incrementAndGet(), getFileInfos(localRemote), new InetSocketAddress(getLocalHost().getHostAddress(), serverSocket.getLocalPort()));
 		} else {
 			serverSocket = null;
 			fileTransferRequest = new MultiFileTransferRequest(lastRequestId.incrementAndGet(), getFileInfos(localRemote));
 			fileTransferRequest.setBeSource(true);
 		}
 
-		final ObjectMessage objectMessage = session.createObjectMessage(fileTransferRequest);
-		objectMessage.setJMSReplyTo(session.createTemporaryQueue());
+		final ObjectMessage objectMessage;
+		try {
+			objectMessage = session.createObjectMessage(fileTransferRequest);
+		} catch (JMSException e) {
+			throw new MprcException("Could not create a JMS message", e);
+		}
+		try {
+			objectMessage.setJMSReplyTo(session.createTemporaryQueue());
+		} catch (JMSException e) {
+			throw new MprcException("Could not create a temporary queue", e);
+		}
 
 		final FileTransfer fileTransfer = new FileTransfer(new LinkedList<File>(localRemote.keySet()));
 		final List<File> transferedFiles = Collections.synchronizedList(new ArrayList<File>(localRemote.size()));
@@ -117,122 +125,152 @@ public final class JmsFileTransferHelper {
 		final AtomicInteger transferedFileCounter = new AtomicInteger(0);
 
 		//Expect reply with list of existing remote files.
-		session.createConsumer(objectMessage.getJMSReplyTo()).setMessageListener(new MessageListener() {
-			public void onMessage(final Message message) {
-				try {
-					LOGGER.debug("Acknowledge message: " + message.toString());
+		final Destination jmsReplyTo;
+		try {
+			jmsReplyTo = objectMessage.getJMSReplyTo();
+		} catch (JMSException e) {
+			throw new MprcException("Could not determine the reply to field on the message", e);
+		}
+		final MessageConsumer consumer;
+		try {
+			consumer = session.createConsumer(jmsReplyTo);
+		} catch (JMSException e) {
+			throw new MprcException("Could not create JMS message consumer", e);
+		}
+		try {
+			consumer.setMessageListener(new MessageListener() {
+				public void onMessage(final Message message) {
+					try {
+						LOGGER.debug("Acknowledge message: " + message.toString());
 
-					if (!(message instanceof ObjectMessage)) {
-						ExceptionUtilities.throwCastException(message, ObjectMessage.class);
-						return;
-					}
-					final Object object = ((ObjectMessage) message).getObject();
+						if (!(message instanceof ObjectMessage)) {
+							ExceptionUtilities.throwCastException(message, ObjectMessage.class);
+							return;
+						}
+						final Object object = ((ObjectMessage) message).getObject();
 
-					if (object instanceof MultiFileTransferResponse) {
-						final MultiFileTransferResponse multiFileTransferResponse = (MultiFileTransferResponse) object;
+						if (object instanceof MultiFileTransferResponse) {
+							final MultiFileTransferResponse multiFileTransferResponse = (MultiFileTransferResponse) object;
 
-						LOGGER.debug("Received file transefer response: " + multiFileTransferResponse.getRequestId());
+							LOGGER.debug("Received file transefer response: " + multiFileTransferResponse.getRequestId());
 
-						transferedFileCounter.addAndGet(multiFileTransferResponse.getFileInfos().size());
-						FileTransferThread fileTransferThread = null;
+							transferedFileCounter.addAndGet(multiFileTransferResponse.getFileInfos().size());
+							FileTransferThread fileTransferThread = null;
 
-						try {
-							LOGGER.debug("Client side request: " + multiFileTransferResponse.getRequestId() + ". Transfering " + multiFileTransferResponse.getFileInfos().size() + " file(s).");
+							try {
+								LOGGER.debug("Client side request: " + multiFileTransferResponse.getRequestId() + ". Transfering " + multiFileTransferResponse.getFileInfos().size() + " file(s).");
 
-							for (final FileInfo fileInfo : multiFileTransferResponse.getFileInfos()) {
-								final File file = remoteFilePathLocalFilePairs.get(fileInfo.getFilePath());
+								for (final FileInfo fileInfo : multiFileTransferResponse.getFileInfos()) {
+									final File file = remoteFilePathLocalFilePairs.get(fileInfo.getFilePath());
 
-								LOGGER.debug("Creating client side socket for request: " + multiFileTransferResponse.getRequestId() + " and file: " + fileInfo.toString());
+									LOGGER.debug("Creating client side socket for request: " + multiFileTransferResponse.getRequestId() + " and file: " + fileInfo.toString());
 
-								if (remoteToLocal) {
-									LOGGER.debug("Client side request: " + multiFileTransferResponse.getRequestId() + ". Listening to server socket port: " + serverSocket.getLocalPort());
-									fileTransferThread = new SocketToFileTransferThread(new FileInfo(file.getAbsolutePath(), fileInfo.getLength(), fileInfo.getLastModified()), serverSocket.accept());
-								} else {
-									//If the source files are the local files, initiate the file transfers.
-									LOGGER.debug("Client side request: " + multiFileTransferResponse.getRequestId() + ". Creating a socket at: " + multiFileTransferResponse.getInetSocketAddress().getPort());
-									fileTransferThread = new FileToSocketTransferThread(file, new Socket(multiFileTransferResponse.getInetSocketAddress().getAddress(), multiFileTransferResponse.getInetSocketAddress().getPort()));
-								}
+									if (remoteToLocal) {
+										LOGGER.debug("Client side request: " + multiFileTransferResponse.getRequestId() + ". Listening to server socket port: " + serverSocket.getLocalPort());
+										fileTransferThread = new SocketToFileTransferThread(new FileInfo(file.getAbsolutePath(), fileInfo.getLength(), fileInfo.getLastModified()), serverSocket.accept());
+									} else {
+										//If the source files are the local files, initiate the file transfers.
+										LOGGER.debug("Client side request: " + multiFileTransferResponse.getRequestId() + ". Creating a socket at: " + multiFileTransferResponse.getInetSocketAddress().getPort());
+										fileTransferThread = new FileToSocketTransferThread(file, new Socket(multiFileTransferResponse.getInetSocketAddress().getAddress(), multiFileTransferResponse.getInetSocketAddress().getPort()));
+									}
 
-								fileTransferThread.setTransferCompleteListener(new TransferCompleteListener() {
-									@Override
-									public void transferCompleted(final TransferCompleteEvent event) {
-										LOGGER.info("Client side request: " + multiFileTransferResponse.getRequestId() + ". Completed transfering file [" + file.getAbsolutePath() + "]");
+									fileTransferThread.setTransferCompleteListener(new TransferCompleteListener() {
+										@Override
+										public void transferCompleted(final TransferCompleteEvent event) {
+											LOGGER.info("Client side request: " + multiFileTransferResponse.getRequestId() + ". Completed transfering file [" + file.getAbsolutePath() + "]");
 
-										if (event.getException() != null && fileTransfer.getErrorException() == null) {
-											fileTransfer.setErrorException(event.getException());
-										} else if (event.getException() == null) {
-											transferedFiles.add(file);
-										}
+											if (event.getException() != null && fileTransfer.getErrorException() == null) {
+												fileTransfer.setErrorException(event.getException());
+											} else if (event.getException() == null) {
+												transferedFiles.add(file);
+											}
 
-										synchronized (transferedFileCounter) {
-											if (transferedFileCounter.decrementAndGet() == 0) {
-												//Notify any thread waiting on this counter to be zero.
-												transferedFileCounter.notifyAll();
+											synchronized (transferedFileCounter) {
+												if (transferedFileCounter.decrementAndGet() == 0) {
+													//Notify any thread waiting on this counter to be zero.
+													transferedFileCounter.notifyAll();
+												}
 											}
 										}
-									}
-								});
+									});
 
-								LOGGER.info("Client side request: " + multiFileTransferResponse.getRequestId() + ". Starting transfering file [" + file.getAbsolutePath() + "]");
+									LOGGER.info("Client side request: " + multiFileTransferResponse.getRequestId() + ". Starting transfering file [" + file.getAbsolutePath() + "]");
 
-								fileTransferThreadExecutorService.submit(fileTransferThread);
+									fileTransferThreadExecutorService.submit(fileTransferThread);
+								}
+							} finally {
+								if (remoteToLocal) {
+									LOGGER.debug("Client side request: " + multiFileTransferResponse.getRequestId() + ". Closing server socket at: " + serverSocket.getLocalPort());
+								}
+								FileUtilities.closeObjectQuietly(serverSocket);
 							}
-						} finally {
+
+							//Propagate deletions
 							if (remoteToLocal) {
-								LOGGER.debug("Client side request: " + multiFileTransferResponse.getRequestId() + ". Closing server socket at: " + serverSocket.getLocalPort());
-							}
-							FileUtilities.closeObjectQuietly(serverSocket);
-						}
-
-						//Propagate deletions
-						if (remoteToLocal) {
-							for (final FileInfo fileInfo : multiFileTransferResponse.getNotExistingFileInfos()) {
-								FileUtilities.deleteNow(remoteFilePathLocalFilePairs.get(fileInfo.getFilePath()));
-							}
-						}
-
-					} else if (object instanceof RemoteTransferCompleteEvent) {
-						final RemoteTransferCompleteEvent remoteTransferCompleteEvent = (RemoteTransferCompleteEvent) object;
-
-						LOGGER.debug("Received file transfer complete event: " + remoteTransferCompleteEvent.getRequestId());
-
-						if (remoteTransferCompleteEvent.getException() != null && fileTransfer.getErrorException() == null) {
-							fileTransfer.setErrorException(remoteTransferCompleteEvent.getException());
-						}
-
-						if (remoteTransferCompleteEvent.getException() == null) {
-							synchronized (transferedFileCounter) {
-								if (transferedFileCounter.get() != 0) {
-									// TODO: Ok, so if not all file got transfered, we wait for a minute (?) and then keep going???
-									transferedFileCounter.wait(60000);
+								for (final FileInfo fileInfo : multiFileTransferResponse.getNotExistingFileInfos()) {
+									FileUtilities.deleteNow(remoteFilePathLocalFilePairs.get(fileInfo.getFilePath()));
 								}
 							}
+
+						} else if (object instanceof RemoteTransferCompleteEvent) {
+							final RemoteTransferCompleteEvent remoteTransferCompleteEvent = (RemoteTransferCompleteEvent) object;
+
+							LOGGER.debug("Received file transfer complete event: " + remoteTransferCompleteEvent.getRequestId());
+
+							if (remoteTransferCompleteEvent.getException() != null && fileTransfer.getErrorException() == null) {
+								fileTransfer.setErrorException(remoteTransferCompleteEvent.getException());
+							}
+
+							if (remoteTransferCompleteEvent.getException() == null) {
+								synchronized (transferedFileCounter) {
+									if (transferedFileCounter.get() != 0) {
+										// TODO: Ok, so if not all file got transfered, we wait for a minute (?) and then keep going???
+										transferedFileCounter.wait(60000);
+									}
+								}
+							}
+
+							LOGGER.info("Client side request: " + remoteTransferCompleteEvent.getRequestId() + ". Transfered " + fileTransfer.getTransferedFiles().size() + " files of " + localRemote.size() + " requested");
+
+							fileTransfer.setDone();
+						} else {
+							fileTransfer.setErrorException(new MprcException("ObjectMessage object must be of the type " + MultiFileTransferResponse.class.getName() + " or " + RemoteTransferCompleteEvent.class.getName() + "."));
+							fileTransfer.setDone();
+						}
+					} catch (Exception e) {
+						if (fileTransfer.getErrorException() != null) {
+							fileTransfer.setErrorException(new MprcException("File(s) transfer could not be completed.", e));
 						}
 
-						LOGGER.info("Client side request: " + remoteTransferCompleteEvent.getRequestId() + ". Transfered " + fileTransfer.getTransferedFiles().size() + " files of " + localRemote.size() + " requested");
-
-						fileTransfer.setDone();
-					} else {
-						fileTransfer.setErrorException(new MprcException("ObjectMessage object must be of the type " + MultiFileTransferResponse.class.getName() + " or " + RemoteTransferCompleteEvent.class.getName() + "."));
 						fileTransfer.setDone();
 					}
-				} catch (Exception e) {
-					if (fileTransfer.getErrorException() != null) {
-						fileTransfer.setErrorException(new MprcException("File(s) transfer could not be completed.", e));
-					}
-
-					fileTransfer.setDone();
 				}
-			}
-		});
+			});
+		} catch (JMSException e) {
+			throw new MprcException("Could not set JMS message listener", e);
+		}
 
 		LOGGER.debug("Sending file transefer request: " + fileTransferRequest.getRequestId() + " with " + fileTransferRequest.getFileInfos().size() + " file(s).");
-		producer.send(objectMessage);
+		try {
+			producer.send(objectMessage);
+		} catch (JMSException e) {
+			throw new MprcException("Could not send a JMS message", e);
+		}
 
 		return fileTransfer;
 	}
 
-	public static void processMultiFileTransferRequest(final MultiFileTransferRequest multiFileTransferRequest, final Session session, final Destination requester) throws Exception {
+	private static InetAddress getLocalHost() {
+		InetAddress localHost;
+		try {
+			localHost = InetAddress.getLocalHost();
+		} catch (UnknownHostException e) {
+			throw new MprcException("Could not determine localhost address", e);
+		}
+		return localHost;
+	}
+
+	public static void processMultiFileTransferRequest(final MultiFileTransferRequest multiFileTransferRequest, final Session session, final Destination requester) {
 
 		LOGGER.debug("Received file transefer request: " + multiFileTransferRequest.getRequestId());
 
@@ -255,13 +293,23 @@ public final class JmsFileTransferHelper {
 			multiFileTransferResponse = new MultiFileTransferResponse(multiFileTransferRequest.getRequestId(), modifiedFileInfos);
 			multiFileTransferResponse.setNotExistingFileInfos(notExistingFileInfos);
 		} else {
-			serverSocket = new ServerSocket(0);
-			multiFileTransferResponse = new MultiFileTransferResponse(multiFileTransferRequest.getRequestId(), modifiedFileInfos, new InetSocketAddress(InetAddress.getLocalHost().getHostAddress(), serverSocket.getLocalPort()));
+			try {
+				serverSocket = new ServerSocket(0);
+			} catch (IOException e) {
+				throw new MprcException("Could not create server socket on a free port", e);
+			}
+			multiFileTransferResponse = new MultiFileTransferResponse(multiFileTransferRequest.getRequestId(), modifiedFileInfos, new InetSocketAddress(getLocalHost().getHostAddress(), serverSocket.getLocalPort()));
 		}
 
 		LOGGER.debug("Sending file transefer response: " + multiFileTransferResponse.getRequestId() + " with " + multiFileTransferResponse.getFileInfos().size() + " file(s).");
 
-		session.createProducer(requester).send(session.createObjectMessage(multiFileTransferResponse));
+		try {
+			final MessageProducer producer = session.createProducer(requester);
+			final ObjectMessage objectMessage = session.createObjectMessage(multiFileTransferResponse);
+			producer.send(objectMessage);
+		} catch (JMSException e) {
+			throw new MprcException("Could not send a JMS message", e);
+		}
 
 		try {
 			FileTransferThread fileTransferThread = null;

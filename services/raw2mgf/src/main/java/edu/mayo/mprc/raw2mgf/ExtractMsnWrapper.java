@@ -79,10 +79,8 @@ public final class ExtractMsnWrapper {
 
 	/**
 	 * call the executable to make the conversion from a raw file to dta files
-	 *
-	 * @throws Exception
 	 */
-	public void run() throws Exception {
+	public void run() {
 		final File folder = outputdir;
 		LOGGER.debug("Extract_msn output files will go to " + folder.getAbsolutePath() + " which " + (folder.exists() ? "exists" : "does not exist."));
 		if (!folder.exists()) {
