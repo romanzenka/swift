@@ -1,13 +1,15 @@
 package edu.mayo.mprc.chem;
 
+import com.google.common.base.Splitter;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Maps;
 import edu.mayo.mprc.MprcException;
+import edu.mayo.mprc.utilities.FileUtilities;
+import edu.mayo.mprc.utilities.ResourceUtilities;
 
-import java.util.Arrays;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeSet;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.util.*;
 
 /**
  * Class represents the whole set of defined amino acids.
@@ -29,30 +31,7 @@ public final class AminoAcidSet {
 
 	public AminoAcidSet() {
 		final ImmutableList.Builder<AminoAcid> aminoAcidBuilder = new ImmutableList.Builder<AminoAcid>();
-		aminoAcidBuilder
-				.add(new AminoAcid('G', "Gly", "C2H3ON", 57.021464, 57.0519))
-				.add(new AminoAcid('A', "Ala", "C3H5ON", 71.037114, 71.0788))
-				.add(new AminoAcid('S', "Ser", "C3H5O2N", 87.032028, 87.0782))
-				.add(new AminoAcid('P', "Pro", "C5H7ON", 97.052764, 97.1167))
-				.add(new AminoAcid('V', "Val", "C5H9ON", 99.068414, 99.1326))
-				.add(new AminoAcid('T', "Thr", "C4H7O2N", 101.047678, 101.1051))
-				.add(new AminoAcid('C', "Cys", "C3H5ONS", 103.009184, 103.1388))
-				.add(new AminoAcid('L', "Leu", "C6H11ON", 113.084064, 113.1594))
-				.add(new AminoAcid('I', "Ile", "C6H11ON", 113.084064, 113.1594))
-				.add(new AminoAcid('N', "Asn", "C4H6O2N2", 114.042927, 114.1038))
-				.add(new AminoAcid('D', "Asp", "C4H5O3N", 115.026943, 115.0886))
-				.add(new AminoAcid('K', "Lys", "C6H12ON2", 128.094963, 128.1741))
-				.add(new AminoAcid('Q', "Gln", "C5H8O2N2", 128.058577, 128.1307))
-				.add(new AminoAcid('E', "Glu", "C5H7O3N", 129.042593, 129.1155))
-				.add(new AminoAcid('M', "Met", "C5H9ONS", 131.040485, 131.1926))
-				.add(new AminoAcid('H', "His", "C6H7ON3", 137.058912, 137.1411))
-				.add(new AminoAcid('F', "Phe", "C9H9ON", 147.068414, 147.1766))
-				.add(new AminoAcid('R', "Arg", "C6H12ON4", 156.101111, 156.1875))
-				.add(new AminoAcid('Y', "Tyr", "C9H9O2N", 163.063328, 163.1760))
-				.add(new AminoAcid('W', "Trp", "C11H10ON2", 186.079313, 186.2132))
-				.add(new AminoAcid('B', "Asx", "C4H?O?N?", 0.0, 0.0))
-				.add(new AminoAcid('Z', "Glx", "C5H?N?O?", 0.0, 0.0))
-				.add(new AminoAcid('X', "Xaa", "?", 0.0, 0.0));
+		aminoAcidBuilder.addAll(loadDefaultAminoAcids());
 
 		final ImmutableList<AminoAcid> aminoAcidList = aminoAcidBuilder.build();
 
@@ -63,6 +42,63 @@ public final class AminoAcidSet {
 		for (final AminoAcid acid : data.values()) {
 			final int index = codeToIndex(acid.getCode());
 			monoisotopicMassByCode[index] = acid.getMonoisotopicMass();
+		}
+	}
+
+	private List<AminoAcid> loadDefaultAminoAcids() {
+		final List<AminoAcid> result = new ArrayList<AminoAcid>(26);
+		final BufferedReader reader = new BufferedReader(ResourceUtilities.getReader("classpath:edu/mayo/mprc/chem/amino-acid.tsv", AminoAcidSet.class));
+		try {
+			final Splitter splitter = Splitter.on("\t").trimResults();
+			while (true) {
+				final String line = reader.readLine();
+				if (line == null) {
+					break;
+				}
+				if (line.trim().isEmpty()) {
+					continue;
+				}
+				final Iterator<String> iterator = splitter.split(line).iterator();
+
+				final String letterString = iterator.next();
+				if (letterString == null || letterString.length() != 1) {
+					throw new MprcException("Wrong AA code " + letterString);
+				}
+				final char code = letterString.charAt(0);
+
+				final String code3 = iterator.next();
+				if (code3 == null || code3.length() != 3) {
+					throw new MprcException("Wrong three code amino acid code [" + code3 + "]");
+				}
+
+				final String formula = iterator.next();
+				if (formula == null) {
+					throw new MprcException("Unspecified amino acid formula [" + formula + "]");
+				}
+
+				final String monoMassString = iterator.next();
+				final double monoisotopicMass;
+				try {
+					monoisotopicMass = Double.parseDouble(monoMassString);
+				} catch (NumberFormatException e) {
+					throw new MprcException("Cannot parse monoisotopic mass [" + monoMassString + "]", e);
+				}
+
+				final String averageMassString = iterator.next();
+				final double averageMass;
+				try {
+					averageMass = Double.parseDouble(averageMassString);
+				} catch (NumberFormatException e) {
+					throw new MprcException("Cannot parse average mass [" + monoMassString + "]", e);
+				}
+
+				result.add(new AminoAcid(code, code3, formula, monoisotopicMass, averageMass));
+			}
+			return result;
+		} catch (IOException e) {
+			throw new MprcException("Could not read the default amino acids", e);
+		} finally {
+			FileUtilities.closeQuietly(reader);
 		}
 	}
 
