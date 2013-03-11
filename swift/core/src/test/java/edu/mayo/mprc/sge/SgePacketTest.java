@@ -70,7 +70,7 @@ public final class SgePacketTest {
 				"    <workFolder>/mnt/raid1/software/swift/swift_2.5.6/var/cache/tandem/wip/wip85136348311630908</workFolder>\n" +
 				"  </workPacket>\n" +
 				"  <messengerInfo>\n" +
-				"    <registryInfo serialization=\"custom\">\n" +
+//				"    <registryInfo serialization=\"custom\">\n" +
 //				"      <java.net.InetSocketAddress>\n" +
 //				"        <default>\n" +
 //				"          <port>41471</port>\n" +
@@ -81,7 +81,7 @@ public final class SgePacketTest {
 //				"          </addr>\n" +
 //				"        </default>\n" +
 //				"      </java.net.InetSocketAddress>\n" +
-				"    </registryInfo>\n" +
+//				"    </registryInfo>\n" +
 				"    <messengerRemoteName>edu.mayo.mprc.messaging.rmi.SimpleOneWayMessenger9</messengerRemoteName>\n" +
 				"  </messengerInfo>\n" +
 				"  <workerFactoryConfig class=\"edu.mayo.mprc.xtandem.XTandemWorker$Config\">\n" +
