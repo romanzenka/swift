@@ -90,8 +90,6 @@ public final class ParamsInfoImpl extends ParamsInfo {
 		}
 	}
 
-	private Set<ModSpecificity> variableModsDefault;
-
 	@Override
 	public Set<ModSpecificity> getVariableModsAllowedValues(final boolean includeHidden) {
 		initializeUnimod();

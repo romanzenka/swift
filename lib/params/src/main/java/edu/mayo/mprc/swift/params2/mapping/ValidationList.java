@@ -38,7 +38,7 @@ public final class ValidationList extends ArrayList<Validation> {
 	private ValidationSeverity getWorstSeverityRec() {
 		ValidationSeverity currentSeverity = ValidationSeverity.NONE;
 		for (final Validation v : this) {
-			if (currentSeverity == null || v.getSeverity().rank > currentSeverity.rank) {
+			if (currentSeverity == null || v.getSeverity().getRank() > currentSeverity.getRank()) {
 				currentSeverity = v.getSeverity();
 			}
 		}

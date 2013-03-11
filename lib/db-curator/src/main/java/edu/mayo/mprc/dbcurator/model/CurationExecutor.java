@@ -325,7 +325,7 @@ public final class CurationExecutor implements Runnable {
 	 *
 	 * @author Eric J. Winter Date: Apr 6, 2007 Time: 9:56:48 AM
 	 */
-	private class MyCurationStatus implements CurationStatus {
+	private static final class MyCurationStatus implements CurationStatus {
 		/**
 		 * a list of step validations representing failed steps
 		 */
@@ -373,6 +373,7 @@ public final class CurationExecutor implements Runnable {
 		 *
 		 * @return the list of messages that have been added
 		 */
+		@Override
 		public synchronized List<String> getMessages() {
 			final List<String> retMessages = new ArrayList<String>();
 			for (final String s : messages) {
@@ -387,6 +388,7 @@ public final class CurationExecutor implements Runnable {
 		 *
 		 * @param toAdd message to add
 		 */
+		@Override
 		public synchronized void addMessage(final String toAdd) {
 			messages.add(toAdd);
 		}
@@ -396,6 +398,7 @@ public final class CurationExecutor implements Runnable {
 		 *
 		 * @return the progress of the currently executing step
 		 */
+		@Override
 		public synchronized float getCurrentStepProgress() {
 			return currentStepProgress;
 		}
@@ -405,6 +408,7 @@ public final class CurationExecutor implements Runnable {
 		 *
 		 * @param progress the progress you want to set
 		 */
+		@Override
 		public synchronized void setCurrentStepProgress(float progress) {
 			if (progress > 100f) {
 				progress = 100f;
@@ -421,6 +425,7 @@ public final class CurationExecutor implements Runnable {
 		 *
 		 * @return a list of validations of successfully completed steps
 		 */
+		@Override
 		public synchronized List<StepValidation> getCompletedStepValidations() {
 
 			return Collections.unmodifiableList(completedStepValidations);
@@ -451,9 +456,7 @@ public final class CurationExecutor implements Runnable {
 			failedStepValidations.add(toAdd);
 		}
 
-		/**
-		 * @return
-		 */
+		@Override
 		public synchronized List<StepValidation> getFailedStepValidations() {
 			//if (this.failedStepValidations == null || this.failedStepValidations.size() == 0) return null;
 			return Collections.unmodifiableList(failedStepValidations);
@@ -464,6 +467,7 @@ public final class CurationExecutor implements Runnable {
 		 *
 		 * @return true if the executor is still running else false
 		 */
+		@Override
 		public synchronized boolean isInProgress() {
 			return !executionComplete && !interrupt;
 		}
@@ -479,6 +483,7 @@ public final class CurationExecutor implements Runnable {
 		/**
 		 * call this to interrupt execution of the curation
 		 */
+		@Override
 		public synchronized void causeInterrupt() {
 			interrupt = true;
 			notifyAll();
@@ -489,6 +494,7 @@ public final class CurationExecutor implements Runnable {
 		 *
 		 * @return true if an interrupt has been asked for
 		 */
+		@Override
 		public synchronized boolean isInterrupted() {
 			return interrupt;
 		}
@@ -506,6 +512,7 @@ public final class CurationExecutor implements Runnable {
 		 *
 		 * @return the step that is currently being executed
 		 */
+		@Override
 		public synchronized int getCurrentStepNumber() {
 			return whichStep;
 		}
@@ -515,6 +522,7 @@ public final class CurationExecutor implements Runnable {
 		 *
 		 * @return
 		 */
+		@Override
 		public synchronized int getLastStepSequenceCount() {
 			if (completedStepValidations.size() == 0) {
 				return -1;

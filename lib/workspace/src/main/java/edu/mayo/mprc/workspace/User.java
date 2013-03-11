@@ -181,7 +181,7 @@ public class User extends EvolvableBase implements Serializable {
 		if (this == o) {
 			return true;
 		}
-		if (o == null || !(o instanceof User)) {
+		if (!(o instanceof User)) {
 			return false;
 		}
 

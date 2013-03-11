@@ -42,11 +42,6 @@ public final class ParamsValidations implements Cloneable {
 		return Collections.unmodifiableMap(validationMap);
 	}
 
-	@Override
-	protected Object clone() throws CloneNotSupportedException {
-		return super.clone();
-	}
-
 	public String toString(final ValidationSeverity minSeverity) {
 		final StringBuilder result = new StringBuilder();
 		for (final Map.Entry<ParamName, ValidationList> entry : validationMap.entrySet()) {

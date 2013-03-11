@@ -54,21 +54,45 @@ public final class NNLS {
 	/**
 	 * Fit results
 	 */
-	public static class Fit {
+	public static final class Fit {
 
 		public Fit() {
-			rss = -1.;
-			coefs = FACTORY_1D.make(0);
+			setRss(-1.0);
+			setCoefs(FACTORY_1D.make(0));
 		}
 
 		public Fit(final int n) {
-			coefs = FACTORY_1D.make(n);
-			rss = -1.;
+			setCoefs(FACTORY_1D.make(n));
+			setRss(-1.0);
 		}
 
-		public DoubleMatrix1D yhat;
-		public DoubleMatrix1D coefs;
-		public double rss;
+		private DoubleMatrix1D yhat;
+		private DoubleMatrix1D coefs;
+		private double rss;
+
+		public DoubleMatrix1D getYhat() {
+			return yhat;
+		}
+
+		public void setYhat(final DoubleMatrix1D yhat) {
+			this.yhat = yhat;
+		}
+
+		public DoubleMatrix1D getCoefs() {
+			return coefs;
+		}
+
+		public void setCoefs(final DoubleMatrix1D coefs) {
+			this.coefs = coefs;
+		}
+
+		public double getRss() {
+			return rss;
+		}
+
+		public void setRss(final double rss) {
+			this.rss = rss;
+		}
 	}
 
 	/**
@@ -76,21 +100,37 @@ public final class NNLS {
 	 */
 	private static final class HatSolve {
 		private HatSolve(final DoubleMatrix2D hat, final DoubleMatrix2D solve) {
-			this.hat = hat;
-			this.solve = solve;
+			setHat(hat);
+			setSolve(solve);
 		}
 
-		public DoubleMatrix2D hat;
-		public DoubleMatrix2D solve;
+		private DoubleMatrix2D hat;
+		private DoubleMatrix2D solve;
+
+		public DoubleMatrix2D getHat() {
+			return hat;
+		}
+
+		public void setHat(final DoubleMatrix2D hat) {
+			this.hat = hat;
+		}
+
+		public DoubleMatrix2D getSolve() {
+			return solve;
+		}
+
+		public void setSolve(final DoubleMatrix2D solve) {
+			this.solve = solve;
+		}
 	}
 
 	public void fit(final DoubleMatrix1D y, final Fit f) {
 		doNNLSRec(y, (1 << n) - 1, required, nn, 0, f);
-		if (debug >= 3 && negfit.size() > 0 && f.rss != -1) {
+		if (debug >= 3 && negfit.size() > 0 && f.getRss() != -1) {
 			LOGGER.debug("Initial coefficents " + negfit.toString() + "\n");
 		}
 		if (debug >= 1) {
-			LOGGER.debug(f.coefs.toString() + " =  " + f.rss + "\n");
+			LOGGER.debug(f.getCoefs().toString() + " =  " + f.getRss() + "\n");
 		}
 	}
 
@@ -161,8 +201,8 @@ public final class NNLS {
 
 
 		final HatSolve pa = getHatSolve(allowed);
-		final DoubleMatrix2D hat = pa.hat;
-		final DoubleMatrix2D solve = pa.solve;
+		final DoubleMatrix2D hat = pa.getHat();
+		final DoubleMatrix2D solve = pa.getSolve();
 
 		final DoubleMatrix1D coefs = ALGEBRA.mult(solve, y);
 		final DoubleMatrix1D yhat = ALGEBRA.mult(hat, y); // FIXME: this sucks: memory allocation at each recursive call, plus gets kept on stack unncessarily.
@@ -188,20 +228,20 @@ public final class NNLS {
 			//return;  // FIXME: should this be optional?
 		}
 
-		if (negcount == 0 && ((fit.rss < 0.) || (rss < fit.rss))) {
-			fit.rss = rss;
-			if (fit.coefs.size() != n) {
-				fit.coefs = setSize(fit.coefs, n);
+		if (negcount == 0 && ((fit.getRss() < 0.) || (rss < fit.getRss()))) {
+			fit.setRss(rss);
+			if (fit.getCoefs().size() != n) {
+				fit.setCoefs(setSize(fit.getCoefs(), n));
 			}
 			for (int i = 0, ii = 0; i < n; ++i) {
 				if (0 != (allowed & (1 << i))) {
-					fit.coefs.set(i, coefs.get(ii));
+					fit.getCoefs().set(i, coefs.get(ii));
 					++ii;
 				} else {
-					fit.coefs.set(i, 0.);
+					fit.getCoefs().set(i, 0.);
 				}
 			}
-			fit.yhat = yhat;
+			fit.setYhat(yhat);
 			return;
 		}
 

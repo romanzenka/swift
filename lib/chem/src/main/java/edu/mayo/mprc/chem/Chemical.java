@@ -278,7 +278,8 @@ public class Chemical implements Molecule, Cloneable {
 	}
 
 	protected void resetCached() {
-		massesCalced = sorted = false;
+		massesCalced = false;
+		sorted = false;
 	}
 
 	private Chemical parse(final String s, String full, final int where) {

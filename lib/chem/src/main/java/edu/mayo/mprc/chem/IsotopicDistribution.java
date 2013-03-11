@@ -168,26 +168,28 @@ public final class IsotopicDistribution implements Cloneable {
 	 */
 	public IsotopicDistribution add(final IsotopicDistribution other, final double fracOther, double errorTolPPM) {
 		// TODO: which Chemical?
-		errorTolPPM /= 1000000.;
-		double maxinten = 0.;
+		errorTolPPM /= 1000000.0;
+		double maxinten = 0.0;
 		int thisi = 0;
 		int otheri = 0;
-		final MassIntensityArray dist = new MassIntensityArray();
+		final MassIntensityArray localDist = new MassIntensityArray();
 		while (otheri < other.getNumIsotopes() && thisi < getNumIsotopes()) {
 			final double othermass = other.getMassOfIsotope(otheri);
 			final double thismass = getMassOfIsotope(thisi);
 			final double inten;
 			if (Math.abs(thismass - othermass) <= thismass * errorTolPPM) {
-				inten = fracOther * other.getIntensityOfIsotope(otheri) + (1. - fracOther) * getIntensityOfIsotope(thisi);
-				final double mass = (thismass + othermass) / 2.;
-				dist.add(mass, inten);
+				inten = fracOther * other.getIntensityOfIsotope(otheri) + (1.0 - fracOther) * getIntensityOfIsotope(thisi);
+				final double mass = (thismass + othermass) / 2.0;
+				localDist.add(mass, inten);
 				++thisi;
 				++otheri;
 			} else if (thismass < othermass) {
-				dist.add(thismass, inten = (1. - fracOther) * getIntensityOfIsotope(thisi));
+				inten = (1.0 - fracOther) * getIntensityOfIsotope(thisi);
+				localDist.add(thismass, inten);
 				++thisi;
 			} else {
-				dist.add(othermass, inten = fracOther * other.getIntensityOfIsotope(otheri));
+				inten = fracOther * other.getIntensityOfIsotope(otheri);
+				localDist.add(othermass, inten);
 				++otheri;
 			}
 			if (inten > maxinten) {
@@ -197,22 +199,22 @@ public final class IsotopicDistribution implements Cloneable {
 		// only one of the two loops below will run
 		while (otheri < other.getNumIsotopes()) {
 			final double inten = fracOther * other.getIntensityOfIsotope(otheri);
-			dist.add(other.getMassOfIsotope(otheri), inten);
+			localDist.add(other.getMassOfIsotope(otheri), inten);
 			++otheri;
 			if (inten > maxinten) {
 				maxinten = inten;
 			}
 		}
 		while (thisi < getNumIsotopes()) {
-			final double inten = (1. - fracOther) * getIntensityOfIsotope(thisi);
-			dist.add(getMassOfIsotope(thisi), inten);
+			final double inten = (1.0 - fracOther) * getIntensityOfIsotope(thisi);
+			localDist.add(getMassOfIsotope(thisi), inten);
 			++thisi;
 			if (inten > maxinten) {
 				maxinten = inten;
 			}
 		}
 
-		return new IsotopicDistribution((therMonoMZ + other.therMonoMZ) / 2., chem, name, thresh, extra, dist, true);
+		return new IsotopicDistribution((therMonoMZ + other.therMonoMZ) / 2.0, chem, name, thresh, extra, localDist, true);
 	}
 
 	/**
@@ -226,8 +228,8 @@ public final class IsotopicDistribution implements Cloneable {
 			return;
 		}
 		for (int i = 0; i < dist.size(); ++i) {
-			if (_getIntensityOfIsotope(i) < 0.) {
-				dist.setIntensity(i, 0.);
+			if (_getIntensityOfIsotope(i) < 0.0) {
+				dist.setIntensity(i, 0.0);
 			}
 			if (_getIntensityOfIsotope(maxIsotope) < _getIntensityOfIsotope(i)) {
 				maxIsotope = i;
@@ -243,7 +245,7 @@ public final class IsotopicDistribution implements Cloneable {
 		// this is a cheezy upper bound on inter-isotope error.
 		final double isotopeDiff = (_getMassOfIsotope(1) - _getMassOfIsotope(0));
 
-		if (thresh >= 0.) {
+		if (thresh >= 0.0) {
 			while ((_getIntensityOfIsotope(end) / maxInten) < thresh && end >= 0) {
 				--end;
 			}
@@ -254,7 +256,7 @@ public final class IsotopicDistribution implements Cloneable {
 				final double dist = _getMassOfIsotope(this.dist.size() - 1) - _getMassOfIsotope(this.dist.size() - 2);
 				double mass = _getMassOfIsotope(this.dist.size() - 1) + dist;
 				for (int i = 0; i < sz; ++i) {
-					this.dist.add(mass, 0.);
+					this.dist.add(mass, 0.0);
 					mass += dist;
 				}
 			}

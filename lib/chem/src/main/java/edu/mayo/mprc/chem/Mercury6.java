@@ -84,15 +84,18 @@ public final class Mercury6 {
 		double Var, intVar;
 		double avemass, intAveMass;
 
-		molVarAndIntMolVar[0] = molVarAndIntMolVar[1] = 0;
+		molVarAndIntMolVar[0] = 0;
+		molVarAndIntMolVar[1] = 0;
 		for (int i = 0; i < numElements; i++) {
 			final int z = atomicNum(i);
-			avemass = intAveMass = 0;
+			avemass = 0;
+			intAveMass = 0;
 			for (int j = 0; j < EZNI(chem, z); j++) {
 				avemass += EZM(chem, z, j) * EZP(chem, z, j);
 				intAveMass += EZI(chem, z, j) * EZP(chem, z, j);
 			}
-			Var = intVar = 0;
+			Var = 0;
+			intVar = 0;
 			for (int j = 0; j < EZNI(chem, z); j++) {
 				Var += (EZM(chem, z, j) - avemass) * (EZM(chem, z, j) - avemass) * EZP(chem, z, j);
 				intVar += (EZI(chem, z, j) - intAveMass) * (EZI(chem, z, j) - intAveMass) * EZP(chem, z, j);
@@ -163,7 +166,8 @@ public final class Mercury6 {
 		theta = 0;
 		for (int j = 0; j < ecount; j++) {
 			final int z = atomicNum(j);
-			real = imag = 0;
+			real = 0;
+			imag = 0;
 			for (int k = 0; k < EZNI(chem, z); k++) {
 				X = TWOPI * EZI(chem, z, k) * freq;
 				real += EZP(chem, z, k) * Math.cos(X);
@@ -246,7 +250,8 @@ public final class Mercury6 {
 					data[i] += tempr;
 					data[i + 1] += tempi;
 				}
-				wr = (wtemp = wr) * wpr - wi * wpi + wr;
+				wtemp = wr;
+				wr = wr * wpr - wi * wpi + wr;
 				wi = wi * wpr + wtemp * wpi + wi;
 			}
 			mmax = istep;

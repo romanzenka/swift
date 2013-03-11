@@ -16,9 +16,10 @@ import java.util.Map;
 public final class ScafmlExperiment extends FileHolder {
 	private static final long serialVersionUID = 4851459805058267855L;
 	/**
-	 * can have more than one biological sample per experiment
+	 * can have more than one biological sample per experiment.
+	 * Must be linked to retain order.
 	 */
-	private final LinkedHashMap<String, ScafmlBiologicalSample> biologicalSamples;
+	private final Map<String, ScafmlBiologicalSample> biologicalSamples;
 	private String name;
 	private final Map<String, ScafmlFastaDatabase> scafmlFastaDatabases;
 	private ScafmlExport export;

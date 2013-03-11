@@ -34,7 +34,7 @@ public class IndexedModSet implements Set<Mod> {
 	/**
 	 * A sorted map of the Delta's sorted by Monoisotopic mass.  This will allow a fast searching of mods in a given mass range.
 	 */
-	private TreeMap<Double, List<Mod>> deltaMonoMassIndex = new TreeMap<Double, List<Mod>>();
+	private NavigableMap<Double, List<Mod>> deltaMonoMassIndex = new TreeMap<Double, List<Mod>>();
 
 	public IndexedModSet() {
 

@@ -85,8 +85,7 @@ public final class CurationDaoImpl extends DaoBase implements CurationDao {
 					.addOrder(Order.desc("d.date"))
 					.setMaxResults(1);
 
-			final Curation curation = (Curation) criteria.uniqueResult();
-			return curation;
+			return (Curation) criteria.uniqueResult();
 		} catch (Exception e) {
 			throw new MprcException("Cannot get a curation named [" + uniqueName + "]", e);
 		}

@@ -1,6 +1,7 @@
 package edu.mayo.mprc.unimod;
 
 import com.google.common.base.Splitter;
+import edu.mayo.mprc.MprcException;
 import org.xml.sax.Attributes;
 import org.xml.sax.helpers.DefaultHandler;
 
@@ -129,6 +130,11 @@ class Unimod1Handler extends DefaultHandler {
 					currentSpecificity.setComments(miscNotes.toString());
 					miscNotes.setLength(0);
 					break;
+				case NO_NOTES:
+					// Do nothing
+					break;
+				default:
+					throw new MprcException("Unknown state")
 			}
 		}
 	}

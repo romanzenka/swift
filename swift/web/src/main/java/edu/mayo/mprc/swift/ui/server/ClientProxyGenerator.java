@@ -94,7 +94,7 @@ public final class ClientProxyGenerator {
 	public ClientValidation convertTo(final Validation v) {
 		final ClientValidation cv = new ClientValidation();
 		cv.setMessage(v.getMessage());
-		cv.setSeverity(v.getSeverity().rank);
+		cv.setSeverity(v.getSeverity().getRank());
 		cv.setParamId(v.getParam().getId());
 		if (v.getValue() != null) {
 			cv.setValue(convert(v.getValue()));
@@ -278,8 +278,7 @@ public final class ClientProxyGenerator {
 		return new ClientStarredProteins(
 				starredProteins.getStarred(),
 				starredProteins.getDelimiter(),
-				starredProteins.isRegularExpression(),
-				starredProteins.isMatchName());
+				starredProteins.isRegularExpression());
 	}
 
 	private ClientSpectrumQa convertTo(final SpectrumQa qa) {
@@ -320,8 +319,7 @@ public final class ClientProxyGenerator {
 		return new StarredProteins(
 				starredProteins.getStarred(),
 				starredProteins.getDelimiter(),
-				starredProteins.isRegularExpression(),
-				starredProteins.isMatchName());
+				starredProteins.isRegularExpression());
 	}
 
 	public SwiftSearchDefinition convertFrom(final ClientSwiftSearchDefinition definition, final SearchEngineParameters parameters) {

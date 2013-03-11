@@ -27,7 +27,7 @@ public final class SimpleThreadPoolExecutor extends ThreadPoolExecutor {
 	 * A synchronous queue that blocks when elements are offered to it.
 	 * @param <T>
 	 */
-	private static class BlockingSynchronousQueue<T> extends SynchronousQueue<T> {
+	private static final class BlockingSynchronousQueue<T> extends SynchronousQueue<T> {
 		private static final long serialVersionUID = -5525953574329882688L;
 
 		private BlockingSynchronousQueue() {

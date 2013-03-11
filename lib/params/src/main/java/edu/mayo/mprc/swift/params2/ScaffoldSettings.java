@@ -127,7 +127,7 @@ public class ScaffoldSettings extends PersistableBase {
 		if (this == obj) {
 			return true;
 		}
-		if (obj == null || !(obj instanceof ScaffoldSettings)) {
+		if (!(obj instanceof ScaffoldSettings)) {
 			return false;
 		}
 		final ScaffoldSettings that = (ScaffoldSettings) obj;

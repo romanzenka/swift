@@ -154,7 +154,6 @@ class ScafmlDump {
 				star != null ? star.getStarred() : "", // Starring
 				star != null ? star.getDelimiter() : "",
 				star != null && star.isRegularExpression(),
-				star != null && star.isMatchName(),
 				scaffoldSettings.isSaveOnlyIdentifiedSpectra(), // Spectra
 				scaffoldSettings.isSaveNoSpectra()
 		);

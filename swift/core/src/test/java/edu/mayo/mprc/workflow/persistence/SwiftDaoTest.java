@@ -92,7 +92,6 @@ public final class SwiftDaoTest {
 		try {
 			StarredProteins starredProteins = new StarredProteins();
 			starredProteins.setDelimiter(",");
-			starredProteins.setMatchName(true);
 			starredProteins.setStarred("ALBU_HUMAN,OVAL_CHICK");
 			starredProteins.setRegularExpression(false);
 			starredProteins = paramsDao.addStarredProteins(starredProteins);
@@ -134,7 +133,6 @@ public final class SwiftDaoTest {
 	private StarredProteins makeRegexStarredProteins(String proteins) {
 		StarredProteins starredProteins = new StarredProteins();
 		starredProteins.setDelimiter("\\s+");
-		starredProteins.setMatchName(true);
 		starredProteins.setStarred(proteins);
 		starredProteins.setRegularExpression(true);
 		return starredProteins;

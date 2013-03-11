@@ -33,14 +33,6 @@ final class FileToSocketTransferThread extends FileTransferThread {
 		uniqueId = lastUniqueId.incrementAndGet();
 	}
 
-	public TransferCompleteListener getTransferCompleteListener() {
-		return listener;
-	}
-
-	public void setTransferCompleteListener(final TransferCompleteListener listener) {
-		this.listener = listener;
-	}
-
 	public void run() {
 		Exception exception = null;
 		OutputStream os = null;
@@ -56,8 +48,8 @@ final class FileToSocketTransferThread extends FileTransferThread {
 			FileUtilities.closeQuietly(os);
 			FileUtilities.closeObjectQuietly(socket);
 
-			if (listener != null) {
-				listener.transferCompleted(new TransferCompleteEvent(file, exception));
+			if (getTransferCompleteListener() != null) {
+				getTransferCompleteListener().transferCompleted(new TransferCompleteEvent(file, exception));
 			}
 		}
 	}

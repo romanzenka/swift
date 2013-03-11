@@ -2,9 +2,9 @@ package edu.mayo.mprc.database;
 
 import org.hibernate.SessionFactory;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
 
 /**
  * This is a base class providing utilities to test a Dao.
@@ -30,7 +30,7 @@ public abstract class DaoTest {
 	 * @param mappingFiles     Additional mapping files to use.
 	 */
 	public void initializeDatabase(final Collection<? extends DaoBase> daosToInitialize, final String... mappingFiles) {
-		final ArrayList<String> mappingResources = DatabaseFactory.collectMappingResouces(daosToInitialize, mappingFiles);
+		final List<String> mappingResources = DatabaseFactory.collectMappingResouces(daosToInitialize, mappingFiles);
 
 		factory = DatabaseUtilities.getTestSessionFactory(mappingResources);
 		databasePlaceholder.setSessionFactory(factory);

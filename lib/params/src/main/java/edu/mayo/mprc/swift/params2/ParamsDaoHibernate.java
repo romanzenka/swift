@@ -209,8 +209,7 @@ public final class ParamsDaoHibernate extends DaoBase implements ParamsDao {
 		return Restrictions.conjunction()
 				.add(nullSafeEq("starred", starredProteins.getStarred()))
 				.add(nullSafeEq("delimiter", starredProteins.getDelimiter()))
-				.add(nullSafeEq("regularExpression", starredProteins.isRegularExpression()))
-				.add(nullSafeEq("matchName", starredProteins.isMatchName()));
+				.add(nullSafeEq("regularExpression", starredProteins.isRegularExpression()));
 	}
 
 	private Criterion getScaffoldSettingsEqualityCriteria(final ScaffoldSettings scaffoldSettings) {

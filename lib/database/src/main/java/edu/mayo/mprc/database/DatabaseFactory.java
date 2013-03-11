@@ -31,7 +31,7 @@ public final class DatabaseFactory extends FactoryBase<ResourceConfig, SessionFa
 	 * @param mappingFiles Array of additional mapping files.
 	 * @return All resources needed for the DAOs in a list. Each resource listed once.
 	 */
-	public static ArrayList<String> collectMappingResouces(final Collection<? extends DaoBase> daos, final String... mappingFiles) {
+	public static List<String> collectMappingResouces(final Collection<? extends DaoBase> daos, final String... mappingFiles) {
 		final TreeSet<String> strings = new TreeSet<String>();
 		Collections.addAll(strings, mappingFiles);
 

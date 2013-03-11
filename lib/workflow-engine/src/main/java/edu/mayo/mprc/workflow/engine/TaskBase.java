@@ -85,15 +85,15 @@ public abstract class TaskBase implements Task {
 	}
 
 	public void setName(final String name) {
-		final WorkflowEngine engine = this.engine;
+		final WorkflowEngine engineCopy = engine;
 		synchronized (stateLock) {
-			if (this.id == null && engine != null) {
-				this.id = engine.getNewTaskId(name);
+			if (this.id == null && engineCopy != null) {
+				this.id = engineCopy.getNewTaskId(name);
 			}
 			this.name = name;
 		}
-		if (engine != null) {
-			engine.taskNameChange(this);
+		if (engineCopy != null) {
+			engineCopy.taskNameChange(this);
 		}
 	}
 
@@ -334,9 +334,9 @@ public abstract class TaskBase implements Task {
 	}
 
 	public String getFullId() {
-		final WorkflowEngine engine = this.engine;
+		final WorkflowEngine engineCopy = this.engine;
 		synchronized (stateLock) {
-			return engine.getId() + "." + id;
+			return engineCopy.getId() + "." + id;
 		}
 	}
 }

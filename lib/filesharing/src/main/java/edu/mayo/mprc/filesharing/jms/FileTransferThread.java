@@ -5,7 +5,7 @@ package edu.mayo.mprc.filesharing.jms;
  */
 abstract class FileTransferThread extends Thread {
 
-	protected TransferCompleteListener listener;
+	private TransferCompleteListener listener;
 
 	protected FileTransferThread(final String name) {
 		super(name);

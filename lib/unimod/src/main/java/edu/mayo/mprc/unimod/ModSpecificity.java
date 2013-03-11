@@ -231,7 +231,7 @@ public class ModSpecificity extends PersistableBase implements Comparable<ModSpe
 		if (this == obj) {
 			return true;
 		}
-		if (obj == null || !(obj instanceof ModSpecificity)) {
+		if (!(obj instanceof ModSpecificity)) {
 			return false;
 		}
 

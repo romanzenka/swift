@@ -182,7 +182,7 @@ public final class JmsFileTransferHandler implements FileTransferHandler {
 		return null;
 	}
 
-	private FileTransfer synchronizeLocalFiles(final String remoteId, final Map<File, String> localFileRemoteFilePathPairs)  {
+	private FileTransfer synchronizeLocalFiles(final String remoteId, final Map<File, String> localFileRemoteFilePathPairs) {
 		if (runningSemaphore.availablePermits() == 0) {
 			return JmsFileTransferHelper.download(session, getMessageProducer(remoteId), localFileRemoteFilePathPairs);
 		}
@@ -230,9 +230,8 @@ public final class JmsFileTransferHandler implements FileTransferHandler {
 
 	private synchronized MessageProducer getMessageProducer(final String sourceId) {
 		try {
-			MessageProducer producer = null;
-
-			if ((producer = messageProducers.get(sourceId)) == null) {
+			MessageProducer producer = messageProducers.get(sourceId);
+			if (producer == null) {
 				producer = session.createProducer(session.createQueue(QUEUE_PREFIX + sourceId));
 				messageProducers.put(sourceId, producer);
 			}

@@ -203,7 +203,7 @@ public class SearchEngineParameters extends PersistableBase {
 		if (this == obj) {
 			return true;
 		}
-		if (obj == null || !(obj instanceof SearchEngineParameters)) {
+		if (!(obj instanceof SearchEngineParameters)) {
 			return false;
 		}
 

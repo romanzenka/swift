@@ -28,7 +28,7 @@ public final class NNLSTest {
 
 		final NNLS.Fit f = new NNLS.Fit();
 		nnls.fit(y, f);
-		assertMatrixEquals(f.coefs, new double[]{1, 2, 3}, 0);
+		assertMatrixEquals(f.getCoefs(), new double[]{1, 2, 3}, 0);
 	}
 
 	@Test
@@ -39,7 +39,7 @@ public final class NNLSTest {
 
 		final NNLS.Fit f = new NNLS.Fit();
 		nnls.fit(y, f);
-		assertMatrixEquals(f.coefs, new double[]{1, 0, 3}, 0);
+		assertMatrixEquals(f.getCoefs(), new double[]{1, 0, 3}, 0);
 	}
 
 	@Test
@@ -50,7 +50,7 @@ public final class NNLSTest {
 
 		final NNLS.Fit f = new NNLS.Fit();
 		nnls.fit(y, f);
-		assertMatrixEquals(f.coefs, new double[]{1, -200, 3}, 0);
+		assertMatrixEquals(f.getCoefs(), new double[]{1, -200, 3}, 0);
 	}
 
 	@Test
@@ -61,7 +61,7 @@ public final class NNLSTest {
 
 		final NNLS.Fit f = new NNLS.Fit();
 		nnls.fit(y, f);
-		assertMatrixEquals(f.coefs, new double[]{1, 0, -100}, 0);
+		assertMatrixEquals(f.getCoefs(), new double[]{1, 0, -100}, 0);
 	}
 
 	@Test
@@ -72,7 +72,7 @@ public final class NNLSTest {
 
 		final NNLS.Fit f = new NNLS.Fit();
 		nnls.fit(y, f);
-		assertMatrixEquals(f.coefs, new double[]{1, -200, 3}, 0);
+		assertMatrixEquals(f.getCoefs(), new double[]{1, -200, 3}, 0);
 	}
 
 	@Test
@@ -83,7 +83,7 @@ public final class NNLSTest {
 
 		final NNLS.Fit f = new NNLS.Fit();
 		nnls.fit(y, f);
-		assertMatrixEquals(f.coefs, new double[]{2, -1, 1}, 1E-10);
+		assertMatrixEquals(f.getCoefs(), new double[]{2, -1, 1}, 1E-10);
 	}
 
 	private static final DoubleMatrix2D test2 = DoubleFactory2D.dense.make(new double[][]{
@@ -101,7 +101,7 @@ public final class NNLSTest {
 
 		final NNLS.Fit f = new NNLS.Fit();
 		nnls.fit(y, f);
-		assertMatrixEquals(f.coefs, new double[]{2, -1, 1}, 1E-10);
+		assertMatrixEquals(f.getCoefs(), new double[]{2, -1, 1}, 1E-10);
 	}
 
 	public static void assertMatrixEquals(final DoubleMatrix1D matrix, final double[] expected, final double precision) {

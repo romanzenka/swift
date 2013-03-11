@@ -12,8 +12,8 @@ import java.io.File;
  */
 public final class FilePathShortener {
 	private static final Logger LOGGER = Logger.getLogger(FilePathShortener.class);
-	boolean temporaryLinkMade = false;
-	File temporaryFile = null;
+	private boolean temporaryLinkMade;
+	private File temporaryFile;
 
 	/**
 	 * Shorten given path.

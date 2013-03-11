@@ -42,7 +42,7 @@ public class ExtractMsnSettings extends PersistableBase {
 		if (this == o) {
 			return true;
 		}
-		if (o == null || !(o instanceof ExtractMsnSettings)) {
+		if (!(o instanceof ExtractMsnSettings)) {
 			return false;
 		}
 

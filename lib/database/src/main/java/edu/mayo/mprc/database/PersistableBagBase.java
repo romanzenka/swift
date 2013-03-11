@@ -114,7 +114,7 @@ public abstract class PersistableBagBase<T extends PersistableBase> extends Pers
 		if (this == o) {
 			return true;
 		}
-		if (o == null || !(o instanceof PersistableBagBase)) {
+		if (!(o instanceof PersistableBagBase)) {
 			return false;
 		}
 

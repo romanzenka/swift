@@ -8,6 +8,7 @@ import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.util.Enumeration;
 import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Class appends filtered log to a given file.
@@ -16,9 +17,9 @@ class LogWriterAppender extends WriterAppender {
 
 	private String allowedMDCKey;
 	private Object mdcValue;
-	private HashSet<String> allowedThreadNames;
-	private HashSet<Level> allowedLevels;
-	private HashSet<Level> notAllowedLevels;
+	private Set<String> allowedThreadNames;
+	private Set<Level> allowedLevels;
+	private Set<Level> notAllowedLevels;
 
 	private static Layout appenderLayout;
 

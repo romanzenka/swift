@@ -43,12 +43,11 @@ public final class StarredProteinsDialog extends FrameDialog {
 			this.lastValue = new ClientStarredProteins(
 					value.getStarredProteins().getStarred(),
 					"\\s+",
-					true,
 					true);
 
 		} else {
 			if (lastValue == null) {
-				lastValue = new ClientStarredProteins("\\bADH1_YEAST\\b\n\\bOVAL_CHICK\\b\n\\bBGAL_ECOLI\\b\n\\bLACB_BOVIN\\b", "\\s+", true, true);
+				lastValue = new ClientStarredProteins("\\bADH1_YEAST\\b\n\\bOVAL_CHICK\\b\n\\bBGAL_ECOLI\\b\n\\bLACB_BOVIN\\b", "\\s+", true);
 			}
 		}
 

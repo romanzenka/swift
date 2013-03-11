@@ -51,7 +51,7 @@ public class IonSeries extends EvolvableBase implements Comparable<IonSeries> {
 		if (this == obj) {
 			return true;
 		}
-		if (obj == null || !(obj instanceof IonSeries)) {
+		if (!(obj instanceof IonSeries)) {
 			return false;
 		}
 

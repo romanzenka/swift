@@ -6,7 +6,7 @@ import org.apache.log4j.Logger;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MaxCommandLine {
+public final class MaxCommandLine {
 
 	public static final Logger LOGGER = Logger.getLogger(MaxCommandLine.class);
 	/**

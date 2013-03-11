@@ -421,7 +421,7 @@ public class Curation extends EvolvableBase implements Serializable {
 		if (this == obj) {
 			return true;
 		}
-		if (obj == null || !(obj instanceof Curation)) {
+		if (!(obj instanceof Curation)) {
 			return false;
 		}
 

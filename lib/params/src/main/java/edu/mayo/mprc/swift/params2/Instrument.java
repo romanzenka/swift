@@ -70,7 +70,7 @@ public class Instrument extends EvolvableBase {
 		if (this == o) {
 			return true;
 		}
-		if (o == null || !(o instanceof Instrument)) {
+		if (!(o instanceof Instrument)) {
 			return false;
 		}
 

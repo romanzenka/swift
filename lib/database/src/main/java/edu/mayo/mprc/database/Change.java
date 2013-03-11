@@ -55,7 +55,7 @@ public class Change {
 		if (this == obj) {
 			return true;
 		}
-		if (obj == null || !(obj instanceof Change)) {
+		if (!(obj instanceof Change)) {
 			return false;
 		}
 

@@ -10,7 +10,7 @@ import java.util.regex.Pattern;
 public final class StarMatcher {
 	private Pattern pattern;
 
-	public StarMatcher(String starred, String delimiter, boolean regularExpression, boolean matchName) {
+	public StarMatcher(final String starred, final String delimiter, final boolean regularExpression) {
 		final String[] items = starred.split(delimiter);
 		final StringBuilder regex = new StringBuilder(100);
 		for (final String item : items) {
@@ -26,7 +26,7 @@ public final class StarMatcher {
 		pattern = Pattern.compile(regex.toString(), Pattern.CASE_INSENSITIVE);
 	}
 
-	public boolean matches(String accNum) {
+	public boolean matches(final String accNum) {
 		return pattern.matcher(accNum).matches();
 	}
 }

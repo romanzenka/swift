@@ -1,9 +1,6 @@
 package edu.mayo.mprc.database;
 
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedHashSet;
+import java.util.*;
 
 /**
  * Base for classes that are nothing but a set to be persisted.
@@ -114,24 +111,24 @@ public abstract class PersistableSetBase<T extends PersistableBase> extends Pers
 		if (this == o) {
 			return true;
 		}
-		if (o == null || !(o instanceof PersistableSetBase)) {
+		if (!(o instanceof PersistableSetBase)) {
 			return false;
 		}
 
 		final PersistableSetBase that = (PersistableSetBase) o;
 
-		final HashSet<T> me = makeSet(this.getList());
-		final HashSet<T> other = makeSet(that.getList());
+		final Set<T> me = makeSet(this.getList());
+		final Set<T> other = makeSet(that.getList());
 		return !(me != null ? !me.equals(other) : other != null);
 
 	}
 
-	private HashSet<T> makeSet(final Collection collection) {
+	private Set<T> makeSet(final Collection collection) {
 		if (collection == null) {
 			return null;
 		}
 		if (collection instanceof HashSet) {
-			return (HashSet<T>) collection;
+			return (Set<T>) collection;
 		}
 		return new HashSet(collection);
 	}

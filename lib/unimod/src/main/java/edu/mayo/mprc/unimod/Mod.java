@@ -60,8 +60,8 @@ public class Mod extends EvolvableBase implements Comparable<Mod> {
 		setAltNames(altNames);
 	}
 
-	private HashSet<ModSpecificity> buildersToSpecificities(final Set<SpecificityBuilder> specificityBuilders) {
-		final HashSet<ModSpecificity> specificities = new HashSet<ModSpecificity>(specificityBuilders.size());
+	private Set<ModSpecificity> buildersToSpecificities(final Set<SpecificityBuilder> specificityBuilders) {
+		final Set<ModSpecificity> specificities = new HashSet<ModSpecificity>(specificityBuilders.size());
 		for (final SpecificityBuilder builder : specificityBuilders) {
 			specificities.add(builder.build(this));
 		}
@@ -170,7 +170,7 @@ public class Mod extends EvolvableBase implements Comparable<Mod> {
 		if (this == obj) {
 			return true;
 		}
-		if (obj == null || !(obj instanceof Mod)) {
+		if (!(obj instanceof Mod)) {
 			return false;
 		}
 

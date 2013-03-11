@@ -25,7 +25,6 @@ public final class ScafmlExport extends FileHolder {
 	private String starred;
 	private String delimiter;
 	private boolean regularExpression;
-	private boolean matchName;
 
 	// Retaining spectra
 	private boolean saveOnlyIdentifiedSpectra;
@@ -34,7 +33,7 @@ public final class ScafmlExport extends FileHolder {
 	public ScafmlExport() {
 	}
 
-	public ScafmlExport(final String experimentName, final File scaffoldOutputDir, final boolean exportSpectra, final boolean exportPeptideReport, final double proteinProbability, final double peptideProbability, final int minimumPeptideCount, final int minimumNonTrypticTerminii, final String starred, final String delimiter, final boolean regularExpression, final boolean matchName, final boolean saveOnlyIdentifiedSpectra, final boolean saveNoSpectra) {
+	public ScafmlExport(final String experimentName, final File scaffoldOutputDir, final boolean exportSpectra, final boolean exportPeptideReport, final double proteinProbability, final double peptideProbability, final int minimumPeptideCount, final int minimumNonTrypticTerminii, final String starred, final String delimiter, final boolean regularExpression, final boolean saveOnlyIdentifiedSpectra, final boolean saveNoSpectra) {
 		this.experimentName = experimentName;
 		this.scaffoldOutputDir = scaffoldOutputDir;
 		this.exportSpectra = exportSpectra;
@@ -46,7 +45,6 @@ public final class ScafmlExport extends FileHolder {
 		this.starred = starred;
 		this.delimiter = delimiter;
 		this.regularExpression = regularExpression;
-		this.matchName = matchName;
 		this.saveOnlyIdentifiedSpectra = saveOnlyIdentifiedSpectra;
 		this.saveNoSpectra = saveNoSpectra;
 	}

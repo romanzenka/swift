@@ -12,6 +12,5 @@
         <property name="starred" column="starred" type="text" /> <!-- TODO: Make binary -->
         <property name="delimiter" column="protein_delimiter" type="string" length="20"/>
         <property name="regularExpression" column="regular_expression" type="boolean"/>
-        <property name="matchName" column="match_name" type="boolean"/>
     </class>
 </hibernate-mapping>
