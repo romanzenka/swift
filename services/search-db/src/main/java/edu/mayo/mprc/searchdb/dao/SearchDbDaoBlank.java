@@ -2,6 +2,7 @@ package edu.mayo.mprc.searchdb.dao;
 
 import edu.mayo.mprc.database.QueryCallback;
 import edu.mayo.mprc.swift.dbmapping.ReportData;
+import edu.mayo.mprc.swift.dbmapping.SwiftSearchDefinition;
 import edu.mayo.mprc.utilities.progress.UserProgressReporter;
 
 import java.util.List;
@@ -23,6 +24,11 @@ public class SearchDbDaoBlank implements SearchDbDao {
 	@Override
 	public Analysis getAnalysis(long reportId) {
 		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public SwiftSearchDefinition getSearchDefinition(long analysisId) {
+		return null;
 	}
 
 	@Override

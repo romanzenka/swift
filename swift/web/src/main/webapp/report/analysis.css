@@ -26,3 +26,13 @@ table td {
 .data {
     background-color: #ddffdd;
 }
+
+td.star, td.no-star {
+    width: 20px;
+}
+
+td.star {
+    background-image: url(star_16.gif);
+    background-repeat: no-repeat;
+    background-position: center center;
+}

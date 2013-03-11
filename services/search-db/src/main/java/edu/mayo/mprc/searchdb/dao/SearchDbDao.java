@@ -3,6 +3,7 @@ package edu.mayo.mprc.searchdb.dao;
 import edu.mayo.mprc.database.Dao;
 import edu.mayo.mprc.database.QueryCallback;
 import edu.mayo.mprc.swift.dbmapping.ReportData;
+import edu.mayo.mprc.swift.dbmapping.SwiftSearchDefinition;
 import edu.mayo.mprc.utilities.progress.UserProgressReporter;
 
 import java.util.List;
@@ -27,6 +28,14 @@ public interface SearchDbDao extends Dao {
 	 * @return Analysis linked to a particular report (Scaffold .sf3 file).
 	 */
 	Analysis getAnalysis(long reportId);
+
+	/**
+	 * Get parameters for Swift search that belongs to a particular analysis.
+	 *
+	 * @param analysisId ID of the {@link Analysis} to get the parameters for.
+	 * @return Swift saerch definition.
+	 */
+	SwiftSearchDefinition getSearchDefinition(long analysisId);
 
 	/**
 	 * @param reportId Id of {@link ReportData} object.

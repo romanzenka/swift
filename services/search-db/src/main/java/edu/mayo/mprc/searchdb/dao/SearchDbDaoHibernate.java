@@ -9,6 +9,8 @@ import edu.mayo.mprc.fastadb.FastaDbDao;
 import edu.mayo.mprc.fastadb.ProteinSequence;
 import edu.mayo.mprc.swift.db.SwiftDao;
 import edu.mayo.mprc.swift.dbmapping.ReportData;
+import edu.mayo.mprc.swift.dbmapping.SwiftSearchDefinition;
+import edu.mayo.mprc.utilities.exceptions.ExceptionUtilities;
 import edu.mayo.mprc.utilities.progress.PercentDoneReporter;
 import edu.mayo.mprc.utilities.progress.UserProgressReporter;
 import org.hibernate.criterion.Criterion;
@@ -323,6 +325,20 @@ public final class SearchDbDaoHibernate extends DaoBase implements RuntimeInitia
 	@Override
 	public Analysis getAnalysis(final long reportId) {
 		return (Analysis) getSession().createCriteria(Analysis.class).add(Restrictions.eq("reportData.id", reportId)).uniqueResult();
+	}
+
+	@Override
+	public SwiftSearchDefinition getSearchDefinition(long analysisId) {
+		final Object searchDefinition = getSession().createQuery("select d from SwiftSearchDefinition d, Analysis a, ReportData r, SearchRun sr where " +
+				"r.searchRun = sr and sr.swiftSearch = d.id and a.reportData = r and a.id = :analysisId")
+				.setLong("analysisId", analysisId)
+				.uniqueResult();
+		if(searchDefinition instanceof SwiftSearchDefinition) {
+			return (SwiftSearchDefinition)searchDefinition;
+		} else {
+			ExceptionUtilities.throwCastException(searchDefinition, SwiftSearchDefinition.class);
+			return null;
+		}
 	}
 
 	@Override

@@ -3,6 +3,9 @@ package edu.mayo.mprc.searchdb.dao;
 import edu.mayo.mprc.database.PersistableBase;
 import edu.mayo.mprc.searchdb.Report;
 import edu.mayo.mprc.swift.dbmapping.ReportData;
+import edu.mayo.mprc.swift.dbmapping.SwiftSearchDefinition;
+import edu.mayo.mprc.swift.params2.StarMatcher;
+import edu.mayo.mprc.swift.params2.StarredProteins;
 import edu.mayo.mprc.utilities.StringUtilities;
 import org.joda.time.DateTime;
 
@@ -219,6 +222,16 @@ public final class Analysis extends PersistableBase {
 
 		r.startTable("Results"); // -- Results
 
+		final SwiftSearchDefinition searchDefinition = searchDbDao.getSearchDefinition(this.getId());
+		final StarredProteins starredProteins = searchDefinition.getSearchParameters().getScaffoldSettings().getStarredProteins();
+		final boolean starredColumn = starredProteins != null;
+		final StarMatcher matcher;
+		if (starredColumn) {
+			matcher = starredProteins.getMatcher();
+		} else {
+			matcher = null;
+		}
+
 		// List biological samples
 		int totalColumns = 0;
 		final ArrayList<String> bioSampleNames = new ArrayList<String>(getBiologicalSamples().size());
@@ -228,6 +241,9 @@ public final class Analysis extends PersistableBase {
 		}
 		final String bioSamplePrefix = StringUtilities.longestPrefix(bioSampleNames);
 		r.cell(bioSamplePrefix, 1, null);
+		if (starredColumn) {
+			r.cell(" ", 1, null);
+		}
 		final int bioSamplePrefixLength = bioSamplePrefix.length();
 
 		for (final BiologicalSample sample : getBiologicalSamples()) {
@@ -244,6 +260,9 @@ public final class Analysis extends PersistableBase {
 		}
 		final String massSpecSamplePrefix = StringUtilities.longestPrefix(massSpectSampleFileNames);
 		r.cell(massSpecSamplePrefix);
+		if (starredColumn) {
+			r.cell(" ", 1, null);
+		}
 		final int massSpecSamplePrefixLength = massSpecSamplePrefix.length();
 
 		final Iterator<String> iterator = massSpectSampleFileNames.iterator();
@@ -264,7 +283,7 @@ public final class Analysis extends PersistableBase {
 				>
 				accnumMap = searchDbDao.getAccessionNumbersMapForProteinSequences(allProteinGroups.keySet());
 
-		final List<TableRow> tableRows = collectTableRows(allProteinGroups, totalColumns, accnumMap);
+		final List<TableRow> tableRows = collectTableRows(allProteinGroups, totalColumns, accnumMap, matcher);
 		Collections.sort(tableRows);
 
 		final StringBuilder accNums = new StringBuilder(50);
@@ -303,6 +322,10 @@ public final class Analysis extends PersistableBase {
 				r.hCellRaw(code);
 			}
 
+			if (starredColumn) {
+				r.cell(" ", row.isStar() ? "star" : "no-star");
+			}
+
 			for (int i = 0; i < totalColumns; i++) {
 				if (row.spectra[i] > 0) {
 					r.cell(String.valueOf(row.spectra[i]), "data");
@@ -318,12 +341,20 @@ public final class Analysis extends PersistableBase {
 		r.endTable();
 	}
 
-	private List<TableRow> collectTableRows(final TreeMap<Integer, ProteinSequenceList> allProteinGroups, final int totalColumns, final Map<Integer, List<String>> accnumMap) {
+	private List<TableRow> collectTableRows(final TreeMap<Integer, ProteinSequenceList> allProteinGroups, final int totalColumns, final Map<Integer, List<String>> accnumMap, StarMatcher matcher) {
 		final List<TableRow> tableRows = new ArrayList<TableRow>(allProteinGroups.size());
 
 		for (final ProteinSequenceList proteinSequences : allProteinGroups.values()) {
 			final TableRow row = new TableRow();
 			row.accnums = accnumMap.get(proteinSequences.getId());
+			if (matcher != null) {
+				for (final String accnum : row.accnums) {
+					if (matcher.matches(accnum)) {
+						row.star = true;
+						break;
+					}
+				}
+			}
 			Collections.sort(row.accnums, new AccnumComparator());
 			row.spectra = new int[totalColumns];
 			row.totalSpectra = 0;
@@ -366,19 +397,28 @@ public final class Analysis extends PersistableBase {
 		public List<String> accnums;
 		public int[] spectra;
 		public int totalSpectra;
+		public boolean star;
 
 		@Override
 		public int compareTo(final TableRow o) {
-			if (this.totalSpectra == o.totalSpectra) {
-				if (this.spectra[0] == o.spectra[0]) {
-					final String s1 = this.accnums.get(0);
-					final String s2 = o.accnums.get(0);
-					return s1.compareTo(s2);
-				} else {
-					return compare(this.spectra[0], o.spectra[0]);
+			if (this.star == o.star) {
+				if (this.totalSpectra == o.totalSpectra) {
+					if (this.spectra[0] == o.spectra[0]) {
+						final String s1 = this.accnums.get(0);
+						final String s2 = o.accnums.get(0);
+						return s1.compareTo(s2);
+					} else {
+						return compare(this.spectra[0], o.spectra[0]);
+					}
 				}
+				return compare(o.totalSpectra, this.totalSpectra);
+			} else {
+				return this.star ? -1 : 1;
 			}
-			return compare(o.totalSpectra, this.totalSpectra);
+		}
+
+		public boolean isStar() {
+			return star;
 		}
 	}
 

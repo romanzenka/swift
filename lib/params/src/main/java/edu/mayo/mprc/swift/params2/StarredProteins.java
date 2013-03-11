@@ -21,6 +21,13 @@ public class StarredProteins extends PersistableBase {
 		this.matchName = matchName;
 	}
 
+	/**
+	 * @return Object that can decide whether given accession number belongs to a starred protein.
+	 */
+	public StarMatcher getMatcher() {
+		return new StarMatcher(starred, delimiter, regularExpression, matchName);
+	}
+
 	public String getStarred() {
 		return starred;
 	}
