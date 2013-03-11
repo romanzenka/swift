@@ -1,0 +1,173 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>edu.mayo.mprc</groupId>
+    <artifactId>swift-installer</artifactId>
+    <packaging>pom</packaging>
+    <version>3.0-SNAPSHOT</version>
+    <name>Swift Installer</name>
+    <url>http://github.com/romanzenka/swift</url>
+    <inceptionYear>2007</inceptionYear>
+
+    <parent>
+        <groupId>edu.mayo.mprc</groupId>
+        <artifactId>mprc</artifactId>
+        <version>3.0-SNAPSHOT</version>
+        <relativePath>mprc/pom.xml</relativePath>
+    </parent>
+
+    <properties>
+         <gwtVersion>2.4.0</gwtVersion>
+     </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>edu.mayo.mprc</groupId>
+            <artifactId>swift-core</artifactId>
+            <version>3.0-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>edu.mayo.mprc</groupId>
+            <artifactId>launcher</artifactId>
+            <version>3.0-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>edu.mayo.mprc</groupId>
+            <artifactId>swift-web</artifactId>
+            <type>war</type>
+            <version>3.0-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>edu.mayo.mprc</groupId>
+            <artifactId>db-curator-ui</artifactId>
+            <version>3.0-SNAPSHOT</version>
+        </dependency>
+
+        <dependency>
+            <groupId>edu.mayo.mprc.swift</groupId>
+            <artifactId>swift-config-ui</artifactId>
+            <version>3.0-SNAPSHOT</version>
+        </dependency>
+
+        <!-- Supports RSS feed generation -->
+        <dependency>
+            <groupId>rome</groupId>
+            <artifactId>rome</artifactId>
+            <version>0.9</version>
+        </dependency>
+
+        <!-- Spring MVC for web services -->
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-webmvc</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-oxm</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.codehaus.jackson</groupId>
+            <artifactId>jackson-core-asl</artifactId>
+            <version>1.9.2</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.codehaus.jackson</groupId>
+            <artifactId>jackson-mapper-asl</artifactId>
+            <version>1.9.2</version>
+        </dependency>
+
+
+        <!--  GWT deps (from central repo) -->
+        <dependency>
+            <groupId>com.google.gwt</groupId>
+            <artifactId>gwt-servlet</artifactId>
+            <version>${gwtVersion}</version>
+            <scope>runtime</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>com.google.gwt</groupId>
+            <artifactId>gwt-user</artifactId>
+            <version>${gwtVersion}</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.testng</groupId>
+            <artifactId>testng</artifactId>
+            <classifier>jdk15</classifier>
+        </dependency>
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-all</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>edu.mayo.mprc</groupId>
+            <artifactId>swift-scripts</artifactId>
+            <version>3.0-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>edu.mayo.mprc</groupId>
+            <artifactId>install</artifactId>
+            <version>3.0-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>edu.mayo.mprc</groupId>
+            <artifactId>install-exe</artifactId>
+            <version>3.0-SNAPSHOT</version>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+                        <configuration>
+                            <finalName>swift-3.0</finalName>
+                            <descriptors>
+                                <descriptor>assembly.xml</descriptor>
+                            </descriptors>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+
+    <repositories>
+        <repository>
+            <id>mayo-nexus-public</id>
+            <url>http://informatics.mayo.edu/maven/content/repositories/releases/</url>
+            <name>Public Mayo Nexus with Mayo-specific releases</name>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </repository>
+        <repository>
+            <id>mayo-nexus-public-snapshots</id>
+            <url>http://informatics.mayo.edu/maven/content/repositories/snapshots/</url>
+            <name>Public Mayo Nexus with Mayo-specific snapshots</name>
+            <releases>
+                <enabled>false</enabled>
+            </releases>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+        </repository>
+    </repositories>
+</project>
