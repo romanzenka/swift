@@ -223,7 +223,10 @@ public final class Analysis extends PersistableBase {
 		r.startTable("Results"); // -- Results
 
 		final SwiftSearchDefinition searchDefinition = searchDbDao.getSearchDefinition(this.getId());
-		final StarredProteins starredProteins = searchDefinition.getSearchParameters().getScaffoldSettings().getStarredProteins();
+		final StarredProteins starredProteins =
+				searchDefinition!=null && searchDefinition.getSearchParameters() != null &&
+						searchDefinition.getSearchParameters().getScaffoldSettings() != null ?
+				searchDefinition.getSearchParameters().getScaffoldSettings().getStarredProteins() : null;
 		final boolean starredColumn = starredProteins != null;
 		final StarMatcher matcher;
 		if (starredColumn) {
