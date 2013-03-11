@@ -85,7 +85,7 @@ public final class SwiftWebContext {
 					SwiftConfig.setupFileTokenFactory(swiftConfig, daemonConfig, webUiHolder.getWebUi().getFileTokenFactory());
 
 					// Initialize DB curator
-					final CurationWebContext curationWebContext = (CurationWebContext)MainFactoryContext.getContext().getBean("curationWebContext");
+					final CurationWebContext curationWebContext = (CurationWebContext) MainFactoryContext.getContext().getBean("curationWebContext");
 					curationWebContext.initialize(
 							webUiHolder.getWebUi().getFastaFolder(),
 							webUiHolder.getWebUi().getFastaUploadFolder(),
@@ -151,6 +151,12 @@ public final class SwiftWebContext {
 		}
 	}
 
+	public static WebUiHolder getWebUiHolder() {
+		synchronized (SwiftWebContext.class) {
+			return webUiHolder;
+		}
+	}
+
 	public static String getPathPrefix() {
 		final String prefix = getServletConfig().getFileTokenFactory().fileToDatabaseToken(
 				getServletConfig().getBrowseRoot());
@@ -171,7 +177,7 @@ public final class SwiftWebContext {
 			map.put(WebUi.BROWSE_ROOT, "/");
 			config.load(map, dependencies);
 			webUiHolder = MainFactoryContext.getWebUiHolder();
-			webUiHolder.setWebUi((WebUi)MainFactoryContext.getResourceTable().createSingleton(config, dependencies));
+			webUiHolder.setWebUi((WebUi) MainFactoryContext.getResourceTable().createSingleton(config, dependencies));
 		}
 	}
 }

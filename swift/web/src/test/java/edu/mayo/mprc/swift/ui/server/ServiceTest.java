@@ -27,8 +27,10 @@ public final class ServiceTest {
 	@BeforeClass
 	protected void init() throws Exception {
 		LOGGER.debug("Starting up service");
+		SwiftWebContext.setupTest();
 		_service = new ServiceImpl();
 		SwiftWebContext.setupTest();
+		_service.setWebUiHolder(SwiftWebContext.getWebUiHolder());
 		LOGGER.debug("Service is up");
 	}
 
