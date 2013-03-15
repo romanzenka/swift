@@ -37,5 +37,14 @@
         <property name="useNotAcceptableStatusCode" value="true"/>
     </bean>
 
+    <bean class="org.springframework.web.servlet.mvc.annotation.AnnotationMethodHandlerAdapter">
+        <property name="order" value="1"/>
+        <property name="messageConverters">
+            <list>
+                <bean class="org.springframework.http.converter.FormHttpMessageConverter"/>
+            </list>
+        </property>
+    </bean>
+
     <context:component-scan base-package="edu.mayo.mprc.swift.webservice"/>
 </beans>

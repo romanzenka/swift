@@ -56,7 +56,7 @@ class DaemonResponseListener implements ResponseListener {
 		} else if (response instanceof DaemonException) {
 			processException((DaemonException) response);
 		} else if (response instanceof Throwable) {
-			processException(new DaemonException("Unexpected exception", (Throwable) response));
+			processException(new DaemonException((Throwable) response));
 		} else {
 			LOGGER.error("Unknown response received: " + response.toString());
 		}

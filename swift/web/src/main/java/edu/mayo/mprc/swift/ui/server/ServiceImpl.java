@@ -159,9 +159,9 @@ public final class ServiceImpl extends SpringGwtServlet implements Service, Appl
 	}
 
 	/**
-	 * Start a new Swift search.
+	 * Start a new Swift search, return its id.
 	 */
-	public SwiftSearchDefinition startNewSearch(final SearchInput searchInput) {
+	public long startNewSearch(final SearchInput searchInput) {
 		try {
 			swiftDao.begin();
 			final SwiftSearchDefinition swiftSearch = createSwiftSearchDefinition(searchInput);
@@ -169,12 +169,14 @@ public final class ServiceImpl extends SpringGwtServlet implements Service, Appl
 			checkSearchTitleUnique(swiftSearch);
 			final SwiftSearchDefinition newSwiftSearch = getSwiftDao().addSwiftSearchDefinition(swiftSearch);
 			swiftDao.commit();
-			submitSearch(newSwiftSearch.getId(),
+			swiftDao.begin();
+			long searchRunId = submitSearch(newSwiftSearch.getId(),
 					newSwiftSearch.getTitle(),
 					0,
 					searchInput.isFromScratch(),
 					searchInput.isLowPriority() ? -1 : 0);
-			return newSwiftSearch;
+			swiftDao.commit();
+			return searchRunId;
 		} catch (Exception e) {
 			swiftDao.rollback();
 			throw new MprcException("New Swift search could not be started", e);
@@ -189,8 +191,8 @@ public final class ServiceImpl extends SpringGwtServlet implements Service, Appl
 		final PeptideReport report = searchInput.isPeptideReport() ? new PeptideReport() : null;
 
 		final SavedSearchEngineParameters searchParameters = paramsDao.getSavedSearchEngineParameters(searchInput.getParamSetId());
-		if(searchParameters==null) {
-			throw new MprcException("Could not find saved search parameters for ID: "+searchInput.getParamSetId());
+		if (searchParameters == null) {
+			throw new MprcException("Could not find saved search parameters for ID: " + searchInput.getParamSetId());
 		}
 		final List<FileSearch> inputFiles = new ArrayList<FileSearch>(searchInput.getInputFilePaths().length);
 		final EnabledEngines enabledEngines = getEnabledEngines(searchInput.getEnabledEngineCodes());
@@ -268,7 +270,7 @@ public final class ServiceImpl extends SpringGwtServlet implements Service, Appl
 		}
 	}
 
-	private void submitSearch(final int searchId, final String batchName, final int previousSearchRunId, final boolean fromScratch, final int priority) throws InterruptedException {
+	private long submitSearch(final int searchId, final String batchName, final int previousSearchRunId, final boolean fromScratch, final int priority) throws InterruptedException {
 		final SwiftSearcherCaller.SearchProgressListener listener =
 				SwiftSearcherCaller.startSearch(
 						searchId, batchName, fromScratch, priority,
@@ -281,6 +283,7 @@ public final class ServiceImpl extends SpringGwtServlet implements Service, Appl
 		if (listener.getSearchRunId() == 0) {
 			throw new MprcException("The search was not started within timeout.");
 		}
+		return listener.getSearchRunId();
 	}
 
 	public ClientLoadedSearch loadSearch(final int searchRunId) throws GWTServiceException {

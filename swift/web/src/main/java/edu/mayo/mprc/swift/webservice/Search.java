@@ -1,22 +1,21 @@
 package edu.mayo.mprc.swift.webservice;
 
 import com.thoughtworks.xstream.annotations.XStreamAlias;
-import edu.mayo.mprc.swift.dbmapping.SwiftSearchDefinition;
 
 /**
  * @author Roman Zenka
  */
 @XStreamAlias("search")
 public final class Search {
-	private final int id;
+	private final long id;
 	private final String title;
 
-	public Search(final SwiftSearchDefinition searchDefinition) {
-		id = searchDefinition.getId();
-		title = searchDefinition.getTitle();
+	public Search(final long searchRunId, final String searchTitle) {
+		id = searchRunId;
+		title = searchTitle;
 	}
 
-	public int getId() {
+	public long getId() {
 		return id;
 	}
 
