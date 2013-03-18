@@ -5,10 +5,7 @@ import edu.mayo.mprc.MprcException;
 import edu.mayo.mprc.config.*;
 import edu.mayo.mprc.config.ui.ServiceUiFactory;
 import edu.mayo.mprc.daemon.DaemonConnectionFactory;
-import edu.mayo.mprc.daemon.SimpleRunner;
 import edu.mayo.mprc.daemon.WorkerFactoryBase;
-import edu.mayo.mprc.database.DatabaseFactory;
-import edu.mayo.mprc.sge.GridRunner;
 import edu.mayo.mprc.utilities.exceptions.ExceptionUtilities;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -31,10 +28,6 @@ public final class ResourceTable extends FactoryBase<ResourceConfig, Object> imp
 	// Same as the previous map, just does lookup using the config class.
 	private final Map</*configClass*/Class<? extends ResourceConfig>, ResourceInfo> tableConfigClass = new LinkedHashMap<Class<? extends ResourceConfig>, ResourceInfo>();
 
-	private DatabaseFactory databaseFactory;
-	private SimpleRunner.Factory simpleDaemonRunnerFactory;
-	private WebUi.Factory webUiFactory;
-	private GridRunner.Factory gridDaemonRunnerFactory;
 	private DaemonConnectionFactory daemonConnectionFactory;
 
 	private Collection<FactoryDescriptor> factoryDescriptors;
@@ -63,42 +56,6 @@ public final class ResourceTable extends FactoryBase<ResourceConfig, Object> imp
 
 		// The daemon connection factory is very special... figure out how to handle it the same way as others
 		addToTable(SERVICE, "Service", ServiceConfig.class, getDaemonConnectionFactory(), null, "???", ResourceType.Resource);
-	}
-
-	@Resource(name = "databaseFactory")
-	public void setDatabaseFactory(final DatabaseFactory databaseFactory) {
-		this.databaseFactory = databaseFactory;
-	}
-
-	public DatabaseFactory getDatabaseFactory() {
-		return databaseFactory;
-	}
-
-	@Resource(name = "simpleDaemonRunnerFactory")
-	public void setSimpleDaemonRunnerFactory(final SimpleRunner.Factory factory) {
-		this.simpleDaemonRunnerFactory = factory;
-	}
-
-	public SimpleRunner.Factory getSimpleDaemonRunnerFactory() {
-		return simpleDaemonRunnerFactory;
-	}
-
-	public WebUi.Factory getWebUiFactory() {
-		return webUiFactory;
-	}
-
-	@Resource(name = "webUiFactory")
-	public void setWebUiFactory(final WebUi.Factory webUiFactory) {
-		this.webUiFactory = webUiFactory;
-	}
-
-	public GridRunner.Factory getGridDaemonRunnerFactory() {
-		return gridDaemonRunnerFactory;
-	}
-
-	@Resource(name = "gridDaemonRunnerFactory")
-	public void setGridDaemonRunnerFactory(final GridRunner.Factory gridDaemonRunnerFactory) {
-		this.gridDaemonRunnerFactory = gridDaemonRunnerFactory;
 	}
 
 	public Collection<FactoryDescriptor> getFactoryDescriptors() {
