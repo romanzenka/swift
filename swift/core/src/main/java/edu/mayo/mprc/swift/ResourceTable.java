@@ -17,7 +17,6 @@ import java.util.*;
  * <p/>
  * The UI counterparts of the resources are defined in ResourceTableUIs.
  * <p/>
- * TODO: This should discover the modules automatically, current setup is too painful to keep up to date.
  *
  * @author Roman Zenka
  */
@@ -54,7 +53,7 @@ public final class ResourceTable extends FactoryBase<ResourceConfig, Object> imp
 			}
 		}
 
-		// The daemon connection factory is very special... figure out how to handle it the same way as others
+		// TODO: The daemon connection factory is very special... figure out how to handle it the same way as others
 		addToTable(SERVICE, "Service", ServiceConfig.class, getDaemonConnectionFactory(), null, "???", ResourceType.Resource);
 	}
 
