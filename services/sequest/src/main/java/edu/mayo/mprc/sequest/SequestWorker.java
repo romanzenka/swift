@@ -14,6 +14,7 @@ import edu.mayo.mprc.sequest.core.Mgf2SequestCaller;
 import edu.mayo.mprc.utilities.FileUtilities;
 import edu.mayo.mprc.utilities.progress.UserProgressReporter;
 import org.apache.log4j.Logger;
+import org.springframework.stereotype.Component;
 
 import java.io.File;
 import java.util.Arrays;
@@ -99,6 +100,7 @@ public final class SequestWorker extends WorkerBase {
 	/**
 	 * A factory capable of creating the worker
 	 */
+	@Component("sequestWorkerFactory")
 	public static final class Factory extends WorkerFactoryBase<Config> {
 		@Override
 		public Worker create(final Config config, final DependencyResolver dependencies) {

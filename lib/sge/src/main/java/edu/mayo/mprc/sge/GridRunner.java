@@ -4,10 +4,8 @@ package edu.mayo.mprc.sge;
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.io.xml.DomDriver;
-import edu.mayo.mprc.config.DependencyResolver;
-import edu.mayo.mprc.config.FactoryBase;
-import edu.mayo.mprc.config.ResourceConfig;
-import edu.mayo.mprc.config.RunnerConfig;
+import edu.mayo.mprc.config.*;
+import edu.mayo.mprc.config.ui.ServiceUiFactory;
 import edu.mayo.mprc.daemon.*;
 import edu.mayo.mprc.daemon.exception.DaemonException;
 import edu.mayo.mprc.daemon.files.FileTokenFactory;
@@ -526,7 +524,7 @@ public final class GridRunner extends AbstractRunner {
 	}
 
 	@Component("gridDaemonRunnerFactory")
-	public static final class Factory extends FactoryBase<Config, GridRunner> {
+	public static final class Factory extends FactoryBase<Config, GridRunner> implements FactoryDescriptor {
 
 		private GridEngineJobManager gridEngineManager;
 		private GridScriptFactory gridScriptFactory;
@@ -600,6 +598,31 @@ public final class GridRunner extends AbstractRunner {
 		@Resource(name = "fileTokenFactory")
 		public void setFileTokenFactory(final FileTokenFactory fileTokenFactory) {
 			this.fileTokenFactory = fileTokenFactory;
+		}
+
+		@Override
+		public String getType() {
+			return TYPE;
+		}
+
+		@Override
+		public String getUserName() {
+			return NAME;
+		}
+
+		@Override
+		public String getDescription() {
+			return null;
+		}
+
+		@Override
+		public Class<? extends ResourceConfig> getConfigClass() {
+			return Config.class;
+		}
+
+		@Override
+		public ServiceUiFactory getServiceUiFactory() {
+			return null;
 		}
 	}
 }

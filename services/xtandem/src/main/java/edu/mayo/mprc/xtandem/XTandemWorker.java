@@ -19,6 +19,7 @@ import edu.mayo.mprc.utilities.ProcessCaller;
 import edu.mayo.mprc.utilities.StreamRegExMatcher;
 import edu.mayo.mprc.utilities.progress.UserProgressReporter;
 import org.apache.log4j.Logger;
+import org.springframework.stereotype.Component;
 
 import java.io.File;
 import java.io.IOException;
@@ -209,6 +210,7 @@ public final class XTandemWorker extends WorkerBase {
 	/**
 	 * A factory capable of creating the worker
 	 */
+	@Component("xTandemWorkerFactory")
 	public static final class Factory extends WorkerFactoryBase<Config> {
 		@Override
 		public Worker create(final Config config, final DependencyResolver dependencies) {

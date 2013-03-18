@@ -12,6 +12,7 @@ import edu.mayo.mprc.daemon.WorkerFactoryBase;
 import edu.mayo.mprc.daemon.exception.DaemonException;
 import edu.mayo.mprc.utilities.ProcessCaller;
 import edu.mayo.mprc.utilities.progress.UserProgressReporter;
+import org.springframework.stereotype.Component;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -51,6 +52,7 @@ public final class QstatDaemonWorker extends WorkerBase {
 	/**
 	 * A factory capable of creating the worker
 	 */
+	@Component("qstatDaemonWorkerFactory")
 	public static final class Factory extends WorkerFactoryBase<Config> {
 		@Override
 		public Worker create(final Config config, final DependencyResolver dependencies) {

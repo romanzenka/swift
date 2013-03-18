@@ -15,6 +15,7 @@ import edu.mayo.mprc.utilities.FileUtilities;
 import edu.mayo.mprc.utilities.ProcessCaller;
 import edu.mayo.mprc.utilities.progress.UserProgressReporter;
 import org.apache.log4j.Logger;
+import org.springframework.stereotype.Component;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -232,6 +233,7 @@ public final class RAWDumpWorker extends WorkerBase {
 	/**
 	 * A factory capable of creating the worker
 	 */
+	@Component("rawDumpWorkerFactory")
 	public static final class Factory extends WorkerFactoryBase<Config> {
 		public Worker create(final Config config, final DependencyResolver dependencies) {
 			final RAWDumpWorker worker = new RAWDumpWorker(config);

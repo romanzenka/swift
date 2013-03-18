@@ -9,6 +9,7 @@ import edu.mayo.mprc.config.ui.UiBuilder;
 import edu.mayo.mprc.daemon.*;
 import edu.mayo.mprc.daemon.exception.DaemonException;
 import edu.mayo.mprc.utilities.progress.UserProgressReporter;
+import org.springframework.stereotype.Component;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -21,7 +22,7 @@ import java.util.Map;
 public final class PingDaemonWorker extends WorkerBase implements NoLoggingWorker {
 	public static final String TYPE = "ping";
 	public static final String NAME = "Ping";
-	public static final String DESC = "A daemon that responds to pings with status information.";
+	public static final String DESC = "Responds to pings with status information. Automatically set for each daemon.";
 
 	@Override
 	public void process(final WorkPacket workPacket, final UserProgressReporter reporter) {
@@ -52,6 +53,7 @@ public final class PingDaemonWorker extends WorkerBase implements NoLoggingWorke
 	/**
 	 * A factory capable of creating the worker
 	 */
+	@Component("pingDaemonWorkerFactory")
 	public static final class Factory extends WorkerFactoryBase<Config> {
 
 		@Override

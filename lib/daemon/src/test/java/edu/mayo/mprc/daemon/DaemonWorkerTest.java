@@ -1,5 +1,7 @@
 package edu.mayo.mprc.daemon;
 
+import edu.mayo.mprc.config.ResourceConfig;
+import edu.mayo.mprc.config.ui.ServiceUiFactory;
 import edu.mayo.mprc.daemon.exception.DaemonException;
 import edu.mayo.mprc.utilities.progress.UserProgressReporter;
 import org.testng.Assert;
@@ -25,8 +27,28 @@ public final class DaemonWorkerTest {
 				return createSimpleWorker();
 			}
 
-			public String getDescription() {
+			@Override
+			public String getType() {
+				return "daemonWorker";
+			}
+
+			public String getUserName() {
 				return "DaemonWorkerTester";
+			}
+
+			@Override
+			public String getDescription() {
+				return "Tester for daemon workers";
+			}
+
+			@Override
+			public Class<? extends ResourceConfig> getConfigClass() {
+				return null;
+			}
+
+			@Override
+			public ServiceUiFactory getServiceUiFactory() {
+				return null;
 			}
 		}, 3);
 		runTest(tester, 6);

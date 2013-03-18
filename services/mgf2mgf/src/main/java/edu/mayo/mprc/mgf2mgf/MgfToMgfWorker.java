@@ -11,6 +11,7 @@ import edu.mayo.mprc.daemon.WorkerBase;
 import edu.mayo.mprc.daemon.WorkerFactoryBase;
 import edu.mayo.mprc.io.mgf.MgfCleanup;
 import edu.mayo.mprc.utilities.progress.UserProgressReporter;
+import org.springframework.stereotype.Component;
 
 import java.io.File;
 import java.util.HashMap;
@@ -48,6 +49,7 @@ public final class MgfToMgfWorker extends WorkerBase {
 	/**
 	 * A factory capable of creating the worker
 	 */
+	@Component("mgfToMgfWorkerFactory")
 	public static final class Factory extends WorkerFactoryBase<Config> {
 		@Override
 		public Worker create(final Config config, final DependencyResolver dependencies) {

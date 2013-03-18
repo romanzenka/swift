@@ -17,6 +17,7 @@ import edu.mayo.mprc.utilities.GZipUtilities;
 import edu.mayo.mprc.utilities.ProcessCaller;
 import edu.mayo.mprc.utilities.progress.ProgressReporter;
 import org.apache.log4j.Logger;
+import org.springframework.stereotype.Component;
 
 import java.io.*;
 import java.util.*;
@@ -568,6 +569,7 @@ public final class SequestDeploymentService extends DeploymentService<SequestDep
 	/**
 	 * A factory capable of creating the worker
 	 */
+	@Component("sequestDeploymentServiceFactory")
 	public static final class Factory extends WorkerFactoryBase<Config> {
 
 		private SequestMappingFactory sequestMappingFactory;

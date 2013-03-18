@@ -2,7 +2,8 @@
 <beans xmlns="http://www.springframework.org/schema/beans"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:context="http://www.springframework.org/schema/context"
-       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+       http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd"
        default-lazy-init="true" default-autowire="no">
 
     <context:component-scan base-package="edu.mayo.mprc"/>
@@ -32,10 +33,6 @@
                   value="%shortname%_REP%tab%&quot;24&quot;%tab%&quot;localhost&quot;%tab%&quot;80&quot;%tab%&quot;MASCOT-INSTALLATION-ROOT/x-cgi/ms-getseq.exe %shortname% #ACCESSION# all&quot;"/>
         <property name="seqLine"
                   value="%shortname%_SEQ%tab%&quot;8&quot;%tab%&quot;localhost&quot;%tab%&quot;80&quot;%tab%&quot;MASCOT-INSTALLATION-ROOT/x-cgi/ms-getseq.exe %shortname% #ACCESSION# seq&quot;"/>
-    </bean>
-
-    <bean id="omssaWorkerFactory" class="edu.mayo.mprc.omssa.OmssaWorker$Factory">
-        <property name="omssaUserModsWriter" ref="omssaUserModsWriter"/>
     </bean>
 
     <bean id="sequestDeployerFactory" class="edu.mayo.mprc.sequest.SequestDeploymentService$Factory">

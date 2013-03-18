@@ -14,6 +14,7 @@ import edu.mayo.mprc.enginedeployment.DeploymentService;
 import edu.mayo.mprc.utilities.FileUtilities;
 import edu.mayo.mprc.utilities.progress.ProgressReporter;
 import org.apache.log4j.Logger;
+import org.springframework.stereotype.Component;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -209,6 +210,7 @@ public final class MyrimatchDeploymentService extends DeploymentService<Deployme
 	/**
 	 * A factory capable of creating the worker
 	 */
+	@Component("myrimatchDeploymentServiceFactory")
 	public static final class Factory extends WorkerFactoryBase<Config> {
 		@Override
 		public Worker create(final Config config, final DependencyResolver dependencies) {

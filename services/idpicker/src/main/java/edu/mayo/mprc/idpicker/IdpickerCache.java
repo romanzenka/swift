@@ -6,6 +6,7 @@ import edu.mayo.mprc.config.ResourceConfig;
 import edu.mayo.mprc.config.ui.ServiceUiFactory;
 import edu.mayo.mprc.config.ui.UiBuilder;
 import edu.mayo.mprc.daemon.WorkCache;
+import org.springframework.stereotype.Component;
 
 /**
  * @author Roman Zenka
@@ -23,6 +24,7 @@ public final class IdpickerCache extends WorkCache<IdpickerWorkPacket> {
 		}
 	}
 
+	@Component("idpickerCacheFactory")
 	public static final class Factory extends WorkCache.Factory<Config> {
 		private static IdpickerCache cache;
 

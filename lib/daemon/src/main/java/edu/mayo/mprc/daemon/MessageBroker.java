@@ -1,10 +1,7 @@
 package edu.mayo.mprc.daemon;
 
 import edu.mayo.mprc.MprcException;
-import edu.mayo.mprc.config.DaemonConfig;
-import edu.mayo.mprc.config.DependencyResolver;
-import edu.mayo.mprc.config.FactoryBase;
-import edu.mayo.mprc.config.ResourceConfig;
+import edu.mayo.mprc.config.*;
 import edu.mayo.mprc.config.ui.PropertyChangeListener;
 import edu.mayo.mprc.config.ui.ServiceUiFactory;
 import edu.mayo.mprc.config.ui.UiBuilder;
@@ -13,6 +10,7 @@ import edu.mayo.mprc.utilities.exceptions.ExceptionUtilities;
 import org.apache.activemq.ActiveMQConnectionFactory;
 import org.apache.activemq.broker.BrokerService;
 import org.apache.log4j.Logger;
+import org.springframework.stereotype.Component;
 
 import javax.jms.Connection;
 import javax.jms.ConnectionFactory;
@@ -111,7 +109,8 @@ public final class MessageBroker implements Closeable {
 	/**
 	 * A factory capable of creating the resource
 	 */
-	public static final class Factory extends FactoryBase<Config, MessageBroker> {
+	@Component("messageBrokerFactory")
+	public static final class Factory extends FactoryBase<Config, MessageBroker> implements FactoryDescriptor {
 		@Override
 		public MessageBroker create(final Config config, final DependencyResolver dependencies) {
 			final MessageBroker broker = new MessageBroker();
@@ -125,6 +124,31 @@ public final class MessageBroker implements Closeable {
 				broker.start();
 			}
 			return broker;
+		}
+
+		@Override
+		public String getType() {
+			return TYPE;
+		}
+
+		@Override
+		public String getUserName() {
+			return NAME;
+		}
+
+		@Override
+		public String getDescription() {
+			return DESC;
+		}
+
+		@Override
+		public Class<? extends ResourceConfig> getConfigClass() {
+			return Config.class;
+		}
+
+		@Override
+		public ServiceUiFactory getServiceUiFactory() {
+			return new Ui();
 		}
 	}
 

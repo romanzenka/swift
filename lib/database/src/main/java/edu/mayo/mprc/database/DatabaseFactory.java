@@ -1,10 +1,7 @@
 package edu.mayo.mprc.database;
 
 import com.google.common.collect.Lists;
-import edu.mayo.mprc.config.DaemonConfig;
-import edu.mayo.mprc.config.DependencyResolver;
-import edu.mayo.mprc.config.FactoryBase;
-import edu.mayo.mprc.config.ResourceConfig;
+import edu.mayo.mprc.config.*;
 import edu.mayo.mprc.config.ui.ServiceUiFactory;
 import edu.mayo.mprc.config.ui.UiBuilder;
 import edu.mayo.mprc.utilities.exceptions.ExceptionUtilities;
@@ -15,7 +12,7 @@ import javax.annotation.Resource;
 import java.util.*;
 
 @Component("databaseFactory")
-public final class DatabaseFactory extends FactoryBase<ResourceConfig, SessionFactory> {
+public final class DatabaseFactory extends FactoryBase<ResourceConfig, SessionFactory> implements FactoryDescriptor {
 
 	public static final String TYPE = "database";
 	public static final String NAME = "Database";
@@ -94,6 +91,31 @@ public final class DatabaseFactory extends FactoryBase<ResourceConfig, SessionFa
 		placeholder.setSessionFactory(sessionFactory);
 
 		return sessionFactory;
+	}
+
+	@Override
+	public String getType() {
+		return TYPE;
+	}
+
+	@Override
+	public String getUserName() {
+		return NAME;
+	}
+
+	@Override
+	public String getDescription() {
+		return DESC;
+	}
+
+	@Override
+	public Class<? extends ResourceConfig> getConfigClass() {
+		return Config.class;
+	}
+
+	@Override
+	public ServiceUiFactory getServiceUiFactory() {
+		return new Ui();
 	}
 
 	/**

@@ -6,6 +6,7 @@ import edu.mayo.mprc.config.ResourceConfig;
 import edu.mayo.mprc.config.ui.ServiceUiFactory;
 import edu.mayo.mprc.config.ui.UiBuilder;
 import edu.mayo.mprc.daemon.WorkCache;
+import org.springframework.stereotype.Component;
 
 public final class SequestCache extends WorkCache<SequestMGFWorkPacket> {
 
@@ -22,6 +23,7 @@ public final class SequestCache extends WorkCache<SequestMGFWorkPacket> {
 		}
 	}
 
+	@Component("sequestCacheFactory")
 	public static final class Factory extends WorkCache.Factory<Config> {
 		private static SequestCache cache;
 

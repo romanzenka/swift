@@ -5,56 +5,14 @@ import edu.mayo.mprc.MprcException;
 import edu.mayo.mprc.config.*;
 import edu.mayo.mprc.config.ui.ServiceUiFactory;
 import edu.mayo.mprc.daemon.DaemonConnectionFactory;
-import edu.mayo.mprc.daemon.MessageBroker;
 import edu.mayo.mprc.daemon.SimpleRunner;
 import edu.mayo.mprc.daemon.WorkerFactoryBase;
-import edu.mayo.mprc.daemon.monitor.PingDaemonWorker;
 import edu.mayo.mprc.database.DatabaseFactory;
-import edu.mayo.mprc.dbundeploy.DatabaseUndeployerWorker;
-import edu.mayo.mprc.fastadb.FastaDbWorker;
-import edu.mayo.mprc.idpicker.IdpickerCache;
-import edu.mayo.mprc.idpicker.IdpickerDeploymentService;
-import edu.mayo.mprc.idpicker.IdpickerWorker;
-import edu.mayo.mprc.mascot.MascotCache;
-import edu.mayo.mprc.mascot.MascotDeploymentService;
-import edu.mayo.mprc.mascot.MascotWorker;
-import edu.mayo.mprc.mascot.MockMascotDeploymentService;
-import edu.mayo.mprc.mgf2mgf.MgfToMgfWorker;
-import edu.mayo.mprc.msconvert.MsconvertCache;
-import edu.mayo.mprc.msconvert.MsconvertWorker;
-import edu.mayo.mprc.msmseval.MSMSEvalWorker;
-import edu.mayo.mprc.msmseval.MsmsEvalCache;
-import edu.mayo.mprc.myrimatch.MyrimatchCache;
-import edu.mayo.mprc.myrimatch.MyrimatchDeploymentService;
-import edu.mayo.mprc.myrimatch.MyrimatchWorker;
-import edu.mayo.mprc.omssa.OmssaCache;
-import edu.mayo.mprc.omssa.OmssaDeploymentService;
-import edu.mayo.mprc.omssa.OmssaWorker;
-import edu.mayo.mprc.qa.QaWorker;
-import edu.mayo.mprc.qa.RAWDumpCache;
-import edu.mayo.mprc.qa.RAWDumpWorker;
-import edu.mayo.mprc.qstat.QstatDaemonWorker;
-import edu.mayo.mprc.raw2mgf.RawToMgfCache;
-import edu.mayo.mprc.raw2mgf.RawToMgfWorker;
-import edu.mayo.mprc.scaffold.ScaffoldDeploymentService;
-import edu.mayo.mprc.scaffold.ScaffoldWorker;
-import edu.mayo.mprc.scaffold.report.ScaffoldReportWorker;
-import edu.mayo.mprc.scaffold3.Scaffold3DeploymentService;
-import edu.mayo.mprc.scaffold3.Scaffold3Worker;
-import edu.mayo.mprc.searchdb.SearchDbWorker;
-import edu.mayo.mprc.sequest.SequestCache;
-import edu.mayo.mprc.sequest.SequestDeploymentService;
-import edu.mayo.mprc.sequest.SequestWorker;
 import edu.mayo.mprc.sge.GridRunner;
-import edu.mayo.mprc.swift.search.DatabaseValidator;
-import edu.mayo.mprc.swift.search.SwiftSearcher;
 import edu.mayo.mprc.utilities.exceptions.ExceptionUtilities;
-import edu.mayo.mprc.xtandem.XTandemCache;
-import edu.mayo.mprc.xtandem.XTandemDeploymentService;
-import edu.mayo.mprc.xtandem.XTandemWorker;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.annotation.Resource;
-import java.lang.reflect.Field;
 import java.util.*;
 
 /**
@@ -73,21 +31,13 @@ public final class ResourceTable extends FactoryBase<ResourceConfig, Object> imp
 	// Same as the previous map, just does lookup using the config class.
 	private final Map</*configClass*/Class<? extends ResourceConfig>, ResourceInfo> tableConfigClass = new LinkedHashMap<Class<? extends ResourceConfig>, ResourceInfo>();
 
-	private ScaffoldDeploymentService.Factory scaffoldDeployerWorkerFactory;
-
 	private DatabaseFactory databaseFactory;
-	private MascotDeploymentService.Factory mascotDeployerWorkerFactory;
-	private SearchDbWorker.Factory searchDbWorkerFactory;
-	private FastaDbWorker.Factory fastaDbWorkerFactory;
 	private SimpleRunner.Factory simpleDaemonRunnerFactory;
-	private OmssaWorker.Factory omssaWorkerFactory;
-	private SequestDeploymentService.Factory sequestDeployerWorkerFactory;
-	private SwiftSearcher.Factory swiftSearcherFactory;
-	private DatabaseUndeployerWorker.Factory databaseUndeployerFactory;
 	private WebUi.Factory webUiFactory;
 	private GridRunner.Factory gridDaemonRunnerFactory;
 	private DaemonConnectionFactory daemonConnectionFactory;
-	private DatabaseValidator databaseValidator;
+
+	private Collection<FactoryDescriptor> factoryDescriptors;
 
 	public ResourceTable() {
 	}
@@ -96,74 +46,23 @@ public final class ResourceTable extends FactoryBase<ResourceConfig, Object> imp
 		if (table.size() != 0) {
 			return;
 		}
-		// Searchers
-		addWorkerByReflection(MascotWorker.class);
-		addWorkerByReflection(SequestWorker.class);
-		addWorkerByReflection(XTandemWorker.class);
-		addWorker(OmssaWorker.TYPE, OmssaWorker.NAME, OmssaWorker.Config.class, getOmssaWorkerFactory(), new OmssaWorker.Ui(), OmssaWorker.DESC);
-		addWorkerByReflection(MyrimatchWorker.class);
-		addWorkerByReflection(IdpickerWorker.class);
-		addWorkerByReflection(ScaffoldWorker.class);
-		addWorkerByReflection(Scaffold3Worker.class);
 
-		// DB deployers
-		addWorker(MascotDeploymentService.TYPE, MascotDeploymentService.NAME, MascotDeploymentService.Config.class, getMascotDeployerWorkerFactory(), new MascotDeploymentService.Ui(), MascotDeploymentService.DESC);
-		addWorkerByReflection(MockMascotDeploymentService.class);
-		addWorker(SequestDeploymentService.TYPE, SequestDeploymentService.NAME, SequestDeploymentService.Config.class, getSequestDeployerWorkerFactory(), new SequestDeploymentService.Ui(), SequestDeploymentService.DESC);
-		addWorkerByReflection(XTandemDeploymentService.class);
-		addWorkerByReflection(OmssaDeploymentService.class);
-		addWorkerByReflection(MyrimatchDeploymentService.class);
-		addWorkerByReflection(IdpickerDeploymentService.class);
-		addWorker(ScaffoldDeploymentService.TYPE, ScaffoldDeploymentService.NAME, ScaffoldDeploymentService.Config.class, getScaffoldDeployerWorkerFactory(), new ScaffoldDeploymentService.Ui(), ScaffoldDeploymentService.DESC);
-		addWorkerByReflection(Scaffold3DeploymentService.class);
+		for (final FactoryDescriptor descriptor : getFactoryDescriptors()) {
+			if (descriptor instanceof WorkerFactoryBase) {
+				final WorkerFactoryBase<? extends ResourceConfig> base = (WorkerFactoryBase<? extends ResourceConfig>) descriptor;
+				addToTable(descriptor, base, ResourceType.Worker);
+			} else if (descriptor instanceof ResourceFactory) {
+				final ResourceFactory base = (ResourceFactory) descriptor;
+				if (RunnerConfig.class.isAssignableFrom(descriptor.getConfigClass())) {
+					addToTable(descriptor, base, ResourceType.Runner);
+				} else {
+					addToTable(descriptor, base, ResourceType.Resource);
+				}
+			}
+		}
 
-		// Format converters
-		addWorkerByReflection(RawToMgfWorker.class);
-		addWorkerByReflection(MsconvertWorker.class);
-		addWorkerByReflection(MgfToMgfWorker.class);
-
-		// Special
-		addWorkerByReflection(RAWDumpWorker.class);
-		addWorkerByReflection(MSMSEvalWorker.class);
-		addWorkerByReflection(QaWorker.class);
-		addWorkerByReflection(QstatDaemonWorker.class);
-		addWorker(SwiftSearcher.TYPE, SwiftSearcher.NAME, SwiftSearcher.Config.class, getSwiftSearcherFactory(), new SwiftSearcher.Ui(getDatabaseValidator()), SwiftSearcher.DESC);
-		addWorker(DatabaseUndeployerWorker.TYPE, DatabaseUndeployerWorker.NAME, DatabaseUndeployerWorker.Config.class, getDatabaseUndeployerFactory(), new DatabaseUndeployerWorker.Ui(), DatabaseUndeployerWorker.DESC);
-		addWorkerByReflection(ScaffoldReportWorker.class);
-		addWorker(SearchDbWorker.TYPE, SearchDbWorker.NAME, SearchDbWorker.Config.class, getSearchDbWorkerFactory(), new SearchDbWorker.Ui(), SearchDbWorker.DESC);
-		addWorker(FastaDbWorker.TYPE, FastaDbWorker.NAME, FastaDbWorker.Config.class, getFastaDbWorkerFactory(), new FastaDbWorker.Ui(), FastaDbWorker.DESC);
-		addWorkerByReflection(PingDaemonWorker.class);
-
-		// Caches
-		addWorkerByReflection(RawToMgfCache.class);
-		addWorkerByReflection(MsconvertCache.class);
-		addWorkerByReflection(MascotCache.class);
-		addWorkerByReflection(SequestCache.class);
-		addWorkerByReflection(XTandemCache.class);
-		addWorkerByReflection(MyrimatchCache.class);
-		addWorkerByReflection(OmssaCache.class);
-		addWorkerByReflection(RAWDumpCache.class);
-		addWorkerByReflection(MsmsEvalCache.class);
-		addWorkerByReflection(IdpickerCache.class);
-
-		// Resources
-		addResource(DatabaseFactory.TYPE, DatabaseFactory.NAME, DatabaseFactory.Config.class, getDatabaseFactory(), new DatabaseFactory.Ui(), DatabaseFactory.DESC);
-		addResource(WebUi.TYPE, WebUi.NAME, WebUi.Config.class, getWebUiFactory(), new WebUi.Ui(), WebUi.DESC);
-		addResource(MessageBroker.TYPE, MessageBroker.NAME, MessageBroker.Config.class, new MessageBroker.Factory(), new MessageBroker.Ui(), MessageBroker.DESC);
-		addResource(SERVICE, "Service", ServiceConfig.class, getDaemonConnectionFactory(), null, "???");
-
-		// Runners
-		addRunner(SimpleRunner.TYPE, SimpleRunner.NAME, SimpleRunner.Config.class, getSimpleDaemonRunnerFactory());
-		addRunner(GridRunner.TYPE, GridRunner.NAME, GridRunner.Config.class, getGridDaemonRunnerFactory());
-	}
-
-	@Resource(name = "scaffoldDeploymentServiceFactory")
-	public void setScaffoldDeployerWorkerFactory(final ScaffoldDeploymentService.Factory scaffoldDeployerWorkerFactory) {
-		this.scaffoldDeployerWorkerFactory = scaffoldDeployerWorkerFactory;
-	}
-
-	public ScaffoldDeploymentService.Factory getScaffoldDeployerWorkerFactory() {
-		return scaffoldDeployerWorkerFactory;
+		// The daemon connection factory is very special... figure out how to handle it the same way as others
+		addToTable(SERVICE, "Service", ServiceConfig.class, getDaemonConnectionFactory(), null, "???", ResourceType.Resource);
 	}
 
 	@Resource(name = "databaseFactory")
@@ -175,33 +74,6 @@ public final class ResourceTable extends FactoryBase<ResourceConfig, Object> imp
 		return databaseFactory;
 	}
 
-	@Resource(name = "mascotDeployerWorkerFactory")
-	public void setMascotDeployerWorkerFactory(final MascotDeploymentService.Factory mascotDeployerWorkerFactory) {
-		this.mascotDeployerWorkerFactory = mascotDeployerWorkerFactory;
-	}
-
-	public MascotDeploymentService.Factory getMascotDeployerWorkerFactory() {
-		return mascotDeployerWorkerFactory;
-	}
-
-	public SearchDbWorker.Factory getSearchDbWorkerFactory() {
-		return searchDbWorkerFactory;
-	}
-
-	@Resource(name = "searchDbFactory")
-	public void setSearchDbWorkerFactory(final SearchDbWorker.Factory searchDbWorkerFactory) {
-		this.searchDbWorkerFactory = searchDbWorkerFactory;
-	}
-
-	public FastaDbWorker.Factory getFastaDbWorkerFactory() {
-		return fastaDbWorkerFactory;
-	}
-
-	@Resource(name = "fastaDbFactory")
-	public void setFastaDbWorkerFactory(final FastaDbWorker.Factory fastaDbWorkerFactory) {
-		this.fastaDbWorkerFactory = fastaDbWorkerFactory;
-	}
-
 	@Resource(name = "simpleDaemonRunnerFactory")
 	public void setSimpleDaemonRunnerFactory(final SimpleRunner.Factory factory) {
 		this.simpleDaemonRunnerFactory = factory;
@@ -209,24 +81,6 @@ public final class ResourceTable extends FactoryBase<ResourceConfig, Object> imp
 
 	public SimpleRunner.Factory getSimpleDaemonRunnerFactory() {
 		return simpleDaemonRunnerFactory;
-	}
-
-	public SwiftSearcher.Factory getSwiftSearcherFactory() {
-		return swiftSearcherFactory;
-	}
-
-	@Resource(name = "swiftSearcherFactory")
-	public void setSwiftSearcherFactory(final SwiftSearcher.Factory swiftSearcherFactory) {
-		this.swiftSearcherFactory = swiftSearcherFactory;
-	}
-
-	public DatabaseUndeployerWorker.Factory getDatabaseUndeployerFactory() {
-		return databaseUndeployerFactory;
-	}
-
-	@Resource(name = "databaseUndeployerFactory")
-	public void setDatabaseUndeployerFactory(final DatabaseUndeployerWorker.Factory databaseUndeployerFactory) {
-		this.databaseUndeployerFactory = databaseUndeployerFactory;
 	}
 
 	public WebUi.Factory getWebUiFactory() {
@@ -247,52 +101,32 @@ public final class ResourceTable extends FactoryBase<ResourceConfig, Object> imp
 		this.gridDaemonRunnerFactory = gridDaemonRunnerFactory;
 	}
 
+	public Collection<FactoryDescriptor> getFactoryDescriptors() {
+		return factoryDescriptors;
+	}
+
+	@Autowired
+	public void setFactoryDescriptors(final Collection<FactoryDescriptor> factoryDescriptors) {
+		this.factoryDescriptors = factoryDescriptors;
+	}
+
 	private void addToTable(String type, String userName, Class<? extends ResourceConfig> configClass, ResourceFactory<? extends ResourceConfig, ?> factory, ServiceUiFactory uiFactory, String description, ResourceType resourceType) {
 		final ResourceInfo info = new ResourceInfo(type, userName, configClass, factory, resourceType, uiFactory, description);
 		table.put(type, info);
 		tableConfigClass.put(configClass, info);
 	}
 
-	private void addResource(final String type, final String userName, final Class<? extends ResourceConfig> configClass, final ResourceFactory<? extends ResourceConfig, ?> factory, final ServiceUiFactory uiFactory, final String description) {
-		addToTable(type, userName, configClass, factory, uiFactory, description, ResourceType.Resource);
-	}
-
-	private void addWorker(final String type, final String userName, final Class<? extends ResourceConfig> configClass, final WorkerFactoryBase<? extends ResourceConfig> factory,
-	                       final ServiceUiFactory uiFactory, final String description) {
-		addToTable(type, userName, configClass, factory, uiFactory, description, ResourceType.Worker);
-	}
-
-	private void addRunner(final String id, final String userName, final Class<? extends ResourceConfig> configClass, final ResourceFactory<? extends ResourceConfig, ?> factory) {
-		addToTable(id, userName, configClass, factory, null, null, ResourceType.Runner);
-	}
-
-	private void addWorkerByReflection(final Class<?> workerClass) {
-		final String name = getStaticString(workerClass, "NAME");
-		final String type = getStaticString(workerClass, "TYPE");
-		final String description = getStaticString(workerClass, "DESC");
-		final Class<? extends ResourceConfig> config = getSubclass(workerClass, "Config");
-		final WorkerFactoryBase factory = (WorkerFactoryBase) getSubclassInstance(workerClass, "Factory");
-		final ServiceUiFactory uiFactory = (ServiceUiFactory) getSubclassInstance(workerClass, "Ui");
-		addWorker(type, name, config, factory, uiFactory, description);
-	}
-
-	private Object getSubclassInstance(final Class parent, final String suffix) {
-		try {
-			return getSubclass(parent, suffix).newInstance();
-		} catch (InstantiationException e) {
-			throw new MprcException("Cannot make an instance of subclass " + suffix + " in " + parent.getName(), e);
-		} catch (IllegalAccessException e) {
-			throw new MprcException("Cannot access subclass " + suffix + " in " + parent.getName(), e);
-		}
-	}
-
-	private Class getSubclass(final Class parent, final String suffix) {
-		final String className = parent.getName() + "$" + suffix;
-		try {
-			return Class.forName(className);
-		} catch (ClassNotFoundException e) {
-			throw new MprcException("Subclass " + suffix + " does not exist in " + parent.getName(), e);
-		}
+	private void addToTable(
+			final FactoryDescriptor descriptor,
+			final ResourceFactory<? extends ResourceConfig, ?> factory,
+			final ResourceType resourceType) {
+		addToTable(descriptor.getType(),
+				descriptor.getUserName(),
+				descriptor.getConfigClass(),
+				factory,
+				descriptor.getServiceUiFactory(),
+				descriptor.getDescription(),
+				resourceType);
 	}
 
 	private Map<String, ResourceInfo> getTable() {
@@ -365,24 +199,6 @@ public final class ResourceTable extends FactoryBase<ResourceConfig, Object> imp
 		return getTable().keySet();
 	}
 
-	@Resource(name = "omssaWorkerFactory")
-	public void setOmssaWorkerFactory(final OmssaWorker.Factory omssaWorkerFactory) {
-		this.omssaWorkerFactory = omssaWorkerFactory;
-	}
-
-	public OmssaWorker.Factory getOmssaWorkerFactory() {
-		return omssaWorkerFactory;
-	}
-
-	@Resource(name = "sequestDeployerFactory")
-	public void setSequestDeployerWorkerFactory(final SequestDeploymentService.Factory sequestDeployerWorkerFactory) {
-		this.sequestDeployerWorkerFactory = sequestDeployerWorkerFactory;
-	}
-
-	public SequestDeploymentService.Factory getSequestDeployerWorkerFactory() {
-		return sequestDeployerWorkerFactory;
-	}
-
 	public DaemonConnectionFactory getDaemonConnectionFactory() {
 		return daemonConnectionFactory;
 	}
@@ -390,15 +206,6 @@ public final class ResourceTable extends FactoryBase<ResourceConfig, Object> imp
 	@Resource(name = "daemonConnectionFactory")
 	public void setDaemonConnectionFactory(final DaemonConnectionFactory daemonConnectionFactory) {
 		this.daemonConnectionFactory = daemonConnectionFactory;
-	}
-
-	public DatabaseValidator getDatabaseValidator() {
-		return databaseValidator;
-	}
-
-	@Resource(name = "databaseValidator")
-	public void setDatabaseValidator(final DatabaseValidator databaseValidator) {
-		this.databaseValidator = databaseValidator;
 	}
 
 	@Override
@@ -415,7 +222,7 @@ public final class ResourceTable extends FactoryBase<ResourceConfig, Object> imp
 	@Override
 	public String getUserName(final ResourceConfig config) {
 		final ResourceInfo info = getByConfigClass(config.getClass());
-		return info==null ? null : info.getUserName();
+		return info == null ? null : info.getUserName();
 	}
 
 	@Override
@@ -498,21 +305,5 @@ public final class ResourceTable extends FactoryBase<ResourceConfig, Object> imp
 		Resource,
 		Worker,
 		Runner
-	}
-
-	private static String getStaticString(final Class<?> clazz, final String fieldName) {
-		try {
-			final Field field = clazz.getDeclaredField(fieldName);
-			final Object value = field.get(null);
-			if (value instanceof String) {
-				return (String) value;
-			} else {
-				throw new MprcException("The value of the field '" + fieldName + "' is not a string.");
-			}
-		} catch (NoSuchFieldException e) {
-			throw new MprcException("Cannot access field '" + fieldName + "'.", e);
-		} catch (IllegalAccessException e) {
-			throw new MprcException("Access to field '" + fieldName + "' is not allowed.", e);
-		}
 	}
 }

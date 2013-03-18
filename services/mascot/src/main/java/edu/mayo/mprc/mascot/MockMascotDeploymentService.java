@@ -11,6 +11,7 @@ import edu.mayo.mprc.daemon.WorkerBase;
 import edu.mayo.mprc.daemon.WorkerFactoryBase;
 import edu.mayo.mprc.enginedeployment.DeploymentResult;
 import edu.mayo.mprc.utilities.progress.UserProgressReporter;
+import org.springframework.stereotype.Component;
 
 import java.util.Map;
 import java.util.TreeMap;
@@ -59,6 +60,7 @@ public final class MockMascotDeploymentService extends WorkerBase {
 	/**
 	 * A factory capable of creating the worker
 	 */
+	@Component("mockMascotDeploymentServiceFactory")
 	public static final class Factory extends WorkerFactoryBase<Config> {
 		@Override
 		public Worker create(final Config config, final DependencyResolver dependencies) {

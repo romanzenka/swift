@@ -8,6 +8,7 @@ import edu.mayo.mprc.config.ui.UiBuilder;
 import edu.mayo.mprc.daemon.WorkCache;
 import edu.mayo.mprc.utilities.FileUtilities;
 import edu.mayo.mprc.utilities.progress.ProgressInfo;
+import org.springframework.stereotype.Component;
 
 import java.io.File;
 
@@ -31,6 +32,7 @@ public final class MascotCache extends WorkCache<MascotWorkPacket> {
 		}
 	}
 
+	@Component("mascotCacheFactory")
 	public static final class Factory extends WorkCache.Factory<Config> {
 		private static MascotCache cache;
 

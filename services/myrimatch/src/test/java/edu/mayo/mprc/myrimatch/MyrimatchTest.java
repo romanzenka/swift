@@ -435,7 +435,6 @@ public final class MyrimatchTest {
 
 	private MyrimatchWorker createWorker(final String executable) {
 		final MyrimatchWorker.Factory factory = new MyrimatchWorker.Factory();
-		factory.setDescription("Myrimatch");
 
 		final MyrimatchWorker.Config config = new MyrimatchWorker.Config(executable);
 		final DependencyResolver resolver = new DependencyResolver(null);

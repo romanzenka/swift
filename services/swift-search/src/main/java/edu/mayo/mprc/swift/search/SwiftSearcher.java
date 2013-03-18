@@ -470,6 +470,12 @@ public final class SwiftSearcher implements Worker {
 		private CurationDao curationDao;
 		private SwiftDao swiftDao;
 		private FileTokenFactory fileTokenFactory;
+		private DatabaseValidator databaseValidator;
+
+		@Override
+		public ServiceUiFactory getServiceUiFactory() {
+			return new Ui(getDatabaseValidator());
+		}
 
 		@Override
 		public Worker create(final Config config, final DependencyResolver dependencies) {
@@ -579,6 +585,15 @@ public final class SwiftSearcher implements Worker {
 		@Resource(name = "fileTokenFactory")
 		public void setFileTokenFactory(final FileTokenFactory fileTokenFactory) {
 			this.fileTokenFactory = fileTokenFactory;
+		}
+
+		public DatabaseValidator getDatabaseValidator() {
+			return databaseValidator;
+		}
+
+		@Resource(name = "databaseValidator")
+		public void setDatabaseValidator(DatabaseValidator databaseValidator) {
+			this.databaseValidator = databaseValidator;
 		}
 	}
 

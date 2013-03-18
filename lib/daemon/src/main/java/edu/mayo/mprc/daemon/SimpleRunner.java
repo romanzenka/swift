@@ -2,6 +2,7 @@ package edu.mayo.mprc.daemon;
 
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import edu.mayo.mprc.config.*;
+import edu.mayo.mprc.config.ui.ServiceUiFactory;
 import edu.mayo.mprc.daemon.exception.DaemonException;
 import edu.mayo.mprc.utilities.progress.ProgressInfo;
 import edu.mayo.mprc.utilities.progress.ProgressReporter;
@@ -34,13 +35,13 @@ public final class SimpleRunner extends AbstractRunner {
 
 	@Override
 	public String toString() {
-		return "Daemon Runner for " + factory.getDescription();
+		return "Daemon Runner for " + getFactory().getUserName();
 	}
 
 	protected void processRequest(final DaemonRequest request) {
 		final Worker worker;
 		try {
-			worker = factory.createWorker();
+			worker = getFactory().createWorker();
 		} catch (Exception e) {
 			request.sendResponse(e, true);
 			return;
@@ -188,7 +189,7 @@ public final class SimpleRunner extends AbstractRunner {
 		}
 	}
 
-	public static final class Factory extends FactoryBase<Config, SimpleRunner> {
+	public static final class Factory extends FactoryBase<Config, SimpleRunner> implements FactoryDescriptor {
 		private MultiFactory table;
 
 		@Override
@@ -201,7 +202,7 @@ public final class SimpleRunner extends AbstractRunner {
 
 			runner.setFactory(getWorkerFactory(getTable(), workerFactoryConfig, dependencies));
 			final int numThreads = config.getNumThreads();
-			runner.setExecutorService(new SimpleThreadPoolExecutor(numThreads, runner.getFactory().getDescription(), true));
+			runner.setExecutorService(new SimpleThreadPoolExecutor(numThreads, runner.getFactory().getUserName(), true));
 			// Important to convert the log file to absolute, otherwise user.dir is not taken into account and
 			// the behavior is inconsistent within the IDE while debugging
 			runner.setLogOutputFolder(new File(config.getLogOutputFolder()).getAbsoluteFile());
@@ -222,11 +223,35 @@ public final class SimpleRunner extends AbstractRunner {
 					(WorkerFactoryBase) table.getFactory(config.getClass());
 			// Since the factory by default does not even know what is it creating (that would require duplicating
 			// the description into the factory), set the description to the user name of created module.
-			factory.setDescription(table.getUserName(config));
 			factory.setConfig(config);
 			factory.setDependencies(dependencies);
 
 			return factory;
+		}
+
+		@Override
+		public String getType() {
+			return TYPE;
+		}
+
+		@Override
+		public String getUserName() {
+			return NAME;
+		}
+
+		@Override
+		public String getDescription() {
+			return null;
+		}
+
+		@Override
+		public Class<? extends ResourceConfig> getConfigClass() {
+			return Config.class;
+		}
+
+		@Override
+		public ServiceUiFactory getServiceUiFactory() {
+			return null;
 		}
 	}
 

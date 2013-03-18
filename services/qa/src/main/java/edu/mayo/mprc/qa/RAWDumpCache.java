@@ -6,6 +6,7 @@ import edu.mayo.mprc.config.ResourceConfig;
 import edu.mayo.mprc.config.ui.ServiceUiFactory;
 import edu.mayo.mprc.config.ui.UiBuilder;
 import edu.mayo.mprc.daemon.WorkCache;
+import org.springframework.stereotype.Component;
 
 public final class RAWDumpCache extends WorkCache<RAWDumpWorkPacket> {
 
@@ -21,6 +22,7 @@ public final class RAWDumpCache extends WorkCache<RAWDumpWorkPacket> {
 		}
 	}
 
+	@Component("rawDumpCacheFactory")
 	public static final class Factory extends WorkCache.Factory<Config> {
 		private static RAWDumpCache cache;
 

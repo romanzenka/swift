@@ -18,7 +18,9 @@ import edu.mayo.mprc.utilities.ProcessCaller;
 import edu.mayo.mprc.utilities.StreamRegExMatcher;
 import edu.mayo.mprc.utilities.progress.UserProgressReporter;
 import org.apache.log4j.Logger;
+import org.springframework.stereotype.Component;
 
+import javax.annotation.Resource;
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
@@ -173,6 +175,7 @@ public final class OmssaWorker extends WorkerBase {
 	/**
 	 * A factory capable of creating the worker
 	 */
+	@Component("omssaWorkerFactory")
 	public static final class Factory extends WorkerFactoryBase<Config> {
 		private OmssaUserModsWriter omssaUserModsWriter;
 
@@ -184,6 +187,7 @@ public final class OmssaWorker extends WorkerBase {
 			return worker;
 		}
 
+		@Resource(name = "omssaUserModsWriter")
 		public void setOmssaUserModsWriter(final OmssaUserModsWriter omssaUserModsWriter) {
 			this.omssaUserModsWriter = omssaUserModsWriter;
 		}

@@ -18,6 +18,7 @@ import edu.mayo.mprc.utilities.FileUtilities;
 import edu.mayo.mprc.utilities.ProcessCaller;
 import edu.mayo.mprc.utilities.progress.UserProgressReporter;
 import org.apache.log4j.Logger;
+import org.springframework.stereotype.Component;
 
 import javax.xml.transform.OutputKeys;
 import java.io.File;
@@ -233,6 +234,7 @@ public final class Scaffold3Worker extends WorkerBase {
 	/**
 	 * A factory capable of creating the worker
 	 */
+	@Component("scaffold3WorkerFactory")
 	public static final class Factory extends WorkerFactoryBase<Config> {
 
 		@Override

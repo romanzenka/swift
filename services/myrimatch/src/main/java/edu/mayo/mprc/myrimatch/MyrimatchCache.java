@@ -6,6 +6,7 @@ import edu.mayo.mprc.config.ResourceConfig;
 import edu.mayo.mprc.config.ui.ServiceUiFactory;
 import edu.mayo.mprc.config.ui.UiBuilder;
 import edu.mayo.mprc.daemon.WorkCache;
+import org.springframework.stereotype.Component;
 
 public final class MyrimatchCache extends WorkCache<MyrimatchWorkPacket> {
 	public static final String TYPE = "myrimatchCache";
@@ -20,6 +21,7 @@ public final class MyrimatchCache extends WorkCache<MyrimatchWorkPacket> {
 		}
 	}
 
+	@Component("myrimatchCacheFactory")
 	public static final class Factory extends WorkCache.Factory<Config> {
 		private static MyrimatchCache cache;
 

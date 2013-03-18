@@ -103,7 +103,7 @@ public final class SearchDbWorker extends WorkerBase {
 	/**
 	 * A factory capable of creating the worker
 	 */
-	@Component("searchDbFactory")
+	@Component("searchDbWorkerFactory")
 	public static final class Factory extends WorkerFactoryBase<Config> {
 		private SearchDbDao searchDbDao;
 		private FastaDbDao fastaDbDao;

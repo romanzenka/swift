@@ -171,7 +171,7 @@ public final class WebUi {
 	/**
 	 * A factory capable of creating the web ui class.
 	 */
-	public static final class Factory extends FactoryBase<Config, WebUi> {
+	public static final class Factory extends FactoryBase<Config, WebUi> implements FactoryDescriptor {
 		private Collection<SearchEngine> searchEngines;
 		private SwiftMonitor swiftMonitor;
 		private FileTokenFactory fileTokenFactory;
@@ -304,6 +304,31 @@ public final class WebUi {
 
 		public void setWorkspaceDao(WorkspaceDao workspaceDao) {
 			this.workspaceDao = workspaceDao;
+		}
+
+		@Override
+		public String getType() {
+			return TYPE;
+		}
+
+		@Override
+		public String getUserName() {
+			return NAME;
+		}
+
+		@Override
+		public String getDescription() {
+			return DESC;
+		}
+
+		@Override
+		public Class<? extends ResourceConfig> getConfigClass() {
+			return Config.class;
+		}
+
+		@Override
+		public ServiceUiFactory getServiceUiFactory() {
+			return new Ui();
 		}
 	}
 

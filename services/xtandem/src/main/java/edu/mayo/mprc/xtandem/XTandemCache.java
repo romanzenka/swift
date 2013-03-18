@@ -6,6 +6,7 @@ import edu.mayo.mprc.config.ResourceConfig;
 import edu.mayo.mprc.config.ui.ServiceUiFactory;
 import edu.mayo.mprc.config.ui.UiBuilder;
 import edu.mayo.mprc.daemon.WorkCache;
+import org.springframework.stereotype.Component;
 
 public final class XTandemCache extends WorkCache<XTandemWorkPacket> {
 	public static final String TYPE = "tandemCache";
@@ -20,6 +21,7 @@ public final class XTandemCache extends WorkCache<XTandemWorkPacket> {
 		}
 	}
 
+	@Component("xtandemCacheFactory")
 	public static final class Factory extends WorkCache.Factory<Config> {
 		private static XTandemCache cache;
 
