@@ -9,9 +9,11 @@ import org.apache.log4j.Logger;
 import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.Restrictions;
 import org.joda.time.DateTime;
+import org.springframework.stereotype.Repository;
 
 import java.util.*;
 
+@Repository("workspaceDao")
 public final class WorkspaceDaoHibernate extends DaoBase implements WorkspaceDao, RuntimeInitializer {
 	private static final Logger LOGGER = Logger.getLogger(WorkspaceDaoHibernate.class);
 

@@ -21,10 +21,13 @@ import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.LogicalExpression;
 import org.hibernate.criterion.Restrictions;
 import org.joda.time.DateTime;
+import org.springframework.stereotype.Repository;
 
+import javax.annotation.Resource;
 import java.io.File;
 import java.util.*;
 
+@Repository("swiftDao")
 public final class SwiftDaoHibernate extends DaoBase implements SwiftDao {
 	private static final Logger LOGGER = Logger.getLogger(SwiftDaoHibernate.class);
 	private static final String MAP = "edu/mayo/mprc/swift/dbmapping/";
@@ -571,6 +574,7 @@ public final class SwiftDaoHibernate extends DaoBase implements SwiftDao {
 		return fileTokenFactory;
 	}
 
+	@Resource(name = "fileTokenFactory")
 	public void setFileTokenFactory(final FileTokenFactory fileTokenFactory) {
 		this.fileTokenFactory = fileTokenFactory;
 	}
@@ -612,13 +616,13 @@ public final class SwiftDaoHibernate extends DaoBase implements SwiftDao {
 		}
 
 		final long searchEngineCount = countAll(SearchEngineConfig.class);
-		if (searchEngineCount < searchEngines.size()) {
+		if (searchEngineCount < getSearchEngines().size()) {
 			final Change change = new Change(
 					searchEngineCount == 0 ?
 							"Installing initial list of search engines" :
 							"Updating list of search engines", new DateTime());
 			LOGGER.info(change.getReason());
-			for (final SearchEngine engine : searchEngines) {
+			for (final SearchEngine engine : getSearchEngines()) {
 				final SearchEngineConfig searchEngineConfig = new SearchEngineConfig(engine.getCode());
 				this.addSearchEngineConfig(searchEngineConfig, change);
 			}
@@ -629,6 +633,7 @@ public final class SwiftDaoHibernate extends DaoBase implements SwiftDao {
 		return workspaceDao;
 	}
 
+	@Resource(name = "workspaceDao")
 	public void setWorkspaceDao(final WorkspaceDao workspaceDao) {
 		this.workspaceDao = workspaceDao;
 	}
@@ -637,6 +642,7 @@ public final class SwiftDaoHibernate extends DaoBase implements SwiftDao {
 		return searchEngines;
 	}
 
+	@Resource(name = "searchEngines")
 	public void setSearchEngines(final List<SearchEngine> searchEngines) {
 		this.searchEngines = searchEngines;
 	}

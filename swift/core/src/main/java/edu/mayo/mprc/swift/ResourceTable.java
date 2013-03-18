@@ -53,6 +53,7 @@ import edu.mayo.mprc.xtandem.XTandemCache;
 import edu.mayo.mprc.xtandem.XTandemDeploymentService;
 import edu.mayo.mprc.xtandem.XTandemWorker;
 
+import javax.annotation.Resource;
 import java.lang.reflect.Field;
 import java.util.*;
 
@@ -73,6 +74,7 @@ public final class ResourceTable extends FactoryBase<ResourceConfig, Object> imp
 	private final Map</*configClass*/Class<? extends ResourceConfig>, ResourceInfo> tableConfigClass = new LinkedHashMap<Class<? extends ResourceConfig>, ResourceInfo>();
 
 	private ScaffoldDeploymentService.Factory scaffoldDeployerWorkerFactory;
+
 	private DatabaseFactory databaseFactory;
 	private MascotDeploymentService.Factory mascotDeployerWorkerFactory;
 	private SearchDbWorker.Factory searchDbWorkerFactory;
@@ -155,6 +157,7 @@ public final class ResourceTable extends FactoryBase<ResourceConfig, Object> imp
 		addRunner(GridRunner.TYPE, GridRunner.NAME, GridRunner.Config.class, getGridDaemonRunnerFactory());
 	}
 
+	@Resource(name = "scaffoldDeploymentServiceFactory")
 	public void setScaffoldDeployerWorkerFactory(final ScaffoldDeploymentService.Factory scaffoldDeployerWorkerFactory) {
 		this.scaffoldDeployerWorkerFactory = scaffoldDeployerWorkerFactory;
 	}
@@ -163,6 +166,7 @@ public final class ResourceTable extends FactoryBase<ResourceConfig, Object> imp
 		return scaffoldDeployerWorkerFactory;
 	}
 
+	@Resource(name = "databaseFactory")
 	public void setDatabaseFactory(final DatabaseFactory databaseFactory) {
 		this.databaseFactory = databaseFactory;
 	}
@@ -171,6 +175,7 @@ public final class ResourceTable extends FactoryBase<ResourceConfig, Object> imp
 		return databaseFactory;
 	}
 
+	@Resource(name = "mascotDeployerWorkerFactory")
 	public void setMascotDeployerWorkerFactory(final MascotDeploymentService.Factory mascotDeployerWorkerFactory) {
 		this.mascotDeployerWorkerFactory = mascotDeployerWorkerFactory;
 	}
@@ -183,6 +188,7 @@ public final class ResourceTable extends FactoryBase<ResourceConfig, Object> imp
 		return searchDbWorkerFactory;
 	}
 
+	@Resource(name = "searchDbFactory")
 	public void setSearchDbWorkerFactory(final SearchDbWorker.Factory searchDbWorkerFactory) {
 		this.searchDbWorkerFactory = searchDbWorkerFactory;
 	}
@@ -191,10 +197,12 @@ public final class ResourceTable extends FactoryBase<ResourceConfig, Object> imp
 		return fastaDbWorkerFactory;
 	}
 
+	@Resource(name = "fastaDbFactory")
 	public void setFastaDbWorkerFactory(final FastaDbWorker.Factory fastaDbWorkerFactory) {
 		this.fastaDbWorkerFactory = fastaDbWorkerFactory;
 	}
 
+	@Resource(name = "simpleDaemonRunnerFactory")
 	public void setSimpleDaemonRunnerFactory(final SimpleRunner.Factory factory) {
 		this.simpleDaemonRunnerFactory = factory;
 	}
@@ -207,6 +215,7 @@ public final class ResourceTable extends FactoryBase<ResourceConfig, Object> imp
 		return swiftSearcherFactory;
 	}
 
+	@Resource(name = "swiftSearcherFactory")
 	public void setSwiftSearcherFactory(final SwiftSearcher.Factory swiftSearcherFactory) {
 		this.swiftSearcherFactory = swiftSearcherFactory;
 	}
@@ -215,6 +224,7 @@ public final class ResourceTable extends FactoryBase<ResourceConfig, Object> imp
 		return databaseUndeployerFactory;
 	}
 
+	@Resource(name = "databaseUndeployerFactory")
 	public void setDatabaseUndeployerFactory(final DatabaseUndeployerWorker.Factory databaseUndeployerFactory) {
 		this.databaseUndeployerFactory = databaseUndeployerFactory;
 	}
@@ -223,6 +233,7 @@ public final class ResourceTable extends FactoryBase<ResourceConfig, Object> imp
 		return webUiFactory;
 	}
 
+	@Resource(name = "webUiFactory")
 	public void setWebUiFactory(final WebUi.Factory webUiFactory) {
 		this.webUiFactory = webUiFactory;
 	}
@@ -231,6 +242,7 @@ public final class ResourceTable extends FactoryBase<ResourceConfig, Object> imp
 		return gridDaemonRunnerFactory;
 	}
 
+	@Resource(name = "gridDaemonRunnerFactory")
 	public void setGridDaemonRunnerFactory(final GridRunner.Factory gridDaemonRunnerFactory) {
 		this.gridDaemonRunnerFactory = gridDaemonRunnerFactory;
 	}
@@ -353,6 +365,7 @@ public final class ResourceTable extends FactoryBase<ResourceConfig, Object> imp
 		return getTable().keySet();
 	}
 
+	@Resource(name = "omssaWorkerFactory")
 	public void setOmssaWorkerFactory(final OmssaWorker.Factory omssaWorkerFactory) {
 		this.omssaWorkerFactory = omssaWorkerFactory;
 	}
@@ -361,6 +374,7 @@ public final class ResourceTable extends FactoryBase<ResourceConfig, Object> imp
 		return omssaWorkerFactory;
 	}
 
+	@Resource(name = "sequestDeployerFactory")
 	public void setSequestDeployerWorkerFactory(final SequestDeploymentService.Factory sequestDeployerWorkerFactory) {
 		this.sequestDeployerWorkerFactory = sequestDeployerWorkerFactory;
 	}
@@ -373,6 +387,7 @@ public final class ResourceTable extends FactoryBase<ResourceConfig, Object> imp
 		return daemonConnectionFactory;
 	}
 
+	@Resource(name = "daemonConnectionFactory")
 	public void setDaemonConnectionFactory(final DaemonConnectionFactory daemonConnectionFactory) {
 		this.daemonConnectionFactory = daemonConnectionFactory;
 	}
@@ -381,6 +396,7 @@ public final class ResourceTable extends FactoryBase<ResourceConfig, Object> imp
 		return databaseValidator;
 	}
 
+	@Resource(name = "databaseValidator")
 	public void setDatabaseValidator(final DatabaseValidator databaseValidator) {
 		this.databaseValidator = databaseValidator;
 	}

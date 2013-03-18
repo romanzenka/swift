@@ -1,8 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd"
        default-lazy-init="true" default-autowire="no">
+
+    <context:component-scan base-package="edu.mayo.mprc"/>
+
     <bean id="defaultPropertyConfigurator"
           class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
         <property name="locations">
@@ -39,9 +43,6 @@
         <property name="sequestMappingFactory" ref="sequestMappingFactory"/>
     </bean>
 
-    <bean id="scaffoldDeployerWorkerFactory" class="edu.mayo.mprc.scaffold.ScaffoldDeploymentService$Factory">
-    </bean>
-
     <bean id="aminoAcidSet" class="edu.mayo.mprc.chem.AminoAcidSet">
     </bean>
 
@@ -60,59 +61,7 @@
         </constructor-arg>
     </bean>
 
-    <bean id="databaseFactory" class="edu.mayo.mprc.database.DatabaseFactory">
-        <property name="hibernateProperties" ref="hibernateProperties"/>
-        <property name="daoList" ref="daoList"/>
-        <property name="placeholder" ref="databasePlaceholder"/>
-    </bean>
-
-    <bean id="swiftSearcherFactory" class="edu.mayo.mprc.swift.search.SwiftSearcher$Factory">
-        <property name="curationDao" ref="curationDao"/>
-        <property name="swiftDao" ref="swiftDao"/>
-        <property name="searchEngines" ref="searchEngines"/>
-        <property name="fileTokenFactory" ref="fileTokenFactory"/>
-    </bean>
-
-    <bean id="searchDbFactory" class="edu.mayo.mprc.searchdb.SearchDbWorker$Factory">
-        <property name="searchDbDao" ref="searchDbDao"/>
-        <property name="fastaDbDao" ref="fastaDbDao"/>
-        <property name="curationDao" ref="curationDao"/>
-        <property name="unimodDao" ref="unimodDao"/>
-        <property name="swiftDao" ref="swiftDao"/>
-    </bean>
-
-    <bean id="fastaDbFactory" class="edu.mayo.mprc.fastadb.FastaDbWorker$Factory">
-        <property name="curationDao" ref="curationDao"/>
-        <property name="fastaDbDao" ref="fastaDbDao"/>
-    </bean>
-
-    <bean id="databaseUndeployerFactory" class="edu.mayo.mprc.dbundeploy.DatabaseUndeployerWorker$Factory">
-        <property name="fileTokenFactory" ref="fileTokenFactory"/>
-        <property name="curationDao" ref="curationDao"/>
-    </bean>
-
-    <bean id="gridDaemonRunnerFactory" class="edu.mayo.mprc.sge.GridRunner$Factory">
-        <property name="gridEngineManager" ref="gridEngineJobManager"/>
-        <property name="gridScriptFactory" ref="gridScriptFactory"/>
-        <property name="messengerFactory" ref="messengerFactory"/>
-        <property name="fileTokenFactory" ref="fileTokenFactory"/>
-    </bean>
-
     <bean id="resourceTable" class="edu.mayo.mprc.swift.ResourceTable">
-        <property name="scaffoldDeployerWorkerFactory" ref="scaffoldDeployerWorkerFactory"/>
-        <property name="databaseFactory" ref="databaseFactory"/>
-        <property name="mascotDeployerWorkerFactory" ref="mascotDeployerWorkerFactory"/>
-        <property name="simpleDaemonRunnerFactory" ref="simpleDaemonRunnerFactory"/>
-        <property name="omssaWorkerFactory" ref="omssaWorkerFactory"/>
-        <property name="sequestDeployerWorkerFactory" ref="sequestDeployerFactory"/>
-        <property name="swiftSearcherFactory" ref="swiftSearcherFactory"/>
-        <property name="databaseUndeployerFactory" ref="databaseUndeployerFactory"/>
-        <property name="gridDaemonRunnerFactory" ref="gridDaemonRunnerFactory"/>
-        <property name="webUiFactory" ref="webUiFactory"/>
-        <property name="daemonConnectionFactory" ref="daemonConnectionFactory"/>
-        <property name="databaseValidator" ref="databaseValidator"/>
-        <property name="fastaDbWorkerFactory" ref="fastaDbFactory"/>
-        <property name="searchDbWorkerFactory" ref="searchDbFactory"/>
     </bean>
 
     <bean id="dependencyResolver" class="edu.mayo.mprc.config.DependencyResolver">
@@ -123,7 +72,6 @@
           class="edu.mayo.mprc.swift.search.DatabaseValidator">
         <property name="daoList" ref="daoList"/>
         <property name="hibernateProperties" ref="hibernateProperties"/>
-        <property name="databasePlaceholder" ref="databasePlaceholder"/>
         <property name="runtimeInitializers" ref="searcherRuntimeInitializers"/>
         <property name="fileTokenFactory" ref="fileTokenFactory"/>
     </bean>
@@ -137,9 +85,6 @@
     </bean>
 
     <bean id="sequestToMakeDbConverter" class="edu.mayo.mprc.sequest.SequestToMakeDBConverter"/>
-
-    <bean id="fileTokenFactory" class="edu.mayo.mprc.daemon.files.FileTokenFactory">
-    </bean>
 
     <!-- Provides a WebUi interface after it gets configured -->
     <bean id="webUiHolder" class="edu.mayo.mprc.swift.WebUiHolder">
@@ -187,44 +132,6 @@
     <bean id="tandemMappingFactory" class="edu.mayo.mprc.xtandem.XTandemMappingFactory"/>
     <bean id="omssaMappingFactory" class="edu.mayo.mprc.omssa.OmssaMappingFactory"/>
     <bean id="myrimatchMappingFactory" class="edu.mayo.mprc.myrimatch.MyrimatchMappingFactory"/>
-
-    <bean id="unimodDao" class="edu.mayo.mprc.unimod.UnimodDaoHibernate">
-        <constructor-arg index="0" ref="databasePlaceholder"/>
-    </bean>
-
-    <bean id="paramsDao" class="edu.mayo.mprc.swift.params2.ParamsDaoHibernate">
-        <constructor-arg index="0" ref="databasePlaceholder"/>
-    </bean>
-
-    <bean id="databasePlaceholder" class="edu.mayo.mprc.database.DatabasePlaceholder"/>
-
-    <bean id="curationDao" class="edu.mayo.mprc.dbcurator.model.persistence.CurationDaoImpl">
-        <!-- if you need to get access to a session directly for some reason you can do it but try to avoid this -->
-        <constructor-arg index="0" ref="databasePlaceholder"/>
-    </bean>
-
-    <bean id="fastaDbDao" class="edu.mayo.mprc.fastadb.FastaDbDaoHibernate">
-        <!-- if you need to get access to a session directly for some reason you can do it but try to avoid this -->
-        <constructor-arg index="0" ref="databasePlaceholder"/>
-    </bean>
-
-
-    <bean id="swiftDao" class="edu.mayo.mprc.swift.db.SwiftDaoHibernate">
-        <property name="databasePlaceholder" ref="databasePlaceholder"/>
-        <property name="fileTokenFactory" ref="fileTokenFactory"/>
-        <property name="workspaceDao" ref="workspaceDao"/>
-        <property name="searchEngines" ref="searchEngines"/>
-    </bean>
-
-    <bean id="searchDbDao" class="edu.mayo.mprc.searchdb.dao.SearchDbDaoHibernate">
-        <constructor-arg index="0" ref="swiftDao"/>
-        <constructor-arg index="1" ref="fastaDbDao"/>
-        <constructor-arg index="2" ref="databasePlaceholder"/>
-    </bean>
-
-    <bean id="workspaceDao" class="edu.mayo.mprc.workspace.WorkspaceDaoHibernate">
-        <constructor-arg index="0" type="edu.mayo.mprc.database.DatabasePlaceholder" ref="databasePlaceholder"/>
-    </bean>
 
     <bean id="paramsInfo" class="edu.mayo.mprc.swift.params2.mapping.ParamsInfoImpl">
         <constructor-arg index="0" ref="curationDao"/>
@@ -392,7 +299,6 @@
     </bean>
 
     <bean class="edu.mayo.mprc.swift.commands.UpgradeUnimodCommand" id="upgradeUnimodCommand">
-        <property name="unimodDao" ref="unimodDao"/>
     </bean>
 
     <bean id="serviceFactory" class="edu.mayo.mprc.messaging.ServiceFactory"/>

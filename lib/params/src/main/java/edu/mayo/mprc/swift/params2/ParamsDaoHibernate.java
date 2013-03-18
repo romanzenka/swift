@@ -14,9 +14,11 @@ import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.criterion.SimpleExpression;
 import org.joda.time.DateTime;
+import org.springframework.stereotype.Repository;
 
 import java.util.*;
 
+@Repository("paramsDao")
 public final class ParamsDaoHibernate extends DaoBase implements ParamsDao {
 	private static final Logger LOGGER = Logger.getLogger(ParamsDaoHibernate.class);
 

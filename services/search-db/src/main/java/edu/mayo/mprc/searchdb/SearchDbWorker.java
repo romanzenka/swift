@@ -22,7 +22,9 @@ import edu.mayo.mprc.unimod.Unimod;
 import edu.mayo.mprc.unimod.UnimodDao;
 import edu.mayo.mprc.utilities.FileUtilities;
 import edu.mayo.mprc.utilities.progress.UserProgressReporter;
+import org.springframework.stereotype.Component;
 
+import javax.annotation.Resource;
 import java.io.File;
 import java.util.Map;
 import java.util.TreeMap;
@@ -101,6 +103,7 @@ public final class SearchDbWorker extends WorkerBase {
 	/**
 	 * A factory capable of creating the worker
 	 */
+	@Component("searchDbFactory")
 	public static final class Factory extends WorkerFactoryBase<Config> {
 		private SearchDbDao searchDbDao;
 		private FastaDbDao fastaDbDao;
@@ -112,6 +115,7 @@ public final class SearchDbWorker extends WorkerBase {
 			return searchDbDao;
 		}
 
+		@Resource(name="searchDbDao")
 		public void setSearchDbDao(final SearchDbDao searchDbDao) {
 			this.searchDbDao = searchDbDao;
 		}
@@ -120,6 +124,7 @@ public final class SearchDbWorker extends WorkerBase {
 			return fastaDbDao;
 		}
 
+		@Resource(name="fastaDbDao")
 		public void setFastaDbDao(final FastaDbDao fastaDbDao) {
 			this.fastaDbDao = fastaDbDao;
 		}
@@ -128,6 +133,7 @@ public final class SearchDbWorker extends WorkerBase {
 			return curationDao;
 		}
 
+		@Resource(name="curationDao")
 		public void setCurationDao(final CurationDao curationDao) {
 			this.curationDao = curationDao;
 		}
@@ -136,6 +142,7 @@ public final class SearchDbWorker extends WorkerBase {
 			return unimodDao;
 		}
 
+		@Resource(name="unimodDao")
 		public void setUnimodDao(final UnimodDao unimodDao) {
 			this.unimodDao = unimodDao;
 		}
@@ -144,6 +151,7 @@ public final class SearchDbWorker extends WorkerBase {
 			return swiftDao;
 		}
 
+		@Resource(name="swiftDao")
 		public void setSwiftDao(final SwiftDao swiftDao) {
 			this.swiftDao = swiftDao;
 		}

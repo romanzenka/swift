@@ -8,6 +8,7 @@ import edu.mayo.mprc.utilities.ResourceUtilities;
 import org.apache.log4j.Logger;
 import org.hibernate.Session;
 import org.joda.time.DateTime;
+import org.springframework.stereotype.Repository;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -21,6 +22,7 @@ import java.util.Map;
  * <p/>
  * The DAO allows you to return current modification set, and to upgrade the set from a given file.
  */
+@Repository("unimodDao")
 public final class UnimodDaoHibernate extends DaoBase implements UnimodDao {
 	private static final Logger LOGGER = Logger.getLogger(UnimodDaoHibernate.class);
 

@@ -17,6 +17,13 @@
     <description>MPRC services - daemons providing various functions that can be combined into specific solutions
     </description>
 
+    <dependencies>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-context</artifactId>
+        </dependency>
+    </dependencies>
+
     <modules>
         <module>db-undeploy</module>
         <module>fasta-db</module>

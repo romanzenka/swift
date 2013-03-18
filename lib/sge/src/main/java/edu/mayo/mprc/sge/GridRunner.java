@@ -17,7 +17,9 @@ import edu.mayo.mprc.messaging.rmi.MessengerFactory;
 import edu.mayo.mprc.messaging.rmi.SimpleOneWayMessenger;
 import edu.mayo.mprc.utilities.FileUtilities;
 import org.apache.log4j.Logger;
+import org.springframework.stereotype.Component;
 
+import javax.annotation.Resource;
 import java.io.*;
 import java.util.Date;
 import java.util.List;
@@ -523,6 +525,7 @@ public final class GridRunner extends AbstractRunner {
 		}
 	}
 
+	@Component("gridDaemonRunnerFactory")
 	public static final class Factory extends FactoryBase<Config, GridRunner> {
 
 		private GridEngineJobManager gridEngineManager;
@@ -567,6 +570,7 @@ public final class GridRunner extends AbstractRunner {
 			return gridEngineManager;
 		}
 
+		@Resource(name = "gridEngineJobManager")
 		public void setGridEngineManager(final GridEngineJobManager gridEngineManager) {
 			this.gridEngineManager = gridEngineManager;
 		}
@@ -575,6 +579,7 @@ public final class GridRunner extends AbstractRunner {
 			return gridScriptFactory;
 		}
 
+		@Resource(name = "gridScriptFactory")
 		public void setGridScriptFactory(final GridScriptFactory gridScriptFactory) {
 			this.gridScriptFactory = gridScriptFactory;
 		}
@@ -583,6 +588,7 @@ public final class GridRunner extends AbstractRunner {
 			return messengerFactory;
 		}
 
+		@Resource(name = "messengerFactory")
 		public void setMessengerFactory(final MessengerFactory messengerFactory) {
 			this.messengerFactory = messengerFactory;
 		}
@@ -591,6 +597,7 @@ public final class GridRunner extends AbstractRunner {
 			return fileTokenFactory;
 		}
 
+		@Resource(name = "fileTokenFactory")
 		public void setFileTokenFactory(final FileTokenFactory fileTokenFactory) {
 			this.fileTokenFactory = fileTokenFactory;
 		}

@@ -12,6 +12,7 @@ import edu.mayo.mprc.utilities.progress.UserProgressReporter;
 import org.apache.log4j.Logger;
 import org.hibernate.Query;
 import org.hibernate.StatelessSession;
+import org.springframework.stereotype.Repository;
 
 import javax.annotation.Nullable;
 import java.io.File;
@@ -24,6 +25,7 @@ import java.util.Collection;
  *
  * @author Roman Zenka
  */
+@Repository("fastaDbDao")
 public final class FastaDbDaoHibernate extends DaoBase implements FastaDbDao {
 	private static final Logger LOGGER = Logger.getLogger(FastaDbDaoHibernate.class);
 	// Progress will be checked each X spectra

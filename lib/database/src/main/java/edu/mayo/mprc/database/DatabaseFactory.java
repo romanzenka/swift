@@ -9,9 +9,12 @@ import edu.mayo.mprc.config.ui.ServiceUiFactory;
 import edu.mayo.mprc.config.ui.UiBuilder;
 import edu.mayo.mprc.utilities.exceptions.ExceptionUtilities;
 import org.hibernate.SessionFactory;
+import org.springframework.stereotype.Component;
 
+import javax.annotation.Resource;
 import java.util.*;
 
+@Component("databaseFactory")
 public final class DatabaseFactory extends FactoryBase<ResourceConfig, SessionFactory> {
 
 	public static final String TYPE = "database";
@@ -46,6 +49,7 @@ public final class DatabaseFactory extends FactoryBase<ResourceConfig, SessionFa
 		return hibernateProperties;
 	}
 
+	@Resource(name = "hibernateProperties")
 	public void setHibernateProperties(final Map<String, String> hibernateProperties) {
 		this.hibernateProperties = hibernateProperties;
 	}
@@ -54,6 +58,7 @@ public final class DatabaseFactory extends FactoryBase<ResourceConfig, SessionFa
 		return daoList;
 	}
 
+	@Resource(name = "daoList")
 	public void setDaoList(final List<DaoBase> daoList) {
 		this.daoList = daoList;
 	}
@@ -62,6 +67,7 @@ public final class DatabaseFactory extends FactoryBase<ResourceConfig, SessionFa
 		return placeholder;
 	}
 
+	@Resource(name = "databasePlaceholder")
 	public void setPlaceholder(final DatabasePlaceholder placeholder) {
 		this.placeholder = placeholder;
 	}

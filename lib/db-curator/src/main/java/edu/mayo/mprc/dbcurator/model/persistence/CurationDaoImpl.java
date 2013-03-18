@@ -12,6 +12,7 @@ import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.criterion.*;
 import org.joda.time.DateTime;
+import org.springframework.stereotype.Repository;
 
 import java.io.File;
 import java.util.*;
@@ -24,6 +25,7 @@ import java.util.regex.Pattern;
  * <p/>
  * A singleton accessed by the get() method
  */
+@Repository("curationDao")
 public final class CurationDaoImpl extends DaoBase implements CurationDao {
 	private List<Curation> allCurationList = null;
 	private Change legacyCurationChange = null;

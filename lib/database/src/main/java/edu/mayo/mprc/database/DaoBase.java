@@ -8,6 +8,7 @@ import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 
+import javax.annotation.Resource;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
@@ -30,6 +31,7 @@ public abstract class DaoBase implements Dao {
 		this.databasePlaceholder = databasePlaceholder;
 	}
 
+	@Resource(name = "databasePlaceholder")
 	public void setDatabasePlaceholder(final DatabasePlaceholder databasePlaceholder) {
 		this.databasePlaceholder = databasePlaceholder;
 	}

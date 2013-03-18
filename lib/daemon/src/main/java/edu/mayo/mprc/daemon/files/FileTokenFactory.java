@@ -8,6 +8,7 @@ import edu.mayo.mprc.filesharing.FileTransferHandler;
 import edu.mayo.mprc.filesharing.jms.JmsFileTransferHandlerFactory;
 import edu.mayo.mprc.utilities.FileUtilities;
 import org.apache.log4j.Logger;
+import org.springframework.stereotype.Component;
 
 import java.io.File;
 import java.net.URI;
@@ -34,6 +35,7 @@ import java.util.concurrent.Executors;
  * </li>
  * </ol>
  */
+@Component("fileTokenFactory")
 public final class FileTokenFactory implements SenderTokenTranslator, ReceiverTokenTranslator, FileTokenSynchronizer {
 
 	private static final Logger LOGGER = Logger.getLogger(FileTokenFactory.class);

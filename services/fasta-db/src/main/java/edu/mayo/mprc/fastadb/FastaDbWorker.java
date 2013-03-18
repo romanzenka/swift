@@ -14,7 +14,9 @@ import edu.mayo.mprc.database.DatabaseFactory;
 import edu.mayo.mprc.dbcurator.model.Curation;
 import edu.mayo.mprc.dbcurator.model.persistence.CurationDao;
 import edu.mayo.mprc.utilities.progress.UserProgressReporter;
+import org.springframework.stereotype.Component;
 
+import javax.annotation.Resource;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -63,6 +65,7 @@ public class FastaDbWorker extends WorkerBase {
 	/**
 	 * A factory capable of creating the worker
 	 */
+	@Component("fastaDbFactory")
 	public static final class Factory extends WorkerFactoryBase<Config> {
 		private FastaDbDao fastaDbDao;
 		private CurationDao curationDao;
@@ -71,6 +74,7 @@ public class FastaDbWorker extends WorkerBase {
 			return fastaDbDao;
 		}
 
+		@Resource(name = "fastaDbDao")
 		public void setFastaDbDao(final FastaDbDao fastaDbDao) {
 			this.fastaDbDao = fastaDbDao;
 		}
@@ -79,6 +83,7 @@ public class FastaDbWorker extends WorkerBase {
 			return curationDao;
 		}
 
+		@Resource(name = "curationDao")
 		public void setCurationDao(final CurationDao curationDao) {
 			this.curationDao = curationDao;
 		}

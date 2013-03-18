@@ -59,7 +59,9 @@ import edu.mayo.mprc.utilities.progress.ProgressReporter;
 import edu.mayo.mprc.xtandem.XTandemCache;
 import edu.mayo.mprc.xtandem.XTandemDeploymentService;
 import edu.mayo.mprc.xtandem.XTandemWorker;
+import org.springframework.stereotype.Component;
 
+import javax.annotation.Resource;
 import java.util.*;
 import java.util.concurrent.ExecutorService;
 
@@ -462,6 +464,7 @@ public final class SwiftSearcher implements Worker {
 	/**
 	 * A factory capable of creating the worker
 	 */
+	@Component("swiftSearcherFactory")
 	public static final class Factory extends WorkerFactoryBase<Config> {
 		private Collection<SearchEngine> searchEngines;
 		private CurationDao curationDao;
@@ -546,6 +549,7 @@ public final class SwiftSearcher implements Worker {
 			return searchEngines;
 		}
 
+		@Resource(name = "searchEngines")
 		public void setSearchEngines(final Collection<SearchEngine> searchEngines) {
 			this.searchEngines = searchEngines;
 		}
@@ -554,6 +558,7 @@ public final class SwiftSearcher implements Worker {
 			return curationDao;
 		}
 
+		@Resource(name = "curationDao")
 		public void setCurationDao(final CurationDao curationDao) {
 			this.curationDao = curationDao;
 		}
@@ -562,6 +567,7 @@ public final class SwiftSearcher implements Worker {
 			return swiftDao;
 		}
 
+		@Resource(name = "swiftDao")
 		public void setSwiftDao(final SwiftDao swiftDao) {
 			this.swiftDao = swiftDao;
 		}
@@ -570,6 +576,7 @@ public final class SwiftSearcher implements Worker {
 			return fileTokenFactory;
 		}
 
+		@Resource(name = "fileTokenFactory")
 		public void setFileTokenFactory(final FileTokenFactory fileTokenFactory) {
 			this.fileTokenFactory = fileTokenFactory;
 		}

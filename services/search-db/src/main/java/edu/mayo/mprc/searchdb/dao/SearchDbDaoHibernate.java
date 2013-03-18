@@ -15,7 +15,9 @@ import edu.mayo.mprc.utilities.progress.PercentDoneReporter;
 import edu.mayo.mprc.utilities.progress.UserProgressReporter;
 import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.Restrictions;
+import org.springframework.stereotype.Repository;
 
+import javax.annotation.Resource;
 import java.util.*;
 
 /**
@@ -24,6 +26,7 @@ import java.util.*;
  *
  * @author Roman Zenka
  */
+@Repository("searchDbDao")
 public final class SearchDbDaoHibernate extends DaoBase implements RuntimeInitializer, SearchDbDao {
 	private SwiftDao swiftDao;
 	private FastaDbDao fastaDbDao;
@@ -47,6 +50,7 @@ public final class SearchDbDaoHibernate extends DaoBase implements RuntimeInitia
 		return swiftDao;
 	}
 
+	@Resource(name="swiftDao")
 	public void setSwiftDao(final SwiftDao swiftDao) {
 		this.swiftDao = swiftDao;
 	}
@@ -55,6 +59,7 @@ public final class SearchDbDaoHibernate extends DaoBase implements RuntimeInitia
 		return fastaDbDao;
 	}
 
+	@Resource(name="fastaDbDao")
 	public void setFastaDbDao(final FastaDbDao fastaDbDao) {
 		this.fastaDbDao = fastaDbDao;
 	}

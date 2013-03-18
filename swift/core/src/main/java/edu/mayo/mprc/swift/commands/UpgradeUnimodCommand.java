@@ -9,6 +9,8 @@ import edu.mayo.mprc.unimod.UnimodUpgrade;
 import org.apache.log4j.Logger;
 import org.joda.time.DateTime;
 
+import javax.annotation.Resource;
+
 /**
  * @author Roman Zenka
  */
@@ -20,6 +22,7 @@ public final class UpgradeUnimodCommand implements SwiftCommand {
 		return unimodDao;
 	}
 
+	@Resource(name = "unimodDao")
 	public void setUnimodDao(UnimodDao unimodDao) {
 		this.unimodDao = unimodDao;
 	}

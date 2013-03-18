@@ -4,6 +4,7 @@ import edu.mayo.mprc.MprcException;
 import org.apache.log4j.Logger;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.springframework.stereotype.Component;
 
 /**
  * Used for spring injection - holds a session factory that gets created manually after the database is validated.
@@ -12,6 +13,7 @@ import org.hibernate.SessionFactory;
  * This is THE way how to get to the database that all the DAOs use. The DAOs do not hold their own
  * session, they defer to this object, which uses {@link ThreadLocal} storage for the session.
  */
+@Component("databasePlaceholder")
 public final class DatabasePlaceholder {
 	private static final Logger LOGGER = Logger.getLogger(DatabasePlaceholder.class);
 	private SessionFactory sessionFactory;

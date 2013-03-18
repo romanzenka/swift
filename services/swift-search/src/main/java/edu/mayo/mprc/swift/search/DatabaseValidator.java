@@ -11,6 +11,7 @@ import edu.mayo.mprc.database.*;
 import edu.mayo.mprc.swift.db.FileTokenFactoryWrapper;
 import org.hibernate.SessionFactory;
 
+import javax.annotation.Resource;
 import java.io.File;
 import java.util.HashMap;
 import java.util.List;
@@ -231,6 +232,7 @@ public final class DatabaseValidator implements RuntimeInitializer {
 		return databasePlaceholder;
 	}
 
+	@Resource(name = "databasePlaceholder")
 	public void setDatabasePlaceholder(final DatabasePlaceholder databasePlaceholder) {
 		this.databasePlaceholder = databasePlaceholder;
 	}
