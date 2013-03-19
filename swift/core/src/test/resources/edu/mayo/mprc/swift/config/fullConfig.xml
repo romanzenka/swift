@@ -1,6 +1,7 @@
 <application id="1">
   <daemons id="2">
     <daemon id="3" name="main">
+      <dumpErrors>false</dumpErrors>
       <services id="4">
         <service id="5" name="mascot">
           <runner class="localRunner" id="6">
