@@ -14,6 +14,8 @@ import edu.mayo.mprc.daemon.Worker;
 import edu.mayo.mprc.daemon.WorkerBase;
 import edu.mayo.mprc.daemon.WorkerFactoryBase;
 import edu.mayo.mprc.daemon.exception.DaemonException;
+import edu.mayo.mprc.searchengine.EngineFactory;
+import edu.mayo.mprc.searchengine.EngineMetadata;
 import edu.mayo.mprc.utilities.FileUtilities;
 import edu.mayo.mprc.utilities.ProcessCaller;
 import edu.mayo.mprc.utilities.StreamRegExMatcher;
@@ -211,7 +213,16 @@ public final class XTandemWorker extends WorkerBase {
 	 * A factory capable of creating the worker
 	 */
 	@Component("xTandemWorkerFactory")
-	public static final class Factory extends WorkerFactoryBase<Config> {
+	public static final class Factory extends WorkerFactoryBase<Config> implements EngineFactory {
+
+		private static final EngineMetadata ENGINE_METADATA = new EngineMetadata(
+				"TANDEM", ".xml", "Tandem", true, "tandem", new XTandemMappingFactory(),
+				new String[]{TYPE},
+				new String[]{XTandemCache.TYPE},
+				new String[]{XTandemDeploymentService.TYPE},
+				30, false);
+
+
 		@Override
 		public Worker create(final Config config, final DependencyResolver dependencies) {
 			XTandemWorker worker = null;
@@ -221,6 +232,11 @@ public final class XTandemWorker extends WorkerBase {
 				throw new MprcException("Tandem worker could not be created.", e);
 			}
 			return worker;
+		}
+
+		@Override
+		public EngineMetadata getEngineMetadata() {
+			return ENGINE_METADATA;
 		}
 	}
 

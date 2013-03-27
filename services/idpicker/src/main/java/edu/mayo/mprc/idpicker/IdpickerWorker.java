@@ -13,6 +13,8 @@ import edu.mayo.mprc.daemon.WorkPacket;
 import edu.mayo.mprc.daemon.Worker;
 import edu.mayo.mprc.daemon.WorkerBase;
 import edu.mayo.mprc.daemon.WorkerFactoryBase;
+import edu.mayo.mprc.searchengine.EngineFactory;
+import edu.mayo.mprc.searchengine.EngineMetadata;
 import edu.mayo.mprc.utilities.FileUtilities;
 import edu.mayo.mprc.utilities.ProcessCaller;
 import edu.mayo.mprc.utilities.exceptions.ExceptionUtilities;
@@ -126,13 +128,24 @@ public final class IdpickerWorker extends WorkerBase {
 	 * A factory capable of creating the worker
 	 */
 	@Component("idPickerWorkerFactory")
-	public static final class Factory extends WorkerFactoryBase<Config> {
+	public static final class Factory extends WorkerFactoryBase<Config> implements EngineFactory {
+		private static final EngineMetadata ENGINE_METADATA = new EngineMetadata(
+				"IDPICKER", ".idp", "ID Picker", false, "idpicker", null,
+				new String[]{TYPE},
+				new String[]{IdpickerCache.TYPE},
+				new String[]{IdpickerDeploymentService.TYPE},
+				80, true);
 
 		@Override
 		public Worker create(final Config config, final DependencyResolver dependencies) {
 			final IdpickerWorker worker = new IdpickerWorker();
 			worker.setIdpQonvertExecutable(new File(config.getIdpQonvertExecutable()));
 			return worker;
+		}
+
+		@Override
+		public EngineMetadata getEngineMetadata() {
+			return ENGINE_METADATA;
 		}
 	}
 

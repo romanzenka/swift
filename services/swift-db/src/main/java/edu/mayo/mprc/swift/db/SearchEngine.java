@@ -1,15 +1,21 @@
 package edu.mayo.mprc.swift.db;
 
+import com.google.common.collect.Maps;
 import edu.mayo.mprc.MprcException;
+import edu.mayo.mprc.config.*;
+import edu.mayo.mprc.config.ui.ServiceUiFactory;
 import edu.mayo.mprc.daemon.DaemonConnection;
+import edu.mayo.mprc.searchengine.EngineMetadata;
 import edu.mayo.mprc.swift.params2.ParamName;
 import edu.mayo.mprc.swift.params2.SearchEngineParameters;
 import edu.mayo.mprc.swift.params2.mapping.*;
 import edu.mayo.mprc.utilities.FileUtilities;
-import org.apache.log4j.Logger;
+import org.springframework.stereotype.Component;
 
+import javax.annotation.Resource;
 import java.io.*;
 import java.util.Collection;
+import java.util.Map;
 
 /**
  * Object representing a configured search engine.
@@ -20,47 +26,47 @@ import java.util.Collection;
  * Since the object is very heavy-weight, it should not be stored and transferred as is. Instead use the {@link #getCode()} method
  * and {@link #getForId}.
  */
-public final class SearchEngine implements Serializable, Comparable<SearchEngine>, Cloneable {
-	private static final long serialVersionUID = 20080212L;
-	private static final Logger LOGGER = Logger.getLogger(SearchEngine.class);
+public final class SearchEngine implements Comparable<SearchEngine> {
+	private EngineMetadata engineMetadata;
+	private String version;
 
-	private String code;
-	private String resultExtension;
-	private String doSearchXmlAttribute;
-	private String friendlyName;
-	private boolean isOnByDefault;
-	private String outputDirName;
-	private ParamsInfo paramsInfo;
+	private DaemonConnection searchDaemon;
+	private DaemonConnection dbDeployDaemon;
 
-	private transient MappingFactory mappingFactory;
-	private transient DaemonConnection searchDaemon;
-	private transient DaemonConnection dbDeployDaemon;
+	public SearchEngine() {
+	}
 
-	public static SearchEngine getForId(final String id, final Collection<SearchEngine> engines) {
+	public SearchEngine(final EngineMetadata engineMetadata, final String version, final DaemonConnection searchDaemon, final DaemonConnection dbDeployDaemon) {
+		if (engineMetadata == null) {
+			throw new MprcException("The search engine must have metadata always defined. This is a programmer error.");
+		}
+		this.engineMetadata = engineMetadata;
+		this.version = version;
+		this.searchDaemon = searchDaemon;
+		this.dbDeployDaemon = dbDeployDaemon;
+		if (searchDaemon == null) {
+			throw new MprcException("Configuration error: Engine " + engineMetadata.getCode() + " version " + version + " must have the worker daemon defined in order to function");
+		}
+		if (searchDaemon == null) {
+			throw new MprcException("Configuration error: Engine " + engineMetadata.getCode() + " version " + version + " must have the deployer daemon defined in order to function");
+		}
+	}
+
+	/**
+	 * Get an engine for given engine code and version.
+	 *
+	 * @param code    Code of the engine (e.g. MASCOT)
+	 * @param ver     Specific version of the engine.
+	 * @param engines List of all engines we know about.
+	 * @return Configured engine ready to have commands sent to it.
+	 */
+	public static SearchEngine getForId(final String code, final String ver, final Collection<SearchEngine> engines) {
 		for (final SearchEngine engine : engines) {
-			if (engine.getCode().equalsIgnoreCase(id)) {
+			if (engine.getCode().equalsIgnoreCase(code) && engine.getVersion().equalsIgnoreCase(ver)) {
 				return engine;
 			}
 		}
 		return null;
-	}
-
-	/**
-	 * Take the parameters as entered by the user and produce a file per each search engine in the given folder.
-	 * The files will have default names as specified by {@link edu.mayo.mprc.swift.params2.mapping.MappingFactory#getCanonicalParamFileName()}.
-	 *
-	 * @param parameters  Parameters to map.
-	 * @param folder      Where to write parameter files.
-	 * @param engines     List of engines to map.
-	 * @param validations Validations for all the parameters for all the search engines.
-	 */
-	public static void mapToParameterFiles(final SearchEngineParameters parameters, final File folder, final Collection<SearchEngine> engines, ParamsValidations validations) {
-		if (validations == null) {
-			validations = new ParamsValidations();
-		}
-		for (final SearchEngine engine : engines) {
-			engine.writeSearchEngineParameterFile(folder, parameters, validations);
-		}
 	}
 
 	/**
@@ -70,10 +76,10 @@ public final class SearchEngine implements Serializable, Comparable<SearchEngine
 	 * @param engines    List of engines that has to have valid parameter mappings.
 	 * @return Object with a list of validations for each parameter
 	 */
-	public static ParamsValidations validate(final SearchEngineParameters parameters, final Collection<SearchEngine> engines) {
+	public static ParamsValidations validate(final SearchEngineParameters parameters, final Collection<SearchEngine> engines, final ParamsInfo paramsInfo) {
 		final ParamsValidations validations = new ParamsValidations();
 		for (final SearchEngine engine : engines) {
-			engine.validate(parameters, validations);
+			engine.validate(parameters, validations, paramsInfo);
 		}
 		return validations;
 	}
@@ -86,7 +92,7 @@ public final class SearchEngine implements Serializable, Comparable<SearchEngine
 	 * @param validations Object to be filled with parameter file validations
 	 * @return The generated parameter file.
 	 */
-	public File writeSearchEngineParameterFile(final File folder, final SearchEngineParameters params, final ParamsValidations validations) {
+	public File writeSearchEngineParameterFile(final File folder, final SearchEngineParameters params, final ParamsValidations validations, final ParamsInfo paramsInfo) {
 		if (getMappingFactory() == null) {
 			// This engine does not support mapping (e.g. Scaffold).
 			return null;
@@ -95,7 +101,7 @@ public final class SearchEngine implements Serializable, Comparable<SearchEngine
 		final File paramFile = new File(folder, getMappingFactory().getCanonicalParamFileName());
 		final Writer writer = FileUtilities.getWriter(paramFile);
 
-		writeSearchEngineParameters(params, validations, writer);
+		writeSearchEngineParameters(params, validations, writer, paramsInfo);
 
 		return paramFile;
 	}
@@ -103,21 +109,21 @@ public final class SearchEngine implements Serializable, Comparable<SearchEngine
 	/**
 	 * Same as {@link #writeSearchEngineParameterFile} only writes the parameters into a string.
 	 */
-	public String writeSearchEngineParameterString(final SearchEngineParameters parameters, final ParamsValidations validations) {
+	public String writeSearchEngineParameterString(final SearchEngineParameters parameters, final ParamsValidations validations, final ParamsInfo paramsInfo) {
 		if (getMappingFactory() == null) {
 			// This engine does not support mapping (e.g. Scaffold).
 			return null;
 		}
 
 		final StringWriter writer = new StringWriter();
-		writeSearchEngineParameters(parameters, validations, writer);
+		writeSearchEngineParameters(parameters, validations, writer, paramsInfo);
 		return writer.toString();
 	}
 
 	/**
 	 * No writing of parameters, only the validations object gets filled.
 	 */
-	public void validate(final SearchEngineParameters parameters, final ParamsValidations validations) {
+	public void validate(final SearchEngineParameters parameters, final ParamsValidations validations, final ParamsInfo paramsInfo) {
 		if (getMappingFactory() == null) {
 			// This engine does not support mapping (e.g. Scaffold).
 			return;
@@ -140,10 +146,10 @@ public final class SearchEngine implements Serializable, Comparable<SearchEngine
 				// Do nothing
 			}
 		};
-		writeSearchEngineParameters(parameters, validations, writer);
+		writeSearchEngineParameters(parameters, validations, writer, paramsInfo);
 	}
 
-	private void writeSearchEngineParameters(final SearchEngineParameters params, ParamsValidations validations, final Writer writer) {
+	private void writeSearchEngineParameters(final SearchEngineParameters params, ParamsValidations validations, final Writer writer, final ParamsInfo paramsInfo) {
 		if (validations == null) {
 			validations = new ParamsValidations();
 		}
@@ -194,55 +200,45 @@ public final class SearchEngine implements Serializable, Comparable<SearchEngine
 		}
 	}
 
-	public void setCode(final String code) {
-		this.code = code;
+	public EngineMetadata getEngineMetadata() {
+		return engineMetadata;
+	}
+
+	public void setEngineMetadata(final EngineMetadata engineMetadata) {
+		this.engineMetadata = engineMetadata;
+	}
+
+	public String getVersion() {
+		return version;
+	}
+
+	public void setVersion(final String version) {
+		this.version = version;
 	}
 
 	/**
 	 * @return Engine code (e.g. MASCOT). Same as {@link edu.mayo.mprc.swift.dbmapping.SearchEngineConfig#code}
 	 */
 	public String getCode() {
-		if (code != null) {
-			return code;
-		} else if (mappingFactory != null) {
-			return mappingFactory.getSearchEngineCode();
+		if (getEngineMetadata().getCode() != null) {
+			return getEngineMetadata().getCode();
 		} else {
 			throw new MprcException("Unknown search engine code");
 		}
-	}
-
-	public void setResultExtension(final String resultExtension) {
-		this.resultExtension = resultExtension;
-	}
-
-	public void setDoSearchXmlAttribute(final String doSearchXmlAttribute) {
-		this.doSearchXmlAttribute = doSearchXmlAttribute;
-	}
-
-	public void setFriendlyName(final String friendlyName) {
-		this.friendlyName = friendlyName;
 	}
 
 	/**
 	 * @return User-friendly name for the engine.
 	 */
 	public String getFriendlyName() {
-		return friendlyName;
+		return getEngineMetadata().getFriendlyName();
 	}
 
 	/**
 	 * @return File extension of the resulting files this engine produces.
 	 */
 	public String getResultExtension() {
-		return resultExtension;
-	}
-
-	/**
-	 * @return Attribute in the search definition xml file that specifies whether given engine should be used
-	 *         for given file.
-	 */
-	public String getDoSearchXmlAttribute() {
-		return doSearchXmlAttribute;
+		return getEngineMetadata().getResultExtension();
 	}
 
 	public DaemonConnection getSearchDaemon() {
@@ -254,11 +250,7 @@ public final class SearchEngine implements Serializable, Comparable<SearchEngine
 	}
 
 	public MappingFactory getMappingFactory() {
-		return mappingFactory;
-	}
-
-	public void setMappingFactory(final MappingFactory mappingFactory) {
-		this.mappingFactory = mappingFactory;
+		return getEngineMetadata().getMappingFactory();
 	}
 
 	public DaemonConnection getDbDeployDaemon() {
@@ -273,31 +265,15 @@ public final class SearchEngine implements Serializable, Comparable<SearchEngine
 		return dbDeployDaemon != null && searchDaemon != null;
 	}
 
-	public ParamsInfo getParamsInfo() {
-		return paramsInfo;
-	}
-
-	public void setParamsInfo(final ParamsInfo paramsInfo) {
-		this.paramsInfo = paramsInfo;
-	}
-
 	/**
 	 * @return True, if the user interface should offer this search engine to be enabled by default.
 	 */
 	public boolean isOnByDefault() {
-		return isOnByDefault;
-	}
-
-	public void setOnByDefault(final boolean onByDefault) {
-		isOnByDefault = onByDefault;
-	}
-
-	public void setOutputDirName(final String outputDirName) {
-		this.outputDirName = outputDirName;
+		return getEngineMetadata().isOnByDefault();
 	}
 
 	public String getOutputDirName() {
-		return outputDirName;
+		return getEngineMetadata().getOutputDirName();
 	}
 
 	public boolean equals(final Object o) {
@@ -325,8 +301,127 @@ public final class SearchEngine implements Serializable, Comparable<SearchEngine
 		return getCode().compareTo(o.getCode());
 	}
 
-	@Override
-	public Object clone() throws CloneNotSupportedException {
-		return super.clone();
+	@Component("searchEngineFactory")
+	public static final class Factory extends FactoryBase<Config, SearchEngine> implements FactoryDescriptor {
+		EngineFactoriesList engineFactoriesList;
+
+		@Override
+		public SearchEngine create(Config config, DependencyResolver dependencies) {
+			final EngineMetadata metadata = getEngineFactoriesList().getEngineMetadataForCode(config.getCode());
+			if (metadata == null) {
+				throw new MprcException("Could not find engine for code [" + config.getCode() + "]");
+			}
+			return new SearchEngine(
+					metadata,
+					config.getVersion(),
+					(DaemonConnection) dependencies.createSingleton(config.getWorker()),
+					(DaemonConnection) dependencies.createSingleton(config.getDeployer()));
+		}
+
+		@Override
+		public String getType() {
+			return "searchEngine";
+		}
+
+		@Override
+		public String getUserName() {
+			return "Search Engine";
+		}
+
+		@Override
+		public String getDescription() {
+			return "A reference to fully configured search engine";
+		}
+
+		@Override
+		public Class<? extends ResourceConfig> getConfigClass() {
+			return Config.class;
+		}
+
+		@Override
+		public ServiceUiFactory getServiceUiFactory() {
+			return null;
+		}
+
+		public EngineFactoriesList getEngineFactoriesList() {
+			return engineFactoriesList;
+		}
+
+		@Resource(name = "engineFactoriesList")
+		public void setEngineFactoriesList(final EngineFactoriesList engineFactoriesList) {
+			this.engineFactoriesList = engineFactoriesList;
+		}
+	}
+
+	/**
+	 * Configuration of a particular engine.
+	 */
+	public static final class Config implements ResourceConfig {
+		private String code;
+		private String version;
+		private ServiceConfig worker;
+		private ServiceConfig deployer;
+
+		public Config(final String code, final String version, final ServiceConfig worker, final ServiceConfig deployer) {
+			this.code = code;
+			this.version = version;
+			this.worker = worker;
+			this.deployer = deployer;
+		}
+
+		public String getCode() {
+			return code;
+		}
+
+		public void setCode(final String code) {
+			this.code = code;
+		}
+
+		public String getVersion() {
+			return version;
+		}
+
+		public void setVersion(final String version) {
+			this.version = version;
+		}
+
+		public ServiceConfig getWorker() {
+			return worker;
+		}
+
+		public void setWorker(final ServiceConfig worker) {
+			this.worker = worker;
+		}
+
+		public ServiceConfig getDeployer() {
+			return deployer;
+		}
+
+		public void setDeployer(final ServiceConfig deployer) {
+			this.deployer = deployer;
+		}
+
+		@Override
+		public Map<String, String> save(final DependencyResolver resolver) {
+			final Map<String, String> result = Maps.newHashMap();
+			result.put("code", getCode());
+			result.put("version", getVersion());
+			result.put("worker", resolver.getIdFromDependency(getWorker()));
+			result.put("deployer", resolver.getIdFromDependency(getDeployer()));
+			return result;
+		}
+
+		@Override
+		public void load(final Map<String, String> values, final DependencyResolver resolver) {
+			setCode(values.get("code"));
+			setVersion(values.get("version"));
+			setWorker((ServiceConfig) resolver.getConfigFromId(values.get("worker")));
+			setDeployer((ServiceConfig) resolver.getConfigFromId(values.get("deployer")));
+		}
+
+		@Override
+		public int getPriority() {
+			return 0;
+		}
 	}
 }

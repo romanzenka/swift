@@ -1,6 +1,7 @@
 package edu.mayo.mprc.swift.config;
 
 import com.google.common.base.Charsets;
+import com.google.common.collect.Lists;
 import com.google.common.io.Files;
 import edu.mayo.mprc.config.ApplicationConfig;
 import edu.mayo.mprc.config.DaemonConfig;
@@ -27,6 +28,7 @@ import edu.mayo.mprc.scaffold.report.ScaffoldReportWorker;
 import edu.mayo.mprc.sequest.SequestDeploymentService;
 import edu.mayo.mprc.sequest.SequestWorker;
 import edu.mayo.mprc.swift.WebUi;
+import edu.mayo.mprc.swift.db.SearchEngine;
 import edu.mayo.mprc.swift.search.SwiftSearcher;
 import edu.mayo.mprc.utilities.FileUtilities;
 import edu.mayo.mprc.utilities.ResourceUtilities;
@@ -44,6 +46,7 @@ import org.xml.sax.SAXException;
 import java.io.File;
 import java.io.IOException;
 import java.io.Reader;
+import java.util.Collection;
 
 public final class TestDaemonFactory {
 	private static MultiFactory table;
@@ -87,7 +90,7 @@ public final class TestDaemonFactory {
 			reader = ResourceUtilities.getReader("classpath:edu/mayo/mprc/swift/config/fullConfig.xml", TestDaemonFactory.class);
 			XMLUnit.setIgnoreWhitespace(true);
 			final Diff diff = XMLUnit.compareXML(reader, savedFileContents);
-			XMLAssert.assertXMLEqual("Config file not equal", diff, true);
+				XMLAssert.assertXMLEqual("Config file not equal", diff, true);
 		} finally {
 			FileUtilities.closeQuietly(reader);
 		}
@@ -228,10 +231,17 @@ public final class TestDaemonFactory {
 		final ServiceConfig databasUndeployer = new ServiceConfig("databaseUndeployer", runner88, BROKER_URI + "databaseUndeployer");
 		main.addService(databasUndeployer);
 
+		Collection<SearchEngine.Config> engineConfigs = Lists.newArrayList(
+				new SearchEngine.Config("MASCOT", "2.4", mascot, mascotDeployer),
+				new SearchEngine.Config("SEQUEST", "v27", sequest, sequestDeployer),
+				new SearchEngine.Config("TANDEM", "2013.2.01", tandem, tandemDeployer),
+				new SearchEngine.Config("OMSSA", "0.1", omssa, omssaDeployer),
+				new SearchEngine.Config("SCAFFOLD", "2.6.0", scaffold, scaffoldDeployer)
+		);
 		final SwiftSearcher.Config searcherConfig = new SwiftSearcher.Config(
 				"fastaPath", "fastaArchivePath",
-				"fastaUploadPath", raw2mgf, msconvert, mgfToMgf, rawDump, mascot, mascotDeployer, sequest,
-				sequestDeployer, tandem, tandemDeployer, omssa, omssaDeployer, null, null, null, null, scaffold, scaffoldDeployer, null, null, scaffoldReport, qa, null, null, msmsEval, null);
+				"fastaUploadPath", raw2mgf, msconvert, mgfToMgf, rawDump,
+				engineConfigs, scaffoldReport, qa, null, null, msmsEval, null);
 		final SimpleRunner.Config runner76 = new SimpleRunner.Config();
 		runner76.setNumThreads(1);
 		runner76.setWorkerConfiguration(searcherConfig);

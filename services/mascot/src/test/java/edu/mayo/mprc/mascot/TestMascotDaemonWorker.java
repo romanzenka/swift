@@ -99,7 +99,8 @@ public final class TestMascotDaemonWorker {
 
 	private File createMascotParamFile() throws IOException {
 		final ParamsInfo paramsInfo = TestMascotMappings.getAbstractParamsInfo();
-		final MascotMappingFactory factory = new MascotMappingFactory(paramsInfo);
+		final MascotMappingFactory factory = new MascotMappingFactory();
+		factory.setParamsInfo(paramsInfo);
 		final Mappings mapping = factory.createMapping();
 		final MappingContext context = new TestMappingContextBase(paramsInfo);
 

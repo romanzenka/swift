@@ -12,6 +12,7 @@ import edu.mayo.mprc.swift.db.SwiftDao;
 import edu.mayo.mprc.swift.dbmapping.*;
 import edu.mayo.mprc.swift.params2.ExtractMsnSettings;
 import edu.mayo.mprc.swift.params2.SearchEngineParameters;
+import edu.mayo.mprc.swift.params2.mapping.ParamsInfo;
 import edu.mayo.mprc.swift.search.SwiftSearchWorkPacket;
 import edu.mayo.mprc.utilities.FileUtilities;
 import edu.mayo.mprc.utilities.Tuple;
@@ -54,6 +55,7 @@ public final class SearchRunner implements Runnable {
 
 	private CurationDao curationDao;
 	private SwiftDao swiftDao;
+	private ParamsInfo paramsInfo;
 
 	/**
 	 * Database record of the search we are currently running.
@@ -185,7 +187,8 @@ public final class SearchRunner implements Runnable {
 			final FileTokenFactory fileTokenFactory,
 			final SearchRun searchRun,
 			final boolean reportDecoyHits,
-			final int priority) {
+			final int priority,
+			final ParamsInfo paramsInfo) {
 		this.searchDefinition = searchDefinition;
 		this.packet = packet;
 		this.raw2mgfDaemon = raw2mgfDaemon;
@@ -208,6 +211,7 @@ public final class SearchRunner implements Runnable {
 		this.priority = priority;
 		this.workflowEngine = new WorkflowEngine(packet.getTaskId());
 		this.workflowEngine.setPriority(priority);
+		this.paramsInfo = paramsInfo;
 		assertValid();
 	}
 
@@ -369,7 +373,7 @@ public final class SearchRunner implements Runnable {
 			FileUtilities.ensureFolderExists(paramFolder);
 			for (final String engineCode : enabledEngines) {
 				final SearchEngine engine = getSearchEngine(engineCode);
-				final File file = engine.writeSearchEngineParameterFile(paramFolder, params, null /*We do not validate, validation should be already done*/);
+				final File file = engine.writeSearchEngineParameterFile(paramFolder, params, null /*We do not validate, validation should be already done*/, paramsInfo);
 				addParamFile(engineCode, file);
 			}
 		}
@@ -481,9 +485,7 @@ public final class SearchRunner implements Runnable {
 	}
 
 	private boolean isNormalEngine(final SearchEngine engine) {
-		return !"SCAFFOLD".equalsIgnoreCase(engine.getCode()) &&
-				!"SCAFFOLD3".equalsIgnoreCase(engine.getCode()) &&
-				!"IDPICKER".equalsIgnoreCase(engine.getCode());
+		return !engine.getEngineMetadata().isAggregator();
 	}
 
 	private void addParamFile(final String engineCode, final File file) {
@@ -680,20 +682,11 @@ public final class SearchRunner implements Runnable {
 				qaTask.addMgfToRawEntry(mgfOutput, file, rawDumpTask);
 			}
 
-			SpectrumQaTask spectrumQaTask = null;
+			final SpectrumQaTask spectrumQaTask;
 
 			if ((spectrumQaTask = spectrumQaTasks.get(getSpectrumQaHashKey(inputFile.getInputFile()))) != null) {
 				qaTask.addMgfToMsmsEvalEntry(mgfOutput, spectrumQaTask);
 				qaTask.addDependency(spectrumQaTask);
-			}
-
-			final SearchEngine myrimatchSearchEngine = SearchEngine.getForId("MYRIMATCH", searchEngines);
-			if (myrimatchSearchEngine != null) {
-				final EngineSearchTask myrimatchTask = engineSearches.get(getEngineSearchHashKey(myrimatchSearchEngine, inputFile.getInputFile()));
-				if (myrimatchTask != null) {
-					qaTask.addMgfToAdditionalSearchEngineEntry(mgfOutput, myrimatchTask);
-					qaTask.addDependency(myrimatchTask);
-				}
 			}
 		}
 	}

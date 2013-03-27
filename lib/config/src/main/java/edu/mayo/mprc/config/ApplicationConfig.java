@@ -58,7 +58,7 @@ public final class ApplicationConfig implements ResourceConfig {
 		xStream.setMode(XStream.ID_REFERENCES);
 
 		xStream.processAnnotations(new Class[]{
-				ApplicationConfig.class
+				ApplicationConfig.class,
 		});
 
 		/** Add all the module aliases */

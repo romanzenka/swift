@@ -1,12 +1,10 @@
 package edu.mayo.mprc.workflow.persistence;
 
-import edu.mayo.mprc.database.Change;
 import edu.mayo.mprc.swift.db.SwiftDaoHibernate;
 import edu.mayo.mprc.swift.dbmapping.*;
 import edu.mayo.mprc.swift.params2.*;
 import edu.mayo.mprc.unimod.ModSet;
 import edu.mayo.mprc.utilities.testing.TestApplicationContext;
-import org.joda.time.DateTime;
 import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
@@ -156,8 +154,8 @@ public final class SwiftDaoTest {
 			blank2 = swiftDao.addSwiftSearchDefinition(blank2);
 			Assert.assertEquals(folder2.getId(), folder1.getId(), "Folder searches has to be stored as one");
 
-			final SearchEngineConfig searchEngineConfig = new SearchEngineConfig("MASCOT");
-			swiftDao.addSearchEngineConfig(searchEngineConfig, new Change("Test search engine added", new DateTime()));
+			SearchEngineConfig searchEngineConfig = new SearchEngineConfig("MASCOT", "2.4");
+			searchEngineConfig = swiftDao.addSearchEngineConfig(searchEngineConfig);
 			final EnabledEngines engines = new EnabledEngines();
 			engines.add(searchEngineConfig);
 
@@ -204,16 +202,14 @@ public final class SwiftDaoTest {
 	public void addSearchEngine() throws Throwable {
 		swiftDao.begin();
 		try {
-			final Change change = new Change("Test search engine add", new DateTime());
-			final SearchEngineConfig config = new SearchEngineConfig("TEST_ENGINE");
-			swiftDao.addSearchEngineConfig(config, change);
+			SearchEngineConfig config = new SearchEngineConfig("TEST_ENGINE", "v1.0");
+			config = swiftDao.addSearchEngineConfig(config);
 			Assert.assertNotNull(config.getId(), "Save did not work");
 
-			final Change change2 = new Change("Test search engine add 2", new DateTime());
-			final SearchEngineConfig config2 = new SearchEngineConfig("TEST_ENGINE");
+			SearchEngineConfig config2 = new SearchEngineConfig("TEST_ENGINE", "v1.0");
 			Assert.assertTrue(config.equals(config2), "The two changes must be identical");
 
-			swiftDao.addSearchEngineConfig(config2, change2);
+			config2 = swiftDao.addSearchEngineConfig(config2);
 			Assert.assertEquals(config2.getId(), config.getId(), "Save must produce same id");
 
 			swiftDao.commit();
@@ -227,20 +223,19 @@ public final class SwiftDaoTest {
 	public void addEnabledEngines() throws Throwable {
 		swiftDao.begin();
 		try {
-			final Change change = new Change("Test enabled engines", new DateTime());
-			final SearchEngineConfig engine1 = new SearchEngineConfig("TEST_ENGINE1");
-			final SearchEngineConfig engine2 = new SearchEngineConfig("TEST_ENGINE2");
-			swiftDao.addSearchEngineConfig(engine1, change);
-			swiftDao.addSearchEngineConfig(engine2, change);
+			SearchEngineConfig engine1 = new SearchEngineConfig("TEST_ENGINE1", "v1.0");
+			SearchEngineConfig engine2 = new SearchEngineConfig("TEST_ENGINE2", "v1.1");
+			engine1 = swiftDao.addSearchEngineConfig(engine1);
+			engine2 = swiftDao.addSearchEngineConfig(engine2);
 
 			final EnabledEngines engines = new EnabledEngines();
 			engines.add(engine1);
 			engines.add(engine2);
 
-			final EnabledEngines engines1 = swiftDao.addEnabledEngineSet(Arrays.asList(engine1.getCode(), engine2.getCode()));
-			final EnabledEngines engines2 = swiftDao.addEnabledEngineSet(Arrays.asList(engine2.getCode(), engine1.getCode()));
-			final EnabledEngines engines3 = swiftDao.addEnabledEngineSet(new ArrayList<String>());
-			final EnabledEngines engines4 = swiftDao.addEnabledEngineSet(new ArrayList<String>());
+			final EnabledEngines engines1 = swiftDao.addEnabledEngineSet(Arrays.asList(engine1, engine2));
+			final EnabledEngines engines2 = swiftDao.addEnabledEngineSet(Arrays.asList(engine2, engine1));
+			final EnabledEngines engines3 = swiftDao.addEnabledEngineSet(new ArrayList<SearchEngineConfig>());
+			final EnabledEngines engines4 = swiftDao.addEnabledEngineSet(new ArrayList<SearchEngineConfig>());
 
 			Assert.assertEquals(engines2, engines1, "Have to be identical sets");
 			Assert.assertNotSame(engines3, engines1, "Empty engine set has to be different");

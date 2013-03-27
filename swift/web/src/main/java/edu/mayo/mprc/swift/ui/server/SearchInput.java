@@ -17,6 +17,7 @@ public final class SearchInput {
 	private String[] categoryNames;
 	private String[] experiments;
 	private String[] enabledEngineCodes;
+	private String[] enabledEngineVersions;
 	private boolean peptideReport;
 	private boolean fromScratch;
 	private boolean lowPriority;
@@ -33,6 +34,7 @@ public final class SearchInput {
 		categoryNames  = getStringArray(searchInputMap, "categoryNames");
 		experiments  = getStringArray(searchInputMap, "experiments");
 		enabledEngineCodes = getStringArray(searchInputMap, "enabledEngineCodes");
+		enabledEngineVersions = getStringArray(searchInputMap, "enabledEngineVersions");
 		peptideReport = isTrue(searchInputMap, "peptideReport");
 		fromScratch = isTrue(searchInputMap, "fromScratch");
 		lowPriority = isTrue(searchInputMap, "lowPriority");
@@ -121,6 +123,14 @@ public final class SearchInput {
 
 	public void setEnabledEngineCodes(final String[] enabledEngineCodes) {
 		this.enabledEngineCodes = enabledEngineCodes;
+	}
+
+	public String[] getEnabledEngineVersions() {
+		return enabledEngineVersions;
+	}
+
+	public void setEnabledEngineVersions(final String[] enabledEngineVersions) {
+		this.enabledEngineVersions = enabledEngineVersions;
 	}
 
 	public boolean isPeptideReport() {

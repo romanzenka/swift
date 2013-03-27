@@ -34,14 +34,12 @@ import java.util.regex.Pattern;
 public final class ClientProxyGenerator {
 	private UnimodDao unimodDao;
 	private WorkspaceDao workspaceDao;
-	private SwiftDao swiftDao;
 	private Unimod cachedUnimod;
 	private File browseRoot;
 
 	public ClientProxyGenerator(final UnimodDao unimodDao, final WorkspaceDao workspaceDao, final SwiftDao swiftDao, final File browseRoot) {
 		this.unimodDao = unimodDao;
 		this.workspaceDao = workspaceDao;
-		this.swiftDao = swiftDao;
 		this.browseRoot = browseRoot;
 	}
 
@@ -175,20 +173,27 @@ public final class ClientProxyGenerator {
 		return modSpecSet;
 	}
 
-	public FileSearch convertFrom(final ClientFileSearch entry) {
+	public SearchEngineConfig convertFrom(final ClientSearchEngineConfig config) {
+		return new SearchEngineConfig(config.getCode(), config.getVersion());
+	}
+
+	public EnabledEngines convertFrom(final Iterable<ClientSearchEngineConfig> configs) {
 		final EnabledEngines enabledEngines = new EnabledEngines();
-		for (final String engineCode : entry.getEnabledEngineCodes()) {
-			if (engineCode != null && engineCode.length() != 0) {
-				enabledEngines.add(swiftDao.getSearchEngineConfig(engineCode));
+		for (final ClientSearchEngineConfig engineInstance : configs) {
+			if (engineInstance != null) {
+				enabledEngines.add(convertFrom(engineInstance));
 			}
 		}
+		return enabledEngines;
+	}
 
+	public FileSearch convertFrom(final ClientFileSearch entry) {
 		return new FileSearch(
 				new File(browseRoot, entry.getPath()),
 				entry.getBiologicalSample(),
 				entry.getCategoryName(),
 				entry.getExperiment(),
-				enabledEngines);
+				convertFrom(entry.getEnabledEngines()));
 	}
 
 	/**
@@ -203,6 +208,18 @@ public final class ClientProxyGenerator {
 			return relativePath.replaceAll(Pattern.quote(File.separator), "/");
 		}
 		return relativePath;
+	}
+
+	public ClientSearchEngineConfig convertTo(final SearchEngineConfig config) {
+		return new ClientSearchEngineConfig(config.getCode(), config.getVersion());
+	}
+
+	public ArrayList<ClientSearchEngineConfig> convertTo(final EnabledEngines enabledEngines) {
+		final ArrayList<ClientSearchEngineConfig> searchEngineConfigs = new ArrayList<ClientSearchEngineConfig>(enabledEngines.getEngineConfigs().size());
+		for (final SearchEngineConfig config : enabledEngines.getEngineConfigs()) {
+			searchEngineConfigs.add(convertTo(config));
+		}
+		return searchEngineConfigs;
 	}
 
 	public ClientSwiftSearchDefinition convertTo(final SwiftSearchDefinition definition, final ClientParamSetResolver resolver) {
@@ -225,7 +242,7 @@ public final class ClientProxyGenerator {
 					fileSearch.getBiologicalSample(),
 					fixedCategoryName(fileSearch),
 					fileSearch.getExperiment(),
-					fileSearch.getEnabledEngines().toEngineCodeList(),
+					convertTo(fileSearch.getEnabledEngines()),
 					inputFileSize);
 
 			clientInputFiles.add(search);

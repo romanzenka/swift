@@ -14,6 +14,8 @@ import edu.mayo.mprc.daemon.WorkerFactoryBase;
 import edu.mayo.mprc.daemon.exception.DaemonException;
 import edu.mayo.mprc.scaffold.ScaffoldLogMonitor;
 import edu.mayo.mprc.scaffoldparser.spectra.ScaffoldSpectraVersion;
+import edu.mayo.mprc.searchengine.EngineFactory;
+import edu.mayo.mprc.searchengine.EngineMetadata;
 import edu.mayo.mprc.utilities.FileUtilities;
 import edu.mayo.mprc.utilities.ProcessCaller;
 import edu.mayo.mprc.utilities.progress.UserProgressReporter;
@@ -235,7 +237,14 @@ public final class Scaffold3Worker extends WorkerBase {
 	 * A factory capable of creating the worker
 	 */
 	@Component("scaffold3WorkerFactory")
-	public static final class Factory extends WorkerFactoryBase<Config> {
+	public static final class Factory extends WorkerFactoryBase<Config> implements EngineFactory {
+
+		private static final EngineMetadata ENGINE_METADATA = new EngineMetadata(
+				"SCAFFOLD3", ".sf3", "Scaffold 3", true, "scaffold3", null,
+				new String[]{TYPE},
+				new String[]{},
+				new String[]{Scaffold3DeploymentService.TYPE},
+				70, true);
 
 		@Override
 		public Worker create(final Config config, final DependencyResolver dependencies) {
@@ -243,6 +252,11 @@ public final class Scaffold3Worker extends WorkerBase {
 			worker.setScaffoldBatchScript(new File(config.getScaffoldBatchScript()).getAbsoluteFile());
 
 			return worker;
+		}
+
+		@Override
+		public EngineMetadata getEngineMetadata() {
+			return ENGINE_METADATA;
 		}
 	}
 

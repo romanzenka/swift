@@ -3,6 +3,7 @@ package edu.mayo.mprc.sequest;
 import edu.mayo.mprc.MprcException;
 import edu.mayo.mprc.utilities.FileUtilities;
 import org.apache.log4j.Logger;
+import org.springframework.stereotype.Component;
 
 import java.io.File;
 import java.io.FileReader;
@@ -14,6 +15,7 @@ import java.util.regex.Pattern;
 /**
  * this class will handle all of the conversion from a sequest.params file to a makedb.params file
  */
+@Component("sequestToMakeDbConverter")
 public final class SequestToMakeDBConverter {
 	private static final Logger LOGGER = Logger.getLogger(SequestToMakeDBConverter.class);
 

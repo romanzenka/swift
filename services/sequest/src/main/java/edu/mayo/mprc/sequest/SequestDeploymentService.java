@@ -19,6 +19,7 @@ import edu.mayo.mprc.utilities.progress.ProgressReporter;
 import org.apache.log4j.Logger;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.Resource;
 import java.io.*;
 import java.util.*;
 
@@ -566,10 +567,7 @@ public final class SequestDeploymentService extends DeploymentService<SequestDep
 		}
 	}
 
-	/**
-	 * A factory capable of creating the worker
-	 */
-	@Component("sequestDeploymentServiceFactory")
+	@Component("sequestDeployerFactory")
 	public static final class Factory extends WorkerFactoryBase<Config> {
 
 		private SequestMappingFactory sequestMappingFactory;
@@ -582,6 +580,7 @@ public final class SequestDeploymentService extends DeploymentService<SequestDep
 			return sequestMappingFactory;
 		}
 
+		@Resource(name = "sequestMappingFactory")
 		public void setSequestMappingFactory(final SequestMappingFactory sequestMappingFactory) {
 			this.sequestMappingFactory = sequestMappingFactory;
 		}
@@ -590,6 +589,7 @@ public final class SequestDeploymentService extends DeploymentService<SequestDep
 			return converter;
 		}
 
+		@Resource(name = "sequestToMakeDbConverter")
 		public void setConverter(final SequestToMakeDBConverter converter) {
 			this.converter = converter;
 		}

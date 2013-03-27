@@ -11,6 +11,8 @@ import edu.mayo.mprc.daemon.Worker;
 import edu.mayo.mprc.daemon.WorkerBase;
 import edu.mayo.mprc.daemon.WorkerFactoryBase;
 import edu.mayo.mprc.daemon.exception.DaemonException;
+import edu.mayo.mprc.searchengine.EngineFactory;
+import edu.mayo.mprc.searchengine.EngineMetadata;
 import edu.mayo.mprc.utilities.FileUtilities;
 import edu.mayo.mprc.utilities.FormScraper;
 import edu.mayo.mprc.utilities.StreamRegExMatcher;
@@ -19,6 +21,7 @@ import edu.mayo.mprc.utilities.progress.UserProgressReporter;
 import org.apache.log4j.Logger;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.Resource;
 import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
@@ -390,7 +393,9 @@ public final class MascotWorker extends WorkerBase {
 	 * A factory capable of creating the worker
 	 */
 	@Component("mascotWorkerFactory")
-	public static final class Factory extends WorkerFactoryBase<Config> {
+	public static final class Factory extends WorkerFactoryBase<Config> implements EngineFactory {
+		private MascotMappingFactory mappingFactory;
+
 		@Override
 		public Worker create(final Config config, final DependencyResolver dependencies) {
 			final MascotWorker worker = new MascotWorker();
@@ -406,6 +411,25 @@ public final class MascotWorker extends WorkerBase {
 				throw new MprcException("Not a valid mascot url: " + config.getMascotUrl(), e);
 			}
 			return worker;
+		}
+
+		public MascotMappingFactory getMappingFactory() {
+			return mappingFactory;
+		}
+
+		@Resource(name = "mascotMappingFactory")
+		public void setMappingFactory(MascotMappingFactory mappingFactory) {
+			this.mappingFactory = mappingFactory;
+		}
+
+		@Override
+		public EngineMetadata getEngineMetadata() {
+			return new EngineMetadata(
+					"MASCOT", ".dat", "Mascot", true, "mascot", getMappingFactory(),
+					new String[]{TYPE},
+					new String[]{MascotCache.TYPE},
+					new String[]{MascotDeploymentService.TYPE, MockMascotDeploymentService.TYPE},
+					10, false);
 		}
 	}
 

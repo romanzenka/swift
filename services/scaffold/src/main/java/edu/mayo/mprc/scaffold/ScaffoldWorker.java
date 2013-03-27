@@ -11,6 +11,8 @@ import edu.mayo.mprc.daemon.Worker;
 import edu.mayo.mprc.daemon.WorkerBase;
 import edu.mayo.mprc.daemon.WorkerFactoryBase;
 import edu.mayo.mprc.daemon.exception.DaemonException;
+import edu.mayo.mprc.searchengine.EngineFactory;
+import edu.mayo.mprc.searchengine.EngineMetadata;
 import edu.mayo.mprc.utilities.FileUtilities;
 import edu.mayo.mprc.utilities.ProcessCaller;
 import edu.mayo.mprc.utilities.progress.UserProgressReporter;
@@ -135,7 +137,14 @@ public final class ScaffoldWorker extends WorkerBase {
 	 * A factory capable of creating the worker
 	 */
 	@Component("scaffoldWorkerFactory")
-	public static final class Factory extends WorkerFactoryBase<Config> {
+	public static final class Factory extends WorkerFactoryBase<Config> implements EngineFactory {
+
+		private static final EngineMetadata ENGINE_METADATA = new EngineMetadata(
+				"SCAFFOLD", ".sfd", "Scaffold", true, "scaffold", null,
+				new String[]{TYPE},
+				new String[]{},
+				new String[]{ScaffoldDeploymentService.TYPE},
+				60, true);
 
 		@Override
 		public Worker create(final Config config, final DependencyResolver dependencies) {
@@ -145,6 +154,11 @@ public final class ScaffoldWorker extends WorkerBase {
 			worker.setMemoryLimit(config.getMemoryLimit());
 
 			return worker;
+		}
+
+		@Override
+		public EngineMetadata getEngineMetadata() {
+			return ENGINE_METADATA;
 		}
 	}
 

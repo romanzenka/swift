@@ -1,10 +1,12 @@
 package edu.mayo.mprc.swift.dbmapping;
 
+import com.google.common.base.Joiner;
 import com.google.common.base.Objects;
+import com.google.common.collect.Lists;
 import edu.mayo.mprc.MprcException;
 import edu.mayo.mprc.database.PersistableBase;
 
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -24,6 +26,10 @@ public class EnabledEngines extends PersistableBase {
 
 	void setEngineConfigs(final Set<SearchEngineConfig> engineConfigs) {
 		this.engineConfigs = engineConfigs;
+	}
+
+	public int size() {
+		return engineConfigs.size();
 	}
 
 	public void add(final SearchEngineConfig engineConfig) {
@@ -46,14 +52,6 @@ public class EnabledEngines extends PersistableBase {
 		return false;
 	}
 
-	public List<String> toEngineCodeList() {
-		final List<String> result = new ArrayList<String>(getEngineConfigs().size());
-		for (final SearchEngineConfig config : getEngineConfigs()) {
-			result.add(config.getCode());
-		}
-		return result;
-	}
-
 	@Override
 	public boolean equals(final Object o) {
 		if (this == o) {
@@ -70,5 +68,27 @@ public class EnabledEngines extends PersistableBase {
 	@Override
 	public int hashCode() {
 		return getEngineConfigs() != null ? getEngineConfigs().hashCode() : 0;
+	}
+
+	/*
+	 * @param code Search engine code.
+	 * @return The version of the search engine that provides the requested service, null if none found, throw an exception
+	 * if more than one version of an engine provides the same service.
+	 */
+	public String getEngineVersion(final String code) {
+		List<String> versions = Lists.newArrayList();
+		for (final SearchEngineConfig config : engineConfigs) {
+			if (config.getCode().equals(code)) {
+				versions.add(config.getVersion());
+			}
+		}
+		if (versions.size() == 1) {
+			return versions.get(0);
+		}
+		if (versions.size() == 0) {
+			return null;
+		}
+		Collections.sort(versions);
+		throw new MprcException("The search engine " + code + " has multiple matching versions: " + Joiner.on(", ").join(versions));
 	}
 }

@@ -1,5 +1,6 @@
 package edu.mayo.mprc.swift;
 
+import com.google.common.collect.Lists;
 import edu.mayo.mprc.MprcException;
 import edu.mayo.mprc.config.*;
 import edu.mayo.mprc.config.ui.PropertyChangeListener;
@@ -9,18 +10,15 @@ import edu.mayo.mprc.config.ui.UiResponse;
 import edu.mayo.mprc.daemon.Daemon;
 import edu.mayo.mprc.daemon.DaemonConnection;
 import edu.mayo.mprc.daemon.files.FileTokenFactory;
-import edu.mayo.mprc.mascot.MascotMappingFactory;
 import edu.mayo.mprc.msmseval.MSMSEvalParamFile;
 import edu.mayo.mprc.msmseval.MSMSEvalWorker;
 import edu.mayo.mprc.msmseval.MsmsEvalCache;
-import edu.mayo.mprc.myrimatch.MyrimatchMappingFactory;
-import edu.mayo.mprc.omssa.OmssaMappingFactory;
-import edu.mayo.mprc.sequest.SequestMappingFactory;
+import edu.mayo.mprc.searchengine.EngineMetadata;
+import edu.mayo.mprc.swift.db.EngineFactoriesList;
 import edu.mayo.mprc.swift.db.SearchEngine;
 import edu.mayo.mprc.swift.db.SwiftDao;
 import edu.mayo.mprc.swift.search.SwiftSearcher;
 import edu.mayo.mprc.workspace.WorkspaceDao;
-import edu.mayo.mprc.xtandem.XTandemMappingFactory;
 
 import java.io.File;
 import java.text.MessageFormat;
@@ -91,8 +89,16 @@ public final class WebUi {
 		return swiftSearcherDaemonConnection;
 	}
 
+	/**
+	 * @return All the search engines that are available to the {@link SwiftSearcher} that
+	 *         is pointed to by this web ui.
+	 */
 	public Collection<SearchEngine> getSearchEngines() {
 		return searchEngines;
+	}
+
+	public void setSearchEngines(Collection<SearchEngine> searchEngines) {
+		this.searchEngines = searchEngines;
 	}
 
 	public boolean isMsmsEval() {
@@ -172,11 +178,11 @@ public final class WebUi {
 	 * A factory capable of creating the web ui class.
 	 */
 	public static final class Factory extends FactoryBase<Config, WebUi> implements FactoryDescriptor {
-		private Collection<SearchEngine> searchEngines;
 		private SwiftMonitor swiftMonitor;
 		private FileTokenFactory fileTokenFactory;
 		private SwiftDao swiftDao;
 		private WorkspaceDao workspaceDao;
+		private EngineFactoriesList engineFactoriesList;
 
 		@Override
 		public WebUi create(final Config config, final DependencyResolver dependencies) {
@@ -228,18 +234,19 @@ public final class WebUi {
 						ui.qa = true;
 					}
 
-					final List<SearchEngine> clonedSearchEngines = new ArrayList<SearchEngine>();
-					for (final SearchEngine engine : getSearchEngines()) {
-						fillEngineDaemons(engine, clonedSearchEngines, MascotMappingFactory.MASCOT, searcherConfig.getMascot(), searcherConfig.getMascotDeployer(), dependencies);
-						fillEngineDaemons(engine, clonedSearchEngines, SequestMappingFactory.SEQUEST, searcherConfig.getSequest(), searcherConfig.getSequestDeployer(), dependencies);
-						fillEngineDaemons(engine, clonedSearchEngines, XTandemMappingFactory.TANDEM, searcherConfig.getTandem(), searcherConfig.getTandemDeployer(), dependencies);
-						fillEngineDaemons(engine, clonedSearchEngines, OmssaMappingFactory.OMSSA, searcherConfig.getOmssa(), searcherConfig.getOmssaDeployer(), dependencies);
-						fillEngineDaemons(engine, clonedSearchEngines, MyrimatchMappingFactory.MYRIMATCH, searcherConfig.getMyrimatch(), searcherConfig.getMyrimatchDeployer(), dependencies);
-						fillEngineDaemons(engine, clonedSearchEngines, "IDPICKER", searcherConfig.getIdpicker(), searcherConfig.getIdpickerDeployer(), dependencies);
-						fillEngineDaemons(engine, clonedSearchEngines, "SCAFFOLD", searcherConfig.getScaffold(), searcherConfig.getScaffoldDeployer(), dependencies);
-						fillEngineDaemons(engine, clonedSearchEngines, "SCAFFOLD3", searcherConfig.getScaffold3(), searcherConfig.getScaffold3Deployer(), dependencies);
+					final Collection<SearchEngine> searchEngines = Lists.newArrayList();
+					for (final SearchEngine.Config engineConfig : searcherConfig.getEngines()) {
+						final EngineMetadata engineMetadata = engineFactoriesList.getEngineMetadataForCode(engineConfig.getCode());
+						if (engineMetadata == null) {
+							throw new MprcException("Engine with code " + engineConfig.getCode() + " is not supported (missing .jar file?)");
+						}
+						final SearchEngine e = new SearchEngine(
+								engineMetadata,
+								engineConfig.getVersion(),
+								(DaemonConnection) dependencies.createSingleton(engineConfig.getWorker()),
+								(DaemonConnection) dependencies.createSingleton(engineConfig.getDeployer()));
+						searchEngines.add(e);
 					}
-					ui.searchEngines = clonedSearchEngines;
 				}
 
 				if (config.getDatabaseUndeployer() != null) {
@@ -250,28 +257,6 @@ public final class WebUi {
 				throw new MprcException("Web UI class could not be created.", e);
 			}
 			return ui;
-		}
-
-		private static void fillEngineDaemons(final SearchEngine engineToFill, final List<SearchEngine> filledList, final String engineCode, final ServiceConfig daemonConfig, final ServiceConfig dbDeployerConfig, final DependencyResolver dependencies) {
-			if (engineCode.equals(engineToFill.getCode()) && daemonConfig != null && dbDeployerConfig != null) {
-				SearchEngine clone = null;
-				try {
-					clone = (SearchEngine) engineToFill.clone();
-				} catch (CloneNotSupportedException e) {
-					throw new MprcException("Cannot clone search engine " + engineCode, e);
-				}
-				clone.setSearchDaemon((DaemonConnection) dependencies.createSingleton(daemonConfig));
-				clone.setDbDeployDaemon((DaemonConnection) dependencies.createSingleton(dbDeployerConfig));
-				filledList.add(clone);
-			}
-		}
-
-		public Collection<SearchEngine> getSearchEngines() {
-			return searchEngines;
-		}
-
-		public void setSearchEngines(final Collection<SearchEngine> searchEngines) {
-			this.searchEngines = searchEngines;
 		}
 
 		public SwiftMonitor getSwiftMonitor() {
@@ -304,6 +289,14 @@ public final class WebUi {
 
 		public void setWorkspaceDao(WorkspaceDao workspaceDao) {
 			this.workspaceDao = workspaceDao;
+		}
+
+		public EngineFactoriesList getEngineFactoriesList() {
+			return engineFactoriesList;
+		}
+
+		public void setEngineFactoriesList(EngineFactoriesList engineFactoriesList) {
+			this.engineFactoriesList = engineFactoriesList;
 		}
 
 		@Override

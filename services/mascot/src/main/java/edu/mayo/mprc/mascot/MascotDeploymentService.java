@@ -18,7 +18,6 @@ import edu.mayo.mprc.utilities.StringUtilities;
 import edu.mayo.mprc.utilities.progress.ProgressReporter;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.log4j.Logger;
-import org.springframework.stereotype.Component;
 
 import java.io.*;
 import java.net.URI;
@@ -834,7 +833,6 @@ public final class MascotDeploymentService extends DeploymentService<DeploymentR
 	/**
 	 * A factory capable of creating the worker
 	 */
-	@Component("mascotDeploymentServiceFactory")
 	public static final class Factory extends WorkerFactoryBase<Config> {
 
 		private boolean deploymentEnabled;

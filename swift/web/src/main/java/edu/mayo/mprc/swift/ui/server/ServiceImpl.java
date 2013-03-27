@@ -183,7 +183,7 @@ public final class ServiceImpl extends SpringGwtServlet implements Service, Appl
 		}
 	}
 
-	private SwiftSearchDefinition createSwiftSearchDefinition(SearchInput searchInput) {
+	private SwiftSearchDefinition createSwiftSearchDefinition(final SearchInput searchInput) {
 		final User user = workspaceDao.getUserByEmail(searchInput.getUserEmail());
 		final File outputFolder = new File(getBrowseRoot(), searchInput.getOutputFolderName());
 		// TODO: This needs to be passed as a parameter
@@ -195,7 +195,7 @@ public final class ServiceImpl extends SpringGwtServlet implements Service, Appl
 			throw new MprcException("Could not find saved search parameters for ID: " + searchInput.getParamSetId());
 		}
 		final List<FileSearch> inputFiles = new ArrayList<FileSearch>(searchInput.getInputFilePaths().length);
-		final EnabledEngines enabledEngines = getEnabledEngines(searchInput.getEnabledEngineCodes());
+		final EnabledEngines enabledEngines = getEnabledEngines(searchInput.getEnabledEngineCodes(), searchInput.getEnabledEngineVersions());
 
 		for (int i = 0; i < searchInput.getInputFilePaths().length; i++) {
 			final String inputFilePath = searchInput.getInputFilePaths()[i];
@@ -217,10 +217,11 @@ public final class ServiceImpl extends SpringGwtServlet implements Service, Appl
 	 * @param enabledEngineCodes Codes to convert.
 	 * @return List of enabled engines.
 	 */
-	private EnabledEngines getEnabledEngines(final String[] enabledEngineCodes) {
+	private static EnabledEngines getEnabledEngines(final String[] enabledEngineCodes, final String[] enabledEngineVersions) {
 		final EnabledEngines enabledEngines = new EnabledEngines();
-		for (final String code : enabledEngineCodes) {
-			final SearchEngineConfig config = getSwiftDao().getSearchEngineConfig(code);
+		final int length = enabledEngineCodes.length;
+		for (int i = 0; i < length; i++) {
+			final SearchEngineConfig config = new SearchEngineConfig(enabledEngineCodes[i], enabledEngineVersions[i]);
 			enabledEngines.add(config);
 		}
 		return enabledEngines;
@@ -309,7 +310,9 @@ public final class ServiceImpl extends SpringGwtServlet implements Service, Appl
 		final List<ClientSearchEngine> infos = new ArrayList<ClientSearchEngine>();
 		for (final SearchEngine engine : getSearchEngines()) {
 			if (engine.isEnabled()) {
-				infos.add(new ClientSearchEngine(engine.getCode(), engine.getFriendlyName(), engine.isOnByDefault()));
+				infos.add(new ClientSearchEngine(
+						new ClientSearchEngineConfig(engine.getCode(), engine.getVersion()),
+						engine.getFriendlyName(), engine.isOnByDefault()));
 			}
 		}
 		return infos;
@@ -529,7 +532,7 @@ public final class ServiceImpl extends SpringGwtServlet implements Service, Appl
 
 			int i = 0;
 			for (final SearchEngine engine : getSearchEngines()) {
-				final String parameters = engine.writeSearchEngineParameterString(ps, null);
+				final String parameters = engine.writeSearchEngineParameterString(ps, null, paramsInfo);
 				files[i++] = new ClientParamFile(engine.getFriendlyName(), parameters);
 			}
 			getParamsDao().commit();
@@ -547,7 +550,7 @@ public final class ServiceImpl extends SpringGwtServlet implements Service, Appl
 			getParamsDao().begin();
 			final ParameterSetCache cache = new ParameterSetCache(session, getParamsDao());
 			final SearchEngineParameters ps = cache.getFromCache(paramSet);
-			final ParamsValidations paramsValidations = SearchEngine.validate(ps, getSearchEngines());
+			final ParamsValidations paramsValidations = SearchEngine.validate(ps, getSearchEngines(), paramsInfo);
 			final ClientParamSetValues clientParamSetValues = getClientProxyGenerator().convertValues(ps, paramsValidations);
 			getParamsDao().commit();
 			return clientParamSetValues;
@@ -606,7 +609,7 @@ public final class ServiceImpl extends SpringGwtServlet implements Service, Appl
 			try {
 				final ParamName name = ParamName.getById(param);
 				ps.setValue(name, getClientProxyGenerator().convert(value, getParamsInfo().getAllowedValues(name)));
-				final ParamsValidations validations = SearchEngine.validate(ps, getSearchEngines());
+				final ParamsValidations validations = SearchEngine.validate(ps, getSearchEngines(), paramsInfo);
 				final ClientParamsValidations validationList = getClientProxyGenerator().convertTo(validations);
 				getParamsDao().commit();
 				return validationList;

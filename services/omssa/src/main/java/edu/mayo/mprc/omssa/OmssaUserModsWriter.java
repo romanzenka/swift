@@ -5,6 +5,7 @@ import edu.mayo.mprc.unimod.ModSpecificity;
 import edu.mayo.mprc.utilities.FileUtilities;
 import edu.mayo.mprc.utilities.ResourceUtilities;
 import edu.mayo.mprc.utilities.xml.XMLUtilities;
+import org.springframework.stereotype.Component;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -28,6 +29,7 @@ import java.util.Map;
  * Since all the mods are already in the OMSSA param file, this activity seems very silly, however that is what
  * OMSSA seems to require.
  */
+@Component("omssaUserModsWriter")
 final class OmssaUserModsWriter {
 
 	// Where to find the user mods element within the original document

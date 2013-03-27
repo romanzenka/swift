@@ -10,7 +10,6 @@ import edu.mayo.mprc.swift.ui.client.rpc.*;
 import edu.mayo.mprc.swift.ui.client.rpc.files.FileInfo;
 import edu.mayo.mprc.swift.ui.client.widgets.*;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -36,6 +35,7 @@ public final class SwiftApp implements EntryPoint, HidesPageContentsWhileLoading
 	private SpectrumQaSetupPanel spectrumQaSetupPanel;
 	private ReportSetupPanel reportSetupPanel;
 	private AdditionalSettingsPanel additionalSettingsPanel;
+	private EnabledEnginesPanel enabledEnginesPanel;
 
 	private Map<String, ClientUser> userInfo = new HashMap<String, ClientUser>();
 
@@ -112,7 +112,7 @@ public final class SwiftApp implements EntryPoint, HidesPageContentsWhileLoading
 			@Override
 			public void onFailure(Throwable caught) {
 				// SWALLOWED: Fail
-				finalizeFileTableInit(new ArrayList<ClientSearchEngine>());
+				finalizeFileTableInit();
 				finalizeSpectrumQa(null);
 				// InitReport fail
 				DOM.setStyleAttribute(DOM.getElementById("reportingRow"), "display", "none");
@@ -123,7 +123,7 @@ public final class SwiftApp implements EntryPoint, HidesPageContentsWhileLoading
 			public void onSuccess(final InitialPageData result) {
 				previousSearchRunId = result.loadedSearch() == null ? -1 : result.loadedSearch().getSearchId();
 				initParamsEditor(result);
-				finalizeFileTableInit(result.getSearchEngines());
+				finalizeFileTableInit();
 				finalizeSpectrumQa(result.getSpectrumQaParamFileInfo());
 				finalizeInitReport(result.isScaffoldReportEnabled());
 				initUserList(result.listUsers());
@@ -134,8 +134,8 @@ public final class SwiftApp implements EntryPoint, HidesPageContentsWhileLoading
 		});
 	}
 
-	private void finalizeFileTableInit(final List<ClientSearchEngine> o) {
-		files = new FileTable(o);
+	private void finalizeFileTableInit() {
+		files = new FileTable();
 		final RootPanel filePanel = RootPanel.get("fileTable");
 		filePanel.add(files);
 		connectOutputLocationAndFileTable();
@@ -450,7 +450,7 @@ public final class SwiftApp implements EntryPoint, HidesPageContentsWhileLoading
 	public void updateOutputLocation() {
 		if (!outputPathChangeEnabled || !outputPathUserSpecified) {
 			// The user is not able to or chose not to influence output path, it gets set automatically
-			final List<ClientFileSearch> fileSearches = files != null ? files.getData() : null;
+			final List<ClientFileSearch> fileSearches = files != null ? files.getData(enabledEnginesPanel.getEnabledEngines()) : null;
 			if (files == null || (fileSearches == null) || (fileSearches.size() == 0)) {
 				if (!outputPathChangeEnabled) {
 					output.setText("<No Files Selected>");
@@ -543,7 +543,7 @@ public final class SwiftApp implements EntryPoint, HidesPageContentsWhileLoading
 			dialog.showModal();
 
 			try {
-				final List<ClientFileSearch> entries = files.getData();
+				final List<ClientFileSearch> entries = files.getData(enabledEnginesPanel.getEnabledEngines());
 
 				final ClientSpectrumQa clientSpectrumQa;
 				if (spectrumQaSetupPanel != null) {

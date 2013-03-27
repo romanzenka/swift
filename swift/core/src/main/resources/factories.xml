@@ -35,10 +35,6 @@
                   value="%shortname%_SEQ%tab%&quot;8&quot;%tab%&quot;localhost&quot;%tab%&quot;80&quot;%tab%&quot;MASCOT-INSTALLATION-ROOT/x-cgi/ms-getseq.exe %shortname% #ACCESSION# seq&quot;"/>
     </bean>
 
-    <bean id="sequestDeployerFactory" class="edu.mayo.mprc.sequest.SequestDeploymentService$Factory">
-        <property name="converter" ref="sequestToMakeDbConverter"/>
-        <property name="sequestMappingFactory" ref="sequestMappingFactory"/>
-    </bean>
 
     <bean id="aminoAcidSet" class="edu.mayo.mprc.chem.AminoAcidSet">
     </bean>
@@ -78,22 +74,17 @@
         <property name="dependencies" ref="dependencyResolver"/>
     </bean>
 
-    <bean id="omssaUserModsWriter" class="edu.mayo.mprc.omssa.OmssaUserModsWriter">
-    </bean>
-
-    <bean id="sequestToMakeDbConverter" class="edu.mayo.mprc.sequest.SequestToMakeDBConverter"/>
-
     <!-- Provides a WebUi interface after it gets configured -->
     <bean id="webUiHolder" class="edu.mayo.mprc.swift.WebUiHolder">
 
     </bean>
 
-    <bean id="webUiFactory" class="edu.mayo.mprc.swift.WebUi$Factory">
-        <property name="searchEngines" ref="searchEngines"/>
+    <bean id="webUiFactory" class="edu.mayo.mprc.swift.WebUi$Factory" autowire="byType">
         <property name="swiftMonitor" ref="swiftMonitor"/>
         <property name="fileTokenFactory" ref="fileTokenFactory"/>
         <property name="swiftDao" ref="swiftDao"/>
         <property name="workspaceDao" ref="workspaceDao"/>
+        <property name="engineFactoriesList" ref="engineFactoriesList"/>
     </bean>
 
     <!-- Hibernate properties -->
@@ -122,115 +113,10 @@
 
     <!-- Hibernate mapping resources -->
 
-    <bean id="mascotMappingFactory" class="edu.mayo.mprc.mascot.MascotMappingFactory">
-        <constructor-arg index="0" ref="paramsInfo"/>
-    </bean>
-    <bean id="sequestMappingFactory" class="edu.mayo.mprc.sequest.SequestMappingFactory"/>
-    <bean id="tandemMappingFactory" class="edu.mayo.mprc.xtandem.XTandemMappingFactory"/>
-    <bean id="omssaMappingFactory" class="edu.mayo.mprc.omssa.OmssaMappingFactory"/>
-    <bean id="myrimatchMappingFactory" class="edu.mayo.mprc.myrimatch.MyrimatchMappingFactory"/>
-
     <bean id="paramsInfo" class="edu.mayo.mprc.swift.params2.mapping.ParamsInfoImpl">
         <constructor-arg index="0" ref="curationDao"/>
         <constructor-arg index="1" ref="unimodDao"/>
         <constructor-arg index="2" ref="paramsDao"/>
-    </bean>
-
-    <bean id="searchEngines" class="java.util.ArrayList">
-        <constructor-arg>
-            <list>
-                <ref bean="mascotSearchEngine"/>
-                <ref bean="sequestSearchEngine"/>
-                <ref bean="tandemSearchEngine"/>
-                <ref bean="omssaSearchEngine"/>
-                <ref bean="myrimatchSearchEngine"/>
-                <ref bean="scaffoldSearchEngine"/>
-                <ref bean="scaffold3SearchEngine"/>
-                <ref bean="idpickerSearchEngine"/>
-            </list>
-        </constructor-arg>
-    </bean>
-
-    <bean id="mascotSearchEngine" class="edu.mayo.mprc.swift.db.SearchEngine">
-        <property name="friendlyName" value="Mascot"/>
-        <property name="resultExtension" value=".dat"/>
-        <property name="doSearchXmlAttribute" value="searchMascot"/>
-        <property name="outputDirName" value="mascot"/>
-        <property name="onByDefault" value="true"/>
-        <property name="mappingFactory" ref="mascotMappingFactory"/>
-        <property name="paramsInfo" ref="paramsInfo"/>
-    </bean>
-
-    <bean id="sequestSearchEngine" class="edu.mayo.mprc.swift.db.SearchEngine">
-        <property name="friendlyName" value="Sequest"/>
-        <property name="resultExtension" value=".tar.gz"/>
-        <property name="doSearchXmlAttribute" value="searchSequest"/>
-        <property name="outputDirName" value="sequest"/>
-        <property name="onByDefault" value="true"/>
-        <property name="mappingFactory" ref="sequestMappingFactory"/>
-        <property name="paramsInfo" ref="paramsInfo"/>
-    </bean>
-
-    <bean id="tandemSearchEngine" class="edu.mayo.mprc.swift.db.SearchEngine">
-        <property name="friendlyName" value="Tandem"/>
-        <property name="resultExtension" value=".xml"/>
-        <property name="doSearchXmlAttribute" value="searchTandem"/>
-        <property name="outputDirName" value="tandem"/>
-        <property name="onByDefault" value="true"/>
-        <property name="mappingFactory" ref="tandemMappingFactory"/>
-        <property name="paramsInfo" ref="paramsInfo"/>
-    </bean>
-
-    <bean id="omssaSearchEngine" class="edu.mayo.mprc.swift.db.SearchEngine">
-        <property name="friendlyName" value="Omssa"/>
-        <property name="resultExtension" value=".omx.gz"/>
-        <property name="doSearchXmlAttribute" value="searchOmssa"/>
-        <property name="outputDirName" value="omssa"/>
-        <property name="onByDefault" value="false"/>
-        <property name="mappingFactory" ref="omssaMappingFactory"/>
-        <property name="paramsInfo" ref="paramsInfo"/>
-    </bean>
-
-    <bean id="myrimatchSearchEngine" class="edu.mayo.mprc.swift.db.SearchEngine">
-        <property name="friendlyName" value="Myrimatch"/>
-        <property name="resultExtension" value=".pepXML"/>
-        <property name="doSearchXmlAttribute" value="searchMyrimatch"/>
-        <property name="outputDirName" value="myrimatch"/>
-        <property name="onByDefault" value="false"/>
-        <property name="mappingFactory" ref="myrimatchMappingFactory"/>
-        <property name="paramsInfo" ref="paramsInfo"/>
-    </bean>
-
-    <bean id="idpickerSearchEngine" class="edu.mayo.mprc.swift.db.SearchEngine">
-        <property name="code" value="IDPICKER"/>
-        <property name="friendlyName" value="ID Picker"/>
-        <property name="resultExtension" value=".idp"/>
-        <property name="doSearchXmlAttribute" value="searchIdpicker"/>
-        <property name="outputDirName" value="idpicker"/>
-        <property name="onByDefault" value="false"/>
-        <property name="paramsInfo" ref="paramsInfo"/>
-    </bean>
-
-    <bean id="scaffoldSearchEngine" class="edu.mayo.mprc.swift.db.SearchEngine">
-        <!-- Needs code, as it has no mappings factory to provide it -->
-        <property name="code" value="SCAFFOLD"/>
-        <property name="friendlyName" value="Scaffold"/>
-        <property name="resultExtension" value=".sfd"/>
-        <property name="doSearchXmlAttribute" value="searchScaffold"/>
-        <property name="outputDirName" value="scaffold"/>
-        <property name="onByDefault" value="true"/>
-        <property name="paramsInfo" ref="paramsInfo"/>
-    </bean>
-
-    <bean id="scaffold3SearchEngine" class="edu.mayo.mprc.swift.db.SearchEngine">
-        <!-- Needs code, as it has no mappings factory to provide it -->
-        <property name="code" value="SCAFFOLD3"/>
-        <property name="friendlyName" value="Scaffold 3"/>
-        <property name="resultExtension" value=".sf3"/>
-        <property name="doSearchXmlAttribute" value="searchScaffold3"/>
-        <property name="outputDirName" value="scaffold3"/>
-        <property name="onByDefault" value="true"/>
-        <property name="paramsInfo" ref="paramsInfo"/>
     </bean>
 
     <!-- SGE -->

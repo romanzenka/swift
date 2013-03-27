@@ -6,6 +6,7 @@ import edu.mayo.mprc.daemon.SimpleThreadPoolExecutor;
 import edu.mayo.mprc.daemon.files.FileTokenFactory;
 import edu.mayo.mprc.dbcurator.model.Curation;
 import edu.mayo.mprc.dbcurator.model.persistence.CurationDao;
+import edu.mayo.mprc.searchengine.EngineMetadata;
 import edu.mayo.mprc.swift.db.SearchEngine;
 import edu.mayo.mprc.swift.db.SwiftDao;
 import edu.mayo.mprc.swift.dbmapping.*;
@@ -92,11 +93,12 @@ public class TestSearchRunner {
 				dummyFileTokenFactory(),
 				searchRun,
 				false,
-				0);
+				0,
+				null);
 
 		runner.initialize();
 
-		final int numEngines = enabledEngines().toEngineCodeList().size();
+		final int numEngines = enabledEngines().size();
 		final int tasksPerFile = (numEngines - 2) /* 1 for each engine except Scaffolds */
 				+ 1 /* Raw->mgf */
 				+ 1 /* RawDump */
@@ -157,11 +159,12 @@ public class TestSearchRunner {
 				dummyFileTokenFactory(),
 				searchRun,
 				false,
-				0);
+				0,
+				null);
 
 		runner.initialize();
 
-		final int numEngines = enabledEngines().toEngineCodeList().size();
+		final int numEngines = enabledEngines().size();
 		final int tasksPerFile = numEngines /* 1 for each engine */
 				+ 1 /* Raw->mgf */
 				+ 1 /* RawDump */
@@ -239,16 +242,17 @@ public class TestSearchRunner {
 
 	private SearchEngine searchEngine(final String code) {
 		final SearchEngine engine = new SearchEngine();
-		engine.setCode(code);
+		final EngineMetadata metadata = new EngineMetadata(
+				code, null, code, false, code + "_output_dir", null,
+				new String[]{}, new String[]{}, new String[]{}, 0, code.equals("SCAFFOLD") || code.equals("SCAFFOLD3") || code.equals("IDPICKER"));
+		engine.setEngineMetadata(metadata);
 		engine.setSearchDaemon(mock(DaemonConnection.class));
 		engine.setDbDeployDaemon(mock(DaemonConnection.class));
-		engine.setOutputDirName(code + "_output_dir");
 		return engine;
 	}
 
 	private SearchEngineConfig createSearchEngineConfig(final String code) {
-		final SearchEngineConfig config = new SearchEngineConfig(code);
-		config.setCode(code);
+		final SearchEngineConfig config = new SearchEngineConfig(code, "1.0");
 		return config;
 	}
 

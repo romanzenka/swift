@@ -10,12 +10,15 @@ import edu.mayo.mprc.daemon.Worker;
 import edu.mayo.mprc.daemon.WorkerBase;
 import edu.mayo.mprc.daemon.WorkerFactoryBase;
 import edu.mayo.mprc.daemon.exception.DaemonException;
+import edu.mayo.mprc.searchengine.EngineFactory;
+import edu.mayo.mprc.searchengine.EngineMetadata;
 import edu.mayo.mprc.sequest.core.Mgf2SequestCaller;
 import edu.mayo.mprc.utilities.FileUtilities;
 import edu.mayo.mprc.utilities.progress.UserProgressReporter;
 import org.apache.log4j.Logger;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.Resource;
 import java.io.File;
 import java.util.Arrays;
 import java.util.Map;
@@ -101,13 +104,35 @@ public final class SequestWorker extends WorkerBase {
 	 * A factory capable of creating the worker
 	 */
 	@Component("sequestWorkerFactory")
-	public static final class Factory extends WorkerFactoryBase<Config> {
+	public static final class Factory extends WorkerFactoryBase<Config> implements EngineFactory {
+
+		private SequestMappingFactory sequestMappingFactory;
+
 		@Override
 		public Worker create(final Config config, final DependencyResolver dependencies) {
 			final SequestWorker worker = new SequestWorker();
 			worker.setPvmHosts(new File(config.getPvmHosts()).getAbsoluteFile());
 			worker.setSequestCommand(config.getSequestCommand());
 			return worker;
+		}
+
+		@Override
+		public EngineMetadata getEngineMetadata() {
+			return new EngineMetadata(
+					"SEQUEST", ".tar.gz", "Sequest", true, "sequest", sequestMappingFactory,
+					new String[]{TYPE},
+					new String[]{SequestCache.TYPE},
+					new String[]{SequestDeploymentService.TYPE},
+					20, true);
+		}
+
+		public SequestMappingFactory getSequestMappingFactory() {
+			return sequestMappingFactory;
+		}
+
+		@Resource(name = "sequestMappingFactory")
+		public void setSequestMappingFactory(final SequestMappingFactory sequestMappingFactory) {
+			this.sequestMappingFactory = sequestMappingFactory;
 		}
 	}
 

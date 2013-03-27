@@ -13,6 +13,7 @@ import edu.mayo.mprc.scaffold3.Scaffold3Worker;
 import edu.mayo.mprc.searchdb.SearchDbWorker;
 import edu.mayo.mprc.searchdb.dao.SearchDbDao;
 import edu.mayo.mprc.swift.ExitCode;
+import edu.mayo.mprc.swift.db.SearchEngine;
 import edu.mayo.mprc.swift.db.SwiftDao;
 import edu.mayo.mprc.swift.dbmapping.FileSearch;
 import edu.mayo.mprc.swift.dbmapping.ReportData;
@@ -31,6 +32,7 @@ import org.joda.time.Interval;
 import java.io.File;
 import java.text.MessageFormat;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -197,7 +199,7 @@ public final class LoadToSearchDb implements SwiftCommand {
 				final int inputSize = swiftSearchDefinition.getInputFiles().size();
 				if (inputSize > maxInputFileSize) {
 					getDao().commit();
-					LOGGER.info("The search for report #" + reportDataId + " ("+reportData.getSearchRun().getTitle()+") uses " + inputSize + " input files, which is more than maximum allowed " + maxInputFileSize);
+					LOGGER.info("The search for report #" + reportDataId + " (" + reportData.getSearchRun().getTitle() + ") uses " + inputSize + " input files, which is more than maximum allowed " + maxInputFileSize);
 					return null;
 				}
 			}
@@ -343,12 +345,24 @@ public final class LoadToSearchDb implements SwiftCommand {
 
 	private void initializeConnections(final SwiftEnvironment environment, final SwiftSearcher.Config config) {
 		rawDump = getConnection(environment, config.getRawdump(), RAWDumpWorker.NAME);
-		scaffold3 = getConnection(environment, config.getScaffold3(), Scaffold3Worker.NAME);
+		final Collection<SearchEngine.Config> engines = config.getEngines();
+		SearchEngine.Config scaffoldEngine = null;
+		for (final SearchEngine.Config engine : engines) {
+			if ("SCAFFOLD3".equals(engine.getCode())) {
+				scaffoldEngine = engine;
+				break;
+			}
+		}
+
+		scaffold3 = getConnection(environment, scaffoldEngine == null ? null : scaffoldEngine.getWorker(), Scaffold3Worker.NAME);
 		fastaDb = getConnection(environment, config.getFastaDb(), FastaDbWorker.NAME);
 		searchDb = getConnection(environment, config.getSearchDb(), SearchDbWorker.NAME);
 	}
 
 	private DaemonConnection getConnection(final SwiftEnvironment environment, final ServiceConfig serviceConfig, final String workerName) {
+		if (serviceConfig == null) {
+			throw new MprcException("No " + workerName + " worker defined.");
+		}
 		final DaemonConnection connection = environment.getConnection(serviceConfig);
 		if (connection == null) {
 			throw new MprcException("No " + workerName + " worker defined.");

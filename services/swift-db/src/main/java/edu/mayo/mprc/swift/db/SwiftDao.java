@@ -2,7 +2,6 @@ package edu.mayo.mprc.swift.db;
 
 import edu.mayo.mprc.config.RuntimeInitializer;
 import edu.mayo.mprc.daemon.AssignedTaskData;
-import edu.mayo.mprc.database.Change;
 import edu.mayo.mprc.database.Dao;
 import edu.mayo.mprc.swift.dbmapping.*;
 import edu.mayo.mprc.utilities.progress.ProgressReport;
@@ -64,21 +63,14 @@ public interface SwiftDao extends Dao, RuntimeInitializer {
 	SearchRun getSearchRunForId(int searchRunId);
 
 	/**
-	 * @return List of all configured search engines.
-	 */
-	List<SearchEngineConfig> listSearchEngines();
-
-	/**
 	 * Adds a search engine config. If the config already exists, the object gets updated.
+	 * Returns a serialized version of the config.
 	 *
 	 * @param config Search engine config.
-	 * @param change Description of the change that caused this addition.
 	 */
-	void addSearchEngineConfig(SearchEngineConfig config, Change change);
+	SearchEngineConfig addSearchEngineConfig(SearchEngineConfig config);
 
-	SearchEngineConfig getSearchEngineConfig(String code);
-
-	EnabledEngines addEnabledEngineSet(Iterable<String> searchEngineCodes);
+	EnabledEngines addEnabledEngineSet(Iterable<SearchEngineConfig> searchEngineConfigs);
 
 	EnabledEngines addEnabledEngines(EnabledEngines engines);
 

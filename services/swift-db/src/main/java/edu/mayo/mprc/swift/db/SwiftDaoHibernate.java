@@ -4,7 +4,6 @@ import com.google.common.base.Preconditions;
 import edu.mayo.mprc.MprcException;
 import edu.mayo.mprc.daemon.AssignedTaskData;
 import edu.mayo.mprc.daemon.files.FileTokenFactory;
-import edu.mayo.mprc.database.Change;
 import edu.mayo.mprc.database.DaoBase;
 import edu.mayo.mprc.database.DatabasePlaceholder;
 import edu.mayo.mprc.swift.dbmapping.*;
@@ -36,7 +35,6 @@ public final class SwiftDaoHibernate extends DaoBase implements SwiftDao {
 	private final Object taskStatesLock = new Object();
 	private Map<TaskState, TaskStateData> taskStates = null;
 	private WorkspaceDao workspaceDao;
-	private List<SearchEngine> searchEngines;
 
 	public SwiftDaoHibernate() {
 		super(null);
@@ -190,45 +188,34 @@ public final class SwiftDaoHibernate extends DaoBase implements SwiftDao {
 	}
 
 	private static Criterion getSearchEngineEqualityCriteria(final SearchEngineConfig searchEngineConfig) {
-		return DaoBase.nullSafeEq("code", searchEngineConfig.getCode());
+		return Restrictions.and(
+				DaoBase.nullSafeEq("code", searchEngineConfig.getCode()),
+				DaoBase.nullSafeEq("version", searchEngineConfig.getVersion())
+		);
 	}
 
-	private static Criterion getSearchEngineEqualityCriteria(final String code) {
-		return DaoBase.nullSafeEq("code", code);
+	private static Criterion getSearchEngineEqualityCriteria(final String code, final String version) {
+		return Restrictions.and(
+				DaoBase.nullSafeEq("code", code),
+				DaoBase.nullSafeEq("version", version)
+		);
 	}
 
 	@Override
-	public List<SearchEngineConfig> listSearchEngines() {
-		return (List<SearchEngineConfig>) listAll(SearchEngineConfig.class);
-	}
-
-	@Override
-	public void addSearchEngineConfig(final SearchEngineConfig config, final Change change) {
+	public SearchEngineConfig addSearchEngineConfig(final SearchEngineConfig config) {
 		try {
-			save(config, change, getSearchEngineEqualityCriteria(config), false);
+			return save(config, getSearchEngineEqualityCriteria(config), false);
 		} catch (Exception t) {
 			throw new MprcException("Cannot add new search engine config '" + config.getCode() + "'", t);
 		}
 	}
 
 	@Override
-	public SearchEngineConfig getSearchEngineConfig(final String code) {
-		try {
-			return get(SearchEngineConfig.class, getSearchEngineEqualityCriteria(code));
-		} catch (Exception t) {
-			throw new MprcException("Cannot obtain search engine config for engine " + code, t);
-		}
-	}
-
-	@Override
-	public EnabledEngines addEnabledEngineSet(final Iterable<String> searchEngineCodes) {
+	public EnabledEngines addEnabledEngineSet(final Iterable<SearchEngineConfig> searchEngineConfigs) {
 		try {
 			final EnabledEngines engines = new EnabledEngines();
-			for (final String engineCode : searchEngineCodes) {
-				final SearchEngineConfig searchEngineConfig = getSearchEngineConfig(engineCode);
-				if (searchEngineConfig == null) {
-					throw new MprcException("Can not find search engine configuration for engine " + engineCode);
-				}
+			for (final SearchEngineConfig config : searchEngineConfigs) {
+				final SearchEngineConfig searchEngineConfig = addSearchEngineConfig(config);
 				engines.add(searchEngineConfig);
 			}
 
@@ -593,13 +580,6 @@ public final class SwiftDaoHibernate extends DaoBase implements SwiftDao {
 		if (rowCount(SearchRun.class) == 0) {
 			return "There were no searches previously run";
 		}
-		final long searchEngineCount = countAll(SearchEngineConfig.class);
-		if (searchEngineCount == 0) {
-			return "No search engines are defined";
-		}
-		if (searchEngineCount < searchEngines.size()) {
-			return "Not all search engines are stored in the database";
-		}
 		return null;
 	}
 
@@ -614,19 +594,6 @@ public final class SwiftDaoHibernate extends DaoBase implements SwiftDao {
 				addTaskState(state);
 			}
 		}
-
-		final long searchEngineCount = countAll(SearchEngineConfig.class);
-		if (searchEngineCount < getSearchEngines().size()) {
-			final Change change = new Change(
-					searchEngineCount == 0 ?
-							"Installing initial list of search engines" :
-							"Updating list of search engines", new DateTime());
-			LOGGER.info(change.getReason());
-			for (final SearchEngine engine : getSearchEngines()) {
-				final SearchEngineConfig searchEngineConfig = new SearchEngineConfig(engine.getCode());
-				this.addSearchEngineConfig(searchEngineConfig, change);
-			}
-		}
 	}
 
 	public WorkspaceDao getWorkspaceDao() {
@@ -636,14 +603,5 @@ public final class SwiftDaoHibernate extends DaoBase implements SwiftDao {
 	@Resource(name = "workspaceDao")
 	public void setWorkspaceDao(final WorkspaceDao workspaceDao) {
 		this.workspaceDao = workspaceDao;
-	}
-
-	public List<SearchEngine> getSearchEngines() {
-		return searchEngines;
-	}
-
-	@Resource(name = "searchEngines")
-	public void setSearchEngines(final List<SearchEngine> searchEngines) {
-		this.searchEngines = searchEngines;
 	}
 }

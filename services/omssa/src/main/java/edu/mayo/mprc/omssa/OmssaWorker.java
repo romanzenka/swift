@@ -12,6 +12,8 @@ import edu.mayo.mprc.daemon.Worker;
 import edu.mayo.mprc.daemon.WorkerBase;
 import edu.mayo.mprc.daemon.WorkerFactoryBase;
 import edu.mayo.mprc.daemon.exception.DaemonException;
+import edu.mayo.mprc.searchengine.EngineFactory;
+import edu.mayo.mprc.searchengine.EngineMetadata;
 import edu.mayo.mprc.utilities.FileUtilities;
 import edu.mayo.mprc.utilities.GZipUtilities;
 import edu.mayo.mprc.utilities.ProcessCaller;
@@ -176,7 +178,13 @@ public final class OmssaWorker extends WorkerBase {
 	 * A factory capable of creating the worker
 	 */
 	@Component("omssaWorkerFactory")
-	public static final class Factory extends WorkerFactoryBase<Config> {
+	public static final class Factory extends WorkerFactoryBase<Config> implements EngineFactory {
+		private static final EngineMetadata ENGINE_METADATA = new EngineMetadata(
+				"OMSSA", ".omx.gz", "Omssa", false, "omssa", new OmssaMappingFactory(),
+				new String[]{TYPE},
+				new String[]{OmssaCache.TYPE},
+				new String[]{OmssaDeploymentService.TYPE},
+				50, false);
 		private OmssaUserModsWriter omssaUserModsWriter;
 
 		@Override
@@ -194,6 +202,11 @@ public final class OmssaWorker extends WorkerBase {
 
 		public OmssaUserModsWriter getOmssaUserModsWriter() {
 			return omssaUserModsWriter;
+		}
+
+		@Override
+		public EngineMetadata getEngineMetadata() {
+			return ENGINE_METADATA;
 		}
 	}
 

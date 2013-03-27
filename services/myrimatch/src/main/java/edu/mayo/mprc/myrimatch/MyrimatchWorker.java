@@ -14,6 +14,8 @@ import edu.mayo.mprc.daemon.Worker;
 import edu.mayo.mprc.daemon.WorkerBase;
 import edu.mayo.mprc.daemon.WorkerFactoryBase;
 import edu.mayo.mprc.daemon.exception.DaemonException;
+import edu.mayo.mprc.searchengine.EngineFactory;
+import edu.mayo.mprc.searchengine.EngineMetadata;
 import edu.mayo.mprc.utilities.FileUtilities;
 import edu.mayo.mprc.utilities.ProcessCaller;
 import edu.mayo.mprc.utilities.progress.UserProgressReporter;
@@ -150,16 +152,28 @@ public final class MyrimatchWorker extends WorkerBase {
 	 * A factory capable of creating the worker
 	 */
 	@Component("myrimatchWorkerFactory")
-	public static final class Factory extends WorkerFactoryBase<Config> {
+	public static final class Factory extends WorkerFactoryBase<Config> implements EngineFactory {
+		private static final EngineMetadata ENGINE_METADATA = new EngineMetadata(
+				"MYRIMATCH", ".pepXML", "Myrimatch", false, "myrimatch", new MyrimatchMappingFactory(),
+				new String[]{TYPE},
+				new String[]{MyrimatchCache.TYPE},
+				new String[]{MyrimatchDeploymentService.TYPE},
+				40, false);
+
 		@Override
 		public Worker create(final Config config, final DependencyResolver dependencies) {
 			MyrimatchWorker worker = null;
 			try {
 				worker = new MyrimatchWorker(FileUtilities.getAbsoluteFileForExecutables(new File(config.getExecutable())));
 			} catch (Exception e) {
-				throw new MprcException("Tandem worker could not be created.", e);
+				throw new MprcException("Myrimatch worker could not be created.", e);
 			}
 			return worker;
+		}
+
+		@Override
+		public EngineMetadata getEngineMetadata() {
+			return ENGINE_METADATA;
 		}
 	}
 

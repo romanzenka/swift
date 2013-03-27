@@ -1,6 +1,8 @@
 package edu.mayo.mprc.swift.search;
 
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Lists;
+import com.google.common.collect.ObjectArrays;
 import edu.mayo.mprc.MprcException;
 import edu.mayo.mprc.config.DaemonConfig;
 import edu.mayo.mprc.config.DependencyResolver;
@@ -16,49 +18,29 @@ import edu.mayo.mprc.daemon.files.FileTokenFactory;
 import edu.mayo.mprc.database.DatabaseFactory;
 import edu.mayo.mprc.dbcurator.model.persistence.CurationDao;
 import edu.mayo.mprc.fastadb.FastaDbWorker;
-import edu.mayo.mprc.idpicker.IdpickerCache;
-import edu.mayo.mprc.idpicker.IdpickerDeploymentService;
-import edu.mayo.mprc.idpicker.IdpickerWorker;
-import edu.mayo.mprc.mascot.MascotCache;
-import edu.mayo.mprc.mascot.MascotDeploymentService;
-import edu.mayo.mprc.mascot.MascotWorker;
-import edu.mayo.mprc.mascot.MockMascotDeploymentService;
 import edu.mayo.mprc.mgf2mgf.MgfToMgfWorker;
 import edu.mayo.mprc.msconvert.MsconvertCache;
 import edu.mayo.mprc.msconvert.MsconvertWorker;
 import edu.mayo.mprc.msmseval.MSMSEvalWorker;
 import edu.mayo.mprc.msmseval.MsmsEvalCache;
-import edu.mayo.mprc.myrimatch.MyrimatchCache;
-import edu.mayo.mprc.myrimatch.MyrimatchDeploymentService;
-import edu.mayo.mprc.myrimatch.MyrimatchWorker;
-import edu.mayo.mprc.omssa.OmssaCache;
-import edu.mayo.mprc.omssa.OmssaDeploymentService;
-import edu.mayo.mprc.omssa.OmssaWorker;
 import edu.mayo.mprc.qa.QaWorker;
 import edu.mayo.mprc.qa.RAWDumpCache;
 import edu.mayo.mprc.qa.RAWDumpWorker;
 import edu.mayo.mprc.raw2mgf.RawToMgfCache;
 import edu.mayo.mprc.raw2mgf.RawToMgfWorker;
-import edu.mayo.mprc.scaffold.ScaffoldDeploymentService;
-import edu.mayo.mprc.scaffold.ScaffoldWorker;
 import edu.mayo.mprc.scaffold.report.ScaffoldReportWorker;
-import edu.mayo.mprc.scaffold3.Scaffold3DeploymentService;
-import edu.mayo.mprc.scaffold3.Scaffold3Worker;
 import edu.mayo.mprc.searchdb.SearchDbWorker;
-import edu.mayo.mprc.sequest.SequestCache;
-import edu.mayo.mprc.sequest.SequestDeploymentService;
-import edu.mayo.mprc.sequest.SequestWorker;
+import edu.mayo.mprc.searchengine.EngineMetadata;
+import edu.mayo.mprc.swift.db.EngineFactoriesList;
 import edu.mayo.mprc.swift.db.SearchEngine;
 import edu.mayo.mprc.swift.db.SwiftDao;
 import edu.mayo.mprc.swift.dbmapping.FileSearch;
 import edu.mayo.mprc.swift.dbmapping.SearchRun;
 import edu.mayo.mprc.swift.dbmapping.SwiftSearchDefinition;
+import edu.mayo.mprc.swift.params2.mapping.ParamsInfo;
 import edu.mayo.mprc.swift.search.task.SearchRunner;
 import edu.mayo.mprc.utilities.exceptions.ExceptionUtilities;
 import edu.mayo.mprc.utilities.progress.ProgressReporter;
-import edu.mayo.mprc.xtandem.XTandemCache;
-import edu.mayo.mprc.xtandem.XTandemDeploymentService;
-import edu.mayo.mprc.xtandem.XTandemWorker;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
@@ -73,6 +55,12 @@ public final class SwiftSearcher implements Worker {
 	public static final String TYPE = "searcher";
 	public static final String NAME = "Swift Searcher";
 	public static final String DESC = "Runs the Swift search, orchestrating all the other modules.";
+
+	public static final String ENGINE_COMMON_PREFIX = "engine-";
+	public static final String ENGINE_WORKER_PREFIX = ENGINE_COMMON_PREFIX + "worker-";
+	public static final String ENGINE_DEPLOYER_PREFIX = ENGINE_COMMON_PREFIX + "deployer-";
+	public static final String ENGINE_VERSION_PREFIX = ENGINE_COMMON_PREFIX + "version-";
+	public static final String ENGINE_CODE_PREFIX = ENGINE_COMMON_PREFIX + "code-";
 
 	private boolean raw2mgfEnabled = false;
 	private boolean mgf2mgfEnabled = false;
@@ -94,12 +82,12 @@ public final class SwiftSearcher implements Worker {
 	private DaemonConnection qaDaemon;
 	private DaemonConnection fastaDbDaemon;
 	private DaemonConnection searchDbDaemon;
-	private Collection<SearchEngine> searchEngines;
 	private static final ExecutorService service = new SimpleThreadPoolExecutor(1, "swiftSearcher", false/* do not block*/);
 	private boolean reportDecoyHits;
 
 	private CurationDao curationDao;
 	private SwiftDao swiftDao;
+	private ParamsInfo paramsInfo;
 
 	private static final String FASTA_PATH = "fastaPath";
 	private static final String FASTA_ARCHIVE_PATH = "fastaArchivePath";
@@ -108,22 +96,7 @@ public final class SwiftSearcher implements Worker {
 	private static final String MSCONVERT = "msconvert";
 	private static final String MGF_2_MGF = "mgf2mgf";
 	private static final String RAWDUMP = "rawdump";
-	private static final String MASCOT = "mascot";
-	private static final String MASCOT_DEPLOYER = "mascotDeployer";
-	private static final String SEQUEST = "sequest";
-	private static final String SEQUEST_DEPLOYER = "sequestDeployer";
-	private static final String TANDEM = "tandem";
-	private static final String TANDEM_DEPLOYER = "tandemDeployer";
-	private static final String OMSSA = "omssa";
-	private static final String OMSSA_DEPLOYER = "omssaDeployer";
-	private static final String MYRIMATCH = "myrimatch";
-	private static final String MYRIMATCH_DEPLOYER = "myrimatchDeployer";
-	private static final String IDPICKER = "idpicker";
-	private static final String IDPICKER_DEPLOYER = "idpickerDeployer";
-	private static final String SCAFFOLD = "scaffold";
-	private static final String SCAFFOLD_DEPLOYER = "scaffoldDeployer";
-	private static final String SCAFFOLD3 = "scaffold3";
-	private static final String SCAFFOLD3_DEPLOYER = "scaffold3Deployer";
+
 	private static final String SCAFFOLD_REPORT = "scaffoldReport";
 	private static final String QA = "qa";
 	private static final String MSMS_EVAL = "msmsEval";
@@ -161,7 +134,7 @@ public final class SwiftSearcher implements Worker {
 		return msconvertEnabled;
 	}
 
-	public void setMsconvertEnabled(boolean msconvertEnabled) {
+	public void setMsconvertEnabled(final boolean msconvertEnabled) {
 		this.msconvertEnabled = msconvertEnabled;
 	}
 
@@ -213,8 +186,12 @@ public final class SwiftSearcher implements Worker {
 		this.supportedEngines = supportedEngines;
 	}
 
-	public Collection<SearchEngine> getSearchEngines() {
-		return searchEngines;
+	public ParamsInfo getParamsInfo() {
+		return paramsInfo;
+	}
+
+	public void setParamsInfo(final ParamsInfo paramsInfo) {
+		this.paramsInfo = paramsInfo;
 	}
 
 	/**
@@ -223,7 +200,6 @@ public final class SwiftSearcher implements Worker {
 	 * @param searchEngines List of all available search engines.
 	 */
 	public void setSearchEngines(final Collection<SearchEngine> searchEngines) {
-		this.searchEngines = searchEngines;
 		supportedEngines = new HashSet<SearchEngine>();
 		for (final SearchEngine engine : searchEngines) {
 			if (engine.isEnabled()) {
@@ -244,7 +220,7 @@ public final class SwiftSearcher implements Worker {
 		return msconvertDaemon;
 	}
 
-	public void setMsconvertDaemon(DaemonConnection msconvertDaemon) {
+	public void setMsconvertDaemon(final DaemonConnection msconvertDaemon) {
 		this.msconvertDaemon = msconvertDaemon;
 	}
 
@@ -308,7 +284,7 @@ public final class SwiftSearcher implements Worker {
 		return reportDecoyHits;
 	}
 
-	public void setReportDecoyHits(boolean reportDecoyHits) {
+	public void setReportDecoyHits(final boolean reportDecoyHits) {
 		this.reportDecoyHits = reportDecoyHits;
 	}
 
@@ -365,7 +341,8 @@ public final class SwiftSearcher implements Worker {
 					fileTokenFactory,
 					searchRun,
 					reportDecoyHits,
-					swiftSearchWorkPacket.getPriority());
+					swiftSearchWorkPacket.getPriority(),
+					paramsInfo);
 
 			searchRunner.initialize();
 
@@ -466,32 +443,30 @@ public final class SwiftSearcher implements Worker {
 	 */
 	@Component("swiftSearcherFactory")
 	public static final class Factory extends WorkerFactoryBase<Config> {
-		private Collection<SearchEngine> searchEngines;
 		private CurationDao curationDao;
 		private SwiftDao swiftDao;
 		private FileTokenFactory fileTokenFactory;
 		private DatabaseValidator databaseValidator;
+		private ParamsInfo paramsInfo;
+		private EngineFactoriesList engineFactoriesList;
 
 		@Override
 		public ServiceUiFactory getServiceUiFactory() {
-			return new Ui(getDatabaseValidator());
+			return new Ui(getDatabaseValidator(), getEngineFactoriesList());
 		}
 
 		@Override
 		public Worker create(final Config config, final DependencyResolver dependencies) {
-			final SwiftSearcher worker = new SwiftSearcher(curationDao, swiftDao, fileTokenFactory);
+			final SwiftSearcher worker = new SwiftSearcher(getCurationDao(), getSwiftDao(), getFileTokenFactory());
+			worker.setParamsInfo(paramsInfo);
 
-			// Fill the search engine list with daemon connections, if we have both the deployer and the searcher defined
 			final List<SearchEngine> connectedSearchEngines = new ArrayList<SearchEngine>();
-			for (final SearchEngine engine : searchEngines) {
-				fillEngineDaemons(engine, connectedSearchEngines, "MASCOT", config.mascot, config.mascotDeployer, dependencies);
-				fillEngineDaemons(engine, connectedSearchEngines, "SEQUEST", config.sequest, config.sequestDeployer, dependencies);
-				fillEngineDaemons(engine, connectedSearchEngines, "TANDEM", config.tandem, config.tandemDeployer, dependencies);
-				fillEngineDaemons(engine, connectedSearchEngines, "OMSSA", config.omssa, config.omssaDeployer, dependencies);
-				fillEngineDaemons(engine, connectedSearchEngines, "MYRIMATCH", config.myrimatch, config.myrimatchDeployer, dependencies);
-				fillEngineDaemons(engine, connectedSearchEngines, "IDPICKER", config.idpicker, config.idpickerDeployer, dependencies);
-				fillEngineDaemons(engine, connectedSearchEngines, "SCAFFOLD", config.scaffold, config.scaffoldDeployer, dependencies);
-				fillEngineDaemons(engine, connectedSearchEngines, "SCAFFOLD3", config.scaffold3, config.scaffold3Deployer, dependencies);
+			for (final SearchEngine.Config engineConfig : config.getEngines()) {
+				if (engineConfig.getWorker() != null && engineConfig.getDeployer() != null) {
+					final SearchEngine engine = (SearchEngine) dependencies.createSingleton(engineConfig);
+					connectedSearchEngines.add(engine);
+				}
+
 			}
 			worker.setSearchEngines(connectedSearchEngines);
 			if (config.raw2mgf != null) {
@@ -537,29 +512,6 @@ public final class SwiftSearcher implements Worker {
 			return worker;
 		}
 
-		private void fillEngineDaemons(final SearchEngine engineToFill, final List<SearchEngine> filledList, final String engineCode, final ServiceConfig daemonConfig, final ServiceConfig dbDeployerConfig, final DependencyResolver dependencies) {
-			if (engineCode.equals(engineToFill.getCode()) && daemonConfig != null && dbDeployerConfig != null) {
-				SearchEngine clone = null;
-				try {
-					clone = (SearchEngine) engineToFill.clone();
-				} catch (CloneNotSupportedException e) {
-					throw new MprcException("Cannot clone search engine " + engineCode, e);
-				}
-				clone.setSearchDaemon((DaemonConnection) dependencies.createSingleton(daemonConfig));
-				clone.setDbDeployDaemon((DaemonConnection) dependencies.createSingleton(dbDeployerConfig));
-				filledList.add(clone);
-			}
-		}
-
-		public Collection<SearchEngine> getSearchEngines() {
-			return searchEngines;
-		}
-
-		@Resource(name = "searchEngines")
-		public void setSearchEngines(final Collection<SearchEngine> searchEngines) {
-			this.searchEngines = searchEngines;
-		}
-
 		public CurationDao getCurationDao() {
 			return curationDao;
 		}
@@ -592,8 +544,26 @@ public final class SwiftSearcher implements Worker {
 		}
 
 		@Resource(name = "databaseValidator")
-		public void setDatabaseValidator(DatabaseValidator databaseValidator) {
+		public void setDatabaseValidator(final DatabaseValidator databaseValidator) {
 			this.databaseValidator = databaseValidator;
+		}
+
+		public ParamsInfo getParamsInfo() {
+			return paramsInfo;
+		}
+
+		@Resource(name = "paramsInfo")
+		public void setParamsInfo(final ParamsInfo paramsInfo) {
+			this.paramsInfo = paramsInfo;
+		}
+
+		public EngineFactoriesList getEngineFactoriesList() {
+			return engineFactoriesList;
+		}
+
+		@Resource(name = "engineFactoriesList")
+		public void setEngineFactoriesList(EngineFactoriesList engineFactoriesList) {
+			this.engineFactoriesList = engineFactoriesList;
 		}
 	}
 
@@ -610,23 +580,11 @@ public final class SwiftSearcher implements Worker {
 		private ServiceConfig msconvert;
 		private ServiceConfig mgf2mgf;
 		private ServiceConfig rawdump;
-		private ServiceConfig mascot;
-		private ServiceConfig mascotDeployer;
-		private ServiceConfig sequest;
-		private ServiceConfig sequestDeployer;
-		private ServiceConfig tandem;
-		private ServiceConfig tandemDeployer;
-		private ServiceConfig omssa;
-		private ServiceConfig omssaDeployer;
-		private ServiceConfig myrimatch;
-		private ServiceConfig myrimatchDeployer;
-		private ServiceConfig idpicker;
-		private ServiceConfig idpickerDeployer;
-		private ServiceConfig scaffold;
-		private ServiceConfig scaffoldDeployer;
+
+		private Collection<SearchEngine.Config> engines;
+
 		private ServiceConfig scaffoldReport;
-		private ServiceConfig scaffold3;
-		private ServiceConfig scaffold3Deployer;
+
 		private ServiceConfig qa;
 		private ServiceConfig fastaDb;
 		private ServiceConfig searchDb;
@@ -637,14 +595,9 @@ public final class SwiftSearcher implements Worker {
 		}
 
 		public Config(final String fastaPath, final String fastaArchivePath, final String fastaUploadPath
-				, final ServiceConfig raw2mgf, final ServiceConfig msconvert,
-				      final ServiceConfig mgf2mgf, final ServiceConfig rawdump, final ServiceConfig mascot, final ServiceConfig mascotDeployer
-				, final ServiceConfig sequest, final ServiceConfig sequestDeployer, final ServiceConfig tandem, final ServiceConfig tandemDeployer
-				, final ServiceConfig omssa, final ServiceConfig omssaDeployer
-				, final ServiceConfig myrimatch, final ServiceConfig myrimatchDeployer
-				, final ServiceConfig idpicker, final ServiceConfig idpickerDeployer
-				, final ServiceConfig scaffold, final ServiceConfig scaffoldDeployer
-				, final ServiceConfig scaffold3, final ServiceConfig scaffold3Deployer
+				, final ServiceConfig raw2mgf, final ServiceConfig msconvert
+				, final ServiceConfig mgf2mgf, final ServiceConfig rawdump
+				, final Collection<SearchEngine.Config> engines
 				, final ServiceConfig scaffoldReport, final ServiceConfig qa
 				, final ServiceConfig fastaDb, final ServiceConfig searchDb
 				, final ServiceConfig msmsEval
@@ -656,22 +609,7 @@ public final class SwiftSearcher implements Worker {
 			this.msconvert = msconvert;
 			this.mgf2mgf = mgf2mgf;
 			this.rawdump = rawdump;
-			this.mascot = mascot;
-			this.mascotDeployer = mascotDeployer;
-			this.sequest = sequest;
-			this.sequestDeployer = sequestDeployer;
-			this.tandem = tandem;
-			this.tandemDeployer = tandemDeployer;
-			this.omssa = omssa;
-			this.omssaDeployer = omssaDeployer;
-			this.myrimatch = myrimatch;
-			this.myrimatchDeployer = myrimatchDeployer;
-			this.idpicker = idpicker;
-			this.idpickerDeployer = idpickerDeployer;
-			this.scaffold = scaffold;
-			this.scaffoldDeployer = scaffoldDeployer;
-			this.scaffold3 = scaffold3;
-			this.scaffold3Deployer = scaffold3Deployer;
+			this.engines = engines;
 			this.scaffoldReport = scaffoldReport;
 			this.qa = qa;
 			this.fastaDb = fastaDb;
@@ -713,70 +651,6 @@ public final class SwiftSearcher implements Worker {
 			return rawdump;
 		}
 
-		public ServiceConfig getMascot() {
-			return mascot;
-		}
-
-		public ServiceConfig getMascotDeployer() {
-			return mascotDeployer;
-		}
-
-		public ServiceConfig getSequest() {
-			return sequest;
-		}
-
-		public ServiceConfig getSequestDeployer() {
-			return sequestDeployer;
-		}
-
-		public ServiceConfig getTandem() {
-			return tandem;
-		}
-
-		public ServiceConfig getTandemDeployer() {
-			return tandemDeployer;
-		}
-
-		public ServiceConfig getOmssa() {
-			return omssa;
-		}
-
-		public ServiceConfig getOmssaDeployer() {
-			return omssaDeployer;
-		}
-
-		public ServiceConfig getMyrimatch() {
-			return myrimatch;
-		}
-
-		public ServiceConfig getMyrimatchDeployer() {
-			return myrimatchDeployer;
-		}
-
-		public ServiceConfig getIdpicker() {
-			return idpicker;
-		}
-
-		public ServiceConfig getIdpickerDeployer() {
-			return idpickerDeployer;
-		}
-
-		public ServiceConfig getScaffold() {
-			return scaffold;
-		}
-
-		public ServiceConfig getScaffoldDeployer() {
-			return scaffoldDeployer;
-		}
-
-		public ServiceConfig getScaffold3() {
-			return scaffold3;
-		}
-
-		public ServiceConfig getScaffold3Deployer() {
-			return scaffold3Deployer;
-		}
-
 		public ServiceConfig getScaffoldReport() {
 			return scaffoldReport;
 		}
@@ -801,6 +675,10 @@ public final class SwiftSearcher implements Worker {
 			return reportDecoyHits;
 		}
 
+		public Collection<SearchEngine.Config> getEngines() {
+			return engines;
+		}
+
 		@Override
 		public Map<String, String> save(final DependencyResolver resolver) {
 			final Map<String, String> map = new TreeMap<String, String>();
@@ -811,22 +689,16 @@ public final class SwiftSearcher implements Worker {
 			map.put(MSCONVERT, resolver.getIdFromConfig(msconvert));
 			map.put(MGF_2_MGF, resolver.getIdFromConfig(mgf2mgf));
 			map.put(RAWDUMP, resolver.getIdFromConfig(rawdump));
-			map.put(MASCOT, resolver.getIdFromConfig(mascot));
-			map.put(MASCOT_DEPLOYER, resolver.getIdFromConfig(mascotDeployer));
-			map.put(SEQUEST, resolver.getIdFromConfig(sequest));
-			map.put(SEQUEST_DEPLOYER, resolver.getIdFromConfig(sequestDeployer));
-			map.put(TANDEM, resolver.getIdFromConfig(tandem));
-			map.put(TANDEM_DEPLOYER, resolver.getIdFromConfig(tandemDeployer));
-			map.put(OMSSA, resolver.getIdFromConfig(omssa));
-			map.put(OMSSA_DEPLOYER, resolver.getIdFromConfig(omssaDeployer));
-			map.put(MYRIMATCH, resolver.getIdFromConfig(myrimatch));
-			map.put(MYRIMATCH_DEPLOYER, resolver.getIdFromConfig(myrimatchDeployer));
-			map.put(IDPICKER, resolver.getIdFromConfig(idpicker));
-			map.put(IDPICKER_DEPLOYER, resolver.getIdFromConfig(idpickerDeployer));
-			map.put(SCAFFOLD, resolver.getIdFromConfig(scaffold));
-			map.put(SCAFFOLD_DEPLOYER, resolver.getIdFromConfig(scaffoldDeployer));
-			map.put(SCAFFOLD3, resolver.getIdFromConfig(scaffold3));
-			map.put(SCAFFOLD3_DEPLOYER, resolver.getIdFromConfig(scaffold3Deployer));
+
+			int i = 0;
+			for (final SearchEngine.Config engineConfig : getEngines()) {
+				i++;
+				map.put(ENGINE_WORKER_PREFIX + i, resolver.getIdFromConfig(engineConfig.getWorker()));
+				map.put(ENGINE_DEPLOYER_PREFIX + i, resolver.getIdFromConfig(engineConfig.getWorker()));
+				map.put(ENGINE_VERSION_PREFIX + i, engineConfig.getVersion());
+				map.put(ENGINE_CODE_PREFIX + i, engineConfig.getCode());
+			}
+
 			map.put(SCAFFOLD_REPORT, resolver.getIdFromConfig(scaffoldReport));
 			map.put(QA, resolver.getIdFromConfig(qa));
 			map.put(FASTA_DB, resolver.getIdFromConfig(fastaDb));
@@ -845,22 +717,14 @@ public final class SwiftSearcher implements Worker {
 			msconvert = (ServiceConfig) resolver.getConfigFromId(values.get(MSCONVERT));
 			mgf2mgf = (ServiceConfig) resolver.getConfigFromId(values.get(MGF_2_MGF));
 			rawdump = (ServiceConfig) resolver.getConfigFromId(values.get(RAWDUMP));
-			mascot = (ServiceConfig) resolver.getConfigFromId(values.get(MASCOT));
-			mascotDeployer = (ServiceConfig) resolver.getConfigFromId(values.get(MASCOT_DEPLOYER));
-			sequest = (ServiceConfig) resolver.getConfigFromId(values.get(SEQUEST));
-			sequestDeployer = (ServiceConfig) resolver.getConfigFromId(values.get(SEQUEST_DEPLOYER));
-			tandem = (ServiceConfig) resolver.getConfigFromId(values.get(TANDEM));
-			tandemDeployer = (ServiceConfig) resolver.getConfigFromId(values.get(TANDEM_DEPLOYER));
-			omssa = (ServiceConfig) resolver.getConfigFromId(values.get(OMSSA));
-			omssaDeployer = (ServiceConfig) resolver.getConfigFromId(values.get(OMSSA_DEPLOYER));
-			myrimatch = (ServiceConfig) resolver.getConfigFromId(values.get(MYRIMATCH));
-			myrimatchDeployer = (ServiceConfig) resolver.getConfigFromId(values.get(MYRIMATCH_DEPLOYER));
-			idpicker = (ServiceConfig) resolver.getConfigFromId(values.get(IDPICKER));
-			idpickerDeployer = (ServiceConfig) resolver.getConfigFromId(values.get(IDPICKER_DEPLOYER));
-			scaffold = (ServiceConfig) resolver.getConfigFromId(values.get(SCAFFOLD));
-			scaffoldDeployer = (ServiceConfig) resolver.getConfigFromId(values.get(SCAFFOLD_DEPLOYER));
-			scaffold3 = (ServiceConfig) resolver.getConfigFromId(values.get(SCAFFOLD3));
-			scaffold3Deployer = (ServiceConfig) resolver.getConfigFromId(values.get(SCAFFOLD3_DEPLOYER));
+
+			final Collection<SearchEngine.Config> engineConfigs = Lists.newArrayList();
+			for (final Map.Entry<String, String> entry : values.entrySet()) {
+				if (entry.getKey().startsWith(ENGINE_CODE_PREFIX)) {
+					setupEngine(entry.getKey().substring(ENGINE_CODE_PREFIX.length()), engineConfigs, values, resolver);
+				}
+			}
+
 			scaffoldReport = (ServiceConfig) resolver.getConfigFromId(values.get(SCAFFOLD_REPORT));
 			qa = (ServiceConfig) resolver.getConfigFromId(values.get(QA));
 			fastaDb = (ServiceConfig) resolver.getConfigFromId(values.get(FASTA_DB));
@@ -868,6 +732,15 @@ public final class SwiftSearcher implements Worker {
 			msmsEval = (ServiceConfig) resolver.getConfigFromId(values.get(MSMS_EVAL));
 			database = (DatabaseFactory.Config) resolver.getConfigFromId(values.get(DATABASE));
 			reportDecoyHits = Boolean.parseBoolean(values.get(REPORT_DECOY_HITS));
+		}
+
+		private void setupEngine(final String number, final Collection<SearchEngine.Config> engineConfigs, final Map<String, String> values, final DependencyResolver resolver) {
+			final String code = values.get(ENGINE_CODE_PREFIX + number);
+			final String worker = values.get(ENGINE_WORKER_PREFIX + number);
+			final String deployer = values.get(ENGINE_DEPLOYER_PREFIX + number);
+			final String version = values.get(ENGINE_VERSION_PREFIX + number);
+
+			engineConfigs.add(new SearchEngine.Config(code, version, (ServiceConfig) resolver.getConfigFromId(worker), (ServiceConfig) resolver.getConfigFromId(deployer)));
 		}
 
 		@Override
@@ -880,8 +753,11 @@ public final class SwiftSearcher implements Worker {
 
 		private DatabaseValidator validator;
 
-		public Ui(final DatabaseValidator validator) {
+		private EngineFactoriesList engineFactoriesList;
+
+		public Ui(final DatabaseValidator validator, final EngineFactoriesList engineFactoriesList) {
 			this.validator = validator;
+			this.engineFactoriesList = engineFactoriesList;
 		}
 
 		public void createUI(final DaemonConfig daemon, final ResourceConfig resource, final UiBuilder builder) {
@@ -951,58 +827,23 @@ public final class SwiftSearcher implements Worker {
 					.reference(MgfToMgfWorker.TYPE, UiBuilder.NONE_TYPE)
 
 					.property(RAWDUMP, RAWDumpWorker.NAME, "Extracts information about experiment and spectra from RAW files.")
-					.reference(RAWDumpWorker.TYPE, RAWDumpCache.TYPE, UiBuilder.NONE_TYPE)
+					.reference(RAWDumpWorker.TYPE, RAWDumpCache.TYPE, UiBuilder.NONE_TYPE);
 
-					.property(MASCOT, MascotWorker.NAME, "")
-					.reference(MascotWorker.TYPE, MascotCache.TYPE, UiBuilder.NONE_TYPE)
+			// Engines here
+			int i = 0;
+			for (final EngineMetadata metadata : engineFactoriesList.getEngineMetadata()) {
+				i++;
+				builder
+						.property(ENGINE_CODE_PREFIX + i, "Engine #" + i + " code", "Temporary, to be removed with better UI").defaultValue(metadata.getCode()).required()
+						.property(ENGINE_VERSION_PREFIX + i, "Engine #" + i + " version", "Put in the version of the particular engine you are using").required()
+						.property(ENGINE_WORKER_PREFIX + i, "Engine #" + i + " worker", "The service that actually does the work of this engine")
+						.reference(ObjectArrays.concat(
+								ObjectArrays.concat(metadata.getWorkerTypes(), metadata.getCacheTypes(), String.class), UiBuilder.NONE_TYPE))
+						.property(ENGINE_DEPLOYER_PREFIX + i, "Engine #" + i + " deployer", "The service that prepares the environment for this engine to work efficiently")
+						.reference(ObjectArrays.concat(metadata.getDeployerTypes(), UiBuilder.NONE_TYPE));
+			}
 
-					.property(MASCOT_DEPLOYER, MascotDeploymentService.NAME, "<p>If you want to use Mascot, you have to have a database deployer set up, typically on the same computer where Mascot is installed, since we modify the <tt>mascot.dat</tt> config file directly to perform the deployment. " +
-							"A version that would use just the Mascot URL is in development.</p>" +
-							"<p>There is an option to use 'mock' Mascot deployer, which just fools Swift into thinking that all the databases were already deployed, and do the database deployment manually.</p>")
-					.reference(MascotDeploymentService.TYPE, MockMascotDeploymentService.TYPE, UiBuilder.NONE_TYPE)
-
-					.property(SEQUEST, SequestWorker.NAME, "")
-					.reference(SequestWorker.TYPE, SequestCache.TYPE, UiBuilder.NONE_TYPE)
-
-					.property(SEQUEST_DEPLOYER, SequestDeploymentService.NAME, "If you want to use Sequest, you have to have a database deployer set up. Sequest database deployment can be very time consuming, when large .fasta files are processed. The deployment however happends only once per database + modification set.")
-					.reference(SequestDeploymentService.TYPE, UiBuilder.NONE_TYPE)
-
-					.property(TANDEM, XTandemWorker.NAME, "")
-					.reference(XTandemWorker.TYPE, XTandemCache.TYPE, UiBuilder.NONE_TYPE)
-
-					.property(TANDEM_DEPLOYER, XTandemDeploymentService.NAME, "If you want to use X!Tandem, you have to have a database deployer set up. This deployer does virtually nothing, so it can be installed even on a very loaded machine.")
-					.reference(XTandemDeploymentService.TYPE, UiBuilder.NONE_TYPE)
-
-					.property(OMSSA, OmssaWorker.NAME, "")
-					.reference(OmssaWorker.TYPE, OmssaCache.TYPE, UiBuilder.NONE_TYPE)
-
-					.property(OMSSA_DEPLOYER, OmssaDeploymentService.NAME, "If you want to use OMSSA, you have to have a database deployer set up. OMSSA deployment converts the .fasta into several index files.")
-					.reference(OmssaDeploymentService.TYPE, UiBuilder.NONE_TYPE)
-
-					.property(MYRIMATCH, MyrimatchWorker.NAME, "MyriMatch is used to augment the search results. Not fully integrated into Scaffold.")
-					.reference(MyrimatchWorker.TYPE, MyrimatchCache.TYPE, UiBuilder.NONE_TYPE)
-
-					.property(MYRIMATCH_DEPLOYER, MyrimatchDeploymentService.NAME, "If you want to use Myrimatch, you have to have a database deployer set up. Myrimatch deployment detects the prefix of decoy sequences.")
-					.reference(MyrimatchDeploymentService.TYPE, UiBuilder.NONE_TYPE)
-
-					.property(IDPICKER, IdpickerWorker.NAME, "Idpicker is roughly equivalent to Scaffold. At the moment it can process Myrimatch files.")
-					.reference(IdpickerWorker.TYPE, IdpickerCache.TYPE, UiBuilder.NONE_TYPE)
-
-					.property(IDPICKER_DEPLOYER, IdpickerDeploymentService.NAME, "If you want to use IDPicker, you have to have a database deployer set up. This deployer does virtually nothing, so it can be installed even on a very loaded machine.")
-					.reference(IdpickerDeploymentService.TYPE, UiBuilder.NONE_TYPE)
-
-					.property(SCAFFOLD, ScaffoldWorker.NAME, "Scaffold 2 batch searcher by Proteome Software")
-					.reference(ScaffoldWorker.TYPE, UiBuilder.NONE_TYPE)
-
-					.property(SCAFFOLD_DEPLOYER, ScaffoldDeploymentService.NAME, "If you want to use Scaffold 2, you have to have a database deployer set up. The deployment is trivial in case of Scaffold 2, so it can be installed even on a loaded machine.")
-					.reference(ScaffoldDeploymentService.TYPE, UiBuilder.NONE_TYPE)
-
-					.property(SCAFFOLD3, Scaffold3Worker.NAME, "Scaffold 3 batch searcher by Proteome Software.")
-					.reference(Scaffold3Worker.TYPE, UiBuilder.NONE_TYPE)
-
-					.property(SCAFFOLD3_DEPLOYER, Scaffold3DeploymentService.NAME, "If you want to use Scaffold 3, you have to have a database deployer set up. The deployment is trivial in case of Scaffold 3, so it can be installed even on a loaded machine.")
-					.reference(Scaffold3DeploymentService.TYPE, UiBuilder.NONE_TYPE)
-
+			builder
 					.property(MSMS_EVAL, MSMSEvalWorker.NAME, "Run msmsEval on the spectra to determine their quality. Results obtained from this module are used in the QA graphs. Eventually we could utilize spectrum quality information to optimize Peaks Online.")
 					.reference(MSMSEvalWorker.TYPE, MsmsEvalCache.TYPE, UiBuilder.NONE_TYPE)
 

@@ -222,16 +222,38 @@
               <msconvert reference="47"/>
               <mgf2mgf reference="56"/>
               <rawdump reference="59"/>
-              <mascot reference="5"/>
-              <mascotDeployer reference="8"/>
-              <sequest reference="17"/>
-              <sequestDeployer reference="20"/>
-              <tandem reference="23"/>
-              <tandemDeployer reference="26"/>
-              <omssa reference="11"/>
-              <omssaDeployer reference="14"/>
-              <scaffold reference="29"/>
-              <scaffoldDeployer reference="38"/>
+              <engines class="list" id="68">
+                <searchEngine id="69">
+                  <code>MASCOT</code>
+                  <version>2.4</version>
+                  <worker reference="5"/>
+                  <deployer reference="8"/>
+                </searchEngine>
+                <searchEngine id="70">
+                  <code>SEQUEST</code>
+                  <version>v27</version>
+                  <worker reference="17"/>
+                  <deployer reference="20"/>
+                </searchEngine>
+                <searchEngine id="71">
+                  <code>TANDEM</code>
+                  <version>2013.2.01</version>
+                  <worker reference="23"/>
+                  <deployer reference="26"/>
+                </searchEngine>
+                <searchEngine id="72">
+                  <code>OMSSA</code>
+                  <version>0.1</version>
+                  <worker reference="11"/>
+                  <deployer reference="14"/>
+                </searchEngine>
+                <searchEngine id="73">
+                  <code>SCAFFOLD</code>
+                  <version>2.6.0</version>
+                  <worker reference="29"/>
+                  <deployer reference="38"/>
+                </searchEngine>
+              </engines>
               <scaffoldReport reference="32"/>
               <qa reference="35"/>
               <msmsEval reference="41"/>
@@ -242,8 +264,8 @@
           <brokerUrl>jms.vm://local?simplequeue=searcher</brokerUrl>
         </service>
       </services>
-      <resources id="68">
-        <webUi id="69">
+      <resources id="74">
+        <webUi id="75">
           <searcher reference="65"/>
           <port>8080</port>
           <title>Swift 2.5</title>

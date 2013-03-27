@@ -76,8 +76,7 @@ public final class TestApplicationContext {
 
 		final SwiftSearcher.Config searcherConfig = new SwiftSearcher.Config(
 				fastaFolder, fastaArchiveFolder, fastaUploadFolder,
-				null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null,
-				null, null, databaseConfig);
+				null, null, null, null, null, null, null, null, null, null, databaseConfig);
 
 		daemonConfig.addService(new ServiceConfig("searcher1", new SimpleRunner.Config(searcherConfig), messageBrokerConfig.getBrokerUrl() + "?simplequeue=searcher1"));
 

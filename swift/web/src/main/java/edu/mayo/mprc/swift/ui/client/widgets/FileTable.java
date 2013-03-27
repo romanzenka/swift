@@ -2,7 +2,7 @@ package edu.mayo.mprc.swift.ui.client.widgets;
 
 import com.google.gwt.user.client.ui.*;
 import edu.mayo.mprc.swift.ui.client.rpc.ClientFileSearch;
-import edu.mayo.mprc.swift.ui.client.rpc.ClientSearchEngine;
+import edu.mayo.mprc.swift.ui.client.rpc.ClientSearchEngineConfig;
 import edu.mayo.mprc.swift.ui.client.rpc.files.FileInfo;
 
 import java.util.ArrayList;
@@ -22,7 +22,6 @@ public final class FileTable extends FlexTable implements SourcesChangeEvents, C
 	private static final int SAMPLE_COLUMN = 4;
 	private static final int EXPERIMENT_COLUMN = 5;
 	private static final int CATEGORY_COLUMN = 6;
-	private static final int FIRST_ENGINE_COLUMN = 7;
 
 	private static final int HEADER_ROW_INDEX = 1;
 	private static final int FIRST_DATA_ROW_INDEX = 2;
@@ -31,8 +30,6 @@ public final class FileTable extends FlexTable implements SourcesChangeEvents, C
 	private static final String ROW_DESELECTED_STYLE = "file-deselected";
 	private static final String REMOVE_IMAGE = "images/delete.gif";
 
-	private List<ClientSearchEngine> searchEngineList;
-	private List<String> searchEnginesOnByDefault;
 	private String searchTitle = ""; // Current title of the search
 
 	private final FileTableColumn[] staticHeaders = {
@@ -46,13 +43,8 @@ public final class FileTable extends FlexTable implements SourcesChangeEvents, C
 	};
 
 	FileTableColumn[] getHeaders() {
-		final FileTableColumn[] headers = new FileTableColumn[staticHeaders.length + searchEngineList.size()];
+		final FileTableColumn[] headers = new FileTableColumn[staticHeaders.length];
 		System.arraycopy(staticHeaders, 0, headers, 0, staticHeaders.length);
-		for (int i = 0; i < searchEngineList.size(); i++) {
-			final ClientSearchEngine info = searchEngineList.get(i);
-			final int column = i + FIRST_ENGINE_COLUMN;
-			headers[column] = new FileTableColumn(column, info.getFriendlyName().replace(" ", "&nbsp;"), null, "engine-column");
-		}
 		return headers;
 	}
 
@@ -90,13 +82,9 @@ public final class FileTable extends FlexTable implements SourcesChangeEvents, C
 
 	private ChangeListenerCollection changeListeners = new ChangeListenerCollection();
 
-	public FileTable(final List<ClientSearchEngine> searchEngineList) {
-		assert searchEngineList != null : "The list of search engines must not be null";
-
+	public FileTable() {
 		searchTypeList = new SearchTypeList();
 		searchTypeList.addSelectionChangeListener(this);
-
-		setSearchEngineList(searchEngineList);
 
 		this.fileCountLabel = new Label("", false);
 
@@ -133,11 +121,6 @@ public final class FileTable extends FlexTable implements SourcesChangeEvents, C
 			}
 		});
 		updateFileCount();
-	}
-
-	private void setSearchEngineList(final List<ClientSearchEngine> searchEngineList) {
-		this.searchEngineList = searchEngineList;
-		searchEnginesOnByDefault = searchEnginesOnByDefault();
 	}
 
 	private void updateFileCount() {
@@ -199,8 +182,7 @@ public final class FileTable extends FlexTable implements SourcesChangeEvents, C
 					index,
 					fileSearch.getCategoryName(),
 					fileSearch.getExperiment(),
-					fileSearch.getBiologicalSample(),
-					fileSearch.getEnabledEngineCodes());
+					fileSearch.getBiologicalSample());
 
 			lastRow++;
 		}
@@ -232,10 +214,10 @@ public final class FileTable extends FlexTable implements SourcesChangeEvents, C
 		final String sampleName = getDefaultSampleName(type, title, name);
 		final String experimentName = getDefaultExperimentName(type, title, name);
 
-		addNewLine(path, fileSize, lineIndex, "none", experimentName, sampleName, searchEnginesOnByDefault);
+		addNewLine(path, fileSize, lineIndex, "none", experimentName, sampleName);
 	}
 
-	private void addNewLine(final String path, final long fileSize, final MutableInteger lineIndex, final String categoryName, final String experimentName, final String sampleName, final List<String> enabledSearchEngines) {
+	private void addNewLine(final String path, final long fileSize, final MutableInteger lineIndex, final String categoryName, final String experimentName, final String sampleName) {
 		final FilePathWidget filePathWidget = new FilePathWidget(path);
 
 		final int rowNumber = lineIndex.i;
@@ -261,41 +243,8 @@ public final class FileTable extends FlexTable implements SourcesChangeEvents, C
 		widgetIndices.put(categoryLabel, lineIndex);
 		this.setWidget(rowNumber, CATEGORY_COLUMN, categoryLabel);
 
-		int engineColumnIndex = FIRST_ENGINE_COLUMN;
-		for (final ClientSearchEngine searchEngine : searchEngineList) {
-			final CheckBox engineCheckbox = new CheckBox();
-
-			engineCheckbox.setChecked(searchEngineInList(searchEngine, enabledSearchEngines));
-			engineCheckbox.addClickListener(new SearchEngineClickListener(this, engineColumnIndex));
-			widgetIndices.put(engineCheckbox, lineIndex);
-			this.setWidget(rowNumber, engineColumnIndex, engineCheckbox);
-			engineColumnIndex++;
-		}
-
 		// By default the files are selected
 		setChecked(rowNumber, SELECT_COLUMN, true);
-	}
-
-	private List<String> searchEnginesOnByDefault() {
-		final List<String> codeList = new ArrayList<String>(4);
-		for (final ClientSearchEngine engine : searchEngineList) {
-			if (engine.isOnByDefault()) {
-				codeList.add(engine.getCode());
-			}
-		}
-		return codeList;
-	}
-
-	/**
-	 * @return True if given search engine is listed.
-	 */
-	private static boolean searchEngineInList(final ClientSearchEngine clientSearchEngine, final List<String> engineCodeList) {
-		for (final String code : engineCodeList) {
-			if (clientSearchEngine.getCode().equals(code)) {
-				return true;
-			}
-		}
-		return false;
 	}
 
 	/**
@@ -465,7 +414,7 @@ public final class FileTable extends FlexTable implements SourcesChangeEvents, C
 		}
 	}
 
-	public List<ClientFileSearch> getData() {
+	public List<ClientFileSearch> getData(final ArrayList<ClientSearchEngineConfig> enabledEngines) {
 		final List<ClientFileSearch> results = new ArrayList<ClientFileSearch>(this.getRowCount() - getFirstDataRow());
 
 		for (int row = getFirstDataRow(); row < this.getRowCount(); row++) {
@@ -478,16 +427,6 @@ public final class FileTable extends FlexTable implements SourcesChangeEvents, C
 
 			final EditableLabel w3 = (EditableLabel) this.getWidget(row, CATEGORY_COLUMN);
 			final String categoryName = w3.getText();
-
-			final List<String> enabledEngines = new ArrayList<String>(searchEngineList.size());
-			for (int i = 0; i < searchEngineList.size(); i++) {
-				final ClientSearchEngine engineInfo = searchEngineList.get(i);
-				if (((CheckBox) this.getWidget(row, i + FIRST_ENGINE_COLUMN)).isChecked()) {
-					enabledEngines.add(engineInfo.getCode());
-				} else {
-					enabledEngines.add("");
-				}
-			}
 			results.add(new ClientFileSearch(
 					((FilePathWidget) this.getWidget(row, FILE_COLUMN)).getFullPath(),
 					sampleName,
@@ -497,30 +436,6 @@ public final class FileTable extends FlexTable implements SourcesChangeEvents, C
 					null));
 		}
 		return results;
-	}
-
-	private class SearchEngineClickListener implements ClickListener {
-		private final FileTable table;
-		private final int column;
-
-		private SearchEngineClickListener(final FileTable table, final int column) {
-			this.table = table;
-			this.column = column;
-		}
-
-		public void onClick(final Widget sender) {
-			// If we are on a selected row, propagate the change to all other selected checkboxes
-			final int r = getWidgetRow(sender);
-			if (table.getSelectionCheckBox(r).isChecked()) {
-				final CheckBox checkBox = (CheckBox) sender;
-				for (int row = getFirstDataRow(); row < table.getRowCount(); row++) {
-					if (table.getSelectionCheckBox(row).isChecked()) {
-						final CheckBox rowCheckBox = (CheckBox) table.getWidget(row, column);
-						rowCheckBox.setChecked(checkBox.isChecked());
-					}
-				}
-			}
-		}
 	}
 
 	private int getWidgetRow(final Widget widget) {

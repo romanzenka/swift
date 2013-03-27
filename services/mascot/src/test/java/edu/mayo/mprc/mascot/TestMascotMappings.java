@@ -25,7 +25,8 @@ public final class TestMascotMappings {
 	@BeforeTest
 	public void startup() {
 		abstractParamsInfo = getAbstractParamsInfo();
-		mappingFactory = new MascotMappingFactory(abstractParamsInfo);
+		mappingFactory = new MascotMappingFactory();
+		mappingFactory.setParamsInfo(abstractParamsInfo);
 		mapping = mappingFactory.createMapping();
 		unimod = abstractParamsInfo.getUnimod();
 	}

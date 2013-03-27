@@ -10,17 +10,9 @@ import edu.mayo.mprc.daemon.files.FileTokenFactory;
 import edu.mayo.mprc.database.DatabaseFactory;
 import edu.mayo.mprc.database.FileType;
 import edu.mayo.mprc.filesharing.jms.JmsFileTransferHandlerFactory;
-import edu.mayo.mprc.mascot.MascotDeploymentService;
-import edu.mayo.mprc.mascot.MascotWorker;
-import edu.mayo.mprc.omssa.OmssaDeploymentService;
-import edu.mayo.mprc.omssa.OmssaWorker;
-import edu.mayo.mprc.scaffold.ScaffoldWorker;
-import edu.mayo.mprc.sequest.SequestDeploymentService;
-import edu.mayo.mprc.sequest.SequestWorker;
 import edu.mayo.mprc.swift.db.FileTokenFactoryWrapper;
+import edu.mayo.mprc.swift.db.SearchEngine;
 import edu.mayo.mprc.swift.search.SwiftSearcher;
-import edu.mayo.mprc.xtandem.XTandemDeploymentService;
-import edu.mayo.mprc.xtandem.XTandemWorker;
 
 import java.io.File;
 import java.net.URI;
@@ -94,11 +86,9 @@ public final class SwiftConfig {
 		// Make sure that coupled modules (deployer + search engine) referenced by a single searcher are either both defined or both are not
 		for (final ResourceConfig config : swift.getModulesOfConfigType(SwiftSearcher.Config.class)) {
 			final SwiftSearcher.Config searcher = (SwiftSearcher.Config) config;
-			checkEngineDeployer(errors, searcher.getMascot(), searcher.getMascotDeployer(), MascotWorker.NAME, MascotDeploymentService.NAME);
-			checkEngineDeployer(errors, searcher.getSequest(), searcher.getSequestDeployer(), SequestWorker.NAME, SequestDeploymentService.NAME);
-			checkEngineDeployer(errors, searcher.getTandem(), searcher.getTandemDeployer(), XTandemWorker.NAME, XTandemDeploymentService.NAME);
-			checkEngineDeployer(errors, searcher.getOmssa(), searcher.getOmssaDeployer(), OmssaWorker.NAME, OmssaDeploymentService.NAME);
-			checkEngineDeployer(errors, searcher.getScaffold(), searcher.getScaffoldDeployer(), ScaffoldWorker.NAME, SequestDeploymentService.NAME);
+			for (final SearchEngine.Config engineConfig : searcher.getEngines()) {
+				checkEngineDeployer(errors, engineConfig.getWorker(), engineConfig.getDeployer(), engineConfig.getCode().toLowerCase(), engineConfig.getCode().toLowerCase() + " deployer");
+			}
 		}
 
 		return errors;

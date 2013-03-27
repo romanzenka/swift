@@ -10,8 +10,6 @@
         </id>
 
         <property name="code" type="string" length="15" not-null="true" column="code"/>
-
-        <many-to-one name="creation" column="creation" class="edu.mayo.mprc.database.Change" lazy="proxy"/>
-        <many-to-one name="deletion" column="deletion" class="edu.mayo.mprc.database.Change" lazy="proxy"/>
+        <property name="version" type="string" length="50" not-null="true" column="version"/>
     </class>
 </hibernate-mapping>
