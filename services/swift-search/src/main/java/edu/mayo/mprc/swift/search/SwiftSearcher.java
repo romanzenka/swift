@@ -592,6 +592,7 @@ public final class SwiftSearcher implements Worker {
 		private DatabaseFactory.Config database;
 
 		public Config() {
+			engines = new ArrayList<SearchEngine.Config>(10);
 		}
 
 		public Config(final String fastaPath, final String fastaArchivePath, final String fastaUploadPath
@@ -724,6 +725,7 @@ public final class SwiftSearcher implements Worker {
 					setupEngine(entry.getKey().substring(ENGINE_CODE_PREFIX.length()), engineConfigs, values, resolver);
 				}
 			}
+			engines = engineConfigs;
 
 			scaffoldReport = (ServiceConfig) resolver.getConfigFromId(values.get(SCAFFOLD_REPORT));
 			qa = (ServiceConfig) resolver.getConfigFromId(values.get(QA));

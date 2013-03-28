@@ -45,18 +45,12 @@ public final class ParamsInfoImpl extends ParamsInfo {
 	@Override
 	public List<Curation> getDatabaseAllowedValues() {
 		final List<Curation> matchingCurations = curationDao.getAllCurations();
-		if (matchingCurations == null || matchingCurations.size() == 0) {
-			throw new MprcException("No curations found. Did you initialize the database with curations?");
-		}
 		final List<Curation> dbs = new ArrayList<Curation>();
 		for (final Curation c : matchingCurations) {
 			if (!c.hasBeenRun()) {
 				continue;
 			}
 			dbs.add(c);
-		}
-		if (dbs.size() == 0) {
-			throw new MprcException("No curations have been run?!");
 		}
 		Collections.sort(dbs, new Comparator<Curation>() {
 			public int compare(final Curation o1, final Curation o2) {

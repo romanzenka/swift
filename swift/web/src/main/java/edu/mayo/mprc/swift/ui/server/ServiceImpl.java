@@ -312,7 +312,8 @@ public final class ServiceImpl extends SpringGwtServlet implements Service, Appl
 			if (engine.isEnabled()) {
 				infos.add(new ClientSearchEngine(
 						new ClientSearchEngineConfig(engine.getCode(), engine.getVersion()),
-						engine.getFriendlyName(), engine.isOnByDefault()));
+						engine.getFriendlyName(), engine.isOnByDefault(),
+						engine.getEngineMetadata().getOrder()));
 			}
 		}
 		return infos;

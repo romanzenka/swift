@@ -240,13 +240,16 @@ public final class WebUi {
 						if (engineMetadata == null) {
 							throw new MprcException("Engine with code " + engineConfig.getCode() + " is not supported (missing .jar file?)");
 						}
-						final SearchEngine e = new SearchEngine(
-								engineMetadata,
-								engineConfig.getVersion(),
-								(DaemonConnection) dependencies.createSingleton(engineConfig.getWorker()),
-								(DaemonConnection) dependencies.createSingleton(engineConfig.getDeployer()));
-						searchEngines.add(e);
+						if (engineConfig.getWorker() != null && engineConfig.getDeployer() != null) {
+							final SearchEngine e = new SearchEngine(
+									engineMetadata,
+									engineConfig.getVersion(),
+									(DaemonConnection) dependencies.createSingleton(engineConfig.getWorker()),
+									(DaemonConnection) dependencies.createSingleton(engineConfig.getDeployer()));
+							searchEngines.add(e);
+						}
 					}
+					ui.setSearchEngines(searchEngines);
 				}
 
 				if (config.getDatabaseUndeployer() != null) {

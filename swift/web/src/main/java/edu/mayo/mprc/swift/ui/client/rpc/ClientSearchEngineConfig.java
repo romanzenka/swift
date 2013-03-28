@@ -1,7 +1,5 @@
 package edu.mayo.mprc.swift.ui.client.rpc;
 
-import edu.mayo.mprc.MprcException;
-
 import java.io.Serializable;
 
 /**
@@ -30,14 +28,14 @@ public final class ClientSearchEngineConfig implements Serializable {
 
 	public void setCode(final String code) {
 		if (code == null) {
-			throw new MprcException("Engine code must not be null");
+			throw new RuntimeException("Engine code must not be null");
 		}
 		this.code = code;
 	}
 
 	public String getVersion() {
 		if (code == null) {
-			throw new MprcException("Engine version must not be null");
+			throw new RuntimeException("Engine version must not be null");
 		}
 		return version;
 	}

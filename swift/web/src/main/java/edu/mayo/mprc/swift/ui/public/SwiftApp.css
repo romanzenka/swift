@@ -743,3 +743,7 @@ span.itemlabel {
 .help-html-popup {
     overflow: scroll;
 }
+
+.engine-version-selector {
+    margin-right: 10px;
+}

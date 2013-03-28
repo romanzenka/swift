@@ -63,8 +63,9 @@ public final class ValidationPanel extends FlowPanel {
 					final String action = fixTag.substring(indexOfActionAttrib + ACTIONATTRIB.length(), fixTag.indexOf("\">"));
 
 					panel.add(new HTML(errorMessage.substring(0, errorMessage.indexOf(fixTag))));
+					final String tagMessage = fixTag.substring(indexOfActionAttrib+ACTIONATTRIB.length()+action.length()+2);
 
-					final Hyperlink link = new Hyperlink(fixTag, true, null);
+					final Button link = new Button(tagMessage);
 					link.addClickListener(new ClickListener() {
 						public void onClick(final Widget sender) {
 							empty();

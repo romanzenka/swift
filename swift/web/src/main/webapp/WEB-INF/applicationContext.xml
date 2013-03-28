@@ -3,7 +3,7 @@
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
 
-    <import resource="classpath*:/factories.xml"/>
+    <import resource="classpath*:factories.xml"/>
 
     <bean id="SwiftAppService" class="edu.mayo.mprc.swift.ui.server.ServiceImpl">
         <property name="workspaceDao" ref="workspaceDao"/>
