@@ -43,7 +43,8 @@ public final class ConfigurationServiceImpl extends SpringGwtServlet implements 
 
 	public ApplicationModel loadConfiguration() throws GWTServiceException {
 		MainFactoryContext.initialize();
-		final File configFile = new File(Swift.CONFIG_FILE_NAME).getAbsoluteFile();
+		final File swiftConfig = new File(Swift.CONFIG_FILE_NAME);
+		final File configFile = swiftConfig.getAbsoluteFile();
 		try {
 			if (configFile.exists()) {
 				getData().setConfig(ApplicationConfig.load(configFile, MainFactoryContext.getResourceTable()));

@@ -47,4 +47,23 @@ public final class EnabledEnginesPanel extends HorizontalPanel {
 		}
 		return result;
 	}
+
+	public void setCurrentEngines(final ArrayList<ClientSearchEngineConfig> enabledEngines) {
+		for (final ClientSearchEngineConfig config : enabledEngines) {
+			final String code = config.getCode();
+			final EngineVersionSelector selector = engines.get(code);
+			if (selector == null) {
+				reportWarning("The engine " + code + " is not available.");
+			} else {
+				if (!selector.selectVersion(config.getVersion())) {
+					reportWarning("Requested " + code + " version " + config.getVersion() + " not available. Using " + selector.getVersion() + " instead.");
+				}
+			}
+		}
+	}
+
+	private void reportWarning(final String warning) {
+		// Do nothing now
+		int i= 0;
+	}
 }

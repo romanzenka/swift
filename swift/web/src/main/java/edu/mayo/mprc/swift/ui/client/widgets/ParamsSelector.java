@@ -17,7 +17,10 @@ public final class ParamsSelector extends ListBox {
 	}
 
 	public ClientParamSet getSelectedParamSet() {
-		return sets.get(getSelectedIndex());
+		if (sets.size() > 0) {
+			return sets.get(getSelectedIndex());
+		}
+		return null;
 	}
 
 	public void select(final int i) {
@@ -37,7 +40,9 @@ public final class ParamsSelector extends ListBox {
 
 		if (sets.size() == 0) {
 			addItem("(No parameter sets available)");
+			setEnabled(false);
 		} else {
+			setEnabled(true);
 			int selectedIndex = -1;
 			for (int i = 0; i < sets.size(); ++i) {
 				addItem(sets.get(i).getName() +

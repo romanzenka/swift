@@ -75,7 +75,7 @@ public final class ParamSetSelectionController implements ChangeListener {
 
 			public void onSuccess(final ClientParamSetList o) {
 				setParamSetList(o);
-				if(cb!=null) {
+				if (cb != null) {
 					cb.done();
 				}
 			}
@@ -101,7 +101,9 @@ public final class ParamSetSelectionController implements ChangeListener {
 					break;
 				}
 			}
-			select(arr.get(index));  // bootstrap by selecting the default value.
+			if (!arr.isEmpty()) {
+				select(arr.get(index));  // bootstrap by selecting the default value.
+			}
 		}
 	}
 

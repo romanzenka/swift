@@ -38,7 +38,7 @@ public final class FileTable extends FlexTable implements SourcesChangeEvents, C
 			new FileTableColumn(SIZE_COLUMN, "Size", null),
 			new FileTableColumn(REMOVE_COLUMN, "Remove", new PushButton(new Image(REMOVE_IMAGE)), "button-column"),
 			new FileTableColumn(SAMPLE_COLUMN, "<img src=\"images/scaffold_column.gif\" style=\"vertical-align: middle;\">&nbsp;Biological Sample", null),
-			new FileTableColumn(EXPERIMENT_COLUMN, "<img src=\"images/scaffold_icon.gif\" style=\"vertical-align: middle;\">&nbsp;.sfd", null),
+			new FileTableColumn(EXPERIMENT_COLUMN, "<img src=\"images/scaffold_icon.gif\" style=\"vertical-align: middle;\">&nbsp;Experiment", null),
 			new FileTableColumn(CATEGORY_COLUMN, "Category", null),
 	};
 

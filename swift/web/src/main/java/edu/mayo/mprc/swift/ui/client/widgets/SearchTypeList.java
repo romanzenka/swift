@@ -13,11 +13,12 @@ public final class SearchTypeList extends ListBox implements SourcesChangeEvents
 	 * Table of offered search types.
 	 */
 	private SearchTypeEntry[] searchTypeEntries = new SearchTypeEntry[]{
-			new SearchTypeEntry(SearchType.OneToOne, "Separate .sfd for each input", "one-to-one"),
-			new SearchTypeEntry(SearchType.ManyToOne, "One .sfd combining all inputs", "many-to-one"),
-			new SearchTypeEntry(SearchType.ManyToSamples, "One .sfd, each input in separate column", "many-to-samples"),
+			new SearchTypeEntry(SearchType.OneToOne, "Separate experiment for each input", "one-to-one"),
+			new SearchTypeEntry(SearchType.ManyToOne, "One experiment, all inputs are one biological sample", "many-to-one"),
+			new SearchTypeEntry(SearchType.ManyToSamples, "One experiment, each input is a separate biological sample", "many-to-samples"),
 			new SearchTypeEntry(SearchType.Custom, "Custom", "custom"),
 	};
+	private final static int DEFAULT_ENTRY = 2; /* ManyToSamples */
 
 	/**
 	 * Listeners interested in hearing about the change in selection.
@@ -32,7 +33,7 @@ public final class SearchTypeList extends ListBox implements SourcesChangeEvents
 		}
 
 		final String searchTypeCookie = Cookies.getCookie(SEARCH_TYPE_COOKIE);
-		SearchTypeEntry selectedSearchType = searchTypeEntries[0];
+		SearchTypeEntry selectedSearchType = searchTypeEntries[DEFAULT_ENTRY];
 		if (searchTypeCookie != null) {
 			for (final SearchTypeEntry searchTypeEntry : searchTypeEntries) {
 				if (searchTypeEntry.getCookie().equalsIgnoreCase(searchTypeCookie)) {

@@ -129,6 +129,7 @@ public final class SwiftApp implements EntryPoint, HidesPageContentsWhileLoading
 				initUserList(result.listUsers());
 				showPageContentsAfterLoad();
 				initMessage(result.getUserMessage());
+				initEnabledEngines(result.getSearchEngines());
 				loadPreviousSearch(result.loadedSearch());
 			}
 		});
@@ -145,6 +146,14 @@ public final class SwiftApp implements EntryPoint, HidesPageContentsWhileLoading
 		additionalSettingsPanel = new AdditionalSettingsPanel();
 		final RootPanel panel = RootPanel.get("publicResults");
 		panel.add(additionalSettingsPanel);
+	}
+
+	private void initEnabledEngines(List<ClientSearchEngine> enabledEngines) {
+		enabledEnginesPanel = new EnabledEnginesPanel(enabledEngines);
+		final RootPanel panel = RootPanel.get("enginesPanel");
+		if (panel != null) {
+			panel.add(enabledEnginesPanel);
+		}
 	}
 
 	private void finalizeSpectrumQa(final List<SpectrumQaParamFileInfo> list) {
@@ -278,7 +287,11 @@ public final class SwiftApp implements EntryPoint, HidesPageContentsWhileLoading
 
 		// Determine search type
 		SearchType searchType = null;
+		ClientFileSearch firstSearch = null;
 		for (final ClientFileSearch clientFileSearch : definition.getInputFiles()) {
+			if (firstSearch == null) {
+				firstSearch = clientFileSearch;
+			}
 			final String fileNamefileNameWithoutExtension = FilePathWidget.getFileNameWithoutExtension(clientFileSearch.getPath());
 			final SearchType newSearchType = SearchTypeList.getSearchTypeFromSetup(
 					definition.getSearchTitle(),
@@ -312,6 +325,7 @@ public final class SwiftApp implements EntryPoint, HidesPageContentsWhileLoading
 
 		additionalSettingsPanel.setPublicMgfs(definition.isPublicMgfFiles());
 		additionalSettingsPanel.setPublicSearchFiles(definition.isPublicSearchFiles());
+		enabledEnginesPanel.setCurrentEngines(firstSearch.getEnabledEngines());
 
 		showPageContentsAfterLoad();
 	}

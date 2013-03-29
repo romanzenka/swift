@@ -23,7 +23,7 @@ public final class EngineVersionSelector extends HorizontalPanel implements Comp
 		code = engine.getEngineConfig().getCode();
 		order = engine.getOrder();
 		checkBox = new CheckBox(engine.getFriendlyName());
-		checkBox.setEnabled(engine.isOnByDefault());
+		checkBox.setValue(engine.isOnByDefault());
 		versionList = new ArrayList<String>(2);
 		versionList.add(engine.getEngineConfig().getVersion());
 		setStyleName("engine-version-selector", true);
@@ -53,6 +53,35 @@ public final class EngineVersionSelector extends HorizontalPanel implements Comp
 		} else {
 			checkBox.setText(checkBox.getText() + " " + versionList.get(0));
 			add(checkBox);
+		}
+	}
+
+	/**
+	 * Select a particular version. If this version is not offered, select the one that is 'closest'
+	 * by ordering the required versions and the new one and picking the closest highest one.
+	 *
+	 * @param version Version to select.
+	 * @return False if the version did not exist in the list.
+	 */
+	public boolean selectVersion(final String version) {
+		if (versions == null) {
+			return version.equals(versionList.get(0));
+		} else {
+			int index = 0;
+			for (final String existing : versionList) {
+				final int comparison = existing.compareTo(version);
+				if (comparison == 0) {
+					versions.setSelectedIndex(index);
+					return true;
+				}
+				if (comparison > 0) {
+					versions.setSelectedIndex(index);
+					return false;
+				}
+				index++;
+			}
+			versions.setSelectedIndex(versionList.size() - 1);
+			return false;
 		}
 	}
 
