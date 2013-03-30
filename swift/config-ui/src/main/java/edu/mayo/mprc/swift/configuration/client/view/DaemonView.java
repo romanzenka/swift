@@ -33,7 +33,7 @@ public final class DaemonView extends SimplePanel implements ModuleView {
 				.addEventListener(listener)
 				.property(DaemonModel.OS_ARCH, "Architecture", "Host system architecture, for example, <tt>x86</tt>, <tt>x86_64</tt>, .")
 				.addEventListener(listener)
-				.property(DaemonModel.SHARED_FILE_SPACE_PATH, "Shared File Space", "Directory on a shared file system can be accessed from all the daemons defined within this Swift configuration. " +
+				.property(DaemonModel.SHARED_FILE_SPACE_PATH, "Shared File Space", "" +
 						"<p>" +
 						"If you plan to run only one daemon, leave this value empty.")
 				.property(DaemonModel.TEMP_FOLDER_PATH, "Temporary Folder", "Temporary folder that can be used for caching. Transferred files from other daemons with no shared file system " +

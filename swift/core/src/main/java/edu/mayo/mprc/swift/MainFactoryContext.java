@@ -1,6 +1,5 @@
 package edu.mayo.mprc.swift;
 
-import edu.mayo.mprc.daemon.Daemon;
 import edu.mayo.mprc.swift.commands.SwiftEnvironment;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
@@ -50,10 +49,6 @@ public final class MainFactoryContext {
 	 */
 	private static Object getBean(final String beanId) {
 		return getContext().getBean(beanId);
-	}
-
-	public static Daemon.Factory getDaemonFactory() {
-		return (Daemon.Factory) getBean("daemonFactory");
 	}
 
 	public static ResourceTable getResourceTable() {

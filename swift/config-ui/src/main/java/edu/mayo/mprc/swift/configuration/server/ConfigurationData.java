@@ -140,7 +140,11 @@ public class ConfigurationData {
 				// A service needs a runner
 				final ServiceConfig serviceConfig = new ServiceConfig();
 
-				serviceConfig.setRunner(new SimpleRunner.Config(resourceConfig));
+				if (!(resourceConfig instanceof WorkerConfig)) {
+					ExceptionUtilities.throwCastException(resourceConfig, WorkerConfig.class);
+					return null;
+				}
+				serviceConfig.setRunner(new SimpleRunner.Config((WorkerConfig) resourceConfig));
 				serviceConfig.setName(type + '_' + index); // The name is type_index
 				serviceConfig.setBrokerUrl(getServiceBrokerUri(getMessageBrokerUrl(), serviceConfig.getName()));
 

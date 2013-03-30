@@ -197,6 +197,16 @@ public final class MessageBroker implements Closeable {
 			return 10;
 		}
 
+		@Override
+		public void write(ConfigWriter writer) {
+			writer.openSection(this);
+			writer.addConfig("brokerUrl", getBrokerUrl(), "URL of the broker");
+			writer.addConfig("embedded", getEmbedded(), "Should we run the embedded broker?");
+			writer.addConfig("embeddedBrokerUrl", getBrokerUrl(), "ActiveMQ configuration URL defining how to start the embedded broker up (if embedded)");
+			writer.addConfig("useJmx", getUseJmx(), "Enable JMX on the broker");
+			writer.closeSection();
+		}
+
 		public String getBrokerUrl() {
 			return brokerUrl;
 		}

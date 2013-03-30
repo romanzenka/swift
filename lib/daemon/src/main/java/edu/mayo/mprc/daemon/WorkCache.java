@@ -3,9 +3,10 @@ package edu.mayo.mprc.daemon;
 import com.google.common.base.Charsets;
 import com.google.common.io.Files;
 import edu.mayo.mprc.MprcException;
+import edu.mayo.mprc.config.ConfigWriter;
 import edu.mayo.mprc.config.DependencyResolver;
-import edu.mayo.mprc.config.ResourceConfig;
 import edu.mayo.mprc.config.ServiceConfig;
+import edu.mayo.mprc.config.WorkerConfig;
 import edu.mayo.mprc.utilities.FileUtilities;
 import edu.mayo.mprc.utilities.StringUtilities;
 import edu.mayo.mprc.utilities.exceptions.ExceptionUtilities;
@@ -360,7 +361,7 @@ public abstract class WorkCache<T extends WorkPacket> implements NoLoggingWorker
 	/**
 	 * Generic work cache config. A work cache knows its folder and the service whose output it is caching.
 	 */
-	public static class CacheConfig implements ResourceConfig {
+	public static class CacheConfig extends WorkerConfig {
 		public static final String CACHE_FOLDER = "cacheFolder";
 		public static final String SERVICE = "service";
 		private String cacheFolder;
@@ -391,6 +392,18 @@ public abstract class WorkCache<T extends WorkPacket> implements NoLoggingWorker
 		@Override
 		public int getPriority() {
 			return 0;
+		}
+
+		@Override
+		public void write(ConfigWriter writer) {
+			writer.register(this);
+
+			service.write(writer);
+
+			writer.openSection(this);
+			writer.addConfig("cacheFolder", cacheFolder, "Where does the cache put the cached files");
+			writer.addConfig("service", writer.getDependencyResolver().getIdFromConfig(service), "Name of the service whose outputs we cache");
+			writer.closeSection();
 		}
 	}
 }

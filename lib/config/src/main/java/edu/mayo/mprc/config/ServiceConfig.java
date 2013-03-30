@@ -38,6 +38,19 @@ public final class ServiceConfig implements ResourceConfig {
 		return name;
 	}
 
+	@Override
+	public void write(final ConfigWriter writer) {
+		writer.register(this, getName());
+		getRunner().write(writer);
+
+		writer.openSection(this);
+		writer.addConfig("type", writer.getResourceId(getRunner().getWorkerConfiguration().getClass()), "Type of the worker");
+
+		getRunner().writeInline(writer);
+
+		writer.closeSection();
+	}
+
 	public void setName(final String name) {
 		this.name = name;
 	}

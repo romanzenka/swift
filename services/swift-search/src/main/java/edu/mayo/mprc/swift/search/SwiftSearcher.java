@@ -4,10 +4,7 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.ObjectArrays;
 import edu.mayo.mprc.MprcException;
-import edu.mayo.mprc.config.DaemonConfig;
-import edu.mayo.mprc.config.DependencyResolver;
-import edu.mayo.mprc.config.ResourceConfig;
-import edu.mayo.mprc.config.ServiceConfig;
+import edu.mayo.mprc.config.*;
 import edu.mayo.mprc.config.ui.PropertyChangeListener;
 import edu.mayo.mprc.config.ui.ServiceUiFactory;
 import edu.mayo.mprc.config.ui.UiBuilder;
@@ -56,11 +53,11 @@ public final class SwiftSearcher implements Worker {
 	public static final String NAME = "Swift Searcher";
 	public static final String DESC = "Runs the Swift search, orchestrating all the other modules.";
 
-	public static final String ENGINE_COMMON_PREFIX = "engine-";
-	public static final String ENGINE_WORKER_PREFIX = ENGINE_COMMON_PREFIX + "worker-";
-	public static final String ENGINE_DEPLOYER_PREFIX = ENGINE_COMMON_PREFIX + "deployer-";
-	public static final String ENGINE_VERSION_PREFIX = ENGINE_COMMON_PREFIX + "version-";
-	public static final String ENGINE_CODE_PREFIX = ENGINE_COMMON_PREFIX + "code-";
+	public static final String ENGINE_PREFIX = "engine.";
+	public static final String ENGINE_WORKER_SUFFIX = ".worker";
+	public static final String ENGINE_DEPLOYER_SUFFIX = ".deployer";
+	public static final String ENGINE_VERSION_SUFFIX = ".version";
+	public static final String ENGINE_CODE_SUFFIX = ".code";
 
 	private boolean raw2mgfEnabled = false;
 	private boolean mgf2mgfEnabled = false;
@@ -570,7 +567,7 @@ public final class SwiftSearcher implements Worker {
 	/**
 	 * Configuration for the factory
 	 */
-	public static final class Config implements ResourceConfig {
+	public static final class Config extends WorkerConfig {
 		private String fastaPath;
 		private String fastaArchivePath;
 		private String fastaUploadPath;
@@ -694,10 +691,10 @@ public final class SwiftSearcher implements Worker {
 			int i = 0;
 			for (final SearchEngine.Config engineConfig : getEngines()) {
 				i++;
-				map.put(ENGINE_WORKER_PREFIX + i, resolver.getIdFromConfig(engineConfig.getWorker()));
-				map.put(ENGINE_DEPLOYER_PREFIX + i, resolver.getIdFromConfig(engineConfig.getWorker()));
-				map.put(ENGINE_VERSION_PREFIX + i, engineConfig.getVersion());
-				map.put(ENGINE_CODE_PREFIX + i, engineConfig.getCode());
+				map.put(ENGINE_PREFIX + i + ENGINE_WORKER_SUFFIX, resolver.getIdFromConfig(engineConfig.getWorker()));
+				map.put(ENGINE_PREFIX + i + ENGINE_DEPLOYER_SUFFIX, resolver.getIdFromConfig(engineConfig.getDeployer()));
+				map.put(ENGINE_PREFIX + i + ENGINE_VERSION_SUFFIX, engineConfig.getVersion());
+				map.put(ENGINE_PREFIX + i + ENGINE_CODE_SUFFIX, engineConfig.getCode());
 			}
 
 			map.put(SCAFFOLD_REPORT, resolver.getIdFromConfig(scaffoldReport));
@@ -721,8 +718,10 @@ public final class SwiftSearcher implements Worker {
 
 			final Collection<SearchEngine.Config> engineConfigs = Lists.newArrayList();
 			for (final Map.Entry<String, String> entry : values.entrySet()) {
-				if (entry.getKey().startsWith(ENGINE_CODE_PREFIX)) {
-					setupEngine(entry.getKey().substring(ENGINE_CODE_PREFIX.length()), engineConfigs, values, resolver);
+				if (entry.getKey().startsWith(ENGINE_PREFIX) &&
+						entry.getKey().endsWith(ENGINE_CODE_SUFFIX)) {
+					setupEngine(entry.getKey().substring(
+							ENGINE_PREFIX.length(), entry.getKey().length() - ENGINE_CODE_SUFFIX.length()), engineConfigs, values, resolver);
 				}
 			}
 			engines = engineConfigs;
@@ -737,10 +736,10 @@ public final class SwiftSearcher implements Worker {
 		}
 
 		private void setupEngine(final String number, final Collection<SearchEngine.Config> engineConfigs, final Map<String, String> values, final DependencyResolver resolver) {
-			final String code = values.get(ENGINE_CODE_PREFIX + number);
-			final String worker = values.get(ENGINE_WORKER_PREFIX + number);
-			final String deployer = values.get(ENGINE_DEPLOYER_PREFIX + number);
-			final String version = values.get(ENGINE_VERSION_PREFIX + number);
+			final String code = values.get(ENGINE_PREFIX + number + ENGINE_CODE_SUFFIX);
+			final String worker = values.get(ENGINE_PREFIX + number + ENGINE_WORKER_SUFFIX);
+			final String deployer = values.get(ENGINE_PREFIX + number + ENGINE_DEPLOYER_SUFFIX);
+			final String version = values.get(ENGINE_PREFIX + number + ENGINE_VERSION_SUFFIX);
 
 			engineConfigs.add(new SearchEngine.Config(code, version, (ServiceConfig) resolver.getConfigFromId(worker), (ServiceConfig) resolver.getConfigFromId(deployer)));
 		}
@@ -836,12 +835,12 @@ public final class SwiftSearcher implements Worker {
 			for (final EngineMetadata metadata : engineFactoriesList.getEngineMetadata()) {
 				i++;
 				builder
-						.property(ENGINE_CODE_PREFIX + i, "Engine #" + i + " code", "Temporary, to be removed with better UI").defaultValue(metadata.getCode()).required()
-						.property(ENGINE_VERSION_PREFIX + i, "Engine #" + i + " version", "Put in the version of the particular engine you are using").required()
-						.property(ENGINE_WORKER_PREFIX + i, "Engine #" + i + " worker", "The service that actually does the work of this engine")
+						.property(ENGINE_PREFIX + i + ENGINE_CODE_SUFFIX, "Engine #" + i + " code", "Temporary, to be removed with better UI").defaultValue(metadata.getCode()).required()
+						.property(ENGINE_PREFIX + i + ENGINE_VERSION_SUFFIX, "Engine #" + i + " version", "Put in the version of the particular engine you are using").required()
+						.property(ENGINE_PREFIX + i + ENGINE_WORKER_SUFFIX, "Engine #" + i + " worker", "The service that actually does the work of this engine")
 						.reference(ObjectArrays.concat(
 								ObjectArrays.concat(metadata.getWorkerTypes(), metadata.getCacheTypes(), String.class), UiBuilder.NONE_TYPE))
-						.property(ENGINE_DEPLOYER_PREFIX + i, "Engine #" + i + " deployer", "The service that prepares the environment for this engine to work efficiently")
+						.property(ENGINE_PREFIX + i + ENGINE_DEPLOYER_SUFFIX, "Engine #" + i + " deployer", "The service that prepares the environment for this engine to work efficiently")
 						.reference(ObjectArrays.concat(metadata.getDeployerTypes(), UiBuilder.NONE_TYPE));
 			}
 

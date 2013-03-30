@@ -300,11 +300,53 @@ public final class DaemonConfig implements ResourceConfig {
 		return null;
 	}
 
-	public void setPingQueueUrl(String pingQueueUrl) {
+	public void setPingQueueUrl(final String pingQueueUrl) {
 		this.pingQueueUrl = pingQueueUrl;
 	}
 
 	public String getPingQueueUrl() {
 		return pingQueueUrl;
+	}
+
+	/**
+	 * Write the daemon configuration itself.
+	 *
+	 * @param writer Writer to write daemon config into.
+	 */
+	public void write(final ConfigWriter writer) {
+		writer.register(this, getName());
+
+		for (final ServiceConfig serviceConfig : getServices()) {
+			serviceConfig.write(writer);
+		}
+		for (final ResourceConfig resourceConfig : getResources()) {
+			resourceConfig.write(writer);
+		}
+
+		writer.openSection(this);
+		writer.addConfig(HOST_NAME, getHostName(), "Hosts the daemon runs on");
+		writer.addConfig(OS_NAME, getOsName(), "Host system operating system name: e.g. Windows or Linux.");
+		writer.addConfig(OS_ARCH, getOsArch(), "Host system architecture: x86, x86_64");
+		writer.addConfig(SHARED_FILE_SPACE_PATH, getSharedFileSpacePath(), "Directory on a shared file system can be accessed from all the daemons");
+		writer.addConfig(TEMP_FOLDER_PATH, getSharedFileSpacePath(), "Temporary folder that can be used for caching. Transferred files from other daemons with no shared file system with this daemon are cached to this folder.");
+		writer.addConfig(DUMP_ERRORS, getSharedFileSpacePath(), "Not implemented yet");
+		writer.addConfig(DUMP_FOLDER_PATH, getSharedFileSpacePath(), "Not implemented yet");
+		writer.addConfig(PING_QUEUE_URL, getPingQueueUrl(), "URL of the queue to ping this daemon through");
+
+		writer.addConfig("services", getResourceList(writer, getServices()), "Comma separated list of provided services");
+		writer.addConfig("resources", getResourceList(writer, getResources()), "Comma separated list of provided resources");
+
+		writer.closeSection();
+	}
+
+	private String getResourceList(final ConfigWriter writer, final Collection<? extends ResourceConfig> resources) {
+		final StringBuilder references = new StringBuilder(10 * resources.size());
+		for (final ResourceConfig resourceConfig : resources) {
+			if (references.length() > 0) {
+				references.append(", ");
+			}
+			references.append(writer.getDependencyResolver().getIdFromConfig(resourceConfig));
+		}
+		return references.toString();
 	}
 }

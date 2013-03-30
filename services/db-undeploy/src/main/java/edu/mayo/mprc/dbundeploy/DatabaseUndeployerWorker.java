@@ -1,9 +1,6 @@
 package edu.mayo.mprc.dbundeploy;
 
-import edu.mayo.mprc.config.DaemonConfig;
-import edu.mayo.mprc.config.DependencyResolver;
-import edu.mayo.mprc.config.ResourceConfig;
-import edu.mayo.mprc.config.ServiceConfig;
+import edu.mayo.mprc.config.*;
 import edu.mayo.mprc.config.ui.ServiceUiFactory;
 import edu.mayo.mprc.config.ui.UiBuilder;
 import edu.mayo.mprc.daemon.*;
@@ -191,7 +188,7 @@ public final class DatabaseUndeployerWorker extends WorkerBase {
 	/**
 	 * Configuration for the factory
 	 */
-	public static final class Config implements ResourceConfig {
+	public static final class Config extends WorkerConfig {
 		private ServiceConfig scaffoldDeployer;
 		private ServiceConfig scaffold3Deployer;
 		private ServiceConfig omssaDeployer;

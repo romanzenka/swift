@@ -226,6 +226,19 @@ public final class DatabaseFactory extends FactoryBase<ResourceConfig, SessionFa
 		public int getPriority() {
 			return 0;
 		}
+
+		@Override
+		public void write(ConfigWriter writer) {
+			writer.openSection(this);
+			writer.addConfig("url", getUrl(), "JDBC-style URL of the server");
+			writer.addConfig("userName", getUserName(), "Database user");
+			writer.addConfig("password", getPassword(), "Database password");
+			writer.addConfig("driverClassName", getDriverClassName(), "Name of the JDBC driver class");
+			writer.addConfig("dialect", getDialect(), "Database dialect");
+			writer.addConfig("defaultSchema", getDefaultSchema(), "Default database schema name");
+			writer.addConfig("schema", getSchema(), "Database schema name");
+			writer.closeSection();
+		}
 	}
 
 	public static final class Ui implements ServiceUiFactory {

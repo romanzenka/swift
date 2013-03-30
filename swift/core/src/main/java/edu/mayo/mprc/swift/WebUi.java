@@ -389,6 +389,18 @@ public final class WebUi {
 			return 0;
 		}
 
+		@Override
+		public void write(ConfigWriter writer) {
+			final Map<String, String> save = save(writer.getDependencyResolver());
+			writer.register(this);
+			writer.openSection(this);
+
+			for (final Map.Entry<String, String> entry : save.entrySet()) {
+				writer.addConfig(entry.getKey(), entry.getValue(), null);
+			}
+			writer.closeSection();
+		}
+
 		public String getPort() {
 			return port;
 		}

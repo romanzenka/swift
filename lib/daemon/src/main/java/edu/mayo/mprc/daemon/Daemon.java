@@ -3,9 +3,11 @@ package edu.mayo.mprc.daemon;
 import com.google.common.base.Joiner;
 import edu.mayo.mprc.MprcException;
 import edu.mayo.mprc.config.*;
+import edu.mayo.mprc.config.ui.ServiceUiFactory;
 import edu.mayo.mprc.daemon.monitor.PingDaemonWorker;
 import edu.mayo.mprc.utilities.FileUtilities;
 import org.apache.log4j.Logger;
+import org.springframework.stereotype.Component;
 
 import java.io.Closeable;
 import java.io.Serializable;
@@ -54,9 +56,9 @@ public final class Daemon {
 		for (final AbstractRunner runner : runners) {
 			runner.stop();
 		}
-		for(Object resource : resources) {
-			if(resource instanceof Closeable) {
-				FileUtilities.closeQuietly((Closeable)resource);
+		for (Object resource : resources) {
+			if (resource instanceof Closeable) {
+				FileUtilities.closeQuietly((Closeable) resource);
 			}
 		}
 	}
@@ -87,36 +89,12 @@ public final class Daemon {
 	/**
 	 * Runs a daemon from its config.
 	 */
-	public static final class Factory {
-		/* Factory for the particular daemon components */
-		private MultiFactory factory;
-		private DependencyResolver dependencies;
-
-		public Daemon createDaemon(final DaemonConfig config) {
-			// Create daemon resources
-			final List<Object> resources = new ArrayList<Object>(config.getResources().size());
-			addResourcesToList(resources, config.getResources(), getDependencies());
-
-			// Create runners
-			final List<AbstractRunner> runners = new ArrayList<AbstractRunner>(config.getServices().size());
-			addRunnersToList(runners, config.getServices(), getDependencies());
-
-			// Create extra runner for the ping service
-
-			final ServiceConfig pingServiceConfig = PingDaemonWorker.getPingServiceConfig(config);
-			if (pingServiceConfig != null) {
-				final AbstractRunner pingRunner = createRunner(pingServiceConfig, getDependencies());
-				runners.add(pingRunner);
-			}
-
-			return new Daemon(runners, resources);
-		}
-
+	@Component("daemonFactory")
+	public static final class Factory extends FactoryBase<DaemonConfig, Daemon> implements FactoryDescriptor {
 		private void addResourcesToList(final List<Object> resources, final List<ResourceConfig> configs, final DependencyResolver dependencies) {
 			Collections.sort(configs, new ResourceComparator());
 			for (final ResourceConfig resourceConfig : configs) {
-				final ResourceFactory resourceFactory = this.factory.getFactory(resourceConfig.getClass());
-				final Object resource = resourceFactory.createSingleton(resourceConfig, dependencies);
+				final Object resource = dependencies.createSingleton(resourceConfig);
 				resources.add(resource);
 			}
 		}
@@ -136,27 +114,57 @@ public final class Daemon {
 		}
 
 		private AbstractRunner createRunner(final ServiceConfig serviceConfig, final DependencyResolver dependencies) {
-			final DaemonConnection daemonConnection = (DaemonConnection) factory.createSingleton(serviceConfig, dependencies);
+			final DaemonConnection daemonConnection = (DaemonConnection) dependencies.createSingleton(serviceConfig);
 			final RunnerConfig runnerConfig = serviceConfig.getRunner();
-			final AbstractRunner runner = (AbstractRunner) factory.createSingleton(runnerConfig, dependencies);
+			final AbstractRunner runner = (AbstractRunner) dependencies.createSingleton(runnerConfig);
 			runner.setDaemonConnection(daemonConnection);
 			return runner;
 		}
 
-		public MultiFactory getMultiFactory() {
-			return factory;
+		@Override
+		public String getType() {
+			return "daemon";
 		}
 
-		public void setMultiFactory(final MultiFactory factory) {
-			this.factory = factory;
+		@Override
+		public String getUserName() {
+			return "Daemon";
 		}
 
-		public DependencyResolver getDependencies() {
-			return dependencies;
+		@Override
+		public String getDescription() {
+			return "A daemon is a collection of services and resources that runs on a particular machine";
 		}
 
-		public void setDependencies(DependencyResolver dependencies) {
-			this.dependencies = dependencies;
+		@Override
+		public Class<? extends ResourceConfig> getConfigClass() {
+			return DaemonConfig.class;
+		}
+
+		@Override
+		public ServiceUiFactory getServiceUiFactory() {
+			return null;
+		}
+
+		@Override
+		public Daemon create(DaemonConfig config, DependencyResolver dependencies) {
+			// Create daemon resources
+			final List<Object> resources = new ArrayList<Object>(config.getResources().size());
+			addResourcesToList(resources, config.getResources(), dependencies);
+
+			// Create runners
+			final List<AbstractRunner> runners = new ArrayList<AbstractRunner>(config.getServices().size());
+			addRunnersToList(runners, config.getServices(), dependencies);
+
+			// Create extra runner for the ping service
+
+			final ServiceConfig pingServiceConfig = PingDaemonWorker.getPingServiceConfig(config);
+			if (pingServiceConfig != null) {
+				final AbstractRunner pingRunner = createRunner(pingServiceConfig, dependencies);
+				runners.add(pingRunner);
+			}
+
+			return new Daemon(runners, resources);
 		}
 	}
 

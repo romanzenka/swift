@@ -100,6 +100,30 @@ public final class ApplicationConfig implements ResourceConfig {
 		}
 	}
 
+	/**
+	 * Save the whole application config into a folder that is easier to handle than a big XStream XML file.
+	 *
+	 * @param configDirectory Directory to save to
+	 * @param table           Table of all the recognized elements
+	 */
+	public void saveDir(final File configDirectory, final MultiFactory table) {
+		FileUtilities.ensureFolderExists(configDirectory);
+		final File config = new File(configDirectory, "swift.cfg");
+		ConfigWriter writer = null;
+		try {
+			writer = new ConfigWriter(config, table);
+			write(writer);
+		} catch (Exception e) {
+			throw new MprcException("Cannot write config file into " + config.getAbsolutePath(), e);
+		} finally {
+			FileUtilities.closeQuietly(writer);
+		}
+	}
+
+	public static ApplicationConfig loadDir(final File configDiretory, final MultiFactory table) {
+		return null;
+	}
+
 	public List<ResourceConfig> getModulesOfConfigType(final Class<? extends ResourceConfig> type) {
 		final List<ResourceConfig> list = new ArrayList<ResourceConfig>();
 		for (final DaemonConfig daemonConfig : daemons) {
@@ -146,6 +170,13 @@ public final class ApplicationConfig implements ResourceConfig {
 	@Override
 	public int getPriority() {
 		return 0;
+	}
+
+	@Override
+	public void write(final ConfigWriter writer) {
+		for (final DaemonConfig daemonConfig : getDaemons()) {
+			daemonConfig.write(writer);
+		}
 	}
 
 	/**

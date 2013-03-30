@@ -1,9 +1,6 @@
 package edu.mayo.mprc.daemon.monitor;
 
-import edu.mayo.mprc.config.DaemonConfig;
-import edu.mayo.mprc.config.DependencyResolver;
-import edu.mayo.mprc.config.ResourceConfig;
-import edu.mayo.mprc.config.ServiceConfig;
+import edu.mayo.mprc.config.*;
 import edu.mayo.mprc.config.ui.ServiceUiFactory;
 import edu.mayo.mprc.config.ui.UiBuilder;
 import edu.mayo.mprc.daemon.*;
@@ -65,7 +62,7 @@ public final class PingDaemonWorker extends WorkerBase implements NoLoggingWorke
 	/**
 	 * Configuration for the factory
 	 */
-	public static final class Config implements ResourceConfig {
+	public static final class Config extends WorkerConfig {
 		public Config() {
 		}
 
@@ -81,6 +78,10 @@ public final class PingDaemonWorker extends WorkerBase implements NoLoggingWorke
 		@Override
 		public int getPriority() {
 			return 0;
+		}
+
+		@Override
+		public void write(final ConfigWriter writer) {
 		}
 	}
 

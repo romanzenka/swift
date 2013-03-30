@@ -38,7 +38,6 @@ public final class SwiftWebContext {
 					System.setProperty("SWIFT_INSTALL", installPropertyFile.getAbsolutePath());
 					MainFactoryContext.initialize();
 					webUiHolder = MainFactoryContext.getWebUiHolder();
-					final Daemon.Factory daemonFactory = MainFactoryContext.getDaemonFactory();
 					final MultiFactory factoryTable = MainFactoryContext.getResourceTable();
 
 					final ApplicationConfig swiftConfig = ApplicationConfig.load(installPropertyFile, factoryTable);
@@ -69,7 +68,7 @@ public final class SwiftWebContext {
 						}
 					}
 
-					final Daemon daemon = daemonFactory.createDaemon(daemonConfig);
+					final Daemon daemon = (Daemon) factoryTable.create(daemonConfig, new DependencyResolver(factoryTable));
 
 					for (final Object obj : daemon.getResources()) {
 						if (obj instanceof WebUi) {

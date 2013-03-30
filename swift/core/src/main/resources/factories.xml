@@ -69,11 +69,6 @@
         <property name="fileTokenFactory" ref="fileTokenFactory"/>
     </bean>
 
-    <bean id="daemonFactory" class="edu.mayo.mprc.daemon.Daemon$Factory">
-        <property name="multiFactory" ref="resourceTable"/>
-        <property name="dependencies" ref="dependencyResolver"/>
-    </bean>
-
     <!-- Provides a WebUi interface after it gets configured -->
     <bean id="webUiHolder" class="edu.mayo.mprc.swift.WebUiHolder">
 

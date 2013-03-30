@@ -3,10 +3,7 @@ package edu.mayo.mprc.swift.config;
 import com.google.common.base.Charsets;
 import com.google.common.collect.Lists;
 import com.google.common.io.Files;
-import edu.mayo.mprc.config.ApplicationConfig;
-import edu.mayo.mprc.config.DaemonConfig;
-import edu.mayo.mprc.config.MultiFactory;
-import edu.mayo.mprc.config.ServiceConfig;
+import edu.mayo.mprc.config.*;
 import edu.mayo.mprc.daemon.Daemon;
 import edu.mayo.mprc.daemon.SimpleRunner;
 import edu.mayo.mprc.dbundeploy.DatabaseUndeployerWorker;
@@ -38,6 +35,7 @@ import edu.mayo.mprc.xtandem.XTandemWorker;
 import org.custommonkey.xmlunit.Diff;
 import org.custommonkey.xmlunit.XMLAssert;
 import org.custommonkey.xmlunit.XMLUnit;
+import org.testng.Assert;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
@@ -46,6 +44,7 @@ import org.xml.sax.SAXException;
 import java.io.File;
 import java.io.IOException;
 import java.io.Reader;
+import java.io.StringWriter;
 import java.util.Collection;
 
 public final class TestDaemonFactory {
@@ -71,7 +70,7 @@ public final class TestDaemonFactory {
 		final ApplicationConfig config = createSwiftConfig();
 
 		final Daemon.Factory daemonFactory = TestApplicationContext.getDaemonFactory();
-		final Daemon daemon = daemonFactory.createDaemon(config.getDaemonConfig("main"));
+		final Daemon daemon = daemonFactory.create(config.getDaemonConfig("main"), new DependencyResolver(table));
 		daemon.start();
 	}
 
@@ -90,13 +89,24 @@ public final class TestDaemonFactory {
 			reader = ResourceUtilities.getReader("classpath:edu/mayo/mprc/swift/config/fullConfig.xml", TestDaemonFactory.class);
 			XMLUnit.setIgnoreWhitespace(true);
 			final Diff diff = XMLUnit.compareXML(reader, savedFileContents);
-				XMLAssert.assertXMLEqual("Config file not equal", diff, true);
+			XMLAssert.assertXMLEqual("Config file not equal", diff, true);
 		} finally {
 			FileUtilities.closeQuietly(reader);
 		}
 
 		FileUtilities.quietDelete(tempFile);
 	}
+
+	@Test
+	public void shouldSaveAndLoadDir() {
+		final ApplicationConfig config = createSwiftConfig();
+		final StringWriter stringWriter = new StringWriter();
+		ConfigWriter writer = new ConfigWriter(stringWriter, table);
+		config.write(writer);
+		Assert.assertEquals(stringWriter.toString(), "");
+
+	}
+
 
 	private static ApplicationConfig createSwiftConfig() {
 		final String BROKER_URI = "jms.vm://local?simplequeue=";

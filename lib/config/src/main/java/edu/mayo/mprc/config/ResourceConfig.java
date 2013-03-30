@@ -17,4 +17,11 @@ public interface ResourceConfig {
 	 *         prior to resource A.
 	 */
 	int getPriority();
+
+	/**
+	 * @param writer       Writer to write into.
+	 *
+	 */
+	void write(ConfigWriter writer);
+
 }

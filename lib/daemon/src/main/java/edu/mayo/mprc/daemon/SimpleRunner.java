@@ -147,7 +147,7 @@ public final class SimpleRunner extends AbstractRunner {
 		public Config() {
 		}
 
-		public Config(final ResourceConfig workerFactory) {
+		public Config(final WorkerConfig workerFactory) {
 			super(workerFactory);
 		}
 
@@ -186,6 +186,20 @@ public final class SimpleRunner extends AbstractRunner {
 		@Override
 		public int getPriority() {
 			return 0;
+		}
+
+		@Override
+		public void writeInline(ConfigWriter writer) {
+			writer.addConfig("runner", writer.getResourceId(getClass()), "Type of the runner (localRunner/sgeRunner)");
+			writer.addConfig("runner.numThreads", Integer.toString(getNumThreads()), "Number of threads");
+			writer.addConfig("runner.logOutputFolder", getLogOutputFolder(), "Where to write logs");
+			getWorkerConfiguration().writeInline(writer);
+		}
+
+		@Override
+		public void write(ConfigWriter writer) {
+			getWorkerConfiguration().write(writer);
+			writer.register(this);
 		}
 	}
 

@@ -170,7 +170,7 @@ public final class SwiftEnvironmentImpl implements SwiftEnvironment {
 
 	@Override
 	public Daemon createDaemon(final DaemonConfig config) {
-		return daemonFactory.createDaemon(config);
+		return daemonFactory.create(config, dependencyResolver);
 	}
 
 	@Override

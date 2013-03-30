@@ -435,8 +435,8 @@ public final class GridRunner extends AbstractRunner {
 		public Config() {
 		}
 
-		public Config(final ResourceConfig workerFactory) {
-			super(workerFactory);
+		public Config(final WorkerConfig workerConfig) {
+			super(workerConfig);
 		}
 
 		public String getQueueName() {
@@ -520,6 +520,24 @@ public final class GridRunner extends AbstractRunner {
 		@Override
 		public int getPriority() {
 			return 0;
+		}
+
+		@Override
+		public void write(final ConfigWriter writer) {
+			getWorkerConfiguration().write(writer);
+			writer.register(this);
+		}
+
+		@Override
+		public void writeInline(ConfigWriter writer) {
+			writer.addConfig("runner.type", writer.getResourceId(getClass()), "Type of the runner (localRunner/sgeRunner)");
+			writer.addConfig("runner.queueName", getQueueName(), "Name of the SGE queue");
+			writer.addConfig("runner.memoryRequirement", getMemoryRequirement(), "Memory requirements for the SGE queue");
+			writer.addConfig("runner.nativeSpecification", getNativeSpecification(), "Native specification (additional parameters) for the SGE queue");
+			writer.addConfig("runner.sharedWorkingDirectory", getSharedWorkingDirectory(), "The shared working directory for file exchanges");
+			writer.addConfig("runner.sharedTempDirectory", getSharedTempDirectory(), "The shared temporary directory for storing temporary files");
+			writer.addConfig("runner.sharedLogDirectory", getSharedLogDirectory(), "The shared directory to store log files");
+			writer.addConfig("runner.wrapperScript", getWrapperScript(), "A wrapper script that will ensure smooth execution of the Swift component (create/tear down environment). Takes the command to execute as its parameter.");
 		}
 	}
 

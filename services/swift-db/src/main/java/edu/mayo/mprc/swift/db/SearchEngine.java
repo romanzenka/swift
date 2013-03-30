@@ -356,7 +356,7 @@ public final class SearchEngine implements Comparable<SearchEngine> {
 	/**
 	 * Configuration of a particular engine.
 	 */
-	public static final class Config implements ResourceConfig {
+	public static final class Config extends WorkerConfig {
 		private String code;
 		private String version;
 		private ServiceConfig worker;
@@ -406,8 +406,8 @@ public final class SearchEngine implements Comparable<SearchEngine> {
 			final Map<String, String> result = Maps.newHashMap();
 			result.put("code", getCode());
 			result.put("version", getVersion());
-			result.put("worker", resolver.getIdFromDependency(getWorker()));
-			result.put("deployer", resolver.getIdFromDependency(getDeployer()));
+			result.put("worker", resolver.getIdFromConfig(getWorker()));
+			result.put("deployer", resolver.getIdFromConfig(getDeployer()));
 			return result;
 		}
 
