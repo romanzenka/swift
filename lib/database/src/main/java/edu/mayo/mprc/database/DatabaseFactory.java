@@ -15,7 +15,7 @@ import java.util.*;
 public final class DatabaseFactory extends FactoryBase<ResourceConfig, SessionFactory> implements FactoryDescriptor {
 
 	public static final String TYPE = "database";
-	public static final String NAME = "Database";
+	public static final String NAME = "Swift SQL Database";
 	public static final String DESC = "Database for storing information about Swift searches and Swift configuration.<p>The database gets created and initialized through the module that uses it (in this case, the Swift Searcher module).<p><b>Important:</b> Swift Searcher and Swift Website have to run within the same daemon as the database.";
 	private Map<String, String> hibernateProperties;
 	private List<DaoBase> daoList;
@@ -200,44 +200,29 @@ public final class DatabaseFactory extends FactoryBase<ResourceConfig, SessionFa
 			this.schema = schema;
 		}
 
-		public Map<String, String> save(final DependencyResolver resolver) {
-			final Map<String, String> map = new TreeMap<String, String>();
-			map.put("url", url);
-			map.put("username", userName);
-			map.put("password", password);
-			map.put("driverClassName", driverClassName);
-			map.put("dialect", dialect);
-			map.put("defaultSchema", defaultSchema);
-			map.put("schema", schema);
-			return map;
+		public void save(final ConfigWriter writer) {
+			writer.put("url", getUrl(), "JDBC-style URL of the server");
+			writer.put("userName", getUserName(), "Database user");
+			writer.put("password", getPassword(), "Database password");
+			writer.put("driverClassName", getDriverClassName(), "Name of the JDBC driver class");
+			writer.put("dialect", getDialect(), "Database dialect");
+			writer.put("defaultSchema", getDefaultSchema(), "Default database schema name");
+			writer.put("schema", getSchema(), "Database schema name");
 		}
 
-		public void load(final Map<String, String> values, final DependencyResolver resolver) {
-			url = values.get("url");
-			userName = values.get("username");
-			password = values.get("password");
-			driverClassName = values.get("driverClassName");
-			dialect = values.get("dialect");
-			defaultSchema = values.get("defaultSchema");
-			schema = values.get("schema");
+		public void load(final ConfigReader reader) {
+			url = reader.get("url");
+			userName = reader.get("username");
+			password = reader.get("password");
+			driverClassName = reader.get("driverClassName");
+			dialect = reader.get("dialect");
+			defaultSchema = reader.get("defaultSchema");
+			schema = reader.get("schema");
 		}
 
 		@Override
 		public int getPriority() {
 			return 0;
-		}
-
-		@Override
-		public void write(ConfigWriter writer) {
-			writer.openSection(this);
-			writer.addConfig("url", getUrl(), "JDBC-style URL of the server");
-			writer.addConfig("userName", getUserName(), "Database user");
-			writer.addConfig("password", getPassword(), "Database password");
-			writer.addConfig("driverClassName", getDriverClassName(), "Name of the JDBC driver class");
-			writer.addConfig("dialect", getDialect(), "Database dialect");
-			writer.addConfig("defaultSchema", getDefaultSchema(), "Default database schema name");
-			writer.addConfig("schema", getSchema(), "Database schema name");
-			writer.closeSection();
 		}
 	}
 

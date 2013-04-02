@@ -1,14 +1,12 @@
 package edu.mayo.mprc.config;
 
-import java.util.Map;
-
 /**
  * A resource marker interface.
  */
 public interface ResourceConfig {
-	Map<String, String> save(DependencyResolver resolver);
+	void save(ConfigWriter writer);
 
-	void load(Map<String, String> values, DependencyResolver resolver);
+	void load(ConfigReader reader);
 
 	/**
 	 * @return Int value that indicates the priority which this resource
@@ -17,11 +15,4 @@ public interface ResourceConfig {
 	 *         prior to resource A.
 	 */
 	int getPriority();
-
-	/**
-	 * @param writer       Writer to write into.
-	 *
-	 */
-	void write(ConfigWriter writer);
-
 }

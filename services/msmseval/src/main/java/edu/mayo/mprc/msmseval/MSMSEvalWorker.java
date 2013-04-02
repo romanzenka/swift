@@ -1,9 +1,6 @@
 package edu.mayo.mprc.msmseval;
 
-import edu.mayo.mprc.config.DaemonConfig;
-import edu.mayo.mprc.config.DependencyResolver;
-import edu.mayo.mprc.config.ResourceConfig;
-import edu.mayo.mprc.config.WorkerConfig;
+import edu.mayo.mprc.config.*;
 import edu.mayo.mprc.config.ui.ExecutableSwitching;
 import edu.mayo.mprc.config.ui.ServiceUiFactory;
 import edu.mayo.mprc.config.ui.UiBuilder;
@@ -21,7 +18,6 @@ import org.springframework.stereotype.Component;
 import java.io.File;
 import java.util.Arrays;
 import java.util.Map;
-import java.util.TreeMap;
 
 public final class MSMSEvalWorker extends WorkerBase {
 
@@ -201,7 +197,7 @@ public final class MSMSEvalWorker extends WorkerBase {
 	/**
 	 * Configuration for the factory
 	 */
-	public static final class Config extends WorkerConfig {
+	public static final class Config implements ResourceConfig {
 		private String msmsEvalExecutable;
 		private String paramFiles;
 
@@ -229,16 +225,14 @@ public final class MSMSEvalWorker extends WorkerBase {
 			this.paramFiles = paramFiles;
 		}
 
-		public Map<String, String> save(final DependencyResolver resolver) {
-			final Map<String, String> map = new TreeMap<String, String>();
-			map.put(MSMS_EVAL_EXECUTABLE, msmsEvalExecutable);
-			map.put(PARAM_FILES, paramFiles);
-			return map;
+		public void save(final ConfigWriter writer) {
+			writer.put(MSMS_EVAL_EXECUTABLE, msmsEvalExecutable, "MSMS Eval executable");
+			writer.put(PARAM_FILES, paramFiles, "A comma-separated list of name,config file pairs for MSMSEval");
 		}
 
-		public void load(final Map<String, String> values, final DependencyResolver resolver) {
-			msmsEvalExecutable = values.get(MSMS_EVAL_EXECUTABLE);
-			paramFiles = values.get(PARAM_FILES);
+		public void load(final ConfigReader reader) {
+			msmsEvalExecutable = reader.get(MSMS_EVAL_EXECUTABLE);
+			paramFiles = reader.get(PARAM_FILES);
 		}
 
 		@Override

@@ -1,6 +1,7 @@
 package edu.mayo.mprc.swift.configuration.server.properties.validator;
 
 import edu.mayo.mprc.config.DependencyResolver;
+import edu.mayo.mprc.config.MapConfigWriter;
 import edu.mayo.mprc.config.ResourceConfig;
 import edu.mayo.mprc.config.ui.FixTag;
 import edu.mayo.mprc.config.ui.PropertyChangeListener;
@@ -86,7 +87,9 @@ public final class FileValidator implements PropertyChangeListener {
 
 	@Override
 	public void fixError(final ResourceConfig config, final String propertyName, final String action) {
-		final Map<String, String> map = config.save(resolver);
+		MapConfigWriter writer = new MapConfigWriter(resolver);
+		config.save(writer);
+		final Map<String, String> map = writer.getMap();
 		fix(map.get(propertyName));
 	}
 }

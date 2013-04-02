@@ -4,6 +4,8 @@ import edu.mayo.mprc.MprcException;
 import edu.mayo.mprc.config.*;
 import edu.mayo.mprc.daemon.Daemon;
 import edu.mayo.mprc.daemon.DaemonConnection;
+import edu.mayo.mprc.daemon.DaemonConnectionFactory;
+import edu.mayo.mprc.daemon.MessageBroker;
 import edu.mayo.mprc.daemon.files.FileTokenFactory;
 import edu.mayo.mprc.swift.ExitCode;
 import edu.mayo.mprc.swift.SwiftConfig;
@@ -24,6 +26,7 @@ import java.util.List;
 public final class SwiftEnvironmentImpl implements SwiftEnvironment {
 	private FileTokenFactory fileTokenFactory;
 	private Daemon.Factory daemonFactory;
+	private DaemonConnectionFactory daemonConnectionFactory;
 	private MultiFactory swiftFactory;
 	private List<SwiftCommand> commands;
 
@@ -142,6 +145,14 @@ public final class SwiftEnvironmentImpl implements SwiftEnvironment {
 		this.commands = commands;
 	}
 
+	public DaemonConnectionFactory getDaemonConnectionFactory() {
+		return daemonConnectionFactory;
+	}
+
+	public void setDaemonConnectionFactory(DaemonConnectionFactory daemonConnectionFactory) {
+		this.daemonConnectionFactory = daemonConnectionFactory;
+	}
+
 	@Override
 	public DaemonConfig getDaemonConfig() {
 		if (daemonConfig == null) {
@@ -163,10 +174,18 @@ public final class SwiftEnvironmentImpl implements SwiftEnvironment {
 	public ApplicationConfig getApplicationConfig() {
 		if (applicationConfig == null) {
 			setApplicationConfig(loadSwiftConfig(configXmlFile, getSwiftFactory()));
+			initDaemonConnectionFactory();
 		}
 		return applicationConfig;
 	}
 
+	private void initDaemonConnectionFactory() {
+		final List<ResourceConfig> brokers = getApplicationConfig().getModulesOfConfigType(MessageBroker.Config.class);
+		if (brokers.size() > 0) {
+			MessageBroker.Config config = (MessageBroker.Config) brokers.get(0);
+			daemonConnectionFactory.setBrokerUrl(config.getBrokerUrl());
+		}
+	}
 
 	@Override
 	public Daemon createDaemon(final DaemonConfig config) {

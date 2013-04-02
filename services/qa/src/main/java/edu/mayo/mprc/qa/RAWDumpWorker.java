@@ -1,10 +1,7 @@
 package edu.mayo.mprc.qa;
 
 import edu.mayo.mprc.MprcException;
-import edu.mayo.mprc.config.DaemonConfig;
-import edu.mayo.mprc.config.DependencyResolver;
-import edu.mayo.mprc.config.ResourceConfig;
-import edu.mayo.mprc.config.WorkerConfig;
+import edu.mayo.mprc.config.*;
 import edu.mayo.mprc.config.ui.ServiceUiFactory;
 import edu.mayo.mprc.config.ui.UiBuilder;
 import edu.mayo.mprc.config.ui.WrapperScriptSwitcher;
@@ -250,7 +247,7 @@ public final class RAWDumpWorker extends WorkerBase {
 	/**
 	 * Configuration for the factory
 	 */
-	public static final class Config extends WorkerConfig {
+	public static final class Config implements ResourceConfig {
 		private String wrapperScript;
 		private String windowsExecWrapperScript;
 
@@ -258,11 +255,9 @@ public final class RAWDumpWorker extends WorkerBase {
 		private String commandLineOptions;
 
 		public Config() {
-			super();
 		}
 
 		public Config(final String rawDumpExecutable, final String commandLineOptions) {
-			super();
 			this.rawDumpExecutable = rawDumpExecutable;
 			this.commandLineOptions = commandLineOptions;
 		}
@@ -283,20 +278,20 @@ public final class RAWDumpWorker extends WorkerBase {
 			return commandLineOptions;
 		}
 
-		public Map<String, String> save(final DependencyResolver resolver) {
-			final Map<String, String> map = new TreeMap<String, String>();
-			map.put("wrapperScript", wrapperScript);
-			map.put("windowsExecWrapperScript", windowsExecWrapperScript);
-			map.put("rawDumpExecutable", rawDumpExecutable);
-			map.put("commandLineOptions", commandLineOptions);
-			return map;
+		@Override
+		public void save(final ConfigWriter writer) {
+			writer.put("wrapperScript", wrapperScript);
+			writer.put("windowsExecWrapperScript", windowsExecWrapperScript);
+			writer.put("rawDumpExecutable", rawDumpExecutable);
+			writer.put("commandLineOptions", commandLineOptions);
 		}
 
-		public void load(final Map<String, String> values, final DependencyResolver resolver) {
-			wrapperScript = values.get("wrapperScript");
-			windowsExecWrapperScript = values.get("windowsExecWrapperScript");
-			rawDumpExecutable = values.get("rawDumpExecutable");
-			commandLineOptions = values.get("commandLineOptions");
+		@Override
+		public void load(final ConfigReader reader) {
+			wrapperScript = reader.get("wrapperScript");
+			windowsExecWrapperScript = reader.get("windowsExecWrapperScript");
+			rawDumpExecutable = reader.get("rawDumpExecutable");
+			commandLineOptions = reader.get("commandLineOptions");
 		}
 
 		@Override

@@ -5,7 +5,7 @@ import edu.mayo.mprc.config.ApplicationConfig;
 import edu.mayo.mprc.config.DaemonConfig;
 import edu.mayo.mprc.config.MultiFactory;
 import edu.mayo.mprc.config.ServiceConfig;
-import edu.mayo.mprc.daemon.Daemon;
+import edu.mayo.mprc.daemon.DaemonConnectionFactory;
 import edu.mayo.mprc.daemon.MessageBroker;
 import edu.mayo.mprc.daemon.SimpleRunner;
 import edu.mayo.mprc.database.DatabaseFactory;
@@ -71,6 +71,8 @@ public final class TestApplicationContext {
 
 		final MessageBroker.Config messageBrokerConfig = MessageBroker.Config.getEmbeddedBroker();
 		daemonConfig.addResource(messageBrokerConfig);
+		final DaemonConnectionFactory daemonConnectionFactory = (DaemonConnectionFactory) testContext.getBean("daemonConnectionFactory");
+		daemonConnectionFactory.setBrokerUrl(messageBrokerConfig.getBrokerUrl());
 
 		daemonConfig.addResource(databaseConfig);
 
@@ -78,7 +80,7 @@ public final class TestApplicationContext {
 				fastaFolder, fastaArchiveFolder, fastaUploadFolder,
 				null, null, null, null, null, null, null, null, null, null, databaseConfig);
 
-		daemonConfig.addService(new ServiceConfig("searcher1", new SimpleRunner.Config(searcherConfig), messageBrokerConfig.getBrokerUrl() + "?simplequeue=searcher1"));
+		daemonConfig.addService(new ServiceConfig("searcher1", new SimpleRunner.Config(searcherConfig)));
 
 		validator.setDaemonConfig(daemonConfig);
 		validator.setSearcherConfig(searcherConfig);
@@ -112,10 +114,6 @@ public final class TestApplicationContext {
 	}
 
 	/* ============================================================================================================== */
-
-	public static Daemon.Factory getDaemonFactory() {
-		return (Daemon.Factory) getBean("daemonFactory");
-	}
 
 	public static SwiftDao getSwiftDao() {
 		return (SwiftDao) getBean("swiftDao");

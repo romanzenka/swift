@@ -1,10 +1,7 @@
 package edu.mayo.mprc.swift;
 
 import edu.mayo.mprc.MprcException;
-import edu.mayo.mprc.config.ApplicationConfig;
-import edu.mayo.mprc.config.DaemonConfig;
-import edu.mayo.mprc.config.DependencyResolver;
-import edu.mayo.mprc.config.MultiFactory;
+import edu.mayo.mprc.config.*;
 import edu.mayo.mprc.daemon.Daemon;
 import edu.mayo.mprc.dbcurator.server.CurationWebContext;
 import edu.mayo.mprc.utilities.FileUtilities;
@@ -174,7 +171,8 @@ public final class SwiftWebContext {
 			final DependencyResolver dependencies = new DependencyResolver(null);
 			final Map<String, String> map = new HashMap<String, String>(1);
 			map.put(WebUi.BROWSE_ROOT, "/");
-			config.load(map, dependencies);
+			final MapConfigReader reader = new MapConfigReader(dependencies, map);
+			config.load(reader);
 			webUiHolder = MainFactoryContext.getWebUiHolder();
 			webUiHolder.setWebUi((WebUi) MainFactoryContext.getResourceTable().createSingleton(config, dependencies));
 		}

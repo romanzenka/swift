@@ -3,10 +3,7 @@ package edu.mayo.mprc.daemon;
 import com.google.common.base.Charsets;
 import com.google.common.io.Files;
 import edu.mayo.mprc.MprcException;
-import edu.mayo.mprc.config.ConfigWriter;
-import edu.mayo.mprc.config.DependencyResolver;
-import edu.mayo.mprc.config.ServiceConfig;
-import edu.mayo.mprc.config.WorkerConfig;
+import edu.mayo.mprc.config.*;
 import edu.mayo.mprc.utilities.FileUtilities;
 import edu.mayo.mprc.utilities.StringUtilities;
 import edu.mayo.mprc.utilities.exceptions.ExceptionUtilities;
@@ -361,11 +358,19 @@ public abstract class WorkCache<T extends WorkPacket> implements NoLoggingWorker
 	/**
 	 * Generic work cache config. A work cache knows its folder and the service whose output it is caching.
 	 */
-	public static class CacheConfig extends WorkerConfig {
+	public static class CacheConfig implements ResourceConfig {
 		public static final String CACHE_FOLDER = "cacheFolder";
 		public static final String SERVICE = "service";
 		private String cacheFolder;
 		private ServiceConfig service;
+
+		public void setService(ServiceConfig service) {
+			this.service = service;
+		}
+
+		public void setCacheFolder(String cacheFolder) {
+			this.cacheFolder = cacheFolder;
+		}
 
 		public String getCacheFolder() {
 			return cacheFolder;
@@ -376,34 +381,20 @@ public abstract class WorkCache<T extends WorkPacket> implements NoLoggingWorker
 		}
 
 		@Override
-		public Map<String, String> save(final DependencyResolver resolver) {
-			final Map<String, String> map = new HashMap<String, String>();
-			map.put("cacheFolder", cacheFolder);
-			map.put("service", resolver.getIdFromConfig(service));
-			return map;
+		public void save(final ConfigWriter writer) {
+			writer.put("cacheFolder", cacheFolder, "Where to cache files");
+			writer.put("service", writer.save(service), "Service being cached");
 		}
 
 		@Override
-		public void load(final Map<String, String> values, final DependencyResolver resolver) {
-			cacheFolder = values.get("cacheFolder");
-			service = (ServiceConfig) resolver.getConfigFromId(values.get("service"));
+		public void load(final ConfigReader reader) {
+			cacheFolder = reader.get("cacheFolder");
+			service = (ServiceConfig) reader.getObject("service");
 		}
 
 		@Override
 		public int getPriority() {
 			return 0;
-		}
-
-		@Override
-		public void write(ConfigWriter writer) {
-			writer.register(this);
-
-			service.write(writer);
-
-			writer.openSection(this);
-			writer.addConfig("cacheFolder", cacheFolder, "Where does the cache put the cached files");
-			writer.addConfig("service", writer.getDependencyResolver().getIdFromConfig(service), "Name of the service whose outputs we cache");
-			writer.closeSection();
 		}
 	}
 }

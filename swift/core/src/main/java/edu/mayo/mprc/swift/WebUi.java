@@ -22,7 +22,9 @@ import edu.mayo.mprc.workspace.WorkspaceDao;
 
 import java.io.File;
 import java.text.MessageFormat;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
 /**
  * A class holding information about WebUI configuration.
@@ -360,45 +362,33 @@ public final class WebUi {
 			return searcher;
 		}
 
-		public Map<String, String> save(final DependencyResolver resolver) {
-			final Map<String, String> map = new TreeMap<String, String>();
-			map.put(SEARCHER, resolver.getIdFromConfig(getSearcher()));
-			map.put(TITLE, getTitle());
-			map.put(PORT, getPort());
-			map.put(BROWSE_ROOT, getBrowseRoot());
-			map.put(BROWSE_WEB_ROOT, getBrowseWebRoot());
-			map.put(QSTAT, resolver.getIdFromConfig(getQstat()));
-			map.put(DATABASE_UNDEPLOYER, resolver.getIdFromConfig(getDatabaseUndeployer()));
-			map.put(SEARCHES_FOLDER, getSearchesFolder());
-			return map;
+		@Override
+		public void save(final ConfigWriter writer) {
+			writer.put(SEARCHER, getSearcher());
+			writer.put(TITLE, getTitle());
+			writer.put(PORT, getPort());
+			writer.put(BROWSE_ROOT, getBrowseRoot());
+			writer.put(BROWSE_WEB_ROOT, getBrowseWebRoot());
+			writer.put(QSTAT, getQstat());
+			writer.put(DATABASE_UNDEPLOYER, getDatabaseUndeployer());
+			writer.put(SEARCHES_FOLDER, getSearchesFolder());
 		}
 
-		public void load(final Map<String, String> values, final DependencyResolver resolver) {
-			searcher = (ServiceConfig) resolver.getConfigFromId(values.get(SEARCHER));
-			title = values.get(TITLE);
-			port = values.get(PORT);
-			browseRoot = values.get(BROWSE_ROOT);
-			browseWebRoot = values.get(BROWSE_WEB_ROOT);
-			qstat = (ServiceConfig) resolver.getConfigFromId(values.get(QSTAT));
-			databaseUndeployer = (ServiceConfig) resolver.getConfigFromId(values.get(DATABASE_UNDEPLOYER));
-			searchesFolder = values.get(SEARCHES_FOLDER);
+		@Override
+		public void load(final ConfigReader reader) {
+			searcher = (ServiceConfig) reader.getObject(SEARCHER);
+			title = reader.get(TITLE);
+			port = reader.get(PORT);
+			browseRoot = reader.get(BROWSE_ROOT);
+			browseWebRoot = reader.get(BROWSE_WEB_ROOT);
+			qstat = (ServiceConfig) reader.getObject(QSTAT);
+			databaseUndeployer = (ServiceConfig) reader.getObject(DATABASE_UNDEPLOYER);
+			searchesFolder = reader.get(SEARCHES_FOLDER);
 		}
 
 		@Override
 		public int getPriority() {
 			return 0;
-		}
-
-		@Override
-		public void write(ConfigWriter writer) {
-			final Map<String, String> save = save(writer.getDependencyResolver());
-			writer.register(this);
-			writer.openSection(this);
-
-			for (final Map.Entry<String, String> entry : save.entrySet()) {
-				writer.addConfig(entry.getKey(), entry.getValue(), null);
-			}
-			writer.closeSection();
 		}
 
 		public String getPort() {

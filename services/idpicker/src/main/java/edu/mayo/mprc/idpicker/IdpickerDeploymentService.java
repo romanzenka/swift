@@ -1,10 +1,7 @@
 package edu.mayo.mprc.idpicker;
 
 import edu.mayo.mprc.MprcException;
-import edu.mayo.mprc.config.DaemonConfig;
-import edu.mayo.mprc.config.DependencyResolver;
-import edu.mayo.mprc.config.ResourceConfig;
-import edu.mayo.mprc.config.WorkerConfig;
+import edu.mayo.mprc.config.*;
 import edu.mayo.mprc.config.ui.ServiceUiFactory;
 import edu.mayo.mprc.config.ui.UiBuilder;
 import edu.mayo.mprc.daemon.Worker;
@@ -20,7 +17,6 @@ import java.io.File;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.TreeMap;
 
 /**
  * This is a dummy class provided only to keep the logic same for all search engine types.
@@ -72,15 +68,14 @@ public final class IdpickerDeploymentService extends DeploymentService<Deploymen
 	/**
 	 * Configuration for the factory
 	 */
-	public static final class Config extends WorkerConfig {
+	public static final class Config implements ResourceConfig {
 		public Config() {
 		}
 
-		public Map<String, String> save(final DependencyResolver resolver) {
-			return new TreeMap<String, String>();
+		public void save(final ConfigWriter writer) {
 		}
 
-		public void load(final Map<String, String> values, final DependencyResolver resolver) {
+		public void load(final ConfigReader reader) {
 		}
 
 		@Override

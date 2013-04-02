@@ -4,10 +4,7 @@ import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
 import com.google.common.io.Files;
 import edu.mayo.mprc.MprcException;
-import edu.mayo.mprc.config.DaemonConfig;
-import edu.mayo.mprc.config.DependencyResolver;
-import edu.mayo.mprc.config.ResourceConfig;
-import edu.mayo.mprc.config.WorkerConfig;
+import edu.mayo.mprc.config.*;
 import edu.mayo.mprc.config.ui.ServiceUiFactory;
 import edu.mayo.mprc.config.ui.UiBuilder;
 import edu.mayo.mprc.daemon.WorkPacket;
@@ -27,8 +24,6 @@ import java.io.File;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
 
 /**
  * Calls <tt>msaccess.exe</tt> to determine whether peak picking should be enabled.
@@ -153,7 +148,7 @@ public final class IdpickerWorker extends WorkerBase {
 	/**
 	 * Configuration for the factory
 	 */
-	public static final class Config extends WorkerConfig {
+	public static final class Config implements ResourceConfig {
 
 		private String idpQonvertExecutable;
 
@@ -172,14 +167,12 @@ public final class IdpickerWorker extends WorkerBase {
 			this.idpQonvertExecutable = idpQonvertExecutable;
 		}
 
-		public Map<String, String> save(final DependencyResolver resolver) {
-			final Map<String, String> map = new TreeMap<String, String>();
-			map.put(IDPQONVERT_EXECUTABLE, getIdpQonvertExecutable());
-			return map;
+		public void save(final ConfigWriter writer) {
+			writer.put(IDPQONVERT_EXECUTABLE, getIdpQonvertExecutable());
 		}
 
-		public void load(final Map<String, String> values, final DependencyResolver resolver) {
-			setIdpQonvertExecutable(values.get(IDPQONVERT_EXECUTABLE));
+		public void load(final ConfigReader reader) {
+			setIdpQonvertExecutable(reader.get(IDPQONVERT_EXECUTABLE));
 		}
 
 		@Override

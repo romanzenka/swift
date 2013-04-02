@@ -1,10 +1,7 @@
 package edu.mayo.mprc.mascot;
 
 import edu.mayo.mprc.MprcException;
-import edu.mayo.mprc.config.DaemonConfig;
-import edu.mayo.mprc.config.DependencyResolver;
-import edu.mayo.mprc.config.ResourceConfig;
-import edu.mayo.mprc.config.WorkerConfig;
+import edu.mayo.mprc.config.*;
 import edu.mayo.mprc.config.ui.ServiceUiFactory;
 import edu.mayo.mprc.config.ui.UiBuilder;
 import edu.mayo.mprc.daemon.WorkPacket;
@@ -34,7 +31,10 @@ import java.nio.channels.FileChannel;
 import java.nio.channels.WritableByteChannel;
 import java.nio.charset.Charset;
 import java.text.MessageFormat;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Random;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -437,7 +437,7 @@ public final class MascotWorker extends WorkerBase {
 	/**
 	 * Configuration for the factory
 	 */
-	public static final class Config extends WorkerConfig {
+	public static final class Config implements ResourceConfig {
 		private String mascotUrl;
 		private String mascotPublicUrl;
 
@@ -465,17 +465,15 @@ public final class MascotWorker extends WorkerBase {
 		}
 
 		@Override
-		public Map<String, String> save(final DependencyResolver resolver) {
-			final Map<String, String> map = new TreeMap<String, String>();
-			map.put(MASCOT_URL, mascotUrl);
-			map.put(MASCOT_PUBLIC_URL, mascotPublicUrl);
-			return map;
+		public void save(final ConfigWriter writer) {
+			writer.put(MASCOT_URL, mascotUrl);
+			writer.put(MASCOT_PUBLIC_URL, mascotPublicUrl);
 		}
 
 		@Override
-		public void load(final Map<String, String> values, final DependencyResolver resolver) {
-			mascotUrl = values.get(MASCOT_URL);
-			mascotPublicUrl = values.get(MASCOT_PUBLIC_URL);
+		public void load(final ConfigReader reader) {
+			setMascotUrl(reader.get(MASCOT_URL));
+			setMascotPublicUrl(reader.get(MASCOT_PUBLIC_URL));
 		}
 
 		@Override

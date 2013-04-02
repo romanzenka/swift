@@ -1,10 +1,7 @@
 package edu.mayo.mprc.scaffold;
 
 import edu.mayo.mprc.MprcException;
-import edu.mayo.mprc.config.DaemonConfig;
-import edu.mayo.mprc.config.DependencyResolver;
-import edu.mayo.mprc.config.ResourceConfig;
-import edu.mayo.mprc.config.WorkerConfig;
+import edu.mayo.mprc.config.*;
 import edu.mayo.mprc.config.ui.ServiceUiFactory;
 import edu.mayo.mprc.config.ui.UiBuilder;
 import edu.mayo.mprc.daemon.WorkPacket;
@@ -21,7 +18,9 @@ import org.apache.log4j.Logger;
 import org.springframework.stereotype.Component;
 
 import java.io.File;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * Runs scaffold search directly (without grid engine).
@@ -166,7 +165,7 @@ public final class ScaffoldWorker extends WorkerBase {
 	/**
 	 * Configuration for the factory
 	 */
-	public static final class Config extends WorkerConfig {
+	public static final class Config implements ResourceConfig {
 
 		private String scaffoldDir;
 		private String scaffoldJavaVmPath;
@@ -205,18 +204,18 @@ public final class ScaffoldWorker extends WorkerBase {
 			this.scaffoldJavaVmPath = scaffoldJavaVmPath;
 		}
 
-		public Map<String, String> save(final DependencyResolver resolver) {
-			final Map<String, String> map = new TreeMap<String, String>();
-			map.put(SCAFFOLD_DIR, scaffoldDir);
-			map.put(SCAFFOLD_JAVA_VM_PATH, scaffoldJavaVmPath);
-			map.put(MEMORY_LIMIT, memoryLimit);
-			return map;
+		@Override
+		public void save(final ConfigWriter writer) {
+			writer.put(SCAFFOLD_DIR, scaffoldDir);
+			writer.put(SCAFFOLD_JAVA_VM_PATH, scaffoldJavaVmPath);
+			writer.put(MEMORY_LIMIT, memoryLimit);
 		}
 
-		public void load(final Map<String, String> values, final DependencyResolver resolver) {
-			scaffoldDir = values.get(SCAFFOLD_DIR);
-			scaffoldJavaVmPath = values.get(SCAFFOLD_JAVA_VM_PATH);
-			memoryLimit = values.get(MEMORY_LIMIT);
+		@Override
+		public void load(final ConfigReader reader) {
+			setScaffoldDir(reader.get(SCAFFOLD_DIR));
+			setScaffoldJavaVmPath(reader.get(SCAFFOLD_JAVA_VM_PATH));
+			setMemoryLimit(reader.get(MEMORY_LIMIT));
 		}
 
 		@Override

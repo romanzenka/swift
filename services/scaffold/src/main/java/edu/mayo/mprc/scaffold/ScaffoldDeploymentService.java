@@ -1,10 +1,7 @@
 package edu.mayo.mprc.scaffold;
 
 import edu.mayo.mprc.MprcException;
-import edu.mayo.mprc.config.DaemonConfig;
-import edu.mayo.mprc.config.DependencyResolver;
-import edu.mayo.mprc.config.ResourceConfig;
-import edu.mayo.mprc.config.WorkerConfig;
+import edu.mayo.mprc.config.*;
 import edu.mayo.mprc.config.ui.ServiceUiFactory;
 import edu.mayo.mprc.config.ui.UiBuilder;
 import edu.mayo.mprc.daemon.Worker;
@@ -212,7 +209,7 @@ public final class ScaffoldDeploymentService extends DeploymentService<Deploymen
 	/**
 	 * Configuration for the factory
 	 */
-	public static final class Config extends WorkerConfig {
+	public static final class Config implements ResourceConfig {
 		private String scaffoldJavaVmPath;
 		private String deployableDbFolder;
 		private String installDir;
@@ -250,18 +247,16 @@ public final class ScaffoldDeploymentService extends DeploymentService<Deploymen
 			this.installDir = installDir;
 		}
 
-		public Map<String, String> save(final DependencyResolver resolver) {
-			final Map<String, String> map = new TreeMap<String, String>();
-			map.put(SCAFFOLD_JAVA_VM_PATH, scaffoldJavaVmPath);
-			map.put(DEPLOYABLE_DB_FOLDER, deployableDbFolder);
-			map.put(INSTALL_DIR, installDir);
-			return map;
+		public void save(final ConfigWriter writer) {
+			writer.put(SCAFFOLD_JAVA_VM_PATH, scaffoldJavaVmPath);
+			writer.put(DEPLOYABLE_DB_FOLDER, deployableDbFolder);
+			writer.put(INSTALL_DIR, installDir);
 		}
 
-		public void load(final Map<String, String> values, final DependencyResolver resolver) {
-			scaffoldJavaVmPath = values.get(SCAFFOLD_JAVA_VM_PATH);
-			deployableDbFolder = values.get(DEPLOYABLE_DB_FOLDER);
-			installDir = values.get(INSTALL_DIR);
+		public void load(final ConfigReader reader) {
+			setScaffoldJavaVmPath(reader.get(SCAFFOLD_JAVA_VM_PATH));
+			setDeployableDbFolder(reader.get(DEPLOYABLE_DB_FOLDER));
+			setInstallDir(reader.get(INSTALL_DIR));
 		}
 
 		@Override

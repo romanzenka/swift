@@ -1,9 +1,6 @@
 package edu.mayo.mprc.qstat;
 
-import edu.mayo.mprc.config.DaemonConfig;
-import edu.mayo.mprc.config.DependencyResolver;
-import edu.mayo.mprc.config.ResourceConfig;
-import edu.mayo.mprc.config.WorkerConfig;
+import edu.mayo.mprc.config.*;
 import edu.mayo.mprc.config.ui.ServiceUiFactory;
 import edu.mayo.mprc.config.ui.UiBuilder;
 import edu.mayo.mprc.daemon.WorkPacket;
@@ -15,16 +12,13 @@ import edu.mayo.mprc.utilities.ProcessCaller;
 import edu.mayo.mprc.utilities.progress.UserProgressReporter;
 import org.springframework.stereotype.Component;
 
-import java.util.HashMap;
-import java.util.Map;
-
 
 /**
  * Simple worker that accepts a string with grid engine id and sends back a String with results of the qstat call.
  */
 public final class QstatDaemonWorker extends WorkerBase {
 	public static final String TYPE = "qstat";
-	public static final String NAME = "Qstat";
+	public static final String NAME = "SGE Qstat";
 	public static final String DESC = "A trivial daemon running <tt>qstat</tt> command to retrieve status of a job running in Sun Grid Engine. This is used only in the web interface and is provided for convenience only. The module has to be enabled on a computer that is Sun Grid Engine submit host.";
 
 	@Override
@@ -64,17 +58,16 @@ public final class QstatDaemonWorker extends WorkerBase {
 	/**
 	 * Configuration for the factory
 	 */
-	public static final class Config extends WorkerConfig {
+	public static final class Config implements ResourceConfig {
 		public Config() {
 		}
 
 		@Override
-		public Map<String, String> save(final DependencyResolver resolver) {
-			return new HashMap<String, String>(1);
+		public void save(final ConfigWriter writer) {
 		}
 
 		@Override
-		public void load(final Map<String, String> values, final DependencyResolver resolver) {
+		public void load(final ConfigReader reader) {
 		}
 
 		@Override

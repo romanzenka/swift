@@ -21,8 +21,6 @@ import javax.annotation.Resource;
 import java.io.*;
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
 import java.util.concurrent.atomic.AtomicLong;
 
 /**
@@ -435,7 +433,7 @@ public final class GridRunner extends AbstractRunner {
 		public Config() {
 		}
 
-		public Config(final WorkerConfig workerConfig) {
+		public Config(final ResourceConfig workerConfig) {
 			super(workerConfig);
 		}
 
@@ -495,49 +493,31 @@ public final class GridRunner extends AbstractRunner {
 			this.sharedLogDirectory = sharedLogDirectory;
 		}
 
-		public Map<String, String> save(final DependencyResolver resolver) {
-			final TreeMap<String, String> map = new TreeMap<String, String>();
-			map.put(QUEUE_NAME, queueName);
-			map.put(MEMORY_REQUIREMENT, memoryRequirement);
-			map.put(NATIVE_SPECIFICATION, nativeSpecification);
-			map.put(SHARED_WORKING_DIRECTORY, sharedWorkingDirectory);
-			map.put(SHARED_TEMP_DIRECTORY, sharedTempDirectory);
-			map.put(SHARED_LOG_DIRECTORY, sharedLogDirectory);
-			map.put(WRAPPER_SCRIPT, wrapperScript);
-			return map;
+		public void save(final ConfigWriter writer) {
+			writer.put(WORKER, getWorkerConfiguration());
+			writer.put(QUEUE_NAME, getQueueName(), "Name of the SGE queue");
+			writer.put(MEMORY_REQUIREMENT, getMemoryRequirement(), "Memory requirements for the SGE queue");
+			writer.put(NATIVE_SPECIFICATION, getNativeSpecification(), "Native specification (additional parameters) for the SGE queue");
+			writer.put(SHARED_WORKING_DIRECTORY, getSharedWorkingDirectory(), "The shared working directory for file exchanges");
+			writer.put(SHARED_TEMP_DIRECTORY, getSharedTempDirectory(), "The shared temporary directory for storing temporary files");
+			writer.put(SHARED_LOG_DIRECTORY, getSharedLogDirectory(), "The shared directory to store log files");
+			writer.put(WRAPPER_SCRIPT, getWrapperScript(), "A wrapper script that will ensure smooth execution of the Swift component (create/tear down environment). Takes the command to execute as its parameter.");
+
 		}
 
-		public void load(final Map<String, String> values, final DependencyResolver resolver) {
-			queueName = values.get(QUEUE_NAME);
-			memoryRequirement = values.get(MEMORY_REQUIREMENT);
-			nativeSpecification = values.get(NATIVE_SPECIFICATION);
-			sharedWorkingDirectory = values.get(SHARED_WORKING_DIRECTORY);
-			sharedTempDirectory = values.get(SHARED_TEMP_DIRECTORY);
-			sharedLogDirectory = values.get(SHARED_LOG_DIRECTORY);
-			wrapperScript = values.get(WRAPPER_SCRIPT);
+		public void load(final ConfigReader reader) {
+			setQueueName(reader.get(QUEUE_NAME));
+			setMemoryRequirement(reader.get(MEMORY_REQUIREMENT));
+			setNativeSpecification(reader.get(NATIVE_SPECIFICATION));
+			setSharedWorkingDirectory(reader.get(SHARED_WORKING_DIRECTORY));
+			setSharedTempDirectory(reader.get(SHARED_TEMP_DIRECTORY));
+			setSharedLogDirectory(reader.get(SHARED_LOG_DIRECTORY));
+			setWrapperScript(reader.get(WRAPPER_SCRIPT));
 		}
 
 		@Override
 		public int getPriority() {
 			return 0;
-		}
-
-		@Override
-		public void write(final ConfigWriter writer) {
-			getWorkerConfiguration().write(writer);
-			writer.register(this);
-		}
-
-		@Override
-		public void writeInline(ConfigWriter writer) {
-			writer.addConfig("runner.type", writer.getResourceId(getClass()), "Type of the runner (localRunner/sgeRunner)");
-			writer.addConfig("runner.queueName", getQueueName(), "Name of the SGE queue");
-			writer.addConfig("runner.memoryRequirement", getMemoryRequirement(), "Memory requirements for the SGE queue");
-			writer.addConfig("runner.nativeSpecification", getNativeSpecification(), "Native specification (additional parameters) for the SGE queue");
-			writer.addConfig("runner.sharedWorkingDirectory", getSharedWorkingDirectory(), "The shared working directory for file exchanges");
-			writer.addConfig("runner.sharedTempDirectory", getSharedTempDirectory(), "The shared temporary directory for storing temporary files");
-			writer.addConfig("runner.sharedLogDirectory", getSharedLogDirectory(), "The shared directory to store log files");
-			writer.addConfig("runner.wrapperScript", getWrapperScript(), "A wrapper script that will ensure smooth execution of the Swift component (create/tear down environment). Takes the command to execute as its parameter.");
 		}
 	}
 

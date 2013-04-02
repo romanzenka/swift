@@ -1,10 +1,7 @@
 package edu.mayo.mprc.scaffold.report;
 
 import edu.mayo.mprc.MprcException;
-import edu.mayo.mprc.config.DaemonConfig;
-import edu.mayo.mprc.config.DependencyResolver;
-import edu.mayo.mprc.config.ResourceConfig;
-import edu.mayo.mprc.config.WorkerConfig;
+import edu.mayo.mprc.config.*;
 import edu.mayo.mprc.config.ui.ServiceUiFactory;
 import edu.mayo.mprc.config.ui.UiBuilder;
 import edu.mayo.mprc.daemon.WorkPacket;
@@ -19,8 +16,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
 
 public final class ScaffoldReportWorker extends WorkerBase {
 	private static final Logger LOGGER = Logger.getLogger(ScaffoldReportWorker.class);
@@ -81,19 +76,17 @@ public final class ScaffoldReportWorker extends WorkerBase {
 	/**
 	 * Configuration for the factory
 	 */
-	public static final class Config extends WorkerConfig {
+	public static final class Config implements ResourceConfig {
 
 		public Config() {
 		}
 
 		@Override
-		public Map<String, String> save(final DependencyResolver resolver) {
-			return new TreeMap<String, String>();
+		public void save(final ConfigWriter writer) {
 		}
 
 		@Override
-		public void load(final Map<String, String> values, final DependencyResolver resolver) {
-			//Do nothing
+		public void load(final ConfigReader reader) {
 		}
 
 		@Override

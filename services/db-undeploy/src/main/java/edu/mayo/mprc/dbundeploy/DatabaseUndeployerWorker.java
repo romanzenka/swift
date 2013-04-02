@@ -14,8 +14,6 @@ import org.joda.time.DateTime;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
-import java.util.Map;
-import java.util.TreeMap;
 
 /**
  * Worker that processes database undeployment request. Given a request, it processes
@@ -25,7 +23,7 @@ public final class DatabaseUndeployerWorker extends WorkerBase {
 	private static final Logger LOGGER = Logger.getLogger(DatabaseUndeployerWorker.class);
 
 	public static final String TYPE = "databaseUndeployer";
-	public static final String NAME = "Database Undeployer";
+	public static final String NAME = "FASTA Database Undeployer";
 	public static final String DESC = "Removes previously deployed search databases from defined database deployers.";
 	private FileTokenFactory fileTokenFactory;
 
@@ -42,7 +40,7 @@ public final class DatabaseUndeployerWorker extends WorkerBase {
 	private static final String SEQUEST_DEPLOYER = "sequestDeployer";
 	private static final String OMSSA_DEPLOYER = "omssaDeployer";
 	private static final String SCAFFOLD_DEPLOYER = "scaffoldDeployer";
-	private static final String SCAFFOLD3_DEPLOYER = "scaffoldDeployer";
+	private static final String SCAFFOLD3_DEPLOYER = "scaffold3Deployer";
 
 	public DatabaseUndeployerWorker(final FileTokenFactory fileTokenFactory, final CurationDao curationDao) {
 		this.fileTokenFactory = fileTokenFactory;
@@ -188,7 +186,7 @@ public final class DatabaseUndeployerWorker extends WorkerBase {
 	/**
 	 * Configuration for the factory
 	 */
-	public static final class Config extends WorkerConfig {
+	public static final class Config implements ResourceConfig {
 		private ServiceConfig scaffoldDeployer;
 		private ServiceConfig scaffold3Deployer;
 		private ServiceConfig omssaDeployer;
@@ -257,24 +255,23 @@ public final class DatabaseUndeployerWorker extends WorkerBase {
 		}
 
 		@Override
-		public Map<String, String> save(final DependencyResolver resolver) {
-			final Map<String, String> map = new TreeMap<String, String>();
-			map.put(MASCOT_DEPLOYER, resolver.getIdFromConfig(mascotDeployer));
-			map.put(TANDEM_DEPLOYER, resolver.getIdFromConfig(tandemDeployer));
-			map.put(SEQUEST_DEPLOYER, resolver.getIdFromConfig(sequestDeployer));
-			map.put(OMSSA_DEPLOYER, resolver.getIdFromConfig(omssaDeployer));
-			map.put(SCAFFOLD_DEPLOYER, resolver.getIdFromConfig(scaffoldDeployer));
-			map.put(SCAFFOLD3_DEPLOYER, resolver.getIdFromConfig(scaffold3Deployer));
-			return map;
+		public void save(final ConfigWriter writer) {
+			writer.put(MASCOT_DEPLOYER, mascotDeployer);
+			writer.put(TANDEM_DEPLOYER, tandemDeployer);
+			writer.put(SEQUEST_DEPLOYER, sequestDeployer);
+			writer.put(OMSSA_DEPLOYER, omssaDeployer);
+			writer.put(SCAFFOLD_DEPLOYER, scaffoldDeployer);
+			writer.put(SCAFFOLD3_DEPLOYER, scaffold3Deployer);
 		}
 
-		public void load(final Map<String, String> values, final DependencyResolver resolver) {
-			mascotDeployer = (ServiceConfig) resolver.getConfigFromId(values.get(MASCOT_DEPLOYER));
-			tandemDeployer = (ServiceConfig) resolver.getConfigFromId(values.get(TANDEM_DEPLOYER));
-			sequestDeployer = (ServiceConfig) resolver.getConfigFromId(values.get(SEQUEST_DEPLOYER));
-			omssaDeployer = (ServiceConfig) resolver.getConfigFromId(values.get(OMSSA_DEPLOYER));
-			scaffoldDeployer = (ServiceConfig) resolver.getConfigFromId(values.get(SCAFFOLD_DEPLOYER));
-			scaffold3Deployer = (ServiceConfig) resolver.getConfigFromId(values.get(SCAFFOLD3_DEPLOYER));
+		@Override
+		public void load(final ConfigReader reader) {
+			mascotDeployer = (ServiceConfig) reader.getObject(MASCOT_DEPLOYER);
+			tandemDeployer = (ServiceConfig) reader.getObject(TANDEM_DEPLOYER);
+			sequestDeployer = (ServiceConfig) reader.getObject(SEQUEST_DEPLOYER);
+			omssaDeployer = (ServiceConfig) reader.getObject(OMSSA_DEPLOYER);
+			scaffoldDeployer = (ServiceConfig) reader.getObject(SCAFFOLD_DEPLOYER);
+			scaffold3Deployer = (ServiceConfig) reader.getObject(SCAFFOLD3_DEPLOYER);
 		}
 
 		@Override

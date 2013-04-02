@@ -17,8 +17,6 @@ import javax.jms.ConnectionFactory;
 import javax.jms.JMSException;
 import java.io.Closeable;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * This module runs an embedded message broker at given URL.
@@ -166,7 +164,7 @@ public final class MessageBroker implements Closeable {
 
 		public static Config getEmbeddedBroker() {
 			final Config config = new Config();
-			config.brokerUrl = "vm://broker";
+			config.brokerUrl = "jms.vm://broker";
 			config.embeddedBrokerUrl = "vm://broker";
 			config.embedded = "true";
 			config.useJmx = "false";
@@ -175,36 +173,24 @@ public final class MessageBroker implements Closeable {
 		}
 
 		@Override
-		public Map<String, String> save(final DependencyResolver resolver) {
-			final Map<String, String> map = new HashMap<String, String>(1);
-			map.put(BROKER_URL, brokerUrl);
-			map.put(EMBEDDED_BROKER_URL, embeddedBrokerUrl);
-			map.put(EMBEDDED, embedded);
-			map.put(USE_JMX, useJmx);
-			return map;
+		public void save(final ConfigWriter writer) {
+			writer.put(BROKER_URL, getBrokerUrl(), "URL of the broker");
+			writer.put(EMBEDDED, getEmbedded(), "Should we run the embedded broker?");
+			writer.put(EMBEDDED_BROKER_URL, getBrokerUrl(), "ActiveMQ configuration URL defining how to start the embedded broker up (if embedded)");
+			writer.put(USE_JMX, getUseJmx(), "Enable JMX on the broker");
 		}
 
 		@Override
-		public void load(final Map<String, String> values, final DependencyResolver resolver) {
-			brokerUrl = values.get(BROKER_URL);
-			embeddedBrokerUrl = values.get(EMBEDDED_BROKER_URL);
-			embedded = values.get(EMBEDDED);
-			useJmx = values.get(USE_JMX);
+		public void load(final ConfigReader reader) {
+			brokerUrl = reader.get(BROKER_URL);
+			embeddedBrokerUrl = reader.get(EMBEDDED_BROKER_URL);
+			embedded = reader.get(EMBEDDED);
+			useJmx = reader.get(USE_JMX);
 		}
 
 		@Override
 		public int getPriority() {
 			return 10;
-		}
-
-		@Override
-		public void write(ConfigWriter writer) {
-			writer.openSection(this);
-			writer.addConfig("brokerUrl", getBrokerUrl(), "URL of the broker");
-			writer.addConfig("embedded", getEmbedded(), "Should we run the embedded broker?");
-			writer.addConfig("embeddedBrokerUrl", getBrokerUrl(), "ActiveMQ configuration URL defining how to start the embedded broker up (if embedded)");
-			writer.addConfig("useJmx", getUseJmx(), "Enable JMX on the broker");
-			writer.closeSection();
 		}
 
 		public String getBrokerUrl() {

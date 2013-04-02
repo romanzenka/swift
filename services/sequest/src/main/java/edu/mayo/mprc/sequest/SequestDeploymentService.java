@@ -3,10 +3,7 @@ package edu.mayo.mprc.sequest;
 import com.google.common.base.Charsets;
 import com.google.common.io.Files;
 import edu.mayo.mprc.MprcException;
-import edu.mayo.mprc.config.DaemonConfig;
-import edu.mayo.mprc.config.DependencyResolver;
-import edu.mayo.mprc.config.ResourceConfig;
-import edu.mayo.mprc.config.WorkerConfig;
+import edu.mayo.mprc.config.*;
 import edu.mayo.mprc.config.ui.ServiceUiFactory;
 import edu.mayo.mprc.config.ui.UiBuilder;
 import edu.mayo.mprc.daemon.Worker;
@@ -510,7 +507,7 @@ public final class SequestDeploymentService extends DeploymentService<SequestDep
 	/**
 	 * Configuration for the factory
 	 */
-	public static final class Config extends WorkerConfig {
+	public static final class Config implements ResourceConfig {
 		private String deployableDbFolder;
 		private String engineRootFolder;
 		private String wineWrapperScript;
@@ -548,18 +545,16 @@ public final class SequestDeploymentService extends DeploymentService<SequestDep
 			this.wineWrapperScript = wineWrapperScript;
 		}
 
-		public Map<String, String> save(final DependencyResolver resolver) {
-			final Map<String, String> map = new TreeMap<String, String>();
-			map.put(DEPLOYABLE_DB_FOLDER, deployableDbFolder);
-			map.put(ENGINE_ROOT_FOLDER, engineRootFolder);
-			map.put(WINE_WRAPPER_SCRIPT, wineWrapperScript);
-			return map;
+		public void save(final ConfigWriter writer) {
+			writer.put(DEPLOYABLE_DB_FOLDER, deployableDbFolder, "Where to put Sequest's .fasta file indices");
+			writer.put(ENGINE_ROOT_FOLDER, engineRootFolder, "Path to the makedb package");
+			writer.put(WINE_WRAPPER_SCRIPT, wineWrapperScript, "Script to wrap the execution with on Linux");
 		}
 
-		public void load(final Map<String, String> values, final DependencyResolver resolver) {
-			deployableDbFolder = values.get(DEPLOYABLE_DB_FOLDER);
-			engineRootFolder = values.get(ENGINE_ROOT_FOLDER);
-			wineWrapperScript = values.get(WINE_WRAPPER_SCRIPT);
+		public void load(final ConfigReader reader) {
+			setDeployableDbFolder(reader.get(DEPLOYABLE_DB_FOLDER));
+			setEngineRootFolder(reader.get(ENGINE_ROOT_FOLDER));
+			setWineWrapperScript(reader.get(WINE_WRAPPER_SCRIPT));
 		}
 
 		@Override

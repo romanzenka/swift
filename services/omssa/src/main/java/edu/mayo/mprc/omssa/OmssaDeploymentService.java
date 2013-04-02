@@ -1,10 +1,7 @@
 package edu.mayo.mprc.omssa;
 
 import edu.mayo.mprc.MprcException;
-import edu.mayo.mprc.config.DaemonConfig;
-import edu.mayo.mprc.config.DependencyResolver;
-import edu.mayo.mprc.config.ResourceConfig;
-import edu.mayo.mprc.config.WorkerConfig;
+import edu.mayo.mprc.config.*;
 import edu.mayo.mprc.config.ui.ExecutableSwitching;
 import edu.mayo.mprc.config.ui.ServiceUiFactory;
 import edu.mayo.mprc.config.ui.UiBuilder;
@@ -244,7 +241,7 @@ public final class OmssaDeploymentService extends DeploymentService<DeploymentRe
 	/**
 	 * Configuration for the factory
 	 */
-	public static final class Config extends WorkerConfig {
+	public static final class Config implements ResourceConfig {
 
 		private String formatDbExe;
 		private String deployableDbFolder;
@@ -273,16 +270,16 @@ public final class OmssaDeploymentService extends DeploymentService<DeploymentRe
 			this.formatDbExe = formatDbExe;
 		}
 
-		public Map<String, String> save(final DependencyResolver resolver) {
-			final Map<String, String> map = new TreeMap<String, String>();
-			map.put(FORMAT_DB_EXE, formatDbExe);
-			map.put(DEPLOYABLE_DB_FOLDER, deployableDbFolder);
-			return map;
+		@Override
+		public void save(final ConfigWriter writer) {
+			writer.put(FORMAT_DB_EXE, formatDbExe);
+			writer.put(DEPLOYABLE_DB_FOLDER, deployableDbFolder);
 		}
 
-		public void load(final Map<String, String> values, final DependencyResolver resolver) {
-			formatDbExe = values.get(FORMAT_DB_EXE);
-			deployableDbFolder = values.get(DEPLOYABLE_DB_FOLDER);
+		@Override
+		public void load(final ConfigReader reader) {
+			setFormatDbExe(reader.get(FORMAT_DB_EXE));
+			setDeployableDbFolder(reader.get(DEPLOYABLE_DB_FOLDER));
 		}
 
 		@Override

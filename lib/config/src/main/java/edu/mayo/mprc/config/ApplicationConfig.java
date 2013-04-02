@@ -1,16 +1,12 @@
 package edu.mayo.mprc.config;
 
-import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
-import com.thoughtworks.xstream.io.xml.DomDriver;
 import edu.mayo.mprc.MprcException;
 import edu.mayo.mprc.utilities.FileUtilities;
 
-import java.io.*;
+import java.io.File;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Application configuration file contains information about every single daemon in the entire distributed application.
@@ -26,6 +22,7 @@ import java.util.Map;
  */
 @XStreamAlias("application")
 public final class ApplicationConfig implements ResourceConfig {
+	public static final String DAEMONS = "daemons";
 	// List of daemons
 	private List<DaemonConfig> daemons = new ArrayList<DaemonConfig>(1);
 
@@ -53,75 +50,35 @@ public final class ApplicationConfig implements ResourceConfig {
 		return daemons;
 	}
 
-	private static XStream createXStream(final MultiFactory table) {
-		final XStream xStream = new XStream(new DomDriver());
-		xStream.setMode(XStream.ID_REFERENCES);
-
-		xStream.processAnnotations(new Class[]{
-				ApplicationConfig.class,
-		});
-
-		/** Add all the module aliases */
-		for (final Map.Entry<String, Class<? extends ResourceConfig>> entry : table.getConfigClasses().entrySet()) {
-			xStream.alias(entry.getKey(), entry.getValue());
-		}
-
-		return xStream;
-	}
-
-	public void save(final File configFile, final MultiFactory table) {
-		BufferedWriter bufferedWriter = null;
-		try {
-			final XStream xStream = createXStream(table);
-			bufferedWriter = new BufferedWriter(new FileWriter(configFile.getAbsoluteFile()));
-			bufferedWriter.write(xStream.toXML(this));
-		} catch (Exception t) {
-			throw new MprcException("Could not save swift configuration to " + configFile.getAbsolutePath(), t);
-		} finally {
-			FileUtilities.closeQuietly(bufferedWriter);
-		}
-	}
-
-	public static ApplicationConfig load(final File configFile, final MultiFactory table) {
-		BufferedReader bufferedReader = null;
-		try {
-			final XStream xStream = createXStream(table);
-			bufferedReader = new BufferedReader(new FileReader(configFile));
-			final ApplicationConfig applicationConfig = (ApplicationConfig) xStream.fromXML(bufferedReader);
-			// Restore link to the parent from all daemons
-			for (final DaemonConfig daemonConfig : applicationConfig.getDaemons()) {
-				daemonConfig.setApplicationConfig(applicationConfig);
-			}
-			return applicationConfig;
-		} catch (Exception t) {
-			throw new MprcException("Could not load swift configuration from " + configFile.getAbsolutePath(), t);
-		} finally {
-			FileUtilities.closeQuietly(bufferedReader);
-		}
-	}
-
 	/**
-	 * Save the whole application config into a folder that is easier to handle than a big XStream XML file.
+	 * Save the whole application config into a text file that is easy to edit by hand.
 	 *
-	 * @param configDirectory Directory to save to
-	 * @param table           Table of all the recognized elements
+	 * @param configFile File to save to
+	 * @param table      Table of all the recognized elements
 	 */
-	public void saveDir(final File configDirectory, final MultiFactory table) {
-		FileUtilities.ensureFolderExists(configDirectory);
-		final File config = new File(configDirectory, "swift.cfg");
-		ConfigWriter writer = null;
+	public void save(final File configFile, final MultiFactory table) {
+		AppConfigWriter writer = null;
 		try {
-			writer = new ConfigWriter(config, table);
-			write(writer);
+			writer = new AppConfigWriter(configFile, table);
+			writer.save(this);
 		} catch (Exception e) {
-			throw new MprcException("Cannot write config file into " + config.getAbsolutePath(), e);
+			throw new MprcException("Cannot write config file into " + configFile.getAbsolutePath(), e);
 		} finally {
 			FileUtilities.closeQuietly(writer);
 		}
 	}
 
-	public static ApplicationConfig loadDir(final File configDiretory, final MultiFactory table) {
-		return null;
+	public static ApplicationConfig load(final File configFile, final MultiFactory table) {
+		AppConfigReader reader = null;
+		try {
+			reader = new AppConfigReader(configFile, table);
+			return reader.load();
+		} catch (Exception e) {
+			throw new MprcException("Cannot read config file from " + configFile.getAbsolutePath(), e);
+		} finally {
+			FileUtilities.closeQuietly(reader);
+		}
+
 	}
 
 	public List<ResourceConfig> getModulesOfConfigType(final Class<? extends ResourceConfig> type) {
@@ -158,25 +115,18 @@ public final class ApplicationConfig implements ResourceConfig {
 	}
 
 	@Override
-	public Map<String, String> save(final DependencyResolver resolver) {
-		return new HashMap<String, String>(1);
+	public void save(final ConfigWriter writer) {
+		writer.put(DAEMONS, getDaemons());
 	}
 
 	@Override
-	public void load(final Map<String, String> values, final DependencyResolver resolver) {
-		// App has no properties
+	public void load(final ConfigReader reader) {
+		daemons = (List<DaemonConfig>) reader.getResourceList("daemons");
 	}
 
 	@Override
 	public int getPriority() {
 		return 0;
-	}
-
-	@Override
-	public void write(final ConfigWriter writer) {
-		for (final DaemonConfig daemonConfig : getDaemons()) {
-			daemonConfig.write(writer);
-		}
 	}
 
 	/**

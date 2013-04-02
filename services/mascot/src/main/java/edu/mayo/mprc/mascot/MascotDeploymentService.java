@@ -3,10 +3,7 @@ package edu.mayo.mprc.mascot;
 import com.google.common.base.Charsets;
 import com.google.common.io.Files;
 import edu.mayo.mprc.MprcException;
-import edu.mayo.mprc.config.DaemonConfig;
-import edu.mayo.mprc.config.DependencyResolver;
-import edu.mayo.mprc.config.ResourceConfig;
-import edu.mayo.mprc.config.WorkerConfig;
+import edu.mayo.mprc.config.*;
 import edu.mayo.mprc.config.ui.ServiceUiFactory;
 import edu.mayo.mprc.config.ui.UiBuilder;
 import edu.mayo.mprc.daemon.Worker;
@@ -773,7 +770,7 @@ public final class MascotDeploymentService extends DeploymentService<DeploymentR
 	/**
 	 * Configuration for the factory
 	 */
-	public static final class Config extends WorkerConfig {
+	public static final class Config implements ResourceConfig {
 		private String engineRootFolder;
 		private String mascotDbMaintenanceUri;
 		private String deployableDbFolder;
@@ -811,18 +808,18 @@ public final class MascotDeploymentService extends DeploymentService<DeploymentR
 			this.mascotDbMaintenanceUri = mascotDbMaintenanceUri;
 		}
 
-		public Map<String, String> save(final DependencyResolver resolver) {
-			final Map<String, String> map = new TreeMap<String, String>();
-			map.put(ENGINE_ROOT_FOLDER, engineRootFolder);
-			map.put(DEPLOYABLE_DB_FOLDER, deployableDbFolder);
-			map.put(MASCOT_DB_MAINTENANCE_URI, mascotDbMaintenanceUri);
-			return map;
+		@Override
+		public void save(final ConfigWriter writer) {
+			writer.put(ENGINE_ROOT_FOLDER, engineRootFolder);
+			writer.put(DEPLOYABLE_DB_FOLDER, deployableDbFolder);
+			writer.put(MASCOT_DB_MAINTENANCE_URI, mascotDbMaintenanceUri);
 		}
 
-		public void load(final Map<String, String> values, final DependencyResolver resolver) {
-			engineRootFolder = values.get(ENGINE_ROOT_FOLDER);
-			deployableDbFolder = values.get(DEPLOYABLE_DB_FOLDER);
-			mascotDbMaintenanceUri = values.get(MASCOT_DB_MAINTENANCE_URI);
+		@Override
+		public void load(final ConfigReader reader) {
+			setEngineRootFolder(reader.get(ENGINE_ROOT_FOLDER));
+			setDeployableDbFolder(reader.get(DEPLOYABLE_DB_FOLDER));
+			setMascotDbMaintenanceUri(reader.get(MASCOT_DB_MAINTENANCE_URI));
 		}
 
 		@Override

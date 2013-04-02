@@ -19,9 +19,18 @@ import java.net.URISyntaxException;
 public final class DaemonConnectionFactory extends FactoryBase<ServiceConfig, DaemonConnection> {
 	private FileTokenFactory fileTokenFactory;
 	private ServiceFactory serviceFactory;
+	private String brokerUrl;
 
 	public FileTokenFactory getFileTokenFactory() {
 		return fileTokenFactory;
+	}
+
+	public String getBrokerUrl() {
+		return brokerUrl;
+	}
+
+	public void setBrokerUrl(String brokerUrl) {
+		this.brokerUrl = brokerUrl;
 	}
 
 	public void setFileTokenFactory(final FileTokenFactory fileTokenFactory) {
@@ -37,14 +46,20 @@ public final class DaemonConnectionFactory extends FactoryBase<ServiceConfig, Da
 	}
 
 	public DaemonConnection create(final ServiceConfig config, final DependencyResolver dependencies) {
+		final URI serviceUri = getServiceUri(config.getName());
+		final ServiceFactory factory = getServiceFactory();
+		final Service service = factory.createService(serviceUri);
+		return new DirectDaemonConnection(service, fileTokenFactory);
+	}
+
+	private URI getServiceUri(final String name) {
+		if (brokerUrl == null) {
+			throw new MprcException("The broker URL has to be initialized before we can start creating connections to daemons");
+		}
 		try {
-			final String brokerUrl = config.getBrokerUrl();
-			final URI serviceUri = new URI(brokerUrl);
-			final ServiceFactory factory = getServiceFactory();
-			final Service service = factory.createService(serviceUri);
-			return new DirectDaemonConnection(service, fileTokenFactory);
+			return new URI(brokerUrl + (brokerUrl.contains("?") ? "&" : "?") + "simplequeue=" + name);
 		} catch (URISyntaxException e) {
-			throw new MprcException("Wrong service uri ", e);
+			throw new MprcException("Wrong service URI for broker [" + brokerUrl + "] and queue name [" + name + "]", e);
 		}
 	}
 }

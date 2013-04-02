@@ -2,10 +2,7 @@ package edu.mayo.mprc.scaffold3;
 
 import com.jamesmurty.utils.XMLBuilder;
 import edu.mayo.mprc.MprcException;
-import edu.mayo.mprc.config.DaemonConfig;
-import edu.mayo.mprc.config.DependencyResolver;
-import edu.mayo.mprc.config.ResourceConfig;
-import edu.mayo.mprc.config.WorkerConfig;
+import edu.mayo.mprc.config.*;
 import edu.mayo.mprc.config.ui.ServiceUiFactory;
 import edu.mayo.mprc.config.ui.UiBuilder;
 import edu.mayo.mprc.daemon.WorkPacket;
@@ -26,9 +23,7 @@ import org.springframework.stereotype.Component;
 import javax.xml.transform.OutputKeys;
 import java.io.File;
 import java.util.Arrays;
-import java.util.Map;
 import java.util.Properties;
-import java.util.TreeMap;
 
 public final class Scaffold3Worker extends WorkerBase {
 	private static final Logger LOGGER = Logger.getLogger(Scaffold3Worker.class);
@@ -264,7 +259,7 @@ public final class Scaffold3Worker extends WorkerBase {
 	/**
 	 * Configuration for the factory
 	 */
-	public static final class Config extends WorkerConfig {
+	public static final class Config implements ResourceConfig {
 
 		private String scaffoldBatchScript;
 		private boolean reportDecoyHits;
@@ -292,14 +287,14 @@ public final class Scaffold3Worker extends WorkerBase {
 			this.reportDecoyHits = reportDecoyHits;
 		}
 
-		public Map<String, String> save(final DependencyResolver resolver) {
-			final Map<String, String> map = new TreeMap<String, String>();
-			map.put(SCAFFOLD_BATCH_SCRIPT, getScaffoldBatchScript());
-			return map;
+		@Override
+		public void save(final ConfigWriter writer) {
+			writer.put(SCAFFOLD_BATCH_SCRIPT, getScaffoldBatchScript());
 		}
 
-		public void load(final Map<String, String> values, final DependencyResolver resolver) {
-			setScaffoldBatchScript(values.get(SCAFFOLD_BATCH_SCRIPT));
+		@Override
+		public void load(final ConfigReader reader) {
+			setScaffoldBatchScript(reader.get(SCAFFOLD_BATCH_SCRIPT));
 		}
 
 		@Override

@@ -9,8 +9,6 @@ import edu.mayo.mprc.utilities.progress.ProgressReporter;
 import org.apache.log4j.Logger;
 
 import java.io.File;
-import java.util.Map;
-import java.util.TreeMap;
 import java.util.concurrent.ExecutorService;
 
 /**
@@ -147,7 +145,7 @@ public final class SimpleRunner extends AbstractRunner {
 		public Config() {
 		}
 
-		public Config(final WorkerConfig workerFactory) {
+		public Config(final ResourceConfig workerFactory) {
 			super(workerFactory);
 		}
 
@@ -168,38 +166,22 @@ public final class SimpleRunner extends AbstractRunner {
 		}
 
 		@Override
-		public Map<String, String> save(final DependencyResolver resolver) {
-			final Map<String, String> map = new TreeMap<String, String>();
-			map.put("numThreads", String.valueOf(numThreads));
-			map.put("logOutputFolder", logOutputFolder);
-			return map;
+		public void save(final ConfigWriter writer) {
+			writer.put("numThreads", numThreads, "Number of threads");
+			writer.put("logOutputFolder", logOutputFolder, "Where to write logs");
+			writer.put(WORKER, getWorkerConfiguration());
 		}
 
 		@Override
-		public void load(final Map<String, String> values, final DependencyResolver resolver) {
-			final String numThreadsString = values.get("numThreads");
-			numThreads = Integer.parseInt(numThreadsString);
-
-			logOutputFolder = values.get("logOutputFolder");
+		public void load(final ConfigReader reader) {
+			numThreads = reader.getInteger("numThreads");
+			logOutputFolder = reader.get("logOutputFolder");
+			setWorkerConfiguration(reader.getObject("worker"));
 		}
 
 		@Override
 		public int getPriority() {
 			return 0;
-		}
-
-		@Override
-		public void writeInline(ConfigWriter writer) {
-			writer.addConfig("runner", writer.getResourceId(getClass()), "Type of the runner (localRunner/sgeRunner)");
-			writer.addConfig("runner.numThreads", Integer.toString(getNumThreads()), "Number of threads");
-			writer.addConfig("runner.logOutputFolder", getLogOutputFolder(), "Where to write logs");
-			getWorkerConfiguration().writeInline(writer);
-		}
-
-		@Override
-		public void write(ConfigWriter writer) {
-			getWorkerConfiguration().write(writer);
-			writer.register(this);
 		}
 	}
 

@@ -1,18 +1,22 @@
 package edu.mayo.mprc.config;
 
+import com.google.common.base.Splitter;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 import com.thoughtworks.xstream.annotations.XStreamOmitField;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Locale;
 
 /**
  * A daemon is simply a running java VM which exposes one or more services.
  */
 @XStreamAlias("daemon")
-public final class DaemonConfig implements ResourceConfig {
+public final class DaemonConfig implements ResourceConfig, NamedResource {
 	public static final String WINE_CMD = "wine";
 	public static final String WINECONSOLE_CMD = "wineconsole";
 	public static final String XVFB_CMD = "bin/util/unixXvfbWrapper.sh";
@@ -25,7 +29,8 @@ public final class DaemonConfig implements ResourceConfig {
 	public static final String TEMP_FOLDER_PATH = "tempFolderPath";
 	public static final String DUMP_ERRORS = "dumpErrors";
 	public static final String DUMP_FOLDER_PATH = "dumpFolderPath";
-	private static final String PING_QUEUE_URL = "pingQueueUrl";
+	public static final String SERVICES = "services";
+	public static final String RESOURCES = "resources";
 
 	@XStreamAlias(NAME)
 	@XStreamAsAttribute
@@ -58,9 +63,6 @@ public final class DaemonConfig implements ResourceConfig {
 	 */
 	@XStreamAlias(DUMP_FOLDER_PATH)
 	private String dumpFolderPath;
-
-	@XStreamAlias(PING_QUEUE_URL)
-	private String pingQueueUrl;
 
 	// Services this daemon provides
 	@XStreamAlias("services")
@@ -249,28 +251,58 @@ public final class DaemonConfig implements ResourceConfig {
 		return osName.contains(osString);
 	}
 
-	public Map<String, String> save(final DependencyResolver resolver) {
-		final Map<String, String> map = new HashMap<String, String>();
-		map.put(NAME, name);
-		map.put(HOST_NAME, hostName);
-		map.put(OS_NAME, osName);
-		map.put(OS_ARCH, osArch);
-		map.put(SHARED_FILE_SPACE_PATH, sharedFileSpacePath);
-		map.put(TEMP_FOLDER_PATH, tempFolderPath);
-		map.put(DUMP_ERRORS, Boolean.toString(dumpErrors));
-		map.put(DUMP_FOLDER_PATH, dumpFolderPath);
-		return map;
+	public void save(final ConfigWriter writer) {
+		writer.put(NAME, getName(), "User-friendly name of this daemon");
+		writer.put(HOST_NAME, getHostName(), "Host the daemon runs on");
+		writer.put(OS_NAME, getOsName(), "Host system operating system name: e.g. Windows or Linux.");
+		writer.put(OS_ARCH, getOsArch(), "Host system architecture: x86, x86_64");
+		writer.put(SHARED_FILE_SPACE_PATH, getSharedFileSpacePath(), "Directory on a shared file system can be accessed from all the daemons");
+		writer.put(TEMP_FOLDER_PATH, getSharedFileSpacePath(), "Temporary folder that can be used for caching. Transferred files from other daemons with no shared file system with this daemon are cached to this folder.");
+		writer.put(DUMP_ERRORS, getSharedFileSpacePath(), "Not implemented yet");
+		writer.put(DUMP_FOLDER_PATH, getSharedFileSpacePath(), "Not implemented yet");
+
+		writer.put(SERVICES, getResourceList(writer, getServices()), "Comma separated list of provided services");
+		writer.put(RESOURCES, getResourceList(writer, getResources()), "Comma separated list of provided resources");
 	}
 
-	public void load(final Map<String, String> values, final DependencyResolver resolver) {
-		name = values.get(NAME);
-		hostName = values.get(HOST_NAME);
-		osName = values.get(OS_NAME);
-		osArch = values.get(OS_ARCH);
-		sharedFileSpacePath = values.get(SHARED_FILE_SPACE_PATH);
-		tempFolderPath = values.get(TEMP_FOLDER_PATH);
-		dumpErrors = Boolean.parseBoolean(values.get(DUMP_ERRORS));
-		dumpFolderPath = values.get(DUMP_FOLDER_PATH);
+	private static String getResourceList(final ConfigWriter writer, final Collection<? extends ResourceConfig> resources) {
+		final StringBuilder result = new StringBuilder(resources.size() * 10);
+		for (final ResourceConfig config : resources) {
+			if (result.length() > 0) {
+				result.append(", ");
+			}
+			result.append(writer.save(config));
+		}
+		return result.toString();
+	}
+
+	public void load(final ConfigReader reader) {
+		name = reader.get(NAME);
+		hostName = reader.get(HOST_NAME);
+		osName = reader.get(OS_NAME);
+		osArch = reader.get(OS_ARCH);
+		sharedFileSpacePath = reader.get(SHARED_FILE_SPACE_PATH);
+		tempFolderPath = reader.get(TEMP_FOLDER_PATH);
+		dumpErrors = reader.getBoolean(DUMP_ERRORS);
+		dumpFolderPath = reader.get(DUMP_FOLDER_PATH);
+
+		{
+			final String servicesString = reader.get(SERVICES);
+			final Iterable<String> servicesList = Splitter.on(",").trimResults().omitEmptyStrings().split(servicesString);
+			services.clear();
+			for (final String service : servicesList) {
+				services.add((ServiceConfig) reader.getObject(service));
+			}
+		}
+
+		{
+			final String resourcesString = reader.get(RESOURCES);
+			final Iterable<String> resourcesList = Splitter.on(",").trimResults().omitEmptyStrings().split(resourcesString);
+			resources.clear();
+			for (final String resource : resourcesList) {
+				resources.add(reader.getObject(resource));
+			}
+		}
 	}
 
 	public DaemonConfigInfo createDaemonConfigInfo() {
@@ -298,55 +330,5 @@ public final class DaemonConfig implements ResourceConfig {
 			}
 		}
 		return null;
-	}
-
-	public void setPingQueueUrl(final String pingQueueUrl) {
-		this.pingQueueUrl = pingQueueUrl;
-	}
-
-	public String getPingQueueUrl() {
-		return pingQueueUrl;
-	}
-
-	/**
-	 * Write the daemon configuration itself.
-	 *
-	 * @param writer Writer to write daemon config into.
-	 */
-	public void write(final ConfigWriter writer) {
-		writer.register(this, getName());
-
-		for (final ServiceConfig serviceConfig : getServices()) {
-			serviceConfig.write(writer);
-		}
-		for (final ResourceConfig resourceConfig : getResources()) {
-			resourceConfig.write(writer);
-		}
-
-		writer.openSection(this);
-		writer.addConfig(HOST_NAME, getHostName(), "Hosts the daemon runs on");
-		writer.addConfig(OS_NAME, getOsName(), "Host system operating system name: e.g. Windows or Linux.");
-		writer.addConfig(OS_ARCH, getOsArch(), "Host system architecture: x86, x86_64");
-		writer.addConfig(SHARED_FILE_SPACE_PATH, getSharedFileSpacePath(), "Directory on a shared file system can be accessed from all the daemons");
-		writer.addConfig(TEMP_FOLDER_PATH, getSharedFileSpacePath(), "Temporary folder that can be used for caching. Transferred files from other daemons with no shared file system with this daemon are cached to this folder.");
-		writer.addConfig(DUMP_ERRORS, getSharedFileSpacePath(), "Not implemented yet");
-		writer.addConfig(DUMP_FOLDER_PATH, getSharedFileSpacePath(), "Not implemented yet");
-		writer.addConfig(PING_QUEUE_URL, getPingQueueUrl(), "URL of the queue to ping this daemon through");
-
-		writer.addConfig("services", getResourceList(writer, getServices()), "Comma separated list of provided services");
-		writer.addConfig("resources", getResourceList(writer, getResources()), "Comma separated list of provided resources");
-
-		writer.closeSection();
-	}
-
-	private String getResourceList(final ConfigWriter writer, final Collection<? extends ResourceConfig> resources) {
-		final StringBuilder references = new StringBuilder(10 * resources.size());
-		for (final ResourceConfig resourceConfig : resources) {
-			if (references.length() > 0) {
-				references.append(", ");
-			}
-			references.append(writer.getDependencyResolver().getIdFromConfig(resourceConfig));
-		}
-		return references.toString();
 	}
 }

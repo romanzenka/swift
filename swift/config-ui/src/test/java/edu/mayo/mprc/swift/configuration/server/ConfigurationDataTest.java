@@ -2,6 +2,7 @@ package edu.mayo.mprc.swift.configuration.server;
 
 import edu.mayo.mprc.common.client.GWTServiceException;
 import edu.mayo.mprc.config.DaemonConfig;
+import edu.mayo.mprc.config.KeyExtractingWriter;
 import edu.mayo.mprc.config.ResourceConfig;
 import edu.mayo.mprc.config.ServiceConfig;
 import edu.mayo.mprc.database.DatabaseFactory;
@@ -15,7 +16,6 @@ import org.testng.annotations.Test;
 
 import java.io.File;
 import java.util.List;
-import java.util.Map;
 
 public final class ConfigurationDataTest {
 
@@ -129,8 +129,7 @@ public final class ConfigurationDataTest {
 	}
 
 	private static void checkTandemExecutable(final ResourceConfig tandem, final String expected) {
-		final Map<String, String> tandemConfig = tandem.save(null);
-		Assert.assertEquals(tandemConfig.get(XTandemWorker.TANDEM_EXECUTABLE), expected);
+		Assert.assertEquals(KeyExtractingWriter.get(tandem, XTandemWorker.TANDEM_EXECUTABLE), expected);
 	}
 
 	private static DaemonConfig getMainDaemon() {

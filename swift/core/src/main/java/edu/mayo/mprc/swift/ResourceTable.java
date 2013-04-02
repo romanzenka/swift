@@ -130,12 +130,21 @@ public final class ResourceTable extends FactoryBase<ResourceConfig, Object> imp
 	}
 
 	@Override
-	public Collection<String> getSupportedConfigClassNames() {
+	public List<String> getSupportedConfigClassNames() {
 		final List<String> names = new ArrayList<String>(getTable().size());
 		for (final ResourceInfo info : getTable().values()) {
 			names.add(info.getConfigClass().getName());
 		}
 		return names;
+	}
+
+	@Override
+	public List<Class> getSupportedConfigClasses() {
+		final List<Class> classes = new ArrayList<Class>(getTable().size());
+		for (final ResourceInfo info : getTable().values()) {
+			classes.add(info.getConfigClass());
+		}
+		return classes;
 	}
 
 	@Override
@@ -177,7 +186,12 @@ public final class ResourceTable extends FactoryBase<ResourceConfig, Object> imp
 	 */
 	@Override
 	public String getUserName(final ResourceConfig config) {
-		final ResourceInfo info = getByConfigClass(config.getClass());
+		return getUserName(config.getClass());
+	}
+
+	@Override
+	public String getUserName(final Class<? extends ResourceConfig> clazz) {
+		final ResourceInfo info = getByConfigClass(clazz);
 		return info == null ? null : info.getUserName();
 	}
 

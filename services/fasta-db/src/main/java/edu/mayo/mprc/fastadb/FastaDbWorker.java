@@ -1,10 +1,7 @@
 package edu.mayo.mprc.fastadb;
 
 import edu.mayo.mprc.MprcException;
-import edu.mayo.mprc.config.DaemonConfig;
-import edu.mayo.mprc.config.DependencyResolver;
-import edu.mayo.mprc.config.ResourceConfig;
-import edu.mayo.mprc.config.WorkerConfig;
+import edu.mayo.mprc.config.*;
 import edu.mayo.mprc.config.ui.ServiceUiFactory;
 import edu.mayo.mprc.config.ui.UiBuilder;
 import edu.mayo.mprc.daemon.WorkPacket;
@@ -18,8 +15,6 @@ import edu.mayo.mprc.utilities.progress.UserProgressReporter;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
-import java.util.Map;
-import java.util.TreeMap;
 
 /**
  * Wrapper around the {@link FastaDbDao#addFastaDatabase} API.
@@ -34,7 +29,7 @@ import java.util.TreeMap;
  */
 public class FastaDbWorker extends WorkerBase {
 	public static final String TYPE = "fasta-db";
-	public static final String NAME = "Database of FASTA entries";
+	public static final String NAME = "FASTA Database Loader";
 	public static final String DESC = "Loads the FASTA files into a database for easier management.";
 
 	private static final String DATABASE = "database";
@@ -99,7 +94,7 @@ public class FastaDbWorker extends WorkerBase {
 	/**
 	 * Configuration for the factory
 	 */
-	public static final class Config extends WorkerConfig {
+	public static final class Config implements ResourceConfig {
 		private DatabaseFactory.Config database;
 
 		public DatabaseFactory.Config getDatabase() {
@@ -107,15 +102,13 @@ public class FastaDbWorker extends WorkerBase {
 		}
 
 		@Override
-		public Map<String, String> save(final DependencyResolver resolver) {
-			final Map<String, String> map = new TreeMap<String, String>();
-			map.put(DATABASE, resolver.getIdFromConfig(database));
-			return map;
+		public void save(final ConfigWriter writer) {
+			writer.put(DATABASE, writer.save(database));
 		}
 
 		@Override
-		public void load(final Map<String, String> values, final DependencyResolver resolver) {
-			database = (DatabaseFactory.Config) resolver.getConfigFromId(values.get(DATABASE));
+		public void load(final ConfigReader reader) {
+			database = (DatabaseFactory.Config) reader.getObject(DATABASE);
 		}
 
 		@Override

@@ -1,10 +1,7 @@
 package edu.mayo.mprc.searchdb;
 
 import edu.mayo.mprc.MprcException;
-import edu.mayo.mprc.config.DaemonConfig;
-import edu.mayo.mprc.config.DependencyResolver;
-import edu.mayo.mprc.config.ResourceConfig;
-import edu.mayo.mprc.config.WorkerConfig;
+import edu.mayo.mprc.config.*;
 import edu.mayo.mprc.config.ui.ServiceUiFactory;
 import edu.mayo.mprc.config.ui.UiBuilder;
 import edu.mayo.mprc.daemon.WorkPacket;
@@ -27,8 +24,6 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
 import java.io.File;
-import java.util.Map;
-import java.util.TreeMap;
 
 /**
  * Loads search results from a given Swift experiment into the database.
@@ -45,7 +40,7 @@ public final class SearchDbWorker extends WorkerBase {
 	private Unimod scaffoldUnimod;
 
 	public static final String TYPE = "search-db";
-	public static final String NAME = "Database of search results";
+	public static final String NAME = "Search Result Loader";
 	public static final String DESC = "Loads the search results into a database for fast future queries.";
 
 	private static final String DATABASE = "database";
@@ -168,7 +163,7 @@ public final class SearchDbWorker extends WorkerBase {
 	/**
 	 * Configuration for the factory
 	 */
-	public static final class Config extends WorkerConfig {
+	public static final class Config implements ResourceConfig {
 		private DatabaseFactory.Config database;
 		private String scaffoldModSet;
 
@@ -181,17 +176,15 @@ public final class SearchDbWorker extends WorkerBase {
 		}
 
 		@Override
-		public Map<String, String> save(final DependencyResolver resolver) {
-			final Map<String, String> map = new TreeMap<String, String>();
-			map.put(DATABASE, resolver.getIdFromConfig(database));
-			map.put(SCAFFOLD_MOD_SET, scaffoldModSet);
-			return map;
+		public void save(final ConfigWriter writer) {
+			writer.put(DATABASE, writer.save(getDatabase()));
+			writer.put(SCAFFOLD_MOD_SET, scaffoldModSet);
 		}
 
 		@Override
-		public void load(final Map<String, String> values, final DependencyResolver resolver) {
-			database = (DatabaseFactory.Config) resolver.getConfigFromId(values.get(DATABASE));
-			scaffoldModSet = values.get(SCAFFOLD_MOD_SET);
+		public void load(final ConfigReader reader) {
+			database = (DatabaseFactory.Config)reader.getObject(DATABASE);
+			scaffoldModSet = reader.get(SCAFFOLD_MOD_SET);
 		}
 
 		@Override

@@ -1,10 +1,7 @@
 package edu.mayo.mprc.myrimatch;
 
 import edu.mayo.mprc.MprcException;
-import edu.mayo.mprc.config.DaemonConfig;
-import edu.mayo.mprc.config.DependencyResolver;
-import edu.mayo.mprc.config.ResourceConfig;
-import edu.mayo.mprc.config.WorkerConfig;
+import edu.mayo.mprc.config.*;
 import edu.mayo.mprc.config.ui.ServiceUiFactory;
 import edu.mayo.mprc.config.ui.UiBuilder;
 import edu.mayo.mprc.daemon.Worker;
@@ -21,7 +18,10 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
 
 /**
  * Myrimatch only supports forward databases.
@@ -113,8 +113,7 @@ public final class MyrimatchDeploymentService extends DeploymentService<Deployme
 					break;
 				}
 				if (line.startsWith(">")) {
-					if (line.startsWith(reversePrefixStart))
-					{
+					if (line.startsWith(reversePrefixStart)) {
 						break;
 					}
 					numSequences++;
@@ -174,7 +173,7 @@ public final class MyrimatchDeploymentService extends DeploymentService<Deployme
 	/**
 	 * Configuration for the factory
 	 */
-	public static final class Config extends WorkerConfig {
+	public static final class Config implements ResourceConfig {
 		private String deployableDbFolder;
 
 		public Config() {
@@ -192,14 +191,14 @@ public final class MyrimatchDeploymentService extends DeploymentService<Deployme
 			this.deployableDbFolder = deployableDbFolder;
 		}
 
-		public Map<String, String> save(final DependencyResolver resolver) {
-			final TreeMap<String, String> map = new TreeMap<String, String>();
-			map.put(DEPLOYABLE_DB_FOLDER, deployableDbFolder);
-			return map;
+		@Override
+		public void save(final ConfigWriter writer) {
+			writer.put(DEPLOYABLE_DB_FOLDER, getDeployableDbFolder());
 		}
 
-		public void load(final Map<String, String> values, final DependencyResolver resolver) {
-			this.deployableDbFolder = values.get(DEPLOYABLE_DB_FOLDER);
+		@Override
+		public void load(final ConfigReader reader) {
+			setDeployableDbFolder(reader.get(DEPLOYABLE_DB_FOLDER));
 		}
 
 		@Override

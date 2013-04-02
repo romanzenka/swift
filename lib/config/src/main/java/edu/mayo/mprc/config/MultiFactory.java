@@ -1,6 +1,6 @@
 package edu.mayo.mprc.config;
 
-import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -29,7 +29,9 @@ public interface MultiFactory extends ResourceFactory<ResourceConfig, Object> {
 
 	String getId(Class<? extends ResourceConfig> configClass);
 
-	Collection<String> getSupportedConfigClassNames();
+	List<String> getSupportedConfigClassNames();
+
+	List<Class> getSupportedConfigClasses();
 
 	String getUserName(String type);
 
@@ -40,6 +42,8 @@ public interface MultiFactory extends ResourceFactory<ResourceConfig, Object> {
 	 * @return User-friendly name of the class.
 	 */
 	String getUserName(ResourceConfig config);
+
+	String getUserName(Class<? extends ResourceConfig> clazz);
 
 	Object getResourceType(String id);
 

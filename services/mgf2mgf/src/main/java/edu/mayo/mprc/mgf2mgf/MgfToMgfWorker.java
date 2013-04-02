@@ -1,9 +1,6 @@
 package edu.mayo.mprc.mgf2mgf;
 
-import edu.mayo.mprc.config.DaemonConfig;
-import edu.mayo.mprc.config.DependencyResolver;
-import edu.mayo.mprc.config.ResourceConfig;
-import edu.mayo.mprc.config.WorkerConfig;
+import edu.mayo.mprc.config.*;
 import edu.mayo.mprc.config.ui.ServiceUiFactory;
 import edu.mayo.mprc.config.ui.UiBuilder;
 import edu.mayo.mprc.daemon.WorkPacket;
@@ -15,8 +12,6 @@ import edu.mayo.mprc.utilities.progress.UserProgressReporter;
 import org.springframework.stereotype.Component;
 
 import java.io.File;
-import java.util.HashMap;
-import java.util.Map;
 
 public final class MgfToMgfWorker extends WorkerBase {
 
@@ -61,18 +56,17 @@ public final class MgfToMgfWorker extends WorkerBase {
 	/**
 	 * Configuration for the factory
 	 */
-	public static final class Config extends WorkerConfig {
+	public static final class Config implements ResourceConfig {
 
 		public Config() {
 		}
 
 		@Override
-		public Map<String, String> save(final DependencyResolver resolver) {
-			return new HashMap<String, String>(1);
+		public void save(final ConfigWriter writer) {
 		}
 
 		@Override
-		public void load(final Map<String, String> values, final DependencyResolver resolver) {
+		public void load(final ConfigReader reader) {
 		}
 
 		@Override

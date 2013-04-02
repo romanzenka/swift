@@ -1,9 +1,6 @@
 package edu.mayo.mprc.sequest;
 
-import edu.mayo.mprc.config.DaemonConfig;
-import edu.mayo.mprc.config.DependencyResolver;
-import edu.mayo.mprc.config.ResourceConfig;
-import edu.mayo.mprc.config.WorkerConfig;
+import edu.mayo.mprc.config.*;
 import edu.mayo.mprc.config.ui.ServiceUiFactory;
 import edu.mayo.mprc.config.ui.UiBuilder;
 import edu.mayo.mprc.daemon.WorkPacket;
@@ -22,8 +19,6 @@ import org.springframework.stereotype.Component;
 import javax.annotation.Resource;
 import java.io.File;
 import java.util.Arrays;
-import java.util.Map;
-import java.util.TreeMap;
 
 
 public final class SequestWorker extends WorkerBase {
@@ -140,7 +135,7 @@ public final class SequestWorker extends WorkerBase {
 	/**
 	 * Configuration for the factory
 	 */
-	public static final class Config extends WorkerConfig {
+	public static final class Config implements ResourceConfig {
 		private String pvmHosts;
 		private String sequestCommand;
 
@@ -168,16 +163,14 @@ public final class SequestWorker extends WorkerBase {
 			this.pvmHosts = pvmHosts;
 		}
 
-		public Map<String, String> save(final DependencyResolver resolver) {
-			final Map<String, String> map = new TreeMap<String, String>();
-			map.put(PVM_HOSTS, pvmHosts);
-			map.put(SEQUEST_COMMAND, sequestCommand);
-			return map;
+		public void save(final ConfigWriter writer) {
+			writer.put(PVM_HOSTS, pvmHosts, "PVM's pvmhosts file");
+			writer.put(SEQUEST_COMMAND, sequestCommand, "Command to run Sequest");
 		}
 
-		public void load(final Map<String, String> values, final DependencyResolver resolver) {
-			pvmHosts = values.get(PVM_HOSTS);
-			sequestCommand = values.get(SEQUEST_COMMAND);
+		public void load(final ConfigReader reader) {
+			setPvmHosts(reader.get(PVM_HOSTS));
+			setSequestCommand(reader.get(SEQUEST_COMMAND));
 		}
 
 		@Override

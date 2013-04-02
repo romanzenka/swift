@@ -1,9 +1,6 @@
 package edu.mayo.mprc.mascot;
 
-import edu.mayo.mprc.config.DaemonConfig;
-import edu.mayo.mprc.config.DependencyResolver;
-import edu.mayo.mprc.config.ResourceConfig;
-import edu.mayo.mprc.config.WorkerConfig;
+import edu.mayo.mprc.config.*;
 import edu.mayo.mprc.config.ui.ServiceUiFactory;
 import edu.mayo.mprc.config.ui.UiBuilder;
 import edu.mayo.mprc.daemon.WorkPacket;
@@ -13,9 +10,6 @@ import edu.mayo.mprc.daemon.WorkerFactoryBase;
 import edu.mayo.mprc.enginedeployment.DeploymentResult;
 import edu.mayo.mprc.utilities.progress.UserProgressReporter;
 import org.springframework.stereotype.Component;
-
-import java.util.Map;
-import java.util.TreeMap;
 
 /**
  * Test-only mascot deployment. Creates extremely simplistic {@link edu.mayo.mprc.enginedeployment.DeploymentResult}
@@ -37,19 +31,17 @@ public final class MockMascotDeploymentService extends WorkerBase {
 	/**
 	 * Configuration for the factory
 	 */
-	public static final class Config extends WorkerConfig {
+	public static final class Config implements ResourceConfig {
 
 		public Config() {
 		}
 
 		@Override
-		public Map<String, String> save(final DependencyResolver resolver) {
-			return new TreeMap<String, String>();
+		public void save(final ConfigWriter writer) {
 		}
 
 		@Override
-		public void load(final Map<String, String> values, final DependencyResolver resolver) {
-			//Do nothing
+		public void load(final ConfigReader reader) {
 		}
 
 		@Override

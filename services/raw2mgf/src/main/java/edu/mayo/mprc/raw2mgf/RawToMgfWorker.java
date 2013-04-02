@@ -3,10 +3,7 @@ package edu.mayo.mprc.raw2mgf;
 import com.google.common.base.Splitter;
 import com.google.common.base.Strings;
 import edu.mayo.mprc.MprcException;
-import edu.mayo.mprc.config.DaemonConfig;
-import edu.mayo.mprc.config.DependencyResolver;
-import edu.mayo.mprc.config.ResourceConfig;
-import edu.mayo.mprc.config.WorkerConfig;
+import edu.mayo.mprc.config.*;
 import edu.mayo.mprc.config.ui.ServiceUiFactory;
 import edu.mayo.mprc.config.ui.UiBuilder;
 import edu.mayo.mprc.config.ui.WrapperScriptSwitcher;
@@ -25,8 +22,6 @@ import java.io.File;
 import java.io.FilenameFilter;
 import java.text.MessageFormat;
 import java.util.Arrays;
-import java.util.Map;
-import java.util.TreeMap;
 import java.util.regex.Pattern;
 
 import static java.util.Arrays.sort;
@@ -389,7 +384,7 @@ public final class RawToMgfWorker extends WorkerBase {
 	/**
 	 * Configuration for the factory
 	 */
-	public static final class Config extends WorkerConfig {
+	public static final class Config implements ResourceConfig {
 
 		private String tempFolder;
 		private String wrapperScript;
@@ -438,20 +433,18 @@ public final class RawToMgfWorker extends WorkerBase {
 			this.xvfbWrapperScript = xvfbWrapperScript;
 		}
 
-		public Map<String, String> save(final DependencyResolver resolver) {
-			final Map<String, String> map = new TreeMap<String, String>();
-			map.put(TEMP_FOLDER, tempFolder);
-			map.put(WRAPPER_SCRIPT, wrapperScript);
-			map.put(XVFB_WRAPPER_SCRIPT, xvfbWrapperScript);
-			map.put(EXTRACT_MSN_EXECUTABLE, extractMsnExecutable);
-			return map;
+		public void save(final ConfigWriter writer) {
+			writer.put(TEMP_FOLDER, tempFolder, "Temp folder to extract the .dta files to");
+			writer.put(WRAPPER_SCRIPT, wrapperScript, "Only for linux - wraps the calls with wine");
+			writer.put(XVFB_WRAPPER_SCRIPT, xvfbWrapperScript, "Only for linux - wraps the calls with start of X virtual frame buffer (when UI is needed by wine)");
+			writer.put(EXTRACT_MSN_EXECUTABLE, extractMsnExecutable, "extract_msn.exe path");
 		}
 
-		public void load(final Map<String, String> values, final DependencyResolver resolver) {
-			tempFolder = values.get(TEMP_FOLDER);
-			wrapperScript = values.get(WRAPPER_SCRIPT);
-			xvfbWrapperScript = values.get(XVFB_WRAPPER_SCRIPT);
-			extractMsnExecutable = values.get(EXTRACT_MSN_EXECUTABLE);
+		public void load(final ConfigReader reader) {
+			tempFolder = reader.get(TEMP_FOLDER);
+			wrapperScript = reader.get(WRAPPER_SCRIPT);
+			xvfbWrapperScript = reader.get(XVFB_WRAPPER_SCRIPT);
+			extractMsnExecutable = reader.get(EXTRACT_MSN_EXECUTABLE);
 		}
 
 		@Override

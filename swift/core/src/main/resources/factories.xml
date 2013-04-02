@@ -144,6 +144,7 @@
         <property name="daemonFactory" ref="daemonFactory"/>
         <property name="swiftFactory" ref="resourceTable"/>
         <property name="monitor" ref="swiftMonitor"/>
+        <property name="daemonConnectionFactory" ref="daemonConnectionFactory"/>
         <property name="commands">
             <list>
                 <bean id="helpCommand" class="edu.mayo.mprc.swift.commands.DisplayHelp"/>

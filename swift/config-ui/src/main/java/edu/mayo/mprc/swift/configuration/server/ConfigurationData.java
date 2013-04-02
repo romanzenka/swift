@@ -140,13 +140,12 @@ public class ConfigurationData {
 				// A service needs a runner
 				final ServiceConfig serviceConfig = new ServiceConfig();
 
-				if (!(resourceConfig instanceof WorkerConfig)) {
-					ExceptionUtilities.throwCastException(resourceConfig, WorkerConfig.class);
+				if (!(resourceConfig instanceof ResourceConfig)) {
+					ExceptionUtilities.throwCastException(resourceConfig, ResourceConfig.class);
 					return null;
 				}
-				serviceConfig.setRunner(new SimpleRunner.Config((WorkerConfig) resourceConfig));
+				serviceConfig.setRunner(new SimpleRunner.Config(resourceConfig));
 				serviceConfig.setName(type + '_' + index); // The name is type_index
-				serviceConfig.setBrokerUrl(getServiceBrokerUri(getMessageBrokerUrl(), serviceConfig.getName()));
 
 				parent.addService(serviceConfig);
 				final ModuleModel moduleModel = mapServiceConfigToModel(index, parent, serviceConfig);
@@ -166,13 +165,6 @@ public class ConfigurationData {
 
 	/**
 	 * Create resourceConfig for given type. Fill it with default values, as specified in the UI builder.
-	 *
-	 * @param type
-	 * @param parent
-	 * @param moduleConfigTable
-	 * @return
-	 * @throws InstantiationException
-	 * @throws IllegalAccessException
 	 */
 	private ResourceConfig getDefaultResourceConfig(final String type, final DaemonConfig parent, final ResourceTable moduleConfigTable) {
 		final Class<? extends ResourceConfig> configClass = moduleConfigTable.getConfigClass(type);
@@ -188,10 +180,10 @@ public class ConfigurationData {
 		// Now that we have a config, we need to fill it with default values
 		final ServiceUiFactory uiFactory = moduleConfigTable.getUiFactory(type);
 		if (uiFactory != null) {
-			final Map<String, String> initialValues = resourceConfig.save(resolver);
+			final Map<String, String> initialValues = MapConfigWriter.save(resourceConfig, resolver);
 			final DefaultSettingUiBuilder builder = new DefaultSettingUiBuilder(initialValues, resolver);
 			uiFactory.createUI(parent, resourceConfig, builder);
-			resourceConfig.load(builder.getValues(), resolver);
+			MapConfigReader.load(resourceConfig, builder.getValues(), resolver);
 		}
 		return resourceConfig;
 	}
@@ -323,7 +315,7 @@ public class ConfigurationData {
 
 	private void setResourceUi(final DaemonConfig daemon, final ResourceConfig config, final String type, final ResourceModel resource) {
 		// Save the config properties, store them into the model
-		resource.setProperties(new HashMap<String, String>(config.save(resolver)));
+		resource.setProperties(new HashMap<String, String>(MapConfigWriter.save(config, resolver)));
 
 		final ServiceUiFactory factory = getResourceTable().getUiFactory(type);
 		final SerializingUiBuilder builder = new SerializingUiBuilder(new ListenerMapBuilder() {
@@ -344,7 +336,7 @@ public class ConfigurationData {
 	private void loadModelData(final ResourceModel resource) {
 		final String id = resolver.getIdFromDependency(resource);
 		final ResourceConfig resourceConfig = resolver.getConfigFromId(id);
-		resource.setProperties(new HashMap<String, String>(resourceConfig.save(resolver)));
+		resource.setProperties(new HashMap<String, String>(MapConfigWriter.save(resourceConfig, resolver)));
 	}
 
 	private ResourceModel mapRunnerConfigToModel(final RunnerConfig runner) {
@@ -357,7 +349,7 @@ public class ConfigurationData {
 			throw new MprcException("Not supported runner config: " + runner.getClass().getName());
 		}
 
-		runnerModel.setProperties(new HashMap<String, String>(runner.save(null)));
+		runnerModel.setProperties(new HashMap<String, String>(MapConfigWriter.save(runner, null)));
 		return runnerModel;
 	}
 
@@ -413,10 +405,6 @@ public class ConfigurationData {
 		for (final String error : errorList) {
 			uiChanges.displayPropertyError(applicationConfig, null, error);
 		}
-		for (final DaemonConfig daemon : applicationConfig.getDaemons()) {
-			// Set daemon's ping URL before saving
-			daemon.setPingQueueUrl(getServiceBrokerUri(getMessageBrokerUrl(), daemon.getName() + "-ping"));
-		}
 		applicationConfig.save(configFile, getResourceTable());
 		for (final DaemonConfig daemon : applicationConfig.getDaemons()) {
 			final String scriptName = daemon.getName().replaceAll("[^a-zA-Z0-9-_+]", "_") + "-run";
@@ -470,9 +458,9 @@ public class ConfigurationData {
 
 	public UiChangesReplayer setProperty(final ResourceConfig resourceConfig, final String propertyName, final String newValue, final boolean onDemand) {
 		// Set the property on the config
-		final Map<String, String> data = resourceConfig.save(resolver);
+		final Map<String, String> data = MapConfigWriter.save(resourceConfig, resolver);
 		data.put(propertyName, newValue);
-		resourceConfig.load(data, resolver);
+		MapConfigReader.load(resourceConfig, data, resolver);
 
 		// Set the property on the corresponding model
 		final ResourceModel model = (ResourceModel) resolver.getDependencyFromId(resolver.getIdFromConfig(resourceConfig));

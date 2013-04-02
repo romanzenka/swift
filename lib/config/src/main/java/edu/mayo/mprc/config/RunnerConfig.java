@@ -7,20 +7,22 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
  */
 @XStreamAlias("runner")
 public abstract class RunnerConfig implements ResourceConfig {
-	private WorkerConfig workerConfiguration;
+	private ResourceConfig workerConfiguration;
+
+	public static final String WORKER="worker";
 
 	public RunnerConfig() {
 	}
 
-	public RunnerConfig(final WorkerConfig workerConfiguration) {
+	public RunnerConfig(final ResourceConfig workerConfiguration) {
 		this.workerConfiguration = workerConfiguration;
 	}
 
-	public WorkerConfig getWorkerConfiguration() {
+	public ResourceConfig getWorkerConfiguration() {
 		return workerConfiguration;
 	}
 
-	public void setWorkerConfiguration(final WorkerConfig workerConfiguration) {
+	public void setWorkerConfiguration(final ResourceConfig workerConfiguration) {
 		this.workerConfiguration = workerConfiguration;
 	}
 
@@ -30,11 +32,4 @@ public abstract class RunnerConfig implements ResourceConfig {
 				"workerConfiguration=" + workerConfiguration +
 				'}';
 	}
-
-	/**
-	 * Runner config is written inline within its enclosing service, including the worker config.
-	 *
-	 * @param writer Writer to write the config into.
-	 */
-	public abstract void writeInline(ConfigWriter writer);
 }

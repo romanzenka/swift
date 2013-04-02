@@ -2,10 +2,7 @@ package edu.mayo.mprc.msconvert;
 
 import com.google.common.collect.Lists;
 import edu.mayo.mprc.MprcException;
-import edu.mayo.mprc.config.DaemonConfig;
-import edu.mayo.mprc.config.DependencyResolver;
-import edu.mayo.mprc.config.ResourceConfig;
-import edu.mayo.mprc.config.WorkerConfig;
+import edu.mayo.mprc.config.*;
 import edu.mayo.mprc.config.ui.ServiceUiFactory;
 import edu.mayo.mprc.config.ui.UiBuilder;
 import edu.mayo.mprc.daemon.WorkPacket;
@@ -25,8 +22,6 @@ import java.io.File;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
 
 /**
  * Calls <tt>msaccess.exe</tt> to determine whether peak picking should be enabled.
@@ -118,7 +113,7 @@ public final class MsconvertWorker extends WorkerBase {
 		command.add("--filter"); // Charge state predictor
 		command.add("chargeStatePredictor false 4 2 0.9");
 
-		if(rawFile.getName().endsWith(".d")) {
+		if (rawFile.getName().endsWith(".d")) {
 			command.add("--filter");
 			command.add("peakPicking true 1-");
 		}
@@ -239,7 +234,7 @@ public final class MsconvertWorker extends WorkerBase {
 	/**
 	 * Configuration for the factory
 	 */
-	public static final class Config extends WorkerConfig {
+	public static final class Config implements ResourceConfig {
 
 		private String msconvertExecutable;
 		private String msaccessExecutable;
@@ -268,16 +263,14 @@ public final class MsconvertWorker extends WorkerBase {
 			this.msaccessExecutable = msaccessExecutable;
 		}
 
-		public Map<String, String> save(final DependencyResolver resolver) {
-			final Map<String, String> map = new TreeMap<String, String>();
-			map.put(MSCONVERT_EXECUTABLE, getMsconvertExecutable());
-			map.put(MSACCESS_EXECUTABLE, getMsaccessExecutable());
-			return map;
+		public void save(final ConfigWriter writer) {
+			writer.put(MSCONVERT_EXECUTABLE, getMsconvertExecutable(), "Location of ProteoWizard's msconvert.exe");
+			writer.put(MSACCESS_EXECUTABLE, getMsaccessExecutable(), "Location of ProteoWizard's msaccess.exe");
 		}
 
-		public void load(final Map<String, String> values, final DependencyResolver resolver) {
-			setMsconvertExecutable(values.get(MSCONVERT_EXECUTABLE));
-			setMsaccessExecutable(msaccessExecutable = values.get(MSACCESS_EXECUTABLE));
+		public void load(final ConfigReader reader) {
+			setMsconvertExecutable(reader.get(MSCONVERT_EXECUTABLE));
+			setMsaccessExecutable(reader.get(MSACCESS_EXECUTABLE));
 		}
 
 		@Override

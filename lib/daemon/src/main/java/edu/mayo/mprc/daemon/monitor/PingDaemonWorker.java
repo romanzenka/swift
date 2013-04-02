@@ -8,9 +8,6 @@ import edu.mayo.mprc.daemon.exception.DaemonException;
 import edu.mayo.mprc.utilities.progress.UserProgressReporter;
 import org.springframework.stereotype.Component;
 
-import java.util.HashMap;
-import java.util.Map;
-
 /**
  * Responds to ping requests.
  *
@@ -18,7 +15,7 @@ import java.util.Map;
  */
 public final class PingDaemonWorker extends WorkerBase implements NoLoggingWorker {
 	public static final String TYPE = "ping";
-	public static final String NAME = "Ping";
+	public static final String NAME = "Ping Responder";
 	public static final String DESC = "Responds to pings with status information. Automatically set for each daemon.";
 
 	@Override
@@ -30,15 +27,11 @@ public final class PingDaemonWorker extends WorkerBase implements NoLoggingWorke
 	}
 
 	public static ServiceConfig getPingServiceConfig(final DaemonConfig config) {
-		if(config.getPingQueueUrl()==null) {
-			return null;
-		}
 		final PingDaemonWorker.Config pingConfig = new PingDaemonWorker.Config();
 		final ServiceConfig pingServiceConfig =
 				new ServiceConfig(
 						config.getName() + "-ping",
-						new SimpleRunner.Config(pingConfig),
-						config.getPingQueueUrl());
+						new SimpleRunner.Config(pingConfig));
 		return pingServiceConfig;
 
 	}
@@ -62,26 +55,21 @@ public final class PingDaemonWorker extends WorkerBase implements NoLoggingWorke
 	/**
 	 * Configuration for the factory
 	 */
-	public static final class Config extends WorkerConfig {
+	public static final class Config implements ResourceConfig {
 		public Config() {
 		}
 
 		@Override
-		public Map<String, String> save(final DependencyResolver resolver) {
-			return new HashMap<String, String>(1);
+		public void save(final ConfigWriter writer) {
 		}
 
 		@Override
-		public void load(final Map<String, String> values, final DependencyResolver resolver) {
+		public void load(final ConfigReader reader) {
 		}
 
 		@Override
 		public int getPriority() {
 			return 0;
-		}
-
-		@Override
-		public void write(final ConfigWriter writer) {
 		}
 	}
 

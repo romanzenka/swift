@@ -1,10 +1,7 @@
 package edu.mayo.mprc.qa;
 
 import edu.mayo.mprc.MprcException;
-import edu.mayo.mprc.config.DaemonConfig;
-import edu.mayo.mprc.config.DependencyResolver;
-import edu.mayo.mprc.config.ResourceConfig;
-import edu.mayo.mprc.config.WorkerConfig;
+import edu.mayo.mprc.config.*;
 import edu.mayo.mprc.config.ui.ServiceUiFactory;
 import edu.mayo.mprc.config.ui.UiBuilder;
 import edu.mayo.mprc.daemon.WorkPacket;
@@ -334,7 +331,7 @@ public final class QaWorker extends WorkerBase {
 	/**
 	 * Configuration for the factory
 	 */
-	public static final class Config extends WorkerConfig {
+	public static final class Config implements ResourceConfig {
 
 		private String xvfbWrapperScript;
 		private String rScript;
@@ -372,18 +369,18 @@ public final class QaWorker extends WorkerBase {
 			this.rExecutable = rExecutable;
 		}
 
-		public Map<String, String> save(final DependencyResolver resolver) {
-			final Map<String, String> map = new TreeMap<String, String>();
-			map.put(XVFB_WRAPPER_SCRIPT, xvfbWrapperScript);
-			map.put(R_SCRIPT, rScript);
-			map.put(R_EXECUTABLE, rExecutable);
-			return map;
+		@Override
+		public void save(final ConfigWriter writer) {
+			writer.put(XVFB_WRAPPER_SCRIPT, xvfbWrapperScript);
+			writer.put(R_SCRIPT, rScript);
+			writer.put(R_EXECUTABLE, rExecutable);
 		}
 
-		public void load(final Map<String, String> values, final DependencyResolver resolver) {
-			xvfbWrapperScript = values.get(XVFB_WRAPPER_SCRIPT);
-			rScript = values.get(R_SCRIPT);
-			rExecutable = values.get(R_EXECUTABLE);
+		@Override
+		public void load(final ConfigReader reader) {
+			setXvfbWrapperScript(reader.get(XVFB_WRAPPER_SCRIPT));
+			setRScript(reader.get(R_SCRIPT));
+			setRExecutable(reader.get(R_EXECUTABLE));
 		}
 
 		@Override

@@ -1,10 +1,7 @@
 package edu.mayo.mprc.swift;
 
 import edu.mayo.mprc.MprcException;
-import edu.mayo.mprc.config.ApplicationConfig;
-import edu.mayo.mprc.config.DaemonConfig;
-import edu.mayo.mprc.config.ResourceConfig;
-import edu.mayo.mprc.config.ServiceConfig;
+import edu.mayo.mprc.config.*;
 import edu.mayo.mprc.daemon.MessageBroker;
 import edu.mayo.mprc.daemon.files.FileTokenFactory;
 import edu.mayo.mprc.database.DatabaseFactory;
@@ -50,8 +47,8 @@ public final class SwiftConfig {
 		if (numDbs > 1) {
 			errors.add("Swift cannot currently be configured with more than one " + DatabaseFactory.NAME + " module.");
 		}
-		if (swift.getModulesOfConfigType(MessageBroker.Config.class).size() == 0) {
-			errors.add("Without " + MessageBroker.NAME + " module, other Swift modules will not be able to communicate with each other.");
+		if (swift.getModulesOfConfigType(MessageBroker.Config.class).size() != 1) {
+			errors.add("Without a single " + MessageBroker.NAME + " module, other Swift modules will not be able to communicate with each other.");
 		}
 
 		// Make sure that modules that have to be within one daemon are within one daemon
@@ -165,7 +162,9 @@ public final class SwiftConfig {
 		final List<ResourceConfig> brokerConfigs = swiftConfig.getModulesOfConfigType(MessageBroker.Config.class);
 		if (brokerConfigs.size() > 0) {
 			try {
-				fileTokenFactory.setFileSharingFactory(new JmsFileTransferHandlerFactory(new URI(brokerConfigs.get(0).save(null).get(MessageBroker.BROKER_URL))));
+				final KeyExtractingWriter keyExtractingWriter = new KeyExtractingWriter(MessageBroker.BROKER_URL);
+				brokerConfigs.get(0).save(keyExtractingWriter);
+				fileTokenFactory.setFileSharingFactory(new JmsFileTransferHandlerFactory(new URI(keyExtractingWriter.getValue())));
 			} catch (URISyntaxException e) {
 				throw new MprcException("Failed to set FileTransferHandlerFactory in FileTokenFactory object.", e);
 			}

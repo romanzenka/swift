@@ -567,7 +567,7 @@ public final class SwiftSearcher implements Worker {
 	/**
 	 * Configuration for the factory
 	 */
-	public static final class Config extends WorkerConfig {
+	public static final class Config implements ResourceConfig {
 		private String fastaPath;
 		private String fastaArchivePath;
 		private String fastaUploadPath;
@@ -678,70 +678,68 @@ public final class SwiftSearcher implements Worker {
 		}
 
 		@Override
-		public Map<String, String> save(final DependencyResolver resolver) {
-			final Map<String, String> map = new TreeMap<String, String>();
-			map.put(FASTA_PATH, fastaPath);
-			map.put(FASTA_ARCHIVE_PATH, fastaArchivePath);
-			map.put(FASTA_UPLOAD_PATH, fastaUploadPath);
-			map.put(RAW_2_MGF, resolver.getIdFromConfig(raw2mgf));
-			map.put(MSCONVERT, resolver.getIdFromConfig(msconvert));
-			map.put(MGF_2_MGF, resolver.getIdFromConfig(mgf2mgf));
-			map.put(RAWDUMP, resolver.getIdFromConfig(rawdump));
+		public void save(final ConfigWriter writer) {
+			writer.put(FASTA_PATH, fastaPath);
+			writer.put(FASTA_ARCHIVE_PATH, fastaArchivePath);
+			writer.put(FASTA_UPLOAD_PATH, fastaUploadPath);
+			writer.put(RAW_2_MGF, writer.save(raw2mgf));
+			writer.put(MSCONVERT, writer.save(msconvert));
+			writer.put(MGF_2_MGF, writer.save(mgf2mgf));
+			writer.put(RAWDUMP, writer.save(rawdump));
 
 			int i = 0;
 			for (final SearchEngine.Config engineConfig : getEngines()) {
 				i++;
-				map.put(ENGINE_PREFIX + i + ENGINE_WORKER_SUFFIX, resolver.getIdFromConfig(engineConfig.getWorker()));
-				map.put(ENGINE_PREFIX + i + ENGINE_DEPLOYER_SUFFIX, resolver.getIdFromConfig(engineConfig.getDeployer()));
-				map.put(ENGINE_PREFIX + i + ENGINE_VERSION_SUFFIX, engineConfig.getVersion());
-				map.put(ENGINE_PREFIX + i + ENGINE_CODE_SUFFIX, engineConfig.getCode());
+				writer.put(ENGINE_PREFIX + i + ENGINE_CODE_SUFFIX, engineConfig.getCode());
+				writer.put(ENGINE_PREFIX + i + ENGINE_VERSION_SUFFIX, engineConfig.getVersion());
+				writer.put(ENGINE_PREFIX + i + ENGINE_WORKER_SUFFIX, writer.save(engineConfig.getWorker()));
+				writer.put(ENGINE_PREFIX + i + ENGINE_DEPLOYER_SUFFIX, writer.save(engineConfig.getDeployer()));
 			}
 
-			map.put(SCAFFOLD_REPORT, resolver.getIdFromConfig(scaffoldReport));
-			map.put(QA, resolver.getIdFromConfig(qa));
-			map.put(FASTA_DB, resolver.getIdFromConfig(fastaDb));
-			map.put(SEARCH_DB, resolver.getIdFromConfig(searchDb));
-			map.put(MSMS_EVAL, resolver.getIdFromConfig(msmsEval));
-			map.put(DATABASE, resolver.getIdFromConfig(database));
-			map.put(REPORT_DECOY_HITS, Boolean.toString(reportDecoyHits));
-			return map;
+			writer.put(SCAFFOLD_REPORT, writer.save(scaffoldReport));
+			writer.put(QA, writer.save(qa));
+			writer.put(FASTA_DB, writer.save(fastaDb));
+			writer.put(SEARCH_DB, writer.save(searchDb));
+			writer.put(MSMS_EVAL, writer.save(msmsEval));
+			writer.put(DATABASE, writer.save(database));
+			writer.put(REPORT_DECOY_HITS, reportDecoyHits);
 		}
 
-		public void load(final Map<String, String> values, final DependencyResolver resolver) {
-			fastaPath = values.get(FASTA_PATH);
-			fastaArchivePath = values.get(FASTA_ARCHIVE_PATH);
-			fastaUploadPath = values.get(FASTA_UPLOAD_PATH);
-			raw2mgf = (ServiceConfig) resolver.getConfigFromId(values.get(RAW_2_MGF));
-			msconvert = (ServiceConfig) resolver.getConfigFromId(values.get(MSCONVERT));
-			mgf2mgf = (ServiceConfig) resolver.getConfigFromId(values.get(MGF_2_MGF));
-			rawdump = (ServiceConfig) resolver.getConfigFromId(values.get(RAWDUMP));
+		public void load(final ConfigReader reader) {
+			fastaPath = reader.get(FASTA_PATH);
+			fastaArchivePath = reader.get(FASTA_ARCHIVE_PATH);
+			fastaUploadPath = reader.get(FASTA_UPLOAD_PATH);
+			raw2mgf = (ServiceConfig) reader.getObject(RAW_2_MGF);
+			msconvert = (ServiceConfig) reader.getObject(MSCONVERT);
+			mgf2mgf = (ServiceConfig) reader.getObject(MGF_2_MGF);
+			rawdump = (ServiceConfig) reader.getObject(RAWDUMP);
 
 			final Collection<SearchEngine.Config> engineConfigs = Lists.newArrayList();
-			for (final Map.Entry<String, String> entry : values.entrySet()) {
-				if (entry.getKey().startsWith(ENGINE_PREFIX) &&
-						entry.getKey().endsWith(ENGINE_CODE_SUFFIX)) {
-					setupEngine(entry.getKey().substring(
-							ENGINE_PREFIX.length(), entry.getKey().length() - ENGINE_CODE_SUFFIX.length()), engineConfigs, values, resolver);
+			for (final String key : reader.getKeys()) {
+				if (key.startsWith(ENGINE_PREFIX) &&
+						key.endsWith(ENGINE_CODE_SUFFIX)) {
+					setupEngine(key.substring(
+							ENGINE_PREFIX.length(), key.length() - ENGINE_CODE_SUFFIX.length()), engineConfigs, reader);
 				}
 			}
 			engines = engineConfigs;
 
-			scaffoldReport = (ServiceConfig) resolver.getConfigFromId(values.get(SCAFFOLD_REPORT));
-			qa = (ServiceConfig) resolver.getConfigFromId(values.get(QA));
-			fastaDb = (ServiceConfig) resolver.getConfigFromId(values.get(FASTA_DB));
-			searchDb = (ServiceConfig) resolver.getConfigFromId(values.get(SEARCH_DB));
-			msmsEval = (ServiceConfig) resolver.getConfigFromId(values.get(MSMS_EVAL));
-			database = (DatabaseFactory.Config) resolver.getConfigFromId(values.get(DATABASE));
-			reportDecoyHits = Boolean.parseBoolean(values.get(REPORT_DECOY_HITS));
+			scaffoldReport = (ServiceConfig) reader.getObject(SCAFFOLD_REPORT);
+			qa = (ServiceConfig) reader.getObject(QA);
+			fastaDb = (ServiceConfig) reader.getObject(FASTA_DB);
+			searchDb = (ServiceConfig) reader.getObject(SEARCH_DB);
+			msmsEval = (ServiceConfig) reader.getObject(MSMS_EVAL);
+			database = (DatabaseFactory.Config) reader.getObject(DATABASE);
+			reportDecoyHits = reader.getBoolean(REPORT_DECOY_HITS);
 		}
 
-		private void setupEngine(final String number, final Collection<SearchEngine.Config> engineConfigs, final Map<String, String> values, final DependencyResolver resolver) {
-			final String code = values.get(ENGINE_PREFIX + number + ENGINE_CODE_SUFFIX);
-			final String worker = values.get(ENGINE_PREFIX + number + ENGINE_WORKER_SUFFIX);
-			final String deployer = values.get(ENGINE_PREFIX + number + ENGINE_DEPLOYER_SUFFIX);
-			final String version = values.get(ENGINE_PREFIX + number + ENGINE_VERSION_SUFFIX);
+		private void setupEngine(final String number, final Collection<SearchEngine.Config> engineConfigs, ConfigReader reader) {
+			final String code = reader.get(ENGINE_PREFIX + number + ENGINE_CODE_SUFFIX);
+			final ServiceConfig worker = (ServiceConfig) reader.getObject(ENGINE_PREFIX + number + ENGINE_WORKER_SUFFIX);
+			final ServiceConfig deployer = (ServiceConfig) reader.getObject(ENGINE_PREFIX + number + ENGINE_DEPLOYER_SUFFIX);
+			final String version = reader.get(ENGINE_PREFIX + number + ENGINE_VERSION_SUFFIX);
 
-			engineConfigs.add(new SearchEngine.Config(code, version, (ServiceConfig) resolver.getConfigFromId(worker), (ServiceConfig) resolver.getConfigFromId(deployer)));
+			engineConfigs.add(new SearchEngine.Config(code, version, worker, deployer));
 		}
 
 		@Override

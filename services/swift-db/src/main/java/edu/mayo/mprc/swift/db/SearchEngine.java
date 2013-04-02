@@ -1,6 +1,5 @@
 package edu.mayo.mprc.swift.db;
 
-import com.google.common.collect.Maps;
 import edu.mayo.mprc.MprcException;
 import edu.mayo.mprc.config.*;
 import edu.mayo.mprc.config.ui.ServiceUiFactory;
@@ -15,7 +14,6 @@ import org.springframework.stereotype.Component;
 import javax.annotation.Resource;
 import java.io.*;
 import java.util.Collection;
-import java.util.Map;
 
 /**
  * Object representing a configured search engine.
@@ -325,7 +323,7 @@ public final class SearchEngine implements Comparable<SearchEngine> {
 
 		@Override
 		public String getUserName() {
-			return "Search Engine";
+			return "Search Engine Reference";
 		}
 
 		@Override
@@ -356,7 +354,7 @@ public final class SearchEngine implements Comparable<SearchEngine> {
 	/**
 	 * Configuration of a particular engine.
 	 */
-	public static final class Config extends WorkerConfig {
+	public static final class Config implements ResourceConfig {
 		private String code;
 		private String version;
 		private ServiceConfig worker;
@@ -402,21 +400,19 @@ public final class SearchEngine implements Comparable<SearchEngine> {
 		}
 
 		@Override
-		public Map<String, String> save(final DependencyResolver resolver) {
-			final Map<String, String> result = Maps.newHashMap();
-			result.put("code", getCode());
-			result.put("version", getVersion());
-			result.put("worker", resolver.getIdFromConfig(getWorker()));
-			result.put("deployer", resolver.getIdFromConfig(getDeployer()));
-			return result;
+		public void save(final ConfigWriter writer) {
+			writer.put("code", getCode());
+			writer.put("version", getVersion());
+			writer.put("worker", writer.save(worker));
+			writer.put("deployer", writer.save(deployer));
 		}
 
 		@Override
-		public void load(final Map<String, String> values, final DependencyResolver resolver) {
-			setCode(values.get("code"));
-			setVersion(values.get("version"));
-			setWorker((ServiceConfig) resolver.getConfigFromId(values.get("worker")));
-			setDeployer((ServiceConfig) resolver.getConfigFromId(values.get("deployer")));
+		public void load(final ConfigReader reader) {
+			setCode(reader.get("code"));
+			setVersion(reader.get("version"));
+			setWorker((ServiceConfig) reader.getObject("worker"));
+			setDeployer((ServiceConfig) reader.getObject("deployer"));
 		}
 
 		@Override

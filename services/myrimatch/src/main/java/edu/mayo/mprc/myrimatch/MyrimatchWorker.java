@@ -4,10 +4,7 @@ import com.google.common.base.Charsets;
 import com.google.common.base.Joiner;
 import com.google.common.io.Files;
 import edu.mayo.mprc.MprcException;
-import edu.mayo.mprc.config.DaemonConfig;
-import edu.mayo.mprc.config.DependencyResolver;
-import edu.mayo.mprc.config.ResourceConfig;
-import edu.mayo.mprc.config.WorkerConfig;
+import edu.mayo.mprc.config.*;
 import edu.mayo.mprc.config.ui.ServiceUiFactory;
 import edu.mayo.mprc.config.ui.UiBuilder;
 import edu.mayo.mprc.daemon.WorkPacket;
@@ -25,7 +22,9 @@ import org.springframework.stereotype.Component;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.*;
+import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.List;
 
 public final class MyrimatchWorker extends WorkerBase {
 	private static final Logger LOGGER = Logger.getLogger(MyrimatchWorker.class);
@@ -181,7 +180,7 @@ public final class MyrimatchWorker extends WorkerBase {
 	/**
 	 * Configuration for the factory
 	 */
-	public static final class Config extends WorkerConfig {
+	public static final class Config implements ResourceConfig {
 		private String executable;
 
 		public Config() {
@@ -199,14 +198,14 @@ public final class MyrimatchWorker extends WorkerBase {
 			this.executable = executable;
 		}
 
-		public Map<String, String> save(final DependencyResolver resolver) {
-			final Map<String, String> map = new TreeMap<String, String>();
-			map.put(EXECUTABLE, executable);
-			return map;
+		@Override
+		public void save(final ConfigWriter writer) {
+			writer.put(EXECUTABLE, executable, "Myrimatch executable");
 		}
 
-		public void load(final Map<String, String> values, final DependencyResolver resolver) {
-			executable = values.get(EXECUTABLE);
+		@Override
+		public void load(final ConfigReader reader) {
+			setExecutable(reader.get(EXECUTABLE));
 		}
 
 		@Override
