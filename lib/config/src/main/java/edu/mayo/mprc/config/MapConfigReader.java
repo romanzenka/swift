@@ -28,7 +28,7 @@ public final class MapConfigReader implements ConfigReader {
 	}
 
 	@Override
-	public int getInteger(final String numThreads) {
+	public int getInteger(final String key) {
 		return 0;  //To change body of implemented methods use File | Settings | File Templates.
 	}
 

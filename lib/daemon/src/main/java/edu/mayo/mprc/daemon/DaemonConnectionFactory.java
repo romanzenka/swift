@@ -1,9 +1,8 @@
 package edu.mayo.mprc.daemon;
 
 import edu.mayo.mprc.MprcException;
-import edu.mayo.mprc.config.DependencyResolver;
-import edu.mayo.mprc.config.FactoryBase;
-import edu.mayo.mprc.config.ServiceConfig;
+import edu.mayo.mprc.config.*;
+import edu.mayo.mprc.config.ui.ServiceUiFactory;
 import edu.mayo.mprc.daemon.files.FileTokenFactory;
 import edu.mayo.mprc.messaging.Service;
 import edu.mayo.mprc.messaging.ServiceFactory;
@@ -16,7 +15,8 @@ import java.net.URISyntaxException;
  * Knows which daemon it is a part of.
  * Capable of creating either the receiving or the sending end for a service of a given id.
  */
-public final class DaemonConnectionFactory extends FactoryBase<ServiceConfig, DaemonConnection> {
+public final class DaemonConnectionFactory extends FactoryBase<ServiceConfig, DaemonConnection> implements FactoryDescriptor {
+	public static final String SERVICE = "service";
 	private FileTokenFactory fileTokenFactory;
 	private ServiceFactory serviceFactory;
 	private String brokerUrl;
@@ -61,5 +61,30 @@ public final class DaemonConnectionFactory extends FactoryBase<ServiceConfig, Da
 		} catch (URISyntaxException e) {
 			throw new MprcException("Wrong service URI for broker [" + brokerUrl + "] and queue name [" + name + "]", e);
 		}
+	}
+
+	@Override
+	public String getType() {
+		return SERVICE;
+	}
+
+	@Override
+	public String getUserName() {
+		return "Service";
+	}
+
+	@Override
+	public String getDescription() {
+		return "A service is basically a queue that accepts work requests and executes them";
+	}
+
+	@Override
+	public Class<? extends ResourceConfig> getConfigClass() {
+		return ServiceConfig.class;
+	}
+
+	@Override
+	public ServiceUiFactory getServiceUiFactory() {
+		return null;
 	}
 }

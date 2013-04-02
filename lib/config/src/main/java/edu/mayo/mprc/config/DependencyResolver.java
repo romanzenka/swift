@@ -53,7 +53,7 @@ public final class DependencyResolver {
 
 	private void testUniqueness(final ResourceConfig config) {
 		if (dependencies.containsKey(config)) {
-			throw new MprcException("Dependency  for " + config + " already defined.");
+			throw new MprcException("Dependency for " + config + " already defined.");
 		}
 	}
 

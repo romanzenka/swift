@@ -7,6 +7,7 @@ import edu.mayo.mprc.common.client.StringUtilities;
 import edu.mayo.mprc.config.*;
 import edu.mayo.mprc.config.ui.PropertyChangeListener;
 import edu.mayo.mprc.config.ui.ServiceUiFactory;
+import edu.mayo.mprc.daemon.DaemonConnectionFactory;
 import edu.mayo.mprc.daemon.MessageBroker;
 import edu.mayo.mprc.daemon.SimpleRunner;
 import edu.mayo.mprc.database.DatabaseFactory;
@@ -292,7 +293,7 @@ public class ConfigurationData {
 	}
 
 	private ModuleModel mapServiceConfigToModel(final String index, final DaemonConfig daemon, final ServiceConfig service) {
-		final ResourceModel serviceModel = new ResourceModel(service.getName(), ResourceTable.SERVICE);
+		final ResourceModel serviceModel = new ResourceModel(service.getName(), DaemonConnectionFactory.SERVICE);
 
 		resolver.addDependency(service, serviceModel);
 		serviceModel.setId(resolver.getIdFromConfig(service));
