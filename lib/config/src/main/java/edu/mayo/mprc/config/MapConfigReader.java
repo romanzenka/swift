@@ -1,6 +1,5 @@
 package edu.mayo.mprc.config;
 
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -8,7 +7,7 @@ import java.util.Map;
  *
  * @author Roman Zenka
  */
-public final class MapConfigReader implements ConfigReader {
+public final class MapConfigReader extends ConfigReaderBase {
 	private final DependencyResolver resolver;
 	private final Map<String, String> values;
 
@@ -23,31 +22,16 @@ public final class MapConfigReader implements ConfigReader {
 	}
 
 	@Override
-	public boolean getBoolean(final String key) {
-		return Boolean.parseBoolean(get(key));
-	}
-
-	@Override
-	public int getInteger(final String key) {
-		return 0;  //To change body of implemented methods use File | Settings | File Templates.
-	}
-
-	@Override
-	public ResourceConfig getObject(final String key) {
-		return null;  //To change body of implemented methods use File | Settings | File Templates.
-	}
-
-	@Override
-	public List<? extends ResourceConfig> getResourceList(final String key) {
-		return null;  //To change body of implemented methods use File | Settings | File Templates.
+	public ResourceConfig getObjectFromId(final String id) {
+		return resolver.getConfigFromId(id);
 	}
 
 	@Override
 	public Iterable<String> getKeys() {
-		return null;  //To change body of implemented methods use File | Settings | File Templates.
+		return values.keySet();
 	}
 
-	public static void load(ResourceConfig resourceConfig, Map<String, String> values, DependencyResolver resolver) {
+	public static void load(final ResourceConfig resourceConfig, final Map<String, String> values, final DependencyResolver resolver) {
 		resourceConfig.load(new MapConfigReader(resolver, values));
 	}
 }

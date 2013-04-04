@@ -1,15 +1,12 @@
 package edu.mayo.mprc.config;
 
-import com.thoughtworks.xstream.annotations.XStreamAlias;
-
 /**
  * A runner is code that waits for work packets and then passes them to a worker.
  */
-@XStreamAlias("runner")
 public abstract class RunnerConfig implements ResourceConfig {
 	private ResourceConfig workerConfiguration;
 
-	public static final String WORKER="worker";
+	public static final String WORKER = "worker";
 
 	public RunnerConfig() {
 	}

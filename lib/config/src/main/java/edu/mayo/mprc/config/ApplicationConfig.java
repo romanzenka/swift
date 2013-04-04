@@ -1,6 +1,5 @@
 package edu.mayo.mprc.config;
 
-import com.thoughtworks.xstream.annotations.XStreamAlias;
 import edu.mayo.mprc.MprcException;
 import edu.mayo.mprc.utilities.FileUtilities;
 
@@ -20,7 +19,6 @@ import java.util.List;
  *       * {@link ResourceConfig} - just a dumb resource, being available, not doing actual work
  * </pre>
  */
-@XStreamAlias("application")
 public final class ApplicationConfig implements ResourceConfig {
 	public static final String DAEMONS = "daemons";
 	// List of daemons

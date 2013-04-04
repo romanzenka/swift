@@ -16,6 +16,8 @@ public interface ConfigReader {
 
 	ResourceConfig getObject(String key);
 
+	ResourceConfig getObjectFromId(String id);
+
 	/**
 	 * Returns a list of the referenced configs given a particular key.
 	 */

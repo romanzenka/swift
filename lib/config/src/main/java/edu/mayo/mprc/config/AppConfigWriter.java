@@ -44,6 +44,9 @@ import java.util.regex.Pattern;
  * @author Roman Zenka
  */
 public final class AppConfigWriter implements Closeable {
+	public static final String RUNNER_WORKER_TYPE = "runner.workerType";
+	public static final String RUNNER_TYPE = "runner.type";
+	public static final String RUNNER_PREFIX = "runner.";
 	private PrintWriter writer;
 	private boolean inSection;
 	private String section;
@@ -84,7 +87,7 @@ public final class AppConfigWriter implements Closeable {
 		final List<Triplet> comments = Lists.newArrayList();
 		comments.add(new Triplet("Application configuration"));
 		comments.add(new Triplet("Supported types:"));
-		final List<Class> supportedConfigClasses = multiFactory.getSupportedConfigClasses();
+		final List<Class> supportedConfigClasses = new ArrayList<Class>(multiFactory.getConfigClasses().values());
 		Collections.sort(supportedConfigClasses, new Comparator<Class>() {
 			@Override
 			public int compare(final Class o1, final Class o2) {
@@ -309,7 +312,7 @@ public final class AppConfigWriter implements Closeable {
 		void saveStrategy(final ResourceConfig resourceConfig) {
 			final InnerConfigWriter innerWriter;
 			if (resourceConfig instanceof RunnerConfig) {
-				put("runner.type", multiFactory.getId(resourceConfig.getClass()), "Type of the runner (localRunner/sgeRunner)");
+				put(RUNNER_TYPE, multiFactory.getId(resourceConfig.getClass()), "Type of the runner (localRunner/sgeRunner)");
 				innerWriter = new RunnerConfigWriter(resourceConfig.getClass(), this);
 				resourceConfig.save(innerWriter);
 			} else if (resourceConfig instanceof ApplicationConfig) {
@@ -337,7 +340,7 @@ public final class AppConfigWriter implements Closeable {
 		public void put(final String key, final String value, final String comment) {
 			// Skip the worker value, we embed the worker directly
 			if (!RunnerConfig.WORKER.equals(key)) {
-				embedIntoWriter.put("runner." + key, value, comment);
+				embedIntoWriter.put(RUNNER_PREFIX + key, value, comment);
 			}
 		}
 
@@ -349,7 +352,7 @@ public final class AppConfigWriter implements Closeable {
 				writer.saveStrategy(resourceConfig);
 			} else {
 				// Worker data embed directly
-				embedIntoWriter.put("runner.workerType", multiFactory.getId(resourceConfig.getClass()), "Type of the worker");
+				embedIntoWriter.put(RUNNER_WORKER_TYPE, multiFactory.getId(resourceConfig.getClass()), "Type of the worker");
 				resourceConfig.save(embedIntoWriter);
 			}
 		}

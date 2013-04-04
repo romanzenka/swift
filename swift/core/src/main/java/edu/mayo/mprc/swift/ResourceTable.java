@@ -1,6 +1,8 @@
 package edu.mayo.mprc.swift;
 
+import com.google.common.base.Function;
 import com.google.common.base.Joiner;
+import com.google.common.collect.Iterables;
 import edu.mayo.mprc.MprcException;
 import edu.mayo.mprc.config.*;
 import edu.mayo.mprc.config.ui.ServiceUiFactory;
@@ -9,6 +11,7 @@ import edu.mayo.mprc.daemon.WorkerFactoryBase;
 import edu.mayo.mprc.utilities.exceptions.ExceptionUtilities;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import javax.annotation.Nullable;
 import javax.annotation.Resource;
 import java.util.*;
 
@@ -66,7 +69,7 @@ public final class ResourceTable extends FactoryBase<ResourceConfig, Object> imp
 		this.factoryDescriptors = factoryDescriptors;
 	}
 
-	private void addToTable(String type, String userName, Class<? extends ResourceConfig> configClass, ResourceFactory<? extends ResourceConfig, ?> factory, ServiceUiFactory uiFactory, String description, ResourceType resourceType) {
+	private void addToTable(final String type, final String userName, final Class<? extends ResourceConfig> configClass, final ResourceFactory<? extends ResourceConfig, ?> factory, final ServiceUiFactory uiFactory, final String description, final ResourceType resourceType) {
 		final ResourceInfo info = new ResourceInfo(type, userName, configClass, factory, resourceType, uiFactory, description);
 		table.put(type, info);
 		tableConfigClass.put(configClass, info);
@@ -116,8 +119,8 @@ public final class ResourceTable extends FactoryBase<ResourceConfig, Object> imp
 			return info.getFactory();
 		}
 
-		throw new MprcException("Unknown type " + configClass.getName() +
-				", supported types are " + Joiner.on(", ").join(getSupportedConfigClassNames()));
+		throw new MprcException("Unknown config class name " + configClass.getName() +
+				", supported classes are " + Joiner.on(", ").join(getSupportedConfigClassNames()));
 	}
 
 	@Override
@@ -127,24 +130,6 @@ public final class ResourceTable extends FactoryBase<ResourceConfig, Object> imp
 			return info.getId();
 		}
 		return null;
-	}
-
-	@Override
-	public List<String> getSupportedConfigClassNames() {
-		final List<String> names = new ArrayList<String>(getTable().size());
-		for (final ResourceInfo info : getTable().values()) {
-			names.add(info.getConfigClass().getName());
-		}
-		return names;
-	}
-
-	@Override
-	public List<Class> getSupportedConfigClasses() {
-		final List<Class> classes = new ArrayList<Class>(getTable().size());
-		for (final ResourceInfo info : getTable().values()) {
-			classes.add(info.getConfigClass());
-		}
-		return classes;
 	}
 
 	@Override
@@ -175,7 +160,16 @@ public final class ResourceTable extends FactoryBase<ResourceConfig, Object> imp
 
 	@Override
 	public String getUserName(final String type) {
-		return getTable().get(type).getUserName();
+		return getResourceInfo(type).getUserName();
+	}
+
+	private ResourceInfo getResourceInfo(String type) {
+		final ResourceInfo info = getTable().get(type);
+		if (info == null) {
+			throw new MprcException("Unknown config type " + type +
+					", supported types are " + Joiner.on(", ").join(getTable().keySet()));
+		}
+		return info;
 	}
 
 	/**
@@ -197,7 +191,7 @@ public final class ResourceTable extends FactoryBase<ResourceConfig, Object> imp
 
 	@Override
 	public Object getResourceType(final String id) {
-		return getTable().get(id).getResourceType();
+		return getResourceInfo(id).getResourceType();
 	}
 
 	public ResourceType getResourceTypeAsType(final String id) {
@@ -211,16 +205,20 @@ public final class ResourceTable extends FactoryBase<ResourceConfig, Object> imp
 
 	@Override
 	public Class<? extends ResourceConfig> getConfigClass(final String type) {
-		return getTable().get(type).getConfigClass();
+		return getResourceInfo(type).getConfigClass();
 	}
 
 	public ServiceUiFactory
 	getUiFactory(final String type) {
-		return getTable().get(type).getUiFactory();
+		return getResourceInfo(type).getUiFactory();
 	}
 
 	public String getDescription(final String type) {
-		return getTable().get(type).getDescription();
+		return getResourceInfo(type).getDescription();
+	}
+
+	public Iterable<String> getSupportedConfigClassNames() {
+		return Iterables.transform(getConfigClasses().values(), new ClassNameFunction());
 	}
 
 	private static final class ResourceInfo {
@@ -275,5 +273,12 @@ public final class ResourceTable extends FactoryBase<ResourceConfig, Object> imp
 		Resource,
 		Worker,
 		Runner
+	}
+
+	private static class ClassNameFunction implements Function<Class<? extends ResourceConfig>, String> {
+		@Override
+		public String apply(@Nullable final Class<? extends ResourceConfig> from) {
+			return from.getName();
+		}
 	}
 }

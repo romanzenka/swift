@@ -3,9 +3,6 @@ package edu.mayo.mprc.config;
 import com.google.common.collect.ImmutableMap;
 import edu.mayo.mprc.MprcException;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -53,23 +50,6 @@ class TestMultiFactory implements MultiFactory {
 	}
 
 	@Override
-	public List<String> getSupportedConfigClassNames() {
-		return Arrays.asList("testResource", "testResource2", "service", "runner", "application", "daemon");
-	}
-
-	@Override
-	public List<Class> getSupportedConfigClasses() {
-		final ArrayList<Class> list = new ArrayList<Class>();
-		list.add(TestResource.class);
-		list.add(TestResource2.class);
-		list.add(ServiceConfig.class);
-		list.add(RunnerConfig.class);
-		list.add(DaemonConfig.class);
-		list.add(ApplicationConfig.class);
-		return list;
-	}
-
-	@Override
 	public String getUserName(String type) {
 		return type.toUpperCase();
 	}
@@ -91,7 +71,7 @@ class TestMultiFactory implements MultiFactory {
 
 	@Override
 	public Class<? extends ResourceConfig> getConfigClass(String type) {
-		return null;  //To change body of implemented methods use File | Settings | File Templates.
+		return getConfigClasses().get(type);
 	}
 
 	@Override

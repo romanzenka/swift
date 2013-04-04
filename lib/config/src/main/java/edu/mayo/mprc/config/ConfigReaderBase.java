@@ -24,12 +24,17 @@ public abstract class ConfigReaderBase implements ConfigReader {
 	}
 
 	@Override
+	public ResourceConfig getObject(final String key) {
+		return getObjectFromId(get(key));
+	}
+
+	@Override
 	public List<? extends ResourceConfig> getResourceList(final String key) {
 		final String resources = get(key);
 		final Iterable<String> split = Splitter.on(",").trimResults().omitEmptyStrings().split(resources);
 		final ArrayList<ResourceConfig> configs = new ArrayList<ResourceConfig>();
 		for (final String item : split) {
-			configs.add(getObject(item));
+			configs.add(getObjectFromId(item));
 		}
 		return configs;
 	}

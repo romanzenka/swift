@@ -1,8 +1,5 @@
 package edu.mayo.mprc.config;
 
-import com.thoughtworks.xstream.annotations.XStreamAlias;
-import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
-
 /**
  * The service manager allows the application to send a service a work packet. The service does the work
  * and responds.
@@ -12,11 +9,10 @@ import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
  */
 public final class ServiceConfig implements ResourceConfig, NamedResource {
 	public static final String RUNNER = "runner";
-	@XStreamAlias("name")
-	@XStreamAsAttribute
+	public static final String NAME = "name";
+
 	private String name;
 
-	@XStreamAlias(RUNNER)
 	private RunnerConfig runner;
 
 	public ServiceConfig() {
@@ -45,13 +41,13 @@ public final class ServiceConfig implements ResourceConfig, NamedResource {
 
 	@Override
 	public void save(final ConfigWriter writer) {
-		writer.put("name", getName());
+		writer.put(NAME, getName());
 		writer.put(RUNNER, writer.save(runner));
 	}
 
 	@Override
 	public void load(final ConfigReader reader) {
-		setName(reader.get("name"));
+		setName(reader.get(NAME));
 		setRunner((RunnerConfig) reader.getObject(RUNNER));
 	}
 

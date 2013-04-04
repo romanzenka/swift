@@ -4,6 +4,9 @@ package edu.mayo.mprc.config;
  * @author Roman Zenka
  */
 public final class TestRunnerConfig extends RunnerConfig {
+	public TestRunnerConfig() {
+	}
+
 	public TestRunnerConfig(ResourceConfig workerConfiguration) {
 		super(workerConfiguration);
 	}

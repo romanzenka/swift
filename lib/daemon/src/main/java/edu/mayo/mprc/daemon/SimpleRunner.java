@@ -1,6 +1,5 @@
 package edu.mayo.mprc.daemon;
 
-import com.thoughtworks.xstream.annotations.XStreamAlias;
 import edu.mayo.mprc.config.*;
 import edu.mayo.mprc.config.ui.ServiceUiFactory;
 import edu.mayo.mprc.daemon.exception.DaemonException;
@@ -137,7 +136,6 @@ public final class SimpleRunner extends AbstractRunner {
 		}
 	}
 
-	@XStreamAlias("simpleDaemonRunner")
 	public static final class Config extends RunnerConfig {
 		private int numThreads = 1;
 		private String logOutputFolder = ".";

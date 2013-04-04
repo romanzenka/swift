@@ -1,10 +1,5 @@
 package edu.mayo.mprc.config;
 
-import com.google.common.base.Splitter;
-import com.thoughtworks.xstream.annotations.XStreamAlias;
-import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
-import com.thoughtworks.xstream.annotations.XStreamOmitField;
-
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
@@ -15,7 +10,6 @@ import java.util.Locale;
 /**
  * A daemon is simply a running java VM which exposes one or more services.
  */
-@XStreamAlias("daemon")
 public final class DaemonConfig implements ResourceConfig, NamedResource {
 	public static final String WINE_CMD = "wine";
 	public static final String WINECONSOLE_CMD = "wineconsole";
@@ -32,50 +26,38 @@ public final class DaemonConfig implements ResourceConfig, NamedResource {
 	public static final String SERVICES = "services";
 	public static final String RESOURCES = "resources";
 
-	@XStreamAlias(NAME)
-	@XStreamAsAttribute
 	private String name;
 
-	@XStreamAlias(HOST_NAME)
 	private String hostName;
 
-	@XStreamAlias(OS_NAME)
 	private String osName;
 
-	@XStreamAlias(OS_ARCH)
 	private String osArch;
 
-	@XStreamAlias(SHARED_FILE_SPACE_PATH)
 	private String sharedFileSpacePath;
 
-	@XStreamAlias(TEMP_FOLDER_PATH)
 	private String tempFolderPath;
 
 	/**
 	 * When enabled, the daemon would dump a file on every error. This dump contains
 	 * the work packet + information about the environment and machine where the error occurred +
 	 */
-	@XStreamAlias(DUMP_ERRORS)
 	private boolean dumpErrors;
 
 	/**
 	 * Where should the daemon dump files when an error occurs. If not set, the tempFolderPath is used.
 	 */
-	@XStreamAlias(DUMP_FOLDER_PATH)
 	private String dumpFolderPath;
 
 	// Services this daemon provides
-	@XStreamAlias("services")
 	private List<ServiceConfig> services = new ArrayList<ServiceConfig>();
 
 	// Resources this daemon defines locally
-	@XStreamAlias("resources")
 	private List<ResourceConfig> resources = new ArrayList<ResourceConfig>();
 
 	/**
 	 * This is not being serialized - recreated on the fly when {@link ApplicationConfig} is loaded.
 	 */
-	@XStreamOmitField()
 	private ApplicationConfig applicationConfig;
 
 	public DaemonConfig() {
@@ -287,20 +269,18 @@ public final class DaemonConfig implements ResourceConfig, NamedResource {
 		dumpFolderPath = reader.get(DUMP_FOLDER_PATH);
 
 		{
-			final String servicesString = reader.get(SERVICES);
-			final Iterable<String> servicesList = Splitter.on(",").trimResults().omitEmptyStrings().split(servicesString);
+			final List<? extends ResourceConfig> servicesList = reader.getResourceList(SERVICES);
 			services.clear();
-			for (final String service : servicesList) {
-				services.add((ServiceConfig) reader.getObject(service));
+			for (final ResourceConfig service : servicesList) {
+				services.add((ServiceConfig) service);
 			}
 		}
 
 		{
-			final String resourcesString = reader.get(RESOURCES);
-			final Iterable<String> resourcesList = Splitter.on(",").trimResults().omitEmptyStrings().split(resourcesString);
+			final List<? extends ResourceConfig> resourcesList = reader.getResourceList(RESOURCES);
 			resources.clear();
-			for (final String resource : resourcesList) {
-				resources.add(reader.getObject(resource));
+			for (final ResourceConfig resource : resourcesList) {
+				resources.add(resource);
 			}
 		}
 	}

@@ -2,7 +2,6 @@ package edu.mayo.mprc.sge;
 
 
 import com.thoughtworks.xstream.XStream;
-import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.io.xml.DomDriver;
 import edu.mayo.mprc.config.*;
 import edu.mayo.mprc.config.ui.ServiceUiFactory;
@@ -420,7 +419,6 @@ public final class GridRunner extends AbstractRunner {
 		this.fileTokenFactory = fileTokenFactory;
 	}
 
-	@XStreamAlias("gridDaemonRunner")
 	public static final class Config extends RunnerConfig {
 		private String queueName;
 		private String memoryRequirement;
