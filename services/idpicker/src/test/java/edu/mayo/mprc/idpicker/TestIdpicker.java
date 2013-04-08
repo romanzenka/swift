@@ -29,54 +29,59 @@ public final class TestIdpicker {
 
 	@BeforeClass
 	public void startup() {
+		if (FileUtilities.isLinuxPlatform() || FileUtilities.isWindowsPlatform()) {
+			final String path = System.getenv("edu.mayo.mprc.swift.idpicker.path");
+			if (path == null) {
+				throw new MprcException("Skipping IdpQonvert tests");
+			}
+			idpQonvert = new File(path).getAbsoluteFile();
+			if (!idpQonvert.isFile() || !idpQonvert.canExecute()) {
+				throw new MprcException("Cannot execute idpqonvert: [" + idpQonvert.getAbsolutePath() + "]");
+			}
 
-		final String path = System.getenv("edu.mayo.mprc.swift.idpicker.path");
-		if (path == null) {
-			throw new MprcException("Skipping IdpQonvert tests");
-		}
-		idpQonvert = new File(path).getAbsoluteFile();
-		if (!idpQonvert.isFile() || !idpQonvert.canExecute()) {
-			throw new MprcException("Cannot execute idpqonvert: [" + idpQonvert.getAbsolutePath() + "]");
-		}
-
-		tmpFolder = FileUtilities.createTempFolder();
-		final File pepXmlFolder = Installer.pepXmlFiles(tmpFolder, Installer.Action.INSTALL);
-		final File fastaFolder = Installer.yeastFastaFiles(tmpFolder, Installer.Action.INSTALL);
-		pepXmlFile = new File(pepXmlFolder, "test.pepXML");
-		fastaFile = new File(fastaFolder, "SprotYeast.fasta");
-		if(!pepXmlFile.isFile()) {
-			throw new MprcException("Failed to create test pepXML file");
+			tmpFolder = FileUtilities.createTempFolder();
+			final File pepXmlFolder = Installer.pepXmlFiles(tmpFolder, Installer.Action.INSTALL);
+			final File fastaFolder = Installer.yeastFastaFiles(tmpFolder, Installer.Action.INSTALL);
+			pepXmlFile = new File(pepXmlFolder, "test.pepXML");
+			fastaFile = new File(fastaFolder, "SprotYeast.fasta");
+			if (!pepXmlFile.isFile()) {
+				throw new MprcException("Failed to create test pepXML file");
+			}
 		}
 	}
 
 	@AfterClass
 	public void teardown() {
-		FileUtilities.cleanupTempFile(tmpFolder);
-		Installer.pepXmlFiles(tmpFolder, Installer.Action.UNINSTALL);
-		Installer.yeastFastaFiles(tmpFolder, Installer.Action.UNINSTALL);
+		if (FileUtilities.isLinuxPlatform() || FileUtilities.isWindowsPlatform()) {
+			FileUtilities.cleanupTempFile(tmpFolder);
+			Installer.pepXmlFiles(tmpFolder, Installer.Action.UNINSTALL);
+			Installer.yeastFastaFiles(tmpFolder, Installer.Action.UNINSTALL);
+		}
 	}
 
 	@Test
 	public void shouldRun() {
-		IdpickerWorker.Config config = new IdpickerWorker.Config();
-		config.setIdpQonvertExecutable(idpQonvert.getAbsolutePath());
+		if (FileUtilities.isLinuxPlatform() || FileUtilities.isWindowsPlatform()) {
+			IdpickerWorker.Config config = new IdpickerWorker.Config();
+			config.setIdpQonvertExecutable(idpQonvert.getAbsolutePath());
 
-		IdpickerWorker.Factory factory = new IdpickerWorker.Factory();
-		factory.setConfig(config);
-		final IdpickerWorker worker = (IdpickerWorker) factory.createWorker();
+			IdpickerWorker.Factory factory = new IdpickerWorker.Factory();
+			factory.setConfig(config);
+			final IdpickerWorker worker = (IdpickerWorker) factory.createWorker();
 
-		final File outputFile = tempFile("out.idp");
-		final File inputFile = pepXmlFile;
-		final IdpQonvertSettings params = new IdpQonvertSettings();
-		params.setDecoyPrefix("REVERSE_");
+			final File outputFile = tempFile("out.idp");
+			final File inputFile = pepXmlFile;
+			final IdpQonvertSettings params = new IdpQonvertSettings();
+			params.setDecoyPrefix("REVERSE_");
 
-		final IdpickerWorkPacket workPacket = new IdpickerWorkPacket(outputFile, params, inputFile, fastaFile, "idp-test", true);
-		worker.process(workPacket, new UserProgressReporter() {
-			@Override
-			public void reportProgress(final ProgressInfo progressInfo) {
-				LOGGER.debug(progressInfo.toString());
-			}
-		});
+			final IdpickerWorkPacket workPacket = new IdpickerWorkPacket(outputFile, params, inputFile, fastaFile, "idp-test", true);
+			worker.process(workPacket, new UserProgressReporter() {
+				@Override
+				public void reportProgress(final ProgressInfo progressInfo) {
+					LOGGER.debug(progressInfo.toString());
+				}
+			});
+		}
 	}
 
 	private File tempFile(final String fileName) {
