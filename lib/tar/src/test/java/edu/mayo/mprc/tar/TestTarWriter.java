@@ -38,7 +38,7 @@ public final class TestTarWriter {
 	 */
 	@Test(enabled = true)
 	public void testWritetoTarFile() {
-		if (FileUtilities.isWindowsPlatform()) {
+		if (FileUtilities.isWindowsPlatform() || FileUtilities.isMacPlatform()) {
 			return;
 		}
 
@@ -102,7 +102,7 @@ public final class TestTarWriter {
 	 */
 	@Test(enabled = true)
 	public void testWritetoTarFileTwice() throws IOException {
-		if (FileUtilities.isWindowsPlatform()) {
+		if (FileUtilities.isWindowsPlatform() || FileUtilities.isMacPlatform()) {
 			return;
 		}
 
@@ -141,7 +141,7 @@ public final class TestTarWriter {
 	 */
 	@Test(enabled = true)
 	public void testWritetoTarAll() throws IOException {
-		if (FileUtilities.isWindowsPlatform()) {
+		if (FileUtilities.isWindowsPlatform() || FileUtilities.isMacPlatform()) {
 			return;
 		}
 		String tempFolder = null;
@@ -178,7 +178,7 @@ public final class TestTarWriter {
 
 	@Test(enabled = true)
 	public void testWriteToTarFileWithRollover() throws IOException {
-		if (FileUtilities.isWindowsPlatform()) {
+		if (FileUtilities.isWindowsPlatform() || FileUtilities.isMacPlatform()) {
 			return;
 		}
 		String tempFolder = null;
