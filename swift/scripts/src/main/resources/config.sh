@@ -8,4 +8,4 @@ SCRIPT=`readlink -f $0`
 # Absolute path to directory this script is in
 SCRIPTPATH=`dirname $SCRIPT`
 
-java  -Dswift.home="${SCRIPTPATH}" -Dswift.daemon=config -cp "bin/swift/*" edu.mayo.mprc.launcher.Launcher --config --war ./bin/swift/swift-${VER}.war  $*
+java  -Dswift.home="${SCRIPTPATH}" -Dswift.daemon=config -cp "bin/swift/*" edu.mayo.mprc.launcher.Launcher --config --war ./bin/swift/swift-web-${VER}.war  $*
