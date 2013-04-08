@@ -122,9 +122,13 @@ public class ConfigurationData {
 	 * @param local If the daemon is to run on the local machine.
 	 */
 	private DaemonModel createDaemon(final String name, final boolean local) {
+		return mapDaemonConfigToModel(createDaemonConfig(name, local));
+	}
+
+	private DaemonConfig createDaemonConfig(String name, boolean local) {
 		final DaemonConfig daemon = DaemonConfig.getDefaultDaemonConfig(name, local);
 		getConfig().addDaemon(daemon);
-		return mapDaemonConfigToModel(daemon);
+		return daemon;
 	}
 
 	/**
@@ -132,36 +136,58 @@ public class ConfigurationData {
 	 */
 	private ResourceModel createResource(final String index, final String type, final DaemonConfig parent) throws GWTServiceException {
 		try {
-			final ResourceTable moduleConfigTable = getResourceTable();
+			final ResourceConfig resultConfig = createResourceConfig(index, type, parent);
 
-			final ResourceConfig resourceConfig = getDefaultResourceConfig(type, parent, moduleConfigTable);
-
-			final ResourceTable.ResourceType resourceType = moduleConfigTable.getResourceTypeAsType(type);
-			if (resourceType == ResourceTable.ResourceType.Worker) {
-				// A service needs a runner
-				final ServiceConfig serviceConfig = new ServiceConfig();
-
-				if (!(resourceConfig instanceof ResourceConfig)) {
-					ExceptionUtilities.throwCastException(resourceConfig, ResourceConfig.class);
-					return null;
-				}
-				serviceConfig.setRunner(new SimpleRunner.Config(resourceConfig));
-				serviceConfig.setName(type + '_' + index); // The name is type_index
-
-				parent.addService(serviceConfig);
-				final ModuleModel moduleModel = mapServiceConfigToModel(index, parent, serviceConfig);
-				return moduleModel;
-			} else if (resourceType == ResourceTable.ResourceType.Resource) {
-				// A resource is more simple
-				parent.addResource(resourceConfig);
-				final ResourceModel resourceModel = mapResourceConfigToModel(parent, resourceConfig);
-				return resourceModel;
-			} else {
-				throw GWTServiceExceptionFactory.createException("Cannot create child of type " + resourceType, null);
+			if (resultConfig == null) {
+				return null;
 			}
+
+			if (resultConfig instanceof ServiceConfig) {
+				final ModuleModel moduleModel = mapServiceConfigToModel(index, parent, (ServiceConfig) resultConfig);
+				return moduleModel;
+			} else {
+				final ResourceModel resourceModel = mapResourceConfigToModel(parent, resultConfig);
+				return resourceModel;
+			}
+
 		} catch (Exception e) {
 			throw GWTServiceExceptionFactory.createException("Cannot create configuration element of type " + type + " as a child of " + parent.getName(), e);
 		}
+	}
+
+	private ResourceConfig createResourceConfig(String index, String type, DaemonConfig parent) throws GWTServiceException {
+		final ResourceTable moduleConfigTable = getResourceTable();
+
+		final ResourceConfig resourceConfig = getDefaultResourceConfig(type, parent, moduleConfigTable);
+		final ResourceConfig resultConfig;
+
+		final ResourceTable.ResourceType resourceType = moduleConfigTable.getResourceTypeAsType(type);
+		if (resourceType == ResourceTable.ResourceType.Worker) {
+			final ServiceConfig serviceConfig = createServiceConfig(index, type, parent, resourceConfig);
+			resultConfig = serviceConfig;
+		} else if (resourceType == ResourceTable.ResourceType.Resource) {
+			// A resource is more simple
+			parent.addResource(resourceConfig);
+			resultConfig = resourceConfig;
+		} else {
+			throw GWTServiceExceptionFactory.createException("Cannot create child of type " + resourceType, null);
+		}
+		return resultConfig;
+	}
+
+	private ServiceConfig createServiceConfig(String index, String type, DaemonConfig parent, ResourceConfig resourceConfig) {
+		// A service needs a runner
+		final ServiceConfig serviceConfig = new ServiceConfig();
+
+		if (!(resourceConfig instanceof ResourceConfig)) {
+			ExceptionUtilities.throwCastException(resourceConfig, ResourceConfig.class);
+			return null;
+		}
+		serviceConfig.setRunner(new SimpleRunner.Config(resourceConfig));
+		serviceConfig.setName(type + '_' + index); // The name is type_index
+
+		parent.addResource(serviceConfig);
+		return serviceConfig;
 	}
 
 	/**
@@ -213,7 +239,7 @@ public class ConfigurationData {
 	 * @param model  The model of the configuration being sent to the client.
 	 */
 	public void bindConfigToModel(final ResourceConfig config, final ResourceModel model) {
-		resolver.addDependency(config, model);
+		resolver.setDependency(config, model);
 		model.setId(resolver.getIdFromConfig(config));
 	}
 
@@ -295,7 +321,7 @@ public class ConfigurationData {
 	private ModuleModel mapServiceConfigToModel(final String index, final DaemonConfig daemon, final ServiceConfig service) {
 		final ResourceModel serviceModel = new ResourceModel(service.getName(), DaemonConnectionFactory.SERVICE);
 
-		resolver.addDependency(service, serviceModel);
+		resolver.setDependency(service, serviceModel);
 		serviceModel.setId(resolver.getIdFromConfig(service));
 
 		final RunnerConfig runner = service.getRunner();
@@ -350,7 +376,7 @@ public class ConfigurationData {
 			throw new MprcException("Not supported runner config: " + runner.getClass().getName());
 		}
 
-		runnerModel.setProperties(new HashMap<String, String>(MapConfigWriter.save(runner, null)));
+		runnerModel.setProperties(new HashMap<String, String>(MapConfigWriter.save(runner, resolver)));
 		return runnerModel;
 	}
 
@@ -359,29 +385,21 @@ public class ConfigurationData {
 	 * Produce a default daemon model to present to the user if configuration is missing.
 	 * Since we are calling the service methods that need a counterpart running on the UI side,
 	 * we are responsible for properly adding the daemon and resources as children.
-	 *
-	 * @return Default swift model.
 	 */
 	public void loadDefaultConfig() throws GWTServiceException {
 		final ApplicationConfig config = new ApplicationConfig();
+		final DaemonConfig daemonConfig = createDaemonConfig("main", true);
+		config.addDaemon(daemonConfig);
+
+		final DatabaseFactory.Config database = (DatabaseFactory.Config) createResourceConfig("1", DatabaseFactory.TYPE, daemonConfig);
+		createResourceConfig("1", MessageBroker.TYPE, daemonConfig);
+		final ServiceConfig searcher = (ServiceConfig)createResourceConfig("1", SwiftSearcher.TYPE, daemonConfig);
+		final WebUi.Config webUi = (WebUi.Config)createResourceConfig("1", WebUi.TYPE, daemonConfig);
+
+		webUi.setSearcher(searcher);
+		((SwiftSearcher.Config) searcher.getRunner().getWorkerConfiguration()).setDatabase(database);
+
 		setConfig(config);
-
-		final DaemonModel daemonModel = createDaemon("main", true);
-		getModel().addDaemon(daemonModel);
-
-		final DaemonConfig daemon = (DaemonConfig) getResourceConfig(daemonModel.getId());
-
-		final ResourceModel database = createResource("1", DatabaseFactory.TYPE, daemon);
-		daemonModel.addChild(database);
-
-		final ResourceModel messageBroker = createResource("1", MessageBroker.TYPE, daemon);
-		daemonModel.addChild(messageBroker);
-
-		final ResourceModel swiftSearcher = createResource("1", SwiftSearcher.TYPE, daemon);
-		daemonModel.addChild(swiftSearcher);
-
-		final ResourceModel webUi = createResource("1", WebUi.TYPE, daemon);
-		daemonModel.addChild(webUi);
 	}
 
 	/**

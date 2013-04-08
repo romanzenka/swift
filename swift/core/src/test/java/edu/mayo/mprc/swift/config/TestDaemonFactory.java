@@ -106,9 +106,9 @@ public final class TestDaemonFactory {
 		final SimpleRunner.Config mascotCacheRunner = new SimpleRunner.Config();
 		mascotCacheRunner.setWorkerConfiguration(mascotCache);
 		final ServiceConfig mascotCacheService = new ServiceConfig("mascotCache", mascotCacheRunner);
-		daemon1.addService(mascotCacheService);
-		daemon1.addService(mascotService);
-		daemon2.addService(mascotService);
+		daemon1.addResource(mascotCacheService);
+		daemon1.addResource(mascotService);
+		daemon2.addResource(mascotService);
 
 		final String result = configToString(config);
 
@@ -129,126 +129,126 @@ public final class TestDaemonFactory {
 		runner.setNumThreads(1);
 		runner.setWorkerConfiguration(new MascotWorker.Config("http://localhost/mascot/"));  //Set up just to work on Carl (Windows server)
 		final ServiceConfig mascot = new ServiceConfig("mascot", runner);
-		main.addService(mascot);
+		main.addResource(mascot);
 
 		final SimpleRunner.Config runner8 = new SimpleRunner.Config();
 		runner8.setNumThreads(1);
 		runner8.setWorkerConfiguration(new MascotDeploymentService.Config("engineRootFolder", "mascotDbMaintenanceUrl", DATABASE_DEPLOYMENT_DIR));
 		final ServiceConfig mascotDeployer = new ServiceConfig("mascotDeployer", runner8);
-		main.addService(mascotDeployer);
+		main.addResource(mascotDeployer);
 
 		final SimpleRunner.Config runner2 = new SimpleRunner.Config();
 		runner2.setNumThreads(2);
 		runner2.setWorkerConfiguration(new OmssaWorker.Config("omssacl"));
 		final ServiceConfig omssa = new ServiceConfig("omssa", runner2);
-		main.addService(omssa);
+		main.addResource(omssa);
 
 		final SimpleRunner.Config runner9 = new SimpleRunner.Config();
 		runner9.setNumThreads(2);
 		runner9.setWorkerConfiguration(new OmssaDeploymentService.Config("formatDbExe", DATABASE_DEPLOYMENT_DIR + "deployableDbFolder"));
 		final ServiceConfig omssaDeployer = new ServiceConfig("omssaDeployer", runner9);
-		main.addService(omssaDeployer);
+		main.addResource(omssaDeployer);
 
 		final SimpleRunner.Config runner22 = new SimpleRunner.Config();
 		runner22.setNumThreads(2);
 		runner22.setWorkerConfiguration(new SequestWorker.Config("sequestCommand", "pvmHosts"));
 		final ServiceConfig sequest = new ServiceConfig("sequest", runner22);
-		main.addService(sequest);
+		main.addResource(sequest);
 
 		final SimpleRunner.Config runner33 = new SimpleRunner.Config();
 		runner33.setNumThreads(2);
 		runner33.setWorkerConfiguration(new SequestDeploymentService.Config("deployableDbFolder", "engineRootFolder", "wineWrapperScript"));
 		final ServiceConfig sequestDeployer = new ServiceConfig("sequestDeployer", runner33);
-		main.addService(sequestDeployer);
+		main.addResource(sequestDeployer);
 
 		final SimpleRunner.Config runner338 = new SimpleRunner.Config();
 		runner338.setNumThreads(2);
 		runner338.setWorkerConfiguration(new XTandemWorker.Config("tandemExecutable"));
 		final ServiceConfig tandem = new ServiceConfig("tandem", runner338);
-		main.addService(tandem);
+		main.addResource(tandem);
 
 		final SimpleRunner.Config runner331 = new SimpleRunner.Config();
 		runner331.setNumThreads(2);
 		runner331.setWorkerConfiguration(new XTandemDeploymentService.Config());
 		final ServiceConfig tandemDeployer = new ServiceConfig("tandemDeployer", runner331);
-		main.addService(tandemDeployer);
+		main.addResource(tandemDeployer);
 
 		final SimpleRunner.Config runner3 = new SimpleRunner.Config();
 		runner3.setNumThreads(2);
 		runner3.setWorkerConfiguration(new ScaffoldWorker.Config("dir", "javavm", "memory"));
 		final ServiceConfig scaffold = new ServiceConfig("scaffold", runner3);
-		main.addService(scaffold);
+		main.addResource(scaffold);
 
 		final SimpleRunner.Config runner34 = new SimpleRunner.Config();
 		runner34.setNumThreads(2);
 		runner34.setWorkerConfiguration(new ScaffoldReportWorker.Config());
 		final ServiceConfig scaffoldReport = new ServiceConfig("scaffoldReport", runner34);
-		main.addService(scaffoldReport);
+		main.addResource(scaffoldReport);
 
 		final SimpleRunner.Config runner35 = new SimpleRunner.Config();
 		runner35.setNumThreads(3);
 		runner35.setWorkerConfiguration(new QaWorker.Config("xvfbWrapperScript", "rScript"));
 		final ServiceConfig qa = new ServiceConfig("qa", runner35);
-		main.addService(qa);
+		main.addResource(qa);
 
 		final SimpleRunner.Config runner11 = new SimpleRunner.Config();
 		runner11.setNumThreads(1);
 		runner11.setWorkerConfiguration(new ScaffoldDeploymentService.Config("scaffoldJavaVmPath", "deployableDbFolder", "engineRootFolder"));
 		final ServiceConfig scaffoldDeployer = new ServiceConfig("scaffoldDeployer", runner11);
-		main.addService(scaffoldDeployer);
+		main.addResource(scaffoldDeployer);
 
 		final SimpleRunner.Config runner4 = new SimpleRunner.Config();
 		runner4.setNumThreads(2);
 		runner4.setWorkerConfiguration(new MSMSEvalWorker.Config("msmsEval", "test,test.txt"));
 		final ServiceConfig msmsEval = new ServiceConfig("msmsEval", runner4);
-		main.addService(msmsEval);
+		main.addResource(msmsEval);
 
 		final SimpleRunner.Config runner5 = new SimpleRunner.Config();
 		runner5.setNumThreads(2);
 		final RawToMgfWorker.Config raw2mgfConfig = new RawToMgfWorker.Config("tempFolder", "wineconsole", "../install/swift/bin/util/unixXvfbWrapper.sh", SWIFT_INSTALL_ROOT_PATH + "/install/swift/bin/extract_msn/extract_msn.exe");
 		runner5.setWorkerConfiguration(raw2mgfConfig);
 		final ServiceConfig raw2mgf = new ServiceConfig("raw2mgf", runner5);
-		main.addService(raw2mgf);
+		main.addResource(raw2mgf);
 
 		final SimpleRunner.Config runner6 = new SimpleRunner.Config();
 		runner6.setNumThreads(3);
 		final MsconvertWorker.Config msconvertConfig = new MsconvertWorker.Config("run_msconvert.sh", "run_msaccess.sh");
 		runner6.setWorkerConfiguration(msconvertConfig);
 		final ServiceConfig msconvert = new ServiceConfig("msconvert", runner6);
-		main.addService(msconvert);
+		main.addResource(msconvert);
 
 		final SimpleRunner.Config runner72 = new SimpleRunner.Config();
 		runner72.setNumThreads(2);
 		runner72.setWorkerConfiguration(new MockMascotDeploymentService.Config());
 		final ServiceConfig mockMascotDeployer = new ServiceConfig("mockMascotDeployer", runner72);
-		main.addService(mockMascotDeployer);
+		main.addResource(mockMascotDeployer);
 
 		final SimpleRunner.Config runner74 = new SimpleRunner.Config();
 		runner74.setNumThreads(2);
 		runner74.setWorkerConfiguration(new QstatDaemonWorker.Config());
 		final ServiceConfig qstat = new ServiceConfig("qstat", runner74);
-		main.addService(qstat);
+		main.addResource(qstat);
 
 		final MgfToMgfWorker.Config mgfToMgfConfig = new MgfToMgfWorker.Config();
 		final SimpleRunner.Config runner75 = new SimpleRunner.Config();
 		runner75.setNumThreads(3);
 		runner75.setWorkerConfiguration(mgfToMgfConfig);
 		final ServiceConfig mgfToMgf = new ServiceConfig("mgfToMgf", runner75);
-		main.addService(mgfToMgf);
+		main.addResource(mgfToMgf);
 
 		final RAWDumpWorker.Config rawDumpWorker = new RAWDumpWorker.Config();
 		final SimpleRunner.Config runner79 = new SimpleRunner.Config();
 		runner79.setNumThreads(3);
 		runner79.setWorkerConfiguration(rawDumpWorker);
 		final ServiceConfig rawDump = new ServiceConfig("rawDump", runner79);
-		main.addService(rawDump);
+		main.addResource(rawDump);
 
 		final SimpleRunner.Config runner88 = new SimpleRunner.Config();
 		runner88.setNumThreads(1);
 		runner88.setWorkerConfiguration(new DatabaseUndeployerWorker.Config(scaffoldDeployer, null, omssaDeployer
 				, sequestDeployer, tandemDeployer, mascotDeployer));
 		final ServiceConfig databasUndeployer = new ServiceConfig("databaseUndeployer", runner88);
-		main.addService(databasUndeployer);
+		main.addResource(databasUndeployer);
 
 		Collection<SearchEngine.Config> engineConfigs = Lists.newArrayList(
 				new SearchEngine.Config("MASCOT", "2.4", mascot, mascotDeployer),
@@ -266,7 +266,7 @@ public final class TestDaemonFactory {
 		runner76.setWorkerConfiguration(searcherConfig);
 
 		final ServiceConfig searcher = new ServiceConfig("searcher", runner76);
-		main.addService(searcher);
+		main.addResource(searcher);
 
 		final WebUi.Config webUi = new WebUi.Config(searcher, "8080", "Swift 2.5", "C:\\", "file:///C:/", qstat, databasUndeployer, "C:\\");
 		main.addResource(webUi);

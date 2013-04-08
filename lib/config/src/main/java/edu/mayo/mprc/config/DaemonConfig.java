@@ -1,5 +1,7 @@
 package edu.mayo.mprc.config;
 
+import edu.mayo.mprc.MprcException;
+
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
@@ -163,25 +165,29 @@ public final class DaemonConfig implements ResourceConfig, NamedResource {
 		return services;
 	}
 
-	public DaemonConfig addService(final ServiceConfig service) {
-		services.add(service);
-		return this;
-	}
-
-	public boolean removeService(final ServiceConfig service) {
-		return services.remove(service);
-	}
-
 	public List<ResourceConfig> getResources() {
 		return resources;
 	}
 
 	public DaemonConfig addResource(final ResourceConfig resource) {
-		resources.add(resource);
+		if (resource instanceof ServiceConfig) {
+			if (services.contains(resource)) {
+				throw new MprcException("Daemon " + getName() + " already contains service " + ((ServiceConfig) resource).getName());
+			}
+			services.add((ServiceConfig) resource);
+		} else {
+			if (resources.contains(resource)) {
+				throw new MprcException("Daemon " + getName() + " already contains resource " + resource.toString());
+			}
+			resources.add(resource);
+		}
 		return this;
 	}
 
 	public boolean removeResource(final ResourceConfig resource) {
+		if (resource instanceof ServiceConfig) {
+			return services.remove(resource);
+		}
 		return resources.remove(resource);
 	}
 

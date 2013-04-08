@@ -80,7 +80,7 @@ public final class TestApplicationContext {
 				fastaFolder, fastaArchiveFolder, fastaUploadFolder,
 				null, null, null, null, null, null, null, null, null, null, databaseConfig);
 
-		daemonConfig.addService(new ServiceConfig("searcher1", new SimpleRunner.Config(searcherConfig)));
+		daemonConfig.addResource(new ServiceConfig("searcher1", new SimpleRunner.Config(searcherConfig)));
 
 		validator.setDaemonConfig(daemonConfig);
 		validator.setSearcherConfig(searcherConfig);

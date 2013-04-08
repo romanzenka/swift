@@ -44,7 +44,7 @@ public final class ConfigurationDataTest {
 
 		Assert.assertEquals(daemon.getChildren().size(), 4, "Daemon has Swift, Database, WebUI and Messenger modules by default");
 
-		final ResourceModel swiftModule = daemon.getChildren().get(2);
+		final ResourceModel swiftModule = daemon.getChildren().get(0);
 		Assert.assertEquals(swiftModule.getProperty("fastaPath"), "var/fasta", "The default value has to be set");
 
 		final ResourceConfig databaseConfig = getMainDaemon().getResources().get(0);
@@ -60,7 +60,7 @@ public final class ConfigurationDataTest {
 		final File folder = FileUtilities.createTempFolder();
 		data.saveConfig(folder);
 		Assert.assertTrue(new File(folder, "conf/").exists(), "Configuration folder must exist");
-		Assert.assertTrue(new File(folder, "conf/swift.xml").exists(), "Swift.xml config must exist");
+		Assert.assertTrue(new File(folder, "conf/swift.conf").exists(), "swift.conf config must exist");
 		Assert.assertTrue(
 				new File(folder, "main-run.bat").exists()
 						|| new File(folder, "main-run.sh").exists(), "Main executable must exist");
@@ -85,7 +85,7 @@ public final class ConfigurationDataTest {
 				Assert.fail("this method should not be called");
 			}
 		});
-		final ResourceModel databaseModel = data.getModel().getDaemons().get(0).getChildren().get(0);
+		final ResourceModel databaseModel = data.getModel().getDaemons().get(0).getChildren().get(1);
 		Assert.assertEquals(databaseModel.getProperty(USERNAME), TEST);
 	}
 

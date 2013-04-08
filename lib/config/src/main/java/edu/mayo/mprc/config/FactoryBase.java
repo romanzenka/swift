@@ -8,7 +8,7 @@ public abstract class FactoryBase<C extends ResourceConfig, R> implements Resour
 			return result;
 		}
 		final R newResult = create(config, dependencies);
-		dependencies.addDependency(config, newResult);
+		dependencies.setDependency(config, newResult);
 		return newResult;
 	}
 }

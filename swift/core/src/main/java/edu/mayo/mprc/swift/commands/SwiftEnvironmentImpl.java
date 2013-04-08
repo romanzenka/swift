@@ -33,7 +33,7 @@ public final class SwiftEnvironmentImpl implements SwiftEnvironment {
 	private ApplicationConfig applicationConfig;
 	private DaemonConfig daemonConfig;
 	private DependencyResolver dependencyResolver;
-	private File configXmlFile;
+	private File configFile;
 	private SwiftCommandLine commandLine;
 	private SwiftMonitor monitor;
 
@@ -43,12 +43,12 @@ public final class SwiftEnvironmentImpl implements SwiftEnvironment {
 	/**
 	 * Load Swift configuration from a given file.
 	 *
-	 * @param configXmlFile XML config file to load config from.
+	 * @param configFile Swift config file to load config from.
 	 * @param swiftFactory  A factory of all objects supported by Swift.
 	 * @return Loaded Swift configuration.
 	 */
-	private static ApplicationConfig loadSwiftConfig(final File configXmlFile, final MultiFactory swiftFactory) {
-		final ApplicationConfig swiftConfig = ApplicationConfig.load(configXmlFile.getAbsoluteFile(), swiftFactory);
+	private static ApplicationConfig loadSwiftConfig(final File configFile, final MultiFactory swiftFactory) {
+		final ApplicationConfig swiftConfig = ApplicationConfig.load(configFile.getAbsoluteFile(), swiftFactory);
 		checkConfig(swiftConfig);
 		return swiftConfig;
 	}
@@ -77,7 +77,7 @@ public final class SwiftEnvironmentImpl implements SwiftEnvironment {
 			throw new MprcException("Unknown command: " + commandLine.getCommand() + "\nSupported: " + listSupportedCommands());
 		}
 
-		configXmlFile = commandLine.getInstallFile();
+		configFile = commandLine.getInstallFile();
 
 		return command.run(this);
 	}
@@ -156,7 +156,7 @@ public final class SwiftEnvironmentImpl implements SwiftEnvironment {
 	@Override
 	public DaemonConfig getDaemonConfig() {
 		if (daemonConfig == null) {
-			if (configXmlFile != null) {
+			if (configFile != null) {
 				daemonConfig = SwiftConfig.getUserSpecifiedDaemonConfig(commandLine.getDaemonId(), getApplicationConfig());
 				SwiftConfig.setupFileTokenFactory(getApplicationConfig(), daemonConfig, getFileTokenFactory());
 			}
@@ -173,7 +173,7 @@ public final class SwiftEnvironmentImpl implements SwiftEnvironment {
 	@Override
 	public ApplicationConfig getApplicationConfig() {
 		if (applicationConfig == null) {
-			setApplicationConfig(loadSwiftConfig(configXmlFile, getSwiftFactory()));
+			setApplicationConfig(loadSwiftConfig(configFile, getSwiftFactory()));
 			initDaemonConnectionFactory();
 		}
 		return applicationConfig;
@@ -209,8 +209,8 @@ public final class SwiftEnvironmentImpl implements SwiftEnvironment {
 	}
 
 	@Override
-	public File getConfigXmlFile() {
-		return configXmlFile;
+	public File getConfigFile() {
+		return configFile;
 	}
 
 	@Override

@@ -46,9 +46,17 @@ public final class DependencyResolver {
 		dependencies.put(config, new IdObjectPair(id, null));
 	}
 
-	public void addDependency(final ResourceConfig config, final Object dependency) {
-		testUniqueness(config);
-		dependencies.put(config, new IdObjectPair(String.valueOf(id++), dependency));
+	public void addConfig(final ResourceConfig config) {
+		setDependency(config, null);
+	}
+
+	public void setDependency(final ResourceConfig config, final Object dependency) {
+		if (dependencies.containsKey(config)) {
+			dependencies.put(config, new IdObjectPair(dependencies.get(config).getId(), dependency));
+
+		} else {
+			dependencies.put(config, new IdObjectPair(String.valueOf(id++), dependency));
+		}
 	}
 
 	private void testUniqueness(final ResourceConfig config) {

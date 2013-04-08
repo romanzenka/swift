@@ -1,7 +1,5 @@
 package edu.mayo.mprc.config;
 
-import edu.mayo.mprc.MprcException;
-
 import java.util.HashMap;
 import java.util.Map;
 
@@ -34,11 +32,16 @@ public final class MapConfigWriter extends ConfigWriterBase {
 
 	@Override
 	public String save(final ResourceConfig resourceConfig) {
+		if (resourceConfig == null) {
+			return "";
+		}
 		final String code = resolver.getIdFromConfig(resourceConfig);
 		if (code == null) {
-			throw new MprcException("The dependency resolver must know of all dependencies before saving the object into a map");
+			resolver.addConfig(resourceConfig);
+		 	return resolver.getIdFromConfig(resourceConfig);
+		} else {
+			return code;
 		}
-		return code;
 	}
 
 	public static Map<String, String> save(final ResourceConfig resourceConfig, final DependencyResolver resolver) {

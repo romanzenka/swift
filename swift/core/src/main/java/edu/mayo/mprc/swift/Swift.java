@@ -15,7 +15,7 @@ import org.apache.log4j.Logger;
 public final class Swift {
 	private static final Logger LOGGER = Logger.getLogger(Swift.class);
 
-	public static final String CONFIG_FILE_NAME = "conf/swift.xml";
+	public static final String CONFIG_FILE_NAME = "conf/swift.conf";
 
 	private Swift() {
 	}

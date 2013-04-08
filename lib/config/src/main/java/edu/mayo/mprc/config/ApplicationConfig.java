@@ -76,7 +76,6 @@ public final class ApplicationConfig implements ResourceConfig {
 		} finally {
 			FileUtilities.closeQuietly(reader);
 		}
-
 	}
 
 	public List<ResourceConfig> getModulesOfConfigType(final Class<? extends ResourceConfig> type) {
@@ -148,7 +147,7 @@ public final class ApplicationConfig implements ResourceConfig {
 
 			for (final ServiceConfig service : daemonConfig.getServices()) {
 				if (service.getRunner().getWorkerConfiguration().equals(resourceConfig)) {
-					daemonConfig.removeService(service);
+					daemonConfig.removeResource(service);
 					return;
 				}
 			}

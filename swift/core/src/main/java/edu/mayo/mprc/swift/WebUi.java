@@ -358,6 +358,10 @@ public final class WebUi {
 			this.searchesFolder = searchesFolder;
 		}
 
+		public void setSearcher(ServiceConfig searcher) {
+			this.searcher = searcher;
+		}
+
 		public ServiceConfig getSearcher() {
 			return searcher;
 		}

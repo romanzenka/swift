@@ -46,7 +46,7 @@ public final class Launcher implements FileListener {
 	public static final int UPGRADE_EXIT_CODE = 100;
 	private static final Logger LOGGER = Logger.getLogger(Launcher.class);
 	private static final int DEFAULT_PORT = 8080;
-	private static final String CONFIG_FILE_NAME = "conf/swift.xml";
+	private static final String CONFIG_FILE_NAME = "conf/swift.conf";
 	private final Object stopMonitor = new Object();
 	private volatile boolean restartRequested = false;
 

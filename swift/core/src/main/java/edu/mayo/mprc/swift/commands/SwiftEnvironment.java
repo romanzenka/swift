@@ -77,7 +77,7 @@ public interface SwiftEnvironment {
 	/**
 	 * @return XML configuration file for entire Swift.
 	 */
-	File getConfigXmlFile();
+	File getConfigFile();
 
 	/**
 	 * @return The parser that was used to parse the command line parameters.

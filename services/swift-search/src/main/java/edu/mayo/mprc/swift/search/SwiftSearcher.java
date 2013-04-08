@@ -665,6 +665,10 @@ public final class SwiftSearcher implements Worker {
 			return searchDb;
 		}
 
+		public void setDatabase(DatabaseFactory.Config database) {
+			this.database = database;
+		}
+
 		public DatabaseFactory.Config getDatabase() {
 			return database;
 		}

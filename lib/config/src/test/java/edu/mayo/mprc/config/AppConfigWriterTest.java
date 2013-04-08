@@ -82,7 +82,7 @@ public final class AppConfigWriterTest {
 	public void shouldWriteOneDaemon() {
 		final DaemonConfig daemon = new DaemonConfig();
 		daemon.setName("daemon1");
-		daemon.addService(new ServiceConfig("service1", new TestRunnerConfig(new TestResource())));
+		daemon.addResource(new ServiceConfig("service1", new TestRunnerConfig(new TestResource())));
 
 		config.addDaemon(daemon);
 		writer.save(config);

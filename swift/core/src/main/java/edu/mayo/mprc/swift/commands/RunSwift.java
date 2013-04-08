@@ -39,14 +39,14 @@ public class RunSwift implements FileListener, SwiftCommand {
 	 */
 	public ExitCode run(final SwiftEnvironment environment) {
 		final DaemonConfig config = environment.getDaemonConfig();
-		final File installXmlFile = environment.getConfigXmlFile();
+		final File configFile = environment.getConfigFile();
 
 		checkDoesNotContainWebModule(config);
 
 		final Daemon daemon = environment.createDaemon(config);
 		LOGGER.debug(daemon.toString());
 
-		startListeningToConfigFileChanges(installXmlFile);
+		startListeningToConfigFileChanges(configFile);
 
 		boolean terminateDaemon = true;
 
@@ -71,7 +71,7 @@ public class RunSwift implements FileListener, SwiftCommand {
 			}
 			LOGGER.info("Daemon stopped");
 		} else {
-			throw new MprcException("No daemons are configured in " + installXmlFile.getAbsolutePath() + ". Exiting.");
+			throw new MprcException("No daemons are configured in " + configFile.getAbsolutePath() + ". Exiting.");
 		}
 
 		return terminateDaemon ? ExitCode.Ok : ExitCode.Restart;
@@ -80,11 +80,11 @@ public class RunSwift implements FileListener, SwiftCommand {
 	/**
 	 * Setup listener to config file, so when the config file changes, we restart.
 	 *
-	 * @param installXmlFile File to check.
+	 * @param configFile File to check.
 	 */
-	private void startListeningToConfigFileChanges(final File installXmlFile) {
+	private void startListeningToConfigFileChanges(final File configFile) {
 		final FileMonitor monitor = new FileMonitor(10 * 1000);
-		monitor.addFile(installXmlFile);
+		monitor.addFile(configFile);
 		monitor.addListener(this);
 	}
 
