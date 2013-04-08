@@ -1,7 +1,7 @@
 package edu.mayo.mprc.swift.search;
 
 import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import com.google.common.collect.ObjectArrays;
 import edu.mayo.mprc.MprcException;
 import edu.mayo.mprc.config.*;
@@ -718,7 +718,7 @@ public final class SwiftSearcher implements Worker {
 			mgf2mgf = (ServiceConfig) reader.getObject(MGF_2_MGF);
 			rawdump = (ServiceConfig) reader.getObject(RAWDUMP);
 
-			final Collection<SearchEngine.Config> engineConfigs = Lists.newArrayList();
+			final Map<Integer, SearchEngine.Config> engineConfigs = Maps.newTreeMap();
 			for (final String key : reader.getKeys()) {
 				if (key.startsWith(ENGINE_PREFIX) &&
 						key.endsWith(ENGINE_CODE_SUFFIX)) {
@@ -726,7 +726,7 @@ public final class SwiftSearcher implements Worker {
 							ENGINE_PREFIX.length(), key.length() - ENGINE_CODE_SUFFIX.length()), engineConfigs, reader);
 				}
 			}
-			engines = engineConfigs;
+			engines = engineConfigs.values();
 
 			scaffoldReport = (ServiceConfig) reader.getObject(SCAFFOLD_REPORT);
 			qa = (ServiceConfig) reader.getObject(QA);
@@ -737,13 +737,14 @@ public final class SwiftSearcher implements Worker {
 			reportDecoyHits = reader.getBoolean(REPORT_DECOY_HITS);
 		}
 
-		private void setupEngine(final String number, final Collection<SearchEngine.Config> engineConfigs, ConfigReader reader) {
+		private void setupEngine(final String number, final Map<Integer, SearchEngine.Config> engineConfigs, ConfigReader reader) {
+			int engineNumber = Integer.parseInt(number);
 			final String code = reader.get(ENGINE_PREFIX + number + ENGINE_CODE_SUFFIX);
 			final ServiceConfig worker = (ServiceConfig) reader.getObject(ENGINE_PREFIX + number + ENGINE_WORKER_SUFFIX);
 			final ServiceConfig deployer = (ServiceConfig) reader.getObject(ENGINE_PREFIX + number + ENGINE_DEPLOYER_SUFFIX);
 			final String version = reader.get(ENGINE_PREFIX + number + ENGINE_VERSION_SUFFIX);
 
-			engineConfigs.add(new SearchEngine.Config(code, version, worker, deployer));
+			engineConfigs.put(engineNumber, new SearchEngine.Config(code, version, worker, deployer));
 		}
 
 		@Override
@@ -837,11 +838,17 @@ public final class SwiftSearcher implements Worker {
 			for (final EngineMetadata metadata : engineFactoriesList.getEngineMetadata()) {
 				i++;
 				builder
-						.property(ENGINE_PREFIX + i + ENGINE_CODE_SUFFIX, "Engine #" + i + " code", "Temporary, to be removed with better UI").defaultValue(metadata.getCode()).required()
-						.property(ENGINE_PREFIX + i + ENGINE_VERSION_SUFFIX, "Engine #" + i + " version", "Put in the version of the particular engine you are using").required()
+						.property(ENGINE_PREFIX + i + ENGINE_CODE_SUFFIX, "Engine #" + i + " code", "Temporary, to be removed with better UI")
+						.defaultValue(metadata.getCode())
+						.required()
+
+						.property(ENGINE_PREFIX + i + ENGINE_VERSION_SUFFIX, "Engine #" + i + " version", "Put in the version of the particular engine you are using")
+						.required()
+
 						.property(ENGINE_PREFIX + i + ENGINE_WORKER_SUFFIX, "Engine #" + i + " worker", "The service that actually does the work of this engine")
 						.reference(ObjectArrays.concat(
 								ObjectArrays.concat(metadata.getWorkerTypes(), metadata.getCacheTypes(), String.class), UiBuilder.NONE_TYPE))
+
 						.property(ENGINE_PREFIX + i + ENGINE_DEPLOYER_SUFFIX, "Engine #" + i + " deployer", "The service that prepares the environment for this engine to work efficiently")
 						.reference(ObjectArrays.concat(metadata.getDeployerTypes(), UiBuilder.NONE_TYPE));
 			}
