@@ -511,6 +511,7 @@ public final class GridRunner extends AbstractRunner {
 			setSharedTempDirectory(reader.get(SHARED_TEMP_DIRECTORY));
 			setSharedLogDirectory(reader.get(SHARED_LOG_DIRECTORY));
 			setWrapperScript(reader.get(WRAPPER_SCRIPT));
+			setWorkerConfiguration(reader.getObject(WORKER));
 		}
 
 		@Override
