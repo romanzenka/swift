@@ -138,7 +138,7 @@ public final class SimpleRunner extends AbstractRunner {
 
 	public static final class Config extends RunnerConfig {
 		private int numThreads = 1;
-		private String logOutputFolder = ".";
+		private String logOutputFolder = "var/log";
 
 		public Config() {
 		}
