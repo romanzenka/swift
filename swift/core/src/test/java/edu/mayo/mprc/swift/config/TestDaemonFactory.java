@@ -268,7 +268,7 @@ public final class TestDaemonFactory {
 		final ServiceConfig searcher = new ServiceConfig("searcher", runner76);
 		main.addResource(searcher);
 
-		final WebUi.Config webUi = new WebUi.Config(searcher, "8080", "Swift 2.5", "C:\\", "file:///C:/", qstat, databasUndeployer, "C:\\");
+		final WebUi.Config webUi = new WebUi.Config(searcher, "8080", "Swift 2.5", "C:\\", "file:///C:/", qstat, databasUndeployer);
 		main.addResource(webUi);
 
 		config.addDaemon(main);

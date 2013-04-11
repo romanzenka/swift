@@ -61,7 +61,6 @@ public final class WebUi {
 	public static final String BROWSE_WEB_ROOT = "browseWebRoot";
 	public static final String QSTAT = "qstat";
 	public static final String DATABASE_UNDEPLOYER = "databaseUndeployer";
-	public static final String SEARCHES_FOLDER = "searchesFolder";
 
 	public WebUi() {
 		USER_MESSAGE.setMessage("Swift's new database deployment has been temporarily disabled. Swift needs to be upgraded to support Mascot's Database Manager. If you need a new database, please ask Roman.");
@@ -342,12 +341,11 @@ public final class WebUi {
 		private String browseWebRoot;
 		private ServiceConfig qstat;
 		private ServiceConfig databaseUndeployer;
-		private String searchesFolder;
 
 		public Config() {
 		}
 
-		public Config(final ServiceConfig searcher, final String port, final String title, final String browseRoot, final String browseWebRoot, final ServiceConfig qstat, final ServiceConfig databaseUndeployer, final String searchesFolder) {
+		public Config(final ServiceConfig searcher, final String port, final String title, final String browseRoot, final String browseWebRoot, final ServiceConfig qstat, final ServiceConfig databaseUndeployer) {
 			this.searcher = searcher;
 			this.port = port;
 			this.title = title;
@@ -355,7 +353,6 @@ public final class WebUi {
 			this.browseWebRoot = browseWebRoot;
 			this.qstat = qstat;
 			this.databaseUndeployer = databaseUndeployer;
-			this.searchesFolder = searchesFolder;
 		}
 
 		public void setSearcher(ServiceConfig searcher) {
@@ -375,7 +372,6 @@ public final class WebUi {
 			writer.put(BROWSE_WEB_ROOT, getBrowseWebRoot());
 			writer.put(QSTAT, getQstat());
 			writer.put(DATABASE_UNDEPLOYER, getDatabaseUndeployer());
-			writer.put(SEARCHES_FOLDER, getSearchesFolder());
 		}
 
 		@Override
@@ -387,7 +383,6 @@ public final class WebUi {
 			browseWebRoot = reader.get(BROWSE_WEB_ROOT);
 			qstat = (ServiceConfig) reader.getObject(QSTAT);
 			databaseUndeployer = (ServiceConfig) reader.getObject(DATABASE_UNDEPLOYER);
-			searchesFolder = reader.get(SEARCHES_FOLDER);
 		}
 
 		@Override
@@ -417,10 +412,6 @@ public final class WebUi {
 
 		public ServiceConfig getDatabaseUndeployer() {
 			return databaseUndeployer;
-		}
-
-		public String getSearchesFolder() {
-			return searchesFolder;
 		}
 	}
 
@@ -493,11 +484,6 @@ public final class WebUi {
 					.property(QSTAT, "Qstat", "If you are running in Sun Grid Engine and want to have the job status available from the web interface, add a Qstat module. This is completely optional and provided solely for user convenience.")
 					.reference("qstat", UiBuilder.NONE_TYPE)
 
-					.property(SEARCHES_FOLDER, "Search definition folder", "When Swift starts a new search, the search definition is written to this folder. "
-							+ "<p>This is going to be soon replaced by a direct write to the database.</p>")
-					.required()
-					.existingDirectory()
-					.defaultValue("var/searches")
 					.addDaemonChangeListener(new PropertyChangeListener() {
 						@Override
 						public void propertyChanged(final ResourceConfig config, final String propertyName, final String newValue, final UiResponse response, final boolean validationRequested) {
