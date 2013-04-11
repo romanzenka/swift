@@ -204,7 +204,7 @@ public final class SearchDbWorker extends WorkerBase {
 					.defaultValue(database);
 
 			builder.property(SCAFFOLD_MOD_SET, "Scaffold's unimod.xml", "A location of Scaffold's current unimod.xml file.<p>" +
-					"On Linux it is typically in <tt>/opt/Scaffold3/parameters/unimod.xml.<p>" +
+					"On Linux it is typically in <tt>/opt/Scaffold3/parameters/unimod.xml</tt>.<p>" +
 					"The file has to be available where the searcher is running, so you might have to copy it elsewhere first.")
 					.existingFile()
 					.required();
