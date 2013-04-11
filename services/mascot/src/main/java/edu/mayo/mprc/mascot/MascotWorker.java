@@ -50,7 +50,7 @@ public final class MascotWorker extends WorkerBase {
 	private static final String MASCOT_PUBLIC_URL = "mascotPublicUrl";
 	public static final String TYPE = "mascot";
 	public static final String NAME = "Mascot";
-	public static final String DESC = "<a href=\"http://www.matrixscience.com/\">Mascot search engine</a> support.<p>Swift was tested against Mascot 2.2 without enabled security.</p>";
+	public static final String DESC = "<a href=\"http://www.matrixscience.com/\">Mascot search engine</a> support.<p>Swift was tested against Mascot 2.2 and 2.4 without enabled security.</p>";
 	public static final int INPUT_FILE_TIMEOUT = 2 * 60 * 1000;
 
 	private URL baseUrl;
