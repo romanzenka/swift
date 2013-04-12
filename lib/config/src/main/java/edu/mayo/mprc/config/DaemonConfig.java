@@ -245,9 +245,9 @@ public final class DaemonConfig implements ResourceConfig, NamedResource {
 		writer.put(OS_NAME, getOsName(), "Host system operating system name: e.g. Windows or Linux.");
 		writer.put(OS_ARCH, getOsArch(), "Host system architecture: x86, x86_64");
 		writer.put(SHARED_FILE_SPACE_PATH, getSharedFileSpacePath(), "Directory on a shared file system can be accessed from all the daemons");
-		writer.put(TEMP_FOLDER_PATH, getSharedFileSpacePath(), "Temporary folder that can be used for caching. Transferred files from other daemons with no shared file system with this daemon are cached to this folder.");
-		writer.put(DUMP_ERRORS, getSharedFileSpacePath(), "Not implemented yet");
-		writer.put(DUMP_FOLDER_PATH, getSharedFileSpacePath(), "Not implemented yet");
+		writer.put(TEMP_FOLDER_PATH, getTempFolderPath(), "Temporary folder that can be used for caching. Transferred files from other daemons with no shared file system with this daemon are cached to this folder.");
+		writer.put(DUMP_ERRORS, isDumpErrors(), "Not implemented yet");
+		writer.put(DUMP_FOLDER_PATH, getDumpFolderPath(), "Not implemented yet");
 
 		writer.put(SERVICES, getResourceList(writer, getServices()), "Comma separated list of provided services");
 		writer.put(RESOURCES, getResourceList(writer, getResources()), "Comma separated list of provided resources");
