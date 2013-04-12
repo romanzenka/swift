@@ -200,7 +200,7 @@ public final class MyrimatchWorker extends WorkerBase {
 
 		@Override
 		public void save(final ConfigWriter writer) {
-			writer.put(EXECUTABLE, executable, "Myrimatch executable");
+			writer.put(EXECUTABLE, getExecutable(), "Myrimatch executable");
 		}
 
 		@Override

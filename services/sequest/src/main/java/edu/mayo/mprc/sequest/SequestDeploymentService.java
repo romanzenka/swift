@@ -546,9 +546,9 @@ public final class SequestDeploymentService extends DeploymentService<SequestDep
 		}
 
 		public void save(final ConfigWriter writer) {
-			writer.put(DEPLOYABLE_DB_FOLDER, deployableDbFolder, "Where to put Sequest's .fasta file indices");
-			writer.put(ENGINE_ROOT_FOLDER, engineRootFolder, "Path to the makedb package");
-			writer.put(WINE_WRAPPER_SCRIPT, wineWrapperScript, "Script to wrap the execution with on Linux");
+			writer.put(DEPLOYABLE_DB_FOLDER, getDeployableDbFolder(), "Where to put Sequest's .fasta file indices");
+			writer.put(ENGINE_ROOT_FOLDER, getEngineRootFolder(), "Path to the makedb package");
+			writer.put(WINE_WRAPPER_SCRIPT, getWineWrapperScript(), "Script to wrap the execution with on Linux");
 		}
 
 		public void load(final ConfigReader reader) {

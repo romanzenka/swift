@@ -272,8 +272,8 @@ public final class OmssaDeploymentService extends DeploymentService<DeploymentRe
 
 		@Override
 		public void save(final ConfigWriter writer) {
-			writer.put(FORMAT_DB_EXE, formatDbExe);
-			writer.put(DEPLOYABLE_DB_FOLDER, deployableDbFolder);
+			writer.put(FORMAT_DB_EXE, getFormatDbExe());
+			writer.put(DEPLOYABLE_DB_FOLDER, getDeployableDbFolder());
 		}
 
 		@Override

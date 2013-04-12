@@ -371,9 +371,9 @@ public final class QaWorker extends WorkerBase {
 
 		@Override
 		public void save(final ConfigWriter writer) {
-			writer.put(XVFB_WRAPPER_SCRIPT, xvfbWrapperScript);
-			writer.put(R_SCRIPT, rScript);
-			writer.put(R_EXECUTABLE, rExecutable);
+			writer.put(XVFB_WRAPPER_SCRIPT, getXvfbWrapperScript());
+			writer.put(R_SCRIPT, getRScript());
+			writer.put(R_EXECUTABLE, getRExecutable());
 		}
 
 		@Override

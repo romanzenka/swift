@@ -256,12 +256,12 @@ public final class DatabaseUndeployerWorker extends WorkerBase {
 
 		@Override
 		public void save(final ConfigWriter writer) {
-			writer.put(MASCOT_DEPLOYER, mascotDeployer);
-			writer.put(TANDEM_DEPLOYER, tandemDeployer);
-			writer.put(SEQUEST_DEPLOYER, sequestDeployer);
-			writer.put(OMSSA_DEPLOYER, omssaDeployer);
-			writer.put(SCAFFOLD_DEPLOYER, scaffoldDeployer);
-			writer.put(SCAFFOLD3_DEPLOYER, scaffold3Deployer);
+			writer.put(MASCOT_DEPLOYER, getMascotDeployer());
+			writer.put(TANDEM_DEPLOYER, getTandemDeployer());
+			writer.put(SEQUEST_DEPLOYER, getSequestDeployer());
+			writer.put(OMSSA_DEPLOYER, getOmssaDeployer());
+			writer.put(SCAFFOLD_DEPLOYER, getScaffoldDeployer());
+			writer.put(SCAFFOLD3_DEPLOYER, getScaffold3Deployer());
 		}
 
 		@Override

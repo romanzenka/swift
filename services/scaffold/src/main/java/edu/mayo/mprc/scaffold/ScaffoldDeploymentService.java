@@ -248,9 +248,9 @@ public final class ScaffoldDeploymentService extends DeploymentService<Deploymen
 		}
 
 		public void save(final ConfigWriter writer) {
-			writer.put(SCAFFOLD_JAVA_VM_PATH, scaffoldJavaVmPath);
-			writer.put(DEPLOYABLE_DB_FOLDER, deployableDbFolder);
-			writer.put(INSTALL_DIR, installDir);
+			writer.put(SCAFFOLD_JAVA_VM_PATH, getScaffoldJavaVmPath());
+			writer.put(DEPLOYABLE_DB_FOLDER, getDeployableDbFolder());
+			writer.put(INSTALL_DIR, getInstallDir());
 		}
 
 		public void load(final ConfigReader reader) {

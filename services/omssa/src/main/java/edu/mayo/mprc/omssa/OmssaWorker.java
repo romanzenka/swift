@@ -231,7 +231,7 @@ public final class OmssaWorker extends WorkerBase {
 
 		@Override
 		public void save(final ConfigWriter writer) {
-			writer.put(OMSSACL_PATH, omssaclPath, "Path to omssacl executable");
+			writer.put(OMSSACL_PATH, getOmssaclPath(), "Path to omssacl executable");
 		}
 
 		@Override

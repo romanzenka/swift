@@ -103,7 +103,7 @@ public class FastaDbWorker extends WorkerBase {
 
 		@Override
 		public void save(final ConfigWriter writer) {
-			writer.put(DATABASE, writer.save(database));
+			writer.put(DATABASE, writer.save(getDatabase()));
 		}
 
 		@Override

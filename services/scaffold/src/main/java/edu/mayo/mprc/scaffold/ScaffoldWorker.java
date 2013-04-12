@@ -206,9 +206,9 @@ public final class ScaffoldWorker extends WorkerBase {
 
 		@Override
 		public void save(final ConfigWriter writer) {
-			writer.put(SCAFFOLD_DIR, scaffoldDir);
-			writer.put(SCAFFOLD_JAVA_VM_PATH, scaffoldJavaVmPath);
-			writer.put(MEMORY_LIMIT, memoryLimit);
+			writer.put(SCAFFOLD_DIR, getScaffoldDir());
+			writer.put(SCAFFOLD_JAVA_VM_PATH, getScaffoldJavaVmPath());
+			writer.put(MEMORY_LIMIT, getMemoryLimit());
 		}
 
 		@Override

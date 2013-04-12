@@ -466,8 +466,8 @@ public final class MascotWorker extends WorkerBase {
 
 		@Override
 		public void save(final ConfigWriter writer) {
-			writer.put(MASCOT_URL, mascotUrl);
-			writer.put(MASCOT_PUBLIC_URL, mascotPublicUrl);
+			writer.put(MASCOT_URL, getMascotUrl());
+			writer.put(MASCOT_PUBLIC_URL, getMascotPublicUrl());
 		}
 
 		@Override

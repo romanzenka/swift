@@ -683,13 +683,13 @@ public final class SwiftSearcher implements Worker {
 
 		@Override
 		public void save(final ConfigWriter writer) {
-			writer.put(FASTA_PATH, fastaPath);
-			writer.put(FASTA_ARCHIVE_PATH, fastaArchivePath);
-			writer.put(FASTA_UPLOAD_PATH, fastaUploadPath);
-			writer.put(RAW_2_MGF, writer.save(raw2mgf));
-			writer.put(MSCONVERT, writer.save(msconvert));
-			writer.put(MGF_2_MGF, writer.save(mgf2mgf));
-			writer.put(RAWDUMP, writer.save(rawdump));
+			writer.put(FASTA_PATH, getFastaPath());
+			writer.put(FASTA_ARCHIVE_PATH, getFastaArchivePath());
+			writer.put(FASTA_UPLOAD_PATH, getFastaUploadPath());
+			writer.put(RAW_2_MGF, writer.save(getRaw2mgf()));
+			writer.put(MSCONVERT, writer.save(getMsconvert()));
+			writer.put(MGF_2_MGF, writer.save(getMgf2mgf()));
+			writer.put(RAWDUMP, writer.save(getRawdump()));
 
 			int i = 0;
 			for (final SearchEngine.Config engineConfig : getEngines()) {
@@ -700,13 +700,13 @@ public final class SwiftSearcher implements Worker {
 				writer.put(ENGINE_PREFIX + i + ENGINE_DEPLOYER_SUFFIX, writer.save(engineConfig.getDeployer()));
 			}
 
-			writer.put(SCAFFOLD_REPORT, writer.save(scaffoldReport));
-			writer.put(QA, writer.save(qa));
-			writer.put(FASTA_DB, writer.save(fastaDb));
-			writer.put(SEARCH_DB, writer.save(searchDb));
-			writer.put(MSMS_EVAL, writer.save(msmsEval));
-			writer.put(DATABASE, writer.save(database));
-			writer.put(REPORT_DECOY_HITS, reportDecoyHits);
+			writer.put(SCAFFOLD_REPORT, writer.save(getScaffoldReport()));
+			writer.put(QA, writer.save(getQa()));
+			writer.put(FASTA_DB, writer.save(getFastaDb()));
+			writer.put(SEARCH_DB, writer.save(getSearchDb()));
+			writer.put(MSMS_EVAL, writer.save(getMsmsEval()));
+			writer.put(DATABASE, writer.save(getDatabase()));
+			writer.put(REPORT_DECOY_HITS, isReportDecoyHits());
 		}
 
 		public void load(final ConfigReader reader) {

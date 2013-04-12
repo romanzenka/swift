@@ -280,10 +280,10 @@ public final class RAWDumpWorker extends WorkerBase {
 
 		@Override
 		public void save(final ConfigWriter writer) {
-			writer.put("wrapperScript", wrapperScript);
-			writer.put("windowsExecWrapperScript", windowsExecWrapperScript);
-			writer.put("rawDumpExecutable", rawDumpExecutable);
-			writer.put("commandLineOptions", commandLineOptions);
+			writer.put("wrapperScript", getWrapperScript());
+			writer.put("windowsExecWrapperScript", getWindowsExecWrapperScript());
+			writer.put("rawDumpExecutable", getRawDumpExecutable());
+			writer.put("commandLineOptions", getCommandLineOptions());
 		}
 
 		@Override

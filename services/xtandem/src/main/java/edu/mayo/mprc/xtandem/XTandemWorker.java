@@ -260,7 +260,7 @@ public final class XTandemWorker extends WorkerBase {
 		}
 
 		public void save(final ConfigWriter writer) {
-			writer.put(TANDEM_EXECUTABLE, tandemExecutable, "Path to tandem.exe");
+			writer.put(TANDEM_EXECUTABLE, getTandemExecutable(), "Path to tandem.exe");
 		}
 
 		public void load(final ConfigReader reader) {

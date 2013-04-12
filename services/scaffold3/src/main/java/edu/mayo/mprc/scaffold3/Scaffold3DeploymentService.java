@@ -151,7 +151,7 @@ public final class Scaffold3DeploymentService extends DeploymentService<Deployme
 
 		@Override
 		public void save(final ConfigWriter writer) {
-			writer.put(DEPLOYABLE_DB_FOLDER, deployableDbFolder);
+			writer.put(DEPLOYABLE_DB_FOLDER, getDeployableDbFolder());
 		}
 
 		@Override

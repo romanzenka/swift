@@ -403,8 +403,8 @@ public final class SearchEngine implements Comparable<SearchEngine> {
 		public void save(final ConfigWriter writer) {
 			writer.put("code", getCode());
 			writer.put("version", getVersion());
-			writer.put("worker", writer.save(worker));
-			writer.put("deployer", writer.save(deployer));
+			writer.put("worker", writer.save(getWorker()));
+			writer.put("deployer", writer.save(getDeployer()));
 		}
 
 		@Override

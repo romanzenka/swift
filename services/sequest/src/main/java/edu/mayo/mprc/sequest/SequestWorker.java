@@ -164,8 +164,8 @@ public final class SequestWorker extends WorkerBase {
 		}
 
 		public void save(final ConfigWriter writer) {
-			writer.put(PVM_HOSTS, pvmHosts, "PVM's pvmhosts file");
-			writer.put(SEQUEST_COMMAND, sequestCommand, "Command to run Sequest");
+			writer.put(PVM_HOSTS, getPvmHosts(), "PVM's pvmhosts file");
+			writer.put(SEQUEST_COMMAND, getSequestCommand(), "Command to run Sequest");
 		}
 
 		public void load(final ConfigReader reader) {

@@ -165,8 +165,8 @@ public final class SimpleRunner extends AbstractRunner {
 
 		@Override
 		public void save(final ConfigWriter writer) {
-			writer.put("numThreads", numThreads, "Number of threads");
-			writer.put("logOutputFolder", logOutputFolder, "Where to write logs");
+			writer.put("numThreads", getNumThreads(), "Number of threads");
+			writer.put("logOutputFolder", getLogOutputFolder(), "Where to write logs");
 			writer.put(WORKER, getWorkerConfiguration());
 		}
 

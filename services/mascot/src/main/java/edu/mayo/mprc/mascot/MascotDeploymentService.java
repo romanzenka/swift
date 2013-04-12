@@ -810,9 +810,9 @@ public final class MascotDeploymentService extends DeploymentService<DeploymentR
 
 		@Override
 		public void save(final ConfigWriter writer) {
-			writer.put(ENGINE_ROOT_FOLDER, engineRootFolder);
-			writer.put(DEPLOYABLE_DB_FOLDER, deployableDbFolder);
-			writer.put(MASCOT_DB_MAINTENANCE_URI, mascotDbMaintenanceUri);
+			writer.put(ENGINE_ROOT_FOLDER, getEngineRootFolder());
+			writer.put(DEPLOYABLE_DB_FOLDER, getDeployableDbFolder());
+			writer.put(MASCOT_DB_MAINTENANCE_URI, getMascotDbMaintenanceUri());
 		}
 
 		@Override

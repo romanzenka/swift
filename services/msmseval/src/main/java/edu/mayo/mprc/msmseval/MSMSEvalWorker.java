@@ -226,8 +226,8 @@ public final class MSMSEvalWorker extends WorkerBase {
 		}
 
 		public void save(final ConfigWriter writer) {
-			writer.put(MSMS_EVAL_EXECUTABLE, msmsEvalExecutable, "MSMS Eval executable");
-			writer.put(PARAM_FILES, paramFiles, "A comma-separated list of name,config file pairs for MSMSEval");
+			writer.put(MSMS_EVAL_EXECUTABLE, getMsmsEvalExecutable(), "MSMS Eval executable");
+			writer.put(PARAM_FILES, getParamFiles(), "A comma-separated list of name,config file pairs for MSMSEval");
 		}
 
 		public void load(final ConfigReader reader) {

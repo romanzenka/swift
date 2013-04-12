@@ -434,10 +434,10 @@ public final class RawToMgfWorker extends WorkerBase {
 		}
 
 		public void save(final ConfigWriter writer) {
-			writer.put(TEMP_FOLDER, tempFolder, "Temp folder to extract the .dta files to");
-			writer.put(WRAPPER_SCRIPT, wrapperScript, "Only for linux - wraps the calls with wine");
-			writer.put(XVFB_WRAPPER_SCRIPT, xvfbWrapperScript, "Only for linux - wraps the calls with start of X virtual frame buffer (when UI is needed by wine)");
-			writer.put(EXTRACT_MSN_EXECUTABLE, extractMsnExecutable, "extract_msn.exe path");
+			writer.put(TEMP_FOLDER, getTempFolder(), "Temp folder to extract the .dta files to");
+			writer.put(WRAPPER_SCRIPT, getWrapperScript(), "Only for linux - wraps the calls with wine");
+			writer.put(XVFB_WRAPPER_SCRIPT, getXvfbWrapperScript(), "Only for linux - wraps the calls with start of X virtual frame buffer (when UI is needed by wine)");
+			writer.put(EXTRACT_MSN_EXECUTABLE, getExtractMsnExecutable(), "extract_msn.exe path");
 		}
 
 		public void load(final ConfigReader reader) {

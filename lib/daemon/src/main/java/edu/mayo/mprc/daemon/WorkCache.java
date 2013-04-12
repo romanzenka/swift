@@ -382,8 +382,8 @@ public abstract class WorkCache<T extends WorkPacket> implements NoLoggingWorker
 
 		@Override
 		public void save(final ConfigWriter writer) {
-			writer.put("cacheFolder", cacheFolder, "Where to cache files");
-			writer.put("service", writer.save(service), "Service being cached");
+			writer.put("cacheFolder", getCacheFolder(), "Where to cache files");
+			writer.put("service", writer.save(getService()), "Service being cached");
 		}
 
 		@Override

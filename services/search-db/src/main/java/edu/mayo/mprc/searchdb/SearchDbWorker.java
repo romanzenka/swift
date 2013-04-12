@@ -178,7 +178,7 @@ public final class SearchDbWorker extends WorkerBase {
 		@Override
 		public void save(final ConfigWriter writer) {
 			writer.put(DATABASE, writer.save(getDatabase()));
-			writer.put(SCAFFOLD_MOD_SET, scaffoldModSet);
+			writer.put(SCAFFOLD_MOD_SET, getScaffoldModSet());
 		}
 
 		@Override
