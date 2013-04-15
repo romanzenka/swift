@@ -27,6 +27,7 @@ public final class DaemonConfig implements ResourceConfig, NamedResource {
 	public static final String DUMP_FOLDER_PATH = "dumpFolderPath";
 	public static final String SERVICES = "services";
 	public static final String RESOURCES = "resources";
+	public static final String TYPE = "daemon";
 
 	private String name;
 

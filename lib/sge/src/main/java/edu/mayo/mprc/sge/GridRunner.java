@@ -492,7 +492,7 @@ public final class GridRunner extends AbstractRunner {
 		}
 
 		public void save(final ConfigWriter writer) {
-			writer.put(WORKER, getWorkerConfiguration());
+			super.save(writer);
 			writer.put(QUEUE_NAME, getQueueName(), "Name of the SGE queue");
 			writer.put(MEMORY_REQUIREMENT, getMemoryRequirement(), "Memory requirements for the SGE queue");
 			writer.put(NATIVE_SPECIFICATION, getNativeSpecification(), "Native specification (additional parameters) for the SGE queue");
@@ -511,12 +511,7 @@ public final class GridRunner extends AbstractRunner {
 			setSharedTempDirectory(reader.get(SHARED_TEMP_DIRECTORY));
 			setSharedLogDirectory(reader.get(SHARED_LOG_DIRECTORY));
 			setWrapperScript(reader.get(WRAPPER_SCRIPT));
-			setWorkerConfiguration(reader.getObject(WORKER));
-		}
-
-		@Override
-		public int getPriority() {
-			return 0;
+			super.load(reader);
 		}
 	}
 

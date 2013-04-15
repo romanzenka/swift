@@ -16,7 +16,6 @@ import java.net.URISyntaxException;
  * Capable of creating either the receiving or the sending end for a service of a given id.
  */
 public final class DaemonConnectionFactory extends FactoryBase<ServiceConfig, DaemonConnection> implements FactoryDescriptor {
-	public static final String SERVICE = "service";
 	private FileTokenFactory fileTokenFactory;
 	private ServiceFactory serviceFactory;
 	private String brokerUrl;
@@ -65,7 +64,7 @@ public final class DaemonConnectionFactory extends FactoryBase<ServiceConfig, Da
 
 	@Override
 	public String getType() {
-		return SERVICE;
+		return ServiceConfig.TYPE;
 	}
 
 	@Override

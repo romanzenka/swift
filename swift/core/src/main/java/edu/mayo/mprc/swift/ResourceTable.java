@@ -8,7 +8,6 @@ import edu.mayo.mprc.config.*;
 import edu.mayo.mprc.config.ui.ServiceUiFactory;
 import edu.mayo.mprc.daemon.DaemonConnectionFactory;
 import edu.mayo.mprc.daemon.WorkerFactoryBase;
-import edu.mayo.mprc.utilities.exceptions.ExceptionUtilities;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.annotation.Nullable;
@@ -189,18 +188,8 @@ public final class ResourceTable extends FactoryBase<ResourceConfig, Object> imp
 		return info == null ? null : info.getUserName();
 	}
 
-	@Override
-	public Object getResourceType(final String id) {
+	public ResourceType getResourceType(final String id) {
 		return getResourceInfo(id).getResourceType();
-	}
-
-	public ResourceType getResourceTypeAsType(final String id) {
-		final Object resType = getResourceType(id);
-		if (!(resType instanceof ResourceTable.ResourceType)) {
-			ExceptionUtilities.throwCastException(resType, ResourceTable.ResourceType.class);
-			return null;
-		}
-		return (ResourceTable.ResourceType) resType;
 	}
 
 	@Override
@@ -208,8 +197,7 @@ public final class ResourceTable extends FactoryBase<ResourceConfig, Object> imp
 		return getResourceInfo(type).getConfigClass();
 	}
 
-	public ServiceUiFactory
-	getUiFactory(final String type) {
+	public ServiceUiFactory getUiFactory(final String type) {
 		return getResourceInfo(type).getUiFactory();
 	}
 

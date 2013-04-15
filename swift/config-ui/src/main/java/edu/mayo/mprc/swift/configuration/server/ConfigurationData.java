@@ -7,7 +7,6 @@ import edu.mayo.mprc.common.client.StringUtilities;
 import edu.mayo.mprc.config.*;
 import edu.mayo.mprc.config.ui.PropertyChangeListener;
 import edu.mayo.mprc.config.ui.ServiceUiFactory;
-import edu.mayo.mprc.daemon.DaemonConnectionFactory;
 import edu.mayo.mprc.daemon.MessageBroker;
 import edu.mayo.mprc.daemon.SimpleRunner;
 import edu.mayo.mprc.database.DatabaseFactory;
@@ -161,7 +160,7 @@ public class ConfigurationData {
 		final ResourceConfig resourceConfig = getDefaultResourceConfig(type, parent, moduleConfigTable);
 		final ResourceConfig resultConfig;
 
-		final ResourceTable.ResourceType resourceType = moduleConfigTable.getResourceTypeAsType(type);
+		final ResourceTable.ResourceType resourceType = moduleConfigTable.getResourceType(type);
 		if (resourceType == ResourceTable.ResourceType.Worker) {
 			final ServiceConfig serviceConfig = createServiceConfig(index, type, parent, resourceConfig);
 			resultConfig = serviceConfig;
@@ -274,7 +273,7 @@ public class ConfigurationData {
 		final AvailableModules availableModules = new AvailableModules();
 		final ResourceTable resourceTable = getResourceTable();
 		for (final String type : resourceTable.getAllTypes()) {
-			availableModules.add(resourceTable.getUserName(type), type, resourceTable.getDescription(type), resourceTable.getResourceTypeAsType(type) == ResourceTable.ResourceType.Worker);
+			availableModules.add(resourceTable.getUserName(type), type, resourceTable.getDescription(type), resourceTable.getResourceType(type) == ResourceTable.ResourceType.Worker);
 		}
 		return availableModules;
 	}
@@ -319,7 +318,7 @@ public class ConfigurationData {
 	}
 
 	private ModuleModel mapServiceConfigToModel(final String index, final DaemonConfig daemon, final ServiceConfig service) {
-		final ResourceModel serviceModel = new ResourceModel(service.getName(), DaemonConnectionFactory.SERVICE);
+		final ResourceModel serviceModel = new ResourceModel(service.getName(), ServiceConfig.TYPE);
 
 		resolver.setDependency(service, serviceModel);
 		serviceModel.setId(resolver.getIdFromConfig(service));

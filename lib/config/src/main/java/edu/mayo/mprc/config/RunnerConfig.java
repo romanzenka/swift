@@ -29,4 +29,19 @@ public abstract class RunnerConfig implements ResourceConfig {
 				"workerConfiguration=" + workerConfiguration +
 				'}';
 	}
+
+	@Override
+	public void save(ConfigWriter writer) {
+		writer.put(WORKER, getWorkerConfiguration());
+	}
+
+	@Override
+	public void load(ConfigReader reader) {
+		setWorkerConfiguration(reader.getObject("worker"));
+	}
+
+	@Override
+	public int getPriority() {
+		return 0;
+	}
 }

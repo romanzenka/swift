@@ -1,6 +1,7 @@
 package edu.mayo.mprc.launcher;
 
 import edu.mayo.mprc.MprcException;
+import edu.mayo.mprc.config.*;
 import edu.mayo.mprc.utilities.CommandLine;
 import edu.mayo.mprc.utilities.FileListener;
 import edu.mayo.mprc.utilities.FileMonitor;
@@ -11,15 +12,8 @@ import org.apache.log4j.Logger;
 import org.mortbay.jetty.Connector;
 import org.mortbay.jetty.Server;
 import org.mortbay.jetty.webapp.WebAppContext;
-import org.xml.sax.InputSource;
 
-import javax.xml.xpath.XPath;
-import javax.xml.xpath.XPathExpression;
-import javax.xml.xpath.XPathExpressionException;
-import javax.xml.xpath.XPathFactory;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.net.InetAddress;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -232,10 +226,11 @@ public final class Launcher implements FileListener {
 		}
 	}
 
-	private File getTempFolder(final File configFile, final String daemonId) {
+	static File getTempFolder(final File configFile, final String daemonId) {
 		File tempFolder = null;
 		try {
-			tempFolder = new File(getDaemonConfigValue(configFile, daemonId, "/tempFolderPath"));
+			final DaemonConfig daemonConfig = getDaemonConfig(configFile, daemonId);
+			tempFolder = new File(daemonConfig.getTempFolderPath());
 		} catch (Exception ignore) {
 			tempFolder = FileUtilities.getDefaultTempDirectory();
 			LOGGER.warn("Could not parse the config file " + configFile.getPath() + " to temporary daemon folder. Using default " + tempFolder);
@@ -243,13 +238,14 @@ public final class Launcher implements FileListener {
 		return tempFolder;
 	}
 
-	private int getPortNumber(final OptionSet options, final File configFile, final String daemonId) {
-		int portNumber = DEFAULT_PORT;
-		if (options.has("port")) {
+	static int getPortNumber(final OptionSet options, final File configFile, final String daemonId) {
+		final int portNumber;
+		if (options!=null && options.has("port")) {
 			portNumber = (Integer) options.valueOf("port");
 		} else {
 			try {
-				portNumber = Integer.parseInt(getDaemonConfigValue(configFile, daemonId, "/resources/webUi/port"));
+				final GenericResource webUi = getResourceConfig(configFile, daemonId, "webUi");
+				return Integer.parseInt(webUi.get("port"));
 			} catch (Exception ignore) {
 				LOGGER.warn("Could not parse the config file " + configFile.getPath() + " to obtain web port number. Using default " + DEFAULT_PORT);
 				portNumber = DEFAULT_PORT;
@@ -258,22 +254,32 @@ public final class Launcher implements FileListener {
 		return portNumber;
 	}
 
-	private String getDaemonConfigValue(final File configFile, final String daemonId, final String configValuePath) throws XPathExpressionException, FileNotFoundException {
-		final XPathFactory xPathFactory = XPathFactory.newInstance();
-		final XPath xPath = xPathFactory.newXPath();
-		final XPathExpression expression;
-		if (daemonId != null) {
-			expression = xPath.compile("/application/daemons/daemon[@name='" + daemonId + "']/" + configValuePath);
+	static GenericResource getResourceConfig(final File configFile, final String daemonId, final String type) {
+		final DaemonConfig daemonConfig = getDaemonConfig(configFile, daemonId);
+		for (final ResourceConfig resource : daemonConfig.getResources()) {
+			if (resource instanceof GenericResource) {
+				final GenericResource r = (GenericResource) resource;
+				if (type.equals(r.getType())) {
+					return r;
+				}
+			}
+		}
+		throw new MprcException("Resource of type " + type + " not defined in daemon " + daemonId);
+	}
+
+	static DaemonConfig getDaemonConfig(final File configFile, final String daemonId) {
+		AppConfigReader reader = new AppConfigReader(configFile, new IndependentReaderFactory());
+		ApplicationConfig appConfig = reader.load();
+		if (daemonId == null) {
+			return appConfig.getDaemons().get(0);
 		} else {
-			expression = xPath.compile("/application/daemons/daemon/" + configValuePath);
+			for (final DaemonConfig config : appConfig.getDaemons()) {
+				if (daemonId.equals(config.getName())) {
+					return config;
+				}
+			}
 		}
-		final FileInputStream stream = new FileInputStream(configFile);
-		try {
-			final InputSource inputSource = new InputSource(stream);
-			return expression.evaluate(inputSource);
-		} finally {
-			FileUtilities.closeQuietly(stream);
-		}
+		throw new MprcException("Could not find daemon [" + daemonId + "] in configuration file [" + configFile.getAbsolutePath() + "]");
 	}
 
 	private void displayHelpMessage(final OptionParser parser) {

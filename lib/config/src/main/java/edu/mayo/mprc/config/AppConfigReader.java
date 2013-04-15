@@ -17,24 +17,24 @@ import java.util.Map;
  */
 public final class AppConfigReader implements Closeable {
 	private BufferedReader reader;
-	private MultiFactory multiFactory;
+	private ReaderFactory readerFactory;
 	private DependencyResolver dependencyResolver;
 
-	public AppConfigReader(final File configFile, final MultiFactory multiFactory) {
+	public AppConfigReader(final File configFile, final ReaderFactory readerFactory) {
 		try {
-			init(new FileReader(configFile), multiFactory);
+			init(new FileReader(configFile), readerFactory);
 		} catch (FileNotFoundException e) {
 			throw new MprcException("Cannot read config file " + configFile.getAbsolutePath(), e);
 		}
 	}
 
-	public AppConfigReader(final Reader reader, final MultiFactory multiFactory) {
-		init(reader, multiFactory);
+	public AppConfigReader(final Reader reader, final ReaderFactory readerFactory) {
+		init(reader, readerFactory);
 	}
 
-	private void init(final Reader reader, final MultiFactory multiFactory) {
+	private void init(final Reader reader, final ReaderFactory multiFactory) {
 		this.reader = new BufferedReader(reader);
-		this.multiFactory = multiFactory;
+		this.readerFactory = multiFactory;
 		this.dependencyResolver = new DependencyResolver(multiFactory);
 	}
 
@@ -63,18 +63,21 @@ public final class AppConfigReader implements Closeable {
 						}
 						inSection = false;
 						final ResourceConfig resourceConfig;
-						if ("service".equals(type)) {
+						if (ServiceConfig.TYPE.equals(type)) {
 							// Special treatment #1
 							resourceConfig = createService(name, values);
 						} else {
 							resourceConfig = createResource(name, type, values);
 						}
 						// Special treatment #2 - add daemons to the enclosing app
-						if ("daemon".equals(type)) {
+						if (DaemonConfig.TYPE.equals(type)) {
 							config.addDaemon((DaemonConfig) resourceConfig);
 						}
 						if (resourceConfig instanceof NamedResource) {
 							((NamedResource) resourceConfig).setName(name);
+						}
+						if(resourceConfig instanceof TypedResource) {
+							((TypedResource)resourceConfig).setType(type);
 						}
 						values.clear();
 					} else {
@@ -167,12 +170,12 @@ public final class AppConfigReader implements Closeable {
 		createResource(runnerId, runnerType, runnerParams);
 
 		serviceParams.put(ServiceConfig.RUNNER, runnerId);
-		return (ServiceConfig) createResource(name, "service", serviceParams);
+		return (ServiceConfig) createResource(name, ServiceConfig.TYPE, serviceParams);
 	}
 
 	private ResourceConfig createResource(final String name, final String type, final Map<String, String> values) {
 		final ResourceConfig resourceConfig;
-		final Class<? extends ResourceConfig> configClass = multiFactory.getConfigClass(type);
+		final Class<? extends ResourceConfig> configClass = readerFactory.getConfigClass(type);
 		try {
 			resourceConfig = configClass.newInstance();
 		} catch (Exception e) {

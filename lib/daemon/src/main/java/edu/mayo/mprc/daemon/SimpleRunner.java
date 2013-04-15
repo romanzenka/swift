@@ -167,19 +167,14 @@ public final class SimpleRunner extends AbstractRunner {
 		public void save(final ConfigWriter writer) {
 			writer.put("numThreads", getNumThreads(), "Number of threads");
 			writer.put("logOutputFolder", getLogOutputFolder(), "Where to write logs");
-			writer.put(WORKER, getWorkerConfiguration());
+			super.save(writer);
 		}
 
 		@Override
 		public void load(final ConfigReader reader) {
 			numThreads = reader.getInteger("numThreads");
 			logOutputFolder = reader.get("logOutputFolder");
-			setWorkerConfiguration(reader.getObject("worker"));
-		}
-
-		@Override
-		public int getPriority() {
-			return 0;
+			super.load(reader);
 		}
 	}
 

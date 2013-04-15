@@ -68,8 +68,12 @@ public final class DatabaseUtilities {
 		schemaInitialization(cfg, initialization);
 
 		cfg.setProperty("hibernate.connection.driver_class", driverClassName);
-		cfg.setProperty("hibernate.connection.username", userName);
-		cfg.setProperty("hibernate.connection.password", password);
+		if (userName != null) {
+			cfg.setProperty("hibernate.connection.username", userName);
+		}
+		if (password != null) {
+			cfg.setProperty("hibernate.connection.password", password);
+		}
 		if (dialect != null) {
 			cfg.setProperty("hibernate.dialect", dialect);
 		}

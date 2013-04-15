@@ -14,12 +14,15 @@ import java.util.Map;
  * <li>type - additional information about the character of the resource. The resources can be grouped by the type in methods such as {@link #getSupportedConfigClassNames()}
  * </ul>
  */
-public interface MultiFactory extends ResourceFactory<ResourceConfig, Object> {
+public interface MultiFactory extends ReaderFactory {
 
 	Map<String/*id*/, Class<? extends ResourceConfig>> getConfigClasses();
 
 	/**
 	 * Obtain a factory that can create instances from given config class type.
+	 * <p/>
+	 * This is useful if the object creation is not to be done instantly.
+	 * A runner for instance keeps the factory to create a new worker on demand.
 	 *
 	 * @param configClass Config class to get factory for.
 	 * @return A factory that can create instances from given config class type.
@@ -40,7 +43,4 @@ public interface MultiFactory extends ResourceFactory<ResourceConfig, Object> {
 
 	String getUserName(Class<? extends ResourceConfig> clazz);
 
-	Object getResourceType(String id);
-
-	Class<? extends ResourceConfig> getConfigClass(String type);
 }

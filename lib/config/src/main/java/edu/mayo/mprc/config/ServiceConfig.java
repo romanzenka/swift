@@ -10,6 +10,7 @@ package edu.mayo.mprc.config;
 public final class ServiceConfig implements ResourceConfig, NamedResource {
 	public static final String RUNNER = "runner";
 	public static final String NAME = "name";
+	public static final String TYPE = "service";
 
 	private String name;
 

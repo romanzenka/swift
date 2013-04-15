@@ -14,8 +14,8 @@ class TestMultiFactory implements MultiFactory {
 		return new ImmutableMap.Builder()
 				.put("testResource", TestResource.class)
 				.put("testResource2", TestResource2.class)
-				.put("service", ServiceConfig.class)
-				.put("daemon", DaemonConfig.class)
+				.put(ServiceConfig.TYPE, ServiceConfig.class)
+				.put(DaemonConfig.TYPE, DaemonConfig.class)
 				.put("runner", TestRunnerConfig.class)
 				.put("appliaction", ApplicationConfig.class)
 				.build();
@@ -62,11 +62,6 @@ class TestMultiFactory implements MultiFactory {
 	@Override
 	public String getUserName(Class<? extends ResourceConfig> clazz) {
 		return getUserName(getId(clazz));
-	}
-
-	@Override
-	public Object getResourceType(String id) {
-		return null;
 	}
 
 	@Override
