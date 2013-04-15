@@ -28,18 +28,18 @@ public final class AppConfigReader implements Closeable {
 		}
 	}
 
-	public AppConfigReader(final Reader reader, final ReaderFactory readerFactory) {
+	public AppConfigReader(Reader reader, ReaderFactory readerFactory) {
 		init(reader, readerFactory);
 	}
 
-	private void init(final Reader reader, final ReaderFactory multiFactory) {
+	private void init(final Reader reader, final ReaderFactory readerFactory) {
 		this.reader = new BufferedReader(reader);
-		this.readerFactory = multiFactory;
-		this.dependencyResolver = new DependencyResolver(multiFactory);
+		this.readerFactory = readerFactory;
+		this.dependencyResolver = new DependencyResolver(readerFactory);
 	}
 
 	public ApplicationConfig load() {
-		final ApplicationConfig config = new ApplicationConfig();
+		final ApplicationConfig config = new ApplicationConfig(dependencyResolver);
 		int lineNum = 0;
 		final Map<String, String> values = new LinkedHashMap<String, String>(10);
 		try {
@@ -76,8 +76,8 @@ public final class AppConfigReader implements Closeable {
 						if (resourceConfig instanceof NamedResource) {
 							((NamedResource) resourceConfig).setName(name);
 						}
-						if(resourceConfig instanceof TypedResource) {
-							((TypedResource)resourceConfig).setType(type);
+						if (resourceConfig instanceof TypedResource) {
+							((TypedResource) resourceConfig).setType(type);
 						}
 						values.clear();
 					} else {
