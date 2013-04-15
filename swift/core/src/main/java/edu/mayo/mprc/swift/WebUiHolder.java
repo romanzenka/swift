@@ -13,4 +13,10 @@ public final class WebUiHolder {
 	public void setWebUi(final WebUi webUi) {
 		this.webUi = webUi;
 	}
+
+	public void stopSwiftMonitor() {
+		if (getWebUi() != null) {
+			getWebUi().stopSwiftMonitor();
+		}
+	}
 }

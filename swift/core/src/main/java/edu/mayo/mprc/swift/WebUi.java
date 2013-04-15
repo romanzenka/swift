@@ -175,6 +175,12 @@ public final class WebUi {
 		this.workspaceDao = workspaceDao;
 	}
 
+	public void stopSwiftMonitor() {
+		if (getSwiftMonitor() != null) {
+			getSwiftMonitor().stop();
+		}
+	}
+
 	/**
 	 * A factory capable of creating the web ui class.
 	 */

@@ -23,6 +23,11 @@ public final class ApplicationConfig implements ResourceConfig {
 	public static final String DAEMONS = "daemons";
 	// List of daemons
 	private List<DaemonConfig> daemons = new ArrayList<DaemonConfig>(1);
+	private DependencyResolver dependencyResolver;
+
+	public ApplicationConfig(DependencyResolver dependencyResolver) {
+		this.dependencyResolver = dependencyResolver;
+	}
 
 	public DaemonConfig getDaemonConfig(final String daemonId) {
 		for (final DaemonConfig config : daemons) {
@@ -66,10 +71,10 @@ public final class ApplicationConfig implements ResourceConfig {
 		}
 	}
 
-	public static ApplicationConfig load(final File configFile, final MultiFactory table) {
+	public static ApplicationConfig load(final File configFile, final ReaderFactory readerFactory) {
 		AppConfigReader reader = null;
 		try {
-			reader = new AppConfigReader(configFile, table);
+			reader = new AppConfigReader(configFile, readerFactory);
 			return reader.load();
 		} catch (Exception e) {
 			throw new MprcException("Cannot read config file from " + configFile.getAbsolutePath(), e);
@@ -152,5 +157,9 @@ public final class ApplicationConfig implements ResourceConfig {
 				}
 			}
 		}
+	}
+
+	public DependencyResolver getDependencyResolver() {
+		return dependencyResolver;
 	}
 }

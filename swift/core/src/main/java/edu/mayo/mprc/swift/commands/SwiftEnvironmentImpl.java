@@ -31,7 +31,6 @@ public final class SwiftEnvironmentImpl implements SwiftEnvironment {
 
 	private ApplicationConfig applicationConfig;
 	private DaemonConfig daemonConfig;
-	private DependencyResolver dependencyResolver;
 	private File configFile;
 	private SwiftCommandLine commandLine;
 	private SwiftMonitor monitor;
@@ -132,7 +131,6 @@ public final class SwiftEnvironmentImpl implements SwiftEnvironment {
 	}
 
 	public void setSwiftFactory(final MultiFactory swiftFactory) {
-		dependencyResolver = new DependencyResolver(swiftFactory);
 		this.swiftFactory = swiftFactory;
 	}
 
@@ -179,17 +177,17 @@ public final class SwiftEnvironmentImpl implements SwiftEnvironment {
 
 	@Override
 	public Daemon createDaemon(final DaemonConfig config) {
-		return daemonFactory.create(config, dependencyResolver);
+		return daemonFactory.create(config, config.getApplicationConfig().getDependencyResolver());
 	}
 
 	@Override
 	public Object createResource(final ResourceConfig resourceConfig) {
-		return dependencyResolver.createSingleton(resourceConfig);
+		return applicationConfig.getDependencyResolver().createSingleton(resourceConfig);
 	}
 
 	@Override
 	public DaemonConnection getConnection(final ServiceConfig service) {
-		final Object singleton = dependencyResolver.createSingleton(service);
+		final Object singleton = applicationConfig.getDependencyResolver().createSingleton(service);
 		if (singleton instanceof DaemonConnection) {
 			return (DaemonConnection) singleton;
 		} else {

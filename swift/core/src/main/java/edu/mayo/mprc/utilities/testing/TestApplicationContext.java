@@ -1,10 +1,7 @@
 package edu.mayo.mprc.utilities.testing;
 
 import com.google.common.collect.ImmutableMap;
-import edu.mayo.mprc.config.ApplicationConfig;
-import edu.mayo.mprc.config.DaemonConfig;
-import edu.mayo.mprc.config.MultiFactory;
-import edu.mayo.mprc.config.ServiceConfig;
+import edu.mayo.mprc.config.*;
 import edu.mayo.mprc.daemon.MessageBroker;
 import edu.mayo.mprc.daemon.SimpleRunner;
 import edu.mayo.mprc.database.DatabaseFactory;
@@ -62,7 +59,7 @@ public final class TestApplicationContext {
 		final DatabaseValidator validator = (DatabaseValidator) getBean("databaseValidator");
 
 		// Create a test application config with one daemon, message broker, database and searcher
-		final ApplicationConfig testConfig = new ApplicationConfig();
+		final ApplicationConfig testConfig = new ApplicationConfig(new DependencyResolver(getResourceTable()));
 
 		final DaemonConfig daemonConfig = DaemonConfig.getDefaultDaemonConfig("test", true);
 		daemonConfig.setTempFolderPath(tempFolder);

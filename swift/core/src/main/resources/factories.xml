@@ -57,10 +57,6 @@
     <bean id="resourceTable" class="edu.mayo.mprc.swift.ResourceTable">
     </bean>
 
-    <bean id="dependencyResolver" class="edu.mayo.mprc.config.DependencyResolver">
-        <constructor-arg index="0" ref="resourceTable"/>
-    </bean>
-
     <bean id="databaseValidator"
           class="edu.mayo.mprc.swift.search.DatabaseValidator">
         <property name="daoList" ref="daoList"/>
@@ -201,6 +197,5 @@
 
     <bean id="swiftMonitor" class="edu.mayo.mprc.swift.SwiftMonitor">
         <property name="factory" ref="resourceTable"/>
-        <property name="dependencies" ref="dependencyResolver"/>
     </bean>
 </beans>

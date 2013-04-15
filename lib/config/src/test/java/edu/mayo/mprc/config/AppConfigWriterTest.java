@@ -62,7 +62,7 @@ public final class AppConfigWriterTest {
 	private void setup() {
 		stringWriter = new StringWriter();
 		writer = new AppConfigWriter(stringWriter, new TestMultiFactory());
-		config = new ApplicationConfig();
+		config = new ApplicationConfig(null);
 	}
 
 	@AfterMethod

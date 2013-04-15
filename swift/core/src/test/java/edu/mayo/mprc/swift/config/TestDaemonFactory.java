@@ -88,7 +88,7 @@ public final class TestDaemonFactory {
 
 	@Test
 	public void shouldSaveDirMultiReferences() {
-		final ApplicationConfig config = new ApplicationConfig();
+		final ApplicationConfig config = new ApplicationConfig(new DependencyResolver(table));
 		final DaemonConfig daemon1 = new DaemonConfig();
 		daemon1.setName("daemon1");
 		final DaemonConfig daemon2 = new DaemonConfig();
@@ -120,7 +120,7 @@ public final class TestDaemonFactory {
 
 
 	private static ApplicationConfig createSwiftConfig() {
-		final ApplicationConfig config = new ApplicationConfig();
+		final ApplicationConfig config = new ApplicationConfig(new DependencyResolver(table));
 
 		final DaemonConfig main = new DaemonConfig();
 		main.setName("main");

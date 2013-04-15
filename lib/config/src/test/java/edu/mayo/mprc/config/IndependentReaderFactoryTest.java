@@ -16,7 +16,8 @@ public final class IndependentReaderFactoryTest {
 	@Test
 	public void shouldReadConfig() throws IOException {
 		final Reader reader = ResourceUtilities.getReader("classpath:edu/mayo/mprc/config/test.conf", IndependentReaderFactoryTest.class);
-		final AppConfigReader appReader = new AppConfigReader(reader, new GenericFactory());
+		final GenericFactory genericFactory = new GenericFactory();
+		final AppConfigReader appReader = new AppConfigReader(reader, genericFactory);
 		final ApplicationConfig load = appReader.load();
 		appReader.close();
 		Assert.assertEquals(load.getDaemons().size(), 1);

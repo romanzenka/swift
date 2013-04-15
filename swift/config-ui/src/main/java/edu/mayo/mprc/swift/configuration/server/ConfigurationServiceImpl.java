@@ -11,6 +11,7 @@ import edu.mayo.mprc.config.ServiceConfig;
 import edu.mayo.mprc.daemon.SimpleRunner;
 import edu.mayo.mprc.sge.GridRunner;
 import edu.mayo.mprc.swift.MainFactoryContext;
+import edu.mayo.mprc.swift.ResourceTable;
 import edu.mayo.mprc.swift.Swift;
 import edu.mayo.mprc.swift.configuration.client.ConfigurationService;
 import edu.mayo.mprc.swift.configuration.client.model.ApplicationModel;
@@ -47,7 +48,8 @@ public final class ConfigurationServiceImpl extends SpringGwtServlet implements 
 		final File configFile = swiftConfig.getAbsoluteFile();
 		try {
 			if (configFile.exists()) {
-				getData().setConfig(ApplicationConfig.load(configFile, MainFactoryContext.getResourceTable()));
+				final ResourceTable resourceTable = MainFactoryContext.getResourceTable();
+				getData().setConfig(ApplicationConfig.load(configFile, resourceTable));
 			} else {
 				getData().loadDefaultConfig();
 			}

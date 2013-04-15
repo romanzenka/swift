@@ -38,7 +38,7 @@ public final class DaemonConnectionFactory extends FactoryBase<ServiceConfig, Da
 	public DaemonConnection create(final ServiceConfig config, final DependencyResolver dependencies) {
 		// The creation of the daemon connection depends on a message broker being present
 		final MessageBroker.Config messageBrokerConfig = getMessageBrokerConfig(dependencies);
-		final URI serviceUri = getServiceUri(messageBrokerConfig.getBrokerUrl(), config.getName());
+		final URI serviceUri = getServiceUri("jms." + messageBrokerConfig.getBrokerUrl(), config.getName());
 		final ServiceFactory factory = getServiceFactory();
 		final Service service = factory.createService(serviceUri);
 		return new DirectDaemonConnection(service, fileTokenFactory);

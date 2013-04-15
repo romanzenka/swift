@@ -97,7 +97,9 @@ public final class SwiftWebContext {
 					initializedDaemon = daemonId;
 				} catch (Exception t) {
 					LOGGER.fatal("Swift web application should be terminated", t);
-					webUiHolder.getWebUi().getSwiftMonitor().stop();
+					if(webUiHolder!=null) {
+						webUiHolder.stopSwiftMonitor();
+					}
 					System.exit(1);
 					throw new MprcException(t);
 				}

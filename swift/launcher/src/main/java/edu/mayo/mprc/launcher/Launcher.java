@@ -273,7 +273,8 @@ public final class Launcher implements FileListener {
 	}
 
 	static DaemonConfig getDaemonConfig(final File configFile, final String daemonId) {
-		AppConfigReader reader = new AppConfigReader(configFile, new GenericFactory());
+		final GenericFactory readerFactory = new GenericFactory();
+		AppConfigReader reader = new AppConfigReader(configFile, readerFactory);
 		ApplicationConfig appConfig = reader.load();
 		if (daemonId == null) {
 			return appConfig.getDaemons().get(0);

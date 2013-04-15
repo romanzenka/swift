@@ -2,7 +2,10 @@ package edu.mayo.mprc.swift;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import edu.mayo.mprc.config.*;
+import edu.mayo.mprc.config.ApplicationConfig;
+import edu.mayo.mprc.config.DaemonConfig;
+import edu.mayo.mprc.config.MultiFactory;
+import edu.mayo.mprc.config.ServiceConfig;
 import edu.mayo.mprc.daemon.DaemonConnection;
 import edu.mayo.mprc.daemon.DaemonStatus;
 import edu.mayo.mprc.daemon.monitor.PingDaemonWorker;
@@ -33,7 +36,6 @@ public final class SwiftMonitor implements Runnable {
 	public static final long MONITOR_PERIOD_SECONDS = 30L;
 
 	private MultiFactory factory;
-	private DependencyResolver dependencies;
 	private ScheduledExecutorService scheduler;
 	private final Object connectionsLock = new Object();
 
@@ -45,7 +47,7 @@ public final class SwiftMonitor implements Runnable {
 			for (DaemonConfig daemonConfig : app.getDaemons()) {
 				final ServiceConfig pingServiceConfig = PingDaemonWorker.getPingServiceConfig(daemonConfig);
 				if (pingServiceConfig != null) {
-					final DaemonConnection daemonConnection = (DaemonConnection) getFactory().createSingleton(pingServiceConfig, getDependencies());
+					final DaemonConnection daemonConnection = (DaemonConnection) getFactory().createSingleton(pingServiceConfig, app.getDependencyResolver());
 					monitoredConnections.put(daemonConnection, new DaemonStatus("No response yet"));
 					pingListeners.put(daemonConnection, new PingListener(daemonConnection));
 				}
@@ -95,14 +97,6 @@ public final class SwiftMonitor implements Runnable {
 
 	public void setFactory(MultiFactory factory) {
 		this.factory = factory;
-	}
-
-	public DependencyResolver getDependencies() {
-		return dependencies;
-	}
-
-	public void setDependencies(DependencyResolver dependencies) {
-		this.dependencies = dependencies;
 	}
 
 	@Override

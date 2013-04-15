@@ -43,7 +43,7 @@ public class ConfigurationData {
 	}
 
 	public ConfigurationData() {
-		config = new ApplicationConfig();
+		config = new ApplicationConfig(new DependencyResolver(resourceTable));
 		initResolver();
 	}
 
@@ -386,7 +386,7 @@ public class ConfigurationData {
 	 * we are responsible for properly adding the daemon and resources as children.
 	 */
 	public void loadDefaultConfig() throws GWTServiceException {
-		final ApplicationConfig config = new ApplicationConfig();
+		final ApplicationConfig config = new ApplicationConfig(new DependencyResolver(resourceTable));
 		final DaemonConfig daemonConfig = createDaemonConfig("main", true);
 		config.addDaemon(daemonConfig);
 
