@@ -231,9 +231,9 @@ public final class Launcher implements FileListener {
 		try {
 			final DaemonConfig daemonConfig = getDaemonConfig(configFile, daemonId);
 			tempFolder = new File(daemonConfig.getTempFolderPath());
-		} catch (Exception ignore) {
+		} catch (Exception e) {
 			tempFolder = FileUtilities.getDefaultTempDirectory();
-			LOGGER.warn("Could not parse the config file " + configFile.getPath() + " to temporary daemon folder. Using default " + tempFolder);
+				LOGGER.warn("Could not parse the config file " + configFile.getPath() + " to temporary daemon folder. Using default " + tempFolder, e);
 		}
 		return tempFolder;
 	}
@@ -246,8 +246,8 @@ public final class Launcher implements FileListener {
 			try {
 				final GenericResource webUi = getResourceConfig(configFile, daemonId, "webUi");
 				return Integer.parseInt(webUi.get("port"));
-			} catch (Exception ignore) {
-				LOGGER.warn("Could not parse the config file " + configFile.getPath() + " to obtain web port number. Using default " + DEFAULT_PORT);
+			} catch (Exception e) {
+				LOGGER.warn("Could not parse the config file " + configFile.getPath() + " to obtain web port number. Using default " + DEFAULT_PORT, e);
 				portNumber = DEFAULT_PORT;
 			}
 		}
