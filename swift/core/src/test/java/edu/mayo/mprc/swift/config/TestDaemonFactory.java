@@ -64,7 +64,7 @@ public final class TestDaemonFactory {
 	public void shouldCreateDaemon() {
 		final ApplicationConfig config = createSwiftConfig();
 
-		final Daemon daemon = (Daemon)table.create(config.getDaemonConfig("main"), new DependencyResolver(table));
+		final Daemon daemon = (Daemon) table.create(config.getDaemonConfig("main"), new DependencyResolver(table));
 		daemon.start();
 	}
 
@@ -270,6 +270,9 @@ public final class TestDaemonFactory {
 
 		final WebUi.Config webUi = new WebUi.Config(searcher, "8080", "Swift 2.5", "C:\\", "file:///C:/", qstat, databasUndeployer);
 		main.addResource(webUi);
+
+		final MessageBroker.Config brokerConfig = MessageBroker.Config.getEmbeddedBroker();
+		main.addResource(brokerConfig);
 
 		config.addDaemon(main);
 

@@ -5,7 +5,6 @@ import edu.mayo.mprc.config.*;
 import edu.mayo.mprc.daemon.Daemon;
 import edu.mayo.mprc.daemon.DaemonConnection;
 import edu.mayo.mprc.daemon.DaemonConnectionFactory;
-import edu.mayo.mprc.daemon.MessageBroker;
 import edu.mayo.mprc.daemon.files.FileTokenFactory;
 import edu.mayo.mprc.swift.ExitCode;
 import edu.mayo.mprc.swift.SwiftConfig;
@@ -43,8 +42,8 @@ public final class SwiftEnvironmentImpl implements SwiftEnvironment {
 	/**
 	 * Load Swift configuration from a given file.
 	 *
-	 * @param configFile Swift config file to load config from.
-	 * @param swiftFactory  A factory of all objects supported by Swift.
+	 * @param configFile   Swift config file to load config from.
+	 * @param swiftFactory A factory of all objects supported by Swift.
 	 * @return Loaded Swift configuration.
 	 */
 	private static ApplicationConfig loadSwiftConfig(final File configFile, final MultiFactory swiftFactory) {
@@ -174,17 +173,8 @@ public final class SwiftEnvironmentImpl implements SwiftEnvironment {
 	public ApplicationConfig getApplicationConfig() {
 		if (applicationConfig == null) {
 			setApplicationConfig(loadSwiftConfig(configFile, getSwiftFactory()));
-			initDaemonConnectionFactory();
 		}
 		return applicationConfig;
-	}
-
-	private void initDaemonConnectionFactory() {
-		final List<ResourceConfig> brokers = getApplicationConfig().getModulesOfConfigType(MessageBroker.Config.class);
-		if (brokers.size() > 0) {
-			MessageBroker.Config config = (MessageBroker.Config) brokers.get(0);
-			daemonConnectionFactory.setBrokerUrl(config.getBrokerUrl());
-		}
 	}
 
 	@Override

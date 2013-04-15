@@ -4,10 +4,7 @@ import edu.mayo.mprc.MprcException;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Locale;
+import java.util.*;
 
 /**
  * A daemon is simply a running java VM which exposes one or more services.
@@ -250,13 +247,22 @@ public final class DaemonConfig implements ResourceConfig, NamedResource {
 		writer.put(DUMP_ERRORS, isDumpErrors(), "Not implemented yet");
 		writer.put(DUMP_FOLDER_PATH, getDumpFolderPath(), "Not implemented yet");
 
-		writer.put(SERVICES, getResourceList(writer, getServices()), "Comma separated list of provided services");
+		// It is important to save the resources before the services.
+		// There are unstated dependencies between the resources and the services
+		// .. e.g. a message broker has to exist before a service can be defined
 		writer.put(RESOURCES, getResourceList(writer, getResources()), "Comma separated list of provided resources");
+		writer.put(SERVICES, getResourceList(writer, getServices()), "Comma separated list of provided services");
 	}
 
 	private static String getResourceList(final ConfigWriter writer, final Collection<? extends ResourceConfig> resources) {
 		final StringBuilder result = new StringBuilder(resources.size() * 10);
+		ArrayList<ResourceConfig> sorted = new ArrayList<ResourceConfig>(resources.size());
 		for (final ResourceConfig config : resources) {
+			sorted.add(config);
+		}
+		Collections.sort(sorted, new ResourceConfigComparator());
+
+		for (final ResourceConfig config : sorted) {
 			if (result.length() > 0) {
 				result.append(", ");
 			}
@@ -276,18 +282,18 @@ public final class DaemonConfig implements ResourceConfig, NamedResource {
 		dumpFolderPath = reader.get(DUMP_FOLDER_PATH);
 
 		{
-			final List<? extends ResourceConfig> servicesList = reader.getResourceList(SERVICES);
-			services.clear();
-			for (final ResourceConfig service : servicesList) {
-				services.add((ServiceConfig) service);
-			}
-		}
-
-		{
 			final List<? extends ResourceConfig> resourcesList = reader.getResourceList(RESOURCES);
 			resources.clear();
 			for (final ResourceConfig resource : resourcesList) {
 				resources.add(resource);
+			}
+		}
+
+		{
+			final List<? extends ResourceConfig> servicesList = reader.getResourceList(SERVICES);
+			services.clear();
+			for (final ResourceConfig service : servicesList) {
+				services.add((ServiceConfig) service);
 			}
 		}
 	}
@@ -318,4 +324,5 @@ public final class DaemonConfig implements ResourceConfig, NamedResource {
 		}
 		return null;
 	}
+
 }

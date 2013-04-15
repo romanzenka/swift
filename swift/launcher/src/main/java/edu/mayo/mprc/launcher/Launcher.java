@@ -1,7 +1,12 @@
 package edu.mayo.mprc.launcher;
 
 import edu.mayo.mprc.MprcException;
-import edu.mayo.mprc.config.*;
+import edu.mayo.mprc.config.AppConfigReader;
+import edu.mayo.mprc.config.ApplicationConfig;
+import edu.mayo.mprc.config.DaemonConfig;
+import edu.mayo.mprc.config.ResourceConfig;
+import edu.mayo.mprc.config.generic.GenericFactory;
+import edu.mayo.mprc.config.generic.GenericResource;
 import edu.mayo.mprc.utilities.CommandLine;
 import edu.mayo.mprc.utilities.FileListener;
 import edu.mayo.mprc.utilities.FileMonitor;
@@ -268,7 +273,7 @@ public final class Launcher implements FileListener {
 	}
 
 	static DaemonConfig getDaemonConfig(final File configFile, final String daemonId) {
-		AppConfigReader reader = new AppConfigReader(configFile, new IndependentReaderFactory());
+		AppConfigReader reader = new AppConfigReader(configFile, new GenericFactory());
 		ApplicationConfig appConfig = reader.load();
 		if (daemonId == null) {
 			return appConfig.getDaemons().get(0);

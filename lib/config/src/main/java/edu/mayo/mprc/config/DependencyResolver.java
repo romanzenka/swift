@@ -55,7 +55,11 @@ public final class DependencyResolver {
 			dependencies.put(config, new IdObjectPair(dependencies.get(config).getId(), dependency));
 
 		} else {
-			dependencies.put(config, new IdObjectPair(String.valueOf(id++), dependency));
+			if(config instanceof NamedResource) {
+				dependencies.put(config, new IdObjectPair(((NamedResource)config).getName(), dependency));
+			} else {
+				dependencies.put(config, new IdObjectPair(String.valueOf(id++), dependency));
+			}
 		}
 	}
 

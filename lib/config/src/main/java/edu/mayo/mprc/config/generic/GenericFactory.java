@@ -1,6 +1,7 @@
-package edu.mayo.mprc.config;
+package edu.mayo.mprc.config.generic;
 
 import edu.mayo.mprc.MprcException;
+import edu.mayo.mprc.config.*;
 
 /**
  * A special factory that does not create actual config classes. Instead it will produce instances
@@ -10,8 +11,8 @@ import edu.mayo.mprc.MprcException;
  *
  * @author Roman Zenka
  */
-public final class IndependentReaderFactory extends FactoryBase<ResourceConfig, Object> implements ReaderFactory {
-	public IndependentReaderFactory() {
+public final class GenericFactory extends FactoryBase<ResourceConfig, Object> implements ReaderFactory {
+	public GenericFactory() {
 	}
 
 	@Override

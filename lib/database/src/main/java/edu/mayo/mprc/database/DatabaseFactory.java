@@ -202,7 +202,7 @@ public final class DatabaseFactory extends FactoryBase<ResourceConfig, SessionFa
 
 		public void save(final ConfigWriter writer) {
 			writer.put("url", getUrl(), "JDBC-style URL of the server");
-			writer.put("userName", getUserName(), "Database user");
+			writer.put("username", getUserName(), "Database user");
 			writer.put("password", getPassword(), "Database password");
 			writer.put("driverClassName", getDriverClassName(), "Name of the JDBC driver class");
 			writer.put("dialect", getDialect(), "Database dialect");

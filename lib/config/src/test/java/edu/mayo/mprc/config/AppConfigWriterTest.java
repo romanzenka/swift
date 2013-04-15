@@ -48,10 +48,10 @@ public final class AppConfigWriterTest {
 			"        osArch                         # Host system architecture: x86, x86_64\n" +
 			"        sharedFileSpacePath            # Directory on a shared file system can be accessed from all the daemons\n" +
 			"        tempFolderPath                 # Temporary folder that can be used for caching. Transferred files from other daemons with no shared file system with this daemon are cached to this folder.\n" +
-			"        dumpErrors                     # Not implemented yet\n" +
+			"        dumpErrors           false     # Not implemented yet\n" +
 			"        dumpFolderPath                 # Not implemented yet\n" +
-			"        services             service1  # Comma separated list of provided services\n" +
 			"        resources                      # Comma separated list of provided resources\n" +
+			"        services             service1  # Comma separated list of provided services\n" +
 			"</daemon>\n";
 
 	private StringWriter stringWriter;

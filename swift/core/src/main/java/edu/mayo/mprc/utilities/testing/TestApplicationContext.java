@@ -5,7 +5,6 @@ import edu.mayo.mprc.config.ApplicationConfig;
 import edu.mayo.mprc.config.DaemonConfig;
 import edu.mayo.mprc.config.MultiFactory;
 import edu.mayo.mprc.config.ServiceConfig;
-import edu.mayo.mprc.daemon.DaemonConnectionFactory;
 import edu.mayo.mprc.daemon.MessageBroker;
 import edu.mayo.mprc.daemon.SimpleRunner;
 import edu.mayo.mprc.database.DatabaseFactory;
@@ -71,8 +70,6 @@ public final class TestApplicationContext {
 
 		final MessageBroker.Config messageBrokerConfig = MessageBroker.Config.getEmbeddedBroker();
 		daemonConfig.addResource(messageBrokerConfig);
-		final DaemonConnectionFactory daemonConnectionFactory = (DaemonConnectionFactory) testContext.getBean("daemonConnectionFactory");
-		daemonConnectionFactory.setBrokerUrl(messageBrokerConfig.getBrokerUrl());
 
 		daemonConfig.addResource(databaseConfig);
 

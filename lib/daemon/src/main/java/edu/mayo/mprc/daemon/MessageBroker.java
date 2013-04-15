@@ -153,7 +153,7 @@ public final class MessageBroker implements Closeable {
 	/**
 	 * Configuration for the factory
 	 */
-	public static final class Config implements ResourceConfig {
+	public static final class Config implements ResourceConfig, NamedResource {
 		private String brokerUrl;
 		private String embeddedBrokerUrl;
 		private String embedded;
@@ -214,7 +214,7 @@ public final class MessageBroker implements Closeable {
 		}
 
 		public boolean isUseJmx() {
-			return getUseJmx().equalsIgnoreCase("true");
+			return getUseJmx() != null && getUseJmx().equalsIgnoreCase("true");
 		}
 
 		public boolean isEmbedded() {
@@ -250,6 +250,18 @@ public final class MessageBroker implements Closeable {
 				return getEmbeddedBrokerUrl().trim();
 			} else {
 				return getBrokerUrl().trim();
+			}
+		}
+
+		@Override
+		public String getName() {
+			return "messageBroker";
+		}
+
+		@Override
+		public void setName(final String name) {
+			if (!"messageBroker".equals(name)) {
+				throw new MprcException("The message broker is a singleton. Only one can exist, and it must be named 'messageBroker'");
 			}
 		}
 	}

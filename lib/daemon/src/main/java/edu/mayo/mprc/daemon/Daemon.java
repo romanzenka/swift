@@ -10,10 +10,8 @@ import org.apache.log4j.Logger;
 import org.springframework.stereotype.Component;
 
 import java.io.Closeable;
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 
 /**
@@ -92,7 +90,7 @@ public final class Daemon {
 	@Component("daemonFactory")
 	public static final class Factory extends FactoryBase<DaemonConfig, Daemon> implements FactoryDescriptor {
 		private void addResourcesToList(final List<Object> resources, final List<ResourceConfig> configs, final DependencyResolver dependencies) {
-			Collections.sort(configs, new ResourceComparator());
+			Collections.sort(configs, new ResourceConfigComparator());
 			for (final ResourceConfig resourceConfig : configs) {
 				final Object resource = dependencies.createSingleton(resourceConfig);
 				resources.add(resource);
@@ -165,14 +163,6 @@ public final class Daemon {
 			}
 
 			return new Daemon(runners, resources);
-		}
-	}
-
-	private static final class ResourceComparator implements Comparator<ResourceConfig>, Serializable {
-		private static final long serialVersionUID = 20101123L;
-
-		public int compare(final ResourceConfig o1, final ResourceConfig o2) {
-			return Integer.valueOf(o2.getPriority()).compareTo(o1.getPriority());
 		}
 	}
 }

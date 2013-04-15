@@ -1,10 +1,15 @@
-package edu.mayo.mprc.config;
+package edu.mayo.mprc.config.generic;
 
 import edu.mayo.mprc.MprcException;
+import edu.mayo.mprc.config.ConfigReader;
+import edu.mayo.mprc.config.ConfigWriter;
+import edu.mayo.mprc.config.RunnerConfig;
 
 import java.util.LinkedHashMap;
 
 /**
+ * A generic runner. Does none of the runner work, only holds runner's configuration.
+ *
  * @author Roman Zenka
  */
 public final class GenericRunner extends RunnerConfig {

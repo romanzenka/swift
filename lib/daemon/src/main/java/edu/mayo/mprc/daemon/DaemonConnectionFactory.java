@@ -18,18 +18,9 @@ import java.net.URISyntaxException;
 public final class DaemonConnectionFactory extends FactoryBase<ServiceConfig, DaemonConnection> implements FactoryDescriptor {
 	private FileTokenFactory fileTokenFactory;
 	private ServiceFactory serviceFactory;
-	private String brokerUrl;
 
 	public FileTokenFactory getFileTokenFactory() {
 		return fileTokenFactory;
-	}
-
-	public String getBrokerUrl() {
-		return brokerUrl;
-	}
-
-	public void setBrokerUrl(String brokerUrl) {
-		this.brokerUrl = brokerUrl;
 	}
 
 	public void setFileTokenFactory(final FileTokenFactory fileTokenFactory) {
@@ -45,13 +36,23 @@ public final class DaemonConnectionFactory extends FactoryBase<ServiceConfig, Da
 	}
 
 	public DaemonConnection create(final ServiceConfig config, final DependencyResolver dependencies) {
-		final URI serviceUri = getServiceUri(config.getName());
+		// The creation of the daemon connection depends on a message broker being present
+		final MessageBroker.Config messageBrokerConfig = getMessageBrokerConfig(dependencies);
+		final URI serviceUri = getServiceUri(messageBrokerConfig.getBrokerUrl(), config.getName());
 		final ServiceFactory factory = getServiceFactory();
 		final Service service = factory.createService(serviceUri);
 		return new DirectDaemonConnection(service, fileTokenFactory);
 	}
 
-	private URI getServiceUri(final String name) {
+	private MessageBroker.Config getMessageBrokerConfig(final DependencyResolver dependencies) {
+		final ResourceConfig messageBroker = dependencies.getConfigFromId("messageBroker");
+		if (messageBroker instanceof MessageBroker.Config) {
+			return (MessageBroker.Config) messageBroker;
+		}
+		throw new MprcException("There must be precisely one message broker named 'messageBroker'");
+	}
+
+	private URI getServiceUri(final String brokerUrl, final String name) {
 		if (brokerUrl == null) {
 			throw new MprcException("The broker URL has to be initialized before we can start creating connections to daemons");
 		}

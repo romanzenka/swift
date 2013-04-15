@@ -1,6 +1,7 @@
-package edu.mayo.mprc.config;
+package edu.mayo.mprc.config.generic;
 
 import edu.mayo.mprc.MprcException;
+import edu.mayo.mprc.config.*;
 
 import java.util.LinkedHashMap;
 
