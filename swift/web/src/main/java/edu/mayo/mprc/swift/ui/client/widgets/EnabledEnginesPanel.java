@@ -39,6 +39,9 @@ public final class EnabledEnginesPanel extends HorizontalPanel {
 	 * @return All the engines the user enabled, together with versions they picked.
 	 */
 	public ArrayList<ClientSearchEngineConfig> getEnabledEngines() {
+		if (engines == null) {
+			return new ArrayList<ClientSearchEngineConfig>(0);
+		}
 		final ArrayList<ClientSearchEngineConfig> result = new ArrayList<ClientSearchEngineConfig>(engines.size());
 		for (final EngineVersionSelector selector : engines.values()) {
 			if (selector.isEnabled()) {
@@ -49,6 +52,9 @@ public final class EnabledEnginesPanel extends HorizontalPanel {
 	}
 
 	public void setCurrentEngines(final ArrayList<ClientSearchEngineConfig> enabledEngines) {
+		if (enabledEngines == null || engines == null) {
+			return;
+		}
 		for (final ClientSearchEngineConfig config : enabledEngines) {
 			final String code = config.getCode();
 			final EngineVersionSelector selector = engines.get(code);
@@ -64,6 +70,6 @@ public final class EnabledEnginesPanel extends HorizontalPanel {
 
 	private void reportWarning(final String warning) {
 		// Do nothing now
-		int i= 0;
+		int i = 0;
 	}
 }

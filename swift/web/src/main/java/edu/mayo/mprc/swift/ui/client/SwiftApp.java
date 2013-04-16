@@ -126,10 +126,10 @@ public final class SwiftApp implements EntryPoint, HidesPageContentsWhileLoading
 				finalizeFileTableInit();
 				finalizeSpectrumQa(result.getSpectrumQaParamFileInfo());
 				finalizeInitReport(result.isScaffoldReportEnabled());
+				initEnabledEngines(result.getSearchEngines());
 				initUserList(result.listUsers());
 				showPageContentsAfterLoad();
 				initMessage(result.getUserMessage());
-				initEnabledEngines(result.getSearchEngines());
 				loadPreviousSearch(result.loadedSearch());
 			}
 		});
