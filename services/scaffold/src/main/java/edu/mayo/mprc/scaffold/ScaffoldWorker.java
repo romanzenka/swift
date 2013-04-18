@@ -79,7 +79,7 @@ public final class ScaffoldWorker extends WorkerBase {
 		final File result = scaffoldWorkPacket.getSpectrumExportFile();
 		if (result.exists() && result.isFile() && result.canRead()) {
 			// The file is there. Is it the correct version?
-			if (isScaffold3SpectrumExport(result)) {
+			if (isScaffoldSpectrumExport(result)) {
 				LOGGER.info("The spectrum export has already been performed: [" + result.getAbsolutePath() + "]");
 				return;
 			} else {
@@ -97,7 +97,7 @@ public final class ScaffoldWorker extends WorkerBase {
 
 		runScaffold(progressReporter, scafmlFile, scaffoldWorkFolder, outputFolder);
 
-		if (!isScaffold3SpectrumExport(result)) {
+		if (!isScaffoldSpectrumExport(result)) {
 			throw new MprcException("Even after rerunning Scaffold, the spectrum report is still the old version");
 		}
 	}
@@ -106,7 +106,7 @@ public final class ScaffoldWorker extends WorkerBase {
 	 * @param export The Scaffold spectrum export to check.
 	 * @return True if this is a proper Scaffold spectrum export (not an older version).
 	 */
-	private boolean isScaffold3SpectrumExport(final File export) {
+	private boolean isScaffoldSpectrumExport(final File export) {
 		final ScaffoldSpectraVersion version = new ScaffoldSpectraVersion();
 		version.load(export, null/*Not sure which version*/, null/* No progress reporting */);
 		// Currently if the version starts with 3, it is deemed ok

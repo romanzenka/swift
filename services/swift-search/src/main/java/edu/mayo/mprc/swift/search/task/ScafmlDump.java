@@ -163,8 +163,7 @@ class ScafmlDump {
 	}
 
 	private static boolean isProcessedByScaffold(final FileSearch inputFile) {
-		return (inputFile.isSearch("SCAFFOLD")
-				|| inputFile.isSearch("SCAFFOLD3"));
+		return inputFile.isSearch("SCAFFOLD");
 	}
 
 	static String deployedDatabaseTableToString(final Map<String, File> deployedDatabases) {

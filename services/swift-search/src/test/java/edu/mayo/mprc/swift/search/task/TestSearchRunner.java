@@ -209,7 +209,6 @@ public class TestSearchRunner {
 		searchEngines.add(searchEngine("TANDEM"));
 		searchEngines.add(searchEngine("MYRIMATCH"));
 		searchEngines.add(searchEngine("SCAFFOLD"));
-		searchEngines.add(searchEngine("SCAFFOLD3"));
 		searchEngines.add(searchEngine("IDPICKER"));
 		return searchEngines;
 	}
@@ -221,7 +220,6 @@ public class TestSearchRunner {
 		engines.add(createSearchEngineConfig("TANDEM"));
 		engines.add(createSearchEngineConfig("MYRIMATCH"));
 		engines.add(createSearchEngineConfig("SCAFFOLD"));
-		engines.add(createSearchEngineConfig("SCAFFOLD3"));
 		engines.add(createSearchEngineConfig("IDPICKER"));
 		return engines;
 	}
@@ -244,7 +242,7 @@ public class TestSearchRunner {
 		final SearchEngine engine = new SearchEngine();
 		final EngineMetadata metadata = new EngineMetadata(
 				code, null, code, false, code + "_output_dir", null,
-				new String[]{}, new String[]{}, new String[]{}, 0, code.equals("SCAFFOLD") || code.equals("SCAFFOLD3") || code.equals("IDPICKER"));
+				new String[]{}, new String[]{}, new String[]{}, 0, code.equals("SCAFFOLD") || code.equals("IDPICKER"));
 		engine.setEngineMetadata(metadata);
 		engine.setSearchDaemon(mock(DaemonConnection.class));
 		engine.setDbDeployDaemon(mock(DaemonConnection.class));

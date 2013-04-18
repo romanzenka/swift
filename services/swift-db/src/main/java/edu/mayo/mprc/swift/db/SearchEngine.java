@@ -287,16 +287,21 @@ public final class SearchEngine implements Comparable<SearchEngine> {
 		if (!getCode().equals(that.getCode())) {
 			return false;
 		}
+		if (!getVersion().equals(that.getVersion())) {
+			return false;
+		}
 
 		return true;
 	}
 
 	public int hashCode() {
-		return getCode().hashCode();
+		return getCode().hashCode()
+				+ 31 * getVersion().hashCode();
 	}
 
 	public int compareTo(final SearchEngine o) {
-		return getCode().compareTo(o.getCode());
+		final int comparison = getCode().compareTo(o.getCode());
+		return comparison == 0 ? getVersion().compareTo(o.getVersion()) : comparison;
 	}
 
 	@Component("searchEngineFactory")

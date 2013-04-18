@@ -194,13 +194,6 @@ public final class SwiftDaoHibernate extends DaoBase implements SwiftDao {
 		);
 	}
 
-	private static Criterion getSearchEngineEqualityCriteria(final String code, final String version) {
-		return Restrictions.and(
-				DaoBase.nullSafeEq("code", code),
-				DaoBase.nullSafeEq("version", version)
-		);
-	}
-
 	@Override
 	public SearchEngineConfig addSearchEngineConfig(final SearchEngineConfig config) {
 		try {
@@ -233,7 +226,12 @@ public final class SwiftDaoHibernate extends DaoBase implements SwiftDao {
 		}
 		Preconditions.checkNotNull(engines, "Enabled engine list must not be null");
 		try {
-			return updateCollection(engines, engines.getEngineConfigs(), "engineConfigs");
+			final EnabledEngines result = new EnabledEngines();
+			result.setId(engines.getId());
+			for(final SearchEngineConfig searchEngineConfig : engines.getEngineConfigs()) {
+				result.add(addSearchEngineConfig(searchEngineConfig));
+			}
+			return updateCollection(result, result.getEngineConfigs(), "engineConfigs");
 		} catch (Exception t) {
 			throw new MprcException("Could not add search engine set", t);
 		}
@@ -431,7 +429,7 @@ public final class SwiftDaoHibernate extends DaoBase implements SwiftDao {
 		}
 	}
 
-	private Criterion getTaskStateDataEqualityCriteria(TaskStateData taskStateData) {
+	private Criterion getTaskStateDataEqualityCriteria(final TaskStateData taskStateData) {
 		return DaoBase.nullSafeEq("description", taskStateData.getDescription());
 	}
 

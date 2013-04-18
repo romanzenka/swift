@@ -62,7 +62,7 @@ public final class SearchDbTask extends AsyncTaskBase {
 	}
 
 	/**
-	 * Override the spectra file if the scaffold3 task is not available.
+	 * Override the spectra file if the scaffold task is not available.
 	 *
 	 * @param scaffoldSpectraFile Scaffold spectra file to load.
 	 */
