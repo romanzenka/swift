@@ -17,6 +17,8 @@ import edu.mayo.mprc.swift.configuration.client.ConfigurationService;
 import edu.mayo.mprc.swift.configuration.client.model.ApplicationModel;
 import edu.mayo.mprc.swift.configuration.client.model.ResourceModel;
 import edu.mayo.mprc.swift.configuration.client.model.UiChangesReplayer;
+import edu.mayo.mprc.swift.configuration.server.session.ServletStorage;
+import edu.mayo.mprc.swift.configuration.server.session.SessionStorage;
 import edu.mayo.mprc.utilities.exceptions.ExceptionUtilities;
 
 import java.io.File;
@@ -28,6 +30,12 @@ import java.io.File;
  */
 public final class ConfigurationServiceImpl extends SpringGwtServlet implements ConfigurationService {
 	private static final long serialVersionUID = 20101221L;
+
+	private SessionStorage storage;
+
+	public ConfigurationServiceImpl() {
+		storage = new ServletStorage(this);
+	}
 
 	/**
 	 * We need to take the client-side model of the configuration and convert it to {@link edu.mayo.mprc.config.ApplicationConfig}.
@@ -43,8 +51,12 @@ public final class ConfigurationServiceImpl extends SpringGwtServlet implements 
 	}
 
 	public ApplicationModel loadConfiguration() throws GWTServiceException {
-		MainFactoryContext.initialize();
 		final File swiftConfig = new File(Swift.CONFIG_FILE_NAME);
+		return loadFromFile(swiftConfig);
+	}
+
+	ApplicationModel loadFromFile(final File swiftConfig) throws GWTServiceException {
+		MainFactoryContext.initialize();
 		final File configFile = swiftConfig.getAbsoluteFile();
 		try {
 			if (configFile.exists()) {
@@ -94,10 +106,10 @@ public final class ConfigurationServiceImpl extends SpringGwtServlet implements 
 	}
 
 	private ConfigurationData getData() {
-		final Object obj = getServletContext().getAttribute("configurationData");
+		final Object obj = getStorage().get("configurationData");
 		if (obj == null) {
 			final ConfigurationData configurationData = new ConfigurationData();
-			getServletContext().setAttribute("configurationData", configurationData);
+			getStorage().put("configurationData", configurationData);
 			return configurationData;
 		}
 		if (obj instanceof ConfigurationData) {
@@ -108,4 +120,11 @@ public final class ConfigurationServiceImpl extends SpringGwtServlet implements 
 		}
 	}
 
+	public SessionStorage getStorage() {
+		return storage;
+	}
+
+	public void setStorage(SessionStorage storage) {
+		this.storage = storage;
+	}
 }

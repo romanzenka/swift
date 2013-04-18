@@ -76,7 +76,7 @@ public class ConfigurationData {
 	}
 
 	public ResourceModel createChild(final String parentId, final String type) throws GWTServiceException {
-		final String index = getFreeIndex(type);
+		final int index = getFreeIndex(type);
 		final ResourceConfig parent = getResourceConfig(parentId);
 		if (parent instanceof DaemonConfig) {
 			return createResource(index, type, (DaemonConfig) parent);
@@ -90,14 +90,14 @@ public class ConfigurationData {
 	 * For given type (e.g. "mascot") finds all objects with names "mascot1", "mascot2"... etc.
 	 * Returns lowest number referring to a name that does not exist yet (e.g. "3") in this case.
 	 */
-	private String getFreeIndex(final String type) {
-		int count = 1;
+	int getFreeIndex(final String type) {
+		int index = 1;
 		while (true) {
-			final String countedName = type + count;
+			final String countedName = getName(type, index);
 			if (!nameExists(countedName)) {
-				return "" + count;
+				return index;
 			}
-			count++;
+			index++;
 		}
 	}
 
@@ -133,7 +133,7 @@ public class ConfigurationData {
 	/**
 	 * Create new resource and add it to the given parent.
 	 */
-	private ResourceModel createResource(final String index, final String type, final DaemonConfig parent) throws GWTServiceException {
+	private ResourceModel createResource(final int index, final String type, final DaemonConfig parent) throws GWTServiceException {
 		try {
 			final ResourceConfig resultConfig = createResourceConfig(index, type, parent);
 
@@ -154,7 +154,7 @@ public class ConfigurationData {
 		}
 	}
 
-	private ResourceConfig createResourceConfig(String index, String type, DaemonConfig parent) throws GWTServiceException {
+	private ResourceConfig createResourceConfig(int index, String type, DaemonConfig parent) throws GWTServiceException {
 		final ResourceTable moduleConfigTable = getResourceTable();
 
 		final ResourceConfig resourceConfig = getDefaultResourceConfig(type, parent, moduleConfigTable);
@@ -174,7 +174,7 @@ public class ConfigurationData {
 		return resultConfig;
 	}
 
-	private ServiceConfig createServiceConfig(String index, String type, DaemonConfig parent, ResourceConfig resourceConfig) {
+	private ServiceConfig createServiceConfig(int index, String type, DaemonConfig parent, ResourceConfig resourceConfig) {
 		// A service needs a runner
 		final ServiceConfig serviceConfig = new ServiceConfig();
 
@@ -183,10 +183,14 @@ public class ConfigurationData {
 			return null;
 		}
 		serviceConfig.setRunner(new SimpleRunner.Config(resourceConfig));
-		serviceConfig.setName(type + '_' + index); // The name is type_index
+		serviceConfig.setName(getName(type, index)); // The name is type_index
 
 		parent.addResource(serviceConfig);
 		return serviceConfig;
+	}
+
+	private String getName(String type, int index) {
+		return type + '_' + index;
 	}
 
 	/**
@@ -212,15 +216,6 @@ public class ConfigurationData {
 			MapConfigReader.load(resourceConfig, builder.getValues(), resolver);
 		}
 		return resourceConfig;
-	}
-
-	private String getMessageBrokerUrl() {
-		final List<ResourceConfig> brokerModules = config.getModulesOfConfigType(MessageBroker.Config.class);
-		if (brokerModules.size() > 0 && (brokerModules.get(0) instanceof MessageBroker.Config)) {
-			final MessageBroker.Config broker = (MessageBroker.Config) brokerModules.get(0);
-			return broker.effectiveBrokerUrl();
-		}
-		return "";
 	}
 
 	public void removeChild(final String childId) throws GWTServiceException {
@@ -293,7 +288,7 @@ public class ConfigurationData {
 		for (final ServiceConfig service : daemon.getServices()) {
 			final ResourceTable table = getResourceTable();
 			final String type = table.getId(service.getRunner().getWorkerConfiguration().getClass());
-			final String moduleIndex = service.getName().substring(type.length() + "_".length());
+			final int moduleIndex = Integer.parseInt(service.getName().substring(type.length() + "_".length()));
 			final ModuleModel module = mapServiceConfigToModel(moduleIndex, daemon, service);
 			daemonModel.addChild(module);
 		}
@@ -317,7 +312,7 @@ public class ConfigurationData {
 		return resource;
 	}
 
-	private ModuleModel mapServiceConfigToModel(final String index, final DaemonConfig daemon, final ServiceConfig service) {
+	private ModuleModel mapServiceConfigToModel(final int index, final DaemonConfig daemon, final ServiceConfig service) {
 		final ResourceModel serviceModel = new ResourceModel(service.getName(), ServiceConfig.TYPE);
 
 		resolver.setDependency(service, serviceModel);
@@ -330,7 +325,7 @@ public class ConfigurationData {
 		final ResourceConfig moduleConfig = runner.getWorkerConfiguration();
 		final ResourceTable table = getResourceTable();
 		final String moduleType = table.getId(moduleConfig.getClass());
-		final String moduleName = table.getUserName(moduleType) + ("1".equals(index) ? "" : " " + index);
+		final String moduleName = table.getUserName(moduleType) + (1 == index ? "" : " " + index);
 
 		final ModuleModel module = new ModuleModel(moduleName, moduleType, serviceModel, runnerModel);
 		setResourceUi(daemon, moduleConfig, moduleType, module);
@@ -390,10 +385,10 @@ public class ConfigurationData {
 		final DaemonConfig daemonConfig = createDaemonConfig("main", true);
 		config.addDaemon(daemonConfig);
 
-		final DatabaseFactory.Config database = (DatabaseFactory.Config) createResourceConfig("1", DatabaseFactory.TYPE, daemonConfig);
-		createResourceConfig("1", MessageBroker.TYPE, daemonConfig);
-		final ServiceConfig searcher = (ServiceConfig)createResourceConfig("1", SwiftSearcher.TYPE, daemonConfig);
-		final WebUi.Config webUi = (WebUi.Config)createResourceConfig("1", WebUi.TYPE, daemonConfig);
+		final DatabaseFactory.Config database = (DatabaseFactory.Config) createResourceConfig(1, DatabaseFactory.TYPE, daemonConfig);
+		createResourceConfig(1, MessageBroker.TYPE, daemonConfig);
+		final ServiceConfig searcher = (ServiceConfig) createResourceConfig(1, SwiftSearcher.TYPE, daemonConfig);
+		final WebUi.Config webUi = (WebUi.Config) createResourceConfig(1, WebUi.TYPE, daemonConfig);
 
 		webUi.setSearcher(searcher);
 		((SwiftSearcher.Config) searcher.getRunner().getWorkerConfiguration()).setDatabase(database);
@@ -468,10 +463,6 @@ public class ConfigurationData {
 			}
 		}
 		return uiChanges.getReplayer();
-	}
-
-	private String getServiceBrokerUri(final String brokerUrl, final String serviceName) {
-		return "jms." + brokerUrl + (brokerUrl.indexOf('?') == -1 ? "?" : "&") + "simplequeue=" + serviceName;
 	}
 
 	public UiChangesReplayer setProperty(final ResourceConfig resourceConfig, final String propertyName, final String newValue, final boolean onDemand) {

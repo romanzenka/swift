@@ -1,5 +1,6 @@
 package edu.mayo.mprc.swift.configuration.server;
 
+import edu.mayo.mprc.MprcException;
 import edu.mayo.mprc.common.client.GWTServiceException;
 import edu.mayo.mprc.config.DaemonConfig;
 import edu.mayo.mprc.config.KeyExtractingWriter;
@@ -69,7 +70,7 @@ public final class ConfigurationDataTest {
 
 	@Test
 	public static void shouldSetProperty() {
-		final DatabaseFactory.Config dbConfig = (DatabaseFactory.Config) getMainDaemon().getResources().get(0);
+		final DatabaseFactory.Config dbConfig = (DatabaseFactory.Config) getMainDaemon().getResources().get(1);
 		final UiChangesReplayer uiChangesReplayer = data.setProperty(dbConfig, USERNAME, TEST, false);
 		uiChangesReplayer.replay(new UiChanges() {
 			private static final long serialVersionUID = 8556656441048925831L;
@@ -126,6 +127,48 @@ public final class ConfigurationDataTest {
 
 		// Config has to change
 		checkTandemExecutable(tandem, "bin/tandem/win32_tandem/tandem.exe");
+	}
+
+	@Test
+	public static void shouldAddChild() throws GWTServiceException {
+		final int children1 = getMainDaemonChildrenCount();
+		final ResourceModel model1 = data.createChild(data.getId(getMainDaemon()), XTandemWorker.TYPE);
+		final int children2 = getMainDaemonChildrenCount();
+		final ResourceModel model2 = data.createChild(data.getId(getMainDaemon()), XTandemWorker.TYPE);
+		final int children3 = getMainDaemonChildrenCount();
+		Assert.assertTrue(model1.getId() != model2.getId(), "Different models must have different names");
+		final String service1 = getServiceForModel(model1).getName();
+		final String service2 = getServiceForModel(model2).getName();
+		Assert.assertFalse(service1.equals(service2), "Different services need different names");
+		Assert.assertEquals(children1 + 1, children2);
+		Assert.assertEquals(children2 + 1, children3);
+	}
+
+	private static ServiceConfig getServiceForModel(final ResourceModel model1) {
+		final ResourceConfig resourceConfig = data.getResourceConfig(model1.getId());
+		for(final DaemonConfig daemonConfig : data.getConfig().getDaemons()) {
+			for(final ServiceConfig serviceConfig : daemonConfig.getServices()) {
+				if(serviceConfig.getRunner().getWorkerConfiguration()==resourceConfig) {
+					return serviceConfig;
+				}
+			}
+		}
+		throw new MprcException("Resource config not found in this application");
+	}
+
+	private static int getMainDaemonChildrenCount() {
+		return getMainDaemon().getServices().size() + getMainDaemon().getResources().size();
+	}
+
+	@Test
+	public static void shouldRemoveChild() throws GWTServiceException {
+		final int children1 = getMainDaemonChildrenCount();
+		final ResourceModel model1 = data.createChild(data.getId(getMainDaemon()), XTandemWorker.TYPE);
+		final int children2 = getMainDaemonChildrenCount();
+		data.removeChild(model1.getId());
+		final int children3 = getMainDaemonChildrenCount();
+		Assert.assertEquals(children1 + 1, children2);
+		Assert.assertEquals(children2 - 1, children3);
 	}
 
 	private static void checkTandemExecutable(final ResourceConfig tandem, final String expected) {
