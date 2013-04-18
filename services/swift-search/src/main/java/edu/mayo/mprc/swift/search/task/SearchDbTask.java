@@ -20,7 +20,7 @@ import java.util.Map;
  */
 public final class SearchDbTask extends AsyncTaskBase {
 
-	private Scaffold3Task scaffold3Task;
+	private ScaffoldTask scaffoldTask;
 	private Long reportId;
 	private File scaffoldSpectraFile;
 	private Map<String, RAWDumpTask> rawDumpTaskMap = new HashMap<String, RAWDumpTask>(5);
@@ -39,9 +39,9 @@ public final class SearchDbTask extends AsyncTaskBase {
 	/**
 	 * Create the task that depends on Scaffold invocation.
 	 */
-	public SearchDbTask(final DaemonConnection daemon, final FileTokenFactory fileTokenFactory, final boolean fromScratch, final Scaffold3Task scaffold3Task) {
+	public SearchDbTask(final DaemonConnection daemon, final FileTokenFactory fileTokenFactory, final boolean fromScratch, final ScaffoldTask scaffoldTask) {
 		super(daemon, fileTokenFactory, fromScratch);
-		this.scaffold3Task = scaffold3Task;
+		this.scaffoldTask = scaffoldTask;
 		setName("SearchDb");
 		setDescription("Load " + fileTokenFactory.fileToTaggedDatabaseToken(getScaffoldSpectraFile()) + " into database");
 	}
@@ -58,7 +58,7 @@ public final class SearchDbTask extends AsyncTaskBase {
 	}
 
 	private File getScaffoldSpectraFile() {
-		return scaffoldSpectraFile == null ? scaffold3Task.getScaffoldSpectraFile() : scaffoldSpectraFile;
+		return scaffoldSpectraFile == null ? scaffoldTask.getScaffoldSpectraFile() : scaffoldSpectraFile;
 	}
 
 	/**
@@ -71,7 +71,7 @@ public final class SearchDbTask extends AsyncTaskBase {
 	}
 
 	private Long getReportId() {
-		return reportId == null ? scaffold3Task.getReportData().getId() : reportId;
+		return reportId == null ? scaffoldTask.getReportData().getId() : reportId;
 	}
 
 	/**

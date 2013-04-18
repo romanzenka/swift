@@ -164,7 +164,7 @@ public final class MessageBroker implements Closeable {
 
 		public static Config getEmbeddedBroker() {
 			final Config config = new Config();
-			config.brokerUrl = "jms.vm://broker";
+			config.brokerUrl = "vm://broker";
 			config.embeddedBrokerUrl = "vm://broker";
 			config.embedded = "true";
 			config.useJmx = "false";

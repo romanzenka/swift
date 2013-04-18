@@ -8,7 +8,7 @@ import java.io.File;
 /**
  * @author Roman Zenka
  */
-public final class TestScaffold3Worker {
+public final class TestScaffoldWorker {
 	/**
 	 * The .scafml for spectrum export should be properly produced.
 	 */
@@ -16,8 +16,8 @@ public final class TestScaffold3Worker {
 	public void testSpectrumExport() {
 		final File input = new File("/scaffold.sfd");
 		final File output = new File("/spectrum.spectra.txt");
-		final Scaffold3SpectrumExportWorkPacket work = new Scaffold3SpectrumExportWorkPacket("task1", false, input, output);
-		final String result = Scaffold3Worker.getScafmlSpectrumExport(work);
+		final ScaffoldSpectrumExportWorkPacket work = new ScaffoldSpectrumExportWorkPacket("task1", false, input, output);
+		final String result = ScaffoldWorker.getScafmlSpectrumExport(work);
 		Assert.assertEquals(result, "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n" +
 				"<Scaffold version=\"1.5\">\n" +
 				"  <Experiment load=\"/scaffold.sfd\" name=\"scaffold\">\n" +

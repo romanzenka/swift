@@ -24,27 +24,27 @@ import java.io.File;
 import java.util.Arrays;
 import java.util.Properties;
 
-public final class Scaffold3Worker extends WorkerBase {
-	private static final Logger LOGGER = Logger.getLogger(Scaffold3Worker.class);
+public final class ScaffoldWorker extends WorkerBase {
+	private static final Logger LOGGER = Logger.getLogger(ScaffoldWorker.class);
 	private static final String SCAFFOLD_BATCH_SCRIPT = "scaffoldBatchScript";
-	public static final String TYPE = "scaffold3";
-	public static final String NAME = "Scaffold 3";
-	public static final String DESC = "Scaffold 3 integrates results from multiple search engines into a single file. You need Scaffold 3 Batch license from <a href=\"http://www.proteomesoftware.com/\">http://www.proteomesoftware.com/</a>";
+	public static final String TYPE = "scaffold";
+	public static final String NAME = "Scaffold";
+	public static final String DESC = "Scaffold integrates results from multiple search engines into a single file. You need Scaffold Batch license from <a href=\"http://www.proteomesoftware.com/\">http://www.proteomesoftware.com/</a>";
 
 	private File scaffoldBatchScript;
 	private boolean reportDecoyHits;
 
-	public Scaffold3Worker() {
+	public ScaffoldWorker() {
 	}
 
 	@Override
 	public void process(WorkPacket workPacket, UserProgressReporter progressReporter) {
-		if (workPacket instanceof Scaffold3WorkPacket) {
-			processSearch((Scaffold3WorkPacket) workPacket, progressReporter);
-		} else if (workPacket instanceof Scaffold3SpectrumExportWorkPacket) {
-			processSpectrumExport((Scaffold3SpectrumExportWorkPacket) workPacket, progressReporter);
+		if (workPacket instanceof ScaffoldWorkPacket) {
+			processSearch((ScaffoldWorkPacket) workPacket, progressReporter);
+		} else if (workPacket instanceof ScaffoldSpectrumExportWorkPacket) {
+			processSpectrumExport((ScaffoldSpectrumExportWorkPacket) workPacket, progressReporter);
 		} else {
-			throw new DaemonException("Unexpected packet type " + workPacket.getClass().getName() + ", expected " + Scaffold3WorkPacket.class.getName() + " or " + Scaffold3SpectrumExportWorkPacket.class.getName());
+			throw new DaemonException("Unexpected packet type " + workPacket.getClass().getName() + ", expected " + ScaffoldWorkPacket.class.getName() + " or " + ScaffoldSpectrumExportWorkPacket.class.getName());
 		}
 	}
 
@@ -54,8 +54,8 @@ public final class Scaffold3Worker extends WorkerBase {
 	 * @param scaffoldWorkPacket Work to do.
 	 * @param progressReporter   Where to report progress.
 	 */
-	private void processSearch(final Scaffold3WorkPacket scaffoldWorkPacket, final UserProgressReporter progressReporter) {
-		LOGGER.debug("Scaffold 3 search processing request");
+	private void processSearch(final ScaffoldWorkPacket scaffoldWorkPacket, final UserProgressReporter progressReporter) {
+		LOGGER.debug("Scaffold search processing request");
 
 		final File outputFolder = scaffoldWorkPacket.getOutputFolder();
 		// Make sure the output folder is there
@@ -73,8 +73,8 @@ public final class Scaffold3Worker extends WorkerBase {
 	 * @param scaffoldWorkPacket Work to do.
 	 * @param progressReporter   Where to report progress.
 	 */
-	private void processSpectrumExport(final Scaffold3SpectrumExportWorkPacket scaffoldWorkPacket, final UserProgressReporter progressReporter) {
-		LOGGER.debug("Scaffold 3 spectrum export request");
+	private void processSpectrumExport(final ScaffoldSpectrumExportWorkPacket scaffoldWorkPacket, final UserProgressReporter progressReporter) {
+		LOGGER.debug("Scaffold spectrum export request");
 
 		final File result = scaffoldWorkPacket.getSpectrumExportFile();
 		if (result.exists() && result.isFile() && result.canRead()) {
@@ -104,7 +104,7 @@ public final class Scaffold3Worker extends WorkerBase {
 
 	/**
 	 * @param export The Scaffold spectrum export to check.
-	 * @return True if this is a proper Scaffold 3 spectrum export (not an older version).
+	 * @return True if this is a proper Scaffold spectrum export (not an older version).
 	 */
 	private boolean isScaffold3SpectrumExport(final File export) {
 		final ScaffoldSpectraVersion version = new ScaffoldSpectraVersion();
@@ -143,7 +143,7 @@ public final class Scaffold3Worker extends WorkerBase {
 	 * @param workPacket Description of work to do.
 	 * @return Created scafml file.
 	 */
-	private File createScafmlFile(final Scaffold3WorkPacket workPacket) {
+	private File createScafmlFile(final ScaffoldWorkPacket workPacket) {
 		// Create the .scafml file
 		final String scafmlDocument = workPacket.getScafmlFile().getDocument();
 		final File scafmlFile = workPacket.getScafmlFileLocation();
@@ -158,7 +158,7 @@ public final class Scaffold3Worker extends WorkerBase {
 	 * @param outputFolder Where to put the {@code .scafml} file.
 	 * @return The created .scafml file
 	 */
-	private File createSpectrumExportScafmlFile(final Scaffold3SpectrumExportWorkPacket work, final File outputFolder) {
+	private File createSpectrumExportScafmlFile(final ScaffoldSpectrumExportWorkPacket work, final File outputFolder) {
 		final String experimentName = FileUtilities.stripGzippedExtension(work.getScaffoldFile().getName());
 		final File scafmlFile = new File(outputFolder,
 				experimentName + "_spectrum_export.scafml");
@@ -178,7 +178,7 @@ public final class Scaffold3Worker extends WorkerBase {
 	 * @param work Spectrume export to do.
 	 * @return String to put into .scafml file that will produce the export.
 	 */
-	static String getScafmlSpectrumExport(final Scaffold3SpectrumExportWorkPacket work) {
+	static String getScafmlSpectrumExport(final ScaffoldSpectrumExportWorkPacket work) {
 		try {
 			final String experimentName = FileUtilities.stripGzippedExtension(work.getScaffoldFile().getName());
 			final XMLBuilder builder = XMLBuilder.create("Scaffold");
@@ -231,19 +231,19 @@ public final class Scaffold3Worker extends WorkerBase {
 	/**
 	 * A factory capable of creating the worker
 	 */
-	@Component("scaffold3WorkerFactory")
+	@Component("scaffoldWorkerFactory")
 	public static final class Factory extends WorkerFactoryBase<Config> implements EngineFactory {
 
 		private static final EngineMetadata ENGINE_METADATA = new EngineMetadata(
-				"SCAFFOLD3", ".sf3", "Scaffold 3", true, "scaffold3", null,
+				"SCAFFOLD", ".sf3", "Scaffold", true, "scaffold", null,
 				new String[]{TYPE},
 				new String[]{},
-				new String[]{Scaffold3DeploymentService.TYPE},
+				new String[]{ScaffoldDeploymentService.TYPE},
 				70, true);
 
 		@Override
 		public Worker create(final Config config, final DependencyResolver dependencies) {
-			final Scaffold3Worker worker = new Scaffold3Worker();
+			final ScaffoldWorker worker = new ScaffoldWorker();
 			worker.setScaffoldBatchScript(new File(config.getScaffoldBatchScript()).getAbsoluteFile());
 
 			return worker;
@@ -305,7 +305,7 @@ public final class Scaffold3Worker extends WorkerBase {
 	public static final class Ui implements ServiceUiFactory {
 		public void createUI(final DaemonConfig daemon, final ResourceConfig resource, final UiBuilder builder) {
 			builder
-					.property(SCAFFOLD_BATCH_SCRIPT, "ScaffoldBatch3 path", "Path to the ScaffoldBatch3 script<p>Default for Linux: <code>/opt/Scaffold3/ScaffoldBatch3</code></p>")
+					.property(SCAFFOLD_BATCH_SCRIPT, "ScaffoldBatch path", "Path to the ScaffoldBatch script<p>Default for Linux: <code>/opt/Scaffold3/ScaffoldBatch3</code></p>")
 					.defaultValue("/opt/Scaffold3/ScaffoldBatch3")
 					.required()
 					.executable(Arrays.asList("-v"));

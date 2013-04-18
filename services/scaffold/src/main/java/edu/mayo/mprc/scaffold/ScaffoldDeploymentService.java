@@ -30,15 +30,15 @@ import java.util.regex.Pattern;
  * <code>com.proteomesoftware.scaffold.DatabaseIndexer <fasta file> [<db accession regex>] [<db description regex>]</code>
  * The db accession and db description regex's are the same as the ones we use in the .scafml file.
  */
-public final class Scaffold3DeploymentService extends DeploymentService<DeploymentResult> {
-	private static final Logger LOGGER = Logger.getLogger(Scaffold3DeploymentService.class);
-	public static final String TYPE = "scaffold3Deployer";
-	public static final String NAME = "Scaffold 3 DB Deployer";
+public final class ScaffoldDeploymentService extends DeploymentService<DeploymentResult> {
+	private static final Logger LOGGER = Logger.getLogger(ScaffoldDeploymentService.class);
+	public static final String TYPE = "scaffoldDeployer";
+	public static final String NAME = "Scaffold DB Deployer";
 
 	private static final String DEPLOYABLE_DB_FOLDER = "deployableDbFolder";
-	public static final String DESC = "Copies the FASTA database to a separate folder. Scaffold 3 has its own indexing process that creates the index next to the FASTA file.";
+	public static final String DESC = "Copies the FASTA database to a separate folder. Scaffold has its own indexing process that creates the index next to the FASTA file.";
 
-	public Scaffold3DeploymentService() {
+	public ScaffoldDeploymentService() {
 	}
 
 	public DeploymentResult performDeployment(final DeploymentRequest request) {
@@ -168,13 +168,13 @@ public final class Scaffold3DeploymentService extends DeploymentService<Deployme
 	/**
 	 * A factory capable of creating the worker
 	 */
-	@Component("scaffold3DeploymentServiceFactory")
+	@Component("scaffoldDeploymentServiceFactory")
 	public static final class Factory extends WorkerFactoryBase<Config> {
 		@Override
 		public Worker create(final Config config, final DependencyResolver dependencies) {
-			Scaffold3DeploymentService worker = null;
+			ScaffoldDeploymentService worker = null;
 			try {
-				worker = new Scaffold3DeploymentService();
+				worker = new ScaffoldDeploymentService();
 				worker.setDeployableDbFolder(new File(config.getDeployableDbFolder()).getAbsoluteFile());
 
 			} catch (Exception e) {
@@ -189,7 +189,7 @@ public final class Scaffold3DeploymentService extends DeploymentService<Deployme
 			builder.property(DEPLOYABLE_DB_FOLDER, "Database Folder", "Folder where deployer copies database files to")
 					.required()
 					.existingDirectory()
-					.defaultValue("var/scaffold3_index");
+					.defaultValue("var/scaffold_index");
 		}
 	}
 }

@@ -18,6 +18,8 @@ import edu.mayo.mprc.qa.QaWorker;
 import edu.mayo.mprc.qa.RAWDumpWorker;
 import edu.mayo.mprc.qstat.QstatDaemonWorker;
 import edu.mayo.mprc.raw2mgf.RawToMgfWorker;
+import edu.mayo.mprc.scaffold.ScaffoldDeploymentService;
+import edu.mayo.mprc.scaffold.ScaffoldWorker;
 import edu.mayo.mprc.scaffold.report.ScaffoldReportWorker;
 import edu.mayo.mprc.sequest.SequestDeploymentService;
 import edu.mayo.mprc.sequest.SequestWorker;
@@ -35,7 +37,6 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import java.io.File;
-import java.io.IOException;
 import java.io.StringWriter;
 import java.util.Collection;
 
@@ -49,7 +50,7 @@ public final class TestDaemonFactory {
 	private static final String DATABASE_DEPLOYMENT_DIR = SWIFT_INSTALL_ROOT_PATH + "/install/swift/var/fasta/";
 
 	@BeforeClass
-	public void setUp() throws IOException {
+	public void setUp() {
 		tempRootDir = FileUtilities.createTempFolder();
 
 		config = createSwiftConfig();
@@ -172,7 +173,7 @@ public final class TestDaemonFactory {
 
 		final SimpleRunner.Config runner3 = new SimpleRunner.Config();
 		runner3.setNumThreads(2);
-		runner3.setWorkerConfiguration(new ScaffoldWorker.Config("dir", "javavm", "memory"));
+		runner3.setWorkerConfiguration(new ScaffoldWorker.Config());
 		final ServiceConfig scaffold = new ServiceConfig("scaffold", runner3);
 		main.addResource(scaffold);
 
@@ -190,7 +191,7 @@ public final class TestDaemonFactory {
 
 		final SimpleRunner.Config runner11 = new SimpleRunner.Config();
 		runner11.setNumThreads(1);
-		runner11.setWorkerConfiguration(new ScaffoldDeploymentService.Config("scaffoldJavaVmPath", "deployableDbFolder", "engineRootFolder"));
+		runner11.setWorkerConfiguration(new ScaffoldDeploymentService.Config("deployableDbFolder"));
 		final ServiceConfig scaffoldDeployer = new ServiceConfig("scaffoldDeployer", runner11);
 		main.addResource(scaffoldDeployer);
 

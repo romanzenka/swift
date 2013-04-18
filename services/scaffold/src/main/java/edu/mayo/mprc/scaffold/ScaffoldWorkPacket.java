@@ -14,19 +14,19 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-public final class Scaffold3WorkPacket extends WorkPacketBase implements CachableWorkPacket {
+public final class ScaffoldWorkPacket extends WorkPacketBase implements CachableWorkPacket {
 	private static final long serialVersionUID = 20110407L;
 	public static final String SF3 = ".sf3";
 	private File outputFolder;
 	private String experimentName;
 	private ScafmlScaffold scafmlFile;
-	private static final Logger LOGGER = Logger.getLogger(Scaffold3WorkPacket.class);
+	private static final Logger LOGGER = Logger.getLogger(ScaffoldWorkPacket.class);
 
-	public Scaffold3WorkPacket(final String taskId, final boolean fromScratch) {
+	public ScaffoldWorkPacket(final String taskId, final boolean fromScratch) {
 		super(taskId, fromScratch);
 	}
 
-	public Scaffold3WorkPacket(final File outputFolder, final ScafmlScaffold scafmlFile, final String experimentName, final String taskId, final boolean fromScratch) {
+	public ScaffoldWorkPacket(final File outputFolder, final ScafmlScaffold scafmlFile, final String experimentName, final String taskId, final boolean fromScratch) {
 		super(taskId, fromScratch);
 
 		assert outputFolder != null : "Scaffold request cannot be created: Work folder was null";

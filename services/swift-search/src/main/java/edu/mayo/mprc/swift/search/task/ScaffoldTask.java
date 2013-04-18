@@ -5,7 +5,7 @@ import edu.mayo.mprc.daemon.DaemonConnection;
 import edu.mayo.mprc.daemon.WorkPacket;
 import edu.mayo.mprc.daemon.exception.DaemonException;
 import edu.mayo.mprc.daemon.files.FileTokenFactory;
-import edu.mayo.mprc.scaffold.Scaffold3WorkPacket;
+import edu.mayo.mprc.scaffold.ScaffoldWorkPacket;
 import edu.mayo.mprc.scaffoldparser.spectra.ScaffoldSpectraReader;
 import edu.mayo.mprc.scafml.ScafmlScaffold;
 import edu.mayo.mprc.swift.db.SwiftDao;
@@ -22,7 +22,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-final class Scaffold3Task extends AsyncTaskBase implements ScaffoldTaskI {
+final class ScaffoldTask extends AsyncTaskBase implements ScaffoldTaskI {
 
 	private String experiment;
 
@@ -43,9 +43,9 @@ final class Scaffold3Task extends AsyncTaskBase implements ScaffoldTaskI {
 	private final SearchRun searchRun;
 	private final boolean reportDecoyHits;
 
-	public Scaffold3Task(final String experiment, final SwiftSearchDefinition definition, final DaemonConnection scaffoldDaemon,
-	                     final SwiftDao swiftDao, final SearchRun searchRun,
-	                     final File outputFolder, final FileTokenFactory fileTokenFactory, final boolean reportDecoyHits, final boolean fromScratch) {
+	public ScaffoldTask(final String experiment, final SwiftSearchDefinition definition, final DaemonConnection scaffoldDaemon,
+	                    final SwiftDao swiftDao, final SearchRun searchRun,
+	                    final File outputFolder, final FileTokenFactory fileTokenFactory, final boolean reportDecoyHits, final boolean fromScratch) {
 		super(scaffoldDaemon, fileTokenFactory, fromScratch);
 		this.experiment = experiment;
 		this.swiftSearchDefinition = definition;
@@ -53,8 +53,8 @@ final class Scaffold3Task extends AsyncTaskBase implements ScaffoldTaskI {
 		this.swiftDao = swiftDao;
 		this.searchRun = searchRun;
 		this.reportDecoyHits = reportDecoyHits;
-		setName("Scaffold3");
-		setDescription("Scaffold 3 search " + this.experiment);
+		setName("Scaffold");
+		setDescription("Scaffold search " + this.experiment);
 	}
 
 	/**
@@ -88,12 +88,12 @@ final class Scaffold3Task extends AsyncTaskBase implements ScaffoldTaskI {
 	 *         to send a work packet.
 	 */
 	public WorkPacket createWorkPacket() {
-		setDescription("Scaffold 3 search " + this.experiment);
+		setDescription("Scaffold search " + this.experiment);
 		final File scaffoldFile = new File(outputFolder, experiment + ".sf3");
 
 		for (final Map.Entry<String, DatabaseDeployment> entry : databases.entrySet()) {
 			if (entry.getValue() == null || entry.getValue().getFastaFile() == null) {
-				throw new DaemonException("Scaffold 3 deployer probably returned invalid data - null fasta path for database " + entry.getKey());
+				throw new DaemonException("Scaffold deployer probably returned invalid data - null fasta path for database " + entry.getKey());
 			}
 		}
 
@@ -121,7 +121,7 @@ final class Scaffold3Task extends AsyncTaskBase implements ScaffoldTaskI {
 		scafmlFile.setVersionMajor(3);
 		scafmlFile.setVersionMinor(0);
 		scafmlFile.getExperiment().setReportDecoyHits(reportDecoyHits);
-		final Scaffold3WorkPacket workPacket = new Scaffold3WorkPacket(
+		final ScaffoldWorkPacket workPacket = new ScaffoldWorkPacket(
 				outputFolder,
 				scafmlFile,
 				this.experiment,
@@ -141,7 +141,7 @@ final class Scaffold3Task extends AsyncTaskBase implements ScaffoldTaskI {
 	 * @param scaffoldFile Scaffold file to test.
 	 * @return True if the file is valid - older than all its inputs, matches the input parameters.
 	 */
-	private boolean isScaffoldValid(final Scaffold3WorkPacket workPacket, final File scaffoldFile) {
+	private boolean isScaffoldValid(final ScaffoldWorkPacket workPacket, final File scaffoldFile) {
 		if (isFromScratch()) {
 			return false;
 		}

@@ -3,7 +3,7 @@ package edu.mayo.mprc.swift.search.task;
 import edu.mayo.mprc.daemon.DaemonConnection;
 import edu.mayo.mprc.daemon.WorkPacket;
 import edu.mayo.mprc.daemon.files.FileTokenFactory;
-import edu.mayo.mprc.scaffold.Scaffold3SpectrumExportWorkPacket;
+import edu.mayo.mprc.scaffold.ScaffoldSpectrumExportWorkPacket;
 import edu.mayo.mprc.scaffoldparser.spectra.ScaffoldSpectraReader;
 import edu.mayo.mprc.utilities.FileUtilities;
 import edu.mayo.mprc.utilities.progress.ProgressInfo;
@@ -45,7 +45,7 @@ public final class ScaffoldSpectraExportTask extends AsyncTaskBase {
 
 	@Override
 	public WorkPacket createWorkPacket() {
-		return new Scaffold3SpectrumExportWorkPacket(getFullId(), isFromScratch(), scaffoldFile, spectrumExportFile);
+		return new ScaffoldSpectrumExportWorkPacket(getFullId(), isFromScratch(), scaffoldFile, spectrumExportFile);
 	}
 
 	@Override

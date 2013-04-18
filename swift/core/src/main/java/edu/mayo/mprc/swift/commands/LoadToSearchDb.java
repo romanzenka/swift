@@ -9,7 +9,7 @@ import edu.mayo.mprc.daemon.files.FileTokenFactory;
 import edu.mayo.mprc.dbcurator.model.Curation;
 import edu.mayo.mprc.fastadb.FastaDbWorker;
 import edu.mayo.mprc.qa.RAWDumpWorker;
-import edu.mayo.mprc.scaffold.Scaffold3Worker;
+import edu.mayo.mprc.scaffold.ScaffoldWorker;
 import edu.mayo.mprc.searchdb.SearchDbWorker;
 import edu.mayo.mprc.searchdb.dao.SearchDbDao;
 import edu.mayo.mprc.swift.ExitCode;
@@ -44,7 +44,7 @@ public final class LoadToSearchDb implements SwiftCommand {
 	public static final int MAX_INPUT_FILE_SIZE = 6;
 
 	private DaemonConnection rawDump;
-	private DaemonConnection scaffold3;
+	private DaemonConnection scaffold;
 	private DaemonConnection fastaDb;
 	private DaemonConnection searchDb;
 	private SwiftDao dao;
@@ -219,7 +219,7 @@ public final class LoadToSearchDb implements SwiftCommand {
 			workflowEngine.addTask(fastaDbTask);
 
 			// Export files from Scaffold
-			final ScaffoldSpectraExportTask scaffoldExportTask = new ScaffoldSpectraExportTask(scaffold3, fileTokenFactory, false, scaffoldFile);
+			final ScaffoldSpectraExportTask scaffoldExportTask = new ScaffoldSpectraExportTask(scaffold, fileTokenFactory, false, scaffoldFile);
 			workflowEngine.addTask(scaffoldExportTask);
 
 			// Load scaffold export into database
@@ -234,7 +234,7 @@ public final class LoadToSearchDb implements SwiftCommand {
 
 			for (final FileSearch fileSearch : swiftSearchDefinition.getInputFiles()) {
 				// Only load files that made it to Scaffold
-				if (fileSearch.isSearch("SCAFFOLD3") || fileSearch.isSearch("SCAFFOLD")) {
+				if (fileSearch.isSearch("SCAFFOLD")) {
 					final File rawFile = fileSearch.getInputFile();
 					if (!"RAW".equalsIgnoreCase(FileUtilities.getExtension(rawFile.getName()))) {
 						// We have a file that is not raw.
@@ -348,13 +348,13 @@ public final class LoadToSearchDb implements SwiftCommand {
 		final Collection<SearchEngine.Config> engines = config.getEngines();
 		SearchEngine.Config scaffoldEngine = null;
 		for (final SearchEngine.Config engine : engines) {
-			if ("SCAFFOLD3".equals(engine.getCode())) {
+			if ("SCAFFOLD".equals(engine.getCode())) {
 				scaffoldEngine = engine;
 				break;
 			}
 		}
 
-		scaffold3 = getConnection(environment, scaffoldEngine == null ? null : scaffoldEngine.getWorker(), Scaffold3Worker.NAME);
+		scaffold = getConnection(environment, scaffoldEngine == null ? null : scaffoldEngine.getWorker(), ScaffoldWorker.NAME);
 		fastaDb = getConnection(environment, config.getFastaDb(), FastaDbWorker.NAME);
 		searchDb = getConnection(environment, config.getSearchDb(), SearchDbWorker.NAME);
 	}
