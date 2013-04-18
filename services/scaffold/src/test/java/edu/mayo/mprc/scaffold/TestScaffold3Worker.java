@@ -1,4 +1,4 @@
-package edu.mayo.mprc.scaffold3;
+package edu.mayo.mprc.scaffold;
 
 import org.testng.Assert;
 import org.testng.annotations.Test;

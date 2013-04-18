@@ -18,8 +18,6 @@ import edu.mayo.mprc.qa.QaWorker;
 import edu.mayo.mprc.qa.RAWDumpWorker;
 import edu.mayo.mprc.qstat.QstatDaemonWorker;
 import edu.mayo.mprc.raw2mgf.RawToMgfWorker;
-import edu.mayo.mprc.scaffold.ScaffoldDeploymentService;
-import edu.mayo.mprc.scaffold.ScaffoldWorker;
 import edu.mayo.mprc.scaffold.report.ScaffoldReportWorker;
 import edu.mayo.mprc.sequest.SequestDeploymentService;
 import edu.mayo.mprc.sequest.SequestWorker;

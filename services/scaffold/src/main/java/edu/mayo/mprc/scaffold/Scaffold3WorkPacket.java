@@ -1,4 +1,4 @@
-package edu.mayo.mprc.scaffold3;
+package edu.mayo.mprc.scaffold;
 
 import com.google.common.base.Charsets;
 import com.google.common.io.Files;

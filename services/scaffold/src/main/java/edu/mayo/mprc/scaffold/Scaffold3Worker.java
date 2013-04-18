@@ -1,4 +1,4 @@
-package edu.mayo.mprc.scaffold3;
+package edu.mayo.mprc.scaffold;
 
 import com.jamesmurty.utils.XMLBuilder;
 import edu.mayo.mprc.MprcException;
@@ -10,7 +10,6 @@ import edu.mayo.mprc.daemon.Worker;
 import edu.mayo.mprc.daemon.WorkerBase;
 import edu.mayo.mprc.daemon.WorkerFactoryBase;
 import edu.mayo.mprc.daemon.exception.DaemonException;
-import edu.mayo.mprc.scaffold.ScaffoldLogMonitor;
 import edu.mayo.mprc.scaffoldparser.spectra.ScaffoldSpectraVersion;
 import edu.mayo.mprc.searchengine.EngineFactory;
 import edu.mayo.mprc.searchengine.EngineMetadata;

@@ -9,7 +9,7 @@ import edu.mayo.mprc.daemon.files.FileTokenFactory;
 import edu.mayo.mprc.dbcurator.model.Curation;
 import edu.mayo.mprc.fastadb.FastaDbWorker;
 import edu.mayo.mprc.qa.RAWDumpWorker;
-import edu.mayo.mprc.scaffold3.Scaffold3Worker;
+import edu.mayo.mprc.scaffold.Scaffold3Worker;
 import edu.mayo.mprc.searchdb.SearchDbWorker;
 import edu.mayo.mprc.searchdb.dao.SearchDbDao;
 import edu.mayo.mprc.swift.ExitCode;

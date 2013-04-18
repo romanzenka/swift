@@ -5,7 +5,7 @@ import edu.mayo.mprc.daemon.DaemonConnection;
 import edu.mayo.mprc.daemon.WorkPacket;
 import edu.mayo.mprc.daemon.exception.DaemonException;
 import edu.mayo.mprc.daemon.files.FileTokenFactory;
-import edu.mayo.mprc.scaffold3.Scaffold3WorkPacket;
+import edu.mayo.mprc.scaffold.Scaffold3WorkPacket;
 import edu.mayo.mprc.scaffoldparser.spectra.ScaffoldSpectraReader;
 import edu.mayo.mprc.scafml.ScafmlScaffold;
 import edu.mayo.mprc.swift.db.SwiftDao;

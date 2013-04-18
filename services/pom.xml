@@ -38,7 +38,6 @@
         <module>qstat</module>
         <module>raw2mgf</module>
         <module>scaffold</module>
-        <module>scaffold3</module>
         <module>search-db</module>
         <module>sequest</module>
         <module>swift-db</module>

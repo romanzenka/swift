@@ -1,4 +1,4 @@
-package edu.mayo.mprc.scaffold3;
+package edu.mayo.mprc.scaffold;
 
 import edu.mayo.mprc.MprcException;
 import edu.mayo.mprc.config.*;
