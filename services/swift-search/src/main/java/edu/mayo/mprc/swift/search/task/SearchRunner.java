@@ -330,8 +330,16 @@ public final class SearchRunner implements Runnable {
 	}
 
 	private SearchEngine getSearchEngine(final String code) {
+		String version = "";
+		for(SearchEngineConfig config : searchDefinition.getInputFiles().get(0).getEnabledEngines().getEngineConfigs()) {
+			if(config.getCode().equals(code)) {
+				version = config.getVersion();
+				break;
+			}
+		}
+
 		for (final SearchEngine engine : searchEngines) {
-			if (engine.getCode().equalsIgnoreCase(code)) {
+			if (engine.getCode().equalsIgnoreCase(code) && engine.getVersion().equalsIgnoreCase(version)) {
 				return engine;
 			}
 		}
