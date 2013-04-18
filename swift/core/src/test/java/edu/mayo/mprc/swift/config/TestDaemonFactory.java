@@ -5,7 +5,6 @@ import edu.mayo.mprc.config.*;
 import edu.mayo.mprc.daemon.Daemon;
 import edu.mayo.mprc.daemon.MessageBroker;
 import edu.mayo.mprc.daemon.SimpleRunner;
-import edu.mayo.mprc.dbundeploy.DatabaseUndeployerWorker;
 import edu.mayo.mprc.mascot.MascotCache;
 import edu.mayo.mprc.mascot.MascotDeploymentService;
 import edu.mayo.mprc.mascot.MascotWorker;
@@ -243,13 +242,6 @@ public final class TestDaemonFactory {
 		final ServiceConfig rawDump = new ServiceConfig("rawDump", runner79);
 		main.addResource(rawDump);
 
-		final SimpleRunner.Config runner88 = new SimpleRunner.Config();
-		runner88.setNumThreads(1);
-		runner88.setWorkerConfiguration(new DatabaseUndeployerWorker.Config(scaffoldDeployer, null, omssaDeployer
-				, sequestDeployer, tandemDeployer, mascotDeployer));
-		final ServiceConfig databasUndeployer = new ServiceConfig("databaseUndeployer", runner88);
-		main.addResource(databasUndeployer);
-
 		Collection<SearchEngine.Config> engineConfigs = Lists.newArrayList(
 				new SearchEngine.Config("MASCOT", "2.4", mascot, mascotDeployer),
 				new SearchEngine.Config("SEQUEST", "v27", sequest, sequestDeployer),
@@ -268,7 +260,7 @@ public final class TestDaemonFactory {
 		final ServiceConfig searcher = new ServiceConfig("searcher", runner76);
 		main.addResource(searcher);
 
-		final WebUi.Config webUi = new WebUi.Config(searcher, "8080", "Swift 2.5", "C:\\", "file:///C:/", qstat, databasUndeployer);
+		final WebUi.Config webUi = new WebUi.Config(searcher, "8080", "Swift 2.5", "C:\\", "file:///C:/", qstat, null);
 		main.addResource(webUi);
 
 		final MessageBroker.Config brokerConfig = MessageBroker.Config.getEmbeddedBroker();

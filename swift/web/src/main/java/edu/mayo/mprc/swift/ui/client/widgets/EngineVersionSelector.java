@@ -31,7 +31,7 @@ public final class EngineVersionSelector extends HorizontalPanel implements Comp
 
 	public void addEngine(final ClientSearchEngine engine) {
 		final String code = engine.getEngineConfig().getCode();
-		if (this.code != code) {
+		if (!this.code.equals(code)) {
 			throw new RuntimeException("Adding engine with wrong code " + code + " to selector " + this.code + " - a programmer error");
 		}
 		versionList.add(engine.getEngineConfig().getVersion());

@@ -11,7 +11,6 @@ import edu.mayo.mprc.dbcurator.model.persistence.CurationDao;
 import edu.mayo.mprc.utilities.progress.UserProgressReporter;
 import org.apache.log4j.Logger;
 import org.joda.time.DateTime;
-import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
 
@@ -133,7 +132,7 @@ public final class DatabaseUndeployerWorker extends WorkerBase {
 	/**
 	 * A factory capable of creating the worker
 	 */
-	@Component("databaseUndeployerFactory")
+	// @Component("databaseUndeployerFactory")
 	public static final class Factory extends WorkerFactoryBase<Config> {
 		private FileTokenFactory fileTokenFactory;
 		private CurationDao curationDao;
