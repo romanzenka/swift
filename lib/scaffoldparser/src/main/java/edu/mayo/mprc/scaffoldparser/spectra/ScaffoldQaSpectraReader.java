@@ -5,9 +5,7 @@ import edu.mayo.mprc.MprcException;
 import edu.mayo.mprc.io.KeyedTsvReader;
 import edu.mayo.mprc.utilities.StringUtilities;
 
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
+import java.util.*;
 
 /**
  * A parser for Scaffold spectrum report - tab separated file with a line for each spectrum.
@@ -40,7 +38,7 @@ public final class ScaffoldQaSpectraReader extends ScaffoldSpectraReader impleme
 		// Extract everything except the spectrum column name
 		final String[] tempHeader = line.split("\t");
 		// Scaffold 2.06.01 has a bug - one column is added extra before the last starred/hidden. We give this column an explicit name "Blank Column"
-		header = new String[tempHeader.length];
+		List<String> headerList = new ArrayList<String>(tempHeader.length);
 		emptyLine = null;
 		spectrumNameColumn = 0;
 		int columnOffset = 0;
@@ -51,14 +49,16 @@ public final class ScaffoldQaSpectraReader extends ScaffoldSpectraReader impleme
 				continue;
 			}
 			if (STARRED.equals(tempHeader[i])) {
-				header[i - columnOffset] = "Blank Column";
+				headerList.add("Blank Column");
 				columnOffset--; // We are inserting a "Blank Column"
 			}
-			header[i - columnOffset] = tempHeader[i];
+			headerList.add(tempHeader[i]);
 		}
 		if (spectrumNameColumn == 0) {
 			throw new MprcException("Wrong Scaffold spectra file format - header column missing [" + SPECTRUM_NAME + "].");
 		}
+		header = new String[headerList.size()];
+		header = headerList.toArray(header);
 		return true;
 	}
 
