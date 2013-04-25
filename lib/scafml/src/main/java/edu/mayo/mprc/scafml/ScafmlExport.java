@@ -74,11 +74,11 @@ public final class ScafmlExport extends FileHolder {
 					.append(
 							"minimumNTT=\"" + minimumNonTrypticTerminii + "\" " +
 									"useCharge=\"true,true,true\" " +
-									"useMergedPeptideProbability=\"true\">");
+									"useMergedPeptideProbability=\"true\"");
 		}
 		result
 				.append(
-						"</DisplayThresholds>\n");
+						"></DisplayThresholds>\n");
 
 		appendScaffoldXmlExport(result, indent);
 
