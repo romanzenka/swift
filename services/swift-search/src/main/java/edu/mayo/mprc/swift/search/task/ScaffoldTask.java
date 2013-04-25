@@ -24,6 +24,7 @@ import java.util.Map;
 
 final class ScaffoldTask extends AsyncTaskBase implements ScaffoldTaskI {
 
+	private String scaffoldVersion;
 	private String experiment;
 
 	/**
@@ -43,10 +44,11 @@ final class ScaffoldTask extends AsyncTaskBase implements ScaffoldTaskI {
 	private final SearchRun searchRun;
 	private final boolean reportDecoyHits;
 
-	public ScaffoldTask(final String experiment, final SwiftSearchDefinition definition, final DaemonConnection scaffoldDaemon,
+	public ScaffoldTask(final String scaffoldVersion, final String experiment, final SwiftSearchDefinition definition, final DaemonConnection scaffoldDaemon,
 	                    final SwiftDao swiftDao, final SearchRun searchRun,
 	                    final File outputFolder, final FileTokenFactory fileTokenFactory, final boolean reportDecoyHits, final boolean fromScratch) {
 		super(scaffoldDaemon, fileTokenFactory, fromScratch);
+		this.scaffoldVersion = scaffoldVersion;
 		this.experiment = experiment;
 		this.swiftSearchDefinition = definition;
 		this.outputFolder = outputFolder;
@@ -117,7 +119,7 @@ final class ScaffoldTask extends AsyncTaskBase implements ScaffoldTaskI {
 			searchResults.addResult(result);
 		}
 
-		final ScafmlScaffold scafmlFile = ScafmlDump.dumpScafmlFile(experiment, swiftSearchDefinition, inputs, outputFolder, searchResults, fastaFiles);
+		final ScafmlScaffold scafmlFile = ScafmlDump.dumpScafmlFile(scaffoldVersion, experiment, swiftSearchDefinition, inputs, outputFolder, searchResults, fastaFiles);
 		scafmlFile.setVersionMajor(3);
 		scafmlFile.setVersionMinor(0);
 		scafmlFile.getExperiment().setReportDecoyHits(reportDecoyHits);

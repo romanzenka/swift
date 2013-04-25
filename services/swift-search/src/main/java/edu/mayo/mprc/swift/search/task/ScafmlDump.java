@@ -22,7 +22,7 @@ class ScafmlDump {
 	/**
 	 * Write the experiment information as a .scafml file directly parseable by Scaffold.
 	 */
-	public static ScafmlScaffold dumpScafmlFile(final String experiment, final SwiftSearchDefinition definition, final LinkedHashMap<FileSearch, InputFileSearches> inputs, final File workFolder, final SearchResults searchResults, final Map<String, File> deployedDatabases) {
+	public static ScafmlScaffold dumpScafmlFile(final String scaffoldVersion, final String experiment, final SwiftSearchDefinition definition, final LinkedHashMap<FileSearch, InputFileSearches> inputs, final File workFolder, final SearchResults searchResults, final Map<String, File> deployedDatabases) {
 		if (experiment == null) {
 			throw new DaemonException("Experiment must not be null");
 		}
@@ -143,6 +143,7 @@ class ScafmlDump {
 
 		final StarredProteins star = scaffoldSettings.getStarredProteins();
 		final ScafmlExport export = new ScafmlExport(
+				scaffoldVersion,
 				experiment,
 				workFolder, // Output folder
 				true, // Always export spectra for QA

@@ -138,4 +138,8 @@ public class FileSearch extends PersistableBase {
 	public boolean isSearch(final String searchEngineCode) {
 		return enabledEngines != null && enabledEngines.isEnabled(searchEngineCode);
 	}
+
+	public String searchVersion(final String searchEngineCode) {
+		return enabledEngines != null ? enabledEngines.enabledVersion(searchEngineCode) : null;
+	}
 }

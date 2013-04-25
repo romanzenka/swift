@@ -331,8 +331,8 @@ public final class SearchRunner implements Runnable {
 
 	private SearchEngine getSearchEngine(final String code) {
 		String version = "";
-		for(SearchEngineConfig config : searchDefinition.getInputFiles().get(0).getEnabledEngines().getEngineConfigs()) {
-			if(config.getCode().equals(code)) {
+		for (SearchEngineConfig config : searchDefinition.getInputFiles().get(0).getEnabledEngines().getEngineConfigs()) {
+			if (config.getCode().equals(code)) {
 				version = config.getVersion();
 				break;
 			}
@@ -387,11 +387,11 @@ public final class SearchRunner implements Runnable {
 		final FileProducingTask mgfOutput = addMgfProducingProcess(inputFile);
 		addInputAnalysis(inputFile, mgfOutput);
 
-		final SearchEngine scaffold3 = getScaffoldEngine();
+		final SearchEngine scaffold = getScaffoldEngine();
 		DatabaseDeployment scaffoldDeployment = null;
-		if (scaffold3 != null && searchWithScaffold(inputFile)) {
+		if (scaffold != null && scaffoldVersion(inputFile) != null) {
 			scaffoldDeployment =
-					addDatabaseDeployment(scaffold3, null/*scaffold has no param file*/,
+					addDatabaseDeployment(scaffold, null/*scaffold has no param file*/,
 							searchDefinition.getSearchParameters().getDatabase());
 		}
 		final SearchEngine idpicker = getIdpickerEngine();
@@ -421,12 +421,13 @@ public final class SearchRunner implements Runnable {
 				}
 				final File outputFolder = getOutputFolderForSearchEngine(engine);
 				final EngineSearchTask search = addEngineSearch(engine, paramFile, inputFile.getInputFile(), outputFolder, mgfOutput, deploymentResult, publicSearchFiles);
-				if (searchWithScaffold(inputFile)) {
+				final String scaffoldVersion = scaffoldVersion(inputFile);
+				if (scaffoldVersion != null) {
 					if (scaffoldDeployment == null) {
 						throw new MprcException("Scaffold search submitted without having Scaffold 3 service enabled.");
 					}
 
-					scaffoldTask = addScaffoldCall(inputFile, search, scaffoldDeployment);
+					scaffoldTask = addScaffoldCall(scaffoldVersion, inputFile, search, scaffoldDeployment);
 
 					if (searchDefinition.getQa() != null) {
 						addQaTask(inputFile, scaffoldTask, mgfOutput);
@@ -453,8 +454,8 @@ public final class SearchRunner implements Runnable {
 		}
 	}
 
-	private boolean searchWithScaffold(final FileSearch inputFile) {
-		return inputFile.isSearch("SCAFFOLD");
+	private String scaffoldVersion(final FileSearch inputFile) {
+		return inputFile.searchVersion("SCAFFOLD");
 	}
 
 	private boolean searchWithIdpicker(final FileSearch inputFile) {
@@ -802,9 +803,9 @@ public final class SearchRunner implements Runnable {
 	 * Add a scaffold 3 call (or update existing one) that depends on this input file to be sought through
 	 * the given engine search.
 	 */
-	private ScaffoldTask addScaffoldCall(final FileSearch inputFile, final EngineSearchTask search, final DatabaseDeployment scaffoldDbDeployment) {
+	private ScaffoldTask addScaffoldCall(final String scaffoldVersion, final FileSearch inputFile, final EngineSearchTask search, final DatabaseDeployment scaffoldDbDeployment) {
 		final String experiment = inputFile.getExperiment();
-		final ScaffoldCall key = new ScaffoldCall(experiment, "3");
+		final ScaffoldCall key = new ScaffoldCall(experiment, scaffoldVersion);
 		final ScaffoldTaskI scaffoldTaskI = scaffoldCalls.get(key);
 		if (scaffoldTaskI != null && !(scaffoldTaskI instanceof ScaffoldTask)) {
 			ExceptionUtilities.throwCastException(scaffoldTaskI, ScaffoldTask.class);
@@ -815,6 +816,7 @@ public final class SearchRunner implements Runnable {
 		if (scaffoldTask == null) {
 			final File scaffoldOutputDir = getOutputFolderForSearchEngine(getScaffoldEngine());
 			scaffoldTask = new ScaffoldTask(
+					scaffoldVersion,
 					experiment,
 					searchDefinition,
 					getScaffoldEngine().getSearchDaemon(),

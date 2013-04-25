@@ -52,6 +52,19 @@ public class EnabledEngines extends PersistableBase {
 		return false;
 	}
 
+	/**
+	 * @param code Engine code.
+	 * @return Version of the engine that is enabled, <c>null</c> if such engine does not exist.
+	 */
+	public String enabledVersion(final String code) {
+		for (final SearchEngineConfig config : engineConfigs) {
+			if (config.getCode().equals(code)) {
+				return config.getVersion();
+			}
+		}
+		return null;
+	}
+
 	@Override
 	public boolean equals(final Object o) {
 		if (this == o) {

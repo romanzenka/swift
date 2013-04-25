@@ -5,9 +5,14 @@ import edu.mayo.mprc.daemon.files.FileHolder;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Pattern;
 
 public final class ScafmlExport extends FileHolder {
 	private static final long serialVersionUID = 7906225867829407626L;
+	private static final Pattern SCAFFOLD_4 = Pattern.compile("^[^0-9]*4(\\..*|$)");
+	// Version of Scaffold
+	private String scaffoldVersion;
+
 	private File scaffoldOutputDir;
 	private String experimentName;
 
@@ -33,7 +38,8 @@ public final class ScafmlExport extends FileHolder {
 	public ScafmlExport() {
 	}
 
-	public ScafmlExport(final String experimentName, final File scaffoldOutputDir, final boolean exportSpectra, final boolean exportPeptideReport, final double proteinProbability, final double peptideProbability, final int minimumPeptideCount, final int minimumNonTrypticTerminii, final String starred, final String delimiter, final boolean regularExpression, final boolean saveOnlyIdentifiedSpectra, final boolean saveNoSpectra) {
+	public ScafmlExport(final String scaffoldVersion, final String experimentName, final File scaffoldOutputDir, final boolean exportSpectra, final boolean exportPeptideReport, final double proteinProbability, final double peptideProbability, final int minimumPeptideCount, final int minimumNonTrypticTerminii, final String starred, final String delimiter, final boolean regularExpression, final boolean saveOnlyIdentifiedSpectra, final boolean saveNoSpectra) {
+		this.scaffoldVersion = scaffoldVersion;
 		this.experimentName = experimentName;
 		this.scaffoldOutputDir = scaffoldOutputDir;
 		this.exportSpectra = exportSpectra;
@@ -49,6 +55,10 @@ public final class ScafmlExport extends FileHolder {
 		this.saveNoSpectra = saveNoSpectra;
 	}
 
+	public boolean isScaffold4() {
+		return SCAFFOLD_4.matcher(scaffoldVersion).matches();
+	}
+
 	public void appendToDocument(final StringBuilder result, final String indent) {
 		result
 				.append(indent)
@@ -57,10 +67,17 @@ public final class ScafmlExport extends FileHolder {
 						"id=\"thresh\" " +
 						"proteinProbability=\"" + proteinProbability + "\" " +
 						"minimumPeptideCount=\"" + minimumPeptideCount + "\" " +
-						"peptideProbability=\"" + peptideProbability + "\" " +
-						"minimumNTT=\"" + minimumNonTrypticTerminii + "\" " +
-						"useCharge=\"true,true,true\" " +
-						"useMergedPeptideProbability=\"true\">" +
+						"peptideProbability=\"" + peptideProbability + "\" ");
+		if (!isScaffold4()) {
+			// Scaffold 4 seems to dislike these settings - the exports fail
+			result
+					.append(
+							"minimumNTT=\"" + minimumNonTrypticTerminii + "\" " +
+									"useCharge=\"true,true,true\" " +
+									"useMergedPeptideProbability=\"true\">");
+		}
+		result
+				.append(
 						"</DisplayThresholds>\n");
 
 		appendScaffoldXmlExport(result, indent);
@@ -108,9 +125,9 @@ public final class ScafmlExport extends FileHolder {
 	public List<String> getExportFileList() {
 		final ArrayList<String> list = new ArrayList<String>(2);
 		if (exportPeptideReport) {
-			list.add(experimentName+".peptide-report.xls");
+			list.add(experimentName + ".peptide-report.xls");
 		}
-		if(exportSpectra) {
+		if (exportSpectra) {
 			list.add(experimentName + ".spectra.txt");
 		}
 		return list;
