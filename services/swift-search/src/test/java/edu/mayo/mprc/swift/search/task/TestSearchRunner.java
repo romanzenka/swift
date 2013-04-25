@@ -99,7 +99,7 @@ public class TestSearchRunner {
 		runner.initialize();
 
 		final int numEngines = enabledEngines().size();
-		final int tasksPerFile = (numEngines - 2) /* 1 for each engine except Scaffolds */
+		final int tasksPerFile = (numEngines - 1) /* 1 for each engine except Scaffold */
 				+ 1 /* Raw->mgf */
 				+ 1 /* RawDump */
 				+ 1 /* msmsEval */;
@@ -111,8 +111,7 @@ public class TestSearchRunner {
 				+ 1 /* Scaffold report */
 
 				+ numEngines /* DB deploys */
-				+ 1 /* Scaffold */
-				+ 1 /* Scaffold 3 */;
+				+ 1 /* Scaffold */;
 
 		int expectedNumTasks = inputFiles.size() * tasksPerFile + tasksPerSearch;
 
@@ -246,6 +245,7 @@ public class TestSearchRunner {
 		engine.setEngineMetadata(metadata);
 		engine.setSearchDaemon(mock(DaemonConnection.class));
 		engine.setDbDeployDaemon(mock(DaemonConnection.class));
+		engine.setVersion("1.0");
 		return engine;
 	}
 
