@@ -94,13 +94,7 @@ public final class AppConfigWriter implements Closeable {
 				return multiFactory.getId(o1).compareTo(multiFactory.getId(o2));
 			}
 		});
-		int maxClassLen = 0;
-		for (final Class clazz : supportedConfigClasses) {
-			final String id = multiFactory.getId(clazz);
-			if (id.length() > maxClassLen) {
-				maxClassLen = id.length();
-			}
-		}
+		int maxClassLen = getMaxTypeLength(supportedConfigClasses);
 		for (final Class clazz : supportedConfigClasses) {
 			final String id = multiFactory.getId(clazz);
 			comments.add(new Triplet("    " + id + StringUtilities.repeat(' ', maxClassLen - id.length()) + "  " + multiFactory.getUserName(clazz)));
@@ -108,28 +102,15 @@ public final class AppConfigWriter implements Closeable {
 		writeTriplets(comments, "");
 	}
 
-	private void openSection(final ResourceConfig config) {
-		if (inSection) {
-			throw new MprcException("Cannot nest sections");
+	private int getMaxTypeLength(List<Class> supportedConfigClasses) {
+		int maxClassLen = 0;
+		for (final Class clazz : supportedConfigClasses) {
+			final String id = multiFactory.getId(clazz);
+			if (id.length() > maxClassLen) {
+				maxClassLen = id.length();
+			}
 		}
-		writer.println();
-		section = multiFactory.getId(config.getClass());
-		final String name = getDependencyResolver().getIdFromConfig(config);
-		if (name == null) {
-			throw new MprcException("The config has to be registered before saving");
-		}
-		writer.println("<" + section + " " + name + ">");
-		inSection = true;
-	}
-
-	private void closeSection(final Collection<Triplet> contents) {
-		if (!inSection) {
-			throw new MprcException("Not in section");
-		}
-		writeTriplets(contents, INDENT);
-
-		writer.println("</" + section + ">");
-		inSection = false;
+		return maxClassLen;
 	}
 
 	private void writeTriplets(final Collection<Triplet> contents, final String indent) {
@@ -174,22 +155,6 @@ public final class AppConfigWriter implements Closeable {
 		return dependencyResolver;
 	}
 
-	private static String getItemName(final ResourceConfig config) {
-		if (config instanceof NamedResource) {
-			return ((NamedResource) config).getName();
-		}
-		return null;
-	}
-
-	private boolean register(final ResourceConfig config) {
-		if (getDependencyResolver().getIdFromConfig(config) == null) {
-			final String name = getItemName(config);
-			getDependencyResolver().addConfig(name == null ? getNewName(config) : name, config);
-			return true;
-		}
-		return false;
-	}
-
 	private String getNewName(final ResourceConfig config) {
 		final String nameBase = multiFactory.getId(config.getClass());
 		int i = 1;
@@ -200,15 +165,6 @@ public final class AppConfigWriter implements Closeable {
 			i++;
 		}
 		return "_" + nameBase + "_" + i;
-	}
-
-	private static String escapeValue(final String value) {
-		String val = value == null ? "" : value.trim();
-		val = val.replaceAll("\\\\", Matcher.quoteReplacement("\\\\"));
-		val = val.replaceAll(Pattern.quote("#"), Matcher.quoteReplacement("\\#"));
-		val = val.replaceAll(Pattern.quote("\n"), Matcher.quoteReplacement("\\n"));
-		val = val.replaceAll(Pattern.quote("\r"), Matcher.quoteReplacement("\\r"));
-		return val;
 	}
 
 	private static final class Triplet {
@@ -238,6 +194,15 @@ public final class AppConfigWriter implements Closeable {
 		public String getComment() {
 			return comment;
 		}
+
+		private static String escapeValue(final String value) {
+			String val = value == null ? "" : value.trim();
+			val = val.replaceAll("\\\\", Matcher.quoteReplacement("\\\\"));
+			val = val.replaceAll(Pattern.quote("#"), Matcher.quoteReplacement("\\#"));
+			val = val.replaceAll(Pattern.quote("\n"), Matcher.quoteReplacement("\\n"));
+			val = val.replaceAll(Pattern.quote("\r"), Matcher.quoteReplacement("\\r"));
+			return val;
+		}
 	}
 
 	/**
@@ -248,11 +213,11 @@ public final class AppConfigWriter implements Closeable {
 		private List<Triplet> contents = new ArrayList<Triplet>(10);
 		private Class currentClass;
 
-		public Class getCurrentClass() {
+		public final Class getCurrentClass() {
 			return currentClass;
 		}
 
-		public List<Triplet> getContents() {
+		public final List<Triplet> getContents() {
 			return contents;
 		}
 
@@ -262,20 +227,35 @@ public final class AppConfigWriter implements Closeable {
 
 		@Override
 		public void put(final String key, final String value, final String comment) {
-			if (NamedResource.class.isAssignableFrom(currentClass) && "name".equals(key)) {
-				// Do not save the name. It is already used in the section
-			} else {
+			if (!NamedResource.class.isAssignableFrom(currentClass) || !"name".equals(key)) {
 				contents.add(new Triplet(key, value, comment));
 			}
+			// Else do not save the name. It is already used in the section
 		}
 
 		@Override
-		public void comment(final String comment) {
+		public final void comment(final String comment) {
 			put(null, null, comment);
 		}
 
+		private boolean register(final ResourceConfig config) {
+			if (getDependencyResolver().getIdFromConfig(config) == null) {
+				final String name = getItemName(config);
+				getDependencyResolver().addConfig(name == null ? getNewName(config) : name, config);
+				return true;
+			}
+			return false;
+		}
+
+		private String getItemName(final ResourceConfig config) {
+			if (config instanceof NamedResource) {
+				return ((NamedResource) config).getName();
+			}
+			return null;
+		}
+
 		@Override
-		public String save(final ResourceConfig resourceConfig) {
+		public final String save(final ResourceConfig resourceConfig) {
 			if (resourceConfig != null) {
 				if (register(resourceConfig)) {
 					saveStrategy(resourceConfig);
@@ -301,11 +281,11 @@ public final class AppConfigWriter implements Closeable {
 		public void put(final String key, final String value, final String comment) {
 			if (getCurrentClass().equals(ServiceConfig.class) && ServiceConfig.RUNNER.equals(key)) {
 				// Do nothing. The values are embedded
-			} else if (getCurrentClass().equals(ApplicationConfig.class) && ApplicationConfig.DAEMONS.equals(key)) {
-				// We do not save the list of daemons. All daemons contained within are used
-			} else {
+
+			} else if (!(getCurrentClass().equals(ApplicationConfig.class) && ApplicationConfig.DAEMONS.equals(key))) {
 				super.put(key, value, comment);
 			}
+			// else: We do not save the list of daemons. All daemons contained within are used
 		}
 
 		@Override
@@ -325,6 +305,30 @@ public final class AppConfigWriter implements Closeable {
 				openSection(resourceConfig);
 				closeSection(innerWriter.getContents());
 			}
+		}
+
+		private void openSection(final ResourceConfig config) {
+			if (inSection) {
+				throw new MprcException("Cannot nest sections");
+			}
+			writer.println();
+			section = multiFactory.getId(config.getClass());
+			final String name = getDependencyResolver().getIdFromConfig(config);
+			if (name == null) {
+				throw new MprcException("The config has to be registered before saving");
+			}
+			writer.println("<" + section + " " + name + ">");
+			inSection = true;
+		}
+
+		private void closeSection(final Collection<Triplet> contents) {
+			if (!inSection) {
+				throw new MprcException("Not in section");
+			}
+			writeTriplets(contents, INDENT);
+
+			writer.println("</" + section + ">");
+			inSection = false;
 		}
 	}
 
