@@ -168,9 +168,20 @@ public final class ScaffoldModificationFormat {
 	private ModSpecificity matchScaffoldMod(final String position, final String title, final String deltaString, final double delta, final char residue, final Terminus terminus) {
 		final Collection<ModSpecificity> matchingModSpecificities = scaffoldModSet.findMatchingModSpecificities(delta, MOD_DELTA_PRECISION, residue, terminus, null, null);
 
-		final String effectiveTitle = fixTandemPyro(title, residue, terminus);
+		String effectiveTitle = fixTandemPyro(title, residue, terminus);
+		ModSpecificity match = findMatch(matchingModSpecificities, effectiveTitle);
+		if (match != null) {
+			return match;
+		}
 
-		final ModSpecificity match = findMatch(matchingModSpecificities, effectiveTitle);
+		effectiveTitle = fixAmmoniaLoss(effectiveTitle, residue, terminus);
+		match = findMatch(matchingModSpecificities, effectiveTitle);
+		if (match != null) {
+			return match;
+		}
+
+		effectiveTitle = fixDehydration(effectiveTitle, residue, terminus);
+		match = findMatch(matchingModSpecificities, effectiveTitle);
 		if (match != null) {
 			return match;
 		}
@@ -205,6 +216,32 @@ public final class ScaffoldModificationFormat {
 			return "Oxidation";
 		}
 		return title;
+	}
+
+	/**
+	 * HACK: If the reported mod is 'Ammonia-loss' and it is defined on Q, try Pyro-glu instead
+	 */
+	private String fixAmmoniaLoss(final String title, final char residue, final Terminus terminus) {
+		String effectiveTitle = title;
+		if ("Ammonia-loss".equalsIgnoreCase(title) && Terminus.Nterm.equals(terminus)) {
+			if (residue == 'Q') {
+				effectiveTitle = "Gln->Pyro-glu";
+			}
+		}
+		return effectiveTitle;
+	}
+
+	/**
+	 * HACK: If the reported mod is 'Ammonia-loss' and it is defined on Q, try Pyro-glu instead
+	 */
+	private String fixDehydration(final String title, final char residue, final Terminus terminus) {
+		String effectiveTitle = title;
+		if ("Dehydrated".equalsIgnoreCase(title) && Terminus.Nterm.equals(terminus)) {
+			if (residue == 'E') {
+				effectiveTitle = "Glu->Pyro-glu";
+			}
+		}
+		return effectiveTitle;
 	}
 
 	/**
