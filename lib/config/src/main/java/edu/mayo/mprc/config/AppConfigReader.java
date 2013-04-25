@@ -28,7 +28,7 @@ public final class AppConfigReader implements Closeable {
 		}
 	}
 
-	public AppConfigReader(Reader reader, ReaderFactory readerFactory) {
+	public AppConfigReader(final Reader reader, final ReaderFactory readerFactory) {
 		init(reader, readerFactory);
 	}
 
@@ -56,29 +56,13 @@ public final class AppConfigReader implements Closeable {
 				if (unescapedLine.isEmpty()) {
 					continue;
 				}
-				if (unescapedLine.startsWith("<")) {
+				if (!unescapedLine.isEmpty() && unescapedLine.charAt(0) == '<') {
 					if (inSection) {
 						if (!unescapedLine.startsWith("</")) {
 							throw new MprcException("Nested sections are not allowed");
 						}
 						inSection = false;
-						final ResourceConfig resourceConfig;
-						if (ServiceConfig.TYPE.equals(type)) {
-							// Special treatment #1
-							resourceConfig = createService(name, values);
-						} else {
-							resourceConfig = createResource(name, type, values);
-						}
-						// Special treatment #2 - add daemons to the enclosing app
-						if (DaemonConfig.TYPE.equals(type)) {
-							config.addDaemon((DaemonConfig) resourceConfig);
-						}
-						if (resourceConfig instanceof NamedResource) {
-							((NamedResource) resourceConfig).setName(name);
-						}
-						if (resourceConfig instanceof TypedResource) {
-							((TypedResource) resourceConfig).setType(type);
-						}
+						processSection(config, type, name, values);
 						values.clear();
 					} else {
 						inSection = true;
@@ -123,6 +107,26 @@ public final class AppConfigReader implements Closeable {
 			FileUtilities.closeQuietly(this);
 		}
 		return config;
+	}
+
+	private void processSection(final ApplicationConfig config, final String type, final String name, final Map<String, String> values) {
+		final ResourceConfig resourceConfig;
+		if (ServiceConfig.TYPE.equals(type)) {
+			// Special treatment #1
+			resourceConfig = createService(name, values);
+		} else {
+			resourceConfig = createResource(name, type, values);
+		}
+		// Special treatment #2 - add daemons to the enclosing app
+		if (DaemonConfig.TYPE.equals(type)) {
+			config.addDaemon((DaemonConfig) resourceConfig);
+		}
+		if (resourceConfig instanceof NamedResource) {
+			((NamedResource) resourceConfig).setName(name);
+		}
+		if (resourceConfig instanceof TypedResource) {
+			((TypedResource) resourceConfig).setType(type);
+		}
 	}
 
 	/**
