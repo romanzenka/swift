@@ -16,7 +16,6 @@ import edu.mayo.mprc.utilities.MprcDoubles;
  * <ul>
  * <li>Best Peptide identification probability</li>
  * <li>{@link #bestPeptideIdentificationProbability}</li>
- * <li>{@link SearchEngineScores}</li>
  * <li>{@link SpectrumIdentificationCounts}</li>
  * </ul>
  * These fields are not stored directly, but are read to calculate statistics or map to peptide information:
@@ -61,11 +60,6 @@ public class PeptideSpectrumMatch extends PersistableBase {
 	private double bestPeptideIdentificationProbability;
 
 	/**
-	 * Best search engine scores encountered so far. Each component is maximized separately.
-	 */
-	private SearchEngineScores bestSearchEngineScores = new SearchEngineScores();
-
-	/**
 	 * How many spectra have we seen so far for different charge states.
 	 */
 	private SpectrumIdentificationCounts spectrumIdentificationCounts = new SpectrumIdentificationCounts();
@@ -78,12 +72,11 @@ public class PeptideSpectrumMatch extends PersistableBase {
 	public PeptideSpectrumMatch() {
 	}
 
-	public PeptideSpectrumMatch(final IdentifiedPeptide peptide, final char previousAminoAcid, final char nextAminoAcid, final double bestPeptideIdentificationProbability, final SearchEngineScores bestSearchEngineScores, final SpectrumIdentificationCounts spectrumIdentificationCounts, final int numberOfEnzymaticTerminii) {
+	public PeptideSpectrumMatch(final IdentifiedPeptide peptide, final char previousAminoAcid, final char nextAminoAcid, final double bestPeptideIdentificationProbability, final SpectrumIdentificationCounts spectrumIdentificationCounts, final int numberOfEnzymaticTerminii) {
 		this.peptide = peptide;
 		this.previousAminoAcid = previousAminoAcid;
 		this.nextAminoAcid = nextAminoAcid;
 		this.bestPeptideIdentificationProbability = bestPeptideIdentificationProbability;
-		this.bestSearchEngineScores = bestSearchEngineScores;
 		this.spectrumIdentificationCounts = spectrumIdentificationCounts;
 		this.numberOfEnzymaticTerminii = numberOfEnzymaticTerminii;
 	}
@@ -128,14 +121,6 @@ public class PeptideSpectrumMatch extends PersistableBase {
 		this.bestPeptideIdentificationProbability = bestPeptideIdentificationProbability;
 	}
 
-	public SearchEngineScores getBestSearchEngineScores() {
-		return bestSearchEngineScores;
-	}
-
-	public void setBestSearchEngineScores(final SearchEngineScores bestSearchEngineScores) {
-		this.bestSearchEngineScores = bestSearchEngineScores;
-	}
-
 	public SpectrumIdentificationCounts getSpectrumIdentificationCounts() {
 		return spectrumIdentificationCounts;
 	}
@@ -167,9 +152,6 @@ public class PeptideSpectrumMatch extends PersistableBase {
 		if (getPreviousAminoAcid() != that.getPreviousAminoAcid()) {
 			return false;
 		}
-		if (getBestSearchEngineScores() != null ? !getBestSearchEngineScores().equals(that.getBestSearchEngineScores()) : that.getBestSearchEngineScores() != null) {
-			return false;
-		}
 		if (getPeptide() != null ? !getPeptide().equals(that.getPeptide()) : that.getPeptide() != null) {
 			return false;
 		}
@@ -189,7 +171,6 @@ public class PeptideSpectrumMatch extends PersistableBase {
 		result = 31 * result + (int) getNextAminoAcid();
 		temp = getBestPeptideIdentificationProbability() != +0.0d ? Double.doubleToLongBits(getBestPeptideIdentificationProbability()) : 0L;
 		result = 31 * result + (int) (temp ^ (temp >>> 32));
-		result = 31 * result + (getBestSearchEngineScores() != null ? getBestSearchEngineScores().hashCode() : 0);
 		result = 31 * result + (getSpectrumIdentificationCounts() != null ? getSpectrumIdentificationCounts().hashCode() : 0);
 		result = 31 * result + getNumberOfEnzymaticTerminii();
 		return result;

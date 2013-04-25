@@ -98,14 +98,8 @@ public final class Analysis extends PersistableBase {
 	public String peptideReport() {
 		final StringBuilder builder = new StringBuilder();
 		builder.append(
-				"Experiment name\t" +
 						"Biological sample category\t" +
 						"Biological sample name\t" +
-						"MS/MS sample name\t" +
-						"Protein name\t" +
-						"Protein accession numbers\t" +
-						"Database sources\t" +
-						"Protein molecular weight (Da)\t" +
 						"Protein identification probability\t" +
 						"Number of Unique Peptides\t" +
 						"Number of Unique Spectra\t" +
@@ -117,30 +111,19 @@ public final class Analysis extends PersistableBase {
 						"Previous Amino Acid\t" +
 						"Next Amino Acid\t" +
 						"Best Peptide Identification Probability\t" +
-						"Best SEQUEST XCorr score\t" +
-						"Best SEQUEST DCn score\t" +
-						"Best Mascot Ion score\t" +
-						"Best Mascot Identity score\t" +
-						"Best Mascot Delta Ion score\t" +
-						"Best X! Tandem -log(e) score\t" +
 						"Number of identified +1H spectra\t" +
 						"Number of identified +2H spectra\t" +
 						"Number of identified +3H spectra\t" +
 						"Number of identified +4H spectra\t" +
 						"Number of enzymatic termini\n");
+		final DecimalFormat percentDecimalFormat = new DecimalFormat("0.######");
 		for (final BiologicalSample sample : getBiologicalSamples()) {
 			for (final SearchResult result : sample.getSearchResults()) {
 				for (final ProteinGroup proteinGroup : result.getProteinGroups()) {
 					for (final PeptideSpectrumMatch psm : proteinGroup.getPeptideSpectrumMatches()) {
 						builder
-								.append("").append('\t')
 								.append(sample.getCategory()).append('\t')
 								.append(sample.getSampleName()).append('\t')
-								.append("").append('\t')
-								.append("").append('\t')
-								.append("").append('\t')
-								.append("").append('\t')
-								.append("").append('\t')
 								.append(percent(proteinGroup.getProteinIdentificationProbability())).append('\t')
 								.append(proteinGroup.getNumberOfUniquePeptides()).append('\t')
 								.append(proteinGroup.getNumberOfUniqueSpectra()).append('\t')
@@ -151,13 +134,7 @@ public final class Analysis extends PersistableBase {
 								.append(psm.getPeptide().getModificationsAsString()).append('\t')
 								.append(psm.getPreviousAminoAcid()).append('\t')
 								.append(psm.getNextAminoAcid()).append('\t')
-								.append(psm.getBestPeptideIdentificationProbability()).append('\t')
-								.append(psm.getBestSearchEngineScores().getSequestXcorrScore()).append('\t')
-								.append(psm.getBestSearchEngineScores().getSequestDcnScore()).append('\t')
-								.append(psm.getBestSearchEngineScores().getMascotIonScore()).append('\t')
-								.append(psm.getBestSearchEngineScores().getMascotIdentityScore()).append('\t')
-								.append(psm.getBestSearchEngineScores().getMascotDeltaIonScore()).append('\t')
-								.append(psm.getBestSearchEngineScores().getTandemHyperScore()).append('\t')
+								.append(percentDecimalFormat.format(psm.getBestPeptideIdentificationProbability())).append('\t')
 								.append(psm.getSpectrumIdentificationCounts().getNumberOfIdentified1HSpectra()).append('\t')
 								.append(psm.getSpectrumIdentificationCounts().getNumberOfIdentified2HSpectra()).append('\t')
 								.append(psm.getSpectrumIdentificationCounts().getNumberOfIdentified3HSpectra()).append('\t')

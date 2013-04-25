@@ -1,19 +1,19 @@
-Experiment name	Biological sample category	Biological sample name	MS/MS sample name	Protein name	Protein accession numbers	Database sources	Protein molecular weight (Da)	Protein identification probability	Number of Unique Peptides	Number of Unique Spectra	Number of Total Spectra	Percentage of Total Spectra	Percentage Sequence Coverage	Peptide Sequence	Peptide Modifications	Previous Amino Acid	Next Amino Acid	Best Peptide Identification Probability	Best SEQUEST XCorr score	Best SEQUEST DCn score	Best Mascot Ion score	Best Mascot Identity score	Best Mascot Delta Ion score	Best X! Tandem -log(e) score	Number of identified +1H spectra	Number of identified +2H spectra	Number of identified +3H spectra	Number of identified +4H spectra	Number of enzymatic termini
-	none	test1						99.80%	2	3	5	6.76%	3.88%	NMQDMVEDYR		K	N	0.95	2.83	0.6	66.9	28.1	61.2	53.8	0	2	0	0	2
-	none	test1						99.80%	2	3	5	6.76%	3.88%	QISNLQQSISDAEQR		K	G	0.95	4.54	0.543	97.4	39.3	89.8	78.4	0	2	1	0	2
-	none	test1						99.80%	2	2	3	4.05%	1.80%	EVDIGIPDATGR		R	L	0.95	3.05	0.553	64.9	38.4	51.5	49.8	0	2	0	0	2
-	none	test1						99.80%	2	2	3	4.05%	1.80%	FDREVDIGIPDATGR		R	L	0.95	3.22	0.237	30.8	39.6	10.0	43.6	0	0	1	0	2
-	none	test1						99.90%	2	2	2	2.70%	3.05%	IKFEMEQNLR		R	Q	0.95	3.42	0.26	42.4	39.8	23.3	NaN	0	0	1	0	2
-	none	test1						99.90%	2	2	2	2.70%	3.05%	TLLDIDNTR		K	M	0.95	2.13	0.21	64.1	40.1	0.0	43.4	0	1	0	0	2
-	none	test1						100.00%	10	13	26	35.10%	14.50%	AHVIVMAATNRPNSIDPALR		R	R	0.95	3.3	0.609	49.8	38.6	43.4	67.4	0	1	2	0	2
-	none	test1						100.00%	10	13	26	35.10%	14.50%	EAVCIVLSDDTCSDEK	c4: Carbamidomethyl (C), c12: Carbamidomethyl (C)	R	I	0.95	5.42	0.581	112.0	32.5	101.0	86.1	0	4	0	0	2
-	none	test1						100.00%	10	13	26	35.10%	14.50%	EDEEESLNEVGYDDIGGCR	c18: Carbamidomethyl (C)	R	K	0.95	5.29	0.749	126.0	27.5	122.0	83.1	0	3	1	0	2
-	none	test1						100.00%	10	13	26	35.10%	14.50%	EDEEESLNEVGYDDIGGCRK	c18: Carbamidomethyl (C)	R	Q	0.95	4.1	0.576	87.6	31.4	77.1	55.0	0	0	2	0	2
-	none	test1						100.00%	10	13	26	35.10%	14.50%	ELQELVQYPVEHPDK		R	F	0.95	4.45	0.471	77.2	40.0	64.2	74.1	0	2	2	0	2
-	none	test1						100.00%	10	13	26	35.10%	14.50%	KGDIFLVR		R	G	0.95	3.17	0.304	56.6	35.8	0.0	41.2	0	3	0	0	2
-	none	test1						100.00%	10	13	26	35.10%	14.50%	KYEMFAQTLQQSR		R	G	0.95	4.27	0.564	82.8	38.5	73.1	81.4	0	1	0	0	2
-	none	test1						100.00%	10	13	26	35.10%	14.50%	LEILQIHTK		R	N	0.95	3.15	0.208	50.0	33.5	22.4	54.8	0	2	0	0	2
-	none	test1						100.00%	10	13	26	35.10%	14.50%	REAVCIVLSDDTCSDEK	c5: Carbamidomethyl (C), c13: Carbamidomethyl (C)	R	I	0.95	5.53	0.571	75.8	35.2	61.3	76.1	0	0	2	0	2
-	none	test1						100.00%	10	13	26	35.10%	14.50%	VINQILTEMDGMSTK	m9: Oxidation (M)	R	K	0.95	4.56	0.567	79.9	38.8	29.7	68.9	0	1	0	0	2
-	none	test1						99.80%	2	2	4	5.41%	4.56%	QSLEASLAETEGR		K	Y	0.95	3.41	0.559	121.0	38.7	111.0	60.8	0	2	0	0	2
-	none	test1						99.80%	2	2	4	5.41%	4.56%	QSVEADINGLR		R	R	0.95	2.91	0.399	60.3	39.1	42.4	48.7	0	2	0	0	2
+Biological sample category	Biological sample name	Protein identification probability	Number of Unique Peptides	Number of Unique Spectra	Number of Total Spectra	Percentage of Total Spectra	Percentage Sequence Coverage	Peptide Sequence	Peptide Modifications	Previous Amino Acid	Next Amino Acid	Best Peptide Identification Probability	Number of identified +1H spectra	Number of identified +2H spectra	Number of identified +3H spectra	Number of identified +4H spectra	Number of enzymatic termini
+none	test1	99.80%	2	3	5	6.76%	3.88%	NMQDMVEDYR		K	N	0.95	0	2	0	0	2
+none	test1	99.80%	2	3	5	6.76%	3.88%	QISNLQQSISDAEQR		K	G	0.95	0	2	1	0	2
+none	test1	99.80%	2	2	3	4.05%	1.80%	EVDIGIPDATGR		R	L	0.95	0	2	0	0	2
+none	test1	99.80%	2	2	3	4.05%	1.80%	FDREVDIGIPDATGR		R	L	0.95	0	0	1	0	2
+none	test1	99.90%	2	2	2	2.70%	3.05%	IKFEMEQNLR		R	Q	0.95	0	0	1	0	2
+none	test1	99.90%	2	2	2	2.70%	3.05%	TLLDIDNTR		K	M	0.95	0	1	0	0	2
+none	test1	100.00%	10	13	26	35.10%	14.50%	AHVIVMAATNRPNSIDPALR		R	R	0.95	0	1	2	0	2
+none	test1	100.00%	10	13	26	35.10%	14.50%	EAVCIVLSDDTCSDEK	c4: Carbamidomethyl (C), c12: Carbamidomethyl (C)	R	I	0.95	0	4	0	0	2
+none	test1	100.00%	10	13	26	35.10%	14.50%	EDEEESLNEVGYDDIGGCR	c18: Carbamidomethyl (C)	R	K	0.95	0	3	1	0	2
+none	test1	100.00%	10	13	26	35.10%	14.50%	EDEEESLNEVGYDDIGGCRK	c18: Carbamidomethyl (C)	R	Q	0.95	0	0	2	0	2
+none	test1	100.00%	10	13	26	35.10%	14.50%	ELQELVQYPVEHPDK		R	F	0.95	0	2	2	0	2
+none	test1	100.00%	10	13	26	35.10%	14.50%	KGDIFLVR		R	G	0.95	0	3	0	0	2
+none	test1	100.00%	10	13	26	35.10%	14.50%	KYEMFAQTLQQSR		R	G	0.95	0	1	0	0	2
+none	test1	100.00%	10	13	26	35.10%	14.50%	LEILQIHTK		R	N	0.95	0	2	0	0	2
+none	test1	100.00%	10	13	26	35.10%	14.50%	REAVCIVLSDDTCSDEK	c5: Carbamidomethyl (C), c13: Carbamidomethyl (C)	R	I	0.95	0	0	2	0	2
+none	test1	100.00%	10	13	26	35.10%	14.50%	VINQILTEMDGMSTK	m9: Oxidation (M)	R	K	0.95	0	1	0	0	2
+none	test1	99.80%	2	2	4	5.41%	4.56%	QSLEASLAETEGR		K	Y	0.95	0	2	0	0	2
+none	test1	99.80%	2	2	4	5.41%	4.56%	QSVEADINGLR		R	R	0.95	0	2	0	0	2

@@ -2,7 +2,6 @@ package edu.mayo.mprc.searchdb.builder;
 
 import edu.mayo.mprc.searchdb.dao.IdentifiedPeptide;
 import edu.mayo.mprc.searchdb.dao.PeptideSpectrumMatch;
-import edu.mayo.mprc.searchdb.dao.SearchEngineScores;
 
 /**
  * @author Roman Zenka
@@ -12,14 +11,13 @@ public class PeptideSpectrumMatchBuilder implements Builder<PeptideSpectrumMatch
 	private char previousAminoAcid;
 	private char nextAminoAcid;
 	private double bestPeptideIdentificationProbability;
-	private SearchEngineScores bestSearchEngineScores = new SearchEngineScores();
 	private SpectrumIdentificationCountsBuilder spectrumIdentificationCounts = new SpectrumIdentificationCountsBuilder();
 	private int numberOfEnzymaticTerminii;
 
 	@Override
 	public PeptideSpectrumMatch build() {
 		return new PeptideSpectrumMatch(peptide, previousAminoAcid, nextAminoAcid, bestPeptideIdentificationProbability,
-				bestSearchEngineScores, spectrumIdentificationCounts.build(), numberOfEnzymaticTerminii);
+				spectrumIdentificationCounts.build(), numberOfEnzymaticTerminii);
 	}
 
 	/**
@@ -31,10 +29,9 @@ public class PeptideSpectrumMatchBuilder implements Builder<PeptideSpectrumMatch
 	public void recordSpectrum(
 			final String spectrumName,
 			final int spectrumCharge,
-			final double peptideIdentificationProbability,
-			final SearchEngineScores searchEngineScores
+			final double peptideIdentificationProbability
 	) {
-		updateScores(peptideIdentificationProbability, searchEngineScores);
+		updateScores(peptideIdentificationProbability);
 		addSpectrum(spectrumCharge);
 	}
 
@@ -43,12 +40,9 @@ public class PeptideSpectrumMatchBuilder implements Builder<PeptideSpectrumMatch
 	 *
 	 * @param peptideIdentificationProbability
 	 *               Potentially better ID probability.
-	 * @param scores Potentially better search engine scores
 	 */
-	public void updateScores(final double peptideIdentificationProbability,
-	                         final SearchEngineScores scores) {
+	public void updateScores(final double peptideIdentificationProbability) {
 		bestPeptideIdentificationProbability = Math.max(bestPeptideIdentificationProbability, peptideIdentificationProbability);
-		bestSearchEngineScores.setMax(scores);
 	}
 
 	/**
@@ -94,14 +88,6 @@ public class PeptideSpectrumMatchBuilder implements Builder<PeptideSpectrumMatch
 
 	public void setBestPeptideIdentificationProbability(final double bestPeptideIdentificationProbability) {
 		this.bestPeptideIdentificationProbability = bestPeptideIdentificationProbability;
-	}
-
-	public SearchEngineScores getBestSearchEngineScores() {
-		return bestSearchEngineScores;
-	}
-
-	public void setBestSearchEngineScores(final SearchEngineScores bestSearchEngineScores) {
-		this.bestSearchEngineScores = bestSearchEngineScores;
 	}
 
 	public int getNumberOfEnzymaticTerminii() {

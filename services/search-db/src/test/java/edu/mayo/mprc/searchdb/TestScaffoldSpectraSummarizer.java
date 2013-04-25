@@ -37,6 +37,10 @@ public class TestScaffoldSpectraSummarizer {
 	private static final String LARGE = "classpath:edu/mayo/mprc/searchdb/large.tsv";
 	private static final String LARGE_EXPECTED = "/edu/mayo/mprc/searchdb/expected_large_report.tsv";
 
+	private static final String SCAFFOLD4 = "classpath:edu/mayo/mprc/searchdb/scaffold4.tsv";
+	private static final String SCAFFOLD4_EXPECTED = "/edu/mayo/mprc/searchdb/expected_scaffold4_report.tsv";
+
+
 	static final String SINGLE_MISSING_DB = "classpath:edu/mayo/mprc/searchdb/single_missing_db.tsv";
 	// Should parse to identical result as SINGLE
 	static final String SINGLE_MISSING_DB_EXPECTED = SINGLE_EXPECTED;
@@ -52,6 +56,13 @@ public class TestScaffoldSpectraSummarizer {
 		unimod = mockUnimodDao.load();
 		scaffoldUnimod = new Unimod();
 		scaffoldUnimod.parseUnimodXML(ResourceUtilities.getStream("classpath:edu/mayo/mprc/searchdb/scaffold_unimod.xml", Unimod.class));
+	}
+
+	@Test
+	public void shouldParseDoubles() {
+		Assert.assertEquals("100.0", String.valueOf(ScaffoldSpectraSummarizer.parseDouble("100.0%")));
+		Assert.assertEquals("94.7", String.valueOf(ScaffoldSpectraSummarizer.parseDouble("94.7%")));
+		Assert.assertEquals("0.948", String.valueOf(ScaffoldSpectraSummarizer.parseDouble("94.8%")/100.0));
 	}
 
 	/**
@@ -149,6 +160,27 @@ public class TestScaffoldSpectraSummarizer {
 			Assert.assertEquals(analysis.getBiologicalSamples().size(), 9, "Biological samples");
 
 			checkAnalysisMatch(analysis, LARGE_EXPECTED);
+		} finally {
+			FileUtilities.closeQuietly(stream);
+		}
+	}
+
+	/**
+	 * Scaffold 4 report should be loaded correctly.
+	 */
+	@Test
+	public void shouldLoadScaffold4Report() {
+		final InputStream stream = ResourceUtilities.getStream(SCAFFOLD4, TestScaffoldSpectraSummarizer.class);
+		try {
+			final ScaffoldSpectraSummarizer summarizer = makeSummarizer();
+			summarizer.load(stream, -1, SCAFFOLD4, "4.0.4", null);
+			final Analysis analysis = summarizer.getAnalysis();
+			Assert.assertEquals(analysis.getAnalysisDate(), new DateTime(2013, 04, 23, 0, 0, 0, 0), "Report date");
+			Assert.assertEquals(analysis.getScaffoldVersion(), "Scaffold_4.0.4", "Scaffold version");
+
+			Assert.assertEquals(analysis.getBiologicalSamples().size(), 2, "Biological samples");
+
+			checkAnalysisMatch(analysis, SCAFFOLD4_EXPECTED);
 		} finally {
 			FileUtilities.closeQuietly(stream);
 		}

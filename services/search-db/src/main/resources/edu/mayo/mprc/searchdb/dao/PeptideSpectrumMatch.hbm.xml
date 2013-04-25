@@ -12,30 +12,6 @@
         <property name="nextAminoAcid" column="next_aa" not-null="true" type="character"/>
         <property name="bestPeptideIdentificationProbability" column="best_id_probability" not-null="true"
                   type="double"/>
-        <component name="bestSearchEngineScores" class="SearchEngineScores" lazy="false">
-            <property name="mascotDeltaIonScore" column="mascot_delta_ion_score" not-null="false"
-                      type="edu.mayo.mprc.database.NullNanDoubleType"/>
-            <property name="mascotHomologyScore" column="mascot_homology_score" not-null="false"
-                      type="edu.mayo.mprc.database.NullNanDoubleType"/>
-            <property name="mascotIdentityScore" column="mascot_identity_score" not-null="false"
-                      type="edu.mayo.mprc.database.NullNanDoubleType"/>
-            <property name="mascotIonScore" column="mascot_ion_score" not-null="false"
-                      type="edu.mayo.mprc.database.NullNanDoubleType"/>
-            <property name="sequestDcnScore" column="sequest_dcn_score" not-null="false"
-                      type="edu.mayo.mprc.database.NullNanDoubleType"/>
-            <property name="sequestPeptidesMatched" column="sequest_peptides_matched" not-null="false"
-                      type="edu.mayo.mprc.database.NullNanDoubleType"/>
-            <property name="sequestSpRank" column="sequest_sp_rank" not-null="false"
-                      type="edu.mayo.mprc.database.NullNanDoubleType"/>
-            <property name="sequestSpScore" column="sequest_sp_score" not-null="false"
-                      type="edu.mayo.mprc.database.NullNanDoubleType"/>
-            <property name="sequestXcorrScore" column="sequest_xcorr_score" not-null="false"
-                      type="edu.mayo.mprc.database.NullNanDoubleType"/>
-            <property name="tandemHyperScore" column="tandem_hyper_score" not-null="false"
-                      type="edu.mayo.mprc.database.NullNanDoubleType"/>
-            <property name="tandemLadderScore" column="tandem_ladder_score" not-null="false"
-                      type="edu.mayo.mprc.database.NullNanDoubleType"/>
-        </component>
         <component name="spectrumIdentificationCounts" class="SpectrumIdentificationCounts" lazy="false">
             <property name="numberOfIdentifiedSpectra" column="total_identified_spectra" not-null="true"
                       type="integer"/>

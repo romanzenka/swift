@@ -7,6 +7,8 @@ package edu.mayo.mprc.scaffoldparser.spectra;
  */
 public final class ScaffoldSpectraVersion extends ScaffoldSpectraReader {
 	public static final String SCAFFOLD_VERSION_KEY = "Scaffold Version";
+	public static final String SCAFFOLD_4_VERSION_KEY = "Scaffold";
+	public static final String SCAFFOLD_4_VERSION_VALUE = "Version:";
 
 	public ScaffoldSpectraVersion() {
 	}
@@ -16,6 +18,11 @@ public final class ScaffoldSpectraVersion extends ScaffoldSpectraReader {
 		if (SCAFFOLD_VERSION_KEY.equalsIgnoreCase(key)) {
 			setScaffoldVersion(value);
 			return false;
+		}
+		if(SCAFFOLD_4_VERSION_KEY.equalsIgnoreCase(key)) {
+			if(value!=null && value.startsWith(SCAFFOLD_4_VERSION_VALUE)) {
+				setScaffoldVersion(value.substring(SCAFFOLD_4_VERSION_VALUE.length()).trim());
+			}
 		}
 		return true;
 	}

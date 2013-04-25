@@ -1,0 +1,65 @@
+TestScaffold4_3, Spectrum report created on 04/23/2013
+Experiment: TestScaffold4_3
+	Peak List Generator: extract_msn
+		Version: Unspecified
+		Charge States Calculated: unknown
+		Deisotoped: unknown
+		Textual Annotation:
+	Database Set: 1 Database
+		Database Name: the Current_SP database
+			Version: unknown
+			Taxonomy: All Entries
+			Number of Proteins: 1033208
+		Does database contain common contaminants?: unknown
+	Search Engine Set: 2 Search Engines
+		Search Engine: Mascot
+			Version: 2.4.0
+			Samples: All Samples
+			Fragment Tolerance: 1.5 Da (Monoisotopic)
+			Parent Tolerance: 1.00 Da (Monoisotopic)
+			Fixed Modifications:
+			Variable Modifications: +16 on M (Oxidation), +58 on C (Carboxymethyl)
+			Database: the Current_SP database (unknown version, 1033208 entries)
+			Digestion Enzyme: stricttrypsin
+			Max Missed Cleavages: 2
+			Probability Model:
+				Sample: test2
+					all charge states: Peptide Prophet with Delta Mass Correction (No decoys found)
+				Sample: testLarge1
+					all charge states: LFDR Model, Classifier data: Bayes, Good (50%) m:89.5/s:16.4 m:49.7/s:1.25 m:0.000/s:0.0000000000000000000000374 m:38.5/s:18.2, Bad (50%) m:56.9/s:8.09 m:46.9/s:5.49 m:0.000/s:0.0000000000000000000000374 m:9.60/s:7.29
+		Search Engine: X! Tandem
+			Version: CYCLONE (2010.12.01.1)
+			Samples: All Samples
+			Fragment Tolerance: 1.5 Da (Monoisotopic)
+			Parent Tolerance: 1.00 Da (Monoisotopic)
+			Fixed Modifications:
+			Variable Modifications: -18 on n (Glu->pyro-Glu), -17 on n (Ammonia-loss), -17 on n (Gln->pyro-Glu), +16 on M (Oxidation), +58 on C (Carboxymethyl)
+			Database: the Current_SP database (unknown version, 1033208 entries)
+			Digestion Enzyme: stricttrypsin
+			Max Missed Cleavages: 2
+			Probability Model:
+				Sample: test2
+					all charge states: LFDR Model, No Classifier
+				Sample: testLarge1
+					all charge states: LFDR Model, Classifier data: Bayes, Good (50%) m:55.0/s:28.8 m:3.48/s:0.411 m:0.304/s:0.138 m:0.507/s:0.208, Bad (50%) m:57.8/s:32.1 m:1.55/s:0.446 m:0.176/s:0.0957 m:0.599/s:0.0836
+	Scaffold: Version: Scaffold_4.0.4
+		Modification Metadata Set: 1541 modifications
+			Source: /opt/Scaffold4/parameters/unimod.xml
+			Comment:
+		Protein Grouping Strategy: Experiment-wide grouping with protein cluster analysis
+		Peptide Thresholds: 95.0% minimum
+		Protein Thresholds: 95.0% minimum and 2 peptides minimum
+		Peptide FDR: 0.0% (Decoy)
+		Protein FDR: 0.0% (Decoy)
+		GO Annotation Source(s):
+
+Experiment name	Biological sample category	Biological sample name	MS/MS sample name	Protein name	Protein accession numbers	Database sources	Protein molecular weight (Da)	Protein identification probability	Number of unique peptides	Number of unique spectra	Number of total spectra	Percentage of total spectra	Percentage sequence coverage	Manual validation	Assigned	Spectrum name	Peptide sequence	Previous amino acid	Next amino acid	Peptide identification probability	Mascot Ion score	Mascot Identity score	Mascot Delta Ion Score	X! Tandem -log(e) score	Number of enzymatic termini	Fixed modifications identified by spectrum	Variable modifications identified by spectrum	Observed m/z	Actual peptide mass (AMU)	Calculated +1H Peptide Mass (AMU)	Spectrum charge	Actual minus calculated peptide mass (AMU)	Actual minus calculated peptide mass (PPM)	Total Ion Current	Peptide start index	Peptide stop index	Exclusive	Other Proteins
+TestScaffold4_3	none	test2	test2	Keratin, type I cytoskeletal 10 OS=Bos taurus GN=KRT10 PE=3 SV=1 (sp) (P06394)	K1C10_BOVIN,K1C10_HUMAN,K1C10_MOUSE,K1C10_RAT	Current_SP.fasta	54,850.0	100.0%	2	2	3	4.05%	4.56%	possibly correct	true	test2 scan 60 60 (test2.60.60.2.dta)	QSLEASLAETEGR	K	Y	99.7%	117	50.5	71.6	0.0605	2			695.843873	1,389.673194	1,390.680946	2	-0.0004759	-0.3422	48,974.2	368	380	true
+TestScaffold4_3	none	test2	test2	Keratin, type I cytoskeletal 10 OS=Bos taurus GN=KRT10 PE=3 SV=1 (sp) (P06394)	K1C10_BOVIN,K1C10_HUMAN,K1C10_MOUSE,K1C10_RAT	Current_SP.fasta	54,850.0	100.0%	2	2	3	4.05%	4.56%	possibly correct	true	test2 scan 56 56 (test2.56.56.2.dta)	QSLEASLAETEGR	K	Y	99.7%	102	50.5	57.1	0.276	2			695.843933	1,389.673314	1,390.680946	2	-0.0003559	-0.2559	86,054.5	368	380	true
+TestScaffold4_3	none	test2	test2	Keratin, type I cytoskeletal 10 OS=Bos taurus GN=KRT10 PE=3 SV=1 (sp) (P06394)	K1C10_BOVIN,K1C10_HUMAN,K1C10_MOUSE,K1C10_RAT	Current_SP.fasta	54,850.0	100.0%	2	2	3	4.05%	4.56%	possibly correct	true	test2 scan 42 42 (test2.42.42.2.dta)	QSVEADINGLR	R	R	96.4%	67.7	50.6	31.3	-0.903	2			601.311888	1,200.609224	1,201.617246	2	-0.0007459	-0.6208	54,516.6	227	237	true
+TestScaffold4_3	none	test2	test2	Transitional endoplasmic reticulum ATPase OS=Homo sapiens GN=VCP PE=1 SV=4 (sp) (P55072)	TERA_HUMAN,TERA_MOUSE	Current_SP.fasta	89,324.8	100.0%	9	11	18	24.3%	17.0%	possibly correct	true	test2 scan 20 20 (test2.20.20.2.dta)	AHVIVMAATNRPNSIDPALR	R	R	99.6%	73.6	49.8	25.7	-0.230	2			1,073.581663	2,145.148774	2,146.155046	2	0.001004	0.4678	21,122.4	339	358	true
+TestScaffold4_3	none	test2	test2	Transitional endoplasmic reticulum ATPase OS=Homo sapiens GN=VCP PE=1 SV=4 (sp) (P55072)	TERA_HUMAN,TERA_MOUSE	Current_SP.fasta	89,324.8	100.0%	9	11	18	24.3%	17.0%	possibly correct	true	test2 scan 14 14 (test2.14.14.3.dta)	AHVIVMAATNRPNSIDPALR	R	R	99.7%	0.000	0.000	0.000	0.721	2			716.056761	2,145.148455	2,146.155046	3	0.0006851	0.3192	325659	339	358	true
+TestScaffold4_3	none	testLarge1	testLarge1	Trypsin OS=Sus scrofa PE=1 SV=1 (sp) (P00761)	TRYP_PIG	Current_SP.fasta	24,409.3	100.0%	5	5	14	0.291%	31.6%	possibly correct	true	testLarge1 scan 5625 5625 (testLarge1.5625.5625.2.dta)	IITHPNFNGNTLDNDIMLIK	K	L	99.7%	79.2	49.5	35.1	2.47	2			1,142.093628	2,282.172704	2,283.180546	2	-0.0005659	-0.2479	77,182.9	78	97	true
+TestScaffold4_3	none	testLarge1	testLarge1	Trypsin OS=Sus scrofa PE=1 SV=1 (sp) (P00761)	TRYP_PIG	Current_SP.fasta	24,409.3	100.0%	5	5	14	0.291%	31.6%	possibly correct	true	testLarge1 scan 5628 5628 (testLarge1.5628.5628.2.dta)	IITHPNFNGNTLDNDIMLIK	K	L	99.7%	85.6	49.5	51.2	3.15	2			1,142.094603	2,282.174654	2,283.180546	2	0.001384	0.6062	58,769.3	78	97	true
+TestScaffold4_3	none	testLarge1	testLarge1	Collagen alpha-2(I) chain OS=Rattus norvegicus GN=Col1a2 PE=1 SV=3 (sp) (P02466)	CO1A2_RAT	Current_SP.fasta	129,564.9	100.0%	2	2	2	0.0416%	4.37%	possibly correct	true	testLarge1 scan 2524 2524 (testLarge1.2524.2524.4.dta)	HGNRGEPGPAGSVGPVGAVGPR	K	G	99.7%	63.2	49.8	17.1	1.37	2			507.016112	2,024.035344	2,025.037546	4	0.005074	2.506	714539	981	1002	false	CO1A2_MOUSE
+END OF FILE

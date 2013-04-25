@@ -129,18 +129,6 @@ public final class SearchDbDaoHibernate extends DaoBase implements RuntimeInitia
 				.add(nullSafeEq("nextAminoAcid", match.getNextAminoAcid()))
 				.add(doubleEq("bestPeptideIdentificationProbability", match.getBestPeptideIdentificationProbability(), PROBABILITY_DELTA))
 
-				.add(doubleEq("bestSearchEngineScores.mascotDeltaIonScore", match.getBestSearchEngineScores().getMascotDeltaIonScore(), SearchEngineScores.DELTA))
-				.add(doubleEq("bestSearchEngineScores.mascotHomologyScore", match.getBestSearchEngineScores().getMascotHomologyScore(), SearchEngineScores.DELTA))
-				.add(doubleEq("bestSearchEngineScores.mascotIdentityScore", match.getBestSearchEngineScores().getMascotIdentityScore(), SearchEngineScores.DELTA))
-				.add(doubleEq("bestSearchEngineScores.mascotIonScore", match.getBestSearchEngineScores().getMascotIonScore(), SearchEngineScores.DELTA))
-				.add(doubleEq("bestSearchEngineScores.sequestDcnScore", match.getBestSearchEngineScores().getSequestDcnScore(), SearchEngineScores.DELTA))
-				.add(doubleEq("bestSearchEngineScores.sequestPeptidesMatched", match.getBestSearchEngineScores().getSequestPeptidesMatched(), SearchEngineScores.DELTA))
-				.add(doubleEq("bestSearchEngineScores.sequestSpRank", match.getBestSearchEngineScores().getSequestSpRank(), SearchEngineScores.DELTA))
-				.add(doubleEq("bestSearchEngineScores.sequestSpScore", match.getBestSearchEngineScores().getSequestSpScore(), SearchEngineScores.DELTA))
-				.add(doubleEq("bestSearchEngineScores.sequestXcorrScore", match.getBestSearchEngineScores().getSequestXcorrScore(), SearchEngineScores.DELTA))
-				.add(doubleEq("bestSearchEngineScores.tandemHyperScore", match.getBestSearchEngineScores().getTandemHyperScore(), SearchEngineScores.DELTA))
-				.add(doubleEq("bestSearchEngineScores.tandemLadderScore", match.getBestSearchEngineScores().getTandemLadderScore(), SearchEngineScores.DELTA))
-
 				.add(Restrictions.eq("spectrumIdentificationCounts.numberOfIdentifiedSpectra", match.getSpectrumIdentificationCounts().getNumberOfIdentifiedSpectra()))
 				.add(Restrictions.eq("spectrumIdentificationCounts.numberOfIdentified1HSpectra", match.getSpectrumIdentificationCounts().getNumberOfIdentified1HSpectra()))
 				.add(Restrictions.eq("spectrumIdentificationCounts.numberOfIdentified2HSpectra", match.getSpectrumIdentificationCounts().getNumberOfIdentified2HSpectra()))

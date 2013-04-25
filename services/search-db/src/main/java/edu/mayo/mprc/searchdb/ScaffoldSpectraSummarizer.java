@@ -9,7 +9,6 @@ import edu.mayo.mprc.scaffoldparser.spectra.ScaffoldSpectraReader;
 import edu.mayo.mprc.scaffoldparser.spectra.ScaffoldSpectraVersion;
 import edu.mayo.mprc.searchdb.builder.*;
 import edu.mayo.mprc.searchdb.dao.Analysis;
-import edu.mayo.mprc.searchdb.dao.SearchEngineScores;
 import edu.mayo.mprc.unimod.IndexedModSet;
 import edu.mayo.mprc.utilities.FileUtilities;
 import org.joda.time.DateTime;
@@ -36,6 +35,8 @@ import java.util.regex.Pattern;
 public class ScaffoldSpectraSummarizer extends ScaffoldSpectraReader {
 	private static final String REPORT_DATE_PREFIX_KEY = "Spectrum report created on ";
 	private static final String SCAFFOLD_VERSION_KEY = ScaffoldSpectraVersion.SCAFFOLD_VERSION_KEY;
+	private static final String SCAFFOLD_4_VERSION_KEY = ScaffoldSpectraVersion.SCAFFOLD_4_VERSION_KEY;
+	private static final String SCAFFOLD_4_VERSION_VALUE = ScaffoldSpectraVersion.SCAFFOLD_4_VERSION_VALUE;
 	private static final String DATABASE_NAME_KEY = "Database Name";
 	private static final Splitter SPLITTER = Splitter.on('\t').trimResults();
 	private static final double HUNDRED_PERCENT = 100.0;
@@ -76,18 +77,6 @@ public class ScaffoldSpectraSummarizer extends ScaffoldSpectraReader {
 	private int spectrumCharge;
 	private int peptideIdentificationProbability;
 
-	private int sequestXcorrScore;
-	private int sequestDcnScore;
-	private int sequestSp;
-	private int sequestSpRank;
-	private int sequestPeptidesMatched;
-	private int mascotIonScore;
-	private int mascotIdentityScore;
-	private int mascotHomologyScore;
-	private int mascotDeltaIonScore;
-	private int tandemHyperScore;
-	private int tandemLadderScore;
-
 	/**
 	 * @param modSet                List of modifications as stored in our database.
 	 * @param scaffoldModSet        List of modifications as configured within Scaffold.
@@ -118,6 +107,8 @@ public class ScaffoldSpectraSummarizer extends ScaffoldSpectraReader {
 			}
 		} else if (SCAFFOLD_VERSION_KEY.equalsIgnoreCase(key)) {
 			analysis.setScaffoldVersion(value);
+		} else if (SCAFFOLD_4_VERSION_KEY.equalsIgnoreCase(key) && value != null && value.startsWith(SCAFFOLD_4_VERSION_VALUE)) {
+			analysis.setScaffoldVersion(value.substring(SCAFFOLD_4_VERSION_VALUE.length()).trim());
 		} else if (DATABASE_NAME_KEY.equalsIgnoreCase(key)) {
 			databaseName = extractDatabaseName(value);
 		}
@@ -184,18 +175,6 @@ public class ScaffoldSpectraSummarizer extends ScaffoldSpectraReader {
 		spectrumName = getColumn(map, ScaffoldSpectraReader.SPECTRUM_NAME);
 		spectrumCharge = getColumn(map, ScaffoldSpectraReader.SPECTRUM_CHARGE);
 		peptideIdentificationProbability = getColumn(map, ScaffoldSpectraReader.PEPTIDE_ID_PROBABILITY);
-
-		sequestXcorrScore = getColumnOptional(map, ScaffoldSpectraReader.SEQUEST_XCORR_SCORE);
-		sequestDcnScore = getColumnOptional(map, ScaffoldSpectraReader.SEQUEST_DCN_SCORE);
-		sequestSp = getColumnOptional(map, ScaffoldSpectraReader.SEQUEST_SP);
-		sequestSpRank = getColumnOptional(map, ScaffoldSpectraReader.SEQUEST_SP_RANK);
-		sequestPeptidesMatched = getColumnOptional(map, ScaffoldSpectraReader.SEQUEST_PEPTIDES_MATCHED);
-		mascotIonScore = getColumnOptional(map, ScaffoldSpectraReader.MASCOT_ION_SCORE);
-		mascotIdentityScore = getColumnOptional(map, ScaffoldSpectraReader.MASCOT_IDENTITY_SCORE);
-		mascotHomologyScore = getColumnOptional(map, ScaffoldSpectraReader.MASCOT_HOMOLOGY_SCORE);
-		mascotDeltaIonScore = getColumnOptional(map, ScaffoldSpectraReader.MASCOT_DELTA_ION_SCORE);
-		tandemHyperScore = getColumnOptional(map, ScaffoldSpectraReader.X_TANDEM_HYPER_SCORE);
-		tandemLadderScore = getColumnOptional(map, ScaffoldSpectraReader.X_TANDEM_LADDER_SCORE);
 		return true;
 	}
 
@@ -254,19 +233,7 @@ public class ScaffoldSpectraSummarizer extends ScaffoldSpectraReader {
 		peptideSpectrumMatch.recordSpectrum(
 				currentLine[spectrumName],
 				parseInt(currentLine[spectrumCharge]),
-				parseDouble(currentLine[peptideIdentificationProbability]) / HUNDRED_PERCENT,
-				new SearchEngineScores(
-						parseOptionalDouble(sequestXcorrScore),
-						parseOptionalDouble(sequestDcnScore),
-						parseOptionalDouble(sequestSp),
-						parseOptionalDouble(sequestSpRank),
-						parseOptionalDouble(sequestPeptidesMatched),
-						parseOptionalDouble(mascotIonScore),
-						parseOptionalDouble(mascotIdentityScore),
-						parseOptionalDouble(mascotHomologyScore),
-						parseOptionalDouble(mascotDeltaIonScore),
-						parseOptionalDouble(tandemHyperScore),
-						parseOptionalDouble(tandemLadderScore))
+				parseDouble(currentLine[peptideIdentificationProbability]) / HUNDRED_PERCENT
 		);
 		return true;
 	}
@@ -303,7 +270,7 @@ public class ScaffoldSpectraSummarizer extends ScaffoldSpectraReader {
 	 * @return The number parsed. If the number is missing. {@link Double#NaN} is returned. Commas separating thousands
 	 *         are handled as if they were not present. Trailing percent sign is removed if present.
 	 */
-	private Double parseDouble(final String s) {
+	static Double parseDouble(final String s) {
 		if ("".equals(s)) {
 			return Double.NaN;
 		}
@@ -312,17 +279,6 @@ public class ScaffoldSpectraSummarizer extends ScaffoldSpectraReader {
 		} catch (NumberFormatException e) {
 			throw new MprcException("Cannot parse number [" + s + "] as real number.", e);
 		}
-	}
-
-	/**
-	 * @param column Column index to convert to double.
-	 * @return If column not defined (-1), return Double.NaN, otherwise parse the value for the column and return that.
-	 */
-	private double parseOptionalDouble(final int column) {
-		if (column < 0) {
-			return Double.NaN;
-		}
-		return parseDouble(currentLine[column]);
 	}
 
 	private static String cutPercentSign(final String s) {
