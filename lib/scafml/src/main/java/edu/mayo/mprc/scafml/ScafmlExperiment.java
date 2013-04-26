@@ -117,7 +117,7 @@ public final class ScafmlExperiment extends FileHolder {
 				.append(XMLUtilities.wrapatt("name", this.getName()))
 				.append(XMLUtilities.wrapatt("connectToNCBI", connectToNCBI ? "true" : "false"))
 				.append(XMLUtilities.wrapatt("annotateWithGOA", annotateWithGOA ? "true" : "false"))
-				.append(XMLUtilities.wrapatt("spectrumNameRegEx", "([^ /(]+\\.dta)"));
+				.append(XMLUtilities.wrapatt("spectrumNameRegEx", "([^ /(]+(\\.dta)?)"));
 
 		if (scaffold.getVersionMajor() >= 3) {
 			result

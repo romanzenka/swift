@@ -80,8 +80,6 @@ public final class ScafmlExport extends FileHolder {
 				.append("useMergedPeptideProbability=\"true\"")
 				.append("></DisplayThresholds>\n");
 
-		appendScaffoldXmlExport(result, indent);
-
 		result
 				.append(indent)
 				.append("<Export type=\"sfd\" thresholds=\"thresh\" path=\"")
@@ -131,19 +129,6 @@ public final class ScafmlExport extends FileHolder {
 			list.add(experimentName + ".spectra.txt");
 		}
 		return list;
-	}
-
-	/**
-	 * Appends an export for Scaffold's internal "scaffoldxml" format. This format is XStream-based
-	 * dump of Scaffold internals.
-	 *
-	 * @param result Resulting XML to append the export to.
-	 * @param indent How much to indent the XML.
-	 */
-	private void appendScaffoldXmlExport(final StringBuilder result, final String indent) {
-		result
-				.append(indent)
-				.append("<Export type=\"scaffoldxml\" thresholds=\"thresh\" path=\"").append(scaffoldOutputDir.getAbsolutePath()).append("\"/>\n");
 	}
 }
 
