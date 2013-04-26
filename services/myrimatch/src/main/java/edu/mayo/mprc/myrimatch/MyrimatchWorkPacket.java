@@ -28,19 +28,19 @@ public final class MyrimatchWorkPacket extends EngineWorkPacket {
 		super(inputFile, outputFile, searchParamsFile, databaseFile, publishSearchFiles, taskId, fromScratch);
 
 		if (inputFile == null) {
-			throw new MprcException("X!Tandem request cannot be created: The .mgf file was null");
+			throw new MprcException("Myrimatch request cannot be created: The .mgf file was null");
 		}
 		if (searchParamsFile == null) {
-			throw new MprcException("X!Tandem request cannot be created: The search params file has to be set");
+			throw new MprcException("Myrimatch request cannot be created: The search params file has to be set");
 		}
 		if (outputFile == null) {
-			throw new MprcException("X!Tandem request cannot be created: The resulting file was null");
+			throw new MprcException("Myrimatch request cannot be created: The resulting file was null");
 		}
 		if (workFolder == null) {
-			throw new MprcException("X!Tandem request cannot be created: The work folder was null");
+			throw new MprcException("Myrimatch request cannot be created: The work folder was null");
 		}
 		if (databaseFile == null) {
-			throw new MprcException("X!Tandem request cannot be created: Path to fasta file was null");
+			throw new MprcException("Myrimatch request cannot be created: Path to fasta file was null");
 		}
 
 		this.workFolder = workFolder;

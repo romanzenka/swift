@@ -35,6 +35,7 @@ public final class MyrimatchWorker extends WorkerBase {
 	private File executable;
 
 	public static final String EXECUTABLE = "executable";
+	public static final String MZ_IDENT_ML = ".mzIdentML";
 
 	public MyrimatchWorker(final File executable) {
 		this.executable = executable;
@@ -123,7 +124,7 @@ public final class MyrimatchWorker extends WorkerBase {
 		);
 		processCaller.runAndCheck("myrimatch");
 
-		final File createdResultFile = new File(packet.getWorkFolder(), FileUtilities.stripExtension(packet.getInputFile().getName()) + ".pepXML");
+		final File createdResultFile = new File(packet.getWorkFolder(), FileUtilities.stripExtension(packet.getInputFile().getName()) + MZ_IDENT_ML);
 		if (!createdResultFile.equals(resultFile))
 
 		{
@@ -154,7 +155,7 @@ public final class MyrimatchWorker extends WorkerBase {
 	@Component("myrimatchWorkerFactory")
 	public static final class Factory extends WorkerFactoryBase<Config> implements EngineFactory {
 		private static final EngineMetadata ENGINE_METADATA = new EngineMetadata(
-				"MYRIMATCH", ".pepXML", "Myrimatch", false, "myrimatch", new MyrimatchMappingFactory(),
+				"MYRIMATCH", MZ_IDENT_ML, "Myrimatch", false, "myrimatch", new MyrimatchMappingFactory(),
 				new String[]{TYPE},
 				new String[]{MyrimatchCache.TYPE},
 				new String[]{MyrimatchDeploymentService.TYPE},
