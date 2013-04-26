@@ -67,18 +67,18 @@ public final class ScafmlExport extends FileHolder {
 						"id=\"thresh\" " +
 						"proteinProbability=\"" + proteinProbability + "\" " +
 						"minimumPeptideCount=\"" + minimumPeptideCount + "\" " +
-						"peptideProbability=\"" + peptideProbability + "\" ");
-		if (!isScaffold4()) {
-			// Scaffold 4 seems to dislike these settings - the exports fail
+						"peptideProbability=\"" + peptideProbability + "\" ")
+				.append("minimumNTT=\"" + minimumNonTrypticTerminii + "\" ");
+		if (isScaffold4()) {
 			result
-					.append(
-							"minimumNTT=\"" + minimumNonTrypticTerminii + "\" " +
-									"useCharge=\"true,true,true\" " +
-									"useMergedPeptideProbability=\"true\"");
+					.append("useCharge=\"true,true,true,true\" ");
+		} else {
+			result
+					.append("useCharge=\"true,true,true\" ");
 		}
 		result
-				.append(
-						"></DisplayThresholds>\n");
+				.append("useMergedPeptideProbability=\"true\"")
+				.append("></DisplayThresholds>\n");
 
 		appendScaffoldXmlExport(result, indent);
 

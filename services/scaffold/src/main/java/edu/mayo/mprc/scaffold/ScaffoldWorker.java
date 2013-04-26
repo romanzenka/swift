@@ -175,7 +175,7 @@ public final class ScaffoldWorker extends WorkerBase {
 	}
 
 	/**
-	 * @param work Spectrume export to do.
+	 * @param work Spectrum export to do.
 	 * @return String to put into .scafml file that will produce the export.
 	 */
 	static String getScafmlSpectrumExport(final ScaffoldSpectrumExportWorkPacket work) {
