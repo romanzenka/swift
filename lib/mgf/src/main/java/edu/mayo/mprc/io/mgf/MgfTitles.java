@@ -1,0 +1,28 @@
+package edu.mayo.mprc.io.mgf;
+
+import edu.mayo.mprc.utilities.FileUtilities;
+import org.proteomecommons.io.mgf.MascotGenericFormatPeakList;
+
+import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
+
+/**
+ * @author Roman Zenka
+ */
+public final class MgfTitles {
+	public List<String> getTitles(final File mgf) {
+		MGFPeakListReader sourceMgfReader = new MGFPeakListReader(mgf);
+		sourceMgfReader.setReadPeaks(false);
+		List<String> titles = new ArrayList<String>(1000);
+		try {
+			MascotGenericFormatPeakList peakList;
+			while ((peakList = sourceMgfReader.nextPeakList()) != null) {
+				titles.add(peakList.getTitle());
+			}
+		} finally {
+			FileUtilities.closeQuietly(sourceMgfReader);
+		}
+		return titles;
+	}
+}
