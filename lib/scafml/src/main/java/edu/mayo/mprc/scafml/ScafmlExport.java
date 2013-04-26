@@ -67,13 +67,13 @@ public final class ScafmlExport extends FileHolder {
 						"id=\"thresh\" " +
 						"proteinProbability=\"" + proteinProbability + "\" " +
 						"minimumPeptideCount=\"" + minimumPeptideCount + "\" " +
-						"peptideProbability=\"" + peptideProbability + "\" ")
-				.append("minimumNTT=\"" + minimumNonTrypticTerminii + "\" ");
+						"peptideProbability=\"" + peptideProbability + "\" ");
 		if (isScaffold4()) {
 			result
 					.append("useCharge=\"true,true,true,true\" ");
 		} else {
 			result
+					.append("minimumNTT=\"" + minimumNonTrypticTerminii + "\" ")
 					.append("useCharge=\"true,true,true\" ");
 		}
 		result
