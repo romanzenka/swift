@@ -35,7 +35,7 @@ public final class MyrimatchWorker extends WorkerBase {
 	private File executable;
 
 	public static final String EXECUTABLE = "executable";
-	public static final String MZ_IDENT_ML = ".mzIdentML";
+	public static final String MZ_IDENT_ML = ".mzid";
 
 	public MyrimatchWorker(final File executable) {
 		this.executable = executable;

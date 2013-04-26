@@ -34,7 +34,7 @@ public final class IdpickerWorker extends WorkerBase {
 	public static final String TYPE = "idpicker";
 	public static final String NAME = "IDPicker";
 	public static final String DESC = "<p>IDPicker uses machine learning algorithms to separate correct and incorrect peptide spectrum matches.</p>" +
-			"<p>Inputs are results from the search engines (in .mzIdentML format), output is an .idp file (sqlite3) with search engine scores " +
+			"<p>Inputs are results from the search engines (in .mzid format), output is an .idp file (sqlite3) with search engine scores " +
 			"recalculated to match a particular target FDR.</p>";
 
 	private static final String IDPQONVERT_EXECUTABLE = "idpqonvert";

@@ -424,7 +424,7 @@ public final class SearchRunner implements Runnable {
 				final String scaffoldVersion = scaffoldVersion(inputFile);
 				if (scaffoldVersion != null) {
 					if (scaffoldDeployment == null) {
-						throw new MprcException("Scaffold search submitted without having Scaffold 3 service enabled.");
+						throw new MprcException("Scaffold search submitted without having Scaffold service enabled.");
 					}
 
 					scaffoldTask = addScaffoldCall(scaffoldVersion, inputFile, search, scaffoldDeployment);
