@@ -126,7 +126,7 @@ public final class IdpickerWorker extends WorkerBase {
 	@Component("idPickerWorkerFactory")
 	public static final class Factory extends WorkerFactoryBase<Config> implements EngineFactory {
 		private static final EngineMetadata ENGINE_METADATA = new EngineMetadata(
-				"IDPICKER", ".idp", "ID Picker", false, "idpicker", null,
+				"IDPICKER", ".idp", "IDPicker", false, "idpicker", null,
 				new String[]{TYPE},
 				new String[]{IdpickerCache.TYPE},
 				new String[]{IdpickerDeploymentService.TYPE},
