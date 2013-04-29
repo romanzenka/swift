@@ -7,24 +7,24 @@ import org.testng.annotations.Test;
 
 import java.io.InputStream;
 
-public class MyrimatchPepXmlReaderTest {
+public class MyriMatchPepXmlReaderTest {
 	@Test
 	public static void shouldParsePepXml() {
-		final InputStream stream = ResourceUtilities.getStream("classpath:edu/mayo/mprc/myrimatch/result.pepXML", MyrimatchPepXmlReaderTest.class);
-		final MyrimatchPepXmlReader reader = new MyrimatchPepXmlReader();
+		final InputStream stream = ResourceUtilities.getStream("classpath:edu/mayo/mprc/myrimatch/result.pepXML", MyriMatchPepXmlReaderTest.class);
+		final MyriMatchPepXmlReader reader = new MyriMatchPepXmlReader();
 		reader.load(stream);
 		final String line = reader.getLineForKey("3");
 
 		Assert.assertEquals(line.replaceAll("[a-zA-Z0-9_.~+-]+", ""), reader.getEmptyLine(), "Empty line has same amount of tabs as normal line");
 		Assert.assertEquals(reader.getHeaderLine(),
-				"Myrimatch Peptide"
-						+ '\t' + "Myrimatch Protein"
-						+ '\t' + "Myrimatch Total Proteins"
-						+ '\t' + "Myrimatch Num Matched Ions"
-						+ '\t' + "Myrimatch Total Num Ions"
-						+ '\t' + "Myrimatch mvh"
-						+ '\t' + "Myrimatch mz Fidelity"
-						+ '\t' + "Myrimatch xcorr", "Myrimatch header does not match");
+				"MyriMatch Peptide"
+						+ '\t' + "MyriMatch Protein"
+						+ '\t' + "MyriMatch Total Proteins"
+						+ '\t' + "MyriMatch Num Matched Ions"
+						+ '\t' + "MyriMatch Total Num Ions"
+						+ '\t' + "MyriMatch mvh"
+						+ '\t' + "MyriMatch mz Fidelity"
+						+ '\t' + "MyriMatch xcorr", "MyriMatch header does not match");
 		Assert.assertEquals(line, Joiner.on('\t').join(
 				"SSGSSYPSLLQCLK", // peptide
 				"CONTAM_TRYP_PIG", // protein
@@ -34,6 +34,6 @@ public class MyrimatchPepXmlReaderTest {
 				"112.38684~", // mvh
 				"138.23982~", // mz fidelity
 				"6.08570~" // xcorr
-		), "Myrimatch reader read wrong data");
+		), "MyriMatch reader read wrong data");
 	}
 }

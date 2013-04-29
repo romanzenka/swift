@@ -9,7 +9,7 @@ import edu.mayo.mprc.daemon.Worker;
 import edu.mayo.mprc.daemon.WorkerBase;
 import edu.mayo.mprc.daemon.WorkerFactoryBase;
 import edu.mayo.mprc.msmseval.MSMSEvalOutputReader;
-import edu.mayo.mprc.myrimatch.MyrimatchPepXmlReader;
+import edu.mayo.mprc.myrimatch.MyriMatchPepXmlReader;
 import edu.mayo.mprc.scaffoldparser.spectra.ScaffoldQaSpectraReader;
 import edu.mayo.mprc.utilities.FileUtilities;
 import edu.mayo.mprc.utilities.ProcessCaller;
@@ -142,7 +142,7 @@ public final class QaWorker extends WorkerBase {
 		// Do not add anything that depends on RawDump unless we are sure we can provide the data
 		ticFile = new File(qaReportFolder, uniqueMgfAnalysisName + ".tic.png");
 
-		final MyrimatchPepXmlReader myrimatchReader = getMyrimatchReader(qaFiles.getAdditionalSearchResults());
+		final MyriMatchPepXmlReader myrimatchReader = getMyriMatchReader(qaFiles.getAdditionalSearchResults());
 
 		if (!outputFile.exists() || outputFile.length() == 0) {
 
@@ -207,11 +207,11 @@ public final class QaWorker extends WorkerBase {
 	/**
 	 * Find a myrimatch search engine results in the list and create a reader from them.
 	 */
-	private MyrimatchPepXmlReader getMyrimatchReader(final HashMap<String, File> additionalSearchResults) {
+	private MyriMatchPepXmlReader getMyriMatchReader(final HashMap<String, File> additionalSearchResults) {
 		for (final Map.Entry<String, File> entry : additionalSearchResults.entrySet()) {
 			final String searchEngineCode = entry.getKey();
 			if ("MYRIMATCH".equals(searchEngineCode)) {
-				final MyrimatchPepXmlReader reader = new MyrimatchPepXmlReader();
+				final MyriMatchPepXmlReader reader = new MyriMatchPepXmlReader();
 				final File searchResult = entry.getValue();
 				reader.load(FileUtilities.getInputStream(searchResult));
 				return reader;

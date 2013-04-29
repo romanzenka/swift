@@ -3,7 +3,7 @@ package edu.mayo.mprc.qa;
 import edu.mayo.mprc.MprcException;
 import edu.mayo.mprc.io.mgf.MGFPeakListReader;
 import edu.mayo.mprc.msmseval.MSMSEvalOutputReader;
-import edu.mayo.mprc.myrimatch.MyrimatchPepXmlReader;
+import edu.mayo.mprc.myrimatch.MyriMatchPepXmlReader;
 import edu.mayo.mprc.scaffoldparser.spectra.ScaffoldQaSpectraReader;
 import edu.mayo.mprc.utilities.FileUtilities;
 import org.apache.log4j.Logger;
@@ -49,7 +49,7 @@ public final class SpectrumInfoJoiner {
 	 * @param rawFileName
 	 * @return Number of rows in output file, not including the column headers.
 	 */
-	public static int joinSpectrumData(final File mgfFile, final ScaffoldQaSpectraReader scaffold, final RawDumpReader rawDumpReader, final MSMSEvalOutputReader msmsEvalReader, final MyrimatchPepXmlReader myrimatchReader, final File outputFile, final String rawFileName) {
+	public static int joinSpectrumData(final File mgfFile, final ScaffoldQaSpectraReader scaffold, final RawDumpReader rawDumpReader, final MSMSEvalOutputReader msmsEvalReader, final MyriMatchPepXmlReader myrimatchReader, final File outputFile, final String rawFileName) {
 		FileWriter fileWriter = null;
 
 		int rowCount = 0;
@@ -138,7 +138,7 @@ public final class SpectrumInfoJoiner {
 		return rowCount;
 	}
 
-	private static int writeMgfWithScaffoldInfos(final ScaffoldQaSpectraReader scaffold, final FileWriter fileWriter, int rowCount, final MSMSEvalOutputReader msmsEvalReader, final RawDumpReader rawDumpReader, final MyrimatchPepXmlReader myrimatchReader, final String scanId, final MgfSpectrum mgfSpectrum, final String rawFileName) throws IOException {
+	private static int writeMgfWithScaffoldInfos(final ScaffoldQaSpectraReader scaffold, final FileWriter fileWriter, int rowCount, final MSMSEvalOutputReader msmsEvalReader, final RawDumpReader rawDumpReader, final MyriMatchPepXmlReader myrimatchReader, final String scanId, final MgfSpectrum mgfSpectrum, final String rawFileName) throws IOException {
 		final String scaffoldVersion = scaffold == null ? null : scaffold.getScaffoldVersion();
 		if (mgfSpectrum.getScaffoldInfos() == null || mgfSpectrum.getScaffoldInfos().size() == 0) {
 			writeSpectrumLine(
@@ -174,7 +174,7 @@ public final class SpectrumInfoJoiner {
 			final FileWriter fileWriter,
 			final MSMSEvalOutputReader msmsEvalReader,
 			final RawDumpReader rawDumpReader,
-			final MyrimatchPepXmlReader myrimatchReader,
+			final MyriMatchPepXmlReader myrimatchReader,
 			final String scanIdStr,
 			final MgfSpectrum mgfSpectrum,
 			final String scaffoldInfo,

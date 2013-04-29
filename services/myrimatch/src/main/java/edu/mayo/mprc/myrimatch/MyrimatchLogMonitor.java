@@ -8,7 +8,7 @@ import edu.mayo.mprc.utilities.progress.UserProgressReporter;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-final class MyrimatchLogMonitor implements LogMonitor {
+final class MyriMatchLogMonitor implements LogMonitor {
 
 	private static final int TIME_BETWEEN_UPDATES_MS = 1000;
 	private final UserProgressReporter progressReporter;
@@ -18,7 +18,7 @@ final class MyrimatchLogMonitor implements LogMonitor {
 	private boolean warningReported = false;
 
 
-	public MyrimatchLogMonitor(final UserProgressReporter progressReporter) {
+	public MyriMatchLogMonitor(final UserProgressReporter progressReporter) {
 		this.progressReporter = progressReporter;
 	}
 

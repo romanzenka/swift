@@ -27,18 +27,18 @@ import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
-public final class MyrimatchWorker extends WorkerBase {
-	private static final Logger LOGGER = Logger.getLogger(MyrimatchWorker.class);
+public final class MyriMatchWorker extends WorkerBase {
+	private static final Logger LOGGER = Logger.getLogger(MyriMatchWorker.class);
 	public static final String TYPE = "myrimatch";
-	public static final String NAME = "Myrimatch";
-	public static final String DESC = "Myrimatch search engine support. <p>Myrimatch is freely available at <a href=\"http://fenchurch.mc.vanderbilt.edu/software.php#MyriMatch\">http://fenchurch.mc.vanderbilt.edu/software.php#MyriMatch</a>.</p>";
+	public static final String NAME = "MyriMatch";
+	public static final String DESC = "MyriMatch search engine support. <p>MyriMatch is freely available at <a href=\"http://fenchurch.mc.vanderbilt.edu/software.php#MyriMatch\">http://fenchurch.mc.vanderbilt.edu/software.php#MyriMatch</a>.</p>";
 
 	private File executable;
 
 	public static final String EXECUTABLE = "executable";
 	public static final String MZ_IDENT_ML = ".mzid";
 
-	public MyrimatchWorker(final File executable) {
+	public MyriMatchWorker(final File executable) {
 		this.executable = executable;
 	}
 
@@ -52,11 +52,11 @@ public final class MyrimatchWorker extends WorkerBase {
 
 	@Override
 	public void process(WorkPacket workPacket, UserProgressReporter progressReporter) {
-		if (!(workPacket instanceof MyrimatchWorkPacket)) {
-			throw new DaemonException("Unexpected packet type " + workPacket.getClass().getName() + ", expected " + MyrimatchWorkPacket.class.getName());
+		if (!(workPacket instanceof MyriMatchWorkPacket)) {
+			throw new DaemonException("Unexpected packet type " + workPacket.getClass().getName() + ", expected " + MyriMatchWorkPacket.class.getName());
 		}
 
-		final MyrimatchWorkPacket packet = (MyrimatchWorkPacket) workPacket;
+		final MyriMatchWorkPacket packet = (MyriMatchWorkPacket) workPacket;
 
 		checkPacketCorrectness(packet);
 
@@ -119,10 +119,10 @@ public final class MyrimatchWorker extends WorkerBase {
 
 		final ProcessCaller processCaller = new ProcessCaller(processBuilder);
 
-		LOGGER.info("Myrimatch search, " + packet.toString() + ", has been submitted.");
+		LOGGER.info("MyriMatch search, " + packet.toString() + ", has been submitted.");
 		processCaller.setOutputMonitor(new
 
-				MyrimatchLogMonitor(progressReporter)
+				MyriMatchLogMonitor(progressReporter)
 
 		);
 		processCaller.runAndCheck("myrimatch");
@@ -140,10 +140,10 @@ public final class MyrimatchWorker extends WorkerBase {
 			FileUtilities.deleteNow(createdResultFile);
 		}
 
-		LOGGER.info("Myrimatch search, " + packet.toString() + ", has been successfully completed.");
+		LOGGER.info("MyriMatch search, " + packet.toString() + ", has been successfully completed.");
 	}
 
-	private void checkPacketCorrectness(final MyrimatchWorkPacket packet) {
+	private void checkPacketCorrectness(final MyriMatchWorkPacket packet) {
 		if (packet.getSearchParamsFile() == null) {
 			throw new MprcException("Params file must not be null");
 		}
@@ -164,19 +164,19 @@ public final class MyrimatchWorker extends WorkerBase {
 	@Component("myrimatchWorkerFactory")
 	public static final class Factory extends WorkerFactoryBase<Config> implements EngineFactory {
 		private static final EngineMetadata ENGINE_METADATA = new EngineMetadata(
-				"MYRIMATCH", MZ_IDENT_ML, "Myrimatch", false, "myrimatch", new MyrimatchMappingFactory(),
+				"MYRIMATCH", MZ_IDENT_ML, "MyriMatch", false, "myrimatch", new MyriMatchMappingFactory(),
 				new String[]{TYPE},
-				new String[]{MyrimatchCache.TYPE},
-				new String[]{MyrimatchDeploymentService.TYPE},
+				new String[]{MyriMatchCache.TYPE},
+				new String[]{MyriMatchDeploymentService.TYPE},
 				40, false);
 
 		@Override
 		public Worker create(final Config config, final DependencyResolver dependencies) {
-			MyrimatchWorker worker = null;
+			MyriMatchWorker worker = null;
 			try {
-				worker = new MyrimatchWorker(FileUtilities.getAbsoluteFileForExecutables(new File(config.getExecutable())));
+				worker = new MyriMatchWorker(FileUtilities.getAbsoluteFileForExecutables(new File(config.getExecutable())));
 			} catch (Exception e) {
-				throw new MprcException("Myrimatch worker could not be created.", e);
+				throw new MprcException("MyriMatch worker could not be created.", e);
 			}
 			return worker;
 		}
@@ -210,7 +210,7 @@ public final class MyrimatchWorker extends WorkerBase {
 
 		@Override
 		public void save(final ConfigWriter writer) {
-			writer.put(EXECUTABLE, getExecutable(), "Myrimatch executable");
+			writer.put(EXECUTABLE, getExecutable(), "MyriMatch executable");
 		}
 
 		@Override
@@ -227,7 +227,7 @@ public final class MyrimatchWorker extends WorkerBase {
 	public static final class Ui implements ServiceUiFactory {
 
 		public void createUI(final DaemonConfig daemon, final ResourceConfig resource, final UiBuilder builder) {
-			builder.property(EXECUTABLE, "Executable Path", "Myrimatch executable path. Myrimatch executables can be " +
+			builder.property(EXECUTABLE, "Executable Path", "MyriMatch executable path. MyriMatch executables can be " +
 					"<br/>found at <a href=\"http://fenchurch.mc.vanderbilt.edu/software.php#MyriMatch/\"/>http://fenchurch.mc.vanderbilt.edu/software.php#MyriMatch</a>")
 					.required()
 					.executable(Arrays.asList("-v"))

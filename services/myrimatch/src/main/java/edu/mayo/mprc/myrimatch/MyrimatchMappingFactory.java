@@ -3,14 +3,14 @@ package edu.mayo.mprc.myrimatch;
 import edu.mayo.mprc.swift.params2.mapping.MappingFactory;
 import edu.mayo.mprc.swift.params2.mapping.Mappings;
 
-public final class MyrimatchMappingFactory implements MappingFactory {
+public final class MyriMatchMappingFactory implements MappingFactory {
 
 	private static final long serialVersionUID = 20110711L;
 	public static final String MYRIMATCH = "MYRIMATCH";
 
 	@Override
 	public Mappings createMapping() {
-		return new MyrimatchMappings();
+		return new MyriMatchMappings();
 	}
 
 	@Override

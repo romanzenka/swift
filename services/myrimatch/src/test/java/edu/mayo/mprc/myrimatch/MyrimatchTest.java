@@ -36,154 +36,154 @@ import java.nio.charset.Charset;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public final class MyrimatchTest {
-	private static final Logger LOGGER = Logger.getLogger(MyrimatchTest.class);
+public final class MyriMatchTest {
+	private static final Logger LOGGER = Logger.getLogger(MyriMatchTest.class);
 	private static final MockUnimodDao UNIMOD_DAO = new MockUnimodDao();
 	public static final Charset CHARSET = Charset.forName("ISO-8859-1");
 
 	@Test
 	public final void shouldCreate() {
-		final MyrimatchWorker worker = createWorker("myrimatch.exe");
+		final MyriMatchWorker worker = createWorker("myrimatch.exe");
 		Assert.assertNotNull(worker);
 		Assert.assertEquals(worker.getExecutable(), new File("myrimatch.exe"));
 	}
 
 	@Test
 	public final void shouldStripComments() {
-		Assert.assertEquals(MyrimatchMappings.stripComment("hello world"), "hello world");
-		Assert.assertEquals(MyrimatchMappings.stripComment("hello # world"), "hello ");
-		Assert.assertEquals(MyrimatchMappings.stripComment("hello # world # test"), "hello ");
-		Assert.assertEquals(MyrimatchMappings.stripComment("# hello # world # test"), "");
+		Assert.assertEquals(MyriMatchMappings.stripComment("hello world"), "hello world");
+		Assert.assertEquals(MyriMatchMappings.stripComment("hello # world"), "hello ");
+		Assert.assertEquals(MyriMatchMappings.stripComment("hello # world # test"), "hello ");
+		Assert.assertEquals(MyriMatchMappings.stripComment("# hello # world # test"), "");
 	}
 
 	@Test
 	public final void shouldMapFixedMods() {
-		final MyrimatchMappings mappings = createMappings();
+		final MyriMatchMappings mappings = createMappings();
 		final MappingContext mappingContext = createMappingContext();
 		final ModSet mods = new ModSet();
 		final Unimod unimod = UNIMOD_DAO.load();
 
 		mappings.setFixedMods(mappingContext, mods);
-		Assert.assertEquals(mappings.getNativeParam(MyrimatchMappings.STATIC_MODS), "", "Should report no mods");
+		Assert.assertEquals(mappings.getNativeParam(MyriMatchMappings.STATIC_MODS), "", "Should report no mods");
 
 		final ModSpecificity oxidationMethionine = unimod.findSingleMatchingModificationSet(15.995, 0.005, 'M', null, null, null);
 		// final ModSpecificity oxidationMethionine = unimod.getSpecificitiesByMascotName("Oxidation (M)").get(0);
 		Assert.assertNotNull(oxidationMethionine, "Not found Oxidation(M)");
 		mods.add(oxidationMethionine);
 		mappings.setFixedMods(mappingContext, mods);
-		Assert.assertEquals(mappings.getNativeParam(MyrimatchMappings.STATIC_MODS), "M 15.994915", "Should report Methionine modification");
+		Assert.assertEquals(mappings.getNativeParam(MyriMatchMappings.STATIC_MODS), "M 15.994915", "Should report Methionine modification");
 
 		final ModSpecificity carbamidomethyl = unimod.findSingleMatchingModificationSet(57.025, 0.025, 'C', null, null, null);
 		Assert.assertNotNull(carbamidomethyl, "Not found Carbamidomethyl(C)");
 		mods.add(carbamidomethyl);
 		mappings.setFixedMods(mappingContext, mods);
-		Assert.assertEquals(mappings.getNativeParam(MyrimatchMappings.STATIC_MODS), "C 57.021464 M 15.994915", "Should report two mods");
+		Assert.assertEquals(mappings.getNativeParam(MyriMatchMappings.STATIC_MODS), "C 57.021464 M 15.994915", "Should report two mods");
 	}
 
 	@Test
 	public final void shouldMapVariableMods() {
-		final MyrimatchMappings mappings = createMappings();
+		final MyriMatchMappings mappings = createMappings();
 		final MappingContext mappingContext = createMappingContext();
 		final ModSet mods = new ModSet();
 		final Unimod unimod = UNIMOD_DAO.load();
 
 		mappings.setVariableMods(mappingContext, mods);
-		Assert.assertEquals(mappings.getNativeParam(MyrimatchMappings.DYNAMIC_MODS), "", "Should report no mods");
+		Assert.assertEquals(mappings.getNativeParam(MyriMatchMappings.DYNAMIC_MODS), "", "Should report no mods");
 
 		final ModSpecificity oxidationMethionine = unimod.findSingleMatchingModificationSet(15.995, 0.005, 'M', null, null, null);
 		// final ModSpecificity oxidationMethionine = unimod.getSpecificitiesByMascotName("Oxidation (M)").get(0);
 		Assert.assertNotNull(oxidationMethionine, "Not found Oxidation(M)");
 		mods.add(oxidationMethionine);
 		mappings.setVariableMods(mappingContext, mods);
-		Assert.assertEquals(mappings.getNativeParam(MyrimatchMappings.DYNAMIC_MODS), "M * 15.994915", "Should report Methionine modification");
+		Assert.assertEquals(mappings.getNativeParam(MyriMatchMappings.DYNAMIC_MODS), "M * 15.994915", "Should report Methionine modification");
 
 		final ModSpecificity carbamidomethyl = unimod.findSingleMatchingModificationSet(57.025, 0.025, 'C', null, null, null);
 		Assert.assertNotNull(carbamidomethyl, "Not found Carbamidomethyl(C)");
 		mods.add(carbamidomethyl);
 		mappings.setVariableMods(mappingContext, mods);
-		Assert.assertEquals(mappings.getNativeParam(MyrimatchMappings.DYNAMIC_MODS), "C * 57.021464 M ^ 15.994915", "Should report two mods");
+		Assert.assertEquals(mappings.getNativeParam(MyriMatchMappings.DYNAMIC_MODS), "C * 57.021464 M ^ 15.994915", "Should report two mods");
 
 		final ModSpecificity dimethyl = unimod.findSingleMatchingModificationSet(28.0315, 0.0005, 'P', null, null, null);
 		Assert.assertNotNull(dimethyl, "Not found Dimethyl(Protein N-term P)");
 		mods.add(dimethyl);
 		mappings.setVariableMods(mappingContext, mods);
-		Assert.assertEquals(mappings.getNativeParam(MyrimatchMappings.DYNAMIC_MODS), "C * 57.021464 (P ^ 28.0313 M @ 15.994915", "Should report three mods");
+		Assert.assertEquals(mappings.getNativeParam(MyriMatchMappings.DYNAMIC_MODS), "C * 57.021464 (P ^ 28.0313 M @ 15.994915", "Should report three mods");
 
 		final ModSpecificity homoserine = unimod.findSingleMatchingModificationSet(-29.99285, 0.00005, 'M', Terminus.Cterm, false, null);
 		Assert.assertNotNull(homoserine, "Not found Homoserine(C-term M)");
 		mods.add(homoserine);
 		mappings.setVariableMods(mappingContext, mods);
-		Assert.assertEquals(mappings.getNativeParam(MyrimatchMappings.DYNAMIC_MODS), "C * 57.021464 (P ^ 28.0313 M) @ -29.992806 M % 15.994915", "Should report four mods");
+		Assert.assertEquals(mappings.getNativeParam(MyriMatchMappings.DYNAMIC_MODS), "C * 57.021464 (P ^ 28.0313 M) @ -29.992806 M % 15.994915", "Should report four mods");
 	}
 
 	@Test
 	public final void shouldMapEnzymes() {
-		Assert.assertEquals(MyrimatchMappings.enzymeToString(new Protease("Arg-C", "R", "!P")), "(?<=R)(?!P)");
-		Assert.assertEquals(MyrimatchMappings.enzymeToString(new Protease("Asp-N", "", "BD")), "(?=[BD])");
-		Assert.assertEquals(MyrimatchMappings.enzymeToString(new Protease("Asp-N_ambic", "", "DE")), "(?=[DE])");
-		Assert.assertEquals(MyrimatchMappings.enzymeToString(new Protease("Chymotrypsin", "FYWL", "!P")), "(?<=[FYWL])(?!P)");
-		Assert.assertEquals(MyrimatchMappings.enzymeToString(new Protease("CNBr", "M", "")), "(?<=M)");
-		Assert.assertEquals(MyrimatchMappings.enzymeToString(new Protease("Formic_acid", "D", "")), "(?<=D)"); // Problem. Formic_acid cleaves on both sides. We support just one
-		Assert.assertEquals(MyrimatchMappings.enzymeToString(new Protease("Lys-C (restrict P)", "K", "!P")), "(?<=K)(?!P)");
-		Assert.assertEquals(MyrimatchMappings.enzymeToString(new Protease("Lys-C (allow P)", "K", "")), "(?<=K)");
-		Assert.assertEquals(MyrimatchMappings.enzymeToString(new Protease("PepsinA", "FL", "")), "(?<=[FL])");
-		Assert.assertEquals(MyrimatchMappings.enzymeToString(new Protease("Tryp-CNBr", "KRM", "!P")), "(?<=[KRM])(?!P)");
-		Assert.assertEquals(MyrimatchMappings.enzymeToString(new Protease("TrypChymo", "FYWLKR", "!P")), "(?<=[FYWLKR])(?!P)");
-		Assert.assertEquals(MyrimatchMappings.enzymeToString(new Protease("TrypChymoKRWFYnoP", "KRWFY", "")), "(?<=[KRWFY])");
-		Assert.assertEquals(MyrimatchMappings.enzymeToString(new Protease("Trypsin (allow P)", "KR", "")), "(?<=[KR])");
-		Assert.assertEquals(MyrimatchMappings.enzymeToString(new Protease("Trypsin (restrict P)", "KR", "!P")), "(?<=[KR])(?!P)");
-		Assert.assertEquals(MyrimatchMappings.enzymeToString(new Protease("V8-DE", "BDEZ", "!P")), "(?<=[BDEZ])(?!P)");
-		Assert.assertEquals(MyrimatchMappings.enzymeToString(new Protease("V8-E", "EZ", "!P")), "(?<=[EZ])(?!P)");
-		Assert.assertEquals(MyrimatchMappings.enzymeToString(new Protease("ChymoAndGluC", "FYWLE", "")), "(?<=[FYWLE])");
-		Assert.assertEquals(MyrimatchMappings.enzymeToString(new Protease("Non-Specific", "", "")), "NoEnzyme");
-		Assert.assertEquals(MyrimatchMappings.enzymeToString(new Protease("DoubleNeg", "!A", "!EF")), "(?<!A)(?![EF])");
+		Assert.assertEquals(MyriMatchMappings.enzymeToString(new Protease("Arg-C", "R", "!P")), "(?<=R)(?!P)");
+		Assert.assertEquals(MyriMatchMappings.enzymeToString(new Protease("Asp-N", "", "BD")), "(?=[BD])");
+		Assert.assertEquals(MyriMatchMappings.enzymeToString(new Protease("Asp-N_ambic", "", "DE")), "(?=[DE])");
+		Assert.assertEquals(MyriMatchMappings.enzymeToString(new Protease("Chymotrypsin", "FYWL", "!P")), "(?<=[FYWL])(?!P)");
+		Assert.assertEquals(MyriMatchMappings.enzymeToString(new Protease("CNBr", "M", "")), "(?<=M)");
+		Assert.assertEquals(MyriMatchMappings.enzymeToString(new Protease("Formic_acid", "D", "")), "(?<=D)"); // Problem. Formic_acid cleaves on both sides. We support just one
+		Assert.assertEquals(MyriMatchMappings.enzymeToString(new Protease("Lys-C (restrict P)", "K", "!P")), "(?<=K)(?!P)");
+		Assert.assertEquals(MyriMatchMappings.enzymeToString(new Protease("Lys-C (allow P)", "K", "")), "(?<=K)");
+		Assert.assertEquals(MyriMatchMappings.enzymeToString(new Protease("PepsinA", "FL", "")), "(?<=[FL])");
+		Assert.assertEquals(MyriMatchMappings.enzymeToString(new Protease("Tryp-CNBr", "KRM", "!P")), "(?<=[KRM])(?!P)");
+		Assert.assertEquals(MyriMatchMappings.enzymeToString(new Protease("TrypChymo", "FYWLKR", "!P")), "(?<=[FYWLKR])(?!P)");
+		Assert.assertEquals(MyriMatchMappings.enzymeToString(new Protease("TrypChymoKRWFYnoP", "KRWFY", "")), "(?<=[KRWFY])");
+		Assert.assertEquals(MyriMatchMappings.enzymeToString(new Protease("Trypsin (allow P)", "KR", "")), "(?<=[KR])");
+		Assert.assertEquals(MyriMatchMappings.enzymeToString(new Protease("Trypsin (restrict P)", "KR", "!P")), "(?<=[KR])(?!P)");
+		Assert.assertEquals(MyriMatchMappings.enzymeToString(new Protease("V8-DE", "BDEZ", "!P")), "(?<=[BDEZ])(?!P)");
+		Assert.assertEquals(MyriMatchMappings.enzymeToString(new Protease("V8-E", "EZ", "!P")), "(?<=[EZ])(?!P)");
+		Assert.assertEquals(MyriMatchMappings.enzymeToString(new Protease("ChymoAndGluC", "FYWLE", "")), "(?<=[FYWLE])");
+		Assert.assertEquals(MyriMatchMappings.enzymeToString(new Protease("Non-Specific", "", "")), "NoEnzyme");
+		Assert.assertEquals(MyriMatchMappings.enzymeToString(new Protease("DoubleNeg", "!A", "!EF")), "(?<!A)(?![EF])");
 	}
 
 	@Test
 	public final void shouldMapPeptideTolerance() {
-		final MyrimatchMappings mappings = createMappings();
+		final MyriMatchMappings mappings = createMappings();
 		final MappingContext mappingContext = createMappingContext();
 
 		mappings.setPeptideTolerance(mappingContext, new Tolerance("2.3 Da"));
-		Assert.assertEquals(mappings.getNativeParam(MyrimatchMappings.PRECURSOR_MZ_TOLERANCE), "2.3daltons");
+		Assert.assertEquals(mappings.getNativeParam(MyriMatchMappings.PRECURSOR_MZ_TOLERANCE), "2.3daltons");
 
 		mappings.setPeptideTolerance(mappingContext, new Tolerance("10 ppm"));
-		Assert.assertEquals(mappings.getNativeParam(MyrimatchMappings.PRECURSOR_MZ_TOLERANCE), "10.0ppm");
+		Assert.assertEquals(mappings.getNativeParam(MyriMatchMappings.PRECURSOR_MZ_TOLERANCE), "10.0ppm");
 	}
 
 	@Test
 	public final void shouldMapFragmentTolerance() {
-		final MyrimatchMappings mappings = createMappings();
+		final MyriMatchMappings mappings = createMappings();
 		final MappingContext mappingContext = createMappingContext();
 
 		mappings.setFragmentTolerance(mappingContext, new Tolerance("10.37 Da"));
-		Assert.assertEquals(mappings.getNativeParam(MyrimatchMappings.FRAGMENT_MZ_TOLERANCE), "10.37daltons");
+		Assert.assertEquals(mappings.getNativeParam(MyriMatchMappings.FRAGMENT_MZ_TOLERANCE), "10.37daltons");
 
 		mappings.setFragmentTolerance(mappingContext, new Tolerance("0.12 ppm"));
-		Assert.assertEquals(mappings.getNativeParam(MyrimatchMappings.FRAGMENT_MZ_TOLERANCE), "0.12ppm");
+		Assert.assertEquals(mappings.getNativeParam(MyriMatchMappings.FRAGMENT_MZ_TOLERANCE), "0.12ppm");
 	}
 
 	@Test
 	public final void shouldMapInstrument() {
-		final MyrimatchMappings mappings = createMappings();
+		final MyriMatchMappings mappings = createMappings();
 		final MappingContext mappingContext = createMappingContext();
 
 		mappings.setInstrument(mappingContext, Instrument.ORBITRAP);
-		Assert.assertEquals(mappings.getNativeParam(MyrimatchMappings.PRECURSOR_MZ_TOLERANCE_RULE), "mono", "Orbitrap uses monoisotopic mass");
-		Assert.assertEquals(mappings.getNativeParam(MyrimatchMappings.FRAGMENTATION_RULE), "manual:b,y", "Orbitrap produces b and y ions");
+		Assert.assertEquals(mappings.getNativeParam(MyriMatchMappings.PRECURSOR_MZ_TOLERANCE_RULE), "mono", "Orbitrap uses monoisotopic mass");
+		Assert.assertEquals(mappings.getNativeParam(MyriMatchMappings.FRAGMENTATION_RULE), "manual:b,y", "Orbitrap produces b and y ions");
 	}
 
 	@Test
 	public final void shouldMapMissedCleavages() {
-		final MyrimatchMappings mappings = createMappings();
+		final MyriMatchMappings mappings = createMappings();
 		final MappingContext mappingContext = createMappingContext();
 		mappings.setMissedCleavages(mappingContext, 3);
-		Assert.assertEquals(mappings.getNativeParam(MyrimatchMappings.NUM_MAX_MISSED_CLEAVAGES), "3", "Missed cleavages do not match");
+		Assert.assertEquals(mappings.getNativeParam(MyriMatchMappings.NUM_MAX_MISSED_CLEAVAGES), "3", "Missed cleavages do not match");
 	}
 
 	@Test
 	public final void shouldWriteChanges() throws IOException {
-		final MyrimatchMappings mappings = createMappings();
+		final MyriMatchMappings mappings = createMappings();
 		compareMappingsToBase(mappings, null, null);
 
 		final MappingContext mappingContext = createMappingContext();
@@ -193,11 +193,11 @@ public final class MyrimatchTest {
 
 	@Test
 	public final void shouldRunSearch() throws IOException, InterruptedException {
-		final File myrimatchExecutable = getMyrimatchExecutable();
+		final File myrimatchExecutable = getMyriMatchExecutable();
 		try {
 			final File tempFolder = FileUtilities.createTempFolder();
 
-			final MyrimatchMappings mappings = createMappings();
+			final MyriMatchMappings mappings = createMappings();
 			final MappingContext mappingContext = createMappingContext();
 			mappings.setProtease(mappingContext, new Protease("Trypsin (allow P)", "KR", ""));
 			mappings.setMissedCleavages(mappingContext, 2);
@@ -211,15 +211,15 @@ public final class MyrimatchTest {
 			}
 
 			final File fastaFile =
-					TestingUtilities.getTempFileFromResource(MyrimatchTest.class, "/edu/mayo/mprc/myrimatch/database.fasta", false, tempFolder, ".fasta");
+					TestingUtilities.getTempFileFromResource(MyriMatchTest.class, "/edu/mayo/mprc/myrimatch/database.fasta", false, tempFolder, ".fasta");
 			final File mgfFile =
-					TestingUtilities.getTempFileFromResource(MyrimatchTest.class, "/edu/mayo/mprc/myrimatch/test.mgf", false, tempFolder, ".mgf");
+					TestingUtilities.getTempFileFromResource(MyriMatchTest.class, "/edu/mayo/mprc/myrimatch/test.mgf", false, tempFolder, ".mgf");
 
 			final File resultFile = new File(tempFolder, "result.pepXML");
 
-			final MyrimatchWorkPacket work = new MyrimatchWorkPacket(resultFile, configFile, mgfFile, tempFolder, fastaFile, 2, "Rev_", false, "Test Myrimatch run", false);
+			final MyriMatchWorkPacket work = new MyriMatchWorkPacket(resultFile, configFile, mgfFile, tempFolder, fastaFile, 2, "Rev_", false, "Test MyriMatch run", false);
 
-			final MyrimatchWorker worker = new MyrimatchWorker(myrimatchExecutable);
+			final MyriMatchWorker worker = new MyriMatchWorker(myrimatchExecutable);
 
 			final DaemonWorkerTester tester = new DaemonWorkerTester(worker);
 
@@ -242,7 +242,7 @@ public final class MyrimatchTest {
 				@Override
 				public void requestTerminated(final Exception e) {
 					LOGGER.error("MyriMatch request terminated", e);
-					Assert.fail("Myrimatch failed", e);
+					Assert.fail("MyriMatch failed", e);
 				}
 
 				@Override
@@ -260,7 +260,7 @@ public final class MyrimatchTest {
 				}
 			}
 
-			Assert.assertTrue(resultFile.exists() && resultFile.isFile() && resultFile.length() > 0, "Myrimatch did not produce valid result file");
+			Assert.assertTrue(resultFile.exists() && resultFile.isFile() && resultFile.length() > 0, "MyriMatch did not produce valid result file");
 			String resultString = Files.toString(resultFile, CHARSET);
 			resultString = replace(resultString, fastaFile.getAbsolutePath(), "$$DB$$");
 			resultString = replace(resultString, work.getWorkFolder().getAbsolutePath(), "$$WORK_DIR$$");
@@ -274,7 +274,7 @@ public final class MyrimatchTest {
 			resultString = replaceLongFloats(resultString);
 
 
-			final URL resource = Resources.getResource(MyrimatchTest.class, "result.pepXML");
+			final URL resource = Resources.getResource(MyriMatchTest.class, "result.pepXML");
 			String expectedString = Resources.toString(resource, CHARSET);
 			expectedString = expectedString.replaceAll("\r\n", "\n");
 
@@ -285,7 +285,7 @@ public final class MyrimatchTest {
 			FileUtilities.cleanupTempFile(mgfFile);
 			FileUtilities.cleanupTempFile(tempFolder);
 
-			Assert.assertEquals(resultString, expectedString, "The Myrimatch results do not match expected ones");
+			Assert.assertEquals(resultString, expectedString, "The MyriMatch results do not match expected ones");
 		} finally {
 			Installer.myrimatch(myrimatchExecutable, Installer.Action.UNINSTALL);
 		}
@@ -295,15 +295,15 @@ public final class MyrimatchTest {
 	public final void shouldDeploy() throws IOException {
 		final File tempFolder = FileUtilities.createTempFolder();
 
-		final File databaseFile = TestingUtilities.getTempFileFromResource(MyrimatchTest.class, "/edu/mayo/mprc/myrimatch/database.fasta", false, tempFolder, ".fasta");
+		final File databaseFile = TestingUtilities.getTempFileFromResource(MyriMatchTest.class, "/edu/mayo/mprc/myrimatch/database.fasta", false, tempFolder, ".fasta");
 
-		final MyrimatchDeploymentService.Config config = new MyrimatchDeploymentService.Config();
+		final MyriMatchDeploymentService.Config config = new MyriMatchDeploymentService.Config();
 		config.setDeployableDbFolder(tempFolder.getAbsolutePath());
-		final MyrimatchDeploymentService.Factory factory = new MyrimatchDeploymentService.Factory();
-		final MyrimatchDeploymentService deployer = (MyrimatchDeploymentService) factory.create(config, new DependencyResolver(null));
+		final MyriMatchDeploymentService.Factory factory = new MyriMatchDeploymentService.Factory();
+		final MyriMatchDeploymentService deployer = (MyriMatchDeploymentService) factory.create(config, new DependencyResolver(null));
 		final DatabaseAnnotation annotation = new DatabaseAnnotation("Rev_");
 		final DeploymentRequest request = new DeploymentRequest("test deployment",
-				new FastaFile("database", "test database for Myrimatch", databaseFile, annotation));
+				new FastaFile("database", "test database for MyriMatch", databaseFile, annotation));
 		deployCheckResult(deployer, request);
 		deployCheckResult(deployer, request);
 
@@ -314,9 +314,9 @@ public final class MyrimatchTest {
 		FileUtilities.cleanupTempFile(tempFolder);
 	}
 
-	private void deployCheckResult(final MyrimatchDeploymentService deployer, final DeploymentRequest request) {
+	private void deployCheckResult(final MyriMatchDeploymentService deployer, final DeploymentRequest request) {
 		final DeploymentResult result = deployer.performDeployment(request);
-		final MyrimatchDeploymentResult myrimatchResult = (MyrimatchDeploymentResult) result;
+		final MyriMatchDeploymentResult myrimatchResult = (MyriMatchDeploymentResult) result;
 		Assert.assertEquals(myrimatchResult.getDecoySequencePrefix(), request.getAnnotation().getDecoyRegex(), "Determined prefix does not match");
 		Assert.assertEquals(myrimatchResult.getNumForwardEntries(), 2, "Different amount of forward entries");
 	}
@@ -354,15 +354,15 @@ public final class MyrimatchTest {
 		return resultString;
 	}
 
-	private File getMyrimatchExecutable() {
+	private File getMyriMatchExecutable() {
 		final File myrimatchExecutable = Installer.myrimatch(null, Installer.Action.INSTALL);
-		Assert.assertTrue(myrimatchExecutable.exists(), "Myrimatch executable must exist");
-		Assert.assertTrue(myrimatchExecutable.isFile(), "Myrimatch executable must be a file");
-		Assert.assertTrue(myrimatchExecutable.canExecute(), "Myrimatch executable must be actually executable");
+		Assert.assertTrue(myrimatchExecutable.exists(), "MyriMatch executable must exist");
+		Assert.assertTrue(myrimatchExecutable.isFile(), "MyriMatch executable must be a file");
+		Assert.assertTrue(myrimatchExecutable.canExecute(), "MyriMatch executable must be actually executable");
 		return myrimatchExecutable;
 	}
 
-	private void compareMappingsToBase(final MyrimatchMappings mappings, final String toReplaceInBase, final String replaceWith) throws IOException {
+	private void compareMappingsToBase(final MyriMatchMappings mappings, final String toReplaceInBase, final String replaceWith) throws IOException {
 		final StringWriter writer = new StringWriter(10000);
 		try {
 			mappings.write(mappings.baseSettings(), writer);
@@ -426,20 +426,20 @@ public final class MyrimatchTest {
 		};
 	}
 
-	private MyrimatchMappings createMappings() {
-		final MyrimatchMappingFactory factory = new MyrimatchMappingFactory();
+	private MyriMatchMappings createMappings() {
+		final MyriMatchMappingFactory factory = new MyriMatchMappingFactory();
 		Assert.assertEquals(factory.getCanonicalParamFileName(), "myrimatch.template.cfg");
-		final MyrimatchMappings mapping = (MyrimatchMappings) factory.createMapping();
+		final MyriMatchMappings mapping = (MyriMatchMappings) factory.createMapping();
 		return mapping;
 	}
 
-	private MyrimatchWorker createWorker(final String executable) {
-		final MyrimatchWorker.Factory factory = new MyrimatchWorker.Factory();
+	private MyriMatchWorker createWorker(final String executable) {
+		final MyriMatchWorker.Factory factory = new MyriMatchWorker.Factory();
 
-		final MyrimatchWorker.Config config = new MyrimatchWorker.Config(executable);
+		final MyriMatchWorker.Config config = new MyriMatchWorker.Config(executable);
 		final DependencyResolver resolver = new DependencyResolver(null);
 
-		return (MyrimatchWorker) factory.create(config, resolver);
+		return (MyriMatchWorker) factory.create(config, resolver);
 	}
 
 }

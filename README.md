@@ -1,7 +1,7 @@
 Swift
 =====
 
-Search multiple tandem mass spec. datafiles using multiple search engines at once: Mascot, Sequest, X!Tandem, OMSSA and Myrimatch.
+Search multiple tandem mass spec. datafiles using multiple search engines at once: Mascot, Sequest, X!Tandem, OMSSA and MyriMatch.
 
 ### Swift inputs
 

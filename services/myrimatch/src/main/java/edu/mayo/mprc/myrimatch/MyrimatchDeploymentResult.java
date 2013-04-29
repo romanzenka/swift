@@ -2,12 +2,12 @@ package edu.mayo.mprc.myrimatch;
 
 import edu.mayo.mprc.enginedeployment.DeploymentResult;
 
-public final class MyrimatchDeploymentResult extends DeploymentResult {
+public final class MyriMatchDeploymentResult extends DeploymentResult {
 	private static final long serialVersionUID = 20110715L;
 	private long numForwardEntries;
 	private String decoySequencePrefix;
 
-	public MyrimatchDeploymentResult() {
+	public MyriMatchDeploymentResult() {
 	}
 
 	public long getNumForwardEntries() {

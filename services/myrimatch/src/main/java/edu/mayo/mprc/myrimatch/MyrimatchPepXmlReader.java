@@ -15,15 +15,15 @@ import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
 
-public final class MyrimatchPepXmlReader extends DefaultHandler implements KeyedTsvReader {
+public final class MyriMatchPepXmlReader extends DefaultHandler implements KeyedTsvReader {
 
 	/**
 	 * Header.
 	 */
 	private static final String[] DEFAULT_HEADER = new String[]{
-			"Myrimatch Peptide", "Myrimatch Protein",
-			"Myrimatch Total Proteins", "Myrimatch Num Matched Ions", "Myrimatch Total Num Ions",
-			"Myrimatch mvh", "Myrimatch mz Fidelity", "Myrimatch xcorr"
+			"MyriMatch Peptide", "MyriMatch Protein",
+			"MyriMatch Total Proteins", "MyriMatch Num Matched Ions", "MyriMatch Total Num Ions",
+			"MyriMatch mvh", "MyriMatch mz Fidelity", "MyriMatch xcorr"
 	};
 	private static final String EMPTY_LINE;
 	public static final int INITIAL_NUM_SPECTRA = 1000;
@@ -46,7 +46,7 @@ public final class MyrimatchPepXmlReader extends DefaultHandler implements Keyed
 	private String xcorr;
 	private boolean rank1;
 
-	public MyrimatchPepXmlReader() {
+	public MyriMatchPepXmlReader() {
 	}
 
 	/**

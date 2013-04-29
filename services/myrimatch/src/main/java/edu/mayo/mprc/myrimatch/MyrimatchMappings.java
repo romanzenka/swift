@@ -20,7 +20,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Pattern;
 
-public final class MyrimatchMappings implements Mappings {
+public final class MyriMatchMappings implements Mappings {
 
 	public static final String STATIC_MODS = "StaticMods";
 	public static final String DYNAMIC_MODS = "DynamicMods";
@@ -37,7 +37,7 @@ public final class MyrimatchMappings implements Mappings {
 	private static final String VARIABLE_MODS_MARKERS = "*^@%~&?!:;|+-/";
 	private static final Pattern INTEGER = Pattern.compile("^[0-9]+$");
 
-	public MyrimatchMappings() {
+	public MyriMatchMappings() {
 		nativeParams = initNativeParams();
 	}
 
@@ -67,7 +67,7 @@ public final class MyrimatchMappings implements Mappings {
 				}
 			}
 		} catch (Exception e) {
-			throw new MprcException("Cannot load base Myrimatch configuration", e);
+			throw new MprcException("Cannot load base MyriMatch configuration", e);
 		} finally {
 			FileUtilities.closeQuietly(bufferedReader);
 		}
@@ -154,7 +154,7 @@ public final class MyrimatchMappings implements Mappings {
 				}
 			}
 		} catch (Exception e) {
-			throw new MprcException("Cannot load base Myrimatch configuration", e);
+			throw new MprcException("Cannot load base MyriMatch configuration", e);
 		} finally {
 			FileUtilities.closeQuietly(bufferedReader);
 		}
@@ -162,10 +162,10 @@ public final class MyrimatchMappings implements Mappings {
 
 	@Override
 	public void setPeptideTolerance(final MappingContext context, final Tolerance peptideTolerance) {
-		nativeParams.put(PRECURSOR_MZ_TOLERANCE, String.valueOf(peptideTolerance.getValue())+massUnitToMyrimatch(peptideTolerance));
+		nativeParams.put(PRECURSOR_MZ_TOLERANCE, String.valueOf(peptideTolerance.getValue())+massUnitToMyriMatch(peptideTolerance));
 	}
 
-	private String massUnitToMyrimatch(final Tolerance peptideTolerance) {
+	private String massUnitToMyriMatch(final Tolerance peptideTolerance) {
 		if (MassUnit.Da == peptideTolerance.getUnit()) {
 			return "daltons";
 		}
@@ -177,7 +177,7 @@ public final class MyrimatchMappings implements Mappings {
 
 	@Override
 	public void setFragmentTolerance(final MappingContext context, final Tolerance fragmentTolerance) {
-		final String tolerance = massUnitToMyrimatch(fragmentTolerance);
+		final String tolerance = massUnitToMyriMatch(fragmentTolerance);
 		nativeParams.put(FRAGMENT_MZ_TOLERANCE, fragmentTolerance.getValue() + "" + tolerance);
 	}
 
@@ -219,7 +219,7 @@ public final class MyrimatchMappings implements Mappings {
 
 			index++;
 			if (variableMods.size() >= VARIABLE_MODS_MARKERS.length()) {
-				context.reportWarning("Myrimatch supports only " + VARIABLE_MODS_MARKERS.length() + " modifications.");
+				context.reportWarning("MyriMatch supports only " + VARIABLE_MODS_MARKERS.length() + " modifications.");
 				break;
 			}
 		}

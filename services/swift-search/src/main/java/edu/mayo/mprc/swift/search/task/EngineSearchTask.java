@@ -6,8 +6,8 @@ import edu.mayo.mprc.daemon.WorkPacket;
 import edu.mayo.mprc.daemon.files.FileTokenFactory;
 import edu.mayo.mprc.mascot.MascotResultUrl;
 import edu.mayo.mprc.mascot.MascotWorkPacket;
-import edu.mayo.mprc.myrimatch.MyrimatchDeploymentResult;
-import edu.mayo.mprc.myrimatch.MyrimatchWorkPacket;
+import edu.mayo.mprc.myrimatch.MyriMatchDeploymentResult;
+import edu.mayo.mprc.myrimatch.MyriMatchWorkPacket;
 import edu.mayo.mprc.omssa.OmssaWorkPacket;
 import edu.mayo.mprc.searchengine.SearchEngineResult;
 import edu.mayo.mprc.sequest.SequestMGFWorkPacket;
@@ -108,8 +108,8 @@ final class EngineSearchTask extends AsyncTaskBase implements FileProducingTask 
 					this.getFullId(),
 					isFromScratch());
 		} else if ("MYRIMATCH".equalsIgnoreCase(engine.getCode())) {
-			final MyrimatchDeploymentResult myrimatchDeploymentResult = (MyrimatchDeploymentResult) deploymentResult.getDeploymentResult();
-			workPacket = new MyrimatchWorkPacket(
+			final MyriMatchDeploymentResult myrimatchDeploymentResult = (MyriMatchDeploymentResult) deploymentResult.getDeploymentResult();
+			workPacket = new MyriMatchWorkPacket(
 					outputFile, paramsFile, inputFile.getResultingFile(),
 					outputFile.getParentFile(),
 					deploymentResult.getFastaFile(),

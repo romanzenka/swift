@@ -14,7 +14,7 @@ Services
 ### Search Engines
 
 * mascot - support for Matrix Software Mascot, uses web scraping to submit searches
-* myrimatch - support for Myrimatch search engine
+* myrimatch - support for MyriMatch search engine
 * omssa - support for OMSSA search engine
 * peaks-online - incomplete support for submitting Peaks Online searches
 * sequest - Sequest search engine support

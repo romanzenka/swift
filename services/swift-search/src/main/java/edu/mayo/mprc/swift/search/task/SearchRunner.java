@@ -434,7 +434,7 @@ public final class SearchRunner implements Runnable {
 					}
 				}
 				// If IDPIcker is on, we chain an IDPicker call to the output of the previous search engine.
-				// We support Myrimatch only for now
+				// We support MyriMatch only for now
 				if (searchWithIdpicker(inputFile) && "MYRIMATCH".equals(engine.getCode())) {
 					addIdpickerCall(
 							idpicker,

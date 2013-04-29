@@ -24,20 +24,20 @@ import java.util.Map;
 import java.util.Properties;
 
 /**
- * Myrimatch only supports forward databases.
+ * MyriMatch only supports forward databases.
  * <p/>
  * We assume that a database file will have all forward sequences at the beginning, followed by all reverse sequences.
  * The deployer simply finds out how many forward sequences are there, and then stores this number in a file, together
  * with the discovered reverse sequence prefix. Currently this algorithm does not work very well - need to improve!
  * <p/>
- * The setup is conveyed to Myrimatch. Myrimatch is then instructed to only consider the forward portion of the database.
+ * The setup is conveyed to MyriMatch. MyriMatch is then instructed to only consider the forward portion of the database.
  */
-public final class MyrimatchDeploymentService extends DeploymentService<DeploymentResult> {
+public final class MyriMatchDeploymentService extends DeploymentService<DeploymentResult> {
 
-	private static final Logger LOGGER = Logger.getLogger(MyrimatchDeploymentService.class);
+	private static final Logger LOGGER = Logger.getLogger(MyriMatchDeploymentService.class);
 	public static final String TYPE = "myrimatchDeployer";
-	public static final String NAME = "Myrimatch DB Deployer";
-	public static final String DESC = "Myrimatch only uses forward databases.<br/>" +
+	public static final String NAME = "MyriMatch DB Deployer";
+	public static final String DESC = "MyriMatch only uses forward databases.<br/>" +
 			"The deployment determines if a database has reverse sequences.";
 
 	public static final String DEFAULT_SEQUENCE_PREFIX = "Reversed_";
@@ -46,12 +46,12 @@ public final class MyrimatchDeploymentService extends DeploymentService<Deployme
 
 	private static final String DEPLOYABLE_DB_FOLDER = "deployableDbFolder";
 
-	public MyrimatchDeploymentService() {
+	public MyriMatchDeploymentService() {
 
 	}
 
 	public synchronized DeploymentResult performDeployment(final DeploymentRequest request) {
-		final MyrimatchDeploymentResult result = new MyrimatchDeploymentResult();
+		final MyriMatchDeploymentResult result = new MyriMatchDeploymentResult();
 
 		if (!hasCachedDeployment(request, result)) {
 			deploy(request, result);
@@ -66,11 +66,11 @@ public final class MyrimatchDeploymentService extends DeploymentService<Deployme
 
 		FileUtilities.quietDelete(infoFile);
 
-		LOGGER.info("Myrimatch undeployment of database " + request.getShortName() + " completed successfully.");
+		LOGGER.info("MyriMatch undeployment of database " + request.getShortName() + " completed successfully.");
 		return new DeploymentResult();
 	}
 
-	private boolean hasCachedDeployment(final DeploymentRequest request, final MyrimatchDeploymentResult result) {
+	private boolean hasCachedDeployment(final DeploymentRequest request, final MyriMatchDeploymentResult result) {
 		final File curationFile = request.getCurationFile();
 
 		if (!curationFile.exists()) {
@@ -94,9 +94,9 @@ public final class MyrimatchDeploymentService extends DeploymentService<Deployme
 		return false;
 	}
 
-	private void deploy(final DeploymentRequest request, final MyrimatchDeploymentResult result) {
+	private void deploy(final DeploymentRequest request, final MyriMatchDeploymentResult result) {
 		final File curationFile = request.getCurationFile();
-		LOGGER.info("Myrimatch deployment services started. Deployment file [" + curationFile.getAbsolutePath() + "]");
+		LOGGER.info("MyriMatch deployment services started. Deployment file [" + curationFile.getAbsolutePath() + "]");
 
 		final File infoFile = getDeploymentInfoFile(request);
 		// Go through all database entries and see when they turn into reverse ones.
@@ -120,7 +120,7 @@ public final class MyrimatchDeploymentService extends DeploymentService<Deployme
 				}
 			}
 		} catch (Exception e) {
-			throw new MprcException("Myrimatch deployer could not determine reversed sequences in " + request.getShortName() + " database: " + curationFile.getAbsolutePath(), e);
+			throw new MprcException("MyriMatch deployer could not determine reversed sequences in " + request.getShortName() + " database: " + curationFile.getAbsolutePath(), e);
 		} finally {
 			FileUtilities.closeQuietly(reader);
 		}
@@ -134,7 +134,7 @@ public final class MyrimatchDeploymentService extends DeploymentService<Deployme
 		result.setNumForwardEntries(numSequences);
 		result.setDecoySequencePrefix(reversePrefix);
 
-		LOGGER.info("Myrimatch deployment services completed. Deployment file [" + curationFile.getAbsolutePath() + "]");
+		LOGGER.info("MyriMatch deployment services completed. Deployment file [" + curationFile.getAbsolutePath() + "]");
 	}
 
 	private Properties loadInfoFile(final File infoFile) {
@@ -143,7 +143,7 @@ public final class MyrimatchDeploymentService extends DeploymentService<Deployme
 			try {
 				properties.loadFromXML(FileUtilities.getInputStream(infoFile));
 			} catch (Exception e) {
-				throw new MprcException("Myrimatch deployer could not read previous deployment information", e);
+				throw new MprcException("MyriMatch deployer could not read previous deployment information", e);
 			}
 		}
 		return properties;
@@ -152,9 +152,9 @@ public final class MyrimatchDeploymentService extends DeploymentService<Deployme
 	private void saveInfoFile(final File infoFile, final Properties properties) {
 		final FileOutputStream outputStream = FileUtilities.getOutputStream(infoFile);
 		try {
-			properties.storeToXML(outputStream, "Myrimatch database information");
+			properties.storeToXML(outputStream, "MyriMatch database information");
 		} catch (IOException e) {
-			throw new MprcException("Cannot save Myrimatch database information to file " + infoFile.getAbsolutePath(), e);
+			throw new MprcException("Cannot save MyriMatch database information to file " + infoFile.getAbsolutePath(), e);
 		} finally {
 			FileUtilities.closeQuietly(outputStream);
 		}
@@ -214,7 +214,7 @@ public final class MyrimatchDeploymentService extends DeploymentService<Deployme
 	public static final class Factory extends WorkerFactoryBase<Config> {
 		@Override
 		public Worker create(final Config config, final DependencyResolver dependencies) {
-			final MyrimatchDeploymentService worker = new MyrimatchDeploymentService();
+			final MyriMatchDeploymentService worker = new MyriMatchDeploymentService();
 			worker.setDeployableDbFolder(new File(config.getDeployableDbFolder()).getAbsoluteFile());
 			return worker;
 		}
@@ -224,7 +224,7 @@ public final class MyrimatchDeploymentService extends DeploymentService<Deployme
 		public void createUI(final DaemonConfig daemon, final ResourceConfig resource, final UiBuilder builder) {
 			builder
 					.property(DEPLOYABLE_DB_FOLDER, "Database Folder", "Information about .fasta files will be put here.<br/>" +
-							"Myrimatch needs to know the prefix for the decoy databases.")
+							"MyriMatch needs to know the prefix for the decoy databases.")
 					.required()
 					.existingDirectory()
 					.defaultValue("var/myrimatch_index");

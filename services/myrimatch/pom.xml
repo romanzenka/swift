@@ -6,7 +6,7 @@
     <artifactId>myrimatch</artifactId>
     <version>3.0-SNAPSHOT</version>
     <name>myrimatch</name>
-    <description>Myrimatch search engine support</description>
+    <description>MyriMatch search engine support</description>
 
     <parent>
         <groupId>edu.mayo.mprc</groupId>
