@@ -12,6 +12,7 @@ import edu.mayo.mprc.daemon.Worker;
 import edu.mayo.mprc.daemon.WorkerBase;
 import edu.mayo.mprc.daemon.WorkerFactoryBase;
 import edu.mayo.mprc.daemon.exception.DaemonException;
+import edu.mayo.mprc.io.mgf.MgfTitles;
 import edu.mayo.mprc.searchengine.EngineFactory;
 import edu.mayo.mprc.searchengine.EngineMetadata;
 import edu.mayo.mprc.utilities.FileUtilities;
@@ -65,9 +66,11 @@ public final class MyrimatchWorker extends WorkerBase {
 
 		final File inputFile = packet.getInputFile();
 		final File paramsFile = packet.getSearchParamsFile();
-		final File resultFile = packet.getOutputFile();
+		final File resultFile = new File(packet.getOutputFile().getParentFile(), packet.getOutputFile().getName() + ".tmp");
+		// The final file has the spectra id replaced with titles of spectra from the .mgf file
+		final File finalFile = new File(packet.getOutputFile().getParentFile(), packet.getOutputFile().getName());
 
-		if (resultFile.exists() && inputFile.exists() && resultFile.lastModified() >= inputFile.lastModified()) {
+		if (finalFile.exists() && inputFile.exists() && finalFile.lastModified() >= inputFile.lastModified()) {
 			return;
 		}
 
@@ -125,11 +128,14 @@ public final class MyrimatchWorker extends WorkerBase {
 		processCaller.runAndCheck("myrimatch");
 
 		final File createdResultFile = new File(packet.getWorkFolder(), FileUtilities.stripExtension(packet.getInputFile().getName()) + MZ_IDENT_ML);
-		if (!createdResultFile.equals(resultFile))
 
-		{
-			FileUtilities.rename(createdResultFile, resultFile);
+		final List<String> titles = MgfTitles.getTitles(inputFile);
+		MzIdentMl.replace(createdResultFile, titles, resultFile);
+
+		if (!resultFile.equals(finalFile)) {
+			FileUtilities.rename(createdResultFile, finalFile);
 		}
+
 
 		LOGGER.info("Myrimatch search, " + packet.toString() + ", has been successfully completed.");
 	}

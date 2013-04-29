@@ -11,7 +11,11 @@ import java.util.List;
  * @author Roman Zenka
  */
 public final class MgfTitles {
-	public List<String> getTitles(final File mgf) {
+	/**
+	 * @param mgf .mgf file
+	 * @return List of all spectra titles.
+	 */
+	public static List<String> getTitles(final File mgf) {
 		MGFPeakListReader sourceMgfReader = new MGFPeakListReader(mgf);
 		sourceMgfReader.setReadPeaks(false);
 		List<String> titles = new ArrayList<String>(1000);
