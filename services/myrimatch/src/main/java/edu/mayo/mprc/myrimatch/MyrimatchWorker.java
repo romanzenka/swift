@@ -133,9 +133,12 @@ public final class MyrimatchWorker extends WorkerBase {
 		MzIdentMl.replace(createdResultFile, titles, resultFile);
 
 		if (!resultFile.equals(finalFile)) {
-			FileUtilities.rename(createdResultFile, finalFile);
+			FileUtilities.rename(resultFile, finalFile);
 		}
 
+		if (!createdResultFile.equals(finalFile)) {
+			FileUtilities.deleteNow(createdResultFile);
+		}
 
 		LOGGER.info("Myrimatch search, " + packet.toString() + ", has been successfully completed.");
 	}
