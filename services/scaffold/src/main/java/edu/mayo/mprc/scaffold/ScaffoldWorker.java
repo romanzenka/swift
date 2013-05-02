@@ -263,7 +263,6 @@ public final class ScaffoldWorker extends WorkerBase {
 
 		private String scaffoldBatchScript;
 		private String scaffoldUnimod;
-		private boolean reportDecoyHits;
 
 		public Config() {
 		}
@@ -286,14 +285,6 @@ public final class ScaffoldWorker extends WorkerBase {
 
 		public void setScaffoldUnimod(String scaffoldUnimod) {
 			this.scaffoldUnimod = scaffoldUnimod;
-		}
-
-		public boolean isReportDecoyHits() {
-			return reportDecoyHits;
-		}
-
-		public void setReportDecoyHits(final boolean reportDecoyHits) {
-			this.reportDecoyHits = reportDecoyHits;
 		}
 
 		@Override
@@ -323,7 +314,7 @@ public final class ScaffoldWorker extends WorkerBase {
 					.executable(Arrays.asList("-v"))
 
 					.property(SCAFFOLD_UNIMOD, "Scaffold unimod.xml", "Path to the Scaffold's unimod.xml config file. Must be accessible from the daemon where Search Result Loader runs.<p>Default for Linux: <code>/opt/Scaffold?/parameters/unimod.xml</code></p>")
-					.defaultValue("/opt/Scaffold3/ScaffoldBatch3")
+					.defaultValue("/opt/Scaffold3/parameters/unimod.xml")
 					.required()
 					.executable(Arrays.asList("-v"));
 		}
