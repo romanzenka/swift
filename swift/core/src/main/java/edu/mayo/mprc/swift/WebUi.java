@@ -250,7 +250,7 @@ public final class WebUi {
 						if (engineConfig.getWorker() != null && engineConfig.getDeployer() != null) {
 							final SearchEngine e = new SearchEngine(
 									engineMetadata,
-									engineConfig.getVersion(),
+									engineConfig,
 									(DaemonConnection) dependencies.createSingleton(engineConfig.getWorker()),
 									(DaemonConnection) dependencies.createSingleton(engineConfig.getDeployer()));
 							searchEngines.add(e);

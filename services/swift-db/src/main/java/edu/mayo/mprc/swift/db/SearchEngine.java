@@ -26,7 +26,7 @@ import java.util.Collection;
  */
 public final class SearchEngine implements Comparable<SearchEngine> {
 	private EngineMetadata engineMetadata;
-	private String version;
+	private Config config;
 
 	private DaemonConnection searchDaemon;
 	private DaemonConnection dbDeployDaemon;
@@ -34,12 +34,13 @@ public final class SearchEngine implements Comparable<SearchEngine> {
 	public SearchEngine() {
 	}
 
-	public SearchEngine(final EngineMetadata engineMetadata, final String version, final DaemonConnection searchDaemon, final DaemonConnection dbDeployDaemon) {
+	public SearchEngine(final EngineMetadata engineMetadata, final Config config, final DaemonConnection searchDaemon, final DaemonConnection dbDeployDaemon) {
 		if (engineMetadata == null) {
 			throw new MprcException("The search engine must have metadata always defined. This is a programmer error.");
 		}
 		this.engineMetadata = engineMetadata;
-		this.version = version;
+		this.config = config;
+		final String version = config.getVersion();
 		this.searchDaemon = searchDaemon;
 		this.dbDeployDaemon = dbDeployDaemon;
 		if (searchDaemon == null) {
@@ -207,11 +208,15 @@ public final class SearchEngine implements Comparable<SearchEngine> {
 	}
 
 	public String getVersion() {
-		return version;
+		return config.getVersion();
 	}
 
-	public void setVersion(final String version) {
-		this.version = version;
+	public Config getConfig() {
+		return config;
+	}
+
+	public void setConfig(final Config config) {
+		this.config = config;
 	}
 
 	/**
@@ -316,7 +321,7 @@ public final class SearchEngine implements Comparable<SearchEngine> {
 			}
 			return new SearchEngine(
 					metadata,
-					config.getVersion(),
+					config,
 					(DaemonConnection) dependencies.createSingleton(config.getWorker()),
 					(DaemonConnection) dependencies.createSingleton(config.getDeployer()));
 		}

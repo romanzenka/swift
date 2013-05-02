@@ -3,10 +3,12 @@ package edu.mayo.mprc.swift.search.task;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Maps;
 import edu.mayo.mprc.MprcException;
+import edu.mayo.mprc.config.ResourceConfig;
 import edu.mayo.mprc.daemon.DaemonConnection;
 import edu.mayo.mprc.daemon.files.FileTokenFactory;
 import edu.mayo.mprc.dbcurator.model.Curation;
 import edu.mayo.mprc.dbcurator.model.persistence.CurationDao;
+import edu.mayo.mprc.scaffold.ScaffoldWorker;
 import edu.mayo.mprc.swift.db.SearchEngine;
 import edu.mayo.mprc.swift.db.SwiftDao;
 import edu.mayo.mprc.swift.dbmapping.*;
@@ -814,13 +816,17 @@ public final class SearchRunner implements Runnable {
 		ScaffoldTask scaffoldTask = (ScaffoldTask) scaffoldTaskI;
 
 		if (scaffoldTask == null) {
-			final File scaffoldOutputDir = getOutputFolderForSearchEngine(getScaffoldEngine());
+			final SearchEngine scaffoldEngine = getScaffoldEngine();
+			final File scaffoldUnimod = getScaffoldUnimod(scaffoldEngine);
+			if (scaffoldUnimod == null) return null;
+			final File scaffoldOutputDir = getOutputFolderForSearchEngine(scaffoldEngine);
 			scaffoldTask = new ScaffoldTask(
 					scaffoldVersion,
 					experiment,
 					searchDefinition,
-					getScaffoldEngine().getSearchDaemon(),
+					scaffoldEngine.getSearchDaemon(),
 					swiftDao, searchRun,
+					scaffoldUnimod,
 					scaffoldOutputDir,
 					fileTokenFactory,
 					reportDecoyHits,
@@ -833,6 +839,16 @@ public final class SearchRunner implements Runnable {
 		scaffoldTask.addDependency(scaffoldDbDeployment);
 
 		return scaffoldTask;
+	}
+
+	private File getScaffoldUnimod(final SearchEngine scaffoldEngine) {
+		final ResourceConfig workerConfiguration = scaffoldEngine.getConfig().getWorker().getRunner().getWorkerConfiguration();
+		if (!(workerConfiguration instanceof ScaffoldWorker.Config)) {
+			ExceptionUtilities.throwCastException(workerConfiguration, ScaffoldWorker.Config.class);
+			return null;
+		}
+		final File scaffoldUnimod = new File(((ScaffoldWorker.Config) workerConfiguration).getScaffoldUnimod());
+		return scaffoldUnimod;
 	}
 
 	private IdpickerTask addIdpickerCall(final SearchEngine idpicker, final File outputFolder,

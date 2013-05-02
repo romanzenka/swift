@@ -42,10 +42,11 @@ final class ScaffoldTask extends AsyncTaskBase implements ScaffoldTaskI {
 	private ReportData reportData;
 	private final SwiftDao swiftDao;
 	private final SearchRun searchRun;
+	private final File unimod;
 	private final boolean reportDecoyHits;
 
 	public ScaffoldTask(final String scaffoldVersion, final String experiment, final SwiftSearchDefinition definition, final DaemonConnection scaffoldDaemon,
-	                    final SwiftDao swiftDao, final SearchRun searchRun,
+	                    final SwiftDao swiftDao, final SearchRun searchRun, final File scaffoldUnimod,
 	                    final File outputFolder, final FileTokenFactory fileTokenFactory, final boolean reportDecoyHits, final boolean fromScratch) {
 		super(scaffoldDaemon, fileTokenFactory, fromScratch);
 		this.scaffoldVersion = scaffoldVersion;
@@ -54,6 +55,7 @@ final class ScaffoldTask extends AsyncTaskBase implements ScaffoldTaskI {
 		this.outputFolder = outputFolder;
 		this.swiftDao = swiftDao;
 		this.searchRun = searchRun;
+		this.unimod = scaffoldUnimod;
 		this.reportDecoyHits = reportDecoyHits;
 		setName("Scaffold");
 		setDescription("Scaffold search " + this.experiment);
@@ -170,6 +172,10 @@ final class ScaffoldTask extends AsyncTaskBase implements ScaffoldTaskI {
 	@Override
 	public File getScaffoldPeptideReportFile() {
 		return new File(outputFolder, experiment + ".peptide-report.xls");
+	}
+
+	File getUnimod() {
+		return unimod;
 	}
 
 	@Override

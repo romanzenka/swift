@@ -27,6 +27,7 @@ import java.util.Properties;
 public final class ScaffoldWorker extends WorkerBase {
 	private static final Logger LOGGER = Logger.getLogger(ScaffoldWorker.class);
 	private static final String SCAFFOLD_BATCH_SCRIPT = "scaffoldBatchScript";
+	private static final String SCAFFOLD_UNIMOD = "scaffoldUnimod";
 	public static final String TYPE = "scaffold";
 	public static final String NAME = "Scaffold";
 	public static final String DESC = "Scaffold integrates results from multiple search engines into a single file. You need Scaffold Batch license from <a href=\"http://www.proteomesoftware.com/\">http://www.proteomesoftware.com/</a>";
@@ -261,6 +262,7 @@ public final class ScaffoldWorker extends WorkerBase {
 	public static final class Config implements ResourceConfig {
 
 		private String scaffoldBatchScript;
+		private String scaffoldUnimod;
 		private boolean reportDecoyHits;
 
 		public Config() {
@@ -278,6 +280,14 @@ public final class ScaffoldWorker extends WorkerBase {
 			this.scaffoldBatchScript = scaffoldBatchScript;
 		}
 
+		public String getScaffoldUnimod() {
+			return scaffoldUnimod;
+		}
+
+		public void setScaffoldUnimod(String scaffoldUnimod) {
+			this.scaffoldUnimod = scaffoldUnimod;
+		}
+
 		public boolean isReportDecoyHits() {
 			return reportDecoyHits;
 		}
@@ -289,11 +299,13 @@ public final class ScaffoldWorker extends WorkerBase {
 		@Override
 		public void save(final ConfigWriter writer) {
 			writer.put(SCAFFOLD_BATCH_SCRIPT, getScaffoldBatchScript());
+			writer.put(SCAFFOLD_UNIMOD, getScaffoldUnimod());
 		}
 
 		@Override
 		public void load(final ConfigReader reader) {
 			setScaffoldBatchScript(reader.get(SCAFFOLD_BATCH_SCRIPT));
+			setScaffoldUnimod(reader.get(SCAFFOLD_UNIMOD));
 		}
 
 		@Override
@@ -306,6 +318,11 @@ public final class ScaffoldWorker extends WorkerBase {
 		public void createUI(final DaemonConfig daemon, final ResourceConfig resource, final UiBuilder builder) {
 			builder
 					.property(SCAFFOLD_BATCH_SCRIPT, "ScaffoldBatch path", "Path to the ScaffoldBatch script<p>Default for Linux: <code>/opt/Scaffold3/ScaffoldBatch3</code></p>")
+					.defaultValue("/opt/Scaffold3/ScaffoldBatch3")
+					.required()
+					.executable(Arrays.asList("-v"))
+
+					.property(SCAFFOLD_UNIMOD, "Scaffold unimod.xml", "Path to the Scaffold's unimod.xml config file. Must be accessible from the daemon where Search Result Loader runs.<p>Default for Linux: <code>/opt/Scaffold?/parameters/unimod.xml</code></p>")
 					.defaultValue("/opt/Scaffold3/ScaffoldBatch3")
 					.required()
 					.executable(Arrays.asList("-v"));

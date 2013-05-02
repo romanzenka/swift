@@ -61,6 +61,11 @@ public final class SearchDbTask extends AsyncTaskBase {
 		return scaffoldSpectraFile == null ? scaffoldTask.getScaffoldSpectraFile() : scaffoldSpectraFile;
 	}
 
+	private File getScaffoldUnimodFile() {
+		return scaffoldTask.getUnimod();
+	}
+
+
 	/**
 	 * Override the spectra file if the scaffold task is not available.
 	 *
@@ -91,7 +96,7 @@ public final class SearchDbTask extends AsyncTaskBase {
 			metaDataMap.put(entry.getKey(), task.getRawFileMetadata());
 		}
 
-		return new SearchDbWorkPacket(getFullId(), isFromScratch(), getReportId(), getScaffoldSpectraFile(), metaDataMap);
+		return new SearchDbWorkPacket(getFullId(), isFromScratch(), getReportId(), getScaffoldSpectraFile(), getScaffoldUnimodFile(), metaDataMap);
 	}
 
 	@Override

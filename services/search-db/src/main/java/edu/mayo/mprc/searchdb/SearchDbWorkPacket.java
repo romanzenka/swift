@@ -26,15 +26,21 @@ public final class SearchDbWorkPacket extends WorkPacketBase {
 	 */
 	private File scaffoldSpectrumReport;
 
+	private File scaffoldUnimod;
+
 	/**
 	 * Map from raw file name -> metadata about the raw file
 	 */
 	private Map<String, RawFileMetaData> fileMetaDataMap;
 
-	public SearchDbWorkPacket(final String taskId, final boolean fromScratch, final long reportDataId, final File scaffoldSpectrumReport, final Map<String, RawFileMetaData> fileMetaDataMap) {
+	public SearchDbWorkPacket(final String taskId, final boolean fromScratch, final long reportDataId,
+	                          final File scaffoldSpectrumReport,
+	                          final File scaffoldUnimod,
+	                          final Map<String, RawFileMetaData> fileMetaDataMap) {
 		super(taskId, fromScratch);
 		this.reportDataId = reportDataId;
 		this.scaffoldSpectrumReport = scaffoldSpectrumReport;
+		this.scaffoldUnimod = scaffoldUnimod;
 		this.fileMetaDataMap = fileMetaDataMap;
 	}
 
@@ -44,6 +50,10 @@ public final class SearchDbWorkPacket extends WorkPacketBase {
 
 	public File getScaffoldSpectrumReport() {
 		return scaffoldSpectrumReport;
+	}
+
+	public File getScaffoldUnimod() {
+		return scaffoldUnimod;
 	}
 
 	public Map<String, RawFileMetaData> getFileMetaDataMap() {
