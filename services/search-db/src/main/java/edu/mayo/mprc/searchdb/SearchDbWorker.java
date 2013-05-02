@@ -29,13 +29,11 @@ import java.io.File;
  * Loads search results from a given Swift experiment into the database.
  */
 public final class SearchDbWorker extends WorkerBase {
-	private DatabaseFactory.Config database;
 	private SearchDbDao dao;
 	private FastaDbDao fastaDbDao;
 	private CurationDao curationDao;
 	private UnimodDao unimodDao;
 	private SwiftDao swiftDao;
-	private File scaffoldModSet;
 	private Unimod databaseUnimod;
 	private Unimod scaffoldUnimod;
 
@@ -46,14 +44,12 @@ public final class SearchDbWorker extends WorkerBase {
 	private static final String DATABASE = "database";
 	private static final String SCAFFOLD_MOD_SET = "scaffoldModSet";
 
-	public SearchDbWorker(final SearchDbDao dao, final FastaDbDao fastaDbDao, final CurationDao curationDao, final UnimodDao unimodDao, final SwiftDao swiftDao, final File scaffoldModSet) {
+	public SearchDbWorker(final SearchDbDao dao, final FastaDbDao fastaDbDao, final CurationDao curationDao, final UnimodDao unimodDao, final SwiftDao swiftDao) {
 		this.dao = dao;
 		this.fastaDbDao = fastaDbDao;
 		this.curationDao = curationDao;
 		this.unimodDao = unimodDao;
 		this.swiftDao = swiftDao;
-		this.scaffoldModSet = scaffoldModSet;
-		loadScaffoldUnimod(scaffoldModSet);
 		loadDatabaseUnimod();
 	}
 
@@ -78,6 +74,7 @@ public final class SearchDbWorker extends WorkerBase {
 		final SearchDbWorkPacket workPacket = (SearchDbWorkPacket) wp;
 		dao.begin();
 		try {
+			loadScaffoldUnimod(workPacket.getScaffoldUnimod());
 			final ReportData reportData = swiftDao.getReportForId(workPacket.getReportDataId());
 
 			final ProteinSequenceTranslator translator = new SingleDatabaseTranslator(fastaDbDao, curationDao);
@@ -111,7 +108,7 @@ public final class SearchDbWorker extends WorkerBase {
 			return searchDbDao;
 		}
 
-		@Resource(name="searchDbDao")
+		@Resource(name = "searchDbDao")
 		public void setSearchDbDao(final SearchDbDao searchDbDao) {
 			this.searchDbDao = searchDbDao;
 		}
@@ -120,7 +117,7 @@ public final class SearchDbWorker extends WorkerBase {
 			return fastaDbDao;
 		}
 
-		@Resource(name="fastaDbDao")
+		@Resource(name = "fastaDbDao")
 		public void setFastaDbDao(final FastaDbDao fastaDbDao) {
 			this.fastaDbDao = fastaDbDao;
 		}
@@ -129,7 +126,7 @@ public final class SearchDbWorker extends WorkerBase {
 			return curationDao;
 		}
 
-		@Resource(name="curationDao")
+		@Resource(name = "curationDao")
 		public void setCurationDao(final CurationDao curationDao) {
 			this.curationDao = curationDao;
 		}
@@ -138,7 +135,7 @@ public final class SearchDbWorker extends WorkerBase {
 			return unimodDao;
 		}
 
-		@Resource(name="unimodDao")
+		@Resource(name = "unimodDao")
 		public void setUnimodDao(final UnimodDao unimodDao) {
 			this.unimodDao = unimodDao;
 		}
@@ -147,15 +144,14 @@ public final class SearchDbWorker extends WorkerBase {
 			return swiftDao;
 		}
 
-		@Resource(name="swiftDao")
+		@Resource(name = "swiftDao")
 		public void setSwiftDao(final SwiftDao swiftDao) {
 			this.swiftDao = swiftDao;
 		}
 
 		@Override
 		public Worker create(final Config config, final DependencyResolver dependencies) {
-			final SearchDbWorker worker = new SearchDbWorker(searchDbDao, fastaDbDao, curationDao, unimodDao, swiftDao,
-					new File(config.getScaffoldModSet()));
+			final SearchDbWorker worker = new SearchDbWorker(searchDbDao, fastaDbDao, curationDao, unimodDao, swiftDao);
 			return worker;
 		}
 	}
@@ -165,26 +161,19 @@ public final class SearchDbWorker extends WorkerBase {
 	 */
 	public static final class Config implements ResourceConfig {
 		private DatabaseFactory.Config database;
-		private String scaffoldModSet;
 
 		public DatabaseFactory.Config getDatabase() {
 			return database;
 		}
 
-		public String getScaffoldModSet() {
-			return scaffoldModSet;
-		}
-
 		@Override
 		public void save(final ConfigWriter writer) {
 			writer.put(DATABASE, writer.save(getDatabase()));
-			writer.put(SCAFFOLD_MOD_SET, getScaffoldModSet());
 		}
 
 		@Override
 		public void load(final ConfigReader reader) {
-			database = (DatabaseFactory.Config)reader.getObject(DATABASE);
-			scaffoldModSet = reader.get(SCAFFOLD_MOD_SET);
+			database = (DatabaseFactory.Config) reader.getObject(DATABASE);
 		}
 
 		@Override
@@ -202,12 +191,6 @@ public final class SearchDbWorker extends WorkerBase {
 			builder.property(DATABASE, "Database", "Database we will be storing data into")
 					.reference(DatabaseFactory.TYPE, UiBuilder.NONE_TYPE)
 					.defaultValue(database);
-
-			builder.property(SCAFFOLD_MOD_SET, "Scaffold's unimod.xml", "A location of Scaffold's current unimod.xml file.<p>" +
-					"On Linux it is typically in <tt>/opt/Scaffold3/parameters/unimod.xml</tt>.<p>" +
-					"The file has to be available where the searcher is running, so you might have to copy it elsewhere first.")
-					.existingFile()
-					.required();
 		}
 	}
 }
