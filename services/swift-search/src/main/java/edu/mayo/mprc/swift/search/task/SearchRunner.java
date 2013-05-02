@@ -345,7 +345,23 @@ public final class SearchRunner implements Runnable {
 				return engine;
 			}
 		}
-		return null;
+
+		// Special case - the version we want is not specified. Pick the newest. This happens for legacy searches
+		if ("".equals(version)) {
+			SearchEngine bestEngine = null;
+			String bestVersion = "";
+			for (final SearchEngine engine : searchEngines) {
+				if (engine.getCode().equalsIgnoreCase(code) && engine.getVersion().compareTo(bestVersion) > 0) {
+					bestVersion = version;
+					bestEngine = engine;
+				}
+			}
+			if (bestEngine != null) {
+				return bestEngine;
+			}
+		}
+
+		throw new MprcException("The search engine [" + code + "] version [" + version + "] is no longer available. Please edit the search and try again");
 	}
 
 	private SearchEngine getScaffoldEngine() {
