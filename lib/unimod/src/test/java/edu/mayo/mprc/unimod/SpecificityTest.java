@@ -41,11 +41,6 @@ public final class SpecificityTest {
 		Assert.assertEquals(makeSpecificity("Phospho", "C", Terminus.Anywhere, true, false).toMascotString(), "Phospho (C)");
 	}
 
-	@Test
-	public void shouldConvertSpecialChars() {
-		Assert.assertEquals(makeSpecificity("Phospho<&>", "C", Terminus.Anywhere, true, false).toMascotString(), "Phospho&lt;&amp;&gt; (C)");
-	}
-
 	private ModSpecificity makeSpecificity(final String title, final String site, final Terminus terminus, final boolean proteinOnly, final boolean setGroup) {
 		final ModBuilder builder = new ModBuilder();
 		builder.setTitle(title);

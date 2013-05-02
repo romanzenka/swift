@@ -164,13 +164,7 @@ public class ModSpecificity extends PersistableBase implements Comparable<ModSpe
 			addLocation(place, this);
 		}
 
-		return htmlEscape(modification.getTitle()) + " (" + place + ")";
-	}
-
-	private static String htmlEscape(final String title) {
-		return title.replaceAll("&", "&amp;")
-				.replaceAll(">", "&gt;")
-				.replaceAll("<", "&lt;");
+		return modification.getTitle() + " (" + place + ")";
 	}
 
 	/**
