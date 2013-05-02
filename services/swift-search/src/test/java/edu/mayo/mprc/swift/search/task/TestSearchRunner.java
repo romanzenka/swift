@@ -245,7 +245,7 @@ public class TestSearchRunner {
 		engine.setEngineMetadata(metadata);
 		engine.setSearchDaemon(mock(DaemonConnection.class));
 		engine.setDbDeployDaemon(mock(DaemonConnection.class));
-		engine.setVersion("1.0");
+		engine.setConfig(new SearchEngine.Config(code, "1.0", null, null));
 		return engine;
 	}
 

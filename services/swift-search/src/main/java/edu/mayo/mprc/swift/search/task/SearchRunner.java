@@ -834,7 +834,6 @@ public final class SearchRunner implements Runnable {
 		if (scaffoldTask == null) {
 			final SearchEngine scaffoldEngine = getScaffoldEngine();
 			final File scaffoldUnimod = getScaffoldUnimod(scaffoldEngine);
-			if (scaffoldUnimod == null) return null;
 			final File scaffoldOutputDir = getOutputFolderForSearchEngine(scaffoldEngine);
 			scaffoldTask = new ScaffoldTask(
 					scaffoldVersion,
@@ -858,13 +857,17 @@ public final class SearchRunner implements Runnable {
 	}
 
 	private File getScaffoldUnimod(final SearchEngine scaffoldEngine) {
-		final ResourceConfig workerConfiguration = scaffoldEngine.getConfig().getWorker().getRunner().getWorkerConfiguration();
-		if (!(workerConfiguration instanceof ScaffoldWorker.Config)) {
-			ExceptionUtilities.throwCastException(workerConfiguration, ScaffoldWorker.Config.class);
-			return null;
+		if (scaffoldEngine != null && scaffoldEngine.getConfig() != null && scaffoldEngine.getConfig().getWorker() != null &&
+				scaffoldEngine.getConfig().getWorker().getRunner() != null && scaffoldEngine.getConfig().getWorker().getRunner().getWorkerConfiguration() != null) {
+			final ResourceConfig workerConfiguration = scaffoldEngine.getConfig().getWorker().getRunner().getWorkerConfiguration();
+			if (!(workerConfiguration instanceof ScaffoldWorker.Config)) {
+				ExceptionUtilities.throwCastException(workerConfiguration, ScaffoldWorker.Config.class);
+				return null;
+			}
+			final File scaffoldUnimod = new File(((ScaffoldWorker.Config) workerConfiguration).getScaffoldUnimod());
+			return scaffoldUnimod;
 		}
-		final File scaffoldUnimod = new File(((ScaffoldWorker.Config) workerConfiguration).getScaffoldUnimod());
-		return scaffoldUnimod;
+		return null;
 	}
 
 	private IdpickerTask addIdpickerCall(final SearchEngine idpicker, final File outputFolder,
