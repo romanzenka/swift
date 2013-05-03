@@ -4,7 +4,7 @@
     <groupId>edu.mayo.mprc</groupId>
     <artifactId>swift</artifactId>
     <packaging>pom</packaging>
-    <version>3.4</version>
+    <version>3.5-SNAPSHOT</version>
     <name>Swift</name>
     <url>http://swift.mayo.edu</url>
     <parent>
@@ -24,8 +24,4 @@
         <module>scripts</module>
         <module>installer</module>
     </modules>
-
-  <scm>
-    <tag>swift-3.4</tag>
-  </scm>
 </project>

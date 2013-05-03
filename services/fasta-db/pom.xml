@@ -4,14 +4,14 @@
 
     <groupId>edu.mayo.mprc</groupId>
     <artifactId>fasta-db</artifactId>
-    <version>3.4</version>
+    <version>3.5-SNAPSHOT</version>
     <name>fasta-db</name>
     <description>Loads FASTA database contents into a relational database for easy querying.</description>
 
     <parent>
         <artifactId>services</artifactId>
         <groupId>edu.mayo.mprc</groupId>
-        <version>3.4</version>
+        <version>3.5-SNAPSHOT</version>
     </parent>
 
     <dependencies>
@@ -23,22 +23,22 @@
         <dependency>
             <groupId>edu.mayo.mprc</groupId>
             <artifactId>daemon</artifactId>
-            <version>3.4</version>
+            <version>3.5-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>edu.mayo.mprc</groupId>
             <artifactId>database</artifactId>
-            <version>3.4</version>
+            <version>3.5-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>edu.mayo.mprc</groupId>
             <artifactId>chem</artifactId>
-            <version>3.4</version>
+            <version>3.5-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>edu.mayo.mprc</groupId>
             <artifactId>db-curator</artifactId>
-            <version>3.4</version>
+            <version>3.5-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>com.google.code.findbugs</groupId>

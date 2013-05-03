@@ -3,14 +3,14 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>edu.mayo.mprc</groupId>
     <artifactId>mgf2mgf</artifactId>
-    <version>3.4</version>
+    <version>3.5-SNAPSHOT</version>
     <name>mgf2mgf</name>
     <description>Cleans up .mgf files to be more easily fed into the pipeline</description>
 
     <parent>
         <groupId>edu.mayo.mprc</groupId>
         <artifactId>services</artifactId>
-        <version>3.4</version>
+        <version>3.5-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
@@ -23,12 +23,12 @@
         <dependency>
             <groupId>edu.mayo.mprc</groupId>
             <artifactId>daemon</artifactId>
-            <version>3.4</version>
+            <version>3.5-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>edu.mayo.mprc</groupId>
             <artifactId>mgf</artifactId>
-            <version>3.4</version>
+            <version>3.5-SNAPSHOT</version>
         </dependency>
     </dependencies>
 </project>

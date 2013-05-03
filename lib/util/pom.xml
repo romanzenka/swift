@@ -2,7 +2,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>edu.mayo.mprc</groupId>
     <artifactId>util</artifactId>
-    <version>3.4</version>
+    <version>3.5-SNAPSHOT</version>
     <name>util</name>
     <description>Basic utilities that are useful everywhere. This module must never depend on any substantial library.
     </description>
@@ -10,7 +10,7 @@
     <parent>
         <groupId>edu.mayo.mprc</groupId>
         <artifactId>lib</artifactId>
-        <version>3.4</version>
+        <version>3.5-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 

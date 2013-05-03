@@ -2,14 +2,14 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>edu.mayo.mprc</groupId>
     <artifactId>params</artifactId>
-    <version>3.4</version>
+    <version>3.5-SNAPSHOT</version>
     <name>params</name>
     <description>Mapping search engine parameters to an abstract set common to all engines</description>
 
     <parent>
         <groupId>edu.mayo.mprc</groupId>
         <artifactId>lib</artifactId>
-        <version>3.4</version>
+        <version>3.5-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
@@ -17,27 +17,27 @@
         <dependency>
             <groupId>edu.mayo.mprc</groupId>
             <artifactId>db-curator</artifactId>
-            <version>3.4</version>
+            <version>3.5-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>edu.mayo.mprc</groupId>
             <artifactId>workspace</artifactId>
-            <version>3.4</version>
+            <version>3.5-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>edu.mayo.mprc</groupId>
             <artifactId>chem</artifactId>
-            <version>3.4</version>
+            <version>3.5-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>edu.mayo.mprc</groupId>
             <artifactId>database</artifactId>
-            <version>3.4</version>
+            <version>3.5-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>edu.mayo.mprc</groupId>
             <artifactId>unimod</artifactId>
-            <version>3.4</version>
+            <version>3.5-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>com.h2database</groupId>
