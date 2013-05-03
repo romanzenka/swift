@@ -119,6 +119,7 @@ public final class FastaTest {
 		assertErrorContains(">12345678901234567890123456789012345 Too long accnum", "too long");
 		assertErrorContains(">strange<>*/chars Not-supported characters", "invalid");
 		assertErrorContains(">abcABC0129|_+*. Ok", null);
+		assertErrorContains(">M99641|IGHV1-18*01|98-AA|98+0=98| Ok", null);
 		assertErrorContains(">LONG_DESC "+ Strings.repeat("0123456789", 20), "too long");
 		assertErrorContains(">LONG_DESC "+ Strings.repeat("X", 1+200-">LONG_DESC ".length()), null);
 		assertErrorContains(">LONG_DESC "+ Strings.repeat("X", 1+200-">LONG_DESC ".length()+1), "too long");

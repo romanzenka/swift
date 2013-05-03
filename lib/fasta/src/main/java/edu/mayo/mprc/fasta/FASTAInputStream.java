@@ -63,8 +63,8 @@ public final class FASTAInputStream implements DBInputStream {
 
 	private static final int MAX_ACCNUM_LENGTH = 34;
 	public static final int MAX_HEADER_LENGTH = 200;
-	private static final String VALID_CHARACTERS = "a-z A-Z 0-9 _-.*+|";
-	private static final Pattern VALID_ACCNUM = Pattern.compile("[a-zA-Z0-9_\\-.*+|]+");
+	private static final String VALID_CHARACTERS = "a-z A-Z 0-9 _\\-.*+|=";
+	private static final Pattern VALID_ACCNUM = Pattern.compile("[a-zA-Z0-9_\\-.*+|=]+");
 
 	private static final Logger LOGGER = Logger.getLogger(FASTAInputStream.class);
 
