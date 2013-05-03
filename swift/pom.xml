@@ -22,7 +22,7 @@
         <module>config-ui</module>
         <module>db-curator-ui</module>
         <module>gwt-common</module>
-	<module>scripts</module>
-	<module>installer</module>
+        <module>scripts</module>
+        <module>installer</module>
     </modules>
 </project>
