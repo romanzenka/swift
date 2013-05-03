@@ -1,10 +1,9 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>edu.mayo.mprc</groupId>
     <artifactId>mprc</artifactId>
     <packaging>pom</packaging>
-    <version>3.0-SNAPSHOT</version>
+    <version>3.4</version>
     <name>MPRC Project Parent</name>
     <description>Parent module for MPRC projects (mostly Swift)</description>
     <url>http://delphi.mayo.edu/projects/mprc</url>
@@ -599,9 +598,9 @@
 
     <properties>
         <!-- Default for the surefire plugin -->
-        <debug.args/>
-        <test.groups/>
-        <test.groups.exclude/>
+        <debug.args />
+        <test.groups />
+        <test.groups.exclude />
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
@@ -620,6 +619,7 @@
         <connection>scm:git:git://github.com/romanzenka/swift.git</connection>
         <developerConnection>scm:git:ssh://git@github.com/romanzenka/swift.git</developerConnection>
         <url>${scm.url.base}/swift/tree/master/${project.artifactId}</url>
-    </scm>
+      <tag>mprc-3.4</tag>
+  </scm>
 </project>
 
