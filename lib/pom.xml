@@ -21,16 +21,15 @@
         <module>commandline</module>
         <module>config</module>
         <module>daemon</module>
-	<module>database</module>
-	<module>db-curator</module>
+        <module>database</module>
+        <module>db-curator</module>
         <module>filesharing</module>
         <module>integration</module>
         <module>math</module>
         <module>messaging</module>
         <module>mgf</module>
-        <module>mprcfile</module>
-	<module>mzxml</module>
-	<module>params</module>
+        <module>mzxml</module>
+        <module>params</module>
         <module>scaffoldparser</module>
         <module>scafml</module>
         <module>search-engine</module>
