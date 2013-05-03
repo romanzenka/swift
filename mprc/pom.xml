@@ -397,12 +397,6 @@
             <name>Mayo Nexus snapshots</name>
             <url>http://informatics.mayo.edu/maven/content/repositories/snapshots/</url>
         </snapshotRepository>
-
-        <site>
-            <id>mprc-site</id>
-            <name>${project.name} Documentation</name>
-            <url>scp://delphi.mayo.edu/var/www/html/projects/mprc</url>
-        </site>
     </distributionManagement>
 
     <!-- Continuous Integration - internal for now -->
