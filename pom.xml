@@ -48,4 +48,14 @@
             </snapshots>
         </repository>
     </repositories>
+
+    <!-- Source Control Management -->
+    <scm>
+        <!-- SCM setup -->
+        <connection>scm:git:git://github.com/romanzenka/swift.git</connection>
+        <developerConnection>scm:git:ssh://git@github.com/romanzenka/swift.git</developerConnection>
+        <url>https://github.com/romanzenka/swift/tree/master/${project.artifactId}</url>
+        <tag>HEAD</tag>
+    </scm>
+
 </project>
