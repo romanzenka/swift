@@ -78,10 +78,4 @@
             </plugin>
         </plugins>
     </build>
-
-    <scm>
-        <connection>scm:svn:https://bsisvn.mayo.edu/mprc/trunk/java/swift/gwt-common</connection>
-        <developerConnection>scm:svn:http://delphi.mayo.edu/mprc/trunk/java/swift/gwt-common</developerConnection>
-        <url>https://delphi.mayo.edu/wiki/trac.cgi/browser/trunk/java/swift/gwt-common</url>
-    </scm>
 </project>

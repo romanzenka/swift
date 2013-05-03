@@ -52,11 +52,4 @@
             <scope>test</scope>
         </dependency>
     </dependencies>
-
-
-    <scm>
-        <connection>scm:svn:http://bsisvn.mayo.edu/mprc/trunk/java/services/fasta-db</connection>
-        <developerConnection>scm:svn:http://bsisvn.mayo.edu/mprc/trunk/java/services/fasta-db</developerConnection>
-        <url>http://delphi.mayo.edu/wiki/trac.cgi/browser/trunk/java/services/fasta-db</url>
-    </scm>
 </project>

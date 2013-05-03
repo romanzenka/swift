@@ -96,11 +96,4 @@
             </plugin>
         </plugins>
     </build>
-
-    <scm>
-        <connection>scm:svn:https://bsisvn.mayo.edu/mprc/trunk/java/swift/launcher</connection>
-        <developerConnection>scm:svn:https://bsisvn.mayo.edu/mprc/trunk/java/swift/launcher</developerConnection>
-        <url>http://delphi.mayo.edu/wiki/trac.cgi/browser/trunk/java/swift/launcher</url>
-    </scm>
-
 </project>

@@ -133,10 +133,4 @@
             </plugin>
         </plugins>
     </build>
-
-    <scm>
-        <connection>scm:git:git://github.com/romanzenka/swift.git</connection>
-        <developerConnection>scm:git:ssh://git@github.com/romanzenka/swift.git</developerConnection>
-        <url>${scm.url.base}/swift/tree/master/${project.artifactId}</url>
-    </scm>
 </project>

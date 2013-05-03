@@ -78,10 +78,4 @@
             </plugin>
         </plugins>
     </build>
-
-    <scm>
-        <connection>scm:svn:https://bsisvn.mayo.edu/mprc/trunk/java/swift/config-ui</connection>
-        <developerConnection>scm:svn:https://bsisvn.mayo.edu/mprc/trunk/java/swift/config-ui</developerConnection>
-        <url>https://delphi.mayo.edu/wiki/trac.cgi/browser/trunk/java/swift/config-ui</url>
-    </scm>
 </project>

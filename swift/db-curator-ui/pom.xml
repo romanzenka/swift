@@ -100,10 +100,4 @@
             </plugin>
         </plugins>
     </build>
-
-    <scm>
-        <connection>scm:svn:http://bsisvn.mayo.edu/mprc/trunk/java/swift/db-curator-ui</connection>
-        <developerConnection>scm:svn:https://bsisvn.mayo.edu/mprc/trunk/java/swift/db-curator-ui</developerConnection>
-        <url>http://delphi.mayo.edu/wiki/trac.cgi/browser/trunk/java/swift/db-curator-ui</url>
-    </scm>
 </project>

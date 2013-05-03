@@ -78,10 +78,4 @@
             <classifier>jdk15</classifier>
         </dependency>
     </dependencies>
-
-    <scm>
-        <connection>scm:svn:http://bsisvn.mayo.edu/mprc/trunk/java/services/search-db</connection>
-        <developerConnection>scm:svn:http://bsisvn.mayo.edu/mprc/trunk/java/services/search-db</developerConnection>
-        <url>http://delphi.mayo.edu/wiki/trac.cgi/browser/trunk/java/services/search-db</url>
-    </scm>
 </project>
