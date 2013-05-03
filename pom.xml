@@ -18,7 +18,7 @@
     </parent>
 
     <modules>
-        <module>mprc</module>
+        <!-- The aggregator ignores the parent pom, which is considered to be independent on swift -->
         <module>lib</module>
         <module>services</module>
         <module>swift</module>
