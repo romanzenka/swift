@@ -134,7 +134,7 @@
                             <goal>single</goal>
                         </goals>
                         <configuration>
-                            <finalName>swift-3.0</finalName>
+                            <finalName>swift-3.5</finalName>
                             <descriptors>
                                 <descriptor>assembly.xml</descriptor>
                             </descriptors>
