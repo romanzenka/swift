@@ -13,7 +13,7 @@
     <parent>
         <artifactId>services</artifactId>
         <groupId>edu.mayo.mprc</groupId>
-        <version>3.0-SNAPSHOT</version>
+        <version>3.4</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
