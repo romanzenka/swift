@@ -1,11 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>edu.mayo.mprc</groupId>
     <artifactId>swift-aggregator</artifactId>
     <packaging>pom</packaging>
-    <version>3.0-SNAPSHOT</version>
+    <version>3.5-SNAPSHOT</version>
     <name>Swift Aggregator Project</name>
     <url>http://github.com/romanzenka/swift</url>
     <inceptionYear>2007</inceptionYear>
@@ -18,7 +17,7 @@
     </parent>
 
     <modules>
-        <module>mprc</module>
+        <!-- The aggregator ignores the parent pom, which is considered to be independent on swift -->
         <module>lib</module>
         <module>services</module>
         <module>swift</module>
@@ -48,4 +47,14 @@
             </snapshots>
         </repository>
     </repositories>
+
+    <!-- Source Control Management -->
+    <scm>
+        <!-- SCM setup -->
+        <connection>scm:git:git://github.com/romanzenka/swift.git</connection>
+        <developerConnection>scm:git:ssh://git@github.com/romanzenka/swift.git</developerConnection>
+        <url>https://github.com/romanzenka/swift/tree/master/${project.artifactId}</url>
+        <tag>HEAD</tag>
+    </scm>
+
 </project>

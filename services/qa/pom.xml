@@ -1,16 +1,15 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>edu.mayo.mprc</groupId>
     <artifactId>qa</artifactId>
-    <version>3.0-SNAPSHOT</version>
+    <version>3.5-SNAPSHOT</version>
     <name>qa</name>
     <description>Quality Assurance - checking RAW files versus the data from the search engine</description>
 
     <parent>
         <groupId>edu.mayo.mprc</groupId>
         <artifactId>services</artifactId>
-        <version>3.4</version>
+        <version>3.5-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
@@ -18,37 +17,37 @@
         <dependency>
             <groupId>edu.mayo.mprc</groupId>
             <artifactId>util</artifactId>
-            <version>3.0-SNAPSHOT</version>
+            <version>3.5-SNAPSHOT</version>
         </dependency>
 
         <dependency>
             <groupId>edu.mayo.mprc</groupId>
             <artifactId>textio</artifactId>
-            <version>3.0-SNAPSHOT</version>
+            <version>3.5-SNAPSHOT</version>
         </dependency>
 
         <dependency>
             <groupId>edu.mayo.mprc</groupId>
             <artifactId>mgf</artifactId>
-            <version>3.0-SNAPSHOT</version>
+            <version>3.5-SNAPSHOT</version>
         </dependency>
 
         <dependency>
             <groupId>edu.mayo.mprc</groupId>
             <artifactId>unimod</artifactId>
-            <version>3.0-SNAPSHOT</version>
+            <version>3.5-SNAPSHOT</version>
         </dependency>
 
         <dependency>
             <groupId>edu.mayo.mprc</groupId>
             <artifactId>scaffoldparser</artifactId>
-            <version>3.0-SNAPSHOT</version>
+            <version>3.5-SNAPSHOT</version>
         </dependency>
 
         <dependency>
             <groupId>edu.mayo.mprc</groupId>
             <artifactId>msmseval</artifactId>
-            <version>3.0-SNAPSHOT</version>
+            <version>3.5-SNAPSHOT</version>
         </dependency>
 
         <dependency>
@@ -60,7 +59,7 @@
         <dependency>
             <groupId>edu.mayo.mprc</groupId>
             <artifactId>myrimatch</artifactId>
-            <version>3.0-SNAPSHOT</version>
+            <version>3.5-SNAPSHOT</version>
         </dependency>
 
         <!-- MGF reader/writer -->
