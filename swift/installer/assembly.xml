@@ -7,7 +7,7 @@
         <format>zip</format>
     </formats>
     <includeBaseDirectory>true</includeBaseDirectory>
-    <baseDirectory>swift-3.0</baseDirectory>
+    <baseDirectory>swift-3.5</baseDirectory>
     <includeSiteDirectory>false</includeSiteDirectory>
     <dependencySets>
         <dependencySet>
@@ -17,9 +17,9 @@
             <directoryMode>755</directoryMode>
 	    <outputDirectory>bin/swift</outputDirectory>
 	    <excludes>
-		    <exclude>edu.mayo.mprc:swift-scripts:jar:3.0-SNAPSHOT</exclude>
-		    <exclude>edu.mayo.mprc:install:jar:3.0-SNAPSHOT</exclude>
-		    <exclude>edu.mayo.mprc:install-exe:jar:3.0-SNAPSHOT</exclude>
+		    <exclude>edu.mayo.mprc:swift-scripts:jar:3.5-SNAPSHOT</exclude>
+		    <exclude>edu.mayo.mprc:install:jar:3.4</exclude>
+		    <exclude>edu.mayo.mprc:install-exe:jar:3.4</exclude>
 	    </excludes>
         </dependencySet>
         <dependencySet>
@@ -29,8 +29,8 @@
             <directoryMode>755</directoryMode>
             <outputDirectory></outputDirectory>
             <includes>
-                <include>edu.mayo.mprc:swift-scripts:jar:3.0-SNAPSHOT</include>
-                <include>edu.mayo.mprc:install-exe:jar:3.0-SNAPSHOT</include>
+                <include>edu.mayo.mprc:swift-scripts:jar:3.5-SNAPSHOT</include>
+                <include>edu.mayo.mprc:install-exe:jar:3.4</include>
 		</includes>
         </dependencySet>
         <dependencySet>
@@ -40,7 +40,7 @@
             <directoryMode>755</directoryMode>
             <outputDirectory></outputDirectory>
             <includes>
-                <include>edu.mayo.mprc:install:jar:3.0-SNAPSHOT</include>
+                <include>edu.mayo.mprc:install:jar:3.4</include>
             </includes>
         </dependencySet>
     </dependencySets>
