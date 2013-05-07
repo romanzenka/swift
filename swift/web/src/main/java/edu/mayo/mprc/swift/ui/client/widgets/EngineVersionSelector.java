@@ -89,6 +89,10 @@ public final class EngineVersionSelector extends HorizontalPanel implements Comp
 		return Boolean.TRUE.equals(checkBox.getValue());
 	}
 
+	public void setEnabled(boolean enabled) {
+		checkBox.setValue(enabled);
+	}
+
 	public String getVersion() {
 		if (versions == null) {
 			return versionList.get(0);

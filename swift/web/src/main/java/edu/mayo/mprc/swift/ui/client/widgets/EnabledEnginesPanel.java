@@ -55,6 +55,11 @@ public final class EnabledEnginesPanel extends HorizontalPanel {
 		if (enabledEngines == null || engines == null) {
 			return;
 		}
+		// Disable all
+		for (final EngineVersionSelector selector : engines.values()) {
+			selector.setEnabled(false);
+		}
+		// Enable selected
 		for (final ClientSearchEngineConfig config : enabledEngines) {
 			final String code = config.getCode();
 			final EngineVersionSelector selector = engines.get(code);
@@ -64,6 +69,7 @@ public final class EnabledEnginesPanel extends HorizontalPanel {
 				if (!selector.selectVersion(config.getVersion())) {
 					reportWarning("Requested " + code + " version " + config.getVersion() + " not available. Using " + selector.getVersion() + " instead.");
 				}
+				selector.setEnabled(true);
 			}
 		}
 	}
