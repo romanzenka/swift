@@ -1,6 +1,6 @@
 #!/bin/bash
 
-VER=3.0-SNAPSHOT
+VER=3.5-SNAPSHOT
 echo Starting Swift configuration
 
 # Absolute path to this script
