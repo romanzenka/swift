@@ -22,7 +22,7 @@ public final class SpectrumExtractionEditor extends Composite implements Validat
 		engineName = new ListBox();
 		engineName.addItem("extract_msn", "extract_msn");
 		engineName.addItem("msconvert", "msconvert");
-		engineName.setSelectedIndex(0);
+		engineName.setSelectedIndex(1);
 		engineName.addChangeListener(this);
 		settings = new TextBox();
 		settings.setVisibleLength(50);
