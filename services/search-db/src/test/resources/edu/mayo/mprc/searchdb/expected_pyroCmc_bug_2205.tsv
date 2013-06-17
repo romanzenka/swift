@@ -1,0 +1,7 @@
+Biological sample category	Biological sample name	Protein identification probability	Number of Unique Peptides	Number of Unique Spectra	Number of Total Spectra	Percentage of Total Spectra	Percentage Sequence Coverage	Peptide Sequence	Peptide Modifications	Previous Amino Acid	Next Amino Acid	Best Peptide Identification Probability	Number of identified +1H spectra	Number of identified +2H spectra	Number of identified +3H spectra	Number of identified +4H spectra	Number of enzymatic termini
+none	O63_Jun14_03_Terzic_SP_mono	100.00%	42	67	74	4.36%	18.00%	PAETEDIAIK		R	V	0.95	0	1	0	0	1
+none	O63_Jun14_03_Terzic_SP_mono	100.00%	42	67	74	4.36%	18.00%	QDQELEKDMEADQTTL	q1: Gln->pyro-Glu (N-term Q)	R	E	0.95	0	1	0	0	1
+none	O63_Jun14_03_Terzic_SP_mono	100.00%	42	67	74	4.36%	18.00%	QDQELEKDMEADQTTLER	m9: Oxidation (M)	R	K	0.95	0	0	1	0	2
+none	O63_Jun14_03_Terzic_SP_mono	100.00%	42	67	74	4.36%	18.00%	QDQELEKDMEADQTTLER	q1: Gln->pyro-Glu (N-term Q)	R	K	0.95	0	1	1	0	2
+none	O63_Jun14_03_Terzic_SP_mono	100.00%	42	67	74	4.36%	18.00%	QDQELEKDMEADQTTLER		R	K	0.95	0	1	1	0	2
+none	O63_Jun14_03_Terzic_SP_mono	100.00%	42	67	74	4.36%	18.00%	QDQELEKDMEADQTTLERK	q1: Gln->pyro-Glu (N-term Q)	R	T	0.95	0	0	1	0	2

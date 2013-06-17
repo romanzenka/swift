@@ -24,6 +24,7 @@ public final class ScaffoldModificationFormat {
 	private IndexedModSet modSet;
 	private IndexedModSet scaffoldModSet;
 	private Boolean pyroCmcBroken = null;
+	private Boolean pyroCmcPresent = null;
 	/**
 	 * Example format:
 	 * <p/>
@@ -139,7 +140,6 @@ public final class ScaffoldModificationFormat {
 		if (matchingMod == null) {
 			matchingMod = modSet.getByTitle(scaffoldMod.getTitle());
 		}
-		matchingMod = fixTandemPyro(matchingMod, scaffoldSpecificity);
 		if (!Objects.equal(matchingMod.getComposition(), scaffoldMod.getComposition())) {
 			throw new MprcException("Modification reported by Scaffold does not match your unimod modification. " +
 					"RecordId=[" + recordId + "], " +
@@ -163,13 +163,22 @@ public final class ScaffoldModificationFormat {
 	 * <p/>
 	 * Out of all those mods we pick the first one with a matching mod title. If no such mod is present, we throw an exception.
 	 * <p/>
-	 * HACK: See {@link #fixTandemPyro}.
+	 * HACK: See {@link #fixTandemPyro}, {@link #fixAmmoniaLoss}, {@link #fixDehydration}
 	 */
 	private ModSpecificity matchScaffoldMod(final String position, final String title, final String deltaString, final double delta, final char residue, final Terminus terminus) {
 		final Collection<ModSpecificity> matchingModSpecificities = scaffoldModSet.findMatchingModSpecificities(delta, MOD_DELTA_PRECISION, residue, terminus, null, null);
 
-		String effectiveTitle = fixTandemPyro(title, residue, terminus);
-		ModSpecificity match = findMatch(matchingModSpecificities, effectiveTitle);
+		String effectiveTitle = title;
+		ModSpecificity match;
+
+		effectiveTitle = fixTandemPyro(effectiveTitle, residue, terminus);
+		match = findMatch(matchingModSpecificities, effectiveTitle);
+		if (match != null) {
+			return match;
+		}
+
+		effectiveTitle = fixPyroToAmmoniaLoss(effectiveTitle, residue, terminus);
+		match = findMatch(matchingModSpecificities, effectiveTitle);
 		if (match != null) {
 			return match;
 		}
@@ -264,17 +273,30 @@ public final class ScaffoldModificationFormat {
 	 * HACK: Anothe part of the workaround. pyro-cmC on carbamidomethylated C as reported by Scaffold
 	 * should actually be reported as Ammonia-loss.
 	 *
-	 * @param matchingMod         What we found in our database.
-	 * @param scaffoldSpecificity What Scaffold requested.
 	 * @return Cleaned up matching mod in case we ran into the X!Tandem pyro-cmC problem
 	 */
-	private Mod fixTandemPyro(final Mod matchingMod, final ModSpecificity scaffoldSpecificity) {
-		// It is the broken PYRO_CMC mod
-		if (PYRO_CMC.equalsIgnoreCase(scaffoldSpecificity.getModification().getTitle()) && checkPyroCmcBroken()) {
-			// Replace the modification with ammonia loss (-NH3) on the top of carbamidomethylation
-			return modSet.getByTitle("Ammonia-loss");
+	private String fixPyroToAmmoniaLoss(final String title, final char residue, final Terminus terminus) {
+		String effectiveTitle = title;
+		if (PYRO_CMC.equalsIgnoreCase(title)) {
+			if (terminus == Terminus.Nterm) {
+				if (!checkPyroCmcPresent()) {
+					// Replace the modification with ammonia loss (-NH3) on the top of carbamidomethylation
+					effectiveTitle = "Ammonia-loss";
+				}
+			}
 		}
-		return matchingMod;
+		return effectiveTitle;
+	}
+
+	/**
+	 * @return True if the Pyro-cmC mod is present.
+	 */
+	private boolean checkPyroCmcPresent() {
+		if (pyroCmcPresent == null) {
+			final Mod brokenMod = scaffoldModSet.getByTitle("Pyro-cmC");
+			pyroCmcPresent = brokenMod != null;
+		}
+		return pyroCmcPresent;
 	}
 
 	/**

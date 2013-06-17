@@ -7,6 +7,7 @@ import edu.mayo.mprc.MprcException;
 import edu.mayo.mprc.fastadb.ProteinSequence;
 import edu.mayo.mprc.fastadb.ProteinSequenceTranslator;
 import edu.mayo.mprc.searchdb.dao.*;
+import edu.mayo.mprc.unimod.IndexedModSet;
 import edu.mayo.mprc.unimod.MockUnimodDao;
 import edu.mayo.mprc.unimod.Unimod;
 import edu.mayo.mprc.utilities.FileUtilities;
@@ -40,6 +41,8 @@ public class TestScaffoldSpectraSummarizer {
 	private static final String SCAFFOLD4 = "classpath:edu/mayo/mprc/searchdb/scaffold4.tsv";
 	private static final String SCAFFOLD4_EXPECTED = "/edu/mayo/mprc/searchdb/expected_scaffold4_report.tsv";
 
+	private static final String BUG_2205 = "classpath:edu/mayo/mprc/searchdb/pyroCmc_bug_2205.tsv";
+	private static final String BUG_2205_EXPECTED = "/edu/mayo/mprc/searchdb/expected_pyroCmc_bug_2205.tsv";
 
 	static final String SINGLE_MISSING_DB = "classpath:edu/mayo/mprc/searchdb/single_missing_db.tsv";
 	// Should parse to identical result as SINGLE
@@ -116,11 +119,15 @@ public class TestScaffoldSpectraSummarizer {
 		}
 	}
 
-	private ScaffoldSpectraSummarizer makeSummarizer() {
+	private ScaffoldSpectraSummarizer makeSummarizer(final IndexedModSet scaffoldUnimod) {
 		return new ScaffoldSpectraSummarizer(
 				unimod, scaffoldUnimod,
 				new DummyTranslator(),
 				new DummyMassSpecDataExtractor(new DateTime()));
+	}
+
+	private ScaffoldSpectraSummarizer makeSummarizer() {
+		return makeSummarizer(scaffoldUnimod);
 	}
 
 	/**
@@ -206,6 +213,31 @@ public class TestScaffoldSpectraSummarizer {
 			FileUtilities.closeQuietly(stream);
 		}
 	}
+
+	/**
+	 * X!Tandem's n-Term pyroCmc was causing issues when parsing.
+	 */
+	@Test
+	public void shouldProcessPyroCmc() {
+		final InputStream stream = ResourceUtilities.getStream(BUG_2205, TestScaffoldSpectraSummarizer.class);
+		try {
+			Unimod scaffoldUnimod = new Unimod();
+			scaffoldUnimod.parseUnimodXML(ResourceUtilities.getStream("classpath:edu/mayo/mprc/searchdb/scaffold_3.6.2_unimod.xml", Unimod.class));
+
+			final ScaffoldSpectraSummarizer summarizer = makeSummarizer(scaffoldUnimod);
+			summarizer.load(stream, -1, BUG_2205, "3", null);
+			final Analysis analysis = summarizer.getAnalysis();
+			Assert.assertEquals(analysis.getAnalysisDate(), new DateTime(2013, 06, 14, 0, 0, 0, 0), "Report date");
+			Assert.assertEquals(analysis.getScaffoldVersion(), "Scaffold_3.6.2", "Scaffold version");
+
+			Assert.assertEquals(analysis.getBiologicalSamples().size(), 1, "Biological samples");
+
+			checkAnalysisMatch(analysis, BUG_2205_EXPECTED);
+		} finally {
+			FileUtilities.closeQuietly(stream);
+		}
+	}
+
 
 
 	/**

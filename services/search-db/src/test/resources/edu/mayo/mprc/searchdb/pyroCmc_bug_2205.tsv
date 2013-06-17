@@ -1,0 +1,52 @@
+Terzic_SP_s1, Spectrum report created on 06/14/2013
+Experiment: Terzic_SP_s1
+	Peak List Generator: extract_msn
+		Version: Unspecified
+		Charge States Calculated: unknown
+		Deisotoped: unknown
+		Textual Annotation: 
+	Database Set: 2 Databases
+		Database Name: the SP_2011_09_rev database
+			Version: unknown
+			Taxonomy: All Entries
+			Number of Proteins: 1064384
+		Database Name: the SP_2011_09_rev database
+			Version: unknown
+			Taxonomy: All Entries
+			Number of Proteins: 1064384
+		Does database contain common contaminants?: unknown
+	Search Engine Set: 2 Search Engines
+		Search Engine: Mascot
+			Version: 2.4.0
+			Samples: All Samples
+			Fragment Tolerance: 0.60 Da (Monoisotopic)
+			Parent Tolerance: 20 PPM (Monoisotopic)
+			Fixed Modifications: 
+			Variable Modifications: +16 on M (Oxidation), +42 on n (Acetyl), +57 on C (Carbamidomethyl), +71 on C (Propionamide)
+			Database: the SP_2011_09_rev database (unknown version, 1064384 entries)
+			Digestion Enzyme: Trypsin
+			Max Missed Cleavages: 2
+		Search Engine: X! Tandem
+			Version: CYCLONE (2010.12.01.1)
+			Samples: All Samples
+			Fragment Tolerance: 0.60 Da (Monoisotopic)
+			Parent Tolerance: 20 PPM (Monoisotopic)
+			Fixed Modifications: 
+			Variable Modifications: +16 on M (Oxidation), +57 on C (Carbamidomethyl), +71 on C (Propionamide)
+			Database: the SP_2011_09_rev database (unknown version, 1064384 entries)
+			Digestion Enzyme: stricttrypsin
+			Max Missed Cleavages: 2
+	Scaffold Version: Scaffold_3.6.2
+		Peptide Thresholds: 95.0% minimum 
+		Protein Thresholds: 95.0% minimum and 2 peptides minimum
+
+Experiment name	Biological sample category	Biological sample name	MS/MS sample name	Protein name	Protein accession numbers	Database sources	Protein molecular weight (Da)	Protein identification probability	Number of unique peptides	Number of unique spectra	Number of total spectra	Percentage of total spectra	Percentage sequence coverage	Manual validation	Assigned	Spectrum name	Peptide sequence	Previous amino acid	Next amino acid	Peptide identification probability	X! Tandem Hyper Score	X! Tandem Ladder Score	Mascot Ion Score	Mascot Identity Score	Mascot Homology Score	Mascot Delta Ion Score	Number of enzymatic termini	Fixed modifications identified by spectrum	Variable modifications identified by spectrum	Observed m/z	Actual peptide mass (AMU)	Calculated +1H Peptide Mass (AMU)	Spectrum charge	Actual minus calculated peptide mass (AMU)	Actual minus calculated peptide mass (PPM)	Peptide start index	Peptide stop index	Exclusive	Other Proteins	Starred	Hidden
+Terzic_SP_s1	none	O63_Jun14_03_Terzic_SP_mono	O63_Jun14_03_Terzic_SP_mono	ATP-binding cassette sub-family C member 9 OS=Mus musculus GN=Abcc9 PE=1 SV=2 (sp) (P70170)	ABCC9_MOUSE	SP_2011_09_rev.fasta	174,245.8	100.0%	42	67	74	4.36%	18.0%	possibly correct	true	O63_Jun14_03_Terzic_SP_mono scan 1093 1093 (O63_Jun14_03_Terzic_SP_mono.1093.1093.2.dta)	PAETEDIAIK	R	V	95.0%	49.5	0.000	67.6	41.6	34.9	49.9	1			543.786623	1,085.558694	1,086.567946	2	-0.001976	-1.819	661	670	true			false	false
+Terzic_SP_s1	none	O63_Jun14_03_Terzic_SP_mono	O63_Jun14_03_Terzic_SP_mono	ATP-binding cassette sub-family C member 9 OS=Mus musculus GN=Abcc9 PE=1 SV=2 (sp) (P70170)	ABCC9_MOUSE	SP_2011_09_rev.fasta	174,245.8	100.0%	42	67	74	4.36%	18.0%	possibly correct	true	O63_Jun14_03_Terzic_SP_mono scan 1866 1866 (O63_Jun14_03_Terzic_SP_mono.1866.1866.2.dta)	qDQELEKDMEADQTTL	R	E	95.0%	52.0	0.000					1		n-term: Pyro-cmC (-17.03)	938.910463	1,875.806374	1,876.812098	2	0.001552	0.8272	914	929	true			false	false
+Terzic_SP_s1	none	O63_Jun14_03_Terzic_SP_mono	O63_Jun14_03_Terzic_SP_mono	ATP-binding cassette sub-family C member 9 OS=Mus musculus GN=Abcc9 PE=1 SV=2 (sp) (P70170)	ABCC9_MOUSE	SP_2011_09_rev.fasta	174,245.8	100.0%	42	67	74	4.36%	18.0%	possibly correct	true	O63_Jun14_03_Terzic_SP_mono scan 934 934 (O63_Jun14_03_Terzic_SP_mono.934.934.3.dta)	QDQELEKDmEADQTTLER	R	K	95.0%	42.0	0.000	51.3	39.5	25.7	41.8	2		m9: Oxidation (+15.99)	732.330688	2,193.970236	2,194.977261	3	0.0002510	0.1144	914	931	true			false	false
+Terzic_SP_s1	none	O63_Jun14_03_Terzic_SP_mono	O63_Jun14_03_Terzic_SP_mono	ATP-binding cassette sub-family C member 9 OS=Mus musculus GN=Abcc9 PE=1 SV=2 (sp) (P70170)	ABCC9_MOUSE	SP_2011_09_rev.fasta	174,245.8	100.0%	42	67	74	4.36%	18.0%	possibly correct	true	O63_Jun14_03_Terzic_SP_mono scan 1650 1650 (O63_Jun14_03_Terzic_SP_mono.1650.1650.3.dta)	qDQELEKDMEADQTTLER	R	K	95.0%	76.2	0.000					2		n-term: Pyro-cmC (-17.03)	721.323791	2,160.949545	2,161.955798	3	0.001023	0.4734	914	931	true			false	false
+Terzic_SP_s1	none	O63_Jun14_03_Terzic_SP_mono	O63_Jun14_03_Terzic_SP_mono	ATP-binding cassette sub-family C member 9 OS=Mus musculus GN=Abcc9 PE=1 SV=2 (sp) (P70170)	ABCC9_MOUSE	SP_2011_09_rev.fasta	174,245.8	100.0%	42	67	74	4.36%	18.0%	possibly correct	true	O63_Jun14_03_Terzic_SP_mono scan 1308 1308 (O63_Jun14_03_Terzic_SP_mono.1308.1308.3.dta)	QDQELEKDMEADQTTLER	R	K	95.0%	52.9	0.000	70.5	40.5	28.9	59.0	2			726.999511	2,177.976705	2,178.982346	3	0.001635	0.7504	914	931	true			false	false
+Terzic_SP_s1	none	O63_Jun14_03_Terzic_SP_mono	O63_Jun14_03_Terzic_SP_mono	ATP-binding cassette sub-family C member 9 OS=Mus musculus GN=Abcc9 PE=1 SV=2 (sp) (P70170)	ABCC9_MOUSE	SP_2011_09_rev.fasta	174,245.8	100.0%	42	67	74	4.36%	18.0%	possibly correct	true	O63_Jun14_03_Terzic_SP_mono scan 1312 1312 (O63_Jun14_03_Terzic_SP_mono.1312.1312.2.dta)	QDQELEKDMEADQTTLER	R	K	95.0%	59.5	0.000	82.2	40.6	24.5	75.9	2			1,089.996458	2,177.978364	2,178.982346	2	0.003294	1.512	914	931	true			false	false
+Terzic_SP_s1	none	O63_Jun14_03_Terzic_SP_mono	O63_Jun14_03_Terzic_SP_mono	ATP-binding cassette sub-family C member 9 OS=Mus musculus GN=Abcc9 PE=1 SV=2 (sp) (P70170)	ABCC9_MOUSE	SP_2011_09_rev.fasta	174,245.8	100.0%	42	67	74	4.36%	18.0%	possibly correct	true	O63_Jun14_03_Terzic_SP_mono scan 1655 1655 (O63_Jun14_03_Terzic_SP_mono.1655.1655.2.dta)	qDQELEKDMEADQTTLER	R	K	95.0%	66.6	0.000					2		n-term: Pyro-cmC (-17.03)	1,081.482908	2,160.951264	2,161.955798	2	0.002742	1.268	914	931	true			false	false
+Terzic_SP_s1	none	O63_Jun14_03_Terzic_SP_mono	O63_Jun14_03_Terzic_SP_mono	ATP-binding cassette sub-family C member 9 OS=Mus musculus GN=Abcc9 PE=1 SV=2 (sp) (P70170)	ABCC9_MOUSE	SP_2011_09_rev.fasta	174,245.8	100.0%	42	67	74	4.36%	18.0%	possibly correct	true	O63_Jun14_03_Terzic_SP_mono scan 1535 1535 (O63_Jun14_03_Terzic_SP_mono.1535.1535.3.dta)	qDQELEKDMEADQTTLERK	R	T	95.0%	63.7	0.000					2		n-term: Pyro-cmC (-17.03)	764.022948	2,289.047016	2,290.050798	3	0.003494	1.526	914	932	true			false	false
+END OF FILE
