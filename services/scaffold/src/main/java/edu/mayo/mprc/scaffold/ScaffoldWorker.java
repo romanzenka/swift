@@ -34,8 +34,19 @@ public final class ScaffoldWorker extends WorkerBase {
 
 	private File scaffoldBatchScript;
 	private boolean reportDecoyHits;
+	private File scaffoldUnimod;
 
 	public ScaffoldWorker() {
+	}
+
+	@Override
+	public void check() {
+		if (!getScaffoldBatchScript().canExecute()) {
+			throw new MprcException("Scaffold batch script not executable: " + scaffoldBatchScript.getAbsolutePath());
+		}
+		if (getScaffoldUnimod().isFile()) {
+			throw new MprcException("Scaffold's unimod file not present: " + getScaffoldUnimod().getAbsolutePath());
+		}
 	}
 
 	@Override
@@ -229,6 +240,14 @@ public final class ScaffoldWorker extends WorkerBase {
 		this.scaffoldBatchScript = scaffoldBatchScript;
 	}
 
+	public void setScaffoldUnimod(File scaffoldUnimod) {
+		this.scaffoldUnimod = scaffoldUnimod;
+	}
+
+	public File getScaffoldUnimod() {
+		return scaffoldUnimod;
+	}
+
 	/**
 	 * A factory capable of creating the worker
 	 */
@@ -246,6 +265,7 @@ public final class ScaffoldWorker extends WorkerBase {
 		public Worker create(final Config config, final DependencyResolver dependencies) {
 			final ScaffoldWorker worker = new ScaffoldWorker();
 			worker.setScaffoldBatchScript(new File(config.getScaffoldBatchScript()).getAbsoluteFile());
+			worker.setScaffoldUnimod(new File(config.getScaffoldUnimod()).getAbsoluteFile());
 
 			return worker;
 		}
