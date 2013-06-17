@@ -6,6 +6,7 @@ import edu.mayo.mprc.config.*;
 import edu.mayo.mprc.config.ui.ServiceUiFactory;
 import edu.mayo.mprc.daemon.monitor.PingDaemonWorker;
 import edu.mayo.mprc.utilities.FileUtilities;
+import edu.mayo.mprc.utilities.exceptions.CompositeException;
 import org.apache.log4j.Logger;
 import org.springframework.stereotype.Component;
 
@@ -58,6 +59,23 @@ public final class Daemon {
 			if (resource instanceof Closeable) {
 				FileUtilities.closeQuietly((Closeable) resource);
 			}
+		}
+	}
+
+	/**
+	 * Check all workers defined in this daemon
+	 */
+	public void check() {
+		final CompositeException exception = new CompositeException();
+		for (final AbstractRunner runner : runners) {
+			try {
+				runner.check();
+			} catch (Exception e) {
+				exception.addCause(e);
+			}
+		}
+		if (!exception.getCauses().isEmpty()) {
+			throw exception;
 		}
 	}
 

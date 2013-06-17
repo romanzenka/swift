@@ -216,6 +216,16 @@ public final class MsconvertWorker extends WorkerBase {
 		this.msaccessExecutable = msaccessExecutable;
 	}
 
+	@Override
+	public void check() {
+		if (!getMsaccessExecutable().canExecute()) {
+			throw new MprcException("msaccess not executable: " + getMsaccessExecutable().getAbsolutePath());
+		}
+		if (!getMsconvertExecutable().canExecute()) {
+			throw new MprcException("msaccess not executable: " + getMsconvertExecutable().getAbsolutePath());
+		}
+	}
+
 	/**
 	 * A factory capable of creating the worker
 	 */

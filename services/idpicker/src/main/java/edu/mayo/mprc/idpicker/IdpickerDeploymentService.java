@@ -65,6 +65,10 @@ public final class IdpickerDeploymentService extends DeploymentService<Deploymen
 		return CO_DEPLOYMENTS;
 	}
 
+	@Override
+	public void check() {
+	}
+
 	/**
 	 * Configuration for the factory
 	 */

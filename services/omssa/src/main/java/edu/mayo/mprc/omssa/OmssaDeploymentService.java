@@ -238,6 +238,10 @@ public final class OmssaDeploymentService extends DeploymentService<DeploymentRe
 		return CO_DEPLOYMENTS;
 	}
 
+	@Override
+	public void check() {
+	}
+
 	/**
 	 * Configuration for the factory
 	 */

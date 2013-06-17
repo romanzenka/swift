@@ -104,16 +104,19 @@ public final class ProcessCaller implements Runnable {
 	 * @param callName Shorthand name for the process to be used in the error messages.
 	 */
 	public void runAndCheck(final String callName) {
+		runAndCheck(callName, 0);
+	}
+
+	public void runAndCheck(final String callName, final int exitCode) {
 		try {
 			run();
 		} catch (Exception t) {
 			throw new MprcException(callName + " process failed: " + getFailedCallDescription(), t);
 		}
 		LOGGER.debug(callName + " process returned " + getExitValue());
-		if (getExitValue() != 0) {
+		if (getExitValue() != exitCode) {
 			throw new MprcException(callName + " process failed: " + getFailedCallDescription());
 		}
-
 	}
 
 	/**

@@ -29,6 +29,11 @@ public abstract class WorkerFactoryBase<C extends ResourceConfig> extends Factor
 		return create(config, dependencies);
 	}
 
+	@Override
+	public void checkWorker() {
+		createWorker().check();
+	}
+
 	public C getConfig() {
 		return config;
 	}

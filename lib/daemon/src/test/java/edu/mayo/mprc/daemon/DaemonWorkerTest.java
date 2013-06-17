@@ -28,6 +28,10 @@ public final class DaemonWorkerTest {
 			}
 
 			@Override
+			public void checkWorker() {
+			}
+
+			@Override
 			public String getType() {
 				return "daemonWorker";
 			}
@@ -80,6 +84,10 @@ public final class DaemonWorkerTest {
 					throw new DaemonException(e);
 				}
 				Assert.assertEquals(concurrentRequests.decrementAndGet(), 0, "The amount of requests must end at 0. The worker calls are not serialized.");
+			}
+
+			@Override
+			public void check() {
 			}
 		};
 	}

@@ -42,6 +42,11 @@ public final class MgfToMgfWorker extends WorkerBase {
 		return "Mgf Title Cleanup";
 	}
 
+	@Override
+	public void check() {
+		// This worker should have no problems running no matter what
+	}
+
 	/**
 	 * A factory capable of creating the worker
 	 */

@@ -504,6 +504,10 @@ public final class SequestDeploymentService extends DeploymentService<SequestDep
 		return CO_DEPLOYMENTS;
 	}
 
+	@Override
+	public void check() {
+	}
+
 	/**
 	 * Configuration for the factory
 	 */

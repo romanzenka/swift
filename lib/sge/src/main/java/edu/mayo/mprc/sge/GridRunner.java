@@ -136,6 +136,11 @@ public final class GridRunner extends AbstractRunner {
 		}
 	}
 
+	@Override
+	public void check() {
+		// Not implemented yet
+	}
+
 	void reportTaskData(final DaemonRequest request, final AssignedTaskData data) {
 		// Clone the data object to make sure the file tokens get updated (files might come into existence that
 		// did not exist before).

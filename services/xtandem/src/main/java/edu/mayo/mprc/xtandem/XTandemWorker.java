@@ -1,5 +1,6 @@
 package edu.mayo.mprc.xtandem;
 
+import com.google.common.base.Charsets;
 import com.google.common.collect.ImmutableMap;
 import edu.mayo.mprc.MprcException;
 import edu.mayo.mprc.config.*;
@@ -21,6 +22,7 @@ import edu.mayo.mprc.utilities.progress.UserProgressReporter;
 import org.apache.log4j.Logger;
 import org.springframework.stereotype.Component;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
@@ -205,6 +207,20 @@ public final class XTandemWorker extends WorkerBase {
 	 */
 	public static int getNumThreads() {
 		return Math.max(1, Runtime.getRuntime().availableProcessors());
+	}
+
+	@Override
+	public void check() {
+		final List<String> parameters = new LinkedList<String>();
+		parameters.add(tandemExecutable.getPath());
+		parameters.add("-h");
+
+		final ProcessBuilder processBuilder = new ProcessBuilder(parameters);
+		final ProcessCaller processCaller = new ProcessCaller(processBuilder);
+		processCaller.setKillTimeout(1000);
+		ByteArrayInputStream stream = new ByteArrayInputStream("\n".getBytes(Charsets.US_ASCII));
+		processCaller.setInputStream(stream);
+		processCaller.runAndCheck("X!Tandem", 255);
 	}
 
 	/**

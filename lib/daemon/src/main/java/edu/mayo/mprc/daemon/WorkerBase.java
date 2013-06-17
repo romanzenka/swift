@@ -3,6 +3,7 @@ package edu.mayo.mprc.daemon;
 import edu.mayo.mprc.utilities.progress.ProgressInfo;
 import edu.mayo.mprc.utilities.progress.ProgressReporter;
 import edu.mayo.mprc.utilities.progress.UserProgressReporter;
+import org.apache.log4j.Logger;
 
 /**
  * Base implementation of {@link Worker} interface.
@@ -10,6 +11,7 @@ import edu.mayo.mprc.utilities.progress.UserProgressReporter;
  * @author Roman Zenka
  */
 public abstract class WorkerBase implements Worker {
+	private static final Logger LOGGER = Logger.getLogger(WorkerBase.class);
 
 	/**
 	 * Default implementation for processing requests.
@@ -32,6 +34,11 @@ public abstract class WorkerBase implements Worker {
 		} catch (Exception t) {
 			progressReporter.reportFailure(t);
 		}
+	}
+
+	@Override
+	public void check() {
+		LOGGER.debug("No check implemented for this worker: " + this.getClass().getSimpleName());
 	}
 
 	/**

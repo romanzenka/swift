@@ -144,6 +144,11 @@ public abstract class AbstractRunner {
 		}
 	}
 
+	/**
+	 * Check the associate worker, throw an exception if there is a failure detected.
+	 */
+	public abstract void check();
+
 	class SynchronousRequestReceiver implements Runnable {
 		private volatile boolean keepRunning = true;
 

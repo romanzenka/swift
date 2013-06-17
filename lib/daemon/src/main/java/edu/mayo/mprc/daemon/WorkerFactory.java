@@ -13,4 +13,10 @@ public interface WorkerFactory extends FactoryDescriptor {
 	 * @return Fully configured worker.
 	 */
 	Worker createWorker();
+
+	/**
+	 * Ensure that the worker to be created will work (all of its attributes are correctly set).
+	 * Utilize the {@link edu.mayo.mprc.daemon.Worker#check} method.
+	 */
+	void checkWorker();
 }

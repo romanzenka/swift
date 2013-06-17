@@ -590,6 +590,10 @@ public final class MascotDeploymentService extends DeploymentService<DeploymentR
 		return null;
 	}
 
+	@Override
+	public void check() {
+	}
+
 	/**
 	 * this is a class that is in charge of monitorying the monitor.log file for changes to the
 	 */

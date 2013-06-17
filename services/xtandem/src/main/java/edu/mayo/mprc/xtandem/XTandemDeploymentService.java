@@ -65,6 +65,11 @@ public final class XTandemDeploymentService extends DeploymentService<Deployment
 		return CO_DEPLOYMENTS;
 	}
 
+	@Override
+	public void check() {
+		// No check needed - this is a no-op
+	}
+
 	/**
 	 * Configuration for the factory
 	 */

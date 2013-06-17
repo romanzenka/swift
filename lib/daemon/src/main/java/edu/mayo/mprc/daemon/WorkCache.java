@@ -70,6 +70,13 @@ public abstract class WorkCache<T extends WorkPacket> implements NoLoggingWorker
 		}
 	}
 
+	@Override
+	public void check() {
+		if (!cacheFolder.isDirectory() || !cacheFolder.canWrite()) {
+			throw new MprcException("The cache folder is not writeable: " + cacheFolder.getAbsolutePath());
+		}
+	}
+
 	/**
 	 * By default returns folder based on the hash code of the task description.
 	 * Your cache can override this implementation.

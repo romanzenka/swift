@@ -285,16 +285,8 @@ public final class SwiftSearcher implements Worker {
 		this.reportDecoyHits = reportDecoyHits;
 	}
 
-	public void assertValid() {
-		assert supportedEngines != null : "Supported engines must not be null";
-		assert !raw2mgfEnabled || raw2mgfDaemon != null : "Raw2mgf daemon must be set up if it is enabled";
-		assert !mgf2mgfEnabled || mgfCleanupDaemon != null : "MgfCleanup daemon must be set up if it is enabled";
-		assert !msconvertEnabled || msconvertDaemon != null : "Msconvert daemon must be set up if it is enabled";
-	}
-
 	public void processRequest(final WorkPacket workPacket, final ProgressReporter progressReporter) {
 		try {
-			assertValid();
 			if (!(workPacket instanceof SwiftSearchWorkPacket)) {
 				throw new DaemonException("Unknown request type: " + workPacket.getClass().getName());
 			}
@@ -309,6 +301,22 @@ public final class SwiftSearcher implements Worker {
 			service.execute(searchRunner);
 		} catch (Exception t) {
 			progressReporter.reportFailure(t);
+		}
+	}
+
+	@Override
+	public void check() {
+		if (supportedEngines != null) {
+			throw new MprcException("Supported engines must not be null");
+		}
+		if (!(!raw2mgfEnabled || raw2mgfDaemon != null)) {
+			throw new MprcException("Raw2mgf daemon must be set up if it is enabled");
+		}
+		if (!(!mgf2mgfEnabled || mgfCleanupDaemon != null)) {
+			throw new MprcException("MgfCleanup daemon must be set up if it is enabled");
+		}
+		if (!(!msconvertEnabled || msconvertDaemon != null)) {
+			throw new MprcException("Msconvert daemon must be set up if it is enabled");
 		}
 	}
 

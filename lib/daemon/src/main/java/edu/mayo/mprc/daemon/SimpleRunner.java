@@ -46,6 +46,11 @@ public final class SimpleRunner extends AbstractRunner {
 		executorService.execute(new RequestProcessor(worker, request));
 	}
 
+	@Override
+	public void check() {
+		factory.checkWorker();
+	}
+
 	public void stop() {
 		super.stop();
 		executorService.shutdownNow();

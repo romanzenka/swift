@@ -58,6 +58,12 @@ public class FastaDbWorker extends WorkerBase {
 		}
 	}
 
+	@Override
+	public void check() {
+		// As long as the database works, this should be ok
+		// TODO: Check the database for being functional
+	}
+
 	/**
 	 * A factory capable of creating the worker
 	 */

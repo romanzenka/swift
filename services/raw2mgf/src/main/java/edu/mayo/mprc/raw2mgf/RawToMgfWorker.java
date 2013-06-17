@@ -364,6 +364,22 @@ public final class RawToMgfWorker extends WorkerBase {
 		return spectrumBatchSize;
 	}
 
+	@Override
+	public void check() {
+		if (!tempFolder.isDirectory() || !tempFolder.canWrite()) {
+			throw new MprcException("Cannot write the temporary folder: " + tempFolder.getAbsolutePath());
+		}
+		if (!extractMsnExecutable.isFile()) {
+			throw new MprcException("I do not see executable extract_msn: " + extractMsnExecutable.getPath());
+		}
+		if (!Strings.isNullOrEmpty(wrapperScript) && !new File(wrapperScript).canExecute()) {
+			throw new MprcException("Wrapper script is defined, but does not seem to be present/executable: " + wrapperScript);
+		}
+		if (xvfbWrapperScript != null && !xvfbWrapperScript.canExecute()) {
+			throw new MprcException("XVFB Wrapper script is defined, but does not seem to be present/executable: " + xvfbWrapperScript.getAbsolutePath());
+		}
+	}
+
 	/**
 	 * A factory capable of creating the worker
 	 */

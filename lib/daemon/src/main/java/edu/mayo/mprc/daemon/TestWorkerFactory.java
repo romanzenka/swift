@@ -18,6 +18,11 @@ final class TestWorkerFactory implements WorkerFactory {
 	}
 
 	@Override
+	public void checkWorker() {
+		finalWorker.check();
+	}
+
+	@Override
 	public String getType() {
 		return "test";
 	}

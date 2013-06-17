@@ -170,6 +170,10 @@ public final class MyriMatchDeploymentService extends DeploymentService<Deployme
 		return CO_DEPLOYMENTS;
 	}
 
+	@Override
+	public void check() {
+	}
+
 	/**
 	 * Configuration for the factory
 	 */

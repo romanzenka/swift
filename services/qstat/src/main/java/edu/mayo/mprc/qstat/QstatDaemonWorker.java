@@ -44,6 +44,14 @@ public final class QstatDaemonWorker extends WorkerBase {
 		return "qstat querying support";
 	}
 
+	@Override
+	public void check() {
+		// Just run qstat to see it works
+		final ProcessBuilder builder = new ProcessBuilder("qstat");
+		final ProcessCaller caller = new ProcessCaller(builder);
+		caller.runAndCheck("qstat");
+	}
+
 	/**
 	 * A factory capable of creating the worker
 	 */
