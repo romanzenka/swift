@@ -140,6 +140,7 @@ public final class ScaffoldModificationFormat {
 		if (matchingMod == null) {
 			matchingMod = modSet.getByTitle(scaffoldMod.getTitle());
 		}
+		matchingMod = fixTandemPyro(matchingMod, scaffoldSpecificity);
 		if (!Objects.equal(matchingMod.getComposition(), scaffoldMod.getComposition())) {
 			throw new MprcException("Modification reported by Scaffold does not match your unimod modification. " +
 					"RecordId=[" + recordId + "], " +
@@ -245,7 +246,7 @@ public final class ScaffoldModificationFormat {
 	 */
 	private String fixDehydration(final String title, final char residue, final Terminus terminus) {
 		String effectiveTitle = title;
-		if ("Dehydrated".equalsIgnoreCase(title) && Terminus.Nterm.equals(terminus)) {
+		if (("Dehydrated".equalsIgnoreCase(title) || "Pyro_glu".equalsIgnoreCase(title)) && Terminus.Nterm.equals(terminus)) {
 			if (residue == 'E') {
 				effectiveTitle = "Glu->Pyro-glu";
 			}
@@ -286,6 +287,23 @@ public final class ScaffoldModificationFormat {
 			}
 		}
 		return effectiveTitle;
+	}
+
+	/**
+	 * HACK: Anothe part of the workaround. pyro-cmC on carbamidomethylated C as reported by Scaffold
+	 * should actually be reported as Ammonia-loss.
+	 *
+	 * @param matchingMod         What we found in our database.
+	 * @param scaffoldSpecificity What Scaffold requested.
+	 * @return Cleaned up matching mod in case we ran into the X!Tandem pyro-cmC problem
+	 */
+	private Mod fixTandemPyro(final Mod matchingMod, final ModSpecificity scaffoldSpecificity) {
+		// It is the broken PYRO_CMC mod
+		if (PYRO_CMC.equalsIgnoreCase(scaffoldSpecificity.getModification().getTitle()) && checkPyroCmcBroken()) {
+			// Replace the modification with ammonia loss (-NH3) on the top of carbamidomethylation
+			return modSet.getByTitle("Ammonia-loss");
+		}
+		return matchingMod;
 	}
 
 	/**
