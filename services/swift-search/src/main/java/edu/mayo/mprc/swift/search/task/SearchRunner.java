@@ -999,8 +999,8 @@ public final class SearchRunner implements Runnable {
 		return engine.getCode() + ':' + curation.getId() + ":" + ("SEQUEST".equalsIgnoreCase(engine.getCode()) ? paramFileToString(paramFile) : "");
 	}
 
-	private static String paramFileToString(File paramFile) {
-		return (paramFile == null ? "<null>" : paramFile.getAbsolutePath());
+	private static String paramFileToString(final File paramFile) {
+		return paramFile == null ? "<null>" : paramFile.getAbsolutePath();
 	}
 
 	public SwiftSearchDefinition getSearchDefinition() {
