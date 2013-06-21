@@ -128,7 +128,7 @@ public class TestTandem {
 	private File getTandemParams() throws IOException {
 		final Mappings mapping = createTestMappings(mappingFactory);
 
-		final File paramFile = new File(tandemTemp, mappingFactory.getCanonicalParamFileName());
+		final File paramFile = new File(tandemTemp, mappingFactory.getCanonicalParamFileName(""));
 		mapping.write(mapping.baseSettings(), Files.newWriter(paramFile, Charsets.UTF_8));
 
 		return paramFile;

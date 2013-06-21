@@ -21,8 +21,9 @@ public final class MascotMappingFactory implements MappingFactory {
 		return MASCOT;
 	}
 
-	public String getCanonicalParamFileName() {
-		return "mascot.params";
+	@Override
+	public String getCanonicalParamFileName(final String distinguishingString) {
+		return "mascot" + distinguishingString + ".params";
 	}
 
 	public ParamsInfo getParamsInfo() {

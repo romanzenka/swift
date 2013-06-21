@@ -146,7 +146,7 @@ public class TestOmssaWorker {
 		mapping.read(isr);
 		FileUtilities.closeQuietly(isr);
 
-		final File omssaParamFile = new File(omssaTemp, mappingFactory.getCanonicalParamFileName());
+		final File omssaParamFile = new File(omssaTemp, mappingFactory.getCanonicalParamFileName(""));
 
 		final BufferedWriter writer = Files.newWriter(omssaParamFile, Charsets.UTF_8);
 		final Reader oldParams = mapping.baseSettings();

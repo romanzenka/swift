@@ -1,6 +1,7 @@
 package edu.mayo.mprc.swift.dbmapping;
 
 import edu.mayo.mprc.database.PersistableBase;
+import edu.mayo.mprc.swift.params2.SearchEngineParameters;
 
 import java.io.File;
 
@@ -32,15 +33,18 @@ public class FileSearch extends PersistableBase {
 
 	private Integer swiftSearchDefinitionId;
 
+	private SearchEngineParameters searchParameters;
+
 	public FileSearch() {
 	}
 
-	public FileSearch(final File inputFile, final String biologicalSample, final String categoryName, final String experiment, final EnabledEngines enabledEngines) {
+	public FileSearch(final File inputFile, final String biologicalSample, final String categoryName, final String experiment, final EnabledEngines enabledEngines, final SearchEngineParameters searchParameters) {
 		this.inputFile = inputFile;
 		this.biologicalSample = biologicalSample;
 		this.categoryName = categoryName;
 		this.experiment = experiment;
 		this.enabledEngines = enabledEngines;
+		this.searchParameters = searchParameters;
 	}
 
 	public File getInputFile() {
@@ -91,6 +95,18 @@ public class FileSearch extends PersistableBase {
 		this.swiftSearchDefinitionId = id;
 	}
 
+	public SearchEngineParameters getSearchParameters() {
+		return searchParameters;
+	}
+
+	public SearchEngineParameters getSearchParametersWithDefault(final SearchEngineParameters defaultParameters) {
+		return searchParameters == null ? defaultParameters : searchParameters;
+	}
+
+	public void setSearchParameters(SearchEngineParameters searchParameters) {
+		this.searchParameters = searchParameters;
+	}
+
 	@Override
 	public boolean equals(final Object o) {
 		if (this == o) {
@@ -120,6 +136,9 @@ public class FileSearch extends PersistableBase {
 		if (getSwiftSearchDefinitionId() != null ? !getSwiftSearchDefinitionId().equals(that.getSwiftSearchDefinitionId()) : that.getSwiftSearchDefinitionId() != null) {
 			return false;
 		}
+		if (getSearchParameters() != null ? !getSearchParameters().equals(that.getSearchParameters()) : that.getSearchParameters() != null) {
+			return false;
+		}
 
 		return true;
 	}
@@ -132,6 +151,7 @@ public class FileSearch extends PersistableBase {
 		result = 31 * result + (getExperiment() != null ? getExperiment().hashCode() : 0);
 		result = 31 * result + (getEnabledEngines() != null ? getEnabledEngines().hashCode() : 0);
 		result = 31 * result + (getSwiftSearchDefinitionId() != null ? getSwiftSearchDefinitionId().hashCode() : 0);
+		result = 31 * result + (getSearchParameters() != null ? getSearchParameters().hashCode() : 0);
 		return result;
 	}
 

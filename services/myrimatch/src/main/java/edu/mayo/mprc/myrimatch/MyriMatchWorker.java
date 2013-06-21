@@ -78,7 +78,7 @@ public final class MyriMatchWorker extends WorkerBase {
 		LOGGER.debug("Input file " + inputFile.getAbsolutePath() + " does" + (inputFile.exists() && inputFile.length() > 0 ? " " : " not ") + "exist.");
 		LOGGER.debug("Parameter file " + paramsFile.getAbsolutePath() + " does" + (paramsFile.exists() && paramsFile.length() > 0 ? " " : " not ") + "exist.");
 
-		File modifiedParamsFile = new File(paramsFile.getParent(), "myrimatch.cfg");
+		File modifiedParamsFile = MyriMatchMappingFactory.resultingParamsFile(paramsFile);
 		if (!modifiedParamsFile.exists() || modifiedParamsFile.lastModified() < paramsFile.lastModified()) {
 
 			try {

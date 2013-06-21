@@ -98,7 +98,7 @@ public final class Analysis extends PersistableBase {
 	public String peptideReport() {
 		final StringBuilder builder = new StringBuilder();
 		builder.append(
-						"Biological sample category\t" +
+				"Biological sample category\t" +
 						"Biological sample name\t" +
 						"Protein identification probability\t" +
 						"Number of Unique Peptides\t" +
@@ -200,10 +200,11 @@ public final class Analysis extends PersistableBase {
 		r.startTable("Results"); // -- Results
 
 		final SwiftSearchDefinition searchDefinition = searchDbDao.getSearchDefinition(this.getId());
+		// TODO: Theoretically we can have different starred proteins for two different input files
 		final StarredProteins starredProteins =
-				searchDefinition!=null && searchDefinition.getSearchParameters() != null &&
+				searchDefinition != null && searchDefinition.getSearchParameters() != null &&
 						searchDefinition.getSearchParameters().getScaffoldSettings() != null ?
-				searchDefinition.getSearchParameters().getScaffoldSettings().getStarredProteins() : null;
+						searchDefinition.getSearchParameters().getScaffoldSettings().getStarredProteins() : null;
 		final boolean starredColumn = starredProteins != null;
 		final StarMatcher matcher;
 		if (starredColumn) {

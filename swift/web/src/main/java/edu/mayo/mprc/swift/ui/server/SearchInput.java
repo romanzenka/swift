@@ -18,6 +18,7 @@ public final class SearchInput {
 	private String[] experiments;
 	private String[] enabledEngineCodes;
 	private String[] enabledEngineVersions;
+	private int[] paramSetIds;
 	private boolean peptideReport;
 	private boolean fromScratch;
 	private boolean lowPriority;
@@ -31,10 +32,20 @@ public final class SearchInput {
 		paramSetId = Integer.parseInt(searchInputMap.getFirst("paramSetId"));
 		inputFilePaths = getStringArray(searchInputMap, "inputFilePaths");
 		biologicalSamples = getStringArray(searchInputMap, "biologicalSamples");
-		categoryNames  = getStringArray(searchInputMap, "categoryNames");
-		experiments  = getStringArray(searchInputMap, "experiments");
+		categoryNames = getStringArray(searchInputMap, "categoryNames");
+		experiments = getStringArray(searchInputMap, "experiments");
 		enabledEngineCodes = getStringArray(searchInputMap, "enabledEngineCodes");
 		enabledEngineVersions = getStringArray(searchInputMap, "enabledEngineVersions");
+		if (searchInputMap.get("paramSetIds") != null) {
+			// If set, use the values
+			paramSetIds = getIntArray(searchInputMap, "paramSetIds");
+		} else {
+			// If not, replicate the global search id over and over
+			paramSetIds = new int[inputFilePaths.length];
+			for (int i = 0; i < inputFilePaths.length; i++) {
+				paramSetIds[i] = paramSetId;
+			}
+		}
 		peptideReport = isTrue(searchInputMap, "peptideReport");
 		fromScratch = isTrue(searchInputMap, "fromScratch");
 		lowPriority = isTrue(searchInputMap, "lowPriority");
@@ -50,6 +61,17 @@ public final class SearchInput {
 		final List<String> strings = searchInputMap.get(key);
 		final String[] result = new String[strings.size()];
 		strings.toArray(result);
+		return result;
+	}
+
+	private static int[] getIntArray(final MultiValueMap<String, String> searchInputMap, final String key) {
+		final List<String> strings = searchInputMap.get(key);
+		final int[] result = new int[strings.size()];
+		int i = 0;
+		for (final String value : strings) {
+			result[i] = Integer.parseInt(value);
+			i++;
+		}
 		return result;
 	}
 
@@ -83,6 +105,14 @@ public final class SearchInput {
 
 	public void setParamSetId(final int paramSetId) {
 		this.paramSetId = paramSetId;
+	}
+
+	public int[] getParamSetIds() {
+		return paramSetIds;
+	}
+
+	public void setParamSetIds(int[] paramSetIds) {
+		this.paramSetIds = paramSetIds;
 	}
 
 	public String[] getInputFilePaths() {

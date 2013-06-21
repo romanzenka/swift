@@ -182,9 +182,9 @@ public final class XTandemWorker extends WorkerBase {
 		try {
 			matcher = new StreamRegExMatcher(templateFile);
 			matcher.replaceAll(replacements);
-			final File outFile = new File(outFolder, templateFile.getName() + '.' + System.currentTimeMillis());
-			matcher.writeContentsToFile(outFile);
-			return outFile;
+			final File resultingParamsFile = XTandemMappingFactory.resultingParamsFile(templateFile);
+			matcher.writeContentsToFile(resultingParamsFile);
+			return resultingParamsFile;
 		} catch (IOException e) {
 			throw new MprcException("Could not read the tandem template or write it perhaps couldn't write it out with substitutions.", e);
 		} finally {

@@ -24,7 +24,7 @@ import java.util.Collection;
  * Since the object is very heavy-weight, it should not be stored and transferred as is. Instead use the {@link #getCode()} method
  * and {@link #getForId}.
  */
-public final class SearchEngine implements Comparable<SearchEngine> {
+public final class SearchEngine implements Comparable<SearchEngine>, Serializable {
 	private EngineMetadata engineMetadata;
 	private Config config;
 
@@ -86,18 +86,19 @@ public final class SearchEngine implements Comparable<SearchEngine> {
 	/**
 	 * Produce a parameter file for the search engine, with default name, in the given folder.
 	 *
-	 * @param folder      Folder to put the param file to.
-	 * @param params      Generic search engine parameter set.
-	 * @param validations Object to be filled with parameter file validations
+	 * @param folder             Folder to put the param file to.
+	 * @param params             Generic search engine parameter set.
+	 * @param distinguishingName A name to distinguish different parameter files within the same folder
+	 * @param validations        Object to be filled with parameter file validations
 	 * @return The generated parameter file.
 	 */
-	public File writeSearchEngineParameterFile(final File folder, final SearchEngineParameters params, final ParamsValidations validations, final ParamsInfo paramsInfo) {
+	public File writeSearchEngineParameterFile(final File folder, final SearchEngineParameters params, final String distinguishingName, final ParamsValidations validations, final ParamsInfo paramsInfo) {
 		if (getMappingFactory() == null) {
 			// This engine does not support mapping (e.g. Scaffold).
 			return null;
 		}
 
-		final File paramFile = new File(folder, getMappingFactory().getCanonicalParamFileName());
+		final File paramFile = new File(folder, getMappingFactory().getCanonicalParamFileName(distinguishingName));
 		final Writer writer = FileUtilities.getWriter(paramFile);
 
 		writeSearchEngineParameters(params, validations, writer, paramsInfo);

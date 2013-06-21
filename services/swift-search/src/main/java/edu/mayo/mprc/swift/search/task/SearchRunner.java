@@ -95,13 +95,13 @@ public final class SearchRunner implements Runnable {
 	private Map<File, SpectrumQaTask> spectrumQaTasks = new HashMap<File, SpectrumQaTask>();
 
 	/**
-	 * Key: (engine, param file) tuple, obtained by {@link #getDbDeploymentHashKey(edu.mayo.mprc.swift.db.SearchEngine)}.<br/>
+	 * Key: engine:curationId:param file tuple, obtained by {@link #getDbDeploymentHashKey}.<br/>
 	 * Value: Database deployment task.
 	 */
-	private Map<SearchEngine, DatabaseDeployment> databaseDeployments = new HashMap<SearchEngine, DatabaseDeployment>();
+	private Map<String, DatabaseDeployment> databaseDeployments = new HashMap<String, DatabaseDeployment>();
 
 	/**
-	 * Key: "engine:input file" tuple, obtained by {@link #getEngineSearchHashKey(edu.mayo.mprc.swift.db.SearchEngine, java.io.File)}.<br/>
+	 * Key: "engine:input file:parameter file" triple, obtained by {@link #getEngineSearchHashKey}.<br/>
 	 * Value: Engine search task.
 	 */
 	private Map<String, EngineSearchTask> engineSearches = new HashMap<String, EngineSearchTask>();
@@ -160,7 +160,20 @@ public final class SearchRunner implements Runnable {
 	private ExecutorService service;
 
 	private FileTokenFactory fileTokenFactory;
-	private Map<SearchEngine, File> parameterFiles;
+
+	/**
+	 * Key: {@link SearchEngineParameters} parameter set
+	 * Value: A string uniquely identifying the parameter set.
+	 * <p/>
+	 * When there is just one parameter set, the string would be "".
+	 * When there are more, the string would be '1' for the first parameter set mentioned by first input file, '2' for second and so on.
+	 */
+	private Map<SearchEngineParameters, String> searchEngineParametersNames;
+	/**
+	 * Key: search engine:{@link #getSearchEngineParametersName}
+	 * Value: parameter file name
+	 */
+	private Map<String, File> parameterFiles;
 
 	/**
 	 * Making files distinct in case the search uses same file name several times.
@@ -322,13 +335,15 @@ public final class SearchRunner implements Runnable {
 		for (final FileSearch inputFile : searchDefinition.getInputFiles()) {
 			file = inputFile.getInputFile();
 			if (file.exists()) {
-				addInputFileToLists(inputFile, Boolean.TRUE.equals(searchDefinition.getPublicSearchFiles()));
+				addInputFileToLists(inputFile, searchDefinition.getSearchParameters(), Boolean.TRUE.equals(searchDefinition.getPublicSearchFiles()));
 			} else {
 				LOGGER.info("Skipping nonexistent input file [" + file.getAbsolutePath() + "]");
 			}
 		}
 
-		addFastaDbCall(searchDefinition.getSearchParameters().getDatabase());
+		for (final FileSearch fileSearch : searchDefinition.getInputFiles()) {
+			addFastaDbCall(fileSearch.getSearchParametersWithDefault(searchDefinition.getSearchParameters()).getDatabase());
+		}
 	}
 
 	private SearchEngine getSearchEngine(final String code) {
@@ -376,6 +391,8 @@ public final class SearchRunner implements Runnable {
 	 * Save parameter files to the disk.
 	 */
 	private void createParameterFiles() {
+		searchEngineParametersNames = nameSearchEngineParameters(searchDefinition.getInputFiles(), searchDefinition.getSearchParameters());
+
 		// Obtain a set of all search engines that were requested
 		// This way we only create config files that we need
 		final Set<String> enabledEngines = new HashSet<String>();
@@ -389,19 +406,52 @@ public final class SearchRunner implements Runnable {
 
 		final File paramFolder = new File(searchDefinition.getOutputFolder(), DEFAULT_PARAMS_FOLDER);
 		FileUtilities.ensureFolderExists(paramFolder);
-		parameterFiles = new HashMap<SearchEngine, File>();
-		final SearchEngineParameters params = searchDefinition.getSearchParameters();
+		parameterFiles = new HashMap<String, File>();
 		if (!enabledEngines.isEmpty()) {
 			FileUtilities.ensureFolderExists(paramFolder);
 			for (final String engineCode : enabledEngines) {
 				final SearchEngine engine = getSearchEngine(engineCode);
-				final File file = engine.writeSearchEngineParameterFile(paramFolder, params, null /*We do not validate, validation should be already done*/, paramsInfo);
-				addParamFile(engineCode, file);
+				for (final Map.Entry<SearchEngineParameters, String> parameterSet : searchEngineParametersNames.entrySet()) {
+					final File file = engine.
+							writeSearchEngineParameterFile(paramFolder, parameterSet.getKey(), parameterSet.getValue(), null /*We do not validate, validation should be already done*/, paramsInfo);
+					addParamFile(engineCode, parameterSet.getValue(), file);
+				}
 			}
 		}
 	}
 
-	void addInputFileToLists(final FileSearch inputFile, final boolean publicSearchFiles) {
+	/**
+	 * Create a map from all used search engine parameters to short names that distinguish them.
+	 */
+	private static Map<SearchEngineParameters, String> nameSearchEngineParameters(final List<FileSearch> searches, final SearchEngineParameters defaultParameters) {
+		final List<SearchEngineParameters> parameters = new ArrayList<SearchEngineParameters>(10);
+		final Collection<SearchEngineParameters> seenParameters = new HashSet<SearchEngineParameters>(10);
+		for (final FileSearch fileSearch : searches) {
+			final SearchEngineParameters searchParameters = fileSearch.getSearchParametersWithDefault(defaultParameters);
+			if (!seenParameters.contains(searchParameters)) {
+				seenParameters.add(searchParameters);
+				parameters.add(searchParameters);
+			}
+		}
+		// Now we have a list of unique search parameters in same order as they appear in files
+		final Map<SearchEngineParameters, String> resultMap = new HashMap<SearchEngineParameters, String>(parameters.size());
+		if (parameters.size() == 1) {
+			resultMap.put(parameters.get(0), "");
+		} else {
+			for (int i = 0; i < parameters.size(); i++) {
+				resultMap.put(parameters.get(i), String.valueOf(i + 1));
+			}
+		}
+		return resultMap;
+	}
+
+	String getSearchEngineParametersName(SearchEngineParameters parameters) {
+		return searchEngineParametersNames.get(parameters);
+	}
+
+	void addInputFileToLists(final FileSearch inputFile, final SearchEngineParameters defaultSearchParameters, final boolean publicSearchFiles) {
+		final SearchEngineParameters searchParameters = inputFile.getSearchParametersWithDefault(defaultSearchParameters);
+
 		final FileProducingTask mgfOutput = addMgfProducingProcess(inputFile);
 		addInputAnalysis(inputFile, mgfOutput);
 
@@ -410,14 +460,14 @@ public final class SearchRunner implements Runnable {
 		if (scaffold != null && scaffoldVersion(inputFile) != null) {
 			scaffoldDeployment =
 					addDatabaseDeployment(scaffold, null/*scaffold has no param file*/,
-							searchDefinition.getSearchParameters().getDatabase());
+							searchParameters.getDatabase());
 		}
 		final SearchEngine idpicker = getIdpickerEngine();
 		DatabaseDeployment idpickerDeployment = null;
 		if (idpicker != null && searchWithIdpicker(inputFile)) {
 			idpickerDeployment =
 					addDatabaseDeployment(idpicker, null/*idpicker has no param file*/,
-							searchDefinition.getSearchParameters().getDatabase());
+							searchParameters.getDatabase());
 		}
 
 		ScaffoldTask scaffoldTask = null;
@@ -428,14 +478,14 @@ public final class SearchRunner implements Runnable {
 			// While building these, the Scaffold search entry itself is initialized in a separate list
 			// The IDPicker search is special as well, it is set up to process the results of the myrimatch search
 			if (isNormalEngine(engine) && inputFile.getEnabledEngines().isEnabled(engine.getCode())) {
-				final File paramFile = getParamFile(engine);
+				final File paramFile = getParamFile(engine, searchParameters);
 
 				DatabaseDeploymentResult deploymentResult = null;
 				// Sequest deployment is counter-productive for particular input fasta file
-				if (sequest(engine) && noSequestDeployment()) {
-					deploymentResult = new NoSequestDeploymentResult(curationDao.findCuration(searchDefinition.getSearchParameters().getDatabase().getShortName()).getCurationFile());
+				if (sequest(engine) && noSequestDeployment(inputFile, defaultSearchParameters)) {
+					deploymentResult = new NoSequestDeploymentResult(curationDao.findCuration(searchParameters.getDatabase().getShortName()).getCurationFile());
 				} else {
-					deploymentResult = addDatabaseDeployment(engine, paramFile, searchDefinition.getSearchParameters().getDatabase());
+					deploymentResult = addDatabaseDeployment(engine, paramFile, searchParameters.getDatabase());
 				}
 				final File outputFolder = getOutputFolderForSearchEngine(engine);
 				final EngineSearchTask search = addEngineSearch(engine, paramFile, inputFile.getInputFile(), outputFolder, mgfOutput, deploymentResult, publicSearchFiles);
@@ -467,7 +517,7 @@ public final class SearchRunner implements Runnable {
 			// Ask for dumping the .RAW file since the QA might be disabled
 			if (isRawFile(inputFile)) {
 				final RAWDumpTask rawDumpTask = addRawDumpTask(inputFile.getInputFile(), QaTask.getQaSubdirectory(scaffoldTask.getScaffoldXmlFile()));
-				addSearchDbCall(scaffoldTask, rawDumpTask, searchDefinition.getSearchParameters().getDatabase());
+				addSearchDbCall(scaffoldTask, rawDumpTask, searchParameters.getDatabase());
 			}
 		}
 	}
@@ -488,12 +538,20 @@ public final class SearchRunner implements Runnable {
 		return !engine.getEngineMetadata().isAggregator();
 	}
 
-	private void addParamFile(final String engineCode, final File file) {
-		parameterFiles.put(getSearchEngine(engineCode), file);
+	private void addParamFile(final String engineCode, final String parametersName, final File file) {
+		parameterFiles.put(getParamFileHash(engineCode, parametersName), file);
 	}
 
-	private File getParamFile(final SearchEngine engine) {
-		return parameterFiles.get(engine);
+	private File getParamFile(final SearchEngine engine, final SearchEngineParameters parameters) {
+		return parameterFiles.get(getParamFileHash(engine, parameters));
+	}
+
+	private String getParamFileHash(final SearchEngine engine, final SearchEngineParameters parameters) {
+		return getParamFileHash(engine.getCode(), getSearchEngineParametersName(parameters));
+	}
+
+	private static String getParamFileHash(final String engineCode, final String parametersName) {
+		return engineCode + ":" + parametersName;
 	}
 
 	/**
@@ -519,10 +577,11 @@ public final class SearchRunner implements Runnable {
 	/**
 	 * @return <code>true</code> if the input file has Sequest deployment disabled.
 	 */
-	private boolean noSequestDeployment() {
+	private boolean noSequestDeployment(FileSearch inputFile, SearchEngineParameters defaultParameters) {
 		// Non-specific proteases (do not define restrictions for Rn-1 and Rn prevent sequest from deploying database index
-		return "".equals(searchDefinition.getSearchParameters().getProtease().getRn()) &&
-				"".equals(searchDefinition.getSearchParameters().getProtease().getRnminus1());
+		final SearchEngineParameters parameters = inputFile.getSearchParametersWithDefault(defaultParameters);
+		return "".equals(parameters.getProtease().getRn()) &&
+				"".equals(parameters.getProtease().getRnminus1());
 	}
 
 	/**
@@ -544,14 +603,15 @@ public final class SearchRunner implements Runnable {
 		if (file.getName().endsWith(".mgf")) {
 			mgfOutput = addMgfCleanupStep(inputFile);
 		} else {
-			mgfOutput = addRaw2MgfConversionStep(inputFile);
+			mgfOutput = addRaw2MgfConversionStep(inputFile, searchDefinition.getSearchParameters());
 		}
 		return mgfOutput;
 	}
 
-	private FileProducingTask addRaw2MgfConversionStep(final FileSearch inputFile) {
+	private FileProducingTask addRaw2MgfConversionStep(final FileSearch inputFile, final SearchEngineParameters defaultParameters) {
 		final File file = inputFile.getInputFile();
-		final ExtractMsnSettings conversionSettings = searchDefinition.getSearchParameters().getExtractMsnSettings();
+		final SearchEngineParameters searchParameters = inputFile.getSearchParametersWithDefault(defaultParameters);
+		final ExtractMsnSettings conversionSettings = searchParameters.getExtractMsnSettings();
 
 		final Tuple<String, File> hashKey = getRawToMgfConversionHashKey(file, conversionSettings);
 
@@ -564,7 +624,7 @@ public final class SearchRunner implements Runnable {
 				task = new RawToMgfTask(
 						/*Input file*/ file,
 						/*Mgf file location*/ mgfFile,
-						/*raw2mgf command line*/ searchDefinition.getSearchParameters().getExtractMsnSettings().getCommandLineSwitches(),
+						/*raw2mgf command line*/ searchParameters.getExtractMsnSettings().getCommandLineSwitches(),
 						Boolean.TRUE.equals(searchDefinition.getPublicMgfFiles()),
 						raw2mgfDaemon, fileTokenFactory, isFromScratch());
 
@@ -771,9 +831,8 @@ public final class SearchRunner implements Runnable {
 	 * Make a record for db deployment, if we do not have one already
 	 */
 	DatabaseDeployment addDatabaseDeployment(final SearchEngine engine, final File paramFile, final Curation dbToDeploy) {
-		final SearchEngine hashKey;
 		// The DB deployment is defined by engine for which it is done
-		hashKey = getDbDeploymentHashKey(engine);
+		final String hashKey = getDbDeploymentHashKey(engine, dbToDeploy, paramFile);
 
 		DatabaseDeployment deployment = databaseDeployments.get(hashKey);
 		if (deployment == null) {
@@ -791,7 +850,7 @@ public final class SearchRunner implements Runnable {
 	 * The search also knows about the conversion and db deployment so it can determine when it can run.
 	 */
 	private EngineSearchTask addEngineSearch(final SearchEngine engine, final File paramFile, final File inputFile, final File searchOutputFolder, final FileProducingTask fileProducingTask, final DatabaseDeploymentResult deploymentResult, final boolean publicSearchFiles) {
-		final String searchKey = getEngineSearchHashKey(engine, inputFile);
+		final String searchKey = getEngineSearchHashKey(engine, inputFile, paramFile);
 		EngineSearchTask search = engineSearches.get(searchKey);
 		if (search == null) {
 			final File outputFile = getSearchResultLocation(engine, searchOutputFolder, inputFile);
@@ -917,8 +976,8 @@ public final class SearchRunner implements Runnable {
 		return searchDbTask;
 	}
 
-	private static String getEngineSearchHashKey(final SearchEngine engine, final File file) {
-		return engine.getCode() + ':' + file.getAbsolutePath();
+	private static String getEngineSearchHashKey(final SearchEngine engine, final File file, final File parameterFile) {
+		return engine.getCode() + ':' + file.getAbsolutePath() + ':' + paramFileToString(parameterFile);
 	}
 
 	private static File getMgfCleanupHashKey(final File file) {
@@ -933,8 +992,15 @@ public final class SearchRunner implements Runnable {
 		return new Tuple<String, File>(extractMsnSettings.getCommandLineSwitches(), inputFile);
 	}
 
-	private static SearchEngine getDbDeploymentHashKey(final SearchEngine engine) {
-		return engine;
+	/**
+	 * The database deployment does not care about the param file, unless it is Sequest.
+	 */
+	private static String getDbDeploymentHashKey(final SearchEngine engine, final Curation curation, final File paramFile) {
+		return engine.getCode() + ':' + curation.getId() + ":" + ("SEQUEST".equalsIgnoreCase(engine.getCode()) ? paramFileToString(paramFile) : "");
+	}
+
+	private static String paramFileToString(File paramFile) {
+		return (paramFile == null ? "<null>" : paramFile.getAbsolutePath());
 	}
 
 	public SwiftSearchDefinition getSearchDefinition() {

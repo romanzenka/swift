@@ -190,12 +190,9 @@ public final class ServiceImpl extends SpringGwtServlet implements Service, Appl
 		final SpectrumQa qa = new SpectrumQa("conf/msmseval/msmsEval-orbi.params", SpectrumQa.DEFAULT_ENGINE);
 		final PeptideReport report = searchInput.isPeptideReport() ? new PeptideReport() : null;
 
-		final SavedSearchEngineParameters searchParameters = paramsDao.getSavedSearchEngineParameters(searchInput.getParamSetId());
-		if (searchParameters == null) {
-			throw new MprcException("Could not find saved search parameters for ID: " + searchInput.getParamSetId());
-		}
 		final List<FileSearch> inputFiles = new ArrayList<FileSearch>(searchInput.getInputFilePaths().length);
 		final EnabledEngines enabledEngines = getEnabledEngines(searchInput.getEnabledEngineCodes(), searchInput.getEnabledEngineVersions());
+		final int[] paramSetIds = searchInput.getParamSetIds();
 
 		for (int i = 0; i < searchInput.getInputFilePaths().length; i++) {
 			final String inputFilePath = searchInput.getInputFilePaths()[i];
@@ -203,12 +200,24 @@ public final class ServiceImpl extends SpringGwtServlet implements Service, Appl
 			final String biologicalSample = searchInput.getBiologicalSamples()[i];
 			final String categoryName = searchInput.getCategoryNames()[i];
 			final String experiment = searchInput.getExperiments()[i];
-			inputFiles.add(new FileSearch(inputFile, biologicalSample, categoryName, experiment, enabledEngines));
+
+			inputFiles.add(new FileSearch(inputFile, biologicalSample, categoryName, experiment, enabledEngines, getSearchEngineParameters(paramSetIds[i])));
 		}
 
 		return new SwiftSearchDefinition(searchInput.getTitle(),
-				user, outputFolder, qa, report, searchParameters.getParameters(), inputFiles, searchInput.isPublicMgfFiles(),
+				user, outputFolder, qa, report, getSearchEngineParameters(searchInput.getParamSetId()), inputFiles, searchInput.isPublicMgfFiles(),
 				searchInput.isPublicSearchFiles());
+	}
+
+	private SearchEngineParameters getSearchEngineParameters(int paramSetId) {
+		SearchEngineParameters searchEngineParameters;
+		final SavedSearchEngineParameters searchParameters;
+		searchParameters = paramsDao.getSavedSearchEngineParameters(paramSetId);
+		if (searchParameters == null) {
+			throw new MprcException("Could not find saved search parameters for ID: " + paramSetId);
+		}
+		searchEngineParameters = searchParameters.getParameters();
+		return searchEngineParameters;
 	}
 
 	/**

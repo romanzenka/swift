@@ -12,9 +12,10 @@ public interface MappingFactory extends Serializable {
 	String getSearchEngineCode();
 
 	/**
+	 * @param distinguishingString A string that distinguishes between multiple parameter files in the same directory.
 	 * @return Typical name for the param file storing parameters for this mapping.
 	 */
-	String getCanonicalParamFileName();
+	String getCanonicalParamFileName(String distinguishingString);
 
 	Mappings createMapping();
 }

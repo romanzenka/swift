@@ -18,8 +18,8 @@ public final class SequestMappingFactory implements MappingFactory {
 		return SEQUEST;
 	}
 
-	public String getCanonicalParamFileName() {
-		return "sequest.params";
+	public String getCanonicalParamFileName(final String distinguishingString) {
+		return "sequest" + distinguishingString + ".params";
 	}
 }
 

@@ -107,7 +107,7 @@ public final class TestMascotDaemonWorker {
 		mapping.read(mapping.baseSettings());
 		mapping.setSequenceDatabase(context, TEST_MASCOT_DB);
 
-		final File result = new File(mascotTemp, factory.getCanonicalParamFileName());
+		final File result = new File(mascotTemp, factory.getCanonicalParamFileName(""));
 		mapping.write(mapping.baseSettings(), Files.newWriter(result, Charsets.UTF_8));
 
 		return result;

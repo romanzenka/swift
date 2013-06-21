@@ -193,7 +193,8 @@ public final class ClientProxyGenerator {
 				entry.getBiologicalSample(),
 				entry.getCategoryName(),
 				entry.getExperiment(),
-				convertFrom(entry.getEnabledEngines()));
+				convertFrom(entry.getEnabledEngines()),
+				null);
 	}
 
 	/**

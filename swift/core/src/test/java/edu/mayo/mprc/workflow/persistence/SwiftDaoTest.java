@@ -163,8 +163,8 @@ public final class SwiftDaoTest {
 
 			parameters = paramsDao.addSearchEngineParameters(parameters);
 
-			final FileSearch fileSearch1 = new FileSearch(new File("input.RAW"), "bio sample", null, "experiment", engines);
-			final FileSearch fileSearch2 = new FileSearch(new File("input.RAW"), "bio sample", null, "experiment", engines);
+			final FileSearch fileSearch1 = new FileSearch(new File("input.RAW"), "bio sample", null, "experiment", engines, parameters);
+			final FileSearch fileSearch2 = new FileSearch(new File("input.RAW"), "bio sample", null, "experiment", engines, parameters);
 
 			final LinkedList<FileSearch> fileSearches1 = new LinkedList<FileSearch>();
 			fileSearches1.add(fileSearch1);

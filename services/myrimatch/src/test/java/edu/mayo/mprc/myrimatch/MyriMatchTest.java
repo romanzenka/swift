@@ -428,7 +428,7 @@ public final class MyriMatchTest {
 
 	private MyriMatchMappings createMappings() {
 		final MyriMatchMappingFactory factory = new MyriMatchMappingFactory();
-		Assert.assertEquals(factory.getCanonicalParamFileName(), "myrimatch.template.cfg");
+		Assert.assertEquals(factory.getCanonicalParamFileName("1"), "myrimatch1.template.cfg");
 		final MyriMatchMappings mapping = (MyriMatchMappings) factory.createMapping();
 		return mapping;
 	}
@@ -440,6 +440,11 @@ public final class MyriMatchTest {
 		final DependencyResolver resolver = new DependencyResolver(null);
 
 		return (MyriMatchWorker) factory.create(config, resolver);
+	}
+
+	@Test
+	public void shouldProvideProperTemplateName() {
+		Assert.assertEquals(MyriMatchMappingFactory.resultingParamsFile(new File("/a/b/test1.template.cfg.template.cfg")), new File("/a/b/test1.template.cfg.cfg"));
 	}
 
 }

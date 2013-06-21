@@ -19,8 +19,8 @@ public final class OmssaMappingFactory implements MappingFactory {
 	/**
 	 * @return Typical name for the param file storing parameters for this mapping.
 	 */
-	public String getCanonicalParamFileName() {
-		return "omssa.params.xml";
+	public String getCanonicalParamFileName(final String distinguishingString) {
+		return "omssa" + distinguishingString + ".params.xml";
 	}
 }
 
