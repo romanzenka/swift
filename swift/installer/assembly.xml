@@ -11,16 +11,22 @@
     <includeSiteDirectory>false</includeSiteDirectory>
     <dependencySets>
         <dependencySet>
-            <useProjectArtifact>true</useProjectArtifact>
+            <useProjectArtifact>false</useProjectArtifact>
             <unpack>false</unpack>
             <fileMode>755</fileMode>
             <directoryMode>755</directoryMode>
-	    <outputDirectory>bin/swift</outputDirectory>
-	    <excludes>
-		    <exclude>edu.mayo.mprc:swift-scripts:jar:3.5-SNAPSHOT</exclude>
-		    <exclude>edu.mayo.mprc:install:jar:3.4</exclude>
-		    <exclude>edu.mayo.mprc:install-exe:jar:3.4</exclude>
-	    </excludes>
+            <outputDirectory>bin/swift</outputDirectory>
+            <excludes>
+                <exclude>edu.mayo.mprc:swift-scripts:jar:3.5-SNAPSHOT</exclude>
+                <exclude>edu.mayo.mprc:install:jar:3.5-SNAPSHOT</exclude>
+                <exclude>edu.mayo.mprc:install-exe:jar:3.5-SNAPSHOT</exclude>
+            </excludes>
+            <unpackOptions>
+                <excludes>
+                    <exclude>**/META-INF</exclude>
+                    <exclude>**/META-INF/**</exclude>
+                </excludes>
+            </unpackOptions>
         </dependencySet>
         <dependencySet>
             <useProjectArtifact>false</useProjectArtifact>
@@ -30,8 +36,14 @@
             <outputDirectory></outputDirectory>
             <includes>
                 <include>edu.mayo.mprc:swift-scripts:jar:3.5-SNAPSHOT</include>
-                <include>edu.mayo.mprc:install-exe:jar:3.4</include>
-		</includes>
+                <include>edu.mayo.mprc:install-exe:jar:3.5-SNAPSHOT</include>
+            </includes>
+            <unpackOptions>
+                <excludes>
+                    <exclude>**/META-INF</exclude>
+                    <exclude>**/META-INF/**</exclude>
+                </excludes>
+            </unpackOptions>
         </dependencySet>
         <dependencySet>
             <useProjectArtifact>false</useProjectArtifact>
@@ -40,8 +52,14 @@
             <directoryMode>755</directoryMode>
             <outputDirectory></outputDirectory>
             <includes>
-                <include>edu.mayo.mprc:install:jar:3.4</include>
+                <include>edu.mayo.mprc:install:jar:3.5-SNAPSHOT</include>
             </includes>
+            <unpackOptions>
+                <excludes>
+                    <exclude>**/META-INF</exclude>
+                    <exclude>**/META-INF/**</exclude>
+                </excludes>
+            </unpackOptions>
         </dependencySet>
     </dependencySets>
 </assembly>
