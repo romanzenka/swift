@@ -20,6 +20,8 @@
                 <exclude>edu.mayo.mprc:swift-scripts:jar:3.5-SNAPSHOT</exclude>
                 <exclude>edu.mayo.mprc:install:jar:3.5-SNAPSHOT</exclude>
                 <exclude>edu.mayo.mprc:install-exe:jar:3.5-SNAPSHOT</exclude>
+                <!-- Exclude the pom from the transitive war dependency collection -->
+                <exclude>edu.mayo.mprc:swift-web:pom:3.5-SNAPSHOT</exclude>
             </excludes>
             <unpackOptions>
                 <excludes>

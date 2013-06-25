@@ -18,6 +18,7 @@ import org.mortbay.jetty.Connector;
 import org.mortbay.jetty.Server;
 import org.mortbay.jetty.webapp.WebAppContext;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.net.InetAddress;
 import java.util.Arrays;
@@ -126,15 +127,14 @@ public final class Launcher implements FileListener {
 			}
 		}
 		try {
-			final String s = "Sending the web server a stop signal";
-			FileUtilities.out(s);
+			LOGGER.info("Sending the web server a stop signal");
 			webServer.stop();
-			FileUtilities.out("Waiting for web server to terminate");
+			LOGGER.info("Waiting for web server to terminate");
 			webServer.join();
-			FileUtilities.out("Web server terminated, exiting");
+			LOGGER.info("Web server terminated, exiting");
 		} catch (Exception t) {
 			// SWALLOWED - just exit
-			FileUtilities.err("Problems stopping the web server:\n\t" + MprcException.getDetailedMessage(t));
+			LOGGER.error("Problems stopping the web server", t);
 		}
 		return restart;
 	}
@@ -165,8 +165,7 @@ public final class Launcher implements FileListener {
 				}
 			});
 		} catch (Exception t) {
-			FileUtilities.err("Swift web server could not be launched. Please run this script with --help for more information.");
-			FileUtilities.stackTrace(t);
+			LOGGER.error("Swift web server could not be launched. Please run this script with --help for more information.", t);
 			System.exit(1);
 			return null;
 		}
@@ -213,12 +212,11 @@ public final class Launcher implements FileListener {
 				try {
 					if (1 == (Integer) future.get()) {
 						final InetAddress localMachine = InetAddress.getLocalHost();
-						FileUtilities.out("Please point your web client to http://" + localMachine.getCanonicalHostName() + ":" + portNumber);
+						LOGGER.info("Please point your web client to http://" + localMachine.getCanonicalHostName() + ":" + portNumber);
 						break;
 					}
 				} catch (Exception t) {
-					FileUtilities.err("Swift web server could not be launched. Please run this script with --help for more information.");
-					FileUtilities.stackTrace(t);
+					LOGGER.error("Swift web server could not be launched. Please run this script with --help for more information.", t);
 					System.exit(EXIT_CODE_ERROR);
 				}
 			}
@@ -238,14 +236,14 @@ public final class Launcher implements FileListener {
 			tempFolder = new File(daemonConfig.getTempFolderPath());
 		} catch (Exception e) {
 			tempFolder = FileUtilities.getDefaultTempDirectory();
-				LOGGER.warn("Could not parse the config file " + configFile.getPath() + " to temporary daemon folder. Using default " + tempFolder, e);
+			LOGGER.warn("Could not parse the config file " + configFile.getPath() + " to temporary daemon folder. Using default " + tempFolder, e);
 		}
 		return tempFolder;
 	}
 
 	static int getPortNumber(final OptionSet options, final File configFile, final String daemonId) {
 		final int portNumber;
-		if (options!=null && options.has("port")) {
+		if (options != null && options.has("port")) {
 			portNumber = (Integer) options.valueOf("port");
 		} else {
 			try {
@@ -288,25 +286,37 @@ public final class Launcher implements FileListener {
 		throw new MprcException("Could not find daemon [" + daemonId + "] in configuration file [" + configFile.getAbsolutePath() + "]");
 	}
 
-	private void displayHelpMessage(final OptionParser parser) {
+	private static void displayHelpMessage(final OptionParser parser) {
 		try {
-			FileUtilities.out("This command starts Swift web interface with the provided configuration parameters.");
-			FileUtilities.out("If Swift is not yet configured, it will run a web server that allows you to configure it first.");
-			FileUtilities.out("");
-			FileUtilities.out("To run Swift daemons (no UI), please use java -jar swift.jar");
-			FileUtilities.out("");
-			FileUtilities.out("Usage:");
-			parser.printHelpOn(System.out);
+			final String helpString = getHelpString(parser);
+
+			LOGGER.info("This command starts Swift web interface with the provided configuration parameters." + "\n" +
+					"If Swift is not yet configured, it will run a web server that allows you to configure it first." + "\n" +
+					"\n" +
+					"Usage:" + "\n" + helpString);
 		} catch (Exception t) {
 			LOGGER.fatal("Could not display help message.", t);
 			System.exit(1);
 		}
 	}
 
+	private static String getHelpString(final OptionParser parser) {
+		try {
+			final ByteArrayOutputStream bos = new ByteArrayOutputStream();
+			parser.printHelpOn(bos);
+			final String result = bos.toString("UTF-8");
+			bos.close();
+			return result;
+		} catch (Exception e) {
+			// SWALLOWED - just say you cannot create the help
+			return "<no help available> : " + MprcException.getDetailedMessage(e);
+		}
+	}
+
 	@Override
 	public void fileChanged(final File file) {
 		synchronized (stopMonitor) {
-			FileUtilities.out("The configuration file " + file.getPath() + " is modified. Restarting.");
+			LOGGER.info("The configuration file " + file.getPath() + " is modified. Restarting.");
 			restartRequested = true;
 			stopMonitor.notifyAll();
 		}
