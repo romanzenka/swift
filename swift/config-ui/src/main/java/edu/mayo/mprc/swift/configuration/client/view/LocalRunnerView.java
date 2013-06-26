@@ -13,7 +13,6 @@ public final class LocalRunnerView extends SimplePanel {
 
 	public static final String THREAD_NUMBER = "Number of Threads";
 	public static final String LOG_OUTPUT_FOLDER = "Log Output Folder";
-	public static final String LOG_OUTPUT_FOLDER_DEFAULT = "var/log";
 
 
 	public LocalRunnerView(final Context context, final ResourceModel model) {
@@ -21,7 +20,7 @@ public final class LocalRunnerView extends SimplePanel {
 
 		builder.start();
 		builder.property("numThreads", THREAD_NUMBER, "Number of simultaneously executing threads.").integerValue(1, MAX_THREADS).defaultValue("1").required();
-		builder.property("logOutputFolder", LOG_OUTPUT_FOLDER, "Output folder where standard out log file and error out log files are stored.").defaultValue(LOG_OUTPUT_FOLDER_DEFAULT).required();
+		builder.property("logOutputFolder", LOG_OUTPUT_FOLDER, "Output folder where standard out log file and error out log files are stored.<p>If you do not enter any value, the setting per daemon will be used.");
 		propertyList = builder.end();
 
 		this.add(propertyList);
@@ -43,8 +42,8 @@ public final class LocalRunnerView extends SimplePanel {
 		resourceModel = model;
 
 		// Clean up potentially missing log folder
-		if (model.getProperty("logOutputFolder") == null || "".equals(model.getProperty("logOutputFolder"))) {
-			model.setProperty("logOutputFolder", LOG_OUTPUT_FOLDER_DEFAULT);
+		if (model.getProperty("logOutputFolder") == null) {
+			model.setProperty("logOutputFolder", "");
 		}
 
 		propertyList.loadUI(resourceModel.getProperties());

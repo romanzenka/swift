@@ -39,7 +39,7 @@ public final class DaemonWorkerTester {
 			this.runner.setExecutorService(getSingleThreadExecutor(worker));
 			this.runner.setDaemonConnection(this.daemonConnection);
 			this.runner.setEnabled(true);
-			this.runner.setLogOutputFolder(FileUtilities.createTempFolder());
+			this.runner.setLogDirectory(FileUtilities.createTempFolder());
 		} catch (URISyntaxException e) {
 			throw new MprcException(e);
 		}
@@ -74,7 +74,7 @@ public final class DaemonWorkerTester {
 			this.runner.setExecutorService(new SimpleThreadPoolExecutor(numWorkerThreads, "test", true));
 			this.runner.setDaemonConnection(this.daemonConnection);
 			this.runner.setEnabled(true);
-			this.runner.setLogOutputFolder(FileUtilities.createTempFolder());
+			this.runner.setLogDirectory(FileUtilities.createTempFolder());
 		} catch (URISyntaxException e) {
 			throw new MprcException(e);
 		}

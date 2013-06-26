@@ -6,6 +6,7 @@ import edu.mayo.mprc.daemon.files.FileTokenHolder;
 import org.apache.log4j.Logger;
 import org.apache.log4j.NDC;
 
+import java.io.File;
 import java.io.Serializable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -29,6 +30,7 @@ public abstract class AbstractRunner {
 	private static final Logger LOGGER = Logger.getLogger(AbstractRunner.class);
 
 	private ExecutorService executorService;
+	private File logDirectory;
 	private SynchronousRequestReceiver receiver;
 
 	public abstract boolean isEnabled();
@@ -176,5 +178,13 @@ public abstract class AbstractRunner {
 		public void cleanShutdown() {
 			keepRunning = false;
 		}
+	}
+
+	public File getLogDirectory() {
+		return logDirectory;
+	}
+
+	public void setLogDirectory(final File logDirectory) {
+		this.logDirectory = logDirectory;
 	}
 }

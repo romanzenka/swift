@@ -23,7 +23,6 @@ public final class SimpleRunner extends AbstractRunner {
 	private boolean operational;
 	private WorkerFactory factory;
 	private ExecutorService executorService;
-	private File logOutputFolder;
 	private DaemonConnection daemonConnection = null;
 
 	public SimpleRunner() {
@@ -70,14 +69,6 @@ public final class SimpleRunner extends AbstractRunner {
 
 	public void setExecutorService(final ExecutorService executorService) {
 		this.executorService = executorService;
-	}
-
-	public File getLogOutputFolder() {
-		return logOutputFolder;
-	}
-
-	public void setLogOutputFolder(final File logOutputFolder) {
-		this.logOutputFolder = logOutputFolder;
 	}
 
 	public boolean isEnabled() {
@@ -144,7 +135,6 @@ public final class SimpleRunner extends AbstractRunner {
 	public static final class Config extends RunnerConfig {
 		public static final int DEFAULT_NUM_THREADS = 1;
 		private int numThreads = 1;
-		private String logOutputFolder = "var/log";
 
 		public Config() {
 		}
@@ -161,25 +151,15 @@ public final class SimpleRunner extends AbstractRunner {
 			this.numThreads = numThreads;
 		}
 
-		public String getLogOutputFolder() {
-			return logOutputFolder;
-		}
-
-		public void setLogOutputFolder(final String logOutputFolder) {
-			this.logOutputFolder = logOutputFolder;
-		}
-
 		@Override
 		public void save(final ConfigWriter writer) {
 			writer.put("numThreads", getNumThreads(), DEFAULT_NUM_THREADS, "Number of threads");
-			writer.put("logOutputFolder", getLogOutputFolder(), "Where to write logs");
 			super.save(writer);
 		}
 
 		@Override
 		public void load(final ConfigReader reader) {
 			numThreads = reader.getInteger("numThreads", DEFAULT_NUM_THREADS);
-			logOutputFolder = reader.get("logOutputFolder");
 			super.load(reader);
 		}
 	}
@@ -200,7 +180,7 @@ public final class SimpleRunner extends AbstractRunner {
 			runner.setExecutorService(new SimpleThreadPoolExecutor(numThreads, runner.getFactory().getUserName(), true));
 			// Important to convert the log file to absolute, otherwise user.dir is not taken into account and
 			// the behavior is inconsistent within the IDE while debugging
-			runner.setLogOutputFolder(new File(config.getLogOutputFolder()).getAbsoluteFile());
+			runner.setLogDirectory(new File(config.getLogOutputFolder()).getAbsoluteFile());
 
 			return runner;
 		}
@@ -264,7 +244,7 @@ public final class SimpleRunner extends AbstractRunner {
 			if (worker instanceof NoLoggingWorker) {
 				logging = null;
 			} else {
-				logging = new LoggingSetup(logOutputFolder);
+				logging = new LoggingSetup(getLogDirectory());
 				try {
 					logging.startLogging();
 				} catch (Exception e) {

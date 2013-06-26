@@ -34,7 +34,6 @@ public final class GridRunner extends AbstractRunner {
 	public static final String NAME = "Sun Grid Engine Runner";
 
 	private static final String WRAPPER_SCRIPT = "wrapperScript";
-	private static final String SHARED_LOG_DIRECTORY = "sharedLogDirectory";
 	private static final String SHARED_TEMP_DIRECTORY = "sharedTempDirectory";
 	private static final String SHARED_WORKING_DIRECTORY = "sharedWorkingDirectory";
 	private static final String NATIVE_SPECIFICATION = "nativeSpecification";
@@ -55,7 +54,6 @@ public final class GridRunner extends AbstractRunner {
 	private File sharedWorkingDirectory;
 	private File sharedTempDirectory;
 	private File outputDirectory;
-	private File sharedLogDirectory;
 	private ResourceConfig workerFactoryConfig;
 
 	private MessengerFactory messengerFactory;
@@ -299,7 +297,7 @@ public final class GridRunner extends AbstractRunner {
 		gridWorkPacket.setMemoryRequirement(memoryRequirement);
 
 		gridWorkPacket.setWorkingFolder(sharedWorkingDirectory.getAbsolutePath());
-		gridWorkPacket.setLogFolder(FileUtilities.getDateBasedDirectory(sharedLogDirectory, new Date()).getAbsolutePath());
+		gridWorkPacket.setLogFolder(FileUtilities.getDateBasedDirectory(getLogDirectory(), new Date()).getAbsolutePath());
 
 		return gridWorkPacket;
 	}
@@ -326,14 +324,6 @@ public final class GridRunner extends AbstractRunner {
 
 	public void setOutputDirectory(final File outputDirectory) {
 		this.outputDirectory = outputDirectory;
-	}
-
-	public File getSharedLogDirectory() {
-		return sharedLogDirectory;
-	}
-
-	public void setSharedLogDirectory(final File sharedLogDirectory) {
-		this.sharedLogDirectory = sharedLogDirectory;
 	}
 
 	public GridEngineJobManager getManager() {
@@ -430,7 +420,6 @@ public final class GridRunner extends AbstractRunner {
 		private String nativeSpecification;
 		private String sharedWorkingDirectory;
 		private String sharedTempDirectory;
-		private String sharedLogDirectory;
 		private String wrapperScript;
 
 		public Config() {
@@ -488,14 +477,6 @@ public final class GridRunner extends AbstractRunner {
 			this.sharedTempDirectory = sharedTempDirectory;
 		}
 
-		public String getSharedLogDirectory() {
-			return sharedLogDirectory;
-		}
-
-		public void setSharedLogDirectory(final String sharedLogDirectory) {
-			this.sharedLogDirectory = sharedLogDirectory;
-		}
-
 		public void save(final ConfigWriter writer) {
 			super.save(writer);
 			writer.put(QUEUE_NAME, getQueueName(), "Name of the SGE queue");
@@ -503,7 +484,6 @@ public final class GridRunner extends AbstractRunner {
 			writer.put(NATIVE_SPECIFICATION, getNativeSpecification(), "Native specification (additional parameters) for the SGE queue");
 			writer.put(SHARED_WORKING_DIRECTORY, getSharedWorkingDirectory(), "The shared working directory for file exchanges");
 			writer.put(SHARED_TEMP_DIRECTORY, getSharedTempDirectory(), "The shared temporary directory for storing temporary files");
-			writer.put(SHARED_LOG_DIRECTORY, getSharedLogDirectory(), "The shared directory to store log files");
 			writer.put(WRAPPER_SCRIPT, getWrapperScript(), "A wrapper script that will ensure smooth execution of the Swift component (create/tear down environment). Takes the command to execute as its parameter.");
 
 		}
@@ -514,7 +494,6 @@ public final class GridRunner extends AbstractRunner {
 			setNativeSpecification(reader.get(NATIVE_SPECIFICATION));
 			setSharedWorkingDirectory(reader.get(SHARED_WORKING_DIRECTORY));
 			setSharedTempDirectory(reader.get(SHARED_TEMP_DIRECTORY));
-			setSharedLogDirectory(reader.get(SHARED_LOG_DIRECTORY));
 			setWrapperScript(reader.get(WRAPPER_SCRIPT));
 			super.load(reader);
 		}
@@ -553,7 +532,7 @@ public final class GridRunner extends AbstractRunner {
 			runner.setSharedWorkingDirectory(new File(config.getSharedWorkingDirectory()).getAbsoluteFile());
 			runner.setSharedTempDirectory(new File(config.getSharedTempDirectory()).getAbsoluteFile());
 			runner.setOutputDirectory(new File(config.getSharedTempDirectory()).getAbsoluteFile());
-			runner.setSharedLogDirectory(new File(config.getSharedLogDirectory()).getAbsoluteFile());
+			runner.setLogDirectory(new File(config.getLogOutputFolder()).getAbsoluteFile());
 			runner.setWrapperScript(config.getWrapperScript());
 			runner.setWorkerFactoryConfig(config.getWorkerConfiguration());
 			runner.setFileTokenFactory(fileTokenFactory);

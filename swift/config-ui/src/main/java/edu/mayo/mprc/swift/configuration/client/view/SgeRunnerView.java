@@ -13,18 +13,15 @@ public final class SgeRunnerView extends SimplePanel {
 	private PropertyList propertyList;
 	private ResourceModel resourceModel;
 
-	public static final String DEFAULT_SHARED_LOG_DIR = "var/log";
 	public static final String DEFAULT_SHARED_TEMP_FOLDER = "var/tmp";
 
 	private static final String QUEUE_NAME = "queueName";
 	private static final String MEMORY_REQUIREMENT = "memoryRequirement";
 	private static final String NATIVE_SPECIFICATION = "nativeSpecification";
 	private static final String SHARED_WORKING_DIRECTORY = "sharedWorkingDirectory";
-	private static final String SHARED_LOG_DIRECTORY = "sharedLogDirectory";
 	private static final String SHARED_TEMP_DIRECTORY = "sharedTempDirectory";
 	private static final String WRAPPER_SCRIPT = "wrapperScript";
-
-
+	private static final String LOG_OUTPUT_FOLDER = "logOutputFolder";
 
 	public SgeRunnerView(final Context context, final ResourceModel model) {
 		final GwtUiBuilder builder = new GwtUiBuilder(context, model);
@@ -33,7 +30,7 @@ public final class SgeRunnerView extends SimplePanel {
 				.property(QUEUE_NAME, "Queue Name", "SGE queue name.<p>There is usually a queue called <tt>all.q</tt> that sends requests to any queue available.").required().defaultValue(DEFAULT_QUEUE_NAME)
 				.property(SHARED_WORKING_DIRECTORY, "Shared Working Folder", "This is a shared folder within the SGE environment. The scripts are executed within this directory. Has to be shared among all the nodes. Important! Any file with a relative path will be relative to this directory at the time of execution.").defaultValue(DEFAULT_SHARED_WORKING_FOLDER).required()
 				.property(SHARED_TEMP_DIRECTORY, "Shared Temp Folder", "This is a shared folder within the SGE environment. Some files may be transferred from remote systems. These transferred files are stored within this directory.").defaultValue(DEFAULT_SHARED_TEMP_FOLDER).required()
-				.property(SHARED_LOG_DIRECTORY, "Shared Log Folder", "This is a shared folder within the SGE environment. Output folder where standard out log file and error out log files are stored.").defaultValue(DEFAULT_SHARED_LOG_DIR).required()
+				.property(LOG_OUTPUT_FOLDER, "Shared Log Folder", "This is a shared folder within the SGE environment. Output folder where standard out log file and error out log files are stored. If not entered, the default per daemon will be used.").defaultValue("")
 				.property(WRAPPER_SCRIPT, "Wrapper Script", "The command is executed through this script that servers as a wrapper. We typically use the wrapper to set umask or produce some log messages. Empty field means the command will be executed directly, with no wrapping.").defaultValue(DEFAULT_WRAPPER_SCRIPT)
 				.property(NATIVE_SPECIFICATION, "Native Specification", "SGE native specification, for example, -p for running task in pvm.")
 				.property(MEMORY_REQUIREMENT, "Memory Requirement", "SGE memory requirement for jobs running in this queue.<p>Integer, in MB.</p><p>Will set <tt>-l s_vmem=</tt> memory soft limit option for SGE.</p>");
