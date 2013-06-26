@@ -89,8 +89,10 @@ public final class TestDaemonFactory {
 		final ApplicationConfig config = new ApplicationConfig(new DependencyResolver(table));
 		final DaemonConfig daemon1 = new DaemonConfig();
 		daemon1.setName("daemon1");
+		daemon1.setLogOutputFolder("var/log");
 		final DaemonConfig daemon2 = new DaemonConfig();
 		daemon2.setName("daemon2");
+		daemon2.setLogOutputFolder("var/log");
 		config.addDaemon(daemon1);
 		config.addDaemon(daemon2);
 		final MessageBroker.Config messageBroker = new MessageBroker.Config();
@@ -121,6 +123,7 @@ public final class TestDaemonFactory {
 		final ApplicationConfig config = new ApplicationConfig(new DependencyResolver(table));
 
 		final DaemonConfig main = new DaemonConfig();
+		main.setLogOutputFolder("var/log");
 		main.setName("main");
 
 		final SimpleRunner.Config runner = new SimpleRunner.Config();

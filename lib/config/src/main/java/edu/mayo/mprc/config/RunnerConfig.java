@@ -1,5 +1,7 @@
 package edu.mayo.mprc.config;
 
+import com.google.common.base.Strings;
+
 /**
  * A runner is code that waits for work packets and then passes them to a worker.
  */
@@ -43,7 +45,9 @@ public abstract class RunnerConfig implements ResourceConfig {
 	@Override
 	public void save(ConfigWriter writer) {
 		writer.put(WORKER, getWorkerConfiguration());
-		writer.put(LOG_OUTPUT_FOLDER, getLogOutputFolder(), "Where to write logs");
+		if (!Strings.isNullOrEmpty(getLogOutputFolder())) {
+			writer.put(LOG_OUTPUT_FOLDER, getLogOutputFolder(), "Where to write logs");
+		}
 	}
 
 	@Override

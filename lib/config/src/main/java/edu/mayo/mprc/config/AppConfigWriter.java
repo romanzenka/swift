@@ -300,7 +300,9 @@ public final class AppConfigWriter implements Closeable {
 		void saveStrategy(final ResourceConfig resourceConfig) {
 			final InnerConfigWriter innerWriter;
 			if (resourceConfig instanceof RunnerConfig) {
-				put(RUNNER_TYPE, multiFactory.getId(resourceConfig.getClass()), "Type of the runner (localRunner/sgeRunner)");
+				if (!"localRunner".equals(multiFactory.getId(resourceConfig.getClass()))) {
+					put(RUNNER_TYPE, multiFactory.getId(resourceConfig.getClass()), "Type of the runner (localRunner/sgeRunner)");
+				}
 				innerWriter = new RunnerConfigWriter(resourceConfig.getClass(), this);
 				resourceConfig.save(innerWriter);
 			} else if (resourceConfig instanceof ApplicationConfig) {

@@ -1,5 +1,6 @@
 package edu.mayo.mprc.config;
 
+import com.google.common.base.Strings;
 import edu.mayo.mprc.MprcException;
 
 import java.net.InetAddress;
@@ -48,6 +49,11 @@ public final class DaemonConfig implements ResourceConfig, NamedResource {
 	 * Where should the daemon dump files when an error occurs. If not set, the tempFolderPath is used.
 	 */
 	private String dumpFolderPath;
+
+	/**
+	 * Default folder where to put the logs.
+	 */
+	private String logOutputFolder = "var/log";
 
 	// Services this daemon provides
 	private List<ServiceConfig> services = new ArrayList<ServiceConfig>();
@@ -159,6 +165,14 @@ public final class DaemonConfig implements ResourceConfig, NamedResource {
 		this.dumpFolderPath = dumpFolderPath;
 	}
 
+	public String getLogOutputFolder() {
+		return logOutputFolder;
+	}
+
+	public void setLogOutputFolder(String logOutputFolder) {
+		this.logOutputFolder = logOutputFolder;
+	}
+
 	public List<ServiceConfig> getServices() {
 		return services;
 	}
@@ -246,6 +260,8 @@ public final class DaemonConfig implements ResourceConfig, NamedResource {
 		writer.put(TEMP_FOLDER_PATH, getTempFolderPath(), "Temporary folder that can be used for caching. Transferred files from other daemons with no shared file system with this daemon are cached to this folder.");
 		writer.put(DUMP_ERRORS, isDumpErrors(), "Not implemented yet");
 		writer.put(DUMP_FOLDER_PATH, getDumpFolderPath(), "Not implemented yet");
+		writer.put(RunnerConfig.LOG_OUTPUT_FOLDER, getLogOutputFolder(), "Shared log folder to be used as a default for all services");
+		cleanupLogOutputFolders(getServices());
 
 		// It is important to save the resources before the services.
 		// There are unstated dependencies between the resources and the services
@@ -254,7 +270,21 @@ public final class DaemonConfig implements ResourceConfig, NamedResource {
 		writer.put(SERVICES, getResourceList(writer, getServices()), "Comma separated list of provided services");
 	}
 
-	private static String getResourceList(final ConfigWriter writer, final Collection<? extends ResourceConfig> resources) {
+	/**
+	 * Make sure the log folder is set to null if it matches the daemon log folder
+	 *
+	 * @param services
+	 */
+	private void cleanupLogOutputFolders(List<ServiceConfig> services) {
+		for (final ServiceConfig serviceConfig : services) {
+			if (serviceConfig.getRunner() != null && serviceConfig.getRunner().getLogOutputFolder() != null &&
+					serviceConfig.getRunner().getLogOutputFolder().equals(getLogOutputFolder())) {
+				serviceConfig.getRunner().setLogOutputFolder(null);
+			}
+		}
+	}
+
+	private String getResourceList(final ConfigWriter writer, final Collection<? extends ResourceConfig> resources) {
 		final StringBuilder result = new StringBuilder(resources.size() * 10);
 		ArrayList<ResourceConfig> sorted = new ArrayList<ResourceConfig>(resources.size());
 		for (final ResourceConfig config : resources) {
@@ -280,6 +310,7 @@ public final class DaemonConfig implements ResourceConfig, NamedResource {
 		tempFolderPath = reader.get(TEMP_FOLDER_PATH);
 		dumpErrors = reader.getBoolean(DUMP_ERRORS);
 		dumpFolderPath = reader.get(DUMP_FOLDER_PATH);
+		logOutputFolder = reader.get(RunnerConfig.LOG_OUTPUT_FOLDER);
 
 		{
 			final List<? extends ResourceConfig> resourcesList = reader.getResourceList(RESOURCES);
@@ -292,8 +323,13 @@ public final class DaemonConfig implements ResourceConfig, NamedResource {
 		{
 			final List<? extends ResourceConfig> servicesList = reader.getResourceList(SERVICES);
 			services.clear();
-			for (final ResourceConfig service : servicesList) {
-				services.add((ServiceConfig) service);
+			for (final ResourceConfig config : servicesList) {
+				final ServiceConfig service = (ServiceConfig) config;
+				// Set the log folder if the user did not specify otherwise
+				if (service != null && service.getRunner() != null && Strings.isNullOrEmpty(service.getRunner().getLogOutputFolder())) {
+					service.getRunner().setLogOutputFolder(getLogOutputFolder());
+				}
+				services.add(service);
 			}
 		}
 	}
