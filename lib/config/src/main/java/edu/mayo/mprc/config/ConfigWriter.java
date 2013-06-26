@@ -18,6 +18,8 @@ public interface ConfigWriter {
 
 	void put(String key, int value, String comment);
 
+	void put(String key, int value, int defaultValue, String comment);
+
 	void put(String key, ResourceConfig config);
 
 	void put(String key, Collection<? extends ResourceConfig> configs);

@@ -142,6 +142,7 @@ public final class SimpleRunner extends AbstractRunner {
 	}
 
 	public static final class Config extends RunnerConfig {
+		public static final int DEFAULT_NUM_THREADS = 1;
 		private int numThreads = 1;
 		private String logOutputFolder = "var/log";
 
@@ -170,14 +171,14 @@ public final class SimpleRunner extends AbstractRunner {
 
 		@Override
 		public void save(final ConfigWriter writer) {
-			writer.put("numThreads", getNumThreads(), "Number of threads");
+			writer.put("numThreads", getNumThreads(), DEFAULT_NUM_THREADS, "Number of threads");
 			writer.put("logOutputFolder", getLogOutputFolder(), "Where to write logs");
 			super.save(writer);
 		}
 
 		@Override
 		public void load(final ConfigReader reader) {
-			numThreads = reader.getInteger("numThreads");
+			numThreads = reader.getInteger("numThreads", DEFAULT_NUM_THREADS);
 			logOutputFolder = reader.get("logOutputFolder");
 			super.load(reader);
 		}

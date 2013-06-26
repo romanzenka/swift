@@ -14,6 +14,8 @@ public interface ConfigReader {
 
 	int getInteger(String key);
 
+	int getInteger(String key, int defaultValue);
+
 	ResourceConfig getObject(String key);
 
 	ResourceConfig getObjectFromId(String id);

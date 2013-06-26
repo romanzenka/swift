@@ -29,6 +29,11 @@ public abstract class ConfigWriterBase implements ConfigWriter {
 	}
 
 	@Override
+	public void put(final String key, final int value, final int defaultValue, final String comment) {
+		put(key, value, comment);
+	}
+
+	@Override
 	public void put(final String key, final ResourceConfig config) {
 		put(key, save(config));
 	}

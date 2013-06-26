@@ -24,6 +24,16 @@ public abstract class ConfigReaderBase implements ConfigReader {
 	}
 
 	@Override
+	public int getInteger(final String key, int defaultValue) {
+		final String value = get(key);
+		if(value==null) {
+			return defaultValue;
+		}
+		return Integer.parseInt(value);
+	}
+
+
+	@Override
 	public ResourceConfig getObject(final String key) {
 		return getObjectFromId(get(key));
 	}

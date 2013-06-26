@@ -163,7 +163,7 @@ public final class AppConfigReader implements Closeable {
 			throw new MprcException("Worker type was not specified. Use " + AppConfigWriter.RUNNER_WORKER_TYPE + " property.");
 		}
 		if (runnerType == null) {
-			throw new MprcException("Runner type was not specified. Use " + AppConfigWriter.RUNNER_TYPE + " property.");
+			runnerType = "localRunner"; // Default setting for the runner
 		}
 
 		final String workerId = "_service_" + name + "_worker";

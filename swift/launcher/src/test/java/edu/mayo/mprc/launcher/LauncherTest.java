@@ -35,7 +35,7 @@ public final class LauncherTest {
 
 	@Test
 	public void testGetTempFolder() throws Exception {
-		Assert.assertEquals(Launcher.getTempFolder(configFile, "main"), new File("/tmp/main"));
+		Assert.assertEquals(Launcher.getTempFolder(null, configFile, "main"), new File("/tmp/main"));
 	}
 
 	@Test

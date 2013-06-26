@@ -233,6 +233,14 @@ public final class AppConfigWriter implements Closeable {
 			// Else do not save the name. It is already used in the section
 		}
 
+		// Only output the value if it is not the same as default.
+		@Override
+		public void put(final String key, final int value, final int defaultValue, final String comment) {
+			if (value != defaultValue) {
+				put(key, value, comment);
+			}
+		}
+
 		@Override
 		public final void comment(final String comment) {
 			put(null, null, comment);

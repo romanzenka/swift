@@ -47,6 +47,11 @@ public final class Launcher implements FileListener {
 	private static final Logger LOGGER = Logger.getLogger(Launcher.class);
 	private static final int DEFAULT_PORT = 8080;
 	private static final String CONFIG_FILE_NAME = "conf/swift.conf";
+	public static final String CONFIG_OPTION = "config";
+	public static final String INSTALL_OPTION = "install";
+	public static final String DAEMON_OPTION = "daemon";
+	public static final String PORT_OPTION = "port";
+	public static final String WAR_OPTION = "war";
 	private final Object stopMonitor = new Object();
 	private volatile boolean restartRequested = false;
 
@@ -65,11 +70,11 @@ public final class Launcher implements FileListener {
 
 	private void runLauncher(final String[] args) {
 		final OptionParser parser = new OptionParser();
-		parser.accepts("config", "Reconfigure Swift. Will run a web server with the configuration screen on a given --port");
-		parser.accepts("install", "Installation config file. If not specified, Swift will run in configuration mode and produce this file. Default is " + CONFIG_FILE_NAME + ".").withRequiredArg().ofType(File.class);
-		parser.accepts("daemon", "Daemon to be run. Will run the daemon defined by the given name in the config file. If there is only one daemon defined in the config file, the daemon will be run and this flag is disregarded.").withRequiredArg().describedAs("Daemon name").ofType(String.class);
-		parser.accepts("port", "Port to run the configuration web server on. Default is " + DEFAULT_PORT + ".").withRequiredArg().ofType(Integer.class);
-		parser.accepts("war", "Path to swift.war file. This is needed only when running config or the web part of Swift. Default is swift.war in the local directory.").withRequiredArg().ofType(File.class);
+		parser.accepts(CONFIG_OPTION, "Reconfigure Swift. Will run a web server with the configuration screen on a given --port");
+		parser.accepts(INSTALL_OPTION, "Installation config file. If not specified, Swift will run in configuration mode and produce this file. Default is " + CONFIG_FILE_NAME + ".").withRequiredArg().ofType(File.class);
+		parser.accepts(DAEMON_OPTION, "Daemon to be run. Will run the daemon defined by the given name in the config file. If there is only one daemon defined in the config file, the daemon will be run and this flag is disregarded.").withRequiredArg().describedAs("Daemon name").ofType(String.class);
+		parser.accepts(PORT_OPTION, "Port to run the configuration web server on. Default is " + DEFAULT_PORT + ".").withRequiredArg().ofType(Integer.class);
+		parser.accepts(WAR_OPTION, "Path to swift.war file. This is needed only when running config or the web part of Swift. Default is swift.war in the local directory.").withRequiredArg().ofType(File.class);
 		parser.acceptsAll(Arrays.asList("help", "?"), "Show this help screen");
 		OptionSet options = null;
 
@@ -85,17 +90,17 @@ public final class Launcher implements FileListener {
 			System.exit(EXIT_CODE_OK);
 		}
 
-		if (options.has("config")) {
+		if (options.has(CONFIG_OPTION)) {
 			File configFile = null;
-			if (options.has("install")) {
-				configFile = CommandLine.findFile(options, "install", "installation config file", CONFIG_FILE_NAME);
+			if (options.has(INSTALL_OPTION)) {
+				configFile = CommandLine.findFile(options, INSTALL_OPTION, "installation config file", CONFIG_FILE_NAME);
 			} else {
 				configFile = new File(CONFIG_FILE_NAME);
 			}
 			// We are running configured Swift with web server enabled
-			runWebServer(options, configFile, "config");
+			runWebServer(options, configFile, CONFIG_OPTION);
 		} else {
-			final File installPropertyFile = CommandLine.findFile(options, "install", "installation config file", CONFIG_FILE_NAME);
+			final File installPropertyFile = CommandLine.findFile(options, INSTALL_OPTION, "installation config file", CONFIG_FILE_NAME);
 
 			final FileMonitor monitor = new FileMonitor(POLLING_INTERVAL);
 			monitor.addFile(installPropertyFile);
@@ -140,11 +145,11 @@ public final class Launcher implements FileListener {
 	}
 
 	private Server runWebServer(final OptionSet options, final File configFile, final String action) {
-		final File warFile = CommandLine.findFile(options, "war", "swift web interface file", "swift.war");
+		final File warFile = CommandLine.findFile(options, WAR_OPTION, "swift web interface file", "swift.war");
 
 		final String daemonId = getDaemonId(options);
 		final int portNumber = getPortNumber(options, configFile, daemonId);
-		final File tempFolder = getTempFolder(configFile, daemonId);
+		final File tempFolder = getTempFolder(options, configFile, daemonId);
 
 		final Server server = new Server(portNumber);
 		for (final Connector connector : server.getConnectors()) {
@@ -196,8 +201,8 @@ public final class Launcher implements FileListener {
 
 	private String getDaemonId(final OptionSet options) {
 		String daemonId = null;
-		if (options.has("daemon")) {
-			daemonId = options.valueOf("daemon").toString();
+		if (options.has(DAEMON_OPTION)) {
+			daemonId = options.valueOf(DAEMON_OPTION).toString();
 		}
 		return daemonId;
 	}
@@ -229,32 +234,43 @@ public final class Launcher implements FileListener {
 		}
 	}
 
-	static File getTempFolder(final File configFile, final String daemonId) {
+	static File getTempFolder(final OptionSet options, final File configFile, final String daemonId) {
 		File tempFolder = null;
 		try {
 			final DaemonConfig daemonConfig = getDaemonConfig(configFile, daemonId);
 			tempFolder = new File(daemonConfig.getTempFolderPath());
 		} catch (Exception e) {
 			tempFolder = FileUtilities.getDefaultTempDirectory();
-			LOGGER.warn("Could not parse the config file " + configFile.getPath() + " to temporary daemon folder. Using default " + tempFolder, e);
+			if (!configNode(options)) {
+				LOGGER.warn("Could not parse the config file " + configFile.getPath() + " to obtain temporary daemon folder. Using default " + tempFolder, e);
+			}
 		}
 		return tempFolder;
 	}
 
 	static int getPortNumber(final OptionSet options, final File configFile, final String daemonId) {
 		final int portNumber;
-		if (options != null && options.has("port")) {
-			portNumber = (Integer) options.valueOf("port");
+		if (options != null && options.has(PORT_OPTION)) {
+			portNumber = (Integer) options.valueOf(PORT_OPTION);
 		} else {
 			try {
 				final GenericResource webUi = getResourceConfig(configFile, daemonId, "webUi");
-				return Integer.parseInt(webUi.get("port"));
+				return Integer.parseInt(webUi.get(PORT_OPTION));
 			} catch (Exception e) {
-				LOGGER.warn("Could not parse the config file " + configFile.getPath() + " to obtain web port number. Using default " + DEFAULT_PORT, e);
+				if (configNode(options)) {
+					// We are configuring Swift, no wonder config file is not present
+					LOGGER.info("Default port used for config: " + DEFAULT_PORT);
+				} else {
+					LOGGER.warn("Could not parse the config file " + configFile.getPath() + " to obtain web port number. Using default " + DEFAULT_PORT, e);
+				}
 				portNumber = DEFAULT_PORT;
 			}
 		}
 		return portNumber;
+	}
+
+	private static boolean configNode(OptionSet options) {
+		return options != null && options.has(CONFIG_OPTION);
 	}
 
 	static GenericResource getResourceConfig(final File configFile, final String daemonId, final String type) {
