@@ -22,6 +22,14 @@
                 <entry key="xml" value="application/xml"/>
             </map>
         </property>
+        <property name="viewResolvers">
+            <list>
+                <bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+                    <property name="prefix" value="/WEB-INF/jsp/"/>
+                    <property name="suffix" value=".jsp"/>
+                </bean>
+            </list>
+        </property>
         <property name="defaultViews">
             <list>
                 <bean class="org.springframework.web.servlet.view.xml.MarshallingView">
