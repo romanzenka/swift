@@ -9,6 +9,15 @@ import java.util.List;
  * @author Roman Zenka
  */
 public abstract class ConfigReaderBase implements ConfigReader {
+	@Override
+	public String get(final String key, final String defaultValue) {
+		final String value = get(key);
+		if (value == null) {
+			return defaultValue;
+		}
+		return value;
+	}
+
 	/**
 	 * @param key Key whose value to retrieve.
 	 * @return Boolean value parsed from the string using {@link Boolean#parseBoolean(String)}.
@@ -26,7 +35,7 @@ public abstract class ConfigReaderBase implements ConfigReader {
 	@Override
 	public int getInteger(final String key, int defaultValue) {
 		final String value = get(key);
-		if(value==null) {
+		if (value == null) {
 			return defaultValue;
 		}
 		return Integer.parseInt(value);

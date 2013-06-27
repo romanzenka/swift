@@ -34,8 +34,6 @@ public final class GridRunner extends AbstractRunner {
 	public static final String NAME = "Sun Grid Engine Runner";
 
 	private static final String WRAPPER_SCRIPT = "wrapperScript";
-	private static final String SHARED_TEMP_DIRECTORY = "sharedTempDirectory";
-	private static final String SHARED_WORKING_DIRECTORY = "sharedWorkingDirectory";
 	private static final String NATIVE_SPECIFICATION = "nativeSpecification";
 	private static final String MEMORY_REQUIREMENT = "memoryRequirement";
 	private static final String QUEUE_NAME = "queueName";
@@ -51,9 +49,6 @@ public final class GridRunner extends AbstractRunner {
 	private String memoryRequirement;
 	private String wrapperScript;
 
-	private File sharedWorkingDirectory;
-	private File sharedTempDirectory;
-	private File outputDirectory;
 	private ResourceConfig workerFactoryConfig;
 
 	private MessengerFactory messengerFactory;
@@ -65,7 +60,6 @@ public final class GridRunner extends AbstractRunner {
 	private static final Logger LOGGER = Logger.getLogger(GridRunner.class);
 
 	public GridRunner() {
-		super();
 	}
 
 	public void stop() {
@@ -84,7 +78,7 @@ public final class GridRunner extends AbstractRunner {
 
 	protected void processRequest(final DaemonRequest request) {
 		final GridWorkPacket gridWorkPacket = getBaseGridWorkPacket(gridScriptFactory.getApplicationName(wrapperScript));
-		final File daemonWorkerAllocatorInputFile = new File(sharedTempDirectory, queueName + "_" + uniqueId.incrementAndGet());
+		final File daemonWorkerAllocatorInputFile = new File(getSharedTempDirectory(), queueName + "_" + uniqueId.incrementAndGet());
 
 		try {
 			final BoundMessenger<SimpleOneWayMessenger> boundMessenger = messengerFactory.createOneWayMessenger();
@@ -98,8 +92,8 @@ public final class GridRunner extends AbstractRunner {
 							, fileTokenFactory.getDaemonConfigInfo()
 							, fileTokenFactory.getFileSharingFactory().getBrokerUri());
 
-			if (sharedTempDirectory != null) {
-				gridDaemonAllocatorInputObject.setSharedTempDirectory(sharedTempDirectory.getAbsolutePath());
+			if (getSharedTempDirectory() != null) {
+				gridDaemonAllocatorInputObject.setSharedTempDirectory(getSharedTempDirectory().getAbsolutePath());
 			}
 
 			writeWorkerAllocatorInputObject(daemonWorkerAllocatorInputFile, gridDaemonAllocatorInputObject);
@@ -296,34 +290,18 @@ public final class GridRunner extends AbstractRunner {
 		gridWorkPacket.setQueueName(queueName);
 		gridWorkPacket.setMemoryRequirement(memoryRequirement);
 
-		gridWorkPacket.setWorkingFolder(sharedWorkingDirectory.getAbsolutePath());
+		gridWorkPacket.setWorkingFolder(getSharedWorkingDirectory().getAbsolutePath());
 		gridWorkPacket.setLogFolder(FileUtilities.getDateBasedDirectory(getLogDirectory(), new Date()).getAbsolutePath());
 
 		return gridWorkPacket;
 	}
 
 	public File getSharedWorkingDirectory() {
-		return sharedWorkingDirectory;
-	}
-
-	public void setSharedWorkingDirectory(final File sharedWorkingDirectory) {
-		this.sharedWorkingDirectory = sharedWorkingDirectory;
+		return getDaemon().getSharedFileSpace();
 	}
 
 	public File getSharedTempDirectory() {
-		return sharedTempDirectory;
-	}
-
-	public void setSharedTempDirectory(final File sharedTempDirectory) {
-		this.sharedTempDirectory = sharedTempDirectory;
-	}
-
-	public File getOutputDirectory() {
-		return outputDirectory;
-	}
-
-	public void setOutputDirectory(final File outputDirectory) {
-		this.outputDirectory = outputDirectory;
+		return getDaemon().getTempFolder();
 	}
 
 	public GridEngineJobManager getManager() {
@@ -418,8 +396,6 @@ public final class GridRunner extends AbstractRunner {
 		private String queueName;
 		private String memoryRequirement;
 		private String nativeSpecification;
-		private String sharedWorkingDirectory;
-		private String sharedTempDirectory;
 		private String wrapperScript;
 
 		public Config() {
@@ -449,14 +425,6 @@ public final class GridRunner extends AbstractRunner {
 			return nativeSpecification;
 		}
 
-		public String getSharedWorkingDirectory() {
-			return sharedWorkingDirectory;
-		}
-
-		public void setSharedWorkingDirectory(final String sharedWorkingDirectory) {
-			this.sharedWorkingDirectory = sharedWorkingDirectory;
-		}
-
 		public void setNativeSpecification(final String nativeSpecification) {
 			this.nativeSpecification = nativeSpecification;
 		}
@@ -469,31 +437,18 @@ public final class GridRunner extends AbstractRunner {
 			this.wrapperScript = wrapperScript;
 		}
 
-		public String getSharedTempDirectory() {
-			return sharedTempDirectory;
-		}
-
-		public void setSharedTempDirectory(final String sharedTempDirectory) {
-			this.sharedTempDirectory = sharedTempDirectory;
-		}
-
 		public void save(final ConfigWriter writer) {
 			super.save(writer);
 			writer.put(QUEUE_NAME, getQueueName(), "Name of the SGE queue");
-			writer.put(MEMORY_REQUIREMENT, getMemoryRequirement(), "Memory requirements for the SGE queue");
-			writer.put(NATIVE_SPECIFICATION, getNativeSpecification(), "Native specification (additional parameters) for the SGE queue");
-			writer.put(SHARED_WORKING_DIRECTORY, getSharedWorkingDirectory(), "The shared working directory for file exchanges");
-			writer.put(SHARED_TEMP_DIRECTORY, getSharedTempDirectory(), "The shared temporary directory for storing temporary files");
+			writer.put(MEMORY_REQUIREMENT, getMemoryRequirement(), "", "Memory requirements for the SGE queue");
+			writer.put(NATIVE_SPECIFICATION, getNativeSpecification(), "", "Native specification (additional parameters) for the SGE queue");
 			writer.put(WRAPPER_SCRIPT, getWrapperScript(), "A wrapper script that will ensure smooth execution of the Swift component (create/tear down environment). Takes the command to execute as its parameter.");
-
 		}
 
 		public void load(final ConfigReader reader) {
 			setQueueName(reader.get(QUEUE_NAME));
-			setMemoryRequirement(reader.get(MEMORY_REQUIREMENT));
-			setNativeSpecification(reader.get(NATIVE_SPECIFICATION));
-			setSharedWorkingDirectory(reader.get(SHARED_WORKING_DIRECTORY));
-			setSharedTempDirectory(reader.get(SHARED_TEMP_DIRECTORY));
+			setMemoryRequirement(reader.get(MEMORY_REQUIREMENT, ""));
+			setNativeSpecification(reader.get(NATIVE_SPECIFICATION, ""));
 			setWrapperScript(reader.get(WRAPPER_SCRIPT));
 			super.load(reader);
 		}
@@ -529,10 +484,6 @@ public final class GridRunner extends AbstractRunner {
 			runner.setGridScriptFactory(gridScriptFactory);
 			runner.setManager(gridEngineManager);
 			runner.setMessengerFactory(messengerFactory);
-			runner.setSharedWorkingDirectory(new File(config.getSharedWorkingDirectory()).getAbsoluteFile());
-			runner.setSharedTempDirectory(new File(config.getSharedTempDirectory()).getAbsoluteFile());
-			runner.setOutputDirectory(new File(config.getSharedTempDirectory()).getAbsoluteFile());
-			runner.setLogDirectory(new File(config.getLogOutputFolder()).getAbsoluteFile());
 			runner.setWrapperScript(config.getWrapperScript());
 			runner.setWorkerFactoryConfig(config.getWorkerConfiguration());
 			runner.setFileTokenFactory(fileTokenFactory);

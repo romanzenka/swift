@@ -7,7 +7,6 @@ import edu.mayo.mprc.utilities.progress.ProgressInfo;
 import edu.mayo.mprc.utilities.progress.ProgressReporter;
 import org.apache.log4j.Logger;
 
-import java.io.File;
 import java.util.concurrent.ExecutorService;
 
 /**
@@ -178,9 +177,6 @@ public final class SimpleRunner extends AbstractRunner {
 			runner.setFactory(getWorkerFactory(getTable(), workerFactoryConfig, dependencies));
 			final int numThreads = config.getNumThreads();
 			runner.setExecutorService(new SimpleThreadPoolExecutor(numThreads, runner.getFactory().getUserName(), true));
-			// Important to convert the log file to absolute, otherwise user.dir is not taken into account and
-			// the behavior is inconsistent within the IDE while debugging
-			runner.setLogDirectory(new File(config.getLogOutputFolder()).getAbsoluteFile());
 
 			return runner;
 		}

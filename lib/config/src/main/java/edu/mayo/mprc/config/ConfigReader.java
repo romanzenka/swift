@@ -10,6 +10,8 @@ import java.util.List;
 public interface ConfigReader {
 	String get(String key);
 
+	String get(String key, String defaultValue);
+
 	boolean getBoolean(String key);
 
 	int getInteger(String key);

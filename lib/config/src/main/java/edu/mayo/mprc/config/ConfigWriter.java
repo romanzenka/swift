@@ -12,6 +12,8 @@ public interface ConfigWriter {
 
 	void put(String key, String value, String comment);
 
+	void put(String key, String value, String defaultValue, String comment);
+
 	void put(String key, boolean value);
 
 	void put(String key, boolean value, String comment);

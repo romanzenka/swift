@@ -34,17 +34,19 @@ public final class DaemonWorkerTester {
 		try {
 			final URI uri = new URI("jms.vm://broker1?simplequeue=test_" + String.valueOf(testId.incrementAndGet()));
 			initializeFromUri(uri);
-			this.runner = new SimpleRunner();
-			this.runner.setFactory(new TestWorkerFactory(worker));
-			this.runner.setExecutorService(getSingleThreadExecutor(worker));
-			this.runner.setDaemonConnection(this.daemonConnection);
-			this.runner.setEnabled(true);
-			this.runner.setLogDirectory(FileUtilities.createTempFolder());
+			runner = new SimpleRunner();
+			runner.setFactory(new TestWorkerFactory(worker));
+			runner.setExecutorService(getSingleThreadExecutor(worker));
+			runner.setDaemonConnection(daemonConnection);
+			final Daemon daemon = new Daemon();
+			daemon.setLogOutputFolder(FileUtilities.createTempFolder());
+			runner.setDaemon(daemon);
+			runner.setEnabled(true);
 		} catch (URISyntaxException e) {
 			throw new MprcException(e);
 		}
-		this.runner.start();
-		waitUntilReady(this.runner);
+		runner.start();
+		waitUntilReady(runner);
 	}
 
 	private static ExecutorService getSingleThreadExecutor(Worker worker) {
@@ -52,10 +54,10 @@ public final class DaemonWorkerTester {
 	}
 
 	private void initializeFromUri(final URI uri) {
-		this.service = new ServiceFactory().createService(uri);
+		service = new ServiceFactory().createService(uri);
 		final FileTokenFactory fileTokenFactory = new FileTokenFactory();
 		fileTokenFactory.setDaemonConfigInfo(new DaemonConfigInfo("daemon1", "shared"));
-		this.daemonConnection = new DirectDaemonConnection(service, fileTokenFactory);
+		daemonConnection = new DirectDaemonConnection(service, fileTokenFactory);
 	}
 
 
@@ -69,17 +71,19 @@ public final class DaemonWorkerTester {
 		try {
 			final URI uri = new URI("jms.vm://broker1?simplequeue=test_" + String.valueOf(testId.incrementAndGet()));
 			initializeFromUri(uri);
-			this.runner = new SimpleRunner();
-			this.runner.setFactory(workerFactory);
-			this.runner.setExecutorService(new SimpleThreadPoolExecutor(numWorkerThreads, "test", true));
-			this.runner.setDaemonConnection(this.daemonConnection);
-			this.runner.setEnabled(true);
-			this.runner.setLogDirectory(FileUtilities.createTempFolder());
+			runner = new SimpleRunner();
+			runner.setFactory(workerFactory);
+			runner.setExecutorService(new SimpleThreadPoolExecutor(numWorkerThreads, "test", true));
+			runner.setDaemonConnection(daemonConnection);
+			final Daemon daemon = new Daemon();
+			daemon.setLogOutputFolder(FileUtilities.createTempFolder());
+			runner.setDaemon(daemon);
+			runner.setEnabled(true);
 		} catch (URISyntaxException e) {
 			throw new MprcException(e);
 		}
-		this.runner.start();
-		waitUntilReady(this.runner);
+		runner.start();
+		waitUntilReady(runner);
 	}
 
 	/**
@@ -114,7 +118,7 @@ public final class DaemonWorkerTester {
 	 * there may still be some progress info being sent back).
 	 */
 	public void stop() {
-		this.runner.stop();
+		runner.stop();
 	}
 
 	/**

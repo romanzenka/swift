@@ -1,5 +1,6 @@
 package edu.mayo.mprc.config;
 
+import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import edu.mayo.mprc.MprcException;
 import edu.mayo.mprc.utilities.StringUtilities;
@@ -237,6 +238,14 @@ public final class AppConfigWriter implements Closeable {
 		@Override
 		public void put(final String key, final int value, final int defaultValue, final String comment) {
 			if (value != defaultValue) {
+				put(key, value, comment);
+			}
+		}
+
+		// Only output the value if it is not the same as default.
+		@Override
+		public void put(final String key, final String value, final String defaultValue, final String comment) {
+			if (!Strings.nullToEmpty(value).equals(defaultValue)) {
 				put(key, value, comment);
 			}
 		}

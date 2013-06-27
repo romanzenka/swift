@@ -19,9 +19,6 @@ import java.util.concurrent.atomic.AtomicInteger;
  * <p/>
  * Daemon thread runs a {@link Worker}. The worker has {@link Worker#processRequest} method,
  * that gets executed. Then the daemon starts processing the next request.
- * <p/>
- * In case a task being run fails to be executed, the runner will produce an entry in {@link #failedTasksDirectory} so
- * the developer can reproduce the error by having Swift process only that one single task.
  *
  * @author Roman Zenka
  */
@@ -29,8 +26,11 @@ public abstract class AbstractRunner {
 
 	private static final Logger LOGGER = Logger.getLogger(AbstractRunner.class);
 
+	/**
+	 * Daemon this runner belongs to. Daemon is accessed to get some configuration information.
+	 */
+	private Daemon daemon;
 	private ExecutorService executorService;
-	private File logDirectory;
 	private SynchronousRequestReceiver receiver;
 
 	public abstract boolean isEnabled();
@@ -181,10 +181,14 @@ public abstract class AbstractRunner {
 	}
 
 	public File getLogDirectory() {
-		return logDirectory;
+		return getDaemon().getLogOutputFolder();
 	}
 
-	public void setLogDirectory(final File logDirectory) {
-		this.logDirectory = logDirectory;
+	public Daemon getDaemon() {
+		return daemon;
+	}
+
+	public void setDaemon(final Daemon daemon) {
+		this.daemon = daemon;
 	}
 }

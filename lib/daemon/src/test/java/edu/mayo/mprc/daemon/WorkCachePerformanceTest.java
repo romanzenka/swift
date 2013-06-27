@@ -97,8 +97,10 @@ public final class WorkCachePerformanceTest {
 	private SimpleRunner wrapWithRunner(final Worker worker, final String queueName, final File logFolder, final FileTokenFactory fileTokenFactory) throws URISyntaxException {
 		final Service service = ServiceFactory.createJmsQueue(new URI("jms.vm://test?broker.useJmx=false&broker.persistent=false&simplequeue=" + queueName));
 		final DirectDaemonConnection directConnection = new DirectDaemonConnection(service, fileTokenFactory);
+		final Daemon daemon = new Daemon();
+		daemon.setLogOutputFolder(logFolder);
 		final SimpleRunner runner = new SimpleRunner();
-		runner.setLogDirectory(logFolder);
+		runner.setDaemon(daemon);
 		runner.setFactory(new TestWorkerFactory(worker));
 		runner.setExecutorService(new SimpleThreadPoolExecutor(1, worker.getClass().getSimpleName() + "-runner", true));
 		runner.setDaemonConnection(directConnection);

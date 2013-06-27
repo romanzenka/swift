@@ -50,6 +50,7 @@ public final class AppConfigWriterTest {
 			"        tempFolderPath                 # Temporary folder that can be used for caching. Transferred files from other daemons with no shared file system with this daemon are cached to this folder.\n" +
 			"        dumpErrors           false     # Not implemented yet\n" +
 			"        dumpFolderPath                 # Not implemented yet\n" +
+			"        logOutputFolder      var/log   # Shared log folder to be used as a default for all services\n" +
 			"        resources                      # Comma separated list of provided resources\n" +
 			"        services             service1  # Comma separated list of provided services\n" +
 			"</daemon>\n";
