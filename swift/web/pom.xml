@@ -142,8 +142,8 @@
 
                     <modules>
                         <module>edu.mayo.mprc.swift.ui.SwiftApp</module>
-			<!-- <module>edu.mayo.mprc.common.Common</module>
-			<module>edu.mayo.mprc.swift.configuration.Configuration</module> -->
+                        <module>edu.mayo.mprc.common.Common</module>
+                        <module>edu.mayo.mprc.swift.configuration.Configuration</module>
                     </modules>
                     <style>OBF</style>
                 </configuration>

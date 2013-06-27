@@ -285,6 +285,7 @@ public class ConfigurationData {
 		daemonModel.setTempFolderPath(daemon.getTempFolderPath());
 		daemonModel.setDumpErrors(daemon.isDumpErrors());
 		daemonModel.setDumpFolderPath(daemon.getDumpFolderPath());
+		daemonModel.setLogOutputFolder(daemon.getLogOutputFolder());
 		for (final ServiceConfig service : daemon.getServices()) {
 			final ResourceTable table = getResourceTable();
 			final String type = table.getId(service.getRunner().getWorkerConfiguration().getClass());

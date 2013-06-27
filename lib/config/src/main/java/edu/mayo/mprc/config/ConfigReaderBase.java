@@ -1,6 +1,8 @@
 package edu.mayo.mprc.config;
 
 import com.google.common.base.Splitter;
+import edu.mayo.mprc.MprcException;
+import org.apache.log4j.Logger;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -9,6 +11,8 @@ import java.util.List;
  * @author Roman Zenka
  */
 public abstract class ConfigReaderBase implements ConfigReader {
+	private static final Logger LOGGER = Logger.getLogger(ConfigReaderBase.class);
+
 	@Override
 	public String get(final String key, final String defaultValue) {
 		final String value = get(key);
@@ -53,7 +57,12 @@ public abstract class ConfigReaderBase implements ConfigReader {
 		final Iterable<String> split = Splitter.on(",").trimResults().omitEmptyStrings().split(resources);
 		final ArrayList<ResourceConfig> configs = new ArrayList<ResourceConfig>();
 		for (final String item : split) {
-			configs.add(getObjectFromId(item));
+			final ResourceConfig objectFromId = getObjectFromId(item);
+			if (objectFromId == null) {
+				throw new MprcException("Could not find object with id [" + item + "] in the configuration");
+			} else {
+				configs.add(objectFromId);
+			}
 		}
 		return configs;
 	}

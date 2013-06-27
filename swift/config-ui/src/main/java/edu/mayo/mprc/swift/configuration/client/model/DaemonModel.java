@@ -13,6 +13,7 @@ public final class DaemonModel extends ResourceModel {
 	public static final String TEMP_FOLDER_PATH = "tempFolderPath";
 	public static final String DUMP_ERRORS = "dumpErrors";
 	public static final String DUMP_FOLDER_PATH = "dumpFolderPath";
+	public static final String LOG_OUTPUT_FOLDER = "logOutputFolder";
 	private static final long serialVersionUID = -3470019100042087509L;
 
 	public DaemonModel() {
@@ -73,6 +74,14 @@ public final class DaemonModel extends ResourceModel {
 
 	public void setDumpFolderPath(final String dumpFolderPath) {
 		setProperty(DUMP_FOLDER_PATH, dumpFolderPath);
+	}
+
+	public String getLogOutputFolder() {
+		return getProperty(LOG_OUTPUT_FOLDER);
+	}
+
+	public void setLogOutputFolder(final String logOutputFolder) {
+		setProperty(LOG_OUTPUT_FOLDER, logOutputFolder);
 	}
 
 	/**

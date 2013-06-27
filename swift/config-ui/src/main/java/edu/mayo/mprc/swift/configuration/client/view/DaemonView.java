@@ -40,6 +40,9 @@ public final class DaemonView extends SimplePanel implements ModuleView {
 						"with this daemon are cached to this folder. " +
 						"<p>" +
 						"If daemon runs any of its modules in a SGE setting, this temporary folder most be accessible from all SGE nodes.").defaultValue("var/tmp")
+				.property(DaemonModel.LOG_OUTPUT_FOLDER, "Log Folder", "A folder where all the services can write their logs." +
+						"<p>" +
+						"If daemon runs any of its modules in a SGE setting, the log folder most be accessible from all SGE nodes.").defaultValue("var/log")
 				.property(DaemonModel.DUMP_ERRORS, "Dump errors", "When an error happens, the daemon will dump the original request information that failed. This allows the user to isolate and debug the particular error.")
 				.boolValue().defaultValue("false")
 				.property(DaemonModel.DUMP_FOLDER_PATH, "Dump folder path", "Where should the dump files be stored.").defaultValue("var/tmp/dumps");
