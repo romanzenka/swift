@@ -64,7 +64,7 @@ final class Dta2TarWriter {
 	public static File getMatchingOutFile(final File dtaFile) {
 		final String prefix = FileUtilities.getFileNameWithoutExtension(dtaFile);
 		final String outFileName = prefix + OUT_EXT;
-		return new File(outFileName);
+		return new File(dtaFile.getParentFile(), outFileName);
 	}
 
 	/**
