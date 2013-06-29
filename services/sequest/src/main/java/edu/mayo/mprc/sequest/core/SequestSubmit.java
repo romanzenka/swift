@@ -173,16 +173,16 @@ final class SequestSubmit implements SequestSubmitterInterface {
 		try {
 			tt = new TarWriter(this.tarFile);
 			// .out and .dta files are in the working  dir for sequest
-			final List<String> DtaToTar = new ArrayList<String>();
+			final List<String> dtasToTar = new ArrayList<String>();
 			final List<File> sequestDtaSnapshot = new ArrayList<File>(this.getSequestDtaFiles());
 			for (final File sequestDtaSnapshotFile : sequestDtaSnapshot) {
-				DtaToTar.add((new File(this.outputDir, sequestDtaSnapshotFile.getName())).getAbsolutePath());
+				dtasToTar.add(sequestDtaSnapshotFile.getAbsolutePath());
 			}
 			// need to tar these files and the corresponding .out files
 			final Date startTar = new Date();
 
 			final Dta2TarWriter dtaWriter = new Dta2TarWriter();
-			dtaWriter.writeDtaFilesToTar(DtaToTar, tt);
+			dtaWriter.writeDtaFilesToTar(dtasToTar, tt);
 			final Date endTar = new Date();
 			final long tarTime = endTar.getTime() - startTar.getTime();
 
