@@ -43,6 +43,9 @@ public final class ClientProxyGenerator {
 		this.browseRoot = browseRoot;
 	}
 
+	/**
+	 * @return a list of client parameter sets (both the saved ones and the temporary ones).
+	 */
 	public static ClientParamSetList getClientParamSetList(final List<SavedSearchEngineParameters> savedSets, final List<ClientParamSet> temporarySets) {
 		final List<ClientParamSet> list = new ArrayList<ClientParamSet>(savedSets.size() + temporarySets.size());
 		for (final SavedSearchEngineParameters params : savedSets) {
@@ -234,6 +237,8 @@ public final class ClientProxyGenerator {
 			Long inputFileSize = null;
 			if (inputFile.exists() && inputFile.isFile()) {
 				inputFileSize = inputFile.length();
+			} else if (FileSearchBean.isAgilentDir(inputFile)) {
+				inputFileSize = FileUtilities.sizeOfDirectory(inputFile);
 			} else {
 				inputFileSize = -1L;
 			}

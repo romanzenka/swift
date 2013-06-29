@@ -1596,6 +1596,17 @@ public final class FileUtilities {
 		}
 	}
 
+	public static Long sizeOfDirectory(final File directory) {
+		long length = 0;
+		for (File file : directory.listFiles()) {
+			if (file.isFile())
+				length += file.length();
+			else
+				length += sizeOfDirectory(file);
+		}
+		return length;
+	}
+
 	private static final class TempFileBackedInputStream extends FileInputStream {
 		private final File backingFile;
 

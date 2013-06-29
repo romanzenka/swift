@@ -244,8 +244,12 @@ public final class FileSearchBean {
 		dirs.addAll(newDirs);
 	}
 
-	private static boolean isAgilentDir(final File dir) {
-		return dir.getName().endsWith(".d");
+	/**
+	 * @param dir File to check.
+	 * @return True if the file is an existing directory with agilent files.
+	 */
+	public static boolean isAgilentDir(final File dir) {
+		return dir.getName().endsWith(".d") && dir.isDirectory();
 	}
 
 	private static final class SimpleFileComparator implements Comparator<File>, Serializable {
