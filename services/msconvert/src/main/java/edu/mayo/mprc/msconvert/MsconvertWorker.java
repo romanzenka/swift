@@ -110,18 +110,19 @@ public final class MsconvertWorker extends WorkerBase {
 		command.add(rawFile.getName()); // .raw file to convert
 		command.add("--mgf"); // We want to convert to .mgf
 
-		command.add("--filter"); // Charge state predictor
-		command.add("chargeStatePredictor false 4 2 0.9");
-
-		if (rawFile.getName().endsWith(".d")) {
+		if (agilentData(rawFile)) {
 			command.add("--filter");
 			command.add("peakPicking true 1-");
 		}
+
+		command.add("--filter"); // Charge state predictor
+		command.add("chargeStatePredictor false 4 2 0.9");
 
 		if (ms2Profile) {
 			command.add("--filter");
 			command.add("peakPicking true 2-"); // Do peak picking on MS2 and higher
 
+		} else if(agilentData(rawFile)) {
 			command.add("--filter");
 			command.add("threshold absolute 0.1 most-intense"); // The peak-picked data have a lot of 0-intensity peaks. toss those
 		}
@@ -138,6 +139,10 @@ public final class MsconvertWorker extends WorkerBase {
 		command.add(mgfFile.getParent());
 
 		return command;
+	}
+
+	private static boolean agilentData(File rawFile) {
+		return rawFile.getName().endsWith(".d");
 	}
 
 	/**
@@ -188,7 +193,7 @@ public final class MsconvertWorker extends WorkerBase {
 
 	private static void checkRawFile(final File pFile) {
 		if (pFile.exists()) {
-			if (pFile.isDirectory() && !pFile.getName().endsWith(".d")) {
+			if (pFile.isDirectory() && !agilentData(pFile)) {
 				throw new DaemonException("Raw to MGF convertor cannot convert a directory");
 			}
 		} else {
