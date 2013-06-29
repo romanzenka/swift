@@ -215,7 +215,7 @@ final class SequestSubmit implements SequestSubmitterInterface {
 	private static List<File> getDtaFilesWithNoOut(final Iterable<File> dtaFiles) {
 		final List<File> noOutDtas = new ArrayList<File>(10);
 		for (final File file : dtaFiles) {
-			if (Dta2TarWriter.getMatchingOutFile(file).isFile()) {
+			if (!Dta2TarWriter.getMatchingOutFile(file).isFile()) {
 				noOutDtas.add(file);
 			}
 		}
