@@ -119,7 +119,7 @@ public final class SequestWorker extends WorkerBase {
 					new String[]{TYPE},
 					new String[]{SequestCache.TYPE},
 					new String[]{SequestDeploymentService.TYPE},
-					20, true);
+					20, false);
 		}
 
 		public SequestMappingFactory getSequestMappingFactory() {
