@@ -26,10 +26,11 @@ public final class ResponseDispatcher {
 
 	private final Session session;
 
+	private final String queueName;
 	/**
 	 * A temporary queue created on the sending end that will receive responses to requests sent from this service.
 	 */
-	private final TemporaryQueue responseQueue;
+	private final Queue responseQueue;
 	/**
 	 * Map from correlation ID (request ID) to the response listener. Has to be synchronized, as an entry removal occurs
 	 * asynchronously when message arrives, which could collide with entry adding.
@@ -45,13 +46,17 @@ public final class ResponseDispatcher {
 	 */
 	public static final String LAST_RESPONSE = "is_last";
 
-
-	public ResponseDispatcher(Connection connection) {
+	/**
+	 * @param connection Connection to the broker.
+	 * @param daemonName Unique name of the daemon we are running (will be used for the response queue)
+	 */
+	public ResponseDispatcher(final Connection connection, final String daemonName) {
 		try {
 			session = connection.createSession(/*transacted?*/false, /*acknowledgment*/Session.CLIENT_ACKNOWLEDGE);
-			responseQueue = session.createTemporaryQueue();
-			final MessageConsumer tempQueueConsumer = session.createConsumer(responseQueue);
-			tempQueueConsumer.setMessageListener(new TempQueueMessageListener());
+			queueName = daemonName + "-responses";
+			responseQueue = session.createQueue(queueName);
+			final MessageConsumer queueConsumer = session.createConsumer(responseQueue);
+			queueConsumer.setMessageListener(new ResponseQueueMessageListener());
 
 		} catch (JMSException e) {
 			throw new MprcException("Could not create response queue", e);
@@ -60,6 +65,10 @@ public final class ResponseDispatcher {
 
 	public Destination getResponseDestination() {
 		return responseQueue;
+	}
+
+	public String getResponseQueueName() {
+		return queueName;
 	}
 
 	/**
@@ -74,7 +83,7 @@ public final class ResponseDispatcher {
 		return correlationId;
 	}
 
-	private class TempQueueMessageListener implements MessageListener {
+	private class ResponseQueueMessageListener implements MessageListener {
 		@Override
 		public void onMessage(final Message message) {
 			try {

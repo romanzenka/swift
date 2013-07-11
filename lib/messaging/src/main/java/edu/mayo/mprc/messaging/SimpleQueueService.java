@@ -45,8 +45,7 @@ final class SimpleQueueService implements Service {
 
 	/**
 	 * Establishes a link of given name on a given broker.
-	 * Each link consists of two JMS queues - one for sending request and a temporary response queue
-	 * for each of the requests.
+	 * Each link consists of two JMS queues - one for sending requests, one (wrapped in ResponseDispatcher) for receiving responses.
 	 *
 	 * @param connection         The ActiveMQ connection to use.
 	 * @param responseDispatcher Response dispatcher that can handle transfer of responses to the requests.
@@ -75,19 +74,18 @@ final class SimpleQueueService implements Service {
 		try {
 			final ObjectMessage objectMessage = sendingSession().createObjectMessage(request);
 
-			if (null != listener) {
-				// User wants response to the message.
+			final int extraPriority = request instanceof PrioritizedData ? ((PrioritizedData) request).getPriority() : 0;
+			objectMessage.setJMSPriority(priority + extraPriority);
 
+			if (null != listener) {
 				// Register the new listener on the temporary queue and remember its correlation ID
 				final String correlationId = responseDispatcher.registerMessageListener(listener);
-
 				// Replies go our temporary queue
 				objectMessage.setJMSReplyTo(responseDispatcher.getResponseDestination());
 				// Correlation ID matches the responses with the response listener
 				objectMessage.setJMSCorrelationID(correlationId);
-				final int extraPriority = request instanceof PrioritizedData ? ((PrioritizedData) request).getPriority() : 0;
-				objectMessage.setJMSPriority(priority + extraPriority);
 			}
+
 			LOGGER.debug("Sending message to [" + queueName + "] with content [" + objectMessage.toString() + "] id: [" + objectMessage.getJMSMessageID() + "]");
 			messageProducer().send(requestDestination, objectMessage);
 		} catch (JMSException e) {

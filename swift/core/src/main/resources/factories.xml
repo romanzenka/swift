@@ -129,6 +129,7 @@
     <bean id="swiftSge" class="edu.mayo.mprc.swift.SgeJobRunner">
         <property name="resourceTable" ref="resourceTable"/>
         <property name="connectionPool" ref="connectionPool"/>
+        <property name="serviceFactory" ref="serviceFactory"/>
     </bean>
 
     <bean id="daemonConnectionFactory" class="edu.mayo.mprc.daemon.DaemonConnectionFactory">
@@ -148,6 +149,7 @@
                 <bean id="helpCommand" class="edu.mayo.mprc.swift.commands.DisplayHelp"/>
                 <bean id="swiftRunCommand" class="edu.mayo.mprc.swift.commands.RunSwift">
                     <property name="connectionPool" ref="connectionPool"/>
+                    <property name="serviceFactory" ref="serviceFactory"/>
                 </bean>
                 <ref bean="sgeRunCommand"/>
                 <ref bean="loadToSearchDbCommand"/>

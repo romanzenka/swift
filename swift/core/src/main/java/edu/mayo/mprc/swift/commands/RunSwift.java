@@ -5,6 +5,7 @@ import edu.mayo.mprc.config.DaemonConfig;
 import edu.mayo.mprc.config.ResourceConfig;
 import edu.mayo.mprc.daemon.Daemon;
 import edu.mayo.mprc.messaging.ActiveMQConnectionPool;
+import edu.mayo.mprc.messaging.ServiceFactory;
 import edu.mayo.mprc.swift.ExitCode;
 import edu.mayo.mprc.swift.WebUi;
 import edu.mayo.mprc.utilities.FileListener;
@@ -26,6 +27,7 @@ public class RunSwift implements FileListener, SwiftCommand {
 
 	private final CountDownLatch configFileChanged = new CountDownLatch(1);
 	private ActiveMQConnectionPool connectionPool;
+	private ServiceFactory serviceFactory;
 
 	@Override
 	public String getName() {
@@ -46,6 +48,7 @@ public class RunSwift implements FileListener, SwiftCommand {
 
 		checkDoesNotContainWebModule(config);
 
+		serviceFactory.initialize(config.getName());
 		final Daemon daemon = environment.createDaemon(config);
 		LOGGER.debug(daemon.toString());
 
@@ -125,5 +128,13 @@ public class RunSwift implements FileListener, SwiftCommand {
 
 	public void setConnectionPool(ActiveMQConnectionPool connectionPool) {
 		this.connectionPool = connectionPool;
+	}
+
+	public ServiceFactory getServiceFactory() {
+		return serviceFactory;
+	}
+
+	public void setServiceFactory(ServiceFactory serviceFactory) {
+		this.serviceFactory = serviceFactory;
 	}
 }

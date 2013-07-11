@@ -12,6 +12,7 @@ import edu.mayo.mprc.daemon.Worker;
 import edu.mayo.mprc.daemon.files.FileTokenFactory;
 import edu.mayo.mprc.daemon.files.FileTokenHolder;
 import edu.mayo.mprc.messaging.ActiveMQConnectionPool;
+import edu.mayo.mprc.messaging.ServiceFactory;
 import edu.mayo.mprc.messaging.rmi.BoundMessenger;
 import edu.mayo.mprc.messaging.rmi.MessengerFactory;
 import edu.mayo.mprc.messaging.rmi.OneWayMessenger;
@@ -35,6 +36,7 @@ public final class SgeJobRunner {
 	private static final Logger LOGGER = Logger.getLogger(SgeJobRunner.class);
 	private ResourceTable resourceTable;
 	private ActiveMQConnectionPool connectionPool;
+	private ServiceFactory serviceFactory;
 
 	public SgeJobRunner() {
 	}
@@ -47,6 +49,7 @@ public final class SgeJobRunner {
 	public void run(final File workPacketXmlFile) {
 		// Wait for the work packet to fully materialize in case it was transferred over a shared filesystem
 		FileUtilities.waitForFile(workPacketXmlFile);
+		serviceFactory.initialize(null);
 
 		FileInputStream fileInputStream = null;
 		SgePacket sgePacket = null;
@@ -131,6 +134,14 @@ public final class SgeJobRunner {
 
 	public void setConnectionPool(ActiveMQConnectionPool connectionPool) {
 		this.connectionPool = connectionPool;
+	}
+
+	public ServiceFactory getServiceFactory() {
+		return serviceFactory;
+	}
+
+	public void setServiceFactory(ServiceFactory serviceFactory) {
+		this.serviceFactory = serviceFactory;
 	}
 
 	private static void reportProgress(final BoundMessenger<OneWayMessenger> boundMessenger, final Serializable serializable) throws RemoteException {

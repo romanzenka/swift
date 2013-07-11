@@ -34,7 +34,24 @@ public final class ServiceFactory {
 	private ResponseDispatcher responseDispatcher;
 	private final Object responseDispatcherLock = new Object();
 
+	/**
+	 * Name of the daemon - used when creating the response queue name.
+	 */
+	private String daemonName;
+
 	public ServiceFactory() {
+	}
+
+	/**
+	 * Give the service factory the name of the daemon we operate within, so the response queue can
+	 * be properly established.
+	 *
+	 * @param daemonName
+	 */
+	public void initialize(final String daemonName) {
+		synchronized (responseDispatcherLock) {
+			this.daemonName = daemonName;
+		}
 	}
 
 	/**
@@ -117,11 +134,18 @@ public final class ServiceFactory {
 		final UserInfo info = extractJmsUserinfo(serviceUri);
 
 		final Connection connection = getConnectionPool().getConnectionToBroker(broker, info.getUserName(), info.getPassword());
+		return new SimpleQueueService(connection, createResponseDispatcher(connection), name);
+	}
+
+	private ResponseDispatcher createResponseDispatcher(final Connection connection) {
 		synchronized (responseDispatcherLock) {
-			if (responseDispatcher != null) {
-				responseDispatcher = new ResponseDispatcher(connection);
+			if (daemonName == null) {
+				throw new MprcException("The daemon name has to be set before a ServiceFactory can be used");
 			}
-			return new SimpleQueueService(connection, responseDispatcher, name);
+			if (responseDispatcher != null) {
+				responseDispatcher = new ResponseDispatcher(connection, daemonName);
+			}
+			return responseDispatcher;
 		}
 	}
 
