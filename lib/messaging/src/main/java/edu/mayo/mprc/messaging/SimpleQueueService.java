@@ -5,10 +5,6 @@ import org.apache.log4j.Logger;
 
 import javax.jms.*;
 import java.io.Serializable;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * A JMS queue that allows request-response communication.
@@ -40,49 +36,30 @@ final class SimpleQueueService implements Service {
 	 */
 	private final ThreadLocal<MessageConsumer> consumer = new ThreadLocal<MessageConsumer>();
 
+	private final ResponseDispatcher responseDispatcher;
+
 	/**
 	 * Name of the queue to send requests to / receive responses from.
 	 */
 	private final String queueName;
 
 	/**
-	 * A temporary queue created on the sending end that will receive responses to requests sent from this service.
-	 */
-	private final TemporaryQueue responseQueue;
-	/**
-	 * Map from correlation ID (request ID) to the response listener. Has to be synchronized, as an entry removal occurs
-	 * asynchronously when message arrives, which could collide with entry adding.
-	 */
-	private final Map<String, ResponseListener> responseMap = Collections.synchronizedMap(new HashMap<String, ResponseListener>());
-	/**
-	 * An id for requests that allows responses to be matched with the original sender.
-	 */
-	private final AtomicInteger uniqueId = new AtomicInteger(0);
-
-	/**
-	 * The very last response to a request is marked with this boolean property set to true.
-	 */
-	public static final String LAST_RESPONSE = "is_last";
-
-	/**
 	 * Establishes a link of given name on a given broker.
 	 * Each link consists of two JMS queues - one for sending request and a temporary response queue
 	 * for each of the requests.
 	 *
-	 * @param name Name of the queue.
+	 * @param connection         The ActiveMQ connection to use.
+	 * @param responseDispatcher Response dispatcher that can handle transfer of responses to the requests.
+	 * @param name               Name of the queue.
 	 */
-	SimpleQueueService(final Connection connection, final String name) {
+	SimpleQueueService(final Connection connection, final ResponseDispatcher responseDispatcher, final String name) {
 		this.queueName = name;
+		this.responseDispatcher = responseDispatcher;
 
 		try {
 			this.connection = connection;
 
-			responseQueue = sendingSession().createTemporaryQueue();
-
 			requestDestination = sendingSession().createQueue(queueName);
-
-			final MessageConsumer tempQueueConsumer = sendingSession().createConsumer(responseQueue);
-			tempQueueConsumer.setMessageListener(new TempQueueMessageListener());
 
 			LOGGER.info("Connected to JMS broker: " + connection.getClientID() + " queue: " + queueName);
 		} catch (JMSException e) {
@@ -102,11 +79,10 @@ final class SimpleQueueService implements Service {
 				// User wants response to the message.
 
 				// Register the new listener on the temporary queue and remember its correlation ID
-				final String correlationId = String.valueOf(uniqueId.incrementAndGet());
-				responseMap.put(correlationId, listener);
+				final String correlationId = responseDispatcher.registerMessageListener(listener);
 
 				// Replies go our temporary queue
-				objectMessage.setJMSReplyTo(responseQueue);
+				objectMessage.setJMSReplyTo(responseDispatcher.getResponseDestination());
 				// Correlation ID matches the responses with the response listener
 				objectMessage.setJMSCorrelationID(correlationId);
 				final int extraPriority = request instanceof PrioritizedData ? ((PrioritizedData) request).getPriority() : 0;
@@ -148,7 +124,7 @@ final class SimpleQueueService implements Service {
 			if (originalMessage.getJMSCorrelationID() != null) {
 				// Response was requested
 				final ObjectMessage responseMessage = receivingSession().createObjectMessage(response);
-				responseMessage.setBooleanProperty(SimpleQueueService.LAST_RESPONSE, isLast);
+				responseMessage.setBooleanProperty(ResponseDispatcher.LAST_RESPONSE, isLast);
 				responseMessage.setJMSCorrelationID(originalMessage.getJMSCorrelationID());
 				messageProducer().send(originalMessage.getJMSReplyTo(), responseMessage);
 				LOGGER.debug("Message sent: " + responseMessage.getJMSMessageID() + " timestamp: " + responseMessage.getJMSTimestamp());
@@ -212,65 +188,4 @@ final class SimpleQueueService implements Service {
 		return sessionHolder.get();
 	}
 
-	private class TempQueueMessageListener implements MessageListener {
-		@Override
-		public void onMessage(final Message message) {
-			try {
-				processMessage(message);
-			} finally {
-				acknowledgeMessage(message);
-			}
-		}
-
-		/**
-		 * Must never throw an exception.
-		 */
-		private void processMessage(final Message message) {
-			boolean isLast = true;
-			ResponseListener listener = null;
-			try {
-				final ObjectMessage objectMessage = (ObjectMessage) message;
-				final Serializable messageData = objectMessage.getObject();
-				final String listenerId = objectMessage.getJMSCorrelationID();
-				listener = responseMap.get(listenerId);
-				isLast = objectMessage.getBooleanProperty(SimpleQueueService.LAST_RESPONSE);
-				if (listener == null) {
-					LOGGER.error("No registered listener for response");
-				} else {
-					if (isLast) {
-						responseMap.remove(listenerId);
-					}
-					listener.responseReceived(messageData, isLast);
-				}
-			} catch (Exception t) {
-				// SWALLOWED: This method cannot throw exceptions, but it can pass them as a received object.
-				if (null != listener) {
-					try {
-						listener.responseReceived(t, isLast);
-					} catch (Exception e) {
-						// SWALLOWED
-						LOGGER.warn("The response listener failed", e);
-					}
-				} else {
-					LOGGER.error("No registered listener for response, cannot report error", t);
-				}
-			}
-		}
-
-		private void acknowledgeMessage(final Message message) {
-			if (message == null) {
-				return;
-			}
-			try {
-				message.acknowledge();
-			} catch (JMSException e) {
-				//SWALLOWED
-				try {
-					LOGGER.error("Failed to acknowledge message received. Message destination: " + message.getJMSDestination(), e);
-				} catch (JMSException ignore) {
-					//SWALLOWED
-				}
-			}
-		}
-	}
 }

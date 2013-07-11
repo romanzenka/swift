@@ -31,6 +31,8 @@ public final class ServiceFactory {
 	private static final Pattern URI_SIMPLE_QUEUE_PART = Pattern.compile("[&?]simplequeue=([^&?]*)$");
 
 	private ActiveMQConnectionPool connectionPool;
+	private ResponseDispatcher responseDispatcher;
+	private final Object responseDispatcherLock = new Object();
 
 	public ServiceFactory() {
 	}
@@ -81,7 +83,6 @@ public final class ServiceFactory {
 	 *
 	 * @param serviceUri
 	 * @return
-	 * @throws URISyntaxException
 	 */
 	public static URI extractJmsBrokerUri(final URI serviceUri) {
 		if (serviceUri == null) {
@@ -116,7 +117,12 @@ public final class ServiceFactory {
 		final UserInfo info = extractJmsUserinfo(serviceUri);
 
 		final Connection connection = getConnectionPool().getConnectionToBroker(broker, info.getUserName(), info.getPassword());
-		return new SimpleQueueService(connection, name);
+		synchronized (responseDispatcherLock) {
+			if (responseDispatcher != null) {
+				responseDispatcher = new ResponseDispatcher(connection);
+			}
+			return new SimpleQueueService(connection, responseDispatcher, name);
+		}
 	}
 
 	public ActiveMQConnectionPool getConnectionPool() {
