@@ -7,6 +7,7 @@ import edu.mayo.mprc.daemon.files.FileTokenFactory;
 import edu.mayo.mprc.database.DatabaseFactory;
 import edu.mayo.mprc.database.FileType;
 import edu.mayo.mprc.filesharing.jms.JmsFileTransferHandlerFactory;
+import edu.mayo.mprc.messaging.ActiveMQConnectionPool;
 import edu.mayo.mprc.swift.db.FileTokenFactoryWrapper;
 import edu.mayo.mprc.swift.db.SearchEngine;
 import edu.mayo.mprc.swift.search.SwiftSearcher;
@@ -147,7 +148,7 @@ public final class SwiftConfig {
 	 * @param swiftConfig  Complete Swift config.
 	 * @param daemonConfig Config for the active daemon.
 	 */
-	public static void setupFileTokenFactory(final ApplicationConfig swiftConfig, final DaemonConfig daemonConfig, final FileTokenFactory fileTokenFactory) {
+	public static void setupFileTokenFactory(final ApplicationConfig swiftConfig, final DaemonConfig daemonConfig, final FileTokenFactory fileTokenFactory, final ActiveMQConnectionPool connectionPool) {
 		// Setup the actual daemon
 		fileTokenFactory.setDaemonConfigInfo(daemonConfig.createDaemonConfigInfo());
 		if (daemonConfig.getTempFolderPath() == null) {
@@ -162,9 +163,8 @@ public final class SwiftConfig {
 		final List<ResourceConfig> brokerConfigs = swiftConfig.getModulesOfConfigType(MessageBroker.Config.class);
 		if (brokerConfigs.size() > 0) {
 			try {
-				final KeyExtractingWriter keyExtractingWriter = new KeyExtractingWriter(MessageBroker.BROKER_URL);
-				brokerConfigs.get(0).save(keyExtractingWriter);
-				fileTokenFactory.setFileSharingFactory(new JmsFileTransferHandlerFactory(new URI(keyExtractingWriter.getValue())));
+				final String brokerUrl = KeyExtractingWriter.get(brokerConfigs.get(0), MessageBroker.BROKER_URL);
+				fileTokenFactory.setFileSharingFactory(new JmsFileTransferHandlerFactory(connectionPool, new URI(brokerUrl)));
 			} catch (URISyntaxException e) {
 				throw new MprcException("Failed to set FileTransferHandlerFactory in FileTokenFactory object.", e);
 			}

@@ -4,10 +4,12 @@ import edu.mayo.mprc.MprcException;
 import edu.mayo.mprc.config.DaemonConfig;
 import edu.mayo.mprc.config.ResourceConfig;
 import edu.mayo.mprc.daemon.Daemon;
+import edu.mayo.mprc.messaging.ActiveMQConnectionPool;
 import edu.mayo.mprc.swift.ExitCode;
 import edu.mayo.mprc.swift.WebUi;
 import edu.mayo.mprc.utilities.FileListener;
 import edu.mayo.mprc.utilities.FileMonitor;
+import edu.mayo.mprc.utilities.FileUtilities;
 import org.apache.log4j.Logger;
 
 import java.io.File;
@@ -23,6 +25,7 @@ public class RunSwift implements FileListener, SwiftCommand {
 	public static final String RUN_SWIFT = "run-swift";
 
 	private final CountDownLatch configFileChanged = new CountDownLatch(1);
+	private ActiveMQConnectionPool connectionPool;
 
 	@Override
 	public String getName() {
@@ -77,6 +80,7 @@ public class RunSwift implements FileListener, SwiftCommand {
 				daemon.awaitTermination();
 			}
 			LOGGER.info("Daemon stopped");
+			FileUtilities.closeQuietly(connectionPool);
 		} else {
 			throw new MprcException("No daemons are configured in " + configFile.getAbsolutePath() + ". Exiting.");
 		}
@@ -113,5 +117,13 @@ public class RunSwift implements FileListener, SwiftCommand {
 	@Override
 	public void fileChanged(final File file) {
 		configFileChanged.countDown();
+	}
+
+	public ActiveMQConnectionPool getConnectionPool() {
+		return connectionPool;
+	}
+
+	public void setConnectionPool(ActiveMQConnectionPool connectionPool) {
+		this.connectionPool = connectionPool;
 	}
 }

@@ -2,6 +2,7 @@ package edu.mayo.mprc.messaging;
 
 import edu.mayo.mprc.MprcException;
 
+import javax.jms.Connection;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.regex.Matcher;
@@ -28,6 +29,8 @@ public final class ServiceFactory {
 	 * Matches the part of URI defining the queue name.
 	 */
 	private static final Pattern URI_SIMPLE_QUEUE_PART = Pattern.compile("[&?]simplequeue=([^&?]*)$");
+
+	private ActiveMQConnectionPool connectionPool;
 
 	public ServiceFactory() {
 	}
@@ -106,13 +109,21 @@ public final class ServiceFactory {
 	 * The consumer can send responses back.
 	 *
 	 * @return Service based on a simple queue that can be used for both sending and receiving of messages.
-	 * @throws edu.mayo.mprc.MprcException SimpleQueue could not be created.
 	 */
-	public static Service createJmsQueue(final URI serviceUri) {
+	public Service createJmsQueue(final URI serviceUri) {
 		final URI broker = extractJmsBrokerUri(serviceUri);
 		final String name = extractJmsQueueName(serviceUri);
 		final UserInfo info = extractJmsUserinfo(serviceUri);
 
-		return new SimpleQueueService(broker, name, info.getUserName(), info.getPassword());
+		final Connection connection = getConnectionPool().getConnectionToBroker(broker, info.getUserName(), info.getPassword());
+		return new SimpleQueueService(connection, name);
+	}
+
+	public ActiveMQConnectionPool getConnectionPool() {
+		return connectionPool;
+	}
+
+	public void setConnectionPool(final ActiveMQConnectionPool connectionPool) {
+		this.connectionPool = connectionPool;
 	}
 }

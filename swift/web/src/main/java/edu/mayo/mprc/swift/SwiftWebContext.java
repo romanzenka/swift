@@ -78,7 +78,7 @@ public final class SwiftWebContext {
 					}
 					webUiHolder.getWebUi().setMainDaemon(daemon);
 
-					SwiftConfig.setupFileTokenFactory(swiftConfig, daemonConfig, webUiHolder.getWebUi().getFileTokenFactory());
+					SwiftConfig.setupFileTokenFactory(swiftConfig, daemonConfig, webUiHolder.getWebUi().getFileTokenFactory(), MainFactoryContext.getConnectionPool());
 
 					// Initialize DB curator
 					final CurationWebContext curationWebContext = (CurationWebContext) MainFactoryContext.getContext().getBean("curationWebContext");
@@ -97,9 +97,10 @@ public final class SwiftWebContext {
 					initializedDaemon = daemonId;
 				} catch (Exception t) {
 					LOGGER.fatal("Swift web application should be terminated", t);
-					if(webUiHolder!=null) {
+					if (webUiHolder != null) {
 						webUiHolder.stopSwiftMonitor();
 					}
+					MainFactoryContext.getConnectionPool().close();
 					System.exit(1);
 					throw new MprcException(t);
 				}

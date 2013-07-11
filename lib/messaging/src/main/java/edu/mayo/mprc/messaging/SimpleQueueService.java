@@ -5,7 +5,6 @@ import org.apache.log4j.Logger;
 
 import javax.jms.*;
 import java.io.Serializable;
-import java.net.URI;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -70,16 +69,13 @@ final class SimpleQueueService implements Service {
 	 * Each link consists of two JMS queues - one for sending request and a temporary response queue
 	 * for each of the requests.
 	 *
-	 * @param broker   Broker the queue lives on.
-	 * @param name     Name of the queue.
-	 * @param userName User for logging to the message broker.
-	 * @param password Password for logging to the message broker.
+	 * @param name Name of the queue.
 	 */
-	SimpleQueueService(final URI broker, final String name, final String userName, final String password) {
+	SimpleQueueService(final Connection connection, final String name) {
 		this.queueName = name;
 
 		try {
-			connection = ActiveMQConnectionPool.getConnectionToBroker(broker, userName, password);
+			this.connection = connection;
 
 			responseQueue = sendingSession().createTemporaryQueue();
 
@@ -88,10 +84,7 @@ final class SimpleQueueService implements Service {
 			final MessageConsumer tempQueueConsumer = sendingSession().createConsumer(responseQueue);
 			tempQueueConsumer.setMessageListener(new TempQueueMessageListener());
 
-			// start the connection and start listening for events
-			connection.start();
-
-			LOGGER.info("Connected to JMS broker: " + broker.toString() + " queue: " + queueName);
+			LOGGER.info("Connected to JMS broker: " + connection.getClientID() + " queue: " + queueName);
 		} catch (JMSException e) {
 			throw new MprcException("Queue could not be created", e);
 		}

@@ -12,6 +12,7 @@ import edu.mayo.mprc.daemon.Worker;
 import edu.mayo.mprc.daemon.files.FileTokenFactory;
 import edu.mayo.mprc.daemon.files.FileTokenHolder;
 import edu.mayo.mprc.filesharing.jms.JmsFileTransferHandlerFactory;
+import edu.mayo.mprc.messaging.ActiveMQConnectionPool;
 import edu.mayo.mprc.messaging.rmi.BoundMessenger;
 import edu.mayo.mprc.messaging.rmi.MessengerFactory;
 import edu.mayo.mprc.messaging.rmi.OneWayMessenger;
@@ -34,6 +35,7 @@ public final class SgeJobRunner {
 
 	private static final Logger LOGGER = Logger.getLogger(SgeJobRunner.class);
 	private ResourceTable resourceTable;
+	private ActiveMQConnectionPool connectionPool;
 
 	public SgeJobRunner() {
 	}
@@ -79,7 +81,7 @@ public final class SgeJobRunner {
 					fileTokenFactory.setTempFolderRepository(new File(sgePacket.getSharedTempDirectory()));
 				}
 
-				fileTokenFactory.setFileSharingFactory(new JmsFileTransferHandlerFactory(sgePacket.getFileSharingFactoryURI()), false);
+				fileTokenFactory.setFileSharingFactory(new JmsFileTransferHandlerFactory(connectionPool, sgePacket.getFileSharingFactoryURI()), false);
 				fileTokenHolder.translateOnReceiver(fileTokenFactory, fileTokenFactory, null);
 			}
 
@@ -99,6 +101,7 @@ public final class SgeJobRunner {
 				// SWALLOWED
 			}
 
+			FileUtilities.closeQuietly(getConnectionPool());
 			System.exit(1);
 		} finally {
 			if (fileInputStream != null) {
@@ -112,6 +115,7 @@ public final class SgeJobRunner {
 		}
 
 		LOGGER.info("Work packet " + sgePacket.getWorkPacket().toString() + " successfully processed.");
+		FileUtilities.closeQuietly(getConnectionPool());
 		System.exit(0);
 	}
 
@@ -123,11 +127,19 @@ public final class SgeJobRunner {
 		this.resourceTable = resourceTable;
 	}
 
+	public ActiveMQConnectionPool getConnectionPool() {
+		return connectionPool;
+	}
+
+	public void setConnectionPool(ActiveMQConnectionPool connectionPool) {
+		this.connectionPool = connectionPool;
+	}
+
 	private static void reportProgress(final BoundMessenger<OneWayMessenger> boundMessenger, final Serializable serializable) throws RemoteException {
 		boundMessenger.getMessenger().sendMessage(serializable);
 	}
 
-	static class DaemonWorkerProgressReporter implements ProgressReporter {
+	class DaemonWorkerProgressReporter implements ProgressReporter {
 		private BoundMessenger<OneWayMessenger> boundMessenger;
 
 		DaemonWorkerProgressReporter(final BoundMessenger<OneWayMessenger> boundMessenger) {
@@ -145,6 +157,7 @@ public final class SgeJobRunner {
 					LOGGER.error("Error sending exception " + MprcException.getDetailedMessage(t) + " to GridRunner", ex);
 					// SWALLOWED
 				}
+				FileUtilities.closeQuietly(getConnectionPool());
 				System.exit(1);
 			}
 		}

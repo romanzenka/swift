@@ -1,5 +1,6 @@
 package edu.mayo.mprc.swift;
 
+import edu.mayo.mprc.messaging.ActiveMQConnectionPool;
 import edu.mayo.mprc.swift.commands.SwiftEnvironment;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
@@ -60,6 +61,10 @@ public final class MainFactoryContext {
 	}
 
 	public static WebUiHolder getWebUiHolder() {
-		return (WebUiHolder)getBean("webUiHolder");
+		return (WebUiHolder) getBean("webUiHolder");
+	}
+
+	public static ActiveMQConnectionPool getConnectionPool() {
+		return (ActiveMQConnectionPool) getBean("connectionPool");
 	}
 }

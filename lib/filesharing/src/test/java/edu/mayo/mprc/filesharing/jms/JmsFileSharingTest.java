@@ -3,6 +3,7 @@ package edu.mayo.mprc.filesharing.jms;
 import edu.mayo.mprc.MprcException;
 import edu.mayo.mprc.filesharing.FileTransfer;
 import edu.mayo.mprc.filesharing.FileTransferHandler;
+import edu.mayo.mprc.messaging.ActiveMQConnectionPool;
 import edu.mayo.mprc.utilities.FileUtilities;
 import edu.mayo.mprc.utilities.TestingUtilities;
 import org.apache.activemq.broker.BrokerService;
@@ -30,12 +31,14 @@ public final class JmsFileSharingTest {
 	private FileTransferHandler fileSharing;
 	private FileTransferHandler fileSharingClient;
 	private FileTransferHandler fileSharingServer;
+	private ActiveMQConnectionPool connectionPool;
 
 	private static final Logger LOGGER = Logger.getLogger(JmsFileSharingTest.class);
 
 	@BeforeClass
 	public void setUp() {
 		LOGGER.debug("Starting set up");
+		this.connectionPool = new ActiveMQConnectionPool();
 
 		try {
 			uri = new URI(brokerUri);
@@ -51,7 +54,7 @@ public final class JmsFileSharingTest {
 
 		tempFolder = FileUtilities.createTempFolder();
 
-		final JmsFileTransferHandlerFactory factory = new JmsFileTransferHandlerFactory(uri, null, null);
+		final JmsFileTransferHandlerFactory factory = new JmsFileTransferHandlerFactory(connectionPool, uri, null, null);
 		fileSharing = factory.createFileSharing("test");
 		fileSharing.startProcessingRequests();
 
@@ -329,6 +332,7 @@ public final class JmsFileSharingTest {
 		fileSharing.stopProcessingRequest();
 		fileSharingClient.stopProcessingRequest();
 		fileSharingServer.stopProcessingRequest();
+		connectionPool.close();
 
 		try {
 			broker.stop();

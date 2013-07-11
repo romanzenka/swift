@@ -3,13 +3,11 @@ package edu.mayo.mprc.filesharing.jms;
 import edu.mayo.mprc.MprcException;
 import edu.mayo.mprc.filesharing.FileTransfer;
 import edu.mayo.mprc.filesharing.FileTransferHandler;
-import edu.mayo.mprc.messaging.ActiveMQConnectionPool;
 import org.apache.activemq.ActiveMQSession;
 import org.apache.log4j.Logger;
 
 import javax.jms.*;
 import java.io.File;
-import java.net.URI;
 import java.util.Collections;
 import java.util.Map;
 import java.util.TreeMap;
@@ -30,10 +28,7 @@ public final class JmsFileTransferHandler implements FileTransferHandler {
 	private static final Logger LOGGER = Logger.getLogger(JmsFileTransferHandler.class);
 	private ActiveMQSession session;
 	private Connection connection;
-	private final URI brokerURI;
 	private final String queueName;
-	private final String userName;
-	private final String password;
 
 	private Destination destination;
 	private MessageConsumer consumer;
@@ -47,19 +42,13 @@ public final class JmsFileTransferHandler implements FileTransferHandler {
 	/**
 	 * Constructor blocks until the connection to JMS broker is stablished.
 	 *
-	 * @param broker
 	 * @param sourceId
-	 * @param userName
-	 * @param password
 	 */
-	public JmsFileTransferHandler(final URI broker, final String sourceId, final String userName, final String password) {
+	public JmsFileTransferHandler(final Connection connection, final String sourceId) {
 		runningSemaphore = new Semaphore(1);
 		messageProducers = Collections.synchronizedMap(new TreeMap<String, MessageProducer>());
-
-		this.brokerURI = broker;
+		this.connection = connection;
 		this.queueName = QUEUE_PREFIX + sourceId;
-		this.userName = userName;
-		this.password = password;
 	}
 
 	/**
@@ -73,17 +62,9 @@ public final class JmsFileTransferHandler implements FileTransferHandler {
 		synchronized (runningSemaphore) {
 			if (runningSemaphore.tryAcquire()) {
 				try {
-					connection = ActiveMQConnectionPool.getConnectionToBroker(brokerURI, userName, password);
-
-					session = (ActiveMQSession) this.connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
+					session = (ActiveMQSession) connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
 
 					destination = session.createQueue(queueName);
-
-					connection.start();
-
-					LOGGER.info("Connected to JMS broker: " + brokerURI.toString() + " queue: " + this.queueName);
-
-					LOGGER.info("Starting file transfer request processing for queue: " + queueName);
 
 					final MessageConsumer consumer = getMessageConsumer();
 
@@ -96,9 +77,19 @@ public final class JmsFileTransferHandler implements FileTransferHandler {
 					}
 				} catch (Exception e) {
 					runningSemaphore.release();
-					throw new MprcException("Failed to start processing file transfer requests from queue: " + queueName + " at JMS broker URI: " + brokerURI, e);
+					throw new MprcException("Failed to start processing file transfer requests from queue: " + queueName + " at JMS broker: " + brokerId(), e);
 				}
 			}
+		}
+	}
+
+	private String brokerId() {
+		try {
+			return connection.getClientID();
+		} catch (JMSException e) {
+			// SWALLOWED: Not a big deal
+			LOGGER.warn("Could not obtain JMS broker ID", e);
+			return "<unknown>";
 		}
 	}
 
@@ -109,7 +100,7 @@ public final class JmsFileTransferHandler implements FileTransferHandler {
 					LOGGER.info("Stopping file transfer request processing for queue: " + queueName);
 					closeConnection();
 				} catch (JMSException e) {
-					throw new MprcException("Error ocurred while stopping file transfer request processing for queue: " + queueName, e);
+					throw new MprcException("Error occurred while stopping file transfer request processing for queue: " + queueName, e);
 				}
 
 				runningSemaphore.release();

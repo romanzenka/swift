@@ -6,6 +6,7 @@ import edu.mayo.mprc.daemon.Daemon;
 import edu.mayo.mprc.daemon.DaemonConnection;
 import edu.mayo.mprc.daemon.DaemonConnectionFactory;
 import edu.mayo.mprc.daemon.files.FileTokenFactory;
+import edu.mayo.mprc.messaging.ActiveMQConnectionPool;
 import edu.mayo.mprc.swift.ExitCode;
 import edu.mayo.mprc.swift.SwiftConfig;
 import edu.mayo.mprc.swift.SwiftMonitor;
@@ -34,6 +35,7 @@ public final class SwiftEnvironmentImpl implements SwiftEnvironment {
 	private File configFile;
 	private SwiftCommandLine commandLine;
 	private SwiftMonitor monitor;
+	private ActiveMQConnectionPool connectionPool;
 
 	public SwiftEnvironmentImpl() {
 	}
@@ -150,12 +152,20 @@ public final class SwiftEnvironmentImpl implements SwiftEnvironment {
 		this.daemonConnectionFactory = daemonConnectionFactory;
 	}
 
+	public ActiveMQConnectionPool getConnectionPool() {
+		return connectionPool;
+	}
+
+	public void setConnectionPool(ActiveMQConnectionPool connectionPool) {
+		this.connectionPool = connectionPool;
+	}
+
 	@Override
 	public DaemonConfig getDaemonConfig() {
 		if (daemonConfig == null) {
 			if (configFile != null) {
 				daemonConfig = SwiftConfig.getUserSpecifiedDaemonConfig(commandLine.getDaemonId(), getApplicationConfig());
-				SwiftConfig.setupFileTokenFactory(getApplicationConfig(), daemonConfig, getFileTokenFactory());
+				SwiftConfig.setupFileTokenFactory(getApplicationConfig(), daemonConfig, getFileTokenFactory(), getConnectionPool());
 			}
 		}
 

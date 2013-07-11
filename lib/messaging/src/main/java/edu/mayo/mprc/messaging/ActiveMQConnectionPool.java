@@ -7,32 +7,33 @@ import org.apache.log4j.Logger;
 import javax.jms.Connection;
 import javax.jms.JMSException;
 import javax.jms.QueueConnectionFactory;
+import java.io.Closeable;
 import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
-public final class ActiveMQConnectionPool {
+public final class ActiveMQConnectionPool implements Closeable {
 	private static final Logger LOGGER = Logger.getLogger(ActiveMQConnectionPool.class);
 
-	private static final String JMS_BROKER_DOWN_MESSAGE = "Connection refused";
-	private static final int DEFAULT_RECONNECTION_DELAY_IN_SECONDS = 10;
-	private static final Map<ConnectionInfo, Connection> CONNECTIONS = new HashMap<ConnectionInfo, Connection>(1);
-	private static final String RECONNECTION_DELAY_PROPERTY = "edu.mayo.mprc.messaging.jms.SimpleQueueService.reconnectionDelay";
+	private final String JMS_BROKER_DOWN_MESSAGE = "Connection refused";
+	private final int DEFAULT_RECONNECTION_DELAY_IN_SECONDS = 10;
+	private final Map<ConnectionInfo, Connection> CONNECTIONS = new HashMap<ConnectionInfo, Connection>(1);
+	private final String RECONNECTION_DELAY_PROPERTY = "edu.mayo.mprc.messaging.jms.SimpleQueueService.reconnectionDelay";
 
-	private ActiveMQConnectionPool() {
+	public ActiveMQConnectionPool() {
 	}
 
 	/**
 	 * Provides a cached connection to given broker. If the broker is down, the method will block indefinitely,
-	 * waiting for the broker to come up.
+	 * waiting for the broker to come up. The connection is started automatically.
 	 *
 	 * @param broker   URI of the broker
 	 * @param userName Broker login
 	 * @param password Broker password
 	 * @return
 	 */
-	public static Connection getConnectionToBroker(final URI broker, final String userName, final String password) {
+	public Connection getConnectionToBroker(final URI broker, final String userName, final String password) {
 		final ConnectionInfo info = new ConnectionInfo(broker, userName, password);
 		synchronized (CONNECTIONS) {
 			Connection connection = CONNECTIONS.get(info);
@@ -50,6 +51,7 @@ public final class ActiveMQConnectionPool {
 						} else {
 							connection = connectionFactory.createConnection();
 						}
+						connection.start();
 						run = false;
 					} catch (JMSException e) {
 						if (e.getMessage().indexOf(broker.toString()) == -1 || e.getMessage().indexOf(JMS_BROKER_DOWN_MESSAGE) == -1) {
@@ -72,7 +74,25 @@ public final class ActiveMQConnectionPool {
 		}
 	}
 
-	private static int getConnectionTrialDelay() {
+	/**
+	 * Close all the connections
+	 */
+	@Override
+	public void close() {
+		synchronized (CONNECTIONS) {
+			for (Map.Entry<ConnectionInfo, Connection> entry : CONNECTIONS.entrySet()) {
+				try {
+					entry.getValue().close();
+				} catch (JMSException e) {
+					// SWALLOWED: We are ending anyway
+					LOGGER.warn("Could not close JMS connection", e);
+				}
+			}
+			CONNECTIONS.clear();
+		}
+	}
+
+	private int getConnectionTrialDelay() {
 		int connectionTrialDelay = DEFAULT_RECONNECTION_DELAY_IN_SECONDS;
 		try {
 			connectionTrialDelay = Integer.parseInt(System.getProperty(RECONNECTION_DELAY_PROPERTY, DEFAULT_RECONNECTION_DELAY_IN_SECONDS + ""));

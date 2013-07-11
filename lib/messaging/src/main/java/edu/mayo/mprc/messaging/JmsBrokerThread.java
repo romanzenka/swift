@@ -27,7 +27,6 @@ public final class JmsBrokerThread {
 	 *                   You can use {@link #getUriForPort(int)} method for obtaining URI for a tcp broker running at specific
 	 *                   port, or {@link #getVmUri()} for a broker that runs just within this VM.
 	 * @param brokerName Unique name of the broker for JMX. If null or zero length, JMX is not enabled.
-	 * @throws edu.mayo.mprc.MprcException Broker could not start.
 	 */
 	public JmsBrokerThread(final URI uri, final String brokerName) {
 		try {
@@ -57,8 +56,6 @@ public final class JmsBrokerThread {
 
 	/**
 	 * Stops the execution of the broker.
-	 *
-	 * @throws edu.mayo.mprc.MprcException The broker could not be stopped.
 	 */
 	public void stopBroker() {
 		try {

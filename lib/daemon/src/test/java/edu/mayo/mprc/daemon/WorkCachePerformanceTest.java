@@ -3,6 +3,7 @@ package edu.mayo.mprc.daemon;
 import edu.mayo.mprc.MprcException;
 import edu.mayo.mprc.config.DaemonConfigInfo;
 import edu.mayo.mprc.daemon.files.FileTokenFactory;
+import edu.mayo.mprc.messaging.ActiveMQConnectionPool;
 import edu.mayo.mprc.messaging.Service;
 import edu.mayo.mprc.messaging.ServiceFactory;
 import edu.mayo.mprc.utilities.FileUtilities;
@@ -11,6 +12,7 @@ import edu.mayo.mprc.utilities.progress.ProgressListener;
 import edu.mayo.mprc.utilities.progress.ProgressReporter;
 import org.apache.log4j.Logger;
 import org.testng.Assert;
+import org.testng.annotations.AfterClass;
 import org.testng.annotations.Test;
 
 import java.io.File;
@@ -33,6 +35,12 @@ public final class WorkCachePerformanceTest {
 	private static final int TOTAL_MESSAGES = 10;
 	private final Object workSuccess = new Object();
 	private int workSuccessCount = 0;
+	private final ActiveMQConnectionPool connectionPool = new ActiveMQConnectionPool();
+
+	@AfterClass
+	public void shutdown() {
+		connectionPool.close();
+	}
 
 	@Test
 	public void shouldAccelerateWithCache() throws URISyntaxException, InterruptedException {
@@ -95,7 +103,9 @@ public final class WorkCachePerformanceTest {
 	}
 
 	private SimpleRunner wrapWithRunner(final Worker worker, final String queueName, final File logFolder, final FileTokenFactory fileTokenFactory) throws URISyntaxException {
-		final Service service = ServiceFactory.createJmsQueue(new URI("jms.vm://test?broker.useJmx=false&broker.persistent=false&simplequeue=" + queueName));
+		final ServiceFactory serviceFactory = new ServiceFactory();
+		serviceFactory.setConnectionPool(connectionPool);
+		final Service service = serviceFactory.createJmsQueue(new URI("jms.vm://test?broker.useJmx=false&broker.persistent=false&simplequeue=" + queueName));
 		final DirectDaemonConnection directConnection = new DirectDaemonConnection(service, fileTokenFactory);
 		final Daemon daemon = new Daemon();
 		daemon.setLogOutputFolder(logFolder);

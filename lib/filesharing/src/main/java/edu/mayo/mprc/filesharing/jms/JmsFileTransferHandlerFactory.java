@@ -1,5 +1,8 @@
 package edu.mayo.mprc.filesharing.jms;
 
+import edu.mayo.mprc.messaging.ActiveMQConnectionPool;
+
+import javax.jms.Connection;
 import java.net.URI;
 
 public final class JmsFileTransferHandlerFactory {
@@ -7,16 +10,18 @@ public final class JmsFileTransferHandlerFactory {
 	private URI brokerUri;
 	private String userName;
 	private String password;
+	private ActiveMQConnectionPool connectionPool;
 
 	public JmsFileTransferHandlerFactory() {
 	}
 
-	public JmsFileTransferHandlerFactory(final URI brokerUri) {
+	public JmsFileTransferHandlerFactory(final ActiveMQConnectionPool connectionPool, final URI brokerUri) {
+		this.connectionPool = connectionPool;
 		this.brokerUri = brokerUri;
 	}
 
-	public JmsFileTransferHandlerFactory(final URI brokerUri, final String userName, final String password) {
-		this.brokerUri = brokerUri;
+	public JmsFileTransferHandlerFactory(final ActiveMQConnectionPool connectionPool, final URI brokerUri, final String userName, final String password) {
+		this(connectionPool, brokerUri);
 		this.userName = userName;
 		this.password = password;
 	}
@@ -46,6 +51,7 @@ public final class JmsFileTransferHandlerFactory {
 	}
 
 	public JmsFileTransferHandler createFileSharing(final String sourceId) {
-		return new JmsFileTransferHandler(brokerUri, sourceId, userName, password);
+		final Connection connection = connectionPool.getConnectionToBroker(brokerUri, userName, password);
+		return new JmsFileTransferHandler(connection, sourceId);
 	}
 }
