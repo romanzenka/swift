@@ -21,6 +21,7 @@ public abstract class MessagingTestBase {
 	}
 
 	protected synchronized void startBroker() {
+		serviceFactory.setConnectionPool(new ActiveMQConnectionPool());
 		LOGGER.debug(broker != null ? "JMS Broker already started ---------" : "JMS Starting broker ------------");
 		if (broker != null) {
 			return;
@@ -43,6 +44,7 @@ public abstract class MessagingTestBase {
 			broker.stopBroker();
 			broker = null;
 		}
+		serviceFactory.getConnectionPool().close();
 		LOGGER.debug("JMS Broker stopped -------------");
 	}
 }
