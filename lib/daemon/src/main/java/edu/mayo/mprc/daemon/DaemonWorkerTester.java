@@ -3,6 +3,7 @@ package edu.mayo.mprc.daemon;
 import edu.mayo.mprc.MprcException;
 import edu.mayo.mprc.config.DaemonConfigInfo;
 import edu.mayo.mprc.daemon.files.FileTokenFactory;
+import edu.mayo.mprc.messaging.ActiveMQConnectionPool;
 import edu.mayo.mprc.messaging.Service;
 import edu.mayo.mprc.messaging.ServiceFactory;
 import edu.mayo.mprc.utilities.FileUtilities;
@@ -23,7 +24,14 @@ public final class DaemonWorkerTester {
 	private SimpleRunner runner;
 	private Service service;
 	private DaemonConnection daemonConnection;
+	private ServiceFactory serviceFactory;
 	private static AtomicInteger testId = new AtomicInteger(0);
+
+	private DaemonWorkerTester() {
+		serviceFactory = new ServiceFactory();
+		serviceFactory.setConnectionPool(new ActiveMQConnectionPool());
+
+	}
 
 	/**
 	 * Creates a test runner that runs given worker in a single thread. Automatically starts a thread.
@@ -31,6 +39,7 @@ public final class DaemonWorkerTester {
 	 * @param worker Worker to run
 	 */
 	public DaemonWorkerTester(final Worker worker) {
+		this();
 		try {
 			final URI uri = new URI("jms.vm://broker1?simplequeue=test_" + String.valueOf(testId.incrementAndGet()));
 			initializeFromUri(uri);
@@ -54,7 +63,7 @@ public final class DaemonWorkerTester {
 	}
 
 	private void initializeFromUri(final URI uri) {
-		service = new ServiceFactory().createService(uri);
+		service = serviceFactory.createService(uri);
 		final FileTokenFactory fileTokenFactory = new FileTokenFactory();
 		fileTokenFactory.setDaemonConfigInfo(new DaemonConfigInfo("daemon1", "shared"));
 		daemonConnection = new DirectDaemonConnection(service, fileTokenFactory);
@@ -68,6 +77,7 @@ public final class DaemonWorkerTester {
 	 * @param numWorkerThreads How many threads does the worker run in
 	 */
 	public DaemonWorkerTester(final WorkerFactory workerFactory, final int numWorkerThreads) {
+		this();
 		try {
 			final URI uri = new URI("jms.vm://broker1?simplequeue=test_" + String.valueOf(testId.incrementAndGet()));
 			initializeFromUri(uri);
