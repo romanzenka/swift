@@ -89,8 +89,7 @@ public final class GridRunner extends AbstractRunner {
 					new SgePacket(request.getWorkPacket()
 							, boundMessenger.getMessengerInfo()
 							, workerFactoryConfig
-							, fileTokenFactory.getDaemonConfigInfo()
-							, fileTokenFactory.getFileSharingFactory().getBrokerUri());
+							, fileTokenFactory.getDaemonConfigInfo());
 
 			if (getSharedTempDirectory() != null) {
 				gridDaemonAllocatorInputObject.setSharedTempDirectory(getSharedTempDirectory().getAbsolutePath());

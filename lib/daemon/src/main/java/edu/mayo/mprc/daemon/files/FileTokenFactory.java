@@ -3,9 +3,6 @@ package edu.mayo.mprc.daemon.files;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import edu.mayo.mprc.MprcException;
 import edu.mayo.mprc.config.DaemonConfigInfo;
-import edu.mayo.mprc.filesharing.FileTransfer;
-import edu.mayo.mprc.filesharing.FileTransferHandler;
-import edu.mayo.mprc.filesharing.jms.JmsFileTransferHandlerFactory;
 import edu.mayo.mprc.utilities.FileUtilities;
 import org.apache.log4j.Logger;
 import org.springframework.stereotype.Component;
@@ -43,9 +40,6 @@ public final class FileTokenFactory implements SenderTokenTranslator, ReceiverTo
 	private DaemonConfigInfo daemonConfigInfo;
 	private DaemonConfigInfo databaseDaemonConfigInfo;
 
-	//For sharing files that  can not be access through shared file system.
-	private JmsFileTransferHandlerFactory fileSharingFactory;
-	private FileTransferHandler fileTransferHandler;
 	private File tempFolderRepository;
 	private static final String DEFAULT_lOCAL_FILE_REPOSITORY_DIRECTORY = "localFileSharingRepository";
 
@@ -85,31 +79,6 @@ public final class FileTokenFactory implements SenderTokenTranslator, ReceiverTo
 
 	public void setDatabaseDaemonConfigInfo(final DaemonConfigInfo databaseDaemonConfigInfo) {
 		this.databaseDaemonConfigInfo = databaseDaemonConfigInfo;
-	}
-
-	public JmsFileTransferHandlerFactory getFileSharingFactory() {
-		return fileSharingFactory;
-	}
-
-	/**
-	 * Sets the FileSharingFactory object and starts processing FileToken transfer requests.
-	 *
-	 * @param fileSharingFactory
-	 * @param processRemoteRequests true if FileToken transfer request from remote systems are to be processed. Otherwise, false.
-	 */
-	public void setFileSharingFactory(final JmsFileTransferHandlerFactory fileSharingFactory, final boolean processRemoteRequests) {
-		this.fileSharingFactory = fileSharingFactory;
-		startFileSharing(processRemoteRequests);
-	}
-
-	/**
-	 * Sets the FileSharingFactory object and starts processing remote and local FileToken transfer requests.
-	 *
-	 * @param fileSharingFactory
-	 */
-	public void setFileSharingFactory(final JmsFileTransferHandlerFactory fileSharingFactory) {
-		this.fileSharingFactory = fileSharingFactory;
-		startFileSharing(true);
 	}
 
 	public File getTempFolderRepository() {
@@ -210,14 +179,7 @@ public final class FileTokenFactory implements SenderTokenTranslator, ReceiverTo
 			// Transfer within the same system, expect that the token is local:
 			return new File(removePrefixFromToken(fileToken.getTokenPath(), LOCAL_TYPE_PREFIX));
 		} else {
-			//No shared between source and destination systems.
-			try {
-				final FileTransfer fileTransfer = getFileTransferHandler().getFile(fileToken.getSourceDaemonConfigInfo().getDaemonId(), getSpecificFilePathFromToken(fileToken), getLocalFileForRemoteToken(fileToken));
-				return fileTransfer.done().get(0);
-
-			} catch (Exception e) {
-				throw new MprcException("Could not get file from file token. FileToken: " + fileToken.toString(), e);
-			}
+			throw new MprcException("Cannot transfer file between systems that do not share disk space. FileToken: " + fileToken.toString());
 		}
 	}
 
@@ -311,27 +273,6 @@ public final class FileTokenFactory implements SenderTokenTranslator, ReceiverTo
 		}
 	}
 
-	private synchronized void startFileSharing(final boolean processRemoteRequests) {
-		if (fileSharingFactory != null) {
-			// The fileSharingFactory can be null, that is valid for DatabaseValidator
-			if (fileTransferHandler == null) {
-				fileTransferHandler = fileSharingFactory.createFileSharing(daemonConfigInfo.getDaemonId());
-			}
-		}
-
-		fileTransferService.submit(new Thread("Starting FileTransferHandler") {
-			public void run() {
-				synchronized (FileTokenFactory.this) {
-					fileTransferHandler.startProcessingRequests(processRemoteRequests);
-				}
-			}
-		});
-	}
-
-	private synchronized FileTransferHandler getFileTransferHandler() {
-		return fileTransferHandler;
-	}
-
 	private FileToken getFileToken(final String fileAbsolutePath) {
 		return getFileToken(new File(fileAbsolutePath));
 	}
@@ -421,89 +362,19 @@ public final class FileTokenFactory implements SenderTokenTranslator, ReceiverTo
 	}
 
 	@Override
-	public void upload(final FileToken fileToken) {
-		fileTransferService.submit(new Thread("Token synchronization: " + fileToken.getTokenPath()) {
-			public void run() {
-				uploadAndWait(fileToken);
-			}
-		});
+	public void upload(final FileToken myToken) {
 	}
 
 	@Override
-	public void uploadAndWait(final FileToken fileToken) {
-		final FileTransfer fileTransfer = uploadFile(fileToken);
-
-		if (fileTransfer != null) {
-			fileTransfer.done();
-
-			if (fileTransfer.getErrorException() != null) {
-				throw new MprcException("File synchronization failed. FileToken: " + fileToken.toString(), fileTransfer.getErrorException());
-			}
-		}
+	public void uploadAndWait(final FileToken myToken) {
 	}
 
+	@Override
 	public void download(final FileToken theirToken) {
-		fileTransferService.submit(new Thread("Token synchronization: " + theirToken.getTokenPath()) {
-			public void run() {
-				downloadAndWait(theirToken);
-			}
-		});
 	}
 
+	@Override
 	public void downloadAndWait(final FileToken theirToken) {
-		final FileTransfer fileTransfer = downloadFile(theirToken);
-
-		if (fileTransfer != null) {
-			fileTransfer.done();
-
-			if (fileTransfer.getErrorException() != null) {
-				throw new MprcException("File synchronization failed. FileToken: " + theirToken.toString(), fileTransfer.getErrorException());
-			}
-		}
-	}
-
-	/**
-	 * Synchronizes file token in its source system with corresponding local file token.
-	 *
-	 * @param fileToken
-	 * @return
-	 */
-	private FileTransfer uploadFile(final FileToken fileToken) {
-		//Synchronized FileToken if the FileToken is not in shared file space.
-		if (!isFileTokenShared(fileToken) && !isFileTokenLocal(fileToken)) {
-			final String destinationId = fileToken.getSourceDaemonConfigInfo().getDaemonId();
-			final File localFile = getLocalFileForRemoteToken(fileToken);
-			final String remoteFilePath = getSpecificFilePathFromToken(fileToken);
-
-			try {
-				if (!localFile.isDirectory()) {
-					return getFileTransferHandler().uploadFile(destinationId, localFile, remoteFilePath);
-				} else {
-					return getFileTransferHandler().uploadFolder(destinationId, localFile, remoteFilePath);
-				}
-			} catch (Exception e) {
-				throw new MprcException("FileToken could not be synchronized. Remote system [" + destinationId + "], Remote file [" + remoteFilePath + "]", e);
-			}
-		}
-
-		return null;
-	}
-
-	private FileTransfer downloadFile(final FileToken fileToken) {
-		//Synchronized FileToken if the FileToken is not in shared file space.
-		if (!isFileTokenShared(fileToken) && !isFileTokenLocal(fileToken)) {
-			final String destinationId = fileToken.getSourceDaemonConfigInfo().getDaemonId();
-			final File localFile = getLocalFileForRemoteToken(fileToken);
-			final String remoteFilePath = getSpecificFilePathFromToken(fileToken);
-
-			try {
-				return getFileTransferHandler().downloadFile(destinationId, localFile, remoteFilePath);
-			} catch (Exception e) {
-				throw new MprcException("FileToken could not be synchronized. Remote system [" + destinationId + "], Remote file [" + remoteFilePath + "]", e);
-			}
-		}
-
-		return null;
 	}
 
 	private boolean isFileTokenShared(final FileToken fileToken) {

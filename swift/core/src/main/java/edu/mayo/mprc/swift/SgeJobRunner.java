@@ -11,7 +11,6 @@ import edu.mayo.mprc.daemon.WorkPacket;
 import edu.mayo.mprc.daemon.Worker;
 import edu.mayo.mprc.daemon.files.FileTokenFactory;
 import edu.mayo.mprc.daemon.files.FileTokenHolder;
-import edu.mayo.mprc.filesharing.jms.JmsFileTransferHandlerFactory;
 import edu.mayo.mprc.messaging.ActiveMQConnectionPool;
 import edu.mayo.mprc.messaging.rmi.BoundMessenger;
 import edu.mayo.mprc.messaging.rmi.MessengerFactory;
@@ -81,7 +80,6 @@ public final class SgeJobRunner {
 					fileTokenFactory.setTempFolderRepository(new File(sgePacket.getSharedTempDirectory()));
 				}
 
-				fileTokenFactory.setFileSharingFactory(new JmsFileTransferHandlerFactory(connectionPool, sgePacket.getFileSharingFactoryURI()), false);
 				fileTokenHolder.translateOnReceiver(fileTokenFactory, fileTokenFactory, null);
 			}
 

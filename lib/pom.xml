@@ -22,7 +22,6 @@
         <module>daemon</module>
         <module>database</module>
         <module>db-curator</module>
-        <module>filesharing</module>
         <module>integration</module>
         <module>math</module>
         <module>messaging</module>

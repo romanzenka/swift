@@ -20,11 +20,6 @@
         </dependency>
         <dependency>
             <groupId>edu.mayo.mprc</groupId>
-            <artifactId>filesharing</artifactId>
-            <version>3.5-SNAPSHOT</version>
-        </dependency>
-        <dependency>
-            <groupId>edu.mayo.mprc</groupId>
             <artifactId>config</artifactId>
             <version>3.5-SNAPSHOT</version>
         </dependency>

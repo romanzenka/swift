@@ -1,20 +1,20 @@
 package edu.mayo.mprc.swift;
 
 import edu.mayo.mprc.MprcException;
-import edu.mayo.mprc.config.*;
+import edu.mayo.mprc.config.ApplicationConfig;
+import edu.mayo.mprc.config.DaemonConfig;
+import edu.mayo.mprc.config.ResourceConfig;
+import edu.mayo.mprc.config.ServiceConfig;
 import edu.mayo.mprc.daemon.MessageBroker;
 import edu.mayo.mprc.daemon.files.FileTokenFactory;
 import edu.mayo.mprc.database.DatabaseFactory;
 import edu.mayo.mprc.database.FileType;
-import edu.mayo.mprc.filesharing.jms.JmsFileTransferHandlerFactory;
 import edu.mayo.mprc.messaging.ActiveMQConnectionPool;
 import edu.mayo.mprc.swift.db.FileTokenFactoryWrapper;
 import edu.mayo.mprc.swift.db.SearchEngine;
 import edu.mayo.mprc.swift.search.SwiftSearcher;
 
 import java.io.File;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -159,18 +159,6 @@ public final class SwiftConfig {
 		final DaemonConfig databaseDaemonConfig = getDatabaseDaemonConfig(swiftConfig);
 
 		fileTokenFactory.setDatabaseDaemonConfigInfo(databaseDaemonConfig.createDaemonConfigInfo());
-
-		final List<ResourceConfig> brokerConfigs = swiftConfig.getModulesOfConfigType(MessageBroker.Config.class);
-		if (brokerConfigs.size() > 0) {
-			try {
-				final String brokerUrl = KeyExtractingWriter.get(brokerConfigs.get(0), MessageBroker.BROKER_URL);
-				fileTokenFactory.setFileSharingFactory(new JmsFileTransferHandlerFactory(connectionPool, new URI(brokerUrl)));
-			} catch (URISyntaxException e) {
-				throw new MprcException("Failed to set FileTransferHandlerFactory in FileTokenFactory object.", e);
-			}
-		} else {
-			throw new MprcException("Swift cannot run without a message broker.");
-		}
 
 		FileType.initialize(new FileTokenFactoryWrapper(fileTokenFactory));
 	}

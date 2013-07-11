@@ -4,8 +4,6 @@ import edu.mayo.mprc.config.DaemonConfigInfo;
 import edu.mayo.mprc.config.ResourceConfig;
 import edu.mayo.mprc.messaging.rmi.MessengerInfo;
 
-import java.net.URI;
-
 /**
  * Class use to send work packet to grid engine. The object contains the actual work itself as {@link #workPacket},
  * but also contains information about how to send progress back from the Sun Grid Engine.
@@ -16,18 +14,16 @@ public final class SgePacket {
 	private MessengerInfo messengerInfo;
 	private ResourceConfig workerFactoryConfig;
 	private DaemonConfigInfo daemonConfigInfo;
-	private URI fileSharingFactoryURI;
 	private String sharedTempDirectory;
 
 	public SgePacket() {
 	}
 
-	public SgePacket(final Object workPacket, final MessengerInfo messengerInfo, final ResourceConfig workerFactoryConfig, final DaemonConfigInfo daemonConfigInfo, final URI fileSharingFactoryURI) {
+	public SgePacket(final Object workPacket, final MessengerInfo messengerInfo, final ResourceConfig workerFactoryConfig, final DaemonConfigInfo daemonConfigInfo) {
 		this.workPacket = workPacket;
 		this.messengerInfo = messengerInfo;
 		this.workerFactoryConfig = workerFactoryConfig;
 		this.daemonConfigInfo = daemonConfigInfo;
-		this.fileSharingFactoryURI = fileSharingFactoryURI;
 	}
 
 	public Object getWorkPacket() {
@@ -60,14 +56,6 @@ public final class SgePacket {
 
 	public void setDaemonConfigInfo(final DaemonConfigInfo daemonConfigInfo) {
 		this.daemonConfigInfo = daemonConfigInfo;
-	}
-
-	public URI getFileSharingFactoryURI() {
-		return fileSharingFactoryURI;
-	}
-
-	public void setFileSharingFactoryURI(final URI fileSharingFactoryURI) {
-		this.fileSharingFactoryURI = fileSharingFactoryURI;
 	}
 
 	public String getSharedTempDirectory() {
