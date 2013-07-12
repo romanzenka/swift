@@ -22,6 +22,7 @@ public abstract class MessagingTestBase {
 
 	protected synchronized void startBroker() {
 		serviceFactory.setConnectionPool(new ActiveMQConnectionPool());
+		serviceFactory.initialize("test-messaging-daemon");
 		LOGGER.debug(broker != null ? "JMS Broker already started ---------" : "JMS Starting broker ------------");
 		if (broker != null) {
 			return;
