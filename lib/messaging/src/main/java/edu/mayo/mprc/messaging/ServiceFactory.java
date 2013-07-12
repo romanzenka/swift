@@ -142,7 +142,7 @@ public final class ServiceFactory {
 			if (daemonName == null) {
 				throw new MprcException("The daemon name has to be set before a ServiceFactory can be used");
 			}
-			if (responseDispatcher != null) {
+			if (responseDispatcher == null) {
 				responseDispatcher = new ResponseDispatcher(connection, daemonName);
 			}
 			return responseDispatcher;

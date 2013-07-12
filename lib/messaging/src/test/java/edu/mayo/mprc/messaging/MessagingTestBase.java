@@ -31,7 +31,7 @@ public abstract class MessagingTestBase {
 
 		try {
 			service = serviceFactory.createService(
-					new URI(MessageFormat.format("jms.vm://localhost?simplequeue={0}", TEST_QUEUE_NAME)));
+					new URI(MessageFormat.format("jms.vm://localhost?broker.persistent=false&simplequeue={0}", TEST_QUEUE_NAME)));
 		} catch (Exception t) {
 			throw new MprcException(t);
 		}

@@ -13,6 +13,7 @@ import edu.mayo.mprc.utilities.progress.ProgressReporter;
 import org.apache.log4j.Logger;
 import org.testng.Assert;
 import org.testng.annotations.AfterClass;
+import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import java.io.File;
@@ -36,6 +37,13 @@ public final class WorkCachePerformanceTest {
 	private final Object workSuccess = new Object();
 	private int workSuccessCount = 0;
 	private final ActiveMQConnectionPool connectionPool = new ActiveMQConnectionPool();
+	private final ServiceFactory serviceFactory = new ServiceFactory();
+
+	@BeforeClass
+	public void init() {
+		serviceFactory.initialize("test-daemon");
+		serviceFactory.setConnectionPool(connectionPool);
+	}
 
 	@AfterClass
 	public void shutdown() {
@@ -103,8 +111,6 @@ public final class WorkCachePerformanceTest {
 	}
 
 	private SimpleRunner wrapWithRunner(final Worker worker, final String queueName, final File logFolder, final FileTokenFactory fileTokenFactory) throws URISyntaxException {
-		final ServiceFactory serviceFactory = new ServiceFactory();
-		serviceFactory.setConnectionPool(connectionPool);
 		final Service service = serviceFactory.createJmsQueue(new URI("jms.vm://test?broker.useJmx=false&broker.persistent=false&simplequeue=" + queueName));
 		final DirectDaemonConnection directConnection = new DirectDaemonConnection(service, fileTokenFactory);
 		final Daemon daemon = new Daemon();

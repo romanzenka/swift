@@ -30,7 +30,7 @@ public final class DaemonWorkerTester {
 	private DaemonWorkerTester() {
 		serviceFactory = new ServiceFactory();
 		serviceFactory.setConnectionPool(new ActiveMQConnectionPool());
-
+		serviceFactory.initialize("test-daemon");
 	}
 
 	/**
@@ -41,7 +41,7 @@ public final class DaemonWorkerTester {
 	public DaemonWorkerTester(final Worker worker) {
 		this();
 		try {
-			final URI uri = new URI("jms.vm://broker1?simplequeue=test_" + String.valueOf(testId.incrementAndGet()));
+			final URI uri = new URI("jms.vm://broker1?broker.persistent=false&simplequeue=test_" + String.valueOf(testId.incrementAndGet()));
 			initializeFromUri(uri);
 			runner = new SimpleRunner();
 			runner.setFactory(new TestWorkerFactory(worker));
@@ -79,7 +79,7 @@ public final class DaemonWorkerTester {
 	public DaemonWorkerTester(final WorkerFactory workerFactory, final int numWorkerThreads) {
 		this();
 		try {
-			final URI uri = new URI("jms.vm://broker1?simplequeue=test_" + String.valueOf(testId.incrementAndGet()));
+			final URI uri = new URI("jms.vm://broker1?broker.persistent=false&simplequeue=test_" + String.valueOf(testId.incrementAndGet()));
 			initializeFromUri(uri);
 			runner = new SimpleRunner();
 			runner.setFactory(workerFactory);

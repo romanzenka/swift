@@ -95,7 +95,8 @@ final class SimpleQueueService implements Service {
 
 	private synchronized MessageProducer messageProducer() throws JMSException {
 		if (null == producer.get()) {
-			producer.set(sendingSession().createProducer(null));
+			final MessageProducer producer1 = sendingSession().createProducer(null);
+			producer.set(producer1);
 		}
 		return producer.get();
 	}
