@@ -25,7 +25,7 @@ final class Dta2TarWriter {
   * @param outputDir - tar file will be placed here
   *
   */
-	public void writeDtaFilesToTar(final List<String> dtaFileNames, final File outputDir, final TarWriter tarWriter) {
+	public void writeDtaFilesToTar(final List<String> dtaFileNames, final TarWriter tarWriter) {
 		final List<File> allFiles = new ArrayList<File>();
 		for (final String fileName1 : dtaFileNames) {
 			final File dtaFile = new File(fileName1);
@@ -33,42 +33,58 @@ final class Dta2TarWriter {
 			if (!new File(fileName).isFile()) {
 				throw new MprcException("not a file : " + fileName);
 			}
-			final String prefix = FileUtilities.stripExtension(fileName);
-			final String outFileName = prefix + OUT_EXT;
-			if (!new File(outFileName).isFile()) {
+			final File out = getMatchingOutFile(dtaFile);
+
+			if (!out.isFile()) {
 				// move all the dtas and out files to a backup folder so can use for troubleshooting
 				// find the temporary folder
-				final String path = dtaFile.getParent();
-
-				final String lastFolder = FileUtilities.getLastFolderName(path);
-				String topPath = path;
-				final File someFile = new File(path);
-				if (someFile.getParent() != null) {
-					topPath = someFile.getParent();
-				}
-				final File p = new File(path);
-				File outs = new File(new File(topPath), "outs");
-				FileUtilities.ensureFolderExists(outs);
-				File destination = new File(outs, lastFolder);
-				LOGGER.debug("moving .out files to " + destination.getAbsolutePath());
-				FileUtilities.rename(p, destination);
-				throw new MprcException("tar failed, as sequest out file does not exist [" + outFileName + "].\n" +
-						"Moving the Sequest working folder to ["+destination.getAbsolutePath()+"] - check what went wrong and delete this folder.");
+				final File destination = moveFailedSequestRun(dtaFile.getParentFile());
+				throw new MprcException("tar failed, as sequest out file does not exist [" + out.getAbsolutePath() + "].\n" +
+						"Moving the Sequest working folder to [" + destination.getAbsolutePath() + "] - check what went wrong and delete this folder.");
 			}
-			final File out = new File(outFileName);
+
 			allFiles.add(dtaFile);
 			allFiles.add(out);
 
 		}
 		// now tar these files
-		if (allFiles.size() > 0) {
+		if (!allFiles.isEmpty()) {
 			tarWriter.addFiles(allFiles);
 		}
 		// And since we added them all, we can delete them now
-		for(final File file : allFiles) {
+		for (final File file : allFiles) {
 			FileUtilities.quietDelete(file);
 		}
 
+	}
+
+	/**
+	 * Strip the .dta extension. add the .out extension.
+	 */
+	public static File getMatchingOutFile(final File dtaFile) {
+		final String prefix = FileUtilities.getFileNameWithoutExtension(dtaFile);
+		final String outFileName = prefix + OUT_EXT;
+		return new File(outFileName);
+	}
+
+	/**
+	 * Move the working folder of Sequest to another location so the user can check it later.
+	 *
+	 * @param workingFolder Folder to move the data to.
+	 * @return Where the data was moved to.
+	 */
+	private File moveFailedSequestRun(final File workingFolder) {
+		final String lastFolder = workingFolder.getName();
+		String topPath = workingFolder.getPath();
+		if (workingFolder.getParent() != null) {
+			topPath = workingFolder.getParent();
+		}
+		File outs = new File(new File(topPath), "outs");
+		FileUtilities.ensureFolderExists(outs);
+		File destination = new File(outs, lastFolder);
+		LOGGER.debug("moving .out files to " + destination.getAbsolutePath());
+		FileUtilities.rename(workingFolder, destination);
+		return destination;
 	}
 
 
