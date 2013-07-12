@@ -174,7 +174,6 @@ public final class SwiftEnvironmentImpl implements SwiftEnvironment {
 
 	private void setApplicationConfig(ApplicationConfig applicationConfig) {
 		this.applicationConfig = applicationConfig;
-		monitor.initialize(applicationConfig);
 	}
 
 	@Override
