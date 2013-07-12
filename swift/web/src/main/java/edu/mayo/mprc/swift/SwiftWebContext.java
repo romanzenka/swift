@@ -64,6 +64,7 @@ public final class SwiftWebContext {
 									"Verify daemon name and try again.");
 						}
 					}
+					MainFactoryContext.getServiceFactory().initialize(daemonConfig.getName());
 
 					final Daemon daemon = (Daemon) factoryTable.create(daemonConfig, new DependencyResolver(factoryTable));
 
