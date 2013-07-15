@@ -290,14 +290,10 @@ public final class GridRunner extends AbstractRunner {
 		gridWorkPacket.setQueueName(queueName);
 		gridWorkPacket.setMemoryRequirement(memoryRequirement);
 
-		gridWorkPacket.setWorkingFolder(getSharedWorkingDirectory().getAbsolutePath());
+		gridWorkPacket.setWorkingFolder(new File(".").getAbsolutePath());
 		gridWorkPacket.setLogFolder(FileUtilities.getDateBasedDirectory(getLogDirectory(), new Date()).getAbsolutePath());
 
 		return gridWorkPacket;
-	}
-
-	public File getSharedWorkingDirectory() {
-		return getDaemon().getSharedFileSpace();
 	}
 
 	public File getSharedTempDirectory() {
