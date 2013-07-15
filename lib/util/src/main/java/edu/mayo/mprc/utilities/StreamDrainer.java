@@ -33,6 +33,7 @@ public final class StreamDrainer implements Runnable {
 
 	private int lastLogLine;
 	private int totalLines;
+	private boolean wasEmpty;
 
 	/**
 	 * Default amount of lines to be retained.
@@ -83,6 +84,15 @@ public final class StreamDrainer implements Runnable {
 		// We started with an escape sequence, ignore this line
 		if (line.indexOf(ESCAPE) == 0) {
 			return;
+		}
+		// Drop spammy empty line messages
+		if (line.isEmpty()) {
+			if (wasEmpty) {
+				return;
+			}
+			wasEmpty = true;
+		} else {
+			wasEmpty = false;
 		}
 		if (loggedLines.length > 0) {
 			loggedLines[lastLogLine] = line;
