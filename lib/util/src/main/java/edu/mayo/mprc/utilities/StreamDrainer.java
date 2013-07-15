@@ -86,7 +86,7 @@ public final class StreamDrainer implements Runnable {
 			return;
 		}
 		// Drop spammy empty line messages
-		if (line.isEmpty()) {
+		if (line == null || line.trim().isEmpty()) {
 			if (wasEmpty) {
 				return;
 			}
