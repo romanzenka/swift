@@ -53,7 +53,7 @@ public final class ResponseDispatcher {
 	public ResponseDispatcher(final Connection connection, final String daemonName) {
 		try {
 			session = connection.createSession(/*transacted?*/false, /*acknowledgment*/Session.CLIENT_ACKNOWLEDGE);
-			queueName = daemonName + "-responses";
+			queueName = "responses-" + daemonName;
 			responseQueue = session.createQueue(queueName);
 			final MessageConsumer queueConsumer = session.createConsumer(responseQueue);
 			queueConsumer.setMessageListener(new ResponseQueueMessageListener());
