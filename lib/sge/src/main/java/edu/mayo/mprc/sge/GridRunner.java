@@ -1,6 +1,7 @@
 package edu.mayo.mprc.sge;
 
 
+import com.google.common.base.Strings;
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.xml.DomDriver;
 import edu.mayo.mprc.config.*;
@@ -483,11 +484,18 @@ public final class GridRunner extends AbstractRunner {
 			runner.setGridScriptFactory(gridScriptFactory);
 			runner.setManager(gridEngineManager);
 			runner.setMessengerFactory(messengerFactory);
-			runner.setWrapperScript(config.getWrapperScript());
+			runner.setWrapperScript(getAbsoluteExecutablePath(config));
 			runner.setWorkerFactoryConfig(config.getWorkerConfiguration());
 			runner.setFileTokenFactory(fileTokenFactory);
 
 			return runner;
+		}
+
+		private static String getAbsoluteExecutablePath(final Config config) {
+			if (Strings.isNullOrEmpty(config.getWrapperScript())) {
+				return "";
+			}
+			return FileUtilities.getAbsoluteFileForExecutables(new File(config.getWrapperScript())).getPath();
 		}
 
 		public GridEngineJobManager getGridEngineManager() {

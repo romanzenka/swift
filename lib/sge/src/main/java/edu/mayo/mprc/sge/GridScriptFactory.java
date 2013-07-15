@@ -1,6 +1,8 @@
 package edu.mayo.mprc.sge;
 
 
+import com.google.common.base.Strings;
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
@@ -33,7 +35,7 @@ public final class GridScriptFactory {
 	}
 
 	private static boolean isWrapper(final String wrapper) {
-		return !(wrapper == null || wrapper.length() == 0);
+		return !Strings.isNullOrEmpty(wrapper);
 	}
 
 	public String getApplicationName(final String wrapper) {
