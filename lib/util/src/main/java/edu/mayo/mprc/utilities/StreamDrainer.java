@@ -23,6 +23,7 @@ public final class StreamDrainer implements Runnable {
 	 * How many characters per line are typically there.
 	 */
 	private static final int AVG_CHARS_PER_LINE = 20;
+	public static final String ESCAPE = "\u001B";
 
 	private final Logger logger;
 	private final InputStream inputStream;
@@ -79,6 +80,10 @@ public final class StreamDrainer implements Runnable {
 	 * @param line Line to be added.
 	 */
 	void addLine(final String line) {
+		// We started with an escape sequence, ignore this line
+		if (line.indexOf(ESCAPE) == 0) {
+			return;
+		}
 		if (loggedLines.length > 0) {
 			loggedLines[lastLogLine] = line;
 			lastLogLine++;
