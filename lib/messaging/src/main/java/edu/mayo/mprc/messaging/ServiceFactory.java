@@ -46,7 +46,7 @@ public final class ServiceFactory {
 	 * Give the service factory the name of the daemon we operate within, so the response queue can
 	 * be properly established.
 	 *
-	 * @param daemonName
+	 * @param daemonName There should be a single response queue per daemon, it is named using the daemon's name.
 	 */
 	public void initialize(final String daemonName) {
 		synchronized (responseDispatcherLock) {
