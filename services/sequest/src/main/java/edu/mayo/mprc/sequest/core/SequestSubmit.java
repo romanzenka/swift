@@ -156,8 +156,73 @@ final class SequestSubmit implements SequestSubmitterInterface {
 			FileUtilities.copyFile(sequestLog, new File(outputDir, sequestLog.getName() + "." + submitCount), true);
 		}
 
-		final List<File> dtaFiles = new ArrayList<File>(this.getSequestDtaFiles());
+		// Get a copy of the list, just in case
+		final List<File> dtaFiles = new ArrayList<File>(getSequestDtaFiles());
 
+		runSequestForDtaFiles(dtaFiles);
+
+		final List<File> dtaFilesWithNoOut = getDtaFilesWithNoOut(dtaFiles);
+		if (!dtaFilesWithNoOut.isEmpty()) {
+			LOGGER.warn("Sequest failed to produce all out files. Give it one more chance.");
+			runSequestForDtaFiles(dtaFilesWithNoOut);
+		}
+
+		// now the tar
+		LOGGER.debug("tar file name=" + tarFile);
+		TarWriter tt = null;
+		try {
+			tt = new TarWriter(this.tarFile);
+			// .out and .dta files are in the working  dir for sequest
+			final List<String> dtasToTar = new ArrayList<String>();
+			final List<File> sequestDtaSnapshot = new ArrayList<File>(this.getSequestDtaFiles());
+			final File workingDir = sequestCaller.getWorkingDir();
+			for (final File sequestDtaSnapshotFile : sequestDtaSnapshot) {
+				dtasToTar.add(new File(workingDir, sequestDtaSnapshotFile.getName()).getAbsolutePath());
+			}
+			// need to tar these files and the corresponding .out files
+			final Date startTar = new Date();
+
+			final Dta2TarWriter dtaWriter = new Dta2TarWriter();
+			dtaWriter.writeDtaFilesToTar(dtasToTar, tt);
+			final Date endTar = new Date();
+			final long tarTime = endTar.getTime() - startTar.getTime();
+
+			LOGGER.debug("tartime = " + tarTime);
+		} finally {
+			if (tt != null) {
+				try {
+					tt.close();
+				} catch (Exception e) {
+					cleanTarOnFailure(tt.getTarFile(), e);
+				}
+			}
+
+			// validate the tar file, if it is corrupted then delete it and throw an exception
+			this.validateTarFile(this.tarFile);
+		}
+
+		LOGGER.debug("tar file = " + tt.getTarFile() + " has " + TarReader.readNumberHeaders(tt.getTarFile()) + " headers");
+
+		// then remove the files
+		this.sequestDtaFiles = new ArrayList<File>();
+		this.accumulatedLength = 0;
+		this.creationTime = new Date().getTime();
+	}
+
+	/**
+	 * A list of dta files that did not get a matching .out file.
+	 */
+	private static List<File> getDtaFilesWithNoOut(final Iterable<File> dtaFiles) {
+		final List<File> noOutDtas = new ArrayList<File>(10);
+		for (final File file : dtaFiles) {
+			if (!Dta2TarWriter.getMatchingOutFile(file).isFile()) {
+				noOutDtas.add(file);
+			}
+		}
+		return noOutDtas;
+	}
+
+	private void runSequestForDtaFiles(final List<File> dtaFiles) {
 		SequestRunner sequestRunner = null;
 		// make the call to sequest
 		if (sequestCaller == null) {
@@ -190,44 +255,6 @@ final class SequestSubmit implements SequestSubmitterInterface {
 		if (exceptionThrown != null) {
 			throw new MprcException(exceptionThrown);
 		}
-
-		// now the tar
-		LOGGER.debug("tar file name=" + tarFile);
-		TarWriter tt = null;
-		try {
-			tt = new TarWriter(this.tarFile);
-			// .out and .dta files are in the working  dir for sequest
-			final List<String> DtaToTar = new ArrayList<String>();
-			final List<File> sequestDtaSnapshot = new ArrayList<File>(this.getSequestDtaFiles());
-			for (final File sequestDtaSnapshotFile : sequestDtaSnapshot) {
-				DtaToTar.add((new File(sequestRunner.getWorkingDir(), sequestDtaSnapshotFile.getName())).getAbsolutePath());
-			}
-			// need to tar these files and the corresponding .out files
-			final Date startTar = new Date();
-			final Dta2TarWriter dtaWriter = new Dta2TarWriter();
-			dtaWriter.writeDtaFilesToTar(DtaToTar, this.outputDir, tt);
-			final Date endTar = new Date();
-			final long tarTime = endTar.getTime() - startTar.getTime();
-			LOGGER.debug("tartime = " + tarTime);
-		} finally {
-			if (tt != null) {
-				try {
-					tt.close();
-				} catch (Exception e) {
-					cleanTarOnFailure(tt.getTarFile(), e);
-				}
-			}
-
-			// validate the tar file, if it is corrupted then delete it and throw an exception
-			this.validateTarFile(this.tarFile);
-		}
-
-		LOGGER.debug("tar file = " + tt.getTarFile() + " has " + TarReader.readNumberHeaders(tt.getTarFile()) + " headers");
-
-		// then remove the files
-		this.sequestDtaFiles = new ArrayList<File>();
-		this.accumulatedLength = 0;
-		this.creationTime = new Date().getTime();
 	}
 
 
