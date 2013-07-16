@@ -93,33 +93,37 @@ public final class DaemonWorkerTest {
 	}
 
 	private static void runTest(final DaemonWorkerTester tester, final int iterations) throws InterruptedException {
-		final Object[] token = new Object[iterations];
-		for (int i = 0; i < iterations; i++) {
-			token[i] = tester.sendWork(new StringWorkPacket("hello #" + String.valueOf(i)), null);
-		}
-		/**
-		 * Give the search at most 10 seconds.
-		 */
-		for (int i = 0; i < 10000; i++) {
-			boolean allDone = true;
-			for (int j = 0; j < iterations; j++) {
-				if (!tester.isDone(token[j])) {
-					allDone = false;
+		try {
+			final Object[] token = new Object[iterations];
+			for (int i = 0; i < iterations; i++) {
+				token[i] = tester.sendWork(new StringWorkPacket("hello #" + String.valueOf(i)), null);
+			}
+			/**
+			 * Give the search at most 10 seconds.
+			 */
+			for (int i = 0; i < 10000; i++) {
+				boolean allDone = true;
+				for (int j = 0; j < iterations; j++) {
+					if (!tester.isDone(token[j])) {
+						allDone = false;
+						break;
+					}
+				}
+				if (allDone) {
 					break;
 				}
+				Thread.sleep(10);
+				i += 10;
 			}
-			if (allDone) {
-				break;
+			tester.stop();
+			for (int i = 0; i < iterations; i++) {
+				Assert.assertTrue(tester.isDone(token[i]), "Work is not done");
+				if (!tester.isSuccess(token[i])) {
+					throw new DaemonException(tester.getLastError(token[i]));
+				}
 			}
-			Thread.sleep(10);
-			i += 10;
-		}
-		tester.stop();
-		for (int i = 0; i < iterations; i++) {
-			Assert.assertTrue(tester.isDone(token[i]), "Work is not done");
-			if (!tester.isSuccess(token[i])) {
-				throw new DaemonException(tester.getLastError(token[i]));
-			}
+		} finally {
+			tester.close();
 		}
 	}
 }

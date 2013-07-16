@@ -11,13 +11,14 @@ import edu.mayo.mprc.utilities.progress.ProgressInfo;
 import edu.mayo.mprc.utilities.progress.ProgressListener;
 import org.apache.log4j.Logger;
 
+import java.io.Closeable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Test harness for {@link Worker} classes. Wrap a daemon worker
  */
-public final class DaemonWorkerTester {
+public final class DaemonWorkerTester implements Closeable {
 	private static final Logger LOGGER = Logger.getLogger(DaemonWorkerTester.class);
 	private SimpleRunner runner;
 	private Service service;
@@ -28,7 +29,7 @@ public final class DaemonWorkerTester {
 	private DaemonWorkerTester() {
 		serviceFactory = new ServiceFactory();
 		serviceFactory.setConnectionPool(new ActiveMQConnectionPool());
-		serviceFactory.initialize("vm://broker1?broker.persistent=false", "test-daemon");
+		serviceFactory.initialize("vm://broker1?broker.useJmx=false&broker.persistent=false", "test-daemon");
 	}
 
 	/**
@@ -171,6 +172,11 @@ public final class DaemonWorkerTester {
 			}
 		}
 		LOGGER.info("The runner for " + runner.toString() + " is up and ready.");
+	}
+
+	@Override
+	public void close() {
+		serviceFactory.close();
 	}
 
 	private static final class TestProgressListener implements ProgressListener {

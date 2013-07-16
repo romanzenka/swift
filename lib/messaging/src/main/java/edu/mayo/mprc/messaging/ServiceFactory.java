@@ -5,6 +5,7 @@ import edu.mayo.mprc.MprcException;
 import org.apache.log4j.Logger;
 
 import javax.jms.*;
+import java.io.Closeable;
 import java.io.Serializable;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -14,7 +15,7 @@ import java.net.URISyntaxException;
  * All services need to be queued using a single JMS connection that has to be initialized by calling
  * {@link #initialize}.
  */
-public final class ServiceFactory {
+public final class ServiceFactory implements Closeable {
 	private static final Logger LOGGER = Logger.getLogger(ServiceFactory.class);
 
 	private URI brokerUri;
@@ -97,6 +98,12 @@ public final class ServiceFactory {
 
 	public Request deserializeRequest(final SerializedRequest serializedRequest) {
 		return new DeserializedRequest(connection, serializedRequest);
+	}
+
+	@Override
+	public void close() {
+		responseDispatcher.close();
+		connectionPool.close();
 	}
 
 	private static class DeserializedRequest implements Request {

@@ -111,74 +111,78 @@ public final class SequestDeploymentServiceTest {
 		final SequestDeploymentResult[] results = new SequestDeploymentResult[1];
 
 		final DaemonWorkerTester tester = new DaemonWorkerTester(service);
-		final Object workToken = tester.sendWork(request, new ProgressListener() {
+		try {
+			final Object workToken = tester.sendWork(request, new ProgressListener() {
 
-			public void requestEnqueued(final String hostString) {
-				LOGGER.debug("SequestDS request enqueued at " + hostString);
-			}
+				public void requestEnqueued(final String hostString) {
+					LOGGER.debug("SequestDS request enqueued at " + hostString);
+				}
 
-			public void requestProcessingStarted() {
-				LOGGER.debug("SequestDS processing started");
-			}
+				public void requestProcessingStarted() {
+					LOGGER.debug("SequestDS processing started");
+				}
 
-			public void requestProcessingFinished() {
-				LOGGER.debug("SequestDS processing finished");
-			}
+				public void requestProcessingFinished() {
+					LOGGER.debug("SequestDS processing finished");
+				}
 
-			public void requestTerminated(final Exception e) {
-				fail("Request terminated", e);
-			}
+				public void requestTerminated(final Exception e) {
+					fail("Request terminated", e);
+				}
 
-			public void userProgressInformation(final ProgressInfo progressInfo) {
-				if (progressInfo instanceof SequestDeploymentResult) {
-					results[0] = (SequestDeploymentResult) progressInfo;
-				} else {
-					LOGGER.info(progressInfo.toString());
+				public void userProgressInformation(final ProgressInfo progressInfo) {
+					if (progressInfo instanceof SequestDeploymentResult) {
+						results[0] = (SequestDeploymentResult) progressInfo;
+					} else {
+						LOGGER.info(progressInfo.toString());
+					}
+				}
+			});
+
+			while (!tester.isDone(workToken)) {
+				try {
+					Thread.sleep(100);
+				} catch (InterruptedException e) {
+					fail("Interupted thread", e);
 				}
 			}
-		});
 
-		while (!tester.isDone(workToken)) {
-			try {
-				Thread.sleep(100);
-			} catch (InterruptedException e) {
-				fail("Interupted thread", e);
+			final SequestDeploymentResult result = results[0];
+
+			assertNotNull(result, "No result was returned to the deployment failed.");
+
+			for (final String message : result.getMessages()) {
+				LOGGER.info(message);
 			}
-		}
 
-		final SequestDeploymentResult result = results[0];
-
-		assertNotNull(result, "No result was returned to the deployment failed.");
-
-		for (final String message : result.getMessages()) {
-			LOGGER.info(message);
-		}
-
-		if (result.getCompositeException() != null) {
-			LOGGER.error(result.getCompositeException());
-		}
-
-		File dgtFile = null;
-		for (final File sharedFile : result.getGeneratedFiles()) {
-			if (sharedFile.getName().contains(".dgt")) {
-				dgtFile = sharedFile;
+			if (result.getCompositeException() != null) {
+				LOGGER.error(result.getCompositeException());
 			}
-		}
 
-		//perform assertions but we need to make sure that generated files are deleted.
-		try {
-			final File hdrFile = result.getFileToSearchAgainst();
-			assertNull(result.getCompositeException(), "There was at least one exception in performing sequest deployment");
-			assertNotNull(result.getDeployedFile(), "No deployed file was returned.");
-			assertNotNull(hdrFile);
-			assertTrue(hdrFile.length() > 0);
-			assertNotNull(dgtFile);
-			assertTrue(dgtFile.length() > fakeFASTAFileToDeploy.length());
-		} finally {
+			File dgtFile = null;
 			for (final File sharedFile : result.getGeneratedFiles()) {
-				LOGGER.debug("deleting: " + sharedFile.getAbsolutePath());
-				FileUtilities.cleanupTempFile(sharedFile);
+				if (sharedFile.getName().contains(".dgt")) {
+					dgtFile = sharedFile;
+				}
 			}
+
+			//perform assertions but we need to make sure that generated files are deleted.
+			try {
+				final File hdrFile = result.getFileToSearchAgainst();
+				assertNull(result.getCompositeException(), "There was at least one exception in performing sequest deployment");
+				assertNotNull(result.getDeployedFile(), "No deployed file was returned.");
+				assertNotNull(hdrFile);
+				assertTrue(hdrFile.length() > 0);
+				assertNotNull(dgtFile);
+				assertTrue(dgtFile.length() > fakeFASTAFileToDeploy.length());
+			} finally {
+				for (final File sharedFile : result.getGeneratedFiles()) {
+					LOGGER.debug("deleting: " + sharedFile.getAbsolutePath());
+					FileUtilities.cleanupTempFile(sharedFile);
+				}
+			}
+		} finally {
+			tester.close();
 		}
 	}
 

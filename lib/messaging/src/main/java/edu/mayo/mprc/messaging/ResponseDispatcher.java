@@ -46,6 +46,8 @@ public final class ResponseDispatcher {
 	 */
 	public static final String LAST_RESPONSE = "is_last";
 
+	private MessageConsumer queueConsumer;
+
 	/**
 	 * @param connection Connection to the broker.
 	 * @param daemonName Unique name of the daemon we are running (will be used for the response queue)
@@ -55,7 +57,7 @@ public final class ResponseDispatcher {
 			session = connection.createSession(/*transacted?*/false, /*acknowledgment*/Session.CLIENT_ACKNOWLEDGE);
 			queueName = "responses-" + daemonName;
 			responseQueue = session.createQueue(queueName);
-			final MessageConsumer queueConsumer = session.createConsumer(responseQueue);
+			queueConsumer = session.createConsumer(responseQueue);
 			queueConsumer.setMessageListener(new ResponseQueueMessageListener());
 
 		} catch (JMSException e) {
@@ -81,6 +83,19 @@ public final class ResponseDispatcher {
 		final String correlationId = String.valueOf(uniqueId.incrementAndGet());
 		responseMap.put(correlationId, listener);
 		return correlationId;
+	}
+
+	public void close() {
+		try {
+			queueConsumer.close();
+			session.close();
+			if (!responseMap.isEmpty()) {
+				LOGGER.warn("The response dispatcher map of listeners is not empty - not all communication ended properly.");
+				responseMap.clear();
+			}
+		} catch (JMSException e) {
+			throw new MprcException(e);
+		}
 	}
 
 	private class ResponseQueueMessageListener implements MessageListener {

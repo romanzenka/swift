@@ -47,21 +47,25 @@ public final class MSMSEvalWorkerTest {
 		msmsEvalWorker.setMsmsEvalExecutable(MSMSEvalTest.getMsmsEvalExecutable());
 
 		final DaemonWorkerTester daemonWorkerTester = new DaemonWorkerTester(msmsEvalWorker);
+		try {
 
-		final Object workerToken = daemonWorkerTester.sendWork(new MSMSEvalWorkPacket(mgfFile, paramFile, tempDirectory, "0"), null);
+			final Object workerToken = daemonWorkerTester.sendWork(new MSMSEvalWorkPacket(mgfFile, paramFile, tempDirectory, "0"), null);
 
-		while (!daemonWorkerTester.isDone(workerToken)) {
-			try {
-				Thread.sleep(100);
-			} catch (InterruptedException e) {
-				//SWALLOWED
-				LOGGER.warn(e);
+			while (!daemonWorkerTester.isDone(workerToken)) {
+				try {
+					Thread.sleep(100);
+				} catch (InterruptedException e) {
+					//SWALLOWED
+					LOGGER.warn(e);
+				}
 			}
+
+			Assert.assertFalse(msmsEvalWorker.isSkippedExecution(), "The " + MSMSEvalWorker.class.getSimpleName() + " skipped execution.");
+
+			Assert.assertTrue(daemonWorkerTester.isSuccess(workerToken), "Method processRequest(..) from " + MSMSEvalWorker.class.getSimpleName() + " class failed.");
+		} finally {
+			daemonWorkerTester.close();
 		}
-
-		Assert.assertFalse(msmsEvalWorker.isSkippedExecution(), "The " + MSMSEvalWorker.class.getSimpleName() + " skipped execution.");
-
-		Assert.assertTrue(daemonWorkerTester.isSuccess(workerToken), "Method processRequest(..) from " + MSMSEvalWorker.class.getSimpleName() + " class failed.");
 	}
 
 	@Test(dependsOnMethods = {"msmsEvalWorkerTest"}, enabled = true)
@@ -71,19 +75,23 @@ public final class MSMSEvalWorkerTest {
 		msmsEvalWorker.setMsmsEvalExecutable(MSMSEvalTest.getMsmsEvalExecutable());
 
 		final DaemonWorkerTester daemonWorkerTester = new DaemonWorkerTester(msmsEvalWorker);
+		try {
 
-		final Object workerToken = daemonWorkerTester.sendWork(new MSMSEvalWorkPacket(mgfFile, paramFile, tempDirectory, "0", false), null);
+			final Object workerToken = daemonWorkerTester.sendWork(new MSMSEvalWorkPacket(mgfFile, paramFile, tempDirectory, "0", false), null);
 
-		while (!daemonWorkerTester.isDone(workerToken)) {
-			try {
-				Thread.sleep(100);
-			} catch (InterruptedException e) {
-				//SWALLOWED
-				LOGGER.warn(e);
+			while (!daemonWorkerTester.isDone(workerToken)) {
+				try {
+					Thread.sleep(100);
+				} catch (InterruptedException e) {
+					//SWALLOWED
+					LOGGER.warn(e);
+				}
 			}
-		}
 
-		Assert.assertTrue(msmsEvalWorker.isSkippedExecution(), "The " + MSMSEvalWorker.class.getSimpleName() + " did not skip execution.");
+			Assert.assertTrue(msmsEvalWorker.isSkippedExecution(), "The " + MSMSEvalWorker.class.getSimpleName() + " did not skip execution.");
+		} finally {
+			daemonWorkerTester.close();
+		}
 	}
 
 	@Test(dependsOnMethods = {"msmsEvalWorkerTest", "msmsEvalWorkerSkippedExecutionTest"}, enabled = false)
