@@ -21,8 +21,8 @@ import edu.mayo.mprc.utilities.FileUtilities;
 import edu.mayo.mprc.utilities.progress.ProgressReporter;
 import edu.mayo.mprc.workspace.User;
 import org.testng.Assert;
-import org.testng.annotations.AfterTest;
-import org.testng.annotations.BeforeTest;
+import org.testng.annotations.AfterClass;
+import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import java.io.*;
@@ -42,7 +42,7 @@ public class TestSearchRunner {
 	private File raw1;
 	private File raw2;
 
-	@BeforeTest
+	@BeforeClass
 	public void setup() throws IOException {
 		outputFolder = FileUtilities.createTempFolder();
 		raw1 = new File(outputFolder, "file1.RAW");
@@ -51,7 +51,7 @@ public class TestSearchRunner {
 		raw2.createNewFile();
 	}
 
-	@AfterTest
+	@AfterClass
 	public void teardown() {
 		FileUtilities.cleanupTempFile(outputFolder);
 	}

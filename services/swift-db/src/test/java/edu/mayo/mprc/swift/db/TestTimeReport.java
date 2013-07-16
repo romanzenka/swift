@@ -7,7 +7,7 @@ import edu.mayo.mprc.swift.dbmapping.TaskStateData;
 import edu.mayo.mprc.workflow.persistence.TaskState;
 import org.joda.time.DateTime;
 import org.testng.Assert;
-import org.testng.annotations.BeforeTest;
+import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import java.util.Date;
@@ -17,7 +17,7 @@ public final class TestTimeReport {
 
 	public static DateTime start;
 
-	@BeforeTest
+	@BeforeClass
 	public static void setUp() {
 		start = randomTime();
 	}

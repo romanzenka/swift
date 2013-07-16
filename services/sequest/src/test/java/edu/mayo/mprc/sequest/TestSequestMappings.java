@@ -7,7 +7,7 @@ import edu.mayo.mprc.swift.params2.mapping.MockParamsInfo;
 import edu.mayo.mprc.swift.params2.mapping.TestMappingContextBase;
 import edu.mayo.mprc.unimod.ModSet;
 import org.testng.Assert;
-import org.testng.annotations.BeforeTest;
+import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 /**
@@ -22,7 +22,7 @@ public final class TestSequestMappings {
 	/**
 	 * Setup the environment for the test.
 	 */
-	@BeforeTest
+	@BeforeClass
 	public void setup() {
 		final SequestMappingFactory mappingFactory = new SequestMappingFactory();
 		sequestMappings = (SequestMappings) mappingFactory.createMapping();

@@ -2,13 +2,13 @@ package edu.mayo.mprc.chem;
 
 import edu.mayo.mprc.utilities.TestingUtilities;
 import org.testng.Assert;
-import org.testng.annotations.BeforeTest;
+import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 public final class AminoAcidsTest {
 	private AminoAcidSet set;
 
-	@BeforeTest
+	@BeforeClass
 	public void setup() {
 		set = AminoAcidSet.DEFAULT;
 	}

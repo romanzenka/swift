@@ -1,7 +1,7 @@
 package edu.mayo.mprc.config;
 
 import org.testng.Assert;
-import org.testng.annotations.BeforeTest;
+import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import java.util.Map;
@@ -13,7 +13,7 @@ public final class ConfigWriterTest {
 	private DependencyResolver resolver;
 	private TestResource resource;
 
-	@BeforeTest
+	@BeforeClass
 	public void init() {
 		resolver = new DependencyResolver(new ResourceFactory<ResourceConfig, Object>() {
 			@Override

@@ -1,14 +1,14 @@
 package edu.mayo.mprc.chem;
 
 import org.testng.Assert;
-import org.testng.annotations.BeforeTest;
+import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 public final class ChemicalTest {
 
 	private PeriodicTable periodicTable;
 
-	@BeforeTest
+	@BeforeClass
 	public void beforeTest() {
 		periodicTable = PeriodicTableFactory.getTestPeriodicTable();
 	}

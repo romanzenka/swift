@@ -3,8 +3,8 @@ package edu.mayo.mprc.mascot;
 import edu.mayo.mprc.utilities.FileUtilities;
 import edu.mayo.mprc.utilities.TestingUtilities;
 import org.testng.Assert;
-import org.testng.annotations.AfterTest;
-import org.testng.annotations.BeforeTest;
+import org.testng.annotations.AfterClass;
+import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import java.io.File;
@@ -25,7 +25,7 @@ public final class DatabaseManagerTest {
 	private DatabaseManager manager;
 	private List<String> originalDatabases;
 
-	@BeforeTest
+	@BeforeClass
 	public void setup() {
 		manager = new DatabaseManager("http://mascot.mayo.edu");
 	}
@@ -66,7 +66,7 @@ public final class DatabaseManagerTest {
 		Assert.assertFalse(databases.contains(TEST_DB), "The test database should be undeployed");
 	}
 
-	@AfterTest
+	@AfterClass
 	public void teardown() {
 		manager.close();
 	}

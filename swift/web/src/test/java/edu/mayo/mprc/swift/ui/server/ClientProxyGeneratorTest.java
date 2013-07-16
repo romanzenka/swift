@@ -8,14 +8,14 @@ import edu.mayo.mprc.swift.ui.client.rpc.ClientInstrument;
 import edu.mayo.mprc.swift.ui.client.rpc.ClientPeptideReport;
 import edu.mayo.mprc.swift.ui.client.rpc.ClientSpectrumQa;
 import org.testng.Assert;
-import org.testng.annotations.BeforeTest;
+import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 public final class ClientProxyGeneratorTest {
 
 	private ClientProxyGenerator generator;
 
-	@BeforeTest
+	@BeforeClass
 	public void setup() {
 		generator = new ClientProxyGenerator(null, null, null, null);
 	}

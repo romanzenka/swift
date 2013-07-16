@@ -10,7 +10,7 @@ import edu.mayo.mprc.swift.params2.mapping.*;
 import edu.mayo.mprc.unimod.*;
 import edu.mayo.mprc.utilities.ResourceUtilities;
 import org.testng.Assert;
-import org.testng.annotations.BeforeTest;
+import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import java.io.Reader;
@@ -22,7 +22,7 @@ public final class TestMascotMappings {
 	private Mappings mapping;
 	private Unimod unimod;
 
-	@BeforeTest
+	@BeforeClass
 	public void startup() {
 		abstractParamsInfo = getAbstractParamsInfo();
 		mappingFactory = new MascotMappingFactory();
