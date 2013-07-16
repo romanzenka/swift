@@ -5,12 +5,11 @@ import edu.mayo.mprc.config.ResourceConfig;
 import edu.mayo.mprc.messaging.SerializedRequest;
 
 /**
- * Class use to send work packet to grid engine. The object contains the actual work itself as {@link #workPacket},
+ * Class use to send work packet to grid engine. The object contains the actual work itself as {@link #getWorkPacket()},
  * but also contains information about how to send progress back from the Sun Grid Engine.
  */
 public final class SgePacket {
 
-	private Object workPacket;
 	private SerializedRequest serializedRequest;
 	private ResourceConfig workerFactoryConfig;
 	private DaemonConfigInfo daemonConfigInfo;

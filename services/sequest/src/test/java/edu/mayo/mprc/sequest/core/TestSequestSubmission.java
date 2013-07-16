@@ -110,7 +110,7 @@ public final class TestSequestSubmission {
 	 */
 	@Test(enabled = true, groups = {"linux", "sequest"})
 	public void testSequestSubmitOver() {
-		if (FileUtilities.isWindowsPlatform()) {
+		if (skipSequestTest()) {
 			return;
 		}
 
@@ -272,7 +272,7 @@ public final class TestSequestSubmission {
 	 */
 	@Test(enabled = true, groups = {"linux", "sequest"})
 	public void testSequestSubmitOneForced() {
-		if (FileUtilities.isWindowsPlatform()) {
+		if (skipSequestTest()) {
 			return;
 		}
 
@@ -436,7 +436,7 @@ public final class TestSequestSubmission {
 	 * test dealing with one ions section;
 	 */
 	public void testMgffileParserOneIonsSection() {
-		if (FileUtilities.isWindowsPlatform()) {
+		if (skipSequestTest()) {
 			return;
 		}
 
@@ -508,7 +508,7 @@ public final class TestSequestSubmission {
 	 * test dealing with 2 ions sections;
 	 */
 	public void testMgffileParserTwoIonsSections() {
-		if (FileUtilities.isWindowsPlatform()) {
+		if (skipSequestTest()) {
 			return;
 		}
 
@@ -756,7 +756,7 @@ public final class TestSequestSubmission {
 
 	@Test(enabled = true, groups = {"linux", "sequest"})
 	public void testMGF2SequestScriptStubbed() {
-		if (FileUtilities.isWindowsPlatform()) {
+		if (skipSequestTest()) {
 			return;
 		}
 
@@ -820,7 +820,7 @@ public final class TestSequestSubmission {
 	 */
 	@Test(enabled = true, groups = {"sequest"})
 	public void testMGF2SequestScriptSequest() {
-		if (FileUtilities.isWindowsPlatform()) {
+		if (skipSequestTest()) {
 			return;
 		}
 
@@ -848,12 +848,16 @@ public final class TestSequestSubmission {
 		}
 	}
 
+	private static boolean skipSequestTest() {
+		return FileUtilities.isWindowsPlatform() || FileUtilities.isMacPlatform();
+	}
+
 	/**
 	 * in this case the the mgf file has two peaklists;
 	 */
 	@Test(enabled = true, groups = {"sequest", "overnight"})
 	public void testMGF2SequestScriptSequestLargeMgfFile() {
-		if (FileUtilities.isWindowsPlatform()) {
+		if (skipSequestTest()) {
 			return;
 		}
 
@@ -900,7 +904,7 @@ public final class TestSequestSubmission {
 	 */
 	@Test(enabled = true, groups = {"sequest"})
 	public void testMGF2SequestScriptSequestNoDatabase() {
-		if (FileUtilities.isWindowsPlatform()) {
+		if (skipSequestTest()) {
 			return;
 		}
 

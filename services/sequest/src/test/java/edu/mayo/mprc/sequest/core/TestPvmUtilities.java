@@ -117,6 +117,10 @@ public final class TestPvmUtilities {
 	 */
 	@Test(enabled = true, groups = {"linux", "pvm", "overnight"})
 	public void testgetSshResult() {
+		if (!new File("/etc/pvmhosts").exists()) {
+			LOGGER.debug("We cannot test sequest on this machine");
+			return;
+		}
 		if (FileUtilities.isWindowsPlatform()) {
 			return;
 		}

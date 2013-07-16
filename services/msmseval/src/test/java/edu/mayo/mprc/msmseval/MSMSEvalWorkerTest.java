@@ -44,7 +44,12 @@ public final class MSMSEvalWorkerTest {
 	public void msmsEvalWorkerTest() {
 
 		final MSMSEvalWorker msmsEvalWorker = new MSMSEvalWorker();
-		msmsEvalWorker.setMsmsEvalExecutable(MSMSEvalTest.getMsmsEvalExecutable());
+		final File msmsEvalExecutable = MSMSEvalTest.getMsmsEvalExecutable();
+		if (!msmsEvalExecutable.canExecute()) {
+			LOGGER.debug("Cannot test msmsEval, the executable is not present");
+			return;
+		}
+		msmsEvalWorker.setMsmsEvalExecutable(msmsEvalExecutable);
 
 		final DaemonWorkerTester daemonWorkerTester = new DaemonWorkerTester(msmsEvalWorker);
 		try {
@@ -72,7 +77,13 @@ public final class MSMSEvalWorkerTest {
 	public void msmsEvalWorkerSkippedExecutionTest() {
 
 		final MSMSEvalWorker msmsEvalWorker = new MSMSEvalWorker();
-		msmsEvalWorker.setMsmsEvalExecutable(MSMSEvalTest.getMsmsEvalExecutable());
+		final File msmsEvalExecutable = MSMSEvalTest.getMsmsEvalExecutable();
+		if (!msmsEvalExecutable.canExecute()) {
+			LOGGER.debug("Cannot test msmsEval, the executable is not present");
+			return;
+		}
+
+		msmsEvalWorker.setMsmsEvalExecutable(msmsEvalExecutable);
 
 		final DaemonWorkerTester daemonWorkerTester = new DaemonWorkerTester(msmsEvalWorker);
 		try {
