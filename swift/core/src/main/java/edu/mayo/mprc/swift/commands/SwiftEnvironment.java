@@ -6,6 +6,7 @@ import edu.mayo.mprc.config.ResourceConfig;
 import edu.mayo.mprc.config.ServiceConfig;
 import edu.mayo.mprc.daemon.Daemon;
 import edu.mayo.mprc.daemon.DaemonConnection;
+import edu.mayo.mprc.daemon.MessageBroker;
 import edu.mayo.mprc.daemon.files.FileTokenFactory;
 import edu.mayo.mprc.swift.ExitCode;
 import edu.mayo.mprc.swift.Swift;
@@ -89,6 +90,11 @@ public interface SwiftEnvironment {
 	 * @return Configuration for the Swift Searcher (core Swift module).
 	 */
 	SwiftSearcher.Config getSwiftSearcher();
+
+	/**
+	 * Shortcut method for obtaining the message broker config. Fails if none or more are defined.
+	 */
+	MessageBroker.Config getMessageBroker();
 
 	/**
 	 * Creates a Swift monitor instance on demand (returns an existing one if one exists).

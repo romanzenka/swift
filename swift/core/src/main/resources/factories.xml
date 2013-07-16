@@ -120,12 +120,6 @@
         <property name="swiftJar" value="bin/swift/swift.jar"/>
     </bean>
 
-    <bean name="remoteObjectHandler" class="edu.mayo.mprc.messaging.rmi.RemoteObjectHandler"/>
-
-    <bean name="messengerFactory" class="edu.mayo.mprc.messaging.rmi.MessengerFactory">
-        <constructor-arg index="0" type="edu.mayo.mprc.messaging.rmi.RemoteObjectHandler" ref="remoteObjectHandler"/>
-    </bean>
-
     <bean id="swiftSge" class="edu.mayo.mprc.swift.SgeJobRunner">
         <property name="resourceTable" ref="resourceTable"/>
         <property name="connectionPool" ref="connectionPool"/>

@@ -17,7 +17,6 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import java.io.File;
-import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
@@ -41,8 +40,8 @@ public final class WorkCachePerformanceTest {
 
 	@BeforeClass
 	public void init() {
-		serviceFactory.initialize("test-daemon");
 		serviceFactory.setConnectionPool(connectionPool);
+		serviceFactory.initialize("vm://test?broker.useJmx=false&broker.persistent=false", "test-daemon");
 	}
 
 	@AfterClass
@@ -111,7 +110,7 @@ public final class WorkCachePerformanceTest {
 	}
 
 	private SimpleRunner wrapWithRunner(final Worker worker, final String queueName, final File logFolder, final FileTokenFactory fileTokenFactory) throws URISyntaxException {
-		final Service service = serviceFactory.createJmsQueue(new URI("jms.vm://test?broker.useJmx=false&broker.persistent=false&simplequeue=" + queueName));
+		final Service service = serviceFactory.createJmsQueue(queueName);
 		final DirectDaemonConnection directConnection = new DirectDaemonConnection(service, fileTokenFactory);
 		final Daemon daemon = new Daemon();
 		daemon.setLogOutputFolder(logFolder);

@@ -1,6 +1,5 @@
 package edu.mayo.mprc.sge;
 
-
 import com.google.common.base.Strings;
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.xml.DomDriver;
@@ -9,10 +8,8 @@ import edu.mayo.mprc.config.ui.ServiceUiFactory;
 import edu.mayo.mprc.daemon.*;
 import edu.mayo.mprc.daemon.exception.DaemonException;
 import edu.mayo.mprc.daemon.files.FileTokenFactory;
-import edu.mayo.mprc.messaging.rmi.BoundMessenger;
-import edu.mayo.mprc.messaging.rmi.MessageListener;
-import edu.mayo.mprc.messaging.rmi.MessengerFactory;
-import edu.mayo.mprc.messaging.rmi.SimpleOneWayMessenger;
+import edu.mayo.mprc.messaging.ResponseListener;
+import edu.mayo.mprc.messaging.ServiceFactory;
 import edu.mayo.mprc.utilities.FileUtilities;
 import org.apache.log4j.Logger;
 import org.springframework.stereotype.Component;
@@ -26,7 +23,7 @@ import java.util.concurrent.atomic.AtomicLong;
 /**
  * Daemon Runner that sends {@link SgePacket} objects to the Sun Grid Engine.
  * The {@link SgePacket} is
- * saved as a shared xml file and a {@link java.io.File} URI that represents the shared xml file
+ * saved as a shared xml file and a {@link File} URI that represents the shared xml file
  * is sent through the Grid.
  */
 public final class GridRunner extends AbstractRunner {
@@ -52,9 +49,9 @@ public final class GridRunner extends AbstractRunner {
 
 	private ResourceConfig workerFactoryConfig;
 
-	private MessengerFactory messengerFactory;
 	private GridScriptFactory gridScriptFactory;
 	private FileTokenFactory fileTokenFactory;
+	private ServiceFactory serviceFactory;
 
 	private static AtomicLong uniqueId = new AtomicLong(System.currentTimeMillis());
 
@@ -82,13 +79,10 @@ public final class GridRunner extends AbstractRunner {
 		final File daemonWorkerAllocatorInputFile = new File(getSharedTempDirectory(), queueName + "_" + uniqueId.incrementAndGet());
 
 		try {
-			final BoundMessenger<SimpleOneWayMessenger> boundMessenger = messengerFactory.createOneWayMessenger();
 			final SgeMessageListener allocatorListener = new SgeMessageListener(request);
-			boundMessenger.getMessenger().addMessageListener(allocatorListener);
-
 			final SgePacket gridDaemonAllocatorInputObject =
-					new SgePacket(request.getWorkPacket()
-							, boundMessenger.getMessengerInfo()
+					new SgePacket(
+							serviceFactory.serializeRequest(request.getWorkPacket(), allocatorListener)
 							, workerFactoryConfig
 							, fileTokenFactory.getDaemonConfigInfo());
 
@@ -102,7 +96,7 @@ public final class GridRunner extends AbstractRunner {
 			gridWorkPacket.setParameters(parameters);
 
 			// Set our own listener to the work packet progress. When the packet returns, the execution will be resumed
-			final MyWorkPacketStateListener listener = new MyWorkPacketStateListener(request, daemonWorkerAllocatorInputFile, boundMessenger, allocatorListener);
+			final MyWorkPacketStateListener listener = new MyWorkPacketStateListener(request, daemonWorkerAllocatorInputFile, allocatorListener);
 			gridWorkPacket.setListener(listener);
 			gridWorkPacket.setPriority(request.getWorkPacket().getPriority());
 			// Run the job
@@ -156,7 +150,7 @@ public final class GridRunner extends AbstractRunner {
 	/**
 	 * Listens to RMI calls from the process running within SGE. None of the messages is final.
 	 */
-	private class SgeMessageListener implements MessageListener {
+	private class SgeMessageListener implements ResponseListener {
 		private static final long serialVersionUID = 20090324L;
 		private DaemonRequest request;
 		private Throwable lastThrowable;
@@ -169,20 +163,21 @@ public final class GridRunner extends AbstractRunner {
 			return lastThrowable;
 		}
 
-		public void messageReceived(final Object message) {
-			if (message instanceof Serializable) {
-				if (message instanceof Throwable) {
+		@Override
+		public void responseReceived(Serializable response, boolean isLast) {
+			if (response instanceof Serializable) {
+				if (response instanceof Throwable) {
 					// We do send an error message now.
 					// That is done once SGE detects termination of the process.
 					synchronized (this) {
-						lastThrowable = (Throwable) message;
+						lastThrowable = (Throwable) response;
 					}
 				} else {
 					// Not final - a progress message
-					sendResponse(request, (Serializable) message, false);
+					sendResponse(request, response, false);
 				}
 			} else {
-				sendResponse(request, "Progress message from SGE " + message.toString(), false);
+				sendResponse(request, "Progress message from SGE " + response.toString(), false);
 			}
 		}
 	}
@@ -194,7 +189,6 @@ public final class GridRunner extends AbstractRunner {
 		private boolean reported;
 		private final DaemonRequest request;
 		private final File sgePacketFile;
-		private final BoundMessenger boundMessenger;
 		private final SgeMessageListener allocatorListener;
 
 		/**
@@ -202,14 +196,10 @@ public final class GridRunner extends AbstractRunner {
 		 */
 		private AssignedTaskData taskData;
 
-		/**
-		 * @param allocatorListener The listener for the RMI messages. We use it so we can send an exception that was cached when SGE terminates.
-		 */
-		public MyWorkPacketStateListener(final DaemonRequest request, final File sgePacketFile, final BoundMessenger boundMessenger, final SgeMessageListener allocatorListener) {
+		public MyWorkPacketStateListener(final DaemonRequest request, final File sgePacketFile, final SgeMessageListener allocatorListener) {
 			reported = false;
 			this.request = request;
 			this.sgePacketFile = sgePacketFile;
-			this.boundMessenger = boundMessenger;
 			this.allocatorListener = allocatorListener;
 		}
 
@@ -250,10 +240,6 @@ public final class GridRunner extends AbstractRunner {
 						}
 					}
 					reported = true;
-
-					boundMessenger.dispose();
-				} catch (IOException e) {
-					LOGGER.warn("Error disposing messenger: " + boundMessenger.getMessengerInfo().getMessengerRemoteName(), e);
 				} finally {
 					if (!w.getFailed()) {
 						//Delete workPacket file
@@ -346,14 +332,6 @@ public final class GridRunner extends AbstractRunner {
 
 	public void setEnabled(final boolean enabled) {
 		this.enabled = enabled;
-	}
-
-	public MessengerFactory getMessengerFactory() {
-		return messengerFactory;
-	}
-
-	public void setMessengerFactory(final MessengerFactory messengerFactory) {
-		this.messengerFactory = messengerFactory;
 	}
 
 	public GridScriptFactory getGridScriptFactory() {
@@ -455,7 +433,6 @@ public final class GridRunner extends AbstractRunner {
 
 		private GridEngineJobManager gridEngineManager;
 		private GridScriptFactory gridScriptFactory;
-		private MessengerFactory messengerFactory;
 		private FileTokenFactory fileTokenFactory;
 
 		@Override
@@ -479,7 +456,6 @@ public final class GridRunner extends AbstractRunner {
 
 			runner.setGridScriptFactory(gridScriptFactory);
 			runner.setManager(gridEngineManager);
-			runner.setMessengerFactory(messengerFactory);
 			runner.setWrapperScript(getAbsoluteExecutablePath(config));
 			runner.setWorkerFactoryConfig(config.getWorkerConfiguration());
 			runner.setFileTokenFactory(fileTokenFactory);
@@ -510,15 +486,6 @@ public final class GridRunner extends AbstractRunner {
 		@Resource(name = "gridScriptFactory")
 		public void setGridScriptFactory(final GridScriptFactory gridScriptFactory) {
 			this.gridScriptFactory = gridScriptFactory;
-		}
-
-		public MessengerFactory getMessengerFactory() {
-			return messengerFactory;
-		}
-
-		@Resource(name = "messengerFactory")
-		public void setMessengerFactory(final MessengerFactory messengerFactory) {
-			this.messengerFactory = messengerFactory;
 		}
 
 		public FileTokenFactory getFileTokenFactory() {

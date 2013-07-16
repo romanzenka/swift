@@ -3,7 +3,9 @@ package edu.mayo.mprc.swift;
 import edu.mayo.mprc.MprcException;
 import edu.mayo.mprc.config.*;
 import edu.mayo.mprc.daemon.Daemon;
+import edu.mayo.mprc.daemon.MessageBroker;
 import edu.mayo.mprc.dbcurator.server.CurationWebContext;
+import edu.mayo.mprc.swift.commands.SwiftEnvironmentImpl;
 import edu.mayo.mprc.utilities.FileUtilities;
 import org.apache.log4j.Logger;
 
@@ -64,7 +66,8 @@ public final class SwiftWebContext {
 									"Verify daemon name and try again.");
 						}
 					}
-					MainFactoryContext.getServiceFactory().initialize(daemonConfig.getName());
+					final MessageBroker.Config messageBroker = SwiftEnvironmentImpl.getMessageBroker(daemonConfig);
+					MainFactoryContext.getServiceFactory().initialize(messageBroker.getBrokerUrl(), daemonConfig.getName());
 
 					final Daemon daemon = (Daemon) factoryTable.create(daemonConfig, new DependencyResolver(factoryTable));
 

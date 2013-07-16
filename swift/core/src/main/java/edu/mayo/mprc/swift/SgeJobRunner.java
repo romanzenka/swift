@@ -12,11 +12,8 @@ import edu.mayo.mprc.daemon.Worker;
 import edu.mayo.mprc.daemon.files.FileTokenFactory;
 import edu.mayo.mprc.daemon.files.FileTokenHolder;
 import edu.mayo.mprc.messaging.ActiveMQConnectionPool;
+import edu.mayo.mprc.messaging.Request;
 import edu.mayo.mprc.messaging.ServiceFactory;
-import edu.mayo.mprc.messaging.rmi.BoundMessenger;
-import edu.mayo.mprc.messaging.rmi.MessengerFactory;
-import edu.mayo.mprc.messaging.rmi.OneWayMessenger;
-import edu.mayo.mprc.messaging.rmi.RemoteObjectHandler;
 import edu.mayo.mprc.sge.SgePacket;
 import edu.mayo.mprc.utilities.FileUtilities;
 import edu.mayo.mprc.utilities.progress.ProgressInfo;
@@ -49,13 +46,9 @@ public final class SgeJobRunner {
 	public void run(final File workPacketXmlFile) {
 		// Wait for the work packet to fully materialize in case it was transferred over a shared filesystem
 		FileUtilities.waitForFile(workPacketXmlFile);
-		serviceFactory.initialize(null);
 
 		FileInputStream fileInputStream = null;
 		SgePacket sgePacket = null;
-		BoundMessenger<OneWayMessenger> boundMessenger = null;
-		final RemoteObjectHandler handler = new RemoteObjectHandler();
-		final MessengerFactory messengerFactory = new MessengerFactory(handler);
 
 		try {
 			LOGGER.info("Running grid job in host: " + InetAddress.getLocalHost().getHostName());
@@ -63,6 +56,7 @@ public final class SgeJobRunner {
 			LOGGER.error("Could not get host name.", e);
 		}
 
+		Request request = null;
 		try {
 			LOGGER.debug(ReleaseInfoCore.buildVersion());
 			LOGGER.info("Parsing xml file: " + workPacketXmlFile.getAbsolutePath());
@@ -72,6 +66,8 @@ public final class SgeJobRunner {
 			fileInputStream = new FileInputStream(workPacketXmlFile);
 
 			sgePacket = (SgePacket) xStream.fromXML(fileInputStream);
+			serviceFactory.initialize(sgePacket.getSerializedRequest().getBrokerUri(), null);
+			request = serviceFactory.deserializeRequest(sgePacket.getSerializedRequest());
 
 			//If the work packet is an instance of a FileTokenHolder, set the the FileTokenFactory on it. The FileTokenFactory object
 			//needs to be reset because it is a transient object.
@@ -86,17 +82,15 @@ public final class SgeJobRunner {
 				fileTokenHolder.translateOnReceiver(fileTokenFactory, fileTokenFactory, null);
 			}
 
-			boundMessenger = messengerFactory.getOneWayMessenger(sgePacket.getMessengerInfo());
-
 			final DependencyResolver dependencies = new DependencyResolver(resourceTable);
 			final Worker daemonWorker = (Worker) resourceTable.createSingleton(sgePacket.getWorkerFactoryConfig(), dependencies);
-			daemonWorker.processRequest((WorkPacket) sgePacket.getWorkPacket(), new DaemonWorkerProgressReporter(boundMessenger));
+			daemonWorker.processRequest((WorkPacket) sgePacket.getWorkPacket(), new DaemonWorkerProgressReporter(request));
 		} catch (Exception e) {
 			final String errorMessage = "Failed to process work packet " + ((sgePacket == null || sgePacket.getWorkPacket() == null) ? "null" : sgePacket.getWorkPacket().toString());
 			LOGGER.error(errorMessage, e);
 
 			try {
-				reportProgress(boundMessenger, e);
+				reportProgress(request, e);
 			} catch (RemoteException ex) {
 				LOGGER.error("Error sending exception " + MprcException.getDetailedMessage(e) + " to GridRunner", ex);
 				// SWALLOWED
@@ -144,24 +138,24 @@ public final class SgeJobRunner {
 		this.serviceFactory = serviceFactory;
 	}
 
-	private static void reportProgress(final BoundMessenger<OneWayMessenger> boundMessenger, final Serializable serializable) throws RemoteException {
-		boundMessenger.getMessenger().sendMessage(serializable);
+	private static void reportProgress(final Request request, final Serializable serializable) throws RemoteException {
+		request.sendResponse(serializable, false);
 	}
 
 	class DaemonWorkerProgressReporter implements ProgressReporter {
-		private BoundMessenger<OneWayMessenger> boundMessenger;
+		private Request request;
 
-		DaemonWorkerProgressReporter(final BoundMessenger<OneWayMessenger> boundMessenger) {
-			this.boundMessenger = boundMessenger;
+		DaemonWorkerProgressReporter(final Request request) {
+			this.request = request;
 		}
 
 		@Override
 		public void reportStart() {
 			try {
-				SgeJobRunner.reportProgress(boundMessenger, new DaemonProgressMessage(DaemonProgress.RequestProcessingStarted));
+				SgeJobRunner.reportProgress(request, new DaemonProgressMessage(DaemonProgress.RequestProcessingStarted));
 			} catch (Exception t) {
 				try {
-					SgeJobRunner.reportProgress(boundMessenger, t);
+					SgeJobRunner.reportProgress(request, t);
 				} catch (RemoteException ex) {
 					LOGGER.error("Error sending exception " + MprcException.getDetailedMessage(t) + " to GridRunner", ex);
 					// SWALLOWED
@@ -173,7 +167,7 @@ public final class SgeJobRunner {
 
 		public void reportProgress(final ProgressInfo progressInfo) {
 			try {
-				SgeJobRunner.reportProgress(boundMessenger, new DaemonProgressMessage(DaemonProgress.UserSpecificProgressInfo, progressInfo));
+				SgeJobRunner.reportProgress(request, new DaemonProgressMessage(DaemonProgress.UserSpecificProgressInfo, progressInfo));
 			} catch (RemoteException e) {
 				LOGGER.error("Error reporting daemon worker progress.", e);
 				//SWALLOWED
@@ -186,7 +180,7 @@ public final class SgeJobRunner {
 
 		public void reportFailure(final Throwable t) {
 			try {
-				SgeJobRunner.reportProgress(boundMessenger, t);
+				SgeJobRunner.reportProgress(request, t);
 			} catch (RemoteException e) {
 				LOGGER.error("Error reporting daemon worker failure.", e);
 				//SWALLOWED

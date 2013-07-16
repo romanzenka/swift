@@ -5,6 +5,7 @@ import edu.mayo.mprc.config.*;
 import edu.mayo.mprc.daemon.Daemon;
 import edu.mayo.mprc.daemon.DaemonConnection;
 import edu.mayo.mprc.daemon.DaemonConnectionFactory;
+import edu.mayo.mprc.daemon.MessageBroker;
 import edu.mayo.mprc.daemon.files.FileTokenFactory;
 import edu.mayo.mprc.messaging.ActiveMQConnectionPool;
 import edu.mayo.mprc.swift.ExitCode;
@@ -222,6 +223,19 @@ public final class SwiftEnvironmentImpl implements SwiftEnvironment {
 			throw new MprcException("More than one Swift Searcher defined in this Swift install");
 		}
 		return (SwiftSearcher.Config) searchers.get(0);
+	}
+
+	@Override
+	public MessageBroker.Config getMessageBroker() {
+		return getMessageBroker(getDaemonConfig());
+	}
+
+	public static MessageBroker.Config getMessageBroker(DaemonConfig daemonConfig) {
+		final List<ResourceConfig> brokers = daemonConfig.getApplicationConfig().getModulesOfConfigType(MessageBroker.Config.class);
+		if (brokers.size() != 1) {
+			throw new MprcException("More than one message broker defined in this Swift install");
+		}
+		return (MessageBroker.Config) brokers.get(0);
 	}
 
 	public SwiftMonitor getMonitor() {

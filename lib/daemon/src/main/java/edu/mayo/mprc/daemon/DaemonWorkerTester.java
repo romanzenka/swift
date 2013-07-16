@@ -11,13 +11,11 @@ import edu.mayo.mprc.utilities.progress.ProgressInfo;
 import edu.mayo.mprc.utilities.progress.ProgressListener;
 import org.apache.log4j.Logger;
 
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
- * Test harness for {@link edu.mayo.mprc.daemon.Worker} classes. Wrap a daemon worker
+ * Test harness for {@link Worker} classes. Wrap a daemon worker
  */
 public final class DaemonWorkerTester {
 	private static final Logger LOGGER = Logger.getLogger(DaemonWorkerTester.class);
@@ -30,7 +28,7 @@ public final class DaemonWorkerTester {
 	private DaemonWorkerTester() {
 		serviceFactory = new ServiceFactory();
 		serviceFactory.setConnectionPool(new ActiveMQConnectionPool());
-		serviceFactory.initialize("test-daemon");
+		serviceFactory.initialize("vm://broker1?broker.persistent=false", "test-daemon");
 	}
 
 	/**
@@ -40,20 +38,16 @@ public final class DaemonWorkerTester {
 	 */
 	public DaemonWorkerTester(final Worker worker) {
 		this();
-		try {
-			final URI uri = new URI("jms.vm://broker1?broker.persistent=false&simplequeue=test_" + String.valueOf(testId.incrementAndGet()));
-			initializeFromUri(uri);
-			runner = new SimpleRunner();
-			runner.setFactory(new TestWorkerFactory(worker));
-			runner.setExecutorService(getSingleThreadExecutor(worker));
-			runner.setDaemonConnection(daemonConnection);
-			final Daemon daemon = new Daemon();
-			daemon.setLogOutputFolder(FileUtilities.createTempFolder());
-			runner.setDaemon(daemon);
-			runner.setEnabled(true);
-		} catch (URISyntaxException e) {
-			throw new MprcException(e);
-		}
+		final String queueName = "test_" + testId.incrementAndGet();
+		initializeFromQueueName(queueName);
+		runner = new SimpleRunner();
+		runner.setFactory(new TestWorkerFactory(worker));
+		runner.setExecutorService(getSingleThreadExecutor(worker));
+		runner.setDaemonConnection(daemonConnection);
+		final Daemon daemon = new Daemon();
+		daemon.setLogOutputFolder(FileUtilities.createTempFolder());
+		runner.setDaemon(daemon);
+		runner.setEnabled(true);
 		runner.start();
 		waitUntilReady(runner);
 	}
@@ -62,8 +56,8 @@ public final class DaemonWorkerTester {
 		return new SimpleThreadPoolExecutor(1, worker.getClass().getSimpleName() + "-runner", true);
 	}
 
-	private void initializeFromUri(final URI uri) {
-		service = serviceFactory.createService(uri);
+	private void initializeFromQueueName(final String queueName) {
+		service = serviceFactory.createService(queueName);
 		final FileTokenFactory fileTokenFactory = new FileTokenFactory();
 		fileTokenFactory.setDaemonConfigInfo(new DaemonConfigInfo("daemon1", "shared"));
 		daemonConnection = new DirectDaemonConnection(service, fileTokenFactory);
@@ -78,20 +72,17 @@ public final class DaemonWorkerTester {
 	 */
 	public DaemonWorkerTester(final WorkerFactory workerFactory, final int numWorkerThreads) {
 		this();
-		try {
-			final URI uri = new URI("jms.vm://broker1?broker.persistent=false&simplequeue=test_" + String.valueOf(testId.incrementAndGet()));
-			initializeFromUri(uri);
-			runner = new SimpleRunner();
-			runner.setFactory(workerFactory);
-			runner.setExecutorService(new SimpleThreadPoolExecutor(numWorkerThreads, "test", true));
-			runner.setDaemonConnection(daemonConnection);
-			final Daemon daemon = new Daemon();
-			daemon.setLogOutputFolder(FileUtilities.createTempFolder());
-			runner.setDaemon(daemon);
-			runner.setEnabled(true);
-		} catch (URISyntaxException e) {
-			throw new MprcException(e);
-		}
+		final String queueName = "test_" + testId.incrementAndGet();
+		initializeFromQueueName(queueName);
+		runner = new SimpleRunner();
+		runner.setFactory(workerFactory);
+		runner.setExecutorService(new SimpleThreadPoolExecutor(numWorkerThreads, "test", true));
+		runner.setDaemonConnection(daemonConnection);
+		final Daemon daemon = new Daemon();
+		daemon.setLogOutputFolder(FileUtilities.createTempFolder());
+		runner.setDaemon(daemon);
+		runner.setEnabled(true);
+
 		runner.start();
 		waitUntilReady(runner);
 	}

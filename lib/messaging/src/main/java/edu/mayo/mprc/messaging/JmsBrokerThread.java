@@ -84,7 +84,7 @@ public final class JmsBrokerThread {
 
 	public static URI getVmUri() {
 		try {
-			return new URI("vm", null, "localhost", -1, null, "asyncSend=true&broker.persistent=false&broker.useJmx=false", null);
+			return new URI("vm", null, "localhost", -1, null, "broker.persistent=false&broker.useJmx=false", null);
 		} catch (URISyntaxException e) {
 			throw new MprcException(e);
 		}

@@ -48,7 +48,7 @@ public class RunSwift implements FileListener, SwiftCommand {
 
 		checkDoesNotContainWebModule(config);
 
-		serviceFactory.initialize(config.getName());
+		serviceFactory.initialize(environment.getMessageBroker().getBrokerUrl(), config.getName());
 		final Daemon daemon = environment.createDaemon(config);
 		LOGGER.debug(daemon.toString());
 

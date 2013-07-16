@@ -64,6 +64,7 @@ public final class SendReceiveTest extends MessagingTestBase {
 
 		Assert.assertEquals(numRequests.get(), expectedNumRequests, "The requests did not arrive ok.");
 		Assert.assertEquals(numResponses.get(), expectedNumResponses, "The responses did not arrive ok.");
+		stopBroker();
 	}
 
 	@Test(enabled = true, groups = {"unit", "fast"})

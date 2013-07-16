@@ -2,7 +2,7 @@ package edu.mayo.mprc.sge;
 
 import edu.mayo.mprc.config.DaemonConfigInfo;
 import edu.mayo.mprc.config.ResourceConfig;
-import edu.mayo.mprc.messaging.rmi.MessengerInfo;
+import edu.mayo.mprc.messaging.SerializedRequest;
 
 /**
  * Class use to send work packet to grid engine. The object contains the actual work itself as {@link #workPacket},
@@ -11,7 +11,7 @@ import edu.mayo.mprc.messaging.rmi.MessengerInfo;
 public final class SgePacket {
 
 	private Object workPacket;
-	private MessengerInfo messengerInfo;
+	private SerializedRequest serializedRequest;
 	private ResourceConfig workerFactoryConfig;
 	private DaemonConfigInfo daemonConfigInfo;
 	private String sharedTempDirectory;
@@ -19,19 +19,14 @@ public final class SgePacket {
 	public SgePacket() {
 	}
 
-	public SgePacket(final Object workPacket, final MessengerInfo messengerInfo, final ResourceConfig workerFactoryConfig, final DaemonConfigInfo daemonConfigInfo) {
-		this.workPacket = workPacket;
-		this.messengerInfo = messengerInfo;
+	public SgePacket(final SerializedRequest serializedRequest, final ResourceConfig workerFactoryConfig, final DaemonConfigInfo daemonConfigInfo) {
+		this.serializedRequest = serializedRequest;
 		this.workerFactoryConfig = workerFactoryConfig;
 		this.daemonConfigInfo = daemonConfigInfo;
 	}
 
 	public Object getWorkPacket() {
-		return workPacket;
-	}
-
-	public void setWorkPacket(final Object workPacket) {
-		this.workPacket = workPacket;
+		return serializedRequest.getMessage();
 	}
 
 	public ResourceConfig getWorkerFactoryConfig() {
@@ -42,12 +37,12 @@ public final class SgePacket {
 		this.workerFactoryConfig = workerFactoryConfig;
 	}
 
-	public MessengerInfo getMessengerInfo() {
-		return messengerInfo;
+	public SerializedRequest getSerializedRequest() {
+		return serializedRequest;
 	}
 
-	public void setMessengerInfo(final MessengerInfo messengerInfo) {
-		this.messengerInfo = messengerInfo;
+	public void setSerializedRequest(SerializedRequest serializedRequest) {
+		this.serializedRequest = serializedRequest;
 	}
 
 	public DaemonConfigInfo getDaemonConfigInfo() {

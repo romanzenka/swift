@@ -5,14 +5,13 @@ import org.apache.log4j.Logger;
 import org.testng.annotations.AfterClass;
 
 import java.net.URI;
-import java.text.MessageFormat;
 
 public abstract class MessagingTestBase {
 	private static final Logger LOGGER = Logger.getLogger(MessagingTestBase.class);
 	private static final String TEST_QUEUE_NAME = "test_queue";
 	protected JmsBrokerThread broker;
 	protected Service service;
-	private ServiceFactory serviceFactory = new ServiceFactory();
+	protected ServiceFactory serviceFactory;
 
 	/**
 	 * Null Constructor
@@ -21,18 +20,20 @@ public abstract class MessagingTestBase {
 	}
 
 	protected synchronized void startBroker() {
-		serviceFactory.setConnectionPool(new ActiveMQConnectionPool());
-		serviceFactory.initialize("test-messaging-daemon");
 		LOGGER.debug(broker != null ? "JMS Broker already started ---------" : "JMS Starting broker ------------");
 		if (broker != null) {
 			return;
 		}
 		// Start a local, vm-only broker with no port.
-		broker = new JmsBrokerThread(JmsBrokerThread.getVmUri(), null);
+		final URI brokerUri = JmsBrokerThread.getVmUri();
+		broker = new JmsBrokerThread(brokerUri, null);
+
+		serviceFactory = new ServiceFactory();
+		serviceFactory.setConnectionPool(new ActiveMQConnectionPool());
+		serviceFactory.initialize(brokerUri.toString(), "test-messaging-daemon");
 
 		try {
-			service = serviceFactory.createService(
-					new URI(MessageFormat.format("jms.vm://localhost?broker.persistent=false&simplequeue={0}", TEST_QUEUE_NAME)));
+			service = serviceFactory.createService(TEST_QUEUE_NAME);
 		} catch (Exception t) {
 			throw new MprcException(t);
 		}
@@ -40,12 +41,15 @@ public abstract class MessagingTestBase {
 
 	@AfterClass
 	public void stopBroker() {
-		LOGGER.debug("Stopping JMS broker");
+		if (serviceFactory != null) {
+			serviceFactory.getConnectionPool().close();
+			serviceFactory = null;
+		}
 		if (broker != null) {
+			LOGGER.debug("Stopping JMS broker");
 			broker.stopBroker();
 			broker = null;
+			LOGGER.debug("JMS Broker stopped -------------");
 		}
-		serviceFactory.getConnectionPool().close();
-		LOGGER.debug("JMS Broker stopped -------------");
 	}
 }
