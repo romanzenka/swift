@@ -147,6 +147,10 @@ public final class GridRunner extends AbstractRunner {
 		}
 	}
 
+	public void setServiceFactory(final ServiceFactory serviceFactory) {
+		this.serviceFactory = serviceFactory;
+	}
+
 	/**
 	 * Listens to RMI calls from the process running within SGE. None of the messages is final.
 	 */
@@ -434,6 +438,7 @@ public final class GridRunner extends AbstractRunner {
 		private GridEngineJobManager gridEngineManager;
 		private GridScriptFactory gridScriptFactory;
 		private FileTokenFactory fileTokenFactory;
+		private ServiceFactory serviceFactory;
 
 		@Override
 		public GridRunner create(final Config config, final DependencyResolver dependencies) {
@@ -442,6 +447,7 @@ public final class GridRunner extends AbstractRunner {
 
 			final GridRunner runner = new GridRunner();
 
+			runner.setServiceFactory(getServiceFactory());
 			runner.setEnabled(true);
 
 			runner.setQueueName(config.getQueueName());
@@ -495,6 +501,15 @@ public final class GridRunner extends AbstractRunner {
 		@Resource(name = "fileTokenFactory")
 		public void setFileTokenFactory(final FileTokenFactory fileTokenFactory) {
 			this.fileTokenFactory = fileTokenFactory;
+		}
+
+		public ServiceFactory getServiceFactory() {
+			return serviceFactory;
+		}
+
+		@Resource(name = "serviceFactory")
+		public void setServiceFactory(final ServiceFactory serviceFactory) {
+			this.serviceFactory = serviceFactory;
 		}
 
 		@Override
