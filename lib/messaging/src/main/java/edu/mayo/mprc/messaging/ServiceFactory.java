@@ -22,6 +22,7 @@ public final class ServiceFactory implements Closeable {
 	private ActiveMQConnectionPool connectionPool;
 	private Connection connection;
 	private ResponseDispatcher responseDispatcher;
+	private String daemonName;
 
 	public ServiceFactory() {
 	}
@@ -39,17 +40,22 @@ public final class ServiceFactory implements Closeable {
 			throw new MprcException("Invalid broker URI", e);
 		}
 
-		final UserInfo info = extractJmsUserinfo(brokerUri);
+		this.daemonName = daemonName;
+	}
 
-		connection = getConnectionPool().getConnectionToBroker(brokerUri, info.getUserName(), info.getPassword());
-
-		if (daemonName == null) {
-			throw new MprcException("The daemon name has to be set before a ServiceFactory can be used");
+	/**
+	 * Run this before using connection or responseDispatcher
+	 */
+	private void startup() {
+		if (connection == null) {
+			final UserInfo info = extractJmsUserinfo(brokerUri);
+			connection = getConnectionPool().getConnectionToBroker(brokerUri, info.getUserName(), info.getPassword());
 		}
-		if (responseDispatcher == null) {
+		if (responseDispatcher == null && daemonName != null) {
 			responseDispatcher = new ResponseDispatcher(connection, daemonName);
 		}
 	}
+
 
 	/**
 	 * Creates a service ({@link Service})
@@ -81,7 +87,7 @@ public final class ServiceFactory implements Closeable {
 	 * @return Service based on a simple queue that can be used for both sending and receiving of messages.
 	 */
 	public Service createJmsQueue(final String name) {
-		return new SimpleQueueService(connection, responseDispatcher, name);
+		return new SimpleQueueService(getConnection(), getResponseDispatcher(), name);
 	}
 
 	public ActiveMQConnectionPool getConnectionPool() {
@@ -93,17 +99,30 @@ public final class ServiceFactory implements Closeable {
 	}
 
 	public SerializedRequest serializeRequest(final Serializable message, final ResponseListener listener) {
-		return new SerializedRequest(brokerUri.toString(), responseDispatcher.getResponseQueueName(), message, responseDispatcher.registerMessageListener(listener));
+		return new SerializedRequest(brokerUri.toString(), getResponseDispatcher().getResponseQueueName(), message, getResponseDispatcher().registerMessageListener(listener));
 	}
 
 	public Request deserializeRequest(final SerializedRequest serializedRequest) {
-		return new DeserializedRequest(connection, serializedRequest);
+		return new DeserializedRequest(getConnection(), serializedRequest);
 	}
 
 	@Override
 	public void close() {
-		responseDispatcher.close();
+		getResponseDispatcher().close();
 		connectionPool.close();
+	}
+
+	public Connection getConnection() {
+		startup();
+		return connection;
+	}
+
+	public ResponseDispatcher getResponseDispatcher() {
+		startup();
+		if (responseDispatcher == null) {
+			throw new MprcException("This service factory does not support response dispatch. This probably because it is not running within a daemon (daemonName is set to " + daemonName + ")");
+		}
+		return responseDispatcher;
 	}
 
 	private static class DeserializedRequest implements Request {
