@@ -183,6 +183,7 @@ public final class XTandemWorker extends WorkerBase {
 			matcher = new StreamRegExMatcher(templateFile);
 			matcher.replaceAll(replacements);
 			final File resultingParamsFile = XTandemMappingFactory.resultingParamsFile(templateFile);
+			FileUtilities.quietDelete(resultingParamsFile);
 			matcher.writeContentsToFile(resultingParamsFile);
 			return resultingParamsFile;
 		} catch (IOException e) {
