@@ -26,8 +26,8 @@ public final class MyriMatchMappings implements Mappings {
 	public static final String DYNAMIC_MODS = "DynamicMods";
 	public static final String CLEAVAGE_RULES = "CleavageRules";
 	public static final String FRAGMENTATION_RULE = "FragmentationRule";
-	public static final String NUM_MIN_TERMINI_CLEAVAGES = "NumMinTerminiCleavages";
-	public static final String NUM_MAX_MISSED_CLEAVAGES = "NumMaxMissedCleavages";
+	public static final String NUM_MIN_TERMINI_CLEAVAGES = "MinTerminiCleavages";
+	public static final String NUM_MAX_MISSED_CLEAVAGES = "MaxMissedCleavages";
 	public static final String PRECURSOR_MZ_TOLERANCE = "PrecursorMzTolerance";
 	public static final String FRAGMENT_MZ_TOLERANCE = "FragmentMzTolerance";
 	public static final String PRECURSOR_MZ_TOLERANCE_RULE = "PrecursorMzToleranceRule";
@@ -133,7 +133,7 @@ public final class MyriMatchMappings implements Mappings {
 					final String oldValue = line.substring(equalsSign + 1, lastPart).trim();
 					final String value = nativeParams.get(key);
 					// We escape strings
-					final String newValue = value==null || INTEGER.matcher(value).matches() ? value : '"' + value + '"';
+					final String newValue = value == null || INTEGER.matcher(value).matches() ? value : '"' + value + '"';
 
 					if (null != newValue && !oldValue.equals(newValue)) {
 						processed = true;
@@ -162,7 +162,7 @@ public final class MyriMatchMappings implements Mappings {
 
 	@Override
 	public void setPeptideTolerance(final MappingContext context, final Tolerance peptideTolerance) {
-		nativeParams.put(PRECURSOR_MZ_TOLERANCE, String.valueOf(peptideTolerance.getValue())+massUnitToMyriMatch(peptideTolerance));
+		nativeParams.put(PRECURSOR_MZ_TOLERANCE, String.valueOf(peptideTolerance.getValue()) + massUnitToMyriMatch(peptideTolerance));
 	}
 
 	private String massUnitToMyriMatch(final Tolerance peptideTolerance) {
@@ -265,11 +265,18 @@ public final class MyriMatchMappings implements Mappings {
 	 */
 	public void setProtease(final MappingContext context, final Protease protease) {
 		nativeParams.put(CLEAVAGE_RULES, enzymeToString(protease));
+		if (isNonSpecificEnzyme(protease)) {
+			nativeParams.put(NUM_MIN_TERMINI_CLEAVAGES, "0");
+		} else {
+			nativeParams.put(NUM_MIN_TERMINI_CLEAVAGES, "2");
+		}
 	}
 
 	static String enzymeToString(final Protease enzyme) {
-		if ("".equals(enzyme.getRnminus1()) && "".equals(enzyme.getRn())) {
-			return "NoEnzyme";
+		if (isNonSpecificEnzyme(enzyme)) {
+			// Non-specific enzymes in Myrimatch are done using a normal enzyme
+			// with MinTerminiCleavages set to 0
+			return enzymeToString(Protease.TRYPSIN_P);
 		}
 
 		final StringBuilder result = new StringBuilder(20);
@@ -303,6 +310,10 @@ public final class MyriMatchMappings implements Mappings {
 		return result.toString();
 	}
 
+	private static boolean isNonSpecificEnzyme(Protease enzyme) {
+		return "".equals(enzyme.getRnminus1()) && "".equals(enzyme.getRn());
+	}
+
 	private static String wrapAminoAcidGroup(final String group) {
 		if (group.length() <= 1) {
 			return group;
@@ -320,7 +331,7 @@ public final class MyriMatchMappings implements Mappings {
 		// Orbis use a monoisotopic precursor
 		nativeParams.put(PRECURSOR_MZ_TOLERANCE_RULE, Instrument.ORBITRAP.equals(instrument) ? "mono" : "avg");
 		final String series = Joiner.on(",").join(Sets.<IonSeries>newTreeSet(instrument.getSeries()));
-		nativeParams.put(FRAGMENTATION_RULE, "manual:"+series);
+		nativeParams.put(FRAGMENTATION_RULE, "manual:" + series);
 	}
 
 	@Override

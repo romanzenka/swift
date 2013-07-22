@@ -42,14 +42,14 @@ public final class MyriMatchTest {
 	public static final Charset CHARSET = Charset.forName("ISO-8859-1");
 
 	@Test
-	public final void shouldCreate() {
+	public void shouldCreate() {
 		final MyriMatchWorker worker = createWorker("myrimatch.exe");
 		Assert.assertNotNull(worker);
 		Assert.assertEquals(worker.getExecutable(), new File("myrimatch.exe"));
 	}
 
 	@Test
-	public final void shouldStripComments() {
+	public void shouldStripComments() {
 		Assert.assertEquals(MyriMatchMappings.stripComment("hello world"), "hello world");
 		Assert.assertEquals(MyriMatchMappings.stripComment("hello # world"), "hello ");
 		Assert.assertEquals(MyriMatchMappings.stripComment("hello # world # test"), "hello ");
@@ -57,7 +57,7 @@ public final class MyriMatchTest {
 	}
 
 	@Test
-	public final void shouldMapFixedMods() {
+	public void shouldMapFixedMods() {
 		final MyriMatchMappings mappings = createMappings();
 		final MappingContext mappingContext = createMappingContext();
 		final ModSet mods = new ModSet();
@@ -81,7 +81,7 @@ public final class MyriMatchTest {
 	}
 
 	@Test
-	public final void shouldMapVariableMods() {
+	public void shouldMapVariableMods() {
 		final MyriMatchMappings mappings = createMappings();
 		final MappingContext mappingContext = createMappingContext();
 		final ModSet mods = new ModSet();
@@ -117,7 +117,7 @@ public final class MyriMatchTest {
 	}
 
 	@Test
-	public final void shouldMapEnzymes() {
+	public void shouldMapEnzymes() {
 		Assert.assertEquals(MyriMatchMappings.enzymeToString(new Protease("Arg-C", "R", "!P")), "(?<=R)(?!P)");
 		Assert.assertEquals(MyriMatchMappings.enzymeToString(new Protease("Asp-N", "", "BD")), "(?=[BD])");
 		Assert.assertEquals(MyriMatchMappings.enzymeToString(new Protease("Asp-N_ambic", "", "DE")), "(?=[DE])");
@@ -135,12 +135,27 @@ public final class MyriMatchTest {
 		Assert.assertEquals(MyriMatchMappings.enzymeToString(new Protease("V8-DE", "BDEZ", "!P")), "(?<=[BDEZ])(?!P)");
 		Assert.assertEquals(MyriMatchMappings.enzymeToString(new Protease("V8-E", "EZ", "!P")), "(?<=[EZ])(?!P)");
 		Assert.assertEquals(MyriMatchMappings.enzymeToString(new Protease("ChymoAndGluC", "FYWLE", "")), "(?<=[FYWLE])");
-		Assert.assertEquals(MyriMatchMappings.enzymeToString(new Protease("Non-Specific", "", "")), "NoEnzyme");
+		// Non-specific is implemented as trypsin with min terminii cleavages set to 0
+		Assert.assertEquals(MyriMatchMappings.enzymeToString(new Protease("Non-Specific", "", "")), "(?<=[KR])");
 		Assert.assertEquals(MyriMatchMappings.enzymeToString(new Protease("DoubleNeg", "!A", "!EF")), "(?<!A)(?![EF])");
 	}
 
 	@Test
-	public final void shouldMapPeptideTolerance() {
+	public void shouldMapNonSpecific() {
+		final MyriMatchMappings mappings = createMappings();
+		final MappingContext mappingContext = createMappingContext();
+
+		mappings.setProtease(mappingContext, new Protease("Non-Specific", "", ""));
+		Assert.assertEquals(mappings.getNativeParam(MyriMatchMappings.CLEAVAGE_RULES), "(?<=[KR])"); // Trypsin-P
+		Assert.assertEquals(mappings.getNativeParam(MyriMatchMappings.NUM_MIN_TERMINI_CLEAVAGES), "0"); // 0 terminii cleavages
+
+		mappings.setProtease(mappingContext, new Protease("Arg-C", "R", "!P"));
+		Assert.assertEquals(mappings.getNativeParam(MyriMatchMappings.CLEAVAGE_RULES), "(?<=R)(?!P)"); // Trypsin-P
+		Assert.assertEquals(mappings.getNativeParam(MyriMatchMappings.NUM_MIN_TERMINI_CLEAVAGES), "2"); // 0 terminii cleavages
+	}
+
+	@Test
+	public void shouldMapPeptideTolerance() {
 		final MyriMatchMappings mappings = createMappings();
 		final MappingContext mappingContext = createMappingContext();
 
@@ -152,7 +167,7 @@ public final class MyriMatchTest {
 	}
 
 	@Test
-	public final void shouldMapFragmentTolerance() {
+	public void shouldMapFragmentTolerance() {
 		final MyriMatchMappings mappings = createMappings();
 		final MappingContext mappingContext = createMappingContext();
 
@@ -164,7 +179,7 @@ public final class MyriMatchTest {
 	}
 
 	@Test
-	public final void shouldMapInstrument() {
+	public void shouldMapInstrument() {
 		final MyriMatchMappings mappings = createMappings();
 		final MappingContext mappingContext = createMappingContext();
 
@@ -174,7 +189,7 @@ public final class MyriMatchTest {
 	}
 
 	@Test
-	public final void shouldMapMissedCleavages() {
+	public void shouldMapMissedCleavages() {
 		final MyriMatchMappings mappings = createMappings();
 		final MappingContext mappingContext = createMappingContext();
 		mappings.setMissedCleavages(mappingContext, 3);
@@ -182,7 +197,7 @@ public final class MyriMatchTest {
 	}
 
 	@Test
-	public final void shouldWriteChanges() throws IOException {
+	public void shouldWriteChanges() throws IOException {
 		final MyriMatchMappings mappings = createMappings();
 		compareMappingsToBase(mappings, null, null);
 
@@ -192,7 +207,7 @@ public final class MyriMatchTest {
 	}
 
 	@Test
-	public final void shouldRunSearch() throws IOException, InterruptedException {
+	public void shouldRunSearch() throws IOException, InterruptedException {
 		final File myrimatchExecutable = getMyriMatchExecutable();
 		try {
 			final File tempFolder = FileUtilities.createTempFolder();
@@ -296,7 +311,7 @@ public final class MyriMatchTest {
 	}
 
 	@Test
-	public final void shouldDeploy() throws IOException {
+	public void shouldDeploy() throws IOException {
 		final File tempFolder = FileUtilities.createTempFolder();
 
 		final File databaseFile = TestingUtilities.getTempFileFromResource(MyriMatchTest.class, "/edu/mayo/mprc/myrimatch/database.fasta", false, tempFolder, ".fasta");
@@ -330,7 +345,7 @@ public final class MyriMatchTest {
 	}
 
 	@Test
-	public final void shouldReplaceLongFloats() {
+	public void shouldReplaceLongFloats() {
 		Assert.assertEquals(replaceLongFloats("hello 1.123456789"), "hello 1.12345~");
 		Assert.assertEquals(replaceLongFloats("hello -1.1234"), "hello -1.1234");
 		Assert.assertEquals(replaceLongFloats("hello -1.12345"), "hello -1.12345");

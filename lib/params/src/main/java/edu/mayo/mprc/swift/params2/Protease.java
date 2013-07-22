@@ -15,6 +15,7 @@ import java.util.List;
  */
 public class Protease extends EvolvableBase implements Serializable, Comparable<Protease> {
 	private static final long serialVersionUID = 20111119L;
+	public static final Protease TRYPSIN_P = new Protease("Trypsin (allow P)", "KR", "");
 	private String name;
 	private String rnminus1;
 	private String rn;
@@ -129,7 +130,7 @@ public class Protease extends EvolvableBase implements Serializable, Comparable<
 				new Protease("Tryp-CNBr", "KRM", "!P"),
 				new Protease("TrypChymo", "FYWLKR", "!P"),
 				new Protease("TrypChymoKRWFYnoP", "KRWFY", ""),
-				new Protease("Trypsin (allow P)", "KR", ""),
+				TRYPSIN_P,
 				new Protease("Trypsin (restrict P)", "KR", "!P"),
 				new Protease("V8-DE", "BDEZ", "!P"),
 				new Protease("V8-E", "EZ", "!P"),
