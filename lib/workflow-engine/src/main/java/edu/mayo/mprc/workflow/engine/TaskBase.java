@@ -1,13 +1,15 @@
 package edu.mayo.mprc.workflow.engine;
 
 import com.google.common.base.Joiner;
-import com.google.common.collect.Sets;
+import edu.emory.mathcs.backport.java.util.Arrays;
 import edu.mayo.mprc.MprcException;
+import edu.mayo.mprc.utilities.FileListener;
 import edu.mayo.mprc.utilities.FileUtilities;
 import edu.mayo.mprc.workflow.persistence.TaskState;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -282,12 +284,15 @@ public abstract class TaskBase implements Task {
 
 	public void completeWhenFilesAppear(final File... files) {
 		waitingForFileToAppear.set(true);
-		try {
-			FileUtilities.waitForFiles(Sets.<File>newHashSet(files));
-			setComplete();
-		} catch (MprcException e) {
-			setError(new MprcException("The files [" + Joiner.on("], [").join(files) + "] did not appear even after 2 minutes."));
-		}
+		FileUtilities.waitForFiles(Arrays.asList(files), new FileListener() {
+			@Override
+			public void fileChanged(Collection<File> files, boolean timeout) {
+				setComplete();
+				if (timeout) {
+					setError(new MprcException("The files [" + Joiner.on("], [").join(files) + "] did not appear even after 2 minutes."));
+				}
+			}
+		});
 	}
 
 	private void setComplete() {

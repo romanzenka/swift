@@ -11,6 +11,7 @@ import edu.mayo.mprc.utilities.FileMonitor;
 import org.apache.log4j.Logger;
 
 import java.io.File;
+import java.util.Collection;
 import java.util.concurrent.CountDownLatch;
 
 /**
@@ -91,8 +92,7 @@ public class RunSwift implements FileListener, SwiftCommand {
 	 */
 	private void startListeningToConfigFileChanges(final File configFile) {
 		final FileMonitor monitor = new FileMonitor(10 * 1000);
-		monitor.addFile(configFile);
-		monitor.addListener(this);
+		monitor.fileToBeChanged(configFile, this);
 	}
 
 	/**
@@ -111,7 +111,7 @@ public class RunSwift implements FileListener, SwiftCommand {
 	}
 
 	@Override
-	public void fileChanged(final File file) {
+	public void fileChanged(final Collection<File> file, final boolean timeout) {
 		configFileChanged.countDown();
 	}
 }

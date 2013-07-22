@@ -45,7 +45,7 @@ public final class SgeJobRunner {
 	 */
 	public void run(final File workPacketXmlFile) {
 		// Wait for the work packet to fully materialize in case it was transferred over a shared filesystem
-		FileUtilities.waitForFile(workPacketXmlFile);
+		FileUtilities.waitForFileBlocking(workPacketXmlFile);
 
 		FileInputStream fileInputStream = null;
 		SgePacket sgePacket = null;

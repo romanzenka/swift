@@ -1,7 +1,9 @@
 package edu.mayo.mprc.utilities;
 
-import com.google.common.base.*;
-import com.google.common.collect.Iterables;
+import com.google.common.base.Charsets;
+import com.google.common.base.Function;
+import com.google.common.base.Preconditions;
+import com.google.common.base.Predicate;
 import com.google.common.io.ByteStreams;
 import com.google.common.io.Files;
 import edu.mayo.mprc.MprcException;
@@ -55,6 +57,8 @@ public final class FileUtilities {
 	 * How many milliseconds to wait for NFS to have a file appear.
 	 */
 	public static final int NFS_FILE_TIMEOUT_MILLIS = 2 * 60 * 1000;
+
+	private static final FileMonitor FILE_MONITOR = new FileMonitor(1);
 
 	private FileUtilities() {
 
@@ -809,24 +813,8 @@ public final class FileUtilities {
 	 * @param msTimeout how long should we wait before throwing an exception
 	 * @throws MprcException if we have waited too long for the file to come around
 	 */
-	public static void waitForFile(final File toWaitFor, final int msTimeout) {
-		final long startTime = new Date().getTime();
-		long warnStartTime = startTime;
-		while (!toWaitFor.exists()) {
-			try {
-				Thread.sleep(FILE_WAIT_GRANULARITY);
-			} catch (InterruptedException e) {
-				throw new MprcException(e);
-			}
-			// After 5 seconds of the file not being there, notify the user we are waiting for it to appear
-			if (new Date().getTime() - warnStartTime > WAIT_FOR_FILE_TIMEOUT) {
-				LOGGER.debug("Waiting for file " + toWaitFor.getAbsolutePath() + " to appear. Timeout " + (msTimeout / MS_PER_SECOND) + " seconds.");
-				warnStartTime = new Date().getTime();
-			}
-			if (new Date().getTime() - startTime > msTimeout) {
-				throw new MprcException("File " + toWaitFor.getAbsolutePath() + " didn't appear after timeout: " + msTimeout + "ms.");
-			}
-		}
+	public static void waitForFile(final File toWaitFor, final int msTimeout, final FileListener listener) {
+		FILE_MONITOR.filesToExist(Arrays.asList(toWaitFor), listener, msTimeout);
 	}
 
 	/**
@@ -835,30 +823,8 @@ public final class FileUtilities {
 	 * @param toWaitFor Set of files to wait for.
 	 * @param msTimeout How long to wait till the files appear.
 	 */
-	public static void waitForFiles(final Set<File> toWaitFor, final int msTimeout) {
-		final long startTime = new Date().getTime();
-		long warnStartTime = startTime;
-		HashSet<File> currentSet = new HashSet<File>(toWaitFor);
-		final FileExists fileExists = new FileExists();
-		while (true) {
-			Iterables.removeIf(currentSet, fileExists);
-			if (currentSet.isEmpty()) {
-				break;
-			}
-			try {
-				Thread.sleep(FILE_WAIT_GRANULARITY);
-			} catch (InterruptedException e) {
-				throw new MprcException(e);
-			}
-			// After 5 seconds of the file not being there, notify the user we are waiting for it to appear
-			if (new Date().getTime() - warnStartTime > WAIT_FOR_FILE_TIMEOUT) {
-				LOGGER.debug("Waiting for " + currentSet.size() + " files to appear. Timeout " + (msTimeout / MS_PER_SECOND) + " seconds.");
-				warnStartTime = new Date().getTime();
-			}
-			if (new Date().getTime() - startTime > msTimeout) {
-				throw new MprcException("Files [" + Joiner.on("], [").join(currentSet) + "] didn't appear after timeout: " + msTimeout + "ms.");
-			}
-		}
+	public static void waitForFiles(final Collection<File> toWaitFor, final int msTimeout, final FileListener listener) {
+		FILE_MONITOR.filesToExist(toWaitFor, listener, msTimeout);
 	}
 
 	/**
@@ -866,18 +832,56 @@ public final class FileUtilities {
 	 *
 	 * @param toWaitFor File to wait for.
 	 */
-	public static void waitForFile(final File toWaitFor) {
-		waitForFile(toWaitFor, NFS_FILE_TIMEOUT_MILLIS);
+	public static void waitForFile(final File toWaitFor, final FileListener listener) {
+		waitForFile(toWaitFor, NFS_FILE_TIMEOUT_MILLIS, listener);
 	}
 
 	/**
-	 * Just like {@link #waitForFile(java.io.File, int)} with default timeout of {@link #NFS_FILE_TIMEOUT_MILLIS}.
+	 * Just like {@link #waitForFile(java.io.File, int, FileListener)} with default timeout of {@link #NFS_FILE_TIMEOUT_MILLIS}.
 	 *
 	 * @param toWaitFor Set of files to wait for.
 	 */
-	public static void waitForFiles(final Set<File> toWaitFor) {
-		waitForFiles(toWaitFor, NFS_FILE_TIMEOUT_MILLIS);
+	public static void waitForFiles(final Collection<File> toWaitFor, final FileListener listener) {
+		waitForFiles(toWaitFor, NFS_FILE_TIMEOUT_MILLIS, listener);
 	}
+
+	/**
+	 * Blocking wait for files.
+	 *
+	 * @param toWaitFor Files to wait for.
+	 */
+	public static void waitForFilesBlocking(final Collection<File> toWaitFor) {
+		final Object lock = new Object();
+		waitForFiles(toWaitFor, NFS_FILE_TIMEOUT_MILLIS, new FileListener() {
+			@Override
+			public void fileChanged(Collection<File> files, boolean timeout) {
+				synchronized (lock) {
+					lock.notifyAll();
+				}
+			}
+		});
+		boolean run = true;
+		while (run) {
+			synchronized (lock) {
+				try {
+					lock.wait(NFS_FILE_TIMEOUT_MILLIS);
+				} catch (InterruptedException e) {
+					throw new MprcException("No longer waiting for files, we got interrupted", e);
+				}
+			}
+			run = false;
+			for (final File file : toWaitFor) {
+				if (!file.exists()) {
+					run = true;
+				}
+			}
+		}
+	}
+
+	public static void waitForFileBlocking(final File toWaitFor) {
+		waitForFilesBlocking(Arrays.asList(toWaitFor));
+	}
+
 
 	public static final File DEFAULT_TEMP_DIRECTORY = getDefaultTempDirectory();
 

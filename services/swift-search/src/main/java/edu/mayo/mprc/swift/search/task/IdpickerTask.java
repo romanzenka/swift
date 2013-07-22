@@ -9,10 +9,12 @@ import edu.mayo.mprc.idpicker.IdpickerWorkPacket;
 import edu.mayo.mprc.swift.db.SwiftDao;
 import edu.mayo.mprc.swift.dbmapping.SearchRun;
 import edu.mayo.mprc.swift.dbmapping.SwiftSearchDefinition;
+import edu.mayo.mprc.utilities.FileListener;
 import edu.mayo.mprc.utilities.FileUtilities;
 import edu.mayo.mprc.utilities.progress.ProgressInfo;
 
 import java.io.File;
+import java.util.Collection;
 
 /**
  * @author Roman Zenka
@@ -62,9 +64,13 @@ public final class IdpickerTask extends AsyncTaskBase {
 	}
 
 	public void onSuccess() {
-		FileUtilities.waitForFile(getResultingFile());
-		storeReportFile();
-		completeWhenFilesAppear(getResultingFile());
+		FileUtilities.waitForFile(getResultingFile(), new FileListener() {
+			@Override
+			public void fileChanged(Collection<File> files, boolean timeout) {
+				storeReportFile();
+				completeWhenFilesAppear(getResultingFile());
+			}
+		});
 	}
 
 	/**

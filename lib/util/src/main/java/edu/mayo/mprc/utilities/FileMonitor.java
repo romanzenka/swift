@@ -1,9 +1,6 @@
 package edu.mayo.mprc.utilities;
 
-import edu.mayo.mprc.MprcException;
-
 import java.io.File;
-import java.lang.ref.WeakReference;
 import java.util.*;
 
 /**
@@ -23,8 +20,8 @@ import java.util.*;
  */
 public final class FileMonitor {
 	private Timer timer;
-	private Map<File, Long> files;
-	private Collection<WeakReference<FileListener>> listeners;
+	private List<FileInfo> files;
+	private final Object lock = new Object();
 
 	/**
 	 * Create a file monitor instance with specified polling interval.
@@ -32,11 +29,12 @@ public final class FileMonitor {
 	 * @param pollingInterval Polling interval in milliseconds.
 	 */
 	public FileMonitor(final long pollingInterval) {
-		files = new HashMap<File, Long>();
-		listeners = new ArrayList<WeakReference<FileListener>>();
+		synchronized (lock) {
+			files = new ArrayList<FileInfo>();
 
-		timer = new Timer(true);
-		timer.schedule(new FileMonitorNotifier(), 0, pollingInterval);
+			timer = new Timer(true);
+			timer.schedule(new FileMonitorNotifier(), 0, pollingInterval);
+		}
 	}
 
 
@@ -49,69 +47,124 @@ public final class FileMonitor {
 
 
 	/**
-	 * Add file to listen for. File may be any java.io.File (including a
-	 * directory) and may well be a non-existing file in the case where the
-	 * creating of the file is to be trepped.
-	 * <p/>
-	 * More than one file can be listened for. When the specified file is
-	 * created, modified or deleted, listeners are notified.
+	 * Add a list of files - once all of these exist, the listener gets notified.
 	 *
-	 * @param file File to listen for.
+	 * @param filesToMonitor A collection of files. All of these have to change, for the listener to be notified.
+	 * @param listener       Listener to call when all the files change
+	 * @param expireInMillis After so many milliseconds, the listener gets notified no matter what and the monitoring stops.
 	 */
-	public void addFile(final File file) {
-		if (!files.containsKey(file)) {
-			final long modifiedTime = file.exists() ? file.lastModified() : -1;
-			files.put(file, modifiedTime);
+	public void filesToExist(final Collection<File> filesToMonitor, final FileListener listener, final int expireInMillis) {
+		final FileInfo e = new FileInfo(filesToMonitor, listener, expireInMillis, false);
+		if (shortcutTrigger(e)) return;
+
+		synchronized (lock) {
+			files.add(e);
 		}
 	}
 
-
 	/**
-	 * Remove specified file for listening.
+	 * Trigger the listener whenever the given file changes.
 	 *
-	 * @param file File to remove.
+	 * @param fileToMonitor The file to check for changes.
+	 * @param listener      Listener to be notified on change.
 	 */
-	public void removeFile(final File file) {
-		files.remove(file);
+	public void fileToBeChanged(final File fileToMonitor, final FileListener listener) {
+		final FileInfo e = new FileInfo(Arrays.asList(fileToMonitor), listener, 0, true);
+		if (shortcutTrigger(e)) return;
+
+		synchronized (lock) {
+			files.add(e);
+		}
 	}
 
+	private boolean shortcutTrigger(final FileInfo info) {
+		if(info.shouldTriggerListener()) {
+			info.fireListener(false);
+			return true;
+		}
+		return false;
+	}
 
 	/**
-	 * Add listener to this file monitor.
-	 *
-	 * @param fileListener Listener to add.
+	 * Information about a file being monitored
 	 */
-	public void addListener(final FileListener fileListener) {
-		if (fileListener == null) {
-			throw new MprcException("Cannot add null listener to file monitor");
-		}
-		// Don't add if its already there
-		for (final WeakReference<FileListener> reference : listeners) {
-			final FileListener listener = reference.get();
-			if (listener != null && listener.equals(fileListener)) {
-				return;
+	private static class FileInfo {
+		private List<File> files;
+		private List<Long> modifiedTimes;
+		private FileListener listener;
+		private long expirationDate;
+		private boolean checkForChange;
+
+		/**
+		 * @param filesToAdd     File to check for changes.
+		 * @param listener       Listener to notify of changes.
+		 * @param expireInMillis How many milliseconds to monitor for. If 0, monitor indefinitely.
+		 * @param checkForChange Whether to check for the file to change modification time. If false, only file creation triggers notification.
+		 */
+		FileInfo(final Collection<File> filesToAdd, final FileListener listener, final int expireInMillis, final boolean checkForChange) {
+			files = new ArrayList<File>(filesToAdd.size());
+			modifiedTimes = new ArrayList<Long>(filesToAdd.size());
+			this.checkForChange = checkForChange;
+
+			for (final File file : filesToAdd) {
+				files.add(file);
+				if (file.exists()) {
+					modifiedTimes.add(file.lastModified());
+				} else {
+					modifiedTimes.add(-1L);
+				}
 			}
+			if (expireInMillis == 0) {
+				expirationDate = 0;
+			} else {
+				expirationDate = new Date().getTime() + (long) expireInMillis;
+			}
+			this.listener = listener;
 		}
 
-		// Use WeakReference to avoid memory leak if this becomes the
-		// sole reference to the object.
-		listeners.add(new WeakReference<FileListener>(fileListener));
-	}
+		private FileListener getListener() {
+			return listener;
+		}
 
-
-	/**
-	 * Remove listener from this file monitor.
-	 *
-	 * @param fileListener Listener to remove.
-	 */
-	public void removeListener(final FileListener fileListener) {
-		for (Iterator<WeakReference<FileListener>> iterator = listeners.iterator(); iterator.hasNext(); ) {
-			final WeakReference<FileListener> reference = iterator.next();
-			final FileListener listener = reference.get();
-			if (listener != null && listener.equals(fileListener)) {
-				iterator.remove();
-				break;
+		private boolean shouldTriggerListener() {
+			for (int i = 0; i < files.size(); i++) {
+				final File file = files.get(i);
+				if (checkForChange) {
+					final long modified = modifiedTimes.get(i);
+					if (file.exists()) {
+						final long modificationTime = file.lastModified();
+						if (modificationTime == modified) {
+							return false;
+						} else {
+							modifiedTimes.set(i, modificationTime);
+						}
+					} else {
+						if (modified == -1L) {
+							return false;
+						}
+					}
+				} else {
+					if (!file.exists()) {
+						return false;
+					}
+				}
 			}
+			return true;
+		}
+
+		private boolean isExpired() {
+			if (expirationDate == 0) {
+				return false;
+			}
+			return new Date().getTime() >= expirationDate;
+		}
+
+		public void fireListener(final boolean expired) {
+			listener.fileChanged(files, expired);
+		}
+
+		private boolean isCheckForChange() {
+			return checkForChange;
 		}
 	}
 
@@ -123,31 +176,16 @@ public final class FileMonitor {
 	 */
 	private class FileMonitorNotifier extends TimerTask {
 		public void run() {
-			// Loop over the registered files and see which have changed.
-			// Use a copy of the list in case listener wants to alter the
-			// list within its fileChanged method.
-			final Collection<File> filesKeysCopy = new ArrayList<File>(FileMonitor.this.files.keySet());
-
-			for (final File file : filesKeysCopy) {
-				final long lastModifiedTime = FileMonitor.this.files.get(file);
-				final long newModifiedTime = file.exists() ? file.lastModified() : -1;
-
-				// Check if file has changed (but it must not have been deleted)
-				if (newModifiedTime != lastModifiedTime && newModifiedTime != -1) {
-
-					// Register new modified time
-					FileMonitor.this.files.put(file, newModifiedTime);
-
-					// Notify listeners
-					for (Iterator<WeakReference<FileListener>> listenerIterator = listeners.iterator(); listenerIterator.hasNext(); ) {
-						final WeakReference<FileListener> reference = listenerIterator.next();
-						final FileListener listener = reference.get();
-
-						// Remove from list if the back-end object has been GC'd
-						if (listener == null) {
-							listenerIterator.remove();
-						} else {
-							listener.fileChanged(file);
+			synchronized (lock) {
+				for (final FileInfo fileInfo : files) {
+					if (fileInfo.isExpired()) {
+						fileInfo.fireListener(true);
+						files.remove(fileInfo);
+					} else if (fileInfo.shouldTriggerListener()) {
+						fileInfo.fireListener(false);
+						if (!fileInfo.isCheckForChange()) {
+							// We are monitoring for files to appear, and they did
+							files.remove(fileInfo);
 						}
 					}
 				}
