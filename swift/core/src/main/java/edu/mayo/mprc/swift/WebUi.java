@@ -86,6 +86,17 @@ public final class WebUi {
 		}
 	}
 
+	/**
+	 * Turn a given file to a link that can be sent to the user over the web.
+	 * Caveats:  We naively assume the file is linkable at the moment.
+	 *
+	 * @param file File to link to.
+	 * @return Hyperlink to the file.
+	 */
+	public String fileToUserLink(final File file) {
+		return getBrowseWebRoot() + file.getAbsolutePath().substring(getBrowseRoot().getAbsolutePath().length()+1);
+	}
+
 	public DaemonConnection getSwiftSearcherDaemonConnection() {
 		return swiftSearcherDaemonConnection;
 	}

@@ -70,6 +70,7 @@
 
     <bean id="FindProtein" class="edu.mayo.mprc.swift.report.FindProtein">
         <property name="searchDbDao" ref="searchDbDao"/>
+        <property name="webUiHolder" ref="webUiHolder"/>
     </bean>
 
     <bean id="SampleReport" class="edu.mayo.mprc.swift.report.SampleReport">

@@ -23,6 +23,7 @@ import javax.servlet.ServletException;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
@@ -95,7 +96,7 @@ public final class ReportUpdate implements HttpRequestHandler {
 		// This action does not make much sense, not sure if it is actually used
 		if ("open".equals(action)) {
 			String file = req.getParameter("file");
-			file = getWebUi().getBrowseWebRoot() + file.substring(getWebUi().getBrowseRoot().getAbsolutePath().length());
+			file = getWebUi().fileToUserLink(new File(file));
 			try {
 				resp.sendRedirect(file);
 			} catch (IOException e) {
