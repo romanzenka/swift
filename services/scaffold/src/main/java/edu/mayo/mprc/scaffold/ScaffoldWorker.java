@@ -336,7 +336,7 @@ public final class ScaffoldWorker extends WorkerBase {
 					.property(SCAFFOLD_UNIMOD, "Scaffold unimod.xml", "Path to the Scaffold's unimod.xml config file. Must be accessible from the daemon where Search Result Loader runs.<p>Default for Linux: <code>/opt/Scaffold?/parameters/unimod.xml</code></p>")
 					.defaultValue("/opt/Scaffold3/parameters/unimod.xml")
 					.required()
-					.executable(Arrays.asList("-v"));
+					.existingFile();
 		}
 	}
 

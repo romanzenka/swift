@@ -22,6 +22,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.net.InetAddress;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.Callable;
@@ -103,8 +104,7 @@ public final class Launcher implements FileListener {
 			final File installPropertyFile = CommandLine.findFile(options, INSTALL_OPTION, "installation config file", CONFIG_FILE_NAME);
 
 			final FileMonitor monitor = new FileMonitor(POLLING_INTERVAL);
-			monitor.addFile(installPropertyFile);
-			monitor.addListener(this);
+			monitor.fileToBeChanged(installPropertyFile, this);
 
 			// This method will exit once the web server is up and running
 			final Server webServer = runWebServer(options, installPropertyFile, "production");
@@ -330,11 +330,13 @@ public final class Launcher implements FileListener {
 	}
 
 	@Override
-	public void fileChanged(final File file) {
-		synchronized (stopMonitor) {
-			LOGGER.info("The configuration file " + file.getPath() + " is modified. Restarting.");
-			restartRequested = true;
-			stopMonitor.notifyAll();
+	public void fileChanged(final Collection<File> file, final boolean timeout) {
+		if (!timeout) {
+			synchronized (stopMonitor) {
+				LOGGER.info("The configuration file " + file.iterator().next() + " is modified. Restarting.");
+				restartRequested = true;
+				stopMonitor.notifyAll();
+			}
 		}
 	}
 }

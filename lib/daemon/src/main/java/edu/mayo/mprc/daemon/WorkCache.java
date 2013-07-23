@@ -4,6 +4,7 @@ import com.google.common.base.Charsets;
 import com.google.common.io.Files;
 import edu.mayo.mprc.MprcException;
 import edu.mayo.mprc.config.*;
+import edu.mayo.mprc.utilities.FileListener;
 import edu.mayo.mprc.utilities.FileUtilities;
 import edu.mayo.mprc.utilities.StringUtilities;
 import edu.mayo.mprc.utilities.exceptions.ExceptionUtilities;
@@ -13,9 +14,7 @@ import edu.mayo.mprc.utilities.progress.ProgressReporter;
 import org.apache.log4j.Logger;
 
 import java.io.File;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Base class for implementing caches. A cache remembers previous work and can provide results fast.
@@ -256,37 +255,48 @@ public abstract class WorkCache<T extends WorkPacket> implements NoLoggingWorker
 
 		@Override
 		public void requestProcessingFinished() {
-			try {
-				final File target = createNewFolder(targetFolder);
-				for (final String outputFile : outputFiles) {
-					// Move the work in progress folder to its final location
-					final File wipFile = new File(wipFolder, outputFile);
-					final File resultingOutputFile = new File(target, outputFile);
-
-					FileUtilities.waitForFile(wipFile);
-					LOGGER.info("Caching output file: " + resultingOutputFile.getAbsolutePath());
-
-					// We move the output file
-					FileUtilities.rename(wipFile, resultingOutputFile);
-				}
-
-				// We write out the parameters used for creating the output file
-				FileUtilities.writeStringToFile(new File(target, taskDescriptionFile), taskDescription, true);
-				// And the wip folder is no longer needed
-				FileUtilities.deleteNow(wipFolder);
-
-				// Now we only need to notify the requestor that the output file was produced elsewhere
-				workPacket.reportCachedResult(reporter, target, outputFiles);
-				publishResultFiles(workPacket, target, outputFiles);
-			} catch (Exception t) {
-				reporter.reportFailure(t);
-				return;
-			} finally {
-				synchronized (workInProgress) {
-					workInProgress.remove(taskDescription);
-				}
+			final File target = createNewFolder(targetFolder);
+			final ArrayList<File> toWaitFor = new ArrayList<File>(outputFiles.size());
+			for (final String outputFile : outputFiles) {
+				final File wipFile = new File(wipFolder, outputFile);
+				toWaitFor.add(wipFile);
 			}
-			reporter.reportSuccess();
+
+			FileUtilities.waitForFiles(toWaitFor, new FileListener() {
+				@Override
+				public void fileChanged(final Collection<File> files, final boolean timeout) {
+					try {
+
+						for (final String outputFile : outputFiles) {
+							// Move the work in progress folder to its final location
+							final File wipFile = new File(wipFolder, outputFile);
+							final File resultingOutputFile = new File(target, outputFile);
+
+							LOGGER.info("Caching output file: " + resultingOutputFile.getAbsolutePath());
+
+							// We move the output file
+							FileUtilities.rename(wipFile, resultingOutputFile);
+						}
+
+						// We write out the parameters used for creating the output file
+						FileUtilities.writeStringToFile(new File(target, taskDescriptionFile), taskDescription, true);
+						// And the wip folder is no longer needed
+						FileUtilities.deleteNow(wipFolder);
+
+						// Now we only need to notify the requestor that the output file was produced elsewhere
+						workPacket.reportCachedResult(reporter, target, outputFiles);
+						publishResultFiles(workPacket, target, outputFiles);
+					} catch (Exception t) {
+						reporter.reportFailure(t);
+						return;
+					} finally {
+						synchronized (workInProgress) {
+							workInProgress.remove(taskDescription);
+						}
+					}
+					reporter.reportSuccess();
+				}
+			});
 		}
 
 		/**
@@ -295,6 +305,7 @@ public abstract class WorkCache<T extends WorkPacket> implements NoLoggingWorker
 		 * @param parent Parent folder to create a new folder in.
 		 * @return The new folder created.
 		 */
+
 		private File createNewFolder(final File parent) {
 			final int numFiles = parent.listFiles().length;
 			if (numFiles > MAX_CACHE_FOLDERS) {
@@ -371,11 +382,11 @@ public abstract class WorkCache<T extends WorkPacket> implements NoLoggingWorker
 		private String cacheFolder;
 		private ServiceConfig service;
 
-		public void setService(ServiceConfig service) {
+		public void setService(final ServiceConfig service) {
 			this.service = service;
 		}
 
-		public void setCacheFolder(String cacheFolder) {
+		public void setCacheFolder(final String cacheFolder) {
 			this.cacheFolder = cacheFolder;
 		}
 

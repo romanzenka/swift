@@ -25,6 +25,7 @@ public final class DaemonConfig implements ResourceConfig, NamedResource {
 	public static final String SERVICES = "services";
 	public static final String RESOURCES = "resources";
 	public static final String TYPE = "daemon";
+	public static final String DEFAULT_LOG_FOLDER = "var/log";
 
 	private String name;
 
@@ -52,7 +53,7 @@ public final class DaemonConfig implements ResourceConfig, NamedResource {
 	/**
 	 * Default folder where to put the logs.
 	 */
-	private String logOutputFolder = "var/log";
+	private String logOutputFolder = DEFAULT_LOG_FOLDER;
 
 	// Services this daemon provides
 	private List<ServiceConfig> services = new ArrayList<ServiceConfig>();

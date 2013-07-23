@@ -3,6 +3,8 @@ package edu.mayo.mprc.swift.report;
 import com.google.common.base.Charsets;
 import edu.mayo.mprc.MprcException;
 import edu.mayo.mprc.searchdb.dao.SearchDbDao;
+import edu.mayo.mprc.swift.WebUi;
+import edu.mayo.mprc.swift.WebUiHolder;
 import edu.mayo.mprc.swift.dbmapping.ReportData;
 import edu.mayo.mprc.swift.dbmapping.SearchRun;
 import edu.mayo.mprc.utilities.FileUtilities;
@@ -22,6 +24,7 @@ import java.util.List;
  */
 public class FindProtein implements HttpRequestHandler {
 	private SearchDbDao searchDbDao;
+	private WebUiHolder webUiHolder;
 
 	@Override
 	public void handleRequest(final HttpServletRequest req, final HttpServletResponse resp) throws ServletException, IOException {
@@ -43,7 +46,7 @@ public class FindProtein implements HttpRequestHandler {
 				writer.write("<form action=\"/find-protein\" method=\"get\">Search: <input type=\"text\" name=\"id\" value=\"" + (null == accessionNumber ? "" : accessionNumber) + "\"></form>");
 				writer.write("<h1>Searches containing " + accessionNumber + "</h1>\n");
 				writer.write("<table>");
-				writer.write("<tr><th>Title</th><th>Completed</th><th>Reports</th></tr>");
+				writer.write("<tr><th>Title</th><th>Completed</th><th>Loaded Swift Data</th><th>Scaffold Files</th></tr>");
 
 				matchingSearchesTable(writer, reportDataList, accessionNumber);
 
@@ -64,6 +67,7 @@ public class FindProtein implements HttpRequestHandler {
 
 	private void matchingSearchesTable(final OutputStreamWriter writer, final List<ReportData> reportDataList, final String accessionNumber) throws IOException {
 		Integer previousSearchRun = 0;
+		final WebUi webUi = getWebUiHolder().getWebUi();
 		for (final ReportData reportData : reportDataList) {
 			final SearchRun searchRun = reportData.getSearchRun();
 			if (!searchRun.getId().equals(previousSearchRun)) {
@@ -75,7 +79,11 @@ public class FindProtein implements HttpRequestHandler {
 				writer.write("<td>" + searchRun.getEndTimestamp() + "</td>");
 				writer.write("<td>");
 			}
-			writer.write("<a href=\"/analysis?id=" + reportData.getId() + "&highlight=" + accessionNumber + "\">" + reportData.getReportFile().getName() + "</a> ");
+			final String reportName = reportData.getReportFile().getName();
+			writer.write("<a href=\"/analysis?id=" + reportData.getId() + "&highlight=" + accessionNumber + "\">" + FileUtilities.stripExtension(reportName) + "</a> ");
+			writer.write("</td><td>");
+			final String link = webUi.fileToUserLink(reportData.getReportFile());
+			writer.write("<a href=\"" + link + "\">" + reportName + "</a>");
 		}
 		closePreviousRun(writer, previousSearchRun);
 	}
@@ -93,5 +101,13 @@ public class FindProtein implements HttpRequestHandler {
 
 	public void setSearchDbDao(SearchDbDao searchDbDao) {
 		this.searchDbDao = searchDbDao;
+	}
+
+	public WebUiHolder getWebUiHolder() {
+		return webUiHolder;
+	}
+
+	public void setWebUiHolder(WebUiHolder webUiHolder) {
+		this.webUiHolder = webUiHolder;
 	}
 }

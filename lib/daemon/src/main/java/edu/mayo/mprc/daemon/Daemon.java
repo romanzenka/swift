@@ -237,7 +237,11 @@ public final class Daemon {
 			Daemon daemon = new Daemon();
 			daemon.setDumpErrors(config.isDumpErrors());
 			daemon.setDumpFolder(new File(config.getDumpFolderPath()));
-			daemon.setLogOutputFolder(new File(config.getLogOutputFolder()));
+			if (config.getLogOutputFolder() == null) {
+				daemon.setLogOutputFolder(new File(DaemonConfig.DEFAULT_LOG_FOLDER));
+			} else {
+				daemon.setLogOutputFolder(new File(config.getLogOutputFolder()));
+			}
 			daemon.setSharedFileSpace(new File(config.getSharedFileSpacePath()));
 			daemon.setTempFolder(new File(config.getTempFolderPath()));
 			// Create daemon resources

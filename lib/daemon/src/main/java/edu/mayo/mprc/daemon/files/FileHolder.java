@@ -69,15 +69,15 @@ public class FileHolder implements FileTokenHolder {
 		// Collect all files that were supposed to exist
 		boolean checkFiles = false;
 
-		if(filesThatShouldExist==null) {
+		if (filesThatShouldExist == null) {
 			filesThatShouldExist = new HashSet<File>(tokenMap.size());
-			checkFiles=true;
+			checkFiles = true;
 		}
 
 		translateOnReceiverBody(translator, synchronizer, filesThatShouldExist);
 
-		if(checkFiles) {
-			FileUtilities.waitForFiles(filesThatShouldExist);
+		if (checkFiles) {
+			FileUtilities.waitForFilesBlocking(filesThatShouldExist);
 		}
 	}
 
@@ -97,7 +97,7 @@ public class FileHolder implements FileTokenHolder {
 
 	private void translateEntry(ReceiverTokenTranslator translator, Set<File> filesThatShouldExist, Map.Entry<FieldIndex, FileToken> entry) {
 		final File file = translator.getFile(entry.getValue());
-		if(entry.getValue()!=null && entry.getValue().existsOnSourceDaemon()) {
+		if (entry.getValue() != null && entry.getValue().existsOnSourceDaemon()) {
 			filesThatShouldExist.add(file);
 		}
 		if (entry.getKey().getIndex() == null) {

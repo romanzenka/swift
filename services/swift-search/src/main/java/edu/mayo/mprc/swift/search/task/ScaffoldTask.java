@@ -13,14 +13,12 @@ import edu.mayo.mprc.swift.dbmapping.FileSearch;
 import edu.mayo.mprc.swift.dbmapping.ReportData;
 import edu.mayo.mprc.swift.dbmapping.SearchRun;
 import edu.mayo.mprc.swift.dbmapping.SwiftSearchDefinition;
+import edu.mayo.mprc.utilities.FileListener;
 import edu.mayo.mprc.utilities.FileUtilities;
 import edu.mayo.mprc.utilities.progress.ProgressInfo;
 
 import java.io.File;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 final class ScaffoldTask extends AsyncTaskBase implements ScaffoldTaskI {
 
@@ -185,9 +183,13 @@ final class ScaffoldTask extends AsyncTaskBase implements ScaffoldTaskI {
 
 	public void onSuccess() {
 		// Store Scaffold report before we announce success
-		FileUtilities.waitForFile(getResultingFile());
-		storeReportFile();
-		completeWhenFilesAppear(getScaffoldSpectraFile());
+		FileUtilities.waitForFile(getResultingFile(), new FileListener() {
+			@Override
+			public void fileChanged(Collection<File> files, boolean timeout) {
+				storeReportFile();
+				completeWhenFilesAppear(getScaffoldSpectraFile());
+			}
+		});
 	}
 
 	/**
