@@ -24,8 +24,9 @@ public final class FileMonitor {
 	private static final Logger LOGGER = Logger.getLogger(FileMonitor.class);
 
 	private Timer timer;
-	private List<FileInfo> files;
+	private final List<FileInfo> files;
 	private final Object lock = new Object();
+	private final long pollingInterval;
 
 	/**
 	 * Create a file monitor instance with specified polling interval.
@@ -33,9 +34,14 @@ public final class FileMonitor {
 	 * @param pollingInterval Polling interval in milliseconds.
 	 */
 	public FileMonitor(final long pollingInterval) {
+		this.pollingInterval = pollingInterval;
 		synchronized (lock) {
 			files = new ArrayList<FileInfo>();
+		}
+	}
 
+	private void startTimer() {
+		if (timer == null) {
 			timer = new Timer(true);
 			timer.schedule(new FileMonitorNotifier(), 0, pollingInterval);
 		}
@@ -63,6 +69,7 @@ public final class FileMonitor {
 
 		synchronized (lock) {
 			files.add(e);
+			startTimer();
 		}
 	}
 
@@ -78,11 +85,12 @@ public final class FileMonitor {
 
 		synchronized (lock) {
 			files.add(e);
+			startTimer();
 		}
 	}
 
 	private boolean shortcutTrigger(final FileInfo info) {
-		if(info.shouldTriggerListener()) {
+		if (info.shouldTriggerListener()) {
 			info.fireListener(false);
 			return true;
 		}
