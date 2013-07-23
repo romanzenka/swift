@@ -17,6 +17,7 @@ import java.net.URI;
 import java.net.URL;
 import java.nio.charset.Charset;
 import java.util.*;
+import java.util.concurrent.Semaphore;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -58,7 +59,7 @@ public final class FileUtilities {
 	 */
 	public static final int NFS_FILE_TIMEOUT_MILLIS = 2 * 60 * 1000;
 
-	private static final FileMonitor FILE_MONITOR = new FileMonitor(1);
+	private static final FileMonitor FILE_MONITOR = new FileMonitor(1000);
 
 	private FileUtilities() {
 
@@ -851,12 +852,15 @@ public final class FileUtilities {
 	 * @param toWaitFor Files to wait for.
 	 */
 	public static void waitForFilesBlocking(final Collection<File> toWaitFor) {
-		final Object lock = new Object();
+		if (toWaitFor.isEmpty()) {
+			return;
+		}
+		final Semaphore lock = new Semaphore(0);
 		waitForFiles(toWaitFor, NFS_FILE_TIMEOUT_MILLIS, new FileListener() {
 			@Override
 			public void fileChanged(Collection<File> files, boolean timeout) {
 				synchronized (lock) {
-					lock.notifyAll();
+					lock.release();
 				}
 			}
 		});
@@ -864,7 +868,7 @@ public final class FileUtilities {
 		while (run) {
 			synchronized (lock) {
 				try {
-					lock.wait(NFS_FILE_TIMEOUT_MILLIS);
+					lock.acquire();
 				} catch (InterruptedException e) {
 					throw new MprcException("No longer waiting for files, we got interrupted", e);
 				}

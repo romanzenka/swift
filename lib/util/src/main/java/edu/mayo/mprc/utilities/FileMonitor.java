@@ -1,5 +1,7 @@
 package edu.mayo.mprc.utilities;
 
+import org.apache.log4j.Logger;
+
 import java.io.File;
 import java.util.*;
 
@@ -19,6 +21,8 @@ import java.util.*;
  * </ul>
  */
 public final class FileMonitor {
+	private static final Logger LOGGER = Logger.getLogger(FileMonitor.class);
+
 	private Timer timer;
 	private List<FileInfo> files;
 	private final Object lock = new Object();
@@ -176,16 +180,18 @@ public final class FileMonitor {
 	 */
 	private class FileMonitorNotifier extends TimerTask {
 		public void run() {
+			LOGGER.debug("File monitor notified invoked");
 			synchronized (lock) {
-				for (final FileInfo fileInfo : files) {
+				for (Iterator<FileInfo> iterator = files.iterator(); iterator.hasNext(); ) {
+					FileInfo fileInfo = iterator.next();
 					if (fileInfo.isExpired()) {
 						fileInfo.fireListener(true);
-						files.remove(fileInfo);
+						iterator.remove();
 					} else if (fileInfo.shouldTriggerListener()) {
 						fileInfo.fireListener(false);
 						if (!fileInfo.isCheckForChange()) {
 							// We are monitoring for files to appear, and they did
-							files.remove(fileInfo);
+							iterator.remove();
 						}
 					}
 				}
