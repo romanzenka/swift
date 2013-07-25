@@ -123,7 +123,8 @@ public final class LoadRawMetadata implements SwiftCommand {
 
 	/**
 	 * Create a workflow engine that dumps .RAW file metadata, loads them into the database and counts the result.
-	 * @param file Raw file to load.
+	 *
+	 * @param file       Raw file to load.
 	 * @param tempFolder Temp folder
 	 * @return Workflow engine that loads the file.
 	 */
@@ -132,14 +133,14 @@ public final class LoadRawMetadata implements SwiftCommand {
 
 		final File temp = FileUtilities.createTempFolder(tempFolder, "dump", true);
 
-		final RAWDumpTask rawDumpTask = new RAWDumpTask(file, temp, rawDump, fileTokenFactory, false);
+		final RAWDumpTask rawDumpTask = new RAWDumpTask(workflowEngine, file, temp, rawDump, fileTokenFactory, false);
 		workflowEngine.addTask(rawDumpTask);
 
-		final LoadRawTask loadRawTask = new LoadRawTask(rawDumpTask, searchDbDao);
+		final LoadRawTask loadRawTask = new LoadRawTask(workflowEngine, rawDumpTask, searchDbDao);
 		workflowEngine.addTask(loadRawTask);
 		loadRawTask.addDependency(rawDumpTask);
 
-		final SuccessfulLoadCounter counter = new SuccessfulLoadCounter(file, temp);
+		final SuccessfulLoadCounter counter = new SuccessfulLoadCounter(workflowEngine, file, temp);
 		workflowEngine.addTask(counter);
 		counter.addDependency(loadRawTask);
 
@@ -181,7 +182,8 @@ public final class LoadRawMetadata implements SwiftCommand {
 		private final File file;
 		private final File temp;
 
-		private SuccessfulLoadCounter(final File file, final File temp) {
+		private SuccessfulLoadCounter(final WorkflowEngine workflowEngine, final File file, final File temp) {
+			super(workflowEngine);
 			this.file = file;
 			this.temp = temp;
 		}
@@ -202,9 +204,10 @@ public final class LoadRawMetadata implements SwiftCommand {
 		private final RAWDumpTask rawDumpTask;
 		private final SearchDbDao dao;
 
-		private LoadRawTask(final RAWDumpTask rawDumpTask, final SearchDbDao dao) {
+		private LoadRawTask(final WorkflowEngine workflowEngine, final RAWDumpTask rawDumpTask, final SearchDbDao dao) {
+			super(workflowEngine);
 			this.rawDumpTask = rawDumpTask;
-			this.dao=dao;
+			this.dao = dao;
 		}
 
 		@Override

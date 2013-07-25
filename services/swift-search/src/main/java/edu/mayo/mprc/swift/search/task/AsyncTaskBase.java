@@ -6,6 +6,7 @@ import edu.mayo.mprc.daemon.WorkPacket;
 import edu.mayo.mprc.daemon.files.FileTokenFactory;
 import edu.mayo.mprc.utilities.progress.ProgressInfo;
 import edu.mayo.mprc.workflow.engine.TaskBase;
+import edu.mayo.mprc.workflow.engine.WorkflowEngine;
 import edu.mayo.mprc.workflow.persistence.TaskState;
 
 import java.util.Date;
@@ -29,7 +30,8 @@ public abstract class AsyncTaskBase extends TaskBase {
 	 * @param fileTokenFactory Used to translate files to tokens that can be sent over the network.
 	 * @param fromScratch      Do not reuse old results, redo everything from scratch.
 	 */
-	protected AsyncTaskBase(final DaemonConnection daemon, final FileTokenFactory fileTokenFactory, final boolean fromScratch) {
+	protected AsyncTaskBase(final WorkflowEngine engine, final DaemonConnection daemon, final FileTokenFactory fileTokenFactory, final boolean fromScratch) {
+		super(engine);
 		assert daemon != null : "The daemon for the task has to be set";
 		this.daemon = daemon;
 		wasSubmitted = false;

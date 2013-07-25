@@ -16,6 +16,7 @@ import edu.mayo.mprc.swift.dbmapping.SwiftSearchDefinition;
 import edu.mayo.mprc.utilities.FileListener;
 import edu.mayo.mprc.utilities.FileUtilities;
 import edu.mayo.mprc.utilities.progress.ProgressInfo;
+import edu.mayo.mprc.workflow.engine.WorkflowEngine;
 
 import java.io.File;
 import java.util.*;
@@ -42,11 +43,13 @@ final class ScaffoldTask extends AsyncTaskBase implements ScaffoldTaskI {
 	private final SearchRun searchRun;
 	private final File unimod;
 	private final boolean reportDecoyHits;
+	private final Object lock = new Object();
 
-	public ScaffoldTask(final String scaffoldVersion, final String experiment, final SwiftSearchDefinition definition, final DaemonConnection scaffoldDaemon,
+	public ScaffoldTask(final WorkflowEngine engine,
+	                    final String scaffoldVersion, final String experiment, final SwiftSearchDefinition definition, final DaemonConnection scaffoldDaemon,
 	                    final SwiftDao swiftDao, final SearchRun searchRun, final File scaffoldUnimod,
 	                    final File outputFolder, final FileTokenFactory fileTokenFactory, final boolean reportDecoyHits, final boolean fromScratch) {
-		super(scaffoldDaemon, fileTokenFactory, fromScratch);
+		super(engine, scaffoldDaemon, fileTokenFactory, fromScratch);
 		this.scaffoldVersion = scaffoldVersion;
 		this.experiment = experiment;
 		this.swiftSearchDefinition = definition;
@@ -77,12 +80,17 @@ final class ScaffoldTask extends AsyncTaskBase implements ScaffoldTaskI {
 
 	@Override
 	public void setReportData(final ReportData reportData) {
-		this.reportData = reportData;
+		// Data is being set asynchronously after the file appears
+		synchronized (lock) {
+			this.reportData = reportData;
+		}
 	}
 
 	@Override
 	public ReportData getReportData() {
-		return reportData;
+		synchronized (lock) {
+			return reportData;
+		}
 	}
 
 	/**
@@ -186,6 +194,7 @@ final class ScaffoldTask extends AsyncTaskBase implements ScaffoldTaskI {
 		FileUtilities.waitForFile(getResultingFile(), new FileListener() {
 			@Override
 			public void fileChanged(Collection<File> files, boolean timeout) {
+				// This gets called from a different thread
 				storeReportFile();
 				completeWhenFilesAppear(getScaffoldSpectraFile());
 			}

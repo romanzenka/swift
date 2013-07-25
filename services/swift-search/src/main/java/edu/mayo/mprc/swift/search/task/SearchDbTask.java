@@ -8,6 +8,7 @@ import edu.mayo.mprc.searchdb.RawFileMetaData;
 import edu.mayo.mprc.searchdb.SearchDbWorkPacket;
 import edu.mayo.mprc.utilities.FileUtilities;
 import edu.mayo.mprc.utilities.progress.ProgressInfo;
+import edu.mayo.mprc.workflow.engine.WorkflowEngine;
 
 import java.io.File;
 import java.util.HashMap;
@@ -28,8 +29,8 @@ public final class SearchDbTask extends AsyncTaskBase {
 	/**
 	 * Create the task independently on Scaffold invocation.
 	 */
-	public SearchDbTask(final DaemonConnection daemon, final FileTokenFactory fileTokenFactory, final boolean fromScratch, final Long reportId, final File scaffoldSpectraFile) {
-		super(daemon, fileTokenFactory, fromScratch);
+	public SearchDbTask(final WorkflowEngine engine, final DaemonConnection daemon, final FileTokenFactory fileTokenFactory, final boolean fromScratch, final Long reportId, final File scaffoldSpectraFile) {
+		super(engine, daemon, fileTokenFactory, fromScratch);
 		setReportId(reportId);
 		setScaffoldSpectraFile(scaffoldSpectraFile);
 		setName("SearchDb");
@@ -39,8 +40,8 @@ public final class SearchDbTask extends AsyncTaskBase {
 	/**
 	 * Create the task that depends on Scaffold invocation.
 	 */
-	public SearchDbTask(final DaemonConnection daemon, final FileTokenFactory fileTokenFactory, final boolean fromScratch, final ScaffoldTask scaffoldTask) {
-		super(daemon, fileTokenFactory, fromScratch);
+	public SearchDbTask(final WorkflowEngine engine, final DaemonConnection daemon, final FileTokenFactory fileTokenFactory, final boolean fromScratch, final ScaffoldTask scaffoldTask) {
+		super(engine, daemon, fileTokenFactory, fromScratch);
 		this.scaffoldTask = scaffoldTask;
 		setName("SearchDb");
 		setDescription("Load " + fileTokenFactory.fileToTaggedDatabaseToken(getScaffoldSpectraFile()) + " into database");

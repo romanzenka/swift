@@ -12,6 +12,7 @@ import edu.mayo.mprc.swift.dbmapping.SwiftSearchDefinition;
 import edu.mayo.mprc.utilities.FileListener;
 import edu.mayo.mprc.utilities.FileUtilities;
 import edu.mayo.mprc.utilities.progress.ProgressInfo;
+import edu.mayo.mprc.workflow.engine.WorkflowEngine;
 
 import java.io.File;
 import java.util.Collection;
@@ -32,14 +33,15 @@ public final class IdpickerTask extends AsyncTaskBase {
 	private final SwiftDao swiftDao;
 	private final SearchRun searchRun;
 
-	public IdpickerTask(final SwiftDao swiftDao,
+	public IdpickerTask(final WorkflowEngine engine,
+	                    final SwiftDao swiftDao,
 	                    final SearchRun searchRun,
 	                    final SwiftSearchDefinition definition,
 	                    final DaemonConnection idpickerDaemon,
 	                    final EngineSearchTask searchTask,
 	                    final DatabaseDeployment dbDeployment,
 	                    final File outputFolder, final FileTokenFactory fileTokenFactory, final boolean fromScratch) {
-		super(idpickerDaemon, fileTokenFactory, fromScratch);
+		super(engine, idpickerDaemon, fileTokenFactory, fromScratch);
 		this.swiftDao = swiftDao;
 		this.searchRun = searchRun;
 		this.swiftSearchDefinition = definition;

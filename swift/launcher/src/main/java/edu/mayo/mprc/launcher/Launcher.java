@@ -330,10 +330,10 @@ public final class Launcher implements FileListener {
 	}
 
 	@Override
-	public void fileChanged(final Collection<File> file, final boolean timeout) {
+	public void fileChanged(final Collection<File> files, final boolean timeout) {
 		if (!timeout) {
 			synchronized (stopMonitor) {
-				LOGGER.info("The configuration file " + file.iterator().next() + " is modified. Restarting.");
+				LOGGER.info("The configuration file " + files.iterator().next() + " is modified. Restarting.");
 				restartRequested = true;
 				stopMonitor.notifyAll();
 			}

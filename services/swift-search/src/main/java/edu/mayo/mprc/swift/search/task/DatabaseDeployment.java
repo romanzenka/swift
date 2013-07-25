@@ -9,6 +9,7 @@ import edu.mayo.mprc.enginedeployment.DeploymentResult;
 import edu.mayo.mprc.sequest.SequestDeploymentResult;
 import edu.mayo.mprc.sequest.SequestDeploymentService;
 import edu.mayo.mprc.utilities.progress.ProgressInfo;
+import edu.mayo.mprc.workflow.engine.WorkflowEngine;
 import org.apache.log4j.Logger;
 
 import java.io.File;
@@ -27,8 +28,8 @@ final class DatabaseDeployment extends AsyncTaskBase implements DatabaseDeployme
 	private List<File> generatedFiles;
 	private DeploymentResult deploymentResult;
 
-	public DatabaseDeployment(final String engineCode, final String engineFriendlyName, final DaemonConnection deploymentDaemon, final File paramsFile, final Curation dbToDeploy, final FileTokenFactory fileTokenFactory, final boolean fromScratch) {
-		super(deploymentDaemon, fileTokenFactory, fromScratch);
+	public DatabaseDeployment(final WorkflowEngine engine, final String engineCode, final String engineFriendlyName, final DaemonConnection deploymentDaemon, final File paramsFile, final Curation dbToDeploy, final FileTokenFactory fileTokenFactory, final boolean fromScratch) {
+		super(engine, deploymentDaemon, fileTokenFactory, fromScratch);
 		this.engineCode = engineCode;
 		this.engineFriendlyName = engineFriendlyName;
 		this.paramsFile = paramsFile;

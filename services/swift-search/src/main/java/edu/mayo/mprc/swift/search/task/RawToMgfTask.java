@@ -6,6 +6,7 @@ import edu.mayo.mprc.daemon.files.FileTokenFactory;
 import edu.mayo.mprc.raw2mgf.RawToMgfResult;
 import edu.mayo.mprc.raw2mgf.RawToMgfWorkPacket;
 import edu.mayo.mprc.utilities.progress.ProgressInfo;
+import edu.mayo.mprc.workflow.engine.WorkflowEngine;
 import org.apache.log4j.Logger;
 
 import java.io.File;
@@ -22,13 +23,14 @@ final class RawToMgfTask extends AsyncTaskBase implements FileProducingTask {
 	 * @param publicAccess When true, the task requests the cache to give the user access to the .mgf file from the user space.
 	 */
 	public RawToMgfTask(
+			final WorkflowEngine engine,
 			final File inputFile,
 			final File mgfFile,
 			final String extractMsnParams,
 			final boolean publicAccess, final DaemonConnection raw2mgfDaemon, final FileTokenFactory fileTokenFactory, final boolean fromScratch
 
 	) {
-		super(raw2mgfDaemon, fileTokenFactory, fromScratch);
+		super(engine, raw2mgfDaemon, fileTokenFactory, fromScratch);
 		this.inputFile = inputFile;
 		this.mgfFile = mgfFile;
 		this.extractMsnParameters = extractMsnParams;

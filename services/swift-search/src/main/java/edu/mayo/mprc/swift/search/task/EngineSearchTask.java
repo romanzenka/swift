@@ -13,6 +13,7 @@ import edu.mayo.mprc.searchengine.SearchEngineResult;
 import edu.mayo.mprc.sequest.SequestMGFWorkPacket;
 import edu.mayo.mprc.swift.db.SearchEngine;
 import edu.mayo.mprc.utilities.progress.ProgressInfo;
+import edu.mayo.mprc.workflow.engine.WorkflowEngine;
 import edu.mayo.mprc.xtandem.XTandemWorkPacket;
 
 import java.io.File;
@@ -34,6 +35,7 @@ final class EngineSearchTask extends AsyncTaskBase implements FileProducingTask 
 	private boolean publicSearchFiles;
 
 	public EngineSearchTask(
+			final WorkflowEngine workflowEngine,
 			final SearchEngine engine,
 			final String searchId,
 			final FileProducingTask inputFile,
@@ -42,7 +44,7 @@ final class EngineSearchTask extends AsyncTaskBase implements FileProducingTask 
 			final File paramsFile,
 			final boolean publicSearchFiles,
 			final DaemonConnection searchEngineDaemon, final FileTokenFactory fileTokenFactory, final boolean fromScratch) {
-		super(searchEngineDaemon, fileTokenFactory, fromScratch);
+		super(workflowEngine, searchEngineDaemon, fileTokenFactory, fromScratch);
 		this.engine = engine;
 		this.outputFile = outputFile;
 		this.paramsFile = paramsFile;
@@ -136,7 +138,7 @@ final class EngineSearchTask extends AsyncTaskBase implements FileProducingTask 
 		// Otherwise we just use it as-is
 		final String deployedFileString = getDeployedDatabaseFile(engine, deploymentResult);
 		final String deployedFileDbString;
-		if(deployedFileString.contains(File.separator)) {
+		if (deployedFileString.contains(File.separator)) {
 			File deployedFile = new File(deployedFileString);
 			deployedFileDbString = fileTokenFactory.fileToTaggedDatabaseToken(deployedFile);
 		} else {

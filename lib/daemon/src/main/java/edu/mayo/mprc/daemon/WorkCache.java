@@ -226,13 +226,13 @@ public abstract class WorkCache<T extends WorkPacket> implements NoLoggingWorker
 	}
 
 	private final class MyProgressListener implements ProgressListener {
-		private CachableWorkPacket workPacket;
-		private File wipFolder;
-		private List<String> outputFiles;
-		private String taskDescriptionFile;
-		private String taskDescription;
-		private File targetFolder;
-		private ProgressReporter reporter;
+		private final CachableWorkPacket workPacket;
+		private final File wipFolder;
+		private final List<String> outputFiles;
+		private final String taskDescriptionFile;
+		private final String taskDescription;
+		private final File targetFolder;
+		private final ProgressReporter reporter;
 
 		private MyProgressListener(final CachableWorkPacket workPacket, final File wipFolder, final File targetCacheFolder, final List<String> outputFiles, final String taskDescriptionFile, final String taskDescription, final ProgressReporter reporter) {
 			this.workPacket = workPacket;
@@ -265,6 +265,7 @@ public abstract class WorkCache<T extends WorkPacket> implements NoLoggingWorker
 			FileUtilities.waitForFiles(toWaitFor, new FileListener() {
 				@Override
 				public void fileChanged(final Collection<File> files, final boolean timeout) {
+					// This is called from a different thread
 					try {
 
 						for (final String outputFile : outputFiles) {

@@ -6,6 +6,7 @@ import edu.mayo.mprc.daemon.files.FileTokenFactory;
 import edu.mayo.mprc.mgf2mgf.MgfTitleCleanupResult;
 import edu.mayo.mprc.mgf2mgf.MgfTitleCleanupWorkPacket;
 import edu.mayo.mprc.utilities.progress.ProgressInfo;
+import edu.mayo.mprc.workflow.engine.WorkflowEngine;
 
 import java.io.File;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -17,8 +18,8 @@ final class MgfTitleCleanupTask extends AsyncTaskBase implements FileProducingTa
 	private final File cleanedMgf;
 	private static final AtomicInteger TASK_ID = new AtomicInteger(0);
 
-	public MgfTitleCleanupTask(final DaemonConnection daemon, final File mgfToCleanup, final File cleanedMgf, final FileTokenFactory fileTokenFactory, final boolean fromScratch) {
-		super(daemon, fileTokenFactory, fromScratch);
+	public MgfTitleCleanupTask(final WorkflowEngine engine, final DaemonConnection daemon, final File mgfToCleanup, final File cleanedMgf, final FileTokenFactory fileTokenFactory, final boolean fromScratch) {
+		super(engine, daemon, fileTokenFactory, fromScratch);
 		this.cleanupPerformed = false;
 		this.cleanedMgf = cleanedMgf;
 		this.mgfToCleanup = mgfToCleanup;

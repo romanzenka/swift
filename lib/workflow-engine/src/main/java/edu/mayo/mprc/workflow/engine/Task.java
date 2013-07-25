@@ -8,7 +8,7 @@ import java.util.Date;
 import java.util.List;
 
 public interface Task {
-	void setWorkflowEngine(WorkflowEngine engine);
+	void initialize();
 
 	WorkflowEngine getEngine();
 

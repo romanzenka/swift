@@ -152,7 +152,7 @@ public final class SearchRunner implements Runnable {
 
 	private Collection<SearchEngine> searchEngines = null;
 
-	private WorkflowEngine workflowEngine;
+	private final WorkflowEngine workflowEngine;
 
 	private boolean initializationDone = false;
 
@@ -621,7 +621,7 @@ public final class SearchRunner implements Runnable {
 			if (task == null) {
 				final File mgfFile = getMgfFileLocation(inputFile);
 
-				task = new RawToMgfTask(
+				task = new RawToMgfTask(workflowEngine,
 						/*Input file*/ file,
 						/*Mgf file location*/ mgfFile,
 						/*raw2mgf command line*/ searchParameters.getExtractMsnSettings().getCommandLineSwitches(),
@@ -637,7 +637,7 @@ public final class SearchRunner implements Runnable {
 			if (task == null) {
 				final File mgfFile = getMgfFileLocation(inputFile);
 
-				task = new MsconvertTask(
+				task = new MsconvertTask(workflowEngine,
 						/*Input file*/ file,
 						/*Mgf file location*/ mgfFile,
 						Boolean.TRUE.equals(searchDefinition.getPublicMgfFiles()),
@@ -657,7 +657,7 @@ public final class SearchRunner implements Runnable {
 		FileProducingTask mgfOutput = mgfCleanups.get(getMgfCleanupHashKey(file));
 		if (mgfOutput == null) {
 			final File outputFile = getMgfFileLocation(inputFile);
-			mgfOutput = new MgfTitleCleanupTask(mgfCleanupDaemon, file, outputFile, fileTokenFactory, isFromScratch());
+			mgfOutput = new MgfTitleCleanupTask(workflowEngine, mgfCleanupDaemon, file, outputFile, fileTokenFactory, isFromScratch());
 			mgfCleanups.put(getMgfCleanupHashKey(file), mgfOutput);
 		}
 		return mgfOutput;
@@ -682,7 +682,7 @@ public final class SearchRunner implements Runnable {
 		final File file = inputFile.getInputFile();
 
 		if (spectrumQaTasks.get(getSpectrumQaHashKey(file)) == null) {
-			final SpectrumQaTask spectrumQaTask = new SpectrumQaTask(
+			final SpectrumQaTask spectrumQaTask = new SpectrumQaTask(workflowEngine,
 					msmsEvalDaemon,
 					mgf,
 					spectrumQa.paramFile() == null ? null : spectrumQa.paramFile().getAbsoluteFile(),
@@ -705,7 +705,7 @@ public final class SearchRunner implements Runnable {
 		final File peptideReportFile = new File(scaffoldOutputFiles.get(0).getParentFile(), "Swift Peptide Report For " + searchDefinition.getTitle() + ".xls");
 		final File proteinReportFile = new File(scaffoldOutputFiles.get(0).getParentFile(), "Swift Protein Report For " + searchDefinition.getTitle() + ".xls");
 
-		final ScaffoldReportTask scaffoldReportTask = new ScaffoldReportTask(scaffoldReportDaemon, scaffoldOutputFiles, peptideReportFile, proteinReportFile, fileTokenFactory, isFromScratch());
+		final ScaffoldReportTask scaffoldReportTask = new ScaffoldReportTask(workflowEngine, scaffoldReportDaemon, scaffoldOutputFiles, peptideReportFile, proteinReportFile, fileTokenFactory, isFromScratch());
 
 		for (final ScaffoldTaskI scaffoldTask : scaffoldCalls.values()) {
 			scaffoldReportTask.addDependency(scaffoldTask);
@@ -721,7 +721,7 @@ public final class SearchRunner implements Runnable {
 	private void addQaTask(final FileSearch inputFile, final ScaffoldTaskI scaffoldTask, final FileProducingTask mgfOutput) {
 		if (qaDaemon != null) {
 			if (qaTask == null) {
-				qaTask = new QaTask(qaDaemon, fileTokenFactory, isFromScratch());
+				qaTask = new QaTask(workflowEngine, qaDaemon, fileTokenFactory, isFromScratch());
 			}
 
 			// Set up a new experiment dependency. All entries called from now on would be added under that experiment
@@ -755,7 +755,7 @@ public final class SearchRunner implements Runnable {
 		RAWDumpTask task = rawDumpTasks.get(rawFile);
 
 		if (task == null) {
-			task = new RAWDumpTask(rawFile, outputFolder, rawDumpDaemon, fileTokenFactory, isFromScratch());
+			task = new RAWDumpTask(workflowEngine, rawFile, outputFolder, rawDumpDaemon, fileTokenFactory, isFromScratch());
 		}
 
 		rawDumpTasks.put(rawFile, task);
@@ -836,7 +836,7 @@ public final class SearchRunner implements Runnable {
 
 		DatabaseDeployment deployment = databaseDeployments.get(hashKey);
 		if (deployment == null) {
-			deployment = new DatabaseDeployment(engine.getCode(), engine.getFriendlyName(), engine.getDbDeployDaemon(), paramFile, dbToDeploy, fileTokenFactory, isFromScratch());
+			deployment = new DatabaseDeployment(workflowEngine, engine.getCode(), engine.getFriendlyName(), engine.getDbDeployDaemon(), paramFile, dbToDeploy, fileTokenFactory, isFromScratch());
 			databaseDeployments.put(hashKey, deployment);
 		}
 		return deployment;
@@ -855,6 +855,7 @@ public final class SearchRunner implements Runnable {
 		if (search == null) {
 			final File outputFile = getSearchResultLocation(engine, searchOutputFolder, inputFile);
 			search = new EngineSearchTask(
+					workflowEngine,
 					engine,
 					inputFile.getName(),
 					fileProducingTask,
@@ -895,6 +896,7 @@ public final class SearchRunner implements Runnable {
 			final File scaffoldUnimod = getScaffoldUnimod(scaffoldEngine);
 			final File scaffoldOutputDir = getOutputFolderForSearchEngine(scaffoldEngine);
 			scaffoldTask = new ScaffoldTask(
+					workflowEngine,
 					scaffoldVersion,
 					experiment,
 					searchDefinition,
@@ -935,7 +937,7 @@ public final class SearchRunner implements Runnable {
 		if (idpickerCalls.containsKey(key)) {
 			return idpickerCalls.get(key);
 		}
-		final IdpickerTask task = new IdpickerTask(swiftDao, searchRun,
+		final IdpickerTask task = new IdpickerTask(workflowEngine, swiftDao, searchRun,
 				getSearchDefinition(), idpicker.getSearchDaemon(),
 				search, idpickerDeployment, outputFolder, fileTokenFactory, isFromScratch());
 		idpickerCalls.put(key, task);
@@ -949,7 +951,7 @@ public final class SearchRunner implements Runnable {
 			final int id = curation.getId();
 			final FastaDbTask task = fastaDbCalls.get(id);
 			if (task == null) {
-				final FastaDbTask newTask = new FastaDbTask(fastaDbDaemon, fileTokenFactory, false, curation);
+				final FastaDbTask newTask = new FastaDbTask(workflowEngine, fastaDbDaemon, fileTokenFactory, false, curation);
 				fastaDbCalls.put(id, newTask);
 				return newTask;
 			} else {
@@ -964,7 +966,7 @@ public final class SearchRunner implements Runnable {
 		SearchDbTask searchDbTask = searchDbCalls.get(file);
 		if (searchDbTask == null) {
 			final FastaDbTask fastaDbTask = addFastaDbCall(curation);
-			final SearchDbTask task = new SearchDbTask(searchDbDaemon, fileTokenFactory, false, scaffoldTask);
+			final SearchDbTask task = new SearchDbTask(workflowEngine, searchDbDaemon, fileTokenFactory, false, scaffoldTask);
 			task.addDependency(fastaDbTask);
 			task.addDependency(scaffoldTask);
 			searchDbCalls.put(file, task);

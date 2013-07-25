@@ -21,7 +21,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 public abstract class TaskBase implements Task {
 	// The engine the task belongs to
-	private WorkflowEngine engine;
+	private final WorkflowEngine engine;
 
 	// List of dependencies
 	private List<Task> inputs = new ArrayList<Task>();
@@ -54,12 +54,12 @@ public abstract class TaskBase implements Task {
 	 */
 	protected AtomicBoolean waitingForFileToAppear = new AtomicBoolean(false);
 
-	public TaskBase() {
+	public TaskBase(final WorkflowEngine engine) {
 		this.id = null;
+		this.engine = engine;
 	}
 
-	public void setWorkflowEngine(final WorkflowEngine engine) {
-		this.engine = engine;
+	public void initialize() {
 		synchronized (stateLock) {
 			if (this.id == null && this.name != null) {
 				this.id = engine.getNewTaskId(this.getName());

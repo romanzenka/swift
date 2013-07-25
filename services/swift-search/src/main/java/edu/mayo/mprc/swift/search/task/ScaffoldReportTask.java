@@ -5,6 +5,7 @@ import edu.mayo.mprc.daemon.WorkPacket;
 import edu.mayo.mprc.daemon.files.FileTokenFactory;
 import edu.mayo.mprc.scaffold.report.ScaffoldReportWorkPacket;
 import edu.mayo.mprc.utilities.progress.ProgressInfo;
+import edu.mayo.mprc.workflow.engine.WorkflowEngine;
 import org.apache.log4j.Logger;
 
 import java.io.File;
@@ -20,8 +21,8 @@ final class ScaffoldReportTask extends AsyncTaskBase {
 
 	public static final String TASK_NAME = "ScaffoldReport";
 
-	public ScaffoldReportTask(final DaemonConnection daemon, final List<File> scaffoldOutputFiles, final File peptideReportFile, final File proteinReportFile, final FileTokenFactory fileTokenFactory, final boolean fromScratch) {
-		super(daemon, fileTokenFactory, fromScratch);
+	public ScaffoldReportTask(final WorkflowEngine engine, final DaemonConnection daemon, final List<File> scaffoldOutputFiles, final File peptideReportFile, final File proteinReportFile, final FileTokenFactory fileTokenFactory, final boolean fromScratch) {
+		super(engine, daemon, fileTokenFactory, fromScratch);
 		this.scaffoldOutputFiles = scaffoldOutputFiles;
 		this.peptideReportFile = peptideReportFile;
 		this.proteinReportFile = proteinReportFile;

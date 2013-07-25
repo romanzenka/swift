@@ -166,7 +166,7 @@ public final class EngineTest {
 					fail = random.nextBoolean();
 					break;
 			}
-			final SimpleTask newTask = new SimpleTask(pause, fail);
+			final SimpleTask newTask = new SimpleTask(engine, pause, fail);
 			addRandomDependencies(random, tasks, newTask);
 			tasks.add(newTask);
 		}
@@ -189,7 +189,8 @@ public final class EngineTest {
 		private boolean pause;
 		private boolean fail;
 
-		public SimpleTask(final boolean pause, final boolean fail) {
+		public SimpleTask(final WorkflowEngine engine, final boolean pause, final boolean fail) {
+			super(engine);
 			this.pause = pause;
 			this.fail = fail;
 			this.dependencies = new ArrayList<Task>();

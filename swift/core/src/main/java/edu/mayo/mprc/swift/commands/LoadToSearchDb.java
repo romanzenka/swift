@@ -92,7 +92,7 @@ public final class LoadToSearchDb implements SwiftCommand {
 			} else {
 				final long reportDataId = getReportDataId(loadParameter);
 
-				WorkflowEngine workflowEngine = loadData(reportDataId, 0);
+				final WorkflowEngine workflowEngine = loadData(reportDataId, 0);
 
 				if (workflowEngine != null) {
 
@@ -105,7 +105,7 @@ public final class LoadToSearchDb implements SwiftCommand {
 
 			final long end = System.currentTimeMillis();
 
-			Interval interval = new Interval(start, end);
+			final Interval interval = new Interval(start, end);
 			LOGGER.info("Elapsed time: " + interval.toDuration().toString());
 
 			return ExitCode.Ok;
@@ -121,14 +121,14 @@ public final class LoadToSearchDb implements SwiftCommand {
 	 * @param environment Swift environment.
 	 * @param config      The configuration of the Swift searcher.
 	 */
-	public static void initializeDatabase(SwiftEnvironment environment, SwiftSearcher.Config config) {
+	public static void initializeDatabase(final SwiftEnvironment environment, final SwiftSearcher.Config config) {
 		LOGGER.info("Initializing database");
 		final Object database = environment.createResource(config.getDatabase());
 		LOGGER.info("Database initialized");
 	}
 
 	private void loadAllData() {
-		List<Long> reportsWithoutAnalysis;
+		final List<Long> reportsWithoutAnalysis;
 		getSearchDbDao().begin();
 		try {
 			reportsWithoutAnalysis = getSearchDbDao().getReportIdsWithoutAnalysis();
@@ -141,8 +141,8 @@ public final class LoadToSearchDb implements SwiftCommand {
 		totalToLoad = reportsWithoutAnalysis.size();
 		LOGGER.info("Total reports with analysis missing: " + totalToLoad);
 		int count = 0;
-		List<WorkflowEngine> engines = new ArrayList<WorkflowEngine>(100);
-		for (Long reportId : reportsWithoutAnalysis) {
+		final List<WorkflowEngine> engines = new ArrayList<WorkflowEngine>(100);
+		for (final Long reportId : reportsWithoutAnalysis) {
 			count++;
 			LOGGER.info(MessageFormat.format("Loading report #{0} ({1} of {2})", reportId, count, totalToLoad));
 			try {
@@ -172,7 +172,7 @@ public final class LoadToSearchDb implements SwiftCommand {
 
 	private boolean runEngines(final List<WorkflowEngine> engines) {
 		boolean allDone = true;
-		for (WorkflowEngine engine : engines) {
+		for (final WorkflowEngine engine : engines) {
 			if (!engine.isDone()) {
 				allDone = false;
 				try {
@@ -215,20 +215,20 @@ public final class LoadToSearchDb implements SwiftCommand {
 			final int curationId = getCurationId(swiftSearchDefinition);
 
 			// Load fasta into database
-			final FastaDbTask fastaDbTask = new FastaDbTask(fastaDb, fileTokenFactory, false, curationId);
+			final FastaDbTask fastaDbTask = new FastaDbTask(workflowEngine, fastaDb, fileTokenFactory, false, curationId);
 			workflowEngine.addTask(fastaDbTask);
 
 			// Export files from Scaffold
-			final ScaffoldSpectraExportTask scaffoldExportTask = new ScaffoldSpectraExportTask(scaffold, fileTokenFactory, false, scaffoldFile);
+			final ScaffoldSpectraExportTask scaffoldExportTask = new ScaffoldSpectraExportTask(workflowEngine, scaffold, fileTokenFactory, false, scaffoldFile);
 			workflowEngine.addTask(scaffoldExportTask);
 
 			// Load scaffold export into database
-			final SearchDbTask searchDbTask = new SearchDbTask(searchDb, fileTokenFactory, false, reportDataId, scaffoldExportTask.getSpectrumExportFile());
+			final SearchDbTask searchDbTask = new SearchDbTask(workflowEngine, searchDb, fileTokenFactory, false, reportDataId, scaffoldExportTask.getSpectrumExportFile());
 			searchDbTask.addDependency(scaffoldExportTask);
 			searchDbTask.addDependency(fastaDbTask);
 			workflowEngine.addTask(searchDbTask);
 
-			SuccessfulLoadCounter counter = new SuccessfulLoadCounter(reportData.getReportFile().getName());
+			final SuccessfulLoadCounter counter = new SuccessfulLoadCounter(workflowEngine, reportData.getReportFile().getName());
 			counter.addDependency(searchDbTask);
 			workflowEngine.addTask(counter);
 
@@ -241,6 +241,7 @@ public final class LoadToSearchDb implements SwiftCommand {
 						throw new MprcException("Could not load search that uses .mgf file: " + rawFile.getAbsolutePath());
 					}
 					final RAWDumpTask rawDumpTask = new RAWDumpTask(
+							workflowEngine,
 							rawFile,
 							new File(swiftSearchDefinition.getOutputFolder(), QaTask.QA_SUBDIRECTORY),
 							rawDump,
@@ -262,27 +263,27 @@ public final class LoadToSearchDb implements SwiftCommand {
 
 		workflowEngine.addMonitor(new SearchMonitor() {
 			@Override
-			public void updateStatistics(ProgressReport report) {
+			public void updateStatistics(final ProgressReport report) {
 				LOGGER.debug(reportDataId + ":" + report.toString());
 			}
 
 			@Override
-			public void taskChange(TaskBase task) {
+			public void taskChange(final TaskBase task) {
 				LOGGER.debug(reportDataId + ":" + "Task " + task.getName() + ": " + task.getState().getText());
 			}
 
 			@Override
-			public void error(TaskBase task, Throwable t) {
+			public void error(final TaskBase task, final Throwable t) {
 				LOGGER.error(reportDataId + ":" + task.getName(), t);
 			}
 
 			@Override
-			public void error(Throwable e) {
+			public void error(final Throwable e) {
 				LOGGER.error(reportDataId + ":" + "Workflow error", e);
 			}
 
 			@Override
-			public void taskProgress(TaskBase task, Object progressInfo) {
+			public void taskProgress(final TaskBase task, final Object progressInfo) {
 				LOGGER.debug(reportDataId + ":" + "Task " + task.getName() + " progress: " + progressInfo);
 			}
 		});
@@ -382,7 +383,7 @@ public final class LoadToSearchDb implements SwiftCommand {
 		return searchDbDao;
 	}
 
-	public void setSearchDbDao(SearchDbDao searchDbDao) {
+	public void setSearchDbDao(final SearchDbDao searchDbDao) {
 		this.searchDbDao = searchDbDao;
 	}
 
@@ -400,7 +401,8 @@ public final class LoadToSearchDb implements SwiftCommand {
 	private class SuccessfulLoadCounter extends TaskBase {
 		private final String scaffoldName;
 
-		private SuccessfulLoadCounter(String scaffoldName) {
+		private SuccessfulLoadCounter(final WorkflowEngine workflowEngine, final String scaffoldName) {
+			super(workflowEngine);
 			this.scaffoldName = scaffoldName;
 		}
 

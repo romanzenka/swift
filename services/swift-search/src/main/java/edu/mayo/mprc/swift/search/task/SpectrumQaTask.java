@@ -7,6 +7,7 @@ import edu.mayo.mprc.msmseval.MSMSEvalWorkPacket;
 import edu.mayo.mprc.msmseval.MSMSEvalWorker;
 import edu.mayo.mprc.msmseval.MsmsEvalResult;
 import edu.mayo.mprc.utilities.progress.ProgressInfo;
+import edu.mayo.mprc.workflow.engine.WorkflowEngine;
 import org.apache.log4j.Logger;
 
 import java.io.File;
@@ -23,8 +24,8 @@ final class SpectrumQaTask extends AsyncTaskBase {
 
 	public static final String TASK_NAME = "MSMSEval Filter";
 
-	public SpectrumQaTask(final DaemonConnection daemon, final FileProducingTask sourceMGFFile, final File msmsEvalParamFile, final File outputDirectory, final FileTokenFactory fileTokenFactory, final boolean fromScratch) {
-		super(daemon, fileTokenFactory, fromScratch);
+	public SpectrumQaTask(final WorkflowEngine engine, final DaemonConnection daemon, final FileProducingTask sourceMGFFile, final File msmsEvalParamFile, final File outputDirectory, final FileTokenFactory fileTokenFactory, final boolean fromScratch) {
+		super(engine, daemon, fileTokenFactory, fromScratch);
 		this.outputDirectory = outputDirectory;
 		this.sourceMGFFile = sourceMGFFile;
 		this.msmsEvalParamFile = msmsEvalParamFile;

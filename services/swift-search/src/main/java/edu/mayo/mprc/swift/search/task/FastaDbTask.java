@@ -6,6 +6,7 @@ import edu.mayo.mprc.daemon.files.FileTokenFactory;
 import edu.mayo.mprc.dbcurator.model.Curation;
 import edu.mayo.mprc.fastadb.FastaDbWorkPacket;
 import edu.mayo.mprc.utilities.progress.ProgressInfo;
+import edu.mayo.mprc.workflow.engine.WorkflowEngine;
 
 /**
  * Loads a FASTA file into the database.
@@ -18,18 +19,18 @@ public class FastaDbTask extends AsyncTaskBase {
 	/**
 	 * Does not require the curation to be loaded at the expense of having uglier description.
 	 */
-	public FastaDbTask(final DaemonConnection daemon, final FileTokenFactory fileTokenFactory, final boolean fromScratch, final int curationIdToLoad) {
-		super(daemon, fileTokenFactory, fromScratch);
+	public FastaDbTask(final WorkflowEngine engine, final DaemonConnection daemon, final FileTokenFactory fileTokenFactory, final boolean fromScratch, final int curationIdToLoad) {
+		super(engine, daemon, fileTokenFactory, fromScratch);
 		this.curationIdToLoad = curationIdToLoad;
 		setName("Fasta DB load");
 		setDescription("Load curation #" + curationIdToLoad + " to database.");
 	}
 
 	/**
-	 * See {@link AsyncTaskBase#AsyncTaskBase(DaemonConnection, FileTokenFactory, boolean)}
+	 * See {@link AsyncTaskBase#AsyncTaskBase}
 	 */
-	public FastaDbTask(final DaemonConnection daemon, final FileTokenFactory fileTokenFactory, final boolean fromScratch, final Curation curationToLoad) {
-		super(daemon, fileTokenFactory, fromScratch);
+	public FastaDbTask(final WorkflowEngine engine, final DaemonConnection daemon, final FileTokenFactory fileTokenFactory, final boolean fromScratch, final Curation curationToLoad) {
+		super(engine, daemon, fileTokenFactory, fromScratch);
 		this.curationIdToLoad = curationToLoad.getId();
 		setName("Fasta DB load");
 		setDescription("Load " + fileTokenFactory.fileToTaggedDatabaseToken(curationToLoad.getCurationFile()) + " to database.");

@@ -8,6 +8,7 @@ import edu.mayo.mprc.qa.MgfQaFiles;
 import edu.mayo.mprc.qa.QaWorkPacket;
 import edu.mayo.mprc.utilities.FileUtilities;
 import edu.mayo.mprc.utilities.progress.ProgressInfo;
+import edu.mayo.mprc.workflow.engine.WorkflowEngine;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -24,8 +25,8 @@ public final class QaTask extends AsyncTaskBase {
 
 	public static final String QA_SUBDIRECTORY = "qa";
 
-	public QaTask(final DaemonConnection daemonConnection, final FileTokenFactory fileTokenFactory, final boolean fromScratch) {
-		super(daemonConnection, fileTokenFactory, fromScratch);
+	public QaTask(final WorkflowEngine engine, final DaemonConnection daemonConnection, final FileTokenFactory fileTokenFactory, final boolean fromScratch) {
+		super(engine, daemonConnection, fileTokenFactory, fromScratch);
 
 		experimentList = new ArrayList<QaTaskExperiment>(1);
 		setName("Quality Assurance");

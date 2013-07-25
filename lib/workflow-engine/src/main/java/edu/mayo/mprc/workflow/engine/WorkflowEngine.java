@@ -60,6 +60,9 @@ public final class WorkflowEngine {
 	 */
 	public void addTask(final Task task) {
 		if (!allTasks.contains(task)) {
+			if (task.getEngine() != this) {
+				throw new MprcException("Task was created for a different engine");
+			}
 			allTasks.add(task);
 			task.setPriority(task.getPriority() + getPriority());
 		}
@@ -96,7 +99,7 @@ public final class WorkflowEngine {
 		// We will start processing all tasks without dependencies
 		synchronized (resumeLock) {
 			for (final Task task : allTasks) {
-				task.setWorkflowEngine(this);
+				task.initialize();
 				if (task.getInputs().size() == 0) {
 					task.setState(TaskState.READY);
 				}
