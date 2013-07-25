@@ -190,6 +190,7 @@ final class ScaffoldTask extends AsyncTaskBase implements ScaffoldTaskI {
 	}
 
 	public void onSuccess() {
+		setWaitForFiles();
 		// Store Scaffold report before we announce success
 		FileUtilities.waitForFile(getResultingFile(), new FileListener() {
 			@Override

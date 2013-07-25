@@ -282,8 +282,12 @@ public abstract class TaskBase implements Task {
 		}
 	}
 
-	public void completeWhenFilesAppear(final File... files) {
+	public void setWaitForFiles() {
 		waitingForFileToAppear.set(true);
+	}
+
+	public void completeWhenFilesAppear(final File... files) {
+		setWaitForFiles();
 		FileUtilities.waitForFiles(Arrays.asList(files), new FileListener() {
 			@Override
 			public void fileChanged(Collection<File> files, boolean timeout) {
