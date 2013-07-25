@@ -188,7 +188,6 @@ public final class FileMonitor {
 	 */
 	private class FileMonitorNotifier extends TimerTask {
 		public void run() {
-			LOGGER.debug("File monitor notified invoked");
 			synchronized (lock) {
 				for (Iterator<FileInfo> iterator = files.iterator(); iterator.hasNext(); ) {
 					FileInfo fileInfo = iterator.next();
