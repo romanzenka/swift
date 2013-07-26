@@ -25,6 +25,7 @@ abstract class TaskProgressListener implements ProgressListener {
 
 	public void requestProcessingStarted(final String hostString) {
 		task.setTaskProcessingStarted(new Date());
+		task.setExecutedOnHost(hostString);
 		task.afterProgressInformationReceived(new AssignedExecutedOnHost(hostString));
 	}
 
