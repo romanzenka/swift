@@ -153,7 +153,7 @@ public final class WorkCachePerformanceTest {
 		}
 
 		@Override
-		public void requestProcessingStarted() {
+		public void requestProcessingStarted(final String hostString) {
 		}
 
 		@Override

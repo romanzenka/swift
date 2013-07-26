@@ -98,7 +98,7 @@ class DaemonResponseListener implements ResponseListener {
 
 	private void requestProcessingStarted(final DaemonProgressMessage msg) {
 		logProgress(msg, "processing started");
-		progressListener.requestProcessingStarted();
+		progressListener.requestProcessingStarted(msg.getHostString());
 	}
 
 	private void userSpecificProgressInfo(final DaemonProgressMessage msg) {

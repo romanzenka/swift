@@ -210,10 +210,10 @@ public final class DaemonWorkerTester implements Closeable {
 			}
 		}
 
-		public void requestProcessingStarted() {
+		public void requestProcessingStarted(final String hostString) {
 			LOGGER.debug("Starting work");
 			if (null != userListener) {
-				userListener.requestProcessingStarted();
+				userListener.requestProcessingStarted(hostString);
 			}
 		}
 

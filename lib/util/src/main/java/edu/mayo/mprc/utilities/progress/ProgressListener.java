@@ -10,9 +10,9 @@ public interface ProgressListener {
 	void requestEnqueued(String hostString);
 
 	/**
-	 * The request processing started.
+	 * The request processing started, potentially on a different host
 	 */
-	void requestProcessingStarted();
+	void requestProcessingStarted(String hostString);
 
 	/**
 	 * The request processing finished successfully. No more notifications will arrive after this one.

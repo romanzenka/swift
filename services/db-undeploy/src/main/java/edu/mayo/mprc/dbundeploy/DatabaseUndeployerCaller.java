@@ -49,8 +49,8 @@ public final class DatabaseUndeployerCaller {
 			}
 
 			@Override
-			public void requestProcessingStarted() {
-				addMessageToQueue(taskId, "Processing request.....", false);
+			public void requestProcessingStarted(final String hostString) {
+				addMessageToQueue(taskId, "Processing request at " + hostString, false);
 			}
 
 			@Override

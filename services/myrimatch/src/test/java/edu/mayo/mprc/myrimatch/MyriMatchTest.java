@@ -241,13 +241,13 @@ public final class MyriMatchTest {
 
 				final Object workToken = tester.sendWork(work, new ProgressListener() {
 					@Override
-					public void requestEnqueued(final String s) {
-						LOGGER.debug("Enqueued MyriMatch request: " + s);
+					public void requestEnqueued(final String hostString) {
+						LOGGER.debug("Enqueued MyriMatch request: " + hostString);
 					}
 
 					@Override
-					public void requestProcessingStarted() {
-						LOGGER.debug("Starting to process MyriMatch request");
+					public void requestProcessingStarted(final String hostString) {
+						LOGGER.debug("Starting to process MyriMatch request: " + hostString);
 					}
 
 					@Override

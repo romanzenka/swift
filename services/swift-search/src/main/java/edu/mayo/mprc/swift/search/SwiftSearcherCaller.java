@@ -96,8 +96,8 @@ public final class SwiftSearcherCaller {
 			LOGGER.debug("Request enqueued " + hostString);
 		}
 
-		public void requestProcessingStarted() {
-			LOGGER.debug("Request processing started");
+		public void requestProcessingStarted(final String hostString) {
+			LOGGER.debug("Request processing started " + hostString);
 		}
 
 		public void waitForSearchReady(final long timeout) throws InterruptedException {

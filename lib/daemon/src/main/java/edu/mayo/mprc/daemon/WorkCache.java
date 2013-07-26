@@ -249,7 +249,7 @@ public abstract class WorkCache<T extends WorkPacket> implements NoLoggingWorker
 		}
 
 		@Override
-		public void requestProcessingStarted() {
+		public void requestProcessingStarted(final String hostString) {
 			reporter.reportStart();
 		}
 

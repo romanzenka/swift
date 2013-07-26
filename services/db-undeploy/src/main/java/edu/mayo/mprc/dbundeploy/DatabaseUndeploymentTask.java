@@ -69,7 +69,7 @@ public final class DatabaseUndeploymentTask {
 			}
 
 			@Override
-			public void requestProcessingStarted() {
+			public void requestProcessingStarted(final String hostString) {
 			}
 
 			@Override

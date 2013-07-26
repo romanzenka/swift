@@ -116,7 +116,7 @@ public final class SwiftMonitor implements Runnable {
 		}
 
 		@Override
-		public void requestProcessingStarted() {
+		public void requestProcessingStarted(final String hostString) {
 		}
 
 		@Override

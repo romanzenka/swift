@@ -347,7 +347,7 @@ public final class ReportUpdate implements HttpRequestHandler {
 		public void requestEnqueued(final String hostString) {
 		}
 
-		public void requestProcessingStarted() {
+		public void requestProcessingStarted(final String hostString) {
 		}
 
 		public void waitForEvent(final long timeout) throws InterruptedException {
@@ -446,7 +446,7 @@ public final class ReportUpdate implements HttpRequestHandler {
 		public void requestEnqueued(final String hostString) {
 		}
 
-		public void requestProcessingStarted() {
+		public void requestProcessingStarted(final String hostString) {
 		}
 
 		public void requestProcessingFinished() {

@@ -118,8 +118,8 @@ public final class SequestDeploymentServiceTest {
 					LOGGER.debug("SequestDS request enqueued at " + hostString);
 				}
 
-				public void requestProcessingStarted() {
-					LOGGER.debug("SequestDS processing started");
+				public void requestProcessingStarted(final String hostString) {
+					LOGGER.debug("SequestDS processing started at " + hostString);
 				}
 
 				public void requestProcessingFinished() {

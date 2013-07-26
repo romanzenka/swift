@@ -134,7 +134,7 @@ public final class WorkCacheTest {
 		}
 
 		public void start(final int index) {
-			listeners.get(index).requestProcessingStarted();
+			listeners.get(index).requestProcessingStarted("localhost");
 		}
 
 		public void progress(final int index) {
