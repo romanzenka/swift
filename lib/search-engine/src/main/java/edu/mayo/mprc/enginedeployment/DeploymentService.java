@@ -4,6 +4,7 @@ import edu.mayo.mprc.MprcException;
 import edu.mayo.mprc.daemon.WorkPacket;
 import edu.mayo.mprc.daemon.Worker;
 import edu.mayo.mprc.daemon.exception.DaemonException;
+import edu.mayo.mprc.daemon.monitor.MonitorUtilities;
 import edu.mayo.mprc.utilities.FileUtilities;
 import edu.mayo.mprc.utilities.progress.ProgressReporter;
 import org.apache.log4j.Logger;
@@ -33,7 +34,7 @@ public abstract class DeploymentService<T extends DeploymentResult> implements W
 	 * @param progressReporter - to report progress
 	 */
 	public void processRequest(final WorkPacket workPacket, final ProgressReporter progressReporter) {
-		progressReporter.reportStart();
+		progressReporter.reportStart(MonitorUtilities.getHostInformation());
 		DeploymentRequest request = null;
 		try {
 			if (!(workPacket instanceof DeploymentRequest)) {

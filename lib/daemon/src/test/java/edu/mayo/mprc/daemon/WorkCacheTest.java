@@ -65,7 +65,7 @@ public final class WorkCacheTest {
 
 		final ArgumentCaptor<TestProgressInfo> argument = ArgumentCaptor.forClass(TestProgressInfo.class);
 
-		verify(reporter, times(6)).reportStart();
+		verify(reporter, times(6)).reportStart("localhost");
 		verify(reporter, times(10)).reportProgress(argument.capture());
 		verify(reporter, times(5)).reportSuccess();
 		verify(reporter, times(1)).reportFailure(Matchers.<Throwable>any());

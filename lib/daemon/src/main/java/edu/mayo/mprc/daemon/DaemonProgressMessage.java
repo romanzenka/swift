@@ -19,6 +19,17 @@ public final class DaemonProgressMessage implements Serializable {
 		this(progress, null);
 	}
 
+	/**
+	 * Processing started on a given host.
+	 * TODO: This is confugins, improve
+	 *
+	 * @param host Host the processing started on.
+	 */
+	public DaemonProgressMessage(final String host) {
+		this(DaemonProgress.RequestProcessingStarted, null);
+		this.host = host;
+	}
+
 	public DaemonProgressMessage(final DaemonProgress progress, final ProgressInfo progressData) {
 		if (DaemonProgress.UserSpecificProgressInfo != progress && null != progressData) {
 			throw new IllegalArgumentException("You cannot specify user progress data on a request that is not marked as user-specific.");

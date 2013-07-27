@@ -154,7 +154,7 @@ public class TestSearchDbDao extends DaoTest {
 
 		searchDbDao.addAnalysis(analysis, reportData, new ProgressReporter() {
 			@Override
-			public void reportStart() {
+			public void reportStart(final String hostString) {
 
 			}
 

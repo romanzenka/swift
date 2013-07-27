@@ -84,8 +84,8 @@ public class TestRawToMgf {
 
 			simpleDaemonWorker.processRequest(workPacket, new ProgressReporter() {
 
-				public void reportStart() {
-					LOGGER.info("Started processing");
+				public void reportStart(final String hostString) {
+					LOGGER.info("Started processing on " + hostString);
 				}
 
 				public void reportProgress(final ProgressInfo progressInfo) {

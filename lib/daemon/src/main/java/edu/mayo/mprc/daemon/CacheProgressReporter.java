@@ -13,6 +13,7 @@ import java.util.List;
  */
 final class CacheProgressReporter implements ProgressReporter {
 	private boolean startReported;
+	private String startedOnHost;
 	private ProgressInfo lastProgressInfo;
 	private boolean successReported;
 	private Throwable failureReported;
@@ -24,7 +25,7 @@ final class CacheProgressReporter implements ProgressReporter {
 	public synchronized void addProgressReporter(final ProgressReporter reporter) {
 		reporters.add(reporter);
 		if (startReported) {
-			reporter.reportStart();
+			reporter.reportStart(startedOnHost);
 		}
 		if (lastProgressInfo != null) {
 			reporter.reportProgress(lastProgressInfo);
@@ -38,10 +39,11 @@ final class CacheProgressReporter implements ProgressReporter {
 	}
 
 	@Override
-	public synchronized void reportStart() {
+	public synchronized void reportStart(final String hostString) {
 		startReported = true;
+		startedOnHost = hostString;
 		for (final ProgressReporter reporter : reporters) {
-			reporter.reportStart();
+			reporter.reportStart(hostString);
 		}
 	}
 

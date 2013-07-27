@@ -20,12 +20,12 @@ public final class CacheProgressReporterTest {
 
 		reporter.addProgressReporter(reporter1);
 
-		reporter.reportStart();
+		reporter.reportStart("localhost");
 		reporter.reportProgress(progressInfo);
 		reporter.reportSuccess();
 
 		final InOrder order1 = inOrder(reporter1);
-		order1.verify(reporter1).reportStart();
+		order1.verify(reporter1).reportStart("localhost");
 		order1.verify(reporter1).reportProgress(progressInfo);
 		order1.verify(reporter1).reportSuccess();
 
@@ -34,7 +34,7 @@ public final class CacheProgressReporterTest {
 		reporter.addProgressReporter(reporter2);
 
 		final InOrder order2 = inOrder(reporter2);
-		order2.verify(reporter2).reportStart();
+		order2.verify(reporter2).reportStart("localhost");
 		order2.verify(reporter2).reportProgress(progressInfo);
 		order2.verify(reporter2).reportSuccess();
 	}

@@ -94,8 +94,8 @@ public class TestTandem {
 			WorkPacketBase.simulateTransfer(workPacket);
 
 			worker.processRequest(workPacket, new ProgressReporter() {
-				public void reportStart() {
-					LOGGER.info("Started processing");
+				public void reportStart(final String hostString) {
+					LOGGER.info("Started processing " + hostString);
 				}
 
 				public void reportProgress(final ProgressInfo progressInfo) {

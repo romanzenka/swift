@@ -150,9 +150,9 @@ public final class SgeJobRunner {
 		}
 
 		@Override
-		public void reportStart() {
+		public void reportStart(final String hostString) {
 			try {
-				SgeJobRunner.reportProgress(request, new DaemonProgressMessage(DaemonProgress.RequestProcessingStarted));
+				SgeJobRunner.reportProgress(request, new DaemonProgressMessage(hostString));
 			} catch (Exception t) {
 				try {
 					SgeJobRunner.reportProgress(request, t);

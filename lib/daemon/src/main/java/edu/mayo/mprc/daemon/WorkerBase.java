@@ -1,5 +1,6 @@
 package edu.mayo.mprc.daemon;
 
+import edu.mayo.mprc.daemon.monitor.MonitorUtilities;
 import edu.mayo.mprc.utilities.progress.ProgressInfo;
 import edu.mayo.mprc.utilities.progress.ProgressReporter;
 import edu.mayo.mprc.utilities.progress.UserProgressReporter;
@@ -27,7 +28,7 @@ public abstract class WorkerBase implements Worker {
 	 */
 	public void processRequest(final WorkPacket workPacket, final ProgressReporter progressReporter) {
 		try {
-			progressReporter.reportStart();
+			progressReporter.reportStart(MonitorUtilities.getHostInformation());
 			process(workPacket, progressReporter);
 			workPacket.synchronizeFileTokensOnReceiver();
 			progressReporter.reportSuccess();

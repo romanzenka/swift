@@ -4,6 +4,7 @@ import com.google.common.base.Charsets;
 import com.google.common.io.Files;
 import edu.mayo.mprc.MprcException;
 import edu.mayo.mprc.config.*;
+import edu.mayo.mprc.daemon.monitor.MonitorUtilities;
 import edu.mayo.mprc.utilities.FileListener;
 import edu.mayo.mprc.utilities.FileUtilities;
 import edu.mayo.mprc.utilities.StringUtilities;
@@ -148,7 +149,7 @@ public abstract class WorkCache<T extends WorkPacket> implements NoLoggingWorker
 					if (!typedWorkPacket.isFromScratch() && !cachableWorkPacket.cacheIsStale(subFolder, outputFiles)) {
 						// The output was created after our input file, thus it is useable
 						LOGGER.info("Using cached values from: " + subFolder.getAbsolutePath());
-						progressReporter.reportStart();
+						progressReporter.reportStart(MonitorUtilities.getHostInformation());
 						cachableWorkPacket.reportCachedResult(progressReporter, subFolder, outputFiles);
 						publishResultFiles(cachableWorkPacket, subFolder, outputFiles);
 						progressReporter.reportSuccess();
@@ -250,7 +251,7 @@ public abstract class WorkCache<T extends WorkPacket> implements NoLoggingWorker
 
 		@Override
 		public void requestProcessingStarted(final String hostString) {
-			reporter.reportStart();
+			reporter.reportStart(hostString);
 		}
 
 		@Override

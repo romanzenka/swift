@@ -14,7 +14,7 @@ public interface ProgressReporter extends UserProgressReporter {
 	 * Reports that the worker has started processing. This is implemented so e.g. a worker cache can
 	 * postpone this report until it hears from its child worker.
 	 */
-	void reportStart();
+	void reportStart(String hostString);
 
 	/**
 	 * Reports success. There must be no more reports after this one.

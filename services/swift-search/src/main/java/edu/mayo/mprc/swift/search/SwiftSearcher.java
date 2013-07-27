@@ -12,6 +12,7 @@ import edu.mayo.mprc.config.ui.UiResponse;
 import edu.mayo.mprc.daemon.*;
 import edu.mayo.mprc.daemon.exception.DaemonException;
 import edu.mayo.mprc.daemon.files.FileTokenFactory;
+import edu.mayo.mprc.daemon.monitor.MonitorUtilities;
 import edu.mayo.mprc.database.DatabaseFactory;
 import edu.mayo.mprc.dbcurator.model.persistence.CurationDao;
 import edu.mayo.mprc.fastadb.FastaDbWorker;
@@ -293,7 +294,7 @@ public final class SwiftSearcher implements Worker {
 
 			final SwiftSearchWorkPacket swiftSearchWorkPacket = (SwiftSearchWorkPacket) workPacket;
 
-			progressReporter.reportStart();
+			progressReporter.reportStart(MonitorUtilities.getHostInformation());
 
 			final SearchRunner searchRunner = createSearchRunner(swiftSearchWorkPacket, progressReporter);
 

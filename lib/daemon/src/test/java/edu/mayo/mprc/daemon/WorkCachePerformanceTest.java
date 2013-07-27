@@ -128,7 +128,7 @@ public final class WorkCachePerformanceTest {
 	private class TestWorker implements Worker {
 		@Override
 		public void processRequest(final WorkPacket workPacket, final ProgressReporter progressReporter) {
-			progressReporter.reportStart();
+			progressReporter.reportStart("localhost");
 			try {
 				Thread.sleep(TASK_RUNTIME);
 				LOGGER.debug("Request completed");

@@ -104,8 +104,8 @@ public final class SimpleRunner extends AbstractRunner {
 		}
 
 		@Override
-		public void reportStart() {
-			sendResponse(request, new DaemonProgressMessage(DaemonProgress.RequestProcessingStarted), false);
+		public void reportStart(final String hostString) {
+			sendResponse(request, new DaemonProgressMessage(hostString), false);
 			reportLogFiles();
 		}
 
