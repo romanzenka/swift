@@ -36,36 +36,39 @@ public final class WorkCacheTest {
 
 		workCache.processRequest(new TestWorkPacket("task1", "request1", null), reporter);
 		connection.enqueue(0);
-		connection.start(0);
+		connection.start(0); // Start 1
 
 		workCache.processRequest(new TestWorkPacket("task2", "request2", null), reporter);
 		connection.enqueue(1);
-		connection.start(1);
-		connection.progress(1);
-		connection.success(1);
+		connection.start(1); // Start 2
+		connection.progress(1); // Progress 1
+		connection.success(1); // Success 1, Progress 2 (cache report)
 
 		workCache.processRequest(new TestWorkPacket("task1", "request3", null), reporter);
-		connection.progress(0);
-		connection.success(0);
+		connection.progress(0); // Progress 3 + 4 (reported twice for task1)
+		connection.success(0); // Success 2 + 3 (reported twice for task 1), Progress 5 + 6 (cache report)
 
 		workCache.processRequest(new TestWorkPacket("error", "request4", null), reporter);
 		connection.enqueue(2);
-		connection.start(2);
-		connection.progress(2);
-		connection.failure(2);
+		connection.start(2); // Start 3
+		connection.progress(2); // Progress 7
+		connection.failure(2); // Failure 1
 
 		workCache.processRequest(new TestWorkPacket("task1", "request5", null), reporter);
+		// Start 4 (From cache)
+		// Progress 8 (cache report)
+		// Success 4 (from cache)
 
 		cacheIsStale = true;
 		workCache.processRequest(new TestWorkPacket("task1", "request6", null), reporter);
 		connection.enqueue(3);
-		connection.start(3);
-		connection.progress(3);
-		connection.success(3);
+		connection.start(3); // Start >>> 5 <<<
+		connection.progress(3); // Progress 9
+		connection.success(3); // Success >>> 5 <<<, Progress >>> 10 <<< (cache report)
 
 		final ArgumentCaptor<TestProgressInfo> argument = ArgumentCaptor.forClass(TestProgressInfo.class);
 
-		verify(reporter, times(6)).reportStart("localhost");
+		verify(reporter, times(5)).reportStart("localhost");
 		verify(reporter, times(10)).reportProgress(argument.capture());
 		verify(reporter, times(5)).reportSuccess();
 		verify(reporter, times(1)).reportFailure(Matchers.<Throwable>any());
