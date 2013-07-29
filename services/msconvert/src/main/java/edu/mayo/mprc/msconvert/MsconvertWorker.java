@@ -82,7 +82,7 @@ public final class MsconvertWorker extends WorkerBase {
 			final boolean ms2Profile = ms2SpectraInProfileMode(rawFile, tempFolder);
 
 			ProcessBuilder builder = new ProcessBuilder(getMsconvertCall(rawFile, mgfFile, ms2Profile));
-			builder.directory(rawFile.getParentFile());
+			builder.directory(msaccessExecutable.getParentFile().getAbsoluteFile());
 			ProcessCaller caller = new ProcessCaller(builder);
 			caller.runAndCheck("msconvert");
 			if (!mgfFile.exists() || !mgfFile.isFile() || !mgfFile.canRead()) {
@@ -107,7 +107,7 @@ public final class MsconvertWorker extends WorkerBase {
 		// /mnt/mprc/instruments/QE1/Z10_qe1_2012october/qe1_2012oct8_02_100_yeast_t10.raw --mgf --filter "chargeStatePredictor false 4 2 0.9"
 		// --filter "peakPicking true 2-" --filter "threshold absolute 0.1 most-intense"   --outfile qe1_2012oct8_02_100_yeast_t10.mgf --outdir ~
 		command.add(msconvertExecutable.getPath());
-		command.add(rawFile.getName()); // .raw file to convert
+		command.add(rawFile.getAbsolutePath()); // .raw file to convert
 		command.add("--mgf"); // We want to convert to .mgf
 
 		if (agilentData(rawFile)) {
