@@ -218,7 +218,9 @@ public final class MzXMLPeakListWriter implements Closeable {
 	public void close() {
 		if (xmlWriter != null) {
 			try {
+				xmlWriter.writeEndElement();
 				xmlWriter.close();
+				xmlWriter = null;
 			} catch (XMLStreamException e) {
 				throw new MprcException("Could not close mzXML writer.", e);
 			}
