@@ -291,8 +291,8 @@ public final class CurationEditor extends Composite {
 		propGrid.setWidget(2, 0, lblNote);
 		propGrid.setWidget(2, 1, txtNotes);
 
-		final Label lblDecoy = new Label("Decoy regex: ");
-		lblDecoy.setTitle("A Scaffold-style regular expression describing which accession numbers in the database correspond to decoys");
+		final Label lblDecoy = new Label("Decoy prefix: ");
+		lblDecoy.setTitle("A string describing which accession numbers in the database correspond to decoys");
 		txtDecoy.setVisibleLength(20);
 		propGrid.setWidget(3, 0, lblDecoy);
 		propGrid.setWidget(3, 1, txtDecoy);
