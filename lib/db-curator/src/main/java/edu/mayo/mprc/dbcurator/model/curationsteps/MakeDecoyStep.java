@@ -130,7 +130,7 @@ public class MakeDecoyStep implements CurationStep {
 	 */
 	@Override
 	public StepValidation performStep(final CurationExecutor exec) {
-		return performStep(exec.getCurrentInStream(), exec.getCurrentOutStream(), exec.getStatusObject());
+		return performStep(exec.getCurrentInStream(), exec.getCurrentOutStream(), exec.getStatusObject(), exec.getCuration().getDecoyRegex());
 	}
 
 	/**
@@ -141,7 +141,7 @@ public class MakeDecoyStep implements CurationStep {
 	 * @param status The progress is updated here, we also take the amount of sequences from here.
 	 * @return Information about how the step performed.
 	 */
-	StepValidation performStep(final DBInputStream in, final DBOutputStream out, final CurationStatus status) {
+	StepValidation performStep(final DBInputStream in, final DBOutputStream out, final CurationStatus status, final String decoyRegex) {
 		//make sure we meet at least the pre validation criteria, this will also make sure our manipulator is set
 		/*
 	  the validation that was created the last time this step object was run.  this will be null if the step has not been run
@@ -174,7 +174,7 @@ public class MakeDecoyStep implements CurationStep {
 				status.setCurrentStepProgress(PERCENT * (float) currentSequence / numberOfSequences);
 
 				out.appendSequence(
-						modifyHeader(in.getHeader(), manipulator.getDescription()), //the modified header
+						modifyHeader(in.getHeader(), decoyRegex), //the modified header
 						manipulator.manipulateString(in.getSequence()) //the manipulated sequence
 				);
 			}
