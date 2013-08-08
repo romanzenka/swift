@@ -55,7 +55,7 @@ public class ManualInclusionStep implements CurationStep {
 	 * There are obviously a wide variety of things that could go wrong with a call to perform step.
 	 *
 	 * @param exe the executor we are performing the step for
-	 * @return the post validation.  This is the same object that will be returned by a call to postValidate()
+	 * @return the post validation.
 	 */
 	public StepValidation performStep(final CurationExecutor exe) {
 		this.runValidation = this.preValidate(exe.getCurationDao());
@@ -99,37 +99,27 @@ public class ManualInclusionStep implements CurationStep {
 		final StepValidation preValidation = new StepValidation();
 
 		if (this.sequence == null) {
-			preValidation.setMessage("No sequence has been entered.");
+			preValidation.addMessage("No sequence has been entered.");
 			return preValidation;
 		}
 
 		this.sequence = this.sequence.trim();
 
 		if (this.sequence.equals("")) {
-			preValidation.setMessage("No sequence has been entered.");
+			preValidation.addMessage("No sequence has been entered.");
 		}
 
 		//if the header is still null after sequence validation then we need to get one
 		if (this.header == null) {
-			preValidation.setMessage("No header has been entered.");
+			preValidation.addMessage("No header has been entered.");
 		} else {
 			this.header = this.header.trim();
 			if (this.header.equals("")) {
-				preValidation.setMessage("No header has been entered.");
+				preValidation.addMessage("No header has been entered.");
 			}
 		}
 
 		return preValidation;
-	}
-
-	/**
-	 * Call this method if you want to see the results of the last performStep call and you didn't keep track of the
-	 * returned object
-	 *
-	 * @return the return value of the last call to performStep()
-	 */
-	public StepValidation postValidate() {
-		return this.runValidation;
 	}
 
 	/**

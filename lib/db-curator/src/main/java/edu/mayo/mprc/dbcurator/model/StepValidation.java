@@ -53,7 +53,7 @@ public final class StepValidation {
 		return Collections.unmodifiableList(messages);
 	}
 
-	public void setMessage(final String message) {
+	public void addMessage(final String message) {
 		this.messages.add(message);
 	}
 

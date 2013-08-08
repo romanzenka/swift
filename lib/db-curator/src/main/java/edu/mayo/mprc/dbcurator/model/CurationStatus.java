@@ -3,7 +3,7 @@ package edu.mayo.mprc.dbcurator.model;
 import java.util.List;
 
 /**
- * A CurationStatus is an object that represents the status of a CuratorExecutor that in in execution.  When
+ * A CurationStatus is an object that represents the status of a CuratorExecutor that in in execution.
  *
  * @author Eric J. Winter Date: Apr 17, 2007 Time: 2:08:22 PM
  */
@@ -14,13 +14,6 @@ public interface CurationStatus {
 	 * @return an unmodifiable list of Strings as messages
 	 */
 	List<String> getMessages();
-
-	/**
-	 * adds a message to this status object
-	 *
-	 * @param toAdd the message you wish to add
-	 */
-	//void addMessage(String toAdd);
 
 	/**
 	 * Gets the progress of the currently executing step
@@ -60,21 +53,11 @@ public interface CurationStatus {
 	boolean isInProgress();
 
 	/**
-	 * Cause the executor to be interrupted
-	 */
-	void causeInterrupt();
-
-	/**
 	 * if this has been interrupted by someone return <code>true</code> else return <code>false</code>
 	 *
 	 * @return true if we have been interrupted else false
 	 */
 	boolean isInterrupted();
-
-	/**
-	 * call this method when we move onto the next step in the curation process
-	 */
-	//void incrementStep();
 
 	/**
 	 * gets which step is currently being worked on (base 1)

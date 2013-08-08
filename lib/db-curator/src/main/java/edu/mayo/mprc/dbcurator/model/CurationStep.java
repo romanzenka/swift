@@ -24,7 +24,7 @@ public interface CurationStep extends Serializable {
 	 * There are obviously a wide variety of things that could go wrong with a call to perform step.
 	 *
 	 * @param exe the CurationExecutor that this step will be working for.
-	 * @return the post validation.  This is the same object that will be returned by a call to postValidate()
+	 * @return the post validation.
 	 * @see CurationExecutor
 	 */
 	StepValidation performStep(CurationExecutor exe);
@@ -33,18 +33,10 @@ public interface CurationStep extends Serializable {
 	 * Call this method if you want to see if the step is ready to be run and if any issues have been predicted.  NOTE:
 	 * succesfull prevalidation can not guarentee<sp> successful processing.
 	 *
-	 * @param curationDao
+	 * @param curationDao DAO is needed in some of the steps.
 	 * @return the @see StepValidation to interrogate for issues
 	 */
 	StepValidation preValidate(CurationDao curationDao);
-
-	/**
-	 * Call this method if you want to see the results of the last performStep call and you didn't keep track of the
-	 * returned object
-	 *
-	 * @return the return value of the last call to performStep()
-	 */
-	StepValidation postValidate();
 
 	/**
 	 * Creates a copy of this step.  Only persistent properties are included in the copy.

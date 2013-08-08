@@ -105,7 +105,7 @@ public class DatabaseUploadStep implements CurationStep {
 					return this.recentRunValidation;
 				}
 			} else {
-				this.recentRunValidation.setMessage("Error finding the input file");
+				this.recentRunValidation.addMessage("Error finding the input file");
 			}
 
 		} finally {
@@ -130,17 +130,13 @@ public class DatabaseUploadStep implements CurationStep {
 	 */
 	private StepValidation preValidate(final StepValidation toValidateInto) {
 		if (getPathToUploadedFile() == null) {
-			toValidateInto.setMessage("No file has been uploaded");
+			toValidateInto.addMessage("No file has been uploaded");
 		}
 
 		if (!(getPathToUploadedFile().exists())) {
-			toValidateInto.setMessage("The file can no longer be found on the server please re-upload");
+			toValidateInto.addMessage("The file can no longer be found on the server please re-upload");
 		}
 		return toValidateInto;
-	}
-
-	public StepValidation postValidate() {
-		return this.recentRunValidation;
 	}
 
 	public CurationStep createCopy() {

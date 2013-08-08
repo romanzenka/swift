@@ -18,8 +18,7 @@ import java.util.regex.Pattern;
 /**
  * A CurationStep that takes a CurationExecutor and randomizes the sequence.  If isOverwriteMode() returns true that
  * means that we are set to remove the original sequence otherwise both the original and randomized sequence will be
- * included. <br> All randomized sequences will have a "&lt;randomized&gt;" tag appended to the end of the header
- * <p/>
+ * included.
  *
  * @author Eric J. Winter Date: Apr 10, 2007 Time: 12:03:54 PM
  */
@@ -39,8 +38,10 @@ public class MakeDecoyStep implements CurationStep {
 	// Helps inserting Reversed_ and (Reversed) in the header.
 	private static final Pattern HEADER_TRANSFORM = Pattern.compile("^>\\s*(\\S+\\s*)(.*)$");
 
+	private static final float PERCENT = 100.0f;
+
 	/**
-	 * the id of the step that is used for persisent storage.  Null if not persisted
+	 * the id of the step that is used for persistent storage.  Null if not persisted
 	 */
 	private Integer id;
 
@@ -50,19 +51,14 @@ public class MakeDecoyStep implements CurationStep {
 	private boolean overwriteMode = true;
 
 	/**
-	 * the string manipulator that is used.  This is not persisted but is created based on the MANIPULATOR type
+	 * the string manipulator that is used.  This is not persisted but is created based on the {@link #manipulatorType}
 	 */
 	private transient StringManipulator manipulator;
 
 	/**
-	 * the manipulator type to associate with this object.  This is perstent and indicates which type of step this is
+	 * the manipulator type to associate with this object.  This is persistent and indicates which type of step this is
 	 */
 	private int manipulatorType;
-
-	/**
-	 * the validation that was created the last time this step object was run.  this will be null if the step has not been run
-	 */
-	private transient StepValidation lastRunValidation;
 
 	/**
 	 * null Ctor defaults to Ovewrite Mode (true)
@@ -78,7 +74,7 @@ public class MakeDecoyStep implements CurationStep {
 	 * @return true if we will effectively erase the original sequence
 	 */
 	public boolean isOverwriteMode() {
-		return this.overwriteMode;
+		return overwriteMode;
 	}
 
 	/**
@@ -87,23 +83,21 @@ public class MakeDecoyStep implements CurationStep {
 	 * @return
 	 */
 	private StringManipulator getManipulator() {
-		if (this.manipulator == null) {
+		if (manipulator == null) {
 			if (manipulatorType == REVERSAL_MANIPULATOR) {
-				this.manipulator = new ReversalStringManipulator();
+				manipulator = new ReversalStringManipulator();
 			} else if (manipulatorType == SCRAMBLE_MANIPULATOR) {
-				this.manipulator = new ScrambleStringManipulator();
+				manipulator = new ScrambleStringManipulator();
 			}
 		}
-		return this.manipulator;
+		return manipulator;
 	}
 
 	/**
-	 * the enumerated type of manipulator that we are set to use (see this classes *_MANIPULATOR enumerations)
-	 *
-	 * @return
+	 * @return the enumerated type of manipulator that we are set to use (see this classes *_MANIPULATOR enumerations)
 	 */
 	public int getManipulatorType() {
-		return this.manipulatorType;
+		return manipulatorType;
 	}
 
 	/**
@@ -112,9 +106,8 @@ public class MakeDecoyStep implements CurationStep {
 	 * @param type
 	 */
 	public void setManipulatorType(final int type) {
-		this.manipulatorType = type;
+		manipulatorType = type;
 	}
-
 
 	/**
 	 * set the mode you want
@@ -122,19 +115,20 @@ public class MakeDecoyStep implements CurationStep {
 	 * @param mode true if you want to be in overwrite mode else false
 	 */
 	public void setOverwriteMode(final boolean mode) {
-		this.overwriteMode = mode;
+		overwriteMode = mode;
 	}
 
 	/**
-	 * perfom the step on a given local database.  If the step could not be performed then a CurationStepException is
+	 * perform the step on a given local database.  If the step could not be performed then a CurationStepException is
 	 * thrown.  This indicates that the PostValidation will be unsuccessful and will contain a message indicating why it
-	 * was unsuccesfull.
+	 * was unsuccessful.
 	 * <p/>
 	 * There are obviously a wide variety of things that could go wrong with a call to perform step.
 	 *
 	 * @param exec the CurationExecutor that we are performing this step for
-	 * @return the post validation.  This is the same object that will be returned by a call to postValidate()
+	 * @return the post validation.
 	 */
+	@Override
 	public StepValidation performStep(final CurationExecutor exec) {
 		return performStep(exec.getCurrentInStream(), exec.getCurrentOutStream(), exec.getStatusObject());
 	}
@@ -149,21 +143,25 @@ public class MakeDecoyStep implements CurationStep {
 	 */
 	StepValidation performStep(final DBInputStream in, final DBOutputStream out, final CurationStatus status) {
 		//make sure we meet at least the pre validation criteria, this will also make sure our manipulator is set
-		this.lastRunValidation = this.preValidate(null);
+		/*
+	  the validation that was created the last time this step object was run.  this will be null if the step has not been run
+	 */
+		final StepValidation lastRunValidation = preValidate(null);
 		if (!lastRunValidation.isOK()) {
 			return lastRunValidation;
 		}
 
-		//the the number of sequences we need to manipulate
-		final int numberOfSequences = status.getLastStepSequenceCount();
-		int currentSequence = 0;
+		//the the number of sequences we need to produce
+		final float numberOfSequences = (float) (overwriteMode ? status.getLastStepSequenceCount() : 2 * status.getLastStepSequenceCount());
 		try {
-			//if we want to append the sequences we need to first write out he origal sequences
-			if (!this.overwriteMode) {
+			//if we want to append the sequences we need to first write out he original sequences
+			int currentSequence = 0;
+			if (!overwriteMode) {
 				in.beforeFirst();
 
 				while (in.gotoNextSequence()) {
-					status.setCurrentStepProgress(Math.round(50f * ++currentSequence / numberOfSequences));
+					currentSequence++;
+					status.setCurrentStepProgress(PERCENT * (float) currentSequence / numberOfSequences);
 					out.appendSequence(
 							in.getHeader(),
 							in.getSequence()
@@ -171,23 +169,23 @@ public class MakeDecoyStep implements CurationStep {
 				}
 			}
 			in.beforeFirst();
-			final float percentMultiplier = (this.overwriteMode ? 100f : 50f); //if we are doing an append then we only want to multiply the manipulation by 50% not 100%
 			while (in.gotoNextSequence()) {
-				status.setCurrentStepProgress(percentMultiplier * ++currentSequence / numberOfSequences);
+				currentSequence++;
+				status.setCurrentStepProgress(PERCENT * (float) currentSequence / numberOfSequences);
 
 				out.appendSequence(
-						modifyHeader(in.getHeader(), this.manipulator.getDescription()), //the modified header
-						this.manipulator.manipulateString(in.getSequence()) //the manipulated sequence
+						modifyHeader(in.getHeader(), manipulator.getDescription()), //the modified header
+						manipulator.manipulateString(in.getSequence()) //the manipulated sequence
 				);
 			}
-			this.lastRunValidation.setCompletionCount(out.getSequenceCount());
-			this.setLastRunCompletionCount(out.getSequenceCount());
+			lastRunValidation.setCompletionCount(out.getSequenceCount());
+			setLastRunCompletionCount(out.getSequenceCount());
 		} catch (IOException e) {
-			this.lastRunValidation.addMessageAndException("Error in performing database IO", e);
+			lastRunValidation.addMessageAndException("Error in performing database IO", e);
 		} catch (Exception e) {
-			this.lastRunValidation.addMessageAndException(e.getMessage(), e);
+			lastRunValidation.addMessageAndException(e.getMessage(), e);
 		}
-		return this.lastRunValidation;
+		return lastRunValidation;
 
 	}
 
@@ -215,28 +213,18 @@ public class MakeDecoyStep implements CurationStep {
 	 * Call this method if you want to see if the step is ready to be run and if any issues have been predicted.  NOTE:
 	 * succesfull prevalidation can not guarentee<sp> successful processing.
 	 *
-	 * @param curationDao
+	 * @param curationDao Data access.
 	 * @return the @see StepValidation to interrogate for issues
 	 */
 	public StepValidation preValidate(final CurationDao curationDao) {
 		final StepValidation prevalidation = new StepValidation();
 
 		//make sure we have a valid type set
-		if (this.getManipulator() == null) {
-			prevalidation.setMessage("Invalid manipulator selected");
+		if (getManipulator() == null) {
+			prevalidation.addMessage("Invalid manipulator selected");
 		}
 
 		return prevalidation;
-	}
-
-	/**
-	 * Call this method if you want to see the results of the last performStep call and you didn't keep track of the
-	 * returned object
-	 *
-	 * @return the return value of the last call to performStep()
-	 */
-	public StepValidation postValidate() {
-		return this.lastRunValidation;
 	}
 
 	/**
@@ -245,17 +233,20 @@ public class MakeDecoyStep implements CurationStep {
 	 *
 	 * @return a cropy of this step
 	 */
+	@Override
 	public CurationStep createCopy() {
 		final MakeDecoyStep copy = new MakeDecoyStep();
-		copy.overwriteMode = this.overwriteMode;
-		copy.manipulatorType = this.manipulatorType;
+		copy.setOverwriteMode(overwriteMode);
+		copy.setManipulatorType(manipulatorType);
 		return copy;
 	}
 
+	@Override
 	public Integer getId() {
 		return id;
 	}
 
+	@Override
 	public void setId(final Integer id) {
 		this.id = id;
 	}
@@ -265,16 +256,19 @@ public class MakeDecoyStep implements CurationStep {
 	 */
 	private Integer lastRunCompletionCount = null;
 
+	@Override
 	public Integer getLastRunCompletionCount() {
-		return this.lastRunCompletionCount;
+		return lastRunCompletionCount;
 	}
 
+	@Override
 	public void setLastRunCompletionCount(final Integer count) {
-		this.lastRunCompletionCount = count;
+		lastRunCompletionCount = count;
 	}
 
+	@Override
 	public String simpleDescription() {
-		return this.getManipulator().getDescription();
+		return getManipulator().getDescription();
 	}
 
 }

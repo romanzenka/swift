@@ -201,11 +201,11 @@ public final class CurationExecutor implements Runnable {
 			if (step.equals(lastStep)) {
 				// if the resulting fasta file is not valid then we want to say something in the status but we should probably just complete anyway
 				if (outStream == null) {
-					postValidation.setMessage("Error: The resulting .fasta file is not valid!");
+					postValidation.addMessage("Error: The resulting .fasta file is not valid!");
 				} else {
 					final String message = FASTAInputStream.isFASTAFileValid(outStream.getFile(), false);
 					if (message != null) {
-						postValidation.setMessage(message);
+						postValidation.addMessage(message);
 					}
 				}
 			}
@@ -292,9 +292,9 @@ public final class CurationExecutor implements Runnable {
 	/**
 	 * gets the curation that this executor is working on
 	 *
-	 * @return the curation that we are set to execute
+	 * @return the curation that we are set to execute.
 	 */
-	private Curation getCuration() {
+	public Curation getCuration() {
 		return curation;
 	}
 
@@ -458,7 +458,6 @@ public final class CurationExecutor implements Runnable {
 
 		@Override
 		public synchronized List<StepValidation> getFailedStepValidations() {
-			//if (this.failedStepValidations == null || this.failedStepValidations.size() == 0) return null;
 			return Collections.unmodifiableList(failedStepValidations);
 		}
 
@@ -477,15 +476,6 @@ public final class CurationExecutor implements Runnable {
 		 */
 		public synchronized void setToDone() {
 			executionComplete = true;
-			notifyAll();
-		}
-
-		/**
-		 * call this to interrupt execution of the curation
-		 */
-		@Override
-		public synchronized void causeInterrupt() {
-			interrupt = true;
 			notifyAll();
 		}
 

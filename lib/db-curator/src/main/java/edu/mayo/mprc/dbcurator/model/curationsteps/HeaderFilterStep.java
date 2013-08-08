@@ -79,7 +79,7 @@ public class HeaderFilterStep implements CurationStep {
 	 * There are obviously a wide variety of things that could go wrong with a call to perform step.
 	 *
 	 * @param exec the executor that we are working for and will need to query to get information from
-	 * @return the post validation.  This is the same object that will be returned by a call to postValidate()
+	 * @return the post validation.
 	 */
 	public StepValidation performStep(final CurationExecutor exec) {
 
@@ -132,22 +132,12 @@ public class HeaderFilterStep implements CurationStep {
 		//if the criteria is valid then just return a successful step validation
 		//if not valid then we want to report the problems with the filter expression
 		if (!TextFilter.VALID.equals(testResults)) {
-			preValidation.setMessage(testResults);
+			preValidation.addMessage(testResults);
 		}
 
 		return preValidation;
 	}
 
-
-	/**
-	 * Call this method if you want to see the results of the last performStep call and you didn't keep track of the
-	 * returned object
-	 *
-	 * @return the return value of the last call to performStep()
-	 */
-	public StepValidation postValidate() {
-		return this.runValidation;
-	}
 
 	/**
 	 * Creates a copy of this step.  Only persistent properties are included in the copy.  Ids are not so they will

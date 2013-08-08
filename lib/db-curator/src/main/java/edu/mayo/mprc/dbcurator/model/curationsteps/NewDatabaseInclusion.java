@@ -137,7 +137,7 @@ public class NewDatabaseInclusion implements CurationStep {
 					return this.recentRunValidation;
 				}
 			} else {
-				this.recentRunValidation.setMessage("Error finding the input file");
+				this.recentRunValidation.addMessage("Error finding the input file");
 			}
 		} finally {
 			FileUtilities.closeQuietly(archiveIn);
@@ -153,7 +153,7 @@ public class NewDatabaseInclusion implements CurationStep {
 		final StepValidation preValidation = new StepValidation();
 
 		if (this.url == null) {
-			preValidation.setMessage("URL not set");
+			preValidation.addMessage("URL not set");
 		} else {
 			//check to see if the url passed in is actually a key into the map of common urls if so check the mapped value
 			final FastaSource matchedSource = curationDao.getDataSourceByName(this.url);
@@ -166,16 +166,12 @@ public class NewDatabaseInclusion implements CurationStep {
 					final URL url = new URL(testURL);
 					assert !"".equals(url.toString());
 				} catch (MalformedURLException ignore) {
-					preValidation.setMessage("Invalid URL");
+					preValidation.addMessage("Invalid URL");
 				}
 			}
 			//TODO: how to see if a resource exists short of making an inputstream
 		}
 		return preValidation;
-	}
-
-	public StepValidation postValidate() {
-		return this.recentRunValidation;
 	}
 
 	public CurationStep createCopy() {

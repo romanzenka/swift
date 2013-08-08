@@ -159,10 +159,6 @@ public class HeaderTransformStep implements CurationStep {
 		return preValidation;
 	}
 
-	public StepValidation postValidate() {
-		return lastRunValidation;
-	}
-
 	public CurationStep createCopy() {
 		final HeaderTransformStep copy = new HeaderTransformStep();
 		copy.setDescription(this.getDescription());
