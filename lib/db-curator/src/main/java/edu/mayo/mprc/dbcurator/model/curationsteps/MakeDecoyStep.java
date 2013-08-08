@@ -200,9 +200,13 @@ public class MakeDecoyStep implements CurationStep {
 		final String modifiedHeader;
 		final Matcher matcher = HEADER_TRANSFORM.matcher(header);
 		if (matcher.matches()) {
+			String name = description;
+			if (description.endsWith("_")) {
+				name = description.substring(0, description.length() - 1);
+			}
 
-			modifiedHeader = ">" + description + "_" + matcher.group(1) + (matcher.group(2).length() > 0 ? ("("
-					+ description + ") " + matcher.group(2)) : "");
+			modifiedHeader = ">" + description + matcher.group(1) + (matcher.group(2).length() > 0 ? ("("
+					+ name + ") " + matcher.group(2)) : "");
 		} else {
 			modifiedHeader = header;
 		}
