@@ -92,7 +92,7 @@ public class TestSearchRunner {
 				+ 1 /* QA Task */
 				+ 1 /* Scaffold report */
 
-				+ numEngines /* DB deploys */
+				+ numEngines /* DB deploys */ - 3 /* TANDEM, MYRIMATCH, IDPICKER */
 				+ 1 /* Scaffold */;
 
 		int expectedNumTasks = inputFiles.size() * tasksPerFile + tasksPerSearch;
@@ -131,7 +131,7 @@ public class TestSearchRunner {
 				+ 1 /* RawDump */
 				+ 1 /* msmsEval */
 				+ 1 /* Fasta DB load (two different DBs) */
-				+ numEngines /* DB deploys */;
+				+ numEngines /* DB deploys */ - 3 /* TANDEM, MYRIMATCH, IDPICKER */;
 
 		final int tasksPerSearch = 0
 				+ 1 /* Search DB load */
@@ -176,7 +176,7 @@ public class TestSearchRunner {
 				+ 1 /* msmsEval */;
 
 		final int tasksPerSearch = 0
-				+ numEngines /* DB deploys */
+				+ numEngines /* DB deploys */ - 3 /* TANDEM, MYRIMATCH, IDPICKER */
 				+ 1 /* One extra Sequest db deployment due to different protease */
 				+ 1 /* Search DB load */
 				+ 1 /* QA Task */
@@ -227,7 +227,7 @@ public class TestSearchRunner {
 				+ 1 /* QA Task */
 				+ 1 /* Scaffold report */
 
-				+ numEngines /* DB Deploys */
+				+ numEngines /* DB Deploys */ - 3 /* TANDEM, MYRIMATCH, IDPICKER */
 				+ 1 /* One extra DB deploy for Sequest */;
 
 		int expectedNumTasks = inputFiles.size() * tasksPerFile + tasksPerSearch;
@@ -315,10 +315,10 @@ public class TestSearchRunner {
 		final EnabledEngines engines = new EnabledEngines();
 		engines.add(createSearchEngineConfig("MASCOT"));
 		engines.add(createSearchEngineConfig("SEQUEST"));
-		engines.add(createSearchEngineConfig("TANDEM"));
-		engines.add(createSearchEngineConfig("MYRIMATCH"));
+		engines.add(createSearchEngineConfig("TANDEM")); // No db deploy
+		engines.add(createSearchEngineConfig("MYRIMATCH")); // No db deploy
 		engines.add(createSearchEngineConfig("SCAFFOLD"));
-		engines.add(createSearchEngineConfig("IDPICKER"));
+		engines.add(createSearchEngineConfig("IDPICKER"));  // No db deploy
 		return engines;
 	}
 
@@ -353,9 +353,13 @@ public class TestSearchRunner {
 				new String[]{}, new String[]{}, new String[]{}, 0, code.equals("SCAFFOLD") || code.equals("IDPICKER"));
 		engine.setEngineMetadata(metadata);
 		engine.setSearchDaemon(mock(DaemonConnection.class));
-		engine.setDbDeployDaemon(mock(DaemonConnection.class));
+		engine.setDbDeployDaemon(dbDeployer(code) ? mock(DaemonConnection.class) : null);
 		engine.setConfig(new SearchEngine.Config(code, "1.0", null, null));
 		return engine;
+	}
+
+	private boolean dbDeployer(final String engineCode) {
+		return !("TANDEM".equals(engineCode) || "MYRIMATCH".equals(engineCode) || "IDPICKER".equals(engineCode));
 	}
 
 	private MappingFactory mappingFactory(final String code) {
