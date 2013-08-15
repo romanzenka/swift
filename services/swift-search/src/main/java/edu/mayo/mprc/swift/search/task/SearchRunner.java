@@ -480,7 +480,7 @@ public final class SearchRunner implements Runnable {
 				if (sequest(engine) && noSequestDeployment(inputFile, defaultSearchParameters)) {
 					deploymentResult = new NoSequestDeploymentResult(curationDao.findCuration(database.getShortName()).getCurationFile());
 				} else {
-					if(engine.getDbDeployDaemon()!=null) {
+					if (engine.getDbDeployDaemon() != null) {
 						deploymentResult = addDatabaseDeployment(engine, paramFile, database);
 					} else {
 						deploymentResult = null;
@@ -489,7 +489,7 @@ public final class SearchRunner implements Runnable {
 				final File outputFolder = getOutputFolderForSearchEngine(engine);
 				final EngineSearchTask search = addEngineSearch(engine, paramFile, inputFile.getInputFile(), outputFolder, mgfOutput, database, deploymentResult, publicSearchFiles);
 				final String scaffoldVersion = scaffoldVersion(inputFile);
-				if (scaffoldVersion != null) {
+				if (scaffoldVersion != null && !myrimatch(engine) /* Scaffold cannot process myrimatch inputs correctly, as of 4.0.7 */) {
 					if (scaffoldDeployment == null) {
 						throw new MprcException("Scaffold search submitted without having Scaffold service enabled.");
 					}
@@ -502,7 +502,7 @@ public final class SearchRunner implements Runnable {
 				}
 				// If IdpQonvert is on, we chain an IdpQonvert call to the output of the previous search engine.
 				// We support MyriMatch only for now
-				if (searchWithIdpQonvert(inputFile) && "MYRIMATCH".equals(engine.getCode())) {
+				if (searchWithIdpQonvert(inputFile) && myrimatch(engine)) {
 					addIdpQonvertCall(
 							idpQonvert,
 							getOutputFolderForSearchEngine(idpQonvert),
@@ -530,6 +530,10 @@ public final class SearchRunner implements Runnable {
 
 	private boolean sequest(final SearchEngine engine) {
 		return "SEQUEST".equalsIgnoreCase(engine.getCode());
+	}
+
+	private boolean myrimatch(final SearchEngine engine) {
+		return "MYRIMATCH".equalsIgnoreCase(engine.getCode());
 	}
 
 	private boolean isNormalEngine(final SearchEngine engine) {
