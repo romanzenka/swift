@@ -254,7 +254,9 @@ public final class WebUi {
 					for (final SearchEngine.Config engineConfig : searcherConfig.getEngines()) {
 						if (engineConfig.getWorker() != null) {
 							final SearchEngine engine = getSearchEngineFactory().create(engineConfig, dependencies);
-							searchEngines.add(engine);
+							if (engine.isEnabled()) {
+								searchEngines.add(engine);
+							}
 						}
 					}
 					ui.setSearchEngines(searchEngines);

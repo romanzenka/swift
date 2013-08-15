@@ -262,10 +262,6 @@ public final class SearchEngine implements Comparable<SearchEngine>, Serializabl
 		this.dbDeployDaemon = dbDeployDaemon;
 	}
 
-	public boolean isEnabled() {
-		return dbDeployDaemon != null && searchDaemon != null;
-	}
-
 	/**
 	 * @return True, if the user interface should offer this search engine to be enabled by default.
 	 */

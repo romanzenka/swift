@@ -176,14 +176,6 @@ public final class SwiftSearcher implements Worker {
 		this.dbLoadEnabled = dbLoadEnabled;
 	}
 
-	public Collection<SearchEngine> getSupportedEngines() {
-		return Collections.unmodifiableCollection(supportedEngines);
-	}
-
-	public void setSupportedEngines(final Collection<SearchEngine> supportedEngines) {
-		this.supportedEngines = supportedEngines;
-	}
-
 	public ParamsInfo getParamsInfo() {
 		return paramsInfo;
 	}
@@ -199,11 +191,7 @@ public final class SwiftSearcher implements Worker {
 	 */
 	public void setSearchEngines(final Collection<SearchEngine> searchEngines) {
 		supportedEngines = new HashSet<SearchEngine>();
-		for (final SearchEngine engine : searchEngines) {
-			if (engine.isEnabled()) {
-				supportedEngines.add(engine);
-			}
-		}
+		supportedEngines.addAll(searchEngines);
 	}
 
 	public DaemonConnection getRaw2mgfDaemon() {
@@ -397,18 +385,10 @@ public final class SwiftSearcher implements Worker {
 	private void checkSearchCapabilities(final SwiftSearchDefinition definition) {
 		boolean raw2mgfProblem = false;
 		try {
-			final Set<SearchEngine> problematicEngines = new HashSet<SearchEngine>();
 			for (final FileSearch inputFile : definition.getInputFiles()) {
 				if (!inputFile.getInputFile().getName().endsWith(".mgf") && !(this.raw2mgfEnabled || this.msconvertEnabled)) {
 					raw2mgfProblem = true;
 				}
-
-				for (final SearchEngine engine : supportedEngines) {
-					if (inputFile.isSearch(engine.getCode()) && !engine.isEnabled()) {
-						problematicEngines.add(engine);
-					}
-				}
-
 			}
 
 			final StringBuilder errorMessage = new StringBuilder();
@@ -418,7 +398,6 @@ public final class SwiftSearcher implements Worker {
 			if (definition.getQa() != null && !isMsmsEvalEnabled()) {
 				errorMessage.append("msmsEval, ");
 			}
-			appendEngines(problematicEngines, errorMessage);
 
 			if (errorMessage.length() > 2) {
 				errorMessage.setLength(errorMessage.length() - 2);
