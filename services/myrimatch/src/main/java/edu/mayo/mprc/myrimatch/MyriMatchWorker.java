@@ -167,7 +167,7 @@ public final class MyriMatchWorker extends WorkerBase {
 				"MYRIMATCH", MZ_IDENT_ML, "MyriMatch", false, "myrimatch", new MyriMatchMappingFactory(),
 				new String[]{TYPE},
 				new String[]{MyriMatchCache.TYPE},
-				new String[]{MyriMatchDeploymentService.TYPE},
+				new String[]{},
 				40, false);
 
 		@Override
