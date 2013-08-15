@@ -28,14 +28,12 @@ public final class DatabaseUndeployerWorker extends WorkerBase {
 
 	private DaemonConnection mascotDeployerDaemon;
 	private DaemonConnection omssaDeployerDaemon;
-	private DaemonConnection tandemDeployerDaemon;
 	private DaemonConnection sequestDeployerDaemon;
 	private DaemonConnection scaffoldDeployerDaemon;
 	private DaemonConnection scaffold3DeployerDaemon;
 	private CurationDao curationDao;
 
 	private static final String MASCOT_DEPLOYER = "mascotDeployer";
-	private static final String TANDEM_DEPLOYER = "tandemDeployer";
 	private static final String SEQUEST_DEPLOYER = "sequestDeployer";
 	private static final String OMSSA_DEPLOYER = "omssaDeployer";
 	private static final String SCAFFOLD_DEPLOYER = "scaffoldDeployer";
@@ -60,14 +58,6 @@ public final class DatabaseUndeployerWorker extends WorkerBase {
 
 	public void setOmssaDeployerDaemon(final DaemonConnection omssaDeployerDaemon) {
 		this.omssaDeployerDaemon = omssaDeployerDaemon;
-	}
-
-	public DaemonConnection getTandemDeployerDaemon() {
-		return tandemDeployerDaemon;
-	}
-
-	public void setTandemDeployerDaemon(final DaemonConnection tandemDeployerDaemon) {
-		this.tandemDeployerDaemon = tandemDeployerDaemon;
 	}
 
 	public DaemonConnection getSequestDeployerDaemon() {
@@ -100,7 +90,7 @@ public final class DatabaseUndeployerWorker extends WorkerBase {
 
 		final DatabaseUndeployerRunner undeployerRunner = new DatabaseUndeployerRunner(undeployerWorkPacket
 				, getMascotDeployerDaemon(), getOmssaDeployerDaemon()
-				, getTandemDeployerDaemon(), getSequestDeployerDaemon(), getScaffoldDeployerDaemon()
+				, getSequestDeployerDaemon(), getScaffoldDeployerDaemon()
 				, fileTokenFactory);
 
 		undeployerRunner.run();
@@ -143,9 +133,6 @@ public final class DatabaseUndeployerWorker extends WorkerBase {
 
 			if (config.mascotDeployer != null) {
 				worker.setMascotDeployerDaemon((DaemonConnection) dependencies.createSingleton(config.mascotDeployer));
-			}
-			if (config.tandemDeployer != null) {
-				worker.setTandemDeployerDaemon((DaemonConnection) dependencies.createSingleton(config.tandemDeployer));
 			}
 			if (config.sequestDeployer != null) {
 				worker.setSequestDeployerDaemon((DaemonConnection) dependencies.createSingleton(config.sequestDeployer));
@@ -190,18 +177,16 @@ public final class DatabaseUndeployerWorker extends WorkerBase {
 		private ServiceConfig scaffold3Deployer;
 		private ServiceConfig omssaDeployer;
 		private ServiceConfig sequestDeployer;
-		private ServiceConfig tandemDeployer;
 		private ServiceConfig mascotDeployer;
 
 		public Config() {
 		}
 
-		public Config(final ServiceConfig scaffoldDeployer, final ServiceConfig scaffold3Deployer, final ServiceConfig omssaDeployer, final ServiceConfig sequestDeployer, final ServiceConfig tandemDeployer, final ServiceConfig mascotDeployer) {
+		public Config(final ServiceConfig scaffoldDeployer, final ServiceConfig scaffold3Deployer, final ServiceConfig omssaDeployer, final ServiceConfig sequestDeployer, final ServiceConfig mascotDeployer) {
 			this.scaffoldDeployer = scaffoldDeployer;
 			this.scaffold3Deployer = scaffold3Deployer;
 			this.omssaDeployer = omssaDeployer;
 			this.sequestDeployer = sequestDeployer;
-			this.tandemDeployer = tandemDeployer;
 			this.mascotDeployer = mascotDeployer;
 		}
 
@@ -237,14 +222,6 @@ public final class DatabaseUndeployerWorker extends WorkerBase {
 			this.sequestDeployer = sequestDeployer;
 		}
 
-		public ServiceConfig getTandemDeployer() {
-			return tandemDeployer;
-		}
-
-		public void setTandemDeployer(final ServiceConfig tandemDeployer) {
-			this.tandemDeployer = tandemDeployer;
-		}
-
 		public ServiceConfig getMascotDeployer() {
 			return mascotDeployer;
 		}
@@ -256,7 +233,6 @@ public final class DatabaseUndeployerWorker extends WorkerBase {
 		@Override
 		public void save(final ConfigWriter writer) {
 			writer.put(MASCOT_DEPLOYER, getMascotDeployer());
-			writer.put(TANDEM_DEPLOYER, getTandemDeployer());
 			writer.put(SEQUEST_DEPLOYER, getSequestDeployer());
 			writer.put(OMSSA_DEPLOYER, getOmssaDeployer());
 			writer.put(SCAFFOLD_DEPLOYER, getScaffoldDeployer());
@@ -266,7 +242,6 @@ public final class DatabaseUndeployerWorker extends WorkerBase {
 		@Override
 		public void load(final ConfigReader reader) {
 			mascotDeployer = (ServiceConfig) reader.getObject(MASCOT_DEPLOYER);
-			tandemDeployer = (ServiceConfig) reader.getObject(TANDEM_DEPLOYER);
 			sequestDeployer = (ServiceConfig) reader.getObject(SEQUEST_DEPLOYER);
 			omssaDeployer = (ServiceConfig) reader.getObject(OMSSA_DEPLOYER);
 			scaffoldDeployer = (ServiceConfig) reader.getObject(SCAFFOLD_DEPLOYER);
@@ -284,9 +259,6 @@ public final class DatabaseUndeployerWorker extends WorkerBase {
 		public void createUI(final DaemonConfig daemon, final ResourceConfig resource, final UiBuilder builder) {
 			builder.property(SEQUEST_DEPLOYER, "Sequest Database Deployer", "Database deployer must provide database undeployment functionality.")
 					.reference("sequestDeployer", UiBuilder.NONE_TYPE)
-
-					.property(TANDEM_DEPLOYER, "X!Tandem Database Deployer", "Database deployer must provide database undeployment functionality.")
-					.reference("tandemDeployer", UiBuilder.NONE_TYPE)
 
 					.property(OMSSA_DEPLOYER, "Omssa Database Deployer", "Database deployer must provide database undeployment functionality.")
 					.reference("omssaDeployer", UiBuilder.NONE_TYPE)

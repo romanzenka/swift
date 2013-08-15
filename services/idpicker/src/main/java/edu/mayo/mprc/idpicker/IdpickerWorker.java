@@ -129,7 +129,7 @@ public final class IdpickerWorker extends WorkerBase {
 				"IDPICKER", ".idp", "IDPicker", false, "idpicker", null,
 				new String[]{TYPE},
 				new String[]{IdpickerCache.TYPE},
-				new String[]{IdpickerDeploymentService.TYPE},
+				null,
 				80, true);
 
 		@Override

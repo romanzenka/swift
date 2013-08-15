@@ -6,10 +6,6 @@ import com.google.common.io.Resources;
 import edu.mayo.mprc.config.DependencyResolver;
 import edu.mayo.mprc.daemon.DaemonWorkerTester;
 import edu.mayo.mprc.dbcurator.model.Curation;
-import edu.mayo.mprc.enginedeployment.DeploymentRequest;
-import edu.mayo.mprc.enginedeployment.DeploymentResult;
-import edu.mayo.mprc.fasta.DatabaseAnnotation;
-import edu.mayo.mprc.fasta.FastaFile;
 import edu.mayo.mprc.integration.Installer;
 import edu.mayo.mprc.swift.params2.Instrument;
 import edu.mayo.mprc.swift.params2.ParamName;
@@ -232,7 +228,7 @@ public final class MyriMatchTest {
 
 			final File resultFile = new File(tempFolder, "result.pepXML");
 
-			final MyriMatchWorkPacket work = new MyriMatchWorkPacket(resultFile, configFile, mgfFile, tempFolder, fastaFile, 2, "Rev_", false, "Test MyriMatch run", false);
+			final MyriMatchWorkPacket work = new MyriMatchWorkPacket(resultFile, configFile, mgfFile, tempFolder, fastaFile, "Rev_", false, "Test MyriMatch run", false);
 
 			final MyriMatchWorker worker = new MyriMatchWorker(myrimatchExecutable);
 
@@ -308,36 +304,6 @@ public final class MyriMatchTest {
 		} finally {
 			Installer.myrimatch(myrimatchExecutable, Installer.Action.UNINSTALL);
 		}
-	}
-
-	@Test
-	public void shouldDeploy() throws IOException {
-		final File tempFolder = FileUtilities.createTempFolder();
-
-		final File databaseFile = TestingUtilities.getTempFileFromResource(MyriMatchTest.class, "/edu/mayo/mprc/myrimatch/database.fasta", false, tempFolder, ".fasta");
-
-		final MyriMatchDeploymentService.Config config = new MyriMatchDeploymentService.Config();
-		config.setDeployableDbFolder(tempFolder.getAbsolutePath());
-		final MyriMatchDeploymentService.Factory factory = new MyriMatchDeploymentService.Factory();
-		final MyriMatchDeploymentService deployer = (MyriMatchDeploymentService) factory.create(config, new DependencyResolver(null));
-		final DatabaseAnnotation annotation = new DatabaseAnnotation("Rev_");
-		final DeploymentRequest request = new DeploymentRequest("test deployment",
-				new FastaFile("database", "test database for MyriMatch", databaseFile, annotation));
-		deployCheckResult(deployer, request);
-		deployCheckResult(deployer, request);
-
-		request.setUndeployment(true);
-		deployer.performUndeployment(request);
-
-		FileUtilities.cleanupTempFile(databaseFile);
-		FileUtilities.cleanupTempFile(tempFolder);
-	}
-
-	private void deployCheckResult(final MyriMatchDeploymentService deployer, final DeploymentRequest request) {
-		final DeploymentResult result = deployer.performDeployment(request);
-		final MyriMatchDeploymentResult myrimatchResult = (MyriMatchDeploymentResult) result;
-		Assert.assertEquals(myrimatchResult.getDecoySequencePrefix(), request.getAnnotation().getDecoyRegex(), "Determined prefix does not match");
-		Assert.assertEquals(myrimatchResult.getNumForwardEntries(), 2, "Different amount of forward entries");
 	}
 
 	private static String replaceLongFloats(final String inputString) {

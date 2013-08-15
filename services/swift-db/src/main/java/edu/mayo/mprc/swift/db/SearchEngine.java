@@ -320,11 +320,15 @@ public final class SearchEngine implements Comparable<SearchEngine>, Serializabl
 			if (metadata == null) {
 				throw new MprcException("Could not find engine for code [" + config.getCode() + "]");
 			}
+			DaemonConnection dbDeployer = null;
+			if (config.getDeployer() != null) {
+				dbDeployer = (DaemonConnection) dependencies.createSingleton(config.getDeployer());
+			}
 			return new SearchEngine(
 					metadata,
 					config,
 					(DaemonConnection) dependencies.createSingleton(config.getWorker()),
-					(DaemonConnection) dependencies.createSingleton(config.getDeployer()));
+					dbDeployer);
 		}
 
 		@Override

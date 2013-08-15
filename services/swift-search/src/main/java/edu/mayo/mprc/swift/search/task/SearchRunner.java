@@ -456,19 +456,14 @@ public final class SearchRunner implements Runnable {
 		addInputAnalysis(inputFile, mgfOutput);
 
 		final SearchEngine scaffold = getScaffoldEngine();
+		final Curation database = searchParameters.getDatabase();
 		DatabaseDeployment scaffoldDeployment = null;
 		if (scaffold != null && scaffoldVersion(inputFile) != null) {
 			scaffoldDeployment =
 					addDatabaseDeployment(scaffold, null/*scaffold has no param file*/,
-							searchParameters.getDatabase());
+							database);
 		}
 		final SearchEngine idpicker = getIdpickerEngine();
-		DatabaseDeployment idpickerDeployment = null;
-		if (idpicker != null && searchWithIdpicker(inputFile)) {
-			idpickerDeployment =
-					addDatabaseDeployment(idpicker, null/*idpicker has no param file*/,
-							searchParameters.getDatabase());
-		}
 
 		ScaffoldTask scaffoldTask = null;
 
@@ -483,12 +478,16 @@ public final class SearchRunner implements Runnable {
 				DatabaseDeploymentResult deploymentResult = null;
 				// Sequest deployment is counter-productive for particular input fasta file
 				if (sequest(engine) && noSequestDeployment(inputFile, defaultSearchParameters)) {
-					deploymentResult = new NoSequestDeploymentResult(curationDao.findCuration(searchParameters.getDatabase().getShortName()).getCurationFile());
+					deploymentResult = new NoSequestDeploymentResult(curationDao.findCuration(database.getShortName()).getCurationFile());
 				} else {
-					deploymentResult = addDatabaseDeployment(engine, paramFile, searchParameters.getDatabase());
+					if(engine.getDbDeployDaemon()!=null) {
+						deploymentResult = addDatabaseDeployment(engine, paramFile, database);
+					} else {
+						deploymentResult = null;
+					}
 				}
 				final File outputFolder = getOutputFolderForSearchEngine(engine);
-				final EngineSearchTask search = addEngineSearch(engine, paramFile, inputFile.getInputFile(), outputFolder, mgfOutput, deploymentResult, publicSearchFiles);
+				final EngineSearchTask search = addEngineSearch(engine, paramFile, inputFile.getInputFile(), outputFolder, mgfOutput, database, deploymentResult, publicSearchFiles);
 				final String scaffoldVersion = scaffoldVersion(inputFile);
 				if (scaffoldVersion != null) {
 					if (scaffoldDeployment == null) {
@@ -507,8 +506,7 @@ public final class SearchRunner implements Runnable {
 					addIdpickerCall(
 							idpicker,
 							getOutputFolderForSearchEngine(idpicker),
-							search,
-							idpickerDeployment);
+							search);
 				}
 			}
 		}
@@ -517,7 +515,7 @@ public final class SearchRunner implements Runnable {
 			// Ask for dumping the .RAW file since the QA might be disabled
 			if (isRawFile(inputFile)) {
 				final RAWDumpTask rawDumpTask = addRawDumpTask(inputFile.getInputFile(), QaTask.getQaSubdirectory(scaffoldTask.getScaffoldXmlFile()));
-				addSearchDbCall(scaffoldTask, rawDumpTask, searchParameters.getDatabase());
+				addSearchDbCall(scaffoldTask, rawDumpTask, database);
 			}
 		}
 	}
@@ -849,7 +847,7 @@ public final class SearchRunner implements Runnable {
 	 * <p/>
 	 * The search also knows about the conversion and db deployment so it can determine when it can run.
 	 */
-	private EngineSearchTask addEngineSearch(final SearchEngine engine, final File paramFile, final File inputFile, final File searchOutputFolder, final FileProducingTask fileProducingTask, final DatabaseDeploymentResult deploymentResult, final boolean publicSearchFiles) {
+	private EngineSearchTask addEngineSearch(final SearchEngine engine, final File paramFile, final File inputFile, final File searchOutputFolder, final FileProducingTask fileProducingTask, final Curation curation, final DatabaseDeploymentResult deploymentResult, final boolean publicSearchFiles) {
 		final String searchKey = getEngineSearchHashKey(engine, inputFile, paramFile);
 		EngineSearchTask search = engineSearches.get(searchKey);
 		if (search == null) {
@@ -859,6 +857,7 @@ public final class SearchRunner implements Runnable {
 					engine,
 					inputFile.getName(),
 					fileProducingTask,
+					curation,
 					deploymentResult,
 					outputFile,
 					paramFile,
@@ -869,7 +868,7 @@ public final class SearchRunner implements Runnable {
 
 			// Depend on the .mgf to be done and on the database deployment
 			search.addDependency(fileProducingTask);
-			if (deploymentResult instanceof Task) {
+			if (deploymentResult!=null && deploymentResult instanceof Task) {
 				search.addDependency((Task) deploymentResult);
 			}
 			engineSearches.put(searchKey, search);
@@ -932,14 +931,14 @@ public final class SearchRunner implements Runnable {
 	}
 
 	private IdpickerTask addIdpickerCall(final SearchEngine idpicker, final File outputFolder,
-	                                     final EngineSearchTask search, final DatabaseDeployment idpickerDeployment) {
+	                                     final EngineSearchTask search) {
 		final String key = search.getOutputFile().getAbsolutePath();
 		if (idpickerCalls.containsKey(key)) {
 			return idpickerCalls.get(key);
 		}
 		final IdpickerTask task = new IdpickerTask(workflowEngine, swiftDao, searchRun,
 				getSearchDefinition(), idpicker.getSearchDaemon(),
-				search, idpickerDeployment, outputFolder, fileTokenFactory, isFromScratch());
+				search, outputFolder, fileTokenFactory, isFromScratch());
 		idpickerCalls.put(key, task);
 		task.addDependency(search);
 		return task;

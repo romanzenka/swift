@@ -29,7 +29,6 @@ import edu.mayo.mprc.swift.search.SwiftSearcher;
 import edu.mayo.mprc.utilities.FileUtilities;
 import edu.mayo.mprc.utilities.TestingUtilities;
 import edu.mayo.mprc.utilities.testing.TestApplicationContext;
-import edu.mayo.mprc.xtandem.XTandemDeploymentService;
 import edu.mayo.mprc.xtandem.XTandemWorker;
 import org.testng.Assert;
 import org.testng.annotations.AfterClass;
@@ -168,12 +167,6 @@ public final class TestDaemonFactory {
 		final ServiceConfig tandem = new ServiceConfig("tandem", runner338);
 		main.addResource(tandem);
 
-		final SimpleRunner.Config runner331 = new SimpleRunner.Config();
-		runner331.setNumThreads(2);
-		runner331.setWorkerConfiguration(new XTandemDeploymentService.Config());
-		final ServiceConfig tandemDeployer = new ServiceConfig("tandemDeployer", runner331);
-		main.addResource(tandemDeployer);
-
 		final SimpleRunner.Config runner3 = new SimpleRunner.Config();
 		runner3.setNumThreads(2);
 		runner3.setWorkerConfiguration(new ScaffoldWorker.Config());
@@ -247,7 +240,7 @@ public final class TestDaemonFactory {
 		Collection<SearchEngine.Config> engineConfigs = Lists.newArrayList(
 				new SearchEngine.Config("MASCOT", "2.4", mascot, mascotDeployer),
 				new SearchEngine.Config("SEQUEST", "v27", sequest, sequestDeployer),
-				new SearchEngine.Config("TANDEM", "2013.2.01", tandem, tandemDeployer),
+				new SearchEngine.Config("TANDEM", "2013.2.01", tandem, null),
 				new SearchEngine.Config("OMSSA", "0.1", omssa, omssaDeployer),
 				new SearchEngine.Config("SCAFFOLD", "2.6.0", scaffold, scaffoldDeployer)
 		);

@@ -4,9 +4,9 @@ import edu.mayo.mprc.MprcException;
 import edu.mayo.mprc.daemon.DaemonConnection;
 import edu.mayo.mprc.daemon.WorkPacket;
 import edu.mayo.mprc.daemon.files.FileTokenFactory;
+import edu.mayo.mprc.dbcurator.model.Curation;
 import edu.mayo.mprc.mascot.MascotResultUrl;
 import edu.mayo.mprc.mascot.MascotWorkPacket;
-import edu.mayo.mprc.myrimatch.MyriMatchDeploymentResult;
 import edu.mayo.mprc.myrimatch.MyriMatchWorkPacket;
 import edu.mayo.mprc.omssa.OmssaWorkPacket;
 import edu.mayo.mprc.searchengine.SearchEngineResult;
@@ -24,6 +24,7 @@ import java.io.File;
 final class EngineSearchTask extends AsyncTaskBase implements FileProducingTask {
 	private SearchEngine engine;
 	private FileProducingTask inputFile;
+	private Curation curation;
 	private DatabaseDeploymentResult deploymentResult;
 	private File outputFile;
 	private File paramsFile;
@@ -39,6 +40,7 @@ final class EngineSearchTask extends AsyncTaskBase implements FileProducingTask 
 			final SearchEngine engine,
 			final String searchId,
 			final FileProducingTask inputFile,
+			final Curation curation,
 			final DatabaseDeploymentResult deploymentResult,
 			final File outputFile,
 			final File paramsFile,
@@ -49,6 +51,7 @@ final class EngineSearchTask extends AsyncTaskBase implements FileProducingTask 
 		this.outputFile = outputFile;
 		this.paramsFile = paramsFile;
 		this.inputFile = inputFile;
+		this.curation = curation;
 		this.deploymentResult = deploymentResult;
 		this.publicSearchFiles = publicSearchFiles;
 		setName(engine.getFriendlyName() + " search");
@@ -95,7 +98,7 @@ final class EngineSearchTask extends AsyncTaskBase implements FileProducingTask 
 					paramsFile,
 					outputFile,
 					outputFile.getParentFile(),
-					deploymentResult.getFastaFile(),
+					curation.getCurationFile(),
 					publicSearchFiles,
 					this.getFullId(),
 					isFromScratch());
@@ -110,13 +113,11 @@ final class EngineSearchTask extends AsyncTaskBase implements FileProducingTask 
 					this.getFullId(),
 					isFromScratch());
 		} else if ("MYRIMATCH".equalsIgnoreCase(engine.getCode())) {
-			final MyriMatchDeploymentResult myrimatchDeploymentResult = (MyriMatchDeploymentResult) deploymentResult.getDeploymentResult();
 			workPacket = new MyriMatchWorkPacket(
 					outputFile, paramsFile, inputFile.getResultingFile(),
 					outputFile.getParentFile(),
-					deploymentResult.getFastaFile(),
-					myrimatchDeploymentResult.getNumForwardEntries(),
-					myrimatchDeploymentResult.getDecoySequencePrefix(),
+					curation.getCurationFile(),
+					curation.getDecoyRegex(),
 					publicSearchFiles, this.getFullId(),
 					isFromScratch()
 			);
@@ -158,12 +159,12 @@ final class EngineSearchTask extends AsyncTaskBase implements FileProducingTask 
 		} else if ("SEQUEST".equalsIgnoreCase(engine.getCode())) {
 			return getSequestDatabase().getAbsolutePath();
 		} else if ("TANDEM".equalsIgnoreCase(engine.getCode())) {
-			return deploymentResult.getShortDbName();
+			return curation.getShortName();
 		} else if ("OMSSA".equalsIgnoreCase(engine.getCode())) {
 			// TODO: OMSSA might be deploying other file types
 			return deploymentResult.getShortDbName();
 		} else if ("MYRIMATCH".equalsIgnoreCase(engine.getCode())) {
-			return deploymentResult.getShortDbName();
+			return curation.getShortName();
 		} else {
 			throw new MprcException("Unsupported engine: " + engine.getFriendlyName());
 		}

@@ -27,7 +27,6 @@ public final class IdpickerTask extends AsyncTaskBase {
 	 * Value: List of searches performed on the file.
 	 */
 	private EngineSearchTask searchTask;
-	private DatabaseDeployment dbDeployment;
 	private final File outputFolder;
 	private final SwiftSearchDefinition swiftSearchDefinition;
 	private final SwiftDao swiftDao;
@@ -39,7 +38,6 @@ public final class IdpickerTask extends AsyncTaskBase {
 	                    final SwiftSearchDefinition definition,
 	                    final DaemonConnection idpickerDaemon,
 	                    final EngineSearchTask searchTask,
-	                    final DatabaseDeployment dbDeployment,
 	                    final File outputFolder, final FileTokenFactory fileTokenFactory, final boolean fromScratch) {
 		super(engine, idpickerDaemon, fileTokenFactory, fromScratch);
 		this.swiftDao = swiftDao;
@@ -47,7 +45,6 @@ public final class IdpickerTask extends AsyncTaskBase {
 		this.swiftSearchDefinition = definition;
 		this.outputFolder = outputFolder;
 		this.searchTask = searchTask;
-		this.dbDeployment = dbDeployment;
 		setName("IdpQonvert");
 	}
 
@@ -61,7 +58,8 @@ public final class IdpickerTask extends AsyncTaskBase {
 		// Max FDR is set to 1- Scaffolds protein probability
 		params.setMaxFDR(1.0 - swiftSearchDefinition.getSearchParameters().getScaffoldSettings().getProteinProbability());
 		params.setDecoyPrefix(swiftSearchDefinition.getSearchParameters().getDatabase().getDatabaseAnnotation().getDecoyRegex());
-		return new IdpickerWorkPacket(getResultingFile(), params, searchTask.getResultingFile(), dbDeployment.getFastaFile(),
+		return new IdpickerWorkPacket(getResultingFile(), params, searchTask.getResultingFile(),
+				swiftSearchDefinition.getSearchParameters().getDatabase().getCurationFile(),
 				getFullId(), isFromScratch());
 	}
 

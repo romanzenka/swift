@@ -22,7 +22,6 @@ public final class DatabaseUndeployerRunner implements Runnable {
 
 	private DaemonConnection mascotDeployerDaemon;
 	private DaemonConnection omssaDeployerDaemon;
-	private DaemonConnection tandemDeployerDaemon;
 	private DaemonConnection sequestDeployerDaemon;
 	private DaemonConnection scaffoldDeployerDaemon;
 
@@ -43,12 +42,11 @@ public final class DatabaseUndeployerRunner implements Runnable {
 	private DatabaseUndeployerState state;
 	private static final int POLLING_INTERVAL = 10000;
 
-	public DatabaseUndeployerRunner(final DatabaseUndeployerWorkPacket undeployerWorkPacket, final DaemonConnection mascotDeployerDaemon, final DaemonConnection omssaDeployerDaemon, final DaemonConnection tandemDeployerDaemon, final DaemonConnection sequestDeployerDaemon, final DaemonConnection scaffoldDeployerDaemon, final FileTokenFactory fileTokenFactory) {
+	public DatabaseUndeployerRunner(final DatabaseUndeployerWorkPacket undeployerWorkPacket, final DaemonConnection mascotDeployerDaemon, final DaemonConnection omssaDeployerDaemon, final DaemonConnection sequestDeployerDaemon, final DaemonConnection scaffoldDeployerDaemon, final FileTokenFactory fileTokenFactory) {
 		this.undeployerWorkPacket = undeployerWorkPacket;
 		this.fileTokenFactory = fileTokenFactory;
 		this.mascotDeployerDaemon = mascotDeployerDaemon;
 		this.omssaDeployerDaemon = omssaDeployerDaemon;
-		this.tandemDeployerDaemon = tandemDeployerDaemon;
 		this.sequestDeployerDaemon = sequestDeployerDaemon;
 		this.scaffoldDeployerDaemon = scaffoldDeployerDaemon;
 
@@ -116,11 +114,6 @@ public final class DatabaseUndeployerRunner implements Runnable {
 		if (sequestDeployerDaemon != null) {
 			final DatabaseUndeploymentTask databaseUndeploymentTask = new DatabaseUndeploymentTask(sequestDeployerDaemon, undeployerWorkPacket.getDbToUndeploy(), fileTokenFactory);
 			undeploymentNameTaskPairs.put(sequestDeployerDaemon.getConnectionName(), databaseUndeploymentTask);
-		}
-
-		if (tandemDeployerDaemon != null) {
-			final DatabaseUndeploymentTask databaseUndeploymentTask = new DatabaseUndeploymentTask(tandemDeployerDaemon, undeployerWorkPacket.getDbToUndeploy(), fileTokenFactory);
-			undeploymentNameTaskPairs.put(tandemDeployerDaemon.getConnectionName(), databaseUndeploymentTask);
 		}
 
 		if (omssaDeployerDaemon != null) {

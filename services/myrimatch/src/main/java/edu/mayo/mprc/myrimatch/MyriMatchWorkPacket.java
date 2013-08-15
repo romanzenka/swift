@@ -11,7 +11,6 @@ public final class MyriMatchWorkPacket extends EngineWorkPacket {
 	private static final long serialVersionUID = 20110711;
 
 	private File workFolder;
-	private long numForwardEntries;
 	private String decoySequencePrefix;
 
 	public MyriMatchWorkPacket(final String taskId, final boolean fromScratch) {
@@ -24,7 +23,7 @@ public final class MyriMatchWorkPacket extends EngineWorkPacket {
 	 * @param workFolder Myrmimatch work folder (the param file will be generated in there).
 	 */
 	public MyriMatchWorkPacket(final File outputFile, final File searchParamsFile, final File inputFile, final File workFolder, final File databaseFile,
-	                           final long numForwardEntries, final String decoySequencePrefix, final boolean publishSearchFiles, final String taskId, final boolean fromScratch) {
+	                           final String decoySequencePrefix, final boolean publishSearchFiles, final String taskId, final boolean fromScratch) {
 		super(inputFile, outputFile, searchParamsFile, databaseFile, publishSearchFiles, taskId, fromScratch);
 
 		if (inputFile == null) {
@@ -44,16 +43,11 @@ public final class MyriMatchWorkPacket extends EngineWorkPacket {
 		}
 
 		this.workFolder = workFolder;
-		this.numForwardEntries = numForwardEntries;
 		this.decoySequencePrefix = decoySequencePrefix;
 	}
 
 	public File getWorkFolder() {
 		return workFolder;
-	}
-
-	public long getNumForwardEntries() {
-		return numForwardEntries;
 	}
 
 	public String getDecoySequencePrefix() {
@@ -66,7 +60,6 @@ public final class MyriMatchWorkPacket extends EngineWorkPacket {
 				new File(wipFolder, getOutputFile().getName()), getSearchParamsFile(), getInputFile(),
 				wipFolder,
 				getDatabaseFile(),
-				getNumForwardEntries(),
 				getDecoySequencePrefix(),
 				isPublishResultFiles(),
 				getTaskId(),
