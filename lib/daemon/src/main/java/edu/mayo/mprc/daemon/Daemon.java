@@ -236,14 +236,14 @@ public final class Daemon {
 		public Daemon create(DaemonConfig config, DependencyResolver dependencies) {
 			Daemon daemon = new Daemon();
 			daemon.setDumpErrors(config.isDumpErrors());
-			daemon.setDumpFolder(new File(config.getDumpFolderPath()));
+			daemon.setDumpFolder(config.getDumpFolderPath() == null ? null : new File(config.getDumpFolderPath()));
 			if (config.getLogOutputFolder() == null) {
 				daemon.setLogOutputFolder(new File(DaemonConfig.DEFAULT_LOG_FOLDER));
 			} else {
 				daemon.setLogOutputFolder(new File(config.getLogOutputFolder()));
 			}
-			daemon.setSharedFileSpace(new File(config.getSharedFileSpacePath()));
-			daemon.setTempFolder(new File(config.getTempFolderPath()));
+			daemon.setSharedFileSpace(config.getSharedFileSpacePath() == null ? null : new File(config.getSharedFileSpacePath()));
+			daemon.setTempFolder(config.getTempFolderPath() == null ? FileUtilities.getDefaultTempDirectory() : new File(config.getTempFolderPath()));
 			// Create daemon resources
 			final List<Object> resources = new ArrayList<Object>(config.getResources().size());
 			addResourcesToList(resources, config.getResources(), dependencies);

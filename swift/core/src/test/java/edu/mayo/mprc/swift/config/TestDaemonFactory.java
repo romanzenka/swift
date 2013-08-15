@@ -9,6 +9,7 @@ import edu.mayo.mprc.mascot.MascotCache;
 import edu.mayo.mprc.mascot.MascotDeploymentService;
 import edu.mayo.mprc.mascot.MascotWorker;
 import edu.mayo.mprc.mascot.MockMascotDeploymentService;
+import edu.mayo.mprc.messaging.ServiceFactory;
 import edu.mayo.mprc.mgf2mgf.MgfToMgfWorker;
 import edu.mayo.mprc.msconvert.MsconvertWorker;
 import edu.mayo.mprc.msmseval.MSMSEvalWorker;
@@ -24,6 +25,7 @@ import edu.mayo.mprc.scaffold.report.ScaffoldReportWorker;
 import edu.mayo.mprc.sequest.SequestDeploymentService;
 import edu.mayo.mprc.sequest.SequestWorker;
 import edu.mayo.mprc.swift.WebUi;
+import edu.mayo.mprc.swift.commands.SwiftEnvironmentImpl;
 import edu.mayo.mprc.swift.db.SearchEngine;
 import edu.mayo.mprc.swift.search.SwiftSearcher;
 import edu.mayo.mprc.utilities.FileUtilities;
@@ -60,6 +62,8 @@ public final class TestDaemonFactory {
 	@Test
 	public void shouldCreateDaemon() {
 		final ApplicationConfig config = createSwiftConfig();
+		((ServiceFactory)TestApplicationContext.getTestApplicationContext().getBean("serviceFactory")).initialize(
+				SwiftEnvironmentImpl.getMessageBroker(config.getDaemonConfig("main")).getBrokerUrl(), "main");
 
 		final Daemon daemon = (Daemon) table.create(config.getDaemonConfig("main"), new DependencyResolver(table));
 		daemon.start();
