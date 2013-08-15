@@ -318,12 +318,10 @@ public final class ServiceImpl extends SpringGwtServlet implements Service, Appl
 	public List<ClientSearchEngine> listSearchEngines() throws GWTServiceException {
 		final List<ClientSearchEngine> infos = new ArrayList<ClientSearchEngine>();
 		for (final SearchEngine engine : getSearchEngines()) {
-			if (engine.isEnabled()) {
-				infos.add(new ClientSearchEngine(
-						new ClientSearchEngineConfig(engine.getCode(), engine.getVersion()),
-						engine.getFriendlyName(), engine.isOnByDefault(),
-						engine.getEngineMetadata().getOrder()));
-			}
+			infos.add(new ClientSearchEngine(
+					new ClientSearchEngineConfig(engine.getCode(), engine.getVersion()),
+					engine.getFriendlyName(), engine.isOnByDefault(),
+					engine.getEngineMetadata().getOrder()));
 		}
 		return infos;
 	}
