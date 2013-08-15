@@ -307,7 +307,7 @@ public class TestSearchRunner {
 		searchEngines.add(searchEngine("TANDEM"));
 		searchEngines.add(searchEngine("MYRIMATCH"));
 		searchEngines.add(searchEngine("SCAFFOLD"));
-		searchEngines.add(searchEngine("IDPICKER"));
+		searchEngines.add(searchEngine("IDPQONVERT"));
 		return searchEngines;
 	}
 
@@ -318,7 +318,7 @@ public class TestSearchRunner {
 		engines.add(createSearchEngineConfig("TANDEM")); // No db deploy
 		engines.add(createSearchEngineConfig("MYRIMATCH")); // No db deploy
 		engines.add(createSearchEngineConfig("SCAFFOLD"));
-		engines.add(createSearchEngineConfig("IDPICKER"));  // No db deploy
+		engines.add(createSearchEngineConfig("IDPQONVERT"));  // No db deploy
 		return engines;
 	}
 
@@ -350,7 +350,7 @@ public class TestSearchRunner {
 		final SearchEngine engine = new SearchEngine();
 		final EngineMetadata metadata = new EngineMetadata(
 				code, null, code, false, code + "_output_dir", mappingFactory(code),
-				new String[]{}, new String[]{}, new String[]{}, 0, code.equals("SCAFFOLD") || code.equals("IDPICKER"));
+				new String[]{}, new String[]{}, new String[]{}, 0, code.equals("SCAFFOLD") || code.equals("IDPQONVERT"));
 		engine.setEngineMetadata(metadata);
 		engine.setSearchDaemon(mock(DaemonConnection.class));
 		engine.setDbDeployDaemon(dbDeployer(code) ? mock(DaemonConnection.class) : null);
@@ -359,7 +359,7 @@ public class TestSearchRunner {
 	}
 
 	private boolean dbDeployer(final String engineCode) {
-		return !("TANDEM".equals(engineCode) || "MYRIMATCH".equals(engineCode) || "IDPICKER".equals(engineCode));
+		return !("TANDEM".equals(engineCode) || "MYRIMATCH".equals(engineCode) || "IDPQONVERT".equals(engineCode));
 	}
 
 	/**
@@ -367,7 +367,7 @@ public class TestSearchRunner {
 	 * See {@link #dbDeployer(String)}.
 	 */
 	private int getEnabledNoDeploy() {
-		return 3; // TANDEM, MYRIMATCH, IDPICKER
+		return 3; // TANDEM, MYRIMATCH, IDPQONVERT
 	}
 
 	private MappingFactory mappingFactory(final String code) {

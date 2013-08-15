@@ -4,8 +4,8 @@ import edu.mayo.mprc.MprcException;
 import edu.mayo.mprc.daemon.DaemonConnection;
 import edu.mayo.mprc.daemon.WorkPacket;
 import edu.mayo.mprc.daemon.files.FileTokenFactory;
-import edu.mayo.mprc.idpicker.IdpQonvertSettings;
-import edu.mayo.mprc.idpicker.IdpickerWorkPacket;
+import edu.mayo.mprc.idpqonvert.IdpQonvertSettings;
+import edu.mayo.mprc.idpqonvert.IdpQonvertWorkPacket;
 import edu.mayo.mprc.swift.db.SwiftDao;
 import edu.mayo.mprc.swift.dbmapping.SearchRun;
 import edu.mayo.mprc.swift.dbmapping.SwiftSearchDefinition;
@@ -20,7 +20,7 @@ import java.util.Collection;
 /**
  * @author Roman Zenka
  */
-public final class IdpickerTask extends AsyncTaskBase {
+public final class IdpQonvertTask extends AsyncTaskBase {
 
 	/**
 	 * Key: Input file search specification.
@@ -32,14 +32,14 @@ public final class IdpickerTask extends AsyncTaskBase {
 	private final SwiftDao swiftDao;
 	private final SearchRun searchRun;
 
-	public IdpickerTask(final WorkflowEngine engine,
-	                    final SwiftDao swiftDao,
-	                    final SearchRun searchRun,
-	                    final SwiftSearchDefinition definition,
-	                    final DaemonConnection idpickerDaemon,
-	                    final EngineSearchTask searchTask,
-	                    final File outputFolder, final FileTokenFactory fileTokenFactory, final boolean fromScratch) {
-		super(engine, idpickerDaemon, fileTokenFactory, fromScratch);
+	public IdpQonvertTask(final WorkflowEngine engine,
+	                      final SwiftDao swiftDao,
+	                      final SearchRun searchRun,
+	                      final SwiftSearchDefinition definition,
+	                      final DaemonConnection idpQonvertDaemon,
+	                      final EngineSearchTask searchTask,
+	                      final File outputFolder, final FileTokenFactory fileTokenFactory, final boolean fromScratch) {
+		super(engine, idpQonvertDaemon, fileTokenFactory, fromScratch);
 		this.swiftDao = swiftDao;
 		this.searchRun = searchRun;
 		this.swiftSearchDefinition = definition;
@@ -58,7 +58,7 @@ public final class IdpickerTask extends AsyncTaskBase {
 		// Max FDR is set to 1- Scaffolds protein probability
 		params.setMaxFDR(1.0 - swiftSearchDefinition.getSearchParameters().getScaffoldSettings().getProteinProbability());
 		params.setDecoyPrefix(swiftSearchDefinition.getSearchParameters().getDatabase().getDatabaseAnnotation().getDecoyRegex());
-		return new IdpickerWorkPacket(getResultingFile(), params, searchTask.getResultingFile(),
+		return new IdpQonvertWorkPacket(getResultingFile(), params, searchTask.getResultingFile(),
 				swiftSearchDefinition.getSearchParameters().getDatabase().getCurationFile(),
 				getFullId(), isFromScratch());
 	}

@@ -9,7 +9,7 @@ import java.text.MessageFormat;
 /**
  * A report that was created by Swift that should be publicly downloadable.
  * <p/>
- * Can be either Scaffold or IDPicker document.
+ * Can be either Scaffold, IdpQonvert or IDPicker document.
  */
 public class ReportData {
 

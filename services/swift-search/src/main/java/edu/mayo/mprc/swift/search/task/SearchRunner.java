@@ -113,10 +113,10 @@ public final class SearchRunner implements Runnable {
 	private Map<ScaffoldCall, ScaffoldTaskI> scaffoldCalls = new HashMap<ScaffoldCall, ScaffoldTaskI>();
 
 	/**
-	 * Key: input file for IdPicker<br/>
-	 * Value: Idpicker caller task
+	 * Key: input file for IdpQonvert<br/>
+	 * Value: IdpQonvert caller task
 	 */
-	private Map<String, IdpickerTask> idpickerCalls = Maps.newHashMap();
+	private Map<String, IdpQonvertTask> idpQonvertTasks = Maps.newHashMap();
 
 	/**
 	 * Key: Curation ID
@@ -296,7 +296,7 @@ public final class SearchRunner implements Runnable {
 							spectrumQaTasks.size() +
 							engineSearches.size() +
 							scaffoldCalls.size() +
-							idpickerCalls.size() +
+							idpQonvertTasks.size() +
 							fastaDbCalls.size() +
 							reportCalls.size() +
 							searchDbCalls.size() +
@@ -313,7 +313,7 @@ public final class SearchRunner implements Runnable {
 		workflowEngine.addAllTasks(spectrumQaTasks.values());
 		workflowEngine.addAllTasks(engineSearches.values());
 		workflowEngine.addAllTasks(scaffoldCalls.values());
-		workflowEngine.addAllTasks(idpickerCalls.values());
+		workflowEngine.addAllTasks(idpQonvertTasks.values());
 		workflowEngine.addAllTasks(fastaDbCalls.values());
 		workflowEngine.addAllTasks(reportCalls);
 		workflowEngine.addAllTasks(searchDbCalls.values());
@@ -383,8 +383,8 @@ public final class SearchRunner implements Runnable {
 		return getSearchEngine("SCAFFOLD");
 	}
 
-	private SearchEngine getIdpickerEngine() {
-		return getSearchEngine("IDPICKER");
+	private SearchEngine getIdpQonvertEngine() {
+		return getSearchEngine("IDPQONVERT");
 	}
 
 	/**
@@ -463,7 +463,7 @@ public final class SearchRunner implements Runnable {
 					addDatabaseDeployment(scaffold, null/*scaffold has no param file*/,
 							database);
 		}
-		final SearchEngine idpicker = getIdpickerEngine();
+		final SearchEngine idpQonvert = getIdpQonvertEngine();
 
 		ScaffoldTask scaffoldTask = null;
 
@@ -471,7 +471,7 @@ public final class SearchRunner implements Runnable {
 		for (final SearchEngine engine : searchEngines) {
 			// All 'normal' searches get normal entries
 			// While building these, the Scaffold search entry itself is initialized in a separate list
-			// The IDPicker search is special as well, it is set up to process the results of the myrimatch search
+			// The IdpQonvert search is special as well, it is set up to process the results of the myrimatch search
 			if (isNormalEngine(engine) && inputFile.getEnabledEngines().isEnabled(engine.getCode())) {
 				final File paramFile = getParamFile(engine, searchParameters);
 
@@ -500,12 +500,12 @@ public final class SearchRunner implements Runnable {
 						addQaTask(inputFile, scaffoldTask, mgfOutput);
 					}
 				}
-				// If IDPIcker is on, we chain an IDPicker call to the output of the previous search engine.
+				// If IdpQonvert is on, we chain an IdpQonvert call to the output of the previous search engine.
 				// We support MyriMatch only for now
-				if (searchWithIdpicker(inputFile) && "MYRIMATCH".equals(engine.getCode())) {
-					addIdpickerCall(
-							idpicker,
-							getOutputFolderForSearchEngine(idpicker),
+				if (searchWithIdpQonvert(inputFile) && "MYRIMATCH".equals(engine.getCode())) {
+					addIdpQonvertCall(
+							idpQonvert,
+							getOutputFolderForSearchEngine(idpQonvert),
 							search);
 				}
 			}
@@ -524,8 +524,8 @@ public final class SearchRunner implements Runnable {
 		return inputFile.searchVersion("SCAFFOLD");
 	}
 
-	private boolean searchWithIdpicker(final FileSearch inputFile) {
-		return inputFile.isSearch("IDPICKER");
+	private boolean searchWithIdpQonvert(final FileSearch inputFile) {
+		return inputFile.isSearch("IDPQONVERT");
 	}
 
 	private boolean sequest(final SearchEngine engine) {
@@ -930,16 +930,16 @@ public final class SearchRunner implements Runnable {
 		return null;
 	}
 
-	private IdpickerTask addIdpickerCall(final SearchEngine idpicker, final File outputFolder,
-	                                     final EngineSearchTask search) {
+	private IdpQonvertTask addIdpQonvertCall(final SearchEngine idpQonvert, final File outputFolder,
+	                                         final EngineSearchTask search) {
 		final String key = search.getOutputFile().getAbsolutePath();
-		if (idpickerCalls.containsKey(key)) {
-			return idpickerCalls.get(key);
+		if (idpQonvertTasks.containsKey(key)) {
+			return idpQonvertTasks.get(key);
 		}
-		final IdpickerTask task = new IdpickerTask(workflowEngine, swiftDao, searchRun,
-				getSearchDefinition(), idpicker.getSearchDaemon(),
+		final IdpQonvertTask task = new IdpQonvertTask(workflowEngine, swiftDao, searchRun,
+				getSearchDefinition(), idpQonvert.getSearchDaemon(),
 				search, outputFolder, fileTokenFactory, isFromScratch());
-		idpickerCalls.put(key, task);
+		idpQonvertTasks.put(key, task);
 		task.addDependency(search);
 		return task;
 	}

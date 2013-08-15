@@ -1,4 +1,4 @@
-package edu.mayo.mprc.idpicker;
+package edu.mayo.mprc.idpqonvert;
 
 import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
@@ -29,11 +29,11 @@ import java.util.List;
  * Calls <tt>msaccess.exe</tt> to determine whether peak picking should be enabled.
  * Then calls <tt>msconvert.exe</tt>.
  */
-public final class IdpickerWorker extends WorkerBase {
-	private static final Logger LOGGER = Logger.getLogger(IdpickerWorker.class);
-	public static final String TYPE = "idpicker";
-	public static final String NAME = "IDPicker";
-	public static final String DESC = "<p>IDPicker uses machine learning algorithms to separate correct and incorrect peptide spectrum matches.</p>" +
+public final class IdpQonvertWorker extends WorkerBase {
+	private static final Logger LOGGER = Logger.getLogger(IdpQonvertWorker.class);
+	public static final String TYPE = "idpqonvert";
+	public static final String NAME = "IdpQonvert";
+	public static final String DESC = "<p>IdpQonvert uses machine learning algorithms to separate correct and incorrect peptide spectrum matches.</p>" +
 			"<p>Inputs are results from the search engines (in .mzid format), output is an .idp file (sqlite3) with search engine scores " +
 			"recalculated to match a particular target FDR.</p>";
 
@@ -42,14 +42,14 @@ public final class IdpickerWorker extends WorkerBase {
 	private File idpQonvertExecutable;
 
 	public void process(final WorkPacket workPacket, final UserProgressReporter progressReporter) {
-		if (!(workPacket instanceof IdpickerWorkPacket)) {
-			ExceptionUtilities.throwCastException(workPacket, IdpickerWorkPacket.class);
+		if (!(workPacket instanceof IdpQonvertWorkPacket)) {
+			ExceptionUtilities.throwCastException(workPacket, IdpQonvertWorkPacket.class);
 			return;
 		}
 
-		final IdpickerWorkPacket batchWorkPacket = (IdpickerWorkPacket) workPacket;
+		final IdpQonvertWorkPacket batchWorkPacket = (IdpQonvertWorkPacket) workPacket;
 
-		LOGGER.debug("Running IDPicker: [" + batchWorkPacket.getInputFile().getAbsolutePath() + "] -> " + batchWorkPacket.getOutputFile());
+		LOGGER.debug("Running IdpQonvert: [" + batchWorkPacket.getInputFile().getAbsolutePath() + "] -> " + batchWorkPacket.getOutputFile());
 
 		//  check if already exists (skip condition)
 		if (isConversionDone(batchWorkPacket)) {
@@ -92,7 +92,7 @@ public final class IdpickerWorker extends WorkerBase {
 		return Math.max(1, Runtime.getRuntime().availableProcessors());
 	}
 
-	private static boolean isConversionDone(final IdpickerWorkPacket batchWorkPacket) {
+	private static boolean isConversionDone(final IdpQonvertWorkPacket batchWorkPacket) {
 		final File resultFile = batchWorkPacket.getOutputFile();
 		if (resultFile.exists()) {
 			final long resultModified = resultFile.lastModified();
@@ -109,7 +109,7 @@ public final class IdpickerWorker extends WorkerBase {
 	}
 
 	public String toString() {
-		return MessageFormat.format("IDPicker:\n\tidpQonvert={0}\n", getIdpQonvertExecutable().getPath());
+		return MessageFormat.format("IdpQonvert:\n\tidpQonvert={0}\n", getIdpQonvertExecutable().getPath());
 	}
 
 	public File getIdpQonvertExecutable() {
@@ -123,18 +123,18 @@ public final class IdpickerWorker extends WorkerBase {
 	/**
 	 * A factory capable of creating the worker
 	 */
-	@Component("idPickerWorkerFactory")
+	@Component("idpQonvertWorkerFactory")
 	public static final class Factory extends WorkerFactoryBase<Config> implements EngineFactory {
 		private static final EngineMetadata ENGINE_METADATA = new EngineMetadata(
-				"IDPICKER", ".idp", "IDPicker", false, "idpicker", null,
+				"IDPQONVERT", ".idp", "IdpQonvert", false, "idpqonvert", null,
 				new String[]{TYPE},
-				new String[]{IdpickerCache.TYPE},
+				new String[]{IdpQonvertCache.TYPE},
 				new String[]{},
 				80, true);
 
 		@Override
 		public Worker create(final Config config, final DependencyResolver dependencies) {
-			final IdpickerWorker worker = new IdpickerWorker();
+			final IdpQonvertWorker worker = new IdpQonvertWorker();
 			worker.setIdpQonvertExecutable(new File(config.getIdpQonvertExecutable()));
 			return worker;
 		}
@@ -185,7 +185,7 @@ public final class IdpickerWorker extends WorkerBase {
 		public void createUI(final DaemonConfig daemon, final ResourceConfig resource, final UiBuilder builder) {
 			builder
 
-					.property(IDPQONVERT_EXECUTABLE, "<tt>idpQonvert</tt> path", "Location of IDPicker ver. 3 <tt>idpQonvert</tt>." +
+					.property(IDPQONVERT_EXECUTABLE, "<tt>idpQonvert</tt> path", "Location of IdpQonvert ver. 3 <tt>idpQonvert</tt>." +
 							"<p><a href=\"http://teamcity.fenchurch.mc.vanderbilt.edu/project.html?projectId=project9&tab=projectOverview\">TeamCity download from Vanderbilt</a></p>")
 					.required()
 					.executable(Lists.<String>newArrayList("-dump"))

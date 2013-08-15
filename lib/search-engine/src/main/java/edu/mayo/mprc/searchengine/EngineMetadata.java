@@ -30,7 +30,7 @@ public final class EngineMetadata {
 	 * @param cacheTypes      An array of types (registered with {@link edu.mayo.mprc.config.ResourceFactory} that can serve to cache results for this engine.
 	 * @param deployerTypes   An array of types (registered with {@link edu.mayo.mprc.config.ResourceFactory} that can serve to prepare the environment for the searches to run optimally.
 	 * @param order           Order in which is the search engine presented to the user (less will be first)
-	 * @param aggregator      True if this engine aggregates output of other engines (e.g. Scaffold, IDPicker)
+	 * @param aggregator      True if this engine aggregates output of other engines (e.g. Scaffold, IdpQonvert, IdPicker)
 	 */
 	public EngineMetadata(
 			final String code, final String resultExtension,

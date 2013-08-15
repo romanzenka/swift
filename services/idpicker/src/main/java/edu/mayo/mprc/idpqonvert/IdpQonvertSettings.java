@@ -1,4 +1,4 @@
-package edu.mayo.mprc.idpicker;
+package edu.mayo.mprc.idpqonvert;
 
 import edu.mayo.mprc.MprcException;
 
@@ -197,7 +197,7 @@ public final class IdpQonvertSettings implements Serializable {
 			case WRITE_QONVERSION_DETAILS:
 				return toggle(isWriteQonversionDetails());
 			default:
-				throw new MprcException("Unsupported IdPicker option: " + option.getKey());
+				throw new MprcException("Unsupported IdpQonvert option: " + option.getKey());
 		}
 	}
 

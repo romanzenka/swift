@@ -1,4 +1,4 @@
-package edu.mayo.mprc.idpicker;
+package edu.mayo.mprc.idpqonvert;
 
 import edu.mayo.mprc.MprcException;
 import edu.mayo.mprc.integration.Installer;
@@ -14,14 +14,14 @@ import java.io.File;
 
 /**
  * Requires idpqonvert to be present at a path obtained from the environment variable
- * <code>edu.mayo.mprc.swift.idpicker.path</code>
+ * <code>edu.mayo.mprc.swift.idpqonvert.path</code>
  * <p/>
  * If not available, the tests are skipped
  *
  * @author Roman Zenka
  */
-public final class TestIdpicker {
-	private static final Logger LOGGER = Logger.getLogger(TestIdpicker.class);
+public final class TestIdpQonvert {
+	private static final Logger LOGGER = Logger.getLogger(TestIdpQonvert.class);
 	private File idpQonvert;
 	private File tmpFolder;
 	private File pepXmlFile;
@@ -30,7 +30,7 @@ public final class TestIdpicker {
 	@BeforeClass
 	public void startup() {
 		if (FileUtilities.isLinuxPlatform() || FileUtilities.isWindowsPlatform()) {
-			final String path = System.getenv("edu.mayo.mprc.swift.idpicker.path");
+			final String path = System.getenv("edu.mayo.mprc.swift.idpqonvert.path");
 			if (path == null) {
 				throw new MprcException("Skipping IdpQonvert tests");
 			}
@@ -62,19 +62,19 @@ public final class TestIdpicker {
 	@Test
 	public void shouldRun() {
 		if (FileUtilities.isLinuxPlatform() || FileUtilities.isWindowsPlatform()) {
-			IdpickerWorker.Config config = new IdpickerWorker.Config();
+			IdpQonvertWorker.Config config = new IdpQonvertWorker.Config();
 			config.setIdpQonvertExecutable(idpQonvert.getAbsolutePath());
 
-			IdpickerWorker.Factory factory = new IdpickerWorker.Factory();
+			IdpQonvertWorker.Factory factory = new IdpQonvertWorker.Factory();
 			factory.setConfig(config);
-			final IdpickerWorker worker = (IdpickerWorker) factory.createWorker();
+			final IdpQonvertWorker worker = (IdpQonvertWorker) factory.createWorker();
 
 			final File outputFile = tempFile("out.idp");
 			final File inputFile = pepXmlFile;
 			final IdpQonvertSettings params = new IdpQonvertSettings();
 			params.setDecoyPrefix("REVERSE_");
 
-			final IdpickerWorkPacket workPacket = new IdpickerWorkPacket(outputFile, params, inputFile, fastaFile, "idp-test", true);
+			final IdpQonvertWorkPacket workPacket = new IdpQonvertWorkPacket(outputFile, params, inputFile, fastaFile, "idp-test", true);
 			worker.process(workPacket, new UserProgressReporter() {
 				@Override
 				public void reportProgress(final ProgressInfo progressInfo) {

@@ -1,4 +1,4 @@
-package edu.mayo.mprc.idpicker;
+package edu.mayo.mprc.idpqonvert;
 
 import edu.mayo.mprc.daemon.CachableWorkPacket;
 import edu.mayo.mprc.daemon.WorkPacket;
@@ -12,7 +12,7 @@ import java.util.List;
 /**
  * A task for idpQonvert to convert .pepXML into .idp files.
  */
-public final class IdpickerWorkPacket extends WorkPacketBase implements CachableWorkPacket {
+public final class IdpQonvertWorkPacket extends WorkPacketBase implements CachableWorkPacket {
 	private static final long serialVersionUID = 20121109;
 
 	/**
@@ -33,7 +33,7 @@ public final class IdpickerWorkPacket extends WorkPacketBase implements Cachable
 	 */
 	private File fastaFile;
 
-	public IdpickerWorkPacket(final String taskId, final boolean fromScratch) {
+	public IdpQonvertWorkPacket(final String taskId, final boolean fromScratch) {
 		super(taskId, fromScratch);
 	}
 
@@ -41,13 +41,13 @@ public final class IdpickerWorkPacket extends WorkPacketBase implements Cachable
 	 * Request to convert a .pepXML file into .idp file
 	 *
 	 * @param outputFile This is the desired target of the output. The cache can overwrite this to anything it sees fit.
-	 *                   If that happens, a {@link IdpickerResult} class is sent back
+	 *                   If that happens, a {@link IdpQonvertResult} class is sent back
 	 *                   as progress report.
 	 */
-	public IdpickerWorkPacket(final File outputFile, final IdpQonvertSettings params, final File inputFile,
-	                          final File fastaFile,
-	                          final String taskId,
-	                          final boolean fromScratch) {
+	public IdpQonvertWorkPacket(final File outputFile, final IdpQonvertSettings params, final File inputFile,
+	                            final File fastaFile,
+	                            final String taskId,
+	                            final boolean fromScratch) {
 		super(taskId, fromScratch);
 
 		this.inputFile = inputFile;
@@ -96,7 +96,7 @@ public final class IdpickerWorkPacket extends WorkPacketBase implements Cachable
 
 	@Override
 	public WorkPacket translateToWorkInProgressPacket(final File wipFolder) {
-		return new IdpickerWorkPacket(new File(wipFolder, getOutputFile().getName()), getParams(), inputFile,
+		return new IdpQonvertWorkPacket(new File(wipFolder, getOutputFile().getName()), getParams(), inputFile,
 				fastaFile, getTaskId(), isFromScratch());
 	}
 
@@ -117,6 +117,6 @@ public final class IdpickerWorkPacket extends WorkPacketBase implements Cachable
 	@Override
 	public void reportCachedResult(final ProgressReporter reporter, final File targetFolder, final List<String> outputFiles) {
 		final File cachedFile = new File(targetFolder, outputFiles.get(0));
-		reporter.reportProgress(new IdpickerResult(cachedFile));
+		reporter.reportProgress(new IdpQonvertResult(cachedFile));
 	}
 }

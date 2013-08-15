@@ -1,4 +1,4 @@
-package edu.mayo.mprc.idpicker;
+package edu.mayo.mprc.idpqonvert;
 
 import edu.mayo.mprc.utilities.FileUtilities;
 import org.testng.Assert;
@@ -11,7 +11,7 @@ import java.io.File;
 /**
  * @author Roman Zenka
  */
-public final class TestIdpickerWorkPacket {
+public final class TestIdpQonvertWorkPacket {
 	private File tempFolder;
 
 	@BeforeClass
@@ -32,8 +32,8 @@ public final class TestIdpickerWorkPacket {
 		final IdpQonvertSettings settings = new IdpQonvertSettings();
 
 		final File fasta = new File(tempFolder, "test.fasta");
-		final IdpickerWorkPacket packet = new IdpickerWorkPacket(
-				output, settings, input, fasta, "Idpicker-1", false
+		final IdpQonvertWorkPacket packet = new IdpQonvertWorkPacket(
+				output, settings, input, fasta, "Idpqonvert-1", false
 		);
 
 		final String desc = packet.getStringDescriptionOfTask();

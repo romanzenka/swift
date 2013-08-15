@@ -1,4 +1,4 @@
-package edu.mayo.mprc.idpicker;
+package edu.mayo.mprc.idpqonvert;
 
 import edu.mayo.mprc.utilities.TestingUtilities;
 import org.testng.Assert;
@@ -28,7 +28,7 @@ public final class TestIdpQonvertSettings {
 			odd = !odd;
 		}
 
-		Assert.assertEquals(TestingUtilities.compareStringsByLine(output.toString(), TestingUtilities.resourceToString("edu/mayo/mprc/idpicker/idpQonvertDefaults"), true), null);
+		Assert.assertEquals(TestingUtilities.compareStringsByLine(output.toString(), TestingUtilities.resourceToString("edu/mayo/mprc/idpqonvert/idpQonvertDefaults"), true), null);
 	}
 
 }

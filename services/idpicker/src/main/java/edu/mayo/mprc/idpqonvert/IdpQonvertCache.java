@@ -1,4 +1,4 @@
-package edu.mayo.mprc.idpicker;
+package edu.mayo.mprc.idpqonvert;
 
 import edu.mayo.mprc.config.DaemonConfig;
 import edu.mayo.mprc.config.DependencyResolver;
@@ -11,12 +11,12 @@ import org.springframework.stereotype.Component;
 /**
  * @author Roman Zenka
  */
-public final class IdpickerCache extends WorkCache<IdpickerWorkPacket> {
-	public static final String TYPE = "idpickerCache";
-	public static final String NAME = "IDPicker Cache";
-	public static final String DESC = "<p>Caches IDPicker result files.</p>";
+public final class IdpQonvertCache extends WorkCache<IdpQonvertWorkPacket> {
+	public static final String TYPE = "idpqonvertCache";
+	public static final String NAME = "IdpQonvert Cache";
+	public static final String DESC = "<p>Caches IdpQonvert result files.</p>";
 
-	public IdpickerCache() {
+	public IdpQonvertCache() {
 	}
 
 	public static final class Config extends CacheConfig {
@@ -24,9 +24,9 @@ public final class IdpickerCache extends WorkCache<IdpickerWorkPacket> {
 		}
 	}
 
-	@Component("idpickerCacheFactory")
+	@Component("idpQonvertCacheFactory")
 	public static final class Factory extends WorkCache.Factory<Config> {
-		private static IdpickerCache cache;
+		private static IdpQonvertCache cache;
 
 		@Override
 		public WorkCache getCache() {
@@ -35,21 +35,21 @@ public final class IdpickerCache extends WorkCache<IdpickerWorkPacket> {
 
 		@Override
 		public WorkCache createCache(final Config config, final DependencyResolver dependencies) {
-			return cache = new IdpickerCache();
+			return cache = new IdpQonvertCache();
 		}
 	}
 
 	public static final class Ui implements ServiceUiFactory {
-		private static final String DEFAULT_CACHE = "var/cache/idpicker";
+		private static final String DEFAULT_CACHE = "var/cache/idpqonvert";
 
 		public void createUI(final DaemonConfig daemon, final ResourceConfig resource, final UiBuilder builder) {
 			builder
-					.property(CacheConfig.CACHE_FOLDER, "IDPicker cache folder", "IDPicker .</p>")
+					.property(CacheConfig.CACHE_FOLDER, "IdpQonvert cache folder", "IdpQonvert will store .idpdb files here.</p>")
 					.required()
 					.defaultValue(DEFAULT_CACHE)
 
-					.property(CacheConfig.SERVICE, "IDPicker instance", "The module that will run IDPicker. The cache just caches the results.")
-					.reference("idpicker", UiBuilder.NONE_TYPE);
+					.property(CacheConfig.SERVICE, "IdpQonvert instance", "The module that will run IdpQonvert. The cache just caches the results.")
+					.reference("idpqonvert", UiBuilder.NONE_TYPE);
 		}
 	}
 }
