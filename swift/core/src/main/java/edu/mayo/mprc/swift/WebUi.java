@@ -13,8 +13,6 @@ import edu.mayo.mprc.daemon.files.FileTokenFactory;
 import edu.mayo.mprc.msmseval.MSMSEvalParamFile;
 import edu.mayo.mprc.msmseval.MSMSEvalWorker;
 import edu.mayo.mprc.msmseval.MsmsEvalCache;
-import edu.mayo.mprc.searchengine.EngineMetadata;
-import edu.mayo.mprc.swift.db.EngineFactoriesList;
 import edu.mayo.mprc.swift.db.SearchEngine;
 import edu.mayo.mprc.swift.db.SwiftDao;
 import edu.mayo.mprc.swift.search.SwiftSearcher;
@@ -94,7 +92,7 @@ public final class WebUi {
 	 * @return Hyperlink to the file.
 	 */
 	public String fileToUserLink(final File file) {
-		return getBrowseWebRoot() + file.getAbsolutePath().substring(getBrowseRoot().getAbsolutePath().length()+1);
+		return getBrowseWebRoot() + file.getAbsolutePath().substring(getBrowseRoot().getAbsolutePath().length() + 1);
 	}
 
 	public DaemonConnection getSwiftSearcherDaemonConnection() {
@@ -200,7 +198,7 @@ public final class WebUi {
 		private FileTokenFactory fileTokenFactory;
 		private SwiftDao swiftDao;
 		private WorkspaceDao workspaceDao;
-		private EngineFactoriesList engineFactoriesList;
+		private SearchEngine.Factory searchEngineFactory;
 
 		@Override
 		public WebUi create(final Config config, final DependencyResolver dependencies) {
@@ -254,17 +252,9 @@ public final class WebUi {
 
 					final Collection<SearchEngine> searchEngines = Lists.newArrayList();
 					for (final SearchEngine.Config engineConfig : searcherConfig.getEngines()) {
-						final EngineMetadata engineMetadata = engineFactoriesList.getEngineMetadataForCode(engineConfig.getCode());
-						if (engineMetadata == null) {
-							throw new MprcException("Engine with code " + engineConfig.getCode() + " is not supported (missing .jar file?)");
-						}
-						if (engineConfig.getWorker() != null && engineConfig.getDeployer() != null) {
-							final SearchEngine e = new SearchEngine(
-									engineMetadata,
-									engineConfig,
-									(DaemonConnection) dependencies.createSingleton(engineConfig.getWorker()),
-									(DaemonConnection) dependencies.createSingleton(engineConfig.getDeployer()));
-							searchEngines.add(e);
+						if (engineConfig.getWorker() != null) {
+							final SearchEngine engine = getSearchEngineFactory().create(engineConfig, dependencies);
+							searchEngines.add(engine);
 						}
 					}
 					ui.setSearchEngines(searchEngines);
@@ -312,12 +302,12 @@ public final class WebUi {
 			this.workspaceDao = workspaceDao;
 		}
 
-		public EngineFactoriesList getEngineFactoriesList() {
-			return engineFactoriesList;
+		public SearchEngine.Factory getSearchEngineFactory() {
+			return searchEngineFactory;
 		}
 
-		public void setEngineFactoriesList(EngineFactoriesList engineFactoriesList) {
-			this.engineFactoriesList = engineFactoriesList;
+		public void setSearchEngineFactory(SearchEngine.Factory searchEngineFactory) {
+			this.searchEngineFactory = searchEngineFactory;
 		}
 
 		@Override

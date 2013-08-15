@@ -75,7 +75,7 @@
         <property name="fileTokenFactory" ref="fileTokenFactory"/>
         <property name="swiftDao" ref="swiftDao"/>
         <property name="workspaceDao" ref="workspaceDao"/>
-        <property name="engineFactoriesList" ref="engineFactoriesList"/>
+        <property name="searchEngineFactory" ref="searchEngineFactory"/>
     </bean>
 
     <!-- Hibernate properties -->

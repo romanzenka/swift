@@ -468,7 +468,7 @@ public final class SwiftSearcher implements Worker {
 
 			final List<SearchEngine> connectedSearchEngines = new ArrayList<SearchEngine>();
 			for (final SearchEngine.Config engineConfig : config.getEngines()) {
-				if (engineConfig.getWorker() != null && engineConfig.getDeployer() != null) {
+				if (engineConfig.getWorker() != null) {
 					final SearchEngine engine = (SearchEngine) dependencies.createSingleton(engineConfig);
 					connectedSearchEngines.add(engine);
 				}

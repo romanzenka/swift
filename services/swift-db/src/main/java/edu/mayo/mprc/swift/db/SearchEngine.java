@@ -46,9 +46,6 @@ public final class SearchEngine implements Comparable<SearchEngine>, Serializabl
 		if (searchDaemon == null) {
 			throw new MprcException("Configuration error: Engine " + engineMetadata.getCode() + " version " + version + " must have the worker daemon defined in order to function");
 		}
-		if (searchDaemon == null) {
-			throw new MprcException("Configuration error: Engine " + engineMetadata.getCode() + " version " + version + " must have the deployer daemon defined in order to function");
-		}
 	}
 
 	/**
@@ -323,6 +320,15 @@ public final class SearchEngine implements Comparable<SearchEngine>, Serializabl
 			DaemonConnection dbDeployer = null;
 			if (config.getDeployer() != null) {
 				dbDeployer = (DaemonConnection) dependencies.createSingleton(config.getDeployer());
+			} else {
+				if (metadata.getDeployerTypes().length > 0) {
+					// We are expected to have a deployer. Cannot create functional engine.
+					throw new MprcException("Cannot create search engine " + config.getCode() + " - database deployer not configured!");
+				}
+			}
+			if (config.getWorker() == null) {
+				// We are expected to have a worker. Cannot create functional engine.
+				throw new MprcException("Cannot create search engine " + config.getCode() + " - worker not configured!");
 			}
 			return new SearchEngine(
 					metadata,
