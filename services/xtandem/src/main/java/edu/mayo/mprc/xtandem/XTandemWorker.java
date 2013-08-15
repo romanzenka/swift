@@ -234,7 +234,7 @@ public final class XTandemWorker extends WorkerBase {
 				"TANDEM", ".xml", "Tandem", true, "tandem", new XTandemMappingFactory(),
 				new String[]{TYPE},
 				new String[]{XTandemCache.TYPE},
-				null,
+				new String[]{},
 				30, false);
 
 
