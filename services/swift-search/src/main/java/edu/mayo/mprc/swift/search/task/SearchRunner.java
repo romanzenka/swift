@@ -868,7 +868,7 @@ public final class SearchRunner implements Runnable {
 
 			// Depend on the .mgf to be done and on the database deployment
 			search.addDependency(fileProducingTask);
-			if (deploymentResult!=null && deploymentResult instanceof Task) {
+			if (deploymentResult instanceof Task) {
 				search.addDependency((Task) deploymentResult);
 			}
 			engineSearches.put(searchKey, search);
