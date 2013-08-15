@@ -92,7 +92,7 @@ public class TestSearchRunner {
 				+ 1 /* QA Task */
 				+ 1 /* Scaffold report */
 
-				+ numEngines /* DB deploys */ - 3 /* TANDEM, MYRIMATCH, IDPICKER */
+				+ numEngines /* DB deploys */ - getEnabledNoDeploy()
 				+ 1 /* Scaffold */;
 
 		int expectedNumTasks = inputFiles.size() * tasksPerFile + tasksPerSearch;
@@ -131,7 +131,7 @@ public class TestSearchRunner {
 				+ 1 /* RawDump */
 				+ 1 /* msmsEval */
 				+ 1 /* Fasta DB load (two different DBs) */
-				+ numEngines /* DB deploys */ - 3 /* TANDEM, MYRIMATCH, IDPICKER */;
+				+ numEngines /* DB deploys */ - getEnabledNoDeploy();
 
 		final int tasksPerSearch = 0
 				+ 1 /* Search DB load */
@@ -176,7 +176,7 @@ public class TestSearchRunner {
 				+ 1 /* msmsEval */;
 
 		final int tasksPerSearch = 0
-				+ numEngines /* DB deploys */ - 3 /* TANDEM, MYRIMATCH, IDPICKER */
+				+ numEngines /* DB deploys */ - getEnabledNoDeploy()
 				+ 1 /* One extra Sequest db deployment due to different protease */
 				+ 1 /* Search DB load */
 				+ 1 /* QA Task */
@@ -227,7 +227,7 @@ public class TestSearchRunner {
 				+ 1 /* QA Task */
 				+ 1 /* Scaffold report */
 
-				+ numEngines /* DB Deploys */ - 3 /* TANDEM, MYRIMATCH, IDPICKER */
+				+ numEngines /* DB Deploys */ - getEnabledNoDeploy()
 				+ 1 /* One extra DB deploy for Sequest */;
 
 		int expectedNumTasks = inputFiles.size() * tasksPerFile + tasksPerSearch;
@@ -360,6 +360,14 @@ public class TestSearchRunner {
 
 	private boolean dbDeployer(final String engineCode) {
 		return !("TANDEM".equals(engineCode) || "MYRIMATCH".equals(engineCode) || "IDPICKER".equals(engineCode));
+	}
+
+	/**
+	 * Number of enabled engines wiht no deployment
+	 * See {@link #dbDeployer(String)}.
+	 */
+	private int getEnabledNoDeploy() {
+		return 3; // TANDEM, MYRIMATCH, IDPICKER
 	}
 
 	private MappingFactory mappingFactory(final String code) {
