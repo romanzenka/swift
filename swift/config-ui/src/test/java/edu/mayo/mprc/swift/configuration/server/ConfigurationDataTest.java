@@ -48,7 +48,7 @@ public final class ConfigurationDataTest {
 		final ResourceModel swiftModule = daemon.getChildren().get(0);
 		Assert.assertEquals(swiftModule.getProperty("fastaPath"), "var/fasta", "The default value has to be set");
 
-		final ResourceConfig databaseConfig = getMainDaemon().getResources().get(0);
+		final ResourceConfig databaseConfig = getMainDaemon().getResources().get(1);
 		final String databaseId = data.getId(databaseConfig);
 		Assert.assertEquals(swiftModule.getProperty("database"), databaseId, "The database has to refer to actual database module");
 
