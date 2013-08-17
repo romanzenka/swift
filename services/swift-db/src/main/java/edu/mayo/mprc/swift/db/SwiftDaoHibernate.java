@@ -1,6 +1,7 @@
 package edu.mayo.mprc.swift.db;
 
 import com.google.common.base.Preconditions;
+import com.google.common.collect.Lists;
 import edu.mayo.mprc.MprcException;
 import edu.mayo.mprc.daemon.AssignedTaskData;
 import edu.mayo.mprc.daemon.files.FileTokenFactory;
@@ -228,7 +229,7 @@ public final class SwiftDaoHibernate extends DaoBase implements SwiftDao {
 		try {
 			final EnabledEngines result = new EnabledEngines();
 			result.setId(engines.getId());
-			for(final SearchEngineConfig searchEngineConfig : engines.getEngineConfigs()) {
+			for (final SearchEngineConfig searchEngineConfig : engines.getEngineConfigs()) {
 				result.add(addSearchEngineConfig(searchEngineConfig));
 			}
 			return updateCollection(result, result.getEngineConfigs(), "engineConfigs");
@@ -526,6 +527,39 @@ public final class SwiftDaoHibernate extends DaoBase implements SwiftDao {
 		renameFileReferences(from, to, "ReportData", "reportFile");
 		renameFileReferences(from, to, "SwiftSearchDefinition", "outputFolder");
 		renameFileReferences(from, to, "TandemMassSpectrometrySample", "file");
+	}
+
+	@Override
+	public List<SearchRun> findSearchRunsForFiles(final List<FileSearch> files) {
+		final Set<SearchRun> searchRuns = new HashSet<SearchRun>();
+		for (final FileSearch fileSearch : files) {
+			final List<Integer> searchDefinitions = (List<Integer>) getSession()
+					.createQuery("select distinct f.swiftSearchDefinitionId from FileSearch f where f.inputFile = :file")
+					.setParameter("file", fileSearch.getInputFile())
+					.list();
+			for (final Integer def : searchDefinitions) {
+				final List<SearchRun> runs = (List<SearchRun>) getSession()
+						.createQuery("from SearchRun s where s.swiftSearch = :id" +
+								" and s.hidden=0 and s.endTimestamp is not null and s.tasksFailed=0 and s.errorMessage is null and s.errorCode=0" +
+								" order by s.endTimestamp desc")
+						.setInteger("id", def)
+						.setMaxResults(1)
+						.list();
+				searchRuns.addAll(runs);
+			}
+		}
+		return Lists.newArrayList(searchRuns);
+	}
+
+	@Override
+	public boolean isFileInSearchRun(final String inputFile, final SearchRun run) {
+		final SwiftSearchDefinition swiftSearchDefinition = getSwiftSearchDefinition(run.getSwiftSearch());
+		for(final FileSearch fileSearch : swiftSearchDefinition.getInputFiles()) {
+			if(inputFile.equalsIgnoreCase(fileSearch.getInputFile().getPath())) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	private void renameFileReferences(final File from, final File to, final String table, final String field) {

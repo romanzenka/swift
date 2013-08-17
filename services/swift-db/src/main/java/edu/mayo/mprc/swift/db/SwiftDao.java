@@ -141,4 +141,24 @@ public interface SwiftDao extends Dao, RuntimeInitializer {
 	 * @param to   To where did the files move.
 	 */
 	void renameAllFileReferences(File from, File to);
+
+	/**
+	 * For a given list of files to be searched, list runs that:
+	 * 1) were successful
+	 * 2) are not hidden
+	 * 3) are the newest, in case multiple runs were executed with the same name
+	 *
+	 * @param files Files that have to be contained in the searches (at least one file)
+	 * @return All runs that touch on the given input files (sans broken/hidden/old ones)
+	 */
+	List<SearchRun> findSearchRunsForFiles(List<FileSearch> files);
+
+	/**
+	 * If the given input file is utilized in a given search run, return true.
+	 *
+	 * @param inputFile File to check for.
+	 * @param run       Search run that has to contain the file.
+	 * @return True if the file is being processed in the given search run.
+	 */
+	boolean isFileInSearchRun(String inputFile, SearchRun run);
 }

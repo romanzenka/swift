@@ -90,4 +90,16 @@ public interface SearchDbDao extends Dao {
 	 * @return Map from {@link ProteinSequenceList} id to list of accession numbers for that group.
 	 */
 	Map<Integer, List<String>> getAccessionNumbersMapForProteinSequences(Set<Integer> proteinSequenceLists);
+
+
+	/**
+	 * Return the number of protein groups identified for a specified raw file
+	 * for a list of reports.
+	 *
+	 * @param inputFile File to check
+	 * @param reports   Reports to check
+	 * @return How many protein groups were identified for the given input file in the first Scaffold report
+	 *         that contains the input file (there should be just one).
+	 */
+	int getScaffoldProteinGroupCount(String inputFile, Iterable<ReportData> reports);
 }

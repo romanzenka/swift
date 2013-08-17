@@ -10,6 +10,7 @@ import edu.mayo.mprc.fastadb.ProteinSequence;
 import edu.mayo.mprc.swift.db.SwiftDao;
 import edu.mayo.mprc.swift.dbmapping.ReportData;
 import edu.mayo.mprc.swift.dbmapping.SwiftSearchDefinition;
+import edu.mayo.mprc.utilities.FileUtilities;
 import edu.mayo.mprc.utilities.exceptions.ExceptionUtilities;
 import edu.mayo.mprc.utilities.progress.PercentDoneReporter;
 import edu.mayo.mprc.utilities.progress.UserProgressReporter;
@@ -18,6 +19,7 @@ import org.hibernate.criterion.Restrictions;
 import org.springframework.stereotype.Repository;
 
 import javax.annotation.Resource;
+import java.io.File;
 import java.util.*;
 
 /**
@@ -50,7 +52,7 @@ public final class SearchDbDaoHibernate extends DaoBase implements RuntimeInitia
 		return swiftDao;
 	}
 
-	@Resource(name="swiftDao")
+	@Resource(name = "swiftDao")
 	public void setSwiftDao(final SwiftDao swiftDao) {
 		this.swiftDao = swiftDao;
 	}
@@ -59,7 +61,7 @@ public final class SearchDbDaoHibernate extends DaoBase implements RuntimeInitia
 		return fastaDbDao;
 	}
 
-	@Resource(name="fastaDbDao")
+	@Resource(name = "fastaDbDao")
 	public void setFastaDbDao(final FastaDbDao fastaDbDao) {
 		this.fastaDbDao = fastaDbDao;
 	}
@@ -321,13 +323,13 @@ public final class SearchDbDaoHibernate extends DaoBase implements RuntimeInitia
 	}
 
 	@Override
-	public SwiftSearchDefinition getSearchDefinition(long analysisId) {
+	public SwiftSearchDefinition getSearchDefinition(final long analysisId) {
 		final Object searchDefinition = getSession().createQuery("select d from SwiftSearchDefinition d, Analysis a, ReportData r, SearchRun sr where " +
 				"r.searchRun = sr and sr.swiftSearch = d.id and a.reportData = r and a.id = :analysisId")
 				.setLong("analysisId", analysisId)
 				.uniqueResult();
-		if(searchDefinition instanceof SwiftSearchDefinition) {
-			return (SwiftSearchDefinition)searchDefinition;
+		if (searchDefinition instanceof SwiftSearchDefinition) {
+			return (SwiftSearchDefinition) searchDefinition;
 		} else {
 			ExceptionUtilities.throwCastException(searchDefinition, SwiftSearchDefinition.class);
 			return null;
@@ -390,7 +392,7 @@ public final class SearchDbDaoHibernate extends DaoBase implements RuntimeInitia
 	}
 
 	@Override
-	public Map<Integer, List<String>> getAccessionNumbersMapForProteinSequences(Set<Integer> proteinSequenceLists) {
+	public Map<Integer, List<String>> getAccessionNumbersMapForProteinSequences(final Set<Integer> proteinSequenceLists) {
 		final HashMap<Integer, List<String>> result = Maps.newHashMap();
 		final List list = getSession().createQuery("select distinct psl.id, pa.accnum from" +
 				" ProteinSequenceList as psl" +
@@ -427,7 +429,36 @@ public final class SearchDbDaoHibernate extends DaoBase implements RuntimeInitia
 	}
 
 	@Override
-	public TreeMap<Integer, ProteinSequenceList> getAllProteinSequences(Analysis analysis) {
+	public int getScaffoldProteinGroupCount(final String inputFile, final Iterable<ReportData> reports) {
+		for (final ReportData reportData : reports) {
+			final File reportFile = reportData.getReportFile();
+			if (isScaffoldReport(reportFile)) {
+				final Analysis analysis = getAnalysis(reportData.getId());
+				if (analysis != null) {
+					for (final BiologicalSample biologicalSample : analysis.getBiologicalSamples()) {
+						try {
+							for (final SearchResult searchResult : biologicalSample.getSearchResults()) {
+								if (inputFile.equals(searchResult.getMassSpecSample().getFile().getPath())) {
+									return searchResult.getProteinGroups().size();
+								}
+							}
+						} catch (Exception ignore) {
+							// SWALLOWED
+						}
+					}
+				}
+			}
+		}
+		return 0;
+	}
+
+	private boolean isScaffoldReport(final File reportFile) {
+		final String extension = FileUtilities.getExtension(reportFile.getName());
+		return "sf3".equalsIgnoreCase(extension) || "sfd".equalsIgnoreCase(extension);
+	}
+
+	@Override
+	public TreeMap<Integer, ProteinSequenceList> getAllProteinSequences(final Analysis analysis) {
 
 		final List list = getSession().createQuery("select distinct psl from" +
 				" Analysis a" +

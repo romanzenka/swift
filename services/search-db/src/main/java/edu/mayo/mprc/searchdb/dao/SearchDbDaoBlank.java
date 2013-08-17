@@ -15,34 +15,34 @@ import java.util.TreeMap;
  *
  * @author Roman Zenka
  */
-public class SearchDbDaoBlank implements SearchDbDao {
+public abstract class SearchDbDaoBlank implements SearchDbDao {
 	@Override
-	public Analysis addAnalysis(Analysis analysis, ReportData reportData, UserProgressReporter reporter) {
+	public Analysis addAnalysis(final Analysis analysis, final ReportData reportData, final UserProgressReporter reporter) {
 		throw new UnsupportedOperationException();
 	}
 
 	@Override
-	public Analysis getAnalysis(long reportId) {
+	public Analysis getAnalysis(final long reportId) {
 		throw new UnsupportedOperationException();
 	}
 
 	@Override
-	public SwiftSearchDefinition getSearchDefinition(long analysisId) {
+	public SwiftSearchDefinition getSearchDefinition(final long analysisId) {
 		return null;
 	}
 
 	@Override
-	public boolean hasAnalysis(long reportId) {
+	public boolean hasAnalysis(final long reportId) {
 		throw new UnsupportedOperationException();
 	}
 
 	@Override
-	public List<String> getProteinAccessionNumbers(ProteinSequenceList proteinSequenceList) {
+	public List<String> getProteinAccessionNumbers(final ProteinSequenceList proteinSequenceList) {
 		throw new UnsupportedOperationException();
 	}
 
 	@Override
-	public List<ReportData> getSearchesForAccessionNumber(String accessionNumber) {
+	public List<ReportData> getSearchesForAccessionNumber(final String accessionNumber) {
 		throw new UnsupportedOperationException();
 	}
 
@@ -52,23 +52,28 @@ public class SearchDbDaoBlank implements SearchDbDao {
 	}
 
 	@Override
-	public void getTandemMassSpectrometrySamples(QueryCallback callback) {
+	public void getTandemMassSpectrometrySamples(final QueryCallback callback) {
 		throw new UnsupportedOperationException();
 	}
 
 	@Override
-	public TandemMassSpectrometrySample updateTandemMassSpectrometrySample(TandemMassSpectrometrySample sample) {
+	public TandemMassSpectrometrySample updateTandemMassSpectrometrySample(final TandemMassSpectrometrySample sample) {
 		throw new UnsupportedOperationException();
 	}
 
 	@Override
-	public TreeMap<Integer, ProteinSequenceList> getAllProteinSequences(Analysis analysis) {
+	public TreeMap<Integer, ProteinSequenceList> getAllProteinSequences(final Analysis analysis) {
 		return null;
 	}
 
 	@Override
-	public Map<Integer, List<String>> getAccessionNumbersMapForProteinSequences(Set<Integer> proteinSequenceLists) {
+	public Map<Integer, List<String>> getAccessionNumbersMapForProteinSequences(final Set<Integer> proteinSequenceLists) {
 		return null;
+	}
+
+	@Override
+	public int getScaffoldProteinGroupCount(final String inputFile, final Iterable<ReportData> reports) {
+		return 0;
 	}
 
 	@Override
