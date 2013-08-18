@@ -90,13 +90,20 @@
     var filterManager;
 
     var user;
+    var title;
 
     function createFilters() {
-        var title = new FilterDropDown("title");
-        title.addRadioButtons("sort", "order", ["Sort A to Z", "Sort Z to A"], ["title ASC", "title DESC"], -1);
+        title = new FilterDropDown("title");
+        title.addRadioButtons("sort", "order", ["Sort A to Z", "Sort Z to A", "Do not sort"], ["1", "-1", "0"], -1);
         title.addSeparator();
+        title.addTextBox("filter", "where")
         title.addSeparator();
         title.addOkCancel();
+        title.onSubmitCallback = function() {
+            title.saveToCookies();
+            ajaxRequest('load');
+        };
+
         $('popups').appendChild(title.getRoot());
 
     <%
@@ -158,7 +165,7 @@
         $('popups').appendChild(results.getRoot());
 
         filters = [
-            new FilterButton('title', 'Title', null /*title*/),
+            new FilterButton('title', 'Title', title),
             new FilterButton('user', 'Owner', user),
             new FilterButton('submission', 'Submission', null /*submission*/),
             new FilterButton('duration', 'Duration', null /*duration*/),
@@ -187,6 +194,7 @@
                 expanded: displayer.listExpandedItems(),
                 timestamp : window.timestamp,
                 userfilter: user.getRequestString(),
+                titlefilter : title.getRequestString(),
                 showHidden: showHidden
             }
         });
@@ -211,6 +219,7 @@
         displayer.render();
 
         createFilters();
+
         var filterRow = document.getElementById('filterRow');
 
         for (var i = 0; i < window.filters.length; i++) {
@@ -219,7 +228,9 @@
 
         Event.observe('popupMask', 'click', closeForm);
 
+        title.loadFromCookies();
         user.loadFromCookies();
+
         ajaxRequest('load');
 
         periodicalUpdate = new PeriodicalExecuter(function(pe) { ajaxRequest('update'); }, updateDelay);

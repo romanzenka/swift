@@ -270,6 +270,41 @@ FilterDropDown.prototype.addRadioButtons = function(id, type, titleArray, sqlArr
     }
 };
 
+// The id is an id for the textbox (unique within this dropdown).
+FilterDropDown.prototype.addTextBox = function(id) {
+    var itemId = this.id + '_' + id;
+    var offset = 0;
+    this[id] = {
+        'type': "where",
+        'isFiltering' : function() {
+            return "" != this.textbox.value.trim();
+        },
+        'getFilterValue' : function() {
+            return this.textbox.value;
+        },
+        'removeS' : function() {
+            return false;
+        }};
+    this[id].storeValues = function() {
+        if (!this.storedValues)
+            this.storedValues = this.textbox.value;
+    };
+    this[id].restoreValues = function() {
+        this.textbox.value = this.storedValues;
+    };
+    this[id].saveToCookie = function() {
+        return this.textbox.value;
+    };
+    this[id].loadFromCookie = function(cookie) {
+        this.textbox.value = cookie;
+    };
+
+    new Insertion.Bottom(this.root,
+            '<li><input type="text" name="' + itemId + '" value="'+this.storedValues+'" id="' + itemId + '"></li>');
+    var inputs = this.root.getElementsByTagName('input');
+    this[id].textbox = inputs[inputs.length - 1];
+};
+
 FilterDropDown.prototype.addText = function(text) {
     new Insertion.Bottom(this.root, '<li>' + text + '</li>');
 };

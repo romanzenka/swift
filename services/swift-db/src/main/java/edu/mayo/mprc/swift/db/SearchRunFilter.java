@@ -2,6 +2,7 @@ package edu.mayo.mprc.swift.db;
 
 import edu.mayo.mprc.utilities.StringUtilities;
 import org.hibernate.Criteria;
+import org.hibernate.criterion.MatchMode;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
 
@@ -17,6 +18,8 @@ public final class SearchRunFilter {
 
 	private int userSortOrder;
 	private String userWhereClause;
+	private int titleSortOrder;
+	private String titleWhereClause;
 	private String start;
 	private String count;
 	private Date startDate;
@@ -54,6 +57,22 @@ public final class SearchRunFilter {
 		this.userWhereClause = userWhereClause;
 	}
 
+	public int getTitleSortOrder() {
+		return titleSortOrder;
+	}
+
+	public void setTitleSortOrder(int titleSortOrder) {
+		this.titleSortOrder = titleSortOrder;
+	}
+
+	public String getTitleWhereClause() {
+		return titleWhereClause;
+	}
+
+	public void setTitleWhereClause(String titleWhereClause) {
+		this.titleWhereClause = titleWhereClause;
+	}
+
 	public void setUserFilter(final String filter) {
 		if (filter == null) {
 			setUserSortOrder(0);
@@ -66,6 +85,22 @@ public final class SearchRunFilter {
 				setUserSortOrder(Integer.parseInt(keyValue[1]));
 			} else if ("filter".equals(keyValue[0]) && keyValue.length >= 2) {
 				setUserWhereClause(keyValue[1]);
+			}
+		}
+	}
+
+	public void setTitleFilter(final String filter) {
+		if (filter == null) {
+			setTitleSortOrder(0);
+			return;
+		}
+		final String[] parts = filter.split(";");
+		for (final String part : parts) {
+			final String[] keyValue = part.split("=");
+			if ("sort".equals(keyValue[0])) {
+				setTitleSortOrder(Integer.parseInt(keyValue[1]));
+			} else if ("filter".equals(keyValue[0]) && keyValue.length >= 2) {
+				setTitleWhereClause(keyValue[1]);
 			}
 		}
 	}
@@ -137,6 +172,9 @@ public final class SearchRunFilter {
 			submittingUserCriteria = criteria.createCriteria("submittingUser");
 			submittingUserCriteria.add(Restrictions.in("id", usersWhereClauseAsArray()));
 		}
+		if(!StringUtilities.stringEmpty(titleWhereClause)) {
+			criteria.add(Restrictions.like("title", titleWhereClause, MatchMode.ANYWHERE));
+		}
 		if (startDate != null) {
 			criteria.add(Restrictions.isNotNull("startTimestamp"));
 			criteria.add(Restrictions.ge("startTimestamp", startDate));
@@ -147,6 +185,16 @@ public final class SearchRunFilter {
 		}
 		if (!isShowHidden()) {
 			criteria.add(Restrictions.eq("hidden", 0));
+		}
+		switch(titleSortOrder) {
+			case -1:
+				criteria.addOrder(Order.desc("title"));
+				break;
+			case 1:
+				criteria.addOrder(Order.asc("title"));
+				break;
+			default:
+				// No order specified
 		}
 		switch (userSortOrder) {
 			case -1:

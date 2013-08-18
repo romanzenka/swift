@@ -117,6 +117,7 @@ public final class ReportUpdate implements HttpRequestHandler {
 			searchRunFilter.setCount(req.getParameter("count"));
 			searchRunFilter.setShowHidden(req.getParameter("showHidden") != null && "true".equals(req.getParameter("showHidden")));
 			searchRunFilter.setUserFilter(req.getParameter("userfilter"));
+			searchRunFilter.setTitleFilter(req.getParameter("titlefilter"));
 
 			final PrintWriter printOut = resp.getWriter();
 			out = new JsonWriter(printOut);
