@@ -404,7 +404,7 @@ a:hover.filter_button.filter.ztoa {
     border: 1px solid #ddf;
 }
 
-.rerun-link, .edit-link, .hide-link, .qa-link, .parent-dir-link, .analysis-data-link {
+.rerun-link, .edit-link, .hide-link, .qa-link, .diff-link, .parent-dir-link, .analysis-data-link {
     display: block;
     color: #fff;
     font-size: 1px;
@@ -427,6 +427,10 @@ a:hover.filter_button.filter.ztoa {
 
 .hide-link {
     background-image: url(search_hide.gif);
+}
+
+.diff-link {
+    background-image: url(search_diff.gif);
 }
 
 .parent-dir-link {

@@ -162,6 +162,14 @@ SearchRunItemVisualizer.prototype.fillWithContents = function(fragment, id, obje
                 editLink.href = "/start/?load=" + object.id;
                 editLink.title = "Edit " + object.id;
                 tdAction.appendChild(editLink);
+
+//                // Add a difference link
+//                diffLink = document.createElement("a");
+//                diffLink.appendChild(document.createTextNode("Hide"));
+//                diffLink.className = "diff-link";
+//                diffLink.href = "/search-diff?id=" + object.id;
+//                diffLink.title = "Differences for " + object.id;
+//                tdAction.appendChild(diffLink);
             }
 
             // Add a hide link

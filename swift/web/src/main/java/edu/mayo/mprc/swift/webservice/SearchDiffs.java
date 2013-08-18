@@ -42,6 +42,9 @@ public final class SearchDiffs {
 		try {
 			dao.begin();
 			final SearchRun searchRun = dao.getSearchRunForId(swiftSearchId);
+			if(searchRun.getSwiftSearch()==null) {
+				throw new MprcException("This search is not defined in the database");
+			}
 			final SwiftSearchDefinition swiftSearchDefinition = dao.getSwiftSearchDefinition(searchRun.getSwiftSearch());
 
 			// Translate the FileSearch objects into lightweight ones to be output

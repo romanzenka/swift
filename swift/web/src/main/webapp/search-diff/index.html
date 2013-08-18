@@ -9,6 +9,22 @@
         #fileTable tr:hover td.present {
             background-color: #e3f6e6;
         }
+        #fileTable thead tr th {
+            width: 2em;
+            height: 18em;
+            overflow-y: hidden;
+        }
+        #fileTable thead tr th .filename {
+            width: 0;
+            height: 0;
+            font-size: 12px;
+            /* FF Chrome Opera etc */
+            -webkit-transform: rotate(-90deg);
+            -moz-transform: rotate(-90deg);
+            -o-transform: rotate(-90deg);
+            /* IE */
+            filter: progid:DXImageTransform.Microsoft.BasicImage(rotation=1);
+        }
     </style>
     <!-- HTML5 shim, for IE6-8 support of HTML5 elements -->
     <!--[if lt IE 9]>
@@ -18,17 +34,31 @@
     <script type="text/javascript" src="/common/bootstrap/js/jquery_1.9.0.min.js"></script>
     <title>Search Difference</title>
     <script type="text/javascript">
-        var data = {"diffs":{"inputFiles":[{"id":1,"path":"/mnt/mprc/test/test1.RAW","name":"test1.RAW"},{"id":2,"path":"/mnt/mprc/test/test2.RAW","name":"test2.RAW"},{"id":3,"path":"/mnt/mprc/test/test_chicago/o63_13apr22_03_ltq90t10_tyeast200ng1.RAW","name":"o63_13apr22_03_ltq90t10_tyeast200ng1.RAW"},{"id":4,"path":"/mnt/mprc/test/test3.RAW","name":"test3.RAW"},{"id":5,"path":"/mnt/mprc/test/test4.RAW","name":"test4.RAW"},{"id":6,"path":"/mnt/mprc/test/testLarge1.RAW","name":"testLarge1.RAW"},{"id":7,"path":"/mnt/mprc/test/testLarge2.RAW","name":"testLarge2.RAW"},{"id":8,"path":"/mnt/mprc/test/testlarge3.RAW","name":"testlarge3.RAW"},{"id":9,"path":"/mnt/mprc/test/testLarge4.RAW","name":"testLarge4.RAW"},{"id":10,"path":"/mnt/mprc/test/test1.mgf","name":"test1.mgf"}],"searches":[{"id":220780,"title":"TestFromScratch"},{"id":220952,"title":"TestRoman638"},{"id":221052,"title":"TestChicago"},{"id":220777,"title":"TestLoadCompleteSP"},{"id":132413,"title":"carrieTest001"},{"id":192861,"title":"DeployNewDatabase"},{"id":219577,"title":"TestSequest17_2"},{"id":219847,"title":"TestRoman645"},{"id":219606,"title":"TestRoman340"},{"id":219694,"title":"TestRoman354"},{"id":219250,"title":"TestRoman560"},{"id":2387,"title":"testExport"},{"id":145506,"title":"TestRoman401"},{"id":219089,"title":"TestRoman413"},{"id":220973,"title":"TestSearchRemote3"},{"id":220482,"title":"TestRoman_DelphiMigration"},{"id":163428,"title":"Test506"},{"id":221096,"title":"Test2205"},{"id":220132,"title":"TestTrembl001"},{"id":220891,"title":"TestRoman624"},{"id":220011,"title":"TestRoman687"},{"id":156927,"title":"DeployCurrentSPHuman"},{"id":220964,"title":"TestNewDev"},{"id":164090,"title":"Test507"}],"results":{"1":{"220780":{"present":true,"proteinGroups":0},"220952":{"present":false,"proteinGroups":0},"221052":{"present":false,"proteinGroups":0},"220777":{"present":true,"proteinGroups":0},"132413":{"present":true,"proteinGroups":0},"192861":{"present":false,"proteinGroups":0},"219577":{"present":true,"proteinGroups":0},"219847":{"present":true,"proteinGroups":0},"219606":{"present":true,"proteinGroups":0},"219694":{"present":true,"proteinGroups":0},"219250":{"present":true,"proteinGroups":0},"2387":{"present":true,"proteinGroups":0},"219089":{"present":true,"proteinGroups":0},"145506":{"present":true,"proteinGroups":0},"220973":{"present":true,"proteinGroups":0},"220482":{"present":true,"proteinGroups":0},"220132":{"present":true,"proteinGroups":0},"221096":{"present":true,"proteinGroups":0},"163428":{"present":false,"proteinGroups":0},"156927":{"present":true,"proteinGroups":0},"220011":{"present":true,"proteinGroups":0},"220891":{"present":false,"proteinGroups":0},"164090":{"present":true,"proteinGroups":0},"220964":{"present":true,"proteinGroups":0}},"2":{"220780":{"present":false,"proteinGroups":0},"220952":{"present":true,"proteinGroups":4},"221052":{"present":true,"proteinGroups":3},"220777":{"present":false,"proteinGroups":0},"132413":{"present":false,"proteinGroups":0},"192861":{"present":true,"proteinGroups":0},"219577":{"present":false,"proteinGroups":0},"219847":{"present":true,"proteinGroups":0},"219606":{"present":false,"proteinGroups":0},"219694":{"present":true,"proteinGroups":0},"219250":{"present":false,"proteinGroups":0},"2387":{"present":true,"proteinGroups":0},"219089":{"present":false,"proteinGroups":0},"145506":{"present":false,"proteinGroups":0},"220973":{"present":true,"proteinGroups":0},"220482":{"present":false,"proteinGroups":0},"220132":{"present":false,"proteinGroups":0},"221096":{"present":false,"proteinGroups":0},"163428":{"present":true,"proteinGroups":0},"156927":{"present":false,"proteinGroups":0},"220011":{"present":false,"proteinGroups":0},"220891":{"present":true,"proteinGroups":0},"164090":{"present":true,"proteinGroups":0},"220964":{"present":false,"proteinGroups":0}},"3":{"220780":{"present":false,"proteinGroups":0},"220952":{"present":false,"proteinGroups":0},"221052":{"present":true,"proteinGroups":499},"220777":{"present":false,"proteinGroups":0},"132413":{"present":false,"proteinGroups":0},"192861":{"present":false,"proteinGroups":0},"219577":{"present":false,"proteinGroups":0},"219847":{"present":false,"proteinGroups":0},"219606":{"present":false,"proteinGroups":0},"219694":{"present":false,"proteinGroups":0},"219250":{"present":false,"proteinGroups":0},"2387":{"present":false,"proteinGroups":0},"219089":{"present":false,"proteinGroups":0},"145506":{"present":false,"proteinGroups":0},"220973":{"present":false,"proteinGroups":0},"220482":{"present":false,"proteinGroups":0},"220132":{"present":false,"proteinGroups":0},"221096":{"present":false,"proteinGroups":0},"163428":{"present":false,"proteinGroups":0},"156927":{"present":false,"proteinGroups":0},"220011":{"present":false,"proteinGroups":0},"220891":{"present":false,"proteinGroups":0},"164090":{"present":false,"proteinGroups":0},"220964":{"present":false,"proteinGroups":0}},"4":{"220780":{"present":false,"proteinGroups":0},"220952":{"present":false,"proteinGroups":0},"221052":{"present":false,"proteinGroups":0},"220777":{"present":false,"proteinGroups":0},"132413":{"present":false,"proteinGroups":0},"192861":{"present":false,"proteinGroups":0},"219577":{"present":false,"proteinGroups":0},"219847":{"present":true,"proteinGroups":0},"219606":{"present":false,"proteinGroups":0},"219694":{"present":false,"proteinGroups":0},"219250":{"present":false,"proteinGroups":0},"2387":{"present":true,"proteinGroups":0},"219089":{"present":false,"proteinGroups":0},"145506":{"present":false,"proteinGroups":0},"220973":{"present":false,"proteinGroups":0},"220482":{"present":false,"proteinGroups":0},"220132":{"present":false,"proteinGroups":0},"221096":{"present":false,"proteinGroups":0},"163428":{"present":false,"proteinGroups":0},"156927":{"present":false,"proteinGroups":0},"220011":{"present":false,"proteinGroups":0},"220891":{"present":false,"proteinGroups":0},"164090":{"present":false,"proteinGroups":0},"220964":{"present":false,"proteinGroups":0}},"5":{"220780":{"present":false,"proteinGroups":0},"220952":{"present":false,"proteinGroups":0},"221052":{"present":false,"proteinGroups":0},"220777":{"present":false,"proteinGroups":0},"132413":{"present":false,"proteinGroups":0},"192861":{"present":false,"proteinGroups":0},"219577":{"present":false,"proteinGroups":0},"219847":{"present":true,"proteinGroups":0},"219606":{"present":false,"proteinGroups":0},"219694":{"present":false,"proteinGroups":0},"219250":{"present":false,"proteinGroups":0},"2387":{"present":true,"proteinGroups":0},"219089":{"present":false,"proteinGroups":0},"145506":{"present":false,"proteinGroups":0},"220973":{"present":false,"proteinGroups":0},"220482":{"present":false,"proteinGroups":0},"220132":{"present":false,"proteinGroups":0},"221096":{"present":false,"proteinGroups":0},"163428":{"present":false,"proteinGroups":0},"156927":{"present":false,"proteinGroups":0},"220011":{"present":false,"proteinGroups":0},"220891":{"present":false,"proteinGroups":0},"164090":{"present":false,"proteinGroups":0},"220964":{"present":false,"proteinGroups":0}},"6":{"220780":{"present":false,"proteinGroups":0},"220952":{"present":false,"proteinGroups":0},"221052":{"present":false,"proteinGroups":0},"220777":{"present":false,"proteinGroups":0},"132413":{"present":false,"proteinGroups":0},"192861":{"present":false,"proteinGroups":0},"219577":{"present":false,"proteinGroups":0},"219847":{"present":true,"proteinGroups":0},"219606":{"present":false,"proteinGroups":0},"219694":{"present":false,"proteinGroups":0},"219250":{"present":false,"proteinGroups":0},"2387":{"present":false,"proteinGroups":0},"219089":{"present":false,"proteinGroups":0},"145506":{"present":false,"proteinGroups":0},"220973":{"present":false,"proteinGroups":0},"220482":{"present":false,"proteinGroups":0},"220132":{"present":false,"proteinGroups":0},"221096":{"present":false,"proteinGroups":0},"163428":{"present":false,"proteinGroups":0},"156927":{"present":false,"proteinGroups":0},"220011":{"present":false,"proteinGroups":0},"220891":{"present":true,"proteinGroups":0},"164090":{"present":false,"proteinGroups":0},"220964":{"present":false,"proteinGroups":0}},"7":{"220780":{"present":false,"proteinGroups":0},"220952":{"present":false,"proteinGroups":0},"221052":{"present":false,"proteinGroups":0},"220777":{"present":false,"proteinGroups":0},"132413":{"present":false,"proteinGroups":0},"192861":{"present":false,"proteinGroups":0},"219577":{"present":false,"proteinGroups":0},"219847":{"present":true,"proteinGroups":0},"219606":{"present":false,"proteinGroups":0},"219694":{"present":false,"proteinGroups":0},"219250":{"present":false,"proteinGroups":0},"2387":{"present":false,"proteinGroups":0},"219089":{"present":false,"proteinGroups":0},"145506":{"present":false,"proteinGroups":0},"220973":{"present":false,"proteinGroups":0},"220482":{"present":false,"proteinGroups":0},"220132":{"present":false,"proteinGroups":0},"221096":{"present":false,"proteinGroups":0},"163428":{"present":false,"proteinGroups":0},"156927":{"present":false,"proteinGroups":0},"220011":{"present":false,"proteinGroups":0},"220891":{"present":false,"proteinGroups":0},"164090":{"present":false,"proteinGroups":0},"220964":{"present":false,"proteinGroups":0}},"8":{"220780":{"present":false,"proteinGroups":0},"220952":{"present":false,"proteinGroups":0},"221052":{"present":false,"proteinGroups":0},"220777":{"present":false,"proteinGroups":0},"132413":{"present":false,"proteinGroups":0},"192861":{"present":false,"proteinGroups":0},"219577":{"present":false,"proteinGroups":0},"219847":{"present":true,"proteinGroups":0},"219606":{"present":false,"proteinGroups":0},"219694":{"present":false,"proteinGroups":0},"219250":{"present":false,"proteinGroups":0},"2387":{"present":false,"proteinGroups":0},"219089":{"present":false,"proteinGroups":0},"145506":{"present":false,"proteinGroups":0},"220973":{"present":false,"proteinGroups":0},"220482":{"present":false,"proteinGroups":0},"220132":{"present":false,"proteinGroups":0},"221096":{"present":false,"proteinGroups":0},"163428":{"present":false,"proteinGroups":0},"156927":{"present":false,"proteinGroups":0},"220011":{"present":false,"proteinGroups":0},"220891":{"present":false,"proteinGroups":0},"164090":{"present":false,"proteinGroups":0},"220964":{"present":false,"proteinGroups":0}},"9":{"220780":{"present":false,"proteinGroups":0},"220952":{"present":false,"proteinGroups":0},"221052":{"present":false,"proteinGroups":0},"220777":{"present":false,"proteinGroups":0},"132413":{"present":false,"proteinGroups":0},"192861":{"present":false,"proteinGroups":0},"219577":{"present":false,"proteinGroups":0},"219847":{"present":true,"proteinGroups":0},"219606":{"present":false,"proteinGroups":0},"219694":{"present":false,"proteinGroups":0},"219250":{"present":false,"proteinGroups":0},"2387":{"present":false,"proteinGroups":0},"219089":{"present":false,"proteinGroups":0},"145506":{"present":false,"proteinGroups":0},"220973":{"present":false,"proteinGroups":0},"220482":{"present":false,"proteinGroups":0},"220132":{"present":false,"proteinGroups":0},"221096":{"present":false,"proteinGroups":0},"163428":{"present":false,"proteinGroups":0},"156927":{"present":false,"proteinGroups":0},"220011":{"present":false,"proteinGroups":0},"220891":{"present":false,"proteinGroups":0},"164090":{"present":false,"proteinGroups":0},"220964":{"present":false,"proteinGroups":0}},"10":{"220780":{"present":false,"proteinGroups":0},"220952":{"present":false,"proteinGroups":0},"221052":{"present":false,"proteinGroups":0},"220777":{"present":false,"proteinGroups":0},"132413":{"present":false,"proteinGroups":0},"192861":{"present":false,"proteinGroups":0},"219577":{"present":false,"proteinGroups":0},"219847":{"present":false,"proteinGroups":0},"219606":{"present":false,"proteinGroups":0},"219694":{"present":false,"proteinGroups":0},"219250":{"present":false,"proteinGroups":0},"2387":{"present":false,"proteinGroups":0},"219089":{"present":false,"proteinGroups":0},"145506":{"present":false,"proteinGroups":0},"220973":{"present":false,"proteinGroups":0},"220482":{"present":true,"proteinGroups":0},"220132":{"present":false,"proteinGroups":0},"221096":{"present":false,"proteinGroups":0},"163428":{"present":false,"proteinGroups":0},"156927":{"present":false,"proteinGroups":0},"220011":{"present":false,"proteinGroups":0},"220891":{"present":true,"proteinGroups":0},"164090":{"present":false,"proteinGroups":0},"220964":{"present":false,"proteinGroups":0}}}}};
+        // Read a page's GET URL variables and return them as an associative array.
+        function getUrlVars()
+        {
+            var vars = [], hash;
+            var hashes = window.location.href.slice(window.location.href.indexOf('?') + 1).split('&');
+            for(var i = 0; i < hashes.length; i++)
+            {
+                hash = hashes[i].split('=');
+                vars.push(hash[0]);
+                vars[hash[0]] = hash[1];
+            }
+            return vars;
+        }
+
         // Convert the data, filling the #fileTable object
         function fillFileTable(data) {
             // Head row - list of all files
             head = $("#fileTable > thead");
-            head.innerHTML="";
-            headRow = head.append("<tr></tr>");
+            head.empty();
+            head.append("<tr></tr>");
+            headRow = $("#fileTable > thead > tr");
             headRow.append('<td></td>');
 
             $(data.diffs.inputFiles).each(function (index, file) {
-                headRow.append('<th>' + file.name + '</th>');
+                headRow.append('<th><div class="filename" title="'+file.name+'">' + file.name + '</div></th>');
             });
 
             // Body - for each search, protein group counts + extra
@@ -50,7 +80,13 @@
         }
 
         $(document).ready(function () {
-            fillFileTable(data);
+            id = getUrlVars()['id'];
+            $.get("/service/search-diffs.json",
+                    {'id' : id},
+                    function(data) {
+                        fillFileTable(data);
+                    },
+                    "json" );
         });
     </script>
 </head>
@@ -58,7 +94,7 @@
 <div class="container">
     <h1>Search Comparison</h1>
 <table id="fileTable" class="table table-bordered table-condensed table-hover">
-    <thead></thead>
+    <thead><tr><td><img src="/start/images/ajax-loader.gif"/></td></tr></thead>
     <tbody></tbody>
     <tfoot></tfoot>
 </table>
