@@ -2,7 +2,7 @@
 <!DOCTYPE hibernate-mapping PUBLIC
         "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
         "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
-<hibernate-mapping package="edu.mayo.mprc.searchdb.dao">
+<hibernate-mapping package="edu.mayo.mprc.searchdb.dao" default-lazy="true">
     <class name="PeptideSpectrumMatch" table="peptide_spectrum_match" mutable="false">
         <id name="id" type="integer" column="peptide_spectrum_match_id">
             <generator class="native"/>

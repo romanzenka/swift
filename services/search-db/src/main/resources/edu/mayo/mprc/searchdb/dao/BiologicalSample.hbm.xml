@@ -8,6 +8,6 @@
         </id>
         <property name="category" type="string" length="200" column="category"/>
         <property name="sampleName" type="string" length="200" column="sample_name"/>
-        <many-to-one name="searchResults" class="SearchResultList" column="search_result_list_id"/>
+        <many-to-one name="searchResults" class="SearchResultList" column="search_result_list_id" lazy="proxy"/>
     </class>
 </hibernate-mapping>

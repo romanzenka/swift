@@ -19,9 +19,9 @@
         <property name="startTime" type="org.joda.time.contrib.hibernate.PersistentDateTime" column="start_time"/>
         <property name="runTimeInSeconds" type="double" column="run_time_seconds"/>
         <property name="comment" type="text" column="comment"/> <!-- TODO: Make binary -->
-        <property name="tuneMethod" type="text" column="tune_method"/> <!-- TODO: Make binary -->
-        <property name="instrumentMethod" type="text" column="instrument_method"/> <!-- TODO: Make binary -->
-        <property name="sampleInformation" type="text" column="sample_information"/> <!-- TODO: Make binary -->
-        <property name="errorLog" type="text" column="error_log"/> <!-- TODO: Make binary -->
+        <property name="tuneMethod" type="text" column="tune_method" lazy="true"/> <!-- TODO: Make binary -->
+        <property name="instrumentMethod" type="text" column="instrument_method" lazy="true"/> <!-- TODO: Make binary -->
+        <property name="sampleInformation" type="text" column="sample_information" lazy="true"/> <!-- TODO: Make binary -->
+        <property name="errorLog" type="text" column="error_log" lazy="true"/> <!-- TODO: Make binary -->
     </class>
 </hibernate-mapping>

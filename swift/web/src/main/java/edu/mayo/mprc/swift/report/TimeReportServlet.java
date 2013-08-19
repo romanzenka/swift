@@ -74,7 +74,7 @@ public final class TimeReportServlet implements HttpRequestHandler {
 	}
 
 	private void printReport(final SearchRunFilter filter, final ServletOutputStream out, final char separator) throws IOException {
-		final List<SearchRun> searchRuns = swiftDao.getSearchRunList(filter);
+		final List<SearchRun> searchRuns = swiftDao.getSearchRunList(filter, false);
 		out.println("Search run" + separator + "Start time" + separator + "Elapsed time" + separator + "Consumed time" + separator + "Productive time");
 		for (final SearchRun searchRun : searchRuns) {
 			// TODO: Optimize this - fetch the task data for all search runs at once, do not order

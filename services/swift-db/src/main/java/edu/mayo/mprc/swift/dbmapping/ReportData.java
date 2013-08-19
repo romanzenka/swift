@@ -17,6 +17,7 @@ public class ReportData {
 	private File reportFile;
 	private DateTime dateCreated;
 	private SearchRun searchRun;
+	private Integer analysisId;
 
 
 	public ReportData() {
@@ -58,6 +59,14 @@ public class ReportData {
 
 	public void setSearchRun(final SearchRun searchRun) {
 		this.searchRun = searchRun;
+	}
+
+	public Integer getAnalysisId() {
+		return analysisId;
+	}
+
+	public void setAnalysisId(Integer analysisId) {
+		this.analysisId = analysisId;
 	}
 
 	public String toString() {

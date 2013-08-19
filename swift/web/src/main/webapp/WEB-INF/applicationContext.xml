@@ -66,6 +66,7 @@
 
     <bean id="AnalysisReport" class="edu.mayo.mprc.swift.report.AnalysisReport">
         <property name="searchDbDao" ref="searchDbDao"/>
+        <property name="swiftDao" ref="swiftDao"/>
     </bean>
 
     <bean id="FindProtein" class="edu.mayo.mprc.swift.report.FindProtein">

@@ -40,9 +40,10 @@ public interface SwiftDao extends Dao, RuntimeInitializer {
 	 * get the status information for all the search runs. The list is considered read-only - do not modify those searches.
 	 *
 	 * @param filter Filter for the search runs.
+	 * @param withReports If true, the reports for the search are fetched as well.
 	 * @return List of all search runs filtered and ordered as {@link SearchRunFilter specifies}.
 	 */
-	List<SearchRun> getSearchRunList(SearchRunFilter filter);
+	List<SearchRun> getSearchRunList(SearchRunFilter filter, boolean withReports);
 
 	/**
 	 * find number of running tasks for a search run

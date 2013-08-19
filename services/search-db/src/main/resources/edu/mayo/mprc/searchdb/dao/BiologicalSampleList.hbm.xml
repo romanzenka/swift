@@ -11,7 +11,7 @@
 
         <bag name="list" table="biological_sample_list_members" mutable="false">
             <key column="biological_sample_list_id"/>
-            <many-to-many column="biological_sample_id" class="BiologicalSample"/>
+            <many-to-many column="biological_sample_id" class="BiologicalSample" lazy="proxy"/>
         </bag>
     </class>
 </hibernate-mapping>

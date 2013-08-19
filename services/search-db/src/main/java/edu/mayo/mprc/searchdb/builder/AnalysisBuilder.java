@@ -89,7 +89,7 @@ public class AnalysisBuilder implements Builder<Analysis> {
 
 	@Override
 	public Analysis build() {
-		return new Analysis(reportData, scaffoldVersion, analysisDate, biologicalSamples.build());
+		return new Analysis(scaffoldVersion, analysisDate, biologicalSamples.build());
 	}
 
 	ProteinSequence getProteinSequence(final String accessionNumber, final String databaseSources) {

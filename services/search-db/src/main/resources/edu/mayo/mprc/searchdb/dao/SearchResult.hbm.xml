@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
         "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
-<hibernate-mapping package="edu.mayo.mprc.searchdb.dao">
+<hibernate-mapping package="edu.mayo.mprc.searchdb.dao" default-lazy="true">
     <class name="SearchResult" table="search_result" mutable="false">
         <id name="id" type="integer" column="search_result_id">
             <generator class="native"/>
         </id>
-        <many-to-one name="proteinGroups" class="ProteinGroupList" column="protein_group_list_id"/>
+        <many-to-one name="proteinGroups" class="ProteinGroupList" column="protein_group_list_id" lazy="proxy"/>
         <many-to-one name="massSpecSample" class="TandemMassSpectrometrySample" column="tandem_mass_spec_sample_id"
-                     not-null="false"/>
+                     not-null="false" lazy="proxy"/>
     </class>
 </hibernate-mapping>

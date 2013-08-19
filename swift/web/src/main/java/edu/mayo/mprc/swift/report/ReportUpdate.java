@@ -242,7 +242,7 @@ public final class ReportUpdate implements HttpRequestHandler {
 	 * @param filter Filter defining what search runs and how sorted to output.
 	 */
 	private void printSearchRuns(final JsonWriter out, final SearchRunFilter filter, final String method) {
-		final List<SearchRun> searchRuns = swiftDao.getSearchRunList(filter);
+		final List<SearchRun> searchRuns = swiftDao.getSearchRunList(filter, true);
 		final int firstSearchRun = 0;
 		final int lastSearchRun = Math.min(
 				filter.getCount() != null ? Integer.parseInt(filter.getCount()) : 0,
@@ -272,7 +272,7 @@ public final class ReportUpdate implements HttpRequestHandler {
 			reports.add(
 					new ReportInfo(report.getId(),
 							fileTokenFactory.fileToTaggedDatabaseToken(report.getReportFile()),
-							searchDbDao.hasAnalysis(report.getId())
+							report.getAnalysisId() != null
 					)
 			);
 		}
@@ -289,7 +289,7 @@ public final class ReportUpdate implements HttpRequestHandler {
 	 * @param filter    Filter defining what search runs and how sorted to output.
 	 */
 	private void updateSearchRuns(final JsonWriter out, final SearchRunFilter filter, final Date timestamp) {
-		final List<SearchRun> searchRuns = swiftDao.getSearchRunList(filter);
+		final List<SearchRun> searchRuns = swiftDao.getSearchRunList(filter, true);
 		final int firstSearchRun = filter.getStart() != null ? Integer.parseInt(filter.getStart()) : 0;
 		final int lastSearchRun = Math.min(firstSearchRun + (filter.getCount() != null ? Integer.parseInt(filter.getCount()) : searchRuns.size()), searchRuns.size());
 

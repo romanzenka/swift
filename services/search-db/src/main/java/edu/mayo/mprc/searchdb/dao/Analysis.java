@@ -2,7 +2,6 @@ package edu.mayo.mprc.searchdb.dao;
 
 import edu.mayo.mprc.database.PersistableBase;
 import edu.mayo.mprc.searchdb.Report;
-import edu.mayo.mprc.swift.dbmapping.ReportData;
 import edu.mayo.mprc.swift.dbmapping.SwiftSearchDefinition;
 import edu.mayo.mprc.swift.params2.StarMatcher;
 import edu.mayo.mprc.swift.params2.StarredProteins;
@@ -22,11 +21,6 @@ import java.util.*;
  */
 public final class Analysis extends PersistableBase {
 	private static final DecimalFormat PERCENT_FORMAT = new DecimalFormat("0.00%", DecimalFormatSymbols.getInstance(Locale.US));
-
-	/**
-	 * Which search report (read = Scaffold file) does this Analysis link to?
-	 */
-	private ReportData reportData;
 
 	/**
 	 * Scaffold version as a string. Can be null if the version could not be determined.
@@ -51,19 +45,10 @@ public final class Analysis extends PersistableBase {
 	public Analysis() {
 	}
 
-	public Analysis(final ReportData reportData, final String scaffoldVersion, final DateTime analysisDate, final BiologicalSampleList biologicalSamples) {
-		this.reportData = reportData;
+	public Analysis(final String scaffoldVersion, final DateTime analysisDate, final BiologicalSampleList biologicalSamples) {
 		this.scaffoldVersion = scaffoldVersion;
 		this.analysisDate = analysisDate;
 		this.biologicalSamples = biologicalSamples;
-	}
-
-	public ReportData getReportData() {
-		return reportData;
-	}
-
-	public void setReportData(final ReportData reportData) {
-		this.reportData = reportData;
 	}
 
 	public String getScaffoldVersion() {
@@ -168,9 +153,6 @@ public final class Analysis extends PersistableBase {
 		if (getBiologicalSamples() != null ? !getBiologicalSamples().equals(analysis.getBiologicalSamples()) : analysis.getBiologicalSamples() != null) {
 			return false;
 		}
-		if (getReportData() != null ? !getReportData().equals(analysis.getReportData()) : analysis.getReportData() != null) {
-			return false;
-		}
 		if (getScaffoldVersion() != null ? !getScaffoldVersion().equals(analysis.getScaffoldVersion()) : analysis.getScaffoldVersion() != null) {
 			return false;
 		}
@@ -180,8 +162,7 @@ public final class Analysis extends PersistableBase {
 
 	@Override
 	public int hashCode() {
-		int result = getReportData() != null ? getReportData().hashCode() : 0;
-		result = 31 * result + (getScaffoldVersion() != null ? getScaffoldVersion().hashCode() : 0);
+		int result = (getScaffoldVersion() != null ? getScaffoldVersion().hashCode() : 0);
 		result = 31 * result + (getAnalysisDate() != null ? getAnalysisDate().hashCode() : 0);
 		result = 31 * result + (getBiologicalSamples() != null ? getBiologicalSamples().hashCode() : 0);
 		return result;

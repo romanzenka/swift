@@ -24,10 +24,10 @@ public interface SearchDbDao extends Dao {
 	Analysis addAnalysis(Analysis analysis, ReportData reportData, UserProgressReporter reporter);
 
 	/**
-	 * @param reportId Id of {@link ReportData}
-	 * @return Analysis linked to a particular report (Scaffold .sf3 file).
+	 * @param analysisId Id of {@link Analysis}
+	 * @return Analysis of given id.
 	 */
-	Analysis getAnalysis(long reportId);
+	Analysis getAnalysis(int analysisId);
 
 	/**
 	 * Get parameters for Swift search that belongs to a particular analysis.
@@ -36,12 +36,6 @@ public interface SearchDbDao extends Dao {
 	 * @return Swift saerch definition.
 	 */
 	SwiftSearchDefinition getSearchDefinition(long analysisId);
-
-	/**
-	 * @param reportId Id of {@link ReportData} object.
-	 * @return True if the given report has {@link Analysis} data linked to it.
-	 */
-	boolean hasAnalysis(long reportId);
 
 	/**
 	 * List accession numbers for a protein group.

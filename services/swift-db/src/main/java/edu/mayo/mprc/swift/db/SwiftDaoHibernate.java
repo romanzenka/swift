@@ -15,6 +15,7 @@ import edu.mayo.mprc.workspace.User;
 import edu.mayo.mprc.workspace.WorkspaceDao;
 import org.apache.log4j.Logger;
 import org.hibernate.Criteria;
+import org.hibernate.FetchMode;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.criterion.Criterion;
@@ -96,10 +97,13 @@ public final class SwiftDaoHibernate extends DaoBase implements SwiftDao {
 	}
 
 	@Override
-	public List<SearchRun> getSearchRunList(final SearchRunFilter filter) {
+	public List<SearchRun> getSearchRunList(final SearchRunFilter filter, final boolean withReports) {
 		try {
 			final Criteria criteria = getSession().createCriteria(SearchRun.class);
 			filter.updateCriteria(criteria);
+			if (withReports) {
+				criteria.setFetchMode("reports", FetchMode.JOIN);
+			}
 			criteria.setCacheable(true)
 					.setReadOnly(true);
 
@@ -554,8 +558,8 @@ public final class SwiftDaoHibernate extends DaoBase implements SwiftDao {
 	@Override
 	public boolean isFileInSearchRun(final String inputFile, final SearchRun run) {
 		final SwiftSearchDefinition swiftSearchDefinition = getSwiftSearchDefinition(run.getSwiftSearch());
-		for(final FileSearch fileSearch : swiftSearchDefinition.getInputFiles()) {
-			if(inputFile.equalsIgnoreCase(fileSearch.getInputFile().getPath())) {
+		for (final FileSearch fileSearch : swiftSearchDefinition.getInputFiles()) {
+			if (inputFile.equalsIgnoreCase(fileSearch.getInputFile().getPath())) {
 				return true;
 			}
 		}

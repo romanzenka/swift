@@ -5,6 +5,8 @@ import edu.mayo.mprc.MprcException;
 import edu.mayo.mprc.searchdb.Report;
 import edu.mayo.mprc.searchdb.dao.Analysis;
 import edu.mayo.mprc.searchdb.dao.SearchDbDao;
+import edu.mayo.mprc.swift.db.SwiftDao;
+import edu.mayo.mprc.swift.dbmapping.ReportData;
 import edu.mayo.mprc.utilities.FileUtilities;
 import org.springframework.web.HttpRequestHandler;
 
@@ -21,6 +23,7 @@ import java.io.OutputStreamWriter;
  */
 public class AnalysisReport implements HttpRequestHandler {
 	private SearchDbDao searchDbDao;
+	private SwiftDao swiftDao;
 
 	@Override
 	public void handleRequest(final HttpServletRequest req, final HttpServletResponse resp) throws ServletException, IOException {
@@ -41,7 +44,8 @@ public class AnalysisReport implements HttpRequestHandler {
 
 			searchDbDao.begin();
 			try {
-				final Analysis analysis = searchDbDao.getAnalysis(reportId);
+				ReportData reportForId = getSwiftDao().getReportForId(reportId);
+				final Analysis analysis = searchDbDao.getAnalysis((int) (long) reportForId.getAnalysisId());
 
 				writer.write("<html><head><title>Scaffold Report</title>\n" +
 						"<link rel=\"stylesheet\" href=\"/report/analysis.css\" type=\"text/css\">\n" +
@@ -68,6 +72,14 @@ public class AnalysisReport implements HttpRequestHandler {
 
 	public void setSearchDbDao(SearchDbDao searchDbDao) {
 		this.searchDbDao = searchDbDao;
+	}
+
+	public SwiftDao getSwiftDao() {
+		return swiftDao;
+	}
+
+	public void setSwiftDao(SwiftDao swiftDao) {
+		this.swiftDao = swiftDao;
 	}
 }
 

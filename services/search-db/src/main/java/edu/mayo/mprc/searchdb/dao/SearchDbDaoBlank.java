@@ -22,18 +22,13 @@ public abstract class SearchDbDaoBlank implements SearchDbDao {
 	}
 
 	@Override
-	public Analysis getAnalysis(final long reportId) {
+	public Analysis getAnalysis(final int analysisId) {
 		throw new UnsupportedOperationException();
 	}
 
 	@Override
 	public SwiftSearchDefinition getSearchDefinition(final long analysisId) {
 		return null;
-	}
-
-	@Override
-	public boolean hasAnalysis(final long reportId) {
-		throw new UnsupportedOperationException();
 	}
 
 	@Override

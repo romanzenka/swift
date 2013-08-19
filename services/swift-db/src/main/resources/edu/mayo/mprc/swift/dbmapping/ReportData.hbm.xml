@@ -13,5 +13,6 @@
         <property name="dateCreated" type="org.joda.time.contrib.hibernate.PersistentDateTime" column="date_created"/>
         <many-to-one name="searchRun" class="SearchRun" column="transaction_id"
                      index="Report_transaction_index" not-null="true"/>
+        <property name="analysisId" type="int" column="analysis_id" not-null="false"/>
     </class>
 </hibernate-mapping>

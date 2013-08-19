@@ -44,7 +44,7 @@ public class JsonStatusFeeder implements HttpRequestHandler {
 			final StringBuilder response = new StringBuilder(TYPICAL_RESPONSE_SIZE);
 			response.append("[");
 
-			final List<SearchRun> searchRuns = swiftDao.getSearchRunList(searchRunFilter);
+			final List<SearchRun> searchRuns = swiftDao.getSearchRunList(searchRunFilter, false);
 			for (int i = 0; i < searchRuns.size(); i++) {
 				final SearchRun searchRun = searchRuns.get(i);
 				final int runningTasks = swiftDao.getNumberRunningTasksForSearchRun(searchRun);

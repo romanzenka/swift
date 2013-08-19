@@ -298,6 +298,7 @@ public final class SearchDbDaoHibernate extends DaoBase implements RuntimeInitia
 	@Override
 	public Analysis addAnalysis(final Analysis analysis, final ReportData reportData, final UserProgressReporter reporter) {
 
+		Analysis savedAnalysis = analysis;
 		if (analysis.getId() == null) {
 			final BiologicalSampleList originalList = analysis.getBiologicalSamples();
 			final PercentRangeReporter analysisRange = new PercentRangeReporter(new PercentDoneReporter(reporter, "Loading analysis into database: "), 0, 1);
@@ -310,22 +311,22 @@ public final class SearchDbDaoHibernate extends DaoBase implements RuntimeInitia
 					sampleNum++;
 				}
 				analysis.setBiologicalSamples(addSet(newList));
-				analysis.setReportData(reportData);
 			}
-			return save(analysis, analysisEqualityCriteria(analysis), false);
+			savedAnalysis = save(analysis, analysisEqualityCriteria(analysis), false);
 		}
+		reportData.setAnalysisId(savedAnalysis.getId());
 		return analysis;
 	}
 
 	@Override
-	public Analysis getAnalysis(final long reportId) {
-		return (Analysis) getSession().createCriteria(Analysis.class).add(Restrictions.eq("reportData.id", reportId)).uniqueResult();
+	public Analysis getAnalysis(final int analysisId) {
+		return (Analysis) getSession().createCriteria(Analysis.class).add(Restrictions.eq("id", analysisId)).uniqueResult();
 	}
 
 	@Override
 	public SwiftSearchDefinition getSearchDefinition(final long analysisId) {
-		final Object searchDefinition = getSession().createQuery("select d from SwiftSearchDefinition d, Analysis a, ReportData r, SearchRun sr where " +
-				"r.searchRun = sr and sr.swiftSearch = d.id and a.reportData = r and a.id = :analysisId")
+		final Object searchDefinition = getSession().createQuery("select d from SwiftSearchDefinition d, ReportData r, SearchRun sr where " +
+				"r.searchRun = sr and sr.swiftSearch = d.id and r.analysisId = :analysisId")
 				.setLong("analysisId", analysisId)
 				.uniqueResult();
 		if (searchDefinition instanceof SwiftSearchDefinition) {
@@ -334,12 +335,6 @@ public final class SearchDbDaoHibernate extends DaoBase implements RuntimeInitia
 			ExceptionUtilities.throwCastException(searchDefinition, SwiftSearchDefinition.class);
 			return null;
 		}
-	}
-
-	@Override
-	public boolean hasAnalysis(final long reportId) {
-		return (Long) getSession().createQuery("select count(*) from Analysis a where a.reportData.id =:reportId")
-				.setParameter("reportId", reportId).uniqueResult() > 0;
 	}
 
 	@Override
@@ -361,13 +356,14 @@ public final class SearchDbDaoHibernate extends DaoBase implements RuntimeInitia
 						" inner join sr.proteinGroups as pgl" +
 						" inner join pgl.list as pg" +
 						" inner join pg.proteinSequences as psl" +
-						" inner join psl.list as ps" +
-						" inner join a.reportData as rd," +
+						" inner join psl.list as ps, " +
+						" ReportData as rd," +
 						" ProteinEntry as pe" +
 						" inner join pe.accessionNumber as pac" +
 						" where pe.sequence = ps " +
+						" and rd.analysisId = a.id " +
 						" and pac.accnum = :accessionNumber" +
-						" order by rd.searchRun")
+						" order by rd.searchRun.startTimestamp")
 				.setParameter("accessionNumber", accessionNumber)
 				.list();
 	}
@@ -377,7 +373,7 @@ public final class SearchDbDaoHibernate extends DaoBase implements RuntimeInitia
 		return (List<Long>) getSession().createQuery("select rd.id from ReportData as rd where " +
 				"rd.searchRun.hidden=0 " +
 				"and rd.searchRun.swiftSearch is not null " +
-				"and not exists (from Analysis as a where a.reportData=rd) order by rd.dateCreated desc").list();
+				"and rd.analysisId is null order by rd.dateCreated desc").list();
 	}
 
 	@Override
@@ -433,7 +429,7 @@ public final class SearchDbDaoHibernate extends DaoBase implements RuntimeInitia
 		for (final ReportData reportData : reports) {
 			final File reportFile = reportData.getReportFile();
 			if (isScaffoldReport(reportFile)) {
-				final Analysis analysis = getAnalysis(reportData.getId());
+				final Analysis analysis = getAnalysis((int)(long)reportData.getAnalysisId());
 				if (analysis != null) {
 					for (final BiologicalSample biologicalSample : analysis.getBiologicalSamples()) {
 						try {
@@ -483,7 +479,6 @@ public final class SearchDbDaoHibernate extends DaoBase implements RuntimeInitia
 		return Restrictions.conjunction()
 				.add(nullSafeEq("scaffoldVersion", analysis.getScaffoldVersion()))
 				.add(nullSafeEq("analysisDate", analysis.getAnalysisDate()))
-				.add(nullSafeEq("reportData.id", analysis.getReportData().getId()))
 				.add(associationEq("biologicalSamples", analysis.getBiologicalSamples()));
 	}
 
