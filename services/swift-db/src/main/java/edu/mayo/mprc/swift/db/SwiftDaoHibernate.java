@@ -20,6 +20,7 @@ import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.LogicalExpression;
+import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.joda.time.DateTime;
 import org.springframework.stereotype.Repository;
@@ -103,6 +104,7 @@ public final class SwiftDaoHibernate extends DaoBase implements SwiftDao {
 			filter.updateCriteria(criteria);
 			if (withReports) {
 				criteria.setFetchMode("reports", FetchMode.JOIN);
+				criteria.setProjection(Projections.distinct(Projections.id()));
 			}
 			criteria.setCacheable(true)
 					.setReadOnly(true);

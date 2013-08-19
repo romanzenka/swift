@@ -10,6 +10,7 @@ import org.hibernate.Criteria;
 import org.hibernate.FetchMode;
 import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.Order;
+import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.joda.time.DateTime;
 import org.springframework.stereotype.Repository;
@@ -50,6 +51,7 @@ public final class WorkspaceDaoHibernate extends DaoBase implements WorkspaceDao
 					.setReadOnly(true);
 			if(withPreferences) {
 				criteria.setFetchMode("preferences", FetchMode.JOIN);
+				criteria.setProjection(Projections.distinct(Projections.id()));
 			}
 			return (List<User>)
 					criteria.list();
