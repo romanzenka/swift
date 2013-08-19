@@ -300,7 +300,7 @@ FilterDropDown.prototype.addTextBox = function(id) {
     };
 
     new Insertion.Bottom(this.root,
-            '<li><input type="text" name="' + itemId + '" value="'+this.storedValues+'" id="' + itemId + '"></li>');
+            '<li><input type="text" name="' + itemId + '" value="" id="' + itemId + '"></li>');
     var inputs = this.root.getElementsByTagName('input');
     this[id].textbox = inputs[inputs.length - 1];
 };
