@@ -26,7 +26,7 @@
         <property name="tasksWithWarning" column="tasks_with_warning"/>
         <property name="tasksFailed" column="tasks_failed"/>
         <property name="tasksCompleted" column="tasks_completed"/>
-        <set name="reports" inverse="true" lazy="false">
+        <set name="reports" inverse="true" lazy="true" batch-size="50">
             <key column="transaction_id"/>
             <one-to-many class="edu.mayo.mprc.swift.dbmapping.ReportData"/>
         </set>

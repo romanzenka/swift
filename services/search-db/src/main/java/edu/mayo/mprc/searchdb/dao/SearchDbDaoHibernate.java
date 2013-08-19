@@ -315,7 +315,7 @@ public final class SearchDbDaoHibernate extends DaoBase implements RuntimeInitia
 			savedAnalysis = save(analysis, analysisEqualityCriteria(analysis), false);
 		}
 		reportData.setAnalysisId(savedAnalysis.getId());
-		return analysis;
+		return savedAnalysis;
 	}
 
 	@Override
@@ -428,8 +428,8 @@ public final class SearchDbDaoHibernate extends DaoBase implements RuntimeInitia
 	public int getScaffoldProteinGroupCount(final String inputFile, final Iterable<ReportData> reports) {
 		for (final ReportData reportData : reports) {
 			final File reportFile = reportData.getReportFile();
-			if (isScaffoldReport(reportFile)) {
-				final Analysis analysis = getAnalysis((int)(long)reportData.getAnalysisId());
+			if (isScaffoldReport(reportFile) && reportData.getAnalysisId()!=null) {
+				final Analysis analysis = getAnalysis(reportData.getAnalysisId());
 				if (analysis != null) {
 					for (final BiologicalSample biologicalSample : analysis.getBiologicalSamples()) {
 						try {

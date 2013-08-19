@@ -17,7 +17,7 @@
         <!-- obsolete -->
         <property name="rights" column="rights"/>
 
-        <map name="preferences" table="user_preferences" cascade="all" lazy="true">
+        <map name="preferences" table="user_preferences" cascade="all" lazy="true" batch-size="50">
             <key column="user_id"/>
             <index column="preference_name" type="string" length="40"/>
             <element column="preference_value" type="text"/> <!-- TODO: Make binary -->
