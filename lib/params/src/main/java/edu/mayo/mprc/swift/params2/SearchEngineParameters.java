@@ -209,6 +209,10 @@ public class SearchEngineParameters extends PersistableBase {
 
 		final SearchEngineParameters other = (SearchEngineParameters) obj;
 
+		if (getId() != null && other.getId() != null) {
+			return getId().equals(other.getId());
+		}
+
 		if (!Objects.equal(getMissedCleavages(), other.getMissedCleavages())) {
 			return false;
 		}

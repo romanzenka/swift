@@ -111,7 +111,7 @@
     final StringBuilder userList=new StringBuilder();
     final StringBuilder idList = new StringBuilder();
     try {
-       final List<User> userInfos = SwiftWebContext.getServletConfig().getWorkspaceDao().getUsers();
+       final List<User> userInfos = SwiftWebContext.getServletConfig().getWorkspaceDao().getUsers(false);
        if (userInfos != null) {
            for (final User userInfo : userInfos) {
                if(userList.length()>0) {

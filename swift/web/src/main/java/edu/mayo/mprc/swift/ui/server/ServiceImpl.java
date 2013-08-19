@@ -106,7 +106,7 @@ public final class ServiceImpl extends SpringGwtServlet implements Service, Appl
 	public ClientUser[] listUsers() throws GWTServiceException {
 		try {
 			getWorkspaceDao().begin();
-			final List<User> users = getWorkspaceDao().getUsers();
+			final List<User> users = getWorkspaceDao().getUsers(true);
 
 			final ClientUser[] result;
 			if (users != null) {

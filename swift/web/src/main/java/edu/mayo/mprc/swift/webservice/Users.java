@@ -27,7 +27,7 @@ public final class Users {
 	public ModelAndView listUsers() {
 		try {
 			getWorkspaceDao().begin();
-			final List<User> users = getWorkspaceDao().getUsers();
+			final List<User> users = getWorkspaceDao().getUsers(false);
 			final ArrayList<edu.mayo.mprc.swift.webservice.User> result =
 					new ArrayList<edu.mayo.mprc.swift.webservice.User>(users.size());
 			for(User user : users) {

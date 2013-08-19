@@ -31,7 +31,7 @@ public final class WorkspaceDaoTest extends DaoTest {
 	public void getUserNamesTest() throws Throwable {
 		workspaceDao.begin();
 		try {
-			final List<User> users = workspaceDao.getUsers();
+			final List<User> users = workspaceDao.getUsers(false);
 			workspaceDao.commit();
 			Assert.assertTrue((users != null && users.size() == 0), "no user names should be found");
 		} catch (Exception t) {
@@ -46,7 +46,7 @@ public final class WorkspaceDaoTest extends DaoTest {
 		try {
 			final Change change = new Change("Test user added", new DateTime());
 			workspaceDao.addNewUser("Roman", "Zenka", "zenka.roman@mayo.edu", change);
-			final List<User> list = workspaceDao.getUsers();
+			final List<User> list = workspaceDao.getUsers(false);
 			workspaceDao.commit();
 			Assert.assertEquals(list.size(), 1, "One user has to be defined");
 			final User user = list.get(0);
@@ -61,7 +61,7 @@ public final class WorkspaceDaoTest extends DaoTest {
 	public void preferencesTest() throws Throwable {
 		workspaceDao.begin();
 		try {
-			final List<User> list = workspaceDao.getUsers();
+			final List<User> list = workspaceDao.getUsers(false);
 			final User user = list.get(0);
 			user.addPreference("likes", "coffee");
 			workspaceDao.commit();
@@ -72,7 +72,7 @@ public final class WorkspaceDaoTest extends DaoTest {
 
 		workspaceDao.begin();
 		try {
-			final List<User> list = workspaceDao.getUsers();
+			final List<User> list = workspaceDao.getUsers(false);
 			final User user = list.get(0);
 			Assert.assertEquals(user.getPreferences().get("likes"), "coffee");
 			workspaceDao.commit();

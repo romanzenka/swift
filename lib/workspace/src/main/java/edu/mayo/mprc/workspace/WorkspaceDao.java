@@ -10,8 +10,9 @@ public interface WorkspaceDao extends Dao, RuntimeInitializer {
 	/**
 	 * @return List of users recognized by the system. The user list should be treated as read-only - you cannot
 	 *         modify the user information.
+	 * @param withPreferences When set to true, the preference list is fetched as well
 	 */
-	List<User> getUsers();
+	List<User> getUsers(boolean withPreferences);
 
 	/**
 	 * @param email

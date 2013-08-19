@@ -61,11 +61,11 @@ public final class SearchDiffs {
 			final List<SearchRun> runs = dao.findSearchRunsForFiles(files);
 			final List<SwiftSearch> searches = new ArrayList<SwiftSearch>();
 			for (final SearchRun run : runs) {
-				final SwiftSearch runOutput = new SwiftSearch(run);
+				final SwiftSearchDefinition definition = dao.getSwiftSearchDefinition(run.getSwiftSearch());
+				final SwiftSearch runOutput = new SwiftSearch(run, definition);
 				searches.add(runOutput);
 
 				// Add newly discovered search files
-				final SwiftSearchDefinition definition = dao.getSwiftSearchDefinition(run.getSwiftSearch());
 				for (final FileSearch search : definition.getInputFiles()) {
 					boolean alreadyThere = false;
 					for (final InputFile inputFile : inputFiles) {

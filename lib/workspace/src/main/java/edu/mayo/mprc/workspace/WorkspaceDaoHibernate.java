@@ -6,7 +6,10 @@ import edu.mayo.mprc.database.Change;
 import edu.mayo.mprc.database.DaoBase;
 import edu.mayo.mprc.database.DatabasePlaceholder;
 import org.apache.log4j.Logger;
+import org.hibernate.Criteria;
+import org.hibernate.FetchMode;
 import org.hibernate.criterion.Criterion;
+import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
 import org.joda.time.DateTime;
 import org.springframework.stereotype.Repository;
@@ -36,16 +39,20 @@ public final class WorkspaceDaoHibernate extends DaoBase implements WorkspaceDao
 	 * scan list.
 	 *
 	 * @return List of users in "first last" order.
+	 * @param withPreferences
 	 */
 	@Override
-	public List<User> getUsers() {
+	public List<User> getUsers(final boolean withPreferences) {
 		try {
+			final Criteria criteria = allCriteria(User.class)
+					.addOrder(Order.asc("firstName"))
+					.addOrder(Order.asc("lastName"))
+					.setReadOnly(true);
+			if(withPreferences) {
+				criteria.setFetchMode("preferences", FetchMode.JOIN);
+			}
 			return (List<User>)
-					allCriteria(User.class)
-							.addOrder(org.hibernate.criterion.Order.asc("firstName"))
-							.addOrder(org.hibernate.criterion.Order.asc("lastName"))
-							.setReadOnly(true)
-							.list();
+					criteria.list();
 		} catch (Exception t) {
 			throw new MprcException("Cannot obtain list of users", t);
 		}
