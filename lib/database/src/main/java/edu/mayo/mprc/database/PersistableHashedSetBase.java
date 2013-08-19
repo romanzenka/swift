@@ -28,4 +28,15 @@ public class PersistableHashedSetBase<T extends PersistableBase> extends Persist
 	public void setHash(long hash) {
 		this.hash = hash;
 	}
+
+	@Override
+	public int hashCode() {
+		if (this.getId() != null) {
+			// We are serialized, that means immutable.
+			// We can use the saved hash value
+			return (int) getHash();
+		} else {
+			return super.hashCode();
+		}
+	}
 }
