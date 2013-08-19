@@ -165,7 +165,7 @@ SearchRunItemVisualizer.prototype.fillWithContents = function(fragment, id, obje
 
                 // Add a difference link
                 diffLink = document.createElement("a");
-                diffLink.appendChild(document.createTextNode("Hide"));
+                diffLink.appendChild(document.createTextNode("Diff"));
                 diffLink.className = "diff-link";
                 diffLink.href = "/search-diff?id=" + object.id;
                 diffLink.title = "Differences for " + object.id;

@@ -2,12 +2,14 @@ package edu.mayo.mprc.swift.webservice.diff;
 
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import edu.mayo.mprc.MprcException;
+import edu.mayo.mprc.swift.WebUi;
 import edu.mayo.mprc.swift.dbmapping.SearchEngineConfig;
 import edu.mayo.mprc.swift.dbmapping.SearchRun;
 import edu.mayo.mprc.swift.dbmapping.SwiftSearchDefinition;
 import edu.mayo.mprc.swift.params2.SearchEngineParameters;
 import edu.mayo.mprc.unimod.ModSpecificity;
 
+import java.io.File;
 import java.util.Date;
 import java.util.Set;
 
@@ -35,8 +37,9 @@ public final class SwiftSearch {
 	private final String scaffoldPeptideProbability;
 	private final String scaffoldMinimumPeptideCount;
 	private final String scaffoldMinimumNonTrypticTerminii;
+	private final String qaUrl;
 
-	public SwiftSearch(final SearchRun run, final SwiftSearchDefinition searchDefinition) {
+	public SwiftSearch(final SearchRun run, final SwiftSearchDefinition searchDefinition, final WebUi webUi) {
 		id = run.getId();
 		title = run.getTitle();
 		if (searchDefinition.getId() != run.getSwiftSearch()) {
@@ -58,16 +61,21 @@ public final class SwiftSearch {
 		scaffoldPeptideProbability = String.valueOf(100.0d * params.getScaffoldSettings().getPeptideProbability()) + "%";
 		scaffoldMinimumPeptideCount = String.valueOf(params.getScaffoldSettings().getMinimumPeptideCount());
 		scaffoldMinimumNonTrypticTerminii = String.valueOf(params.getScaffoldSettings().getMinimumNonTrypticTerminii());
+		if (searchDefinition.getOutputFolder() != null && searchDefinition.getOutputFolder().isDirectory()) {
+			qaUrl = webUi.fileToUserLink(new File(searchDefinition.getOutputFolder(), "qa/index.html"));
+		} else {
+			qaUrl = null;
+		}
 	}
 
 	private String[] enginesToString(final Set<SearchEngineConfig> engineConfigs) {
 		final String[] result = new String[engineConfigs.size()];
 		int i = 0;
 		for (final SearchEngineConfig config : engineConfigs) {
-			result[i] = config.getCode()+" "+config.getVersion();
+			result[i] = config.getCode() + " " + config.getVersion();
 			i++;
 		}
-		return  result;
+		return result;
 	}
 
 	private String[] modsToString(final Set<ModSpecificity> modifications) {
@@ -146,5 +154,9 @@ public final class SwiftSearch {
 
 	public String getScaffoldMinimumNonTrypticTerminii() {
 		return scaffoldMinimumNonTrypticTerminii;
+	}
+
+	public String getQaUrl() {
+		return qaUrl;
 	}
 }

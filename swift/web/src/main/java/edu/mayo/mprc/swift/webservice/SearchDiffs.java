@@ -2,6 +2,7 @@ package edu.mayo.mprc.swift.webservice;
 
 import edu.mayo.mprc.MprcException;
 import edu.mayo.mprc.searchdb.dao.SearchDbDao;
+import edu.mayo.mprc.swift.WebUiHolder;
 import edu.mayo.mprc.swift.db.SwiftDao;
 import edu.mayo.mprc.swift.dbmapping.FileSearch;
 import edu.mayo.mprc.swift.dbmapping.SearchRun;
@@ -33,6 +34,9 @@ public final class SearchDiffs {
 	@Resource(name = "searchDbDao")
 	private SearchDbDao searchDbDao;
 
+	@Resource(name = "webUiHolder")
+	private WebUiHolder webUiHolder;
+
 	public SearchDiffs() {
 	}
 
@@ -42,7 +46,7 @@ public final class SearchDiffs {
 		try {
 			dao.begin();
 			final SearchRun searchRun = dao.getSearchRunForId(swiftSearchId);
-			if(searchRun.getSwiftSearch()==null) {
+			if (searchRun.getSwiftSearch() == null) {
 				throw new MprcException("This search is not defined in the database");
 			}
 			final SwiftSearchDefinition swiftSearchDefinition = dao.getSwiftSearchDefinition(searchRun.getSwiftSearch());
@@ -62,7 +66,7 @@ public final class SearchDiffs {
 			final List<SwiftSearch> searches = new ArrayList<SwiftSearch>();
 			for (final SearchRun run : runs) {
 				final SwiftSearchDefinition definition = dao.getSwiftSearchDefinition(run.getSwiftSearch());
-				final SwiftSearch runOutput = new SwiftSearch(run, definition);
+				final SwiftSearch runOutput = new SwiftSearch(run, definition, getWebUiHolder().getWebUi());
 				searches.add(runOutput);
 
 				// Add newly discovered search files
@@ -126,5 +130,13 @@ public final class SearchDiffs {
 
 	public void setSearchDbDao(final SearchDbDao searchDbDao) {
 		this.searchDbDao = searchDbDao;
+	}
+
+	public WebUiHolder getWebUiHolder() {
+		return webUiHolder;
+	}
+
+	public void setWebUiHolder(WebUiHolder webUiHolder) {
+		this.webUiHolder = webUiHolder;
 	}
 }
