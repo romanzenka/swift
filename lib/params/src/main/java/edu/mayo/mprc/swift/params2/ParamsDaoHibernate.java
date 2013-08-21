@@ -224,6 +224,8 @@ public final class ParamsDaoHibernate extends DaoBase implements ParamsDao {
 				.add(Restrictions.eq("saveNoSpectra", scaffoldSettings.isSaveNoSpectra()))
 				.add(Restrictions.eq("connectToNCBI", scaffoldSettings.isConnectToNCBI()))
 				.add(Restrictions.eq("annotateWithGOA", scaffoldSettings.isAnnotateWithGOA()))
+				.add(Restrictions.eq("useFamilyProteinGrouping", scaffoldSettings.isUseFamilyProteinGrouping()))
+				.add(Restrictions.eq("useIndependentSampleGrouping", scaffoldSettings.isUseIndependentSampleGrouping()))
 				.add(associationEq("starredProteins", scaffoldSettings.getStarredProteins()));
 	}
 
