@@ -314,9 +314,6 @@ public final class MascotWorker extends WorkerBase {
 			throw new MprcException("Could not open .mgf file for Mascot search " + data, e);
 		}
 		final long length = dataLength + buffer.limit() + buffer2.limit() + buffer3.limit();
-		if (length > Integer.MAX_VALUE) {
-			throw new DaemonException("Too large data to post via HTTP: " + length + " bytes, maximum allowed is " + Integer.MAX_VALUE);
-		}
 
 		setupPOSTConnection((int) length);
 
