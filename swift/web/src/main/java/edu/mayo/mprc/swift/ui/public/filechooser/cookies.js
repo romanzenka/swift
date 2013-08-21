@@ -38,11 +38,11 @@ function findNextNotEscaped(s, c, startIndex) {
     var escapeMode = false;
     var foundIndex = -1;
     for (var i = startIndex; i < s.length; i++) {
-        if (s[i] == '\\') {
+        if (s.charAt(i) == '\\') {
             escapeMode = !escapeMode;
             continue;
         }
-        if (s[i] == c && !escapeMode) {
+        if (s.charAt(i) == c && !escapeMode) {
             foundIndex = i;
             break;
         }
@@ -57,13 +57,13 @@ function unescapeBackslashes(s) {
     var result = '';
     var escapeMode = false;
     for (var i = 0; i < s.length; i++) {
-        if (s[i] == '\\') {
+        if ('\\' == s.charAt(i)) {
             escapeMode = !escapeMode;
         } else {
             escapeMode = false;
         }
         if (!escapeMode) {
-            result = result + s[i];
+            result += s.charAt(i);
         }
     }
     return result;
