@@ -290,7 +290,9 @@ public final class ClientProxyGenerator {
 				scaffoldSettings.isSaveOnlyIdentifiedSpectra(),
 				scaffoldSettings.isSaveNoSpectra(),
 				scaffoldSettings.isConnectToNCBI(),
-				scaffoldSettings.isAnnotateWithGOA()
+				scaffoldSettings.isAnnotateWithGOA(),
+				scaffoldSettings.isUseIndependentSampleGrouping(),
+				scaffoldSettings.isUseFamilyProteinGrouping()
 		);
 	}
 
@@ -331,7 +333,9 @@ public final class ClientProxyGenerator {
 				scaffoldSettings.isSaveOnlyIdentifiedSpectra(),
 				scaffoldSettings.isSaveNoSpectra(),
 				scaffoldSettings.isConnectToNCBI(),
-				scaffoldSettings.isAnnotateWithGOA()
+				scaffoldSettings.isAnnotateWithGOA(),
+				scaffoldSettings.isUseIndependentSampleGrouping(),
+				scaffoldSettings.isUseFamilyProteinGrouping()
 		);
 	}
 

@@ -20,5 +20,7 @@
         <property name="saveNoSpectra" type="boolean" column="save_no_spectra"/>
         <property name="connectToNCBI" type="boolean" column="connect_to_ncbi"/>
         <property name="annotateWithGOA" type="boolean" column="annotate_with_goa"/>
+        <property name="useFamilyProteinGrouping" type="boolean" column="use_family_protein_grouping"/>
+        <property name="useIndependentSampleGrouping" type="boolean" column="use_independent_sample_grouping"/>
     </class>
 </hibernate-mapping>

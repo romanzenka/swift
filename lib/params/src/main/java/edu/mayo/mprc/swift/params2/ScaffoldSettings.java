@@ -18,6 +18,9 @@ public class ScaffoldSettings extends PersistableBase {
 	private boolean saveNoSpectra;
 	private boolean connectToNCBI;
 	private boolean annotateWithGOA;
+	private boolean useIndependentSampleGrouping;
+	private boolean useFamilyProteinGrouping;
+
 	public static final double PROBABILITY_PRECISION = 1E-5;
 
 	public ScaffoldSettings() {
@@ -35,10 +38,13 @@ public class ScaffoldSettings extends PersistableBase {
 			false,
 			false,
 			false,
-			false
+			false,
+			false,
+			true
 	);
 
-	public ScaffoldSettings(final double proteinProbability, final double peptideProbability, final int minimumPeptideCount, final int minimumNonTrypticTerminii, final StarredProteins starredProteins, final boolean saveOnlyIdentifiedSpectra, final boolean saveNoSpectra, final boolean connectToNCBI, final boolean annotateWithGOA) {
+	public ScaffoldSettings(final double proteinProbability, final double peptideProbability, final int minimumPeptideCount, final int minimumNonTrypticTerminii, final StarredProteins starredProteins, final boolean saveOnlyIdentifiedSpectra, final boolean saveNoSpectra, final boolean connectToNCBI, final boolean annotateWithGOA,
+	                        final boolean useIndependentSampleGrouping, final boolean useFamilyProteinGrouping) {
 		this.proteinProbability = proteinProbability;
 		this.peptideProbability = peptideProbability;
 		this.minimumPeptideCount = minimumPeptideCount;
@@ -48,6 +54,8 @@ public class ScaffoldSettings extends PersistableBase {
 		this.saveNoSpectra = saveNoSpectra;
 		this.connectToNCBI = connectToNCBI;
 		this.annotateWithGOA = annotateWithGOA;
+		this.useIndependentSampleGrouping = useIndependentSampleGrouping;
+		this.useFamilyProteinGrouping = useFamilyProteinGrouping;
 	}
 
 	public double getProteinProbability() {
@@ -122,6 +130,22 @@ public class ScaffoldSettings extends PersistableBase {
 		this.annotateWithGOA = annotateWithGOA;
 	}
 
+	public boolean isUseIndependentSampleGrouping() {
+		return useIndependentSampleGrouping;
+	}
+
+	public void setUseIndependentSampleGrouping(boolean useIndependentSampleGrouping) {
+		this.useIndependentSampleGrouping = useIndependentSampleGrouping;
+	}
+
+	public boolean isUseFamilyProteinGrouping() {
+		return useFamilyProteinGrouping;
+	}
+
+	public void setUseFamilyProteinGrouping(boolean useFamilyProteinGrouping) {
+		this.useFamilyProteinGrouping = useFamilyProteinGrouping;
+	}
+
 	@Override
 	public boolean equals(final Object obj) {
 		if (this == obj) {
@@ -140,7 +164,9 @@ public class ScaffoldSettings extends PersistableBase {
 				(Math.abs(this.getProteinProbability() - that.getProteinProbability()) <= PROBABILITY_PRECISION) &&
 				Objects.equal(this.isSaveNoSpectra(), that.isSaveNoSpectra()) &&
 				Objects.equal(this.isSaveOnlyIdentifiedSpectra(), that.isSaveOnlyIdentifiedSpectra()) &&
-				Objects.equal(this.getStarredProteins(), that.getStarredProteins());
+				Objects.equal(this.getStarredProteins(), that.getStarredProteins()) &&
+				Objects.equal(this.isUseIndependentSampleGrouping(), that.isUseIndependentSampleGrouping()) &&
+				Objects.equal(this.isUseFamilyProteinGrouping(), that.isUseFamilyProteinGrouping());
 	}
 
 	@Override
@@ -153,7 +179,9 @@ public class ScaffoldSettings extends PersistableBase {
 				isSaveOnlyIdentifiedSpectra(),
 				isSaveNoSpectra(),
 				isConnectToNCBI(),
-				isAnnotateWithGOA());
+				isAnnotateWithGOA(),
+				isUseIndependentSampleGrouping(),
+				isUseFamilyProteinGrouping());
 	}
 
 	public ScaffoldSettings copy() {
@@ -165,7 +193,9 @@ public class ScaffoldSettings extends PersistableBase {
 				this.isSaveOnlyIdentifiedSpectra(),
 				this.isSaveNoSpectra(),
 				this.isConnectToNCBI(),
-				this.isAnnotateWithGOA());
+				this.isAnnotateWithGOA(),
+				this.isUseIndependentSampleGrouping(),
+				this.isUseFamilyProteinGrouping());
 		scaffoldSettings.setId(getId());
 		return scaffoldSettings;
 	}

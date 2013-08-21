@@ -247,7 +247,7 @@ public final class ParamsDaoTest extends DaoTest {
 		params.setPeptideTolerance(new Tolerance("10 ppm"));
 		params.setFragmentTolerance(new Tolerance("0.5 Da"));
 		params.setExtractMsnSettings(new ExtractMsnSettings("-Z10", "extract_msn"));
-		params.setScaffoldSettings(new ScaffoldSettings(0.95, 0.95, 2, 2, null, true, true, true, true));
+		params.setScaffoldSettings(new ScaffoldSettings(0.95, 0.95, 2, 2, null, true, true, true, true, false, true, false));
 
 		Instrument instrument = getSimpleInstrument();
 		instrument = dao.updateInstrument(instrument, new Change("Updating instrument", new DateTime()));
@@ -275,7 +275,7 @@ public final class ParamsDaoTest extends DaoTest {
 
 		SearchEngineParameters params2 = new SearchEngineParameters();
 		params2.setExtractMsnSettings(new ExtractMsnSettings("-Z10", "extract_msn"));
-		params2.setScaffoldSettings(new ScaffoldSettings(0.95, 0.95, 2, 2, null, true, true, true, true));
+		params2.setScaffoldSettings(new ScaffoldSettings(0.95, 0.95, 2, 2, null, true, true, true, true, false, true, false));
 		params2.setDatabase(database);
 		params2.setFixedModifications(fixedMods);
 		params2.setVariableModifications(variableMods2);
@@ -289,7 +289,7 @@ public final class ParamsDaoTest extends DaoTest {
 
 		SearchEngineParameters params3 = new SearchEngineParameters();
 		params3.setExtractMsnSettings(new ExtractMsnSettings("-Z10", "extract_msn"));
-		params3.setScaffoldSettings(new ScaffoldSettings(0.95, 0.95, 2, 2, null, true, true, true, true));
+		params3.setScaffoldSettings(new ScaffoldSettings(0.95, 0.95, 2, 2, null, true, true, true, true, false, true, false));
 		params3.setDatabase(database);
 		params3.setFixedModifications(fixedMods);
 		params3.setVariableModifications(variableMods);

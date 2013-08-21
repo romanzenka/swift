@@ -18,11 +18,14 @@ public final class ClientScaffoldSettings implements ClientValue {
 	private boolean saveNoSpectra;
 	private boolean connectToNCBI;
 	private boolean annotateWithGOA;
+	private boolean useIndependentSampleGrouping;
+	private boolean useFamilyProteinGrouping;
 
 	public ClientScaffoldSettings() {
 	}
 
-	public ClientScaffoldSettings(final double proteinProbability, final double peptideProbability, final int minimumPeptideCount, final int minimumNonTrypticTerminii, final ClientStarredProteins starredProteins, final boolean saveOnlyIdentifiedSpectra, final boolean saveNoSpectra, final boolean connectToNCBI, final boolean annotateWithGOA) {
+	public ClientScaffoldSettings(final double proteinProbability, final double peptideProbability, final int minimumPeptideCount, final int minimumNonTrypticTerminii, final ClientStarredProteins starredProteins, final boolean saveOnlyIdentifiedSpectra, final boolean saveNoSpectra, final boolean connectToNCBI, final boolean annotateWithGOA,
+	                              final boolean useIndependentSampleGrouping, final boolean useFamilyProteinGrouping) {
 		this.proteinProbability = proteinProbability;
 		this.peptideProbability = peptideProbability;
 		this.minimumPeptideCount = minimumPeptideCount;
@@ -32,6 +35,8 @@ public final class ClientScaffoldSettings implements ClientValue {
 		this.saveNoSpectra = saveNoSpectra;
 		this.connectToNCBI = connectToNCBI;
 		this.annotateWithGOA = annotateWithGOA;
+		this.useIndependentSampleGrouping = useIndependentSampleGrouping;
+		this.useFamilyProteinGrouping = useFamilyProteinGrouping;
 	}
 
 	public double getProteinProbability() {
@@ -104,5 +109,21 @@ public final class ClientScaffoldSettings implements ClientValue {
 
 	public void setAnnotateWithGOA(final boolean annotateWithGOA) {
 		this.annotateWithGOA = annotateWithGOA;
+	}
+
+	public boolean isUseIndependentSampleGrouping() {
+		return useIndependentSampleGrouping;
+	}
+
+	public void setUseIndependentSampleGrouping(boolean useIndependentSampleGrouping) {
+		this.useIndependentSampleGrouping = useIndependentSampleGrouping;
+	}
+
+	public boolean isUseFamilyProteinGrouping() {
+		return useFamilyProteinGrouping;
+	}
+
+	public void setUseFamilyProteinGrouping(boolean useFamilyProteinGrouping) {
+		this.useFamilyProteinGrouping = useFamilyProteinGrouping;
 	}
 }

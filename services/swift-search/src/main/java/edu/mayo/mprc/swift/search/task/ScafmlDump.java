@@ -140,6 +140,8 @@ class ScafmlDump {
 
 		se.setConnectToNCBI(scaffoldSettings.isConnectToNCBI());
 		se.setAnnotateWithGOA(scaffoldSettings.isAnnotateWithGOA());
+		se.setUseFamilyProteinGrouping(scaffoldSettings.isUseFamilyProteinGrouping());
+		se.setUseIndependentSampleGrouping(scaffoldSettings.isUseIndependentSampleGrouping());
 
 		final StarredProteins star = scaffoldSettings.getStarredProteins();
 		final ScafmlExport export = new ScafmlExport(

@@ -27,6 +27,16 @@ public final class ScafmlExperiment extends FileHolder {
 	private boolean annotateWithGOA = true;
 	private boolean reportDecoyHits;
 
+	/**
+	 * If set to true, each sample column should appear exactly as if they were ran in separate Scaffolds.
+	 */
+	private boolean useIndependentSampleGrouping;
+
+	/**
+	 * If set to true, the protein families are produced
+	 */
+	private boolean useFamilyProteinGrouping = true;
+
 	public ScafmlExperiment(final String name) {
 		biologicalSamples = new LinkedHashMap<String, ScafmlBiologicalSample>(1);
 		scafmlFastaDatabases = new HashMap<String, ScafmlFastaDatabase>(1);
@@ -110,13 +120,31 @@ public final class ScafmlExperiment extends FileHolder {
 		this.reportDecoyHits = reportDecoyHits;
 	}
 
+	public boolean isUseIndependentSampleGrouping() {
+		return useIndependentSampleGrouping;
+	}
+
+	public void setUseIndependentSampleGrouping(boolean useIndependentSampleGrouping) {
+		this.useIndependentSampleGrouping = useIndependentSampleGrouping;
+	}
+
+	public boolean isUseFamilyProteinGrouping() {
+		return useFamilyProteinGrouping;
+	}
+
+	public void setUseFamilyProteinGrouping(boolean useFamilyProteinGrouping) {
+		this.useFamilyProteinGrouping = useFamilyProteinGrouping;
+	}
+
 	public void appendToDocument(final StringBuilder result, final String indent, final ScafmlScaffold scaffold) {
 		result
 				.append(indent)
 				.append("<" + "Experiment")
 				.append(XMLUtilities.wrapatt("name", this.getName()))
-				.append(XMLUtilities.wrapatt("connectToNCBI", connectToNCBI ? "true" : "false"))
-				.append(XMLUtilities.wrapatt("annotateWithGOA", annotateWithGOA ? "true" : "false"))
+				.append(XMLUtilities.wrapatt("connectToNCBI", isConnectToNCBI() ? "true" : "false"))
+				.append(XMLUtilities.wrapatt("annotateWithGOA", isAnnotateWithGOA() ? "true" : "false"))
+				.append(XMLUtilities.wrapatt("useIndependentSampleGrouping", isUseIndependentSampleGrouping() ? "true" : "false"))
+				.append(XMLUtilities.wrapatt("useFamilyProteinGrouping", isUseFamilyProteinGrouping() ? "true" : "false"))
 				.append(XMLUtilities.wrapatt("spectrumNameRegEx", "([^ /(]+\\.dta)"));
 
 		if (scaffold.getVersionMajor() >= 3) {
@@ -128,12 +156,12 @@ public final class ScafmlExperiment extends FileHolder {
 		result.append(">\n");
 
 		// now the fasta databases
-		for (final ScafmlFastaDatabase fd : this.scafmlFastaDatabases.values()) {
+		for (final ScafmlFastaDatabase fd : getDatabases()) {
 			fd.appendToDocument(result, indent + "\t", isReportDecoyHits());
 		}
 
 		// now the biological samples
-		for (final ScafmlBiologicalSample bios : biologicalSamples.values()) {
+		for (final ScafmlBiologicalSample bios : getBiologicalSamples()) {
 			bios.appendToDocument(result, indent + "\t");
 		}
 

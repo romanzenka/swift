@@ -11,22 +11,24 @@ import java.util.List;
 
 public final class ScaffoldSettingsEditor extends Composite implements Validatable, ChangeListener, ClickListener {
 	private ClientScaffoldSettings scaffoldSettings;
-	private ChangeListenerCollection changeListenerCollection = new ChangeListenerCollection();
-	private HorizontalPanel panel;
-	private ValidatedDoubleTextBox proteinProbability;
-	private ValidatedIntegerTextBox minPeptideCount;
-	private ValidatedDoubleTextBox peptideProbability;
+	private final ChangeListenerCollection changeListenerCollection = new ChangeListenerCollection();
+	private final HorizontalPanel panel;
+	private final ValidatedDoubleTextBox proteinProbability;
+	private final ValidatedIntegerTextBox minPeptideCount;
+	private final ValidatedDoubleTextBox peptideProbability;
 
-	private Label minNTTLabel;
-	private ValidatedIntegerTextBox minNTT;
+	private final Label minNTTLabel;
+	private final ValidatedIntegerTextBox minNTT;
 
-	private CheckBox starredCheckbox;
-	private Anchor starEditor;
-	private StarredProteinsDialog starredDialog;
+	private final CheckBox starredCheckbox;
+	private final Anchor starEditor;
+	private final StarredProteinsDialog starredDialog;
 
-	private CheckBox goAnnotations;
-	private Label saveSpectraLabel;
-	private ListBox saveSpectra;
+	private final CheckBox goAnnotations;
+	private final Label saveSpectraLabel;
+	private final ListBox saveSpectra;
+	private final CheckBox useIndependentSampleGrouping;
+	private final CheckBox useFamilyProteinGrouping;
 
 	public ScaffoldSettingsEditor() {
 		panel = new HorizontalPanel();
@@ -83,6 +85,26 @@ public final class ScaffoldSettingsEditor extends Composite implements Validatab
 		saveSpectra.addChangeListener(this);
 		panel.add(saveSpectra);
 
+		useIndependentSampleGrouping = new CheckBox("Independent Samples");
+		useIndependentSampleGrouping.setTitle("Samples will be reported as if they were processed in independent Scaffold runs");
+		useIndependentSampleGrouping.setStyleName("scaffold-setting-group");
+		useIndependentSampleGrouping.addClickListener(new ClickListener() {
+			public void onClick(final Widget sender) {
+				onChange(sender);
+			}
+		});
+		panel.add(useIndependentSampleGrouping);
+
+		useFamilyProteinGrouping = new CheckBox("Protein Families");
+		useFamilyProteinGrouping.setTitle("Scaffold will group proteins into families. New in Scaffold 4");
+		useFamilyProteinGrouping.setStyleName("scaffold-setting-group");
+		useFamilyProteinGrouping.addClickListener(new ClickListener() {
+			public void onClick(final Widget sender) {
+				onChange(sender);
+			}
+		});
+		panel.add(useFamilyProteinGrouping);
+
 		starredDialog = new StarredProteinsDialog();
 		starredDialog.setOkListener(new ClickListener() {
 			public void onClick(final Widget sender) {
@@ -111,6 +133,8 @@ public final class ScaffoldSettingsEditor extends Composite implements Validatab
 		goAnnotations.setChecked(scaffoldSettings.isAnnotateWithGOA());
 		saveSpectra.setSelectedIndex(scaffoldSettings.isSaveNoSpectra() ? 2 : (scaffoldSettings.isSaveOnlyIdentifiedSpectra() ? 1 : 0));
 		starredDialog.setValue(scaffoldSettings);
+		useIndependentSampleGrouping.setValue(scaffoldSettings.isUseIndependentSampleGrouping());
+		useFamilyProteinGrouping.setValue(scaffoldSettings.isUseFamilyProteinGrouping());
 	}
 
 	public void focus() {
@@ -136,6 +160,8 @@ public final class ScaffoldSettingsEditor extends Composite implements Validatab
 		minNTT.setEnabled(enabled);
 		starredCheckbox.setEnabled(enabled);
 		goAnnotations.setEnabled(enabled);
+		useFamilyProteinGrouping.setEnabled(enabled);
+		useIndependentSampleGrouping.setEnabled(enabled);
 		saveSpectra.setEnabled(enabled);
 	}
 
@@ -152,11 +178,13 @@ public final class ScaffoldSettingsEditor extends Composite implements Validatab
 		scaffoldSettings.setMinimumPeptideCount(minPeptideCount.getIntegerValue());
 		scaffoldSettings.setPeptideProbability(peptideProbability.getDoubleValue() / 100.0);
 		scaffoldSettings.setMinimumNonTrypticTerminii(minNTT.getIntegerValue());
-		scaffoldSettings.setAnnotateWithGOA(goAnnotations.isChecked());
-		scaffoldSettings.setConnectToNCBI(goAnnotations.isChecked());
+		scaffoldSettings.setAnnotateWithGOA(goAnnotations.getValue());
+		scaffoldSettings.setConnectToNCBI(goAnnotations.getValue());
 		scaffoldSettings.setSaveNoSpectra("none".equals(saveSpectra.getValue(saveSpectra.getSelectedIndex())));
 		scaffoldSettings.setSaveOnlyIdentifiedSpectra("id".equals(saveSpectra.getValue(saveSpectra.getSelectedIndex())));
 		starredCheckbox.setChecked(scaffoldSettings.getStarredProteins() != null);
+		scaffoldSettings.setUseIndependentSampleGrouping(useIndependentSampleGrouping.getValue());
+		scaffoldSettings.setUseFamilyProteinGrouping(useFamilyProteinGrouping.getValue());
 		fireChange();
 	}
 
