@@ -121,8 +121,9 @@ public final class MsconvertWorker extends WorkerBase {
 		if (ms2Profile) {
 			command.add("--filter");
 			command.add("peakPicking true 2-"); // Do peak picking on MS2 and higher
+		}
 
-		} else if(agilentData(rawFile)) {
+		if(ms2Profile || agilentData(rawFile)) {
 			command.add("--filter");
 			command.add("threshold absolute 0.1 most-intense"); // The peak-picked data have a lot of 0-intensity peaks. toss those
 		}
