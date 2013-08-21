@@ -154,7 +154,9 @@
                     '<th>Protein Prob.</th>' +
                     '<th>Min Peptides</th>' +
                     '<th>Peptide Prob.</th>' +
-                    '<th>NTT</th>');
+                    '<th>NTT</th>',
+                    '<th>Independent Samples</th>',
+                    '<th>Protein Families</th>');
 
             // Body - for each search, protein group counts + extra
             body = $("#searchSettingsTable > tbody");
@@ -178,6 +180,8 @@
                 row.append('<td>' + search.scaffoldMinimumPeptideCount + '</td>');
                 row.append('<td>' + search.scaffoldPeptideProbability + '</td>');
                 row.append('<td>' + search.scaffoldMinimumNonTrypticTerminii + '</td>');
+                row.append('<td>' + search.useIndependentSampleGrouping + '</td>');
+                row.append('<td>' + search.useFamilyProteinGrouping + '</td>');
                 body.append(row);
             });
         }

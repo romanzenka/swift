@@ -37,6 +37,8 @@ public final class SwiftSearch {
 	private final String scaffoldPeptideProbability;
 	private final String scaffoldMinimumPeptideCount;
 	private final String scaffoldMinimumNonTrypticTerminii;
+	private final boolean useIndependentSampleGrouping;
+	private final boolean useFamilyProteinGrouping;
 	private final String qaUrl;
 
 	public SwiftSearch(final SearchRun run, final SwiftSearchDefinition searchDefinition, final WebUi webUi) {
@@ -66,6 +68,8 @@ public final class SwiftSearch {
 		} else {
 			qaUrl = null;
 		}
+		useFamilyProteinGrouping = params.getScaffoldSettings().isUseFamilyProteinGrouping();
+		useIndependentSampleGrouping = params.getScaffoldSettings().isUseIndependentSampleGrouping();
 	}
 
 	private String[] enginesToString(final Set<SearchEngineConfig> engineConfigs) {
@@ -158,5 +162,13 @@ public final class SwiftSearch {
 
 	public String getQaUrl() {
 		return qaUrl;
+	}
+
+	public boolean isUseIndependentSampleGrouping() {
+		return useIndependentSampleGrouping;
+	}
+
+	public boolean isUseFamilyProteinGrouping() {
+		return useFamilyProteinGrouping;
 	}
 }
