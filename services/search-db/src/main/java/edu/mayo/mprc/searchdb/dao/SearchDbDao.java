@@ -79,11 +79,13 @@ public interface SearchDbDao extends Dao {
 	/**
 	 * Look at all protein given {@link ProteinSequenceList} ids. For each protein sequence list
 	 * load all accession numbers associated with it and put them in a map keyed by their id.
+	 * Only limit yourself to accession numbers from a given database.
 	 *
 	 * @param proteinSequenceLists Ids of protein sequence lists to load the ids for.
+	 * @param databaseId           Database to get the  accession numbers from. If null, all matching accnums are returned.
 	 * @return Map from {@link ProteinSequenceList} id to list of accession numbers for that group.
 	 */
-	Map<Integer, List<String>> getAccessionNumbersMapForProteinSequences(Set<Integer> proteinSequenceLists);
+	Map<Integer, List<String>> getAccessionNumbersMapForProteinSequences(Set<Integer> proteinSequenceLists, Integer databaseId);
 
 
 	/**

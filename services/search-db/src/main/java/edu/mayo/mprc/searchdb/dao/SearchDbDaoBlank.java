@@ -62,7 +62,7 @@ public abstract class SearchDbDaoBlank implements SearchDbDao {
 	}
 
 	@Override
-	public Map<Integer, List<String>> getAccessionNumbersMapForProteinSequences(final Set<Integer> proteinSequenceLists) {
+	public Map<Integer, List<String>> getAccessionNumbersMapForProteinSequences(final Set<Integer> proteinSequenceLists, final Integer databaseId) {
 		return null;
 	}
 

@@ -14,6 +14,7 @@ import edu.mayo.mprc.utilities.FileUtilities;
 import edu.mayo.mprc.utilities.exceptions.ExceptionUtilities;
 import edu.mayo.mprc.utilities.progress.PercentDoneReporter;
 import edu.mayo.mprc.utilities.progress.UserProgressReporter;
+import org.hibernate.Query;
 import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.Restrictions;
 import org.springframework.stereotype.Repository;
@@ -388,18 +389,23 @@ public final class SearchDbDaoHibernate extends DaoBase implements RuntimeInitia
 	}
 
 	@Override
-	public Map<Integer, List<String>> getAccessionNumbersMapForProteinSequences(final Set<Integer> proteinSequenceLists) {
+	public Map<Integer, List<String>> getAccessionNumbersMapForProteinSequences(final Set<Integer> proteinSequenceLists, final Integer databaseId) {
 		final HashMap<Integer, List<String>> result = Maps.newHashMap();
-		final List list = getSession().createQuery("select distinct psl.id, pa.accnum from" +
+		Query query = getSession().createQuery("select distinct psl.id, pa.accnum from" +
 				" ProteinSequenceList as psl" +
 				" inner join psl.list as ps," +
 				" ProteinEntry as pe," +
 				" ProteinAccnum as pa" +
 				" where pe.sequence = ps" +
 				" and pe.accessionNumber = pa" +
+				(databaseId != null ? " and pe.database.id = :databaseId" : "") +
 				" and psl.id in (:ids)")
-				.setParameterList("ids", proteinSequenceLists.toArray())
-				.list();
+				.setParameterList("ids", proteinSequenceLists.toArray());
+
+		if(databaseId!=null) {
+			query.setParameter("databaseId", databaseId);
+		}
+		final List list =  query.list();
 
 		int lastGroup = -1;
 		final Collection<String> numbers = new ArrayList<String>(20);
@@ -428,7 +434,7 @@ public final class SearchDbDaoHibernate extends DaoBase implements RuntimeInitia
 	public int getScaffoldProteinGroupCount(final String inputFile, final Iterable<ReportData> reports) {
 		for (final ReportData reportData : reports) {
 			final File reportFile = reportData.getReportFile();
-			if (isScaffoldReport(reportFile) && reportData.getAnalysisId()!=null) {
+			if (isScaffoldReport(reportFile) && reportData.getAnalysisId() != null) {
 				final Analysis analysis = getAnalysis(reportData.getAnalysisId());
 				if (analysis != null) {
 					for (final BiologicalSample biologicalSample : analysis.getBiologicalSamples()) {

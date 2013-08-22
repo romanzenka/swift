@@ -238,12 +238,14 @@ public final class Analysis extends PersistableBase {
 
 		/** Load all protein sequence lists */
 		final TreeMap<Integer, ProteinSequenceList> allProteinGroups = searchDbDao.getAllProteinSequences(this);
+		final Integer databaseId = (searchDefinition != null && searchDefinition.getSearchParameters() != null) &&
+				searchDefinition.getSearchParameters().getDatabase() != null ? searchDefinition.getSearchParameters().getDatabase().getId() : null;
 
 		final Map<
 				Integer/*protein sequence id*/,
 				List<String>/* accession numbers for the protein sequence  */
 				>
-				accnumMap = searchDbDao.getAccessionNumbersMapForProteinSequences(allProteinGroups.keySet());
+				accnumMap = searchDbDao.getAccessionNumbersMapForProteinSequences(allProteinGroups.keySet(), databaseId);
 
 		final List<TableRow> tableRows = collectTableRows(allProteinGroups, totalColumns, accnumMap, matcher);
 		Collections.sort(tableRows);
