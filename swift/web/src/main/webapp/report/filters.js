@@ -270,6 +270,12 @@ FilterDropDown.prototype.addRadioButtons = function(id, type, titleArray, sqlArr
     }
 };
 
+if (!String.prototype.trim) {
+  String.prototype.trim = function () {
+    return this.replace(/^\s+|\s+$/g, '');
+  };
+}
+
 // The id is an id for the textbox (unique within this dropdown).
 FilterDropDown.prototype.addTextBox = function(id) {
     var itemId = this.id + '_' + id;
@@ -277,7 +283,11 @@ FilterDropDown.prototype.addTextBox = function(id) {
     this[id] = {
         'type': "where",
         'isFiltering' : function() {
-            return "" != this.textbox.value.trim();
+            if(this.textbox.value) {
+                return this.textbox.value.trim() != "";
+            } else {
+                return false;
+            }
         },
         'getFilterValue' : function() {
             return this.textbox.value;
