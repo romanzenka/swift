@@ -68,7 +68,7 @@ public final class ServiceImpl extends SpringGwtServlet implements Service, Appl
 	private static final int SEARCH_TIMEOUT = 10 * 1000;
 
 	private static final ClientUser[] EMPTY_USER_LIST = new ClientUser[0];
-	private static final Pattern BAD_TITLE_CHARACTER = Pattern.compile("[^a-zA-Z0-9-+._()[\\\\]{}=# ]");
+	private static final Pattern BAD_TITLE_CHARACTER = Pattern.compile("[^a-zA-Z0-9-+._()\\[\\]{}=# ]");
 	public static final String AGILENT_FOLDER_SUFFIX = ".d";
 
 	private WebUiHolder webUiHolder;
@@ -271,12 +271,20 @@ public final class ServiceImpl extends SpringGwtServlet implements Service, Appl
 	}
 
 	private void validateSearch(final SwiftSearchDefinition swiftSearch) {
-		final Matcher badTitleMatcher = BAD_TITLE_CHARACTER.matcher(swiftSearch.getTitle());
-		if (swiftSearch.getTitle().length() == 0) {
+		String title = swiftSearch.getTitle();
+		if (title.length() == 0) {
 			throw new MprcException("Cannot run Swift search with an empty title");
 		}
+		validateTitleCharacters(title, "Search title");
+		for (final FileSearch fileSearch : swiftSearch.getInputFiles()) {
+			validateTitleCharacters(fileSearch.getExperiment(), "Experiment name " + fileSearch.getExperiment());
+		}
+	}
+
+	static void validateTitleCharacters(final String title, final String location) {
+		final Matcher badTitleMatcher = BAD_TITLE_CHARACTER.matcher(title);
 		if (badTitleMatcher.find()) {
-			throw new MprcException("Search title must not contain '" + badTitleMatcher.group() + "'");
+			throw new MprcException(location + " must not contain '" + badTitleMatcher.group() + "'");
 		}
 	}
 

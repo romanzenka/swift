@@ -1,6 +1,8 @@
 package edu.mayo.mprc.swift.ui.client;
 
 import com.google.gwt.core.client.EntryPoint;
+import com.google.gwt.regexp.shared.MatchResult;
+import com.google.gwt.regexp.shared.RegExp;
 import com.google.gwt.user.client.Cookies;
 import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.Window;
@@ -20,6 +22,7 @@ import java.util.Map;
 public final class SwiftApp implements EntryPoint, HidesPageContentsWhileLoading {
 
 	private static final String SELECT_USER_STRING = "<Select User>";
+	private static final RegExp TITLE_PROHIBITED = RegExp.compile("[^a-zA-Z0-9-+._()[\\\\]{}=# ]");
 
 	private ListBox users = new ListBox();
 	private TextBox title = new TextBox();
@@ -542,11 +545,31 @@ public final class SwiftApp implements EntryPoint, HidesPageContentsWhileLoading
 			updateUserMessage();
 			updateOutputLocation();
 
+			String titleText = title.getText();
+			MatchResult exec = TITLE_PROHIBITED.exec(titleText);
+			if (exec != null) {
+				Window.alert("The character " + exec.getGroup(0) + " is not allowed in search title");
+				title.setFocus(true);
+				return;
+			}
+
 			final String effectiveOutputPath = outputPathUserSpecified ? output.getText() : outputPath;
 			final String user = users.getValue(users.getSelectedIndex());
 
-			if ((effectiveOutputPath == null) || user.equals("") || user.equals(SELECT_USER_STRING) || files == null) {
-				Window.alert("No files, no title, or no user specified");
+			if (effectiveOutputPath == null) {
+				Window.alert("No title specified");
+				title.setFocus(true);
+				return;
+			}
+
+			if (files == null) {
+				Window.alert("No files added to the search");
+				return;
+			}
+
+			if ("".equals(user) || user.equals(SELECT_USER_STRING)) {
+				Window.alert("No user selected");
+				users.setFocus(true);
 				return;
 			}
 
