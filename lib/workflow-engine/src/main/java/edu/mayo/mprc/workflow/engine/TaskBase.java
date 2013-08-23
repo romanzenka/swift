@@ -59,6 +59,7 @@ public abstract class TaskBase implements Task {
 		this.engine = engine;
 	}
 
+	@Override
 	public void initialize() {
 		synchronized (stateLock) {
 			if (this.id == null && this.name != null) {
@@ -67,16 +68,19 @@ public abstract class TaskBase implements Task {
 		}
 	}
 
+	@Override
 	public WorkflowEngine getEngine() {
 		return engine;
 	}
 
+	@Override
 	public String getDescription() {
 		synchronized (stateLock) {
 			return description;
 		}
 	}
 
+	@Override
 	public void setDescription(final String description) {
 		synchronized (stateLock) {
 			this.description = description;
@@ -86,6 +90,7 @@ public abstract class TaskBase implements Task {
 		}
 	}
 
+	@Override
 	public void setName(final String name) {
 		final WorkflowEngine engineCopy = engine;
 		synchronized (stateLock) {
@@ -99,24 +104,28 @@ public abstract class TaskBase implements Task {
 		}
 	}
 
+	@Override
 	public String getName() {
 		synchronized (stateLock) {
 			return this.name;
 		}
 	}
 
+	@Override
 	public Date getBecameReady() {
 		synchronized (stateLock) {
 			return becameReady;
 		}
 	}
 
+	@Override
 	public Date getExecutionStarted() {
 		synchronized (stateLock) {
 			return executionStarted;
 		}
 	}
 
+	@Override
 	public Date getExecutionFinished() {
 		synchronized (stateLock) {
 			return executionFinished;
@@ -135,10 +144,12 @@ public abstract class TaskBase implements Task {
 		}
 	}
 
+	@Override
 	public String getExecutedOnHost() {
 		return executedOnHost;
 	}
 
+	@Override
 	public void setExecutedOnHost(final String executedOnHost) {
 		this.executedOnHost = executedOnHost;
 	}
@@ -185,6 +196,7 @@ public abstract class TaskBase implements Task {
 		}
 	}
 
+	@Override
 	public void setState(final TaskState newState) {
 		assert engine != null : "Cannot change task state if the task is not associtated with an engine" + this.getName() + " " + this.getDescription();
 		TaskState oldState = null;
@@ -211,12 +223,14 @@ public abstract class TaskBase implements Task {
 		engine.afterTaskStateChange(this, oldState, newState);
 	}
 
+	@Override
 	public TaskState getState() {
 		synchronized (stateLock) {
 			return state;
 		}
 	}
 
+	@Override
 	public boolean isFailed() {
 		synchronized (stateLock) {
 			return TaskState.INIT_FAILED == state ||
@@ -224,6 +238,7 @@ public abstract class TaskBase implements Task {
 		}
 	}
 
+	@Override
 	public boolean isSuccessful() {
 		synchronized (stateLock) {
 			return TaskState.COMPLETED_SUCCESFULLY == state ||
@@ -231,6 +246,7 @@ public abstract class TaskBase implements Task {
 		}
 	}
 
+	@Override
 	public boolean isDone() {
 		synchronized (stateLock) {
 			return TaskState.COMPLETED_SUCCESFULLY == state ||
@@ -240,12 +256,14 @@ public abstract class TaskBase implements Task {
 		}
 	}
 
+	@Override
 	public boolean stateEquals(final TaskState checkAgainst) {
 		synchronized (stateLock) {
 			return checkAgainst == state;
 		}
 	}
 
+	@Override
 	public void setError(final Throwable error) {
 		synchronized (stateLock) {
 			this.lastError = error;
@@ -262,14 +280,17 @@ public abstract class TaskBase implements Task {
 		}
 	}
 
+	@Override
 	public int getPriority() {
 		return priority;
 	}
 
+	@Override
 	public void setPriority(final int priority) {
 		this.priority = priority;
 	}
 
+	@Override
 	public Throwable getLastError() {
 		synchronized (stateLock) {
 			return lastError;
@@ -286,6 +307,7 @@ public abstract class TaskBase implements Task {
 		waitingForFileToAppear.set(true);
 	}
 
+	@Override
 	public void completeWhenFilesAppear(final File... files) {
 		setWaitForFiles();
 		FileUtilities.waitForFiles(Arrays.asList(files), new FileListener() {
@@ -303,6 +325,7 @@ public abstract class TaskBase implements Task {
 		setState(TaskState.COMPLETED_SUCCESFULLY);
 	}
 
+	@Override
 	public void addDependency(final Task task) {
 		if (task != null) {
 			if (!task.getOutputs().contains(this)) {
@@ -312,6 +335,7 @@ public abstract class TaskBase implements Task {
 		}
 	}
 
+	@Override
 	public void inputDone(final Task input) {
 		assert getState() == TaskState.UNINITIALIZED : "Only uninitialized tasks are interested in their inputs. This task is in state " + getState().getText();
 		// If the input failed, keep a note
@@ -334,14 +358,17 @@ public abstract class TaskBase implements Task {
 		}
 	}
 
+	@Override
 	public List<Task> getInputs() {
 		return inputs;
 	}
 
+	@Override
 	public List<Task> getOutputs() {
 		return outputs;
 	}
 
+	@Override
 	public String getFullId() {
 		final WorkflowEngine engineCopy = this.engine;
 		synchronized (stateLock) {

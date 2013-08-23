@@ -298,6 +298,7 @@ public final class SearchEngine implements Comparable<SearchEngine>, Serializabl
 				+ 31 * getVersion().hashCode();
 	}
 
+	@Override
 	public int compareTo(final SearchEngine o) {
 		final int comparison = getCode().compareTo(o.getCode());
 		return comparison == 0 ? getVersion().compareTo(o.getVersion()) : comparison;

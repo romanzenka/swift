@@ -32,6 +32,7 @@ class JmsRequest implements Request {
 	/**
 	 * Acknowledge to the JMS broker that the request has been processed.
 	 */
+	@Override
 	public void processed() {
 		try {
 			objectMessage.acknowledge();
@@ -40,6 +41,7 @@ class JmsRequest implements Request {
 		}
 	}
 
+	@Override
 	public Serializable getMessageData() {
 		try {
 			return objectMessage.getObject();
@@ -48,6 +50,7 @@ class JmsRequest implements Request {
 		}
 	}
 
+	@Override
 	public void sendResponse(final Serializable response, final boolean isLast) {
 		assert !lastResponseSent : "Last response was already sent.";
 		lastResponseSent = isLast;

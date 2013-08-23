@@ -177,7 +177,7 @@ public final class FileUtilitiesTest {
 	public void shouldListFolderContentsLong() throws IOException {
 		final File folder = FileUtilities.createTempFolder();
 		for (int i = 1; i < 50; i++) {
-			FileUtilities.ensureFolderExists(new File(folder, "a" + String.valueOf(i)));
+			FileUtilities.ensureFolderExists(new File(folder, "a" + i));
 		}
 		FileUtilities.ensureFolderExists(new File(folder, "b"));
 

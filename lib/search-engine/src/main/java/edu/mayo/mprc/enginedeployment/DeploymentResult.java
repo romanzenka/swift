@@ -79,7 +79,7 @@ public class DeploymentResult extends FileHolder implements ProgressInfo {
 	}
 
 	public synchronized CompositeException getCompositeException() {
-		if (this.exceptions.size() == 0) {
+		if (this.exceptions.isEmpty()) {
 			return null;
 		}
 		return new CompositeException(this.exceptions);

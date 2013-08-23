@@ -21,6 +21,7 @@ public abstract class ValidatableListBox extends ListBox implements Validatable 
 		this.param = param;
 	}
 
+	@Override
 	public void focus() {
 		super.setFocus(true);
 	}
@@ -30,6 +31,7 @@ public abstract class ValidatableListBox extends ListBox implements Validatable 
 	 *
 	 * @return the selected values bundled into a
 	 */
+	@Override
 	public ClientValue getClientValue() {
 		if (allowedValues == null) {
 			return null;
@@ -55,6 +57,7 @@ public abstract class ValidatableListBox extends ListBox implements Validatable 
 	 *
 	 * @param values
 	 */
+	@Override
 	public void setAllowedValues(final List<? extends ClientValue> values) {
 		if (values.equals(allowedValues)) {
 			return;
@@ -79,6 +82,7 @@ public abstract class ValidatableListBox extends ListBox implements Validatable 
 		return this.allowedValues;
 	}
 
+	@Override
 	public void setValidationSeverity(final int validationSeverity) {
 		ValidationController.setValidationSeverity(validationSeverity, this);
 	}
@@ -180,6 +184,7 @@ public abstract class ValidatableListBox extends ListBox implements Validatable 
 	 *
 	 * @param value
 	 */
+	@Override
 	public void setValue(final ClientValue value) {
 		if (isMultipleSelect()) {
 			if (value != null) {

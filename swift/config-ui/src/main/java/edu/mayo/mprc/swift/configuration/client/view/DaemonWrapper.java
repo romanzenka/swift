@@ -68,6 +68,7 @@ public final class DaemonWrapper extends SimplePanel {
 		newModuleButton = new Button("Add new module");
 		newModuleButton.addStyleName("new-module-button");
 		newModuleButton.addClickListener(new ClickListener() {
+			@Override
 			public void onClick(final Widget sender) {
 				final int index = newModulePicker.getSelectedIndex();
 				final String type = newModulePicker.getValue(index);
@@ -101,20 +102,25 @@ public final class DaemonWrapper extends SimplePanel {
 	}
 
 	private class MyDaemonModelListener implements ResourceModelListener {
+		@Override
 		public void initialized(final ResourceModel model) {
 		}
 
+		@Override
 		public void nameChanged(final ResourceModel model) {
 		}
 
+		@Override
 		public void childAdded(final ResourceModel child, final ResourceModel addedTo) {
 			addUiForResource(child);
 		}
 
+		@Override
 		public void childRemoved(final ResourceModel child, final ResourceModel removedFrom) {
 			removeUiForResource(child);
 		}
 
+		@Override
 		public void propertyChanged(final ResourceModel model, final String propertyName, final String newValue) {
 			daemonConfigUI.loadUI((DaemonModel) model);
 		}

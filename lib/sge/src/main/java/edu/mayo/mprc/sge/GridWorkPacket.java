@@ -151,7 +151,7 @@ public class GridWorkPacket {
 	}
 
 	public String getParametersAsCallString() {
-		if (this.parameters == null || this.parameters.size() == 0) {
+		if (this.parameters == null || this.parameters.isEmpty()) {
 			return "";
 		}
 		return Joiner.on(" ").join(this.parameters);

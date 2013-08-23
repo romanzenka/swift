@@ -55,6 +55,7 @@ public final class SimpleStringTextFilter implements TextFilter {
 	 * @param toTest the string you want to see if the criteria is contained within
 	 * @return <code>true</code> if toTest contains the criteria else <code>false</code>
 	 */
+	@Override
 	public boolean matches(final String toTest) {
 
 		//we want to ignore case so make lower case
@@ -87,6 +88,7 @@ public final class SimpleStringTextFilter implements TextFilter {
 	/**
 	 * {@inheritDoc}
 	 */
+	@Override
 	public void setMatchMode(final MatchMode mode) {
 		this.mode = mode;
 	}
@@ -97,8 +99,9 @@ public final class SimpleStringTextFilter implements TextFilter {
 	 *
 	 * @return a message indicating any problem so it should always return TextFilter.VALID
 	 */
+	@Override
 	public String testCriteria() {
-		if (this.criteria == null || this.criteria.size() == 0) {
+		if (this.criteria == null || this.criteria.isEmpty()) {
 			return "Enter a criteria string";
 		}
 		return TextFilter.VALID;

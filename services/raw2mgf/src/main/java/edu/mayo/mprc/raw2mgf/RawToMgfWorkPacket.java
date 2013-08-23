@@ -66,6 +66,7 @@ public final class RawToMgfWorkPacket extends WorkPacketBase implements Cachable
 		return isPublicAccess();
 	}
 
+	@Override
 	public File getOutputFile() {
 		return outputFile;
 	}

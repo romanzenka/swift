@@ -335,7 +335,7 @@ final class UnimodOmssaConverter {
 	}
 
 	protected static Character getSite(final String modType, final String residue) {
-		if (residue == null || residue.length() == 0) {
+		if (residue == null || residue.isEmpty()) {
 			if (!modType.endsWith("aa")) {
 				return '*';
 			} else {

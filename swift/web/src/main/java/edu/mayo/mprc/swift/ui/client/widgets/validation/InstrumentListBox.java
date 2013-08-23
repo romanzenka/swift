@@ -16,6 +16,7 @@ public final class InstrumentListBox extends ValidatableListBox {
 		super(param, false);
 	}
 
+	@Override
 	public String getStringValue(final ClientValue value) {
 		if (value == null) {
 			return "";
@@ -27,10 +28,12 @@ public final class InstrumentListBox extends ValidatableListBox {
 		return csd.getName();
 	}
 
+	@Override
 	public ClientValue bundle(final List<? extends ClientValue> selected) {
 		return null;//unused
 	}
 
+	@Override
 	public List<? extends ClientValue> unbundle(final ClientValue value) {
 		return EMPTY_VALUE; // unused
 	}
@@ -40,6 +43,7 @@ public final class InstrumentListBox extends ValidatableListBox {
 	 *
 	 * @return null if we do not want new list of allowed values (instruments).
 	 */
+	@Override
 	public boolean needsAllowedValues() {
 		return allowedValues == null || allowedValues.isEmpty();
 	}

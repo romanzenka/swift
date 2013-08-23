@@ -92,10 +92,12 @@ public final class SwiftSearcherCaller {
 			}
 		}
 
+		@Override
 		public void requestEnqueued(final String hostString) {
 			LOGGER.debug("Request enqueued " + hostString);
 		}
 
+		@Override
 		public void requestProcessingStarted(final String hostString) {
 			LOGGER.debug("Request processing started " + hostString);
 		}
@@ -108,6 +110,7 @@ public final class SwiftSearcherCaller {
 			}
 		}
 
+		@Override
 		public void requestProcessingFinished() {
 			LOGGER.debug("Request processing finished successfully");
 			synchronized (monitor) {
@@ -117,6 +120,7 @@ public final class SwiftSearcherCaller {
 			}
 		}
 
+		@Override
 		public void requestTerminated(final Exception e) {
 			LOGGER.debug("Request terminated with error", e);
 			synchronized (monitor) {
@@ -127,6 +131,7 @@ public final class SwiftSearcherCaller {
 			}
 		}
 
+		@Override
 		public void userProgressInformation(final ProgressInfo progressInfo) {
 			synchronized (monitor) {
 				if (progressInfo instanceof AssignedSearchRunId) {

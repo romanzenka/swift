@@ -46,13 +46,21 @@ public final class ClientSearchEngineConfig implements Serializable {
 
 	@Override
 	public boolean equals(final Object o) {
-		if (this == o) return true;
-		if (!(o instanceof ClientSearchEngineConfig)) return false;
+		if (this == o) {
+			return true;
+		}
+		if (!(o instanceof ClientSearchEngineConfig)) {
+			return false;
+		}
 
 		final ClientSearchEngineConfig that = (ClientSearchEngineConfig) o;
 
-		if (!code.equals(that.code)) return false;
-		if (!version.equals(that.version)) return false;
+		if (!code.equals(that.code)) {
+			return false;
+		}
+		if (!version.equals(that.version)) {
+			return false;
+		}
 
 		return true;
 	}

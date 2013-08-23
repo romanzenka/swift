@@ -63,7 +63,7 @@ final class ScaffoldOutputReader implements Closeable {
 
 		final boolean group = groupByColumnIndex != -1;
 
-		if (rows.size() > 0) {
+		if (!rows.isEmpty()) {
 			String currentGroupByColumnValue = group ? rows.first().get(groupByColumnIndex) : null;
 
 			for (Iterator<List<String>> rowIterator = rows.iterator(); rowIterator.hasNext(); ) {
@@ -108,6 +108,7 @@ final class ScaffoldOutputReader implements Closeable {
 		return null;
 	}
 
+	@Override
 	public void close() throws IOException {
 		reader.close();
 	}

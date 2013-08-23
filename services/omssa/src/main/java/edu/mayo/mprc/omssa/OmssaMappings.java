@@ -47,6 +47,7 @@ public final class OmssaMappings implements Mappings {
 		return ResourceUtilities.getReader("classpath:edu/mayo/mprc/swift/params/base.omssa.params.xml", this.getClass());
 	}
 
+	@Override
 	public void read(final Reader isr) {
 		final Document doc = XMLUtilities.loadDocument(isr);
 		nativeParamsDocument = doc;
@@ -60,6 +61,7 @@ public final class OmssaMappings implements Mappings {
 		}
 	}
 
+	@Override
 	public void write(final Reader oldParams, final Writer out) {
 		final Document bioml = nativeParamsDocument;
 		// Write the DOM document to the file
@@ -72,14 +74,17 @@ public final class OmssaMappings implements Mappings {
 		}
 	}
 
+	@Override
 	public String getNativeParam(final String name) {
 		return nativeParams.get(name).getTextContent();
 	}
 
+	@Override
 	public void setNativeParam(final String name, final String value) {
 		nativeParams.get(name).setTextContent(value);
 	}
 
+	@Override
 	public void setPeptideTolerance(final MappingContext context, final Tolerance peptideTolerance) {
 		if (!MassUnit.Da.equals(peptideTolerance.getUnit()) && !MassUnit.Ppm.equals(peptideTolerance.getUnit())) {
 			//the user is trying to use ppm or an unsupported unit
@@ -103,6 +108,7 @@ public final class OmssaMappings implements Mappings {
 		return value;
 	}
 
+	@Override
 	public void setFragmentTolerance(final MappingContext context, final Tolerance fragmentTolerance) {
 		if (!fragmentTolerance.getUnit().equals(MassUnit.Da)) {
 			//the user is trying to use ppm or an unsupported unit
@@ -114,6 +120,7 @@ public final class OmssaMappings implements Mappings {
 		setNativeParam(FRAG_TOL, String.valueOf(value));
 	}
 
+	@Override
 	public void setVariableMods(final MappingContext context, final ModSet variableMods) {
 		final Document doc = nativeParamsDocument;
 		try {
@@ -123,6 +130,7 @@ public final class OmssaMappings implements Mappings {
 		}
 	}
 
+	@Override
 	public void setFixedMods(final MappingContext context, final ModSet fixedMods) {
 		//this converter will insert necessary into the document
 		try {
@@ -132,10 +140,12 @@ public final class OmssaMappings implements Mappings {
 		}
 	}
 
+	@Override
 	public void setSequenceDatabase(final MappingContext context, final String shortDatabaseName) {
 		setNativeParam(DATABASE, "${DB:" + shortDatabaseName + "}");
 	}
 
+	@Override
 	public void setProtease(final MappingContext context, final Protease protease) {
 		final String omssaId = EnzymeLookup.mapEnzymeAbstractToOmssa(protease.getName());
 
@@ -166,6 +176,7 @@ public final class OmssaMappings implements Mappings {
 		}
 	}
 
+	@Override
 	public void setMissedCleavages(final MappingContext context, final Integer missedCleavages) {
 		String value = null;
 		try {
@@ -176,6 +187,7 @@ public final class OmssaMappings implements Mappings {
 		}
 	}
 
+	@Override
 	public void setInstrument(final MappingContext context, final Instrument instrument) {
 		final Document doc = nativeParamsDocument;
 		final List<String> ionSeriesIds = new ArrayList<String>();
@@ -189,7 +201,7 @@ public final class OmssaMappings implements Mappings {
 				ionSeriesIds.add(id);
 			}
 		}
-		if (unsupportedIons.size() > 0) {
+		if (!unsupportedIons.isEmpty()) {
 			context.reportWarning("OMSSA does not support ions: " + Joiner.on(", ").join(unsupportedIons));
 		}
 		final Element elemIons = (Element) nativeParams.get("ionstosearch");

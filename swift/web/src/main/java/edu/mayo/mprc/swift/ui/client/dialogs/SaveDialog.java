@@ -82,16 +82,19 @@ public final class SaveDialog extends FrameDialog {
 	}
 
 	public final class KeyListener extends KeyboardListenerAdapter {
+		@Override
 		public void onKeyUp(final Widget sender, final char keyCode, final int modifiers) {
 			setValidStatus();
 			super.onKeyUp(sender, keyCode, modifiers);
 		}
 	}
 
+	@Override
 	protected void cancel() {
 		hide();
 	}
 
+	@Override
 	protected void okay() {
 		if (!setValidStatus()) {
 			return; // TODO need better validation.
@@ -104,11 +107,13 @@ public final class SaveDialog extends FrameDialog {
 				user.getInitials(),
 				true,
 				new AsyncCallback<ClientParamSet>() {
+					@Override
 					public void onFailure(final Throwable throwable) {
 						hide();
 						SimpleParamsEditorPanel.handleGlobalError(throwable);
 					}
 
+					@Override
 					public void onSuccess(final ClientParamSet o) {
 
 						if (o != null) {

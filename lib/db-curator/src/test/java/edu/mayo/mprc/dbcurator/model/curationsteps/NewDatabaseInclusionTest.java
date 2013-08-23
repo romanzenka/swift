@@ -51,7 +51,7 @@ public final class NewDatabaseInclusionTest extends CurationDaoTestBase {
 			LOGGER.debug(msg);
 		}
 
-		if (status.getFailedStepValidations() != null && status.getFailedStepValidations().size() > 0) {
+		if (status.getFailedStepValidations() != null && !status.getFailedStepValidations().isEmpty()) {
 			Assert.fail("The IPI test failed:\n" +
 					CurationExecutor.failedValidationsToString(status.getFailedStepValidations()));
 		}

@@ -274,6 +274,7 @@ public final class SwiftSearcher implements Worker {
 		this.reportDecoyHits = reportDecoyHits;
 	}
 
+	@Override
 	public void processRequest(final WorkPacket workPacket, final ProgressReporter progressReporter) {
 		try {
 			if (!(workPacket instanceof SwiftSearchWorkPacket)) {
@@ -697,6 +698,7 @@ public final class SwiftSearcher implements Worker {
 			writer.put(REPORT_DECOY_HITS, isReportDecoyHits());
 		}
 
+		@Override
 		public void load(final ConfigReader reader) {
 			fastaPath = reader.get(FASTA_PATH);
 			fastaArchivePath = reader.get(FASTA_ARCHIVE_PATH);
@@ -752,6 +754,7 @@ public final class SwiftSearcher implements Worker {
 			this.engineFactoriesList = engineFactoriesList;
 		}
 
+		@Override
 		public void createUI(final DaemonConfig daemon, final ResourceConfig resource, final UiBuilder builder) {
 			final DatabaseFactory.Config database = (DatabaseFactory.Config) daemon.firstResourceOfType(DatabaseFactory.Config.class);
 

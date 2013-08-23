@@ -59,7 +59,7 @@ public final class SequestDeploymentService extends DeploymentService<SequestDep
 	}
 
 	public boolean isUseWine() {
-		return wineWrapperScript != null && wineWrapperScript.length() > 0;
+		return wineWrapperScript != null && !wineWrapperScript.isEmpty();
 	}
 
 	public SequestMappingFactory getSequestMappingFactory() {
@@ -119,6 +119,7 @@ public final class SequestDeploymentService extends DeploymentService<SequestDep
 	 *
 	 * @param request the deployment request that we want to perform
 	 */
+	@Override
 	public SequestDeploymentResult performDeployment(final DeploymentRequest request) {
 		final SequestDeploymentResult reportInto = new SequestDeploymentResult();
 
@@ -341,6 +342,7 @@ public final class SequestDeploymentService extends DeploymentService<SequestDep
 			if (depdir.exists()) {
 
 				final FilenameFilter makedbFileFilter = new FilenameFilter() {
+					@Override
 					public boolean accept(final File dir, final String name) {
 						return name.endsWith("makedb.params");
 					}
@@ -448,7 +450,7 @@ public final class SequestDeploymentService extends DeploymentService<SequestDep
 		}
 
 		//if none of the files existed then return true
-		if (existingFiles.size() == 0) {
+		if (existingFiles.isEmpty()) {
 			return true;
 		} else if (existingFiles.size() == necessaryFiles.size()) {
 			return false;
@@ -500,6 +502,7 @@ public final class SequestDeploymentService extends DeploymentService<SequestDep
 
 	private static final Map<String, List<ProgressReporter>> CO_DEPLOYMENTS = new HashMap<String, List<ProgressReporter>>();
 
+	@Override
 	public Map<String, List<ProgressReporter>> getCoDeployments() {
 		return CO_DEPLOYMENTS;
 	}
@@ -549,12 +552,14 @@ public final class SequestDeploymentService extends DeploymentService<SequestDep
 			this.wineWrapperScript = wineWrapperScript;
 		}
 
+		@Override
 		public void save(final ConfigWriter writer) {
 			writer.put(DEPLOYABLE_DB_FOLDER, getDeployableDbFolder(), "Where to put Sequest's .fasta file indices");
 			writer.put(ENGINE_ROOT_FOLDER, getEngineRootFolder(), "Path to the makedb package");
 			writer.put(WINE_WRAPPER_SCRIPT, getWineWrapperScript(), "Script to wrap the execution with on Linux");
 		}
 
+		@Override
 		public void load(final ConfigReader reader) {
 			setDeployableDbFolder(reader.get(DEPLOYABLE_DB_FOLDER));
 			setEngineRootFolder(reader.get(ENGINE_ROOT_FOLDER));
@@ -607,6 +612,7 @@ public final class SequestDeploymentService extends DeploymentService<SequestDep
 	}
 
 	public static final class Ui implements ServiceUiFactory {
+		@Override
 		public void createUI(final DaemonConfig daemon, final ResourceConfig resource, final UiBuilder builder) {
 			builder
 					.property(DEPLOYABLE_DB_FOLDER, "Database Folder", "Sequest .fasta index files will be put here.<br/>" +

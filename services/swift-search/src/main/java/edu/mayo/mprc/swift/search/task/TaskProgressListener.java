@@ -17,18 +17,21 @@ abstract class TaskProgressListener implements ProgressListener {
 		this.task = task;
 	}
 
+	@Override
 	public void requestEnqueued(final String hostString) {
 		task.setTaskEnqueued(new Date());
 		task.setExecutedOnHost(hostString);
 		task.afterProgressInformationReceived(new AssignedExecutedOnHost(hostString));
 	}
 
+	@Override
 	public void requestProcessingStarted(final String hostString) {
 		task.setTaskProcessingStarted(new Date());
 		task.setExecutedOnHost(hostString);
 		task.afterProgressInformationReceived(new AssignedExecutedOnHost(hostString));
 	}
 
+	@Override
 	public void requestTerminated(final Exception e) {
 		try {
 			NDC.push(this.task.getFullId());
@@ -39,6 +42,7 @@ abstract class TaskProgressListener implements ProgressListener {
 		}
 	}
 
+	@Override
 	public void userProgressInformation(final ProgressInfo progressInfo) {
 		task.afterProgressInformationReceived(progressInfo);
 	}

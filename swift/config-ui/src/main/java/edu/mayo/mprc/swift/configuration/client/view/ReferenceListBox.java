@@ -39,9 +39,11 @@ public final class ReferenceListBox extends SimplePanel implements SourcesChange
 	private void addCreateNewButton() {
 		this.createNew = new Button("Add new...");
 		this.createNew.addClickListener(new ClickListener() {
+			@Override
 			public void onClick(final Widget widget) {
 				// User wants a new item of this type
 				final AddNewModuleDialog dialog = new AddNewModuleDialog(model, types, new NewModuleCreatedCallback() {
+					@Override
 					public void newModuleCreated(final ResourceModel model) {
 						setValue(model);
 						fireChange();
@@ -165,6 +167,7 @@ public final class ReferenceListBox extends SimplePanel implements SourcesChange
 	}
 
 	// Delegate the change listener to the embedded listbox
+	@Override
 	public void addChangeListener(final ChangeListener changeListener) {
 		if (changeListeners == null) {
 			changeListeners = new DelegatingChangeListenerCollection(this, listBox);
@@ -173,6 +176,7 @@ public final class ReferenceListBox extends SimplePanel implements SourcesChange
 	}
 
 	// Delegate the change listener to the embedded listbox
+	@Override
 	public void removeChangeListener(final ChangeListener changeListener) {
 		if (changeListeners != null) {
 			changeListeners.remove(changeListener);
@@ -187,16 +191,20 @@ public final class ReferenceListBox extends SimplePanel implements SourcesChange
 	}
 
 	private class MyApplicationModelListener implements ResourceModelListener {
+		@Override
 		public void initialized(final ResourceModel model) {
 		}
 
+		@Override
 		public void nameChanged(final ResourceModel model) {
 		}
 
+		@Override
 		public void childAdded(final ResourceModel child, final ResourceModel addedTo) {
 			addedTo.addListener(daemonModelListener);
 		}
 
+		@Override
 		public void childRemoved(final ResourceModel child, final ResourceModel removedFrom) {
 			// Remove all children
 			for (final ResourceModel model : child.getChildren()) {
@@ -205,25 +213,31 @@ public final class ReferenceListBox extends SimplePanel implements SourcesChange
 			removedFrom.removeListener(daemonModelListener);
 		}
 
+		@Override
 		public void propertyChanged(final ResourceModel model, final String propertyName, final String newValue) {
 		}
 	}
 
 	private class MyDaemonModelListener implements ResourceModelListener {
+		@Override
 		public void initialized(final ResourceModel model) {
 		}
 
+		@Override
 		public void nameChanged(final ResourceModel model) {
 		}
 
+		@Override
 		public void childAdded(final ResourceModel child, final ResourceModel addedTo) {
 			addResourceModel(child);
 		}
 
+		@Override
 		public void childRemoved(final ResourceModel child, final ResourceModel removedFrom) {
 			removeModule(child);
 		}
 
+		@Override
 		public void propertyChanged(final ResourceModel model, final String propertyName, final String newValue) {
 
 		}

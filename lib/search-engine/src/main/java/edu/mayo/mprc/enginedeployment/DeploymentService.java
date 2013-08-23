@@ -33,6 +33,7 @@ public abstract class DeploymentService<T extends DeploymentResult> implements W
 	 * @param workPacket       - deployment request to process
 	 * @param progressReporter - to report progress
 	 */
+	@Override
 	public void processRequest(final WorkPacket workPacket, final ProgressReporter progressReporter) {
 		progressReporter.reportStart(MonitorUtilities.getHostInformation());
 		DeploymentRequest request = null;
@@ -277,7 +278,7 @@ public abstract class DeploymentService<T extends DeploymentResult> implements W
 					.append("\n");
 		}
 
-		if (notDeletedFiles.size() > 0) {
+		if (!notDeletedFiles.isEmpty()) {
 			reportResult.addMessage(deleted.toString());
 
 			reportResult.setUndeployedFiles(deletedFiles);

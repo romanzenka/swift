@@ -65,6 +65,7 @@ final class ScaffoldTask extends AsyncTaskBase implements ScaffoldTaskI {
 	/**
 	 * Which input file/search parameters tuple gets outputs from which engine search.
 	 */
+	@Override
 	public void addInput(final FileSearch fileSearch, final EngineSearchTask search) {
 		InputFileSearches searches = inputs.get(fileSearch);
 		if (searches == null) {
@@ -74,6 +75,7 @@ final class ScaffoldTask extends AsyncTaskBase implements ScaffoldTaskI {
 		searches.addSearch(search);
 	}
 
+	@Override
 	public void addDatabase(final String id, final DatabaseDeployment dbDeployment) {
 		databases.put(id, dbDeployment);
 	}
@@ -97,6 +99,7 @@ final class ScaffoldTask extends AsyncTaskBase implements ScaffoldTaskI {
 	 * @return Work packet to be sent asynchronously. If it returns null, it means the work was done without a need
 	 *         to send a work packet.
 	 */
+	@Override
 	public WorkPacket createWorkPacket() {
 		setDescription("Scaffold search " + this.experiment);
 		final File scaffoldFile = new File(outputFolder, experiment + ".sf3");
@@ -108,7 +111,7 @@ final class ScaffoldTask extends AsyncTaskBase implements ScaffoldTaskI {
 		}
 
 		// Sanity check - make sure that Scaffold gets some input files
-		if (inputs.size() == 0) {
+		if (inputs.isEmpty()) {
 			throw new DaemonException("There are no files defined for this experiment");
 		}
 
@@ -189,6 +192,7 @@ final class ScaffoldTask extends AsyncTaskBase implements ScaffoldTaskI {
 		return new File(outputFolder, experiment + ScaffoldSpectraReader.EXTENSION);
 	}
 
+	@Override
 	public void onSuccess() {
 		setWaitForFiles();
 		// Store Scaffold report before we announce success
@@ -219,6 +223,7 @@ final class ScaffoldTask extends AsyncTaskBase implements ScaffoldTaskI {
 		}
 	}
 
+	@Override
 	public void onProgress(final ProgressInfo progressInfo) {
 	}
 

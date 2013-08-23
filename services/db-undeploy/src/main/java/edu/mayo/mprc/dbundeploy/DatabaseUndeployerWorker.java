@@ -256,6 +256,7 @@ public final class DatabaseUndeployerWorker extends WorkerBase {
 
 	public static final class Ui implements ServiceUiFactory {
 
+		@Override
 		public void createUI(final DaemonConfig daemon, final ResourceConfig resource, final UiBuilder builder) {
 			builder.property(SEQUEST_DEPLOYER, "Sequest Database Deployer", "Database deployer must provide database undeployment functionality.")
 					.reference("sequestDeployer", UiBuilder.NONE_TYPE)

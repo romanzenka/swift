@@ -38,18 +38,22 @@ public class GenericResource implements ResourceConfig, NamedResource, TypedReso
 		return values.get(key);
 	}
 
+	@Override
 	public String getName() {
 		return name;
 	}
 
+	@Override
 	public void setName(String name) {
 		this.name = name;
 	}
 
+	@Override
 	public String getType() {
 		return type;
 	}
 
+	@Override
 	public void setType(String type) {
 		this.type = type;
 	}

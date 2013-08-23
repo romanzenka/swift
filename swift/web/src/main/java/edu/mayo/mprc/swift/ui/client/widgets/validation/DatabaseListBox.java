@@ -24,6 +24,7 @@ public final class DatabaseListBox extends ValidatableListBox {
 		this.userInfo = userInfo;
 	}
 
+	@Override
 	public String getStringValue(final ClientValue value) {
 		if (value == null) {
 			return "";
@@ -32,7 +33,7 @@ public final class DatabaseListBox extends ValidatableListBox {
 			throw new RuntimeException("Expected a ClientSequenceDatabase");
 		}
 		final ClientSequenceDatabase csd = (ClientSequenceDatabase) value;
-		return csd.getShortName() + " - " + csd.getDisplayName() + (userInfo != null && csd.getOwnerEmail() != null && csd.getOwnerEmail().length() != 0
+		return csd.getShortName() + " - " + csd.getDisplayName() + (userInfo != null && csd.getOwnerEmail() != null && !csd.getOwnerEmail().isEmpty()
 				&& userInfo.get(csd.getOwnerEmail()) != null ? " (" + userInfo.get(csd.getOwnerEmail()).getInitials() + ")" : "");
 	}
 
@@ -59,14 +60,17 @@ public final class DatabaseListBox extends ValidatableListBox {
 		// throw new RuntimeException("Can't find database with id " + databaseId);
 	}
 
+	@Override
 	public ClientValue bundle(final List<? extends ClientValue> selected) {
 		return null;//unused
 	}
 
+	@Override
 	public List<? extends ClientValue> unbundle(final ClientValue value) {
 		return EMPTY_VALUES; // unused
 	}
 
+	@Override
 	public boolean needsAllowedValues() {
 		return true;
 	}

@@ -13,6 +13,7 @@ public final class ColumnSelectListener implements ClickListener {
 		this.table = table;
 	}
 
+	@Override
 	public void onClick(final Widget widget) {
 		final CheckBox mainCheckBox = (CheckBox) widget;
 		for (int row = table.getFirstDataRow(); row < table.getRowCount(); row++) {

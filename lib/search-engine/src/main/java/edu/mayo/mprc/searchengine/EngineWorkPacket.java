@@ -74,6 +74,7 @@ public abstract class EngineWorkPacket extends WorkPacketBase implements Cachabl
 		return inputFile;
 	}
 
+	@Override
 	public File getOutputFile() {
 		return outputFile;
 	}
@@ -126,6 +127,7 @@ public abstract class EngineWorkPacket extends WorkPacketBase implements Cachabl
 		return searchParamsFile;
 	}
 
+	@Override
 	public boolean isPublishResultFiles() {
 		return publishResultFiles;
 	}

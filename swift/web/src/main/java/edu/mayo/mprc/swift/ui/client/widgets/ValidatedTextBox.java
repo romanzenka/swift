@@ -71,6 +71,7 @@ public abstract class ValidatedTextBox extends TextBox {
 				p.setPopupPosition(sender.getAbsoluteLeft() + sender.getOffsetWidth() + 5, sender.getAbsoluteTop());
 				p.show();
 				DeferredCommand.addCommand(new Command() {
+					@Override
 					public void execute() {
 						vTxtBox.setFocus(true);
 					}

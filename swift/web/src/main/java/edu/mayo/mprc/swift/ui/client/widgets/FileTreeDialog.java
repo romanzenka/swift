@@ -66,6 +66,7 @@ public final class FileTreeDialog extends DialogBox implements ClickListener {
 
 	}
 
+	@Override
 	public void show() {
 		super.show();
 		showFileDialogBox("filelist", "");
@@ -79,6 +80,7 @@ public final class FileTreeDialog extends DialogBox implements ClickListener {
 		this.selectedFilesListener = selectedFilesListener;
 	}
 
+	@Override
 	public void onClick(final Widget widget) {
 		if (widget.equals(okButton)) {
 			final String selectedFilesHairBall = getSelectedFiles();
@@ -90,10 +92,12 @@ public final class FileTreeDialog extends DialogBox implements ClickListener {
 
 			fileFinderService.findFiles(eachSelectedFile, new AsyncCallback<FileInfo[]>() {
 
+				@Override
 				public void onFailure(final Throwable throwable) {
 					//TODO: implement me
 				}
 
+				@Override
 				public void onSuccess(final FileInfo[] o) {
 					selectedFilesListener.selectedFiles(o);
 				}

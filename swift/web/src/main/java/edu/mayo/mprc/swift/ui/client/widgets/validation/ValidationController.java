@@ -162,13 +162,14 @@ public final class ValidationController implements ChangeListener, SourcesChange
 		if (rr.getAllowedValues() != null) {
 			rr.getV().setAllowedValues(rr.getAllowedValues());
 		}
-		final boolean validationDefinesNullValue = value == null && (ccv != null && ccv.size() > 0);
+		final boolean validationDefinesNullValue = value == null && (ccv != null && !ccv.isEmpty());
 		final boolean validationDefinesValue = validationDefinesNullValue || value != null;
 		if (rr.getV().getClientValue() == null || (validationDefinesValue && !rr.getV().getClientValue().equals(value))) {
 			rr.getV().setValue(value);
 		}
 	}
 
+	@Override
 	public void onChange(final Widget widget) {
 		final Validatable v = (Validatable) widget;
 		if (v == null) {
@@ -212,10 +213,12 @@ public final class ValidationController implements ChangeListener, SourcesChange
 	private void createTemporary(final Registration r, final ClientValue value) {
 		serviceAsync.save(paramSet, null, null, null,
 				false, new AsyncCallback<ClientParamSet>() {
+			@Override
 			public void onFailure(final Throwable throwable) {
 				SimpleParamsEditorPanel.handleGlobalError(throwable);
 			}
 
+			@Override
 			public void onSuccess(final ClientParamSet newParamSet) {
 				selector.refresh(new Callback() {
 					@Override
@@ -239,10 +242,12 @@ public final class ValidationController implements ChangeListener, SourcesChange
 			this.r = r;
 		}
 
+		@Override
 		public void onFailure(final Throwable throwable) {
 			r.getValidationPanel().addValidation(new ClientValidation(throwable.toString()), r.getV());
 		}
 
+		@Override
 		public void onSuccess(final ClientParamsValidations o) {
 			final HashSet<Validatable> visited = new HashSet<Validatable>();
 			// Update all validations to clear them
@@ -263,6 +268,7 @@ public final class ValidationController implements ChangeListener, SourcesChange
 	public void updateDependent(final Callback cb) {
 		fetchAllowedValues(byWidget.keySet(), new Callback() {
 
+			@Override
 			public void done() {
 				final List<ClientParam> vals = values.getValues();
 				final HashSet<Validatable> visited = new HashSet<Validatable>();
@@ -279,7 +285,7 @@ public final class ValidationController implements ChangeListener, SourcesChange
 	}
 
 	public boolean isValid() {
-		return invalid.size() == 0;
+		return invalid.isEmpty();
 	}
 
 	public void getAllowedValuesForValidatable(final Validatable v, final Callback cb) {
@@ -317,15 +323,17 @@ public final class ValidationController implements ChangeListener, SourcesChange
 			return;
 		}
 
-		if (paramsToFetch.size() > 0) {
+		if (!paramsToFetch.isEmpty()) {
 			serviceAsync.getAllowedValues(
 					paramsToFetch.toArray(new String[paramsToFetch.size()]),
 					new AsyncCallback<List<List<ClientValue>>>() {
 
+						@Override
 						public void onFailure(final Throwable throwable) {
 							SimpleParamsEditorPanel.handleGlobalError(throwable);
 						}
 
+						@Override
 						public void onSuccess(final List<List<ClientValue>> allowedValues) {
 							allowedValues.addAll(cachedValues);
 							paramsToFetch.addAll(params);
@@ -368,10 +376,12 @@ public final class ValidationController implements ChangeListener, SourcesChange
 		allowedValues.remove(r.getParam());
 	}
 
+	@Override
 	public void addChangeListener(final ChangeListener changeListener) {
 		listeners.add(changeListener);
 	}
 
+	@Override
 	public void removeChangeListener(final ChangeListener changeListener) {
 		listeners.remove(changeListener);
 	}
@@ -411,6 +421,7 @@ public final class ValidationController implements ChangeListener, SourcesChange
 	/**
 	 * Fired whenever the selection changes.
 	 */
+	@Override
 	public void selected(final ClientParamSet selection) {
 		final ClientParamSet sel = selection;
 		if (paramSet == null || !paramSet.equals(sel)) {
@@ -426,10 +437,12 @@ public final class ValidationController implements ChangeListener, SourcesChange
 			} else {
 
 				serviceAsync.getParamSetValues(sel, new AsyncCallback<ClientParamSetValues>() {
+					@Override
 					public void onFailure(final Throwable throwable) {
 						SimpleParamsEditorPanel.handleGlobalError(throwable);
 					}
 
+					@Override
 					public void onSuccess(final ClientParamSetValues newValues) {
 						if (newValues == null) {
 							throw new RuntimeException("Didn't get a ClientParamSet");

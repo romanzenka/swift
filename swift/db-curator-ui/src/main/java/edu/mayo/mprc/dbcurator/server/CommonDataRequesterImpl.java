@@ -34,6 +34,7 @@ public final class CommonDataRequesterImpl extends SpringGwtServlet implements C
 	public CommonDataRequesterImpl() {
 	}
 
+	@Override
 	public List<HeaderTransformStub> getHeaderTransformers() {
 		final List<HeaderTransform> transforms;
 		if (curationDao == null) {
@@ -63,6 +64,7 @@ public final class CommonDataRequesterImpl extends SpringGwtServlet implements C
 		return abstractList;
 	}
 
+	@Override
 	public Map<String, String> getFTPDataSources() {
 		if (curationDao == null) {
 			return new HashMap<String, String>();
@@ -87,6 +89,7 @@ public final class CommonDataRequesterImpl extends SpringGwtServlet implements C
 		return sourceMap;
 	}
 
+	@Override
 	public Boolean isShortnameUnique(final String toCheck) {
 		curationDao.begin();
 		try {
@@ -100,7 +103,7 @@ public final class CommonDataRequesterImpl extends SpringGwtServlet implements C
 	}
 
 	private Boolean isShortnameUniqueBody(final String toCheck) {
-		return (0 == curationDao.getCurationsByShortname(toCheck, /*ignoreCase*/true).size());
+		return (curationDao.getCurationsByShortname(toCheck, /*ignoreCase*/true).isEmpty());
 	}
 
 	/**
@@ -111,6 +114,7 @@ public final class CommonDataRequesterImpl extends SpringGwtServlet implements C
 	 * @param toUpdate the stub that you want to have updated
 	 * @return the updated stub
 	 */
+	@Override
 	public CurationStub performUpdate(final CurationStub toUpdate) {
 		curationDao.begin();
 		try {
@@ -124,6 +128,7 @@ public final class CommonDataRequesterImpl extends SpringGwtServlet implements C
 		}
 	}
 
+	@Override
 	public CurationStub lookForCuration() {
 		curationDao.begin();
 		try {
@@ -136,6 +141,7 @@ public final class CommonDataRequesterImpl extends SpringGwtServlet implements C
 		}
 	}
 
+	@Override
 	public CurationStub getCurationByID(final Integer id) {
 		curationDao.begin();
 		try {
@@ -149,6 +155,7 @@ public final class CommonDataRequesterImpl extends SpringGwtServlet implements C
 	}
 
 
+	@Override
 	public CurationStub copyCurationStub(final CurationStub toCopy) {
 		curationDao.begin();
 		try {
@@ -173,6 +180,7 @@ public final class CommonDataRequesterImpl extends SpringGwtServlet implements C
 	 *
 	 * @param toRun the curation you want to have run
 	 */
+	@Override
 	public CurationStub runCuration(final CurationStub toRun) {
 		curationDao.begin();
 		try {
@@ -194,6 +202,7 @@ public final class CommonDataRequesterImpl extends SpringGwtServlet implements C
 		}
 	}
 
+	@Override
 	public String testPattern(final String pattern) {
 		try {
 			Pattern.compile(pattern);
@@ -203,6 +212,7 @@ public final class CommonDataRequesterImpl extends SpringGwtServlet implements C
 		}
 	}
 
+	@Override
 	public String[] getLines(final String sharedPath, final int startLineInclusive, final int numberOfLines, String pattern) throws GWTServiceException {
 		RandomAccessFile raf = null;
 		try {
@@ -210,7 +220,7 @@ public final class CommonDataRequesterImpl extends SpringGwtServlet implements C
 			this.clearResults();
 
 			Pattern compiledPattern = null;
-			if (pattern != null && pattern.length() > 0) {
+			if (pattern != null && !pattern.isEmpty()) {
 				pattern = ".*" + pattern + ".*";
 				pattern = pattern.replace("\\", "\\\\");
 				compiledPattern = Pattern.compile(pattern, Pattern.CASE_INSENSITIVE);
@@ -225,7 +235,7 @@ public final class CommonDataRequesterImpl extends SpringGwtServlet implements C
 				final SortedMap<Integer, Long> headMap = currentPositionMap.headMap(startLineInclusive);
 
 				Integer closestLessThanLine = 0;
-				if (headMap.size() == 0) {
+				if (headMap.isEmpty()) {
 					startLinePosition = 0L;
 				} else {
 					closestLessThanLine = Collections.max(headMap.keySet());
@@ -310,6 +320,7 @@ public final class CommonDataRequesterImpl extends SpringGwtServlet implements C
 		results.add(result);
 	}
 
+	@Override
 	public synchronized String[] getResults() throws GWTServiceException {
 		try {
 			final List<String> results;
@@ -334,6 +345,7 @@ public final class CommonDataRequesterImpl extends SpringGwtServlet implements C
 		}
 	}
 
+	@Override
 	public void setCancelMessage(final boolean cancelMessage) throws GWTServiceException {
 		try {
 			this.getThreadLocalRequest().getSession().setAttribute("cancelRequest", (cancelMessage ? true : null));
@@ -349,7 +361,7 @@ public final class CommonDataRequesterImpl extends SpringGwtServlet implements C
 
 	private SortedMap<Integer, Long> getCurrentPositionMap(final String filePath, final String pattern) {
 		final Map<String, SortedMap<Integer, Long>> allPositionMaps = getPositionMaps();
-		final String currentKey = (pattern == null || pattern.length() == 0 ? filePath : filePath + "_" + pattern);
+		final String currentKey = (pattern == null || pattern.isEmpty() ? filePath : filePath + "_" + pattern);
 
 		SortedMap<Integer, Long> currentPositionLookup = null;
 

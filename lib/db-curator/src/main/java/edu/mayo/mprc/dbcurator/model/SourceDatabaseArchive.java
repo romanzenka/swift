@@ -167,7 +167,7 @@ public class SourceDatabaseArchive implements Serializable {
 
 					final String[] path = url.getPath().split("/");
 					for (int i = 0; i < path.length - 1; i++) {
-						if (path[i].length() > 0) {
+						if (!path[i].isEmpty()) {
 							ftp.chdir(path[i]);
 						}
 					}

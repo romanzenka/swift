@@ -24,7 +24,7 @@ public final class DaemonConfigInfo implements Serializable {
 
 	private void storeCanonical(final String sharedFileSpacePath) {
 		if (sharedFileSpacePath != null) {
-			if (sharedFileSpacePath.length() > 0) {
+			if (!sharedFileSpacePath.isEmpty()) {
 				this.sharedFileSpacePath = FileUtilities.canonicalDirectoryPath(new File(sharedFileSpacePath));
 			} else {
 				this.sharedFileSpacePath = "";
@@ -43,7 +43,7 @@ public final class DaemonConfigInfo implements Serializable {
 	}
 
 	public String getSharedFileSpacePath() {
-		if (sharedFileSpacePath != null && sharedFileSpacePath.length() == 0) {
+		if (sharedFileSpacePath != null && sharedFileSpacePath.isEmpty()) {
 			sharedFileSpacePath = null;
 		}
 

@@ -146,7 +146,7 @@ public final class CurationDaoImpl extends DaoBase implements CurationDao {
 		// So we will try to see if there are any matches on the shortname and find the most recently run curation with that shortname.
 		final List<Curation> allMatches = getCurationsByShortname(extractShortname(name));
 
-		if (allMatches.size() == 0) {
+		if (allMatches.isEmpty()) {
 			match = null;
 		} else if (allMatches.size() == 1) {
 			match = allMatches.get(0);
@@ -156,6 +156,7 @@ public final class CurationDaoImpl extends DaoBase implements CurationDao {
 		} else {
 			//sort the list based on the run date of the curation descending
 			Collections.sort(allMatches, new Comparator<Curation>() {
+				@Override
 				public int compare(final Curation o1, final Curation o2) {
 					if (o1.getRunDate() == null && o2.getRunDate() == null) {
 						return 0;
@@ -183,10 +184,12 @@ public final class CurationDaoImpl extends DaoBase implements CurationDao {
 		return match;
 	}
 
+	@Override
 	public List<Curation> getCurationsByShortname(final String shortname) {
 		return getCurationsByShortname(shortname, false);
 	}
 
+	@Override
 	public List<Curation> getCurationsByShortname(final String shortname, final boolean ignoreCase) {
 		final List<Curation> returnList = new ArrayList<Curation>();
 		List genericResults = null;
@@ -281,7 +284,7 @@ public final class CurationDaoImpl extends DaoBase implements CurationDao {
 			throw new MprcException("Cannot find source database for url: " + url + " and creation date " + fileCreationDate, t);
 		}
 
-		if (archiveList != null && archiveList.size() > 0) {
+		if (archiveList != null && !archiveList.isEmpty()) {
 			for (final Object o : archiveList) {
 				final SourceDatabaseArchive archive = (SourceDatabaseArchive) o;
 				if (archive.getArchive() != null && archive.getArchive().exists()) {
@@ -292,6 +295,7 @@ public final class CurationDaoImpl extends DaoBase implements CurationDao {
 		return null;
 	}
 
+	@Override
 	public List<FastaSource> getCommonSources() {
 		try {
 			return getSession().createQuery("from FastaSource ds where ds.common = true").list();
@@ -309,6 +313,7 @@ public final class CurationDaoImpl extends DaoBase implements CurationDao {
 		this.save(sprotTrans, getHeaderTransformEqualityCriteria(sprotTrans), true);
 	}
 
+	@Override
 	public List<HeaderTransform> getCommonHeaderTransforms() {
 		try {
 			return getSession().createQuery("from HeaderTransform ht where ht.common = true").list();
@@ -350,6 +355,7 @@ public final class CurationDaoImpl extends DaoBase implements CurationDao {
 		getSession().flush();
 	}
 
+	@Override
 	public void addCuration(final Curation toSave) {
 		try {
 			save(toSave, new Change("Adding database " + toSave.getShortName(), new DateTime()), getCurationEqualityCriteria(toSave), true);
@@ -384,6 +390,7 @@ public final class CurationDaoImpl extends DaoBase implements CurationDao {
 		}
 	}
 
+	@Override
 	public FastaSource getDataSourceByName(final String name) {
 		List<FastaSource> matches = null;
 		try {
@@ -398,6 +405,7 @@ public final class CurationDaoImpl extends DaoBase implements CurationDao {
 		return matches == null || matches.isEmpty() ? null : matches.get(0);
 	}
 
+	@Override
 	public FastaSource getDataSourceByUrl(final String url) {
 		List<FastaSource> matches = null;
 		try {
@@ -412,6 +420,7 @@ public final class CurationDaoImpl extends DaoBase implements CurationDao {
 		return matches == null || matches.isEmpty() ? null : matches.get(0);
 	}
 
+	@Override
 	public HeaderTransform getHeaderTransformByName(final String name) {
 		List<HeaderTransform> matches = null;
 		try {
@@ -425,6 +434,7 @@ public final class CurationDaoImpl extends DaoBase implements CurationDao {
 		return (matches == null || matches.isEmpty() ? null : matches.get(0));
 	}
 
+	@Override
 	public HeaderTransform getHeaderTransformByUrl(final String forUrl) {
 		List<HeaderTransform> matches = null;
 		try {

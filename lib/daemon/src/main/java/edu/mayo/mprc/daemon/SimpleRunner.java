@@ -33,6 +33,7 @@ public final class SimpleRunner extends AbstractRunner {
 		return "Daemon Runner for " + getFactory().getUserName();
 	}
 
+	@Override
 	protected void processRequest(final DaemonRequest request) {
 		final Worker worker;
 		try {
@@ -49,6 +50,7 @@ public final class SimpleRunner extends AbstractRunner {
 		factory.checkWorker();
 	}
 
+	@Override
 	public void stop() {
 		super.stop();
 		executorService.shutdownNow();
@@ -70,26 +72,32 @@ public final class SimpleRunner extends AbstractRunner {
 		this.executorService = executorService;
 	}
 
+	@Override
 	public boolean isEnabled() {
 		return enabled;
 	}
 
+	@Override
 	public void setEnabled(final boolean enabled) {
 		this.enabled = enabled;
 	}
 
+	@Override
 	public boolean isOperational() {
 		return operational;
 	}
 
+	@Override
 	public void setOperational(final boolean operational) {
 		this.operational = operational;
 	}
 
+	@Override
 	public DaemonConnection getDaemonConnection() {
 		return daemonConnection;
 	}
 
+	@Override
 	public void setDaemonConnection(final DaemonConnection daemonConnection) {
 		this.daemonConnection = daemonConnection;
 	}
@@ -109,15 +117,18 @@ public final class SimpleRunner extends AbstractRunner {
 			reportLogFiles();
 		}
 
+		@Override
 		public void reportProgress(final ProgressInfo progressInfo) {
 			sendResponse(request, new DaemonProgressMessage(DaemonProgress.UserSpecificProgressInfo, progressInfo), false);
 		}
 
+		@Override
 		public void reportSuccess() {
 			reportLogFiles();
 			sendResponse(request, new DaemonProgressMessage(DaemonProgress.RequestCompleted), true);
 		}
 
+		@Override
 		public void reportFailure(final Throwable t) {
 			reportLogFiles();
 			sendResponse(request, t, true);
@@ -235,6 +246,7 @@ public final class SimpleRunner extends AbstractRunner {
 			this.request = request;
 		}
 
+		@Override
 		public void run() {
 			final LoggingSetup logging;
 			if (worker instanceof NoLoggingWorker) {

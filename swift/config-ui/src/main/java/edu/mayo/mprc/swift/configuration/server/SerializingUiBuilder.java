@@ -36,12 +36,14 @@ public class SerializingUiBuilder implements UiBuilder, Serializable {
 		return new UiBuilderReplayer(commands);
 	}
 
+	@Override
 	public UiBuilder nativeInterface(final String className) {
 		commands.add(UiBuilderReplayer.NATIVE_INTERFACE);
 		commands.add(className);
 		return this;
 	}
 
+	@Override
 	public UiBuilder property(final String name, final String displayName, final String description) {
 		previousProperty = name;
 		commands.add(UiBuilderReplayer.PROPERTY);
@@ -51,11 +53,13 @@ public class SerializingUiBuilder implements UiBuilder, Serializable {
 		return this;
 	}
 
+	@Override
 	public UiBuilder required() {
 		commands.add(UiBuilderReplayer.REQUIRED);
 		return this;
 	}
 
+	@Override
 	public UiBuilder defaultValue(final String value) {
 		commands.add(UiBuilderReplayer.DEFAULT_VALUE);
 		commands.add(value);
@@ -67,37 +71,44 @@ public class SerializingUiBuilder implements UiBuilder, Serializable {
 		return defaultValue(resolver.getIdFromConfig(value));
 	}
 
+	@Override
 	public UiBuilder addChangeListener(final PropertyChangeListener listener) {
 		recorder.setListener(previousProperty, listener);
 		return this;
 	}
 
+	@Override
 	public UiBuilder addDaemonChangeListener(final PropertyChangeListener listener) {
 		recorder.setDaemonListener(listener);
 		return this;
 	}
 
+	@Override
 	public UiBuilder validateOnDemand(final PropertyChangeListener listener) {
 		commands.add(UiBuilderReplayer.VALIDATE_ON_DEMAND);
 		recorder.setListener(previousProperty, listener);
 		return this;
 	}
 
+	@Override
 	public UiBuilder boolValue() {
 		commands.add(UiBuilderReplayer.BOOL_VALUE);
 		return this;
 	}
 
+	@Override
 	public UiBuilder existingDirectory() {
 		recorder.setListener(previousProperty, new FileValidator(null, true, true, false));
 		return this;
 	}
 
+	@Override
 	public UiBuilder existingFile() {
 		recorder.setListener(previousProperty, new FileValidator(null, true, false, false));
 		return this;
 	}
 
+	@Override
 	public UiBuilder integerValue(final Integer minimum, final Integer maximum) {
 		commands.add(UiBuilderReplayer.INTEGER_VALUE);
 		commands.add(minimum == null ? null : String.valueOf(minimum));
@@ -105,12 +116,14 @@ public class SerializingUiBuilder implements UiBuilder, Serializable {
 		return this;
 	}
 
+	@Override
 	public UiBuilder executable(final List<String> commandLineParams) {
 		commands.add(UiBuilderReplayer.VALIDATE_ON_DEMAND);
 		recorder.setListener(previousProperty, new ExecutableValidator(commandLineParams));
 		return this;
 	}
 
+	@Override
 	public UiBuilder reference(final String... type) {
 		commands.add(UiBuilderReplayer.REFERENCE);
 		commands.add(String.valueOf(type.length));
@@ -118,6 +131,7 @@ public class SerializingUiBuilder implements UiBuilder, Serializable {
 		return this;
 	}
 
+	@Override
 	public UiBuilder enable(final String propertyName, final boolean synchronous) {
 		commands.add(UiBuilderReplayer.ENABLE);
 		commands.add(propertyName);

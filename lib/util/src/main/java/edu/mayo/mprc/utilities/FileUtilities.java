@@ -200,6 +200,7 @@ public final class FileUtilities {
 
 		final File[] matchingFileArray = withinFolder.listFiles(new FileFilter() {
 
+			@Override
 			public boolean accept(final File pathname) {
 				if (pathname.isDirectory() || pathname.equals(toFind) || !pathname.canRead()) {
 					return false;
@@ -287,7 +288,7 @@ public final class FileUtilities {
 
 		caller.run();
 
-		final boolean unexpectedResult = caller.getExitValue() != 0 || caller.getOutputLog().length() > 0 || caller.getErrorLog().length() > 0;
+		final boolean unexpectedResult = caller.getExitValue() != 0 || !caller.getOutputLog().isEmpty() || !caller.getErrorLog().isEmpty();
 
 		if (unexpectedResult && !canonicalLinkSource.exists()) {
 			throw new IOException(caller.getFailedCallDescription());
@@ -451,7 +452,7 @@ public final class FileUtilities {
 		if (extension.equalsIgnoreCase(GZIP_EXTENSION)) {
 			final String base = filename.substring(0, filename.length() - 1 - GZIP_EXTENSION.length());
 			final String prevExtension = getExtension(base);
-			if (prevExtension.length() == 0) {
+			if (prevExtension.isEmpty()) {
 				return extension;
 			} else {
 				return prevExtension + "." + extension;
@@ -1275,7 +1276,7 @@ public final class FileUtilities {
 					((flags & 0100) == 0 ? "" : "x");
 		}
 		if ((flags & 0070) != 0) {
-			if (chmodRights.length() > 0) {
+			if (!chmodRights.isEmpty()) {
 				chmodRights += ",";
 			}
 			chmodRights += "g" + operation +
@@ -1284,7 +1285,7 @@ public final class FileUtilities {
 					((flags & 0010) == 0 ? "" : "x");
 		}
 		if ((flags & 0007) != 0) {
-			if (chmodRights.length() > 0) {
+			if (!chmodRights.isEmpty()) {
 				chmodRights += ",";
 			}
 			chmodRights += "o" + operation +
@@ -1559,7 +1560,7 @@ public final class FileUtilities {
 	 */
 	public static String stripGzippedExtension(final String fileName) {
 		final String extension = getGzippedExtension(fileName);
-		return fileName.substring(0, fileName.length() - extension.length() - (/*dot*/extension.length() > 0 ? 1 : 0));
+		return fileName.substring(0, fileName.length() - extension.length() - (/*dot*/!extension.isEmpty() ? 1 : 0));
 	}
 
 	/**
@@ -1607,10 +1608,11 @@ public final class FileUtilities {
 	public static Long sizeOfDirectory(final File directory) {
 		long length = 0;
 		for (File file : directory.listFiles()) {
-			if (file.isFile())
+			if (file.isFile()) {
 				length += file.length();
-			else
+			} else {
 				length += sizeOfDirectory(file);
+			}
 		}
 		return length;
 	}

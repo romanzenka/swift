@@ -72,6 +72,7 @@ public final class IsotopicDistribution implements Cloneable {
 		this.extra = rhs.extra;
 	}
 
+	@Override
 	public IsotopicDistribution clone() {
 		IsotopicDistribution distribution = null;
 		try {

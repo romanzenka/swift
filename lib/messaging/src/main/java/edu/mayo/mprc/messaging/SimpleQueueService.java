@@ -66,10 +66,12 @@ final class SimpleQueueService implements Service {
 		}
 	}
 
+	@Override
 	public String getName() {
 		return queueName;
 	}
 
+	@Override
 	public void sendRequest(final Serializable request, final int priority, final ResponseListener listener) {
 		try {
 			final ObjectMessage objectMessage = sendingSession().createObjectMessage(request);
@@ -134,6 +136,7 @@ final class SimpleQueueService implements Service {
 		}
 	}
 
+	@Override
 	public Request receiveRequest(final long timeout) {
 		try {
 			final Message message = messageConsumer().receive(timeout);
@@ -148,6 +151,7 @@ final class SimpleQueueService implements Service {
 		}
 	}
 
+	@Override
 	public synchronized void stopReceiving() {
 		if (null != consumer.get()) {
 			try {

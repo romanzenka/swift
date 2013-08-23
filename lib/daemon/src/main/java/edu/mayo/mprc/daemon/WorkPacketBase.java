@@ -30,6 +30,7 @@ public abstract class WorkPacketBase extends FileHolder implements WorkPacket {
 		this.fromScratch = fromScratch;
 	}
 
+	@Override
 	public int getPriority() {
 		return priority;
 	}
@@ -37,14 +38,17 @@ public abstract class WorkPacketBase extends FileHolder implements WorkPacket {
 	/**
 	 * @param priority Priority for this work packet. +1 - high, -1 low, 0 - normal
 	 */
+	@Override
 	public void setPriority(final int priority) {
 		this.priority = priority;
 	}
 
+	@Override
 	public String getTaskId() {
 		return taskId;
 	}
 
+	@Override
 	public boolean isFromScratch() {
 		return fromScratch;
 	}

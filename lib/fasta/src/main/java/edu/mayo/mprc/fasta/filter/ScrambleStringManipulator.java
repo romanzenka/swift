@@ -26,6 +26,7 @@ public final class ScrambleStringManipulator implements StringManipulator {
 	 * @param toManipulate the String you want to create a manipulation of, will obviously be unchanged
 	 * @return the manipulated String
 	 */
+	@Override
 	public String manipulateString(final String toManipulate) {
 		final StringBuilder builder = new StringBuilder(toManipulate);
 
@@ -47,6 +48,7 @@ public final class ScrambleStringManipulator implements StringManipulator {
 	 *
 	 * @return a single String identifying what this does
 	 */
+	@Override
 	public String getDescription() {
 		return "Random";
 	}

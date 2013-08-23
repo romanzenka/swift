@@ -79,6 +79,7 @@ public final class GwtUiBuilder implements UiBuilderClient {
 		return propertyList;
 	}
 
+	@Override
 	public GwtUiBuilder nativeInterface(final String className) {
 		if ("database".equals(className)) {
 			nativeInterface = new DatabaseView(this, model);
@@ -95,6 +96,7 @@ public final class GwtUiBuilder implements UiBuilderClient {
 	 * @param displayName Property display name (user-friendly text)
 	 * @param description Property description.
 	 */
+	@Override
 	public GwtUiBuilder property(final String name, final String displayName, final String description) {
 		if (editor != null) {
 			endPropertyUi();
@@ -178,12 +180,14 @@ public final class GwtUiBuilder implements UiBuilderClient {
 	private void addEditorValidator(final Widget editor, final MultiValidator validator, final ValidationPanel validationPanel) {
 		if (editor instanceof SourcesChangeEvents) {
 			((SourcesChangeEvents) editor).addChangeListener(new ChangeListener() {
+				@Override
 				public void onChange(final Widget sender) {
 					validator.validate(PropertyList.getEditorValue(sender));
 				}
 			});
 		} else if (editor instanceof SourcesClickEvents) {
 			((SourcesClickEvents) editor).addClickListener(new ClickListener() {
+				@Override
 				public void onClick(final Widget sender) {
 					validator.validate(PropertyList.getEditorValue(sender));
 				}
@@ -220,6 +224,7 @@ public final class GwtUiBuilder implements UiBuilderClient {
 		validationPanel.setTestProgress(testProgress);
 		validationPanel.setSuccessIndicator(successIndicator);
 		test.addClickListener(new ClickListener() {
+			@Override
 			public void onClick(final Widget widget) {
 				validator.runOnDemandValidation(PropertyList.getEditorValue(editor), validationPanel);
 			}
@@ -271,6 +276,7 @@ public final class GwtUiBuilder implements UiBuilderClient {
 		return this;
 	}
 
+	@Override
 	public GwtUiBuilder required() {
 		this.validator.addValidator(new RequiredFieldValidator());
 		return this;
@@ -283,11 +289,13 @@ public final class GwtUiBuilder implements UiBuilderClient {
 	 *
 	 * @param value Default value for the current property.
 	 */
+	@Override
 	public GwtUiBuilder defaultValue(final String value) {
 		this.defaultValue = value;
 		return this;
 	}
 
+	@Override
 	public GwtUiBuilder validateOnDemand() {
 		this.validator.addOnDemandValidator();
 		return this;
@@ -307,11 +315,13 @@ public final class GwtUiBuilder implements UiBuilderClient {
 		return this;
 	}
 
+	@Override
 	public GwtUiBuilder boolValue() {
 		editor = new CheckBox();
 		return this;
 	}
 
+	@Override
 	public GwtUiBuilder integerValue(final Integer minimum, final Integer maximum) {
 		final IntegerValidator v = new IntegerValidator(minimum, maximum);
 		validator.addValidator(v);
@@ -319,17 +329,20 @@ public final class GwtUiBuilder implements UiBuilderClient {
 	}
 
 
+	@Override
 	public GwtUiBuilder reference(final String... type) {
 		this.editor = new ReferenceListBox(Arrays.asList(type), applicationModel, context);
 		return this;
 	}
 
 
+	@Override
 	public GwtUiBuilder enable(final String propertyName, final boolean synchronous) {
 		if (this.editor instanceof CheckBox) {
 			final CheckBox checkBox = (CheckBox) editor;
 			checkBox.addClickListener(new ClickListener() {
 
+				@Override
 				public void onClick(final Widget sender) {
 
 					if (sender instanceof CheckBox) {

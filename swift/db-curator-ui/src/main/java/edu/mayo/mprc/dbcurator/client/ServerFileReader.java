@@ -45,6 +45,7 @@ public final class ServerFileReader extends PopupPanel implements ClickListener 
 	private boolean commandsEnabled = true;
 
 	private Timer resultTime = new Timer() {
+		@Override
 		public void run() {
 			ServerFileReader.this.getInterrimResults();
 		}
@@ -89,12 +90,14 @@ public final class ServerFileReader extends PopupPanel implements ClickListener 
 		this.txtGrepExpression.setText(pattern);
 	}
 
+	@Override
 	public void setSize(final String w, final String h) {
 		super.setSize(w, h);
 		this.mainPanel.setSize(w, h);
 		contentRenderer.setSize(w, h);
 	}
 
+	@Override
 	public void setPixelSize(final int w, final int h) {
 		super.setPixelSize(w, h);
 		this.mainPanel.setPixelSize(w, h);
@@ -131,6 +134,7 @@ public final class ServerFileReader extends PopupPanel implements ClickListener 
 		final Hyperlink cmdClose = new Hyperlink("Close", "Close");
 		cmdClose.setStyleName("serverfilereader_commandbuttons");
 		cmdClose.addClickListener(new ClickListener() {
+			@Override
 			public void onClick(final Widget widget) {
 				if (waitPopup != null && waitPopup.isVisible()) {
 					waitPopup.hide();
@@ -152,6 +156,7 @@ public final class ServerFileReader extends PopupPanel implements ClickListener 
 
 	public static final int PAGE_OVERLAP = 5;
 
+	@Override
 	public void onClick(final Widget widget) {
 		if (widget.equals(cmdApplyGrep) && ((Hyperlink) widget).getText().equals("Stop")) {
 			cancelRequest();
@@ -186,12 +191,14 @@ public final class ServerFileReader extends PopupPanel implements ClickListener 
 		cmdApplyGrep.setText("Stop");
 		//todo retreive content
 		getService().getLines(this.fileDisplayed, this.startingLine, this.linesPerPage, txtGrepExpression.getText(), new AsyncCallback<String[]>() {
+			@Override
 			public void onFailure(final Throwable throwable) {
 				setCommandsEnabled(true);
 				resultTime.cancel();
 				showMessage("Could not get contents from server.  " + throwable.getMessage());
 			}
 
+			@Override
 			public void onSuccess(final String[] o) {
 				setCommandsEnabled(true);
 				if (waitPopup != null) {
@@ -211,10 +218,12 @@ public final class ServerFileReader extends PopupPanel implements ClickListener 
 		//todo retreive content
 		getService().setCancelMessage(true, new AsyncCallback<Void>() {
 
+			@Override
 			public void onFailure(final Throwable throwable) {
 				showMessage("Could not cancel for some reason. \n" + throwable.getMessage());
 			}
 
+			@Override
 			public void onSuccess(final Void aVoid) {
 				cmdApplyGrep.setText("Filter");
 			}
@@ -233,11 +242,13 @@ public final class ServerFileReader extends PopupPanel implements ClickListener 
 	}
 
 	private class ContentRetreivalCallback implements AsyncCallback<String[]> {
+		@Override
 		public void onFailure(final Throwable throwable) {
 			setCommandsEnabled(true);
 			showMessage("Could not get contents from server.  " + throwable.getMessage());
 		}
 
+		@Override
 		public void onSuccess(final String[] currentLines) {
 			if (currentLines.length > 0 && waitPopup != null && waitPopup.isVisible()) {
 				waitPopup.hide();

@@ -184,8 +184,9 @@ public final class CsvWriter implements Closeable {
      */
     public void writeNext(String[] nextLine) {
     	
-    	if (nextLine == null)
-    		return;
+    	if (nextLine == null) {
+		    return;
+	    }
     	
         StringBuilder sb = new StringBuilder(INITIAL_STRING_SIZE);
         for (int i = 0; i < nextLine.length; i++) {
@@ -195,8 +196,9 @@ public final class CsvWriter implements Closeable {
             }
 
             String nextElement = nextLine[i];
-            if (nextElement == null)
-                continue;
+            if (nextElement == null) {
+	            continue;
+            }
 
             sb.append(stringContainsSpecialCharacters(nextElement) ? processLine(nextElement) : nextElement);
         }
@@ -214,8 +216,9 @@ public final class CsvWriter implements Closeable {
     {
 		StringBuilder sb = new StringBuilder(INITIAL_STRING_SIZE);
 
-	    if (quotechar !=  NO_QUOTE_CHARACTER)
+	    if (quotechar !=  NO_QUOTE_CHARACTER) {
 		    sb.append(quotechar);
+	    }
 
 	    for (int j = 0; j < nextElement.length(); j++) {
 	        char nextChar = nextElement.charAt(j);
@@ -228,8 +231,9 @@ public final class CsvWriter implements Closeable {
 	        }
 	    }
 
-	    if (quotechar !=  NO_QUOTE_CHARACTER)
+	    if (quotechar !=  NO_QUOTE_CHARACTER) {
 		    sb.append(quotechar);
+	    }
 
 	    return sb;
     }
@@ -251,6 +255,7 @@ public final class CsvWriter implements Closeable {
      * @throws IOException if bad things happen
      *
      */
+    @Override
     public void close() throws IOException {
         flush();
         pw.close();

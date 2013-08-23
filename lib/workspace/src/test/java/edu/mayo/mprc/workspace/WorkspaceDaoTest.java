@@ -33,7 +33,7 @@ public final class WorkspaceDaoTest extends DaoTest {
 		try {
 			final List<User> users = workspaceDao.getUsers(false);
 			workspaceDao.commit();
-			Assert.assertTrue((users != null && users.size() == 0), "no user names should be found");
+			Assert.assertTrue((users != null && users.isEmpty()), "no user names should be found");
 		} catch (Exception t) {
 			workspaceDao.rollback();
 			throw t;

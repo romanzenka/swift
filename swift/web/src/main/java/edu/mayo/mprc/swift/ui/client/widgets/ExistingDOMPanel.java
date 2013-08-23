@@ -79,7 +79,7 @@ public final class ExistingDOMPanel extends ComplexPanel {
 		sibling = DOM.getNextSibling(root);
 		DOM.removeChild(parent, root);
 
-		if (panels.size() == 0) {
+		if (panels.isEmpty()) {
 			hookWindowClosing();
 		}
 		panels.put(domChunkId, this);
@@ -211,6 +211,7 @@ public final class ExistingDOMPanel extends ComplexPanel {
 		}
 	}
 
+	@Override
 	public Element getElement() {
 		return parent;
 	}
@@ -227,6 +228,7 @@ public final class ExistingDOMPanel extends ComplexPanel {
 	private static void hookWindowClosing() {
 		// Catch the window closing event.
 		Window.addWindowCloseListener(new WindowCloseListener() {
+			@Override
 			public void onWindowClosed() {
 				// When the window is closing, detach all root panels. This will cause
 				// all of their children's event listeners to be unhooked, which will
@@ -239,6 +241,7 @@ public final class ExistingDOMPanel extends ComplexPanel {
 				}
 			}
 
+			@Override
 			public String onWindowClosing() {
 				return null;
 			}

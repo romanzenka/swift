@@ -23,11 +23,13 @@ public final class PreviewDialog extends FrameDialog {
 		setContent(label);
 
 		service.getFiles(paramSet, new AsyncCallback<ClientParamFile[]>() {
+			@Override
 			public void onFailure(final Throwable throwable) {
 				hide();
 				SimpleParamsEditorPanel.handleGlobalError(throwable);
 			}
 
+			@Override
 			public void onSuccess(final ClientParamFile[] files) {
 
 				final TabPanel panel = new TabPanel();
@@ -53,10 +55,12 @@ public final class PreviewDialog extends FrameDialog {
 		show();
 	}
 
+	@Override
 	protected void cancel() {
 		hide();
 	}
 
+	@Override
 	protected void okay() {
 		hide();
 	}

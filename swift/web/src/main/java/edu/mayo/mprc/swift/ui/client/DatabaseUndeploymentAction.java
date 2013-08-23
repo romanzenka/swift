@@ -19,6 +19,7 @@ public final class DatabaseUndeploymentAction implements ClickListener {
 		this.dlb = dlb;
 	}
 
+	@Override
 	public void onClick(final Widget widget) {
 		final ClientSequenceDatabase csd = (ClientSequenceDatabase) dlb.getSelected();
 
@@ -28,10 +29,12 @@ public final class DatabaseUndeploymentAction implements ClickListener {
 
 		serviceAsync.undeployDatabase(csd.getShortName(), new AsyncCallback<ClientDatabaseUndeployerProgress>() {
 
+			@Override
 			public void onFailure(final Throwable caught) {
 				showError(new RuntimeException("Error occurred while submitting undeployment request. " + caught.getMessage(), caught));
 			}
 
+			@Override
 			public void onSuccess(final ClientDatabaseUndeployerProgress result) {
 				showProgressMessage(result);
 			}
@@ -56,10 +59,12 @@ public final class DatabaseUndeploymentAction implements ClickListener {
 	private void getNextProgressMessage(final long taskId) {
 		serviceAsync.getProgressMessageForDatabaseUndeployment(taskId, new AsyncCallback<ClientDatabaseUndeployerProgress>() {
 
+			@Override
 			public void onFailure(final Throwable caught) {
 				showError(new RuntimeException("Error occurred while listening undeployment progress messages. " + caught.getMessage(), caught));
 			}
 
+			@Override
 			public void onSuccess(final ClientDatabaseUndeployerProgress result) {
 				showProgressMessage(result);
 			}

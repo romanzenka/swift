@@ -18,6 +18,7 @@ public class SerializingUiChanges implements UiResponse {
 		this.resolver = resolver;
 	}
 
+	@Override
 	public void displayPropertyError(final ResourceConfig config, final String propertyName, final String error) {
 		commands.add(UiChangesReplayer.DISPLAY_PROPERTY_ERROR);
 		commands.add(resolver.getIdFromConfig(config));
@@ -25,6 +26,7 @@ public class SerializingUiChanges implements UiResponse {
 		commands.add(error);
 	}
 
+	@Override
 	public void setProperty(final ResourceConfig config, final String propertyName, final String newValue) {
 		commands.add(UiChangesReplayer.SET_PROPERTY);
 		commands.add(resolver.getIdFromConfig(config));

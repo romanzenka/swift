@@ -282,27 +282,27 @@ public abstract class ComparisonChain {
 		}
 
 		@Override
-		public final ComparisonChain compare(final int left, final int right) {
+		public ComparisonChain compare(final int left, final int right) {
 			return classify(Ints.compare(left, right));
 		}
 
 		@Override
-		public final ComparisonChain compare(final long left, final long right) {
+		public ComparisonChain compare(final long left, final long right) {
 			return classify(Longs.compare(left, right));
 		}
 
 		@Override
-		public final ComparisonChain compare(final float left, final float right) {
+		public ComparisonChain compare(final float left, final float right) {
 			return classify(Float.compare(left, right));
 		}
 
 		@Override
-		public final ComparisonChain compare(final double left, final double right) {
+		public ComparisonChain compare(final double left, final double right) {
 			return classify(Double.compare(left, right));
 		}
 
 		@Override
-		public final ComparisonChain compare(final boolean left, final boolean right) {
+		public ComparisonChain compare(final boolean left, final boolean right) {
 			return classify(Booleans.compare(left, right));
 		}
 
@@ -316,7 +316,7 @@ public abstract class ComparisonChain {
 			return this;
 		}
 
-		final ComparisonChain classify(final int result) {
+		ComparisonChain classify(final int result) {
 			return (result < 0) ? LESS : (result > 0) ? GREATER : ACTIVE_NULLS_FIRST;
 		}
 	}

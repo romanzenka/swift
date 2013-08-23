@@ -92,6 +92,7 @@ public final class FASTAInputStream implements DBInputStream {
 	 * goes to the first sequence in the sequence database file so that the next call to getHeader() will return the
 	 * first header in the file.
 	 */
+	@Override
 	public void beforeFirst() {
 		try {
 			FileUtilities.closeQuietly(this.reader);
@@ -108,6 +109,7 @@ public final class FASTAInputStream implements DBInputStream {
 	 *
 	 * @return false if we are already at the end of the file else true
 	 */
+	@Override
 	public boolean gotoNextSequence() {
 		if (reader == null) {
 			throw new MprcException("FASTA stream not initalized properly. Call beforeFirst() before reading first sequence");
@@ -174,11 +176,11 @@ public final class FASTAInputStream implements DBInputStream {
 	 * @return true if the string is a header or if it is null (meaning end of file)
 	 */
 	private static boolean isSequence(final String potentialSequence) {
-		return !(potentialSequence == null || potentialSequence.length() == 0 || potentialSequence.charAt(0) == FASTA_HEADER);
+		return !(potentialSequence == null || potentialSequence.isEmpty() || potentialSequence.charAt(0) == FASTA_HEADER);
 	}
 
 	private static boolean isHeader(final String potentialHeader) {
-		return !(potentialHeader == null || potentialHeader.length() == 0) && potentialHeader.charAt(0) == FASTA_HEADER;
+		return !(potentialHeader == null || potentialHeader.isEmpty()) && potentialHeader.charAt(0) == FASTA_HEADER;
 	}
 
 	/**
@@ -186,6 +188,7 @@ public final class FASTAInputStream implements DBInputStream {
 	 *
 	 * @return the current sequence's header
 	 */
+	@Override
 	public String getHeader() {
 		return this.currentHeader;
 	}
@@ -199,6 +202,7 @@ public final class FASTAInputStream implements DBInputStream {
 	 *
 	 * @return the current sequence
 	 */
+	@Override
 	public String getSequence() {
 		return this.currentSequence;
 	}
@@ -206,6 +210,7 @@ public final class FASTAInputStream implements DBInputStream {
 	/**
 	 * performs any cleaning up that may be necessary.  Always call when you are done.
 	 */
+	@Override
 	public void close() {
 		FileUtilities.closeQuietly(this.reader);
 	}

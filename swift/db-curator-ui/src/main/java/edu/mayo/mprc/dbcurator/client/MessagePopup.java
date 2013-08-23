@@ -16,6 +16,7 @@ class MessagePopup extends PopupPanel {
 		super.show();
 		if (msToDisplay > 0) {
 			final Timer hideTimer = new Timer() {
+				@Override
 				public void run() {
 					MessagePopup.this.hide();
 				}
@@ -24,6 +25,7 @@ class MessagePopup extends PopupPanel {
 		}
 	}
 
+	@Override
 	public void show() {
 		this.show(2500);
 	}

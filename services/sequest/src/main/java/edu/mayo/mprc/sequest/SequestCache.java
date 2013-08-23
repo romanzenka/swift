@@ -41,6 +41,7 @@ public final class SequestCache extends WorkCache<SequestMGFWorkPacket> {
 	public static final class Ui implements ServiceUiFactory {
 		private static final String DEFAULT_CACHE = "var/cache/sequest";
 
+		@Override
 		public void createUI(final DaemonConfig daemon, final ResourceConfig resource, final UiBuilder builder) {
 			builder
 					.property(CacheConfig.CACHE_FOLDER, "Sequest cache folder", "When a file gets searched by Sequest, the result is stored in this folder. Subsequent searches of the same file with same parameters use the cached value."

@@ -81,6 +81,7 @@ class SequestRunner implements Runnable, SequestCallerInterface {
 		this.setArgs(newArgs);
 	}
 
+	@Override
 	public File getWorkingDir() {
 		return workingDir;
 	}
@@ -117,6 +118,7 @@ class SequestRunner implements Runnable, SequestCallerInterface {
 		this.args = args;
 	}
 
+	@Override
 	public String getCommand() {
 		return command;
 	}
@@ -125,11 +127,13 @@ class SequestRunner implements Runnable, SequestCallerInterface {
 		this.command = command;
 	}
 
+	@Override
 	public String getSequestExe() {
 		return this.sequestExe;
 	}
 
 
+	@Override
 	public SequestCallerInterface createInstance(final File workingdir, final File paramsFile, final List<File> sequestDtaFiles, final File hostsFile) {
 		final SequestRunner runner = new SequestRunner(workingdir, paramsFile, sequestDtaFiles, this.hostsFile);
 		runner.setWatchDogTimeOut(this.getWatchDogTimeOut());
@@ -146,23 +150,27 @@ class SequestRunner implements Runnable, SequestCallerInterface {
 		return runner;
 	}
 
+	@Override
 	public void setSequestExe(final String sequestExe) {
 		this.sequestExe = sequestExe;
 		this.setCommand(sequestExe);
 	}
 
+	@Override
 	public String getSearchResultsFolder() {
 		return this.searchResultsFolder;
 	}
 
+	@Override
 	public void setSearchResultsFolder(final String folder) {
 		this.searchResultsFolder = folder;
 	}
 
 	// TODO : need to replace with getCommand and getParameters
 
+	@Override
 	public String getCall() {
-		if (sequestDtaFiles == null || sequestDtaFiles.size() == 0) {
+		if (sequestDtaFiles == null || sequestDtaFiles.isEmpty()) {
 			throw new MprcException(NO_DTA_FILES_PASSED);
 		}
 		if (paramsFile == null || paramsFile.length() == 0) {
@@ -221,6 +229,7 @@ class SequestRunner implements Runnable, SequestCallerInterface {
 	 * used to make the call to sequest
 	 * Note : grabs the standard out and standard error logs so immediately respond to changes in run
 	 */
+	@Override
 	public void run() {
 
 		try {

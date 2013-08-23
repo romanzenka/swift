@@ -49,12 +49,12 @@ final class DistinctFiles {
 
 			// Form a hypothesis - this new path should be okay. But we still need to test it in the next loop.			
 			String extension = FileUtilities.getGzippedExtension(new File(resultingPath).getName());
-			if (extension.length() > 0) {
+			if (!extension.isEmpty()) {
 				extension = "." + extension;
 			}
 
 			final String basePath = resultingPath.substring(0, resultingPath.length() - extension.length());
-			resultingPath = basePath + "_" + String.valueOf(newCount) + extension;
+			resultingPath = basePath + "_" + newCount + extension;
 		}
 		// The freshly created name has a count 1
 		fileNameDisambiguation.put(resultingPath, 1);

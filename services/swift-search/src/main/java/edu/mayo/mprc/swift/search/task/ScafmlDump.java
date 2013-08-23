@@ -80,7 +80,7 @@ class ScafmlDump {
 				final ScafmlFastaDatabase sfd = new ScafmlFastaDatabase(definition.getSearchParameters().getDatabase().getDatabaseAnnotation());
 				sfd.setDatabase(deployedDatabase);
 				// Generate db id
-				dbId = "db" + String.valueOf(dbIdNum);
+				dbId = "db" + dbIdNum;
 				dbIdNum++;
 				sfd.setId(dbId);
 				try {

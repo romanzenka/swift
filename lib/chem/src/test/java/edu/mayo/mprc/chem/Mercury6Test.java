@@ -41,7 +41,7 @@ public final class Mercury6Test {
 			line = line.trim();
 			switch (state) {
 				case 0:
-					if (line.length() == 0 || line.charAt(0) == '#') {
+					if (line.isEmpty() || line.charAt(0) == '#') {
 						continue;
 					}
 					chemical = new Chemical(line, pt);
@@ -53,7 +53,7 @@ public final class Mercury6Test {
 					state++;
 					break;
 				case 2:
-					if (line.length() != 0 && line.charAt(0) != '#') {
+					if (!line.isEmpty() && line.charAt(0) != '#') {
 						final DistributionItem item = new DistributionItem(line);
 						items.add(item);
 					} else {

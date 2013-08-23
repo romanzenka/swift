@@ -73,6 +73,7 @@ public final class SpectrumExtractionEditor extends Composite implements Validat
 		this.initWidget(panel);
 	}
 
+	@Override
 	public ClientValue getClientValue() {
 		if (extractMsnSettings == null) {
 			return null;
@@ -83,6 +84,7 @@ public final class SpectrumExtractionEditor extends Composite implements Validat
 				extractMsnSettings.getCommand());
 	}
 
+	@Override
 	public void setValue(final ClientValue value) {
 		if (!(value instanceof ClientExtractMsnSettings)) {
 			ExceptionUtilities.throwCastException(value, ClientExtractMsnSettings.class);
@@ -99,35 +101,43 @@ public final class SpectrumExtractionEditor extends Composite implements Validat
 		updateInterface();
 	}
 
+	@Override
 	public void focus() {
 		settings.setFocus(true);
 	}
 
+	@Override
 	public void setValidationSeverity(final int validationSeverity) {
 		ValidationController.setValidationSeverity(validationSeverity, this);
 	}
 
+	@Override
 	public boolean needsAllowedValues() {
 		return false;
 	}
 
+	@Override
 	public void setAllowedValues(final List<? extends ClientValue> values) {
 		// Not supported
 	}
 
+	@Override
 	public void setEnabled(final boolean enabled) {
 		settings.setEnabled(enabled && commandLineSupported(engineName.getValue(engineName.getSelectedIndex())));
 		engineName.setEnabled(enabled);
 	}
 
+	@Override
 	public void addChangeListener(final ChangeListener changeListener) {
 		changeListenerCollection.add(changeListener);
 	}
 
+	@Override
 	public void removeChangeListener(final ChangeListener changeListener) {
 		changeListenerCollection.remove(changeListener);
 	}
 
+	@Override
 	public void onChange(final Widget widget) {
 		updateSettings();
 		updateInterface();

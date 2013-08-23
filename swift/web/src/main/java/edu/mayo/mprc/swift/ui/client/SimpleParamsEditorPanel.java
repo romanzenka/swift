@@ -109,6 +109,7 @@ public final class SimpleParamsEditorPanel implements SourcesChangeEvents {
 		saveButton.addStyleName(ACTION_LINK);
 		saveButton.addStyleName(SPACE_AFTER);
 		saveButton.addClickListener(new ClickListener() {
+			@Override
 			public void onClick(final Widget widget) {
 				save();
 			}
@@ -120,6 +121,7 @@ public final class SimpleParamsEditorPanel implements SourcesChangeEvents {
 		button.addStyleName(ACTION_LINK);
 		button.addStyleName(SPACE_AFTER);
 		button.addClickListener(new ClickListener() {
+			@Override
 			public void onClick(final Widget widget) {
 				preview();
 			}
@@ -130,6 +132,7 @@ public final class SimpleParamsEditorPanel implements SourcesChangeEvents {
 		deleteButton.addStyleName(ACTION_LINK);
 		deleteButton.addStyleName(SPACE_AFTER);
 		deleteButton.addClickListener(new ClickListener() {
+			@Override
 			public void onClick(final Widget widget) {
 				delete();
 			}
@@ -170,6 +173,7 @@ public final class SimpleParamsEditorPanel implements SourcesChangeEvents {
 			pb.addStyleName(ACTION_LINK);
 			pb.setTitle("Click here to review the selected database and potentially modify it for your own needs.");
 			pb.addClickListener(new ClickListener() {
+				@Override
 				public void onClick(final Widget widget) {
 					popupDbCurator();
 				}
@@ -212,8 +216,9 @@ public final class SimpleParamsEditorPanel implements SourcesChangeEvents {
 			label1.setStyleName(PARAMS_LABEL);
 			label1.setHorizontalAlignment(HasHorizontalAlignment.ALIGN_RIGHT);
 			final ValidatableTextBox tdb = new ValidatableTextBox("sequence.missed_cleavages") {
+				@Override
 				protected ClientValue getValueFromString(final String value) {
-					if ((value == null) || (value.length() == 0)) {
+					if ((value == null) || (value.isEmpty())) {
 						return null;
 					}
 					try {
@@ -228,14 +233,17 @@ public final class SimpleParamsEditorPanel implements SourcesChangeEvents {
 					}
 				}
 
+				@Override
 				protected String setValueAsString(final ClientValue object) {
 					return object.toString();
 				}
 
+				@Override
 				public void setAllowedValues(final List<? extends ClientValue> values) {
 					// unused.
 				}
 
+				@Override
 				public boolean needsAllowedValues() {
 					return false;
 				}
@@ -359,6 +367,7 @@ public final class SimpleParamsEditorPanel implements SourcesChangeEvents {
 		selectionController.setParamSetList(pageData.getParamSetList());
 
 		validationController.addChangeListener(new ChangeListener() {
+			@Override
 			public void onChange(final Widget widget) {
 				for (final PushButton button : buttons) {
 					button.setEnabled(isValid());
@@ -418,7 +427,7 @@ public final class SimpleParamsEditorPanel implements SourcesChangeEvents {
 			}
 			if (editorVisible) {
 				// We are becoming visible. We load list of fixed/variable mods so the controls are ready when the user needs them
-				if (fixedMods.getAllowedValues() == null || fixedMods.getAllowedValues().size() == 0) {
+				if (fixedMods.getAllowedValues() == null || fixedMods.getAllowedValues().isEmpty()) {
 					loadModificationAllowedValues();
 				}
 			}
@@ -437,6 +446,7 @@ public final class SimpleParamsEditorPanel implements SourcesChangeEvents {
 	 */
 	private void loadModificationAllowedValues() {
 		validationController.getAllowedValuesForValidatable(fixedMods, new Callback() {
+			@Override
 			public void done() {
 				varMods.setAllowedValues(fixedMods.getAllowedValues());
 			}
@@ -458,10 +468,12 @@ public final class SimpleParamsEditorPanel implements SourcesChangeEvents {
 	/**
 	 * Fires change events whenever the selected ParamSet changes, or when a change in validation state occurs.
 	 */
+	@Override
 	public void addChangeListener(final ChangeListener changeListener) {
 		listeners.add(changeListener);
 	}
 
+	@Override
 	public void removeChangeListener(final ChangeListener changeListener) {
 		listeners.remove(changeListener);
 	}
@@ -477,6 +489,7 @@ public final class SimpleParamsEditorPanel implements SourcesChangeEvents {
 	private void save() {
 		new SaveDialog(selector.getSelectedParamSet(), serviceAsync, user,
 				new SaveDialog.Callback() {
+					@Override
 					public void saveCompleted(final ClientParamSet paramSet) {
 						selectionController.refresh();
 
@@ -496,10 +509,12 @@ public final class SimpleParamsEditorPanel implements SourcesChangeEvents {
 			if (Window.confirm("Do you really want to delete parameter set " + setToDelete.getName() + "?")) {
 				serviceAsync.delete(
 						selector.getSelectedParamSet(), new AsyncCallback<Void>() {
+					@Override
 					public void onFailure(final Throwable throwable) {
 						handleGlobalError(throwable);
 					}
 
+					@Override
 					public void onSuccess(final Void aVoid) {
 						selectionController.refresh();
 					}
@@ -521,8 +536,10 @@ public final class SimpleParamsEditorPanel implements SourcesChangeEvents {
 
 		final DialogBox dialogBox = new DialogBox(false);
 		final CurationEditor ce = new CurationEditor(selected, user.getEmail(), emailInitialPairs, new EditorCloseCallback() {
+			@Override
 			public void editorClosed(final Integer openCurationID) {
 				validationController.getAllowedValues(dlb, new Callback() {
+					@Override
 					public void done() {
 						if (openCurationID != null) {
 							dlb.select(openCurationID, validationController);

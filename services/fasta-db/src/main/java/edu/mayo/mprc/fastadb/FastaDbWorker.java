@@ -42,6 +42,7 @@ public class FastaDbWorker extends WorkerBase {
 		this.curationDao = curationDao;
 	}
 
+	@Override
 	public void process(final WorkPacket wp, final UserProgressReporter reporter) {
 		final FastaDbWorkPacket workPacket = (FastaDbWorkPacket) wp;
 		curationDao.begin();

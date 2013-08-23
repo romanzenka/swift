@@ -38,6 +38,7 @@ public final class SequestToMakeDBConverter {
 				.add(new Mapper("digest_mass_range") {
 					private final Pattern p = Pattern.compile("(\\S+)\\s+(\\S+)");
 
+					@Override
 					public Map<String, String> grab(Map<String, String> values, final String inputKey, final String inputValue) {
 						final Matcher m = p.matcher(inputValue);
 						if (!m.matches()) {
@@ -47,6 +48,7 @@ public final class SequestToMakeDBConverter {
 						return put(values, "max_peptide_mass", m.group(2));
 					}
 
+					@Override
 					public void output(final Map<String, String> values, final StringBuilder newPic) {
 						for (final Map.Entry<String, String> entry : values.entrySet()) {
 							add(entry.getKey(), entry.getValue(), newPic);
@@ -142,10 +144,12 @@ public final class SequestToMakeDBConverter {
 			super(regexp);
 		}
 
+		@Override
 		public Map<String, String> grab(final Map<String, String> values, final String inputKey, final String inputValue) {
 			return values;
 		}
 
+		@Override
 		public void output(final Map<String, String> values, final StringBuilder newPic) { /* nothing */}
 	}
 
@@ -162,11 +166,13 @@ public final class SequestToMakeDBConverter {
 			this.value = value;
 		}
 
+		@Override
 		public Map<String, String> grab(final Map<String, String> values, final String inputKey, final String inputValue) {
 			// never called because has no regex
 			return values;
 		}
 
+		@Override
 		public void output(final Map<String, String> values, final StringBuilder newPic) {
 			add(this.outputKey, this.value, newPic);
 		}
@@ -188,10 +194,12 @@ public final class SequestToMakeDBConverter {
 
 		private String outputKey;
 
+		@Override
 		public Map<String, String> grab(final Map<String, String> values, final String inputKey, final String inputValue) {
 			return put(values, outputKey == null ? inputKey : outputKey, inputValue);
 		}
 
+		@Override
 		public void output(final Map<String, String> values, final StringBuilder newPic) {
 			for (final Map.Entry<String, String> e : values.entrySet()) {
 				add(e.getKey(), e.getValue(), newPic);
@@ -201,7 +209,7 @@ public final class SequestToMakeDBConverter {
 
 	public SequestToMakeDBConverter add(final Mapper m) {
 		final String re = m.getRegexp();
-		if (re != null && re.length() > 0) {
+		if (re != null && !re.isEmpty()) {
 			if (re.matches("\\((?!\\?)")) {
 				throw new MprcException("Can't handle regexps with capturing groups yet");
 			}

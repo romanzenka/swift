@@ -114,22 +114,27 @@ public final class SequestDeploymentServiceTest {
 		try {
 			final Object workToken = tester.sendWork(request, new ProgressListener() {
 
+				@Override
 				public void requestEnqueued(final String hostString) {
 					LOGGER.debug("SequestDS request enqueued at " + hostString);
 				}
 
+				@Override
 				public void requestProcessingStarted(final String hostString) {
 					LOGGER.debug("SequestDS processing started at " + hostString);
 				}
 
+				@Override
 				public void requestProcessingFinished() {
 					LOGGER.debug("SequestDS processing finished");
 				}
 
+				@Override
 				public void requestTerminated(final Exception e) {
 					fail("Request terminated", e);
 				}
 
+				@Override
 				public void userProgressInformation(final ProgressInfo progressInfo) {
 					if (progressInfo instanceof SequestDeploymentResult) {
 						results[0] = (SequestDeploymentResult) progressInfo;

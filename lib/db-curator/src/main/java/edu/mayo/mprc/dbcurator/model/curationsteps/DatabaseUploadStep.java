@@ -61,6 +61,7 @@ public class DatabaseUploadStep implements CurationStep {
 	 * @param exec the CurationExecutor that is running this step
 	 * @return the StepValidation describing the progress through this step
 	 */
+	@Override
 	public StepValidation performStep(final CurationExecutor exec) {
 		this.recentRunValidation = preValidate(new StepValidation());
 		//if the prevalidation already failed then return the failed validation
@@ -118,6 +119,7 @@ public class DatabaseUploadStep implements CurationStep {
 		return this.recentRunValidation;
 	}
 
+	@Override
 	public StepValidation preValidate(final CurationDao curationDao) {
 		return preValidate(new StepValidation());
 	}
@@ -139,6 +141,7 @@ public class DatabaseUploadStep implements CurationStep {
 		return toValidateInto;
 	}
 
+	@Override
 	public CurationStep createCopy() {
 		final DatabaseUploadStep copy = new DatabaseUploadStep();
 		copy.setPathToUploadedFile(this.pathToUploadedFile);
@@ -146,18 +149,22 @@ public class DatabaseUploadStep implements CurationStep {
 		return copy;
 	}
 
+	@Override
 	public Integer getId() {
 		return this.id;
 	}
 
+	@Override
 	public void setId(final Integer id) {
 		this.id = id;
 	}
 
+	@Override
 	public Integer getLastRunCompletionCount() {
 		return this.lastRunCompletionCount;
 	}
 
+	@Override
 	public void setLastRunCompletionCount(final Integer count) {
 		this.lastRunCompletionCount = count;
 	}
@@ -206,6 +213,7 @@ public class DatabaseUploadStep implements CurationStep {
 		this.md5CheckSum = md5CheckSum == null ? null : Arrays.copyOf(md5CheckSum, md5CheckSum.length);
 	}
 
+	@Override
 	public String simpleDescription() {
 		return "Upload " + this.getFileName();
 	}

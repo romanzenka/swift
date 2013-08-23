@@ -32,6 +32,7 @@ public final class AsyncFileWriter implements Runnable, Future<File> {
 		this.outFile = toWriteTo;
 	}
 
+	@Override
 	public void run() {
 		InputStream istream = null;
 		try {
@@ -75,6 +76,7 @@ public final class AsyncFileWriter implements Runnable, Future<File> {
 		return sourceSize;
 	}
 
+	@Override
 	public synchronized boolean cancel(final boolean mayInterruptIfRunning) {
 		if (isDone() || mayInterruptIfRunning) {
 			this.cancelled.set(true);
@@ -84,18 +86,22 @@ public final class AsyncFileWriter implements Runnable, Future<File> {
 		return false;
 	}
 
+	@Override
 	public synchronized boolean isCancelled() {
 		return this.cancelled.get();
 	}
 
+	@Override
 	public synchronized boolean isDone() {
 		return !results.isEmpty();
 	}
 
+	@Override
 	public synchronized File get() throws InterruptedException {
 		return results.take();
 	}
 
+	@Override
 	public synchronized File get(final long timeout, final TimeUnit unit) throws InterruptedException {
 		return results.poll(timeout, unit);
 	}

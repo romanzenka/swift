@@ -38,6 +38,7 @@ public final class ModificationsLabelRunClick implements ClickListener {
 		this.updateSelectedOnEditor = updateSelections;
 	}
 
+	@Override
 	public void onClick(final Widget sender) {
 		final ModificationDialog p = new ModificationDialog(editor);
 
@@ -72,6 +73,7 @@ public final class ModificationsLabelRunClick implements ClickListener {
 		 *
 		 * @param sender - the Ok button
 		 */
+		@Override
 		public void onClick(final Widget sender) {
 			proxy.setValue(editor.getClientValue());
 		}

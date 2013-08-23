@@ -59,7 +59,7 @@ final class DirectDaemonConnection implements DaemonConnection {
 
 		try {
 			listenerNumber++;
-			service.sendRequest(workPacket, priority, new DaemonResponseListener(listener, "R#" + String.valueOf(listenerNumber), this));
+			service.sendRequest(workPacket, priority, new DaemonResponseListener(listener, "R#" + listenerNumber, this));
 		} catch (MprcException e) {
 			// SWALLOWED: The exception is reported directly to the listener
 			listener.requestTerminated(new DaemonException(e));

@@ -25,6 +25,7 @@ public final class DeleteButton extends PushButton {
 		this.deleteMessage = deleteMessage;
 	}
 
+	@Override
 	public void addClickListener(final ClickListener listener) {
 		super.addClickListener(new ConfirmationClickListener(listener));
 	}
@@ -36,6 +37,7 @@ public final class DeleteButton extends PushButton {
 			this.wrappedClickListener = wrappedClickListener;
 		}
 
+		@Override
 		public void onClick(final Widget sender) {
 			if (Window.confirm(deleteMessage)) {
 				wrappedClickListener.onClick(sender);

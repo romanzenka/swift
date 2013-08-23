@@ -124,7 +124,7 @@ public final class ReportUpdate implements HttpRequestHandler {
 			resp.setContentType(CONTENT_TYPE);
 
 			// No action - clear everything, get fresh copy of data
-			if (action == null || action.length() == 0 || "load".equals(action)) {
+			if (action == null || action.isEmpty() || "load".equals(action)) {
 				out.clearAll();
 				printSearchRuns(out, searchRunFilter, "insert");
 			} else if ("rewrite".equals(action)) {
@@ -149,7 +149,7 @@ public final class ReportUpdate implements HttpRequestHandler {
 				if (null != expanded) {
 					final String[] expandedIds = expanded.split(",");
 					for (final String idString : expandedIds) {
-						if (null != idString && idString.length() != 0) {
+						if (null != idString && !idString.isEmpty()) {
 							final int id = Integer.parseInt(idString);
 							out.rewriteTaskDataList(id, swiftDao.getTaskDataList(id));
 						}
@@ -345,9 +345,11 @@ public final class ReportUpdate implements HttpRequestHandler {
 			this.response = response;
 		}
 
+		@Override
 		public void requestEnqueued(final String hostString) {
 		}
 
+		@Override
 		public void requestProcessingStarted(final String hostString) {
 		}
 
@@ -360,6 +362,7 @@ public final class ReportUpdate implements HttpRequestHandler {
 			}
 		}
 
+		@Override
 		public void requestProcessingFinished() {
 			signalFinished();
 		}
@@ -371,6 +374,7 @@ public final class ReportUpdate implements HttpRequestHandler {
 			}
 		}
 
+		@Override
 		public void requestTerminated(final Exception e) {
 			final String info = e.getMessage();
 			try {
@@ -383,6 +387,7 @@ public final class ReportUpdate implements HttpRequestHandler {
 			signalFinished();
 		}
 
+		@Override
 		public void userProgressInformation(final ProgressInfo progressInfo) {
 			if (progressInfo instanceof QstatOutput) {
 				final QstatOutput info = (QstatOutput) progressInfo;
@@ -444,15 +449,19 @@ public final class ReportUpdate implements HttpRequestHandler {
 			}
 		}
 
+		@Override
 		public void requestEnqueued(final String hostString) {
 		}
 
+		@Override
 		public void requestProcessingStarted(final String hostString) {
 		}
 
+		@Override
 		public void requestProcessingFinished() {
 		}
 
+		@Override
 		public void requestTerminated(final Exception e) {
 			synchronized (lock) {
 				this.lastException = e;
@@ -460,6 +469,7 @@ public final class ReportUpdate implements HttpRequestHandler {
 			}
 		}
 
+		@Override
 		public void userProgressInformation(final ProgressInfo progressInfo) {
 			if (progressInfo instanceof AssignedSearchRunId) {
 				synchronized (lock) {

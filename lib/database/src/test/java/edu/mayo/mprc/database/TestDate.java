@@ -37,13 +37,21 @@ public class TestDate extends PersistableBase {
 
 	@Override
 	public boolean equals(final Object o) {
-		if (this == o) return true;
-		if (o == null || !(o instanceof TestDate)) return false;
+		if (this == o) {
+			return true;
+		}
+		if (o == null || !(o instanceof TestDate)) {
+			return false;
+		}
 
 		final TestDate testDate = (TestDate) o;
 
-		if (value1 != null ? !value1.equals(testDate.value1) : testDate.value1 != null) return false;
-		if (value2 != null ? !value2.equals(testDate.value2) : testDate.value2 != null) return false;
+		if (value1 != null ? !value1.equals(testDate.value1) : testDate.value1 != null) {
+			return false;
+		}
+		if (value2 != null ? !value2.equals(testDate.value2) : testDate.value2 != null) {
+			return false;
+		}
 
 		return true;
 	}

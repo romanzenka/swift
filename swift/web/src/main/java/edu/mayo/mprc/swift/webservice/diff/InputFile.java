@@ -8,9 +8,9 @@ import edu.mayo.mprc.swift.dbmapping.FileSearch;
  */
 @XStreamAlias("inputFile")
 public final class InputFile {
-	final int id;
-	final String path;
-	final String name;
+	private final int id;
+	private final String path;
+	private final String name;
 
 	public InputFile(final int id, final String path, final String name) {
 		this.id = id;

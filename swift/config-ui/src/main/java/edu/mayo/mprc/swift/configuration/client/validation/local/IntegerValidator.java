@@ -12,6 +12,7 @@ public final class IntegerValidator implements Validator {
 		this.minimumValue = minimumValue;
 	}
 
+	@Override
 	public String validate(final String value) {
 		try {
 			final Integer integer = Integer.valueOf(value);

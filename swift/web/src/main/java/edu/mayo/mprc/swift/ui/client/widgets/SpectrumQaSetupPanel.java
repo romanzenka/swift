@@ -36,6 +36,7 @@ public final class SpectrumQaSetupPanel extends HorizontalPanel {
 		propertyFile.setSelectedIndex(0);
 
 		spectrumQaEnabled.addClickListener(new ClickListener() {
+			@Override
 			public void onClick(final Widget widget) {
 				updateEnabledControls();
 			}

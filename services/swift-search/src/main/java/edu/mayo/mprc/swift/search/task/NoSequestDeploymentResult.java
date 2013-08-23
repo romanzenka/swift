@@ -14,6 +14,7 @@ final class NoSequestDeploymentResult implements DatabaseDeploymentResult {
 		this.fastaFile = fastaFile;
 	}
 
+	@Override
 	public String getShortDbName() {
 		assert false : "Short database name is not used by Sequest";
 		return null;
@@ -22,6 +23,7 @@ final class NoSequestDeploymentResult implements DatabaseDeploymentResult {
 	/**
 	 * @return We did not do deployment, so null is returned.
 	 */
+	@Override
 	public File getSequestHdrFile() {
 		return null;
 	}
@@ -34,14 +36,17 @@ final class NoSequestDeploymentResult implements DatabaseDeploymentResult {
 		return null;
 	}
 
+	@Override
 	public File getFastaFile() {
 		return fastaFile;
 	}
 
+	@Override
 	public List<File> getGeneratedFiles() {
 		return new ArrayList<File>(0);
 	}
 
+	@Override
 	public DeploymentResult getDeploymentResult() {
 		return null;
 	}

@@ -19,15 +19,18 @@ public final class Configuration implements EntryPoint, Context {
 	private ApplicationModel model = new ApplicationModel();
 	private ConfigWrapper configWrapper;
 
+	@Override
 	public void onModuleLoad() {
 		progressPanel = RootPanel.get("progress");
 
 		displayProgressMessage("Loading...");
 		ConfigurationService.App.getInstance().loadConfiguration(new AsyncCallback<ApplicationModel>() {
+			@Override
 			public void onFailure(final Throwable throwable) {
 				displayErrorMessage(throwable.getMessage());
 			}
 
+			@Override
 			public void onSuccess(final ApplicationModel applicationModel) {
 				displayProgressMessage(null);
 				model = applicationModel;
@@ -43,6 +46,7 @@ public final class Configuration implements EntryPoint, Context {
 
 		saveConfigurationButton = new Button("Save configuration");
 		saveConfigurationButton.addClickListener(new ClickListener() {
+			@Override
 			public void onClick(final Widget widget) {
 				clearErrorMessages();
 				displayProgressMessage("Saving...");
@@ -63,11 +67,13 @@ public final class Configuration implements EntryPoint, Context {
 
 	private void save() {
 		ConfigurationService.App.getInstance().saveConfiguration(new AsyncCallback<UiChangesReplayer>() {
+			@Override
 			public void onFailure(final Throwable throwable) {
 				displayProgressMessage(null);
 				displayErrorMessage(throwable.getMessage());
 			}
 
+			@Override
 			public void onSuccess(final UiChangesReplayer changes) {
 				displayProgressMessage(null);
 				final StringBuilder message = new StringBuilder();
@@ -75,9 +81,11 @@ public final class Configuration implements EntryPoint, Context {
 				changes.replay(new UiChanges() {
 					private static final long serialVersionUID = -5054481989230026680L;
 
+					@Override
 					public void setProperty(final String resourceId, final String propertyName, final String newValue) {
 					}
 
+					@Override
 					public void displayPropertyError(final String resourceId, final String propertyName, final String error) {
 						if (error == null) {
 							message.setLength(0);
@@ -105,10 +113,12 @@ public final class Configuration implements EntryPoint, Context {
 		}
 	}
 
+	@Override
 	public ApplicationModel getApplicationModel() {
 		return model;
 	}
 
+	@Override
 	public void displayErrorMessage(final String message) {
 		if (message != null) {
 			final Panel panel = new FlowPanel();
@@ -119,6 +129,7 @@ public final class Configuration implements EntryPoint, Context {
 
 			final Button clearErrorButton = new Button("Clear Error");
 			clearErrorButton.addClickListener(new ClickListener() {
+				@Override
 				public void onClick(final Widget sender) {
 					multiErrorPanel.remove(panel);
 				}
@@ -129,6 +140,7 @@ public final class Configuration implements EntryPoint, Context {
 		}
 	}
 
+	@Override
 	public void displayErrorMessage(final String message, final Throwable t) {
 		displayErrorMessage(message + ": " + t.getMessage());
 	}

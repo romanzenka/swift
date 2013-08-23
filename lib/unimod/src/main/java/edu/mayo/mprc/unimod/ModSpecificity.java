@@ -262,6 +262,7 @@ public class ModSpecificity extends PersistableBase implements Comparable<ModSpe
 
 	}
 
+	@Override
 	public int compareTo(final ModSpecificity o) {
 		if (o == null) {
 			return -1;
@@ -361,7 +362,7 @@ public class ModSpecificity extends PersistableBase implements Comparable<ModSpe
 		if (terminus != Terminus.Anywhere && isProteinOnly() != proteinEnd) {
 			return false;
 		}
-		if (acids.length() == 0) {
+		if (acids.isEmpty()) {
 			if (isPositionCTerminus() || isPositionNTerminus()) {
 				return true;
 			}

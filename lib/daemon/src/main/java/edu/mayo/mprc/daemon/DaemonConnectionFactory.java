@@ -31,6 +31,7 @@ public final class DaemonConnectionFactory extends FactoryBase<ServiceConfig, Da
 		this.serviceFactory = serviceFactory;
 	}
 
+	@Override
 	public DaemonConnection create(final ServiceConfig config, final DependencyResolver dependencies) {
 		// The creation of the daemon connection depends on a message broker being present
 		final ServiceFactory factory = getServiceFactory();

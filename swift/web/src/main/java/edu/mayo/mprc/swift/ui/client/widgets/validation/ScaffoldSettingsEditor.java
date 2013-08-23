@@ -69,6 +69,7 @@ public final class ScaffoldSettingsEditor extends Composite implements Validatab
 		goAnnotations = new CheckBox("GO Annotations");
 		goAnnotations.setStyleName("scaffold-setting-group");
 		goAnnotations.addClickListener(new ClickListener() {
+			@Override
 			public void onClick(final Widget sender) {
 				onChange(sender);
 			}
@@ -89,6 +90,7 @@ public final class ScaffoldSettingsEditor extends Composite implements Validatab
 		useIndependentSampleGrouping.setTitle("Samples will be reported as if they were processed in independent Scaffold runs");
 		useIndependentSampleGrouping.setStyleName("scaffold-setting-group");
 		useIndependentSampleGrouping.addClickListener(new ClickListener() {
+			@Override
 			public void onClick(final Widget sender) {
 				onChange(sender);
 			}
@@ -99,6 +101,7 @@ public final class ScaffoldSettingsEditor extends Composite implements Validatab
 		useFamilyProteinGrouping.setTitle("Scaffold will group proteins into families. New in Scaffold 4");
 		useFamilyProteinGrouping.setStyleName("scaffold-setting-group");
 		useFamilyProteinGrouping.addClickListener(new ClickListener() {
+			@Override
 			public void onClick(final Widget sender) {
 				onChange(sender);
 			}
@@ -107,6 +110,7 @@ public final class ScaffoldSettingsEditor extends Composite implements Validatab
 
 		starredDialog = new StarredProteinsDialog();
 		starredDialog.setOkListener(new ClickListener() {
+			@Override
 			public void onClick(final Widget sender) {
 				onChange(sender);
 			}
@@ -115,10 +119,12 @@ public final class ScaffoldSettingsEditor extends Composite implements Validatab
 		this.initWidget(panel);
 	}
 
+	@Override
 	public ClientValue getClientValue() {
 		return scaffoldSettings;
 	}
 
+	@Override
 	public void setValue(final ClientValue value) {
 		if (!(value instanceof ClientScaffoldSettings)) {
 			ExceptionUtilities.throwCastException(value, ClientScaffoldSettings.class);
@@ -137,22 +143,27 @@ public final class ScaffoldSettingsEditor extends Composite implements Validatab
 		useFamilyProteinGrouping.setValue(scaffoldSettings.isUseFamilyProteinGrouping());
 	}
 
+	@Override
 	public void focus() {
 		proteinProbability.setFocus(true);
 	}
 
+	@Override
 	public void setValidationSeverity(final int validationSeverity) {
 		ValidationController.setValidationSeverity(validationSeverity, this);
 	}
 
+	@Override
 	public boolean needsAllowedValues() {
 		return false;
 	}
 
+	@Override
 	public void setAllowedValues(final List<? extends ClientValue> values) {
 		// ignore
 	}
 
+	@Override
 	public void setEnabled(final boolean enabled) {
 		proteinProbability.setEnabled(enabled);
 		minPeptideCount.setEnabled(enabled);
@@ -165,14 +176,17 @@ public final class ScaffoldSettingsEditor extends Composite implements Validatab
 		saveSpectra.setEnabled(enabled);
 	}
 
+	@Override
 	public void addChangeListener(final ChangeListener changeListener) {
 		changeListenerCollection.add(changeListener);
 	}
 
+	@Override
 	public void removeChangeListener(final ChangeListener changeListener) {
 		changeListenerCollection.remove(changeListener);
 	}
 
+	@Override
 	public void onChange(final Widget widget) {
 		scaffoldSettings.setProteinProbability(proteinProbability.getDoubleValue() / 100.0);
 		scaffoldSettings.setMinimumPeptideCount(minPeptideCount.getIntegerValue());
@@ -192,6 +206,7 @@ public final class ScaffoldSettingsEditor extends Composite implements Validatab
 		changeListenerCollection.fireChange(this);
 	}
 
+	@Override
 	public void onClick(final Widget sender) {
 		if (starredCheckbox.equals(sender)) {
 			if (starredCheckbox.isChecked()) {

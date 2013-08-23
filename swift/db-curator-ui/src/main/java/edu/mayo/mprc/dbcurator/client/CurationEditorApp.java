@@ -15,6 +15,7 @@ public final class CurationEditorApp implements EntryPoint {
 	/**
 	 * this is called when we loadPanel the module (kicks off the application)
 	 */
+	@Override
 	public void onModuleLoad() {
 		if (TESTING) {
 			final RootPanel rootPanel = RootPanel.get("db-curator");

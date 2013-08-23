@@ -93,7 +93,7 @@ public final class ModificationsLabel extends Composite implements Validatable {
 
 	private void resetText() {
 		final StringBuilder text = new StringBuilder();
-		if (selectedValues.size() == 0) {
+		if (selectedValues.isEmpty()) {
 			text.append("(none)");
 		} else {
 			final Iterator<ClientModSpecificity> it = selectedValues.iterator();
@@ -123,10 +123,12 @@ public final class ModificationsLabel extends Composite implements Validatable {
 		return null;
 	}
 
+	@Override
 	public void focus() {
 		this.getEditor().focus();
 	}
 
+	@Override
 	public ClientValue getClientValue() {
 		final List<ClientValue> items = new ArrayList<ClientValue>(selectedValues);
 		return bundle(items);
@@ -137,6 +139,7 @@ public final class ModificationsLabel extends Composite implements Validatable {
 	 *
 	 * @param value
 	 */
+	@Override
 	public void setValue(final ClientValue value) {
 		if (value != null) {
 			final List<? extends ClientValue> selected = unbundle(value);
@@ -152,6 +155,7 @@ public final class ModificationsLabel extends Composite implements Validatable {
 		}
 	}
 
+	@Override
 	public void setValidationSeverity(final int validationSeverity) {
 		ValidationController.setValidationSeverity(validationSeverity, this.getEditCmd());
 	}
@@ -161,9 +165,10 @@ public final class ModificationsLabel extends Composite implements Validatable {
 	 *
 	 * @param values Allowed values.
 	 */
+	@Override
 	public void setAllowedValues(final List<? extends ClientValue> values) {
 		allowedValues = values;
-		if (values != null && values.size() > 0) {
+		if (values != null && !values.isEmpty()) {
 			getEditCmd().setEnabled(true);
 		}
 	}
@@ -172,6 +177,7 @@ public final class ModificationsLabel extends Composite implements Validatable {
 		return allowedValues;
 	}
 
+	@Override
 	public void setEnabled(final boolean enabled) {
 		this.enabled = enabled;
 	}
@@ -205,14 +211,17 @@ public final class ModificationsLabel extends Composite implements Validatable {
 	/**
 	 * @return null - we will get the allowed values fetched by an independent mechanism
 	 */
+	@Override
 	public boolean needsAllowedValues() {
 		return false;
 	}
 
+	@Override
 	public void addChangeListener(final ChangeListener changeListener) {
 		listeners.add(changeListener);
 	}
 
+	@Override
 	public void removeChangeListener(final ChangeListener changeListener) {
 		listeners.remove(changeListener);
 	}

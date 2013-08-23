@@ -54,7 +54,7 @@ public final class StringUtilities {
 	 * Convert first character of the string to uppercase (English locale to stay consistent).
 	 */
 	public static String firstToUpper(final String s) {
-		if (s.length() == 0) {
+		if (s.isEmpty()) {
 			return "";
 		}
 		return String.valueOf(s.charAt(0)).toUpperCase(Locale.ENGLISH) + s.substring(1);
@@ -64,7 +64,7 @@ public final class StringUtilities {
 	 * Convert first character of the string to uppercase, rest of the string to lowercase (English locale to stay consistent).
 	 */
 	public static String firstToUpperRestToLower(final String s) {
-		if (s.length() == 0) {
+		if (s.isEmpty()) {
 			return "";
 		}
 		return String.valueOf(s.charAt(0)).toUpperCase(Locale.ENGLISH) + s.substring(1).toLowerCase(Locale.ENGLISH);
@@ -156,7 +156,7 @@ public final class StringUtilities {
 	 * @return True if the string contains just whitespace or is null.
 	 */
 	public static boolean stringEmpty(final String s) {
-		return s == null || s.trim().length() == 0;
+		return s == null || s.trim().isEmpty();
 	}
 
 	public static void split(final String line, final char delimiter, final List<String> parts) {

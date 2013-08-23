@@ -18,6 +18,7 @@ public final class DirectoryEntry extends Entry {
 		super(name);
 	}
 
+	@Override
 	public TreeItem createTreeItem() {
 		final TreeCheckBox checkBox = new TreeCheckBox(getName(), false);
 		final TreeItem newItem = new TreeItem(checkBox);

@@ -21,6 +21,7 @@ public final class GoodSpectraNumbersFilter implements MgfPeakListFilter {
 		this.spectrumNumberExtractor = extractor;
 	}
 
+	@Override
 	public boolean peakListAccepted(final MascotGenericFormatPeakList peakList) {
 		if (peakList == null || peakList.getTitle() == null) {
 			return false;

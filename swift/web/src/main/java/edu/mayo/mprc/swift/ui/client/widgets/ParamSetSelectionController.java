@@ -69,10 +69,12 @@ public final class ParamSetSelectionController implements ChangeListener {
 
 	public void refresh(final Callback cb) {
 		service.getParamSetList(new AsyncCallback<ClientParamSetList>() {
+			@Override
 			public void onFailure(final Throwable throwable) {
 				SimpleParamsEditorPanel.handleGlobalError(throwable);
 			}
 
+			@Override
 			public void onSuccess(final ClientParamSetList o) {
 				setParamSetList(o);
 				if (cb != null) {
@@ -160,6 +162,7 @@ public final class ParamSetSelectionController implements ChangeListener {
 		return newSetIndex;
 	}
 
+	@Override
 	public void onChange(final Widget widget) {
 		// The primary selector's changes get preserved
 		setDefaultParamSetId(selector.getSelectedParamSet().getId());

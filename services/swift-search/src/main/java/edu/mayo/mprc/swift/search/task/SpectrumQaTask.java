@@ -48,6 +48,7 @@ final class SpectrumQaTask extends AsyncTaskBase {
 	 * @return Work packet to be sent asynchronously. If it returns null, it means the work was done without a need
 	 *         to send a work packet.
 	 */
+	@Override
 	public WorkPacket createWorkPacket() {
 		final File msmsEvalOutputFile = getMsmsEvalOutputFile();
 		if (!isFromScratch() && msmsEvalOutputFile.exists() && msmsEvalOutputFile.length() > 0) {
@@ -58,10 +59,12 @@ final class SpectrumQaTask extends AsyncTaskBase {
 		return new MSMSEvalWorkPacket(sourceMGFFile.getResultingFile(), msmsEvalParamFile, outputDirectory, getFullId());
 	}
 
+	@Override
 	public void onSuccess() {
 		//Do nothing
 	}
 
+	@Override
 	public void onProgress(final ProgressInfo progressInfo) {
 		if (progressInfo instanceof MsmsEvalResult) {
 			final MsmsEvalResult evalResult = (MsmsEvalResult) progressInfo;

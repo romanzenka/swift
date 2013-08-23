@@ -12,6 +12,7 @@ public class NotHiddenFilter implements FilenameFilter {
 	public NotHiddenFilter() {
 	}
 
+	@Override
 	public boolean accept(final File dir, final String name) {
 		return !new File(dir, name).isHidden();
 	}

@@ -131,7 +131,7 @@ public final class RawToMgfWorker extends WorkerBase {
 				}
 
 				// Combine .dta to .mgf
-				final boolean wine = wrapperScript != null && wrapperScript.length() > 0;
+				final boolean wine = wrapperScript != null && !wrapperScript.isEmpty();
 				dtaToMgf(fulltempfolder, dtaFiles, mgfFile, wine && !FileUtilities.isWindowsPlatform());
 
 				// Determine next batch position
@@ -155,7 +155,7 @@ public final class RawToMgfWorker extends WorkerBase {
 		for (final String parameter : Splitter.on(" ").omitEmptyStrings().trimResults().split(params)) {
 			if (parameter.toLowerCase().startsWith(lcParamName)) {
 				final String value = parameter.substring(paramName.length()).trim();
-				if (value.length() != 0 && value.charAt(0) >= '0' && value.charAt(0) <= '9') {
+				if (!value.isEmpty() && value.charAt(0) >= '0' && value.charAt(0) <= '9') {
 					try {
 						return Long.valueOf(value);
 					} catch (NumberFormatException e) {
@@ -218,7 +218,7 @@ public final class RawToMgfWorker extends WorkerBase {
 	 * @return Number of extracted spectra. If there are genuinely no spectra, returns 0. Throws an exception if things go wrong.
 	 */
 	synchronized void runExtractMsnJob(final File fileToExec, final File thermoOutputDir, final String params, final File rawfile, final long firstSpectrum, final long lastSpectrum, final String wrapperScript, final String xvfbWrapperScript) {
-		final String spectrumRangeParams = (params.length() == 0 ? "" : params + " ") + "-F" + firstSpectrum + " -L" + lastSpectrum;
+		final String spectrumRangeParams = (params.isEmpty() ? "" : params + " ") + "-F" + firstSpectrum + " -L" + lastSpectrum;
 		final ExtractMsnWrapper extractMsn = new ExtractMsnWrapper(fileToExec, spectrumRangeParams, rawfile, wrapperScript, xvfbWrapperScript);
 		extractMsn.setOutputDir(thermoOutputDir);
 
@@ -449,6 +449,7 @@ public final class RawToMgfWorker extends WorkerBase {
 			this.xvfbWrapperScript = xvfbWrapperScript;
 		}
 
+		@Override
 		public void save(final ConfigWriter writer) {
 			writer.put(TEMP_FOLDER, getTempFolder(), "Temp folder to extract the .dta files to");
 			writer.put(WRAPPER_SCRIPT, getWrapperScript(), "Only for linux - wraps the calls with wine");
@@ -456,6 +457,7 @@ public final class RawToMgfWorker extends WorkerBase {
 			writer.put(EXTRACT_MSN_EXECUTABLE, getExtractMsnExecutable(), "extract_msn.exe path");
 		}
 
+		@Override
 		public void load(final ConfigReader reader) {
 			tempFolder = reader.get(TEMP_FOLDER);
 			wrapperScript = reader.get(WRAPPER_SCRIPT);
@@ -472,6 +474,7 @@ public final class RawToMgfWorker extends WorkerBase {
 	public static final class Ui implements ServiceUiFactory {
 		private static final String PROVIDED_EXTRACT_MSN = "bin/extract_msn/extract_msn.exe";
 
+		@Override
 		public void createUI(final DaemonConfig daemon, final ResourceConfig resource, final UiBuilder builder) {
 			builder.property(EXTRACT_MSN_EXECUTABLE, "<tt>extract_msn.exe</tt> path", "Location of XCalibur's <tt>extract_msn.exe</tt>."
 					+ "<p>Typically installed at <tt>C:\\XCalibur\\System\\Programs\\extract_msn.exe</tt></p>"

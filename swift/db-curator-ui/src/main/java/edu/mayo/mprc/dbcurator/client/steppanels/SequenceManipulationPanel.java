@@ -58,6 +58,7 @@ public final class SequenceManipulationPanel extends AbstractStepPanel {
 	 *
 	 * @return the containedStep that this mainPanel represents
 	 */
+	@Override
 	public CurationStepStub getContainedStep() {
 		this.containedStep.manipulationType = (this.radioReversal.isChecked() ? SequenceManipulationStepStub.REVERSAL : SequenceManipulationStepStub.SCRAMBLE);
 		this.containedStep.overwrite = !chkRetainOriginal.isChecked();
@@ -70,6 +71,7 @@ public final class SequenceManipulationPanel extends AbstractStepPanel {
 	 * @param step the containedStep you want this mainPanel to represent
 	 * @throws ClassCastException if the containedStep passed in wasn't the type that the Panel can represent
 	 */
+	@Override
 	public void setContainedStep(final CurationStepStub step) throws ClassCastException {
 		if (!(step instanceof SequenceManipulationStepStub)) {
 			ExceptionUtilities.throwCastException(step, SequenceManipulationStepStub.class);
@@ -84,6 +86,7 @@ public final class SequenceManipulationPanel extends AbstractStepPanel {
 	 *
 	 * @return "shell-header-manipulation"
 	 */
+	@Override
 	public String getStyle() {
 		return "shell-header-manipulation";
 	}
@@ -92,6 +95,7 @@ public final class SequenceManipulationPanel extends AbstractStepPanel {
 	/**
 	 * call this method when this mainPanel should look for updates in its contained step
 	 */
+	@Override
 	public void update() {
 
 		if (containedStep.manipulationType.equalsIgnoreCase(SequenceManipulationStepStub.SCRAMBLE)) {
@@ -102,6 +106,7 @@ public final class SequenceManipulationPanel extends AbstractStepPanel {
 		chkRetainOriginal.setChecked(!containedStep.overwrite);
 	}
 
+	@Override
 	public String getImageURL() {
 		return "images/step-icon-manip.png";
 	}

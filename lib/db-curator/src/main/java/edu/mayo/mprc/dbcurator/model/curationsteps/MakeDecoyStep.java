@@ -205,7 +205,7 @@ public class MakeDecoyStep implements CurationStep {
 				name = description.substring(0, description.length() - 1);
 			}
 
-			modifiedHeader = ">" + description + matcher.group(1) + (matcher.group(2).length() > 0 ? ("("
+			modifiedHeader = ">" + description + matcher.group(1) + (!matcher.group(2).isEmpty() ? ("("
 					+ name + ") " + matcher.group(2)) : "");
 		} else {
 			modifiedHeader = header;
@@ -220,6 +220,7 @@ public class MakeDecoyStep implements CurationStep {
 	 * @param curationDao Data access.
 	 * @return the @see StepValidation to interrogate for issues
 	 */
+	@Override
 	public StepValidation preValidate(final CurationDao curationDao) {
 		final StepValidation prevalidation = new StepValidation();
 

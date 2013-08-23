@@ -52,6 +52,7 @@ public final class DaemonView extends SimplePanel implements ModuleView {
 		loadUI(daemonModel);
 	}
 
+	@Override
 	public Widget getModuleWidget() {
 		return this;
 	}
@@ -69,10 +70,12 @@ public final class DaemonView extends SimplePanel implements ModuleView {
 		propertyList.loadUI(values);
 	}
 
+	@Override
 	public void loadUI(final Map<String, String> values) {
 		propertyList.loadUI(values);
 	}
 
+	@Override
 	public HashMap<String, String> saveUI() {
 		final HashMap<String, String> values = propertyList.saveUI();
 		setDaemonModelProperties(values);
@@ -85,6 +88,7 @@ public final class DaemonView extends SimplePanel implements ModuleView {
 	}
 
 	private class PropertyChangeListener implements ChangeListener {
+		@Override
 		public void onChange(final Widget widget) {
 			saveUI();
 		}

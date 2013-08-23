@@ -61,7 +61,7 @@ public final class SwiftEnvironmentImpl implements SwiftEnvironment {
 	 */
 	private static void checkConfig(final ApplicationConfig swiftConfig) {
 		final List<String> errorList = SwiftConfig.validateSwiftConfig(swiftConfig);
-		if (errorList.size() > 0) {
+		if (!errorList.isEmpty()) {
 			FileUtilities.err("WARNING: The configuration file has issues, Swift may not function correctly:");
 			for (final String error : errorList) {
 				FileUtilities.err("\t" + error);
@@ -238,6 +238,7 @@ public final class SwiftEnvironmentImpl implements SwiftEnvironment {
 		return (MessageBroker.Config) brokers.get(0);
 	}
 
+	@Override
 	public SwiftMonitor getMonitor() {
 		return monitor;
 	}

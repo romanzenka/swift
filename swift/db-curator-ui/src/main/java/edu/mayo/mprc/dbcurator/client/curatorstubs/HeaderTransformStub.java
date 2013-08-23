@@ -14,6 +14,7 @@ public final class HeaderTransformStub extends CurationStepStub {
 	public String matchPattern;
 	public String subPattern;
 
+	@Override
 	public AbstractStepPanel getStepPanel() {
 		final HeaderTransformPanel panel = new HeaderTransformPanel();
 		panel.setContainedStep(this);

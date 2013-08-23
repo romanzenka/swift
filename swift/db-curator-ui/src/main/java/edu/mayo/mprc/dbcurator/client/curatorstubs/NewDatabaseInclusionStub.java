@@ -19,6 +19,7 @@ public final class NewDatabaseInclusionStub extends CurationStepStub {
 	 * <br>
 	 * In this case a StepPanelShell containing a NewDatabaseInclusionPanel will be returned.
 	 */
+	@Override
 	public AbstractStepPanel getStepPanel() {
 		//create a panel and add this stub to it
 		final NewDatabaseInclusionPanel panel = new NewDatabaseInclusionPanel();

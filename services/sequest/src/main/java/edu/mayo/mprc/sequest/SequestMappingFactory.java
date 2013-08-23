@@ -9,6 +9,7 @@ public final class SequestMappingFactory implements MappingFactory {
 	private static final long serialVersionUID = 20101221L;
 	public static final String SEQUEST = "SEQUEST";
 
+	@Override
 	public Mappings createMapping() {
 		return new SequestMappings();
 	}
@@ -18,6 +19,7 @@ public final class SequestMappingFactory implements MappingFactory {
 		return SEQUEST;
 	}
 
+	@Override
 	public String getCanonicalParamFileName(final String distinguishingString) {
 		return "sequest" + distinguishingString + ".params";
 	}

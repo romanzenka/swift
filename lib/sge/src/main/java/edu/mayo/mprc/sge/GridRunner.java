@@ -60,6 +60,7 @@ public final class GridRunner extends AbstractRunner {
 	public GridRunner() {
 	}
 
+	@Override
 	public void stop() {
 		super.stop();
 		// Disables message processing
@@ -74,6 +75,7 @@ public final class GridRunner extends AbstractRunner {
 		return "Grid Daemon Runner for " + (daemonConnection == null ? "(null)" : daemonConnection.getConnectionName());
 	}
 
+	@Override
 	protected void processRequest(final DaemonRequest request) {
 		final GridWorkPacket gridWorkPacket = getBaseGridWorkPacket(gridScriptFactory.getApplicationName(wrapperScript));
 		final File daemonWorkerAllocatorInputFile = new File(getSharedTempDirectory(), queueName + "_" + uniqueId.incrementAndGet());
@@ -135,7 +137,7 @@ public final class GridRunner extends AbstractRunner {
 				clonedTaskData), false);
 	}
 
-	private static void writeWorkerAllocatorInputObject(File file, SgePacket object) throws IOException {
+	private static void writeWorkerAllocatorInputObject(final File file, final SgePacket object) throws IOException {
 		BufferedWriter bufferedWriter = null;
 
 		try {
@@ -168,20 +170,16 @@ public final class GridRunner extends AbstractRunner {
 		}
 
 		@Override
-		public void responseReceived(Serializable response, boolean isLast) {
-			if (response instanceof Serializable) {
-				if (response instanceof Throwable) {
-					// We do send an error message now.
-					// That is done once SGE detects termination of the process.
-					synchronized (this) {
-						lastThrowable = (Throwable) response;
-					}
-				} else {
-					// Not final - a progress message
-					sendResponse(request, response, false);
+		public void responseReceived(final Serializable response, final boolean isLast) {
+			if (response instanceof Throwable) {
+				// We do send an error message now.
+				// That is done once SGE detects termination of the process.
+				synchronized (this) {
+					lastThrowable = (Throwable) response;
 				}
 			} else {
-				sendResponse(request, "Progress message from SGE " + response.toString(), false);
+				// Not final - a progress message
+				sendResponse(request, response, false);
 			}
 		}
 	}
@@ -213,6 +211,7 @@ public final class GridRunner extends AbstractRunner {
 		 *
 		 * @param w Work packet whose state changed
 		 */
+		@Override
 		public void stateChanged(final GridWorkPacket w) {
 			if (w == null) {
 				return;
@@ -260,15 +259,17 @@ public final class GridRunner extends AbstractRunner {
 			return taskData;
 		}
 
-		public synchronized void setTaskData(AssignedTaskData taskData) {
+		public synchronized void setTaskData(final AssignedTaskData taskData) {
 			this.taskData = taskData;
 		}
 	}
 
+	@Override
 	public boolean isOperational() {
 		return operational || !enabled;
 	}
 
+	@Override
 	public void setOperational(final boolean operational) {
 		this.operational = operational;
 	}
@@ -330,10 +331,12 @@ public final class GridRunner extends AbstractRunner {
 		this.memoryRequirement = memoryRequirement;
 	}
 
+	@Override
 	public boolean isEnabled() {
 		return enabled;
 	}
 
+	@Override
 	public void setEnabled(final boolean enabled) {
 		this.enabled = enabled;
 	}
@@ -346,10 +349,12 @@ public final class GridRunner extends AbstractRunner {
 		this.gridScriptFactory = gridScriptFactory;
 	}
 
+	@Override
 	public DaemonConnection getDaemonConnection() {
 		return daemonConnection;
 	}
 
+	@Override
 	public void setDaemonConnection(final DaemonConnection daemonConnection) {
 		this.daemonConnection = daemonConnection;
 	}
@@ -415,6 +420,7 @@ public final class GridRunner extends AbstractRunner {
 			this.wrapperScript = wrapperScript;
 		}
 
+		@Override
 		public void save(final ConfigWriter writer) {
 			super.save(writer);
 			writer.put(QUEUE_NAME, getQueueName(), "Name of the SGE queue");
@@ -423,6 +429,7 @@ public final class GridRunner extends AbstractRunner {
 			writer.put(WRAPPER_SCRIPT, getWrapperScript(), "A wrapper script that will ensure smooth execution of the Swift component (create/tear down environment). Takes the command to execute as its parameter.");
 		}
 
+		@Override
 		public void load(final ConfigReader reader) {
 			setQueueName(reader.get(QUEUE_NAME));
 			setMemoryRequirement(reader.get(MEMORY_REQUIREMENT, ""));

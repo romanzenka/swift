@@ -34,6 +34,7 @@ public final class ScaffoldQaSpectraReader extends ScaffoldSpectraReader impleme
 	/**
 	 * Fills in the spectrum column that is to be skipped.
 	 */
+	@Override
 	public boolean processHeader(final String line) {
 		// Extract everything except the spectrum column name
 		final String[] tempHeader = line.split("\t");
@@ -62,6 +63,7 @@ public final class ScaffoldQaSpectraReader extends ScaffoldSpectraReader impleme
 		return true;
 	}
 
+	@Override
 	public boolean processRow(final String line) {
 		sb.setLength(0);
 		int columnNumber = 0;

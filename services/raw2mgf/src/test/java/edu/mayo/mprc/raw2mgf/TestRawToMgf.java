@@ -84,19 +84,23 @@ public class TestRawToMgf {
 
 			simpleDaemonWorker.processRequest(workPacket, new ProgressReporter() {
 
+				@Override
 				public void reportStart(final String hostString) {
 					LOGGER.info("Started processing on " + hostString);
 				}
 
+				@Override
 				public void reportProgress(final ProgressInfo progressInfo) {
 					LOGGER.info(progressInfo);
 				}
 
+				@Override
 				public void reportSuccess() {
 					Assert.assertTrue(mgfFile.exists(), "MGF file was not created by raw to mgf converter worker.");
 					Assert.assertTrue(mgfFile.length() > 0, "MGF file was created, but it is empty.");
 				}
 
+				@Override
 				public void reportFailure(final Throwable t) {
 					throw new MprcException("Raw2Mgf worker failed to process work packet.", t);
 				}

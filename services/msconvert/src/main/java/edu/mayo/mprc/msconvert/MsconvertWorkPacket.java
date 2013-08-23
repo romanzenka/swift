@@ -58,6 +58,7 @@ public final class MsconvertWorkPacket extends WorkPacketBase implements Cachabl
 		return isPublicAccess();
 	}
 
+	@Override
 	public File getOutputFile() {
 		return outputFile;
 	}

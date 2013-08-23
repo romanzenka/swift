@@ -21,10 +21,12 @@ public class PersistableHashedBagBase<T extends PersistableBase> extends Persist
 		super(items);
 	}
 
+	@Override
 	public long getHash() {
 		return hash;
 	}
 
+	@Override
 	public void setHash(long hash) {
 		this.hash = hash;
 	}

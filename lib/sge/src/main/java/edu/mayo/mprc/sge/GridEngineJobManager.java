@@ -58,6 +58,7 @@ public final class GridEngineJobManager implements Closeable {
 		return gridEngineSession;
 	}
 
+	@Override
 	public void close() {
 		if (getGridEngineSession() != null) {
 			try {
@@ -343,6 +344,7 @@ public final class GridEngineJobManager implements Closeable {
 		public Runner() {
 		}
 
+		@Override
 		public void run() {
 			while (true) {
 				try {

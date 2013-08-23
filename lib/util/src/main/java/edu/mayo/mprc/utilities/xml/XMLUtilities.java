@@ -151,7 +151,7 @@ public final class XMLUtilities {
 			if (node instanceof Text) {
 				final Text text = (Text) node;
 				final String value = text.getNodeValue();
-				if ((value != null) && (value.length() > 0)) {
+				if ((value != null) && (!value.isEmpty())) {
 					return value;
 				}
 			}

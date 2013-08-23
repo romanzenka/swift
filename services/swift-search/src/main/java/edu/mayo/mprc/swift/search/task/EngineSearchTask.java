@@ -70,6 +70,7 @@ final class EngineSearchTask extends AsyncTaskBase implements FileProducingTask 
 	 * @return Work packet to be sent asynchronously. If it returns null, it means the work was done without a need
 	 *         to send a work packet.
 	 */
+	@Override
 	public WorkPacket createWorkPacket() {
 		updateDescription(null);
 
@@ -170,10 +171,12 @@ final class EngineSearchTask extends AsyncTaskBase implements FileProducingTask 
 		}
 	}
 
+	@Override
 	public void onSuccess() {
 		completeWhenFilesAppear(outputFile);
 	}
 
+	@Override
 	public void onProgress(final ProgressInfo progressInfo) {
 		// The search engine produced the output file at a different location than where we asked it to
 		if (progressInfo instanceof SearchEngineResult) {

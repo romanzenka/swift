@@ -79,6 +79,7 @@ public final class PingDaemonWorker extends WorkerBase implements NoLoggingWorke
 	}
 
 	public static final class Ui implements ServiceUiFactory {
+		@Override
 		public void createUI(final DaemonConfig daemon, final ResourceConfig resource, final UiBuilder builder) {
 			// No UI needed
 		}

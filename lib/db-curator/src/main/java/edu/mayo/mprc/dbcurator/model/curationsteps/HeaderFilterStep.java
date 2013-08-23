@@ -81,6 +81,7 @@ public class HeaderFilterStep implements CurationStep {
 	 * @param exec the executor that we are working for and will need to query to get information from
 	 * @return the post validation.
 	 */
+	@Override
 	public StepValidation performStep(final CurationExecutor exec) {
 
 		//create a new validation object for this run
@@ -119,6 +120,7 @@ public class HeaderFilterStep implements CurationStep {
 	 * @param curationDao
 	 * @return the @see StepValidation to interrogate for issues
 	 */
+	@Override
 	public StepValidation preValidate(final CurationDao curationDao) {
 		//the validation we will return
 		final StepValidation preValidation = new StepValidation();
@@ -145,6 +147,7 @@ public class HeaderFilterStep implements CurationStep {
 	 *
 	 * @return a cropy of this step
 	 */
+	@Override
 	public CurationStep createCopy() {
 		final HeaderFilterStep copy = new HeaderFilterStep();
 		copy.matchMode = this.matchMode;
@@ -228,10 +231,12 @@ public class HeaderFilterStep implements CurationStep {
 		this.criteriaString = criteriaString;
 	}
 
+	@Override
 	public Integer getId() {
 		return id;
 	}
 
+	@Override
 	public void setId(final Integer id) {
 		this.id = id;
 	}
@@ -241,15 +246,18 @@ public class HeaderFilterStep implements CurationStep {
 	 */
 	private Integer lastRunCompletionCount = null;
 
+	@Override
 	public Integer getLastRunCompletionCount() {
 		return this.lastRunCompletionCount;
 	}
 
+	@Override
 	public void setLastRunCompletionCount(final Integer count) {
 		this.lastRunCompletionCount = count;
 	}
 
 
+	@Override
 	public String simpleDescription() {
 		return "filtered " + this.getMatchMode().toString().toLowerCase(Locale.ENGLISH) + "\"" + getCriteriaString() + "\"";
 	}

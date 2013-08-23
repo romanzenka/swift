@@ -72,6 +72,7 @@ public final class HeaderTransformPanel extends AbstractStepPanel {
 		lstCommonTransforms.setStyleName("steppanel-headertransform-lstcommontransforms");
 		requestTransformers(); //populate the list box making an rpc call if necessary
 		lstCommonTransforms.addChangeListener(new ChangeListener() {
+			@Override
 			public void onChange(final Widget widget) {
 				final int selectedIndex = ((ListBox) widget).getSelectedIndex();
 				if (selectedIndex == 0) {
@@ -119,6 +120,7 @@ public final class HeaderTransformPanel extends AbstractStepPanel {
 
 	}
 
+	@Override
 	public CurationStepStub getContainedStep() {
 		this.containedStep.description = txtDescription.getText();
 		this.containedStep.matchPattern = txtMatchPattern.getText();
@@ -135,10 +137,12 @@ public final class HeaderTransformPanel extends AbstractStepPanel {
 		endpoint.setServiceEntryPoint(GWT.getModuleBaseURL() + "CommonDataRequester");
 		dataRequester.getHeaderTransformers(new AsyncCallback<List<HeaderTransformStub>>() {
 
+			@Override
 			public void onFailure(final Throwable throwable) {
 				//do nothing we just can't add common formatters
 			}
 
+			@Override
 			public void onSuccess(final List<HeaderTransformStub> trans) {
 				for (final HeaderTransformStub tran : trans) {
 					commonHeaderTransformers.add(tran);
@@ -148,14 +152,17 @@ public final class HeaderTransformPanel extends AbstractStepPanel {
 		});
 	}
 
+	@Override
 	public String getImageURL() {
 		return "images/step-icon-add.png"; //todo: change icon
 	}
 
+	@Override
 	public String getStyle() {
 		return "shell-header-headertransformstep";
 	}
 
+	@Override
 	public void setContainedStep(final CurationStepStub step) throws ClassCastException {
 		if (!(step instanceof HeaderTransformStub)) {
 			ExceptionUtilities.throwCastException(step, HeaderTransformStub.class);
@@ -165,6 +172,7 @@ public final class HeaderTransformPanel extends AbstractStepPanel {
 		update();
 	}
 
+	@Override
 	public void update() {
 		if (this.containedStep != null) {
 			txtDescription.setText(this.containedStep.description);

@@ -16,10 +16,11 @@ import java.util.concurrent.TimeUnit;
 public final class ActiveMQConnectionPool implements Closeable {
 	private static final Logger LOGGER = Logger.getLogger(ActiveMQConnectionPool.class);
 
-	private final String JMS_BROKER_DOWN_MESSAGE = "Connection refused";
-	private final int DEFAULT_RECONNECTION_DELAY_IN_SECONDS = 10;
-	private final Map<ConnectionInfo, Connection> CONNECTIONS = new HashMap<ConnectionInfo, Connection>(1);
-	private final String RECONNECTION_DELAY_PROPERTY = "edu.mayo.mprc.messaging.jms.SimpleQueueService.reconnectionDelay";
+	private static final String JMS_BROKER_DOWN_MESSAGE = "Connection refused";
+	private static final int RECONNECT_DELAY_SECONDS = 10;
+	private static final String RECONNECTION_DELAY_PROPERTY = "edu.mayo.mprc.messaging.jms.SimpleQueueService.reconnectionDelay";
+
+	private final Map<ConnectionInfo, Connection> connections = new HashMap<ConnectionInfo, Connection>(1);
 
 	public ActiveMQConnectionPool() {
 	}
@@ -35,8 +36,8 @@ public final class ActiveMQConnectionPool implements Closeable {
 	 */
 	public Connection getConnectionToBroker(final URI broker, final String userName, final String password) {
 		final ConnectionInfo info = new ConnectionInfo(broker, userName, password);
-		synchronized (CONNECTIONS) {
-			Connection connection = CONNECTIONS.get(info);
+		synchronized (connections) {
+			Connection connection = connections.get(info);
 			if (connection == null) {
 				LOGGER.info("Connecting to broker: " + broker + (userName != null ? (" as user " + userName) : ""));
 				final QueueConnectionFactory connectionFactory = new ActiveMQConnectionFactory(broker);
@@ -68,7 +69,7 @@ public final class ActiveMQConnectionPool implements Closeable {
 						}
 					}
 				}
-				CONNECTIONS.put(info, connection);
+				connections.put(info, connection);
 			}
 			return connection;
 		}
@@ -79,8 +80,8 @@ public final class ActiveMQConnectionPool implements Closeable {
 	 */
 	@Override
 	public void close() {
-		synchronized (CONNECTIONS) {
-			for (Map.Entry<ConnectionInfo, Connection> entry : CONNECTIONS.entrySet()) {
+		synchronized (connections) {
+			for (Map.Entry<ConnectionInfo, Connection> entry : connections.entrySet()) {
 				try {
 					entry.getValue().close();
 				} catch (JMSException e) {
@@ -88,14 +89,14 @@ public final class ActiveMQConnectionPool implements Closeable {
 					LOGGER.warn("Could not close JMS connection", e);
 				}
 			}
-			CONNECTIONS.clear();
+			connections.clear();
 		}
 	}
 
 	private int getConnectionTrialDelay() {
-		int connectionTrialDelay = DEFAULT_RECONNECTION_DELAY_IN_SECONDS;
+		int connectionTrialDelay = RECONNECT_DELAY_SECONDS;
 		try {
-			connectionTrialDelay = Integer.parseInt(System.getProperty(RECONNECTION_DELAY_PROPERTY, DEFAULT_RECONNECTION_DELAY_IN_SECONDS + ""));
+			connectionTrialDelay = Integer.parseInt(System.getProperty(RECONNECTION_DELAY_PROPERTY, RECONNECT_DELAY_SECONDS + ""));
 		} catch (NumberFormatException ignore) {
 			//SWALLOWED
 		}

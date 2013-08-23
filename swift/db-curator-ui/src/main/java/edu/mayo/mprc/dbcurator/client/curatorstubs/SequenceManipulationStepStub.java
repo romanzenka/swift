@@ -22,6 +22,7 @@ public final class SequenceManipulationStepStub extends CurationStepStub {
 	 * <p/>
 	 * In this case we will create a StepPanelShell that will contain a SequenceManipulationPanel
 	 */
+	@Override
 	public AbstractStepPanel getStepPanel() {
 		final SequenceManipulationPanel panel = new SequenceManipulationPanel();
 		panel.setContainedStep(this);

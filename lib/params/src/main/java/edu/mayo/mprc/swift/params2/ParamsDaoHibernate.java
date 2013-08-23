@@ -199,6 +199,7 @@ public final class ParamsDaoHibernate extends DaoBase implements ParamsDao {
 				.add(nullSafeEq("command", extractMsnSettings.getCommand()));
 	}
 
+	@Override
 	public ExtractMsnSettings addExtractMsnSettings(final ExtractMsnSettings extractMsnSettings) {
 		try {
 			return save(extractMsnSettings, getExtractMsnSettingsEqualityCriteria(extractMsnSettings), false);
@@ -229,6 +230,7 @@ public final class ParamsDaoHibernate extends DaoBase implements ParamsDao {
 				.add(associationEq("starredProteins", scaffoldSettings.getStarredProteins()));
 	}
 
+	@Override
 	public ScaffoldSettings addScaffoldSettings(final ScaffoldSettings scaffoldSettings) {
 		try {
 			if (scaffoldSettings.getStarredProteins() != null) {
@@ -240,6 +242,7 @@ public final class ParamsDaoHibernate extends DaoBase implements ParamsDao {
 		}
 	}
 
+	@Override
 	public StarredProteins addStarredProteins(final StarredProteins starredProteins) {
 		try {
 			return save(starredProteins, getStarredProteinsEqualityCriteria(starredProteins), false);
@@ -295,7 +298,7 @@ public final class ParamsDaoHibernate extends DaoBase implements ParamsDao {
 		;
 		final List<SearchEngineParameters> parameterList = (List<SearchEngineParameters>) criteria.list();
 		final SearchEngineParameters existing =
-				parameterList.size() == 0 ? null : (SearchEngineParameters) parameterList.get(0);
+				parameterList.isEmpty() ? null : (SearchEngineParameters) parameterList.get(0);
 
 		if (existing != null) {
 			if (parameters.equals(existing)) {
@@ -364,7 +367,7 @@ public final class ParamsDaoHibernate extends DaoBase implements ParamsDao {
 					allCriteria(SavedSearchEngineParameters.class)
 							.add(Restrictions.eq("parameters", parameters))
 							.list();
-			if (list.size() == 0) {
+			if (list.isEmpty()) {
 				return null;
 			}
 			for (final SavedSearchEngineParameters p : list) {

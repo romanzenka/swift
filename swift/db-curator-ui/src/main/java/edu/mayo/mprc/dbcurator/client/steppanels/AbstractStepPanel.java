@@ -24,6 +24,7 @@ public abstract class AbstractStepPanel extends Composite {
 	 *
 	 * @return the title that should be given for this step mainPanel
 	 */
+	@Override
 	public String getTitle() {
 		return this.title;
 	}
@@ -33,6 +34,7 @@ public abstract class AbstractStepPanel extends Composite {
 	 *
 	 * @param title the new title
 	 */
+	@Override
 	public void setTitle(final String title) {
 		this.title = title;
 	}

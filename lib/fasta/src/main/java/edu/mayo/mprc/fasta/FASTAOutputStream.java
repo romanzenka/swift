@@ -65,6 +65,7 @@ public final class FASTAOutputStream implements DBOutputStream {
 	 * @param sequence the actual sequence that should be written out
 	 * @throws java.io.IOException if there was a problem performing the output
 	 */
+	@Override
 	public void appendSequence(final String header, final String sequence) throws IOException {
 		final String cleanHeader;
 		if(isCleanupHeaders()) {
@@ -75,7 +76,7 @@ public final class FASTAOutputStream implements DBOutputStream {
 		final String cleanSequence = cleanupProteinSequence(sequence);
 
 		//check to make sure the header contains a > since this is what denotes a header
-		if (cleanHeader.length() == 0 || cleanHeader.charAt(0) != '>') {
+		if (cleanHeader.isEmpty() || cleanHeader.charAt(0) != '>') {
 			this.out.write('>');
 		}
 		//write out the header on a single line
@@ -141,6 +142,7 @@ public final class FASTAOutputStream implements DBOutputStream {
 	 * @param inputStream the stream to copy to this stream
 	 * @throws IOException if there was a problem openning or working with either stream
 	 */
+	@Override
 	public void appendRemaining(final DBInputStream inputStream) throws IOException {
 		if (inputStream != null) {
 			while (inputStream.gotoNextSequence()) {
@@ -149,6 +151,7 @@ public final class FASTAOutputStream implements DBOutputStream {
 		}
 	}
 
+	@Override
 	public File getFile() {
 		return this.file;
 	}
@@ -156,6 +159,7 @@ public final class FASTAOutputStream implements DBOutputStream {
 	/**
 	 * performs any cleaning up that may be necessary.
 	 */
+	@Override
 	public void close() {
 		FileUtilities.closeQuietly(this.out);
 	}
@@ -165,6 +169,7 @@ public final class FASTAOutputStream implements DBOutputStream {
 	 *
 	 * @return the number of sequences written out (0 if no writting has been done)
 	 */
+	@Override
 	public int getSequenceCount() {
 		return this.sequenceCount;
 	}

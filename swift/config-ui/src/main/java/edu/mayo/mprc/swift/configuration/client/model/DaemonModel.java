@@ -91,10 +91,12 @@ public final class DaemonModel extends ResourceModel {
 	 */
 	public void addNewResource(final String type, final NewModuleCreatedCallback callback, final Context errorDisplay) {
 		ConfigurationService.App.getInstance().createChild(this.getId(), type, new AsyncCallback<ResourceModel>() {
+			@Override
 			public void onFailure(final Throwable throwable) {
 				errorDisplay.displayErrorMessage("Could not add new resource", throwable);
 			}
 
+			@Override
 			public void onSuccess(final ResourceModel model) {
 				// By adding to the model, we get a notification that will create the UI
 				addChild(model);

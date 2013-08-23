@@ -62,6 +62,7 @@ public final class Tuple<S extends Comparable<S> & Serializable, T extends Compa
 		return o1.compareTo(o2);
 	}
 
+	@Override
 	public int compareTo(final Tuple<S, T> o) {
 		final int c1 = compareWithNulls(this.first, o.first);
 		if (c1 == 0) {

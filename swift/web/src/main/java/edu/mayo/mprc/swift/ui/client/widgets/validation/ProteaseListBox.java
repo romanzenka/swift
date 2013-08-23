@@ -17,10 +17,12 @@ public final class ProteaseListBox extends ValidatableListBox {
 		super(param, false);
 	}
 
+	@Override
 	public ClientValue bundle(final List<? extends ClientValue> selected) {
 		return null;// not used.
 	}
 
+	@Override
 	public String getStringValue(final ClientValue value) {
 		if (value == null) {
 			return "";
@@ -32,6 +34,7 @@ public final class ProteaseListBox extends ValidatableListBox {
 		return ((ClientProtease) value).getName();
 	}
 
+	@Override
 	public List<? extends ClientValue> unbundle(final ClientValue value) {
 		return EMPTY_VALUE;  //To change body of implemented methods use File | Settings | File Templates.
 	}
@@ -45,6 +48,7 @@ public final class ProteaseListBox extends ValidatableListBox {
 	 *
 	 * @return a string that's passed to the mapping's getAllowedValues() method for this param, or null.
 	 */
+	@Override
 	public boolean needsAllowedValues() {
 		return !(allowedValues != null && !allowedValues.isEmpty());
 	}

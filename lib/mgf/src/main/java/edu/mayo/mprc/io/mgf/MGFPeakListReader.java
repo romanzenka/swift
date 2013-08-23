@@ -178,6 +178,7 @@ public final class MGFPeakListReader implements Closeable {
 	 *
 	 * @throws IOException
 	 */
+	@Override
 	public void close() throws IOException {
 		if (bufferedReader != null) {
 			bufferedReader.close();

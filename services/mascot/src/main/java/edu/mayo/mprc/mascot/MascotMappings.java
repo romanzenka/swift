@@ -94,6 +94,7 @@ public final class MascotMappings implements Mappings {
 		return ResourceUtilities.getReader("classpath:edu/mayo/mprc/swift/params/base.mascot.params", this.getClass());
 	}
 
+	@Override
 	public void read(final Reader isr) {
 		nativeParams = new HashMap<String, String>();
 		LineNumberReader br = null;
@@ -104,7 +105,7 @@ public final class MascotMappings implements Mappings {
 				if (it == null) {
 					break;
 				}
-				if (it.length() == 0) {
+				if (it.isEmpty()) {
 					break;
 				}
 
@@ -137,6 +138,7 @@ public final class MascotMappings implements Mappings {
 		// Comments are ignored, do nothing
 	}
 
+	@Override
 	public void write(final Reader oldParams, final Writer out) {
 		Writer writer = null;
 		try {
@@ -147,7 +149,7 @@ public final class MascotMappings implements Mappings {
 				if (it == null) {
 					break;
 				}
-				if (it.length() == 0) {
+				if (it.isEmpty()) {
 					writer.write(it);
 					writer.write('\n');
 				} else if (PARAM.matcher(it).matches()) {
@@ -193,10 +195,12 @@ public final class MascotMappings implements Mappings {
 		}
 	}
 
+	@Override
 	public void setPeptideTolerance(final MappingContext context, final Tolerance peptideTolerance) {
 		mapToleranceToNative(context, peptideTolerance, PEP_TOL_VALUE, PEP_TOL_UNIT);
 	}
 
+	@Override
 	public void setFragmentTolerance(final MappingContext context, final Tolerance fragmentTolerance) {
 		if (fragmentTolerance.getUnit() == MassUnit.Ppm) {
 			final double value = fragmentTolerance.getValue() / PPM_TO_DALTON;
@@ -208,6 +212,7 @@ public final class MascotMappings implements Mappings {
 		}
 	}
 
+	@Override
 	public void setVariableMods(final MappingContext context, final ModSet variableMods) {
 		final TreeSet<String> mods = new TreeSet<String>();
 		int i = 0;
@@ -231,6 +236,7 @@ public final class MascotMappings implements Mappings {
 		setNativeMods(context, VAR_MODS, mods);
 	}
 
+	@Override
 	public void setFixedMods(final MappingContext context, final ModSet fixedMods) {
 		final TreeSet<String> mods = new TreeSet<String>();
 
@@ -248,10 +254,12 @@ public final class MascotMappings implements Mappings {
 		setNativeMods(context, FIXED_MODS, mods);
 	}
 
+	@Override
 	public String getNativeParam(final String name) {
 		return nativeParams.get(name);
 	}
 
+	@Override
 	public void setNativeParam(final String name, final String value) {
 		nativeParams.put(name, value);
 	}
@@ -259,10 +267,12 @@ public final class MascotMappings implements Mappings {
 	/**
 	 * The short db name matches directly the db name in Mascot.
 	 */
+	@Override
 	public void setSequenceDatabase(final MappingContext context, final String shortName) {
 		setNativeParam(DATABASE, shortName);
 	}
 
+	@Override
 	public void setProtease(final MappingContext context, final Protease protease) {
 		final String cle;
 		if (!mascotNamesByEnzyme.containsKey(protease)) {
@@ -275,12 +285,14 @@ public final class MascotMappings implements Mappings {
 		setNativeParam(ENZYME, cle);
 	}
 
+	@Override
 	public void setMissedCleavages(final MappingContext context, final Integer missedCleavages) {
 		if (missedCleavages != null) {
 			setNativeParam(MISSED_CLEAVAGES, String.valueOf(missedCleavages));
 		}
 	}
 
+	@Override
 	public void setInstrument(final MappingContext context, final Instrument instrument) {
 		final String instName = instrument.getMascotName();
 		setNativeParam(INSTRUMENT, instName);
@@ -309,7 +321,7 @@ public final class MascotMappings implements Mappings {
 		final String fixedMods = getNativeParam(FIXED_MODS);
 		final String variableMods = getNativeParam(VAR_MODS);
 
-		if (fixedMods != null && fixedMods.length() > 0 && variableMods != null && variableMods.length() > 0) {
+		if (fixedMods != null && !fixedMods.isEmpty() && variableMods != null && !variableMods.isEmpty()) {
 			final String[] fixedModsArr = COMMA_SPLIT.split(fixedMods);
 			final String[] variableModsArr = COMMA_SPLIT.split(variableMods);
 
@@ -343,7 +355,7 @@ public final class MascotMappings implements Mappings {
 					specificities.append(modSpecificity.getSite());
 				}
 			}
-			if (specificities.toString().length() > 0) {
+			if (!specificities.toString().isEmpty()) {
 				context.reportWarning("Mascot will search additional site (" + specificities.toString() + ") for modification " + ms.toString());
 			}
 		}

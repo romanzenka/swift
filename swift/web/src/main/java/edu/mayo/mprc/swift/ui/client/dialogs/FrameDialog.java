@@ -33,6 +33,7 @@ public abstract class FrameDialog extends DialogBox {
 			okayButton = new Button("OK");
 			buttonPanel.add(okayButton);
 			okayButton.addClickListener(new ClickListener() {
+				@Override
 				public void onClick(final Widget widget) {
 					okay();
 				}
@@ -43,6 +44,7 @@ public abstract class FrameDialog extends DialogBox {
 			cancelButton = new Button("Cancel");
 			buttonPanel.add(cancelButton);
 			cancelButton.addClickListener(new ClickListener() {
+				@Override
 				public void onClick(final Widget widget) {
 					cancel();
 				}

@@ -215,6 +215,7 @@ public final class MzXMLPeakListWriter implements Closeable {
 		}
 	}
 
+	@Override
 	public void close() {
 		if (xmlWriter != null) {
 			try {

@@ -226,6 +226,7 @@ public final class MyriMatchWorker extends WorkerBase {
 
 	public static final class Ui implements ServiceUiFactory {
 
+		@Override
 		public void createUI(final DaemonConfig daemon, final ResourceConfig resource, final UiBuilder builder) {
 			builder.property(EXECUTABLE, "Executable Path", "MyriMatch executable path. MyriMatch executables can be " +
 					"<br/>found at <a href=\"http://fenchurch.mc.vanderbilt.edu/software.php#MyriMatch/\"/>http://fenchurch.mc.vanderbilt.edu/software.php#MyriMatch</a>")

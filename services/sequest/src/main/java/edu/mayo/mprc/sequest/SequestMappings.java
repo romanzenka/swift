@@ -107,12 +107,13 @@ public final class SequestMappings implements Mappings, Cloneable {
 	 *
 	 * @param isr Reader for the params file
 	 */
+	@Override
 	public void read(final Reader isr) {
 		final BufferedReader reader = new BufferedReader(isr);
 		try {
 			final String header = reader.readLine();
 			final Matcher m = SEQUEST_HEADER.matcher(header);
-			if ((header == null) || (header.length() == 0) || (!m.lookingAt())) {
+			if ((header == null) || (header.isEmpty()) || (!m.lookingAt())) {
 				throw new MprcException("Not a sequest params file");
 			}
 			while (true) {
@@ -152,6 +153,7 @@ public final class SequestMappings implements Mappings, Cloneable {
 		}
 	}
 
+	@Override
 	public void write(final Reader oldParams, final Writer out) {
 		BufferedReader reader = null;
 		PrintWriter pw = null;
@@ -214,6 +216,7 @@ public final class SequestMappings implements Mappings, Cloneable {
 	 * @param name Name of the parameter.
 	 * @return Value of the native parameter.
 	 */
+	@Override
 	public String getNativeParam(final String name) {
 		return nativeParams.get(name).trim();
 	}
@@ -224,10 +227,12 @@ public final class SequestMappings implements Mappings, Cloneable {
 	 * @param name  Name of the native parameter.
 	 * @param value Value of the native parameter.
 	 */
+	@Override
 	public void setNativeParam(final String name, final String value) {
 		nativeParams.put(name, value);
 	}
 
+	@Override
 	public void setPeptideTolerance(final MappingContext context, final Tolerance peptideTolerance) {
 		setNativeParam(PEP_TOL_VALUE, String.valueOf(peptideTolerance.getValue()));
 		if (MassUnit.Da.equals(peptideTolerance.getUnit())) {
@@ -238,6 +243,7 @@ public final class SequestMappings implements Mappings, Cloneable {
 		}
 	}
 
+	@Override
 	public void setFragmentTolerance(final MappingContext context, final Tolerance fragmentTolerance) {
 		final Tolerance newTolerance;
 		if (fragmentTolerance.getUnit() == MassUnit.Ppm) {
@@ -258,6 +264,7 @@ public final class SequestMappings implements Mappings, Cloneable {
 		setNativeParam(FRAG_TOL_VALUE, String.valueOf(clampedTolerance.getValue()));
 	}
 
+	@Override
 	public void setVariableMods(final MappingContext context, final ModSet variableMods) {
 		final StringBuilder sb = new StringBuilder();
 
@@ -359,6 +366,7 @@ public final class SequestMappings implements Mappings, Cloneable {
 		return ms.isSiteSpecificAminoAcid() && (!ms.isPositionAnywhere() || ms.isProteinOnly());
 	}
 
+	@Override
 	public void setFixedMods(final MappingContext context, final ModSet fixedMods) {
 		// The key is in form [AA|Cterm|Nterm]_[protein|peptide]
 		// We sum all the fixed mod contributions
@@ -406,10 +414,12 @@ public final class SequestMappings implements Mappings, Cloneable {
 		}
 	}
 
+	@Override
 	public void setSequenceDatabase(final MappingContext context, final String shortDatabaseName) {
 		setNativeParam(DATABASE, "${DB:" + shortDatabaseName + "}");
 	}
 
+	@Override
 	public void setProtease(final MappingContext context, final Protease protease) {
 
 		final String name = protease.getName().replaceAll("\\s", "_");
@@ -422,7 +432,7 @@ public final class SequestMappings implements Mappings, Cloneable {
 		if ("Non-Specific".equals(protease.getName())) {
 			firstDigit = "0";
 			secondDigit = "0";
-		} else if (rnminus1.length() == 0) {
+		} else if (rnminus1.isEmpty()) {
 			// if there's no rnminus1, then we assume this is an inverted match
 			secondDigit = "0";
 			final String swap = rn;
@@ -430,7 +440,7 @@ public final class SequestMappings implements Mappings, Cloneable {
 			rnminus1 = swap;
 		} else if (rn.startsWith("!")) {
 			rn = rn.substring(1);
-		} else if (rn.length() != 0) { // RN.length = 0 is fine, allowed
+		} else if (!rn.isEmpty()) { // RN.length = 0 is fine, allowed
 			// can't deal with this enzyme
 			throw new MprcException("Enzyme " + protease.getName() + " cannot be used by Sequest");
 		}
@@ -441,6 +451,7 @@ public final class SequestMappings implements Mappings, Cloneable {
 						(rn.equals("") ? "-" : rn));
 	}
 
+	@Override
 	public void setMissedCleavages(final MappingContext context, final Integer missedCleavages) {
 		String value = String.valueOf(missedCleavages);
 		if (missedCleavages > 12) {
@@ -454,6 +465,7 @@ public final class SequestMappings implements Mappings, Cloneable {
 	private static final String[] INSTRUMENT_SERIES = "a      b      y      a           b           c           d           v           w           x           y           z".split("\\s+");
 	private static final Pattern R = Pattern.compile("(\\d+) (\\d+) (\\d+) (\\d+.\\d+) (\\d+.\\d+) (\\d+.\\d+) (\\d+.\\d+) (\\d+.\\d+) (\\d+.\\d+) (\\d+.\\d+) (\\d+.\\d+) (\\d+.\\d+)");
 
+	@Override
 	public void setInstrument(final MappingContext context, final Instrument it) {
 		final Map<String, IonSeries> hasseries = new HashMap<String, IonSeries>();
 		final StringBuilder sb = new StringBuilder();

@@ -74,6 +74,7 @@ public final class MascotWorker extends WorkerBase {
 	 */
 	public static final String MASCOT_CGI = "cgi/nph-mascot.exe?1";
 
+	@Override
 	public void process(final WorkPacket workPacket, final UserProgressReporter progressReporter) {
 		final MascotWorkPacket mascotWorkPacket = (MascotWorkPacket) workPacket;
 		assert mascotWorkPacket.getInputFile() != null : "Mascot search failed: mgf file not specified";
@@ -364,7 +365,7 @@ public final class MascotWorker extends WorkerBase {
 		while ((line = reader.readLine()) != null) {
 			count++;
 			line = line.trim();
-			if ((line.length() == 0) || (line.charAt(0) == '#')) {
+			if ((line.isEmpty()) || (line.charAt(0) == '#')) {
 				continue;
 			}
 			final int pos = line.indexOf('=');
@@ -400,7 +401,7 @@ public final class MascotWorker extends WorkerBase {
 			try {
 				final URL mascotUrl = new URL(config.getMascotUrl());
 				worker.setUrl(mascotUrl);
-				if (config.getMascotPublicUrl() != null && config.getMascotPublicUrl().trim().length() > 0) {
+				if (config.getMascotPublicUrl() != null && !config.getMascotPublicUrl().trim().isEmpty()) {
 					worker.setPublicUrl(new URL(config.getMascotPublicUrl()));
 				} else {
 					worker.setPublicUrl(mascotUrl);
@@ -480,6 +481,7 @@ public final class MascotWorker extends WorkerBase {
 	}
 
 	public static final class Ui implements ServiceUiFactory {
+		@Override
 		public void createUI(final DaemonConfig daemon, final ResourceConfig resource, final UiBuilder builder) {
 			builder
 					.property(MASCOT_URL, "URL", "Mascot search engine URL.<p>This URL is used by Swift to give commands to Mascot.</p>").required()

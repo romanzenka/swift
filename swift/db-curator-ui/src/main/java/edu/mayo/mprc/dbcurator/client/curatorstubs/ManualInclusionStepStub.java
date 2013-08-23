@@ -17,6 +17,7 @@ public final class ManualInclusionStepStub extends CurationStepStub {
 	 * {@inheritDoc}
 	 * in this case we will return a StepPanelShell that will contain a ManualInclusionPanel
 	 */
+	@Override
 	public AbstractStepPanel getStepPanel() {
 		final ManualInclusionPanel panel = new ManualInclusionPanel();
 		panel.setContainedStep(this);

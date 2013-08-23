@@ -165,6 +165,7 @@ public final class SgeJobRunner {
 			}
 		}
 
+		@Override
 		public void reportProgress(final ProgressInfo progressInfo) {
 			try {
 				SgeJobRunner.reportProgress(request, new DaemonProgressMessage(DaemonProgress.UserSpecificProgressInfo, progressInfo));
@@ -174,10 +175,12 @@ public final class SgeJobRunner {
 			}
 		}
 
+		@Override
 		public void reportSuccess() {
 			//Do nothing. GridRunner gets notified of completion by SGE.
 		}
 
+		@Override
 		public void reportFailure(final Throwable t) {
 			try {
 				SgeJobRunner.reportProgress(request, t);

@@ -13,6 +13,7 @@ final class TestWorkerFactory implements WorkerFactory {
 		this.finalWorker = finalWorker;
 	}
 
+	@Override
 	public Worker createWorker() {
 		return finalWorker;
 	}
@@ -27,6 +28,7 @@ final class TestWorkerFactory implements WorkerFactory {
 		return "test";
 	}
 
+	@Override
 	public String getUserName() {
 		return finalWorker.toString();
 	}

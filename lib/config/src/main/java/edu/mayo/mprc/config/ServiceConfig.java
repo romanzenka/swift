@@ -24,10 +24,12 @@ public final class ServiceConfig implements ResourceConfig, NamedResource {
 		this.runner = runner;
 	}
 
+	@Override
 	public String getName() {
 		return name;
 	}
 
+	@Override
 	public void setName(final String name) {
 		this.name = name;
 	}

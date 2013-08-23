@@ -154,6 +154,7 @@ public abstract class AbstractRunner {
 	class SynchronousRequestReceiver implements Runnable {
 		private volatile boolean keepRunning = true;
 
+		@Override
 		public void run() {
 			while (keepRunning) {
 				final DaemonRequest request = getDaemonConnection().receiveDaemonRequest(5000);

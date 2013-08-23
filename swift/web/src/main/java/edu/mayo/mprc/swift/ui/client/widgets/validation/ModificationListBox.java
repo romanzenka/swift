@@ -15,6 +15,7 @@ public final class ModificationListBox extends ValidatableListBox {
 		super(param, allowMultiple);
 	}
 
+	@Override
 	public ClientValue bundle(final List<? extends ClientValue> selected) {
 		final List<ClientModSpecificity> specs = new ArrayList<ClientModSpecificity>(selected.size());
 		for (final ClientValue value : selected) {
@@ -23,10 +24,12 @@ public final class ModificationListBox extends ValidatableListBox {
 		return new ClientModSpecificitySet(specs);
 	}
 
+	@Override
 	public String getStringValue(final ClientValue value) {
 		return ClientModSpecificity.cast(value).getName();
 	}
 
+	@Override
 	public List<? extends ClientValue> unbundle(final ClientValue value) {
 		return ClientModSpecificitySet.cast(value).getModSpecificities();
 	}
@@ -35,6 +38,7 @@ public final class ModificationListBox extends ValidatableListBox {
 	 * @return We have our own mechanism of fetching allowed values, because there are many modifications and they never change.
 	 *         We never request update of allowed values.
 	 */
+	@Override
 	public boolean needsAllowedValues() {
 		return false;
 	}

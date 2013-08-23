@@ -50,8 +50,9 @@ public final class DatabaseUploadPanel extends AbstractStepPanel {
 			 * there is no progress indicator for this.  Maybe we can find another widget, someday.
 			 * @param event
 			 */
+			@Override
 			public void onSubmit(final FormSubmitEvent event) {
-				if (lblClientPath.getText().trim().length() == 0) {
+				if (lblClientPath.getText().trim().isEmpty()) {
 					lblNotification.setText("You must select a file first");
 					event.setCancelled(true);
 				} else if (containedStep.getCompletionCount() != null) {
@@ -67,6 +68,7 @@ public final class DatabaseUploadPanel extends AbstractStepPanel {
 			 * display the location of the new file on the server
 			 * @param event contains the result (from Response.Writer) which contains ther error messages or the path to the file
 			 */
+			@Override
 			public void onSubmitComplete(final FormSubmitCompleteEvent event) {
 				final String results = event.getResults();
 				if (results.indexOf("<Error>") != -1) {
@@ -112,6 +114,7 @@ public final class DatabaseUploadPanel extends AbstractStepPanel {
 
 		final Button cmdStart = new Button("Upload");
 		cmdStart.addClickListener(new ClickListener() {
+			@Override
 			public void onClick(final Widget widget) {
 				containedStep.clientFilePath = uploadWidget.getFilename();
 				lblClientPath.setText(uploadWidget.getFilename());
@@ -132,12 +135,14 @@ public final class DatabaseUploadPanel extends AbstractStepPanel {
 	}
 
 
+	@Override
 	public CurationStepStub getContainedStep() {
 		this.containedStep.clientFilePath = this.lblClientPath.getText();
 		this.containedStep.serverFilePath = this.lblServerPath.getText();
 		return containedStep;
 	}
 
+	@Override
 	public void setContainedStep(final CurationStepStub step) throws ClassCastException {
 		if (!(step instanceof DatabaseUploadStepStub)) {
 			ExceptionUtilities.throwCastException(step, DatabaseUploadStepStub.class);
@@ -147,10 +152,12 @@ public final class DatabaseUploadPanel extends AbstractStepPanel {
 		update();
 	}
 
+	@Override
 	public String getStyle() {
 		return "shell-header-uploadstep";
 	}
 
+	@Override
 	public void update() {
 		if (this.containedStep.clientFilePath != null) {
 			this.lblClientPath.setText(this.containedStep.clientFilePath);
@@ -158,12 +165,13 @@ public final class DatabaseUploadPanel extends AbstractStepPanel {
 			this.lblClientPath.setText("");
 		}
 
-		if (containedStep.serverFilePath != null && containedStep.serverFilePath.length() > 0) {
+		if (containedStep.serverFilePath != null && !containedStep.serverFilePath.isEmpty()) {
 			this.lblServerPath.setText(this.containedStep.serverFilePath);
 			lblNotification.setText("Upload Complete");
 		}
 	}
 
+	@Override
 	public String getImageURL() {
 		return "images/fileupload.png";
 	}

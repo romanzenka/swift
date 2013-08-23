@@ -46,6 +46,7 @@ public final class RegExTextFilter implements TextFilter {
 	 * @param toMatch the String that you want to test
 	 * @return true if this filter matches at least one segment of the toMatch String
 	 */
+	@Override
 	public boolean matches(final String toMatch) {
 		compilePattern();
 
@@ -61,6 +62,7 @@ public final class RegExTextFilter implements TextFilter {
 	 *
 	 * @param mode the mode that we want to use
 	 */
+	@Override
 	public void setMatchMode(final MatchMode mode) {
 		this.mode = mode;
 	}
@@ -72,6 +74,7 @@ public final class RegExTextFilter implements TextFilter {
 	 * @return if the criteria is valid the VALID String is returned else a short string indicating where the problem
 	 *         may be will be given
 	 */
+	@Override
 	public String testCriteria() {
 		try {
 			compilePattern();

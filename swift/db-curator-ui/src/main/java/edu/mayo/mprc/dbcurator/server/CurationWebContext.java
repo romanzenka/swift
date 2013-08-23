@@ -11,7 +11,7 @@ public final class CurationWebContext {
 	private File fastaArchiveFolder;
 	private File localTempFolder;
 
-	private CurationWebContext() {
+	public CurationWebContext() {
 	}
 
 	public void initialize(final File fastaFolder, final File fastaUploadFolder, final File fastaArchiveFolder, final File localTempFolder) {

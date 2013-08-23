@@ -51,6 +51,7 @@ public final class MascotCache extends WorkCache<MascotWorkPacket> {
 	public static final class Ui implements ServiceUiFactory {
 		private static final String DEFAULT_CACHE = "var/cache/mascot";
 
+		@Override
 		public void createUI(final DaemonConfig daemon, final ResourceConfig resource, final UiBuilder builder) {
 			builder.property(CacheConfig.CACHE_FOLDER, "Mascot cache folder", "When a file gets searched by Mascot, the result is stored in this folder. Subsequent searches of the same file with same parameters use the cached value."
 					+ "<p>Ideally, this folder would be on a fast, potentially less reliable storage.</p>")

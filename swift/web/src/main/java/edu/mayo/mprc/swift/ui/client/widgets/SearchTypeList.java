@@ -18,7 +18,7 @@ public final class SearchTypeList extends ListBox implements SourcesChangeEvents
 			new SearchTypeEntry(SearchType.ManyToSamples, "One experiment, each input is a separate biological sample", "many-to-samples"),
 			new SearchTypeEntry(SearchType.Custom, "Custom", "custom"),
 	};
-	private final static int DEFAULT_ENTRY = 2; /* ManyToSamples */
+	private static final int DEFAULT_ENTRY = 2; /* ManyToSamples */
 
 	/**
 	 * Listeners interested in hearing about the change in selection.
@@ -111,10 +111,12 @@ public final class SearchTypeList extends ListBox implements SourcesChangeEvents
 		listeners.remove(changeListener);
 	}
 
+	@Override
 	public void onClick(final Widget widget) {
 		fireSelectionChanged();
 	}
 
+	@Override
 	public void onChange(final Widget widget) {
 		fireSelectionChanged();
 	}

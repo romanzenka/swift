@@ -240,6 +240,7 @@ public class EditableLabel extends Composite implements HasWordWrap, HasText {
 		text.setStyleName("editableLabel-label");
 
 		text.addClickListener(new ClickListener() {
+			@Override
 			public void onClick(final Widget sender) {
 				changeTextLabel();
 			}
@@ -251,6 +252,7 @@ public class EditableLabel extends Composite implements HasWordWrap, HasText {
 		changeText.setStyleName("editableLabel-textBox");
 
 		changeText.addKeyboardListener(new KeyboardListenerAdapter() {
+			@Override
 			public void onKeyPress(final Widget sender, final char keyCode, final int modifiers) {
 				// If return then save, if Esc cancel the change, otherwise do nothing
 				switch (keyCode) {
@@ -271,6 +273,7 @@ public class EditableLabel extends Composite implements HasWordWrap, HasText {
 		changeTextArea.setStyleName("editableLabel-textArea");
 
 		changeTextArea.addKeyboardListener(new KeyboardListenerAdapter() {
+			@Override
 			public void onKeyPress(final Widget sender, final char keyCode, final int modifiers) {
 				// If Esc then cancel the change, otherwise do nothing
 				switch (keyCode) {
@@ -290,6 +293,7 @@ public class EditableLabel extends Composite implements HasWordWrap, HasText {
 		}
 
 		((SourcesClickEvents) confirmChange).addClickListener(new ClickListener() {
+			@Override
 			public void onClick(final Widget sender) {
 				setTextLabel();
 			}
@@ -302,6 +306,7 @@ public class EditableLabel extends Composite implements HasWordWrap, HasText {
 		}
 
 		((SourcesClickEvents) cancelChange).addClickListener(new ClickListener() {
+			@Override
 			public void onClick(final Widget sender) {
 				cancelLabelChange();
 			}
@@ -367,6 +372,7 @@ public class EditableLabel extends Composite implements HasWordWrap, HasText {
 	 *
 	 * @param b Boolean value, true means Label is word wrapped, false means it is not.
 	 */
+	@Override
 	public void setWordWrap(final boolean b) {
 		text.setWordWrap(b);
 	}
@@ -374,6 +380,7 @@ public class EditableLabel extends Composite implements HasWordWrap, HasText {
 	/**
 	 * Return whether the Label is word wrapped or not.
 	 */
+	@Override
 	public boolean getWordWrap() {
 		return text.getWordWrap();
 	}
@@ -381,6 +388,7 @@ public class EditableLabel extends Composite implements HasWordWrap, HasText {
 	/**
 	 * Return the text value of the Label
 	 */
+	@Override
 	public String getText() {
 		return text.getText();
 	}
@@ -388,6 +396,7 @@ public class EditableLabel extends Composite implements HasWordWrap, HasText {
 	/**
 	 * Set the text value of the Label
 	 */
+	@Override
 	public void setText(final String newText) {
 		text.setText(newText);
 	}

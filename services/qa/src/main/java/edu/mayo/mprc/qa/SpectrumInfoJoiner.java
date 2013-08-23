@@ -140,7 +140,7 @@ public final class SpectrumInfoJoiner {
 
 	private static int writeMgfWithScaffoldInfos(final ScaffoldQaSpectraReader scaffold, final FileWriter fileWriter, int rowCount, final MSMSEvalOutputReader msmsEvalReader, final RawDumpReader rawDumpReader, final MyriMatchPepXmlReader myrimatchReader, final String scanId, final MgfSpectrum mgfSpectrum, final String rawFileName) throws IOException {
 		final String scaffoldVersion = scaffold == null ? null : scaffold.getScaffoldVersion();
-		if (mgfSpectrum.getScaffoldInfos() == null || mgfSpectrum.getScaffoldInfos().size() == 0) {
+		if (mgfSpectrum.getScaffoldInfos() == null || mgfSpectrum.getScaffoldInfos().isEmpty()) {
 			writeSpectrumLine(
 					fileWriter,
 					msmsEvalReader,

@@ -464,7 +464,7 @@ final class PvmUtilities {
 		}
 
 		for (final String fileName : tempFiles) {
-			if (fileName != null && fileName.length() > 0) {
+			if (fileName != null && !fileName.isEmpty()) {
 				deleteFileRemote(nodeTempFolder, fileName, hostName);
 			}
 		}
@@ -536,7 +536,7 @@ final class PvmUtilities {
 
 	public static void deleteFile(final String nodeTempFolder, final String fileName) {
 		try {
-			if (fileName.length() > 0) {
+			if (!fileName.isEmpty()) {
 				final File f = new File(new File(nodeTempFolder), fileName);
 				if (f.exists()) {
 					final List<String> lines;
@@ -562,7 +562,7 @@ final class PvmUtilities {
 	 *
 	 */
 	public static void deleteFileRemote(final String nodeTempFolder, final String fileName, final String hostName) {
-		if (fileName.length() > 0) {
+		if (!fileName.isEmpty()) {
 
 			final List<String> lines;
 

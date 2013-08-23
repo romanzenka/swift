@@ -249,6 +249,7 @@ public final class OmssaWorker extends WorkerBase {
 		private static final String WINDOWS = "bin/omssa/windows/omssacl.exe";
 		private static final String LINUX = "bin/omssa/linux/omssacl";
 
+		@Override
 		public void createUI(final DaemonConfig daemon, final ResourceConfig resource, final UiBuilder builder) {
 			builder.property(OMSSACL_PATH, "CL", "Omssa command line executable." +
 					"<p>Swift install contains following executables for your convenience:</p>"

@@ -33,10 +33,12 @@ public final class SequestRunnerStub extends SequestRunner {
 	}
 
 
+	@Override
 	public String getSearchResultsFolder() {
 		return super.getSearchResultsFolder();
 	}
 
+	@Override
 	public void setSearchResultsFolder(final String folder) {
 		super.setSearchResultsFolder(folder);
 	}

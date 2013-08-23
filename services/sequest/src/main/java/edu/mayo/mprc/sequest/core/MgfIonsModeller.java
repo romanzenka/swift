@@ -111,6 +111,7 @@ final class MgfIonsModeller implements IonsModellerInterface {
 	private Map<String, String> dtaHistory;
 
 
+	@Override
 	public void setMgfFileName(final String mgfFileName) {
 		this.mgfFileName = mgfFileName;
 	}
@@ -174,6 +175,7 @@ final class MgfIonsModeller implements IonsModellerInterface {
 	 * process a single line from the mgf file
 	 * This is a slow version of {@link #processLine(char[], int, int)} provided for convenience only.
 	 */
+	@Override
 	public void processLine(final String line) {
 		final char[] chars = line.trim().toCharArray();
 		processLine(chars, 0, chars.length);
@@ -272,6 +274,7 @@ final class MgfIonsModeller implements IonsModellerInterface {
 	 * @linelen length of the line not including new line terminator
 	 */
 
+	@Override
 	public void processLine(final char[] buffer, final int pos, final int lineLen) {
 		lineNumber++;
 
@@ -331,6 +334,7 @@ final class MgfIonsModeller implements IonsModellerInterface {
 
 	}
 
+	@Override
 	public void forceSubmit() {
 		sequestSubmitter.forceSubmit();
 	}
@@ -380,12 +384,12 @@ final class MgfIonsModeller implements IonsModellerInterface {
 		} else {
 			// charge could contain a + sign at the end
 			String charge = this.charge;
-			if (charge == null || charge.trim().length() == 0) {
+			if (charge == null || charge.trim().isEmpty()) {
 				// Charge was not specified, skip this .dta file
 				LOGGER.warn("Unspecified charge, skipping spectrum " + dtaFileName);
 				return;
 			}
-			if (mz.trim().length() == 0) {
+			if (mz.trim().isEmpty()) {
 				LOGGER.warn("Unspecified M/Z, skipping spectrum " + dtaFileName);
 				return;
 			}
@@ -419,15 +423,18 @@ final class MgfIonsModeller implements IonsModellerInterface {
 		}
 	}
 
+	@Override
 	public void setSequestSubmitter(final SequestSubmitterInterface submitter) {
 		this.sequestSubmitter = submitter;
 	}
 
 
+	@Override
 	public void setWorkingDir(final String name) {
 		this.workingDir = name;
 	}
 
+	@Override
 	public void setOutFilePrefix(final String name) {
 		this.outFilePrefix = name;
 	}

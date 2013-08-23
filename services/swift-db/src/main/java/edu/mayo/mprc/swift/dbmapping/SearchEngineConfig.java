@@ -51,13 +51,21 @@ public class SearchEngineConfig extends PersistableBase {
 
 	@Override
 	public boolean equals(Object o) {
-		if (this == o) return true;
-		if (!(o instanceof SearchEngineConfig)) return false;
+		if (this == o) {
+			return true;
+		}
+		if (!(o instanceof SearchEngineConfig)) {
+			return false;
+		}
 
 		SearchEngineConfig that = (SearchEngineConfig) o;
 
-		if (!code.equals(that.code)) return false;
-		if (!version.equals(that.version)) return false;
+		if (!code.equals(that.code)) {
+			return false;
+		}
+		if (!version.equals(that.version)) {
+			return false;
+		}
 
 		return true;
 	}

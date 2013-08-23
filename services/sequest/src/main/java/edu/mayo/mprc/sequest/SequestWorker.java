@@ -163,11 +163,13 @@ public final class SequestWorker extends WorkerBase {
 			this.pvmHosts = pvmHosts;
 		}
 
+		@Override
 		public void save(final ConfigWriter writer) {
 			writer.put(PVM_HOSTS, getPvmHosts(), "PVM's pvmhosts file");
 			writer.put(SEQUEST_COMMAND, getSequestCommand(), "Command to run Sequest");
 		}
 
+		@Override
 		public void load(final ConfigReader reader) {
 			setPvmHosts(reader.get(PVM_HOSTS));
 			setSequestCommand(reader.get(SEQUEST_COMMAND));
@@ -180,6 +182,7 @@ public final class SequestWorker extends WorkerBase {
 	}
 
 	public static final class Ui implements ServiceUiFactory {
+		@Override
 		public void createUI(final DaemonConfig daemon, final ResourceConfig resource, final UiBuilder builder) {
 			builder.property(SEQUEST_COMMAND, "Sequest Command", "Sequest command line executable.")
 					.required()

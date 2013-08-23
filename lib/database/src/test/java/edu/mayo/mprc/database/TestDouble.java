@@ -35,13 +35,21 @@ public class TestDouble extends PersistableBase {
 
 	@Override
 	public boolean equals(final Object o) {
-		if (this == o) return true;
-		if (o == null || !(o instanceof TestDouble)) return false;
+		if (this == o) {
+			return true;
+		}
+		if (o == null || !(o instanceof TestDouble)) {
+			return false;
+		}
 
 		final TestDouble that = (TestDouble) o;
 
-		if (Math.abs(that.value1 - value1) >= 0.01 || Double.isNaN(that.value1) != Double.isNaN(value1)) return false;
-		if (Math.abs(that.value2 - value2) >= 0.01 || Double.isNaN(that.value2) != Double.isNaN(value2)) return false;
+		if (Math.abs(that.value1 - value1) >= 0.01 || Double.isNaN(that.value1) != Double.isNaN(value1)) {
+			return false;
+		}
+		if (Math.abs(that.value2 - value2) >= 0.01 || Double.isNaN(that.value2) != Double.isNaN(value2)) {
+			return false;
+		}
 
 		return true;
 	}

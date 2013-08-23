@@ -29,6 +29,7 @@ public final class FASTAFileUploadServlet implements HttpRequestHandler {
 		return curationWebContext.getFastaUploadFolder();
 	}
 
+	@Override
 	public void handleRequest(final HttpServletRequest request, final HttpServletResponse response) throws IOException {
 
 		response.setContentType("text/html;charset=UTF-8");

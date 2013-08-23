@@ -69,6 +69,7 @@ public final class XTandemMappings implements Mappings {
 		return ResourceUtilities.getReader("classpath:edu/mayo/mprc/swift/params/base.tandem.xml.template", this.getClass());
 	}
 
+	@Override
 	public void read(final Reader isr) {
 		final Document bioml;
 		try {
@@ -94,6 +95,7 @@ public final class XTandemMappings implements Mappings {
 		}
 	}
 
+	@Override
 	public void write(final Reader oldParams, final Writer out) {
 		final Document bioml;
 		try {
@@ -132,14 +134,17 @@ public final class XTandemMappings implements Mappings {
 		}
 	}
 
+	@Override
 	public String getNativeParam(final String name) {
 		return nativeParams.get(name);
 	}
 
+	@Override
 	public void setNativeParam(final String name, final String value) {
 		nativeParams.put(name, value);
 	}
 
+	@Override
 	public void setPeptideTolerance(final MappingContext context, final Tolerance peptideTolerance) {
 		final double value = peptideTolerance.getValue();
 		String unit = peptideTolerance.getUnit().getCode();
@@ -151,6 +156,7 @@ public final class XTandemMappings implements Mappings {
 		setNativeParam(PEP_TOL_UNIT, unit);
 	}
 
+	@Override
 	public void setFragmentTolerance(final MappingContext context, final Tolerance fragmentTolerance) {
 		if (!MassUnit.Da.equals(fragmentTolerance.getUnit())) {
 			setNativeParam(FRAG_TOL_VALUE, "1");
@@ -162,10 +168,12 @@ public final class XTandemMappings implements Mappings {
 		setNativeParam(FRAG_TOL_UNIT, DALTONS);
 	}
 
+	@Override
 	public void setVariableMods(final MappingContext context, final ModSet variableMods) {
 		mapModsToNative(context, variableMods, VAR_MODS);
 	}
 
+	@Override
 	public void setFixedMods(final MappingContext context, final ModSet fixedMods) {
 		mapModsToNative(context, fixedMods, FIXED_MODS);
 	}
@@ -207,27 +215,29 @@ public final class XTandemMappings implements Mappings {
 		return Joiner.on(",").join(modsArray);
 	}
 
+	@Override
 	public void setSequenceDatabase(final MappingContext context, final String shortDatabaseName) {
 		setNativeParam(DATABASE, DATABASE_TAXON);
 	}
 
 	private static final Pattern TANDEM_MOD = Pattern.compile("\\s*([\\[\\{])([A-Z]*)[\\]\\}]\\|([\\[\\{])([A-Z]*)[\\]\\}]\\s*");
 
+	@Override
 	public void setProtease(final MappingContext context, final Protease protease) {
 		String cle = null;
 		String rnminus1 = protease.getRnminus1();
 		String rn = protease.getRn();
 
-		if (rn.length() == 0 && rnminus1.length() == 0) {
+		if (rn.isEmpty() && rnminus1.isEmpty()) {
 			rnminus1 = "X";
 			rn = "X";
 			// handle the case where we set to 50 in allow non-specific cleavages
 			setNativeParam(MISSED_CLEAVAGES, "50");
 		} else {
-			if (rnminus1.length() == 0) {
+			if (rnminus1.isEmpty()) {
 				rnminus1 = "X";
 			}
-			if (rn.length() == 0) {
+			if (rn.isEmpty()) {
 				rn = "X";
 			}
 		}
@@ -247,6 +257,7 @@ public final class XTandemMappings implements Mappings {
 		setNativeParam(ENZYME, cle);
 	}
 
+	@Override
 	public void setMissedCleavages(final MappingContext context, final Integer missedCleavages) {
 		String value = null;
 
@@ -265,6 +276,7 @@ public final class XTandemMappings implements Mappings {
 		}
 	}
 
+	@Override
 	public void setInstrument(final MappingContext context, final Instrument instrument) {
 		final Map<String, IonSeries> hasSeries = new HashMap<String, IonSeries>();
 		for (final IonSeries is : instrument.getSeries()) {

@@ -29,6 +29,7 @@ public final class ParamsEditorApp {
 	 */
 	public static void onModuleLoad(InitialPageData pageData) {
 		GWT.setUncaughtExceptionHandler(new GWT.UncaughtExceptionHandler() {
+			@Override
 			public void onUncaughtException(final Throwable throwable) {
 				SimpleParamsEditorPanel.handleGlobalError(throwable);
 			}

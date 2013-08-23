@@ -40,6 +40,7 @@ public final class MsmsEvalCache extends WorkCache<MSMSEvalWorkPacket> {
 	public static final class Ui implements ServiceUiFactory {
 		private static final String DEFAULT_CACHE = "var/cache/msmseval";
 
+		@Override
 		public void createUI(final DaemonConfig daemon, final ResourceConfig resource, final UiBuilder builder) {
 			builder.property(CacheConfig.CACHE_FOLDER, "msmsEval cache folder", "When an .mgf file gets evaluated by msmsEval, the result is stored in this folder. Subsequent attempts to evaluate same file will use the cached results."
 					+ "<p>Ideally, this folder would be on a fast, potentially less reliable storage.</p>")

@@ -17,6 +17,7 @@ public final class PeriodicTable implements Cloneable {
 	/**
 	 * Shallow copy. The returned PeriodicTable will share Elements with this.
 	 */
+	@Override
 	public PeriodicTable clone() throws CloneNotSupportedException {
 		final PeriodicTable copy = (PeriodicTable) super.clone();
 		copy.elements = elements;

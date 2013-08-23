@@ -60,6 +60,7 @@ public class HeaderTransformStep implements CurationStep {
 	 * This step will take each header in the DBInputStream and apply the pressribed subtitution to all of the headers.
 	 * {@inheritDoc}
 	 */
+	@Override
 	public StepValidation performStep(final CurationExecutor exe) {
 		//perform pre-validation of the step to make sure we at least pass that.
 		lastRunValidation = this.preValidate(exe.getCurationDao());
@@ -140,6 +141,7 @@ public class HeaderTransformStep implements CurationStep {
 	 *
 	 * @param curationDao
 	 */
+	@Override
 	public StepValidation preValidate(final CurationDao curationDao) {
 		final StepValidation preValidation = new StepValidation();
 
@@ -159,6 +161,7 @@ public class HeaderTransformStep implements CurationStep {
 		return preValidation;
 	}
 
+	@Override
 	public CurationStep createCopy() {
 		final HeaderTransformStep copy = new HeaderTransformStep();
 		copy.setDescription(this.getDescription());
@@ -167,18 +170,22 @@ public class HeaderTransformStep implements CurationStep {
 		return copy;
 	}
 
+	@Override
 	public Integer getId() {
 		return this.id;
 	}
 
+	@Override
 	public void setId(final Integer id) {
 		this.id = id;
 	}
 
+	@Override
 	public Integer getLastRunCompletionCount() {
 		return this.lastRunCompletionCount;
 	}
 
+	@Override
 	public void setLastRunCompletionCount(final Integer count) {
 		this.lastRunCompletionCount = count;
 	}
@@ -238,6 +245,7 @@ public class HeaderTransformStep implements CurationStep {
 		this.substitutionPattern = substitutionPattern;
 	}
 
+	@Override
 	public String simpleDescription() {
 		return null;
 	}

@@ -14,6 +14,7 @@ class BadSpectraTitleFilter implements MgfPeakListFilter {
 		this.badSpectraMGFTitles = badSpectraMGFTitles;
 	}
 
+	@Override
 	public boolean peakListAccepted(final MascotGenericFormatPeakList peakList) {
 		// The peak list is accepted if it cannot be removed from the collection of bad spectra titles
 		return !badSpectraMGFTitles.remove(peakList.getTitle());

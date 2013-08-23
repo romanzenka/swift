@@ -224,7 +224,7 @@ public final class MessageBroker implements Closeable {
 		public String validate() {
 			Connection connection = null;
 			try {
-				if (brokerUrl != null && brokerUrl.length() > 0) {
+				if (brokerUrl != null && !brokerUrl.isEmpty()) {
 					final ConnectionFactory connectionFactory = new ActiveMQConnectionFactory(brokerUrl);
 					connection = connectionFactory.createConnection();
 				} else {
@@ -246,7 +246,7 @@ public final class MessageBroker implements Closeable {
 		}
 
 		public String effectiveBrokerUrl() {
-			if (isEmbedded() && getEmbeddedBrokerUrl().trim().length() > 0) {
+			if (isEmbedded() && !getEmbeddedBrokerUrl().trim().isEmpty()) {
 				return getEmbeddedBrokerUrl().trim();
 			} else {
 				return getBrokerUrl().trim();
@@ -270,6 +270,7 @@ public final class MessageBroker implements Closeable {
 
 		public static final String DEFAULT_PORT = "61616";
 
+		@Override
 		public void createUI(final DaemonConfig daemon, final ResourceConfig resource, final UiBuilder builder) {
 			builder.property(BROKER_URL, "Connection URI", "The URI defines where the broker runs (hostname and port) as well as the protocol used to communicate with it." +
 					" The initial default value is set to use failover. This settign will allow for reconnection attempts if JMS broker system goes down.")

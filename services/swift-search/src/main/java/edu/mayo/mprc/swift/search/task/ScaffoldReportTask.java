@@ -35,6 +35,7 @@ final class ScaffoldReportTask extends AsyncTaskBase {
 	 * @return Work packet to be sent asynchronously. If it returns null, it means the work was done without a need
 	 *         to send a work packet.
 	 */
+	@Override
 	public WorkPacket createWorkPacket() {
 		if (!isFromScratch() && peptideReportFile.exists() && peptideReportFile.length() > 0 &&
 				proteinReportFile.exists() && proteinReportFile.length() > 0) {
@@ -45,10 +46,12 @@ final class ScaffoldReportTask extends AsyncTaskBase {
 		return new ScaffoldReportWorkPacket(scaffoldOutputFiles, peptideReportFile, proteinReportFile, getFullId(), isFromScratch());
 	}
 
+	@Override
 	public void onSuccess() {
 		completeWhenFilesAppear(proteinReportFile);
 	}
 
+	@Override
 	public void onProgress(final ProgressInfo progressInfo) {
 		//Do nothing
 	}

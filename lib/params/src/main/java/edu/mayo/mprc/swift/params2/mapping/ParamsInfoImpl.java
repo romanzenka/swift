@@ -53,6 +53,7 @@ public final class ParamsInfoImpl extends ParamsInfo {
 			dbs.add(c);
 		}
 		Collections.sort(dbs, new Comparator<Curation>() {
+			@Override
 			public int compare(final Curation o1, final Curation o2) {
 				final String name1 = o1.getShortName();
 				final String name2 = o2.getShortName();

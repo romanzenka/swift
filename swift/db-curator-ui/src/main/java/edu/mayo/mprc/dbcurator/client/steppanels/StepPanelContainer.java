@@ -56,16 +56,20 @@ public final class StepPanelContainer extends Composite {
 
 		dragController.addDragHandler(new DragHandler() {
 
+			@Override
 			public void onDragEnd(final DragEndEvent event) {
 				StepPanelContainer.this.updateStepOrderFromUI();
 			}
 
+			@Override
 			public void onDragStart(final DragStartEvent event) {
 			}
 
+			@Override
 			public void onPreviewDragEnd(final DragEndEvent event) throws VetoDragException {
 			}
 
+			@Override
 			public void onPreviewDragStart(final DragStartEvent event) throws VetoDragException {
 			}
 		});
@@ -136,7 +140,7 @@ public final class StepPanelContainer extends Composite {
 	 * @param stepToInsert the step that you want to insert
 	 */
 	public void add(final CurationStepStub stepToInsert) {
-		if (this.containedSteps.size() == 0) {
+		if (this.containedSteps.isEmpty()) {
 			this.stepOrganizer.clear();
 		}
 		this.containedSteps.add(stepToInsert);
@@ -169,7 +173,7 @@ public final class StepPanelContainer extends Composite {
 	 * @param index    where you want to insert the widget
 	 */
 	public void insert(final Widget toInsert, final int index) {
-		if (this.containedSteps.size() == 0) {
+		if (this.containedSteps.isEmpty()) {
 			this.stepOrganizer.clear();
 		}
 

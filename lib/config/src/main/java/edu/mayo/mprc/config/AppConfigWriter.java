@@ -51,7 +51,7 @@ public final class AppConfigWriter implements Closeable {
 	private PrintWriter writer;
 	private boolean inSection;
 	private String section;
-	private final static String INDENT = "        ";
+	private static final String INDENT = "        ";
 	private MultiFactory multiFactory;
 	private DependencyResolver dependencyResolver;
 	private InnerConfigWriter rootWriter = new SectionConfigWriter(ApplicationConfig.class);

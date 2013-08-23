@@ -50,7 +50,7 @@ public final class ValidationPanel extends FlowPanel {
 	 * @return A widget that allows users to click on the fix tags defined in the specified string.
 	 */
 	public void fillPanel(final Panel panel, final String errorMessage, final FixTagActionListener listener) {
-		if (errorMessage != null && errorMessage.trim().length() > 0) {
+		if (errorMessage != null && !errorMessage.trim().isEmpty()) {
 			String fixTag = null;
 			final int indexOfBeginningTag = errorMessage.indexOf(BEGINNINGTAG);
 			final int indexOfEndTag = errorMessage.indexOf(ENDTAG);
@@ -67,6 +67,7 @@ public final class ValidationPanel extends FlowPanel {
 
 					final Button link = new Button(tagMessage);
 					link.addClickListener(new ClickListener() {
+						@Override
 						public void onClick(final Widget sender) {
 							empty();
 							validationStarted();

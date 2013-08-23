@@ -21,21 +21,25 @@ public class ParamValidationsMappingContext implements MappingContext {
 		}
 	}
 
+	@Override
 	public ParamsInfo getAbstractParamsInfo() {
 		return paramsInfo;
 	}
 
+	@Override
 	public void reportError(final String message, final Throwable t) {
 		final Validation v = new Validation(message, ValidationSeverity.ERROR, currentParam, null, t);
 		validations.addValidation(currentParam, v);
 		noErrors = false;
 	}
 
+	@Override
 	public void reportWarning(final String message) {
 		final Validation v = new Validation(message, ValidationSeverity.WARNING, currentParam, null, null);
 		validations.addValidation(currentParam, v);
 	}
 
+	@Override
 	public void reportInfo(final String message) {
 		final Validation v = new Validation(message, ValidationSeverity.INFO, currentParam, null, null);
 		validations.addValidation(currentParam, v);
@@ -45,14 +49,17 @@ public class ParamValidationsMappingContext implements MappingContext {
 	 * @return True if no errors occured since last call to a mapping method.
 	 *         Use this if you want to do an action only if all mappings validated ok.
 	 */
+	@Override
 	public boolean noErrors() {
 		return noErrors;
 	}
 
+	@Override
 	public Curation addLegacyCuration(final String legacyName) {
 		return null;
 	}
 
+	@Override
 	public void startMapping(final ParamName paramName) {
 		currentParam = paramName;
 		noErrors = true;

@@ -94,18 +94,22 @@ public class TestTandem {
 			WorkPacketBase.simulateTransfer(workPacket);
 
 			worker.processRequest(workPacket, new ProgressReporter() {
+				@Override
 				public void reportStart(final String hostString) {
 					LOGGER.info("Started processing " + hostString);
 				}
 
+				@Override
 				public void reportProgress(final ProgressInfo progressInfo) {
 					LOGGER.info(progressInfo);
 				}
 
+				@Override
 				public void reportSuccess() {
 					Assert.assertTrue(resultFile.length() > 0, "Tandem result file is empty.");
 				}
 
+				@Override
 				public void reportFailure(final Throwable t) {
 					throw new MprcException("Tandem worker failed to process work packet.", t);
 				}

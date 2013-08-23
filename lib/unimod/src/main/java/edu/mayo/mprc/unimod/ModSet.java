@@ -72,6 +72,7 @@ public class ModSet extends PersistableBase implements Comparable<ModSet> {
 		return copy;
 	}
 
+	@Override
 	public int compareTo(final ModSet tt) {
 		if (this.getModifications().size() < tt.getModifications().size()) {
 			return -1;

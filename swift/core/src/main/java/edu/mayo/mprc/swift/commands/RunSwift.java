@@ -43,6 +43,7 @@ public class RunSwift implements FileListener, SwiftCommand {
 	/**
 	 * Run all workers configured for this daemon.
 	 */
+	@Override
 	public ExitCode run(final SwiftEnvironment environment) {
 		final DaemonConfig config = environment.getDaemonConfig();
 		final File configFile = environment.getConfigFile();

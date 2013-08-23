@@ -24,7 +24,7 @@ public final class MonitorUtilities {
 		// WARNING: this is vendor specific... oh well...
 
 		final String pidstr = ManagementFactory.getRuntimeMXBean().getName();
-		if (pidstr == null || pidstr.length() == 0) {
+		if (pidstr == null || pidstr.isEmpty()) {
 			return -1;
 		}
 		final Matcher m = PID_MATCHER.matcher(pidstr);

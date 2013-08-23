@@ -36,6 +36,7 @@ public final class ClientInstrument implements ClientValue, Comparable {
 		return getName().hashCode();
 	}
 
+	@Override
 	public int compareTo(final Object t) {
 		if (!(t instanceof ClientInstrument)) {
 			return 1;

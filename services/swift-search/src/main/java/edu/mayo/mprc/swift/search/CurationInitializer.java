@@ -194,7 +194,7 @@ public final class CurationInitializer implements RuntimeInitializer {
 				}
 
 				//if we had a failure then let's figure out why
-				if (status.getFailedStepValidations() != null && status.getFailedStepValidations().size() > 0) {
+				if (status.getFailedStepValidations() != null && !status.getFailedStepValidations().isEmpty()) {
 					LOGGER.error("Could not execute curation: " + curation.getShortName()
 							+ "\nStep validation failed:\n"
 							+ CurationExecutor.failedValidationsToString(status.getFailedStepValidations()));

@@ -21,6 +21,7 @@ public final class ProgressDialog extends FrameDialog {
 		center();
 	}
 
+	@Override
 	public void setText(final String text) {
 		textArea.setText(text);
 	}

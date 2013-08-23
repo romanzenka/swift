@@ -196,6 +196,7 @@ public final class EngineTest {
 			this.dependencies = new ArrayList<Task>();
 		}
 
+		@Override
 		public void run() {
 			if (!pause) {
 				if (fail) {
@@ -233,6 +234,7 @@ public final class EngineTest {
 			usedForResume = false;
 		}
 
+		@Override
 		public void resume() {
 			synchronized (lock) {
 				Assert.assertFalse(usedForResume, "resume() can be called only once between resets");
@@ -280,10 +282,11 @@ public final class EngineTest {
 			this.stop = true;
 		}
 
+		@Override
 		public void run() {
 			try {
 				while (!stop) {
-					if (pausedTasks.size() > 0) {
+					if (!pausedTasks.isEmpty()) {
 						final int index = random.nextInt(pausedTasks.size());
 						final Task task = pausedTasks.get(index);
 						pausedTasks.remove(index);

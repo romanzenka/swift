@@ -140,6 +140,7 @@ public final class FileTokenFactory implements SenderTokenTranslator, ReceiverTo
 	 * @param fileToken Token to be translated.
 	 * @return Translated token - it's source daemon is properly filled in if it was not previously
 	 */
+	@Override
 	public FileToken translateBeforeTransfer(final FileToken fileToken) {
 		if (fileToken == null) {
 			return null;
@@ -167,6 +168,7 @@ public final class FileTokenFactory implements SenderTokenTranslator, ReceiverTo
 	 * @param fileToken
 	 * @return
 	 */
+	@Override
 	public File getFile(final FileToken fileToken) {
 		if (fileToken == null) {
 			return null;
@@ -215,64 +217,6 @@ public final class FileTokenFactory implements SenderTokenTranslator, ReceiverTo
 		return "<" + FILE_TAG + ">" + databaseToken + "</" + FILE_TAG + ">";
 	}
 
-	/**
-	 * Given a remote daemon FileToken, this method generates the corresponding local FileToken.
-	 * If the remote daemon and this daemon do not have common shared file space, local File
-	 * is created in a local folder that is determined by the value of the given LocalFileType.
-	 *
-	 * @param fileToken
-	 * @return
-	 */
-	private File getLocalFileForRemoteToken(final FileToken fileToken) {
-		final File rootFolder = new File(getTempFolderRepository(), fileToken.getSourceDaemonConfigInfo().getDaemonId());
-
-		FileUtilities.ensureFolderExists(rootFolder);
-
-		if (fileTokenOnSharedPath(fileToken)) {
-			return new File(rootFolder, removePrefixFromToken(fileToken.getTokenPath(), SHARED_TYPE_PREFIX));
-		} else {
-			String relativePath = null;
-
-			if (fileToken.getTokenPath().startsWith(LOCAL_TYPE_PREFIX)) {
-				relativePath = removePrefixFromToken(fileToken.getTokenPath(), LOCAL_TYPE_PREFIX);
-			} else {
-				relativePath = fileToken.getTokenPath();
-			}
-
-			//Todo: Review logic to remove root of windows path. This logic handles c: root, but //rome/mprc may failed.
-			final int index = relativePath.indexOf(':');
-			if (index != -1) {
-				relativePath = relativePath.substring(index + 1);
-			}
-
-			return new File(rootFolder, relativePath);
-		}
-	}
-
-	/**
-	 * Returns a file path built from this file token and relative to its source daemon.
-	 *
-	 * @param fileToken
-	 * @return
-	 */
-	private String getSpecificFilePathFromToken(final FileToken fileToken) {
-		if (fileTokenOnSharedPath(fileToken)) {
-			String sharedPath = fileToken.getSourceDaemonConfigInfo().getSharedFileSpacePath();
-
-			if (sharedPath.endsWith("/")) {
-				sharedPath = sharedPath.substring(0, sharedPath.length() - 1);
-			}
-
-			return sharedPath + removePrefixFromToken(fileToken.getTokenPath(), SHARED_TYPE_PREFIX);
-		} else {
-			if (fileToken.getTokenPath().startsWith(LOCAL_TYPE_PREFIX)) {
-				return removePrefixFromToken(fileToken.getTokenPath(), LOCAL_TYPE_PREFIX);
-			}
-
-			return fileToken.getTokenPath();
-		}
-	}
-
 	private FileToken getFileToken(final String fileAbsolutePath) {
 		return getFileToken(new File(fileAbsolutePath));
 	}
@@ -295,7 +239,7 @@ public final class FileTokenFactory implements SenderTokenTranslator, ReceiverTo
 			}
 			final String filePathPrefix = filePath.substring(0, sourceDaemonConfigInfo.getSharedFileSpacePath().length());
 
-			if (filePathPrefix.equals(sourceDaemonConfigInfo.getSharedFileSpacePath()) && filePathPrefix.length() > 0) {
+			if (filePathPrefix.equals(sourceDaemonConfigInfo.getSharedFileSpacePath()) && !filePathPrefix.isEmpty()) {
 				return new SharedToken(sourceDaemonConfigInfo, addPrefixToPath(SHARED_TYPE_PREFIX, filePath.substring(sourceDaemonConfigInfo.getSharedFileSpacePath().length())), file.exists());
 			} else {
 				return fileToLocalToken(sourceDaemonConfigInfo, file);
@@ -397,6 +341,7 @@ public final class FileTokenFactory implements SenderTokenTranslator, ReceiverTo
 			this.existsOnSource = existsOnSource;
 		}
 
+		@Override
 		public String getTokenPath() {
 			return tokenPath;
 		}
@@ -406,6 +351,7 @@ public final class FileTokenFactory implements SenderTokenTranslator, ReceiverTo
 			return existsOnSource;
 		}
 
+		@Override
 		public DaemonConfigInfo getSourceDaemonConfigInfo() {
 			return sourceDaemonConfigInfo;
 		}

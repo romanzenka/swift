@@ -86,7 +86,7 @@ public class User extends EvolvableBase implements Serializable {
 	}
 
 	public String getInitials() {
-		if (initials != null && initials.length() > 0) {
+		if (initials != null && !initials.isEmpty()) {
 			return initials;
 		} else {
 			return (firstName.charAt(0) + "" + lastName.charAt(0)).toLowerCase(Locale.ENGLISH);

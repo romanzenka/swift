@@ -429,6 +429,7 @@ public class IndexedModSet implements Set<Mod> {
 
 				//favor non-hidden over hidden specificities.
 
+				@Override
 				public int compare(final ModSpecificity o1, final ModSpecificity o2) {
 					//want hidden ones to be higher in the list
 					return Boolean.valueOf(o1.getHidden()).compareTo(o2.getHidden());

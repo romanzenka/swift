@@ -56,12 +56,14 @@ public class Chemical implements Molecule, Cloneable {
 		this.mostAbundant = rhs.mostAbundant;
 	}
 
+	@Override
 	public Chemical clone() throws CloneNotSupportedException {
 		final Chemical copy = (Chemical) super.clone();
 		copy.set(this);
 		return copy;
 	}
 
+	@Override
 	public String getName() {
 		if ("".equals(name)) {
 			return getCanonicalFormula();
@@ -141,6 +143,7 @@ public class Chemical implements Molecule, Cloneable {
 	 * Returns the monoisotopic mass of this Chemical.  The monoisotopic mass is the mass
 	 * that contains only the lowest mass isotopes.
 	 */
+	@Override
 	public double getMonoisotopicMass() {
 		calcMasses();
 		return monoisotopic;
@@ -150,6 +153,7 @@ public class Chemical implements Molecule, Cloneable {
 	 * Returns the average mass of this Chemical.  The average mass is an abundance weighted average
 	 * of isotope masses.
 	 */
+	@Override
 	public double getAverageMass() {
 		calcMasses();
 		return average;
@@ -254,6 +258,7 @@ public class Chemical implements Molecule, Cloneable {
 		resetCached();
 	}
 
+	@Override
 	public PrintWriter write(final PrintWriter out) {
 		out.println(toString());
 		return out;

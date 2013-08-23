@@ -9,8 +9,11 @@ import java.util.Map;
 /**
  * A map of validation results tied to separate {@link edu.mayo.mprc.swift.params2.ParamName}.
  */
-public final class ParamsValidations implements Cloneable {
+public final class ParamsValidations {
 	private final Map<ParamName, ValidationList> validationMap = new HashMap<ParamName, ValidationList>();
+
+	public ParamsValidations() {
+	}
 
 	public void addValidation(final ParamName name, final Validation v) {
 		ValidationList list = validationMap.get(name);

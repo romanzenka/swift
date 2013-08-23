@@ -88,10 +88,10 @@ public final class WorkspaceDaoHibernate extends DaoBase implements WorkspaceDao
 		if (countAll(User.class) == 0) {
 			return "At least one user has to be defined";
 		}
-		if (getUsersNoInitials().size() > 0) {
+		if (!getUsersNoInitials().isEmpty()) {
 			return "There are users with no initials defined";
 		}
-		if (getUsersWithRights().size() > 0) {
+		if (!getUsersWithRights().isEmpty()) {
 			return "There are users with legacy user rights defined";
 		}
 		return null;
@@ -110,7 +110,7 @@ public final class WorkspaceDaoHibernate extends DaoBase implements WorkspaceDao
 
 	private void updateUserRights() {
 		final List<User> users = this.getUsersWithRights();
-		if (users.size() > 0) {
+		if (!users.isEmpty()) {
 			LOGGER.info("Updating user rights");
 			for (final User user : users) {
 				user.setParameterEditorEnabled(user.isParameterEditorEnabled());
@@ -126,7 +126,7 @@ public final class WorkspaceDaoHibernate extends DaoBase implements WorkspaceDao
 	private void addUserInitials() {
 		// Update initials
 		final List<User> users = getUsersNoInitials();
-		if (users.size() > 0) {
+		if (!users.isEmpty()) {
 			LOGGER.info("Updating user initials");
 			int count = 0;
 

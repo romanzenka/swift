@@ -15,14 +15,16 @@ public final class ToleranceBox extends ValidatableTextBox {
 		setVisibleLength(8);
 	}
 
+	@Override
 	protected ClientValue getValueFromString(final String value) {
-		if ((value == null) || (value.length() == 0)) {
+		if ((value == null) || (value.isEmpty())) {
 			return null;
 		}
 		return new ClientTolerance(value);
 
 	}
 
+	@Override
 	protected String setValueAsString(final ClientValue object) {
 		final ClientTolerance du = (ClientTolerance) object;
 		return du.getValue();
@@ -32,10 +34,12 @@ public final class ToleranceBox extends ValidatableTextBox {
 		// ignore.
 	}
 
+	@Override
 	public void setAllowedValues(final List<? extends ClientValue> values) {
 		// ignore.
 	}
 
+	@Override
 	public boolean needsAllowedValues() {
 		return false;
 	}

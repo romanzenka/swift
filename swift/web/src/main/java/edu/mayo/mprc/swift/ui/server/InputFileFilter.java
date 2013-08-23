@@ -47,6 +47,7 @@ public final class InputFileFilter implements FilenameFilter, Serializable {
 		return Pattern.compile(pattern.substring(1));
 	}
 
+	@Override
 	public boolean accept(final File dir, final String name) {
 		boolean result = false;
 		final File file = new File(dir, name);

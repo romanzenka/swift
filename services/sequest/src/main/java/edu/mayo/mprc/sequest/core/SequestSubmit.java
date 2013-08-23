@@ -86,6 +86,7 @@ final class SequestSubmit implements SequestSubmitterInterface {
 	/**
 	 * add a dta file for submission
 	 */
+	@Override
 	public void addDtaFile(final File file, final boolean forced) {
 		if (n == 0) {
 			creationTime = new Date().getTime();
@@ -108,12 +109,13 @@ final class SequestSubmit implements SequestSubmitterInterface {
 	}
 
 	private boolean haveSequestDtaFiles() {
-		return (sequestDtaFiles != null && sequestDtaFiles.size() > 0);
+		return (sequestDtaFiles != null && !sequestDtaFiles.isEmpty());
 	}
 
 	/**
 	 * force cleanup by forcing a submit to sequest of all file in the queue
 	 */
+	@Override
 	public void forceSubmit() {
 		if (haveSequestDtaFiles()) {
 			submitFilesToSequest();
@@ -265,6 +267,7 @@ final class SequestSubmit implements SequestSubmitterInterface {
 			submitter = sequestSubmitter;
 		}
 
+		@Override
 		public void uncaughtException(final Thread t, final Throwable e) {
 			submitter.setExceptionThrown(e);
 			throw new MprcException(e);
@@ -300,18 +303,22 @@ final class SequestSubmit implements SequestSubmitterInterface {
 		throw new MprcException("tar file=" + tarFile.getAbsolutePath() + " is corrupted, renamed to " + newName, t);
 	}
 
+	@Override
 	public int getHowManyFiles() {
 		return this.sequestDtaFiles.size();
 	}
 
+	@Override
 	public void setExceptionThrown(final Throwable exceptionThrown) {
 		this.exceptionThrown = exceptionThrown;
 	}
 
+	@Override
 	public SequestCallerInterface getSequestCaller() {
 		return sequestCaller;
 	}
 
+	@Override
 	public void setSequestCaller(final SequestCallerInterface sequestCaller) {
 		this.sequestCaller = sequestCaller;
 	}

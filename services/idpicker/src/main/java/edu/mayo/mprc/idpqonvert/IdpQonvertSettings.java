@@ -100,7 +100,7 @@ public final class IdpQonvertSettings implements Serializable {
 		return value ? "1" : "0";
 	}
 
-	private static DecimalFormat FORMAT = new DecimalFormat("0.########");
+	private static final DecimalFormat FORMAT = new DecimalFormat("0.########");
 
 	private static String dbl(final double value) {
 		return FORMAT.format(value);

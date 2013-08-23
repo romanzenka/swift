@@ -39,5 +39,6 @@ public interface DBInputStream extends Closeable {
 	/**
 	 * Closes the stream.
 	 */
+	@Override
 	void close();
 }

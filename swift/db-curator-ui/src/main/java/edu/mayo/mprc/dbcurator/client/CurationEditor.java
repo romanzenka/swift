@@ -29,6 +29,7 @@ public final class CurationEditor extends Composite {
 	 */
 	private Timer updateTimer = new Timer() {
 
+		@Override
 		public void run() {
 			if (!curationIsRunning) {
 				this.cancel();
@@ -126,6 +127,7 @@ public final class CurationEditor extends Composite {
 
 		Window.addWindowCloseListener(closeHandler = new WindowCloseListener() {
 
+			@Override
 			public String onWindowClosing() {
 				//if the curation has not been run then make sure they are given a chance to abort.
 				if (curation.hasBeenRun()) {
@@ -136,6 +138,7 @@ public final class CurationEditor extends Composite {
 				}
 			}
 
+			@Override
 			public void onWindowClosed() {
 			}
 		});
@@ -167,7 +170,7 @@ public final class CurationEditor extends Composite {
 
 		this.curation = curation;
 
-		if (this.curation.getErrorMessages() != null && this.curation.getErrorMessages().size() > 0) {
+		if (this.curation.getErrorMessages() != null && !this.curation.getErrorMessages().isEmpty()) {
 			for (Iterator i = this.curation.getErrorMessages().iterator(); i.hasNext(); ) {
 				messageManager.addMessage((String) i.next());
 			}
@@ -229,6 +232,7 @@ public final class CurationEditor extends Composite {
 	 * @param width
 	 * @param height
 	 */
+	@Override
 	public void setPixelSize(final int width, final int height) {
 		super.setPixelSize(width, height);
 
@@ -264,13 +268,16 @@ public final class CurationEditor extends Composite {
 
 		txtShortName.setMaxLength(CurationValidation.SHORTNAME_MAX_LENGTH);
 		txtShortName.addKeyboardListener(new KeyboardListener() {
+			@Override
 			public void onKeyUp(final Widget widget, final char c, final int i) {
 				validateShortName(txtShortName.getText());
 			}
 
+			@Override
 			public void onKeyDown(final Widget widget, final char c, final int i) {
 			}
 
+			@Override
 			public void onKeyPress(final Widget widget, final char c, final int i) {
 			}
 		});
@@ -313,6 +320,7 @@ public final class CurationEditor extends Composite {
 		lblResultFilePath.setStyleName("resultfilepath");
 		lblResultFilePath.addMouseListener(new MouseListener() {
 
+			@Override
 			public void onMouseDown(final Widget widget, final int i, final int i1) {
 				final PopupPanel pop = new PopupPanel(/*autoHide*/true);
 				pop.setPopupPosition(lblResultFilePath.getAbsoluteLeft(), lblResultFilePath.getAbsoluteTop());
@@ -322,18 +330,22 @@ public final class CurationEditor extends Composite {
 				pop.show();
 			}
 
+			@Override
 			public void onMouseEnter(final Widget widget) {
 				//ignore
 			}
 
+			@Override
 			public void onMouseLeave(final Widget widget) {
 				//ignore
 			}
 
+			@Override
 			public void onMouseMove(final Widget widget, final int i, final int i1) {
 				//ignore
 			}
 
+			@Override
 			public void onMouseUp(final Widget widget, final int i, final int i1) {
 				//ignore
 			}
@@ -360,6 +372,7 @@ public final class CurationEditor extends Composite {
 
 		chkShowLog.setText("Show Log:");
 		chkShowLog.addClickListener(new ClickListener() {
+			@Override
 			public void onClick(final Widget widget) {
 				textareaLog.setVisible(((CheckBox) widget).isChecked());
 			}
@@ -389,10 +402,12 @@ public final class CurationEditor extends Composite {
 		} else {
 			lblShortNameError.addStyleName("warning-label-ok");
 			commonDataRequester.isShortnameUnique(txtShortName.getText(), new AsyncCallback<Boolean>() {
+				@Override
 				public void onFailure(final Throwable throwable) {
 					Window.alert("We could not determine that uniquness of the entered shortname:\n" + throwable.getMessage());
 				}
 
+				@Override
 				public void onSuccess(final Boolean isUnique) {
 					if (!isUnique) {
 						lblShortNameError.setText("Non-unique shortname");
@@ -429,6 +444,7 @@ public final class CurationEditor extends Composite {
 		lstStepChoice.addItem(HeaderTransformPanel.TITLE);
 
 		lstStepChoice.addChangeListener(new ChangeListener() {
+			@Override
 			public void onChange(final Widget widget) {
 				final int selectedIndex = ((ListBox) widget).getSelectedIndex();
 
@@ -507,6 +523,7 @@ public final class CurationEditor extends Composite {
 		cmdCreateNew.setTitle("To create a new empty curation for you editing.");
 		cmdCreateNew.setStyleName("command-link");
 		cmdCreateNew.addClickListener(new ClickListener() {
+			@Override
 			public void onClick(final Widget widget) {
 				CurationEditor.this.startNewCuration();
 			}
@@ -517,6 +534,7 @@ public final class CurationEditor extends Composite {
 		cmdCopyCurrent.setTitle("To make a copy of the currently displayed curation for you own editing.");
 		cmdCopyCurrent.setStyleName("command-link");
 		cmdCopyCurrent.addClickListener(new ClickListener() {
+			@Override
 			public void onClick(final Widget widget) {
 				CurationEditor.this.copyCuration();
 			}
@@ -528,6 +546,7 @@ public final class CurationEditor extends Composite {
 		cmdRun.setStyleName("command-link");
 		cmdRun.setTitle("To run the Curation and generate a FASTA file.");
 		cmdRun.addClickListener(new ClickListener() {
+			@Override
 			public void onClick(final Widget widget) {
 				//call the server and perform a validation of the curation.  When the validation is complete then this CurationEditor
 				//will be notified and it will need to tell the StepPanelContainer and it will forward the message to the steps that they
@@ -549,8 +568,9 @@ public final class CurationEditor extends Composite {
 		cmdView.setStyleName("command-link");
 		cmdView.addClickListener(new ClickListener() {
 
+			@Override
 			public void onClick(final Widget widget) {
-				if (curation.getPathToResult() == null || curation.getPathToResult().length() == 0) {
+				if (curation.getPathToResult() == null || curation.getPathToResult().isEmpty()) {
 					showPopupMessage("There is not file associated with the curation please run the curation first.");
 					return;
 				}
@@ -570,6 +590,7 @@ public final class CurationEditor extends Composite {
 		cmdClose.setStyleName("command-link");
 		cmdClose.addClickListener(new ClickListener() {
 
+			@Override
 			public void onClick(final Widget widget) {
 				if (closeCallback != null && (curation.hasBeenRun() || Window.confirm("In order to use a database a curation must be run.\nClick 'OK' to close anyway."))) {
 					Window.removeWindowCloseListener(closeHandler);
@@ -621,11 +642,13 @@ public final class CurationEditor extends Composite {
 
 			commonDataRequester.runCuration(curation, new AsyncCallback<CurationStub>() {
 
+				@Override
 				public void onFailure(final Throwable throwable) {
 					curationIsRunning = false;
 					showPopupMessage(throwable.getMessage());
 				}
 
+				@Override
 				public void onSuccess(final CurationStub o) {
 					curationIsRunning = false;
 					setCuration(o, false);
@@ -689,11 +712,13 @@ public final class CurationEditor extends Composite {
 		updateCurationFromForm();
 		this.commandPanel.setVisible(false);
 		commonDataRequester.performUpdate(curation, new AsyncCallback<CurationStub>() {
+			@Override
 			public void onFailure(final Throwable throwable) {
 				showPopupMessage("Failed to sync with the server");
 				commandPanel.setVisible(true);
 			}
 
+			@Override
 			public void onSuccess(final CurationStub result) {
 				curation = result;
 
@@ -715,7 +740,7 @@ public final class CurationEditor extends Composite {
 	/**
 	 * A callback to use when trying to retreive a curation
 	 */
-	private class RetreivalCallback implements AsyncCallback<CurationStub> {
+	private final class RetreivalCallback implements AsyncCallback<CurationStub> {
 
 		//True if this retrieved curation is being copied.
 		private boolean isCopy;
@@ -736,6 +761,7 @@ public final class CurationEditor extends Composite {
 		 * <p/>
 		 * {@inheritDoc}
 		 */
+		@Override
 		public void onFailure(final Throwable throwable) {
 			showPopupMessage("Error retreiving curation from server: " + throwable.getMessage());
 			final String msg = throwable.getMessage();
@@ -751,6 +777,7 @@ public final class CurationEditor extends Composite {
 		 * <p/>
 		 * {@inheritDoc}
 		 */
+		@Override
 		public void onSuccess(final CurationStub result) {
 			setCuration(result, isCopy);
 		}
@@ -798,7 +825,7 @@ public final class CurationEditor extends Composite {
 		public void removeError(final String message) {
 			this.messages.remove(message);
 
-			if (messages.size() == 0) {
+			if (messages.isEmpty()) {
 				toLogTo.removeStyleName("textboxes-error");
 			}
 
@@ -812,7 +839,7 @@ public final class CurationEditor extends Composite {
 		 */
 		public void setTextArea(final TextArea toLogTo) {
 			this.toLogTo = toLogTo;
-			if (this.messages.size() > 0) {
+			if (!this.messages.isEmpty()) {
 				toLogTo.addStyleName("textboxes-error");
 				this.writeMessages();
 			}

@@ -9,6 +9,7 @@ import java.util.Comparator;
 public final class CompareClientModSpecificity implements Comparator<ClientValue>, Serializable {
 	private static final long serialVersionUID = 20101221L;
 
+	@Override
 	public int compare(final ClientValue o1, final ClientValue o2) {
 		final ClientModSpecificity first = ClientModSpecificity.cast(o1);
 		final ClientModSpecificity second = ClientModSpecificity.cast(o2);

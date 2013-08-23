@@ -30,10 +30,12 @@ public final class ManualInclusionPanel extends AbstractStepPanel {
 		txtHeader.setWidth("100%");
 		txtHeader.setText(WELCOME_HEADER);
 		txtHeader.addFocusListener(new FocusListener() {
+			@Override
 			public void onFocus(final Widget widget) {
 				txtHeader.selectAll();
 			}
 
+			@Override
 			public void onLostFocus(final Widget widget) {
 				txtHeader.setText(stripHeaderChar(txtHeader.getText()));
 			}
@@ -44,10 +46,12 @@ public final class ManualInclusionPanel extends AbstractStepPanel {
 		txtSequence.setWidth("100%");
 		txtSequence.setText(WELCOME_SEQUENCE);
 		txtSequence.addFocusListener(new FocusListener() {
+			@Override
 			public void onFocus(final Widget widget) {
 				txtSequence.selectAll();
 			}
 
+			@Override
 			public void onLostFocus(final Widget widget) {
 				if (!txtSequence.getText().equals(WELCOME_SEQUENCE)) {
 					txtSequence.setText(cleanSequence(txtSequence.getText()));
@@ -67,6 +71,7 @@ public final class ManualInclusionPanel extends AbstractStepPanel {
 	 *
 	 * @return the step that this mainPanel represents
 	 */
+	@Override
 	public CurationStepStub getContainedStep() {
 		this.containedStep.header = ">" + this.txtHeader.getText();
 		this.containedStep.sequence = cleanSequence(this.txtSequence.getText());
@@ -79,6 +84,7 @@ public final class ManualInclusionPanel extends AbstractStepPanel {
 	 * @param step the step you want this mainPanel to represent
 	 * @throws ClassCastException if the step passed in wasn't the type that the Panel can represent
 	 */
+	@Override
 	public void setContainedStep(final CurationStepStub step) throws ClassCastException {
 		if (!(step instanceof ManualInclusionStepStub)) {
 			ExceptionUtilities.throwCastException(step, ManualInclusionStepStub.class);
@@ -88,10 +94,12 @@ public final class ManualInclusionPanel extends AbstractStepPanel {
 		update();
 	}
 
+	@Override
 	public String getStyle() {
 		return "shell-header-manualinclusion";
 	}
 
+	@Override
 	public void update() {
 		txtHeader.setText(stripHeaderChar(containedStep.header));
 		txtSequence.setText(containedStep.sequence);
@@ -104,7 +112,7 @@ public final class ManualInclusionPanel extends AbstractStepPanel {
 	 * @return the string minus a leading header character if it had existed
 	 */
 	public String stripHeaderChar(final String toStrip) {
-		if (toStrip == null || toStrip.length() == 0) {
+		if (toStrip == null || toStrip.isEmpty()) {
 			return "";
 		}
 		return toStrip.replaceAll("^[>]*[\\s]*", "");
@@ -118,7 +126,7 @@ public final class ManualInclusionPanel extends AbstractStepPanel {
 	 * @return the sequence with header and white space removed
 	 */
 	public String cleanSequence(String toClean) {
-		if (toClean == null || toClean.length() == 0) {
+		if (toClean == null || toClean.isEmpty()) {
 			return toClean;
 		}
 
@@ -141,6 +149,7 @@ public final class ManualInclusionPanel extends AbstractStepPanel {
 		return toClean;
 	}
 
+	@Override
 	public String getImageURL() {
 		return "images/step-icon-add.png";
 	}

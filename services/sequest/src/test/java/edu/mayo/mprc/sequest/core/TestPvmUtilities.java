@@ -128,13 +128,13 @@ public final class TestPvmUtilities {
 		final PvmUtilities pvm = new PvmUtilities();
 		// look up the pvmhosts
 		final List<String> slaves = pvm.getSlaveNodes(hostsFile);
-		if (slaves != null && slaves.size() == 0) {
+		if (slaves != null && slaves.isEmpty()) {
 			LOGGER.warn("No slaves detected in this pvm setup. The ssh test cannot be performed.");
 			return;
 		}
-		Assert.assertTrue(slaves != null && slaves.size() > 0, "slaves not found");
+		Assert.assertTrue(slaves != null && !slaves.isEmpty(), "slaves not found");
 		String hostName = null;
-		if (slaves != null && slaves.size() != 0) {
+		if (slaves != null && !slaves.isEmpty()) {
 			hostName = slaves.get(0);
 		}
 
@@ -182,7 +182,7 @@ public final class TestPvmUtilities {
 			LOGGER.debug("in testKillPVMonNode");
 			final PvmUtilities pvm = new PvmUtilities();
 			final List<String> nodes = pvm.getSlaveNodes(hostsFile);
-			if (nodes == null || nodes.size() == 0) {
+			if (nodes == null || nodes.isEmpty()) {
 				LOGGER.debug("no slave nodes");
 				return;
 			}
@@ -208,7 +208,7 @@ public final class TestPvmUtilities {
 			LOGGER.debug("in testKillPVMonNodes");
 			final PvmUtilities pvm = new PvmUtilities();
 			final List<String> nodes = pvm.getSlaveNodes(hostsFile);
-			if (nodes == null || nodes.size() == 0) {
+			if (nodes == null || nodes.isEmpty()) {
 				LOGGER.debug("no slave nodes");
 				return;
 			}
@@ -293,7 +293,7 @@ public final class TestPvmUtilities {
 			try {
 				LOGGER.debug("killng  pvm on slave");
 				final List<String> nodes = pvm.getSlaveNodes(hostsFile);
-				if (nodes == null || nodes.size() == 0) {
+				if (nodes == null || nodes.isEmpty()) {
 					LOGGER.debug("no slave nodes");
 					return;
 				}

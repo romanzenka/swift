@@ -102,6 +102,7 @@ public final class CurationExecutor implements Runnable {
 	/**
 	 * Executes the curation in a separate thread, opening and closing a session.
 	 */
+	@Override
 	public void run() {
 		try {
 			curationDao.begin();
@@ -514,7 +515,7 @@ public final class CurationExecutor implements Runnable {
 		 */
 		@Override
 		public synchronized int getLastStepSequenceCount() {
-			if (completedStepValidations.size() == 0) {
+			if (completedStepValidations.isEmpty()) {
 				return -1;
 			}
 			return completedStepValidations.get(completedStepValidations.size() - 1).getCompletionCount();
@@ -532,7 +533,7 @@ public final class CurationExecutor implements Runnable {
 		for (final StepValidation failedValidation : failedValidations) {
 			for (final String msg : failedValidation.getMessages()) {
 				sb.append(msg);
-				if (failedValidation.getWrappedExceptions() != null && failedValidation.getWrappedExceptions().size() > 0) {
+				if (failedValidation.getWrappedExceptions() != null && !failedValidation.getWrappedExceptions().isEmpty()) {
 					for (final Exception e : failedValidation.getWrappedExceptions()) {
 						sb.append("\n\t* ");
 						sb.append(e.getMessage());

@@ -37,6 +37,7 @@ class MultiValidator implements Validator {
 		onDemand = true;
 	}
 
+	@Override
 	public String validate(final String value) {
 		// The first synchronous validator to fail stops further validations
 		// - it is already broken, why bother doing expensive validation?
@@ -50,10 +51,12 @@ class MultiValidator implements Validator {
 
 	private void sendPropertyChange(final String value, final boolean onDemand) {
 		ConfigurationService.App.getInstance().propertyChanged(model.getId(), propertyName, value, onDemand, new AsyncCallback<UiChangesReplayer>() {
+			@Override
 			public void onFailure(final Throwable throwable) {
 				validationPanel.addMessage(throwable.getMessage());
 			}
 
+			@Override
 			public void onSuccess(final UiChangesReplayer uiChangesReplayer) {
 				validationPanel.empty();
 				final MyUiChanges uiChanges = new MyUiChanges(value);
@@ -126,6 +129,7 @@ class MultiValidator implements Validator {
 			error = false;
 		}
 
+		@Override
 		public void setProperty(final String resourceId, final String propertyName, final String newValue) {
 			//TODO: implement me
 		}
@@ -134,6 +138,7 @@ class MultiValidator implements Validator {
 			//TODO: implement me
 		}
 
+		@Override
 		public void displayPropertyError(final String resourceId, final String propertyName, final String error) {
 			//TODO: Implement properly (allow user to display error on a different property than the validated one)
 			if (error == null) {
@@ -141,12 +146,15 @@ class MultiValidator implements Validator {
 			} else {
 				this.error = true;
 				validationPanel.addMessage(error, new FixTagActionListener() {
+					@Override
 					public void onFix(final String action, final ValidationPanel validationPanel) {
 						ConfigurationService.App.getInstance().fix(resourceId, propertyName, action, new AsyncCallback<Void>() {
+							@Override
 							public void onFailure(final Throwable throwable) {
 								validationPanel.addMessage(throwable.getMessage());
 							}
 
+							@Override
 							public void onSuccess(final Void aVoid) {
 								validationPanel.clear();
 								sendPropertyChange(value, false);

@@ -35,12 +35,15 @@ public final class ConfigWrapper extends SimplePanel {
 		this.newDaemonButton = new PushButton("Add new");
 		this.newDaemonButton.addStyleName("tree-item-pusbutton");
 		this.newDaemonButton.addClickListener(new ClickListener() {
+			@Override
 			public void onClick(final Widget widget) {
 				ConfigurationService.App.getInstance().createChild(model.getId(), "daemon", new AsyncCallback<ResourceModel>() {
+					@Override
 					public void onFailure(final Throwable throwable) {
 						context.displayErrorMessage("Cannot create new daemon", throwable);
 					}
 
+					@Override
 					public void onSuccess(final ResourceModel model) {
 						if (model instanceof DaemonModel) {
 							ConfigWrapper.this.context.getApplicationModel().addDaemon((DaemonModel) model);
@@ -61,6 +64,7 @@ public final class ConfigWrapper extends SimplePanel {
 		initFromData();
 
 		configTree.addTreeListener(new TreeListener() {
+			@Override
 			public void onTreeItemSelected(final TreeItem item) {
 				if (item != null) {
 					if (isDaemonItem(item)) {
@@ -84,6 +88,7 @@ public final class ConfigWrapper extends SimplePanel {
 				}
 			}
 
+			@Override
 			public void onTreeItemStateChanged(final TreeItem item) {
 			}
 		});
@@ -132,16 +137,20 @@ public final class ConfigWrapper extends SimplePanel {
 
 	private class MyApplicationModelListener implements ResourceModelListener {
 
+		@Override
 		public void initialized(final ResourceModel model) {
 		}
 
+		@Override
 		public void nameChanged(final ResourceModel model) {
 		}
 
+		@Override
 		public void childAdded(final ResourceModel child, final ResourceModel addedTo) {
 			addDaemonUi((DaemonModel) child);
 		}
 
+		@Override
 		public void childRemoved(final ResourceModel child, final ResourceModel removedFrom) {
 			final DaemonModel daemon = (DaemonModel) child;
 			final DaemonUi ui = daemonMap.get(daemon);
@@ -162,6 +171,7 @@ public final class ConfigWrapper extends SimplePanel {
 			}
 		}
 
+		@Override
 		public void propertyChanged(final ResourceModel model, final String propertyName, final String newValue) {
 		}
 	}
@@ -171,12 +181,15 @@ public final class ConfigWrapper extends SimplePanel {
 		daemonItem.add(new Label(daemon.getName()));
 		final DeleteButton removeDaemonButton = new DeleteButton("Do you really want to remove this daemon?");
 		removeDaemonButton.addClickListener(new ClickListener() {
+			@Override
 			public void onClick(final Widget sender) {
 				ConfigurationService.App.getInstance().removeChild(daemon.getId(), new AsyncCallback<Void>() {
+					@Override
 					public void onFailure(final Throwable throwable) {
 						context.displayErrorMessage("Could not remove daemon " + daemon.getName(), throwable);
 					}
 
+					@Override
 					public void onSuccess(final Void aVoid) {
 						model.removeDaemon(daemon);
 					}
@@ -209,17 +222,21 @@ public final class ConfigWrapper extends SimplePanel {
 			this.daemonTreeItem = daemonTreeItem;
 		}
 
+		@Override
 		public void initialized(final ResourceModel model) {
 		}
 
+		@Override
 		public void nameChanged(final ResourceModel model) {
 			changeTreeItemLabel(daemonTreeItem, model.getName());
 		}
 
+		@Override
 		public void childAdded(final ResourceModel child, final ResourceModel addedTo) {
 			addTreeItemForResource((DaemonModel) addedTo, child, daemonTreeItem);
 		}
 
+		@Override
 		public void childRemoved(final ResourceModel child, final ResourceModel removedFrom) {
 			removeTreeItemForResource(child, daemonTreeItem);
 			final ModuleWrapper removedModuleWrapper = daemonMap.get((DaemonModel) removedFrom).wrapper.getUiForResource(child);
@@ -230,6 +247,7 @@ public final class ConfigWrapper extends SimplePanel {
 			daemonsItem.getTree().setSelectedItem(daemonsItem);
 		}
 
+		@Override
 		public void propertyChanged(final ResourceModel model, final String propertyName, final String newValue) {
 		}
 	}
@@ -239,12 +257,15 @@ public final class ConfigWrapper extends SimplePanel {
 		panel.add(new Label(resource.getName()));
 		final DeleteButton deleteButton = new DeleteButton("Do you really want to remove this module?");
 		deleteButton.addClickListener(new ClickListener() {
+			@Override
 			public void onClick(final Widget sender) {
 				ConfigurationService.App.getInstance().removeChild(resource.getId(), new AsyncCallback<Void>() {
+					@Override
 					public void onFailure(final Throwable throwable) {
 						context.displayErrorMessage("Could not remove module " + resource.getName(), throwable);
 					}
 
+					@Override
 					public void onSuccess(final Void aVoid) {
 						daemon.removeChild(resource);
 					}

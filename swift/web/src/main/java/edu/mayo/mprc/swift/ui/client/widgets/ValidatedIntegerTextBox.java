@@ -52,7 +52,7 @@ public final class ValidatedIntegerTextBox extends ValidatedTextBox {
 	 *
 	 * @return The lowest value this input will accept
 	 */
-	public final int getLow() {
+	public int getLow() {
 		return low;
 	}
 
@@ -61,11 +61,11 @@ public final class ValidatedIntegerTextBox extends ValidatedTextBox {
 	 *
 	 * @return The highest value this input will accept
 	 */
-	public final int getHigh() {
+	public int getHigh() {
 		return high;
 	}
 
-	public final int getIntegerValue() {
+	public int getIntegerValue() {
 		try {
 			return Integer.valueOf(getText());
 		} catch (NumberFormatException ignore) {

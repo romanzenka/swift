@@ -276,10 +276,12 @@ public final class XTandemWorker extends WorkerBase {
 			this.tandemExecutable = tandemExecutable;
 		}
 
+		@Override
 		public void save(final ConfigWriter writer) {
 			writer.put(TANDEM_EXECUTABLE, getTandemExecutable(), "Path to tandem.exe");
 		}
 
+		@Override
 		public void load(final ConfigReader reader) {
 			setTandemExecutable(reader.get(TANDEM_EXECUTABLE));
 		}
@@ -297,6 +299,7 @@ public final class XTandemWorker extends WorkerBase {
 		private static final String LINUX_64 = "bin/tandem/ubuntu_64bit_tandem/tandem.exe";
 		private static final String MAC_OSX = "bin/tandem/osx_intel_tandem/tandem.exe";
 
+		@Override
 		public void createUI(final DaemonConfig daemon, final ResourceConfig resource, final UiBuilder builder) {
 			builder.property(TANDEM_EXECUTABLE, "Executable Path", "Tandem executable path. Tandem executables can be " +
 					"<br/>found at <a href=\"ftp://ftp.thegpm.org/projects/tandem/binaries/\"/>ftp://ftp.thegpm.org/projects/tandem/binaries</a>"

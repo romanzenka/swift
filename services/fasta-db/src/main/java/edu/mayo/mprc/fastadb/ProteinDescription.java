@@ -32,12 +32,18 @@ public final class ProteinDescription extends PersistableBase {
 
 	@Override
 	public boolean equals(Object o) {
-		if (this == o) return true;
-		if (!(o instanceof ProteinDescription)) return false;
+		if (this == o) {
+			return true;
+		}
+		if (!(o instanceof ProteinDescription)) {
+			return false;
+		}
 
 		ProteinDescription that = (ProteinDescription) o;
 
-		if (!description.equals(that.description)) return false;
+		if (!description.equals(that.description)) {
+			return false;
+		}
 
 		return true;
 	}

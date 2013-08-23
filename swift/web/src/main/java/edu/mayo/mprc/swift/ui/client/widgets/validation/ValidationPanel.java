@@ -126,6 +126,7 @@ public final class ValidationPanel extends Composite {
 		if (!reflowing) {
 			reflowing = true;
 			DeferredCommand.addCommand(new Command() {
+				@Override
 				public void execute() {
 					ValidationPanel.this.reflow();
 				}
@@ -172,6 +173,7 @@ public final class ValidationPanel extends Composite {
 				pb.addStyleName("actionLink");
 				pb.addStyleName("params-validation");
 				pb.addClickListener(new ClickListener() {
+					@Override
 					public void onClick(final Widget sender) {
 						popup();
 					}
@@ -179,6 +181,7 @@ public final class ValidationPanel extends Composite {
 			}
 
 			fp.addClickListener(new ClickListener() {
+				@Override
 				public void onClick(final Widget sender) {
 					focus();
 				}
@@ -216,6 +219,7 @@ public final class ValidationPanel extends Composite {
 	private static final class ValidationComparator implements Comparator<ClientValidation>, Serializable {
 		private static final long serialVersionUID = 20101221L;
 
+		@Override
 		public int compare(final ClientValidation o1, final ClientValidation o2) {
 			return o2.getSeverity() - o1.getSeverity(); // reverse order of integer severity (ie: errors first).
 		}

@@ -5,6 +5,7 @@ import com.gargoylesoftware.htmlunit.WebClient;
 import com.gargoylesoftware.htmlunit.WebRequest;
 import com.gargoylesoftware.htmlunit.html.*;
 import com.google.common.base.Function;
+import com.google.common.base.Objects;
 import com.google.common.collect.Collections2;
 import edu.mayo.mprc.MprcException;
 import edu.mayo.mprc.dbcurator.model.Curation;
@@ -130,7 +131,7 @@ public final class DatabaseManager implements Closeable {
 	private void checkRadioButton(HtmlForm dbForm, String radioName, String radioValue) {
 		final List<HtmlRadioButtonInput> radioButtonsByName = dbForm.getRadioButtonsByName(radioName);
 		for (HtmlRadioButtonInput radio : radioButtonsByName) {
-			if (radioValue == radio.getValueAttribute()) {
+			if (Objects.equal(radioValue, radio.getValueAttribute())) {
 				radio.setChecked(true);
 			}
 		}
@@ -152,6 +153,7 @@ public final class DatabaseManager implements Closeable {
 	 * Close all resources associated with the manager.
 	 * After this call, the object is no longer useable.
 	 */
+	@Override
 	public void close() {
 		client.closeAllWindows();
 	}

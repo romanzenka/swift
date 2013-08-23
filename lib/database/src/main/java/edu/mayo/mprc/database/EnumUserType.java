@@ -22,6 +22,7 @@ public final class EnumUserType implements UserType, ParameterizedType {
 
 	private Class clazz = null;
 
+	@Override
 	public void setParameterValues(final Properties params) {
 		final String enumClassName = params.getProperty("enumClassName");
 		if (enumClassName == null) {
@@ -40,14 +41,17 @@ public final class EnumUserType implements UserType, ParameterizedType {
 
 	private static final int[] SQL_TYPES = {Types.VARCHAR};
 
+	@Override
 	public int[] sqlTypes() {
 		return SQL_TYPES;
 	}
 
+	@Override
 	public Class returnedClass() {
 		return clazz;
 	}
 
+	@Override
 	public Object nullSafeGet(final ResultSet resultSet, final String[] names, final Object owner)
 			throws HibernateException, SQLException {
 		final String name = resultSet.getString(names[0]);
@@ -58,6 +62,7 @@ public final class EnumUserType implements UserType, ParameterizedType {
 		return result;
 	}
 
+	@Override
 	public void nullSafeSet(final PreparedStatement preparedStatement, final Object value, final int index)
 			throws HibernateException, SQLException {
 		if (null == value) {
@@ -67,30 +72,37 @@ public final class EnumUserType implements UserType, ParameterizedType {
 		}
 	}
 
+	@Override
 	public Object deepCopy(final Object value) throws HibernateException {
 		return value;
 	}
 
+	@Override
 	public boolean isMutable() {
 		return false;
 	}
 
+	@Override
 	public Object assemble(final Serializable cached, final Object owner) throws HibernateException {
 		return cached;
 	}
 
+	@Override
 	public Serializable disassemble(final Object value) throws HibernateException {
 		return (Serializable) value;
 	}
 
+	@Override
 	public Object replace(final Object original, final Object target, final Object owner) throws HibernateException {
 		return original;
 	}
 
+	@Override
 	public int hashCode(final Object x) throws HibernateException {
 		return x.hashCode();
 	}
 
+	@Override
 	public boolean equals(final Object x, final Object y) throws HibernateException {
 		if (x == y) {
 			return true;

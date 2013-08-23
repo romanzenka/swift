@@ -19,6 +19,7 @@ public final class MgfToMgfWorker extends WorkerBase {
 	public static final String NAME = "Mgf Cleanup";
 	public static final String DESC = "Swift expects <tt>.mgf</tt> headers to be in certain format (indicate the spectrum), so the results of the search engines can be more easily pieced together. If you want to search .mgf files directly, the cleaner has to check that the headers are okay and modify them if they are not. Without this module, Swift cannot process <tt>.mgf</tt> files.";
 
+	@Override
 	public void process(final WorkPacket wp, final UserProgressReporter reporter) {
 		final MgfTitleCleanupWorkPacket workPacket = (MgfTitleCleanupWorkPacket) wp;
 		final File mgfFile = workPacket.getMgfToCleanup();
@@ -81,6 +82,7 @@ public final class MgfToMgfWorker extends WorkerBase {
 	}
 
 	public static final class Ui implements ServiceUiFactory {
+		@Override
 		public void createUI(final DaemonConfig daemon, final ResourceConfig resource, final UiBuilder builder) {
 		}
 	}

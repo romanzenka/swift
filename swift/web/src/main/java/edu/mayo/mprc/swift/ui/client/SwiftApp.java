@@ -65,6 +65,7 @@ public final class SwiftApp implements EntryPoint, HidesPageContentsWhileLoading
 	 * This is the entry point method. Creates all the elements and hooks up some
 	 * event listeners.
 	 */
+	@Override
 	public void onModuleLoad() {
 		try {
 			DOM.setStyleAttribute(DOM.getElementById("shown_while_loading"), "display", "block");
@@ -87,15 +88,18 @@ public final class SwiftApp implements EntryPoint, HidesPageContentsWhileLoading
 		}
 	}
 
+	@Override
 	public synchronized void hidePageContentsWhileLoading() {
 		hiddenWhileLoadingCounter++;
 	}
 
+	@Override
 	public synchronized void showPageContents() {
 		DOM.setStyleAttribute(DOM.getElementById("shown_while_loading"), "display", "none");
 		DOM.setStyleAttribute(DOM.getElementById("hidden_while_loading"), "display", "block");
 	}
 
+	@Override
 	public synchronized void showPageContentsAfterLoad() {
 		hiddenWhileLoadingCounter--;
 		if (hiddenWhileLoadingCounter == 0) {
@@ -160,7 +164,7 @@ public final class SwiftApp implements EntryPoint, HidesPageContentsWhileLoading
 	}
 
 	private void finalizeSpectrumQa(final List<SpectrumQaParamFileInfo> list) {
-		if (list == null || list.size() == 0) {
+		if (list == null || list.isEmpty()) {
 			DOM.setStyleAttribute(DOM.getElementById("spectrumQaRow"), "display", "none");
 		} else {
 			DOM.setStyleAttribute(DOM.getElementById("spectrumQaRow"), "display", "");
@@ -176,6 +180,7 @@ public final class SwiftApp implements EntryPoint, HidesPageContentsWhileLoading
 		title.setVisibleLength(30);
 		titlePanel.add(title);
 		title.addKeyboardListener(new KeyboardListenerAdapter() {
+			@Override
 			public void onKeyUp(final Widget sender, final char keyCode, final int modifiers) {
 				// TODO Validation
 				updateOutputLocation();
@@ -208,6 +213,7 @@ public final class SwiftApp implements EntryPoint, HidesPageContentsWhileLoading
 		editorToggle.addStyleName("toggle-button");
 		togglePanel.add(editorToggle);
 		editorToggle.addClickListener(new ClickListener() {
+			@Override
 			public void onClick(final Widget sender) {
 				paramsEditor.setEditorExpanded(editorToggle.isDown());
 			}
@@ -335,10 +341,12 @@ public final class SwiftApp implements EntryPoint, HidesPageContentsWhileLoading
 
 	private void updateUserMessage() {
 		ServiceConnection.instance().getUserMessage(new AsyncCallback<String>() {
+			@Override
 			public void onFailure(final Throwable throwable) {
 				displayMessage("");
 			}
 
+			@Override
 			public void onSuccess(final String message) {
 				displayMessage(message);
 			}
@@ -346,7 +354,7 @@ public final class SwiftApp implements EntryPoint, HidesPageContentsWhileLoading
 	}
 
 	private void displayMessage(final String message) {
-		if (message != null && message.length() > 0) {
+		if (message != null && !message.isEmpty()) {
 			messageDisplay.setHTML(wrapDisplayMessage(message));
 			messageDisplay.setVisible(true);
 		} else {
@@ -359,6 +367,7 @@ public final class SwiftApp implements EntryPoint, HidesPageContentsWhileLoading
 		final RootPanel userPanel = RootPanel.get("email");
 		userPanel.add(users);
 		users.addChangeListener(new ChangeListener() {
+			@Override
 			public void onChange(final Widget widget) {
 				userChanged();
 			}
@@ -390,6 +399,7 @@ public final class SwiftApp implements EntryPoint, HidesPageContentsWhileLoading
 	private void initAddFilesButton() {
 		// Add files button produces a dialog
 		addFileButton = new PushButton("", new ClickListener() {
+			@Override
 			public void onClick(final Widget sender) {
 				final int clientWidth = Window.getClientWidth();
 				final int clientHeight = Window.getClientHeight();
@@ -400,6 +410,7 @@ public final class SwiftApp implements EntryPoint, HidesPageContentsWhileLoading
 				final FileTreeDialog dialog = new FileTreeDialog(popupWidth, popupHeight);
 				dialog.setPopupPosition(posX, posY);
 				dialog.setSelectedFilesListener(new SelectedFilesListener() {
+					@Override
 					public void selectedFiles(final FileInfo[] info) {
 						files.addFiles(info);
 					}
@@ -419,6 +430,7 @@ public final class SwiftApp implements EntryPoint, HidesPageContentsWhileLoading
 		output = new TextBox();
 		output.setVisibleLength(150);
 		output.addChangeListener(new ChangeListener() {
+			@Override
 			public void onChange(final Widget widget) {
 				outputPathUserSpecified = true;
 				updateOutputLocation();
@@ -436,6 +448,7 @@ public final class SwiftApp implements EntryPoint, HidesPageContentsWhileLoading
 	private void connectOutputLocationAndFileTable() {
 		if (files != null) {
 			files.addChangeListener(new ChangeListener() {
+				@Override
 				public void onChange(final Widget widget) {
 					updateOutputLocation();
 				}
@@ -452,6 +465,7 @@ public final class SwiftApp implements EntryPoint, HidesPageContentsWhileLoading
 		// Make params editor disable the runWithCallback button when it is invalid
 		if (paramsEditor != null) {
 			paramsEditor.getValidationController().addChangeListener(new ChangeListener() {
+				@Override
 				public void onChange(final Widget sender) {
 					runButton.setEnabled(paramsEditor.isValid());
 				}
@@ -468,7 +482,7 @@ public final class SwiftApp implements EntryPoint, HidesPageContentsWhileLoading
 		if (!outputPathChangeEnabled || !outputPathUserSpecified) {
 			// The user is not able to or chose not to influence output path, it gets set automatically
 			final List<ClientFileSearch> fileSearches = getFileSearches();
-			if (files == null || (fileSearches == null) || (fileSearches.size() == 0)) {
+			if (files == null || (fileSearches == null) || (fileSearches.isEmpty())) {
 				if (!outputPathChangeEnabled) {
 					output.setText("<No Files Selected>");
 					outputPathSpecial = true;
@@ -545,6 +559,7 @@ public final class SwiftApp implements EntryPoint, HidesPageContentsWhileLoading
 			swiftApp = app;
 		}
 
+		@Override
 		public void onClick(final Widget sender) {
 			updateUserMessage();
 			updateOutputLocation();
@@ -567,7 +582,7 @@ public final class SwiftApp implements EntryPoint, HidesPageContentsWhileLoading
 			}
 
 			List<ClientFileSearch> fileSearches = getFileSearches();
-			if (fileSearches == null || fileSearches.size() == 0) {
+			if (fileSearches == null || fileSearches.isEmpty()) {
 				Window.alert("No files added to the search");
 				return;
 			}
@@ -614,11 +629,13 @@ public final class SwiftApp implements EntryPoint, HidesPageContentsWhileLoading
 				def.setLowPriority(additionalSettingsPanel.isLowPriority());
 
 				ServiceConnection.instance().startSearch(def, new AsyncCallback<Void>() {
+					@Override
 					public void onFailure(final Throwable throwable) {
 						dialog.hide();
 						SimpleParamsEditorPanel.handleGlobalError(throwable);
 					}
 
+					@Override
 					public void onSuccess(final Void o) {
 						dialog.hide();
 						redirect("/report/report.jsp");
@@ -632,6 +649,7 @@ public final class SwiftApp implements EntryPoint, HidesPageContentsWhileLoading
 	}
 
 	private class TitleChangeListener implements ChangeListener {
+		@Override
 		public void onChange(final Widget sender) {
 			files.updateSearchTitle(getTitleText());
 		}

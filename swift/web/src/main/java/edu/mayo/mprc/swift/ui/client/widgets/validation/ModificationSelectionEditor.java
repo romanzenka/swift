@@ -106,14 +106,17 @@ public final class ModificationSelectionEditor extends Composite implements Sour
 			updateModsDescriptionText(this.available, this.selected, this.description);
 		}
 
+		@Override
 		public void onKeyDown(final Widget widget, final char c, final int i) {
 
 		}
 
+		@Override
 		public void onKeyPress(final Widget widget, final char c, final int i) {
 
 		}
 
+		@Override
 		public void onKeyUp(final Widget widget, final char c, final int i) {
 			// want the enter Key
 			//if (c == (char) KEY_ENTER) {
@@ -125,6 +128,7 @@ public final class ModificationSelectionEditor extends Composite implements Sour
 	private static final class SearchDefinitionClickListener implements ClickListener {
 		private boolean first = true;
 
+		@Override
 		public void onClick(final Widget sender) {
 
 			sender.setStyleName("mods-search-definition-enter");
@@ -212,6 +216,7 @@ public final class ModificationSelectionEditor extends Composite implements Sour
 	 *
 	 * @return the allowed values as a @ClientModSpecificitySet
 	 */
+	@Override
 	public ClientValue getClientValue() {
 		final List<? extends ClientValue> selected = this.modsSelected.getAllValues();
 		int length = 0;
@@ -242,6 +247,7 @@ public final class ModificationSelectionEditor extends Composite implements Sour
 			this.selected = selected;
 		}
 
+		@Override
 		public void onClick(final Widget sender) {
 			// copy contents of the availabe list to the selected list
 			final ClientValue items = available.getClientValue();
@@ -265,6 +271,7 @@ public final class ModificationSelectionEditor extends Composite implements Sour
 			this.description = description;
 		}
 
+		@Override
 		public void onClick(final Widget sender) {
 			// remove the selected items in the selected list from the selected list
 			final ClientValue items = selected.getClientValue();
@@ -328,6 +335,7 @@ public final class ModificationSelectionEditor extends Composite implements Sour
 			this.description = description;
 		}
 
+		@Override
 		public void onChange(final Widget widget) {
 			updateModsDescriptionText(this.available, this.selected, this.description);
 		}
@@ -481,6 +489,7 @@ public final class ModificationSelectionEditor extends Composite implements Sour
 		modsSearchDefinition.addKeyboardListener(new SearchKeyboardListener(this.modsAvailable, this.modsSelected, this.modsDescription));
 	}
 
+	@Override
 	public void addChangeListener(final ChangeListener listener) {
 		if (this.changeListeners == null) {
 			changeListeners = new ChangeListenerCollection();
@@ -488,6 +497,7 @@ public final class ModificationSelectionEditor extends Composite implements Sour
 		changeListeners.add(listener);
 	}
 
+	@Override
 	public void removeChangeListener(final ChangeListener listener) {
 		if (this.changeListeners == null) {
 			return;
@@ -511,28 +521,34 @@ public final class ModificationSelectionEditor extends Composite implements Sour
 	 *
 	 * @param value - the value(s) that want to be selected
 	 */
+	@Override
 	public void setValue(final ClientValue value) {
 		this.modsSelected.addValueWithoutSelecting(value, new CompareClientModSpecificity());
 		// need to update the description area also
 		this.updateModsDescriptionText(this.modsAvailable, this.modsSelected, this.modsDescription);
 	}
 
+	@Override
 	public void focus() {
 		this.modsAvailable.focus();
 	}
 
+	@Override
 	public void setValidationSeverity(final int validationSeverity) {
 		this.modsAvailable.setValidationSeverity(validationSeverity);
 	}
 
+	@Override
 	public boolean needsAllowedValues() {
 		return true;
 	}
 
+	@Override
 	public void setAllowedValues(final List<? extends ClientValue> values) {
 		this.modsAvailable.setAllowedValues(values);
 	}
 
+	@Override
 	public void setEnabled(final boolean enabled) {
 		// enable each of the controls
 		this.modsAvailable.setEnabled(enabled);

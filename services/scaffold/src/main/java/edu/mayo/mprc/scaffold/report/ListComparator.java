@@ -29,6 +29,7 @@ final class ListComparator implements Comparator<List<String>>, Serializable {
 		this.directions = directions.clone();
 	}
 
+	@Override
 	public int compare(final List<String> o1, final List<String> o2) {
 		for (int i = 0; i < indices.length; i++) {
 			final int index = indices[i];

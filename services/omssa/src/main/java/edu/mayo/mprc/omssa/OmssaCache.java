@@ -39,6 +39,7 @@ public final class OmssaCache extends WorkCache<OmssaWorkPacket> {
 	public static final class Ui implements ServiceUiFactory {
 		private static final String DEFAULT_CACHE = "var/cache/omssa";
 
+		@Override
 		public void createUI(final DaemonConfig daemon, final ResourceConfig resource, final UiBuilder builder) {
 			builder
 					.property(WorkCache.CacheConfig.CACHE_FOLDER, "OMSSA cache folder", "When a file gets searched by OMSSA, the result is stored in this folder. Subsequent searches of the same file with same parameters use the cached value."

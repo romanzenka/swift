@@ -322,6 +322,7 @@ public final class MascotDeploymentService extends DeploymentService<DeploymentR
 		return reportResult;
 	}
 
+	@Override
 	protected void validateAndDeleteDeploymentRelatedFiles(final File deployedFastaFile, final File deploymentFolder, final List<File> deletedFiles, final List<File> notDeletedFiles) {
 		final File[] deploymentFiles = deploymentFolder.listFiles();
 
@@ -469,7 +470,7 @@ public final class MascotDeploymentService extends DeploymentService<DeploymentR
 
 			//close up resources and check for error conditions that indicate that we need to rollback any changes that might have been made
 			//if there was a failure at some point we want ot roll back to the backup that was created
-			if (errorMessage.length() != 0) {
+			if (!errorMessage.isEmpty()) {
 				LOGGER.warn(errorMessage);
 				LOGGER.warn("Rolling back to the original mascot.dat file");
 				if (newDatFileBackup != null && newDatFileBackup.exists() && newDatFileBackup.length() > 0) {
@@ -499,6 +500,7 @@ public final class MascotDeploymentService extends DeploymentService<DeploymentR
 	 */
 	private int getLastDatFileSuffix(final File folderToLookIn) {
 		final File[] fileList = folderToLookIn.listFiles(new FilenameFilter() {
+			@Override
 			public boolean accept(final File dir, final String name) {
 				return StringUtilities.startsWithIgnoreCase(name, "mascot.dat");
 			}
@@ -545,6 +547,7 @@ public final class MascotDeploymentService extends DeploymentService<DeploymentR
 
 	private static final Map<String, List<ProgressReporter>> CO_DEPLOYMENTS = new HashMap<String, List<ProgressReporter>>();
 
+	@Override
 	public Map<String, List<ProgressReporter>> getCoDeployments() {
 		return CO_DEPLOYMENTS;
 	}
@@ -635,6 +638,7 @@ public final class MascotDeploymentService extends DeploymentService<DeploymentR
 		/**
 		 * goes through and watches the monitor.log file and reads the new lines
 		 */
+		@Override
 		public void run() {
 			LOGGER.debug("Monitoring " + logFile.getAbsolutePath());
 			RandomAccessFile logRAF = null;
@@ -670,7 +674,7 @@ public final class MascotDeploymentService extends DeploymentService<DeploymentR
 							newLine = logRAF.readLine();
 						}
 
-						if (linesSinceLastCheck.size() > 0) {
+						if (!linesSinceLastCheck.isEmpty()) {
 							for (final String line : linesSinceLastCheck) {
 								//if the line contains the shortname then we want to do something with it
 								if (line.contains(shortname)) {
@@ -926,6 +930,7 @@ public final class MascotDeploymentService extends DeploymentService<DeploymentR
 	}
 
 	public static final class Ui implements ServiceUiFactory {
+		@Override
 		public void createUI(final DaemonConfig daemon, final ResourceConfig resource, final UiBuilder builder) {
 			builder.property(ENGINE_ROOT_FOLDER, "Mascot Installation Folder", "The deployer modifies <tt>config/mascot.dat</tt> in this folder and watches <tt>logs/monitor.log</tt> to determine if the deployment succeeded.").existingDirectory().required()
 					.property(MASCOT_DB_MAINTENANCE_URI, "Mascot Database Maintenance Url", "Mascot database maintenance url, for example, <tt>http://mascot/x-cgi/db_gui.pl</tt>").required()

@@ -49,6 +49,7 @@ final class DatabaseDeployment extends AsyncTaskBase implements DatabaseDeployme
 	 * @return Work packet to be sent asynchronously. If it returns null, it means the work was done without a need
 	 *         to send a work packet.
 	 */
+	@Override
 	public WorkPacket createWorkPacket() {
 		final DeploymentRequest workPacket = new DeploymentRequest(getFullId(), dbToDeploy.getFastaFile());
 		if ("SEQUEST".equalsIgnoreCase(engineCode)) {
@@ -60,9 +61,11 @@ final class DatabaseDeployment extends AsyncTaskBase implements DatabaseDeployme
 		return workPacket;
 	}
 
+	@Override
 	public synchronized void onSuccess() {
 	}
 
+	@Override
 	public synchronized void onProgress(final ProgressInfo progressInfo) {
 		// The deployer sends deployment result as progress message
 		if (progressInfo instanceof DeploymentResult) {
@@ -80,12 +83,14 @@ final class DatabaseDeployment extends AsyncTaskBase implements DatabaseDeployme
 		}
 	}
 
+	@Override
 	public String getShortDbName() {
 		return dbToDeploy.getShortName();
 	}
 
 	//this may not be an hdrFile but actually a fasta file
 
+	@Override
 	public synchronized File getSequestHdrFile() {
 		return hdrFile;
 	}
@@ -93,14 +98,17 @@ final class DatabaseDeployment extends AsyncTaskBase implements DatabaseDeployme
 	/**
 	 * @return Deployed fasta file.
 	 */
+	@Override
 	public synchronized File getFastaFile() {
 		return fastaFile;
 	}
 
+	@Override
 	public synchronized List<File> getGeneratedFiles() {
 		return generatedFiles;
 	}
 
+	@Override
 	public DeploymentResult getDeploymentResult() {
 		return deploymentResult;
 	}

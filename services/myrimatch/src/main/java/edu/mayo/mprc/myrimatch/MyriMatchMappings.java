@@ -162,7 +162,7 @@ public final class MyriMatchMappings implements Mappings {
 
 	@Override
 	public void setPeptideTolerance(final MappingContext context, final Tolerance peptideTolerance) {
-		nativeParams.put(PRECURSOR_MZ_TOLERANCE, String.valueOf(peptideTolerance.getValue()) + massUnitToMyriMatch(peptideTolerance));
+		nativeParams.put(PRECURSOR_MZ_TOLERANCE, peptideTolerance.getValue() + massUnitToMyriMatch(peptideTolerance));
 	}
 
 	private String massUnitToMyriMatch(final Tolerance peptideTolerance) {
@@ -187,7 +187,7 @@ public final class MyriMatchMappings implements Mappings {
 	}
 
 	private String variableModsToString(final MappingContext context, final ModSet variableMods) {
-		if (variableMods.getModifications().size() == 0) {
+		if (variableMods.getModifications().isEmpty()) {
 			return "";
 		}
 
@@ -232,7 +232,7 @@ public final class MyriMatchMappings implements Mappings {
 	}
 
 	private String fixedModsToString(final ModSet fixedMods) {
-		if (fixedMods.getModifications().size() == 0) {
+		if (fixedMods.getModifications().isEmpty()) {
 			return "";
 		}
 		final StringBuilder result = new StringBuilder(50);

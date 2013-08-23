@@ -25,6 +25,7 @@ public final class ProgressDialogBox extends DialogBox {
 		this.setText(text);
 		final Button cancel = new Button("Cancel");
 		cancel.addClickListener(new ClickListener() {
+			@Override
 			public void onClick(final Widget sender) {
 				hide();
 			}
@@ -62,7 +63,7 @@ public final class ProgressDialogBox extends DialogBox {
 		final int popupHeight = (int) Math.max(clientHeight * heightFraction, minHeight);
 		final int posX = (clientWidth - popupWidth) / 2;
 		final int posY = (clientHeight - popupHeight) / 2;
-		this.setSize(String.valueOf(popupWidth) + "px", String.valueOf(popupHeight) + "px");
+		this.setSize(popupWidth + "px", popupHeight + "px");
 		this.setPopupPosition(posX, posY);
 	}
 }

@@ -245,7 +245,7 @@ public class Curation extends EvolvableBase implements Serializable {
 	 *         the default {@link DatabaseAnnotation#DEFAULT_DECOY_REGEX} is used.
 	 */
 	public String getDecoyRegex() {
-		if (decoyRegex == null || decoyRegex.length() == 0) {
+		if (decoyRegex == null || decoyRegex.isEmpty()) {
 			return DatabaseAnnotation.DEFAULT_DECOY_REGEX;
 		}
 		return decoyRegex;
@@ -336,7 +336,7 @@ public class Curation extends EvolvableBase implements Serializable {
 		if (step > curationSteps.size()) {
 			return curationSteps.size() - 1;
 		}
-		if (curationSteps.size() == 0) {
+		if (curationSteps.isEmpty()) {
 			return 0;
 		}
 		if (step < 0) {

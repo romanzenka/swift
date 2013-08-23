@@ -48,11 +48,13 @@ public final class ModificationDialog extends FrameDialog {
 		this.type = type;
 	}
 
+	@Override
 	protected void okay() {
 		// clear the description textarea
 		this.hide();
 	}
 
+	@Override
 	protected void cancel() {
 		// clear the description textarea
 		this.hide();

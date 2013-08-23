@@ -101,10 +101,12 @@ public final class DaemonConfig implements ResourceConfig, NamedResource {
 		return daemon;
 	}
 
+	@Override
 	public String getName() {
 		return name;
 	}
 
+	@Override
 	public void setName(final String name) {
 		this.name = name;
 	}
@@ -251,6 +253,7 @@ public final class DaemonConfig implements ResourceConfig, NamedResource {
 		return osName.contains(osString);
 	}
 
+	@Override
 	public void save(final ConfigWriter writer) {
 		writer.put(NAME, getName(), "User-friendly name of this daemon");
 		writer.put(HOST_NAME, getHostName(), "Host the daemon runs on");
@@ -286,6 +289,7 @@ public final class DaemonConfig implements ResourceConfig, NamedResource {
 		return result.toString();
 	}
 
+	@Override
 	public void load(final ConfigReader reader) {
 		name = reader.get(NAME);
 		hostName = reader.get(HOST_NAME);

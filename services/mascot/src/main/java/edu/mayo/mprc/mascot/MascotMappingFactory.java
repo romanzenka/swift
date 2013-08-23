@@ -35,6 +35,7 @@ public final class MascotMappingFactory implements MappingFactory {
 		this.paramsInfo = paramsInfo;
 	}
 
+	@Override
 	public Mappings createMapping() {
 		return new MascotMappings(paramsInfo);
 	}

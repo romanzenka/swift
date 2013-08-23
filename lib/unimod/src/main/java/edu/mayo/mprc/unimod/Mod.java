@@ -218,6 +218,7 @@ public class Mod extends EvolvableBase implements Comparable<Mod> {
 	/**
 	 * Sort by title, full name and record ID
 	 */
+	@Override
 	public int compareTo(final Mod o) {
 		return ComparisonChain.start().nullsFirst()
 				.compare(this.getTitle(), o.getTitle())

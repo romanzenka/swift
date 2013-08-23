@@ -86,7 +86,7 @@ public final class CurationExecutorTest extends CurationDaoTestBase {
 			final CurationStatus status = executeCuration();
 
 			//if we had a failure then let's figure out why
-			if (status.getFailedStepValidations() != null && status.getFailedStepValidations().size() > 0) {
+			if (status.getFailedStepValidations() != null && !status.getFailedStepValidations().isEmpty()) {
 				Assert.fail("There were errors executing the curation.\n" +
 						CurationExecutor.failedValidationsToString(status.getFailedStepValidations()));
 			}

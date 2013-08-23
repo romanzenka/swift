@@ -165,7 +165,7 @@ public abstract class DaoBase implements Dao {
 		final T existing;
 		final String className = owner.getClass().getName();
 
-		if (collection.size() > 0) {
+		if (!collection.isEmpty()) {
 			existing = (T) getMatchingCollection(collection, setField, className);
 		} else {
 			existing = (T) getMatchingEmptyCollection(setField, className);
@@ -423,7 +423,7 @@ public abstract class DaoBase implements Dao {
 				.add(equalityCriteria)
 				.list();
 
-		if (existingObjects != null && existingObjects.size() > 0) {
+		if (existingObjects != null && !existingObjects.isEmpty()) {
 			for (final T existingObject : existingObjects) {
 				if (existingObject.equals(item)) {
 					if (createNew) {

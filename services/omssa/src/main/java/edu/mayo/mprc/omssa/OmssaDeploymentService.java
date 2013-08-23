@@ -113,6 +113,7 @@ public final class OmssaDeploymentService extends DeploymentService<DeploymentRe
 
 		try {
 			final File[] blastIndexFiles = deployableFile.getParentFile().listFiles(new FilenameFilter() {
+				@Override
 				public boolean accept(final File dir, final String name) {
 					if (!name.startsWith(deployableFile.getName())) {
 						return false;
@@ -146,6 +147,7 @@ public final class OmssaDeploymentService extends DeploymentService<DeploymentRe
 		}
 	}
 
+	@Override
 	public DeploymentResult performDeployment(final DeploymentRequest request) {
 		LOGGER.info("Deploying OMSSA database " + request.getShortName());
 		final DeploymentResult reportInto = new DeploymentResult();
@@ -202,6 +204,7 @@ public final class OmssaDeploymentService extends DeploymentService<DeploymentRe
 		return reportResult;
 	}
 
+	@Override
 	protected void validateAndDeleteDeploymentRelatedFiles(final File deployedFastaFile, final File deploymentFolder, final List<File> deletedFiles, final List<File> notDeletedFiles) {
 		final File[] deploymentFiles = deploymentFolder.listFiles();
 
@@ -234,6 +237,7 @@ public final class OmssaDeploymentService extends DeploymentService<DeploymentRe
 
 	private static final Map<String, List<ProgressReporter>> CO_DEPLOYMENTS = new HashMap<String, List<ProgressReporter>>();
 
+	@Override
 	public Map<String, List<ProgressReporter>> getCoDeployments() {
 		return CO_DEPLOYMENTS;
 	}
@@ -318,6 +322,7 @@ public final class OmssaDeploymentService extends DeploymentService<DeploymentRe
 
 		private static final String DEFAULT_DEPLOYMENT_FOLDER = "var/omssa_index";
 
+		@Override
 		public void createUI(final DaemonConfig daemon, final ResourceConfig resource, final UiBuilder builder) {
 			builder.property(FORMAT_DB_EXE, "Database Format Executable", "Omssa deployer database format executable." +
 					"<p>Swift install contains following executables for your convenience:</p>"

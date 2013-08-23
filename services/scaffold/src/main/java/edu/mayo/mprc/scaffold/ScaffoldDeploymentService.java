@@ -41,6 +41,7 @@ public final class ScaffoldDeploymentService extends DeploymentService<Deploymen
 	public ScaffoldDeploymentService() {
 	}
 
+	@Override
 	public DeploymentResult performDeployment(final DeploymentRequest request) {
 		final DeploymentResult reportInto = new DeploymentResult();
 
@@ -124,6 +125,7 @@ public final class ScaffoldDeploymentService extends DeploymentService<Deploymen
 
 	private static final Map<String, List<ProgressReporter>> CO_DEPLOYMENTS = new HashMap<String, List<ProgressReporter>>();
 
+	@Override
 	public Map<String, List<ProgressReporter>> getCoDeployments() {
 		return CO_DEPLOYMENTS;
 	}
@@ -189,6 +191,7 @@ public final class ScaffoldDeploymentService extends DeploymentService<Deploymen
 	}
 
 	public static final class Ui implements ServiceUiFactory {
+		@Override
 		public void createUI(final DaemonConfig daemon, final ResourceConfig resource, final UiBuilder builder) {
 			builder.property(DEPLOYABLE_DB_FOLDER, "Database Folder", "Folder where deployer copies database files to")
 					.required()

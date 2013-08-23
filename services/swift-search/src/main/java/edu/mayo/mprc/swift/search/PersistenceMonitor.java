@@ -25,6 +25,7 @@ public final class PersistenceMonitor implements SearchMonitor {
 		this.searchRunId = searchRunId;
 	}
 
+	@Override
 	public void updateStatistics(final ProgressReport report) {
 		swiftDao.begin();
 		try {
@@ -36,6 +37,7 @@ public final class PersistenceMonitor implements SearchMonitor {
 		}
 	}
 
+	@Override
 	public void taskChange(final TaskBase task) {
 		// We do not report tasks failing internally
 		if (task.getState() == TaskState.INIT_FAILED || task.getState() == TaskState.UNINITIALIZED) {
@@ -51,6 +53,7 @@ public final class PersistenceMonitor implements SearchMonitor {
 		}
 	}
 
+	@Override
 	public void error(final TaskBase task, final Throwable t) {
 		swiftDao.begin();
 		try {
@@ -63,6 +66,7 @@ public final class PersistenceMonitor implements SearchMonitor {
 		}
 	}
 
+	@Override
 	public void error(final Throwable t) {
 		// TODO: Ideally this would store the exception in a separate table that SearchRun table links to
 		LOGGER.error("Workflow engine error (logged here as it currently cannot be fully stored in the database):", t);
@@ -84,6 +88,7 @@ public final class PersistenceMonitor implements SearchMonitor {
 	/**
 	 * Task progress information arrived. This is called after the task has a chance to process the progress info.
 	 */
+	@Override
 	public void taskProgress(final TaskBase task, final Object progressInfo) {
 		if (task instanceof AsyncTaskBase) {
 			if (progressInfo instanceof AssignedTaskData) {

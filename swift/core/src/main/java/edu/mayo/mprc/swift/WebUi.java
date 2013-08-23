@@ -39,7 +39,6 @@ public final class WebUi {
 	private DaemonConnection swiftSearcherDaemonConnection;
 	private Collection<SearchEngine> searchEngines;
 	private boolean scaffoldReport;
-	private boolean qa;
 	private boolean msmsEval;
 	private List<MSMSEvalParamFile> spectrumQaParamFiles;
 	private File fastaUploadFolder;
@@ -246,9 +245,6 @@ public final class WebUi {
 					if (searcherConfig.getScaffoldReport() != null) {
 						ui.scaffoldReport = true;
 					}
-					if (searcherConfig.getQa() != null) {
-						ui.qa = true;
-					}
 
 					final Collection<SearchEngine> searchEngines = Lists.newArrayList();
 					for (final SearchEngine.Config engineConfig : searcherConfig.getEngines()) {
@@ -448,6 +444,7 @@ public final class WebUi {
 		private static final String LINUX_ROOT = "/";
 		private static final String LINUX_WEB_ROOT = "file:////";
 
+		@Override
 		public void createUI(final DaemonConfig daemon, final ResourceConfig resource, final UiBuilder builder) {
 			final ResourceConfig swiftSearcher = daemon.firstServiceOfType(SwiftSearcher.Config.class);
 

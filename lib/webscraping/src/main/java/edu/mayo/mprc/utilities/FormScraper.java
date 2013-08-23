@@ -36,7 +36,7 @@ public final class FormScraper {
 			while (node != null) {
 				if (node instanceof Text) {
 					final String txt = ((Text) node).getData();
-					if (txt.length() == 0) {
+					if (txt.isEmpty()) {
 						continue;
 					}
 					if (sb.length() > 0) {

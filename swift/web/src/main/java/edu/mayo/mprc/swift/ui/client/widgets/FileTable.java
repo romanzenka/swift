@@ -64,6 +64,7 @@ public final class FileTable extends FlexTable implements SourcesChangeEvents, C
 		public int i;
 	}
 
+	@Override
 	public void onChange(final Widget widget) {
 		if (this.searchTypeList.equals(widget)) {
 			setSearchType(this.searchTypeList.getSelectedSearchType());
@@ -103,6 +104,7 @@ public final class FileTable extends FlexTable implements SourcesChangeEvents, C
 
 		((CheckBox) headers[SELECT_COLUMN].getWidget()).addClickListener(new ColumnSelectListener(SELECT_COLUMN, this));
 		((PushButton) headers[REMOVE_COLUMN].getWidget()).addClickListener(new ClickListener() {
+			@Override
 			public void onClick(final Widget sender) {
 				removeSelectedFiles();
 			}
@@ -112,6 +114,7 @@ public final class FileTable extends FlexTable implements SourcesChangeEvents, C
 
 		// On every change, update count of selected files
 		changeListeners.add(new ChangeListener() {
+			@Override
 			public void onChange(final Widget widget) {
 				// List of files changed
 
@@ -138,6 +141,7 @@ public final class FileTable extends FlexTable implements SourcesChangeEvents, C
 
 			final CheckBox selection = new CheckBox();
 			selection.addClickListener(new ClickListener() {
+				@Override
 				public void onClick(final Widget sender) {
 					setChecked(getWidgetRow(sender), SELECT_COLUMN, ((CheckBox) sender).isChecked());
 				}
@@ -169,6 +173,7 @@ public final class FileTable extends FlexTable implements SourcesChangeEvents, C
 
 			final CheckBox selection = new CheckBox();
 			selection.addClickListener(new ClickListener() {
+				@Override
 				public void onClick(final Widget sender) {
 					setChecked(getWidgetRow(sender), SELECT_COLUMN, ((CheckBox) sender).isChecked());
 				}
@@ -461,10 +466,12 @@ public final class FileTable extends FlexTable implements SourcesChangeEvents, C
 		}
 	}
 
+	@Override
 	public void addChangeListener(final ChangeListener changeListener) {
 		changeListeners.add(changeListener);
 	}
 
+	@Override
 	public void removeChangeListener(final ChangeListener changeListener) {
 		changeListeners.add(changeListener);
 	}
@@ -478,6 +485,7 @@ public final class FileTable extends FlexTable implements SourcesChangeEvents, C
 			_fileTable = fileTable;
 		}
 
+		@Override
 		public void onChange(final Widget widget) {
 			final EditableLabel label = (EditableLabel) widget;
 			_fileTable.changeColumnText(getWidgetRow(widget), _column, label.getText());
@@ -493,6 +501,7 @@ public final class FileTable extends FlexTable implements SourcesChangeEvents, C
 			this.rowIndex = rowIndex;
 		}
 
+		@Override
 		public void onClick(final Widget sender) {
 			removeFileAtRow(rowIndex.i);
 		}

@@ -32,12 +32,9 @@ public final class DatabaseView extends SimplePanel implements ModuleView {
 
 	private static final String MYSQL_URL_PREFIX = "jdbc:mysql://";
 
-	private TabPanel databaseConfiguration;
-	private ResourceModel model;
+	private final TabPanel databaseConfiguration;
 
 	public DatabaseView(final GwtUiBuilder builder, final ResourceModel model) {
-
-		this.model = model;
 		databaseConfiguration = new TabPanel();
 		final PropertyChangeListener listener = new PropertyChangeListener();
 
@@ -92,10 +89,12 @@ public final class DatabaseView extends SimplePanel implements ModuleView {
 
 		databaseConfiguration.selectTab(0);
 		databaseConfiguration.addTabListener(new TabListener() {
+			@Override
 			public boolean onBeforeTabSelected(final SourcesTabEvents sourcesTabEvents, final int i) {
 				return true;
 			}
 
+			@Override
 			public void onTabSelected(final SourcesTabEvents sourcesTabEvents, final int i) {
 				saveUI();
 				// Fire validations for every single resulting property
@@ -106,10 +105,12 @@ public final class DatabaseView extends SimplePanel implements ModuleView {
 		this.setWidget(databaseConfiguration);
 	}
 
+	@Override
 	public Widget getModuleWidget() {
 		return this;
 	}
 
+	@Override
 	public void loadUI(final Map<String, String> values) {
 		if (values == null) {
 			return;
@@ -153,6 +154,7 @@ public final class DatabaseView extends SimplePanel implements ModuleView {
 	 *
 	 * @return Saved version of the resulting parameter set.
 	 */
+	@Override
 	public HashMap<String, String> saveUI() {
 		if (databaseConfiguration.getTabBar().getSelectedTab() == 0) {
 			final HashMap<String, String> properties = h2PropertyList.saveUI();
@@ -192,6 +194,7 @@ public final class DatabaseView extends SimplePanel implements ModuleView {
 	}
 
 	private class PropertyChangeListener implements ChangeListener {
+		@Override
 		public void onChange(final Widget sender) {
 			saveUI();
 		}

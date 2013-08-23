@@ -98,6 +98,7 @@ public final class Mgf2SequestCaller implements Mgf2SequestInterface {
 	 * @param startTimeOut    - the start time out
 	 * @param watchDogTimeOut - the watch dog time out
 	 */
+	@Override
 	public void callSequest(final File tarFile, final File paramsFile, final File mgfFile, final long startTimeOut, final long watchDogTimeOut, final File hdrFile) {
 		assert hostsFile != null : "Path to pvm_hosts file is not set.";
 		validateInputsToSequestCaller(mgfFile, paramsFile, hdrFile);
@@ -244,14 +245,17 @@ public final class Mgf2SequestCaller implements Mgf2SequestInterface {
 		return existingTar;
 	}
 
+	@Override
 	public void setSequestExe(final String sequestExe) {
 		this.sequestExe = sequestExe;
 	}
 
+	@Override
 	public void setHostsFile(final File hostsFile) {
 		this.hostsFile = hostsFile;
 	}
 
+	@Override
 	public void setMaxCommandLineLength(final int commandLineLength) {
 		this.maxCommandLineLength = commandLineLength;
 	}

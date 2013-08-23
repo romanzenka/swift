@@ -16,6 +16,6 @@ public final class UserMessage {
 	}
 
 	public boolean messageDefined() {
-		return message != null && message.trim().length() > 0;
+		return message != null && !message.trim().isEmpty();
 	}
 }

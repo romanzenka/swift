@@ -65,7 +65,9 @@ public final class FileMonitor {
 	 */
 	public void filesToExist(final Collection<File> filesToMonitor, final FileListener listener, final int expireInMillis) {
 		final FileInfo e = new FileInfo(filesToMonitor, listener, expireInMillis, false);
-		if (shortcutTrigger(e)) return;
+		if (shortcutTrigger(e)) {
+			return;
+		}
 
 		synchronized (lock) {
 			files.add(e);
@@ -81,7 +83,9 @@ public final class FileMonitor {
 	 */
 	public void fileToBeChanged(final File fileToMonitor, final FileListener listener) {
 		final FileInfo e = new FileInfo(Arrays.asList(fileToMonitor), listener, 0, true);
-		if (shortcutTrigger(e)) return;
+		if (shortcutTrigger(e)) {
+			return;
+		}
 
 		synchronized (lock) {
 			files.add(e);
@@ -187,6 +191,7 @@ public final class FileMonitor {
 	 * file in question and notify listeners if changed.
 	 */
 	private class FileMonitorNotifier extends TimerTask {
+		@Override
 		public void run() {
 			synchronized (lock) {
 				for (Iterator<FileInfo> iterator = files.iterator(); iterator.hasNext(); ) {

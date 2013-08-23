@@ -34,7 +34,7 @@ public final class DatabaseValidator implements RuntimeInitializer {
 	private DaemonConfig daemonConfig;
 	private List<RuntimeInitializer> runtimeInitializers;
 	private FileTokenFactory fileTokenFactory;
-	private final static ExecutorService EXECUTOR = Executors.newSingleThreadExecutor();
+	private static final ExecutorService EXECUTOR = Executors.newSingleThreadExecutor();
 
 	/**
 	 * Sets up the file token factory. File token factory needs to know which daemon we are running in,
@@ -73,7 +73,7 @@ public final class DatabaseValidator implements RuntimeInitializer {
 		if (configs.size() > 1) {
 			throw new MprcException("Swift has more than one database defined.");
 		}
-		if (configs.size() == 0) {
+		if (configs.isEmpty()) {
 			throw new MprcException("Swift does not define a database.");
 		}
 		return configs.get(0);

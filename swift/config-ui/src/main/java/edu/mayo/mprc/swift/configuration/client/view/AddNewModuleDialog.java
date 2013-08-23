@@ -75,12 +75,14 @@ public final class AddNewModuleDialog extends DialogBox {
 		buttonPanel.add(cancelButton);
 
 		okButton.addClickListener(new ClickListener() {
+			@Override
 			public void onClick(final Widget widget) {
 				okClicked(callback);
 			}
 		});
 
 		cancelButton.addClickListener(new ClickListener() {
+			@Override
 			public void onClick(final Widget widget) {
 				AddNewModuleDialog.this.hide();
 			}

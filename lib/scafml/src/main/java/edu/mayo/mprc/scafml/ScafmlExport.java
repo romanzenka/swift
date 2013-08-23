@@ -100,7 +100,7 @@ public final class ScafmlExport extends FileHolder {
 					.append("<Export type=\"spectrum\" thresholds=\"thresh\" path=\"").append(scaffoldOutputDir.getAbsolutePath()).append("\"/>\n");
 		}
 
-		if (starred != null && starred.trim().length() != 0) {
+		if (starred != null && !starred.trim().isEmpty()) {
 			result
 					.append(indent)
 					.append("<Annotation id=\"stars\">\n")

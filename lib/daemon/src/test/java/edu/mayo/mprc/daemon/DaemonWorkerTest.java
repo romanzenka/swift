@@ -23,6 +23,7 @@ public final class DaemonWorkerTest {
 	@Test
 	public void shouldDoSimpleWorkInThreadPool() throws InterruptedException {
 		final DaemonWorkerTester tester = new DaemonWorkerTester(new WorkerFactory() {
+			@Override
 			public Worker createWorker() {
 				return createSimpleWorker();
 			}
@@ -36,6 +37,7 @@ public final class DaemonWorkerTest {
 				return "daemonWorker";
 			}
 
+			@Override
 			public String getUserName() {
 				return "DaemonWorkerTester";
 			}
@@ -76,6 +78,7 @@ public final class DaemonWorkerTest {
 		return new WorkerBase() {
 			private AtomicInteger concurrentRequests = new AtomicInteger(0);
 
+			@Override
 			public void process(final WorkPacket wp, final UserProgressReporter progressReporter) {
 				Assert.assertEquals(concurrentRequests.incrementAndGet(), 1, "The amount of requests must start at 1. The worker calls are not serialized.");
 				try {
@@ -96,7 +99,7 @@ public final class DaemonWorkerTest {
 		try {
 			final Object[] token = new Object[iterations];
 			for (int i = 0; i < iterations; i++) {
-				token[i] = tester.sendWork(new StringWorkPacket("hello #" + String.valueOf(i)), null);
+				token[i] = tester.sendWork(new StringWorkPacket("hello #" + i), null);
 			}
 			/**
 			 * Give the search at most 10 seconds.

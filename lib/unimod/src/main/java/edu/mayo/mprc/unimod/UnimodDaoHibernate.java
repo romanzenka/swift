@@ -94,6 +94,7 @@ public final class UnimodDaoHibernate extends DaoBase implements UnimodDao {
 		}
 	}
 
+	@Override
 	public Unimod getDefaultUnimod() {
 		final Unimod unimod = new Unimod();
 		try {

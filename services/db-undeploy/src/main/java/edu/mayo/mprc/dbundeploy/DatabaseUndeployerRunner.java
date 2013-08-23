@@ -63,7 +63,7 @@ public final class DatabaseUndeployerRunner implements Runnable {
 		synchronized (taskCounter) {
 			createTasks();
 
-			if (undeploymentNameTaskPairs.size() > 0) {
+			if (!undeploymentNameTaskPairs.isEmpty()) {
 				state = DatabaseUndeployerState.RUNNING;
 			} else {
 				state = DatabaseUndeployerState.DONE;

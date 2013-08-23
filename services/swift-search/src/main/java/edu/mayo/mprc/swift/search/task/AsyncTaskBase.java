@@ -79,6 +79,7 @@ public abstract class AsyncTaskBase extends TaskBase {
 	 * Will be called until the task fails or succeeds through changing its status. If you do neither,
 	 * you must use the resumer otherwise you might not run again.
 	 */
+	@Override
 	public void run() {
 		if (!wasSubmitted) {
 			if (daemon == null) {
@@ -93,6 +94,7 @@ public abstract class AsyncTaskBase extends TaskBase {
 			}
 			workPacket.setPriority(getPriority());
 			daemon.sendWork(workPacket, new TaskProgressListener(this) {
+				@Override
 				public void requestProcessingFinished() {
 					try {
 						onSuccess();
@@ -104,6 +106,7 @@ public abstract class AsyncTaskBase extends TaskBase {
 					}
 				}
 
+				@Override
 				public void userProgressInformation(final ProgressInfo progressInfo) {
 					try {
 						onProgress(progressInfo);

@@ -28,6 +28,7 @@ final class MgfTitleCleanupTask extends AsyncTaskBase implements FileProducingTa
 		this.setDescription(".mgf cleanup " + fileTokenFactory.fileToTaggedDatabaseToken(mgfToCleanup));
 	}
 
+	@Override
 	public synchronized WorkPacket createWorkPacket() {
 		if (!isFromScratch() && cleanedMgf.exists()) {
 			cleanupPerformed = true;
@@ -36,10 +37,12 @@ final class MgfTitleCleanupTask extends AsyncTaskBase implements FileProducingTa
 		return new MgfTitleCleanupWorkPacket(mgfToCleanup, cleanedMgf, "Mgf Cleanup #" + TASK_ID.incrementAndGet(), false);
 	}
 
+	@Override
 	public void onSuccess() {
 		// Nothing to do.
 	}
 
+	@Override
 	public synchronized void onProgress(final ProgressInfo progressInfo) {
 		if (progressInfo instanceof MgfTitleCleanupResult) {
 			final MgfTitleCleanupResult result = (MgfTitleCleanupResult) progressInfo;
@@ -47,6 +50,7 @@ final class MgfTitleCleanupTask extends AsyncTaskBase implements FileProducingTa
 		}
 	}
 
+	@Override
 	public synchronized File getResultingFile() {
 		if (cleanupPerformed) {
 			return cleanedMgf;

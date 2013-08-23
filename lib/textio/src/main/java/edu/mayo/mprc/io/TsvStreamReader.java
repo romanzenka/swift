@@ -130,6 +130,7 @@ public final class TsvStreamReader implements Closeable {
 	}
 
 
+	@Override
 	public void close() {
 		FileUtilities.closeQuietly(reader);
 	}

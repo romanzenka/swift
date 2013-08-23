@@ -323,7 +323,7 @@ public final class QaWorker extends WorkerBase {
 			final QaWorker qaWorker = new QaWorker();
 			qaWorker.setRExecutable(config.getRExecutable());
 			qaWorker.setRScript(new File(config.getRScript()));
-			qaWorker.setXvfbWrapperScript(config.getXvfbWrapperScript() != null && config.getXvfbWrapperScript().length() > 0 ? new File(config.getXvfbWrapperScript()) : null);
+			qaWorker.setXvfbWrapperScript(config.getXvfbWrapperScript() != null && !config.getXvfbWrapperScript().isEmpty() ? new File(config.getXvfbWrapperScript()) : null);
 			return qaWorker;
 		}
 	}
@@ -393,6 +393,7 @@ public final class QaWorker extends WorkerBase {
 		private static final String PROVIDED_R_SCRIPT = "bin/util/rPpmPlot.r";
 		private static final String R_EXECUTABLE_DEFAULT = "Rscript";
 
+		@Override
 		public void createUI(final DaemonConfig daemon, final ResourceConfig resource, final UiBuilder builder) {
 			builder
 					.property(R_EXECUTABLE, "<tt>R executable</tt>", "R script executable or interpreter that runs the given R script below. R must be installed in the system. " +

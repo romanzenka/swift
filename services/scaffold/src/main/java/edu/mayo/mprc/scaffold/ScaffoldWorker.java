@@ -328,6 +328,7 @@ public final class ScaffoldWorker extends WorkerBase {
 	}
 
 	public static final class Ui implements ServiceUiFactory {
+		@Override
 		public void createUI(final DaemonConfig daemon, final ResourceConfig resource, final UiBuilder builder) {
 			builder
 					.property(SCAFFOLD_BATCH_SCRIPT, "ScaffoldBatch path", "Path to the ScaffoldBatch script<p>Default for Linux: <code>/opt/Scaffold3/ScaffoldBatch3</code></p>")

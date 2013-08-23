@@ -73,17 +73,17 @@ public final class ModificationSearch {
 	 * @return array of ClientModSpecificity
 	 */
 	public List<ClientModSpecificity> search(final String spec) {
-		if (spec == null || spec.length() == 0 || spec.trim().equals("")) {
+		if (spec == null || spec.isEmpty() || spec.trim().equals("")) {
 			return this.allowedValues;
 		}
 		List<ClientModSpecificity> result;
 
 		result = searchByMass(spec);
 
-		if (result == null || result.size() == 0) {
+		if (result == null || result.isEmpty()) {
 			result = searchByWord(spec);
 			// TODO record id
-			if (result.size() == 0) {
+			if (result.isEmpty()) {
 				// search by record id
 				final ClientModSpecificity singleResult = searchByRecordId(spec);
 				if (singleResult != null) {

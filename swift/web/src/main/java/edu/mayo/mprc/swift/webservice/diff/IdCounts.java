@@ -7,8 +7,8 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
  */
 @XStreamAlias("idCounts")
 public final class IdCounts {
-	final boolean present;
-	final int proteinGroups;
+	private final boolean present;
+	private final int proteinGroups;
 
 	public IdCounts(boolean present, int proteinGroups) {
 		this.present = present;

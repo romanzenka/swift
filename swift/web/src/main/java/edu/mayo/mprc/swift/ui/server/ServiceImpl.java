@@ -83,6 +83,7 @@ public final class ServiceImpl extends SpringGwtServlet implements Service, Appl
 	public ServiceImpl() {
 	}
 
+	@Override
 	public Entry listFiles(final String relativePath, final String[] expandedPaths) throws GWTServiceException {
 		try {
 			final Entry rootEntry = new DirectoryEntry("(root)");
@@ -103,6 +104,7 @@ public final class ServiceImpl extends SpringGwtServlet implements Service, Appl
 		}
 	}
 
+	@Override
 	public ClientUser[] listUsers() throws GWTServiceException {
 		try {
 			getWorkspaceDao().begin();
@@ -127,6 +129,7 @@ public final class ServiceImpl extends SpringGwtServlet implements Service, Appl
 		}
 	}
 
+	@Override
 	public void startSearch(final ClientSwiftSearchDefinition def) throws GWTServiceException {
 		try {
 			final HttpSession session = getSession();
@@ -272,7 +275,7 @@ public final class ServiceImpl extends SpringGwtServlet implements Service, Appl
 
 	private void validateSearch(final SwiftSearchDefinition swiftSearch) {
 		String title = swiftSearch.getTitle();
-		if (title.length() == 0) {
+		if (title.isEmpty()) {
 			throw new MprcException("Cannot run Swift search with an empty title");
 		}
 		validateTitleCharacters(title, "Search title");
@@ -304,6 +307,7 @@ public final class ServiceImpl extends SpringGwtServlet implements Service, Appl
 		return listener.getSearchRunId();
 	}
 
+	@Override
 	public ClientLoadedSearch loadSearch(final int searchRunId) throws GWTServiceException {
 		try {
 			final HttpSession session = getSession();
@@ -323,6 +327,7 @@ public final class ServiceImpl extends SpringGwtServlet implements Service, Appl
 		}
 	}
 
+	@Override
 	public List<ClientSearchEngine> listSearchEngines() throws GWTServiceException {
 		final List<ClientSearchEngine> infos = new ArrayList<ClientSearchEngine>();
 		for (final SearchEngine engine : getSearchEngines()) {
@@ -334,6 +339,7 @@ public final class ServiceImpl extends SpringGwtServlet implements Service, Appl
 		return infos;
 	}
 
+	@Override
 	public List<SpectrumQaParamFileInfo> listSpectrumQaParamFiles() throws GWTServiceException {
 
 		final List<SpectrumQaParamFileInfo> paramFiles = new ArrayList<SpectrumQaParamFileInfo>();
@@ -345,15 +351,18 @@ public final class ServiceImpl extends SpringGwtServlet implements Service, Appl
 		return paramFiles;
 	}
 
+	@Override
 	public boolean isScaffoldReportEnabled() throws GWTServiceException {
 		return isScaffoldReport();
 	}
 
+	@Override
 	public String getUserMessage() throws GWTServiceException {
 		// TODO - re-add support for user messages
 		return null;
 	}
 
+	@Override
 	public FileInfo[] findFiles(final String[] relativePaths) throws GWTServiceException {
 		try {
 			// Filter paths so we never have both parent and a child in the list.
@@ -491,10 +500,12 @@ public final class ServiceImpl extends SpringGwtServlet implements Service, Appl
 
 	private static final File[] EMPTY_EXPANDED_FILES = new File[0];
 
+	@Override
 	public Boolean login(final String userName, final String password) throws GWTServiceException {
 		return true;
 	}
 
+	@Override
 	public synchronized ClientParamSet save(final ClientParamSet toCopy, final String newName, final String ownerEmail,
 	                                        final String ownerInitials,
 	                                        final boolean permanent) throws GWTServiceException {
@@ -538,6 +549,7 @@ public final class ServiceImpl extends SpringGwtServlet implements Service, Appl
 	}
 
 
+	@Override
 	public ClientParamFile[] getFiles(final ClientParamSet paramSet) throws GWTServiceException {
 		try {
 			final HttpSession session = getSession();
@@ -560,6 +572,7 @@ public final class ServiceImpl extends SpringGwtServlet implements Service, Appl
 		}
 	}
 
+	@Override
 	public ClientParamSetValues getParamSetValues(final ClientParamSet paramSet) throws GWTServiceException {
 		try {
 			final HttpSession session = getSession();
@@ -577,6 +590,7 @@ public final class ServiceImpl extends SpringGwtServlet implements Service, Appl
 		}
 	}
 
+	@Override
 	public synchronized ClientParamSetList getParamSetList() throws GWTServiceException {
 		try {
 			final HttpSession session = getSession();
@@ -597,6 +611,7 @@ public final class ServiceImpl extends SpringGwtServlet implements Service, Appl
 		return ClientProxyGenerator.getClientParamSetList(engineParametersList, cache.getTemporaryClientParamList());
 	}
 
+	@Override
 	public List<List<ClientValue>> getAllowedValues(final String[] params) throws GWTServiceException {
 		try {
 			getParamsDao().begin();
@@ -615,6 +630,7 @@ public final class ServiceImpl extends SpringGwtServlet implements Service, Appl
 		}
 	}
 
+	@Override
 	public ClientParamsValidations update(final ClientParamSet paramSet, final String param, final ClientValue value) throws GWTServiceException {
 		try {
 			final HttpSession session = getSession();
@@ -641,6 +657,7 @@ public final class ServiceImpl extends SpringGwtServlet implements Service, Appl
 		}
 	}
 
+	@Override
 	public void delete(final ClientParamSet paramSet) throws GWTServiceException {
 		try {
 			final HttpSession session = getSession();

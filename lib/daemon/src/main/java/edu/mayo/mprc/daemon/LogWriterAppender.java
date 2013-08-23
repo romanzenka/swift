@@ -82,8 +82,8 @@ class LogWriterAppender extends WriterAppender {
 
 	@Override
 	public void append(final LoggingEvent loggingEvent) {
-		if (allowedThreadNames.size() == 0 || allowedThreadNames.contains(loggingEvent.getThreadName())) {
-			if ((allowedLevels.size() == 0 || allowedLevels.contains(loggingEvent.getLevel())) && (notAllowedLevels.size() == 0 || !notAllowedLevels.contains(loggingEvent.getLevel()))) {
+		if (allowedThreadNames.isEmpty() || allowedThreadNames.contains(loggingEvent.getThreadName())) {
+			if ((allowedLevels.isEmpty() || allowedLevels.contains(loggingEvent.getLevel())) && (notAllowedLevels.isEmpty() || !notAllowedLevels.contains(loggingEvent.getLevel()))) {
 				if (allowedMDCKey == null || mdcValue.equals(loggingEvent.getMDC(allowedMDCKey))) {
 					super.append(loggingEvent);
 				}

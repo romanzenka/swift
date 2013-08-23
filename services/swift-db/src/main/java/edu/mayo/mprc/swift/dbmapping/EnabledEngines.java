@@ -98,7 +98,7 @@ public class EnabledEngines extends PersistableBase {
 		if (versions.size() == 1) {
 			return versions.get(0);
 		}
-		if (versions.size() == 0) {
+		if (versions.isEmpty()) {
 			return null;
 		}
 		Collections.sort(versions);

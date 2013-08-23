@@ -61,6 +61,7 @@ public final class ErrorDialog extends DialogBox {
 	}
 
 	class MyPositionCallback implements PositionCallback {
+		@Override
 		public void setPosition(final int width, final int height) {
 			final int clientHeight = Window.getClientHeight();
 

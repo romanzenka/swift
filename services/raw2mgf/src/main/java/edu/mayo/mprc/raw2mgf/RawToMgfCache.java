@@ -40,6 +40,7 @@ public final class RawToMgfCache extends WorkCache<RawToMgfWorkPacket> {
 	public static final class Ui implements ServiceUiFactory {
 		private static final String DEFAULT_CACHE = "var/cache/mgf";
 
+		@Override
 		public void createUI(final DaemonConfig daemon, final ResourceConfig resource, final UiBuilder builder) {
 			builder
 					.property(CacheConfig.CACHE_FOLDER, ".mgf cache folder", "When a .RAW file gets converted to .mgf, the result is stored in this folder. Subsequent conversions of the same file use the cached value."

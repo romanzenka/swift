@@ -81,6 +81,7 @@ public final class HeaderFilterStepPanel extends AbstractStepPanel {
 	 *
 	 * @return the containedStep that this mainPanel represents
 	 */
+	@Override
 	public CurationStepStub getContainedStep() {
 
 		this.containedStep.criteria = this.criteria.getText();
@@ -100,6 +101,7 @@ public final class HeaderFilterStepPanel extends AbstractStepPanel {
 	 * @param step the containedStep you want this mainPanel to represent
 	 * @throws ClassCastException if the containedStep passed in wasn't the type that the Panel can represent
 	 */
+	@Override
 	public void setContainedStep(final CurationStepStub step) throws ClassCastException {
 		if (!(step instanceof HeaderFilterStepStub)) {
 			ExceptionUtilities.throwCastException(step, HeaderFilterStepStub.class);
@@ -115,6 +117,7 @@ public final class HeaderFilterStepPanel extends AbstractStepPanel {
 	 *
 	 * @return a css style to use in conjunction with this mainPanel
 	 */
+	@Override
 	public String getStyle() {
 		return "shell-header-headerfilter";
 	}
@@ -122,6 +125,7 @@ public final class HeaderFilterStepPanel extends AbstractStepPanel {
 	/**
 	 * call this method when this mainPanel should look for updates in its contained containedStep
 	 */
+	@Override
 	public void update() {
 		criteria.setText(this.containedStep.criteria);
 
@@ -141,6 +145,7 @@ public final class HeaderFilterStepPanel extends AbstractStepPanel {
 		}
 	}
 
+	@Override
 	public String getImageURL() {
 		return "images/step-icon-filter.png";
 	}

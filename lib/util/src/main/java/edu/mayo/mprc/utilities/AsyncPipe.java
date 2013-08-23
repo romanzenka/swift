@@ -20,6 +20,7 @@ public final class AsyncPipe implements Runnable {
 		this.outputStream = outputStream;
 	}
 
+	@Override
 	public void run() {
 		try {
 			final byte[] buffer = new byte[BUFFER_SIZE];

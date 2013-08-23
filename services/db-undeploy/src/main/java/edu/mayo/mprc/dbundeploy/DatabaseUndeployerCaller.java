@@ -76,7 +76,7 @@ public final class DatabaseUndeployerCaller {
 						/**
 						 * If there is an error or any message in the undeployment task result object, report it.
 						 */
-						if (me.getValue().getExecutionError() != null || me.getValue().getMessages().size() > 0) {
+						if (me.getValue().getExecutionError() != null || !me.getValue().getMessages().isEmpty()) {
 							builder.append("\n").append(me.getValue().toString());
 						}
 

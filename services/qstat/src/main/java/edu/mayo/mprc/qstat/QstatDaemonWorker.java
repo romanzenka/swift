@@ -85,6 +85,7 @@ public final class QstatDaemonWorker extends WorkerBase {
 	}
 
 	public static final class Ui implements ServiceUiFactory {
+		@Override
 		public void createUI(final DaemonConfig daemon, final ResourceConfig resource, final UiBuilder builder) {
 			// No UI needed
 		}

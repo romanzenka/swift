@@ -41,6 +41,7 @@ public final class IdpQonvertWorker extends WorkerBase {
 
 	private File idpQonvertExecutable;
 
+	@Override
 	public void process(final WorkPacket workPacket, final UserProgressReporter progressReporter) {
 		if (!(workPacket instanceof IdpQonvertWorkPacket)) {
 			ExceptionUtilities.throwCastException(workPacket, IdpQonvertWorkPacket.class);
@@ -80,8 +81,8 @@ public final class IdpQonvertWorker extends WorkerBase {
 			Files.move(
 					from,
 					batchWorkPacket.getOutputFile());
-		} catch (Throwable t) {
-			throw new MprcException("Failed to move the resulting file from [" + from.getAbsolutePath() + "] to [" + batchWorkPacket.getOutputFile() + "]", t);
+		} catch (Exception e) {
+			throw new MprcException("Failed to move the resulting file from [" + from.getAbsolutePath() + "] to [" + batchWorkPacket.getOutputFile() + "]", e);
 		}
 		if (!batchWorkPacket.getOutputFile().exists() || !batchWorkPacket.getOutputFile().canRead() || !batchWorkPacket.getOutputFile().isFile()) {
 			throw new MprcException("idpQonvert failed to create file: " + batchWorkPacket.getOutputFile().getAbsolutePath());
@@ -167,10 +168,12 @@ public final class IdpQonvertWorker extends WorkerBase {
 			this.idpQonvertExecutable = idpQonvertExecutable;
 		}
 
+		@Override
 		public void save(final ConfigWriter writer) {
 			writer.put(IDPQONVERT_EXECUTABLE, getIdpQonvertExecutable());
 		}
 
+		@Override
 		public void load(final ConfigReader reader) {
 			setIdpQonvertExecutable(reader.get(IDPQONVERT_EXECUTABLE));
 		}
@@ -182,6 +185,7 @@ public final class IdpQonvertWorker extends WorkerBase {
 	}
 
 	public static final class Ui implements ServiceUiFactory {
+		@Override
 		public void createUI(final DaemonConfig daemon, final ResourceConfig resource, final UiBuilder builder) {
 			builder
 

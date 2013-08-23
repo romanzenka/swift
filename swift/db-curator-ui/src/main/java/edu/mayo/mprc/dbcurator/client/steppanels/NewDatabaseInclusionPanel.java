@@ -32,6 +32,7 @@ public final class NewDatabaseInclusionPanel extends AbstractStepPanel {
 		lstCommonSites.addItem("Manual Entry");
 		this.getCommonSites(); //generate the list of common sites
 		lstCommonSites.addChangeListener(new ChangeListener() {
+			@Override
 			public void onChange(final Widget widget) {
 				final ListBox source = (ListBox) widget;
 				final String selection = source.getItemText(source.getSelectedIndex());
@@ -56,11 +57,13 @@ public final class NewDatabaseInclusionPanel extends AbstractStepPanel {
 		initWidget(panel);
 	}
 
+	@Override
 	public CurationStepStub getContainedStep() {
 		this.containedStep.url = this.url.getText();
 		return this.containedStep;
 	}
 
+	@Override
 	public void setContainedStep(final CurationStepStub step) throws ClassCastException {
 		if (!(step instanceof NewDatabaseInclusionStub)) {
 			ExceptionUtilities.throwCastException(step, NewDatabaseInclusionStub.class);
@@ -70,6 +73,7 @@ public final class NewDatabaseInclusionPanel extends AbstractStepPanel {
 		update();
 	}
 
+	@Override
 	public String getStyle() {
 		return "shell-header-newdb";
 	}
@@ -90,10 +94,12 @@ public final class NewDatabaseInclusionPanel extends AbstractStepPanel {
 			endpoint.setServiceEntryPoint(GWT.getModuleBaseURL() + "CommonDataRequester");
 			dataRequester.getFTPDataSources(new AsyncCallback<Map<String, String>>() {
 
+				@Override
 				public void onFailure(final Throwable throwable) {
 					//do nothing we just can't add common formatters
 				}
 
+				@Override
 				public void onSuccess(final Map<String, String> trans) {
 					commonSites.putAll(trans);
 
@@ -110,10 +116,12 @@ public final class NewDatabaseInclusionPanel extends AbstractStepPanel {
 
 	}
 
+	@Override
 	public void update() {
 		url.setText(containedStep.url);
 	}
 
+	@Override
 	public String getImageURL() {
 		return "images/step-icon-add.png";
 	}

@@ -164,6 +164,7 @@ public final class Launcher implements FileListener {
 			server.addHandler(webAppContext);
 
 			future = Executors.newSingleThreadExecutor().submit(new Callable<Object>() {
+				@Override
 				public Object call() throws Exception {
 					server.start();
 					return 1;

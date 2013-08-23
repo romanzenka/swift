@@ -35,10 +35,10 @@ public final class SwiftConfig {
 	public static List<String> validateSwiftConfig(final ApplicationConfig swift) {
 		final List<String> errors = new ArrayList<String>();
 		// Make sure we have the essential modules
-		if (swift.getModulesOfConfigType(SwiftSearcher.Config.class).size() == 0) {
+		if (swift.getModulesOfConfigType(SwiftSearcher.Config.class).isEmpty()) {
 			errors.add("Without " + SwiftSearcher.NAME + " module you will not be able to run any Swift searches.");
 		}
-		if (swift.getModulesOfConfigType(WebUi.Config.class).size() == 0) {
+		if (swift.getModulesOfConfigType(WebUi.Config.class).isEmpty()) {
 			errors.add("Without " + WebUi.NAME + " modules you will not be able to interact with Swift.");
 		}
 		final int numDbs = swift.getModulesOfConfigType(DatabaseFactory.Config.class).size();
@@ -179,7 +179,7 @@ public final class SwiftConfig {
 		if (configs.size() > 1) {
 			throw new MprcException("Swift has more than one database defined.");
 		}
-		if (configs.size() == 0) {
+		if (configs.isEmpty()) {
 			throw new MprcException("Swift does not define a database.");
 		}
 		return configs.get(0);

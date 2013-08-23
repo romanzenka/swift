@@ -749,6 +749,7 @@ public final class TestSequestSubmission {
 
 	class ExceptionHandler implements Thread.UncaughtExceptionHandler {
 
+		@Override
 		public void uncaughtException(final Thread thread, final Throwable throwable) {
 			Assert.fail("thread failed", throwable);
 		}

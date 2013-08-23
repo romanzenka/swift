@@ -74,6 +74,7 @@ public final class SendReceiveTest extends MessagingTestBase {
 		expectedNumResponses = 0;
 
 		(new Thread() {
+			@Override
 			public void run() {
 				final Request request = receiveRequest();
 				service.stopReceiving();
@@ -117,6 +118,7 @@ public final class SendReceiveTest extends MessagingTestBase {
 		expectedNumResponses = 1;
 
 		(new Thread() {
+			@Override
 			public void run() {
 				final Request request = receiveRequest();
 				service.stopReceiving();
@@ -130,6 +132,7 @@ public final class SendReceiveTest extends MessagingTestBase {
 		// Send request
 		logChatty("Sending request, waiting for response");
 		service.sendRequest(REQUEST_1, PRIORITY, new ResponseListener() {
+			@Override
 			public void responseReceived(final Serializable response, final boolean isClosing) {
 				Assert.assertEquals(response, RESPONSE_1, "Response does not match expectations");
 				Assert.assertTrue(isClosing, "This must be the only message sent");
@@ -146,6 +149,7 @@ public final class SendReceiveTest extends MessagingTestBase {
 		expectedNumResponses = TOTAL_REQUESTS;
 
 		final Thread thread = new Thread() {
+			@Override
 			public void run() {
 				while (TOTAL_REQUESTS > numRequests.get()) {
 					Request request = null;
@@ -179,6 +183,7 @@ public final class SendReceiveTest extends MessagingTestBase {
 		final ResponseListener listener = new ResponseListener() {
 			private AtomicInteger expectedRequest = new AtomicInteger(1);
 
+			@Override
 			public void responseReceived(final Serializable response, final boolean isLast) {
 				logChatty("Response received: " + response.toString() + " is last: " + isLast);
 				numResponses.incrementAndGet();

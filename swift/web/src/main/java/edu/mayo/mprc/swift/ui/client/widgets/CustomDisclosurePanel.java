@@ -92,18 +92,22 @@ public final class CustomDisclosurePanel extends Composite implements
 			setStyle();
 		}
 
+		@Override
 		public final String getText() {
 			return DOM.getInnerText(labelTD);
 		}
 
+		@Override
 		public final void onClose(final CustomDisclosureEvent event) {
 			setStyle();
 		}
 
+		@Override
 		public final void onOpen(final CustomDisclosureEvent event) {
 			setStyle();
 		}
 
+		@Override
 		public final void setText(final String text) {
 			DOM.setInnerText(labelTD, text);
 		}
@@ -116,6 +120,7 @@ public final class CustomDisclosurePanel extends Composite implements
 			}
 		}
 
+		@Override
 		public final void onBrowserEvent(final Event event) {
 			// no need to call super.
 			if (DOM.eventGetType(event) == Event.ONCLICK) {
@@ -206,6 +211,7 @@ public final class CustomDisclosurePanel extends Composite implements
 	}
 
 
+	@Override
 	public void add(final Widget w) {
 		if (this.getContent() == null) {
 			setContent(w);
@@ -221,13 +227,14 @@ public final class CustomDisclosurePanel extends Composite implements
 	 *
 	 * @param handler the handler to be added (should not be null)
 	 */
-	public final void addEventHandler(final CustomDisclosureHandler handler) {
+	public void addEventHandler(final CustomDisclosureHandler handler) {
 		if (handlers == null) {
 			handlers = new ArrayList();
 		}
 		handlers.add(handler);
 	}
 
+	@Override
 	public void clear() {
 		setContent(null);
 	}
@@ -237,7 +244,7 @@ public final class CustomDisclosurePanel extends Composite implements
 	 *
 	 * @return the panel's current content widget
 	 */
-	public final Widget getContent() {
+	public Widget getContent() {
 		return content;
 	}
 
@@ -246,7 +253,7 @@ public final class CustomDisclosurePanel extends Composite implements
 	 *
 	 * @return the widget currently being used as a header
 	 */
-	public final Widget getHeader() {
+	public Widget getHeader() {
 		return staticHeader;
 	}
 
@@ -261,7 +268,7 @@ public final class CustomDisclosurePanel extends Composite implements
 	 * @return a reference to the header widget if it implements {@link HasText},
 	 *         <code>null</code> otherwise
 	 */
-	public final HasText getHeaderTextAccessor() {
+	public HasText getHeaderTextAccessor() {
 		final Widget widget = staticHeader;
 		return (widget instanceof HasText) ? (HasText) widget : null;
 	}
@@ -271,7 +278,7 @@ public final class CustomDisclosurePanel extends Composite implements
 	 *
 	 * @return <code>true</code> if panel is in open state
 	 */
-	public final boolean isOpen() {
+	public boolean isOpen() {
 		return isOpen;
 	}
 
@@ -305,10 +312,12 @@ public final class CustomDisclosurePanel extends Composite implements
 				}
 			}
 
+			@Override
 			public boolean hasNext() {
 				return (index < contained.length);
 			}
 
+			@Override
 			public Widget next() {
 				if (!hasNext()) {
 					throw new NoSuchElementException();
@@ -319,6 +328,7 @@ public final class CustomDisclosurePanel extends Composite implements
 				return w;
 			}
 
+			@Override
 			public void remove() {
 				if (last < 0) {
 					throw new IllegalStateException();
@@ -335,11 +345,13 @@ public final class CustomDisclosurePanel extends Composite implements
 		};
 	}
 
+	@Override
 	public Iterator<Widget> iterator() {
 		return createWidgetIterator(this,
 				new Widget[]{getContent()});
 	}
 
+	@Override
 	public boolean remove(final Widget w) {
 		if (w.equals(getContent())) {
 			setContent(null);
@@ -353,7 +365,7 @@ public final class CustomDisclosurePanel extends Composite implements
 	 *
 	 * @param handler the handler to be removed
 	 */
-	public final void removeEventHandler(final CustomDisclosureHandler handler) {
+	public void removeEventHandler(final CustomDisclosureHandler handler) {
 		if (handlers == null) {
 			return;
 		}
@@ -366,7 +378,7 @@ public final class CustomDisclosurePanel extends Composite implements
 	 *
 	 * @param content the widget to be used as the content panel
 	 */
-	public final void setContent(final Widget content) {
+	public void setContent(final Widget content) {
 		final Widget currentContent = this.content;
 
 		// Remove existing content widget.
@@ -389,7 +401,7 @@ public final class CustomDisclosurePanel extends Composite implements
 	 *
 	 * @param headerWidget the widget to be used as the header
 	 */
-	public final void setHeader(final Widget headerWidget) {
+	public void setHeader(final Widget headerWidget) {
 
 		staticHeader.setWidget(headerWidget);
 	}
@@ -400,7 +412,7 @@ public final class CustomDisclosurePanel extends Composite implements
 	 * @param isOpen <code>true</code> to open the panel, <code>false</code>
 	 *               to close
 	 */
-	public final void setOpen(final boolean isOpen) {
+	public void setOpen(final boolean isOpen) {
 		if (this.isOpen != isOpen) {
 			this.isOpen = isOpen;
 			setContentDisplay();

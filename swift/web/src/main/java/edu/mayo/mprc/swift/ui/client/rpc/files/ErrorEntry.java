@@ -21,6 +21,7 @@ public final class ErrorEntry extends Entry {
 		this.errorMessage = message;
 	}
 
+	@Override
 	public TreeItem createTreeItem() {
 		return new TreeItem(errorMessage);
 	}

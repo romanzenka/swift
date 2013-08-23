@@ -223,7 +223,7 @@ public abstract class WorkCache<T extends WorkPacket> implements NoLoggingWorker
 	 * For test writing purposes. Access to class internals.
 	 */
 	boolean isWorkInProgress() {
-		return workInProgress.size() != 0;
+		return !workInProgress.isEmpty();
 	}
 
 	private final class MyProgressListener implements ProgressListener {

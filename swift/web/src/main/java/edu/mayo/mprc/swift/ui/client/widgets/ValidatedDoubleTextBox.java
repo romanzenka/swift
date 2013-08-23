@@ -47,7 +47,7 @@ public final class ValidatedDoubleTextBox extends ValidatedTextBox {
 	 *
 	 * @return The lowest value this input will accept
 	 */
-	public final double getLow() {
+	public double getLow() {
 		return low;
 	}
 
@@ -56,11 +56,11 @@ public final class ValidatedDoubleTextBox extends ValidatedTextBox {
 	 *
 	 * @return The highest value this input will accept
 	 */
-	public final double getHigh() {
+	public double getHigh() {
 		return high;
 	}
 
-	public final double getDoubleValue() {
+	public double getDoubleValue() {
 		try {
 			return Double.valueOf(getText());
 		} catch (NumberFormatException ignore) {

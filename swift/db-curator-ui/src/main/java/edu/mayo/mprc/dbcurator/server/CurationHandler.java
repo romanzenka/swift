@@ -112,12 +112,12 @@ public final class CurationHandler {
 		curation.setDecoyRegex(toSync.getDecoyRegex());
 
 		// If we know where the resulting file went, we update the curation
-		if (toSync.getPathToResult() != null && toSync.getPathToResult().trim().length() > 0) {
+		if (toSync.getPathToResult() != null && !toSync.getPathToResult().trim().isEmpty()) {
 			curation.setCurationFile(new File(toSync.getPathToResult().trim()));
 		}
 
 		try {
-			if (toSync.getLastRunDate() == null || toSync.getLastRunDate().trim().length() == 0) {
+			if (toSync.getLastRunDate() == null || toSync.getLastRunDate().trim().isEmpty()) {
 				curation.setRunDate(null);
 			} else {
 				curation.setRunDate(dater.parseDateTime(toSync.getLastRunDate()));
@@ -190,7 +190,7 @@ public final class CurationHandler {
 
 		//if we have more steps to report on then one must be executing
 		if (i < toSync.getSteps().size()) { //we had a failure in the last step
-			if (this.lastRunStatus.getFailedStepValidations().size() > 0) {
+			if (!this.lastRunStatus.getFailedStepValidations().isEmpty()) {
 				final StepValidation failedValidation = this.lastRunStatus.getFailedStepValidations().get(0);
 				final CurationStepStub syncStep = toSync.getSteps().get(i);
 

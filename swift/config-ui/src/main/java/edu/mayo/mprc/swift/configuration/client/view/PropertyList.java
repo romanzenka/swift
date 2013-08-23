@@ -12,6 +12,7 @@ import java.util.Map;
 public final class PropertyList extends FlexTable implements ModuleView {
 	private Map<String, PropertyDefinition> properties = new HashMap<String, PropertyDefinition>();
 
+	@Override
 	public void loadUI(final Map<String, String> values) {
 		if (values == null) {
 			return;
@@ -56,6 +57,7 @@ public final class PropertyList extends FlexTable implements ModuleView {
 		}
 	}
 
+	@Override
 	public HashMap<String, String> saveUI() {
 		final HashMap<String, String> map = new HashMap<String, String>();
 		for (final PropertyDefinition prop : properties.values()) {
@@ -94,6 +96,7 @@ public final class PropertyList extends FlexTable implements ModuleView {
 		return getEditorValue(editor);
 	}
 
+	@Override
 	public Widget getModuleWidget() {
 		return this;
 	}

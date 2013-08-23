@@ -74,6 +74,7 @@ public class NewDatabaseInclusion implements CurationStep {
 	 * @return the validation object that was created during this process.  Basically an unchecked error handling
 	 *         mechanism.  You can check this object to see if there was any problems.
 	 */
+	@Override
 	public StepValidation performStep(final CurationExecutor exec) {
 		//create a new validation object for this run
 		this.recentRunValidation = new StepValidation();
@@ -149,6 +150,7 @@ public class NewDatabaseInclusion implements CurationStep {
 		return this.recentRunValidation;
 	}
 
+	@Override
 	public StepValidation preValidate(final CurationDao curationDao) {
 		final StepValidation preValidation = new StepValidation();
 
@@ -174,6 +176,7 @@ public class NewDatabaseInclusion implements CurationStep {
 		return preValidation;
 	}
 
+	@Override
 	public CurationStep createCopy() {
 		final NewDatabaseInclusion copy = new NewDatabaseInclusion();
 		copy.setUrl(this.url);
@@ -217,10 +220,12 @@ public class NewDatabaseInclusion implements CurationStep {
 		this.source = source;
 	}
 
+	@Override
 	public Integer getId() {
 		return id;
 	}
 
+	@Override
 	public void setId(final Integer id) {
 		this.id = id;
 	}
@@ -231,14 +236,17 @@ public class NewDatabaseInclusion implements CurationStep {
 	 */
 	private Integer lastRunCompletionCount = null;
 
+	@Override
 	public Integer getLastRunCompletionCount() {
 		return this.lastRunCompletionCount;
 	}
 
+	@Override
 	public void setLastRunCompletionCount(final Integer count) {
 		this.lastRunCompletionCount = count;
 	}
 
+	@Override
 	public String simpleDescription() {
 		final int lastPathIndex = url.lastIndexOf('/');
 		if (lastPathIndex > 0) {

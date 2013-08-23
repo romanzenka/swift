@@ -1,5 +1,6 @@
 package edu.mayo.mprc.swift.webservice.diff;
 
+import com.google.common.base.Objects;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import edu.mayo.mprc.MprcException;
 import edu.mayo.mprc.swift.WebUi;
@@ -44,7 +45,7 @@ public final class SwiftSearch {
 	public SwiftSearch(final SearchRun run, final SwiftSearchDefinition searchDefinition, final WebUi webUi) {
 		id = run.getId();
 		title = run.getTitle();
-		if (searchDefinition.getId() != run.getSwiftSearch()) {
+		if (Objects.equal(searchDefinition.getId(), run.getSwiftSearch())) {
 			throw new MprcException("Search must match the definition");
 		}
 		startTimestamp = run.getStartTimestamp();
@@ -59,8 +60,8 @@ public final class SwiftSearch {
 		fragmentTolerance = params.getFragmentTolerance().toString();
 		instrument = params.getInstrument().getName();
 		raw2mgfConvertor = params.getExtractMsnSettings().getCommand() + " " + params.getExtractMsnSettings().getCommandLineSwitches();
-		scaffoldProteinProbability = String.valueOf(100.0d * params.getScaffoldSettings().getProteinProbability()) + "%";
-		scaffoldPeptideProbability = String.valueOf(100.0d * params.getScaffoldSettings().getPeptideProbability()) + "%";
+		scaffoldProteinProbability = 100.0d * params.getScaffoldSettings().getProteinProbability() + "%";
+		scaffoldPeptideProbability = 100.0d * params.getScaffoldSettings().getPeptideProbability() + "%";
 		scaffoldMinimumPeptideCount = String.valueOf(params.getScaffoldSettings().getMinimumPeptideCount());
 		scaffoldMinimumNonTrypticTerminii = String.valueOf(params.getScaffoldSettings().getMinimumNonTrypticTerminii());
 		if (searchDefinition.getOutputFolder() != null && searchDefinition.getOutputFolder().isDirectory()) {

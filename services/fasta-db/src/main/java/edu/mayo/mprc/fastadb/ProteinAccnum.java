@@ -31,12 +31,18 @@ public final class ProteinAccnum extends PersistableBase {
 
 	@Override
 	public boolean equals(Object o) {
-		if (this == o) return true;
-		if (!(o instanceof ProteinAccnum)) return false;
+		if (this == o) {
+			return true;
+		}
+		if (!(o instanceof ProteinAccnum)) {
+			return false;
+		}
 
 		ProteinAccnum that = (ProteinAccnum) o;
 
-		if (!accnum.equals(that.accnum)) return false;
+		if (!accnum.equals(that.accnum)) {
+			return false;
+		}
 
 		return true;
 	}

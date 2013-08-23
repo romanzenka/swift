@@ -56,6 +56,7 @@ final class RawToMgfTask extends AsyncTaskBase implements FileProducingTask {
 		return getFileReference(this.inputFile);
 	}
 
+	@Override
 	public File getResultingFile() {
 		return mgfFile;
 	}
@@ -64,6 +65,7 @@ final class RawToMgfTask extends AsyncTaskBase implements FileProducingTask {
 	 * @return Work packet to be sent asynchronously. If it returns null, it means the work was done without a need
 	 *         to send a work packet.
 	 */
+	@Override
 	public WorkPacket createWorkPacket() {
 		if (inputFile.getName().endsWith(".mgf")) {
 			LOGGER.info("Skipping Raw2MGF for an mgf file " + inputFile.getAbsolutePath());
@@ -85,10 +87,12 @@ final class RawToMgfTask extends AsyncTaskBase implements FileProducingTask {
 		}
 	}
 
+	@Override
 	public void onSuccess() {
 		completeWhenFilesAppear(mgfFile);
 	}
 
+	@Override
 	public void onProgress(final ProgressInfo progressInfo) {
 		if (progressInfo instanceof RawToMgfResult) {
 			final RawToMgfResult result = (RawToMgfResult) progressInfo;

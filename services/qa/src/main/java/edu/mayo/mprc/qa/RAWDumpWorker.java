@@ -53,7 +53,7 @@ public final class RAWDumpWorker extends WorkerBase {
 	private static final int MAX_UNSHORTENED_PATH_LENGTH = 100;
 
 	protected RAWDumpWorker(final Config config) {
-		setWrapperScript(config.getWrapperScript() != null && config.getWrapperScript().length() > 0 ? new File(config.getWrapperScript()) : null);
+		setWrapperScript(config.getWrapperScript() != null && !config.getWrapperScript().isEmpty() ? new File(config.getWrapperScript()) : null);
 		setWindowsExecWrapperScript(config.getWindowsExecWrapperScript());
 	}
 
@@ -213,7 +213,7 @@ public final class RAWDumpWorker extends WorkerBase {
 			parameters.add(wrapperScript.getAbsolutePath());
 		}
 
-		if (isWindowsExecutable && windowsWrapperScript != null && !FileUtilities.isWindowsPlatform() && windowsWrapperScript.length() > 0) {
+		if (isWindowsExecutable && windowsWrapperScript != null && !FileUtilities.isWindowsPlatform() && !windowsWrapperScript.isEmpty()) {
 			parameters.add(windowsWrapperScript);
 		}
 
@@ -233,6 +233,7 @@ public final class RAWDumpWorker extends WorkerBase {
 	 */
 	@Component("rawDumpWorkerFactory")
 	public static final class Factory extends WorkerFactoryBase<Config> {
+		@Override
 		public Worker create(final Config config, final DependencyResolver dependencies) {
 			final RAWDumpWorker worker = new RAWDumpWorker(config);
 
@@ -307,6 +308,7 @@ public final class RAWDumpWorker extends WorkerBase {
 		private static final String DEFAULT_RAWDUMP_EXEC = "bin/rawExtract/MprcExtractRaw.exe";
 		private static final String DEFAULT_CMDS = "--data";
 
+		@Override
 		public void createUI(final DaemonConfig daemon, final ResourceConfig resource, final UiBuilder builder) {
 			builder.property("rawDumpExecutable", "Executable Path", "RAW Dump executable path."
 					+ "<br/>The RAW Dump executable has been inplemented in house and is included with the Swift installation. "

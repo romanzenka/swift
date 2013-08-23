@@ -85,6 +85,7 @@ public class Protease extends EvolvableBase implements Serializable, Comparable<
 		return getName() + ": " + rnminus1 + " " + rn;
 	}
 
+	@Override
 	public int compareTo(final Protease o) {
 		return ComparisonChain.start().nullsFirst()
 				.compare(getName(), o.getName())

@@ -242,6 +242,7 @@ public final class SearchRunner implements Runnable {
 		}
 	}
 
+	@Override
 	public void run() {
 		while (true) {
 			try {
@@ -1023,6 +1024,7 @@ public final class SearchRunner implements Runnable {
 			this.runner = runner;
 		}
 
+		@Override
 		public void resume() {
 			runner.service.execute(runner);
 		}

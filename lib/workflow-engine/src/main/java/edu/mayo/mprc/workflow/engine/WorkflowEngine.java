@@ -100,7 +100,7 @@ public final class WorkflowEngine {
 		synchronized (resumeLock) {
 			for (final Task task : allTasks) {
 				task.initialize();
-				if (task.getInputs().size() == 0) {
+				if (task.getInputs().isEmpty()) {
 					task.setState(TaskState.READY);
 				}
 			}
@@ -195,7 +195,7 @@ public final class WorkflowEngine {
 	 */
 	public boolean isWorkAvailable() {
 		synchronized (resumeLock) {
-			return tasksToProcess.size() > 0;
+			return !tasksToProcess.isEmpty();
 		}
 	}
 
@@ -210,7 +210,7 @@ public final class WorkflowEngine {
 		synchronized (resumeLock) {
 			this.resumer = null;
 
-			if (tasksToProcess.size() > 0) {
+			if (!tasksToProcess.isEmpty()) {
 				runResumer = true;
 			} else {
 				this.resumer = resumer;

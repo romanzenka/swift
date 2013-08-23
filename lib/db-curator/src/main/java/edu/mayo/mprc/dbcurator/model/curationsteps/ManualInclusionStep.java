@@ -57,6 +57,7 @@ public class ManualInclusionStep implements CurationStep {
 	 * @param exe the executor we are performing the step for
 	 * @return the post validation.
 	 */
+	@Override
 	public StepValidation performStep(final CurationExecutor exe) {
 		this.runValidation = this.preValidate(exe.getCurationDao());
 
@@ -95,6 +96,7 @@ public class ManualInclusionStep implements CurationStep {
 	 * @param curationDao
 	 * @return the @see StepValidation to interrogate for issues
 	 */
+	@Override
 	public StepValidation preValidate(final CurationDao curationDao) {
 		final StepValidation preValidation = new StepValidation();
 
@@ -127,6 +129,7 @@ public class ManualInclusionStep implements CurationStep {
 	 *
 	 * @return a cropy of this step
 	 */
+	@Override
 	public CurationStep createCopy() {
 		final ManualInclusionStep copy = new ManualInclusionStep();
 		copy.setHeader(this.header);
@@ -159,10 +162,12 @@ public class ManualInclusionStep implements CurationStep {
 	/**
 	 * the id of this object that can uniquly identify the step
 	 */
+	@Override
 	public Integer getId() {
 		return id;
 	}
 
+	@Override
 	public void setId(final Integer id) {
 		this.id = id;
 	}
@@ -173,14 +178,17 @@ public class ManualInclusionStep implements CurationStep {
 	 */
 	private Integer lastRunCompletionCount = null;
 
+	@Override
 	public Integer getLastRunCompletionCount() {
 		return this.lastRunCompletionCount;
 	}
 
+	@Override
 	public void setLastRunCompletionCount(final Integer count) {
 		this.lastRunCompletionCount = count;
 	}
 
+	@Override
 	public String simpleDescription() {
 		return "user sequence";
 	}

@@ -20,10 +20,12 @@ public final class RunnerView extends SimplePanel {
 	public RunnerView(final Context context, final ResourceModel model) {
 		runnerType = new TabPanel();
 		runnerType.addTabListener(new TabListener() {
+			@Override
 			public boolean onBeforeTabSelected(final SourcesTabEvents sender, final int tabIndex) {
 				return true;
 			}
 
+			@Override
 			public void onTabSelected(final SourcesTabEvents sender, final int tabIndex) {
 				final String newType = runnerType.getTabBar().getSelectedTab() == 0 ? "localRunner" : "sgeRunner";
 				if (newType.equals(model.getType())) {
@@ -34,9 +36,11 @@ public final class RunnerView extends SimplePanel {
 				final ModuleModel module = (ModuleModel) model.getParent();
 				ConfigurationService.App.getInstance().changeRunner(module.getService().getId(), newType,
 						new AsyncCallback<Void>() {
+							@Override
 							public void onFailure(final Throwable caught) {
 							}
 
+							@Override
 							public void onSuccess(final Void result) {
 							}
 						});

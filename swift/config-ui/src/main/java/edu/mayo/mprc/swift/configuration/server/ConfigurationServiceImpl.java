@@ -42,6 +42,7 @@ public final class ConfigurationServiceImpl extends SpringGwtServlet implements 
 	 * <p/>
 	 * As the configuration gets saved, we produce startup scripts as well.
 	 */
+	@Override
 	public UiChangesReplayer saveConfiguration() throws GWTServiceException {
 		try {
 			return getData().saveConfig(null);
@@ -50,6 +51,7 @@ public final class ConfigurationServiceImpl extends SpringGwtServlet implements 
 		}
 	}
 
+	@Override
 	public ApplicationModel loadConfiguration() throws GWTServiceException {
 		final File swiftConfig = new File(Swift.CONFIG_FILE_NAME);
 		return loadFromFile(swiftConfig);

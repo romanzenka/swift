@@ -115,6 +115,6 @@ public final class ExtractMsnWrapper {
 	 * We are running wine iff there is a wrapper script.
 	 */
 	private boolean isWine() {
-		return wrapperScript != null && wrapperScript.length() > 0 && !FileUtilities.isWindowsPlatform();
+		return wrapperScript != null && !wrapperScript.isEmpty() && !FileUtilities.isWindowsPlatform();
 	}
 }

@@ -37,7 +37,7 @@ public final class ResourceTable extends FactoryBase<ResourceConfig, Object> imp
 	}
 
 	private void initialize() {
-		if (table.size() != 0) {
+		if (!table.isEmpty()) {
 			return;
 		}
 

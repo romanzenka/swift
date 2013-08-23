@@ -204,12 +204,14 @@ public final class DaemonWorkerTester implements Closeable {
 			return lastError;
 		}
 
+		@Override
 		public void requestEnqueued(final String hostString) {
 			if (null != userListener) {
 				userListener.requestEnqueued(hostString);
 			}
 		}
 
+		@Override
 		public void requestProcessingStarted(final String hostString) {
 			LOGGER.debug("Starting work");
 			if (null != userListener) {
@@ -217,6 +219,7 @@ public final class DaemonWorkerTester implements Closeable {
 			}
 		}
 
+		@Override
 		public void requestProcessingFinished() {
 			success = true;
 			done = true;
@@ -226,6 +229,7 @@ public final class DaemonWorkerTester implements Closeable {
 			}
 		}
 
+		@Override
 		public void requestTerminated(final Exception e) {
 			LOGGER.error("Work failed", e);
 			lastError = e;
@@ -235,6 +239,7 @@ public final class DaemonWorkerTester implements Closeable {
 			}
 		}
 
+		@Override
 		public void userProgressInformation(final ProgressInfo progressInfo) {
 			LOGGER.debug("Work progress: " + progressInfo.toString());
 			if (null != userListener) {

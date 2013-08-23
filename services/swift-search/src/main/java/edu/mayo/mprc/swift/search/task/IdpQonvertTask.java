@@ -52,6 +52,7 @@ public final class IdpQonvertTask extends AsyncTaskBase {
 	 * @return Work packet to be sent asynchronously. If it returns null, it means the work was done without a need
 	 *         to send a work packet.
 	 */
+	@Override
 	public WorkPacket createWorkPacket() {
 		setDescription("IdpQonvert conversion of " + fileTokenFactory.fileToTaggedDatabaseToken(searchTask.getOutputFile()));
 		IdpQonvertSettings params = new IdpQonvertSettings();
@@ -63,6 +64,7 @@ public final class IdpQonvertTask extends AsyncTaskBase {
 				getFullId(), isFromScratch());
 	}
 
+	@Override
 	public void onSuccess() {
 		FileUtilities.waitForFile(getResultingFile(), new FileListener() {
 			@Override
@@ -91,6 +93,7 @@ public final class IdpQonvertTask extends AsyncTaskBase {
 	}
 
 
+	@Override
 	public void onProgress(final ProgressInfo progressInfo) {
 	}
 

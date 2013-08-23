@@ -34,7 +34,7 @@ public final class JmsBrokerThread {
 			this.broker = new BrokerService();
 			this.broker.setPersistent(false);
 			this.broker.setUseJmx(true);
-			if (brokerName != null && brokerName.length() != 0) {
+			if (brokerName != null && !brokerName.isEmpty()) {
 				this.broker.setBrokerObjectName(new ObjectName(brokerName, "swift", "2.0"));
 			}
 			this.broker.addConnector(uri);

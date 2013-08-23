@@ -34,7 +34,7 @@ public final class SearchDbDaoHibernate extends DaoBase implements RuntimeInitia
 	private SwiftDao swiftDao;
 	private FastaDbDao fastaDbDao;
 
-	private final String MAP = "edu/mayo/mprc/searchdb/dao/";
+	private static final String MAP = "edu/mayo/mprc/searchdb/dao/";
 	/**
 	 * Max delta for storing the protein/peptide probability.
 	 */

@@ -45,7 +45,7 @@ public final class SwiftWebContext {
 					//if id matches. Throw exceptions if in any other case.
 					DaemonConfig daemonConfig = null;
 
-					if (swiftConfig.getDaemons().size() == 0) {
+					if (swiftConfig.getDaemons().isEmpty()) {
 						throw new MprcException("No daemon has been defined in the Swift config file. Define daemon to swift config file and try again.");
 					} else if (swiftConfig.getDaemons().size() > 1 && daemonId == null) {
 						throw new MprcException("Multiple daemons are defined in the Swift config file, but no daemon was selected to be run. Select daemon and try again.");

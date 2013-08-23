@@ -31,6 +31,7 @@ public final class HelpPopupButton extends Label implements ClickListener {
 		this.addClickListener(this);
 	}
 
+	@Override
 	public void onClick(final Widget widget) {
 		final DialogBox dialogBox = new DialogBox(true, true);
 		dialogBox.setWidget(helpHtml);

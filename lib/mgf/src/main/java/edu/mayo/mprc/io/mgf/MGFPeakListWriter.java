@@ -100,6 +100,7 @@ public final class MGFPeakListWriter implements Closeable {
 	 *
 	 * @throws IOException
 	 */
+	@Override
 	public void close() {
 		try {
 			if (bufferedWriter != null) {

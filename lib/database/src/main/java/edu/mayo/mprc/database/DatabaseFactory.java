@@ -200,6 +200,7 @@ public final class DatabaseFactory extends FactoryBase<ResourceConfig, SessionFa
 			this.schema = schema;
 		}
 
+		@Override
 		public void save(final ConfigWriter writer) {
 			writer.put("url", getUrl(), "JDBC-style URL of the server");
 			writer.put("username", getUserName(), "Database user");
@@ -210,6 +211,7 @@ public final class DatabaseFactory extends FactoryBase<ResourceConfig, SessionFa
 			writer.put("schema", getSchema(), "Database schema name");
 		}
 
+		@Override
 		public void load(final ConfigReader reader) {
 			url = reader.get("url");
 			userName = reader.get("username");

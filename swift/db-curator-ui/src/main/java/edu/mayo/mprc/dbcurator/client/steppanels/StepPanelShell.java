@@ -115,6 +115,7 @@ class StepPanelShell extends Composite {
 
 		expandButton = new Image("images/rightarrow.png");
 		expandButton.addClickListener(new ClickListener() {
+			@Override
 			public void onClick(final Widget sender) {
 				toggleCollapse();
 			}
@@ -122,6 +123,7 @@ class StepPanelShell extends Composite {
 
 		collapseButton = new Image("images/downarrow.png");
 		collapseButton.addClickListener(new ClickListener() {
+			@Override
 			public void onClick(final Widget sender) {
 				toggleCollapse();
 			}
@@ -139,6 +141,7 @@ class StepPanelShell extends Composite {
 //		removalButton.setOnStyle("stepshell-header-stepremover");
 //		removalButton.setOffStyle("stepshell-header-stepremover");
 		removalButton.addClickListener(new ClickListener() {
+			@Override
 			public void onClick(final Widget sender) {
 				if (StepPanelShell.this.containedStepPanel.isEditable()) {
 					container.remove(StepPanelShell.this);
@@ -188,6 +191,7 @@ class StepPanelShell extends Composite {
 	/**
 	 * method to call when we want to load this shell
 	 */
+	@Override
 	protected void onLoad() {
 		super.onLoad();
 	}
@@ -204,7 +208,7 @@ class StepPanelShell extends Composite {
 
 		//print any error messages out into the error message box
 		if (this.containedStepPanel.getContainedStep().getErrorMessages() != null
-				&& this.containedStepPanel.getContainedStep().getErrorMessages().size() > 0) {
+				&& !this.containedStepPanel.getContainedStep().getErrorMessages().isEmpty()) {
 			final StringBuilder builder = new StringBuilder();
 			for (final Object o : this.containedStepPanel.getContainedStep().getErrorMessages()) {
 				builder.append((String) o);

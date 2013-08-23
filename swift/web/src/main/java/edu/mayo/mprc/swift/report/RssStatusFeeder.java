@@ -86,7 +86,7 @@ public final class RssStatusFeeder implements HttpRequestHandler {
 	protected synchronized SyndFeed getFeed(final boolean showSuccess, final boolean showFailures, final boolean showWarnings) {
 		final Date now = new Date();
 
-		final String cacheKey = String.valueOf(showSuccess) + "_" + String.valueOf(showFailures) + "_" + String.valueOf(showWarnings);
+		final String cacheKey = showSuccess + "_" + showFailures + "_" + showWarnings;
 
 		final SyndFeed cachedFeed = getCachedFeed(cacheKey);
 

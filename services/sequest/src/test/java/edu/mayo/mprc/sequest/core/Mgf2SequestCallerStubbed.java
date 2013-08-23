@@ -21,6 +21,7 @@ class Mgf2SequestCallerStubbed implements Mgf2SequestInterface {
 	private File hostsFile;
 	private int maxCommandLineLength;
 
+	@Override
 	public void callSequest(final File tarFile, final File paramsFile, final File mgfFile, final long startTimeOut, final long watchDogTimeOut, final File hdrFile) {
 
 		// validate that mgf file exists
@@ -84,14 +85,17 @@ class Mgf2SequestCallerStubbed implements Mgf2SequestInterface {
 
 	}
 
+	@Override
 	public void setSequestExe(final String sequestexe) {
 		this.sequestExe = sequestexe;
 	}
 
+	@Override
 	public void setHostsFile(final File hostsFile) {
 		this.hostsFile = hostsFile;
 	}
 
+	@Override
 	public void setMaxCommandLineLength(final int commandlinelength) {
 		this.maxCommandLineLength = commandlinelength;
 	}

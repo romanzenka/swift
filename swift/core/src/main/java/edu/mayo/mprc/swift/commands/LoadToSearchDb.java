@@ -74,6 +74,7 @@ public final class LoadToSearchDb implements SwiftCommand {
 	 *
 	 * @param environment The Swift environment to execute within.
 	 */
+	@Override
 	public ExitCode run(final SwiftEnvironment environment) {
 		try {
 			final long start = System.currentTimeMillis();

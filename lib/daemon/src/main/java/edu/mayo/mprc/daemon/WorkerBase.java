@@ -26,6 +26,7 @@ public abstract class WorkerBase implements Worker {
 	 * @param workPacket       Work packet to be processed.
 	 * @param progressReporter To report progress, success or failures.
 	 */
+	@Override
 	public void processRequest(final WorkPacket workPacket, final ProgressReporter progressReporter) {
 		try {
 			progressReporter.reportStart(MonitorUtilities.getHostInformation());
