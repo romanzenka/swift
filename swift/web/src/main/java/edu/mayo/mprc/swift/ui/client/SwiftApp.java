@@ -1,8 +1,6 @@
 package edu.mayo.mprc.swift.ui.client;
 
 import com.google.gwt.core.client.EntryPoint;
-import com.google.gwt.regexp.shared.MatchResult;
-import com.google.gwt.regexp.shared.RegExp;
 import com.google.gwt.user.client.Cookies;
 import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.Window;
@@ -22,7 +20,7 @@ import java.util.Map;
 public final class SwiftApp implements EntryPoint, HidesPageContentsWhileLoading {
 
 	private static final String SELECT_USER_STRING = "<Select User>";
-	private static final RegExp TITLE_PROHIBITED = RegExp.compile("[^a-zA-Z0-9-+._()[\\\\]{}=# ]");
+	private static final String TITLE_ALLOWED = "^[a-zA-Z0-9-+._()\\[\\]{}=# ]*$";
 
 	private ListBox users = new ListBox();
 	private TextBox title = new TextBox();
@@ -565,9 +563,9 @@ public final class SwiftApp implements EntryPoint, HidesPageContentsWhileLoading
 			updateOutputLocation();
 
 			String titleText = title.getText();
-			MatchResult exec = TITLE_PROHIBITED.exec(titleText);
-			if (exec != null) {
-				Window.alert("The character " + exec.getGroup(0) + " is not allowed in search title");
+
+			if (!titleText.matches(TITLE_ALLOWED)) {
+				Window.alert("The search title " + titleText + " is invalid. Please use only letters, numbers, - + . _ ( ) [ ] { } = # and a space.");
 				title.setFocus(true);
 				return;
 			}
