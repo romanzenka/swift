@@ -467,7 +467,7 @@ public final class SwiftApp implements EntryPoint, HidesPageContentsWhileLoading
 	public void updateOutputLocation() {
 		if (!outputPathChangeEnabled || !outputPathUserSpecified) {
 			// The user is not able to or chose not to influence output path, it gets set automatically
-			final List<ClientFileSearch> fileSearches = files != null ? files.getData(enabledEnginesPanel.getEnabledEngines()) : null;
+			final List<ClientFileSearch> fileSearches = getFileSearches();
 			if (files == null || (fileSearches == null) || (fileSearches.size() == 0)) {
 				if (!outputPathChangeEnabled) {
 					output.setText("<No Files Selected>");
@@ -506,6 +506,10 @@ public final class SwiftApp implements EntryPoint, HidesPageContentsWhileLoading
 			}
 		}
 		// TODO update validation state;
+	}
+
+	private List<ClientFileSearch> getFileSearches() {
+		return files != null ? files.getData(enabledEnginesPanel.getEnabledEngines()) : null;
 	}
 
 	/**
@@ -556,14 +560,20 @@ public final class SwiftApp implements EntryPoint, HidesPageContentsWhileLoading
 			final String effectiveOutputPath = outputPathUserSpecified ? output.getText() : outputPath;
 			final String user = users.getValue(users.getSelectedIndex());
 
-			if (effectiveOutputPath == null) {
+			if (titleText == null) {
 				Window.alert("No title specified");
 				title.setFocus(true);
 				return;
 			}
 
-			if (files == null) {
+			List<ClientFileSearch> fileSearches = getFileSearches();
+			if (fileSearches == null || fileSearches.size() == 0) {
 				Window.alert("No files added to the search");
+				return;
+			}
+
+			if (effectiveOutputPath == null || "".equals(effectiveOutputPath)) {
+				Window.alert("The output folder not specified");
 				return;
 			}
 
