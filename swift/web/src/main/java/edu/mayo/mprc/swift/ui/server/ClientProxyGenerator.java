@@ -193,9 +193,9 @@ public final class ClientProxyGenerator {
 	public FileSearch convertFrom(final ClientFileSearch entry) {
 		return new FileSearch(
 				new File(browseRoot, entry.getPath()),
-				entry.getBiologicalSample(),
-				entry.getCategoryName(),
-				entry.getExperiment(),
+				entry.getBiologicalSample().trim(),
+				entry.getCategoryName().trim(),
+				entry.getExperiment().trim(),
 				convertFrom(entry.getEnabledEngines()),
 				null);
 	}
