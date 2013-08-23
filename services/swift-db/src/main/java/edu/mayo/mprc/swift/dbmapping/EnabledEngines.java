@@ -43,9 +43,9 @@ public class EnabledEngines extends PersistableBase {
 		return engineConfigs.contains(config);
 	}
 
-	public boolean isEnabled(final String code, final String version) {
+	public boolean isEnabled(final String code) {
 		for (final SearchEngineConfig config : engineConfigs) {
-			if (config.getCode().equals(code) && config.getVersion().equals(version)) {
+			if (config.getCode().equals(code)) {
 				return true;
 			}
 		}
