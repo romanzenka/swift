@@ -473,7 +473,7 @@ public final class SearchRunner implements Runnable {
 			// All 'normal' searches get normal entries
 			// While building these, the Scaffold search entry itself is initialized in a separate list
 			// The IdpQonvert search is special as well, it is set up to process the results of the myrimatch search
-			if (isNormalEngine(engine) && inputFile.getEnabledEngines().isEnabled(engine.getCode())) {
+			if (isNormalEngine(engine) && inputFile.getEnabledEngines().isEnabled(engine.getCode(), engine.getVersion())) {
 				final File paramFile = getParamFile(engine, searchParameters);
 
 				DatabaseDeploymentResult deploymentResult = null;
