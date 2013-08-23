@@ -194,6 +194,8 @@ public final class ScaffoldWorker extends WorkerBase {
 		try {
 			final String experimentName = FileUtilities.stripGzippedExtension(work.getScaffoldFile().getName());
 			final XMLBuilder builder = XMLBuilder.create("Scaffold");
+			builder.getDocument().setXmlStandalone(true);
+
 			builder.a("version", "1.5")
 					.e("Experiment")
 					.a("name", experimentName)
