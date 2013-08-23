@@ -145,7 +145,7 @@
                         <module>edu.mayo.mprc.common.Common</module>
                         <module>edu.mayo.mprc.swift.configuration.Configuration</module>
                     </modules>
-                    <style>OBF</style>
+                    <style>DETAILED</style>
                 </configuration>
             </plugin>
 

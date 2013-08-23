@@ -315,6 +315,7 @@ public final class SearchDbDaoHibernate extends DaoBase implements RuntimeInitia
 			}
 			savedAnalysis = save(analysis, analysisEqualityCriteria(analysis), false);
 		}
+		getSession().saveOrUpdate(reportData);
 		reportData.setAnalysisId(savedAnalysis.getId());
 		return savedAnalysis;
 	}
@@ -363,8 +364,7 @@ public final class SearchDbDaoHibernate extends DaoBase implements RuntimeInitia
 						" inner join pe.accessionNumber as pac" +
 						" where pe.sequence = ps " +
 						" and rd.analysisId = a.id " +
-						" and pac.accnum = :accessionNumber" +
-						" order by rd.searchRun.startTimestamp")
+						" and pac.accnum = :accessionNumber")
 				.setParameter("accessionNumber", accessionNumber)
 				.list();
 	}
