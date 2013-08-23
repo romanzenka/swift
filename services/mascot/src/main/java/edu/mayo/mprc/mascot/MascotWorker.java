@@ -392,7 +392,7 @@ public final class MascotWorker extends WorkerBase {
 	 * A factory capable of creating the worker
 	 */
 	@Component("mascotWorkerFactory")
-	public static final class Factory extends WorkerFactoryBase<Config> implements EngineFactory {
+	public static final class Factory extends WorkerFactoryBase<Config> implements EngineFactory<Config, Worker> {
 		private MascotMappingFactory mappingFactory;
 
 		@Override

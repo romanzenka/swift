@@ -228,7 +228,7 @@ public final class XTandemWorker extends WorkerBase {
 	 * A factory capable of creating the worker
 	 */
 	@Component("xTandemWorkerFactory")
-	public static final class Factory extends WorkerFactoryBase<Config> implements EngineFactory {
+	public static final class Factory extends WorkerFactoryBase<Config> implements EngineFactory<Config, Worker> {
 
 		private static final EngineMetadata ENGINE_METADATA = new EngineMetadata(
 				"TANDEM", ".xml", "Tandem", true, "tandem", new XTandemMappingFactory(),

@@ -20,9 +20,11 @@ public final class SimpleRunner extends AbstractRunner {
 	public static final String NAME = "Local Runner";
 	private boolean enabled = true;
 	private boolean operational;
-	private WorkerFactory factory;
+	private WorkerFactory<ResourceConfig, Worker> factory;
 	private ExecutorService executorService;
 	private DaemonConnection daemonConnection = null;
+	private ResourceConfig config;
+	private DependencyResolver dependencies;
 
 	public SimpleRunner() {
 		super();
@@ -37,7 +39,7 @@ public final class SimpleRunner extends AbstractRunner {
 	protected void processRequest(final DaemonRequest request) {
 		final Worker worker;
 		try {
-			worker = getFactory().createWorker();
+			worker = getFactory().create(config, dependencies);
 		} catch (Exception e) {
 			request.sendResponse(e, true);
 			return;
@@ -47,7 +49,7 @@ public final class SimpleRunner extends AbstractRunner {
 
 	@Override
 	public void check() {
-		factory.checkWorker();
+		factory.create(config, dependencies).check();
 	}
 
 	@Override
@@ -56,11 +58,11 @@ public final class SimpleRunner extends AbstractRunner {
 		executorService.shutdownNow();
 	}
 
-	public WorkerFactory getFactory() {
+	public WorkerFactory<ResourceConfig, Worker> getFactory() {
 		return factory;
 	}
 
-	public void setFactory(final WorkerFactory factory) {
+	public void setFactory(final WorkerFactory<ResourceConfig, Worker> factory) {
 		this.factory = factory;
 	}
 
@@ -100,6 +102,22 @@ public final class SimpleRunner extends AbstractRunner {
 	@Override
 	public void setDaemonConnection(final DaemonConnection daemonConnection) {
 		this.daemonConnection = daemonConnection;
+	}
+
+	public void setConfig(ResourceConfig config) {
+		this.config = config;
+	}
+
+	public ResourceConfig getConfig() {
+		return config;
+	}
+
+	public void setDependencies(DependencyResolver dependencies) {
+		this.dependencies = dependencies;
+	}
+
+	public DependencyResolver getDependencies() {
+		return dependencies;
 	}
 
 	private final class MyProgressReporter implements ProgressReporter {
@@ -185,7 +203,9 @@ public final class SimpleRunner extends AbstractRunner {
 
 			final ResourceConfig workerFactoryConfig = config.getWorkerConfiguration();
 
-			runner.setFactory(getWorkerFactory(getTable(), workerFactoryConfig, dependencies));
+			runner.setFactory(getWorkerFactory(getTable(), workerFactoryConfig));
+			runner.setConfig(workerFactoryConfig);
+			runner.setDependencies(dependencies);
 			final int numThreads = config.getNumThreads();
 			runner.setExecutorService(new SimpleThreadPoolExecutor(numThreads, runner.getFactory().getUserName(), true));
 
@@ -200,14 +220,9 @@ public final class SimpleRunner extends AbstractRunner {
 			return table;
 		}
 
-		private static WorkerFactoryBase getWorkerFactory(final MultiFactory table, final ResourceConfig config, final DependencyResolver dependencies) {
+		private static WorkerFactoryBase getWorkerFactory(final MultiFactory table, final ResourceConfig config) {
 			final WorkerFactoryBase factory =
-					(WorkerFactoryBase) table.getFactory(config.getClass());
-			// Since the factory by default does not even know what is it creating (that would require duplicating
-			// the description into the factory), set the description to the user name of created module.
-			factory.setConfig(config);
-			factory.setDependencies(dependencies);
-
+					((WorkerFactoryBase) table.getFactory(config.getClass()));
 			return factory;
 		}
 

@@ -254,7 +254,7 @@ public final class ScaffoldWorker extends WorkerBase {
 	 * A factory capable of creating the worker
 	 */
 	@Component("scaffoldWorkerFactory")
-	public static final class Factory extends WorkerFactoryBase<Config> implements EngineFactory {
+	public static final class Factory extends WorkerFactoryBase<Config> implements EngineFactory<Config, Worker> {
 
 		private static final EngineMetadata ENGINE_METADATA = new EngineMetadata(
 				"SCAFFOLD", ".sf3", "Scaffold", true, "scaffold", null,

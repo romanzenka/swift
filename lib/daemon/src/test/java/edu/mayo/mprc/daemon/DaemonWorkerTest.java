@@ -1,5 +1,6 @@
 package edu.mayo.mprc.daemon;
 
+import edu.mayo.mprc.config.DependencyResolver;
 import edu.mayo.mprc.config.ResourceConfig;
 import edu.mayo.mprc.config.ui.ServiceUiFactory;
 import edu.mayo.mprc.daemon.exception.DaemonException;
@@ -22,14 +23,15 @@ public final class DaemonWorkerTest {
 
 	@Test
 	public void shouldDoSimpleWorkInThreadPool() throws InterruptedException {
-		final DaemonWorkerTester tester = new DaemonWorkerTester(new WorkerFactory() {
+		final DaemonWorkerTester tester = new DaemonWorkerTester(new WorkerFactory<ResourceConfig, Worker>() {
 			@Override
-			public Worker createWorker() {
+			public Worker create(ResourceConfig config, DependencyResolver dependencies) {
 				return createSimpleWorker();
 			}
 
 			@Override
-			public void checkWorker() {
+			public Worker createSingleton(ResourceConfig config, DependencyResolver dependencies) {
+				return create(config, dependencies);
 			}
 
 			@Override

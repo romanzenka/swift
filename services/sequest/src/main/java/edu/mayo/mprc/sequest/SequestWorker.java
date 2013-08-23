@@ -100,7 +100,7 @@ public final class SequestWorker extends WorkerBase {
 	 * A factory capable of creating the worker
 	 */
 	@Component("sequestWorkerFactory")
-	public static final class Factory extends WorkerFactoryBase<Config> implements EngineFactory {
+	public static final class Factory extends WorkerFactoryBase<Config> implements EngineFactory<Config, Worker> {
 
 		private SequestMappingFactory sequestMappingFactory;
 

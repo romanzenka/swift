@@ -1,6 +1,7 @@
 package edu.mayo.mprc.idpqonvert;
 
 import edu.mayo.mprc.MprcException;
+import edu.mayo.mprc.config.DependencyResolver;
 import edu.mayo.mprc.integration.Installer;
 import edu.mayo.mprc.utilities.FileUtilities;
 import edu.mayo.mprc.utilities.progress.ProgressInfo;
@@ -66,8 +67,7 @@ public final class TestIdpQonvert {
 			config.setIdpQonvertExecutable(idpQonvert.getAbsolutePath());
 
 			IdpQonvertWorker.Factory factory = new IdpQonvertWorker.Factory();
-			factory.setConfig(config);
-			final IdpQonvertWorker worker = (IdpQonvertWorker) factory.createWorker();
+			final IdpQonvertWorker worker = (IdpQonvertWorker) factory.create(config, new DependencyResolver(null));
 
 			final File outputFile = tempFile("out.idp");
 			final File inputFile = pepXmlFile;

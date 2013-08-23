@@ -162,7 +162,7 @@ public final class MyriMatchWorker extends WorkerBase {
 	 * A factory capable of creating the worker
 	 */
 	@Component("myrimatchWorkerFactory")
-	public static final class Factory extends WorkerFactoryBase<Config> implements EngineFactory {
+	public static final class Factory extends WorkerFactoryBase<Config> implements EngineFactory<Config, Worker> {
 		private static final EngineMetadata ENGINE_METADATA = new EngineMetadata(
 				"MYRIMATCH", MZ_IDENT_ML, "MyriMatch", false, "myrimatch", new MyriMatchMappingFactory(),
 				new String[]{TYPE},

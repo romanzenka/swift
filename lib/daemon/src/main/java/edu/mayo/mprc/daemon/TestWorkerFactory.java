@@ -1,12 +1,13 @@
 package edu.mayo.mprc.daemon;
 
+import edu.mayo.mprc.config.DependencyResolver;
 import edu.mayo.mprc.config.ResourceConfig;
 import edu.mayo.mprc.config.ui.ServiceUiFactory;
 
 /**
  * Fake factory - single worker in a single thread has the same worker object recycled all the time
  */
-final class TestWorkerFactory implements WorkerFactory {
+final class TestWorkerFactory implements WorkerFactory<ResourceConfig, Worker> {
 	private final Worker finalWorker;
 
 	public TestWorkerFactory(final Worker finalWorker) {
@@ -14,13 +15,13 @@ final class TestWorkerFactory implements WorkerFactory {
 	}
 
 	@Override
-	public Worker createWorker() {
+	public Worker create(ResourceConfig config, DependencyResolver dependencies) {
 		return finalWorker;
 	}
 
 	@Override
-	public void checkWorker() {
-		finalWorker.check();
+	public Worker createSingleton(ResourceConfig config, DependencyResolver dependencies) {
+		return finalWorker;
 	}
 
 	@Override

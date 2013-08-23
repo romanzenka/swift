@@ -176,7 +176,7 @@ public final class OmssaWorker extends WorkerBase {
 	 * A factory capable of creating the worker
 	 */
 	@Component("omssaWorkerFactory")
-	public static final class Factory extends WorkerFactoryBase<Config> implements EngineFactory {
+	public static final class Factory extends WorkerFactoryBase<Config> implements EngineFactory<Config, Worker> {
 		private static final EngineMetadata ENGINE_METADATA = new EngineMetadata(
 				"OMSSA", ".omx.gz", "Omssa", false, "omssa", new OmssaMappingFactory(),
 				new String[]{TYPE},
