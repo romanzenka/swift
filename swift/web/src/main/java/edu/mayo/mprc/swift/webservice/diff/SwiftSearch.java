@@ -45,7 +45,7 @@ public final class SwiftSearch {
 	public SwiftSearch(final SearchRun run, final SwiftSearchDefinition searchDefinition, final WebUi webUi) {
 		id = run.getId();
 		title = run.getTitle();
-		if (Objects.equal(searchDefinition.getId(), run.getSwiftSearch())) {
+		if (!Objects.equal(searchDefinition.getId(), run.getSwiftSearch())) {
 			throw new MprcException("Search must match the definition");
 		}
 		startTimestamp = run.getStartTimestamp();
