@@ -364,7 +364,7 @@ public final class ProcessCaller implements Runnable {
 	}
 
 	public void setInputStream(final InputStream input) {
-		this.inputStream = input;
+		inputStream = input;
 	}
 
 	public InputStream getInputStream() {

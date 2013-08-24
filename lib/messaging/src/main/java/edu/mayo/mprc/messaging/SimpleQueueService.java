@@ -52,7 +52,7 @@ final class SimpleQueueService implements Service {
 	 * @param name               Name of the queue.
 	 */
 	SimpleQueueService(final Connection connection, final ResponseDispatcher responseDispatcher, final String name) {
-		this.queueName = name;
+		queueName = name;
 		this.responseDispatcher = responseDispatcher;
 
 		try {
@@ -172,11 +172,11 @@ final class SimpleQueueService implements Service {
 	}
 
 	private Session receivingSession() {
-		return setupSession(this.receivingSession);
+		return setupSession(receivingSession);
 	}
 
 	private Session sendingSession() {
-		return setupSession(this.sendingSession);
+		return setupSession(sendingSession);
 	}
 
 	private Session setupSession(ThreadLocal<Session> sessionHolder) {

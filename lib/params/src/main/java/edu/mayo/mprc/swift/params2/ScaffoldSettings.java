@@ -156,17 +156,17 @@ public class ScaffoldSettings extends PersistableBase {
 		}
 		final ScaffoldSettings that = (ScaffoldSettings) obj;
 
-		return Objects.equal(this.isAnnotateWithGOA(), that.isAnnotateWithGOA()) &&
-				Objects.equal(this.isConnectToNCBI(), that.isConnectToNCBI()) &&
-				Objects.equal(this.getMinimumNonTrypticTerminii(), that.getMinimumNonTrypticTerminii()) &&
-				Objects.equal(this.getMinimumPeptideCount(), that.getMinimumPeptideCount()) &&
-				(Math.abs(this.getPeptideProbability() - that.getPeptideProbability()) <= PROBABILITY_PRECISION) &&
-				(Math.abs(this.getProteinProbability() - that.getProteinProbability()) <= PROBABILITY_PRECISION) &&
-				Objects.equal(this.isSaveNoSpectra(), that.isSaveNoSpectra()) &&
-				Objects.equal(this.isSaveOnlyIdentifiedSpectra(), that.isSaveOnlyIdentifiedSpectra()) &&
-				Objects.equal(this.getStarredProteins(), that.getStarredProteins()) &&
-				Objects.equal(this.isUseIndependentSampleGrouping(), that.isUseIndependentSampleGrouping()) &&
-				Objects.equal(this.isUseFamilyProteinGrouping(), that.isUseFamilyProteinGrouping());
+		return Objects.equal(isAnnotateWithGOA(), that.isAnnotateWithGOA()) &&
+				Objects.equal(isConnectToNCBI(), that.isConnectToNCBI()) &&
+				Objects.equal(getMinimumNonTrypticTerminii(), that.getMinimumNonTrypticTerminii()) &&
+				Objects.equal(getMinimumPeptideCount(), that.getMinimumPeptideCount()) &&
+				(Math.abs(getPeptideProbability() - that.getPeptideProbability()) <= PROBABILITY_PRECISION) &&
+				(Math.abs(getProteinProbability() - that.getProteinProbability()) <= PROBABILITY_PRECISION) &&
+				Objects.equal(isSaveNoSpectra(), that.isSaveNoSpectra()) &&
+				Objects.equal(isSaveOnlyIdentifiedSpectra(), that.isSaveOnlyIdentifiedSpectra()) &&
+				Objects.equal(getStarredProteins(), that.getStarredProteins()) &&
+				Objects.equal(isUseIndependentSampleGrouping(), that.isUseIndependentSampleGrouping()) &&
+				Objects.equal(isUseFamilyProteinGrouping(), that.isUseFamilyProteinGrouping());
 	}
 
 	@Override
@@ -185,17 +185,17 @@ public class ScaffoldSettings extends PersistableBase {
 	}
 
 	public ScaffoldSettings copy() {
-		final ScaffoldSettings scaffoldSettings = new ScaffoldSettings(this.getProteinProbability(),
-				this.getPeptideProbability(),
-				this.getMinimumPeptideCount(),
-				this.getMinimumNonTrypticTerminii(),
-				this.getStarredProteins(),
-				this.isSaveOnlyIdentifiedSpectra(),
-				this.isSaveNoSpectra(),
-				this.isConnectToNCBI(),
-				this.isAnnotateWithGOA(),
-				this.isUseIndependentSampleGrouping(),
-				this.isUseFamilyProteinGrouping());
+		final ScaffoldSettings scaffoldSettings = new ScaffoldSettings(getProteinProbability(),
+				getPeptideProbability(),
+				getMinimumPeptideCount(),
+				getMinimumNonTrypticTerminii(),
+				getStarredProteins(),
+				isSaveOnlyIdentifiedSpectra(),
+				isSaveNoSpectra(),
+				isConnectToNCBI(),
+				isAnnotateWithGOA(),
+				isUseIndependentSampleGrouping(),
+				isUseFamilyProteinGrouping());
 		scaffoldSettings.setId(getId());
 		return scaffoldSettings;
 	}

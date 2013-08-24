@@ -30,6 +30,6 @@ public class ReportInfo implements Comparable<ReportInfo> {
 
 	@Override
 	public int compareTo(final ReportInfo reportInfo) {
-		return this.getFilePath().compareTo(reportInfo.getFilePath());
+		return getFilePath().compareTo(reportInfo.getFilePath());
 	}
 }

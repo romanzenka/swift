@@ -14,7 +14,7 @@ public final class TestingUtilitiesTest {
 	@Test(groups = {"fast"})
 	public void test_getTempFileFromResource() {
 		try {
-			final File tempFile = TestingUtilities.getTempFileFromResource(this.getClass(), "/SimpleFile.txt", true, null);
+			final File tempFile = TestingUtilities.getTempFileFromResource(getClass(), "/SimpleFile.txt", true, null);
 			Assert.assertTrue(tempFile.exists(), "The file wasn't created.");
 			if (tempFile.exists()) {
 				LOGGER.debug("Temp file created: " + tempFile.getAbsolutePath());
@@ -26,8 +26,8 @@ public final class TestingUtilitiesTest {
 
 	@Test(groups = {"fast", "unit"})
 	public void FileComparisonTest() throws IOException {
-		final File f1 = TestingUtilities.getTempFileFromResource(this.getClass(), "/edu/mayo/mprc/utilities/testing/simpleFileA.txt", true, null);
-		final File f2 = TestingUtilities.getTempFileFromResource(this.getClass(), "/edu/mayo/mprc/utilities/testing/simpleFileACopy.txt", true, null);
+		final File f1 = TestingUtilities.getTempFileFromResource(getClass(), "/edu/mayo/mprc/utilities/testing/simpleFileA.txt", true, null);
+		final File f2 = TestingUtilities.getTempFileFromResource(getClass(), "/edu/mayo/mprc/utilities/testing/simpleFileACopy.txt", true, null);
 		LOGGER.debug(f2.getAbsolutePath());
 		Assert.assertTrue(f2.exists());
 		Assert.assertEquals(TestingUtilities.compareFilesByLine(f1, f2), null);
@@ -35,8 +35,8 @@ public final class TestingUtilitiesTest {
 
 	@Test(groups = {"fast", "unit"})
 	public void DifferentFileComparisonTest() throws IOException {
-		final File f1 = TestingUtilities.getTempFileFromResource(this.getClass(), "/edu/mayo/mprc/utilities/testing/simpleFileA.txt", true, null);
-		final File f2 = TestingUtilities.getTempFileFromResource(this.getClass(), "/edu/mayo/mprc/utilities/testing/simpleFileB.txt", true, null);
+		final File f1 = TestingUtilities.getTempFileFromResource(getClass(), "/edu/mayo/mprc/utilities/testing/simpleFileA.txt", true, null);
+		final File f2 = TestingUtilities.getTempFileFromResource(getClass(), "/edu/mayo/mprc/utilities/testing/simpleFileB.txt", true, null);
 		Assert.assertEquals(TestingUtilities.compareFilesByLine(f1, f2), "Difference in line #1:\n" +
 				"[A simple file to compare.]\n" +
 				"[A second simple file to compare]");

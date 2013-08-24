@@ -103,9 +103,9 @@ public final class FileTreeDialog extends DialogBox implements ClickListener {
 				}
 			});
 
-			this.hide();
+			hide();
 		} else if (widget.equals(cancelButton)) {
-			this.hide();
+			hide();
 		}
 	}
 

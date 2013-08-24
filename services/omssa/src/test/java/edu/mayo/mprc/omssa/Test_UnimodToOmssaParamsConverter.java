@@ -60,7 +60,7 @@ public final class Test_UnimodToOmssaParamsConverter {
 
 		//now round trip to test convertUnimodToOmssa
 
-		final Set<ModSpecificity> matchedModSpecificities = this.findMatchedSpecificities(w.converter, w.umodSet, w.elemRoot.getElementsByTagName("MSModSpec"));
+		final Set<ModSpecificity> matchedModSpecificities = findMatchedSpecificities(w.converter, w.umodSet, w.elemRoot.getElementsByTagName("MSModSpec"));
 
 		Assert.assertEquals(matchedModSpecificities.size(), 28, "Unexpected number of mod specificities");
 

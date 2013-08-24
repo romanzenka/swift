@@ -20,12 +20,12 @@ final class MgfTitleCleanupTask extends AsyncTaskBase implements FileProducingTa
 
 	public MgfTitleCleanupTask(final WorkflowEngine engine, final DaemonConnection daemon, final File mgfToCleanup, final File cleanedMgf, final FileTokenFactory fileTokenFactory, final boolean fromScratch) {
 		super(engine, daemon, fileTokenFactory, fromScratch);
-		this.cleanupPerformed = false;
+		cleanupPerformed = false;
 		this.cleanedMgf = cleanedMgf;
 		this.mgfToCleanup = mgfToCleanup;
-		this.setName("Mgf cleanup");
+		setName("Mgf cleanup");
 
-		this.setDescription(".mgf cleanup " + fileTokenFactory.fileToTaggedDatabaseToken(mgfToCleanup));
+		setDescription(".mgf cleanup " + fileTokenFactory.fileToTaggedDatabaseToken(mgfToCleanup));
 	}
 
 	@Override

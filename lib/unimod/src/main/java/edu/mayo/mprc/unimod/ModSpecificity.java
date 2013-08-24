@@ -268,11 +268,11 @@ public class ModSpecificity extends PersistableBase implements Comparable<ModSpe
 			return -1;
 		}
 		return ComparisonChain.start().nullsFirst()
-				.compare(this.getModification().getTitle().toLowerCase(Locale.ENGLISH), o.getModification().getTitle().toLowerCase(Locale.ENGLISH))
-				.compare(this.getTerm(), o.getTerm())
-				.compare(this.isProteinOnly(), o.isProteinOnly())
-				.compare(this.getSite(), o.getSite())
-				.compare(this.getSpecificityGroup(), o.getSpecificityGroup())
+				.compare(getModification().getTitle().toLowerCase(Locale.ENGLISH), o.getModification().getTitle().toLowerCase(Locale.ENGLISH))
+				.compare(getTerm(), o.getTerm())
+				.compare(isProteinOnly(), o.isProteinOnly())
+				.compare(getSite(), o.getSite())
+				.compare(getSpecificityGroup(), o.getSpecificityGroup())
 				.result();
 	}
 

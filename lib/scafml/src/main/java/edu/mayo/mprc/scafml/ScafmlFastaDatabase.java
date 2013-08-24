@@ -36,9 +36,9 @@ public final class ScafmlFastaDatabase extends FileHolder {
 		result.append(indent)
 				.append("<" + "FastaDatabase")
 				.append(" id=\"")
-				.append(this.getId())
+				.append(getId())
 				.append("\" path=\"")
-				.append(this.getDatabase().getAbsolutePath())
+				.append(getDatabase().getAbsolutePath())
 				.append("\"")
 				.append(XMLUtilities.wrapatt("databaseAccessionRegEx", annotation.getAccessionRegex()))
 				.append(XMLUtilities.wrapatt("databaseDescriptionRegEx", annotation.getDescriptionRegex()));

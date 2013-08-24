@@ -23,9 +23,9 @@ public final class ModificationsLabelRunClick implements ClickListener {
 	private boolean updateSelectedOnEditor;
 
 	public ModificationsLabelRunClick(final ModificationsLabel proxy) {
-		this.editor = proxy.getEditor();
-		this.param = proxy.getParam();
-		this.type = proxy.getType();
+		editor = proxy.getEditor();
+		param = proxy.getParam();
+		type = proxy.getType();
 		this.proxy = proxy;
 	}
 
@@ -35,7 +35,7 @@ public final class ModificationsLabelRunClick implements ClickListener {
 	 * @param updateSelections - indicates if should progagate the selections
 	 */
 	protected void setUpdateSelectedOnEditor(final boolean updateSelections) {
-		this.updateSelectedOnEditor = updateSelections;
+		updateSelectedOnEditor = updateSelections;
 	}
 
 	@Override
@@ -43,7 +43,7 @@ public final class ModificationsLabelRunClick implements ClickListener {
 		final ModificationDialog p = new ModificationDialog(editor);
 
 		editor.setAllowedValues(proxy.getAllowedValues());
-		if (this.updateSelectedOnEditor) {
+		if (updateSelectedOnEditor) {
 			editor.setValueClear();
 			editor.setValue(proxy.getClientValue());
 		}

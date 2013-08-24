@@ -21,7 +21,7 @@ public final class AddNewModuleDialog extends DialogBox {
 	public AddNewModuleDialog(final ApplicationModel model, final List<String> types, final NewModuleCreatedCallback callback, final Context errorDisplay) {
 		super(false, true);
 		this.errorDisplay = errorDisplay;
-		this.setTitle("Add new module");
+		setTitle("Add new module");
 
 		final Panel radioPanel = new HorizontalPanel();
 
@@ -84,14 +84,14 @@ public final class AddNewModuleDialog extends DialogBox {
 		cancelButton.addClickListener(new ClickListener() {
 			@Override
 			public void onClick(final Widget widget) {
-				AddNewModuleDialog.this.hide();
+				hide();
 			}
 		});
 
 		final Panel allPanel = new VerticalPanel();
 		allPanel.add(radioPanel);
 		allPanel.add(buttonPanel);
-		this.add(allPanel);
+		add(allPanel);
 	}
 
 	/**
@@ -122,6 +122,6 @@ public final class AddNewModuleDialog extends DialogBox {
 
 		modelToAddTo.addNewResource(type, callback, errorDisplay);
 
-		this.hide();
+		hide();
 	}
 }

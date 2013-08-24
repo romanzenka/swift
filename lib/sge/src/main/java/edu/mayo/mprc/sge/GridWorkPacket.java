@@ -107,7 +107,7 @@ public class GridWorkPacket {
 	}
 
 	public String getWorkingFolder() {
-		return this.workingFolder;
+		return workingFolder;
 	}
 
 	public String getLogFolder() {
@@ -135,26 +135,26 @@ public class GridWorkPacket {
 	}
 
 	public String getMemoryRequirement() {
-		return this.minMemoryRequirement;
+		return minMemoryRequirement;
 	}
 
 	public void setMemoryRequirement(final String memoryRequirement) {
-		this.minMemoryRequirement = memoryRequirement;
+		minMemoryRequirement = memoryRequirement;
 	}
 
 	public String getApplicationName() {
-		return this.applicationName;
+		return applicationName;
 	}
 
 	public List<String> getParameters() {
-		return this.parameters;
+		return parameters;
 	}
 
 	public String getParametersAsCallString() {
-		if (this.parameters == null || this.parameters.isEmpty()) {
+		if (parameters == null || parameters.isEmpty()) {
 			return "";
 		}
-		return Joiner.on(" ").join(this.parameters);
+		return Joiner.on(" ").join(parameters);
 	}
 
 	public Long getPersistentRequestId() {
@@ -178,7 +178,7 @@ public class GridWorkPacket {
 	}
 
 	public void fireStateChanged() {
-		this.listener.stateChanged(this);
+		listener.stateChanged(this);
 	}
 
 	public void jobUpdateSucceeded() {

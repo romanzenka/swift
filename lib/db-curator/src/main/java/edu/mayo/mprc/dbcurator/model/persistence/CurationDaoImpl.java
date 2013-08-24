@@ -221,7 +221,7 @@ public final class CurationDaoImpl extends DaoBase implements CurationDao {
 	 * @return List of all curations from cache, or (if their number changed) from database.
 	 */
 	private synchronized List<Curation> allCurations() {
-		if (this.allCurationList == null) {
+		if (allCurationList == null) {
 			allCurationList = getMatchingCurationsFromDb(null, null, null);
 			return allCurationList;
 		} else {
@@ -310,7 +310,7 @@ public final class CurationDaoImpl extends DaoBase implements CurationDao {
 
 	@Override
 	public void addHeaderTransform(final HeaderTransform sprotTrans) {
-		this.save(sprotTrans, getHeaderTransformEqualityCriteria(sprotTrans), true);
+		save(sprotTrans, getHeaderTransformEqualityCriteria(sprotTrans), true);
 	}
 
 	@Override

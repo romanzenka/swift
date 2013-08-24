@@ -60,7 +60,7 @@ public final class RunnerView extends SimplePanel {
 		runnerType.add(localRunnerView, "Run locally");
 		sgeRunnerView = new SgeRunnerView(context, model);
 		runnerType.add(sgeRunnerView, "Run in grid");
-		this.add(runnerType);
+		add(runnerType);
 
 		setModel(model);
 	}

@@ -154,7 +154,7 @@ public abstract class ScaffoldSpectraReader {
 	public void load(final InputStream stream, final long inputSize, final String dataSourceName, final String scaffoldVersion, final ProgressReporter reporter) {
 		this.dataSourceName = dataSourceName;
 		this.scaffoldVersion = scaffoldVersion;
-		this.totalBytesToRead = inputSize;
+		totalBytesToRead = inputSize;
 		try {
 			processStream(stream, reporter);
 		} catch (Exception t) {

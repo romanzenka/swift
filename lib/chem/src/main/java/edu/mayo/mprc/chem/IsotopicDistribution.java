@@ -43,7 +43,7 @@ public final class IsotopicDistribution implements Cloneable {
 		this.thresh = thresh;
 		this.extra = extra;
 		this.dist = new MassIntensityArray(dist);
-		this.mostAbundant = -1;
+		mostAbundant = -1;
 		if (init) {
 			doInit();
 		}
@@ -62,14 +62,14 @@ public final class IsotopicDistribution implements Cloneable {
 	}
 
 	private void set(final IsotopicDistribution rhs) {
-		this.therMonoMZ = rhs.therMonoMZ;
-		this.chem = rhs.chem;
-		this.name = rhs.name;
-		this.dist = new MassIntensityArray(rhs.dist);
-		this.mostAbundant = rhs.mostAbundant;
-		this.monoisotope = rhs.monoisotope;
-		this.thresh = rhs.thresh;
-		this.extra = rhs.extra;
+		therMonoMZ = rhs.therMonoMZ;
+		chem = rhs.chem;
+		name = rhs.name;
+		dist = new MassIntensityArray(rhs.dist);
+		mostAbundant = rhs.mostAbundant;
+		monoisotope = rhs.monoisotope;
+		thresh = rhs.thresh;
+		extra = rhs.extra;
 	}
 
 	@Override

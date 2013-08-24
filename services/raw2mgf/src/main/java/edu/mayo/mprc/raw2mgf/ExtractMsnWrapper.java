@@ -31,9 +31,9 @@ public final class ExtractMsnWrapper {
 	 * @param rawfile    - the full path to the raw file
 	 */
 	public ExtractMsnWrapper(final File fileToExec, final String params, final File rawfile, final String wrapperScript, final String xvfbWrapperScript) {
-		this.fileToExecute = fileToExec;
-		this.sParams = params;
-		this.sRAWFileName = rawfile.getAbsolutePath();
+		fileToExecute = fileToExec;
+		sParams = params;
+		sRAWFileName = rawfile.getAbsolutePath();
 		this.wrapperScript = wrapperScript;
 		this.xvfbWrapperScript = xvfbWrapperScript;
 	}
@@ -69,9 +69,9 @@ public final class ExtractMsnWrapper {
 			result.add(wrapperScript);
 		}
 
-		result.add(this.fileToExecute.getAbsolutePath());
-		result.addAll(Arrays.asList(this.sParams.split(" ")));
-		result.add(toWinePathIfWine(this.sRAWFileName));
+		result.add(fileToExecute.getAbsolutePath());
+		result.addAll(Arrays.asList(sParams.split(" ")));
+		result.add(toWinePathIfWine(sRAWFileName));
 
 		final String[] array = new String[result.size()];
 		return result.toArray(array);
@@ -108,7 +108,7 @@ public final class ExtractMsnWrapper {
 	 * @param sOutputdir - the folder to place dta files  in
 	 */
 	public void setOutputDir(final File sOutputdir) {
-		this.outputdir = sOutputdir;
+		outputdir = sOutputdir;
 	}
 
 	/**

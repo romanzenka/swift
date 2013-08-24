@@ -20,7 +20,7 @@ final class SearchResults implements Serializable {
 	}
 
 	public SearchResults addResult(final FileSearchResult result) {
-		this.results.add(result);
+		results.add(result);
 		return this;
 	}
 

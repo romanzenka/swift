@@ -10,7 +10,7 @@ public final class RawToMgfResult extends FileHolder implements ProgressInfo {
 	private File mgf;
 
 	public RawToMgfResult(final File mgfFile) {
-		this.mgf = mgfFile;
+		mgf = mgfFile;
 	}
 
 	public File getMgf() {

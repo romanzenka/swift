@@ -52,22 +52,22 @@ final class MgfToDtaFileParser {
 
 
 	public MgfToDtaFileParser(final SequestSubmitterInterface s, final IonsModellerInterface i, final String tempBase) {
-		this.sequestSubmitter = s;
-		this.ionsModeller = i;
-		this.tempWorkingDir = tempBase;
+		sequestSubmitter = s;
+		ionsModeller = i;
+		tempWorkingDir = tempBase;
 	}
 
 
 	public void setMgfFileName(final String fileName) {
-		this.mgfFileName = fileName;
-		this.outfilePrefix = new File(this.mgfFileName).getName();
-		this.outfilePrefix = FileUtilities.stripExtension(outfilePrefix);
-		this.dtaTempFolder = this.tempWorkingDir + File.separator + outfilePrefix;
+		mgfFileName = fileName;
+		outfilePrefix = new File(mgfFileName).getName();
+		outfilePrefix = FileUtilities.stripExtension(outfilePrefix);
+		dtaTempFolder = tempWorkingDir + File.separator + outfilePrefix;
 		// create the output directory
 		if (new File(dtaTempFolder).isDirectory()) {
 			LOGGER.warn("Output directory for dtas already exists: " + dtaTempFolder);
 		} else {
-			if (new File(this.dtaTempFolder).isFile()) {
+			if (new File(dtaTempFolder).isFile()) {
 				LOGGER.error("The file " + dtaTempFolder + " exists and is not a directory");
 			}
 		}
@@ -79,10 +79,10 @@ final class MgfToDtaFileParser {
 	public void getDTAsFromFile(final BufferedReader br) {
 
 
-		ionsModeller.setSequestSubmitter(this.sequestSubmitter);
-		ionsModeller.setWorkingDir(this.tempWorkingDir);
-		ionsModeller.setMgfFileName(this.mgfFileName);
-		ionsModeller.setOutFilePrefix(this.outfilePrefix);
+		ionsModeller.setSequestSubmitter(sequestSubmitter);
+		ionsModeller.setWorkingDir(tempWorkingDir);
+		ionsModeller.setMgfFileName(mgfFileName);
+		ionsModeller.setOutFilePrefix(outfilePrefix);
 
 		String line;
 
@@ -115,10 +115,10 @@ final class MgfToDtaFileParser {
 	public void getDTAsFromFileWithBlockReads(final BufferedReader br) {
 
 
-		ionsModeller.setSequestSubmitter(this.sequestSubmitter);
-		ionsModeller.setWorkingDir(this.tempWorkingDir);
-		ionsModeller.setMgfFileName(this.mgfFileName);
-		ionsModeller.setOutFilePrefix(this.outfilePrefix);
+		ionsModeller.setSequestSubmitter(sequestSubmitter);
+		ionsModeller.setWorkingDir(tempWorkingDir);
+		ionsModeller.setMgfFileName(mgfFileName);
+		ionsModeller.setOutFilePrefix(outfilePrefix);
 
 
 		long offset = 0;

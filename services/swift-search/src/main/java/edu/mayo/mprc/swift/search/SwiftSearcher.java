@@ -387,7 +387,7 @@ public final class SwiftSearcher implements Worker {
 		boolean raw2mgfProblem = false;
 		try {
 			for (final FileSearch inputFile : definition.getInputFiles()) {
-				if (!inputFile.getInputFile().getName().endsWith(".mgf") && !(this.raw2mgfEnabled || this.msconvertEnabled)) {
+				if (!inputFile.getInputFile().getName().endsWith(".mgf") && !(raw2mgfEnabled || msconvertEnabled)) {
 					raw2mgfProblem = true;
 				}
 			}
@@ -603,7 +603,7 @@ public final class SwiftSearcher implements Worker {
 			this.searchDb = searchDb;
 			this.msmsEval = msmsEval;
 			this.database = database;
-			this.reportDecoyHits = true;
+			reportDecoyHits = true;
 		}
 
 		public ServiceConfig getMsmsEval() {

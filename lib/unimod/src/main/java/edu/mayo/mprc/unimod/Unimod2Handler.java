@@ -75,9 +75,9 @@ class Unimod2Handler extends DefaultHandler {
 
 	@Override
 	public void characters(final char[] ch, final int start, final int length) {
-		if (this.tagScanner != null) {
+		if (tagScanner != null) {
 			for (int i = 0; i < length; i++) {
-				this.tagScanner.append(ch[start + i]);
+				tagScanner.append(ch[start + i]);
 			}
 
 		}

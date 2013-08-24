@@ -65,9 +65,9 @@ public final class ErrorDialog extends DialogBox {
 		public void setPosition(final int width, final int height) {
 			final int clientHeight = Window.getClientHeight();
 
-			ErrorDialog.this.setPopupPosition(widget.getAbsoluteLeft(), widget.getAbsoluteTop() + widget.getOffsetHeight());
+			setPopupPosition(widget.getAbsoluteLeft(), widget.getAbsoluteTop() + widget.getOffsetHeight());
 			if (height > clientHeight) {
-				ErrorDialog.this.setHeight(clientHeight - ErrorDialog.this.getAbsoluteTop() + " px");
+				setHeight(clientHeight - getAbsoluteTop() + " px");
 			}
 		}
 	}

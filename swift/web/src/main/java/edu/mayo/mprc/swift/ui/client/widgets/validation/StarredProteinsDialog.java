@@ -40,7 +40,7 @@ public final class StarredProteinsDialog extends FrameDialog {
 	public void setValue(final ClientScaffoldSettings value) {
 		this.value = value;
 		if (value.getStarredProteins() != null) {
-			this.lastValue = new ClientStarredProteins(
+			lastValue = new ClientStarredProteins(
 					value.getStarredProteins().getStarred(),
 					"\\s+",
 					true);

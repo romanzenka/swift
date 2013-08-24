@@ -43,7 +43,7 @@ public final class MyriMatchMappings implements Mappings {
 
 	@Override
 	public Reader baseSettings() {
-		return ResourceUtilities.getReader("classpath:edu/mayo/mprc/myrimatch/base.myrimatch.cfg", this.getClass());
+		return ResourceUtilities.getReader("classpath:edu/mayo/mprc/myrimatch/base.myrimatch.cfg", getClass());
 	}
 
 	@Override

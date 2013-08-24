@@ -71,7 +71,7 @@ public final class SwiftEnvironmentImpl implements SwiftEnvironment {
 
 	@Override
 	public ExitCode runSwiftCommand(final SwiftCommandLine cmdLine) {
-		this.commandLine = cmdLine;
+		commandLine = cmdLine;
 		final SwiftCommand command = getCommand(commandLine.getCommand());
 
 		if (command == null) {
@@ -126,7 +126,7 @@ public final class SwiftEnvironmentImpl implements SwiftEnvironment {
 	}
 
 	public void setDaemonFactory(final Daemon.Factory factory) {
-		this.daemonFactory = factory;
+		daemonFactory = factory;
 	}
 
 	public MultiFactory getSwiftFactory() {

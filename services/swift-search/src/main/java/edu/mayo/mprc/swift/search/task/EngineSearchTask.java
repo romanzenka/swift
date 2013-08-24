@@ -81,7 +81,7 @@ final class EngineSearchTask extends AsyncTaskBase implements FileProducingTask 
 					paramsFile,
 					inputFile.getResultingFile(),
 					deploymentResult.getShortDbName(),
-					this.getFullId(),
+					getFullId(),
 					isFromScratch(),
 					publicSearchFiles);
 		} else if ("SEQUEST".equalsIgnoreCase(engine.getCode())) {
@@ -91,7 +91,7 @@ final class EngineSearchTask extends AsyncTaskBase implements FileProducingTask 
 					inputFile.getResultingFile(),
 					getSequestDatabase(),
 					publicSearchFiles,
-					this.getFullId(),
+					getFullId(),
 					isFromScratch());
 		} else if ("TANDEM".equalsIgnoreCase(engine.getCode())) {
 			workPacket = new XTandemWorkPacket(
@@ -101,7 +101,7 @@ final class EngineSearchTask extends AsyncTaskBase implements FileProducingTask 
 					outputFile.getParentFile(),
 					curation.getCurationFile(),
 					publicSearchFiles,
-					this.getFullId(),
+					getFullId(),
 					isFromScratch());
 		} else if ("OMSSA".equalsIgnoreCase(engine.getCode())) {
 			workPacket = new OmssaWorkPacket(
@@ -111,7 +111,7 @@ final class EngineSearchTask extends AsyncTaskBase implements FileProducingTask 
 					deploymentResult.getFastaFile(),
 					deploymentResult.getGeneratedFiles(),
 					publicSearchFiles,
-					this.getFullId(),
+					getFullId(),
 					isFromScratch());
 		} else if ("MYRIMATCH".equalsIgnoreCase(engine.getCode())) {
 			workPacket = new MyriMatchWorkPacket(
@@ -119,7 +119,7 @@ final class EngineSearchTask extends AsyncTaskBase implements FileProducingTask 
 					outputFile.getParentFile(),
 					curation.getCurationFile(),
 					curation.getDecoyRegex(),
-					publicSearchFiles, this.getFullId(),
+					publicSearchFiles, getFullId(),
 					isFromScratch()
 			);
 		} else {

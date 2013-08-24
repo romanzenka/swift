@@ -55,7 +55,7 @@ public final class MascotDeploymentServiceTest {
 			final Curation toDeploy = new Curation();
 			toDeploy.setShortName("test_in");
 			toDeploy.setCurationFile(fakeFASTAFileToDeploy);
-			final DeploymentRequest request = new DeploymentRequest(this.getClass().getSimpleName(), toDeploy.getFastaFile());
+			final DeploymentRequest request = new DeploymentRequest(getClass().getSimpleName(), toDeploy.getFastaFile());
 			WorkPacketBase.simulateTransfer(request);
 
 			final DeploymentResult result = service.performDeployment(request);
@@ -109,7 +109,7 @@ public final class MascotDeploymentServiceTest {
 		private File mockDat = null;
 
 		public MockMonitor() {
-			this.toSucceed = true;
+			toSucceed = true;
 		}
 
 		public MockMonitor(final boolean toSucceed) {
@@ -123,7 +123,7 @@ public final class MascotDeploymentServiceTest {
 		 */
 		public File getMockMascotDatFile() throws IOException {
 			if (mockDat == null) {
-				mockDat = TestingUtilities.getTempFileFromResource(this.getClass(), "/edu/mayo/mprc/mascot/mascot.dat", true, tempFolder);
+				mockDat = TestingUtilities.getTempFileFromResource(getClass(), "/edu/mayo/mprc/mascot/mascot.dat", true, tempFolder);
 			}
 			return mockDat;
 		}
@@ -134,7 +134,7 @@ public final class MascotDeploymentServiceTest {
 		 */
 		public File getMockMonitorLogFile() throws IOException {
 			if (mockLog == null) {
-				mockLog = TestingUtilities.getTempFileFromResource(this.getClass(), "/edu/mayo/mprc/mascot/monitor.log", /*autoDelete*/true, tempFolder);
+				mockLog = TestingUtilities.getTempFileFromResource(getClass(), "/edu/mayo/mprc/mascot/monitor.log", /*autoDelete*/true, tempFolder);
 			}
 			return mockLog;
 		}
@@ -165,7 +165,7 @@ public final class MascotDeploymentServiceTest {
 				writer = new RandomAccessFile(getMockMonitorLogFile(), "rw");
 
 				String toWrite;
-				if (this.toSucceed) {
+				if (toSucceed) {
 					toWrite = "Thu Aug 23 13:00:41 2007 - ${shortname} Compressed files -&gt; cluster to Finished compressing files \n" +
 							"Thu Aug 23 13:00:42 2007 - ${shortname} Finished compressing files  to Running 1st test           \n" +
 							"Thu Aug 23 13:00:48 2007 - ${shortname} Running 1st test            to First test just run OK     \n" +

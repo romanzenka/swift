@@ -45,7 +45,7 @@ public final class FASTAOutputStream implements DBOutputStream {
 	 */
 	public FASTAOutputStream(final File file) throws IOException {
 		this.file = file;
-		this.out = new FileWriter(this.file);
+		out = new FileWriter(this.file);
 	}
 
 	public boolean isCleanupHeaders() {
@@ -77,27 +77,27 @@ public final class FASTAOutputStream implements DBOutputStream {
 
 		//check to make sure the header contains a > since this is what denotes a header
 		if (cleanHeader.isEmpty() || cleanHeader.charAt(0) != '>') {
-			this.out.write('>');
+			out.write('>');
 		}
 		//write out the header on a single line
-		this.out.write(cleanHeader);
-		this.out.write("\n");
+		out.write(cleanHeader);
+		out.write("\n");
 
 		//find out how many lines there eare and print out each but the last line in a loop
 		final int steps = cleanSequence.length() / LINE_WIDTH;
 		int i = 0;
 		for (; i < steps; i++) {
-			this.out.write(cleanSequence, i * LINE_WIDTH, LINE_WIDTH);
-			this.out.write("\n");
+			out.write(cleanSequence, i * LINE_WIDTH, LINE_WIDTH);
+			out.write("\n");
 		}
 
 		//if we have more to print then print out the last line but make sure that we don't run off of the String
 		if ((cleanSequence.length() - i * LINE_WIDTH) != 0) {
-			this.out.write(cleanSequence, i * LINE_WIDTH, cleanSequence.length() - i * LINE_WIDTH);
-			this.out.write("\n");
+			out.write(cleanSequence, i * LINE_WIDTH, cleanSequence.length() - i * LINE_WIDTH);
+			out.write("\n");
 		}
 
-		this.sequenceCount++;
+		sequenceCount++;
 	}
 
 	/**
@@ -146,14 +146,14 @@ public final class FASTAOutputStream implements DBOutputStream {
 	public void appendRemaining(final DBInputStream inputStream) throws IOException {
 		if (inputStream != null) {
 			while (inputStream.gotoNextSequence()) {
-				this.appendSequence(inputStream.getHeader(), inputStream.getSequence());
+				appendSequence(inputStream.getHeader(), inputStream.getSequence());
 			}
 		}
 	}
 
 	@Override
 	public File getFile() {
-		return this.file;
+		return file;
 	}
 
 	/**
@@ -161,7 +161,7 @@ public final class FASTAOutputStream implements DBOutputStream {
 	 */
 	@Override
 	public void close() {
-		FileUtilities.closeQuietly(this.out);
+		FileUtilities.closeQuietly(out);
 	}
 
 	/**
@@ -171,6 +171,6 @@ public final class FASTAOutputStream implements DBOutputStream {
 	 */
 	@Override
 	public int getSequenceCount() {
-		return this.sequenceCount;
+		return sequenceCount;
 	}
 }

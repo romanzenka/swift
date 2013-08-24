@@ -19,7 +19,7 @@ public final class ChargeUnit {
 	private ChargeUnit(final Element chargeCarrier, final PeriodicTable pt) {
 		this.chargeCarrier = chargeCarrier;
 		this.pt = pt;
-		this.mass = this.chargeCarrier.getMonoisotopicMass() - this.pt.getElectronMass();
+		mass = this.chargeCarrier.getMonoisotopicMass() - this.pt.getElectronMass();
 	}
 
 	/**

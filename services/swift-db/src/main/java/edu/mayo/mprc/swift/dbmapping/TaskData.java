@@ -29,7 +29,7 @@ public class TaskData {
 	private Float percentDone;
 
 	public TaskData() {
-		this.setTaskState(new TaskStateData(TaskState.UNINITIALIZED.getText()));
+		setTaskState(new TaskStateData(TaskState.UNINITIALIZED.getText()));
 	}
 
 	public TaskData(final String name,
@@ -38,17 +38,17 @@ public class TaskData {
 	                final Date endTimeStamp,
 	                final SearchRun searchRun, final TaskStateData taskState, final String descriptionLong) {
 		setId(null);
-		this.taskName = name;
-		this.queueTimestamp = queueTimeStamp;
-		this.startTimestamp = startTimeStamp;
-		this.endTimestamp = endTimeStamp;
-		this.errorCode = 0;
-		this.errorMessage = null;
+		taskName = name;
+		queueTimestamp = queueTimeStamp;
+		startTimestamp = startTimeStamp;
+		endTimestamp = endTimeStamp;
+		errorCode = 0;
+		errorMessage = null;
 		this.searchRun = searchRun;
-		this.setTaskState(taskState);
+		setTaskState(taskState);
 		this.descriptionLong = descriptionLong;
-		this.exceptionString = null;
-		this.percentDone = null;
+		exceptionString = null;
+		percentDone = null;
 	}
 
 	public void setId(final Integer id) {
@@ -161,7 +161,7 @@ public class TaskData {
 	}
 
 	public void setHostString(final String hostString) {
-		this.host = hostString;
+		host = hostString;
 	}
 
 	public String getHostString() {

@@ -70,7 +70,7 @@ public abstract class ValidatableListBox extends ListBox implements Validatable 
 			addItem(stringrep);
 			byObject.put(values.get(i), i);
 		}
-		this.allowedValues = values;
+		allowedValues = values;
 	}
 
 	/**
@@ -79,7 +79,7 @@ public abstract class ValidatableListBox extends ListBox implements Validatable 
 	 * @return array of ClientValue
 	 */
 	public List<? extends ClientValue> getAllValues() {
-		return this.allowedValues;
+		return allowedValues;
 	}
 
 	@Override
@@ -91,8 +91,8 @@ public abstract class ValidatableListBox extends ListBox implements Validatable 
 	 * used to clear the values from list box
 	 */
 	public void clearValues() {
-		this.allowedValues = null;
-		this.clear();
+		allowedValues = null;
+		clear();
 	}
 
 	/**
@@ -102,12 +102,12 @@ public abstract class ValidatableListBox extends ListBox implements Validatable 
 	 */
 	public void addValue(final ClientValue value, final Comparator<ClientValue> c) {
 		if (isMultipleSelect()) {
-			final ClientValue selected = this.getClientValue();
+			final ClientValue selected = getClientValue();
 			addToMultiSelect(value, c);
 			// now set the selected ones
-			this.setValue(value);
+			setValue(value);
 
-			this.setValue(selected);
+			setValue(selected);
 		}
 		// TODO: Add non-multiple select variant
 	}
@@ -133,7 +133,7 @@ public abstract class ValidatableListBox extends ListBox implements Validatable 
 		// these need to be sorted
 		Collections.sort(allowed, c);
 
-		this.setAllowedValues(allowed);
+		setAllowedValues(allowed);
 	}
 
 	/**
@@ -144,10 +144,10 @@ public abstract class ValidatableListBox extends ListBox implements Validatable 
 	public void addValueWithoutSelecting(final ClientValue value, final Comparator<ClientValue> c) {
 
 		if (isMultipleSelect()) {
-			final ClientValue selected = this.getClientValue();
+			final ClientValue selected = getClientValue();
 			addToMultiSelect(value, c);
 
-			this.setValue(selected);
+			setValue(selected);
 		}
 		// TODO: Add non-multiple select variant
 	}
@@ -166,7 +166,7 @@ public abstract class ValidatableListBox extends ListBox implements Validatable 
 			final HashSet<ClientValue> hs = new HashSet<ClientValue>();
 			hs.addAll(toRemove);
 			final List<ClientValue> toKeep = new ArrayList<ClientValue>();
-			for (final ClientValue allowedValue : this.allowedValues) {
+			for (final ClientValue allowedValue : allowedValues) {
 				// if not in hs keep it
 				if (!hs.contains(allowedValue)) {
 					toKeep.add(allowedValue);
@@ -174,7 +174,7 @@ public abstract class ValidatableListBox extends ListBox implements Validatable 
 			}
 
 			Collections.sort(toKeep, c);
-			this.setAllowedValues(toKeep);
+			setAllowedValues(toKeep);
 		}
 		// TODO: Add non-multiple select variant
 	}

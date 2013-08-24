@@ -31,14 +31,14 @@ public final class JmsBrokerThread {
 	public JmsBrokerThread(final URI uri, final String brokerName) {
 		try {
 			this.uri = uri;
-			this.broker = new BrokerService();
-			this.broker.setPersistent(false);
-			this.broker.setUseJmx(true);
+			broker = new BrokerService();
+			broker.setPersistent(false);
+			broker.setUseJmx(true);
 			if (brokerName != null && !brokerName.isEmpty()) {
-				this.broker.setBrokerObjectName(new ObjectName(brokerName, "swift", "2.0"));
+				broker.setBrokerObjectName(new ObjectName(brokerName, "swift", "2.0"));
 			}
-			this.broker.addConnector(uri);
-			this.broker.start();
+			broker.addConnector(uri);
+			broker.start();
 		} catch (Exception e) {
 			throw new MprcException("Could not start broker for uri " + uri.toString(), e);
 		}

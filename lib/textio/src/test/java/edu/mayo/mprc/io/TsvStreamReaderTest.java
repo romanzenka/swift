@@ -10,7 +10,7 @@ public final class TsvStreamReaderTest {
 
 	@Test
 	public void testReader() throws IOException {
-		final TsvStreamReader reader = new TsvStreamReader(TestingUtilities.getTempFileFromResource(this.getClass(), "/tsvFile.tsv", true, null));
+		final TsvStreamReader reader = new TsvStreamReader(TestingUtilities.getTempFileFromResource(getClass(), "/tsvFile.tsv", true, null));
 		Assert.assertTrue(reader.hasLine(), "Reader must report lines");
 		final String header = reader.nextLine();
 		Assert.assertEquals(header, "header1\theader2\theader3\theader4\theader5");

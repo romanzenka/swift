@@ -81,10 +81,10 @@ public final class SpecificityBuilder {
 	}
 
 	public void addComment(final String comment) {
-		if (this.comments.length() > 0) {
-			this.comments.append("; ").append(comment);
+		if (comments.length() > 0) {
+			comments.append("; ").append(comment);
 		} else {
-			this.comments.append(comment);
+			comments.append(comment);
 		}
 	}
 

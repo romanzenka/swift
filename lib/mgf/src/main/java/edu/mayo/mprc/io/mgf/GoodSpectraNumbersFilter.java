@@ -18,7 +18,7 @@ public final class GoodSpectraNumbersFilter implements MgfPeakListFilter {
 
 	public GoodSpectraNumbersFilter(final Collection<Integer> allowedSpectra, final SpectrumNumberExtractor extractor) {
 		this.allowedSpectra = allowedSpectra;
-		this.spectrumNumberExtractor = extractor;
+		spectrumNumberExtractor = extractor;
 	}
 
 	@Override

@@ -19,7 +19,7 @@ public final class ModificationDialog extends FrameDialog {
 	public ModificationDialog(final ModificationSelectionEditor editor) {
 		super("", true, true, false, false);
 
-		this.setContent(editor);
+		setContent(editor);
 	}
 
 
@@ -51,13 +51,13 @@ public final class ModificationDialog extends FrameDialog {
 	@Override
 	protected void okay() {
 		// clear the description textarea
-		this.hide();
+		hide();
 	}
 
 	@Override
 	protected void cancel() {
 		// clear the description textarea
-		this.hide();
+		hide();
 	}
 
 

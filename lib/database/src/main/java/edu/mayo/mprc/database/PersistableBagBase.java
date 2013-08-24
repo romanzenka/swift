@@ -120,7 +120,7 @@ public abstract class PersistableBagBase<T extends PersistableBase> extends Pers
 
 		final PersistableBagBase that = (PersistableBagBase) o;
 
-		final LinkedHashMultiset<T> me = makeMultiset(this.getList());
+		final LinkedHashMultiset<T> me = makeMultiset(getList());
 		final LinkedHashMultiset<T> other = makeMultiset(that.getList());
 		return !(me != null ? !me.equals(other) : other != null);
 
@@ -138,6 +138,6 @@ public abstract class PersistableBagBase<T extends PersistableBase> extends Pers
 
 	@Override
 	public int hashCode() {
-		return getList() != null ? makeMultiset(this.getList()).hashCode() : 0;
+		return getList() != null ? makeMultiset(getList()).hashCode() : 0;
 	}
 }

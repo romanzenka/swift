@@ -88,7 +88,7 @@ public class MockParamsInfo extends ParamsInfo {
 			final MockUnimodDao dao = new MockUnimodDao();
 			try {
 				dao.begin();
-				this.unimod = dao.load();
+				unimod = dao.load();
 				dao.commit();
 			} catch (Exception t) {
 				dao.rollback();

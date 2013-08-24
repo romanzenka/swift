@@ -48,7 +48,7 @@ public final class MsconvertWorkPacket extends WorkPacketBase implements Cachabl
 		assert inputFile != null : "msconvert request cannot be created: input file is null";
 
 		this.outputFile = outputFile;
-		this.skipIfExists = bSkipIfExists;
+		skipIfExists = bSkipIfExists;
 		this.inputFile = inputFile;
 		this.publicAccess = publicAccess;
 	}

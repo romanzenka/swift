@@ -23,8 +23,8 @@ final class MgfIonsModeller implements IonsModellerInterface {
 	private static final double PROTON_MASS = 1.00727646;
 
 	public MgfIonsModeller() {
-		this.scans = new HashMap<String, Integer>();
-		this.dtaHistory = new HashMap<String, String>();
+		scans = new HashMap<String, Integer>();
+		dtaHistory = new HashMap<String, String>();
 		ionsSection = 1;
 	}
 
@@ -121,14 +121,14 @@ final class MgfIonsModeller implements IonsModellerInterface {
 	 */
 	public void clear() {
 
-		this.mz = null;
-		this.charge = null;
+		mz = null;
+		charge = null;
 
-		this.active = false;
-		this.done = false;
-		this.cycle = -1;
-		this.dtaFileName = null;
-		this.outFilePrefix = null;
+		active = false;
+		done = false;
+		cycle = -1;
+		dtaFileName = null;
+		outFilePrefix = null;
 	}
 
 	public static String matchPattern(final Pattern p, final String seq) {
@@ -311,22 +311,22 @@ final class MgfIonsModeller implements IonsModellerInterface {
 
 					// clear the ions
 					sIONS.setLength(0);
-					this.clear();
-					this.active = true;
+					clear();
+					active = true;
 					return;
 				}
 				loc = findEndIons(left, rem);
 				if (loc != -1) {
-					this.createDtaFilePrototype();
-					this.done = true;
+					createDtaFilePrototype();
+					done = true;
 					return;
 				}
 				loc = findTitle(left, rem);
 				if (loc != -1) {
-					this.sTITLE.setLength(0);
-					this.sTITLE.append(left, loc + TITLE.length(), rem - loc - TITLE.length());
-					this.sTITLE.setLength(rem - loc - TITLE.length());
-					this.parsetitle(sTITLE.toString());
+					sTITLE.setLength(0);
+					sTITLE.append(left, loc + TITLE.length(), rem - loc - TITLE.length());
+					sTITLE.setLength(rem - loc - TITLE.length());
+					parsetitle(sTITLE.toString());
 					return;
 				}
 			}
@@ -353,10 +353,10 @@ final class MgfIonsModeller implements IonsModellerInterface {
 			// found a dta filename
 			final File dta = new File(item);
 			item = dta.getName();
-			this.dtaFileName = this.workingDir + File.separator + item;
+			dtaFileName = workingDir + File.separator + item;
 		} else {
-			this.cycle = getCycleFromTitle(titleright);
-			if (this.cycle != -1) {
+			cycle = getCycleFromTitle(titleright);
+			if (cycle != -1) {
 				// in this case have to build the dta filename
 				//  <MGF file prefix>.<scan>.<scan><charge>.dta
 				item = findPattern(FILE_PATTERN, titleright);
@@ -373,13 +373,13 @@ final class MgfIonsModeller implements IonsModellerInterface {
 
 
 	private void createDtaFilePrototype() {
-		final String scan = (((this.cycle < 0 ? "_" + ionsSection : "" + this.cycle)));
-		this.scans.put(scan, this.ionsSection);
-		if (this.dtaFileName == null) {
+		final String scan = (((cycle < 0 ? "_" + ionsSection : "" + cycle)));
+		scans.put(scan, ionsSection);
+		if (dtaFileName == null) {
 			final String shortname = outFilePrefix + "." + scan + "." + scan + "." + charge + ".dta";
-			this.dtaFileName = this.workingDir + File.separator + shortname;
+			dtaFileName = workingDir + File.separator + shortname;
 		}
-		if (dtaHistory.get(this.dtaFileName) != null) {
+		if (dtaHistory.get(dtaFileName) != null) {
 			LOGGER.warn("duplicate DTA file name " + dtaFileName + " at " + mgfFileName + ":" + lineNumber + " previous occurrence at " + dtaHistory.get(dtaFileName));
 		} else {
 			// charge could contain a + sign at the end
@@ -398,8 +398,8 @@ final class MgfIonsModeller implements IonsModellerInterface {
 			charge = charge.replace("-", "");
 			final double mh = (new Double(mz) * new Double(charge) - ((new Double(charge)) - 1.0) * PROTON_MASS);
 
-			this.dtaHistory.put(this.dtaFileName, "" + mgfFileName + ":" + lineNumber);
-			final File dta = new File(this.dtaFileName);
+			dtaHistory.put(dtaFileName, "" + mgfFileName + ":" + lineNumber);
+			final File dta = new File(dtaFileName);
 			FileUtilities.ensureFileExists(dta);
 
 			FileWriter w = null;
@@ -409,7 +409,7 @@ final class MgfIonsModeller implements IonsModellerInterface {
 						.append(" ")
 						.append(charge)
 						.append("\n")
-						.append(this.sIONS);
+						.append(sIONS);
 			} catch (IOException ioe) {
 				throw new MprcException("could not write to file", ioe);
 			} finally {
@@ -418,24 +418,24 @@ final class MgfIonsModeller implements IonsModellerInterface {
 			//LOGGER.debug("created file="+dta.getAbsolutePath());
 
 
-			this.sequestSubmitter.addDtaFile(new File(this.dtaFileName), false);
-			this.ionsSection++;
+			sequestSubmitter.addDtaFile(new File(dtaFileName), false);
+			ionsSection++;
 		}
 	}
 
 	@Override
 	public void setSequestSubmitter(final SequestSubmitterInterface submitter) {
-		this.sequestSubmitter = submitter;
+		sequestSubmitter = submitter;
 	}
 
 
 	@Override
 	public void setWorkingDir(final String name) {
-		this.workingDir = name;
+		workingDir = name;
 	}
 
 	@Override
 	public void setOutFilePrefix(final String name) {
-		this.outFilePrefix = name;
+		outFilePrefix = name;
 	}
 }

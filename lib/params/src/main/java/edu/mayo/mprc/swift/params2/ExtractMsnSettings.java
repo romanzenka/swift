@@ -66,8 +66,8 @@ public class ExtractMsnSettings extends PersistableBase {
 	}
 
 	public ExtractMsnSettings copy() {
-		final ExtractMsnSettings msnSettings = new ExtractMsnSettings(this.getCommandLineSwitches(), this.getCommand());
-		msnSettings.setId(this.getId());
+		final ExtractMsnSettings msnSettings = new ExtractMsnSettings(getCommandLineSwitches(), getCommand());
+		msnSettings.setId(getId());
 		return msnSettings;
 	}
 }

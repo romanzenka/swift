@@ -70,7 +70,7 @@ public enum ParamName {
 			case ScaffoldSettings:
 				return params.getScaffoldSettings();
 			default:
-				throw new MprcException("Unsupported parameter " + this.toString());
+				throw new MprcException("Unsupported parameter " + toString());
 		}
 	}
 

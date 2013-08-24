@@ -104,9 +104,9 @@ public abstract class ValidatedTextBox extends TextBox {
 	 */
 	public final void setInvalid(final boolean b) {
 		if (b && !isInvalid()) {
-			this.addStyleDependentName("invalid");
+			addStyleDependentName("invalid");
 		} else if (!b && isInvalid()) {
-			this.removeStyleDependentName("invalid");
+			removeStyleDependentName("invalid");
 		}
 		return;
 	}
@@ -135,7 +135,7 @@ public abstract class ValidatedTextBox extends TextBox {
 	 * @return True if the widget is in the invalid state or false otherwise
 	 */
 	public final boolean isInvalid() {
-		return this.getStyleName().contains("-invalid");
+		return getStyleName().contains("-invalid");
 	}
 
 	@Override

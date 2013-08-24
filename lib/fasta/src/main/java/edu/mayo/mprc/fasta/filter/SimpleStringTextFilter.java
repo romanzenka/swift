@@ -46,7 +46,7 @@ public final class SimpleStringTextFilter implements TextFilter {
 		}
 
 		//get the size in order to reduce the calls to criteria.size() in the future
-		this.tokenCount = this.criteria.size();
+		tokenCount = criteria.size();
 	}
 
 	/**
@@ -73,11 +73,11 @@ public final class SimpleStringTextFilter implements TextFilter {
 		// - mode is any and count is 0
 		// - mode is all and match ount is less then the number of criteria
 		// - mode is none and we have a match
-		if ((this.mode == MatchMode.ANY) && (matchCount == 0)) {
+		if ((mode == MatchMode.ANY) && (matchCount == 0)) {
 			return false;
-		} else if ((this.mode == MatchMode.ALL) && (matchCount < this.tokenCount)) {
+		} else if ((mode == MatchMode.ALL) && (matchCount < tokenCount)) {
 			return false;
-		} else if ((this.mode == MatchMode.NONE) && (matchCount > 0)) {
+		} else if ((mode == MatchMode.NONE) && (matchCount > 0)) {
 			return false;
 		}
 
@@ -101,7 +101,7 @@ public final class SimpleStringTextFilter implements TextFilter {
 	 */
 	@Override
 	public String testCriteria() {
-		if (this.criteria == null || this.criteria.isEmpty()) {
+		if (criteria == null || criteria.isEmpty()) {
 			return "Enter a criteria string";
 		}
 		return TextFilter.VALID;

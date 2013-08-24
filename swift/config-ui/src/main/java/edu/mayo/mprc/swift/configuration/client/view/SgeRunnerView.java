@@ -33,7 +33,7 @@ public final class SgeRunnerView extends SimplePanel {
 				.property(MEMORY_REQUIREMENT, "Memory Requirement", "SGE memory requirement for jobs running in this queue.<p>Integer, in MB.</p><p>Will set <tt>-l s_vmem=</tt> memory soft limit option for SGE.</p>");
 		propertyList = builder.end();
 
-		this.add(propertyList);
+		add(propertyList);
 		setModel(model);
 	}
 

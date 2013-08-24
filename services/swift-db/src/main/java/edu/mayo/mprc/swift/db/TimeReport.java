@@ -123,8 +123,8 @@ public final class TimeReport {
 		@Override
 		public int compareTo(final TaskTimestamp o) {
 			return ComparisonChain.start()
-					.compare(this.time, o.time)
-					.compare(this.start, o.start)
+					.compare(time, o.time)
+					.compare(start, o.start)
 					.result();
 		}
 

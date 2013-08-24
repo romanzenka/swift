@@ -16,7 +16,7 @@ public final class ClientPeptideReport implements Serializable {
 	}
 
 	public ClientPeptideReport(final boolean scaffoldReportEnabled) {
-		this.scaffoldPeptideReportEnabled = scaffoldReportEnabled;
+		scaffoldPeptideReportEnabled = scaffoldReportEnabled;
 	}
 
 	public boolean isScaffoldPeptideReportEnabled() {

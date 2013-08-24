@@ -56,12 +56,12 @@ public final class ClientSwiftSearchDefinition implements Serializable {
 		this.outputFolder = outputFolder;
 		this.paramSet = paramSet;
 		this.inputFiles = inputFiles;
-		this.clientSpectrumQa = spectrumQa;
-		this.clientPeptideReport = peptideReport;
+		clientSpectrumQa = spectrumQa;
+		clientPeptideReport = peptideReport;
 		this.publicMgfFiles = publicMgfFiles;
 		this.publicSearchFiles = publicSearchFiles;
 		this.previousSearchRunId = previousSearchRunId;
-		this.fromScratch = false;
+		fromScratch = false;
 	}
 
 	public String getSearchTitle() {

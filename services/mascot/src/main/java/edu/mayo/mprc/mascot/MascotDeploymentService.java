@@ -255,7 +255,7 @@ public final class MascotDeploymentService extends DeploymentService<DeploymentR
 			final MonitorLogPoller poller = new MonitorLogPoller(getLogFile(), request.getShortName());
 			new Thread(poller).start();
 
-			final File toDeploy = this.getFileToDeploy(request.getShortName());
+			final File toDeploy = getFileToDeploy(request.getShortName());
 			FileUtilities.ensureFolderExists(toDeploy.getParentFile());
 
 			if (!toDeploy.exists()) {
@@ -263,7 +263,7 @@ public final class MascotDeploymentService extends DeploymentService<DeploymentR
 			}
 
 			//if we have a curation in mind then deploy it with the unique name of that curation if not we have to use the curation shortname given in the request
-			this.updateMascotDatFile(request.getShortName(), toDeploy);
+			updateMascotDatFile(request.getShortName(), toDeploy);
 			final Integer lastLogSize = 0;
 			int currentSleep = 50; // Start at 50 milliseconds, go up to 1 second delays
 			while (poller.getStatus() == MonitorLogPoller.STATUS_MONITORING) {
@@ -294,7 +294,7 @@ public final class MascotDeploymentService extends DeploymentService<DeploymentR
 	@Override
 	public DeploymentResult performUndeployment(final DeploymentRequest request) {
 		final DeploymentResult reportResult = new DeploymentResult();
-		final File deployedFile = this.getFileToDeploy(request.getShortName());
+		final File deployedFile = getFileToDeploy(request.getShortName());
 
 		try {
 			final MascotDatabaseMaintenance databaseMaintenance = getMascotDatabaseMaintenance();
@@ -313,7 +313,7 @@ public final class MascotDeploymentService extends DeploymentService<DeploymentR
 				/**
 				 * Clean up deployment files.
 				 */
-				this.cleanUpDeployedFiles(deployedFile, reportResult);
+				cleanUpDeployedFiles(deployedFile, reportResult);
 			}
 		} catch (Exception e) {
 			throw new MprcException("Error occurred while undeploying database " + request.getShortName() + " from Mascot.", e);
@@ -390,8 +390,8 @@ public final class MascotDeploymentService extends DeploymentService<DeploymentR
 			String in = isr.readLine();
 			String inSection = "";
 
-			final String newLineRep = this.repLine.replaceAll("%shortname%", Matcher.quoteReplacement(shortname)).replaceAll("%tab%", "\t");
-			final String newLineSeq = this.seqLine.replaceAll("%shortname%", Matcher.quoteReplacement(shortname)).replaceAll("%tab%", "\t");
+			final String newLineRep = repLine.replaceAll("%shortname%", Matcher.quoteReplacement(shortname)).replaceAll("%tab%", "\t");
+			final String newLineSeq = seqLine.replaceAll("%shortname%", Matcher.quoteReplacement(shortname)).replaceAll("%tab%", "\t");
 			boolean containsLineRep = false;
 			boolean containsLineSeq = false;
 			String currentLine = null;
@@ -540,7 +540,7 @@ public final class MascotDeploymentService extends DeploymentService<DeploymentR
 				.append(FileUtilities.getExtension(fileToDeploy.getAbsolutePath()));
 
 		//append the parameter string tells mascot how to do certain things.  This should be uniform between all deployed curations
-		sb.append(this.getDeploymentParameterList());
+		sb.append(getDeploymentParameterList());
 
 		return sb.toString();
 	}
@@ -564,7 +564,7 @@ public final class MascotDeploymentService extends DeploymentService<DeploymentR
 	 */
 	private synchronized String getDeploymentParameterList() {
 		try {
-			final String parameterList = this.datParameters;
+			final String parameterList = datParameters;
 
 			final String[] individualParameters = parameterList.split("[\\s]");
 
@@ -644,11 +644,11 @@ public final class MascotDeploymentService extends DeploymentService<DeploymentR
 			RandomAccessFile logRAF = null;
 			try {
 				//open the log file read only and go to the end and read in the position at the end of the file
-				logRAF = new RandomAccessFile(this.logFile, "r");
+				logRAF = new RandomAccessFile(logFile, "r");
 
 				LOGGER.info("Monitoring file: " + logFile.getAbsolutePath());
 
-				long lastWriteCheck = this.logFile.length();
+				long lastWriteCheck = logFile.length();
 				final List<String> linesSinceLastCheck = new ArrayList<String>();
 
 				long lastReadLinePosition = logRAF.length() - 1;
@@ -657,7 +657,7 @@ public final class MascotDeploymentService extends DeploymentService<DeploymentR
 				final int maximumTimeout = 500;
 				int currentTimeout = 10;
 				while (status == STATUS_MONITORING) {
-					final long currentWriteCheck = this.logFile.length();
+					final long currentWriteCheck = logFile.length();
 
 					//if the size of the file has changed
 					if (currentWriteCheck > lastWriteCheck) {
@@ -681,18 +681,18 @@ public final class MascotDeploymentService extends DeploymentService<DeploymentR
 									//log any lines that contain the short name
 
 									synchronized (this) {
-										this.log.append(line).append("\n");
+										log.append(line).append("\n");
 									}
 
-									if (this.successIndicator.matcher(line).matches()) {
+									if (successIndicator.matcher(line).matches()) {
 										LOGGER.debug("Mascot deploying  " + shortname + ": success indicator matched: " + line);
-										this.status = STATUS_SUCCESSFUL;
-									} else if (this.failedIndicator.matcher(line).matches()) {
+										status = STATUS_SUCCESSFUL;
+									} else if (failedIndicator.matcher(line).matches()) {
 										LOGGER.debug("Mascot deploying " + shortname + ": failed indicator matched: " + line);
-										this.status = STATUS_FAILED;
-									} else if (this.outOfDatabasesIndicator.matcher(line).matches()) {
+										status = STATUS_FAILED;
+									} else if (outOfDatabasesIndicator.matcher(line).matches()) {
 										LOGGER.debug("Mascot deploying " + shortname + ": out of databases indicator matched: " + line);
-										this.status = STATUS_FAILED;
+										status = STATUS_FAILED;
 									} else {
 										LOGGER.debug("Mascot deploying " + shortname + ": relevant line: " + line);
 									}
@@ -734,7 +734,7 @@ public final class MascotDeploymentService extends DeploymentService<DeploymentR
 		 * @return
 		 */
 		public synchronized int getStatus() {
-			return this.status;
+			return status;
 		}
 
 		/**

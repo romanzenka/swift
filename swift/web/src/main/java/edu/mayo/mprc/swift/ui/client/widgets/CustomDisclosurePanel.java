@@ -213,7 +213,7 @@ public final class CustomDisclosurePanel extends Composite implements
 
 	@Override
 	public void add(final Widget w) {
-		if (this.getContent() == null) {
+		if (getContent() == null) {
 			setContent(w);
 		} else {
 			throw new IllegalStateException(

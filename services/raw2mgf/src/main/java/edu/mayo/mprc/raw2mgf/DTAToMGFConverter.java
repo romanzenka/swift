@@ -21,7 +21,7 @@ public final class DTAToMGFConverter {
 
 	public DTAToMGFConverter(final File[] dtaFiles, final File outputMgfFile) {
 		this.dtaFiles = dtaFiles;
-		this.resultFile = outputMgfFile;
+		resultFile = outputMgfFile;
 	}
 
 	public boolean isWineCleanup() {
@@ -34,7 +34,7 @@ public final class DTAToMGFConverter {
 
 	public void run() {
 		try {
-			convert(resultFile, dtaFiles, this.wineCleanup);
+			convert(resultFile, dtaFiles, wineCleanup);
 		} catch (IOException e) {
 			throw new MprcException("Conversion of dta files to [" + (resultFile == null ? "null" : resultFile.getAbsolutePath()) + "] failed", e);
 		} finally {
@@ -161,7 +161,7 @@ public final class DTAToMGFConverter {
 	}
 
 	public File getResultFile() {
-		return this.resultFile;
+		return resultFile;
 	}
 }
 

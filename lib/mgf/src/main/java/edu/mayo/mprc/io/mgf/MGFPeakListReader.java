@@ -44,7 +44,7 @@ public final class MGFPeakListReader implements Closeable {
 	 */
 	public MGFPeakListReader(final File inputFile) {
 		this.inputFile = inputFile;
-		this.readPeaks = true;
+		readPeaks = true;
 		bufferedReader = FileUtilities.getReader(inputFile);
 	}
 

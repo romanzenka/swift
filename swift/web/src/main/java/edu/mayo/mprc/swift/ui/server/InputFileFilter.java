@@ -52,7 +52,7 @@ public final class InputFileFilter implements FilenameFilter, Serializable {
 		boolean result = false;
 		final File file = new File(dir, name);
 		if (!file.isHidden()) {
-			if (this.dirsToo && file.isDirectory() && (dirPattern == null || dirPattern.matcher(name).matches())) {
+			if (dirsToo && file.isDirectory() && (dirPattern == null || dirPattern.matcher(name).matches())) {
 				result = true;
 			} else if (file.isFile()) {
 				final Matcher match = filePattern.matcher(name);

@@ -92,7 +92,7 @@ public abstract class FrameDialog extends DialogBox {
 
 
 	public void setOkListener(final ClickListener listener) {
-		this.okayButton.addClickListener(listener);
+		okayButton.addClickListener(listener);
 	}
 
 	protected abstract void okay();

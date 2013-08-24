@@ -47,7 +47,7 @@ public class SearchRun extends PersistableBase implements Serializable {
 		this.errorMessage = errorMessage;
 		this.numTasks = numTasks;
 		this.tasksWithWarning = tasksWithWarning;
-		this.tasksFailed = taskFailed;
+		tasksFailed = taskFailed;
 		this.tasksCompleted = tasksCompleted;
 		this.hidden = hidden ? 1 : 0;
 	}

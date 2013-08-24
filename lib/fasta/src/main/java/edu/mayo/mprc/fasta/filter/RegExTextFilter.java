@@ -36,7 +36,7 @@ public final class RegExTextFilter implements TextFilter {
 	 * @throws PatternSyntaxException
 	 */
 	public RegExTextFilter(final String regex) {
-		this.searchRegEx = regex;
+		searchRegEx = regex;
 	}
 
 
@@ -50,8 +50,8 @@ public final class RegExTextFilter implements TextFilter {
 	public boolean matches(final String toMatch) {
 		compilePattern();
 
-		boolean result = this.pattern.matcher(toMatch).find();
-		if (this.mode == MatchMode.NONE) {
+		boolean result = pattern.matcher(toMatch).find();
+		if (mode == MatchMode.NONE) {
 			result = !result;
 		}
 		return result;
@@ -85,8 +85,8 @@ public final class RegExTextFilter implements TextFilter {
 	}
 
 	private void compilePattern() {
-		if (this.pattern == null) {
-			this.pattern = Pattern.compile(this.searchRegEx, Pattern.CASE_INSENSITIVE);
+		if (pattern == null) {
+			pattern = Pattern.compile(searchRegEx, Pattern.CASE_INSENSITIVE);
 		}
 	}
 }

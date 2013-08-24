@@ -107,8 +107,8 @@ public final class SwiftApp implements EntryPoint, HidesPageContentsWhileLoading
 
 	private void loadCompleted() {
 		// The load completed, enable buttons
-		this.runButton.setEnabled(true);
-		this.addFileButton.setEnabled(true);
+		runButton.setEnabled(true);
+		addFileButton.setEnabled(true);
 	}
 
 	private void initPage(Integer previousSearchId) {
@@ -242,8 +242,8 @@ public final class SwiftApp implements EntryPoint, HidesPageContentsWhileLoading
 	}
 
 	private void setOutputPathChangeEnabled(final boolean enabled) {
-		if (output != null && enabled != this.outputPathChangeEnabled) {
-			this.outputPathChangeEnabled = enabled;
+		if (output != null && enabled != outputPathChangeEnabled) {
+			outputPathChangeEnabled = enabled;
 			if (!outputPathChangeEnabled) {
 				outputPathUserSpecified = false;
 			}

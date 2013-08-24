@@ -24,7 +24,7 @@ public class ReportData {
 	}
 
 	public ReportData(final File file, final DateTime dateCreated, final SearchRun searchRun) {
-		this.reportFile = file;
+		reportFile = file;
 		this.dateCreated = dateCreated;
 		this.searchRun = searchRun;
 	}

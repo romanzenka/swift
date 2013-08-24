@@ -28,7 +28,7 @@ public final class ClientInteger implements ClientValue {
 	}
 
 	public String toString() {
-		if (this.value == null) {
+		if (value == null) {
 			return "(null)";
 		}
 		return String.valueOf(value);

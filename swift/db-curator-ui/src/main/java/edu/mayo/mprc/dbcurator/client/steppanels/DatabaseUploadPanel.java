@@ -137,8 +137,8 @@ public final class DatabaseUploadPanel extends AbstractStepPanel {
 
 	@Override
 	public CurationStepStub getContainedStep() {
-		this.containedStep.clientFilePath = this.lblClientPath.getText();
-		this.containedStep.serverFilePath = this.lblServerPath.getText();
+		containedStep.clientFilePath = lblClientPath.getText();
+		containedStep.serverFilePath = lblServerPath.getText();
 		return containedStep;
 	}
 
@@ -148,7 +148,7 @@ public final class DatabaseUploadPanel extends AbstractStepPanel {
 			ExceptionUtilities.throwCastException(step, DatabaseUploadStepStub.class);
 			return;
 		}
-		this.containedStep = (DatabaseUploadStepStub) step;
+		containedStep = (DatabaseUploadStepStub) step;
 		update();
 	}
 
@@ -159,14 +159,14 @@ public final class DatabaseUploadPanel extends AbstractStepPanel {
 
 	@Override
 	public void update() {
-		if (this.containedStep.clientFilePath != null) {
-			this.lblClientPath.setText(this.containedStep.clientFilePath);
+		if (containedStep.clientFilePath != null) {
+			lblClientPath.setText(containedStep.clientFilePath);
 		} else {
-			this.lblClientPath.setText("");
+			lblClientPath.setText("");
 		}
 
 		if (containedStep.serverFilePath != null && !containedStep.serverFilePath.isEmpty()) {
-			this.lblServerPath.setText(this.containedStep.serverFilePath);
+			lblServerPath.setText(containedStep.serverFilePath);
 			lblNotification.setText("Upload Complete");
 		}
 	}

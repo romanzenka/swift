@@ -25,7 +25,7 @@ public final class DatabaseUndeployerWorkPacket extends WorkPacketBase {
 		super(taskId, true);
 
 		this.dbToUndeploy = dbToUndeploy;
-		this.curationFile = dbToUndeploy.getCurationFile();
+		curationFile = dbToUndeploy.getCurationFile();
 	}
 
 	public Curation getDbToUndeploy() {

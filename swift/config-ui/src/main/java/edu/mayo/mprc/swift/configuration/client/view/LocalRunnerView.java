@@ -23,7 +23,7 @@ public final class LocalRunnerView extends SimplePanel {
 		builder.property("logOutputFolder", LOG_OUTPUT_FOLDER, "Output folder where standard out log file and error out log files are stored.<p>If you do not enter any value, the setting per daemon will be used.");
 		propertyList = builder.end();
 
-		this.add(propertyList);
+		add(propertyList);
 		setModel(model);
 	}
 

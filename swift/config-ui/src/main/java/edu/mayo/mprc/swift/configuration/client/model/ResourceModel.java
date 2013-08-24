@@ -23,16 +23,16 @@ public class ResourceModel implements Serializable {
 	}
 
 	public ResourceModel(final String name, final String type) {
-		this.properties.put(NAME, name);
-		this.properties.put(TYPE, type);
+		properties.put(NAME, name);
+		properties.put(TYPE, type);
 		count++;
-		this.id = type + count;
+		id = type + count;
 	}
 
 	public ResourceModel(final String id, final String name, final String type) {
 		this.id = id;
-		this.properties.put(NAME, name);
-		this.properties.put(TYPE, type);
+		properties.put(NAME, name);
+		properties.put(TYPE, type);
 	}
 
 	public void setId(final String id) {
@@ -87,12 +87,12 @@ public class ResourceModel implements Serializable {
 	}
 
 	public String getProperty(final String name) {
-		return this.properties.get(name);
+		return properties.get(name);
 	}
 
 	public void setProperty(final String name, final String value) {
-		final String oldValue = this.properties.get(name);
-		this.properties.put(name, value);
+		final String oldValue = properties.get(name);
+		properties.put(name, value);
 
 		if (!valuesEqual(value, oldValue)) {
 			firePropertyChange(name, value);

@@ -109,7 +109,7 @@ public final class WorkspaceDaoHibernate extends DaoBase implements WorkspaceDao
 	}
 
 	private void updateUserRights() {
-		final List<User> users = this.getUsersWithRights();
+		final List<User> users = getUsersWithRights();
 		if (!users.isEmpty()) {
 			LOGGER.info("Updating user rights");
 			for (final User user : users) {

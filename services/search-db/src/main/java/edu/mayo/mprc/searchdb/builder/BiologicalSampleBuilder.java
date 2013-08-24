@@ -27,7 +27,7 @@ public class BiologicalSampleBuilder implements Builder<BiologicalSample> {
 		this.analysis = analysis;
 		this.sampleName = sampleName;
 		this.category = category;
-		this.searchResults = new SearchResultListBuilder(this);
+		searchResults = new SearchResultListBuilder(this);
 	}
 
 	@Override

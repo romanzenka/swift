@@ -110,11 +110,11 @@ public final class Mgf2SequestCaller implements Mgf2SequestInterface {
 
 		final File searchParamsFile = prepareParamsFile(paramsFile, hdrFile, tempFolderName);
 
-		final File outputDir = this.getOutputDir(tarFile);
+		final File outputDir = getOutputDir(tarFile);
 
 		// find the max allowable command line length and reduce it by 1000
-		if (this.maxCommandLineLength == 0) {
-			this.maxCommandLineLength = (int) getMaxCallLength();
+		if (maxCommandLineLength == 0) {
+			maxCommandLineLength = (int) getMaxCallLength();
 		}
 
 		final File tarFileName = prepareTarFileLocation(tarFile);
@@ -122,7 +122,7 @@ public final class Mgf2SequestCaller implements Mgf2SequestInterface {
 
 		final SequestRunner sc = new SequestRunner(tempFolder, paramsFile, new ArrayList<File>(), hostsFile);
 
-		sc.setSequestExe(this.sequestExe);
+		sc.setSequestExe(sequestExe);
 		sc.setWatchDogTimeOut(watchDogTimeOut);
 		sc.setStartTimeOut(startTimeOut);
 		sc.setSearchResultsFolder(outputDir.getAbsolutePath());
@@ -257,7 +257,7 @@ public final class Mgf2SequestCaller implements Mgf2SequestInterface {
 
 	@Override
 	public void setMaxCommandLineLength(final int commandLineLength) {
-		this.maxCommandLineLength = commandLineLength;
+		maxCommandLineLength = commandLineLength;
 	}
 
 

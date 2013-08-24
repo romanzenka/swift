@@ -116,7 +116,7 @@ public final class ScaffoldSettingsEditor extends Composite implements Validatab
 			}
 		});
 
-		this.initWidget(panel);
+		initWidget(panel);
 	}
 
 	@Override

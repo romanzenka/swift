@@ -34,8 +34,8 @@ abstract class TaskProgressListener implements ProgressListener {
 	@Override
 	public void requestTerminated(final Exception e) {
 		try {
-			NDC.push(this.task.getFullId());
-			LOGGER.debug("Task failed: " + this.task.getName(), e);
+			NDC.push(task.getFullId());
+			LOGGER.debug("Task failed: " + task.getName(), e);
 			task.setError(e);
 		} finally {
 			NDC.pop();

@@ -122,10 +122,10 @@ public final class HeaderTransformPanel extends AbstractStepPanel {
 
 	@Override
 	public CurationStepStub getContainedStep() {
-		this.containedStep.description = txtDescription.getText();
-		this.containedStep.matchPattern = txtMatchPattern.getText();
-		this.containedStep.subPattern = txtSubPattern.getText();
-		return this.containedStep;
+		containedStep.description = txtDescription.getText();
+		containedStep.matchPattern = txtMatchPattern.getText();
+		containedStep.subPattern = txtSubPattern.getText();
+		return containedStep;
 	}
 
 	/**
@@ -168,16 +168,16 @@ public final class HeaderTransformPanel extends AbstractStepPanel {
 			ExceptionUtilities.throwCastException(step, HeaderTransformStub.class);
 			return;
 		}
-		this.containedStep = (HeaderTransformStub) step;
+		containedStep = (HeaderTransformStub) step;
 		update();
 	}
 
 	@Override
 	public void update() {
-		if (this.containedStep != null) {
-			txtDescription.setText(this.containedStep.description);
-			txtMatchPattern.setText(this.containedStep.matchPattern);
-			txtSubPattern.setText(this.containedStep.subPattern);
+		if (containedStep != null) {
+			txtDescription.setText(containedStep.description);
+			txtMatchPattern.setText(containedStep.matchPattern);
+			txtSubPattern.setText(containedStep.subPattern);
 		}
 	}
 }

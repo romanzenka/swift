@@ -65,7 +65,7 @@ public final class ParamsInfoImpl extends ParamsInfo {
 
 	private void initializeEnzymes() {
 		if (enzymes == null) {
-			this.enzymes = paramsDao.proteases();
+			enzymes = paramsDao.proteases();
 		}
 	}
 
@@ -78,7 +78,7 @@ public final class ParamsInfoImpl extends ParamsInfo {
 	private void initializeUnimod() {
 		if (unimod == null) {
 			try {
-				this.unimod = unimodDao.load();
+				unimod = unimodDao.load();
 			} catch (Exception t) {
 				throw new MprcException("Could not load unimod data from the database", t);
 			}
@@ -105,7 +105,7 @@ public final class ParamsInfoImpl extends ParamsInfo {
 
 	private void initializeInstruments() {
 		if (insts == null) {
-			this.insts = paramsDao.instruments();
+			insts = paramsDao.instruments();
 			for (final Instrument instrument : insts) {
 				if (instrument.getMascotName() != null && instrument.getMascotName().equals(Instrument.ORBITRAP.getMascotName())) {
 					defInst = instrument;

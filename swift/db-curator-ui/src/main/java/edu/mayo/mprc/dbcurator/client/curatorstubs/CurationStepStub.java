@@ -43,7 +43,7 @@ public abstract class CurationStepStub implements Serializable {
 	 * the number of sequences that were in the curation when the step was complete
 	 */
 	public Integer getCompletionCount() {
-		return this.completionCount;
+		return completionCount;
 	}
 
 	/**
@@ -60,7 +60,7 @@ public abstract class CurationStepStub implements Serializable {
 	 * it should not be allowed to be changed.
 	 */
 	public Integer getId() {
-		return this.id;
+		return id;
 	}
 
 	/**
@@ -74,7 +74,7 @@ public abstract class CurationStepStub implements Serializable {
 	 * get the progress of teh step if it is executing else null
 	 */
 	public Integer getProgress() {
-		return this.progress;
+		return progress;
 	}
 
 	/**
@@ -92,14 +92,14 @@ public abstract class CurationStepStub implements Serializable {
 	 * @param msg
 	 */
 	public void addMessage(final String msg) {
-		this.messages.add(msg);
+		messages.add(msg);
 	}
 
 	/**
 	 * gets any error messages that should be associated with the Step
 	 */
 	public List<String> getErrorMessages() {
-		return this.messages;
+		return messages;
 	}
 
 	/**

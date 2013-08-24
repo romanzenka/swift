@@ -29,7 +29,7 @@ public final class AsyncFileWriter implements Runnable, Future<File> {
 		final URLConnection connection = source.openConnection();
 		connection.connect();
 		sourceSize = connection.getContentLength();
-		this.outFile = toWriteTo;
+		outFile = toWriteTo;
 	}
 
 	@Override
@@ -40,8 +40,8 @@ public final class AsyncFileWriter implements Runnable, Future<File> {
 			istream = connection.getInputStream();
 			FileUtilities.writeStreamToFile(istream, outFile);
 			synchronized (this) {
-				this.results.add(outFile);
-				this.notifyAll();
+				results.add(outFile);
+				notifyAll();
 			}
 		} catch (Exception e) {
 			throw new MprcException("Error writing file.", e);
@@ -79,7 +79,7 @@ public final class AsyncFileWriter implements Runnable, Future<File> {
 	@Override
 	public synchronized boolean cancel(final boolean mayInterruptIfRunning) {
 		if (isDone() || mayInterruptIfRunning) {
-			this.cancelled.set(true);
+			cancelled.set(true);
 			notifyAll();
 			return true;
 		}
@@ -88,7 +88,7 @@ public final class AsyncFileWriter implements Runnable, Future<File> {
 
 	@Override
 	public synchronized boolean isCancelled() {
-		return this.cancelled.get();
+		return cancelled.get();
 	}
 
 	@Override
@@ -108,15 +108,15 @@ public final class AsyncFileWriter implements Runnable, Future<File> {
 
 	private void monitorProgress(final String progressMessage) {
 		new Thread(this).start();
-		while (!this.isDone() && !this.isCancelled()) {
+		while (!isDone() && !isCancelled()) {
 			if (sourceSize < 0) {
 				LOGGER.debug(progressMessage + "(progress undetermined)");
 			} else {
-				LOGGER.debug(progressMessage + this.getProgress() + "%");
+				LOGGER.debug(progressMessage + getProgress() + "%");
 			}
 			try {
 				synchronized (this) {
-					this.wait(PROGRESS_UPDATE_GRANULARITY);
+					wait(PROGRESS_UPDATE_GRANULARITY);
 				}
 			} catch (InterruptedException e) {
 				throw new MprcException("Download interrupted", e);

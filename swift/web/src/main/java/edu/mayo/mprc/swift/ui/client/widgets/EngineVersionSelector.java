@@ -103,7 +103,7 @@ public final class EngineVersionSelector extends HorizontalPanel implements Comp
 
 	@Override
 	public int compareTo(EngineVersionSelector o) {
-		return this.order < o.order ? -1 : (this.order == o.order ? 0 : 1);
+		return order < o.order ? -1 : (order == o.order ? 0 : 1);
 	}
 
 	public String getCode() {

@@ -37,11 +37,11 @@ public final class ScafmlBiologicalSample extends FileHolder {
 	}
 
 	public String getId() {
-		return this.id;
+		return id;
 	}
 
 	public ScafmlInputFile getInputFile(final String id) {
-		return this.inputFiles.get(id);
+		return inputFiles.get(id);
 	}
 
 	public void addInputFile(final ScafmlInputFile pInputFile) {
@@ -52,8 +52,8 @@ public final class ScafmlBiologicalSample extends FileHolder {
 		if (id == null) {
 			throw new MprcException("no id for Input File\" object");
 		}
-		if (this.inputFiles.get(id) == null) {
-			this.inputFiles.put(id, pInputFile);
+		if (inputFiles.get(id) == null) {
+			inputFiles.put(id, pInputFile);
 		}
 	}
 
@@ -62,7 +62,7 @@ public final class ScafmlBiologicalSample extends FileHolder {
 	}
 
 	public void setAnalyzeAsMudpit(final String sAnalyzeMudpit) {
-		this.analyzeAsMudpit = sAnalyzeMudpit;
+		analyzeAsMudpit = sAnalyzeMudpit;
 	}
 
 	public String getAnalyzeAsMudpit() {
@@ -70,7 +70,7 @@ public final class ScafmlBiologicalSample extends FileHolder {
 	}
 
 	public void setDatabase(final String sDatabase) {
-		this.database = sDatabase;
+		database = sDatabase;
 	}
 
 	public String getDatabase() {
@@ -78,7 +78,7 @@ public final class ScafmlBiologicalSample extends FileHolder {
 	}
 
 	public void setName(final String sName) {
-		this.name = sName;
+		name = sName;
 	}
 
 	public String getName() {
@@ -86,7 +86,7 @@ public final class ScafmlBiologicalSample extends FileHolder {
 	}
 
 	public void setCategory(final String sCategory) {
-		this.category = sCategory;
+		category = sCategory;
 	}
 
 	public String getCategory() {
@@ -95,18 +95,18 @@ public final class ScafmlBiologicalSample extends FileHolder {
 
 
 	public void appendToDocument(final StringBuilder result, final String indent) {
-		if (this.inputFiles.values().isEmpty()) {
-			result.append(indent).append("<!-- Biological sample with no input files: ").append(this.getName()).append(" -->\n");
+		if (inputFiles.values().isEmpty()) {
+			result.append(indent).append("<!-- Biological sample with no input files: ").append(getName()).append(" -->\n");
 		} else {
 			final String header = indent + "<" + "BiologicalSample" +
-					XMLUtilities.wrapatt("analyzeAsMudpit", this.getAnalyzeAsMudpit()) +
-					XMLUtilities.wrapatt("database", this.getDatabase()) +
-					XMLUtilities.wrapatt("name", this.getName()) +
-					XMLUtilities.wrapatt("category", this.getCategory()) +
+					XMLUtilities.wrapatt("analyzeAsMudpit", getAnalyzeAsMudpit()) +
+					XMLUtilities.wrapatt("database", getDatabase()) +
+					XMLUtilities.wrapatt("name", getName()) +
+					XMLUtilities.wrapatt("category", getCategory()) +
 					">\n";
 			result.append(header);
 			// now the input files
-			for (final ScafmlInputFile inputfile : this.inputFiles.values()) {
+			for (final ScafmlInputFile inputfile : inputFiles.values()) {
 				inputfile.appendToDocument(result, indent + '\t');
 			}
 

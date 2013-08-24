@@ -29,9 +29,9 @@ public final class StreamRegExMatcher {
 		if (!toMatchIn.exists()) {
 			throw new FileNotFoundException("The file given could not be found " + toMatchIn.getAbsolutePath());
 		}
-		this.pattern = toLookFor;
-		this.file = toMatchIn;
-		this.contents = new StringBuilder(Files.toString(file, Charsets.UTF_8));
+		pattern = toLookFor;
+		file = toMatchIn;
+		contents = new StringBuilder(Files.toString(file, Charsets.UTF_8));
 	}
 
 	public StreamRegExMatcher(final File toMatchIn) throws IOException {
@@ -40,8 +40,8 @@ public final class StreamRegExMatcher {
 
 	public void replaceAll(final Map<Pattern, String> patternToReplacementMap) {
 		for (final Map.Entry<Pattern, String> p : patternToReplacementMap.entrySet()) {
-			this.setPattern(p.getKey());
-			this.replaceAll(p.getValue());
+			setPattern(p.getKey());
+			replaceAll(p.getValue());
 		}
 	}
 
@@ -51,7 +51,7 @@ public final class StreamRegExMatcher {
 	 * @param newPattern the pattern you will now be using for matches.
 	 */
 	public synchronized void setPattern(final Pattern newPattern) {
-		this.pattern = newPattern;
+		pattern = newPattern;
 	}
 
 
@@ -63,7 +63,7 @@ public final class StreamRegExMatcher {
 	 * @see java.util.regex.Matcher#replaceAll(String)
 	 */
 	public synchronized void replaceAll(final String replacement) {
-		this.contents = new StringBuilder(pattern.matcher(contents).replaceAll(replacement));
+		contents = new StringBuilder(pattern.matcher(contents).replaceAll(replacement));
 	}
 
 	/**
@@ -72,7 +72,7 @@ public final class StreamRegExMatcher {
 	 * @return the contents of the file being worked with
 	 */
 	public synchronized String getContents() {
-		return this.contents.toString();
+		return contents.toString();
 	}
 
 	/**
@@ -84,7 +84,7 @@ public final class StreamRegExMatcher {
 	 * @see java.util.regex.Matcher#replaceAll(String)
 	 */
 	public synchronized void writeContentsToFile(final File toWriteTo) throws IOException {
-		final boolean overwriteSameFile = this.file != null && toWriteTo.equals(this.file);
+		final boolean overwriteSameFile = file != null && toWriteTo.equals(file);
 		writeContentsToFile(toWriteTo, overwriteSameFile);
 	}
 
@@ -97,7 +97,7 @@ public final class StreamRegExMatcher {
 	 * @see java.util.regex.Matcher#replaceAll(String)
 	 */
 	public synchronized void writeContentsToFile(final File toWriteTo, final boolean overwrite) throws IOException {
-		FileUtilities.writeStringToFile(toWriteTo, this.contents.toString(), overwrite);
+		FileUtilities.writeStringToFile(toWriteTo, contents.toString(), overwrite);
 	}
 
 	/**

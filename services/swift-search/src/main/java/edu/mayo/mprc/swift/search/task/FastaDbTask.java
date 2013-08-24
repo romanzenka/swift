@@ -31,7 +31,7 @@ public class FastaDbTask extends AsyncTaskBase {
 	 */
 	public FastaDbTask(final WorkflowEngine engine, final DaemonConnection daemon, final FileTokenFactory fileTokenFactory, final boolean fromScratch, final Curation curationToLoad) {
 		super(engine, daemon, fileTokenFactory, fromScratch);
-		this.curationIdToLoad = curationToLoad.getId();
+		curationIdToLoad = curationToLoad.getId();
 		setName("Fasta DB load");
 		setDescription("Load " + fileTokenFactory.fileToTaggedDatabaseToken(curationToLoad.getCurationFile()) + " to database.");
 	}

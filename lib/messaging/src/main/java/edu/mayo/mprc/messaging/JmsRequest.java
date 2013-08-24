@@ -25,7 +25,7 @@ class JmsRequest implements Request {
 	 */
 	JmsRequest(final ObjectMessage objectMessage, final SimpleQueueService receivedFrom) {
 		this.receivedFrom = receivedFrom;
-		this.lastResponseSent = false;
+		lastResponseSent = false;
 		this.objectMessage = objectMessage;
 	}
 

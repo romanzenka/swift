@@ -35,11 +35,6 @@ public class ManualInclusionStep implements CurationStep {
 	private String sequence;
 
 	/**
-	 * the validation that was created when performStep was last performed
-	 */
-	private transient StepValidation runValidation;
-
-	/**
 	 * CTor that takes the header and the sequence in seperate fields.  The header does not need to contain a '>' in the
 	 * first character position.
 	 */
@@ -59,15 +54,15 @@ public class ManualInclusionStep implements CurationStep {
 	 */
 	@Override
 	public StepValidation performStep(final CurationExecutor exe) {
-		this.runValidation = this.preValidate(exe.getCurationDao());
+		StepValidation runValidation = preValidate(exe.getCurationDao());
 
 		//run a prevalidation before continuing.  If prevalidation fails return that StepValidation else create a new one
 		//for the post validation
-		if (!this.runValidation.isOK()) {
-			return this.runValidation;
+		if (!runValidation.isOK()) {
+			return runValidation;
 		}
 
-		this.runValidation = new StepValidation();
+		runValidation = new StepValidation();
 
 		final DBInputStream in = exe.getCurrentInStream();
 		final DBOutputStream out = exe.getCurrentOutStream();
@@ -77,16 +72,16 @@ public class ManualInclusionStep implements CurationStep {
 				in.beforeFirst();
 				out.appendRemaining(in);
 			}
-			out.appendSequence(this.getHeader(), this.getSequence());
+			out.appendSequence(getHeader(), getSequence());
 		} catch (IOException e) {
-			this.runValidation.addMessageAndException("Error writing manual inclusion: " + this.getHeader(), e);
-			return this.runValidation;
+			runValidation.addMessageAndException("Error writing manual inclusion: " + getHeader(), e);
+			return runValidation;
 		}
 
-		this.runValidation.setCompletionCount(out.getSequenceCount());
-		this.setLastRunCompletionCount(out.getSequenceCount());
+		runValidation.setCompletionCount(out.getSequenceCount());
+		setLastRunCompletionCount(out.getSequenceCount());
 
-		return this.runValidation;
+		return runValidation;
 	}
 
 	/**
@@ -100,23 +95,23 @@ public class ManualInclusionStep implements CurationStep {
 	public StepValidation preValidate(final CurationDao curationDao) {
 		final StepValidation preValidation = new StepValidation();
 
-		if (this.sequence == null) {
+		if (sequence == null) {
 			preValidation.addMessage("No sequence has been entered.");
 			return preValidation;
 		}
 
-		this.sequence = this.sequence.trim();
+		sequence = sequence.trim();
 
-		if (this.sequence.equals("")) {
+		if (sequence.equals("")) {
 			preValidation.addMessage("No sequence has been entered.");
 		}
 
 		//if the header is still null after sequence validation then we need to get one
-		if (this.header == null) {
+		if (header == null) {
 			preValidation.addMessage("No header has been entered.");
 		} else {
-			this.header = this.header.trim();
-			if (this.header.equals("")) {
+			header = header.trim();
+			if (header.equals("")) {
 				preValidation.addMessage("No header has been entered.");
 			}
 		}
@@ -132,8 +127,8 @@ public class ManualInclusionStep implements CurationStep {
 	@Override
 	public CurationStep createCopy() {
 		final ManualInclusionStep copy = new ManualInclusionStep();
-		copy.setHeader(this.header);
-		copy.setSequence(this.sequence);
+		copy.setHeader(header);
+		copy.setSequence(sequence);
 		return copy;
 	}
 
@@ -180,12 +175,12 @@ public class ManualInclusionStep implements CurationStep {
 
 	@Override
 	public Integer getLastRunCompletionCount() {
-		return this.lastRunCompletionCount;
+		return lastRunCompletionCount;
 	}
 
 	@Override
 	public void setLastRunCompletionCount(final Integer count) {
-		this.lastRunCompletionCount = count;
+		lastRunCompletionCount = count;
 	}
 
 	@Override

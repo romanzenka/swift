@@ -66,8 +66,8 @@ public final class FileTable extends FlexTable implements SourcesChangeEvents, C
 
 	@Override
 	public void onChange(final Widget widget) {
-		if (this.searchTypeList.equals(widget)) {
-			setSearchType(this.searchTypeList.getSelectedSearchType());
+		if (searchTypeList.equals(widget)) {
+			setSearchType(searchTypeList.getSelectedSearchType());
 		}
 	}
 
@@ -87,15 +87,15 @@ public final class FileTable extends FlexTable implements SourcesChangeEvents, C
 		searchTypeList = new SearchTypeList();
 		searchTypeList.addSelectionChangeListener(this);
 
-		this.fileCountLabel = new Label("", false);
+		fileCountLabel = new Label("", false);
 
-		this.getRowFormatter().addStyleName(0, "info-row");
-		this.getCellFormatter().addStyleName(0, FILE_COUNT_COLUMN, "file-count");
-		this.setWidget(0, FILE_COUNT_COLUMN, fileCountLabel);
+		getRowFormatter().addStyleName(0, "info-row");
+		getCellFormatter().addStyleName(0, FILE_COUNT_COLUMN, "file-count");
+		setWidget(0, FILE_COUNT_COLUMN, fileCountLabel);
 
-		this.getFlexCellFormatter().setColSpan(0, SAMPLE_COLUMN, 2);
-		this.getCellFormatter().addStyleName(0, SAMPLE_COLUMN, "search-type");
-		this.setWidget(0, SAMPLE_COLUMN, searchTypeList);
+		getFlexCellFormatter().setColSpan(0, SAMPLE_COLUMN, 2);
+		getCellFormatter().addStyleName(0, SAMPLE_COLUMN, "search-type");
+		setWidget(0, SAMPLE_COLUMN, searchTypeList);
 
 		final FileTableColumn[] headers = getHeaders();
 		for (final FileTableColumn header : headers) {
@@ -110,7 +110,7 @@ public final class FileTable extends FlexTable implements SourcesChangeEvents, C
 			}
 		});
 
-		this.getRowFormatter().setStyleName(getHeaderRowIndex(), "table-header");
+		getRowFormatter().setStyleName(getHeaderRowIndex(), "table-header");
 
 		// On every change, update count of selected files
 		changeListeners.add(new ChangeListener() {
@@ -128,13 +128,13 @@ public final class FileTable extends FlexTable implements SourcesChangeEvents, C
 
 	private void updateFileCount() {
 		if (fileCountLabel != null) {
-			final int count = this.getRowCount() - getFirstDataRow();
+			final int count = getRowCount() - getFirstDataRow();
 			fileCountLabel.setText(count + (count == 1 ? " file" : " files"));
 		}
 	}
 
 	public void addFiles(final FileInfo[] fileInfos) {
-		int lastRow = this.getRowCount();
+		int lastRow = getRowCount();
 
 		for (final FileInfo info : fileInfos) {
 			final MutableInteger index = new MutableInteger(lastRow);
@@ -146,7 +146,7 @@ public final class FileTable extends FlexTable implements SourcesChangeEvents, C
 					setChecked(getWidgetRow(sender), SELECT_COLUMN, ((CheckBox) sender).isChecked());
 				}
 			});
-			this.setWidget(lastRow, 0, selection);
+			setWidget(lastRow, 0, selection);
 			widgetIndices.put(selection, index);
 
 			addNewLine(info, index, searchTitle, searchTypeList.getSelectedSearchType());
@@ -163,10 +163,10 @@ public final class FileTable extends FlexTable implements SourcesChangeEvents, C
 			removeTableRow(i);
 		}
 
-		this.searchTypeList.setSelectedSearchType(searchType, false/*This is coming from search load. Do not store the preference*/);
+		searchTypeList.setSelectedSearchType(searchType, false/*This is coming from search load. Do not store the preference*/);
 		setSearchType(searchType);
 
-		int lastRow = this.getRowCount();
+		int lastRow = getRowCount();
 
 		for (final ClientFileSearch fileSearch : inputFiles) {
 			final MutableInteger index = new MutableInteger(lastRow);
@@ -178,7 +178,7 @@ public final class FileTable extends FlexTable implements SourcesChangeEvents, C
 					setChecked(getWidgetRow(sender), SELECT_COLUMN, ((CheckBox) sender).isChecked());
 				}
 			});
-			this.setWidget(lastRow, 0, selection);
+			setWidget(lastRow, 0, selection);
 			widgetIndices.put(selection, index);
 
 			addNewLine(
@@ -201,7 +201,7 @@ public final class FileTable extends FlexTable implements SourcesChangeEvents, C
 	private void updateSizeDisplay() {
 		final long maxSize = getMaxFileSize();
 		for (int i = getFirstDataRow(); i < getRowCount(); i++) {
-			final FileSizeWidget fileSize = (FileSizeWidget) this.getWidget(i, SIZE_COLUMN);
+			final FileSizeWidget fileSize = (FileSizeWidget) getWidget(i, SIZE_COLUMN);
 			fileSize.setMaxSize(maxSize);
 		}
 	}
@@ -227,26 +227,26 @@ public final class FileTable extends FlexTable implements SourcesChangeEvents, C
 
 		final int rowNumber = lineIndex.i;
 
-		this.setWidget(rowNumber, FILE_COLUMN, filePathWidget);
-		this.setWidget(rowNumber, SIZE_COLUMN, new FileSizeWidget(fileSize));
+		setWidget(rowNumber, FILE_COLUMN, filePathWidget);
+		setWidget(rowNumber, SIZE_COLUMN, new FileSizeWidget(fileSize));
 		final PushButton removeButton = new PushButton(new Image(REMOVE_IMAGE));
 		removeButton.addClickListener(new RemoveButtonListener(lineIndex));
-		this.setWidget(rowNumber, REMOVE_COLUMN, removeButton);
+		setWidget(rowNumber, REMOVE_COLUMN, removeButton);
 
 		final EditableLabel sampleLabel = new EditableLabel(sampleName, new TextChangeListener(SAMPLE_COLUMN, this));
 		sampleLabel.addStyleName("editable-label");
 		widgetIndices.put(sampleLabel, lineIndex);
-		this.setWidget(rowNumber, SAMPLE_COLUMN, sampleLabel);
+		setWidget(rowNumber, SAMPLE_COLUMN, sampleLabel);
 
 		final EditableLabel experimentLabel = new EditableLabel(experimentName, new TextChangeListener(EXPERIMENT_COLUMN, this));
 		experimentLabel.addStyleName("editable-label");
 		widgetIndices.put(experimentLabel, lineIndex);
-		this.setWidget(rowNumber, EXPERIMENT_COLUMN, experimentLabel);
+		setWidget(rowNumber, EXPERIMENT_COLUMN, experimentLabel);
 
 		final EditableLabel categoryLabel = new EditableLabel(categoryName, new TextChangeListener(CATEGORY_COLUMN, this));
 		categoryLabel.addStyleName("editable-label");
 		widgetIndices.put(categoryLabel, lineIndex);
-		this.setWidget(rowNumber, CATEGORY_COLUMN, categoryLabel);
+		setWidget(rowNumber, CATEGORY_COLUMN, categoryLabel);
 
 		// By default the files are selected
 		setChecked(rowNumber, SELECT_COLUMN, true);
@@ -286,7 +286,7 @@ public final class FileTable extends FlexTable implements SourcesChangeEvents, C
 		String[] maxCommonPath = null;
 		int maxCommonPathLength = 0;
 		for (int i = getFirstDataRow(); i < getRowCount(); i++) {
-			final FilePathWidget filePath = (FilePathWidget) this.getWidget(i, FILE_COLUMN);
+			final FilePathWidget filePath = (FilePathWidget) getWidget(i, FILE_COLUMN);
 			final String path = filePath.getFullPath();
 			final String[] tokens = path.split("/");
 			if (maxCommonPath == null) {
@@ -311,7 +311,7 @@ public final class FileTable extends FlexTable implements SourcesChangeEvents, C
 		}
 
 		for (int i = getFirstDataRow(); i < getRowCount(); i++) {
-			final FilePathWidget filePath = (FilePathWidget) this.getWidget(i, FILE_COLUMN);
+			final FilePathWidget filePath = (FilePathWidget) getWidget(i, FILE_COLUMN);
 			filePath.setPrefixPath(pathPrefix.toString());
 		}
 	}
@@ -352,7 +352,7 @@ public final class FileTable extends FlexTable implements SourcesChangeEvents, C
 				widgetIndices.remove(ww);
 			}
 		}
-		this.removeRow(i);
+		removeRow(i);
 	}
 
 	public void setSearchType(final SearchType searchType) {
@@ -366,7 +366,7 @@ public final class FileTable extends FlexTable implements SourcesChangeEvents, C
 	 */
 	public void updateSearchTitle(final String searchTitle) {
 		this.searchTitle = searchTitle;
-		final SearchType selectedSearchType = this.searchTypeList.getSelectedSearchType();
+		final SearchType selectedSearchType = searchTypeList.getSelectedSearchType();
 		if (SearchType.ManyToOne.equals(selectedSearchType) || SearchType.ManyToSamples.equals(selectedSearchType)) {
 			rewriteSamplesAndExperiments(selectedSearchType);
 		}
@@ -374,15 +374,15 @@ public final class FileTable extends FlexTable implements SourcesChangeEvents, C
 
 	private void rewriteSamplesAndExperiments(final SearchType searchType) {
 		for (int row = getFirstDataRow(); row < getRowCount(); row++) {
-			final EditableLabel w = (EditableLabel) this.getWidget(row, SAMPLE_COLUMN);
-			final String fileName = ((FilePathWidget) this.getWidget(row, FILE_COLUMN)).getFileNameWithoutExtension();
+			final EditableLabel w = (EditableLabel) getWidget(row, SAMPLE_COLUMN);
+			final String fileName = ((FilePathWidget) getWidget(row, FILE_COLUMN)).getFileNameWithoutExtension();
 			w.setText(
 					getDefaultSampleName(
 							searchType,
 							searchTitle,
 							fileName));
 
-			final EditableLabel w2 = (EditableLabel) this.getWidget(row, EXPERIMENT_COLUMN);
+			final EditableLabel w2 = (EditableLabel) getWidget(row, EXPERIMENT_COLUMN);
 			w2.setText(
 					getDefaultExperimentName(
 							searchType,
@@ -392,13 +392,13 @@ public final class FileTable extends FlexTable implements SourcesChangeEvents, C
 	}
 
 	private CheckBox getSelectionCheckBox(final int row) {
-		return ((CheckBox) this.getWidget(row, SELECT_COLUMN));
+		return ((CheckBox) getWidget(row, SELECT_COLUMN));
 	}
 
 	private long getMaxFileSize() {
 		long max = 0;
-		for (int i = getFirstDataRow(); i < this.getRowCount(); i++) {
-			final FileSizeWidget fileSize = (FileSizeWidget) this.getWidget(i, SIZE_COLUMN);
+		for (int i = getFirstDataRow(); i < getRowCount(); i++) {
+			final FileSizeWidget fileSize = (FileSizeWidget) getWidget(i, SIZE_COLUMN);
 			final long size = fileSize.getFileSize();
 			if (size > max) {
 				max = size;
@@ -420,20 +420,20 @@ public final class FileTable extends FlexTable implements SourcesChangeEvents, C
 	}
 
 	public List<ClientFileSearch> getData(final ArrayList<ClientSearchEngineConfig> enabledEngines) {
-		final List<ClientFileSearch> results = new ArrayList<ClientFileSearch>(this.getRowCount() - getFirstDataRow());
+		final List<ClientFileSearch> results = new ArrayList<ClientFileSearch>(getRowCount() - getFirstDataRow());
 
-		for (int row = getFirstDataRow(); row < this.getRowCount(); row++) {
+		for (int row = getFirstDataRow(); row < getRowCount(); row++) {
 
-			final EditableLabel w = (EditableLabel) this.getWidget(row, SAMPLE_COLUMN);
+			final EditableLabel w = (EditableLabel) getWidget(row, SAMPLE_COLUMN);
 			final String sampleName = w.getText();
 
-			final EditableLabel w2 = (EditableLabel) this.getWidget(row, EXPERIMENT_COLUMN);
+			final EditableLabel w2 = (EditableLabel) getWidget(row, EXPERIMENT_COLUMN);
 			final String experimentName = w2.getText();
 
-			final EditableLabel w3 = (EditableLabel) this.getWidget(row, CATEGORY_COLUMN);
+			final EditableLabel w3 = (EditableLabel) getWidget(row, CATEGORY_COLUMN);
 			final String categoryName = w3.getText();
 			results.add(new ClientFileSearch(
-					((FilePathWidget) this.getWidget(row, FILE_COLUMN)).getFullPath(),
+					((FilePathWidget) getWidget(row, FILE_COLUMN)).getFullPath(),
 					sampleName,
 					categoryName,
 					experimentName,

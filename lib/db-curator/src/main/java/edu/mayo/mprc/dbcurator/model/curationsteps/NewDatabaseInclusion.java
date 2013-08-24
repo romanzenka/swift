@@ -28,11 +28,6 @@ public class NewDatabaseInclusion implements CurationStep {
 	private Integer id;
 
 	/**
-	 * The validation that was the result (returned object) of the most recent call to performStep() TRANSIENT
-	 */
-	private transient StepValidation recentRunValidation = null;
-
-	/**
 	 * the url of the database we downloaded or need to download.  This will generally be an ftp url.  If we need to
 	 * check for data at the specified URL and but we cannot find it for some reason we will raise an exception.
 	 * PERSISTENT
@@ -53,12 +48,12 @@ public class NewDatabaseInclusion implements CurationStep {
 	}
 
 	public void setHeaderTransform(final HeaderTransform trans) {
-		this.headerTransformer = trans;
+		headerTransformer = trans;
 	}
 
 	public HeaderTransform getHeaderTransform(final CurationDao curationDao) {
 		if (headerTransformer == null) {
-			headerTransformer = curationDao.getHeaderTransformByUrl(this.url);
+			headerTransformer = curationDao.getHeaderTransformByUrl(url);
 		}
 		return headerTransformer;
 	}
@@ -77,7 +72,7 @@ public class NewDatabaseInclusion implements CurationStep {
 	@Override
 	public StepValidation performStep(final CurationExecutor exec) {
 		//create a new validation object for this run
-		this.recentRunValidation = new StepValidation();
+		final StepValidation recentRunValidation = new StepValidation();
 
 		//get the data we will need
 		final DBInputStream in = exec.getCurrentInStream(); //the file we should be reading from (may be null)
@@ -91,23 +86,23 @@ public class NewDatabaseInclusion implements CurationStep {
 				in.beforeFirst();
 				out.appendRemaining(in);
 			} catch (IOException e) {
-				this.recentRunValidation.addMessageAndException("Error copying in stream to out stream", e);
+				recentRunValidation.addMessageAndException("Error copying in stream to out stream", e);
 			}
 		}
 		//if we want or need to pull down a new SourceDatabaseArchive then do it.
-		if (this.getSource() == null) {
+		if (getSource() == null) {
 			try {
 				//get a source database by first connecting to the ftp server and seeing what date the file at the given
 				//url was updated and seeing if we have already downloaded it.  If so use then one else download it.
-				this.source = new SourceDatabaseArchive().createArchive(
-						this.url,
+				source = new SourceDatabaseArchive().createArchive(
+						url,
 						status,
 						exec.getFastaArchiveFolder(), exec.getCurationDao());
 				status.addMessage("We have completed getting an archive.");
 			} catch (Exception e) {
 				//if we couldn't find or download a database then we had an error and the executor should be notified
-				this.recentRunValidation.addMessageAndException("FTP error: \n" + e.getMessage(), e);
-				return this.recentRunValidation;
+				recentRunValidation.addMessageAndException("FTP error: \n" + e.getMessage(), e);
+				return recentRunValidation;
 			}
 		}
 
@@ -115,10 +110,10 @@ public class NewDatabaseInclusion implements CurationStep {
 		DBInputStream archiveIn = null;
 		try {
 			try {
-				archiveIn = new FASTAInputStream(this.source.getArchive());
+				archiveIn = new FASTAInputStream(source.getArchive());
 			} catch (Exception e) {
 				//this is not expected to happen
-				this.recentRunValidation.addMessageAndException("Error creating an input stream from the archive", e);
+				recentRunValidation.addMessageAndException("Error creating an input stream from the archive", e);
 			}
 
 			//next if we have an archive setup then we want to copy it to the output stream
@@ -134,34 +129,34 @@ public class NewDatabaseInclusion implements CurationStep {
 						}
 					}
 				} catch (IOException e) {
-					this.recentRunValidation.addMessageAndException("Error copying archive to output file", e);
-					return this.recentRunValidation;
+					recentRunValidation.addMessageAndException("Error copying archive to output file", e);
+					return recentRunValidation;
 				}
 			} else {
-				this.recentRunValidation.addMessage("Error finding the input file");
+				recentRunValidation.addMessage("Error finding the input file");
 			}
 		} finally {
 			FileUtilities.closeQuietly(archiveIn);
 		}
 
-		this.recentRunValidation.setCompletionCount(out.getSequenceCount());
-		this.setLastRunCompletionCount(out.getSequenceCount());
+		recentRunValidation.setCompletionCount(out.getSequenceCount());
+		setLastRunCompletionCount(out.getSequenceCount());
 
-		return this.recentRunValidation;
+		return recentRunValidation;
 	}
 
 	@Override
 	public StepValidation preValidate(final CurationDao curationDao) {
 		final StepValidation preValidation = new StepValidation();
 
-		if (this.url == null) {
+		if (url == null) {
 			preValidation.addMessage("URL not set");
 		} else {
 			//check to see if the url passed in is actually a key into the map of common urls if so check the mapped value
-			final FastaSource matchedSource = curationDao.getDataSourceByName(this.url);
+			final FastaSource matchedSource = curationDao.getDataSourceByName(url);
 
 
-			final String testURL = (matchedSource == null ? this.url : matchedSource.getUrl());
+			final String testURL = (matchedSource == null ? url : matchedSource.getUrl());
 
 			if (!StringUtilities.startsWithIgnoreCase(testURL, "classpath:")) {
 				try {
@@ -179,8 +174,8 @@ public class NewDatabaseInclusion implements CurationStep {
 	@Override
 	public CurationStep createCopy() {
 		final NewDatabaseInclusion copy = new NewDatabaseInclusion();
-		copy.setUrl(this.url);
-		copy.setSource(this.source == null ? null : this.source.createCopy());
+		copy.setUrl(url);
+		copy.setSource(source == null ? null : source.createCopy());
 		return copy;
 	}
 
@@ -190,7 +185,7 @@ public class NewDatabaseInclusion implements CurationStep {
 	 * @return the associated url
 	 */
 	public String getUrl() {
-		return this.url;
+		return url;
 	}
 
 	/**
@@ -238,12 +233,12 @@ public class NewDatabaseInclusion implements CurationStep {
 
 	@Override
 	public Integer getLastRunCompletionCount() {
-		return this.lastRunCompletionCount;
+		return lastRunCompletionCount;
 	}
 
 	@Override
 	public void setLastRunCompletionCount(final Integer count) {
-		this.lastRunCompletionCount = count;
+		lastRunCompletionCount = count;
 	}
 
 	@Override

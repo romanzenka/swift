@@ -32,7 +32,7 @@ public final class CurationEditor extends Composite {
 		@Override
 		public void run() {
 			if (!curationIsRunning) {
-				this.cancel();
+				cancel();
 			} else {
 				syncCuration();
 			}
@@ -88,12 +88,12 @@ public final class CurationEditor extends Composite {
 	 * @param closeCallback     a method we will call when the user clicks close.  As part of the callback will be the id of the currently open curation.
 	 */
 	public CurationEditor(final Integer curationToDisplay, final String currentUserEmail, final Map<String, String> userEmailInitialPairs, final EditorCloseCallback closeCallback) {
-		this.commonDataRequester = (CommonDataRequesterAsync) GWT.create(CommonDataRequester.class);
+		commonDataRequester = (CommonDataRequesterAsync) GWT.create(CommonDataRequester.class);
 		final ServiceDefTarget endpoint = (ServiceDefTarget) commonDataRequester;
 		endpoint.setServiceEntryPoint(GWT.getModuleBaseURL() + "CommonDataRequester");
 
 		this.closeCallback = closeCallback;
-		this.initialCurationID = curationToDisplay;
+		initialCurationID = curationToDisplay;
 
 		this.userEmailInitialPairs = userEmailInitialPairs;
 		this.currentUserEmail = currentUserEmail;
@@ -154,7 +154,7 @@ public final class CurationEditor extends Composite {
 	}
 
 	private void showPopupMessage(final String message) {
-		new MessagePopup(message, this.getAbsoluteLeft() + 100, this.getAbsoluteTop() + 100);
+		new MessagePopup(message, getAbsoluteLeft() + 100, getAbsoluteTop() + 100);
 	}
 
 	/**
@@ -237,7 +237,7 @@ public final class CurationEditor extends Composite {
 		super.setPixelSize(width, height);
 
 		final int stepContainerHeight = height - CurationEditor.WINDOW_MARGIN;
-		final int stepContainerWidth = width - CurationEditor.WINDOW_MARGIN - this.controlPanel.getOffsetWidth();
+		final int stepContainerWidth = width - CurationEditor.WINDOW_MARGIN - controlPanel.getOffsetWidth();
 
 		if (stepContainer != null) {
 			stepContainer.setPixelSize(stepContainerHeight, stepContainerWidth);
@@ -525,7 +525,7 @@ public final class CurationEditor extends Composite {
 		cmdCreateNew.addClickListener(new ClickListener() {
 			@Override
 			public void onClick(final Widget widget) {
-				CurationEditor.this.startNewCuration();
+				startNewCuration();
 			}
 		});
 		newPanel.add(cmdCreateNew);
@@ -536,7 +536,7 @@ public final class CurationEditor extends Composite {
 		cmdCopyCurrent.addClickListener(new ClickListener() {
 			@Override
 			public void onClick(final Widget widget) {
-				CurationEditor.this.copyCuration();
+				copyCuration();
 			}
 		});
 		newPanel.add(cmdCopyCurrent);
@@ -551,7 +551,7 @@ public final class CurationEditor extends Composite {
 				//call the server and perform a validation of the curation.  When the validation is complete then this CurationEditor
 				//will be notified and it will need to tell the StepPanelContainer and it will forward the message to the steps that they
 				//should check for any error messages.
-				CurationEditor.this.runCuration();
+				runCuration();
 			}
 		});
 
@@ -576,7 +576,7 @@ public final class CurationEditor extends Composite {
 				}
 				final ServerFileReader reader = new ServerFileReader();
 				reader.setPopupPosition(getAbsoluteLeft() + 10, getAbsoluteTop() + 10);
-				reader.setPixelSize(CurationEditor.this.getWidget().getOffsetWidth() - 20, CurationEditor.this.getWidget().getOffsetHeight() - 20);
+				reader.setPixelSize(getWidget().getOffsetWidth() - 20, getWidget().getOffsetHeight() - 20);
 				reader.setFileToDisplay(curation.getPathToResult());
 				reader.setGrepPattern(">");
 				reader.show();
@@ -652,7 +652,7 @@ public final class CurationEditor extends Composite {
 				public void onSuccess(final CurationStub o) {
 					curationIsRunning = false;
 					setCuration(o, false);
-					CurationEditor.this.retreiveCuration(curation.getId());
+					retreiveCuration(curation.getId());
 				}
 			});
 		}
@@ -710,7 +710,7 @@ public final class CurationEditor extends Composite {
 	 */
 	private void syncCuration() {
 		updateCurationFromForm();
-		this.commandPanel.setVisible(false);
+		commandPanel.setVisible(false);
 		commonDataRequester.performUpdate(curation, new AsyncCallback<CurationStub>() {
 			@Override
 			public void onFailure(final Throwable throwable) {
@@ -727,8 +727,8 @@ public final class CurationEditor extends Composite {
 					//stop performing updates if there was an error
 					//_updateTimer.cancel();
 				}
-				CurationEditor.this.refreshPanel();
-				if (!CurationEditor.this.curationIsRunning) {
+				refreshPanel();
+				if (!curationIsRunning) {
 					commandPanel.setVisible(true);
 				}
 			}
@@ -804,16 +804,16 @@ public final class CurationEditor extends Composite {
 		 * @param message the message you want to add to this manager
 		 */
 		public void addMessage(final String message) {
-			if (this.messages.contains(message)) {
+			if (messages.contains(message)) {
 				return;
 			}
-			this.messages.add(message);
+			messages.add(message);
 
 			writeMessages();
 		}
 
 		public void clearMessages() {
-			this.messages.clear();
+			messages.clear();
 		}
 
 
@@ -823,7 +823,7 @@ public final class CurationEditor extends Composite {
 		 * @param message
 		 */
 		public void removeError(final String message) {
-			this.messages.remove(message);
+			messages.remove(message);
 
 			if (messages.isEmpty()) {
 				toLogTo.removeStyleName("textboxes-error");
@@ -839,9 +839,9 @@ public final class CurationEditor extends Composite {
 		 */
 		public void setTextArea(final TextArea toLogTo) {
 			this.toLogTo = toLogTo;
-			if (!this.messages.isEmpty()) {
+			if (!messages.isEmpty()) {
 				toLogTo.addStyleName("textboxes-error");
-				this.writeMessages();
+				writeMessages();
 			}
 		}
 

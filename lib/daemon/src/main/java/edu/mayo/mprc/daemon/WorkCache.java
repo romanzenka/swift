@@ -238,7 +238,7 @@ public abstract class WorkCache<T extends WorkPacket> implements NoLoggingWorker
 		private MyProgressListener(final CachableWorkPacket workPacket, final File wipFolder, final File targetCacheFolder, final List<String> outputFiles, final String taskDescriptionFile, final String taskDescription, final ProgressReporter reporter) {
 			this.workPacket = workPacket;
 			this.wipFolder = wipFolder;
-			this.targetFolder = targetCacheFolder;
+			targetFolder = targetCacheFolder;
 			this.outputFiles = outputFiles;
 			this.taskDescriptionFile = taskDescriptionFile;
 			this.taskDescription = taskDescription;

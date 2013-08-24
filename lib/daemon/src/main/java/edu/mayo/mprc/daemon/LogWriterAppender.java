@@ -47,13 +47,13 @@ class LogWriterAppender extends WriterAppender {
 	}
 
 	public void setAllowedMDCKey(final String key, final Object value) {
-		this.allowedMDCKey = key;
-		this.mdcValue = value;
+		allowedMDCKey = key;
+		mdcValue = value;
 	}
 
 	public void clearAllowedMDCKey() {
-		this.allowedMDCKey = null;
-		this.mdcValue = null;
+		allowedMDCKey = null;
+		mdcValue = null;
 	}
 
 	public void addAllowedThreadName(final String threadName) {

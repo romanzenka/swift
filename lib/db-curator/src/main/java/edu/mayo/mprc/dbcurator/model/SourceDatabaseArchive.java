@@ -69,10 +69,10 @@ public class SourceDatabaseArchive implements Serializable {
 
 	protected SourceDatabaseArchive(final String url, final File file, final DateTime serverDate, final DateTime downloadDate) {
 		super();
-		this.setSourceURL(url);
-		this.setArchive(file);
-		this.setServerDate(serverDate);
-		this.setDownloadDate(downloadDate);
+		setSourceURL(url);
+		setArchive(file);
+		setServerDate(serverDate);
+		setDownloadDate(downloadDate);
 	}
 
 
@@ -261,10 +261,10 @@ public class SourceDatabaseArchive implements Serializable {
 	 */
 	public SourceDatabaseArchive createCopy() {
 		final SourceDatabaseArchive copy = new SourceDatabaseArchive();
-		copy.downloadDate = this.downloadDate;
-		copy.sourceURL = this.sourceURL;
-		copy.serverDate = this.serverDate;
-		copy.archive = this.archive;
+		copy.downloadDate = downloadDate;
+		copy.sourceURL = sourceURL;
+		copy.serverDate = serverDate;
+		copy.archive = archive;
 		return copy;
 	}
 
@@ -290,11 +290,11 @@ public class SourceDatabaseArchive implements Serializable {
 	}
 
 	public File getArchive() {
-		return this.archive;
+		return archive;
 	}
 
 	public void setArchive(final File file) {
-		this.archive = file;
+		archive = file;
 	}
 
 	protected Integer getId() {

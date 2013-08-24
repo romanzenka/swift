@@ -44,7 +44,7 @@ public final class ScafmlExperiment extends FileHolder {
 	}
 
 	public ScafmlFastaDatabase getFastaDatabase(final String id) {
-		return this.scafmlFastaDatabases.get(id);
+		return scafmlFastaDatabases.get(id);
 	}
 
 	public void addFastaDatabase(final ScafmlFastaDatabase pFastaDatabase) {
@@ -54,7 +54,7 @@ public final class ScafmlExperiment extends FileHolder {
 		if (pFastaDatabase.getId() == null) {
 			throw new MprcException("no id for Biological Sample object");
 		}
-		this.scafmlFastaDatabases.put(pFastaDatabase.getId(), pFastaDatabase);
+		scafmlFastaDatabases.put(pFastaDatabase.getId(), pFastaDatabase);
 	}
 
 	public Collection<ScafmlFastaDatabase> getDatabases() {
@@ -76,11 +76,11 @@ public final class ScafmlExperiment extends FileHolder {
 		if (pBiologicalSample.getId() == null) {
 			throw new MprcException("no id for Biological Sample object");
 		}
-		this.biologicalSamples.put(pBiologicalSample.getId(), pBiologicalSample);
+		biologicalSamples.put(pBiologicalSample.getId(), pBiologicalSample);
 	}
 
 	public void setName(final String sName) {
-		this.name = sName;
+		name = sName;
 	}
 
 	public String getName() {
@@ -89,7 +89,7 @@ public final class ScafmlExperiment extends FileHolder {
 
 
 	public void setExport(final ScafmlExport pExport) {
-		this.export = pExport;
+		export = pExport;
 	}
 
 	public ScafmlExport getExport() {
@@ -140,7 +140,7 @@ public final class ScafmlExperiment extends FileHolder {
 		result
 				.append(indent)
 				.append("<" + "Experiment")
-				.append(XMLUtilities.wrapatt("name", this.getName()))
+				.append(XMLUtilities.wrapatt("name", getName()))
 				.append(XMLUtilities.wrapatt("connectToNCBI", isConnectToNCBI() ? "true" : "false"))
 				.append(XMLUtilities.wrapatt("annotateWithGOA", isAnnotateWithGOA() ? "true" : "false"))
 				.append(XMLUtilities.wrapatt("useIndependentSampleGrouping", isUseIndependentSampleGrouping() ? "true" : "false"))
@@ -166,7 +166,7 @@ public final class ScafmlExperiment extends FileHolder {
 		}
 
 		// now the exports
-		this.getExport().appendToDocument(result, indent + "\t");
+		getExport().appendToDocument(result, indent + "\t");
 
 		result.append(indent + "</" + "Experiment" + ">\n");
 	}

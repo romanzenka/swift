@@ -25,7 +25,7 @@ public final class ValueSeparatedFileReader implements Closeable {
 	public ValueSeparatedFileReader(final File file, final String columnDelimiter) throws IOException {
 		this.file = file;
 		this.columnDelimiter = columnDelimiter;
-		this.reader = null;
+		reader = null;
 		resetCurrentRowPointer();
 	}
 
@@ -129,7 +129,7 @@ public final class ValueSeparatedFileReader implements Closeable {
 	 * Start reading from the beginning
 	 */
 	public void resetCurrentRowPointer() throws IOException {
-		this.currentRowValue = null;
+		currentRowValue = null;
 
 		FileUtilities.closeQuietly(reader);
 

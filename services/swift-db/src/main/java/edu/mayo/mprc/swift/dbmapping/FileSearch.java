@@ -92,7 +92,7 @@ public class FileSearch extends PersistableBase {
 	}
 
 	public void setSwiftSearchDefinitionId(final Integer id) {
-		this.swiftSearchDefinitionId = id;
+		swiftSearchDefinitionId = id;
 	}
 
 	public SearchEngineParameters getSearchParameters() {

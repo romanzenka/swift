@@ -75,16 +75,16 @@ public final class FASTAInputStream implements DBInputStream {
 	 *             ¬
 	 */
 	public FASTAInputStream(final File file) {
-		this.fastaFile = file;
+		fastaFile = file;
 	}
 
 	private void reopenReader() throws IOException {
 		totalBytesToRead = fastaFile.length();
 		countingInputStream = new CountingInputStream(new FileInputStream(fastaFile));
 		if (GZipUtilities.isGZipped(fastaFile)) {
-			this.reader = new BufferedReader(new InputStreamReader(new GZIPInputStream(countingInputStream), Charsets.ISO_8859_1));
+			reader = new BufferedReader(new InputStreamReader(new GZIPInputStream(countingInputStream), Charsets.ISO_8859_1));
 		} else {
-			this.reader = new BufferedReader(new InputStreamReader(countingInputStream, Charsets.ISO_8859_1));
+			reader = new BufferedReader(new InputStreamReader(countingInputStream, Charsets.ISO_8859_1));
 		}
 	}
 
@@ -95,11 +95,11 @@ public final class FASTAInputStream implements DBInputStream {
 	@Override
 	public void beforeFirst() {
 		try {
-			FileUtilities.closeQuietly(this.reader);
+			FileUtilities.closeQuietly(reader);
 			reopenReader();
-			this.nextHeader = this.reader.readLine();
+			nextHeader = reader.readLine();
 		} catch (Exception e) {
-			throw new MprcException("Cannot open FASTA file [" + this.fastaFile.getAbsolutePath() + "]", e);
+			throw new MprcException("Cannot open FASTA file [" + fastaFile.getAbsolutePath() + "]", e);
 		}
 	}
 
@@ -125,7 +125,7 @@ public final class FASTAInputStream implements DBInputStream {
 		final StringBuilder sequenceBuilder = new StringBuilder();
 		String nextLine = null;
 		try {
-			nextLine = this.reader.readLine();
+			nextLine = reader.readLine();
 		} catch (IOException e) {
 			LOGGER.warn(e);
 		}
@@ -134,7 +134,7 @@ public final class FASTAInputStream implements DBInputStream {
 			sequenceBuilder.append(cleanupSequence(nextLine));
 			try {
 				//read in the next line
-				nextLine = this.reader.readLine();
+				nextLine = reader.readLine();
 			} catch (IOException e) {
 				LOGGER.warn(e);
 			}
@@ -142,12 +142,12 @@ public final class FASTAInputStream implements DBInputStream {
 
 		while (nextLine != null && !isHeader(nextLine)) {
 			try {
-				nextLine = this.reader.readLine();
+				nextLine = reader.readLine();
 			} catch (IOException e) {
 				LOGGER.warn(e);
 			}
 		}
-		this.nextHeader = nextLine;
+		nextHeader = nextLine;
 
 		//set the current sequence to the concatenation of all strings
 		// If the sequence ends with an * signalizing end codon, quietly drop it
@@ -190,7 +190,7 @@ public final class FASTAInputStream implements DBInputStream {
 	 */
 	@Override
 	public String getHeader() {
-		return this.currentHeader;
+		return currentHeader;
 	}
 
 	private void setHeader(final String header) {
@@ -204,7 +204,7 @@ public final class FASTAInputStream implements DBInputStream {
 	 */
 	@Override
 	public String getSequence() {
-		return this.currentSequence;
+		return currentSequence;
 	}
 
 	/**
@@ -212,7 +212,7 @@ public final class FASTAInputStream implements DBInputStream {
 	 */
 	@Override
 	public void close() {
-		FileUtilities.closeQuietly(this.reader);
+		FileUtilities.closeQuietly(reader);
 	}
 
 	/**

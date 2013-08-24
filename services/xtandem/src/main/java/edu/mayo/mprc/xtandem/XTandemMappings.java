@@ -66,7 +66,7 @@ public final class XTandemMappings implements Mappings {
 
 	@Override
 	public Reader baseSettings() {
-		return ResourceUtilities.getReader("classpath:edu/mayo/mprc/swift/params/base.tandem.xml.template", this.getClass());
+		return ResourceUtilities.getReader("classpath:edu/mayo/mprc/swift/params/base.tandem.xml.template", getClass());
 	}
 
 	@Override

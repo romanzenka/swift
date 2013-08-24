@@ -50,7 +50,7 @@ public final class SequestDeploymentServiceTest {
 		private void init(final String resourcePath) {
 			try {
 				sharedTestFolder = null;//TestApplicationContext.getSharedTestFolder();
-				fakeFASTAFileToDeploy = TestingUtilities.getTempFileFromResource(this.getClass(), resourcePath, sharedTestFolder);
+				fakeFASTAFileToDeploy = TestingUtilities.getTempFileFromResource(getClass(), resourcePath, sharedTestFolder);
 				final File fakeParamsFile = writeToFile(sequestparams, sharedTestFolder, "tmp_sequest.params");
 
 				final String shortName = FileUtilities.stripExtension(fakeFASTAFileToDeploy.getName());
@@ -59,7 +59,7 @@ public final class SequestDeploymentServiceTest {
 				toDeploy.setShortName(shortName);
 				toDeploy.setCurationFile(fakeFASTAFileToDeploy);
 
-				request = new DeploymentRequest(this.getClass().getSimpleName(), toDeploy.getFastaFile());
+				request = new DeploymentRequest(getClass().getSimpleName(), toDeploy.getFastaFile());
 				request.addProperty(SequestDeploymentService.SEQUEST_PARAMS_FILE, fakeParamsFile);
 			} catch (IOException e) {
 				throw new MprcException(e);
@@ -67,7 +67,7 @@ public final class SequestDeploymentServiceTest {
 		}
 
 		public File writeToFile(final String resourceOnClasspath, final File directoryToWriteTo, final String name) {
-			final InputStream is = this.getClass().getResourceAsStream(resourceOnClasspath);
+			final InputStream is = getClass().getResourceAsStream(resourceOnClasspath);
 			final File file = new File(directoryToWriteTo, name);
 			try {
 				FileUtilities.writeStreamToFile(is, file);
@@ -192,7 +192,7 @@ public final class SequestDeploymentServiceTest {
 	}
 
 	private DeploymentRequest getFakeDeploymentRequest(final File sharedTestFolder, final File fakeFASTAFileToDeploy) throws IOException {
-		final InputStream is = this.getClass().getResourceAsStream("/edu/mayo/mprc/swift/params/Orbitrap_Sprot_Latest_CarbC_OxM/sequest.params");
+		final InputStream is = getClass().getResourceAsStream("/edu/mayo/mprc/swift/params/Orbitrap_Sprot_Latest_CarbC_OxM/sequest.params");
 		final File fakeParamsFile = new File(sharedTestFolder, "tmp_sequest.params");
 		try {
 			FileUtilities.writeStreamToFile(is, fakeParamsFile);
@@ -209,7 +209,7 @@ public final class SequestDeploymentServiceTest {
 		toDeploy.setShortName(shortName);
 		toDeploy.setCurationFile(fakeFASTAFileToDeploy);
 
-		final DeploymentRequest request = new DeploymentRequest(this.getClass().getSimpleName(), toDeploy.getFastaFile());
+		final DeploymentRequest request = new DeploymentRequest(getClass().getSimpleName(), toDeploy.getFastaFile());
 
 		request.addProperty(SequestDeploymentService.SEQUEST_PARAMS_FILE, fakeParamsFile);
 		return request;
@@ -224,7 +224,7 @@ public final class SequestDeploymentServiceTest {
 	@Test(enabled = true)
 	public void testConvertSequestToMakedb() throws Throwable {
 		final SequestMappings pic = new SequestMappings();
-		pic.read(ResourceUtilities.getReader(INPUT_SEQUEST_PARAMS, this.getClass()));
+		pic.read(ResourceUtilities.getReader(INPUT_SEQUEST_PARAMS, getClass()));
 		final SequestToMakeDBConverter converter = new SequestToMakeDBConverter();
 		final StringBuilder outpic = converter.convertSequestToMakeDB(pic, new File(FASTA_NAME));
 		String expected = FileUtilities.readIntoString(ResourceUtilities.getReader(EXPECTED_MAKEDB_PARAMS, pic), 1024 * 1024);
@@ -235,7 +235,7 @@ public final class SequestDeploymentServiceTest {
 
 	@Test
 	public void testSpecifiesNoEnzyme() throws IOException {
-		final File nsParamsFile = TestingUtilities.getTempFileFromResource(this.getClass(), "/edu/mayo/mprc/sequest/nonspecific_sequest.params", true, null);
+		final File nsParamsFile = TestingUtilities.getTempFileFromResource(getClass(), "/edu/mayo/mprc/sequest/nonspecific_sequest.params", true, null);
 
 		final SequestDeploymentService service = new SequestDeploymentService();
 		service.setConverter(new SequestToMakeDBConverter());

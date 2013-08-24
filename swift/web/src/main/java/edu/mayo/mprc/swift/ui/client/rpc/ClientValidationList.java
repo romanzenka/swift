@@ -18,7 +18,7 @@ public final class ClientValidationList extends ArrayList<ClientValidation> impl
 	}
 
 	public ClientValidation getLast() {
-		return this.get(this.size() - 1);
+		return get(size() - 1);
 	}
 
 	public ClientValue getValue() {

@@ -10,7 +10,7 @@ public final class ModuleWrapper extends SimplePanel {
 
 	public ModuleWrapper(final String moduleName, final ModuleView module, final String description) {
 		this.module = module;
-		this.addStyleName("module-wrapper");
+		addStyleName("module-wrapper");
 		final FlowPanel panel = new FlowPanel();
 		panel.addStyleName("module");
 		final Label label = new Label(moduleName);
@@ -20,7 +20,7 @@ public final class ModuleWrapper extends SimplePanel {
 		desc.addStyleName("module-description");
 		panel.add(desc);
 		panel.add(module.getModuleWidget());
-		this.setWidget(panel);
+		setWidget(panel);
 	}
 
 	public ModuleView getModule() {

@@ -91,7 +91,7 @@ public final class MascotMappings implements Mappings {
 
 	@Override
 	public Reader baseSettings() {
-		return ResourceUtilities.getReader("classpath:edu/mayo/mprc/swift/params/base.mascot.params", this.getClass());
+		return ResourceUtilities.getReader("classpath:edu/mayo/mprc/swift/params/base.mascot.params", getClass());
 	}
 
 	@Override

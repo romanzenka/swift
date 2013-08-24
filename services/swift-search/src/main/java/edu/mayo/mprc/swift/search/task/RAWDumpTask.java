@@ -41,13 +41,13 @@ public final class RAWDumpTask extends AsyncTaskBase {
 
 		this.rawFile = rawFile;
 		this.outputFolder = outputFolder;
-		this.rawInfoFile = getExpectedRawInfoFile();
-		this.rawSpectraFile = getExpectedRawSpectraFile();
-		this.chromatogramFile = getExpectedChromatogramFile();
-		this.tuneMethodFile = getExpectedTuneMethodFile();
-		this.instrumentMethodFile = getExpectedInstrumentMethodFile();
-		this.sampleInformationFile = getExpectedSampleInformationFile();
-		this.errorLogFile = getExpectedErrorLogFile();
+		rawInfoFile = getExpectedRawInfoFile();
+		rawSpectraFile = getExpectedRawSpectraFile();
+		chromatogramFile = getExpectedChromatogramFile();
+		tuneMethodFile = getExpectedTuneMethodFile();
+		instrumentMethodFile = getExpectedInstrumentMethodFile();
+		sampleInformationFile = getExpectedSampleInformationFile();
+		errorLogFile = getExpectedErrorLogFile();
 
 		setName("RAW Dump");
 		updateDescription();

@@ -33,7 +33,7 @@ public class EnabledEngines extends PersistableBase {
 	}
 
 	public void add(final SearchEngineConfig engineConfig) {
-		if (this.getId() != null) {
+		if (getId() != null) {
 			throw new MprcException("Enabled engine set is immutable once saved to the database");
 		}
 		engineConfigs.add(engineConfig);
@@ -75,7 +75,7 @@ public class EnabledEngines extends PersistableBase {
 		}
 
 		final EnabledEngines that = (EnabledEngines) o;
-		return Objects.equal(that.getEngineConfigs(), this.getEngineConfigs());
+		return Objects.equal(that.getEngineConfigs(), getEngineConfigs());
 	}
 
 	@Override

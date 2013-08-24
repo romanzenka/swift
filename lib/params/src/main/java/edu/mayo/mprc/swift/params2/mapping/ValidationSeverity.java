@@ -6,7 +6,7 @@ public enum ValidationSeverity {
 	private int rank;
 
 	ValidationSeverity(final int rank) {
-		this.setRank(rank);
+		setRank(rank);
 	}
 
 	public int getRank() {

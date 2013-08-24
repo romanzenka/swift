@@ -46,7 +46,7 @@ public abstract class AsyncTaskBase extends TaskBase {
 	}
 
 	public void setTaskEnqueued(final Date enqueued) {
-		this.taskEnqueued = enqueued;
+		taskEnqueued = enqueued;
 	}
 
 	public Date getTaskProcessingStarted() {
@@ -54,7 +54,7 @@ public abstract class AsyncTaskBase extends TaskBase {
 	}
 
 	public void setTaskProcessingStarted(final Date processingStarted) {
-		this.taskProcessingStarted = processingStarted;
+		taskProcessingStarted = processingStarted;
 	}
 
 	public FileTokenFactory getFileTokenFactory() {
@@ -83,7 +83,7 @@ public abstract class AsyncTaskBase extends TaskBase {
 	public void run() {
 		if (!wasSubmitted) {
 			if (daemon == null) {
-				throw new MprcException("The daemon for asynchronous task '" + this.getName() + "' was not set.");
+				throw new MprcException("The daemon for asynchronous task '" + getName() + "' was not set.");
 			}
 			wasSubmitted = true;
 			final WorkPacket workPacket = createWorkPacket();
@@ -102,7 +102,7 @@ public abstract class AsyncTaskBase extends TaskBase {
 							setState(TaskState.COMPLETED_SUCCESFULLY);
 						}
 					} catch (Exception t) {
-						this.getTask().setError(t);
+						getTask().setError(t);
 					}
 				}
 
@@ -111,7 +111,7 @@ public abstract class AsyncTaskBase extends TaskBase {
 					try {
 						onProgress(progressInfo);
 					} catch (Exception t) {
-						this.getTask().setError(t);
+						getTask().setError(t);
 					}
 					super.userProgressInformation(progressInfo);
 				}

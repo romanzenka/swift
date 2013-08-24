@@ -33,8 +33,8 @@ public final class StepValidation {
 	 * A null constructor that sets the message to "undetermined" and completion count to -1
 	 */
 	public StepValidation() {
-		this.setCompletionCount(-1);
-		this.wrappedExceptions = new ArrayList<Exception>();
+		setCompletionCount(-1);
+		wrappedExceptions = new ArrayList<Exception>();
 	}
 
 	/**
@@ -43,7 +43,7 @@ public final class StepValidation {
 	 * @return true if the validation indicates success or else false
 	 */
 	public boolean isOK() {
-		return this.messages.isEmpty();
+		return messages.isEmpty();
 	}
 
 	/**
@@ -54,7 +54,7 @@ public final class StepValidation {
 	}
 
 	public void addMessage(final String message) {
-		this.messages.add(message);
+		messages.add(message);
 	}
 
 	/**
@@ -76,7 +76,7 @@ public final class StepValidation {
 	 * @return the list of exceptions that may have been thrown as part of the step or validation
 	 */
 	public List<Exception> getWrappedExceptions() {
-		return this.wrappedExceptions;
+		return wrappedExceptions;
 	}
 
 	/**
@@ -96,9 +96,9 @@ public final class StepValidation {
 	 * @param e
 	 */
 	public void addMessageAndException(final String message, final Exception e) {
-		this.messages.add(message);
+		messages.add(message);
 		if (e != null) {
-			this.wrappedExceptions.add(e);
+			wrappedExceptions.add(e);
 		}
 	}
 

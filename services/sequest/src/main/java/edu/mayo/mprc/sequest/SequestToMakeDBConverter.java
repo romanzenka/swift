@@ -27,8 +27,7 @@ public final class SequestToMakeDBConverter {
 
 	public SequestToMakeDBConverter() {
 		// NOTE: the Mappers are specified in the order their corresponding keys should appear in the output makedb.params
-		this
-				.add(new DirectMapper("first_database_name", "database_name"))
+		add(new DirectMapper("first_database_name", "database_name"))
 				.add(new ConstantMapper("sort_directory", "."))
 				.add(new ConstantMapper("sort_program", "sort.exe"))
 				.add(new DirectMapper("enzyme_info"))
@@ -174,7 +173,7 @@ public final class SequestToMakeDBConverter {
 
 		@Override
 		public void output(final Map<String, String> values, final StringBuilder newPic) {
-			add(this.outputKey, this.value, newPic);
+			add(outputKey, value, newPic);
 		}
 
 	}
@@ -184,12 +183,12 @@ public final class SequestToMakeDBConverter {
 	private static final class DirectMapper extends Mapper {
 		public DirectMapper(final String sameKeyRegexp) {
 			super(sameKeyRegexp);
-			this.outputKey = null;
+			outputKey = null;
 		}
 
 		public DirectMapper(final String inputKeyRegexp, final String newKey) {
 			super(inputKeyRegexp);
-			this.outputKey = newKey;
+			outputKey = newKey;
 		}
 
 		private String outputKey;

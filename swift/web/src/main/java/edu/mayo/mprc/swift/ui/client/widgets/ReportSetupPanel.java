@@ -21,7 +21,7 @@ public final class ReportSetupPanel extends HorizontalPanel {
 	public ReportSetupPanel(final boolean enableScaffoldReport) {
 		scaffoldReport = new CheckBox("Generate Peptide Report");
 		scaffoldReport.setChecked(enableScaffoldReport);
-		this.add(scaffoldReport);
+		add(scaffoldReport);
 	}
 
 	public boolean isScaffoldReportEnable() {

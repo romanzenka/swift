@@ -31,7 +31,7 @@ public final class EnabledEnginesPanel extends HorizontalPanel {
 		List<EngineVersionSelector> list = new ArrayList<EngineVersionSelector>(engines.values());
 		Collections.sort(list);
 		for (final EngineVersionSelector selector : list) {
-			this.add(selector);
+			add(selector);
 		}
 	}
 

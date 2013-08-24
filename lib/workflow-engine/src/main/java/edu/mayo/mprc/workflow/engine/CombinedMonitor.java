@@ -10,7 +10,7 @@ public final class CombinedMonitor implements SearchMonitor {
 	private List<SearchMonitor> monitors = null;
 
 	public CombinedMonitor() {
-		this.monitors = new ArrayList<SearchMonitor>();
+		monitors = new ArrayList<SearchMonitor>();
 	}
 
 	public CombinedMonitor(final List<SearchMonitor> monitors) {
@@ -18,7 +18,7 @@ public final class CombinedMonitor implements SearchMonitor {
 	}
 
 	public void addMonitor(final SearchMonitor monitor) {
-		this.monitors.add(monitor);
+		monitors.add(monitor);
 	}
 
 	@Override

@@ -7,11 +7,11 @@ class InputFileSearches {
 	private Set<EngineSearchTask> searches;
 
 	InputFileSearches() {
-		this.searches = new HashSet<EngineSearchTask>();
+		searches = new HashSet<EngineSearchTask>();
 	}
 
 	public void addSearch(final EngineSearchTask search) {
-		this.searches.add(search);
+		searches.add(search);
 	}
 
 	public Set<EngineSearchTask> getSearches() {

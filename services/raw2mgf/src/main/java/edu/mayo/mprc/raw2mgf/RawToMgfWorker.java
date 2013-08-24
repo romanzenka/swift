@@ -325,7 +325,7 @@ public final class RawToMgfWorker extends WorkerBase {
 	}
 
 	public File getExtractMsnExecutable() {
-		return this.extractMsnExecutable;
+		return extractMsnExecutable;
 	}
 
 	public File getTempFolder() {

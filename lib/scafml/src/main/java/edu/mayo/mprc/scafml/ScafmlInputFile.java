@@ -13,7 +13,7 @@ public final class ScafmlInputFile extends FileHolder {
 	}
 
 	public void setID(final String iD) {
-		this._sID = iD;
+		_sID = iD;
 	}
 
 	public String getID() {

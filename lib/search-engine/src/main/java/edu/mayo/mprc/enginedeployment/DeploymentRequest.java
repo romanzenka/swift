@@ -75,7 +75,7 @@ public final class DeploymentRequest extends WorkPacketBase {
 	}
 
 	public Object getProperty(final String key) {
-		if (this.properties == null) {
+		if (properties == null) {
 			return null;
 		}
 
@@ -89,8 +89,8 @@ public final class DeploymentRequest extends WorkPacketBase {
 	}
 
 	public void addProperty(final String key, Serializable value) {
-		if (this.properties == null) {
-			this.properties = new HashMap<String, Serializable>();
+		if (properties == null) {
+			properties = new HashMap<String, Serializable>();
 		}
 
 		properties.put(key, value);

@@ -242,7 +242,7 @@ public final class WorkflowEngine {
 			for (final SearchMonitor m : monitor.getMonitors()) {
 				m.updateStatistics(report);
 			}
-			this.previousProgressReport = report;
+			previousProgressReport = report;
 		}
 
 		return succeededTasks.get() + failedTasks.get() == allTasks.size();

@@ -33,7 +33,7 @@ public class PersistableHashedSetBase<T extends PersistableBase> extends Persist
 
 	@Override
 	public int hashCode() {
-		if (this.getId() != null) {
+		if (getId() != null) {
 			// We are serialized, that means immutable.
 			// We can use the saved hash value
 			return (int) getHash();

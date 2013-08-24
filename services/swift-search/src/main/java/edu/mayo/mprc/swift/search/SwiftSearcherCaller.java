@@ -126,7 +126,7 @@ public final class SwiftSearcherCaller {
 			synchronized (monitor) {
 				ready = true;
 				running = false;
-				this.exception = e;
+				exception = e;
 				monitor.notifyAll();
 			}
 		}

@@ -23,7 +23,7 @@ public final class DaemonWrapper extends SimplePanel {
 
 	private class ModuleConfigUis {
 		private ModuleConfigUis(final ModuleWrapper moduleWrapper, final RunnerView runner) {
-			this.ui = moduleWrapper;
+			ui = moduleWrapper;
 			this.runner = runner;
 		}
 
@@ -33,7 +33,7 @@ public final class DaemonWrapper extends SimplePanel {
 
 	public DaemonWrapper(final DaemonModel daemonModel, final Context context) {
 		this.context = context;
-		this.addStyleName("module-wrapper");
+		addStyleName("module-wrapper");
 		final FlowPanel panel = new FlowPanel();
 		panel.addStyleName("module");
 		final Label label = new Label("Daemon");
@@ -50,7 +50,7 @@ public final class DaemonWrapper extends SimplePanel {
 		panel.add(desc);
 
 		this.daemonModel = daemonModel;
-		this.availableModules = context.getApplicationModel().getAvailableModules();
+		availableModules = context.getApplicationModel().getAvailableModules();
 
 		this.daemonModel.addListener(new MyDaemonModelListener());
 
@@ -89,7 +89,7 @@ public final class DaemonWrapper extends SimplePanel {
 		for (final ResourceModel resource : resources) {
 			addUiForResource(resource);
 		}
-		this.setWidget(panel);
+		setWidget(panel);
 	}
 
 	public ModuleWrapper getUiForResource(final ResourceModel resourceModel) {

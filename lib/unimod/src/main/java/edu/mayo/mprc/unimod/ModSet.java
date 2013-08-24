@@ -74,13 +74,13 @@ public class ModSet extends PersistableBase implements Comparable<ModSet> {
 
 	@Override
 	public int compareTo(final ModSet tt) {
-		if (this.getModifications().size() < tt.getModifications().size()) {
+		if (getModifications().size() < tt.getModifications().size()) {
 			return -1;
 		}
-		if (this.getModifications().size() > tt.getModifications().size()) {
+		if (getModifications().size() > tt.getModifications().size()) {
 			return 1;
 		}
-		for (Iterator<ModSpecificity> i = this.getModifications().iterator(), j = tt.getModifications().iterator(); i.hasNext(); ) {
+		for (Iterator<ModSpecificity> i = getModifications().iterator(), j = tt.getModifications().iterator(); i.hasNext(); ) {
 			final int ret = i.next().compareTo(j.next());
 			if (ret != 0) {
 				return ret;
@@ -94,7 +94,7 @@ public class ModSet extends PersistableBase implements Comparable<ModSet> {
 			return false;
 		}
 		final ModSet tt = (ModSet) t;
-		return Objects.equal(this.getModifications(), tt.getModifications());
+		return Objects.equal(getModifications(), tt.getModifications());
 	}
 
 	public int hashCode() {

@@ -28,7 +28,7 @@ public final class SearchTypeList extends ListBox implements SourcesChangeEvents
 
 	public SearchTypeList() {
 		for (int i = 0; i < searchTypeEntries.length; i++) {
-			this.addItem(searchTypeEntries[i].getLabel(), String.valueOf(searchTypeEntries[i].getType().getType()));
+			addItem(searchTypeEntries[i].getLabel(), String.valueOf(searchTypeEntries[i].getType().getType()));
 			searchTypeEntries[i].index = i;
 		}
 
@@ -43,7 +43,7 @@ public final class SearchTypeList extends ListBox implements SourcesChangeEvents
 			}
 		}
 
-		this.setSelectedIndex(selectedSearchType.getIndex());
+		setSelectedIndex(selectedSearchType.getIndex());
 		addClickListener(this);
 		addChangeListener(this);
 	}
@@ -76,13 +76,13 @@ public final class SearchTypeList extends ListBox implements SourcesChangeEvents
 	}
 
 	public SearchType getSelectedSearchType() {
-		return SearchType.fromType(Integer.parseInt(this.getValue(this.getSelectedIndex())));
+		return SearchType.fromType(Integer.parseInt(getValue(getSelectedIndex())));
 	}
 
 	public void setSelectedSearchType(final SearchType type, final boolean storeUserPreference) {
-		for (int i = 0; i < this.getItemCount(); i++) {
-			if (this.getValue(i).equals(String.valueOf(type.getType()))) {
-				this.setSelectedIndex(i);
+		for (int i = 0; i < getItemCount(); i++) {
+			if (getValue(i).equals(String.valueOf(type.getType()))) {
+				setSelectedIndex(i);
 				if (storeUserPreference) {
 					storeSelectionInCookie();
 				}
@@ -93,8 +93,8 @@ public final class SearchTypeList extends ListBox implements SourcesChangeEvents
 	}
 
 	private void storeSelectionInCookie() {
-		if (this.getSelectedIndex() >= 0 && this.getSelectedIndex() < searchTypeEntries.length) {
-			Cookies.setCookie(SEARCH_TYPE_COOKIE, searchTypeEntries[this.getSelectedIndex()].getCookie(), ParamSetSelectionController.getCookieExpirationDate(), null, "/", false);
+		if (getSelectedIndex() >= 0 && getSelectedIndex() < searchTypeEntries.length) {
+			Cookies.setCookie(SEARCH_TYPE_COOKIE, searchTypeEntries[getSelectedIndex()].getCookie(), ParamSetSelectionController.getCookieExpirationDate(), null, "/", false);
 		}
 	}
 

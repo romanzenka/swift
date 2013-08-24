@@ -47,22 +47,22 @@ public final class ServerFileReader extends PopupPanel implements ClickListener 
 	private Timer resultTime = new Timer() {
 		@Override
 		public void run() {
-			ServerFileReader.this.getInterrimResults();
+			getInterrimResults();
 		}
 	};
 
 	public ServerFileReader() {
-		this.init();
+		init();
 	}
 
 	protected void init() {
-		this.mainPanel = new DockPanel();
+		mainPanel = new DockPanel();
 
 		mainPanel.setStyleName("serverfilereader");
 		mainPanel.add(getCommandPanel(), DockPanel.NORTH);
 
-		this.contentRenderer = new TextArea();
-		this.contentRenderer.setSize("100%", "100%");
+		contentRenderer = new TextArea();
+		contentRenderer.setSize("100%", "100%");
 
 		contentRenderer.setReadOnly(true);
 		contentRenderer.setStyleName("serverfilereader_text");
@@ -71,11 +71,11 @@ public final class ServerFileReader extends PopupPanel implements ClickListener 
 		DOM.setElementAttribute(contentRenderer.getElement(), "wrap", "off");
 
 		mainPanel.add(contentRenderer, DockPanel.CENTER);
-		this.add(mainPanel);
+		add(mainPanel);
 	}
 
 	public ServerFileReader setFileToDisplay(final String path) {
-		this.fileDisplayed = path;
+		fileDisplayed = path;
 		return this;
 	}
 
@@ -87,20 +87,20 @@ public final class ServerFileReader extends PopupPanel implements ClickListener 
 	}
 
 	public void setGrepPattern(final String pattern) {
-		this.txtGrepExpression.setText(pattern);
+		txtGrepExpression.setText(pattern);
 	}
 
 	@Override
 	public void setSize(final String w, final String h) {
 		super.setSize(w, h);
-		this.mainPanel.setSize(w, h);
+		mainPanel.setSize(w, h);
 		contentRenderer.setSize(w, h);
 	}
 
 	@Override
 	public void setPixelSize(final int w, final int h) {
 		super.setPixelSize(w, h);
-		this.mainPanel.setPixelSize(w, h);
+		mainPanel.setPixelSize(w, h);
 		contentRenderer.setPixelSize(w, h - 25);
 	}
 
@@ -139,8 +139,8 @@ public final class ServerFileReader extends PopupPanel implements ClickListener 
 				if (waitPopup != null && waitPopup.isVisible()) {
 					waitPopup.hide();
 				}
-				ServerFileReader.this.cancelRequest(); //if there is any requesting being processed then just cancel it.
-				ServerFileReader.this.hide();
+				cancelRequest(); //if there is any requesting being processed then just cancel it.
+				hide();
 			}
 		});
 
@@ -151,7 +151,7 @@ public final class ServerFileReader extends PopupPanel implements ClickListener 
 
 
 	protected void setCommandsEnabled(final boolean enabled) {
-		this.commandsEnabled = enabled;
+		commandsEnabled = enabled;
 	}
 
 	public static final int PAGE_OVERLAP = 5;
@@ -161,36 +161,36 @@ public final class ServerFileReader extends PopupPanel implements ClickListener 
 		if (widget.equals(cmdApplyGrep) && ((Hyperlink) widget).getText().equals("Stop")) {
 			cancelRequest();
 		} else if (!commandsEnabled) {
-			new MessagePopup("Currently retreiving file contents.  Please wait.  Depending on filter criteria this may take a while.", this.getAbsoluteLeft() + 50, this.getAbsoluteTop() + 50).show();
+			new MessagePopup("Currently retreiving file contents.  Please wait.  Depending on filter criteria this may take a while.", getAbsoluteLeft() + 50, getAbsoluteTop() + 50).show();
 		} else {
 			if (widget.equals(cmdNextPage)) {
-				this.startingLine = this.startingLine + this.linesPerPage - PAGE_OVERLAP;
+				startingLine = startingLine + linesPerPage - PAGE_OVERLAP;
 			} else if (widget.equals(cmdPrevPage)) {
-				this.startingLine = this.startingLine - this.linesPerPage + PAGE_OVERLAP;
+				startingLine = startingLine - linesPerPage + PAGE_OVERLAP;
 			} else if (widget.equals(cmdFirstPage)) {
-				this.startingLine = 0;
+				startingLine = 0;
 			} else if (widget.equals(cmdApplyGrep)) {
-				this.startingLine = 0; //change to the first line for less bafflement.
+				startingLine = 0; //change to the first line for less bafflement.
 			}
-			updateContent(this.startingLine);
+			updateContent(startingLine);
 		}
 	}
 
 	protected void showMessage(final String message) {
-		new MessagePopup(message, this.getAbsoluteLeft() + 50, this.getAbsoluteTop() + 50).show();
+		new MessagePopup(message, getAbsoluteLeft() + 50, getAbsoluteTop() + 50).show();
 	}
 
 	public void updateContent(final int startingLine) {
 		this.startingLine = startingLine;
 
-		waitPopup = new MessagePopup("Retreiving file data.  Please wait.", this.getAbsoluteLeft() + 100, this.getAbsoluteTop() + 50);
+		waitPopup = new MessagePopup("Retreiving file data.  Please wait.", getAbsoluteLeft() + 100, getAbsoluteTop() + 50);
 		waitPopup.show();
-		this.setCommandsEnabled(false);
+		setCommandsEnabled(false);
 
-		this.txtGrepExpression.setText(txtGrepExpression.getText().trim());
+		txtGrepExpression.setText(txtGrepExpression.getText().trim());
 		cmdApplyGrep.setText("Stop");
 		//todo retreive content
-		getService().getLines(this.fileDisplayed, this.startingLine, this.linesPerPage, txtGrepExpression.getText(), new AsyncCallback<String[]>() {
+		getService().getLines(fileDisplayed, this.startingLine, linesPerPage, txtGrepExpression.getText(), new AsyncCallback<String[]>() {
 			@Override
 			public void onFailure(final Throwable throwable) {
 				setCommandsEnabled(true);
@@ -263,7 +263,7 @@ public final class ServerFileReader extends PopupPanel implements ClickListener 
 				}
 				content.append(currentLine).append("\n");
 			}
-			ServerFileReader.this.contentRenderer.setText(content.toString());
+			contentRenderer.setText(content.toString());
 
 		}
 	}

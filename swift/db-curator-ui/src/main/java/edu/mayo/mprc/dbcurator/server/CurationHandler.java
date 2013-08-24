@@ -91,7 +91,7 @@ public final class CurationHandler {
 		toSync.getErrorMessages().clear();
 
 		// if we are running then update the progress status of the curation stub.
-		if (this.lastRunStatus != null) {
+		if (lastRunStatus != null) {
 			upgradeProgressInCurationStub(toSync);
 		}
 
@@ -178,27 +178,27 @@ public final class CurationHandler {
 
 	private void upgradeProgressInCurationStub(final CurationStub toSync) {
 		//if there are any global error messages then sync them to the stub
-		final List<String> msgs = this.lastRunStatus.getMessages();
+		final List<String> msgs = lastRunStatus.getMessages();
 		for (final String msg : msgs) {
 			toSync.getErrorMessages().add(msg);
 		}
 
 		int i = 0;
-		for (final StepValidation stepValidation : this.lastRunStatus.getCompletedStepValidations()) {
+		for (final StepValidation stepValidation : lastRunStatus.getCompletedStepValidations()) {
 			(toSync.getSteps().get(i++)).setCompletionCount(stepValidation.getCompletionCount());
 		}
 
 		//if we have more steps to report on then one must be executing
 		if (i < toSync.getSteps().size()) { //we had a failure in the last step
-			if (!this.lastRunStatus.getFailedStepValidations().isEmpty()) {
-				final StepValidation failedValidation = this.lastRunStatus.getFailedStepValidations().get(0);
+			if (!lastRunStatus.getFailedStepValidations().isEmpty()) {
+				final StepValidation failedValidation = lastRunStatus.getFailedStepValidations().get(0);
 				final CurationStepStub syncStep = toSync.getSteps().get(i);
 
 				for (final String message : failedValidation.getMessages()) {
 					syncStep.addMessage(message);
 				}
 			} else { //we are current performing the next set sp report progress
-				(toSync.getSteps().get(i)).setProgress((int) this.lastRunStatus.getCurrentStepProgress());
+				(toSync.getSteps().get(i)).setProgress((int) lastRunStatus.getCurrentStepProgress());
 			}
 		}
 	}
@@ -328,8 +328,8 @@ public final class CurationHandler {
 		}
 
 		//if there are any global error messages then sync them to the stub
-		if (this.lastRunStatus != null) {
-			final List<String> msgs = this.lastRunStatus.getMessages();
+		if (lastRunStatus != null) {
+			final List<String> msgs = lastRunStatus.getMessages();
 			for (final String msg : msgs) {
 				result.getErrorMessages().add(msg);
 			}
@@ -432,20 +432,20 @@ public final class CurationHandler {
 	}
 
 	public CurationStub getCurationByID(final Integer id) {
-		this.cache = null;
-		this.lastRunStatus = null;
+		cache = null;
+		lastRunStatus = null;
 
 		if (id == null) {
-			this.cache = new Curation();
+			cache = new Curation();
 			return new CurationStub();
 		}
 
-		this.cache = curationDao.getCuration(id);
+		cache = curationDao.getCuration(id);
 
-		if (this.cache != null) {
-			return this.createStub(this.cache);
+		if (cache != null) {
+			return createStub(cache);
 		} else {
-			this.cache = new Curation();
+			cache = new Curation();
 			return new CurationStub();
 		}
 
@@ -461,18 +461,18 @@ public final class CurationHandler {
 	 */
 	public CurationStub executeCuration(final CurationStub toExecute) {
 		//sync the curation to the cache
-		this.syncCuration(toExecute);
+		syncCuration(toExecute);
 
 		// the cache is now set to curation matching our stub
-		final Curation curation = this.cache;
+		final Curation curation = cache;
 
 		final CurationExecutor curationExecutor = new CurationExecutor(curation, true, curationDao,
 				curationWebContext.getFastaFolder(),
 				curationWebContext.getLocalTempFolder(),
 				curationWebContext.getFastaArchiveFolder());
-		this.lastRunStatus = curationExecutor.execute();
+		lastRunStatus = curationExecutor.execute();
 
-		while (this.lastRunStatus.isInProgress()) {
+		while (lastRunStatus.isInProgress()) {
 			try {
 				Thread.sleep(500);
 			} catch (InterruptedException e) {
@@ -481,10 +481,10 @@ public final class CurationHandler {
 		}
 
 		//make sure the cache is set to the curation
-		this.cache = curation;
+		cache = curation;
 
 		// do a sync to make sure the stub matches current state
-		return this.syncCuration(toExecute);
+		return syncCuration(toExecute);
 	}
 
 	private static final Logger LOGGER = Logger.getLogger(CurationHandler.class);
@@ -495,7 +495,7 @@ public final class CurationHandler {
 	 * @return the stub for the current cached curation
 	 */
 	public CurationStub getCachedCurationStub() {
-		return this.createStub(this.getCachedCuration());
+		return createStub(getCachedCuration());
 	}
 
 	/**
@@ -504,7 +504,7 @@ public final class CurationHandler {
 	 * @param toSet the curation to be associated with this handler
 	 */
 	public void setCachedCuration(final Curation toSet) {
-		this.cache = toSet;
+		cache = toSet;
 	}
 
 	/**
@@ -513,7 +513,7 @@ public final class CurationHandler {
 	 * @return the curation cached with this object
 	 */
 	public Curation getCachedCuration() {
-		return this.cache;
+		return cache;
 	}
 
 	public CurationDao getCurationDao() {

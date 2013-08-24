@@ -87,7 +87,7 @@ public final class MascotWorker extends WorkerBase {
 					mascotWorkPacket.getInputFile().getAbsolutePath(),
 					mascotWorkPacket.getOutputFile().getAbsolutePath(),
 					mascotWorkPacket.getShortDbName()));
-			this.setMascotOutputFile(mascotWorkPacket.getOutputFile());
+			setMascotOutputFile(mascotWorkPacket.getOutputFile());
 
 			// We have to modify the mascot params file, replacing the ${DB:whatever} tag with the supplied short db name.
 			final StreamRegExMatcher matcher = new StreamRegExMatcher(DB_TAG_PATTERN, mascotWorkPacket.getSearchParamsFile());
@@ -96,7 +96,7 @@ public final class MascotWorker extends WorkerBase {
 			matcher.close();
 
 			// Now we can run the search
-			this.search(
+			search(
 					mascotWorkPacket.getSearchParamsFile().getAbsolutePath(),
 					mascotWorkPacket.getInputFile().getAbsolutePath(),
 					progressReporter);

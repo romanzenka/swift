@@ -88,7 +88,7 @@ public class Mod extends EvolvableBase implements Comparable<Mod> {
 	}
 
 	public Set<String> getAltNames() {
-		return this.altNames;
+		return altNames;
 	}
 
 	private void setAltNames(final Set<String> altNames) {
@@ -162,7 +162,7 @@ public class Mod extends EvolvableBase implements Comparable<Mod> {
 	}
 
 	public int hashCode() {
-		return (this.getTitle() != null ? this.getTitle().hashCode() : 0) + (getMassMono() == null ? 0 : getMassMono().hashCode());
+		return (getTitle() != null ? getTitle().hashCode() : 0) + (getMassMono() == null ? 0 : getMassMono().hashCode());
 	}
 
 	@Override
@@ -221,9 +221,9 @@ public class Mod extends EvolvableBase implements Comparable<Mod> {
 	@Override
 	public int compareTo(final Mod o) {
 		return ComparisonChain.start().nullsFirst()
-				.compare(this.getTitle(), o.getTitle())
-				.compare(this.getFullName(), o.getFullName())
-				.compare(this.getRecordID(), o.getRecordID())
+				.compare(getTitle(), o.getTitle())
+				.compare(getFullName(), o.getFullName())
+				.compare(getRecordID(), o.getRecordID())
 				.result();
 	}
 }

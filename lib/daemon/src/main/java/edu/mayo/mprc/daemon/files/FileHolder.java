@@ -136,7 +136,7 @@ public class FileHolder implements FileTokenHolder {
 	 */
 	private List<Field> getFields() {
 		final List<Field> fields = new ArrayList<Field>();
-		addFields(this.getClass(), fields);
+		addFields(getClass(), fields);
 		return fields;
 	}
 
@@ -146,7 +146,7 @@ public class FileHolder implements FileTokenHolder {
 			field.setAccessible(true);
 			fields.add(field);
 		}
-		if (!this.getClass().equals(FileHolder.class) && clazz.getSuperclass() != null) {
+		if (!getClass().equals(FileHolder.class) && clazz.getSuperclass() != null) {
 			addFields(clazz.getSuperclass(), fields);
 		}
 	}
@@ -244,7 +244,7 @@ public class FileHolder implements FileTokenHolder {
 	}
 
 	private void setFileField(final String fieldName, final File file) {
-		final Field field = getFieldForName(this.getClass(), fieldName);
+		final Field field = getFieldForName(getClass(), fieldName);
 		try {
 			field.set(this, file);
 		} catch (IllegalAccessException e) {
@@ -253,7 +253,7 @@ public class FileHolder implements FileTokenHolder {
 	}
 
 	private void setFileIndexedField(final FieldIndex fieldIndex, final File file) {
-		final Field field = getFieldForName(this.getClass(), fieldIndex.getField());
+		final Field field = getFieldForName(getClass(), fieldIndex.getField());
 		if (List.class.isAssignableFrom(field.getType())) {
 			final Serializable index = fieldIndex.getIndex();
 			if (index instanceof Integer) {
@@ -280,7 +280,7 @@ public class FileHolder implements FileTokenHolder {
 			field = getFieldForName(clazz.getSuperclass(), fieldName);
 		}
 		if (field == null) {
-			throw new MprcException("Could not access field " + fieldName + " of " + this.getClass().getCanonicalName());
+			throw new MprcException("Could not access field " + fieldName + " of " + getClass().getCanonicalName());
 		}
 		return field;
 	}
@@ -348,6 +348,6 @@ public class FileHolder implements FileTokenHolder {
 	}
 
 	private void throwFieldAccess(final Field field, final IllegalAccessException e) {
-		throw new MprcException("Could not serialize field " + field.getName() + " of " + this.getClass().getCanonicalName(), e);
+		throw new MprcException("Could not serialize field " + field.getName() + " of " + getClass().getCanonicalName(), e);
 	}
 }

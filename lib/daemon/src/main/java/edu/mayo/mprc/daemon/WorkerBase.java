@@ -40,7 +40,7 @@ public abstract class WorkerBase implements Worker {
 
 	@Override
 	public void check() {
-		LOGGER.debug("No check implemented for this worker: " + this.getClass().getSimpleName());
+		LOGGER.debug("No check implemented for this worker: " + getClass().getSimpleName());
 	}
 
 	/**

@@ -193,7 +193,7 @@ public final class EngineTest {
 			super(engine);
 			this.pause = pause;
 			this.fail = fail;
-			this.dependencies = new ArrayList<Task>();
+			dependencies = new ArrayList<Task>();
 		}
 
 		@Override
@@ -275,11 +275,11 @@ public final class EngineTest {
 		public UnPauser(final List<Task> pausedTasks, final Random random) {
 			this.pausedTasks = pausedTasks;
 			this.random = random;
-			this.stop = false;
+			stop = false;
 		}
 
 		public void stop() {
-			this.stop = true;
+			stop = true;
 		}
 
 		@Override

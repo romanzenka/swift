@@ -27,7 +27,7 @@ public final class SpectrumQaSetupPanel extends HorizontalPanel {
 			"</div>");
 
 	public SpectrumQaSetupPanel(final List<SpectrumQaParamFileInfo> paramFileInfos) {
-		this.setVerticalAlignment(HasVerticalAlignment.ALIGN_MIDDLE);
+		setVerticalAlignment(HasVerticalAlignment.ALIGN_MIDDLE);
 		spectrumQaEnabled.setChecked(true);
 
 		for (final SpectrumQaParamFileInfo paramFileInfo : paramFileInfos) {
@@ -44,9 +44,9 @@ public final class SpectrumQaSetupPanel extends HorizontalPanel {
 
 		updateEnabledControls();
 
-		this.add(spectrumQaEnabled);
-		this.add(propertyFile);
-		this.add(helpPopupButton);
+		add(spectrumQaEnabled);
+		add(propertyFile);
+		add(helpPopupButton);
 	}
 
 	private void updateEnabledControls() {

@@ -30,7 +30,7 @@ public final class EnumUserType implements UserType, ParameterizedType {
 		}
 
 		try {
-			this.clazz = Class.forName(enumClassName);
+			clazz = Class.forName(enumClassName);
 		} catch (java.lang.ClassNotFoundException e) {
 			//try to it as if it were an inner class (aka enum) before failing all together
 

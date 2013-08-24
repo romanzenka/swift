@@ -188,7 +188,7 @@ public class TestSearchDbDao extends DaoTest {
 		}
 
 		public void assertSame(final ClassCounts other) {
-			for (final Map.Entry<Class<?>, Long> entry : this.counts.entrySet()) {
+			for (final Map.Entry<Class<?>, Long> entry : counts.entrySet()) {
 				final Long otherCount = other.counts.get(entry.getKey());
 				Assert.assertEquals(entry.getValue(), otherCount, "The count of [" + entry.getKey().getSimpleName() + "] should not change.");
 			}

@@ -52,6 +52,6 @@ final class Column implements Comparable<Column> {
 
 	@Override
 	public int compareTo(final Column o) {
-		return this.getTitle().compareTo(o.getTitle());
+		return getTitle().compareTo(o.getTitle());
 	}
 }

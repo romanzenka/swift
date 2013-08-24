@@ -18,7 +18,7 @@ public final class AvailableModules implements Serializable {
 
 	public AvailableModules(final Collection<Info> infos) {
 		for (final Info info : infos) {
-			this.configUIs.put(info.getType(), info);
+			configUIs.put(info.getType(), info);
 		}
 	}
 

@@ -54,7 +54,7 @@ final class MascotDatabaseMaintenance {
 	public MascotDatabaseMaintenance(final URI dbMaintenanceUri, final HttpClient httpClient) {
 		this.dbMaintenanceUri = dbMaintenanceUri;
 		this.httpClient = httpClient;
-		this.referenceUri = dbMaintenanceUri.toString();
+		referenceUri = dbMaintenanceUri.toString();
 
 		refresh();
 	}

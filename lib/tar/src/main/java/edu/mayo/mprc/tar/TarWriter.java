@@ -69,12 +69,12 @@ public final class TarWriter {
 	 * @param file
 	 */
 	private void initialize(final File file) {
-		this.tarFile = file;
-		if (this.tarFile.exists()) {
+		tarFile = file;
+		if (tarFile.exists()) {
 			// backup the existing one to the file with name tarFileName + ROLL_OVER_EXTENSION
-			FileUtilities.rename(this.tarFile, getRolloverFile());
+			FileUtilities.rename(tarFile, getRolloverFile());
 		}
-		FileUtilities.ensureFileExists(this.tarFile);
+		FileUtilities.ensureFileExists(tarFile);
 	}
 
 	/**
@@ -92,7 +92,7 @@ public final class TarWriter {
 	 */
 	public void addFile(final File file) {
 		if (isTarClosed()) {
-			this.rolloverContents();
+			rolloverContents();
 		}
 		final String name = file.getName();
 		final TarEntry t = new TarEntry(file);
@@ -100,7 +100,7 @@ public final class TarWriter {
 		try {
 			outputStream.putNextEntry(t);
 		} catch (IOException e) {
-			throw new MprcException("failed adding tar entry for file=" + name + "to tar file=" + this.tarFile.getAbsolutePath(), e);
+			throw new MprcException("failed adding tar entry for file=" + name + "to tar file=" + tarFile.getAbsolutePath(), e);
 		}
 		BufferedInputStream bis = null;
 
@@ -124,12 +124,12 @@ public final class TarWriter {
 					try {
 						outputStream.flush();
 					} catch (IOException e) {
-						throw new MprcException("could not flush stream to tar file=" + this.tarFile.getAbsolutePath(), e);
+						throw new MprcException("could not flush stream to tar file=" + tarFile.getAbsolutePath(), e);
 					}
 					try {
 						outputStream.closeEntry();
 					} catch (IOException e) {
-						throw new MprcException("could not close the stream to tar file=" + this.tarFile.getAbsolutePath(), e);
+						throw new MprcException("could not close the stream to tar file=" + tarFile.getAbsolutePath(), e);
 					}
 					return;
 				}
@@ -151,7 +151,7 @@ public final class TarWriter {
 		for (final File file : files) {
 			addFile(file);
 		}
-		this.close();
+		close();
 	}
 
 	/**
@@ -181,14 +181,14 @@ public final class TarWriter {
 	 * close the tar archive
 	 */
 	public void close() {
-		if (this.outputStream != null) {
+		if (outputStream != null) {
 			try {
-				this.outputStream.close();
+				outputStream.close();
 			} catch (IOException e) {
 				// this is a fatal exception as the tar file will be corrupted
 				throw new MprcException("could not close the tar file=" + tarFile.getAbsolutePath(), e);
 			}
-			this.outputStream = null;
+			outputStream = null;
 			written = true;
 			rolled = false;
 
@@ -205,7 +205,7 @@ public final class TarWriter {
 	 * @return The file name used for doing the rollover.
 	 */
 	private File getRolloverFile() {
-		return new File(this.tarFile.getAbsolutePath() + ROLL_OVER_EXTENSION);
+		return new File(tarFile.getAbsolutePath() + ROLL_OVER_EXTENSION);
 	}
 
 	/**
@@ -218,21 +218,21 @@ public final class TarWriter {
 	 * @return the tar file object
 	 */
 	public File rolloverContents() {
-		if (tarFile.exists() && this.written && !this.rolled) {
-			if (this.outputStream != null) {
+		if (tarFile.exists() && written && !rolled) {
+			if (outputStream != null) {
 				try {
-					this.outputStream.close();
+					outputStream.close();
 				} catch (IOException e) {
 					throw new MprcException(e);
 				}
-				this.outputStream = null;
+				outputStream = null;
 			}
 			rolled = true;
 			// create the new tar file then append the records to it
 			final File newTar = getRolloverFile();
 			// now append to this file
 			final FileOutputStream fo = FileUtilities.getOutputStream(newTar);
-			this.outputStream = new TarOutputStream(fo);
+			outputStream = new TarOutputStream(fo);
 			return newTar;
 		}
 
@@ -256,6 +256,6 @@ public final class TarWriter {
 	 * @return tar file name
 	 */
 	public File getTarFile() {
-		return this.tarFile;
+		return tarFile;
 	}
 }

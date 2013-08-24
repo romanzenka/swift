@@ -35,7 +35,7 @@ public final class AppConfigReader implements Closeable {
 	private void init(final Reader reader, final ReaderFactory readerFactory) {
 		this.reader = new BufferedReader(reader);
 		this.readerFactory = readerFactory;
-		this.dependencyResolver = new DependencyResolver(readerFactory);
+		dependencyResolver = new DependencyResolver(readerFactory);
 	}
 
 	public ApplicationConfig load() {

@@ -13,7 +13,7 @@ public final class MsconvertResult extends FileHolder implements ProgressInfo {
 	private File mgf;
 
 	public MsconvertResult(final File mgfFile) {
-		this.mgf = mgfFile;
+		mgf = mgfFile;
 	}
 
 	public File getMgf() {

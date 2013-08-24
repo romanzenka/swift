@@ -19,7 +19,7 @@ public final class ValidationList extends ArrayList<Validation> {
 	}
 
 	public Validation getLast() {
-		return this.get(this.size() - 1);
+		return get(size() - 1);
 	}
 
 	public Object getValue() {

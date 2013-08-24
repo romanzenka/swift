@@ -195,7 +195,7 @@ public abstract class DeploymentService<T extends DeploymentResult> implements W
 	 * @return the File object represening the folder where we should deploy files from.
 	 */
 	protected File getConfigDeploymentFolder() {
-		final File engineDeploymentFolder = this.deployableDbFolder;
+		final File engineDeploymentFolder = deployableDbFolder;
 
 		//if the folders are the same meaning they were explicity pointed to the same location
 		if (engineDeploymentFolder.exists()) {

@@ -70,7 +70,7 @@ public final class SpectrumExtractionEditor extends Composite implements Validat
 		panel.add(engineName);
 		panel.add(settings);
 		panel.add(help);
-		this.initWidget(panel);
+		initWidget(panel);
 	}
 
 	@Override

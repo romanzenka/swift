@@ -33,12 +33,12 @@ public final class ReferenceListBox extends SimplePanel implements SourcesChange
 		addListBox(types);
 		addCreateNewButton();
 		attachToModel(model);
-		this.add(panel);
+		add(panel);
 	}
 
 	private void addCreateNewButton() {
-		this.createNew = new Button("Add new...");
-		this.createNew.addClickListener(new ClickListener() {
+		createNew = new Button("Add new...");
+		createNew.addClickListener(new ClickListener() {
 			@Override
 			public void onClick(final Widget widget) {
 				// User wants a new item of this type
@@ -66,7 +66,7 @@ public final class ReferenceListBox extends SimplePanel implements SourcesChange
 	}
 
 	private void addListBox(final List<String> types) {
-		this.listBox = new ListBox();
+		listBox = new ListBox();
 		panel.add(listBox);
 
 		for (final String type : types) {

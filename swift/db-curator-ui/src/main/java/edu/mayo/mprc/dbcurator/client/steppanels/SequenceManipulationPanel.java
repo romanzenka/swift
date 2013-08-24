@@ -28,8 +28,8 @@ public final class SequenceManipulationPanel extends AbstractStepPanel {
 
 		final String radioGroup = String.valueOf(new Date().getTime());
 
-		this.radioReversal = new RadioButton(radioGroup, "Sequence Reversal");
-		this.radioScramble = new RadioButton(radioGroup, "Sequence Scramble");
+		radioReversal = new RadioButton(radioGroup, "Sequence Reversal");
+		radioScramble = new RadioButton(radioGroup, "Sequence Scramble");
 		final HorizontalPanel modePanel = new HorizontalPanel();
 		//radioReversal.setChecked(true);
 
@@ -44,7 +44,7 @@ public final class SequenceManipulationPanel extends AbstractStepPanel {
 
 		panel.setSpacing(5);
 
-		this.setTitle(TITLE);
+		setTitle(TITLE);
 
 		initWidget(panel);
 
@@ -60,9 +60,9 @@ public final class SequenceManipulationPanel extends AbstractStepPanel {
 	 */
 	@Override
 	public CurationStepStub getContainedStep() {
-		this.containedStep.manipulationType = (this.radioReversal.isChecked() ? SequenceManipulationStepStub.REVERSAL : SequenceManipulationStepStub.SCRAMBLE);
-		this.containedStep.overwrite = !chkRetainOriginal.isChecked();
-		return this.containedStep;
+		containedStep.manipulationType = (radioReversal.isChecked() ? SequenceManipulationStepStub.REVERSAL : SequenceManipulationStepStub.SCRAMBLE);
+		containedStep.overwrite = !chkRetainOriginal.isChecked();
+		return containedStep;
 	}
 
 	/**
@@ -77,7 +77,7 @@ public final class SequenceManipulationPanel extends AbstractStepPanel {
 			ExceptionUtilities.throwCastException(step, SequenceManipulationStepStub.class);
 			return;
 		}
-		this.containedStep = (SequenceManipulationStepStub) step;
+		containedStep = (SequenceManipulationStepStub) step;
 		update();
 	}
 

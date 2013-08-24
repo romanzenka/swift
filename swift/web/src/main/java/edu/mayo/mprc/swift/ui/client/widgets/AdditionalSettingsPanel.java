@@ -25,19 +25,19 @@ public class AdditionalSettingsPanel extends HorizontalPanel {
 	public AdditionalSettingsPanel(final boolean publicMgfs, final boolean publicSearchFiles) {
 		this.publicMgfs = new CheckBox("Provide .mgf files");
 		this.publicMgfs.setChecked(publicMgfs);
-		this.add(this.publicMgfs);
+		add(this.publicMgfs);
 
 		this.publicSearchFiles = new CheckBox("Provide intermediate search results");
 		this.publicSearchFiles.setChecked(publicSearchFiles);
-		this.add(this.publicSearchFiles);
+		add(this.publicSearchFiles);
 
-		this.fromScratch = new CheckBox("From scratch (no cache)");
-		this.fromScratch.setChecked(false);
-		this.add(this.fromScratch);
+		fromScratch = new CheckBox("From scratch (no cache)");
+		fromScratch.setChecked(false);
+		add(fromScratch);
 
-		this.lowPriority = new CheckBox("Low priority");
-		this.lowPriority.setChecked(false);
-		this.add(this.lowPriority);
+		lowPriority = new CheckBox("Low priority");
+		lowPriority.setChecked(false);
+		add(lowPriority);
 	}
 
 	/**

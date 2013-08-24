@@ -14,30 +14,30 @@ public final class FileSizeWidget extends FlowPanel {
 	 * @param fileSize Size of the file. When negative, it means the file does not exist.
 	 */
 	public FileSizeWidget(final long fileSize) {
-		this.addStyleName("file-size");
+		addStyleName("file-size");
 		if (fileSize >= 0) {
 			this.fileSize = fileSize;
-			this.text = new Label(sizeToText(this.fileSize));
-			this.text.addStyleName("file-size-text");
-			this.bar = new Label();
-			this.bar.addStyleName("file-size-bar");
-			this.bar.setWidth("0");
-			this.add(this.bar);
+			text = new Label(sizeToText(this.fileSize));
+			text.addStyleName("file-size-text");
+			bar = new Label();
+			bar.addStyleName("file-size-bar");
+			bar.setWidth("0");
+			add(bar);
 		} else {
 			this.fileSize = 0;
-			this.text = new Label("missing");
-			this.text.addStyleName("file-size-text-missing");
+			text = new Label("missing");
+			text.addStyleName("file-size-text-missing");
 		}
-		this.add(this.text);
+		add(text);
 	}
 
 	public void setMaxSize(final long maxSize) {
-		if (this.bar != null) {
+		if (bar != null) {
 			if (maxSize <= 0) {
 				return;
 			}
-			final double percent = 100.0 * (double) this.fileSize / (double) maxSize;
-			this.bar.setWidth(String.valueOf((int) (percent + 0.5)) + '%');
+			final double percent = 100.0 * (double) fileSize / (double) maxSize;
+			bar.setWidth(String.valueOf((int) (percent + 0.5)) + '%');
 		}
 	}
 

@@ -81,7 +81,7 @@ public final class ScafmlScaffold extends FileHolder {
 				.append("\n")
 				.append("<" + "Scaffold" + XMLUtilities.wrapatt("version", "" + versionMajor + "." + versionMinor) + ">\n");
 
-		final ScafmlExperiment e = this.getExperiment();
+		final ScafmlExperiment e = getExperiment();
 		e.appendToDocument(result, "\t", this);
 
 		result.append("</" + "Scaffold" + ">\n");

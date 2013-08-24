@@ -32,9 +32,9 @@ public final class ConfigWrapper extends SimplePanel {
 		daemonsPanel.setVerticalAlignment(HasVerticalAlignment.ALIGN_MIDDLE);
 		daemonsPanel.add(new Label("Daemons"));
 
-		this.newDaemonButton = new PushButton("Add new");
-		this.newDaemonButton.addStyleName("tree-item-pusbutton");
-		this.newDaemonButton.addClickListener(new ClickListener() {
+		newDaemonButton = new PushButton("Add new");
+		newDaemonButton.addStyleName("tree-item-pusbutton");
+		newDaemonButton.addClickListener(new ClickListener() {
 			@Override
 			public void onClick(final Widget widget) {
 				ConfigurationService.App.getInstance().createChild(model.getId(), "daemon", new AsyncCallback<ResourceModel>() {
@@ -59,8 +59,8 @@ public final class ConfigWrapper extends SimplePanel {
 		daemonsItem = configTree.addItem(daemonsPanel);
 
 		final HorizontalPanel treeAndItems = new HorizontalPanel();
-		this.model = context.getApplicationModel();
-		this.model.addListener(new MyApplicationModelListener());
+		model = context.getApplicationModel();
+		model.addListener(new MyApplicationModelListener());
 		initFromData();
 
 		configTree.addTreeListener(new TreeListener() {
@@ -100,7 +100,7 @@ public final class ConfigWrapper extends SimplePanel {
 		treeAndItems.add(runnerPanel);
 
 		mainPanel.add(treeAndItems);
-		this.setWidget(mainPanel);
+		setWidget(mainPanel);
 
 		// Open the daemons item
 		daemonsItem.setState(true);

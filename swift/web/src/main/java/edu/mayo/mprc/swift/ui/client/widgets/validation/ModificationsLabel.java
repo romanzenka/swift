@@ -36,14 +36,14 @@ public final class ModificationsLabel extends Composite implements Validatable {
 
 
 	public ModificationsLabel(final String param, final String buttonName) {
-		this.setParam(param);
-		this.setType(getType(param));
-		this.setButtonName(buttonName);
+		setParam(param);
+		setType(getType(param));
+		setButtonName(buttonName);
 	}
 
 	public void setEditor(final ModificationSelectionEditor editor) {
 		this.editor = editor;
-		this.createModificationsLabel();
+		createModificationsLabel();
 	}
 	// TODO
 	//  this widget needs to register a listener with the Modificatons Editor so that  when it closes with OK status
@@ -60,25 +60,25 @@ public final class ModificationsLabel extends Composite implements Validatable {
 
 	private void createContainer() {
 		setContainer(new FlowPanel());
-		this.setModsText(new Label());
-		this.getModsText().setStyleName("mods-label-text");
+		setModsText(new Label());
+		getModsText().setStyleName("mods-label-text");
 		// need a click listener to call the modifications editor popup
-		this.setPopupLauncher(new ModificationsLabelRunClick(this));
+		setPopupLauncher(new ModificationsLabelRunClick(this));
 
 		setEditCmd(new PushButton("Edit", getPopupLauncher()));
 		getEditCmd().setStylePrimaryName("editModsButton");
 		// We will enable the editor as soon as our modification list loads
 		getEditCmd().setEnabled(false);
 		getPopupLauncher().setUpdateSelectedOnEditor(true);
-		getContainer().add(this.getModsText());
-		getContainer().add(this.getEditCmd());
-		this.resetText();
+		getContainer().add(getModsText());
+		getContainer().add(getEditCmd());
+		resetText();
 	}
 
 	private void createModificationsLabel() {
-		this.createContainer();
+		createContainer();
 
-		this.initWidget(this.getContainer());
+		initWidget(getContainer());
 	}
 
 	public void clear() {
@@ -107,7 +107,7 @@ public final class ModificationsLabel extends Composite implements Validatable {
 				}
 			}
 		}
-		this.getModsText().setText(text.toString());
+		getModsText().setText(text.toString());
 	}
 
 	private static String getType(final String param) /* throws GWTServiceException */ {
@@ -125,7 +125,7 @@ public final class ModificationsLabel extends Composite implements Validatable {
 
 	@Override
 	public void focus() {
-		this.getEditor().focus();
+		getEditor().focus();
 	}
 
 	@Override
@@ -147,8 +147,8 @@ public final class ModificationsLabel extends Composite implements Validatable {
 				selectedValues.add((ClientModSpecificity) sel);
 			}
 
-			this.addModifications(getValues(value));
-			this.resetText();
+			addModifications(getValues(value));
+			resetText();
 			if (isEnabled()) {
 				listeners.fireChange(this);
 			}
@@ -157,7 +157,7 @@ public final class ModificationsLabel extends Composite implements Validatable {
 
 	@Override
 	public void setValidationSeverity(final int validationSeverity) {
-		ValidationController.setValidationSeverity(validationSeverity, this.getEditCmd());
+		ValidationController.setValidationSeverity(validationSeverity, getEditCmd());
 	}
 
 	/**

@@ -18,7 +18,7 @@ public final class LogInfo {
 	}
 
 	public void setType(final String Type) {
-		this.type = Type;
+		type = Type;
 	}
 
 	public String getTaggedDatabaseToken() {

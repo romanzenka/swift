@@ -98,7 +98,7 @@ public final class SequestMappings implements Mappings, Cloneable {
 
 	@Override
 	public Reader baseSettings() {
-		return ResourceUtilities.getReader("classpath:edu/mayo/mprc/swift/params/base.sequest.params", this.getClass());
+		return ResourceUtilities.getReader("classpath:edu/mayo/mprc/swift/params/base.sequest.params", getClass());
 	}
 
 	/**
@@ -509,8 +509,8 @@ public final class SequestMappings implements Mappings, Cloneable {
 	@Override
 	public Object clone() throws CloneNotSupportedException {
 		final SequestMappings mappings = (SequestMappings) super.clone();
-		mappings.nativeParams = new LinkedHashMap<String, String>(this.nativeParams.size());
-		mappings.nativeParams.putAll(this.nativeParams);
+		mappings.nativeParams = new LinkedHashMap<String, String>(nativeParams.size());
+		mappings.nativeParams.putAll(nativeParams);
 		return mappings;
 	}
 }

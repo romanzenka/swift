@@ -14,7 +14,7 @@ public final class DatabaseUndeployerResult implements ProgressInfo {
 	private Map<String, UndeploymentTaskResult> undeploymentTaskResults;
 
 	public DatabaseUndeployerResult() {
-		this.undeploymentTaskResults = new HashMap<String, UndeploymentTaskResult>();
+		undeploymentTaskResults = new HashMap<String, UndeploymentTaskResult>();
 	}
 
 	public Map<String, UndeploymentTaskResult> getDatabaseUndeployerResults() {

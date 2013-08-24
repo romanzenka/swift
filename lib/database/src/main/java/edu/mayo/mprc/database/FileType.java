@@ -83,7 +83,7 @@ public final class FileType implements UserType {
 
 	private void checkTranslatorNotNull() {
 		if (translator == null) {
-			throw new MprcException(this.getClass().getName() + " was not initialized with a translator for file tokens.\nUse for instance " + DummyFileTokenTranslator.class.getName() + " before you start storing file paths to database.");
+			throw new MprcException(getClass().getName() + " was not initialized with a translator for file tokens.\nUse for instance " + DummyFileTokenTranslator.class.getName() + " before you start storing file paths to database.");
 		}
 	}
 

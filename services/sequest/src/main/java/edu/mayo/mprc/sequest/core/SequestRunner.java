@@ -78,7 +78,7 @@ class SequestRunner implements Runnable, SequestCallerInterface {
 
 		LOGGER.debug("sequest caller processing " + sequestDtaFiles.size() + " dta files");
 
-		this.setArgs(newArgs);
+		setArgs(newArgs);
 	}
 
 	@Override
@@ -129,23 +129,23 @@ class SequestRunner implements Runnable, SequestCallerInterface {
 
 	@Override
 	public String getSequestExe() {
-		return this.sequestExe;
+		return sequestExe;
 	}
 
 
 	@Override
 	public SequestCallerInterface createInstance(final File workingdir, final File paramsFile, final List<File> sequestDtaFiles, final File hostsFile) {
 		final SequestRunner runner = new SequestRunner(workingdir, paramsFile, sequestDtaFiles, this.hostsFile);
-		runner.setWatchDogTimeOut(this.getWatchDogTimeOut());
-		runner.setStartTimeOut(this.getStartTimeOut());
-		if (this.getCommand() != null) {
+		runner.setWatchDogTimeOut(getWatchDogTimeOut());
+		runner.setStartTimeOut(getStartTimeOut());
+		if (getCommand() != null) {
 			runner.setCommand(getCommand());
 		}
-		if (this.sequestExe != null) {
-			runner.sequestExe = this.sequestExe;
+		if (sequestExe != null) {
+			runner.sequestExe = sequestExe;
 		}
-		if (this.searchResultsFolder != null) {
-			runner.searchResultsFolder = this.searchResultsFolder;
+		if (searchResultsFolder != null) {
+			runner.searchResultsFolder = searchResultsFolder;
 		}
 		return runner;
 	}
@@ -153,17 +153,17 @@ class SequestRunner implements Runnable, SequestCallerInterface {
 	@Override
 	public void setSequestExe(final String sequestExe) {
 		this.sequestExe = sequestExe;
-		this.setCommand(sequestExe);
+		setCommand(sequestExe);
 	}
 
 	@Override
 	public String getSearchResultsFolder() {
-		return this.searchResultsFolder;
+		return searchResultsFolder;
 	}
 
 	@Override
 	public void setSearchResultsFolder(final String folder) {
-		this.searchResultsFolder = folder;
+		searchResultsFolder = folder;
 	}
 
 	// TODO : need to replace with getCommand and getParameters
@@ -178,7 +178,7 @@ class SequestRunner implements Runnable, SequestCallerInterface {
 		}
 		// use the args and cmd
 		final StringBuilder cmdString = new StringBuilder();
-		cmdString.append(this.getCommand());
+		cmdString.append(getCommand());
 		cmdString.append(" ");
 		for (final String arg : getArgs()) {
 			cmdString.append(arg);
@@ -193,7 +193,7 @@ class SequestRunner implements Runnable, SequestCallerInterface {
 	}
 
 	public File getParamsFile() {
-		return this.paramsFile;
+		return paramsFile;
 	}
 
 	/**
@@ -239,10 +239,10 @@ class SequestRunner implements Runnable, SequestCallerInterface {
 		}
 
 		if (getCommand() == null) {
-			if (this.sequestExe == null) {
+			if (sequestExe == null) {
 				setCommand(SEQUEST_EXE);
 			} else {
-				setCommand(this.sequestExe);
+				setCommand(sequestExe);
 			}
 		}
 

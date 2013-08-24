@@ -417,10 +417,10 @@ public final class JsonWriter {
 
 	private void dumpMethod(final String method, final String parameter) {
 		if (isMethodChanging(method)) {
-			if (this.currentMethod != null) {
-				out.print(MessageFormat.format("root.{0}([{1}]);", this.currentMethod, currentMethodArray.toString()));
+			if (currentMethod != null) {
+				out.print(MessageFormat.format("root.{0}([{1}]);", currentMethod, currentMethodArray.toString()));
 			}
-			this.currentMethod = method;
+			currentMethod = method;
 			currentMethodArray.setLength(0);
 		}
 		if (parameter != null) {
@@ -432,9 +432,9 @@ public final class JsonWriter {
 	}
 
 	private boolean isMethodChanging(final String method) {
-		if (this.currentMethod == null && method != null) {
+		if (currentMethod == null && method != null) {
 			return true;
 		}
-		return this.currentMethod != null && !this.currentMethod.equals(method);
+		return currentMethod != null && !currentMethod.equals(method);
 	}
 }

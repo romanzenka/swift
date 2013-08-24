@@ -20,15 +20,15 @@ public final class HelpPopupButton extends Label implements ClickListener {
 
 	private void initialize(final String helpHtmlString) {
 		if (helpHtmlString == null) {
-			this.setVisible(false);
+			setVisible(false);
 			return;
 		}
-		this.setText("?");
-		this.addStyleName("help-popup-button");
-		this.helpHtml = new HTMLPanel(helpHtmlString);
-		this.helpHtml.setStyleName("help-html-popup");
-		this.helpHtml.setWidth(WIDTH + "px");
-		this.addClickListener(this);
+		setText("?");
+		addStyleName("help-popup-button");
+		helpHtml = new HTMLPanel(helpHtmlString);
+		helpHtml.setStyleName("help-html-popup");
+		helpHtml.setWidth(WIDTH + "px");
+		addClickListener(this);
 	}
 
 	@Override
@@ -36,11 +36,11 @@ public final class HelpPopupButton extends Label implements ClickListener {
 		final DialogBox dialogBox = new DialogBox(true, true);
 		dialogBox.setWidget(helpHtml);
 		// Make sure we do not run out of the screen on the right side
-		int left = this.getAbsoluteLeft();
+		int left = getAbsoluteLeft();
 		if (left + WIDTH > Window.getClientWidth()) {
 			left = Math.max(Window.getClientWidth() - WIDTH, 0);
 		}
-		dialogBox.setPopupPosition(left, this.getAbsoluteTop() + 15);
+		dialogBox.setPopupPosition(left, getAbsoluteTop() + 15);
 		dialogBox.show();
 	}
 }

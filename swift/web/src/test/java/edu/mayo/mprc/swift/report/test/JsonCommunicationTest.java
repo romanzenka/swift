@@ -44,7 +44,7 @@ public final class JsonCommunicationTest {
 
 	@BeforeMethod
 	public void init() {
-		this.outputStream = new ByteArrayOutputStream();
+		outputStream = new ByteArrayOutputStream();
 		final PrintWriter out = new PrintWriter(outputStream);
 		this.out = new JsonWriter(out);
 
@@ -53,7 +53,7 @@ public final class JsonCommunicationTest {
 	}
 
 	private void setUpTaskData() {
-		this.status = new TaskData();
+		status = new TaskData();
 		status.setId(123);
 		status.setTaskState(new TaskStateData(TaskState.COMPLETED_SUCCESFULLY.getText()));
 		status.setDescriptionLong("'Mascot Search'");
@@ -156,8 +156,8 @@ public final class JsonCommunicationTest {
 
 	@Test(enabled = true, groups = {"fast", "unit"}, dependsOnMethods = {"testInsertClearInsert"}, sequential = true)
 	public void testDoubleInsert() {
-		out.processSearchRun(0, this.searchRun, 3, getReportInfos(), "insert");
-		out.processSearchRun(0, this.searchRun, 3, getReportInfos(), "insert");
+		out.processSearchRun(0, searchRun, 3, getReportInfos(), "insert");
+		out.processSearchRun(0, searchRun, 3, getReportInfos(), "insert");
 		out.close();
 		Assert.assertEquals(outputStream.toString(),
 				JsonWriter.TARGET + ".insert([" + SEARCH_RUN_JSON + ", " + SEARCH_RUN_JSON + "]);" + JsonWriter.TARGET + ".fireOnChange();", "Double insert");
@@ -166,7 +166,7 @@ public final class JsonCommunicationTest {
 	@Test(enabled = true, groups = {"fast", "unit"}, dependsOnMethods = {"testDoubleInsert"}, sequential = true)
 	public void testTaskData() {
 		final StringBuilder builder = new StringBuilder();
-		JsonWriter.appendTaskDataJson(builder, 0, this.status);
+		JsonWriter.appendTaskDataJson(builder, 0, status);
 		Assert.assertEquals(builder.toString(), STATUS_JSON, "Task status");
 	}
 

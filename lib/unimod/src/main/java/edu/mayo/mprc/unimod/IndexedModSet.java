@@ -53,7 +53,7 @@ public class IndexedModSet implements Set<Mod> {
 			}
 		}
 
-		List<Mod> massList = this.deltaMonoMassIndex.get(m.getMassMono());
+		List<Mod> massList = deltaMonoMassIndex.get(m.getMassMono());
 		if (massList == null) {
 			massList = new LinkedList<Mod>();
 		}
@@ -521,9 +521,9 @@ public class IndexedModSet implements Set<Mod> {
 
 	@Override
 	public boolean add(final Mod toAdd) {
-		final boolean added = this.modifications.add(toAdd);
+		final boolean added = modifications.add(toAdd);
 		if (added) {
-			this.index(toAdd);
+			index(toAdd);
 		}
 		return added;
 	}
@@ -543,7 +543,7 @@ public class IndexedModSet implements Set<Mod> {
 		final boolean added = modifications.addAll(c);
 		if (added) {
 			for (final Mod mod : c) {
-				this.index(mod);
+				index(mod);
 			}
 		}
 		return added;
@@ -571,10 +571,10 @@ public class IndexedModSet implements Set<Mod> {
 		final IndexedModSet tt = (IndexedModSet) t;
 		ComparisonChain chain = ComparisonChain.start().nullsFirst();
 		chain = chain
-				.compare(this.name, tt.name)
-				.compare(this.modifications.size(), tt.modifications.size());
+				.compare(name, tt.name)
+				.compare(modifications.size(), tt.modifications.size());
 		if (chain.result() == 0) {
-			for (Iterator<Mod> i = this.modifications.iterator(), j = tt.modifications.iterator(); i.hasNext(); ) {
+			for (Iterator<Mod> i = modifications.iterator(), j = tt.modifications.iterator(); i.hasNext(); ) {
 				final Mod left = i.next();
 				final Mod right = j.next();
 				chain = chain.compare(left, right);
@@ -630,8 +630,8 @@ public class IndexedModSet implements Set<Mod> {
 			return false;
 		}
 		final IndexedModSet tt = (IndexedModSet) obj;
-		return Objects.equal(this.name, tt.name) &&
-				Objects.equal(this.modifications, tt.modifications);
+		return Objects.equal(name, tt.name) &&
+				Objects.equal(modifications, tt.modifications);
 	}
 
 	public int hashCode() {

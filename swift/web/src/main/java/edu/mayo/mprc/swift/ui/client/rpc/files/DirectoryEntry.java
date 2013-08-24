@@ -24,7 +24,7 @@ public final class DirectoryEntry extends Entry {
 		final TreeItem newItem = new TreeItem(checkBox);
 		checkBox.setTreeItem(newItem);
 		newItem.setUserObject(this);
-		if (this.getChildrenList().isEmpty()) {
+		if (getChildrenList().isEmpty()) {
 			newItem.addItem("empty");
 		}
 		return newItem;

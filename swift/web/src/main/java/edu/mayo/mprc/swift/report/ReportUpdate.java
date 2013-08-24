@@ -464,7 +464,7 @@ public final class ReportUpdate implements HttpRequestHandler {
 		@Override
 		public void requestTerminated(final Exception e) {
 			synchronized (lock) {
-				this.lastException = e;
+				lastException = e;
 				lock.notifyAll();
 			}
 		}
@@ -473,7 +473,7 @@ public final class ReportUpdate implements HttpRequestHandler {
 		public void userProgressInformation(final ProgressInfo progressInfo) {
 			if (progressInfo instanceof AssignedSearchRunId) {
 				synchronized (lock) {
-					this.assignedId = ((AssignedSearchRunId) progressInfo).getSearchRunId();
+					assignedId = ((AssignedSearchRunId) progressInfo).getSearchRunId();
 					lock.notifyAll();
 				}
 			}

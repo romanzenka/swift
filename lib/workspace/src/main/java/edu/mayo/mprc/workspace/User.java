@@ -40,9 +40,9 @@ public class User extends EvolvableBase implements Serializable {
 		this.firstName = firstName;
 		this.lastName = lastName;
 		this.userName = userName;
-		this.initials = firstName.charAt(0) + "" + lastName.charAt(0);
+		initials = firstName.charAt(0) + "" + lastName.charAt(0);
 		this.userPassword = userPassword;
-		this.rights = 0L;
+		rights = 0L;
 	}
 
 	public User(final String firstName, final String lastName, final String userName, final String initials, final String userPassword) {
@@ -51,18 +51,18 @@ public class User extends EvolvableBase implements Serializable {
 		this.userName = userName;
 		this.initials = initials;
 		this.userPassword = userPassword;
-		this.rights = 0L;
+		rights = 0L;
 	}
 
 	/**
 	 * Copy constructor.
 	 */
 	public User(final User copyFrom) {
-		this.firstName = copyFrom.firstName;
-		this.lastName = copyFrom.lastName;
-		this.userName = copyFrom.userName;
-		this.userPassword = copyFrom.userPassword;
-		this.rights = copyFrom.rights;
+		firstName = copyFrom.firstName;
+		lastName = copyFrom.lastName;
+		userName = copyFrom.userName;
+		userPassword = copyFrom.userPassword;
+		rights = copyFrom.rights;
 	}
 
 	public void setFirstName(final String firstName) {
@@ -123,14 +123,14 @@ public class User extends EvolvableBase implements Serializable {
 	 */
 	void addPreference(final String key, final String value) {
 		if (value == null) {
-			this.preferences.remove(key);
+			preferences.remove(key);
 		} else {
-			this.preferences.put(key, value);
+			preferences.put(key, value);
 		}
 	}
 
 	String preferenceValue(final String key) {
-		return this.preferences.get(key);
+		return preferences.get(key);
 	}
 
 	/**
@@ -214,10 +214,10 @@ public class User extends EvolvableBase implements Serializable {
 
 	public String toString() {
 		return MessageFormat.format("{0}: {1} {2} - {3}",
-				this.getId(),
-				this.getFirstName(),
-				this.getLastName(),
-				this.getUserName());
+				getId(),
+				getFirstName(),
+				getLastName(),
+				getUserName());
 	}
 }
 

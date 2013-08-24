@@ -26,7 +26,7 @@ public abstract class AbstractStepPanel extends Composite {
 	 */
 	@Override
 	public String getTitle() {
-		return this.title;
+		return title;
 	}
 
 	/**
@@ -76,7 +76,7 @@ public abstract class AbstractStepPanel extends Composite {
 	 * @return true if the step is editable else false
 	 */
 	public boolean isEditable() {
-		return this.getContainedStep().isEditable();
+		return getContainedStep().isEditable();
 	}
 
 	/**

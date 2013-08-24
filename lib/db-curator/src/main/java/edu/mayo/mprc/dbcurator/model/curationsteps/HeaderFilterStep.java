@@ -50,14 +50,6 @@ public class HeaderFilterStep implements CurationStep {
 	private TextMode textMode = TextMode.SIMPLE;
 
 	/**
-	 * the StepValidation that was created the last time that performStep() was run.
-	 * <p/>
-	 * transient
-	 */
-	private transient StepValidation runValidation;
-
-
-	/**
 	 * The string that the user entered and should be searched
 	 * <p/>
 	 * PERSISTENT
@@ -85,12 +77,12 @@ public class HeaderFilterStep implements CurationStep {
 	public StepValidation performStep(final CurationExecutor exec) {
 
 		//create a new validation object for this run
-		this.runValidation = new StepValidation();
+		final StepValidation runValidation = new StepValidation();
 
 		final DBInputStream in = exec.getCurrentInStream(); //the file we should be reading from (may be null)
 		final DBOutputStream out = exec.getCurrentOutStream(); // the file we should be writing to
 		final CurationStatus status = exec.getStatusObject(); //the status objec we want to update
-		final TextFilter filter = this.getAppropriateTextFilter();
+		final TextFilter filter = getAppropriateTextFilter();
 		final float sequencesToFilter = status.getLastStepSequenceCount();
 		int numberFilteredSoFar = 0;
 
@@ -104,13 +96,13 @@ public class HeaderFilterStep implements CurationStep {
 				try {
 					out.appendSequence(in.getHeader(), in.getSequence());
 				} catch (IOException e) {
-					this.runValidation.addMessageAndException("Error filtering steps", e);
+					runValidation.addMessageAndException("Error filtering steps", e);
 				}
 			}
 		}
-		this.runValidation.setCompletionCount(out.getSequenceCount());
-		this.setLastRunCompletionCount(out.getSequenceCount());
-		return this.runValidation;
+		runValidation.setCompletionCount(out.getSequenceCount());
+		setLastRunCompletionCount(out.getSequenceCount());
+		return runValidation;
 	}
 
 	/**
@@ -126,7 +118,7 @@ public class HeaderFilterStep implements CurationStep {
 		final StepValidation preValidation = new StepValidation();
 
 		//create a test filter from the current set of properties
-		final TextFilter toTest = this.getAppropriateTextFilter();
+		final TextFilter toTest = getAppropriateTextFilter();
 
 		//ask the TextFilter to check itself for validity
 		final String testResults = toTest.testCriteria();
@@ -150,9 +142,9 @@ public class HeaderFilterStep implements CurationStep {
 	@Override
 	public CurationStep createCopy() {
 		final HeaderFilterStep copy = new HeaderFilterStep();
-		copy.matchMode = this.matchMode;
-		copy.textMode = this.textMode;
-		copy.criteriaString = this.criteriaString;
+		copy.matchMode = matchMode;
+		copy.textMode = textMode;
+		copy.criteriaString = criteriaString;
 		return copy;
 	}
 
@@ -165,14 +157,14 @@ public class HeaderFilterStep implements CurationStep {
 	 */
 	protected TextFilter getAppropriateTextFilter() {
 		final TextFilter toCreate;
-		if (this.textMode == TextMode.SIMPLE) {
-			toCreate = new SimpleStringTextFilter(this.criteriaString);
-		} else if (this.textMode == TextMode.REG_EX) {
-			toCreate = new RegExTextFilter(this.criteriaString);
+		if (textMode == TextMode.SIMPLE) {
+			toCreate = new SimpleStringTextFilter(criteriaString);
+		} else if (textMode == TextMode.REG_EX) {
+			toCreate = new RegExTextFilter(criteriaString);
 		} else {
 			return null;
 		}
-		toCreate.setMatchMode(this.matchMode);
+		toCreate.setMatchMode(matchMode);
 		return toCreate;
 	}
 
@@ -248,17 +240,17 @@ public class HeaderFilterStep implements CurationStep {
 
 	@Override
 	public Integer getLastRunCompletionCount() {
-		return this.lastRunCompletionCount;
+		return lastRunCompletionCount;
 	}
 
 	@Override
 	public void setLastRunCompletionCount(final Integer count) {
-		this.lastRunCompletionCount = count;
+		lastRunCompletionCount = count;
 	}
 
 
 	@Override
 	public String simpleDescription() {
-		return "filtered " + this.getMatchMode().toString().toLowerCase(Locale.ENGLISH) + "\"" + getCriteriaString() + "\"";
+		return "filtered " + getMatchMode().toString().toLowerCase(Locale.ENGLISH) + "\"" + getCriteriaString() + "\"";
 	}
 }

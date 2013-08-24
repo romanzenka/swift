@@ -61,7 +61,7 @@ public final class ManualInclusionPanel extends AbstractStepPanel {
 		txtSequence.setVisibleLines(5);
 		panel.add(txtSequence);
 		panel.setSpacing(5);
-		this.setTitle(TITLE);
+		setTitle(TITLE);
 		initWidget(panel);
 	}
 
@@ -73,9 +73,9 @@ public final class ManualInclusionPanel extends AbstractStepPanel {
 	 */
 	@Override
 	public CurationStepStub getContainedStep() {
-		this.containedStep.header = ">" + this.txtHeader.getText();
-		this.containedStep.sequence = cleanSequence(this.txtSequence.getText());
-		return this.containedStep;
+		containedStep.header = ">" + txtHeader.getText();
+		containedStep.sequence = cleanSequence(txtSequence.getText());
+		return containedStep;
 	}
 
 	/**
@@ -90,7 +90,7 @@ public final class ManualInclusionPanel extends AbstractStepPanel {
 			ExceptionUtilities.throwCastException(step, ManualInclusionStepStub.class);
 			return;
 		}
-		this.containedStep = (ManualInclusionStepStub) step;
+		containedStep = (ManualInclusionStepStub) step;
 		update();
 	}
 
@@ -137,7 +137,7 @@ public final class ManualInclusionPanel extends AbstractStepPanel {
 			if (endChar < 0) {
 				endChar = startChar;
 			}
-			this.txtHeader.setText(stripHeaderChar(toClean.substring(startChar, endChar)));
+			txtHeader.setText(stripHeaderChar(toClean.substring(startChar, endChar)));
 
 			toClean = toClean.substring(endChar + 1);
 		}

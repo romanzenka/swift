@@ -30,16 +30,16 @@ public final class NewDatabaseInclusionPanel extends AbstractStepPanel {
 		final VerticalPanel panel = new VerticalPanel();
 
 		lstCommonSites.addItem("Manual Entry");
-		this.getCommonSites(); //generate the list of common sites
+		getCommonSites(); //generate the list of common sites
 		lstCommonSites.addChangeListener(new ChangeListener() {
 			@Override
 			public void onChange(final Widget widget) {
 				final ListBox source = (ListBox) widget;
 				final String selection = source.getItemText(source.getSelectedIndex());
 				if (!selection.equalsIgnoreCase("Manual Entry")) {
-					NewDatabaseInclusionPanel.this.url.setText(NewDatabaseInclusionPanel.this.commonSites.get(selection));
+					url.setText(commonSites.get(selection));
 				} else {
-					NewDatabaseInclusionPanel.this.url.setText("ftp://");
+					url.setText("ftp://");
 				}
 			}
 		});
@@ -52,15 +52,15 @@ public final class NewDatabaseInclusionPanel extends AbstractStepPanel {
 		panel.add(url);
 
 		panel.setSpacing(5);
-		this.setTitle(TITLE);
+		setTitle(TITLE);
 
 		initWidget(panel);
 	}
 
 	@Override
 	public CurationStepStub getContainedStep() {
-		this.containedStep.url = this.url.getText();
-		return this.containedStep;
+		containedStep.url = url.getText();
+		return containedStep;
 	}
 
 	@Override
@@ -69,7 +69,7 @@ public final class NewDatabaseInclusionPanel extends AbstractStepPanel {
 			ExceptionUtilities.throwCastException(step, NewDatabaseInclusionStub.class);
 			return;
 		}
-		this.containedStep = (NewDatabaseInclusionStub) step;
+		containedStep = (NewDatabaseInclusionStub) step;
 		update();
 	}
 

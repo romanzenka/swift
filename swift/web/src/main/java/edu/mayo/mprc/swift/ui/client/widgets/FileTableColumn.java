@@ -20,10 +20,10 @@ class FileTableColumn {
 	}
 
 	public void init(final FileTable table) {
-		if (this.widget != null) {
+		if (widget != null) {
 			table.setWidget(table.getHeaderRowIndex(), column, widget);
 		} else {
-			table.setHTML(table.getHeaderRowIndex(), column, this.title);
+			table.setHTML(table.getHeaderRowIndex(), column, title);
 		}
 		if (columnStyle != null) {
 			table.getColumnFormatter().addStyleName(column, columnStyle);

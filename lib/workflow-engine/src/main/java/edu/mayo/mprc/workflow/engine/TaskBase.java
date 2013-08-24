@@ -55,15 +55,15 @@ public abstract class TaskBase implements Task {
 	protected AtomicBoolean waitingForFileToAppear = new AtomicBoolean(false);
 
 	public TaskBase(final WorkflowEngine engine) {
-		this.id = null;
+		id = null;
 		this.engine = engine;
 	}
 
 	@Override
 	public void initialize() {
 		synchronized (stateLock) {
-			if (this.id == null && this.name != null) {
-				this.id = engine.getNewTaskId(this.getName());
+			if (id == null && name != null) {
+				id = engine.getNewTaskId(getName());
 			}
 		}
 	}
@@ -94,8 +94,8 @@ public abstract class TaskBase implements Task {
 	public void setName(final String name) {
 		final WorkflowEngine engineCopy = engine;
 		synchronized (stateLock) {
-			if (this.id == null && engineCopy != null) {
-				this.id = engineCopy.getNewTaskId(name);
+			if (id == null && engineCopy != null) {
+				id = engineCopy.getNewTaskId(name);
 			}
 			this.name = name;
 		}
@@ -107,7 +107,7 @@ public abstract class TaskBase implements Task {
 	@Override
 	public String getName() {
 		synchronized (stateLock) {
-			return this.name;
+			return name;
 		}
 	}
 
@@ -198,7 +198,7 @@ public abstract class TaskBase implements Task {
 
 	@Override
 	public void setState(final TaskState newState) {
-		assert engine != null : "Cannot change task state if the task is not associtated with an engine" + this.getName() + " " + this.getDescription();
+		assert engine != null : "Cannot change task state if the task is not associtated with an engine" + getName() + " " + getDescription();
 		TaskState oldState = null;
 		synchronized (stateLock) {
 			oldState = state;
@@ -266,14 +266,14 @@ public abstract class TaskBase implements Task {
 	@Override
 	public void setError(final Throwable error) {
 		synchronized (stateLock) {
-			this.lastError = error;
+			lastError = error;
 			setState(TaskState.RUN_FAILED);
 		}
 	}
 
 	public void setWarning(final String warning) {
 		synchronized (stateLock) {
-			this.lastWarning = warning;
+			lastWarning = warning;
 			if (state == TaskState.RUNNING) {
 				setState(TaskState.RUNNING_WARN);
 			}
@@ -345,9 +345,9 @@ public abstract class TaskBase implements Task {
 		// If all inputs are done, we change our own state
 		if (numInputsDone.incrementAndGet() == inputs.size()) {
 			if (numInputsFailed.get() > 0) {
-				this.setState(TaskState.INIT_FAILED);
+				setState(TaskState.INIT_FAILED);
 			} else {
-				this.setState(TaskState.READY);
+				setState(TaskState.READY);
 			}
 		}
 	}
@@ -370,7 +370,7 @@ public abstract class TaskBase implements Task {
 
 	@Override
 	public String getFullId() {
-		final WorkflowEngine engineCopy = this.engine;
+		final WorkflowEngine engineCopy = engine;
 		synchronized (stateLock) {
 			return engineCopy.getId() + "." + id;
 		}

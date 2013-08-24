@@ -79,6 +79,6 @@ public class IonSeries extends EvolvableBase implements Comparable<IonSeries> {
 
 	@Override
 	public int compareTo(IonSeries o) {
-		return String.CASE_INSENSITIVE_ORDER.compare(this.getName(), o.getName());
+		return String.CASE_INSENSITIVE_ORDER.compare(getName(), o.getName());
 	}
 }

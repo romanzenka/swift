@@ -42,7 +42,7 @@ public final class IdpQonvertTask extends AsyncTaskBase {
 		super(engine, idpQonvertDaemon, fileTokenFactory, fromScratch);
 		this.swiftDao = swiftDao;
 		this.searchRun = searchRun;
-		this.swiftSearchDefinition = definition;
+		swiftSearchDefinition = definition;
 		this.outputFolder = outputFolder;
 		this.searchTask = searchTask;
 		setName("IdpQonvert");

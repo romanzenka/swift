@@ -47,8 +47,8 @@ public final class QaTask extends AsyncTaskBase {
 		currentExperiment = e;
 
 		if (experimentList.size() == 1) {
-			this.qaReportFolder = getQaSubdirectory(scaffoldXmlFile);
-			this.reportFile = new File(qaReportFolder, "index.html");
+			qaReportFolder = getQaSubdirectory(scaffoldXmlFile);
+			reportFile = new File(qaReportFolder, "index.html");
 			setDescription("QA analysis report " + fileTokenFactory.fileToTaggedDatabaseToken(reportFile));
 		}
 	}

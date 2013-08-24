@@ -49,7 +49,7 @@ public class HeaderTransform extends PersistableBase {
 		}
 		match.appendTail(result);
 
-		if (result.toString().equalsIgnoreCase(this.substitutionPattern)) {
+		if (result.toString().equalsIgnoreCase(substitutionPattern)) {
 			LOGGER.info("Pattern not matched in header: " + toTransform);
 			return toTransform;
 		} else {

@@ -43,11 +43,11 @@ public final class CompositeException extends MprcException {
 	}
 
 	public void addCause(final Throwable cause) {
-		this.causes.add(cause);
+		causes.add(cause);
 	}
 
 	public Collection<Throwable> getCauses() {
-		return this.causes;
+		return causes;
 	}
 
 	public String getMainMessage() {
@@ -68,7 +68,7 @@ public final class CompositeException extends MprcException {
 		final StringBuilder sb = new StringBuilder();
 		sb.append(getMainMessage()).append(":");
 		int num = 1;
-		for (final Throwable t : this.causes) {
+		for (final Throwable t : causes) {
 			sb.append("\n").append(num).append(") ").append(MprcException.getDetailedMessage(t));
 			num++;
 		}
@@ -77,7 +77,7 @@ public final class CompositeException extends MprcException {
 
 	@Override
 	public void printStackTrace() {
-		for (final Throwable t : this.causes) {
+		for (final Throwable t : causes) {
 			t.printStackTrace();
 		}
 	}
@@ -85,8 +85,8 @@ public final class CompositeException extends MprcException {
 	@Override
 	public void printStackTrace(final PrintWriter p) {
 		int i = 1;
-		final int total = this.causes.size();
-		for (final Throwable t : this.causes) {
+		final int total = causes.size();
+		for (final Throwable t : causes) {
 			LOGGER.error(getMainMessage() + " (" + i + "/" + total + ")", t);
 			i++;
 		}
@@ -94,7 +94,7 @@ public final class CompositeException extends MprcException {
 
 	@Override
 	public void printStackTrace(final PrintStream s) {
-		for (final Throwable t : this.causes) {
+		for (final Throwable t : causes) {
 			t.printStackTrace(s);
 		}
 	}

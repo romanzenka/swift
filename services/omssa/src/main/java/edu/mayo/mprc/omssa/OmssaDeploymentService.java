@@ -118,7 +118,7 @@ public final class OmssaDeploymentService extends DeploymentService<DeploymentRe
 					if (!name.startsWith(deployableFile.getName())) {
 						return false;
 					}
-					for (final String s : OmssaDeploymentService.this.indexExtensions) {
+					for (final String s : indexExtensions) {
 						if (name.endsWith(s)) {
 							return true;
 						}
@@ -199,7 +199,7 @@ public final class OmssaDeploymentService extends DeploymentService<DeploymentRe
 		final DeploymentResult reportResult = new DeploymentResult();
 		final File deployedFile = getDeployedFastaFile(request.getCurationFile());
 
-		this.cleanUpDeployedFiles(deployedFile, reportResult);
+		cleanUpDeployedFiles(deployedFile, reportResult);
 
 		return reportResult;
 	}

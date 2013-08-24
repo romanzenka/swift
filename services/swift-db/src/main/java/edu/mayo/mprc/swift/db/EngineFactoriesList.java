@@ -39,7 +39,7 @@ public final class EngineFactoriesList {
 	@Autowired
 	public void setEngineFactories(Collection<EngineFactory> engineFactories) {
 		this.engineFactories = engineFactories;
-		this.engineMetadata = Maps.newHashMap();
+		engineMetadata = Maps.newHashMap();
 		for (final EngineFactory factory : engineFactories) {
 			final EngineMetadata metadata = factory.getEngineMetadata();
 			engineMetadata.put(metadata.getCode(), metadata);

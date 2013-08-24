@@ -21,8 +21,8 @@ public final class ProgressDialogBox extends DialogBox {
 	}
 
 	public void setProgressMessage(final String text) {
-		this.addStyleName(PROGRESS_STYLE);
-		this.setText(text);
+		addStyleName(PROGRESS_STYLE);
+		setText(text);
 		final Button cancel = new Button("Cancel");
 		cancel.addClickListener(new ClickListener() {
 			@Override
@@ -52,7 +52,7 @@ public final class ProgressDialogBox extends DialogBox {
 //		try {
 //			lightBox.show();
 //		} catch (Exception ignore) {
-		this.show();
+		show();
 //		}
 	}
 
@@ -63,7 +63,7 @@ public final class ProgressDialogBox extends DialogBox {
 		final int popupHeight = (int) Math.max(clientHeight * heightFraction, minHeight);
 		final int posX = (clientWidth - popupWidth) / 2;
 		final int posY = (clientHeight - popupHeight) / 2;
-		this.setSize(popupWidth + "px", popupHeight + "px");
-		this.setPopupPosition(posX, posY);
+		setSize(popupWidth + "px", popupHeight + "px");
+		setPopupPosition(posX, posY);
 	}
 }

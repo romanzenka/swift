@@ -42,16 +42,16 @@ public final class GwtUiBuilder implements UiBuilderClient {
 
 	public GwtUiBuilder(final Context context, final ResourceModel model) {
 		this.model = model;
-		this.applicationModel = context.getApplicationModel();
-		this.configUIs = context.getApplicationModel().getAvailableModules();
+		applicationModel = context.getApplicationModel();
+		configUIs = context.getApplicationModel().getAvailableModules();
 		this.context = context;
 
-		this.name = null;
-		this.displayName = null;
-		this.editor = null;
-		this.description = null;
-		this.validator = null;
-		this.propertyList = null;
+		name = null;
+		displayName = null;
+		editor = null;
+		description = null;
+		validator = null;
+		propertyList = null;
 		row = 0;
 	}
 
@@ -109,8 +109,8 @@ public final class GwtUiBuilder implements UiBuilderClient {
 	}
 
 	private void makeTextBoxEditor() {
-		this.editor = new TextBox();
-		this.editor.addStyleName("property-text-box");
+		editor = new TextBox();
+		editor.addStyleName("property-text-box");
 	}
 
 	/**
@@ -242,16 +242,16 @@ public final class GwtUiBuilder implements UiBuilderClient {
 	 * preceeding property is represented by a CheckBox, the listner must be of the type ClickListener.
 	 */
 	public GwtUiBuilder addEventListener(final EventListener listener) {
-		if (this.editor instanceof TextBox) {
+		if (editor instanceof TextBox) {
 			if (!(listener instanceof ChangeListener)) {
 				throw new RuntimeException("The event listener for TextBox must be a change listener");
 			}
-			((TextBox) this.editor).addChangeListener((ChangeListener) listener);
-		} else if (this.editor instanceof CheckBox) {
+			((TextBox) editor).addChangeListener((ChangeListener) listener);
+		} else if (editor instanceof CheckBox) {
 			if (!(listener instanceof ClickListener)) {
 				throw new RuntimeException("The event listener for CheckBox must be a click listener");
 			}
-			((CheckBox) this.editor).addClickListener((ClickListener) listener);
+			((CheckBox) editor).addClickListener((ClickListener) listener);
 		}
 		return this;
 	}
@@ -262,23 +262,23 @@ public final class GwtUiBuilder implements UiBuilderClient {
 	 * preceeding property is represented by a CheckBox, the listner must be of the type ClickListener.
 	 */
 	public GwtUiBuilder removeEventListener(final EventListener listener) {
-		if (this.editor instanceof TextBox) {
+		if (editor instanceof TextBox) {
 			if (!(listener instanceof ChangeListener)) {
 				throw new RuntimeException("The event listener for TextBox must be a change listener");
 			}
-			((TextBox) this.editor).removeChangeListener((ChangeListener) listener);
-		} else if (this.editor instanceof CheckBox) {
+			((TextBox) editor).removeChangeListener((ChangeListener) listener);
+		} else if (editor instanceof CheckBox) {
 			if (!(listener instanceof ClickListener)) {
 				throw new RuntimeException("The event listener for CheckBox must be a click listener");
 			}
-			((CheckBox) this.editor).removeClickListener((ClickListener) listener);
+			((CheckBox) editor).removeClickListener((ClickListener) listener);
 		}
 		return this;
 	}
 
 	@Override
 	public GwtUiBuilder required() {
-		this.validator.addValidator(new RequiredFieldValidator());
+		validator.addValidator(new RequiredFieldValidator());
 		return this;
 	}
 
@@ -291,13 +291,13 @@ public final class GwtUiBuilder implements UiBuilderClient {
 	 */
 	@Override
 	public GwtUiBuilder defaultValue(final String value) {
-		this.defaultValue = value;
+		defaultValue = value;
 		return this;
 	}
 
 	@Override
 	public GwtUiBuilder validateOnDemand() {
-		this.validator.addOnDemandValidator();
+		validator.addOnDemandValidator();
 		return this;
 	}
 
@@ -331,14 +331,14 @@ public final class GwtUiBuilder implements UiBuilderClient {
 
 	@Override
 	public GwtUiBuilder reference(final String... type) {
-		this.editor = new ReferenceListBox(Arrays.asList(type), applicationModel, context);
+		editor = new ReferenceListBox(Arrays.asList(type), applicationModel, context);
 		return this;
 	}
 
 
 	@Override
 	public GwtUiBuilder enable(final String propertyName, final boolean synchronous) {
-		if (this.editor instanceof CheckBox) {
+		if (editor instanceof CheckBox) {
 			final CheckBox checkBox = (CheckBox) editor;
 			checkBox.addClickListener(new ClickListener() {
 

@@ -30,8 +30,8 @@ public class SearchResult extends PersistableBase {
 	}
 
 	public SearchResult(final TandemMassSpectrometrySample massSpecSample, final ProteinGroupList proteinGroups) {
-		this.setMassSpecSample(massSpecSample);
-		this.setProteinGroups(proteinGroups);
+		setMassSpecSample(massSpecSample);
+		setProteinGroups(proteinGroups);
 	}
 
 	public TandemMassSpectrometrySample getMassSpecSample() {

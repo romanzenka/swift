@@ -40,11 +40,6 @@ public class DatabaseUploadStep implements CurationStep {
 	private Integer lastRunCompletionCount;
 
 	/**
-	 * the validation that was created the last time this step was run
-	 */
-	private transient StepValidation recentRunValidation;
-
-	/**
 	 * An MD5 of the file that was uploaded.  We can use this to eliminate redundant uploads
 	 */
 	private byte[] md5CheckSum;
@@ -63,7 +58,7 @@ public class DatabaseUploadStep implements CurationStep {
 	 */
 	@Override
 	public StepValidation performStep(final CurationExecutor exec) {
-		this.recentRunValidation = preValidate(new StepValidation());
+		final StepValidation recentRunValidation = preValidate(new StepValidation());
 		//if the prevalidation already failed then return the failed validation
 		if (!recentRunValidation.isOK()) {
 			return recentRunValidation;
@@ -80,7 +75,7 @@ public class DatabaseUploadStep implements CurationStep {
 				in.beforeFirst();
 				out.appendRemaining(in);
 			} catch (IOException e) {
-				this.recentRunValidation.addMessageAndException("Error copying in stream to out stream", e);
+				recentRunValidation.addMessageAndException("Error copying in stream to out stream", e);
 			}
 		}
 
@@ -88,10 +83,10 @@ public class DatabaseUploadStep implements CurationStep {
 		DBInputStream archiveIn = null;
 		try {
 			try {
-				archiveIn = new FASTAInputStream(this.pathToUploadedFile);
+				archiveIn = new FASTAInputStream(thpathToUploadedFile
 			} catch (Exception e) {
 				//this is not expected to happen
-				this.recentRunValidation.addMessageAndException("Could not find the file on the server please re-upload", e);
+				recentRunValidation.addMessageAndException("Could not find the file on the server please re-upload", e);
 			}
 
 			//next if we have an archive setup then we want to copy it to the output stream
@@ -102,21 +97,21 @@ public class DatabaseUploadStep implements CurationStep {
 					archiveIn.beforeFirst();
 					out.appendRemaining(archiveIn);
 				} catch (IOException e) {
-					this.recentRunValidation.addMessageAndException("Error copying archive to output file", e);
-					return this.recentRunValidation;
+					recentRunValidation.addMessageAndException("Error copying archive to output file", e);
+					return recentRunValidation;
 				}
 			} else {
-				this.recentRunValidation.addMessage("Error finding the input file");
+				recentRunValidation.addMessage("Error finding the input file");
 			}
 
 		} finally {
 			FileUtilities.closeQuietly(archiveIn);
 		}
 
-		this.recentRunValidation.setCompletionCount(out.getSequenceCount());
-		this.setLastRunCompletionCount(out.getSequenceCount());
+		recentRunValidation.setCompletionCount(out.getSequenceCount());
+		thsetLastRunCompletionCountut.getSequenceCount());
 
-		return this.recentRunValidation;
+		return recentRunValidation;
 	}
 
 	@Override
@@ -144,15 +139,14 @@ public class DatabaseUploadStep implements CurationStep {
 	@Override
 	public CurationStep createCopy() {
 		final DatabaseUploadStep copy = new DatabaseUploadStep();
-		copy.setPathToUploadedFile(this.pathToUploadedFile);
-		copy.setFileName(this.getFileName());
+		copy.setPathToUploadedFile(thpathToUploadedFile
+		copy.setFileName(thgetFileName);
 		return copy;
 	}
 
 	@Override
 	public Integer getId() {
-		return this.id;
-	}
+		return t id	}
 
 	@Override
 	public void setId(final Integer id) {
@@ -161,12 +155,11 @@ public class DatabaseUploadStep implements CurationStep {
 
 	@Override
 	public Integer getLastRunCompletionCount() {
-		return this.lastRunCompletionCount;
-	}
+		return t lastRunCompletionCount	}
 
 	@Override
 	public void setLastRunCompletionCount(final Integer count) {
-		this.lastRunCompletionCount = count;
+		thlastRunCompletionCount count;
 	}
 
 	/**
@@ -215,6 +208,6 @@ public class DatabaseUploadStep implements CurationStep {
 
 	@Override
 	public String simpleDescription() {
-		return "Upload " + this.getFileName();
+		return "Upload " + thgetFileName;
 	}
 }

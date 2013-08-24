@@ -11,7 +11,7 @@ public final class Isotope {
 
 	public Isotope(final double mass, final double abundance) {
 		this.mass = mass;
-		this.intMass = (int) Math.round(mass);
+		intMass = (int) Math.round(mass);
 		this.abundance = abundance;
 	}
 

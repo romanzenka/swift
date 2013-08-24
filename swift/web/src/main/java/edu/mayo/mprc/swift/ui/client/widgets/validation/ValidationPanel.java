@@ -128,7 +128,7 @@ public final class ValidationPanel extends Composite {
 			DeferredCommand.addCommand(new Command() {
 				@Override
 				public void execute() {
-					ValidationPanel.this.reflow();
+					reflow();
 				}
 			});
 		}

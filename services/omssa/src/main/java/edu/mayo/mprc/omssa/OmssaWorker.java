@@ -68,7 +68,7 @@ public final class OmssaWorker extends WorkerBase {
 
 		final List<String> commandLine = new ArrayList<String>();
 
-		commandLine.add(this.omssaclPath.getAbsolutePath());
+		commandLine.add(omssaclPath.getAbsolutePath());
 		commandLine.add("-pm");
 		commandLine.add(completeParamsFile.getAbsolutePath());
 		commandLine.add("-mux");

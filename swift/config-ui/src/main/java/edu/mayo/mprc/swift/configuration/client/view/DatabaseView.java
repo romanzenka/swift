@@ -102,7 +102,7 @@ public final class DatabaseView extends SimplePanel implements ModuleView {
 			}
 		});
 
-		this.setWidget(databaseConfiguration);
+		setWidget(databaseConfiguration);
 	}
 
 	@Override

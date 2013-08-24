@@ -43,17 +43,17 @@ public class Chemical implements Molecule, Cloneable {
 	}
 
 	private void set(final Chemical rhs) {
-		this.pt = rhs.pt;
-		this.name = rhs.name;
-		this.sorted = rhs.sorted;
-		this.elements = new ArrayList<ElementCountPair>(rhs.elements.size());
+		pt = rhs.pt;
+		name = rhs.name;
+		sorted = rhs.sorted;
+		elements = new ArrayList<ElementCountPair>(rhs.elements.size());
 		for (final ElementCountPair e : rhs.elements) {
-			this.elements.add(new ElementCountPair(e.getElement(), e.getCount()));
+			elements.add(new ElementCountPair(e.getElement(), e.getCount()));
 		}
-		this.massesCalced = rhs.massesCalced;
-		this.average = rhs.average;
-		this.monoisotopic = rhs.monoisotopic;
-		this.mostAbundant = rhs.mostAbundant;
+		massesCalced = rhs.massesCalced;
+		average = rhs.average;
+		monoisotopic = rhs.monoisotopic;
+		mostAbundant = rhs.mostAbundant;
 	}
 
 	@Override
@@ -437,7 +437,7 @@ public class Chemical implements Molecule, Cloneable {
 
 	public Chemical subtract(final Chemical rhs) {
 		if (rhs == this) {
-			this.clear();
+			clear();
 		} else {
 			for (final ElementCountPair i : rhs.elements) {
 				removeElement(i.getElement(), i.getCount());
@@ -480,7 +480,7 @@ public class Chemical implements Molecule, Cloneable {
 	 */
 	Chemical multiply(final double b) {
 		if (b == 0) {
-			this.clear();
+			clear();
 		} else {
 			for (final ElementCountPair pair : elements) {
 				pair.setCount(pair.getCount() * b);

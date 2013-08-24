@@ -216,8 +216,8 @@ public final class CommonDataRequesterImpl extends SpringGwtServlet implements C
 	public String[] getLines(final String sharedPath, final int startLineInclusive, final int numberOfLines, String pattern) throws GWTServiceException {
 		RandomAccessFile raf = null;
 		try {
-			this.setCancelMessage(false);
-			this.clearResults();
+			setCancelMessage(false);
+			clearResults();
 
 			Pattern compiledPattern = null;
 			if (pattern != null && !pattern.isEmpty()) {
@@ -303,16 +303,16 @@ public final class CommonDataRequesterImpl extends SpringGwtServlet implements C
 	}
 
 	protected synchronized void clearResults() {
-		this.getThreadLocalRequest().getSession().setAttribute("results", null);
+		getThreadLocalRequest().getSession().setAttribute("results", null);
 	}
 
 	protected synchronized void addResult(final String result) {
 		final List<String> results;
-		final Object o = this.getThreadLocalRequest().getSession().getAttribute("results");
+		final Object o = getThreadLocalRequest().getSession().getAttribute("results");
 
 		if (o == null) {
 			results = new ArrayList<String>();
-			this.getThreadLocalRequest().getSession().setAttribute("results", results);
+			getThreadLocalRequest().getSession().setAttribute("results", results);
 		} else {
 			results = (List<String>) o;
 		}
@@ -324,11 +324,11 @@ public final class CommonDataRequesterImpl extends SpringGwtServlet implements C
 	public synchronized String[] getResults() throws GWTServiceException {
 		try {
 			final List<String> results;
-			final Object o = this.getThreadLocalRequest().getSession().getAttribute("results");
+			final Object o = getThreadLocalRequest().getSession().getAttribute("results");
 
 			if (o == null) {
 				results = new ArrayList<String>();
-				this.getThreadLocalRequest().getSession().setAttribute("results", results);
+				getThreadLocalRequest().getSession().setAttribute("results", results);
 			} else {
 				results = (List<String>) o;
 			}
@@ -348,7 +348,7 @@ public final class CommonDataRequesterImpl extends SpringGwtServlet implements C
 	@Override
 	public void setCancelMessage(final boolean cancelMessage) throws GWTServiceException {
 		try {
-			this.getThreadLocalRequest().getSession().setAttribute("cancelRequest", (cancelMessage ? true : null));
+			getThreadLocalRequest().getSession().setAttribute("cancelRequest", (cancelMessage ? true : null));
 		} catch (Exception t) {
 			LOGGER.error("Could not cancel request", t);
 			throw GWTServiceExceptionFactory.createException("Could not cancel request", t);
@@ -356,7 +356,7 @@ public final class CommonDataRequesterImpl extends SpringGwtServlet implements C
 	}
 
 	protected boolean getCancelMessage() {
-		return !(this.getThreadLocalRequest().getSession().getAttribute("cancelRequest") == null);
+		return !(getThreadLocalRequest().getSession().getAttribute("cancelRequest") == null);
 	}
 
 	private SortedMap<Integer, Long> getCurrentPositionMap(final String filePath, final String pattern) {
@@ -382,11 +382,11 @@ public final class CommonDataRequesterImpl extends SpringGwtServlet implements C
 	}
 
 	private Map<String, SortedMap<Integer, Long>> getPositionMaps() {
-		final Object attribute = this.getThreadLocalRequest().getSession().getAttribute("FileLineMap");
+		final Object attribute = getThreadLocalRequest().getSession().getAttribute("FileLineMap");
 		Map<String, SortedMap<Integer, Long>> positionMap = (Map<String, SortedMap<Integer, Long>>) attribute;
 		if (positionMap == null) {
 			positionMap = new HashMap<String, SortedMap<Integer, Long>>();
-			this.getThreadLocalRequest().getSession().setAttribute("FileLineMap", positionMap);
+			getThreadLocalRequest().getSession().setAttribute("FileLineMap", positionMap);
 		}
 		return positionMap;
 	}

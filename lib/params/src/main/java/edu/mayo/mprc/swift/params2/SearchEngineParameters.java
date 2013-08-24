@@ -73,8 +73,8 @@ public class SearchEngineParameters extends PersistableBase {
 		this.database = database;
 		this.protease = protease;
 		this.missedCleavages = missedCleavages;
-		this.fixedModifications = fixed;
-		this.variableModifications = variable;
+		fixedModifications = fixed;
+		variableModifications = variable;
 		this.peptideTolerance = peptideTolerance;
 		this.fragmentTolerance = fragmentTolerance;
 		this.instrument = instrument;
@@ -266,20 +266,20 @@ public class SearchEngineParameters extends PersistableBase {
 	 * @return Deep copy, independent on hibernate to be stored in the session cache.
 	 */
 	public SearchEngineParameters copy() {
-		final Curation database1 = this.getDatabase().copyFull();
+		final Curation database1 = getDatabase().copyFull();
 		// Retain the database ID
-		database1.setId(this.getDatabase().getId());
+		database1.setId(getDatabase().getId());
 		return new SearchEngineParameters(
 				database1,
-				this.getProtease().copy(),
-				this.getMissedCleavages(),
-				this.getFixedModifications().copy(),
-				this.getVariableModifications().copy(),
-				this.getPeptideTolerance().copy(),
-				this.getFragmentTolerance().copy(),
-				this.getInstrument().copy(),
-				this.getExtractMsnSettings().copy(),
-				this.getScaffoldSettings().copy());
+				getProtease().copy(),
+				getMissedCleavages(),
+				getFixedModifications().copy(),
+				getVariableModifications().copy(),
+				getPeptideTolerance().copy(),
+				getFragmentTolerance().copy(),
+				getInstrument().copy(),
+				getExtractMsnSettings().copy(),
+				getScaffoldSettings().copy());
 	}
 
 	public void setValue(final ParamName name, final Object o) {

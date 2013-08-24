@@ -153,8 +153,8 @@ public final class CsvWriter implements Closeable {
      * 			  the line feed terminator to use
      */
     public CsvWriter(Writer writer, char separator, char quotechar, char escapechar, String lineEnd) {
-        this.rawWriter = writer;
-        this.pw = new PrintWriter(writer);
+	    rawWriter = writer;
+	    pw = new PrintWriter(writer);
         this.separator = separator;
         this.quotechar = quotechar;
         this.escapechar = escapechar;

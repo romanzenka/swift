@@ -7,8 +7,8 @@ import com.google.gwt.user.client.ui.PopupPanel;
 class MessagePopup extends PopupPanel {
 	public MessagePopup(final String msg, final int xPosition, final int yPosition) {
 		super(true);
-		this.setPopupPosition(xPosition, yPosition);
-		this.setStyleName("curator-message-popup");
+		setPopupPosition(xPosition, yPosition);
+		setStyleName("curator-message-popup");
 		setWidget(new Label(msg));
 	}
 
@@ -18,7 +18,7 @@ class MessagePopup extends PopupPanel {
 			final Timer hideTimer = new Timer() {
 				@Override
 				public void run() {
-					MessagePopup.this.hide();
+					hide();
 				}
 			};
 			hideTimer.schedule(msToDisplay);
@@ -27,6 +27,6 @@ class MessagePopup extends PopupPanel {
 
 	@Override
 	public void show() {
-		this.show(2500);
+		show(2500);
 	}
 }

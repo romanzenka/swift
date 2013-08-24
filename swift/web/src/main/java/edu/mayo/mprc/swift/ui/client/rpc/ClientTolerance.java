@@ -12,7 +12,7 @@ public final class ClientTolerance implements ClientValue {
 	private String value;
 
 	public ClientTolerance() {
-		this.value = "UNSET";
+		value = "UNSET";
 	}
 
 	public ClientTolerance(final String value) {

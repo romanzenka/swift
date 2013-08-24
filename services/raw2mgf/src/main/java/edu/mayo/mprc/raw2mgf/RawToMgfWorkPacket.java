@@ -52,7 +52,7 @@ public final class RawToMgfWorkPacket extends WorkPacketBase implements Cachable
 
 		this.params = params;
 		this.outputFile = outputFile;
-		this.skipIfExists = bSkipIfExists;
+		skipIfExists = bSkipIfExists;
 		this.inputFile = inputFile;
 		this.publicAccess = publicAccess;
 	}

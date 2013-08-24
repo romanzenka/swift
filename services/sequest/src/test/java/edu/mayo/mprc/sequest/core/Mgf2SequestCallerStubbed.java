@@ -47,7 +47,7 @@ class Mgf2SequestCallerStubbed implements Mgf2SequestInterface {
 		final File tempfolder = FileUtilities.createTempFolder();
 		final String tempFolderName = tempfolder.getAbsolutePath();
 
-		int maxCommandLength = this.maxCommandLineLength;
+		int maxCommandLength = maxCommandLineLength;
 		if (maxCommandLength == 0) {
 			maxCommandLength = 100;
 		}
@@ -56,7 +56,7 @@ class Mgf2SequestCallerStubbed implements Mgf2SequestInterface {
 
 		final SequestRunnerStub sc = new SequestRunnerStub(tempfolder, null, new ArrayList<File>(), hostsFile);
 
-		sc.setSequestExe(this.sequestExe);
+		sc.setSequestExe(sequestExe);
 
 		s.setSequestCaller(sc);
 		sc.setWatchDogTimeOut(watchDogTimeOut);
@@ -87,7 +87,7 @@ class Mgf2SequestCallerStubbed implements Mgf2SequestInterface {
 
 	@Override
 	public void setSequestExe(final String sequestexe) {
-		this.sequestExe = sequestexe;
+		sequestExe = sequestexe;
 	}
 
 	@Override
@@ -97,7 +97,7 @@ class Mgf2SequestCallerStubbed implements Mgf2SequestInterface {
 
 	@Override
 	public void setMaxCommandLineLength(final int commandlinelength) {
-		this.maxCommandLineLength = commandlinelength;
+		maxCommandLineLength = commandlinelength;
 	}
 
 }

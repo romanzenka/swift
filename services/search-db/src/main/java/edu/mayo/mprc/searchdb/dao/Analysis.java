@@ -180,7 +180,7 @@ public final class Analysis extends PersistableBase {
 
 		r.startTable("Results"); // -- Results
 
-		final SwiftSearchDefinition searchDefinition = searchDbDao.getSearchDefinition(this.getId());
+		final SwiftSearchDefinition searchDefinition = searchDbDao.getSearchDefinition(getId());
 		// TODO: Theoretically we can have different starred proteins for two different input files
 		final StarredProteins starredProteins =
 				searchDefinition != null && searchDefinition.getSearchParameters() != null &&
@@ -365,19 +365,19 @@ public final class Analysis extends PersistableBase {
 
 		@Override
 		public int compareTo(final TableRow o) {
-			if (this.star == o.star) {
-				if (this.totalSpectra == o.totalSpectra) {
-					if (this.spectra[0] == o.spectra[0]) {
-						final String s1 = this.accnums.get(0);
+			if (star == o.star) {
+				if (totalSpectra == o.totalSpectra) {
+					if (spectra[0] == o.spectra[0]) {
+						final String s1 = accnums.get(0);
 						final String s2 = o.accnums.get(0);
 						return s1.compareTo(s2);
 					} else {
-						return compare(this.spectra[0], o.spectra[0]);
+						return compare(spectra[0], o.spectra[0]);
 					}
 				}
-				return compare(o.totalSpectra, this.totalSpectra);
+				return compare(o.totalSpectra, totalSpectra);
 			} else {
-				return this.star ? -1 : 1;
+				return star ? -1 : 1;
 			}
 		}
 

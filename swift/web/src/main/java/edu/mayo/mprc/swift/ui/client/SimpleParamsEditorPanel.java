@@ -383,7 +383,7 @@ public final class SimpleParamsEditorPanel implements SourcesChangeEvents {
 	public void setEditorEnabled(final boolean editorEnabled, final ClientUser user) {
 		this.editorEnabled = editorEnabled;
 		this.user = user;
-		setEditorVisible(this.editorExpanded && this.editorEnabled, !this.editorEnabled && this.editorExpanded);
+		setEditorVisible(editorExpanded && this.editorEnabled, !this.editorEnabled && editorExpanded);
 		setDeleteVisible(editorEnabled);
 	}
 
@@ -404,7 +404,7 @@ public final class SimpleParamsEditorPanel implements SourcesChangeEvents {
 	 */
 	public void setEditorExpanded(final boolean editorExpanded) {
 		this.editorExpanded = editorExpanded;
-		setEditorVisible(this.editorExpanded && this.editorEnabled, !this.editorEnabled && this.editorExpanded);
+		setEditorVisible(this.editorExpanded && editorEnabled, !editorEnabled && this.editorExpanded);
 	}
 
 	public boolean isEditorExpanded() {
@@ -421,7 +421,7 @@ public final class SimpleParamsEditorPanel implements SourcesChangeEvents {
 	 */
 	private void setEditorVisible(final boolean editorVisible, final boolean errorMessageVisible) {
 		if (this.editorVisible != editorVisible) {
-			saveButton.setVisible(editorVisible && this.editorEnabled);
+			saveButton.setVisible(editorVisible && editorEnabled);
 			for (final Element e : editorElements) {
 				DOM.setStyleAttribute(e, "display", editorVisible ? "" : "none");
 			}
@@ -434,10 +434,10 @@ public final class SimpleParamsEditorPanel implements SourcesChangeEvents {
 		}
 		this.editorVisible = editorVisible;
 
-		if (this.editorErrorMessageVisible != errorMessageVisible) {
+		if (editorErrorMessageVisible != errorMessageVisible) {
 			DOM.setStyleAttribute(DOM.getElementById("parameterEditorDisabledMessage"), "display", errorMessageVisible ? "" : "none");
 		}
-		this.editorErrorMessageVisible = errorMessageVisible;
+		editorErrorMessageVisible = errorMessageVisible;
 	}
 
 	/**

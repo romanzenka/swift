@@ -13,7 +13,7 @@ public final class DeleteButton extends PushButton {
 
 	public DeleteButton(final String deleteMessage) {
 		super();
-		this.addStyleName("delete-button");
+		addStyleName("delete-button");
 		this.deleteMessage = deleteMessage;
 	}
 

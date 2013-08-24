@@ -63,7 +63,7 @@ public abstract class SpringGwtServlet extends RemoteServiceServlet implements H
 
 	@Override
 	public void setBeanName(String name) {
-		this.beanName = name;
+		beanName = name;
 	}
 
 	public String getBeanName() {

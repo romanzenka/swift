@@ -55,19 +55,19 @@ class StepPanelShell extends Composite {
 	 * @param container the panel that contains this shell
 	 */
 	public StepPanelShell(final AbstractStepPanel toContain, final StepPanelContainer container) {
-		this.containedStepPanel = toContain;
+		containedStepPanel = toContain;
 
 		this.container = container;
 
-		this.panel.add(initializeHeader(toContain), DockPanel.NORTH);
-		this.panel.add(initializeFooter(), DockPanel.SOUTH);
+		panel.add(initializeHeader(toContain), DockPanel.NORTH);
+		panel.add(initializeFooter(), DockPanel.SOUTH);
 
 		toContain.addStyleName("stepshell-containedstep");
-		this.panel.add(toContain, DockPanel.CENTER);
+		panel.add(toContain, DockPanel.CENTER);
 
-		this.panel.addStyleName("stepshell-panel");
+		panel.addStyleName("stepshell-panel");
 
-		initWidget(this.panel);
+		initWidget(panel);
 
 		//tell the parent classes that we are interested in mouse events
 		sinkEvents(Event.MOUSEEVENTS);
@@ -77,7 +77,7 @@ class StepPanelShell extends Composite {
 	 * update this shell assuming there hasn't been a change in step
 	 */
 	public void update() {
-		this.update(this.containedStepPanel.getContainedStep());
+		update(containedStepPanel.getContainedStep());
 	}
 
 	/**  */
@@ -110,8 +110,8 @@ class StepPanelShell extends Composite {
 
 		header.setStyleName("stepshell-header-panel");
 
-		this.lblStepNumber.setStyleName("stepshell-stepnumber");
-		header.add(this.lblStepNumber);
+		lblStepNumber.setStyleName("stepshell-stepnumber");
+		header.add(lblStepNumber);
 
 		expandButton = new Image("images/rightarrow.png");
 		expandButton.addClickListener(new ClickListener() {
@@ -133,8 +133,8 @@ class StepPanelShell extends Composite {
 		collapsePanel.addStyleName("stepshell-header-collapserpanel");
 		header.add(collapsePanel);
 
-		this.title.setText(toContain.getTitle());
-		this.title.setStyleName("shell-header-title");
+		title.setText(toContain.getTitle());
+		title.setStyleName("shell-header-title");
 
 		final Image removalButton = new Image("images/delete.png");
 		removalButton.setStyleName("stepshell-header-stepremover");
@@ -143,7 +143,7 @@ class StepPanelShell extends Composite {
 		removalButton.addClickListener(new ClickListener() {
 			@Override
 			public void onClick(final Widget sender) {
-				if (StepPanelShell.this.containedStepPanel.isEditable()) {
+				if (containedStepPanel.isEditable()) {
 					container.remove(StepPanelShell.this);
 					container.refresh();
 				}
@@ -151,11 +151,11 @@ class StepPanelShell extends Composite {
 		});
 		header.add(removalButton);
 
-		final Image image = new Image(this.containedStepPanel.getImageURL());
+		final Image image = new Image(containedStepPanel.getImageURL());
 		image.addStyleName("shell-header-stepimage");
 		header.add(image);
 
-		header.add(this.title);
+		header.add(title);
 		return header;
 	}
 
@@ -168,8 +168,8 @@ class StepPanelShell extends Composite {
 		final FlowPanel panel = new FlowPanel();
 
 		panel.setStyleName("stepshell-footer");
-		this.txtErrorReport.setVisibleLines(1);
-		this.txtErrorReport.setStyleName("step-error-report");
+		txtErrorReport.setVisibleLines(1);
+		txtErrorReport.setStyleName("step-error-report");
 		panel.add(txtErrorReport);
 		completionCount.addStyleName("stepshell-completioncount");
 		panel.add(completionCount);
@@ -184,8 +184,8 @@ class StepPanelShell extends Composite {
 	 * @return the mainPanel this shell encompasses
 	 */
 	public AbstractStepPanel getContainedStepPanel() {
-		this.containedStepPanel.getContainedStep();
-		return this.containedStepPanel;
+		containedStepPanel.getContainedStep();
+		return containedStepPanel;
 	}
 
 	/**
@@ -202,42 +202,42 @@ class StepPanelShell extends Composite {
 	 * @param stub the stub we want to update the panel with.
 	 */
 	public void update(final CurationStepStub stub) {
-		this.containedStepPanel.setContainedStep(stub);
+		containedStepPanel.setContainedStep(stub);
 
-		this.lblStepNumber.setText(String.valueOf(this.container.getWidgetIndex(this) + 1));
+		lblStepNumber.setText(String.valueOf(container.getWidgetIndex(this) + 1));
 
 		//print any error messages out into the error message box
-		if (this.containedStepPanel.getContainedStep().getErrorMessages() != null
-				&& !this.containedStepPanel.getContainedStep().getErrorMessages().isEmpty()) {
+		if (containedStepPanel.getContainedStep().getErrorMessages() != null
+				&& !containedStepPanel.getContainedStep().getErrorMessages().isEmpty()) {
 			final StringBuilder builder = new StringBuilder();
-			for (final Object o : this.containedStepPanel.getContainedStep().getErrorMessages()) {
+			for (final Object o : containedStepPanel.getContainedStep().getErrorMessages()) {
 				builder.append((String) o);
 				builder.append("\n");
 			}
 
 			//if the step has failed we want to change our style to indicate a failed step
-			this.txtErrorReport.setText(builder.toString());
+			txtErrorReport.setText(builder.toString());
 			panel.addStyleName("stepshell-inerror");
-			this.containedStepPanel.addStyleName("stepshell-containedstep-inerror");
+			containedStepPanel.addStyleName("stepshell-containedstep-inerror");
 		}
 
 		//if the step has been completed then we want to change our style to indicate that we have completed
-		if (this.containedStepPanel.getContainedStep() != null
-				&& this.getContainedStepPanel().getContainedStep().getCompletionCount() != null) {
-			this.containedStepPanel.addStyleName("stepshell-containedstep-complete");
-			this.panel.addStyleName("stepshell-complete");
-			this.txtErrorReport.setText("Step completed successfully");
-			this.title.removeStyleName("stepshell-title-inprogress");
-			final Integer completionCount = this.getContainedStepPanel().getContainedStep().getCompletionCount();
+		if (containedStepPanel.getContainedStep() != null
+				&& getContainedStepPanel().getContainedStep().getCompletionCount() != null) {
+			containedStepPanel.addStyleName("stepshell-containedstep-complete");
+			panel.addStyleName("stepshell-complete");
+			txtErrorReport.setText("Step completed successfully");
+			title.removeStyleName("stepshell-title-inprogress");
+			final Integer completionCount = getContainedStepPanel().getContainedStep().getCompletionCount();
 
 			this.completionCount.setText((completionCount == null ? "???" : commaFormatNumber(completionCount)));
-		} else if (this.containedStepPanel.getContainedStep().getProgress() != null) {
-			this.completionCount.setText(this.containedStepPanel.getContainedStep().getProgress().toString() + "%");
-			this.txtErrorReport.setText("Step is running");
+		} else if (containedStepPanel.getContainedStep().getProgress() != null) {
+			completionCount.setText(containedStepPanel.getContainedStep().getProgress().toString() + "%");
+			txtErrorReport.setText("Step is running");
 
-			this.title.addStyleName("stepshell-title-inprogress");
+			title.addStyleName("stepshell-title-inprogress");
 		} else {
-			this.completionCount.setText("---");
+			completionCount.setText("---");
 		}
 	}
 
@@ -267,7 +267,7 @@ class StepPanelShell extends Composite {
 	 * @return the title widget (Label)
 	 */
 	Label getStepTitle() {
-		return this.title;
+		return title;
 	}
 
 	public String toString() {

@@ -224,18 +224,18 @@ public final class SearchRunner implements Runnable {
 		this.searchRun = searchRun;
 		this.reportDecoyHits = reportDecoyHits;
 		this.priority = priority;
-		this.workflowEngine = new WorkflowEngine(packet.getTaskId());
-		this.workflowEngine.setPriority(priority);
+		workflowEngine = new WorkflowEngine(packet.getTaskId());
+		workflowEngine.setPriority(priority);
 		this.paramsInfo = paramsInfo;
 		assertValid();
 	}
 
 	public void initialize() {
 		if (!initializationDone) {
-			LOGGER.debug("Initializing search " + this.searchDefinition.getTitle());
+			LOGGER.debug("Initializing search " + searchDefinition.getTitle());
 			createParameterFiles();
-			searchDefinitionToLists(this.searchDefinition);
-			addReportTasks(this.searchDefinition);
+			searchDefinitionToLists(searchDefinition);
+			addReportTasks(searchDefinition);
 			collectAllTasks();
 			assertValid();
 			initializationDone = true;
@@ -287,7 +287,7 @@ public final class SearchRunner implements Runnable {
 		Preconditions.checkNotNull(swiftDao, "Swift DAO has to be set up");
 
 		assert searchEngines != null : "Search engine set must not be null";
-		if (this.searchDefinition != null) {
+		if (searchDefinition != null) {
 			assert workflowEngine.getNumTasks() ==
 					databaseDeployments.size() +
 							rawToMgfConversions.size() +
@@ -1014,7 +1014,7 @@ public final class SearchRunner implements Runnable {
 	}
 
 	public void addSearchMonitor(final SearchMonitor monitor) {
-		this.workflowEngine.addMonitor(monitor);
+		workflowEngine.addMonitor(monitor);
 	}
 
 	private static final class MyResumer implements Resumer {

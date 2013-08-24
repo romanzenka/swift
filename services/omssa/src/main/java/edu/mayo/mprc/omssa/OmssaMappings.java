@@ -44,7 +44,7 @@ public final class OmssaMappings implements Mappings {
 
 	@Override
 	public Reader baseSettings() {
-		return ResourceUtilities.getReader("classpath:edu/mayo/mprc/swift/params/base.omssa.params.xml", this.getClass());
+		return ResourceUtilities.getReader("classpath:edu/mayo/mprc/swift/params/base.omssa.params.xml", getClass());
 	}
 
 	@Override

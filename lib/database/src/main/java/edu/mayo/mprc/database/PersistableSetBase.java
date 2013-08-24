@@ -117,7 +117,7 @@ public abstract class PersistableSetBase<T extends PersistableBase> extends Pers
 
 		final PersistableSetBase that = (PersistableSetBase) o;
 
-		final Set<T> me = makeSet(this.getList());
+		final Set<T> me = makeSet(getList());
 		final Set<T> other = makeSet(that.getList());
 		return !(me != null ? !me.equals(other) : other != null);
 
@@ -135,6 +135,6 @@ public abstract class PersistableSetBase<T extends PersistableBase> extends Pers
 
 	@Override
 	public int hashCode() {
-		return getList() != null ? makeSet(this.getList()).hashCode() : 0;
+		return getList() != null ? makeSet(getList()).hashCode() : 0;
 	}
 }

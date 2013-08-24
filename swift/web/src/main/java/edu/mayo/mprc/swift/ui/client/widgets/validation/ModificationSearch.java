@@ -39,7 +39,7 @@ public final class ModificationSearch {
 	}
 
 	private void initialize() {
-		if (this.allowedValues == null) {
+		if (allowedValues == null) {
 			return;
 		}
 		// build record index
@@ -49,7 +49,7 @@ public final class ModificationSearch {
 			addRecordToMap(allowedValue);
 		}
 		// create the wordmap
-		words = this.createWordHash();
+		words = createWordHash();
 	}
 
 	private void addRecordToMap(final ClientModSpecificity specificity) {
@@ -74,7 +74,7 @@ public final class ModificationSearch {
 	 */
 	public List<ClientModSpecificity> search(final String spec) {
 		if (spec == null || spec.isEmpty() || spec.trim().equals("")) {
-			return this.allowedValues;
+			return allowedValues;
 		}
 		List<ClientModSpecificity> result;
 
@@ -92,7 +92,7 @@ public final class ModificationSearch {
 					return result;
 				}
 				// otherwise
-				result = this.allowedValues;
+				result = allowedValues;
 			}
 		}
 		Collections.sort(result, new CompareClientModSpecificity());
@@ -123,7 +123,7 @@ public final class ModificationSearch {
 	public List<ClientModSpecificity> searchByMass(final String massWindow) {
 		// regular expressions cannot be used here as GWT1.4 does not support them
 		final MassPrecision mp = new MassPrecision();
-		final boolean found = this.parseMassWindow(massWindow, mp);
+		final boolean found = parseMassWindow(massWindow, mp);
 		if (!found) {
 			return null;
 		}
@@ -131,7 +131,7 @@ public final class ModificationSearch {
 			mp.setPrecision(1.0);
 		}
 
-		return this.getByMass(mp.getMass(), mp.getPrecision());
+		return getByMass(mp.getMass(), mp.getPrecision());
 	}
 
 	/**
@@ -152,7 +152,7 @@ public final class ModificationSearch {
 			return null;
 		}
 		final int recordId = Integer.parseInt((spec.trim()).substring(1));
-		return this.records.get(String.valueOf(recordId));
+		return records.get(String.valueOf(recordId));
 	}
 
 	/**
@@ -169,7 +169,7 @@ public final class ModificationSearch {
 		final HashSet<ClientModSpecificity> found = new HashSet<ClientModSpecificity>();
 		for (final List<WordMap> someWords : wordMaps) {
 			for (final WordMap w : someWords) {
-				final ClientModSpecificity specificity = this.records.get("" + w.getRecordId() + w.getSite());
+				final ClientModSpecificity specificity = records.get("" + w.getRecordId() + w.getSite());
 				if (!found.contains(specificity)) {
 					found.add(specificity);
 				}
@@ -188,14 +188,14 @@ public final class ModificationSearch {
 	 */
 	private List<List<WordMap>> findWords(final String subSequence) {
 		final List<List<WordMap>> wordmaps = new ArrayList<List<WordMap>>();
-		if (this.words == null) {
+		if (words == null) {
 			initialize();
 		}
 		final String subSequenceLower = StringUtilities.toLowerCase(subSequence);
-		for (final String word : this.words.keySet()) {
+		for (final String word : words.keySet()) {
 			final String word_lower = StringUtilities.toLowerCase(word);
 			if (word_lower.indexOf(subSequenceLower) != -1) {
-				wordmaps.add(this.words.get(word));
+				wordmaps.add(words.get(word));
 			}
 		}
 		return wordmaps;
@@ -342,7 +342,7 @@ public final class ModificationSearch {
 		}
 
 		public boolean hasMoreTokens() {
-			return index < this.tokens.size();
+			return index < tokens.size();
 		}
 
 		public String nextToken() {

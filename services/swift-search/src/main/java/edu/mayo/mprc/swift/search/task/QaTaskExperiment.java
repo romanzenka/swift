@@ -114,9 +114,9 @@ class QaTaskExperiment implements Comparable<QaTaskExperiment> {
 	@Override
 	public int compareTo(final QaTaskExperiment o) {
 		return ComparisonChain.start()
-				.compare(this.name, o.name)
-				.compare(this.spectraFile, o.spectraFile)
-				.compare(this.scaffoldVersion, o.scaffoldVersion)
+				.compare(name, o.name)
+				.compare(spectraFile, o.spectraFile)
+				.compare(scaffoldVersion, o.scaffoldVersion)
 				.result();
 	}
 }

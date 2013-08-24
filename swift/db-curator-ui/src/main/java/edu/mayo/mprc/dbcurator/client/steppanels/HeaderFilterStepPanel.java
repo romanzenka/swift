@@ -84,15 +84,15 @@ public final class HeaderFilterStepPanel extends AbstractStepPanel {
 	@Override
 	public CurationStepStub getContainedStep() {
 
-		this.containedStep.criteria = this.criteria.getText();
+		containedStep.criteria = criteria.getText();
 
 		//see which match mode should be used
-		this.containedStep.textMode = (radioModeSimple.isChecked() ? "simple" : "regex");
+		containedStep.textMode = (radioModeSimple.isChecked() ? "simple" : "regex");
 
 		//look at which mode is checked and set appropriately
-		this.containedStep.matchMode = (radioLogicalAll.isChecked() ? "all" : (radioLogicalNone.isChecked() ? "none" : "any"));
+		containedStep.matchMode = (radioLogicalAll.isChecked() ? "all" : (radioLogicalNone.isChecked() ? "none" : "any"));
 
-		return this.containedStep;
+		return containedStep;
 	}
 
 	/**
@@ -107,8 +107,8 @@ public final class HeaderFilterStepPanel extends AbstractStepPanel {
 			ExceptionUtilities.throwCastException(step, HeaderFilterStepStub.class);
 			return;
 		}
-		this.containedStep = (HeaderFilterStepStub) step;
-		this.setTitle("Filter sequences by header content");
+		containedStep = (HeaderFilterStepStub) step;
+		setTitle("Filter sequences by header content");
 		update();
 	}
 
@@ -127,9 +127,9 @@ public final class HeaderFilterStepPanel extends AbstractStepPanel {
 	 */
 	@Override
 	public void update() {
-		criteria.setText(this.containedStep.criteria);
+		criteria.setText(containedStep.criteria);
 
-		final String logicalMode = this.containedStep.matchMode;
+		final String logicalMode = containedStep.matchMode;
 		if (logicalMode.equalsIgnoreCase("none")) {
 			radioLogicalNone.setChecked(true);
 		} else if (logicalMode.equalsIgnoreCase("all")) {
@@ -138,7 +138,7 @@ public final class HeaderFilterStepPanel extends AbstractStepPanel {
 			radioLogicalAny.setChecked(true);
 		}
 
-		if (this.containedStep.textMode.equalsIgnoreCase("regex")) {
+		if (containedStep.textMode.equalsIgnoreCase("regex")) {
 			radioModeRegEx.setChecked(true);
 		} else {
 			radioModeSimple.setChecked(true);

@@ -15,7 +15,7 @@ public abstract class ValidatableTextBox extends TextBox implements Validatable 
 		super();
 		this.param = param;
 		listeners = new ChangeListenerCollection();
-		this.addKeyboardListener(
+		addKeyboardListener(
 				new KeyboardListenerAdapter() {
 					@Override
 					public void onKeyUp(final Widget widget, final char c, final int i) {

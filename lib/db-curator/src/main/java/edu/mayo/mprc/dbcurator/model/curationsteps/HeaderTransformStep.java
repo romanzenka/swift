@@ -52,18 +52,13 @@ public class HeaderTransformStep implements CurationStep {
 	private Pattern compiledPattern = null;
 
 	/**
-	 * the StepValidation created the last time the step was run
-	 */
-	private transient StepValidation lastRunValidation = null;
-
-	/**
 	 * This step will take each header in the DBInputStream and apply the pressribed subtitution to all of the headers.
 	 * {@inheritDoc}
 	 */
 	@Override
 	public StepValidation performStep(final CurationExecutor exe) {
 		//perform pre-validation of the step to make sure we at least pass that.
-		lastRunValidation = this.preValidate(exe.getCurationDao());
+		final StepValidation lastRunValidation = preValidate(exe.getCurationDao());
 		if (!lastRunValidation.isOK()) {
 			return lastRunValidation;
 		}
@@ -84,20 +79,20 @@ public class HeaderTransformStep implements CurationStep {
 				currentHeader = in.getHeader();
 				out.appendSequence(transformString(currentHeader), in.getSequence());
 			}
-			this.lastRunValidation.setCompletionCount(out.getSequenceCount());
-			this.setLastRunCompletionCount(out.getSequenceCount());
+			lastRunValidation.setCompletionCount(out.getSequenceCount());
+			setLastRunCompletionCount(out.getSequenceCount());
 		} catch (PatternSyntaxException e) {
 			LOGGER.error(e);
-			this.lastRunValidation.addMessageAndException("Error applying the transform to the header: " + currentHeader, e);
+			lastRunValidation.addMessageAndException("Error applying the transform to the header: " + currentHeader, e);
 		} catch (IOException e) {
 			LOGGER.error(e);
-			this.lastRunValidation.addMessageAndException("Error in performing database IO", e);
+			lastRunValidation.addMessageAndException("Error in performing database IO", e);
 		} catch (Exception e) {
 			LOGGER.error(e);
-			this.lastRunValidation.addMessageAndException(e.getMessage(), e);
+			lastRunValidation.addMessageAndException(e.getMessage(), e);
 		}
 
-		return this.lastRunValidation;
+		return lastRunValidation;
 	}
 
 	/**
@@ -113,8 +108,8 @@ public class HeaderTransformStep implements CurationStep {
 			return toTransform;
 		}
 
-		if (compiledPattern == null || !compiledPattern.pattern().equals(this.getMatchPattern())) {
-			compiledPattern = Pattern.compile(this.getMatchPattern());
+		if (compiledPattern == null || !compiledPattern.pattern().equals(getMatchPattern())) {
+			compiledPattern = Pattern.compile(getMatchPattern());
 		}
 
 		final StringBuffer result = new StringBuffer();
@@ -122,11 +117,11 @@ public class HeaderTransformStep implements CurationStep {
 		final Matcher match = compiledPattern.matcher(toTransform);
 
 		while (match.find()) {
-			match.appendReplacement(result, this.substitutionPattern);
+			match.appendReplacement(result, substitutionPattern);
 		}
 		match.appendTail(result);
 
-		if (result.toString().equalsIgnoreCase(this.getSubstitutionPattern())) {
+		if (result.toString().equalsIgnoreCase(getSubstitutionPattern())) {
 			LOGGER.info("Pattern not matched in header: " + toTransform);
 			return toTransform;
 		} else {
@@ -154,7 +149,7 @@ public class HeaderTransformStep implements CurationStep {
 			}
 		}
 
-		if (this.getSubstitutionPattern() == null) {
+		if (getSubstitutionPattern() == null) {
 			preValidation.addMessageAndException("The subsitution pattern is not set", null);
 		}
 
@@ -164,15 +159,15 @@ public class HeaderTransformStep implements CurationStep {
 	@Override
 	public CurationStep createCopy() {
 		final HeaderTransformStep copy = new HeaderTransformStep();
-		copy.setDescription(this.getDescription());
-		copy.setMatchPattern(this.getMatchPattern());
-		copy.setSubstitutionPattern(this.getSubstitutionPattern());
+		copy.setDescription(getDescription());
+		copy.setMatchPattern(getMatchPattern());
+		copy.setSubstitutionPattern(getSubstitutionPattern());
 		return copy;
 	}
 
 	@Override
 	public Integer getId() {
-		return this.id;
+		return id;
 	}
 
 	@Override
@@ -182,12 +177,12 @@ public class HeaderTransformStep implements CurationStep {
 
 	@Override
 	public Integer getLastRunCompletionCount() {
-		return this.lastRunCompletionCount;
+		return lastRunCompletionCount;
 	}
 
 	@Override
 	public void setLastRunCompletionCount(final Integer count) {
-		this.lastRunCompletionCount = count;
+		lastRunCompletionCount = count;
 	}
 
 	/**

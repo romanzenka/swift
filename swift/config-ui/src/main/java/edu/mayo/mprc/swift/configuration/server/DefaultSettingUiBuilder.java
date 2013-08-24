@@ -18,7 +18,7 @@ class DefaultSettingUiBuilder implements UiBuilder {
 	private DependencyResolver resolver;
 
 	public DefaultSettingUiBuilder(final Map<String, String> initialValues, final DependencyResolver resolver) {
-		this.values = initialValues;
+		values = initialValues;
 		this.resolver = resolver;
 	}
 

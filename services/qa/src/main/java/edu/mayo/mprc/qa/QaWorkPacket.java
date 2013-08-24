@@ -27,7 +27,7 @@ public final class QaWorkPacket extends WorkPacketBase {
 	public QaWorkPacket(final List<ExperimentQa> experimentQas, final File qaReportFolderFile, final File reportFile, final String taskId, final boolean fromScratch) {
 		super(taskId, fromScratch);
 
-		this.experimentQaTokens = experimentQas;
+		experimentQaTokens = experimentQas;
 
 		this.qaReportFolderFile = qaReportFolderFile;
 		this.reportFile = reportFile;

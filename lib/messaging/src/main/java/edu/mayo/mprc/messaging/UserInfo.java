@@ -11,16 +11,16 @@ final class UserInfo {
 	public UserInfo(final URI uri) {
 		final String userInfo = uri.getUserInfo();
 		if ((userInfo == null) || userInfo.equals("")) {
-			this.userName = null;
-			this.password = null;
+			userName = null;
+			password = null;
 		} else {
 
 			final int index = userInfo.indexOf(':');
 			if (index < 0) {
 				throw new MprcException("The URI does not contain proper user name:password pair: " + uri.toString());
 			}
-			this.userName = userInfo.substring(0, index);
-			this.password = userInfo.substring(index + 1);
+			userName = userInfo.substring(0, index);
+			password = userInfo.substring(index + 1);
 		}
 	}
 

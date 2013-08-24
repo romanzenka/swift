@@ -13,12 +13,12 @@ public final class ErrorEntry extends Entry {
 
 	public ErrorEntry() {
 		super("");
-		this.errorMessage = "Unknown error occured.";
+		errorMessage = "Unknown error occured.";
 	}
 
 	public ErrorEntry(final String message) {
 		super("");
-		this.errorMessage = message;
+		errorMessage = message;
 	}
 
 	@Override

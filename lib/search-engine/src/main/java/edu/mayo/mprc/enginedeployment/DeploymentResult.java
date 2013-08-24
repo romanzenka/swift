@@ -79,14 +79,14 @@ public class DeploymentResult extends FileHolder implements ProgressInfo {
 	}
 
 	public synchronized CompositeException getCompositeException() {
-		if (this.exceptions.isEmpty()) {
+		if (exceptions.isEmpty()) {
 			return null;
 		}
-		return new CompositeException(this.exceptions);
+		return new CompositeException(exceptions);
 	}
 
 	public synchronized void addException(final Exception toAdd) {
-		this.exceptions.add(toAdd);
+		exceptions.add(toAdd);
 	}
 
 	public synchronized List<String> getMessages() {
@@ -94,7 +94,7 @@ public class DeploymentResult extends FileHolder implements ProgressInfo {
 	}
 
 	public synchronized void addMessage(final String toAdd) {
-		this.messages.add(toAdd);
+		messages.add(toAdd);
 	}
 
 	public List<File> getGeneratedFiles() {

@@ -13,6 +13,6 @@ public final class SequestDeploymentResult extends DeploymentResult {
 	}
 
 	public void setFileToSearchAgainst(final File toSearchAgainst) {
-		this.fileToSearchAgainst = toSearchAgainst;
+		fileToSearchAgainst = toSearchAgainst;
 	}
 }

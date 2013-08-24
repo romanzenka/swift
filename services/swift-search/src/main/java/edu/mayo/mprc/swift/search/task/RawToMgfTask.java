@@ -33,7 +33,7 @@ final class RawToMgfTask extends AsyncTaskBase implements FileProducingTask {
 		super(engine, raw2mgfDaemon, fileTokenFactory, fromScratch);
 		this.inputFile = inputFile;
 		this.mgfFile = mgfFile;
-		this.extractMsnParameters = extractMsnParams;
+		extractMsnParameters = extractMsnParams;
 		this.publicAccess = publicAccess;
 		setName("RAW2mgf");
 
@@ -43,9 +43,9 @@ final class RawToMgfTask extends AsyncTaskBase implements FileProducingTask {
 	private void updateDescription() {
 		setDescription(
 				"Converting "
-						+ getFileTokenFactory().fileToTaggedDatabaseToken(this.inputFile)
-						+ " to " + getFileTokenFactory().fileToTaggedDatabaseToken(this.mgfFile)
-						+ " (" + this.extractMsnParameters + ")");
+						+ getFileTokenFactory().fileToTaggedDatabaseToken(inputFile)
+						+ " to " + getFileTokenFactory().fileToTaggedDatabaseToken(mgfFile)
+						+ " (" + extractMsnParameters + ")");
 	}
 
 	private static String getFileReference(final File rawFile) {
@@ -53,7 +53,7 @@ final class RawToMgfTask extends AsyncTaskBase implements FileProducingTask {
 	}
 
 	public String getFileReference() {
-		return getFileReference(this.inputFile);
+		return getFileReference(inputFile);
 	}
 
 	@Override

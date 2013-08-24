@@ -17,7 +17,7 @@ final class ScaffoldOutputReader implements Closeable {
 
 	public ScaffoldOutputReader(final File scaffoldOutputFile) {
 		try {
-			this.reader = new TsvStreamReader(scaffoldOutputFile);
+			reader = new TsvStreamReader(scaffoldOutputFile);
 		} catch (Exception e) {
 			throw new MprcException("Error reading scaffold output file: " + scaffoldOutputFile.getAbsolutePath(), e);
 		}

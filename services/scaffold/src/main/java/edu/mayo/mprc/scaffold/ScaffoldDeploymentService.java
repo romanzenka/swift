@@ -51,7 +51,7 @@ public final class ScaffoldDeploymentService extends DeploymentService<Deploymen
 
 		LOGGER.debug("Asked to deploy curation " + request.getShortName());
 		final File deployFrom = getCurationFile(request);
-		final File deployTo = this.getFileToDeploy(request.getShortName());
+		final File deployTo = getFileToDeploy(request.getShortName());
 
 		LOGGER.debug("Deploying file " + deployTo.getAbsolutePath());
 
@@ -68,9 +68,9 @@ public final class ScaffoldDeploymentService extends DeploymentService<Deploymen
 	@Override
 	public DeploymentResult performUndeployment(final DeploymentRequest request) {
 		final DeploymentResult reportResult = new DeploymentResult();
-		final File deployedFile = this.getFileToDeploy(request.getShortName());
+		final File deployedFile = getFileToDeploy(request.getShortName());
 
-		this.cleanUpDeployedFiles(deployedFile, reportResult);
+		cleanUpDeployedFiles(deployedFile, reportResult);
 
 		return reportResult;
 	}

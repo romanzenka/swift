@@ -89,7 +89,7 @@ public final class ValidationController implements ChangeListener, SourcesChange
 	public ValidationController(final ServiceAsync serviceAsync, final ParamSetSelectionController selector, final InitialPageData pageData) {
 		this.serviceAsync = serviceAsync;
 		this.selector = selector;
-		this.allowedValues = pageData.getAllowedValues();
+		allowedValues = pageData.getAllowedValues();
 		selector.addParamSetSelectionListener(this);
 	}
 

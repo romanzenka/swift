@@ -52,11 +52,11 @@ final class ScaffoldTask extends AsyncTaskBase implements ScaffoldTaskI {
 		super(engine, scaffoldDaemon, fileTokenFactory, fromScratch);
 		this.scaffoldVersion = scaffoldVersion;
 		this.experiment = experiment;
-		this.swiftSearchDefinition = definition;
+		swiftSearchDefinition = definition;
 		this.outputFolder = outputFolder;
 		this.swiftDao = swiftDao;
 		this.searchRun = searchRun;
-		this.unimod = scaffoldUnimod;
+		unimod = scaffoldUnimod;
 		this.reportDecoyHits = reportDecoyHits;
 		setName("Scaffold");
 		setDescription("Scaffold search " + this.experiment);
@@ -101,7 +101,7 @@ final class ScaffoldTask extends AsyncTaskBase implements ScaffoldTaskI {
 	 */
 	@Override
 	public WorkPacket createWorkPacket() {
-		setDescription("Scaffold search " + this.experiment);
+		setDescription("Scaffold search " + experiment);
 		final File scaffoldFile = new File(outputFolder, experiment + ".sf3");
 
 		for (final Map.Entry<String, DatabaseDeployment> entry : databases.entrySet()) {
@@ -137,7 +137,7 @@ final class ScaffoldTask extends AsyncTaskBase implements ScaffoldTaskI {
 		final ScaffoldWorkPacket workPacket = new ScaffoldWorkPacket(
 				outputFolder,
 				scafmlFile,
-				this.experiment,
+				experiment,
 				getFullId(),
 				isFromScratch());
 

@@ -129,7 +129,7 @@ public final class DatabaseUndeploymentTask {
 		synchronized (monitor) {
 			try {
 				isDone = true;
-				this.throwable = t;
+				throwable = t;
 			} finally {
 				monitor.notifyAll();
 			}

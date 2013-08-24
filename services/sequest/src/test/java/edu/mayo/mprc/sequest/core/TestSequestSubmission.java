@@ -58,7 +58,7 @@ public final class TestSequestSubmission {
 			final char c = 'a';
 			final List<String> dtafilenames = new ArrayList<String>();
 			for (int i = 0; i < 9; i++) {
-				final String dtafilename = this.createDtaAndOutFile(folder);
+				final String dtafilename = createDtaAndOutFile(folder);
 				LOGGER.debug("dtafilename=" + dtafilename);
 				dtafilenames.add(dtafilename);
 			}
@@ -133,7 +133,7 @@ public final class TestSequestSubmission {
 
 			final List<String> dtafilenames = new ArrayList<String>();
 			for (int i = 0; i < 10; i++) {
-				final String dtafilename = this.createDtaAndOutFile(folder);
+				final String dtafilename = createDtaAndOutFile(folder);
 				LOGGER.debug("dtafilename=" + dtafilename);
 				dtafilenames.add(dtafilename);
 			}
@@ -197,7 +197,7 @@ public final class TestSequestSubmission {
 
 			for (int i = 0; i < 10; i++) {
 
-				final String dtafilename = this.createDtaAndOutFile(folder);
+				final String dtafilename = createDtaAndOutFile(folder);
 				s.addDtaFile(new File(dtafilename), false);
 			}
 			LOGGER.debug("wrote 10");
@@ -246,7 +246,7 @@ public final class TestSequestSubmission {
 			f.createNewFile();
 
 
-			final String dtafilename = this.createDtaAndOutFile(folder);
+			final String dtafilename = createDtaAndOutFile(folder);
 			s.addDtaFile(new File(dtafilename), true);
 
 			LOGGER.debug("wrote 1");
@@ -297,7 +297,7 @@ public final class TestSequestSubmission {
 			f.createNewFile();
 
 
-			final String dtafilename = this.createDtaAndOutFile(folder);
+			final String dtafilename = createDtaAndOutFile(folder);
 			s.addDtaFile(new File(dtafilename), true);
 
 			LOGGER.debug("wrote 1");
@@ -838,7 +838,7 @@ public final class TestSequestSubmission {
 			final File fparams = TestingUtilities.getTempFileFromResource("/mgftosequesttestSequestParams.params", true, /*useSystemTempFolder*/ null);
 
 			final Mgf2SequestCaller m = new Mgf2SequestCaller();
-			m.setSequestExe(this.getSequestExe());
+			m.setSequestExe(getSequestExe());
 			m.setHostsFile(getHostsFile());
 
 			m.callSequest(new File(outputDir, "tarfile.tar"), fparams, fmgf, 120 * 1000, 120 * 1000, hdrFile);
@@ -883,7 +883,7 @@ public final class TestSequestSubmission {
 			final File fparams = TestingUtilities.getTempFileFromResource("/sequest_LTQ.params", true, /*useSystemTempFolder*/ null);
 
 			final Mgf2SequestCaller m = new Mgf2SequestCaller();
-			m.setSequestExe(this.getSequestExe());
+			m.setSequestExe(getSequestExe());
 			m.setHostsFile(getHostsFile());
 
 			m.callSequest(new File(outputDir, "tarfile.tar"), fparams, fmgf, 10 * 1000, 10 * 1000, hdrFile);
@@ -922,7 +922,7 @@ public final class TestSequestSubmission {
 			final File hdrFile = File.createTempFile("hdr", "db", outputDir);
 
 			final Mgf2SequestCaller m = new Mgf2SequestCaller();
-			m.setSequestExe(this.getSequestExe());
+			m.setSequestExe(getSequestExe());
 			m.setHostsFile(getHostsFile());
 
 			LOGGER.debug("outputDir=" + outputDir.getAbsolutePath());

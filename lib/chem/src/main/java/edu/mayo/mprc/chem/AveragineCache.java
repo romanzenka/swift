@@ -29,10 +29,10 @@ public final class AveragineCache {
 	public AveragineCache(final double precision, final PeriodicTable periodicTable) {
 		this.periodicTable = periodicTable;
 		this.precision = precision;
-		this.averagine = new Averagine(periodicTable);
-		this.chargeUnit = ChargeUnit.getProtonChargeUnit(periodicTable);
+		averagine = new Averagine(periodicTable);
+		chargeUnit = ChargeUnit.getProtonChargeUnit(periodicTable);
 		hydrogen = periodicTable.getElementBySymbol("H");
-		this.hydrogenMass = hydrogen.getMonoisotopicMass();
+		hydrogenMass = hydrogen.getMonoisotopicMass();
 	}
 
 	/**
