@@ -198,11 +198,11 @@ public abstract class DeploymentService<T extends DeploymentResult> implements W
 		final File engineDeploymentFolder = deployableDbFolder;
 
 		//if the folders are the same meaning they were explicity pointed to the same location
-		if (engineDeploymentFolder.exists()) {
-			return engineDeploymentFolder;
-		} else {
-			throw new MprcException("The deployment folder " + engineDeploymentFolder.getAbsolutePath() + " does not exist");
+		if (!engineDeploymentFolder.exists()) {
+			LOGGER.warn("Creating deployment folder at [" + engineDeploymentFolder.getAbsolutePath() + "] for " + getEngineVersion());
+			FileUtilities.ensureFolderExists(engineDeploymentFolder);
 		}
+		return engineDeploymentFolder;
 	}
 
 	/**
