@@ -46,6 +46,8 @@ class TestResource implements ResourceConfig {
 		Assert.assertEquals(resource.getClass(), TestResource2.class);
 		final List<? extends ResourceConfig> resources = reader.getResourceList("resources");
 		Assert.assertEquals(resources.size(), 2);
+		// A missing resource should produce an empty list
+		final List<? extends ResourceConfig> missing = reader.getResourceList("missing");
 	}
 
 	@Override

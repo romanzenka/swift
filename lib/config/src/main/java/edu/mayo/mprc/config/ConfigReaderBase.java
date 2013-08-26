@@ -54,8 +54,11 @@ public abstract class ConfigReaderBase implements ConfigReader {
 	@Override
 	public List<? extends ResourceConfig> getResourceList(final String key) {
 		final String resources = get(key);
-		final Iterable<String> split = Splitter.on(",").trimResults().omitEmptyStrings().split(resources);
 		final ArrayList<ResourceConfig> configs = new ArrayList<ResourceConfig>();
+		if (resources == null) {
+			return configs;
+		}
+		final Iterable<String> split = Splitter.on(",").trimResults().omitEmptyStrings().split(resources);
 		for (final String item : split) {
 			final ResourceConfig objectFromId = getObjectFromId(item);
 			if (objectFromId == null) {
