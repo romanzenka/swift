@@ -83,7 +83,7 @@ public class DatabaseUploadStep implements CurationStep {
 		DBInputStream archiveIn = null;
 		try {
 			try {
-				archiveIn = new FASTAInputStream(thpathToUploadedFile
+				archiveIn = new FASTAInputStream(pathToUploadedFile);
 			} catch (Exception e) {
 				//this is not expected to happen
 				recentRunValidation.addMessageAndException("Could not find the file on the server please re-upload", e);
@@ -109,7 +109,7 @@ public class DatabaseUploadStep implements CurationStep {
 		}
 
 		recentRunValidation.setCompletionCount(out.getSequenceCount());
-		thsetLastRunCompletionCountut.getSequenceCount());
+		setLastRunCompletionCount(out.getSequenceCount());
 
 		return recentRunValidation;
 	}
@@ -139,14 +139,15 @@ public class DatabaseUploadStep implements CurationStep {
 	@Override
 	public CurationStep createCopy() {
 		final DatabaseUploadStep copy = new DatabaseUploadStep();
-		copy.setPathToUploadedFile(thpathToUploadedFile
-		copy.setFileName(thgetFileName);
+		copy.setPathToUploadedFile(pathToUploadedFile);
+		copy.setFileName(getFileName());
 		return copy;
 	}
 
 	@Override
 	public Integer getId() {
-		return t id	}
+		return id;
+	}
 
 	@Override
 	public void setId(final Integer id) {
@@ -155,11 +156,12 @@ public class DatabaseUploadStep implements CurationStep {
 
 	@Override
 	public Integer getLastRunCompletionCount() {
-		return t lastRunCompletionCount	}
+		return lastRunCompletionCount;
+	}
 
 	@Override
 	public void setLastRunCompletionCount(final Integer count) {
-		thlastRunCompletionCount count;
+		lastRunCompletionCount = count;
 	}
 
 	/**
@@ -208,6 +210,6 @@ public class DatabaseUploadStep implements CurationStep {
 
 	@Override
 	public String simpleDescription() {
-		return "Upload " + thgetFileName;
+		return "Upload " + getFileName();
 	}
 }
