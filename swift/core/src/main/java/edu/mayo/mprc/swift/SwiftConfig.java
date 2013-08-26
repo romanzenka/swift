@@ -11,7 +11,6 @@ import edu.mayo.mprc.database.DatabaseFactory;
 import edu.mayo.mprc.database.FileType;
 import edu.mayo.mprc.messaging.ActiveMQConnectionPool;
 import edu.mayo.mprc.swift.db.FileTokenFactoryWrapper;
-import edu.mayo.mprc.swift.db.SearchEngine;
 import edu.mayo.mprc.swift.search.SwiftSearcher;
 
 import java.io.File;
@@ -81,14 +80,6 @@ public final class SwiftConfig {
 			}
 		}
 
-		// Make sure that coupled modules (deployer + search engine) referenced by a single searcher are either both defined or both are not
-		for (final ResourceConfig config : swift.getModulesOfConfigType(SwiftSearcher.Config.class)) {
-			final SwiftSearcher.Config searcher = (SwiftSearcher.Config) config;
-			for (final SearchEngine.Config engineConfig : searcher.getEngines()) {
-				checkEngineDeployer(errors, engineConfig.getWorker(), engineConfig.getDeployer(), engineConfig.getCode().toLowerCase(), engineConfig.getCode().toLowerCase() + " deployer");
-			}
-		}
-
 		return errors;
 	}
 
@@ -102,12 +93,6 @@ public final class SwiftConfig {
 		}
 		final DaemonConfig daemon2 = swift.getDaemonForResource(config2);
 		return !daemon1.equals(daemon2);
-	}
-
-	private static void checkEngineDeployer(final List<String> errors, final ServiceConfig searchEngine, final ServiceConfig deployer, final String engineName, final String deployerName) {
-		if (searchEngine != null && deployer == null) {
-			errors.add(engineName + " needs to have a corresponding " + deployerName + " defined.");
-		}
 	}
 
 	/**
