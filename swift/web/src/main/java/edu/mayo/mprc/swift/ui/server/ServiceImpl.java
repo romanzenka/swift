@@ -194,7 +194,7 @@ public final class ServiceImpl extends SpringGwtServlet implements Service, Appl
 		final PeptideReport report = searchInput.isPeptideReport() ? new PeptideReport() : null;
 
 		final List<FileSearch> inputFiles = new ArrayList<FileSearch>(searchInput.getInputFilePaths().length);
-		final EnabledEngines enabledEngines = getEnabledEngines(searchInput.getEnabledEngineCodes(), searchInput.getEnabledEngineVersions());
+		final EnabledEngines enabledEngines = getEnabledEngines(searchInput.getEnabledEngines());
 		final int[] paramSetIds = searchInput.getParamSetIds();
 
 		for (int i = 0; i < searchInput.getInputFilePaths().length; i++) {
@@ -226,17 +226,22 @@ public final class ServiceImpl extends SpringGwtServlet implements Service, Appl
 	/**
 	 * Convert a list of codes to enabled engines.
 	 *
-	 * @param enabledEngineCodes Codes to convert.
+	 * @param enabledEngines Codes to convert.
 	 * @return List of enabled engines.
 	 */
-	private static EnabledEngines getEnabledEngines(final String[] enabledEngineCodes, final String[] enabledEngineVersions) {
-		final EnabledEngines enabledEngines = new EnabledEngines();
-		final int length = enabledEngineCodes.length;
+	private static EnabledEngines getEnabledEngines(final String[] enabledEngines) {
+		final EnabledEngines result = new EnabledEngines();
+		final int length = enabledEngines.length;
 		for (int i = 0; i < length; i++) {
-			final SearchEngineConfig config = new SearchEngineConfig(enabledEngineCodes[i], enabledEngineVersions[i]);
-			enabledEngines.add(config);
+			String engine = enabledEngines[i];
+			int split = engine.indexOf('-');
+			if (split < 0) {
+				throw new MprcException("Engine [" + engine + "] is not in <engine>-<version> format.");
+			}
+			final SearchEngineConfig config = new SearchEngineConfig(engine.substring(0, split), engine.substring(split + 1));
+			result.add(config);
 		}
-		return enabledEngines;
+		return result;
 	}
 
 	private SearchRun getPreviousSearchRun(final ClientSwiftSearchDefinition def, final SwiftSearchDefinition swiftSearch) {

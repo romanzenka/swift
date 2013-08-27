@@ -16,8 +16,7 @@ public final class SearchInput {
 	private String[] biologicalSamples;
 	private String[] categoryNames;
 	private String[] experiments;
-	private String[] enabledEngineCodes;
-	private String[] enabledEngineVersions;
+	private String[] enabledEngines;
 	private int[] paramSetIds;
 	private boolean peptideReport;
 	private boolean fromScratch;
@@ -34,8 +33,7 @@ public final class SearchInput {
 		biologicalSamples = getStringArray(searchInputMap, "biologicalSamples");
 		categoryNames = getStringArray(searchInputMap, "categoryNames");
 		experiments = getStringArray(searchInputMap, "experiments");
-		enabledEngineCodes = getStringArray(searchInputMap, "enabledEngineCodes");
-		enabledEngineVersions = getStringArray(searchInputMap, "enabledEngineVersions");
+		enabledEngines = getStringArray(searchInputMap, "enabledEngines");
 		if (searchInputMap.get("paramSetIds") != null) {
 			// If set, use the values
 			paramSetIds = getIntArray(searchInputMap, "paramSetIds");
@@ -147,20 +145,12 @@ public final class SearchInput {
 		this.experiments = experiments;
 	}
 
-	public String[] getEnabledEngineCodes() {
-		return enabledEngineCodes;
+	public String[] getEnabledEngines() {
+		return enabledEngines;
 	}
 
-	public void setEnabledEngineCodes(final String[] enabledEngineCodes) {
-		this.enabledEngineCodes = enabledEngineCodes;
-	}
-
-	public String[] getEnabledEngineVersions() {
-		return enabledEngineVersions;
-	}
-
-	public void setEnabledEngineVersions(final String[] enabledEngineVersions) {
-		this.enabledEngineVersions = enabledEngineVersions;
+	public void setEnabledEngines(String[] enabledEngines) {
+		this.enabledEngines = enabledEngines;
 	}
 
 	public boolean isPeptideReport() {
