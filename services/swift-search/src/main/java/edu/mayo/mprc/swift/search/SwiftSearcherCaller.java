@@ -35,12 +35,8 @@ public final class SwiftSearcherCaller {
 
 	public static SearchProgressListener startSearch(final int swiftSearchId, final String batchName, final boolean fromScratch, final int priority, final int previousSearchId, final DaemonConnection dispatcherDaemonConnection) {
 		final SearchProgressListener listener = new SearchProgressListener();
-		sendNewSearchToDispatcher(swiftSearchId, batchName, fromScratch, priority, previousSearchId, dispatcherDaemonConnection, listener);
-		return listener;
-	}
-
-	public static void sendNewSearchToDispatcher(final int swiftSearchId, final String batchName, final boolean fromScratch, final int priority, final int previousSearchId, final DaemonConnection dispatcherDaemonConnection, final ProgressListener listener) {
 		sendCallToDispatcher(dispatcherDaemonConnection, swiftSearchId, batchName, fromScratch, priority, previousSearchId, listener);
+		return listener;
 	}
 
 	private static void sendCallToDispatcher(final DaemonConnection connection, final Integer swiftSearchId, final String sBatchName, final boolean fromScratch, final int priority, final int previousSearchId, final ProgressListener listener) {
