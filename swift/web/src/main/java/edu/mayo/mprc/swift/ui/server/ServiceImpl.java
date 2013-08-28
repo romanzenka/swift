@@ -141,16 +141,17 @@ public final class ServiceImpl extends SpringGwtServlet implements Service, Appl
 				parameters = getParamsDao().addSearchEngineParameters(parameters);
 			}
 
+
 			SwiftSearchDefinition swiftSearch = getClientProxyGenerator().convertFrom(def, parameters);
-			validateSearch(swiftSearch);
 
-			final SearchRun previousSearchRun = getPreviousSearchRun(def, swiftSearch);
+			final SearchRun previousSearchRun = getPreviousSearchRun(def.getPreviousSearchRunId(), swiftSearch);
 
-			swiftSearch = getSwiftDao().addSwiftSearchDefinition(swiftSearch);
+			final SwiftSearchDefinition newSwiftSearch = validateAndSaveSearchDefinition(swiftSearch);
+
 			getSwiftDao().commit(); // We must commit here before we send the search over (it is loaded from the database)
 
-			submitSearch(swiftSearch.getId(),
-					swiftSearch.getTitle(),
+			submitSearch(newSwiftSearch.getId(),
+					newSwiftSearch.getTitle(),
 					previousSearchRun == null ? 0 : previousSearchRun.getId(),
 					def.isFromScratch(),
 					def.isLowPriority() ? -1 : 0);
@@ -162,32 +163,46 @@ public final class ServiceImpl extends SpringGwtServlet implements Service, Appl
 	}
 
 	/**
-	 * Start a new Swift search, return its id.
+	 * Start a new Swift search, return its id. Done to support the REST-ful API.
+	 * <p/>
+	 * It creates a swift search definition, validates it, makes sure that the search title is unique,
+	 * saves it to the database.
+	 * <p/>
+	 * The ID of the saved search definition is sent to swift searcher, which then in turn loads the
+	 * definition out of the database and starts performing it. The database is used because
+	 * the searcher logs its progress into the database + it loads data and produces reports,
+	 * all using the database entry.
 	 */
-	public long startNewSearch(final SearchInput searchInput) {
+	public long startSearchRestful(final SearchInput searchInput) {
 		try {
-			swiftDao.begin();
+			getSwiftDao().begin();
 			final SwiftSearchDefinition swiftSearch = createSwiftSearchDefinition(searchInput);
-			validateSearch(swiftSearch);
-			checkSearchTitleUnique(swiftSearch);
-			final SwiftSearchDefinition newSwiftSearch = getSwiftDao().addSwiftSearchDefinition(swiftSearch);
-			swiftDao.commit();
-			swiftDao.begin();
+
+			final SwiftSearchDefinition newSwiftSearch = validateAndSaveSearchDefinition(swiftSearch);
+
+			getSwiftDao().commit();
+			getSwiftDao().begin();
 			long searchRunId = submitSearch(newSwiftSearch.getId(),
 					newSwiftSearch.getTitle(),
 					0,
 					searchInput.isFromScratch(),
 					searchInput.isLowPriority() ? -1 : 0);
-			swiftDao.commit();
+			getSwiftDao().commit();
 			return searchRunId;
 		} catch (Exception e) {
-			swiftDao.rollback();
+			getSwiftDao().rollback();
 			throw new MprcException("New Swift search could not be started", e);
 		}
 	}
 
+	private SwiftSearchDefinition validateAndSaveSearchDefinition(SwiftSearchDefinition swiftSearch) {
+		validateSearch(swiftSearch);
+		hideOlderSearches(swiftSearch);
+		return getSwiftDao().addSwiftSearchDefinition(swiftSearch);
+	}
+
 	private SwiftSearchDefinition createSwiftSearchDefinition(final SearchInput searchInput) {
-		final User user = workspaceDao.getUserByEmail(searchInput.getUserEmail());
+		final User user = getWorkspaceDao().getUserByEmail(searchInput.getUserEmail());
 		final File outputFolder = new File(getBrowseRoot(), searchInput.getOutputFolderName());
 		// TODO: This needs to be passed as a parameter
 		final SpectrumQa qa = new SpectrumQa("conf/msmseval/msmsEval-orbi.params", SpectrumQa.DEFAULT_ENGINE);
@@ -215,7 +230,7 @@ public final class ServiceImpl extends SpringGwtServlet implements Service, Appl
 	private SearchEngineParameters getSearchEngineParameters(int paramSetId) {
 		SearchEngineParameters searchEngineParameters;
 		final SavedSearchEngineParameters searchParameters;
-		searchParameters = paramsDao.getSavedSearchEngineParameters(paramSetId);
+		searchParameters = getParamsDao().getSavedSearchEngineParameters(paramSetId);
 		if (searchParameters == null) {
 			throw new MprcException("Could not find saved search parameters for ID: " + paramSetId);
 		}
@@ -244,12 +259,12 @@ public final class ServiceImpl extends SpringGwtServlet implements Service, Appl
 		return result;
 	}
 
-	private SearchRun getPreviousSearchRun(final ClientSwiftSearchDefinition def, final SwiftSearchDefinition swiftSearch) {
+	private SearchRun getPreviousSearchRun(final int previousSearchRunId, final SwiftSearchDefinition swiftSearch) {
 		boolean rerunPreviousSearch = false;
 		SearchRun previousSearchRun;
-		if (def.getPreviousSearchRunId() > 0) {
+		if (previousSearchRunId > 0) {
 			// We already ran the search before.
-			previousSearchRun = getSwiftDao().getSearchRunForId(def.getPreviousSearchRunId());
+			previousSearchRun = getSwiftDao().getSearchRunForId(previousSearchRunId);
 			if (previousSearchRun.getTitle().equals(swiftSearch.getTitle())) {
 				// The titles match, output folders match, but since this is a reload, it is okay
 				rerunPreviousSearch = true;
@@ -266,16 +281,17 @@ public final class ServiceImpl extends SpringGwtServlet implements Service, Appl
 		} else {
 			previousSearchRun = null;
 		}
-		if (!rerunPreviousSearch) {
-			checkSearchTitleUnique(swiftSearch);
-		}
 		return previousSearchRun;
 	}
 
-	private void checkSearchTitleUnique(final SwiftSearchDefinition swiftSearch) {
-		if (getSwiftDao().isExistingTitle(swiftSearch.getTitle(), swiftSearch.getUser())) {
-			throw new MprcException("There is already a search titled " + swiftSearch.getTitle() + ".");
-		}
+	/**
+	 * When an older search exists in the database that writes output to the same folder,
+	 * it should get hidden so it does not get confused with this search.
+	 *
+	 * @param swiftSearch Current search to hide the older searches.
+	 */
+	private void hideOlderSearches(final SwiftSearchDefinition swiftSearch) {
+		getSwiftDao().hideSearchesWithOutputFolder(swiftSearch.getOutputFolder());
 	}
 
 	private void validateSearch(final SwiftSearchDefinition swiftSearch) {
@@ -754,6 +770,12 @@ public final class ServiceImpl extends SpringGwtServlet implements Service, Appl
 				listSearchEngines(),
 				listSpectrumQaParamFiles(),
 				isScaffoldReportEnabled());
+	}
+
+	@Override
+	public boolean outputFolderExists(final String outputFolder) throws GWTServiceException {
+		final File file = new File(getBrowseRoot(), outputFolder);
+		return file.exists();
 	}
 
 	/**

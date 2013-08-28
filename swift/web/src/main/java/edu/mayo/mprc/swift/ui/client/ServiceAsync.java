@@ -184,4 +184,10 @@ public interface ServiceAsync {
 	void loadSearch(int searchRunId, AsyncCallback<ClientLoadedSearch> async);
 
 	void getInitialPageData(Integer previousSearchId, AsyncCallback<InitialPageData> async);
+
+	/**
+	 * @param outputFolder
+	 * @return True if the given output folder exists. The folder is entered relative to browse root.
+	 */
+	void outputFolderExists(String outputFolder, AsyncCallback<Boolean> async);
 }

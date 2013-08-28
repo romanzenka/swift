@@ -65,7 +65,6 @@ public interface Service extends RemoteService {
 	/**
 	 * Starts search for given definition.
 	 *
-	 *
 	 * @param def Search definition.
 	 * @throws GWTServiceException When anything fails.
 	 */
@@ -73,7 +72,6 @@ public interface Service extends RemoteService {
 
 	/**
 	 * Return search definition for a previous search with given search id.
-	 *
 	 *
 	 * @param searchRunId Id of a search to load.
 	 * @return Search definition
@@ -112,7 +110,6 @@ public interface Service extends RemoteService {
 
 	/**
 	 * Save a copy of the given parameter set (either as a temporary or as a permanent).
-	 *
 	 *
 	 * @param toCopy        the existing ClientParamSet to save a copy of.
 	 * @param newName       name to give the new param set; ignored if permanent is false
@@ -197,4 +194,10 @@ public interface Service extends RemoteService {
 	boolean isDatabaseUndeployerEnabled() throws GWTServiceException;
 
 	InitialPageData getInitialPageData(Integer previousSearchId) throws GWTServiceException;
+
+	/**
+	 * @param outputFolder
+	 * @return True if the given output folder exists. The folder is entered relative to browse root.
+	 */
+	boolean outputFolderExists(String outputFolder) throws GWTServiceException;
 }

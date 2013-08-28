@@ -223,12 +223,6 @@ div.hint {
     margin: 0 0 0.5em 0;
 }
 
-div.warning {
-    background-image: url(images/warning.gif);
-    visibility: hidden; /* background-color: #ffd; */
-    margin: 0;
-}
-
 .label {
     text-align: right;
     width: 20%;
@@ -702,8 +696,6 @@ span.itemlabel {
     font-weight: bold;
     font-size: 10px;
 }
-
-    }
 
 .mods-label-description {
     font-weight: bold;

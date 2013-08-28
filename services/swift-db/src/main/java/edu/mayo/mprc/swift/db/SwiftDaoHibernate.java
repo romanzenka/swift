@@ -566,6 +566,20 @@ public final class SwiftDaoHibernate extends DaoBase implements SwiftDao {
 		return false;
 	}
 
+	@Override
+	public void hideSearchesWithOutputFolder(final File outputFolder) {
+		// This could be done with a single SQL query that updates the database directly, but Hibernate does not support
+		// updates with joins.
+		final List<SearchRun> searchRuns = (List<SearchRun>) getSession()
+				.createQuery("select r from SearchRun as r, SwiftSearchDefinition as d where d.id = r.swiftSearch and (d.outputFolder = :outputFolder or d.outputFolder = :outputFolder2)")
+				.setParameter("outputFolder", outputFolder)
+				.setParameter("outputFolder", new File(outputFolder.getPath() + "/"))
+				.list();
+		for (final SearchRun run : searchRuns) {
+			run.setHidden(1);
+		}
+	}
+
 	private void renameFileReferences(final File from, final File to, final String table, final String field) {
 		LOGGER.info("Renaming all " + table + "." + field);
 		final Query query = getSession().createQuery("update " + table + " as f set f." + field + "=:file where f.id=:id");

@@ -39,7 +39,7 @@ public interface SwiftDao extends Dao, RuntimeInitializer {
 	/**
 	 * get the status information for all the search runs. The list is considered read-only - do not modify those searches.
 	 *
-	 * @param filter Filter for the search runs.
+	 * @param filter      Filter for the search runs.
 	 * @param withReports If true, the reports for the search are fetched as well.
 	 * @return List of all search runs filtered and ordered as {@link SearchRunFilter specifies}.
 	 */
@@ -162,4 +162,11 @@ public interface SwiftDao extends Dao, RuntimeInitializer {
 	 * @return True if the file is being processed in the given search run.
 	 */
 	boolean isFileInSearchRun(String inputFile, SearchRun run);
+
+	/**
+	 * Hide all {@link SearchRun} instances whose output folder matches the specified one.
+	 *
+	 * @param outputFolder Output folder. Searches where this matches get hidden.
+	 */
+	void hideSearchesWithOutputFolder(File outputFolder);
 }

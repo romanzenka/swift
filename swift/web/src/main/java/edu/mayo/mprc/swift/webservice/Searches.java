@@ -31,7 +31,7 @@ public final class Searches {
 			@RequestBody final MultiValueMap<String, String> searchInputMap) {
 		try {
 			final SearchInput searchInput = new SearchInput(searchInputMap);
-			final long searchRunId = swiftService.startNewSearch(searchInput);
+			final long searchRunId = swiftService.startSearchRestful(searchInput);
 			final Search result = new Search(searchRunId, searchInput.getTitle());
 			final Collection<Search> searches = new ArrayList<Search>(1);
 			searches.add(result);

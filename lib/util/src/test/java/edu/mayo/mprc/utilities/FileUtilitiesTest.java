@@ -218,4 +218,12 @@ public final class FileUtilitiesTest {
 		Assert.assertEquals(FileUtilities.unixizeWindowsAbsolutePath("/hi"), "/hi");
 		Assert.assertEquals(FileUtilities.unixizeWindowsAbsolutePath("/weird:path"), "/weird:path");
 	}
+
+	@Test
+	public void shouldNormalizePath() {
+		Assert.assertEquals(FileUtilities.normalizePath("/hello"), "/hello");
+		Assert.assertEquals(FileUtilities.normalizePath("/hello/"), "/hello");
+		Assert.assertEquals(FileUtilities.normalizePath("///hello///"), "/hello");
+		Assert.assertEquals(FileUtilities.normalizePath("/hello/../hello/"), "/hello/../hello");
+	}
 }

@@ -9,6 +9,7 @@ import com.google.gwt.user.client.ui.*;
 import edu.mayo.mprc.swift.ui.client.rpc.*;
 import edu.mayo.mprc.swift.ui.client.rpc.files.FileInfo;
 import edu.mayo.mprc.swift.ui.client.widgets.*;
+import edu.mayo.mprc.swift.ui.client.widgets.validation.ValidationPanel;
 
 import java.util.HashMap;
 import java.util.List;
@@ -29,6 +30,7 @@ public final class SwiftApp implements EntryPoint, HidesPageContentsWhileLoading
 	private FileTable files;
 
 	private TextBox output;
+	private ValidationPanel outputValidationPanel;
 	private PushButton runButton;
 	private PushButton addFileButton;
 	private SimpleParamsEditorPanel paramsEditor;
@@ -111,11 +113,11 @@ public final class SwiftApp implements EntryPoint, HidesPageContentsWhileLoading
 		addFileButton.setEnabled(true);
 	}
 
-	private void initPage(Integer previousSearchId) {
+	private void initPage(final Integer previousSearchId) {
 		hidePageContentsWhileLoading();
 		ServiceConnection.instance().getInitialPageData(previousSearchId, new AsyncCallback<InitialPageData>() {
 			@Override
-			public void onFailure(Throwable caught) {
+			public void onFailure(final Throwable caught) {
 				// SWALLOWED: Fail
 				finalizeFileTableInit();
 				finalizeSpectrumQa(null);
@@ -153,7 +155,7 @@ public final class SwiftApp implements EntryPoint, HidesPageContentsWhileLoading
 		panel.add(additionalSettingsPanel);
 	}
 
-	private void initEnabledEngines(List<ClientSearchEngine> enabledEngines) {
+	private void initEnabledEngines(final List<ClientSearchEngine> enabledEngines) {
 		enabledEnginesPanel = new EnabledEnginesPanel(enabledEngines);
 		final RootPanel panel = RootPanel.get("enginesPanel");
 		if (panel != null) {
@@ -188,7 +190,7 @@ public final class SwiftApp implements EntryPoint, HidesPageContentsWhileLoading
 		title.addChangeListener(titleChangeListener);
 	}
 
-	private void finalizeInitReport(Boolean reportEnabled) {
+	private void finalizeInitReport(final Boolean reportEnabled) {
 		if (reportEnabled) {
 			DOM.setStyleAttribute(DOM.getElementById("reportingRow"), "display", "");
 			reportSetupPanel = new ReportSetupPanel();
@@ -199,7 +201,7 @@ public final class SwiftApp implements EntryPoint, HidesPageContentsWhileLoading
 		}
 	}
 
-	private void initParamsEditor(InitialPageData pageData) {
+	private void initParamsEditor(final InitialPageData pageData) {
 		ParamsEditorApp.onModuleLoad(pageData);
 		paramsEditor = ParamsEditorApp.getPanel();
 	}
@@ -360,7 +362,7 @@ public final class SwiftApp implements EntryPoint, HidesPageContentsWhileLoading
 		}
 	}
 
-	private void initUserList(ClientUser[] list) {
+	private void initUserList(final ClientUser[] list) {
 		// The user listing is downloaded by an async call.
 		final RootPanel userPanel = RootPanel.get("email");
 		userPanel.add(users);
@@ -435,6 +437,12 @@ public final class SwiftApp implements EntryPoint, HidesPageContentsWhileLoading
 			}
 		});
 		outputPanel.add(output);
+
+		final RootPanel outputWarning = RootPanel.get("outputWarning");
+		outputValidationPanel = new ValidationPanel(2);
+
+		outputWarning.add(outputValidationPanel);
+
 		connectOutputLocationAndFileTable();
 		// Fire userChanged to get the output location updated
 		userChanged();
@@ -487,6 +495,7 @@ public final class SwiftApp implements EntryPoint, HidesPageContentsWhileLoading
 				} else {
 					output.setText("");
 				}
+				outputValidationPanel.removeValidationsFor(output);
 				outputPath = null;
 			} else if ((getTitleText() == null) || getTitleText().equals("")) {
 				if (!outputPathChangeEnabled) {
@@ -495,6 +504,7 @@ public final class SwiftApp implements EntryPoint, HidesPageContentsWhileLoading
 				} else {
 					output.setText("");
 				}
+				outputValidationPanel.removeValidationsFor(output);
 				outputPath = null;
 			} else {
 				outputPathSpecial = false;
@@ -509,6 +519,7 @@ public final class SwiftApp implements EntryPoint, HidesPageContentsWhileLoading
 				}
 				outputPath += pathify(getTitleText());
 				output.setText(outputPath);
+				validateOutputPath(output.getText());
 			}
 		} else {
 			// The user can influence output path. Keep whatever was the previous setting, unless
@@ -516,8 +527,26 @@ public final class SwiftApp implements EntryPoint, HidesPageContentsWhileLoading
 			if (outputPathSpecial) {
 				outputPathSpecial = false;
 			}
+			validateOutputPath(output.getText());
 		}
-		// TODO update validation state;
+
+	}
+
+	private void validateOutputPath(String text) {
+		ServiceConnection.instance().outputFolderExists(text, new AsyncCallback<Boolean>() {
+			@Override
+			public void onFailure(Throwable caught) {
+				outputValidationPanel.removeValidationsFor(output);
+			}
+
+			@Override
+			public void onSuccess(Boolean result) {
+				outputValidationPanel.removeValidationsFor(output);
+				if(Boolean.TRUE.equals(result)) {
+					outputValidationPanel.addValidation(new ClientValidation("Folder exists, will be overwritten"), output);
+				}
+			}
+		});
 	}
 
 	private List<ClientFileSearch> getFileSearches() {
@@ -562,7 +591,7 @@ public final class SwiftApp implements EntryPoint, HidesPageContentsWhileLoading
 			updateUserMessage();
 			updateOutputLocation();
 
-			String titleText = title.getText();
+			final String titleText = title.getText();
 
 			if (!titleText.matches(TITLE_ALLOWED)) {
 				Window.alert("The search title " + titleText + " is invalid. Please use only letters, numbers, - + . _ ( ) [ ] { } = # and a space.");
@@ -579,7 +608,7 @@ public final class SwiftApp implements EntryPoint, HidesPageContentsWhileLoading
 				return;
 			}
 
-			List<ClientFileSearch> fileSearches = getFileSearches();
+			final List<ClientFileSearch> fileSearches = getFileSearches();
 			if (fileSearches == null || fileSearches.isEmpty()) {
 				Window.alert("No files added to the search");
 				return;

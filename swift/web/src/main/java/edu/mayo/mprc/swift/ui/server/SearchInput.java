@@ -2,6 +2,7 @@ package edu.mayo.mprc.swift.ui.server;
 
 import org.springframework.util.MultiValueMap;
 
+import java.io.File;
 import java.util.List;
 
 /**
@@ -27,9 +28,12 @@ public final class SearchInput {
 	public SearchInput(final MultiValueMap<String, String> searchInputMap) {
 		title = searchInputMap.getFirst("title");
 		userEmail = searchInputMap.getFirst("userEmail");
-		outputFolderName = searchInputMap.getFirst("outputFolderName");
+		outputFolderName = new File(searchInputMap.getFirst("outputFolderName")).getPath(); // Normalize the path
 		paramSetId = Integer.parseInt(searchInputMap.getFirst("paramSetId"));
-		inputFilePaths = getStringArray(searchInputMap, "inputFilePaths");
+		inputFilePaths = getStringArray(searchInputMap, "inputFilePaths"); // Normalize all the paths
+		for (int i = 0; i < inputFilePaths.length; i++) {
+			inputFilePaths[i] = new File(inputFilePaths[i]).getPath();
+		}
 		biologicalSamples = getStringArray(searchInputMap, "biologicalSamples");
 		categoryNames = getStringArray(searchInputMap, "categoryNames");
 		experiments = getStringArray(searchInputMap, "experiments");

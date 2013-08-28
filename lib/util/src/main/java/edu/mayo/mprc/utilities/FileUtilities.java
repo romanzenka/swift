@@ -1656,6 +1656,15 @@ public final class FileUtilities {
 	}
 
 	/**
+	 * Normalize a given path to remove irregularities (e.g. multiple slashes).
+	 * @param path Path to normalize
+	 * @return Normalized path
+	 */
+	public static String normalizePath(final String path) {
+		return new File(path).getAbsolutePath();
+	}
+
+	/**
 	 * Creates a file from given uri. First attempts normal conversion using File constructor. If that fails,
 	 * it checks whether the URI is opaque, with schema set to file:, and attempts to create the file
 	 * manually from the scheme-specific part.

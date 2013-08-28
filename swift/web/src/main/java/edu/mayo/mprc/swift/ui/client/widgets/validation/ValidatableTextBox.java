@@ -1,6 +1,5 @@
 package edu.mayo.mprc.swift.ui.client.widgets.validation;
 
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.ui.*;
 import edu.mayo.mprc.swift.ui.client.rpc.ClientValue;
 
@@ -29,17 +28,6 @@ public abstract class ValidatableTextBox extends TextBox implements Validatable 
 			@Override
 			public void onChange(final Widget widget) {
 				listeners.fireChange(widget);
-			}
-		});
-		addFocusListener(new FocusListener() {
-			@Override
-			public void onFocus(final Widget widget) {
-
-			}
-
-			@Override
-			public void onLostFocus(final Widget widget) {
-				GWT.log(getParam() + " lost focus", null);
 			}
 		});
 	}

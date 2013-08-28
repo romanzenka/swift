@@ -67,8 +67,8 @@ public final class ValidationPanel extends Composite {
 	}
 
 	private List<ClientValidation> currentValidations = new ArrayList<ClientValidation>();
-	private Map<ClientValidation, Validatable> byValidation = new HashMap<ClientValidation, Validatable>();
-	private Map<Validatable, List<ClientValidation>> byValidatable = new HashMap<Validatable, List<ClientValidation>>();
+	private Map<ClientValidation, Object> byValidation = new HashMap<ClientValidation, Object>();
+	private Map<Object, List<ClientValidation>> byValidatable = new HashMap<Object, List<ClientValidation>>();
 	private VerticalPanel vp = new VerticalPanel();
 	private int numLines;
 	private boolean reflowing;
@@ -85,7 +85,7 @@ public final class ValidationPanel extends Composite {
 	}
 
 
-	public void addValidation(final ClientValidation cv, final Validatable v) {
+	public void addValidation(final ClientValidation cv, final Object v) {
 		if (!currentValidations.contains(cv)) {
 			currentValidations.add(cv);
 			byValidation.put(cv, v);
@@ -105,7 +105,7 @@ public final class ValidationPanel extends Composite {
 		delayedReflow();
 	}
 
-	public void removeValidationsFor(final Validatable v) {
+	public void removeValidationsFor(final Object v) {
 		final List<ClientValidation> al = byValidatable.get(v);
 		if (al == null) {
 			return;
@@ -210,8 +210,14 @@ public final class ValidationPanel extends Composite {
 		}
 
 		public void focus() {
-			final Validatable v = (Validatable) byValidation.get(cv);
-			v.focus();
+			Object o = byValidation.get(cv);
+			if (o instanceof Validatable) {
+				final Validatable v = (Validatable) o;
+				v.focus();
+			} else if (o instanceof Focusable) {
+				final Focusable w = (Focusable) o;
+				w.setFocus(true);
+			}
 		}
 
 	}
