@@ -1,9 +1,8 @@
 package edu.mayo.mprc.config;
 
 import edu.mayo.mprc.MprcException;
+import edu.mayo.mprc.utilities.FileUtilities;
 
-import java.net.InetAddress;
-import java.net.UnknownHostException;
 import java.util.*;
 
 /**
@@ -88,14 +87,8 @@ public final class DaemonConfig implements ResourceConfig, NamedResource {
 
 		if (local) {
 			// Host name set by default to this computer
-			final InetAddress localHost;
-			try {
-				localHost = InetAddress.getLocalHost();
-				final String hostName = localHost.getHostName();
-				daemon.setHostName(hostName);
-			} catch (UnknownHostException ignore) {
-				daemon.setHostName("localhost");
-			}
+			String hostName = FileUtilities.getHostname();
+			daemon.setHostName(hostName);
 		}
 
 		return daemon;

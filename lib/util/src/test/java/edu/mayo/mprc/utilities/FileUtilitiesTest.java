@@ -226,4 +226,17 @@ public final class FileUtilitiesTest {
 		Assert.assertEquals(FileUtilities.normalizePath("///hello///"), "/hello");
 		Assert.assertEquals(FileUtilities.normalizePath("/hello/../hello/"), "/hello/../hello");
 	}
+
+	@Test
+	public void shouldExtractShortHostname() {
+		Assert.assertEquals(FileUtilities.extractShortHostname("hostname.domain.tld"), "hostname");
+		Assert.assertEquals(FileUtilities.extractShortHostname("localhost"), "localhost");
+		Assert.assertEquals(FileUtilities.extractShortHostname("10.20.30.40"), "10.20.30.40");
+		Assert.assertEquals(FileUtilities.extractShortHostname(""), "");
+	}
+
+	@Test(expectedExceptions = NullPointerException.class)
+	public void shouldFailOnNullHostname() {
+		Assert.assertEquals(FileUtilities.extractShortHostname(null), null);
+	}
 }

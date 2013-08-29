@@ -13,8 +13,10 @@ import org.apache.log4j.Logger;
 import javax.annotation.Nullable;
 import java.io.*;
 import java.lang.reflect.Method;
+import java.net.InetAddress;
 import java.net.URI;
 import java.net.URL;
+import java.net.UnknownHostException;
 import java.nio.charset.Charset;
 import java.util.*;
 import java.util.concurrent.Semaphore;
@@ -1617,6 +1619,54 @@ public final class FileUtilities {
 		return length;
 	}
 
+	/**
+	 * @return Hostname of this computer, e.g. <code>hostname.domain.tld</code>
+	 */
+	public static String getHostname() {
+		String hostName;
+		final InetAddress localHost;
+		try {
+			localHost = InetAddress.getLocalHost();
+			hostName = localHost.getHostName();
+		} catch (UnknownHostException ignore) {
+			hostName = "localhost";
+		}
+		return hostName;
+	}
+
+	public static boolean isNumeric(String str) {
+		try {
+			Integer.parseInt(str);
+		} catch (NumberFormatException ignore) {
+			return false;
+		}
+		return true;
+	}
+
+	/**
+	 * @return A short hostname (using {@link #extractShortHostname} of this computer's host name.
+	 */
+	public static String getShortHostname() {
+		return extractShortHostname(getHostname());
+	}
+
+	/**
+	 * @param hostname Hostname to shorten
+	 * @return Short hostname - everything till the first dot, excluding domain. E.g. for <code>hostname.domain.tld</code> you will get <code>hostname</code>
+	 */
+	public static String extractShortHostname(final String hostname) {
+		final int firstDot = hostname.indexOf('.');
+		if (firstDot > 0) {
+			final String result = hostname.substring(0, firstDot);
+			// We happened to get an IP address most likely, let's retain it.
+			if (isNumeric(result)) {
+				return hostname;
+			}
+			return result;
+		}
+		return hostname;
+	}
+
 	private static final class TempFileBackedInputStream extends FileInputStream {
 		private final File backingFile;
 
@@ -1657,6 +1707,7 @@ public final class FileUtilities {
 
 	/**
 	 * Normalize a given path to remove irregularities (e.g. multiple slashes).
+	 *
 	 * @param path Path to normalize
 	 * @return Normalized path
 	 */

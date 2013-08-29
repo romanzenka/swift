@@ -12,6 +12,7 @@ import edu.mayo.mprc.database.FileType;
 import edu.mayo.mprc.messaging.ActiveMQConnectionPool;
 import edu.mayo.mprc.swift.db.FileTokenFactoryWrapper;
 import edu.mayo.mprc.swift.search.SwiftSearcher;
+import edu.mayo.mprc.utilities.FileUtilities;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -97,7 +98,8 @@ public final class SwiftConfig {
 
 	/**
 	 * Returns the daemon the user asked us to run. If the user did not specify anything, and there is just one
-	 * daemon defined, we return that one. Otherwise we throw an exception.
+	 * daemon defined, we return that one. Otherwise we look at the hostname of the machine we run, and attempt
+	 * to find a daemon that matches this hostname. If all fails, we throw an exception.
 	 *
 	 * @param daemonId    ID of the daemon to run.
 	 * @param swiftConfig Current swift config.
@@ -109,21 +111,56 @@ public final class SwiftConfig {
 			// The user did not specify daemon name. If there is only one daemon defined, that is fine - we
 			// will run that one. Otherwise complain.
 			if (swiftConfig.getDaemons().size() > 1) {
-				final StringBuilder builder = new StringBuilder(100);
-				for (final DaemonConfig daemonConfig : swiftConfig.getDaemons()) {
-					builder.append("'");
-					builder.append(daemonConfig.getName());
-					builder.append("', ");
+				daemonIdToLoad = daemonIdMatchingHostname(swiftConfig.getDaemons());
+				if (daemonIdToLoad == null) {
+					throw new MprcException("There is more than one daemon specified in this configuration, none matches the hostname.\n"
+							+ "Run Swift with --daemon set to one of: " + joinDaemonNames(swiftConfig));
 				}
-				builder.setLength(builder.length() - 2);
-				throw new MprcException("There is more than one daemon specified in this configuration.\n"
-						+ "Run Swift with --daemon set to one of: " + builder);
+			} else {
+				daemonIdToLoad = swiftConfig.getDaemons().get(0).getName();
 			}
-			daemonIdToLoad = swiftConfig.getDaemons().get(0).getName();
 		} else {
 			daemonIdToLoad = daemonId;
 		}
 		return swiftConfig.getDaemonConfig(daemonIdToLoad);
+	}
+
+	/**
+	 * Return id of the daemon that matches the current hostname.
+	 *
+	 * @param daemons List of daemons to check.
+	 * @return Daemon id matching hostname, null if none found.
+	 */
+	private static String daemonIdMatchingHostname(final Iterable<DaemonConfig> daemons) {
+		final String hostname = FileUtilities.getHostname();
+		for (final DaemonConfig config : daemons) {
+			if (hostname.equalsIgnoreCase(config.getHostName())) {
+				return config.getName();
+			}
+		}
+
+		final String shortHostname = FileUtilities.getShortHostname();
+		for (final DaemonConfig config : daemons) {
+			if (shortHostname.equalsIgnoreCase(FileUtilities.extractShortHostname(config.getHostName()))) {
+				return config.getName();
+			}
+		}
+
+		return null;
+	}
+
+	/**
+	 * Join names of all daemons defined in this config.
+	 */
+	private static String joinDaemonNames(ApplicationConfig swiftConfig) {
+		final StringBuilder builder = new StringBuilder(100);
+		for (final DaemonConfig daemonConfig : swiftConfig.getDaemons()) {
+			builder.append("'");
+			builder.append(daemonConfig.getName());
+			builder.append("', ");
+		}
+		builder.setLength(builder.length() - 2);
+		return builder.toString();
 	}
 
 	/**
