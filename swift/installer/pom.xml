@@ -6,7 +6,8 @@
     <artifactId>swift-installer</artifactId>
     <packaging>pom</packaging>
     <version>3.6-SNAPSHOT</version>
-    <name>Swift Installer</name>
+    <name>Swift</name>
+    <description>Generates Swift's installer artifacts ready for distribution</description>
     <url>http://github.com/romanzenka/swift</url>
     <inceptionYear>2007</inceptionYear>
 
@@ -32,6 +33,7 @@
             <artifactId>launcher</artifactId>
             <version>3.5-SNAPSHOT</version>
         </dependency>
+        <!-- This dependency does not seem to be getting picked by appassembler -->
         <dependency>
             <groupId>edu.mayo.mprc</groupId>
             <artifactId>swift-web</artifactId>
@@ -40,6 +42,7 @@
         </dependency>
         <!-- The .war file will not list transitive dependencies, and our .war is 'skinny'. -->
         <!-- Take the dependencies from the .war by linking to the swift-web as a pom artifact -->
+        <!-- This is probably not honored by the appassembler plugin -->
         <dependency>
             <groupId>edu.mayo.mprc</groupId>
             <artifactId>swift-web</artifactId>
@@ -96,6 +99,50 @@
                             <platforms>
                                 <platform>jsw</platform>
                             </platforms>
+                            <generatorConfigurations>
+                                <generatorConfiguration>
+                                    <generator>jsw</generator>
+                                    <includes>
+                                          <include>linux-x86-32</include>
+                                          <include>linux-x86-64</include>
+                                          <include>windows-x86-32</include>
+                                        </includes>
+                                    <configuration>
+                                        <property>
+                                           <name>wrapper.logfile</name>
+                                           <value>var/log/wrapper.log</value>
+                                         </property>
+                                        <property>
+                                            <name>wrapper.console.title</name>
+                                            <value>Swift</value>
+                                        </property>
+                                        <property>
+                                            <name>wrapper.ntservice.displayname</name>
+                                            <value>Swift</value>
+                                        </property>
+                                        <property>
+                                            <name>wrapper.ntservice.description</name>
+                                            <value>Proteomics workflow daemon running multiple services</value>
+                                        </property>
+                                        <property>
+                                            <name>wrapper.pidfile</name>
+                                            <value>../var</value>
+                                        </property>
+                                        <property>
+                                            <name>wrapper.java.library.path.append_system_path</name>
+                                            <value>true</value>
+                                        </property>
+                                        <property>
+                                            <name>wrapper.java.library.path.2</name>
+                                            <value>/usr/lib64</value>
+                                        </property>
+                                        <property>
+                                            <name>set.SGE_ROOT</name>
+                                            <value>/usr/share/gridengine</value>
+                                        </property>
+                                    </configuration>
+                                </generatorConfiguration>
+                            </generatorConfigurations>
                         </daemon>
                     </daemons>
                 </configuration>
@@ -119,7 +166,7 @@
                             <goal>single</goal>
                         </goals>
                         <configuration>
-                            <finalName>swift-3.5</finalName>
+                            <finalName>swift-3.6</finalName>
                             <descriptors>
                                 <descriptor>assembly.xml</descriptor>
                             </descriptors>

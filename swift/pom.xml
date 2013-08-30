@@ -5,7 +5,7 @@
     <artifactId>swift</artifactId>
     <packaging>pom</packaging>
     <version>3.5-SNAPSHOT</version>
-    <name>Swift</name>
+    <name>Swift Modules</name>
     <url>http://swift.mayo.edu</url>
     <parent>
         <groupId>edu.mayo.mprc</groupId>

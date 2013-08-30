@@ -21,11 +21,8 @@
             <directoryMode>755</directoryMode>
         </fileSet>
         <fileSet>
-            <directory>target/generated-resources/appassembler/jsw/swift</directory>
-            <includes>
-                <include>bin/**</include>
-            </includes>
-            <outputDirectory></outputDirectory>
+            <directory>target/generated-resources/appassembler/jsw/swift/bin</directory>
+            <outputDirectory>bin</outputDirectory>
             <filtered>false</filtered>
             <fileMode>755</fileMode>
             <directoryMode>755</directoryMode>
@@ -34,12 +31,21 @@
     <dependencySets>
         <dependencySet>
             <useProjectArtifact>false</useProjectArtifact>
+            <unpack>false</unpack>
+            <fileMode>755</fileMode>
+            <outputDirectory>lib</outputDirectory>
+            <includes>
+                <include>edu.mayo.mprc:swift-web:war:3.5-SNAPSHOT</include>
+            </includes>
+        </dependencySet>
+        <dependencySet>
+            <useProjectArtifact>false</useProjectArtifact>
             <unpack>true</unpack>
             <fileMode>755</fileMode>
             <directoryMode>755</directoryMode>
             <outputDirectory></outputDirectory>
             <includes>
-                <include>edu.mayo.mprc:swift-scripts:jar:3.6-SNAPSHOT</include>
+                <include>edu.mayo.mprc:swift-scripts:jar:3.5-SNAPSHOT</include>
                 <include>edu.mayo.mprc:install-exe:jar:3.6-SNAPSHOT</include>
             </includes>
             <unpackOptions>
