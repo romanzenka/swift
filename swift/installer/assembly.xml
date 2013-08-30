@@ -9,27 +9,29 @@
     <includeBaseDirectory>true</includeBaseDirectory>
     <baseDirectory>swift-3.5</baseDirectory>
     <includeSiteDirectory>false</includeSiteDirectory>
-    <dependencySets>
-        <dependencySet>
-            <useProjectArtifact>false</useProjectArtifact>
-            <unpack>false</unpack>
+    <fileSets>
+        <fileSet>
+            <directory>target/generated-resources/appassembler/jsw/swift</directory>
+            <excludes>
+                <exclude>bin/**</exclude>
+            </excludes>
+            <outputDirectory></outputDirectory>
+            <filtered>false</filtered>
+            <fileMode>644</fileMode>
+            <directoryMode>755</directoryMode>
+        </fileSet>
+        <fileSet>
+            <directory>target/generated-resources/appassembler/jsw/swift</directory>
+            <includes>
+                <include>bin/**</include>
+            </includes>
+            <outputDirectory></outputDirectory>
+            <filtered>false</filtered>
             <fileMode>755</fileMode>
             <directoryMode>755</directoryMode>
-            <outputDirectory>bin/swift</outputDirectory>
-            <excludes>
-                <exclude>edu.mayo.mprc:swift-scripts:jar:3.5-SNAPSHOT</exclude>
-                <exclude>edu.mayo.mprc:install:jar:3.5-SNAPSHOT</exclude>
-                <exclude>edu.mayo.mprc:install-exe:jar:3.5-SNAPSHOT</exclude>
-                <!-- Exclude the pom from the transitive war dependency collection -->
-                <exclude>edu.mayo.mprc:swift-web:pom:3.5-SNAPSHOT</exclude>
-            </excludes>
-            <unpackOptions>
-                <excludes>
-                    <exclude>**/META-INF</exclude>
-                    <exclude>**/META-INF/**</exclude>
-                </excludes>
-            </unpackOptions>
-        </dependencySet>
+        </fileSet>
+    </fileSets>
+    <dependencySets>
         <dependencySet>
             <useProjectArtifact>false</useProjectArtifact>
             <unpack>true</unpack>

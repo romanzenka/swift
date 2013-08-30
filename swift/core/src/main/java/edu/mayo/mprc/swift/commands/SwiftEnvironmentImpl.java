@@ -15,7 +15,10 @@ import edu.mayo.mprc.swift.search.SwiftSearcher;
 import edu.mayo.mprc.utilities.FileUtilities;
 import edu.mayo.mprc.utilities.exceptions.ExceptionUtilities;
 import joptsimple.OptionParser;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
+import javax.annotation.Resource;
 import java.io.File;
 import java.util.List;
 
@@ -24,6 +27,7 @@ import java.util.List;
  * it can initialize itself using the various switches and then run Swift using
  * {@link #runSwiftCommand}.
  */
+@Component("swiftEnvironment")
 public final class SwiftEnvironmentImpl implements SwiftEnvironment {
 	private FileTokenFactory fileTokenFactory;
 	private Daemon.Factory daemonFactory;
@@ -49,6 +53,9 @@ public final class SwiftEnvironmentImpl implements SwiftEnvironment {
 	 * @return Loaded Swift configuration.
 	 */
 	private static ApplicationConfig loadSwiftConfig(final File configFile, final MultiFactory swiftFactory) {
+		if (configFile == null) {
+			return null;
+		}
 		final ApplicationConfig swiftConfig = ApplicationConfig.load(configFile.getAbsoluteFile(), swiftFactory);
 		checkConfig(swiftConfig);
 		return swiftConfig;
@@ -117,6 +124,7 @@ public final class SwiftEnvironmentImpl implements SwiftEnvironment {
 		return fileTokenFactory;
 	}
 
+	@Resource(name = "fileTokenFactory")
 	public void setFileTokenFactory(final FileTokenFactory fileTokenFactory) {
 		this.fileTokenFactory = fileTokenFactory;
 	}
@@ -125,6 +133,7 @@ public final class SwiftEnvironmentImpl implements SwiftEnvironment {
 		return daemonFactory;
 	}
 
+	@Resource(name = "daemonFactory")
 	public void setDaemonFactory(final Daemon.Factory factory) {
 		daemonFactory = factory;
 	}
@@ -133,6 +142,7 @@ public final class SwiftEnvironmentImpl implements SwiftEnvironment {
 		return swiftFactory;
 	}
 
+	@Resource(name = "resourceTable")
 	public void setSwiftFactory(final MultiFactory swiftFactory) {
 		this.swiftFactory = swiftFactory;
 	}
@@ -141,6 +151,7 @@ public final class SwiftEnvironmentImpl implements SwiftEnvironment {
 		return commands;
 	}
 
+	@Autowired
 	public void setCommands(final List<SwiftCommand> commands) {
 		this.commands = commands;
 	}
@@ -149,6 +160,7 @@ public final class SwiftEnvironmentImpl implements SwiftEnvironment {
 		return daemonConnectionFactory;
 	}
 
+	@Resource(name = "daemonConnectionFactory")
 	public void setDaemonConnectionFactory(DaemonConnectionFactory daemonConnectionFactory) {
 		this.daemonConnectionFactory = daemonConnectionFactory;
 	}
@@ -157,6 +169,7 @@ public final class SwiftEnvironmentImpl implements SwiftEnvironment {
 		return connectionPool;
 	}
 
+	@Resource(name = "connectionPool")
 	public void setConnectionPool(ActiveMQConnectionPool connectionPool) {
 		this.connectionPool = connectionPool;
 	}
@@ -243,6 +256,7 @@ public final class SwiftEnvironmentImpl implements SwiftEnvironment {
 		return monitor;
 	}
 
+	@Resource(name = "swiftMonitor")
 	public void setMonitor(SwiftMonitor monitor) {
 		this.monitor = monitor;
 	}

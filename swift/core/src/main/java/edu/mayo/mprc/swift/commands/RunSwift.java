@@ -12,7 +12,9 @@ import edu.mayo.mprc.utilities.FileListener;
 import edu.mayo.mprc.utilities.FileMonitor;
 import edu.mayo.mprc.utilities.FileUtilities;
 import org.apache.log4j.Logger;
+import org.springframework.stereotype.Component;
 
+import javax.annotation.Resource;
 import java.io.File;
 import java.util.Collection;
 import java.util.concurrent.CountDownLatch;
@@ -22,6 +24,7 @@ import java.util.concurrent.CountDownLatch;
  *
  * @author Roman Zenka
  */
+@Component("swiftRunCommand")
 public class RunSwift implements FileListener, SwiftCommand {
 	private static final Logger LOGGER = Logger.getLogger(RunSwift.class);
 	public static final String RUN_SWIFT = "run-swift";
@@ -29,6 +32,9 @@ public class RunSwift implements FileListener, SwiftCommand {
 	private final CountDownLatch configFileChanged = new CountDownLatch(1);
 	private ActiveMQConnectionPool connectionPool;
 	private ServiceFactory serviceFactory;
+
+	private SwiftCommand runSwiftWeb;
+	private SwiftCommand runSwiftConfig;
 
 	@Override
 	public String getName() {
@@ -48,7 +54,13 @@ public class RunSwift implements FileListener, SwiftCommand {
 		final DaemonConfig config = environment.getDaemonConfig();
 		final File configFile = environment.getConfigFile();
 
-		checkDoesNotContainWebModule(config);
+		if (config == null || configFile == null) {
+			return getRunSwiftConfig().run(environment);
+		}
+
+		if (containsWebModule(config)) {
+			return getRunSwiftWeb().run(environment);
+		}
 
 		serviceFactory.initialize(environment.getMessageBroker().getBrokerUrl(), config.getName());
 		final Daemon daemon = environment.createDaemon(config);
@@ -108,14 +120,13 @@ public class RunSwift implements FileListener, SwiftCommand {
 	 *
 	 * @param config Config of the deamon we are trying to run.
 	 */
-	private static void checkDoesNotContainWebModule(final DaemonConfig config) {
+	private static boolean containsWebModule(final DaemonConfig config) {
 		for (final ResourceConfig resourceConfig : config.getResources()) {
 			if (resourceConfig instanceof WebUi.Config) {
-				throw new MprcException("The configuration of daemon '" + config.getName() + "' contains Swift website setup.\n"
-						+ "This daemon has to run within a web server. Please use:\n\tswiftWeb --daemon " + config.getName()
-						+ "\ninstead of\n\tswift --daemon " + config.getName());
+				return true;
 			}
 		}
+		return false;
 	}
 
 	@Override
@@ -127,6 +138,7 @@ public class RunSwift implements FileListener, SwiftCommand {
 		return connectionPool;
 	}
 
+	@Resource(name = "connectionPool")
 	public void setConnectionPool(ActiveMQConnectionPool connectionPool) {
 		this.connectionPool = connectionPool;
 	}
@@ -135,7 +147,26 @@ public class RunSwift implements FileListener, SwiftCommand {
 		return serviceFactory;
 	}
 
+	@Resource(name = "serviceFactory")
 	public void setServiceFactory(ServiceFactory serviceFactory) {
 		this.serviceFactory = serviceFactory;
+	}
+
+	public SwiftCommand getRunSwiftWeb() {
+		return runSwiftWeb;
+	}
+
+	@Resource(name = "swiftRunWebCommand")
+	public void setRunSwiftWeb(SwiftCommand runSwiftWeb) {
+		this.runSwiftWeb = runSwiftWeb;
+	}
+
+	public SwiftCommand getRunSwiftConfig() {
+		return runSwiftConfig;
+	}
+
+	@Resource(name="swiftRunConfigCommand")
+	public void setRunSwiftConfig(SwiftCommand runSwiftConfig) {
+		this.runSwiftConfig = runSwiftConfig;
 	}
 }

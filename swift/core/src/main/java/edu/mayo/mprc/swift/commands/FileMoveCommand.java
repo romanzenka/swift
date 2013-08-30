@@ -4,7 +4,9 @@ import edu.mayo.mprc.MprcException;
 import edu.mayo.mprc.swift.ExitCode;
 import edu.mayo.mprc.swift.db.SwiftDao;
 import edu.mayo.mprc.swift.search.SwiftSearcher;
+import org.springframework.stereotype.Component;
 
+import javax.annotation.Resource;
 import java.io.File;
 
 
@@ -18,6 +20,7 @@ import java.io.File;
  *
  * @author Roman Zenka
  */
+@Component("fileMoveCommand")
 public final class FileMoveCommand implements SwiftCommand {
 	private SwiftDao swiftDao;
 
@@ -67,6 +70,7 @@ public final class FileMoveCommand implements SwiftCommand {
 		return swiftDao;
 	}
 
+	@Resource(name = "swiftDao")
 	public void setSwiftDao(SwiftDao swiftDao) {
 		this.swiftDao = swiftDao;
 	}

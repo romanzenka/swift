@@ -131,51 +131,6 @@
         <property name="serviceFactory" ref="serviceFactory"/>
     </bean>
 
-    <bean id="swiftEnvironment" class="edu.mayo.mprc.swift.commands.SwiftEnvironmentImpl">
-        <property name="fileTokenFactory" ref="fileTokenFactory"/>
-        <property name="daemonFactory" ref="daemonFactory"/>
-        <property name="swiftFactory" ref="resourceTable"/>
-        <property name="monitor" ref="swiftMonitor"/>
-        <property name="daemonConnectionFactory" ref="daemonConnectionFactory"/>
-        <property name="connectionPool" ref="connectionPool"/>
-        <property name="commands">
-            <list>
-                <bean id="helpCommand" class="edu.mayo.mprc.swift.commands.DisplayHelp"/>
-                <bean id="swiftRunCommand" class="edu.mayo.mprc.swift.commands.RunSwift">
-                    <property name="connectionPool" ref="connectionPool"/>
-                    <property name="serviceFactory" ref="serviceFactory"/>
-                </bean>
-                <ref bean="sgeRunCommand"/>
-                <ref bean="loadToSearchDbCommand"/>
-                <ref bean="loadRawMetadataCommand"/>
-                <ref bean="fileMoveCommand"/>
-                <ref bean="upgradeUnimodCommand"/>
-            </list>
-        </property>
-    </bean>
-
-    <bean class="edu.mayo.mprc.swift.commands.FileMoveCommand" id="fileMoveCommand">
-        <property name="swiftDao" ref="swiftDao"/>
-    </bean>
-
-    <bean class="edu.mayo.mprc.swift.commands.LoadToSearchDb" id="loadToSearchDbCommand">
-        <property name="dao" ref="swiftDao"/>
-        <property name="searchDbDao" ref="searchDbDao"/>
-        <property name="fileTokenFactory" ref="fileTokenFactory"/>
-    </bean>
-
-    <bean class="edu.mayo.mprc.swift.commands.LoadRawMetadata" id="loadRawMetadataCommand">
-        <property name="searchDbDao" ref="searchDbDao"/>
-        <property name="fileTokenFactory" ref="fileTokenFactory"/>
-    </bean>
-
-    <bean class="edu.mayo.mprc.swift.commands.RunSge" id="sgeRunCommand">
-        <property name="swiftSge" ref="swiftSge"/>
-    </bean>
-
-    <bean class="edu.mayo.mprc.swift.commands.UpgradeUnimodCommand" id="upgradeUnimodCommand">
-    </bean>
-
     <bean id="serviceFactory" class="edu.mayo.mprc.messaging.ServiceFactory">
         <property name="connectionPool" ref="connectionPool"/>
     </bean>

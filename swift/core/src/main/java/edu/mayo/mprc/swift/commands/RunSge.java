@@ -2,12 +2,15 @@ package edu.mayo.mprc.swift.commands;
 
 import edu.mayo.mprc.swift.ExitCode;
 import edu.mayo.mprc.swift.SgeJobRunner;
+import org.springframework.stereotype.Component;
 
+import javax.annotation.Resource;
 import java.io.File;
 
 /**
  * @author Roman Zenka
  */
+@Component("sgeRunCommand")
 public class RunSge implements SwiftCommand {
 	public static final String COMMAND = "sge";
 	private SgeJobRunner swiftSge;
@@ -33,6 +36,7 @@ public class RunSge implements SwiftCommand {
 		return swiftSge;
 	}
 
+	@Resource(name = "swiftSge")
 	public void setSwiftSge(final SgeJobRunner swiftSge) {
 		this.swiftSge = swiftSge;
 	}

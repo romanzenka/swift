@@ -1,12 +1,11 @@
 package edu.mayo.mprc.launcher;
 
 import edu.mayo.mprc.MprcException;
-import edu.mayo.mprc.config.AppConfigReader;
-import edu.mayo.mprc.config.ApplicationConfig;
 import edu.mayo.mprc.config.DaemonConfig;
 import edu.mayo.mprc.config.ResourceConfig;
-import edu.mayo.mprc.config.generic.GenericFactory;
-import edu.mayo.mprc.config.generic.GenericResource;
+import edu.mayo.mprc.swift.ExitCode;
+import edu.mayo.mprc.swift.WebUi;
+import edu.mayo.mprc.swift.commands.SwiftEnvironment;
 import edu.mayo.mprc.utilities.CommandLine;
 import edu.mayo.mprc.utilities.FileListener;
 import edu.mayo.mprc.utilities.FileMonitor;
@@ -21,7 +20,6 @@ import org.mortbay.jetty.webapp.WebAppContext;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.net.InetAddress;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
@@ -55,6 +53,7 @@ public final class Launcher implements FileListener {
 	public static final String WAR_OPTION = "war";
 	private final Object stopMonitor = new Object();
 	private volatile boolean restartRequested = false;
+	private SwiftEnvironment swiftEnvironment;
 
 	private static final int EXIT_CODE_OK = 0;
 	private static final int EXIT_CODE_ERROR = 1;
@@ -64,19 +63,17 @@ public final class Launcher implements FileListener {
 	// Enlarge the header buffer size as we use large cookies to store the currently opened directories
 	public static final int HEADER_BUFFER_SIZE = 65536;
 
-	public static void main(final String[] args) {
-		final Launcher launcher = new Launcher();
-		launcher.runLauncher(args);
+	public Launcher() {
 	}
 
-	private void runLauncher(final String[] args) {
+	public ExitCode runLauncher(final String[] args, final SwiftEnvironment swiftEnvironment) {
+		this.swiftEnvironment = swiftEnvironment;
 		final OptionParser parser = new OptionParser();
 		parser.accepts(CONFIG_OPTION, "Reconfigure Swift. Will run a web server with the configuration screen on a given --port");
 		parser.accepts(INSTALL_OPTION, "Installation config file. If not specified, Swift will run in configuration mode and produce this file. Default is " + CONFIG_FILE_NAME + ".").withRequiredArg().ofType(File.class);
 		parser.accepts(DAEMON_OPTION, "Daemon to be run. Will run the daemon defined by the given name in the config file. If there is only one daemon defined in the config file, the daemon will be run and this flag is disregarded.").withRequiredArg().describedAs("Daemon name").ofType(String.class);
 		parser.accepts(PORT_OPTION, "Port to run the configuration web server on. Default is " + DEFAULT_PORT + ".").withRequiredArg().ofType(Integer.class);
 		parser.accepts(WAR_OPTION, "Path to swift.war file. This is needed only when running config or the web part of Swift. Default is swift.war in the local directory.").withRequiredArg().ofType(File.class);
-		parser.acceptsAll(Arrays.asList("help", "?"), "Show this help screen");
 		OptionSet options = null;
 
 		try {
@@ -86,7 +83,7 @@ public final class Launcher implements FileListener {
 			displayHelpMessage(parser);
 			System.exit(EXIT_CODE_ERROR);
 		}
-		if (options == null || options.has("?")) {
+		if (options == null) {
 			displayHelpMessage(parser);
 			System.exit(EXIT_CODE_OK);
 		}
@@ -99,17 +96,21 @@ public final class Launcher implements FileListener {
 				configFile = new File(CONFIG_FILE_NAME);
 			}
 			// We are running configured Swift with web server enabled
-			runWebServer(options, configFile, CONFIG_OPTION);
+			final Server webServer = runWebServer(options, configFile, CONFIG_OPTION);
+
+			return shutdownWhenRestartRequested(webServer) ? ExitCode.Restart : ExitCode.Ok;
 		} else {
 			final File installPropertyFile = CommandLine.findFile(options, INSTALL_OPTION, "installation config file", CONFIG_FILE_NAME);
 
 			final FileMonitor monitor = new FileMonitor(POLLING_INTERVAL);
-			monitor.fileToBeChanged(installPropertyFile, this);
+			if (installPropertyFile != null) {
+				monitor.fileToBeChanged(installPropertyFile, this);
+			}
 
 			// This method will exit once the web server is up and running
 			final Server webServer = runWebServer(options, installPropertyFile, "production");
 
-			System.exit(shutdownWhenRestartRequested(webServer) ? EXIT_CODE_RESTART : EXIT_CODE_OK);
+			return shutdownWhenRestartRequested(webServer) ? ExitCode.Restart : ExitCode.Ok;
 		}
 	}
 
@@ -145,11 +146,14 @@ public final class Launcher implements FileListener {
 	}
 
 	private Server runWebServer(final OptionSet options, final File configFile, final String action) {
-		final File warFile = CommandLine.findFile(options, WAR_OPTION, "swift web interface file", "swift.war");
+		final File warFile = CommandLine.findFile(options, WAR_OPTION, "swift web interface file", "lib/swift-web-3.5-SNAPSHOT.war");
+		if (warFile == null) {
+			throw new MprcException("Could not locate the swift's war file");
+		}
 
 		final String daemonId = getDaemonId(options);
-		final int portNumber = getPortNumber(options, configFile, daemonId);
-		final File tempFolder = getTempFolder(options, configFile, daemonId);
+		final int portNumber = getPortNumber(options, configFile);
+		final File tempFolder = getTempFolder(options, configFile);
 
 		final Server server = new Server(portNumber);
 		for (final Connector connector : server.getConnectors()) {
@@ -235,34 +239,34 @@ public final class Launcher implements FileListener {
 		}
 	}
 
-	static File getTempFolder(final OptionSet options, final File configFile, final String daemonId) {
+	File getTempFolder(final OptionSet options, final File configFile) {
 		File tempFolder = null;
 		try {
-			final DaemonConfig daemonConfig = getDaemonConfig(configFile, daemonId);
+			final DaemonConfig daemonConfig = swiftEnvironment.getDaemonConfig();
 			tempFolder = new File(daemonConfig.getTempFolderPath());
 		} catch (Exception e) {
 			tempFolder = FileUtilities.getDefaultTempDirectory();
 			if (!configNode(options)) {
-				LOGGER.warn("Could not parse the config file " + configFile.getPath() + " to obtain temporary daemon folder. Using default " + tempFolder, e);
+				LOGGER.warn("Could not parse the config file " + (configFile == null ? "<null>" : configFile.getPath()) + " to obtain temporary daemon folder. Using default " + tempFolder, e);
 			}
 		}
 		return tempFolder;
 	}
 
-	static int getPortNumber(final OptionSet options, final File configFile, final String daemonId) {
+	int getPortNumber(final OptionSet options, final File configFile) {
 		final int portNumber;
 		if (options != null && options.has(PORT_OPTION)) {
 			portNumber = (Integer) options.valueOf(PORT_OPTION);
 		} else {
 			try {
-				final GenericResource webUi = getResourceConfig(configFile, daemonId, "webUi");
-				return Integer.parseInt(webUi.get(PORT_OPTION));
+				final WebUi.Config webUi = (WebUi.Config)getResourceConfig(WebUi.Config.class);
+				return Integer.parseInt(webUi.getPort());
 			} catch (Exception e) {
 				if (configNode(options)) {
 					// We are configuring Swift, no wonder config file is not present
 					LOGGER.info("Default port used for config: " + DEFAULT_PORT);
 				} else {
-					LOGGER.warn("Could not parse the config file " + configFile.getPath() + " to obtain web port number. Using default " + DEFAULT_PORT, e);
+					LOGGER.warn("Could not parse the config file " + (configFile == null ? "<null>" : configFile.getPath()) + " to obtain web port number. Using default " + DEFAULT_PORT, e);
 				}
 				portNumber = DEFAULT_PORT;
 			}
@@ -270,37 +274,21 @@ public final class Launcher implements FileListener {
 		return portNumber;
 	}
 
-	private static boolean configNode(OptionSet options) {
+	private static boolean configNode(final OptionSet options) {
 		return options != null && options.has(CONFIG_OPTION);
 	}
 
-	static GenericResource getResourceConfig(final File configFile, final String daemonId, final String type) {
-		final DaemonConfig daemonConfig = getDaemonConfig(configFile, daemonId);
+	ResourceConfig getResourceConfig(final Class clazz) {
+		final DaemonConfig daemonConfig = swiftEnvironment.getDaemonConfig();
+		if (daemonConfig == null) {
+			return null;
+		}
 		for (final ResourceConfig resource : daemonConfig.getResources()) {
-			if (resource instanceof GenericResource) {
-				final GenericResource r = (GenericResource) resource;
-				if (type.equals(r.getType())) {
-					return r;
-				}
+			if (clazz.isAssignableFrom(resource.getClass())) {
+				return resource;
 			}
 		}
-		throw new MprcException("Resource of type " + type + " not defined in daemon " + daemonId);
-	}
-
-	static DaemonConfig getDaemonConfig(final File configFile, final String daemonId) {
-		final GenericFactory readerFactory = new GenericFactory();
-		AppConfigReader reader = new AppConfigReader(configFile, readerFactory);
-		ApplicationConfig appConfig = reader.load();
-		if (daemonId == null) {
-			return appConfig.getDaemons().get(0);
-		} else {
-			for (final DaemonConfig config : appConfig.getDaemons()) {
-				if (daemonId.equals(config.getName())) {
-					return config;
-				}
-			}
-		}
-		throw new MprcException("Could not find daemon [" + daemonId + "] in configuration file [" + configFile.getAbsolutePath() + "]");
+		throw new MprcException("Resource of type " + clazz.getSimpleName() + " not defined in daemon");
 	}
 
 	private static void displayHelpMessage(final OptionParser parser) {

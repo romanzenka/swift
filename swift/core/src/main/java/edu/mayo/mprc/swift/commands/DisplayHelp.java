@@ -4,10 +4,12 @@ import edu.mayo.mprc.ReleaseInfoCore;
 import edu.mayo.mprc.swift.ExitCode;
 import edu.mayo.mprc.utilities.FileUtilities;
 import org.apache.log4j.Logger;
+import org.springframework.stereotype.Component;
 
 /**
  * @author Roman Zenka
  */
+@Component("helpCommand")
 public class DisplayHelp implements SwiftCommand {
 	private static final Logger LOGGER = Logger.getLogger(DisplayHelp.class);
 	public static final String COMMAND = "help";

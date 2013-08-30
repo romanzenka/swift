@@ -28,7 +28,9 @@ import edu.mayo.mprc.workflow.engine.WorkflowEngine;
 import edu.mayo.mprc.workflow.persistence.TaskState;
 import org.apache.log4j.Logger;
 import org.joda.time.Interval;
+import org.springframework.stereotype.Component;
 
+import javax.annotation.Resource;
 import java.io.File;
 import java.text.MessageFormat;
 import java.util.ArrayList;
@@ -38,6 +40,7 @@ import java.util.List;
 /**
  * @author Roman Zenka
  */
+@Component("loadToSearchDbCommand")
 public final class LoadToSearchDb implements SwiftCommand {
 	private static final Logger LOGGER = Logger.getLogger(LoadToSearchDb.class);
 	public static final int BATCH_SIZE = 3;
@@ -376,6 +379,7 @@ public final class LoadToSearchDb implements SwiftCommand {
 		return dao;
 	}
 
+	@Resource(name="swiftDao")
 	public void setDao(final SwiftDao dao) {
 		this.dao = dao;
 	}
@@ -384,6 +388,7 @@ public final class LoadToSearchDb implements SwiftCommand {
 		return searchDbDao;
 	}
 
+	@Resource(name="searchDbDao")
 	public void setSearchDbDao(final SearchDbDao searchDbDao) {
 		this.searchDbDao = searchDbDao;
 	}
@@ -392,6 +397,7 @@ public final class LoadToSearchDb implements SwiftCommand {
 		return fileTokenFactory;
 	}
 
+	@Resource(name="fileTokenFactory")
 	public void setFileTokenFactory(final FileTokenFactory fileTokenFactory) {
 		this.fileTokenFactory = fileTokenFactory;
 	}

@@ -69,7 +69,7 @@ public final class CommandLineParser {
 		}
 		File installFile = null;
 		if (!DisplayHelp.COMMAND.equals(command)) {
-			installFile = CommandLine.findPropertyFile(options, "install", "installation config file", Swift.CONFIG_FILE_NAME, null);
+			installFile = CommandLine.findFile(options, "install", "installation config file", Swift.CONFIG_FILE_NAME);
 		}
 		final String daemonId = (String) options.valueOf("daemon");
 		commandLine = new SwiftCommandLine(command, parameters, installFile, daemonId, error, parser);

@@ -8,12 +8,14 @@ import edu.mayo.mprc.unimod.UnimodDao;
 import edu.mayo.mprc.unimod.UnimodUpgrade;
 import org.apache.log4j.Logger;
 import org.joda.time.DateTime;
+import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
 
 /**
  * @author Roman Zenka
  */
+@Component("upgradeUnimodCommand")
 public final class UpgradeUnimodCommand implements SwiftCommand {
 	private static final Logger LOGGER = Logger.getLogger(UpgradeUnimodCommand.class);
 	private UnimodDao unimodDao;
