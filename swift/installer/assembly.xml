@@ -7,7 +7,7 @@
         <format>zip</format>
     </formats>
     <includeBaseDirectory>true</includeBaseDirectory>
-    <baseDirectory>swift-3.5</baseDirectory>
+    <baseDirectory>swift-3.6</baseDirectory>
     <includeSiteDirectory>false</includeSiteDirectory>
     <fileSets>
         <fileSet>
@@ -39,8 +39,8 @@
             <directoryMode>755</directoryMode>
             <outputDirectory></outputDirectory>
             <includes>
-                <include>edu.mayo.mprc:swift-scripts:jar:3.5-SNAPSHOT</include>
-                <include>edu.mayo.mprc:install-exe:jar:3.5-SNAPSHOT</include>
+                <include>edu.mayo.mprc:swift-scripts:jar:3.6-SNAPSHOT</include>
+                <include>edu.mayo.mprc:install-exe:jar:3.6-SNAPSHOT</include>
             </includes>
             <unpackOptions>
                 <excludes>
@@ -56,7 +56,7 @@
             <directoryMode>755</directoryMode>
             <outputDirectory></outputDirectory>
             <includes>
-                <include>edu.mayo.mprc:install:jar:3.5-SNAPSHOT</include>
+                <include>edu.mayo.mprc:install:jar:3.6-SNAPSHOT</include>
             </includes>
             <unpackOptions>
                 <excludes>
