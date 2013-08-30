@@ -14,7 +14,7 @@ public final class GridScriptFactory {
 
 	private String javaCommand = "java";
 
-	private String swiftJar;
+	private String swiftLibDirectory;
 	private static final String LOG4J_CONFIGURATION = "log4j.configuration";
 	private static final String SWIFT_HOME = "swift.home";
 
@@ -26,12 +26,12 @@ public final class GridScriptFactory {
 		this.javaCommand = javaCommand;
 	}
 
-	public String getSwiftJar() {
-		return swiftJar;
+	public String getSwiftLibDirectory() {
+		return swiftLibDirectory;
 	}
 
-	public void setSwiftJar(final String swiftJar) {
-		this.swiftJar = swiftJar;
+	public void setSwiftLibDirectory(final String swiftLibDirectory) {
+		this.swiftLibDirectory = swiftLibDirectory;
 	}
 
 	private static boolean isWrapper(final String wrapper) {
@@ -63,7 +63,7 @@ public final class GridScriptFactory {
 		}
 
 		params.add("-cp");
-		params.add(new File(swiftJar).getParentFile().getAbsolutePath() + "/*");
+		params.add(new File(swiftLibDirectory).getAbsolutePath() + "/*");
 
 		params.add("edu.mayo.mprc.swift.Swift");
 

@@ -117,7 +117,7 @@
 
     <bean id="gridScriptFactory" class="edu.mayo.mprc.sge.GridScriptFactory">
         <property name="javaCommand" value="java"/>
-        <property name="swiftJar" value="bin/swift/swift.jar"/>
+        <property name="swiftLibDirectory" value="lib"/>
     </bean>
 
     <bean id="swiftSge" class="edu.mayo.mprc.swift.SgeJobRunner">
