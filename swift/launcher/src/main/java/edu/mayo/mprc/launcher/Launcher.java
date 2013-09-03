@@ -48,7 +48,6 @@ public final class Launcher implements FileListener {
 	private static final String CONFIG_FILE_NAME = "conf/swift.conf";
 	public static final String CONFIG_OPTION = "config";
 	public static final String INSTALL_OPTION = "install";
-	public static final String DAEMON_OPTION = "daemon";
 	public static final String PORT_OPTION = "port";
 	public static final String WAR_OPTION = "war";
 	private final Object stopMonitor = new Object();
@@ -71,7 +70,6 @@ public final class Launcher implements FileListener {
 		final OptionParser parser = new OptionParser();
 		parser.accepts(CONFIG_OPTION, "Reconfigure Swift. Will run a web server with the configuration screen on a given --port");
 		parser.accepts(INSTALL_OPTION, "Installation config file. If not specified, Swift will run in configuration mode and produce this file. Default is " + CONFIG_FILE_NAME + ".").withRequiredArg().ofType(File.class);
-		parser.accepts(DAEMON_OPTION, "Daemon to be run. Will run the daemon defined by the given name in the config file. If there is only one daemon defined in the config file, the daemon will be run and this flag is disregarded.").withRequiredArg().describedAs("Daemon name").ofType(String.class);
 		parser.accepts(PORT_OPTION, "Port to run the configuration web server on. Default is " + DEFAULT_PORT + ".").withRequiredArg().ofType(Integer.class);
 		parser.accepts(WAR_OPTION, "Path to swift.war file. This is needed only when running config or the web part of Swift. Default is swift.war in the local directory.").withRequiredArg().ofType(File.class);
 		OptionSet options = null;
@@ -151,7 +149,7 @@ public final class Launcher implements FileListener {
 			throw new MprcException("Could not locate the swift's war file");
 		}
 
-		final String daemonId = getDaemonId(options);
+		final String daemonId = swiftEnvironment.getDaemonConfig().getName();
 		final int portNumber = getPortNumber(options, configFile);
 		final File tempFolder = getTempFolder(options, configFile);
 
@@ -202,14 +200,6 @@ public final class Launcher implements FileListener {
 
 		webAppContext.setInitParams(initParams);
 		return webAppContext;
-	}
-
-	private String getDaemonId(final OptionSet options) {
-		String daemonId = null;
-		if (options.has(DAEMON_OPTION)) {
-			daemonId = options.valueOf(DAEMON_OPTION).toString();
-		}
-		return daemonId;
 	}
 
 	/**

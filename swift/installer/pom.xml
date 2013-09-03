@@ -87,6 +87,7 @@
                 <configuration>
                     <repositoryLayout>flat</repositoryLayout>
                     <includeConfigurationDirectoryInClasspath>false</includeConfigurationDirectoryInClasspath>
+                    <useWildcardClassPath>true</useWildcardClassPath>
 
                     <daemons>
                         <daemon>
@@ -106,12 +107,15 @@
                                           <include>linux-x86-32</include>
                                           <include>linux-x86-64</include>
                                           <include>windows-x86-32</include>
+                                          <include>windows-x86-64</include>
                                         </includes>
                                     <configuration>
+                                        <!-- TODO: This does not work with the 3.2.3 version of the wrapper -->
                                         <property>
                                            <name>wrapper.logfile</name>
-                                           <value>var/log/wrapper.log</value>
+                                           <value>var/log/wrapper-%WRAPPER_HOSTNAME%.log</value>
                                          </property>
+                                        <!-- Nice title -->
                                         <property>
                                             <name>wrapper.console.title</name>
                                             <value>Swift</value>
@@ -128,14 +132,27 @@
                                             <name>wrapper.pidfile</name>
                                             <value>../var</value>
                                         </property>
+                                        <!-- We will append to the java.library.path -->
                                         <property>
                                             <name>wrapper.java.library.path.append_system_path</name>
                                             <value>true</value>
                                         </property>
+                                        <!-- DRMAA location on our system -->
                                         <property>
                                             <name>wrapper.java.library.path.2</name>
                                             <value>/usr/lib64</value>
                                         </property>
+                                        <!-- When exiting with exit code 2, restart -->
+                                        <property>
+                                            <name>wrapper.on_exit.2</name>
+                                            <value>RESTART</value>
+                                        </property>
+                                        <!-- On Linux, we want all members of our group to access data we produce -->
+                                        <property>
+                                            <name>wrapper.umask</name>
+                                            <value>002</value>
+                                        </property>
+                                        <!-- Sun Grid Engine Root needs to be set for DRMAA to work -->
                                         <property>
                                             <name>set.SGE_ROOT</name>
                                             <value>/usr/share/gridengine</value>
