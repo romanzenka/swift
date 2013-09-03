@@ -34,7 +34,8 @@ function SearchRunItemVisualizer() {
 }
 SearchRunItemVisualizer.prototype = new AbstractItemVisualizer();
 
-SearchRunItemVisualizer.prototype.toggleExpanded = function(evt, element, id, object) {
+SearchRunItemVisualizer.prototype.toggleExpanded = function(evt, id, object) {
+    var element = $(Event.element(evt)).up(3); // a 0-> td 1-> tr 2-> fragment
     Event.stop(evt);
     object.expanded = !object.expanded;
     this.update(element, object);
@@ -308,7 +309,7 @@ SearchRunItemVisualizer.prototype.fillWithContents = function(fragment, id, obje
         // ------------------------------------------------------------------
         // Arrow
         var arrow = $(document.createElement("a"));
-        Event.observe(arrow, 'click', this.toggleExpanded.bindAsEventListener(this, fragment, id, object));
+        Event.observe(arrow, 'click', this.toggleExpanded.bindAsEventListener(this, id, object));
         arrow.className = "arrow";
         arrow.href = "#";
         var arrowImg = document.createElement("span");

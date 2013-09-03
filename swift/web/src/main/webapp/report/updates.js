@@ -38,22 +38,22 @@ function turnIntoSparseArray(obj, recursive) {
 function SparseArray() {
 }
 
-SparseArray.prototype.setTotalLength = function(length) {
+SparseArray.prototype.setTotalLength = function (length) {
     if (length < this.total)
         for (var i = length; i < this.total; i++) this["_" + i] = null;
     this.total = length;
 };
 
-SparseArray.prototype.getItemById = function(id) {
+SparseArray.prototype.getItemById = function (id) {
     return this['_' + id];
 };
 
-SparseArray.prototype.execute = function(updateProgram) {
+SparseArray.prototype.execute = function (updateProgram) {
     eval(updateProgram);
 };
 
-SparseArray.prototype.remove = function(removeList) {
-    removeList.sort(function(a, b) {
+SparseArray.prototype.remove = function (removeList) {
+    removeList.sort(function (a, b) {
         return a < b ? -1 : (a > b ? 1 : 0);
     });
 
@@ -87,7 +87,7 @@ SparseArray.prototype.remove = function(removeList) {
     this.setTotalLength(this.total - totalItemsToRemove);
 };
 
-SparseArray.prototype.turnPropertiesIntoSparseArray = function(item) {
+SparseArray.prototype.turnPropertiesIntoSparseArray = function (item) {
     for (var property in item) {
         if (item[property] && item[property].total) {
             turnIntoSparseArray(item[property]);
@@ -101,9 +101,9 @@ SparseArray.prototype.turnPropertiesIntoSparseArray = function(item) {
 // After the insert is done, each inserted object will be placed where the user requested and the rest of the
 // array would be shifted accordingly. Example:
 // A B C D + insert {_:0 X},{_:3 Y},{_:7:Z} = X A B Y C D _ Z
-SparseArray.prototype.insert = function(insertList) {
+SparseArray.prototype.insert = function (insertList) {
     // Sort the inserts ascendingly
-    insertList.sort(function(a, b) {
+    insertList.sort(function (a, b) {
         return a._ < b._ ? -1 : (a._ > b._ ? 1 : 0);
     });
 
@@ -164,7 +164,7 @@ SparseArray.prototype.insert = function(insertList) {
 // @param list: array of objects to be rewritten. The "_" property determines the index, if this is not specified,
 // "id" property determines the item id.
 // The rewrite completely discards the original object properties, inserting a new set instead
-SparseArray.prototype.rewrite = function(list) {
+SparseArray.prototype.rewrite = function (list) {
     var maxLength = 0;
     for (var i = 0; i < list.length; i++) {
         var pos = -1;
@@ -182,10 +182,10 @@ SparseArray.prototype.rewrite = function(list) {
         this.setTotalLength(maxLength);
 };
 
-SparseArray.prototype.updateProperties = function(source, target) {
+SparseArray.prototype.updateProperties = function (source, target) {
     for (var property in source) {
         if ((target[property] && target[property].total) &&
-                (source[property] && source[property].total))
+            (source[property] && source[property].total))
             this.updateProperties(source[property], target[property]);
         else
             target[property] = source[property];
@@ -195,7 +195,7 @@ SparseArray.prototype.updateProperties = function(source, target) {
 // @param list: array of objects containing the updates. The "_" property determines the index, if this is not specified,
 // "id" property determines the item id.
 // The update keeps original object properties, replacing only the specified ones with new values.
-SparseArray.prototype.update = function(list) {
+SparseArray.prototype.update = function (list) {
     var maxUpdate = 0;
     for (var i = 0; i < list.length; i++) {
         var target;
@@ -211,7 +211,7 @@ SparseArray.prototype.update = function(list) {
     }
 };
 
-SparseArray.prototype.clearAll = function() {
+SparseArray.prototype.clearAll = function () {
     for (var i = 0; i < this.total; i++) {
         this["_" + i] = null;
     }
@@ -219,14 +219,14 @@ SparseArray.prototype.clearAll = function() {
     return this;
 };
 
-SparseArray.prototype.fireOnChange = function() {
+SparseArray.prototype.fireOnChange = function () {
     if (this.onchange) this.onchange();
     return this;
 };
 
 // Searches for a given ID
 // TODO: Optimize this using hashmap (?)
-SparseArray.prototype.findOffsetOfId = function(id) {
+SparseArray.prototype.findOffsetOfId = function (id) {
     for (var i = 0; i < this.total; i++) {
         if (this["_" + i].id == id) {
             return i;
@@ -236,7 +236,7 @@ SparseArray.prototype.findOffsetOfId = function(id) {
 };
 
 // Searches for a given ID
-SparseArray.prototype.findId = function(id) {
+SparseArray.prototype.findId = function (id) {
     var offset = this.findOffsetOfId(id);
     if (offset < 0) return null;
     return this["_" + offset];
@@ -245,9 +245,25 @@ SparseArray.prototype.findId = function(id) {
 //======================================================================================================================
 // Utilities
 
+function removeAllClicks(element) {
+    if ($(element).nodeType !== Node.ELEMENT_NODE) {
+        return;
+    }
+    try {
+        var descendants = Element.descendants(element);
+        for (var i = 0; i<descendants.length; i++) {
+            Event.stopObserving(descendants[i]);
+        }
+        Event.stopObserving(element);
+    } catch (err) {
+        // Ignore
+    }
+}
+
 // Removes all children of an element
 function removeChildren(element) {
     while (element.childNodes.length > 0) {
+        removeAllClicks(childNodes[0]);
         element.removeChild(childNodes[0]);
     }
 }
@@ -263,6 +279,7 @@ function removeChildrenExcept(element, exceptClassRegex) {
     len = nodes.length;
     for (var i = 0; i < len; ++i) {
         if (!nodes[i].className || !nodes[i].className.match(exceptRegex)) {
+            removeAllClicks(nodes[i]);
             element.removeChild(nodes[i]);
         }
     }
