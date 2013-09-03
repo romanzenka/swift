@@ -39,10 +39,11 @@ SearchRunItemVisualizer.prototype.toggleExpanded = function(evt, element, id, ob
     object.expanded = !object.expanded;
     this.update(element, object);
     if (object.expanded) {
+        var objectId = object.id;
         new Ajax.Request('reportupdate',
             {
                 method: 'get',
-                parameters : { action : 'expand', id : object.id }
+                parameters : { action : 'expand', id : objectId }
             });
     }
 };
