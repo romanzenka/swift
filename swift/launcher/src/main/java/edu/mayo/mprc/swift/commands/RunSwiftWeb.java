@@ -4,8 +4,6 @@ import edu.mayo.mprc.launcher.Launcher;
 import edu.mayo.mprc.swift.ExitCode;
 import org.springframework.stereotype.Component;
 
-import java.util.List;
-
 /**
  * @author Roman Zenka
  */
@@ -24,9 +22,6 @@ public class RunSwiftWeb implements SwiftCommand {
 	@Override
 	public ExitCode run(final SwiftEnvironment environment) {
 		final Launcher launcher = new Launcher();
-		final List<String> parameters = environment.getParameters();
-		final String[] paramArray = new String[parameters.size()];
-		parameters.toArray(paramArray);
-		return launcher.runLauncher(paramArray, environment);
+		return launcher.runLauncher(false, environment);
 	}
 }
