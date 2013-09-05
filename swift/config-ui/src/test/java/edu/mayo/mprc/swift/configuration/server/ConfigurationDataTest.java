@@ -7,6 +7,8 @@ import edu.mayo.mprc.config.KeyExtractingWriter;
 import edu.mayo.mprc.config.ResourceConfig;
 import edu.mayo.mprc.config.ServiceConfig;
 import edu.mayo.mprc.database.DatabaseFactory;
+import edu.mayo.mprc.swift.MainFactoryContext;
+import edu.mayo.mprc.swift.ResourceTable;
 import edu.mayo.mprc.swift.configuration.client.model.*;
 import edu.mayo.mprc.swift.search.SwiftSearcher;
 import edu.mayo.mprc.utilities.FileUtilities;
@@ -26,7 +28,7 @@ public final class ConfigurationDataTest {
 
 	@BeforeClass
 	public static void setup() throws GWTServiceException {
-		data = new ConfigurationData();
+		data = new ConfigurationData((ResourceTable)MainFactoryContext.getContext().getBean("resourceTable"));
 		data.loadDefaultConfig();
 	}
 
@@ -48,7 +50,7 @@ public final class ConfigurationDataTest {
 		final ResourceModel swiftModule = daemon.getChildren().get(0);
 		Assert.assertEquals(swiftModule.getProperty("fastaPath"), "var/fasta", "The default value has to be set");
 
-		final ResourceConfig databaseConfig = getMainDaemon().getResources().get(1);
+		final ResourceConfig databaseConfig = getMainDaemon().getResources().get(0);
 		final String databaseId = data.getId(databaseConfig);
 		Assert.assertEquals(swiftModule.getProperty("database"), databaseId, "The database has to refer to actual database module");
 
