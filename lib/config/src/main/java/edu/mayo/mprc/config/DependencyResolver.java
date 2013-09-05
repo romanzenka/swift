@@ -6,7 +6,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Holds currently instantiated triples (id, config, object). When given one of these, returns the other two.
+ * Holds currently instantiated triples (id, config, pair). When given one of these, returns the other two.
  */
 public final class DependencyResolver {
 	private ResourceFactory<ResourceConfig, Object> factory;
@@ -18,8 +18,8 @@ public final class DependencyResolver {
 	}
 
 	/**
-	 * Creates a new object from given config. Keeps track of created objects, so next time
-	 * same config is provided, identical object is returned.
+	 * Creates a new pair from given config. Keeps track of created objects, so next time
+	 * same config is provided, identical pair is returned.
 	 */
 	public Object createSingleton(final ResourceConfig config) {
 		final Object o = resolveDependencyQuietly(config);
@@ -39,7 +39,7 @@ public final class DependencyResolver {
 	}
 
 	/**
-	 * No object, we are just mapping ids to configurations.
+	 * No pair, we are just mapping ids to configurations.
 	 */
 	public void addConfig(final String id, final ResourceConfig config) {
 		testUniqueness(config);
@@ -55,8 +55,8 @@ public final class DependencyResolver {
 			dependencies.put(config, new IdObjectPair(dependencies.get(config).getId(), dependency));
 
 		} else {
-			if(config instanceof NamedResource) {
-				dependencies.put(config, new IdObjectPair(((NamedResource)config).getName(), dependency));
+			if (config instanceof NamedResource) {
+				dependencies.put(config, new IdObjectPair(((NamedResource) config).getName(), dependency));
 			} else {
 				dependencies.put(config, new IdObjectPair(String.valueOf(id++), dependency));
 			}
@@ -103,7 +103,7 @@ public final class DependencyResolver {
 
 	/**
 	 * This is actually quite nasty. We are saying that the same model's corresponding config has changed from
-	 * one object to another.
+	 * one pair to another.
 	 *
 	 * @param oldConfig Old resource that used to be mapped.
 	 * @param newConfig New resource to map in its place.
@@ -112,6 +112,26 @@ public final class DependencyResolver {
 		final IdObjectPair idObjectPair = dependencies.get(oldConfig);
 		dependencies.remove(oldConfig);
 		dependencies.put(newConfig, idObjectPair);
+	}
+
+	/**
+	 * For a given class, return the only instance of previously created object that is assignable to this class.
+	 *
+	 * @param clazz Class to look for.
+	 * @return Previously created object of a matching class.
+	 */
+	public Object getSingletonForType(final Class clazz) {
+		Object result = null;
+		for (final IdObjectPair pair : dependencies.values()) {
+			Object object = pair.getObject();
+			if (clazz.isInstance(object)) {
+				if (result != null) {
+					throw new MprcException("More than one configured object matches the requested class " + clazz.getName() + ":\n1)\t" + result + "\n2)\t" + object);
+				}
+				result = object;
+			}
+		}
+		return result;
 	}
 
 	private static final class IdObjectPair {

@@ -1,9 +1,6 @@
 package edu.mayo.mprc.swift.commands;
 
-import edu.mayo.mprc.config.ApplicationConfig;
-import edu.mayo.mprc.config.DaemonConfig;
-import edu.mayo.mprc.config.ResourceConfig;
-import edu.mayo.mprc.config.ServiceConfig;
+import edu.mayo.mprc.config.*;
 import edu.mayo.mprc.daemon.Daemon;
 import edu.mayo.mprc.daemon.DaemonConnection;
 import edu.mayo.mprc.daemon.MessageBroker;
@@ -19,10 +16,11 @@ import java.util.List;
 
 /**
  * An environment for the running Swift instance. Knows all about the Swift configuration and about the command line parameters.
+ * Can be initialized either from command line, or from a servlet configuration.
  *
  * @author Roman Zenka
  */
-public interface SwiftEnvironment {
+public interface SwiftEnvironment extends RunningApplicationContext {
 	/**
 	 * Runs a Swift command within the Swift environment. The environment changes based on the
 	 * command line provided (e.g. current daemon config is set, {@link FileTokenFactory} is set up for it etc.
@@ -59,12 +57,6 @@ public interface SwiftEnvironment {
 	 */
 	Daemon createDaemon(DaemonConfig config);
 
-	/**
-	 * Create a resource from a given config.
-	 *
-	 * @param resourceConfig Configuration of the resource to create.
-	 * @return Singleton instance of the given resource.
-	 */
 	Object createResource(ResourceConfig resourceConfig);
 
 	/**

@@ -25,7 +25,7 @@
         <th>Message</th>
     </tr>
     <%
-        for (final Map.Entry<DaemonConnection, DaemonStatus> entry : SwiftWebContext.getServletConfig().getSwiftMonitor().getMonitoredConnections().entrySet()) {
+        for (final Map.Entry<DaemonConnection, DaemonStatus> entry : SwiftWebContext.getWebUi().getSwiftMonitor().getMonitoredConnections().entrySet()) {
             final DaemonStatus status = entry.getValue();
             out.print("<tr><td>");
             out.print(status != null ? (status.isOk() && !status.isTooOld(SwiftMonitor.MONITOR_PERIOD_SECONDS)) : "?");

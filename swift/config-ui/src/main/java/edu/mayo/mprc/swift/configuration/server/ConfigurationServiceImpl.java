@@ -32,6 +32,7 @@ public final class ConfigurationServiceImpl extends SpringGwtServlet implements 
 	private static final long serialVersionUID = 20101221L;
 
 	private SessionStorage storage;
+	private ResourceTable resourceTable;
 
 	public ConfigurationServiceImpl() {
 		storage = new ServletStorage(this);
@@ -62,8 +63,7 @@ public final class ConfigurationServiceImpl extends SpringGwtServlet implements 
 		final File configFile = swiftConfig.getAbsoluteFile();
 		try {
 			if (configFile.exists()) {
-				final ResourceTable resourceTable = MainFactoryContext.getResourceTable();
-				getData().setConfig(ApplicationConfig.load(configFile, resourceTable));
+				getData().setConfig(ApplicationConfig.load(configFile, getResourceTable()));
 			} else {
 				getData().loadDefaultConfig();
 			}
@@ -110,7 +110,7 @@ public final class ConfigurationServiceImpl extends SpringGwtServlet implements 
 	private ConfigurationData getData() {
 		final Object obj = getStorage().get("configurationData");
 		if (obj == null) {
-			final ConfigurationData configurationData = new ConfigurationData();
+			final ConfigurationData configurationData = new ConfigurationData(getResourceTable());
 			getStorage().put("configurationData", configurationData);
 			return configurationData;
 		}
@@ -128,5 +128,13 @@ public final class ConfigurationServiceImpl extends SpringGwtServlet implements 
 
 	public void setStorage(SessionStorage storage) {
 		this.storage = storage;
+	}
+
+	public ResourceTable getResourceTable() {
+		return resourceTable;
+	}
+
+	public void setResourceTable(ResourceTable resourceTable) {
+		this.resourceTable = resourceTable;
 	}
 }

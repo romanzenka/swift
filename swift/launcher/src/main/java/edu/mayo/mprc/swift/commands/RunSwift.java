@@ -12,6 +12,7 @@ import edu.mayo.mprc.utilities.FileListener;
 import edu.mayo.mprc.utilities.FileMonitor;
 import edu.mayo.mprc.utilities.FileUtilities;
 import org.apache.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
@@ -55,6 +56,7 @@ public class RunSwift implements FileListener, SwiftCommand {
 		final File configFile = environment.getConfigFile();
 
 		if (config == null || configFile == null) {
+			// Config is done standalone
 			return getRunSwiftConfig().run(environment);
 		}
 
@@ -156,6 +158,7 @@ public class RunSwift implements FileListener, SwiftCommand {
 		return runSwiftWeb;
 	}
 
+	@Autowired(required = false)
 	@Resource(name = "swiftRunWebCommand")
 	public void setRunSwiftWeb(SwiftCommand runSwiftWeb) {
 		this.runSwiftWeb = runSwiftWeb;
@@ -165,7 +168,8 @@ public class RunSwift implements FileListener, SwiftCommand {
 		return runSwiftConfig;
 	}
 
-	@Resource(name="swiftRunConfigCommand")
+	@Autowired(required = false)
+	@Resource(name = "swiftRunConfigCommand")
 	public void setRunSwiftConfig(SwiftCommand runSwiftConfig) {
 		this.runSwiftConfig = runSwiftConfig;
 	}

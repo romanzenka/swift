@@ -20,6 +20,7 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -161,7 +162,7 @@ public final class SwiftEnvironmentImpl implements SwiftEnvironment {
 	}
 
 	@Resource(name = "daemonConnectionFactory")
-	public void setDaemonConnectionFactory(DaemonConnectionFactory daemonConnectionFactory) {
+	public void setDaemonConnectionFactory(final DaemonConnectionFactory daemonConnectionFactory) {
 		this.daemonConnectionFactory = daemonConnectionFactory;
 	}
 
@@ -170,7 +171,7 @@ public final class SwiftEnvironmentImpl implements SwiftEnvironment {
 	}
 
 	@Resource(name = "connectionPool")
-	public void setConnectionPool(ActiveMQConnectionPool connectionPool) {
+	public void setConnectionPool(final ActiveMQConnectionPool connectionPool) {
 		this.connectionPool = connectionPool;
 	}
 
@@ -186,7 +187,7 @@ public final class SwiftEnvironmentImpl implements SwiftEnvironment {
 		return daemonConfig;
 	}
 
-	private void setApplicationConfig(ApplicationConfig applicationConfig) {
+	private void setApplicationConfig(final ApplicationConfig applicationConfig) {
 		this.applicationConfig = applicationConfig;
 	}
 
@@ -206,6 +207,37 @@ public final class SwiftEnvironmentImpl implements SwiftEnvironment {
 	@Override
 	public Object createResource(final ResourceConfig resourceConfig) {
 		return applicationConfig.getDependencyResolver().createSingleton(resourceConfig);
+	}
+
+	@Override
+	public ResourceConfig getSingletonConfig(final Class clazz) {
+		final List<ResourceConfig> matchingConfigs = new ArrayList<ResourceConfig>(2);
+		addMatchingToList(clazz, getDaemonConfig().getResources(), matchingConfigs);
+		addMatchingToList(clazz, getDaemonConfig().getServices(), matchingConfigs);
+
+		final ResourceConfig singleMatchingResource = getSingleMatchingResource(clazz, matchingConfigs);
+		if (singleMatchingResource != null) {
+			return singleMatchingResource;
+		}
+		return getSingleMatchingResource(clazz, getApplicationConfig().getModulesOfConfigType(clazz));
+	}
+
+	private void addMatchingToList(final Class clazz, final List<? extends ResourceConfig> resources, final List<ResourceConfig> matchingConfigs) {
+		for (final ResourceConfig resource : resources) {
+			if (clazz.isInstance(resource)) {
+				matchingConfigs.add(resource);
+			}
+		}
+	}
+
+	private ResourceConfig getSingleMatchingResource(final Class clazz, final List<ResourceConfig> modulesOfConfigType) {
+		if (modulesOfConfigType.size() > 1) {
+			throw new MprcException("There is more than one resource of type " + clazz.getName() + " defined");
+		}
+		if (modulesOfConfigType.size() == 0) {
+			return null;
+		}
+		return modulesOfConfigType.get(0);
 	}
 
 	@Override
@@ -243,7 +275,7 @@ public final class SwiftEnvironmentImpl implements SwiftEnvironment {
 		return getMessageBroker(getDaemonConfig());
 	}
 
-	public static MessageBroker.Config getMessageBroker(DaemonConfig daemonConfig) {
+	public static MessageBroker.Config getMessageBroker(final DaemonConfig daemonConfig) {
 		final List<ResourceConfig> brokers = daemonConfig.getApplicationConfig().getModulesOfConfigType(MessageBroker.Config.class);
 		if (brokers.size() != 1) {
 			throw new MprcException("More than one message broker defined in this Swift install");
@@ -257,7 +289,7 @@ public final class SwiftEnvironmentImpl implements SwiftEnvironment {
 	}
 
 	@Resource(name = "swiftMonitor")
-	public void setMonitor(SwiftMonitor monitor) {
+	public void setMonitor(final SwiftMonitor monitor) {
 		this.monitor = monitor;
 	}
 }

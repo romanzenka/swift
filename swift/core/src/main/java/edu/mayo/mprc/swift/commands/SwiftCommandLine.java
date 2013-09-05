@@ -12,7 +12,7 @@ import java.util.List;
  */
 public final class SwiftCommandLine {
 	public static final String COMMAND_SGE = "sge";
-	public static final String DEFAULT_RUN_COMMAND = RunSwift.RUN_SWIFT;
+	public static final String DEFAULT_RUN_COMMAND = "run-swift";
 
 	private final String command;
 	private final List<String> parameters;

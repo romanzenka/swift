@@ -11,7 +11,10 @@ import edu.mayo.mprc.daemon.MessageBroker;
 import edu.mayo.mprc.daemon.SimpleRunner;
 import edu.mayo.mprc.database.DatabaseFactory;
 import edu.mayo.mprc.sge.GridRunner;
-import edu.mayo.mprc.swift.*;
+import edu.mayo.mprc.swift.ResourceTable;
+import edu.mayo.mprc.swift.Swift;
+import edu.mayo.mprc.swift.SwiftConfig;
+import edu.mayo.mprc.swift.WebUi;
 import edu.mayo.mprc.swift.configuration.client.model.*;
 import edu.mayo.mprc.swift.search.SwiftSearcher;
 import edu.mayo.mprc.utilities.FileUtilities;
@@ -36,14 +39,15 @@ public class ConfigurationData {
 	private ApplicationConfig config;
 	private DependencyResolver resolver;
 	private HashMap<ConcreteProperty, PropertyChangeListener> listeners = new HashMap<ConcreteProperty, PropertyChangeListener>(100);
-	private final ResourceTable resourceTable = MainFactoryContext.getResourceTable();
+	private final ResourceTable resourceTable;
 
 	private ResourceTable getResourceTable() {
 		return resourceTable;
 	}
 
-	public ConfigurationData() {
+	public ConfigurationData(final ResourceTable resourceTable) {
 		config = new ApplicationConfig(new DependencyResolver(resourceTable));
+		this.resourceTable = resourceTable;
 		initResolver();
 	}
 

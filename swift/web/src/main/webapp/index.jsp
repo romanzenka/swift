@@ -78,7 +78,7 @@
             right: 0;
         }
         .reflected:before {
-            content: '<%=SwiftWebContext.getServletConfig().getTitle()%>';
+            content: '<%=SwiftWebContext.getWebUi().getTitle()%>';
             opacity: .3;
             /* This is how the text is flipped vertically */
             -webkit-transform: scaleY(-1);
@@ -99,7 +99,7 @@
 </head>
 <body>
 <div class="topbar">
-    <span class="logo-small"><%=SwiftWebContext.getServletConfig().getTitle()%></span>
+    <span class="logo-small"><%=SwiftWebContext.getWebUi().getTitle()%></span>
     <ul class="locations">
         <li><a href="/start">New search</a></li>
         <li><a href="/report/report.jsp">Existing searches</a></li>
@@ -109,13 +109,13 @@
 </div>
 <div id="content">
     <% ServletIntialization.initServletConfiguration(getServletConfig()); %>
-    <% if (SwiftWebContext.getServletConfig().getUserMessage().messageDefined()) { %>
+    <% if (SwiftWebContext.getWebUi().getUserMessage().messageDefined()) { %>
     <div class="user-message">
-        <%=SwiftWebContext.getServletConfig().getUserMessage().getMessage()%>
+        <%=SwiftWebContext.getWebUi().getUserMessage().getMessage()%>
     </div>
     <% } %>
     <div style="height: 130px; overflow: hidden">
-        <h1 style="text-align: center;" class="logo reflected"><%=SwiftWebContext.getServletConfig().getTitle()%></h1>
+        <h1 style="text-align: center;" class="logo reflected"><%=SwiftWebContext.getWebUi().getTitle()%></h1>
     </div>
 
     <p>Search multiple tandem mass spec. datafiles using <b>multiple search engines at once</b>: Mascot, Sequest,

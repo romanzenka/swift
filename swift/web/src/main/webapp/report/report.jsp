@@ -9,7 +9,7 @@
 "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
-<title><%=SwiftWebContext.getServletConfig().getTitle()%> Search Status</title>
+<title><%=SwiftWebContext.getWebUi().getTitle()%> Search Status</title>
 <!--[if IE]>
 <style type="text/css">
     .opacityZero {
@@ -24,7 +24,7 @@
 
     // How does the raw file root map to the web browser? Idea is that you strip pathPrefix from the path,
     // prepend pathWebPrefix instead and use the resulting URL in your browser
-    var pathWebPrefix = "<%=SwiftWebContext.getServletConfig().getBrowseWebRoot().replace("\\", "\\\\") %>";
+    var pathWebPrefix = "<%=SwiftWebContext.getWebUi().getBrowseWebRoot().replace("\\", "\\\\") %>";
 </script>
 
 <link rel="stylesheet" href="report.css">
@@ -107,11 +107,11 @@
         $('popups').appendChild(title.getRoot());
 
     <%
-    SwiftWebContext.getServletConfig().getSwiftDao().begin();
+    SwiftWebContext.getWebUi().getSwiftDao().begin();
     final StringBuilder userList=new StringBuilder();
     final StringBuilder idList = new StringBuilder();
     try {
-       final List<User> userInfos = SwiftWebContext.getServletConfig().getWorkspaceDao().getUsers(false);
+       final List<User> userInfos = SwiftWebContext.getWebUi().getWorkspaceDao().getUsers(false);
        if (userInfos != null) {
            for (final User userInfo : userInfos) {
                if(userList.length()>0) {
@@ -122,9 +122,9 @@
                idList.append("'").append(JsonWriter.escapeSingleQuoteJavascript(String.valueOf(userInfo.getId()))).append("'");
            }
        }
-       SwiftWebContext.getServletConfig().getSwiftDao().commit();
+       SwiftWebContext.getWebUi().getSwiftDao().commit();
     } catch(Exception ignore) {
-        SwiftWebContext.getServletConfig().getSwiftDao().rollback();
+        SwiftWebContext.getWebUi().getSwiftDao().rollback();
     }
 %>
         user = new FilterDropDown("user");
@@ -241,7 +241,7 @@
 </head>
 <body id="body">
 <div class="topbar">
-    <span class="logo-small"><%=SwiftWebContext.getServletConfig().getTitle()%></span>
+    <span class="logo-small"><%=SwiftWebContext.getWebUi().getTitle()%></span>
     <ul class="locations">
         <li><a href="/start">New search</a></li>
         <li class="active-tab"><a href="/report/report.jsp">Existing searches</a></li>
@@ -249,9 +249,9 @@
         <li><a href="/extras">Extras</a></li>
     </ul>
 </div>
-<% if (SwiftWebContext.getServletConfig().getUserMessage().messageDefined()) { %>
+<% if (SwiftWebContext.getWebUi().getUserMessage().messageDefined()) { %>
 <div class="user-message">
-    <%=SwiftWebContext.getServletConfig().getUserMessage().getMessage()%>
+    <%=SwiftWebContext.getWebUi().getUserMessage().getMessage()%>
 </div>
 <% } %>
 <div id="contents">

@@ -1,7 +1,11 @@
 package edu.mayo.mprc;
 
+import edu.mayo.mprc.swift.ExitCode;
+import edu.mayo.mprc.swift.MainFactoryContext;
 import edu.mayo.mprc.swift.Swift;
-import edu.mayo.mprc.swift.SwiftWebContext;
+import edu.mayo.mprc.swift.commands.InitializeWebCommand;
+import edu.mayo.mprc.swift.commands.SwiftCommandLine;
+import edu.mayo.mprc.swift.commands.SwiftEnvironment;
 import edu.mayo.mprc.utilities.FileUtilities;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
@@ -12,6 +16,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
+import java.util.Arrays;
 
 public final class ServletIntialization {
 	private static final Logger LOGGER = Logger.getLogger(ServletIntialization.class);
@@ -24,45 +29,39 @@ public final class ServletIntialization {
 	private ServletIntialization() {
 	}
 
-	/**
-	 * @return true if initialization was successful, false if the initialization did not happen due to running in config mode
-	 */
-	public static boolean initServletConfiguration(final ServletConfig config) throws ServletException {
+	public static void initServletConfiguration(final ServletConfig config) throws ServletException {
 		try {
 			if (wasInitialized) {
-				return true;
+				return;
 			}
-			// Make sure the swift context is properly created
 
 			setupLogging();
 
-			// If the context does not define install parameters, we revert to SWIFT_HOME
-			// This is useful for testing GWT hosted mode.
-
-
 			final String action = getAction(config);
-			if ("config".equals(action)) {
-				// We are in Swift config mode. Do not do any initialization
-				return false;
-			}
-
 			final File confFile = getConfigFile(config);
+			final String swiftDaemon = getSwiftDaemon(config);
 
-			// through init parameter.
-			String swiftDaemon = config.getServletContext().getInitParameter("SWIFT_DAEMON");
-			if (swiftDaemon == null) {
-				// Hack - we allow SWIFT_DAEMON to be defined as system property to make debugging in GWT easier
-				swiftDaemon = System.getProperty("SWIFT_DAEMON");
-			}
-			if (!SwiftWebContext.isInitialized(swiftDaemon)) {
-				SwiftWebContext.initialize(confFile.getAbsoluteFile(), swiftDaemon);
+			final SwiftEnvironment swiftEnvironment = MainFactoryContext.getSwiftEnvironment();
+			// Simulate command line being passed to Swift
+			final SwiftCommandLine commandLine = new SwiftCommandLine(InitializeWebCommand.INITIALIZE_WEB, Arrays.asList("action", action), confFile, swiftDaemon, null, null);
+			if (swiftEnvironment.runSwiftCommand(commandLine) != ExitCode.Ok) {
+				throw new MprcException("Initialization failed, shut down Swift");
 			}
 
 			wasInitialized = true;
 		} catch (Exception e) {
 			throw new ServletException("Could not initialize Swift web", e);
 		}
-		return true;
+	}
+
+	private static String getSwiftDaemon(final ServletConfig config) {
+		String swiftDaemon;
+		swiftDaemon = config.getServletContext().getInitParameter("SWIFT_DAEMON");
+		if (swiftDaemon == null) {
+			// Hack - we allow SWIFT_DAEMON to be defined as system property to make debugging in GWT easier
+			swiftDaemon = System.getProperty("SWIFT_DAEMON");
+		}
+		return swiftDaemon;
 	}
 
 	/**
@@ -75,7 +74,7 @@ public final class ServletIntialization {
 		File confFile = null;
 		if (getSwiftHome(config) == null) {
 			String swiftHome = System.getenv(SWIFT_HOME);
-			if(swiftHome == null) {
+			if (swiftHome == null) {
 				swiftHome = System.getProperty(SWIFT_HOME);
 			}
 			if (swiftHome != null) {
@@ -135,9 +134,5 @@ public final class ServletIntialization {
 			return true;
 		}
 		return false;
-	}
-
-	public static void destroy() {
-		SwiftWebContext.destroy();
 	}
 }

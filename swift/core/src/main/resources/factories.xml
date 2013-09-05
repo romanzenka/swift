@@ -67,7 +67,7 @@
 
     <!-- Provides a WebUi interface after it gets configured -->
     <bean id="webUiHolder" class="edu.mayo.mprc.swift.WebUiHolder">
-
+        <property name="context" ref="swiftEnvironment"/>
     </bean>
 
     <bean id="webUiFactory" class="edu.mayo.mprc.swift.WebUi$Factory" autowire="byType">

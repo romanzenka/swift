@@ -20,7 +20,7 @@
 <body>
 <iframe src="javascript:''" id='__gwt_historyFrame' style='position:absolute;width:0;height:0;border:0'></iframe>
 <div class="topbar">
-    <span class="logo-small"><%=SwiftWebContext.getServletConfig().getTitle()%></span>
+    <span class="logo-small"><%=SwiftWebContext.getWebUi().getTitle()%></span>
     <ul class="locations">
         <li class="active-tab"><a href="/start">New search</a></li>
         <li><a href="/report/report.jsp">Existing searches</a></li>

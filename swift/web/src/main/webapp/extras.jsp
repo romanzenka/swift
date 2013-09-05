@@ -29,7 +29,7 @@
                 <span class="icon-bar"></span>
                 <span class="icon-bar"></span>
             </button>
-            <a class="brand" href="/"><%=SwiftWebContext.getServletConfig().getTitle()%></a>
+            <a class="brand" href="/"><%=SwiftWebContext.getWebUi().getTitle()%></a>
 
             <div class="nav-collapse collapse">
                 <ul class="nav">
@@ -124,7 +124,7 @@
     <h3>About</h3>
 
     <table class="table">
-        <tr><th>User-set Title</th><td> <%=StringUtilities.escapeHtml(SwiftWebContext.getServletConfig().getTitle())%></td></tr>
+        <tr><th>User-set Title</th><td> <%=StringUtilities.escapeHtml(SwiftWebContext.getWebUi().getTitle())%></td></tr>
         <tr><th>Build Version</th><td><%=StringUtilities.escapeHtml(ReleaseInfoCore.buildVersion())%></td></tr>
         <tr><th>Build Revision</th><td><%= StringUtilities.escapeHtml(ReleaseInfoCore.buildRevision())%></td></tr>
         <tr><th>Build Timestamp</th><td><%= StringUtilities.escapeHtml(ReleaseInfoCore.buildTimestamp())%></td></tr>

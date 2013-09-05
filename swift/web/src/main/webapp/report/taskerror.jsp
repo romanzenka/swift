@@ -11,11 +11,11 @@
 <head><title>Swift Task Error Report</title></head>
 <body>
 <%
-    final String browseWebRoot = SwiftWebContext.getServletConfig().getBrowseWebRoot();
-    final File browseRoot = SwiftWebContext.getServletConfig().getBrowseRoot();
+    final String browseWebRoot = SwiftWebContext.getWebUi().getBrowseWebRoot();
+    final File browseRoot = SwiftWebContext.getWebUi().getBrowseRoot();
     final String taskIdString = request.getParameter("id");
     final String searchRunIdString = request.getParameter("tid");
-    final FileTokenFactory tokenFactory = SwiftWebContext.getServletConfig().getFileTokenFactory();
+    final FileTokenFactory tokenFactory = SwiftWebContext.getWebUi().getFileTokenFactory();
     if (taskIdString == null && searchRunIdString == null) {
 %>
 <h1>Error</h1>
@@ -41,9 +41,9 @@ Task id is not valid: <%=taskIdString%><br/>
         return;
     }
 
-    SwiftWebContext.getServletConfig().getSwiftDao().begin();
+    SwiftWebContext.getWebUi().getSwiftDao().begin();
     try {
-        final TaskData data = SwiftWebContext.getServletConfig().getSwiftDao().getTaskData(taskid);
+        final TaskData data = SwiftWebContext.getWebUi().getSwiftDao().getTaskData(taskid);
 %>
 <h1>Task Error</h1>
 <table border="2" cellspacing="1" cellpadding="5">
@@ -70,9 +70,9 @@ Task id is not valid: <%=taskIdString%><br/>
     </tr>
 </table>
 <%
-        SwiftWebContext.getServletConfig().getSwiftDao().commit();
+        SwiftWebContext.getWebUi().getSwiftDao().commit();
     } catch (Exception e) {
-        SwiftWebContext.getServletConfig().getSwiftDao().rollback();
+        SwiftWebContext.getWebUi().getSwiftDao().rollback();
         throw new MprcException(e);
     }
 } else {
@@ -92,9 +92,9 @@ Transaction id is not valid: <%=searchRunIdString%><br/>
         return;
     }
 
-    SwiftWebContext.getServletConfig().getSwiftDao().begin();
+    SwiftWebContext.getWebUi().getSwiftDao().begin();
     try {
-        final SearchRun data = SwiftWebContext.getServletConfig().getSwiftDao().getSearchRunForId(transactionid);
+        final SearchRun data = SwiftWebContext.getWebUi().getSwiftDao().getSearchRunForId(transactionid);
 %>
 <h1>Transaction Error</h1>
 <table border="2" cellspacing="1" cellpadding="5">
@@ -110,9 +110,9 @@ Transaction id is not valid: <%=searchRunIdString%><br/>
     </tr>
 </table>
 <%
-            SwiftWebContext.getServletConfig().getSwiftDao().commit();
+            SwiftWebContext.getWebUi().getSwiftDao().commit();
         } catch (Exception e) {
-            SwiftWebContext.getServletConfig().getSwiftDao().rollback();
+            SwiftWebContext.getWebUi().getSwiftDao().rollback();
             throw new MprcException(e);
         }
     } %>

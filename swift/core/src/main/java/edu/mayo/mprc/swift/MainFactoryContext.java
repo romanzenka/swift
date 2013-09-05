@@ -1,7 +1,5 @@
 package edu.mayo.mprc.swift;
 
-import edu.mayo.mprc.messaging.ActiveMQConnectionPool;
-import edu.mayo.mprc.messaging.ServiceFactory;
 import edu.mayo.mprc.swift.commands.SwiftEnvironment;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
@@ -53,23 +51,11 @@ public final class MainFactoryContext {
 		return getContext().getBean(beanId);
 	}
 
-	public static ResourceTable getResourceTable() {
-		return (ResourceTable) getBean("resourceTable");
-	}
-
 	public static SwiftEnvironment getSwiftEnvironment() {
 		return (SwiftEnvironment) getBean("swiftEnvironment");
 	}
 
 	public static WebUiHolder getWebUiHolder() {
 		return (WebUiHolder) getBean("webUiHolder");
-	}
-
-	public static ActiveMQConnectionPool getConnectionPool() {
-		return (ActiveMQConnectionPool) getBean("connectionPool");
-	}
-
-	public static ServiceFactory getServiceFactory() {
-		return (ServiceFactory) getBean("serviceFactory");
 	}
 }
