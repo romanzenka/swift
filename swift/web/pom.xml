@@ -39,6 +39,13 @@
             <version>3.5-SNAPSHOT</version>
         </dependency>
 
+        <dependency>
+            <groupId>edu.mayo.mprc.swift</groupId>
+            <artifactId>heme</artifactId>
+            <version>3.5-SNAPSHOT</version>
+            <type>war</type>
+        </dependency>
+
         <!-- Supports RSS feed generation -->
         <dependency>
             <groupId>rome</groupId>
@@ -161,6 +168,13 @@
                             <classpathPrefix/>
                         </manifest>
                     </archive>
+                    <!-- Overlay the Heme Pathology stuff on top of this project -->
+                    <overlays>
+                        <overlay>
+                            <groupId>edu.mayo.mprc.swift</groupId>
+                            <artifactId>heme</artifactId>
+                        </overlay>
+                    </overlays>
                 </configuration>
             </plugin>
 

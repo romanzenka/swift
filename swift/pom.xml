@@ -23,5 +23,6 @@
         <module>gwt-common</module>
         <module>scripts</module>
         <module>installer</module>
-    </modules>
+        <module>heme</module>
+   </modules>
 </project>
