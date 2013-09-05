@@ -1,6 +1,5 @@
 package edu.mayo.mprc.swift;
 
-import edu.mayo.mprc.MprcException;
 import edu.mayo.mprc.swift.commands.SwiftCommandLine;
 import edu.mayo.mprc.utilities.FileUtilities;
 import org.testng.Assert;
@@ -45,8 +44,8 @@ public final class TestCommandLineParsing {
 		Assert.assertEquals(cmd.getError(), "You must specify either the --daemon, --sge or --run options.");
 	}
 
-	@Test(expectedExceptions = MprcException.class)
-	public void shouldNoticeMissingConfig() {
+	@Test
+	public void shouldBeOkWithMissingConfig() {
 		final CommandLineParser parser = new CommandLineParser(new String[]{"--install", "test.xml", "--daemon", "main-daemon"});
 	}
 

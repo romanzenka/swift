@@ -1,7 +1,11 @@
 package edu.mayo.mprc.swift;
 
+import edu.mayo.mprc.utilities.FileUtilities;
 import org.testng.Assert;
 import org.testng.annotations.Test;
+
+import java.io.File;
+import java.io.IOException;
 
 /**
  * Test whether Swift can run with particular command line options.
@@ -29,14 +33,14 @@ public final class TestSwiftStartup {
 	 * Swift with --sge without the actual install config should complain and terminate.
 	 */
 	@Test
-	public void shouldRunSge() {
+	public void shouldRunSge() throws IOException {
+		File file = File.createTempFile("broken-sge", "xml");
 		try {
-			Swift.runSwift("--sge", "nonexistent");
-		} catch (Exception e) {
-			Assert.assertTrue(e.getMessage().contains("installation config"));
-			return;
+			FileUtilities.ensureFileExists(file);
+			Assert.assertEquals(Swift.runSwift("--sge", file.getAbsolutePath()), ExitCode.Error);
+		} finally {
+			FileUtilities.cleanupTempFile(file);
 		}
-		Assert.fail("Exception should be thrown");
 	}
 
 }
