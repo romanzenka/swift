@@ -43,6 +43,7 @@ public class HemeScaffoldReader extends ScaffoldSpectraReader {
 
 	@Override
 	public boolean processRow(final String line) {
+		fillCurrentLine(line);
 		final String accNums = currentLine[proteinAccessionNumbers];
 		final String accNum = PROTEIN_ACCESSION_SPLITTER.split(accNums).iterator().next();
 		final String desc = currentLine[proteinName];
