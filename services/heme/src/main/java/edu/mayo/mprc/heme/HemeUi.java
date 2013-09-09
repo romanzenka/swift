@@ -59,6 +59,7 @@ public final class HemeUi {
 	private static final String USER_EMAIL = "userEmail";
 	private static final String SEARCH_ENGINES = "searchEngines";
 	public static final String SPECTRA_EXTENSION = ".spectra.txt";
+	public static final double DEFAULT_MASS_DELTA_TOLERANCE = 0.5;
 
 	private final File data;
 	private final File results;
@@ -142,7 +143,7 @@ public final class HemeUi {
 					if (name != null) {
 						final String path = dateDir.getName() + "/" + name;
 						if (!existingTestsByPath.containsKey(path) && !alreadyAdded.contains(path)) {
-							final HemeTest test = new HemeTest(name, date, path, 0.0, 0.0);
+							final HemeTest test = new HemeTest(name, date, path, 0.0, DEFAULT_MASS_DELTA_TOLERANCE);
 							getHemeDao().addTest(test);
 							alreadyAdded.add(path);
 						}
