@@ -1,5 +1,6 @@
 package edu.mayo.mprc.config;
 
+import com.google.common.base.CharMatcher;
 import com.google.common.base.Splitter;
 import edu.mayo.mprc.MprcException;
 import edu.mayo.mprc.utilities.FileUtilities;
@@ -66,7 +67,7 @@ public final class AppConfigReader implements Closeable {
 						values.clear();
 					} else {
 						inSection = true;
-						final Iterable<String> typeName = Splitter.on(' ').omitEmptyStrings().trimResults().split(
+						final Iterable<String> typeName = Splitter.on(CharMatcher.WHITESPACE).omitEmptyStrings().trimResults().split(
 								unescapedLine.subSequence(1, unescapedLine.length() - 1));
 
 						final Iterator<String> iterator = typeName.iterator();

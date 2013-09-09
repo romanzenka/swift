@@ -2,8 +2,8 @@ package edu.mayo.mprc.swift.webservice;
 
 
 import edu.mayo.mprc.MprcException;
-import edu.mayo.mprc.swift.ui.server.SearchInput;
-import edu.mayo.mprc.swift.ui.server.ServiceImpl;
+import edu.mayo.mprc.swift.search.SearchInput;
+import edu.mayo.mprc.swift.search.SwiftSearcherCaller;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -20,8 +20,8 @@ import java.util.Collection;
  */
 @Controller
 public final class Searches {
-	@Resource(name = "SwiftAppService")
-	private ServiceImpl swiftService;
+	@Resource(name = "swiftSearcherCaller")
+	private SwiftSearcherCaller swiftSearcherCaller;
 
 	public Searches() {
 	}
@@ -31,7 +31,7 @@ public final class Searches {
 			@RequestBody final MultiValueMap<String, String> searchInputMap) {
 		try {
 			final SearchInput searchInput = new SearchInput(searchInputMap);
-			final long searchRunId = swiftService.startSearchRestful(searchInput);
+			final long searchRunId = swiftSearcherCaller.startSearchRestful(searchInput);
 			final Search result = new Search(searchRunId, searchInput.getTitle());
 			final Collection<Search> searches = new ArrayList<Search>(1);
 			searches.add(result);

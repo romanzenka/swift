@@ -40,6 +40,7 @@ public final class ReportUpdate implements HttpRequestHandler {
 	private transient SearchDbDao searchDbDao;
 	private transient FileTokenFactory fileTokenFactory;
 	private transient WebUiHolder webUiHolder;
+	private transient SwiftSearcherCaller swiftSearcherCaller;
 	/**
 	 * How many milliseconds to wait till qstat considered down.
 	 */
@@ -168,7 +169,7 @@ public final class ReportUpdate implements HttpRequestHandler {
 	}
 
 	private WebUi getWebUi() {
-		return webUiHolder.getWebUi();
+		return getWebUiHolder().getWebUi();
 	}
 
 	private void rerunSearch(final HttpServletRequest req, final HttpServletResponse resp, final String rerun) throws ServletException {
@@ -184,7 +185,7 @@ public final class ReportUpdate implements HttpRequestHandler {
 		final ResubmitProgressListener listener = new ResubmitProgressListener();
 
 		try {
-			SwiftSearcherCaller.resubmitSearchRun(td, getWebUi().getSwiftSearcherDaemonConnection(), listener);
+			swiftSearcherCaller.resubmitSearchRun(td, listener);
 		} catch (Exception t) {
 			throw new ServletException(t);
 		}
@@ -408,6 +409,14 @@ public final class ReportUpdate implements HttpRequestHandler {
 
 	public void setWebUiHolder(WebUiHolder webUiHolder) {
 		this.webUiHolder = webUiHolder;
+	}
+
+	public SwiftSearcherCaller getSwiftSearcherCaller() {
+		return swiftSearcherCaller;
+	}
+
+	public void setSwiftSearcherCaller(SwiftSearcherCaller swiftSearcherCaller) {
+		this.swiftSearcherCaller = swiftSearcherCaller;
 	}
 
 	private class ResubmitProgressListener implements ProgressListener {

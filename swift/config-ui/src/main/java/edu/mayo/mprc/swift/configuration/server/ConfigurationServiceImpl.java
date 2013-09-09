@@ -12,7 +12,7 @@ import edu.mayo.mprc.daemon.SimpleRunner;
 import edu.mayo.mprc.sge.GridRunner;
 import edu.mayo.mprc.swift.MainFactoryContext;
 import edu.mayo.mprc.swift.ResourceTable;
-import edu.mayo.mprc.swift.Swift;
+import edu.mayo.mprc.swift.commands.SwiftEnvironment;
 import edu.mayo.mprc.swift.configuration.client.ConfigurationService;
 import edu.mayo.mprc.swift.configuration.client.model.ApplicationModel;
 import edu.mayo.mprc.swift.configuration.client.model.ResourceModel;
@@ -33,6 +33,7 @@ public final class ConfigurationServiceImpl extends SpringGwtServlet implements 
 
 	private SessionStorage storage;
 	private ResourceTable resourceTable;
+	private SwiftEnvironment swiftEnvironment;
 
 	public ConfigurationServiceImpl() {
 		storage = new ServletStorage(this);
@@ -54,7 +55,7 @@ public final class ConfigurationServiceImpl extends SpringGwtServlet implements 
 
 	@Override
 	public ApplicationModel loadConfiguration() throws GWTServiceException {
-		final File swiftConfig = new File(Swift.CONFIG_FILE_NAME);
+		final File swiftConfig = swiftEnvironment.getConfigFile();
 		return loadFromFile(swiftConfig);
 	}
 
@@ -134,7 +135,15 @@ public final class ConfigurationServiceImpl extends SpringGwtServlet implements 
 		return resourceTable;
 	}
 
-	public void setResourceTable(ResourceTable resourceTable) {
+	public void setResourceTable(final ResourceTable resourceTable) {
 		this.resourceTable = resourceTable;
+	}
+
+	public SwiftEnvironment getSwiftEnvironment() {
+		return swiftEnvironment;
+	}
+
+	public void setSwiftEnvironment(SwiftEnvironment swiftEnvironment) {
+		this.swiftEnvironment = swiftEnvironment;
 	}
 }

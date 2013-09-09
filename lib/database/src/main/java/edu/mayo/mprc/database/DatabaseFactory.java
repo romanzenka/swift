@@ -55,7 +55,7 @@ public final class DatabaseFactory extends FactoryBase<ResourceConfig, SessionFa
 		return daoList;
 	}
 
-	@Resource(name = "daoList")
+	@Resource
 	public void setDaoList(final List<DaoBase> daoList) {
 		this.daoList = daoList;
 	}

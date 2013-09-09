@@ -42,5 +42,6 @@
         <module>swift-db</module>
         <module>swift-search</module>
         <module>xtandem</module>
+        <module>heme</module>
     </modules>
 </project>

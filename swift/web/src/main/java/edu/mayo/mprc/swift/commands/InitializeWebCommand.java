@@ -12,6 +12,7 @@ import edu.mayo.mprc.swift.ExitCode;
 import edu.mayo.mprc.swift.SwiftMonitor;
 import edu.mayo.mprc.swift.WebUi;
 import edu.mayo.mprc.swift.WebUiHolder;
+import edu.mayo.mprc.swift.search.SwiftSearcherCaller;
 import edu.mayo.mprc.utilities.FileUtilities;
 import org.apache.log4j.Logger;
 import org.springframework.stereotype.Component;
@@ -33,6 +34,7 @@ public final class InitializeWebCommand implements SwiftCommand {
 	private CurationWebContext curationWebContext;
 	private SwiftMonitor swiftMonitor;
 	private ActiveMQConnectionPool connectionPool;
+	private SwiftSearcherCaller swiftSearcherCaller;
 
 	@Override
 	public String getName() {
@@ -64,6 +66,8 @@ public final class InitializeWebCommand implements SwiftCommand {
 				throw new MprcException("The daemon " + daemonConfig.getName() + " does not define any web interface module.");
 			}
 			webUi.setMainDaemon(daemon);
+			getSwiftSearcherCaller().setSwiftSearcherConnection(webUi.getSwiftSearcherDaemonConnection());
+			getSwiftSearcherCaller().setBrowseRoot(webUi.getBrowseRoot());
 
 			// Initialize DB curator
 			curationWebContext.initialize(
@@ -142,7 +146,16 @@ public final class InitializeWebCommand implements SwiftCommand {
 	}
 
 	@Resource(name = "connectionPool")
-	public void setConnectionPool(ActiveMQConnectionPool connectionPool) {
+	public void setConnectionPool(final ActiveMQConnectionPool connectionPool) {
 		this.connectionPool = connectionPool;
+	}
+
+	public SwiftSearcherCaller getSwiftSearcherCaller() {
+		return swiftSearcherCaller;
+	}
+
+	@Resource(name = "swiftSearcherCaller")
+	public void setSwiftSearcherCaller(final SwiftSearcherCaller swiftSearcherCaller) {
+		this.swiftSearcherCaller = swiftSearcherCaller;
 	}
 }

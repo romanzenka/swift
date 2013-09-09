@@ -1467,13 +1467,18 @@ public final class FileUtilities {
 	 * TODO: Get rid of this once migrated to Java 7.
 	 *
 	 * @param folder Folder whose contents to list
-	 * @param filter Filter to apply to files (not directories).
-	 * @param dirs   Resulting directories.
-	 * @param files  Resulting files.
+	 * @param filter Filter to apply to files (not directories). If files is null, filter can be null as well.
+	 * @param dirs   Resulting directories. If null, no directories are collected.
+	 * @param files  Resulting files. If null, no files are collected.
 	 */
 	public static void listFolderContents(final File folder, final FilenameFilter filter, final List<File> dirs, final List<File> files) {
-		dirs.clear();
-		files.clear();
+		if (dirs != null) {
+			dirs.clear();
+		}
+		if (files != null) {
+			files.clear();
+		}
+
 		final File[] fileEntries = folder.listFiles(new NotHiddenFilter());
 
 		if (fileEntries != null && fileEntries.length > MIN_FOLDER_SIZE_FOR_LS && isLinuxPlatform()) {
@@ -1492,8 +1497,10 @@ public final class FileUtilities {
 				@Override
 				public void line(final String line) {
 					if (line.endsWith("/")) {
-						dirs.add(new File(folder, line));
-					} else if (filter.accept(folder, line)) {
+						if (dirs != null) {
+							dirs.add(new File(folder, line));
+						}
+					} else if (files != null && filter.accept(folder, line)) {
 						files.add(new File(folder, line));
 					}
 				}
@@ -1503,8 +1510,10 @@ public final class FileUtilities {
 			if (fileEntries != null) {
 				for (final File file : fileEntries) {
 					if (file.isDirectory()) {
-						dirs.add(file);
-					} else if (filter.accept(folder, file.getName())) {
+						if (dirs != null) {
+							dirs.add(file);
+						}
+					} else if (files != null && filter.accept(folder, file.getName())) {
 						files.add(file);
 					}
 				}

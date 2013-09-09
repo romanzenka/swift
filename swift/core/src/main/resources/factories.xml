@@ -39,27 +39,11 @@
     <bean id="aminoAcidSet" class="edu.mayo.mprc.chem.AminoAcidSet">
     </bean>
 
-    <bean id="daoList" class="java.util.ArrayList">
-        <constructor-arg index="0">
-            <list value-type="edu.mayo.mprc.database.DaoBase">
-                <ref bean="curationDao"/>
-                <ref bean="fastaDbDao"/>
-                <ref bean="paramsDao"/>
-                <ref bean="fastaDbDao"/>
-                <ref bean="searchDbDao"/>
-                <ref bean="swiftDao"/>
-                <ref bean="unimodDao"/>
-                <ref bean="workspaceDao"/>
-            </list>
-        </constructor-arg>
-    </bean>
-
     <bean id="resourceTable" class="edu.mayo.mprc.swift.ResourceTable">
     </bean>
 
     <bean id="databaseValidator"
           class="edu.mayo.mprc.swift.search.DatabaseValidator">
-        <property name="daoList" ref="daoList"/>
         <property name="hibernateProperties" ref="hibernateProperties"/>
         <property name="runtimeInitializers" ref="searcherRuntimeInitializers"/>
         <property name="fileTokenFactory" ref="fileTokenFactory"/>

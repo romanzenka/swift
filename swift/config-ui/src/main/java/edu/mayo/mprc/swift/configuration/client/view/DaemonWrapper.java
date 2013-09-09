@@ -60,9 +60,9 @@ public final class DaemonWrapper extends SimplePanel {
 		Collections.sort(moduleInfoList, new InfoComparator());
 
 		for (final AvailableModules.Info info : moduleInfoList) {
-			if (info.isModule()) {
+			// if (info.isModule()) {
 				newModulePicker.addItem(info.getName(), info.getType());
-			}
+			// }
 		}
 
 		newModuleButton = new Button("Add new module");

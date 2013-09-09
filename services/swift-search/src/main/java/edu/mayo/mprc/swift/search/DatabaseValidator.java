@@ -241,6 +241,7 @@ public final class DatabaseValidator implements RuntimeInitializer {
 		return daoList;
 	}
 
+	@Resource
 	public void setDaoList(final List<DaoBase> daoList) {
 		this.daoList = daoList;
 	}

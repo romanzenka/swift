@@ -69,7 +69,9 @@ public final class SwiftMonitor implements Runnable {
 	 * Stop monitoring Swift.
 	 */
 	public void stop() {
-		scheduler.shutdown();
+		if (scheduler != null) {
+			scheduler.shutdown();
+		}
 	}
 
 	public void ping() {
