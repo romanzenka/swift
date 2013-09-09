@@ -1,5 +1,6 @@
 package edu.mayo.mprc.scaffoldparser.spectra;
 
+import com.google.common.base.Splitter;
 import com.google.common.io.CountingInputStream;
 import edu.mayo.mprc.MprcException;
 import edu.mayo.mprc.utilities.BufferedEofReader;
@@ -9,6 +10,10 @@ import edu.mayo.mprc.utilities.progress.ProgressReporter;
 import edu.mayo.mprc.utilities.progress.UserProgressReporter;
 
 import java.io.*;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Locale;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
@@ -28,6 +33,10 @@ public abstract class ScaffoldSpectraReader {
 	 * Report progress every X lines.
 	 */
 	public static final int REPORT_FREQUENCY = 10;
+	public static final Splitter SPLITTER = Splitter.on('\t').trimResults();
+	public static final Pattern DATABASE_REGEX = Pattern.compile("the (.*) database");
+	protected static final String DATABASE_NAME_KEY = "Database Name";
+	public static final Splitter PROTEIN_ACCESSION_SPLITTER = Splitter.on(',').trimResults().omitEmptyStrings();
 
 	/**
 	 * Version of Scaffold that produced the report (Currently "2" for Scaffold 2 or "3" for Scaffold 3).
@@ -58,6 +67,10 @@ public abstract class ScaffoldSpectraReader {
 	 * We use this to report percent done.
 	 */
 	private PercentDoneReporter percentDoneReporter;
+
+	// Current line parsed into columns, with data in fields trimmed
+	protected String[] currentLine;
+
 
 	// Scaffold files are terminated with this marker
 	private static final String END_OF_FILE = "END OF FILE";
@@ -122,6 +135,85 @@ public abstract class ScaffoldSpectraReader {
 	 * Initializes the reader.
 	 */
 	protected ScaffoldSpectraReader() {
+	}
+
+	protected static int parseInt(final String s) {
+		try {
+			return Integer.parseInt(fixCommaSeparatedThousands(s));
+		} catch (NumberFormatException e) {
+			throw new MprcException("Cannot parse number [" + s + "] as integer.", e);
+		}
+	}
+
+	/**
+	 * Extract database name from Scaffold export. The database is specified as "the WHATEVER database"
+	 *
+	 * @param value String to extract the name from.
+	 * @return Extracted database name.
+	 */
+	public static String extractDatabaseName(final String value) {
+		final Matcher matcher = DATABASE_REGEX.matcher(value);
+		if (matcher.matches()) {
+			return addFastaSuffix(matcher.group(1));
+		}
+		return addFastaSuffix(value);
+	}
+
+	/**
+	 * Add a .fasta suffix to a string if it does not have it already.
+	 *
+	 * @param value Value to add suffix to.
+	 * @return Value with suffix added.
+	 */
+	public static String addFastaSuffix(final String value) {
+		if (value.endsWith(".fasta")) {
+			return value;
+		}
+		return value + ".fasta";
+	}
+
+	public void initializeCurrentLine(final HashMap<String, Integer> columnMap) {
+		int numColumns = columnMap.size();
+		currentLine = new String[numColumns];
+	}
+
+	public void fillCurrentLine(final String line) {
+		final Iterator<String> iterator = SPLITTER.split(line).iterator();
+		for (int i = 0; i < currentLine.length; i++) {
+			if (iterator.hasNext()) {
+				currentLine[i] = iterator.next();
+			} else {
+				currentLine[i] = "";
+			}
+		}
+	}
+
+	public static HashMap<String, Integer> buildColumnMap(final String line) {
+		final HashMap<String, Integer> columnPositions = new HashMap<String, Integer>(30);
+		int position = 0;
+		for (final String column : SPLITTER.split(line)) {
+			columnPositions.put(column.toUpperCase(Locale.US), position);
+			position++;
+		}
+		return columnPositions;
+	}
+
+	public static Integer getColumnNumber(final HashMap<String, Integer> columnPositions, final String columnName) {
+		return columnPositions.get(columnName.toUpperCase(Locale.US));
+	}
+
+	/**
+	 * @param columnPositions Column positions.
+	 * @param columnName      Name of the column to find.
+	 * @return Index of the column. If a matching column not found, throws an exception.
+	 */
+	public static int getColumn(final HashMap<String, Integer> columnPositions, final String columnName) {
+		final Integer column = getColumnNumber(columnPositions, columnName);
+		if (null == column) {
+			throw new MprcException("Missing column [" + columnName + "]");
+		} else {
+			return column;
+		}
 	}
 
 	/**

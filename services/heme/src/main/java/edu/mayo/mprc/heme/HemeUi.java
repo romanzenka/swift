@@ -58,6 +58,7 @@ public final class HemeUi {
 	private static final String CHYMO_PARAM_SET_NAME = "chymoParamSetName";
 	private static final String USER_EMAIL = "userEmail";
 	private static final String SEARCH_ENGINES = "searchEngines";
+	public static final String SPECTRA_EXTENSION = ".spectra.txt";
 
 	private final File data;
 	private final File results;
@@ -251,6 +252,25 @@ public final class HemeUi {
 		test.setMassDeltaTolerance(massDeltaTolerance);
 	}
 
+	public HemeReport createReport(final int testId) {
+		final HemeTest test = getHemeDao().getTestForId(testId);
+		final String path = test.getPath();
+		final File resultFolder = new File(getResults(), path);
+		final File scaffoldFolder = new File(resultFolder, "scaffold");
+		final File scaffoldFile = new File(scaffoldFolder, test.getName() + SPECTRA_EXTENSION);
+		final HemeScaffoldReader reader = new HemeScaffoldReader();
+		reader.load(scaffoldFile, "3", null);
+		final Collection<HemeReportEntry> entries = reader.getEntries();
+		final List<HemeReportEntry> list = new ArrayList<HemeReportEntry>();
+		for (final HemeReportEntry entry : entries) {
+			if (Math.abs(entry.getMassDelta() - test.getMassDelta()) <= test.getMassDeltaTolerance()) {
+				list.add(entry);
+			}
+		}
+		final HemeReport report = new HemeReport(list);
+		return report;
+	}
+
 	private String extractPatientName(final File patient) {
 		String name = null;
 		if (patient.getName().endsWith(CHYMO_SUFFIX)) {
@@ -378,7 +398,7 @@ public final class HemeUi {
 
 		@Override
 		public HemeUi create(final Config config, final DependencyResolver dependencies) {
-			String rootDir = getRunningApplicationContext().getDaemonConfig().getSharedFileSpacePath();
+			final String rootDir = getRunningApplicationContext().getDaemonConfig().getSharedFileSpacePath();
 			final File dataDir = new File(rootDir, config.getDataPath());
 			FileUtilities.ensureFolderExists(dataDir);
 			final File resultDir = new File(rootDir, config.getResultPath());

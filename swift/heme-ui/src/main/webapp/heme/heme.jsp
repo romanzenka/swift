@@ -91,34 +91,37 @@
                 <div class="alert save-error" id="save-error-<%= id %>">Error!</div>
             </td>
             <td>
-                    <%
-                switch (entry.getStatus()) {
-                    case NOT_STARTED:
-        %>
+                <%
+                    switch (entry.getStatus()) {
+                        case NOT_STARTED:
+                %>
                 <button class="btn btn-primary analyze-action" data-id="<%= +id %>" type="button">Analyze</button>
-                    <%
-                break;
-            case RUNNING:
-        %>
+                <%
+                        break;
+                    case RUNNING:
+                %>
                 <div class="progress progress-striped" style="width: 100px">
                     <div class="bar" style="width: <%= entry.getProgressPercent() %>%;"></div>
                 </div>
-                    <%
-                break;
-            case FAILED:
-        %>
+                <%
+                        break;
+                    case FAILED:
+                %>
                 <div class="alert">Search failed</div>
                 <button class="btn btn-primary analyze-action" data-id="<%= id %>" type="button">Re-analyze</button>
-                    <%
-                break;
-            case SUCCESS:
-        %>
-                <button class="btn result-action" data-id="<%= id %>" type="button">Result</button>
-                    <%
+                <%
                         break;
-                }
+                    case SUCCESS:
+                %>
+                <button class="btn result-action" data-id="<%= id %>" type="button">Result</button>
+                <%
+                            break;
+                    }
 
-                out.print("</td></tr>");
+                %>
+            </td>
+        </tr>
+        <%
             }
         %>
     </table>
@@ -143,7 +146,7 @@
     }
 
     function showResult(id) {
-        window.location.url = "/service/heme/data/"+id+"/report.html";
+        window.location.href = "/service/heme/data/" + id + "/report.html";
     }
 
     function saveValue(id, type, value) {

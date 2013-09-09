@@ -2,6 +2,7 @@ package edu.mayo.mprc.swift.webservice;
 
 import edu.mayo.mprc.MprcException;
 import edu.mayo.mprc.config.RunningApplicationContext;
+import edu.mayo.mprc.heme.HemeReport;
 import edu.mayo.mprc.heme.HemeUi;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -84,6 +85,25 @@ public final class HemeService {
 		return modelAndView;
 	}
 
+	@RequestMapping(value = "/heme/data/{entry}/report.*", method = RequestMethod.GET)
+	public ModelAndView viewReport(@PathVariable final int entry) {
+		final HemeUi hemeUi = getHemeUi();
+		final ModelAndView modelAndView = new ModelAndView();
+
+		hemeUi.begin();
+		try {
+			HemeReport report = hemeUi.createReport(entry);
+			modelAndView.addObject("report", report);
+			modelAndView.setView(new HemeReportView());
+			hemeUi.commit();
+		} catch (Exception e) {
+			hemeUi.rollback();
+			throw new MprcException("Could not start Swift search", e);
+		}
+
+		return modelAndView;
+
+	}
 
 	private HemeUi getHemeUi() {
 		return (HemeUi) getApplicationContext().createResource(getApplicationContext().getSingletonConfig(HemeUi.Config.class));

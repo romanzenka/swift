@@ -2,9 +2,9 @@ package edu.mayo.mprc.searchdb.builder;
 
 import com.google.common.base.Joiner;
 import com.google.common.base.Objects;
-import com.google.common.base.Splitter;
 import com.google.common.collect.Iterables;
 import edu.mayo.mprc.MprcException;
+import edu.mayo.mprc.scaffoldparser.spectra.ScaffoldSpectraReader;
 import edu.mayo.mprc.searchdb.dao.ProteinGroup;
 import edu.mayo.mprc.searchdb.dao.ProteinGroupList;
 import edu.mayo.mprc.searchdb.dao.ProteinSequenceList;
@@ -15,7 +15,6 @@ import java.util.*;
  * @author Roman Zenka
  */
 public class ProteinGroupListBuilder implements Builder<ProteinGroupList> {
-	private static final Splitter PROTEIN_ACCESSION_SPLITTER = Splitter.on(',').trimResults().omitEmptyStrings();
 
 	private SearchResultBuilder searchResult;
 
@@ -59,7 +58,7 @@ public class ProteinGroupListBuilder implements Builder<ProteinGroupList> {
 	                                           final double percentageOfTotalSpectra, final double percentageSequenceCoverage,
 	                                           final double proteinIdentificationProbability) {
 		// Canonicalize the protein accession numbers- just in case
-		final String[] accNums = Iterables.toArray(PROTEIN_ACCESSION_SPLITTER.split(proteinAccessionNumbers), String.class);
+		final String[] accNums = Iterables.toArray(ScaffoldSpectraReader.PROTEIN_ACCESSION_SPLITTER.split(proteinAccessionNumbers), String.class);
 
 		Arrays.sort(accNums, String.CASE_INSENSITIVE_ORDER);
 		final String canonicalizedAccNums = Joiner.on(',').join(accNums);
