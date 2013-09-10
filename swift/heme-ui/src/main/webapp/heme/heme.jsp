@@ -146,7 +146,7 @@
     }
 
     function showResult(id) {
-        window.location.href = "/service/heme/data/" + id + "/report.html";
+        window.location.href = "/service/heme/data/" + id + "/report.tsv";
     }
 
     function saveValue(id, type, value) {
