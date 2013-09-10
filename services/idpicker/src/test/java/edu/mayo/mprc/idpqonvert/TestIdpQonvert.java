@@ -27,6 +27,7 @@ public final class TestIdpQonvert {
 	private File tmpFolder;
 	private File pepXmlFile;
 	private File fastaFile;
+	private File outputFile;
 
 	@BeforeClass
 	public void startup() {
@@ -56,6 +57,7 @@ public final class TestIdpQonvert {
 		if (FileUtilities.isLinuxPlatform() || FileUtilities.isWindowsPlatform()) {
 			Installer.pepXmlFiles(tmpFolder, Installer.Action.UNINSTALL);
 			Installer.yeastFastaFiles(tmpFolder, Installer.Action.UNINSTALL);
+			FileUtilities.cleanupTempFile(outputFile);
 			FileUtilities.cleanupTempFile(tmpFolder);
 		}
 	}
@@ -69,7 +71,7 @@ public final class TestIdpQonvert {
 			IdpQonvertWorker.Factory factory = new IdpQonvertWorker.Factory();
 			final IdpQonvertWorker worker = (IdpQonvertWorker) factory.create(config, new DependencyResolver(null));
 
-			final File outputFile = tempFile("out.idp");
+			outputFile = tempFile("out.idp");
 			final File inputFile = pepXmlFile;
 			final IdpQonvertSettings params = new IdpQonvertSettings();
 			params.setDecoyPrefix("REVERSE_");
