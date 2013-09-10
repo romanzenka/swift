@@ -12,7 +12,7 @@ import edu.mayo.mprc.swift.ExitCode;
 import edu.mayo.mprc.swift.SwiftMonitor;
 import edu.mayo.mprc.swift.WebUi;
 import edu.mayo.mprc.swift.WebUiHolder;
-import edu.mayo.mprc.swift.search.SwiftSearcherCaller;
+import edu.mayo.mprc.swift.search.DefaultSwiftSearcherCaller;
 import edu.mayo.mprc.utilities.FileUtilities;
 import org.apache.log4j.Logger;
 import org.springframework.stereotype.Component;
@@ -34,7 +34,7 @@ public final class InitializeWebCommand implements SwiftCommand {
 	private CurationWebContext curationWebContext;
 	private SwiftMonitor swiftMonitor;
 	private ActiveMQConnectionPool connectionPool;
-	private SwiftSearcherCaller swiftSearcherCaller;
+	private DefaultSwiftSearcherCaller swiftSearcherCaller;
 
 	@Override
 	public String getName() {
@@ -150,12 +150,12 @@ public final class InitializeWebCommand implements SwiftCommand {
 		this.connectionPool = connectionPool;
 	}
 
-	public SwiftSearcherCaller getSwiftSearcherCaller() {
+	public DefaultSwiftSearcherCaller getSwiftSearcherCaller() {
 		return swiftSearcherCaller;
 	}
 
 	@Resource(name = "swiftSearcherCaller")
-	public void setSwiftSearcherCaller(final SwiftSearcherCaller swiftSearcherCaller) {
+	public void setSwiftSearcherCaller(final DefaultSwiftSearcherCaller swiftSearcherCaller) {
 		this.swiftSearcherCaller = swiftSearcherCaller;
 	}
 }
