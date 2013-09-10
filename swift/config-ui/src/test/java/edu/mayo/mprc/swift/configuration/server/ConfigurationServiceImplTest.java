@@ -1,6 +1,8 @@
 package edu.mayo.mprc.swift.configuration.server;
 
 import edu.mayo.mprc.common.client.GWTServiceException;
+import edu.mayo.mprc.swift.MainFactoryContext;
+import edu.mayo.mprc.swift.ResourceTable;
 import edu.mayo.mprc.swift.configuration.client.model.ApplicationModel;
 import edu.mayo.mprc.swift.configuration.server.session.HashStorage;
 import org.testng.Assert;
@@ -19,6 +21,7 @@ public final class ConfigurationServiceImplTest {
 	public void setup() throws Exception {
 		service = new ConfigurationServiceImpl();
 		service.setStorage(new HashStorage());
+		service.setResourceTable((ResourceTable) MainFactoryContext.getContext().getBean("resourceTable"));
 		loadDefault();
 	}
 
