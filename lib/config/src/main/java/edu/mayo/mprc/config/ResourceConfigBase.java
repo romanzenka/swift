@@ -9,6 +9,7 @@ import edu.mayo.mprc.config.ui.UiBuilder;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 
 /**
  * A base for trivial resource configs that only store values as strings.
@@ -17,7 +18,7 @@ import java.util.Map;
  * @author Roman Zenka
  */
 public abstract class ResourceConfigBase implements ResourceConfig {
-	private Map<String, String> data = new HashMap<String, String>();
+	private Map<String, String> data = new TreeMap<String, String>();
 
 	/**
 	 * Get value for given key.
@@ -61,7 +62,10 @@ public abstract class ResourceConfigBase implements ResourceConfig {
 
 		for (final Map.Entry<String, String> entry : data.entrySet()) {
 			final String key = entry.getKey();
-			writer.put(key, entry.getValue(), Strings.nullToEmpty(descriptions.get(key)));
+			final String value = entry.getValue();
+			if (!Strings.isNullOrEmpty(value)) {
+				writer.put(key, value, Strings.nullToEmpty(descriptions.get(key)));
+			}
 		}
 	}
 
