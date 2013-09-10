@@ -4,7 +4,10 @@ import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
 import com.google.common.io.Files;
 import edu.mayo.mprc.MprcException;
-import edu.mayo.mprc.config.*;
+import edu.mayo.mprc.config.DaemonConfig;
+import edu.mayo.mprc.config.DependencyResolver;
+import edu.mayo.mprc.config.ResourceConfig;
+import edu.mayo.mprc.config.ResourceConfigBase;
 import edu.mayo.mprc.config.ui.ServiceUiFactory;
 import edu.mayo.mprc.config.ui.UiBuilder;
 import edu.mayo.mprc.daemon.WorkPacket;
@@ -37,7 +40,7 @@ public final class IdpQonvertWorker extends WorkerBase {
 			"<p>Inputs are results from the search engines (in .mzid format), output is an .idp file (sqlite3) with search engine scores " +
 			"recalculated to match a particular target FDR.</p>";
 
-	private static final String IDPQONVERT_EXECUTABLE = "idpqonvert";
+	public static final String IDPQONVERT_EXECUTABLE = "idpqonvert";
 
 	private File idpQonvertExecutable;
 
@@ -136,7 +139,7 @@ public final class IdpQonvertWorker extends WorkerBase {
 		@Override
 		public Worker create(final Config config, final DependencyResolver dependencies) {
 			final IdpQonvertWorker worker = new IdpQonvertWorker();
-			worker.setIdpQonvertExecutable(new File(config.getIdpQonvertExecutable()));
+			worker.setIdpQonvertExecutable(new File(config.get(IDPQONVERT_EXECUTABLE)));
 			return worker;
 		}
 
@@ -149,38 +152,8 @@ public final class IdpQonvertWorker extends WorkerBase {
 	/**
 	 * Configuration for the factory
 	 */
-	public static final class Config implements ResourceConfig {
-
-		private String idpQonvertExecutable;
-
+	public static final class Config extends ResourceConfigBase {
 		public Config() {
-		}
-
-		public Config(final String idpQonvertExecutable) {
-			setIdpQonvertExecutable(idpQonvertExecutable);
-		}
-
-		public String getIdpQonvertExecutable() {
-			return idpQonvertExecutable;
-		}
-
-		public void setIdpQonvertExecutable(final String idpQonvertExecutable) {
-			this.idpQonvertExecutable = idpQonvertExecutable;
-		}
-
-		@Override
-		public void save(final ConfigWriter writer) {
-			writer.put(IDPQONVERT_EXECUTABLE, getIdpQonvertExecutable());
-		}
-
-		@Override
-		public void load(final ConfigReader reader) {
-			setIdpQonvertExecutable(reader.get(IDPQONVERT_EXECUTABLE));
-		}
-
-		@Override
-		public int getPriority() {
-			return 0;
 		}
 	}
 

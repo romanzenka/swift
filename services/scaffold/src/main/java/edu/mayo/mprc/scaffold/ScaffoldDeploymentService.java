@@ -1,7 +1,10 @@
 package edu.mayo.mprc.scaffold;
 
 import edu.mayo.mprc.MprcException;
-import edu.mayo.mprc.config.*;
+import edu.mayo.mprc.config.DaemonConfig;
+import edu.mayo.mprc.config.DependencyResolver;
+import edu.mayo.mprc.config.ResourceConfig;
+import edu.mayo.mprc.config.ResourceConfigBase;
 import edu.mayo.mprc.config.ui.ServiceUiFactory;
 import edu.mayo.mprc.config.ui.UiBuilder;
 import edu.mayo.mprc.daemon.Worker;
@@ -137,37 +140,12 @@ public final class ScaffoldDeploymentService extends DeploymentService<Deploymen
 	/**
 	 * Configuration for the factory
 	 */
-	public static final class Config implements ResourceConfig {
-		private String deployableDbFolder;
-
+	public static final class Config extends ResourceConfigBase {
 		public Config() {
 		}
 
 		public Config(final String deployableDbFolder) {
-			this.deployableDbFolder = deployableDbFolder;
-		}
-
-		public String getDeployableDbFolder() {
-			return deployableDbFolder;
-		}
-
-		public void setDeployableDbFolder(final String deployableDbFolder) {
-			this.deployableDbFolder = deployableDbFolder;
-		}
-
-		@Override
-		public void save(final ConfigWriter writer) {
-			writer.put(DEPLOYABLE_DB_FOLDER, getDeployableDbFolder());
-		}
-
-		@Override
-		public void load(final ConfigReader reader) {
-			setDeployableDbFolder(reader.get(DEPLOYABLE_DB_FOLDER));
-		}
-
-		@Override
-		public int getPriority() {
-			return 0;
+			put(DEPLOYABLE_DB_FOLDER, deployableDbFolder);
 		}
 	}
 
@@ -181,7 +159,7 @@ public final class ScaffoldDeploymentService extends DeploymentService<Deploymen
 			ScaffoldDeploymentService worker = null;
 			try {
 				worker = new ScaffoldDeploymentService();
-				worker.setDeployableDbFolder(new File(config.getDeployableDbFolder()).getAbsoluteFile());
+				worker.setDeployableDbFolder(new File(config.get(DEPLOYABLE_DB_FOLDER)).getAbsoluteFile());
 
 			} catch (Exception e) {
 				throw new MprcException("Scaffold deployment service worker could not be created.", e);

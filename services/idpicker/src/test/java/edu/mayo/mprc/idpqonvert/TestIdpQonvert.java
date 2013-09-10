@@ -66,7 +66,7 @@ public final class TestIdpQonvert {
 	public void shouldRun() {
 		if (FileUtilities.isLinuxPlatform() || FileUtilities.isWindowsPlatform()) {
 			IdpQonvertWorker.Config config = new IdpQonvertWorker.Config();
-			config.setIdpQonvertExecutable(idpQonvert.getAbsolutePath());
+			config.put(IdpQonvertWorker.IDPQONVERT_EXECUTABLE, idpQonvert.getAbsolutePath());
 
 			IdpQonvertWorker.Factory factory = new IdpQonvertWorker.Factory();
 			final IdpQonvertWorker worker = (IdpQonvertWorker) factory.create(config, new DependencyResolver(null));

@@ -101,7 +101,8 @@ public final class TestDaemonFactory {
 		final MessageBroker.Config messageBroker = new MessageBroker.Config();
 		daemon1.addResource(messageBroker);
 		final MascotCache.Config mascotCache = new MascotCache.Config();
-		final MascotWorker.Config mascot = new MascotWorker.Config("http://mascot");
+		final MascotWorker.Config mascot = new MascotWorker.Config();
+		mascot.put(MascotWorker.MASCOT_URL, "http://mascot");
 		final SimpleRunner.Config mascotRunner = new SimpleRunner.Config();
 		mascotRunner.setWorkerConfiguration(mascot);
 		final ServiceConfig mascotService = new ServiceConfig("mascot", mascotRunner);

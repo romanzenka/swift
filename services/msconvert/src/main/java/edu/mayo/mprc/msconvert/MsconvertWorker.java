@@ -2,7 +2,10 @@ package edu.mayo.mprc.msconvert;
 
 import com.google.common.collect.Lists;
 import edu.mayo.mprc.MprcException;
-import edu.mayo.mprc.config.*;
+import edu.mayo.mprc.config.DaemonConfig;
+import edu.mayo.mprc.config.DependencyResolver;
+import edu.mayo.mprc.config.ResourceConfig;
+import edu.mayo.mprc.config.ResourceConfigBase;
 import edu.mayo.mprc.config.ui.ServiceUiFactory;
 import edu.mayo.mprc.config.ui.UiBuilder;
 import edu.mayo.mprc.daemon.WorkPacket;
@@ -123,7 +126,7 @@ public final class MsconvertWorker extends WorkerBase {
 			command.add("peakPicking true 2-"); // Do peak picking on MS2 and higher
 		}
 
-		if(ms2Profile || agilentData(rawFile)) {
+		if (ms2Profile || agilentData(rawFile)) {
 			command.add("--filter");
 			command.add("threshold absolute 0.1 most-intense"); // The peak-picked data have a lot of 0-intensity peaks. toss those
 		}
@@ -241,8 +244,8 @@ public final class MsconvertWorker extends WorkerBase {
 		@Override
 		public Worker create(final Config config, final DependencyResolver dependencies) {
 			final MsconvertWorker worker = new MsconvertWorker();
-			worker.setMsaccessExecutable(new File(config.getMsaccessExecutable()));
-			worker.setMsconvertExecutable(new File(config.getMsconvertExecutable()));
+			worker.setMsaccessExecutable(new File(config.get(MSACCESS_EXECUTABLE)));
+			worker.setMsconvertExecutable(new File(config.get(MSCONVERT_EXECUTABLE)));
 			return worker;
 		}
 	}
@@ -250,50 +253,13 @@ public final class MsconvertWorker extends WorkerBase {
 	/**
 	 * Configuration for the factory
 	 */
-	public static final class Config implements ResourceConfig {
-
-		private String msconvertExecutable;
-		private String msaccessExecutable;
-
+	public static final class Config extends ResourceConfigBase {
 		public Config() {
 		}
 
-		public Config(final String msconvertExecutable, final String msaccessExecutable) {
-			this.msconvertExecutable = msconvertExecutable;
-			this.msaccessExecutable = msaccessExecutable;
-		}
-
-		public String getMsconvertExecutable() {
-			return msconvertExecutable;
-		}
-
-		public void setMsconvertExecutable(final String msconvertExecutable) {
-			this.msconvertExecutable = msconvertExecutable;
-		}
-
-		public String getMsaccessExecutable() {
-			return msaccessExecutable;
-		}
-
-		public void setMsaccessExecutable(final String msaccessExecutable) {
-			this.msaccessExecutable = msaccessExecutable;
-		}
-
-		@Override
-		public void save(final ConfigWriter writer) {
-			writer.put(MSCONVERT_EXECUTABLE, getMsconvertExecutable(), "Location of ProteoWizard's msconvert.exe");
-			writer.put(MSACCESS_EXECUTABLE, getMsaccessExecutable(), "Location of ProteoWizard's msaccess.exe");
-		}
-
-		@Override
-		public void load(final ConfigReader reader) {
-			setMsconvertExecutable(reader.get(MSCONVERT_EXECUTABLE));
-			setMsaccessExecutable(reader.get(MSACCESS_EXECUTABLE));
-		}
-
-		@Override
-		public int getPriority() {
-			return 0;
+		public Config(final String msconvert, final String msaccess) {
+			put(MSCONVERT_EXECUTABLE, msconvert);
+			put(MSACCESS_EXECUTABLE, msaccess);
 		}
 	}
 

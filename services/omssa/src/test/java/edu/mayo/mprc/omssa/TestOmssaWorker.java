@@ -58,7 +58,9 @@ public class TestOmssaWorker {
 			omssaDeployedFile = new File(DATABASE_DEPLOYMENT_DIR, DATABASE_SHORT_NAME + "/" + fastaFile.getName());
 
 			final String formatdbPath = new File(formatdbFolder, FileUtilities.isWindowsPlatform() ? "formatdb.exe" : "formatdb").getAbsolutePath();
-			final OmssaDeploymentService.Config omssaConfig = new OmssaDeploymentService.Config(formatdbPath, omssaTemp.getAbsolutePath());
+			final OmssaDeploymentService.Config omssaConfig = new OmssaDeploymentService.Config();
+			omssaConfig.put(OmssaDeploymentService.FORMAT_DB_EXE, formatdbPath);
+			omssaConfig.put(OmssaDeploymentService.DEPLOYABLE_DB_FOLDER, omssaTemp.getAbsolutePath());
 
 			final OmssaDeploymentService.Factory factory = new OmssaDeploymentService.Factory();
 
@@ -107,7 +109,8 @@ public class TestOmssaWorker {
 				throw new MprcException("Unsupported platform");
 			}
 
-			final OmssaWorker.Config omssaConfig = new OmssaWorker.Config(omssaclPath);
+			final OmssaWorker.Config omssaConfig = new OmssaWorker.Config();
+			omssaConfig.put(OmssaWorker.OMSSACL_PATH, omssaclPath);
 			final OmssaWorker.Factory factory = new OmssaWorker.Factory();
 			factory.setOmssaUserModsWriter(new OmssaUserModsWriter());
 
@@ -119,7 +122,7 @@ public class TestOmssaWorker {
 			omssaWorker.processRequest(workPacket, new ProgressReporter() {
 				@Override
 				public void reportStart(final String hostString) {
-					LOGGER.info("Started processing on "+hostString);
+					LOGGER.info("Started processing on " + hostString);
 				}
 
 				@Override

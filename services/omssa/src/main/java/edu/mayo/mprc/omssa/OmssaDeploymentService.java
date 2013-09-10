@@ -1,7 +1,10 @@
 package edu.mayo.mprc.omssa;
 
 import edu.mayo.mprc.MprcException;
-import edu.mayo.mprc.config.*;
+import edu.mayo.mprc.config.DaemonConfig;
+import edu.mayo.mprc.config.DependencyResolver;
+import edu.mayo.mprc.config.ResourceConfig;
+import edu.mayo.mprc.config.ResourceConfigBase;
 import edu.mayo.mprc.config.ui.ExecutableSwitching;
 import edu.mayo.mprc.config.ui.ServiceUiFactory;
 import edu.mayo.mprc.config.ui.UiBuilder;
@@ -249,50 +252,13 @@ public final class OmssaDeploymentService extends DeploymentService<DeploymentRe
 	/**
 	 * Configuration for the factory
 	 */
-	public static final class Config implements ResourceConfig {
-
-		private String formatDbExe;
-		private String deployableDbFolder;
-
+	public static final class Config extends ResourceConfigBase {
 		public Config() {
 		}
 
 		public Config(final String formatDbExe, final String deployableDbFolder) {
-			this.formatDbExe = formatDbExe;
-			this.deployableDbFolder = deployableDbFolder;
-		}
-
-		public String getDeployableDbFolder() {
-			return deployableDbFolder;
-		}
-
-		public void setDeployableDbFolder(final String deployableDbFolder) {
-			this.deployableDbFolder = deployableDbFolder;
-		}
-
-		public String getFormatDbExe() {
-			return formatDbExe;
-		}
-
-		public void setFormatDbExe(final String formatDbExe) {
-			this.formatDbExe = formatDbExe;
-		}
-
-		@Override
-		public void save(final ConfigWriter writer) {
-			writer.put(FORMAT_DB_EXE, getFormatDbExe());
-			writer.put(DEPLOYABLE_DB_FOLDER, getDeployableDbFolder());
-		}
-
-		@Override
-		public void load(final ConfigReader reader) {
-			setFormatDbExe(reader.get(FORMAT_DB_EXE));
-			setDeployableDbFolder(reader.get(DEPLOYABLE_DB_FOLDER));
-		}
-
-		@Override
-		public int getPriority() {
-			return 0;
+			put(FORMAT_DB_EXE, formatDbExe);
+			put(DEPLOYABLE_DB_FOLDER, deployableDbFolder);
 		}
 	}
 
@@ -305,12 +271,12 @@ public final class OmssaDeploymentService extends DeploymentService<DeploymentRe
 		public Worker create(final Config config, final DependencyResolver dependencies) {
 			OmssaDeploymentService worker = null;
 			try {
-				worker = new OmssaDeploymentService(new File(config.getFormatDbExe()));
+				worker = new OmssaDeploymentService(new File(config.get(FORMAT_DB_EXE)));
 			} catch (Exception e) {
 				throw new MprcException("Omssa deployment service worker could not be created.", e);
 			}
 
-			worker.setDeployableDbFolder(new File(config.getDeployableDbFolder()).getAbsoluteFile());
+			worker.setDeployableDbFolder(new File(config.get(DEPLOYABLE_DB_FOLDER)).getAbsoluteFile());
 
 			return worker;
 		}

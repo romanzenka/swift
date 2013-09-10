@@ -4,7 +4,10 @@ import com.google.common.base.Charsets;
 import com.google.common.base.Joiner;
 import com.google.common.io.Files;
 import edu.mayo.mprc.MprcException;
-import edu.mayo.mprc.config.*;
+import edu.mayo.mprc.config.DaemonConfig;
+import edu.mayo.mprc.config.DependencyResolver;
+import edu.mayo.mprc.config.ResourceConfig;
+import edu.mayo.mprc.config.ResourceConfigBase;
 import edu.mayo.mprc.config.ui.ServiceUiFactory;
 import edu.mayo.mprc.config.ui.UiBuilder;
 import edu.mayo.mprc.daemon.WorkPacket;
@@ -174,7 +177,7 @@ public final class MyriMatchWorker extends WorkerBase {
 		public Worker create(final Config config, final DependencyResolver dependencies) {
 			MyriMatchWorker worker = null;
 			try {
-				worker = new MyriMatchWorker(FileUtilities.getAbsoluteFileForExecutables(new File(config.getExecutable())));
+				worker = new MyriMatchWorker(FileUtilities.getAbsoluteFileForExecutables(new File(config.get(EXECUTABLE))));
 			} catch (Exception e) {
 				throw new MprcException("MyriMatch worker could not be created.", e);
 			}
@@ -190,37 +193,8 @@ public final class MyriMatchWorker extends WorkerBase {
 	/**
 	 * Configuration for the factory
 	 */
-	public static final class Config implements ResourceConfig {
-		private String executable;
-
+	public static final class Config extends ResourceConfigBase {
 		public Config() {
-		}
-
-		public Config(final String executable) {
-			this.executable = executable;
-		}
-
-		public String getExecutable() {
-			return executable;
-		}
-
-		public void setExecutable(final String executable) {
-			this.executable = executable;
-		}
-
-		@Override
-		public void save(final ConfigWriter writer) {
-			writer.put(EXECUTABLE, getExecutable(), "MyriMatch executable");
-		}
-
-		@Override
-		public void load(final ConfigReader reader) {
-			setExecutable(reader.get(EXECUTABLE));
-		}
-
-		@Override
-		public int getPriority() {
-			return 0;
 		}
 	}
 

@@ -60,21 +60,8 @@ public final class PingDaemonWorker extends WorkerBase implements NoLoggingWorke
 	/**
 	 * Configuration for the factory
 	 */
-	public static final class Config implements ResourceConfig {
+	public static final class Config extends ResourceConfigBase {
 		public Config() {
-		}
-
-		@Override
-		public void save(final ConfigWriter writer) {
-		}
-
-		@Override
-		public void load(final ConfigReader reader) {
-		}
-
-		@Override
-		public int getPriority() {
-			return 0;
 		}
 	}
 

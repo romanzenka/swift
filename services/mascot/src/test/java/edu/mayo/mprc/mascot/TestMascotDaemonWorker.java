@@ -69,8 +69,8 @@ public final class TestMascotDaemonWorker {
 		final File mascotOut = new File(mascotTemp, "mascot.dat");
 
 		final File mascotParamFile = createMascotParamFile();
-
-		final MascotWorker.Config config = new MascotWorker.Config(MASCOT_URL);
+		final MascotWorker.Config config = new MascotWorker.Config();
+		config.put(MascotWorker.MASCOT_URL, MASCOT_URL);
 		final MascotWorker.Factory factory = new MascotWorker.Factory();
 
 		final Worker worker = factory.create(config, null);

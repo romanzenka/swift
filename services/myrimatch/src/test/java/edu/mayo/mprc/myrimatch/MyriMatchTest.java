@@ -421,7 +421,8 @@ public final class MyriMatchTest {
 	private MyriMatchWorker createWorker(final String executable) {
 		final MyriMatchWorker.Factory factory = new MyriMatchWorker.Factory();
 
-		final MyriMatchWorker.Config config = new MyriMatchWorker.Config(executable);
+		final MyriMatchWorker.Config config = new MyriMatchWorker.Config();
+		config.put(MyriMatchWorker.EXECUTABLE, executable);
 		final DependencyResolver resolver = new DependencyResolver(null);
 
 		return (MyriMatchWorker) factory.create(config, resolver);

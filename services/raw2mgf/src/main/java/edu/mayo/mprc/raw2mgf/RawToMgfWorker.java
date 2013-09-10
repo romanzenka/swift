@@ -3,7 +3,10 @@ package edu.mayo.mprc.raw2mgf;
 import com.google.common.base.Splitter;
 import com.google.common.base.Strings;
 import edu.mayo.mprc.MprcException;
-import edu.mayo.mprc.config.*;
+import edu.mayo.mprc.config.DaemonConfig;
+import edu.mayo.mprc.config.DependencyResolver;
+import edu.mayo.mprc.config.ResourceConfig;
+import edu.mayo.mprc.config.ResourceConfigBase;
 import edu.mayo.mprc.config.ui.ServiceUiFactory;
 import edu.mayo.mprc.config.ui.UiBuilder;
 import edu.mayo.mprc.config.ui.WrapperScriptSwitcher;
@@ -47,8 +50,8 @@ public final class RawToMgfWorker extends WorkerBase {
 
 	public static final String TEMP_FOLDER = "tempFolder";
 	public static final String EXTRACT_MSN_EXECUTABLE = "extractMsnExecutable";
-	private static final String WRAPPER_SCRIPT = "wrapperScript";
-	private static final String XVFB_WRAPPER_SCRIPT = "xvfbWrapperScript";
+	public static final String WRAPPER_SCRIPT = "wrapperScript";
+	public static final String XVFB_WRAPPER_SCRIPT = "xvfbWrapperScript";
 
 	private static final int MAX_RAW_PATH_LENGTH = 100;
 
@@ -104,7 +107,7 @@ public final class RawToMgfWorker extends WorkerBase {
 		final File fulltempfolder = getMirrorFolderonTemp(tempFolder);
 		FileUtilities.ensureFolderExists(fulltempfolder);
 
-		FilePathShortener shortener = new FilePathShortener(rawFile, MAX_RAW_PATH_LENGTH);
+		final FilePathShortener shortener = new FilePathShortener(rawFile, MAX_RAW_PATH_LENGTH);
 		rawFile = shortener.getShortenedFile();
 
 		long currentSpectrum = firstSpectrum == null ? 1 : firstSpectrum;
@@ -120,7 +123,7 @@ public final class RawToMgfWorker extends WorkerBase {
 				runExtractMsnJob(executable, fulltempfolder, params, rawFile, currentSpectrum, lastSpectrumInBatch, wrapperScript, xvfbWrapperScript == null ? null : xvfbWrapperScript.getAbsolutePath());
 
 				// Extract .dta files
-				File[] dtaFiles = getDtaFiles(fulltempfolder);
+				final File[] dtaFiles = getDtaFiles(fulltempfolder);
 
 				// Terminate if we could not find any .dta anymore
 				if (dtaFiles.length == 0) {
@@ -389,10 +392,10 @@ public final class RawToMgfWorker extends WorkerBase {
 		@Override
 		public Worker create(final Config config, final DependencyResolver dependencies) {
 			final RawToMgfWorker worker = new RawToMgfWorker();
-			worker.setTempFolder(new File(config.getTempFolder()));
-			worker.setWrapperScript(config.getWrapperScript());
-			worker.setXvfbWrapperScript(Strings.isNullOrEmpty(config.getXvfbWrapperScript()) ? null : new File(config.getXvfbWrapperScript()));
-			worker.setExtractMsnExecutable(new File(config.getExtractMsnExecutable()));
+			worker.setTempFolder(new File(config.get(TEMP_FOLDER)));
+			worker.setWrapperScript(config.get(WRAPPER_SCRIPT));
+			worker.setXvfbWrapperScript(Strings.isNullOrEmpty(config.get(XVFB_WRAPPER_SCRIPT)) ? null : new File(config.get(XVFB_WRAPPER_SCRIPT)));
+			worker.setExtractMsnExecutable(new File(config.get(EXTRACT_MSN_EXECUTABLE)));
 			return worker;
 		}
 	}
@@ -400,74 +403,15 @@ public final class RawToMgfWorker extends WorkerBase {
 	/**
 	 * Configuration for the factory
 	 */
-	public static final class Config implements ResourceConfig {
-
-		private String tempFolder;
-		private String wrapperScript;
-		private String xvfbWrapperScript;
-		private String extractMsnExecutable;
-
+	public static final class Config extends ResourceConfigBase {
 		public Config() {
 		}
 
-		public Config(final String tempFolder, final String wrapperScript, final String xvfbWrapperScript, final String extractMsnExecutable) {
-			this.tempFolder = tempFolder;
-			this.wrapperScript = wrapperScript;
-			this.xvfbWrapperScript = xvfbWrapperScript;
-			this.extractMsnExecutable = extractMsnExecutable;
-		}
-
-		public String getTempFolder() {
-			return tempFolder;
-		}
-
-		public void setTempFolder(final String tempFolder) {
-			this.tempFolder = tempFolder;
-		}
-
-		public String getWrapperScript() {
-			return wrapperScript;
-		}
-
-		public void setWrapperScript(final String wrapperScript) {
-			this.wrapperScript = wrapperScript;
-		}
-
-		public String getExtractMsnExecutable() {
-			return extractMsnExecutable;
-		}
-
-		public void setExtractMsnExecutable(final String extractMsnExecutable) {
-			this.extractMsnExecutable = extractMsnExecutable;
-		}
-
-		public String getXvfbWrapperScript() {
-			return xvfbWrapperScript;
-		}
-
-		public void setXvfbWrapperScript(final String xvfbWrapperScript) {
-			this.xvfbWrapperScript = xvfbWrapperScript;
-		}
-
-		@Override
-		public void save(final ConfigWriter writer) {
-			writer.put(TEMP_FOLDER, getTempFolder(), "Temp folder to extract the .dta files to");
-			writer.put(WRAPPER_SCRIPT, getWrapperScript(), "Only for linux - wraps the calls with wine");
-			writer.put(XVFB_WRAPPER_SCRIPT, getXvfbWrapperScript(), "Only for linux - wraps the calls with start of X virtual frame buffer (when UI is needed by wine)");
-			writer.put(EXTRACT_MSN_EXECUTABLE, getExtractMsnExecutable(), "extract_msn.exe path");
-		}
-
-		@Override
-		public void load(final ConfigReader reader) {
-			tempFolder = reader.get(TEMP_FOLDER);
-			wrapperScript = reader.get(WRAPPER_SCRIPT);
-			xvfbWrapperScript = reader.get(XVFB_WRAPPER_SCRIPT);
-			extractMsnExecutable = reader.get(EXTRACT_MSN_EXECUTABLE);
-		}
-
-		@Override
-		public int getPriority() {
-			return 0;
+		public Config(final String tempFolder, final String wrapperScript, final String xvfbWrapper, final String extractMsn) {
+			put(TEMP_FOLDER, tempFolder);
+			put(WRAPPER_SCRIPT, wrapperScript);
+			put(XVFB_WRAPPER_SCRIPT, xvfbWrapper);
+			put(EXTRACT_MSN_EXECUTABLE, extractMsn);
 		}
 	}
 

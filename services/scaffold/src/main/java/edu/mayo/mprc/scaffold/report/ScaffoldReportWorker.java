@@ -1,7 +1,10 @@
 package edu.mayo.mprc.scaffold.report;
 
 import edu.mayo.mprc.MprcException;
-import edu.mayo.mprc.config.*;
+import edu.mayo.mprc.config.DaemonConfig;
+import edu.mayo.mprc.config.DependencyResolver;
+import edu.mayo.mprc.config.ResourceConfig;
+import edu.mayo.mprc.config.ResourceConfigBase;
 import edu.mayo.mprc.config.ui.ServiceUiFactory;
 import edu.mayo.mprc.config.ui.UiBuilder;
 import edu.mayo.mprc.daemon.WorkPacket;
@@ -76,22 +79,8 @@ public final class ScaffoldReportWorker extends WorkerBase {
 	/**
 	 * Configuration for the factory
 	 */
-	public static final class Config implements ResourceConfig {
-
+	public static final class Config extends ResourceConfigBase {
 		public Config() {
-		}
-
-		@Override
-		public void save(final ConfigWriter writer) {
-		}
-
-		@Override
-		public void load(final ConfigReader reader) {
-		}
-
-		@Override
-		public int getPriority() {
-			return 0;
 		}
 	}
 

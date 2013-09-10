@@ -1,7 +1,10 @@
 package edu.mayo.mprc.qa;
 
 import edu.mayo.mprc.MprcException;
-import edu.mayo.mprc.config.*;
+import edu.mayo.mprc.config.DaemonConfig;
+import edu.mayo.mprc.config.DependencyResolver;
+import edu.mayo.mprc.config.ResourceConfig;
+import edu.mayo.mprc.config.ResourceConfigBase;
 import edu.mayo.mprc.config.ui.ServiceUiFactory;
 import edu.mayo.mprc.config.ui.UiBuilder;
 import edu.mayo.mprc.daemon.WorkPacket;
@@ -321,9 +324,10 @@ public final class QaWorker extends WorkerBase {
 		@Override
 		public Worker create(final Config config, final DependencyResolver dependencies) {
 			final QaWorker qaWorker = new QaWorker();
-			qaWorker.setRExecutable(config.getRExecutable());
-			qaWorker.setRScript(new File(config.getRScript()));
-			qaWorker.setXvfbWrapperScript(config.getXvfbWrapperScript() != null && !config.getXvfbWrapperScript().isEmpty() ? new File(config.getXvfbWrapperScript()) : null);
+			qaWorker.setRExecutable(config.get(R_EXECUTABLE));
+			qaWorker.setRScript(new File(config.get(R_SCRIPT)));
+			String xvfbWrapperScript = config.get(XVFB_WRAPPER_SCRIPT);
+			qaWorker.setXvfbWrapperScript(xvfbWrapperScript != null && !xvfbWrapperScript.isEmpty() ? new File(xvfbWrapperScript) : null);
 			return qaWorker;
 		}
 	}
@@ -331,61 +335,13 @@ public final class QaWorker extends WorkerBase {
 	/**
 	 * Configuration for the factory
 	 */
-	public static final class Config implements ResourceConfig {
-
-		private String xvfbWrapperScript;
-		private String rScript;
-		private String rExecutable;
-
+	public static final class Config extends ResourceConfigBase {
 		public Config() {
 		}
 
-		public Config(final String xvfbWrapperScript, final String rScript) {
-			this.xvfbWrapperScript = xvfbWrapperScript;
-			this.rScript = rScript;
-		}
-
-		public String getXvfbWrapperScript() {
-			return xvfbWrapperScript;
-		}
-
-		public void setXvfbWrapperScript(final String xvfbWrapperScript) {
-			this.xvfbWrapperScript = xvfbWrapperScript;
-		}
-
-		public String getRScript() {
-			return rScript;
-		}
-
-		public void setRScript(final String rScript) {
-			this.rScript = rScript;
-		}
-
-		public String getRExecutable() {
-			return rExecutable;
-		}
-
-		public void setRExecutable(final String rExecutable) {
-			this.rExecutable = rExecutable;
-		}
-
-		@Override
-		public void save(final ConfigWriter writer) {
-			writer.put(XVFB_WRAPPER_SCRIPT, getXvfbWrapperScript());
-			writer.put(R_SCRIPT, getRScript());
-			writer.put(R_EXECUTABLE, getRExecutable());
-		}
-
-		@Override
-		public void load(final ConfigReader reader) {
-			setXvfbWrapperScript(reader.get(XVFB_WRAPPER_SCRIPT));
-			setRScript(reader.get(R_SCRIPT));
-			setRExecutable(reader.get(R_EXECUTABLE));
-		}
-
-		@Override
-		public int getPriority() {
-			return 0;
+		public Config(String xvfbWrapperScript, String rScript) {
+			put(XVFB_WRAPPER_SCRIPT, xvfbWrapperScript);
+			put(R_SCRIPT, rScript);
 		}
 	}
 

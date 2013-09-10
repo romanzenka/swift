@@ -1,7 +1,11 @@
 package edu.mayo.mprc.qa;
 
+import com.google.common.base.Strings;
 import edu.mayo.mprc.MprcException;
-import edu.mayo.mprc.config.*;
+import edu.mayo.mprc.config.DaemonConfig;
+import edu.mayo.mprc.config.DependencyResolver;
+import edu.mayo.mprc.config.ResourceConfig;
+import edu.mayo.mprc.config.ResourceConfigBase;
 import edu.mayo.mprc.config.ui.ServiceUiFactory;
 import edu.mayo.mprc.config.ui.UiBuilder;
 import edu.mayo.mprc.config.ui.WrapperScriptSwitcher;
@@ -41,6 +45,10 @@ public final class RAWDumpWorker extends WorkerBase {
 	public static final String TYPE = "rawdump";
 	public static final String NAME = "RAW Dump";
 	public static final String DESC = "Extracts information about experiment and spectra from RAW files.";
+	public static final String WRAPPER_SCRIPT = "wrapperScript";
+	public static final String WINDOWS_EXEC_WRAPPER_SCRIPT = "windowsExecWrapperScript";
+	public static final String RAW_DUMP_EXECUTABLE = "rawDumpExecutable";
+	public static final String COMMAND_LINE_OPTIONS = "commandLineOptions";
 
 	private File wrapperScript;
 	private String windowsExecWrapperScript;
@@ -53,8 +61,9 @@ public final class RAWDumpWorker extends WorkerBase {
 	private static final int MAX_UNSHORTENED_PATH_LENGTH = 100;
 
 	protected RAWDumpWorker(final Config config) {
-		setWrapperScript(config.getWrapperScript() != null && !config.getWrapperScript().isEmpty() ? new File(config.getWrapperScript()) : null);
-		setWindowsExecWrapperScript(config.getWindowsExecWrapperScript());
+		final String wrapperScript = config.get(WRAPPER_SCRIPT);
+		setWrapperScript(Strings.isNullOrEmpty(wrapperScript) ? null : new File(wrapperScript));
+		setWindowsExecWrapperScript(config.get(WINDOWS_EXEC_WRAPPER_SCRIPT));
 	}
 
 	@Override
@@ -238,8 +247,8 @@ public final class RAWDumpWorker extends WorkerBase {
 			final RAWDumpWorker worker = new RAWDumpWorker(config);
 
 			//Raw dump values
-			worker.setRawDumpExecutable(FileUtilities.getAbsoluteFileForExecutables(new File(config.getRawDumpExecutable())));
-			worker.setCommandLineOptions(config.getCommandLineOptions());
+			worker.setRawDumpExecutable(FileUtilities.getAbsoluteFileForExecutables(new File(config.get(RAW_DUMP_EXECUTABLE))));
+			worker.setCommandLineOptions(config.get(COMMAND_LINE_OPTIONS));
 
 			return worker;
 		}
@@ -248,76 +257,28 @@ public final class RAWDumpWorker extends WorkerBase {
 	/**
 	 * Configuration for the factory
 	 */
-	public static final class Config implements ResourceConfig {
-		private String wrapperScript;
-		private String windowsExecWrapperScript;
-
-		private String rawDumpExecutable;
-		private String commandLineOptions;
-
+	public static final class Config extends ResourceConfigBase {
 		public Config() {
-		}
-
-		public Config(final String rawDumpExecutable, final String commandLineOptions) {
-			this.rawDumpExecutable = rawDumpExecutable;
-			this.commandLineOptions = commandLineOptions;
-		}
-
-		public String getWrapperScript() {
-			return wrapperScript;
-		}
-
-		public String getWindowsExecWrapperScript() {
-			return windowsExecWrapperScript;
-		}
-
-		public String getRawDumpExecutable() {
-			return rawDumpExecutable;
-		}
-
-		public String getCommandLineOptions() {
-			return commandLineOptions;
-		}
-
-		@Override
-		public void save(final ConfigWriter writer) {
-			writer.put("wrapperScript", getWrapperScript());
-			writer.put("windowsExecWrapperScript", getWindowsExecWrapperScript());
-			writer.put("rawDumpExecutable", getRawDumpExecutable());
-			writer.put("commandLineOptions", getCommandLineOptions());
-		}
-
-		@Override
-		public void load(final ConfigReader reader) {
-			wrapperScript = reader.get("wrapperScript");
-			windowsExecWrapperScript = reader.get("windowsExecWrapperScript");
-			rawDumpExecutable = reader.get("rawDumpExecutable");
-			commandLineOptions = reader.get("commandLineOptions");
-		}
-
-		@Override
-		public int getPriority() {
-			return 0;
 		}
 	}
 
 	public static final class Ui implements ServiceUiFactory {
-		private static final String WINDOWS_EXEC_WRAPPER_SCRIPT = "windowsExecWrapperScript";
-		private static final String WRAPPER_SCRIPT = "wrapperScript";
+		private static final String WINDOWS_EXEC_WRAPPER_SCRIPT = RAWDumpWorker.WINDOWS_EXEC_WRAPPER_SCRIPT;
+		private static final String WRAPPER_SCRIPT = RAWDumpWorker.WRAPPER_SCRIPT;
 
 		private static final String DEFAULT_RAWDUMP_EXEC = "bin/rawExtract/MprcExtractRaw.exe";
 		private static final String DEFAULT_CMDS = "--data";
 
 		@Override
 		public void createUI(final DaemonConfig daemon, final ResourceConfig resource, final UiBuilder builder) {
-			builder.property("rawDumpExecutable", "Executable Path", "RAW Dump executable path."
+			builder.property(RAW_DUMP_EXECUTABLE, "Executable Path", "RAW Dump executable path."
 					+ "<br/>The RAW Dump executable has been inplemented in house and is included with the Swift installation. "
 					+ "<br/>Executable can be found in the Swift installation directory: "
 					+ "<br/><tt>" + DEFAULT_RAWDUMP_EXEC + "</tt>").executable(Arrays.asList("-v"))
 					.required()
 					.defaultValue(DEFAULT_RAWDUMP_EXEC)
 
-					.property("commandLineOptions", "Command Line Options",
+					.property(COMMAND_LINE_OPTIONS, "Command Line Options",
 							"<br/>Command line option --data is required for this application to generate RAW file information related files. Multiple command line options must be separated by commas.")
 					.required()
 					.defaultValue(DEFAULT_CMDS);

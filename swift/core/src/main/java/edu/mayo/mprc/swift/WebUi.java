@@ -238,7 +238,7 @@ public final class WebUi {
 						}
 						if (msmsEvalWorkerConfig instanceof MSMSEvalWorker.Config) {
 							final MSMSEvalWorker.Config msmsEvalConfig = (MSMSEvalWorker.Config) msmsEvalWorkerConfig;
-							ui.spectrumQaParamFiles = parseSpectrumQaParamFiles(msmsEvalConfig.getParamFiles());
+							ui.spectrumQaParamFiles = parseSpectrumQaParamFiles(msmsEvalConfig.get(MSMSEvalWorker.PARAM_FILES));
 						}
 					}
 

@@ -400,24 +400,24 @@ public final class HemeUi {
 		@Override
 		public HemeUi create(final Config config, final DependencyResolver dependencies) {
 			final String rootDir = getRunningApplicationContext().getDaemonConfig().getSharedFileSpacePath();
-			final File dataDir = new File(rootDir, config.getDataPath());
+			final File dataDir = new File(rootDir, config.get(DATA_PATH));
 			FileUtilities.ensureFolderExists(dataDir);
-			final File resultDir = new File(rootDir, config.getResultPath());
+			final File resultDir = new File(rootDir, config.get(RESULT_PATH));
 			FileUtilities.ensureFolderExists(resultDir);
 
 			final int trypsinId;
 			final int chymoId;
 			paramsDao.begin();
 			try {
-				trypsinId = getIdForParameterSet(config.getTrypsinParameterSetName());
-				chymoId = getIdForParameterSet(config.getChymoParameterSetName());
+				trypsinId = getIdForParameterSet(config.get(TRYPSIN_PARAM_SET_NAME));
+				chymoId = getIdForParameterSet(config.get(CHYMO_PARAM_SET_NAME));
 				paramsDao.commit();
 			} catch (Exception e) {
 				paramsDao.rollback();
 				throw new MprcException("Could not translate saved parameter sets", e);
 			}
 
-			final String[] engines = splitEngineString(config.getSearchEngines());
+			final String[] engines = splitEngineString(config.get(SEARCH_ENGINES));
 
 			return new HemeUi(dataDir,
 					resultDir,
@@ -425,7 +425,7 @@ public final class HemeUi {
 					getSwiftDao(),
 					getSwiftSearcherCaller(),
 					trypsinId, chymoId,
-					config.getUserEmail(),
+					config.get(USER_EMAIL),
 					engines);
 		}
 
@@ -444,61 +444,8 @@ public final class HemeUi {
 		}
 	}
 
-	public static final class Config implements ResourceConfig {
-		private String dataPath;
-		private String resultPath;
-		private String trypsinParameterSetName;
-		private String chymoParameterSetName;
-		private String userEmail;
-		private String searchEngines;
-
-		public String getDataPath() {
-			return dataPath;
-		}
-
-		public String getResultPath() {
-			return resultPath;
-		}
-
-		public String getTrypsinParameterSetName() {
-			return trypsinParameterSetName;
-		}
-
-		public String getChymoParameterSetName() {
-			return chymoParameterSetName;
-		}
-
-		public String getUserEmail() {
-			return userEmail;
-		}
-
-		public String getSearchEngines() {
-			return searchEngines;
-		}
-
-		@Override
-		public void save(final ConfigWriter writer) {
-			writer.put(DATA_PATH, dataPath, "Where to take data from");
-			writer.put(RESULT_PATH, resultPath, "Where to put results");
-			writer.put(TRYPSIN_PARAM_SET_NAME, trypsinParameterSetName, "Trypsin parameter set for _T.d");
-			writer.put(CHYMO_PARAM_SET_NAME, chymoParameterSetName, "Chymotrypsin parameter set for _CT.d");
-			writer.put(USER_EMAIL, userEmail, "E-mail of user to run search under");
-			writer.put(SEARCH_ENGINES, searchEngines, "Space separated engine-version pairs");
-		}
-
-		@Override
-		public void load(final ConfigReader reader) {
-			dataPath = reader.get(DATA_PATH);
-			resultPath = reader.get(RESULT_PATH);
-			trypsinParameterSetName = reader.get(TRYPSIN_PARAM_SET_NAME);
-			chymoParameterSetName = reader.get(CHYMO_PARAM_SET_NAME);
-			userEmail = reader.get(USER_EMAIL);
-			searchEngines = reader.get(SEARCH_ENGINES);
-		}
-
-		@Override
-		public int getPriority() {
-			return 0;
+	public static final class Config extends ResourceConfigBase {
+		public Config() {
 		}
 	}
 

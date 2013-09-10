@@ -929,7 +929,7 @@ public final class SearchRunner implements Runnable {
 				ExceptionUtilities.throwCastException(workerConfiguration, ScaffoldWorker.Config.class);
 				return null;
 			}
-			final File scaffoldUnimod = new File(((ScaffoldWorker.Config) workerConfiguration).getScaffoldUnimod());
+			final File scaffoldUnimod = new File(((ScaffoldWorker.Config) workerConfiguration).get(ScaffoldWorker.SCAFFOLD_UNIMOD));
 			return scaffoldUnimod;
 		}
 		return null;

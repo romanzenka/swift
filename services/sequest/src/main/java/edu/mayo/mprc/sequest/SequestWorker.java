@@ -1,6 +1,9 @@
 package edu.mayo.mprc.sequest;
 
-import edu.mayo.mprc.config.*;
+import edu.mayo.mprc.config.DaemonConfig;
+import edu.mayo.mprc.config.DependencyResolver;
+import edu.mayo.mprc.config.ResourceConfig;
+import edu.mayo.mprc.config.ResourceConfigBase;
 import edu.mayo.mprc.config.ui.ServiceUiFactory;
 import edu.mayo.mprc.config.ui.UiBuilder;
 import edu.mayo.mprc.daemon.WorkPacket;
@@ -107,8 +110,8 @@ public final class SequestWorker extends WorkerBase {
 		@Override
 		public Worker create(final Config config, final DependencyResolver dependencies) {
 			final SequestWorker worker = new SequestWorker();
-			worker.setPvmHosts(new File(config.getPvmHosts()).getAbsoluteFile());
-			worker.setSequestCommand(config.getSequestCommand());
+			worker.setPvmHosts(new File(config.get(PVM_HOSTS)).getAbsoluteFile());
+			worker.setSequestCommand(config.get(SEQUEST_COMMAND));
 			return worker;
 		}
 
@@ -135,49 +138,13 @@ public final class SequestWorker extends WorkerBase {
 	/**
 	 * Configuration for the factory
 	 */
-	public static final class Config implements ResourceConfig {
-		private String pvmHosts;
-		private String sequestCommand;
-
+	public static final class Config extends ResourceConfigBase {
 		public Config() {
 		}
 
 		public Config(final String sequestCommand, final String pvmHosts) {
-			this.pvmHosts = pvmHosts;
-			this.sequestCommand = sequestCommand;
-		}
-
-		public String getSequestCommand() {
-			return sequestCommand;
-		}
-
-		public void setSequestCommand(final String sequestCommand) {
-			this.sequestCommand = sequestCommand;
-		}
-
-		public String getPvmHosts() {
-			return pvmHosts;
-		}
-
-		public void setPvmHosts(final String pvmHosts) {
-			this.pvmHosts = pvmHosts;
-		}
-
-		@Override
-		public void save(final ConfigWriter writer) {
-			writer.put(PVM_HOSTS, getPvmHosts(), "PVM's pvmhosts file");
-			writer.put(SEQUEST_COMMAND, getSequestCommand(), "Command to run Sequest");
-		}
-
-		@Override
-		public void load(final ConfigReader reader) {
-			setPvmHosts(reader.get(PVM_HOSTS));
-			setSequestCommand(reader.get(SEQUEST_COMMAND));
-		}
-
-		@Override
-		public int getPriority() {
-			return 0;
+			put(SEQUEST_COMMAND, sequestCommand);
+			put(PVM_HOSTS, pvmHosts);
 		}
 	}
 

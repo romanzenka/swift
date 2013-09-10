@@ -3,7 +3,10 @@ package edu.mayo.mprc.mascot;
 import com.google.common.base.Charsets;
 import com.google.common.io.Files;
 import edu.mayo.mprc.MprcException;
-import edu.mayo.mprc.config.*;
+import edu.mayo.mprc.config.DaemonConfig;
+import edu.mayo.mprc.config.DependencyResolver;
+import edu.mayo.mprc.config.ResourceConfig;
+import edu.mayo.mprc.config.ResourceConfigBase;
 import edu.mayo.mprc.config.ui.ServiceUiFactory;
 import edu.mayo.mprc.config.ui.UiBuilder;
 import edu.mayo.mprc.daemon.Worker;
@@ -778,61 +781,14 @@ public final class MascotDeploymentService extends DeploymentService<DeploymentR
 	/**
 	 * Configuration for the factory
 	 */
-	public static final class Config implements ResourceConfig {
-		private String engineRootFolder;
-		private String mascotDbMaintenanceUri;
-		private String deployableDbFolder;
-
+	public static final class Config extends ResourceConfigBase {
 		public Config() {
 		}
 
-		public Config(final String engineRootFolder, final String mascotDbMaintenanceUri, final String deployableDbFolder) {
-			this.engineRootFolder = engineRootFolder;
-			this.deployableDbFolder = deployableDbFolder;
-			this.mascotDbMaintenanceUri = mascotDbMaintenanceUri;
-		}
-
-		public String getEngineRootFolder() {
-			return engineRootFolder;
-		}
-
-		public void setEngineRootFolder(final String engineRootFolder) {
-			this.engineRootFolder = engineRootFolder;
-		}
-
-		public String getDeployableDbFolder() {
-			return deployableDbFolder;
-		}
-
-		public void setDeployableDbFolder(final String deployableDbFolder) {
-			this.deployableDbFolder = deployableDbFolder;
-		}
-
-		public String getMascotDbMaintenanceUri() {
-			return mascotDbMaintenanceUri;
-		}
-
-		public void setMascotDbMaintenanceUri(final String mascotDbMaintenanceUri) {
-			this.mascotDbMaintenanceUri = mascotDbMaintenanceUri;
-		}
-
-		@Override
-		public void save(final ConfigWriter writer) {
-			writer.put(ENGINE_ROOT_FOLDER, getEngineRootFolder());
-			writer.put(DEPLOYABLE_DB_FOLDER, getDeployableDbFolder());
-			writer.put(MASCOT_DB_MAINTENANCE_URI, getMascotDbMaintenanceUri());
-		}
-
-		@Override
-		public void load(final ConfigReader reader) {
-			setEngineRootFolder(reader.get(ENGINE_ROOT_FOLDER));
-			setDeployableDbFolder(reader.get(DEPLOYABLE_DB_FOLDER));
-			setMascotDbMaintenanceUri(reader.get(MASCOT_DB_MAINTENANCE_URI));
-		}
-
-		@Override
-		public int getPriority() {
-			return 0;
+		public Config(String engineRootFolder, String mascotDbMaintenanceUrl, String databaseDeploymentDir) {
+			put(ENGINE_ROOT_FOLDER, engineRootFolder);
+			put(MASCOT_DB_MAINTENANCE_URI, mascotDbMaintenanceUrl);
+			put(DEPLOYABLE_DB_FOLDER, databaseDeploymentDir);
 		}
 	}
 
@@ -903,25 +859,25 @@ public final class MascotDeploymentService extends DeploymentService<DeploymentR
 			MascotDeploymentService worker = null;
 			try {
 				final URI dbMaintenanceUri;
-				if (config.getMascotDbMaintenanceUri().indexOf(mascotDatabaseMaintenanceUriPostfix) != -1) {
-					dbMaintenanceUri = new URI(config.getMascotDbMaintenanceUri());
+				if (config.get(MASCOT_DB_MAINTENANCE_URI).indexOf(mascotDatabaseMaintenanceUriPostfix) != -1) {
+					dbMaintenanceUri = new URI(config.get(MASCOT_DB_MAINTENANCE_URI));
 				} else {
-					if (config.getMascotDbMaintenanceUri().endsWith("/")) {
-						dbMaintenanceUri = new URI(config.getMascotDbMaintenanceUri() + mascotDatabaseMaintenanceUriPostfix);
+					if (config.get(MASCOT_DB_MAINTENANCE_URI).endsWith("/")) {
+						dbMaintenanceUri = new URI(config.get(MASCOT_DB_MAINTENANCE_URI) + mascotDatabaseMaintenanceUriPostfix);
 					} else {
-						dbMaintenanceUri = new URI(config.getMascotDbMaintenanceUri() + "/" + mascotDatabaseMaintenanceUriPostfix);
+						dbMaintenanceUri = new URI(config.get(MASCOT_DB_MAINTENANCE_URI) + "/" + mascotDatabaseMaintenanceUriPostfix);
 					}
 				}
-				final String mascotInstallationRoot = new File(config.getEngineRootFolder()).getAbsolutePath();
+				final String mascotInstallationRoot = new File(config.get(ENGINE_ROOT_FOLDER)).getAbsolutePath();
 				worker = new MascotDeploymentService(
 						getSeqLine().replaceAll(MASCOT_ROOT_PATTERN.pattern(), mascotInstallationRoot),
 						getRepLine().replaceAll(MASCOT_ROOT_PATTERN.pattern(), mascotInstallationRoot),
 						getDatParameters(),
 						dbMaintenanceUri
 				);
-				worker.setDeployableDbFolder(new File(config.getDeployableDbFolder()).getAbsoluteFile());
+				worker.setDeployableDbFolder(new File(config.get(DEPLOYABLE_DB_FOLDER)).getAbsoluteFile());
 				worker.setEngineVersion(getEngineVersion());
-				worker.setEngineRootFolder(new File(config.getEngineRootFolder()).getAbsoluteFile());
+				worker.setEngineRootFolder(new File(config.get(ENGINE_ROOT_FOLDER)).getAbsoluteFile());
 			} catch (Exception e) {
 				throw new MprcException("Mascot deployment service worker could not be created.", e);
 			}

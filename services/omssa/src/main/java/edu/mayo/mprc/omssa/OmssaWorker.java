@@ -1,7 +1,10 @@
 package edu.mayo.mprc.omssa;
 
 import edu.mayo.mprc.MprcException;
-import edu.mayo.mprc.config.*;
+import edu.mayo.mprc.config.DaemonConfig;
+import edu.mayo.mprc.config.DependencyResolver;
+import edu.mayo.mprc.config.ResourceConfig;
+import edu.mayo.mprc.config.ResourceConfigBase;
 import edu.mayo.mprc.config.ui.ExecutableSwitching;
 import edu.mayo.mprc.config.ui.ServiceUiFactory;
 import edu.mayo.mprc.config.ui.UiBuilder;
@@ -188,7 +191,7 @@ public final class OmssaWorker extends WorkerBase {
 		@Override
 		public Worker create(final Config config, final DependencyResolver dependencies) {
 			final OmssaWorker worker = new OmssaWorker(getOmssaUserModsWriter());
-			worker.setOmssaclPath(new File(config.getOmssaclPath()));
+			worker.setOmssaclPath(new File(config.get(OMSSACL_PATH)));
 			worker.validateConfiguration();
 			return worker;
 		}
@@ -211,37 +214,12 @@ public final class OmssaWorker extends WorkerBase {
 	/**
 	 * Configuration for the factory
 	 */
-	public static final class Config implements ResourceConfig {
-		private String omssaclPath;
-
+	public static final class Config extends ResourceConfigBase {
 		public Config() {
 		}
 
-		public Config(final String omssaclPath) {
-			this.omssaclPath = omssaclPath;
-		}
-
-		public String getOmssaclPath() {
-			return omssaclPath;
-		}
-
-		public void setOmssaclPath(final String omssaclPath) {
-			this.omssaclPath = omssaclPath;
-		}
-
-		@Override
-		public void save(final ConfigWriter writer) {
-			writer.put(OMSSACL_PATH, getOmssaclPath(), "Path to omssacl executable");
-		}
-
-		@Override
-		public void load(final ConfigReader reader) {
-			setOmssaclPath(reader.get(OMSSACL_PATH));
-		}
-
-		@Override
-		public int getPriority() {
-			return 0;
+		public Config(final String omssacl) {
+			put(OMSSACL_PATH, omssacl);
 		}
 	}
 

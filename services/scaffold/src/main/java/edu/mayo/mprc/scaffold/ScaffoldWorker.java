@@ -2,7 +2,10 @@ package edu.mayo.mprc.scaffold;
 
 import com.jamesmurty.utils.XMLBuilder;
 import edu.mayo.mprc.MprcException;
-import edu.mayo.mprc.config.*;
+import edu.mayo.mprc.config.DaemonConfig;
+import edu.mayo.mprc.config.DependencyResolver;
+import edu.mayo.mprc.config.ResourceConfig;
+import edu.mayo.mprc.config.ResourceConfigBase;
 import edu.mayo.mprc.config.ui.ServiceUiFactory;
 import edu.mayo.mprc.config.ui.UiBuilder;
 import edu.mayo.mprc.daemon.WorkPacket;
@@ -27,7 +30,7 @@ import java.util.Properties;
 public final class ScaffoldWorker extends WorkerBase {
 	private static final Logger LOGGER = Logger.getLogger(ScaffoldWorker.class);
 	private static final String SCAFFOLD_BATCH_SCRIPT = "scaffoldBatchScript";
-	private static final String SCAFFOLD_UNIMOD = "scaffoldUnimod";
+	public static final String SCAFFOLD_UNIMOD = "scaffoldUnimod";
 	public static final String TYPE = "scaffold";
 	public static final String NAME = "Scaffold";
 	public static final String DESC = "Scaffold integrates results from multiple search engines into a single file. You need Scaffold Batch license from <a href=\"http://www.proteomesoftware.com/\">http://www.proteomesoftware.com/</a>";
@@ -266,8 +269,8 @@ public final class ScaffoldWorker extends WorkerBase {
 		@Override
 		public Worker create(final Config config, final DependencyResolver dependencies) {
 			final ScaffoldWorker worker = new ScaffoldWorker();
-			worker.setScaffoldBatchScript(new File(config.getScaffoldBatchScript()).getAbsoluteFile());
-			worker.setScaffoldUnimod(new File(config.getScaffoldUnimod()).getAbsoluteFile());
+			worker.setScaffoldBatchScript(new File(config.get(SCAFFOLD_BATCH_SCRIPT)).getAbsoluteFile());
+			worker.setScaffoldUnimod(new File(config.get(SCAFFOLD_UNIMOD)).getAbsoluteFile());
 
 			return worker;
 		}
@@ -281,49 +284,8 @@ public final class ScaffoldWorker extends WorkerBase {
 	/**
 	 * Configuration for the factory
 	 */
-	public static final class Config implements ResourceConfig {
-
-		private String scaffoldBatchScript;
-		private String scaffoldUnimod;
-
+	public static final class Config extends ResourceConfigBase {
 		public Config() {
-		}
-
-		public Config(final String scaffoldBatchScript) {
-			this.scaffoldBatchScript = scaffoldBatchScript;
-		}
-
-		public String getScaffoldBatchScript() {
-			return scaffoldBatchScript;
-		}
-
-		public void setScaffoldBatchScript(final String scaffoldBatchScript) {
-			this.scaffoldBatchScript = scaffoldBatchScript;
-		}
-
-		public String getScaffoldUnimod() {
-			return scaffoldUnimod;
-		}
-
-		public void setScaffoldUnimod(String scaffoldUnimod) {
-			this.scaffoldUnimod = scaffoldUnimod;
-		}
-
-		@Override
-		public void save(final ConfigWriter writer) {
-			writer.put(SCAFFOLD_BATCH_SCRIPT, getScaffoldBatchScript());
-			writer.put(SCAFFOLD_UNIMOD, getScaffoldUnimod());
-		}
-
-		@Override
-		public void load(final ConfigReader reader) {
-			setScaffoldBatchScript(reader.get(SCAFFOLD_BATCH_SCRIPT));
-			setScaffoldUnimod(reader.get(SCAFFOLD_UNIMOD));
-		}
-
-		@Override
-		public int getPriority() {
-			return 0;
 		}
 	}
 

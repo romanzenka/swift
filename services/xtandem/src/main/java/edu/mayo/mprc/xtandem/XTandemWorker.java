@@ -3,7 +3,10 @@ package edu.mayo.mprc.xtandem;
 import com.google.common.base.Charsets;
 import com.google.common.collect.ImmutableMap;
 import edu.mayo.mprc.MprcException;
-import edu.mayo.mprc.config.*;
+import edu.mayo.mprc.config.DaemonConfig;
+import edu.mayo.mprc.config.DependencyResolver;
+import edu.mayo.mprc.config.ResourceConfig;
+import edu.mayo.mprc.config.ResourceConfigBase;
 import edu.mayo.mprc.config.ui.PropertyChangeListener;
 import edu.mayo.mprc.config.ui.ServiceUiFactory;
 import edu.mayo.mprc.config.ui.UiBuilder;
@@ -242,7 +245,7 @@ public final class XTandemWorker extends WorkerBase {
 		public Worker create(final Config config, final DependencyResolver dependencies) {
 			XTandemWorker worker = null;
 			try {
-				worker = new XTandemWorker(FileUtilities.getAbsoluteFileForExecutables(new File(config.getTandemExecutable())));
+				worker = new XTandemWorker(FileUtilities.getAbsoluteFileForExecutables(new File(config.get(TANDEM_EXECUTABLE))));
 			} catch (Exception e) {
 				throw new MprcException("Tandem worker could not be created.", e);
 			}
@@ -258,37 +261,12 @@ public final class XTandemWorker extends WorkerBase {
 	/**
 	 * Configuration for the factory
 	 */
-	public static final class Config implements ResourceConfig {
-		private String tandemExecutable;
-
+	public static final class Config extends ResourceConfigBase {
 		public Config() {
 		}
 
 		public Config(final String tandemExecutable) {
-			this.tandemExecutable = tandemExecutable;
-		}
-
-		public String getTandemExecutable() {
-			return tandemExecutable;
-		}
-
-		public void setTandemExecutable(final String tandemExecutable) {
-			this.tandemExecutable = tandemExecutable;
-		}
-
-		@Override
-		public void save(final ConfigWriter writer) {
-			writer.put(TANDEM_EXECUTABLE, getTandemExecutable(), "Path to tandem.exe");
-		}
-
-		@Override
-		public void load(final ConfigReader reader) {
-			setTandemExecutable(reader.get(TANDEM_EXECUTABLE));
-		}
-
-		@Override
-		public int getPriority() {
-			return 0;
+			put(TANDEM_EXECUTABLE, tandemExecutable);
 		}
 	}
 

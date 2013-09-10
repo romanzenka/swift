@@ -1,7 +1,10 @@
 package edu.mayo.mprc.msmseval;
 
 import edu.mayo.mprc.MprcException;
-import edu.mayo.mprc.config.*;
+import edu.mayo.mprc.config.DaemonConfig;
+import edu.mayo.mprc.config.DependencyResolver;
+import edu.mayo.mprc.config.ResourceConfig;
+import edu.mayo.mprc.config.ResourceConfigBase;
 import edu.mayo.mprc.config.ui.ExecutableSwitching;
 import edu.mayo.mprc.config.ui.ServiceUiFactory;
 import edu.mayo.mprc.config.ui.UiBuilder;
@@ -28,7 +31,7 @@ public final class MSMSEvalWorker extends WorkerBase {
 	public static final String MZXML_OUTPUT_FILE_EXTENTION = ".mzxml";
 
 	private static final String MSMS_EVAL_EXECUTABLE = "msmsEvalExecutable";
-	private static final String PARAM_FILES = "paramFiles";
+	public static final String PARAM_FILES = "paramFiles";
 
 	private static final Logger LOGGER = Logger.getLogger(MSMSEvalWorker.class);
 	public static final String TYPE = "msmsEval";
@@ -197,7 +200,7 @@ public final class MSMSEvalWorker extends WorkerBase {
 		@Override
 		public Worker create(final Config config, final DependencyResolver dependencies) {
 			final MSMSEvalWorker worker = new MSMSEvalWorker();
-			worker.setMsmsEvalExecutable(FileUtilities.getAbsoluteFileForExecutables(new File(config.getMsmsEvalExecutable())));
+			worker.setMsmsEvalExecutable(FileUtilities.getAbsoluteFileForExecutables(new File(config.get(MSMS_EVAL_EXECUTABLE))));
 			return worker;
 		}
 	}
@@ -205,49 +208,13 @@ public final class MSMSEvalWorker extends WorkerBase {
 	/**
 	 * Configuration for the factory
 	 */
-	public static final class Config implements ResourceConfig {
-		private String msmsEvalExecutable;
-		private String paramFiles;
-
+	public static final class Config extends ResourceConfigBase {
 		public Config() {
 		}
 
-		public Config(final String msmsEvalExecutable, final String paramFiles) {
-			this.msmsEvalExecutable = msmsEvalExecutable;
-			this.paramFiles = paramFiles;
-		}
-
-		public String getMsmsEvalExecutable() {
-			return msmsEvalExecutable;
-		}
-
-		public void setMsmsEvalExecutable(final String msmsEvalExecutable) {
-			this.msmsEvalExecutable = msmsEvalExecutable;
-		}
-
-		public String getParamFiles() {
-			return paramFiles;
-		}
-
-		public void setParamFiles(final String paramFiles) {
-			this.paramFiles = paramFiles;
-		}
-
-		@Override
-		public void save(final ConfigWriter writer) {
-			writer.put(MSMS_EVAL_EXECUTABLE, getMsmsEvalExecutable(), "MSMS Eval executable");
-			writer.put(PARAM_FILES, getParamFiles(), "A comma-separated list of name,config file pairs for MSMSEval");
-		}
-
-		@Override
-		public void load(final ConfigReader reader) {
-			msmsEvalExecutable = reader.get(MSMS_EVAL_EXECUTABLE);
-			paramFiles = reader.get(PARAM_FILES);
-		}
-
-		@Override
-		public int getPriority() {
-			return 0;
+		public Config(final String msmsEval, final String paramFiles) {
+			put(MSMS_EVAL_EXECUTABLE, msmsEval);
+			put(PARAM_FILES, paramFiles);
 		}
 	}
 

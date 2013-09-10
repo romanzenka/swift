@@ -3,7 +3,10 @@ package edu.mayo.mprc.sequest;
 import com.google.common.base.Charsets;
 import com.google.common.io.Files;
 import edu.mayo.mprc.MprcException;
-import edu.mayo.mprc.config.*;
+import edu.mayo.mprc.config.DaemonConfig;
+import edu.mayo.mprc.config.DependencyResolver;
+import edu.mayo.mprc.config.ResourceConfig;
+import edu.mayo.mprc.config.ResourceConfigBase;
 import edu.mayo.mprc.config.ui.ServiceUiFactory;
 import edu.mayo.mprc.config.ui.UiBuilder;
 import edu.mayo.mprc.daemon.Worker;
@@ -514,61 +517,14 @@ public final class SequestDeploymentService extends DeploymentService<SequestDep
 	/**
 	 * Configuration for the factory
 	 */
-	public static final class Config implements ResourceConfig {
-		private String deployableDbFolder;
-		private String engineRootFolder;
-		private String wineWrapperScript;
-
+	public static final class Config extends ResourceConfigBase {
 		public Config() {
 		}
 
 		public Config(final String deployableDbFolder, final String engineRootFolder, final String wineWrapperScript) {
-			this.deployableDbFolder = deployableDbFolder;
-			this.engineRootFolder = engineRootFolder;
-			this.wineWrapperScript = wineWrapperScript;
-		}
-
-		public String getDeployableDbFolder() {
-			return deployableDbFolder;
-		}
-
-		public void setDeployableDbFolder(final String deployableDbFolder) {
-			this.deployableDbFolder = deployableDbFolder;
-		}
-
-		public String getEngineRootFolder() {
-			return engineRootFolder;
-		}
-
-		public void setEngineRootFolder(final String engineRootFolder) {
-			this.engineRootFolder = engineRootFolder;
-		}
-
-		public String getWineWrapperScript() {
-			return wineWrapperScript;
-		}
-
-		public void setWineWrapperScript(final String wineWrapperScript) {
-			this.wineWrapperScript = wineWrapperScript;
-		}
-
-		@Override
-		public void save(final ConfigWriter writer) {
-			writer.put(DEPLOYABLE_DB_FOLDER, getDeployableDbFolder(), "Where to put Sequest's .fasta file indices");
-			writer.put(ENGINE_ROOT_FOLDER, getEngineRootFolder(), "Path to the makedb package");
-			writer.put(WINE_WRAPPER_SCRIPT, getWineWrapperScript(), "Script to wrap the execution with on Linux");
-		}
-
-		@Override
-		public void load(final ConfigReader reader) {
-			setDeployableDbFolder(reader.get(DEPLOYABLE_DB_FOLDER));
-			setEngineRootFolder(reader.get(ENGINE_ROOT_FOLDER));
-			setWineWrapperScript(reader.get(WINE_WRAPPER_SCRIPT));
-		}
-
-		@Override
-		public int getPriority() {
-			return 0;
+			put(DEPLOYABLE_DB_FOLDER, deployableDbFolder);
+			put(ENGINE_ROOT_FOLDER, engineRootFolder);
+			put(WINE_WRAPPER_SCRIPT, wineWrapperScript);
 		}
 	}
 
@@ -604,9 +560,9 @@ public final class SequestDeploymentService extends DeploymentService<SequestDep
 			final SequestDeploymentService worker = new SequestDeploymentService();
 			worker.setConverter(getConverter());
 			worker.setSequestMappingFactory(getSequestMappingFactory());
-			worker.setEngineRootFolder(new File(config.getEngineRootFolder()).getAbsoluteFile());
-			worker.setDeployableDbFolder(new File(config.getDeployableDbFolder()).getAbsoluteFile());
-			worker.setWineWrapperScript(config.getWineWrapperScript());
+			worker.setEngineRootFolder(new File(config.get(ENGINE_ROOT_FOLDER)).getAbsoluteFile());
+			worker.setDeployableDbFolder(new File(config.get(DEPLOYABLE_DB_FOLDER)).getAbsoluteFile());
+			worker.setWineWrapperScript(config.get(WINE_WRAPPER_SCRIPT));
 			return worker;
 		}
 	}

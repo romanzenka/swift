@@ -83,7 +83,8 @@ public class TestTandem {
 				tandemExecutable = "tandem.exe";
 			}
 
-			final XTandemWorker.Config tandemConfig = new XTandemWorker.Config(tandemExecutable);
+			final XTandemWorker.Config tandemConfig = new XTandemWorker.Config();
+			tandemConfig.put(XTandemWorker.TANDEM_EXECUTABLE, tandemExecutable);
 
 			final XTandemWorker.Factory factory = new XTandemWorker.Factory();
 			final Worker worker = factory.create(tandemConfig, null);

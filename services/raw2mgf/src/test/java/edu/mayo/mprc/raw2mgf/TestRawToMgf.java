@@ -64,14 +64,16 @@ public class TestRawToMgf {
 			FileUtilities.ensureFileExists(rawFile);
 			LOGGER.info("Raw file created. Raw file [" + rawFile.getAbsolutePath() + "]");
 
-			final RawToMgfWorker.Config raw2mgfConfig = new RawToMgfWorker.Config("tempFolder", "wineconsole",
-					unixXvfbWrapper.getAbsolutePath(), new File(extractMsnFolder, "extract_msn.exe").getAbsolutePath());
-
-			raw2mgfConfig.setTempFolder(FileUtilities.DEFAULT_TEMP_DIRECTORY.getAbsolutePath());
+			final RawToMgfWorker.Config raw2mgfConfig = new RawToMgfWorker.Config();
+			raw2mgfConfig.put(RawToMgfWorker.TEMP_FOLDER, "tempFolder");
+			raw2mgfConfig.put(RawToMgfWorker.WRAPPER_SCRIPT, "wineconsole");
+			raw2mgfConfig.put(RawToMgfWorker.XVFB_WRAPPER_SCRIPT, unixXvfbWrapper.getAbsolutePath());
+			raw2mgfConfig.put(RawToMgfWorker.EXTRACT_MSN_EXECUTABLE, new File(extractMsnFolder, "extract_msn.exe").getAbsolutePath());
+			raw2mgfConfig.put(RawToMgfWorker.TEMP_FOLDER, FileUtilities.DEFAULT_TEMP_DIRECTORY.getAbsolutePath());
 			// The config comes pre-set for linux, on Windows we switch the wrappers off
 			if (FileUtilities.isWindowsPlatform()) {
-				raw2mgfConfig.setWrapperScript(null);
-				raw2mgfConfig.setXvfbWrapperScript("");
+				raw2mgfConfig.put(RawToMgfWorker.WRAPPER_SCRIPT, null);
+				raw2mgfConfig.put(RawToMgfWorker.XVFB_WRAPPER_SCRIPT, "");
 			}
 			final ResourceFactory<RawToMgfWorker.Config, Worker> factory = new RawToMgfWorker.Factory();
 			final RawToMgfWorker simpleDaemonWorker = (RawToMgfWorker) factory.create(raw2mgfConfig, null);

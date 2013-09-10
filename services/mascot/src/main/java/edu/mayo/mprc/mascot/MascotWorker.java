@@ -1,7 +1,10 @@
 package edu.mayo.mprc.mascot;
 
 import edu.mayo.mprc.MprcException;
-import edu.mayo.mprc.config.*;
+import edu.mayo.mprc.config.DaemonConfig;
+import edu.mayo.mprc.config.DependencyResolver;
+import edu.mayo.mprc.config.ResourceConfig;
+import edu.mayo.mprc.config.ResourceConfigBase;
 import edu.mayo.mprc.config.ui.ServiceUiFactory;
 import edu.mayo.mprc.config.ui.UiBuilder;
 import edu.mayo.mprc.daemon.WorkPacket;
@@ -46,7 +49,7 @@ public final class MascotWorker extends WorkerBase {
 
 	private static final int BUFFER_SIZE = 8192;
 	private static final Pattern PERCENT_DONE = Pattern.compile("^\\.*(\\d+)\\% complete\\s*$");
-	private static final String MASCOT_URL = "mascotUrl";
+	public static final String MASCOT_URL = "mascotUrl";
 	private static final String MASCOT_PUBLIC_URL = "mascotPublicUrl";
 	public static final String TYPE = "mascot";
 	public static final String NAME = "Mascot";
@@ -399,15 +402,15 @@ public final class MascotWorker extends WorkerBase {
 		public Worker create(final Config config, final DependencyResolver dependencies) {
 			final MascotWorker worker = new MascotWorker();
 			try {
-				final URL mascotUrl = new URL(config.getMascotUrl());
+				final URL mascotUrl = new URL(config.get(MASCOT_URL));
 				worker.setUrl(mascotUrl);
-				if (config.getMascotPublicUrl() != null && !config.getMascotPublicUrl().trim().isEmpty()) {
-					worker.setPublicUrl(new URL(config.getMascotPublicUrl()));
+				if (config.get(MASCOT_PUBLIC_URL) != null && !config.get(MASCOT_PUBLIC_URL).trim().isEmpty()) {
+					worker.setPublicUrl(new URL(config.get(MASCOT_PUBLIC_URL)));
 				} else {
 					worker.setPublicUrl(mascotUrl);
 				}
 			} catch (MalformedURLException e) {
-				throw new MprcException("Not a valid mascot url: " + config.getMascotUrl(), e);
+				throw new MprcException("Not a valid mascot url: " + config.get(MASCOT_URL), e);
 			}
 			return worker;
 		}
@@ -435,48 +438,12 @@ public final class MascotWorker extends WorkerBase {
 	/**
 	 * Configuration for the factory
 	 */
-	public static final class Config implements ResourceConfig {
-		private String mascotUrl;
-		private String mascotPublicUrl;
-
+	public static final class Config extends ResourceConfigBase {
 		public Config() {
 		}
 
 		public Config(final String mascotUrl) {
-			this.mascotUrl = mascotUrl;
-		}
-
-		public String getMascotUrl() {
-			return mascotUrl;
-		}
-
-		public void setMascotUrl(final String mascotUrl) {
-			this.mascotUrl = mascotUrl;
-		}
-
-		public String getMascotPublicUrl() {
-			return mascotPublicUrl;
-		}
-
-		public void setMascotPublicUrl(final String mascotPublicUrl) {
-			this.mascotPublicUrl = mascotPublicUrl;
-		}
-
-		@Override
-		public void save(final ConfigWriter writer) {
-			writer.put(MASCOT_URL, getMascotUrl());
-			writer.put(MASCOT_PUBLIC_URL, getMascotPublicUrl());
-		}
-
-		@Override
-		public void load(final ConfigReader reader) {
-			setMascotUrl(reader.get(MASCOT_URL));
-			setMascotPublicUrl(reader.get(MASCOT_PUBLIC_URL));
-		}
-
-		@Override
-		public int getPriority() {
-			return 0;
+			put(MASCOT_URL, mascotUrl);
 		}
 	}
 
