@@ -4,7 +4,7 @@ import edu.mayo.mprc.daemon.DaemonConnection;
 import edu.mayo.mprc.daemon.WorkPacket;
 import edu.mayo.mprc.daemon.files.FileTokenFactory;
 import edu.mayo.mprc.scaffold.ScaffoldSpectrumExportWorkPacket;
-import edu.mayo.mprc.scaffoldparser.spectra.ScaffoldSpectraReader;
+import edu.mayo.mprc.scaffoldparser.spectra.ScaffoldReportReader;
 import edu.mayo.mprc.utilities.FileUtilities;
 import edu.mayo.mprc.utilities.progress.ProgressInfo;
 import edu.mayo.mprc.workflow.engine.WorkflowEngine;
@@ -32,7 +32,7 @@ public final class ScaffoldSpectraExportTask extends AsyncTaskBase {
 	public static File getDefaultSpectrumExportFile(File scaffoldFile) {
 		final File scaffoldSpectrumExport = new File(
 				scaffoldFile.getParentFile(),
-				FileUtilities.getFileNameWithoutExtension(scaffoldFile) + ScaffoldSpectraReader.EXTENSION);
+				FileUtilities.getFileNameWithoutExtension(scaffoldFile) + ScaffoldReportReader.SPECTRA_EXTENSION);
 		return scaffoldSpectrumExport;
 	}
 

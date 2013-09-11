@@ -5,7 +5,7 @@ package edu.mayo.mprc.scaffoldparser.spectra;
  *
  * @author Roman Zenka
  */
-public final class ScaffoldSpectraVersion extends ScaffoldSpectraReader {
+public final class ScaffoldSpectraVersion extends ScaffoldReportReader {
 	public static final String SCAFFOLD_VERSION_KEY = "Scaffold Version";
 	public static final String SCAFFOLD_4_VERSION_KEY = "Scaffold";
 	public static final String SCAFFOLD_4_VERSION_VALUE = "Version:";

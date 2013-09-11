@@ -4,7 +4,7 @@ import com.google.common.base.Strings;
 import edu.mayo.mprc.MprcException;
 import edu.mayo.mprc.chem.AminoAcidSet;
 import edu.mayo.mprc.fastadb.ProteinSequenceTranslator;
-import edu.mayo.mprc.scaffoldparser.spectra.ScaffoldSpectraReader;
+import edu.mayo.mprc.scaffoldparser.spectra.ScaffoldReportReader;
 import edu.mayo.mprc.scaffoldparser.spectra.ScaffoldSpectraVersion;
 import edu.mayo.mprc.searchdb.builder.*;
 import edu.mayo.mprc.searchdb.dao.Analysis;
@@ -28,7 +28,7 @@ import java.util.Locale;
  *
  * @author Roman Zenka
  */
-public class ScaffoldSpectraSummarizer extends ScaffoldSpectraReader {
+public class ScaffoldSpectraSummarizer extends ScaffoldReportReader {
 	private static final String REPORT_DATE_PREFIX_KEY = "Spectrum report created on ";
 	private static final String SCAFFOLD_VERSION_KEY = ScaffoldSpectraVersion.SCAFFOLD_VERSION_KEY;
 	private static final String SCAFFOLD_4_VERSION_KEY = ScaffoldSpectraVersion.SCAFFOLD_4_VERSION_KEY;
@@ -117,26 +117,26 @@ public class ScaffoldSpectraSummarizer extends ScaffoldSpectraReader {
 		initializeCurrentLine(map);
 
 		// Store the column numbers for faster parsing
-		biologicalSampleName = getColumn(map, ScaffoldSpectraReader.BIOLOGICAL_SAMPLE_NAME);
-		biologicalSampleCategory = getColumn(map, ScaffoldSpectraReader.BIOLOGICAL_SAMPLE_CATEGORY);
-		msmsSampleName = getColumn(map, ScaffoldSpectraReader.MS_MS_SAMPLE_NAME);
-		proteinAccessionNumbers = getColumn(map, ScaffoldSpectraReader.PROTEIN_ACCESSION_NUMBERS);
-		databaseSources = getColumn(map, ScaffoldSpectraReader.DATABASE_SOURCES);
-		numberOfTotalSpectra = getColumn(map, ScaffoldSpectraReader.NUMBER_OF_TOTAL_SPECTRA);
-		numberOfUniqueSpectra = getColumn(map, ScaffoldSpectraReader.NUMBER_OF_UNIQUE_SPECTRA);
-		numberOfUniquePeptides = getColumn(map, ScaffoldSpectraReader.NUMBER_OF_UNIQUE_PEPTIDES);
-		percentageOfTotalSpectra = getColumn(map, ScaffoldSpectraReader.PERCENTAGE_OF_TOTAL_SPECTRA);
-		percentageSequenceCoverage = getColumn(map, ScaffoldSpectraReader.PERCENTAGE_SEQUENCE_COVERAGE);
-		proteinIdentificationProbability = getColumn(map, ScaffoldSpectraReader.PROTEIN_ID_PROBABILITY);
-		peptideSequence = getColumn(map, ScaffoldSpectraReader.PEPTIDE_SEQUENCE);
-		previousAminoAcid = getColumn(map, ScaffoldSpectraReader.PREVIOUS_AMINO_ACID);
-		nextAminoAcid = getColumn(map, ScaffoldSpectraReader.NEXT_AMINO_ACID);
-		numberOfEnzymaticTerminii = getColumn(map, ScaffoldSpectraReader.NUMBER_OF_ENZYMATIC_TERMINII);
-		fixedModifications = getColumn(map, ScaffoldSpectraReader.FIXED_MODIFICATIONS);
-		variableModifications = getColumn(map, ScaffoldSpectraReader.VARIABLE_MODIFICATIONS);
-		spectrumName = getColumn(map, ScaffoldSpectraReader.SPECTRUM_NAME);
-		spectrumCharge = getColumn(map, ScaffoldSpectraReader.SPECTRUM_CHARGE);
-		peptideIdentificationProbability = getColumn(map, ScaffoldSpectraReader.PEPTIDE_ID_PROBABILITY);
+		biologicalSampleName = getColumn(map, ScaffoldReportReader.BIOLOGICAL_SAMPLE_NAME);
+		biologicalSampleCategory = getColumn(map, ScaffoldReportReader.BIOLOGICAL_SAMPLE_CATEGORY);
+		msmsSampleName = getColumn(map, ScaffoldReportReader.MS_MS_SAMPLE_NAME);
+		proteinAccessionNumbers = getColumn(map, ScaffoldReportReader.PROTEIN_ACCESSION_NUMBERS);
+		databaseSources = getColumn(map, ScaffoldReportReader.DATABASE_SOURCES);
+		numberOfTotalSpectra = getColumn(map, ScaffoldReportReader.NUMBER_OF_TOTAL_SPECTRA);
+		numberOfUniqueSpectra = getColumn(map, ScaffoldReportReader.NUMBER_OF_UNIQUE_SPECTRA);
+		numberOfUniquePeptides = getColumn(map, ScaffoldReportReader.NUMBER_OF_UNIQUE_PEPTIDES);
+		percentageOfTotalSpectra = getColumn(map, ScaffoldReportReader.PERCENTAGE_OF_TOTAL_SPECTRA);
+		percentageSequenceCoverage = getColumn(map, ScaffoldReportReader.PERCENTAGE_SEQUENCE_COVERAGE);
+		proteinIdentificationProbability = getColumn(map, ScaffoldReportReader.PROTEIN_ID_PROBABILITY);
+		peptideSequence = getColumn(map, ScaffoldReportReader.PEPTIDE_SEQUENCE);
+		previousAminoAcid = getColumn(map, ScaffoldReportReader.PREVIOUS_AMINO_ACID);
+		nextAminoAcid = getColumn(map, ScaffoldReportReader.NEXT_AMINO_ACID);
+		numberOfEnzymaticTerminii = getColumn(map, ScaffoldReportReader.NUMBER_OF_ENZYMATIC_TERMINII);
+		fixedModifications = getColumn(map, ScaffoldReportReader.FIXED_MODIFICATIONS);
+		variableModifications = getColumn(map, ScaffoldReportReader.VARIABLE_MODIFICATIONS);
+		spectrumName = getColumn(map, ScaffoldReportReader.SPECTRUM_NAME);
+		spectrumCharge = getColumn(map, ScaffoldReportReader.SPECTRUM_CHARGE);
+		peptideIdentificationProbability = getColumn(map, ScaffoldReportReader.PEPTIDE_ID_PROBABILITY);
 		return true;
 	}
 

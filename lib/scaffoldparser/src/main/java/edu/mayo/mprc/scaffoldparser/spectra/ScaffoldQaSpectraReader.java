@@ -13,7 +13,7 @@ import java.util.*;
  *
  * @author Roman Zenka
  */
-public final class ScaffoldQaSpectraReader extends ScaffoldSpectraReader implements Iterable<String>, KeyedTsvReader {
+public final class ScaffoldQaSpectraReader extends ScaffoldReportReader implements Iterable<String>, KeyedTsvReader {
 
 	private Map<String/*spectrumName*/, String/*entire line about spectrum except spectrumName*/> mapSpectrumNameToScaffoldSpectraInfo = new HashMap<String, String>();
 	private String[] header;

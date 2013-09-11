@@ -1,6 +1,7 @@
 package edu.mayo.mprc.scaffoldparser.spectra;
 
 import com.google.common.base.Splitter;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.io.CountingInputStream;
 import edu.mayo.mprc.MprcException;
 import edu.mayo.mprc.utilities.BufferedEofReader;
@@ -10,24 +11,33 @@ import edu.mayo.mprc.utilities.progress.ProgressReporter;
 import edu.mayo.mprc.utilities.progress.UserProgressReporter;
 
 import java.io.*;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Locale;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * An abstract class for reading Scaffold's spectrum report. Calls abstract methods that provide the actual functionality.
+ * An abstract class for reading Scaffold's reports. Calls abstract methods that provide the actual functionality.
  * This class is supposed to be used to load a file only once - after the {@link #load} method was called, you should
  * retrieve results and dispose of the class.
+ * <p/>
+ * The typical Scaffold report has this format:
+ * <ul>
+ * <li>metadata processed a line at a time with {@link #processMetadata}</li>
+ * <li>blank line</li>
+ * <li>header line processed with {@link #processHeader}</li>
+ * <li>data processed with {@link #processRow}</li>
+ * <li><code>END OF FILE</code> - when missing, file is terminated prematurely</li>
+ * </ul>
  *
  * @author Roman Zenka
  */
-public abstract class ScaffoldSpectraReader {
+public abstract class ScaffoldReportReader {
 	/**
 	 * Default extension - as Scaffold produces it.
 	 */
-	public static final String EXTENSION = ".spectra.txt";
+	public static final String SPECTRA_EXTENSION = ".spectra.txt";
 
 	/**
 	 * Report progress every X lines.
@@ -75,6 +85,7 @@ public abstract class ScaffoldSpectraReader {
 	// Scaffold files are terminated with this marker
 	private static final String END_OF_FILE = "END OF FILE";
 
+	// Some constants for column names (from the spectrum report)
 	public static final String EXPERIMENT_NAME = "Experiment name";
 	public static final String BIOLOGICAL_SAMPLE_CATEGORY = "Biological sample category";
 	public static final String BIOLOGICAL_SAMPLE_NAME = "Biological sample name";
@@ -134,7 +145,7 @@ public abstract class ScaffoldSpectraReader {
 	/**
 	 * Initializes the reader.
 	 */
-	protected ScaffoldSpectraReader() {
+	protected ScaffoldReportReader() {
 	}
 
 	protected static int parseInt(final String s) {
@@ -172,13 +183,13 @@ public abstract class ScaffoldSpectraReader {
 		return value + ".fasta";
 	}
 
-	public void initializeCurrentLine(final HashMap<String, Integer> columnMap) {
+	public void initializeCurrentLine(final Map<String, Integer> columnMap) {
 		int numColumns = columnMap.size();
 		currentLine = new String[numColumns];
 	}
 
 	public void fillCurrentLine(final String line) {
-		final Iterator<String> iterator = SPLITTER.split(line).iterator();
+		final Iterator<String> iterator = getColumnNames(line).iterator();
 		for (int i = 0; i < currentLine.length; i++) {
 			if (iterator.hasNext()) {
 				currentLine[i] = iterator.next();
@@ -188,17 +199,27 @@ public abstract class ScaffoldSpectraReader {
 		}
 	}
 
-	public static HashMap<String, Integer> buildColumnMap(final String line) {
-		final HashMap<String, Integer> columnPositions = new HashMap<String, Integer>(30);
+	public static Map<String, Integer> buildColumnMap(final String line) {
+		final ImmutableMap.Builder<String, Integer> builder = new ImmutableMap.Builder<String, Integer>();
 		int position = 0;
-		for (final String column : SPLITTER.split(line)) {
-			columnPositions.put(column.toUpperCase(Locale.US), position);
+		final Iterable<String> columnNames = getColumnNames(line);
+		for (final String column : columnNames) {
+			builder.put(column.toUpperCase(Locale.US), position);
 			position++;
 		}
-		return columnPositions;
+		return builder.build();
 	}
 
-	public static Integer getColumnNumber(final HashMap<String, Integer> columnPositions, final String columnName) {
+	public static Iterable<String> getColumnNames(final CharSequence line) {
+		return SPLITTER.split(line);
+	}
+
+	/**
+	 * @param columnPositions Column positions
+	 * @param columnName      Requested column name
+	 * @return Column index or null if column not present
+	 */
+	public static Integer getColumnNumber(final Map<String, Integer> columnPositions, final String columnName) {
 		return columnPositions.get(columnName.toUpperCase(Locale.US));
 	}
 
@@ -207,7 +228,7 @@ public abstract class ScaffoldSpectraReader {
 	 * @param columnName      Name of the column to find.
 	 * @return Index of the column. If a matching column not found, throws an exception.
 	 */
-	public static int getColumn(final HashMap<String, Integer> columnPositions, final String columnName) {
+	public static int getColumn(final Map<String, Integer> columnPositions, final String columnName) {
 		final Integer column = getColumnNumber(columnPositions, columnName);
 		if (null == column) {
 			throw new MprcException("Missing column [" + columnName + "]");

@@ -1,6 +1,6 @@
 package edu.mayo.mprc.heme;
 
-import edu.mayo.mprc.scaffoldparser.spectra.ScaffoldSpectraReader;
+import edu.mayo.mprc.scaffoldparser.spectra.ScaffoldReportReader;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -11,7 +11,7 @@ import java.util.regex.Pattern;
 /**
  * @author Roman Zenka
  */
-public class HemeScaffoldReader extends ScaffoldSpectraReader {
+public class HemeScaffoldReader extends ScaffoldReportReader {
 	private int proteinAccessionNumbers;
 	private int proteinName;
 	private int numberOfTotalSpectra;
@@ -34,10 +34,10 @@ public class HemeScaffoldReader extends ScaffoldSpectraReader {
 		initializeCurrentLine(map);
 
 		// Store the column numbers for faster parsing
-		proteinAccessionNumbers = getColumn(map, ScaffoldSpectraReader.PROTEIN_ACCESSION_NUMBERS);
-		proteinName = getColumn(map, ScaffoldSpectraReader.PROTEIN_NAME);
-		numberOfTotalSpectra = getColumn(map, ScaffoldSpectraReader.NUMBER_OF_TOTAL_SPECTRA);
-		numberOfUniquePeptides = getColumn(map, ScaffoldSpectraReader.NUMBER_OF_UNIQUE_PEPTIDES);
+		proteinAccessionNumbers = getColumn(map, ScaffoldReportReader.PROTEIN_ACCESSION_NUMBERS);
+		proteinName = getColumn(map, ScaffoldReportReader.PROTEIN_NAME);
+		numberOfTotalSpectra = getColumn(map, ScaffoldReportReader.NUMBER_OF_TOTAL_SPECTRA);
+		numberOfUniquePeptides = getColumn(map, ScaffoldReportReader.NUMBER_OF_UNIQUE_PEPTIDES);
 		return true;
 	}
 
