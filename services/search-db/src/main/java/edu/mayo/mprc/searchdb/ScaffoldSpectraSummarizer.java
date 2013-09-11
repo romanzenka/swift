@@ -14,8 +14,8 @@ import org.joda.time.DateTime;
 
 import java.text.DateFormat;
 import java.text.ParseException;
-import java.util.HashMap;
 import java.util.Locale;
+import java.util.Map;
 
 /**
  * Summarizes Scaffold spectra report into a collection of objects suitable to be loaded into the database.
@@ -113,7 +113,7 @@ public class ScaffoldSpectraSummarizer extends ScaffoldReportReader {
 	 */
 	@Override
 	public boolean processHeader(final String line) {
-		final HashMap<String, Integer> map = buildColumnMap(line);
+		final Map<String, Integer> map = buildColumnMap(line);
 		initializeCurrentLine(map);
 
 		// Store the column numbers for faster parsing

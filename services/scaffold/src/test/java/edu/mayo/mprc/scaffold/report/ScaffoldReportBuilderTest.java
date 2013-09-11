@@ -31,8 +31,8 @@ public final class ScaffoldReportBuilderTest {
 
 		ScaffoldReportBuilder.buildReport(inputFiles, outputPeptideFile, outputProteinFile);
 
-		Assert.assertEquals(TestingUtilities.compareFilesByLine(outputPeptideFile, result_peptide), null, "Peptide scaffold report file does not match");
-		Assert.assertEquals(TestingUtilities.compareFilesByLine(outputProteinFile, result_protein), null, "Protein scaffold report file does not match");
+		Assert.assertEquals(TestingUtilities.compareFilesByLine(outputPeptideFile, result_peptide, true), null, "Peptide scaffold report file does not match");
+		Assert.assertEquals(TestingUtilities.compareFilesByLine(outputProteinFile, result_protein, true), null, "Protein scaffold report file does not match");
 
 		FileUtilities.cleanupTempFile(parentFolder);
 	}

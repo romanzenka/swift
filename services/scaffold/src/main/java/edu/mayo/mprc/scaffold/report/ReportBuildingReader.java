@@ -3,10 +3,7 @@ package edu.mayo.mprc.scaffold.report;
 import com.google.common.collect.Lists;
 import edu.mayo.mprc.scaffoldparser.spectra.ScaffoldReportReader;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeSet;
+import java.util.*;
 
 /**
  * @author Roman Zenka
@@ -20,7 +17,9 @@ final class ReportBuildingReader extends ScaffoldReportReader {
 			PROTEIN_ID_PROBABILITY,
 			NUMBER_OF_UNIQUE_PEPTIDES,
 			PERCENTAGE_SEQUENCE_COVERAGE,
-			PEPTIDE_SEQUENCE
+			PEPTIDE_SEQUENCE,
+			FIXED_MODIFICATIONS,
+			VARIABLE_MODIFICATIONS
 	};
 	static final String PEPTIDE_GROUP_BY = ScaffoldReportReader.EXPERIMENT_NAME;
 
@@ -43,12 +42,17 @@ final class ReportBuildingReader extends ScaffoldReportReader {
 	private int peptideGroupBy;
 	private int proteinGroupBy;
 
-	private LineComparator peptideComparator;
-	private LineComparator proteinComparator;
+	private static final Comparator<String[]> PEPTIDE_COMPARATOR = new LineComparator(
+			PEPTIDE_COLUMNS,
+			new String[]{BIOLOGICAL_SAMPLE_NAME /* group by */, NUMBER_OF_UNIQUE_PEPTIDES, PROTEIN_NAME, PEPTIDE_SEQUENCE, FIXED_MODIFICATIONS, VARIABLE_MODIFICATIONS},
+			new String[]{"a", "di", "a", "a", "a", "a"});
+	private static final Comparator<String[]> PROTEIN_COMPARATOR = new LineComparator(
+			PROTEIN_COLUMNS,
+			new String[]{BIOLOGICAL_SAMPLE_NAME /* group by */, NUMBER_OF_UNIQUE_PEPTIDES, PROTEIN_NAME},
+			new String[]{"a", "di", "a"});
 
 	private TreeSet<String[]> peptides;
 	private TreeSet<String[]> proteins;
-
 
 	@Override
 	public boolean processMetadata(final String key, final String value) {
@@ -67,17 +71,8 @@ final class ReportBuildingReader extends ScaffoldReportReader {
 		peptideGroupBy = getColumn(columnMap, PEPTIDE_GROUP_BY);
 		proteinGroupBy = getColumn(columnMap, PROTEIN_GROUP_BY);
 
-		peptideComparator = new LineComparator(
-				new String[]{EXPERIMENT_NAME /* group by */, PROTEIN_ACCESSION_NUMBERS, BIOLOGICAL_SAMPLE_NAME, PROTEIN_MOLECULAR_WEIGHT_DA},
-				new String[]{"a", "di", "a", "a"},
-				columnMap);
-		proteinComparator = new LineComparator(
-				new String[]{EXPERIMENT_NAME /* group by */, PROTEIN_ACCESSION_NUMBERS, BIOLOGICAL_SAMPLE_NAME},
-				new String[]{"a", "di", "a"},
-				columnMap);
-
-		peptides = new TreeSet<String[]>(peptideComparator);
-		proteins = new TreeSet<String[]>(proteinComparator);
+		peptides = new TreeSet<String[]>(PEPTIDE_COMPARATOR);
+		proteins = new TreeSet<String[]>(PROTEIN_COMPARATOR);
 
 		return true;
 	}

@@ -30,7 +30,7 @@ public class HemeScaffoldReader extends ScaffoldReportReader {
 
 	@Override
 	public boolean processHeader(final String line) {
-		final HashMap<String, Integer> map = buildColumnMap(line);
+		final Map<String, Integer> map = buildColumnMap(line);
 		initializeCurrentLine(map);
 
 		// Store the column numbers for faster parsing

@@ -18,7 +18,6 @@ public final class ScafmlExport extends FileHolder {
 
 	// Additional exports
 	private boolean exportSpectra;
-	private boolean exportPeptideReport;
 
 	// Thresholds
 	private double proteinProbability;
@@ -38,12 +37,11 @@ public final class ScafmlExport extends FileHolder {
 	public ScafmlExport() {
 	}
 
-	public ScafmlExport(final String scaffoldVersion, final String experimentName, final File scaffoldOutputDir, final boolean exportSpectra, final boolean exportPeptideReport, final double proteinProbability, final double peptideProbability, final int minimumPeptideCount, final int minimumNonTrypticTerminii, final String starred, final String delimiter, final boolean regularExpression, final boolean saveOnlyIdentifiedSpectra, final boolean saveNoSpectra) {
+	public ScafmlExport(final String scaffoldVersion, final String experimentName, final File scaffoldOutputDir, final boolean exportSpectra, final double proteinProbability, final double peptideProbability, final int minimumPeptideCount, final int minimumNonTrypticTerminii, final String starred, final String delimiter, final boolean regularExpression, final boolean saveOnlyIdentifiedSpectra, final boolean saveNoSpectra) {
 		this.scaffoldVersion = scaffoldVersion;
 		this.experimentName = experimentName;
 		this.scaffoldOutputDir = scaffoldOutputDir;
 		this.exportSpectra = exportSpectra;
-		this.exportPeptideReport = exportPeptideReport;
 		this.proteinProbability = proteinProbability;
 		this.peptideProbability = peptideProbability;
 		this.minimumPeptideCount = minimumPeptideCount;
@@ -88,12 +86,6 @@ public final class ScafmlExport extends FileHolder {
 				.append(" saveNoSpectra=\"").append(saveNoSpectra ? "true" : "false").append("\"")
 				.append("/>\n");
 
-		if (exportPeptideReport) {
-			result
-					.append(indent)
-					.append("<Export type=\"peptide-report\" thresholds=\"thresh\" path=\"").append(scaffoldOutputDir.getAbsolutePath()).append("\"/>\n");
-		}
-
 		if (exportSpectra) {
 			result
 					.append(indent)
@@ -122,9 +114,6 @@ public final class ScafmlExport extends FileHolder {
 	 */
 	public List<String> getExportFileList() {
 		final ArrayList<String> list = new ArrayList<String>(2);
-		if (exportPeptideReport) {
-			list.add(experimentName + ".peptide-report.xls");
-		}
 		if (exportSpectra) {
 			list.add(experimentName + ".spectra.txt");
 		}

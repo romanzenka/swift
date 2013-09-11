@@ -178,11 +178,6 @@ final class ScaffoldTask extends AsyncTaskBase implements ScaffoldTaskI {
 		return new File(outputFolder, experiment + ".xml");
 	}
 
-	@Override
-	public File getScaffoldPeptideReportFile() {
-		return new File(outputFolder, experiment + ".peptide-report.xls");
-	}
-
 	File getUnimod() {
 		return unimod;
 	}

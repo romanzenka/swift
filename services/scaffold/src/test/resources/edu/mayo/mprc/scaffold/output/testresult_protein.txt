@@ -1,17 +1,17 @@
 Biological sample name	Protein name	Protein accession numbers	Protein molecular weight (Da)	Protein identification probability	Number of unique peptides	Percentage sequence coverage
-Band 1	Transitional endoplasmic reticulum ATPase - Homo sapiens (Human) (P55072)	TERA_HUMAN,TERA_MOUSE	89,306.8	100.0%	12	20.2%
-Band 1	Keratin, type II cytoskeletal 1 - Homo sapiens (Human) (P04264)	K2C1_HUMAN	66,001.2	99.9%	3	5.59%
-Band 1	Keratin, type I cytoskeletal 10 - Bos taurus (Bovine) (P06394)	K1C10_BOVIN,K1C10_HUMAN,K1C10_MOUSE,K1C10_RAT	56,488.5	99.0%	2	4.56%
+Band 1	Transitional endoplasmic reticulum ATPase - Homo sapiens (Human) (P55072)	TERA_HUMAN,TERA_MOUSE	89,306.80	100.00%	12	20.20%
+Band 1	Keratin, type II cytoskeletal 1 - Homo sapiens (Human) (P04264)	K2C1_HUMAN	66,001.20	99.90%	3	5.59%
+Band 1	Keratin, type I cytoskeletal 10 - Bos taurus (Bovine) (P06394)	K1C10_BOVIN,K1C10_HUMAN,K1C10_MOUSE,K1C10_RAT	56,488.50	99.00%	2	4.56%
 
-Band 2	Transitional endoplasmic reticulum ATPase - Homo sapiens (Human) (P55072)	TERA_HUMAN,TERA_MOUSE	89,306.8	100.0%	12	20.2%
-Band 2	Keratin, type II cytoskeletal 1 - Homo sapiens (Human) (P04264)	K2C1_HUMAN	66,001.2	99.9%	3	5.59%
-Band 2	Keratin, type I cytoskeletal 10 - Bos taurus (Bovine) (P06394)	K1C10_BOVIN,K1C10_HUMAN,K1C10_MOUSE,K1C10_RAT	56,488.5	99.0%	2	4.56%
+Band 2	Transitional endoplasmic reticulum ATPase - Homo sapiens (Human) (P55072)	TERA_HUMAN,TERA_MOUSE	89,306.80	100.00%	12	20.20%
+Band 2	Keratin, type II cytoskeletal 1 - Homo sapiens (Human) (P04264)	K2C1_HUMAN	66,001.20	99.90%	3	5.59%
+Band 2	Keratin, type I cytoskeletal 10 - Bos taurus (Bovine) (P06394)	K1C10_BOVIN,K1C10_HUMAN,K1C10_MOUSE,K1C10_RAT	56,488.50	99.00%	2	4.56%
 
-Band 3	Transitional endoplasmic reticulum ATPase - Homo sapiens (Human) (P55072)	TERA_HUMAN,TERA_MOUSE	89,306.8	100.0%	12	20.2%
-Band 3	Keratin, type II cytoskeletal 1 - Homo sapiens (Human) (P04264)	K2C1_HUMAN	66,001.2	99.9%	3	5.59%
-Band 3	Keratin, type I cytoskeletal 10 - Bos taurus (Bovine) (P06394)	K1C10_BOVIN,K1C10_HUMAN,K1C10_MOUSE,K1C10_RAT	56,488.5	99.0%	2	4.56%
+Band 3	Transitional endoplasmic reticulum ATPase - Homo sapiens (Human) (P55072)	TERA_HUMAN,TERA_MOUSE	89,306.80	100.00%	12	20.20%
+Band 3	Keratin, type II cytoskeletal 1 - Homo sapiens (Human) (P04264)	K2C1_HUMAN	66,001.20	99.90%	3	5.59%
+Band 3	Keratin, type I cytoskeletal 10 - Bos taurus (Bovine) (P06394)	K1C10_BOVIN,K1C10_HUMAN,K1C10_MOUSE,K1C10_RAT	56,488.50	99.00%	2	4.56%
 
-Band 4	Transitional endoplasmic reticulum ATPase - Homo sapiens (Human) (P55072)	TERA_HUMAN,TERA_MOUSE	89,306.8	100.0%	12	20.2%
-Band 4	Keratin, type II cytoskeletal 1 - Homo sapiens (Human) (P04264)	K2C1_HUMAN	66,001.2	99.9%	3	5.59%
-Band 4	Keratin, type II test cytoskeletal 1 - Homo sapiens (Human) (P04264)	K2C1_HUMAN_TEST	66,001.2	99.9%	3	5.59%
-Band 4	Keratin, type I cytoskeletal 10 - Bos taurus (Bovine) (P06394)	K1C10_BOVIN,K1C10_HUMAN,K1C10_MOUSE,K1C10_RAT	54,831.9	99.0%	2	4.56%
+Band 4	Transitional endoplasmic reticulum ATPase - Homo sapiens (Human) (P55072)	TERA_HUMAN,TERA_MOUSE	89,306.80	100.00%	12	20.20%
+Band 4	Keratin, type II cytoskeletal 1 - Homo sapiens (Human) (P04264)	K2C1_HUMAN	66,001.20	99.90%	3	5.59%
+Band 4	Keratin, type II test cytoskeletal 1 - Homo sapiens (Human) (P04264)	K2C1_HUMAN_TEST	66,001.20	99.90%	3	5.59%
+Band 4	Keratin, type I cytoskeletal 10 - Bos taurus (Bovine) (P06394)	K1C10_BOVIN,K1C10_HUMAN,K1C10_MOUSE,K1C10_RAT	54,831.90	99.00%	2	4.56%

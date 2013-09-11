@@ -1,11 +1,10 @@
 package edu.mayo.mprc.scaffold.report;
 
+import com.google.common.base.Joiner;
 import edu.mayo.mprc.MprcException;
-import edu.mayo.mprc.scaffoldparser.spectra.ScaffoldReportReader;
 
 import java.io.Serializable;
 import java.util.Comparator;
-import java.util.Map;
 
 final class LineComparator implements Comparator<String[]>, Serializable {
 	private static final long serialVersionUID = 20101221L;
@@ -18,11 +17,12 @@ final class LineComparator implements Comparator<String[]>, Serializable {
 	/**
 	 * Initialize the comparator to compare given items of the list in given order.
 	 *
+	 * @param columnsRead     Names of the columns as they are being read
 	 * @param columns         List of column names to be compared to each other.
 	 * @param directions      Direction of the comparison, 'a' stands for ascending, 'd' stands for descending.
-	 * @param columnPositions Map from column names to column positions
 	 */
-	public LineComparator(final String[] columns, final String[] directions, final Map<String, Integer> columnPositions) {
+	public LineComparator(final String[] columnsRead,
+	                      final String[] columns, final String[] directions) {
 		if (columns.length != directions.length) {
 			throw new MprcException("The list comparator is not set up correctly.");
 		}
@@ -30,7 +30,17 @@ final class LineComparator implements Comparator<String[]>, Serializable {
 		this.directions = directions.clone();
 		positions = new int[columns.length];
 		for (int i = 0; i < columns.length; i++) {
-			positions[i] = ScaffoldReportReader.getColumn(columnPositions, columns[i]);
+			boolean found = false;
+			for (int j = 0; j < columnsRead.length; j++) {
+				if (columnsRead[j].equals(columns[i])) {
+					positions[i] = j;
+					found = true;
+					break;
+				}
+			}
+			if (!found) {
+				throw new MprcException("Sorted column " + columns[i] + " is not present in the list of columns being read: " + Joiner.on(',').join(columnsRead));
+			}
 		}
 	}
 

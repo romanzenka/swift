@@ -149,7 +149,6 @@ class ScafmlDump {
 				experiment,
 				workFolder, // Output folder
 				true, // Always export spectra for QA
-				definition.getPeptideReport() != null, // Export peptide report
 				scaffoldSettings.getProteinProbability(), // Thresholds
 				scaffoldSettings.getPeptideProbability(),
 				scaffoldSettings.getMinimumPeptideCount(),

@@ -358,7 +358,7 @@ public abstract class ScaffoldReportReader {
 			}
 			if (line == null || eofReader.isEof()) {
 				// We are at the end of file, but have not reach the end of file mark!
-				throw new MprcException("End of file reached before finding Scaffold's " + END_OF_FILE + " marker.");
+				throw new MprcException("Scaffold file is truncated - the " + END_OF_FILE + " marker not found");
 			}
 			if (!processRow(line)) {
 				break;

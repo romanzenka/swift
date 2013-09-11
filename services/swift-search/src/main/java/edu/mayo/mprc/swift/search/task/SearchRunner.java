@@ -702,7 +702,7 @@ public final class SearchRunner implements Runnable {
 		final List<File> scaffoldOutputFiles = new ArrayList<File>(scaffoldCalls.size());
 
 		for (final ScaffoldTaskI scaffoldTask : scaffoldCalls.values()) {
-			scaffoldOutputFiles.add(scaffoldTask.getScaffoldPeptideReportFile());
+			scaffoldOutputFiles.add(scaffoldTask.getScaffoldSpectraFile());
 		}
 
 		final File peptideReportFile = new File(scaffoldOutputFiles.get(0).getParentFile(), "Swift Peptide Report For " + searchDefinition.getTitle() + ".xls");

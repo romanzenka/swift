@@ -13,8 +13,6 @@ public interface ScaffoldTaskI extends Task {
 
     File getScaffoldXmlFile();
 
-    File getScaffoldPeptideReportFile();
-
     File getScaffoldSpectraFile();
 
     void addInput(FileSearch fileSearch, EngineSearchTask search);
