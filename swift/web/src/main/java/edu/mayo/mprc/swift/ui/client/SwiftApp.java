@@ -332,8 +332,7 @@ public final class SwiftApp implements EntryPoint, HidesPageContentsWhileLoading
 		output.setText(definition.getOutputFolder());
 		selectUser(definition.getUser().getEmail());
 
-		additionalSettingsPanel.setPublicMgfs(definition.isPublicMgfFiles());
-		additionalSettingsPanel.setPublicSearchFiles(definition.isPublicSearchFiles());
+		additionalSettingsPanel.setDefinition(definition);
 		enabledEnginesPanel.setCurrentEngines(firstSearch.getEnabledEngines());
 
 		showPageContentsAfterLoad();
@@ -649,6 +648,7 @@ public final class SwiftApp implements EntryPoint, HidesPageContentsWhileLoading
 						clientSpectrumQa,
 						reportSetupPanel == null ? new ClientPeptideReport(false) : reportSetupPanel.getParameters(),
 						additionalSettingsPanel.isPublicMgfs(),
+						additionalSettingsPanel.isPublicMzxmls(),
 						additionalSettingsPanel.isPublicSearchFiles(),
 						previousSearchRunId
 				);

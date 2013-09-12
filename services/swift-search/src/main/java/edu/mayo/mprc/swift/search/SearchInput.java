@@ -24,6 +24,7 @@ public final class SearchInput {
 	private boolean lowPriority;
 	private boolean publicMgfFiles;
 	private boolean publicSearchFiles;
+	private boolean publicMzxmlFiles;
 
 	public SearchInput() {
 	}
@@ -55,6 +56,7 @@ public final class SearchInput {
 		fromScratch = isTrue(searchInputMap, "fromScratch");
 		lowPriority = isTrue(searchInputMap, "lowPriority");
 		publicMgfFiles = isTrue(searchInputMap, "publicMgfFiles");
+		publicMgfFiles = isTrue(searchInputMap, "publicMzxmlFiles");
 		publicSearchFiles = isTrue(searchInputMap, "publicSearchFiles");
 	}
 
@@ -198,5 +200,13 @@ public final class SearchInput {
 
 	public void setPublicSearchFiles(final boolean publicSearchFiles) {
 		this.publicSearchFiles = publicSearchFiles;
+	}
+
+	public boolean isPublicMzxmlFiles() {
+		return publicMzxmlFiles;
+	}
+
+	public void setPublicMzxmlFiles(boolean publicMzxmlFiles) {
+		this.publicMzxmlFiles = publicMzxmlFiles;
 	}
 }

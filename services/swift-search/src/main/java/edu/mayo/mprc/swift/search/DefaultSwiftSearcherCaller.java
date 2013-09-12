@@ -134,7 +134,9 @@ public final class DefaultSwiftSearcherCaller implements SwiftSearcherCaller {
 		}
 
 		return new SwiftSearchDefinition(searchInput.getTitle(),
-				user, outputFolder, qa, report, getSearchEngineParameters(searchInput.getParamSetId()), inputFiles, searchInput.isPublicMgfFiles(),
+				user, outputFolder, qa, report, getSearchEngineParameters(searchInput.getParamSetId()), inputFiles,
+				searchInput.isPublicMgfFiles(),
+				searchInput.isPublicMzxmlFiles(),
 				searchInput.isPublicSearchFiles());
 	}
 

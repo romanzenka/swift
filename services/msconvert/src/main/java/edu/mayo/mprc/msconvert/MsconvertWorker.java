@@ -25,6 +25,7 @@ import java.io.File;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 /**
  * Calls <tt>msaccess.exe</tt> to determine whether peak picking should be enabled.
@@ -66,9 +67,9 @@ public final class MsconvertWorker extends WorkerBase {
 		//	call msaccess and determine whether the MS2 data is in profile mode
 		//	call msconvert with one or the other parameter set, based on what kind of MS2 data we have
 
-		final File mgfFile = batchWorkPacket.getOutputFile().getAbsoluteFile();
+		final File outputFile = batchWorkPacket.getOutputFile().getAbsoluteFile();
 
-		LOGGER.debug("msconvert: starting conversion " + batchWorkPacket.getInputFile() + " -> " + mgfFile);
+		LOGGER.debug("msconvert: starting conversion " + batchWorkPacket.getInputFile() + " -> " + outputFile);
 
 		File rawFile = getRawFile(batchWorkPacket);
 
@@ -84,12 +85,12 @@ public final class MsconvertWorker extends WorkerBase {
 		try {
 			final boolean ms2Profile = ms2SpectraInProfileMode(rawFile, tempFolder);
 
-			ProcessBuilder builder = new ProcessBuilder(getMsconvertCall(rawFile, mgfFile, ms2Profile));
+			ProcessBuilder builder = new ProcessBuilder(getMsconvertCall(rawFile, outputFile, ms2Profile));
 			builder.directory(msaccessExecutable.getParentFile().getAbsoluteFile());
 			ProcessCaller caller = new ProcessCaller(builder);
 			caller.runAndCheck("msconvert");
-			if (!mgfFile.exists() || !mgfFile.isFile() || !mgfFile.canRead()) {
-				throw new MprcException("msconvert failed to create file: " + mgfFile.getAbsolutePath());
+			if (!outputFile.exists() || !outputFile.isFile() || !outputFile.canRead()) {
+				throw new MprcException("msconvert failed to create file: " + outputFile.getAbsolutePath());
 			}
 		} finally {
 			FileUtilities.deleteNow(tempFolder);
@@ -101,17 +102,28 @@ public final class MsconvertWorker extends WorkerBase {
 	 * Return the command line to execute msconvert.
 	 *
 	 * @param rawFile    Raw file to convert.
-	 * @param mgfFile    The resulting mgf file.
+	 * @param outputFile The resulting mgf file.
 	 * @param ms2Profile True if the MS2 data are in profile mode.
 	 * @return Command to execute
 	 */
-	private List<String> getMsconvertCall(File rawFile, File mgfFile, boolean ms2Profile) {
+	private List<String> getMsconvertCall(File rawFile, File outputFile, boolean ms2Profile) {
 		List<String> command = new ArrayList<String>();
 		// /mnt/mprc/instruments/QE1/Z10_qe1_2012october/qe1_2012oct8_02_100_yeast_t10.raw --mgf --filter "chargeStatePredictor false 4 2 0.9"
 		// --filter "peakPicking true 2-" --filter "threshold absolute 0.1 most-intense"   --outfile qe1_2012oct8_02_100_yeast_t10.mgf --outdir ~
 		command.add(msconvertExecutable.getPath());
 		command.add(rawFile.getAbsolutePath()); // .raw file to convert
-		command.add("--mgf"); // We want to convert to .mgf
+		String extension = FileUtilities.getExtension(outputFile.getName()).toLowerCase(Locale.US);
+		if ("mgf".equals(extension)) {
+			command.add("--mgf"); // We want to convert to .mgf
+		} else if ("mzxml".equals(extension)) {
+			command.add("--mzXML");
+		} else if ("mzml".equals(extension)) {
+			command.add("--mzML");
+		} else if ("mz5".equals(extension)) {
+			command.add("--mz5");
+		} else {
+			throw new MprcException("Unsupported extension: " + extension);
+		}
 
 		if (agilentData(rawFile)) {
 			command.add("--filter");
@@ -137,10 +149,10 @@ public final class MsconvertWorker extends WorkerBase {
 		command.add("titleMaker " + filename + " scan <ScanNumber> <ScanNumber> (" + filename + ".<ScanNumber>.<ScanNumber>.<ChargeState>.dta)");
 
 		command.add("--outfile");
-		command.add(mgfFile.getName());
+		command.add(outputFile.getName());
 
 		command.add("--outdir");
-		command.add(mgfFile.getParent());
+		command.add(outputFile.getParent());
 
 		return command;
 	}

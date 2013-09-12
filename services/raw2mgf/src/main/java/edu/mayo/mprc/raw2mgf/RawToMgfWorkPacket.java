@@ -3,7 +3,6 @@ package edu.mayo.mprc.raw2mgf;
 import edu.mayo.mprc.daemon.CachableWorkPacket;
 import edu.mayo.mprc.daemon.WorkPacket;
 import edu.mayo.mprc.daemon.WorkPacketBase;
-import edu.mayo.mprc.utilities.FileUtilities;
 import edu.mayo.mprc.utilities.progress.ProgressReporter;
 
 import java.io.File;
@@ -111,7 +110,7 @@ public final class RawToMgfWorkPacket extends WorkPacketBase implements Cachable
 
 	@Override
 	public List<String> getOutputFiles() {
-		return Arrays.asList(FileUtilities.getFileNameWithoutExtension(getInputFile()) + ".mgf");
+		return Arrays.asList(getOutputFile().getAbsolutePath());
 	}
 
 	@Override

@@ -341,10 +341,6 @@ public final class SearchRunner implements Runnable {
 				LOGGER.info("Skipping nonexistent input file [" + file.getAbsolutePath() + "]");
 			}
 		}
-
-		for (final FileSearch fileSearch : searchDefinition.getInputFiles()) {
-			addFastaDbCall(fileSearch.getSearchParametersWithDefault(searchDefinition.getSearchParameters()).getDatabase());
-		}
 	}
 
 	private SearchEngine getSearchEngine(final String code) {
@@ -516,7 +512,7 @@ public final class SearchRunner implements Runnable {
 			// Ask for dumping the .RAW file since the QA might be disabled
 			if (isRawFile(inputFile)) {
 				final RAWDumpTask rawDumpTask = addRawDumpTask(inputFile.getInputFile(), QaTask.getQaSubdirectory(scaffoldTask.getScaffoldXmlFile()));
-				addSearchDbCall(scaffoldTask, rawDumpTask, database);
+				addSearchDbCall(scaffoldTask, rawDumpTask);
 			}
 		}
 	}
@@ -633,6 +629,11 @@ public final class SearchRunner implements Runnable {
 
 				rawToMgfConversions.put(hashKey, task);
 			}
+
+			if (Boolean.TRUE.equals(searchDefinition.getPublicMzxmlFiles())) {
+				throw new MprcException("Cannot provide .mzxml files with extract_msn. Please use msconvert");
+			}
+
 			return task;
 		} else {
 			MsconvertTask task = msconvertConversions.get(hashKey);
@@ -648,6 +649,20 @@ public final class SearchRunner implements Runnable {
 
 				msconvertConversions.put(hashKey, task);
 			}
+
+			if (Boolean.TRUE.equals(searchDefinition.getPublicMzxmlFiles())) {
+				// WE make a weird key just for the purpose of mzxml conversion
+				final Tuple<String, File> key = getRawToMgfConversionHashKey(new File(file.getParentFile(), file.getName() + ".mzXML"), conversionSettings);
+
+				if (msconvertConversions.get(key) == null) {
+					final File mzxmlFile = getMzxmlFileLocation(inputFile);
+
+					final MsconvertTask msconvertTask = new MsconvertTask(workflowEngine, file, mzxmlFile, true, msconvertDaemon, fileTokenFactory, isFromScratch());
+
+					msconvertConversions.put(key, msconvertTask);
+				}
+			}
+
 			return task;
 		}
 	}
@@ -698,23 +713,24 @@ public final class SearchRunner implements Runnable {
 	}
 
 	private void addScaffoldReportStep(final SwiftSearchDefinition searchDefinition) {
+		if (scaffoldVersion(searchDefinition.getInputFiles().iterator().next()) != null) {
+			final List<File> scaffoldOutputFiles = new ArrayList<File>(scaffoldCalls.size());
 
-		final List<File> scaffoldOutputFiles = new ArrayList<File>(scaffoldCalls.size());
+			for (final ScaffoldTaskI scaffoldTask : scaffoldCalls.values()) {
+				scaffoldOutputFiles.add(scaffoldTask.getScaffoldSpectraFile());
+			}
 
-		for (final ScaffoldTaskI scaffoldTask : scaffoldCalls.values()) {
-			scaffoldOutputFiles.add(scaffoldTask.getScaffoldSpectraFile());
+			final File peptideReportFile = new File(scaffoldOutputFiles.get(0).getParentFile(), "Swift Peptide Report For " + searchDefinition.getTitle() + ".xls");
+			final File proteinReportFile = new File(scaffoldOutputFiles.get(0).getParentFile(), "Swift Protein Report For " + searchDefinition.getTitle() + ".xls");
+
+			final ScaffoldReportTask scaffoldReportTask = new ScaffoldReportTask(workflowEngine, scaffoldReportDaemon, scaffoldOutputFiles, peptideReportFile, proteinReportFile, fileTokenFactory, isFromScratch());
+
+			for (final ScaffoldTaskI scaffoldTask : scaffoldCalls.values()) {
+				scaffoldReportTask.addDependency(scaffoldTask);
+			}
+
+			reportCalls.add(scaffoldReportTask);
 		}
-
-		final File peptideReportFile = new File(scaffoldOutputFiles.get(0).getParentFile(), "Swift Peptide Report For " + searchDefinition.getTitle() + ".xls");
-		final File proteinReportFile = new File(scaffoldOutputFiles.get(0).getParentFile(), "Swift Protein Report For " + searchDefinition.getTitle() + ".xls");
-
-		final ScaffoldReportTask scaffoldReportTask = new ScaffoldReportTask(workflowEngine, scaffoldReportDaemon, scaffoldOutputFiles, peptideReportFile, proteinReportFile, fileTokenFactory, isFromScratch());
-
-		for (final ScaffoldTaskI scaffoldTask : scaffoldCalls.values()) {
-			scaffoldReportTask.addDependency(scaffoldTask);
-		}
-
-		reportCalls.add(scaffoldReportTask);
 	}
 
 	private boolean isFromScratch() {
@@ -776,16 +792,28 @@ public final class SearchRunner implements Runnable {
 
 	/**
 	 * @param inputFile The input file entry from the search definition.
-	 * @return
+	 * @return Where does the output file go.
 	 */
 	private File getMgfFileLocation(final FileSearch inputFile) {
+		return getOutputFileLocation(inputFile, "dta", ".mgf");
+	}
+
+	/**
+	 * @param inputFile The input file entry from the search definition.
+	 * @return Where does the output file go.
+	 */
+	private File getMzxmlFileLocation(final FileSearch inputFile) {
+		return getOutputFileLocation(inputFile, "mzxml", ".mzXML");
+	}
+
+	private File getOutputFileLocation(FileSearch inputFile, String folder, String extension) {
 		final File file = inputFile.getInputFile();
-		final String mgfOutputDir = new File(
-				new File(searchDefinition.getOutputFolder(), "dta"),
+		final String outputDir = new File(
+				new File(searchDefinition.getOutputFolder(), folder),
 				getFileTitle(file)).getPath();
-		final File mgfFile = new File(mgfOutputDir, replaceFileExtension(file, ".mgf").getName());
+		final File outputFile = new File(outputDir, replaceFileExtension(file, extension).getName());
 		// Make sure we never produce same mgf file twice (for instance when we get two identical input mgf file names as input that differ only in the folder).
-		return distinctFiles.getDistinctFile(mgfFile);
+		return distinctFiles.getDistinctFile(outputFile);
 	}
 
 	/**
@@ -965,13 +993,17 @@ public final class SearchRunner implements Runnable {
 		return null;
 	}
 
-	private SearchDbTask addSearchDbCall(final ScaffoldTask scaffoldTask, final RAWDumpTask rawDumpTask, final Curation curation) {
+	private SearchDbTask addSearchDbCall(final ScaffoldTask scaffoldTask, final RAWDumpTask rawDumpTask) {
 		final File file = scaffoldTask.getScaffoldSpectraFile();
 		SearchDbTask searchDbTask = searchDbCalls.get(file);
 		if (searchDbTask == null) {
-			final FastaDbTask fastaDbTask = addFastaDbCall(curation);
 			final SearchDbTask task = new SearchDbTask(workflowEngine, searchDbDaemon, fileTokenFactory, false, scaffoldTask);
-			task.addDependency(fastaDbTask);
+
+			for (final FileSearch fileSearch : searchDefinition.getInputFiles()) {
+				FastaDbTask fastaDbTask = addFastaDbCall(fileSearch.getSearchParametersWithDefault(searchDefinition.getSearchParameters()).getDatabase());
+				task.addDependency(fastaDbTask);
+			}
+
 			task.addDependency(scaffoldTask);
 			searchDbCalls.put(file, task);
 			searchDbTask = task;

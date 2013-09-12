@@ -15,6 +15,7 @@
         <many-to-one name="qa" class="SpectrumQa" column="spectrum_qa" foreign-key="ssd_sqa_fk"/>
         <many-to-one name="peptideReport" class="PeptideReport" column="peptide_report" foreign-key="ssd_pepr_fk"/>
         <property name="publicMgfFiles" type="boolean" column="public_mgf_files" not-null="false"/>
+        <property name="publicMzxmlFiles" type="boolean" column="public_mzxml_files" not-null="false"/>
         <property name="publicSearchFiles" type="boolean" column="public_search_files" not-null="false"/>
         <many-to-one name="searchParameters" class="edu.mayo.mprc.swift.params2.SearchEngineParameters"
                      column="search_parameters"

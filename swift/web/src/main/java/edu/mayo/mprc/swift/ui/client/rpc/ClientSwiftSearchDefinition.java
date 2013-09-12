@@ -20,6 +20,7 @@ public final class ClientSwiftSearchDefinition implements Serializable {
 	private ClientPeptideReport clientPeptideReport;
 	private ClientParamSet paramSet;
 	private boolean publicMgfFiles;
+	private boolean publicMzxmlFiles;
 	private boolean publicSearchFiles;
 
 	private boolean fromScratch; // Rerun everything from scratch, no caching
@@ -44,13 +45,14 @@ public final class ClientSwiftSearchDefinition implements Serializable {
 	 * @param spectrumQa        Parameters for spectrum QA.
 	 * @param peptideReport     Parameters for peptide report
 	 * @param publicMgfFiles    True if the mgf files are to be published.
+	 * @param publicMzxmlFiles  True if the mzxml files are to be published.
 	 * @param publicSearchFiles True if the intermediate search results are to be published.
 	 * @param publicSearchFiles
 	 */
 	public ClientSwiftSearchDefinition(final String searchTitle, final ClientUser user, final String outputFolder,
 	                                   final ClientParamSet paramSet, final List<ClientFileSearch> inputFiles,
 	                                   final ClientSpectrumQa spectrumQa, final ClientPeptideReport peptideReport,
-	                                   final boolean publicMgfFiles, final boolean publicSearchFiles, final int previousSearchRunId) {
+	                                   final boolean publicMgfFiles, final boolean publicMzxmlFiles, final boolean publicSearchFiles, final int previousSearchRunId) {
 		this.searchTitle = searchTitle;
 		this.user = user;
 		this.outputFolder = outputFolder;
@@ -59,6 +61,7 @@ public final class ClientSwiftSearchDefinition implements Serializable {
 		clientSpectrumQa = spectrumQa;
 		clientPeptideReport = peptideReport;
 		this.publicMgfFiles = publicMgfFiles;
+		this.publicMzxmlFiles = publicMzxmlFiles;
 		this.publicSearchFiles = publicSearchFiles;
 		this.previousSearchRunId = previousSearchRunId;
 		fromScratch = false;
@@ -98,6 +101,10 @@ public final class ClientSwiftSearchDefinition implements Serializable {
 
 	public boolean isPublicMgfFiles() {
 		return publicMgfFiles;
+	}
+
+	public boolean isPublicMzxmlFiles() {
+		return publicMzxmlFiles;
 	}
 
 	public boolean isPublicSearchFiles() {

@@ -2,9 +2,11 @@ package edu.mayo.mprc.swift.ui.client.widgets;
 
 import com.google.gwt.user.client.ui.CheckBox;
 import com.google.gwt.user.client.ui.HorizontalPanel;
+import edu.mayo.mprc.swift.ui.client.rpc.ClientSwiftSearchDefinition;
 
 public class AdditionalSettingsPanel extends HorizontalPanel {
 	private final CheckBox publicMgfs;
+	private final CheckBox publicMzxmls;
 	private final CheckBox publicSearchFiles;
 	private final CheckBox fromScratch;
 	private final CheckBox lowPriority;
@@ -13,7 +15,7 @@ public class AdditionalSettingsPanel extends HorizontalPanel {
 	 * Null Constructor
 	 */
 	public AdditionalSettingsPanel() {
-		this(false, false);
+		this(false, false, false);
 	}
 
 	/**
@@ -22,10 +24,16 @@ public class AdditionalSettingsPanel extends HorizontalPanel {
 	 * @param publicMgfs        True if .mgfs should be made public.
 	 * @param publicSearchFiles True if search files should be made public.
 	 */
-	public AdditionalSettingsPanel(final boolean publicMgfs, final boolean publicSearchFiles) {
-		this.publicMgfs = new CheckBox("Provide .mgf files");
+	public AdditionalSettingsPanel(final boolean publicMgfs, final boolean publicMzxmls, final boolean publicSearchFiles) {
+		this.publicMgfs = new CheckBox("Provide .mgf");
+		this.publicMgfs.setTitle("Place converted .mgf files in the output directory of your project");
 		this.publicMgfs.setChecked(publicMgfs);
 		add(this.publicMgfs);
+
+		this.publicMzxmls = new CheckBox("Provide .mzxml");
+		this.publicMzxmls.setTitle("Place converted .mzxml files in the output directory of your project");
+		this.publicMzxmls.setChecked(publicMgfs);
+		add(this.publicMzxmls);
 
 		this.publicSearchFiles = new CheckBox("Provide intermediate search results");
 		this.publicSearchFiles.setChecked(publicSearchFiles);
@@ -54,6 +62,14 @@ public class AdditionalSettingsPanel extends HorizontalPanel {
 		return publicMgfs.isChecked();
 	}
 
+	public void setPublicMzxmls(final boolean publicMzxmls) {
+		this.publicMzxmls.setChecked(publicMzxmls);
+	}
+
+	public boolean isPublicMzxmls() {
+		return publicMzxmls.isChecked();
+	}
+
 	public void setPublicSearchFiles(final boolean publicSearchFiles) {
 		this.publicSearchFiles.setChecked(publicSearchFiles);
 	}
@@ -76,5 +92,10 @@ public class AdditionalSettingsPanel extends HorizontalPanel {
 
 	public boolean isLowPriority() {
 		return lowPriority.isChecked();
+	}
+
+	public void setDefinition(final ClientSwiftSearchDefinition definition) {
+		setPublicMgfs(definition.isPublicMgfFiles());
+		setPublicSearchFiles(definition.isPublicSearchFiles());
 	}
 }

@@ -102,6 +102,46 @@ public class TestSearchRunner {
 	}
 
 	@Test
+	public void onlyProvideMgfAndMzxmlRunner() throws IOException {
+		final SwiftSearchWorkPacket packet = new SwiftSearchWorkPacket(1, "task1", false, 0);
+
+		final Collection<SearchEngine> searchEngines = searchEngines();
+
+		final EnabledEngines engines = new EnabledEngines();
+
+		SearchEngineParameters searchParameters = searchEngineParameters1();
+		searchParameters.setExtractMsnSettings(new ExtractMsnSettings("", ExtractMsnSettings.MSCONVERT));
+		final List<FileSearch> inputFiles = Arrays.asList(
+				new FileSearch(raw1, "biosample", "category", "experiment", engines, searchParameters),
+				new FileSearch(raw2, "biosample2", "category", "experiment", engines, searchParameters)
+		);
+
+		final SwiftSearchDefinition definition = defaultSearchDefinition(inputFiles);
+		definition.setPublicMgfFiles(true);
+		definition.setPublicMzxmlFiles(true);
+
+		final ProgressReporter reporter = mock(ProgressReporter.class);
+		final ExecutorService service = new SimpleThreadPoolExecutor(1, "testSwiftSearcher", true);
+
+		final SearchRun searchRun = null;
+
+		final SearchRunner runner = makeSearchRunner(packet, searchEngines, definition, reporter, service, searchRun);
+
+		runner.initialize();
+
+		final int tasksPerFile = 0
+				+ 1 /* Raw->mgf */
+				+ 1 /* Raw->mzxml */
+				+ 1 /* msmsEval */;
+
+		final int tasksPerSearch = 0;
+
+		int expectedNumTasks = inputFiles.size() * tasksPerFile + tasksPerSearch;
+
+		Assert.assertEquals(runner.getWorkflowEngine().getNumTasks(), expectedNumTasks);
+	}
+
+	@Test
 	public void singleExperimentTwoDatabasesRunner() throws IOException {
 		final SwiftSearchWorkPacket packet = new SwiftSearchWorkPacket(1, "task1", false, 0);
 
@@ -268,6 +308,7 @@ public class TestSearchRunner {
 				new PeptideReport(),
 				searchEngineParameters1(),
 				inputFiles,
+				false,
 				false,
 				false
 		);

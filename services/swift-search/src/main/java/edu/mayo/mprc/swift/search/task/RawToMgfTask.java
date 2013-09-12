@@ -15,7 +15,7 @@ final class RawToMgfTask extends AsyncTaskBase implements FileProducingTask {
 	private static final Logger LOGGER = Logger.getLogger(RawToMgfTask.class);
 
 	private File inputFile;
-	private File mgfFile = null;
+	private File outputFile = null;
 	private String extractMsnParameters;
 	private boolean publicAccess;
 
@@ -25,14 +25,15 @@ final class RawToMgfTask extends AsyncTaskBase implements FileProducingTask {
 	public RawToMgfTask(
 			final WorkflowEngine engine,
 			final File inputFile,
-			final File mgfFile,
+			final File outputFile,
 			final String extractMsnParams,
-			final boolean publicAccess, final DaemonConnection raw2mgfDaemon, final FileTokenFactory fileTokenFactory, final boolean fromScratch
+			final boolean publicAccess,
+			final DaemonConnection raw2mgfDaemon, final FileTokenFactory fileTokenFactory, final boolean fromScratch
 
 	) {
 		super(engine, raw2mgfDaemon, fileTokenFactory, fromScratch);
 		this.inputFile = inputFile;
-		this.mgfFile = mgfFile;
+		this.outputFile = outputFile;
 		extractMsnParameters = extractMsnParams;
 		this.publicAccess = publicAccess;
 		setName("RAW2mgf");
@@ -44,7 +45,7 @@ final class RawToMgfTask extends AsyncTaskBase implements FileProducingTask {
 		setDescription(
 				"Converting "
 						+ getFileTokenFactory().fileToTaggedDatabaseToken(inputFile)
-						+ " to " + getFileTokenFactory().fileToTaggedDatabaseToken(mgfFile)
+						+ " to " + getFileTokenFactory().fileToTaggedDatabaseToken(outputFile)
 						+ " (" + extractMsnParameters + ")");
 	}
 
@@ -58,7 +59,7 @@ final class RawToMgfTask extends AsyncTaskBase implements FileProducingTask {
 
 	@Override
 	public File getResultingFile() {
-		return mgfFile;
+		return outputFile;
 	}
 
 	/**
@@ -69,7 +70,7 @@ final class RawToMgfTask extends AsyncTaskBase implements FileProducingTask {
 	public WorkPacket createWorkPacket() {
 		if (inputFile.getName().endsWith(".mgf")) {
 			LOGGER.info("Skipping Raw2MGF for an mgf file " + inputFile.getAbsolutePath());
-			mgfFile = inputFile;
+			outputFile = inputFile;
 			// Nothing to do, signalize success
 			return null;
 		} else {
@@ -78,7 +79,7 @@ final class RawToMgfTask extends AsyncTaskBase implements FileProducingTask {
 			// to work properly.
 			return new RawToMgfWorkPacket(
 					extractMsnParameters,
-					mgfFile,
+					outputFile,
 					true,
 					inputFile,
 					getFullId(),
@@ -89,7 +90,7 @@ final class RawToMgfTask extends AsyncTaskBase implements FileProducingTask {
 
 	@Override
 	public void onSuccess() {
-		completeWhenFilesAppear(mgfFile);
+		completeWhenFilesAppear(outputFile);
 	}
 
 	@Override
@@ -97,7 +98,7 @@ final class RawToMgfTask extends AsyncTaskBase implements FileProducingTask {
 		if (progressInfo instanceof RawToMgfResult) {
 			final RawToMgfResult result = (RawToMgfResult) progressInfo;
 			result.synchronizeFileTokensOnReceiver();
-			mgfFile = result.getMgf();
+			outputFile = result.getMgf();
 			updateDescription();
 		}
 	}

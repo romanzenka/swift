@@ -17,6 +17,7 @@ public class SwiftSearchDefinition extends PersistableBase {
 	private SpectrumQa qa;
 	private PeptideReport peptideReport;
 	private Boolean publicMgfFiles;
+	private Boolean publicMzxmlFiles;
 	private Boolean publicSearchFiles;
 
 	private SearchEngineParameters searchParameters;
@@ -25,7 +26,10 @@ public class SwiftSearchDefinition extends PersistableBase {
 	public SwiftSearchDefinition() {
 	}
 
-	public SwiftSearchDefinition(final String title, final User user, final File outputFolder, final SpectrumQa qa, final PeptideReport peptideReport, final SearchEngineParameters searchParameters, final List<FileSearch> inputFiles, final boolean publicMgfFiles, final boolean publicSearchFiles) {
+	public SwiftSearchDefinition(final String title, final User user, final File outputFolder, final SpectrumQa qa,
+	                             final PeptideReport peptideReport, final SearchEngineParameters searchParameters,
+	                             final List<FileSearch> inputFiles, final boolean publicMgfFiles,
+	                             final boolean publicMzxmlFiles, final boolean publicSearchFiles) {
 		this.title = title;
 		this.user = user;
 		this.outputFolder = outputFolder;
@@ -34,6 +38,7 @@ public class SwiftSearchDefinition extends PersistableBase {
 		this.searchParameters = searchParameters;
 		this.inputFiles = inputFiles;
 		this.publicMgfFiles = publicMgfFiles;
+		this.publicMzxmlFiles = publicMzxmlFiles;
 		this.publicSearchFiles = publicSearchFiles;
 	}
 
@@ -101,6 +106,14 @@ public class SwiftSearchDefinition extends PersistableBase {
 		this.publicMgfFiles = publicMgfFiles;
 	}
 
+	public Boolean getPublicMzxmlFiles() {
+		return publicMzxmlFiles == null ? false : publicMzxmlFiles;
+	}
+
+	public void setPublicMzxmlFiles(Boolean publicMzxmlFiles) {
+		this.publicMzxmlFiles = publicMzxmlFiles;
+	}
+
 	public Boolean getPublicSearchFiles() {
 		return publicSearchFiles == null ? false : publicSearchFiles;
 	}
@@ -142,6 +155,10 @@ public class SwiftSearchDefinition extends PersistableBase {
 			return false;
 		}
 
+		if (getPublicMzxmlFiles() != null ? !getPublicMzxmlFiles().equals(that.getPublicMzxmlFiles()) : that.getPublicMzxmlFiles() != null) {
+			return false;
+		}
+
 		if (getPublicSearchFiles() != null ? !getPublicSearchFiles().equals(that.getPublicMgfFiles()) : that.getPublicSearchFiles() != null) {
 			return false;
 		}
@@ -158,6 +175,7 @@ public class SwiftSearchDefinition extends PersistableBase {
 		result = 31 * result + (getPeptideReport() != null ? getPeptideReport().hashCode() : 0);
 		result = 31 * result + (getInputFiles() != null ? getInputFiles().hashCode() : 0);
 		result = 31 * result + (getPublicMgfFiles() != null ? getPublicMgfFiles().hashCode() : 0);
+		result = 31 * result + (getPublicMzxmlFiles() != null ? getPublicMzxmlFiles().hashCode() : 0);
 		result = 31 * result + (getPublicSearchFiles() != null ? getPublicSearchFiles().hashCode() : 0);
 		return result;
 	}

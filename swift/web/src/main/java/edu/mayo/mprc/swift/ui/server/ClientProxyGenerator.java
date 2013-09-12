@@ -263,6 +263,7 @@ public final class ClientProxyGenerator {
 				convertTo(definition.getQa()),
 				convertTo(definition.getPeptideReport()),
 				Boolean.TRUE.equals(definition.getPublicMgfFiles()),
+				Boolean.TRUE.equals(definition.getPublicMzxmlFiles()),
 				Boolean.TRUE.equals(definition.getPublicSearchFiles()),
 				0
 		);
@@ -365,6 +366,7 @@ public final class ClientProxyGenerator {
 				parameters,
 				fileEntries,
 				definition.isPublicMgfFiles(),
+				definition.isPublicMzxmlFiles(),
 				definition.isPublicSearchFiles());
 	}
 
