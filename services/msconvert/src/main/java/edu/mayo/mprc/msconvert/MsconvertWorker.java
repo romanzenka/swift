@@ -117,6 +117,7 @@ public final class MsconvertWorker extends WorkerBase {
 			command.add("--mgf"); // We want to convert to .mgf
 		} else if ("mzxml".equals(extension)) {
 			command.add("--mzXML");
+			command.add("--zlib");
 		} else if ("mzml".equals(extension)) {
 			command.add("--mzML");
 		} else if ("mz5".equals(extension)) {
