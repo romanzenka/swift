@@ -102,7 +102,7 @@ public final class MsconvertWorkPacket extends WorkPacketBase implements Cachabl
 
 	@Override
 	public List<String> getOutputFiles() {
-		return Arrays.asList(FileUtilities.getFileNameWithoutExtension(getInputFile()) + ".mgf");
+		return Arrays.asList(getOutputFile().getName());
 	}
 
 	@Override

@@ -110,7 +110,7 @@ public final class RawToMgfWorkPacket extends WorkPacketBase implements Cachable
 
 	@Override
 	public List<String> getOutputFiles() {
-		return Arrays.asList(getOutputFile().getAbsolutePath());
+		return Arrays.asList(getOutputFile().getName());
 	}
 
 	@Override

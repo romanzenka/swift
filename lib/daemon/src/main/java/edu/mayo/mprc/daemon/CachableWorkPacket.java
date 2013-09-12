@@ -53,7 +53,7 @@ public interface CachableWorkPacket extends WorkPacket {
 	WorkPacket translateToWorkInProgressPacket(File wipFolder);
 
 	/**
-	 * @return A list of all output files that are expected to be a result of processing this work packet.
+	 * @return A list of all output files that are expected to be a result of processing this work packet. Just names, no paths.
 	 */
 	List<String> getOutputFiles();
 
