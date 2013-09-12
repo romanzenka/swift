@@ -83,7 +83,8 @@ public final class MsconvertWorkPacket extends WorkPacketBase implements Cachabl
 	@Override
 	public String getStringDescriptionOfTask() {
 		final File sourceFile = getInputFile();
-		return "Input:" + sourceFile.getAbsolutePath();
+		final String resultExtension = FileUtilities.getExtension(getOutputFile().getName());
+		return "Input:" + sourceFile.getAbsolutePath() + "\nExtension:" + resultExtension;
 	}
 
 	@Override

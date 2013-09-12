@@ -15,7 +15,7 @@ final class MsconvertTask extends AsyncTaskBase implements FileProducingTask {
 	private static final Logger LOGGER = Logger.getLogger(MsconvertTask.class);
 
 	private File inputFile;
-	private File mgfFile = null;
+	private File outputFile = null;
 	private boolean publicAccess;
 
 	/**
@@ -24,13 +24,13 @@ final class MsconvertTask extends AsyncTaskBase implements FileProducingTask {
 	public MsconvertTask(
 			final WorkflowEngine engine,
 			final File inputFile,
-			final File mgfFile,
+			final File outputFile,
 			final boolean publicAccess, final DaemonConnection raw2mgfDaemon, final FileTokenFactory fileTokenFactory, final boolean fromScratch
 
 	) {
 		super(engine, raw2mgfDaemon, fileTokenFactory, fromScratch);
 		this.inputFile = inputFile;
-		this.mgfFile = mgfFile;
+		this.outputFile = outputFile;
 		this.publicAccess = publicAccess;
 		setName("msconvert");
 
@@ -41,7 +41,7 @@ final class MsconvertTask extends AsyncTaskBase implements FileProducingTask {
 		setDescription(
 				"Converting "
 						+ getFileTokenFactory().fileToTaggedDatabaseToken(inputFile)
-						+ " to " + getFileTokenFactory().fileToTaggedDatabaseToken(mgfFile));
+						+ " to " + getFileTokenFactory().fileToTaggedDatabaseToken(outputFile));
 	}
 
 	private static String getFileReference(final File rawFile) {
@@ -54,7 +54,7 @@ final class MsconvertTask extends AsyncTaskBase implements FileProducingTask {
 
 	@Override
 	public File getResultingFile() {
-		return mgfFile;
+		return outputFile;
 	}
 
 	/**
@@ -65,7 +65,7 @@ final class MsconvertTask extends AsyncTaskBase implements FileProducingTask {
 	public WorkPacket createWorkPacket() {
 		if (inputFile.getName().endsWith(".mgf")) {
 			LOGGER.info("Skipping msconvert for an mgf file " + inputFile.getAbsolutePath());
-			mgfFile = inputFile;
+			outputFile = inputFile;
 			// Nothing to do, signalize success
 			return null;
 		} else {
@@ -73,7 +73,7 @@ final class MsconvertTask extends AsyncTaskBase implements FileProducingTask {
 			// We need to get its cached location in order for the subsequent caching mechanisms
 			// to work properly.
 			return new MsconvertWorkPacket(
-					mgfFile,
+					outputFile,
 					true,
 					inputFile,
 					getFullId(),
@@ -84,7 +84,7 @@ final class MsconvertTask extends AsyncTaskBase implements FileProducingTask {
 
 	@Override
 	public void onSuccess() {
-		completeWhenFilesAppear(mgfFile);
+		completeWhenFilesAppear(outputFile);
 	}
 
 	@Override
@@ -92,7 +92,7 @@ final class MsconvertTask extends AsyncTaskBase implements FileProducingTask {
 		if (progressInfo instanceof MsconvertResult) {
 			final MsconvertResult result = (MsconvertResult) progressInfo;
 			result.synchronizeFileTokensOnReceiver();
-			mgfFile = result.getMgf();
+			outputFile = result.getMgf();
 			updateDescription();
 		}
 	}
