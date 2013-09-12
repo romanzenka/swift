@@ -96,6 +96,7 @@ public class AdditionalSettingsPanel extends HorizontalPanel {
 
 	public void setDefinition(final ClientSwiftSearchDefinition definition) {
 		setPublicMgfs(definition.isPublicMgfFiles());
+		setPublicMzxmls(definition.isPublicMzxmlFiles());
 		setPublicSearchFiles(definition.isPublicSearchFiles());
 	}
 }
