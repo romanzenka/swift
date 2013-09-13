@@ -31,6 +31,7 @@ public final class FastaDbDaoHibernate extends DaoBase implements FastaDbDao {
 	// Progress will be checked each X spectra
 	public static final long REPORT_FREQUENCY = 100L;
 	private static final String HBM_HOME = "edu/mayo/mprc/fastadb/";
+	public static final int BATCH_SIZE = 100;
 
 	public FastaDbDaoHibernate() {
 	}
@@ -188,7 +189,7 @@ public final class FastaDbDaoHibernate extends DaoBase implements FastaDbDao {
 				order++;
 				final TempSequenceLoading load = new TempSequenceLoading(bulkLoadJob, order, sequence);
 				getSession().save(load);
-				if (order % 20 == 0) {
+				if (order % BATCH_SIZE == 0) {
 					getSession().flush();
 					getSession().clear();
 				}
