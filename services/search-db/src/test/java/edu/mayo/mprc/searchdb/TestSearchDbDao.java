@@ -9,6 +9,7 @@ import edu.mayo.mprc.dbcurator.model.Curation;
 import edu.mayo.mprc.dbcurator.model.persistence.CurationDaoImpl;
 import edu.mayo.mprc.fastadb.FastaDbDaoHibernate;
 import edu.mayo.mprc.fastadb.SingleDatabaseTranslator;
+import edu.mayo.mprc.searchdb.builder.AnalysisBuilder;
 import edu.mayo.mprc.searchdb.dao.*;
 import edu.mayo.mprc.swift.db.SwiftDaoHibernate;
 import edu.mayo.mprc.swift.dbmapping.ReportData;
@@ -150,16 +151,16 @@ public class TestSearchDbDao extends DaoTest {
 				new SingleDatabaseTranslator(fastaDbDao, curationDao),
 				new DummyMassSpecDataExtractor(now));
 		summarizer.load(stream, -1, reportToLoad, "3", null);
-		final Analysis analysis = summarizer.getAnalysis();
 
-		searchDbDao.addAnalysis(analysis, reportData, new ProgressReporter() {
+		final AnalysisBuilder analysisBuilder = summarizer.getAnalysisBuilder();
+		return searchDbDao.addAnalysis(analysisBuilder, reportData, new ProgressReporter() {
 			@Override
 			public void reportStart(final String hostString) {
 
 			}
 
 			@Override
-			public void reportProgress(ProgressInfo progressInfo) {
+			public void reportProgress(final ProgressInfo progressInfo) {
 
 			}
 
@@ -169,11 +170,10 @@ public class TestSearchDbDao extends DaoTest {
 			}
 
 			@Override
-			public void reportFailure(Throwable t) {
+			public void reportFailure(final Throwable t) {
 
 			}
 		});
-		return analysis;
 	}
 
 	/**

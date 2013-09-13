@@ -6,6 +6,7 @@ import com.google.common.io.Resources;
 import edu.mayo.mprc.MprcException;
 import edu.mayo.mprc.fastadb.ProteinSequence;
 import edu.mayo.mprc.fastadb.ProteinSequenceTranslator;
+import edu.mayo.mprc.searchdb.builder.AnalysisBuilder;
 import edu.mayo.mprc.searchdb.dao.*;
 import edu.mayo.mprc.unimod.IndexedModSet;
 import edu.mayo.mprc.unimod.MockUnimodDao;
@@ -65,7 +66,7 @@ public class TestScaffoldSpectraSummarizer {
 	public void shouldParseDoubles() {
 		Assert.assertEquals("100.0", String.valueOf(ScaffoldSpectraSummarizer.parseDouble("100.0%")));
 		Assert.assertEquals("94.7", String.valueOf(ScaffoldSpectraSummarizer.parseDouble("94.7%")));
-		Assert.assertEquals("0.948", String.valueOf(ScaffoldSpectraSummarizer.parseDouble("94.8%")/100.0));
+		Assert.assertEquals("0.948", String.valueOf(ScaffoldSpectraSummarizer.parseDouble("94.8%") / 100.0));
 	}
 
 	/**
@@ -78,9 +79,10 @@ public class TestScaffoldSpectraSummarizer {
 			final ScaffoldSpectraSummarizer summarizer = makeSummarizer();
 
 			summarizer.load(stream, -1, SINGLE, "3", null);
-			final Analysis analysis = summarizer.getAnalysis();
-			Assert.assertEquals(analysis.getAnalysisDate(), new DateTime(2011, 12, 16, 0, 0, 0, 0), "Report date");
-			Assert.assertEquals(analysis.getScaffoldVersion(), "Scaffold_3.3.1", "Scaffold version");
+			final AnalysisBuilder analysisBuilder = summarizer.getAnalysisBuilder();
+			final Analysis analysis = analysisBuilder.build();
+			Assert.assertEquals(analysisBuilder.getAnalysisDate(), new DateTime(2011, 12, 16, 0, 0, 0, 0), "Report date");
+			Assert.assertEquals(analysisBuilder.getScaffoldVersion(), "Scaffold_3.3.1", "Scaffold version");
 
 			Assert.assertEquals(analysis.getBiologicalSamples().size(), 1, "Biological samples");
 
@@ -139,7 +141,7 @@ public class TestScaffoldSpectraSummarizer {
 		try {
 			final ScaffoldSpectraSummarizer summarizer = makeSummarizer();
 			summarizer.load(stream, -1, MULTIPLE, "3", null);
-			final Analysis analysis = summarizer.getAnalysis();
+			final Analysis analysis = summarizer.getAnalysisBuilder().build();
 			Assert.assertEquals(analysis.getAnalysisDate(), new DateTime(2011, 12, 28, 0, 0, 0, 0), "Report date");
 			Assert.assertEquals(analysis.getScaffoldVersion(), "Scaffold_3.3.1", "Scaffold version");
 
@@ -160,7 +162,7 @@ public class TestScaffoldSpectraSummarizer {
 		try {
 			final ScaffoldSpectraSummarizer summarizer = makeSummarizer();
 			summarizer.load(stream, -1, LARGE, "3", null);
-			final Analysis analysis = summarizer.getAnalysis();
+			final Analysis analysis = summarizer.getAnalysisBuilder().build();
 			Assert.assertEquals(analysis.getAnalysisDate(), new DateTime(2011, 10, 18, 0, 0, 0, 0), "Report date");
 			Assert.assertEquals(analysis.getScaffoldVersion(), "Scaffold_3.2.0", "Scaffold version");
 
@@ -181,7 +183,7 @@ public class TestScaffoldSpectraSummarizer {
 		try {
 			final ScaffoldSpectraSummarizer summarizer = makeSummarizer();
 			summarizer.load(stream, -1, SCAFFOLD4, "4.0.4", null);
-			final Analysis analysis = summarizer.getAnalysis();
+			final Analysis analysis = summarizer.getAnalysisBuilder().build();
 			Assert.assertEquals(analysis.getAnalysisDate(), new DateTime(2013, 04, 23, 0, 0, 0, 0), "Report date");
 			Assert.assertEquals(analysis.getScaffoldVersion(), "Scaffold_4.0.4", "Scaffold version");
 
@@ -202,7 +204,7 @@ public class TestScaffoldSpectraSummarizer {
 		try {
 			final ScaffoldSpectraSummarizer summarizer = makeSummarizer();
 			summarizer.load(stream, -1, SINGLE_MISSING_DB, "3", null);
-			final Analysis analysis = summarizer.getAnalysis();
+			final Analysis analysis = summarizer.getAnalysisBuilder().build();
 			Assert.assertEquals(analysis.getAnalysisDate(), new DateTime(2011, 12, 16, 0, 0, 0, 0), "Report date");
 			Assert.assertEquals(analysis.getScaffoldVersion(), "Scaffold_3.3.1", "Scaffold version");
 
@@ -226,7 +228,7 @@ public class TestScaffoldSpectraSummarizer {
 
 			final ScaffoldSpectraSummarizer summarizer = makeSummarizer(scaffoldUnimod);
 			summarizer.load(stream, -1, BUG_2205, "3", null);
-			final Analysis analysis = summarizer.getAnalysis();
+			final Analysis analysis = summarizer.getAnalysisBuilder().build();
 			Assert.assertEquals(analysis.getAnalysisDate(), new DateTime(2013, 06, 14, 0, 0, 0, 0), "Report date");
 			Assert.assertEquals(analysis.getScaffoldVersion(), "Scaffold_3.6.2", "Scaffold version");
 
@@ -237,7 +239,6 @@ public class TestScaffoldSpectraSummarizer {
 			FileUtilities.closeQuietly(stream);
 		}
 	}
-
 
 
 	/**

@@ -2,6 +2,7 @@ package edu.mayo.mprc.searchdb.dao;
 
 import edu.mayo.mprc.database.Dao;
 import edu.mayo.mprc.database.QueryCallback;
+import edu.mayo.mprc.searchdb.builder.AnalysisBuilder;
 import edu.mayo.mprc.swift.dbmapping.ReportData;
 import edu.mayo.mprc.swift.dbmapping.SwiftSearchDefinition;
 import edu.mayo.mprc.utilities.progress.UserProgressReporter;
@@ -17,11 +18,11 @@ import java.util.TreeMap;
  */
 public interface SearchDbDao extends Dao {
 	/**
-	 * @param analysis   Analysis to add.
-	 * @param reportData The analysis is bound to this Scaffold data report (.sf3 file)
+	 * @param analysisBuilder Builder filled with analysis to add.
+	 * @param reportData      The analysis is bound to this Scaffold data report (.sf3 file)
 	 * @return Added analysis properly linked into Hibernate.
 	 */
-	Analysis addAnalysis(Analysis analysis, ReportData reportData, UserProgressReporter reporter);
+	Analysis addAnalysis(AnalysisBuilder analysisBuilder, ReportData reportData, UserProgressReporter reporter);
 
 	/**
 	 * @param analysisId Id of {@link Analysis}

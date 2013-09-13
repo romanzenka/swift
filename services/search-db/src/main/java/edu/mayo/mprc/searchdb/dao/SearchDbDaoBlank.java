@@ -1,6 +1,7 @@
 package edu.mayo.mprc.searchdb.dao;
 
 import edu.mayo.mprc.database.QueryCallback;
+import edu.mayo.mprc.searchdb.builder.AnalysisBuilder;
 import edu.mayo.mprc.swift.dbmapping.ReportData;
 import edu.mayo.mprc.swift.dbmapping.SwiftSearchDefinition;
 import edu.mayo.mprc.utilities.progress.UserProgressReporter;
@@ -17,7 +18,7 @@ import java.util.TreeMap;
  */
 public abstract class SearchDbDaoBlank implements SearchDbDao {
 	@Override
-	public Analysis addAnalysis(final Analysis analysis, final ReportData reportData, final UserProgressReporter reporter) {
+	public Analysis addAnalysis(final AnalysisBuilder analysisBuilder, final ReportData reportData, final UserProgressReporter reporter) {
 		throw new UnsupportedOperationException();
 	}
 

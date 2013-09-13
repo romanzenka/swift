@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+    "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="edu.mayo.mprc.fastadb">
+    <class name="BulkLoadJob" table="bulk_load_job" mutable="false">
+        <id name="id" type="integer" column="bulk_load_job_id">
+            <generator class="native" />
+        </id>
+        <property name="jobDate" column="job_date" not-null="true" />
+    </class>
+</hibernate-mapping>

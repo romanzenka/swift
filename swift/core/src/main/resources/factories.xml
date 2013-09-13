@@ -77,8 +77,8 @@
                 <entry key="hibernate.c3p0.min_size" value="5"/>
                 <entry key="hibernate.c3p0.max_size" value="20"/>
                 <entry key="hibernate.c3p0.timeout" value="6000"/>
-                <entry key="hibernate.c3p0.max_statements" value="0"/>
-                <entry key="hibernate.c3p0.max_statements_per_connection" value="0"/>
+                <entry key="hibernate.c3p0.max_statements" value="100"/>
+                <entry key="hibernate.c3p0.max_statements_per_connection" value="20"/>
                 <entry key="hibernate.c3p0.idle_connection_test_period" value="300"/>
                 <entry key="hibernate.connection.provider_class"
                        value="org.hibernate.connection.C3P0ConnectionProvider"/>

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+    "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="edu.mayo.mprc.fastadb">
+    <class name="edu.mayo.mprc.fastadb.TempSequenceLoading" table="temp_sequence_loading">
+        <composite-id class="TempKey" access="field" name="tempKey">
+            <key-property name="job" column="job" type="integer" />
+            <key-property name="dataOrder" column="data_order" type="integer" />
+        </composite-id>
+        <property name="newId" column="new_id" type="integer" />
+        <property name="mass" type="double" column="mass" />
+        <property name="sequence" type="text" column="sequence" />
+    </class>
+</hibernate-mapping>

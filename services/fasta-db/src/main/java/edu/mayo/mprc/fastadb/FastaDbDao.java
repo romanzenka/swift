@@ -4,6 +4,8 @@ import edu.mayo.mprc.dbcurator.model.Curation;
 import edu.mayo.mprc.utilities.progress.PercentDone;
 import edu.mayo.mprc.utilities.progress.UserProgressReporter;
 
+import java.util.Collection;
+
 /**
  * Can load .FASTA file into a database for easy lookups of protein sequences.
  * <p/>
@@ -70,4 +72,29 @@ public interface FastaDbDao {
 	 */
 	void addFastaDatabase(Curation database, UserProgressReporter progressReporter);
 
+	/**
+	 * Add all protein sequences as fast as possible.
+	 *
+	 * @param proteinSequences List of protein sequences to add.
+	 */
+	void addProteinSequences(Collection<ProteinSequence> proteinSequences);
+
+	/**
+	 * Add all peptide sequences as fast as possible.
+	 *
+	 * @param peptideSequences List of protein sequences to add.
+	 */
+	void addPeptideSequences(Collection<PeptideSequence> peptideSequences);
+
+	/**
+	 * @return New job to start.
+	 */
+	BulkLoadJob startNewJob();
+
+	/**
+	 * Remove the running job.
+	 *
+	 * @param job Job to be removed.
+	 */
+	void endJob(BulkLoadJob job);
 }

@@ -1,31 +1,32 @@
-<?xml version='1.0' encoding='utf-8'?>
-<!DOCTYPE hibernate-configuration PUBLIC
-        "-//Hibernate/Hibernate Configuration DTD//EN"
-        "http://www.hibernate.org/dtd/hibernate-configuration-3.0.dtd">
+<?xml version='1.0' encoding='utf-8'?><!DOCTYPE hibernate-configuration PUBLIC
+    "-//Hibernate/Hibernate Configuration DTD//EN"
+    "http://www.hibernate.org/dtd/hibernate-configuration-3.0.dtd">
 <hibernate-configuration>
     <session-factory>
         <property name="connection.url">jdbc:mysql://node029.mprc.mayo.edu:3306/swift_dev</property>
         <property name="connection.driver_class">com.mysql.jdbc.Driver</property>
         <property name="connection.username">swift_dev</property>
         <property name="connection.password">app$dev</property>
-        <mapping resource="edu/mayo/mprc/searchdb/dao/Analysis.hbm.xml"/>
-        <mapping resource="edu/mayo/mprc/searchdb/dao/BiologicalSample.hbm.xml"/>
-        <mapping resource="edu/mayo/mprc/searchdb/dao/BiologicalSampleList.hbm.xml"/>
-        <mapping resource="edu/mayo/mprc/searchdb/dao/IdentifiedPeptide.hbm.xml"/>
-        <mapping resource="edu/mayo/mprc/searchdb/dao/LocalizedModification.hbm.xml"/>
-        <mapping resource="edu/mayo/mprc/searchdb/dao/LocalizedModList.hbm.xml"/>
-        <mapping resource="edu/mayo/mprc/fastadb/PeptideSequence.hbm.xml"/>
-        <mapping resource="edu/mayo/mprc/searchdb/dao/PeptideSpectrumMatch.hbm.xml"/>
-        <mapping resource="edu/mayo/mprc/fastadb/ProteinEntry.hbm.xml"/>
-        <mapping resource="edu/mayo/mprc/fastadb/ProteinAccnum.hbm.xml"/>
-        <mapping resource="edu/mayo/mprc/fastadb/ProteinDescription.hbm.xml"/>
-        <mapping resource="edu/mayo/mprc/searchdb/dao/ProteinGroup.hbm.xml"/>
-        <mapping resource="edu/mayo/mprc/searchdb/dao/ProteinGroupList.hbm.xml"/>
-        <mapping resource="edu/mayo/mprc/fastadb/ProteinSequence.hbm.xml"/>
-        <mapping resource="edu/mayo/mprc/searchdb/dao/ProteinSequenceList.hbm.xml"/>
-        <mapping resource="edu/mayo/mprc/searchdb/dao/PsmList.hbm.xml"/>
-        <mapping resource="edu/mayo/mprc/searchdb/dao/SearchResult.hbm.xml"/>
-        <mapping resource="edu/mayo/mprc/searchdb/dao/SearchResultList.hbm.xml"/>
-        <mapping resource="edu/mayo/mprc/searchdb/dao/TandemMassSpectrometrySample.hbm.xml"/>
+        <mapping resource="edu/mayo/mprc/searchdb/dao/Analysis.hbm.xml" />
+        <mapping resource="edu/mayo/mprc/searchdb/dao/BiologicalSample.hbm.xml" />
+        <mapping resource="edu/mayo/mprc/searchdb/dao/BiologicalSampleList.hbm.xml" />
+        <mapping resource="edu/mayo/mprc/searchdb/dao/IdentifiedPeptide.hbm.xml" />
+        <mapping resource="edu/mayo/mprc/searchdb/dao/LocalizedModification.hbm.xml" />
+        <mapping resource="edu/mayo/mprc/searchdb/dao/LocalizedModList.hbm.xml" />
+        <mapping resource="edu/mayo/mprc/fastadb/BulkLoadJob.hbm.xml" />
+        <mapping resource="edu/mayo/mprc/fastadb/TempSequenceLoading.hbm.xml" />
+        <mapping resource="edu/mayo/mprc/fastadb/PeptideSequence.hbm.xml" />
+        <mapping resource="edu/mayo/mprc/searchdb/dao/PeptideSpectrumMatch.hbm.xml" />
+        <mapping resource="edu/mayo/mprc/fastadb/ProteinEntry.hbm.xml" />
+        <mapping resource="edu/mayo/mprc/fastadb/ProteinAccnum.hbm.xml" />
+        <mapping resource="edu/mayo/mprc/fastadb/ProteinDescription.hbm.xml" />
+        <mapping resource="edu/mayo/mprc/searchdb/dao/ProteinGroup.hbm.xml" />
+        <mapping resource="edu/mayo/mprc/searchdb/dao/ProteinGroupList.hbm.xml" />
+        <mapping resource="edu/mayo/mprc/fastadb/ProteinSequence.hbm.xml" />
+        <mapping resource="edu/mayo/mprc/searchdb/dao/ProteinSequenceList.hbm.xml" />
+        <mapping resource="edu/mayo/mprc/searchdb/dao/PsmList.hbm.xml" />
+        <mapping resource="edu/mayo/mprc/searchdb/dao/SearchResult.hbm.xml" />
+        <mapping resource="edu/mayo/mprc/searchdb/dao/SearchResultList.hbm.xml" />
+        <mapping resource="edu/mayo/mprc/searchdb/dao/TandemMassSpectrometrySample.hbm.xml" />
     </session-factory>
 </hibernate-configuration>

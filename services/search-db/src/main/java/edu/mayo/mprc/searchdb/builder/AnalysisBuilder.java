@@ -92,6 +92,22 @@ public class AnalysisBuilder implements Builder<Analysis> {
 		return new Analysis(scaffoldVersion, analysisDate, biologicalSamples.build());
 	}
 
+	public Collection<ProteinSequence> getProteinSequences() {
+		return proteinSequences.values();
+	}
+
+	public Collection<PeptideSequence> getPeptideSequences() {
+		return peptideSequences.values();
+	}
+
+	public Collection<LocalizedModification> getLocalizedModifications() {
+		return localizedModifications.values();
+	}
+
+	public Collection<IdentifiedPeptide> getIdentifiedPeptides() {
+		return identifiedPeptides.values();
+	}
+
 	ProteinSequence getProteinSequence(final String accessionNumber, final String databaseSources) {
 		final ProteinSequence proteinSequence = proteinSequences.get(accessionNumber);
 		if (proteinSequence == null) {

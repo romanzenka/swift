@@ -480,7 +480,8 @@ public abstract class DaoBase implements Dao {
 	 * Scroll through results of a given query, calling a given callback on each result.
 	 * Do this in as efficient manner as possible - use stateless session (no memory garbage),
 	 * use scroll access so not all results are loaded into memory at once.
-	 * @param query Query to process.
+	 *
+	 * @param query    Query to process.
 	 * @param callback Callback to be called per each method.
 	 */
 	protected void scrollQuery(final String query, final QueryCallback callback) {
@@ -495,7 +496,7 @@ public abstract class DaoBase implements Dao {
 			results.close();
 
 			tx.commit();
-		} catch(Exception e) {
+		} catch (Exception e) {
 			tx.rollback();
 			throw new MprcException(e);
 		} finally {

@@ -121,10 +121,24 @@ public final class DatabaseUtilities {
 	public static Configuration getTestHibernateConfiguration(final List<String> mappingResources) {
 		LOGGER.debug("Creating test database configuration");
 		final Map<String, String> hibernateProperties = new HashMap<String, String>();
-		hibernateProperties.put("hibernate.show_sql", "false");
+		hibernateProperties.put("hibernate.show_sql", "true");
+		hibernateProperties.put("hibernate.statement_cache.size", "100");
+		hibernateProperties.put("hibernate.jdbc.batch_size", "100");
 		hibernateProperties.put("hibernate.current_session_context_class", "thread");
 		hibernateProperties.put("hibernate.transaction.factory_class", "org.hibernate.transaction.JDBCTransactionFactory");
 		hibernateProperties.put("hibernate.cache.provider_class", "org.hibernate.cache.HashtableCacheProvider");
+		hibernateProperties.put("hibernate.order_inserts", "true");
+		hibernateProperties.put("hibernate.order_updates", "true");
+
+		hibernateProperties.put("hibernate.c3p0.min_size", "5");
+		hibernateProperties.put("hibernate.c3p0.max_size", "20");
+		hibernateProperties.put("hibernate.c3p0.timeout", "6000");
+		hibernateProperties.put("hibernate.c3p0.max_statements", "100");
+		hibernateProperties.put("hibernate.c3p0.max_statements_per_connection", "20");
+		hibernateProperties.put("hibernate.c3p0.idle_connection_test_period", "300");
+		hibernateProperties.put("hibernate.connection.provider_class", "org.hibernate.connection.C3P0ConnectionProvider");
+
+
 		return getHibernateConfiguration(
 				"jdbc:h2:mem:test", "sa", "", "org.hibernate.dialect.HSQLDialect", "org.h2.Driver", "PUBLIC", "PUBLIC", hibernateProperties, mappingResources,
 				SchemaInitialization.CreateDrop);

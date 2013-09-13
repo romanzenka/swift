@@ -10,8 +10,7 @@ import edu.mayo.mprc.utilities.FileUtilities;
 import edu.mayo.mprc.utilities.progress.PercentDoneReporter;
 import edu.mayo.mprc.utilities.progress.UserProgressReporter;
 import org.apache.log4j.Logger;
-import org.hibernate.Query;
-import org.hibernate.StatelessSession;
+import org.hibernate.*;
 import org.springframework.stereotype.Repository;
 
 import javax.annotation.Nullable;
@@ -19,6 +18,7 @@ import java.io.File;
 import java.text.MessageFormat;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Iterator;
 
 /**
  * Hibernate implementation of {@link FastaDbDao}.
@@ -168,13 +168,100 @@ public final class FastaDbDaoHibernate extends DaoBase implements FastaDbDao {
 	}
 
 	@Override
+	public void addProteinSequences(Collection<ProteinSequence> proteinSequences) {
+		addSequences(proteinSequences, "protein_sequence", "protein_sequence_id");
+	}
+
+	@Override
+	public void addPeptideSequences(Collection<PeptideSequence> peptideSequences) {
+		addSequences(peptideSequences, "peptide_sequence", "peptide_sequence_id");
+	}
+
+	private void addSequences(Collection<? extends Sequence> sequences, String table, String tableId) {
+		BulkLoadJob bulkLoadJob = startNewJob();
+
+		// Load data quickly into temp table
+		getSession().setDefaultReadOnly(true);
+		int order = 0;
+		for (Sequence sequence : sequences) {
+			order++;
+			final TempSequenceLoading load = new TempSequenceLoading(bulkLoadJob, order, sequence);
+			getSession().save(load);
+			if (order % 20 == 0) {
+				getSession().flush();
+				getSession().clear();
+			}
+		}
+		getSession().flush();
+		getSession().clear();
+
+		SQLQuery sqlQuery = getSession().createSQLQuery("UPDATE temp_sequence_loading AS t SET t.new_id = (select " + tableId + " from " + table + " as s where t.sequence = s.sequence and t.job = :job)");
+		sqlQuery.setParameter("job", bulkLoadJob.getId());
+		int update1 = sqlQuery.executeUpdate();
+
+		SQLQuery sqlQuery2 = getSession().createSQLQuery("INSERT INTO " + table + " (sequence, mass) select t.sequence, t.mass from temp_sequence_loading as t where t.job = :job and t.new_id is null");
+		sqlQuery2.setParameter("job", bulkLoadJob.getId());
+		int insert1 = sqlQuery2.executeUpdate();
+
+		if (insert1 > 0) {
+			SQLQuery sqlQuery3 = getSession().createSQLQuery("UPDATE temp_sequence_loading AS t SET t.new_id = (select " + tableId + " from " + table + " as s where t.sequence = s.sequence and t.job = :job) where t.new_id is null");
+			sqlQuery3.setParameter("job", bulkLoadJob.getId());
+			int update2 = sqlQuery3.executeUpdate();
+		}
+
+		getSession().flush();
+		getSession().clear();
+
+		Query query = getSession().createQuery("select newId from TempSequenceLoading t where t.tempKey.job = :job order by t.tempKey.dataOrder");
+		query.setParameter("job", bulkLoadJob.getId());
+		query.setReadOnly(true);
+		ScrollableResults scroll = query.scroll(ScrollMode.FORWARD_ONLY);
+		Iterator<? extends Sequence> iterator = sequences.iterator();
+		int rowNumber = 0;
+		while (scroll.next()) {
+			rowNumber++;
+			Integer newId = (Integer) scroll.get(0);
+			Sequence sequence = iterator.next();
+			if (newId != null) {
+				sequence.setId(newId);
+			} else {
+				throw new MprcException("All ids must be set, not true for row " + rowNumber);
+			}
+		}
+		scroll.close();
+
+		SQLQuery deleteQuery = getSession().createSQLQuery("DELETE FROM temp_sequence_loading WHERE job=:job");
+		deleteQuery.setParameter("job", bulkLoadJob.getId());
+		int numDeleted = deleteQuery.executeUpdate();
+		if (numDeleted != sequences.size()) {
+			throw new MprcException("Could not delete all the elements from the temporary table");
+		}
+
+		endJob(bulkLoadJob);
+	}
+
+	@Override
+	public BulkLoadJob startNewJob() {
+		final BulkLoadJob job = new BulkLoadJob();
+		getSession().save(job);
+		return job;
+	}
+
+	@Override
+	public void endJob(final BulkLoadJob job) {
+		getSession().delete(job);
+	}
+
+	@Override
 	public Collection<String> getHibernateMappings() {
 		return Arrays.asList(
 				HBM_HOME + "PeptideSequence.hbm.xml",
 				HBM_HOME + "ProteinSequence.hbm.xml",
 				HBM_HOME + "ProteinEntry.hbm.xml",
 				HBM_HOME + "ProteinAccnum.hbm.xml",
-				HBM_HOME + "ProteinDescription.hbm.xml"
+				HBM_HOME + "ProteinDescription.hbm.xml",
+				HBM_HOME + "BulkLoadJob.hbm.xml",
+				HBM_HOME + "TempSequenceLoading.hbm.xml"
 		);
 	}
 }

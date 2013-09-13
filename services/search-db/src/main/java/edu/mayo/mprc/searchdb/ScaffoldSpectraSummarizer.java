@@ -7,7 +7,6 @@ import edu.mayo.mprc.fastadb.ProteinSequenceTranslator;
 import edu.mayo.mprc.scaffoldparser.spectra.ScaffoldReportReader;
 import edu.mayo.mprc.scaffoldparser.spectra.ScaffoldSpectraVersion;
 import edu.mayo.mprc.searchdb.builder.*;
-import edu.mayo.mprc.searchdb.dao.Analysis;
 import edu.mayo.mprc.unimod.IndexedModSet;
 import edu.mayo.mprc.utilities.FileUtilities;
 import org.joda.time.DateTime;
@@ -82,8 +81,8 @@ public class ScaffoldSpectraSummarizer extends ScaffoldReportReader {
 	/**
 	 * @return Result of the parse process.
 	 */
-	public Analysis getAnalysis() {
-		return analysis.build();
+	public AnalysisBuilder getAnalysisBuilder() {
+		return analysis;
 	}
 
 	@Override

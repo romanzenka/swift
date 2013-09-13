@@ -7,6 +7,7 @@ import edu.mayo.mprc.config.RuntimeInitializer;
 import edu.mayo.mprc.database.*;
 import edu.mayo.mprc.fastadb.FastaDbDao;
 import edu.mayo.mprc.fastadb.ProteinSequence;
+import edu.mayo.mprc.searchdb.builder.AnalysisBuilder;
 import edu.mayo.mprc.swift.db.SwiftDao;
 import edu.mayo.mprc.swift.dbmapping.ReportData;
 import edu.mayo.mprc.swift.dbmapping.SwiftSearchDefinition;
@@ -297,8 +298,11 @@ public final class SearchDbDaoHibernate extends DaoBase implements RuntimeInitia
 	}
 
 	@Override
-	public Analysis addAnalysis(final Analysis analysis, final ReportData reportData, final UserProgressReporter reporter) {
+	public Analysis addAnalysis(final AnalysisBuilder analysisBuilder, final ReportData reportData, final UserProgressReporter reporter) {
+		fastaDbDao.addProteinSequences(analysisBuilder.getProteinSequences());
+		fastaDbDao.addPeptideSequences(analysisBuilder.getPeptideSequences());
 
+		Analysis analysis = analysisBuilder.build();
 		Analysis savedAnalysis = analysis;
 		if (analysis.getId() == null) {
 			final BiologicalSampleList originalList = analysis.getBiologicalSamples();
@@ -402,10 +406,10 @@ public final class SearchDbDaoHibernate extends DaoBase implements RuntimeInitia
 				" and psl.id in (:ids)")
 				.setParameterList("ids", proteinSequenceLists.toArray());
 
-		if(databaseId!=null) {
+		if (databaseId != null) {
 			query.setParameter("databaseId", databaseId);
 		}
-		final List list =  query.list();
+		final List list = query.list();
 
 		int lastGroup = -1;
 		final Collection<String> numbers = new ArrayList<String>(20);
