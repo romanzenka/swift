@@ -168,71 +168,80 @@ public final class FastaDbDaoHibernate extends DaoBase implements FastaDbDao {
 	}
 
 	@Override
-	public void addProteinSequences(Collection<ProteinSequence> proteinSequences) {
+	public void addProteinSequences(final Collection<ProteinSequence> proteinSequences) {
 		addSequences(proteinSequences, "protein_sequence", "protein_sequence_id");
 	}
 
 	@Override
-	public void addPeptideSequences(Collection<PeptideSequence> peptideSequences) {
+	public void addPeptideSequences(final Collection<PeptideSequence> peptideSequences) {
 		addSequences(peptideSequences, "peptide_sequence", "peptide_sequence_id");
 	}
 
-	private void addSequences(Collection<? extends Sequence> sequences, String table, String tableId) {
-		BulkLoadJob bulkLoadJob = startNewJob();
+	private void addSequences(final Collection<? extends Sequence> sequences, final String table, final String tableId) {
+		final BulkLoadJob bulkLoadJob = startNewJob();
 
 		// Load data quickly into temp table
 		getSession().setDefaultReadOnly(true);
 		int order = 0;
-		for (Sequence sequence : sequences) {
-			order++;
-			final TempSequenceLoading load = new TempSequenceLoading(bulkLoadJob, order, sequence);
-			getSession().save(load);
-			if (order % 20 == 0) {
-				getSession().flush();
-				getSession().clear();
+		for (final Sequence sequence : sequences) {
+			if (sequence.getId() == null) {
+				order++;
+				final TempSequenceLoading load = new TempSequenceLoading(bulkLoadJob, order, sequence);
+				getSession().save(load);
+				if (order % 20 == 0) {
+					getSession().flush();
+					getSession().clear();
+				}
 			}
 		}
 		getSession().flush();
 		getSession().clear();
 
-		SQLQuery sqlQuery = getSession().createSQLQuery("UPDATE temp_sequence_loading AS t SET t.new_id = (select " + tableId + " from " + table + " as s where t.sequence = s.sequence and t.job = :job)");
+		final SQLQuery sqlQuery = getSession().createSQLQuery("UPDATE temp_sequence_loading AS t SET t.new_id = (select " + tableId + " from " + table + " as s where t.sequence = s.sequence and t.job = :job)");
 		sqlQuery.setParameter("job", bulkLoadJob.getId());
-		int update1 = sqlQuery.executeUpdate();
+		final int update1 = sqlQuery.executeUpdate();
 
-		SQLQuery sqlQuery2 = getSession().createSQLQuery("INSERT INTO " + table + " (sequence, mass) select t.sequence, t.mass from temp_sequence_loading as t where t.job = :job and t.new_id is null");
+		final SQLQuery sqlQuery2 = getSession().createSQLQuery("INSERT INTO " + table + " (sequence, mass) select t.sequence, t.mass from temp_sequence_loading as t where t.job = :job and t.new_id is null");
 		sqlQuery2.setParameter("job", bulkLoadJob.getId());
-		int insert1 = sqlQuery2.executeUpdate();
+		final int insert1 = sqlQuery2.executeUpdate();
 
 		if (insert1 > 0) {
-			SQLQuery sqlQuery3 = getSession().createSQLQuery("UPDATE temp_sequence_loading AS t SET t.new_id = (select " + tableId + " from " + table + " as s where t.sequence = s.sequence and t.job = :job) where t.new_id is null");
+			final SQLQuery sqlQuery3 = getSession().createSQLQuery("UPDATE temp_sequence_loading AS t SET t.new_id = (select " + tableId + " from " + table + " as s where t.sequence = s.sequence and t.job = :job) where t.new_id is null");
 			sqlQuery3.setParameter("job", bulkLoadJob.getId());
-			int update2 = sqlQuery3.executeUpdate();
+			final int update2 = sqlQuery3.executeUpdate();
 		}
 
 		getSession().flush();
 		getSession().clear();
 
-		Query query = getSession().createQuery("select newId from TempSequenceLoading t where t.tempKey.job = :job order by t.tempKey.dataOrder");
+		final Query query = getSession().createQuery("select newId from TempSequenceLoading t where t.tempKey.job = :job order by t.tempKey.dataOrder");
 		query.setParameter("job", bulkLoadJob.getId());
 		query.setReadOnly(true);
-		ScrollableResults scroll = query.scroll(ScrollMode.FORWARD_ONLY);
-		Iterator<? extends Sequence> iterator = sequences.iterator();
+		final ScrollableResults scroll = query.scroll(ScrollMode.FORWARD_ONLY);
+		final Iterator<? extends Sequence> iterator = sequences.iterator();
 		int rowNumber = 0;
 		while (scroll.next()) {
 			rowNumber++;
-			Integer newId = (Integer) scroll.get(0);
+			final Integer newId = (Integer) scroll.get(0);
 			Sequence sequence = iterator.next();
+			// Skip all the sequences already saved
+			while (sequence != null && sequence.getId() != null) {
+				sequence = iterator.next();
+			}
 			if (newId != null) {
+				if (sequence == null) {
+					throw new MprcException("Ran out of sequences before data finished streaming in! Two identical sequences must have been present in the collection. Row: " + rowNumber);
+				}
 				sequence.setId(newId);
 			} else {
-				throw new MprcException("All ids must be set, not true for row " + rowNumber);
+				throw new MprcException("All ids must be set, not true for row: " + rowNumber);
 			}
 		}
 		scroll.close();
 
-		SQLQuery deleteQuery = getSession().createSQLQuery("DELETE FROM temp_sequence_loading WHERE job=:job");
+		final SQLQuery deleteQuery = getSession().createSQLQuery("DELETE FROM temp_sequence_loading WHERE job=:job");
 		deleteQuery.setParameter("job", bulkLoadJob.getId());
-		int numDeleted = deleteQuery.executeUpdate();
+		final int numDeleted = deleteQuery.executeUpdate();
 		if (numDeleted != sequences.size()) {
 			throw new MprcException("Could not delete all the elements from the temporary table");
 		}
