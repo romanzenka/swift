@@ -42,7 +42,7 @@ public final class MsconvertWorker extends WorkerBase {
 	/**
 	 * Maximum size of msconvert/msaccess .RAW file path.
 	 */
-	public static final int MAX_MSACCESS_PATH_SIZE = 120;
+	public static final int MAX_MSACCESS_PATH_SIZE = 110;
 	public static final String MSACCESS_SUFFIX = ".metadata.txt";
 
 	private File msconvertExecutable;
