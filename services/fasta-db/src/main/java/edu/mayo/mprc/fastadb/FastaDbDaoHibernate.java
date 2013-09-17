@@ -53,6 +53,19 @@ public final class FastaDbDaoHibernate extends DaoBase implements FastaDbDao {
 	}
 
 	@Override
+	public String getProteinDescription(final Curation database, final String accessionNumber) {
+		try {
+			return (String) getSession()
+					.createQuery("select e.description.description from ProteinEntry e where e.accessionNumber.accnum = :accessionNumber and e.database=:database")
+					.setParameter("accessionNumber", accessionNumber)
+					.setParameter("database", database)
+					.uniqueResult();
+		} catch (Exception e) {
+			throw new MprcException(MessageFormat.format("Could not find description for protein [{0}] in database [{1}]", accessionNumber, database.getShortName()), e);
+		}
+	}
+
+	@Override
 	public ProteinSequence addProteinSequence(final ProteinSequence proteinSequence) {
 		if (null == proteinSequence.getId()) {
 			return save(proteinSequence, nullSafeEq("sequence", proteinSequence.getSequence()), false);

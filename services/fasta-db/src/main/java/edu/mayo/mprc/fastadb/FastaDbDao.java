@@ -42,6 +42,15 @@ public interface FastaDbDao {
 	ProteinSequence getProteinSequence(Curation database, String accessionNumber);
 
 	/**
+	 * Find a matching protein description for given accession number.
+	 *
+	 * @param database        Database to use.
+	 * @param accessionNumber Protein accession number.
+	 * @return Matching protein description. Throws an exception if accession number was not found.
+	 */
+	String getProteinDescription(Curation database, String accessionNumber);
+
+	/**
 	 * Look up given peptide sequence in the database.
 	 * If the sequence does not exist in the database, it is added.
 	 * ID of the peptide sequence is updated to match the database id.

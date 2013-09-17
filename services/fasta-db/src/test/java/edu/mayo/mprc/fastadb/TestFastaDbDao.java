@@ -60,6 +60,15 @@ public class TestFastaDbDao extends DaoTest {
 	}
 
 	@Test
+	public void shouldResolveDescription() throws IOException, SQLException {
+		final Curation currentSp = loadFasta("/edu/mayo/mprc/fastadb/test.fasta", "Current_SP");
+
+		fastaDbDao.begin();
+		Assert.assertEquals(fastaDbDao.getProteinDescription(currentSp, "K1C9_HUMAN"), "Keratin, type I cytoskeletal 9 OS=Homo sapiens GN=KRT9 PE=1 SV=3 (sp) (P35527)");
+		fastaDbDao.commit();
+	}
+
+	@Test
 	public void shouldSaveUniqueProtein() {
 		fastaDbDao.begin();
 		final ProteinSequence seq1 = new ProteinSequence("STNQR");
