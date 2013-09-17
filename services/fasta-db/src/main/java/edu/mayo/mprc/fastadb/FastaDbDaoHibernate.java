@@ -182,13 +182,16 @@ public final class FastaDbDaoHibernate extends DaoBase implements FastaDbDao {
 		final BulkLoadJob bulkLoadJob = startNewJob();
 
 		// Load data quickly into temp table
-		getSession().setDefaultReadOnly(true);
+
 		int order = 0;
+		int numAddedSequences = 0;
 		for (final Sequence sequence : sequences) {
 			if (sequence.getId() == null) {
 				order++;
 				final TempSequenceLoading load = new TempSequenceLoading(bulkLoadJob, order, sequence);
 				getSession().save(load);
+				getSession().setReadOnly(load, true);
+				numAddedSequences++;
 				if (order % BATCH_SIZE == 0) {
 					getSession().flush();
 					getSession().clear();
@@ -198,53 +201,57 @@ public final class FastaDbDaoHibernate extends DaoBase implements FastaDbDao {
 		getSession().flush();
 		getSession().clear();
 
-		final SQLQuery sqlQuery = getSession().createSQLQuery("UPDATE temp_sequence_loading AS t SET t.new_id = (select " + tableId + " from " + table + " as s where t.sequence = s.sequence and t.job = :job)");
-		sqlQuery.setParameter("job", bulkLoadJob.getId());
-		final int update1 = sqlQuery.executeUpdate();
+		if (numAddedSequences > 0) {
+			final SQLQuery sqlQuery = getSession().createSQLQuery("UPDATE temp_sequence_loading AS t SET t.new_id = (select " + tableId + " from " + table + " as s where t.sequence = s.sequence and t.job = :job)");
+			sqlQuery.setParameter("job", bulkLoadJob.getId()).setReadOnly(true);
+			final int update1 = sqlQuery.executeUpdate();
 
-		final SQLQuery sqlQuery2 = getSession().createSQLQuery("INSERT INTO " + table + " (sequence, mass) select t.sequence, t.mass from temp_sequence_loading as t where t.job = :job and t.new_id is null");
-		sqlQuery2.setParameter("job", bulkLoadJob.getId());
-		final int insert1 = sqlQuery2.executeUpdate();
-
-		if (insert1 > 0) {
-			final SQLQuery sqlQuery3 = getSession().createSQLQuery("UPDATE temp_sequence_loading AS t SET t.new_id = (select " + tableId + " from " + table + " as s where t.sequence = s.sequence and t.job = :job) where t.new_id is null");
-			sqlQuery3.setParameter("job", bulkLoadJob.getId());
-			final int update2 = sqlQuery3.executeUpdate();
-		}
-
-		getSession().flush();
-		getSession().clear();
-
-		final Query query = getSession().createQuery("select newId from TempSequenceLoading t where t.tempKey.job = :job order by t.tempKey.dataOrder");
-		query.setParameter("job", bulkLoadJob.getId());
-		query.setReadOnly(true);
-		final ScrollableResults scroll = query.scroll(ScrollMode.FORWARD_ONLY);
-		final Iterator<? extends Sequence> iterator = sequences.iterator();
-		int rowNumber = 0;
-		while (scroll.next()) {
-			rowNumber++;
-			final Integer newId = (Integer) scroll.get(0);
-			Sequence sequence = iterator.next();
-			// Skip all the sequences already saved
-			while (sequence != null && sequence.getId() != null) {
-				sequence = iterator.next();
+			int insert1 = 0;
+			if (update1 < numAddedSequences) {
+				final SQLQuery sqlQuery2 = getSession().createSQLQuery("INSERT INTO " + table + " (sequence, mass) select t.sequence, t.mass from temp_sequence_loading as t where t.job = :job and t.new_id is null");
+				insert1 = sqlQuery2.executeUpdate();
 			}
-			if (newId != null) {
-				if (sequence == null) {
-					throw new MprcException("Ran out of sequences before data finished streaming in! Two identical sequences must have been present in the collection. Row: " + rowNumber);
+
+			if (insert1 > 0) {
+				final SQLQuery sqlQuery3 = getSession().createSQLQuery("UPDATE temp_sequence_loading AS t SET t.new_id = (select " + tableId + " from " + table + " as s where t.sequence = s.sequence and t.job = :job) where t.new_id is null");
+				sqlQuery3.setParameter("job", bulkLoadJob.getId()).setReadOnly(true);
+				final int update2 = sqlQuery3.executeUpdate();
+			}
+
+			getSession().flush();
+			getSession().clear();
+
+			final Query query = getSession().createQuery("select newId from TempSequenceLoading t where t.tempKey.job = :job order by t.tempKey.dataOrder");
+			query.setParameter("job", bulkLoadJob.getId()).setReadOnly(true);
+			query.setReadOnly(true);
+			final ScrollableResults scroll = query.scroll(ScrollMode.FORWARD_ONLY);
+			final Iterator<? extends Sequence> iterator = sequences.iterator();
+			int rowNumber = 0;
+			while (scroll.next()) {
+				rowNumber++;
+				final Integer newId = (Integer) scroll.get(0);
+				Sequence sequence = iterator.next();
+				// Skip all the sequences already saved
+				while (sequence != null && sequence.getId() != null) {
+					sequence = iterator.next();
 				}
-				sequence.setId(newId);
-			} else {
-				throw new MprcException("All ids must be set, not true for row: " + rowNumber);
+				if (newId != null) {
+					if (sequence == null) {
+						throw new MprcException("Ran out of sequences before data finished streaming in! Two identical sequences must have been present in the collection. Row: " + rowNumber);
+					}
+					sequence.setId(newId);
+				} else {
+					throw new MprcException("All ids must be set, not true for row: " + rowNumber);
+				}
 			}
-		}
-		scroll.close();
+			scroll.close();
 
-		final SQLQuery deleteQuery = getSession().createSQLQuery("DELETE FROM temp_sequence_loading WHERE job=:job");
-		deleteQuery.setParameter("job", bulkLoadJob.getId());
-		final int numDeleted = deleteQuery.executeUpdate();
-		if (numDeleted != sequences.size()) {
-			throw new MprcException("Could not delete all the elements from the temporary table");
+			final SQLQuery deleteQuery = getSession().createSQLQuery("DELETE FROM temp_sequence_loading WHERE job=:job");
+			deleteQuery.setParameter("job", bulkLoadJob.getId()).setReadOnly(true);
+			final int numDeleted = deleteQuery.executeUpdate();
+			if (numDeleted != numAddedSequences) {
+				throw new MprcException("Could not delete all the elements from the temporary table");
+			}
 		}
 
 		endJob(bulkLoadJob);
