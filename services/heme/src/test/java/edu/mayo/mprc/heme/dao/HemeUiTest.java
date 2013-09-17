@@ -1,5 +1,7 @@
 package edu.mayo.mprc.heme.dao;
 
+import edu.mayo.mprc.dbcurator.model.Curation;
+import edu.mayo.mprc.fastadb.FastaDbDao;
 import edu.mayo.mprc.heme.HemeEntry;
 import edu.mayo.mprc.heme.HemeTestStatus;
 import edu.mayo.mprc.heme.HemeUi;
@@ -27,6 +29,7 @@ public final class HemeUiTest {
 	private File results;
 	private HemeDao hemeDao;
 	private SwiftDao swiftDao;
+	private FastaDbDao fastaDbDao;
 	private SwiftSearcherCaller swiftSearcherCaller;
 
 	@BeforeTest
@@ -56,7 +59,10 @@ public final class HemeUiTest {
 		swiftDao = mock(SwiftDao.class);
 		swiftSearcherCaller = mock(SwiftSearcherCaller.class);
 
-		hemeUi = new HemeUi(data, results, hemeDao, swiftDao, swiftSearcherCaller, 1, 2, "zenka.roman@mayo.edu", new String[]{"MASCOT-2.4", "SCAFFOLD-4.0.7"});
+		fastaDbDao = mock(FastaDbDao.class);
+		stub(fastaDbDao.getProteinDescription(any(Curation.class), anyString())).toReturn("Protein description");
+
+		hemeUi = new HemeUi(data, results, hemeDao, swiftDao, fastaDbDao, swiftSearcherCaller, 1, 2, "zenka.roman@mayo.edu", new String[]{"MASCOT-2.4", "SCAFFOLD-4.0.7"});
 	}
 
 	private void createValidEntry(String name, String date) {
@@ -94,7 +100,6 @@ public final class HemeUiTest {
 		HemeEntry hemeEntry = currentEntries.get(0);
 		Assert.assertEquals(hemeEntry.getTest().getName(), "PT1");
 		Assert.assertEquals(hemeEntry.getTest().getPath(), "20130905/PT1");
-		Assert.assertEquals(hemeEntry.getTest().getMassDelta(), 40.0);
 		Assert.assertEquals(hemeEntry.getTest().getMassDelta(), 40.0);
 		Assert.assertEquals(hemeEntry.getStatus(), HemeTestStatus.NOT_STARTED);
 		Assert.assertEquals(hemeEntry.getDuration(), null);

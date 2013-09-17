@@ -9,10 +9,12 @@ import edu.mayo.mprc.MprcException;
 import edu.mayo.mprc.config.*;
 import edu.mayo.mprc.config.ui.ServiceUiFactory;
 import edu.mayo.mprc.config.ui.UiBuilder;
+import edu.mayo.mprc.fastadb.FastaDbDao;
 import edu.mayo.mprc.heme.dao.HemeDao;
 import edu.mayo.mprc.heme.dao.HemeTest;
 import edu.mayo.mprc.swift.db.SwiftDao;
 import edu.mayo.mprc.swift.dbmapping.SearchRun;
+import edu.mayo.mprc.swift.dbmapping.SwiftSearchDefinition;
 import edu.mayo.mprc.swift.params2.ParamsDao;
 import edu.mayo.mprc.swift.params2.SavedSearchEngineParameters;
 import edu.mayo.mprc.swift.params2.SearchEngineParameters;
@@ -65,6 +67,7 @@ public final class HemeUi {
 	private final File results;
 	private final HemeDao hemeDao;
 	private final SwiftDao swiftDao;
+	private final FastaDbDao fastaDbDao;
 	private SwiftSearcherCaller swiftSearcherCaller;
 	/**
 	 * Id of {@link SearchEngineParameters} for the {@link #TRYPSIN_SUFFIX} searches.
@@ -77,13 +80,14 @@ public final class HemeUi {
 	private String userEmail;
 	private String[] searchEngines;
 
-	public HemeUi(final File data, final File results, final HemeDao hemeDao, final SwiftDao swiftDao, final SwiftSearcherCaller swiftSearcherCaller,
+	public HemeUi(final File data, final File results, final HemeDao hemeDao, final SwiftDao swiftDao, final FastaDbDao fastaDbDao, final SwiftSearcherCaller swiftSearcherCaller,
 	              final int trypsinParameterSetId, final int chymoParameterSetId, final String userEmail,
 	              final String[] searchEngines) {
 		this.data = data;
 		this.results = results;
 		this.hemeDao = hemeDao;
 		this.swiftDao = swiftDao;
+		this.fastaDbDao = fastaDbDao;
 		this.swiftSearcherCaller = swiftSearcherCaller;
 		this.trypsinParameterSetId = trypsinParameterSetId;
 		this.chymoParameterSetId = chymoParameterSetId;
@@ -253,23 +257,51 @@ public final class HemeUi {
 		test.setMassDeltaTolerance(massDeltaTolerance);
 	}
 
+	/**
+	 * Load all the protein groups from the report.
+	 *
+	 * @param testId The id of the test to load.
+	 * @return Data ready to be passed to the report viewer.
+	 */
 	public HemeReport createReport(final int testId) {
 		final HemeTest test = getHemeDao().getTestForId(testId);
 		final String path = test.getPath();
 		final File resultFolder = new File(getResults(), path);
 		final File scaffoldFolder = new File(resultFolder, "scaffold");
 		final File scaffoldFile = new File(scaffoldFolder, test.getName() + SPECTRA_EXTENSION);
-		final HemeScaffoldReader reader = new HemeScaffoldReader();
+		final SwiftSearchDefinition swiftSearchDefinition = swiftDao.getSwiftSearchDefinition(test.getSearchRun().getSwiftSearch());
+		final HemeScaffoldReader reader = new HemeScaffoldReader(fastaDbDao, swiftSearchDefinition.getSearchParameters().getDatabase());
 		reader.load(scaffoldFile, "3", null);
 		final Collection<HemeReportEntry> entries = reader.getEntries();
-		final List<HemeReportEntry> list = new ArrayList<HemeReportEntry>();
+
+		// We split all entries into three:
+		// These are within the specified range (at least one hit):
+		final List<HemeReportEntry> withinRange = new ArrayList<HemeReportEntry>();
+		// These have mass delta specified (are some kind of hemoglobin), but they are not within the threshold:
+		final List<HemeReportEntry> haveMassDelta = new ArrayList<HemeReportEntry>();
+		// Everyone else (contaminants?):
+		final List<HemeReportEntry> allOthers = new ArrayList<HemeReportEntry>();
 		for (final HemeReportEntry entry : entries) {
-			if (Math.abs(entry.getMassDelta() - test.getMassDelta()) <= test.getMassDeltaTolerance()) {
-				list.add(entry);
+			boolean isInRange = false;
+			boolean hasMassDelta = false;
+			for (final ProteinId proteinId : entry.getProteinIds()) {
+				if (proteinId.getMassDelta() != null) {
+					hasMassDelta = true;
+					if (Math.abs(proteinId.getMassDelta() - test.getMassDelta()) <= test.getMassDeltaTolerance()) {
+						isInRange = true;
+						break;
+					}
+				}
+			}
+			if (isInRange) {
+				withinRange.add(entry);
+			} else if (hasMassDelta) {
+				haveMassDelta.add(entry);
+			} else {
+				allOthers.add(entry);
 			}
 		}
-		final HemeReport report = new HemeReport(list);
-		return report;
+		return new HemeReport(test, withinRange, haveMassDelta, allOthers);
 	}
 
 	private String extractPatientName(final File patient) {
@@ -324,6 +356,7 @@ public final class HemeUi {
 		private HemeDao hemeDao;
 		private ParamsDao paramsDao;
 		private SwiftDao swiftDao;
+		private FastaDbDao fastaDbDao;
 		private SwiftSearcherCaller swiftSearcherCaller;
 		private RunningApplicationContext runningApplicationContext;
 
@@ -352,6 +385,15 @@ public final class HemeUi {
 		@Resource(name = "paramsDao")
 		public void setParamsDao(final ParamsDao paramsDao) {
 			this.paramsDao = paramsDao;
+		}
+
+		public FastaDbDao getFastaDbDao() {
+			return fastaDbDao;
+		}
+
+		@Resource(name = "fastaDbDao")
+		public void setFastaDbDao(FastaDbDao fastaDbDao) {
+			this.fastaDbDao = fastaDbDao;
 		}
 
 		public SwiftSearcherCaller getSwiftSearcherCaller() {
@@ -423,6 +465,7 @@ public final class HemeUi {
 					resultDir,
 					getHemeDao(),
 					getSwiftDao(),
+					getFastaDbDao(),
 					getSwiftSearcherCaller(),
 					trypsinId, chymoId,
 					config.get(USER_EMAIL),

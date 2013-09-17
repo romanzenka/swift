@@ -1,38 +1,40 @@
 package edu.mayo.mprc.heme;
 
+import edu.mayo.mprc.MprcException;
+
+import java.util.List;
+
 /**
  * @author Roman Zenka
  */
 public final class HemeReportEntry {
-	private String proteinAccNum;
-	private String proteinDescription;
+	private List<ProteinId> proteinIds;
 	private int totalSpectra;
-	private double massDelta;
 
-	public HemeReportEntry(String proteinAccNum, String proteinDescription, int totalSpectra, double massDelta) {
-		this.proteinAccNum = proteinAccNum;
-		this.proteinDescription = proteinDescription;
+	public HemeReportEntry(List<ProteinId> proteinIds, int totalSpectra) {
+		this.proteinIds = proteinIds;
 		this.totalSpectra = totalSpectra;
-		this.massDelta = massDelta;
 	}
 
-	public void addSpectra(int spectra) {
-		this.totalSpectra += spectra;
+	public List<ProteinId> getProteinIds() {
+		return proteinIds;
 	}
 
-	public String getProteinAccNum() {
-		return proteinAccNum;
+	public void setProteinIds(List<ProteinId> proteinIds) {
+		this.proteinIds = proteinIds;
 	}
 
-	public String getProteinDescription() {
-		return proteinDescription;
+	public void setTotalSpectra(int totalSpectra) {
+		this.totalSpectra = totalSpectra;
+	}
+
+	public void checkSpectra(int spectra) {
+		if (getTotalSpectra() != spectra) {
+			throw new MprcException("Corrupted Scaffold report. Protein spectrum count changed from + " getTotalSpectra() + " to " + spectra + " for accnum " + getProteinIds().get(0).getAccNum());
+		}
 	}
 
 	public int getTotalSpectra() {
 		return totalSpectra;
-	}
-
-	public double getMassDelta() {
-		return massDelta;
 	}
 }

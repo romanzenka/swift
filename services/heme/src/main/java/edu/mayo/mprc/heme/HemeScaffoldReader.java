@@ -1,10 +1,10 @@
 package edu.mayo.mprc.heme;
 
+import edu.mayo.mprc.dbcurator.model.Curation;
+import edu.mayo.mprc.fastadb.FastaDbDao;
 import edu.mayo.mprc.scaffoldparser.spectra.ScaffoldReportReader;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -17,6 +17,13 @@ public class HemeScaffoldReader extends ScaffoldReportReader {
 	private int numberOfTotalSpectra;
 	private int numberOfUniquePeptides;
 	private static final Pattern DELTA_PATTERN = Pattern.compile(".*#DeltaMass:([^#]+)#.*");
+	private FastaDbDao fastaDao;
+	private Curation database;
+
+	public HemeScaffoldReader(FastaDbDao fastaDao, Curation database) {
+		this.fastaDao = fastaDao;
+		this.database = database;
+	}
 
 	private Map<String, HemeReportEntry> entries = new HashMap<String, HemeReportEntry>(100);
 
@@ -44,26 +51,33 @@ public class HemeScaffoldReader extends ScaffoldReportReader {
 	@Override
 	public boolean processRow(final String line) {
 		fillCurrentLine(line);
-		final String accNums = currentLine[proteinAccessionNumbers];
-		final String accNum = PROTEIN_ACCESSION_SPLITTER.split(accNums).iterator().next();
-		final String desc = currentLine[proteinName];
+		final List<ProteinId> ids = new ArrayList<ProteinId>();
+		String accnumString = currentLine[proteinAccessionNumbers];
+		final Iterable<String> accNums = PROTEIN_ACCESSION_SPLITTER.split(accnumString);
+		for (final String accNum : accNums) {
+			final String description = getDescription(accNum);
+			final ProteinId id = new ProteinId(accNum, description, getMassDelta(description));
+			ids.add(id);
+		}
 		final int totalSpectra = parseInt(currentLine[numberOfTotalSpectra]);
 		final int uniquePeptides = parseInt(currentLine[numberOfUniquePeptides]);
-		final Double massDelta = getMassDelta(desc);
 
-		if (massDelta == null) {
-			return true;
-		}
-
-		HemeReportEntry entry = entries.get(accNum);
+		HemeReportEntry entry = entries.get(accnumString);
 		if (entry == null) {
-			entry = new HemeReportEntry(accNum, desc, totalSpectra, massDelta);
-			entries.put(accNum, entry);
+			entry = new HemeReportEntry(ids, totalSpectra);
+			entries.put(accnumString, entry);
 		} else {
-			entry.addSpectra(totalSpectra);
+			entry.checkSpectra(totalSpectra);
 		}
 
 		return true;
+	}
+
+	/**
+	 * Get description for a protein of given accession number
+	 */
+	private String getDescription(final String accNum) {
+		return fastaDao.getProteinDescription(database, accNum);
 	}
 
 	private static Double getMassDelta(final CharSequence description) {
