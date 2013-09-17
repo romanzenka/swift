@@ -30,7 +30,7 @@ public final class HemeReportEntry {
 
 	public void checkSpectra(int spectra) {
 		if (getTotalSpectra() != spectra) {
-			throw new MprcException("Corrupted Scaffold report. Protein spectrum count changed from + " getTotalSpectra() + " to " + spectra + " for accnum " + getProteinIds().get(0).getAccNum());
+			throw new MprcException("Corrupted Scaffold report. Protein spectrum count changed from + " + getTotalSpectra() + " to " + spectra + " for accnum " + getProteinIds().get(0).getAccNum());
 		}
 	}
 
