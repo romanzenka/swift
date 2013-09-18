@@ -14,7 +14,7 @@ import java.util.Collection;
  *
  * @author Roman Zenka
  */
-public interface FastaDbDao {
+public interface FastaDbDao extends BulkLoadJobStarter {
 	/**
 	 * Look up given protein sequence in the database.
 	 * If the sequence does not exist in the database, it is added.

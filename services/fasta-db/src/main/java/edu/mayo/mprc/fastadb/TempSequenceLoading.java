@@ -13,8 +13,8 @@ public class TempSequenceLoading {
 	public TempSequenceLoading() {
 	}
 
-	public TempSequenceLoading(final BulkLoadJob job, final int order, final Sequence sequence) {
-		this.tempKey = new TempKey(job.getId(), order);
+	public TempSequenceLoading(final TempKey tempKey, final Sequence sequence) {
+		this.tempKey = tempKey;
 		this.mass = sequence.getMass();
 		this.sequence = sequence.getSequence();
 	}

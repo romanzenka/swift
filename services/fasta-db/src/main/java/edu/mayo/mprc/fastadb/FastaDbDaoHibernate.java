@@ -26,7 +26,7 @@ import java.util.Collection;
  * @author Roman Zenka
  */
 @Repository("fastaDbDao")
-public final class FastaDbDaoHibernate extends DaoBase implements FastaDbDao, BulkLoadJobStarter {
+public final class FastaDbDaoHibernate extends DaoBase implements FastaDbDao {
 	private static final Logger LOGGER = Logger.getLogger(FastaDbDaoHibernate.class);
 	// Progress will be checked each X spectra
 	public static final long REPORT_FREQUENCY = 100L;

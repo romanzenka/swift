@@ -29,8 +29,8 @@ public final class SequenceBulkLoader extends BulkLoader<Sequence> {
 	}
 
 	@Override
-	public Object wrapForTempTable(final Sequence value, final BulkLoadJob job, final int order) {
-		return new TempSequenceLoading(job, order, value);
+	public Object wrapForTempTable(final Sequence value, final TempKey key) {
+		return new TempSequenceLoading(key, value);
 	}
 
 

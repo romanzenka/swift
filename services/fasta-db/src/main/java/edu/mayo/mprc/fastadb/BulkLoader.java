@@ -47,11 +47,9 @@ public abstract class BulkLoader<T extends PersistableBase> {
 
 	/**
 	 * @param value value to wrap
-	 * @param job   loading job
-	 * @param order record order within the job
 	 * @return wrapped value
 	 */
-	public abstract Object wrapForTempTable(T value, BulkLoadJob job, int order);
+	public abstract Object wrapForTempTable(T value, TempKey key);
 
 	/**
 	 * Comma separated list of columns to transfer from temp table to the actual one.
@@ -72,7 +70,8 @@ public abstract class BulkLoader<T extends PersistableBase> {
 		for (final T value : values) {
 			if (value.getId() == null) {
 				order++;
-				final Object load = wrapForTempTable(value, bulkLoadJob, order);
+				TempKey key = new TempKey(bulkLoadJob.getId(), order);
+				final Object load = wrapForTempTable(value, key);
 				getSession().save(load);
 				getSession().setReadOnly(load, true);
 				numAddedValues++;

@@ -5,7 +5,6 @@ import com.google.common.collect.Maps;
 import edu.mayo.mprc.MprcException;
 import edu.mayo.mprc.config.RuntimeInitializer;
 import edu.mayo.mprc.database.*;
-import edu.mayo.mprc.fastadb.BulkLoadJob;
 import edu.mayo.mprc.fastadb.FastaDbDao;
 import edu.mayo.mprc.fastadb.ProteinSequence;
 import edu.mayo.mprc.searchdb.builder.AnalysisBuilder;
@@ -332,12 +331,8 @@ public final class SearchDbDaoHibernate extends DaoBase implements RuntimeInitia
 	}
 
 	private void addLocalizedModifications(Collection<LocalizedModification> localizedModifications) {
-		final BulkLoadJob job = fastaDbDao.startNewJob();
-		try {
-
-		} finally {
-			fastaDbDao.endJob(job);
-		}
+		LocalizedModificationLoader loader = new LocalizedModificationLoader(fastaDbDao, this);
+		loader.addObjects(localizedModifications);
 	}
 
 	@Override
@@ -552,7 +547,8 @@ public final class SearchDbDaoHibernate extends DaoBase implements RuntimeInitia
 				MAP + "PsmList.hbm.xml",
 				MAP + "SearchResult.hbm.xml",
 				MAP + "SearchResultList.hbm.xml",
-				MAP + "TandemMassSpectrometrySample.hbm.xml"
+				MAP + "TandemMassSpectrometrySample.hbm.xml",
+				MAP + "TempLocalizedModification.hbm.xml"
 		);
 	}
 }
