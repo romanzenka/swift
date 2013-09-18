@@ -18,7 +18,7 @@ import java.util.List;
  * <p/>
  * TODO: This class is more of a DAO factory. We should clean this up by introducing actual DAO factories.
  */
-public abstract class DaoBase implements Dao {
+public abstract class DaoBase implements Dao, SessionProvider {
 	// The hibernate field that stores the deletion change.
 	public static final String DELETION_FIELD = "deletion";
 
@@ -40,7 +40,8 @@ public abstract class DaoBase implements Dao {
 		return databasePlaceholder;
 	}
 
-	protected Session getSession() {
+	@Override
+	public Session getSession() {
 		return databasePlaceholder.getSession();
 	}
 

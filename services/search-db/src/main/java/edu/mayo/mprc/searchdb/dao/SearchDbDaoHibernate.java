@@ -5,6 +5,7 @@ import com.google.common.collect.Maps;
 import edu.mayo.mprc.MprcException;
 import edu.mayo.mprc.config.RuntimeInitializer;
 import edu.mayo.mprc.database.*;
+import edu.mayo.mprc.fastadb.BulkLoadJob;
 import edu.mayo.mprc.fastadb.FastaDbDao;
 import edu.mayo.mprc.fastadb.ProteinSequence;
 import edu.mayo.mprc.searchdb.builder.AnalysisBuilder;
@@ -301,6 +302,8 @@ public final class SearchDbDaoHibernate extends DaoBase implements RuntimeInitia
 	public Analysis addAnalysis(final AnalysisBuilder analysisBuilder, final ReportData reportData, final UserProgressReporter reporter) {
 		fastaDbDao.addProteinSequences(analysisBuilder.getProteinSequences());
 		fastaDbDao.addPeptideSequences(analysisBuilder.getPeptideSequences());
+		addLocalizedModifications(analysisBuilder.getLocalizedModifications());
+		addIdentifiedPeptides(analysisBuilder.getIdentifiedPeptides());
 
 		Analysis analysis = analysisBuilder.build();
 		Analysis savedAnalysis = analysis;
@@ -322,6 +325,19 @@ public final class SearchDbDaoHibernate extends DaoBase implements RuntimeInitia
 		getSession().saveOrUpdate(reportData);
 		reportData.setAnalysisId(savedAnalysis.getId());
 		return savedAnalysis;
+	}
+
+	private void addIdentifiedPeptides(Collection<IdentifiedPeptide> identifiedPeptides) {
+
+	}
+
+	private void addLocalizedModifications(Collection<LocalizedModification> localizedModifications) {
+		final BulkLoadJob job = fastaDbDao.startNewJob();
+		try {
+
+		} finally {
+			fastaDbDao.endJob(job);
+		}
 	}
 
 	@Override
