@@ -19,7 +19,6 @@ import java.text.MessageFormat;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
-import java.util.List;
 
 /**
  * Hibernate implementation of {@link FastaDbDao}.
@@ -241,9 +240,6 @@ public final class FastaDbDaoHibernate extends DaoBase implements FastaDbDao {
 			getSession().flush();
 			getSession().clear();
 
-			final List<TempSequenceLoading> testList = (List<TempSequenceLoading>) getSession().createQuery("from TempSequenceLoading where tempKey.job = :job order by     tempKey.dataOrder")
-					.setParameter("job", bulkLoadJob.getId())
-					.list();
 			final Query query = getSession().createQuery("select newId from TempSequenceLoading t where t.tempKey.job = :job order by t.tempKey.dataOrder");
 			query.setParameter("job", bulkLoadJob.getId()).setReadOnly(true);
 			query.setReadOnly(true);
