@@ -64,12 +64,18 @@ public class AnalysisBuilder implements Builder<Analysis> {
 	/**
 	 * Cache of all protein sequences.
 	 */
-	private Map<String, ProteinSequence> proteinSequences = new HashMap<String, ProteinSequence>();
+	private Map<String/*accnum*/, ProteinSequence> proteinSequencesByAccnum = new HashMap<String, ProteinSequence>();
+
+	/**
+	 * Cache of all protein sequences by sequence.
+	 */
+	private Map<String/*sequence*/, ProteinSequence> proteinSequencesBySequence = new HashMap<String, ProteinSequence>();
+
 
 	/**
 	 * Cache of all peptide sequences.
 	 */
-	private Map<String, PeptideSequence> peptideSequences = new HashMap<String, PeptideSequence>();
+	private Map<String/*uppercase sequence*/, PeptideSequence> peptideSequences = new HashMap<String, PeptideSequence>();
 
 	/**
 	 * Cache of all localized mods.
@@ -92,8 +98,11 @@ public class AnalysisBuilder implements Builder<Analysis> {
 		return new Analysis(scaffoldVersion, analysisDate, biologicalSamples.build());
 	}
 
+	/**
+	 * @return All protein sequence, identical sequence will be reported just once.
+	 */
 	public Collection<ProteinSequence> getProteinSequences() {
-		return proteinSequences.values();
+		return proteinSequencesBySequence.values();
 	}
 
 	public Collection<PeptideSequence> getPeptideSequences() {
@@ -109,11 +118,16 @@ public class AnalysisBuilder implements Builder<Analysis> {
 	}
 
 	ProteinSequence getProteinSequence(final String accessionNumber, final String databaseSources) {
-		final ProteinSequence proteinSequence = proteinSequences.get(accessionNumber);
+		final ProteinSequence proteinSequence = proteinSequencesByAccnum.get(accessionNumber);
 		if (proteinSequence == null) {
 			final ProteinSequence newProteinSequence = translator.getProteinSequence(accessionNumber, databaseSources);
-			proteinSequences.put(accessionNumber, newProteinSequence);
-			return newProteinSequence;
+			ProteinSequence result = proteinSequencesBySequence.get(newProteinSequence.getSequence());
+			if (result == null) {
+				proteinSequencesBySequence.put(newProteinSequence.getSequence(), newProteinSequence);
+				result = newProteinSequence;
+			}
+			proteinSequencesByAccnum.put(accessionNumber, result);
+			return result;
 		}
 		return proteinSequence;
 	}

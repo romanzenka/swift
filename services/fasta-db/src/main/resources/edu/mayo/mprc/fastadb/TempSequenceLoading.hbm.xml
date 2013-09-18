@@ -6,7 +6,7 @@
             <key-property name="job" column="job" type="integer" />
             <key-property name="dataOrder" column="data_order" type="integer" />
         </composite-id>
-        <property name="newId" column="new_id" type="integer" />
+        <property name="newId" column="new_id" type="integer" not-null="false" />
         <property name="mass" type="double" column="mass" />
         <property name="sequence" type="text" column="sequence" />
     </class>

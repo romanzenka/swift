@@ -19,6 +19,7 @@ import java.text.MessageFormat;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.List;
 
 /**
  * Hibernate implementation of {@link FastaDbDao}.
@@ -215,25 +216,34 @@ public final class FastaDbDaoHibernate extends DaoBase implements FastaDbDao {
 		getSession().clear();
 
 		if (numAddedSequences > 0) {
-			final SQLQuery sqlQuery = getSession().createSQLQuery("UPDATE temp_sequence_loading AS t SET t.new_id = (select " + tableId + " from " + table + " as s where t.sequence = s.sequence and t.job = :job)");
+			final SQLQuery sqlQuery = getSession().createSQLQuery("UPDATE temp_sequence_loading AS t SET t.new_id = (select s." + tableId + " from " + table + " as s where t.sequence = s.sequence and t.job = :job)");
 			sqlQuery.setParameter("job", bulkLoadJob.getId()).setReadOnly(true);
 			final int update1 = sqlQuery.executeUpdate();
-
-			int insert1 = 0;
-			if (update1 < numAddedSequences) {
-				final SQLQuery sqlQuery2 = getSession().createSQLQuery("INSERT INTO " + table + " (sequence, mass) select t.sequence, t.mass from temp_sequence_loading as t where t.job = :job and t.new_id is null");
-				insert1 = sqlQuery2.executeUpdate();
+			if (update1 != numAddedSequences) {
+				throw new MprcException("Programmer error: we were supposed to update " + numAddedSequences + ", instead updated " + update1);
 			}
 
+			int insert1 = 0;
+			final Query sqlQuery2 = getSession()
+					.createSQLQuery("INSERT INTO " + table + " (sequence, mass) select t.sequence, t.mass from temp_sequence_loading as t where t.job = :job and t.new_id is null")
+					.setParameter("job", bulkLoadJob.getId());
+			insert1 = sqlQuery2.executeUpdate();
+
 			if (insert1 > 0) {
-				final SQLQuery sqlQuery3 = getSession().createSQLQuery("UPDATE temp_sequence_loading AS t SET t.new_id = (select " + tableId + " from " + table + " as s where t.sequence = s.sequence and t.job = :job) where t.new_id is null");
+				final SQLQuery sqlQuery3 = getSession().createSQLQuery("UPDATE temp_sequence_loading AS t SET t.new_id = (select s." + tableId + " from " + table + " as s where t.sequence = s.sequence and t.job = :job) where t.new_id is null");
 				sqlQuery3.setParameter("job", bulkLoadJob.getId()).setReadOnly(true);
 				final int update2 = sqlQuery3.executeUpdate();
+				if (update2 != insert1) {
+					throw new MprcException("Programmer error: the amount of newly inserted sequences (" + update2 + ") does not match updated sequences (" + insert1 + ")");
+				}
 			}
 
 			getSession().flush();
 			getSession().clear();
 
+			final List<TempSequenceLoading> testList = (List<TempSequenceLoading>) getSession().createQuery("from TempSequenceLoading where tempKey.job = :job order by     tempKey.dataOrder")
+					.setParameter("job", bulkLoadJob.getId())
+					.list();
 			final Query query = getSession().createQuery("select newId from TempSequenceLoading t where t.tempKey.job = :job order by t.tempKey.dataOrder");
 			query.setParameter("job", bulkLoadJob.getId()).setReadOnly(true);
 			query.setReadOnly(true);

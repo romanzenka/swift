@@ -6,7 +6,7 @@ package edu.mayo.mprc.fastadb;
 public class TempSequenceLoading {
 	private TempKey tempKey;
 
-	private int newId;
+	private Integer newId;
 	private Double mass;
 	private String sequence;
 
@@ -27,11 +27,11 @@ public class TempSequenceLoading {
 		this.tempKey = tempKey;
 	}
 
-	public int getNewId() {
+	public Integer getNewId() {
 		return newId;
 	}
 
-	public void setNewId(int newId) {
+	public void setNewId(Integer newId) {
 		this.newId = newId;
 	}
 
