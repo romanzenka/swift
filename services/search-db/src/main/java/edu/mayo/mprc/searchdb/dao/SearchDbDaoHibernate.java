@@ -299,10 +299,7 @@ public final class SearchDbDaoHibernate extends DaoBase implements RuntimeInitia
 
 	@Override
 	public Analysis addAnalysis(final AnalysisBuilder analysisBuilder, final ReportData reportData, final UserProgressReporter reporter) {
-		fastaDbDao.addProteinSequences(analysisBuilder.getProteinSequences());
-		fastaDbDao.addPeptideSequences(analysisBuilder.getPeptideSequences());
-		addLocalizedModifications(analysisBuilder.getLocalizedModifications());
-		addIdentifiedPeptides(analysisBuilder.getIdentifiedPeptides());
+		bulkLoad(analysisBuilder);
 
 		Analysis analysis = analysisBuilder.build();
 		Analysis savedAnalysis = analysis;
@@ -326,12 +323,40 @@ public final class SearchDbDaoHibernate extends DaoBase implements RuntimeInitia
 		return savedAnalysis;
 	}
 
-	private void addIdentifiedPeptides(Collection<IdentifiedPeptide> identifiedPeptides) {
+	/**
+	 * This is a mere optimization of the database loading.
+	 * The code should work the same even if this function is not called at all.
+	 * It would just run slower, as it would produce more "select-insert" pairs of queries,
+	 * as we never insert the same value twice.
+	 *
+	 * @param analysisBuilder The analysis to load
+	 */
+	private void bulkLoad(AnalysisBuilder analysisBuilder) {
+		// The order of these operations matters
+		// We are bulk-saving the lower level objects before the higher-level ones get saved
+		// This way we have always all the data available (like ids of child objects)
+		// The reason for this work is to speed the database communication. We want to avoid
+		// select / insert call pairs that occur if we update object at a time
+		fastaDbDao.addProteinSequences(analysisBuilder.getProteinSequences());
+		fastaDbDao.addPeptideSequences(analysisBuilder.getPeptideSequences());
+		addLocalizedModifications(analysisBuilder.getLocalizedModifications());
+		addLocalizedModBags(analysisBuilder.collectLocalizedModBags());
+		addIdentifiedPeptides(analysisBuilder.getIdentifiedPeptides());
+	}
 
+	private void addLocalizedModBags(Collection<LocalizedModBag> localizedModBags) {
+		for (final LocalizedModBag bag : localizedModBags) {
+			addBag(bag);
+		}
+	}
+
+	private void addIdentifiedPeptides(Collection<IdentifiedPeptide> identifiedPeptides) {
+		final IdentifiedPeptideLoader loader = new IdentifiedPeptideLoader(fastaDbDao, this);
+		loader.addObjects(identifiedPeptides);
 	}
 
 	private void addLocalizedModifications(Collection<LocalizedModification> localizedModifications) {
-		LocalizedModificationLoader loader = new LocalizedModificationLoader(fastaDbDao, this);
+		final LocalizedModificationLoader loader = new LocalizedModificationLoader(fastaDbDao, this);
 		loader.addObjects(localizedModifications);
 	}
 
@@ -548,7 +573,8 @@ public final class SearchDbDaoHibernate extends DaoBase implements RuntimeInitia
 				MAP + "SearchResult.hbm.xml",
 				MAP + "SearchResultList.hbm.xml",
 				MAP + "TandemMassSpectrometrySample.hbm.xml",
-				MAP + "TempLocalizedModification.hbm.xml"
+				MAP + "TempLocalizedModification.hbm.xml",
+				MAP + "TempIdentifiedPeptide.hbm.xml"
 		);
 	}
 }

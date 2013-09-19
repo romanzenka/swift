@@ -188,8 +188,9 @@ public abstract class DaoBase implements Dao, SessionProvider {
 	}
 
 	/**
-	 * Adds a hashed set object, making sure we do not store the same cbag twice.
+	 * Adds a hashed object, making sure we do not store the same bag twice.
 	 * An additional field is used for storing a hash key for the collection. This is used to optimize the equality checking.
+	 * A bad does not care about item ordering. It supports item entered more than once.
 	 *
 	 * @param bag The set to update.
 	 */
@@ -212,7 +213,7 @@ public abstract class DaoBase implements Dao, SessionProvider {
 	}
 
 	/**
-	 * Adds a hashed set object, making sure we do not store the same cbag twice.
+	 * Adds a hashed object, making sure we do not store the same bag twice.
 	 * An additional field is used for storing a hash key for the collection. This is used to optimize the equality checking.
 	 *
 	 * @param set The set to update.
@@ -294,11 +295,14 @@ public abstract class DaoBase implements Dao, SessionProvider {
 	 * @param <S>        Type of the collection items.
 	 * @return Hash for the collection, ignoring item order.
 	 */
-	private <S extends PersistableBase> long calculateHash(Collection<S> collection) {
+	public static <S extends PersistableBase> long calculateHash(Collection<S> collection) {
 		final Integer[] ids = DatabaseUtilities.getIdList(collection);
 		Arrays.sort(ids);
 		long hash = 0;
 		for (Integer id : ids) {
+			if (id == null) {
+				throw new MprcException("Programmer error: trying to calculate hash of a list of items, while some items are not saved already");
+			}
 			hash = hash * 31 + id;
 		}
 		return hash;

@@ -2,6 +2,7 @@ package edu.mayo.mprc.searchdb.builder;
 
 import com.google.common.base.Function;
 import com.google.common.collect.Lists;
+import edu.mayo.mprc.database.DaoBase;
 import edu.mayo.mprc.fastadb.PeptideSequence;
 import edu.mayo.mprc.fastadb.ProteinSequence;
 import edu.mayo.mprc.fastadb.ProteinSequenceTranslator;
@@ -15,10 +16,7 @@ import edu.mayo.mprc.swift.dbmapping.ReportData;
 import org.joda.time.DateTime;
 
 import javax.annotation.Nullable;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Locale;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @author Roman Zenka
@@ -185,6 +183,21 @@ public class AnalysisBuilder implements Builder<Analysis> {
 			return from;
 		}
 	};
+
+	/**
+	 * @return All localized mod bag objects from the analysis. The hash code is pre-calculated.
+	 */
+	public Collection<LocalizedModBag> collectLocalizedModBags() {
+		// By now we expect all the modifications to be saved to the database, with no nulls lurking
+		final Collection<LocalizedModBag> bags = new ArrayList<LocalizedModBag>(identifiedPeptides.size() / 10);
+		for (final IdentifiedPeptide peptide : identifiedPeptides.values()) {
+			final LocalizedModBag modifications = peptide.getModifications();
+			final long hash = DaoBase.calculateHash(modifications);
+			modifications.setHash(hash);
+			bags.add(modifications);
+		}
+		return bags;
+	}
 
 	public ReportData getReportData() {
 		return reportData;
