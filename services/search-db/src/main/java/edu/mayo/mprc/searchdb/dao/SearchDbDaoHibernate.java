@@ -339,7 +339,7 @@ public final class SearchDbDaoHibernate extends DaoBase implements RuntimeInitia
 		fastaDbDao.addProteinSequences(analysisBuilder.getProteinSequences());
 		fastaDbDao.addPeptideSequences(analysisBuilder.getPeptideSequences());
 		addLocalizedModifications(analysisBuilder.getLocalizedModifications());
-		addLocalizedModBags(analysisBuilder.getLocalizedModBags());
+		addLocalizedModBags(analysisBuilder.calculateLocalizedModBags());
 		addIdentifiedPeptides(analysisBuilder.getIdentifiedPeptides());
 		addPeptideSpectrumMatches(analysisBuilder.getPeptideSpectrumMatches());
 	}

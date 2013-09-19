@@ -167,7 +167,7 @@ public class AnalysisBuilder implements Builder<Analysis> {
 			final String fixedModifications,
 			final String variableModifications) {
 		final Collection<LocalizedModification> mods = format.parseModifications(peptideSequence.getSequence(), fixedModifications, variableModifications);
-		final LocalizedModBag mappedMods = addLocalizedModBag(new LocalizedModBag(Lists.transform(Lists.newArrayList(mods), mapLocalizedModification)));
+		final LocalizedModBag mappedMods = new LocalizedModBag(Lists.transform(Lists.newArrayList(mods), mapLocalizedModification));
 
 		final IdentifiedPeptide key = new IdentifiedPeptide(peptideSequence, mappedMods);
 		final IdentifiedPeptide peptide = identifiedPeptides.get(key);
@@ -193,10 +193,10 @@ public class AnalysisBuilder implements Builder<Analysis> {
 		}
 	};
 
-	private LocalizedModBag addLocalizedModBag(LocalizedModBag bag) {
+	private LocalizedModBag addLocalizedModBag(final LocalizedModBag bag) {
 		final long hash = DaoBase.calculateHash(bag);
 		bag.setHash(hash);
-		LocalizedModBag existing = localizedModBags.get(bag);
+		final LocalizedModBag existing = localizedModBags.get(bag);
 		if (existing != null) {
 			return existing;
 		}
@@ -206,8 +206,15 @@ public class AnalysisBuilder implements Builder<Analysis> {
 
 	/**
 	 * @return All localized mod bag objects from the analysis. The hash code is pre-calculated.
+	 *         This has to be called AFTER all {@link LocalizedModification} objects have been saved and have
+	 *         their id associated, but BEFORE the identified peptides get saved.
 	 */
-	public Collection<LocalizedModBag> getLocalizedModBags() {
+	public Collection<LocalizedModBag> calculateLocalizedModBags() {
+		for (final IdentifiedPeptide peptide : getIdentifiedPeptides()) {
+			final LocalizedModBag bag = peptide.getModifications();
+			final LocalizedModBag replacedBag = addLocalizedModBag(bag);
+			peptide.setModifications(replacedBag);
+		}
 		return localizedModBags.values();
 	}
 
@@ -247,8 +254,8 @@ public class AnalysisBuilder implements Builder<Analysis> {
 		return massSpecDataExtractor;
 	}
 
-	public PeptideSpectrumMatch addPeptideSpectrumMatch(PeptideSpectrumMatch match) {
-		PeptideSpectrumMatch peptideSpectrumMatch = peptideSpectrumMatches.get(match);
+	public PeptideSpectrumMatch addPeptideSpectrumMatch(final PeptideSpectrumMatch match) {
+		final PeptideSpectrumMatch peptideSpectrumMatch = peptideSpectrumMatches.get(match);
 		if (peptideSpectrumMatch != null) {
 			return peptideSpectrumMatch;
 		}
