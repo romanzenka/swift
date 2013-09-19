@@ -79,7 +79,7 @@ public final class SearchDbDaoTest extends DaoTest {
 	@AfterMethod
 	public void teardown() {
 		searchDbDao = null;
-		Assert.assertTrue(stats.getQueryExecutionCount() < 450, "The total number of queries must be around ~400 for 100 entries being saved");
+		Assert.assertTrue(stats.getQueryExecutionCount() < 350, "The total number of queries must be around ~300 for 100 entries being saved");
 		stats.setStatisticsEnabled(false);
 		teardownDatabase();
 	}

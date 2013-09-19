@@ -13,7 +13,10 @@ import edu.mayo.mprc.swift.dbmapping.ReportData;
 import org.joda.time.DateTime;
 
 import javax.annotation.Nullable;
-import java.util.*;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.Map;
 
 /**
  * @author Roman Zenka
@@ -75,6 +78,11 @@ public class AnalysisBuilder implements Builder<Analysis> {
 	 * Cache of all localized mods.
 	 */
 	private Map<LocalizedModification, LocalizedModification> localizedModifications = new HashMap<LocalizedModification, LocalizedModification>(100);
+
+	/**
+	 * Cache of all localized mod bags
+	 */
+	private Map<LocalizedModBag, LocalizedModBag> localizedModBags = new HashMap<LocalizedModBag, LocalizedModBag>(1000);
 
 	/**
 	 * Cache of all peptide spectrum matches.
@@ -159,7 +167,7 @@ public class AnalysisBuilder implements Builder<Analysis> {
 			final String fixedModifications,
 			final String variableModifications) {
 		final Collection<LocalizedModification> mods = format.parseModifications(peptideSequence.getSequence(), fixedModifications, variableModifications);
-		final LocalizedModBag mappedMods = new LocalizedModBag(Lists.transform(Lists.newArrayList(mods), mapLocalizedModification));
+		final LocalizedModBag mappedMods = addLocalizedModBag(new LocalizedModBag(Lists.transform(Lists.newArrayList(mods), mapLocalizedModification)));
 
 		final IdentifiedPeptide key = new IdentifiedPeptide(peptideSequence, mappedMods);
 		final IdentifiedPeptide peptide = identifiedPeptides.get(key);
@@ -185,19 +193,22 @@ public class AnalysisBuilder implements Builder<Analysis> {
 		}
 	};
 
+	private LocalizedModBag addLocalizedModBag(LocalizedModBag bag) {
+		final long hash = DaoBase.calculateHash(bag);
+		bag.setHash(hash);
+		LocalizedModBag existing = localizedModBags.get(bag);
+		if (existing != null) {
+			return existing;
+		}
+		localizedModBags.put(bag, bag);
+		return bag;
+	}
+
 	/**
 	 * @return All localized mod bag objects from the analysis. The hash code is pre-calculated.
 	 */
-	public Collection<LocalizedModBag> collectLocalizedModBags() {
-		// By now we expect all the modifications to be saved to the database, with no nulls lurking
-		final Collection<LocalizedModBag> bags = new ArrayList<LocalizedModBag>(identifiedPeptides.size() / 10);
-		for (final IdentifiedPeptide peptide : identifiedPeptides.values()) {
-			final LocalizedModBag modifications = peptide.getModifications();
-			final long hash = DaoBase.calculateHash(modifications);
-			modifications.setHash(hash);
-			bags.add(modifications);
-		}
-		return bags;
+	public Collection<LocalizedModBag> getLocalizedModBags() {
+		return localizedModBags.values();
 	}
 
 	public ReportData getReportData() {
