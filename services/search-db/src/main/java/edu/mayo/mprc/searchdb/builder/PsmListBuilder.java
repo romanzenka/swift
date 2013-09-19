@@ -62,7 +62,7 @@ public class PsmListBuilder implements Builder<PsmList> {
 		final IdentifiedPeptide identifiedPeptide = analysis.getIdentifiedPeptide(sequence, fixedModifications, variableModifications);
 		final PeptideSpectrumMatchBuilder match = list.get(identifiedPeptide);
 		if (match == null) {
-			final PeptideSpectrumMatchBuilder newMatch = new PeptideSpectrumMatchBuilder();
+			final PeptideSpectrumMatchBuilder newMatch = new PeptideSpectrumMatchBuilder(analysis);
 			newMatch.setPeptide(identifiedPeptide);
 			newMatch.setPreviousAminoAcid(previousAminoAcid);
 			newMatch.setNextAminoAcid(nextAminoAcid);

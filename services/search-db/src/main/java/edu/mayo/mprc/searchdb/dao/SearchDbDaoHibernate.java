@@ -299,9 +299,8 @@ public final class SearchDbDaoHibernate extends DaoBase implements RuntimeInitia
 
 	@Override
 	public Analysis addAnalysis(final AnalysisBuilder analysisBuilder, final ReportData reportData, final UserProgressReporter reporter) {
+		final Analysis analysis = analysisBuilder.build();
 		bulkLoad(analysisBuilder);
-
-		Analysis analysis = analysisBuilder.build();
 		Analysis savedAnalysis = analysis;
 		if (analysis.getId() == null) {
 			final BiologicalSampleList originalList = analysis.getBiologicalSamples();
@@ -331,7 +330,7 @@ public final class SearchDbDaoHibernate extends DaoBase implements RuntimeInitia
 	 *
 	 * @param analysisBuilder The analysis to load
 	 */
-	private void bulkLoad(AnalysisBuilder analysisBuilder) {
+	private void bulkLoad(final AnalysisBuilder analysisBuilder) {
 		// The order of these operations matters
 		// We are bulk-saving the lower level objects before the higher-level ones get saved
 		// This way we have always all the data available (like ids of child objects)
@@ -342,20 +341,26 @@ public final class SearchDbDaoHibernate extends DaoBase implements RuntimeInitia
 		addLocalizedModifications(analysisBuilder.getLocalizedModifications());
 		addLocalizedModBags(analysisBuilder.collectLocalizedModBags());
 		addIdentifiedPeptides(analysisBuilder.getIdentifiedPeptides());
+		addPeptideSpectrumMatches(analysisBuilder.getPeptideSpectrumMatches());
 	}
 
-	private void addLocalizedModBags(Collection<LocalizedModBag> localizedModBags) {
+	private void addPeptideSpectrumMatches(final Collection<PeptideSpectrumMatch> peptideSpectrumMatches) {
+		final PeptideSpectrumMatchLoader loader = new PeptideSpectrumMatchLoader(fastaDbDao, this);
+		loader.addObjects(peptideSpectrumMatches);
+	}
+
+	private void addLocalizedModBags(final Collection<LocalizedModBag> localizedModBags) {
 		for (final LocalizedModBag bag : localizedModBags) {
 			addBag(bag);
 		}
 	}
 
-	private void addIdentifiedPeptides(Collection<IdentifiedPeptide> identifiedPeptides) {
+	private void addIdentifiedPeptides(final Collection<IdentifiedPeptide> identifiedPeptides) {
 		final IdentifiedPeptideLoader loader = new IdentifiedPeptideLoader(fastaDbDao, this);
 		loader.addObjects(identifiedPeptides);
 	}
 
-	private void addLocalizedModifications(Collection<LocalizedModification> localizedModifications) {
+	private void addLocalizedModifications(final Collection<LocalizedModification> localizedModifications) {
 		final LocalizedModificationLoader loader = new LocalizedModificationLoader(fastaDbDao, this);
 		loader.addObjects(localizedModifications);
 	}
@@ -431,7 +436,7 @@ public final class SearchDbDaoHibernate extends DaoBase implements RuntimeInitia
 	@Override
 	public Map<Integer, List<String>> getAccessionNumbersMapForProteinSequences(final Set<Integer> proteinSequenceLists, final Integer databaseId) {
 		final HashMap<Integer, List<String>> result = Maps.newHashMap();
-		Query query = getSession().createQuery("select distinct psl.id, pa.accnum from" +
+		final Query query = getSession().createQuery("select distinct psl.id, pa.accnum from" +
 				" ProteinSequenceList as psl" +
 				" inner join psl.list as ps," +
 				" ProteinEntry as pe," +
@@ -574,7 +579,8 @@ public final class SearchDbDaoHibernate extends DaoBase implements RuntimeInitia
 				MAP + "SearchResultList.hbm.xml",
 				MAP + "TandemMassSpectrometrySample.hbm.xml",
 				MAP + "TempLocalizedModification.hbm.xml",
-				MAP + "TempIdentifiedPeptide.hbm.xml"
+				MAP + "TempIdentifiedPeptide.hbm.xml",
+				MAP + "TempPeptideSpectrumMatch.hbm.xml"
 		);
 	}
 }

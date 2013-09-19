@@ -27,6 +27,7 @@ import edu.mayo.mprc.workspace.WorkspaceDaoHibernate;
 import org.apache.log4j.Logger;
 import org.hibernate.stat.Statistics;
 import org.joda.time.DateTime;
+import org.testng.Assert;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
@@ -78,6 +79,8 @@ public final class SearchDbDaoTest extends DaoTest {
 	@AfterMethod
 	public void teardown() {
 		searchDbDao = null;
+		Assert.assertTrue(stats.getQueryExecutionCount() < 450, "The total number of queries must be around ~400 for 100 entries being saved");
+		stats.setStatisticsEnabled(false);
 		teardownDatabase();
 	}
 

@@ -13,11 +13,17 @@ public class PeptideSpectrumMatchBuilder implements Builder<PeptideSpectrumMatch
 	private double bestPeptideIdentificationProbability;
 	private SpectrumIdentificationCountsBuilder spectrumIdentificationCounts = new SpectrumIdentificationCountsBuilder();
 	private int numberOfEnzymaticTerminii;
+	private AnalysisBuilder analysisBuilder;
+
+	public PeptideSpectrumMatchBuilder(AnalysisBuilder analysisBuilder) {
+		this.analysisBuilder = analysisBuilder;
+	}
 
 	@Override
 	public PeptideSpectrumMatch build() {
-		return new PeptideSpectrumMatch(peptide, previousAminoAcid, nextAminoAcid, bestPeptideIdentificationProbability,
-				spectrumIdentificationCounts.build(), numberOfEnzymaticTerminii);
+		return analysisBuilder.addPeptideSpectrumMatch(
+				new PeptideSpectrumMatch(peptide, previousAminoAcid, nextAminoAcid, bestPeptideIdentificationProbability,
+						spectrumIdentificationCounts.build(), numberOfEnzymaticTerminii));
 	}
 
 	/**
@@ -39,7 +45,7 @@ public class PeptideSpectrumMatchBuilder implements Builder<PeptideSpectrumMatch
 	 * Bump up best scores based on a new bunch.
 	 *
 	 * @param peptideIdentificationProbability
-	 *               Potentially better ID probability.
+	 *         Potentially better ID probability.
 	 */
 	public void updateScores(final double peptideIdentificationProbability) {
 		bestPeptideIdentificationProbability = Math.max(bestPeptideIdentificationProbability, peptideIdentificationProbability);

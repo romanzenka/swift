@@ -8,10 +8,7 @@ import edu.mayo.mprc.fastadb.ProteinSequence;
 import edu.mayo.mprc.fastadb.ProteinSequenceTranslator;
 import edu.mayo.mprc.searchdb.MassSpecDataExtractor;
 import edu.mayo.mprc.searchdb.ScaffoldModificationFormat;
-import edu.mayo.mprc.searchdb.dao.Analysis;
-import edu.mayo.mprc.searchdb.dao.IdentifiedPeptide;
-import edu.mayo.mprc.searchdb.dao.LocalizedModBag;
-import edu.mayo.mprc.searchdb.dao.LocalizedModification;
+import edu.mayo.mprc.searchdb.dao.*;
 import edu.mayo.mprc.swift.dbmapping.ReportData;
 import org.joda.time.DateTime;
 
@@ -69,7 +66,6 @@ public class AnalysisBuilder implements Builder<Analysis> {
 	 */
 	private Map<String/*sequence*/, ProteinSequence> proteinSequencesBySequence = new HashMap<String, ProteinSequence>();
 
-
 	/**
 	 * Cache of all peptide sequences.
 	 */
@@ -79,6 +75,11 @@ public class AnalysisBuilder implements Builder<Analysis> {
 	 * Cache of all localized mods.
 	 */
 	private Map<LocalizedModification, LocalizedModification> localizedModifications = new HashMap<LocalizedModification, LocalizedModification>(100);
+
+	/**
+	 * Cache of all peptide spectrum matches.
+	 */
+	private Map<PeptideSpectrumMatch, PeptideSpectrumMatch> peptideSpectrumMatches = new HashMap<PeptideSpectrumMatch, PeptideSpectrumMatch>(1000);
 
 	/**
 	 * Cache of all identified peptides.
@@ -233,6 +234,19 @@ public class AnalysisBuilder implements Builder<Analysis> {
 
 	public MassSpecDataExtractor getMassSpecDataExtractor() {
 		return massSpecDataExtractor;
+	}
+
+	public PeptideSpectrumMatch addPeptideSpectrumMatch(PeptideSpectrumMatch match) {
+		PeptideSpectrumMatch peptideSpectrumMatch = peptideSpectrumMatches.get(match);
+		if (peptideSpectrumMatch != null) {
+			return peptideSpectrumMatch;
+		}
+		peptideSpectrumMatches.put(match, match);
+		return match;
+	}
+
+	public Collection<PeptideSpectrumMatch> getPeptideSpectrumMatches() {
+		return peptideSpectrumMatches.values();
 	}
 
 	@Override
