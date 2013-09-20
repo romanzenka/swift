@@ -17,8 +17,10 @@ import org.springframework.stereotype.Repository;
 import javax.annotation.Nullable;
 import java.io.File;
 import java.text.MessageFormat;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
 
 /**
  * Hibernate implementation of {@link FastaDbDao}.
@@ -196,27 +198,17 @@ public final class FastaDbDaoHibernate extends DaoBase implements FastaDbDao {
 	}
 
 	@Override
-	public BulkLoadJob startNewJob() {
-		final BulkLoadJob job = new BulkLoadJob();
-		getSession().save(job);
-		return job;
-	}
-
-	@Override
-	public void endJob(final BulkLoadJob job) {
-		getSession().delete(job);
-	}
-
-	@Override
 	public Collection<String> getHibernateMappings() {
-		return Arrays.asList(
+		final List<String> list = new ArrayList<String>(Arrays.asList(
 				HBM_HOME + "PeptideSequence.hbm.xml",
 				HBM_HOME + "ProteinSequence.hbm.xml",
 				HBM_HOME + "ProteinEntry.hbm.xml",
 				HBM_HOME + "ProteinAccnum.hbm.xml",
 				HBM_HOME + "ProteinDescription.hbm.xml",
-				HBM_HOME + "BulkLoadJob.hbm.xml",
 				HBM_HOME + "TempSequenceLoading.hbm.xml"
-		);
+		));
+		list.addAll(super.getHibernateMappings());
+		return list;
+
 	}
 }

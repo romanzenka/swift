@@ -1,5 +1,7 @@
 package edu.mayo.mprc.fastadb;
 
+import edu.mayo.mprc.database.bulk.BulkLoadJob;
+import edu.mayo.mprc.database.bulk.BulkLoadJobStarter;
 import edu.mayo.mprc.dbcurator.model.Curation;
 import edu.mayo.mprc.utilities.progress.PercentDone;
 import edu.mayo.mprc.utilities.progress.UserProgressReporter;

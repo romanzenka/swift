@@ -33,8 +33,7 @@ public final class ParamsDaoHibernate extends DaoBase implements ParamsDao {
 
 	@Override
 	public Collection<String> getHibernateMappings() {
-		return Arrays.asList(
-				"edu/mayo/mprc/database/Change.hbm.xml",
+		List<String> list = new ArrayList<String>(Arrays.asList(
 				"edu/mayo/mprc/dbcurator/model/Curation.hbm.xml",
 				"edu/mayo/mprc/dbcurator/model/SourceDatabaseArchive.hbm.xml",
 				"edu/mayo/mprc/dbcurator/model/curationsteps/CurationStep.hbm.xml",
@@ -52,7 +51,9 @@ public final class ParamsDaoHibernate extends DaoBase implements ParamsDao {
 				PARAMS_FOLDER + "ExtractMsnSettings.hbm.xml",
 				PARAMS_FOLDER + "ScaffoldSettings.hbm.xml",
 				PARAMS_FOLDER + "StarredProteins.hbm.xml"
-		);
+		));
+		list.addAll(super.getHibernateMappings());
+		return list;
 	}
 
 	@Override

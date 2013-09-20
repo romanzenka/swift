@@ -48,7 +48,7 @@ public final class SwiftDaoHibernate extends DaoBase implements SwiftDao {
 
 	@Override
 	public Collection<String> getHibernateMappings() {
-		return Arrays.asList(
+		final List<String> list = new ArrayList<String>(Arrays.asList(
 				MAP + "EnabledEngines.hbm.xml",
 				MAP + "FileSearch.hbm.xml",
 				MAP + "PeptideReport.hbm.xml",
@@ -60,7 +60,9 @@ public final class SwiftDaoHibernate extends DaoBase implements SwiftDao {
 				MAP + "SwiftSearchDefinition.hbm.xml",
 				MAP + "TaskData.hbm.xml",
 				MAP + "TaskStateData.hbm.xml"
-		);
+		));
+		list.addAll(super.getHibernateMappings());
+		return list;
 	}
 
 	@Override

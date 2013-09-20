@@ -1,6 +1,6 @@
 package edu.mayo.mprc.searchdb.dao;
 
-import edu.mayo.mprc.fastadb.TempKey;
+import edu.mayo.mprc.database.bulk.TempKey;
 import edu.mayo.mprc.unimod.ModSpecificity;
 
 /**

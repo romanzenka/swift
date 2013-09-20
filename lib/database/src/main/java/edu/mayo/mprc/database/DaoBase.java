@@ -2,6 +2,8 @@ package edu.mayo.mprc.database;
 
 import com.google.common.base.Preconditions;
 import edu.mayo.mprc.MprcException;
+import edu.mayo.mprc.database.bulk.BulkLoadJob;
+import edu.mayo.mprc.database.bulk.BulkLoadJobStarter;
 import org.hibernate.*;
 import org.hibernate.criterion.Conjunction;
 import org.hibernate.criterion.Criterion;
@@ -18,7 +20,7 @@ import java.util.List;
  * <p/>
  * TODO: This class is more of a DAO factory. We should clean this up by introducing actual DAO factories.
  */
-public abstract class DaoBase implements Dao, SessionProvider {
+public abstract class DaoBase implements Dao, SessionProvider, BulkLoadJobStarter {
 	// The hibernate field that stores the deletion change.
 	public static final String DELETION_FIELD = "deletion";
 
@@ -65,7 +67,14 @@ public abstract class DaoBase implements Dao, SessionProvider {
 	 *
 	 * @return List of hibernate mapping files to be used.
 	 */
-	public abstract Collection<String> getHibernateMappings();
+	public Collection<String> getHibernateMappings() {
+		return Arrays.asList(
+				"edu/mayo/mprc/database/Change.hbm.xml",
+				"edu/mayo/mprc/database/bulk/BulkLoadJob.hbm.xml",
+				"edu/mayo/mprc/database/bulk/TempHashedSet.hbm.xml",
+				"edu/mayo/mprc/database/bulk/TempHashedSetMember.hbm.xml"
+		);
+	}
 
 	/**
 	 * Return criteria ready to list all instances of given class that were not deleted before.
@@ -546,5 +555,17 @@ public abstract class DaoBase implements Dao, SessionProvider {
 		return new Conjunction()
 				.add(Restrictions.ge(propertyName, value - tolerance))
 				.add(Restrictions.le(propertyName, value + tolerance));
+	}
+
+	@Override
+	public BulkLoadJob startNewJob() {
+		final BulkLoadJob job = new BulkLoadJob();
+		getSession().save(job);
+		return job;
+	}
+
+	@Override
+	public void endJob(final BulkLoadJob job) {
+		getSession().delete(job);
 	}
 }

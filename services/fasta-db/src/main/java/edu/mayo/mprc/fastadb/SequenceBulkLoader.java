@@ -1,6 +1,9 @@
 package edu.mayo.mprc.fastadb;
 
 import edu.mayo.mprc.database.SessionProvider;
+import edu.mayo.mprc.database.bulk.BulkLoadJobStarter;
+import edu.mayo.mprc.database.bulk.BulkLoader;
+import edu.mayo.mprc.database.bulk.TempKey;
 
 /**
  * @author Roman Zenka

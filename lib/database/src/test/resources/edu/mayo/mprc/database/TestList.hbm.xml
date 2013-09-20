@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+    "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="edu.mayo.mprc.database">
+    <class name="TestList" table="test_list">
+        <id name="id" type="integer" column="test_list_id">
+            <generator class="native" />
+        </id>
+        <property name="hash" column="hash" not-null="true" />
+        <set name="list" table="test_list_members" lazy="false" cascade="none" access="field">
+            <key column="test_list_id" />
+            <many-to-many column="test_set_member_id" class="TestSetMember" />
+        </set>
+    </class>
+</hibernate-mapping>

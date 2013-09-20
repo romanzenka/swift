@@ -1,4 +1,4 @@
-package edu.mayo.mprc.fastadb;
+package edu.mayo.mprc.database.bulk;
 
 /**
  * @author Roman Zenka

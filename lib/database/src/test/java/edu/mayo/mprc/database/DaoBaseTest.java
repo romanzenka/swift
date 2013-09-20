@@ -11,31 +11,16 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import java.util.Arrays;
-import java.util.Collection;
 
 public final class DaoBaseTest extends DaoTest {
 	private DaoBase base;
 	private static final Logger LOGGER = Logger.getLogger(DaoBaseTest.class);
 
-	public final class DaoBaseImpl extends DaoBase {
-		public DaoBaseImpl() {
-		}
-
-		@Override
-		public Collection<String> getHibernateMappings() {
-			return Arrays.asList(
-					"edu/mayo/mprc/database/TestSet.hbm.xml",
-					"edu/mayo/mprc/database/TestSetMember.hbm.xml",
-					"edu/mayo/mprc/database/TestDouble.hbm.xml",
-					"edu/mayo/mprc/database/TestDate.hbm.xml");
-		}
-	}
-
 	@BeforeClass(alwaysRun = true)
 	public void setUp() {
 
 		LOGGER.getParent().setLevel(Level.DEBUG);
-		base = new DaoBaseImpl();
+		base = new TestDaoBaseImpl();
 		initializeDatabase(Arrays.asList(base));
 		base.begin();
 	}

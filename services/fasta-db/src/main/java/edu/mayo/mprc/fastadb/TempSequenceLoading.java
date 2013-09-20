@@ -1,5 +1,7 @@
 package edu.mayo.mprc.fastadb;
 
+import edu.mayo.mprc.database.bulk.TempKey;
+
 /**
  * @author Roman Zenka
  */

@@ -10,10 +10,7 @@ import org.hibernate.criterion.Restrictions;
 import org.springframework.stereotype.Repository;
 
 import java.text.MessageFormat;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @author Roman Zenka
@@ -22,7 +19,9 @@ import java.util.Map;
 public final class HemeDaoHibernate extends DaoBase implements HemeDao {
 	@Override
 	public Collection<String> getHibernateMappings() {
-		return Arrays.asList("edu/mayo/mprc/heme/dao/HemeTest.hbm.xml");
+		final List<String> list = new ArrayList<String>(Arrays.asList("edu/mayo/mprc/heme/dao/HemeTest.hbm.xml"));
+		list.addAll(super.getHibernateMappings());
+		return list;
 	}
 
 	@Override

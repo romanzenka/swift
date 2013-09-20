@@ -41,14 +41,15 @@ public final class CurationDaoImpl extends DaoBase implements CurationDao {
 
 	@Override
 	public Collection<String> getHibernateMappings() {
-		return Arrays.asList(
-				"edu/mayo/mprc/database/Change.hbm.xml",
+		final List<String> list = Arrays.asList(
 				STEPS + "CurationStep.hbm.xml",
 				STEPS + "DataSource.hbm.xml",
 				STEPS + "HeaderTransform.hbm.xml",
 				MODEL + "Curation.hbm.xml",
 				MODEL + "SourceDatabaseArchive.hbm.xml"
 		);
+		list.addAll(super.getHibernateMappings());
+		return list;
 	}
 
 	@Override
@@ -66,7 +67,7 @@ public final class CurationDaoImpl extends DaoBase implements CurationDao {
 	@Override
 	public Curation getCurationByShortName(final String uniqueName) {
 		final List<Curation> curationsByShortname = getCurationsByShortname(uniqueName);
-		if(curationsByShortname!=null && !curationsByShortname.isEmpty()) {
+		if (curationsByShortname != null && !curationsByShortname.isEmpty()) {
 			return curationsByShortname.get(0);
 		}
 		return null;

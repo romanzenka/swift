@@ -563,7 +563,7 @@ public final class SearchDbDaoHibernate extends DaoBase implements RuntimeInitia
 
 	@Override
 	public Collection<String> getHibernateMappings() {
-		return Arrays.asList(
+		List<String> list = new ArrayList<String>(Arrays.asList(
 				MAP + "Analysis.hbm.xml",
 				MAP + "BiologicalSample.hbm.xml",
 				MAP + "BiologicalSampleList.hbm.xml",
@@ -581,6 +581,8 @@ public final class SearchDbDaoHibernate extends DaoBase implements RuntimeInitia
 				MAP + "TempLocalizedModification.hbm.xml",
 				MAP + "TempIdentifiedPeptide.hbm.xml",
 				MAP + "TempPeptideSpectrumMatch.hbm.xml"
-		);
+		));
+		list.addAll(super.getHibernateMappings());
+		return list;
 	}
 }

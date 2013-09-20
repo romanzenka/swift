@@ -1,4 +1,4 @@
-package edu.mayo.mprc.fastadb;
+package edu.mayo.mprc.database.bulk;
 
 import java.io.Serializable;
 

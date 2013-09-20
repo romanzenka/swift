@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+    "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="edu.mayo.mprc.searchdb.dao" default-lazy="true">
+    <class name="edu.mayo.mprc.database.bulk.TempHashedSetMember" table="temp_hashed_set_member">
+        <composite-id>
+            <key-property name="job" column="job" type="integer" />
+            <key-property name="dataOrder" column="data_order" type="integer" />
+            <key-property name="id" column="value" />
+        </composite-id>
+    </class>
+</hibernate-mapping>

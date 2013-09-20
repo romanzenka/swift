@@ -1,11 +1,10 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
-        "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+    "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
 <hibernate-mapping package="edu.mayo.mprc.database">
-    <class name="TestSetMember" table="member">
-        <id name="id" type="integer" column="member_id">
-            <generator class="native"/>
+    <class name="TestSetMember" table="test_set_member">
+        <id name="id" type="integer" column="test_set_member_id">
+            <generator class="native" />
         </id>
-        <property name="memberName" type="string" length="50" column="member_name"/>
+        <property name="memberName" type="string" length="50" column="member_name" />
     </class>
 </hibernate-mapping>

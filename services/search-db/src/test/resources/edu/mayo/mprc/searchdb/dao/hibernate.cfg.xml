@@ -13,7 +13,6 @@
         <mapping resource="edu/mayo/mprc/searchdb/dao/IdentifiedPeptide.hbm.xml" />
         <mapping resource="edu/mayo/mprc/searchdb/dao/LocalizedModification.hbm.xml" />
         <mapping resource="edu/mayo/mprc/searchdb/dao/LocalizedModList.hbm.xml" />
-        <mapping resource="edu/mayo/mprc/fastadb/BulkLoadJob.hbm.xml" />
         <mapping resource="edu/mayo/mprc/fastadb/TempSequenceLoading.hbm.xml" />
         <mapping resource="edu/mayo/mprc/searchdb/dao/TempLocalizedModification.hbm.xml" />
         <mapping resource="edu/mayo/mprc/searchdb/dao/TempIdentifiedPeptide.hbm.xml" />

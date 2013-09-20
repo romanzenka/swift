@@ -29,17 +29,17 @@ public final class WorkspaceDaoHibernate extends DaoBase implements WorkspaceDao
 
 	@Override
 	public Collection<String> getHibernateMappings() {
-		return Arrays.asList(
-				"edu/mayo/mprc/database/Change.hbm.xml",
-				"edu/mayo/mprc/workspace/User.hbm.xml");
+		final List<String> list = new ArrayList<String>(Arrays.asList("edu/mayo/mprc/workspace/User.hbm.xml"));
+		list.addAll(super.getHibernateMappings());
+		return list;
 	}
 
 	/**
 	 * We are sorting users by first and then last name. Display the names in "first last" order for a natural, easy to
 	 * scan list.
 	 *
-	 * @return List of users in "first last" order.
 	 * @param withPreferences
+	 * @return List of users in "first last" order.
 	 */
 	@Override
 	public List<User> getUsers(final boolean withPreferences) {
@@ -48,7 +48,7 @@ public final class WorkspaceDaoHibernate extends DaoBase implements WorkspaceDao
 					.addOrder(Order.asc("firstName"))
 					.addOrder(Order.asc("lastName"))
 					.setReadOnly(true);
-			if(withPreferences) {
+			if (withPreferences) {
 				criteria.setFetchMode("preferences", FetchMode.SELECT);
 			}
 			return (List<User>)

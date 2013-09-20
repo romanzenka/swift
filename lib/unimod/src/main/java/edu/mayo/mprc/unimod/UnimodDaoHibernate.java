@@ -10,10 +10,7 @@ import org.hibernate.Session;
 import org.joda.time.DateTime;
 import org.springframework.stereotype.Repository;
 
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Provides access to the unimod set from the database.
@@ -37,11 +34,12 @@ public final class UnimodDaoHibernate extends DaoBase implements UnimodDao {
 
 	@Override
 	public Collection<String> getHibernateMappings() {
-		return Arrays.asList(
+		List<String> list = new ArrayList<String>(Arrays.asList(
 				HBM_DIR + "Mod.hbm.xml",
 				HBM_DIR + "ModSet.hbm.xml",
-				HBM_DIR + "ModSpecificity.hbm.xml",
-				"edu/mayo/mprc/database/Change.hbm.xml");
+				HBM_DIR + "ModSpecificity.hbm.xml"));
+		list.addAll(super.getHibernateMappings());
+		return list;
 	}
 
 	@Override

@@ -1,7 +1,7 @@
 package edu.mayo.mprc.searchdb.dao;
 
+import edu.mayo.mprc.database.bulk.TempKey;
 import edu.mayo.mprc.fastadb.PeptideSequence;
-import edu.mayo.mprc.fastadb.TempKey;
 
 /**
  * A copy pf {@link IdentifiedPeptide} for bulk loading into a temp table.
