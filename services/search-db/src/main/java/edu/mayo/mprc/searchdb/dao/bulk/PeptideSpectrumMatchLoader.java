@@ -1,9 +1,11 @@
-package edu.mayo.mprc.searchdb.dao;
+package edu.mayo.mprc.searchdb.dao.bulk;
 
 import edu.mayo.mprc.database.SessionProvider;
 import edu.mayo.mprc.database.bulk.BulkLoadJobStarter;
 import edu.mayo.mprc.database.bulk.BulkLoader;
 import edu.mayo.mprc.database.bulk.TempKey;
+import edu.mayo.mprc.searchdb.dao.PeptideSpectrumMatch;
+import edu.mayo.mprc.searchdb.dao.TempPeptideSpectrumMatch;
 
 /**
  * @author Roman Zenka

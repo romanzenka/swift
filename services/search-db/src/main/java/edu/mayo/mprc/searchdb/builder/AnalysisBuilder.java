@@ -218,6 +218,10 @@ public class AnalysisBuilder implements Builder<Analysis> {
 		return localizedModBags.values();
 	}
 
+	public Collection<PsmList> calculatePsmLists() {
+		return null;
+	}
+
 	public ReportData getReportData() {
 		return reportData;
 	}

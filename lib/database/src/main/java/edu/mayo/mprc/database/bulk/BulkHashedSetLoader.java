@@ -1,11 +1,12 @@
 package edu.mayo.mprc.database.bulk;
 
+import edu.mayo.mprc.MprcException;
+import edu.mayo.mprc.database.DaoBase;
 import edu.mayo.mprc.database.PersistableBase;
 import edu.mayo.mprc.database.PersistableHashedSetBase;
 import edu.mayo.mprc.database.SessionProvider;
 import org.hibernate.Query;
 import org.hibernate.SQLQuery;
-import org.testng.Assert;
 
 import java.text.MessageFormat;
 
@@ -71,11 +72,15 @@ public abstract class BulkHashedSetLoader<T extends PersistableHashedSetBase<? e
 	public Object wrapForTempTable(final T value, final TempKey key) {
 		final TempHashedSet result = new TempHashedSet();
 		result.setTempKey(key);
+		value.setHash(DaoBase.calculateHash(value.getList()));
+		// Wrap and save all the members. We need to store these for extra equality checks.
 		for (final PersistableBase member : value.getList()) {
-			Assert.assertNotNull(member.getId());
-			result.getMembers().add(new TempHashedSetMember(key, member.getId()));
+			if (member.getId() == null) {
+				throw new MprcException("The hashed set members have to be all saved in the database (ids associated) before bulk loading");
+			}
+			getSession().save(new TempHashedSetMember(key, member.getId()));
 		}
-		result.calculateHash();
+		result.setHash(value.getHash());
 		return result;
 	}
 

@@ -36,9 +36,9 @@ public final class BulkLoadSetTest extends DaoTest {
 		// We save the members first, independently, so they have ids
 		final List<TestSetMember> members = new ArrayList<TestSetMember>(VALUES / 10);
 		for (int i = 0; i < VALUES / 10; i++) {
-			final TestSetMember member = new TestSetMember("member #" + i);
+			TestSetMember member = new TestSetMember("member #" + i);
+			member = dao.save(member, testMemberEqualityCriteria(member), true);
 			members.add(member);
-			dao.save(member, testMemberEqualityCriteria(member), true);
 		}
 		dao.commit();
 

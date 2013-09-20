@@ -1,15 +1,17 @@
-package edu.mayo.mprc.searchdb.dao;
+package edu.mayo.mprc.searchdb.dao.bulk;
 
 import edu.mayo.mprc.database.SessionProvider;
 import edu.mayo.mprc.database.bulk.BulkLoadJobStarter;
 import edu.mayo.mprc.database.bulk.BulkLoader;
 import edu.mayo.mprc.database.bulk.TempKey;
+import edu.mayo.mprc.searchdb.dao.IdentifiedPeptide;
+import edu.mayo.mprc.searchdb.dao.TempIdentifiedPeptide;
 
 /**
  * @author Roman Zenka
  */
 public final class IdentifiedPeptideLoader extends BulkLoader<IdentifiedPeptide> {
-	protected IdentifiedPeptideLoader(BulkLoadJobStarter jobStarter, SessionProvider sessionProvider) {
+	public IdentifiedPeptideLoader(final BulkLoadJobStarter jobStarter, final SessionProvider sessionProvider) {
 		super(jobStarter, sessionProvider);
 	}
 
@@ -29,7 +31,7 @@ public final class IdentifiedPeptideLoader extends BulkLoader<IdentifiedPeptide>
 	}
 
 	@Override
-	public Object wrapForTempTable(IdentifiedPeptide value, TempKey key) {
+	public Object wrapForTempTable(final IdentifiedPeptide value, final TempKey key) {
 		return new TempIdentifiedPeptide(key, value);
 	}
 

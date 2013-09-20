@@ -3,9 +3,7 @@ package edu.mayo.mprc.database.bulk;
 import edu.mayo.mprc.MprcException;
 import edu.mayo.mprc.database.PersistableBase;
 import edu.mayo.mprc.database.SessionProvider;
-import org.hibernate.Query;
-import org.hibernate.SQLQuery;
-import org.hibernate.Session;
+import org.hibernate.*;
 
 import java.text.MessageFormat;
 import java.util.Collection;
@@ -89,7 +87,7 @@ public abstract class BulkLoader<T extends PersistableBase> {
 			getSession().flush();
 			getSession().clear();
 
-			loadNewIdsBack(values, bulkLoadJob, lastId);
+			loadNewIdsBack(values, bulkLoadJob);
 
 			deleteTemp(bulkLoadJob, numAddedValues);
 		}
@@ -160,20 +158,42 @@ public abstract class BulkLoader<T extends PersistableBase> {
 								table, tableId, columnsToTranfer, lastId, columnsToTranfer, tempTableName))
 				.setParameter("job", bulkLoadJob.getId());
 		query.executeUpdate();
+
+		final Query query2 = getSession()
+				.createSQLQuery(
+						MessageFormat.format(
+								"UPDATE {0} SET new_id = data_order+{1} where job = :job and new_id is null",
+								tempTableName, lastId))
+				.setParameter("job", bulkLoadJob.getId());
+		query2.executeUpdate();
 	}
 
-	protected void loadNewIdsBack(final Collection<? extends T> values, final BulkLoadJob bulkLoadJob, final int lastId) {
-		final Iterator<? extends T> iterator = values.iterator();
-		int order = lastId;
-		while (iterator.hasNext()) {
-			final T value = nextNullIdValue(iterator);
-			if (value == null) {
-				break;
-			}
+	protected void loadNewIdsBack(final Collection<? extends T> values, final BulkLoadJob bulkLoadJob) {
+		final String tempTableName = getTempTableName();
+		final Query query = getSession().createSQLQuery(
+				MessageFormat.format(
+						"SELECT new_id FROM {0} t WHERE t.job = :job ORDER BY t.data_order",
+						tempTableName));
 
-			order++;
-			value.setId(order);
+		query.setParameter("job", bulkLoadJob.getId()).setReadOnly(true);
+		query.setReadOnly(true);
+		final ScrollableResults scroll = query.scroll(ScrollMode.FORWARD_ONLY);
+		final Iterator<? extends T> iterator = values.iterator();
+		int rowNumber = 0;
+		while (scroll.next()) {
+			rowNumber++;
+			final Integer newId = (Integer) scroll.get(0);
+			final T value = nextNullIdValue(iterator);
+			if (newId != null) {
+				if (value == null) {
+					throw new MprcException("Ran out of values before data finished streaming in! Two identical values must have been present in the collection. Row: " + rowNumber);
+				}
+				value.setId(newId);
+			} else {
+				throw new MprcException("All ids must be set, not true for row: " + rowNumber);
+			}
 		}
+		scroll.close();
 	}
 
 	protected void deleteTemp(final BulkLoadJob bulkLoadJob, final int numAddedValues) {

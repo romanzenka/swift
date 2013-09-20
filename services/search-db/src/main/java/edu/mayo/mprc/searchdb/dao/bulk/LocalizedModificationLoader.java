@@ -1,15 +1,17 @@
-package edu.mayo.mprc.searchdb.dao;
+package edu.mayo.mprc.searchdb.dao.bulk;
 
 import edu.mayo.mprc.database.SessionProvider;
 import edu.mayo.mprc.database.bulk.BulkLoadJobStarter;
 import edu.mayo.mprc.database.bulk.BulkLoader;
 import edu.mayo.mprc.database.bulk.TempKey;
+import edu.mayo.mprc.searchdb.dao.LocalizedModification;
+import edu.mayo.mprc.searchdb.dao.TempLocalizedModification;
 
 /**
  * @author Roman Zenka
  */
 public final class LocalizedModificationLoader extends BulkLoader<LocalizedModification> {
-	protected LocalizedModificationLoader(BulkLoadJobStarter jobStarter, SessionProvider sessionProvider) {
+	public LocalizedModificationLoader(final BulkLoadJobStarter jobStarter, final SessionProvider sessionProvider) {
 		super(jobStarter, sessionProvider);
 	}
 

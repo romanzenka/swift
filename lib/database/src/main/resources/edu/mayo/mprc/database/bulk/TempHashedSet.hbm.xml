@@ -9,13 +9,5 @@
         <property name="newId" column="new_id" type="integer" not-null="false" />
 
         <property name="hash" column="hash" not-null="true" />
-
-        <set name="members" cascade="all">
-            <key>
-                <column name="job" />
-                <column name="data_order" />
-            </key>
-            <one-to-many class="TempHashedSetMember" />
-        </set>
     </class>
 </hibernate-mapping>
