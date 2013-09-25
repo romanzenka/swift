@@ -117,7 +117,7 @@ public abstract class BulkHashedSetLoader<T extends PersistableHashedSetBase<? e
 			final Query query = getSession()
 					.createSQLQuery(
 							MessageFormat.format(
-									"INSERT INTO {0} ({1}, {2}) select data_order+{3}, {4} from {5} where job = :job and new_id is null",
+									"INSERT INTO {0} ({1}, {2}) select data_order+{3,number,#}, {4} from {5} where job = :job and new_id is null",
 									table, tableId, columnsToTranfer, lastId, columnsToTranfer, tempTableName))
 					.setParameter("job", bulkLoadJob.getId());
 			query.executeUpdate();
@@ -129,7 +129,7 @@ public abstract class BulkHashedSetLoader<T extends PersistableHashedSetBase<? e
 			final Query query = getSession()
 					.createSQLQuery(
 							MessageFormat.format(
-									"INSERT INTO {0} ({1}, {2}) select m.data_order+{3}, m.value from {4} as m inner join {5} as t on m.job=t.job and m.data_order=t.data_order where t.job = :job and t.new_id is null",
+									"INSERT INTO {0} ({1}, {2}) select m.data_order+{3,number,#}, m.value from {4} as m inner join {5} as t on m.job=t.job and m.data_order=t.data_order where t.job = :job and t.new_id is null",
 									getMemberTableName(), getMemberTableKey(), getMemberTableValue(), lastId, TEMP_MEMBERS, TEMP_TABLE))
 					.setParameter("job", bulkLoadJob.getId());
 			query.executeUpdate();
@@ -141,7 +141,7 @@ public abstract class BulkHashedSetLoader<T extends PersistableHashedSetBase<? e
 			final Query query2 = getSession()
 					.createSQLQuery(
 							MessageFormat.format(
-									"UPDATE {0} SET new_id = data_order+{1} where job = :job and new_id is null",
+									"UPDATE {0} SET new_id = data_order+{1,number,#} where job = :job and new_id is null",
 									tempTableName, lastId))
 					.setParameter("job", bulkLoadJob.getId());
 			query2.executeUpdate();

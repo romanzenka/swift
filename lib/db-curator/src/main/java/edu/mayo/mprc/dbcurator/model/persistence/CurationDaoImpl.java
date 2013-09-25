@@ -41,13 +41,13 @@ public final class CurationDaoImpl extends DaoBase implements CurationDao {
 
 	@Override
 	public Collection<String> getHibernateMappings() {
-		final List<String> list = Arrays.asList(
+		final List<String> list = new ArrayList<String>(Arrays.asList(
 				STEPS + "CurationStep.hbm.xml",
 				STEPS + "DataSource.hbm.xml",
 				STEPS + "HeaderTransform.hbm.xml",
 				MODEL + "Curation.hbm.xml",
 				MODEL + "SourceDatabaseArchive.hbm.xml"
-		);
+		));
 		list.addAll(super.getHibernateMappings());
 		return list;
 	}

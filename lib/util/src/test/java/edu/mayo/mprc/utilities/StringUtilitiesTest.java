@@ -3,6 +3,7 @@ package edu.mayo.mprc.utilities;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -123,5 +124,10 @@ public final class StringUtilitiesTest {
 		Assert.assertEquals(StringUtilities.longestPrefix(Arrays.asList("hello")), "hello");
 		Assert.assertEquals(StringUtilities.longestPrefix(Arrays.asList("hello", "hello")), "hello");
 		Assert.assertEquals(StringUtilities.longestPrefix(Arrays.asList("", "hello", "hell", "her", "he", "h")), "");
+	}
+
+	@Test
+	public void shouldFormatMessages() {
+		Assert.assertEquals(MessageFormat.format("{0,number,#}", 123456), "123456");
 	}
 }
