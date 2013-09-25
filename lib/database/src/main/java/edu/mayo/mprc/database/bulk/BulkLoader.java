@@ -155,7 +155,7 @@ public abstract class BulkLoader<T extends PersistableBase> {
 			final Query query = getSession()
 					.createSQLQuery(
 							MessageFormat.format(
-									"INSERT INTO {0} ({1}, {2}) select data_order+{3}, {4} from {5} where job = :job and new_id is null",
+									"INSERT INTO {0} ({1}, {2}) select data_order+{3,number,#}, {4} from {5} where job = :job and new_id is null",
 									table, tableId, columnsToTranfer, lastId, columnsToTranfer, tempTableName))
 					.setParameter("job", bulkLoadJob.getId());
 			query.executeUpdate();
@@ -167,7 +167,7 @@ public abstract class BulkLoader<T extends PersistableBase> {
 			final Query query2 = getSession()
 					.createSQLQuery(
 							MessageFormat.format(
-									"UPDATE {0} SET new_id = data_order+{1} where job = :job and new_id is null",
+									"UPDATE {0} SET new_id = data_order+{1,number,#} where job = :job and new_id is null",
 									tempTableName, lastId))
 					.setParameter("job", bulkLoadJob.getId());
 			query2.executeUpdate();
