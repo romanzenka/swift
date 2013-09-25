@@ -8,6 +8,7 @@ import edu.mayo.mprc.utilities.progress.ProgressReport;
 import edu.mayo.mprc.workflow.persistence.TaskState;
 import edu.mayo.mprc.workspace.User;
 import org.hibernate.Session;
+import org.joda.time.DateTime;
 
 import java.io.File;
 import java.util.Date;
@@ -120,6 +121,9 @@ public interface SwiftDao extends Dao, RuntimeInitializer {
 	TaskData createTask(int searchRunId, String name, String descriptionLong, TaskState taskState);
 
 	ReportData storeReport(int searchRunId, File resultFile);
+
+	ReportData storeReport(int searchRunId, File resultFile, DateTime reportDate);
+
 
 	/**
 	 * Find search report file for given report id. Used to retrieve {@link #storeReport} result

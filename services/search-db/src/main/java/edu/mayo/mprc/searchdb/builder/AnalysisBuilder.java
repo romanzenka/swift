@@ -2,7 +2,7 @@ package edu.mayo.mprc.searchdb.builder;
 
 import com.google.common.base.Function;
 import com.google.common.collect.Lists;
-import edu.mayo.mprc.database.DaoBase;
+import edu.mayo.mprc.MprcException;
 import edu.mayo.mprc.fastadb.PeptideSequence;
 import edu.mayo.mprc.fastadb.ProteinSequence;
 import edu.mayo.mprc.fastadb.ProteinSequenceTranslator;
@@ -13,10 +13,7 @@ import edu.mayo.mprc.swift.dbmapping.ReportData;
 import org.joda.time.DateTime;
 
 import javax.annotation.Nullable;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Locale;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @author Roman Zenka
@@ -94,15 +91,25 @@ public class AnalysisBuilder implements Builder<Analysis> {
 	 */
 	private Map<IdentifiedPeptide, IdentifiedPeptide> identifiedPeptides = new HashMap<IdentifiedPeptide, IdentifiedPeptide>(1000);
 
+	private Analysis analysis;
+
 	public AnalysisBuilder(final ScaffoldModificationFormat format, final ProteinSequenceTranslator translator, final MassSpecDataExtractor massSpecDataExtractor) {
 		this.format = format;
 		this.translator = translator;
 		this.massSpecDataExtractor = massSpecDataExtractor;
 	}
 
+	public Analysis getAnalysis() {
+		return analysis;
+	}
+
 	@Override
 	public Analysis build() {
-		return new Analysis(scaffoldVersion, analysisDate, biologicalSamples.build());
+		if (analysis != null) {
+			throw new MprcException("Analysis cannot be built more than once");
+		}
+		analysis = new Analysis(scaffoldVersion, analysisDate, biologicalSamples.build());
+		return analysis;
 	}
 
 	/**
@@ -194,8 +201,7 @@ public class AnalysisBuilder implements Builder<Analysis> {
 	};
 
 	private LocalizedModBag addLocalizedModBag(final LocalizedModBag bag) {
-		final long hash = DaoBase.calculateHash(bag);
-		bag.setHash(hash);
+		bag.calculateHash();
 		final LocalizedModBag existing = localizedModBags.get(bag);
 		if (existing != null) {
 			return existing;
@@ -218,9 +224,54 @@ public class AnalysisBuilder implements Builder<Analysis> {
 		return localizedModBags.values();
 	}
 
+	/**
+	 * @return A list of all {@link PsmList} objects in the Analysis, each listed only once.
+	 *         The duplicities are resolved within the existing analysis.
+	 */
 	public Collection<PsmList> calculatePsmLists() {
-		return null;
+		final LinkedHashMap<PsmList, PsmList> map = new LinkedHashMap<PsmList, PsmList>();
+
+		for (final BiologicalSample sample : getAnalysis().getBiologicalSamples()) {
+			for (final SearchResult result : sample.getSearchResults()) {
+				for (final ProteinGroup proteinGroup : result.getProteinGroups()) {
+					final PsmList list = proteinGroup.getPeptideSpectrumMatches();
+					list.calculateHash();
+					final PsmList existing = map.get(list);
+					if (existing == null) {
+						map.put(list, list);
+					} else {
+						proteinGroup.setPeptideSpectrumMatches(existing);
+					}
+				}
+			}
+		}
+		return map.values();
 	}
+
+	/**
+	 * @return A list of all {@link ProteinSequenceList} objects in the Analysis, each listed only once.
+	 *         The duplicities are resolved within the existing analysis.
+	 */
+	public Collection<ProteinSequenceList> calculateProteinSequenceLists() {
+		final LinkedHashMap<ProteinSequenceList, ProteinSequenceList> map = new LinkedHashMap<ProteinSequenceList, ProteinSequenceList>();
+
+		for (final BiologicalSample sample : getAnalysis().getBiologicalSamples()) {
+			for (final SearchResult result : sample.getSearchResults()) {
+				for (final ProteinGroup proteinGroup : result.getProteinGroups()) {
+					final ProteinSequenceList list = proteinGroup.getProteinSequences();
+					list.calculateHash();
+					final ProteinSequenceList existing = map.get(list);
+					if (existing == null) {
+						map.put(list, list);
+					} else {
+						proteinGroup.setProteinSequences(existing);
+					}
+				}
+			}
+		}
+		return map.values();
+	}
+
 
 	public ReportData getReportData() {
 		return reportData;

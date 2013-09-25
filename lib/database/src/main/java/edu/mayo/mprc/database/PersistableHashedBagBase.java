@@ -30,4 +30,9 @@ public class PersistableHashedBagBase<T extends PersistableBase> extends Persist
 	public void setHash(long hash) {
 		this.hash = hash;
 	}
+
+	@Override
+	public void calculateHash() {
+		setHash(DaoBase.calculateHash(this));
+	}
 }

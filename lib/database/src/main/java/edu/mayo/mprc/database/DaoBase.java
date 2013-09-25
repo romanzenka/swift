@@ -206,10 +206,9 @@ public abstract class DaoBase implements Dao, SessionProvider, BulkLoadJobStarte
 	protected <T extends PersistableHashedBagBase> T updateHashedBag(T bag) {
 		final Session session = getSession();
 
-		final long hash = calculateHash(bag.getList());
-		bag.setHash(hash);
+		bag.calculateHash();
 
-		final T existing = (T) getMatchingCollection(bag, "list", "hash", bag.getClass().getName(), hash);
+		final T existing = (T) getMatchingCollection(bag, "list", "hash", bag.getClass().getName(), bag.getHash());
 
 		if (existing != null) {
 			// Item equals the saved object, bring forth the additional parameters that do not participate in equality.
@@ -230,10 +229,9 @@ public abstract class DaoBase implements Dao, SessionProvider, BulkLoadJobStarte
 	protected <T extends PersistableHashedSetBase> T updateHashedSet(T set) {
 		final Session session = getSession();
 
-		final long hash = calculateHash(set.getList());
-		set.setHash(hash);
+		set.calculateHash();
 
-		final T existing = (T) getMatchingCollection(set, "list", "hash", set.getClass().getName(), hash);
+		final T existing = (T) getMatchingCollection(set, "list", "hash", set.getClass().getName(), set.getHash());
 
 		if (existing != null) {
 			// Item equals the saved object, bring forth the additional parameters that do not participate in equality.

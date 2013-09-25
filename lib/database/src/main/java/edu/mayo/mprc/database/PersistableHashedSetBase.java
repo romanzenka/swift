@@ -32,6 +32,11 @@ public class PersistableHashedSetBase<T extends PersistableBase> extends Persist
 	}
 
 	@Override
+	public void calculateHash() {
+		setHash(DaoBase.calculateHash(this));
+	}
+
+	@Override
 	public int hashCode() {
 		if (getId() != null) {
 			// We are serialized, that means immutable.

@@ -1,9 +1,7 @@
 package edu.mayo.mprc.searchdb.dao;
 
-import edu.mayo.mprc.database.Change;
-import edu.mayo.mprc.database.DaoTest;
-import edu.mayo.mprc.database.DummyFileTokenTranslator;
-import edu.mayo.mprc.database.FileType;
+import edu.mayo.mprc.MprcException;
+import edu.mayo.mprc.database.*;
 import edu.mayo.mprc.fastadb.FastaDbDao;
 import edu.mayo.mprc.fastadb.FastaDbDaoHibernate;
 import edu.mayo.mprc.fastadb.ProteinSequence;
@@ -19,12 +17,22 @@ import edu.mayo.mprc.swift.params2.ParamsDaoHibernate;
 import edu.mayo.mprc.unimod.Unimod;
 import edu.mayo.mprc.unimod.UnimodDao;
 import edu.mayo.mprc.unimod.UnimodDaoHibernate;
+import edu.mayo.mprc.utilities.FileUtilities;
 import edu.mayo.mprc.utilities.progress.ProgressInfo;
 import edu.mayo.mprc.utilities.progress.UserProgressReporter;
 import edu.mayo.mprc.workspace.User;
 import edu.mayo.mprc.workspace.WorkspaceDao;
 import edu.mayo.mprc.workspace.WorkspaceDaoHibernate;
 import org.apache.log4j.Logger;
+import org.dbunit.database.DatabaseConnection;
+import org.dbunit.database.DatabaseSequenceFilter;
+import org.dbunit.database.IDatabaseConnection;
+import org.dbunit.dataset.FilteredDataSet;
+import org.dbunit.dataset.IDataSet;
+import org.dbunit.dataset.filter.ITableFilter;
+import org.dbunit.dataset.xml.FlatXmlDataSet;
+import org.dbunit.operation.DatabaseOperation;
+import org.hibernate.Transaction;
 import org.hibernate.stat.Statistics;
 import org.joda.time.DateTime;
 import org.testng.Assert;
@@ -33,13 +41,15 @@ import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.util.*;
 
 /**
  * @author Roman Zenka
  */
-public final class SearchDbDaoTest extends DaoTest {
-	private static final Logger LOGGER = Logger.getLogger(SearchDbDaoTest.class);
+public final class BulkLoadingTest extends DaoTest {
+	private static final Logger LOGGER = Logger.getLogger(BulkLoadingTest.class);
 	public static final int PROTEIN_MIN = 6;
 	public static final int PROTEIN_MAX = 20;
 	private SearchDbDao searchDbDao;
@@ -48,6 +58,7 @@ public final class SearchDbDaoTest extends DaoTest {
 	private FastaDbDao fastaDbDao;
 	private WorkspaceDao workspaceDao;
 	private UnimodDao unimodDao;
+	private SessionProvider sessionProvider;
 	private Statistics stats;
 
 	@BeforeMethod
@@ -59,7 +70,9 @@ public final class SearchDbDaoTest extends DaoTest {
 		WorkspaceDaoHibernate workspaceDaoImpl = new WorkspaceDaoHibernate();
 		final UnimodDaoHibernate unimodDaoImpl = new UnimodDaoHibernate();
 		final SearchDbDaoHibernate searchDbDaoImpl = new SearchDbDaoHibernate(swiftDaoImpl, fastaDbDaoImpl, getDatabasePlaceholder());
+		sessionProvider = fastaDbDaoImpl;
 		initializeDatabase(Arrays.asList(swiftDaoImpl, paramsDaoImpl, fastaDbDaoImpl, workspaceDaoImpl, unimodDaoImpl, searchDbDaoImpl));
+		// loadXml();
 
 		stats = getDatabasePlaceholder().getSessionFactory().getStatistics();
 
@@ -69,6 +82,7 @@ public final class SearchDbDaoTest extends DaoTest {
 		fastaDbDao = fastaDbDaoImpl;
 		workspaceDao = workspaceDaoImpl;
 		unimodDao = unimodDaoImpl;
+		paramsDao = paramsDaoImpl;
 	}
 
 	private void startStats() {
@@ -79,9 +93,44 @@ public final class SearchDbDaoTest extends DaoTest {
 	@AfterMethod
 	public void teardown() {
 		searchDbDao = null;
-		Assert.assertTrue(stats.getQueryExecutionCount() < 350, "The total number of queries must be around ~300 for 100 entries being saved");
+		Assert.assertTrue(stats.getQueryExecutionCount() < 140, "The total number of queries must be around ~100 for 100 entries being saved, was: " + stats.getQueryExecutionCount());
 		stats.setStatisticsEnabled(false);
+
+		// dumpXml();
 		teardownDatabase();
+	}
+
+	private void loadXml() {
+		FileInputStream in = null;
+		try {
+			final Transaction transaction = sessionProvider.getSession().beginTransaction();
+			final IDatabaseConnection connection = new DatabaseConnection(sessionProvider.getSession().connection());
+			IDataSet currentData = connection.createDataSet();
+			FlatXmlDataSet set = new FlatXmlDataSet(new File("/Users/m044910/Documents/devel/swift/services/search-db/src/test/resources/edu/mayo/mprc/searchdb/dump.xml"));
+			DatabaseOperation.CLEAN_INSERT.execute(connection, set);
+			transaction.commit();
+		} catch (Exception e) {
+			throw new MprcException("Could not dump database XML", e);
+		} finally {
+			FileUtilities.closeQuietly(in);
+		}
+	}
+
+	private void dumpXml() {
+		FileOutputStream out = null;
+		try {
+			out = new FileOutputStream("/Users/m044910/Documents/devel/swift/services/search-db/src/test/resources/edu/mayo/mprc/searchdb/dump.xml");
+			final Transaction transaction = sessionProvider.getSession().beginTransaction();
+			final IDatabaseConnection conn = new DatabaseConnection(sessionProvider.getSession().connection());
+			ITableFilter filter = new DatabaseSequenceFilter(conn);
+			IDataSet dataset = new FilteredDataSet(filter, conn.createDataSet());
+			FlatXmlDataSet.write(dataset, out);
+			transaction.commit();
+		} catch (Exception e) {
+			throw new MprcException("Could not dump database XML", e);
+		} finally {
+			FileUtilities.closeQuietly(out);
+		}
 	}
 
 	@Test
@@ -93,7 +142,10 @@ public final class SearchDbDaoTest extends DaoTest {
 			}
 		};
 		searchDbDao.begin();
-		User user = workspaceDao.addNewUser("test", "testovic", "test@test.com", new Change("test user", new DateTime()));
+		User user = workspaceDao.getUserByEmail("test@test.com");
+		if (user == null) {
+			user = workspaceDao.addNewUser("test", "testovic", "test@test.com", new Change("test user", new DateTime()));
+		}
 
 		List<FileSearch> inputFiles = new ArrayList<FileSearch>(1);
 		inputFiles.add(new FileSearch(new File("input.mgf"), "sample", "category", "experiment", new EnabledEngines(), null));
@@ -102,7 +154,7 @@ public final class SearchDbDaoTest extends DaoTest {
 
 		SearchRun searchRun = swiftDao.fillSearchRun(searchDefinition);
 
-		ReportData reportData = swiftDao.storeReport(1, new File("test.sf3"));
+		ReportData reportData = swiftDao.storeReport(searchRun.getId(), new File("test.sf3"), new DateTime(2013, 8, 20, 20, 30, 40, 50));
 
 		Unimod defaultUnimod = unimodDao.getDefaultUnimod();
 		ScaffoldModificationFormat format = new ScaffoldModificationFormat(defaultUnimod, defaultUnimod);
@@ -119,7 +171,7 @@ public final class SearchDbDaoTest extends DaoTest {
 		searchDbDao.begin();
 
 		// Start building the analysis
-		AnalysisBuilder builder = new AnalysisBuilder(format, new DummyTranslator(), new DummyMassSpecDataExtractor(new DateTime()));
+		AnalysisBuilder builder = new AnalysisBuilder(format, new DummyTranslator(), new DummyMassSpecDataExtractor(new DateTime(2013, 9, 22, 10, 20, 30, 0)));
 		builder.setReportData(reportData);
 		SearchResultListBuilder searchResults = builder.getBiologicalSamples().getBiologicalSample("sample", "category").getSearchResults();
 		SearchResultBuilder tandemMassSpecResult = searchResults.getTandemMassSpecResult("test.RAW");

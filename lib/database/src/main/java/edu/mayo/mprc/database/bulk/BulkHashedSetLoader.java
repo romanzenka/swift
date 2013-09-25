@@ -1,7 +1,6 @@
 package edu.mayo.mprc.database.bulk;
 
 import edu.mayo.mprc.MprcException;
-import edu.mayo.mprc.database.DaoBase;
 import edu.mayo.mprc.database.PersistableBase;
 import edu.mayo.mprc.database.PersistableHashedSetBase;
 import edu.mayo.mprc.database.SessionProvider;
@@ -72,7 +71,7 @@ public abstract class BulkHashedSetLoader<T extends PersistableHashedSetBase<? e
 	public Object wrapForTempTable(final T value, final TempKey key) {
 		final TempHashedSet result = new TempHashedSet();
 		result.setTempKey(key);
-		value.setHash(DaoBase.calculateHash(value.getList()));
+		value.calculateHash();
 		// Wrap and save all the members. We need to store these for extra equality checks.
 		for (final PersistableBase member : value.getList()) {
 			if (member.getId() == null) {
@@ -106,17 +105,48 @@ public abstract class BulkHashedSetLoader<T extends PersistableHashedSetBase<? e
 	}
 
 	/**
-	 * We need to insert not only into the table itself, but also of the table with members.
+	 * We need to insert not only into the table itself, but also into the member table.
 	 */
 	@Override
 	protected void insertMissing(final BulkLoadJob bulkLoadJob, final int lastId) {
-		super.insertMissing(bulkLoadJob, lastId);
-		final Query query = getSession()
-				.createSQLQuery(
-						MessageFormat.format(
-								"INSERT INTO {0} ({1}, {2}) select data_order+{3}, value from {4} where job = :job",
-								getMemberTableName(), getMemberTableKey(), getMemberTableValue(), lastId, TEMP_MEMBERS))
-				.setParameter("job", bulkLoadJob.getId());
-		query.executeUpdate();
+		final String table = getTableName();
+		final String tableId = getTableIdColumn();
+		final String tempTableName = getTempTableName();
+		final String columnsToTranfer = getColumnsToTransfer();
+		try {
+			final Query query = getSession()
+					.createSQLQuery(
+							MessageFormat.format(
+									"INSERT INTO {0} ({1}, {2}) select data_order+{3}, {4} from {5} where job = :job and new_id is null",
+									table, tableId, columnsToTranfer, lastId, columnsToTranfer, tempTableName))
+					.setParameter("job", bulkLoadJob.getId());
+			query.executeUpdate();
+		} catch (Exception e) {
+			throw new MprcException("Cannot insert new data to " + table, e);
+		}
+
+		try {
+			final Query query = getSession()
+					.createSQLQuery(
+							MessageFormat.format(
+									"INSERT INTO {0} ({1}, {2}) select m.data_order+{3}, m.value from {4} as m inner join {5} as t on m.job=t.job and m.data_order=t.data_order where t.job = :job and t.new_id is null",
+									getMemberTableName(), getMemberTableKey(), getMemberTableValue(), lastId, TEMP_MEMBERS, TEMP_TABLE))
+					.setParameter("job", bulkLoadJob.getId());
+			query.executeUpdate();
+		} catch (Exception e) {
+			throw new MprcException("Cannot insert new data to member table " + getMemberTableName(), e);
+		}
+
+		try {
+			final Query query2 = getSession()
+					.createSQLQuery(
+							MessageFormat.format(
+									"UPDATE {0} SET new_id = data_order+{1} where job = :job and new_id is null",
+									tempTableName, lastId))
+					.setParameter("job", bulkLoadJob.getId());
+			query2.executeUpdate();
+		} catch (Exception e) {
+			throw new MprcException("Cannot update existing data in " + tempTableName, e);
+		}
 	}
 }

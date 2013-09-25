@@ -8,9 +8,7 @@ import edu.mayo.mprc.database.*;
 import edu.mayo.mprc.fastadb.FastaDbDao;
 import edu.mayo.mprc.fastadb.ProteinSequence;
 import edu.mayo.mprc.searchdb.builder.AnalysisBuilder;
-import edu.mayo.mprc.searchdb.dao.bulk.IdentifiedPeptideLoader;
-import edu.mayo.mprc.searchdb.dao.bulk.LocalizedModificationLoader;
-import edu.mayo.mprc.searchdb.dao.bulk.PeptideSpectrumMatchLoader;
+import edu.mayo.mprc.searchdb.dao.bulk.*;
 import edu.mayo.mprc.swift.db.SwiftDao;
 import edu.mayo.mprc.swift.dbmapping.ReportData;
 import edu.mayo.mprc.swift.dbmapping.SwiftSearchDefinition;
@@ -327,7 +325,7 @@ public final class SearchDbDaoHibernate extends DaoBase implements RuntimeInitia
 
 	/**
 	 * This is a mere optimization of the database loading.
-	 * The code should work the same even if this function is not called at all.
+	 * The code should work the same even if this entire function is not called at all.
 	 * It would just run slower, as it would produce more "select-insert" pairs of queries,
 	 * as we never insert the same value twice.
 	 *
@@ -345,6 +343,18 @@ public final class SearchDbDaoHibernate extends DaoBase implements RuntimeInitia
 		addLocalizedModBags(analysisBuilder.calculateLocalizedModBags());
 		addIdentifiedPeptides(analysisBuilder.getIdentifiedPeptides());
 		addPeptideSpectrumMatches(analysisBuilder.getPeptideSpectrumMatches());
+		addPsmLists(analysisBuilder.calculatePsmLists());
+		addProteinSequenceLists(analysisBuilder.calculateProteinSequenceLists());
+	}
+
+	private void addProteinSequenceLists(Collection<ProteinSequenceList> lists) {
+		final ProteinSequenceListLoader loader = new ProteinSequenceListLoader(fastaDbDao, this);
+		loader.addObjects(lists);
+	}
+
+	private void addPsmLists(Collection<PsmList> lists) {
+		final PsmListLoader loader = new PsmListLoader(fastaDbDao, this);
+		loader.addObjects(lists);
 	}
 
 	private void addPeptideSpectrumMatches(final Collection<PeptideSpectrumMatch> peptideSpectrumMatches) {

@@ -11,4 +11,9 @@ public interface HashedCollection<S extends PersistableBase> extends Collection<
 	long getHash();
 
 	void setHash(long hash);
+
+	/**
+	 * Set hash calculated using the standard algorithm.
+	 */
+	void calculateHash();
 }
