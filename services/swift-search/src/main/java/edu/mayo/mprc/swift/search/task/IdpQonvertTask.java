@@ -69,7 +69,9 @@ public final class IdpQonvertTask extends AsyncTaskBase {
 		FileUtilities.waitForFile(getResultingFile(), new FileListener() {
 			@Override
 			public void fileChanged(Collection<File> files, boolean timeout) {
-				storeReportFile();
+				if (!timeout) {
+					storeReportFile();
+				}
 				completeWhenFilesAppear(getResultingFile());
 			}
 		});

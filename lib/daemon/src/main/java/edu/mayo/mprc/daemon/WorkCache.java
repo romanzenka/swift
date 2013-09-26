@@ -1,6 +1,7 @@
 package edu.mayo.mprc.daemon;
 
 import com.google.common.base.Charsets;
+import com.google.common.base.Joiner;
 import com.google.common.io.Files;
 import edu.mayo.mprc.MprcException;
 import edu.mayo.mprc.config.*;
@@ -268,6 +269,10 @@ public abstract class WorkCache<T extends WorkPacket> implements NoLoggingWorker
 				public void fileChanged(final Collection<File> files, final boolean timeout) {
 					// This is called from a different thread
 					try {
+						if (timeout) {
+							reporter.reportFailure(new MprcException("Timeout when waiting for file collection: [" + Joiner.on(", ").join(files) + "]"));
+							return;
+						}
 
 						for (final String outputFile : outputFiles) {
 							// Move the work in progress folder to its final location

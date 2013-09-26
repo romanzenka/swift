@@ -313,9 +313,10 @@ public abstract class TaskBase implements Task {
 		FileUtilities.waitForFiles(Arrays.asList(files), new FileListener() {
 			@Override
 			public void fileChanged(Collection<File> files, boolean timeout) {
-				setComplete();
 				if (timeout) {
 					setError(new MprcException("The files [" + Joiner.on("], [").join(files) + "] did not appear even after 2 minutes."));
+				} else {
+					setComplete();
 				}
 			}
 		});

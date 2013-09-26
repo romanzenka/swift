@@ -195,7 +195,9 @@ final class ScaffoldTask extends AsyncTaskBase implements ScaffoldTaskI {
 			@Override
 			public void fileChanged(Collection<File> files, boolean timeout) {
 				// This gets called from a different thread
-				storeReportFile();
+				if (!timeout) {
+					storeReportFile();
+				}
 				completeWhenFilesAppear(getScaffoldSpectraFile());
 			}
 		});

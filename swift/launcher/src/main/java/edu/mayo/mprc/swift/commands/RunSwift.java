@@ -133,7 +133,9 @@ public class RunSwift implements FileListener, SwiftCommand {
 
 	@Override
 	public void fileChanged(final Collection<File> file, final boolean timeout) {
-		configFileChanged.countDown();
+		if (!timeout) {
+			configFileChanged.countDown();
+		}
 	}
 
 	public ActiveMQConnectionPool getConnectionPool() {
