@@ -698,7 +698,7 @@
     <!-- Source Control Management -->
     <scm>
         <!-- SCM setup -->
-        <connection>scm:git:git://github.com/romanzenka/swift.git</connection>
+        <connection>scm:git:ssh://git@github.com/romanzenka/swift.git</connection>
         <developerConnection>scm:git:ssh://git@github.com/romanzenka/swift.git</developerConnection>
         <url>${scm.url.base}/swift/tree/master/${project.artifactId}</url>
         <tag>HEAD</tag>
