@@ -4,6 +4,7 @@ import com.google.common.base.Preconditions;
 import edu.mayo.mprc.MprcException;
 import edu.mayo.mprc.database.bulk.BulkLoadJob;
 import edu.mayo.mprc.database.bulk.BulkLoadJobStarter;
+import org.apache.log4j.Logger;
 import org.hibernate.*;
 import org.hibernate.criterion.Conjunction;
 import org.hibernate.criterion.Criterion;
@@ -21,44 +22,45 @@ import java.util.List;
  * TODO: This class is more of a DAO factory. We should clean this up by introducing actual DAO factories.
  */
 public abstract class DaoBase implements Dao, SessionProvider, BulkLoadJobStarter {
+	private static final Logger LOGGER = Logger.getLogger(DaoBase.class);
 	// The hibernate field that stores the deletion change.
 	public static final String DELETION_FIELD = "deletion";
 
 	private DatabasePlaceholder databasePlaceholder;
 
-	public DaoBase() {
+	protected DaoBase() {
 	}
 
-	public DaoBase(final DatabasePlaceholder databasePlaceholder) {
+	protected DaoBase(final DatabasePlaceholder databasePlaceholder) {
 		this.databasePlaceholder = databasePlaceholder;
 	}
 
 	@Resource(name = "databasePlaceholder")
-	public void setDatabasePlaceholder(final DatabasePlaceholder databasePlaceholder) {
+	public final void setDatabasePlaceholder(final DatabasePlaceholder databasePlaceholder) {
 		this.databasePlaceholder = databasePlaceholder;
 	}
 
-	public DatabasePlaceholder getDatabasePlaceholder() {
+	public final DatabasePlaceholder getDatabasePlaceholder() {
 		return databasePlaceholder;
 	}
 
 	@Override
-	public Session getSession() {
+	public final Session getSession() {
 		return databasePlaceholder.getSession();
 	}
 
 	@Override
-	public void begin() {
+	public final void begin() {
 		databasePlaceholder.begin();
 	}
 
 	@Override
-	public void commit() {
+	public final void commit() {
 		databasePlaceholder.commit();
 	}
 
 	@Override
-	public void rollback() {
+	public final void rollback() {
 		databasePlaceholder.rollback();
 	}
 
@@ -82,7 +84,7 @@ public abstract class DaoBase implements Dao, SessionProvider, BulkLoadJobStarte
 	 * @param clazz
 	 * @return
 	 */
-	protected Criteria allCriteria(final Class<? extends Evolvable> clazz) {
+	protected final Criteria allCriteria(final Class<? extends Evolvable> clazz) {
 		return getSession().createCriteria(clazz).add(Restrictions.isNull(DELETION_FIELD));
 	}
 
@@ -94,7 +96,7 @@ public abstract class DaoBase implements Dao, SessionProvider, BulkLoadJobStarte
 	 * @param clazz Class instances to list.
 	 * @return A list of all instances.
 	 */
-	protected List<?> listAll(final Class<? extends Evolvable> clazz) {
+	protected final List<?> listAll(final Class<? extends Evolvable> clazz) {
 		try {
 			return (List<?>) allCriteria(clazz).setReadOnly(true).list();
 		} catch (Exception t) {
@@ -109,7 +111,7 @@ public abstract class DaoBase implements Dao, SessionProvider, BulkLoadJobStarte
 	 * @param clazz Type of the class
 	 * @return How many instances are in the database.
 	 */
-	public long countAll(final Class<? extends Evolvable> clazz) {
+	public final long countAll(final Class<? extends Evolvable> clazz) {
 		final Object o = allCriteria(clazz)
 				.setProjection(Projections.rowCount())
 				.uniqueResult();
@@ -127,7 +129,7 @@ public abstract class DaoBase implements Dao, SessionProvider, BulkLoadJobStarte
 	 * @param clazz Class to count instances of.
 	 * @return Total count of rows in the database for the given class.
 	 */
-	public long rowCount(final Class<?> clazz) {
+	public final long rowCount(final Class<?> clazz) {
 		final Object o = getSession().createCriteria(clazz)
 				.setProjection(Projections.rowCount())
 				.uniqueResult();
@@ -145,7 +147,7 @@ public abstract class DaoBase implements Dao, SessionProvider, BulkLoadJobStarte
 	 * @param equalityCriteria Criteria for object equality.
 	 * @return A single instance of a matching object, <c>null</c> if nothing matches the criteria.
 	 */
-	protected <T extends Evolvable> T get(final Class<? extends Evolvable> clazz, final Criterion equalityCriteria) {
+	protected final <T extends Evolvable> T get(final Class<? extends Evolvable> clazz, final Criterion equalityCriteria) {
 		try {
 			return (T) allCriteria(clazz)
 					.add(equalityCriteria)
@@ -164,7 +166,7 @@ public abstract class DaoBase implements Dao, SessionProvider, BulkLoadJobStarte
 	 *                   the same collection.
 	 * @param setField   Name of the field under which is the collection stored to the database.
 	 */
-	protected <T extends PersistableBase, S extends PersistableBase> T updateCollection(final T owner, final Collection<S> collection, final String setField) {
+	protected final <T extends PersistableBase, S extends PersistableBase> T updateCollection(final T owner, final Collection<S> collection, final String setField) {
 		final Session session = getSession();
 		if (owner == null) {
 			throw new MprcException("The owner of the collection must not be null");
@@ -203,12 +205,12 @@ public abstract class DaoBase implements Dao, SessionProvider, BulkLoadJobStarte
 	 *
 	 * @param bag The set to update.
 	 */
-	protected <T extends PersistableHashedBagBase> T updateHashedBag(T bag) {
+	protected final <T extends PersistableHashedBagBase> T updateHashedBag(final T bag) {
 		final Session session = getSession();
 
 		bag.calculateHash();
 
-		final T existing = (T) getMatchingCollection(bag, "list", "hash", bag.getClass().getName(), bag.getHash());
+		final T existing = (T) getMatchingCollection(bag, "hash", bag.getClass().getName(), bag.getHash());
 
 		if (existing != null) {
 			// Item equals the saved object, bring forth the additional parameters that do not participate in equality.
@@ -226,12 +228,12 @@ public abstract class DaoBase implements Dao, SessionProvider, BulkLoadJobStarte
 	 *
 	 * @param set The set to update.
 	 */
-	protected <T extends PersistableHashedSetBase> T updateHashedSet(T set) {
+	protected final <T extends PersistableHashedSetBase> T updateHashedSet(final T set) {
 		final Session session = getSession();
 
 		set.calculateHash();
 
-		final T existing = (T) getMatchingCollection(set, "list", "hash", set.getClass().getName(), set.getHash());
+		final T existing = (T) getMatchingCollection(set, "hash", set.getClass().getName(), set.getHash());
 
 		if (existing != null) {
 			// Item equals the saved object, bring forth the additional parameters that do not participate in equality.
@@ -274,7 +276,7 @@ public abstract class DaoBase implements Dao, SessionProvider, BulkLoadJobStarte
 		return null;
 	}
 
-	private <S extends PersistableBase> PersistableBase getMatchingCollection(final Collection<S> collection, final String setField, final String hashField, final String className, long hash) {
+	private <S extends PersistableBase> PersistableBase getMatchingCollection(final Collection<S> collection, final String hashField, final String className, final long hash) {
 		final Session session = getSession();
 
 		final List ts = session.createQuery(
@@ -302,11 +304,11 @@ public abstract class DaoBase implements Dao, SessionProvider, BulkLoadJobStarte
 	 * @param <S>        Type of the collection items.
 	 * @return Hash for the collection, ignoring item order.
 	 */
-	public static <S extends PersistableBase> long calculateHash(Collection<S> collection) {
+	public static <S extends PersistableBase> long calculateHash(final Collection<S> collection) {
 		final Integer[] ids = DatabaseUtilities.getIdList(collection);
 		Arrays.sort(ids);
 		long hash = 0;
-		for (Integer id : ids) {
+		for (final Integer id : ids) {
 			if (id == null) {
 				throw new MprcException("Programmer error: trying to calculate hash of a list of items, while some items are not saved already");
 			}
@@ -323,7 +325,7 @@ public abstract class DaoBase implements Dao, SessionProvider, BulkLoadJobStarte
 	 * @param equalityCriteria Criteria to find identical, already existing item. Do not need to check for the item class and deletion.
 	 * @param createNew        New object must be created.
 	 */
-	protected <T extends Evolvable> T save(final T item, final Change change, final Criterion equalityCriteria, final boolean createNew) {
+	protected final <T extends Evolvable> T save(final T item, final Change change, final Criterion equalityCriteria, final boolean createNew) {
 		final Session session = getSession();
 		final Evolvable existingObject = (Evolvable)
 				allCriteria(item.getClass()) // It is not deprecated already
@@ -366,14 +368,19 @@ public abstract class DaoBase implements Dao, SessionProvider, BulkLoadJobStarte
 	 * @param createNew        New object must be created.
 	 * @return The saved object. This can be either the newly saved item (it did not exist in the database yet), or a result of Hibernate's merge operation.
 	 */
-	protected <T extends PersistableBase> T save(final T item, final Criterion equalityCriteria, final boolean createNew) {
+	protected final <T extends PersistableBase> T save(final T item, final Criterion equalityCriteria, final boolean createNew) {
 		final Session session = getSession();
-		final T existingObject = (T) session
+		@SuppressWarnings("unchecked")
+		final List<T> existingObjects = session
 				.createCriteria(item.getClass())
 				.add(equalityCriteria)
-				.uniqueResult();
+				.list();
 
-		if (existingObject != null) {
+		if (!existingObjects.isEmpty()) {
+			final T existingObject = (T) existingObjects.get(0);
+			if (existingObjects.size() > 1) {
+				LOGGER.warn("Table of items of type " + item.getClass().getSimpleName() + " contains more than one entry for query [ " + equalityCriteria.toString() + "]");
+			}
 			if (createNew) {
 				throw new MprcException(item.getClass().getSimpleName() + " already exists");
 			} else if (item.equals(existingObject)) {
@@ -398,11 +405,12 @@ public abstract class DaoBase implements Dao, SessionProvider, BulkLoadJobStarte
 	 * @param <T>
 	 * @return
 	 */
-	protected <T extends PersistableBase> T saveStateless(final StatelessSession session, final T item, final Criterion equalityCriteria, final boolean createNew) {
+	protected final <T extends PersistableBase> T saveStateless(final StatelessSession session, final T item, final Criterion equalityCriteria, final boolean createNew) {
 		if (item.getId() != null) {
 			return item;
 		}
 
+		@SuppressWarnings("unchecked")
 		final T existingObject = equalityCriteria == null ? null : (T) session
 				.createCriteria(item.getClass())
 				.add(equalityCriteria)
@@ -428,8 +436,9 @@ public abstract class DaoBase implements Dao, SessionProvider, BulkLoadJobStarte
 	 * @param equalityCriteria Criteria to find identical, already existing item. Do not need to check for the item class and deletion.
 	 * @param createNew        New object must be created.
 	 */
-	protected <T extends PersistableBase> T saveLaxEquality(final T item, final Criterion equalityCriteria, final boolean createNew) {
+	protected final <T extends PersistableBase> T saveLaxEquality(final T item, final Criterion equalityCriteria, final boolean createNew) {
 		final Session session = getSession();
+		@SuppressWarnings("unchecked")
 		final List<T> existingObjects = (List<T>) session
 				.createCriteria(item.getClass())
 				.add(equalityCriteria)
@@ -473,7 +482,7 @@ public abstract class DaoBase implements Dao, SessionProvider, BulkLoadJobStarte
 	 * @param item   The item to create (in database)
 	 * @param change What change is this creation related to.
 	 */
-	protected void delete(final Evolvable item, final Change change) {
+	protected final void delete(final Evolvable item, final Change change) {
 		if (item.getDeletion() != null) {
 			// Already deleted
 			return;
@@ -496,12 +505,12 @@ public abstract class DaoBase implements Dao, SessionProvider, BulkLoadJobStarte
 	 * @param query    Query to process.
 	 * @param callback Callback to be called per each method.
 	 */
-	protected void scrollQuery(final String query, final QueryCallback callback) {
+	protected final void scrollQuery(final String query, final QueryCallback callback) {
 		final StatelessSession session = getDatabasePlaceholder().getSessionFactory().openStatelessSession();
 
 		final Transaction tx = session.beginTransaction();
 		try {
-			ScrollableResults results = session.createQuery(query).scroll(ScrollMode.FORWARD_ONLY);
+			final ScrollableResults results = session.createQuery(query).scroll(ScrollMode.FORWARD_ONLY);
 			while (results.next()) {
 				callback.process(results.get());
 			}
