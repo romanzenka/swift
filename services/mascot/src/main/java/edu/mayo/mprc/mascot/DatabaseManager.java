@@ -114,7 +114,7 @@ public final class DatabaseManager implements Closeable {
 	}
 
 	private HtmlForm addCustomDatabase(String name, HtmlForm dbForm) throws IOException {
-		final HtmlInput nameInput = dbForm.getInputByName("ctrl_dbs.new.name_3");
+		final HtmlInput nameInput = dbForm.getInputByName("dbs.new.name");
 		nameInput.setValueAttribute(name);
 		checkRadioButton(dbForm, "dbs.new.new-mode", "");
 		final HtmlPage next = (HtmlPage) dbForm.getInputByValue("Next").click();
