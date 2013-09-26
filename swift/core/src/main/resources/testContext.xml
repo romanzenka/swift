@@ -1,23 +1,21 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<!-- this is a test application context, tests should run with this context -->
-<beans xmlns="http://www.springframework.org/schema/beans"
-       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd"
-       default-lazy-init="true">
+<?xml version="1.0" encoding="UTF-8"?><!-- this is a test application context, tests should run with this context -->
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.springframework.org/schema/beans classpath:org/springframework/beans/factory/xml/spring-beans-2.0.xsd"
+    default-lazy-init="true">
 
     <description>
         Test version of Swift. The database is created in memory.
     </description>
 
-    <import resource="factories.xml"/>
+    <import resource="factories.xml" />
 
     <bean class="java.net.URL" id="testFastaUrl">
-        <constructor-arg value="ftp://proteomics.mayo.edu/test/ShortTest.fasta.gz"/>
+        <constructor-arg value="ftp://proteomics.mayo.edu/test/ShortTest.fasta.gz" />
     </bean>
     <bean class="java.io.File" id="sequestCommand">
-        <constructor-arg index="0" type="java.lang.String" value="/usr/local/bin/sequest27_master"/>
+        <constructor-arg index="0" type="java.lang.String" value="/usr/local/bin/sequest27_master" />
     </bean>
     <bean class="java.io.File" id="sharedTestFolder">
-        <constructor-arg index="0" type="java.lang.String" value="${test.sharedFolder}"/>
+        <constructor-arg index="0" type="java.lang.String" value="${test.sharedFolder}" />
     </bean>
 </beans>

@@ -1,15 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<beans xmlns="http://www.springframework.org/schema/beans"
-       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xmlns:context="http://www.springframework.org/schema/context"
-       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
-       http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd"
-       default-lazy-init="true" default-autowire="no">
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:context="http://www.springframework.org/schema/context" xsi:schemaLocation="http://www.springframework.org/schema/beans classpath:org/springframework/beans/factory/xml/spring-beans-2.0.xsd
+       http://www.springframework.org/schema/context classpath:org/springframework/context/config/spring-context-3.0.xsd"
+    default-lazy-init="true" default-autowire="no">
 
-    <context:component-scan base-package="edu.mayo.mprc"/>
+    <context:component-scan base-package="edu.mayo.mprc" />
 
     <bean id="defaultPropertyConfigurator"
-          class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+        class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
         <property name="locations">
             <list>
                 <value>classpath:swift.properties</value>
@@ -17,71 +15,67 @@
         </property>
 
         <!--<property name="ignoreResourceNotFound" value="true"/>-->
-        <property name="ignoreUnresolvablePlaceholders" value="true"/>
+        <property name="ignoreUnresolvablePlaceholders" value="true" />
     </bean>
 
     <bean id="simpleDaemonRunnerFactory" class="edu.mayo.mprc.daemon.SimpleRunner$Factory">
-        <property name="table" ref="resourceTable"/>
+        <property name="table" ref="resourceTable" />
     </bean>
 
     <bean id="mascotDeployerWorkerFactory" class="edu.mayo.mprc.mascot.MascotDeploymentService$Factory">
-        <property name="mascotDatabaseMaintenanceUriPostfix" value="x-cgi/db_gui.pl"/>
-        <property name="deploymentEnabled" value="true"/>
-        <property name="engineVersion" value="2.2"/>
-        <property name="datParameters" value="AA 1234 32 1 1 1 0 0 12 13 0 0"/>
+        <property name="mascotDatabaseMaintenanceUriPostfix" value="x-cgi/db_gui.pl" />
+        <property name="deploymentEnabled" value="true" />
+        <property name="engineVersion" value="2.2" />
+        <property name="datParameters" value="AA 1234 32 1 1 1 0 0 12 13 0 0" />
         <property name="repLine"
-                  value="%shortname%_REP%tab%&quot;24&quot;%tab%&quot;localhost&quot;%tab%&quot;80&quot;%tab%&quot;MASCOT-INSTALLATION-ROOT/x-cgi/ms-getseq.exe %shortname% #ACCESSION# all&quot;"/>
+            value="%shortname%_REP%tab%&quot;24&quot;%tab%&quot;localhost&quot;%tab%&quot;80&quot;%tab%&quot;MASCOT-INSTALLATION-ROOT/x-cgi/ms-getseq.exe %shortname% #ACCESSION# all&quot;" />
         <property name="seqLine"
-                  value="%shortname%_SEQ%tab%&quot;8&quot;%tab%&quot;localhost&quot;%tab%&quot;80&quot;%tab%&quot;MASCOT-INSTALLATION-ROOT/x-cgi/ms-getseq.exe %shortname% #ACCESSION# seq&quot;"/>
+            value="%shortname%_SEQ%tab%&quot;8&quot;%tab%&quot;localhost&quot;%tab%&quot;80&quot;%tab%&quot;MASCOT-INSTALLATION-ROOT/x-cgi/ms-getseq.exe %shortname% #ACCESSION# seq&quot;" />
     </bean>
 
 
-    <bean id="aminoAcidSet" class="edu.mayo.mprc.chem.AminoAcidSet">
-    </bean>
+    <bean id="aminoAcidSet" class="edu.mayo.mprc.chem.AminoAcidSet"></bean>
 
-    <bean id="resourceTable" class="edu.mayo.mprc.swift.ResourceTable">
-    </bean>
+    <bean id="resourceTable" class="edu.mayo.mprc.swift.ResourceTable"></bean>
 
-    <bean id="databaseValidator"
-          class="edu.mayo.mprc.swift.search.DatabaseValidator">
-        <property name="hibernateProperties" ref="hibernateProperties"/>
-        <property name="runtimeInitializers" ref="searcherRuntimeInitializers"/>
-        <property name="fileTokenFactory" ref="fileTokenFactory"/>
+    <bean id="databaseValidator" class="edu.mayo.mprc.swift.search.DatabaseValidator">
+        <property name="hibernateProperties" ref="hibernateProperties" />
+        <property name="runtimeInitializers" ref="searcherRuntimeInitializers" />
+        <property name="fileTokenFactory" ref="fileTokenFactory" />
     </bean>
 
     <!-- Provides a WebUi interface after it gets configured -->
     <bean id="webUiHolder" class="edu.mayo.mprc.swift.WebUiHolder">
-        <property name="context" ref="swiftEnvironment"/>
+        <property name="context" ref="swiftEnvironment" />
     </bean>
 
     <bean id="webUiFactory" class="edu.mayo.mprc.swift.WebUi$Factory" autowire="byType">
-        <property name="swiftMonitor" ref="swiftMonitor"/>
-        <property name="fileTokenFactory" ref="fileTokenFactory"/>
-        <property name="swiftDao" ref="swiftDao"/>
-        <property name="workspaceDao" ref="workspaceDao"/>
-        <property name="searchEngineFactory" ref="searchEngineFactory"/>
+        <property name="swiftMonitor" ref="swiftMonitor" />
+        <property name="fileTokenFactory" ref="fileTokenFactory" />
+        <property name="swiftDao" ref="swiftDao" />
+        <property name="workspaceDao" ref="workspaceDao" />
+        <property name="searchEngineFactory" ref="searchEngineFactory" />
     </bean>
 
     <!-- Hibernate properties -->
     <bean id="hibernateProperties" class="java.util.HashMap">
         <constructor-arg type="java.util.Map">
             <map>
-                <entry key="hibernate.show_sql" value="${hibernate.show_sql}"/>
+                <entry key="hibernate.show_sql" value="${hibernate.show_sql}" />
 
                 <entry key="hibernate.current_session_context_class"
-                       value="${hibernate.current_session_context_class}"/>
-                <entry key="hibernate.transaction.factory_class"
-                       value="${hibernate.transaction.factory_class}"/>
-                <entry key="hibernate.cache.provider_class" value="${hibernate.cache.provider_class}"/>
-                <entry key="hibernate.jdbc.batch_size" value="0"/>
-                <entry key="hibernate.c3p0.min_size" value="5"/>
-                <entry key="hibernate.c3p0.max_size" value="20"/>
-                <entry key="hibernate.c3p0.timeout" value="6000"/>
-                <entry key="hibernate.c3p0.max_statements" value="100"/>
-                <entry key="hibernate.c3p0.max_statements_per_connection" value="20"/>
-                <entry key="hibernate.c3p0.idle_connection_test_period" value="300"/>
+                    value="${hibernate.current_session_context_class}" />
+                <entry key="hibernate.transaction.factory_class" value="${hibernate.transaction.factory_class}" />
+                <entry key="hibernate.cache.provider_class" value="${hibernate.cache.provider_class}" />
+                <entry key="hibernate.jdbc.batch_size" value="0" />
+                <entry key="hibernate.c3p0.min_size" value="5" />
+                <entry key="hibernate.c3p0.max_size" value="20" />
+                <entry key="hibernate.c3p0.timeout" value="6000" />
+                <entry key="hibernate.c3p0.max_statements" value="100" />
+                <entry key="hibernate.c3p0.max_statements_per_connection" value="20" />
+                <entry key="hibernate.c3p0.idle_connection_test_period" value="300" />
                 <entry key="hibernate.connection.provider_class"
-                       value="org.hibernate.connection.C3P0ConnectionProvider"/>
+                    value="org.hibernate.connection.C3P0ConnectionProvider" />
             </map>
         </constructor-arg>
     </bean>
@@ -89,56 +83,55 @@
     <!-- Hibernate mapping resources -->
 
     <bean id="paramsInfo" class="edu.mayo.mprc.swift.params2.mapping.ParamsInfoImpl">
-        <constructor-arg index="0" ref="curationDao"/>
-        <constructor-arg index="1" ref="unimodDao"/>
-        <constructor-arg index="2" ref="paramsDao"/>
+        <constructor-arg index="0" ref="curationDao" />
+        <constructor-arg index="1" ref="unimodDao" />
+        <constructor-arg index="2" ref="paramsDao" />
     </bean>
 
     <!-- SGE -->
     <bean id="gridEngineJobManager" class="edu.mayo.mprc.sge.GridEngineJobManager" scope="singleton"
-          lazy-init="true">
-    </bean>
+        lazy-init="true"></bean>
 
     <bean id="gridScriptFactory" class="edu.mayo.mprc.sge.GridScriptFactory">
-        <property name="javaCommand" value="java"/>
-        <property name="swiftLibDirectory" value="lib"/>
+        <property name="javaCommand" value="java" />
+        <property name="swiftLibDirectory" value="lib" />
     </bean>
 
     <bean id="swiftSge" class="edu.mayo.mprc.swift.SgeJobRunner">
-        <property name="resourceTable" ref="resourceTable"/>
-        <property name="connectionPool" ref="connectionPool"/>
-        <property name="serviceFactory" ref="serviceFactory"/>
+        <property name="resourceTable" ref="resourceTable" />
+        <property name="connectionPool" ref="connectionPool" />
+        <property name="serviceFactory" ref="serviceFactory" />
     </bean>
 
     <bean id="daemonConnectionFactory" class="edu.mayo.mprc.daemon.DaemonConnectionFactory">
-        <property name="fileTokenFactory" ref="fileTokenFactory"/>
-        <property name="serviceFactory" ref="serviceFactory"/>
+        <property name="fileTokenFactory" ref="fileTokenFactory" />
+        <property name="serviceFactory" ref="serviceFactory" />
     </bean>
 
     <bean id="serviceFactory" class="edu.mayo.mprc.messaging.ServiceFactory">
-        <property name="connectionPool" ref="connectionPool"/>
+        <property name="connectionPool" ref="connectionPool" />
     </bean>
 
     <bean id="curationInitializer" class="edu.mayo.mprc.swift.search.CurationInitializer">
-        <property name="curationDao" ref="curationDao"/>
+        <property name="curationDao" ref="curationDao" />
     </bean>
 
     <bean id="searcherRuntimeInitializers" class="java.util.ArrayList">
         <constructor-arg>
             <list>
-                <ref bean="workspaceDao"/>
-                <ref bean="paramsDao"/>
-                <ref bean="unimodDao"/>
-                <ref bean="curationInitializer"/>
-                <ref bean="swiftDao"/>
-                <ref bean="searchDbDao"/>
+                <ref bean="workspaceDao" />
+                <ref bean="paramsDao" />
+                <ref bean="unimodDao" />
+                <ref bean="curationInitializer" />
+                <ref bean="swiftDao" />
+                <ref bean="searchDbDao" />
             </list>
         </constructor-arg>
     </bean>
 
     <bean id="swiftMonitor" class="edu.mayo.mprc.swift.SwiftMonitor">
-        <property name="factory" ref="resourceTable"/>
+        <property name="factory" ref="resourceTable" />
     </bean>
 
-    <bean id="connectionPool" class="edu.mayo.mprc.messaging.ActiveMQConnectionPool"/>
+    <bean id="connectionPool" class="edu.mayo.mprc.messaging.ActiveMQConnectionPool" />
 </beans>
