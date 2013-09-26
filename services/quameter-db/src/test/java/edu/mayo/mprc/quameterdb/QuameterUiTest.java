@@ -70,10 +70,7 @@ public final class QuameterUiTest extends DaoTest {
 						new DateTime(2014, 1, 10, 10, 20, 30, 0),
 						60.0,
 						"comment",
-						"tune Method",
-						"instrument Method",
-						"sample Information",
-						"error log"));
+						"sample Information"));
 
 		sample2 = searchDbDao.addTandemMassSpectrometrySample(
 				new TandemMassSpectrometrySample(
@@ -87,10 +84,7 @@ public final class QuameterUiTest extends DaoTest {
 						new DateTime(2014, 2, 12, 12, 21, 22, 23),
 						120.0,
 						"comment 2",
-						"tune Method 2",
-						"instrument Method 2",
-						"sample Information 2",
-						"error log 2"));
+						"sample Information 2"));
 
 
 		fileSearch1 = swiftDao.addFileSearch(new FileSearch(new File("test.RAW"), "bioSample", "category", "experiment", new EnabledEngines(), null));
