@@ -192,8 +192,8 @@ public final class SearchDbDaoHibernate extends DaoBase implements RuntimeInitia
 				.add(nullSafeEq("numberOfUniquePeptides", group.getNumberOfUniquePeptides()))
 				.add(nullSafeEq("numberOfUniqueSpectra", group.getNumberOfUniqueSpectra()))
 				.add(nullSafeEq("numberOfTotalSpectra", group.getNumberOfTotalSpectra()))
-				.add(nullSafeEq("percentageOfTotalSpectra", group.getPercentageOfTotalSpectra()))
-				.add(nullSafeEq("percentageSequenceCoverage", group.getPercentageSequenceCoverage()));
+				.add(doubleEq("percentageOfTotalSpectra", group.getPercentageOfTotalSpectra(), ProteinGroup.PERCENT_TOLERANCE))
+				.add(doubleEq("percentageSequenceCoverage", group.getPercentageSequenceCoverage(), ProteinGroup.PERCENT_TOLERANCE));
 	}
 
 	public TandemMassSpectrometrySample addTandemMassSpectrometrySample(final TandemMassSpectrometrySample sample) {
