@@ -74,6 +74,9 @@ public final class XTandemWorker extends WorkerBase {
 			if (processCaller.getExitValue() != 0) {
 				throw new MprcException("Execution of tandem search engine failed. Error: " + processCaller.getFailedCallDescription());
 			}
+			if (!packet.getOutputFile().exists()) {
+				throw new MprcException("Tandem call completed, but the output file was not created. Error: " + processCaller.getFailedCallDescription());
+			}
 			LOGGER.info("Tandem search, " + packet.toString() + ", has been successfully completed.");
 		} finally {
 			cleanUp(packet);
