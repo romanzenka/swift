@@ -32,7 +32,7 @@ public final class TestIdpQonvert {
 	@BeforeClass
 	public void startup() {
 		if (FileUtilities.isLinuxPlatform() || FileUtilities.isWindowsPlatform()) {
-			final String path = System.getenv("edu.mayo.mprc.swift.idpqonvert.path");
+			final String path = System.getenv("edu_mayo_mprc_swift_idpqonvert_path");
 			if (path == null) {
 				throw new MprcException("Skipping IdpQonvert tests");
 			}
