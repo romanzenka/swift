@@ -123,7 +123,7 @@ public abstract class BulkLoader<T extends PersistableBase> {
 		final String tempTableName = getTempTableName();
 		final String equalityString = getEqualityString();
 
-		final SQLQuery sqlQuery = getSession().createSQLQuery("UPDATE " + tempTableName + " AS t SET t.new_id = (select s." + tableId + " from " + table + " as s where " + equalityString + " and t.job = :job) where t.job = :job");
+		final SQLQuery sqlQuery = getSession().createSQLQuery("UPDATE " + tempTableName + " AS t SET t.new_id = (select s." + tableId + " from " + table + " as s where " + equalityString + " and t.job = :job LIMIT 1) where t.job = :job");
 		sqlQuery.setParameter("job", bulkLoadJob.getId()).setReadOnly(true);
 		final int update1 = sqlQuery.executeUpdate();
 		return update1;
