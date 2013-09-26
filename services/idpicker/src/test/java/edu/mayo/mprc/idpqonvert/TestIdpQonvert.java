@@ -55,6 +55,7 @@ public final class TestIdpQonvert {
 	@AfterClass
 	public void teardown() {
 		if (FileUtilities.isLinuxPlatform() || FileUtilities.isWindowsPlatform()) {
+			FileUtilities.cleanupTempFile(new File(tmpFolder, "SprotYeast.fasta.index"));
 			Installer.pepXmlFiles(tmpFolder, Installer.Action.UNINSTALL);
 			Installer.yeastFastaFiles(tmpFolder, Installer.Action.UNINSTALL);
 			FileUtilities.cleanupTempFile(outputFile);
