@@ -33,6 +33,10 @@ import java.util.*;
  */
 @Repository("searchDbDao")
 public final class SearchDbDaoHibernate extends DaoBase implements RuntimeInitializer, SearchDbDao {
+	/**
+	 * How many percent of the time does the bulk loading part take.
+	 */
+	private static final float BULK_PERCENT = 0.8f;
 	private SwiftDao swiftDao;
 	private FastaDbDao fastaDbDao;
 
@@ -301,11 +305,11 @@ public final class SearchDbDaoHibernate extends DaoBase implements RuntimeInitia
 	@Override
 	public Analysis addAnalysis(final AnalysisBuilder analysisBuilder, final ReportData reportData, final UserProgressReporter reporter) {
 		final Analysis analysis = analysisBuilder.build();
-		bulkLoad(analysisBuilder);
+		bulkLoad(analysisBuilder, new PercentRangeReporter(new PercentDoneReporter(reporter, "Loading bulk of analysis data into database: "), 0.0f, BULK_PERCENT));
 		Analysis savedAnalysis = analysis;
 		if (analysis.getId() == null) {
 			final BiologicalSampleList originalList = analysis.getBiologicalSamples();
-			final PercentRangeReporter analysisRange = new PercentRangeReporter(new PercentDoneReporter(reporter, "Loading analysis into database: "), 0, 1);
+			final PercentRangeReporter analysisRange = new PercentRangeReporter(new PercentDoneReporter(reporter, "Loading remaining analysis data into database: "), BULK_PERCENT, 1.0f);
 			final int numBioSamples = originalList.size();
 			if (originalList.getId() == null) {
 				final BiologicalSampleList newList = new BiologicalSampleList(numBioSamples);
@@ -331,28 +335,38 @@ public final class SearchDbDaoHibernate extends DaoBase implements RuntimeInitia
 	 *
 	 * @param analysisBuilder The analysis to load
 	 */
-	private void bulkLoad(final AnalysisBuilder analysisBuilder) {
+	private void bulkLoad(final AnalysisBuilder analysisBuilder, final PercentRangeReporter reporter) {
 		// The order of these operations matters
 		// We are bulk-saving the lower level objects before the higher-level ones get saved
 		// This way we have always all the data available (like ids of child objects)
 		// The reason for this work is to speed the database communication. We want to avoid
 		// select / insert call pairs that occur if we update object at a time
+		final int totalSteps = 8;
+		reporter.reportDone(totalSteps, 0);
 		fastaDbDao.addProteinSequences(analysisBuilder.getProteinSequences());
+		reporter.reportDone(totalSteps, 1);
 		fastaDbDao.addPeptideSequences(analysisBuilder.getPeptideSequences());
+		reporter.reportDone(totalSteps, 2);
 		addLocalizedModifications(analysisBuilder.getLocalizedModifications());
+		reporter.reportDone(totalSteps, 3);
 		addLocalizedModBags(analysisBuilder.calculateLocalizedModBags());
+		reporter.reportDone(totalSteps, 4);
 		addIdentifiedPeptides(analysisBuilder.getIdentifiedPeptides());
+		reporter.reportDone(totalSteps, 5);
 		addPeptideSpectrumMatches(analysisBuilder.getPeptideSpectrumMatches());
+		reporter.reportDone(totalSteps, 6);
 		addPsmLists(analysisBuilder.calculatePsmLists());
+		reporter.reportDone(totalSteps, 7);
 		addProteinSequenceLists(analysisBuilder.calculateProteinSequenceLists());
+		reporter.reportDone(totalSteps, 8);
 	}
 
-	private void addProteinSequenceLists(Collection<ProteinSequenceList> lists) {
+	private void addProteinSequenceLists(final Collection<ProteinSequenceList> lists) {
 		final ProteinSequenceListLoader loader = new ProteinSequenceListLoader(fastaDbDao, this);
 		loader.addObjects(lists);
 	}
 
-	private void addPsmLists(Collection<PsmList> lists) {
+	private void addPsmLists(final Collection<PsmList> lists) {
 		final PsmListLoader loader = new PsmListLoader(fastaDbDao, this);
 		loader.addObjects(lists);
 	}
@@ -576,7 +590,7 @@ public final class SearchDbDaoHibernate extends DaoBase implements RuntimeInitia
 
 	@Override
 	public Collection<String> getHibernateMappings() {
-		List<String> list = new ArrayList<String>(Arrays.asList(
+		final List<String> list = new ArrayList<String>(Arrays.asList(
 				MAP + "Analysis.hbm.xml",
 				MAP + "BiologicalSample.hbm.xml",
 				MAP + "BiologicalSampleList.hbm.xml",
