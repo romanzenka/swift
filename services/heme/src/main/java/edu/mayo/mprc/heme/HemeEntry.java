@@ -41,7 +41,11 @@ public final class HemeEntry {
 					duration = new Interval(searchRun.getStartTimestamp().getTime(), searchRun.getEndTimestamp().getTime());
 				}
 			} else {
-				status = HemeTestStatus.RUNNING;
+				if (searchRun.getTasksFailed() > 0) {
+					status = HemeTestStatus.FAILED;
+				} else {
+					status = HemeTestStatus.RUNNING;
+				}
 				if (searchRun.getStartTimestamp() != null) {
 					duration = new Interval(searchRun.getStartTimestamp().getTime(), new Date().getTime());
 				}
