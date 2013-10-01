@@ -116,7 +116,6 @@ public final class AppConfigWriter implements Closeable {
 
 	private void writeTriplets(final Collection<Triplet> contents, final String indent) {
 		int maxKey = 0;
-		int maxVal = 0;
 		for (final Triplet triplet : contents) {
 			final String key = triplet.getKey();
 			if (key != null) {
@@ -124,31 +123,47 @@ public final class AppConfigWriter implements Closeable {
 				if (keyLength > maxKey) {
 					maxKey = keyLength;
 				}
-				final int valueLength = triplet.getValue().length();
-				if (valueLength > maxVal && valueLength < 50) {
-					maxVal = valueLength;
-				}
 			}
 		}
 
+		boolean prevValue = false;
+		boolean prevNoComment = false;
 		for (final Triplet triplet : contents) {
-			writer.print(indent);
-			final String key = triplet.getKey();
-			if (key != null) {
-				writer.print(key);
-				writer.print(StringUtilities.repeat(' ', maxKey - key.length() + 2));
-
-				final String value = triplet.getValue();
-				writer.print(value);
-				writer.print(StringUtilities.repeat(' ', Math.max(maxVal - value.length() + 2, 2)));
-			}
-
 			final String comment = triplet.getComment();
-			if (comment != null && !comment.isEmpty()) {
+			boolean noComment = Strings.isNullOrEmpty(comment);
+			if (!noComment) {
+				if (prevValue) {
+					// Extra line to separate us from previous value
+					writer.println();
+				}
+				writer.print(indent);
 				writer.print("# ");
 				writer.print(comment);
+				writer.println();
 			}
-			writer.println();
+
+			final String key = triplet.getKey();
+			if (key != null) {
+				if (noComment && prevValue && !prevNoComment) {
+					// Extra line to separate us from previous value as we do not have comment and they did
+					writer.println();
+				}
+				writer.print(indent);
+				if (key != null) {
+					writer.print(key);
+
+					final String value = triplet.getValue();
+					if (!Strings.isNullOrEmpty(value)) {
+						writer.print(StringUtilities.repeat(' ', maxKey - key.length() + 2));
+						writer.print(value);
+					}
+				}
+				writer.println();
+				prevValue = true;
+			} else {
+				prevValue = false;
+			}
+			prevNoComment = noComment;
 		}
 	}
 
