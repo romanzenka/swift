@@ -21,7 +21,11 @@ import edu.mayo.mprc.searchengine.EngineMetadata;
 import edu.mayo.mprc.utilities.FileUtilities;
 import edu.mayo.mprc.utilities.ProcessCaller;
 import edu.mayo.mprc.utilities.StreamRegExMatcher;
+import edu.mayo.mprc.utilities.progress.ProgressInfo;
+import edu.mayo.mprc.utilities.progress.ProgressReporter;
 import edu.mayo.mprc.utilities.progress.UserProgressReporter;
+import joptsimple.OptionParser;
+import joptsimple.OptionSet;
 import org.apache.log4j.Logger;
 import org.springframework.stereotype.Component;
 
@@ -37,6 +41,11 @@ public final class XTandemWorker extends WorkerBase {
 	public static final String TYPE = "tandem";
 	public static final String NAME = "X!Tandem";
 	public static final String DESC = "X!Tandem search engine support. <p>X!Tandem is freely available at <a href=\"http://www.thegpm.org/TANDEM/\">http://www.thegpm.org/TANDEM/</a>. We include the binaries directly in Swift install for your convenience.</p>";
+	public static final String INPUT_FILE = "inputFile";
+	public static final String SEARCH_PARAMS_FILE = "searchParamsFile";
+	public static final String DATABASE_FILE = "databaseFile";
+	public static final String OUTPUT_FILE = "outputFile";
+	public static final String WORK_FOLDER = "workFolder";
 
 	private File tandemExecutable;
 
@@ -44,6 +53,78 @@ public final class XTandemWorker extends WorkerBase {
 
 	public XTandemWorker(final File tandemExecutable) {
 		this.tandemExecutable = tandemExecutable;
+	}
+
+	public static void main(final String[] args) {
+		final OptionParser parser = new OptionParser();
+
+		// Config
+		parser.accepts(TANDEM_EXECUTABLE, "X!Tandem executable to run").withRequiredArg().ofType(String.class);
+
+		// Work packet
+
+		parser.accepts(INPUT_FILE, "Input file to search (.mgf)").withRequiredArg().ofType(File.class);
+		parser.accepts(SEARCH_PARAMS_FILE, "X!Tandem search parameters").withRequiredArg().ofType(File.class);
+		parser.accepts(DATABASE_FILE, "X!Tandem database").withRequiredArg().ofType(File.class);
+		parser.accepts(OUTPUT_FILE, "Where to put the results of X!Tandem search").withRequiredArg().ofType(File.class);
+		parser.accepts(WORK_FOLDER, "Where to execute X!Tandem").withRequiredArg().ofType(File.class);
+
+		final OptionSet options = parser.parse(args);
+		final String tandemExecutable = getParameterString(TANDEM_EXECUTABLE, options);
+		final File inputFile = getParameter(INPUT_FILE, options);
+		final File searchParamsFile = getParameter(SEARCH_PARAMS_FILE, options);
+		final File databaseFile = getParameter(DATABASE_FILE, options);
+		final File outputFile = getParameter(OUTPUT_FILE, options);
+		final File workFolder = getParameter(WORK_FOLDER, options);
+
+		final Factory factory = new Factory();
+		final Config config = new Config(tandemExecutable);
+		final Worker worker = factory.create(config, null);
+
+		final XTandemWorkPacket packet = new XTandemWorkPacket(inputFile, searchParamsFile, outputFile, workFolder, databaseFile, false, "1", false);
+
+		worker.processRequest(packet, new ProgressReporter() {
+			@Override
+			public void reportStart(final String hostString) {
+				LOGGER.info("Processing started at " + hostString);
+			}
+
+			@Override
+			public void reportSuccess() {
+				LOGGER.info("Success");
+			}
+
+			@Override
+			public void reportFailure(final Throwable t) {
+				LOGGER.error("Could not run X!Tandem", t);
+			}
+
+			@Override
+			public void reportProgress(final ProgressInfo progressInfo) {
+				LOGGER.info("Progress: " + progressInfo);
+			}
+		});
+	}
+
+	private static String getParameterString(final String param, final OptionSet options) {
+		final String string;
+		if (options.has(param)) {
+			string = (String) options.valueOf(param);
+		} else {
+			throw new MprcException("The " + param + " parameter is mandatory");
+		}
+		return string;
+	}
+
+
+	private static File getParameter(final String param, final OptionSet options) {
+		final File file;
+		if (options.has(param)) {
+			file = (File) options.valueOf(param);
+		} else {
+			throw new MprcException("The " + param + " parameter is mandatory");
+		}
+		return file;
 	}
 
 	@Override
@@ -225,7 +306,7 @@ public final class XTandemWorker extends WorkerBase {
 		final ProcessBuilder processBuilder = new ProcessBuilder(parameters);
 		final ProcessCaller processCaller = new ProcessCaller(processBuilder);
 		processCaller.setKillTimeout(1000);
-		ByteArrayInputStream stream = new ByteArrayInputStream("\n".getBytes(Charsets.US_ASCII));
+		final ByteArrayInputStream stream = new ByteArrayInputStream("\n".getBytes(Charsets.US_ASCII));
 		processCaller.setInputStream(stream);
 		processCaller.runAndCheck("X!Tandem", 255);
 	}
