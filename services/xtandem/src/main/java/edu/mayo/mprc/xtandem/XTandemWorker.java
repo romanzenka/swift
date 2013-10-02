@@ -136,6 +136,13 @@ public final class XTandemWorker extends WorkerBase {
 		final XTandemWorkPacket packet = (XTandemWorkPacket) workPacket;
 
 		try {
+			LOGGER.info("X!Tandem parameters:\n"
+					+ "--" + TANDEM_EXECUTABLE + " '" + tandemExecutable.getPath() + "' "
+					+ "--" + INPUT_FILE + " '" + packet.getInputFile().getPath() + "' "
+					+ "--" + OUTPUT_FILE + " '" + packet.getOutputFile().getPath() + "' "
+					+ "--" + SEARCH_PARAMS_FILE + " '" + packet.getSearchParamsFile().getPath() + "' "
+					+ "--" + DATABASE_FILE + " '" + packet.getDatabaseFile().getPath() + "' "
+					+ "--" + WORK_FOLDER + " '" + packet.getWorkFolder().getPath() + "' ");
 			checkPacketCorrectness(packet);
 
 			FileUtilities.ensureFolderExists(packet.getWorkFolder());
