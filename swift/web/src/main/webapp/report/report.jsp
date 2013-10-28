@@ -13,7 +13,7 @@
 <!--[if IE]>
 <style type="text/css">
     .opacityZero {
-        filter: alpha(opacity = 0);
+        filter: alpha(opacity=0);
     }
 </style>
 <![endif]-->
@@ -34,7 +34,7 @@
 <script type="text/javascript" src="visualizers.js"></script>
 <script type="text/javascript" src="filters.js"></script>
 <script type="text/javascript">
-    window.test = ({ total : 0 });
+    window.test = ({ total: 0 });
 </script>
 
 <script type="text/javascript">
@@ -52,7 +52,7 @@
     function SimpleArrayDisplayer(array, parentElement, id, itemVisualizer) {
         this.array = array;
         var myself = this;
-        this.array.onchange = function() {
+        this.array.onchange = function () {
             myself.update();
         };
         this.parentElement = parentElement;
@@ -60,7 +60,7 @@
         this.itemVisualizer = itemVisualizer;
     }
 
-    SimpleArrayDisplayer.prototype.render = function() {
+    SimpleArrayDisplayer.prototype.render = function () {
         for (var i = 0; i < this.array.total; i++) {
             var item = this.array.getItemById(i);
             var element = this.itemVisualizer.render(this.id + "_" + i, item, 'tbody');
@@ -68,12 +68,12 @@
         }
     };
 
-    SimpleArrayDisplayer.prototype.update = function() {
+    SimpleArrayDisplayer.prototype.update = function () {
         removeChildrenExcept(this.parentElement, /noRemove/i);
         this.render();
     };
 
-    SimpleArrayDisplayer.prototype.listExpandedItems = function() {
+    SimpleArrayDisplayer.prototype.listExpandedItems = function () {
         var list = "";
         for (var i = 0; i < this.array.total; i++) {
             var item = this.array.getItemById(i);
@@ -99,34 +99,34 @@
         title.addTextBox("filter", "where")
         title.addSeparator();
         title.addOkCancel();
-        title.onSubmitCallback = function() {
+        title.onSubmitCallback = function () {
             title.saveToCookies();
             ajaxRequest('load');
         };
 
         $('popups').appendChild(title.getRoot());
 
-    <%
-    SwiftWebContext.getWebUi().getSwiftDao().begin();
-    final StringBuilder userList=new StringBuilder();
-    final StringBuilder idList = new StringBuilder();
-    try {
-       final List<User> userInfos = SwiftWebContext.getWebUi().getWorkspaceDao().getUsers(false);
-       if (userInfos != null) {
-           for (final User userInfo : userInfos) {
-               if(userList.length()>0) {
-                   userList.append(",");
-                   idList.append(",");
+        <%
+        SwiftWebContext.getWebUi().getSwiftDao().begin();
+        final StringBuilder userList=new StringBuilder();
+        final StringBuilder idList = new StringBuilder();
+        try {
+           final List<User> userInfos = SwiftWebContext.getWebUi().getWorkspaceDao().getUsers(false);
+           if (userInfos != null) {
+               for (final User userInfo : userInfos) {
+                   if(userList.length()>0) {
+                       userList.append(",");
+                       idList.append(",");
+                   }
+                   userList.append("'").append(StringUtilities.toUnicodeEscapeString(JsonWriter.escapeSingleQuoteJavascript(userInfo.getFirstName()))).append(' ').append(StringUtilities.toUnicodeEscapeString(JsonWriter.escapeSingleQuoteJavascript(userInfo.getLastName()))).append("'");
+                   idList.append("'").append(JsonWriter.escapeSingleQuoteJavascript(String.valueOf(userInfo.getId()))).append("'");
                }
-               userList.append("'").append(StringUtilities.toUnicodeEscapeString(JsonWriter.escapeSingleQuoteJavascript(userInfo.getFirstName()))).append(' ').append(StringUtilities.toUnicodeEscapeString(JsonWriter.escapeSingleQuoteJavascript(userInfo.getLastName()))).append("'");
-               idList.append("'").append(JsonWriter.escapeSingleQuoteJavascript(String.valueOf(userInfo.getId()))).append("'");
            }
-       }
-       SwiftWebContext.getWebUi().getSwiftDao().commit();
-    } catch(Exception ignore) {
-        SwiftWebContext.getWebUi().getSwiftDao().rollback();
-    }
-%>
+           SwiftWebContext.getWebUi().getSwiftDao().commit();
+        } catch(Exception ignore) {
+            SwiftWebContext.getWebUi().getSwiftDao().rollback();
+        }
+    %>
         user = new FilterDropDown("user");
         user.addRadioButtons("sort", "order", ["Sort A to Z", "Sort Z to A", "Sort by submission time"], ["1", "-1", "0"], 2);
         user.addSeparator();
@@ -134,7 +134,7 @@
         user.addCheckboxes("filter", "where", [<%=userList.toString()%>], [<%=idList.toString()%>], true);
         user.addSeparator();
         user.addOkCancel();
-        user.onSubmitCallback = function() {
+        user.onSubmitCallback = function () {
             user.saveToCookies();
             ajaxRequest('load');
         };
@@ -192,9 +192,9 @@
                 start: firstEntry,
                 count: listedEntries,
                 expanded: displayer.listExpandedItems(),
-                timestamp : window.timestamp,
+                timestamp: window.timestamp,
                 userfilter: user.getRequestString(),
-                titlefilter : title.getRequestString(),
+                titlefilter: title.getRequestString(),
                 showHidden: showHidden
             }
         });
@@ -211,7 +211,7 @@
     var showHidden = queries['showHidden'] == null ? 0 : queries['showHidden'];
     var displayer;
 
-    Event.observe(window, 'load', function() {
+    Event.observe(window, 'load', function () {
 
         window.root = turnIntoSparseArray(window.test, true);
         var reportTable = document.getElementById("reportTable");
@@ -233,7 +233,9 @@
 
         ajaxRequest('load');
 
-        periodicalUpdate = new PeriodicalExecuter(function(pe) { ajaxRequest('update'); }, updateDelay);
+        periodicalUpdate = new PeriodicalExecuter(function (pe) {
+            ajaxRequest('update');
+        }, updateDelay);
 
     });
 </script>
@@ -264,11 +266,15 @@
     </table>
     <div id="navigation">
         <script type="text/javascript">
-            if (firstEntry > 0) {
-                document.write('<a class="first" href="?start=0" title="Go to the first search">&lt;&lt;&lt First</a>&nbsp;');
-                document.write('<a class="prev" href="?start=' + (Number(firstEntry) - Number(listedEntries)) + '" title="Go to previous page">&lt; Prev</a>&nbsp;');
+            hiddenStr = ""
+            if (showHidden) {
+                hiddenStr = "&showHidden=true"
             }
-            document.write('<a class="next" href="?start=' + (Number(firstEntry) + Number(listedEntries)) + '" title="Go to next page">&gt;&gt;&lt Next</a>&nbsp;');
+            if (firstEntry > 0) {
+                document.write('<a class="first" href="?start=0' + hiddenStr + '" title="Go to the first search">&lt;&lt;&lt First</a>&nbsp;');
+                document.write('<a class="prev" href="?start=' + (Number(firstEntry) - Number(listedEntries)) + hiddenStr + '" title="Go to previous page">&lt; Prev</a>&nbsp;');
+            }
+            document.write('<a class="next" href="?start=' + (Number(firstEntry) + Number(listedEntries)) + hiddenStr + '" title="Go to next page">&gt;&gt;&lt Next</a>&nbsp;');
         </script>
     </div>
 </div>
