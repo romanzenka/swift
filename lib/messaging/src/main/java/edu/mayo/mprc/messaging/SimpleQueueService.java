@@ -60,7 +60,7 @@ final class SimpleQueueService implements Service {
 
 			requestDestination = sendingSession().createQueue(queueName);
 
-			LOGGER.info("Connected to JMS broker: " + connection.getClientID() + " queue: " + queueName);
+			LOGGER.debug("Connected to JMS broker: " + connection.getClientID() + " queue: " + queueName);
 		} catch (JMSException e) {
 			throw new MprcException("Queue could not be created", e);
 		}
