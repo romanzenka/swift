@@ -126,7 +126,7 @@ public final class GridRunner extends AbstractRunner {
 
 	@Override
 	public void check() {
-		// Not implemented yet
+		// TODO: We will need to submit a 'checking packet' to the grid and collect response
 	}
 
 	void reportTaskData(final DaemonRequest request, final AssignedTaskData data) {
