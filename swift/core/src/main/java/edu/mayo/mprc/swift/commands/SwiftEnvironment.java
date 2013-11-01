@@ -79,6 +79,7 @@ public interface SwiftEnvironment extends RunningApplicationContext {
 
 	/**
 	 * Shortcut method for obtaining the one Swift searcher. Fails if none or more are defined.
+	 *
 	 * @return Configuration for the Swift Searcher (core Swift module).
 	 */
 	SwiftSearcher.Config getSwiftSearcher();
@@ -90,7 +91,15 @@ public interface SwiftEnvironment extends RunningApplicationContext {
 
 	/**
 	 * Creates a Swift monitor instance on demand (returns an existing one if one exists).
+	 *
 	 * @return Swift monitor (periodically pings all daemon services, captures their responses in a status report).
 	 */
 	SwiftMonitor getMonitor();
+
+	/**
+	 * Register an additional command.
+	 *
+	 * @param command Command to be added to the list
+	 */
+	void registerCommand(SwiftCommand command);
 }

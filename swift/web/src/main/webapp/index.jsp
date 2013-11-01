@@ -1,10 +1,10 @@
 <%@ page import="edu.mayo.mprc.ReleaseInfoCore" %>
-<%@ page import="edu.mayo.mprc.ServletIntialization" %>
+<%@ page import="edu.mayo.mprc.ServletInitialization" %>
 <%@ page import="edu.mayo.mprc.swift.SwiftWebContext" %>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
-    <% if (ServletIntialization.redirectToConfig(getServletConfig(), response)) {
+    <% if (ServletInitialization.redirectToConfig(getServletConfig(), response)) {
         return;
     } %>
     <title>Swift - search using multiple engines</title>
@@ -65,11 +65,12 @@
             font-size: 60px;
         }
 
-        /* CSS code */
+            /* CSS code */
 
         .reflected {
             position: relative;
         }
+
         .reflected:before, .reflected:after {
             display: block;
             position: absolute;
@@ -77,6 +78,7 @@
             left: 0;
             right: 0;
         }
+
         .reflected:before {
             content: '<%=SwiftWebContext.getWebUi().getTitle()%>';
             opacity: .3;
@@ -85,11 +87,12 @@
             -moz-transform: scaleY(-1);
             -o-transform: scaleY(-1);
         }
+
         .reflected:after {
             /* Fading using CSS gradient */
             /* Don't forget to change the colors to your background color */
-            background: -webkit-gradient(linear, left top, left center, from(rgba(255,255,255,0)), to(rgb(255,255,255)));
-            background: -moz-linear-gradient(top, rgba(255,255,255,0), rgb(255,255,255));
+            background: -webkit-gradient(linear, left top, left center, from(rgba(255, 255, 255, 0)), to(rgb(255, 255, 255)));
+            background: -moz-linear-gradient(top, rgba(255, 255, 255, 0), rgb(255, 255, 255));
             /* I left out the `filter` property,
                because IE doesn't know `:before` and `:after` pseudo-elements anyway */
             content: ' ';
@@ -108,14 +111,15 @@
     </ul>
 </div>
 <div id="content">
-    <% ServletIntialization.initServletConfiguration(getServletConfig()); %>
+    <% ServletInitialization.initServletConfiguration(getServletConfig()); %>
     <% if (SwiftWebContext.getWebUi().getUserMessage().messageDefined()) { %>
     <div class="user-message">
         <%=SwiftWebContext.getWebUi().getUserMessage().getMessage()%>
     </div>
     <% } %>
     <div style="height: 130px; overflow: hidden">
-        <h1 style="text-align: center;" class="logo reflected"><%=SwiftWebContext.getWebUi().getTitle()%></h1>
+        <h1 style="text-align: center;" class="logo reflected"><%=SwiftWebContext.getWebUi().getTitle()%>
+        </h1>
     </div>
 
     <p>Search multiple tandem mass spec. datafiles using <b>multiple search engines at once</b>: Mascot, Sequest,

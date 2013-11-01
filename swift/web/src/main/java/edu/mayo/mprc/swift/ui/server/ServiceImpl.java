@@ -2,7 +2,6 @@ package edu.mayo.mprc.swift.ui.server;
 
 import edu.mayo.mprc.GWTServiceExceptionFactory;
 import edu.mayo.mprc.MprcException;
-import edu.mayo.mprc.ServletIntialization;
 import edu.mayo.mprc.common.client.GWTServiceException;
 import edu.mayo.mprc.common.server.SpringGwtServlet;
 import edu.mayo.mprc.daemon.DaemonConnection;
@@ -756,7 +755,6 @@ public final class ServiceImpl extends SpringGwtServlet implements Service, Appl
 	@Override
 	public void init(final ServletConfig config) throws ServletException {
 		super.init(config);
-		ServletIntialization.initServletConfiguration(config);
 	}
 
 	private class Resolver implements ClientParamSetResolver {

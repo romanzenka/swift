@@ -288,6 +288,11 @@ public final class SwiftEnvironmentImpl implements SwiftEnvironment {
 		return monitor;
 	}
 
+	@Override
+	public void registerCommand(SwiftCommand command) {
+		commands.add(command);
+	}
+
 	@Resource(name = "swiftMonitor")
 	public void setMonitor(final SwiftMonitor monitor) {
 		this.monitor = monitor;
