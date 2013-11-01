@@ -244,7 +244,7 @@ public final class MsconvertWorker extends WorkerBase {
 			throw new MprcException("msaccess not executable: " + getMsaccessExecutable().getAbsolutePath());
 		}
 		if (!getMsconvertExecutable().canExecute()) {
-			throw new MprcException("msaccess not executable: " + getMsconvertExecutable().getAbsolutePath());
+			throw new MprcException("msconvert not executable: " + getMsconvertExecutable().getAbsolutePath());
 		}
 	}
 
