@@ -11,6 +11,7 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.PrintWriter;
 
 /**
@@ -27,16 +28,30 @@ public final class ReformatConfig implements SwiftCommand {
 
 	@Override
 	public String getDescription() {
-		return "Reformat a configuration file, write result to the screen";
+		return "Reformat a configuration file, write result to the screen or another file";
 	}
 
 	@Override
 	public ExitCode run(final SwiftEnvironment environment) {
-		if (environment.getParameters().size() != 1) {
-			throw new MprcException("Missing path to configuration file.\nUsage: swift --run reformat-config <file>");
+		if (environment.getParameters().size() < 1) {
+			throw new MprcException("Missing path to configuration file.\nUsage: reformat-config <config> [<result>]");
 		}
 
 		final File file = new File(environment.getParameters().get(0));
+
+		final PrintWriter printWriter;
+		if (environment.getParameters().size() >= 2) {
+			String pathname = environment.getParameters().get(1);
+			try {
+				printWriter = new PrintWriter(new File(pathname));
+			} catch (FileNotFoundException e) {
+				FileUtilities.err("Could not open file for writing: " + pathname + "\n" + MprcException.getDetailedMessage(e));
+				return ExitCode.Error;
+			}
+		} else {
+			printWriter = new PrintWriter(System.out);
+		}
+
 		final AppConfigReader reader = new AppConfigReader(file, getFactory());
 		final ApplicationConfig config;
 		try {
@@ -46,7 +61,7 @@ public final class ReformatConfig implements SwiftCommand {
 		}
 
 		AppConfigWriter writer = null;
-		PrintWriter printWriter = new PrintWriter(System.out);
+
 		try {
 			writer = new AppConfigWriter(printWriter, getFactory());
 			writer.save(config);
