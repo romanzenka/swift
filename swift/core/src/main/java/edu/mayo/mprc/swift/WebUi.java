@@ -27,7 +27,7 @@ import java.util.List;
 /**
  * A class holding information about WebUI configuration.
  */
-public final class WebUi {
+public final class WebUi implements Checkable {
 	public static final String TYPE = "webUi";
 	public static final String NAME = "Swift Website";
 	public static final String DESC = "Swift's web user interface.<p>The daemon that contains the web interface will run within a web server.</p>";
@@ -186,6 +186,19 @@ public final class WebUi {
 	public void stopSwiftMonitor() {
 		if (getSwiftMonitor() != null) {
 			getSwiftMonitor().stop();
+		}
+	}
+
+	@Override
+	public void check() {
+		if (browseRoot == null) {
+			throw new MprcException(BROWSE_ROOT + " must be set");
+		}
+		if (!browseRoot.isDirectory()) {
+			throw new MprcException(BROWSE_ROOT + " must refer to a directory");
+		}
+		if (!browseRoot.canRead()) {
+			throw new MprcException(BROWSE_ROOT + " must be readable");
 		}
 	}
 

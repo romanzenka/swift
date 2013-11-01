@@ -19,7 +19,7 @@ import java.util.List;
 /**
  * A daemon - collection of multiple runners that provide services.
  */
-public final class Daemon {
+public final class Daemon implements Checkable {
 	private static final Logger LOGGER = Logger.getLogger(Daemon.class);
 
 	private List<AbstractRunner> runners;
@@ -82,8 +82,18 @@ public final class Daemon {
 	/**
 	 * Check all workers defined in this daemon
 	 */
+	@Override
 	public void check() {
 		final CompositeException exception = new CompositeException();
+		for (final Object resource : resources) {
+			try {
+				if (resource instanceof Checkable) {
+					((Checkable) resource).check();
+				}
+			} catch (Exception e) {
+				exception.addCause(e);
+			}
+		}
 		for (final AbstractRunner runner : runners) {
 			try {
 				runner.check();

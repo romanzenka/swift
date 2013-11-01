@@ -1,8 +1,9 @@
 package edu.mayo.mprc.daemon;
 
+import edu.mayo.mprc.config.Checkable;
 import edu.mayo.mprc.utilities.progress.ProgressReporter;
 
-public interface Worker {
+public interface Worker extends Checkable {
 
 	/**
 	 * Processes given request data.
