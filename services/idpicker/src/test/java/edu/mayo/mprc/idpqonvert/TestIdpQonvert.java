@@ -32,14 +32,8 @@ public final class TestIdpQonvert {
 	@BeforeClass
 	public void startup() {
 		if (FileUtilities.isLinuxPlatform() || FileUtilities.isWindowsPlatform()) {
-			final String path = System.getenv("edu_mayo_mprc_swift_idpqonvert_path");
-			if (path == null) {
-				throw new MprcException("Skipping IdpQonvert tests");
-			}
-			idpQonvert = new File(path).getAbsoluteFile();
-			if (!idpQonvert.isFile() || !idpQonvert.canExecute()) {
-				throw new MprcException("Cannot execute idpqonvert: [" + idpQonvert.getAbsolutePath() + "]");
-			}
+			idpQonvert = Installer.getExecutable("SWIFT_TEST_IDPQONVERT_EXECUTABLE", "idpqonvert executable");
+			idpQonvert = idpQonvert.getAbsoluteFile();
 
 			tmpFolder = FileUtilities.createTempFolder();
 			final File pepXmlFolder = Installer.pepXmlFiles(tmpFolder, Installer.Action.INSTALL);
