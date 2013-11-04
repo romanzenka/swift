@@ -50,7 +50,7 @@ public class TestOmssaWorker {
 	public void runOmssaDeployer() {
 
 		final String executableName = FileUtilities.isWindowsPlatform() ? "formatdb.exe" : "formatdb";
-		final File formatdbFolder = Installer.getDirectory("SWIFT_TEST_FORMAT_DB", executableName + " for OMSSA database indexing");
+		final File formatdbFolder = Installer.getDirectory("SWIFT_TEST_FORMAT_DB_FOLDER", executableName + " for OMSSA database indexing");
 		final File yeastFolder = Installer.yeastFastaFiles(null, Installer.Action.INSTALL);
 
 		try {

@@ -32,7 +32,7 @@ public final class TestIdpQonvert {
 	@BeforeClass
 	public void startup() {
 		if (FileUtilities.isLinuxPlatform() || FileUtilities.isWindowsPlatform()) {
-			idpQonvert = Installer.getExecutable("SWIFT_TEST_IDPQONVERT_EXECUTABLE", "idpqonvert executable");
+			idpQonvert = Installer.getExecutable("SWIFT_TEST_IDPQONVERT", "idpqonvert executable");
 			idpQonvert = idpQonvert.getAbsoluteFile();
 
 			tmpFolder = FileUtilities.createTempFolder();
