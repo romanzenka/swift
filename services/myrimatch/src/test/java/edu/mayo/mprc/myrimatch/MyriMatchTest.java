@@ -205,104 +205,100 @@ public final class MyriMatchTest {
 	@Test
 	public void shouldRunSearch() throws IOException, InterruptedException {
 		final File myrimatchExecutable = getMyriMatchExecutable();
+		final File tempFolder = FileUtilities.createTempFolder();
+
+		final MyriMatchMappings mappings = createMappings();
+		final MappingContext mappingContext = createMappingContext();
+		mappings.setProtease(mappingContext, new Protease("Trypsin (allow P)", "KR", ""));
+		mappings.setMissedCleavages(mappingContext, 2);
+
+		final File configFile = new File(tempFolder, "myrimatch.cfg");
+		final FileWriter writer = new FileWriter(configFile);
 		try {
-			final File tempFolder = FileUtilities.createTempFolder();
+			mappings.write(mappings.baseSettings(), writer);
+		} finally {
+			FileUtilities.closeQuietly(writer);
+		}
 
-			final MyriMatchMappings mappings = createMappings();
-			final MappingContext mappingContext = createMappingContext();
-			mappings.setProtease(mappingContext, new Protease("Trypsin (allow P)", "KR", ""));
-			mappings.setMissedCleavages(mappingContext, 2);
+		final File fastaFile =
+				TestingUtilities.getTempFileFromResource(MyriMatchTest.class, "/edu/mayo/mprc/myrimatch/database.fasta", false, tempFolder, ".fasta");
+		final File mgfFile =
+				TestingUtilities.getTempFileFromResource(MyriMatchTest.class, "/edu/mayo/mprc/myrimatch/test.mgf", false, tempFolder, ".mgf");
 
-			final File configFile = new File(tempFolder, "myrimatch.cfg");
-			final FileWriter writer = new FileWriter(configFile);
-			try {
-				mappings.write(mappings.baseSettings(), writer);
-			} finally {
-				FileUtilities.closeQuietly(writer);
-			}
+		final File resultFile = new File(tempFolder, "result.pepXML");
 
-			final File fastaFile =
-					TestingUtilities.getTempFileFromResource(MyriMatchTest.class, "/edu/mayo/mprc/myrimatch/database.fasta", false, tempFolder, ".fasta");
-			final File mgfFile =
-					TestingUtilities.getTempFileFromResource(MyriMatchTest.class, "/edu/mayo/mprc/myrimatch/test.mgf", false, tempFolder, ".mgf");
+		final MyriMatchWorkPacket work = new MyriMatchWorkPacket(resultFile, configFile, mgfFile, tempFolder, fastaFile, "Rev_", false, "Test MyriMatch run", false);
 
-			final File resultFile = new File(tempFolder, "result.pepXML");
+		final MyriMatchWorker worker = new MyriMatchWorker(myrimatchExecutable);
 
-			final MyriMatchWorkPacket work = new MyriMatchWorkPacket(resultFile, configFile, mgfFile, tempFolder, fastaFile, "Rev_", false, "Test MyriMatch run", false);
+		final DaemonWorkerTester tester = new DaemonWorkerTester(worker);
+		try {
 
-			final MyriMatchWorker worker = new MyriMatchWorker(myrimatchExecutable);
-
-			final DaemonWorkerTester tester = new DaemonWorkerTester(worker);
-			try {
-
-				final Object workToken = tester.sendWork(work, new ProgressListener() {
-					@Override
-					public void requestEnqueued(final String hostString) {
-						LOGGER.debug("Enqueued MyriMatch request: " + hostString);
-					}
-
-					@Override
-					public void requestProcessingStarted(final String hostString) {
-						LOGGER.debug("Starting to process MyriMatch request: " + hostString);
-					}
-
-					@Override
-					public void requestProcessingFinished() {
-						LOGGER.debug("MyriMatch request processing finished");
-					}
-
-					@Override
-					public void requestTerminated(final Exception e) {
-						LOGGER.error("MyriMatch request terminated", e);
-						Assert.fail("MyriMatch failed", e);
-					}
-
-					@Override
-					public void userProgressInformation(final ProgressInfo progressInfo) {
-						LOGGER.debug("MyriMatch progress: " + progressInfo.toString());
-					}
-				});
-
-				while (true) {
-					synchronized (workToken) {
-						if (tester.isDone(workToken)) {
-							break;
-						}
-						workToken.wait(100);
-					}
+			final Object workToken = tester.sendWork(work, new ProgressListener() {
+				@Override
+				public void requestEnqueued(final String hostString) {
+					LOGGER.debug("Enqueued MyriMatch request: " + hostString);
 				}
 
-				Assert.assertTrue(resultFile.exists() && resultFile.isFile() && resultFile.length() > 0, "MyriMatch did not produce valid result file");
-				String resultString = Files.toString(resultFile, CHARSET);
-				resultString = replace(resultString, fastaFile.getAbsolutePath(), "$$DB$$");
-				resultString = replace(resultString, work.getWorkFolder().getAbsolutePath(), "$$WORK_DIR$$");
-				resultString = replace(resultString, FileUtilities.stripExtension(mgfFile.getName()), "$$BASE$$");
-				resultString = replace(resultString, "9.9999999999999995e-008", "9.9999999999999995e-08");
-				resultString = replaceTime(resultString, "date=");
-				resultString = replaceTime(resultString, "time=");
-				resultString = replaceTime(resultString, "SearchTime: Duration\" value=");
-				resultString = replaceTime(resultString, "SearchTime: Started\" value=");
-				resultString = replaceTime(resultString, "SearchTime: Stopped\" value=");
-				resultString = replaceLongFloats(resultString);
+				@Override
+				public void requestProcessingStarted(final String hostString) {
+					LOGGER.debug("Starting to process MyriMatch request: " + hostString);
+				}
 
+				@Override
+				public void requestProcessingFinished() {
+					LOGGER.debug("MyriMatch request processing finished");
+				}
 
-				final URL resource = Resources.getResource(MyriMatchTest.class, "result.pepXML");
-				String expectedString = Resources.toString(resource, CHARSET);
-				expectedString = expectedString.replaceAll("\r\n", "\n");
+				@Override
+				public void requestTerminated(final Exception e) {
+					LOGGER.error("MyriMatch request terminated", e);
+					Assert.fail("MyriMatch failed", e);
+				}
 
-				FileUtilities.cleanupTempFile(configFile);
-				FileUtilities.cleanupTempFile(fastaFile);
-				FileUtilities.cleanupTempFile(resultFile);
-				FileUtilities.cleanupTempFile(new File(tempFolder, fastaFile.getName() + ".index"));
-				FileUtilities.cleanupTempFile(mgfFile);
-				FileUtilities.cleanupTempFile(tempFolder);
+				@Override
+				public void userProgressInformation(final ProgressInfo progressInfo) {
+					LOGGER.debug("MyriMatch progress: " + progressInfo.toString());
+				}
+			});
 
-				Assert.assertEquals(resultString, expectedString, "The MyriMatch results do not match expected ones");
-			} finally {
-				tester.close();
+			while (true) {
+				synchronized (workToken) {
+					if (tester.isDone(workToken)) {
+						break;
+					}
+					workToken.wait(100);
+				}
 			}
+
+			Assert.assertTrue(resultFile.exists() && resultFile.isFile() && resultFile.length() > 0, "MyriMatch did not produce valid result file");
+			String resultString = Files.toString(resultFile, CHARSET);
+			resultString = replace(resultString, fastaFile.getAbsolutePath(), "$$DB$$");
+			resultString = replace(resultString, work.getWorkFolder().getAbsolutePath(), "$$WORK_DIR$$");
+			resultString = replace(resultString, FileUtilities.stripExtension(mgfFile.getName()), "$$BASE$$");
+			resultString = replace(resultString, "9.9999999999999995e-008", "9.9999999999999995e-08");
+			resultString = replaceTime(resultString, "date=");
+			resultString = replaceTime(resultString, "time=");
+			resultString = replaceTime(resultString, "SearchTime: Duration\" value=");
+			resultString = replaceTime(resultString, "SearchTime: Started\" value=");
+			resultString = replaceTime(resultString, "SearchTime: Stopped\" value=");
+			resultString = replaceLongFloats(resultString);
+
+
+			final URL resource = Resources.getResource(MyriMatchTest.class, "result.pepXML");
+			String expectedString = Resources.toString(resource, CHARSET);
+			expectedString = expectedString.replaceAll("\r\n", "\n");
+
+			FileUtilities.cleanupTempFile(configFile);
+			FileUtilities.cleanupTempFile(fastaFile);
+			FileUtilities.cleanupTempFile(resultFile);
+			FileUtilities.cleanupTempFile(new File(tempFolder, fastaFile.getName() + ".index"));
+			FileUtilities.cleanupTempFile(mgfFile);
+			FileUtilities.cleanupTempFile(tempFolder);
+
+			Assert.assertEquals(resultString, expectedString, "The MyriMatch results do not match expected ones");
 		} finally {
-			Installer.myrimatch(myrimatchExecutable, Installer.Action.UNINSTALL);
+			tester.close();
 		}
 	}
 
@@ -340,7 +336,7 @@ public final class MyriMatchTest {
 	}
 
 	private File getMyriMatchExecutable() {
-		final File myrimatchExecutable = Installer.myrimatch(null, Installer.Action.INSTALL);
+		final File myrimatchExecutable = Installer.getExecutable("SWIFT_TEST_MYRIMATCH", "myrimatch executable");
 		Assert.assertTrue(myrimatchExecutable.exists(), "MyriMatch executable must exist");
 		Assert.assertTrue(myrimatchExecutable.isFile(), "MyriMatch executable must be a file");
 		Assert.assertTrue(myrimatchExecutable.canExecute(), "MyriMatch executable must be actually executable");

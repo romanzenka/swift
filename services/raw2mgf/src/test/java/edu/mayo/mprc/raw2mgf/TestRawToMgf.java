@@ -28,15 +28,15 @@ public class TestRawToMgf {
 
 	@BeforeClass()
 	public void setUp() throws IOException {
+		extractMsnFolder = Installer.getDirectory("SWIFT_TEST_EXTRACT_MSN_FOLDER", "extract_msn.exe and supporting files");
+
 		tempRootDir = FileUtilities.createTempFolder();
-		extractMsnFolder = Installer.extractMsn(null, Installer.Action.INSTALL);
 		unixXvfbWrapper = Installer.xvfbWrapper(null, Installer.Action.INSTALL);
 		rawFolder = Installer.rawFiles(null, Installer.Action.INSTALL);
 	}
 
 	@AfterClass
 	public void tearDown() {
-		Installer.extractMsn(extractMsnFolder, Installer.Action.UNINSTALL);
 		Installer.xvfbWrapper(unixXvfbWrapper, Installer.Action.UNINSTALL);
 		Installer.rawFiles(rawFolder, Installer.Action.UNINSTALL);
 	}

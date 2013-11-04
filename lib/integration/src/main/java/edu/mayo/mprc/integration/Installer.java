@@ -21,112 +21,57 @@ import java.util.List;
 public class Installer {
 	private static final String UNKNOWN_INSTALL_ACTION = "Unknown install action {0}";
 
+	/**
+	 * Obtain a directory corresponding to given environment variable name. Exception is thrown if the variable
+	 * is not set or if the variable points to nonexistent directory.
+	 *
+	 * @param envVar      Environment variable to read.
+	 * @param description Description of what the folder should contain.
+	 * @return The matching directory.
+	 */
+	public static File getDirectory(final String envVar, final String description) {
+		final String value = System.getenv(envVar);
+		if (value == null) {
+			throw new MprcException(MessageFormat.format("Cannot run test. Please set environment variable {0} to a folder with {1}", envVar, description));
+		}
+		final File directory = new File(value);
+		if (!directory.isDirectory()) {
+			throw new MprcException(MessageFormat.format("Cannot run test. The environment variable {0} points to {1}, which is not an existing folder", envVar, value));
+		}
+		if (!directory.canRead()) {
+			throw new MprcException(MessageFormat.format("Cannot run test. The environment variable {0} points to {1}, which is not a readable folder", envVar, value));
+		}
+		return directory;
+	}
+
+	/**
+	 * Obtain an executable file corresponding to given environment variable name. Exception is thrown if the variable
+	 * is not set or if the variable points to nonexistent/non-executable file.
+	 *
+	 * @param envVar      Environment variable to read.
+	 * @param description Description of the executable.
+	 * @return The matching executable
+	 */
+	public static File getExecutable(final String envVar, final String description) {
+		final String value = System.getenv(envVar);
+		if (value == null) {
+			throw new MprcException(MessageFormat.format("Cannot run test. Please set environment variable {0} to a folder with {1}", envVar, description));
+		}
+		final File directory = new File(value);
+		if (!directory.isDirectory()) {
+			throw new MprcException(MessageFormat.format("Cannot run test. The environment variable {0} points to {1}, which is not an existing folder", envVar, value));
+		}
+		if (!directory.canRead()) {
+			throw new MprcException(MessageFormat.format("Cannot run test. The environment variable {0} points to {1}, which is not a readable folder", envVar, value));
+		}
+		return directory;
+	}
+
+
 	public enum Action {
 		INSTALL,
 		UNINSTALL,
 	}
-
-	private static final List<String> EXTRACT_MSN_FILES = Arrays.asList(
-			"/extract_msn/extract_msn.exe",
-			"/extract_msn/Fileio.dll",
-			"/extract_msn/Fregistry.dll",
-			"/extract_msn/MFC42U.DLL",
-			"/extract_msn/MSVCP60.DLL",
-			"/extract_msn/readme.txt",
-			"/extract_msn/UnifiedFile.dll"
-	);
-
-	private static final List<String> OMSSA_LINUX = Arrays.asList(
-			"!/omssa/linux/omssacl",
-			"/omssa/linux/mods.xml",
-			"!/omssa/linux/mgf2omssa.pl"
-	);
-
-	private static final List<String> OMSSA_WINDOWS = Arrays.asList(
-			"/omssa/windows/omssacl.exe",
-			"/omssa/windows/mods.xml",
-			"/omssa/windows/msvcp80.dll",
-			"/omssa/windows/msvcr80.dll",
-			"/omssa/windows/OMSSA.xsd"
-	);
-
-	private static final List<String> FORMATDB_LINUX = Arrays.asList(
-			"!/formatdb/linux/formatdb"
-	);
-
-	private static final List<String> FORMATDB_WINDOWS = Arrays.asList(
-			"/formatdb/windows/formatdb.exe"
-	);
-
-	private static final List<String> TANDEM_LINUX = Arrays.asList(
-			"!/tandem/tandem-linux-10-12-01-1/bin/tandem.exe"
-	);
-
-	private static final List<String> TANDEM_WINDOWS = Arrays.asList(
-			"/tandem/tandem-win32-10-12-01-1/bin/tandem.exe"
-	);
-
-	private static final List<String> MSMSEVAL_WINDOWS = Arrays.asList(
-			"/win/cygexpat-0.dll",
-			"/win/cygwin1.dll",
-			"/win/msmsEval.exe"
-	);
-
-	private static final List<String> MSMSEVAL_LINUX = Arrays.asList(
-			"/linux_x86_64/msmsEval"
-	);
-
-	private static final String MYRIMATCH_EXE_WINDOWS = "myrimatch.exe";
-
-	private static final String MYRIMATCH_EXE_LINUX = "myrimatch";
-
-	private static final List<String> MYRIMATCH_WINDOWS = Arrays.asList(
-			"agtsampleinforw.dll",
-			"BaseCommon.dll",
-			"BaseDataAccess.dll",
-			"BaseError.dll",
-			"BaseTof.dll",
-			"BDal.CXt.Lc.dll",
-			"BDal.CXt.Lc.Factory.dll",
-			"BDal.CXt.Lc.Interfaces.dll",
-			"BDal.CXt.Lc.UntU2.dll",
-			"boost_date_time-vc80-mt-1_33_1-BDAL_20070424.dll",
-			"boost_regex-vc80-mt-1_33_1-BDAL_20070424.dll",
-			"boost_thread-vc80-mt-1_33_1-BDAL_20070424.dll",
-			"Clearcore2.Data.AnalystDataProvider.dll",
-			"Clearcore2.Data.CommonInterfaces.dll",
-			"Clearcore2.Data.dll",
-			"Clearcore2.Data.WiffReader.dll",
-			"Clearcore2.InternalRawXYProcessing.dll",
-			"Clearcore2.ProjectUtilities.dll",
-			"Clearcore2.StructuredStorage.dll",
-			"Clearcore2.Utility.dll",
-			"CompassXtractMS.dll",
-			"EULA.MHDAC",
-			"EULA.MSFileReader",
-			"fileio.dll",
-			"FlexVariableTable.xml",
-			"fregistry.dll",
-			"HSReadWrite.dll",
-			"ICRVariableTable.xml",
-			"Interop.DataExplorer.dll",
-			"Interop.EDAL.dll",
-			"Interop.EDAL.SxS.manifest",
-			"Interop.HSREADWRITELib.dll",
-			"Interop.HSREADWRITELib.SxS.manifest",
-			"libfftw3-3.dll",
-			"libfftw3f-3.dll",
-			"MassLynxRaw.dll",
-			"MassSpecDataReader.dll",
-			"MSFileReader.XRawfile2.dll",
-			"MSFileReader.XRawfile2.SxS.manifest",
-			MYRIMATCH_EXE_WINDOWS,
-			"NTB-vc80-mt-1_5_97.dll"
-	);
-
-	private static final List<String> MYRIMATCH_LINUX = Arrays.asList(
-			"!/myrimatch_2_1_87/linux/" + MYRIMATCH_EXE_LINUX
-	);
 
 	private static final String WRAPPER_SCRIPT = "unixXvfbWrapper.sh";
 
@@ -219,41 +164,6 @@ public class Installer {
 		}
 	}
 
-	/**
-	 * Install extract_msn in a given folder.
-	 *
-	 * @param folder Folder to install extract_msn into. If null, temp folder is created.
-	 * @param action {@link Action#INSTALL} to install or {@link Action#UNINSTALL} to uninstall
-	 * @return Folder where extract_msn got installed.
-	 */
-	public static File extractMsn(final File folder, final Action action) {
-		return processList(folder, "extract_msn", EXTRACT_MSN_FILES, action);
-	}
-
-	public static File omssa(final File folder, final Action action) {
-		return processList(folder, "omssa", FileUtilities.isWindowsPlatform() ? OMSSA_WINDOWS : OMSSA_LINUX, action);
-	}
-
-	public static File tandem(final File folder, final Action action) {
-		return processList(folder, "tandem", getTandemFiles(), action);
-	}
-
-	public static File myrimatch(final File folder, final Action action) {
-		final boolean win = FileUtilities.isWindowsPlatform();
-		return processSingleFile(folder, "myrimatch",
-				win ? MYRIMATCH_WINDOWS : MYRIMATCH_LINUX,
-				win ? MYRIMATCH_EXE_WINDOWS : MYRIMATCH_EXE_LINUX,
-				action);
-	}
-
-	public static File msmsEval(final File folder, final Action action) {
-		return processList(folder, "msmsEval", FileUtilities.isWindowsPlatform() ? MSMSEVAL_WINDOWS : MSMSEVAL_LINUX, action);
-	}
-
-	public static File formatDb(final File folder, final Action action) {
-		return processList(folder, "formatdb", FileUtilities.isWindowsPlatform() ? FORMATDB_WINDOWS : FORMATDB_LINUX, action);
-	}
-
 	public static File xvfbWrapper(final File folder, final Action action) {
 		return processSingleFile(folder, "util", UNIX_XVFB_WRAPPER, WRAPPER_SCRIPT, action);
 	}
@@ -276,13 +186,6 @@ public class Installer {
 
 	public static File pepXmlFiles(final File folder, final Action action) {
 		return processList(folder, "pepxml", PEPXML_FILES, action);
-	}
-
-	private static List<String> getTandemFiles() {
-		if (FileUtilities.isMacPlatform()) {
-			throw new MprcException("Tandem testing not supported on Mac OS X");
-		}
-		return FileUtilities.isWindowsPlatform() ? TANDEM_WINDOWS : TANDEM_LINUX;
 	}
 
 	private static File processSingleFile(final File folder, final String defaultFolder, final List<String> files, final String mainFile, final Action action) {

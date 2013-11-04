@@ -49,7 +49,8 @@ public class TestOmssaWorker {
 	@Test
 	public void runOmssaDeployer() {
 
-		final File formatdbFolder = Installer.formatDb(null, Installer.Action.INSTALL);
+		final String executableName = FileUtilities.isWindowsPlatform() ? "formatdb.exe" : "formatdb";
+		final File formatdbFolder = Installer.getDirectory("SWIFT_TEST_FORMAT_DB", executableName + " for OMSSA database indexing");
 		final File yeastFolder = Installer.yeastFastaFiles(null, Installer.Action.INSTALL);
 
 		try {
@@ -57,7 +58,7 @@ public class TestOmssaWorker {
 
 			omssaDeployedFile = new File(DATABASE_DEPLOYMENT_DIR, DATABASE_SHORT_NAME + "/" + fastaFile.getName());
 
-			final String formatdbPath = new File(formatdbFolder, FileUtilities.isWindowsPlatform() ? "formatdb.exe" : "formatdb").getAbsolutePath();
+			final String formatdbPath = new File(formatdbFolder, executableName).getAbsolutePath();
 			final OmssaDeploymentService.Config omssaConfig = new OmssaDeploymentService.Config();
 			omssaConfig.put(OmssaDeploymentService.FORMAT_DB_EXE, formatdbPath);
 			omssaConfig.put(OmssaDeploymentService.DEPLOYABLE_DB_FOLDER, omssaTemp.getAbsolutePath());
@@ -85,13 +86,12 @@ public class TestOmssaWorker {
 			throw new MprcException("Omssa deployment service test failed.", e);
 		} finally {
 			Installer.yeastFastaFiles(yeastFolder, Installer.Action.UNINSTALL);
-			Installer.formatDb(formatdbFolder, Installer.Action.UNINSTALL);
 		}
 	}
 
 	@Test(dependsOnMethods = {"runOmssaDeployer"})
 	public void runOmssaWorker() throws IOException {
-		final File omssaFolder = Installer.omssa(null, Installer.Action.INSTALL);
+		final File omssaFolder = Installer.getDirectory("SWIFT_TEST_OMSSA_FOLDER", "omssacl/omssacl.exe");
 		final File mgfFolder = Installer.mgfFiles(null, Installer.Action.INSTALL);
 		try {
 			final File omssaOut = new File(omssaTemp, "omssa.out");
@@ -141,7 +141,6 @@ public class TestOmssaWorker {
 				}
 			});
 		} finally {
-			Installer.omssa(omssaFolder, Installer.Action.UNINSTALL);
 			Installer.mgfFiles(mgfFolder, Installer.Action.UNINSTALL);
 		}
 	}

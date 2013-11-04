@@ -43,12 +43,12 @@ public class TestTandem {
 
 	@BeforeClass()
 	public void setup() throws IOException {
+		tandemInstallFolder = Installer.getDirectory("SWIFT_TEST_TANDEM", "tandem.exe");
 		tempRootDir = FileUtilities.createTempFolder();
 		inputMgfFolder = Installer.mgfFiles(null, Installer.Action.INSTALL);
 		inputMgfFile = new File(inputMgfFolder, "test.mgf");
 		fastaFolder = Installer.yeastFastaFiles(null, Installer.Action.INSTALL);
 		fastaFile = new File(fastaFolder, DATABASE_SHORT_NAME + ".fasta");
-		tandemInstallFolder = Installer.tandem(null, Installer.Action.INSTALL);
 	}
 
 	@AfterClass()
@@ -56,9 +56,6 @@ public class TestTandem {
 		FileUtilities.cleanupTempFile(tempRootDir);
 		Installer.mgfFiles(inputMgfFolder, Installer.Action.UNINSTALL);
 		Installer.yeastFastaFiles(fastaFolder, Installer.Action.UNINSTALL);
-		if (tandemInstallFolder != null) {
-			Installer.tandem(tandemInstallFolder, Installer.Action.UNINSTALL);
-		}
 	}
 
 	@Test
