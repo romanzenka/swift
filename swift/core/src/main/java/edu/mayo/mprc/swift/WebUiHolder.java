@@ -7,7 +7,7 @@ import edu.mayo.mprc.utilities.exceptions.ExceptionUtilities;
 /**
  * @author Roman Zenka
  */
-public final class WebUiHolder {
+public class WebUiHolder {
 	private RunningApplicationContext context;
 
 	public WebUi getWebUi() {

@@ -83,6 +83,10 @@ public final class WebUi implements Checkable {
 		}
 	}
 
+	public void setBrowseRoot(File browseRoot) {
+		this.browseRoot = browseRoot;
+	}
+
 	/**
 	 * Turn a given file to a link that can be sent to the user over the web.
 	 * Caveats:  We naively assume the file is linkable at the moment.
