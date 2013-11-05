@@ -134,10 +134,11 @@ public class Installer {
 		return folder;
 	}
 
-	private static File folderOrDefault(File folder, final String defaultFolder) {
+	private static File folderOrDefault(final File folder, final String defaultFolder) {
 		if (folder == null) {
-			folder = FileUtilities.createTempFolder(null, defaultFolder, true);
+			return FileUtilities.createTempFolder(null, defaultFolder, true);
 		}
+		FileUtilities.ensureFileExists(folder);
 		return folder;
 	}
 
