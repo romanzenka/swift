@@ -895,7 +895,7 @@ public final class TestSequestSubmission {
 	}
 
 	private String getSequestExe() {
-		return null;//TestApplicationContext.getSequestCommand().getAbsolutePath();
+		return "sequest27_master";
 	}
 
 
