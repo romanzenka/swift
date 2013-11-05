@@ -28,6 +28,8 @@ public final class TestIdpQonvert {
 	private File pepXmlFile;
 	private File fastaFile;
 	private File outputFile;
+	private File pepXmlFolder;
+	private File fastaFolder;
 
 	@BeforeClass
 	public void startup() {
@@ -36,8 +38,8 @@ public final class TestIdpQonvert {
 			idpQonvert = idpQonvert.getAbsoluteFile();
 
 			tmpFolder = FileUtilities.createTempFolder();
-			final File pepXmlFolder = Installer.pepXmlFiles(new File(tmpFolder, "pepXML"), Installer.Action.INSTALL);
-			final File fastaFolder = Installer.yeastFastaFiles(new File(tmpFolder, "fasta"), Installer.Action.INSTALL);
+			pepXmlFolder = Installer.pepXmlFiles(new File(tmpFolder, "pepXML"), Installer.Action.INSTALL);
+			fastaFolder = Installer.yeastFastaFiles(new File(tmpFolder, "fasta"), Installer.Action.INSTALL);
 			pepXmlFile = new File(pepXmlFolder, "test.pepXML");
 			fastaFile = new File(fastaFolder, "SprotYeast.fasta");
 			if (!pepXmlFile.isFile()) {
@@ -49,9 +51,9 @@ public final class TestIdpQonvert {
 	@AfterClass
 	public void teardown() {
 		if (FileUtilities.isLinuxPlatform() || FileUtilities.isWindowsPlatform()) {
-			FileUtilities.cleanupTempFile(new File(tmpFolder, "SprotYeast.fasta.index"));
-			Installer.pepXmlFiles(tmpFolder, Installer.Action.UNINSTALL);
-			Installer.yeastFastaFiles(tmpFolder, Installer.Action.UNINSTALL);
+			FileUtilities.cleanupTempFile(new File(fastaFolder, "SprotYeast.fasta.index"));
+			Installer.pepXmlFiles(pepXmlFolder, Installer.Action.UNINSTALL);
+			Installer.yeastFastaFiles(fastaFolder, Installer.Action.UNINSTALL);
 			FileUtilities.cleanupTempFile(outputFile);
 			FileUtilities.cleanupTempFile(tmpFolder);
 		}
