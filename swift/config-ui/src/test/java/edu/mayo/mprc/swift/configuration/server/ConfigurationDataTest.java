@@ -28,7 +28,7 @@ public final class ConfigurationDataTest {
 
 	@BeforeClass
 	public static void setup() throws GWTServiceException {
-		data = new ConfigurationData((ResourceTable)MainFactoryContext.getContext().getBean("resourceTable"));
+		data = new ConfigurationData((ResourceTable) MainFactoryContext.getContext().getBean("resourceTable"));
 		data.loadDefaultConfig();
 	}
 
@@ -50,7 +50,15 @@ public final class ConfigurationDataTest {
 		final ResourceModel swiftModule = daemon.getChildren().get(0);
 		Assert.assertEquals(swiftModule.getProperty("fastaPath"), "var/fasta", "The default value has to be set");
 
-		final ResourceConfig databaseConfig = getMainDaemon().getResources().get(0);
+		final List<ResourceConfig> resources = getMainDaemon().getResources();
+		ResourceConfig databaseConfig = null;
+		for (final ResourceConfig resourceConfig : resources) {
+			if (resourceConfig instanceof DatabaseFactory.Config) {
+				databaseConfig = resourceConfig;
+				break;
+			}
+		}
+		Assert.assertNotNull(databaseConfig, "Missing database configuration");
 		final String databaseId = data.getId(databaseConfig);
 		Assert.assertEquals(swiftModule.getProperty("database"), databaseId, "The database has to refer to actual database module");
 
@@ -148,9 +156,9 @@ public final class ConfigurationDataTest {
 
 	private static ServiceConfig getServiceForModel(final ResourceModel model1) {
 		final ResourceConfig resourceConfig = data.getResourceConfig(model1.getId());
-		for(final DaemonConfig daemonConfig : data.getConfig().getDaemons()) {
-			for(final ServiceConfig serviceConfig : daemonConfig.getServices()) {
-				if(serviceConfig.getRunner().getWorkerConfiguration()==resourceConfig) {
+		for (final DaemonConfig daemonConfig : data.getConfig().getDaemons()) {
+			for (final ServiceConfig serviceConfig : daemonConfig.getServices()) {
+				if (serviceConfig.getRunner().getWorkerConfiguration() == resourceConfig) {
 					return serviceConfig;
 				}
 			}
