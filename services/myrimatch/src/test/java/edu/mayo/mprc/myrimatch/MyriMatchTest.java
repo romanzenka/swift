@@ -280,6 +280,9 @@ public final class MyriMatchTest {
 			resultString = replaceTime(resultString, "activityDate=");
 			resultString = replaceTime(resultString, "<SearchDatabase id=\"SDB\" name=");
 			resultString = replaceTime(resultString, "<userParam name=\"database name\" value=");
+			resultString = replaceTime(resultString, "SearchTime: Duration\" value=");
+			resultString = replaceTime(resultString, "SearchTime: Started\" value=");
+			resultString = replaceTime(resultString, "SearchTime: Stopped\" value=");
 			resultString = replaceLongFloats(resultString);
 
 
