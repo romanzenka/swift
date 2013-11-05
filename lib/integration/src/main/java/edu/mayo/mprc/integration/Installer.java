@@ -58,11 +58,11 @@ public class Installer {
 			throw new MprcException(MessageFormat.format("Cannot run test. Please set environment variable {0} to a folder with {1}", envVar, description));
 		}
 		final File directory = new File(value);
-		if (!directory.isDirectory()) {
-			throw new MprcException(MessageFormat.format("Cannot run test. The environment variable {0} points to {1}, which is not an existing folder", envVar, value));
+		if (!directory.isFile()) {
+			throw new MprcException(MessageFormat.format("Cannot run test. The environment variable {0} points to {1}, which is not a file", envVar, value));
 		}
-		if (!directory.canRead()) {
-			throw new MprcException(MessageFormat.format("Cannot run test. The environment variable {0} points to {1}, which is not a readable folder", envVar, value));
+		if (!directory.canExecute()) {
+			throw new MprcException(MessageFormat.format("Cannot run test. The environment variable {0} points to {1}, which is not executable", envVar, value));
 		}
 		return directory;
 	}
