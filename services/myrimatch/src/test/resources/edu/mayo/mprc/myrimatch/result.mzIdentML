@@ -1,0 +1,238 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<MzIdentML xmlns="http://psidev.info/psi/pi/mzIdentML/1.1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" id="$$WORK_DIR$$/$$BASE$$.mgf $$DB$$ MyriMatch 2.1.120" creationDate="$$TIME$$" version="1.1.0" xsi:schemaLocation="http://psidev.info/psi/pi/mzIdentML/1.1 ../schema/mzIdentML1.1.0.xsd">
+<cvList>
+<cv id="MS" fullName="Proteomics Standards Initiative Mass Spectrometry Ontology" version="3.18.0" uri="http://psidev.cvs.sourceforge.net/*checkout*/psidev/psi/psi-ms/mzML/controlledVocabulary/psi-ms.obo"/>
+<cv id="UNIMOD" fullName="UNIMOD" version="2012-02-15" uri="http://www.unimod.org/obo/unimod.obo"/>
+<cv id="UO" fullName="Unit Ontology" version="12:10:2011" uri="http://obo.cvs.sourceforge.net/*checkout*/obo/obo/ontology/phenotype/unit.obo"/>
+</cvList>
+<AnalysisSoftwareList>
+<AnalysisSoftware id="AS" version="2.1.120" uri="http://forge.fenchurch.mc.vanderbilt.edu/projects/myrimatch/">
+<SoftwareName>
+<cvParam cvRef="MS" accession="MS:1001585" name="MyriMatch" value=""/>
+</SoftwareName>
+</AnalysisSoftware>
+</AnalysisSoftwareList>
+<SequenceCollection>
+<DBSequence id="DBSeq_ALBU_HUMAN" accession="ALBU_HUMAN" searchDatabase_ref="SDB"/>
+<DBSequence id="DBSeq_rev_Rev_ALBU_HUMAN" accession="rev_Rev_ALBU_HUMAN" searchDatabase_ref="SDB"/>
+<DBSequence id="DBSeq_CONTAM_TRYP_PIG" accession="CONTAM_TRYP_PIG" searchDatabase_ref="SDB"/>
+<DBSequence id="DBSeq_rev_Rev_CONTAM_TRYP_PIG" accession="rev_Rev_CONTAM_TRYP_PIG" searchDatabase_ref="SDB"/>
+<DBSequence id="DBSeq_Rev_CONTAM_TRYP_PIG" accession="Rev_CONTAM_TRYP_PIG" searchDatabase_ref="SDB"/>
+<DBSequence id="DBSeq_rev_CONTAM_TRYP_PIG" accession="rev_CONTAM_TRYP_PIG" searchDatabase_ref="SDB"/>
+<Peptide id="PEP_1">
+<PeptideSequence>WVTFISLLFLFSSAYSR</PeptideSequence>
+</Peptide>
+<Peptide id="PEP_2">
+<PeptideSequence>FQNALLVR</PeptideSequence>
+</Peptide>
+<Peptide id="PEP_3">
+<PeptideSequence>SSGSSYPSLLQCLK</PeptideSequence>
+</Peptide>
+<Peptide id="PEP_4">
+<PeptideSequence>LCQLLSPYSSGSSK</PeptideSequence>
+</Peptide>
+<PeptideEvidence id="DBSeq_ALBU_HUMAN_PEP_1" peptide_ref="PEP_1" dBSequence_ref="DBSeq_ALBU_HUMAN" pre="K" post="G" isDecoy="false"/>
+<PeptideEvidence id="DBSeq_rev_Rev_ALBU_HUMAN_PEP_1" peptide_ref="PEP_1" dBSequence_ref="DBSeq_rev_Rev_ALBU_HUMAN" pre="K" post="G" isDecoy="true"/>
+<PeptideEvidence id="DBSeq_ALBU_HUMAN_PEP_2" peptide_ref="PEP_2" dBSequence_ref="DBSeq_ALBU_HUMAN" pre="K" post="Y" isDecoy="false"/>
+<PeptideEvidence id="DBSeq_rev_Rev_ALBU_HUMAN_PEP_2" peptide_ref="PEP_2" dBSequence_ref="DBSeq_rev_Rev_ALBU_HUMAN" pre="K" post="Y" isDecoy="true"/>
+<PeptideEvidence id="DBSeq_CONTAM_TRYP_PIG_PEP_3" peptide_ref="PEP_3" dBSequence_ref="DBSeq_CONTAM_TRYP_PIG" pre="K" post="A" isDecoy="false"/>
+<PeptideEvidence id="DBSeq_rev_Rev_CONTAM_TRYP_PIG_PEP_3" peptide_ref="PEP_3" dBSequence_ref="DBSeq_rev_Rev_CONTAM_TRYP_PIG" pre="K" post="A" isDecoy="true"/>
+<PeptideEvidence id="DBSeq_Rev_CONTAM_TRYP_PIG_PEP_4" peptide_ref="PEP_4" dBSequence_ref="DBSeq_Rev_CONTAM_TRYP_PIG" pre="K" post="T" isDecoy="false"/>
+<PeptideEvidence id="DBSeq_rev_CONTAM_TRYP_PIG_PEP_4" peptide_ref="PEP_4" dBSequence_ref="DBSeq_rev_CONTAM_TRYP_PIG" pre="K" post="T" isDecoy="true"/>
+</SequenceCollection>
+<AnalysisCollection>
+<SpectrumIdentification id="SI" spectrumIdentificationProtocol_ref="SIP" spectrumIdentificationList_ref="SIL" activityDate="$$TIME$$">
+<InputSpectra spectraData_ref="SD"/>
+<SearchDatabaseRef searchDatabase_ref="SDB"/>
+</SpectrumIdentification>
+</AnalysisCollection>
+<AnalysisProtocolCollection>
+<SpectrumIdentificationProtocol id="SIP" analysisSoftware_ref="AS">
+<SearchType>
+<cvParam cvRef="MS" accession="MS:1001083" name="ms-ms search" value=""/>
+</SearchType>
+<AdditionalSearchParams>
+<cvParam cvRef="MS" accession="MS:1001211" name="parent mass type mono" value=""/>
+<cvParam cvRef="MS" accession="MS:1001256" name="fragment mass type mono" value=""/>
+<cvParam cvRef="MS" accession="MS:1001108" name="param: a ion" value=""/>
+<cvParam cvRef="MS" accession="MS:1001118" name="param: b ion" value=""/>
+<cvParam cvRef="MS" accession="MS:1001262" name="param: y ion" value=""/>
+<userParam name="Config: AvgPrecursorMzTolerance" value="1.25mz"/>
+<userParam name="Config: ClassSizeMultiplier" value="2"/>
+<userParam name="Config: CleavageRules" value="(?&lt;=[KR])"/>
+<userParam name="Config: ComputeXCorr" value="1"/>
+<userParam name="Config: DecoyPrefix" value="rev_"/>
+<userParam name="Config: DynamicMods"/>
+<userParam name="Config: EstimateSearchTimeOnly" value="0"/>
+<userParam name="Config: FragmentMzTolerance" value="10ppm"/>
+<userParam name="Config: FragmentationAutoRule" value="1"/>
+<userParam name="Config: FragmentationRule" value="manual:a,b,y"/>
+<userParam name="Config: MaxDynamicMods" value="3"/>
+<userParam name="Config: MaxFragmentChargeState" value="0"/>
+<userParam name="Config: MaxMissedCleavages" value="2"/>
+<userParam name="Config: MaxPeakCount" value="250"/>
+<userParam name="Config: MaxPeptideLength" value="75"/>
+<userParam name="Config: MaxPeptideMass" value="10000"/>
+<userParam name="Config: MaxPeptideVariants" value="1000000"/>
+<userParam name="Config: MaxResultRank" value="2"/>
+<userParam name="Config: MinPeptideLength" value="5"/>
+<userParam name="Config: MinPeptideMass" value="0"/>
+<userParam name="Config: MinResultScore" value="9.99999~e-08"/>
+<userParam name="Config: MinTerminiCleavages" value="2"/>
+<userParam name="Config: MonoPrecursorMzTolerance" value="10ppm"/>
+<userParam name="Config: MonoisotopeAdjustmentSet" value="[-1,2] "/>
+<userParam name="Config: NumBatches" value="50"/>
+<userParam name="Config: NumChargeStates" value="4"/>
+<userParam name="Config: NumIntensityClasses" value="3"/>
+<userParam name="Config: NumMzFidelityClasses" value="3"/>
+<userParam name="Config: OutputFormat" value="mzIdentML"/>
+<userParam name="Config: OutputSuffix"/>
+<userParam name="Config: PrecursorMzToleranceRule" value="auto"/>
+<userParam name="Config: PreferIntenseComplements" value="1"/>
+<userParam name="Config: ProteinDatabase" value="$$DB$$"/>
+<userParam name="Config: ProteinListFilters"/>
+<userParam name="Config: ProteinSamplingTime" value="15"/>
+<userParam name="Config: ResultsPerBatch" value="200000"/>
+<userParam name="Config: SpectrumListFilters" value="peakPicking 1 2-;chargeStatePredictor 0 4 2 0.9"/>
+<userParam name="Config: StaticMods"/>
+<userParam name="Config: StatusUpdateFrequency" value="5"/>
+<userParam name="Config: TicCutoffPercentage" value="0.97999~"/>
+<userParam name="Config: UseMultipleProcessors" value="1"/>
+<userParam name="Config: UseSmartPlusThreeModel" value="0"/>
+<userParam name="Config: WorkingDirectory" value="$$WORK_DIR$$"/>
+<userParam name="PeakCounts: 1stQuartile: Filtered" value="14"/>
+<userParam name="PeakCounts: 1stQuartile: Original" value="14"/>
+<userParam name="PeakCounts: 2ndQuartile: Filtered" value="26"/>
+<userParam name="PeakCounts: 2ndQuartile: Original" value="26"/>
+<userParam name="PeakCounts: 3rdQuartile: Filtered" value="32"/>
+<userParam name="PeakCounts: 3rdQuartile: Original" value="32"/>
+<userParam name="PeakCounts: Mean: Filtered" value="24"/>
+<userParam name="PeakCounts: Mean: Original" value="24"/>
+<userParam name="PeakCounts: Min/Max: Filtered" value="14 / 32"/>
+<userParam name="PeakCounts: Min/Max: Original" value="14 / 32"/>
+<userParam name="SearchEngine: Name" value="MyriMatch"/>
+<userParam name="SearchEngine: Version" value="2.1.120"/>
+<userParam name="SearchStats: Nodes" value="1"/>
+<userParam name="SearchStats: Overall" value="8 proteins; 960 peptides; 420 variants; 12 comparisons"/>
+<userParam name="SearchTime: Duration" value="$$TIME$$"/>
+<userParam name="SearchTime: Started" value="$$TIME$$"/>
+<userParam name="SearchTime: Stopped" value="$$TIME$$"/>
+</AdditionalSearchParams>
+<Enzymes independent="false">
+<Enzyme id="ENZ_1" cTermGain="OH" nTermGain="H" missedCleavages="2" minDistance="1" semiSpecific="false">
+<SiteRegexp>(?&lt;=[KR])</SiteRegexp>
+<EnzymeName>
+<cvParam cvRef="MS" accession="MS:1001313" name="Trypsin/P" value=""/>
+</EnzymeName>
+</Enzyme>
+</Enzymes>
+<MassTable id="MT" msLevel="1 2 3">
+<Residue code="A" mass="71.03711~"/>
+<Residue code="C" mass="103.00918~"/>
+<Residue code="D" mass="115.02694~"/>
+<Residue code="E" mass="129.04259~"/>
+<Residue code="F" mass="147.06841~"/>
+<Residue code="G" mass="57.02146~"/>
+<Residue code="H" mass="137.05891~"/>
+<Residue code="I" mass="113.08406~"/>
+<Residue code="K" mass="128.09496~"/>
+<Residue code="L" mass="113.08406~"/>
+<Residue code="M" mass="131.04048~"/>
+<Residue code="N" mass="114.04292~"/>
+<Residue code="P" mass="97.05276~"/>
+<Residue code="Q" mass="128.05857~"/>
+<Residue code="R" mass="156.10111~"/>
+<Residue code="S" mass="87.03202~"/>
+<Residue code="T" mass="101.04767~"/>
+<Residue code="U" mass="150.95363~"/>
+<Residue code="V" mass="99.06841~"/>
+<Residue code="W" mass="186.07931~"/>
+<Residue code="Y" mass="163.06332~"/>
+</MassTable>
+<FragmentTolerance>
+<cvParam cvRef="MS" accession="MS:1001413" name="search tolerance minus value" value="10.0" unitCvRef="UO" unitAccession="UO:0000169" unitName="parts per million"/>
+<cvParam cvRef="MS" accession="MS:1001412" name="search tolerance plus value" value="10.0" unitCvRef="UO" unitAccession="UO:0000169" unitName="parts per million"/>
+</FragmentTolerance>
+<ParentTolerance>
+<cvParam cvRef="MS" accession="MS:1001413" name="search tolerance minus value" value="10.0" unitCvRef="UO" unitAccession="UO:0000169" unitName="parts per million"/>
+<cvParam cvRef="MS" accession="MS:1001412" name="search tolerance plus value" value="10.0" unitCvRef="UO" unitAccession="UO:0000169" unitName="parts per million"/>
+</ParentTolerance>
+<Threshold>
+<cvParam cvRef="MS" accession="MS:1001494" name="no threshold" value=""/>
+</Threshold>
+</SpectrumIdentificationProtocol>
+</AnalysisProtocolCollection>
+<DataCollection>
+<Inputs>
+<SearchDatabase id="SDB" name="$$TIME$$" location="$$DB$$">
+<FileFormat>
+<cvParam cvRef="MS" accession="MS:1001348" name="FASTA format" value=""/>
+</FileFormat>
+<DatabaseName>
+<userParam name="database name" value="$$TIME$$" type="xsd:string"/>
+</DatabaseName>
+<cvParam cvRef="MS" accession="MS:1001073" name="database type amino acid" value=""/>
+</SearchDatabase>
+<SpectraData id="SD" name="$$BASE$$.mgf" location="$$WORK_DIR$$/$$BASE$$.mgf">
+<FileFormat>
+<cvParam cvRef="MS" accession="MS:1001062" name="Mascot MGF file" value=""/>
+</FileFormat>
+<SpectrumIDFormat>
+<cvParam cvRef="MS" accession="MS:1000774" name="multiple peak list nativeID format" value=""/>
+</SpectrumIDFormat>
+</SpectraData>
+</Inputs>
+<AnalysisData>
+<SpectrumIdentificationList id="SIL" numSequencesSearched="8">
+<SpectrumIdentificationResult id="SIR_1" spectrumID="test scan 1 1 (test.1.1.2.dta)" spectraData_ref="SD">
+<SpectrumIdentificationItem id="SIR_1_SII_1" rank="1" chargeState="2" peptide_ref="PEP_1" experimentalMassToCharge="1019.04584~" calculatedMassToCharge="1019.68642~" passThreshold="true" massTable_ref="MT">
+<PeptideEvidenceRef peptideEvidence_ref="DBSeq_ALBU_HUMAN_PEP_1"/>
+<PeptideEvidenceRef peptideEvidence_ref="DBSeq_rev_Rev_ALBU_HUMAN_PEP_1"/>
+<cvParam cvRef="MS" accession="MS:1001121" name="number of matched peaks" value="31"/>
+<cvParam cvRef="MS" accession="MS:1001362" name="number of unmatched peaks" value="16"/>
+<cvParam cvRef="MS" accession="MS:1001589" name="MyriMatch:MVH" value="249.15589~"/>
+<cvParam cvRef="MS" accession="MS:1001590" name="MyriMatch:mzFidelity" value="269.84285~"/>
+<userParam name="xcorr" value="7.72841~"/>
+</SpectrumIdentificationItem>
+<userParam name="num_target_comparisons" value="0"/>
+<userParam name="num_decoy_comparisons" value="0"/>
+</SpectrumIdentificationResult>
+<SpectrumIdentificationResult id="SIR_2" spectrumID="test scan 2 2 (test.2.2.3.dta)" spectraData_ref="SD">
+<SpectrumIdentificationItem id="SIR_2_SII_1" rank="1" chargeState="2" peptide_ref="PEP_2" experimentalMassToCharge="480.78490~" calculatedMassToCharge="481.07273~" passThreshold="true" massTable_ref="MT">
+<PeptideEvidenceRef peptideEvidence_ref="DBSeq_ALBU_HUMAN_PEP_2"/>
+<PeptideEvidenceRef peptideEvidence_ref="DBSeq_rev_Rev_ALBU_HUMAN_PEP_2"/>
+<cvParam cvRef="MS" accession="MS:1001121" name="number of matched peaks" value="14"/>
+<cvParam cvRef="MS" accession="MS:1001362" name="number of unmatched peaks" value="8"/>
+<cvParam cvRef="MS" accession="MS:1001589" name="MyriMatch:MVH" value="123.31346~"/>
+<cvParam cvRef="MS" accession="MS:1001590" name="MyriMatch:mzFidelity" value="132.47662~"/>
+<userParam name="xcorr" value="3.37510~"/>
+</SpectrumIdentificationItem>
+<userParam name="num_target_comparisons" value="1"/>
+<userParam name="num_decoy_comparisons" value="1"/>
+</SpectrumIdentificationResult>
+<SpectrumIdentificationResult id="SIR_3" spectrumID="test scan 4 4 (test.4.4.2.dta)" spectraData_ref="SD">
+<SpectrumIdentificationItem id="SIR_3_SII_1" rank="1" chargeState="2" peptide_ref="PEP_3" experimentalMassToCharge="735.36886~" calculatedMassToCharge="735.83670~" passThreshold="true" massTable_ref="MT">
+<PeptideEvidenceRef peptideEvidence_ref="DBSeq_CONTAM_TRYP_PIG_PEP_3"/>
+<PeptideEvidenceRef peptideEvidence_ref="DBSeq_rev_Rev_CONTAM_TRYP_PIG_PEP_3"/>
+<cvParam cvRef="MS" accession="MS:1001121" name="number of matched peaks" value="26"/>
+<cvParam cvRef="MS" accession="MS:1001362" name="number of unmatched peaks" value="13"/>
+<cvParam cvRef="MS" accession="MS:1001589" name="MyriMatch:MVH" value="215.25321~"/>
+<cvParam cvRef="MS" accession="MS:1001590" name="MyriMatch:mzFidelity" value="231.86767~"/>
+<userParam name="xcorr" value="6.25958~"/>
+</SpectrumIdentificationItem>
+<SpectrumIdentificationItem id="SIR_3_SII_2" rank="2" chargeState="2" peptide_ref="PEP_4" experimentalMassToCharge="735.36886~" calculatedMassToCharge="735.83670~" passThreshold="true" massTable_ref="MT">
+<PeptideEvidenceRef peptideEvidence_ref="DBSeq_Rev_CONTAM_TRYP_PIG_PEP_4"/>
+<PeptideEvidenceRef peptideEvidence_ref="DBSeq_rev_CONTAM_TRYP_PIG_PEP_4"/>
+<cvParam cvRef="MS" accession="MS:1001121" name="number of matched peaks" value="2"/>
+<cvParam cvRef="MS" accession="MS:1001362" name="number of unmatched peaks" value="37"/>
+<cvParam cvRef="MS" accession="MS:1001589" name="MyriMatch:MVH" value="11.63923~"/>
+<cvParam cvRef="MS" accession="MS:1001590" name="MyriMatch:mzFidelity" value="12.99723~"/>
+<userParam name="xcorr" value="0.79204~"/>
+</SpectrumIdentificationItem>
+<userParam name="num_target_comparisons" value="4"/>
+<userParam name="num_decoy_comparisons" value="4"/>
+</SpectrumIdentificationResult>
+</SpectrumIdentificationList>
+</AnalysisData>
+</DataCollection>
+</MzIdentML>

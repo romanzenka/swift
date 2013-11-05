@@ -276,12 +276,10 @@ public final class MyriMatchTest {
 			resultString = replace(resultString, fastaFile.getAbsolutePath(), "$$DB$$");
 			resultString = replace(resultString, work.getWorkFolder().getAbsolutePath(), "$$WORK_DIR$$");
 			resultString = replace(resultString, FileUtilities.stripExtension(mgfFile.getName()), "$$BASE$$");
-			resultString = replace(resultString, "9.9999999999999995e-008", "9.9999999999999995e-08");
-			resultString = replaceTime(resultString, "date=");
-			resultString = replaceTime(resultString, "time=");
-			resultString = replaceTime(resultString, "SearchTime: Duration\" value=");
-			resultString = replaceTime(resultString, "SearchTime: Started\" value=");
-			resultString = replaceTime(resultString, "SearchTime: Stopped\" value=");
+			resultString = replaceTime(resultString, "creationDate=");
+			resultString = replaceTime(resultString, "activityDate=");
+			resultString = replaceTime(resultString, "<SearchDatabase id=\"SDB\" name=");
+			resultString = replaceTime(resultString, "<userParam name=\"database name\" value=");
 			resultString = replaceLongFloats(resultString);
 
 
