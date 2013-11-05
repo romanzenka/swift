@@ -43,7 +43,7 @@ public class TestTandem {
 
 	@BeforeClass()
 	public void setup() throws IOException {
-		tandemInstallFolder = Installer.getDirectory("SWIFT_TEST_TANDEM", "tandem.exe");
+		tandemInstallFolder = Installer.getDirectory("SWIFT_TEST_TANDEM_FOLDER", "tandem.exe");
 		tempRootDir = FileUtilities.createTempFolder();
 		inputMgfFolder = Installer.mgfFiles(null, Installer.Action.INSTALL);
 		inputMgfFile = new File(inputMgfFolder, "test.mgf");
