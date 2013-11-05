@@ -138,7 +138,7 @@ public class Installer {
 		if (folder == null) {
 			return FileUtilities.createTempFolder(null, defaultFolder, true);
 		}
-		FileUtilities.ensureFileExists(folder);
+		FileUtilities.ensureFolderExists(folder);
 		return folder;
 	}
 
