@@ -286,7 +286,7 @@ public final class MyriMatchTest {
 			resultString = replaceLongFloats(resultString);
 
 
-			final URL resource = Resources.getResource(MyriMatchTest.class, "result.pepXML");
+			final URL resource = Resources.getResource(MyriMatchTest.class, "result.mzIdentML");
 			String expectedString = Resources.toString(resource, CHARSET);
 			expectedString = expectedString.replaceAll("\r\n", "\n");
 
