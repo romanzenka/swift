@@ -36,8 +36,8 @@ public final class TestIdpQonvert {
 			idpQonvert = idpQonvert.getAbsoluteFile();
 
 			tmpFolder = FileUtilities.createTempFolder();
-			final File pepXmlFolder = Installer.pepXmlFiles(tmpFolder, Installer.Action.INSTALL);
-			final File fastaFolder = Installer.yeastFastaFiles(tmpFolder, Installer.Action.INSTALL);
+			final File pepXmlFolder = Installer.pepXmlFiles(new File(tmpFolder, "pepXML"), Installer.Action.INSTALL);
+			final File fastaFolder = Installer.yeastFastaFiles(new File(tmpFolder, "fasta"), Installer.Action.INSTALL);
 			pepXmlFile = new File(pepXmlFolder, "test.pepXML");
 			fastaFile = new File(fastaFolder, "SprotYeast.fasta");
 			if (!pepXmlFile.isFile()) {
