@@ -436,7 +436,7 @@ public final class WebUi implements Checkable {
 	}
 
 	/**
-	 * Parses a comma delimited string in <code>desc1,file1,desc2,file2,...</code> format
+	 * Parses a comma delimited string in {@code desc1, file1, desc2, file2, ...} format
 	 * into a list of {@link edu.mayo.mprc.msmseval.MSMSEvalParamFile}
 	 */
 	public static List<MSMSEvalParamFile> parseSpectrumQaParamFiles(final String paramFileString) {

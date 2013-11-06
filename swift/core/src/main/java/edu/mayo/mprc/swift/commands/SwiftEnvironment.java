@@ -7,7 +7,6 @@ import edu.mayo.mprc.daemon.MessageBroker;
 import edu.mayo.mprc.daemon.files.FileTokenFactory;
 import edu.mayo.mprc.swift.ExitCode;
 import edu.mayo.mprc.swift.Swift;
-import edu.mayo.mprc.swift.SwiftMonitor;
 import edu.mayo.mprc.swift.search.SwiftSearcher;
 import joptsimple.OptionParser;
 
@@ -88,13 +87,6 @@ public interface SwiftEnvironment extends RunningApplicationContext {
 	 * Shortcut method for obtaining the message broker config. Fails if none or more are defined.
 	 */
 	MessageBroker.Config getMessageBroker();
-
-	/**
-	 * Creates a Swift monitor instance on demand (returns an existing one if one exists).
-	 *
-	 * @return Swift monitor (periodically pings all daemon services, captures their responses in a status report).
-	 */
-	SwiftMonitor getMonitor();
 
 	/**
 	 * Register an additional command.

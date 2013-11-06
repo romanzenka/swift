@@ -192,9 +192,9 @@ public class MakeDecoyStep implements CurationStep {
 	/**
 	 * modify the header so that a description of the modification precedes the original header
 	 *
-	 * @param header      Header to modify, e.g. <code>&gt;WHATEVER Whatever description</code>
-	 * @param description Description of the change, e.g. <code>Reversed</code>
-	 * @return Modified header <code>&gt;Reversed_WHATEVER (Reversed) Whatever description</code>
+	 * @param header      Header to modify, e.g. {@code >WHATEVER Whatever description}
+	 * @param description Description of the change, e.g. {@code Reversed}
+	 * @return Modified header {@code >Reversed_WHATEVER (Reversed) Whatever description}
 	 */
 	static String modifyHeader(final String header, final String description) {
 		final String modifiedHeader;

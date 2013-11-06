@@ -30,7 +30,7 @@ import java.util.regex.Pattern;
  * <li>Index the .fasta file</li>
  * </ul>
  * Indexing means running Scaffold's
- * <code>com.proteomesoftware.scaffold.DatabaseIndexer <fasta file> [<db accession regex>] [<db description regex>]</code>
+ * {@code com.proteomesoftware.scaffold.DatabaseIndexer <fasta file> [<db accession regex>] [<db description regex>]}
  * The db accession and db description regex's are the same as the ones we use in the .scafml file.
  */
 public final class ScaffoldDeploymentService extends DeploymentService<DeploymentResult> {

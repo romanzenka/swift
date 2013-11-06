@@ -4,9 +4,9 @@ package edu.mayo.mprc.config.ui;
  * A &lt;fix&gt; tag describing a way to fix a problem.
  * <p/>
  * The validation error messages can contain special markup that allows the user to "fix" an error. The markup is:
- * <code>
- * &lt;fix action="whatever data">Message for the user&lt;/fix&gt;
- * </code>
+ * {@code
+ * <fix action="whatever data">Message for the user</fix>
+ * }
  * <p/>
  * When the user clicks the link, the {@link PropertyChangeListener#fixError}
  * method will be called with the particular action and property name.

@@ -1626,7 +1626,7 @@ public final class FileUtilities {
 	}
 
 	/**
-	 * @return Hostname of this computer, e.g. <code>hostname.domain.tld</code>
+	 * @return Hostname of this computer, e.g. {@code hostname.domain.tld}
 	 */
 	public static String getHostname() {
 		String hostName;
@@ -1658,7 +1658,7 @@ public final class FileUtilities {
 
 	/**
 	 * @param hostname Hostname to shorten
-	 * @return Short hostname - everything till the first dot, excluding domain. E.g. for <code>hostname.domain.tld</code> you will get <code>hostname</code>
+	 * @return Short hostname - everything till the first dot, excluding domain. E.g. for {@code hostname.domain.tld} you will get {@code hostname}
 	 */
 	public static String extractShortHostname(final String hostname) {
 		final int firstDot = hostname.indexOf('.');

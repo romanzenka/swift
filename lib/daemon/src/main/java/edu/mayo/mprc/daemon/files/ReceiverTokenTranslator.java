@@ -4,7 +4,7 @@ import java.io.File;
 
 /**
  * After a {@link FileTokenHolder} was sent over the wire, this translator allows you to turn {@link FileToken} back
- * to <code>File</code> objects.
+ * to {@code File} objects.
  */
 public interface ReceiverTokenTranslator {
 	/**

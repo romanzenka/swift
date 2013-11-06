@@ -53,7 +53,7 @@ public final class SimpleStringTextFilter implements TextFilter {
 	 * tests to see if the given criteria is contained within the toTest
 	 *
 	 * @param toTest the string you want to see if the criteria is contained within
-	 * @return <code>true</code> if toTest contains the criteria else <code>false</code>
+	 * @return {@code true} if toTest contains the criteria else {@code false}
 	 */
 	@Override
 	public boolean matches(final String toTest) {

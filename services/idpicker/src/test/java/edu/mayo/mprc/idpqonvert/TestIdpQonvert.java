@@ -15,7 +15,7 @@ import java.io.File;
 
 /**
  * Requires idpqonvert to be present at a path obtained from the environment variable
- * <code>edu.mayo.mprc.swift.idpqonvert.path</code>
+ * {@code edu.mayo.mprc.swift.idpqonvert.path}
  * <p/>
  * If not available, the tests are skipped
  *

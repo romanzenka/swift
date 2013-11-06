@@ -10,7 +10,6 @@ import edu.mayo.mprc.daemon.files.FileTokenFactory;
 import edu.mayo.mprc.messaging.ActiveMQConnectionPool;
 import edu.mayo.mprc.swift.ExitCode;
 import edu.mayo.mprc.swift.SwiftConfig;
-import edu.mayo.mprc.swift.SwiftMonitor;
 import edu.mayo.mprc.swift.search.SwiftSearcher;
 import edu.mayo.mprc.utilities.FileUtilities;
 import edu.mayo.mprc.utilities.exceptions.ExceptionUtilities;
@@ -40,7 +39,6 @@ public final class SwiftEnvironmentImpl implements SwiftEnvironment {
 	private DaemonConfig daemonConfig;
 	private File configFile;
 	private SwiftCommandLine commandLine;
-	private SwiftMonitor monitor;
 	private ActiveMQConnectionPool connectionPool;
 
 	public SwiftEnvironmentImpl() {
@@ -284,17 +282,7 @@ public final class SwiftEnvironmentImpl implements SwiftEnvironment {
 	}
 
 	@Override
-	public SwiftMonitor getMonitor() {
-		return monitor;
-	}
-
-	@Override
 	public void registerCommand(SwiftCommand command) {
 		commands.add(command);
-	}
-
-	@Resource(name = "swiftMonitor")
-	public void setMonitor(final SwiftMonitor monitor) {
-		this.monitor = monitor;
 	}
 }

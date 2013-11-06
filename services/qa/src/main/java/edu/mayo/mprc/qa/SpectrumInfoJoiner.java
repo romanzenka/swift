@@ -296,7 +296,7 @@ public final class SpectrumInfoJoiner {
 	 * Return either the .dta portion of spectrum title, if this is missing, return full title.
 	 *
 	 * @param title Title to extract spectrum info from
-	 * @return Extracted spectrum name in form <code>file.scan1.scan2.charge.dta</code>
+	 * @return Extracted spectrum name in form {@code file.scan1.scan2.charge.dta}
 	 */
 	public static String getSpectrum(final String title) {
 		final Matcher matcher = SPECTRUM_FROM_TITLE.matcher(title);

@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * * Entry point classes define <code>onModuleLoad()</code>.
+ * * Entry point classes define {@code onModuleLoad()}.
  */
 public final class SwiftApp implements EntryPoint, HidesPageContentsWhileLoading {
 

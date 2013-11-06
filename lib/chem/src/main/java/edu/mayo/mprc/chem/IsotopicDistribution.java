@@ -85,8 +85,8 @@ public final class IsotopicDistribution implements Cloneable {
 	}
 
 	/**
-	 * Returns a new copy of this IsotopicDistribution, with monoisotopic m/z set to <code>therMonoMZ</code>, with
-	 * <code>mzShift</code> added to all mzs, and all intensities scaled by <code>intenScale</code>.
+	 * Returns a new copy of this IsotopicDistribution, with monoisotopic m/z set to {@code therMonoMZ}, with
+	 * {@code mzShift} added to all mzs, and all intensities scaled by {@code intenScale}.
 	 */
 	public IsotopicDistribution copy(final double therMonoMZ, final double mzShift, final double intenScale) {
 		final IsotopicDistribution ret = new IsotopicDistribution(this, false);
@@ -165,7 +165,7 @@ public final class IsotopicDistribution implements Cloneable {
 	 * to within the given error tolerance (peaks which don't match are simply scaled
 	 * and passed through).
 	 *
-	 * @return New isotopic distribution representing <code>(1-fracOther)*this + fracOther*other</code>
+	 * @return New isotopic distribution representing {@code (1-fracOther)*this + fracOther*other}
 	 */
 	public IsotopicDistribution add(final IsotopicDistribution other, final double fracOther, double errorTolPPM) {
 		// TODO: which Chemical?

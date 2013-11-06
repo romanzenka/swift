@@ -119,7 +119,7 @@ public class User extends EvolvableBase implements Serializable {
 
 	/**
 	 * @param key   Preference key to set.
-	 * @param value Preference value to set. When set to <code>null</code>, the preference is removed.
+	 * @param value Preference value to set. When set to {@code null}, the preference is removed.
 	 */
 	void addPreference(final String key, final String value) {
 		if (value == null) {
@@ -151,7 +151,7 @@ public class User extends EvolvableBase implements Serializable {
 	}
 
 	/**
-	 * @return <code>true</code> if the user can use the parameter editor.
+	 * @return {@code true} if the user can use the parameter editor.
 	 */
 	public boolean isParameterEditorEnabled() {
 		return preferenceValue(PARAMETER_EDITOR_DISABLED) == null;

@@ -18,7 +18,7 @@ import java.util.*;
  * <p/>
  * Usage:
  * <ol>
- * <li><code>{@link #MascotDatabaseMaintenance}("http://[mascot server URI]/x-cgi/db_gui.pl", new HttpClient(new SimpleHttpConnectionManager()));</code>
+ * <li>{@link #MascotDatabaseMaintenance}{@code ("http://[mascot server URI]/x-cgi/db_gui.pl", new HttpClient(new SimpleHttpConnectionManager()));}
  * <p>This will load an initial list of databases using {@link #refresh()}.
  * </li>
  * <li>{@link #isDatabaseDeployed}("mascot database name") - returns true/false from the cache obtained by {@link #refresh} </li>

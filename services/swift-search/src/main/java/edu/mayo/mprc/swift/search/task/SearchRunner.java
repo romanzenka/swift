@@ -572,7 +572,7 @@ public final class SearchRunner implements Runnable {
 	}
 
 	/**
-	 * @return <code>true</code> if the input file has Sequest deployment disabled.
+	 * @return {@code true} if the input file has Sequest deployment disabled.
 	 */
 	private boolean noSequestDeployment(FileSearch inputFile, SearchEngineParameters defaultParameters) {
 		// Non-specific proteases (do not define restrictions for Rn-1 and Rn prevent sequest from deploying database index

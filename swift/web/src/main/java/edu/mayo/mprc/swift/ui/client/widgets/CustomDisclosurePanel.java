@@ -266,7 +266,7 @@ public final class CustomDisclosurePanel extends Composite implements
 	 * the header widget does provide such access.
 	 *
 	 * @return a reference to the header widget if it implements {@link HasText},
-	 *         <code>null</code> otherwise
+	 *         {@code null} otherwise
 	 */
 	public HasText getHeaderTextAccessor() {
 		final Widget widget = staticHeader;
@@ -276,7 +276,7 @@ public final class CustomDisclosurePanel extends Composite implements
 	/**
 	 * Determines whether the panel is open.
 	 *
-	 * @return <code>true</code> if panel is in open state
+	 * @return {@code true} if panel is in open state
 	 */
 	public boolean isOpen() {
 		return isOpen;
@@ -407,9 +407,9 @@ public final class CustomDisclosurePanel extends Composite implements
 	}
 
 	/**
-	 * Changes the visible state of this <code>DisclosurePanel</code>.
+	 * Changes the visible state of this {@code DisclosurePanel}.
 	 *
-	 * @param isOpen <code>true</code> to open the panel, <code>false</code>
+	 * @param isOpen {@code true} to open the panel, {@code false}
 	 *               to close
 	 */
 	public void setOpen(final boolean isOpen) {

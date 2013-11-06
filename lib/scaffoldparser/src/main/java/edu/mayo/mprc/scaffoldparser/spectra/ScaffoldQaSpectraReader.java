@@ -113,7 +113,7 @@ public final class ScaffoldQaSpectraReader extends ScaffoldReportReader implemen
 
 	/**
 	 * @param key Name of the .dta file. This corresponds to Scaffolds 'spectrum' attribute in the PepXML export.
-	 * @return Information for given spectrum, tab-separated. The <code>spectrumName</code> itself is not included.
+	 * @return Information for given spectrum, tab-separated. The {@code spectrumName} itself is not included.
 	 */
 	@Override
 	public String getLineForKey(final String key) {

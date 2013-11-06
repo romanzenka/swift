@@ -53,7 +53,7 @@ public interface CurationStatus {
 	boolean isInProgress();
 
 	/**
-	 * if this has been interrupted by someone return <code>true</code> else return <code>false</code>
+	 * if this has been interrupted by someone return {@code true} else return {@code false}
 	 *
 	 * @return true if we have been interrupted else false
 	 */

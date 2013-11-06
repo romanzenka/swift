@@ -11,12 +11,12 @@ import java.util.List;
 
 /**
  * A specific chemical compound that can be written as a single chemical formula of the
- * form <CODE>CH NH4 COOH (CH2)2SCH3</CODE>.  Spaces are allowed but not required in
+ * form {@code CH NH4 COOH (CH2)2SCH3}.  Spaces are allowed but not required in
  * chemical formulas.
  * <p/>
  * Note that chemicals can have negative numbers of elements; this is useful
  * for, eg, fragmentation patterns or modifications that result in the
- * loss of atoms.  A loss chemical formula would look like <CODE>C-1H-3</CODE>.
+ * loss of atoms.  A loss chemical formula would look like {@code C-1H-3}.
  */
 public class Chemical implements Molecule, Cloneable {
 	public Chemical(final PeriodicTable pt) {
@@ -173,7 +173,7 @@ public class Chemical implements Molecule, Cloneable {
 	 * Mercury algorithm by Rockwood and Van Orden. This function is expensive; you should call it
 	 * only once and store the result somewhere.
 	 * <p/>
-	 * See IsotopicDistribution for an explanation of <code>thresh</code> and <code>extra</code>.
+	 * See IsotopicDistribution for an explanation of {@code thresh} and {@code extra}.
 	 * <p/>
 	 *
 	 * @param thresh (default -1)

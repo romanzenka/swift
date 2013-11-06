@@ -101,7 +101,7 @@ public final class TestApplicationContext {
 	 * Returns a bean of a given id using the context returned by {@link #getTestApplicationContext()} ()}.
 	 *
 	 * @param beanId Bean id we want.
-	 * @return The bean for <code>beanId</code>.
+	 * @return The bean for {@code beanId}.
 	 */
 	private static Object getBean(final String beanId) {
 		return getTestApplicationContext().getBean(beanId);

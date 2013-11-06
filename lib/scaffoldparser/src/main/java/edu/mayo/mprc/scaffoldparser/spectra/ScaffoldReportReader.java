@@ -28,7 +28,7 @@ import java.util.regex.Pattern;
  * <li>blank line</li>
  * <li>header line processed with {@link #processHeader}</li>
  * <li>data processed with {@link #processRow}</li>
- * <li><code>END OF FILE</code> - when missing, file is terminated prematurely</li>
+ * <li>{@code END OF FILE} - when missing, file is terminated prematurely</li>
  * </ul>
  *
  * @author Roman Zenka

@@ -27,7 +27,7 @@ public interface FileTokenHolder extends Serializable {
 
 	/**
 	 * After the holder is received over the wire, this method lets it translate all {@link FileToken} objects back
-	 * to <code>File</code>s. As the files get modified, the provided synchronizer can be used to push the changes back to
+	 * to {@code File}s. As the files get modified, the provided synchronizer can be used to push the changes back to
 	 * the original token sender.
 	 *
 	 * @param translator           An object that allows translation of file tokens back to files.

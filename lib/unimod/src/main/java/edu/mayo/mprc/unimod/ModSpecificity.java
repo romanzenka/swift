@@ -33,8 +33,8 @@ public class ModSpecificity extends PersistableBase implements Comparable<ModSpe
 	 */
 	private Terminus term;
 	/**
-	 * If the 'term' field is set, <code>true</code> signalizes this modification can occur only at the protein C or N term.
-	 * <code>false</code> means it can be any peptide C or N term.
+	 * If the 'term' field is set, {@code true} signalizes this modification can occur only at the protein C or N term.
+	 * {@code false} means it can be any peptide C or N term.
 	 */
 	private Boolean proteinOnly;
 	/**

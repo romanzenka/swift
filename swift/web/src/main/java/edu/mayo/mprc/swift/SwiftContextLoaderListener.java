@@ -12,7 +12,7 @@ import javax.servlet.ServletContext;
  * That way the beans that do not depend on the web portion of Swift will not get initialized twice,
  * leading to issues.
  * <p/>
- * This class is configured in <code>web.xml</code> and utilized by Spring's DispatcherServlet.
+ * This class is configured in {@code web.xml} and utilized by Spring's DispatcherServlet.
  *
  * @author Roman Zenka
  */

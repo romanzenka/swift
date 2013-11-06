@@ -14,7 +14,7 @@ import java.net.URISyntaxException;
  * Key class for handling {@link FileToken} classes. A {@link FileToken} is basically path to a file + information about the daemon
  * where the file resides. These tokens are needed when sharing files over shared filesystem between daemons.
  * <p/>
- * <code>FileTokenFactory</code> not only creates {@link FileToken} classes, it also performs translations of the paths
+ * {@code FileTokenFactory} not only creates {@link FileToken} classes, it also performs translations of the paths
  * contained in them. The usage is following:
  * <p/>
  * <ol>
