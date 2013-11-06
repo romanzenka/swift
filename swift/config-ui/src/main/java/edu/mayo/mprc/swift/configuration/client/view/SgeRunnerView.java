@@ -8,17 +8,13 @@ import java.util.HashMap;
 public final class SgeRunnerView extends SimplePanel {
 
 	public static final String DEFAULT_WRAPPER_SCRIPT = "bin/util/sgeWrapper.sh";
-	public static final String DEFAULT_SHARED_WORKING_FOLDER = ".";
 	public static final String DEFAULT_QUEUE_NAME = "all.q";
 	private PropertyList propertyList;
 	private ResourceModel resourceModel;
 
-	public static final String DEFAULT_SHARED_TEMP_FOLDER = "var/tmp";
-
 	private static final String QUEUE_NAME = "queueName";
 	private static final String MEMORY_REQUIREMENT = "memoryRequirement";
 	private static final String NATIVE_SPECIFICATION = "nativeSpecification";
-	private static final String SHARED_TEMP_DIRECTORY = "sharedTempDirectory";
 	private static final String WRAPPER_SCRIPT = "wrapperScript";
 	private static final String LOG_OUTPUT_FOLDER = "logOutputFolder";
 

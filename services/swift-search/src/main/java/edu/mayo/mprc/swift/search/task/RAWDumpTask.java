@@ -8,7 +8,6 @@ import edu.mayo.mprc.qa.RAWDumpWorkPacket;
 import edu.mayo.mprc.searchdb.RawFileMetaData;
 import edu.mayo.mprc.utilities.progress.ProgressInfo;
 import edu.mayo.mprc.workflow.engine.WorkflowEngine;
-import org.apache.log4j.Logger;
 
 import java.io.File;
 
@@ -16,8 +15,6 @@ import java.io.File;
  * Dumping data from a .RAW file.
  */
 public final class RAWDumpTask extends AsyncTaskBase {
-	private static final Logger LOGGER = Logger.getLogger(RAWDumpTask.class);
-
 	private File rawFile;
 	private File rawInfoFile;
 	private File rawSpectraFile;

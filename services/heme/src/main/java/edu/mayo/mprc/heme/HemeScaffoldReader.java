@@ -13,9 +13,7 @@ import java.util.regex.Pattern;
  */
 public class HemeScaffoldReader extends ScaffoldReportReader {
 	private int proteinAccessionNumbers;
-	private int proteinName;
 	private int numberOfTotalSpectra;
-	private int numberOfUniquePeptides;
 	private static final Pattern DELTA_PATTERN = Pattern.compile(".*#DeltaMass:([^#]+)#.*");
 	private FastaDbDao fastaDao;
 	private Curation database;
@@ -42,9 +40,7 @@ public class HemeScaffoldReader extends ScaffoldReportReader {
 
 		// Store the column numbers for faster parsing
 		proteinAccessionNumbers = getColumn(map, ScaffoldReportReader.PROTEIN_ACCESSION_NUMBERS);
-		proteinName = getColumn(map, ScaffoldReportReader.PROTEIN_NAME);
 		numberOfTotalSpectra = getColumn(map, ScaffoldReportReader.NUMBER_OF_TOTAL_SPECTRA);
-		numberOfUniquePeptides = getColumn(map, ScaffoldReportReader.NUMBER_OF_UNIQUE_PEPTIDES);
 		return true;
 	}
 

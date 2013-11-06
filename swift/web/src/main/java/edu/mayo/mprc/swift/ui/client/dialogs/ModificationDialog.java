@@ -10,11 +10,6 @@ public final class ModificationDialog extends FrameDialog {
 	private ModificationSelectionEditor editor;
 	private String param;
 	private String type;
-	/**
-	 * don't want a title
-	 */
-	private static final String TITLE = "";
-
 
 	public ModificationDialog(final ModificationSelectionEditor editor) {
 		super("", true, true, false, false);

@@ -51,9 +51,6 @@ public final class MsconvertWorker extends WorkerBase {
 	public static final String MSCONVERT_EXECUTABLE = "msconvertExecutable";
 	public static final String MSACCESS_EXECUTABLE = "msaccessExecutable";
 
-	// Format in which we expect the .mgf titles to be done
-	private static final String TITLE_FILTER = "titleMaker %FILENAME% scan <ScanNumber> <ScanNumber> (%FILENAME%.<ScanNumber>.<ScanNumber>.<ChargeState>.dta)";
-
 	@Override
 	public void process(final WorkPacket workPacket, final UserProgressReporter progressReporter) {
 		if (!(workPacket instanceof MsconvertWorkPacket)) {

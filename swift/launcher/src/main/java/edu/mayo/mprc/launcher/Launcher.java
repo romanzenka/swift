@@ -30,25 +30,15 @@ import java.util.concurrent.Future;
  * <li>Starts up all the services as instructed, including web server.</li>
  * <li>If configuration is missing, starts up web server with config page.</li>
  * </ul>
- * <p/>
- * The return code from the main method is important. Following meanings are defined:
- * <ul>
- * <li>0 - smooth shutdown, do not attempt to restart</li>
- * <li>{@link #UPGRADE_EXIT_CODE} - shutting down to be restarted immediately (e.g. just got reconfigured)</li>
- * <li>anything else - error</li>
- * </ul>
  */
 public final class Launcher implements FileListener {
-	public static final int UPGRADE_EXIT_CODE = 100;
 	private static final Logger LOGGER = Logger.getLogger(Launcher.class);
 	private static final int DEFAULT_PORT = 8080;
 	private final Object stopMonitor = new Object();
-	private volatile boolean restartRequested = false;
+	private volatile boolean restartRequested;
 	private SwiftEnvironment swiftEnvironment;
 
-	private static final int EXIT_CODE_OK = 0;
 	private static final int EXIT_CODE_ERROR = 1;
-	private static final int EXIT_CODE_RESTART = 2;
 	public static final int POLLING_INTERVAL = 10 * 1000;
 
 	// Enlarge the header buffer size as we use large cookies to store the currently opened directories

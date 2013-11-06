@@ -220,8 +220,6 @@ public final class XTandemMappings implements Mappings {
 		setNativeParam(DATABASE, DATABASE_TAXON);
 	}
 
-	private static final Pattern TANDEM_MOD = Pattern.compile("\\s*([\\[\\{])([A-Z]*)[\\]\\}]\\|([\\[\\{])([A-Z]*)[\\]\\}]\\s*");
-
 	@Override
 	public void setProtease(final MappingContext context, final Protease protease) {
 		String cle = null;

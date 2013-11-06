@@ -255,9 +255,9 @@ public final class SequestMappings implements Mappings, Cloneable {
 			newTolerance = fragmentTolerance;
 		}
 		final Tolerance clampedTolerance;
-		if(newTolerance.getValue() < MIN_FRAGMENT_TOLERANCE) {
-		 	clampedTolerance = new Tolerance(MIN_FRAGMENT_TOLERANCE, MassUnit.Da);
-			context.reportWarning("Sequest runs too slow with fragment tolerance below "+MIN_FRAGMENT_TOLERANCE+" Da, using "+MIN_FRAGMENT_TOLERANCE+" Da instead.");
+		if (newTolerance.getValue() < MIN_FRAGMENT_TOLERANCE) {
+			clampedTolerance = new Tolerance(MIN_FRAGMENT_TOLERANCE, MassUnit.Da);
+			context.reportWarning("Sequest runs too slow with fragment tolerance below " + MIN_FRAGMENT_TOLERANCE + " Da, using " + MIN_FRAGMENT_TOLERANCE + " Da instead.");
 		} else {
 			clampedTolerance = newTolerance;
 		}
@@ -463,7 +463,6 @@ public final class SequestMappings implements Mappings, Cloneable {
 
 	// The series matches the pattern.
 	private static final String[] INSTRUMENT_SERIES = "a      b      y      a           b           c           d           v           w           x           y           z".split("\\s+");
-	private static final Pattern R = Pattern.compile("(\\d+) (\\d+) (\\d+) (\\d+.\\d+) (\\d+.\\d+) (\\d+.\\d+) (\\d+.\\d+) (\\d+.\\d+) (\\d+.\\d+) (\\d+.\\d+) (\\d+.\\d+) (\\d+.\\d+)");
 
 	@Override
 	public void setInstrument(final MappingContext context, final Instrument it) {

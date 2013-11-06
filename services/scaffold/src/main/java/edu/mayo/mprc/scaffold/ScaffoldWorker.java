@@ -36,7 +36,6 @@ public final class ScaffoldWorker extends WorkerBase {
 	public static final String DESC = "Scaffold integrates results from multiple search engines into a single file. You need Scaffold Batch license from <a href=\"http://www.proteomesoftware.com/\">http://www.proteomesoftware.com/</a>";
 
 	private File scaffoldBatchScript;
-	private boolean reportDecoyHits;
 	private File scaffoldUnimod;
 
 	public ScaffoldWorker() {

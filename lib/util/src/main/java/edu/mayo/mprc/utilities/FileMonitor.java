@@ -1,7 +1,5 @@
 package edu.mayo.mprc.utilities;
 
-import org.apache.log4j.Logger;
-
 import java.io.File;
 import java.util.*;
 
@@ -21,8 +19,6 @@ import java.util.*;
  * </ul>
  */
 public final class FileMonitor {
-	private static final Logger LOGGER = Logger.getLogger(FileMonitor.class);
-
 	private Timer timer;
 	private final List<FileInfo> files;
 	private final Object lock = new Object();

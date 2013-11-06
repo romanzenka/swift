@@ -34,7 +34,6 @@ final class OmssaUserModsWriter {
 
 	// Where to find the user mods element within the original document
 	private static final String SOURCE_ELEMENT = "/MSSearchSettings/MSSearchSettings_usermods/MSModSpecSet";
-	private static final String TARGET_ELEMENT = "/MSModSpecSet";
 
 	private static final XPathFactory XPATH_FACTORY = XPathFactory.newInstance();
 

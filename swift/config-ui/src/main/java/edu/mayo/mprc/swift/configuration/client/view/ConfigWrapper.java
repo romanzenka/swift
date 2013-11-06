@@ -19,7 +19,6 @@ public final class ConfigWrapper extends SimplePanel {
 	private TreeItem daemonsItem;
 	private SimplePanel uiPanel;
 	private SimplePanel runnerPanel;
-	private TreeItem lastItemSelected = null;
 	private Context context;
 
 	public ConfigWrapper(final Context context) {
@@ -84,7 +83,6 @@ public final class ConfigWrapper extends SimplePanel {
 						uiPanel.clear();
 						runnerPanel.clear();
 					}
-					lastItemSelected = item;
 				}
 			}
 

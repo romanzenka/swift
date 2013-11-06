@@ -1,6 +1,5 @@
 package edu.mayo.mprc.daemon.files;
 
-import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import edu.mayo.mprc.MprcException;
 import edu.mayo.mprc.config.DaemonConfigInfo;
 import edu.mayo.mprc.utilities.FileUtilities;
@@ -10,8 +9,6 @@ import org.springframework.stereotype.Component;
 import java.io.File;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 /**
  * Key class for handling {@link FileToken} classes. A {@link FileToken} is basically path to a file + information about the daemon
@@ -46,17 +43,6 @@ public final class FileTokenFactory implements SenderTokenTranslator, ReceiverTo
 	public static final String SHARED_TYPE_PREFIX = "shared:";
 	public static final String LOCAL_TYPE_PREFIX = "local:";
 	public static final String FILE_TAG = "file";
-
-
-	private static final ExecutorService fileTransferService;
-
-	static {
-		fileTransferService = Executors.newFixedThreadPool(4,
-				new ThreadFactoryBuilder()
-						.setDaemon(false)
-						.setNameFormat("fileTransfer-%d")
-						.build());
-	}
 
 	public FileTokenFactory() {
 	}

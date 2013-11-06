@@ -54,13 +54,11 @@ public final class MascotWorker extends WorkerBase {
 	public static final String TYPE = "mascot";
 	public static final String NAME = "Mascot";
 	public static final String DESC = "<a href=\"http://www.matrixscience.com/\">Mascot search engine</a> support.<p>Swift was tested against Mascot 2.2 and 2.4 without enabled security.</p>";
-	public static final int INPUT_FILE_TIMEOUT = 2 * 60 * 1000;
 
-	private URL baseUrl;
 	private URL datFileBaseUrl;
 
 	/**
-	 * An URL the users can use to access Mascot from their workstations. Typically identical to {@link #baseUrl}.
+	 * An URL the users can use to access Mascot from their workstations. Typically identical to the internal mascot URL.
 	 */
 	private URL publicBaseUrl;
 	private HttpURLConnection connection;
@@ -114,7 +112,6 @@ public final class MascotWorker extends WorkerBase {
 			throw new MprcException("The mascot url must not be null");
 		}
 		boundary = ("--------" + RANDOM.nextLong()) + Math.abs(RANDOM.nextLong() % Long.MAX_VALUE);
-		baseUrl = mascotUrl;
 		datFileBaseUrl = mascotCgiUrl(mascotUrl);
 	}
 

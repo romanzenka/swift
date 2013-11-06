@@ -2,7 +2,6 @@ package edu.mayo.mprc.config;
 
 import com.google.common.base.Splitter;
 import edu.mayo.mprc.MprcException;
-import org.apache.log4j.Logger;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -11,8 +10,6 @@ import java.util.List;
  * @author Roman Zenka
  */
 public abstract class ConfigReaderBase implements ConfigReader {
-	private static final Logger LOGGER = Logger.getLogger(ConfigReaderBase.class);
-
 	@Override
 	public String get(final String key, final String defaultValue) {
 		final String value = get(key);

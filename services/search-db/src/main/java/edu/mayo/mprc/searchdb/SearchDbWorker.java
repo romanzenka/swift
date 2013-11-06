@@ -42,7 +42,6 @@ public final class SearchDbWorker extends WorkerBase {
 	public static final String DESC = "Loads the search results into a database for fast future queries.";
 
 	private static final String DATABASE = "database";
-	private static final String SCAFFOLD_MOD_SET = "scaffoldModSet";
 
 	public SearchDbWorker(final SearchDbDao dao, final FastaDbDao fastaDbDao, final CurationDao curationDao, final UnimodDao unimodDao, final SwiftDao swiftDao) {
 		this.dao = dao;

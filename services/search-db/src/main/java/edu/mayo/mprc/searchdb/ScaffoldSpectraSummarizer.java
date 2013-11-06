@@ -46,7 +46,6 @@ public class ScaffoldSpectraSummarizer extends ScaffoldReportReader {
 	// Column indices for different fields.
 	private int biologicalSampleName;
 	private int biologicalSampleCategory;
-	private int numColumns;
 	private int msmsSampleName;
 	private int proteinAccessionNumbers;
 	private int databaseSources;

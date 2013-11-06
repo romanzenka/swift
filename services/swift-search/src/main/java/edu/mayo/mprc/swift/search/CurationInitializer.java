@@ -25,7 +25,6 @@ public final class CurationInitializer implements RuntimeInitializer {
 	// Needed for initialization of the database
 	private String testURL = "classpath:/edu/mayo/mprc/dbcurator/ShortTest.fasta.gz";
 	private String defaultURL = "ftp://ftp.expasy.org/databases/uniprot/current_release/knowledgebase/complete/uniprot_sprot.fasta.gz";
-	private static final int CURATION_UPDATE_SPEED = 5000;
 	private CurationDao curationDao;
 	private boolean addSprotRev = false;
 

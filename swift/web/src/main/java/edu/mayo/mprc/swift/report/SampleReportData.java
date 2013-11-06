@@ -8,7 +8,6 @@ import edu.mayo.mprc.utilities.CsvWriter;
 import edu.mayo.mprc.utilities.FileUtilities;
 import edu.mayo.mprc.utilities.Tuple;
 import edu.mayo.mprc.utilities.exceptions.ExceptionUtilities;
-import org.apache.log4j.Logger;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 
@@ -24,7 +23,6 @@ import java.util.*;
  * @author Roman Zenka
  */
 public final class SampleReportData {
-	private static final Logger LOGGER = Logger.getLogger(SampleReportData.class);
 	private static final int TYPICAL_SAMPLE_HEADERS = 30;
 	private static final List<String> FIXED_HEADER = Arrays.asList(
 			"File", "Last Modified",

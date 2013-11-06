@@ -1,8 +1,8 @@
 package edu.mayo.mprc.swift.configuration.client.view;
 
 import com.google.gwt.user.client.ui.*;
+import edu.mayo.mprc.swift.configuration.client.ConfigurationService;
 import edu.mayo.mprc.swift.configuration.client.model.ApplicationModel;
-import edu.mayo.mprc.swift.configuration.client.model.AvailableModules;
 import edu.mayo.mprc.swift.configuration.client.model.ResourceModel;
 import edu.mayo.mprc.swift.configuration.client.validation.local.IntegerValidator;
 import edu.mayo.mprc.swift.configuration.client.validation.local.RequiredFieldValidator;
@@ -19,7 +19,7 @@ import java.util.EventListener;
  * - preceding (pertaining to the preceding property call) and future (pertaining to the property call that is to come).
  * <p/>
  * GwtUiBuilder makes a {@link PropertyList} control.
- * All controls are set up to send any change to {@link edu.mayo.mprc.swift.configuration.client.ConfigurationService#propertyChanged}.
+ * All controls are set up to send any change to {@link ConfigurationService#propertyChanged}.
  */
 public final class GwtUiBuilder implements UiBuilderClient {
 	private final ResourceModel model;
@@ -35,7 +35,6 @@ public final class GwtUiBuilder implements UiBuilderClient {
 	private String defaultValue;
 
 	private ApplicationModel applicationModel;
-	private AvailableModules configUIs;
 	private Widget nativeInterface;
 
 	private Context context;
@@ -43,15 +42,7 @@ public final class GwtUiBuilder implements UiBuilderClient {
 	public GwtUiBuilder(final Context context, final ResourceModel model) {
 		this.model = model;
 		applicationModel = context.getApplicationModel();
-		configUIs = context.getApplicationModel().getAvailableModules();
 		this.context = context;
-
-		name = null;
-		displayName = null;
-		editor = null;
-		description = null;
-		validator = null;
-		propertyList = null;
 		row = 0;
 	}
 

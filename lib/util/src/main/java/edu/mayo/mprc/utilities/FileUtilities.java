@@ -43,9 +43,6 @@ public final class FileUtilities {
 	private static final String FILE_URL_PREFIX = "file://";
 	private static final String GZIP_EXTENSION = "gz";
 	private static final int FILE_LOCK_WAIT_GRANULARITY = 500;
-	private static final double MS_PER_SECOND = 1000.0;
-	private static final int WAIT_FOR_FILE_TIMEOUT = 5 * 1000;
-	private static final int FILE_WAIT_GRANULARITY = 50;
 	private static final int UMASK_UNKNOWN = -2;
 	/**
 	 * 40 seconds should be enough to list a folder
