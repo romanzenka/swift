@@ -58,7 +58,7 @@ public final class DatabaseManagerTest {
 		// Assert.assertTrue(newDbs.contains(TEST_DB), "The test database should be deployed now");
 	}
 
-	@Test(dependsOnMethods = "shouldDeployDatabase")
+	@Test(dependsOnMethods = "shouldDeployDatabase", enabled = false)
 	public void shouldUndeployDatabase() {
 		manager.undeployDatabase(TEST_DB);
 
