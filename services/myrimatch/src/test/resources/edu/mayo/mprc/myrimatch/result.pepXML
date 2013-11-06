@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<msms_pipeline_analysis date="$$TIME$$" summary_xml="$$BASE$$.pepXML" xmlns="http://regis-web.systemsbiology.net/pepXML" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://sashimi.sourceforge.net/schema_revision/pepXML/pepXML_v117.xsd">
+  <analysis_summary analysis="MyriMatch" version="2.1.87" time="$$TIME$$"/>
+  <msms_run_summary base_name="$$BASE$$" raw_data_type="" raw_data="">
+    <sample_enzyme name="Trypsin/P" independent="false" fidelity="specific">
+      <specificity sense="C" cut="KR" no_cut="" min_spacing="1"/>
+    </sample_enzyme>
+    <search_summary base_name="$$BASE$$" search_engine="MyriMatch" precursor_mass_type="monoisotopic" fragment_mass_type="monoisotopic" out_data_type="" out_data="">
+      <search_database local_path="$$DB$$" database_name="SDB" type="AA"/>
+      <enzymatic_search_constraint enzyme="Trypsin/P" max_num_internal_cleavages="100000" min_number_termini="2"/>
+      <parameter name="Config: AvgPrecursorMzTolerance" value="1.5mz"/>
+      <parameter name="Config: ClassSizeMultiplier" value="2"/>
+      <parameter name="Config: CleavageRules" value="(?&lt;=[KR])"/>
+      <parameter name="Config: ComputeXCorr" value="1"/>
+      <parameter name="Config: DecoyPrefix" value="Rev_"/>
+      <parameter name="Config: DynamicMods" value=""/>
+      <parameter name="Config: EstimateSearchTimeOnly" value="0"/>
+      <parameter name="Config: FragmentMzTolerance" value="0.5mz"/>
+      <parameter name="Config: FragmentationAutoRule" value="1"/>
+      <parameter name="Config: FragmentationRule" value="cid"/>
+      <parameter name="Config: MaxDynamicMods" value="2"/>
+      <parameter name="Config: MaxFragmentChargeState" value="0"/>
+      <parameter name="Config: MaxMissedCleavages" value="100000"/>
+      <parameter name="Config: MaxPeakCount" value="300"/>
+      <parameter name="Config: MaxPeptideLength" value="75"/>
+      <parameter name="Config: MaxPeptideMass" value="10000"/>
+      <parameter name="Config: MaxPeptideVariants" value="1000000"/>
+      <parameter name="Config: MaxResultRank" value="2"/>
+      <parameter name="Config: MinPeptideLength" value="5"/>
+      <parameter name="Config: MinPeptideMass" value="0"/>
+      <parameter name="Config: MinResultScore" value="9.99999~e-08"/>
+      <parameter name="Config: MinTerminiCleavages" value="2"/>
+      <parameter name="Config: MonoPrecursorMzTolerance" value="10ppm"/>
+      <parameter name="Config: MonoisotopeAdjustmentSet" value="[-1,2] "/>
+      <parameter name="Config: NumBatches" value="50"/>
+      <parameter name="Config: NumChargeStates" value="3"/>
+      <parameter name="Config: NumIntensityClasses" value="3"/>
+      <parameter name="Config: NumMzFidelityClasses" value="3"/>
+      <parameter name="Config: OutputFormat" value="pepXML"/>
+      <parameter name="Config: OutputSuffix" value=""/>
+      <parameter name="Config: PrecursorMzToleranceRule" value="auto"/>
+      <parameter name="Config: PreferIntenseComplements" value="1"/>
+      <parameter name="Config: ProteinDatabase" value="$$DB$$"/>
+      <parameter name="Config: ProteinListFilters" value=""/>
+      <parameter name="Config: ProteinSamplingTime" value="15"/>
+      <parameter name="Config: ResultsPerBatch" value="200000"/>
+      <parameter name="Config: SpectrumListFilters" value="peakPicking true 2-"/>
+      <parameter name="Config: StaticMods" value=""/>
+      <parameter name="Config: StatusUpdateFrequency" value="5"/>
+      <parameter name="Config: TicCutoffPercentage" value="0.97999~"/>
+      <parameter name="Config: UseChargeStateFromMS" value="1"/>
+      <parameter name="Config: UseMultipleProcessors" value="1"/>
+      <parameter name="Config: UseSmartPlusThreeModel" value="1"/>
+      <parameter name="Config: WorkingDirectory" value="$$WORK_DIR$$"/>
+      <parameter name="PeakCounts: 1stQuartile: Filtered" value="14"/>
+      <parameter name="PeakCounts: 1stQuartile: Original" value="14"/>
+      <parameter name="PeakCounts: 2ndQuartile: Filtered" value="25"/>
+      <parameter name="PeakCounts: 2ndQuartile: Original" value="26"/>
+      <parameter name="PeakCounts: 3rdQuartile: Filtered" value="32"/>
+      <parameter name="PeakCounts: 3rdQuartile: Original" value="32"/>
+      <parameter name="PeakCounts: Mean: Filtered" value="23"/>
+      <parameter name="PeakCounts: Mean: Original" value="24"/>
+      <parameter name="PeakCounts: Min/Max: Filtered" value="14 / 32"/>
+      <parameter name="PeakCounts: Min/Max: Original" value="14 / 32"/>
+      <parameter name="SearchEngine: Name" value="MyriMatch"/>
+      <parameter name="SearchEngine: Version" value="2.1.87"/>
+      <parameter name="SearchStats: Nodes" value="1"/>
+      <parameter name="SearchStats: Overall" value="4 proteins; 252 candidates; 4 queries; 4 comparisons"/>
+      <parameter name="SearchTime: Duration" value="$$TIME$$"/>
+      <parameter name="SearchTime: Started" value="$$TIME$$"/>
+      <parameter name="SearchTime: Stopped" value="$$TIME$$"/>
+    </search_summary>
+    <spectrum_query spectrum="$$BASE$$.0.0.2" spectrumNativeID="index=0" start_scan="0" end_scan="0" precursor_neutral_mass="2036.07713~" assumed_charge="2" index="2">
+      <search_result num_target_comparisons="1" num_decoy_comparisons="0">
+        <search_hit hit_rank="1" peptide="WVTFISLLFLFSSAYSR" peptide_prev_aa="K" peptide_next_aa="G" protein="ALBU_HUMAN" num_tot_proteins="1" calc_neutral_pep_mass="2036.07713~" massdiff="1.99431~e-06" num_tol_term="2" num_missed_cleavages="0" num_matched_ions="31" tot_num_ions="31">
+          <search_score name="number of matched peaks" value="31"/>
+          <search_score name="number of unmatched peaks" value="0"/>
+          <search_score name="mvh" value="150.39148~"/>
+          <search_score name="mzFidelity" value="184.22153~"/>
+          <search_score name="xcorr" value="7.80136~"/>
+        </search_hit>
+      </search_result>
+    </spectrum_query>
+    <spectrum_query spectrum="$$BASE$$.1.1.2" spectrumNativeID="index=1" start_scan="1" end_scan="1" precursor_neutral_mass="959.55524~" assumed_charge="2" index="4">
+      <search_result num_target_comparisons="1" num_decoy_comparisons="0">
+        <search_hit hit_rank="1" peptide="FQNALLVR" peptide_prev_aa="K" peptide_next_aa="Y" protein="ALBU_HUMAN" num_tot_proteins="1" calc_neutral_pep_mass="959.55525~" massdiff="5.54220~e-07" num_tol_term="2" num_missed_cleavages="0" num_matched_ions="12" tot_num_ions="12">
+          <search_score name="number of matched peaks" value="12"/>
+          <search_score name="number of unmatched peaks" value="0"/>
+          <search_score name="mvh" value="55.13781~"/>
+          <search_score name="mzFidelity" value="71.49334~"/>
+          <search_score name="xcorr" value="3.41701~"/>
+        </search_hit>
+      </search_result>
+    </spectrum_query>
+    <spectrum_query spectrum="$$BASE$$.3.3.2" spectrumNativeID="index=3" start_scan="3" end_scan="3" precursor_neutral_mass="1468.72317~" assumed_charge="2" index="6">
+      <search_result num_target_comparisons="1" num_decoy_comparisons="1">
+        <search_hit hit_rank="1" peptide="SSGSSYPSLLQCLK" peptide_prev_aa="K" peptide_next_aa="A" protein="CONTAM_TRYP_PIG" num_tot_proteins="1" calc_neutral_pep_mass="1468.72317~" massdiff="3.09801~e-06" num_tol_term="2" num_missed_cleavages="0" num_matched_ions="24" tot_num_ions="25">
+          <search_score name="number of matched peaks" value="24"/>
+          <search_score name="number of unmatched peaks" value="1"/>
+          <search_score name="mvh" value="112.38684~"/>
+          <search_score name="mzFidelity" value="138.23982~"/>
+          <search_score name="xcorr" value="6.08570~"/>
+        </search_hit>
+        <search_hit hit_rank="2" peptide="LCQLLSPYSSGSSK" peptide_prev_aa="K" peptide_next_aa="T" protein="Rev_CONTAM_TRYP_PIG" num_tot_proteins="1" calc_neutral_pep_mass="1468.72317~" massdiff="3.09801~e-06" num_tol_term="2" num_missed_cleavages="0" num_matched_ions="2" tot_num_ions="26">
+          <search_score name="number of matched peaks" value="2"/>
+          <search_score name="number of unmatched peaks" value="24"/>
+          <search_score name="mvh" value="4.26410~"/>
+          <search_score name="mzFidelity" value="6.41225~"/>
+          <search_score name="xcorr" value="0.42233~"/>
+        </search_hit>
+      </search_result>
+    </spectrum_query>
+  </msms_run_summary>
+</msms_pipeline_analysis>
