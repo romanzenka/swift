@@ -895,7 +895,7 @@ public final class TestSequestSubmission {
 	}
 
 	private String getSequestExe() {
-		return "sequest27_master";
+		return SequestRunner.SEQUEST_EXE;
 	}
 
 

@@ -17,7 +17,7 @@ class SequestRunner implements Runnable, SequestCallerInterface {
 	private static final Logger LOGGER = Logger.getLogger(SequestRunner.class);
 	private File paramsFile;
 	private List<File> sequestDtaFiles;
-	private static final String SEQUEST_EXE = "/usr/local/bin/sequest27_master";
+	public static final String SEQUEST_EXE = "/usr/local/bin/sequest27_master";
 	private static final String SEQUEST_OPTIONS = "-P";
 	public static final String NO_DTA_FILES_PASSED = "No dta files were passed to sequest caller.";
 	public static final String NO_PARAMS_FILE_PASSED = "No sequest params file was passed to the sequest caller";
