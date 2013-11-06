@@ -342,7 +342,7 @@ public final class ReportUpdate implements HttpRequestHandler {
 		private boolean finished;
 		private final Object lock = new Object();
 
-		public SgeStatusProgressListener(final HttpServletResponse response) {
+		SgeStatusProgressListener(final HttpServletResponse response) {
 			this.response = response;
 		}
 
@@ -424,7 +424,7 @@ public final class ReportUpdate implements HttpRequestHandler {
 		private long assignedId = -1;
 		private final Object lock = new Object();
 
-		public ResubmitProgressListener() {
+		ResubmitProgressListener() {
 		}
 
 		private boolean isComplete() {

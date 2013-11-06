@@ -33,7 +33,7 @@ public final class EngineWorkPacketTest {
 
 		private static final long serialVersionUID = 4029468324506386517L;
 
-		public TestEngineWorkPacket(final File inputFile, final File outputFile, final File searchParamsFile, final File databaseFile, final boolean publishResultFiles, final String taskId, final boolean fromScratch) {
+		TestEngineWorkPacket(final File inputFile, final File outputFile, final File searchParamsFile, final File databaseFile, final boolean publishResultFiles, final String taskId, final boolean fromScratch) {
 			super(inputFile, outputFile, searchParamsFile, databaseFile, publishResultFiles, taskId, fromScratch);
 		}
 

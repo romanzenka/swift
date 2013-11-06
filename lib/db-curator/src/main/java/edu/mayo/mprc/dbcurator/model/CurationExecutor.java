@@ -363,13 +363,6 @@ public final class CurationExecutor implements Runnable {
 		private boolean interrupt = false;
 
 		/**
-		 * create a new status object
-		 */
-		public MyCurationStatus() {
-			super();
-		}
-
-		/**
 		 * get the messages that have been added the messages are then removed form so they won't be hurd from again
 		 *
 		 * @return the list of messages that have been added

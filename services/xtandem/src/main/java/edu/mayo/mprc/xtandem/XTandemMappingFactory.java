@@ -6,7 +6,6 @@ import edu.mayo.mprc.swift.params2.mapping.Mappings;
 import java.io.File;
 
 public final class XTandemMappingFactory implements MappingFactory {
-	private static final long serialVersionUID = 20101221L;
 	public static final String TANDEM = "TANDEM";
 
 	@Override

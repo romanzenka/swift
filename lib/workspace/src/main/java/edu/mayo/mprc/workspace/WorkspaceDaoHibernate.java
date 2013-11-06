@@ -51,8 +51,7 @@ public final class WorkspaceDaoHibernate extends DaoBase implements WorkspaceDao
 			if (withPreferences) {
 				criteria.setFetchMode("preferences", FetchMode.SELECT);
 			}
-			return (List<User>)
-					criteria.list();
+			return listAndCast(criteria);
 		} catch (Exception t) {
 			throw new MprcException("Cannot obtain list of users", t);
 		}
@@ -91,9 +90,6 @@ public final class WorkspaceDaoHibernate extends DaoBase implements WorkspaceDao
 		if (!getUsersNoInitials().isEmpty()) {
 			return "There are users with no initials defined";
 		}
-		if (!getUsersWithRights().isEmpty()) {
-			return "There are users with legacy user rights defined";
-		}
 		return null;
 	}
 
@@ -105,22 +101,6 @@ public final class WorkspaceDaoHibernate extends DaoBase implements WorkspaceDao
 		}
 
 		addUserInitials();
-		updateUserRights();
-	}
-
-	private void updateUserRights() {
-		final List<User> users = getUsersWithRights();
-		if (!users.isEmpty()) {
-			LOGGER.info("Updating user rights");
-			for (final User user : users) {
-				user.setParameterEditorEnabled(user.isParameterEditorEnabled());
-				user.setOutputPathChangeEnabled(user.isOutputPathChangeEnabled());
-				LOGGER.info("User " + user.getUserName() + ": "
-						+ (user.isParameterEditorEnabled() ? "Parameter editor, " : "")
-						+ (user.isOutputPathChangeEnabled() ? "Output path, " : ""));
-				user.setRights(null);
-			}
-		}
 	}
 
 	private void addUserInitials() {
@@ -139,21 +119,8 @@ public final class WorkspaceDaoHibernate extends DaoBase implements WorkspaceDao
 
 	private List<User> getUsersNoInitials() {
 		try {
-			return (List<User>) allCriteria(User.class)
-					.add(Restrictions.isNull("initials"))
-					.list();
-		} catch (Exception t) {
-			throw new MprcException("Cannot obtain list of users", t);
-		}
-	}
-
-	private List<User> getUsersWithRights() {
-		try {
-			return (List<User>)
-					allCriteria(User.class)
-							.add(Restrictions.isNotNull("rights"))
-							.add(Restrictions.ne("rights", 0L))
-							.list();
+			return listAndCast(allCriteria(User.class)
+					.add(Restrictions.isNull("initials")));
 		} catch (Exception t) {
 			throw new MprcException("Cannot obtain list of users", t);
 		}

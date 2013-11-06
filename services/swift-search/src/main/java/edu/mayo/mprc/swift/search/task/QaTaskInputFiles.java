@@ -20,7 +20,7 @@ final class QaTaskInputFiles {
 	// Additional engine search
 	private List<EngineSearchTask> additionalSearches = new ArrayList<EngineSearchTask>(1);
 
-	public QaTaskInputFiles() {
+	QaTaskInputFiles() {
 	}
 
 	public File getRawInputFile() {

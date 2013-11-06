@@ -622,7 +622,7 @@ public final class MascotDeploymentService extends DeploymentService<DeploymentR
 		 * @param shortnameToLookFor the shortname that will appear in lines about our current deployment
 		 * @throws java.io.IOException if there is a problem setting up the deployment
 		 */
-		public MonitorLogPoller(final File logFile, final String shortnameToLookFor) throws IOException {
+		MonitorLogPoller(final File logFile, final String shortnameToLookFor) throws IOException {
 
 			this.logFile = logFile;
 			if (!logFile.exists()) {

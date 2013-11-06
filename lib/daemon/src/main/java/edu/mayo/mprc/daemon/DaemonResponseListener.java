@@ -14,7 +14,7 @@ import java.io.Serializable;
  * Listens to response returned by the daemon and translates it to calls on a given {@link edu.mayo.mprc.utilities.progress.ProgressListener}.
  * TODO: This should get better explanation.
  */
-class DaemonResponseListener implements ResponseListener {
+final class DaemonResponseListener implements ResponseListener {
 	private static final Logger LOGGER = Logger.getLogger(DaemonResponseListener.class);
 
 	private final ProgressListener progressListener;
@@ -27,7 +27,7 @@ class DaemonResponseListener implements ResponseListener {
 	private String terminateCause = null;
 	private String contextInfo = "(unknown)";
 
-	public DaemonResponseListener(final ProgressListener progressListener, final String contextInfo, final DaemonConnection daemonConnection) {
+	DaemonResponseListener(final ProgressListener progressListener, final String contextInfo, final DaemonConnection daemonConnection) {
 		this.progressListener = progressListener;
 		this.contextInfo = contextInfo;
 		this.daemonConnection = daemonConnection;

@@ -18,7 +18,7 @@ final class MyriMatchLogMonitor implements LogMonitor {
 	private boolean warningReported = false;
 
 
-	public MyriMatchLogMonitor(final UserProgressReporter progressReporter) {
+	MyriMatchLogMonitor(final UserProgressReporter progressReporter) {
 		this.progressReporter = progressReporter;
 	}
 

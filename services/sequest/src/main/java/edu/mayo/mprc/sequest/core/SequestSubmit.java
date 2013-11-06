@@ -71,7 +71,7 @@ final class SequestSubmit implements SequestSubmitterInterface {
 
 	private long creationTime;
 
-	public SequestSubmit(final long maxLineLength, final File paramsFile, final File workingDir, final File tarFile, final File hostsFile) {
+	SequestSubmit(final long maxLineLength, final File paramsFile, final File workingDir, final File tarFile, final File hostsFile) {
 		// this needs to be grabbed from the system
 		this.maxLineLength = (int) maxLineLength;
 		this.paramsFile = paramsFile;
@@ -263,7 +263,7 @@ final class SequestSubmit implements SequestSubmitterInterface {
 	class ProcessExceptionCatcher implements Thread.UncaughtExceptionHandler {
 		private SequestSubmitterInterface submitter;
 
-		public ProcessExceptionCatcher(final SequestSubmitterInterface sequestSubmitter) {
+		ProcessExceptionCatcher(final SequestSubmitterInterface sequestSubmitter) {
 			submitter = sequestSubmitter;
 		}
 

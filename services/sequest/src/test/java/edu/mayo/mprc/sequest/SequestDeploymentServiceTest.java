@@ -90,7 +90,7 @@ public final class SequestDeploymentServiceTest {
 			writeToFile(makedbparams, fakeFASTAFileToDeploy.getParentFile(), FileUtilities.stripExtension(testName) + ".makedb.params");
 		}
 
-		public FakeDeploymentTest(final String resourcePath) {
+		FakeDeploymentTest(final String resourcePath) {
 			init(resourcePath);
 		}
 	}

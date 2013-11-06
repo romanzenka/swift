@@ -20,7 +20,7 @@ final class ModsUtilities {
 	/**
 	 * Null Constructor
 	 */
-	public ModsUtilities() {
+	ModsUtilities() {
 		modTypeLookup = new ImmutableBiMap.Builder<String, String>()
 				.put("modaa", "0")
 				.put("modn", "1")

@@ -4,10 +4,10 @@ import java.util.ArrayList;
 
 final class Column implements Comparable<Column> {
 
-	private String title;
-	private ArrayList<String> data = new ArrayList<String>(10);
+	private final String title;
+	private final ArrayList<String> data = new ArrayList<String>(10);
 
-	public Column(final String title) {
+	Column(final String title) {
 		this.title = title;
 	}
 
@@ -20,25 +20,21 @@ final class Column implements Comparable<Column> {
 	}
 
 	public String getData(final int index) {
-		if (index < data.size()) {
-			return data.get(index);
-		} else {
-			return "";
-		}
+		return index < data.size() ? data.get(index) : "";
 	}
 
 	@Override
-	public boolean equals(final Object o) {
-		if (this == o) {
+	public boolean equals(final Object obj) {
+		if (this == obj) {
 			return true;
 		}
-		if (o == null || getClass() != o.getClass()) {
+		if (obj == null || getClass() != obj.getClass()) {
 			return false;
 		}
 
-		final Column column = (Column) o;
+		final Column column = (Column) obj;
 
-		if (title != null ? !title.equals(column.title) : column.title != null) {
+		if (title != null ? !title.equals(column.getTitle()) : column.getTitle() != null) {
 			return false;
 		}
 

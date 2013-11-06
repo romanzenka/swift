@@ -1676,7 +1676,7 @@ public final class FileUtilities {
 	private static final class TempFileBackedInputStream extends FileInputStream {
 		private final File backingFile;
 
-		public TempFileBackedInputStream(final File backingFile) throws FileNotFoundException {
+		TempFileBackedInputStream(final File backingFile) throws FileNotFoundException {
 			super(backingFile);
 			this.backingFile = backingFile;
 		}

@@ -5,7 +5,7 @@ import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.PopupPanel;
 
 class MessagePopup extends PopupPanel {
-	public MessagePopup(final String msg, final int xPosition, final int yPosition) {
+	MessagePopup(final String msg, final int xPosition, final int yPosition) {
 		super(true);
 		setPopupPosition(xPosition, yPosition);
 		setStyleName("curator-message-popup");

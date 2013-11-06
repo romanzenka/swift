@@ -256,7 +256,7 @@ public final class SimpleRunner extends AbstractRunner {
 		private final Worker worker;
 		private final DaemonRequest request;
 
-		public RequestProcessor(final Worker worker, final DaemonRequest request) {
+		RequestProcessor(final Worker worker, final DaemonRequest request) {
 			this.worker = worker;
 			this.request = request;
 		}

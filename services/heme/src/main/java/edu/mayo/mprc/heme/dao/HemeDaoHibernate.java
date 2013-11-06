@@ -19,19 +19,18 @@ import java.util.*;
 public final class HemeDaoHibernate extends DaoBase implements HemeDao {
 	@Override
 	public Collection<String> getHibernateMappings() {
-		final List<String> list = new ArrayList<String>(Arrays.asList("edu/mayo/mprc/heme/dao/HemeTest.hbm.xml"));
+		final Collection<String> list = new ArrayList<String>(Arrays.asList("edu/mayo/mprc/heme/dao/HemeTest.hbm.xml"));
 		list.addAll(super.getHibernateMappings());
 		return list;
 	}
 
 	@Override
 	public List<HemeTest> getAllTests() {
-		return (List<HemeTest>) getSession()
+		return listAndCast(getSession()
 				.createCriteria(HemeTest.class)
 				.setFetchMode("searchRun", FetchMode.JOIN)
 				.addOrder(Order.desc("date"))
-				.addOrder(Order.asc("name"))
-				.list();
+				.addOrder(Order.asc("name")));
 	}
 
 	/**
@@ -42,7 +41,7 @@ public final class HemeDaoHibernate extends DaoBase implements HemeDao {
 	 * @param test Test to check for equality.
 	 * @return Hibernate criteria matching all records equal to the provided one.
 	 */
-	private Criterion getHemeTestEqualityCriteria(final HemeTest test) {
+	private static Criterion getHemeTestEqualityCriteria(final HemeTest test) {
 		return Restrictions.and(
 				DaoBase.nullSafeEq("date", test.getDate()),
 				DaoBase.nullSafeEq("path", test.getPath()));

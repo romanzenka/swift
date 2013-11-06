@@ -29,7 +29,7 @@ final class LoggingSetup {
 
 	private static final AtomicLong UNIQUE_LOG_FILE_ID = new AtomicLong(System.currentTimeMillis());
 
-	public LoggingSetup(final File logOutputFolder) {
+	LoggingSetup(final File logOutputFolder) {
 		this.logOutputFolder = logOutputFolder;
 	}
 

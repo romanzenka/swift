@@ -21,7 +21,7 @@ final class MsconvertTask extends AsyncTaskBase implements FileProducingTask {
 	/**
 	 * @param publicAccess When true, the task requests the cache to give the user access to the .mgf file from the user space.
 	 */
-	public MsconvertTask(
+	MsconvertTask(
 			final WorkflowEngine engine,
 			final File inputFile,
 			final File outputFile,

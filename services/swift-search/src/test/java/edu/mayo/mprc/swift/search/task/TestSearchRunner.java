@@ -421,10 +421,9 @@ public class TestSearchRunner {
 	}
 
 	private static class MyMappingFactory implements MappingFactory {
-		private static final long serialVersionUID = -6099034607375054441L;
 		private final String code;
 
-		public MyMappingFactory(String code) {
+		MyMappingFactory(String code) {
 			this.code = code;
 		}
 

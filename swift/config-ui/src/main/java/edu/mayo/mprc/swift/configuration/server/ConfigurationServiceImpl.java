@@ -31,12 +31,12 @@ import java.io.File;
 public final class ConfigurationServiceImpl extends SpringGwtServlet implements ConfigurationService {
 	private static final long serialVersionUID = 20101221L;
 
-	private SessionStorage storage;
-	private ResourceTable resourceTable;
-	private SwiftEnvironment swiftEnvironment;
+	private transient SessionStorage storage;
+	private transient ResourceTable resourceTable;
+	private transient SwiftEnvironment swiftEnvironment;
 
 	public ConfigurationServiceImpl() {
-		storage = new ServletStorage(this);
+		setStorage(new ServletStorage(this));
 	}
 
 	/**

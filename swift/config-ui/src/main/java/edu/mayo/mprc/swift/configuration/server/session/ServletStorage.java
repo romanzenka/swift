@@ -6,7 +6,7 @@ import javax.servlet.Servlet;
  * @author Roman Zenka
  */
 public final class ServletStorage implements SessionStorage {
-	private Servlet servlet;
+	private final Servlet servlet;
 
 	public ServletStorage(final Servlet servlet) {
 		this.servlet = servlet;

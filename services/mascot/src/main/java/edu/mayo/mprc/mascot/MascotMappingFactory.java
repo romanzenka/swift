@@ -9,7 +9,6 @@ import javax.annotation.Resource;
 
 @Component("mascotMappingFactory")
 public final class MascotMappingFactory implements MappingFactory {
-	private static final long serialVersionUID = 20121221L;
 	public static final String MASCOT = "MASCOT";
 	private ParamsInfo paramsInfo;
 

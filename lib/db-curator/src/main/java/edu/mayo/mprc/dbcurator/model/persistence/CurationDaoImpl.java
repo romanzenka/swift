@@ -10,7 +10,10 @@ import edu.mayo.mprc.dbcurator.model.HeaderTransform;
 import edu.mayo.mprc.dbcurator.model.SourceDatabaseArchive;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
-import org.hibernate.criterion.*;
+import org.hibernate.criterion.Criterion;
+import org.hibernate.criterion.Example;
+import org.hibernate.criterion.Order;
+import org.hibernate.criterion.Restrictions;
 import org.joda.time.DateTime;
 import org.springframework.stereotype.Repository;
 
@@ -251,10 +254,10 @@ public final class CurationDaoImpl extends DaoBase implements CurationDao {
 				criteria.add(Example.create(templateCuration));
 			}
 			if (earliestRunDate != null) {
-				criteria.add(Expression.ge("runDate", earliestRunDate));
+				criteria.add(Restrictions.ge("runDate", earliestRunDate));
 			}
 			if (latestRunDate != null) {
-				criteria.add(Expression.le("runDate", latestRunDate));
+				criteria.add(Restrictions.le("runDate", latestRunDate));
 			}
 			genericResults = criteria.list();
 		} catch (Exception t) {

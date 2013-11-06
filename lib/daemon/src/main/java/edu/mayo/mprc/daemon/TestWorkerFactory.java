@@ -10,7 +10,7 @@ import edu.mayo.mprc.config.ui.ServiceUiFactory;
 final class TestWorkerFactory implements WorkerFactory<ResourceConfig, Worker> {
 	private final Worker finalWorker;
 
-	public TestWorkerFactory(final Worker finalWorker) {
+	TestWorkerFactory(final Worker finalWorker) {
 		this.finalWorker = finalWorker;
 	}
 

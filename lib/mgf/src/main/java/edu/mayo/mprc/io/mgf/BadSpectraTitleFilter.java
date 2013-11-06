@@ -10,7 +10,7 @@ import java.util.Collection;
 class BadSpectraTitleFilter implements MgfPeakListFilter {
 	private Collection<String> badSpectraMGFTitles;
 
-	public BadSpectraTitleFilter(final Collection<String> badSpectraMGFTitles) {
+	BadSpectraTitleFilter(final Collection<String> badSpectraMGFTitles) {
 		this.badSpectraMGFTitles = badSpectraMGFTitles;
 	}
 

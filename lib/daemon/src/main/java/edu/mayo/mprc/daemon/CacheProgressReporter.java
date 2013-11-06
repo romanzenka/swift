@@ -19,7 +19,7 @@ final class CacheProgressReporter implements ProgressReporter {
 	private Throwable failureReported;
 	private List<ProgressReporter> reporters = new ArrayList<ProgressReporter>(1);
 
-	public CacheProgressReporter() {
+	CacheProgressReporter() {
 	}
 
 	public synchronized void addProgressReporter(final ProgressReporter reporter) {

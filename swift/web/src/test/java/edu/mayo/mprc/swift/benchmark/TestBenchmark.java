@@ -17,32 +17,32 @@ public final class TestBenchmark {
 
 	private static final TaskData MASCOT_SEARCH = new TaskData(
 			"Mascot search",
-			new Date(12345678),
-			new Date(12345678 + 1000),
-			new Date(12345678 + 3500), // Runs for 2.5 seconds
+			new Date(12345678L),
+			new Date(12345678L + 1000L),
+			new Date(12345678L + 3500L), // Runs for 2.5 seconds
 			null,
 			new TaskStateData(TaskState.COMPLETED_SUCCESFULLY.getText()),
 			"Mascot search of <file>test.txt</file>");
 
 	private static final TaskData SEQUEST_SEARCH = new TaskData(
 			"Sequest search",
-			new Date(12345678),
-			new Date(12345678 + 2000),
-			new Date(12345678 + 3000), // Runs for 1 second
+			new Date(12345678L),
+			new Date(12345678L + 2000L),
+			new Date(12345678L + 3000L), // Runs for 1 second
 			null,
 			new TaskStateData(TaskState.COMPLETED_SUCCESFULLY.getText()),
 			"Sequest search of <file>test.txt</file>");
 
 	private static final TaskData SEQUEST_FAIL_SEARCH = new TaskData(
 			"Sequest search",
-			new Date(12345678),
-			new Date(12345678 + 2000),
+			new Date(12345678L),
+			new Date(12345678L + 2000L),
 			null,
 			null,
 			new TaskStateData(TaskState.RUN_FAILED.getText()),
 			"Sequest search of <file>test.txt</file>");
 
-	private List<TaskData> tasks = new ArrayList<TaskData>();
+	private final List<TaskData> tasks = new ArrayList<TaskData>();
 
 	@BeforeMethod
 	public void setup() {
@@ -82,8 +82,8 @@ public final class TestBenchmark {
 		Assert.assertEquals(outputStream.getOutput(), expected);
 	}
 
-	private class Stream extends ServletOutputStream {
-		private StringBuilder output = new StringBuilder(1000);
+	private static final class Stream extends ServletOutputStream {
+		private final StringBuilder output = new StringBuilder(1000);
 
 		public String getOutput() {
 			return output.toString();
@@ -104,7 +104,6 @@ public final class TestBenchmark {
 			output.append("\n");
 		}
 
-		@Override
 		public void write(final int b) throws IOException {
 			output.append((char) b);
 		}

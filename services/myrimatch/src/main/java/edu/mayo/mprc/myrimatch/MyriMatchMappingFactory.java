@@ -6,8 +6,6 @@ import edu.mayo.mprc.swift.params2.mapping.Mappings;
 import java.io.File;
 
 public final class MyriMatchMappingFactory implements MappingFactory {
-
-	private static final long serialVersionUID = 20110711L;
 	public static final String MYRIMATCH = "MYRIMATCH";
 
 	@Override

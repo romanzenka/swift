@@ -108,11 +108,11 @@ public final class MascotDeploymentServiceTest {
 		private File mockLog = null;
 		private File mockDat = null;
 
-		public MockMonitor() {
+		MockMonitor() {
 			toSucceed = true;
 		}
 
-		public MockMonitor(final boolean toSucceed) {
+		MockMonitor(final boolean toSucceed) {
 			this.toSucceed = toSucceed;
 		}
 

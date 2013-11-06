@@ -189,7 +189,7 @@ public final class EngineTest {
 		private boolean pause;
 		private boolean fail;
 
-		public SimpleTask(final WorkflowEngine engine, final boolean pause, final boolean fail) {
+		SimpleTask(final WorkflowEngine engine, final boolean pause, final boolean fail) {
 			super(engine);
 			this.pause = pause;
 			this.fail = fail;
@@ -228,7 +228,7 @@ public final class EngineTest {
 		private volatile boolean usedForWait;
 		private volatile boolean usedForResume;
 
-		public MyResumer() {
+		MyResumer() {
 			resumed = false;
 			usedForWait = false;
 			usedForResume = false;
@@ -272,7 +272,7 @@ public final class EngineTest {
 		private volatile boolean stop;
 		private Random random;
 
-		public UnPauser(final List<Task> pausedTasks, final Random random) {
+		UnPauser(final List<Task> pausedTasks, final Random random) {
 			this.pausedTasks = pausedTasks;
 			this.random = random;
 			stop = false;

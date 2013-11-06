@@ -18,7 +18,7 @@ final class MgfTitleCleanupTask extends AsyncTaskBase implements FileProducingTa
 	private final File cleanedMgf;
 	private static final AtomicInteger TASK_ID = new AtomicInteger(0);
 
-	public MgfTitleCleanupTask(final WorkflowEngine engine, final DaemonConnection daemon, final File mgfToCleanup, final File cleanedMgf, final FileTokenFactory fileTokenFactory, final boolean fromScratch) {
+	MgfTitleCleanupTask(final WorkflowEngine engine, final DaemonConnection daemon, final File mgfToCleanup, final File cleanedMgf, final FileTokenFactory fileTokenFactory, final boolean fromScratch) {
 		super(engine, daemon, fileTokenFactory, fromScratch);
 		cleanupPerformed = false;
 		this.cleanedMgf = cleanedMgf;

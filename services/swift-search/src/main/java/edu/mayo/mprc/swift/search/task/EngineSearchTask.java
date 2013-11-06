@@ -35,7 +35,7 @@ final class EngineSearchTask extends AsyncTaskBase implements FileProducingTask 
 	 */
 	private boolean publicSearchFiles;
 
-	public EngineSearchTask(
+	EngineSearchTask(
 			final WorkflowEngine workflowEngine,
 			final SearchEngine engine,
 			final String searchId,

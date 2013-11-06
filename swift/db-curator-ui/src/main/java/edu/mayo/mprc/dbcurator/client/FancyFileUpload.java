@@ -1,6 +1,8 @@
 package edu.mayo.mprc.dbcurator.client;
 
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.ui.*;
 
@@ -102,11 +104,11 @@ public final class FancyFileUpload extends Composite implements HasText, HasWord
 			pendingPanel.add(uploadFileName);
 			uploadFileName.setWordWrap(true);
 			pendingPanel.add(proceed);
-			proceed.setChecked(true);
+			proceed.setValue(true);
 			// Set up a click listener on the proceed check box
-			proceed.addClickListener(new ClickListener() {
+			proceed.addClickHandler(new ClickHandler() {
 				@Override
-				public void onClick(final Widget sender) {
+				public void onClick(final ClickEvent event) {
 					// If clicked we need to check the status of the upload.
 					if (widgetState == UPLOADED_STATE) {
 						// File has previously been uploaded, so now must be deleted.
@@ -201,7 +203,7 @@ public final class FancyFileUpload extends Composite implements HasText, HasWord
 	 */
 	private void uploadFiles() {
 		fileName = uploadItem.uploadFileWidget.getFilename();
-		if (uploadItem.proceed.isChecked()) {
+		if (uploadItem.proceed.getValue()) {
 			uploadItem.setLoading();
 			uploadForm.submit();
 		}

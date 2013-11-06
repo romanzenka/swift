@@ -8,7 +8,7 @@ final class UserInfo {
 	private String userName;
 	private String password;
 
-	public UserInfo(final URI uri) {
+	UserInfo(final URI uri) {
 		final String userInfo = uri.getUserInfo();
 		if ((userInfo == null) || userInfo.equals("")) {
 			userName = null;

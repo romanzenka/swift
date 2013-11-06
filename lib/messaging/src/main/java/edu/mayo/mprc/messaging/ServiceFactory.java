@@ -130,7 +130,7 @@ public final class ServiceFactory implements Closeable {
 		private final Session session;
 		private final MessageProducer producer;
 
-		public DeserializedRequest(final Connection connection, final SerializedRequest serializedRequest) {
+		DeserializedRequest(final Connection connection, final SerializedRequest serializedRequest) {
 			this.serializedRequest = serializedRequest;
 			try {
 				session = connection.createSession(/*transacted*/false, Session.CLIENT_ACKNOWLEDGE);

@@ -24,7 +24,7 @@ import java.util.Collection;
  * Since the object is very heavy-weight, it should not be stored and transferred as is. Instead use the {@link #getCode()} method
  * and {@link #getForId}.
  */
-public final class SearchEngine implements Comparable<SearchEngine>, Serializable {
+public final class SearchEngine implements Comparable<SearchEngine> {
 	private EngineMetadata engineMetadata;
 	private Config config;
 

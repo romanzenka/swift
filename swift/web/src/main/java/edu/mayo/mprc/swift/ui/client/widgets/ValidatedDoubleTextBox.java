@@ -5,7 +5,7 @@ public final class ValidatedDoubleTextBox extends ValidatedTextBox {
 		private double low;
 		private double high;
 
-		public DoubleValidator(final double low, final double high) {
+		DoubleValidator(final double low, final double high) {
 			this.low = low;
 			this.high = high;
 		}

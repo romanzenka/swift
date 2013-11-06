@@ -59,7 +59,7 @@ public final class HeaderTransformTest {
 		public final String subPattern;
 		public final String expectedResult;
 
-		public TransformTest(final String toTransform, final String matchPattern, final String subPattern, final String expectedResult) {
+		TransformTest(final String toTransform, final String matchPattern, final String subPattern, final String expectedResult) {
 			this.toTransform = toTransform;
 			this.matchPattern = matchPattern;
 			this.subPattern = subPattern;

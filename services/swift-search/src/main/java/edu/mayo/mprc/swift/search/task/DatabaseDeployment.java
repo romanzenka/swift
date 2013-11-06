@@ -28,7 +28,7 @@ final class DatabaseDeployment extends AsyncTaskBase implements DatabaseDeployme
 	private List<File> generatedFiles;
 	private DeploymentResult deploymentResult;
 
-	public DatabaseDeployment(final WorkflowEngine engine, final String engineCode, final String engineFriendlyName, final DaemonConnection deploymentDaemon, final File paramsFile, final Curation dbToDeploy, final FileTokenFactory fileTokenFactory, final boolean fromScratch) {
+	DatabaseDeployment(final WorkflowEngine engine, final String engineCode, final String engineFriendlyName, final DaemonConnection deploymentDaemon, final File paramsFile, final Curation dbToDeploy, final FileTokenFactory fileTokenFactory, final boolean fromScratch) {
 		super(engine, deploymentDaemon, fileTokenFactory, fromScratch);
 		this.engineCode = engineCode;
 		this.engineFriendlyName = engineFriendlyName;

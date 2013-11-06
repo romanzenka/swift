@@ -16,7 +16,7 @@ final class SearchResults implements Serializable {
 	// Full paths to the input files and their search results.
 	private List<FileSearchResult> results = new ArrayList<FileSearchResult>();
 
-	public SearchResults() {
+	SearchResults() {
 	}
 
 	public SearchResults addResult(final FileSearchResult result) {

@@ -64,6 +64,18 @@ public abstract class DaoBase implements Dao, SessionProvider, BulkLoadJobStarte
 		databasePlaceholder.rollback();
 	}
 
+	public static <T> List<T> listAndCast(final Criteria criteria) {
+		@SuppressWarnings("unchecked")
+		List list = criteria.list();
+		return list;
+	}
+
+	public static <T> List<T> listAndCast(final Query query) {
+		@SuppressWarnings("unchecked")
+		List list = query.list();
+		return list;
+	}
+
 	/**
 	 * Provides a list of all hibernate mapping files (.hbm.xml) that are needed for this Dao to function.
 	 *
@@ -96,9 +108,9 @@ public abstract class DaoBase implements Dao, SessionProvider, BulkLoadJobStarte
 	 * @param clazz Class instances to list.
 	 * @return A list of all instances.
 	 */
-	protected final List<?> listAll(final Class<? extends Evolvable> clazz) {
+	protected final <T extends Evolvable> List<T> listAll(final Class<T> clazz) {
 		try {
-			return (List<?>) allCriteria(clazz).setReadOnly(true).list();
+			return listAndCast(allCriteria(clazz).setReadOnly(true));
 		} catch (Exception t) {
 			throw new MprcException("Cannot list all items of type " + clazz.getSimpleName(), t);
 		}
@@ -147,7 +159,7 @@ public abstract class DaoBase implements Dao, SessionProvider, BulkLoadJobStarte
 	 * @param equalityCriteria Criteria for object equality.
 	 * @return A single instance of a matching object, <c>null</c> if nothing matches the criteria.
 	 */
-	protected final <T extends Evolvable> T get(final Class<? extends Evolvable> clazz, final Criterion equalityCriteria) {
+	protected final <T extends Evolvable> T get(final Class<T> clazz, final Criterion equalityCriteria) {
 		try {
 			return (T) allCriteria(clazz)
 					.add(equalityCriteria)

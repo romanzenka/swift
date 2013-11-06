@@ -755,7 +755,7 @@ public final class ServiceImpl extends SpringGwtServlet implements Service, Appl
 		private ParameterSetCache cache;
 		private boolean clientParamSetListChanged;
 
-		public Resolver(final ParameterSetCache cache) {
+		Resolver(final ParameterSetCache cache) {
 			this.cache = cache;
 			clientParamSetListChanged = false;
 		}

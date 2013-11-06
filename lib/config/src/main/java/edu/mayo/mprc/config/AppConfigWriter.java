@@ -186,11 +186,11 @@ public final class AppConfigWriter implements Closeable {
 		private final String value;
 		private final String comment;
 
-		public Triplet(final String comment) {
+		Triplet(final String comment) {
 			this(null, null, comment);
 		}
 
-		public Triplet(final String key, final String value, final String comment) {
+		Triplet(final String key, final String value, final String comment) {
 			this.key = key == null ? null : key.trim();
 
 			this.value = escapeValue(value);
@@ -367,7 +367,7 @@ public final class AppConfigWriter implements Closeable {
 	private final class RunnerConfigWriter extends InnerConfigWriter {
 		InnerConfigWriter embedIntoWriter;
 
-		public RunnerConfigWriter(final Class currentClass, final InnerConfigWriter embedIntoWriter) {
+		RunnerConfigWriter(final Class currentClass, final InnerConfigWriter embedIntoWriter) {
 			super(currentClass);
 			this.embedIntoWriter = embedIntoWriter;
 		}

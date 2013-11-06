@@ -34,11 +34,11 @@ class LogWriterAppender extends WriterAppender {
 		}
 	}
 
-	public LogWriterAppender(final OutputStream outputStream) {
+	LogWriterAppender(final OutputStream outputStream) {
 		this(new OutputStreamWriter(outputStream));
 	}
 
-	public LogWriterAppender(final Writer writer) {
+	LogWriterAppender(final Writer writer) {
 		super(appenderLayout, writer);
 
 		allowedThreadNames = new HashSet<String>(4);

@@ -4,7 +4,6 @@ import edu.mayo.mprc.swift.params2.mapping.MappingFactory;
 import edu.mayo.mprc.swift.params2.mapping.Mappings;
 
 public final class OmssaMappingFactory implements MappingFactory {
-	private static final long serialVersionUID = 20101221L;
 	public static final String OMSSA = "OMSSA";
 
 	@Override

@@ -169,7 +169,7 @@ public final class Test_UnimodToOmssaParamsConverter {
 		public final UnimodOmssaConverter converter;
 		public final Unimod umodSet;
 
-		public UnimodWriter(final boolean includeFixed, final boolean includeVariable) {
+		UnimodWriter(final boolean includeFixed, final boolean includeVariable) {
 			/**
 			 * ommssa only supports 30 user defined modifications so that is what we will support.
 			 */

@@ -21,7 +21,7 @@ final class ScaffoldReportTask extends AsyncTaskBase {
 
 	public static final String TASK_NAME = "ScaffoldReport";
 
-	public ScaffoldReportTask(final WorkflowEngine engine, final DaemonConnection daemon, final List<File> scaffoldOutputFiles, final File peptideReportFile, final File proteinReportFile, final FileTokenFactory fileTokenFactory, final boolean fromScratch) {
+	ScaffoldReportTask(final WorkflowEngine engine, final DaemonConnection daemon, final List<File> scaffoldOutputFiles, final File peptideReportFile, final File proteinReportFile, final FileTokenFactory fileTokenFactory, final boolean fromScratch) {
 		super(engine, daemon, fileTokenFactory, fromScratch);
 		this.scaffoldOutputFiles = scaffoldOutputFiles;
 		this.peptideReportFile = peptideReportFile;

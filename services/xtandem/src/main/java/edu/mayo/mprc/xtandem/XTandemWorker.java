@@ -392,7 +392,7 @@ public final class XTandemWorker extends WorkerBase {
 			private final ResourceConfig resource;
 			private final DaemonConfig daemon;
 
-			public ExecutableChanger(final ResourceConfig resource, final DaemonConfig daemon) {
+			ExecutableChanger(final ResourceConfig resource, final DaemonConfig daemon) {
 				this.resource = resource;
 				this.daemon = daemon;
 			}

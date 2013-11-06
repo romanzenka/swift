@@ -161,7 +161,7 @@ public final class GridRunner extends AbstractRunner {
 		private DaemonRequest request;
 		private Throwable lastThrowable;
 
-		public SgeMessageListener(final DaemonRequest request) {
+		SgeMessageListener(final DaemonRequest request) {
 			this.request = request;
 		}
 
@@ -198,7 +198,7 @@ public final class GridRunner extends AbstractRunner {
 		 */
 		private AssignedTaskData taskData;
 
-		public MyWorkPacketStateListener(final DaemonRequest request, final File sgePacketFile, final SgeMessageListener allocatorListener) {
+		MyWorkPacketStateListener(final DaemonRequest request, final File sgePacketFile, final SgeMessageListener allocatorListener) {
 			reported = false;
 			this.request = request;
 			this.sgePacketFile = sgePacketFile;

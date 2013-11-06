@@ -73,7 +73,7 @@ public final class Mercury6Test {
 		private boolean mono;
 		private boolean max;
 
-		public DistributionItem(final String line) {
+		DistributionItem(final String line) {
 			final String[] items = line.split("\\s+");
 			mass = Double.parseDouble(items[0]);
 			intensity = Double.parseDouble(items[1]);

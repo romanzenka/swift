@@ -39,7 +39,7 @@ public final class Launcher implements FileListener {
 	private SwiftEnvironment swiftEnvironment;
 
 	private static final int EXIT_CODE_ERROR = 1;
-	public static final int POLLING_INTERVAL = 10 * 1000;
+	public static final long POLLING_INTERVAL = (long) (10 * 1000);
 
 	// Enlarge the header buffer size as we use large cookies to store the currently opened directories
 	public static final int HEADER_BUFFER_SIZE = 65536;
@@ -109,11 +109,9 @@ public final class Launcher implements FileListener {
 			connector.setHeaderBufferSize(HEADER_BUFFER_SIZE);
 		}
 
-		WebAppContext webAppContext = null;
-
 		Future<Object> future = null;
 		try {
-			webAppContext = makeWebAppContext(environment.getConfigFile(), configMode ? "config" : "production", warFile, daemonId, tempFolder);
+			WebAppContext webAppContext = makeWebAppContext(environment.getConfigFile(), configMode ? "config" : "production", warFile, daemonId, tempFolder);
 			server.addHandler(webAppContext);
 
 			future = Executors.newSingleThreadExecutor().submit(new Callable<Object>() {
@@ -136,8 +134,7 @@ public final class Launcher implements FileListener {
 	}
 
 	private WebAppContext makeWebAppContext(final File configFile, final String action, final File warFile, final String daemonId, final File tempFolder) {
-		final WebAppContext webAppContext;
-		webAppContext = new WebAppContext();
+		final WebAppContext webAppContext = new WebAppContext();
 		webAppContext.setWar(warFile.getAbsolutePath());
 		webAppContext.setContextPath("/");
 		// We must set temp directory, otherwise the app goes to /tmp which will get deleted periodically
@@ -216,7 +213,7 @@ public final class Launcher implements FileListener {
 		}
 	}
 
-	static ResourceConfig getResourceConfig(final SwiftEnvironment environment, final Class clazz) {
+	static ResourceConfig getResourceConfig(final SwiftEnvironment environment, final Class<?> clazz) {
 		final DaemonConfig daemonConfig = environment.getDaemonConfig();
 		if (daemonConfig == null) {
 			return null;

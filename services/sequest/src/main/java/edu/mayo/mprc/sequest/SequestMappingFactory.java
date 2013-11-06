@@ -6,7 +6,6 @@ import org.springframework.stereotype.Component;
 
 @Component("sequestMappingFactory")
 public final class SequestMappingFactory implements MappingFactory {
-	private static final long serialVersionUID = 20101221L;
 	public static final String SEQUEST = "SEQUEST";
 
 	@Override

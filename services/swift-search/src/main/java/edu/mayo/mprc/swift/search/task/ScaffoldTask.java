@@ -45,10 +45,10 @@ final class ScaffoldTask extends AsyncTaskBase implements ScaffoldTaskI {
 	private final boolean reportDecoyHits;
 	private final Object lock = new Object();
 
-	public ScaffoldTask(final WorkflowEngine engine,
-	                    final String scaffoldVersion, final String experiment, final SwiftSearchDefinition definition, final DaemonConnection scaffoldDaemon,
-	                    final SwiftDao swiftDao, final SearchRun searchRun, final File scaffoldUnimod,
-	                    final File outputFolder, final FileTokenFactory fileTokenFactory, final boolean reportDecoyHits, final boolean fromScratch) {
+	ScaffoldTask(final WorkflowEngine engine,
+	             final String scaffoldVersion, final String experiment, final SwiftSearchDefinition definition, final DaemonConnection scaffoldDaemon,
+	             final SwiftDao swiftDao, final SearchRun searchRun, final File scaffoldUnimod,
+	             final File outputFolder, final FileTokenFactory fileTokenFactory, final boolean reportDecoyHits, final boolean fromScratch) {
 		super(engine, scaffoldDaemon, fileTokenFactory, fromScratch);
 		this.scaffoldVersion = scaffoldVersion;
 		this.experiment = experiment;

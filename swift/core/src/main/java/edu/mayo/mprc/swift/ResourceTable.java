@@ -219,7 +219,7 @@ public final class ResourceTable extends FactoryBase<ResourceConfig, Object> imp
 		private final ServiceUiFactory uiFactory;
 		private final String description;
 
-		public ResourceInfo(final String id, final String userName, final Class<? extends ResourceConfig> configClass, final ResourceFactory<? extends ResourceConfig, ?> factory, final ResourceType resourceType, final ServiceUiFactory uiFactory, final String description) {
+		ResourceInfo(final String id, final String userName, final Class<? extends ResourceConfig> configClass, final ResourceFactory<? extends ResourceConfig, ?> factory, final ResourceType resourceType, final ServiceUiFactory uiFactory, final String description) {
 			this.id = id;
 			this.userName = userName;
 			this.configClass = configClass;

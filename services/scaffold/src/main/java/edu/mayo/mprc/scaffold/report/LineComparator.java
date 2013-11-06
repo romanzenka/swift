@@ -17,12 +17,12 @@ final class LineComparator implements Comparator<String[]>, Serializable {
 	/**
 	 * Initialize the comparator to compare given items of the list in given order.
 	 *
-	 * @param columnsRead     Names of the columns as they are being read
-	 * @param columns         List of column names to be compared to each other.
-	 * @param directions      Direction of the comparison, 'a' stands for ascending, 'd' stands for descending.
+	 * @param columnsRead Names of the columns as they are being read
+	 * @param columns     List of column names to be compared to each other.
+	 * @param directions  Direction of the comparison, 'a' stands for ascending, 'd' stands for descending.
 	 */
-	public LineComparator(final String[] columnsRead,
-	                      final String[] columns, final String[] directions) {
+	LineComparator(final String[] columnsRead,
+	               final String[] columns, final String[] directions) {
 		if (columns.length != directions.length) {
 			throw new MprcException("The list comparator is not set up correctly.");
 		}

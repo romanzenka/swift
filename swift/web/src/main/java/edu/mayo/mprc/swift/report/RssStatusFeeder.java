@@ -10,7 +10,6 @@ import org.springframework.web.HttpRequestHandler;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpUtils;
 import java.util.*;
 
 public final class RssStatusFeeder implements HttpRequestHandler {
@@ -72,7 +71,7 @@ public final class RssStatusFeeder implements HttpRequestHandler {
 				}
 			}
 			final SyndFeed feed = getFeed(showSuccess, true, true);
-			feed.setLink(HttpUtils.getRequestURL(req).toString());
+			feed.setLink(req.getRequestURL().toString());
 			feed.setFeedType("rss_2.0");
 			resp.setContentType("text/plain");
 			new SyndFeedOutput().output(feed, resp.getWriter());

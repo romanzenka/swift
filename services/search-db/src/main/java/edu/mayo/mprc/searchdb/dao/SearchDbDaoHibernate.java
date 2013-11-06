@@ -89,7 +89,7 @@ public final class SearchDbDaoHibernate extends DaoBase implements RuntimeInitia
 		return mod;
 	}
 
-	private Criterion localizedModificationEqualityCriteria(final LocalizedModification mod) {
+	private static Criterion localizedModificationEqualityCriteria(final LocalizedModification mod) {
 		return Restrictions.conjunction()
 				.add(nullSafeEq("position", mod.getPosition()))
 				.add(nullSafeEq("residue", mod.getResidue()))
@@ -117,7 +117,7 @@ public final class SearchDbDaoHibernate extends DaoBase implements RuntimeInitia
 		return peptide;
 	}
 
-	private Criterion identifiedPeptideEqualityCriteria(final IdentifiedPeptide peptide) {
+	private static Criterion identifiedPeptideEqualityCriteria(final IdentifiedPeptide peptide) {
 		return Restrictions.conjunction()
 				.add(associationEq("sequence", peptide.getSequence()))
 				.add(associationEq("modifications", peptide.getModifications()));
@@ -131,7 +131,7 @@ public final class SearchDbDaoHibernate extends DaoBase implements RuntimeInitia
 		return match;
 	}
 
-	private Criterion matchEqualityCriteria(final PeptideSpectrumMatch match) {
+	private static Criterion matchEqualityCriteria(final PeptideSpectrumMatch match) {
 		return Restrictions.conjunction()
 				.add(associationEq("peptide", match.getPeptide()))
 				.add(nullSafeEq("previousAminoAcid", match.getPreviousAminoAcid()))
@@ -184,7 +184,7 @@ public final class SearchDbDaoHibernate extends DaoBase implements RuntimeInitia
 		return group;
 	}
 
-	private Criterion proteinGroupEqualityCriteria(final ProteinGroup group) {
+	private static Criterion proteinGroupEqualityCriteria(final ProteinGroup group) {
 		return Restrictions.conjunction()
 				.add(associationEq("proteinSequences", group.getProteinSequences()))
 				.add(associationEq("peptideSpectrumMatches", group.getPeptideSpectrumMatches()))
@@ -210,7 +210,7 @@ public final class SearchDbDaoHibernate extends DaoBase implements RuntimeInitia
 	 * Two {@link TandemMassSpectrometrySample} objects are considered identical if they point to the same file.
 	 * This way it is possible to update an older extraction of metadata for a file.
 	 */
-	private Criterion sampleEqualityCriteria(final TandemMassSpectrometrySample sample) {
+	private static Criterion sampleEqualityCriteria(final TandemMassSpectrometrySample sample) {
 		return Restrictions.conjunction()
 				.add(nullSafeEq("file", sample.getFile()))
 				.add(nullSafeEq("lastModified", sample.getLastModified()));
@@ -235,7 +235,7 @@ public final class SearchDbDaoHibernate extends DaoBase implements RuntimeInitia
 		return searchResult;
 	}
 
-	private Criterion searchResultEqualityCriteria(final SearchResult searchResult) {
+	private static Criterion searchResultEqualityCriteria(final SearchResult searchResult) {
 		return Restrictions.conjunction()
 				.add(associationEq("massSpecSample", searchResult.getMassSpecSample()))
 				.add(associationEq("proteinGroups", searchResult.getProteinGroups()));
@@ -260,7 +260,7 @@ public final class SearchDbDaoHibernate extends DaoBase implements RuntimeInitia
 		return biologicalSample;
 	}
 
-	private Criterion biologicalSampleEqualityCriteria(final BiologicalSample biologicalSample) {
+	private static Criterion biologicalSampleEqualityCriteria(final BiologicalSample biologicalSample) {
 		return Restrictions.conjunction()
 				.add(nullSafeEq("sampleName", biologicalSample.getSampleName()))
 				.add(nullSafeEq("category", biologicalSample.getCategory()))
@@ -420,7 +420,7 @@ public final class SearchDbDaoHibernate extends DaoBase implements RuntimeInitia
 
 	@Override
 	public List<ReportData> getSearchesForAccessionNumber(final String accessionNumber) {
-		return (List<ReportData>) getSession().createQuery(
+		return listAndCast(getSession().createQuery(
 				"select distinct rd from " +
 						" Analysis as a" +
 						" inner join a.biologicalSamples as bsl" +
@@ -437,16 +437,15 @@ public final class SearchDbDaoHibernate extends DaoBase implements RuntimeInitia
 						" where pe.sequence = ps " +
 						" and rd.analysisId = a.id " +
 						" and pac.accnum = :accessionNumber")
-				.setParameter("accessionNumber", accessionNumber)
-				.list();
+				.setParameter("accessionNumber", accessionNumber));
 	}
 
 	@Override
 	public List<Long> getReportIdsWithoutAnalysis() {
-		return (List<Long>) getSession().createQuery("select rd.id from ReportData as rd where " +
+		return listAndCast(getSession().createQuery("select rd.id from ReportData as rd where " +
 				"rd.searchRun.hidden=0 " +
 				"and rd.searchRun.swiftSearch is not null " +
-				"and rd.analysisId is null order by rd.dateCreated desc").list();
+				"and rd.analysisId is null order by rd.dateCreated desc"));
 	}
 
 	@Override
@@ -477,13 +476,13 @@ public final class SearchDbDaoHibernate extends DaoBase implements RuntimeInitia
 		if (databaseId != null) {
 			query.setParameter("databaseId", databaseId);
 		}
-		final List list = query.list();
+		final List<Object> list = listAndCast(query);
 
 		int lastGroup = -1;
 		final Collection<String> numbers = new ArrayList<String>(20);
 		for (final Object o : list) {
 			final Object[] array = (Object[]) o;
-			final int pgId = ((Integer) array[0]).intValue();
+			final int pgId = (Integer) array[0];
 			if (lastGroup == -1) {
 				lastGroup = pgId;
 			}
@@ -526,7 +525,7 @@ public final class SearchDbDaoHibernate extends DaoBase implements RuntimeInitia
 		return 0;
 	}
 
-	private boolean isScaffoldReport(final File reportFile) {
+	private static boolean isScaffoldReport(final File reportFile) {
 		final String extension = FileUtilities.getExtension(reportFile.getName());
 		return "sf3".equalsIgnoreCase(extension) || "sfd".equalsIgnoreCase(extension);
 	}
@@ -534,7 +533,7 @@ public final class SearchDbDaoHibernate extends DaoBase implements RuntimeInitia
 	@Override
 	public TreeMap<Integer, ProteinSequenceList> getAllProteinSequences(final Analysis analysis) {
 
-		final List list = getSession().createQuery("select distinct psl from" +
+		final List<ProteinSequenceList> list = listAndCast(getSession().createQuery("select distinct psl from" +
 				" Analysis a" +
 				" inner join a.biologicalSamples as bsl" +
 				" inner join bsl.list as b" +
@@ -543,17 +542,16 @@ public final class SearchDbDaoHibernate extends DaoBase implements RuntimeInitia
 				" inner join r.proteinGroups as pgl" +
 				" inner join pgl.list as pg" +
 				" inner join pg.proteinSequences as psl" +
-				" where a=:a").setParameter("a", analysis).list();
+				" where a=:a").setParameter("a", analysis));
 
 		final TreeMap<Integer, ProteinSequenceList> allProteinGroups = new TreeMap<Integer, ProteinSequenceList>();
-		for (final Object o : list) {
-			final ProteinSequenceList psl = (ProteinSequenceList) o;
+		for (final ProteinSequenceList psl : list) {
 			allProteinGroups.put(psl.getId(), psl);
 		}
 		return allProteinGroups;
 	}
 
-	private Criterion analysisEqualityCriteria(final Analysis analysis) {
+	private static Criterion analysisEqualityCriteria(final Analysis analysis) {
 		return Restrictions.conjunction()
 				.add(nullSafeEq("scaffoldVersion", analysis.getScaffoldVersion()))
 				.add(nullSafeEq("analysisDate", analysis.getAnalysisDate()))

@@ -124,7 +124,7 @@ class MultiValidator implements Validator {
 		private boolean error;
 		private final String value;
 
-		public MyUiChanges(final String value) {
+		MyUiChanges(final String value) {
 			this.value = value;
 			error = false;
 		}

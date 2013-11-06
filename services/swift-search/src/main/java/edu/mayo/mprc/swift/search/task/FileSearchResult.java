@@ -20,7 +20,7 @@ final class FileSearchResult implements Serializable {
 	private Map<String/*Search Engine Code*/, /*search result*/File> results =
 			new HashMap<String/*Search Engine Code*/, File>();
 
-	public FileSearchResult(final File inputFile) {
+	FileSearchResult(final File inputFile) {
 		this.inputFile = inputFile;
 	}
 

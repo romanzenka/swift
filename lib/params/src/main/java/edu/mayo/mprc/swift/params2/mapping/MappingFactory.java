@@ -1,11 +1,9 @@
 package edu.mayo.mprc.swift.params2.mapping;
 
-import java.io.Serializable;
-
 /**
  * Search engine mapping factory interface. Produces {@link Mappings}
  */
-public interface MappingFactory extends Serializable {
+public interface MappingFactory {
 	/**
 	 * @return String code of the search engine.
 	 */

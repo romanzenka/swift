@@ -203,7 +203,7 @@ public final class GridEngineJobManager implements Closeable {
 
 		// SGE allows only decreasing priority. If that is the case, use native specification to pass
 		// the priority decrease
-		if(pPacket.getPriority()<0) {
+		if (pPacket.getPriority() < 0) {
 			if (!spec.isEmpty()) {
 				spec += " ";
 			}
@@ -341,7 +341,7 @@ public final class GridEngineJobManager implements Closeable {
 	 * implements the thread that listens for grid engine responses
 	 */
 	class Runner implements Runnable {
-		public Runner() {
+		Runner() {
 		}
 
 		@Override

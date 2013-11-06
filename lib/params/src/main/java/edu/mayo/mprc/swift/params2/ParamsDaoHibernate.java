@@ -33,7 +33,7 @@ public final class ParamsDaoHibernate extends DaoBase implements ParamsDao {
 
 	@Override
 	public Collection<String> getHibernateMappings() {
-		List<String> list = new ArrayList<String>(Arrays.asList(
+		final Collection<String> list = new ArrayList<String>(Arrays.asList(
 				"edu/mayo/mprc/dbcurator/model/Curation.hbm.xml",
 				"edu/mayo/mprc/dbcurator/model/SourceDatabaseArchive.hbm.xml",
 				"edu/mayo/mprc/dbcurator/model/curationsteps/CurationStep.hbm.xml",
@@ -58,13 +58,13 @@ public final class ParamsDaoHibernate extends DaoBase implements ParamsDao {
 
 	@Override
 	public List<IonSeries> ionSeries() {
-		return (List<IonSeries>) listAll(IonSeries.class);
+		return listAll(IonSeries.class);
 	}
 
 	/**
 	 * @return Criteria that selects ion series equal to given one.
 	 */
-	private SimpleExpression getIonSeriesEqCriteria(final IonSeries ionSeries) {
+	private static Criterion getIonSeriesEqCriteria(final IonSeries ionSeries) {
 		return Restrictions.eq("name", ionSeries.getName());
 	}
 
@@ -97,19 +97,20 @@ public final class ParamsDaoHibernate extends DaoBase implements ParamsDao {
 
 	@Override
 	public List<Instrument> instruments() {
-		return (List<Instrument>) listAll(Instrument.class);
+		return listAll(Instrument.class);
 	}
 
 	@Override
 	public Instrument getInstrumentByName(final String name) {
 		try {
-			return get(Instrument.class, Restrictions.eq("name", name));
+			return
+					get(Instrument.class, Restrictions.eq("name", name));
 		} catch (Exception t) {
 			throw new MprcException("Cannot find instrument " + name, t);
 		}
 	}
 
-	private SimpleExpression getInstrumentEqCriteria(final Instrument instrument) {
+	private static SimpleExpression getInstrumentEqCriteria(final Instrument instrument) {
 		return Restrictions.eq("name", instrument.getName());
 	}
 
@@ -155,10 +156,10 @@ public final class ParamsDaoHibernate extends DaoBase implements ParamsDao {
 
 	@Override
 	public List<Protease> proteases() {
-		return (List<Protease>) listAll(Protease.class);
+		return listAll(Protease.class);
 	}
 
-	private SimpleExpression getProteaseEqCriteria(final Protease protease) {
+	private static SimpleExpression getProteaseEqCriteria(final Protease protease) {
 		return Restrictions.eq("name", protease.getName());
 	}
 
@@ -194,7 +195,7 @@ public final class ParamsDaoHibernate extends DaoBase implements ParamsDao {
 		}
 	}
 
-	private Criterion getExtractMsnSettingsEqualityCriteria(final ExtractMsnSettings extractMsnSettings) {
+	private static Criterion getExtractMsnSettingsEqualityCriteria(final ExtractMsnSettings extractMsnSettings) {
 		return Restrictions.conjunction()
 				.add(nullSafeEq("commandLineSwitches", extractMsnSettings.getCommandLineSwitches()))
 				.add(nullSafeEq("command", extractMsnSettings.getCommand()));
@@ -209,14 +210,14 @@ public final class ParamsDaoHibernate extends DaoBase implements ParamsDao {
 		}
 	}
 
-	private Criterion getStarredProteinsEqualityCriteria(final StarredProteins starredProteins) {
+	private static Criterion getStarredProteinsEqualityCriteria(final StarredProteins starredProteins) {
 		return Restrictions.conjunction()
 				.add(nullSafeEq("starred", starredProteins.getStarred()))
 				.add(nullSafeEq("delimiter", starredProteins.getDelimiter()))
 				.add(nullSafeEq("regularExpression", starredProteins.isRegularExpression()));
 	}
 
-	private Criterion getScaffoldSettingsEqualityCriteria(final ScaffoldSettings scaffoldSettings) {
+	private static Criterion getScaffoldSettingsEqualityCriteria(final ScaffoldSettings scaffoldSettings) {
 		return Restrictions.conjunction()
 				.add(Restrictions.between("proteinProbability", scaffoldSettings.getProteinProbability() - ScaffoldSettings.PROBABILITY_PRECISION, scaffoldSettings.getProteinProbability() + ScaffoldSettings.PROBABILITY_PRECISION))
 				.add(Restrictions.between("peptideProbability", scaffoldSettings.getPeptideProbability() - ScaffoldSettings.PROBABILITY_PRECISION, scaffoldSettings.getPeptideProbability() + ScaffoldSettings.PROBABILITY_PRECISION))
@@ -297,9 +298,9 @@ public final class ParamsDaoHibernate extends DaoBase implements ParamsDao {
 				.add(associationEq("extractMsnSettings", parameters.getExtractMsnSettings()))
 				.add(associationEq("scaffoldSettings", parameters.getScaffoldSettings()))
 		;
-		final List<SearchEngineParameters> parameterList = (List<SearchEngineParameters>) criteria.list();
+		final List<SearchEngineParameters> parameterList = listAndCast(criteria);
 		final SearchEngineParameters existing =
-				parameterList.isEmpty() ? null : (SearchEngineParameters) parameterList.get(0);
+				parameterList.isEmpty() ? null : parameterList.get(0);
 
 		if (existing != null) {
 			if (parameters.equals(existing)) {
@@ -322,10 +323,10 @@ public final class ParamsDaoHibernate extends DaoBase implements ParamsDao {
 	@Override
 	public List<SavedSearchEngineParameters> savedSearchEngineParameters() {
 		try {
-			return (List<SavedSearchEngineParameters>)
+			return listAndCast(
 					allCriteria(SavedSearchEngineParameters.class)
-							.addOrder(Order.asc("name").ignoreCase())
-							.list();
+							.addOrder(Order.asc("name").ignoreCase()));
+
 		} catch (Exception t) {
 			throw new MprcException("Cannot list all saved search parameters", t);
 		}
@@ -364,10 +365,9 @@ public final class ParamsDaoHibernate extends DaoBase implements ParamsDao {
 	@Override
 	public SavedSearchEngineParameters findBestSavedSearchEngineParameters(final SearchEngineParameters parameters, final User user) {
 		try {
-			final List<SavedSearchEngineParameters> list = (List<SavedSearchEngineParameters>)
+			final List<SavedSearchEngineParameters> list = listAndCast(
 					allCriteria(SavedSearchEngineParameters.class)
-							.add(Restrictions.eq("parameters", parameters))
-							.list();
+							.add(Restrictions.eq("parameters", parameters)));
 			if (list.isEmpty()) {
 				return null;
 			}

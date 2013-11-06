@@ -155,7 +155,7 @@ public final class ValidationPanel extends Composite {
 
 		private FlowPanel hp = new FlowPanel();
 
-		public ValidationWidget(final ClientValidation cv) {
+		ValidationWidget(final ClientValidation cv) {
 			this.cv = cv;
 			img = getImageForSeverity(cv.getSeverity());
 			img.addStyleName("params-validation");

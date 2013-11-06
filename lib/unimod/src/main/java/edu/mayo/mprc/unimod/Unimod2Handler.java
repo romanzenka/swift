@@ -24,7 +24,7 @@ class Unimod2Handler extends DefaultHandler {
 
 	private StringBuilder tagScanner = new StringBuilder();
 
-	public Unimod2Handler(final Unimod into) {
+	Unimod2Handler(final Unimod into) {
 		this.into = into;
 	}
 

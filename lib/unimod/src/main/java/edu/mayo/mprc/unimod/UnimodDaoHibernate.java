@@ -46,9 +46,8 @@ public final class UnimodDaoHibernate extends DaoBase implements UnimodDao {
 	public Unimod load() {
 		final Session session = getSession();
 		try {
-			final List<Mod> list = (List<Mod>) allCriteria(Mod.class)
-					.setReadOnly(true)
-					.list();
+			final List<Mod> list = listAndCast(allCriteria(Mod.class)
+					.setReadOnly(true));
 			final Unimod unimod = new Unimod();
 			for (final Mod mod : list) {
 				unimod.add(mod);
@@ -63,7 +62,7 @@ public final class UnimodDaoHibernate extends DaoBase implements UnimodDao {
 	@Override
 	public UnimodUpgrade upgrade(final Unimod unimod, final Change request) {
 		try {
-			final List<Mod> list = (List<Mod>) allCriteria(Mod.class).list();
+			final List<Mod> list = listAndCast(allCriteria(Mod.class));
 			final UnimodUpgrade upgrade = new UnimodUpgrade();
 			upgrade.upgrade(list, unimod, request, getSession());
 			return upgrade;

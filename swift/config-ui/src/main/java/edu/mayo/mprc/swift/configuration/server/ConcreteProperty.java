@@ -11,7 +11,7 @@ class ConcreteProperty {
 	private ResourceConfig resourceConfig;
 	private String propertyName;
 
-	public ConcreteProperty(final ResourceConfig resourceConfig, final String propertyName) {
+	ConcreteProperty(final ResourceConfig resourceConfig, final String propertyName) {
 		this.resourceConfig = resourceConfig;
 		this.propertyName = propertyName;
 	}

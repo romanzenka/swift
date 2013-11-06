@@ -142,7 +142,7 @@ public final class TestSequestVariableMods {
 		/**
 		 * Create basic context with mocked parameter info.
 		 */
-		public SequestContext() {
+		SequestContext() {
 			super(new MockParamsInfo());
 		}
 

@@ -38,7 +38,7 @@ final class OmssaUserModsWriter {
 	private static final XPathFactory XPATH_FACTORY = XPathFactory.newInstance();
 
 
-	public OmssaUserModsWriter() {
+	OmssaUserModsWriter() {
 	}
 
 	/**

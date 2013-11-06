@@ -17,7 +17,7 @@ final class OmssaModsReader {
 	/**
 	 * Null Constructor
 	 */
-	public OmssaModsReader(final File userModsFile) {
+	OmssaModsReader(final File userModsFile) {
 		this.userModsFile = userModsFile;
 	}
 

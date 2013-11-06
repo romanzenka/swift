@@ -6,7 +6,7 @@ import java.io.FilenameFilter;
 class ExtensionFilter implements FilenameFilter {
 	private String extension;
 
-	public ExtensionFilter(final String extension) {
+	ExtensionFilter(final String extension) {
 		this.extension = extension;
 	}
 

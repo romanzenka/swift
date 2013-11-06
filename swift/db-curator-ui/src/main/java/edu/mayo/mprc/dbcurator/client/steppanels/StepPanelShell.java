@@ -54,7 +54,7 @@ class StepPanelShell extends Composite {
 	 * @param toContain the StepPanel that we will wrap around
 	 * @param container the panel that contains this shell
 	 */
-	public StepPanelShell(final AbstractStepPanel toContain, final StepPanelContainer container) {
+	StepPanelShell(final AbstractStepPanel toContain, final StepPanelContainer container) {
 		containedStepPanel = toContain;
 
 		this.container = container;

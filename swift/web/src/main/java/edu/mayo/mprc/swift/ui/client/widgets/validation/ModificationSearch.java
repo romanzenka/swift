@@ -100,13 +100,13 @@ public final class ModificationSearch {
 	}
 
 	public static native boolean match(String toMatch) /*-{
-		var numPatt = /\d+|(\d+\.\d*)|(\.\d+)/;
-		var result = toMatch.match(numPatt);
-		if (result && result.length > 0) {
-			return true;
-		}
-		return false;
-	}-*/;
+        var numPatt = /\d+|(\d+\.\d*)|(\.\d+)/;
+        var result = toMatch.match(numPatt);
+        if (result && result.length > 0) {
+            return true;
+        }
+        return false;
+    }-*/;
 
 	/**
 	 * search by monoisotopic delta mass
@@ -329,7 +329,7 @@ public final class ModificationSearch {
 		private int index;
 		private List<String> tokens;
 
-		public StringTokenizer(final String input, final String delimiters, final boolean includeDelimiter) {
+		StringTokenizer(final String input, final String delimiters, final boolean includeDelimiter) {
 			this.input = input;
 			this.delimiters = delimiters;
 			this.includeDelimiter = includeDelimiter;

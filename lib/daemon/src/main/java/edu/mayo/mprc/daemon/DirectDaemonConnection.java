@@ -30,7 +30,7 @@ final class DirectDaemonConnection implements DaemonConnection {
 	private static int listenerNumber = 0;
 	private FileTokenFactory fileTokenFactory;
 
-	public DirectDaemonConnection(final Service service, final FileTokenFactory fileTokenFactory) {
+	DirectDaemonConnection(final Service service, final FileTokenFactory fileTokenFactory) {
 		if (service == null) {
 			throw new MprcException("The service must not be null");
 		}

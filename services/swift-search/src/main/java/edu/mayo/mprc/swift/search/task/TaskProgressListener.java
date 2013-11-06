@@ -11,7 +11,7 @@ import java.util.Date;
 abstract class TaskProgressListener implements ProgressListener {
 	private static final Logger LOGGER = Logger.getLogger(TaskProgressListener.class);
 
-	private AsyncTaskBase task;
+	private final AsyncTaskBase task;
 
 	protected TaskProgressListener(final AsyncTaskBase task) {
 		this.task = task;

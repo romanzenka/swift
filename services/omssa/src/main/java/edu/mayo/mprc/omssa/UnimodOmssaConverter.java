@@ -22,7 +22,7 @@ import java.util.*;
 final class UnimodOmssaConverter {
 	private ModsUtilities modsUtilities;
 
-	public UnimodOmssaConverter(final ModsUtilities modsUtilities) {
+	UnimodOmssaConverter(final ModsUtilities modsUtilities) {
 		this.modsUtilities = modsUtilities;
 	}
 

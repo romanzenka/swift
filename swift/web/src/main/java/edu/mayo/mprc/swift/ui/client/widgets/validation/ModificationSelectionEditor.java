@@ -79,7 +79,7 @@ public final class ModificationSelectionEditor extends Composite implements Sour
 		private boolean first;
 		private ModificationSearch searcher;
 
-		public SearchKeyboardListener(final ModificationListBox available, final ModificationListBox selected, final HTML description) {
+		SearchKeyboardListener(final ModificationListBox available, final ModificationListBox selected, final HTML description) {
 			this.available = available;
 			this.selected = selected;
 			this.description = description;
@@ -242,7 +242,7 @@ public final class ModificationSelectionEditor extends Composite implements Sour
 		private ModificationListBox available;
 		private ModificationListBox selected;
 
-		public AddOnClick(final ModificationListBox available, final ModificationListBox selected) {
+		AddOnClick(final ModificationListBox available, final ModificationListBox selected) {
 			this.available = available;
 			this.selected = selected;
 		}
@@ -265,7 +265,7 @@ public final class ModificationSelectionEditor extends Composite implements Sour
 		private ModificationListBox selected;
 		private HTML description;
 
-		public RemoveOnClick(final ModificationListBox available, final ModificationListBox selected, final HTML description) {
+		RemoveOnClick(final ModificationListBox available, final ModificationListBox selected, final HTML description) {
 			this.available = available;
 			this.selected = selected;
 			this.description = description;
@@ -329,7 +329,7 @@ public final class ModificationSelectionEditor extends Composite implements Sour
 		private ModificationListBox selected;
 		private HTML description;
 
-		public ModificationsChange(final ModificationListBox available, final ModificationListBox selected, final HTML description) {
+		ModificationsChange(final ModificationListBox available, final ModificationListBox selected, final HTML description) {
 			this.available = available;
 			this.selected = selected;
 			this.description = description;

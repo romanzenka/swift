@@ -23,10 +23,10 @@ public final class CurationInitializer implements RuntimeInitializer {
 	public static final String FASTA_ARCHIVE_FOLDER = "fastaArchiveFolder";
 
 	// Needed for initialization of the database
-	private String testURL = "classpath:/edu/mayo/mprc/dbcurator/ShortTest.fasta.gz";
-	private String defaultURL = "ftp://ftp.expasy.org/databases/uniprot/current_release/knowledgebase/complete/uniprot_sprot.fasta.gz";
+	private final String testURL = "classpath:/edu/mayo/mprc/dbcurator/ShortTest.fasta.gz";
+	private final String defaultURL = "ftp://ftp.expasy.org/databases/uniprot/current_release/knowledgebase/complete/uniprot_sprot.fasta.gz";
 	private CurationDao curationDao;
-	private boolean addSprotRev = false;
+	private final boolean addSprotRev = false;
 
 	public CurationDao getCurationDao() {
 		return curationDao;

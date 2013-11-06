@@ -30,11 +30,11 @@ public interface Mappings {
 
 	/**
 	 * The read method is responsible for reading data from the native params file (e.g. mascot.params)
-	 * and storing them into whatever internal structure of native parameters. This method does no longer make much sense,
-	 * as all the native parameters should get overwritten by the mapped values.
+	 * and storing them into whatever internal structure of native parameters.
+	 * The main reason for this method is historical. Currently it is used to initialize native parameters beyond the ones that are directly
+	 * controlled by the user.
 	 *
 	 * @param isr Reader for the params file
-	 * @deprecated Remove completely.
 	 */
 	void read(Reader isr);
 

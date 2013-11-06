@@ -39,7 +39,7 @@ public final class TestSequestMappings {
 
 	@Test
 	public void shouldClampFragment() {
-		context.setExpectWarnings(new String[] { "'ppm' fragment tolerances", "slow with fragment tolerance below 0.1 Da" });
+		context.setExpectWarnings(new String[]{"'ppm' fragment tolerances", "slow with fragment tolerance below 0.1 Da"});
 		sequestMappings.setFragmentTolerance(context, new Tolerance(20, MassUnit.Ppm));
 		Assert.assertEquals(sequestMappings.getNativeParam("fragment_ion_tolerance"), "0.1", "The tolerance did not get clamped");
 	}
@@ -70,7 +70,7 @@ public final class TestSequestMappings {
 		/**
 		 * Create basic context with mocked parameter info.
 		 */
-		public SequestContext() {
+		SequestContext() {
 			super(new MockParamsInfo());
 		}
 
@@ -87,8 +87,8 @@ public final class TestSequestMappings {
 		public void reportWarning(final String message) {
 			if (expectWarnings != null) {
 
-				for(final String warning : expectWarnings) {
-					if(message.contains(warning)) {
+				for (final String warning : expectWarnings) {
+					if (message.contains(warning)) {
 						return;
 					}
 				}

@@ -122,7 +122,7 @@ public final class ConfigWrapper extends SimplePanel {
 	}
 
 	private static final class DaemonUi {
-		public DaemonUi(final DaemonModel model, final TreeItem treeItem, final DaemonWrapper wrapper) {
+		DaemonUi(final DaemonModel model, final TreeItem treeItem, final DaemonWrapper wrapper) {
 			this.model = model;
 			this.treeItem = treeItem;
 			this.wrapper = wrapper;

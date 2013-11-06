@@ -51,7 +51,7 @@ final class MgfToDtaFileParser {
 	private String outfilePrefix;
 
 
-	public MgfToDtaFileParser(final SequestSubmitterInterface s, final IonsModellerInterface i, final String tempBase) {
+	MgfToDtaFileParser(final SequestSubmitterInterface s, final IonsModellerInterface i, final String tempBase) {
 		sequestSubmitter = s;
 		ionsModeller = i;
 		tempWorkingDir = tempBase;

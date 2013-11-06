@@ -57,7 +57,7 @@ public final class FileTable extends FlexTable implements SourcesChangeEvents, C
 	}
 
 	private static final class MutableInteger {
-		public MutableInteger(final int i) {
+		MutableInteger(final int i) {
 			this.i = i;
 		}
 
@@ -480,7 +480,7 @@ public final class FileTable extends FlexTable implements SourcesChangeEvents, C
 		private int _column;
 		private FileTable _fileTable;
 
-		public TextChangeListener(final int column, final FileTable fileTable) {
+		TextChangeListener(final int column, final FileTable fileTable) {
 			_column = column;
 			_fileTable = fileTable;
 		}
@@ -497,7 +497,7 @@ public final class FileTable extends FlexTable implements SourcesChangeEvents, C
 	private class RemoveButtonListener implements ClickListener {
 		private MutableInteger rowIndex;
 
-		public RemoveButtonListener(final MutableInteger rowIndex) {
+		RemoveButtonListener(final MutableInteger rowIndex) {
 			this.rowIndex = rowIndex;
 		}
 

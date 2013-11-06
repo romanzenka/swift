@@ -59,7 +59,7 @@ class SequestRunner implements Runnable, SequestCallerInterface {
 	 * @param sequestDtaFiles - the list of '.dta' files for this call to the sequest executable
 	 * @param hostsFile       - pvm.hosts file location. Needed for checking whether pvm operates ok.
 	 */
-	public SequestRunner(final File workingdir, final File paramsFile, final List<File> sequestDtaFiles, final File hostsFile) {
+	SequestRunner(final File workingdir, final File paramsFile, final List<File> sequestDtaFiles, final File hostsFile) {
 		setWorkingDir(workingdir);
 		this.paramsFile = paramsFile;
 		this.sequestDtaFiles = sequestDtaFiles;
@@ -284,7 +284,7 @@ class SequestRunner implements Runnable, SequestCallerInterface {
 		private String errorDescription;
 		private final ProcessCaller caller;
 
-		public SequestLogMonitor(final ProcessCaller caller) {
+		SequestLogMonitor(final ProcessCaller caller) {
 			this.caller = caller;
 		}
 

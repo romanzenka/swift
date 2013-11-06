@@ -63,7 +63,7 @@ public final class ModificationsLabelRunClick implements ClickListener {
 		private ModificationSelectionEditor editor;
 		private ModificationsLabel proxy;
 
-		public OkClickListener(final ModificationSelectionEditor editor, final ModificationsLabel proxy) {
+		OkClickListener(final ModificationSelectionEditor editor, final ModificationsLabel proxy) {
 			this.editor = editor;
 			this.proxy = proxy;
 		}

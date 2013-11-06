@@ -10,7 +10,7 @@ import java.util.List;
 final class NoSequestDeploymentResult implements DatabaseDeploymentResult {
 	private File fastaFile;
 
-	public NoSequestDeploymentResult(final File fastaFile) {
+	NoSequestDeploymentResult(final File fastaFile) {
 		this.fastaFile = fastaFile;
 	}
 

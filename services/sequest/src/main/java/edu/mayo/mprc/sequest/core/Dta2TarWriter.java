@@ -13,7 +13,7 @@ final class Dta2TarWriter {
 	private static final Logger LOGGER = Logger.getLogger(Dta2TarWriter.class);
 	private static final String OUT_EXT = ".out";
 
-	public Dta2TarWriter() {
+	Dta2TarWriter() {
 	}
 
 

@@ -39,7 +39,7 @@ class Unimod1Handler extends DefaultHandler {
 	private ModBuilder currentMod;
 	private SpecificityBuilder currentSpecificity;
 
-	public Unimod1Handler(final Unimod into) {
+	Unimod1Handler(final Unimod into) {
 		this.into = into;
 	}
 

@@ -579,7 +579,7 @@ public final class SwiftApp implements EntryPoint, HidesPageContentsWhileLoading
     }-*/;
 
 	private class RunClickListener implements ClickListener {
-		public RunClickListener() {
+		RunClickListener() {
 		}
 
 		@Override

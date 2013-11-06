@@ -100,7 +100,7 @@ public final class TestMascotMappings {
 	}
 
 	private static final class PpmContext extends TestMappingContextBase {
-		public PpmContext(final ParamsInfo paramsInfo) {
+		PpmContext(final ParamsInfo paramsInfo) {
 			super(paramsInfo);
 		}
 

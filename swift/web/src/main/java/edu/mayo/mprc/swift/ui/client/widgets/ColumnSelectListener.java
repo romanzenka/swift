@@ -5,8 +5,8 @@ import com.google.gwt.user.client.ui.ClickListener;
 import com.google.gwt.user.client.ui.Widget;
 
 public final class ColumnSelectListener implements ClickListener {
-	private int column;
-	private FileTable table;
+	private final int column;
+	private final FileTable table;
 
 	public ColumnSelectListener(final int column, final FileTable table) {
 		this.column = column;

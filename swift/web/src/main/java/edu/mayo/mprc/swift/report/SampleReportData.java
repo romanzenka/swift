@@ -85,7 +85,7 @@ public final class SampleReportData {
 		private final String[] row;
 		private static final DateTimeFormatter DATE_FORMAT = DateTimeFormat.forPattern("YYYY-MM-dd HH:mm:ss");
 
-		public SamplePrinter(String[] headers, CsvWriter writer) {
+		SamplePrinter(String[] headers, CsvWriter writer) {
 			this.headers = headers;
 			this.writer = writer;
 			row = new String[headers.length];

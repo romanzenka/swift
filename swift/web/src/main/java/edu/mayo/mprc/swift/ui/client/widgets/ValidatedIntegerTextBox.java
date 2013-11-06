@@ -4,7 +4,7 @@ public final class ValidatedIntegerTextBox extends ValidatedTextBox {
 	private static class IntegerValidator extends TextBoxValidator {
 		private int low, high;
 
-		public IntegerValidator(final int low, final int high) {
+		IntegerValidator(final int low, final int high) {
 			this.low = low;
 			this.high = high;
 		}

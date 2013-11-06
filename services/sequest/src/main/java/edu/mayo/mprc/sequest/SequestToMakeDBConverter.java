@@ -94,7 +94,7 @@ public final class SequestToMakeDBConverter {
 	}
 
 	private abstract static class Mapper {
-		public Mapper(final String regexp) {
+		Mapper(final String regexp) {
 			this.regexp = regexp;
 		}
 
@@ -139,7 +139,7 @@ public final class SequestToMakeDBConverter {
 	 * Silently ignores the input Param matching regexp.
 	 */
 	private static final class NullMapper extends Mapper {
-		public NullMapper(final String regexp) {
+		NullMapper(final String regexp) {
 			super(regexp);
 		}
 
@@ -159,7 +159,7 @@ public final class SequestToMakeDBConverter {
 		private String outputKey;
 		private String value;
 
-		public ConstantMapper(final String outputKey, final String value) {
+		ConstantMapper(final String outputKey, final String value) {
 			super(null);
 			this.outputKey = outputKey;
 			this.value = value;
@@ -181,12 +181,12 @@ public final class SequestToMakeDBConverter {
 	/* Maps the save value from inputKey to outputKey.*/
 
 	private static final class DirectMapper extends Mapper {
-		public DirectMapper(final String sameKeyRegexp) {
+		DirectMapper(final String sameKeyRegexp) {
 			super(sameKeyRegexp);
 			outputKey = null;
 		}
 
-		public DirectMapper(final String inputKeyRegexp, final String newKey) {
+		DirectMapper(final String inputKeyRegexp, final String newKey) {
 			super(inputKeyRegexp);
 			outputKey = newKey;
 		}

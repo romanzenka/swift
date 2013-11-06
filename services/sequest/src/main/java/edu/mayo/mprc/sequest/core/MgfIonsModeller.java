@@ -22,7 +22,7 @@ final class MgfIonsModeller implements IonsModellerInterface {
 
 	private static final double PROTON_MASS = 1.00727646;
 
-	public MgfIonsModeller() {
+	MgfIonsModeller() {
 		scans = new HashMap<String, Integer>();
 		dtaHistory = new HashMap<String, String>();
 		ionsSection = 1;
