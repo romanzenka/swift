@@ -127,7 +127,7 @@ public final class LoadToSearchDb implements SwiftCommand {
 	 */
 	public static void initializeDatabase(final SwiftEnvironment environment, final SwiftSearcher.Config config) {
 		LOGGER.info("Initializing database");
-		final Object database = environment.createResource(config.getDatabase());
+		environment.createResource(config.getDatabase());
 		LOGGER.info("Database initialized");
 	}
 
@@ -379,7 +379,7 @@ public final class LoadToSearchDb implements SwiftCommand {
 		return dao;
 	}
 
-	@Resource(name="swiftDao")
+	@Resource(name = "swiftDao")
 	public void setDao(final SwiftDao dao) {
 		this.dao = dao;
 	}
@@ -388,7 +388,7 @@ public final class LoadToSearchDb implements SwiftCommand {
 		return searchDbDao;
 	}
 
-	@Resource(name="searchDbDao")
+	@Resource(name = "searchDbDao")
 	public void setSearchDbDao(final SearchDbDao searchDbDao) {
 		this.searchDbDao = searchDbDao;
 	}
@@ -397,7 +397,7 @@ public final class LoadToSearchDb implements SwiftCommand {
 		return fileTokenFactory;
 	}
 
-	@Resource(name="fileTokenFactory")
+	@Resource(name = "fileTokenFactory")
 	public void setFileTokenFactory(final FileTokenFactory fileTokenFactory) {
 		this.fileTokenFactory = fileTokenFactory;
 	}

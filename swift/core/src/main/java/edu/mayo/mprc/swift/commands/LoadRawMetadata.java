@@ -103,7 +103,9 @@ public final class LoadRawMetadata implements SwiftCommand {
 	}
 
 	private void runTillDone(final List<WorkflowEngine> engines) {
-		while (!runEngines(engines)) {
+		boolean allDone = false;
+		while (!allDone) {
+			allDone = runEngines(engines);
 		}
 		engines.clear();
 	}
@@ -166,7 +168,7 @@ public final class LoadRawMetadata implements SwiftCommand {
 		return searchDbDao;
 	}
 
-	@Resource(name="searchDbDao")
+	@Resource(name = "searchDbDao")
 	public void setSearchDbDao(final SearchDbDao searchDbDao) {
 		this.searchDbDao = searchDbDao;
 	}
@@ -175,7 +177,7 @@ public final class LoadRawMetadata implements SwiftCommand {
 		return fileTokenFactory;
 	}
 
-	@Resource(name="fileTokenFactory")
+	@Resource(name = "fileTokenFactory")
 	public void setFileTokenFactory(final FileTokenFactory fileTokenFactory) {
 		this.fileTokenFactory = fileTokenFactory;
 	}

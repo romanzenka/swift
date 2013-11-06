@@ -477,7 +477,7 @@ public final class SwiftApp implements EntryPoint, HidesPageContentsWhileLoading
 			});
 		}
 
-		runButton.addClickListener(new RunClickListener(this));
+		runButton.addClickListener(new RunClickListener());
 	}
 
 	/**
@@ -541,7 +541,7 @@ public final class SwiftApp implements EntryPoint, HidesPageContentsWhileLoading
 			@Override
 			public void onSuccess(Boolean result) {
 				outputValidationPanel.removeValidationsFor(output);
-				if(Boolean.TRUE.equals(result)) {
+				if (Boolean.TRUE.equals(result)) {
 					outputValidationPanel.addValidation(new ClientValidation("Folder exists, will be overwritten"), output);
 				}
 			}
@@ -579,10 +579,7 @@ public final class SwiftApp implements EntryPoint, HidesPageContentsWhileLoading
     }-*/;
 
 	private class RunClickListener implements ClickListener {
-		private final SwiftApp swiftApp;
-
-		public RunClickListener(final SwiftApp app) {
-			swiftApp = app;
+		public RunClickListener() {
 		}
 
 		@Override
@@ -592,6 +589,12 @@ public final class SwiftApp implements EntryPoint, HidesPageContentsWhileLoading
 
 			final String titleText = title.getText();
 
+			if (titleText == null) {
+				Window.alert("No title specified");
+				title.setFocus(true);
+				return;
+			}
+
 			if (!titleText.matches(TITLE_ALLOWED)) {
 				Window.alert("The search title " + titleText + " is invalid. Please use only letters, numbers, - + . _ ( ) [ ] { } = # and a space.");
 				title.setFocus(true);
@@ -600,12 +603,6 @@ public final class SwiftApp implements EntryPoint, HidesPageContentsWhileLoading
 
 			final String effectiveOutputPath = outputPathUserSpecified ? output.getText() : outputPath;
 			final String user = users.getValue(users.getSelectedIndex());
-
-			if (titleText == null) {
-				Window.alert("No title specified");
-				title.setFocus(true);
-				return;
-			}
 
 			final List<ClientFileSearch> fileSearches = getFileSearches();
 			if (fileSearches == null || fileSearches.isEmpty()) {

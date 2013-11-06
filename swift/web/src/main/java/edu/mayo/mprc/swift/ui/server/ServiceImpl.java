@@ -40,8 +40,6 @@ import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 
-import javax.servlet.ServletConfig;
-import javax.servlet.ServletException;
 import javax.servlet.http.HttpSession;
 import java.io.File;
 import java.text.MessageFormat;
@@ -750,11 +748,6 @@ public final class ServiceImpl extends SpringGwtServlet implements Service, Appl
 	@Override
 	public void setApplicationContext(final ApplicationContext applicationContext) throws BeansException {
 		MainFactoryContext.setContext(applicationContext);
-	}
-
-	@Override
-	public void init(final ServletConfig config) throws ServletException {
-		super.init(config);
 	}
 
 	private class Resolver implements ClientParamSetResolver {

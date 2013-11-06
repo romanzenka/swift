@@ -1,6 +1,7 @@
 package edu.mayo.mprc.heme;
 
 import com.google.common.base.Function;
+import com.google.common.base.Preconditions;
 import com.google.common.base.Splitter;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
@@ -318,6 +319,7 @@ public final class HemeUi {
 		return Maps.uniqueIndex(getHemeDao().getAllTests(), new Function<HemeTest, String>() {
 			@Override
 			public String apply(@Nullable final HemeTest from) {
+				Preconditions.checkNotNull(from, "Programmer error - the heme test was null");
 				return from.getPath();
 			}
 		});

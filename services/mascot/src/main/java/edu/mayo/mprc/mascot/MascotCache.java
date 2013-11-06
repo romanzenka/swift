@@ -34,17 +34,9 @@ public final class MascotCache extends WorkCache<MascotWorkPacket> {
 
 	@Component("mascotCacheFactory")
 	public static final class Factory extends WorkCache.Factory<Config> {
-		private static MascotCache cache;
-
-		@Override
-		public WorkCache getCache() {
-			return cache;
-		}
-
 		@Override
 		public WorkCache createCache(final Config config, final DependencyResolver dependencies) {
-			cache = new MascotCache();
-			return cache;
+			return new MascotCache();
 		}
 	}
 

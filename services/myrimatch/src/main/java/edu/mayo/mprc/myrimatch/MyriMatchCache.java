@@ -23,16 +23,9 @@ public final class MyriMatchCache extends WorkCache<MyriMatchWorkPacket> {
 
 	@Component("myrimatchCacheFactory")
 	public static final class Factory extends WorkCache.Factory<Config> {
-		private static MyriMatchCache cache;
-
-		@Override
-		public WorkCache getCache() {
-			return cache;
-		}
-
 		@Override
 		public WorkCache createCache(final Config config, final DependencyResolver dependencies) {
-			return cache = new MyriMatchCache();
+			return new MyriMatchCache();
 		}
 	}
 

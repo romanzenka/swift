@@ -23,16 +23,9 @@ public final class OmssaCache extends WorkCache<OmssaWorkPacket> {
 
 	@Component("omssaCacheFactory")
 	public static final class Factory extends WorkCache.Factory<Config> {
-		private static OmssaCache cache;
-
-		@Override
-		public WorkCache getCache() {
-			return cache;
-		}
-
 		@Override
 		public WorkCache createCache(final Config config, final DependencyResolver dependencies) {
-			return cache = new OmssaCache();
+			return new OmssaCache();
 		}
 	}
 

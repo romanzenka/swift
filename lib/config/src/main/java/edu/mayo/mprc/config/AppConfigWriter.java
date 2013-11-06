@@ -149,14 +149,12 @@ public final class AppConfigWriter implements Closeable {
 					writer.println();
 				}
 				writer.print(indent);
-				if (key != null) {
-					writer.print(key);
+				writer.print(key);
 
-					final String value = triplet.getValue();
-					if (!Strings.isNullOrEmpty(value)) {
-						writer.print(StringUtilities.repeat(' ', maxKey - key.length() + 2));
-						writer.print(value);
-					}
+				final String value = triplet.getValue();
+				if (!Strings.isNullOrEmpty(value)) {
+					writer.print(StringUtilities.repeat(' ', maxKey - key.length() + 2));
+					writer.print(value);
 				}
 				writer.println();
 				prevValue = true;

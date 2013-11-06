@@ -182,10 +182,6 @@ public class ConfigurationData {
 		// A service needs a runner
 		final ServiceConfig serviceConfig = new ServiceConfig();
 
-		if (!(resourceConfig instanceof ResourceConfig)) {
-			ExceptionUtilities.throwCastException(resourceConfig, ResourceConfig.class);
-			return null;
-		}
 		serviceConfig.setRunner(new SimpleRunner.Config(resourceConfig));
 		serviceConfig.setName(getName(type, index)); // The name is type_index
 

@@ -62,7 +62,7 @@ public final class UpgradeUnimodCommand implements SwiftCommand {
 	 */
 	public static void initializeDatabase(SwiftEnvironment environment, SwiftSearcher.Config config) {
 		LOGGER.info("Initializing database");
-		final Object database = environment.createResource(config.getDatabase());
+		environment.createResource(config.getDatabase());
 		LOGGER.info("Database initialized");
 	}
 

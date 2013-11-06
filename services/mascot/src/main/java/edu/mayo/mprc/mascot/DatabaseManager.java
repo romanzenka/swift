@@ -97,7 +97,7 @@ public final class DatabaseManager implements Closeable {
 		try {
 			final HtmlPage page = getPage(mascotServerUrl + DB_MANAGER_URL);
 			final HtmlForm newDbForm = clickNewDatabase(page);
-			final HtmlForm dbDefForm = addCustomDatabase(name, newDbForm);
+			addCustomDatabase(name, newDbForm);
 
 		} catch (Exception e) {
 			throw new MprcException("Could not deploy mascot database " + name, e);

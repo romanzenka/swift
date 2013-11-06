@@ -10,26 +10,32 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
  * effort (too large?) to decouple Swift enough to make full Spring wiring possible.
  */
 public final class MainFactoryContext {
-	private static ApplicationContext context;
+	private static ApplicationContext context = null;
 
 	private MainFactoryContext() {
 	}
 
-	public static synchronized ApplicationContext getContext() {
-		initialize();
-		return context;
+	public static ApplicationContext getContext() {
+		synchronized (MainFactoryContext.class) {
+			initialize();
+			return context;
+		}
 	}
 
-	public static synchronized void setContext(final ApplicationContext c) {
-		context = c;
+	public static void setContext(final ApplicationContext c) {
+		synchronized (MainFactoryContext.class) {
+			context = c;
+		}
 	}
 
 	/**
 	 * Initialize the context.
 	 */
 	public static void initialize() {
-		if (context == null) {
-			context = getDefaultContext();
+		synchronized (MainFactoryContext.class) {
+			if (context == null) {
+				context = getDefaultContext();
+			}
 		}
 	}
 
@@ -45,7 +51,7 @@ public final class MainFactoryContext {
 	 * Returns a bean of a given id using the context returned by {@link #getContext()}.
 	 *
 	 * @param beanId Bean id we want.
-	 * @return The bean for <code>beanId</code>.
+	 * @return The bean for {@code beanId}.
 	 */
 	private static Object getBean(final String beanId) {
 		return getContext().getBean(beanId);

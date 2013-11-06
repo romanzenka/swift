@@ -25,16 +25,9 @@ public final class SequestCache extends WorkCache<SequestMGFWorkPacket> {
 
 	@Component("sequestCacheFactory")
 	public static final class Factory extends WorkCache.Factory<Config> {
-		private static SequestCache cache;
-
-		@Override
-		public WorkCache getCache() {
-			return cache;
-		}
-
 		@Override
 		public WorkCache createCache(final Config config, final DependencyResolver dependencies) {
-			return cache = new SequestCache();
+			return new SequestCache();
 		}
 	}
 

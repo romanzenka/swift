@@ -73,7 +73,7 @@ public final class AminoAcidSet {
 
 				final String formula = iterator.next();
 				if (formula == null) {
-					throw new MprcException("Unspecified amino acid formula [" + formula + "]");
+					throw new MprcException("Null amino acid formula for code [" + code3 + "]");
 				}
 
 				final String monoMassString = iterator.next();

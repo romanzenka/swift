@@ -60,7 +60,6 @@ public class HemeScaffoldReader extends ScaffoldReportReader {
 			ids.add(id);
 		}
 		final int totalSpectra = parseInt(currentLine[numberOfTotalSpectra]);
-		final int uniquePeptides = parseInt(currentLine[numberOfUniquePeptides]);
 
 		HemeReportEntry entry = entries.get(accnumString);
 		if (entry == null) {

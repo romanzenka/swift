@@ -364,11 +364,10 @@ public abstract class WorkCache<T extends WorkPacket> implements NoLoggingWorker
 	 * @param <S> Configuration the cache takes to set itself up.
 	 */
 	public abstract static class Factory<S extends CacheConfig> extends WorkerFactoryBase<S> {
-		public abstract WorkCache getCache();
+		private WorkCache cache;
 
 		@Override
 		public synchronized Worker create(final S config, final DependencyResolver dependencies) {
-			WorkCache cache = getCache();
 			if (cache == null) {
 				cache = createCache(config, dependencies);
 				cache.setCacheFolder(new File(config.getCacheFolder()).getAbsoluteFile());

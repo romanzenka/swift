@@ -24,16 +24,9 @@ public final class RAWDumpCache extends WorkCache<RAWDumpWorkPacket> {
 
 	@Component("rawDumpCacheFactory")
 	public static final class Factory extends WorkCache.Factory<Config> {
-		private static RAWDumpCache cache;
-
-		@Override
-		public WorkCache getCache() {
-			return cache;
-		}
-
 		@Override
 		public WorkCache createCache(final Config config, final DependencyResolver dependencies) {
-			return cache = new RAWDumpCache();
+			return new RAWDumpCache();
 		}
 	}
 

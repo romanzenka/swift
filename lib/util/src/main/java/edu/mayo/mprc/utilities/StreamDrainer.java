@@ -82,7 +82,7 @@ public final class StreamDrainer implements Runnable {
 	 */
 	void addLine(final String line) {
 		// We started with an escape sequence, ignore this line
-		if (line.indexOf(ESCAPE) == 0) {
+		if (line != null && line.indexOf(ESCAPE) == 0) {
 			return;
 		}
 		// Drop spammy empty line messages

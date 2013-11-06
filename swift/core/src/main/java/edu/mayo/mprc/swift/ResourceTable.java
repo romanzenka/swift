@@ -2,6 +2,7 @@ package edu.mayo.mprc.swift;
 
 import com.google.common.base.Function;
 import com.google.common.base.Joiner;
+import com.google.common.base.Preconditions;
 import com.google.common.collect.Iterables;
 import edu.mayo.mprc.MprcException;
 import edu.mayo.mprc.config.*;
@@ -266,6 +267,7 @@ public final class ResourceTable extends FactoryBase<ResourceConfig, Object> imp
 	private static class ClassNameFunction implements Function<Class<? extends ResourceConfig>, String> {
 		@Override
 		public String apply(@Nullable final Class<? extends ResourceConfig> from) {
+			Preconditions.checkNotNull(from, "Programmer error - passed null class to obtain name from");
 			return from.getName();
 		}
 	}
