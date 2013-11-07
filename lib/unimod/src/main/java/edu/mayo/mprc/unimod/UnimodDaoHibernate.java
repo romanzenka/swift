@@ -72,7 +72,7 @@ public final class UnimodDaoHibernate extends DaoBase implements UnimodDao {
 	}
 
 	@Override
-	public String check(final Map<String, String> params) {
+	public String check() {
 		if (countAll(Mod.class) == 0) {
 			return "No unimod modifications defined";
 		}
@@ -80,7 +80,7 @@ public final class UnimodDaoHibernate extends DaoBase implements UnimodDao {
 	}
 
 	@Override
-	public void initialize(final Map<String, String> params) {
+	public void initialize(Map<String, String> params) {
 		if (countAll(Mod.class) == 0) {
 			final Change change = new Change("Installing initial unimod modifications", new DateTime());
 			LOGGER.info(change.getReason());

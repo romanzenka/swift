@@ -149,10 +149,10 @@ public abstract class AbstractRunner implements Checkable, Installable {
 	}
 
 	/**
-	 * Check the associate worker, throw an exception if there is a failure detected.
+	 * Check the associate worker, return null if ok, message when something is wrong.
 	 */
 	@Override
-	public abstract void check();
+	public abstract String check();
 
 	class SynchronousRequestReceiver implements Runnable {
 		private volatile boolean keepRunning = true;

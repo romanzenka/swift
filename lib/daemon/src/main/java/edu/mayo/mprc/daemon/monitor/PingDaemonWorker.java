@@ -40,11 +40,6 @@ public final class PingDaemonWorker extends WorkerBase implements NoLoggingWorke
 		return "ping monitoring support";
 	}
 
-	@Override
-	public void check() {
-		// No check needed
-	}
-
 	/**
 	 * A factory capable of creating the worker
 	 */

@@ -186,11 +186,11 @@ public final class MockParamsDao implements ParamsDao {
 	}
 
 	@Override
-	public String check(final Map<String, String> params) {
+	public String check() {
 		return null;
 	}
 
 	@Override
-	public void initialize(final Map<String, String> params) {
+	public void initialize(Map<String, String> params) {
 	}
 }

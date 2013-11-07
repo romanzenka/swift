@@ -48,8 +48,8 @@ public final class SimpleRunner extends AbstractRunner {
 	}
 
 	@Override
-	public void check() {
-		factory.create(config, dependencies).check();
+	public String check() {
+		return factory.create(config, dependencies).check();
 	}
 
 	@Override

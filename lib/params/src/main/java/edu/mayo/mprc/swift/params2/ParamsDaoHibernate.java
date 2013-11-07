@@ -388,7 +388,7 @@ public final class ParamsDaoHibernate extends DaoBase implements ParamsDao {
 	}
 
 	@Override
-	public String check(final Map<String, String> params) {
+	public String check() {
 		if (countAll(IonSeries.class) == 0) {
 			return "No ion series defined";
 		}
@@ -402,7 +402,7 @@ public final class ParamsDaoHibernate extends DaoBase implements ParamsDao {
 	}
 
 	@Override
-	public void initialize(final Map<String, String> params) {
+	public void initialize(Map<String, String> params) {
 		installIonSeries();
 		installInstruments();
 		installProteases();

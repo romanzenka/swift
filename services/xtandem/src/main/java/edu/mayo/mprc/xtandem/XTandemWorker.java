@@ -305,17 +305,22 @@ public final class XTandemWorker extends WorkerBase {
 	}
 
 	@Override
-	public void check() {
-		final List<String> parameters = new LinkedList<String>();
-		parameters.add(tandemExecutable.getPath());
-		parameters.add("-h");
+	public String check() {
+		try {
+			final List<String> parameters = new LinkedList<String>();
+			parameters.add(tandemExecutable.getPath());
+			parameters.add("-h");
 
-		final ProcessBuilder processBuilder = new ProcessBuilder(parameters);
-		final ProcessCaller processCaller = new ProcessCaller(processBuilder);
-		processCaller.setKillTimeout(1000);
-		final ByteArrayInputStream stream = new ByteArrayInputStream("\n".getBytes(Charsets.US_ASCII));
-		processCaller.setInputStream(stream);
-		processCaller.runAndCheck("X!Tandem", 255);
+			final ProcessBuilder processBuilder = new ProcessBuilder(parameters);
+			final ProcessCaller processCaller = new ProcessCaller(processBuilder);
+			processCaller.setKillTimeout(1000);
+			final ByteArrayInputStream stream = new ByteArrayInputStream("\n".getBytes(Charsets.US_ASCII));
+			processCaller.setInputStream(stream);
+			processCaller.runAndCheck("X!Tandem", 255);
+		} catch (Exception e) {
+			return e.getMessage();
+		}
+		return null;
 	}
 
 	/**

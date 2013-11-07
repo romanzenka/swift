@@ -1,6 +1,5 @@
 package edu.mayo.mprc.msmseval;
 
-import edu.mayo.mprc.MprcException;
 import edu.mayo.mprc.config.DaemonConfig;
 import edu.mayo.mprc.config.DependencyResolver;
 import edu.mayo.mprc.config.ResourceConfig;
@@ -185,10 +184,11 @@ public final class MSMSEvalWorker extends WorkerBase {
 	}
 
 	@Override
-	public void check() {
+	public String check() {
 		if (!msmsEvalExecutable.canExecute()) {
-			throw new MprcException("msmsEval is not executable: " + msmsEvalExecutable.getAbsolutePath());
+			return "msmsEval is not executable: " + msmsEvalExecutable.getAbsolutePath();
 		}
+		return null;
 	}
 
 

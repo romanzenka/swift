@@ -134,7 +134,8 @@ public final class ScaffoldDeploymentService extends DeploymentService<Deploymen
 	}
 
 	@Override
-	public void check() {
+	public String check() {
+		return null;
 	}
 
 	/**

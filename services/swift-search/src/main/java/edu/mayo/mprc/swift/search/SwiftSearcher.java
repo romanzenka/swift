@@ -1,6 +1,5 @@
 package edu.mayo.mprc.swift.search;
 
-import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 import com.google.common.collect.ObjectArrays;
 import edu.mayo.mprc.MprcException;
@@ -295,19 +294,20 @@ public final class SwiftSearcher implements Worker {
 	}
 
 	@Override
-	public void check() {
+	public String check() {
 		if (supportedEngines != null) {
-			throw new MprcException("Supported engines must not be null");
+			return "Supported engines must not be null";
 		}
 		if (!(!raw2mgfEnabled || raw2mgfDaemon != null)) {
-			throw new MprcException("Raw2mgf daemon must be set up if it is enabled");
+			return "Raw2mgf daemon must be set up if it is enabled";
 		}
 		if (!(!mgf2mgfEnabled || mgfCleanupDaemon != null)) {
-			throw new MprcException("MgfCleanup daemon must be set up if it is enabled");
+			return "MgfCleanup daemon must be set up if it is enabled";
 		}
 		if (!(!msconvertEnabled || msconvertDaemon != null)) {
-			throw new MprcException("Msconvert daemon must be set up if it is enabled");
+			return "Msconvert daemon must be set up if it is enabled";
 		}
+		return null;
 	}
 
 	private SearchRunner createSearchRunner(final SwiftSearchWorkPacket swiftSearchWorkPacket, final ProgressReporter progressReporter) {
@@ -782,7 +782,7 @@ public final class SwiftSearcher implements Worker {
 								final Config searcher = (Config) config;
 								validator.setSearcherConfig(searcher);
 								validator.setDaemonConfig(daemon);
-								final String error = validator.check(new HashMap<String, String>(0));
+								final String error = validator.check();
 								if (error != null) {
 									response.displayPropertyError(config, DATABASE, error);
 								}
@@ -798,9 +798,7 @@ public final class SwiftSearcher implements Worker {
 							final Config searcher = (Config) config;
 							validator.setSearcherConfig(searcher);
 							validator.setDaemonConfig(daemon);
-							validator.initialize(new ImmutableMap.Builder<String, String>()
-									.put("action", action)
-									.build());
+							validator.initialize(new HashMap<String, String>(0));
 						}
 					})
 					.reference(Database.Factory.TYPE, UiBuilder.NONE_TYPE)

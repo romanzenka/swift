@@ -38,8 +38,11 @@ public final class CheckConfigCommand implements SwiftCommand {
 
 			getServiceFactory().initialize(environment.getMessageBroker().getBrokerUrl(), config.getName());
 			final Daemon daemon = environment.createDaemon(config);
-			daemon.check();
-
+			String check = daemon.check();
+			if (check != null) {
+				FileUtilities.err(check);
+				return ExitCode.Error;
+			}
 		} catch (MprcException e) {
 			FileUtilities.err(e.getMessage());
 			return ExitCode.Error;

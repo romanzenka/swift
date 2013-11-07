@@ -194,16 +194,17 @@ public final class WebUi implements Checkable {
 	}
 
 	@Override
-	public void check() {
+	public String check() {
 		if (browseRoot == null) {
-			throw new MprcException(BROWSE_ROOT + " must be set");
+			return BROWSE_ROOT + " must be set";
 		}
 		if (!browseRoot.isDirectory()) {
-			throw new MprcException(BROWSE_ROOT + " must refer to a directory");
+			return BROWSE_ROOT + " must refer to a directory";
 		}
 		if (!browseRoot.canRead()) {
-			throw new MprcException(BROWSE_ROOT + " must be readable");
+			return BROWSE_ROOT + " must be readable";
 		}
+		return null;
 	}
 
 	/**

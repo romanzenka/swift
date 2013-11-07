@@ -597,7 +597,8 @@ public final class MascotDeploymentService extends DeploymentService<DeploymentR
 	}
 
 	@Override
-	public void check() {
+	public String check() {
+		return null;
 	}
 
 	/**

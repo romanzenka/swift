@@ -117,7 +117,6 @@ public final class ServletInitialization implements SwiftCommand, ServletContext
 			daemon.start();
 
 			// Start the ping monitor
-			getSwiftMonitor().initialize(environment.getApplicationConfig());
 			getSwiftMonitor().start();
 
 		} catch (Exception t) {

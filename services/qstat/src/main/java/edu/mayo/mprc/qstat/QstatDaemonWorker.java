@@ -48,11 +48,17 @@ public final class QstatDaemonWorker extends WorkerBase {
 	}
 
 	@Override
-	public void check() {
+	public String check() {
 		// Just run qstat to see it works
-		final ProcessBuilder builder = new ProcessBuilder("qstat");
-		final ProcessCaller caller = new ProcessCaller(builder);
-		caller.runAndCheck("qstat");
+		try {
+			final ProcessBuilder builder = new ProcessBuilder("qstat");
+			final ProcessCaller caller = new ProcessCaller(builder);
+			caller.runAndCheck("qstat");
+		} catch (Exception e) {
+			// SWALLOWED: We return a string
+			return e.getMessage();
+		}
+		return null;
 	}
 
 	/**

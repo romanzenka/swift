@@ -102,27 +102,26 @@ public final class Daemon implements Checkable {
 	 * Check all workers defined in this daemon
 	 */
 	@Override
-	public void check() {
+	public String check() {
 		final CompositeException exception = new CompositeException();
 		for (final Object resource : resources) {
-			try {
-				if (resource instanceof Checkable) {
-					((Checkable) resource).check();
+			if (resource instanceof Checkable) {
+				String check = ((Checkable) resource).check();
+				if (check != null) {
+					exception.addCause(new Exception(check));
 				}
-			} catch (Exception e) {
-				exception.addCause(e);
 			}
 		}
 		for (final AbstractRunner runner : runners) {
-			try {
-				runner.check();
-			} catch (Exception e) {
-				exception.addCause(e);
+			String check = runner.check();
+			if (check != null) {
+				exception.addCause(new Exception(check));
 			}
 		}
 		if (!exception.getCauses().isEmpty()) {
-			throw exception;
+			return exception.getMessage();
 		}
+		return null;
 	}
 
 	/**

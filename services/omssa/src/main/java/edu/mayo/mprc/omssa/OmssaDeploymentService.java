@@ -246,7 +246,8 @@ public final class OmssaDeploymentService extends DeploymentService<DeploymentRe
 	}
 
 	@Override
-	public void check() {
+	public String check() {
+		return null;
 	}
 
 	/**

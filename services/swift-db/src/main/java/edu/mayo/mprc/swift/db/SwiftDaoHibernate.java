@@ -624,9 +624,9 @@ public final class SwiftDaoHibernate extends DaoBase implements SwiftDao {
 	}
 
 	@Override
-	public String check(final Map<String, String> params) {
+	public String check() {
 		// First, the workspace has to be defined, with a user
-		final String workspaceCheck = workspaceDao.check(params);
+		final String workspaceCheck = workspaceDao.check();
 		if (workspaceCheck != null) {
 			return workspaceCheck;
 		}
@@ -641,9 +641,9 @@ public final class SwiftDaoHibernate extends DaoBase implements SwiftDao {
 	}
 
 	@Override
-	public void initialize(final Map<String, String> params) {
+	public void initialize(Map<String, String> params) {
 		// Initialize the dependent DAO
-		workspaceDao.initialize(params);
+		workspaceDao.initialize(new HashMap<String, String>(0));
 
 		if (rowCount(TaskStateData.class) != (long) TaskState.values().length) {
 			LOGGER.info("Initializing task state enumeration");

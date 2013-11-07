@@ -38,8 +38,9 @@ public abstract class WorkerBase implements Worker {
 	}
 
 	@Override
-	public void check() {
+	public String check() {
 		LOGGER.debug("No check implemented for this worker: " + getClass().getSimpleName());
+		return null;
 	}
 
 	/**

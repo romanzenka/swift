@@ -19,11 +19,4 @@ public interface Worker extends Checkable {
 	 * @param progressReporter To report progress, success or failures.
 	 */
 	void processRequest(WorkPacket workPacket, ProgressReporter progressReporter);
-
-	/**
-	 * After the worker was fully configured, this method makes sure that all pieces are in place.
-	 * If they are not, it will throw an exception.
-	 * This way we can fail early on startup.
-	 */
-	void check();
 }

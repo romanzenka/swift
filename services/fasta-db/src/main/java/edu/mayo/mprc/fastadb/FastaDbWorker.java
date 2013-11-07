@@ -60,9 +60,10 @@ public class FastaDbWorker extends WorkerBase {
 	}
 
 	@Override
-	public void check() {
+	public String check() {
 		// As long as the database works, this should be ok
 		// TODO: Check the database for being functional
+		return null;
 	}
 
 	/**

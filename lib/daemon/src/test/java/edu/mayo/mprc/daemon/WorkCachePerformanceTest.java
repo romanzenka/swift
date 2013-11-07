@@ -141,7 +141,8 @@ public final class WorkCachePerformanceTest {
 		}
 
 		@Override
-		public void check() {
+		public String check() {
+			return null;
 		}
 	}
 

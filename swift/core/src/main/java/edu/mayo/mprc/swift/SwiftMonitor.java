@@ -35,6 +35,7 @@ public final class SwiftMonitor implements Runnable {
 	private final Map<DaemonConnection, ProgressListener> pingListeners = new HashMap<DaemonConnection, ProgressListener>(20);
 	public static final long MONITOR_PERIOD_SECONDS = 30L;
 
+	private ApplicationConfig applicationConfig;
 	private MultiFactory factory;
 	private ScheduledExecutorService scheduler;
 	private final Object connectionsLock = new Object();
@@ -42,9 +43,11 @@ public final class SwiftMonitor implements Runnable {
 	public SwiftMonitor() {
 	}
 
-	public void initialize(final ApplicationConfig app) {
+	private void initialize(final ApplicationConfig app) {
 		synchronized (connectionsLock) {
-			for (DaemonConfig daemonConfig : app.getDaemons()) {
+			monitoredConnections.clear();
+			pingListeners.clear();
+			for (final DaemonConfig daemonConfig : app.getDaemons()) {
 				final ServiceConfig pingServiceConfig = PingDaemonWorker.getPingServiceConfig(daemonConfig);
 				if (pingServiceConfig != null) {
 					final DaemonConnection daemonConnection = (DaemonConnection) getFactory().createSingleton(pingServiceConfig, app.getDependencyResolver());
@@ -75,7 +78,7 @@ public final class SwiftMonitor implements Runnable {
 	}
 
 	public void ping() {
-		List<DaemonConnection> copy;
+		final List<DaemonConnection> copy;
 		synchronized (connectionsLock) {
 			copy = Lists.newArrayList(monitoredConnections.keySet());
 		}
@@ -97,8 +100,17 @@ public final class SwiftMonitor implements Runnable {
 		return factory;
 	}
 
-	public void setFactory(MultiFactory factory) {
+	public void setFactory(final MultiFactory factory) {
 		this.factory = factory;
+	}
+
+	public ApplicationConfig getApplicationConfig() {
+		return applicationConfig;
+	}
+
+	public void setApplicationConfig(final ApplicationConfig applicationConfig) {
+		this.applicationConfig = applicationConfig;
+		initialize(applicationConfig);
 	}
 
 	@Override
@@ -126,14 +138,14 @@ public final class SwiftMonitor implements Runnable {
 		}
 
 		@Override
-		public void requestTerminated(Exception e) {
+		public void requestTerminated(final Exception e) {
 			synchronized (connectionsLock) {
 				monitoredConnections.put(daemonConnection, new DaemonStatus(e.getMessage()));
 			}
 		}
 
 		@Override
-		public void userProgressInformation(ProgressInfo progressInfo) {
+		public void userProgressInformation(final ProgressInfo progressInfo) {
 			if (progressInfo instanceof PingResponse) {
 				synchronized (connectionsLock) {
 					monitoredConnections.put(daemonConnection, ((PingResponse) progressInfo).getStatus());

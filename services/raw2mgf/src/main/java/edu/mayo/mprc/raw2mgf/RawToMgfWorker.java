@@ -368,19 +368,20 @@ public final class RawToMgfWorker extends WorkerBase {
 	}
 
 	@Override
-	public void check() {
+	public String check() {
 		if (!tempFolder.isDirectory() || !tempFolder.canWrite()) {
-			throw new MprcException("Cannot write the temporary folder: " + tempFolder.getAbsolutePath());
+			return "Cannot write the temporary folder: " + tempFolder.getAbsolutePath();
 		}
 		if (!extractMsnExecutable.isFile()) {
-			throw new MprcException("I do not see executable extract_msn: " + extractMsnExecutable.getPath());
+			return "extract_msn executable missing: " + extractMsnExecutable.getPath();
 		}
 		if (!Strings.isNullOrEmpty(wrapperScript) && !new File(wrapperScript).canExecute()) {
-			throw new MprcException("Wrapper script is defined, but does not seem to be present/executable: " + wrapperScript);
+			return "Wrapper script is defined, but does not seem to be present/executable: " + wrapperScript;
 		}
 		if (xvfbWrapperScript != null && !xvfbWrapperScript.canExecute()) {
-			throw new MprcException("XVFB Wrapper script is defined, but does not seem to be present/executable: " + xvfbWrapperScript.getAbsolutePath());
+			return "XVFB Wrapper script is defined, but does not seem to be present/executable: " + xvfbWrapperScript.getAbsolutePath();
 		}
+		return null;
 	}
 
 	/**

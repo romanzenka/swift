@@ -47,8 +47,9 @@ public final class MgfToMgfWorker extends WorkerBase {
 	}
 
 	@Override
-	public void check() {
+	public String check() {
 		// This worker should have no problems running no matter what
+		return null;
 	}
 
 	/**

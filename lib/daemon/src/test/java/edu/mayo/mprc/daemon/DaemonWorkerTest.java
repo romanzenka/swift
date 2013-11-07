@@ -92,7 +92,8 @@ public final class DaemonWorkerTest {
 			}
 
 			@Override
-			public void check() {
+			public String check() {
+				return null;
 			}
 		};
 	}

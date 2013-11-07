@@ -65,13 +65,12 @@ public class RunSwift implements FileListener, SwiftCommand {
 		boolean terminateDaemon = true;
 
 		if (daemon.getNumRunners() > 0) {
-			try {
-				daemon.check();
-			} catch (MprcException e) {
-				// SWALLOWED: We just display the exception
-				LOGGER.error("Daemon check failed, terminating", e);
+			String check = daemon.check();
+			if (check != null) {
+				LOGGER.error("Daemon check failed, terminating: " + check);
 				return ExitCode.Error;
 			}
+
 			daemon.start();
 
 			try {

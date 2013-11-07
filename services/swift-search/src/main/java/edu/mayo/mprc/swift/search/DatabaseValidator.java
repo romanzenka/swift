@@ -117,11 +117,7 @@ public final class DatabaseValidator implements RuntimeInitializer {
 	}
 
 	@Override
-	public String check(final Map<String, String> params) {
-		final HashMap<String, String> newParams = new HashMap<String, String>(params);
-		newParams.put(CurationInitializer.FASTA_FOLDER, searcherConfig.getFastaPath());
-		newParams.put(CurationInitializer.FASTA_ARCHIVE_FOLDER, searcherConfig.getFastaArchivePath());
-
+	public String check() {
 		final Future<String> future = EXECUTOR.submit(new Callable<String>() {
 			@Override
 			public String call() {
@@ -134,7 +130,7 @@ public final class DatabaseValidator implements RuntimeInitializer {
 
 					// Go through a list of RuntimeInitializer, stop when one of them reports it is not ready
 					for (final RuntimeInitializer initializer : runtimeInitializers) {
-						final String result = initializer.check(newParams);
+						final String result = initializer.check();
 						database.getSession().flush();
 						if (result != null) {
 							initializationToDo = result;
@@ -190,7 +186,7 @@ public final class DatabaseValidator implements RuntimeInitializer {
 					beginTransaction(initialization);
 
 					for (final RuntimeInitializer initializer : runtimeInitializers) {
-						initializer.initialize(newParams);
+						initializer.initialize(new HashMap<String, String>(0));
 						database.getSession().flush();
 						// We completely wipe out the caches between the initialization steps to prevent
 						// huge memory consumption.

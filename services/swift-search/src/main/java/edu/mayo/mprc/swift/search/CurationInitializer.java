@@ -37,7 +37,7 @@ public final class CurationInitializer implements RuntimeInitializer {
 	}
 
 	@Override
-	public String check(final Map<String, String> params) {
+	public String check() {
 		if (curationDao.countAll(Curation.class) == 0) {
 			return "There needs to be at least one FASTA database defined";
 		}
@@ -48,7 +48,7 @@ public final class CurationInitializer implements RuntimeInitializer {
 	}
 
 	@Override
-	public void initialize(final Map<String, String> params) {
+	public void initialize(Map<String, String> params) {
 		final File fastaFolder = new File(params.get(FASTA_FOLDER));
 		final File fastaArchiveFolder = new File(params.get(FASTA_ARCHIVE_FOLDER));
 
@@ -148,34 +148,17 @@ public final class CurationInitializer implements RuntimeInitializer {
 					sprotRev.setShortName("SprotRev");
 					sprotRev.setTitle("Built-in");
 
-					if (params.containsKey("forTest")) {
-						LOGGER.debug("Creating Curation 'SprotRev' from " + testURL);
+					LOGGER.debug("Creating Curation 'SprotRev' from " + defaultURL);
 
-						toExecute.add(sprotRev);
-						final NewDatabaseInclusion sprotDownload = new NewDatabaseInclusion();
-						sprotDownload.setUrl(testURL);
-						//the following step is a hack allowing use to specify a header transform before those entries are in the database.
-						sprotDownload.setHeaderTransform(new HeaderTransform().setName("SwissProt General").setGroupString("^>([^|]*)\\|(.*)$").setSubstitutionPattern(">$2 ($1)").setCommon(true));
-						sprotRev.addStep(sprotDownload, /*position*/-1);
+					toExecute.add(sprotRev);
+					final NewDatabaseInclusion step1 = new NewDatabaseInclusion();
+					step1.setUrl(defaultURL);
+					sprotRev.addStep(step1, /*position*/-1);
 
-						final MakeDecoyStep decoyStep = new MakeDecoyStep();
-						decoyStep.setManipulatorType(MakeDecoyStep.REVERSAL_MANIPULATOR);
-						decoyStep.setOverwriteMode(/*overwrite?*/false);
-						sprotRev.addStep(decoyStep, /*position*/-1);
-
-					} else {
-						LOGGER.debug("Creating Curation 'SprotRev' from " + defaultURL);
-
-						toExecute.add(sprotRev);
-						final NewDatabaseInclusion step1 = new NewDatabaseInclusion();
-						step1.setUrl(defaultURL);
-						sprotRev.addStep(step1, /*position*/-1);
-
-						final MakeDecoyStep step3 = new MakeDecoyStep();
-						step3.setManipulatorType(MakeDecoyStep.REVERSAL_MANIPULATOR);
-						step3.setOverwriteMode(/*overwrite?*/false);
-						sprotRev.addStep(step3, /*position*/-1);
-					}
+					final MakeDecoyStep step3 = new MakeDecoyStep();
+					step3.setManipulatorType(MakeDecoyStep.REVERSAL_MANIPULATOR);
+					step3.setOverwriteMode(/*overwrite?*/false);
+					sprotRev.addStep(step3, /*position*/-1);
 				}
 			}
 

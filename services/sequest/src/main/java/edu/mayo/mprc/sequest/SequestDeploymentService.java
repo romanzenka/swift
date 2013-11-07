@@ -511,7 +511,8 @@ public final class SequestDeploymentService extends DeploymentService<SequestDep
 	}
 
 	@Override
-	public void check() {
+	public String check() {
+		return null;
 	}
 
 	/**

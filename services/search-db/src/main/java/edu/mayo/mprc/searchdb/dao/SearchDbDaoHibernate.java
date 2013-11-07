@@ -74,12 +74,12 @@ public final class SearchDbDaoHibernate extends DaoBase implements RuntimeInitia
 	}
 
 	@Override
-	public String check(final Map<String, String> params) {
+	public String check() {
 		return null;
 	}
 
 	@Override
-	public void initialize(final Map<String, String> params) {
+	public void initialize(Map<String, String> params) {
 	}
 
 	public LocalizedModification addLocalizedModification(final LocalizedModification mod) {

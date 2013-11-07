@@ -5,7 +5,7 @@ package edu.mayo.mprc.config;
  */
 public interface Checkable {
 	/**
-	 * Throw an exception if something is wrong with this object.
+	 * Return a string if something is wrong, null if everything is ok.
 	 */
-	void check();
+	String check();
 }

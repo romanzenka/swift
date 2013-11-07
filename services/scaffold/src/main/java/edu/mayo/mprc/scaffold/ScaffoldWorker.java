@@ -42,13 +42,14 @@ public final class ScaffoldWorker extends WorkerBase {
 	}
 
 	@Override
-	public void check() {
+	public String check() {
 		if (!getScaffoldBatchScript().canExecute()) {
-			throw new MprcException("Scaffold batch script not executable: " + scaffoldBatchScript.getAbsolutePath());
+			return "Scaffold batch script not executable: " + scaffoldBatchScript.getAbsolutePath();
 		}
 		if (getScaffoldUnimod().isFile()) {
-			throw new MprcException("Scaffold's unimod file not present: " + getScaffoldUnimod().getAbsolutePath());
+			return "Scaffold's unimod file not present: " + getScaffoldUnimod().getAbsolutePath();
 		}
+		return null;
 	}
 
 	@Override
