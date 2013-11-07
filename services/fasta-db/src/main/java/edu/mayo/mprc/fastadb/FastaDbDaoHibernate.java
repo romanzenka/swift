@@ -3,7 +3,7 @@ package edu.mayo.mprc.fastadb;
 import com.google.common.base.Preconditions;
 import edu.mayo.mprc.MprcException;
 import edu.mayo.mprc.database.DaoBase;
-import edu.mayo.mprc.database.DatabasePlaceholder;
+import edu.mayo.mprc.database.Database;
 import edu.mayo.mprc.dbcurator.model.Curation;
 import edu.mayo.mprc.fasta.FASTAInputStream;
 import edu.mayo.mprc.utilities.FileUtilities;
@@ -37,8 +37,8 @@ public final class FastaDbDaoHibernate extends DaoBase implements FastaDbDao {
 	public FastaDbDaoHibernate() {
 	}
 
-	public FastaDbDaoHibernate(final DatabasePlaceholder databasePlaceholder) {
-		super(databasePlaceholder);
+	public FastaDbDaoHibernate(final Database database) {
+		super(database);
 	}
 
 	@Override
@@ -129,7 +129,7 @@ public final class FastaDbDaoHibernate extends DaoBase implements FastaDbDao {
 	 */
 	@Override
 	public void addFastaDatabase(final Curation database, @Nullable final UserProgressReporter progressReporter) {
-		final StatelessSession session = getDatabasePlaceholder().getSessionFactory().openStatelessSession();
+		final StatelessSession session = getDatabase().getSessionFactory().openStatelessSession();
 		final Query entryCount = session.createQuery("select count(*) from ProteinEntry p where p.database=:database").setEntity("database", database);
 		if (0L != ((Long) entryCount.uniqueResult()).longValue()) {
 			// We have loaded the database already

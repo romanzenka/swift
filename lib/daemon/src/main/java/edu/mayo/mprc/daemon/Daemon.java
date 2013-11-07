@@ -46,11 +46,30 @@ public final class Daemon implements Checkable {
 	public Daemon() {
 	}
 
+	public void install() {
+		for (final Object resource : getResources()) {
+			if (resource instanceof Installable) {
+				((Installable) resource).install();
+			}
+		}
+		for (final AbstractRunner runner : getRunners()) {
+			if (runner instanceof Installable) {
+				((Installable) runner).install();
+			}
+		}
+
+	}
+
 	/**
 	 * Runs all the defined daemons runners.
 	 */
 	public void start() {
-		for (final AbstractRunner runner : runners) {
+		for (final Object resource : getResources()) {
+			if (resource instanceof Installable) {
+				((Installable) resource).install();
+			}
+		}
+		for (final AbstractRunner runner : getRunners()) {
 			startRunner(runner);
 		}
 	}

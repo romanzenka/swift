@@ -120,6 +120,20 @@ public final class SimpleRunner extends AbstractRunner {
 		return dependencies;
 	}
 
+	@Override
+	public void install() {
+		// First check if the factory we hold needs installing
+		if (factory instanceof Installable) {
+			((Installable) factory).install();
+		}
+
+		// Check whether the created worker itself needs installing
+		final Worker worker = factory.create(config, dependencies);
+		if (worker instanceof Installable) {
+			((Installable) worker).install();
+		}
+	}
+
 	private final class MyProgressReporter implements ProgressReporter {
 		private final DaemonRequest request;
 		private final LoggingSetup loggingSetup;

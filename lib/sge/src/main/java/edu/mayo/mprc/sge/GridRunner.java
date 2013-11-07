@@ -153,6 +153,11 @@ public final class GridRunner extends AbstractRunner {
 		this.serviceFactory = serviceFactory;
 	}
 
+	@Override
+	public void install() {
+		// TODO: We will need to submit an 'installing packet' to the grid and collect response
+	}
+
 	/**
 	 * Listens to RMI calls from the process running within SGE. None of the messages is final.
 	 */

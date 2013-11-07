@@ -3,7 +3,7 @@ package edu.mayo.mprc.unimod;
 import edu.mayo.mprc.MprcException;
 import edu.mayo.mprc.database.Change;
 import edu.mayo.mprc.database.DaoBase;
-import edu.mayo.mprc.database.DatabasePlaceholder;
+import edu.mayo.mprc.database.Database;
 import edu.mayo.mprc.utilities.ResourceUtilities;
 import org.apache.log4j.Logger;
 import org.hibernate.Session;
@@ -28,8 +28,8 @@ public final class UnimodDaoHibernate extends DaoBase implements UnimodDao {
 	public UnimodDaoHibernate() {
 	}
 
-	public UnimodDaoHibernate(final DatabasePlaceholder databasePlaceholder) {
-		super(databasePlaceholder);
+	public UnimodDaoHibernate(final Database database) {
+		super(database);
 	}
 
 	@Override

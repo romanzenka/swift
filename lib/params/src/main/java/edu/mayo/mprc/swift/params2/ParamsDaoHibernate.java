@@ -3,7 +3,7 @@ package edu.mayo.mprc.swift.params2;
 import edu.mayo.mprc.MprcException;
 import edu.mayo.mprc.database.Change;
 import edu.mayo.mprc.database.DaoBase;
-import edu.mayo.mprc.database.DatabasePlaceholder;
+import edu.mayo.mprc.database.Database;
 import edu.mayo.mprc.unimod.ModSet;
 import edu.mayo.mprc.workspace.User;
 import org.apache.log4j.Logger;
@@ -27,8 +27,8 @@ public final class ParamsDaoHibernate extends DaoBase implements ParamsDao {
 	public ParamsDaoHibernate() {
 	}
 
-	public ParamsDaoHibernate(final DatabasePlaceholder databasePlaceholder) {
-		super(databasePlaceholder);
+	public ParamsDaoHibernate(final Database database) {
+		super(database);
 	}
 
 	@Override

@@ -49,8 +49,8 @@ public final class SearchDbDaoHibernate extends DaoBase implements RuntimeInitia
 	public SearchDbDaoHibernate() {
 	}
 
-	public SearchDbDaoHibernate(final SwiftDao swiftDao, final FastaDbDao fastaDbDao, final DatabasePlaceholder databasePlaceholder) {
-		super(databasePlaceholder);
+	public SearchDbDaoHibernate(final SwiftDao swiftDao, final FastaDbDao fastaDbDao, final Database database) {
+		super(database);
 		this.swiftDao = swiftDao;
 		this.fastaDbDao = fastaDbDao;
 	}

@@ -12,7 +12,7 @@ import java.util.List;
  */
 public abstract class DaoTest {
 	private SessionFactory factory;
-	private final DatabasePlaceholder databasePlaceholder = new DatabasePlaceholder();
+	private final Database database = new Database();
 
 	/**
 	 * Shortcut for {@link #initializeDatabase(java.util.Collection, String...)}.
@@ -33,10 +33,10 @@ public abstract class DaoTest {
 		final List<String> mappingResources = DatabaseFactory.collectMappingResouces(daosToInitialize, mappingFiles);
 
 		factory = DatabaseUtilities.getTestSessionFactory(mappingResources);
-		databasePlaceholder.setSessionFactory(factory);
+		database.setSessionFactory(factory);
 
 		for (final DaoBase daoBase : daosToInitialize) {
-			daoBase.setDatabasePlaceholder(databasePlaceholder);
+			daoBase.setDatabase(database);
 		}
 	}
 
@@ -50,8 +50,8 @@ public abstract class DaoTest {
 	/**
 	 * @return Current database placeholder if you need to create e.g. an additional DAO.
 	 */
-	public DatabasePlaceholder getDatabasePlaceholder() {
-		return databasePlaceholder;
+	public Database getDatabase() {
+		return database;
 	}
 
 	/**
@@ -59,9 +59,9 @@ public abstract class DaoTest {
 	 * Useful for tests that need to do some action in multiple transactions.
 	 */
 	public void nextTransaction() {
-		databasePlaceholder.flushSession();
-		databasePlaceholder.getSession().clear();
-		databasePlaceholder.commit();
-		databasePlaceholder.begin();
+		database.flushSession();
+		database.getSession().clear();
+		database.commit();
+		database.begin();
 	}
 }

@@ -3,7 +3,7 @@ package edu.mayo.mprc.dbcurator.model.persistence;
 import edu.mayo.mprc.MprcException;
 import edu.mayo.mprc.database.Change;
 import edu.mayo.mprc.database.DaoBase;
-import edu.mayo.mprc.database.DatabasePlaceholder;
+import edu.mayo.mprc.database.Database;
 import edu.mayo.mprc.dbcurator.model.Curation;
 import edu.mayo.mprc.dbcurator.model.FastaSource;
 import edu.mayo.mprc.dbcurator.model.HeaderTransform;
@@ -38,8 +38,8 @@ public final class CurationDaoImpl extends DaoBase implements CurationDao {
 	public CurationDaoImpl() {
 	}
 
-	public CurationDaoImpl(final DatabasePlaceholder databasePlaceholder) {
-		super(databasePlaceholder);
+	public CurationDaoImpl(final Database database) {
+		super(database);
 	}
 
 	@Override

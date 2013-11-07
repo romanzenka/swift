@@ -69,12 +69,12 @@ public final class BulkLoadingTest extends DaoTest {
 		FastaDbDaoHibernate fastaDbDaoImpl = new FastaDbDaoHibernate();
 		WorkspaceDaoHibernate workspaceDaoImpl = new WorkspaceDaoHibernate();
 		final UnimodDaoHibernate unimodDaoImpl = new UnimodDaoHibernate();
-		final SearchDbDaoHibernate searchDbDaoImpl = new SearchDbDaoHibernate(swiftDaoImpl, fastaDbDaoImpl, getDatabasePlaceholder());
+		final SearchDbDaoHibernate searchDbDaoImpl = new SearchDbDaoHibernate(swiftDaoImpl, fastaDbDaoImpl, getDatabase());
 		sessionProvider = fastaDbDaoImpl;
 		initializeDatabase(Arrays.asList(swiftDaoImpl, paramsDaoImpl, fastaDbDaoImpl, workspaceDaoImpl, unimodDaoImpl, searchDbDaoImpl));
 		// loadXml();
 
-		stats = getDatabasePlaceholder().getSessionFactory().getStatistics();
+		stats = getDatabase().getSessionFactory().getStatistics();
 
 		searchDbDao = searchDbDaoImpl;
 		swiftDao = swiftDaoImpl;

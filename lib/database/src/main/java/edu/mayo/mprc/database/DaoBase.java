@@ -26,42 +26,42 @@ public abstract class DaoBase implements Dao, SessionProvider, BulkLoadJobStarte
 	// The hibernate field that stores the deletion change.
 	public static final String DELETION_FIELD = "deletion";
 
-	private DatabasePlaceholder databasePlaceholder;
+	private Database database;
 
 	protected DaoBase() {
 	}
 
-	protected DaoBase(final DatabasePlaceholder databasePlaceholder) {
-		this.databasePlaceholder = databasePlaceholder;
+	protected DaoBase(final Database database) {
+		this.database = database;
 	}
 
-	@Resource(name = "databasePlaceholder")
-	public final void setDatabasePlaceholder(final DatabasePlaceholder databasePlaceholder) {
-		this.databasePlaceholder = databasePlaceholder;
+	@Resource(name = "database")
+	public final void setDatabase(final Database database) {
+		this.database = database;
 	}
 
-	public final DatabasePlaceholder getDatabasePlaceholder() {
-		return databasePlaceholder;
+	public final Database getDatabase() {
+		return database;
 	}
 
 	@Override
 	public final Session getSession() {
-		return databasePlaceholder.getSession();
+		return database.getSession();
 	}
 
 	@Override
 	public final void begin() {
-		databasePlaceholder.begin();
+		database.begin();
 	}
 
 	@Override
 	public final void commit() {
-		databasePlaceholder.commit();
+		database.commit();
 	}
 
 	@Override
 	public final void rollback() {
-		databasePlaceholder.rollback();
+		database.rollback();
 	}
 
 	public static <T> List<T> listAndCast(final Criteria criteria) {
@@ -518,7 +518,7 @@ public abstract class DaoBase implements Dao, SessionProvider, BulkLoadJobStarte
 	 * @param callback Callback to be called per each method.
 	 */
 	protected final void scrollQuery(final String query, final QueryCallback callback) {
-		final StatelessSession session = getDatabasePlaceholder().getSessionFactory().openStatelessSession();
+		final StatelessSession session = getDatabase().getSessionFactory().openStatelessSession();
 
 		final Transaction tx = session.beginTransaction();
 		try {

@@ -5,21 +5,28 @@ import edu.mayo.mprc.config.*;
 import edu.mayo.mprc.config.ui.ServiceUiFactory;
 import edu.mayo.mprc.config.ui.UiBuilder;
 import edu.mayo.mprc.utilities.exceptions.ExceptionUtilities;
-import org.hibernate.SessionFactory;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
 import java.util.*;
 
+/**
+ * This factory always returns the same singleton object {@link Database}.
+ * <p/>
+ * That is because the database is meant to be a singleton.
+ * <p/>
+ * The object gets configured on creation, but needs to be initialized after it gets created to actually function.
+ * Initialization is split from creation so we can run checks on the created object before it goes live.
+ */
 @Component("databaseFactory")
-public final class DatabaseFactory extends FactoryBase<ResourceConfig, SessionFactory> implements FactoryDescriptor {
+public final class DatabaseFactory extends FactoryBase<ResourceConfig, Database> implements FactoryDescriptor {
 
 	public static final String TYPE = "database";
 	public static final String NAME = "Swift SQL Database";
 	public static final String DESC = "Database for storing information about Swift searches and Swift configuration.<p>The database gets created and initialized through the module that uses it (in this case, the Swift Searcher module).<p><b>Important:</b> Swift Searcher and Swift Website have to run within the same daemon as the database.";
 	private Map<String, String> hibernateProperties;
 	private List<DaoBase> daoList;
-	private DatabasePlaceholder placeholder;
+	private Database placeholder;
 
 	public DatabaseFactory() {
 	}
@@ -60,37 +67,28 @@ public final class DatabaseFactory extends FactoryBase<ResourceConfig, SessionFa
 		this.daoList = daoList;
 	}
 
-	public DatabasePlaceholder getPlaceholder() {
+	public Database getPlaceholder() {
 		return placeholder;
 	}
 
-	@Resource(name = "databasePlaceholder")
-	public void setPlaceholder(final DatabasePlaceholder placeholder) {
+	@Resource(name = "database")
+	public void setPlaceholder(final Database placeholder) {
 		this.placeholder = placeholder;
 	}
 
 	@Override
-	public SessionFactory create(final ResourceConfig config, final DependencyResolver dependencies) {
+	public Database create(final ResourceConfig config, final DependencyResolver dependencies) {
 		if (!(config instanceof Config)) {
 			ExceptionUtilities.throwCastException(config, Config.class);
 			return null;
 		}
 		final Config localConfig = (Config) config;
 
-		final SessionFactory sessionFactory = DatabaseUtilities.getSessionFactory(localConfig.getUrl()
-				, localConfig.getUserName()
-				, localConfig.getPassword()
-				, localConfig.getDialect()
-				, localConfig.getDriverClassName()
-				, localConfig.getDefaultSchema()
-				, localConfig.getSchema()
-				, getHibernateProperties()
-				, collectMappingResouces(daoList),
-				DatabaseUtilities.SchemaInitialization.None);
-
-		placeholder.setSessionFactory(sessionFactory);
-
-		return sessionFactory;
+		Database placeholder = getPlaceholder();
+		placeholder.setConfig(localConfig);
+		placeholder.setHibernateProperties(getHibernateProperties());
+		placeholder.setMappingResources(collectMappingResouces(daoList));
+		return placeholder;
 	}
 
 	@Override

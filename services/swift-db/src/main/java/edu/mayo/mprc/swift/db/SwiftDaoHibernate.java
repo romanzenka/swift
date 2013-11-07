@@ -6,7 +6,7 @@ import edu.mayo.mprc.MprcException;
 import edu.mayo.mprc.daemon.AssignedTaskData;
 import edu.mayo.mprc.daemon.files.FileTokenFactory;
 import edu.mayo.mprc.database.DaoBase;
-import edu.mayo.mprc.database.DatabasePlaceholder;
+import edu.mayo.mprc.database.Database;
 import edu.mayo.mprc.swift.dbmapping.*;
 import edu.mayo.mprc.utilities.FileUtilities;
 import edu.mayo.mprc.utilities.progress.ProgressReport;
@@ -42,8 +42,8 @@ public final class SwiftDaoHibernate extends DaoBase implements SwiftDao {
 		super(null);
 	}
 
-	public SwiftDaoHibernate(final DatabasePlaceholder databasePlaceholder) {
-		super(databasePlaceholder);
+	public SwiftDaoHibernate(final Database database) {
+		super(database);
 	}
 
 	@Override

@@ -2,6 +2,8 @@ package edu.mayo.mprc.daemon;
 
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import edu.mayo.mprc.MprcException;
+import edu.mayo.mprc.config.Checkable;
+import edu.mayo.mprc.config.Installable;
 import edu.mayo.mprc.daemon.files.FileTokenHolder;
 import org.apache.log4j.Logger;
 import org.apache.log4j.NDC;
@@ -22,7 +24,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  *
  * @author Roman Zenka
  */
-public abstract class AbstractRunner {
+public abstract class AbstractRunner implements Checkable, Installable {
 
 	private static final Logger LOGGER = Logger.getLogger(AbstractRunner.class);
 
@@ -149,6 +151,7 @@ public abstract class AbstractRunner {
 	/**
 	 * Check the associate worker, throw an exception if there is a failure detected.
 	 */
+	@Override
 	public abstract void check();
 
 	class SynchronousRequestReceiver implements Runnable {

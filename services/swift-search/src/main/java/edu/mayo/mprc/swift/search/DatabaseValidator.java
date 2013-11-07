@@ -29,7 +29,7 @@ public final class DatabaseValidator implements RuntimeInitializer {
 
 	private List<DaoBase> daoList;
 	private Map<String, String> hibernateProperties;
-	private DatabasePlaceholder databasePlaceholder;
+	private Database database;
 	private SwiftSearcher.Config searcherConfig;
 	private DaemonConfig daemonConfig;
 	private List<RuntimeInitializer> runtimeInitializers;
@@ -101,19 +101,19 @@ public final class DatabaseValidator implements RuntimeInitializer {
 				, DatabaseFactory.collectMappingResouces(daoList)
 				, schemaInitialization);
 
-		databasePlaceholder.setSessionFactory(sessionFactory);
+		this.database.setSessionFactory(sessionFactory);
 
 		setupFileTokenFactory(daemonConfig, fileTokenFactory);
 
-		databasePlaceholder.begin();
+		this.database.begin();
 	}
 
 	private void commitTransaction() {
-		databasePlaceholder.commit();
+		database.commit();
 	}
 
 	private void rollbackTransaction() {
-		databasePlaceholder.rollback();
+		database.rollback();
 	}
 
 	@Override
@@ -135,7 +135,7 @@ public final class DatabaseValidator implements RuntimeInitializer {
 					// Go through a list of RuntimeInitializer, stop when one of them reports it is not ready
 					for (final RuntimeInitializer initializer : runtimeInitializers) {
 						final String result = initializer.check(newParams);
-						databasePlaceholder.getSession().flush();
+						database.getSession().flush();
 						if (result != null) {
 							initializationToDo = result;
 							break;
@@ -191,10 +191,10 @@ public final class DatabaseValidator implements RuntimeInitializer {
 
 					for (final RuntimeInitializer initializer : runtimeInitializers) {
 						initializer.initialize(newParams);
-						databasePlaceholder.getSession().flush();
+						database.getSession().flush();
 						// We completely wipe out the caches between the initialization steps to prevent
 						// huge memory consumption.
-						databasePlaceholder.getSession().clear();
+						database.getSession().clear();
 					}
 
 					commitTransaction();
@@ -228,13 +228,13 @@ public final class DatabaseValidator implements RuntimeInitializer {
 		this.daemonConfig = daemonConfig;
 	}
 
-	public DatabasePlaceholder getDatabasePlaceholder() {
-		return databasePlaceholder;
+	public Database getDatabase() {
+		return database;
 	}
 
-	@Resource(name = "databasePlaceholder")
-	public void setDatabasePlaceholder(final DatabasePlaceholder databasePlaceholder) {
-		this.databasePlaceholder = databasePlaceholder;
+	@Resource(name = "database")
+	public void setDatabase(final Database database) {
+		this.database = database;
 	}
 
 	public List<DaoBase> getDaoList() {

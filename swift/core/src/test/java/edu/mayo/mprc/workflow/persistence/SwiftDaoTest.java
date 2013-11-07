@@ -70,7 +70,7 @@ public final class SwiftDaoTest {
 			ScaffoldSettings settings = new ScaffoldSettings(0.95, 0.95, 2, 1, null, false, false, false, false, false, true);
 			settings = paramsDao.addScaffoldSettings(settings);
 
-			final List list = swiftDao.getDatabasePlaceholder().getSession().createQuery("from ScaffoldSettings").list();
+			final List list = swiftDao.getDatabase().getSession().createQuery("from ScaffoldSettings").list();
 
 			ScaffoldSettings settings2 = new ScaffoldSettings(0.95, 0.95, 2, 1, null, false, false, false, false, false, true);
 			settings2 = paramsDao.addScaffoldSettings(settings2);

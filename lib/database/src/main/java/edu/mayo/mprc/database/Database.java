@@ -1,10 +1,14 @@
 package edu.mayo.mprc.database;
 
 import edu.mayo.mprc.MprcException;
+import edu.mayo.mprc.config.Installable;
 import org.apache.log4j.Logger;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.springframework.stereotype.Component;
+
+import java.util.List;
+import java.util.Map;
 
 /**
  * Used for spring injection - holds a session factory that gets created manually after the database is validated.
@@ -13,12 +17,35 @@ import org.springframework.stereotype.Component;
  * This is THE way how to get to the database that all the DAOs use. The DAOs do not hold their own
  * session, they defer to this object, which uses {@link ThreadLocal} storage for the session.
  */
-@Component("databasePlaceholder")
-public final class DatabasePlaceholder {
-	private static final Logger LOGGER = Logger.getLogger(DatabasePlaceholder.class);
+@Component("database")
+public final class Database implements Installable {
+	private static final Logger LOGGER = Logger.getLogger(Database.class);
 	private SessionFactory sessionFactory;
+	private DatabaseFactory.Config config;
+	private Map<String, String> hibernateProperties;
+	private List<String> mappingResources;
 
-	public DatabasePlaceholder() {
+	public Database() {
+	}
+
+	@Override
+	public void install() {
+		initialize(DatabaseUtilities.SchemaInitialization.Update);
+	}
+
+	private void initialize(DatabaseUtilities.SchemaInitialization initialization) {
+		final SessionFactory sessionFactory = DatabaseUtilities.getSessionFactory(config.getUrl()
+				, config.getUserName()
+				, config.getPassword()
+				, config.getDialect()
+				, config.getDriverClassName()
+				, config.getDefaultSchema()
+				, config.getSchema()
+				, hibernateProperties
+				, mappingResources,
+				initialization);
+
+		setSessionFactory(sessionFactory);
 	}
 
 	public SessionFactory getSessionFactory() {
@@ -117,5 +144,29 @@ public final class DatabasePlaceholder {
 			// SWALLOWED - failing rollback is not so tragic
 			LOGGER.warn("Rollback failed", e);
 		}
+	}
+
+	public DatabaseFactory.Config getConfig() {
+		return config;
+	}
+
+	public void setConfig(DatabaseFactory.Config config) {
+		this.config = config;
+	}
+
+	public Map<String, String> getHibernateProperties() {
+		return hibernateProperties;
+	}
+
+	public void setHibernateProperties(Map<String, String> hibernateProperties) {
+		this.hibernateProperties = hibernateProperties;
+	}
+
+	public List<String> getMappingResources() {
+		return mappingResources;
+	}
+
+	public void setMappingResources(List<String> mappingResources) {
+		this.mappingResources = mappingResources;
 	}
 }

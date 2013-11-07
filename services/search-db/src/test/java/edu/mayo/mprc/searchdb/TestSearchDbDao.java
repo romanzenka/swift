@@ -117,7 +117,7 @@ public class TestSearchDbDao extends DaoTest {
 
 		final Analysis analysis = loadAnalysis(new DateTime(), SINGLE, saveNewReportData());
 
-		getDatabasePlaceholder().getSession().flush();
+		getDatabase().getSession().flush();
 
 		final StringWriter writer = new StringWriter();
 		final Report r = new Report(writer);
@@ -125,7 +125,7 @@ public class TestSearchDbDao extends DaoTest {
 		analysis.htmlReport(r, searchDbDao, null);
 
 		// TODO: Check that the analysis is saved properly
-//        DatabaseConnection databaseConnection = new DatabaseConnection(getDatabasePlaceholder().getSession().connection());
+//        DatabaseConnection databaseConnection = new DatabaseConnection(getDatabase().getSession().connection());
 //        FlatXmlDataSet.write(databaseConnection.createDataSet(), new FileOutputStream("/Users/m044910/database.xml"));
 
 		searchDbDao.commit();
@@ -233,7 +233,7 @@ public class TestSearchDbDao extends DaoTest {
 
 		searchDbDao.begin();
 		final Analysis analysis = loadAnalysis(now, report, reportData);
-		getDatabasePlaceholder().getSession().flush();
+		getDatabase().getSession().flush();
 		searchDbDao.commit();
 
 		searchDbDao.begin();
@@ -242,7 +242,7 @@ public class TestSearchDbDao extends DaoTest {
 
 		searchDbDao.begin();
 		final Analysis analysis2 = loadAnalysis(now, report, reportData);
-		getDatabasePlaceholder().getSession().flush();
+		getDatabase().getSession().flush();
 		searchDbDao.commit();
 
 		searchDbDao.begin();

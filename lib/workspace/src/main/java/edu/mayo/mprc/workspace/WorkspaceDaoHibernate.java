@@ -4,7 +4,7 @@ import edu.mayo.mprc.MprcException;
 import edu.mayo.mprc.config.RuntimeInitializer;
 import edu.mayo.mprc.database.Change;
 import edu.mayo.mprc.database.DaoBase;
-import edu.mayo.mprc.database.DatabasePlaceholder;
+import edu.mayo.mprc.database.Database;
 import org.apache.log4j.Logger;
 import org.hibernate.Criteria;
 import org.hibernate.FetchMode;
@@ -23,8 +23,8 @@ public final class WorkspaceDaoHibernate extends DaoBase implements WorkspaceDao
 	public WorkspaceDaoHibernate() {
 	}
 
-	public WorkspaceDaoHibernate(final DatabasePlaceholder databasePlaceholder) {
-		super(databasePlaceholder);
+	public WorkspaceDaoHibernate(final Database database) {
+		super(database);
 	}
 
 	@Override
