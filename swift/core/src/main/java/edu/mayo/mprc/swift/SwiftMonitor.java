@@ -44,6 +44,9 @@ public final class SwiftMonitor implements Runnable {
 	}
 
 	private void initialize(final ApplicationConfig app) {
+		if (app == null) {
+			return;
+		}
 		synchronized (connectionsLock) {
 			monitoredConnections.clear();
 			pingListeners.clear();

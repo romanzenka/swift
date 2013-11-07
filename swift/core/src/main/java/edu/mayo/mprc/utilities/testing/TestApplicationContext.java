@@ -6,6 +6,7 @@ import edu.mayo.mprc.daemon.MessageBroker;
 import edu.mayo.mprc.daemon.SimpleRunner;
 import edu.mayo.mprc.database.Database;
 import edu.mayo.mprc.database.DatabaseUtilities;
+import edu.mayo.mprc.swift.commands.SwiftEnvironment;
 import edu.mayo.mprc.swift.db.SwiftDao;
 import edu.mayo.mprc.swift.params2.ParamsDao;
 import edu.mayo.mprc.swift.search.DatabaseValidator;
@@ -59,7 +60,7 @@ public final class TestApplicationContext {
 		final DatabaseValidator validator = (DatabaseValidator) getBean("databaseValidator");
 
 		// Create a test application config with one daemon, message broker, database and searcher
-		final ApplicationConfig testConfig = new ApplicationConfig(new DependencyResolver(getResourceTable()));
+		final ApplicationConfig testConfig = new ApplicationConfig(null);
 
 		final DaemonConfig daemonConfig = DaemonConfig.getDefaultDaemonConfig("test", true);
 		daemonConfig.setTempFolderPath(tempFolder);
@@ -75,6 +76,11 @@ public final class TestApplicationContext {
 				null, null, null, null, null, null, null, null, null, null, databaseConfig);
 
 		daemonConfig.addResource(new ServiceConfig("searcher1", new SimpleRunner.Config(searcherConfig)));
+
+		SwiftEnvironment swiftEnvironment = (SwiftEnvironment) testContext.getBean("swiftEnvironment");
+		testConfig.setDependencyResolver(new DependencyResolver(getResourceTable()));
+		swiftEnvironment.setApplicationConfig(testConfig);
+
 
 		validator.setDaemonConfig(daemonConfig);
 		validator.setSearcherConfig(searcherConfig);

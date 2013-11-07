@@ -52,6 +52,13 @@ public interface SwiftEnvironment extends RunningApplicationContext {
 	ApplicationConfig getApplicationConfig();
 
 	/**
+	 * For testing purposes mainly.
+	 *
+	 * @param config The config of the application
+	 */
+	void setApplicationConfig(ApplicationConfig config);
+
+	/**
 	 * Creates a daemon of given configuration.
 	 */
 	Daemon createDaemon(DaemonConfig config);

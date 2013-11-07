@@ -170,7 +170,7 @@ public final class SwiftEnvironmentImpl implements SwiftEnvironment, Application
 		return daemonConfig;
 	}
 
-	private void setApplicationConfig(final ApplicationConfig applicationConfig) {
+	public void setApplicationConfig(final ApplicationConfig applicationConfig) {
 		this.applicationConfig = applicationConfig;
 	}
 

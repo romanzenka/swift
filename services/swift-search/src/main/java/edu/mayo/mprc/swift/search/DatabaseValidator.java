@@ -186,7 +186,7 @@ public final class DatabaseValidator implements RuntimeInitializer {
 					beginTransaction(initialization);
 
 					for (final RuntimeInitializer initializer : runtimeInitializers) {
-						initializer.install(new HashMap<String, String>(0));
+						initializer.install(newParams);
 						database.getSession().flush();
 						// We completely wipe out the caches between the initialization steps to prevent
 						// huge memory consumption.

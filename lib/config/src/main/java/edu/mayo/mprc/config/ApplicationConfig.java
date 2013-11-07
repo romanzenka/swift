@@ -159,6 +159,10 @@ public final class ApplicationConfig implements ResourceConfig {
 		}
 	}
 
+	public void setDependencyResolver(DependencyResolver dependencyResolver) {
+		this.dependencyResolver = dependencyResolver;
+	}
+
 	public DependencyResolver getDependencyResolver() {
 		return dependencyResolver;
 	}
