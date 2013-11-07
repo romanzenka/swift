@@ -40,7 +40,7 @@ import java.util.List;
 /**
  * @author Roman Zenka
  */
-@Component("loadToSearchDbCommand")
+@Component("load-to-search-db-command")
 public final class LoadToSearchDb implements SwiftCommand {
 	private static final Logger LOGGER = Logger.getLogger(LoadToSearchDb.class);
 	public static final int BATCH_SIZE = 3;
@@ -55,12 +55,6 @@ public final class LoadToSearchDb implements SwiftCommand {
 	private FileTokenFactory fileTokenFactory;
 	private int totalToLoad;
 	private int loaded;
-
-
-	@Override
-	public String getName() {
-		return "load-to-search-db";
-	}
 
 	@Override
 	public String getDescription() {

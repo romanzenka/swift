@@ -7,13 +7,8 @@ import org.springframework.stereotype.Component;
 /**
  * @author Roman Zenka
  */
-@Component("swiftRunWebCommand")
+@Component("web-command")
 public class RunSwiftWeb implements SwiftCommand {
-	@Override
-	public String getName() {
-		return "web";
-	}
-
 	@Override
 	public String getDescription() {
 		return "Run Swift's web interface.";

@@ -30,7 +30,7 @@ import java.util.List;
  *
  * @author Roman Zenka
  */
-@Component("loadRawMetadataCommand")
+@Component("load-raw-command")
 public final class LoadRawMetadata implements SwiftCommand {
 	private static final Logger LOGGER = Logger.getLogger(LoadRawMetadata.class);
 	public static final int BATCH_SIZE = 20;
@@ -40,11 +40,6 @@ public final class LoadRawMetadata implements SwiftCommand {
 	private FileTokenFactory fileTokenFactory;
 	private int totalToLoad;
 	private int loaded;
-
-	@Override
-	public String getName() {
-		return "load-raw";
-	}
 
 	@Override
 	public String getDescription() {

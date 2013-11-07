@@ -17,14 +17,9 @@ import java.io.PrintWriter;
 /**
  * @author Roman Zenka
  */
-@Component("reformatConfigCommand")
+@Component("reformat-config-command")
 public final class ReformatConfig implements SwiftCommand {
 	private MultiFactory factory;
-
-	@Override
-	public String getName() {
-		return "reformat-config";
-	}
 
 	@Override
 	public String getDescription() {

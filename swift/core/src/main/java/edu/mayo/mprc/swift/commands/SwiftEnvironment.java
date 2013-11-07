@@ -91,7 +91,8 @@ public interface SwiftEnvironment extends RunningApplicationContext {
 	/**
 	 * Register an additional command.
 	 *
+	 * @param name    Name of the command without the -command suffix
 	 * @param command Command to be added to the list
 	 */
-	void registerCommand(SwiftCommand command);
+	void registerCommand(String name, SwiftCommand command);
 }

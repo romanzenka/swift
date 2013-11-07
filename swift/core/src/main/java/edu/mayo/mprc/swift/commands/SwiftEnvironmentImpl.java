@@ -1,5 +1,6 @@
 package edu.mayo.mprc.swift.commands;
 
+import com.google.common.base.Joiner;
 import edu.mayo.mprc.MprcException;
 import edu.mayo.mprc.config.*;
 import edu.mayo.mprc.daemon.Daemon;
@@ -12,13 +13,14 @@ import edu.mayo.mprc.swift.search.SwiftSearcher;
 import edu.mayo.mprc.utilities.FileUtilities;
 import edu.mayo.mprc.utilities.exceptions.ExceptionUtilities;
 import joptsimple.OptionParser;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.BeansException;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
 import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 /**
  * Swift environment - knows of all the resources Swift has. Given a command line,
@@ -26,16 +28,18 @@ import java.util.List;
  * {@link #runSwiftCommand}.
  */
 @Component("swiftEnvironment")
-public final class SwiftEnvironmentImpl implements SwiftEnvironment {
+public final class SwiftEnvironmentImpl implements SwiftEnvironment, ApplicationContextAware {
+	public static final String COMMAND_SUFFIX = "-command";
 	private FileTokenFactory fileTokenFactory;
 	private Daemon.Factory daemonFactory;
 	private MultiFactory swiftFactory;
-	private List<SwiftCommand> commands;
 
 	private ApplicationConfig applicationConfig;
 	private DaemonConfig daemonConfig;
 	private File configFile;
 	private SwiftCommandLine commandLine;
+	private ApplicationContext applicationContext;
+	private Map<String, SwiftCommand> extraCommands = new HashMap<String, SwiftCommand>(1);
 
 	public SwiftEnvironmentImpl() {
 	}
@@ -95,24 +99,36 @@ public final class SwiftEnvironmentImpl implements SwiftEnvironment {
 	 * @return The command to be executed or null if no such command exists.
 	 */
 	private SwiftCommand getCommand(final String commandName) {
-		for (final SwiftCommand command : commands) {
-			if (command.getName().equalsIgnoreCase(commandName)) {
-				return command;
-			}
+		final String beanName = getBeanNameForCommand(commandName);
+
+		final SwiftCommand swiftCommand = extraCommands.get(beanName);
+		if (swiftCommand != null) {
+			return swiftCommand;
+		}
+
+		final Object bean = applicationContext.getBean(beanName);
+		if (bean instanceof SwiftCommand) {
+			return (SwiftCommand) bean;
 		}
 		return null;
+	}
+
+	private static String getBeanNameForCommand(final String commandName) {
+		return commandName + COMMAND_SUFFIX;
 	}
 
 	/**
 	 * @return A comma-separated list of command names.
 	 */
 	private String listSupportedCommands() {
-		final StringBuilder supportedCommands = new StringBuilder(commands.size() * 10);
-		for (final SwiftCommand command : commands) {
-			supportedCommands.append(command.getName());
-			supportedCommands.append(", ");
+		final String[] commands = applicationContext.getBeanNamesForType(SwiftCommand.class);
+		Arrays.sort(commands);
+		for (int i = 0; i < commands.length; i++) {
+			if (commands[i].endsWith(COMMAND_SUFFIX)) {
+				commands[i] = commands[i].substring(0, commands[i].length() - COMMAND_SUFFIX.length());
+			}
 		}
-		return supportedCommands.substring(0, supportedCommands.length() - 2);
+		return Joiner.on(", ").join(commands);
 	}
 
 	public FileTokenFactory getFileTokenFactory() {
@@ -140,15 +156,6 @@ public final class SwiftEnvironmentImpl implements SwiftEnvironment {
 	@Resource(name = "resourceTable")
 	public void setSwiftFactory(final MultiFactory swiftFactory) {
 		this.swiftFactory = swiftFactory;
-	}
-
-	public List<SwiftCommand> getCommands() {
-		return commands;
-	}
-
-	@Autowired
-	public void setCommands(final List<SwiftCommand> commands) {
-		this.commands = commands;
 	}
 
 	@Override
@@ -260,7 +267,12 @@ public final class SwiftEnvironmentImpl implements SwiftEnvironment {
 	}
 
 	@Override
-	public void registerCommand(SwiftCommand command) {
-		commands.add(command);
+	public void registerCommand(final String name, final SwiftCommand command) {
+		extraCommands.put(getBeanNameForCommand(name), command);
+	}
+
+	@Override
+	public void setApplicationContext(final ApplicationContext applicationContext) throws BeansException {
+		this.applicationContext = applicationContext;
 	}
 }

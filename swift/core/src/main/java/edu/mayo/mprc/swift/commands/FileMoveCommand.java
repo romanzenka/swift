@@ -20,14 +20,9 @@ import java.io.File;
  *
  * @author Roman Zenka
  */
-@Component("fileMoveCommand")
+@Component("file-move-command")
 public final class FileMoveCommand implements SwiftCommand {
 	private SwiftDao swiftDao;
-
-	@Override
-	public String getName() {
-		return "file-move";
-	}
 
 	@Override
 	public String getDescription() {

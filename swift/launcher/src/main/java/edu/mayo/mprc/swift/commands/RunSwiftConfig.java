@@ -7,13 +7,8 @@ import org.springframework.stereotype.Component;
 /**
  * @author Roman Zenka
  */
-@Component("swiftRunConfigCommand")
+@Component("config-command")
 public class RunSwiftConfig implements SwiftCommand {
-	@Override
-	public String getName() {
-		return "config";
-	}
-
 	@Override
 	public String getDescription() {
 		return "Run Swift's configuration interface.";

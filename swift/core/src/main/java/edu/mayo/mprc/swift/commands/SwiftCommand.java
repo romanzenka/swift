@@ -7,11 +7,6 @@ import edu.mayo.mprc.swift.ExitCode;
  */
 public interface SwiftCommand {
 	/**
-	 * @return Name of the command (what user enters on the command line).
-	 */
-	String getName();
-
-	/**
 	 * @return A longer description of the command.
 	 */
 	String getDescription();

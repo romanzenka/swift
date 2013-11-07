@@ -15,7 +15,7 @@ import javax.annotation.Resource;
 /**
  * @author Roman Zenka
  */
-@Component("upgradeUnimodCommand")
+@Component("upgrade-unimod-command")
 public final class UpgradeUnimodCommand implements SwiftCommand {
 	private static final Logger LOGGER = Logger.getLogger(UpgradeUnimodCommand.class);
 	private UnimodDao unimodDao;
@@ -27,11 +27,6 @@ public final class UpgradeUnimodCommand implements SwiftCommand {
 	@Resource(name = "unimodDao")
 	public void setUnimodDao(UnimodDao unimodDao) {
 		this.unimodDao = unimodDao;
-	}
-
-	@Override
-	public String getName() {
-		return "upgrade-unimod";
 	}
 
 	@Override

@@ -23,7 +23,7 @@ import java.util.concurrent.CountDownLatch;
  *
  * @author Roman Zenka
  */
-@Component("swiftRunCommand")
+@Component("run-swift-command")
 public class RunSwift implements FileListener, SwiftCommand {
 	private static final Logger LOGGER = Logger.getLogger(RunSwift.class);
 	public static final String RUN_SWIFT = "run-swift";
@@ -33,11 +33,6 @@ public class RunSwift implements FileListener, SwiftCommand {
 
 	private SwiftCommand runSwiftWeb;
 	private SwiftCommand runSwiftConfig;
-
-	@Override
-	public String getName() {
-		return RUN_SWIFT;
-	}
 
 	@Override
 	public String getDescription() {

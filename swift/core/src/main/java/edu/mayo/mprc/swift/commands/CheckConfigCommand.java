@@ -14,14 +14,9 @@ import java.io.File;
 /**
  * @author Roman Zenka
  */
-@Component("checkConfigCommand")
+@Component("check-config-command")
 public final class CheckConfigCommand implements SwiftCommand {
 	private ServiceFactory serviceFactory;
-
-	@Override
-	public String getName() {
-		return "check-config";
-	}
 
 	@Override
 	public String getDescription() {

@@ -66,20 +66,15 @@ public final class ServletInitialization implements SwiftCommand, ServletContext
 			final SwiftEnvironment swiftEnvironment = MainFactoryContext.getSwiftEnvironment();
 			// Simulate command line being passed to Swift
 
-			swiftEnvironment.registerCommand(this);
+			swiftEnvironment.registerCommand("servlet-initialization", this);
 
-			final SwiftCommandLine commandLine = new SwiftCommandLine(getName(), Arrays.asList("action", action), confFile, swiftDaemon, null, null);
+			final SwiftCommandLine commandLine = new SwiftCommandLine("servlet-initialization", Arrays.asList("action", action), confFile, swiftDaemon, null, null);
 			if (swiftEnvironment.runSwiftCommand(commandLine) != ExitCode.Ok) {
 				throw new MprcException("Initialization failed, shut down Swift");
 			}
 		} catch (Exception e) {
 			throw new RuntimeException("Could not initialize Swift web", e);
 		}
-	}
-
-	@Override
-	public String getName() {
-		return "ServletInitialization";
 	}
 
 	@Override

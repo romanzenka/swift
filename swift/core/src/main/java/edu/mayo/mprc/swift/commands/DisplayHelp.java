@@ -9,15 +9,10 @@ import org.springframework.stereotype.Component;
 /**
  * @author Roman Zenka
  */
-@Component("helpCommand")
+@Component("help-command")
 public class DisplayHelp implements SwiftCommand {
 	private static final Logger LOGGER = Logger.getLogger(DisplayHelp.class);
 	public static final String COMMAND = "help";
-
-	@Override
-	public String getName() {
-		return COMMAND;
-	}
 
 	@Override
 	public String getDescription() {

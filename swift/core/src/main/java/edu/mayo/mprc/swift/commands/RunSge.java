@@ -33,18 +33,13 @@ import java.net.UnknownHostException;
 /**
  * @author Roman Zenka
  */
-@Component("sgeRunCommand")
+@Component("sge-command")
 public class RunSge implements SwiftCommand {
 	private static final Logger LOGGER = Logger.getLogger(RunSge.class);
 	public static final String COMMAND = "sge";
 
 	private ResourceTable resourceTable;
 	private ServiceFactory serviceFactory;
-
-	@Override
-	public String getName() {
-		return COMMAND;
-	}
 
 	@Override
 	public String getDescription() {
@@ -67,9 +62,6 @@ public class RunSge implements SwiftCommand {
 		// Wait for the work packet to fully materialize in case it was transferred over a shared filesystem
 		FileUtilities.waitForFileBlocking(workPacketXmlFile);
 
-		FileInputStream fileInputStream = null;
-		SgePacket sgePacket = null;
-
 		try {
 			LOGGER.info("Running grid job in host: " + InetAddress.getLocalHost().getHostName());
 		} catch (UnknownHostException e) {
@@ -77,6 +69,8 @@ public class RunSge implements SwiftCommand {
 		}
 
 		Request request = null;
+		FileInputStream fileInputStream = null;
+		SgePacket sgePacket = null;
 		try {
 			LOGGER.debug(ReleaseInfoCore.buildVersion());
 			LOGGER.info("Parsing xml file: " + workPacketXmlFile.getAbsolutePath());
