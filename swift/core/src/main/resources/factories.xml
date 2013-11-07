@@ -97,12 +97,6 @@
         <property name="swiftLibDirectory" value="lib" />
     </bean>
 
-    <bean id="swiftSge" class="edu.mayo.mprc.swift.SgeJobRunner">
-        <property name="resourceTable" ref="resourceTable" />
-        <property name="connectionPool" ref="connectionPool" />
-        <property name="serviceFactory" ref="serviceFactory" />
-    </bean>
-
     <bean id="daemonConnectionFactory" class="edu.mayo.mprc.daemon.DaemonConnectionFactory">
         <property name="fileTokenFactory" ref="fileTokenFactory" />
         <property name="serviceFactory" ref="serviceFactory" />

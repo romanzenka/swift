@@ -4,13 +4,11 @@ import edu.mayo.mprc.MprcException;
 import edu.mayo.mprc.config.DaemonConfig;
 import edu.mayo.mprc.config.ResourceConfig;
 import edu.mayo.mprc.daemon.Daemon;
-import edu.mayo.mprc.messaging.ActiveMQConnectionPool;
 import edu.mayo.mprc.messaging.ServiceFactory;
 import edu.mayo.mprc.swift.ExitCode;
 import edu.mayo.mprc.swift.WebUi;
 import edu.mayo.mprc.utilities.FileListener;
 import edu.mayo.mprc.utilities.FileMonitor;
-import edu.mayo.mprc.utilities.FileUtilities;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -31,7 +29,6 @@ public class RunSwift implements FileListener, SwiftCommand {
 	public static final String RUN_SWIFT = "run-swift";
 
 	private final CountDownLatch configFileChanged = new CountDownLatch(1);
-	private ActiveMQConnectionPool connectionPool;
 	private ServiceFactory serviceFactory;
 
 	private SwiftCommand runSwiftWeb;
@@ -64,7 +61,7 @@ public class RunSwift implements FileListener, SwiftCommand {
 			return getRunSwiftWeb().run(environment);
 		}
 
-		serviceFactory.initialize(environment.getMessageBroker().getBrokerUrl(), config.getName());
+		getServiceFactory().initialize(environment.getMessageBroker().getBrokerUrl(), config.getName());
 		final Daemon daemon = environment.createDaemon(config);
 		LOGGER.debug(daemon.toString());
 
@@ -99,7 +96,6 @@ public class RunSwift implements FileListener, SwiftCommand {
 				daemon.awaitTermination();
 			}
 			LOGGER.info("Daemon stopped");
-			FileUtilities.closeQuietly(connectionPool);
 		} else {
 			throw new MprcException("No daemons are configured in " + configFile.getAbsolutePath() + ". Exiting.");
 		}
@@ -136,15 +132,6 @@ public class RunSwift implements FileListener, SwiftCommand {
 		if (!timeout) {
 			configFileChanged.countDown();
 		}
-	}
-
-	public ActiveMQConnectionPool getConnectionPool() {
-		return connectionPool;
-	}
-
-	@Resource(name = "connectionPool")
-	public void setConnectionPool(ActiveMQConnectionPool connectionPool) {
-		this.connectionPool = connectionPool;
 	}
 
 	public ServiceFactory getServiceFactory() {

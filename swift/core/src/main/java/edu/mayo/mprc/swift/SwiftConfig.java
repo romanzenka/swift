@@ -9,12 +9,10 @@ import edu.mayo.mprc.daemon.MessageBroker;
 import edu.mayo.mprc.daemon.files.FileTokenFactory;
 import edu.mayo.mprc.database.Database;
 import edu.mayo.mprc.database.FileType;
-import edu.mayo.mprc.messaging.ActiveMQConnectionPool;
 import edu.mayo.mprc.swift.db.FileTokenFactoryWrapper;
 import edu.mayo.mprc.swift.search.SwiftSearcher;
 import edu.mayo.mprc.utilities.FileUtilities;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -170,14 +168,12 @@ public final class SwiftConfig {
 	 * @param swiftConfig  Complete Swift config.
 	 * @param daemonConfig Config for the active daemon.
 	 */
-	public static void setupFileTokenFactory(final ApplicationConfig swiftConfig, final DaemonConfig daemonConfig, final FileTokenFactory fileTokenFactory, final ActiveMQConnectionPool connectionPool) {
+	public static void setupFileTokenFactory(final ApplicationConfig swiftConfig, final DaemonConfig daemonConfig, final FileTokenFactory fileTokenFactory) {
 		// Setup the actual daemon
 		fileTokenFactory.setDaemonConfigInfo(daemonConfig.createDaemonConfigInfo());
 		if (daemonConfig.getTempFolderPath() == null) {
 			throw new MprcException("The temporary folder is not configured for this daemon. Swift cannot run.");
 		}
-		fileTokenFactory.setTempFolderRepository(new File(daemonConfig.getTempFolderPath()));
-
 		final DaemonConfig databaseDaemonConfig = getDatabaseDaemonConfig(swiftConfig);
 
 		fileTokenFactory.setDatabaseDaemonConfigInfo(databaseDaemonConfig.createDaemonConfigInfo());

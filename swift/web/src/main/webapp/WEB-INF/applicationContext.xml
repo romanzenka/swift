@@ -3,7 +3,6 @@
     xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
 
     <bean id="servletInitialization" class="edu.mayo.mprc.ServletInitialization">
-        <property name="connectionPool" ref="connectionPool" />
         <property name="curationWebContext" ref="curationWebContext" />
         <property name="factoryTable" ref="resourceTable" />
         <property name="serviceFactory" ref="serviceFactory" />

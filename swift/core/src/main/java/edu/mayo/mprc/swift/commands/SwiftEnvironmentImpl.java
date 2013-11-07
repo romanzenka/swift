@@ -4,10 +4,8 @@ import edu.mayo.mprc.MprcException;
 import edu.mayo.mprc.config.*;
 import edu.mayo.mprc.daemon.Daemon;
 import edu.mayo.mprc.daemon.DaemonConnection;
-import edu.mayo.mprc.daemon.DaemonConnectionFactory;
 import edu.mayo.mprc.daemon.MessageBroker;
 import edu.mayo.mprc.daemon.files.FileTokenFactory;
-import edu.mayo.mprc.messaging.ActiveMQConnectionPool;
 import edu.mayo.mprc.swift.ExitCode;
 import edu.mayo.mprc.swift.SwiftConfig;
 import edu.mayo.mprc.swift.search.SwiftSearcher;
@@ -31,7 +29,6 @@ import java.util.List;
 public final class SwiftEnvironmentImpl implements SwiftEnvironment {
 	private FileTokenFactory fileTokenFactory;
 	private Daemon.Factory daemonFactory;
-	private DaemonConnectionFactory daemonConnectionFactory;
 	private MultiFactory swiftFactory;
 	private List<SwiftCommand> commands;
 
@@ -39,7 +36,6 @@ public final class SwiftEnvironmentImpl implements SwiftEnvironment {
 	private DaemonConfig daemonConfig;
 	private File configFile;
 	private SwiftCommandLine commandLine;
-	private ActiveMQConnectionPool connectionPool;
 
 	public SwiftEnvironmentImpl() {
 	}
@@ -155,30 +151,12 @@ public final class SwiftEnvironmentImpl implements SwiftEnvironment {
 		this.commands = commands;
 	}
 
-	public DaemonConnectionFactory getDaemonConnectionFactory() {
-		return daemonConnectionFactory;
-	}
-
-	@Resource(name = "daemonConnectionFactory")
-	public void setDaemonConnectionFactory(final DaemonConnectionFactory daemonConnectionFactory) {
-		this.daemonConnectionFactory = daemonConnectionFactory;
-	}
-
-	public ActiveMQConnectionPool getConnectionPool() {
-		return connectionPool;
-	}
-
-	@Resource(name = "connectionPool")
-	public void setConnectionPool(final ActiveMQConnectionPool connectionPool) {
-		this.connectionPool = connectionPool;
-	}
-
 	@Override
 	public DaemonConfig getDaemonConfig() {
 		if (daemonConfig == null) {
 			if (configFile != null) {
 				daemonConfig = SwiftConfig.getUserSpecifiedDaemonConfig(commandLine.getDaemonId(), getApplicationConfig());
-				SwiftConfig.setupFileTokenFactory(getApplicationConfig(), daemonConfig, getFileTokenFactory(), getConnectionPool());
+				SwiftConfig.setupFileTokenFactory(getApplicationConfig(), daemonConfig, getFileTokenFactory());
 			}
 		}
 

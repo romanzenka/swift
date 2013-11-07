@@ -15,7 +15,6 @@ import edu.mayo.mprc.swift.db.FileTokenFactoryWrapper;
 import org.hibernate.SessionFactory;
 
 import javax.annotation.Resource;
-import java.io.File;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -51,8 +50,6 @@ public final class DatabaseValidator implements RuntimeInitializer {
 		if (daemonConfig.getTempFolderPath() == null) {
 			throw new MprcException("The temporary folder is not configured for this daemon. Swift cannot run.");
 		}
-		fileTokenFactory.setTempFolderRepository(new File(daemonConfig.getTempFolderPath()));
-
 		final DaemonConfig databaseDaemonConfig = getDatabaseDaemonConfig(daemonConfig.getApplicationConfig());
 
 		fileTokenFactory.setDatabaseDaemonConfigInfo(databaseDaemonConfig.createDaemonConfigInfo());

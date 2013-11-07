@@ -5,7 +5,6 @@ import edu.mayo.mprc.config.MultiFactory;
 import edu.mayo.mprc.daemon.Daemon;
 import edu.mayo.mprc.daemon.MessageBroker;
 import edu.mayo.mprc.dbcurator.server.CurationWebContext;
-import edu.mayo.mprc.messaging.ActiveMQConnectionPool;
 import edu.mayo.mprc.messaging.ServiceFactory;
 import edu.mayo.mprc.swift.*;
 import edu.mayo.mprc.swift.commands.SwiftCommand;
@@ -44,7 +43,6 @@ public final class ServletInitialization implements SwiftCommand, ServletContext
 	private ServiceFactory serviceFactory;
 	private CurationWebContext curationWebContext;
 	private SwiftMonitor swiftMonitor;
-	private ActiveMQConnectionPool connectionPool;
 	private DefaultSwiftSearcherCaller swiftSearcherCaller;
 	private ServletContext servletContext;
 
@@ -132,7 +130,6 @@ public final class ServletInitialization implements SwiftCommand, ServletContext
 			if (webUiHolder != null) {
 				webUiHolder.stopSwiftMonitor();
 			}
-			getConnectionPool().close();
 			return ExitCode.Error;
 		}
 		return ExitCode.Ok;
@@ -176,14 +173,6 @@ public final class ServletInitialization implements SwiftCommand, ServletContext
 
 	public void setSwiftMonitor(final SwiftMonitor swiftMonitor) {
 		this.swiftMonitor = swiftMonitor;
-	}
-
-	public ActiveMQConnectionPool getConnectionPool() {
-		return connectionPool;
-	}
-
-	public void setConnectionPool(final ActiveMQConnectionPool connectionPool) {
-		this.connectionPool = connectionPool;
 	}
 
 	public DefaultSwiftSearcherCaller getSwiftSearcherCaller() {

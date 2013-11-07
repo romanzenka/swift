@@ -3,7 +3,6 @@ package edu.mayo.mprc.daemon.files;
 import edu.mayo.mprc.MprcException;
 import edu.mayo.mprc.config.DaemonConfigInfo;
 import edu.mayo.mprc.utilities.FileUtilities;
-import org.apache.log4j.Logger;
 import org.springframework.stereotype.Component;
 
 import java.io.File;
@@ -29,14 +28,8 @@ import java.net.URISyntaxException;
  */
 @Component("fileTokenFactory")
 public final class FileTokenFactory implements SenderTokenTranslator, ReceiverTokenTranslator {
-
-	private static final Logger LOGGER = Logger.getLogger(FileTokenFactory.class);
-
 	private DaemonConfigInfo daemonConfigInfo;
 	private DaemonConfigInfo databaseDaemonConfigInfo;
-
-	private File tempFolderRepository;
-	private static final String DEFAULT_lOCAL_FILE_REPOSITORY_DIRECTORY = "localFileSharingRepository";
 
 	public static final String SHARED_TYPE_PREFIX = "shared:";
 	public static final String LOCAL_TYPE_PREFIX = "local:";
@@ -63,21 +56,6 @@ public final class FileTokenFactory implements SenderTokenTranslator, ReceiverTo
 
 	public void setDatabaseDaemonConfigInfo(final DaemonConfigInfo databaseDaemonConfigInfo) {
 		this.databaseDaemonConfigInfo = databaseDaemonConfigInfo;
-	}
-
-	public File getTempFolderRepository() {
-		if (tempFolderRepository == null) {
-			tempFolderRepository = new File(FileUtilities.DEFAULT_TEMP_DIRECTORY, DEFAULT_lOCAL_FILE_REPOSITORY_DIRECTORY).getAbsoluteFile();
-			FileUtilities.ensureFolderExists(tempFolderRepository);
-
-			LOGGER.info("FileTokenFactory is using local file sharing repository [" + tempFolderRepository.getAbsolutePath() + "]");
-		}
-		return tempFolderRepository;
-	}
-
-	public void setTempFolderRepository(final File tempFolderRepository) {
-		this.tempFolderRepository = tempFolderRepository;
-		LOGGER.info("FileTokenFactory is using local file sharing repository [" + tempFolderRepository.getAbsolutePath() + "]");
 	}
 
 	/**
