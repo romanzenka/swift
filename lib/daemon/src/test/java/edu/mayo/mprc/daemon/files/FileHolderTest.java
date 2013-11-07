@@ -1,6 +1,5 @@
 package edu.mayo.mprc.daemon.files;
 
-import edu.mayo.mprc.MprcException;
 import edu.mayo.mprc.utilities.FileUtilities;
 import org.apache.log4j.Logger;
 import org.testng.Assert;
@@ -146,8 +145,7 @@ public class FileHolderTest {
 		translatedTokens = 0;
 		test.translateOnSender(new MySenderTokenTranslator());
 
-		final SingleFileTokenSynchronizer synchronizer = new SingleFileTokenSynchronizer();
-		test.translateOnReceiver(new MyReceiverTokenTranslator(), synchronizer, null);
+		test.translateOnReceiver(new MyReceiverTokenTranslator(), null);
 
 		Assert.assertEquals(translatedTokens, 7);
 		assertFilesTranslated(test.getFile(), "dest/test.txt", temp);
@@ -160,9 +158,6 @@ public class FileHolderTest {
 		assertFilesTranslated(testClass2.getFileMap().get("test4"), "dest/test4.txt", temp);
 		assertFilesTranslated(test.getNotSerializable(), "src/ns1.txt", temp);
 		assertFilesTranslated(TestClass.getNotSerializable2(), "src/ns2.txt", temp);
-
-		test.uploadAndWait("file");
-		Assert.assertNotNull(synchronizer.getUploadedToken());
 	}
 
 	@Test
@@ -176,8 +171,7 @@ public class FileHolderTest {
 		translatedTokens = 0;
 		test.translateOnSender(new MySenderTokenTranslator());
 
-		final SingleFileTokenSynchronizer synchronizer = new SingleFileTokenSynchronizer();
-		test.translateOnReceiver(new MyReceiverTokenTranslator(), synchronizer, null);
+		test.translateOnReceiver(new MyReceiverTokenTranslator(), null);
 
 		Assert.assertEquals(translatedTokens, 1);
 		assertFilesTranslated((File) test.getMap().get("file"), "dest/test.txt", temp);
@@ -193,8 +187,8 @@ public class FileHolderTest {
 	}
 
 	/**
-	 *  We change all "src" to "dest" to simulate translation
- 	 */
+	 * We change all "src" to "dest" to simulate translation
+	 */
 	private class MySenderTokenTranslator implements SenderTokenTranslator {
 		@Override
 		public FileToken translateBeforeTransfer(final FileToken fileToken) {
@@ -217,41 +211,6 @@ public class FileHolderTest {
 		@Override
 		public File getFile(final FileToken fileToken) {
 			return new File(getFilePathFromToken(fileToken));
-		}
-	}
-
-	/**
-	 * A mock {@link FileTokenSynchronizer} implementation that allows its uploadAndWait method to be called once,
-	 * then it provides the parameter it was called with.
-	 *
-	 * @author Roman Zenka
-	 */
-	public static class SingleFileTokenSynchronizer implements FileTokenSynchronizer {
-		private FileToken uploadedToken;
-
-		public FileToken getUploadedToken() {
-			return uploadedToken;
-		}
-
-		@Override
-		public void upload(final FileToken myToken) {
-		}
-
-		@Override
-		public void uploadAndWait(final FileToken myToken) {
-			if (uploadedToken == null) {
-				uploadedToken = myToken;
-			} else {
-				throw new MprcException("Too many uploads");
-			}
-		}
-
-		@Override
-		public void download(final FileToken theirToken) {
-		}
-
-		@Override
-		public void downloadAndWait(final FileToken theirToken) {
 		}
 	}
 }

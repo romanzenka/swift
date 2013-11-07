@@ -50,11 +50,6 @@ public final class ScaffoldWorkPacket extends WorkPacketBase implements Cachable
 	}
 
 	@Override
-	public void synchronizeFileTokensOnReceiver() {
-		uploadAndWait("outputFolder");
-	}
-
-	@Override
 	public boolean isPublishResultFiles() {
 		return true;
 	}
@@ -92,7 +87,7 @@ public final class ScaffoldWorkPacket extends WorkPacketBase implements Cachable
 		long oldestOutput = Long.MAX_VALUE;
 		for (final String file : outputFiles) {
 			final File outputFile = new File(subFolder, file);
-			if(!outputFile.exists() || !outputFile.isFile() || outputFile.length()<=0) {
+			if (!outputFile.exists() || !outputFile.isFile() || outputFile.length() <= 0) {
 				return true;
 			}
 			final long fileModified = outputFile.lastModified();

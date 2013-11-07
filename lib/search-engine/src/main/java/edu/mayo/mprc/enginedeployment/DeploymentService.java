@@ -75,9 +75,6 @@ public abstract class DeploymentService<T extends DeploymentResult> implements W
 
 				result.addMessage("Deployment of " + request.getShortName() + " complete.");
 				LOGGER.debug("Deployment of " + request.getShortName() + " complete.");
-
-				//Synchronize file tokens between source and destination system.
-				workPacket.synchronizeFileTokensOnReceiver();
 			}
 
 			// Report success for all other requests for same deployment

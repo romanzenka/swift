@@ -91,7 +91,6 @@ final class MsconvertTask extends AsyncTaskBase implements FileProducingTask {
 	public void onProgress(final ProgressInfo progressInfo) {
 		if (progressInfo instanceof MsconvertResult) {
 			final MsconvertResult result = (MsconvertResult) progressInfo;
-			result.synchronizeFileTokensOnReceiver();
 			outputFile = result.getMgf();
 			updateDescription();
 		}

@@ -31,7 +31,6 @@ public abstract class WorkerBase implements Worker {
 		try {
 			progressReporter.reportStart(MonitorUtilities.getHostInformation());
 			process(workPacket, progressReporter);
-			workPacket.synchronizeFileTokensOnReceiver();
 			progressReporter.reportSuccess();
 		} catch (Exception t) {
 			progressReporter.reportFailure(t);

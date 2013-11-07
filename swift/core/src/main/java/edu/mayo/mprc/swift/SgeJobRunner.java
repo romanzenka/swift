@@ -79,7 +79,7 @@ public final class SgeJobRunner {
 					fileTokenFactory.setTempFolderRepository(new File(sgePacket.getSharedTempDirectory()));
 				}
 
-				fileTokenHolder.translateOnReceiver(fileTokenFactory, fileTokenFactory, null);
+				fileTokenHolder.translateOnReceiver(fileTokenFactory, null);
 			}
 
 			final DependencyResolver dependencies = new DependencyResolver(resourceTable);

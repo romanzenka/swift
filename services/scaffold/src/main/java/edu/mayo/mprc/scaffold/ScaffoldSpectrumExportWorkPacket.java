@@ -32,9 +32,4 @@ public final class ScaffoldSpectrumExportWorkPacket extends WorkPacketBase {
 	public File getSpectrumExportFile() {
 		return spectrumExportFile;
 	}
-
-	@Override
-	public void synchronizeFileTokensOnReceiver() {
-		uploadAndWait("spectrumExportFile");
-	}
 }

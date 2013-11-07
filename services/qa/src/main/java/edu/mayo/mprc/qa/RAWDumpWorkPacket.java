@@ -81,17 +81,6 @@ public final class RAWDumpWorkPacket extends WorkPacketBase implements CachableW
 	}
 
 	@Override
-	public void synchronizeFileTokensOnReceiver() {
-		uploadAndWait("rawInfoFile");
-		uploadAndWait("rawSpectraFile");
-		uploadAndWait("chromatogramFile");
-		uploadAndWait("tuneMethodFile");
-		uploadAndWait("instrumentMethodFile");
-		uploadAndWait("sampleInformationFile");
-		uploadAndWait("errorLogFile");
-	}
-
-	@Override
 	public boolean isPublishResultFiles() {
 		// We never publish these intermediate files
 		return false;

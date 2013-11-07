@@ -108,7 +108,7 @@ final class DaemonResponseListener implements ResponseListener {
 		//If response is a FileTokenHolder, translate its tokens to files
 		if (msg.getProgressData() instanceof FileTokenHolder) {
 			final FileTokenHolder fileTokenHolder = (FileTokenHolder) msg.getProgressData();
-			fileTokenHolder.translateOnReceiver(daemonConnection.getFileTokenFactory(), daemonConnection.getFileTokenFactory(), null);
+			fileTokenHolder.translateOnReceiver(daemonConnection.getFileTokenFactory(), null);
 		}
 
 		progressListener.userProgressInformation(msg.getProgressData());

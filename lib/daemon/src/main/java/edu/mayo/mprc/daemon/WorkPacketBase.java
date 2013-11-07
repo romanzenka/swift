@@ -62,6 +62,6 @@ public abstract class WorkPacketBase extends FileHolder implements WorkPacket {
 	 */
 	public static void simulateTransfer(final FileTokenHolder workPacket) {
 		workPacket.translateOnSender(NULL_TOKEN_FACTORY);
-		workPacket.translateOnReceiver(NULL_TOKEN_FACTORY, NULL_TOKEN_FACTORY, null);
+		workPacket.translateOnReceiver(NULL_TOKEN_FACTORY, null);
 	}
 }

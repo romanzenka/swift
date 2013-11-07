@@ -144,11 +144,6 @@ public final class DatabaseUndeploymentTask {
 		} else if (progressInfo instanceof DeploymentResult) {
 			final DeploymentResult deploymentResult = (DeploymentResult) progressInfo;
 
-			/**
-			 * This step must synchronize the deployment folder.
-			 */
-			deploymentResult.synchronizeFileTokensOnReceiver();
-
 			messages.addAll(deploymentResult.getMessages());
 		} else {
 			messages.add(progressInfo.toString());

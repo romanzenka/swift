@@ -246,7 +246,6 @@ public final class SearchRunner implements Runnable {
 			try {
 				workflowEngine.run();
 				if (workflowEngine.isDone()) {
-					packet.synchronizeFileTokensOnReceiver();
 					reporter.reportSuccess();
 					break;
 				} else if (workflowEngine.isWorkAvailable()) {

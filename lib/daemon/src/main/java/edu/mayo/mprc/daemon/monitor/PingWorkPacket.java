@@ -1,7 +1,6 @@
 package edu.mayo.mprc.daemon.monitor;
 
 import edu.mayo.mprc.daemon.WorkPacket;
-import edu.mayo.mprc.daemon.files.FileTokenSynchronizer;
 import edu.mayo.mprc.daemon.files.ReceiverTokenTranslator;
 import edu.mayo.mprc.daemon.files.SenderTokenTranslator;
 
@@ -36,12 +35,7 @@ public final class PingWorkPacket implements WorkPacket {
 	}
 
 	@Override
-	public void translateOnReceiver(final ReceiverTokenTranslator translator, final FileTokenSynchronizer synchronizer, @Nullable final Set<File> filesThatShouldExist) {
-		// Nothing needs to be done - no files moved
-	}
-
-	@Override
-	public void synchronizeFileTokensOnReceiver() {
+	public void translateOnReceiver(final ReceiverTokenTranslator translator, @Nullable final Set<File> filesThatShouldExist) {
 		// Nothing needs to be done - no files moved
 	}
 

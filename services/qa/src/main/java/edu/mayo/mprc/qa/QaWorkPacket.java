@@ -49,10 +49,4 @@ public final class QaWorkPacket extends WorkPacketBase {
 	public File getReportFile() {
 		return reportFile;
 	}
-
-	@Override
-	public void synchronizeFileTokensOnReceiver() {
-		uploadAndWait("qaReportFolderFile");
-		uploadAndWait("reportFile");
-	}
 }

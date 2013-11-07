@@ -178,9 +178,4 @@ public abstract class EngineWorkPacket extends WorkPacketBase implements Cachabl
 				+ "\n\toutput file: " + getOutputFile()
 				+ "\n\tsearch params: " + getSearchParamsFile();
 	}
-
-	@Override
-	public void synchronizeFileTokensOnReceiver() {
-		uploadAndWait("outputFile");
-	}
 }

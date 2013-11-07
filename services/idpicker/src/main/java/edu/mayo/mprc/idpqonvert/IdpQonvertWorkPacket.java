@@ -79,12 +79,6 @@ public final class IdpQonvertWorkPacket extends WorkPacketBase implements Cachab
 	}
 
 	@Override
-	public void synchronizeFileTokensOnReceiver() {
-		super.synchronizeFileTokensOnReceiver();
-		uploadAndWait("outputFile");
-	}
-
-	@Override
 	public String getStringDescriptionOfTask() {
 		final String paramString = getParams().toConfigFile();
 

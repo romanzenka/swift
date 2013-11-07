@@ -24,13 +24,11 @@ import java.net.URISyntaxException;
  * is called, which gives the tokens information about who is the actual sender.</li>
  * <li>When the token is received, {@link #getFile(FileToken)}
  * is called to turn it into a file.
- * <li>Because tokens can refer to objects that will be created in the future (e.g. "put my files here"), there is last
- * step - calling either {@link #uploadAndWait(FileToken)} or other {@link FileTokenSynchronizer} methods.
  * </li>
  * </ol>
  */
 @Component("fileTokenFactory")
-public final class FileTokenFactory implements SenderTokenTranslator, ReceiverTokenTranslator, FileTokenSynchronizer {
+public final class FileTokenFactory implements SenderTokenTranslator, ReceiverTokenTranslator {
 
 	private static final Logger LOGGER = Logger.getLogger(FileTokenFactory.class);
 
@@ -289,22 +287,6 @@ public final class FileTokenFactory implements SenderTokenTranslator, ReceiverTo
 			path = FileUtilities.removeFileUrlPrefix(file.getAbsoluteFile().toURI());
 		}
 		return path;
-	}
-
-	@Override
-	public void upload(final FileToken myToken) {
-	}
-
-	@Override
-	public void uploadAndWait(final FileToken myToken) {
-	}
-
-	@Override
-	public void download(final FileToken theirToken) {
-	}
-
-	@Override
-	public void downloadAndWait(final FileToken theirToken) {
 	}
 
 	private boolean isFileTokenShared(final FileToken fileToken) {

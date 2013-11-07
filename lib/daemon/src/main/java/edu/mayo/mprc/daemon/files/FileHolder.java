@@ -34,17 +34,12 @@ public class FileHolder implements FileTokenHolder {
 	private static final long serialVersionUID = 20110418L;
 	private HashMap<FieldIndex, FileToken> tokenMap;
 	private transient ReceiverTokenTranslator translator;
-	private transient FileTokenSynchronizer synchronizer;
 
 	public FileHolder() {
 	}
 
 	public ReceiverTokenTranslator getTranslator() {
 		return translator;
-	}
-
-	public FileTokenSynchronizer getSynchronizer() {
-		return synchronizer;
 	}
 
 	@Override
@@ -65,7 +60,7 @@ public class FileHolder implements FileTokenHolder {
 	}
 
 	@Override
-	public void translateOnReceiver(final ReceiverTokenTranslator translator, final FileTokenSynchronizer synchronizer, Set<File> filesThatShouldExist) {
+	public void translateOnReceiver(final ReceiverTokenTranslator translator, Set<File> filesThatShouldExist) {
 		// Collect all files that were supposed to exist
 		boolean checkFiles = false;
 
@@ -74,16 +69,15 @@ public class FileHolder implements FileTokenHolder {
 			checkFiles = true;
 		}
 
-		translateOnReceiverBody(translator, synchronizer, filesThatShouldExist);
+		translateOnReceiverBody(translator, filesThatShouldExist);
 
 		if (checkFiles) {
 			FileUtilities.waitForFilesBlocking(filesThatShouldExist);
 		}
 	}
 
-	private void translateOnReceiverBody(ReceiverTokenTranslator translator, FileTokenSynchronizer synchronizer, Set<File> filesThatShouldExist) {
+	private void translateOnReceiverBody(ReceiverTokenTranslator translator, Set<File> filesThatShouldExist) {
 		this.translator = translator;
-		this.synchronizer = synchronizer;
 
 		// Set all directly accessible fields from our token map
 		for (final Map.Entry<FieldIndex, FileToken> entry : tokenMap.entrySet()) {
@@ -91,7 +85,7 @@ public class FileHolder implements FileTokenHolder {
 		}
 		// Recursively set all the file token holder fields
 		for (final Field field : getFields()) {
-			translateTokenHolderField(translator, synchronizer, filesThatShouldExist, field);
+			translateTokenHolderField(translator, filesThatShouldExist, field);
 		}
 	}
 
@@ -107,16 +101,16 @@ public class FileHolder implements FileTokenHolder {
 		}
 	}
 
-	private void translateTokenHolderField(ReceiverTokenTranslator translator, FileTokenSynchronizer synchronizer, Set<File> filesThatShouldExist, Field field) {
+	private void translateTokenHolderField(ReceiverTokenTranslator translator, Set<File> filesThatShouldExist, Field field) {
 		if (serializableFileTokenField(field)) {
 			final FileTokenHolder fileTokenHolder = getFileTokenHolder(field);
 			if (fileTokenHolder != null) {
-				fileTokenHolder.translateOnReceiver(translator, synchronizer, filesThatShouldExist);
+				fileTokenHolder.translateOnReceiver(translator, filesThatShouldExist);
 			}
 		} else if (serializableFileListField(field)) {
 			for (final Object o : getFieldList(field)) {
 				if (o instanceof FileTokenHolder) {
-					((FileTokenHolder) o).translateOnReceiver(translator, synchronizer, filesThatShouldExist);
+					((FileTokenHolder) o).translateOnReceiver(translator, filesThatShouldExist);
 				}
 			}
 		} else if (serializableFileMapField(field)) {
@@ -124,7 +118,7 @@ public class FileHolder implements FileTokenHolder {
 				if (o instanceof Map.Entry) {
 					Map.Entry e = (Map.Entry) o;
 					if (e.getValue() instanceof FileTokenHolder) {
-						((FileTokenHolder) e.getValue()).translateOnReceiver(translator, synchronizer, filesThatShouldExist);
+						((FileTokenHolder) e.getValue()).translateOnReceiver(translator, filesThatShouldExist);
 					}
 				}
 			}
@@ -149,21 +143,6 @@ public class FileHolder implements FileTokenHolder {
 		if (!getClass().equals(FileHolder.class) && clazz.getSuperclass() != null) {
 			addFields(clazz.getSuperclass(), fields);
 		}
-	}
-
-	@Override
-	public void synchronizeFileTokensOnReceiver() {
-		// Nothing is being uploaded by default
-	}
-
-	/**
-	 * Upload the file for a given field name. To be called from {@link #synchronizeFileTokensOnReceiver()} implementations.
-	 *
-	 * @param fieldName Name of the field to upload.
-	 */
-	public void uploadAndWait(final String fieldName) {
-		final FileToken fileToken = tokenMap.get(new FieldIndex(fieldName, null));
-		synchronizer.uploadAndWait(fileToken);
 	}
 
 	private boolean isSerializableField(final Field field) {

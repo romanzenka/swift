@@ -83,11 +83,6 @@ public final class RawToMgfWorkPacket extends WorkPacketBase implements Cachable
 	}
 
 	@Override
-	public void synchronizeFileTokensOnReceiver() {
-		uploadAndWait("outputFile");
-	}
-
-	@Override
 	public String getStringDescriptionOfTask() {
 		final File sourceFile = getInputFile();
 		final String params = getParams();

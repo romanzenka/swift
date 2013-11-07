@@ -88,7 +88,7 @@ final class DirectDaemonConnection implements DaemonConnection {
 
 			if (request.getMessageData() instanceof FileTokenHolder) {
 				final FileTokenHolder fileTokenHolder = (FileTokenHolder) request.getMessageData();
-				fileTokenHolder.translateOnReceiver(fileTokenFactory, fileTokenFactory, null);
+				fileTokenHolder.translateOnReceiver(fileTokenFactory, null);
 			}
 		}
 

@@ -23,12 +23,4 @@ public final class MgfTitleCleanupWorkPacket extends WorkPacketBase {
 	public File getCleanedMgf() {
 		return cleanedMgf;
 	}
-
-
-	@Override
-	public void synchronizeFileTokensOnReceiver() {
-		if (getCleanedMgf().exists()) {
-			uploadAndWait("cleanedMgf");
-		}
-	}
 }

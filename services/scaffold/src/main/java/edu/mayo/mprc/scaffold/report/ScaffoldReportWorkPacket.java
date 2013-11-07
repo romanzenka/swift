@@ -39,10 +39,4 @@ public final class ScaffoldReportWorkPacket extends WorkPacketBase {
 	public File getProteinReportFile() {
 		return proteinReportFile;
 	}
-
-	@Override
-	public void synchronizeFileTokensOnReceiver() {
-		uploadAndWait("peptideReportFile");
-		uploadAndWait("proteinReportFile");
-	}
 }

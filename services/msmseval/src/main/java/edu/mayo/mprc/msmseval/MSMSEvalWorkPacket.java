@@ -51,11 +51,6 @@ public final class MSMSEvalWorkPacket extends WorkPacketBase implements Cachable
 	}
 
 	@Override
-	public void synchronizeFileTokensOnReceiver() {
-		uploadAndWait("outputDirectory");
-	}
-
-	@Override
 	public boolean isPublishResultFiles() {
 		// We never publish msmsEval results to the end user - they are fine in the cache folder
 		return false;

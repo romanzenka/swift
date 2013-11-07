@@ -76,11 +76,6 @@ public final class MsconvertWorkPacket extends WorkPacketBase implements Cachabl
 	}
 
 	@Override
-	public void synchronizeFileTokensOnReceiver() {
-		uploadAndWait("outputFile");
-	}
-
-	@Override
 	public String getStringDescriptionOfTask() {
 		final File sourceFile = getInputFile();
 		final String resultExtension = FileUtilities.getExtension(getOutputFile().getName());

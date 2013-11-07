@@ -65,7 +65,6 @@ public abstract class WorkCache<T extends WorkPacket> implements NoLoggingWorker
 	public final void processRequest(final WorkPacket workPacket, final ProgressReporter progressReporter) {
 		try {
 			process(workPacket, progressReporter);
-			workPacket.synchronizeFileTokensOnReceiver();
 		} catch (Exception t) {
 			progressReporter.reportFailure(t);
 		}

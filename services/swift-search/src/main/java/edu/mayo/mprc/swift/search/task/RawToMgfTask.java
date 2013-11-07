@@ -97,7 +97,6 @@ final class RawToMgfTask extends AsyncTaskBase implements FileProducingTask {
 	public void onProgress(final ProgressInfo progressInfo) {
 		if (progressInfo instanceof RawToMgfResult) {
 			final RawToMgfResult result = (RawToMgfResult) progressInfo;
-			result.synchronizeFileTokensOnReceiver();
 			outputFile = result.getMgf();
 			updateDescription();
 		}
