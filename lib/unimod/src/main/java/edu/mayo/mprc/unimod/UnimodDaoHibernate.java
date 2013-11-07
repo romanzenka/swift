@@ -80,7 +80,7 @@ public final class UnimodDaoHibernate extends DaoBase implements UnimodDao {
 	}
 
 	@Override
-	public void initialize(Map<String, String> params) {
+	public void install(Map<String, String> params) {
 		if (countAll(Mod.class) == 0) {
 			final Change change = new Change("Installing initial unimod modifications", new DateTime());
 			LOGGER.info(change.getReason());

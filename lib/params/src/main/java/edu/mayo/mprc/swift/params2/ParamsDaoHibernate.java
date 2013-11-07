@@ -402,7 +402,7 @@ public final class ParamsDaoHibernate extends DaoBase implements ParamsDao {
 	}
 
 	@Override
-	public void initialize(Map<String, String> params) {
+	public void install(Map<String, String> params) {
 		installIonSeries();
 		installInstruments();
 		installProteases();

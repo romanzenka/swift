@@ -1,5 +1,7 @@
 package edu.mayo.mprc.config;
 
+import java.util.Map;
+
 /**
  * A marker of a resource that can be installed.
  * <p/>
@@ -11,6 +13,8 @@ package edu.mayo.mprc.config;
 public interface Installable {
 	/**
 	 * Perform installation steps on the resource so it can start to get used.
+	 *
+	 * @param params
 	 */
-	void install();
+	void install(Map<String, String> params);
 }

@@ -78,7 +78,7 @@ public final class TestApplicationContext {
 
 		validator.setDaemonConfig(daemonConfig);
 		validator.setSearcherConfig(searcherConfig);
-		validator.initialize(
+		validator.install(
 				new ImmutableMap.Builder<String, String>()
 						.put("action", DatabaseUtilities.SchemaInitialization.CreateDrop.getValue())
 						.build());

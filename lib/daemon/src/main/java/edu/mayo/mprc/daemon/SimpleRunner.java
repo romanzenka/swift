@@ -7,6 +7,7 @@ import edu.mayo.mprc.utilities.progress.ProgressInfo;
 import edu.mayo.mprc.utilities.progress.ProgressReporter;
 import org.apache.log4j.Logger;
 
+import java.util.Map;
 import java.util.concurrent.ExecutorService;
 
 /**
@@ -121,16 +122,16 @@ public final class SimpleRunner extends AbstractRunner {
 	}
 
 	@Override
-	public void install() {
+	public void install(Map<String, String> params) {
 		// First check if the factory we hold needs installing
 		if (factory instanceof Installable) {
-			((Installable) factory).install();
+			((Installable) factory).install(params);
 		}
 
 		// Check whether the created worker itself needs installing
 		final Worker worker = factory.create(config, dependencies);
 		if (worker instanceof Installable) {
-			((Installable) worker).install();
+			((Installable) worker).install(params);
 		}
 	}
 

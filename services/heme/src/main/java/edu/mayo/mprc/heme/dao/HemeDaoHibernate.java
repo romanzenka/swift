@@ -91,7 +91,7 @@ public final class HemeDaoHibernate extends DaoBase implements HemeDao {
 	}
 
 	@Override
-	public void initialize(Map<String, String> params) {
+	public void install(Map<String, String> params) {
 		// Nothing to do
 	}
 }

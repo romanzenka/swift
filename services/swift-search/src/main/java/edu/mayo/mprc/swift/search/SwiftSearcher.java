@@ -798,7 +798,7 @@ public final class SwiftSearcher implements Worker {
 							final Config searcher = (Config) config;
 							validator.setSearcherConfig(searcher);
 							validator.setDaemonConfig(daemon);
-							validator.initialize(new HashMap<String, String>(0));
+							validator.install(new HashMap<String, String>(0));
 						}
 					})
 					.reference(Database.Factory.TYPE, UiBuilder.NONE_TYPE)

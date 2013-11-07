@@ -53,6 +53,6 @@ public final class MockUnimodDao implements UnimodDao {
 	}
 
 	@Override
-	public void initialize(Map<String, String> params) {
+	public void install(Map<String, String> params) {
 	}
 }

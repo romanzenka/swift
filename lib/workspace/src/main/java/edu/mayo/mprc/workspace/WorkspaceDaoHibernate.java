@@ -94,7 +94,7 @@ public final class WorkspaceDaoHibernate extends DaoBase implements WorkspaceDao
 	}
 
 	@Override
-	public void initialize(Map<String, String> params) {
+	public void install(Map<String, String> params) {
 		if (countAll(User.class) == 0) {
 			final User user = new User("Mprc", "Test", "mprctest@localhost", "mt", "database");
 			save(user, new Change("Creating a test user - no users were defined", new DateTime()), getUserEqualityCriteria(user), true);

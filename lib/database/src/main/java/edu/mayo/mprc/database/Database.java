@@ -33,7 +33,7 @@ public final class Database implements Installable {
 	}
 
 	@Override
-	public void install() {
+	public void install(Map<String, String> params) {
 		initialize(DatabaseUtilities.SchemaInitialization.Update);
 	}
 

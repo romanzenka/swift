@@ -166,7 +166,7 @@ public final class DatabaseValidator implements RuntimeInitializer {
 	 * @param params Recognizes "action" key that can be one of
 	 * {@link edu.mayo.mprc.database.DatabaseUtilities.SchemaInitialization#getValue()}.
 	 */
-	public void initialize(final Map<String, String> params) {
+	public void install(final Map<String, String> params) {
 		final String action = params.get("action");
 		final HashMap<String, String> newParams = new HashMap<String, String>(params);
 		newParams.put(CurationInitializer.FASTA_FOLDER, searcherConfig.getFastaPath());
@@ -186,7 +186,7 @@ public final class DatabaseValidator implements RuntimeInitializer {
 					beginTransaction(initialization);
 
 					for (final RuntimeInitializer initializer : runtimeInitializers) {
-						initializer.initialize(new HashMap<String, String>(0));
+						initializer.install(new HashMap<String, String>(0));
 						database.getSession().flush();
 						// We completely wipe out the caches between the initialization steps to prevent
 						// huge memory consumption.

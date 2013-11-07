@@ -18,6 +18,7 @@ import javax.annotation.Resource;
 import java.io.*;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicLong;
 
 /**
@@ -155,7 +156,7 @@ public final class GridRunner extends AbstractRunner {
 	}
 
 	@Override
-	public void install() {
+	public void install(Map<String, String> params) {
 		// TODO: We will need to submit an 'installing packet' to the grid and collect response
 	}
 

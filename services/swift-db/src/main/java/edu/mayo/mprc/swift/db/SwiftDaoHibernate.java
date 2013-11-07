@@ -641,9 +641,9 @@ public final class SwiftDaoHibernate extends DaoBase implements SwiftDao {
 	}
 
 	@Override
-	public void initialize(Map<String, String> params) {
+	public void install(Map<String, String> params) {
 		// Initialize the dependent DAO
-		workspaceDao.initialize(new HashMap<String, String>(0));
+		workspaceDao.install(new HashMap<String, String>(0));
 
 		if (rowCount(TaskStateData.class) != (long) TaskState.values().length) {
 			LOGGER.info("Initializing task state enumeration");

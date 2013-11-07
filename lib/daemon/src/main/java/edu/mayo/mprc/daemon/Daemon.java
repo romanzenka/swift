@@ -15,11 +15,12 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 /**
  * A daemon - collection of multiple runners that provide services.
  */
-public final class Daemon implements Checkable {
+public final class Daemon implements Checkable, Installable {
 	private static final Logger LOGGER = Logger.getLogger(Daemon.class);
 
 	private List<AbstractRunner> runners;
@@ -46,29 +47,21 @@ public final class Daemon implements Checkable {
 	public Daemon() {
 	}
 
-	public void install() {
+	public void install(final Map<String, String> params) {
 		for (final Object resource : getResources()) {
 			if (resource instanceof Installable) {
-				((Installable) resource).install();
+				((Installable) resource).install(params);
 			}
 		}
 		for (final AbstractRunner runner : getRunners()) {
-			if (runner instanceof Installable) {
-				((Installable) runner).install();
-			}
+			runner.install(params);
 		}
-
 	}
 
 	/**
 	 * Runs all the defined daemons runners.
 	 */
 	public void start() {
-		for (final Object resource : getResources()) {
-			if (resource instanceof Installable) {
-				((Installable) resource).install();
-			}
-		}
 		for (final AbstractRunner runner : getRunners()) {
 			startRunner(runner);
 		}

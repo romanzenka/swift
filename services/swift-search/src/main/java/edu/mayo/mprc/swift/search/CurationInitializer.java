@@ -48,7 +48,7 @@ public final class CurationInitializer implements RuntimeInitializer {
 	}
 
 	@Override
-	public void initialize(Map<String, String> params) {
+	public void install(Map<String, String> params) {
 		final File fastaFolder = new File(params.get(FASTA_FOLDER));
 		final File fastaArchiveFolder = new File(params.get(FASTA_ARCHIVE_FOLDER));
 
