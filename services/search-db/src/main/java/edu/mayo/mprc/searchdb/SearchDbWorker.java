@@ -8,7 +8,7 @@ import edu.mayo.mprc.daemon.WorkPacket;
 import edu.mayo.mprc.daemon.Worker;
 import edu.mayo.mprc.daemon.WorkerBase;
 import edu.mayo.mprc.daemon.WorkerFactoryBase;
-import edu.mayo.mprc.database.DatabaseFactory;
+import edu.mayo.mprc.database.Database;
 import edu.mayo.mprc.dbcurator.model.persistence.CurationDao;
 import edu.mayo.mprc.fastadb.FastaDbDao;
 import edu.mayo.mprc.fastadb.ProteinSequenceTranslator;
@@ -159,9 +159,9 @@ public final class SearchDbWorker extends WorkerBase {
 	 * Configuration for the factory
 	 */
 	public static final class Config implements ResourceConfig {
-		private DatabaseFactory.Config database;
+		private Database.Config database;
 
-		public DatabaseFactory.Config getDatabase() {
+		public Database.Config getDatabase() {
 			return database;
 		}
 
@@ -172,7 +172,7 @@ public final class SearchDbWorker extends WorkerBase {
 
 		@Override
 		public void load(final ConfigReader reader) {
-			database = (DatabaseFactory.Config) reader.getObject(DATABASE);
+			database = (Database.Config) reader.getObject(DATABASE);
 		}
 
 		@Override
@@ -185,10 +185,10 @@ public final class SearchDbWorker extends WorkerBase {
 
 		@Override
 		public void createUI(final DaemonConfig daemon, final ResourceConfig resource, final UiBuilder builder) {
-			final DatabaseFactory.Config database = (DatabaseFactory.Config) daemon.firstResourceOfType(DatabaseFactory.Config.class);
+			final Database.Config database = (Database.Config) daemon.firstResourceOfType(Database.Config.class);
 
 			builder.property(DATABASE, "Database", "Database we will be storing data into")
-					.reference(DatabaseFactory.TYPE, UiBuilder.NONE_TYPE)
+					.reference(Database.Factory.TYPE, UiBuilder.NONE_TYPE)
 					.defaultValue(database);
 		}
 	}
