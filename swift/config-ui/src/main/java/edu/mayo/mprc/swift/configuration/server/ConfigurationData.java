@@ -9,7 +9,7 @@ import edu.mayo.mprc.config.ui.PropertyChangeListener;
 import edu.mayo.mprc.config.ui.ServiceUiFactory;
 import edu.mayo.mprc.daemon.MessageBroker;
 import edu.mayo.mprc.daemon.SimpleRunner;
-import edu.mayo.mprc.database.DatabaseFactory;
+import edu.mayo.mprc.database.Database;
 import edu.mayo.mprc.sge.GridRunner;
 import edu.mayo.mprc.swift.ResourceTable;
 import edu.mayo.mprc.swift.Swift;
@@ -386,7 +386,7 @@ public class ConfigurationData {
 		final DaemonConfig daemonConfig = createDaemonConfig("main", true);
 		config.addDaemon(daemonConfig);
 
-		final DatabaseFactory.Config database = (DatabaseFactory.Config) createResourceConfig(1, DatabaseFactory.TYPE, daemonConfig);
+		final Database.Config database = (Database.Config) createResourceConfig(1, Database.Factory.TYPE, daemonConfig);
 		createResourceConfig(1, MessageBroker.TYPE, daemonConfig);
 		final ServiceConfig searcher = (ServiceConfig) createResourceConfig(1, SwiftSearcher.TYPE, daemonConfig);
 		final WebUi.Config webUi = (WebUi.Config) createResourceConfig(1, WebUi.TYPE, daemonConfig);

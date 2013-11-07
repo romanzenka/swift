@@ -4,7 +4,7 @@ import com.google.common.collect.ImmutableMap;
 import edu.mayo.mprc.config.*;
 import edu.mayo.mprc.daemon.MessageBroker;
 import edu.mayo.mprc.daemon.SimpleRunner;
-import edu.mayo.mprc.database.DatabaseFactory;
+import edu.mayo.mprc.database.Database;
 import edu.mayo.mprc.database.DatabaseUtilities;
 import edu.mayo.mprc.swift.db.SwiftDao;
 import edu.mayo.mprc.swift.params2.ParamsDao;
@@ -44,7 +44,7 @@ public final class TestApplicationContext {
 		return testContext;
 	}
 
-	public static void initialize(final DatabaseFactory.Config databaseConfig, final DatabaseUtilities.SchemaInitialization schemaInitialization) {
+	public static void initialize(final Database.Config databaseConfig, final DatabaseUtilities.SchemaInitialization schemaInitialization) {
 		System.setProperty("SWIFT_INSTALL",
 				new File(System.getenv("SWIFT_HOME"), "install.properties").getAbsolutePath());
 		testContext = new ClassPathXmlApplicationContext(new String[]{"/testContext.xml"});
@@ -86,8 +86,8 @@ public final class TestApplicationContext {
 		LOGGER.info("Done setting up database.");
 	}
 
-	private static DatabaseFactory.Config getInMemoryDatabaseConfig() {
-		return new DatabaseFactory.Config(
+	private static Database.Config getInMemoryDatabaseConfig() {
+		return new Database.Config(
 				"jdbc:h2:mem:test",
 				"sa",
 				"",

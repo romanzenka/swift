@@ -8,7 +8,7 @@ import edu.mayo.mprc.daemon.WorkPacket;
 import edu.mayo.mprc.daemon.Worker;
 import edu.mayo.mprc.daemon.WorkerBase;
 import edu.mayo.mprc.daemon.WorkerFactoryBase;
-import edu.mayo.mprc.database.DatabaseFactory;
+import edu.mayo.mprc.database.Database;
 import edu.mayo.mprc.dbcurator.model.Curation;
 import edu.mayo.mprc.dbcurator.model.persistence.CurationDao;
 import edu.mayo.mprc.utilities.progress.UserProgressReporter;
@@ -102,9 +102,9 @@ public class FastaDbWorker extends WorkerBase {
 	 * Configuration for the factory
 	 */
 	public static final class Config implements ResourceConfig {
-		private DatabaseFactory.Config database;
+		private Database.Config database;
 
-		public DatabaseFactory.Config getDatabase() {
+		public Database.Config getDatabase() {
 			return database;
 		}
 
@@ -115,7 +115,7 @@ public class FastaDbWorker extends WorkerBase {
 
 		@Override
 		public void load(final ConfigReader reader) {
-			database = (DatabaseFactory.Config) reader.getObject(DATABASE);
+			database = (Database.Config) reader.getObject(DATABASE);
 		}
 
 		@Override

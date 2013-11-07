@@ -13,7 +13,7 @@ import edu.mayo.mprc.daemon.*;
 import edu.mayo.mprc.daemon.exception.DaemonException;
 import edu.mayo.mprc.daemon.files.FileTokenFactory;
 import edu.mayo.mprc.daemon.monitor.MonitorUtilities;
-import edu.mayo.mprc.database.DatabaseFactory;
+import edu.mayo.mprc.database.Database;
 import edu.mayo.mprc.dbcurator.model.persistence.CurationDao;
 import edu.mayo.mprc.fastadb.FastaDbWorker;
 import edu.mayo.mprc.mgf2mgf.MgfToMgfWorker;
@@ -575,7 +575,7 @@ public final class SwiftSearcher implements Worker {
 		private ServiceConfig fastaDb;
 		private ServiceConfig searchDb;
 		private ServiceConfig msmsEval;
-		private DatabaseFactory.Config database;
+		private Database.Config database;
 
 		public Config() {
 			engines = new ArrayList<SearchEngine.Config>(10);
@@ -588,7 +588,7 @@ public final class SwiftSearcher implements Worker {
 				, final ServiceConfig scaffoldReport, final ServiceConfig qa
 				, final ServiceConfig fastaDb, final ServiceConfig searchDb
 				, final ServiceConfig msmsEval
-				, final DatabaseFactory.Config database) {
+				, final Database.Config database) {
 			this.fastaPath = fastaPath;
 			this.fastaArchivePath = fastaArchivePath;
 			this.fastaUploadPath = fastaUploadPath;
@@ -654,11 +654,11 @@ public final class SwiftSearcher implements Worker {
 			return searchDb;
 		}
 
-		public void setDatabase(DatabaseFactory.Config database) {
+		public void setDatabase(Database.Config database) {
 			this.database = database;
 		}
 
-		public DatabaseFactory.Config getDatabase() {
+		public Database.Config getDatabase() {
 			return database;
 		}
 
@@ -723,7 +723,7 @@ public final class SwiftSearcher implements Worker {
 			fastaDb = (ServiceConfig) reader.getObject(FASTA_DB);
 			searchDb = (ServiceConfig) reader.getObject(SEARCH_DB);
 			msmsEval = (ServiceConfig) reader.getObject(MSMS_EVAL);
-			database = (DatabaseFactory.Config) reader.getObject(DATABASE);
+			database = (Database.Config) reader.getObject(DATABASE);
 			reportDecoyHits = reader.getBoolean(REPORT_DECOY_HITS);
 		}
 
@@ -756,7 +756,7 @@ public final class SwiftSearcher implements Worker {
 
 		@Override
 		public void createUI(final DaemonConfig daemon, final ResourceConfig resource, final UiBuilder builder) {
-			final DatabaseFactory.Config database = (DatabaseFactory.Config) daemon.firstResourceOfType(DatabaseFactory.Config.class);
+			final Database.Config database = (Database.Config) daemon.firstResourceOfType(Database.Config.class);
 
 			builder
 					.property(FASTA_PATH, "FASTA Database Path", "When Swift filters a database, the results go here.<p>" +
@@ -803,7 +803,7 @@ public final class SwiftSearcher implements Worker {
 									.build());
 						}
 					})
-					.reference(DatabaseFactory.TYPE, UiBuilder.NONE_TYPE)
+					.reference(Database.Factory.TYPE, UiBuilder.NONE_TYPE)
 					.defaultValue(database)
 
 					.property(REPORT_DECOY_HITS, "Report Decoy Hits",

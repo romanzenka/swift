@@ -7,7 +7,10 @@ import edu.mayo.mprc.config.ResourceConfig;
 import edu.mayo.mprc.config.RuntimeInitializer;
 import edu.mayo.mprc.config.ui.FixTag;
 import edu.mayo.mprc.daemon.files.FileTokenFactory;
-import edu.mayo.mprc.database.*;
+import edu.mayo.mprc.database.DaoBase;
+import edu.mayo.mprc.database.Database;
+import edu.mayo.mprc.database.DatabaseUtilities;
+import edu.mayo.mprc.database.FileType;
 import edu.mayo.mprc.swift.db.FileTokenFactoryWrapper;
 import org.hibernate.SessionFactory;
 
@@ -69,7 +72,7 @@ public final class DatabaseValidator implements RuntimeInitializer {
 	}
 
 	private static ResourceConfig getDatabaseResource(final ApplicationConfig swiftConfig) {
-		final List<ResourceConfig> configs = swiftConfig.getModulesOfConfigType(DatabaseFactory.Config.class);
+		final List<ResourceConfig> configs = swiftConfig.getModulesOfConfigType(Database.Config.class);
 		if (configs.size() > 1) {
 			throw new MprcException("Swift has more than one database defined.");
 		}
@@ -89,7 +92,7 @@ public final class DatabaseValidator implements RuntimeInitializer {
 	 * @param schemaInitialization How to initialize the database.
 	 */
 	private void beginTransaction(final DatabaseUtilities.SchemaInitialization schemaInitialization) {
-		final DatabaseFactory.Config database = searcherConfig.getDatabase();
+		final Database.Config database = searcherConfig.getDatabase();
 		final SessionFactory sessionFactory = DatabaseUtilities.getSessionFactory(database.getUrl()
 				, database.getUserName()
 				, database.getPassword()
@@ -98,7 +101,7 @@ public final class DatabaseValidator implements RuntimeInitializer {
 				, database.getDefaultSchema()
 				, database.getSchema()
 				, hibernateProperties
-				, DatabaseFactory.collectMappingResouces(daoList)
+				, Database.Factory.collectMappingResouces(daoList)
 				, schemaInitialization);
 
 		this.database.setSessionFactory(sessionFactory);

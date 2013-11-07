@@ -7,7 +7,7 @@ import edu.mayo.mprc.config.ResourceConfig;
 import edu.mayo.mprc.config.ServiceConfig;
 import edu.mayo.mprc.daemon.MessageBroker;
 import edu.mayo.mprc.daemon.files.FileTokenFactory;
-import edu.mayo.mprc.database.DatabaseFactory;
+import edu.mayo.mprc.database.Database;
 import edu.mayo.mprc.database.FileType;
 import edu.mayo.mprc.messaging.ActiveMQConnectionPool;
 import edu.mayo.mprc.swift.db.FileTokenFactoryWrapper;
@@ -41,12 +41,12 @@ public final class SwiftConfig {
 		if (swift.getModulesOfConfigType(WebUi.Config.class).isEmpty()) {
 			errors.add("Without " + WebUi.NAME + " modules you will not be able to interact with Swift.");
 		}
-		final int numDbs = swift.getModulesOfConfigType(DatabaseFactory.Config.class).size();
+		final int numDbs = swift.getModulesOfConfigType(Database.Config.class).size();
 		if (numDbs == 0) {
-			errors.add("Without " + DatabaseFactory.NAME + " module, Swift will not be able to function.");
+			errors.add("Without " + Database.Factory.NAME + " module, Swift will not be able to function.");
 		}
 		if (numDbs > 1) {
-			errors.add("Swift cannot currently be configured with more than one " + DatabaseFactory.NAME + " module.");
+			errors.add("Swift cannot currently be configured with more than one " + Database.Factory.NAME + " module.");
 		}
 		if (swift.getModulesOfConfigType(MessageBroker.Config.class).size() != 1) {
 			errors.add("Without a single " + MessageBroker.NAME + " module, other Swift modules will not be able to communicate with each other.");
@@ -59,10 +59,10 @@ public final class SwiftConfig {
 			final SwiftSearcher.Config searcher = (SwiftSearcher.Config) config;
 			final ResourceConfig database = searcher.getDatabase();
 			if (database == null) {
-				errors.add("Each " + SwiftSearcher.NAME + " has to reference a " + DatabaseFactory.NAME + " module that is within the same daemon.");
+				errors.add("Each " + SwiftSearcher.NAME + " has to reference a " + Database.Factory.NAME + " module that is within the same daemon.");
 			} else {
 				if (isDifferentDaemon(swift, database, searcher)) {
-					errors.add("Each " + SwiftSearcher.NAME + " must be located in the same daemon as the " + DatabaseFactory.NAME + " it refers to.");
+					errors.add("Each " + SwiftSearcher.NAME + " must be located in the same daemon as the " + Database.Factory.NAME + " it refers to.");
 					break;
 				}
 			}
@@ -197,7 +197,7 @@ public final class SwiftConfig {
 	}
 
 	static ResourceConfig getDatabaseResource(final ApplicationConfig swiftConfig) {
-		final List<ResourceConfig> configs = swiftConfig.getModulesOfConfigType(DatabaseFactory.Config.class);
+		final List<ResourceConfig> configs = swiftConfig.getModulesOfConfigType(Database.Config.class);
 		if (configs.size() > 1) {
 			throw new MprcException("Swift has more than one database defined.");
 		}

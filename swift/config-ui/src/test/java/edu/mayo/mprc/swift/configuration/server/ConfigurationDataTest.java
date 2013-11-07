@@ -6,7 +6,7 @@ import edu.mayo.mprc.config.DaemonConfig;
 import edu.mayo.mprc.config.KeyExtractingWriter;
 import edu.mayo.mprc.config.ResourceConfig;
 import edu.mayo.mprc.config.ServiceConfig;
-import edu.mayo.mprc.database.DatabaseFactory;
+import edu.mayo.mprc.database.Database;
 import edu.mayo.mprc.swift.MainFactoryContext;
 import edu.mayo.mprc.swift.ResourceTable;
 import edu.mayo.mprc.swift.configuration.client.model.*;
@@ -53,7 +53,7 @@ public final class ConfigurationDataTest {
 		final List<ResourceConfig> resources = getMainDaemon().getResources();
 		ResourceConfig databaseConfig = null;
 		for (final ResourceConfig resourceConfig : resources) {
-			if (resourceConfig instanceof DatabaseFactory.Config) {
+			if (resourceConfig instanceof Database.Config) {
 				databaseConfig = resourceConfig;
 				break;
 			}
@@ -80,7 +80,7 @@ public final class ConfigurationDataTest {
 
 	@Test
 	public static void shouldSetProperty() {
-		final DatabaseFactory.Config dbConfig = (DatabaseFactory.Config) getMainDaemon().getResources().get(1);
+		final Database.Config dbConfig = (Database.Config) getMainDaemon().getResources().get(1);
 		final UiChangesReplayer uiChangesReplayer = data.setProperty(dbConfig, USERNAME, TEST, false);
 		uiChangesReplayer.replay(new UiChanges() {
 			private static final long serialVersionUID = 8556656441048925831L;

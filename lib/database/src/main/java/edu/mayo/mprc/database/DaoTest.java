@@ -30,7 +30,7 @@ public abstract class DaoTest {
 	 * @param mappingFiles     Additional mapping files to use.
 	 */
 	public void initializeDatabase(final Collection<? extends DaoBase> daosToInitialize, final String... mappingFiles) {
-		final List<String> mappingResources = DatabaseFactory.collectMappingResouces(daosToInitialize, mappingFiles);
+		final List<String> mappingResources = Database.Factory.collectMappingResouces(daosToInitialize, mappingFiles);
 
 		factory = DatabaseUtilities.getTestSessionFactory(mappingResources);
 		database.setSessionFactory(factory);
