@@ -39,8 +39,9 @@ public final class AppConfigReader implements Closeable {
 		dependencyResolver = new DependencyResolver(readerFactory);
 	}
 
-	public ApplicationConfig load() {
-		final ApplicationConfig config = new ApplicationConfig(dependencyResolver);
+	public void load(final ApplicationConfig config) {
+		config.setDependencyResolver(dependencyResolver);
+		config.clear();
 		int lineNum = 0;
 		final Map<String, String> values = new LinkedHashMap<String, String>(10);
 		try {
@@ -107,7 +108,6 @@ public final class AppConfigReader implements Closeable {
 		} finally {
 			FileUtilities.closeQuietly(this);
 		}
-		return config;
 	}
 
 	private void processSection(final ApplicationConfig config, final String type, final String name, final Map<String, String> values) {

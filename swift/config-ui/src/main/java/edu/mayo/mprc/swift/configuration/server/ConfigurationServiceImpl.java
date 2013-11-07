@@ -4,10 +4,7 @@ import edu.mayo.mprc.GWTServiceExceptionFactory;
 import edu.mayo.mprc.MprcException;
 import edu.mayo.mprc.common.client.GWTServiceException;
 import edu.mayo.mprc.common.server.SpringGwtServlet;
-import edu.mayo.mprc.config.ApplicationConfig;
-import edu.mayo.mprc.config.ResourceConfig;
-import edu.mayo.mprc.config.RunnerConfig;
-import edu.mayo.mprc.config.ServiceConfig;
+import edu.mayo.mprc.config.*;
 import edu.mayo.mprc.daemon.SimpleRunner;
 import edu.mayo.mprc.sge.GridRunner;
 import edu.mayo.mprc.swift.MainFactoryContext;
@@ -64,7 +61,9 @@ public final class ConfigurationServiceImpl extends SpringGwtServlet implements 
 		final File configFile = swiftConfig.getAbsoluteFile();
 		try {
 			if (configFile.exists()) {
-				getData().setConfig(ApplicationConfig.load(configFile, getResourceTable()));
+				ApplicationConfig config = new ApplicationConfig(new DependencyResolver(resourceTable));
+				ApplicationConfig.load(config, configFile, getResourceTable());
+				getData().setConfig(config);
 			} else {
 				getData().loadDefaultConfig();
 			}

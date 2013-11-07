@@ -25,6 +25,9 @@ public final class ApplicationConfig implements ResourceConfig {
 	private List<DaemonConfig> daemons = new ArrayList<DaemonConfig>(1);
 	private DependencyResolver dependencyResolver;
 
+	public ApplicationConfig() {
+	}
+
 	public ApplicationConfig(DependencyResolver dependencyResolver) {
 		this.dependencyResolver = dependencyResolver;
 	}
@@ -71,11 +74,12 @@ public final class ApplicationConfig implements ResourceConfig {
 		}
 	}
 
-	public static ApplicationConfig load(final File configFile, final ReaderFactory readerFactory) {
+	public static void load(final ApplicationConfig config, final File configFile, final ReaderFactory readerFactory) {
 		AppConfigReader reader = null;
 		try {
 			reader = new AppConfigReader(configFile, readerFactory);
-			return reader.load();
+
+			reader.load(config);
 		} catch (Exception e) {
 			throw new MprcException("Cannot read config file from " + configFile.getAbsolutePath(), e);
 		} finally {
@@ -165,5 +169,9 @@ public final class ApplicationConfig implements ResourceConfig {
 
 	public DependencyResolver getDependencyResolver() {
 		return dependencyResolver;
+	}
+
+	public void clear() {
+		daemons.clear();
 	}
 }

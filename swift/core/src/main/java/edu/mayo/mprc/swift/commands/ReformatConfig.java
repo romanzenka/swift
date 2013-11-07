@@ -20,6 +20,7 @@ import java.io.PrintWriter;
 @Component("reformat-config-command")
 public final class ReformatConfig implements SwiftCommand {
 	private MultiFactory factory;
+	private ApplicationConfig applicationConfig;
 
 	@Override
 	public String getDescription() {
@@ -48,9 +49,8 @@ public final class ReformatConfig implements SwiftCommand {
 		}
 
 		final AppConfigReader reader = new AppConfigReader(file, getFactory());
-		final ApplicationConfig config;
 		try {
-			config = reader.load();
+			reader.load(applicationConfig);
 		} finally {
 			FileUtilities.closeQuietly(reader);
 		}
@@ -59,7 +59,7 @@ public final class ReformatConfig implements SwiftCommand {
 
 		try {
 			writer = new AppConfigWriter(printWriter, getFactory());
-			writer.save(config);
+			writer.save(applicationConfig);
 		} finally {
 			FileUtilities.closeQuietly(writer);
 			FileUtilities.closeQuietly(printWriter);
@@ -74,5 +74,14 @@ public final class ReformatConfig implements SwiftCommand {
 	@Resource(name = "resourceTable")
 	public void setFactory(final MultiFactory factory) {
 		this.factory = factory;
+	}
+
+	public ApplicationConfig getApplicationConfig() {
+		return applicationConfig;
+	}
+
+	@Resource(name = "applicationConfig")
+	public void setApplicationConfig(ApplicationConfig applicationConfig) {
+		this.applicationConfig = applicationConfig;
 	}
 }

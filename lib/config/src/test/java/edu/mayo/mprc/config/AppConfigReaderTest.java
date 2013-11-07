@@ -29,14 +29,16 @@ public final class AppConfigReaderTest {
 	@Test
 	public void shouldLoadEmptyApp() {
 		AppConfigReader reader = new AppConfigReader(new StringReader(AppConfigWriterTest.getHeader()), MULTI_FACTORY);
-		final ApplicationConfig config = reader.load();
+		ApplicationConfig config = new ApplicationConfig();
+		reader.load(config);
 		Assert.assertEquals(config.getDaemons().size(), 0);
 	}
 
 	@Test
 	public void shouldLoadSimpleApp() {
 		AppConfigReader reader = new AppConfigReader(new StringReader(AppConfigWriterTest.getHeader() + "\n" + AppConfigWriterTest.getBody()), MULTI_FACTORY);
-		final ApplicationConfig config = reader.load();
+		final ApplicationConfig config = new ApplicationConfig();
+		reader.load(config);
 		Assert.assertEquals(config.getDaemons().size(), 1);
 		final DaemonConfig daemon = config.getDaemons().get(0);
 		Assert.assertEquals(daemon.getName(), "daemon1");

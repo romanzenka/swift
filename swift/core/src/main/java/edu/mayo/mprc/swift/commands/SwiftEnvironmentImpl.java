@@ -51,13 +51,12 @@ public final class SwiftEnvironmentImpl implements SwiftEnvironment, Application
 	 * @param swiftFactory A factory of all objects supported by Swift.
 	 * @return Loaded Swift configuration.
 	 */
-	private static ApplicationConfig loadSwiftConfig(final File configFile, final MultiFactory swiftFactory) {
+	private void loadSwiftConfig(final File configFile, final MultiFactory swiftFactory) {
 		if (configFile == null) {
-			return null;
+			return;
 		}
-		final ApplicationConfig swiftConfig = ApplicationConfig.load(configFile.getAbsoluteFile(), swiftFactory);
-		checkConfig(swiftConfig);
-		return swiftConfig;
+		ApplicationConfig.load(applicationConfig, configFile.getAbsoluteFile(), swiftFactory);
+		checkConfig(applicationConfig);
 	}
 
 	/**
@@ -170,6 +169,7 @@ public final class SwiftEnvironmentImpl implements SwiftEnvironment, Application
 		return daemonConfig;
 	}
 
+	@Resource(name = "applicationConfig")
 	public void setApplicationConfig(final ApplicationConfig applicationConfig) {
 		this.applicationConfig = applicationConfig;
 	}
@@ -177,7 +177,10 @@ public final class SwiftEnvironmentImpl implements SwiftEnvironment, Application
 	@Override
 	public ApplicationConfig getApplicationConfig() {
 		if (applicationConfig == null) {
-			setApplicationConfig(loadSwiftConfig(configFile, getSwiftFactory()));
+			setApplicationConfig(new ApplicationConfig());
+		}
+		if (applicationConfig.getDaemons().size() == 0) {
+			loadSwiftConfig(configFile, getSwiftFactory());
 		}
 		return applicationConfig;
 	}

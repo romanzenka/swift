@@ -18,7 +18,8 @@ public final class IndependentReaderFactoryTest {
 		final Reader reader = ResourceUtilities.getReader("classpath:edu/mayo/mprc/config/test.conf", IndependentReaderFactoryTest.class);
 		final GenericFactory genericFactory = new GenericFactory();
 		final AppConfigReader appReader = new AppConfigReader(reader, genericFactory);
-		final ApplicationConfig load = appReader.load();
+		ApplicationConfig load = new ApplicationConfig();
+		appReader.load(load);
 		appReader.close();
 		Assert.assertEquals(load.getDaemons().size(), 1);
 		final DaemonConfig daemon = load.getDaemons().get(0);

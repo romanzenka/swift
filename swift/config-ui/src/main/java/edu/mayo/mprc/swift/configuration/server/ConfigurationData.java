@@ -382,7 +382,7 @@ public class ConfigurationData {
 	 * we are responsible for properly adding the daemon and resources as children.
 	 */
 	public void loadDefaultConfig() throws GWTServiceException {
-		final ApplicationConfig config = new ApplicationConfig(new DependencyResolver(resourceTable));
+		config.clear();
 		final DaemonConfig daemonConfig = createDaemonConfig("main", true);
 		config.addDaemon(daemonConfig);
 
