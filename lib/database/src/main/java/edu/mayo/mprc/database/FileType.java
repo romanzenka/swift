@@ -1,6 +1,5 @@
 package edu.mayo.mprc.database;
 
-import edu.mayo.mprc.MprcException;
 import edu.mayo.mprc.utilities.exceptions.ExceptionUtilities;
 import org.hibernate.HibernateException;
 import org.hibernate.type.StandardBasicTypes;
@@ -14,17 +13,11 @@ import java.sql.SQLException;
 import java.sql.Types;
 
 /**
- * Storing {@link File} into database as URI of its absolute path.
+ * Storing {@link File} into database as its absolute path.
  */
 public final class FileType implements UserType {
 
-	private static FileTokenToDatabaseTranslator translator;
-
 	public FileType() {
-	}
-
-	public static void initialize(final FileTokenToDatabaseTranslator translator) {
-		FileType.translator = translator;
 	}
 
 	@Override
@@ -76,14 +69,7 @@ public final class FileType implements UserType {
 		if (null == value) {
 			preparedStatement.setNull(index, Types.VARCHAR);
 		} else {
-			checkTranslatorNotNull();
-			preparedStatement.setString(index, translator.fileToDatabaseToken((File) value));
-		}
-	}
-
-	private void checkTranslatorNotNull() {
-		if (translator == null) {
-			throw new MprcException(getClass().getName() + " was not initialized with a translator for file tokens.\nUse for instance " + DummyFileTokenTranslator.class.getName() + " before you start storing file paths to database.");
+			preparedStatement.setString(index, ((File) value).getAbsolutePath());
 		}
 	}
 
@@ -103,8 +89,7 @@ public final class FileType implements UserType {
 	@Override
 	public Serializable disassemble(final Object o) throws HibernateException {
 		try {
-			checkTranslatorNotNull();
-			return translator.fileToDatabaseToken((File) o);
+			return ((File) o).getAbsolutePath();
 		} catch (Exception t) {
 			throw new HibernateException(t);
 		}
@@ -117,8 +102,7 @@ public final class FileType implements UserType {
 				ExceptionUtilities.throwCastException(serializable, String.class);
 				return null;
 			}
-			checkTranslatorNotNull();
-			return translator.databaseTokenToFile((String) serializable);
+			return new File((String) serializable);
 		} catch (Exception t) {
 			throw new HibernateException(t);
 		}

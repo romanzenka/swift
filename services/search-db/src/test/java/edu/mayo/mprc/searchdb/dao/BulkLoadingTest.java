@@ -1,7 +1,9 @@
 package edu.mayo.mprc.searchdb.dao;
 
 import edu.mayo.mprc.MprcException;
-import edu.mayo.mprc.database.*;
+import edu.mayo.mprc.database.Change;
+import edu.mayo.mprc.database.DaoTest;
+import edu.mayo.mprc.database.SessionProvider;
 import edu.mayo.mprc.fastadb.FastaDbDao;
 import edu.mayo.mprc.fastadb.FastaDbDaoHibernate;
 import edu.mayo.mprc.fastadb.ProteinSequence;
@@ -63,7 +65,6 @@ public final class BulkLoadingTest extends DaoTest {
 
 	@BeforeMethod
 	public void setupDb() {
-		FileType.initialize(new DummyFileTokenTranslator());
 		SwiftDaoHibernate swiftDaoImpl = new SwiftDaoHibernate();
 		ParamsDaoHibernate paramsDaoImpl = new ParamsDaoHibernate();
 		FastaDbDaoHibernate fastaDbDaoImpl = new FastaDbDaoHibernate();

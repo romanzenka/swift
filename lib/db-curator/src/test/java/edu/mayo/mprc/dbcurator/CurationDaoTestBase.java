@@ -1,8 +1,6 @@
 package edu.mayo.mprc.dbcurator;
 
 import edu.mayo.mprc.database.DaoTest;
-import edu.mayo.mprc.database.DummyFileTokenTranslator;
-import edu.mayo.mprc.database.FileType;
 import edu.mayo.mprc.dbcurator.model.persistence.CurationDaoImpl;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
@@ -13,19 +11,17 @@ import org.testng.annotations.BeforeClass;
  * @author Roman Zenka
  */
 public abstract class CurationDaoTestBase extends DaoTest {
-    protected CurationDaoImpl curationDao;
+	protected CurationDaoImpl curationDao;
 
-    @BeforeClass()
-    public void setup() {
-        FileType.initialize(new DummyFileTokenTranslator());
+	@BeforeClass()
+	public void setup() {
+		curationDao = new CurationDaoImpl();
+		initializeDatabase(curationDao);
+	}
 
-        curationDao = new CurationDaoImpl();
-        initializeDatabase(curationDao);
-    }
-
-    @AfterClass()
-    public void teardown() {
-        teardownDatabase();
-    }
+	@AfterClass()
+	public void teardown() {
+		teardownDatabase();
+	}
 
 }

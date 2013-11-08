@@ -10,9 +10,6 @@ import edu.mayo.mprc.daemon.files.FileTokenFactory;
 import edu.mayo.mprc.database.DaoBase;
 import edu.mayo.mprc.database.Database;
 import edu.mayo.mprc.database.DatabaseUtilities;
-import edu.mayo.mprc.database.FileType;
-import edu.mayo.mprc.swift.db.FileTokenFactoryWrapper;
-import org.hibernate.SessionFactory;
 
 import javax.annotation.Resource;
 import java.util.HashMap;
@@ -30,7 +27,6 @@ import java.util.concurrent.Future;
 public final class DatabaseValidator implements RuntimeInitializer {
 
 	private List<DaoBase> daoList;
-	private Map<String, String> hibernateProperties;
 	private Database database;
 	private SwiftSearcher.Config searcherConfig;
 	private DaemonConfig daemonConfig;
@@ -53,8 +49,6 @@ public final class DatabaseValidator implements RuntimeInitializer {
 		final DaemonConfig databaseDaemonConfig = getDatabaseDaemonConfig(daemonConfig.getApplicationConfig());
 
 		fileTokenFactory.setDatabaseDaemonConfigInfo(databaseDaemonConfig.createDaemonConfigInfo());
-
-		FileType.initialize(new FileTokenFactoryWrapper(fileTokenFactory));
 	}
 
 	/**
@@ -89,23 +83,13 @@ public final class DatabaseValidator implements RuntimeInitializer {
 	 * @param schemaInitialization How to initialize the database.
 	 */
 	private void beginTransaction(final DatabaseUtilities.SchemaInitialization schemaInitialization) {
-		final Database.Config database = searcherConfig.getDatabase();
-		final SessionFactory sessionFactory = DatabaseUtilities.getSessionFactory(database.getUrl()
-				, database.getUserName()
-				, database.getPassword()
-				, database.getDialect()
-				, database.getDriverClassName()
-				, database.getDefaultSchema()
-				, database.getSchema()
-				, hibernateProperties
-				, Database.Factory.collectMappingResouces(daoList)
-				, schemaInitialization);
-
-		this.database.setSessionFactory(sessionFactory);
+		HashMap<String, String> params = new HashMap<String, String>();
+		params.put("action", schemaInitialization.getValue());
+		database.install(params);
 
 		setupFileTokenFactory(daemonConfig, fileTokenFactory);
 
-		this.database.begin();
+		database.begin();
 	}
 
 	private void commitTransaction() {
@@ -176,12 +160,7 @@ public final class DatabaseValidator implements RuntimeInitializer {
 			@Override
 			public void run() {
 				try {
-					DatabaseUtilities.SchemaInitialization initialization = DatabaseUtilities.SchemaInitialization.Update;
-					for (final DatabaseUtilities.SchemaInitialization schema : DatabaseUtilities.SchemaInitialization.values()) {
-						if (schema.getValue().equals(action)) {
-							initialization = schema;
-						}
-					}
+					DatabaseUtilities.SchemaInitialization initialization = DatabaseUtilities.SchemaInitialization.getForValue(action);
 
 					beginTransaction(initialization);
 
@@ -240,14 +219,6 @@ public final class DatabaseValidator implements RuntimeInitializer {
 	@Resource
 	public void setDaoList(final List<DaoBase> daoList) {
 		this.daoList = daoList;
-	}
-
-	public Map<String, String> getHibernateProperties() {
-		return hibernateProperties;
-	}
-
-	public void setHibernateProperties(final Map<String, String> hibernateProperties) {
-		this.hibernateProperties = hibernateProperties;
 	}
 
 	public List<RuntimeInitializer> getRuntimeInitializers() {

@@ -34,7 +34,9 @@ public final class Database implements Installable {
 
 	@Override
 	public void install(Map<String, String> params) {
-		initialize(DatabaseUtilities.SchemaInitialization.Update);
+		if (sessionFactory != null) {
+			initialize(DatabaseUtilities.SchemaInitialization.getForValue(params.get("action")));
+		}
 	}
 
 	private void initialize(DatabaseUtilities.SchemaInitialization initialization) {

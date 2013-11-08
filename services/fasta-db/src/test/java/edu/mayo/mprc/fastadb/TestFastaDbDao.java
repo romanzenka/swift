@@ -2,8 +2,6 @@ package edu.mayo.mprc.fastadb;
 
 import edu.mayo.mprc.MprcException;
 import edu.mayo.mprc.database.DaoTest;
-import edu.mayo.mprc.database.DummyFileTokenTranslator;
-import edu.mayo.mprc.database.FileType;
 import edu.mayo.mprc.dbcurator.model.Curation;
 import edu.mayo.mprc.dbcurator.model.persistence.CurationDaoImpl;
 import edu.mayo.mprc.utilities.FileUtilities;
@@ -29,8 +27,6 @@ public class TestFastaDbDao extends DaoTest {
 
 	@BeforeMethod
 	public void setup() {
-		FileType.initialize(new DummyFileTokenTranslator());
-
 		fastaDbDao = new FastaDbDaoHibernate();
 		curationDao = new CurationDaoImpl();
 

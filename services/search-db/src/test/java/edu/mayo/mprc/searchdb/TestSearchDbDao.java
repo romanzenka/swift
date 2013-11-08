@@ -3,8 +3,6 @@ package edu.mayo.mprc.searchdb;
 import edu.mayo.mprc.MprcException;
 import edu.mayo.mprc.database.Change;
 import edu.mayo.mprc.database.DaoTest;
-import edu.mayo.mprc.database.DummyFileTokenTranslator;
-import edu.mayo.mprc.database.FileType;
 import edu.mayo.mprc.dbcurator.model.Curation;
 import edu.mayo.mprc.dbcurator.model.persistence.CurationDaoImpl;
 import edu.mayo.mprc.fastadb.FastaDbDaoHibernate;
@@ -74,8 +72,6 @@ public class TestSearchDbDao extends DaoTest {
 
 	@BeforeMethod
 	public void setup() {
-		FileType.initialize(new DummyFileTokenTranslator());
-
 		final ParamsDaoHibernate paramsDao = new ParamsDaoHibernate();
 		unimodDao = new UnimodDaoHibernate();
 		curationDao = new CurationDaoImpl();

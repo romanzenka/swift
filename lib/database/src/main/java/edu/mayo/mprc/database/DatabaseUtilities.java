@@ -37,6 +37,16 @@ public final class DatabaseUtilities {
 		public String getValue() {
 			return value;
 		}
+
+		public static SchemaInitialization getForValue(final String value) {
+			SchemaInitialization initialization = Update;
+			for (final SchemaInitialization schema : SchemaInitialization.values()) {
+				if (schema.getValue().equals(value)) {
+					initialization = schema;
+				}
+			}
+			return initialization;
+		}
 	}
 
 	public static SessionFactory getSessionFactory(final String url, final String userName, final String password,

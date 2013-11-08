@@ -39,7 +39,6 @@
     <bean id="resourceTable" class="edu.mayo.mprc.swift.ResourceTable"></bean>
 
     <bean id="databaseValidator" class="edu.mayo.mprc.swift.search.DatabaseValidator">
-        <property name="hibernateProperties" ref="hibernateProperties" />
         <property name="runtimeInitializers" ref="searcherRuntimeInitializers" />
         <property name="fileTokenFactory" ref="fileTokenFactory" />
     </bean>
@@ -108,9 +107,7 @@
         <property name="connectionPool" ref="connectionPool" />
     </bean>
 
-    <bean id="curationInitializer" class="edu.mayo.mprc.swift.search.CurationInitializer">
-        <property name="curationDao" ref="curationDao" />
-    </bean>
+    <bean id="curationInitializer" class="edu.mayo.mprc.swift.search.CurationInitializer"></bean>
 
     <bean id="searcherRuntimeInitializers" class="java.util.ArrayList">
         <constructor-arg>

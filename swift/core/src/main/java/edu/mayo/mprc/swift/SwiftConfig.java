@@ -8,8 +8,6 @@ import edu.mayo.mprc.config.ServiceConfig;
 import edu.mayo.mprc.daemon.MessageBroker;
 import edu.mayo.mprc.daemon.files.FileTokenFactory;
 import edu.mayo.mprc.database.Database;
-import edu.mayo.mprc.database.FileType;
-import edu.mayo.mprc.swift.db.FileTokenFactoryWrapper;
 import edu.mayo.mprc.swift.search.SwiftSearcher;
 import edu.mayo.mprc.utilities.FileUtilities;
 
@@ -177,8 +175,6 @@ public final class SwiftConfig {
 		final DaemonConfig databaseDaemonConfig = getDatabaseDaemonConfig(swiftConfig);
 
 		fileTokenFactory.setDatabaseDaemonConfigInfo(databaseDaemonConfig.createDaemonConfigInfo());
-
-		FileType.initialize(new FileTokenFactoryWrapper(fileTokenFactory));
 	}
 
 	/**
