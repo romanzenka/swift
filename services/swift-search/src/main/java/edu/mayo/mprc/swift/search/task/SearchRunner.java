@@ -5,10 +5,10 @@ import com.google.common.collect.Maps;
 import edu.mayo.mprc.MprcException;
 import edu.mayo.mprc.config.ResourceConfig;
 import edu.mayo.mprc.daemon.DaemonConnection;
-import edu.mayo.mprc.daemon.files.FileTokenFactory;
 import edu.mayo.mprc.dbcurator.model.Curation;
 import edu.mayo.mprc.dbcurator.model.persistence.CurationDao;
 import edu.mayo.mprc.scaffold.ScaffoldWorker;
+import edu.mayo.mprc.swift.db.DatabaseFileTokenFactory;
 import edu.mayo.mprc.swift.db.SearchEngine;
 import edu.mayo.mprc.swift.db.SwiftDao;
 import edu.mayo.mprc.swift.dbmapping.*;
@@ -158,7 +158,7 @@ public final class SearchRunner implements Runnable {
 	private ProgressReporter reporter;
 	private ExecutorService service;
 
-	private FileTokenFactory fileTokenFactory;
+	private DatabaseFileTokenFactory fileTokenFactory;
 
 	/**
 	 * Key: {@link SearchEngineParameters} parameter set
@@ -198,7 +198,7 @@ public final class SearchRunner implements Runnable {
 			final ExecutorService service,
 			final CurationDao curationDao,
 			final SwiftDao swiftDao,
-			final FileTokenFactory fileTokenFactory,
+			final DatabaseFileTokenFactory fileTokenFactory,
 			final SearchRun searchRun,
 			final boolean reportDecoyHits,
 			final int priority,

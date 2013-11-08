@@ -6,7 +6,6 @@ import edu.mayo.mprc.config.DaemonConfig;
 import edu.mayo.mprc.config.ResourceConfig;
 import edu.mayo.mprc.config.ServiceConfig;
 import edu.mayo.mprc.daemon.MessageBroker;
-import edu.mayo.mprc.daemon.files.FileTokenFactory;
 import edu.mayo.mprc.database.Database;
 import edu.mayo.mprc.swift.search.SwiftSearcher;
 import edu.mayo.mprc.utilities.FileUtilities;
@@ -157,45 +156,5 @@ public final class SwiftConfig {
 		}
 		builder.setLength(builder.length() - 2);
 		return builder.toString();
-	}
-
-	/**
-	 * Sets up the file token factory. File token factory needs to know which daemon we are running in,
-	 * and where is the database module. The database module is located within the config.
-	 *
-	 * @param swiftConfig  Complete Swift config.
-	 * @param daemonConfig Config for the active daemon.
-	 */
-	public static void setupFileTokenFactory(final ApplicationConfig swiftConfig, final DaemonConfig daemonConfig, final FileTokenFactory fileTokenFactory) {
-		// Setup the actual daemon
-		fileTokenFactory.setDaemonConfigInfo(daemonConfig.createDaemonConfigInfo());
-		if (daemonConfig.getTempFolderPath() == null) {
-			throw new MprcException("The temporary folder is not configured for this daemon. Swift cannot run.");
-		}
-		final DaemonConfig databaseDaemonConfig = getDatabaseDaemonConfig(swiftConfig);
-
-		fileTokenFactory.setDatabaseDaemonConfigInfo(databaseDaemonConfig.createDaemonConfigInfo());
-	}
-
-	/**
-	 * Returns a config for a daemon that contains the database. There must be exactly one such daemon.
-	 *
-	 * @param swiftConfig Swift configuration.
-	 * @return Daemon that contains the database module.
-	 */
-	static DaemonConfig getDatabaseDaemonConfig(final ApplicationConfig swiftConfig) {
-		final ResourceConfig databaseResource = getDatabaseResource(swiftConfig);
-		return swiftConfig.getDaemonForResource(databaseResource);
-	}
-
-	static ResourceConfig getDatabaseResource(final ApplicationConfig swiftConfig) {
-		final List<ResourceConfig> configs = swiftConfig.getModulesOfConfigType(Database.Config.class);
-		if (configs.size() > 1) {
-			throw new MprcException("Swift has more than one database defined.");
-		}
-		if (configs.isEmpty()) {
-			throw new MprcException("Swift does not define a database.");
-		}
-		return configs.get(0);
 	}
 }

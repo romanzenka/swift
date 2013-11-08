@@ -3,7 +3,6 @@ package edu.mayo.mprc.daemon.files;
 import edu.mayo.mprc.MprcException;
 import edu.mayo.mprc.config.DaemonConfigInfo;
 import edu.mayo.mprc.utilities.FileUtilities;
-import org.springframework.stereotype.Component;
 
 import java.io.File;
 import java.net.URI;
@@ -26,14 +25,11 @@ import java.net.URISyntaxException;
  * </li>
  * </ol>
  */
-@Component("fileTokenFactory")
-public final class FileTokenFactory implements SenderTokenTranslator, ReceiverTokenTranslator {
+public class FileTokenFactory implements SenderTokenTranslator, ReceiverTokenTranslator {
 	private DaemonConfigInfo daemonConfigInfo;
-	private DaemonConfigInfo databaseDaemonConfigInfo;
 
 	public static final String SHARED_TYPE_PREFIX = "shared:";
 	public static final String LOCAL_TYPE_PREFIX = "local:";
-	public static final String FILE_TAG = "file";
 
 	public FileTokenFactory() {
 	}
@@ -48,14 +44,6 @@ public final class FileTokenFactory implements SenderTokenTranslator, ReceiverTo
 
 	public void setDaemonConfigInfo(final DaemonConfigInfo daemonConfigInfo) {
 		this.daemonConfigInfo = daemonConfigInfo;
-	}
-
-	public DaemonConfigInfo getDatabaseDaemonConfigInfo() {
-		return databaseDaemonConfigInfo;
-	}
-
-	public void setDatabaseDaemonConfigInfo(final DaemonConfigInfo databaseDaemonConfigInfo) {
-		this.databaseDaemonConfigInfo = databaseDaemonConfigInfo;
 	}
 
 	/**
@@ -147,38 +135,6 @@ public final class FileTokenFactory implements SenderTokenTranslator, ReceiverTo
 		}
 	}
 
-	public String fileToDatabaseToken(final File file) {
-		if (file == null) {
-			return null;
-		}
-		if (databaseDaemonConfigInfo != null) {
-			final FileToken fileToken = getFileToken(file);
-			return translateFileToken(fileToken, databaseDaemonConfigInfo).getTokenPath();
-		} else {
-			throw new MprcException("Database DaemonConfigInfo object is not set. Can not translate file to database String token.");
-		}
-	}
-
-	public File databaseTokenToFile(final String tokenPath) {
-		if (tokenPath == null) {
-			return null;
-		}
-		if (databaseDaemonConfigInfo != null) {
-			final FileToken fileToken = new SharedToken(databaseDaemonConfigInfo, tokenPath, false);
-			return getFile(fileToken);
-		} else {
-			throw new MprcException("Database DaemonConfigInfo object is not set. Can not translate database String token to File.");
-		}
-	}
-
-	public String fileToTaggedDatabaseToken(final File file) {
-		return "<" + FILE_TAG + ">" + fileToDatabaseToken(file) + "</" + FILE_TAG + ">";
-	}
-
-	public static String tagDatabaseToken(final String databaseToken) {
-		return "<" + FILE_TAG + ">" + databaseToken + "</" + FILE_TAG + ">";
-	}
-
 	private FileToken getFileToken(final String fileAbsolutePath) {
 		return getFileToken(new File(fileAbsolutePath));
 	}
@@ -221,7 +177,7 @@ public final class FileTokenFactory implements SenderTokenTranslator, ReceiverTo
 		throw new MprcException("Transfer of nonshared files between systems is not supported yet - trying to transfer " + file.getPath());
 	}
 
-	private FileToken translateFileToken(final FileToken fileToken, final DaemonConfigInfo destinationDaemonConfigInfo) {
+	protected FileToken translateFileToken(final FileToken fileToken, final DaemonConfigInfo destinationDaemonConfigInfo) {
 		if (fileToken.getSourceDaemonConfigInfo() == null) {
 			return translateFileToken(getFileToken(fileToken.getTokenPath()), destinationDaemonConfigInfo);
 		} else if (fileToken.getSourceDaemonConfigInfo().getSharedFileSpacePath() != null && destinationDaemonConfigInfo.getSharedFileSpacePath() != null && fileTokenOnSharedPath(fileToken)) {
@@ -249,7 +205,7 @@ public final class FileTokenFactory implements SenderTokenTranslator, ReceiverTo
 	 * Returns canonical path to a given file. The canonicality means:
 	 * <ul>
 	 * <li>uses only forward slashes</li>
-	 * <li>lowercase/uppercase, links, ., .. are resolved via {@link edu.mayo.mprc.utilities.FileUtilities#getCanonicalFileNoLinks}.</li>
+	 * <li>lowercase/uppercase, links, ., .. are resolved via {@link FileUtilities#getCanonicalFileNoLinks}.</li>
 	 * </ul>
 	 * <p/>
 	 * / is appended in case the file refers to existing directory.
@@ -275,13 +231,13 @@ public final class FileTokenFactory implements SenderTokenTranslator, ReceiverTo
 		return daemonConfigInfo.equals(fileToken.getSourceDaemonConfigInfo());
 	}
 
-	private static final class SharedToken implements FileToken {
+	protected static final class SharedToken implements FileToken {
 		private static final long serialVersionUID = 20111119L;
 		private DaemonConfigInfo sourceDaemonConfigInfo;
 		private String tokenPath;
 		private boolean existsOnSource;
 
-		private SharedToken(final DaemonConfigInfo sourceDaemonConfigInfo, final String tokenPath, boolean existsOnSource) {
+		public SharedToken(final DaemonConfigInfo sourceDaemonConfigInfo, final String tokenPath, boolean existsOnSource) {
 			this.sourceDaemonConfigInfo = sourceDaemonConfigInfo;
 			this.tokenPath = tokenPath;
 			this.existsOnSource = existsOnSource;

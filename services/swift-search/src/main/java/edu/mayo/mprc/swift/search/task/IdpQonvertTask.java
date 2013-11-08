@@ -3,9 +3,9 @@ package edu.mayo.mprc.swift.search.task;
 import edu.mayo.mprc.MprcException;
 import edu.mayo.mprc.daemon.DaemonConnection;
 import edu.mayo.mprc.daemon.WorkPacket;
-import edu.mayo.mprc.daemon.files.FileTokenFactory;
 import edu.mayo.mprc.idpqonvert.IdpQonvertSettings;
 import edu.mayo.mprc.idpqonvert.IdpQonvertWorkPacket;
+import edu.mayo.mprc.swift.db.DatabaseFileTokenFactory;
 import edu.mayo.mprc.swift.db.SwiftDao;
 import edu.mayo.mprc.swift.dbmapping.SearchRun;
 import edu.mayo.mprc.swift.dbmapping.SwiftSearchDefinition;
@@ -38,7 +38,7 @@ public final class IdpQonvertTask extends AsyncTaskBase {
 	                      final SwiftSearchDefinition definition,
 	                      final DaemonConnection idpQonvertDaemon,
 	                      final EngineSearchTask searchTask,
-	                      final File outputFolder, final FileTokenFactory fileTokenFactory, final boolean fromScratch) {
+	                      final File outputFolder, final DatabaseFileTokenFactory fileTokenFactory, final boolean fromScratch) {
 		super(engine, idpQonvertDaemon, fileTokenFactory, fromScratch);
 		this.swiftDao = swiftDao;
 		this.searchRun = searchRun;

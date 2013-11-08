@@ -2,9 +2,9 @@ package edu.mayo.mprc.swift.search.task;
 
 import edu.mayo.mprc.daemon.DaemonConnection;
 import edu.mayo.mprc.daemon.WorkPacket;
-import edu.mayo.mprc.daemon.files.FileTokenFactory;
 import edu.mayo.mprc.mgf2mgf.MgfTitleCleanupResult;
 import edu.mayo.mprc.mgf2mgf.MgfTitleCleanupWorkPacket;
+import edu.mayo.mprc.swift.db.DatabaseFileTokenFactory;
 import edu.mayo.mprc.utilities.progress.ProgressInfo;
 import edu.mayo.mprc.workflow.engine.WorkflowEngine;
 
@@ -18,7 +18,7 @@ final class MgfTitleCleanupTask extends AsyncTaskBase implements FileProducingTa
 	private final File cleanedMgf;
 	private static final AtomicInteger TASK_ID = new AtomicInteger(0);
 
-	MgfTitleCleanupTask(final WorkflowEngine engine, final DaemonConnection daemon, final File mgfToCleanup, final File cleanedMgf, final FileTokenFactory fileTokenFactory, final boolean fromScratch) {
+	MgfTitleCleanupTask(final WorkflowEngine engine, final DaemonConnection daemon, final File mgfToCleanup, final File cleanedMgf, final DatabaseFileTokenFactory fileTokenFactory, final boolean fromScratch) {
 		super(engine, daemon, fileTokenFactory, fromScratch);
 		cleanupPerformed = false;
 		this.cleanedMgf = cleanedMgf;

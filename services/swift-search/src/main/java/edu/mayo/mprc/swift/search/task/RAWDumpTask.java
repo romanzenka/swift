@@ -2,10 +2,10 @@ package edu.mayo.mprc.swift.search.task;
 
 import edu.mayo.mprc.daemon.DaemonConnection;
 import edu.mayo.mprc.daemon.WorkPacket;
-import edu.mayo.mprc.daemon.files.FileTokenFactory;
 import edu.mayo.mprc.qa.RAWDumpResult;
 import edu.mayo.mprc.qa.RAWDumpWorkPacket;
 import edu.mayo.mprc.searchdb.RawFileMetaData;
+import edu.mayo.mprc.swift.db.DatabaseFileTokenFactory;
 import edu.mayo.mprc.utilities.progress.ProgressInfo;
 import edu.mayo.mprc.workflow.engine.WorkflowEngine;
 
@@ -33,7 +33,7 @@ public final class RAWDumpTask extends AsyncTaskBase {
 	public static final String SAMPLE_INFORMATION_FILE_SUFFIX = ".sample.tsv";
 	public static final String ERROR_LOG_FILE_SUFFIX = ".error.tsv";
 
-	public RAWDumpTask(final WorkflowEngine engine, final File rawFile, final File outputFolder, final DaemonConnection daemonConnection, final FileTokenFactory fileTokenFactory, final boolean fromScratch) {
+	public RAWDumpTask(final WorkflowEngine engine, final File rawFile, final File outputFolder, final DaemonConnection daemonConnection, final DatabaseFileTokenFactory fileTokenFactory, final boolean fromScratch) {
 		super(engine, daemonConnection, fileTokenFactory, fromScratch);
 
 		this.rawFile = rawFile;

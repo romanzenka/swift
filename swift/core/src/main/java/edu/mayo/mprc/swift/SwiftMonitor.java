@@ -2,10 +2,7 @@ package edu.mayo.mprc.swift;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import edu.mayo.mprc.config.ApplicationConfig;
-import edu.mayo.mprc.config.DaemonConfig;
-import edu.mayo.mprc.config.MultiFactory;
-import edu.mayo.mprc.config.ServiceConfig;
+import edu.mayo.mprc.config.*;
 import edu.mayo.mprc.daemon.DaemonConnection;
 import edu.mayo.mprc.daemon.DaemonStatus;
 import edu.mayo.mprc.daemon.monitor.PingDaemonWorker;
@@ -35,7 +32,7 @@ public final class SwiftMonitor implements Runnable {
 	private final Map<DaemonConnection, ProgressListener> pingListeners = new HashMap<DaemonConnection, ProgressListener>(20);
 	public static final long MONITOR_PERIOD_SECONDS = 30L;
 
-	private ApplicationConfig applicationConfig;
+	private RunningApplicationContext context;
 	private MultiFactory factory;
 	private ScheduledExecutorService scheduler;
 	private final Object connectionsLock = new Object();
@@ -65,6 +62,7 @@ public final class SwiftMonitor implements Runnable {
 	 * Start monitoring Swift.
 	 */
 	public void start() {
+		initialize(context.getApplicationConfig());
 		if (scheduler == null) {
 			scheduler = Executors.newScheduledThreadPool(1);
 			scheduler.scheduleAtFixedRate(this, MONITOR_PERIOD_SECONDS, MONITOR_PERIOD_SECONDS, TimeUnit.SECONDS);
@@ -107,13 +105,12 @@ public final class SwiftMonitor implements Runnable {
 		this.factory = factory;
 	}
 
-	public ApplicationConfig getApplicationConfig() {
-		return applicationConfig;
+	public RunningApplicationContext getContext() {
+		return context;
 	}
 
-	public void setApplicationConfig(final ApplicationConfig applicationConfig) {
-		this.applicationConfig = applicationConfig;
-		initialize(applicationConfig);
+	public void setContext(RunningApplicationContext context) {
+		this.context = context;
 	}
 
 	@Override

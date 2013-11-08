@@ -2,9 +2,9 @@ package edu.mayo.mprc.swift.search.task;
 
 import edu.mayo.mprc.daemon.DaemonConnection;
 import edu.mayo.mprc.daemon.WorkPacket;
-import edu.mayo.mprc.daemon.files.FileTokenFactory;
 import edu.mayo.mprc.msconvert.MsconvertResult;
 import edu.mayo.mprc.msconvert.MsconvertWorkPacket;
+import edu.mayo.mprc.swift.db.DatabaseFileTokenFactory;
 import edu.mayo.mprc.utilities.progress.ProgressInfo;
 import edu.mayo.mprc.workflow.engine.WorkflowEngine;
 import org.apache.log4j.Logger;
@@ -25,7 +25,7 @@ final class MsconvertTask extends AsyncTaskBase implements FileProducingTask {
 			final WorkflowEngine engine,
 			final File inputFile,
 			final File outputFile,
-			final boolean publicAccess, final DaemonConnection raw2mgfDaemon, final FileTokenFactory fileTokenFactory, final boolean fromScratch
+			final boolean publicAccess, final DaemonConnection raw2mgfDaemon, final DatabaseFileTokenFactory fileTokenFactory, final boolean fromScratch
 
 	) {
 		super(engine, raw2mgfDaemon, fileTokenFactory, fromScratch);

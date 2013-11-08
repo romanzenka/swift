@@ -43,8 +43,6 @@
         <property name="fileTokenFactory" ref="fileTokenFactory" />
     </bean>
 
-    <bean id="applicationConfig" class="edu.mayo.mprc.config.ApplicationConfig" />
-
     <!-- Provides a WebUi interface after it gets configured -->
     <bean id="webUiHolder" class="edu.mayo.mprc.swift.WebUiHolder">
         <property name="context" ref="swiftEnvironment" />
@@ -124,7 +122,7 @@
 
     <bean id="swiftMonitor" class="edu.mayo.mprc.swift.SwiftMonitor">
         <property name="factory" ref="resourceTable" />
-        <property name="applicationConfig" ref="applicationConfig" />
+        <property name="context" ref="swiftEnvironment" />
     </bean>
 
     <bean id="connectionPool" class="edu.mayo.mprc.messaging.ActiveMQConnectionPool" />

@@ -13,6 +13,7 @@ import edu.mayo.mprc.scaffold.ScaffoldWorker;
 import edu.mayo.mprc.searchdb.SearchDbWorker;
 import edu.mayo.mprc.searchdb.dao.SearchDbDao;
 import edu.mayo.mprc.swift.ExitCode;
+import edu.mayo.mprc.swift.db.DatabaseFileTokenFactory;
 import edu.mayo.mprc.swift.db.SearchEngine;
 import edu.mayo.mprc.swift.db.SwiftDao;
 import edu.mayo.mprc.swift.dbmapping.FileSearch;
@@ -52,7 +53,7 @@ public final class LoadToSearchDb implements SwiftCommand {
 	private DaemonConnection searchDb;
 	private SwiftDao dao;
 	private SearchDbDao searchDbDao;
-	private FileTokenFactory fileTokenFactory;
+	private DatabaseFileTokenFactory fileTokenFactory;
 	private int totalToLoad;
 	private int loaded;
 
@@ -392,7 +393,7 @@ public final class LoadToSearchDb implements SwiftCommand {
 	}
 
 	@Resource(name = "fileTokenFactory")
-	public void setFileTokenFactory(final FileTokenFactory fileTokenFactory) {
+	public void setFileTokenFactory(final DatabaseFileTokenFactory fileTokenFactory) {
 		this.fileTokenFactory = fileTokenFactory;
 	}
 

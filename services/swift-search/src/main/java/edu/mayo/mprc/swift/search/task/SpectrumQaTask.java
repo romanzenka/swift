@@ -2,10 +2,10 @@ package edu.mayo.mprc.swift.search.task;
 
 import edu.mayo.mprc.daemon.DaemonConnection;
 import edu.mayo.mprc.daemon.WorkPacket;
-import edu.mayo.mprc.daemon.files.FileTokenFactory;
 import edu.mayo.mprc.msmseval.MSMSEvalWorkPacket;
 import edu.mayo.mprc.msmseval.MSMSEvalWorker;
 import edu.mayo.mprc.msmseval.MsmsEvalResult;
+import edu.mayo.mprc.swift.db.DatabaseFileTokenFactory;
 import edu.mayo.mprc.utilities.progress.ProgressInfo;
 import edu.mayo.mprc.workflow.engine.WorkflowEngine;
 import org.apache.log4j.Logger;
@@ -24,7 +24,7 @@ final class SpectrumQaTask extends AsyncTaskBase {
 
 	public static final String TASK_NAME = "MSMSEval Filter";
 
-	SpectrumQaTask(final WorkflowEngine engine, final DaemonConnection daemon, final FileProducingTask sourceMGFFile, final File msmsEvalParamFile, final File outputDirectory, final FileTokenFactory fileTokenFactory, final boolean fromScratch) {
+	SpectrumQaTask(final WorkflowEngine engine, final DaemonConnection daemon, final FileProducingTask sourceMGFFile, final File msmsEvalParamFile, final File outputDirectory, final DatabaseFileTokenFactory fileTokenFactory, final boolean fromScratch) {
 		super(engine, daemon, fileTokenFactory, fromScratch);
 		this.outputDirectory = outputDirectory;
 		this.sourceMGFFile = sourceMGFFile;

@@ -1,7 +1,6 @@
 package edu.mayo.mprc.dbundeploy;
 
 import edu.mayo.mprc.daemon.DaemonConnection;
-import edu.mayo.mprc.daemon.files.FileTokenFactory;
 import org.apache.log4j.Logger;
 
 import java.util.HashMap;
@@ -18,7 +17,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 public final class DatabaseUndeployerRunner implements Runnable {
 
 	private DatabaseUndeployerWorkPacket undeployerWorkPacket;
-	private FileTokenFactory fileTokenFactory;
 
 	private DaemonConnection mascotDeployerDaemon;
 	private DaemonConnection omssaDeployerDaemon;
@@ -42,9 +40,8 @@ public final class DatabaseUndeployerRunner implements Runnable {
 	private DatabaseUndeployerState state;
 	private static final int POLLING_INTERVAL = 10000;
 
-	public DatabaseUndeployerRunner(final DatabaseUndeployerWorkPacket undeployerWorkPacket, final DaemonConnection mascotDeployerDaemon, final DaemonConnection omssaDeployerDaemon, final DaemonConnection sequestDeployerDaemon, final DaemonConnection scaffoldDeployerDaemon, final FileTokenFactory fileTokenFactory) {
+	public DatabaseUndeployerRunner(final DatabaseUndeployerWorkPacket undeployerWorkPacket, final DaemonConnection mascotDeployerDaemon, final DaemonConnection omssaDeployerDaemon, final DaemonConnection sequestDeployerDaemon, final DaemonConnection scaffoldDeployerDaemon) {
 		this.undeployerWorkPacket = undeployerWorkPacket;
-		this.fileTokenFactory = fileTokenFactory;
 		this.mascotDeployerDaemon = mascotDeployerDaemon;
 		this.omssaDeployerDaemon = omssaDeployerDaemon;
 		this.sequestDeployerDaemon = sequestDeployerDaemon;
@@ -102,22 +99,22 @@ public final class DatabaseUndeployerRunner implements Runnable {
 
 	private void createTasks() {
 		if (mascotDeployerDaemon != null) {
-			final DatabaseUndeploymentTask databaseUndeploymentTask = new DatabaseUndeploymentTask(mascotDeployerDaemon, undeployerWorkPacket.getDbToUndeploy(), fileTokenFactory);
+			final DatabaseUndeploymentTask databaseUndeploymentTask = new DatabaseUndeploymentTask(mascotDeployerDaemon, undeployerWorkPacket.getDbToUndeploy());
 			undeploymentNameTaskPairs.put(mascotDeployerDaemon.getConnectionName(), databaseUndeploymentTask);
 		}
 
 		if (scaffoldDeployerDaemon != null) {
-			final DatabaseUndeploymentTask databaseUndeploymentTask = new DatabaseUndeploymentTask(scaffoldDeployerDaemon, undeployerWorkPacket.getDbToUndeploy(), fileTokenFactory);
+			final DatabaseUndeploymentTask databaseUndeploymentTask = new DatabaseUndeploymentTask(scaffoldDeployerDaemon, undeployerWorkPacket.getDbToUndeploy());
 			undeploymentNameTaskPairs.put(scaffoldDeployerDaemon.getConnectionName(), databaseUndeploymentTask);
 		}
 
 		if (sequestDeployerDaemon != null) {
-			final DatabaseUndeploymentTask databaseUndeploymentTask = new DatabaseUndeploymentTask(sequestDeployerDaemon, undeployerWorkPacket.getDbToUndeploy(), fileTokenFactory);
+			final DatabaseUndeploymentTask databaseUndeploymentTask = new DatabaseUndeploymentTask(sequestDeployerDaemon, undeployerWorkPacket.getDbToUndeploy());
 			undeploymentNameTaskPairs.put(sequestDeployerDaemon.getConnectionName(), databaseUndeploymentTask);
 		}
 
 		if (omssaDeployerDaemon != null) {
-			final DatabaseUndeploymentTask databaseUndeploymentTask = new DatabaseUndeploymentTask(omssaDeployerDaemon, undeployerWorkPacket.getDbToUndeploy(), fileTokenFactory);
+			final DatabaseUndeploymentTask databaseUndeploymentTask = new DatabaseUndeploymentTask(omssaDeployerDaemon, undeployerWorkPacket.getDbToUndeploy());
 			undeploymentNameTaskPairs.put(omssaDeployerDaemon.getConnectionName(), databaseUndeploymentTask);
 		}
 	}

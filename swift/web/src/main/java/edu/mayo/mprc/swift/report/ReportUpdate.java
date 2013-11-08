@@ -2,12 +2,12 @@ package edu.mayo.mprc.swift.report;
 
 import edu.mayo.mprc.MprcException;
 import edu.mayo.mprc.daemon.DaemonConnection;
-import edu.mayo.mprc.daemon.files.FileTokenFactory;
 import edu.mayo.mprc.qstat.QstatOutput;
 import edu.mayo.mprc.qstat.QstatWorkPacket;
 import edu.mayo.mprc.searchdb.dao.SearchDbDao;
 import edu.mayo.mprc.swift.WebUi;
 import edu.mayo.mprc.swift.WebUiHolder;
+import edu.mayo.mprc.swift.db.DatabaseFileTokenFactory;
 import edu.mayo.mprc.swift.db.SearchRunFilter;
 import edu.mayo.mprc.swift.db.SwiftDao;
 import edu.mayo.mprc.swift.dbmapping.ReportData;
@@ -38,7 +38,7 @@ public final class ReportUpdate implements HttpRequestHandler {
 	private static final Logger LOGGER = Logger.getLogger(ReportUpdate.class);
 	private transient SwiftDao swiftDao;
 	private transient SearchDbDao searchDbDao;
-	private transient FileTokenFactory fileTokenFactory;
+	private transient DatabaseFileTokenFactory fileTokenFactory;
 	private transient WebUiHolder webUiHolder;
 	private transient SwiftSearcherCaller swiftSearcherCaller;
 	/**
@@ -328,11 +328,11 @@ public final class ReportUpdate implements HttpRequestHandler {
 		this.searchDbDao = searchDbDao;
 	}
 
-	public FileTokenFactory getFileTokenFactory() {
+	public DatabaseFileTokenFactory getFileTokenFactory() {
 		return fileTokenFactory;
 	}
 
-	public void setFileTokenFactory(FileTokenFactory fileTokenFactory) {
+	public void setFileTokenFactory(DatabaseFileTokenFactory fileTokenFactory) {
 		this.fileTokenFactory = fileTokenFactory;
 	}
 

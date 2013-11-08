@@ -91,7 +91,7 @@ public final class DatabaseUndeployerWorker extends WorkerBase {
 		final DatabaseUndeployerRunner undeployerRunner = new DatabaseUndeployerRunner(undeployerWorkPacket
 				, getMascotDeployerDaemon(), getOmssaDeployerDaemon()
 				, getSequestDeployerDaemon(), getScaffoldDeployerDaemon()
-				, fileTokenFactory);
+		);
 
 		undeployerRunner.run();
 

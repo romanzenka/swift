@@ -9,10 +9,10 @@ import edu.mayo.mprc.config.ui.UiBuilder;
 import edu.mayo.mprc.config.ui.UiResponse;
 import edu.mayo.mprc.daemon.Daemon;
 import edu.mayo.mprc.daemon.DaemonConnection;
-import edu.mayo.mprc.daemon.files.FileTokenFactory;
 import edu.mayo.mprc.msmseval.MSMSEvalParamFile;
 import edu.mayo.mprc.msmseval.MSMSEvalWorker;
 import edu.mayo.mprc.msmseval.MsmsEvalCache;
+import edu.mayo.mprc.swift.db.DatabaseFileTokenFactory;
 import edu.mayo.mprc.swift.db.SearchEngine;
 import edu.mayo.mprc.swift.db.SwiftDao;
 import edu.mayo.mprc.swift.search.SwiftSearcher;
@@ -45,7 +45,7 @@ public final class WebUi implements Checkable {
 	private File fastaFolder;
 	private File fastaArchiveFolder;
 	private String title;
-	private FileTokenFactory fileTokenFactory;
+	private DatabaseFileTokenFactory fileTokenFactory;
 	private SwiftMonitor swiftMonitor;
 	private Daemon mainDaemon;
 	private SwiftDao swiftDao;
@@ -142,11 +142,11 @@ public final class WebUi implements Checkable {
 		return title;
 	}
 
-	public FileTokenFactory getFileTokenFactory() {
+	public DatabaseFileTokenFactory getFileTokenFactory() {
 		return fileTokenFactory;
 	}
 
-	public void setFileTokenFactory(FileTokenFactory fileTokenFactory) {
+	public void setFileTokenFactory(DatabaseFileTokenFactory fileTokenFactory) {
 		this.fileTokenFactory = fileTokenFactory;
 	}
 
@@ -212,7 +212,7 @@ public final class WebUi implements Checkable {
 	 */
 	public static final class Factory extends FactoryBase<Config, WebUi> implements FactoryDescriptor {
 		private SwiftMonitor swiftMonitor;
-		private FileTokenFactory fileTokenFactory;
+		private DatabaseFileTokenFactory fileTokenFactory;
 		private SwiftDao swiftDao;
 		private WorkspaceDao workspaceDao;
 		private SearchEngine.Factory searchEngineFactory;
@@ -292,11 +292,11 @@ public final class WebUi implements Checkable {
 			this.swiftMonitor = swiftMonitor;
 		}
 
-		public FileTokenFactory getFileTokenFactory() {
+		public DatabaseFileTokenFactory getFileTokenFactory() {
 			return fileTokenFactory;
 		}
 
-		public void setFileTokenFactory(FileTokenFactory fileTokenFactory) {
+		public void setFileTokenFactory(DatabaseFileTokenFactory fileTokenFactory) {
 			this.fileTokenFactory = fileTokenFactory;
 		}
 

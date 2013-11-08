@@ -2,12 +2,12 @@ package edu.mayo.mprc.swift.search.task;
 
 import edu.mayo.mprc.daemon.DaemonConnection;
 import edu.mayo.mprc.daemon.WorkPacket;
-import edu.mayo.mprc.daemon.files.FileTokenFactory;
 import edu.mayo.mprc.dbcurator.model.Curation;
 import edu.mayo.mprc.enginedeployment.DeploymentRequest;
 import edu.mayo.mprc.enginedeployment.DeploymentResult;
 import edu.mayo.mprc.sequest.SequestDeploymentResult;
 import edu.mayo.mprc.sequest.SequestDeploymentService;
+import edu.mayo.mprc.swift.db.DatabaseFileTokenFactory;
 import edu.mayo.mprc.utilities.progress.ProgressInfo;
 import edu.mayo.mprc.workflow.engine.WorkflowEngine;
 import org.apache.log4j.Logger;
@@ -28,7 +28,7 @@ final class DatabaseDeployment extends AsyncTaskBase implements DatabaseDeployme
 	private List<File> generatedFiles;
 	private DeploymentResult deploymentResult;
 
-	DatabaseDeployment(final WorkflowEngine engine, final String engineCode, final String engineFriendlyName, final DaemonConnection deploymentDaemon, final File paramsFile, final Curation dbToDeploy, final FileTokenFactory fileTokenFactory, final boolean fromScratch) {
+	DatabaseDeployment(final WorkflowEngine engine, final String engineCode, final String engineFriendlyName, final DaemonConnection deploymentDaemon, final File paramsFile, final Curation dbToDeploy, final DatabaseFileTokenFactory fileTokenFactory, final boolean fromScratch) {
 		super(engine, deploymentDaemon, fileTokenFactory, fromScratch);
 		this.engineCode = engineCode;
 		this.engineFriendlyName = engineFriendlyName;

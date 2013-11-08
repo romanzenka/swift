@@ -10,7 +10,6 @@ import edu.mayo.mprc.config.ui.UiBuilder;
 import edu.mayo.mprc.config.ui.UiResponse;
 import edu.mayo.mprc.daemon.*;
 import edu.mayo.mprc.daemon.exception.DaemonException;
-import edu.mayo.mprc.daemon.files.FileTokenFactory;
 import edu.mayo.mprc.daemon.monitor.MonitorUtilities;
 import edu.mayo.mprc.database.Database;
 import edu.mayo.mprc.dbcurator.model.persistence.CurationDao;
@@ -28,6 +27,7 @@ import edu.mayo.mprc.raw2mgf.RawToMgfWorker;
 import edu.mayo.mprc.scaffold.report.ScaffoldReportWorker;
 import edu.mayo.mprc.searchdb.SearchDbWorker;
 import edu.mayo.mprc.searchengine.EngineMetadata;
+import edu.mayo.mprc.swift.db.DatabaseFileTokenFactory;
 import edu.mayo.mprc.swift.db.EngineFactoriesList;
 import edu.mayo.mprc.swift.db.SearchEngine;
 import edu.mayo.mprc.swift.db.SwiftDao;
@@ -102,9 +102,9 @@ public final class SwiftSearcher implements Worker {
 	private static final String SEARCH_DB = "searchDb";
 	private static final String REPORT_DECOY_HITS = "reportDecoyHits";
 
-	private FileTokenFactory fileTokenFactory;
+	private DatabaseFileTokenFactory fileTokenFactory;
 
-	public SwiftSearcher(final CurationDao curationDao, final SwiftDao swiftDao, final FileTokenFactory fileTokenFactory) {
+	public SwiftSearcher(final CurationDao curationDao, final SwiftDao swiftDao, final DatabaseFileTokenFactory fileTokenFactory) {
 		// We execute the switch workflows in a single thread
 		this.curationDao = curationDao;
 		this.swiftDao = swiftDao;
@@ -431,7 +431,7 @@ public final class SwiftSearcher implements Worker {
 	public static final class Factory extends WorkerFactoryBase<Config> {
 		private CurationDao curationDao;
 		private SwiftDao swiftDao;
-		private FileTokenFactory fileTokenFactory;
+		private DatabaseFileTokenFactory fileTokenFactory;
 		private DatabaseValidator databaseValidator;
 		private ParamsInfo paramsInfo;
 		private EngineFactoriesList engineFactoriesList;
@@ -516,12 +516,12 @@ public final class SwiftSearcher implements Worker {
 			this.swiftDao = swiftDao;
 		}
 
-		public FileTokenFactory getFileTokenFactory() {
+		public DatabaseFileTokenFactory getFileTokenFactory() {
 			return fileTokenFactory;
 		}
 
 		@Resource(name = "fileTokenFactory")
-		public void setFileTokenFactory(final FileTokenFactory fileTokenFactory) {
+		public void setFileTokenFactory(final DatabaseFileTokenFactory fileTokenFactory) {
 			this.fileTokenFactory = fileTokenFactory;
 		}
 

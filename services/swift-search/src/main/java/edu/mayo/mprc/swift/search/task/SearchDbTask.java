@@ -3,9 +3,9 @@ package edu.mayo.mprc.swift.search.task;
 import edu.mayo.mprc.MprcException;
 import edu.mayo.mprc.daemon.DaemonConnection;
 import edu.mayo.mprc.daemon.WorkPacket;
-import edu.mayo.mprc.daemon.files.FileTokenFactory;
 import edu.mayo.mprc.searchdb.RawFileMetaData;
 import edu.mayo.mprc.searchdb.SearchDbWorkPacket;
+import edu.mayo.mprc.swift.db.DatabaseFileTokenFactory;
 import edu.mayo.mprc.utilities.FileUtilities;
 import edu.mayo.mprc.utilities.progress.ProgressInfo;
 import edu.mayo.mprc.workflow.engine.WorkflowEngine;
@@ -29,7 +29,7 @@ public final class SearchDbTask extends AsyncTaskBase {
 	/**
 	 * Create the task independently on Scaffold invocation.
 	 */
-	public SearchDbTask(final WorkflowEngine engine, final DaemonConnection daemon, final FileTokenFactory fileTokenFactory, final boolean fromScratch, final Long reportId, final File scaffoldSpectraFile) {
+	public SearchDbTask(final WorkflowEngine engine, final DaemonConnection daemon, final DatabaseFileTokenFactory fileTokenFactory, final boolean fromScratch, final Long reportId, final File scaffoldSpectraFile) {
 		super(engine, daemon, fileTokenFactory, fromScratch);
 		setReportId(reportId);
 		setScaffoldSpectraFile(scaffoldSpectraFile);
@@ -40,7 +40,7 @@ public final class SearchDbTask extends AsyncTaskBase {
 	/**
 	 * Create the task that depends on Scaffold invocation.
 	 */
-	public SearchDbTask(final WorkflowEngine engine, final DaemonConnection daemon, final FileTokenFactory fileTokenFactory, final boolean fromScratch, final ScaffoldTask scaffoldTask) {
+	public SearchDbTask(final WorkflowEngine engine, final DaemonConnection daemon, final DatabaseFileTokenFactory fileTokenFactory, final boolean fromScratch, final ScaffoldTask scaffoldTask) {
 		super(engine, daemon, fileTokenFactory, fromScratch);
 		this.scaffoldTask = scaffoldTask;
 		setName("SearchDb");

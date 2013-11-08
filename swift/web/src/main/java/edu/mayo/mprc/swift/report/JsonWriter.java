@@ -1,6 +1,6 @@
 package edu.mayo.mprc.swift.report;
 
-import edu.mayo.mprc.daemon.files.FileTokenFactory;
+import edu.mayo.mprc.swift.db.DatabaseFileTokenFactory;
 import edu.mayo.mprc.swift.db.LogInfo;
 import edu.mayo.mprc.swift.dbmapping.SearchRun;
 import edu.mayo.mprc.swift.dbmapping.TaskData;
@@ -115,7 +115,7 @@ public final class JsonWriter {
 		} else {
 			appendKeyString(builder, "duration", formatTimeSpan(endStamp.getTime() - searchRun.getStartTimestamp().getTime()));
 		}
-		if(searchRun.isRunningTooLong()) {
+		if (searchRun.isRunningTooLong()) {
 			appendKeyNumber(builder, "ranTooLong", 1);
 		}
 		if (!justLiveData) {
@@ -235,11 +235,11 @@ public final class JsonWriter {
 			builder.append("\"logs\":[");
 
 			if (status.getOutputLogDatabaseToken() != null) {
-				appendLogInfo(builder, new LogInfo(LogInfo.STD_OUT_LOG_TYPE, FileTokenFactory.tagDatabaseToken(status.getOutputLogDatabaseToken())));
+				appendLogInfo(builder, new LogInfo(LogInfo.STD_OUT_LOG_TYPE, DatabaseFileTokenFactory.tagDatabaseToken(status.getOutputLogDatabaseToken())));
 			}
 
 			if (status.getErrorLogDatabaseToken() != null) {
-				appendLogInfo(builder, new LogInfo(LogInfo.STD_ERR_LOG_TYPE, FileTokenFactory.tagDatabaseToken(status.getErrorLogDatabaseToken())));
+				appendLogInfo(builder, new LogInfo(LogInfo.STD_ERR_LOG_TYPE, DatabaseFileTokenFactory.tagDatabaseToken(status.getErrorLogDatabaseToken())));
 			}
 
 			builder.append(']');

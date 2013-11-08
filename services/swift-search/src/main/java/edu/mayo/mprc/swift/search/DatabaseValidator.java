@@ -1,15 +1,14 @@
 package edu.mayo.mprc.swift.search;
 
 import edu.mayo.mprc.MprcException;
-import edu.mayo.mprc.config.ApplicationConfig;
 import edu.mayo.mprc.config.DaemonConfig;
-import edu.mayo.mprc.config.ResourceConfig;
 import edu.mayo.mprc.config.RuntimeInitializer;
 import edu.mayo.mprc.config.ui.FixTag;
 import edu.mayo.mprc.daemon.files.FileTokenFactory;
 import edu.mayo.mprc.database.DaoBase;
 import edu.mayo.mprc.database.Database;
 import edu.mayo.mprc.database.DatabaseUtilities;
+import edu.mayo.mprc.swift.db.DatabaseFileTokenFactory;
 
 import javax.annotation.Resource;
 import java.util.HashMap;
@@ -31,47 +30,8 @@ public final class DatabaseValidator implements RuntimeInitializer {
 	private SwiftSearcher.Config searcherConfig;
 	private DaemonConfig daemonConfig;
 	private List<RuntimeInitializer> runtimeInitializers;
-	private FileTokenFactory fileTokenFactory;
+	private DatabaseFileTokenFactory fileTokenFactory;
 	private static final ExecutorService EXECUTOR = Executors.newSingleThreadExecutor();
-
-	/**
-	 * Sets up the file token factory. File token factory needs to know which daemon we are running in,
-	 * and where is the database module. The database module is located within the config.
-	 *
-	 * @param daemonConfig Config for the active daemon.
-	 */
-	public static void setupFileTokenFactory(final DaemonConfig daemonConfig, final FileTokenFactory fileTokenFactory) {
-		// Setup the actual daemon
-		fileTokenFactory.setDaemonConfigInfo(daemonConfig.createDaemonConfigInfo());
-		if (daemonConfig.getTempFolderPath() == null) {
-			throw new MprcException("The temporary folder is not configured for this daemon. Swift cannot run.");
-		}
-		final DaemonConfig databaseDaemonConfig = getDatabaseDaemonConfig(daemonConfig.getApplicationConfig());
-
-		fileTokenFactory.setDatabaseDaemonConfigInfo(databaseDaemonConfig.createDaemonConfigInfo());
-	}
-
-	/**
-	 * Returns a config for a daemon that contains the database. There must be exactly one such daemon.
-	 *
-	 * @param swiftConfig Swift configuration.
-	 * @return Daemon that contains the database module.
-	 */
-	private static DaemonConfig getDatabaseDaemonConfig(final ApplicationConfig swiftConfig) {
-		final ResourceConfig databaseResource = getDatabaseResource(swiftConfig);
-		return swiftConfig.getDaemonForResource(databaseResource);
-	}
-
-	private static ResourceConfig getDatabaseResource(final ApplicationConfig swiftConfig) {
-		final List<ResourceConfig> configs = swiftConfig.getModulesOfConfigType(Database.Config.class);
-		if (configs.size() > 1) {
-			throw new MprcException("Swift has more than one database defined.");
-		}
-		if (configs.isEmpty()) {
-			throw new MprcException("Swift does not define a database.");
-		}
-		return configs.get(0);
-	}
 
 	/**
 	 * Initialize the connection to the database.
@@ -86,8 +46,6 @@ public final class DatabaseValidator implements RuntimeInitializer {
 		HashMap<String, String> params = new HashMap<String, String>();
 		params.put("action", schemaInitialization.getValue());
 		database.install(params);
-
-		setupFileTokenFactory(daemonConfig, fileTokenFactory);
 
 		database.begin();
 	}
@@ -148,7 +106,7 @@ public final class DatabaseValidator implements RuntimeInitializer {
 	@Override
 	/**
 	 * @param params Recognizes "action" key that can be one of
-	 * {@link edu.mayo.mprc.database.DatabaseUtilities.SchemaInitialization#getValue()}.
+	 * {@link DatabaseUtilities.SchemaInitialization#getValue()}.
 	 */
 	public void install(final Map<String, String> params) {
 		final String action = params.get("action");
@@ -229,11 +187,11 @@ public final class DatabaseValidator implements RuntimeInitializer {
 		this.runtimeInitializers = runtimeInitializers;
 	}
 
-	public FileTokenFactory getFileTokenFactory() {
+	public DatabaseFileTokenFactory getFileTokenFactory() {
 		return fileTokenFactory;
 	}
 
-	public void setFileTokenFactory(final FileTokenFactory fileTokenFactory) {
+	public void setFileTokenFactory(final DatabaseFileTokenFactory fileTokenFactory) {
 		this.fileTokenFactory = fileTokenFactory;
 	}
 }

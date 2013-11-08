@@ -4,7 +4,6 @@ import edu.mayo.mprc.MprcException;
 import edu.mayo.mprc.daemon.AssignedTaskData;
 import edu.mayo.mprc.daemon.DaemonConnection;
 import edu.mayo.mprc.daemon.WorkPacket;
-import edu.mayo.mprc.daemon.files.FileTokenFactory;
 import edu.mayo.mprc.dbcurator.model.Curation;
 import edu.mayo.mprc.enginedeployment.DeploymentRequest;
 import edu.mayo.mprc.enginedeployment.DeploymentResult;
@@ -40,7 +39,7 @@ public final class DatabaseUndeploymentTask {
 	private LinkedList<String> messages;
 	private DaemonConnection deploymentDaemon;
 
-	public DatabaseUndeploymentTask(final DaemonConnection deploymentDaemon, final Curation dbToUndeploy, final FileTokenFactory fileTokenFactory) {
+	public DatabaseUndeploymentTask(final DaemonConnection deploymentDaemon, final Curation dbToUndeploy) {
 		this.deploymentDaemon = deploymentDaemon;
 		this.dbToUndeploy = dbToUndeploy;
 

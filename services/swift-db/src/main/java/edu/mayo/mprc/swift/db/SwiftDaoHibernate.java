@@ -33,7 +33,7 @@ public final class SwiftDaoHibernate extends DaoBase implements SwiftDao {
 	private static final Logger LOGGER = Logger.getLogger(SwiftDaoHibernate.class);
 	private static final String MAP = "edu/mayo/mprc/swift/dbmapping/";
 
-	private FileTokenFactory fileTokenFactory;
+	private DatabaseFileTokenFactory fileTokenFactory;
 	private final Object taskStatesLock = new Object();
 	private Map<TaskState, TaskStateData> taskStates = null;
 	private WorkspaceDao workspaceDao;
@@ -619,7 +619,7 @@ public final class SwiftDaoHibernate extends DaoBase implements SwiftDao {
 	}
 
 	@Resource(name = "fileTokenFactory")
-	public void setFileTokenFactory(final FileTokenFactory fileTokenFactory) {
+	public void setFileTokenFactory(final DatabaseFileTokenFactory fileTokenFactory) {
 		this.fileTokenFactory = fileTokenFactory;
 	}
 

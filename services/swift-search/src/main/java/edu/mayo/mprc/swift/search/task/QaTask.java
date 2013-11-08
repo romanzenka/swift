@@ -2,10 +2,10 @@ package edu.mayo.mprc.swift.search.task;
 
 import edu.mayo.mprc.daemon.DaemonConnection;
 import edu.mayo.mprc.daemon.WorkPacket;
-import edu.mayo.mprc.daemon.files.FileTokenFactory;
 import edu.mayo.mprc.qa.ExperimentQa;
 import edu.mayo.mprc.qa.MgfQaFiles;
 import edu.mayo.mprc.qa.QaWorkPacket;
+import edu.mayo.mprc.swift.db.DatabaseFileTokenFactory;
 import edu.mayo.mprc.utilities.FileUtilities;
 import edu.mayo.mprc.utilities.progress.ProgressInfo;
 import edu.mayo.mprc.workflow.engine.WorkflowEngine;
@@ -25,7 +25,7 @@ public final class QaTask extends AsyncTaskBase {
 
 	public static final String QA_SUBDIRECTORY = "qa";
 
-	public QaTask(final WorkflowEngine engine, final DaemonConnection daemonConnection, final FileTokenFactory fileTokenFactory, final boolean fromScratch) {
+	public QaTask(final WorkflowEngine engine, final DaemonConnection daemonConnection, final DatabaseFileTokenFactory fileTokenFactory, final boolean fromScratch) {
 		super(engine, daemonConnection, fileTokenFactory, fromScratch);
 
 		experimentList = new ArrayList<QaTaskExperiment>(1);

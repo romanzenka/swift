@@ -2,6 +2,7 @@ package edu.mayo.mprc.swift;
 
 import edu.mayo.mprc.MprcException;
 import edu.mayo.mprc.daemon.files.FileTokenFactory;
+import edu.mayo.mprc.swift.db.DatabaseFileTokenFactory;
 import edu.mayo.mprc.utilities.FileUtilities;
 import org.joda.time.DateTime;
 import org.joda.time.format.ISODateTimeFormat;
@@ -20,7 +21,7 @@ public final class ReportUtils {
 		return text.replaceAll("(\r\n|\n\r|\n)", "<br/>");
 	}
 
-	public static String replaceTokensWithHyperlinks(final String text, final File browseRoot, final String browseWebRoot, final FileTokenFactory tokenFactory) {
+	public static String replaceTokensWithHyperlinks(final String text, final File browseRoot, final String browseWebRoot, final DatabaseFileTokenFactory tokenFactory) {
 		final Matcher matcher = tokenToHyperlink.matcher(text);
 
 		final StringBuffer result = new StringBuffer(text.length());

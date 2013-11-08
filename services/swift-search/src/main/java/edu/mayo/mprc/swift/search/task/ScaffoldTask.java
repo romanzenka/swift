@@ -4,10 +4,10 @@ import edu.mayo.mprc.MprcException;
 import edu.mayo.mprc.daemon.DaemonConnection;
 import edu.mayo.mprc.daemon.WorkPacket;
 import edu.mayo.mprc.daemon.exception.DaemonException;
-import edu.mayo.mprc.daemon.files.FileTokenFactory;
 import edu.mayo.mprc.scaffold.ScaffoldWorkPacket;
 import edu.mayo.mprc.scaffoldparser.spectra.ScaffoldReportReader;
 import edu.mayo.mprc.scafml.ScafmlScaffold;
+import edu.mayo.mprc.swift.db.DatabaseFileTokenFactory;
 import edu.mayo.mprc.swift.db.SwiftDao;
 import edu.mayo.mprc.swift.dbmapping.FileSearch;
 import edu.mayo.mprc.swift.dbmapping.ReportData;
@@ -48,7 +48,7 @@ final class ScaffoldTask extends AsyncTaskBase implements ScaffoldTaskI {
 	ScaffoldTask(final WorkflowEngine engine,
 	             final String scaffoldVersion, final String experiment, final SwiftSearchDefinition definition, final DaemonConnection scaffoldDaemon,
 	             final SwiftDao swiftDao, final SearchRun searchRun, final File scaffoldUnimod,
-	             final File outputFolder, final FileTokenFactory fileTokenFactory, final boolean reportDecoyHits, final boolean fromScratch) {
+	             final File outputFolder, final DatabaseFileTokenFactory fileTokenFactory, final boolean reportDecoyHits, final boolean fromScratch) {
 		super(engine, scaffoldDaemon, fileTokenFactory, fromScratch);
 		this.scaffoldVersion = scaffoldVersion;
 		this.experiment = experiment;

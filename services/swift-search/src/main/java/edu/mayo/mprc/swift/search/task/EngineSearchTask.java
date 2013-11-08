@@ -3,7 +3,6 @@ package edu.mayo.mprc.swift.search.task;
 import edu.mayo.mprc.MprcException;
 import edu.mayo.mprc.daemon.DaemonConnection;
 import edu.mayo.mprc.daemon.WorkPacket;
-import edu.mayo.mprc.daemon.files.FileTokenFactory;
 import edu.mayo.mprc.dbcurator.model.Curation;
 import edu.mayo.mprc.mascot.MascotResultUrl;
 import edu.mayo.mprc.mascot.MascotWorkPacket;
@@ -11,6 +10,7 @@ import edu.mayo.mprc.myrimatch.MyriMatchWorkPacket;
 import edu.mayo.mprc.omssa.OmssaWorkPacket;
 import edu.mayo.mprc.searchengine.SearchEngineResult;
 import edu.mayo.mprc.sequest.SequestMGFWorkPacket;
+import edu.mayo.mprc.swift.db.DatabaseFileTokenFactory;
 import edu.mayo.mprc.swift.db.SearchEngine;
 import edu.mayo.mprc.utilities.progress.ProgressInfo;
 import edu.mayo.mprc.workflow.engine.WorkflowEngine;
@@ -45,7 +45,7 @@ final class EngineSearchTask extends AsyncTaskBase implements FileProducingTask 
 			final File outputFile,
 			final File paramsFile,
 			final boolean publicSearchFiles,
-			final DaemonConnection searchEngineDaemon, final FileTokenFactory fileTokenFactory, final boolean fromScratch) {
+			final DaemonConnection searchEngineDaemon, final DatabaseFileTokenFactory fileTokenFactory, final boolean fromScratch) {
 		super(workflowEngine, searchEngineDaemon, fileTokenFactory, fromScratch);
 		this.engine = engine;
 		this.outputFile = outputFile;

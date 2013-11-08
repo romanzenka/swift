@@ -2,7 +2,7 @@ package edu.mayo.mprc.swift;
 
 import edu.mayo.mprc.MprcException;
 import edu.mayo.mprc.config.DaemonConfigInfo;
-import edu.mayo.mprc.daemon.files.FileTokenFactory;
+import edu.mayo.mprc.swift.db.DatabaseFileTokenFactory;
 import org.joda.time.DateTime;
 import org.testng.Assert;
 import org.testng.annotations.DataProvider;
@@ -16,7 +16,7 @@ public final class ReportUtilsTest {
 	public void shouldConvertTokens() {
 		final DaemonConfigInfo info = new DaemonConfigInfo("my daemon", "/mnt/raid1");
 		final DaemonConfigInfo dbInfo = new DaemonConfigInfo("database daemon", "/mnt/raid1");
-		final FileTokenFactory tokenFactory = new FileTokenFactory(info);
+		final DatabaseFileTokenFactory tokenFactory = new DatabaseFileTokenFactory(info);
 		tokenFactory.setDatabaseDaemonConfigInfo(dbInfo);
 		Assert.assertEquals(
 				ReportUtils.replaceTokensWithHyperlinks("hello world", new File("/mnt/raid1/browsing"), "file:///rome/mprc", tokenFactory),

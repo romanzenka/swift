@@ -3,11 +3,11 @@ package edu.mayo.mprc.swift.commands;
 import edu.mayo.mprc.MprcException;
 import edu.mayo.mprc.config.ServiceConfig;
 import edu.mayo.mprc.daemon.DaemonConnection;
-import edu.mayo.mprc.daemon.files.FileTokenFactory;
 import edu.mayo.mprc.qa.RAWDumpWorker;
 import edu.mayo.mprc.searchdb.RawFileMetaData;
 import edu.mayo.mprc.searchdb.dao.SearchDbDao;
 import edu.mayo.mprc.swift.ExitCode;
+import edu.mayo.mprc.swift.db.DatabaseFileTokenFactory;
 import edu.mayo.mprc.swift.search.SwiftSearcher;
 import edu.mayo.mprc.swift.search.task.RAWDumpTask;
 import edu.mayo.mprc.utilities.FileUtilities;
@@ -37,7 +37,7 @@ public final class LoadRawMetadata implements SwiftCommand {
 
 	private DaemonConnection rawDump;
 	private SearchDbDao searchDbDao;
-	private FileTokenFactory fileTokenFactory;
+	private DatabaseFileTokenFactory fileTokenFactory;
 	private int totalToLoad;
 	private int loaded;
 
@@ -168,12 +168,12 @@ public final class LoadRawMetadata implements SwiftCommand {
 		this.searchDbDao = searchDbDao;
 	}
 
-	public FileTokenFactory getFileTokenFactory() {
+	public DatabaseFileTokenFactory getFileTokenFactory() {
 		return fileTokenFactory;
 	}
 
 	@Resource(name = "fileTokenFactory")
-	public void setFileTokenFactory(final FileTokenFactory fileTokenFactory) {
+	public void setFileTokenFactory(final DatabaseFileTokenFactory fileTokenFactory) {
 		this.fileTokenFactory = fileTokenFactory;
 	}
 

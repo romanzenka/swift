@@ -4,6 +4,7 @@ import edu.mayo.mprc.config.DaemonConfigInfo;
 import edu.mayo.mprc.daemon.files.FileToken;
 import edu.mayo.mprc.daemon.files.FileTokenFactory;
 import edu.mayo.mprc.daemon.files.ReceiverTokenTranslator;
+import edu.mayo.mprc.swift.db.DatabaseFileTokenFactory;
 import edu.mayo.mprc.utilities.FileUtilities;
 import org.testng.Assert;
 import org.testng.annotations.Test;
@@ -89,23 +90,6 @@ public final class FileTokenFactoryTest {
 		transfer("fromdir", null, "todir", null);
 	}
 
-	private FileTokenFactory makeDaemonTokenFactory(final String daemonSharedFolder, final String daemonName) {
-		final DaemonConfigInfo mainDaemon = new DaemonConfigInfo(daemonName, daemonSharedFolder);
-		final FileTokenFactory factory = new FileTokenFactory(mainDaemon);
-		factory.setDatabaseDaemonConfigInfo(mainDaemon);
-		return factory;
-	}
-
-	private void roundtrip(final String daemonSharedFolder, final String daemonSharedFile, final String expectedToken) {
-		final String daemomName = "main";
-		final FileTokenFactory factory = makeDaemonTokenFactory(daemonSharedFolder, daemomName);
-		final File input = daemonSharedFile == null ? null : new File(daemonSharedFile);
-		final String token = factory.fileToDatabaseToken(input);
-		Assert.assertEquals(token, expectedToken, "The tokens stored and retrieved from the database do not match");
-		final File output = factory.databaseTokenToFile(token);
-		Assert.assertEquals(output == null ? null : output.getAbsoluteFile(), input == null ? null : input.getAbsoluteFile(), "The file translations should round trip through database without changing the file");
-	}
-
 	@Test(groups = "windows")
 	public void shouldTransferBetweenDaemonsWindows() {
 		if (!FileUtilities.isWindowsPlatform()) {
@@ -115,6 +99,23 @@ public final class FileTokenFactoryTest {
 		transfer("C:\\", "C:\\test.txt", "D:\\", "D:\\test.txt");
 		transfer("C:\\hello", "C:\\hello\\test.txt", "D:\\", "D:\\test.txt");
 		transfer("C:", "C:\\hello\\test.txt", "D:\\", "D:\\hello\\test.txt");
+	}
+
+	private DatabaseFileTokenFactory makeDaemonTokenFactory(final String daemonSharedFolder, final String daemonName) {
+		final DaemonConfigInfo mainDaemon = new DaemonConfigInfo(daemonName, daemonSharedFolder);
+		final DatabaseFileTokenFactory factory = new DatabaseFileTokenFactory(mainDaemon);
+		factory.setDatabaseDaemonConfigInfo(mainDaemon);
+		return factory;
+	}
+
+	private void roundtrip(final String daemonSharedFolder, final String daemonSharedFile, final String expectedToken) {
+		final String daemomName = "main";
+		final DatabaseFileTokenFactory factory = makeDaemonTokenFactory(daemonSharedFolder, daemomName);
+		final File input = daemonSharedFile == null ? null : new File(daemonSharedFile);
+		final String token = factory.fileToDatabaseToken(input);
+		Assert.assertEquals(token, expectedToken, "The tokens stored and retrieved from the database do not match");
+		final File output = factory.databaseTokenToFile(token);
+		Assert.assertEquals(output == null ? null : output.getAbsoluteFile(), input == null ? null : input.getAbsoluteFile(), "The file translations should round trip through database without changing the file");
 	}
 
 	private void transfer(final String homeDaemon1, final String sourceFile, final String homeDaemon2, final String destFile) {

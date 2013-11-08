@@ -6,9 +6,9 @@ import edu.mayo.mprc.config.*;
 import edu.mayo.mprc.daemon.Daemon;
 import edu.mayo.mprc.daemon.DaemonConnection;
 import edu.mayo.mprc.daemon.MessageBroker;
-import edu.mayo.mprc.daemon.files.FileTokenFactory;
 import edu.mayo.mprc.swift.ExitCode;
 import edu.mayo.mprc.swift.SwiftConfig;
+import edu.mayo.mprc.swift.db.DatabaseFileTokenFactory;
 import edu.mayo.mprc.swift.search.SwiftSearcher;
 import edu.mayo.mprc.utilities.FileUtilities;
 import edu.mayo.mprc.utilities.exceptions.ExceptionUtilities;
@@ -30,7 +30,7 @@ import java.util.*;
 @Component("swiftEnvironment")
 public final class SwiftEnvironmentImpl implements SwiftEnvironment, ApplicationContextAware {
 	public static final String COMMAND_SUFFIX = "-command";
-	private FileTokenFactory fileTokenFactory;
+	private DatabaseFileTokenFactory fileTokenFactory;
 	private Daemon.Factory daemonFactory;
 	private MultiFactory swiftFactory;
 
@@ -130,12 +130,12 @@ public final class SwiftEnvironmentImpl implements SwiftEnvironment, Application
 		return Joiner.on(", ").join(commands);
 	}
 
-	public FileTokenFactory getFileTokenFactory() {
+	public DatabaseFileTokenFactory getFileTokenFactory() {
 		return fileTokenFactory;
 	}
 
 	@Resource(name = "fileTokenFactory")
-	public void setFileTokenFactory(final FileTokenFactory fileTokenFactory) {
+	public void setFileTokenFactory(final DatabaseFileTokenFactory fileTokenFactory) {
 		this.fileTokenFactory = fileTokenFactory;
 	}
 
@@ -162,14 +162,12 @@ public final class SwiftEnvironmentImpl implements SwiftEnvironment, Application
 		if (daemonConfig == null) {
 			if (configFile != null) {
 				daemonConfig = SwiftConfig.getUserSpecifiedDaemonConfig(commandLine.getDaemonId(), getApplicationConfig());
-				SwiftConfig.setupFileTokenFactory(getApplicationConfig(), daemonConfig, getFileTokenFactory());
 			}
 		}
 
 		return daemonConfig;
 	}
 
-	@Resource(name = "applicationConfig")
 	public void setApplicationConfig(final ApplicationConfig applicationConfig) {
 		this.applicationConfig = applicationConfig;
 	}

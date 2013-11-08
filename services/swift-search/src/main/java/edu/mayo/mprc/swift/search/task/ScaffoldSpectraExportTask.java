@@ -2,9 +2,9 @@ package edu.mayo.mprc.swift.search.task;
 
 import edu.mayo.mprc.daemon.DaemonConnection;
 import edu.mayo.mprc.daemon.WorkPacket;
-import edu.mayo.mprc.daemon.files.FileTokenFactory;
 import edu.mayo.mprc.scaffold.ScaffoldSpectrumExportWorkPacket;
 import edu.mayo.mprc.scaffoldparser.spectra.ScaffoldReportReader;
+import edu.mayo.mprc.swift.db.DatabaseFileTokenFactory;
 import edu.mayo.mprc.utilities.FileUtilities;
 import edu.mayo.mprc.utilities.progress.ProgressInfo;
 import edu.mayo.mprc.workflow.engine.WorkflowEngine;
@@ -21,7 +21,7 @@ public final class ScaffoldSpectraExportTask extends AsyncTaskBase {
 
 	private File spectrumExportFile;
 
-	public ScaffoldSpectraExportTask(final WorkflowEngine engine, DaemonConnection daemon, FileTokenFactory fileTokenFactory, boolean fromScratch, File scaffoldFile) {
+	public ScaffoldSpectraExportTask(final WorkflowEngine engine, DaemonConnection daemon, DatabaseFileTokenFactory fileTokenFactory, boolean fromScratch, File scaffoldFile) {
 		super(engine, daemon, fileTokenFactory, fromScratch);
 		this.scaffoldFile = scaffoldFile;
 		spectrumExportFile = getDefaultSpectrumExportFile(scaffoldFile);

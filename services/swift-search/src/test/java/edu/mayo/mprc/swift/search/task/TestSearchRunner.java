@@ -3,10 +3,10 @@ package edu.mayo.mprc.swift.search.task;
 import edu.mayo.mprc.config.DaemonConfigInfo;
 import edu.mayo.mprc.daemon.DaemonConnection;
 import edu.mayo.mprc.daemon.SimpleThreadPoolExecutor;
-import edu.mayo.mprc.daemon.files.FileTokenFactory;
 import edu.mayo.mprc.dbcurator.model.Curation;
 import edu.mayo.mprc.dbcurator.model.persistence.CurationDao;
 import edu.mayo.mprc.searchengine.EngineMetadata;
+import edu.mayo.mprc.swift.db.DatabaseFileTokenFactory;
 import edu.mayo.mprc.swift.db.SearchEngine;
 import edu.mayo.mprc.swift.db.SwiftDao;
 import edu.mayo.mprc.swift.dbmapping.*;
@@ -363,8 +363,8 @@ public class TestSearchRunner {
 		return engines;
 	}
 
-	private FileTokenFactory dummyFileTokenFactory() {
-		final FileTokenFactory fileTokenFactory = new FileTokenFactory();
+	private DatabaseFileTokenFactory dummyFileTokenFactory() {
+		final DatabaseFileTokenFactory fileTokenFactory = new DatabaseFileTokenFactory();
 		final DaemonConfigInfo mainDaemon = new DaemonConfigInfo("daemon1", "/");
 		fileTokenFactory.setDaemonConfigInfo(mainDaemon);
 		fileTokenFactory.setDatabaseDaemonConfigInfo(mainDaemon);

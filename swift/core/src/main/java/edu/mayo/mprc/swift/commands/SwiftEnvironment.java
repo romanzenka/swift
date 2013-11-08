@@ -4,7 +4,6 @@ import edu.mayo.mprc.config.*;
 import edu.mayo.mprc.daemon.Daemon;
 import edu.mayo.mprc.daemon.DaemonConnection;
 import edu.mayo.mprc.daemon.MessageBroker;
-import edu.mayo.mprc.daemon.files.FileTokenFactory;
 import edu.mayo.mprc.swift.ExitCode;
 import edu.mayo.mprc.swift.Swift;
 import edu.mayo.mprc.swift.search.SwiftSearcher;
@@ -22,7 +21,7 @@ import java.util.List;
 public interface SwiftEnvironment extends RunningApplicationContext {
 	/**
 	 * Runs a Swift command within the Swift environment. The environment changes based on the
-	 * command line provided (e.g. current daemon config is set, {@link FileTokenFactory} is set up for it etc.
+	 * command line provided (e.g. current daemon config is set, {@link edu.mayo.mprc.daemon.files.FileTokenFactory} is set up for it etc.
 	 * Then the command is executed.
 	 *
 	 * @param cmdLine Parsed command line.
@@ -37,9 +36,6 @@ public interface SwiftEnvironment extends RunningApplicationContext {
 	/**
 	 * User specifies which environment to run within using the --daemon command line switch.
 	 * Daemons are configured in the main Swift configuration file, by default in {@link Swift#CONFIG_FILE_NAME}.
-	 * <p/>
-	 * The side effect of this function is initialization of the {@link FileTokenFactory}. This can be done only
-	 * if the daemon is known.
 	 *
 	 * @return Configuration of the current daemon. A daemon specifies a particular environment
 	 *         and a list of services to run in that environment.
