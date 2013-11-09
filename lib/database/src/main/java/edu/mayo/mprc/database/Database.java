@@ -34,24 +34,20 @@ public final class Database implements Installable {
 
 	@Override
 	public void install(Map<String, String> params) {
-		if (sessionFactory != null) {
-			initialize(DatabaseUtilities.SchemaInitialization.getForValue(params.get("action")));
+		if (sessionFactory == null) {
+			final SessionFactory sessionFactory1 = DatabaseUtilities.getSessionFactory(config.getUrl()
+					, config.getUserName()
+					, config.getPassword()
+					, config.getDialect()
+					, config.getDriverClassName()
+					, config.getDefaultSchema()
+					, config.getSchema()
+					, hibernateProperties
+					, mappingResources,
+					DatabaseUtilities.SchemaInitialization.getForValue(params.get("action")));
+
+			setSessionFactory(sessionFactory1);
 		}
-	}
-
-	private void initialize(DatabaseUtilities.SchemaInitialization initialization) {
-		final SessionFactory sessionFactory = DatabaseUtilities.getSessionFactory(config.getUrl()
-				, config.getUserName()
-				, config.getPassword()
-				, config.getDialect()
-				, config.getDriverClassName()
-				, config.getDefaultSchema()
-				, config.getSchema()
-				, hibernateProperties
-				, mappingResources,
-				initialization);
-
-		setSessionFactory(sessionFactory);
 	}
 
 	public SessionFactory getSessionFactory() {

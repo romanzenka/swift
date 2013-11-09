@@ -447,12 +447,13 @@ public final class SwiftSearcher implements Worker {
 			worker.setParamsInfo(paramsInfo);
 
 			final List<SearchEngine> connectedSearchEngines = new ArrayList<SearchEngine>();
-			for (final SearchEngine.Config engineConfig : config.getEngines()) {
-				if (engineConfig.getWorker() != null) {
-					final SearchEngine engine = (SearchEngine) dependencies.createSingleton(engineConfig);
-					connectedSearchEngines.add(engine);
+			if (config.getEngines() != null) {
+				for (final SearchEngine.Config engineConfig : config.getEngines()) {
+					if (engineConfig.getWorker() != null) {
+						final SearchEngine engine = (SearchEngine) dependencies.createSingleton(engineConfig);
+						connectedSearchEngines.add(engine);
+					}
 				}
-
 			}
 			worker.setSearchEngines(connectedSearchEngines);
 			if (config.raw2mgf != null) {

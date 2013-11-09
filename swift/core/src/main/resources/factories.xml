@@ -107,7 +107,9 @@
         <property name="context" ref="swiftEnvironment" />
     </bean>
 
-    <bean id="curationInitializer" class="edu.mayo.mprc.swift.search.CurationInitializer"></bean>
+    <bean id="curationInitializer" class="edu.mayo.mprc.swift.search.CurationInitializer">
+        <property name="curationDao" ref="curationDao" />
+    </bean>
 
     <bean id="messageBrokerFactory" class="edu.mayo.mprc.daemon.MessageBroker$Factory" />
 

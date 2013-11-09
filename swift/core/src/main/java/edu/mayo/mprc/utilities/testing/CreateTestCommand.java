@@ -36,6 +36,9 @@ public final class CreateTestCommand implements SwiftCommand {
 				.put("test", "true")
 				.build();
 
+		// TODO: Database needs to depend on its validator for its installation needs
+		// That way the install runs directly through the daemon
+		validator.install(installMap);
 		daemon.install(installMap);
 
 		return ExitCode.Ok;
