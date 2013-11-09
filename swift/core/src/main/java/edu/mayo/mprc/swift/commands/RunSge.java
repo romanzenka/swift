@@ -80,7 +80,6 @@ public class RunSge implements SwiftCommand {
 			fileInputStream = new FileInputStream(workPacketXmlFile);
 
 			sgePacket = (SgePacket) xStream.fromXML(fileInputStream);
-			serviceFactory.initialize(sgePacket.getSerializedRequest().getBrokerUri(), null);
 			request = serviceFactory.deserializeRequest(sgePacket.getSerializedRequest());
 
 			//If the work packet is an instance of a FileTokenHolder, set the the FileTokenFactory on it. The FileTokenFactory object

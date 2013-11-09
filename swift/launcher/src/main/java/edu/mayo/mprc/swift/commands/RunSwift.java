@@ -56,7 +56,6 @@ public class RunSwift implements FileListener, SwiftCommand {
 			return getRunSwiftWeb().run(environment);
 		}
 
-		getServiceFactory().initialize(environment.getMessageBroker().getBrokerUrl(), config.getName());
 		final Daemon daemon = environment.createDaemon(config);
 		LOGGER.debug(daemon.toString());
 

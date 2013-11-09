@@ -34,5 +34,5 @@ public interface RunningApplicationContext {
 	 * @param clazz Type of the config.
 	 * @return The configuration of the given type.
 	 */
-	ResourceConfig getSingletonConfig(Class clazz);
+	<T extends ResourceConfig> T getSingletonConfig(Class<T> clazz);
 }

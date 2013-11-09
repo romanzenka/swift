@@ -43,6 +43,13 @@ public interface SwiftEnvironment extends RunningApplicationContext {
 	DaemonConfig getDaemonConfig();
 
 	/**
+	 * Manually override the daemon config.
+	 *
+	 * @param config Daemon config to be used.
+	 */
+	void setDaemonConfig(DaemonConfig config);
+
+	/**
 	 * @return Configuration of the entire application.
 	 */
 	ApplicationConfig getApplicationConfig();

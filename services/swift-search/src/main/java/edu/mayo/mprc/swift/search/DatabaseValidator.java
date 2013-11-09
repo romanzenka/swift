@@ -1,14 +1,14 @@
 package edu.mayo.mprc.swift.search;
 
 import edu.mayo.mprc.MprcException;
-import edu.mayo.mprc.config.DaemonConfig;
-import edu.mayo.mprc.config.RuntimeInitializer;
+import edu.mayo.mprc.config.*;
 import edu.mayo.mprc.config.ui.FixTag;
 import edu.mayo.mprc.daemon.files.FileTokenFactory;
 import edu.mayo.mprc.database.DaoBase;
 import edu.mayo.mprc.database.Database;
 import edu.mayo.mprc.database.DatabaseUtilities;
 import edu.mayo.mprc.swift.db.DatabaseFileTokenFactory;
+import edu.mayo.mprc.utilities.exceptions.ExceptionUtilities;
 
 import javax.annotation.Resource;
 import java.util.HashMap;
@@ -31,6 +31,8 @@ public final class DatabaseValidator implements RuntimeInitializer {
 	private DaemonConfig daemonConfig;
 	private List<RuntimeInitializer> runtimeInitializers;
 	private DatabaseFileTokenFactory fileTokenFactory;
+	private RunningApplicationContext runningApplicationContext;
+
 	private static final ExecutorService EXECUTOR = Executors.newSingleThreadExecutor();
 
 	/**
@@ -111,8 +113,8 @@ public final class DatabaseValidator implements RuntimeInitializer {
 	public void install(final Map<String, String> params) {
 		final String action = params.get("action");
 		final HashMap<String, String> newParams = new HashMap<String, String>(params);
-		newParams.put(CurationInitializer.FASTA_FOLDER, searcherConfig.getFastaPath());
-		newParams.put(CurationInitializer.FASTA_ARCHIVE_FOLDER, searcherConfig.getFastaArchivePath());
+		newParams.put(CurationInitializer.FASTA_FOLDER, getSearcherConfig().getFastaPath());
+		newParams.put(CurationInitializer.FASTA_ARCHIVE_FOLDER, getSearcherConfig().getFastaArchivePath());
 
 		final Future<?> future = EXECUTOR.submit(new Runnable() {
 			@Override
@@ -145,20 +147,32 @@ public final class DatabaseValidator implements RuntimeInitializer {
 		}
 	}
 
-	public SwiftSearcher.Config getSearcherConfig() {
-		return searcherConfig;
-	}
-
-	public void setSearcherConfig(final SwiftSearcher.Config searcherConfig) {
+	public void setSearcherConfig(SwiftSearcher.Config searcherConfig) {
 		this.searcherConfig = searcherConfig;
 	}
 
-	public DaemonConfig getDaemonConfig() {
-		return daemonConfig;
+	public SwiftSearcher.Config getSearcherConfig() {
+		if (searcherConfig == null && runningApplicationContext != null) {
+			ServiceConfig config = runningApplicationContext.getDaemonConfig().firstServiceOfType(SwiftSearcher.Config.class);
+			ResourceConfig workerConfig = config.getRunner().getWorkerConfiguration();
+			if (!(workerConfig instanceof SwiftSearcher.Config)) {
+				ExceptionUtilities.throwCastException(config, SwiftSearcher.Config.class);
+				return null;
+			}
+			searcherConfig = (SwiftSearcher.Config) workerConfig;
+		}
+		return searcherConfig;
 	}
 
-	public void setDaemonConfig(final DaemonConfig daemonConfig) {
+	public void setDaemonConfig(DaemonConfig daemonConfig) {
 		this.daemonConfig = daemonConfig;
+	}
+
+	public DaemonConfig getDaemonConfig() {
+		if (daemonConfig == null && runningApplicationContext != null) {
+			daemonConfig = runningApplicationContext.getDaemonConfig();
+		}
+		return daemonConfig;
 	}
 
 	public Database getDatabase() {
@@ -185,6 +199,14 @@ public final class DatabaseValidator implements RuntimeInitializer {
 
 	public void setRuntimeInitializers(final List<RuntimeInitializer> runtimeInitializers) {
 		this.runtimeInitializers = runtimeInitializers;
+	}
+
+	public RunningApplicationContext getRunningApplicationContext() {
+		return runningApplicationContext;
+	}
+
+	public void setRunningApplicationContext(final RunningApplicationContext context) {
+		runningApplicationContext = context;
 	}
 
 	public DatabaseFileTokenFactory getFileTokenFactory() {

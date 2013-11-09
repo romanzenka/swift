@@ -87,17 +87,17 @@ public final class ApplicationConfig implements ResourceConfig {
 		}
 	}
 
-	public List<ResourceConfig> getModulesOfConfigType(final Class<? extends ResourceConfig> type) {
-		final List<ResourceConfig> list = new ArrayList<ResourceConfig>();
+	public <T extends ResourceConfig> List<T> getModulesOfConfigType(final Class<T> type) {
+		final List<T> list = new ArrayList<T>();
 		for (final DaemonConfig daemonConfig : daemons) {
 			for (final ResourceConfig resourceConfig : daemonConfig.getResources()) {
 				if (type.equals(resourceConfig.getClass())) {
-					list.add(resourceConfig);
+					list.add((T) resourceConfig);
 				}
 			}
 			for (final ServiceConfig serviceConfig : daemonConfig.getServices()) {
 				if (type.equals(serviceConfig.getRunner().getWorkerConfiguration().getClass())) {
-					list.add(serviceConfig.getRunner().getWorkerConfiguration());
+					list.add((T) serviceConfig.getRunner().getWorkerConfiguration());
 				}
 			}
 		}

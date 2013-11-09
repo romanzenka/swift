@@ -90,7 +90,6 @@ public final class ServletInitialization implements SwiftCommand, ServletContext
 
 			// The service factory needs to be initialized by message broker config
 			final MessageBroker.Config messageBroker = SwiftEnvironmentImpl.getMessageBroker(daemonConfig);
-			serviceFactory.initialize(messageBroker.getBrokerUrl(), daemonConfig.getName());
 
 			// WebUi needs reference to the actual daemon
 			final Daemon daemon = environment.createDaemon(daemonConfig);

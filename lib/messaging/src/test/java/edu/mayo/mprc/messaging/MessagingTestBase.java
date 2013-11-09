@@ -30,7 +30,8 @@ public abstract class MessagingTestBase {
 
 		serviceFactory = new ServiceFactory();
 		serviceFactory.setConnectionPool(new ActiveMQConnectionPool());
-		serviceFactory.initialize(brokerUri.toString(), "test-messaging-daemon");
+		serviceFactory.setBrokerUri(brokerUri);
+		serviceFactory.setDaemonName("test-messaging-daemon");
 
 		try {
 			service = serviceFactory.createService(TEST_QUEUE_NAME);

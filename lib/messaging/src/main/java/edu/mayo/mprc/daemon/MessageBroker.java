@@ -10,7 +10,6 @@ import edu.mayo.mprc.utilities.exceptions.ExceptionUtilities;
 import org.apache.activemq.ActiveMQConnectionFactory;
 import org.apache.activemq.broker.BrokerService;
 import org.apache.log4j.Logger;
-import org.springframework.stereotype.Component;
 
 import javax.jms.Connection;
 import javax.jms.ConnectionFactory;
@@ -107,7 +106,6 @@ public final class MessageBroker implements Closeable {
 	/**
 	 * A factory capable of creating the resource
 	 */
-	@Component("messageBrokerFactory")
 	public static final class Factory extends FactoryBase<Config, MessageBroker> implements FactoryDescriptor {
 		@Override
 		public MessageBroker create(final Config config, final DependencyResolver dependencies) {

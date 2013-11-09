@@ -41,6 +41,7 @@
     <bean id="databaseValidator" class="edu.mayo.mprc.swift.search.DatabaseValidator">
         <property name="runtimeInitializers" ref="searcherRuntimeInitializers" />
         <property name="fileTokenFactory" ref="fileTokenFactory" />
+        <property name="runningApplicationContext" ref="swiftEnvironment" />
     </bean>
 
     <!-- Provides a WebUi interface after it gets configured -->
@@ -103,9 +104,12 @@
 
     <bean id="serviceFactory" class="edu.mayo.mprc.messaging.ServiceFactory">
         <property name="connectionPool" ref="connectionPool" />
+        <property name="context" ref="swiftEnvironment" />
     </bean>
 
     <bean id="curationInitializer" class="edu.mayo.mprc.swift.search.CurationInitializer"></bean>
+
+    <bean id="messageBrokerFactory" class="edu.mayo.mprc.daemon.MessageBroker$Factory" />
 
     <bean id="searcherRuntimeInitializers" class="java.util.ArrayList">
         <constructor-arg>

@@ -1,15 +1,14 @@
 package edu.mayo.mprc.utilities.testing;
 
-import com.google.common.collect.ImmutableMap;
 import edu.mayo.mprc.config.*;
 import edu.mayo.mprc.daemon.MessageBroker;
 import edu.mayo.mprc.daemon.SimpleRunner;
 import edu.mayo.mprc.database.Database;
 import edu.mayo.mprc.database.DatabaseUtilities;
+import edu.mayo.mprc.swift.commands.SwiftCommandLine;
 import edu.mayo.mprc.swift.commands.SwiftEnvironment;
 import edu.mayo.mprc.swift.db.SwiftDao;
 import edu.mayo.mprc.swift.params2.ParamsDao;
-import edu.mayo.mprc.swift.search.DatabaseValidator;
 import edu.mayo.mprc.swift.search.SwiftSearcher;
 import edu.mayo.mprc.utilities.FileUtilities;
 import org.apache.log4j.Logger;
@@ -57,8 +56,6 @@ public final class TestApplicationContext {
 		final String fastaUploadFolder = FileUtilities.createTempFolder().getAbsolutePath();
 		final String tempFolder = FileUtilities.createTempFolder().getAbsolutePath();
 
-		final DatabaseValidator validator = (DatabaseValidator) getBean("databaseValidator");
-
 		// Create a test application config with one daemon, message broker, database and searcher
 		final ApplicationConfig testConfig = new ApplicationConfig(null);
 
@@ -80,16 +77,10 @@ public final class TestApplicationContext {
 		SwiftEnvironment swiftEnvironment = (SwiftEnvironment) testContext.getBean("swiftEnvironment");
 		testConfig.setDependencyResolver(new DependencyResolver(getResourceTable()));
 		swiftEnvironment.setApplicationConfig(testConfig);
+		swiftEnvironment.setDaemonConfig(daemonConfig);
 
-
-		validator.setDaemonConfig(daemonConfig);
-		validator.setSearcherConfig(searcherConfig);
-		validator.install(
-				new ImmutableMap.Builder<String, String>()
-						.put("action", DatabaseUtilities.SchemaInitialization.CreateDrop.getValue())
-						.build());
-
-		LOGGER.info("Done setting up database.");
+		SwiftCommandLine cmdLine = new SwiftCommandLine("create-test", null, null, daemonConfig.getName(), null, null);
+		swiftEnvironment.runSwiftCommand(cmdLine);
 	}
 
 	private static Database.Config getInMemoryDatabaseConfig() {

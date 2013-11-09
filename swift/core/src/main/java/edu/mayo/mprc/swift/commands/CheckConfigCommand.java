@@ -36,7 +36,6 @@ public final class CheckConfigCommand implements SwiftCommand {
 			final DaemonConfig config = environment.getDaemonConfig();
 			FileUtilities.out("Checking configuration file: " + environment.getConfigFile().getAbsolutePath() + " for daemon " + environment.getDaemonConfig().getName());
 
-			getServiceFactory().initialize(environment.getMessageBroker().getBrokerUrl(), config.getName());
 			final Daemon daemon = environment.createDaemon(config);
 			String check = daemon.check();
 			if (check != null) {

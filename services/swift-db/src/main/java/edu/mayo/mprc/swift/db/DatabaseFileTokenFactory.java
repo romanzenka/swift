@@ -1,7 +1,10 @@
 package edu.mayo.mprc.swift.db;
 
 import edu.mayo.mprc.MprcException;
-import edu.mayo.mprc.config.*;
+import edu.mayo.mprc.config.ApplicationConfig;
+import edu.mayo.mprc.config.DaemonConfig;
+import edu.mayo.mprc.config.DaemonConfigInfo;
+import edu.mayo.mprc.config.RunningApplicationContext;
 import edu.mayo.mprc.daemon.files.FileToken;
 import edu.mayo.mprc.daemon.files.FileTokenFactory;
 import edu.mayo.mprc.database.Database;
@@ -91,12 +94,12 @@ public final class DatabaseFileTokenFactory extends FileTokenFactory {
 	 * @return Daemon that contains the database module.
 	 */
 	static DaemonConfig getDatabaseDaemonConfig(final ApplicationConfig swiftConfig) {
-		final ResourceConfig databaseResource = getDatabaseResource(swiftConfig);
+		final Database.Config databaseResource = getDatabaseResource(swiftConfig);
 		return swiftConfig.getDaemonForResource(databaseResource);
 	}
 
-	static ResourceConfig getDatabaseResource(final ApplicationConfig swiftConfig) {
-		final List<ResourceConfig> configs = swiftConfig.getModulesOfConfigType(Database.Config.class);
+	static Database.Config getDatabaseResource(final ApplicationConfig swiftConfig) {
+		final List<Database.Config> configs = swiftConfig.getModulesOfConfigType(Database.Config.class);
 		if (configs.size() > 1) {
 			throw new MprcException("Swift has more than one database defined.");
 		}

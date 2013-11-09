@@ -330,7 +330,7 @@ public final class DaemonConfig implements ResourceConfig, NamedResource {
 		return null;
 	}
 
-	public ResourceConfig firstServiceOfType(final Class<?> clazz) {
+	public ServiceConfig firstServiceOfType(final Class<?> clazz) {
 		for (final ServiceConfig serviceConfig : services) {
 			if (clazz.isAssignableFrom(serviceConfig.getRunner().getWorkerConfiguration().getClass())) {
 				return serviceConfig;

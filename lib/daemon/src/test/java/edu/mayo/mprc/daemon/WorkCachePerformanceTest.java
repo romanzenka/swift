@@ -17,6 +17,7 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import java.io.File;
+import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
@@ -41,7 +42,12 @@ public final class WorkCachePerformanceTest {
 	@BeforeClass
 	public void init() {
 		serviceFactory.setConnectionPool(connectionPool);
-		serviceFactory.initialize("vm://test?broker.useJmx=false&broker.persistent=false", "test-daemon");
+		try {
+			serviceFactory.setBrokerUri(new URI("vm://test?broker.useJmx=false&broker.persistent=false"));
+		} catch (URISyntaxException e) {
+			throw new MprcException(e);
+		}
+		serviceFactory.setDaemonName("test-daemon");
 	}
 
 	@AfterClass

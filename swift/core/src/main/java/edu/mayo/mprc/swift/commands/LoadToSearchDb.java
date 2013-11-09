@@ -2,7 +2,6 @@ package edu.mayo.mprc.swift.commands;
 
 import edu.mayo.mprc.MprcException;
 import edu.mayo.mprc.config.DaemonConfig;
-import edu.mayo.mprc.config.ResourceConfig;
 import edu.mayo.mprc.config.ServiceConfig;
 import edu.mayo.mprc.daemon.DaemonConnection;
 import edu.mayo.mprc.daemon.files.FileTokenFactory;
@@ -336,11 +335,11 @@ public final class LoadToSearchDb implements SwiftCommand {
 	}
 
 	public static SwiftSearcher.Config getSearcher(final DaemonConfig daemonConfig) {
-		final List<ResourceConfig> searchers = daemonConfig.getApplicationConfig().getModulesOfConfigType(SwiftSearcher.Config.class);
+		final List<SwiftSearcher.Config> searchers = daemonConfig.getApplicationConfig().getModulesOfConfigType(SwiftSearcher.Config.class);
 		if (searchers.size() != 1) {
 			throw new MprcException("More than one Swift Searcher defined in this Swift install");
 		}
-		return (SwiftSearcher.Config) searchers.get(0);
+		return searchers.get(0);
 	}
 
 	private void initializeConnections(final SwiftEnvironment environment, final SwiftSearcher.Config config) {

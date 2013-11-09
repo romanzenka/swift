@@ -2,6 +2,8 @@ package edu.mayo.mprc.messaging;
 
 import com.google.common.base.Strings;
 import edu.mayo.mprc.MprcException;
+import edu.mayo.mprc.config.RunningApplicationContext;
+import edu.mayo.mprc.daemon.MessageBroker;
 import org.apache.log4j.Logger;
 
 import javax.jms.*;
@@ -12,35 +14,19 @@ import java.net.URISyntaxException;
 
 /**
  * Returns a service using a queue of a given name.
- * All services need to be queued using a single JMS connection that has to be initialized by calling
- * {@link #initialize}.
  */
 public final class ServiceFactory implements Closeable {
 	private static final Logger LOGGER = Logger.getLogger(ServiceFactory.class);
 
 	private URI brokerUri;
+	private String daemonName;
+
 	private ActiveMQConnectionPool connectionPool;
 	private Connection connection;
 	private ResponseDispatcher responseDispatcher;
-	private String daemonName;
+	private RunningApplicationContext context;
 
 	public ServiceFactory() {
-	}
-
-	/**
-	 * Give the service factory the name of the daemon we operate within, so the response queue can
-	 * be properly established.
-	 *
-	 * @param daemonName There should be a single response queue per daemon, it is named using the daemon's name.
-	 */
-	public void initialize(final String brokerUriString, final String daemonName) {
-		try {
-			brokerUri = new URI(brokerUriString);
-		} catch (URISyntaxException e) {
-			throw new MprcException("Invalid broker URI", e);
-		}
-
-		this.daemonName = daemonName;
 	}
 
 	/**
@@ -48,11 +34,11 @@ public final class ServiceFactory implements Closeable {
 	 */
 	private void startup() {
 		if (connection == null) {
-			final UserInfo info = extractJmsUserinfo(brokerUri);
-			connection = getConnectionPool().getConnectionToBroker(brokerUri, info.getUserName(), info.getPassword());
+			final UserInfo info = extractJmsUserinfo(getBrokerUri());
+			connection = getConnectionPool().getConnectionToBroker(getBrokerUri(), info.getUserName(), info.getPassword());
 		}
-		if (responseDispatcher == null && daemonName != null) {
-			responseDispatcher = new ResponseDispatcher(connection, daemonName);
+		if (responseDispatcher == null && getDaemonName() != null) {
+			responseDispatcher = new ResponseDispatcher(connection, getDaemonName());
 		}
 	}
 
@@ -98,8 +84,46 @@ public final class ServiceFactory implements Closeable {
 		this.connectionPool = connectionPool;
 	}
 
+	public RunningApplicationContext getContext() {
+		return context;
+	}
+
+	public void setContext(final RunningApplicationContext context) {
+		this.context = context;
+	}
+
+	public String getDaemonName() {
+		if (daemonName == null && context != null) {
+			daemonName = context.getDaemonConfig().getName();
+		}
+		return daemonName;
+	}
+
+	public void setDaemonName(String daemonName) {
+		this.daemonName = daemonName;
+	}
+
+	public URI getBrokerUri() {
+		if (brokerUri == null && context != null) {
+			MessageBroker.Config config = context.getSingletonConfig(MessageBroker.Config.class);
+			if (config == null) {
+				throw new MprcException("The application does not define a message broker");
+			}
+			try {
+				brokerUri = new URI(config.getBrokerUrl());
+			} catch (URISyntaxException e) {
+				throw new MprcException("The broker URI is in invalid format: " + config.getBrokerUrl(), e);
+			}
+		}
+		return brokerUri;
+	}
+
+	public void setBrokerUri(URI brokerUri) {
+		this.brokerUri = brokerUri;
+	}
+
 	public SerializedRequest serializeRequest(final Serializable message, final ResponseListener listener) {
-		return new SerializedRequest(brokerUri.toString(), getResponseDispatcher().getResponseQueueName(), message, getResponseDispatcher().registerMessageListener(listener));
+		return new SerializedRequest(getResponseDispatcher().getResponseQueueName(), message, getResponseDispatcher().registerMessageListener(listener));
 	}
 
 	public Request deserializeRequest(final SerializedRequest serializedRequest) {

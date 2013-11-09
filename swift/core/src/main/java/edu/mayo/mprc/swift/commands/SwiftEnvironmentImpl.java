@@ -157,6 +157,10 @@ public final class SwiftEnvironmentImpl implements SwiftEnvironment, Application
 		this.swiftFactory = swiftFactory;
 	}
 
+	public void setDaemonConfig(DaemonConfig daemonConfig) {
+		this.daemonConfig = daemonConfig;
+	}
+
 	@Override
 	public DaemonConfig getDaemonConfig() {
 		if (daemonConfig == null) {
@@ -194,31 +198,31 @@ public final class SwiftEnvironmentImpl implements SwiftEnvironment, Application
 	}
 
 	@Override
-	public ResourceConfig getSingletonConfig(final Class clazz) {
-		final List<ResourceConfig> matchingConfigs = new ArrayList<ResourceConfig>(2);
+	public <T extends ResourceConfig> T getSingletonConfig(final Class<T> clazz) {
+		final List<T> matchingConfigs = new ArrayList<T>(2);
 		addMatchingToList(clazz, getDaemonConfig().getResources(), matchingConfigs);
 		addMatchingToList(clazz, getDaemonConfig().getServices(), matchingConfigs);
 
-		final ResourceConfig singleMatchingResource = getSingleMatchingResource(clazz, matchingConfigs);
+		final T singleMatchingResource = getSingleMatchingResource(clazz, matchingConfigs);
 		if (singleMatchingResource != null) {
 			return singleMatchingResource;
 		}
 		return getSingleMatchingResource(clazz, getApplicationConfig().getModulesOfConfigType(clazz));
 	}
 
-	private void addMatchingToList(final Class clazz, final List<? extends ResourceConfig> resources, final List<ResourceConfig> matchingConfigs) {
+	private <T extends ResourceConfig> void addMatchingToList(final Class<T> clazz, final List<? extends ResourceConfig> resources, final List<T> matchingConfigs) {
 		for (final ResourceConfig resource : resources) {
 			if (clazz.isInstance(resource)) {
-				matchingConfigs.add(resource);
+				matchingConfigs.add((T) resource);
 			}
 		}
 	}
 
-	private ResourceConfig getSingleMatchingResource(final Class clazz, final List<ResourceConfig> modulesOfConfigType) {
+	private <T extends ResourceConfig> T getSingleMatchingResource(final Class<T> clazz, final List<T> modulesOfConfigType) {
 		if (modulesOfConfigType.size() > 1) {
 			throw new MprcException("There is more than one resource of type " + clazz.getName() + " defined");
 		}
-		if (modulesOfConfigType.size() == 0) {
+		if (modulesOfConfigType.isEmpty()) {
 			return null;
 		}
 		return modulesOfConfigType.get(0);
@@ -247,11 +251,11 @@ public final class SwiftEnvironmentImpl implements SwiftEnvironment, Application
 
 	@Override
 	public SwiftSearcher.Config getSwiftSearcher() {
-		final List<ResourceConfig> searchers = getDaemonConfig().getApplicationConfig().getModulesOfConfigType(SwiftSearcher.Config.class);
+		final List<SwiftSearcher.Config> searchers = getDaemonConfig().getApplicationConfig().getModulesOfConfigType(SwiftSearcher.Config.class);
 		if (searchers.size() != 1) {
 			throw new MprcException("More than one Swift Searcher defined in this Swift install");
 		}
-		return (SwiftSearcher.Config) searchers.get(0);
+		return searchers.get(0);
 	}
 
 	@Override
@@ -260,11 +264,11 @@ public final class SwiftEnvironmentImpl implements SwiftEnvironment, Application
 	}
 
 	public static MessageBroker.Config getMessageBroker(final DaemonConfig daemonConfig) {
-		final List<ResourceConfig> brokers = daemonConfig.getApplicationConfig().getModulesOfConfigType(MessageBroker.Config.class);
+		final List<MessageBroker.Config> brokers = daemonConfig.getApplicationConfig().getModulesOfConfigType(MessageBroker.Config.class);
 		if (brokers.size() != 1) {
 			throw new MprcException("More than one message broker defined in this Swift install");
 		}
-		return (MessageBroker.Config) brokers.get(0);
+		return brokers.get(0);
 	}
 
 	@Override

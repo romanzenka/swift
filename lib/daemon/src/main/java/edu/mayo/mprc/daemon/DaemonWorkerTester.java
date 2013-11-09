@@ -12,6 +12,8 @@ import edu.mayo.mprc.utilities.progress.ProgressListener;
 import org.apache.log4j.Logger;
 
 import java.io.Closeable;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -29,7 +31,12 @@ public final class DaemonWorkerTester implements Closeable {
 	private DaemonWorkerTester() {
 		serviceFactory = new ServiceFactory();
 		serviceFactory.setConnectionPool(new ActiveMQConnectionPool());
-		serviceFactory.initialize("vm://broker1?broker.useJmx=false&broker.persistent=false", "test-daemon");
+		try {
+			serviceFactory.setBrokerUri(new URI("vm://broker1?broker.useJmx=false&broker.persistent=false"));
+		} catch (URISyntaxException e) {
+			throw new MprcException(e);
+		}
+		serviceFactory.setDaemonName("test-daemon");
 	}
 
 	/**
