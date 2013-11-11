@@ -6,6 +6,7 @@ import org.testng.annotations.Test;
 /**
  * @author Roman Zenka
  */
+@Test(sequential = true)
 public final class TestThreadPoolExecutor {
 	@Test
 	public void shouldBlock() throws InterruptedException {
