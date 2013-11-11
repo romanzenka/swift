@@ -134,20 +134,24 @@ public final class ServiceFactory implements Lifecycle {
 
 	@Override
 	public void start() {
-		if (connection == null) {
-			final UserInfo info = extractJmsUserinfo(getBrokerUri());
-			connection = getConnectionPool().getConnectionToBroker(getBrokerUri(), info.getUserName(), info.getPassword());
-		}
-		if (responseDispatcher == null && getDaemonName() != null) {
-			responseDispatcher = new ResponseDispatcher(connection, getDaemonName());
+		if (!isRunning()) {
+			if (connection == null) {
+				final UserInfo info = extractJmsUserinfo(getBrokerUri());
+				connection = getConnectionPool().getConnectionToBroker(getBrokerUri(), info.getUserName(), info.getPassword());
+			}
+			if (responseDispatcher == null && getDaemonName() != null) {
+				responseDispatcher = new ResponseDispatcher(connection, getDaemonName());
+			}
 		}
 	}
 
 	@Override
 	public void stop() {
-		getResponseDispatcher().close();
-		connectionPool.close();
-		connectionPool = null;
+		if (isRunning()) {
+			getResponseDispatcher().close();
+			connectionPool.close();
+			connectionPool = null;
+		}
 	}
 
 	private static class DeserializedRequest implements Request {

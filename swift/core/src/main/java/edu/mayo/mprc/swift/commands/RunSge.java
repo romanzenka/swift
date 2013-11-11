@@ -50,8 +50,7 @@ public class RunSge implements SwiftCommand, Lifecycle {
 	@Override
 	public ExitCode run(final SwiftEnvironment environment) {
 		final String xmlConfigFilePath = environment.getParameters().get(0);
-		run(new File(xmlConfigFilePath));
-		return ExitCode.Ok;
+		return run(new File(xmlConfigFilePath));
 	}
 
 	/**
