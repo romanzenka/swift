@@ -384,7 +384,6 @@ public class ConfigurationData {
 	public void loadDefaultConfig() throws GWTServiceException {
 		config.clear();
 		final DaemonConfig daemonConfig = createDaemonConfig("main", true);
-		config.addDaemon(daemonConfig);
 
 		final Database.Config database = (Database.Config) createResourceConfig(1, Database.Factory.TYPE, daemonConfig);
 		createResourceConfig(1, MessageBroker.TYPE, daemonConfig);

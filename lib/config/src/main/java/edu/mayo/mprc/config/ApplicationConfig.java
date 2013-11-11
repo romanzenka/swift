@@ -42,6 +42,11 @@ public final class ApplicationConfig implements ResourceConfig {
 	}
 
 	public ApplicationConfig addDaemon(final DaemonConfig daemon) {
+		for (DaemonConfig config : daemons) {
+			if (config.equals(daemon)) {
+				throw new MprcException("You cannot add the same daemon configuration twice to one application");
+			}
+		}
 		daemons.add(daemon);
 		daemon.setApplicationConfig(this);
 		return this;
