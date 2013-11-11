@@ -5,6 +5,9 @@ import edu.mayo.mprc.daemon.MessageBroker;
 import org.apache.log4j.Logger;
 import org.testng.annotations.AfterClass;
 
+import java.net.URI;
+import java.net.URISyntaxException;
+
 public abstract class MessagingTestBase {
 	private static final Logger LOGGER = Logger.getLogger(MessagingTestBase.class);
 	private static final String TEST_QUEUE_NAME = "test_queue";
@@ -33,6 +36,11 @@ public abstract class MessagingTestBase {
 		serviceFactory = new ServiceFactory();
 		serviceFactory.setConnectionPool(new ActiveMQConnectionPool());
 		serviceFactory.setDaemonName("test-messaging-daemon");
+		try {
+			serviceFactory.setBrokerUri(new URI(BROKER));
+		} catch (URISyntaxException e) {
+			throw new MprcException(e);
+		}
 		serviceFactory.start();
 
 		try {
