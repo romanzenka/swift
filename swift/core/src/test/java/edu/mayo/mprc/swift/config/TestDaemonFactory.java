@@ -67,7 +67,6 @@ public final class TestDaemonFactory {
 
 	@Test
 	public void shouldCreateDaemon() {
-		final ApplicationConfig config = createSwiftConfig();
 		final Daemon daemon = (Daemon) table.create(config.getDaemonConfig("main"), new DependencyResolver(table));
 		daemon.start();
 		daemon.stop();
@@ -75,7 +74,6 @@ public final class TestDaemonFactory {
 
 	@Test
 	public void shouldSaveDir() {
-		final ApplicationConfig config = createSwiftConfig();
 		String result = configToString(config);
 
 		Assert.assertEquals(
@@ -268,6 +266,8 @@ public final class TestDaemonFactory {
 		main.addResource(webUi);
 
 		final MessageBroker.Config brokerConfig = MessageBroker.Config.getEmbeddedBroker();
+		brokerConfig.setEmbedded("true");
+		brokerConfig.setEmbeddedBrokerUrl("vm://broker2");
 		main.addResource(brokerConfig);
 
 		config.addDaemon(main);

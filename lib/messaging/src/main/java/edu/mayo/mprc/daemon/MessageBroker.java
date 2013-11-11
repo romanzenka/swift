@@ -205,8 +205,16 @@ public final class MessageBroker implements Lifecycle {
 			this.brokerUrl = brokerUrl;
 		}
 
+		public void setEmbeddedBrokerUrl(final String embeddedBrokerUrl) {
+			this.embeddedBrokerUrl = embeddedBrokerUrl;
+		}
+
 		public String getEmbeddedBrokerUrl() {
 			return embeddedBrokerUrl;
+		}
+
+		public void setEmbedded(String embedded) {
+			this.embedded = embedded;
 		}
 
 		public String getEmbedded() {
