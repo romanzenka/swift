@@ -7,6 +7,7 @@ import edu.mayo.mprc.daemon.Daemon;
 import edu.mayo.mprc.daemon.DaemonConnection;
 import edu.mayo.mprc.daemon.MessageBroker;
 import edu.mayo.mprc.swift.ExitCode;
+import edu.mayo.mprc.swift.ResourceTable;
 import edu.mayo.mprc.swift.SwiftConfig;
 import edu.mayo.mprc.swift.db.DatabaseFileTokenFactory;
 import edu.mayo.mprc.swift.search.SwiftSearcher;
@@ -32,7 +33,7 @@ public final class SwiftEnvironmentImpl implements SwiftEnvironment, Application
 	public static final String COMMAND_SUFFIX = "-command";
 	private DatabaseFileTokenFactory fileTokenFactory;
 	private Daemon.Factory daemonFactory;
-	private MultiFactory swiftFactory;
+	private ResourceTable swiftFactory;
 
 	private ApplicationConfig applicationConfig;
 	private DaemonConfig daemonConfig;
@@ -84,6 +85,11 @@ public final class SwiftEnvironmentImpl implements SwiftEnvironment, Application
 		}
 
 		configFile = commandLine.getInstallFile();
+
+		// We initialize the environment on demand before we run the command
+		if (!isRunning()) {
+			start();
+		}
 
 		return command.run(this);
 	}
@@ -153,7 +159,7 @@ public final class SwiftEnvironmentImpl implements SwiftEnvironment, Application
 	}
 
 	@Resource(name = "resourceTable")
-	public void setSwiftFactory(final MultiFactory swiftFactory) {
+	public void setSwiftFactory(final ResourceTable swiftFactory) {
 		this.swiftFactory = swiftFactory;
 	}
 
@@ -279,5 +285,24 @@ public final class SwiftEnvironmentImpl implements SwiftEnvironment, Application
 	@Override
 	public void setApplicationContext(final ApplicationContext applicationContext) throws BeansException {
 		this.applicationContext = applicationContext;
+	}
+
+	@Override
+	public boolean isRunning() {
+		return getDaemonFactory().isRunning();
+	}
+
+	@Override
+	public void start() {
+		if (!isRunning()) {
+			getDaemonFactory().start();
+		}
+	}
+
+	@Override
+	public void stop() {
+		if (isRunning()) {
+			getDaemonFactory().stop();
+		}
 	}
 }

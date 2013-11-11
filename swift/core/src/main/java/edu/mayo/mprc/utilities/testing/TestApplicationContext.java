@@ -60,6 +60,7 @@ public final class TestApplicationContext implements Lifecycle {
 		if (daemon != null) {
 			daemon.stop();
 		}
+		swiftEnvironment.stop();
 	}
 
 	private void initialize(final Database.Config databaseConfig) {

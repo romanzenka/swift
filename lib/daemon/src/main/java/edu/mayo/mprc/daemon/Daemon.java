@@ -10,6 +10,7 @@ import edu.mayo.mprc.utilities.exceptions.CompositeException;
 import org.apache.log4j.Logger;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.Resource;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -103,14 +104,14 @@ public final class Daemon implements Checkable, Installable {
 		final CompositeException exception = new CompositeException();
 		for (final Object resource : resources) {
 			if (resource instanceof Checkable) {
-				String check = ((Checkable) resource).check();
+				final String check = ((Checkable) resource).check();
 				if (check != null) {
 					exception.addCause(new Exception(check));
 				}
 			}
 		}
 		for (final AbstractRunner runner : runners) {
-			String check = runner.check();
+			final String check = runner.check();
 			if (check != null) {
 				exception.addCause(new Exception(check));
 			}
@@ -148,11 +149,11 @@ public final class Daemon implements Checkable, Installable {
 		return runners;
 	}
 
-	public void setRunners(List<AbstractRunner> runners) {
+	public void setRunners(final List<AbstractRunner> runners) {
 		this.runners = runners;
 	}
 
-	public void setResources(List<Object> resources) {
+	public void setResources(final List<Object> resources) {
 		this.resources = resources;
 	}
 
@@ -160,7 +161,7 @@ public final class Daemon implements Checkable, Installable {
 		return sharedFileSpace;
 	}
 
-	public void setSharedFileSpace(File sharedFileSpace) {
+	public void setSharedFileSpace(final File sharedFileSpace) {
 		this.sharedFileSpace = sharedFileSpace;
 	}
 
@@ -168,7 +169,7 @@ public final class Daemon implements Checkable, Installable {
 		return tempFolder;
 	}
 
-	public void setTempFolder(File tempFolder) {
+	public void setTempFolder(final File tempFolder) {
 		this.tempFolder = tempFolder;
 	}
 
@@ -176,7 +177,7 @@ public final class Daemon implements Checkable, Installable {
 		return dumpErrors;
 	}
 
-	public void setDumpErrors(boolean dumpErrors) {
+	public void setDumpErrors(final boolean dumpErrors) {
 		this.dumpErrors = dumpErrors;
 	}
 
@@ -184,7 +185,7 @@ public final class Daemon implements Checkable, Installable {
 		return dumpFolder;
 	}
 
-	public void setDumpFolder(File dumpFolder) {
+	public void setDumpFolder(final File dumpFolder) {
 		this.dumpFolder = dumpFolder;
 	}
 
@@ -192,7 +193,7 @@ public final class Daemon implements Checkable, Installable {
 		return logOutputFolder;
 	}
 
-	public void setLogOutputFolder(File logOutputFolder) {
+	public void setLogOutputFolder(final File logOutputFolder) {
 		this.logOutputFolder = logOutputFolder;
 	}
 
@@ -200,7 +201,12 @@ public final class Daemon implements Checkable, Installable {
 	 * Runs a daemon from its config.
 	 */
 	@Component("daemonFactory")
-	public static final class Factory extends FactoryBase<DaemonConfig, Daemon> implements FactoryDescriptor {
+	public static final class Factory extends FactoryBase<DaemonConfig, Daemon> implements FactoryDescriptor, Lifecycle {
+		/**
+		 * We need a link to this factory because it needs to be initialized before we run.
+		 */
+		private DaemonConnectionFactory daemonConnectionFactory;
+
 		private void addResourcesToList(final List<Object> resources, final List<ResourceConfig> configs, final DependencyResolver dependencies) {
 			Collections.sort(configs, new ResourceConfigComparator());
 			for (final ResourceConfig resourceConfig : configs) {
@@ -258,8 +264,8 @@ public final class Daemon implements Checkable, Installable {
 		}
 
 		@Override
-		public Daemon create(DaemonConfig config, DependencyResolver dependencies) {
-			Daemon daemon = new Daemon();
+		public Daemon create(final DaemonConfig config, final DependencyResolver dependencies) {
+			final Daemon daemon = new Daemon();
 			daemon.setDumpErrors(config.isDumpErrors());
 			daemon.setDumpFolder(config.getDumpFolderPath() == null ? null : new File(config.getDumpFolderPath()));
 			if (config.getLogOutputFolder() == null) {
@@ -287,6 +293,34 @@ public final class Daemon implements Checkable, Installable {
 			}
 			daemon.setRunners(runners);
 			return daemon;
+		}
+
+		public DaemonConnectionFactory getDaemonConnectionFactory() {
+			return daemonConnectionFactory;
+		}
+
+		@Resource(name = "daemonConnectionFactory")
+		public void setDaemonConnectionFactory(final DaemonConnectionFactory daemonConnectionFactory) {
+			this.daemonConnectionFactory = daemonConnectionFactory;
+		}
+
+		@Override
+		public boolean isRunning() {
+			return getDaemonConnectionFactory().isRunning();
+		}
+
+		@Override
+		public void start() {
+			if (!isRunning()) {
+				getDaemonConnectionFactory().start();
+			}
+		}
+
+		@Override
+		public void stop() {
+			if (isRunning()) {
+				getDaemonConnectionFactory().stop();
+			}
 		}
 	}
 }

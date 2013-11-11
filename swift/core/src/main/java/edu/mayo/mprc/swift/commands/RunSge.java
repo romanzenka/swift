@@ -5,6 +5,7 @@ import com.thoughtworks.xstream.io.xml.DomDriver;
 import edu.mayo.mprc.MprcException;
 import edu.mayo.mprc.ReleaseInfoCore;
 import edu.mayo.mprc.config.DependencyResolver;
+import edu.mayo.mprc.config.Lifecycle;
 import edu.mayo.mprc.daemon.DaemonProgress;
 import edu.mayo.mprc.daemon.DaemonProgressMessage;
 import edu.mayo.mprc.daemon.WorkPacket;
@@ -34,7 +35,7 @@ import java.net.UnknownHostException;
  * @author Roman Zenka
  */
 @Component("sge-command")
-public class RunSge implements SwiftCommand {
+public class RunSge implements SwiftCommand, Lifecycle {
 	private static final Logger LOGGER = Logger.getLogger(RunSge.class);
 	public static final String COMMAND = "sge";
 
@@ -80,6 +81,9 @@ public class RunSge implements SwiftCommand {
 			fileInputStream = new FileInputStream(workPacketXmlFile);
 
 			sgePacket = (SgePacket) xStream.fromXML(fileInputStream);
+
+			start();
+
 			request = serviceFactory.deserializeRequest(sgePacket.getSerializedRequest());
 
 			//If the work packet is an instance of a FileTokenHolder, set the the FileTokenFactory on it. The FileTokenFactory object
@@ -114,6 +118,7 @@ public class RunSge implements SwiftCommand {
 					// SWALLOWED
 				}
 			}
+			stop();
 		}
 
 		LOGGER.info("Work packet " + sgePacket.getWorkPacket().toString() + " successfully processed.");
@@ -140,6 +145,25 @@ public class RunSge implements SwiftCommand {
 
 	private static void reportProgress(final Request request, final Serializable serializable) {
 		request.sendResponse(serializable, false);
+	}
+
+	@Override
+	public boolean isRunning() {
+		return serviceFactory.isRunning();
+	}
+
+	@Override
+	public void start() {
+		if (!isRunning()) {
+			serviceFactory.start();
+		}
+	}
+
+	@Override
+	public void stop() {
+		if (isRunning()) {
+			serviceFactory.stop();
+		}
 	}
 
 	class DaemonWorkerProgressReporter implements ProgressReporter {

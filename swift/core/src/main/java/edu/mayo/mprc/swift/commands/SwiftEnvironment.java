@@ -18,7 +18,7 @@ import java.util.List;
  *
  * @author Roman Zenka
  */
-public interface SwiftEnvironment extends RunningApplicationContext {
+public interface SwiftEnvironment extends RunningApplicationContext, Lifecycle {
 	/**
 	 * Runs a Swift command within the Swift environment. The environment changes based on the
 	 * command line provided (e.g. current daemon config is set, {@link edu.mayo.mprc.daemon.files.FileTokenFactory} is set up for it etc.

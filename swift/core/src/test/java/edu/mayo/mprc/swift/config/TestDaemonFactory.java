@@ -56,6 +56,7 @@ public final class TestDaemonFactory {
 		config = createSwiftConfig();
 
 		context = new TestApplicationContext();
+		context.start();
 		table = context.getResourceTable();
 	}
 

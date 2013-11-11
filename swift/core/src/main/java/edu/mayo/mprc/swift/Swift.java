@@ -54,7 +54,8 @@ public final class Swift {
 		} catch (Exception e) {
 			LOGGER.error(MprcException.getDetailedMessage(e));
 			return ExitCode.Error;
+		} finally {
+			swiftEnvironment.stop();
 		}
 	}
-
 }

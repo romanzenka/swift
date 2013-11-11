@@ -1,5 +1,6 @@
 package edu.mayo.mprc.daemon;
 
+import edu.mayo.mprc.MprcException;
 import edu.mayo.mprc.config.*;
 import edu.mayo.mprc.config.ui.ServiceUiFactory;
 import edu.mayo.mprc.daemon.files.FileTokenFactory;
@@ -11,9 +12,10 @@ import edu.mayo.mprc.messaging.ServiceFactory;
  * Knows which daemon it is a part of.
  * Capable of creating either the receiving or the sending end for a service of a given id.
  */
-public final class DaemonConnectionFactory extends FactoryBase<ServiceConfig, DaemonConnection> implements FactoryDescriptor {
+public final class DaemonConnectionFactory extends FactoryBase<ServiceConfig, DaemonConnection> implements FactoryDescriptor, Lifecycle {
 	private FileTokenFactory fileTokenFactory;
 	private ServiceFactory serviceFactory;
+	private boolean running;
 
 	public FileTokenFactory getFileTokenFactory() {
 		return fileTokenFactory;
@@ -33,6 +35,9 @@ public final class DaemonConnectionFactory extends FactoryBase<ServiceConfig, Da
 
 	@Override
 	public DaemonConnection create(final ServiceConfig config, final DependencyResolver dependencies) {
+		if (!isRunning()) {
+			throw new MprcException("The daemon connection factory has to be started before it gets used");
+		}
 		// The creation of the daemon connection depends on a message broker being present
 		final ServiceFactory factory = getServiceFactory();
 		final Service service = factory.createService(config.getName());
@@ -62,5 +67,26 @@ public final class DaemonConnectionFactory extends FactoryBase<ServiceConfig, Da
 	@Override
 	public ServiceUiFactory getServiceUiFactory() {
 		return null;
+	}
+
+	@Override
+	public boolean isRunning() {
+		return running;
+	}
+
+	@Override
+	public void start() {
+		if (!isRunning()) {
+			running = true;
+			serviceFactory.start();
+		}
+	}
+
+	@Override
+	public void stop() {
+		if (isRunning()) {
+			serviceFactory.stop();
+			running = false;
+		}
 	}
 }
