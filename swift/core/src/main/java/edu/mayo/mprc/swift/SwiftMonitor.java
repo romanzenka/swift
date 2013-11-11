@@ -24,7 +24,7 @@ import java.util.concurrent.TimeUnit;
  *
  * @author Roman Zenka
  */
-public final class SwiftMonitor implements Runnable {
+public final class SwiftMonitor implements Runnable, Lifecycle {
 	/**
 	 * Guarded by {@link #connectionsLock}
 	 */
@@ -44,16 +44,13 @@ public final class SwiftMonitor implements Runnable {
 		if (app == null) {
 			return;
 		}
-		synchronized (connectionsLock) {
-			monitoredConnections.clear();
-			pingListeners.clear();
-			for (final DaemonConfig daemonConfig : app.getDaemons()) {
-				final ServiceConfig pingServiceConfig = PingDaemonWorker.getPingServiceConfig(daemonConfig);
-				if (pingServiceConfig != null) {
-					final DaemonConnection daemonConnection = (DaemonConnection) getFactory().createSingleton(pingServiceConfig, app.getDependencyResolver());
-					monitoredConnections.put(daemonConnection, new DaemonStatus("No response yet"));
-					pingListeners.put(daemonConnection, new PingListener(daemonConnection));
-				}
+		clear();
+		for (final DaemonConfig daemonConfig : app.getDaemons()) {
+			final ServiceConfig pingServiceConfig = PingDaemonWorker.getPingServiceConfig(daemonConfig);
+			if (pingServiceConfig != null) {
+				final DaemonConnection daemonConnection = (DaemonConnection) getFactory().createSingleton(pingServiceConfig, app.getDependencyResolver());
+				monitoredConnections.put(daemonConnection, new DaemonStatus("No response yet"));
+				pingListeners.put(daemonConnection, new PingListener(daemonConnection));
 			}
 		}
 	}
@@ -61,20 +58,37 @@ public final class SwiftMonitor implements Runnable {
 	/**
 	 * Start monitoring Swift.
 	 */
+	@Override
 	public void start() {
-		initialize(context.getApplicationConfig());
-		if (scheduler == null) {
-			scheduler = Executors.newScheduledThreadPool(1);
-			scheduler.scheduleAtFixedRate(this, MONITOR_PERIOD_SECONDS, MONITOR_PERIOD_SECONDS, TimeUnit.SECONDS);
+		synchronized (connectionsLock) {
+			if (!isRunning()) {
+				initialize(context.getApplicationConfig());
+				if (scheduler == null) {
+					scheduler = Executors.newScheduledThreadPool(1);
+					scheduler.scheduleAtFixedRate(this, MONITOR_PERIOD_SECONDS, MONITOR_PERIOD_SECONDS, TimeUnit.SECONDS);
+				}
+			}
 		}
 	}
 
 	/**
 	 * Stop monitoring Swift.
 	 */
+	@Override
 	public void stop() {
-		if (scheduler != null) {
-			scheduler.shutdown();
+		synchronized (connectionsLock) {
+			if (scheduler != null) {
+				clear();
+				scheduler.shutdown();
+				scheduler = null;
+			}
+		}
+	}
+
+	@Override
+	public boolean isRunning() {
+		synchronized (connectionsLock) {
+			return scheduler != null;
 		}
 	}
 
@@ -86,6 +100,11 @@ public final class SwiftMonitor implements Runnable {
 		for (final DaemonConnection connection : copy) {
 			connection.sendWork(new PingWorkPacket(), pingListeners.get(connection));
 		}
+	}
+
+	private void clear() {
+		monitoredConnections.clear();
+		pingListeners.clear();
 	}
 
 	/**

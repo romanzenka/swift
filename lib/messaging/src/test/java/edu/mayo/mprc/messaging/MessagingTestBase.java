@@ -1,15 +1,14 @@
 package edu.mayo.mprc.messaging;
 
 import edu.mayo.mprc.MprcException;
+import edu.mayo.mprc.daemon.MessageBroker;
 import org.apache.log4j.Logger;
 import org.testng.annotations.AfterClass;
-
-import java.net.URI;
 
 public abstract class MessagingTestBase {
 	private static final Logger LOGGER = Logger.getLogger(MessagingTestBase.class);
 	private static final String TEST_QUEUE_NAME = "test_queue";
-	protected JmsBrokerThread broker;
+	protected MessageBroker broker;
 	protected Service service;
 	protected ServiceFactory serviceFactory;
 
@@ -25,12 +24,12 @@ public abstract class MessagingTestBase {
 			return;
 		}
 		// Start a local, vm-only broker with no port.
-		final URI brokerUri = JmsBrokerThread.getVmUri();
-		broker = new JmsBrokerThread(brokerUri, null);
+		broker = new MessageBroker();
+		broker.setBrokerUrl("vm://broker");
+
 
 		serviceFactory = new ServiceFactory();
 		serviceFactory.setConnectionPool(new ActiveMQConnectionPool());
-		serviceFactory.setBrokerUri(brokerUri);
 		serviceFactory.setDaemonName("test-messaging-daemon");
 
 		try {
@@ -48,7 +47,7 @@ public abstract class MessagingTestBase {
 		}
 		if (broker != null) {
 			LOGGER.debug("Stopping JMS broker");
-			broker.stopBroker();
+			broker.stop();
 			broker = null;
 			LOGGER.debug("JMS Broker stopped -------------");
 		}

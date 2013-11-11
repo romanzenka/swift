@@ -2,10 +2,10 @@ package edu.mayo.mprc.sge;
 
 import com.google.common.base.Strings;
 import edu.mayo.mprc.MprcException;
+import edu.mayo.mprc.config.Lifecycle;
 import org.apache.log4j.Logger;
 import org.ggf.drmaa.*;
 
-import java.io.Closeable;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.HashMap;
@@ -16,7 +16,7 @@ import java.util.concurrent.Semaphore;
 /**
  * this supports submission and handling of results for grid engine jobs
  */
-public final class GridEngineJobManager implements Closeable {
+public final class GridEngineJobManager implements Lifecycle {
 	private static final Logger LOGGER = Logger.getLogger(GridEngineJobManager.class);
 
 	private static final String QUEUE_SPEC_OPTION = "-q";
@@ -34,38 +34,53 @@ public final class GridEngineJobManager implements Closeable {
 	public GridEngineJobManager() {
 	}
 
+	@Override
+	public boolean isRunning() {
+		synchronized (this) {
+			return gridEngineSession != null;
+		}
+	}
+
 	/**
 	 * You can call this method repeatedly, once it succeeds, it does nothing.
 	 */
-	public synchronized void initialize() {
-		if (gridEngineSession == null) {
-			try {
-				final SessionFactory factory = SessionFactory.getFactory();
-				gridEngineSession = factory.getSession();
-				gridEngineSession.init(null);
-				initializeListenerThread();
-			} catch (Error error) {
-				gridEngineSession = null;
-				throw new MprcException("Sun Grid Engine not available, the DRMAA library is probably missing", error);
-			} catch (Exception e) {
-				gridEngineSession = null;
-				throw new MprcException("Sun Grid Engine not available, DRMAA library initialization failed", e);
+	@Override
+	public void start() {
+		synchronized (this) {
+			if (!isRunning()) {
+				try {
+					final SessionFactory factory = SessionFactory.getFactory();
+					gridEngineSession = factory.getSession();
+					gridEngineSession.init(null);
+					initializeListenerThread();
+				} catch (Error error) {
+					gridEngineSession = null;
+					throw new MprcException("Sun Grid Engine not available, the DRMAA library is probably missing", error);
+				} catch (Exception e) {
+					gridEngineSession = null;
+					throw new MprcException("Sun Grid Engine not available, DRMAA library initialization failed", e);
+				}
 			}
 		}
 	}
 
-	private synchronized Session getGridEngineSession() {
-		return gridEngineSession;
+	private Session getGridEngineSession() {
+		synchronized (this) {
+			return gridEngineSession;
+		}
 	}
 
 	@Override
-	public void close() {
-		if (getGridEngineSession() != null) {
-			try {
-				getGridEngineSession().exit();
-			} catch (DrmaaException ignore) {
-				// SWALLOWED: We do not care, there is no real reporting of drmaa failing in finalizer anyway
-				LOGGER.debug("session already released", ignore);
+	public void stop() {
+		synchronized (this) {
+			if (isRunning()) {
+				try {
+					getGridEngineSession().exit();
+					gridEngineSession = null;
+				} catch (DrmaaException ignore) {
+					// SWALLOWED: We do not care, there is no real reporting of drmaa failing in finalizer anyway
+					LOGGER.debug("session already released", ignore);
+				}
 			}
 		}
 	}
@@ -126,8 +141,6 @@ public final class GridEngineJobManager implements Closeable {
 	 * @return id of SGE assigned job id.
 	 */
 	public String passToGridEngine(final GridWorkPacket pgridPacket) {
-		initialize();
-
 		final GridEngineWorkPacket pPacket = new GridEngineWorkPacket(pgridPacket);
 
 		final String taskString = pPacket.getApplicationName() + " " + getApplicationCallParameters(pPacket);

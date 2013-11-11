@@ -14,7 +14,6 @@ import org.apache.log4j.Logger;
 import javax.jms.Connection;
 import javax.jms.ConnectionFactory;
 import javax.jms.JMSException;
-import java.io.Closeable;
 import java.io.IOException;
 
 /**
@@ -23,14 +22,13 @@ import java.io.IOException;
  * The broker is being set as non-persistent so we do not have to deal with the broker creating temporary
  * files. If the user wants permanent broker, they can install standalone ActiveMQ and configure it separately.
  */
-public final class MessageBroker implements Closeable {
+public final class MessageBroker implements Lifecycle {
 	private static final Logger LOGGER = Logger.getLogger(MessageBroker.class);
 	public static final String TYPE = "messageBroker";
 	public static final String NAME = "Message Broker";
 	public static final String DESC = "Daemons need a JMS (Java Messaging Service) message broker to communicate with each other. The broker can be external or embedded within Swift. It is enough for one of the daemons to define access to the broker. All other daemons then connect to it using the URI you configure.</p><p>A more robust alternative is to use an external broker. Swift was tested with Apache ActiveMQ 5.2.0, which can be obtained at <a href=\"http://activemq.apache.org/\">http://activemq.apache.org/</a>. To use external broker, download, configure and run it, fill in the broker URI and uncheck the 'Run embedded broker' checkbox.</p>";
 
 	private String brokerUrl;
-	private String embeddedBrokerUrl;
 	private BrokerService broker;
 	private boolean embedded;
 	private boolean useJmx;
@@ -41,6 +39,7 @@ public final class MessageBroker implements Closeable {
 	private static final String EMBEDDED_BROKER_URL = "embeddedBrokerUrl";
 
 	public MessageBroker() {
+		embedded = true;
 	}
 
 	public String getBrokerUrl() {
@@ -49,14 +48,6 @@ public final class MessageBroker implements Closeable {
 
 	public void setBrokerUrl(final String brokerUrl) {
 		this.brokerUrl = brokerUrl;
-	}
-
-	public String getEmbeddedBrokerUrl() {
-		return embeddedBrokerUrl;
-	}
-
-	public void setEmbeddedBrokerUrl(final String embeddedBrokerUrl) {
-		this.embeddedBrokerUrl = embeddedBrokerUrl;
 	}
 
 	public boolean isEmbedded() {
@@ -75,20 +66,33 @@ public final class MessageBroker implements Closeable {
 		this.useJmx = useJmx;
 	}
 
+	/**
+	 * The broker is running either when it is embdeded, and it is actually running,
+	 * or if it is not embedded - then it is assumed to be running without our intervention.
+	 */
+	@Override
+	public boolean isRunning() {
+		return broker != null || !isEmbedded();
+	}
+
+	@Override
 	public void start() {
-		broker = new BrokerService();
-		try {
-			broker.addConnector(brokerUrl);
-			broker.setPersistent(false);
-			broker.setUseJmx(useJmx);
-			broker.start();
-		} catch (Exception e) {
-			throw new MprcException("The message broker failed to start", e);
+		if (broker == null && isEmbedded()) {
+			broker = new BrokerService();
+			try {
+				broker.addConnector(getBrokerUrl());
+				broker.setPersistent(false);
+				broker.setUseJmx(isUseJmx());
+				broker.start();
+			} catch (Exception e) {
+				throw new MprcException("The message broker failed to start", e);
+			}
 		}
 	}
 
+	@Override
 	public void stop() {
-		if (broker != null) {
+		if (broker != null && isEmbedded()) {
 			try {
 				broker.stop();
 			} catch (Exception e) {
@@ -98,9 +102,14 @@ public final class MessageBroker implements Closeable {
 		}
 	}
 
-	@Override
-	public void close() throws IOException {
-		stop();
+	public void deleteAllMessages() {
+		if (isRunning()) {
+			try {
+				broker.deleteAllMessages();
+			} catch (IOException e) {
+				throw new MprcException("Failed to clean messages in the broker", e);
+			}
+		}
 	}
 
 	/**
@@ -116,9 +125,6 @@ public final class MessageBroker implements Closeable {
 
 			broker.setBrokerUrl(config.effectiveBrokerUrl());
 
-			if (broker.isEmbedded()) {
-				broker.start();
-			}
 			return broker;
 		}
 

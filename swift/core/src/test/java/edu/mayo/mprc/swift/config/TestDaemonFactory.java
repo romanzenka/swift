@@ -62,6 +62,7 @@ public final class TestDaemonFactory {
 		final ApplicationConfig config = createSwiftConfig();
 		final Daemon daemon = (Daemon) table.create(config.getDaemonConfig("main"), new DependencyResolver(table));
 		daemon.start();
+		daemon.stop();
 	}
 
 	@Test

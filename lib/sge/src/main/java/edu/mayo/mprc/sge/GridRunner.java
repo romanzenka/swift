@@ -63,12 +63,12 @@ public final class GridRunner extends AbstractRunner {
 
 	@Override
 	public void stop() {
-		super.stop();
 		// Disables message processing
 		enabled = false;
 		if (manager != null) {
-			manager.close();
+			manager.stop();
 		}
+		super.stop();
 	}
 
 	@Override
@@ -456,9 +456,6 @@ public final class GridRunner extends AbstractRunner {
 
 		@Override
 		public GridRunner create(final Config config, final DependencyResolver dependencies) {
-			// Check that SGE is initialized. If it cannot initialize, we cannot create the runners
-			gridEngineManager.initialize();
-
 			final GridRunner runner = new GridRunner();
 
 			runner.setServiceFactory(getServiceFactory());

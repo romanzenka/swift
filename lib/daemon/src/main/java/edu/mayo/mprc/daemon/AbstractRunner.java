@@ -4,6 +4,7 @@ import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import edu.mayo.mprc.MprcException;
 import edu.mayo.mprc.config.Checkable;
 import edu.mayo.mprc.config.Installable;
+import edu.mayo.mprc.config.Lifecycle;
 import edu.mayo.mprc.daemon.files.FileTokenHolder;
 import org.apache.log4j.Logger;
 import org.apache.log4j.NDC;
@@ -24,7 +25,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  *
  * @author Roman Zenka
  */
-public abstract class AbstractRunner implements Checkable, Installable {
+public abstract class AbstractRunner implements Checkable, Installable, Lifecycle {
 
 	private static final Logger LOGGER = Logger.getLogger(AbstractRunner.class);
 
@@ -58,9 +59,15 @@ public abstract class AbstractRunner implements Checkable, Installable {
 	protected AbstractRunner() {
 	}
 
+	@Override
+	public boolean isRunning() {
+		return isOperational();
+	}
+
 	/**
 	 * Starts processing the input.
 	 */
+	@Override
 	public void start() {
 		if (!isEnabled()) {
 			return;
@@ -78,6 +85,7 @@ public abstract class AbstractRunner implements Checkable, Installable {
 		setOperational(true);
 	}
 
+	@Override
 	public void stop() {
 		if (receiver != null) {
 			receiver.cleanShutdown();

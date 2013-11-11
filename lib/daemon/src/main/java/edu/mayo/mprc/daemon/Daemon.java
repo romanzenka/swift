@@ -10,7 +10,6 @@ import edu.mayo.mprc.utilities.exceptions.CompositeException;
 import org.apache.log4j.Logger;
 import org.springframework.stereotype.Component;
 
-import java.io.Closeable;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -62,6 +61,11 @@ public final class Daemon implements Checkable, Installable {
 	 * Runs all the defined daemons runners.
 	 */
 	public void start() {
+		for (final Object resource : resources) {
+			if (resource instanceof Lifecycle) {
+				((Lifecycle) resource).start();
+			}
+		}
 		for (final AbstractRunner runner : getRunners()) {
 			startRunner(runner);
 		}
@@ -84,9 +88,9 @@ public final class Daemon implements Checkable, Installable {
 		for (final AbstractRunner runner : runners) {
 			runner.stop();
 		}
-		for (Object resource : resources) {
-			if (resource instanceof Closeable) {
-				FileUtilities.closeQuietly((Closeable) resource);
+		for (final Object resource : resources) {
+			if (resource instanceof Lifecycle) {
+				((Lifecycle) resource).stop();
 			}
 		}
 	}

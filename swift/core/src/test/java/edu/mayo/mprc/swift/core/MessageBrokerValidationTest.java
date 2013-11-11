@@ -2,27 +2,30 @@ package edu.mayo.mprc.swift.core;
 
 import edu.mayo.mprc.MprcException;
 import edu.mayo.mprc.daemon.MessageBroker;
-import edu.mayo.mprc.messaging.JmsBrokerThread;
 import org.testng.Assert;
 import org.testng.annotations.Test;
-
-import java.net.URI;
 
 public final class MessageBrokerValidationTest {
 
 	@Test
 	public void validateJMSBrokerTest() {
-		JmsBrokerThread broker = null;
+		MessageBroker broker = null;
 		try {
-			broker = new JmsBrokerThread(new URI("tcp://localhost:8783"), null);
-			final MessageBroker.Config config = new MessageBroker.Config();
-			config.setBrokerUrl(broker.getURI().toString());
+			// Run a broker
+			broker = new MessageBroker();
+			broker.setBrokerUrl("tcp://localhost:8783");
+			broker.start();
+
+			// Check that broker validation passes
+			MessageBroker.Config config = new MessageBroker.Config();
+			config.setBrokerUrl("tcp://localhost:8783");
 			Assert.assertNull(config.validate(), "JMS broker validation failed. Validation should had been successful.");
+
 		} catch (Exception e) {
 			throw new MprcException("JMS broker validation test failed", e);
 		} finally {
 			if (broker != null) {
-				broker.stopBroker();
+				broker.stop();
 			}
 		}
 	}
