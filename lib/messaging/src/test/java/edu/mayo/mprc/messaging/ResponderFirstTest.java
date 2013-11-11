@@ -1,6 +1,7 @@
 package edu.mayo.mprc.messaging;
 
 import org.testng.Assert;
+import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
@@ -18,6 +19,11 @@ public final class ResponderFirstTest extends MessagingTestBase {
 	@BeforeClass
 	public void init() {
 		startBroker();
+	}
+
+	@AfterClass
+	public void destroy() {
+		stopBroker();
 	}
 
 	@Test

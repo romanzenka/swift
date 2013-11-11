@@ -48,10 +48,12 @@ public final class WorkCachePerformanceTest {
 			throw new MprcException(e);
 		}
 		serviceFactory.setDaemonName("test-daemon");
+		serviceFactory.start();
 	}
 
 	@AfterClass
 	public void shutdown() {
+		serviceFactory.stop();
 		connectionPool.close();
 	}
 
