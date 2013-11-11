@@ -44,6 +44,7 @@ public final class TestDaemonFactory {
 	private static File tempRootDir;
 
 	private ApplicationConfig config;
+	private TestApplicationContext context;
 
 	private static final String SWIFT_INSTALL_ROOT_PATH = "..";
 	private static final String DATABASE_DEPLOYMENT_DIR = SWIFT_INSTALL_ROOT_PATH + "/install/swift/var/fasta/";
@@ -54,7 +55,13 @@ public final class TestDaemonFactory {
 
 		config = createSwiftConfig();
 
-		table = TestApplicationContext.getResourceTable();
+		context = new TestApplicationContext();
+		table = context.getResourceTable();
+	}
+
+	@AfterClass
+	public void teardown() {
+		context.stop();
 	}
 
 	@Test
@@ -270,5 +277,6 @@ public final class TestDaemonFactory {
 	@AfterClass
 	public void cleanUp() {
 		FileUtilities.cleanupTempFile(tempRootDir);
+		config.clear();
 	}
 }

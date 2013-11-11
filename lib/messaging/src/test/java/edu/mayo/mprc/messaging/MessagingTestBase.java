@@ -8,6 +8,8 @@ import org.testng.annotations.AfterClass;
 public abstract class MessagingTestBase {
 	private static final Logger LOGGER = Logger.getLogger(MessagingTestBase.class);
 	private static final String TEST_QUEUE_NAME = "test_queue";
+	// This URL has to be different than vm://broker, as that is the TestApplicationContext's default
+	public static final String BROKER = "vm://messaging-test-broker";
 	protected MessageBroker broker;
 	protected Service service;
 	protected ServiceFactory serviceFactory;
@@ -25,7 +27,7 @@ public abstract class MessagingTestBase {
 		}
 		// Start a local, vm-only broker with no port.
 		broker = new MessageBroker();
-		broker.setBrokerUrl("vm://broker");
+		broker.setBrokerUrl(BROKER);
 
 
 		serviceFactory = new ServiceFactory();

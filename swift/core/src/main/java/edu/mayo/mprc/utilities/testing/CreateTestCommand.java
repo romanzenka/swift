@@ -19,6 +19,7 @@ import javax.annotation.Resource;
 @Component("create-test-command")
 public final class CreateTestCommand implements SwiftCommand {
 	private DatabaseValidator validator;
+	private Daemon daemon;
 
 	@Override
 	public String getDescription() {
@@ -30,7 +31,7 @@ public final class CreateTestCommand implements SwiftCommand {
 		ResourceConfig database = environment.getDaemonConfig().firstResourceOfType(Database.Config.class);
 		environment.createResource(database);
 
-		Daemon daemon = environment.createDaemon(environment.getDaemonConfig());
+		daemon = environment.createDaemon(environment.getDaemonConfig());
 		ImmutableMap<String, String> installMap = new ImmutableMap.Builder<String, String>()
 				.put("action", DatabaseUtilities.SchemaInitialization.CreateDrop.getValue())
 				.put("test", "true")
@@ -51,5 +52,9 @@ public final class CreateTestCommand implements SwiftCommand {
 	@Resource(name = "databaseValidator")
 	public void setValidator(final DatabaseValidator validator) {
 		this.validator = validator;
+	}
+
+	public Daemon getDaemon() {
+		return daemon;
 	}
 }

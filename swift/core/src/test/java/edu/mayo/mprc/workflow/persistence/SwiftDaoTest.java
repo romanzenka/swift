@@ -6,6 +6,7 @@ import edu.mayo.mprc.swift.params2.*;
 import edu.mayo.mprc.unimod.ModSet;
 import edu.mayo.mprc.utilities.testing.TestApplicationContext;
 import org.testng.Assert;
+import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
@@ -16,13 +17,20 @@ import java.util.*;
 public final class SwiftDaoTest {
 	private SwiftDaoHibernate swiftDao;
 	private ParamsDao paramsDao;
+	private TestApplicationContext context;
 
 	@BeforeClass
 	public void setup() {
-		swiftDao = (SwiftDaoHibernate) TestApplicationContext.getSwiftDao();
-		paramsDao = TestApplicationContext.getParamsDao();
+		context = new TestApplicationContext();
+		context.start();
+		swiftDao = (SwiftDaoHibernate) context.getSwiftDao();
+		paramsDao = context.getParamsDao();
 	}
 
+	@AfterClass
+	public void shutdown() {
+		context.stop();
+	}
 
 	@Test
 	public void doubleSaveExtractMsn() throws Throwable {

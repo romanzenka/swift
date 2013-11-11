@@ -1,10 +1,10 @@
 package edu.mayo.mprc.utilities.testing;
 
 import edu.mayo.mprc.config.*;
+import edu.mayo.mprc.daemon.Daemon;
 import edu.mayo.mprc.daemon.MessageBroker;
 import edu.mayo.mprc.daemon.SimpleRunner;
 import edu.mayo.mprc.database.Database;
-import edu.mayo.mprc.database.DatabaseUtilities;
 import edu.mayo.mprc.swift.commands.SwiftCommandLine;
 import edu.mayo.mprc.swift.commands.SwiftEnvironment;
 import edu.mayo.mprc.swift.db.SwiftDao;
@@ -19,68 +19,89 @@ import java.io.File;
 
 /**
  * Support for setting up Spring test context.
+ * <p/>
+ * It basically runs a test Swift application with its own simple config.
+ * Messaging broker and database get set up and executed.
  */
-public final class TestApplicationContext {
+public final class TestApplicationContext implements Lifecycle {
 	private static final Logger LOGGER = Logger.getLogger(TestApplicationContext.class);
-	private static ApplicationContext testContext = null;
-
-	private TestApplicationContext() {
-	}
+	private ApplicationContext testContext;
+	private SwiftEnvironment swiftEnvironment;
+	private DaemonConfig daemonConfig;
+	private Daemon daemon;
 
 	/**
-	 * This gets a context that overrides swiftContext.xml with properties in testContext.xml.  All tests should use
+	 * This creates a context that overrides swiftContext.xml with properties in testContext.xml.  All tests should use
 	 * this context.  If your test dirties the context for some reason then you will need to reset the context using the
 	 * AfterClass or AfterTest methods.  Tests should be able to act on the database as it exists in this context and
 	 * IF a test dirties the database so it is not usable by other tests (IT SHOULDN'T) then that test needs to drop
-	 * and rebuild the database.  An alternative would be to manage the trasaction for the session by starting a new Transaction
+	 * and rebuild the database.  An alternative would be to manage the transaction for the session by starting a new Transaction
 	 * before the test and rolling it back after the test.
-	 *
-	 * @return The context that should be used for testing.
 	 */
-	public static synchronized ApplicationContext getTestApplicationContext() {
-		if (testContext == null) {
-			initialize(getInMemoryDatabaseConfig(), DatabaseUtilities.SchemaInitialization.CreateDrop);
-		}
-		return testContext;
+	public TestApplicationContext() {
+		initialize(getInMemoryDatabaseConfig());
 	}
 
-	public static void initialize(final Database.Config databaseConfig, final DatabaseUtilities.SchemaInitialization schemaInitialization) {
+	@Override
+	public boolean isRunning() {
+		return swiftEnvironment != null;
+	}
+
+	@Override
+	public void start() {
+		final SwiftCommandLine cmdLine = new SwiftCommandLine("create-test", null, null, daemonConfig.getName(), null, null);
+		swiftEnvironment.runSwiftCommand(cmdLine);
+		final CreateTestCommand command = (CreateTestCommand) testContext.getBean("create-test-command");
+		daemon = command.getDaemon();
+	}
+
+	@Override
+	public void stop() {
+		if (daemon != null) {
+			daemon.stop();
+		}
+	}
+
+	private void initialize(final Database.Config databaseConfig) {
 		System.setProperty("SWIFT_INSTALL",
 				new File(System.getenv("SWIFT_HOME"), "install.properties").getAbsolutePath());
+
 		testContext = new ClassPathXmlApplicationContext(new String[]{"/testContext.xml"});
 
 		LOGGER.info("Setting up Test Database.");
 
+		// Create a test application config with one daemon, message broker, database and searcher
+		final ApplicationConfig testConfig = new ApplicationConfig(null);
+
+		daemonConfig = defaultDaemonConfig(databaseConfig, testConfig);
+
+		swiftEnvironment = (SwiftEnvironment) testContext.getBean("swiftEnvironment");
+		testConfig.setDependencyResolver(new DependencyResolver(getResourceTable()));
+		swiftEnvironment.setApplicationConfig(testConfig);
+		swiftEnvironment.setDaemonConfig(daemonConfig);
+	}
+
+	private static DaemonConfig defaultDaemonConfig(Database.Config database, ApplicationConfig application) {
 		final String fastaFolder = FileUtilities.createTempFolder().getAbsolutePath();
 		final String fastaArchiveFolder = FileUtilities.createTempFolder().getAbsolutePath();
 		final String fastaUploadFolder = FileUtilities.createTempFolder().getAbsolutePath();
 		final String tempFolder = FileUtilities.createTempFolder().getAbsolutePath();
 
-		// Create a test application config with one daemon, message broker, database and searcher
-		final ApplicationConfig testConfig = new ApplicationConfig(null);
-
 		final DaemonConfig daemonConfig = DaemonConfig.getDefaultDaemonConfig("test", true);
 		daemonConfig.setTempFolderPath(tempFolder);
-		testConfig.addDaemon(daemonConfig);
+		application.addDaemon(daemonConfig);
 
 		final MessageBroker.Config messageBrokerConfig = MessageBroker.Config.getEmbeddedBroker();
 		daemonConfig.addResource(messageBrokerConfig);
 
-		daemonConfig.addResource(databaseConfig);
+		daemonConfig.addResource(database);
 
 		final SwiftSearcher.Config searcherConfig = new SwiftSearcher.Config(
 				fastaFolder, fastaArchiveFolder, fastaUploadFolder,
-				null, null, null, null, null, null, null, null, null, null, databaseConfig);
+				null, null, null, null, null, null, null, null, null, null, database);
 
 		daemonConfig.addResource(new ServiceConfig("searcher1", new SimpleRunner.Config(searcherConfig)));
-
-		SwiftEnvironment swiftEnvironment = (SwiftEnvironment) testContext.getBean("swiftEnvironment");
-		testConfig.setDependencyResolver(new DependencyResolver(getResourceTable()));
-		swiftEnvironment.setApplicationConfig(testConfig);
-		swiftEnvironment.setDaemonConfig(daemonConfig);
-
-		SwiftCommandLine cmdLine = new SwiftCommandLine("create-test", null, null, daemonConfig.getName(), null, null);
-		swiftEnvironment.runSwiftCommand(cmdLine);
+		return daemonConfig;
 	}
 
 	private static Database.Config getInMemoryDatabaseConfig() {
@@ -95,30 +116,30 @@ public final class TestApplicationContext {
 	}
 
 	/**
-	 * Returns a bean of a given id using the context returned by {@link #getTestApplicationContext()} ()}.
+	 * Returns a bean of a given id.
 	 *
 	 * @param beanId Bean id we want.
 	 * @return The bean for {@code beanId}.
 	 */
-	private static Object getBean(final String beanId) {
-		return getTestApplicationContext().getBean(beanId);
+	private Object getBean(final String beanId) {
+		return testContext.getBean(beanId);
 	}
 
 	/* ============================================================================================================== */
 
-	public static SwiftDao getSwiftDao() {
+	public SwiftDao getSwiftDao() {
 		return (SwiftDao) getBean("swiftDao");
 	}
 
-	public static ParamsDao getParamsDao() {
+	public ParamsDao getParamsDao() {
 		return (ParamsDao) getBean("paramsDao");
 	}
 
-	public static String getTitle() {
+	public String getTitle() {
 		return (String) getBean("title");
 	}
 
-	public static MultiFactory getResourceTable() {
+	public MultiFactory getResourceTable() {
 		return (MultiFactory) getBean("resourceTable");
 	}
 }
