@@ -37,6 +37,7 @@ public final class DaemonWorkerTester implements Closeable {
 			throw new MprcException(e);
 		}
 		serviceFactory.setDaemonName("test-daemon");
+		serviceFactory.start();
 	}
 
 	/**
@@ -183,7 +184,7 @@ public final class DaemonWorkerTester implements Closeable {
 
 	@Override
 	public void close() {
-		serviceFactory.close();
+		serviceFactory.stop();
 	}
 
 	private static final class TestProgressListener implements ProgressListener {

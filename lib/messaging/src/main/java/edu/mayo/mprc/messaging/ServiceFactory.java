@@ -2,12 +2,12 @@ package edu.mayo.mprc.messaging;
 
 import com.google.common.base.Strings;
 import edu.mayo.mprc.MprcException;
+import edu.mayo.mprc.config.Lifecycle;
 import edu.mayo.mprc.config.RunningApplicationContext;
 import edu.mayo.mprc.daemon.MessageBroker;
 import org.apache.log4j.Logger;
 
 import javax.jms.*;
-import java.io.Closeable;
 import java.io.Serializable;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -15,7 +15,7 @@ import java.net.URISyntaxException;
 /**
  * Returns a service using a queue of a given name.
  */
-public final class ServiceFactory implements Closeable {
+public final class ServiceFactory implements Lifecycle {
 	private static final Logger LOGGER = Logger.getLogger(ServiceFactory.class);
 
 	private URI brokerUri;
@@ -28,20 +28,6 @@ public final class ServiceFactory implements Closeable {
 
 	public ServiceFactory() {
 	}
-
-	/**
-	 * Run this before using connection or responseDispatcher
-	 */
-	private void startup() {
-		if (connection == null) {
-			final UserInfo info = extractJmsUserinfo(getBrokerUri());
-			connection = getConnectionPool().getConnectionToBroker(getBrokerUri(), info.getUserName(), info.getPassword());
-		}
-		if (responseDispatcher == null && getDaemonName() != null) {
-			responseDispatcher = new ResponseDispatcher(connection, getDaemonName());
-		}
-	}
-
 
 	/**
 	 * Creates a service ({@link Service})
@@ -130,23 +116,38 @@ public final class ServiceFactory implements Closeable {
 		return new DeserializedRequest(getConnection(), serializedRequest);
 	}
 
-	@Override
-	public void close() {
-		getResponseDispatcher().close();
-		connectionPool.close();
-	}
-
 	public Connection getConnection() {
-		startup();
 		return connection;
 	}
 
 	public ResponseDispatcher getResponseDispatcher() {
-		startup();
 		if (responseDispatcher == null) {
 			throw new MprcException("This service factory does not support response dispatch. This probably because it is not running within a daemon (daemonName is set to " + daemonName + ")");
 		}
 		return responseDispatcher;
+	}
+
+	@Override
+	public boolean isRunning() {
+		return connection != null;
+	}
+
+	@Override
+	public void start() {
+		if (connection == null) {
+			final UserInfo info = extractJmsUserinfo(getBrokerUri());
+			connection = getConnectionPool().getConnectionToBroker(getBrokerUri(), info.getUserName(), info.getPassword());
+		}
+		if (responseDispatcher == null && getDaemonName() != null) {
+			responseDispatcher = new ResponseDispatcher(connection, getDaemonName());
+		}
+	}
+
+	@Override
+	public void stop() {
+		getResponseDispatcher().close();
+		connectionPool.close();
+		connectionPool = null;
 	}
 
 	private static class DeserializedRequest implements Request {

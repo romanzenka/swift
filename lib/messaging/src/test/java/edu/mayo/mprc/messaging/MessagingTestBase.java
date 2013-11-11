@@ -33,6 +33,7 @@ public abstract class MessagingTestBase {
 		serviceFactory = new ServiceFactory();
 		serviceFactory.setConnectionPool(new ActiveMQConnectionPool());
 		serviceFactory.setDaemonName("test-messaging-daemon");
+		serviceFactory.start();
 
 		try {
 			service = serviceFactory.createService(TEST_QUEUE_NAME);
@@ -44,7 +45,7 @@ public abstract class MessagingTestBase {
 	@AfterClass
 	public void stopBroker() {
 		if (serviceFactory != null) {
-			serviceFactory.getConnectionPool().close();
+			serviceFactory.stop();
 			serviceFactory = null;
 		}
 		if (broker != null) {

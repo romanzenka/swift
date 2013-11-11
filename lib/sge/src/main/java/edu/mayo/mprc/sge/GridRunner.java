@@ -62,12 +62,18 @@ public final class GridRunner extends AbstractRunner {
 	}
 
 	@Override
+	public void start() {
+		super.start();
+		manager.start();
+		serviceFactory.start();
+	}
+
+	@Override
 	public void stop() {
 		// Disables message processing
 		enabled = false;
-		if (manager != null) {
-			manager.stop();
-		}
+		serviceFactory.stop();
+		manager.stop();
 		super.stop();
 	}
 
