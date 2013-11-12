@@ -119,7 +119,7 @@ public final class SearchInput {
 	}
 
 	public void setParamSetIds(int[] paramSetIds) {
-		this.paramSetIds = paramSetIds;
+		this.paramSetIds = paramSetIds.clone();
 	}
 
 	public String[] getInputFilePaths() {

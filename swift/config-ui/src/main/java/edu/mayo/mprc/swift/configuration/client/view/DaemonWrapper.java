@@ -61,7 +61,7 @@ public final class DaemonWrapper extends SimplePanel {
 
 		for (final AvailableModules.Info info : moduleInfoList) {
 			// if (info.isModule()) {
-				newModulePicker.addItem(info.getName(), info.getType());
+			newModulePicker.addItem(info.getName(), info.getType());
 			// }
 		}
 
@@ -122,7 +122,11 @@ public final class DaemonWrapper extends SimplePanel {
 
 		@Override
 		public void propertyChanged(final ResourceModel model, final String propertyName, final String newValue) {
-			daemonConfigUI.loadUI((DaemonModel) model);
+			if (model instanceof DaemonModel) {
+				daemonConfigUI.loadUI((DaemonModel) model);
+			} else {
+				throw new RuntimeException("Programmer error: type mismatch");
+			}
 		}
 	}
 

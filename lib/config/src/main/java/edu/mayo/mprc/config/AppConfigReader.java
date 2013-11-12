@@ -202,9 +202,8 @@ public final class AppConfigReader implements Closeable {
 			final char c = line.charAt(i);
 			switch (state) {
 				case 0: // Start
-					if ((' ' == c) || (c == '\t')) {
-						// Keep eating spaces and tabs
-					} else {
+					// Keep eating spaces and tabs
+					if (' ' != c && '\t' != c) {
 						if ('\\' == c) {
 							state = 2; // Escape
 						} else if ('#' == c) {

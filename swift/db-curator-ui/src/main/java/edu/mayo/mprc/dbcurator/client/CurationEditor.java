@@ -371,7 +371,11 @@ public final class CurationEditor extends Composite {
 		chkShowLog.addClickListener(new ClickListener() {
 			@Override
 			public void onClick(final Widget widget) {
-				textareaLog.setVisible(((CheckBox) widget).isChecked());
+				if (widget instanceof CheckBox) {
+					textareaLog.setVisible(((CheckBox) widget).isChecked());
+				} else {
+					throw new RuntimeException("Programmer error: incompatible type");
+				}
 			}
 		});
 		controlPanel.add(chkShowLog);
@@ -443,7 +447,12 @@ public final class CurationEditor extends Composite {
 		lstStepChoice.addChangeListener(new ChangeListener() {
 			@Override
 			public void onChange(final Widget widget) {
-				final int selectedIndex = ((ListBox) widget).getSelectedIndex();
+				final int selectedIndex;
+				if (widget instanceof ListBox) {
+					selectedIndex = ((ListBox) widget).getSelectedIndex();
+				} else {
+					throw new RuntimeException("Programmer error: incompatible type");
+				}
 
 				switch (selectedIndex) {
 					case (0):

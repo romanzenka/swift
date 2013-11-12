@@ -32,7 +32,7 @@ public final class InitialPageData implements Serializable {
 	                       List<ClientSearchEngine> searchEngines,
 	                       List<SpectrumQaParamFileInfo> spectrumQaParamFileInfo,
 	                       boolean scaffoldReportEnabled) {
-		this.users = users;
+		this.users = users.clone();
 		this.loadedSearch = loadedSearch;
 		this.userMessage = userMessage;
 		this.paramSetList = paramSetList;

@@ -166,38 +166,6 @@ public final class StepPanelContainer extends Composite {
 	}
 
 	/**
-	 * use this to insert a widget into a certain position
-	 *
-	 * @param toInsert the widget to insert
-	 * @param index    where you want to insert the widget
-	 */
-	public void insert(final Widget toInsert, final int index) {
-		if (containedSteps.isEmpty()) {
-			stepOrganizer.clear();
-		}
-
-		final StepPanelShell shell = (StepPanelShell) toInsert;
-
-		//if the step has not been run then make it draggable
-		if (shell.getContainedStepPanel().getContainedStep().getCompletionCount() == null) {
-			dragController.makeDraggable(shell, shell.getStepTitle());
-		}
-
-		containedSteps.add(index, ((StepPanelShell) toInsert).getContainedStepPanel().getContainedStep());
-
-		stepOrganizer.insert(toInsert, index);
-	}
-
-	/**
-	 * gets the number of steps in this container
-	 *
-	 * @return the number of steps in the container
-	 */
-	public int getStepCount() {
-		return containedSteps.size();
-	}
-
-	/**
 	 * Updates each of the steps in the container and returns the list of step
 	 *
 	 * @return the list of curation steps in the container

@@ -65,6 +65,7 @@ public final class HemeUi {
 	private static final String SEARCH_ENGINES = "searchEngines";
 	public static final String SPECTRA_EXTENSION = ".spectra.txt";
 	public static final double DEFAULT_MASS_DELTA_TOLERANCE = 0.5;
+	public static final String[] NO_ENGINES = new String[0];
 
 	private final File data;
 	private final File results;
@@ -95,7 +96,7 @@ public final class HemeUi {
 		this.trypsinParameterSetId = trypsinParameterSetId;
 		this.chymoParameterSetId = chymoParameterSetId;
 		this.userEmail = userEmail;
-		this.searchEngines = searchEngines;
+		this.searchEngines = searchEngines == null ? NO_ENGINES : searchEngines.clone();
 	}
 
 	public void begin() {

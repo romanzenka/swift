@@ -20,7 +20,7 @@ public final class DTAToMGFConverter {
 	private boolean wineCleanup;
 
 	public DTAToMGFConverter(final File[] dtaFiles, final File outputMgfFile) {
-		this.dtaFiles = dtaFiles;
+		this.dtaFiles = dtaFiles.clone();
 		resultFile = outputMgfFile;
 	}
 

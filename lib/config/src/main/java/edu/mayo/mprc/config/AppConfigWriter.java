@@ -309,13 +309,13 @@ public final class AppConfigWriter implements Closeable {
 
 		@Override
 		public void put(final String key, final String value, final String comment) {
-			if (getCurrentClass().equals(ServiceConfig.class) && ServiceConfig.RUNNER.equals(key)) {
-				// Do nothing. The values are embedded
-
-			} else if (!(getCurrentClass().equals(ApplicationConfig.class) && ApplicationConfig.DAEMONS.equals(key))) {
+			// We do not save runners (their config is embedded into the service they run)
+			final boolean valuesEmbedded = getCurrentClass().equals(ServiceConfig.class) && ServiceConfig.RUNNER.equals(key);
+			// We do not save the list of daemons. All daemons contained within are usedf
+			final boolean daemonsOfApplication = getCurrentClass().equals(ApplicationConfig.class) && ApplicationConfig.DAEMONS.equals(key);
+			if (!valuesEmbedded && !daemonsOfApplication) {
 				super.put(key, value, comment);
 			}
-			// else: We do not save the list of daemons. All daemons contained within are used
 		}
 
 		@Override
