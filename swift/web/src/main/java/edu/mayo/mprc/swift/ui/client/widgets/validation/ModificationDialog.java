@@ -1,6 +1,6 @@
-package edu.mayo.mprc.swift.ui.client.dialogs;
+package edu.mayo.mprc.swift.ui.client.widgets.validation;
 
-import edu.mayo.mprc.swift.ui.client.widgets.validation.ModificationSelectionEditor;
+import edu.mayo.mprc.swift.ui.client.dialogs.FrameDialog;
 
 /**
  * popup panel container for the mods selection editor

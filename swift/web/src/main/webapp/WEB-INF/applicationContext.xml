@@ -2,7 +2,7 @@
 <beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
 
-    <bean id="servletInitialization" class="edu.mayo.mprc.ServletInitialization">
+    <bean id="servletInitialization" class="edu.mayo.mprc.swift.ServletInitialization">
         <property name="curationWebContext" ref="curationWebContext" />
         <property name="factoryTable" ref="resourceTable" />
         <property name="serviceFactory" ref="serviceFactory" />

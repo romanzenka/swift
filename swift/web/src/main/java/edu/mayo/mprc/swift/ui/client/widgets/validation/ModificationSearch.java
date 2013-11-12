@@ -1,8 +1,8 @@
 package edu.mayo.mprc.swift.ui.client.widgets.validation;
 
 import edu.mayo.mprc.common.client.StringUtilities;
-import edu.mayo.mprc.swift.ui.client.CompareClientModSpecificity;
 import edu.mayo.mprc.swift.ui.client.rpc.ClientModSpecificity;
+import edu.mayo.mprc.swift.ui.client.rpc.CompareClientModSpecificity;
 
 import java.util.*;
 

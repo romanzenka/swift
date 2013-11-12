@@ -1,7 +1,4 @@
-package edu.mayo.mprc.swift.ui.client;
-
-import edu.mayo.mprc.swift.ui.client.rpc.ClientModSpecificity;
-import edu.mayo.mprc.swift.ui.client.rpc.ClientValue;
+package edu.mayo.mprc.swift.ui.client.rpc;
 
 import java.io.Serializable;
 import java.util.Comparator;

@@ -2,10 +2,11 @@ package edu.mayo.mprc.swift.ui.client.widgets.validation;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.*;
-import edu.mayo.mprc.swift.ui.client.InitialPageData;
-import edu.mayo.mprc.swift.ui.client.ServiceAsync;
-import edu.mayo.mprc.swift.ui.client.SimpleParamsEditorPanel;
+import edu.mayo.mprc.swift.ui.client.dialogs.ErrorDialog;
+import edu.mayo.mprc.swift.ui.client.dialogs.Validatable;
+import edu.mayo.mprc.swift.ui.client.dialogs.ValidationPanel;
 import edu.mayo.mprc.swift.ui.client.rpc.*;
+import edu.mayo.mprc.swift.ui.client.service.ServiceAsync;
 import edu.mayo.mprc.swift.ui.client.widgets.Callback;
 import edu.mayo.mprc.swift.ui.client.widgets.ParamSetSelectionController;
 import edu.mayo.mprc.swift.ui.client.widgets.ParamSetSelectionListener;
@@ -215,7 +216,7 @@ public final class ValidationController implements ChangeListener, SourcesChange
 				false, new AsyncCallback<ClientParamSet>() {
 			@Override
 			public void onFailure(final Throwable throwable) {
-				SimpleParamsEditorPanel.handleGlobalError(throwable);
+				ErrorDialog.handleGlobalError(throwable);
 			}
 
 			@Override
@@ -330,7 +331,7 @@ public final class ValidationController implements ChangeListener, SourcesChange
 
 						@Override
 						public void onFailure(final Throwable throwable) {
-							SimpleParamsEditorPanel.handleGlobalError(throwable);
+							ErrorDialog.handleGlobalError(throwable);
 						}
 
 						@Override
@@ -439,7 +440,7 @@ public final class ValidationController implements ChangeListener, SourcesChange
 				serviceAsync.getParamSetValues(sel, new AsyncCallback<ClientParamSetValues>() {
 					@Override
 					public void onFailure(final Throwable throwable) {
-						SimpleParamsEditorPanel.handleGlobalError(throwable);
+						ErrorDialog.handleGlobalError(throwable);
 					}
 
 					@Override

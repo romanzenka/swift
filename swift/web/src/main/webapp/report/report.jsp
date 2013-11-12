@@ -1,4 +1,4 @@
-<%@ page import="edu.mayo.mprc.ServletInitialization" %>
+<%@ page import="edu.mayo.mprc.swift.ServletInitialization" %>
 <%@ page import="edu.mayo.mprc.swift.SwiftWebContext" %>
 <%@ page import="edu.mayo.mprc.swift.report.JsonWriter" %>
 <%@ page import="edu.mayo.mprc.utilities.StringUtilities" %>

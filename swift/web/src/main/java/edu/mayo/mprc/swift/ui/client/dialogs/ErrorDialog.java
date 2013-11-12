@@ -4,7 +4,6 @@ import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.*;
 import edu.mayo.mprc.common.client.GWTServiceException;
 import edu.mayo.mprc.swift.ui.client.rpc.ClientValidation;
-import edu.mayo.mprc.swift.ui.client.widgets.validation.ValidationPanel;
 
 /**
  * Simple dialog for showing errors.
@@ -41,6 +40,14 @@ public final class ErrorDialog extends DialogBox {
 	public static void show(final Throwable t) {
 		final ErrorDialog dialog = new ErrorDialog(t);
 		dialog.show();
+	}
+
+	/**
+	 * Deal with errors not associated with any specific widget.
+	 * TODO Does this really belong here?
+	 */
+	public static void handleGlobalError(final Throwable t) {
+		show(t);
 	}
 
 	private void init(final int severity, final String shortMessage, final String detailedMessage) {

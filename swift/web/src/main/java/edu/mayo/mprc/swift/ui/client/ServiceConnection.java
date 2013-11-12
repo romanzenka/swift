@@ -2,6 +2,8 @@ package edu.mayo.mprc.swift.ui.client;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.rpc.ServiceDefTarget;
+import edu.mayo.mprc.swift.ui.client.service.Service;
+import edu.mayo.mprc.swift.ui.client.service.ServiceAsync;
 
 public final class ServiceConnection {
 	private static ServiceAsync browsingService;

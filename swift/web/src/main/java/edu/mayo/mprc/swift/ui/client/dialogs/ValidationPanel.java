@@ -1,10 +1,9 @@
-package edu.mayo.mprc.swift.ui.client.widgets.validation;
+package edu.mayo.mprc.swift.ui.client.dialogs;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.DeferredCommand;
 import com.google.gwt.user.client.ui.*;
-import edu.mayo.mprc.swift.ui.client.dialogs.ErrorDialog;
 import edu.mayo.mprc.swift.ui.client.rpc.ClientValidation;
 
 import java.io.Serializable;

@@ -1,6 +1,7 @@
-package edu.mayo.mprc.swift.ui.client.widgets.validation;
+package edu.mayo.mprc.swift.ui.client.dialogs;
 
 import com.google.gwt.user.client.ui.SourcesChangeEvents;
+import edu.mayo.mprc.swift.ui.client.rpc.ClientValidation;
 import edu.mayo.mprc.swift.ui.client.rpc.ClientValue;
 
 import java.util.List;
@@ -24,7 +25,7 @@ public interface Validatable extends SourcesChangeEvents {
 	 * coloring it's background yellow if the state >= SEVERITY_WARNING.
 	 *
 	 * @param validationSeverity The maximum severity value from any ClientValidations for this widget.
-	 * @see edu.mayo.mprc.swift.ui.client.rpc.ClientValidation for list of possible severity values.
+	 * @see ClientValidation for list of possible severity values.
 	 */
 	void setValidationSeverity(int validationSeverity);
 

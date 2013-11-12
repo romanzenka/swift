@@ -2,6 +2,7 @@ package edu.mayo.mprc.swift.ui.client.widgets.validation;
 
 import com.google.gwt.user.client.ui.*;
 import edu.mayo.mprc.common.client.ExceptionUtilities;
+import edu.mayo.mprc.swift.ui.client.dialogs.Validatable;
 import edu.mayo.mprc.swift.ui.client.rpc.ClientExtractMsnSettings;
 import edu.mayo.mprc.swift.ui.client.rpc.ClientValue;
 import edu.mayo.mprc.swift.ui.client.widgets.HelpPopupButton;

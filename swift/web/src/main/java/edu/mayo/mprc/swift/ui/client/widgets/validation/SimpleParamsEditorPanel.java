@@ -1,4 +1,4 @@
-package edu.mayo.mprc.swift.ui.client;
+package edu.mayo.mprc.swift.ui.client.widgets.validation;
 
 import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.Element;
@@ -10,12 +10,13 @@ import edu.mayo.mprc.dbcurator.client.EditorCloseCallback;
 import edu.mayo.mprc.swift.ui.client.dialogs.ErrorDialog;
 import edu.mayo.mprc.swift.ui.client.dialogs.PreviewDialog;
 import edu.mayo.mprc.swift.ui.client.dialogs.SaveDialog;
+import edu.mayo.mprc.swift.ui.client.dialogs.ValidationPanel;
 import edu.mayo.mprc.swift.ui.client.rpc.*;
+import edu.mayo.mprc.swift.ui.client.service.ServiceAsync;
 import edu.mayo.mprc.swift.ui.client.widgets.Callback;
 import edu.mayo.mprc.swift.ui.client.widgets.ExistingDOMPanel;
 import edu.mayo.mprc.swift.ui.client.widgets.ParamSetSelectionController;
 import edu.mayo.mprc.swift.ui.client.widgets.ParamsSelector;
-import edu.mayo.mprc.swift.ui.client.widgets.validation.*;
 
 import java.util.*;
 
@@ -45,14 +46,6 @@ public final class SimpleParamsEditorPanel implements SourcesChangeEvents {
 	public static final String TOLERANCES = "tolerances";
 	public static final String INSTRUMENT = "instrument";
 	public static final String SCAFFOLD_SETTINGS = "scaffoldSettings";
-
-	/**
-	 * Deal with errors not associated with any specific widget.
-	 * TODO Does this really belong here?
-	 */
-	public static void handleGlobalError(final Throwable t) {
-		ErrorDialog.show(t);
-	}
 
 	private ChangeListenerCollection listeners = new ChangeListenerCollection();
 
@@ -182,7 +175,7 @@ public final class SimpleParamsEditorPanel implements SourcesChangeEvents {
 			p.add(pb);
 
 			//Add undeployer link if enabled.
-			if(pageData.isDatabaseUndeployerEnabled()) {
+			if (pageData.isDatabaseUndeployerEnabled()) {
 				final PushButton du = new PushButton("Undeploy Database");
 				du.addStyleName(ACTION_LINK);
 				du.setTitle("Click here to undeploy database from search engines.");
@@ -511,7 +504,7 @@ public final class SimpleParamsEditorPanel implements SourcesChangeEvents {
 						selector.getSelectedParamSet(), new AsyncCallback<Void>() {
 					@Override
 					public void onFailure(final Throwable throwable) {
-						handleGlobalError(throwable);
+						ErrorDialog.handleGlobalError(throwable);
 					}
 
 					@Override

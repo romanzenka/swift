@@ -6,9 +6,9 @@ import com.google.gwt.user.client.Element;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.rpc.ServiceDefTarget;
 import com.google.gwt.user.client.ui.*;
-import edu.mayo.mprc.swift.ui.client.Service;
-import edu.mayo.mprc.swift.ui.client.ServiceAsync;
 import edu.mayo.mprc.swift.ui.client.rpc.files.FileInfo;
+import edu.mayo.mprc.swift.ui.client.service.Service;
+import edu.mayo.mprc.swift.ui.client.service.ServiceAsync;
 
 /**
  * A dialog box that contains a file tree.
@@ -116,22 +116,22 @@ public final class FileTreeDialog extends DialogBox implements ClickListener {
 	 * @return the List<String> denoting the paths to the selected files/folders.
 	 */
 	public static native void showFileDialogBox(String iframe, String basePath)/*-{
-		$wnd.initDialog(iframe, null, "Load", basePath);
+        $wnd.initDialog(iframe, null, "Load", basePath);
 
-	}-*/;
+    }-*/;
 
 	/**
 	 * @return
 	 */
 	public static native String getSelectedFiles()/*-{
-		var retFiles = "";
+        var retFiles = "";
 
-		var selectedFiles = $wnd.getSelectedFilesAndFolders();
-		for (var i = 0; i < selectedFiles.length; i++) {
-			retFiles += selectedFiles[i] + "\n";
-		}
+        var selectedFiles = $wnd.getSelectedFilesAndFolders();
+        for (var i = 0; i < selectedFiles.length; i++) {
+            retFiles += selectedFiles[i] + "\n";
+        }
 
-		return retFiles;
-	}-*/;
+        return retFiles;
+    }-*/;
 
 }

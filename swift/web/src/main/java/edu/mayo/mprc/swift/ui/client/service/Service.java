@@ -1,4 +1,4 @@
-package edu.mayo.mprc.swift.ui.client;
+package edu.mayo.mprc.swift.ui.client.service;
 
 import com.google.gwt.user.client.rpc.RemoteService;
 import edu.mayo.mprc.common.client.GWTServiceException;

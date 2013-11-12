@@ -4,10 +4,10 @@ import com.google.gwt.user.client.Cookies;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.ChangeListener;
 import com.google.gwt.user.client.ui.Widget;
-import edu.mayo.mprc.swift.ui.client.ServiceAsync;
-import edu.mayo.mprc.swift.ui.client.SimpleParamsEditorPanel;
+import edu.mayo.mprc.swift.ui.client.dialogs.ErrorDialog;
 import edu.mayo.mprc.swift.ui.client.rpc.ClientParamSet;
 import edu.mayo.mprc.swift.ui.client.rpc.ClientParamSetList;
+import edu.mayo.mprc.swift.ui.client.service.ServiceAsync;
 
 import java.util.*;
 
@@ -71,7 +71,7 @@ public final class ParamSetSelectionController implements ChangeListener {
 		service.getParamSetList(new AsyncCallback<ClientParamSetList>() {
 			@Override
 			public void onFailure(final Throwable throwable) {
-				SimpleParamsEditorPanel.handleGlobalError(throwable);
+				ErrorDialog.handleGlobalError(throwable);
 			}
 
 			@Override

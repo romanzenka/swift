@@ -2,7 +2,6 @@ package edu.mayo.mprc.swift.ui.client.rpc.files;
 
 import com.google.gwt.user.client.ui.TreeItem;
 import edu.mayo.mprc.common.client.StringUtilities;
-import edu.mayo.mprc.swift.ui.client.widgets.TreeCheckBox;
 
 /**
  * A file. FileEntry knows about its size and maybe some other information.
@@ -29,7 +28,7 @@ public final class FileEntry extends Entry {
 			newItem.addStyleName("file-raw");
 		} else if (getName().endsWith(".mgf")) {
 			newItem.addStyleName("file-mgf");
-		} else if(upperCaseName.endsWith(".d")) {
+		} else if (upperCaseName.endsWith(".d")) {
 			newItem.addStyleName("file-d");
 		}
 		return newItem;

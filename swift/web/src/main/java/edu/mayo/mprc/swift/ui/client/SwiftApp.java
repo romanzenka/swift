@@ -6,10 +6,13 @@ import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.*;
+import edu.mayo.mprc.swift.ui.client.dialogs.ErrorDialog;
+import edu.mayo.mprc.swift.ui.client.dialogs.ValidationPanel;
 import edu.mayo.mprc.swift.ui.client.rpc.*;
 import edu.mayo.mprc.swift.ui.client.rpc.files.FileInfo;
 import edu.mayo.mprc.swift.ui.client.widgets.*;
-import edu.mayo.mprc.swift.ui.client.widgets.validation.ValidationPanel;
+import edu.mayo.mprc.swift.ui.client.widgets.validation.ParamsEditorApp;
+import edu.mayo.mprc.swift.ui.client.widgets.validation.SimpleParamsEditorPanel;
 
 import java.util.HashMap;
 import java.util.List;
@@ -656,7 +659,7 @@ public final class SwiftApp implements EntryPoint, HidesPageContentsWhileLoading
 					@Override
 					public void onFailure(final Throwable throwable) {
 						dialog.hide();
-						SimpleParamsEditorPanel.handleGlobalError(throwable);
+						ErrorDialog.handleGlobalError(throwable);
 					}
 
 					@Override
@@ -667,7 +670,7 @@ public final class SwiftApp implements EntryPoint, HidesPageContentsWhileLoading
 				});
 			} catch (Exception e) {
 				dialog.hide();
-				SimpleParamsEditorPanel.handleGlobalError(e);
+				ErrorDialog.handleGlobalError(e);
 			}
 		}
 	}

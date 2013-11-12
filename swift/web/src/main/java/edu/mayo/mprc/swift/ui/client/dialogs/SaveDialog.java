@@ -2,12 +2,10 @@ package edu.mayo.mprc.swift.ui.client.dialogs;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.*;
-import edu.mayo.mprc.swift.ui.client.ServiceAsync;
-import edu.mayo.mprc.swift.ui.client.SimpleParamsEditorPanel;
 import edu.mayo.mprc.swift.ui.client.rpc.ClientParamSet;
 import edu.mayo.mprc.swift.ui.client.rpc.ClientUser;
 import edu.mayo.mprc.swift.ui.client.rpc.ClientValidation;
-import edu.mayo.mprc.swift.ui.client.widgets.validation.ValidationPanel;
+import edu.mayo.mprc.swift.ui.client.service.ServiceAsync;
 
 /**
  * Prompt user to save the param set.
@@ -110,7 +108,7 @@ public final class SaveDialog extends FrameDialog {
 					@Override
 					public void onFailure(final Throwable throwable) {
 						hide();
-						SimpleParamsEditorPanel.handleGlobalError(throwable);
+						ErrorDialog.handleGlobalError(throwable);
 					}
 
 					@Override

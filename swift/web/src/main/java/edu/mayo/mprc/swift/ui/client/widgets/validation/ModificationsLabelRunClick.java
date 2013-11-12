@@ -2,7 +2,6 @@ package edu.mayo.mprc.swift.ui.client.widgets.validation;
 
 import com.google.gwt.user.client.ui.ClickListener;
 import com.google.gwt.user.client.ui.Widget;
-import edu.mayo.mprc.swift.ui.client.dialogs.ModificationDialog;
 
 /**
  * handles calling a modifications editor popup on a click event

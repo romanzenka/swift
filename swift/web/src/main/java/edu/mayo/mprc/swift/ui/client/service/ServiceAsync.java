@@ -1,4 +1,4 @@
-package edu.mayo.mprc.swift.ui.client;
+package edu.mayo.mprc.swift.ui.client.service;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import edu.mayo.mprc.swift.ui.client.rpc.*;
@@ -102,7 +102,6 @@ public interface ServiceAsync {
 	/**
 	 * Save a copy of the given parameter set (either as a temporary or as a permanent).
 	 *
-	 *
 	 * @param toCopy     the existing ClientParamSet to save a copy of.
 	 * @param newName    name to give the new param set; ignored if permanent is false
 	 * @param ownerEmail email of owner of new param set; ignored if permanent is false.
@@ -115,7 +114,6 @@ public interface ServiceAsync {
 	/**
 	 * Deletes given parameter set.
 	 *
-	 *
 	 * @param paramSet the {@link edu.mayo.mprc.swift.ui.client.rpc.ClientParamSet} object to delete
 	 * @throws edu.mayo.mprc.common.client.GWTServiceException
 	 *
@@ -124,7 +122,6 @@ public interface ServiceAsync {
 
 	/**
 	 * Fetch generated params files for display to user.
-	 *
 	 *
 	 * @param paramSet the clientParamSet to obtain files from
 	 * @return array of client param files
@@ -165,7 +162,6 @@ public interface ServiceAsync {
 	/**
 	 * Starts search for given definition.
 	 *
-	 *
 	 * @param def Search definition.
 	 * @throws edu.mayo.mprc.common.client.GWTServiceException
 	 *          When anything fails.
@@ -174,7 +170,6 @@ public interface ServiceAsync {
 
 	/**
 	 * Return search definition for a previous search with given search id.
-	 *
 	 *
 	 * @param searchRunId Id of a search run to load
 	 * @return Search definition

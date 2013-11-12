@@ -1,6 +1,7 @@
 package edu.mayo.mprc.swift.ui.client.widgets.validation;
 
 import com.google.gwt.user.client.ui.ListBox;
+import edu.mayo.mprc.swift.ui.client.dialogs.Validatable;
 import edu.mayo.mprc.swift.ui.client.rpc.ClientValue;
 
 import java.util.*;

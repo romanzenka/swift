@@ -1,7 +1,11 @@
-package edu.mayo.mprc.swift.ui.client;
+package edu.mayo.mprc.swift.ui.client.widgets.validation;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.rpc.ServiceDefTarget;
+import edu.mayo.mprc.swift.ui.client.dialogs.ErrorDialog;
+import edu.mayo.mprc.swift.ui.client.rpc.InitialPageData;
+import edu.mayo.mprc.swift.ui.client.service.Service;
+import edu.mayo.mprc.swift.ui.client.service.ServiceAsync;
 
 /**
  * Hosts SimpleParamsEditorPanel for testing.
@@ -31,7 +35,7 @@ public final class ParamsEditorApp {
 		GWT.setUncaughtExceptionHandler(new GWT.UncaughtExceptionHandler() {
 			@Override
 			public void onUncaughtException(final Throwable throwable) {
-				SimpleParamsEditorPanel.handleGlobalError(throwable);
+				ErrorDialog.handleGlobalError(throwable);
 			}
 		});
 

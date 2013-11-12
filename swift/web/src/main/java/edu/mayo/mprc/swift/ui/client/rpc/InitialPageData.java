@@ -1,6 +1,4 @@
-package edu.mayo.mprc.swift.ui.client;
-
-import edu.mayo.mprc.swift.ui.client.rpc.*;
+package edu.mayo.mprc.swift.ui.client.rpc;
 
 import java.io.Serializable;
 import java.util.HashMap;
@@ -45,23 +43,23 @@ public final class InitialPageData implements Serializable {
 		this.scaffoldReportEnabled = scaffoldReportEnabled;
 	}
 
-	List<ClientSearchEngine> getSearchEngines() {
+	public List<ClientSearchEngine> getSearchEngines() {
 		return searchEngines;
 	}
 
-	ClientUser[] listUsers() {
+	public ClientUser[] listUsers() {
 		return users;
 	}
 
-	ClientLoadedSearch loadedSearch() {
+	public ClientLoadedSearch loadedSearch() {
 		return loadedSearch;
 	}
 
-	String getUserMessage() {
+	public String getUserMessage() {
 		return userMessage;
 	}
 
-	ClientParamSetList getParamSetList() {
+	public ClientParamSetList getParamSetList() {
 		return paramSetList;
 	}
 
@@ -69,7 +67,7 @@ public final class InitialPageData implements Serializable {
 		return allowedValues;
 	}
 
-	boolean isDatabaseUndeployerEnabled() {
+	public boolean isDatabaseUndeployerEnabled() {
 		return databaseUndeployerEnabled;
 	}
 

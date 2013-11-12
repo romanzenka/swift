@@ -2,10 +2,11 @@ package edu.mayo.mprc.swift.ui.client.widgets.validation;
 
 import com.google.gwt.user.client.ui.*;
 import edu.mayo.mprc.common.client.StringUtilities;
-import edu.mayo.mprc.swift.ui.client.CompareClientModSpecificity;
+import edu.mayo.mprc.swift.ui.client.dialogs.Validatable;
 import edu.mayo.mprc.swift.ui.client.rpc.ClientModSpecificity;
 import edu.mayo.mprc.swift.ui.client.rpc.ClientModSpecificitySet;
 import edu.mayo.mprc.swift.ui.client.rpc.ClientValue;
+import edu.mayo.mprc.swift.ui.client.rpc.CompareClientModSpecificity;
 
 import java.util.*;
 

@@ -1,4 +1,4 @@
-package edu.mayo.mprc.swift.ui.client;
+package edu.mayo.mprc.swift.ui.client.widgets.validation;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.ClickListener;
@@ -6,7 +6,7 @@ import com.google.gwt.user.client.ui.Widget;
 import edu.mayo.mprc.swift.ui.client.dialogs.ProgressDialog;
 import edu.mayo.mprc.swift.ui.client.rpc.ClientDatabaseUndeployerProgress;
 import edu.mayo.mprc.swift.ui.client.rpc.ClientSequenceDatabase;
-import edu.mayo.mprc.swift.ui.client.widgets.validation.DatabaseListBox;
+import edu.mayo.mprc.swift.ui.client.service.ServiceAsync;
 
 public final class DatabaseUndeploymentAction implements ClickListener {
 

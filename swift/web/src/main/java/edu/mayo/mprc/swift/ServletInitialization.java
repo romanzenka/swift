@@ -1,13 +1,12 @@
-package edu.mayo.mprc;
+package edu.mayo.mprc.swift;
 
+import edu.mayo.mprc.MprcException;
 import edu.mayo.mprc.config.DaemonConfig;
 import edu.mayo.mprc.config.MultiFactory;
 import edu.mayo.mprc.daemon.Daemon;
 import edu.mayo.mprc.daemon.MessageBroker;
 import edu.mayo.mprc.dbcurator.server.CurationWebContext;
 import edu.mayo.mprc.messaging.ServiceFactory;
-import edu.mayo.mprc.swift.MainFactoryContext;
-import edu.mayo.mprc.swift.Swift;
 import edu.mayo.mprc.swift.commands.*;
 import edu.mayo.mprc.swift.resources.SwiftMonitor;
 import edu.mayo.mprc.swift.resources.WebUi;

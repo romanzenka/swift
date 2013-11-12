@@ -1,7 +1,6 @@
 package edu.mayo.mprc.swift.ui.client.rpc.files;
 
 import com.google.gwt.user.client.ui.TreeItem;
-import edu.mayo.mprc.swift.ui.client.widgets.TreeCheckBox;
 
 /**
  * A directory.

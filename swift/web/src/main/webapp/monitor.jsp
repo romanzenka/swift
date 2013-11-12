@@ -1,6 +1,6 @@
-<%@ page import="edu.mayo.mprc.ServletInitialization" %>
 <%@ page import="edu.mayo.mprc.daemon.DaemonConnection" %>
 <%@ page import="edu.mayo.mprc.daemon.monitor.DaemonStatus" %>
+<%@ page import="edu.mayo.mprc.swift.ServletInitialization" %>
 <%@ page import="edu.mayo.mprc.swift.SwiftWebContext" %>
 <%@ page import="edu.mayo.mprc.swift.resources.SwiftMonitor" %>
 <%@ page import="java.util.Date" %>
