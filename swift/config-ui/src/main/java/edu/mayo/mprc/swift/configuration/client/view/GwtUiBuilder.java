@@ -1,9 +1,7 @@
 package edu.mayo.mprc.swift.configuration.client.view;
 
 import com.google.gwt.user.client.ui.*;
-import edu.mayo.mprc.swift.configuration.client.ConfigurationService;
-import edu.mayo.mprc.swift.configuration.client.model.ApplicationModel;
-import edu.mayo.mprc.swift.configuration.client.model.ResourceModel;
+import edu.mayo.mprc.swift.configuration.client.model.*;
 import edu.mayo.mprc.swift.configuration.client.validation.local.IntegerValidator;
 import edu.mayo.mprc.swift.configuration.client.validation.local.RequiredFieldValidator;
 import edu.mayo.mprc.swift.configuration.client.validation.local.Validator;

@@ -1,6 +1,4 @@
-package edu.mayo.mprc.swift.configuration.client.view;
-
-import edu.mayo.mprc.swift.configuration.client.model.ApplicationModel;
+package edu.mayo.mprc.swift.configuration.client.model;
 
 public interface Context {
 	ApplicationModel getApplicationModel();

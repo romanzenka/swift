@@ -3,11 +3,8 @@ package edu.mayo.mprc.swift.configuration.client;
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.*;
-import edu.mayo.mprc.swift.configuration.client.model.ApplicationModel;
-import edu.mayo.mprc.swift.configuration.client.model.UiChanges;
-import edu.mayo.mprc.swift.configuration.client.model.UiChangesReplayer;
+import edu.mayo.mprc.swift.configuration.client.model.*;
 import edu.mayo.mprc.swift.configuration.client.view.ConfigWrapper;
-import edu.mayo.mprc.swift.configuration.client.view.Context;
 
 public final class Configuration implements EntryPoint, Context {
 

@@ -1,4 +1,4 @@
-package edu.mayo.mprc.swift.configuration.client.view;
+package edu.mayo.mprc.swift.configuration.client.model;
 
 import java.io.Serializable;
 import java.util.ArrayList;

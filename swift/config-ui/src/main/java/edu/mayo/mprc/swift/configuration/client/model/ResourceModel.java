@@ -1,7 +1,5 @@
 package edu.mayo.mprc.swift.configuration.client.model;
 
-import edu.mayo.mprc.swift.configuration.client.view.UiBuilderReplayer;
-
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;

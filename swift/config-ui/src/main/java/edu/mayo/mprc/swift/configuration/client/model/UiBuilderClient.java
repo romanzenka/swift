@@ -1,4 +1,4 @@
-package edu.mayo.mprc.swift.configuration.client.view;
+package edu.mayo.mprc.swift.configuration.client.model;
 
 /**
  * A client version of an Ui builder.

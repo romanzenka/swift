@@ -3,6 +3,7 @@ package edu.mayo.mprc.swift.configuration.client.view;
 import com.google.gwt.user.client.ui.ChangeListener;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
+import edu.mayo.mprc.swift.configuration.client.model.Context;
 import edu.mayo.mprc.swift.configuration.client.model.DaemonModel;
 
 import java.util.HashMap;

@@ -4,7 +4,7 @@ import edu.mayo.mprc.config.DependencyResolver;
 import edu.mayo.mprc.config.ResourceConfig;
 import edu.mayo.mprc.config.ui.PropertyChangeListener;
 import edu.mayo.mprc.config.ui.UiBuilder;
-import edu.mayo.mprc.swift.configuration.client.view.UiBuilderReplayer;
+import edu.mayo.mprc.swift.configuration.client.model.UiBuilderReplayer;
 import edu.mayo.mprc.swift.configuration.server.properties.validator.ExecutableValidator;
 import edu.mayo.mprc.swift.configuration.server.properties.validator.FileValidator;
 

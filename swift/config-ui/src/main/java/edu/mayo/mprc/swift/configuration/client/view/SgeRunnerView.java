@@ -1,6 +1,7 @@
 package edu.mayo.mprc.swift.configuration.client.view;
 
 import com.google.gwt.user.client.ui.SimplePanel;
+import edu.mayo.mprc.swift.configuration.client.model.Context;
 import edu.mayo.mprc.swift.configuration.client.model.ResourceModel;
 
 import java.util.HashMap;

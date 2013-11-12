@@ -2,7 +2,6 @@ package edu.mayo.mprc.swift.configuration.client.view;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.*;
-import edu.mayo.mprc.swift.configuration.client.ConfigurationService;
 import edu.mayo.mprc.swift.configuration.client.model.*;
 
 import java.util.HashMap;

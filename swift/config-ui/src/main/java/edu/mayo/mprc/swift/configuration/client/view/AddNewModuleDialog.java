@@ -1,8 +1,7 @@
 package edu.mayo.mprc.swift.configuration.client.view;
 
 import com.google.gwt.user.client.ui.*;
-import edu.mayo.mprc.swift.configuration.client.model.ApplicationModel;
-import edu.mayo.mprc.swift.configuration.client.model.DaemonModel;
+import edu.mayo.mprc.swift.configuration.client.model.*;
 
 import java.util.HashMap;
 import java.util.List;

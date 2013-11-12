@@ -1,9 +1,6 @@
 package edu.mayo.mprc.swift.configuration.client.model;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import edu.mayo.mprc.swift.configuration.client.ConfigurationService;
-import edu.mayo.mprc.swift.configuration.client.view.Context;
-import edu.mayo.mprc.swift.configuration.client.view.NewModuleCreatedCallback;
 
 public final class DaemonModel extends ResourceModel {
 	public static final String HOST_NAME = "hostName";

@@ -1,8 +1,7 @@
 package edu.mayo.mprc.swift.configuration.client.view;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import edu.mayo.mprc.swift.configuration.client.ConfigurationService;
-import edu.mayo.mprc.swift.configuration.client.FixTagActionListener;
+import edu.mayo.mprc.swift.configuration.client.model.ConfigurationService;
 import edu.mayo.mprc.swift.configuration.client.model.ResourceModel;
 import edu.mayo.mprc.swift.configuration.client.model.UiChanges;
 import edu.mayo.mprc.swift.configuration.client.model.UiChangesReplayer;

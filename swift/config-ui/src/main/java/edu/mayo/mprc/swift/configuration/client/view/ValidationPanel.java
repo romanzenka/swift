@@ -1,7 +1,7 @@
 package edu.mayo.mprc.swift.configuration.client.view;
 
 import com.google.gwt.user.client.ui.*;
-import edu.mayo.mprc.swift.configuration.client.FixTagActionListener;
+import edu.mayo.mprc.config.ui.FixTag;
 
 /**
  * A panel that displays validation text. Has useful methods for parsing the &lt;fix&gt; tags.
@@ -13,7 +13,7 @@ public final class ValidationPanel extends FlowPanel {
 	private Widget successIndicator;
 
 	/**
-	 * Copy of {@link edu.mayo.mprc.config.ui.FixTag} values
+	 * Copy of {@link FixTag} values
 	 */
 	public static final String BEGINNINGTAG = "<fix";
 	public static final String ENDTAG = "</fix>";
@@ -63,7 +63,7 @@ public final class ValidationPanel extends FlowPanel {
 					final String action = fixTag.substring(indexOfActionAttrib + ACTIONATTRIB.length(), fixTag.indexOf("\">"));
 
 					panel.add(new HTML(errorMessage.substring(0, errorMessage.indexOf(fixTag))));
-					final String tagMessage = fixTag.substring(indexOfActionAttrib+ACTIONATTRIB.length()+action.length()+2);
+					final String tagMessage = fixTag.substring(indexOfActionAttrib + ACTIONATTRIB.length() + action.length() + 2);
 
 					final Button link = new Button(tagMessage);
 					link.addClickListener(new ClickListener() {

@@ -1,9 +1,6 @@
-package edu.mayo.mprc.swift.configuration.client;
+package edu.mayo.mprc.swift.configuration.client.model;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import edu.mayo.mprc.swift.configuration.client.model.ApplicationModel;
-import edu.mayo.mprc.swift.configuration.client.model.ResourceModel;
-import edu.mayo.mprc.swift.configuration.client.model.UiChangesReplayer;
 
 public interface ConfigurationServiceAsync {
 	void saveConfiguration(AsyncCallback<UiChangesReplayer> async);

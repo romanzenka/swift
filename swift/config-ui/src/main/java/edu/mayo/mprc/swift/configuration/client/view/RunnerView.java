@@ -5,7 +5,8 @@ import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.SourcesTabEvents;
 import com.google.gwt.user.client.ui.TabListener;
 import com.google.gwt.user.client.ui.TabPanel;
-import edu.mayo.mprc.swift.configuration.client.ConfigurationService;
+import edu.mayo.mprc.swift.configuration.client.model.ConfigurationService;
+import edu.mayo.mprc.swift.configuration.client.model.Context;
 import edu.mayo.mprc.swift.configuration.client.model.ModuleModel;
 import edu.mayo.mprc.swift.configuration.client.model.ResourceModel;
 

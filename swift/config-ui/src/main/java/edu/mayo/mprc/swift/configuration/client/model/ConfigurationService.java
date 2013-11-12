@@ -1,12 +1,9 @@
-package edu.mayo.mprc.swift.configuration.client;
+package edu.mayo.mprc.swift.configuration.client.model;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.rpc.RemoteService;
 import com.google.gwt.user.client.rpc.ServiceDefTarget;
 import edu.mayo.mprc.common.client.GWTServiceException;
-import edu.mayo.mprc.swift.configuration.client.model.ApplicationModel;
-import edu.mayo.mprc.swift.configuration.client.model.ResourceModel;
-import edu.mayo.mprc.swift.configuration.client.model.UiChangesReplayer;
 
 public interface ConfigurationService extends RemoteService {
 
