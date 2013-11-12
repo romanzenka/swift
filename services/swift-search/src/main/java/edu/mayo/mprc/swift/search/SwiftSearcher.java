@@ -317,7 +317,6 @@ public final class SwiftSearcher implements Worker {
 			final SearchRun searchRun = swiftDao.fillSearchRun(swiftSearchDefinition);
 
 			final SearchRunner searchRunner = new SearchRunner(
-					swiftSearchWorkPacket,
 					swiftSearchDefinition,
 					raw2mgfDaemon,
 					msconvertDaemon,
@@ -337,7 +336,9 @@ public final class SwiftSearcher implements Worker {
 					searchRun,
 					reportDecoyHits,
 					swiftSearchWorkPacket.getPriority(),
-					paramsInfo);
+					paramsInfo,
+					swiftSearchWorkPacket.getTaskId(),
+					swiftSearchWorkPacket.isFromScratch());
 
 			searchRunner.initialize();
 

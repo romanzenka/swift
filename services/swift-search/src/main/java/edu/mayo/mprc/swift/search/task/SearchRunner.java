@@ -15,7 +15,6 @@ import edu.mayo.mprc.swift.dbmapping.*;
 import edu.mayo.mprc.swift.params2.ExtractMsnSettings;
 import edu.mayo.mprc.swift.params2.SearchEngineParameters;
 import edu.mayo.mprc.swift.params2.mapping.ParamsInfo;
-import edu.mayo.mprc.swift.search.SwiftSearchWorkPacket;
 import edu.mayo.mprc.utilities.FileUtilities;
 import edu.mayo.mprc.utilities.Tuple;
 import edu.mayo.mprc.utilities.exceptions.ExceptionUtilities;
@@ -51,7 +50,7 @@ import java.util.concurrent.ExecutorService;
 public final class SearchRunner implements Runnable {
 	private static final Logger LOGGER = Logger.getLogger(SearchRunner.class);
 
-	private SwiftSearchWorkPacket packet;
+	private boolean fromScratch;
 	private SwiftSearchDefinition searchDefinition;
 
 	private CurationDao curationDao;
@@ -182,7 +181,6 @@ public final class SearchRunner implements Runnable {
 	private static final String DEFAULT_PARAMS_FOLDER = "params";
 
 	public SearchRunner(
-			final SwiftSearchWorkPacket packet,
 			final SwiftSearchDefinition searchDefinition,
 			final DaemonConnection raw2mgfDaemon,
 			final DaemonConnection msconvertDaemon,
@@ -202,9 +200,10 @@ public final class SearchRunner implements Runnable {
 			final SearchRun searchRun,
 			final boolean reportDecoyHits,
 			final int priority,
-			final ParamsInfo paramsInfo) {
+			final ParamsInfo paramsInfo,
+			final String taskId,
+			final boolean fromScratch) {
 		this.searchDefinition = searchDefinition;
-		this.packet = packet;
 		this.raw2mgfDaemon = raw2mgfDaemon;
 		this.msconvertDaemon = msconvertDaemon;
 		this.mgfCleanupDaemon = mgfCleanupDaemon;
@@ -222,9 +221,10 @@ public final class SearchRunner implements Runnable {
 		this.fileTokenFactory = fileTokenFactory;
 		this.searchRun = searchRun;
 		this.reportDecoyHits = reportDecoyHits;
-		workflowEngine = new WorkflowEngine(packet.getTaskId());
+		workflowEngine = new WorkflowEngine(taskId);
 		workflowEngine.setPriority(priority);
 		this.paramsInfo = paramsInfo;
+		this.fromScratch = fromScratch;
 		assertValid();
 	}
 
@@ -731,7 +731,7 @@ public final class SearchRunner implements Runnable {
 	}
 
 	private boolean isFromScratch() {
-		return packet.isFromScratch();
+		return fromScratch;
 	}
 
 	private void addQaTask(final FileSearch inputFile, final ScaffoldTaskI scaffoldTask, final FileProducingTask mgfOutput) {

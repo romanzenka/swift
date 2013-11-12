@@ -15,7 +15,6 @@ import edu.mayo.mprc.swift.params2.mapping.MappingContext;
 import edu.mayo.mprc.swift.params2.mapping.MappingFactory;
 import edu.mayo.mprc.swift.params2.mapping.Mappings;
 import edu.mayo.mprc.swift.params2.mapping.MockParamsInfo;
-import edu.mayo.mprc.swift.search.SwiftSearchWorkPacket;
 import edu.mayo.mprc.unimod.ModSet;
 import edu.mayo.mprc.utilities.FileUtilities;
 import edu.mayo.mprc.utilities.progress.ProgressReporter;
@@ -58,8 +57,6 @@ public class TestSearchRunner {
 
 	@Test
 	public void singleExperimentRunner() throws IOException {
-		final SwiftSearchWorkPacket packet = new SwiftSearchWorkPacket(1, "task1", false, 0);
-
 		final Collection<SearchEngine> searchEngines = searchEngines();
 
 		final EnabledEngines engines = enabledEngines();
@@ -76,7 +73,7 @@ public class TestSearchRunner {
 
 		final SearchRun searchRun = null;
 
-		final SearchRunner runner = makeSearchRunner(packet, searchEngines, definition, reporter, service, searchRun);
+		final SearchRunner runner = makeSearchRunner("task1", false, searchEngines, definition, reporter, service, searchRun);
 
 		runner.initialize();
 
@@ -103,8 +100,6 @@ public class TestSearchRunner {
 
 	@Test
 	public void onlyProvideMgfAndMzxmlRunner() throws IOException {
-		final SwiftSearchWorkPacket packet = new SwiftSearchWorkPacket(1, "task1", false, 0);
-
 		final Collection<SearchEngine> searchEngines = searchEngines();
 
 		final EnabledEngines engines = new EnabledEngines();
@@ -125,7 +120,7 @@ public class TestSearchRunner {
 
 		final SearchRun searchRun = null;
 
-		final SearchRunner runner = makeSearchRunner(packet, searchEngines, definition, reporter, service, searchRun);
+		final SearchRunner runner = makeSearchRunner("task1", false, searchEngines, definition, reporter, service, searchRun);
 
 		runner.initialize();
 
@@ -143,8 +138,6 @@ public class TestSearchRunner {
 
 	@Test
 	public void singleExperimentTwoDatabasesRunner() throws IOException {
-		final SwiftSearchWorkPacket packet = new SwiftSearchWorkPacket(1, "task1", false, 0);
-
 		final Collection<SearchEngine> searchEngines = searchEngines();
 
 		final EnabledEngines engines = enabledEngines();
@@ -161,7 +154,7 @@ public class TestSearchRunner {
 
 		final SearchRun searchRun = null;
 
-		final SearchRunner runner = makeSearchRunner(packet, searchEngines, definition, reporter, service, searchRun);
+		final SearchRunner runner = makeSearchRunner("task1", false, searchEngines, definition, reporter, service, searchRun);
 
 		runner.initialize();
 
@@ -187,8 +180,6 @@ public class TestSearchRunner {
 
 	@Test
 	public void singleExperimentTwoProteasesRunner() throws IOException {
-		final SwiftSearchWorkPacket packet = new SwiftSearchWorkPacket(1, "task1", false, 0);
-
 		final Collection<SearchEngine> searchEngines = searchEngines();
 
 		final EnabledEngines engines = enabledEngines();
@@ -205,7 +196,7 @@ public class TestSearchRunner {
 
 		final SearchRun searchRun = null;
 
-		final SearchRunner runner = makeSearchRunner(packet, searchEngines, definition, reporter, service, searchRun);
+		final SearchRunner runner = makeSearchRunner("task1", false, searchEngines, definition, reporter, service, searchRun);
 
 		runner.initialize();
 
@@ -233,8 +224,6 @@ public class TestSearchRunner {
 
 	@Test
 	public void multipleExperimentRunner() throws IOException {
-		final SwiftSearchWorkPacket packet = new SwiftSearchWorkPacket(1, "task1", false, 0);
-
 		final Collection<SearchEngine> searchEngines = searchEngines();
 
 		final EnabledEngines engines = enabledEngines();
@@ -251,7 +240,7 @@ public class TestSearchRunner {
 
 		final SearchRun searchRun = null;
 
-		final SearchRunner runner = makeSearchRunner(packet, searchEngines, definition, reporter, service, searchRun);
+		final SearchRunner runner = makeSearchRunner("task1", false, searchEngines, definition, reporter, service, searchRun);
 
 		runner.initialize();
 
@@ -275,8 +264,8 @@ public class TestSearchRunner {
 		Assert.assertEquals(runner.getWorkflowEngine().getNumTasks(), expectedNumTasks);
 	}
 
-	private SearchRunner makeSearchRunner(SwiftSearchWorkPacket packet, Collection<SearchEngine> searchEngines, SwiftSearchDefinition definition, ProgressReporter reporter, ExecutorService service, SearchRun searchRun) {
-		return new SearchRunner(packet,
+	private SearchRunner makeSearchRunner(String taskId, boolean fromScratch, Collection<SearchEngine> searchEngines, SwiftSearchDefinition definition, ProgressReporter reporter, ExecutorService service, SearchRun searchRun) {
+		return new SearchRunner(
 				definition,
 				mock(DaemonConnection.class),
 				mock(DaemonConnection.class),
@@ -296,7 +285,9 @@ public class TestSearchRunner {
 				searchRun,
 				false,
 				0,
-				new MockParamsInfo());
+				new MockParamsInfo(),
+				taskId,
+				fromScratch);
 	}
 
 	private SwiftSearchDefinition defaultSearchDefinition(final List<FileSearch> inputFiles) {
