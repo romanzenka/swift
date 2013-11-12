@@ -9,6 +9,29 @@
 
     <import resource="factories.xml" />
 
+    <!-- Hibernate properties -->
+    <bean id="hibernateProperties" class="java.util.HashMap">
+        <constructor-arg type="java.util.Map">
+            <map>
+                <entry key="hibernate.show_sql" value="${hibernate.show_sql}" />
+
+                <entry key="hibernate.current_session_context_class"
+                    value="${hibernate.current_session_context_class}" />
+                <entry key="hibernate.transaction.factory_class" value="${hibernate.transaction.factory_class}" />
+                <entry key="hibernate.cache.provider_class" value="${hibernate.cache.provider_class}" />
+                <entry key="hibernate.jdbc.batch_size" value="0" />
+                <entry key="hibernate.c3p0.min_size" value="5" />
+                <entry key="hibernate.c3p0.max_size" value="20" />
+                <entry key="hibernate.c3p0.timeout" value="6000" />
+                <entry key="hibernate.c3p0.max_statements" value="100" />
+                <entry key="hibernate.c3p0.max_statements_per_connection" value="20" />
+                <entry key="hibernate.c3p0.idle_connection_test_period" value="300" />
+                <entry key="hibernate.connection.provider_class"
+                    value="org.hibernate.connection.C3P0ConnectionProvider" />
+            </map>
+        </constructor-arg>
+    </bean>
+
     <bean class="java.net.URL" id="testFastaUrl">
         <constructor-arg value="ftp://proteomics.mayo.edu/test/ShortTest.fasta.gz" />
     </bean>

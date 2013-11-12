@@ -276,7 +276,7 @@ public final class MyriMatchMappings implements Mappings {
 		if (isNonSpecificEnzyme(enzyme)) {
 			// Non-specific enzymes in Myrimatch are done using a normal enzyme
 			// with MinTerminiCleavages set to 0
-			return enzymeToString(Protease.TRYPSIN_P);
+			return enzymeToString(Protease.getTrypsinAllowP());
 		}
 
 		final StringBuilder result = new StringBuilder(20);

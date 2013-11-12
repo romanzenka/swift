@@ -17,17 +17,6 @@ public class IonSeries extends EvolvableBase implements Comparable<IonSeries> {
 
 	private String name;
 
-	private static final List<IonSeries> DEFAULT_SERIES = Arrays.asList(
-			new IonSeries("a"),
-			new IonSeries("b"),
-			new IonSeries("c"),
-			new IonSeries("d"),
-			new IonSeries("v"),
-			new IonSeries("w"),
-			new IonSeries("x"),
-			new IonSeries("y"),
-			new IonSeries("z"));
-
 	IonSeries() {
 	}
 
@@ -74,7 +63,18 @@ public class IonSeries extends EvolvableBase implements Comparable<IonSeries> {
 	}
 
 	public static List<IonSeries> getInitial() {
-		return DEFAULT_SERIES;
+		final List<IonSeries> defaultSeries = Arrays.asList(
+				new IonSeries("a"),
+				new IonSeries("b"),
+				new IonSeries("c"),
+				new IonSeries("d"),
+				new IonSeries("v"),
+				new IonSeries("w"),
+				new IonSeries("x"),
+				new IonSeries("y"),
+				new IonSeries("z"));
+
+		return defaultSeries;
 	}
 
 	@Override

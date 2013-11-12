@@ -111,7 +111,7 @@ public final class ParamsDaoTest extends DaoTest {
 		dao.addIonSeries(series2, change2);
 	}
 
-	@Test()
+	@Test
 	public void shouldIgnoreIonSeriesUpdates() {
 		IonSeries series = new IonSeries("a");
 		final Change change = new Change("test add", new DateTime());
