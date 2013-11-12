@@ -144,7 +144,11 @@ public final class ConfigWrapper extends SimplePanel {
 
 		@Override
 		public void childAdded(final ResourceModel child, final ResourceModel addedTo) {
-			addDaemonUi((DaemonModel) child);
+			if (child instanceof DaemonModel) {
+				addDaemonUi((DaemonModel) child);
+			} else {
+				throw new RuntimeException("Programmer error, type mismatch");
+			}
 		}
 
 		@Override
@@ -230,13 +234,17 @@ public final class ConfigWrapper extends SimplePanel {
 
 		@Override
 		public void childAdded(final ResourceModel child, final ResourceModel addedTo) {
-			addTreeItemForResource((DaemonModel) addedTo, child, daemonTreeItem);
+			if (addedTo instanceof DaemonModel) {
+				addTreeItemForResource((DaemonModel) addedTo, child, daemonTreeItem);
+			} else {
+				throw new RuntimeException("Programmer error, type mismatch");
+			}
 		}
 
 		@Override
 		public void childRemoved(final ResourceModel child, final ResourceModel removedFrom) {
 			removeTreeItemForResource(child, daemonTreeItem);
-			final ModuleWrapper removedModuleWrapper = daemonMap.get((DaemonModel) removedFrom).wrapper.getUiForResource(child);
+			final ModuleWrapper removedModuleWrapper = daemonMap.get(removedFrom).wrapper.getUiForResource(child);
 			if (uiPanel.getWidget().equals(removedModuleWrapper)) {
 				uiPanel.clear();
 				runnerPanel.clear();

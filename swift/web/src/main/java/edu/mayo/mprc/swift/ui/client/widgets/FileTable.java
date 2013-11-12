@@ -143,7 +143,11 @@ public final class FileTable extends FlexTable implements SourcesChangeEvents, C
 			selection.addClickListener(new ClickListener() {
 				@Override
 				public void onClick(final Widget sender) {
-					setChecked(getWidgetRow(sender), SELECT_COLUMN, ((CheckBox) sender).isChecked());
+					if (sender instanceof CheckBox) {
+						setChecked(getWidgetRow(sender), SELECT_COLUMN, ((CheckBox) sender).isChecked());
+					} else {
+						throw new RuntimeException("Programmer error, type mismatch");
+					}
 				}
 			});
 			setWidget(lastRow, 0, selection);
@@ -175,7 +179,11 @@ public final class FileTable extends FlexTable implements SourcesChangeEvents, C
 			selection.addClickListener(new ClickListener() {
 				@Override
 				public void onClick(final Widget sender) {
-					setChecked(getWidgetRow(sender), SELECT_COLUMN, ((CheckBox) sender).isChecked());
+					if (sender instanceof CheckBox) {
+						setChecked(getWidgetRow(sender), SELECT_COLUMN, ((CheckBox) sender).isChecked());
+					} else {
+						throw new RuntimeException("Programmer error, type mismatch");
+					}
 				}
 			});
 			setWidget(lastRow, 0, selection);
@@ -487,10 +495,14 @@ public final class FileTable extends FlexTable implements SourcesChangeEvents, C
 
 		@Override
 		public void onChange(final Widget widget) {
-			final EditableLabel label = (EditableLabel) widget;
-			_fileTable.changeColumnText(getWidgetRow(widget), _column, label.getText());
-			_fileTable.setSearchType(SearchType.Custom);
-			_fileTable.searchTypeList.setSelectedSearchType(SearchType.Custom, true);
+			if (widget instanceof EditableLabel) {
+				final EditableLabel label = (EditableLabel) widget;
+				_fileTable.changeColumnText(getWidgetRow(widget), _column, label.getText());
+				_fileTable.setSearchType(SearchType.Custom);
+				_fileTable.searchTypeList.setSelectedSearchType(SearchType.Custom, true);
+			} else {
+				throw new RuntimeException("Programmer error, type mismatch");
+			}
 		}
 	}
 
