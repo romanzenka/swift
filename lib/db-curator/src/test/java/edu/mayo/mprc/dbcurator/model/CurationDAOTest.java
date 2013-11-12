@@ -1,4 +1,4 @@
-package edu.mayo.mprc.dbcurator.model.persistence;
+package edu.mayo.mprc.dbcurator.model;
 
 import org.testng.Assert;
 import org.testng.annotations.Test;

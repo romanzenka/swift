@@ -1,13 +1,9 @@
-package edu.mayo.mprc.dbcurator.model.persistence;
+package edu.mayo.mprc.dbcurator.model;
 
 import edu.mayo.mprc.MprcException;
 import edu.mayo.mprc.database.Change;
 import edu.mayo.mprc.database.DaoBase;
 import edu.mayo.mprc.database.Database;
-import edu.mayo.mprc.dbcurator.model.Curation;
-import edu.mayo.mprc.dbcurator.model.FastaSource;
-import edu.mayo.mprc.dbcurator.model.HeaderTransform;
-import edu.mayo.mprc.dbcurator.model.SourceDatabaseArchive;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.criterion.Criterion;

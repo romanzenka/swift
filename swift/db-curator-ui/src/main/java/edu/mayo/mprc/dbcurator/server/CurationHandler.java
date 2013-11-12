@@ -4,7 +4,6 @@ import edu.mayo.mprc.dbcurator.client.CurationValidation;
 import edu.mayo.mprc.dbcurator.client.curatorstubs.*;
 import edu.mayo.mprc.dbcurator.model.*;
 import edu.mayo.mprc.dbcurator.model.curationsteps.*;
-import edu.mayo.mprc.dbcurator.model.persistence.CurationDao;
 import edu.mayo.mprc.fasta.DatabaseAnnotation;
 import edu.mayo.mprc.fasta.filter.MatchMode;
 import org.apache.log4j.Logger;

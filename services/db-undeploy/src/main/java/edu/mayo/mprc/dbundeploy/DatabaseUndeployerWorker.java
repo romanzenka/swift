@@ -11,7 +11,7 @@ import edu.mayo.mprc.daemon.worker.WorkerBase;
 import edu.mayo.mprc.daemon.worker.WorkerFactoryBase;
 import edu.mayo.mprc.database.Change;
 import edu.mayo.mprc.dbcurator.model.Curation;
-import edu.mayo.mprc.dbcurator.model.persistence.CurationDao;
+import edu.mayo.mprc.dbcurator.model.CurationDao;
 import edu.mayo.mprc.utilities.progress.UserProgressReporter;
 import org.apache.log4j.Logger;
 import org.joda.time.DateTime;

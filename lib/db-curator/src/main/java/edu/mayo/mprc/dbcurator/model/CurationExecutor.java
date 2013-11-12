@@ -1,7 +1,6 @@
 package edu.mayo.mprc.dbcurator.model;
 
 import edu.mayo.mprc.MprcException;
-import edu.mayo.mprc.dbcurator.model.persistence.CurationDao;
 import edu.mayo.mprc.fasta.DBInputStream;
 import edu.mayo.mprc.fasta.DBOutputStream;
 import edu.mayo.mprc.fasta.FASTAInputStream;

@@ -8,9 +8,9 @@ import edu.mayo.mprc.dbcurator.client.curatorstubs.CurationStub;
 import edu.mayo.mprc.dbcurator.client.curatorstubs.HeaderTransformStub;
 import edu.mayo.mprc.dbcurator.client.services.CommonDataRequester;
 import edu.mayo.mprc.dbcurator.model.Curation;
+import edu.mayo.mprc.dbcurator.model.CurationDao;
 import edu.mayo.mprc.dbcurator.model.FastaSource;
 import edu.mayo.mprc.dbcurator.model.HeaderTransform;
-import edu.mayo.mprc.dbcurator.model.persistence.CurationDao;
 import edu.mayo.mprc.utilities.FileUtilities;
 import org.apache.log4j.Logger;
 

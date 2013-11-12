@@ -3,7 +3,6 @@ package edu.mayo.mprc.dbcurator.model;
 import com.enterprisedt.net.ftp.FTPClient;
 import com.enterprisedt.net.ftp.FTPException;
 import edu.mayo.mprc.MprcException;
-import edu.mayo.mprc.dbcurator.model.persistence.CurationDao;
 import edu.mayo.mprc.utilities.AsyncFileWriter;
 import edu.mayo.mprc.utilities.FileUtilities;
 import org.apache.log4j.Logger;
@@ -175,7 +174,7 @@ public class SourceDatabaseArchive implements Serializable {
 
 				} catch (Exception e) {
 					LOGGER.debug(e);
-					throw new MprcException("There was a problem retrieving data from ["+url.getProtocol()+"://"+url.getHost()+(url.getPort()>0?":"+url.getPort():"")+url.getPath()+ "]", e);
+					throw new MprcException("There was a problem retrieving data from [" + url.getProtocol() + "://" + url.getHost() + (url.getPort() > 0 ? ":" + url.getPort() : "") + url.getPath() + "]", e);
 				} finally {
 					if (ftp != null) {
 						try {

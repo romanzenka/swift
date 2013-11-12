@@ -2,7 +2,7 @@ package edu.mayo.mprc.swift.params2.mapping;
 
 import edu.mayo.mprc.MprcException;
 import edu.mayo.mprc.dbcurator.model.Curation;
-import edu.mayo.mprc.dbcurator.model.persistence.CurationDao;
+import edu.mayo.mprc.dbcurator.model.CurationDao;
 import edu.mayo.mprc.swift.params2.Instrument;
 import edu.mayo.mprc.swift.params2.IonSeries;
 import edu.mayo.mprc.swift.params2.ParamsDao;

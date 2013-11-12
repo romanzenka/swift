@@ -9,7 +9,7 @@ import edu.mayo.mprc.daemon.worker.Worker;
 import edu.mayo.mprc.daemon.worker.WorkerBase;
 import edu.mayo.mprc.daemon.worker.WorkerFactoryBase;
 import edu.mayo.mprc.database.Database;
-import edu.mayo.mprc.dbcurator.model.persistence.CurationDao;
+import edu.mayo.mprc.dbcurator.model.CurationDao;
 import edu.mayo.mprc.fastadb.FastaDbDao;
 import edu.mayo.mprc.fastadb.ProteinSequenceTranslator;
 import edu.mayo.mprc.fastadb.SingleDatabaseTranslator;

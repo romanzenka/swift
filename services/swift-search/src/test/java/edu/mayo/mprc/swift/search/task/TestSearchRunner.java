@@ -4,7 +4,7 @@ import edu.mayo.mprc.config.DaemonConfigInfo;
 import edu.mayo.mprc.daemon.DaemonConnection;
 import edu.mayo.mprc.daemon.SimpleThreadPoolExecutor;
 import edu.mayo.mprc.dbcurator.model.Curation;
-import edu.mayo.mprc.dbcurator.model.persistence.CurationDao;
+import edu.mayo.mprc.dbcurator.model.CurationDao;
 import edu.mayo.mprc.searchengine.EngineMetadata;
 import edu.mayo.mprc.swift.db.DatabaseFileTokenFactory;
 import edu.mayo.mprc.swift.db.SearchEngine;

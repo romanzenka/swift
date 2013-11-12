@@ -1,7 +1,7 @@
 package edu.mayo.mprc.omssa;
 
-import edu.mayo.mprc.dbcurator.model.persistence.CurationDao;
-import edu.mayo.mprc.dbcurator.model.persistence.MockCurationDao;
+import edu.mayo.mprc.dbcurator.model.CurationDao;
+import edu.mayo.mprc.dbcurator.model.MockCurationDao;
 import edu.mayo.mprc.swift.params2.MockParamsDao;
 import edu.mayo.mprc.swift.params2.mapping.*;
 import edu.mayo.mprc.unimod.MockUnimodDao;

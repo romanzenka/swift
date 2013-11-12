@@ -1,7 +1,7 @@
 package edu.mayo.mprc.mascot;
 
-import edu.mayo.mprc.dbcurator.model.persistence.CurationDao;
-import edu.mayo.mprc.dbcurator.model.persistence.MockCurationDao;
+import edu.mayo.mprc.dbcurator.model.CurationDao;
+import edu.mayo.mprc.dbcurator.model.MockCurationDao;
 import edu.mayo.mprc.swift.params2.MassUnit;
 import edu.mayo.mprc.swift.params2.MockParamsDao;
 import edu.mayo.mprc.swift.params2.ParamsDao;

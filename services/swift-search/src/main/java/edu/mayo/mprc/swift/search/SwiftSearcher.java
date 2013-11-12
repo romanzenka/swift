@@ -15,7 +15,7 @@ import edu.mayo.mprc.daemon.worker.WorkPacket;
 import edu.mayo.mprc.daemon.worker.Worker;
 import edu.mayo.mprc.daemon.worker.WorkerFactoryBase;
 import edu.mayo.mprc.database.Database;
-import edu.mayo.mprc.dbcurator.model.persistence.CurationDao;
+import edu.mayo.mprc.dbcurator.model.CurationDao;
 import edu.mayo.mprc.fastadb.FastaDbWorker;
 import edu.mayo.mprc.mgf2mgf.MgfToMgfWorker;
 import edu.mayo.mprc.msconvert.MsconvertCache;

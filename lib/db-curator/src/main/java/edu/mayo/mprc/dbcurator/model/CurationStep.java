@@ -1,7 +1,5 @@
 package edu.mayo.mprc.dbcurator.model;
 
-import edu.mayo.mprc.dbcurator.model.persistence.CurationDao;
-
 import java.io.Serializable;
 
 /**

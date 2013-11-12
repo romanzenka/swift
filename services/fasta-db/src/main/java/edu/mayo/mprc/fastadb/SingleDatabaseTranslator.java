@@ -2,7 +2,7 @@ package edu.mayo.mprc.fastadb;
 
 import edu.mayo.mprc.MprcException;
 import edu.mayo.mprc.dbcurator.model.Curation;
-import edu.mayo.mprc.dbcurator.model.persistence.CurationDao;
+import edu.mayo.mprc.dbcurator.model.CurationDao;
 import edu.mayo.mprc.utilities.FileUtilities;
 
 import java.util.regex.Matcher;
@@ -42,17 +42,17 @@ public class SingleDatabaseTranslator implements ProteinSequenceTranslator {
 					if (database == null) {
 						throw new MprcException("Cannot find information about database [" + currentDatabaseSources + "] even after removing the timestamp");
 					}
-					stripDatabaseTimestamp=true;
+					stripDatabaseTimestamp = true;
 				} else {
 					throw new MprcException("Cannot find information about database [" + currentDatabaseSources + "]");
 				}
 			}
 		} else {
 			String cleanedDatabaseName = FileUtilities.stripGzippedExtension(databaseSources);
-			if(stripDatabaseTimestamp) {
+			if (stripDatabaseTimestamp) {
 				final Matcher matcher = TIMESTAMP.matcher(cleanedDatabaseName);
-				if(matcher.matches()) {
-					cleanedDatabaseName=matcher.group(1);
+				if (matcher.matches()) {
+					cleanedDatabaseName = matcher.group(1);
 				}
 			}
 			if (!cleanedDatabaseName.equals(currentDatabaseSources)) {

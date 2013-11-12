@@ -7,7 +7,7 @@ import edu.mayo.mprc.common.server.SpringGwtServlet;
 import edu.mayo.mprc.daemon.DaemonConnection;
 import edu.mayo.mprc.database.Change;
 import edu.mayo.mprc.dbcurator.model.Curation;
-import edu.mayo.mprc.dbcurator.model.persistence.CurationDao;
+import edu.mayo.mprc.dbcurator.model.CurationDao;
 import edu.mayo.mprc.dbundeploy.DatabaseUndeployerCaller;
 import edu.mayo.mprc.dbundeploy.DatabaseUndeployerProgress;
 import edu.mayo.mprc.msmseval.MSMSEvalParamFile;

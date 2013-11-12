@@ -5,7 +5,7 @@ import edu.mayo.mprc.chem.AminoAcidSet;
 import edu.mayo.mprc.database.Change;
 import edu.mayo.mprc.database.DaoTest;
 import edu.mayo.mprc.dbcurator.model.Curation;
-import edu.mayo.mprc.dbcurator.model.persistence.CurationDaoImpl;
+import edu.mayo.mprc.dbcurator.model.CurationDaoImpl;
 import edu.mayo.mprc.unimod.*;
 import org.apache.log4j.Logger;
 import org.joda.time.DateTime;

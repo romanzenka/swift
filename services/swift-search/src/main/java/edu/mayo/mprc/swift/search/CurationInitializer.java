@@ -4,7 +4,6 @@ import edu.mayo.mprc.config.RuntimeInitializer;
 import edu.mayo.mprc.dbcurator.model.*;
 import edu.mayo.mprc.dbcurator.model.curationsteps.MakeDecoyStep;
 import edu.mayo.mprc.dbcurator.model.curationsteps.NewDatabaseInclusion;
-import edu.mayo.mprc.dbcurator.model.persistence.CurationDao;
 import edu.mayo.mprc.utilities.FileUtilities;
 import org.apache.log4j.Logger;
 

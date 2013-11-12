@@ -1,11 +1,7 @@
-package edu.mayo.mprc.dbcurator.model.persistence;
+package edu.mayo.mprc.dbcurator.model;
 
 import edu.mayo.mprc.database.Change;
 import edu.mayo.mprc.database.Evolvable;
-import edu.mayo.mprc.dbcurator.model.Curation;
-import edu.mayo.mprc.dbcurator.model.FastaSource;
-import edu.mayo.mprc.dbcurator.model.HeaderTransform;
-import edu.mayo.mprc.dbcurator.model.SourceDatabaseArchive;
 import org.joda.time.DateTime;
 
 import java.util.List;
