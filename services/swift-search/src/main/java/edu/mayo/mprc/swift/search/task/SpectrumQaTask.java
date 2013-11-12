@@ -3,7 +3,6 @@ package edu.mayo.mprc.swift.search.task;
 import edu.mayo.mprc.daemon.DaemonConnection;
 import edu.mayo.mprc.daemon.WorkPacket;
 import edu.mayo.mprc.msmseval.MSMSEvalWorkPacket;
-import edu.mayo.mprc.msmseval.MSMSEvalWorker;
 import edu.mayo.mprc.msmseval.MsmsEvalResult;
 import edu.mayo.mprc.swift.db.DatabaseFileTokenFactory;
 import edu.mayo.mprc.utilities.progress.ProgressInfo;
@@ -29,8 +28,8 @@ final class SpectrumQaTask extends AsyncTaskBase {
 		this.outputDirectory = outputDirectory;
 		this.sourceMGFFile = sourceMGFFile;
 		this.msmsEvalParamFile = msmsEvalParamFile;
-		outputFile = MSMSEvalWorker.getExpectedResultFileName(sourceMGFFile.getResultingFile(), outputDirectory);
-		emFile = MSMSEvalWorker.getExpectedEmOutputFileName(sourceMGFFile.getResultingFile(), outputDirectory);
+		outputFile = MSMSEvalWorkPacket.getExpectedResultFileName(sourceMGFFile.getResultingFile(), outputDirectory);
+		emFile = MSMSEvalWorkPacket.getExpectedEmOutputFileName(sourceMGFFile.getResultingFile(), outputDirectory);
 
 		setName(TASK_NAME);
 

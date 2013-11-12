@@ -24,11 +24,6 @@ import java.util.Map;
 
 public final class MSMSEvalWorker extends WorkerBase {
 
-	public static final String SCORE_FILE_SUFFIX = "_eval.csv";
-	public static final String EM_FILE_SUFFIX = "_em.csv";
-	public static final String OUTPUT_FILE_SUFFIX = "_eval.mod.csv";
-	public static final String MZXML_OUTPUT_FILE_EXTENTION = ".mzxml";
-
 	private static final String MSMS_EVAL_EXECUTABLE = "msmsEvalExecutable";
 	public static final String PARAM_FILES = "paramFiles";
 
@@ -78,9 +73,9 @@ public final class MSMSEvalWorker extends WorkerBase {
 		/**
 		 * Output files.
 		 */
-		final File outputMzXMLFile = getExpectedMzXMLOutputFileName(sourceMGFFile, outputDirectory);
-		final File msmsEvalFormattedOuputFile = getExpectedResultFileName(sourceMGFFile, outputDirectory);
-		final File msmsEvalOuputFile = getExpectedMsmsEvalOutputFileName(sourceMGFFile, outputDirectory); // Temporary
+		final File outputMzXMLFile = MSMSEvalWorkPacket.getExpectedMzXMLOutputFileName(sourceMGFFile, outputDirectory);
+		final File msmsEvalFormattedOuputFile = MSMSEvalWorkPacket.getExpectedResultFileName(sourceMGFFile, outputDirectory);
+		final File msmsEvalOuputFile = MSMSEvalWorkPacket.getExpectedMsmsEvalOutputFileName(sourceMGFFile, outputDirectory); // Temporary
 
 		//If msmsEval has been executed, skip operation.
 		if (!msmsEvalWorkPacket.isFromScratch() && hasMSMSEvalFilterWorkerRun(msmsEvalFormattedOuputFile)) {
@@ -129,28 +124,6 @@ public final class MSMSEvalWorker extends WorkerBase {
 	 */
 	public boolean isSkippedExecution() {
 		return skippedExecution;
-	}
-
-	private static File getExpectedMzXMLOutputFileName(final File sourceMGFFile, final File outputDirectory) {
-		return new File(outputDirectory, FileUtilities.getFileNameWithoutExtension(sourceMGFFile) + MZXML_OUTPUT_FILE_EXTENTION);
-	}
-
-	private static File getExpectedMsmsEvalOutputFileName(final File sourceMGFFile, final File outputDirectory) {
-		return new File(outputDirectory, getExpectedMzXMLOutputFileName(sourceMGFFile, outputDirectory).getName() + SCORE_FILE_SUFFIX);
-	}
-
-	/**
-	 * File with information about expectation maximization parameters.
-	 */
-	public static File getExpectedEmOutputFileName(final File sourceMGFFile, final File outputDirectory) {
-		return new File(outputDirectory, getExpectedMzXMLOutputFileName(sourceMGFFile, outputDirectory).getName() + EM_FILE_SUFFIX);
-	}
-
-	/**
-	 * File with list of spectra (original spectrum numbers) + their msmsEval information.
-	 */
-	public static File getExpectedResultFileName(final File sourceMGFFile, final File outputDirectory) {
-		return new File(outputDirectory, getExpectedMzXMLOutputFileName(sourceMGFFile, outputDirectory).getName() + OUTPUT_FILE_SUFFIX);
 	}
 
 	public File getMsmsEvalExecutable() {
