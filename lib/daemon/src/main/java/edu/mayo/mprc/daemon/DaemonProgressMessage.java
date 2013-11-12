@@ -1,6 +1,6 @@
 package edu.mayo.mprc.daemon;
 
-import edu.mayo.mprc.daemon.monitor.MonitorUtilities;
+import edu.mayo.mprc.utilities.MonitorUtilities;
 import edu.mayo.mprc.utilities.progress.ProgressInfo;
 
 import java.io.Serializable;
@@ -21,7 +21,7 @@ public final class DaemonProgressMessage implements Serializable {
 
 	/**
 	 * Processing started on a given host.
-	 * TODO: This is confugins, improve
+	 * TODO: This is confusins, improve
 	 *
 	 * @param host Host the processing started on.
 	 */

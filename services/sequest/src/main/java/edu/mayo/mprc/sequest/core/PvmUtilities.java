@@ -2,9 +2,9 @@ package edu.mayo.mprc.sequest.core;
 
 import com.google.common.base.Joiner;
 import edu.mayo.mprc.MprcException;
-import edu.mayo.mprc.daemon.monitor.MonitorUtilities;
 import edu.mayo.mprc.utilities.CollectingLogMonitor;
 import edu.mayo.mprc.utilities.FileUtilities;
+import edu.mayo.mprc.utilities.MonitorUtilities;
 import edu.mayo.mprc.utilities.ProcessCaller;
 import org.apache.log4j.Logger;
 

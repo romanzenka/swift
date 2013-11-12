@@ -1,7 +1,7 @@
 package edu.mayo.mprc.daemon.exception;
 
 import edu.mayo.mprc.MprcException;
-import edu.mayo.mprc.daemon.monitor.MonitorUtilities;
+import edu.mayo.mprc.utilities.MonitorUtilities;
 
 /**
  * Exception thrown by {@link edu.mayo.mprc.daemon.Worker} or by {@link edu.mayo.mprc.daemon.AbstractRunner}.

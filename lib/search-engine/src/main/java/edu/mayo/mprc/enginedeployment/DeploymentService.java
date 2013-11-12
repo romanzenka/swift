@@ -4,8 +4,8 @@ import edu.mayo.mprc.MprcException;
 import edu.mayo.mprc.daemon.WorkPacket;
 import edu.mayo.mprc.daemon.Worker;
 import edu.mayo.mprc.daemon.exception.DaemonException;
-import edu.mayo.mprc.daemon.monitor.MonitorUtilities;
 import edu.mayo.mprc.utilities.FileUtilities;
+import edu.mayo.mprc.utilities.MonitorUtilities;
 import edu.mayo.mprc.utilities.progress.ProgressReporter;
 import org.apache.log4j.Logger;
 

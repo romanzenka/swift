@@ -1,4 +1,6 @@
-package edu.mayo.mprc.daemon.monitor;
+package edu.mayo.mprc.utilities;
+
+import edu.mayo.mprc.MprcException;
 
 import java.lang.management.ManagementFactory;
 import java.net.InetAddress;
@@ -6,6 +8,9 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 
+/**
+ * Utility functions for monitoring current execution - determine JVM PID, hostname, etc.
+ */
 public final class MonitorUtilities {
 
 	private static final Pattern PID_MATCHER = Pattern.compile("(\\d+)@.*");
@@ -33,10 +38,9 @@ public final class MonitorUtilities {
 		}
 		try {
 			return Integer.parseInt(m.group(1));
-		} catch (Exception e) {
-			// SWALLOWED: won't happen...
+		} catch (NumberFormatException e) {
+			throw new MprcException("Programmer error, the regular expression " + PID_MATCHER.pattern() + " matched a non-numeric string in group #1", e);
 		}
-		return -1;
 	}
 
 	/**
@@ -64,9 +68,8 @@ public final class MonitorUtilities {
 	public static String getFullHostname() {
 		// find the hostname
 		String hostname = "unknown";
-		final InetAddress host;
 		try {
-			host = InetAddress.getLocalHost();
+			final InetAddress host = InetAddress.getLocalHost();
 			hostname = host.getHostName();
 		} catch (Exception ignore) {
 			// SWALLOWED

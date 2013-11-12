@@ -1,6 +1,6 @@
 package edu.mayo.mprc.daemon;
 
-import edu.mayo.mprc.daemon.monitor.MonitorUtilities;
+import edu.mayo.mprc.utilities.MonitorUtilities;
 import edu.mayo.mprc.utilities.progress.ProgressInfo;
 import edu.mayo.mprc.utilities.progress.ProgressReporter;
 import edu.mayo.mprc.utilities.progress.UserProgressReporter;
