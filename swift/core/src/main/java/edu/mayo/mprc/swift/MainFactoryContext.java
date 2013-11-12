@@ -1,6 +1,7 @@
 package edu.mayo.mprc.swift;
 
 import edu.mayo.mprc.swift.commands.SwiftEnvironment;
+import edu.mayo.mprc.swift.resources.WebUiHolder;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 

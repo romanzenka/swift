@@ -20,7 +20,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  * A daemon thread. When a request arrives, the daemon processes it. Responses to requests
  * are sent when the request starts and when it finishes being processed.
  * <p/>
- * Daemon thread runs a {@link Worker}. The worker has {@link Worker#processRequest} method,
+ * Daemon thread runs a {@link edu.mayo.mprc.daemon.worker.Worker}. The worker has {@link edu.mayo.mprc.daemon.worker.Worker#processRequest} method,
  * that gets executed. Then the daemon starts processing the next request.
  *
  * @author Roman Zenka

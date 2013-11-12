@@ -1,7 +1,7 @@
 package edu.mayo.mprc.enginedeployment;
 
-import edu.mayo.mprc.daemon.WorkPacketBase;
 import edu.mayo.mprc.daemon.files.FileToken;
+import edu.mayo.mprc.daemon.worker.WorkPacketBase;
 import edu.mayo.mprc.fasta.DatabaseAnnotation;
 import edu.mayo.mprc.fasta.FastaFile;
 

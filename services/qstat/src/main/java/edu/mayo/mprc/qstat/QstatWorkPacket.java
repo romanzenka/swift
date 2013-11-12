@@ -1,6 +1,6 @@
 package edu.mayo.mprc.qstat;
 
-import edu.mayo.mprc.daemon.WorkPacketBase;
+import edu.mayo.mprc.daemon.worker.WorkPacketBase;
 
 /**
  * Work packet for the qstat call. Defines the job id to be queried.

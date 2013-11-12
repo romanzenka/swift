@@ -1,6 +1,6 @@
 package edu.mayo.mprc.searchdb;
 
-import edu.mayo.mprc.daemon.WorkPacketBase;
+import edu.mayo.mprc.daemon.worker.WorkPacketBase;
 import edu.mayo.mprc.searchdb.builder.RawFileMetaData;
 import edu.mayo.mprc.swift.dbmapping.ReportData;
 

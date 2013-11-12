@@ -1,5 +1,7 @@
 package edu.mayo.mprc.daemon;
 
+import edu.mayo.mprc.daemon.worker.WorkPacket;
+
 import java.io.Serializable;
 
 public interface DaemonRequest {

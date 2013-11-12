@@ -2,7 +2,7 @@ package edu.mayo.mprc.swift.search.task;
 
 import edu.mayo.mprc.MprcException;
 import edu.mayo.mprc.daemon.DaemonConnection;
-import edu.mayo.mprc.daemon.WorkPacket;
+import edu.mayo.mprc.daemon.worker.WorkPacket;
 import edu.mayo.mprc.idpqonvert.IdpQonvertSettings;
 import edu.mayo.mprc.idpqonvert.IdpQonvertWorkPacket;
 import edu.mayo.mprc.swift.db.DatabaseFileTokenFactory;

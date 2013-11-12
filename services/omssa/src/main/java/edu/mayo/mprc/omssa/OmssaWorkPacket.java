@@ -1,6 +1,6 @@
 package edu.mayo.mprc.omssa;
 
-import edu.mayo.mprc.daemon.WorkPacket;
+import edu.mayo.mprc.daemon.worker.WorkPacket;
 import edu.mayo.mprc.searchengine.EngineWorkPacket;
 
 import java.io.File;

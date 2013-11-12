@@ -3,6 +3,9 @@ package edu.mayo.mprc.daemon;
 import edu.mayo.mprc.MprcException;
 import edu.mayo.mprc.config.DaemonConfigInfo;
 import edu.mayo.mprc.daemon.files.FileTokenFactory;
+import edu.mayo.mprc.daemon.worker.WorkPacket;
+import edu.mayo.mprc.daemon.worker.Worker;
+import edu.mayo.mprc.daemon.worker.WorkerFactory;
 import edu.mayo.mprc.messaging.ActiveMQConnectionPool;
 import edu.mayo.mprc.messaging.Service;
 import edu.mayo.mprc.messaging.ServiceFactory;
@@ -18,7 +21,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
- * Test harness for {@link Worker} classes. Wrap a daemon worker
+ * Test harness for {@link edu.mayo.mprc.daemon.worker.Worker} classes. Wrap a daemon worker
  */
 public final class DaemonWorkerTester implements Closeable {
 	private static final Logger LOGGER = Logger.getLogger(DaemonWorkerTester.class);

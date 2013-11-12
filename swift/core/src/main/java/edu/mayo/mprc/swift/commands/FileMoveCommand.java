@@ -1,7 +1,6 @@
 package edu.mayo.mprc.swift.commands;
 
 import edu.mayo.mprc.MprcException;
-import edu.mayo.mprc.swift.ExitCode;
 import edu.mayo.mprc.swift.db.SwiftDao;
 import edu.mayo.mprc.swift.search.SwiftSearcher;
 import org.springframework.stereotype.Component;

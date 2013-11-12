@@ -1,8 +1,8 @@
 package edu.mayo.mprc.daemon.monitor;
 
-import edu.mayo.mprc.daemon.WorkPacket;
 import edu.mayo.mprc.daemon.files.ReceiverTokenTranslator;
 import edu.mayo.mprc.daemon.files.SenderTokenTranslator;
+import edu.mayo.mprc.daemon.worker.WorkPacket;
 
 import javax.annotation.Nullable;
 import java.io.File;

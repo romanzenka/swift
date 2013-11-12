@@ -4,6 +4,7 @@ import edu.mayo.mprc.MprcException;
 import edu.mayo.mprc.daemon.exception.DaemonException;
 import edu.mayo.mprc.daemon.files.FileTokenFactory;
 import edu.mayo.mprc.daemon.files.FileTokenHolder;
+import edu.mayo.mprc.daemon.worker.WorkPacket;
 import edu.mayo.mprc.messaging.Request;
 import edu.mayo.mprc.messaging.Service;
 import edu.mayo.mprc.utilities.progress.ProgressListener;

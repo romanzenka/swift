@@ -1,7 +1,7 @@
 package edu.mayo.mprc.mascot;
 
 import edu.mayo.mprc.MprcException;
-import edu.mayo.mprc.daemon.WorkPacketBase;
+import edu.mayo.mprc.daemon.worker.WorkPacketBase;
 import edu.mayo.mprc.dbcurator.model.Curation;
 import edu.mayo.mprc.enginedeployment.DeploymentRequest;
 import edu.mayo.mprc.enginedeployment.DeploymentResult;

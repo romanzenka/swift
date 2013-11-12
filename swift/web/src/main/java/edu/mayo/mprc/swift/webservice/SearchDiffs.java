@@ -2,11 +2,11 @@ package edu.mayo.mprc.swift.webservice;
 
 import edu.mayo.mprc.MprcException;
 import edu.mayo.mprc.searchdb.dao.SearchDbDao;
-import edu.mayo.mprc.swift.WebUiHolder;
 import edu.mayo.mprc.swift.db.SwiftDao;
 import edu.mayo.mprc.swift.dbmapping.FileSearch;
 import edu.mayo.mprc.swift.dbmapping.SearchRun;
 import edu.mayo.mprc.swift.dbmapping.SwiftSearchDefinition;
+import edu.mayo.mprc.swift.resources.WebUiHolder;
 import edu.mayo.mprc.swift.webservice.diff.IdCounts;
 import edu.mayo.mprc.swift.webservice.diff.InputFile;
 import edu.mayo.mprc.swift.webservice.diff.SearchDiff;

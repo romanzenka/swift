@@ -4,7 +4,6 @@ import edu.mayo.mprc.MprcException;
 import edu.mayo.mprc.config.DaemonConfig;
 import edu.mayo.mprc.daemon.Daemon;
 import edu.mayo.mprc.messaging.ServiceFactory;
-import edu.mayo.mprc.swift.ExitCode;
 import edu.mayo.mprc.utilities.FileUtilities;
 import org.springframework.stereotype.Component;
 

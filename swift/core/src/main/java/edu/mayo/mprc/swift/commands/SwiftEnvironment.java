@@ -4,7 +4,6 @@ import edu.mayo.mprc.config.*;
 import edu.mayo.mprc.daemon.Daemon;
 import edu.mayo.mprc.daemon.DaemonConnection;
 import edu.mayo.mprc.daemon.MessageBroker;
-import edu.mayo.mprc.swift.ExitCode;
 import edu.mayo.mprc.swift.Swift;
 import edu.mayo.mprc.swift.search.SwiftSearcher;
 import joptsimple.OptionParser;

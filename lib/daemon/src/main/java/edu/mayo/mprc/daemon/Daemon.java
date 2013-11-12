@@ -140,6 +140,16 @@ public final class Daemon implements Checkable, Installable {
 		return resources;
 	}
 
+	public static ServiceConfig getPingServiceConfig(final DaemonConfig config) {
+		final PingDaemonWorker.Config pingConfig = new PingDaemonWorker.Config();
+		final ServiceConfig pingServiceConfig =
+				new ServiceConfig(
+						config.getName() + "-ping",
+						new SimpleRunner.Config(pingConfig));
+		return pingServiceConfig;
+
+	}
+
 	@Override
 	public String toString() {
 		return "Daemon running following services: " +
@@ -287,7 +297,7 @@ public final class Daemon implements Checkable, Installable {
 
 			// Create extra runner for the ping service
 
-			final ServiceConfig pingServiceConfig = PingDaemonWorker.getPingServiceConfig(config);
+			final ServiceConfig pingServiceConfig = getPingServiceConfig(config);
 			if (pingServiceConfig != null) {
 				final AbstractRunner pingRunner = createRunner(daemon, pingServiceConfig, dependencies);
 				runners.add(pingRunner);

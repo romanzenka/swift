@@ -1,8 +1,8 @@
 package edu.mayo.mprc.searchengine;
 
 import edu.mayo.mprc.config.ResourceConfig;
-import edu.mayo.mprc.daemon.Worker;
-import edu.mayo.mprc.daemon.WorkerFactory;
+import edu.mayo.mprc.daemon.worker.Worker;
+import edu.mayo.mprc.daemon.worker.WorkerFactory;
 
 /**
  * A factory capable of creating a search engine.

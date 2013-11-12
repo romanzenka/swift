@@ -1,7 +1,7 @@
 package edu.mayo.mprc.swift.ui.server;
 
 import edu.mayo.mprc.MprcException;
-import edu.mayo.mprc.swift.WebUiHolder;
+import edu.mayo.mprc.swift.resources.WebUiHolder;
 import org.apache.log4j.Logger;
 import org.springframework.web.HttpRequestHandler;
 

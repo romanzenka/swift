@@ -3,7 +3,7 @@ package edu.mayo.mprc.mascot;
 import com.google.common.base.Charsets;
 import com.google.common.io.Files;
 import edu.mayo.mprc.MprcException;
-import edu.mayo.mprc.daemon.WorkPacket;
+import edu.mayo.mprc.daemon.worker.WorkPacket;
 import edu.mayo.mprc.searchengine.EngineWorkPacket;
 import edu.mayo.mprc.searchengine.SearchEngineResult;
 import edu.mayo.mprc.utilities.progress.ProgressReporter;

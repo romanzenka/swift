@@ -1,7 +1,6 @@
 package edu.mayo.mprc.swift.commands;
 
 import edu.mayo.mprc.launcher.Launcher;
-import edu.mayo.mprc.swift.ExitCode;
 import org.springframework.stereotype.Component;
 
 /**

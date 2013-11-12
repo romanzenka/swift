@@ -1,8 +1,8 @@
 package edu.mayo.mprc.msmseval;
 
 import edu.mayo.mprc.daemon.CachableWorkPacket;
-import edu.mayo.mprc.daemon.WorkPacket;
-import edu.mayo.mprc.daemon.WorkPacketBase;
+import edu.mayo.mprc.daemon.worker.WorkPacket;
+import edu.mayo.mprc.daemon.worker.WorkPacketBase;
 import edu.mayo.mprc.utilities.FileUtilities;
 import edu.mayo.mprc.utilities.progress.ProgressReporter;
 

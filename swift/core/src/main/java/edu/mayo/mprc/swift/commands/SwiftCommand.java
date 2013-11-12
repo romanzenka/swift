@@ -1,7 +1,5 @@
 package edu.mayo.mprc.swift.commands;
 
-import edu.mayo.mprc.swift.ExitCode;
-
 /**
  * @author Roman Zenka
  */

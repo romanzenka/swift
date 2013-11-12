@@ -1,9 +1,9 @@
 package edu.mayo.mprc.enginedeployment;
 
 import edu.mayo.mprc.MprcException;
-import edu.mayo.mprc.daemon.WorkPacket;
-import edu.mayo.mprc.daemon.Worker;
 import edu.mayo.mprc.daemon.exception.DaemonException;
+import edu.mayo.mprc.daemon.worker.WorkPacket;
+import edu.mayo.mprc.daemon.worker.Worker;
 import edu.mayo.mprc.utilities.FileUtilities;
 import edu.mayo.mprc.utilities.MonitorUtilities;
 import edu.mayo.mprc.utilities.progress.ProgressReporter;

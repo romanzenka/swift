@@ -36,7 +36,7 @@
 
     <bean id="aminoAcidSet" class="edu.mayo.mprc.chem.AminoAcidSet"></bean>
 
-    <bean id="resourceTable" class="edu.mayo.mprc.swift.ResourceTable"></bean>
+    <bean id="resourceTable" class="edu.mayo.mprc.swift.resources.ResourceTable"></bean>
 
     <bean id="databaseValidator" class="edu.mayo.mprc.swift.search.DatabaseValidator">
         <property name="runtimeInitializers" ref="searcherRuntimeInitializers" />
@@ -45,11 +45,11 @@
     </bean>
 
     <!-- Provides a WebUi interface after it gets configured -->
-    <bean id="webUiHolder" class="edu.mayo.mprc.swift.WebUiHolder">
+    <bean id="webUiHolder" class="edu.mayo.mprc.swift.resources.WebUiHolder">
         <property name="context" ref="swiftEnvironment" />
     </bean>
 
-    <bean id="webUiFactory" class="edu.mayo.mprc.swift.WebUi$Factory" autowire="byType">
+    <bean id="webUiFactory" class="edu.mayo.mprc.swift.resources.WebUi$Factory" autowire="byType">
         <property name="swiftMonitor" ref="swiftMonitor" />
         <property name="fileTokenFactory" ref="fileTokenFactory" />
         <property name="swiftDao" ref="swiftDao" />
@@ -126,7 +126,7 @@
         </constructor-arg>
     </bean>
 
-    <bean id="swiftMonitor" class="edu.mayo.mprc.swift.SwiftMonitor">
+    <bean id="swiftMonitor" class="edu.mayo.mprc.swift.resources.SwiftMonitor">
         <property name="factory" ref="resourceTable" />
         <property name="context" ref="swiftEnvironment" />
     </bean>

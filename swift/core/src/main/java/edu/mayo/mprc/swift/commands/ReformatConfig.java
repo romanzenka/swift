@@ -5,7 +5,6 @@ import edu.mayo.mprc.config.AppConfigReader;
 import edu.mayo.mprc.config.AppConfigWriter;
 import edu.mayo.mprc.config.ApplicationConfig;
 import edu.mayo.mprc.config.MultiFactory;
-import edu.mayo.mprc.swift.ExitCode;
 import edu.mayo.mprc.utilities.FileUtilities;
 import org.springframework.stereotype.Component;
 

@@ -1,7 +1,7 @@
 package edu.mayo.mprc.swift.search.task;
 
 import edu.mayo.mprc.daemon.DaemonConnection;
-import edu.mayo.mprc.daemon.WorkPacket;
+import edu.mayo.mprc.daemon.worker.WorkPacket;
 import edu.mayo.mprc.msconvert.MsconvertResult;
 import edu.mayo.mprc.msconvert.MsconvertWorkPacket;
 import edu.mayo.mprc.swift.db.DatabaseFileTokenFactory;

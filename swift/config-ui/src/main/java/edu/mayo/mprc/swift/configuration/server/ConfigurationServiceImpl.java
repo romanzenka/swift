@@ -8,7 +8,6 @@ import edu.mayo.mprc.config.*;
 import edu.mayo.mprc.daemon.SimpleRunner;
 import edu.mayo.mprc.sge.GridRunner;
 import edu.mayo.mprc.swift.MainFactoryContext;
-import edu.mayo.mprc.swift.ResourceTable;
 import edu.mayo.mprc.swift.commands.SwiftEnvironment;
 import edu.mayo.mprc.swift.configuration.client.ConfigurationService;
 import edu.mayo.mprc.swift.configuration.client.model.ApplicationModel;
@@ -16,6 +15,7 @@ import edu.mayo.mprc.swift.configuration.client.model.ResourceModel;
 import edu.mayo.mprc.swift.configuration.client.model.UiChangesReplayer;
 import edu.mayo.mprc.swift.configuration.server.session.ServletStorage;
 import edu.mayo.mprc.swift.configuration.server.session.SessionStorage;
+import edu.mayo.mprc.swift.resources.ResourceTable;
 import edu.mayo.mprc.utilities.exceptions.ExceptionUtilities;
 
 import java.io.File;

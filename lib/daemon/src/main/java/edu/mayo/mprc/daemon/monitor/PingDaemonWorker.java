@@ -3,12 +3,11 @@ package edu.mayo.mprc.daemon.monitor;
 import edu.mayo.mprc.config.DaemonConfig;
 import edu.mayo.mprc.config.DependencyResolver;
 import edu.mayo.mprc.config.ResourceConfig;
-import edu.mayo.mprc.config.ServiceConfig;
 import edu.mayo.mprc.config.ui.ResourceConfigBase;
 import edu.mayo.mprc.config.ui.ServiceUiFactory;
 import edu.mayo.mprc.config.ui.UiBuilder;
-import edu.mayo.mprc.daemon.*;
 import edu.mayo.mprc.daemon.exception.DaemonException;
+import edu.mayo.mprc.daemon.worker.*;
 import edu.mayo.mprc.utilities.progress.UserProgressReporter;
 import org.springframework.stereotype.Component;
 
@@ -28,16 +27,6 @@ public final class PingDaemonWorker extends WorkerBase implements NoLoggingWorke
 			throw new DaemonException("Unknown input format: " + workPacket.getClass().getName() + " expected string");
 		}
 		reporter.reportProgress(new PingResponse());
-	}
-
-	public static ServiceConfig getPingServiceConfig(final DaemonConfig config) {
-		final PingDaemonWorker.Config pingConfig = new PingDaemonWorker.Config();
-		final ServiceConfig pingServiceConfig =
-				new ServiceConfig(
-						config.getName() + "-ping",
-						new SimpleRunner.Config(pingConfig));
-		return pingServiceConfig;
-
 	}
 
 	public String toString() {

@@ -4,7 +4,7 @@ import edu.mayo.mprc.MprcException;
 import edu.mayo.mprc.utilities.MonitorUtilities;
 
 /**
- * Exception thrown by {@link edu.mayo.mprc.daemon.Worker} or by {@link edu.mayo.mprc.daemon.AbstractRunner}.
+ * Exception thrown by {@link edu.mayo.mprc.daemon.worker.Worker} or by {@link edu.mayo.mprc.daemon.AbstractRunner}.
  * <p/>
  * Compared to a normal MprcException, this one contains information about the host where the error happened.
  */

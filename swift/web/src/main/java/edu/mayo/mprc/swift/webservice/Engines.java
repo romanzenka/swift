@@ -1,8 +1,8 @@
 package edu.mayo.mprc.swift.webservice;
 
 import edu.mayo.mprc.MprcException;
-import edu.mayo.mprc.swift.WebUiHolder;
 import edu.mayo.mprc.swift.db.SearchEngine;
+import edu.mayo.mprc.swift.resources.WebUiHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;

@@ -2,9 +2,7 @@ package edu.mayo.mprc.swift;
 
 import edu.mayo.mprc.MprcException;
 import edu.mayo.mprc.ReleaseInfoCore;
-import edu.mayo.mprc.swift.commands.DisplayHelp;
-import edu.mayo.mprc.swift.commands.SwiftCommandLine;
-import edu.mayo.mprc.swift.commands.SwiftEnvironment;
+import edu.mayo.mprc.swift.commands.*;
 import edu.mayo.mprc.utilities.FileUtilities;
 import org.apache.log4j.Logger;
 

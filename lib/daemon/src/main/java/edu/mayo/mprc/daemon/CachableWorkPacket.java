@@ -1,5 +1,6 @@
 package edu.mayo.mprc.daemon;
 
+import edu.mayo.mprc.daemon.worker.WorkPacket;
 import edu.mayo.mprc.utilities.progress.ProgressReporter;
 
 import java.io.File;

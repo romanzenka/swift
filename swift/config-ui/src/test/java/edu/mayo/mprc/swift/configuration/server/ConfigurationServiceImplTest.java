@@ -2,9 +2,9 @@ package edu.mayo.mprc.swift.configuration.server;
 
 import edu.mayo.mprc.common.client.GWTServiceException;
 import edu.mayo.mprc.swift.MainFactoryContext;
-import edu.mayo.mprc.swift.ResourceTable;
 import edu.mayo.mprc.swift.configuration.client.model.ApplicationModel;
 import edu.mayo.mprc.swift.configuration.server.session.HashStorage;
+import edu.mayo.mprc.swift.resources.ResourceTable;
 import org.testng.Assert;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;

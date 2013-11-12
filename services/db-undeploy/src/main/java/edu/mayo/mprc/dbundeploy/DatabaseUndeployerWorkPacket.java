@@ -1,6 +1,6 @@
 package edu.mayo.mprc.dbundeploy;
 
-import edu.mayo.mprc.daemon.WorkPacketBase;
+import edu.mayo.mprc.daemon.worker.WorkPacketBase;
 import edu.mayo.mprc.dbcurator.model.Curation;
 
 import java.io.File;

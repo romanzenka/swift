@@ -1,7 +1,7 @@
 package edu.mayo.mprc.xtandem;
 
 import edu.mayo.mprc.MprcException;
-import edu.mayo.mprc.daemon.WorkPacket;
+import edu.mayo.mprc.daemon.worker.WorkPacket;
 import edu.mayo.mprc.searchengine.EngineWorkPacket;
 
 import java.io.File;

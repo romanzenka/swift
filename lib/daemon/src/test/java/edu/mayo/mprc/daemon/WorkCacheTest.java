@@ -3,6 +3,8 @@ package edu.mayo.mprc.daemon;
 import com.google.common.collect.Lists;
 import edu.mayo.mprc.daemon.exception.DaemonException;
 import edu.mayo.mprc.daemon.files.FileTokenFactory;
+import edu.mayo.mprc.daemon.worker.WorkPacket;
+import edu.mayo.mprc.daemon.worker.WorkPacketBase;
 import edu.mayo.mprc.utilities.FileUtilities;
 import edu.mayo.mprc.utilities.progress.ProgressInfo;
 import edu.mayo.mprc.utilities.progress.ProgressListener;

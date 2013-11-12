@@ -1,6 +1,6 @@
 package edu.mayo.mprc.fastadb;
 
-import edu.mayo.mprc.daemon.WorkPacketBase;
+import edu.mayo.mprc.daemon.worker.WorkPacketBase;
 
 /**
  * Request to load FASTA database for a curation of a given ID.

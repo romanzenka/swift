@@ -2,7 +2,7 @@ package edu.mayo.mprc.searchengine;
 
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.xml.DomDriver;
-import edu.mayo.mprc.daemon.WorkPacket;
+import edu.mayo.mprc.daemon.worker.WorkPacket;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 

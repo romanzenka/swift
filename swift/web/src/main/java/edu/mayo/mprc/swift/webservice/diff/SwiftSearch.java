@@ -3,11 +3,11 @@ package edu.mayo.mprc.swift.webservice.diff;
 import com.google.common.base.Objects;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import edu.mayo.mprc.MprcException;
-import edu.mayo.mprc.swift.WebUi;
 import edu.mayo.mprc.swift.dbmapping.SearchEngineConfig;
 import edu.mayo.mprc.swift.dbmapping.SearchRun;
 import edu.mayo.mprc.swift.dbmapping.SwiftSearchDefinition;
 import edu.mayo.mprc.swift.params2.SearchEngineParameters;
+import edu.mayo.mprc.swift.resources.WebUi;
 import edu.mayo.mprc.unimod.ModSpecificity;
 
 import java.io.File;

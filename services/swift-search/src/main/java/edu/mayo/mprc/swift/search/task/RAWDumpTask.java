@@ -1,7 +1,7 @@
 package edu.mayo.mprc.swift.search.task;
 
 import edu.mayo.mprc.daemon.DaemonConnection;
-import edu.mayo.mprc.daemon.WorkPacket;
+import edu.mayo.mprc.daemon.worker.WorkPacket;
 import edu.mayo.mprc.qa.RAWDumpResult;
 import edu.mayo.mprc.qa.RAWDumpWorkPacket;
 import edu.mayo.mprc.searchdb.builder.RawFileMetaData;

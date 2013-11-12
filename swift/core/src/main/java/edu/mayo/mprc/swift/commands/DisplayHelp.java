@@ -1,7 +1,6 @@
 package edu.mayo.mprc.swift.commands;
 
 import edu.mayo.mprc.ReleaseInfoCore;
-import edu.mayo.mprc.swift.ExitCode;
 import edu.mayo.mprc.utilities.FileUtilities;
 import org.apache.log4j.Logger;
 import org.springframework.stereotype.Component;

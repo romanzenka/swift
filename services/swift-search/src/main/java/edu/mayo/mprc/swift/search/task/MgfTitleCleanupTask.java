@@ -1,7 +1,7 @@
 package edu.mayo.mprc.swift.search.task;
 
 import edu.mayo.mprc.daemon.DaemonConnection;
-import edu.mayo.mprc.daemon.WorkPacket;
+import edu.mayo.mprc.daemon.worker.WorkPacket;
 import edu.mayo.mprc.mgf2mgf.MgfTitleCleanupResult;
 import edu.mayo.mprc.mgf2mgf.MgfTitleCleanupWorkPacket;
 import edu.mayo.mprc.swift.db.DatabaseFileTokenFactory;

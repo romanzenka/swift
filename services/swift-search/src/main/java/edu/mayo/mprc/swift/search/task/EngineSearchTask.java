@@ -2,7 +2,7 @@ package edu.mayo.mprc.swift.search.task;
 
 import edu.mayo.mprc.MprcException;
 import edu.mayo.mprc.daemon.DaemonConnection;
-import edu.mayo.mprc.daemon.WorkPacket;
+import edu.mayo.mprc.daemon.worker.WorkPacket;
 import edu.mayo.mprc.dbcurator.model.Curation;
 import edu.mayo.mprc.mascot.MascotResultUrl;
 import edu.mayo.mprc.mascot.MascotWorkPacket;

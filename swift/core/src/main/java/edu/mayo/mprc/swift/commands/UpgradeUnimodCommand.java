@@ -2,7 +2,6 @@ package edu.mayo.mprc.swift.commands;
 
 import edu.mayo.mprc.MprcException;
 import edu.mayo.mprc.database.Change;
-import edu.mayo.mprc.swift.ExitCode;
 import edu.mayo.mprc.swift.search.SwiftSearcher;
 import edu.mayo.mprc.unimod.UnimodDao;
 import edu.mayo.mprc.unimod.UnimodUpgrade;

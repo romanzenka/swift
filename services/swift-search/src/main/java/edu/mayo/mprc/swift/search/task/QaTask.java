@@ -1,7 +1,7 @@
 package edu.mayo.mprc.swift.search.task;
 
 import edu.mayo.mprc.daemon.DaemonConnection;
-import edu.mayo.mprc.daemon.WorkPacket;
+import edu.mayo.mprc.daemon.worker.WorkPacket;
 import edu.mayo.mprc.qa.ExperimentQa;
 import edu.mayo.mprc.qa.MgfQaFiles;
 import edu.mayo.mprc.qa.QaWorkPacket;

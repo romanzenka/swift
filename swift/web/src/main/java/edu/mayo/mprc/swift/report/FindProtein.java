@@ -3,10 +3,10 @@ package edu.mayo.mprc.swift.report;
 import com.google.common.base.Charsets;
 import edu.mayo.mprc.MprcException;
 import edu.mayo.mprc.searchdb.dao.SearchDbDao;
-import edu.mayo.mprc.swift.WebUi;
-import edu.mayo.mprc.swift.WebUiHolder;
 import edu.mayo.mprc.swift.dbmapping.ReportData;
 import edu.mayo.mprc.swift.dbmapping.SearchRun;
+import edu.mayo.mprc.swift.resources.WebUi;
+import edu.mayo.mprc.swift.resources.WebUiHolder;
 import edu.mayo.mprc.utilities.FileUtilities;
 import org.springframework.web.HttpRequestHandler;
 

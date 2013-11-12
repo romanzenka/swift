@@ -1,6 +1,6 @@
 package edu.mayo.mprc.scaffold.report;
 
-import edu.mayo.mprc.daemon.WorkPacketBase;
+import edu.mayo.mprc.daemon.worker.WorkPacketBase;
 
 import java.io.File;
 import java.util.List;

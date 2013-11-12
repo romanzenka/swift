@@ -3,6 +3,8 @@ package edu.mayo.mprc.daemon;
 import edu.mayo.mprc.config.DependencyResolver;
 import edu.mayo.mprc.config.ResourceConfig;
 import edu.mayo.mprc.config.ui.ServiceUiFactory;
+import edu.mayo.mprc.daemon.worker.Worker;
+import edu.mayo.mprc.daemon.worker.WorkerFactory;
 
 /**
  * Fake factory - single worker in a single thread has the same worker object recycled all the time

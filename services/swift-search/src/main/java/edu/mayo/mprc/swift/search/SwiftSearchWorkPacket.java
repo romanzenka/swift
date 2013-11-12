@@ -1,6 +1,6 @@
 package edu.mayo.mprc.swift.search;
 
-import edu.mayo.mprc.daemon.WorkPacketBase;
+import edu.mayo.mprc.daemon.worker.WorkPacketBase;
 
 public final class SwiftSearchWorkPacket extends WorkPacketBase {
 	private static final long serialVersionUID = 20110901;

@@ -2,7 +2,7 @@ package edu.mayo.mprc.swift.search.task;
 
 import edu.mayo.mprc.MprcException;
 import edu.mayo.mprc.daemon.DaemonConnection;
-import edu.mayo.mprc.daemon.WorkPacket;
+import edu.mayo.mprc.daemon.worker.WorkPacket;
 import edu.mayo.mprc.swift.db.DatabaseFileTokenFactory;
 import edu.mayo.mprc.utilities.progress.ProgressInfo;
 import edu.mayo.mprc.workflow.engine.TaskBase;

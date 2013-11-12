@@ -2,6 +2,7 @@ package edu.mayo.mprc.daemon;
 
 import edu.mayo.mprc.daemon.files.FileTokenFactory;
 import edu.mayo.mprc.daemon.files.FileTokenHolder;
+import edu.mayo.mprc.daemon.worker.WorkPacket;
 import edu.mayo.mprc.messaging.Request;
 import edu.mayo.mprc.messaging.ResponseListener;
 import edu.mayo.mprc.messaging.Service;

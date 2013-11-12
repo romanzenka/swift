@@ -1,8 +1,8 @@
 package edu.mayo.mprc.swift.ui.server;
 
 import edu.mayo.mprc.common.client.GWTServiceException;
-import edu.mayo.mprc.swift.WebUi;
-import edu.mayo.mprc.swift.WebUiHolder;
+import edu.mayo.mprc.swift.resources.WebUi;
+import edu.mayo.mprc.swift.resources.WebUiHolder;
 import edu.mayo.mprc.swift.ui.client.rpc.ClientUser;
 import edu.mayo.mprc.swift.ui.client.rpc.files.DirectoryEntry;
 import edu.mayo.mprc.swift.ui.client.rpc.files.Entry;

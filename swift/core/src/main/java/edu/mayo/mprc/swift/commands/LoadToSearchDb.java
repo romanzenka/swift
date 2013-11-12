@@ -11,7 +11,6 @@ import edu.mayo.mprc.qa.RAWDumpWorker;
 import edu.mayo.mprc.scaffold.ScaffoldWorker;
 import edu.mayo.mprc.searchdb.SearchDbWorker;
 import edu.mayo.mprc.searchdb.dao.SearchDbDao;
-import edu.mayo.mprc.swift.ExitCode;
 import edu.mayo.mprc.swift.db.DatabaseFileTokenFactory;
 import edu.mayo.mprc.swift.db.SearchEngine;
 import edu.mayo.mprc.swift.db.SwiftDao;
