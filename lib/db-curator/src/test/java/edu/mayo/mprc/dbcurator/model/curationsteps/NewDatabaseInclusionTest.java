@@ -1,6 +1,5 @@
 package edu.mayo.mprc.dbcurator.model.curationsteps;
 
-import edu.mayo.mprc.dbcurator.CurationDaoTestBase;
 import edu.mayo.mprc.dbcurator.model.Curation;
 import edu.mayo.mprc.dbcurator.model.CurationExecutor;
 import edu.mayo.mprc.dbcurator.model.CurationStatus;

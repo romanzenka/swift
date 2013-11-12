@@ -1,4 +1,4 @@
-package edu.mayo.mprc.dbcurator;
+package edu.mayo.mprc.dbcurator.model.curationsteps;
 
 import edu.mayo.mprc.database.DaoTest;
 import edu.mayo.mprc.dbcurator.model.persistence.CurationDaoImpl;

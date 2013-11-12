@@ -1,6 +1,6 @@
 package edu.mayo.mprc.dbcurator.model;
 
-import edu.mayo.mprc.dbcurator.CurationDaoTestBase;
+import edu.mayo.mprc.dbcurator.model.curationsteps.CurationDaoTestBase;
 import edu.mayo.mprc.utilities.FileUtilities;
 import org.testng.Assert;
 import org.testng.annotations.Test;
