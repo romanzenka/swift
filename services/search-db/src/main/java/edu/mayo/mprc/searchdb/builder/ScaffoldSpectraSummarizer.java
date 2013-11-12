@@ -1,4 +1,4 @@
-package edu.mayo.mprc.searchdb;
+package edu.mayo.mprc.searchdb.builder;
 
 import com.google.common.base.Strings;
 import edu.mayo.mprc.MprcException;
@@ -6,7 +6,7 @@ import edu.mayo.mprc.chem.AminoAcidSet;
 import edu.mayo.mprc.fastadb.ProteinSequenceTranslator;
 import edu.mayo.mprc.scaffoldparser.spectra.ScaffoldReportReader;
 import edu.mayo.mprc.scaffoldparser.spectra.ScaffoldSpectraVersion;
-import edu.mayo.mprc.searchdb.builder.*;
+import edu.mayo.mprc.searchdb.dao.ScaffoldModificationFormat;
 import edu.mayo.mprc.unimod.IndexedModSet;
 import edu.mayo.mprc.utilities.FileUtilities;
 import org.joda.time.DateTime;

@@ -2,7 +2,6 @@ package edu.mayo.mprc.searchdb.dao;
 
 import edu.mayo.mprc.database.PersistableBase;
 import edu.mayo.mprc.fastadb.PeptideSequence;
-import edu.mayo.mprc.searchdb.ScaffoldModificationFormat;
 
 /**
  * The peptide is uniquely identified by its sequence and a list of modifications.

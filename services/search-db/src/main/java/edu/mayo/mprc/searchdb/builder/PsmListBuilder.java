@@ -43,8 +43,8 @@ public class PsmListBuilder implements Builder<PsmList> {
 	 * Get current {@link PeptideSpectrumMatch} entry. If none exist, new one is created and added to the protein group.
 	 *
 	 * @param peptideSequence           Peptide sequence. This + fixed+variable mods form a primary key.
-	 * @param fixedModifications        Fixed modifications, parsed by {@link edu.mayo.mprc.searchdb.ScaffoldModificationFormat}. Primary key.
-	 * @param variableModifications     Variable modifications, parsed by {@link edu.mayo.mprc.searchdb.ScaffoldModificationFormat}. Primary key.
+	 * @param fixedModifications        Fixed modifications, parsed by {@link edu.mayo.mprc.searchdb.dao.ScaffoldModificationFormat}. Primary key.
+	 * @param variableModifications     Variable modifications, parsed by {@link edu.mayo.mprc.searchdb.dao.ScaffoldModificationFormat}. Primary key.
 	 * @param previousAminoAcid         Previous amino acid in the context of this protein group.
 	 * @param nextAminoAcid             Next amino acid in the context of this protein group.
 	 * @param numberOfEnzymaticTerminii Number of enzymatic terminii for this peptide (0,1=semi,2=fully)

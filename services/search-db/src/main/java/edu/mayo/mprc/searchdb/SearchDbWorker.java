@@ -13,7 +13,10 @@ import edu.mayo.mprc.dbcurator.model.persistence.CurationDao;
 import edu.mayo.mprc.fastadb.FastaDbDao;
 import edu.mayo.mprc.fastadb.ProteinSequenceTranslator;
 import edu.mayo.mprc.fastadb.SingleDatabaseTranslator;
-import edu.mayo.mprc.searchdb.dao.SearchDbDao;
+import edu.mayo.mprc.searchdb.builder.MapMassSpecDataExtractor;
+import edu.mayo.mprc.searchdb.builder.MassSpecDataExtractor;
+import edu.mayo.mprc.searchdb.builder.ScaffoldSpectraSummarizer;
+import edu.mayo.mprc.searchdb.bulk.BulkSearchDbDao;
 import edu.mayo.mprc.swift.db.SwiftDao;
 import edu.mayo.mprc.swift.dbmapping.ReportData;
 import edu.mayo.mprc.unimod.Unimod;
@@ -29,7 +32,7 @@ import java.io.File;
  * Loads search results from a given Swift experiment into the database.
  */
 public final class SearchDbWorker extends WorkerBase {
-	private SearchDbDao dao;
+	private BulkSearchDbDao dao;
 	private FastaDbDao fastaDbDao;
 	private CurationDao curationDao;
 	private UnimodDao unimodDao;
@@ -43,7 +46,7 @@ public final class SearchDbWorker extends WorkerBase {
 
 	private static final String DATABASE = "database";
 
-	public SearchDbWorker(final SearchDbDao dao, final FastaDbDao fastaDbDao, final CurationDao curationDao, final UnimodDao unimodDao, final SwiftDao swiftDao) {
+	public SearchDbWorker(final BulkSearchDbDao dao, final FastaDbDao fastaDbDao, final CurationDao curationDao, final UnimodDao unimodDao, final SwiftDao swiftDao) {
 		this.dao = dao;
 		this.fastaDbDao = fastaDbDao;
 		this.curationDao = curationDao;
@@ -97,18 +100,18 @@ public final class SearchDbWorker extends WorkerBase {
 	 */
 	@Component("searchDbWorkerFactory")
 	public static final class Factory extends WorkerFactoryBase<Config> {
-		private SearchDbDao searchDbDao;
+		private BulkSearchDbDao searchDbDao;
 		private FastaDbDao fastaDbDao;
 		private CurationDao curationDao;
 		private UnimodDao unimodDao;
 		private SwiftDao swiftDao;
 
-		public SearchDbDao getSearchDbDao() {
+		public BulkSearchDbDao getSearchDbDao() {
 			return searchDbDao;
 		}
 
 		@Resource(name = "searchDbDao")
-		public void setSearchDbDao(final SearchDbDao searchDbDao) {
+		public void setSearchDbDao(final BulkSearchDbDao searchDbDao) {
 			this.searchDbDao = searchDbDao;
 		}
 
@@ -150,7 +153,7 @@ public final class SearchDbWorker extends WorkerBase {
 
 		@Override
 		public Worker create(final Config config, final DependencyResolver dependencies) {
-			final SearchDbWorker worker = new SearchDbWorker(searchDbDao, fastaDbDao, curationDao, unimodDao, swiftDao);
+			final SearchDbWorker worker = new SearchDbWorker(getSearchDbDao(), getFastaDbDao(), getCurationDao(), getUnimodDao(), getSwiftDao());
 			return worker;
 		}
 	}

@@ -1,4 +1,4 @@
-package edu.mayo.mprc.searchdb;
+package edu.mayo.mprc.searchdb.builder;
 
 import edu.mayo.mprc.searchdb.dao.TandemMassSpectrometrySample;
 import org.joda.time.DateTime;

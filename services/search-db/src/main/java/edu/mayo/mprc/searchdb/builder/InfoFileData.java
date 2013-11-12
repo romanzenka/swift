@@ -1,4 +1,4 @@
-package edu.mayo.mprc.searchdb;
+package edu.mayo.mprc.searchdb.builder;
 
 import org.joda.time.DateTime;
 

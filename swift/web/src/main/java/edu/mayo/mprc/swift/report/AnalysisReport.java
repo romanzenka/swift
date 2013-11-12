@@ -2,8 +2,8 @@ package edu.mayo.mprc.swift.report;
 
 import com.google.common.base.Charsets;
 import edu.mayo.mprc.MprcException;
-import edu.mayo.mprc.searchdb.Report;
 import edu.mayo.mprc.searchdb.dao.Analysis;
+import edu.mayo.mprc.searchdb.dao.Report;
 import edu.mayo.mprc.searchdb.dao.SearchDbDao;
 import edu.mayo.mprc.swift.db.SwiftDao;
 import edu.mayo.mprc.swift.dbmapping.ReportData;

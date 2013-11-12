@@ -1,4 +1,4 @@
-package edu.mayo.mprc.searchdb;
+package edu.mayo.mprc.searchdb.builder;
 
 import edu.mayo.mprc.MprcException;
 import edu.mayo.mprc.io.TsvStreamReader;

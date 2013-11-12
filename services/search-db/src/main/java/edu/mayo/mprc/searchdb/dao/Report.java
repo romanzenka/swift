@@ -1,4 +1,4 @@
-package edu.mayo.mprc.searchdb;
+package edu.mayo.mprc.searchdb.dao;
 
 import com.google.common.base.Strings;
 import edu.mayo.mprc.MprcException;
@@ -65,11 +65,11 @@ public class Report {
 
 	public Report cell(final String text, final int colspan, final String clazz) {
 		checkRow();
-		String classString = clazz==null ? "" : " class=\""+clazz+"\"";
+		String classString = clazz == null ? "" : " class=\"" + clazz + "\"";
 		if (colspan == 1) {
-			write("<td"+classString+">");
+			write("<td" + classString + ">");
 		} else {
-			write("<td"+classString+" colspan=\"" + colspan + "\">");
+			write("<td" + classString + " colspan=\"" + colspan + "\">");
 		}
 		if (Strings.isNullOrEmpty(text)) {
 			write("&nbsp;");
@@ -101,7 +101,7 @@ public class Report {
 
 	public Report hCellRaw(final String text, final String clazz) {
 		checkRow();
-		write("<th class=\""+clazz+"\">" + text + "</th>\n");
+		write("<th class=\"" + clazz + "\">" + text + "</th>\n");
 		return this;
 	}
 

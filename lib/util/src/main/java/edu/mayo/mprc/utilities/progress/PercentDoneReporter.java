@@ -10,7 +10,7 @@ import java.text.MessageFormat;
  *
  * @author Roman Zenka
  */
-public final class PercentDoneReporter {
+public final class PercentDoneReporter implements PercentProgressReporter {
 	private static final Logger LOGGER = Logger.getLogger(PercentDoneReporter.class);
 
 	private static final float PERCENT = 100.0f;
@@ -77,6 +77,7 @@ public final class PercentDoneReporter {
 	/**
 	 * @param percent How many percent done. 1 == 100%
 	 */
+	@Override
 	public void reportProgress(final float percent) {
 		final long timeNow = System.currentTimeMillis();
 		if (reportEachMillis < timeNow - lastReportTimestamp) {

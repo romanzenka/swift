@@ -1,9 +1,7 @@
-package edu.mayo.mprc.searchdb;
+package edu.mayo.mprc.searchdb.dao;
 
 import com.google.common.base.Objects;
 import edu.mayo.mprc.MprcException;
-import edu.mayo.mprc.searchdb.dao.LocalizedModBag;
-import edu.mayo.mprc.searchdb.dao.LocalizedModification;
 import edu.mayo.mprc.unimod.IndexedModSet;
 import edu.mayo.mprc.unimod.Mod;
 import edu.mayo.mprc.unimod.ModSpecificity;

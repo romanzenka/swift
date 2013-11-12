@@ -4,7 +4,7 @@ import edu.mayo.mprc.daemon.DaemonConnection;
 import edu.mayo.mprc.daemon.WorkPacket;
 import edu.mayo.mprc.qa.RAWDumpResult;
 import edu.mayo.mprc.qa.RAWDumpWorkPacket;
-import edu.mayo.mprc.searchdb.RawFileMetaData;
+import edu.mayo.mprc.searchdb.builder.RawFileMetaData;
 import edu.mayo.mprc.swift.db.DatabaseFileTokenFactory;
 import edu.mayo.mprc.utilities.progress.ProgressInfo;
 import edu.mayo.mprc.workflow.engine.WorkflowEngine;

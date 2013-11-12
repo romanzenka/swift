@@ -1,4 +1,4 @@
-package edu.mayo.mprc.searchdb.dao.bulk;
+package edu.mayo.mprc.searchdb.bulk;
 
 import edu.mayo.mprc.database.SessionProvider;
 import edu.mayo.mprc.database.bulk.BulkLoadJobStarter;

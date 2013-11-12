@@ -1,4 +1,4 @@
-package edu.mayo.mprc.searchdb;
+package edu.mayo.mprc.searchdb.builder;
 
 import com.google.common.base.Charsets;
 import edu.mayo.mprc.daemon.files.FileHolder;

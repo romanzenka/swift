@@ -1,7 +1,6 @@
 package edu.mayo.mprc.searchdb.dao;
 
 import edu.mayo.mprc.database.PersistableBase;
-import edu.mayo.mprc.searchdb.Report;
 import edu.mayo.mprc.swift.dbmapping.SwiftSearchDefinition;
 import edu.mayo.mprc.swift.params2.StarMatcher;
 import edu.mayo.mprc.swift.params2.StarredProteins;

@@ -1,4 +1,4 @@
-package edu.mayo.mprc.searchdb;
+package edu.mayo.mprc.searchdb.builder;
 
 import edu.mayo.mprc.MprcException;
 import edu.mayo.mprc.database.Change;
@@ -7,7 +7,6 @@ import edu.mayo.mprc.dbcurator.model.Curation;
 import edu.mayo.mprc.dbcurator.model.persistence.CurationDaoImpl;
 import edu.mayo.mprc.fastadb.FastaDbDaoHibernate;
 import edu.mayo.mprc.fastadb.SingleDatabaseTranslator;
-import edu.mayo.mprc.searchdb.builder.AnalysisBuilder;
 import edu.mayo.mprc.searchdb.dao.*;
 import edu.mayo.mprc.swift.db.SwiftDaoHibernate;
 import edu.mayo.mprc.swift.dbmapping.ReportData;
@@ -19,8 +18,7 @@ import edu.mayo.mprc.unimod.UnimodDaoHibernate;
 import edu.mayo.mprc.utilities.FileUtilities;
 import edu.mayo.mprc.utilities.ResourceUtilities;
 import edu.mayo.mprc.utilities.TestingUtilities;
-import edu.mayo.mprc.utilities.progress.ProgressInfo;
-import edu.mayo.mprc.utilities.progress.ProgressReporter;
+import edu.mayo.mprc.utilities.progress.PercentProgressReporter;
 import org.dbunit.DatabaseUnitException;
 import org.joda.time.DateTime;
 import org.testng.Assert;
@@ -149,25 +147,9 @@ public class TestSearchDbDao extends DaoTest {
 		summarizer.load(stream, -1, reportToLoad, "3", null);
 
 		final AnalysisBuilder analysisBuilder = summarizer.getAnalysisBuilder();
-		return searchDbDao.addAnalysis(analysisBuilder, reportData, new ProgressReporter() {
+		return searchDbDao.addAnalysis(analysisBuilder.getAnalysis(), reportData, new PercentProgressReporter() {
 			@Override
-			public void reportStart(final String hostString) {
-
-			}
-
-			@Override
-			public void reportProgress(final ProgressInfo progressInfo) {
-
-			}
-
-			@Override
-			public void reportSuccess() {
-
-			}
-
-			@Override
-			public void reportFailure(final Throwable t) {
-
+			public void reportProgress(float percent) {
 			}
 		});
 	}

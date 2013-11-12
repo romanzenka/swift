@@ -6,8 +6,6 @@ import edu.mayo.mprc.MprcException;
 import edu.mayo.mprc.fastadb.PeptideSequence;
 import edu.mayo.mprc.fastadb.ProteinSequence;
 import edu.mayo.mprc.fastadb.ProteinSequenceTranslator;
-import edu.mayo.mprc.searchdb.MassSpecDataExtractor;
-import edu.mayo.mprc.searchdb.ScaffoldModificationFormat;
 import edu.mayo.mprc.searchdb.dao.*;
 import edu.mayo.mprc.swift.dbmapping.ReportData;
 import org.joda.time.DateTime;

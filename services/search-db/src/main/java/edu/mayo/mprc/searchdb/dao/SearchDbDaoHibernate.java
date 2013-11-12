@@ -7,19 +7,16 @@ import edu.mayo.mprc.config.RuntimeInitializer;
 import edu.mayo.mprc.database.*;
 import edu.mayo.mprc.fastadb.FastaDbDao;
 import edu.mayo.mprc.fastadb.ProteinSequence;
-import edu.mayo.mprc.searchdb.builder.AnalysisBuilder;
-import edu.mayo.mprc.searchdb.dao.bulk.*;
 import edu.mayo.mprc.swift.db.SwiftDao;
 import edu.mayo.mprc.swift.dbmapping.ReportData;
 import edu.mayo.mprc.swift.dbmapping.SwiftSearchDefinition;
 import edu.mayo.mprc.utilities.FileUtilities;
 import edu.mayo.mprc.utilities.exceptions.ExceptionUtilities;
-import edu.mayo.mprc.utilities.progress.PercentDoneReporter;
-import edu.mayo.mprc.utilities.progress.UserProgressReporter;
+import edu.mayo.mprc.utilities.progress.PercentProgressReporter;
+import edu.mayo.mprc.utilities.progress.PercentRangeReporter;
 import org.hibernate.Query;
 import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.Restrictions;
-import org.springframework.stereotype.Repository;
 
 import javax.annotation.Resource;
 import java.io.File;
@@ -31,12 +28,7 @@ import java.util.*;
  *
  * @author Roman Zenka
  */
-@Repository("searchDbDao")
-public final class SearchDbDaoHibernate extends DaoBase implements RuntimeInitializer, SearchDbDao {
-	/**
-	 * How many percent of the time does the bulk loading part take.
-	 */
-	private static final float BULK_PERCENT = 0.8f;
+public class SearchDbDaoHibernate extends DaoBase implements RuntimeInitializer, SearchDbDao {
 	private SwiftDao swiftDao;
 	private FastaDbDao fastaDbDao;
 
@@ -159,7 +151,7 @@ public final class SearchDbDaoHibernate extends DaoBase implements RuntimeInitia
 					final ProteinSequenceList newList = new ProteinSequenceList(size);
 					for (final ProteinSequence item : originalList) {
 						newList.add(fastaDbDao.addProteinSequence(item));
-						reporter.reportDone(size, itemsSaved);
+						reporter.reportProgress((float) itemsSaved / (float) size);
 						itemsSaved++;
 					}
 					group.setProteinSequences(addSet(newList));
@@ -173,7 +165,7 @@ public final class SearchDbDaoHibernate extends DaoBase implements RuntimeInitia
 					for (final PeptideSpectrumMatch item : originalList) {
 						newList.add(addPeptideSpectrumMatch(item));
 						itemsSaved++;
-						reporter.reportDone(size, itemsSaved);
+						reporter.reportProgress((float) itemsSaved / (float) size);
 					}
 					group.setPeptideSpectrumMatches(addSet(newList));
 				}
@@ -253,7 +245,7 @@ public final class SearchDbDaoHibernate extends DaoBase implements RuntimeInitia
 					resultNum++;
 				}
 				biologicalSample.setSearchResults(addSet(newList));
-				reporter.reportDone();
+				reporter.reportProgress((float) 0 / (float) 0);
 			}
 			return save(biologicalSample, biologicalSampleEqualityCriteria(biologicalSample), false);
 		}
@@ -267,49 +259,12 @@ public final class SearchDbDaoHibernate extends DaoBase implements RuntimeInitia
 				.add(associationEq("searchResults", biologicalSample.getSearchResults()));
 	}
 
-	/**
-	 * Reports percent of a task done within a given range.
-	 */
-	private final class PercentRangeReporter {
-		private final PercentDoneReporter reporter;
-		private final float percentFrom;
-		private final float percentTo;
-
-		PercentRangeReporter(final PercentDoneReporter reporter, final float percentFrom, final float percentTo) {
-			this.reporter = reporter;
-			this.percentFrom = percentFrom;
-			this.percentTo = percentTo;
-		}
-
-		public void reportDone() {
-			reporter.reportProgress(percentTo);
-		}
-
-		public void reportDone(final int totalChunks, final int chunkNumber) {
-			reporter.reportProgress(percentFrom + (percentTo - percentFrom) / totalChunks * chunkNumber);
-		}
-
-		/**
-		 * Get a percent range by splitting the current range into equally sized chunks and returning a chunk of a given numer.
-		 *
-		 * @param totalChunks How many chunks.
-		 * @param chunkNumber Which chunk we want range for.
-		 * @return a reporter going over the specified chunk
-		 */
-		public PercentRangeReporter getSubset(final int totalChunks, final int chunkNumber) {
-			final float chunkPercent = (percentTo - percentFrom) / totalChunks;
-			return new PercentRangeReporter(reporter, percentFrom + chunkPercent * chunkNumber, percentFrom + chunkPercent * (chunkNumber + 1));
-		}
-	}
-
 	@Override
-	public Analysis addAnalysis(final AnalysisBuilder analysisBuilder, final ReportData reportData, final UserProgressReporter reporter) {
-		final Analysis analysis = analysisBuilder.build();
-		bulkLoad(analysisBuilder, new PercentRangeReporter(new PercentDoneReporter(reporter, "Loading bulk of analysis data into database: "), 0.0f, BULK_PERCENT));
+	public Analysis addAnalysis(Analysis analysis, ReportData reportData, PercentProgressReporter reporter) {
 		Analysis savedAnalysis = analysis;
 		if (analysis.getId() == null) {
 			final BiologicalSampleList originalList = analysis.getBiologicalSamples();
-			final PercentRangeReporter analysisRange = new PercentRangeReporter(new PercentDoneReporter(reporter, "Loading remaining analysis data into database: "), BULK_PERCENT, 1.0f);
+			final PercentRangeReporter analysisRange = new PercentRangeReporter(reporter, 0.0f, 1.0f);
 			final int numBioSamples = originalList.size();
 			if (originalList.getId() == null) {
 				final BiologicalSampleList newList = new BiologicalSampleList(numBioSamples);
@@ -325,71 +280,6 @@ public final class SearchDbDaoHibernate extends DaoBase implements RuntimeInitia
 		getSession().saveOrUpdate(reportData);
 		reportData.setAnalysisId(savedAnalysis.getId());
 		return savedAnalysis;
-	}
-
-	/**
-	 * This is a mere optimization of the database loading.
-	 * The code should work the same even if this entire function is not called at all.
-	 * It would just run slower, as it would produce more "select-insert" pairs of queries,
-	 * as we never insert the same value twice.
-	 *
-	 * @param analysisBuilder The analysis to load
-	 */
-	private void bulkLoad(final AnalysisBuilder analysisBuilder, final PercentRangeReporter reporter) {
-		// The order of these operations matters
-		// We are bulk-saving the lower level objects before the higher-level ones get saved
-		// This way we have always all the data available (like ids of child objects)
-		// The reason for this work is to speed the database communication. We want to avoid
-		// select / insert call pairs that occur if we update object at a time
-		final int totalSteps = 8;
-		reporter.reportDone(totalSteps, 0);
-		fastaDbDao.addProteinSequences(analysisBuilder.getProteinSequences());
-		reporter.reportDone(totalSteps, 1);
-		fastaDbDao.addPeptideSequences(analysisBuilder.getPeptideSequences());
-		reporter.reportDone(totalSteps, 2);
-		addLocalizedModifications(analysisBuilder.getLocalizedModifications());
-		reporter.reportDone(totalSteps, 3);
-		addLocalizedModBags(analysisBuilder.calculateLocalizedModBags());
-		reporter.reportDone(totalSteps, 4);
-		addIdentifiedPeptides(analysisBuilder.getIdentifiedPeptides());
-		reporter.reportDone(totalSteps, 5);
-		addPeptideSpectrumMatches(analysisBuilder.getPeptideSpectrumMatches());
-		reporter.reportDone(totalSteps, 6);
-		addPsmLists(analysisBuilder.calculatePsmLists());
-		reporter.reportDone(totalSteps, 7);
-		addProteinSequenceLists(analysisBuilder.calculateProteinSequenceLists());
-		reporter.reportDone(totalSteps, 8);
-	}
-
-	private void addProteinSequenceLists(final Collection<ProteinSequenceList> lists) {
-		final ProteinSequenceListLoader loader = new ProteinSequenceListLoader(fastaDbDao, this);
-		loader.addObjects(lists);
-	}
-
-	private void addPsmLists(final Collection<PsmList> lists) {
-		final PsmListLoader loader = new PsmListLoader(fastaDbDao, this);
-		loader.addObjects(lists);
-	}
-
-	private void addPeptideSpectrumMatches(final Collection<PeptideSpectrumMatch> peptideSpectrumMatches) {
-		final PeptideSpectrumMatchLoader loader = new PeptideSpectrumMatchLoader(fastaDbDao, this);
-		loader.addObjects(peptideSpectrumMatches);
-	}
-
-	private void addLocalizedModBags(final Collection<LocalizedModBag> localizedModBags) {
-		for (final LocalizedModBag bag : localizedModBags) {
-			addBag(bag);
-		}
-	}
-
-	private void addIdentifiedPeptides(final Collection<IdentifiedPeptide> identifiedPeptides) {
-		final IdentifiedPeptideLoader loader = new IdentifiedPeptideLoader(fastaDbDao, this);
-		loader.addObjects(identifiedPeptides);
-	}
-
-	private void addLocalizedModifications(final Collection<LocalizedModification> localizedModifications) {
-		final LocalizedModificationLoader loader = new LocalizedModificationLoader(fastaDbDao, this);
-		loader.addObjects(localizedModifications);
 	}
 
 	@Override
@@ -565,7 +455,7 @@ public final class SearchDbDaoHibernate extends DaoBase implements RuntimeInitia
 	 * @param <T> Type of the list, must extend {@link PersistableBagBase}
 	 * @return Saved list (or the same one in case it was saved already).
 	 */
-	private <T extends PersistableHashedBagBase<?>> T addBag(final T bag) {
+	protected <T extends PersistableHashedBagBase<?>> T addBag(final T bag) {
 		if (bag.getId() == null) {
 			return updateHashedBag(bag);
 		}

@@ -4,7 +4,7 @@ import edu.mayo.mprc.MprcException;
 import edu.mayo.mprc.config.ServiceConfig;
 import edu.mayo.mprc.daemon.DaemonConnection;
 import edu.mayo.mprc.qa.RAWDumpWorker;
-import edu.mayo.mprc.searchdb.RawFileMetaData;
+import edu.mayo.mprc.searchdb.builder.RawFileMetaData;
 import edu.mayo.mprc.searchdb.dao.SearchDbDao;
 import edu.mayo.mprc.swift.ExitCode;
 import edu.mayo.mprc.swift.db.DatabaseFileTokenFactory;
