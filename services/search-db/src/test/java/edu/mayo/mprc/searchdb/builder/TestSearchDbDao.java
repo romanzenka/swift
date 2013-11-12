@@ -147,6 +147,7 @@ public class TestSearchDbDao extends DaoTest {
 		summarizer.load(stream, -1, reportToLoad, "3", null);
 
 		final AnalysisBuilder analysisBuilder = summarizer.getAnalysisBuilder();
+		analysisBuilder.build();
 		return searchDbDao.addAnalysis(analysisBuilder.getAnalysis(), reportData, new PercentProgressReporter() {
 			@Override
 			public void reportProgress(float percent) {
