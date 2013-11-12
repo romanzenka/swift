@@ -3,7 +3,6 @@ package edu.mayo.mprc.dbcurator.client.steppanels;
 import com.allen_sauer.gwt.dnd.client.*;
 import com.allen_sauer.gwt.dnd.client.drop.IndexedDropController;
 import com.google.gwt.user.client.ui.*;
-import edu.mayo.mprc.dbcurator.client.curatorstubs.CurationStepStub;
 
 import java.util.ArrayList;
 import java.util.List;

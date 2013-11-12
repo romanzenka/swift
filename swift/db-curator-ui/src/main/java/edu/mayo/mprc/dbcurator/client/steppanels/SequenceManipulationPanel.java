@@ -5,8 +5,6 @@ import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.RadioButton;
 import com.google.gwt.user.client.ui.VerticalPanel;
 import edu.mayo.mprc.common.client.ExceptionUtilities;
-import edu.mayo.mprc.dbcurator.client.curatorstubs.CurationStepStub;
-import edu.mayo.mprc.dbcurator.client.curatorstubs.SequenceManipulationStepStub;
 
 import java.util.Date;
 

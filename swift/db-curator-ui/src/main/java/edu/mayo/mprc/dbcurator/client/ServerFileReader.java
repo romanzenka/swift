@@ -6,8 +6,8 @@ import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.rpc.ServiceDefTarget;
 import com.google.gwt.user.client.ui.*;
-import edu.mayo.mprc.dbcurator.client.services.CommonDataRequester;
-import edu.mayo.mprc.dbcurator.client.services.CommonDataRequesterAsync;
+import edu.mayo.mprc.dbcurator.client.steppanels.CommonDataRequester;
+import edu.mayo.mprc.dbcurator.client.steppanels.CommonDataRequesterAsync;
 
 /**
  * This will be a widget that can display a file from the server.  It will do this in a manner analagous to

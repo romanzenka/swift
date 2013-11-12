@@ -2,8 +2,6 @@ package edu.mayo.mprc.dbcurator.client.steppanels;
 
 import com.google.gwt.user.client.ui.*;
 import edu.mayo.mprc.common.client.ExceptionUtilities;
-import edu.mayo.mprc.dbcurator.client.curatorstubs.CurationStepStub;
-import edu.mayo.mprc.dbcurator.client.curatorstubs.HeaderFilterStepStub;
 
 import java.util.Date;
 

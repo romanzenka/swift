@@ -1,9 +1,6 @@
-package edu.mayo.mprc.dbcurator.client.services;
+package edu.mayo.mprc.dbcurator.client.steppanels;
 
-import com.google.gwt.user.client.rpc.RemoteService;
-import edu.mayo.mprc.common.client.GWTServiceException;
-import edu.mayo.mprc.dbcurator.client.curatorstubs.CurationStub;
-import edu.mayo.mprc.dbcurator.client.curatorstubs.HeaderTransformStub;
+import com.google.gwt.user.client.rpc.AsyncCallback;
 
 import java.util.List;
 import java.util.Map;
@@ -11,12 +8,13 @@ import java.util.Map;
 /**
  * @author Eric Winter
  */
-public interface CommonDataRequester extends RemoteService {
-	List<HeaderTransformStub> getHeaderTransformers() throws GWTServiceException;
+public interface CommonDataRequesterAsync {
 
-	Map<String, String> getFTPDataSources() throws GWTServiceException;
+	void isShortnameUnique(String toCheck, AsyncCallback<Boolean> async);
 
-	Boolean isShortnameUnique(String toCheck) throws GWTServiceException;
+	void getHeaderTransformers(AsyncCallback<List<HeaderTransformStub>> async);
+
+	void getFTPDataSources(AsyncCallback<Map<String, String>> async);
 
 	/**
 	 * Takes a CurationStub that we want to have updated with status from the server and performs that update returning
@@ -26,7 +24,7 @@ public interface CommonDataRequester extends RemoteService {
 	 * @param toUpdate the stub that you want to have updated
 	 * @return the updated stub
 	 */
-	CurationStub performUpdate(CurationStub toUpdate) throws GWTServiceException;
+	void performUpdate(CurationStub toUpdate, AsyncCallback<CurationStub> async);
 
 	/**
 	 * returns a CurationStub that was stored on the server and that we should display.  This object should be called
@@ -34,7 +32,7 @@ public interface CommonDataRequester extends RemoteService {
 	 *
 	 * @return the stub for the curation that was already on the HttpSession object
 	 */
-	CurationStub lookForCuration() throws GWTServiceException;
+	void lookForCuration(AsyncCallback<CurationStub> async);
 
 	/**
 	 * Attempt to find a curation with a given id from the server, if no curation with that id can be found null will
@@ -43,7 +41,7 @@ public interface CommonDataRequester extends RemoteService {
 	 * @param id the id of the curation to retreive
 	 * @return the CurationStub with the given id
 	 */
-	CurationStub getCurationByID(Integer id) throws GWTServiceException;
+	void getCurationByID(Integer id, AsyncCallback<CurationStub> async);
 
 	/**
 	 * creates a copy of a given stub by finding the curation that the copy represents and making a copy of that and then
@@ -52,7 +50,7 @@ public interface CommonDataRequester extends RemoteService {
 	 * @param toCopy the stub you want to copy
 	 * @return a stub for the copy
 	 */
-	CurationStub copyCurationStub(CurationStub toCopy) throws GWTServiceException;
+	void copyCurationStub(CurationStub toCopy, AsyncCallback<CurationStub> async);
 
 	/**
 	 * Runs a curation on the server.  This will execute a curation.  If you want to get the status of a curation call getStatus()
@@ -60,9 +58,7 @@ public interface CommonDataRequester extends RemoteService {
 	 * @param toRun the curation you want to have run
 	 * @return the curation stub that should be used after it is returned in place of the one that was run
 	 */
-	CurationStub runCuration(CurationStub toRun) throws GWTServiceException;
-
-	// File listing
+	void runCuration(CurationStub toRun, AsyncCallback<CurationStub> async);
 
 	/**
 	 * gets a number of lines from the server from a given file.
@@ -74,11 +70,11 @@ public interface CommonDataRequester extends RemoteService {
 	 * @return an array of Strings from a start line to an exclusive end line.  The array may be shorter than numberOfLines if there
 	 *         were not enough lines left in the file.
 	 */
-	String[] getLines(String sharedPath, int startLineInclusive, int numberOfLines, String pattern) throws GWTServiceException;
+	void getLines(String sharedPath, int startLineInclusive, int numberOfLines, String pattern, AsyncCallback<String[]> async);
 
-	void setCancelMessage(boolean cancelMessage) throws GWTServiceException;
+	void setCancelMessage(boolean cancelMessage, AsyncCallback<Void> async);
 
-	String testPattern(String pattern) throws GWTServiceException;
+	void testPattern(String pattern, AsyncCallback<String> async);
 
-	String[] getResults() throws GWTServiceException;
+	void getResults(AsyncCallback<String[]> async);
 }

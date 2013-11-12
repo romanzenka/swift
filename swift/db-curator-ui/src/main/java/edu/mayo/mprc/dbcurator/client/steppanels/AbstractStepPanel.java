@@ -1,7 +1,6 @@
 package edu.mayo.mprc.dbcurator.client.steppanels;
 
 import com.google.gwt.user.client.ui.Composite;
-import edu.mayo.mprc.dbcurator.client.curatorstubs.CurationStepStub;
 
 /**
  * The abstract step mainPanel that will be implemented by the Panels that will contain the step specific infromation entry

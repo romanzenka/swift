@@ -1,7 +1,4 @@
-package edu.mayo.mprc.dbcurator.client.curatorstubs;
-
-import edu.mayo.mprc.dbcurator.client.steppanels.AbstractStepPanel;
-import edu.mayo.mprc.dbcurator.client.steppanels.SequenceManipulationPanel;
+package edu.mayo.mprc.dbcurator.client.steppanels;
 
 /**
  * A CurationStepStub that will act as a front for SequenceManipulationSteps.

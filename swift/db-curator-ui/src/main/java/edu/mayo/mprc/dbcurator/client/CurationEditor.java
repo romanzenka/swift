@@ -7,9 +7,6 @@ import com.google.gwt.user.client.WindowCloseListener;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.rpc.ServiceDefTarget;
 import com.google.gwt.user.client.ui.*;
-import edu.mayo.mprc.dbcurator.client.curatorstubs.*;
-import edu.mayo.mprc.dbcurator.client.services.CommonDataRequester;
-import edu.mayo.mprc.dbcurator.client.services.CommonDataRequesterAsync;
 import edu.mayo.mprc.dbcurator.client.steppanels.*;
 
 import java.util.ArrayList;

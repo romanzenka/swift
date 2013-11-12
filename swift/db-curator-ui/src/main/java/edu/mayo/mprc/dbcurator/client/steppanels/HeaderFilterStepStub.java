@@ -1,7 +1,4 @@
-package edu.mayo.mprc.dbcurator.client.curatorstubs;
-
-import edu.mayo.mprc.dbcurator.client.steppanels.AbstractStepPanel;
-import edu.mayo.mprc.dbcurator.client.steppanels.HeaderFilterStepPanel;
+package edu.mayo.mprc.dbcurator.client.steppanels;
 
 /**
  * @author Eric Winter

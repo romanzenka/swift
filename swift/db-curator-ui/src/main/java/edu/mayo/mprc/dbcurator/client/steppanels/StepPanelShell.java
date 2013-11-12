@@ -2,7 +2,6 @@ package edu.mayo.mprc.dbcurator.client.steppanels;
 
 import com.google.gwt.user.client.Event;
 import com.google.gwt.user.client.ui.*;
-import edu.mayo.mprc.dbcurator.client.curatorstubs.CurationStepStub;
 
 
 /**

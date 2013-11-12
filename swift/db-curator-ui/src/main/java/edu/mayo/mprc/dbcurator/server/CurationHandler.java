@@ -1,7 +1,7 @@
 package edu.mayo.mprc.dbcurator.server;
 
 import edu.mayo.mprc.dbcurator.client.CurationValidation;
-import edu.mayo.mprc.dbcurator.client.curatorstubs.*;
+import edu.mayo.mprc.dbcurator.client.steppanels.*;
 import edu.mayo.mprc.dbcurator.model.*;
 import edu.mayo.mprc.dbcurator.model.curationsteps.*;
 import edu.mayo.mprc.fasta.DatabaseAnnotation;

@@ -1,7 +1,4 @@
-package edu.mayo.mprc.dbcurator.client.curatorstubs;
-
-import edu.mayo.mprc.dbcurator.client.steppanels.AbstractStepPanel;
-import edu.mayo.mprc.dbcurator.client.steppanels.NewDatabaseInclusionPanel;
+package edu.mayo.mprc.dbcurator.client.steppanels;
 
 /**
  * A stub for the NewDatabaseInclusionStep that contains only the properties and a few client required methods.

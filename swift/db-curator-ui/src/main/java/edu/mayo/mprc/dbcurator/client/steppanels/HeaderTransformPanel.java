@@ -5,10 +5,6 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.rpc.ServiceDefTarget;
 import com.google.gwt.user.client.ui.*;
 import edu.mayo.mprc.common.client.ExceptionUtilities;
-import edu.mayo.mprc.dbcurator.client.curatorstubs.CurationStepStub;
-import edu.mayo.mprc.dbcurator.client.curatorstubs.HeaderTransformStub;
-import edu.mayo.mprc.dbcurator.client.services.CommonDataRequester;
-import edu.mayo.mprc.dbcurator.client.services.CommonDataRequesterAsync;
 
 import java.util.ArrayList;
 import java.util.List;

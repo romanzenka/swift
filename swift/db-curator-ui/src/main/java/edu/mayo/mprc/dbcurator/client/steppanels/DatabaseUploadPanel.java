@@ -4,8 +4,6 @@ import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.ui.*;
 import edu.mayo.mprc.common.client.ExceptionUtilities;
 import edu.mayo.mprc.common.client.StringUtilities;
-import edu.mayo.mprc.dbcurator.client.curatorstubs.CurationStepStub;
-import edu.mayo.mprc.dbcurator.client.curatorstubs.DatabaseUploadStepStub;
 
 import java.util.Date;
 

@@ -1,4 +1,4 @@
-package edu.mayo.mprc.dbcurator.client.curatorstubs;
+package edu.mayo.mprc.dbcurator.client.steppanels;
 
 import java.io.Serializable;
 import java.util.ArrayList;
