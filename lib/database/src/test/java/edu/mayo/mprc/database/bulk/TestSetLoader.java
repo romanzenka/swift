@@ -1,7 +1,7 @@
-package edu.mayo.mprc.database;
+package edu.mayo.mprc.database.bulk;
 
-import edu.mayo.mprc.database.bulk.BulkHashedSetLoader;
-import edu.mayo.mprc.database.bulk.BulkLoadJobStarter;
+import edu.mayo.mprc.database.SessionProvider;
+import edu.mayo.mprc.database.TestList;
 
 /**
  * @author Roman Zenka

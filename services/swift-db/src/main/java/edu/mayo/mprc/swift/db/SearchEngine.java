@@ -2,6 +2,7 @@ package edu.mayo.mprc.swift.db;
 
 import edu.mayo.mprc.MprcException;
 import edu.mayo.mprc.config.*;
+import edu.mayo.mprc.config.ui.FactoryDescriptor;
 import edu.mayo.mprc.config.ui.ServiceUiFactory;
 import edu.mayo.mprc.daemon.DaemonConnection;
 import edu.mayo.mprc.searchengine.EngineMetadata;

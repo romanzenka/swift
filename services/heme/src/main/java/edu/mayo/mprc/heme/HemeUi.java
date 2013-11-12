@@ -8,6 +8,8 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import edu.mayo.mprc.MprcException;
 import edu.mayo.mprc.config.*;
+import edu.mayo.mprc.config.ui.FactoryDescriptor;
+import edu.mayo.mprc.config.ui.ResourceConfigBase;
 import edu.mayo.mprc.config.ui.ServiceUiFactory;
 import edu.mayo.mprc.config.ui.UiBuilder;
 import edu.mayo.mprc.fastadb.FastaDbDao;

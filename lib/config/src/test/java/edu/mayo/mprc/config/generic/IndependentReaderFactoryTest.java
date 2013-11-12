@@ -1,7 +1,8 @@
-package edu.mayo.mprc.config;
+package edu.mayo.mprc.config.generic;
 
-import edu.mayo.mprc.config.generic.GenericFactory;
-import edu.mayo.mprc.config.generic.GenericResource;
+import edu.mayo.mprc.config.AppConfigReader;
+import edu.mayo.mprc.config.ApplicationConfig;
+import edu.mayo.mprc.config.DaemonConfig;
 import edu.mayo.mprc.utilities.ResourceUtilities;
 import org.testng.Assert;
 import org.testng.annotations.Test;

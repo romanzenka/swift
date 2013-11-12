@@ -1,10 +1,11 @@
-package edu.mayo.mprc.config;
+package edu.mayo.mprc.config.ui;
 
 import com.google.common.base.Strings;
 import edu.mayo.mprc.MprcException;
-import edu.mayo.mprc.config.ui.PropertyChangeListener;
-import edu.mayo.mprc.config.ui.ServiceUiFactory;
-import edu.mayo.mprc.config.ui.UiBuilder;
+import edu.mayo.mprc.config.ConfigReader;
+import edu.mayo.mprc.config.ConfigWriter;
+import edu.mayo.mprc.config.DaemonConfig;
+import edu.mayo.mprc.config.ResourceConfig;
 
 import java.util.HashMap;
 import java.util.List;

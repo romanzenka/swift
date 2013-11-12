@@ -2,8 +2,8 @@ package edu.mayo.mprc.fastadb;
 
 import com.google.common.base.Preconditions;
 import edu.mayo.mprc.MprcException;
-import edu.mayo.mprc.database.DaoBase;
 import edu.mayo.mprc.database.Database;
+import edu.mayo.mprc.database.bulk.BulkDaoBase;
 import edu.mayo.mprc.dbcurator.model.Curation;
 import edu.mayo.mprc.fasta.FASTAInputStream;
 import edu.mayo.mprc.utilities.FileUtilities;
@@ -28,7 +28,7 @@ import java.util.List;
  * @author Roman Zenka
  */
 @Repository("fastaDbDao")
-public final class FastaDbDaoHibernate extends DaoBase implements FastaDbDao {
+public final class FastaDbDaoHibernate extends BulkDaoBase implements FastaDbDao {
 	private static final Logger LOGGER = Logger.getLogger(FastaDbDaoHibernate.class);
 	// Progress will be checked each X spectra
 	public static final long REPORT_FREQUENCY = 100L;

@@ -1,5 +1,8 @@
-package edu.mayo.mprc.database;
+package edu.mayo.mprc.database.bulk;
 
+import edu.mayo.mprc.database.DaoTest;
+import edu.mayo.mprc.database.TestList;
+import edu.mayo.mprc.database.TestSetMember;
 import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.Restrictions;
 import org.testng.Assert;
@@ -16,11 +19,11 @@ import java.util.List;
  */
 public final class BulkLoadSetTest extends DaoTest {
 	public static final int VALUES = 100;
-	private TestDaoBaseImpl dao;
+	private TestBulkDaoBaseImpl dao;
 
 	@BeforeMethod
 	public void setup() {
-		dao = new TestDaoBaseImpl();
+		dao = new TestBulkDaoBaseImpl();
 		initializeDatabase(Arrays.asList(dao));
 	}
 

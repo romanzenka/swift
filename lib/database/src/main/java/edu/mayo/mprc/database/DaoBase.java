@@ -2,8 +2,6 @@ package edu.mayo.mprc.database;
 
 import com.google.common.base.Preconditions;
 import edu.mayo.mprc.MprcException;
-import edu.mayo.mprc.database.bulk.BulkLoadJob;
-import edu.mayo.mprc.database.bulk.BulkLoadJobStarter;
 import org.apache.log4j.Logger;
 import org.hibernate.*;
 import org.hibernate.criterion.Conjunction;
@@ -21,7 +19,7 @@ import java.util.List;
  * <p/>
  * TODO: This class is more of a DAO factory. We should clean this up by introducing actual DAO factories.
  */
-public abstract class DaoBase implements Dao, SessionProvider, BulkLoadJobStarter {
+public abstract class DaoBase implements Dao, SessionProvider {
 	private static final Logger LOGGER = Logger.getLogger(DaoBase.class);
 	// The hibernate field that stores the deletion change.
 	public static final String DELETION_FIELD = "deletion";
@@ -83,10 +81,7 @@ public abstract class DaoBase implements Dao, SessionProvider, BulkLoadJobStarte
 	 */
 	public Collection<String> getHibernateMappings() {
 		return Arrays.asList(
-				"edu/mayo/mprc/database/Change.hbm.xml",
-				"edu/mayo/mprc/database/bulk/BulkLoadJob.hbm.xml",
-				"edu/mayo/mprc/database/bulk/TempHashedSet.hbm.xml",
-				"edu/mayo/mprc/database/bulk/TempHashedSetMember.hbm.xml"
+				"edu/mayo/mprc/database/Change.hbm.xml"
 		);
 	}
 
@@ -380,7 +375,7 @@ public abstract class DaoBase implements Dao, SessionProvider, BulkLoadJobStarte
 	 * @param createNew        New object must be created.
 	 * @return The saved object. This can be either the newly saved item (it did not exist in the database yet), or a result of Hibernate's merge operation.
 	 */
-	protected final <T extends PersistableBase> T save(final T item, final Criterion equalityCriteria, final boolean createNew) {
+	public final <T extends PersistableBase> T save(final T item, final Criterion equalityCriteria, final boolean createNew) {
 		final Session session = getSession();
 		@SuppressWarnings("unchecked")
 		final List<T> existingObjects = session
@@ -574,17 +569,5 @@ public abstract class DaoBase implements Dao, SessionProvider, BulkLoadJobStarte
 		return new Conjunction()
 				.add(Restrictions.ge(propertyName, value - tolerance))
 				.add(Restrictions.le(propertyName, value + tolerance));
-	}
-
-	@Override
-	public BulkLoadJob startNewJob() {
-		final BulkLoadJob job = new BulkLoadJob();
-		getSession().save(job);
-		return job;
-	}
-
-	@Override
-	public void endJob(final BulkLoadJob job) {
-		getSession().delete(job);
 	}
 }

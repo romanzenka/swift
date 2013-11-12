@@ -1,7 +1,8 @@
-package edu.mayo.mprc.config;
+package edu.mayo.mprc.config.ui;
 
-import edu.mayo.mprc.config.ui.ServiceUiFactory;
-import edu.mayo.mprc.config.ui.UiBuilder;
+import edu.mayo.mprc.config.ConfigWriter;
+import edu.mayo.mprc.config.DaemonConfig;
+import edu.mayo.mprc.config.ResourceConfig;
 import org.testng.annotations.Test;
 
 import static org.mockito.Mockito.*;

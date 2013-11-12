@@ -6,6 +6,7 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.Iterables;
 import edu.mayo.mprc.MprcException;
 import edu.mayo.mprc.config.*;
+import edu.mayo.mprc.config.ui.FactoryDescriptor;
 import edu.mayo.mprc.config.ui.ServiceUiFactory;
 import edu.mayo.mprc.daemon.DaemonConnectionFactory;
 import edu.mayo.mprc.daemon.WorkerFactoryBase;

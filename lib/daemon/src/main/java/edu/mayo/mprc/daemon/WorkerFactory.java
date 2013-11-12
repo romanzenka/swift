@@ -1,8 +1,8 @@
 package edu.mayo.mprc.daemon;
 
-import edu.mayo.mprc.config.FactoryDescriptor;
 import edu.mayo.mprc.config.ResourceConfig;
 import edu.mayo.mprc.config.ResourceFactory;
+import edu.mayo.mprc.config.ui.FactoryDescriptor;
 
 /**
  * Creates a fully configured worker.

@@ -1,6 +1,6 @@
-package edu.mayo.mprc.config;
+package edu.mayo.mprc.config.ui;
 
-import edu.mayo.mprc.config.ui.ServiceUiFactory;
+import edu.mayo.mprc.config.ResourceConfig;
 
 /**
  * A class that can describe objects to be created by a particular factory.
