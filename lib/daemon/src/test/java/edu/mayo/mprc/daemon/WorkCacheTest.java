@@ -1,6 +1,7 @@
 package edu.mayo.mprc.daemon;
 
 import com.google.common.collect.Lists;
+import edu.mayo.mprc.MprcException;
 import edu.mayo.mprc.daemon.exception.DaemonException;
 import edu.mayo.mprc.daemon.files.FileTokenFactory;
 import edu.mayo.mprc.daemon.worker.WorkPacket;
@@ -27,6 +28,7 @@ public final class WorkCacheTest {
 	@Test
 	public void shouldCacheWork() {
 		final TestConnection connection = new TestConnection();
+		connection.start();
 
 		final ProgressReporter reporter = mock(ProgressReporter.class);
 		cacheFolder = FileUtilities.createTempFolder();
@@ -91,6 +93,7 @@ public final class WorkCacheTest {
 		Assert.assertEquals(cacheFolder.listFiles().length, 3, "There should be two result folders (two hashes fold into one) and wip folder");
 		Assert.assertFalse(workCache.isWorkInProgress(), "There should be no work in progress anymore");
 
+		connection.stop();
 		FileUtilities.cleanupTempFile(cacheFolder);
 	}
 
@@ -111,6 +114,7 @@ public final class WorkCacheTest {
 	public class TestConnection implements DaemonConnection {
 		private ArrayList<ProgressListener> listeners = new ArrayList<ProgressListener>();
 		private ArrayList<TestWorkPacket> workPackets = new ArrayList<TestWorkPacket>();
+		private boolean running;
 
 		@Override
 		public FileTokenFactory getFileTokenFactory() {
@@ -129,6 +133,9 @@ public final class WorkCacheTest {
 
 		@Override
 		public void sendWork(final WorkPacket workPacket, final int priority, final ProgressListener listener) {
+			if (!running) {
+				throw new MprcException("The service is not running");
+			}
 			final TestWorkPacket testPacket = (TestWorkPacket) workPacket;
 			listeners.add(listener);
 			workPackets.add(testPacket);
@@ -163,7 +170,18 @@ public final class WorkCacheTest {
 		}
 
 		@Override
-		public void close() {
+		public boolean isRunning() {
+			return running;
+		}
+
+		@Override
+		public void start() {
+			running = true;
+		}
+
+		@Override
+		public void stop() {
+			running = false;
 		}
 	}
 

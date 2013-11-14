@@ -45,6 +45,7 @@ public abstract class MessagingTestBase {
 
 		try {
 			service = serviceFactory.createService(TEST_QUEUE_NAME);
+			service.start();
 		} catch (Exception t) {
 			throw new MprcException(t);
 		}
@@ -53,6 +54,7 @@ public abstract class MessagingTestBase {
 	@AfterClass
 	public void stopBroker() {
 		if (serviceFactory != null) {
+			service.stop();
 			serviceFactory.stop();
 			serviceFactory = null;
 		}

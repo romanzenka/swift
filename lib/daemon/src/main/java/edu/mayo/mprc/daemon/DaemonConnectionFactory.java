@@ -39,10 +39,6 @@ public final class DaemonConnectionFactory extends FactoryBase<ServiceConfig, Da
 		if (!isRunning()) {
 			throw new MprcException("The daemon connection factory has to be started before it gets used");
 		}
-		// We initialize the service factory on demand, as it is unclear that it will be actually needed
-		if (!getServiceFactory().isRunning()) {
-			getServiceFactory().start();
-		}
 		final ServiceFactory factory = getServiceFactory();
 		final Service service = factory.createService(config.getName());
 		return new DirectDaemonConnection(service, fileTokenFactory);

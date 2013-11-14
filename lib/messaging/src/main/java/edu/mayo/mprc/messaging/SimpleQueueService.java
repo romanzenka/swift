@@ -11,22 +11,24 @@ import java.io.Serializable;
  * The responses are transferred using temporary queue, as described here:
  * http://activemq.apache.org/how-should-i-implement-request-response-with-jms.html
  * <p/>
- * Never share the service among multiple threads - it is single-threaded only due to usage of Session.
+ * Multithreaded access is resolved using threadlocal variables.
  */
 final class SimpleQueueService implements Service {
 	private static final Logger LOGGER = Logger.getLogger(SimpleQueueService.class);
 
-	private final Connection connection;
+	private final ServiceFactory serviceFactory;
 	/**
 	 * Each thread using the SimpleQueueService uses a separate session.
 	 * A session for sending messages is separate from the session for receiving messages.
 	 */
 	private final ThreadLocal<Session> sendingSession = new ThreadLocal<Session>();
 	private final ThreadLocal<Session> receivingSession = new ThreadLocal<Session>();
+
 	/**
-	 * This is where the requests get sent to. A destination supports concurrent use.
+	 * Connection to the activemq server;
 	 */
-	private final Destination requestDestination;
+	private Connection connection;
+	private Destination requestDestination;
 	/**
 	 * Cached producer for sending messages.
 	 */
@@ -47,23 +49,14 @@ final class SimpleQueueService implements Service {
 	 * Establishes a link of given name on a given broker.
 	 * Each link consists of two JMS queues - one for sending requests, one (wrapped in ResponseDispatcher) for receiving responses.
 	 *
-	 * @param connection         The ActiveMQ connection to use.
+	 * @param serviceFactory     Service factory
 	 * @param responseDispatcher Response dispatcher that can handle transfer of responses to the requests.
 	 * @param name               Name of the queue.
 	 */
-	SimpleQueueService(final Connection connection, final ResponseDispatcher responseDispatcher, final String name) {
+	SimpleQueueService(final ServiceFactory serviceFactory, final ResponseDispatcher responseDispatcher, final String name) {
+		this.serviceFactory = serviceFactory;
 		queueName = name;
 		this.responseDispatcher = responseDispatcher;
-
-		try {
-			this.connection = connection;
-
-			requestDestination = sendingSession().createQueue(queueName);
-
-			LOGGER.debug("Connected to JMS broker: " + connection.getClientID() + " queue: " + queueName);
-		} catch (JMSException e) {
-			throw new MprcException("Queue could not be created", e);
-		}
 	}
 
 	@Override
@@ -89,18 +82,20 @@ final class SimpleQueueService implements Service {
 			}
 
 			LOGGER.debug("Sending message to [" + queueName + "] with content [" + objectMessage.toString() + "] id: [" + objectMessage.getJMSMessageID() + "]");
-			messageProducer().send(requestDestination, objectMessage);
+			messageProducer().send(getRequestDestination(), objectMessage);
 		} catch (JMSException e) {
 			throw new MprcException("Could not send message", e);
 		}
 	}
 
-	private synchronized MessageProducer messageProducer() throws JMSException {
-		if (null == producer.get()) {
-			final MessageProducer producer1 = sendingSession().createProducer(null);
-			producer.set(producer1);
+	private MessageProducer messageProducer() throws JMSException {
+		synchronized (this) {
+			if (null == producer.get()) {
+				final MessageProducer producer1 = sendingSession().createProducer(null);
+				producer.set(producer1);
+			}
+			return producer.get();
 		}
-		return producer.get();
 	}
 
 	/**
@@ -151,24 +146,13 @@ final class SimpleQueueService implements Service {
 		}
 	}
 
-	@Override
-	public synchronized void stopReceiving() {
-		if (null != consumer.get()) {
-			try {
-				consumer.get().close();
-			} catch (JMSException e) {
-				throw new MprcException(e);
-			} finally {
-				consumer.set(null);
+	private MessageConsumer messageConsumer() throws JMSException {
+		synchronized (this) {
+			if (null == consumer.get()) {
+				consumer.set(receivingSession().createConsumer(getRequestDestination()));
 			}
+			return consumer.get();
 		}
-	}
-
-	private synchronized MessageConsumer messageConsumer() throws JMSException {
-		if (null == consumer.get()) {
-			consumer.set(receivingSession().createConsumer(requestDestination));
-		}
-		return consumer.get();
 	}
 
 	private Session receivingSession() {
@@ -182,7 +166,7 @@ final class SimpleQueueService implements Service {
 	private Session setupSession(ThreadLocal<Session> sessionHolder) {
 		if (sessionHolder.get() == null) {
 			try {
-				final Session value = connection.createSession(/*transacted?*/false, /*acknowledgment*/Session.CLIENT_ACKNOWLEDGE);
+				final Session value = createConnection().createSession(/*transacted?*/false, /*acknowledgment*/Session.CLIENT_ACKNOWLEDGE);
 				sessionHolder.set(value);
 			} catch (JMSException e) {
 				throw new MprcException("Could not open JMS session", e);
@@ -191,4 +175,84 @@ final class SimpleQueueService implements Service {
 		return sessionHolder.get();
 	}
 
+	private Connection createConnection() {
+		synchronized (this) {
+			if (connection == null) {
+				if (!serviceFactory.isRunning()) {
+					serviceFactory.start();
+				}
+				connection = serviceFactory.getConnection();
+			}
+			return connection;
+		}
+	}
+
+	@Override
+	public boolean isRunning() {
+		synchronized (this) {
+			return connection != null;
+		}
+	}
+
+	@Override
+	public void start() {
+		synchronized (this) {
+			if (!isRunning()) {
+				try {
+					createConnection();
+
+					setRequestDestination(sendingSession().createQueue(queueName));
+
+					LOGGER.debug("Connected to JMS broker: " + connection.getClientID() + " queue: " + queueName);
+				} catch (JMSException e) {
+					throw new MprcException("Queue could not be created", e);
+				}
+			}
+		}
+	}
+
+	@Override
+	public void stop() {
+		synchronized (this) {
+			if (isRunning()) {
+				closeSession(receivingSession);
+				closeSession(sendingSession);
+				if (null != consumer.get()) {
+					try {
+						consumer.get().close();
+					} catch (JMSException e) {
+						throw new MprcException(e);
+					} finally {
+						consumer.set(null);
+					}
+				}
+			}
+		}
+	}
+
+	private static void closeSession(final ThreadLocal<Session> toClose) {
+		final Session session = toClose.get();
+		if (session != null) {
+			try {
+				session.close();
+			} catch (JMSException e) {
+				throw new MprcException("Could not close session", e);
+			}
+		}
+	}
+
+	/**
+	 * This is where the requests get sent to. A destination supports concurrent use.
+	 */
+	public Destination getRequestDestination() {
+		synchronized (this) {
+			return requestDestination;
+		}
+	}
+
+	public void setRequestDestination(Destination requestDestination) {
+		synchronized (this) {
+			this.requestDestination = requestDestination;
+		}
+	}
 }

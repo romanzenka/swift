@@ -1,5 +1,6 @@
 package edu.mayo.mprc.swift.search;
 
+import edu.mayo.mprc.config.Lifecycle;
 import edu.mayo.mprc.swift.dbmapping.SearchRun;
 import edu.mayo.mprc.swift.dbmapping.SwiftSearchDefinition;
 import edu.mayo.mprc.utilities.progress.ProgressListener;
@@ -11,7 +12,7 @@ import java.io.File;
  *
  * @author Roman Zenka
  */
-public interface SwiftSearcherCaller {
+public interface SwiftSearcherCaller extends Lifecycle {
 	/**
 	 * used to resubmit a transaction that has been run before
 	 *

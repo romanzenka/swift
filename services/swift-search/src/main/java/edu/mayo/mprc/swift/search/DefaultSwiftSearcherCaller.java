@@ -3,6 +3,7 @@ package edu.mayo.mprc.swift.search;
 import edu.mayo.mprc.MprcException;
 import edu.mayo.mprc.daemon.AssignedTaskData;
 import edu.mayo.mprc.daemon.DaemonConnection;
+import edu.mayo.mprc.daemon.DaemonUtilities;
 import edu.mayo.mprc.swift.db.SwiftDao;
 import edu.mayo.mprc.swift.dbmapping.*;
 import edu.mayo.mprc.swift.params2.ParamsDao;
@@ -40,6 +41,7 @@ public final class DefaultSwiftSearcherCaller implements SwiftSearcherCaller {
 	private WorkspaceDao workspaceDao;
 	private ParamsDao paramsDao;
 	private File browseRoot;
+	private boolean running;
 
 	private DefaultSwiftSearcherCaller() {
 	}
@@ -244,6 +246,23 @@ public final class DefaultSwiftSearcherCaller implements SwiftSearcherCaller {
 
 	public void setBrowseRoot(File browseRoot) {
 		this.browseRoot = browseRoot;
+	}
+
+	@Override
+	public boolean isRunning() {
+		return running;
+	}
+
+	@Override
+	public void start() {
+		if (!isRunning()) {
+			DaemonUtilities.startDaemonConnections(swiftSearcherConnection);
+			running = true;
+		}
+	}
+
+	@Override
+	public void stop() {
 	}
 
 	private static class SearchProgressListener implements ProgressListener {

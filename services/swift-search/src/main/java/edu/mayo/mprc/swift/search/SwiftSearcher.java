@@ -9,6 +9,7 @@ import edu.mayo.mprc.config.ui.ServiceUiFactory;
 import edu.mayo.mprc.config.ui.UiBuilder;
 import edu.mayo.mprc.config.ui.UiResponse;
 import edu.mayo.mprc.daemon.DaemonConnection;
+import edu.mayo.mprc.daemon.DaemonUtilities;
 import edu.mayo.mprc.daemon.SimpleThreadPoolExecutor;
 import edu.mayo.mprc.daemon.exception.DaemonException;
 import edu.mayo.mprc.daemon.worker.WorkPacket;
@@ -52,7 +53,7 @@ import java.util.concurrent.ExecutorService;
  * Swift search daemon. Converts a given work packet into an instance of {@link SearchRunner} which holds
  * the state of the search and is responsible for the execution.
  */
-public final class SwiftSearcher implements Worker {
+public final class SwiftSearcher implements Worker, Lifecycle {
 	public static final String TYPE = "searcher";
 	public static final String NAME = "Swift Searcher";
 	public static final String DESC = "Runs the Swift search, orchestrating all the other modules.";
@@ -107,6 +108,7 @@ public final class SwiftSearcher implements Worker {
 	private static final String REPORT_DECOY_HITS = "reportDecoyHits";
 
 	private DatabaseFileTokenFactory fileTokenFactory;
+	private boolean running;
 
 	public SwiftSearcher(final CurationDao curationDao, final SwiftDao swiftDao, final DatabaseFileTokenFactory fileTokenFactory) {
 		// We execute the switch workflows in a single thread
@@ -427,6 +429,32 @@ public final class SwiftSearcher implements Worker {
 		}
 		appendEngines(supportedEngines, result);
 		return result.toString();
+	}
+
+	@Override
+	public boolean isRunning() {
+		return running;
+	}
+
+	@Override
+	public void start() {
+		if (!isRunning()) {
+			DaemonUtilities.startDaemonConnections(
+					raw2mgfDaemon,
+					msconvertDaemon,
+					mgfCleanupDaemon,
+					rawDumpDaemon,
+					msmsEvalDaemon,
+					scaffoldReportDaemon,
+					qaDaemon,
+					fastaDbDaemon,
+					searchDbDaemon
+			);
+		}
+	}
+
+	@Override
+	public void stop() {
 	}
 
 	/**

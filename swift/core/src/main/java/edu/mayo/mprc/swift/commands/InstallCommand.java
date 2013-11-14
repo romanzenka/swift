@@ -7,15 +7,22 @@ import edu.mayo.mprc.utilities.FileUtilities;
 import org.springframework.stereotype.Component;
 
 import java.io.File;
+import java.util.HashMap;
+import java.util.Map;
+
 
 /**
+ * Makes sure that for a given config and daemon, all pieces are in place.
+ * <p/>
+ * Then runs a check
+ *
  * @author Roman Zenka
  */
-@Component("check-config-command")
-public final class CheckConfigCommand implements SwiftCommand {
+@Component("install-command")
+public final class InstallCommand implements SwiftCommand {
 	@Override
 	public String getDescription() {
-		return "Make sure the Swift configuration for the current daemon is correct";
+		return "Make sure that the daemon is ready to run (creates directories, initializes database, etc.)";
 	}
 
 	@Override
@@ -29,9 +36,13 @@ public final class CheckConfigCommand implements SwiftCommand {
 			}
 
 			final DaemonConfig config = environment.getDaemonConfig();
-			FileUtilities.out("Checking configuration file: " + environment.getConfigFile().getAbsolutePath() + " for daemon " + environment.getDaemonConfig().getName());
-
 			final Daemon daemon = environment.createDaemon(config);
+
+			FileUtilities.out("Installing from configuration file: " + environment.getConfigFile().getAbsolutePath() + " for daemon " + environment.getDaemonConfig().getName());
+			final Map<String, String> params = new HashMap<String, String>(0);
+			daemon.install(params);
+
+			FileUtilities.out("Checking the installation");
 			final String check = daemon.check();
 			if (check != null) {
 				FileUtilities.err(check);
@@ -41,7 +52,7 @@ public final class CheckConfigCommand implements SwiftCommand {
 			FileUtilities.err(e.getMessage());
 			return ExitCode.Error;
 		}
-		FileUtilities.out("Check passed");
+		FileUtilities.out("Check passed, Swift is successfully installed");
 		return ExitCode.Ok;
 	}
 }

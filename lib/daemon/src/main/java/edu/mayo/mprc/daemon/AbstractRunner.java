@@ -167,6 +167,7 @@ public abstract class AbstractRunner implements Checkable, Installable, Lifecycl
 
 		@Override
 		public void run() {
+			getDaemonConnection().start();
 			while (keepRunning) {
 				final DaemonRequest request = getDaemonConnection().receiveDaemonRequest(5000);
 				if (request != null) {
@@ -174,7 +175,7 @@ public abstract class AbstractRunner implements Checkable, Installable, Lifecycl
 				}
 			}
 
-			getDaemonConnection().close();
+			getDaemonConnection().stop();
 
 			synchronized (requestCount) {
 				while (requestCount.get() != 0) {

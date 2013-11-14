@@ -1,5 +1,6 @@
 package edu.mayo.mprc.daemon;
 
+import edu.mayo.mprc.config.Lifecycle;
 import edu.mayo.mprc.daemon.files.FileTokenFactory;
 import edu.mayo.mprc.daemon.files.FileTokenHolder;
 import edu.mayo.mprc.daemon.worker.WorkPacket;
@@ -17,7 +18,7 @@ import edu.mayo.mprc.utilities.progress.ProgressListener;
  * starts running, finishes running successfully or finishes running with a failure. All these responses are
  * being reported using a {@link ProgressListener} which wraps {@link ResponseListener}.
  */
-public interface DaemonConnection {
+public interface DaemonConnection extends Lifecycle {
 	/**
 	 * @return The file token factory that to translate work packets with files to be sent over the net.
 	 */
@@ -53,9 +54,4 @@ public interface DaemonConnection {
 	 * @return Requested work + means of reporting progress.
 	 */
 	DaemonRequest receiveDaemonRequest(long timeout);
-
-	/**
-	 * When you no longer want to receive messages.
-	 */
-	void close();
 }

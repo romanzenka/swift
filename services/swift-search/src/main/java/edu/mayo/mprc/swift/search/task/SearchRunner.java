@@ -3,8 +3,10 @@ package edu.mayo.mprc.swift.search.task;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Maps;
 import edu.mayo.mprc.MprcException;
+import edu.mayo.mprc.config.Lifecycle;
 import edu.mayo.mprc.config.ResourceConfig;
 import edu.mayo.mprc.daemon.DaemonConnection;
+import edu.mayo.mprc.daemon.DaemonUtilities;
 import edu.mayo.mprc.dbcurator.model.Curation;
 import edu.mayo.mprc.dbcurator.model.CurationDao;
 import edu.mayo.mprc.scaffold.ScaffoldWorker;
@@ -47,9 +49,10 @@ import java.util.concurrent.ExecutorService;
  * {@link #run()} method performs next step of the search by calling the workflow
  * engine.
  */
-public final class SearchRunner implements Runnable {
+public final class SearchRunner implements Runnable, Lifecycle {
 	private static final Logger LOGGER = Logger.getLogger(SearchRunner.class);
 
+	private boolean running;
 	private boolean fromScratch;
 	private SwiftSearchDefinition searchDefinition;
 
@@ -1044,6 +1047,35 @@ public final class SearchRunner implements Runnable {
 
 	public void addSearchMonitor(final SearchMonitor monitor) {
 		workflowEngine.addMonitor(monitor);
+	}
+
+	@Override
+	public boolean isRunning() {
+		return running;
+	}
+
+	@Override
+	public void start() {
+		if (!isRunning()) {
+			DaemonUtilities.startDaemonConnections(
+					raw2mgfDaemon,
+					msconvertDaemon,
+					mgfCleanupDaemon,
+					rawDumpDaemon,
+					msmsEvalDaemon,
+					scaffoldReportDaemon,
+					qaDaemon,
+					fastaDbDaemon,
+					searchDbDaemon);
+			running = true;
+		}
+	}
+
+	@Override
+	public void stop() {
+		if (isRunning()) {
+			running = false;
+		}
 	}
 
 	private static final class MyResumer implements Resumer {

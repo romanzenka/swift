@@ -93,6 +93,7 @@ public abstract class AsyncTaskBase extends TaskBase {
 				return;
 			}
 			workPacket.setPriority(getPriority());
+			daemon.start();
 			daemon.sendWork(workPacket, new TaskProgressListener(this) {
 				@Override
 				public void requestProcessingFinished() {

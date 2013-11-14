@@ -56,6 +56,10 @@ final class DirectDaemonConnection implements DaemonConnection {
 
 	@Override
 	public void sendWork(final WorkPacket workPacket, final int priority, final ProgressListener listener) {
+		if (!isRunning()) {
+			throw new MprcException("The daemon connection is not running. Cannot send work");
+		}
+
 		workPacket.translateOnSender(fileTokenFactory);
 
 		try {
@@ -69,6 +73,10 @@ final class DirectDaemonConnection implements DaemonConnection {
 
 	@Override
 	public DaemonRequest receiveDaemonRequest(final long timeout) {
+		if (!isRunning()) {
+			throw new MprcException("The daemon connection is not running. Cannot send work");
+		}
+
 		final Request request = service.receiveRequest(timeout);
 		if (request != null) {
 			return new MyDaemonRequest(request, fileTokenFactory);
@@ -77,8 +85,22 @@ final class DirectDaemonConnection implements DaemonConnection {
 	}
 
 	@Override
-	public void close() {
-		service.stopReceiving();
+	public boolean isRunning() {
+		return service.isRunning();
+	}
+
+	@Override
+	public void start() {
+		if (!isRunning()) {
+			service.start();
+		}
+	}
+
+	@Override
+	public void stop() {
+		if (!isRunning()) {
+			service.stop();
+		}
 	}
 
 	private static final class MyDaemonRequest implements DaemonRequest {

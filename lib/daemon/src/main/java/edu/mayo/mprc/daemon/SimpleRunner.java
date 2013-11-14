@@ -285,6 +285,7 @@ public final class SimpleRunner extends AbstractRunner {
 		@Override
 		public void run() {
 			final LoggingSetup logging;
+
 			if (worker instanceof NoLoggingWorker) {
 				logging = null;
 			} else {
@@ -297,7 +298,13 @@ public final class SimpleRunner extends AbstractRunner {
 
 			}
 			try {
+				if (worker instanceof Lifecycle) {
+					((Lifecycle) worker).start();
+				}
 				worker.processRequest(request.getWorkPacket(), new MyProgressReporter(request, logging));
+				if (worker instanceof Lifecycle) {
+					((Lifecycle) worker).stop();
+				}
 			} catch (Exception t) {
 				// SWALLOWED
 				LOGGER.error("Exception was thrown when processing a request - that means a communication error, or badly implemented worker.\nWorkers must never thrown an exception - they must report a failure.", t);

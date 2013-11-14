@@ -59,7 +59,7 @@ public final class ServiceFactory implements Lifecycle {
 	 * @return Service based on a simple queue that can be used for both sending and receiving of messages.
 	 */
 	public Service createJmsQueue(final String name) {
-		return new SimpleQueueService(getConnection(), getResponseDispatcher(), name);
+		return new SimpleQueueService(this, getResponseDispatcher(), name);
 	}
 
 	public ActiveMQConnectionPool getConnectionPool() {

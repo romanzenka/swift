@@ -67,6 +67,7 @@ public final class GridRunner extends AbstractRunner {
 		super.start();
 		manager.start();
 		serviceFactory.start();
+		daemonConnection.start();
 	}
 
 	@Override
@@ -76,6 +77,7 @@ public final class GridRunner extends AbstractRunner {
 		serviceFactory.stop();
 		manager.stop();
 		super.stop();
+		daemonConnection.stop();
 	}
 
 	@Override

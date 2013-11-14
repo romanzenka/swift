@@ -77,7 +77,7 @@ public final class SendReceiveTest extends MessagingTestBase {
 			@Override
 			public void run() {
 				final Request request = receiveRequest();
-				service.stopReceiving();
+				service.stop();
 
 				Assert.assertEquals(request.getMessageData(), REQUEST_1, "Received wrong data");
 				sendResponse(request);
@@ -121,7 +121,7 @@ public final class SendReceiveTest extends MessagingTestBase {
 			@Override
 			public void run() {
 				final Request request = receiveRequest();
-				service.stopReceiving();
+				service.stop();
 
 				Assert.assertEquals(request.getMessageData(), REQUEST_1, "Received wrong data");
 				sendResponse(request);
@@ -175,7 +175,7 @@ public final class SendReceiveTest extends MessagingTestBase {
 						}
 					}
 				}
-				service.stopReceiving();
+				service.stop();
 			}
 		};
 		thread.start();
@@ -242,7 +242,7 @@ public final class SendReceiveTest extends MessagingTestBase {
 			final Request request = service.receiveRequest(10000);
 			Assert.assertEquals(request.getMessageData(), 2, "Request value does not match");
 			// Close the receiver instead
-			service.stopReceiving();
+			service.stop();
 		}
 
 		// Process second request
@@ -255,7 +255,7 @@ public final class SendReceiveTest extends MessagingTestBase {
 		final Request request = service.receiveRequest(10);
 		Assert.assertNull(request, "There should be no request left");
 
-		service.stopReceiving();
+		service.stop();
 
 		cleanup();
 	}

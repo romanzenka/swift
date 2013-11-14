@@ -1,5 +1,7 @@
 package edu.mayo.mprc.messaging;
 
+import edu.mayo.mprc.config.Lifecycle;
+
 import java.io.Serializable;
 
 /**
@@ -17,7 +19,7 @@ import java.io.Serializable;
  * <p/>
  * See {@link ServiceFactory}.
  */
-public interface Service {
+public interface Service extends Lifecycle {
 	/**
 	 * Sends an object request to given target with given priority. 5 is default, 0..5 low, 6..9 high.
 	 *
@@ -31,7 +33,7 @@ public interface Service {
 	 * This methods returns the next request sent through this service object. The call to this method
 	 * blocks until a request is received.
 	 * <p/>
-	 * Once you are done receiving, do not forget to call {@link #stopReceiving()}. If somebody else wants to
+	 * Once you are done receiving, do not forget to call {@link #stop()}. If somebody else wants to
 	 * start receiving requests later on and you do not indicate you are no longer receiving, the requests
 	 * would bounce round-robin style between the two receivers and the messaging would block.
 	 *
@@ -39,11 +41,6 @@ public interface Service {
 	 * @return Received request, or null if nothing arrived within the timeout.
 	 */
 	Request receiveRequest(long timeout);
-
-	/**
-	 * Invoke this once you no longer want to receive more data.
-	 */
-	void stopReceiving();
 
 	/**
 	 * Gets service name.
