@@ -876,9 +876,9 @@ public final class MascotDeploymentService extends DeploymentService<DeploymentR
 						getDatParameters(),
 						dbMaintenanceUri
 				);
-				worker.setDeployableDbFolder(new File(config.get(DEPLOYABLE_DB_FOLDER)).getAbsoluteFile());
+				worker.setDeployableDbFolder(getFile(config, DEPLOYABLE_DB_FOLDER));
 				worker.setEngineVersion(getEngineVersion());
-				worker.setEngineRootFolder(new File(config.get(ENGINE_ROOT_FOLDER)).getAbsoluteFile());
+				worker.setEngineRootFolder(getFile(config, ENGINE_ROOT_FOLDER));
 			} catch (Exception e) {
 				throw new MprcException("Mascot deployment service worker could not be created.", e);
 			}

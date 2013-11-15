@@ -561,8 +561,8 @@ public final class SequestDeploymentService extends DeploymentService<SequestDep
 			final SequestDeploymentService worker = new SequestDeploymentService();
 			worker.setConverter(getConverter());
 			worker.setSequestMappingFactory(getSequestMappingFactory());
-			worker.setEngineRootFolder(new File(config.get(ENGINE_ROOT_FOLDER)).getAbsoluteFile());
-			worker.setDeployableDbFolder(new File(config.get(DEPLOYABLE_DB_FOLDER)).getAbsoluteFile());
+			worker.setEngineRootFolder(getFile(config, ENGINE_ROOT_FOLDER));
+			worker.setDeployableDbFolder(getFile(config, DEPLOYABLE_DB_FOLDER));
 			worker.setWineWrapperScript(config.get(WINE_WRAPPER_SCRIPT));
 			return worker;
 		}

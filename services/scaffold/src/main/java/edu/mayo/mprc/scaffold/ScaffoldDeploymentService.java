@@ -160,7 +160,7 @@ public final class ScaffoldDeploymentService extends DeploymentService<Deploymen
 			ScaffoldDeploymentService worker = null;
 			try {
 				worker = new ScaffoldDeploymentService();
-				worker.setDeployableDbFolder(new File(config.get(DEPLOYABLE_DB_FOLDER)).getAbsoluteFile());
+				worker.setDeployableDbFolder(getFile(config, DEPLOYABLE_DB_FOLDER));
 
 			} catch (Exception e) {
 				throw new MprcException("Scaffold deployment service worker could not be created.", e);

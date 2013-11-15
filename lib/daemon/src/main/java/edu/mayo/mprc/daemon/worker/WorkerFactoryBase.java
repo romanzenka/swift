@@ -1,11 +1,14 @@
 package edu.mayo.mprc.daemon.worker;
 
+import com.google.common.base.Strings;
 import edu.mayo.mprc.MprcException;
 import edu.mayo.mprc.config.FactoryBase;
 import edu.mayo.mprc.config.ResourceConfig;
+import edu.mayo.mprc.config.ui.ResourceConfigBase;
 import edu.mayo.mprc.config.ui.ServiceUiFactory;
 import edu.mayo.mprc.utilities.exceptions.ExceptionUtilities;
 
+import java.io.File;
 import java.lang.reflect.Field;
 
 /**
@@ -18,6 +21,14 @@ import java.lang.reflect.Field;
  */
 public abstract class WorkerFactoryBase<C extends ResourceConfig> extends FactoryBase<C, Worker> implements WorkerFactory<C, Worker> {
 	protected WorkerFactoryBase() {
+	}
+
+	protected File getFile(ResourceConfigBase config, final String file) {
+		String pathname = config.get(file);
+		if (Strings.isNullOrEmpty(pathname)) {
+			throw new MprcException("Missing configuration for " + getUserName() + " worker, please set " + file + " parameter");
+		}
+		return new File(pathname).getAbsoluteFile();
 	}
 
 	/**

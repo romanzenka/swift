@@ -270,8 +270,8 @@ public final class ScaffoldWorker extends WorkerBase {
 		@Override
 		public Worker create(final Config config, final DependencyResolver dependencies) {
 			final ScaffoldWorker worker = new ScaffoldWorker();
-			worker.setScaffoldBatchScript(new File(config.get(SCAFFOLD_BATCH_SCRIPT)).getAbsoluteFile());
-			worker.setScaffoldUnimod(new File(config.get(SCAFFOLD_UNIMOD)).getAbsoluteFile());
+			worker.setScaffoldBatchScript(getFile(config, SCAFFOLD_BATCH_SCRIPT));
+			worker.setScaffoldUnimod(getFile(config, SCAFFOLD_UNIMOD));
 
 			return worker;
 		}

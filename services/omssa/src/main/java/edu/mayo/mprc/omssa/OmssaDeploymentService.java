@@ -277,7 +277,7 @@ public final class OmssaDeploymentService extends DeploymentService<DeploymentRe
 				throw new MprcException("Omssa deployment service worker could not be created.", e);
 			}
 
-			worker.setDeployableDbFolder(new File(config.get(DEPLOYABLE_DB_FOLDER)).getAbsoluteFile());
+			worker.setDeployableDbFolder(getFile(config, DEPLOYABLE_DB_FOLDER));
 
 			return worker;
 		}
