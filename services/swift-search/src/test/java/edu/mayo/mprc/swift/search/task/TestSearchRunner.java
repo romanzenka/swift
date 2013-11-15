@@ -359,6 +359,7 @@ public class TestSearchRunner {
 		final DaemonConfigInfo mainDaemon = new DaemonConfigInfo("daemon1", "/");
 		fileTokenFactory.setDaemonConfigInfo(mainDaemon);
 		fileTokenFactory.setDatabaseDaemonConfigInfo(mainDaemon);
+		fileTokenFactory.start();
 		return fileTokenFactory;
 	}
 
