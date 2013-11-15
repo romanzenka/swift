@@ -295,6 +295,7 @@ public final class SwiftEnvironmentImpl implements SwiftEnvironment, Application
 	public void start() {
 		if (!isRunning()) {
 			getDaemonFactory().start();
+			getFileTokenFactory().start();
 		}
 	}
 
@@ -302,6 +303,7 @@ public final class SwiftEnvironmentImpl implements SwiftEnvironment, Application
 	public void stop() {
 		if (isRunning()) {
 			getDaemonFactory().stop();
+			getFileTokenFactory().stop();
 		}
 	}
 }

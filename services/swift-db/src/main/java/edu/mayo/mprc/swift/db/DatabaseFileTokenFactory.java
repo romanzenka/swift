@@ -1,10 +1,7 @@
 package edu.mayo.mprc.swift.db;
 
 import edu.mayo.mprc.MprcException;
-import edu.mayo.mprc.config.ApplicationConfig;
-import edu.mayo.mprc.config.DaemonConfig;
-import edu.mayo.mprc.config.DaemonConfigInfo;
-import edu.mayo.mprc.config.RunningApplicationContext;
+import edu.mayo.mprc.config.*;
 import edu.mayo.mprc.daemon.files.FileToken;
 import edu.mayo.mprc.daemon.files.FileTokenFactory;
 import edu.mayo.mprc.database.Database;
@@ -21,7 +18,7 @@ import java.util.List;
  * Using this class, links to files can be stored in the database and retrieved as strings.
  */
 @Component("fileTokenFactory")
-public final class DatabaseFileTokenFactory extends FileTokenFactory {
+public final class DatabaseFileTokenFactory extends FileTokenFactory implements Lifecycle {
 	public static final String FILE_TAG = "file";
 
 	private DaemonConfigInfo databaseDaemonConfigInfo;
@@ -68,19 +65,8 @@ public final class DatabaseFileTokenFactory extends FileTokenFactory {
 	}
 
 	public DaemonConfigInfo getDatabaseDaemonConfigInfo() {
-		if (databaseDaemonConfigInfo == null) {
-			// Setup the actual daemon
-			final DaemonConfig daemonConfig = applicationContext.getDaemonConfig();
-			setDaemonConfigInfo(daemonConfig.createDaemonConfigInfo());
-			if (daemonConfig.getTempFolderPath() == null) {
-				throw new MprcException("The temporary folder is not configured for this daemon. Swift cannot run.");
-			}
-			final DaemonConfig databaseDaemonConfig = getDatabaseDaemonConfig(applicationContext.getApplicationConfig());
-			databaseDaemonConfigInfo = databaseDaemonConfig.createDaemonConfigInfo();
-		}
 		return databaseDaemonConfigInfo;
 	}
-
 
 	public RunningApplicationContext getApplicationContext() {
 		return applicationContext;
@@ -111,5 +97,28 @@ public final class DatabaseFileTokenFactory extends FileTokenFactory {
 			throw new MprcException("Swift does not define a database.");
 		}
 		return configs.get(0);
+	}
+
+	@Override
+	public boolean isRunning() {
+		return databaseDaemonConfigInfo != null;
+	}
+
+	@Override
+	public void start() {
+		if (!isRunning()) {
+			// Setup the actual daemon
+			final DaemonConfig daemonConfig = applicationContext.getDaemonConfig();
+			setDaemonConfigInfo(daemonConfig.createDaemonConfigInfo());
+			if (daemonConfig.getTempFolderPath() == null) {
+				throw new MprcException("The temporary folder is not configured for this daemon. Swift cannot run.");
+			}
+			final DaemonConfig databaseDaemonConfig = getDatabaseDaemonConfig(applicationContext.getApplicationConfig());
+			databaseDaemonConfigInfo = databaseDaemonConfig.createDaemonConfigInfo();
+		}
+	}
+
+	@Override
+	public void stop() {
 	}
 }
