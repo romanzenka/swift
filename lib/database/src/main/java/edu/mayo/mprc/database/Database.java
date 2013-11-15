@@ -23,7 +23,7 @@ import java.util.*;
  * session, they defer to this object, which uses {@link ThreadLocal} storage for the session.
  */
 @Component("database")
-public final class Database implements Installable {
+public final class Database implements Installable, Lifecycle {
 	private static final Logger LOGGER = Logger.getLogger(Database.class);
 	private SessionFactory sessionFactory;
 	private Config config;
@@ -36,6 +36,11 @@ public final class Database implements Installable {
 	@Override
 	public void install(Map<String, String> params) {
 		LOGGER.info("Installing database");
+		final DatabaseUtilities.SchemaInitialization action = DatabaseUtilities.SchemaInitialization.getForValue(params.get("action"));
+		initializeSessionFactory(action);
+	}
+
+	private void initializeSessionFactory(DatabaseUtilities.SchemaInitialization action) {
 		if (sessionFactory == null) {
 			final SessionFactory sessionFactory1 = DatabaseUtilities.getSessionFactory(config.getUrl()
 					, config.getUserName()
@@ -46,7 +51,7 @@ public final class Database implements Installable {
 					, config.getSchema()
 					, hibernateProperties
 					, mappingResources,
-					DatabaseUtilities.SchemaInitialization.getForValue(params.get("action")));
+					action);
 
 			setSessionFactory(sessionFactory1);
 		}
@@ -172,6 +177,25 @@ public final class Database implements Installable {
 
 	public void setMappingResources(List<String> mappingResources) {
 		this.mappingResources = mappingResources;
+	}
+
+	@Override
+	public boolean isRunning() {
+		return sessionFactory != null;
+	}
+
+	@Override
+	public void start() {
+		if (!isRunning()) {
+			initializeSessionFactory(DatabaseUtilities.SchemaInitialization.None);
+		}
+	}
+
+	@Override
+	public void stop() {
+		if (isRunning()) {
+			sessionFactory.close();
+		}
 	}
 
 	/**

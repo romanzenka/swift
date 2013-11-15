@@ -39,8 +39,12 @@ public final class DatabaseFileTokenFactory extends FileTokenFactory {
 		if (file == null) {
 			return null;
 		}
+		// Initialize the configs before we run getFileToken
+		final DaemonConfigInfo info = getDatabaseDaemonConfigInfo();
+
 		final FileToken fileToken = getFileToken(file);
-		return translateFileToken(fileToken, getDatabaseDaemonConfigInfo()).getTokenPath();
+
+		return translateFileToken(fileToken, info).getTokenPath();
 	}
 
 	public File databaseTokenToFile(final String tokenPath) {
