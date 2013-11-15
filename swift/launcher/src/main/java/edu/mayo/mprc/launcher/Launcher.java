@@ -10,6 +10,7 @@ import edu.mayo.mprc.utilities.FileListener;
 import edu.mayo.mprc.utilities.FileMonitor;
 import edu.mayo.mprc.utilities.FileUtilities;
 import org.apache.log4j.Logger;
+import org.mortbay.component.AbstractLifeCycle;
 import org.mortbay.jetty.Connector;
 import org.mortbay.jetty.Server;
 import org.mortbay.jetty.webapp.WebAppContext;
@@ -37,6 +38,7 @@ public final class Launcher implements FileListener {
 	private final Object stopMonitor = new Object();
 	private volatile boolean restartRequested;
 	private SwiftEnvironment swiftEnvironment;
+	private JettyStopThread jettyStopThread;
 
 	private static final int EXIT_CODE_ERROR = 1;
 	public static final long POLLING_INTERVAL = (long) (10 * 1000);
@@ -105,13 +107,22 @@ public final class Launcher implements FileListener {
 		final File tempFolder = getTempFolder(environment, configMode);
 
 		final Server server = new Server(portNumber);
+		server.addLifeCycle(new AbstractLifeCycle() {
+			@Override
+			protected void doStop() throws Exception {
+				stopSwift();
+			}
+		});
+		jettyStopThread = new JettyStopThread(server);
+		jettyStopThread.start();
+
 		for (final Connector connector : server.getConnectors()) {
 			connector.setHeaderBufferSize(HEADER_BUFFER_SIZE);
 		}
 
 		Future<Object> future = null;
 		try {
-			WebAppContext webAppContext = makeWebAppContext(environment.getConfigFile(), configMode ? "config" : "production", warFile, daemonId, tempFolder);
+			WebAppContext webAppContext = makeWebAppContext(environment.getConfigFile(), configMode ? "config" : "production", warFile, daemonId, tempFolder, jettyStopThread.getPort());
 			server.addHandler(webAppContext);
 
 			future = Executors.newSingleThreadExecutor().submit(new Callable<Object>() {
@@ -133,7 +144,7 @@ public final class Launcher implements FileListener {
 
 	}
 
-	private WebAppContext makeWebAppContext(final File configFile, final String action, final File warFile, final String daemonId, final File tempFolder) {
+	private WebAppContext makeWebAppContext(final File configFile, final String action, final File warFile, final String daemonId, final File tempFolder, int stopPort) {
 		final WebAppContext webAppContext = new WebAppContext();
 		webAppContext.setWar(warFile.getAbsolutePath());
 		webAppContext.setContextPath("/");
@@ -145,6 +156,7 @@ public final class Launcher implements FileListener {
 		}
 		initParams.put("SWIFT_ACTION", action);
 		initParams.put("SWIFT_DAEMON", daemonId);
+		initParams.put("SWIFT_STOP_PORT", String.valueOf(stopPort));
 
 		webAppContext.setInitParams(initParams);
 		return webAppContext;
@@ -229,11 +241,15 @@ public final class Launcher implements FileListener {
 	@Override
 	public void fileChanged(final Collection<File> files, final boolean timeout) {
 		if (!timeout) {
-			synchronized (stopMonitor) {
-				LOGGER.info("The configuration file " + files.iterator().next() + " is modified. Restarting.");
-				restartRequested = true;
-				stopMonitor.notifyAll();
-			}
+			LOGGER.info("The configuration file " + files.iterator().next() + " is modified. Restarting.");
+			stopSwift();
+		}
+	}
+
+	private void stopSwift() {
+		synchronized (stopMonitor) {
+			restartRequested = true;
+			stopMonitor.notifyAll();
 		}
 	}
 }

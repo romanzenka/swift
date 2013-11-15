@@ -237,6 +237,7 @@ public final class MsconvertWorker extends WorkerBase {
 
 	@Override
 	public String check() {
+		LOGGER.info("Checking msconvert worker");
 		if (!getMsaccessExecutable().canExecute()) {
 			return "msaccess not executable: " + getMsaccessExecutable().getAbsolutePath();
 		}

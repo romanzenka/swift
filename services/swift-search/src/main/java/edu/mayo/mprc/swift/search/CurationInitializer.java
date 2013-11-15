@@ -37,6 +37,7 @@ public final class CurationInitializer implements RuntimeInitializer {
 
 	@Override
 	public String check() {
+		LOGGER.info("Checking database curations");
 		if (curationDao.countAll(Curation.class) == 0) {
 			return "There needs to be at least one FASTA database defined";
 		}
@@ -48,6 +49,7 @@ public final class CurationInitializer implements RuntimeInitializer {
 
 	@Override
 	public void install(Map<String, String> params) {
+		LOGGER.info("Installing database curator data");
 		final File fastaFolder = new File(params.get(FASTA_FOLDER));
 		final File fastaArchiveFolder = new File(params.get(FASTA_ARCHIVE_FOLDER));
 

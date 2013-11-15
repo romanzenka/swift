@@ -43,6 +43,7 @@ import edu.mayo.mprc.swift.search.task.SearchRunner;
 import edu.mayo.mprc.utilities.MonitorUtilities;
 import edu.mayo.mprc.utilities.exceptions.ExceptionUtilities;
 import edu.mayo.mprc.utilities.progress.ProgressReporter;
+import org.apache.log4j.Logger;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
@@ -54,6 +55,8 @@ import java.util.concurrent.ExecutorService;
  * the state of the search and is responsible for the execution.
  */
 public final class SwiftSearcher implements Worker, Lifecycle {
+	private static final Logger LOGGER = Logger.getLogger(SwiftSearcher.class);
+
 	public static final String TYPE = "searcher";
 	public static final String NAME = "Swift Searcher";
 	public static final String DESC = "Runs the Swift search, orchestrating all the other modules.";
@@ -301,7 +304,8 @@ public final class SwiftSearcher implements Worker, Lifecycle {
 
 	@Override
 	public String check() {
-		if (supportedEngines != null) {
+		LOGGER.info("Checking swift searcher");
+		if (supportedEngines == null) {
 			return "Supported engines must not be null";
 		}
 		if (!(!raw2mgfEnabled || raw2mgfDaemon != null)) {

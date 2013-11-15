@@ -2,8 +2,10 @@ package edu.mayo.mprc.utilities;
 
 import edu.mayo.mprc.MprcException;
 
+import java.io.OutputStream;
 import java.lang.management.ManagementFactory;
 import java.net.InetAddress;
+import java.net.Socket;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -13,6 +15,7 @@ import java.util.regex.Pattern;
  */
 public final class MonitorUtilities {
 
+	public static final String LOCALHOST = "127.0.0.1";
 	private static final Pattern PID_MATCHER = Pattern.compile("(\\d+)@.*");
 
 	private MonitorUtilities() {
@@ -77,4 +80,15 @@ public final class MonitorUtilities {
 		return hostname;
 	}
 
+	public static void sendStopSignal(int port) {
+		try {
+			Socket s = new Socket(InetAddress.getByName(LOCALHOST), port);
+			OutputStream out = s.getOutputStream();
+			out.write(("\r\n").getBytes());
+			out.flush();
+			s.close();
+		} catch (Exception e) {
+			throw new MprcException("Failed to stop Jetty", e);
+		}
+	}
 }

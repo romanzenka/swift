@@ -59,7 +59,7 @@ public final class ServiceFactory implements Lifecycle {
 	 * @return Service based on a simple queue that can be used for both sending and receiving of messages.
 	 */
 	public Service createJmsQueue(final String name) {
-		return new SimpleQueueService(this, getResponseDispatcher(), name);
+		return new SimpleQueueService(this, name);
 	}
 
 	public ActiveMQConnectionPool getConnectionPool() {
@@ -148,6 +148,13 @@ public final class ServiceFactory implements Lifecycle {
 	@Override
 	public void stop() {
 		if (isRunning()) {
+			try {
+				connection.close();
+			} catch (JMSException e) {
+				// SWALLOWED
+				LOGGER.warn("Could not close connection when shutting down service", e);
+			}
+			connection = null;
 			getResponseDispatcher().close();
 			connectionPool.close();
 			connectionPool = null;

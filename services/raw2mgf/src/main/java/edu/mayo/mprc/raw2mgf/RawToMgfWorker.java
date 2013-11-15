@@ -369,6 +369,7 @@ public final class RawToMgfWorker extends WorkerBase {
 
 	@Override
 	public String check() {
+		LOGGER.info("Checking raw2mgf");
 		if (!tempFolder.isDirectory() || !tempFolder.canWrite()) {
 			return "Cannot write the temporary folder: " + tempFolder.getAbsolutePath();
 		}

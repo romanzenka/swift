@@ -9,12 +9,12 @@ import edu.mayo.mprc.database.Database;
 import edu.mayo.mprc.database.DatabaseUtilities;
 import edu.mayo.mprc.swift.db.DatabaseFileTokenFactory;
 import edu.mayo.mprc.utilities.exceptions.ExceptionUtilities;
+import org.apache.log4j.Logger;
 
 import javax.annotation.Resource;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
@@ -24,6 +24,7 @@ import java.util.concurrent.Future;
  * for all database-related initialization.
  */
 public final class DatabaseValidator implements RuntimeInitializer {
+	private static final Logger LOGGER = Logger.getLogger(DatabaseValidator.class);
 
 	private List<DaoBase> daoList;
 	private Database database;
@@ -62,47 +63,36 @@ public final class DatabaseValidator implements RuntimeInitializer {
 
 	@Override
 	public String check() {
-		final Future<String> future = EXECUTOR.submit(new Callable<String>() {
-			@Override
-			public String call() {
-				String errors = "";
-				try {
-					// Before checking, update the schema
-					beginTransaction(DatabaseUtilities.SchemaInitialization.Update);
-
-					String initializationToDo = null;
-
-					// Go through a list of RuntimeInitializer, stop when one of them reports it is not ready
-					for (final RuntimeInitializer initializer : runtimeInitializers) {
-						final String result = initializer.check();
-						database.getSession().flush();
-						if (result != null) {
-							initializationToDo = result;
-							break;
-						}
-					}
-
-					if (initializationToDo != null) {
-						errors += "Database is not initialized: " + initializationToDo + " - " + FixTag.getTag(
-								DatabaseUtilities.SchemaInitialization.Update.getValue(), "Initialize Database");
-					}
-					commitTransaction();
-				} catch (Exception e) {
-					errors += "Database connection could not be established.<br/>Error: " + e.getMessage()
-							+ "<br/>Database may not exist. " + FixTag.getTag(
-							DatabaseUtilities.SchemaInitialization.Create.getValue(), "Create Database");
-					rollbackTransaction();
-				}
-
-				return "".equals(errors) ? null : errors;
-			}
-		});
-
+		LOGGER.info("Checking database");
+		String errors = "";
 		try {
-			return future.get();
+			// Before checking, update the schema
+			beginTransaction(DatabaseUtilities.SchemaInitialization.Update);
+
+			String initializationToDo = null;
+
+			// Go through a list of RuntimeInitializer, stop when one of them reports it is not ready
+			for (final RuntimeInitializer initializer : runtimeInitializers) {
+				final String result = initializer.check();
+				database.getSession().flush();
+				if (result != null) {
+					initializationToDo = result;
+					break;
+				}
+			}
+
+			if (initializationToDo != null) {
+				errors += "Database is not initialized: " + initializationToDo + " - " + FixTag.getTag(
+						DatabaseUtilities.SchemaInitialization.Update.getValue(), "Initialize Database");
+			}
+			commitTransaction();
 		} catch (Exception e) {
-			throw new MprcException("Could not check the database", e);
+			errors += "Database connection could not be established.<br/>Error: " + e.getMessage()
+					+ "<br/>Database may not exist. " + FixTag.getTag(
+					DatabaseUtilities.SchemaInitialization.Create.getValue(), "Create Database");
+			rollbackTransaction();
 		}
+		return !errors.isEmpty() ? errors : null;
 	}
 
 	@Override
@@ -111,6 +101,7 @@ public final class DatabaseValidator implements RuntimeInitializer {
 	 * {@link DatabaseUtilities.SchemaInitialization#getValue()}.
 	 */
 	public void install(final Map<String, String> params) {
+		LOGGER.info("Installing DAOs");
 		final String action = params.get("action");
 		final HashMap<String, String> newParams = new HashMap<String, String>(params);
 		newParams.put(CurationInitializer.FASTA_FOLDER, getSearcherConfig().getFastaPath());

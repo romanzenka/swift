@@ -8,7 +8,7 @@
 <!DOCTYPE HTML>
 <html lang="en">
 <head>
-    <% if (ServletInitialization.redirectToConfig(getServletConfig(), response)) {
+    <% if (ServletInitialization.redirectToConfig(getServletConfig().getServletContext(), response)) {
         return;
     } %>
     <title>Swift Monitor</title>

@@ -35,7 +35,7 @@ import java.util.*;
  *
  * @param <T>
  */
-public abstract class WorkCache<T extends WorkPacket> implements NoLoggingWorker {
+public abstract class WorkCache<T extends WorkPacket> implements NoLoggingWorker, Installable {
 	private static final Logger LOGGER = Logger.getLogger(WorkCache.class);
 	public static final int MAX_CACHE_FOLDERS = 1000 * 10;
 	private File cacheFolder;
@@ -76,10 +76,17 @@ public abstract class WorkCache<T extends WorkPacket> implements NoLoggingWorker
 
 	@Override
 	public String check() {
+		LOGGER.info("Checking cache for " + getDaemon().getConnectionName());
 		if (!cacheFolder.isDirectory() || !cacheFolder.canWrite()) {
 			return "The cache folder is not writeable: " + cacheFolder.getAbsolutePath();
 		}
 		return null;
+	}
+
+	@Override
+	public void install(Map<String, String> params) {
+		LOGGER.info("Installing cache for " + getDaemon().getConnectionName());
+		FileUtilities.ensureFolderExists(cacheFolder);
 	}
 
 	/**

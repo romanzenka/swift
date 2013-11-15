@@ -43,6 +43,7 @@ public final class ScaffoldWorker extends WorkerBase {
 
 	@Override
 	public String check() {
+		LOGGER.info("Checking scaffold batch");
 		if (!getScaffoldBatchScript().canExecute()) {
 			return "Scaffold batch script not executable: " + scaffoldBatchScript.getAbsolutePath();
 		}

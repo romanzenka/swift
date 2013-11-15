@@ -35,6 +35,7 @@ public final class Database implements Installable {
 
 	@Override
 	public void install(Map<String, String> params) {
+		LOGGER.info("Installing database");
 		if (sessionFactory == null) {
 			final SessionFactory sessionFactory1 = DatabaseUtilities.getSessionFactory(config.getUrl()
 					, config.getUserName()

@@ -158,6 +158,7 @@ public final class MSMSEvalWorker extends WorkerBase {
 
 	@Override
 	public String check() {
+		LOGGER.info("Checking msmsEval worker");
 		if (!msmsEvalExecutable.canExecute()) {
 			return "msmsEval is not executable: " + msmsEvalExecutable.getAbsolutePath();
 		}

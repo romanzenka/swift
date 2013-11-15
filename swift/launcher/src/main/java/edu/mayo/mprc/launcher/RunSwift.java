@@ -143,7 +143,7 @@ public class RunSwift implements FileListener, SwiftCommand {
 	}
 
 	@Autowired(required = false)
-	@Resource(name = "swiftRunWebCommand")
+	@Resource(name = "web-command")
 	public void setRunSwiftWeb(SwiftCommand runSwiftWeb) {
 		this.runSwiftWeb = runSwiftWeb;
 	}
@@ -153,7 +153,7 @@ public class RunSwift implements FileListener, SwiftCommand {
 	}
 
 	@Autowired(required = false)
-	@Resource(name = "swiftRunConfigCommand")
+	@Resource(name = "config-command")
 	public void setRunSwiftConfig(SwiftCommand runSwiftConfig) {
 		this.runSwiftConfig = runSwiftConfig;
 	}

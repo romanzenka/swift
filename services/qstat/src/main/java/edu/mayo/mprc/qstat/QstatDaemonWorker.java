@@ -13,6 +13,7 @@ import edu.mayo.mprc.daemon.worker.WorkerBase;
 import edu.mayo.mprc.daemon.worker.WorkerFactoryBase;
 import edu.mayo.mprc.utilities.ProcessCaller;
 import edu.mayo.mprc.utilities.progress.UserProgressReporter;
+import org.apache.log4j.Logger;
 import org.springframework.stereotype.Component;
 
 
@@ -20,6 +21,8 @@ import org.springframework.stereotype.Component;
  * Simple worker that accepts a string with grid engine id and sends back a String with results of the qstat call.
  */
 public final class QstatDaemonWorker extends WorkerBase {
+	private static final Logger LOGGER = Logger.getLogger(QstatDaemonWorker.class);
+
 	public static final String TYPE = "qstat";
 	public static final String NAME = "SGE Qstat";
 	public static final String DESC = "A trivial daemon running <tt>qstat</tt> command to retrieve status of a job running in Sun Grid Engine. This is used only in the web interface and is provided for convenience only. The module has to be enabled on a computer that is Sun Grid Engine submit host.";
@@ -49,6 +52,7 @@ public final class QstatDaemonWorker extends WorkerBase {
 
 	@Override
 	public String check() {
+		LOGGER.info("Checking qstat");
 		// Just run qstat to see it works
 		try {
 			final ProcessBuilder builder = new ProcessBuilder("qstat");

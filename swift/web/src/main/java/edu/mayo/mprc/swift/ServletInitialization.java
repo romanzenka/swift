@@ -13,6 +13,7 @@ import edu.mayo.mprc.swift.resources.WebUi;
 import edu.mayo.mprc.swift.resources.WebUiHolder;
 import edu.mayo.mprc.swift.search.DefaultSwiftSearcherCaller;
 import edu.mayo.mprc.utilities.FileUtilities;
+import edu.mayo.mprc.utilities.MonitorUtilities;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
 import org.springframework.beans.factory.InitializingBean;
@@ -70,9 +71,10 @@ public final class ServletInitialization implements SwiftCommand, ServletContext
 
 			final SwiftCommandLine commandLine = new SwiftCommandLine("servlet-initialization", Arrays.asList("action", action), confFile, swiftDaemon, null, null);
 			if (swiftEnvironment.runSwiftCommand(commandLine) != ExitCode.Ok) {
-				throw new MprcException("Initialization failed, shut down Swift");
+				stopSwift();
 			}
 		} catch (Exception e) {
+			stopSwift();
 			throw new RuntimeException("Could not initialize Swift web", e);
 		}
 	}
@@ -83,6 +85,7 @@ public final class ServletInitialization implements SwiftCommand, ServletContext
 	}
 
 	public ExitCode run(SwiftEnvironment environment) {
+		Daemon daemon = null;
 		try {
 			System.setProperty("SWIFT_INSTALL", environment.getConfigFile().getAbsolutePath());
 
@@ -92,7 +95,7 @@ public final class ServletInitialization implements SwiftCommand, ServletContext
 			final MessageBroker.Config messageBroker = SwiftEnvironmentImpl.getMessageBroker(daemonConfig);
 
 			// WebUi needs reference to the actual daemon
-			final Daemon daemon = environment.createDaemon(daemonConfig);
+			daemon = environment.createDaemon(daemonConfig);
 
 			final WebUi webUi = webUiHolder.getWebUi();
 
@@ -119,10 +122,14 @@ public final class ServletInitialization implements SwiftCommand, ServletContext
 			getSwiftMonitor().start();
 
 		} catch (Exception t) {
-			LOGGER.fatal("Swift web application should be terminated", t);
+			LOGGER.fatal("Swift web application is terminating", t);
 			if (webUiHolder != null) {
 				webUiHolder.stopSwiftMonitor();
 			}
+			if (daemon != null) {
+				daemon.stop();
+			}
+			getSwiftMonitor().stop();
 			return ExitCode.Error;
 		}
 		return ExitCode.Ok;
@@ -245,6 +252,30 @@ public final class ServletInitialization implements SwiftCommand, ServletContext
 			// SWALLOWED - login is not a big deal
 			LOGGER.error("Could not initialize logging", e);
 		}
+	}
+
+	public void stopSwift() {
+
+		int port = getStopPort(servletContext);
+		if (port > 0) {
+			LOGGER.fatal("Stopping Swift");
+			MonitorUtilities.sendStopSignal(port);
+		} else {
+			LOGGER.fatal("Cannot stop Swift, jetty stop port was not configured. Please terminate Swift manually.");
+			throw new MprcException("Jetty stop port was not configured");
+		}
+	}
+
+	private static int getStopPort(final ServletContext context) {
+		String stopPort = context.getInitParameter("SWIFT_STOP_PORT");
+		if (stopPort == null) {
+			stopPort = System.getenv("SWIFT_STOP_PORT");
+		}
+		if (stopPort == null) {
+			stopPort = System.getProperty("SWIFT_STOP_PORT");
+		}
+
+		return stopPort == null ? -1 : Integer.valueOf(stopPort);
 	}
 
 	private static String getAction(final ServletContext context) {

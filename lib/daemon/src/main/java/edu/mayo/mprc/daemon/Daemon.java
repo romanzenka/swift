@@ -49,6 +49,7 @@ public final class Daemon implements Checkable, Installable {
 	}
 
 	public void install(final Map<String, String> params) {
+		LOGGER.info("Installing daemon");
 		for (final Object resource : getResources()) {
 			if (resource instanceof Installable) {
 				((Installable) resource).install(params);
@@ -102,6 +103,7 @@ public final class Daemon implements Checkable, Installable {
 	 */
 	@Override
 	public String check() {
+		LOGGER.info("Checking daemon");
 		final CompositeException exception = new CompositeException();
 		for (final Object resource : resources) {
 			if (resource instanceof Checkable) {

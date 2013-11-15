@@ -625,6 +625,7 @@ public final class SwiftDaoHibernate extends DaoBase implements SwiftDao {
 
 	@Override
 	public String check() {
+		LOGGER.info("Checking swift DAO");
 		// First, the workspace has to be defined, with a user
 		final String workspaceCheck = workspaceDao.check();
 		if (workspaceCheck != null) {
@@ -642,6 +643,7 @@ public final class SwiftDaoHibernate extends DaoBase implements SwiftDao {
 
 	@Override
 	public void install(Map<String, String> params) {
+		LOGGER.info("Installing Swift DAO");
 		// Initialize the dependent DAO
 		workspaceDao.install(new HashMap<String, String>(0));
 

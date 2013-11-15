@@ -389,6 +389,7 @@ public final class ParamsDaoHibernate extends DaoBase implements ParamsDao {
 
 	@Override
 	public String check() {
+		LOGGER.info("Checking parameters DAO");
 		if (countAll(IonSeries.class) == 0) {
 			return "No ion series defined";
 		}

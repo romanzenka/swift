@@ -302,6 +302,7 @@ public final class XTandemWorker extends WorkerBase {
 
 	@Override
 	public String check() {
+		LOGGER.info("Checking X!Tandem worker");
 		try {
 			final List<String> parameters = new LinkedList<String>();
 			parameters.add(tandemExecutable.getPath());

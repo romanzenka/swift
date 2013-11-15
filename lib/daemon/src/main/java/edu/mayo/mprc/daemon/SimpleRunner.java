@@ -56,6 +56,7 @@ public final class SimpleRunner extends AbstractRunner {
 
 	@Override
 	public String check() {
+		LOGGER.info("Checking worker for " + factory.getUserName());
 		return factory.create(config, dependencies).check();
 	}
 
@@ -129,6 +130,7 @@ public final class SimpleRunner extends AbstractRunner {
 
 	@Override
 	public void install(Map<String, String> params) {
+		LOGGER.info("Installing runner for " + getDaemonConnection().getConnectionName());
 		// First check if the factory we hold needs installing
 		if (factory instanceof Installable) {
 			((Installable) factory).install(params);

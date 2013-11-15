@@ -14,6 +14,7 @@ import edu.mayo.mprc.swift.db.SearchEngine;
 import edu.mayo.mprc.swift.db.SwiftDao;
 import edu.mayo.mprc.swift.search.SwiftSearcher;
 import edu.mayo.mprc.workspace.WorkspaceDao;
+import org.apache.log4j.Logger;
 
 import java.io.File;
 import java.text.MessageFormat;
@@ -25,6 +26,8 @@ import java.util.List;
  * A class holding information about WebUI configuration.
  */
 public final class WebUi implements Checkable {
+	private static final Logger LOGGER = Logger.getLogger(WebUi.class);
+
 	public static final String TYPE = "webUi";
 	public static final String NAME = "Swift Website";
 	public static final String DESC = "Swift's web user interface.<p>The daemon that contains the web interface will run within a web server.</p>";
@@ -192,6 +195,7 @@ public final class WebUi implements Checkable {
 
 	@Override
 	public String check() {
+		LOGGER.info("Checking web user interface");
 		if (browseRoot == null) {
 			return BROWSE_ROOT + " must be set";
 		}

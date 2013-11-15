@@ -4,7 +4,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
-    <% if (ServletInitialization.redirectToConfig(getServletConfig(), response)) {
+    <% if (ServletInitialization.redirectToConfig(getServletConfig().getServletContext(), response)) {
         return;
     } %>
     <title>Swift - search using multiple engines</title>
@@ -111,7 +111,6 @@
     </ul>
 </div>
 <div id="content">
-    <% ServletInitialization.initServletConfiguration(getServletConfig()); %>
     <% if (SwiftWebContext.getWebUi().getUserMessage().messageDefined()) { %>
     <div class="user-message">
         <%=SwiftWebContext.getWebUi().getUserMessage().getMessage()%>
