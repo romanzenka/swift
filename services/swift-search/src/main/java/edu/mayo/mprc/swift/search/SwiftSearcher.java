@@ -465,7 +465,7 @@ public final class SwiftSearcher implements Worker, Lifecycle {
 	 * A factory capable of creating the worker
 	 */
 	@Component("swiftSearcherFactory")
-	public static final class Factory extends WorkerFactoryBase<Config> {
+	public static final class Factory extends WorkerFactoryBase<Config> implements Installable {
 		private CurationDao curationDao;
 		private SwiftDao swiftDao;
 		private DatabaseFileTokenFactory fileTokenFactory;
@@ -588,6 +588,11 @@ public final class SwiftSearcher implements Worker, Lifecycle {
 		@Resource(name = "engineFactoriesList")
 		public void setEngineFactoriesList(EngineFactoriesList engineFactoriesList) {
 			this.engineFactoriesList = engineFactoriesList;
+		}
+
+		@Override
+		public void install(Map<String, String> params) {
+			getDatabaseValidator().install(params);
 		}
 	}
 
