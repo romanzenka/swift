@@ -1,10 +1,8 @@
-<%@ page import="edu.mayo.mprc.swift.ServletInitialization" %>
 <%@ page import="edu.mayo.mprc.swift.SwiftWebContext" %>
 <%@ page import="edu.mayo.mprc.swift.report.JsonWriter" %>
 <%@ page import="edu.mayo.mprc.utilities.StringUtilities" %>
 <%@ page import="edu.mayo.mprc.workspace.User" %>
 <%@ page import="java.util.List" %>
-<%ServletInitialization.initServletConfiguration(getServletConfig());%>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
 "http://www.w3.org/TR/html4/loose.dtd">
 <html>
