@@ -4,7 +4,6 @@ import edu.mayo.mprc.MprcException;
 import edu.mayo.mprc.config.DaemonConfig;
 import edu.mayo.mprc.config.MultiFactory;
 import edu.mayo.mprc.daemon.Daemon;
-import edu.mayo.mprc.dbcurator.server.CurationWebContext;
 import edu.mayo.mprc.messaging.ServiceFactory;
 import edu.mayo.mprc.swift.commands.ExitCode;
 import edu.mayo.mprc.swift.commands.SwiftCommand;
@@ -44,7 +43,6 @@ public final class ServletInitialization implements SwiftCommand, ServletContext
 	private WebUiHolder webUiHolder;
 	private MultiFactory factoryTable;
 	private ServiceFactory serviceFactory;
-	private CurationWebContext curationWebContext;
 	private SwiftMonitor swiftMonitor;
 	private DefaultSwiftSearcherCaller swiftSearcherCaller;
 	private ServletContext servletContext;
@@ -105,15 +103,6 @@ public final class ServletInitialization implements SwiftCommand, ServletContext
 			getSwiftSearcherCaller().setSwiftSearcherConnection(webUi.getSwiftSearcherDaemonConnection());
 			getSwiftSearcherCaller().setBrowseRoot(webUi.getBrowseRoot());
 
-			// Initialize DB curator
-			curationWebContext.initialize(
-					webUi.getFastaFolder(),
-					webUi.getFastaUploadFolder(),
-					webUi.getFastaArchiveFolder(),
-					// TODO: Fix this - the curator will keep creating temp folders and never deleting them
-					// TODO: Also, the user should be able to specify where the temp files should go
-					FileUtilities.createTempFolder());
-
 			// Start all the services
 			daemon.start();
 
@@ -156,14 +145,6 @@ public final class ServletInitialization implements SwiftCommand, ServletContext
 
 	public void setServiceFactory(final ServiceFactory serviceFactory) {
 		this.serviceFactory = serviceFactory;
-	}
-
-	public CurationWebContext getCurationWebContext() {
-		return curationWebContext;
-	}
-
-	public void setCurationWebContext(final CurationWebContext curationWebContext) {
-		this.curationWebContext = curationWebContext;
 	}
 
 	public SwiftMonitor getSwiftMonitor() {

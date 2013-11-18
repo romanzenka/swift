@@ -1,5 +1,6 @@
 package edu.mayo.mprc.dbcurator.server;
 
+import edu.mayo.mprc.dbcurator.model.CurationContext;
 import edu.mayo.mprc.fasta.FASTAInputStream;
 import edu.mayo.mprc.utilities.FileUtilities;
 import org.apache.commons.fileupload.FileItem;
@@ -23,10 +24,10 @@ import java.util.List;
 public final class FASTAFileUploadServlet implements HttpRequestHandler {
 	protected static final int MAX_FILE_SIZE = 1000000000;
 
-	private CurationWebContext curationWebContext;
+	private CurationContext curationContext;
 
 	private File getUploadFolder() {
-		return curationWebContext.getFastaUploadFolder();
+		return curationContext.getFastaUploadFolder();
 	}
 
 	@Override
@@ -70,7 +71,7 @@ public final class FASTAFileUploadServlet implements HttpRequestHandler {
 
 				//if it was a file then just go on else we want to delete the file that was just created
 				final String errorMessage = FASTAInputStream.isFASTAFileValid(toSave, false);
-				if (errorMessage==null) {
+				if (errorMessage == null) {
 					break; //we only need to worry about the first file
 				} else {
 					responseMessage.append(errorMessage);
@@ -139,11 +140,11 @@ public final class FASTAFileUploadServlet implements HttpRequestHandler {
 		}
 	}
 
-	public CurationWebContext getCurationWebContext() {
-		return curationWebContext;
+	public CurationContext getCurationContext() {
+		return curationContext;
 	}
 
-	public void setCurationWebContext(CurationWebContext curationWebContext) {
-		this.curationWebContext = curationWebContext;
+	public void setCurationContext(CurationContext curationContext) {
+		this.curationContext = curationContext;
 	}
 }

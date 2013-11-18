@@ -6,6 +6,7 @@ import edu.mayo.mprc.config.*;
 import edu.mayo.mprc.config.ui.*;
 import edu.mayo.mprc.daemon.Daemon;
 import edu.mayo.mprc.daemon.DaemonConnection;
+import edu.mayo.mprc.dbcurator.model.CurationContext;
 import edu.mayo.mprc.msmseval.MSMSEvalParamFile;
 import edu.mayo.mprc.msmseval.MSMSEvalWorker;
 import edu.mayo.mprc.msmseval.MsmsEvalCache;
@@ -13,6 +14,7 @@ import edu.mayo.mprc.swift.db.DatabaseFileTokenFactory;
 import edu.mayo.mprc.swift.db.SearchEngine;
 import edu.mayo.mprc.swift.db.SwiftDao;
 import edu.mayo.mprc.swift.search.SwiftSearcher;
+import edu.mayo.mprc.utilities.FileUtilities;
 import edu.mayo.mprc.workspace.WorkspaceDao;
 import org.apache.log4j.Logger;
 
@@ -41,9 +43,7 @@ public final class WebUi implements Checkable {
 	private boolean scaffoldReport;
 	private boolean msmsEval;
 	private List<MSMSEvalParamFile> spectrumQaParamFiles;
-	private File fastaUploadFolder;
-	private File fastaFolder;
-	private File fastaArchiveFolder;
+	private CurationContext curationContext;
 	private String title;
 	private DatabaseFileTokenFactory fileTokenFactory;
 	private SwiftMonitor swiftMonitor;
@@ -61,10 +61,6 @@ public final class WebUi implements Checkable {
 
 	public WebUi() {
 		USER_MESSAGE.setMessage("Swift's new database deployment has been temporarily disabled. Swift needs to be upgraded to support Mascot's Database Manager. If you need a new database, please ask Roman.");
-	}
-
-	public File getFastaUploadFolder() {
-		return fastaUploadFolder;
 	}
 
 	public File getBrowseRoot() {
@@ -130,12 +126,8 @@ public final class WebUi implements Checkable {
 		return spectrumQaParamFiles;
 	}
 
-	public File getFastaFolder() {
-		return fastaFolder;
-	}
-
-	public File getFastaArchiveFolder() {
-		return fastaArchiveFolder;
+	public CurationContext getCurationContext() {
+		return curationContext;
 	}
 
 	public String getTitle() {
@@ -217,6 +209,7 @@ public final class WebUi implements Checkable {
 		private SwiftDao swiftDao;
 		private WorkspaceDao workspaceDao;
 		private SearchEngine.Factory searchEngineFactory;
+		private CurationContext curationContext;
 
 		@Override
 		public WebUi create(final Config config, final DependencyResolver dependencies) {
@@ -240,9 +233,13 @@ public final class WebUi implements Checkable {
 					ui.swiftSearcherDaemonConnection = (DaemonConnection) dependencies.createSingleton(config.getSearcher());
 					final SwiftSearcher.Config searcherConfig = (SwiftSearcher.Config) config.getSearcher().getRunner().getWorkerConfiguration();
 
-					ui.fastaUploadFolder = new File(searcherConfig.getFastaUploadPath());
-					ui.fastaArchiveFolder = new File(searcherConfig.getFastaArchivePath());
-					ui.fastaFolder = new File(searcherConfig.getFastaPath());
+					ui.curationContext = curationContext;
+					ui.curationContext.initialize(new File(searcherConfig.getFastaPath()),
+							new File(searcherConfig.getFastaUploadPath()),
+							new File(searcherConfig.getFastaArchivePath()),
+							// TODO: Fix this - the curator will keep creating temp folders and never deleting them
+							// TODO: Also, the user should be able to specify where the temp files should go
+							FileUtilities.createTempFolder());
 
 					if (searcherConfig.getMsmsEval() != null) {
 						// We got msmsEval, take spectrumQaParamFiles from it
@@ -323,6 +320,14 @@ public final class WebUi implements Checkable {
 
 		public void setSearchEngineFactory(SearchEngine.Factory searchEngineFactory) {
 			this.searchEngineFactory = searchEngineFactory;
+		}
+
+		public CurationContext getCurationContext() {
+			return curationContext;
+		}
+
+		public void setCurationContext(CurationContext curationContext) {
+			this.curationContext = curationContext;
 		}
 
 		@Override

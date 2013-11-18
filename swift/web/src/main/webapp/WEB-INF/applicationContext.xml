@@ -3,7 +3,6 @@
     xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
 
     <bean id="servletInitialization" class="edu.mayo.mprc.swift.ServletInitialization">
-        <property name="curationWebContext" ref="curationWebContext" />
         <property name="factoryTable" ref="resourceTable" />
         <property name="serviceFactory" ref="serviceFactory" />
         <property name="servletContext" ref="servletContext" />
@@ -37,15 +36,13 @@
         <property name="installCommand" ref="install-command" />
     </bean>
 
-    <bean id="curationWebContext" class="edu.mayo.mprc.dbcurator.server.CurationWebContext"></bean>
-
     <bean id="FileUploadServlet" class="edu.mayo.mprc.dbcurator.server.FASTAFileUploadServlet">
-        <property name="curationWebContext" ref="curationWebContext" />
+        <property name="curationContext" ref="curationContext" />
     </bean>
 
     <bean id="CommonDataRequester" class="edu.mayo.mprc.dbcurator.server.CommonDataRequesterImpl">
         <property name="curationDao" ref="curationDao" />
-        <property name="curationWebContext" ref="curationWebContext" />
+        <property name="curationContext" ref="curationContext" />
     </bean>
 
     <bean id="Feed" class="edu.mayo.mprc.swift.report.RssStatusFeeder">

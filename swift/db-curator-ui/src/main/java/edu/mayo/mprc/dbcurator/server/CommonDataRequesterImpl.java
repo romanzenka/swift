@@ -7,10 +7,7 @@ import edu.mayo.mprc.common.server.SpringGwtServlet;
 import edu.mayo.mprc.dbcurator.client.steppanels.CommonDataRequester;
 import edu.mayo.mprc.dbcurator.client.steppanels.CurationStub;
 import edu.mayo.mprc.dbcurator.client.steppanels.HeaderTransformStub;
-import edu.mayo.mprc.dbcurator.model.Curation;
-import edu.mayo.mprc.dbcurator.model.CurationDao;
-import edu.mayo.mprc.dbcurator.model.FastaSource;
-import edu.mayo.mprc.dbcurator.model.HeaderTransform;
+import edu.mayo.mprc.dbcurator.model.*;
 import edu.mayo.mprc.utilities.FileUtilities;
 import org.apache.log4j.Logger;
 
@@ -29,7 +26,7 @@ public final class CommonDataRequesterImpl extends SpringGwtServlet implements C
 	private static final Logger LOGGER = Logger.getLogger(CommonDataRequesterImpl.class);
 
 	private transient CurationDao curationDao;
-	private transient CurationWebContext curationWebContext;
+	private transient CurationContext curationContext;
 
 	public CommonDataRequesterImpl() {
 	}
@@ -172,7 +169,7 @@ public final class CommonDataRequesterImpl extends SpringGwtServlet implements C
 	}
 
 	private CurationHandler getHandler() {
-		return CurationHandler.getInstance(getThreadLocalRequest().getSession(), curationDao, curationWebContext);
+		return CurationHandler.getInstance(getThreadLocalRequest().getSession(), curationDao, curationContext);
 	}
 
 	/**
@@ -399,11 +396,11 @@ public final class CommonDataRequesterImpl extends SpringGwtServlet implements C
 		this.curationDao = curationDao;
 	}
 
-	public CurationWebContext getCurationWebContext() {
-		return curationWebContext;
+	public CurationContext getCurationContext() {
+		return curationContext;
 	}
 
-	public void setCurationWebContext(final CurationWebContext curationWebContext) {
-		this.curationWebContext = curationWebContext;
+	public void setCurationContext(final CurationContext curationContext) {
+		this.curationContext = curationContext;
 	}
 }

@@ -32,7 +32,7 @@ public final class CurationHandler {
 	 * @param session the HttpSession that we want to look for the CurationHandler on
 	 * @return the curation handler that was on the session or a new one that has been put on the session
 	 */
-	public static CurationHandler getInstance(final HttpSession session, CurationDao curationDao, CurationWebContext context) {
+	public static CurationHandler getInstance(final HttpSession session, CurationDao curationDao, CurationContext context) {
 
 		CurationHandler perSession = null;
 		try {
@@ -47,7 +47,7 @@ public final class CurationHandler {
 			session.setAttribute("curationHandler", perSession);
 		}
 		perSession.setCurationDao(curationDao);
-		perSession.setCurationWebContext(context);
+		perSession.setCurationContext(context);
 		return perSession;
 	}
 
@@ -64,7 +64,7 @@ public final class CurationHandler {
 
 	private CurationDao curationDao;
 
-	private CurationWebContext curationWebContext;
+	private CurationContext curationContext;
 
 	/**
 	 * protect the constructor to ensure ThreadLocal access to instances
@@ -466,9 +466,9 @@ public final class CurationHandler {
 		final Curation curation = cache;
 
 		final CurationExecutor curationExecutor = new CurationExecutor(curation, true, curationDao,
-				curationWebContext.getFastaFolder(),
-				curationWebContext.getLocalTempFolder(),
-				curationWebContext.getFastaArchiveFolder());
+				curationContext.getFastaFolder(),
+				curationContext.getLocalTempFolder(),
+				curationContext.getFastaArchiveFolder());
 		lastRunStatus = curationExecutor.execute();
 
 		while (lastRunStatus.isInProgress()) {
@@ -523,11 +523,11 @@ public final class CurationHandler {
 		this.curationDao = curationDao;
 	}
 
-	public CurationWebContext getCurationWebContext() {
-		return curationWebContext;
+	public CurationContext getCurationContext() {
+		return curationContext;
 	}
 
-	public void setCurationWebContext(CurationWebContext curationWebContext) {
-		this.curationWebContext = curationWebContext;
+	public void setCurationContext(CurationContext curationContext) {
+		this.curationContext = curationContext;
 	}
 }
