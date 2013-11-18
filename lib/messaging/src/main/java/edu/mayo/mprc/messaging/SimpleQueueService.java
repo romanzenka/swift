@@ -222,6 +222,7 @@ final class SimpleQueueService implements Service {
 						consumer.set(null);
 					}
 				}
+				connection = null;
 			}
 		}
 	}
@@ -231,6 +232,7 @@ final class SimpleQueueService implements Service {
 		if (session != null) {
 			try {
 				session.close();
+				toClose.set(null);
 			} catch (JMSException e) {
 				throw new MprcException("Could not close session", e);
 			}

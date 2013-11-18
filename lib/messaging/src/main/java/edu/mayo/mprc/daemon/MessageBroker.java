@@ -77,13 +77,23 @@ public final class MessageBroker implements Lifecycle {
 		if (broker == null && isEmbedded()) {
 			broker = new BrokerService();
 			try {
-				broker.addConnector(getBrokerUrl());
+				setBrokerNameFromUrl(broker, getBrokerUrl());
 				broker.setPersistent(false);
+				broker.addConnector(getBrokerUrl());
 				broker.setUseJmx(isUseJmx());
 				broker.start();
 			} catch (Exception e) {
 				throw new MprcException("The message broker failed to start", e);
 			}
+		}
+	}
+
+	/**
+	 * For embeded VM brokers we need to set broker name, otherwise the broker is not recognized
+	 */
+	private static void setBrokerNameFromUrl(final BrokerService broker, final String brokerUrl) {
+		if (brokerUrl.startsWith("vm://")) {
+			broker.setBrokerName(brokerUrl.substring("vm://".length()));
 		}
 	}
 

@@ -17,6 +17,7 @@ import java.net.URISyntaxException;
  */
 public final class ServiceFactory implements Lifecycle {
 	private static final Logger LOGGER = Logger.getLogger(ServiceFactory.class);
+	public static final String BROKER_PARAMS = "create=false&waitForStart=100";
 
 	private URI brokerUri;
 	private String daemonName;
@@ -95,10 +96,16 @@ public final class ServiceFactory implements Lifecycle {
 			if (config == null) {
 				throw new MprcException("The application does not define a message broker");
 			}
+			String brokerUrl = config.getBrokerUrl();
+			if (brokerUrl.contains("?")) {
+				brokerUrl += "&" + BROKER_PARAMS;
+			} else {
+				brokerUrl += "?" + BROKER_PARAMS;
+			}
 			try {
-				brokerUri = new URI(config.getBrokerUrl());
+				brokerUri = new URI(brokerUrl);
 			} catch (URISyntaxException e) {
-				throw new MprcException("The broker URI is in invalid format: " + config.getBrokerUrl(), e);
+				throw new MprcException("The broker URI is in invalid format: " + brokerUrl, e);
 			}
 		}
 		return brokerUri;

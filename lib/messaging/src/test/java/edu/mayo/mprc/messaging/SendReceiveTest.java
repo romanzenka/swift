@@ -27,7 +27,7 @@ public final class SendReceiveTest extends MessagingTestBase {
 	private static final int MAX_WAIT_FOR_MESSAGES_TO_ARRIVE = 10000;
 
 	private void logChatty(final String message) {
-		// LOGGER.debug(message);
+		LOGGER.debug(message);
 	}
 
 	private void restartBroker() {
@@ -45,26 +45,29 @@ public final class SendReceiveTest extends MessagingTestBase {
 	}
 
 	private void cleanup() {
-		int totalSleep = 0;
-		while (numRequests.get() != expectedNumRequests || numResponses.get() != expectedNumResponses) {
-			logChatty("Waiting for messages to be delivered. Requests :" + numRequests.get() + "/" + expectedNumRequests + " Responses: " + numResponses.get() + "/" + expectedNumResponses);
-			try {
-				Thread.sleep(100);
-			} catch (InterruptedException e) {
-				throw new MprcException("Sleep interrupted", e);
+		try {
+			int totalSleep = 0;
+			while (numRequests.get() != expectedNumRequests || numResponses.get() != expectedNumResponses) {
+				logChatty("Waiting for messages to be delivered. Requests :" + numRequests.get() + "/" + expectedNumRequests + " Responses: " + numResponses.get() + "/" + expectedNumResponses);
+				try {
+					Thread.sleep(100);
+				} catch (InterruptedException e) {
+					throw new MprcException("Sleep interrupted", e);
+				}
+				totalSleep += 100;
+				if (totalSleep >= MAX_WAIT_FOR_MESSAGES_TO_ARRIVE) {
+					Assert.fail("Slept for " + MAX_WAIT_FOR_MESSAGES_TO_ARRIVE + " and yet the expected amount of messages was not received: "
+							+ numRequests.get() + "/" + expectedNumRequests + " requests, "
+							+ numResponses.get() + "/" + expectedNumResponses + " responses.");
+					break;
+				}
 			}
-			totalSleep += 100;
-			if (totalSleep >= MAX_WAIT_FOR_MESSAGES_TO_ARRIVE) {
-				Assert.fail("Slept for " + MAX_WAIT_FOR_MESSAGES_TO_ARRIVE + " and yet the expected amount of messages was not received: "
-						+ numRequests.get() + "/" + expectedNumRequests + " requests, "
-						+ numResponses.get() + "/" + expectedNumResponses + " responses.");
-				break;
-			}
-		}
 
-		Assert.assertEquals(numRequests.get(), expectedNumRequests, "The requests did not arrive ok.");
-		Assert.assertEquals(numResponses.get(), expectedNumResponses, "The responses did not arrive ok.");
-		stopBroker();
+			Assert.assertEquals(numRequests.get(), expectedNumRequests, "The requests did not arrive ok.");
+			Assert.assertEquals(numResponses.get(), expectedNumResponses, "The responses did not arrive ok.");
+		} finally {
+			stopBroker();
+		}
 	}
 
 	@Test(enabled = true, groups = {"unit", "fast"})
@@ -77,7 +80,6 @@ public final class SendReceiveTest extends MessagingTestBase {
 			@Override
 			public void run() {
 				final Request request = receiveRequest();
-				service.stop();
 
 				Assert.assertEquals(request.getMessageData(), REQUEST_1, "Received wrong data");
 				sendResponse(request);
@@ -121,7 +123,6 @@ public final class SendReceiveTest extends MessagingTestBase {
 			@Override
 			public void run() {
 				final Request request = receiveRequest();
-				service.stop();
 
 				Assert.assertEquals(request.getMessageData(), REQUEST_1, "Received wrong data");
 				sendResponse(request);
@@ -175,7 +176,6 @@ public final class SendReceiveTest extends MessagingTestBase {
 						}
 					}
 				}
-				service.stop();
 			}
 		};
 		thread.start();
@@ -243,6 +243,7 @@ public final class SendReceiveTest extends MessagingTestBase {
 			Assert.assertEquals(request.getMessageData(), 2, "Request value does not match");
 			// Close the receiver instead
 			service.stop();
+			service.start();
 		}
 
 		// Process second request
@@ -254,8 +255,6 @@ public final class SendReceiveTest extends MessagingTestBase {
 
 		final Request request = service.receiveRequest(10);
 		Assert.assertNull(request, "There should be no request left");
-
-		service.stop();
 
 		cleanup();
 	}

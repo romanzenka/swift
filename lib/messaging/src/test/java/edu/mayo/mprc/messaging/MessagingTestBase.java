@@ -30,14 +30,17 @@ public abstract class MessagingTestBase {
 		}
 		// Start a local, vm-only broker with no port.
 		broker = new MessageBroker();
+		broker.setEmbedded(true);
+		broker.setUseJmx(false);
 		broker.setBrokerUrl(BROKER);
+		broker.start();
 
 
 		serviceFactory = new ServiceFactory();
 		serviceFactory.setConnectionPool(new ActiveMQConnectionPool());
 		serviceFactory.setDaemonName("test-messaging-daemon");
 		try {
-			serviceFactory.setBrokerUri(new URI(BROKER));
+			serviceFactory.setBrokerUri(new URI(BROKER + "?create=false&waitForStart=100"));
 		} catch (URISyntaxException e) {
 			throw new MprcException(e);
 		}
