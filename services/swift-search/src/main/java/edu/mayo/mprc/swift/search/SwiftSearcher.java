@@ -451,11 +451,13 @@ public final class SwiftSearcher implements Worker, Lifecycle {
 					fastaDbDaemon,
 					searchDbDaemon
 			);
+			running = true;
 		}
 	}
 
 	@Override
 	public void stop() {
+		running = false;
 	}
 
 	/**
