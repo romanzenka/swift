@@ -355,6 +355,7 @@ public final class Database implements RuntimeInitializer, Lifecycle {
 			placeholder.setConfig(localConfig);
 			placeholder.setHibernateProperties(getHibernateProperties());
 			placeholder.setMappingResources(collectMappingResouces(getDaoList()));
+			placeholder.setRuntimeInitializers(getRuntimeInitializers());
 			return placeholder;
 		}
 
