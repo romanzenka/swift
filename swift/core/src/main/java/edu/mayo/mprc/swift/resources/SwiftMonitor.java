@@ -63,6 +63,9 @@ public final class SwiftMonitor implements Runnable, Lifecycle {
 		synchronized (connectionsLock) {
 			if (!isRunning()) {
 				initialize(context.getApplicationConfig());
+				for (final DaemonConnection connection : monitoredConnections.keySet()) {
+					connection.start();
+				}
 				if (scheduler == null) {
 					scheduler = Executors.newScheduledThreadPool(1);
 					scheduler.scheduleAtFixedRate(this, MONITOR_PERIOD_SECONDS, MONITOR_PERIOD_SECONDS, TimeUnit.SECONDS);
@@ -81,6 +84,9 @@ public final class SwiftMonitor implements Runnable, Lifecycle {
 				clear();
 				scheduler.shutdown();
 				scheduler = null;
+				for (final DaemonConnection connection : monitoredConnections.keySet()) {
+					connection.stop();
+				}
 			}
 		}
 	}
