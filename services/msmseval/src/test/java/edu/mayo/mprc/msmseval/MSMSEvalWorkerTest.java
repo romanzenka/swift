@@ -53,7 +53,7 @@ public final class MSMSEvalWorkerTest {
 
 		final DaemonWorkerTester daemonWorkerTester = new DaemonWorkerTester(msmsEvalWorker);
 		try {
-
+			daemonWorkerTester.start();
 			final Object workerToken = daemonWorkerTester.sendWork(new MSMSEvalWorkPacket(mgfFile, paramFile, tempDirectory, "0"), null);
 
 			while (!daemonWorkerTester.isDone(workerToken)) {
@@ -69,7 +69,7 @@ public final class MSMSEvalWorkerTest {
 
 			Assert.assertTrue(daemonWorkerTester.isSuccess(workerToken), "Method processRequest(..) from " + MSMSEvalWorker.class.getSimpleName() + " class failed.");
 		} finally {
-			daemonWorkerTester.close();
+			daemonWorkerTester.stop();
 		}
 	}
 
@@ -87,6 +87,7 @@ public final class MSMSEvalWorkerTest {
 
 		final DaemonWorkerTester daemonWorkerTester = new DaemonWorkerTester(msmsEvalWorker);
 		try {
+			daemonWorkerTester.start();
 
 			final Object workerToken = daemonWorkerTester.sendWork(new MSMSEvalWorkPacket(mgfFile, paramFile, tempDirectory, "0", false), null);
 
@@ -101,7 +102,7 @@ public final class MSMSEvalWorkerTest {
 
 			Assert.assertTrue(msmsEvalWorker.isSkippedExecution(), "The " + MSMSEvalWorker.class.getSimpleName() + " did not skip execution.");
 		} finally {
-			daemonWorkerTester.close();
+			daemonWorkerTester.stop();
 		}
 	}
 

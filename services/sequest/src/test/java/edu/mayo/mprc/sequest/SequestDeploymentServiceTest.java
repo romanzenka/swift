@@ -112,6 +112,7 @@ public final class SequestDeploymentServiceTest {
 
 		final DaemonWorkerTester tester = new DaemonWorkerTester(service);
 		try {
+			tester.start();
 			final Object workToken = tester.sendWork(request, new ProgressListener() {
 
 				@Override
@@ -187,7 +188,7 @@ public final class SequestDeploymentServiceTest {
 				}
 			}
 		} finally {
-			tester.close();
+			tester.stop();
 		}
 	}
 

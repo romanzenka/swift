@@ -233,6 +233,7 @@ public final class MyriMatchTest {
 
 		final DaemonWorkerTester tester = new DaemonWorkerTester(worker);
 		try {
+			tester.start();
 
 			final Object workToken = tester.sendWork(work, new ProgressListener() {
 				@Override
@@ -299,7 +300,7 @@ public final class MyriMatchTest {
 
 			Assert.assertEquals(resultString, expectedString, "The MyriMatch results do not match expected ones");
 		} finally {
-			tester.close();
+			tester.stop();
 		}
 	}
 

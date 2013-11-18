@@ -101,6 +101,7 @@ public final class DaemonWorkerTest {
 
 	private static void runTest(final DaemonWorkerTester tester, final int iterations) throws InterruptedException {
 		try {
+			tester.start();
 			final Object[] token = new Object[iterations];
 			for (int i = 0; i < iterations; i++) {
 				token[i] = tester.sendWork(new StringWorkPacket("hello #" + i), null);
@@ -130,7 +131,7 @@ public final class DaemonWorkerTest {
 				}
 			}
 		} finally {
-			tester.close();
+			tester.stop();
 		}
 	}
 }

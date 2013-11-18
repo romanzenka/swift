@@ -2,6 +2,7 @@ package edu.mayo.mprc.daemon;
 
 import edu.mayo.mprc.MprcException;
 import edu.mayo.mprc.config.DaemonConfigInfo;
+import edu.mayo.mprc.config.Lifecycle;
 import edu.mayo.mprc.daemon.files.FileTokenFactory;
 import edu.mayo.mprc.daemon.worker.WorkPacket;
 import edu.mayo.mprc.daemon.worker.Worker;
@@ -14,7 +15,6 @@ import edu.mayo.mprc.utilities.progress.ProgressInfo;
 import edu.mayo.mprc.utilities.progress.ProgressListener;
 import org.apache.log4j.Logger;
 
-import java.io.Closeable;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.concurrent.ExecutorService;
@@ -23,7 +23,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 /**
  * Test harness for {@link edu.mayo.mprc.daemon.worker.Worker} classes. Wrap a daemon worker
  */
-public final class DaemonWorkerTester implements Closeable {
+public final class DaemonWorkerTester implements Lifecycle {
 	private static final Logger LOGGER = Logger.getLogger(DaemonWorkerTester.class);
 	private SimpleRunner runner;
 	private Service service;
@@ -40,7 +40,6 @@ public final class DaemonWorkerTester implements Closeable {
 			throw new MprcException(e);
 		}
 		serviceFactory.setDaemonName("test-daemon");
-		serviceFactory.start();
 	}
 
 	/**
@@ -60,8 +59,6 @@ public final class DaemonWorkerTester implements Closeable {
 		daemon.setLogOutputFolder(FileUtilities.createTempFolder());
 		runner.setDaemon(daemon);
 		runner.setEnabled(true);
-		runner.start();
-		waitUntilReady(runner);
 	}
 
 	private static ExecutorService getSingleThreadExecutor(Worker worker) {
@@ -94,9 +91,6 @@ public final class DaemonWorkerTester implements Closeable {
 		daemon.setLogOutputFolder(FileUtilities.createTempFolder());
 		runner.setDaemon(daemon);
 		runner.setEnabled(true);
-
-		runner.start();
-		waitUntilReady(runner);
 	}
 
 	/**
@@ -126,12 +120,35 @@ public final class DaemonWorkerTester implements Closeable {
 		return listener;
 	}
 
+	@Override
+	public boolean isRunning() {
+		return runner.isRunning();
+	}
+
+	@Override
+	public void start() {
+		if (!isRunning()) {
+			if (serviceFactory != null) {
+				serviceFactory.start();
+			}
+			runner.start();
+			waitUntilReady(runner);
+			daemonConnection.start();
+		}
+	}
+
 	/**
 	 * Stop the execution of the daemon as soon as possible (the thread does not quit immediatelly, so
 	 * there may still be some progress info being sent back).
 	 */
 	public void stop() {
-		runner.stop();
+		if (isRunning()) {
+			runner.stop();
+			daemonConnection.stop();
+			if (serviceFactory != null) {
+				serviceFactory.stop();
+			}
+		}
 	}
 
 	/**
@@ -183,11 +200,6 @@ public final class DaemonWorkerTester implements Closeable {
 			}
 		}
 		LOGGER.info("The runner for " + runner.toString() + " is up and ready.");
-	}
-
-	@Override
-	public void close() {
-		serviceFactory.stop();
 	}
 
 	private static final class TestProgressListener implements ProgressListener {
