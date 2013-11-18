@@ -8,6 +8,8 @@ import edu.mayo.mprc.config.ResourceConfig;
 import edu.mayo.mprc.config.ServiceConfig;
 import edu.mayo.mprc.database.Database;
 import edu.mayo.mprc.swift.MainFactoryContext;
+import edu.mayo.mprc.swift.commands.SwiftCommand;
+import edu.mayo.mprc.swift.commands.SwiftEnvironment;
 import edu.mayo.mprc.swift.configuration.client.model.*;
 import edu.mayo.mprc.swift.resources.ResourceTable;
 import edu.mayo.mprc.swift.search.SwiftSearcher;
@@ -28,7 +30,10 @@ public final class ConfigurationDataTest {
 
 	@BeforeClass
 	public static void setup() throws GWTServiceException {
-		data = new ConfigurationData((ResourceTable) MainFactoryContext.getContext().getBean("resourceTable"));
+		data = new ConfigurationData(
+				(ResourceTable) MainFactoryContext.getContext().getBean("resourceTable"),
+				(SwiftEnvironment) MainFactoryContext.getContext().getBean("swiftEnvironment"),
+				(SwiftCommand) MainFactoryContext.getContext().getBean("install-command"));
 		data.loadDefaultConfig();
 	}
 

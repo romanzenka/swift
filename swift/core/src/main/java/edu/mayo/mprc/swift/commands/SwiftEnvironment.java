@@ -27,6 +27,15 @@ public interface SwiftEnvironment extends RunningApplicationContext, Lifecycle {
 	ExitCode runSwiftCommand(final SwiftCommandLine cmdLine);
 
 	/**
+	 * Run a Swift command directly.
+	 *
+	 * @param command    Command to run.
+	 * @param configFile Configuration file to use for the environment.
+	 * @return Exit code of the command.
+	 */
+	ExitCode runSwiftCommand(final SwiftCommand command, final File configFile);
+
+	/**
 	 * @return Parameters for the Swift command.
 	 */
 	List<String> getParameters();

@@ -37,7 +37,7 @@
                 </li>
             </ol>
         </li>
-        <li>Configure the database - the database is created and tested by the containing Swift Searcher</li>
+        <li>Configure the database. The database stores file paths as seen by its containing daemon.</li>
         <li>Configure the message broker</li>
         <li>Configure the Swift Searcher.
             <ul>
@@ -47,32 +47,29 @@
                 <li>
                     Configure the <code>.fasta</code> directories for the searcher
                 </li>
-                <li>Test the database. The test will fail the first time, giving you an option to initialize the
-                    database.
-                </li>
             </ul>
         </li>
         <li>Configure all the remaining Swift modules</li>
+        <li>Save the configuration</li>
     </ol>
 
     <p>
-        The installation will:
+        When the configuration gets saved, the installation will:
     <ol>
-        <li>create config file at <code>conf/swift.xml</code> - defines what services should Swift run, how and where
+        <li>create config file <code>conf/swift.conf</code> - it defines what services should Swift run, how and where
         </li>
-        <li>create <code>[daemon name]-run</code> - startup script(s). This will start Swift once the configuration is
-            all
-            set up. Simply run these scripts on the respective machines.
-        </li>
-        <li>Seed the provided database with initial data. Alternatively, create a simple file database if you do not
-            have a database server ready.
+        <li>run a check, making sure all parts are configured properly</li>
+        <li>run an installation script, making sure that all requested folders are created, and that the database
+            is seeded with initial data
         </li>
     </ol>
 
     <p>
         When you are done configuring, press the <b>Save configuration</b> button below, kill the configuration script
-        and start the provided
-        run scripts.
+        and start the provided bin/swift script.
+    </p>
+
+    <p>
         Keep in mind that the daemon containing the embedded Message Broker module has to start first, so other modules
         can use it to communicate.
     </p>

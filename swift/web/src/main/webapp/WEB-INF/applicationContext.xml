@@ -34,6 +34,7 @@
     <bean id="ConfigurationService" class="edu.mayo.mprc.swift.configuration.server.ConfigurationServiceImpl">
         <property name="resourceTable" ref="resourceTable" />
         <property name="swiftEnvironment" ref="swiftEnvironment" />
+        <property name="installCommand" ref="install-command" />
     </bean>
 
     <bean id="curationWebContext" class="edu.mayo.mprc.dbcurator.server.CurationWebContext"></bean>

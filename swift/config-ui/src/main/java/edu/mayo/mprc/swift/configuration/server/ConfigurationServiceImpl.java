@@ -8,6 +8,7 @@ import edu.mayo.mprc.config.*;
 import edu.mayo.mprc.daemon.SimpleRunner;
 import edu.mayo.mprc.sge.GridRunner;
 import edu.mayo.mprc.swift.MainFactoryContext;
+import edu.mayo.mprc.swift.commands.SwiftCommand;
 import edu.mayo.mprc.swift.commands.SwiftEnvironment;
 import edu.mayo.mprc.swift.configuration.client.model.ApplicationModel;
 import edu.mayo.mprc.swift.configuration.client.model.ConfigurationService;
@@ -31,6 +32,7 @@ public final class ConfigurationServiceImpl extends SpringGwtServlet implements 
 	private transient SessionStorage storage;
 	private transient ResourceTable resourceTable;
 	private transient SwiftEnvironment swiftEnvironment;
+	private transient SwiftCommand installCommand;
 
 	public ConfigurationServiceImpl() {
 		setStorage(new ServletStorage(this));
@@ -110,7 +112,7 @@ public final class ConfigurationServiceImpl extends SpringGwtServlet implements 
 	private ConfigurationData getData() {
 		final Object obj = getStorage().get("configurationData");
 		if (obj == null) {
-			final ConfigurationData configurationData = new ConfigurationData(getResourceTable());
+			final ConfigurationData configurationData = new ConfigurationData(getResourceTable(), getSwiftEnvironment(), getInstallCommand());
 			getStorage().put("configurationData", configurationData);
 			return configurationData;
 		}
@@ -144,5 +146,13 @@ public final class ConfigurationServiceImpl extends SpringGwtServlet implements 
 
 	public void setSwiftEnvironment(SwiftEnvironment swiftEnvironment) {
 		this.swiftEnvironment = swiftEnvironment;
+	}
+
+	public SwiftCommand getInstallCommand() {
+		return installCommand;
+	}
+
+	public void setInstallCommand(SwiftCommand installCommand) {
+		this.installCommand = installCommand;
 	}
 }

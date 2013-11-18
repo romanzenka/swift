@@ -63,41 +63,7 @@ public final class Configuration implements EntryPoint, Context {
 	}
 
 	private void save() {
-		ConfigurationService.App.getInstance().saveConfiguration(new AsyncCallback<UiChangesReplayer>() {
-			@Override
-			public void onFailure(final Throwable throwable) {
-				displayProgressMessage(null);
-				displayErrorMessage(throwable.getMessage());
-			}
-
-			@Override
-			public void onSuccess(final UiChangesReplayer changes) {
-				displayProgressMessage(null);
-				final StringBuilder message = new StringBuilder();
-
-				changes.replay(new UiChanges() {
-					private static final long serialVersionUID = -5054481989230026680L;
-
-					@Override
-					public void setProperty(final String resourceId, final String propertyName, final String newValue) {
-					}
-
-					@Override
-					public void displayPropertyError(final String resourceId, final String propertyName, final String error) {
-						if (error == null) {
-							message.setLength(0);
-						} else {
-							message.append("<li>")
-									.append(error)
-									.append("</li>");
-						}
-					}
-				});
-				if (message.length() > 0) {
-					displayErrorMessage("<ul>" + message.toString() + "</ul>");
-				}
-			}
-		});
+		ConfigurationService.App.getInstance().saveConfiguration(new UiChangesReplay());
 	}
 
 	private void displayProgressMessage(final String message) {
@@ -140,5 +106,41 @@ public final class Configuration implements EntryPoint, Context {
 	@Override
 	public void displayErrorMessage(final String message, final Throwable t) {
 		displayErrorMessage(message + ": " + t.getMessage());
+	}
+
+	private class UiChangesReplay implements AsyncCallback<UiChangesReplayer> {
+		@Override
+		public void onFailure(final Throwable throwable) {
+			displayProgressMessage(null);
+			displayErrorMessage(throwable.getMessage());
+		}
+
+		@Override
+		public void onSuccess(final UiChangesReplayer changes) {
+			displayProgressMessage(null);
+			final StringBuilder message = new StringBuilder();
+
+			changes.replay(new UiChanges() {
+				private static final long serialVersionUID = -5054481989230026680L;
+
+				@Override
+				public void setProperty(final String resourceId, final String propertyName, final String newValue) {
+				}
+
+				@Override
+				public void displayPropertyError(final String resourceId, final String propertyName, final String error) {
+					if (error == null) {
+						message.setLength(0);
+					} else {
+						message.append("<li>")
+								.append(error)
+								.append("</li>");
+					}
+				}
+			});
+			if (message.length() > 0) {
+				displayErrorMessage("<ul>" + message.toString() + "</ul>");
+			}
+		}
 	}
 }

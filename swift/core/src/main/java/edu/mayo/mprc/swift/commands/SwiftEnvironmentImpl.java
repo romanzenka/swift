@@ -90,6 +90,20 @@ public final class SwiftEnvironmentImpl implements SwiftEnvironment, Application
 		return command.run(this);
 	}
 
+	/**
+	 * Run a swift command directly, without involving the command line.
+	 */
+	@Override
+	public ExitCode runSwiftCommand(final SwiftCommand command, final File configFile) {
+		this.configFile = configFile;
+
+		if (!isRunning()) {
+			start();
+		}
+
+		return command.run(this);
+	}
+
 	@Override
 	public List<String> getParameters() {
 		return commandLine.getParameters();
@@ -150,7 +164,7 @@ public final class SwiftEnvironmentImpl implements SwiftEnvironment, Application
 		this.swiftFactory = swiftFactory;
 	}
 
-	public void setDaemonConfig(DaemonConfig daemonConfig) {
+	public void setDaemonConfig(final DaemonConfig daemonConfig) {
 		this.daemonConfig = daemonConfig;
 	}
 

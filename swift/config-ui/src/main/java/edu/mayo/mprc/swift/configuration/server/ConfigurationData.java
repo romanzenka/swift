@@ -3,7 +3,6 @@ package edu.mayo.mprc.swift.configuration.server;
 import edu.mayo.mprc.GWTServiceExceptionFactory;
 import edu.mayo.mprc.MprcException;
 import edu.mayo.mprc.common.client.GWTServiceException;
-import edu.mayo.mprc.common.client.StringUtilities;
 import edu.mayo.mprc.config.*;
 import edu.mayo.mprc.config.ui.PropertyChangeListener;
 import edu.mayo.mprc.config.ui.ServiceUiFactory;
@@ -12,6 +11,8 @@ import edu.mayo.mprc.daemon.SimpleRunner;
 import edu.mayo.mprc.database.Database;
 import edu.mayo.mprc.sge.GridRunner;
 import edu.mayo.mprc.swift.Swift;
+import edu.mayo.mprc.swift.commands.SwiftCommand;
+import edu.mayo.mprc.swift.commands.SwiftEnvironment;
 import edu.mayo.mprc.swift.configuration.client.model.*;
 import edu.mayo.mprc.swift.resources.ResourceTable;
 import edu.mayo.mprc.swift.resources.SwiftConfig;
@@ -45,9 +46,14 @@ public class ConfigurationData {
 		return resourceTable;
 	}
 
-	public ConfigurationData(final ResourceTable resourceTable) {
+	private SwiftEnvironment environment;
+	private SwiftCommand installCommand;
+
+	public ConfigurationData(final ResourceTable resourceTable, final SwiftEnvironment environment, final SwiftCommand installCommand) {
 		config = new ApplicationConfig(new DependencyResolver(resourceTable));
 		this.resourceTable = resourceTable;
+		this.environment = environment;
+		this.installCommand = installCommand;
 		initResolver();
 	}
 
@@ -403,10 +409,7 @@ public class ConfigurationData {
 	 * @return List of UI changes (validations triggered by save).
 	 */
 	public UiChangesReplayer saveConfig(final File parentFolder) {
-		final File configFile = new File(parentFolder, Swift.CONFIG_FILE_NAME).getAbsoluteFile();
-		if (configFile.getParent() != null) {
-			FileUtilities.ensureFolderExists(configFile.getParentFile());
-		}
+		final File configFile = getConfigFile(parentFolder);
 
 		final SerializingUiChanges uiChanges = new SerializingUiChanges(resolver);
 
@@ -418,52 +421,23 @@ public class ConfigurationData {
 		for (final String error : errorList) {
 			uiChanges.displayPropertyError(applicationConfig, null, error);
 		}
-		applicationConfig.save(configFile, getResourceTable());
-		for (final DaemonConfig daemon : applicationConfig.getDaemons()) {
-			final String scriptName = daemon.getName().replaceAll("[^a-zA-Z0-9-_+]", "_") + "-run";
-			boolean hasWeb = false;
-			for (final ResourceConfig resource : daemon.getResources()) {
-				if (resource instanceof WebUi.Config) {
-					hasWeb = true;
-					break;
-				}
-			}
 
-			boolean linux = true;
-			boolean windows = true;
-
-			if (StringUtilities.toLowerCase(daemon.getOsName()).contains("windows")) {
-				linux = false;
-			}
-			if (StringUtilities.toLowerCase(daemon.getOsName()).contains("linux")) {
-				windows = false;
-			}
-
-			if (linux) {
-				final File linuxScript = new File(parentFolder, scriptName + ".sh");
-				FileUtilities.writeStringToFile(linuxScript, ""
-						+ "while true\n"
-						+ "do\n"
-						+ "echo ==== Starting daemon " + daemon.getName() + " ====\n"
-						+ "./swift" + (hasWeb ? "Web" : "") + ".sh --daemon='" + daemon.getName() + "' $*\n"
-						+ "if [ $? -ne 2 ]; then break; fi\n"
-						+ "done\n"
-						, true);
-			}
-
-			if (windows) {
-				final File dosScript = new File(parentFolder, scriptName + ".bat");
-				FileUtilities.writeStringToFile(dosScript, ""
-						+ "@echo off\r\n"
-						+ ":RUN_DAEMON\r\n"
-						+ "echo ====  Starting daemon " + daemon.getName() + " ====\r\n"
-						+ "call swift" + (hasWeb ? "Web" : "") + ".bat --daemon=\"" + daemon.getName() + "\"\r\n"
-						+ "IF ERRORLEVEL 2 GOTO RUN_DAEMON\r\n"
-						, true);
-			}
+		if (errorList.size() == 0) {
+			applicationConfig.save(configFile, getResourceTable());
+			environment.runSwiftCommand(installCommand, configFile);
 		}
+
 		return uiChanges.getReplayer();
 	}
+
+	private static File getConfigFile(final File parentFolder) {
+		final File configFile = new File(parentFolder, Swift.CONFIG_FILE_NAME).getAbsoluteFile();
+		if (configFile.getParent() != null) {
+			FileUtilities.ensureFolderExists(configFile.getParentFile());
+		}
+		return configFile;
+	}
+
 
 	public UiChangesReplayer setProperty(final ResourceConfig resourceConfig, final String propertyName, final String newValue, final boolean onDemand) {
 		// Set the property on the config

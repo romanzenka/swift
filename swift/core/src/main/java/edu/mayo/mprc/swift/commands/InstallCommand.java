@@ -26,24 +26,9 @@ public final class InstallCommand implements SwiftCommand {
 	}
 
 	@Override
-	public ExitCode run(SwiftEnvironment environment) {
+	public ExitCode run(final SwiftEnvironment environment) {
 		try {
-			final File configFile = environment.getConfigFile();
-			if (configFile == null) {
-				// Config is done standalone
-				FileUtilities.err("Please create and provide the configuration file first");
-				return ExitCode.Error;
-			}
-
-			final DaemonConfig config = environment.getDaemonConfig();
-			final Daemon daemon = environment.createDaemon(config);
-
-			FileUtilities.out("Installing from configuration file: " + environment.getConfigFile().getAbsolutePath() + " for daemon " + environment.getDaemonConfig().getName());
-			final Map<String, String> params = new HashMap<String, String>(0);
-			daemon.install(params);
-
-			FileUtilities.out("Checking the installation");
-			final String check = daemon.check();
+			final String check = install(environment);
 			if (check != null) {
 				FileUtilities.err(check);
 				return ExitCode.Error;
@@ -54,5 +39,26 @@ public final class InstallCommand implements SwiftCommand {
 		}
 		FileUtilities.out("Check passed, Swift is successfully installed");
 		return ExitCode.Ok;
+	}
+
+	public static String install(final SwiftEnvironment environment) {
+		String check = null;
+		final File configFile = environment.getConfigFile();
+		if (configFile == null) {
+			// Config is done standalone
+			check = "Please create and provide the configuration file first";
+		} else {
+
+			final DaemonConfig config = environment.getDaemonConfig();
+			final Daemon daemon = environment.createDaemon(config);
+
+			FileUtilities.out("Installing from configuration file: " + environment.getConfigFile().getAbsolutePath() + " for daemon " + environment.getDaemonConfig().getName());
+			final Map<String, String> params = new HashMap<String, String>(0);
+			daemon.install(params);
+
+			FileUtilities.out("Checking the installation");
+			check = daemon.check();
+		}
+		return check;
 	}
 }
