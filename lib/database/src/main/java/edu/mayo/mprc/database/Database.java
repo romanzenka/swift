@@ -4,6 +4,7 @@ import com.google.common.collect.Lists;
 import edu.mayo.mprc.MprcException;
 import edu.mayo.mprc.config.*;
 import edu.mayo.mprc.config.ui.FactoryDescriptor;
+import edu.mayo.mprc.config.ui.FixTag;
 import edu.mayo.mprc.config.ui.ServiceUiFactory;
 import edu.mayo.mprc.config.ui.UiBuilder;
 import edu.mayo.mprc.utilities.exceptions.ExceptionUtilities;
@@ -23,12 +24,13 @@ import java.util.*;
  * session, they defer to this object, which uses {@link ThreadLocal} storage for the session.
  */
 @Component("database")
-public final class Database implements Installable, Lifecycle {
+public final class Database implements RuntimeInitializer, Lifecycle {
 	private static final Logger LOGGER = Logger.getLogger(Database.class);
 	private SessionFactory sessionFactory;
 	private Config config;
 	private Map<String, String> hibernateProperties;
 	private List<String> mappingResources;
+	private List<RuntimeInitializer> runtimeInitializers;
 
 	public Database() {
 	}
@@ -38,6 +40,64 @@ public final class Database implements Installable, Lifecycle {
 		LOGGER.info("Installing database");
 		final DatabaseUtilities.SchemaInitialization action = DatabaseUtilities.SchemaInitialization.getForValue(params.get("action"));
 		initializeSessionFactory(action);
+
+		LOGGER.info("Installing DAOs");
+		final HashMap<String, String> newParams = new HashMap<String, String>(params);
+		try {
+			beginTransaction();
+
+			for (final RuntimeInitializer initializer : runtimeInitializers) {
+				initializer.install(newParams);
+				getSession().flush();
+				// We completely wipe out the caches between the initialization steps to prevent
+				// huge memory consumption.
+				getSession().clear();
+			}
+
+			commitTransaction();
+		} catch (Exception e) {
+			rollbackTransaction();
+			throw new MprcException(e);
+		}
+	}
+
+	@Override
+	public String check() {
+		LOGGER.info("Checking database");
+		String errors = "";
+		try {
+			// Before checking, update the schema
+			HashMap<String, String> params = new HashMap<String, String>();
+			params.put("action", DatabaseUtilities.SchemaInitialization.Update.getValue());
+			final DatabaseUtilities.SchemaInitialization action = DatabaseUtilities.SchemaInitialization.getForValue(params.get("action"));
+			initializeSessionFactory(action);
+
+			beginTransaction();
+
+			String initializationToDo = null;
+
+			// Go through a list of RuntimeInitializer, stop when one of them reports it is not ready
+			for (final RuntimeInitializer initializer : runtimeInitializers) {
+				final String result = initializer.check();
+				getSession().flush();
+				if (result != null) {
+					initializationToDo = result;
+					break;
+				}
+			}
+
+			if (initializationToDo != null) {
+				errors += "Database is not initialized: " + initializationToDo + " - " + FixTag.getTag(
+						DatabaseUtilities.SchemaInitialization.Update.getValue(), "Initialize Database");
+			}
+			commitTransaction();
+		} catch (Exception e) {
+			errors += "Database connection could not be established.<br/>Error: " + e.getMessage()
+					+ "<br/>Database may not exist. " + FixTag.getTag(
+					DatabaseUtilities.SchemaInitialization.Create.getValue(), "Create Database");
+			rollbackTransaction();
+		}
+		return !errors.isEmpty() ? errors : null;
 	}
 
 	private void initializeSessionFactory(DatabaseUtilities.SchemaInitialization action) {
@@ -179,6 +239,14 @@ public final class Database implements Installable, Lifecycle {
 		this.mappingResources = mappingResources;
 	}
 
+	public List<RuntimeInitializer> getRuntimeInitializers() {
+		return runtimeInitializers;
+	}
+
+	public void setRuntimeInitializers(final List<RuntimeInitializer> runtimeInitializers) {
+		this.runtimeInitializers = runtimeInitializers;
+	}
+
 	@Override
 	public boolean isRunning() {
 		return sessionFactory != null;
@@ -215,6 +283,7 @@ public final class Database implements Installable, Lifecycle {
 		private Map<String, String> hibernateProperties;
 		private List<DaoBase> daoList;
 		private Database database;
+		private List<RuntimeInitializer> runtimeInitializers;
 
 		public Factory() {
 		}
@@ -263,6 +332,16 @@ public final class Database implements Installable, Lifecycle {
 		public void setDatabase(final Database database) {
 			this.database = database;
 		}
+
+		public List<RuntimeInitializer> getRuntimeInitializers() {
+			return runtimeInitializers;
+		}
+
+		@Resource(name = "searcherRuntimeInitializers")
+		public void setRuntimeInitializers(final List<RuntimeInitializer> runtimeInitializers) {
+			this.runtimeInitializers = runtimeInitializers;
+		}
+
 
 		@Override
 		public Database create(final ResourceConfig config, final DependencyResolver dependencies) {

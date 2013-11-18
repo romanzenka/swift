@@ -38,12 +38,6 @@
 
     <bean id="resourceTable" class="edu.mayo.mprc.swift.resources.ResourceTable"></bean>
 
-    <bean id="databaseValidator" class="edu.mayo.mprc.swift.search.DatabaseValidator">
-        <property name="runtimeInitializers" ref="searcherRuntimeInitializers" />
-        <property name="fileTokenFactory" ref="fileTokenFactory" />
-        <property name="runningApplicationContext" ref="swiftEnvironment" />
-    </bean>
-
     <!-- Provides a WebUi interface after it gets configured -->
     <bean id="webUiHolder" class="edu.mayo.mprc.swift.resources.WebUiHolder">
         <property name="context" ref="swiftEnvironment" />

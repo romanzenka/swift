@@ -8,17 +8,13 @@ import edu.mayo.mprc.database.DatabaseUtilities;
 import edu.mayo.mprc.swift.commands.ExitCode;
 import edu.mayo.mprc.swift.commands.SwiftCommand;
 import edu.mayo.mprc.swift.commands.SwiftEnvironment;
-import edu.mayo.mprc.swift.search.DatabaseValidator;
 import org.springframework.stereotype.Component;
-
-import javax.annotation.Resource;
 
 /**
  * @author Roman Zenka
  */
 @Component("create-test-command")
 public final class CreateTestCommand implements SwiftCommand {
-	private DatabaseValidator validator;
 	private Daemon daemon;
 
 	@Override
@@ -37,21 +33,9 @@ public final class CreateTestCommand implements SwiftCommand {
 				.put("test", "true")
 				.build();
 
-		// TODO: Database needs to depend on its validator for its installation needs
-		// That way the install runs directly through the daemon
-		validator.install(installMap);
 		daemon.install(installMap);
 
 		return ExitCode.Ok;
-	}
-
-	public DatabaseValidator getValidator() {
-		return validator;
-	}
-
-	@Resource(name = "databaseValidator")
-	public void setValidator(final DatabaseValidator validator) {
-		this.validator = validator;
 	}
 
 	public Daemon getDaemon() {

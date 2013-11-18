@@ -4,10 +4,8 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.ObjectArrays;
 import edu.mayo.mprc.MprcException;
 import edu.mayo.mprc.config.*;
-import edu.mayo.mprc.config.ui.PropertyChangeListener;
 import edu.mayo.mprc.config.ui.ServiceUiFactory;
 import edu.mayo.mprc.config.ui.UiBuilder;
-import edu.mayo.mprc.config.ui.UiResponse;
 import edu.mayo.mprc.daemon.DaemonConnection;
 import edu.mayo.mprc.daemon.DaemonUtilities;
 import edu.mayo.mprc.daemon.SimpleThreadPoolExecutor;
@@ -41,7 +39,6 @@ import edu.mayo.mprc.swift.dbmapping.SwiftSearchDefinition;
 import edu.mayo.mprc.swift.params2.mapping.ParamsInfo;
 import edu.mayo.mprc.swift.search.task.SearchRunner;
 import edu.mayo.mprc.utilities.MonitorUtilities;
-import edu.mayo.mprc.utilities.exceptions.ExceptionUtilities;
 import edu.mayo.mprc.utilities.progress.ProgressReporter;
 import org.apache.log4j.Logger;
 import org.springframework.stereotype.Component;
@@ -465,17 +462,16 @@ public final class SwiftSearcher implements Worker, Lifecycle {
 	 * A factory capable of creating the worker
 	 */
 	@Component("swiftSearcherFactory")
-	public static final class Factory extends WorkerFactoryBase<Config> implements Installable {
+	public static final class Factory extends WorkerFactoryBase<Config> {
 		private CurationDao curationDao;
 		private SwiftDao swiftDao;
 		private DatabaseFileTokenFactory fileTokenFactory;
-		private DatabaseValidator databaseValidator;
 		private ParamsInfo paramsInfo;
 		private EngineFactoriesList engineFactoriesList;
 
 		@Override
 		public ServiceUiFactory getServiceUiFactory() {
-			return new Ui(getDatabaseValidator(), getEngineFactoriesList());
+			return new Ui(getEngineFactoriesList());
 		}
 
 		@Override
@@ -563,15 +559,6 @@ public final class SwiftSearcher implements Worker, Lifecycle {
 			this.fileTokenFactory = fileTokenFactory;
 		}
 
-		public DatabaseValidator getDatabaseValidator() {
-			return databaseValidator;
-		}
-
-		@Resource(name = "databaseValidator")
-		public void setDatabaseValidator(final DatabaseValidator databaseValidator) {
-			this.databaseValidator = databaseValidator;
-		}
-
 		public ParamsInfo getParamsInfo() {
 			return paramsInfo;
 		}
@@ -588,11 +575,6 @@ public final class SwiftSearcher implements Worker, Lifecycle {
 		@Resource(name = "engineFactoriesList")
 		public void setEngineFactoriesList(EngineFactoriesList engineFactoriesList) {
 			this.engineFactoriesList = engineFactoriesList;
-		}
-
-		@Override
-		public void install(Map<String, String> params) {
-			getDatabaseValidator().install(params);
 		}
 	}
 
@@ -788,12 +770,9 @@ public final class SwiftSearcher implements Worker, Lifecycle {
 
 	public static final class Ui implements ServiceUiFactory {
 
-		private DatabaseValidator validator;
-
 		private EngineFactoriesList engineFactoriesList;
 
-		public Ui(final DatabaseValidator validator, final EngineFactoriesList engineFactoriesList) {
-			this.validator = validator;
+		public Ui(final EngineFactoriesList engineFactoriesList) {
 			this.engineFactoriesList = engineFactoriesList;
 		}
 
@@ -815,35 +794,8 @@ public final class SwiftSearcher implements Worker, Lifecycle {
 					.required()
 					.existingDirectory().defaultValue("var/dbcurator/uploads")
 
-					.property(DATABASE, "Swift Database",
-							"<b>Important!</b> Make sure to test the database before running Swift. If the database does not exist, the test will let you set it up.")
+					.property(DATABASE, "Swift Database", "Reference to the database to be used for storing search metadata")
 					.required()
-					.validateOnDemand(new PropertyChangeListener() {
-						@Override
-						public void propertyChanged(final ResourceConfig config, final String propertyName, final String newValue, final UiResponse response, final boolean validationRequested) {
-							if (validationRequested && (config instanceof Config)) {
-								final Config searcher = (Config) config;
-								validator.setSearcherConfig(searcher);
-								validator.setDaemonConfig(daemon);
-								final String error = validator.check();
-								if (error != null) {
-									response.displayPropertyError(config, DATABASE, error);
-								}
-							}
-						}
-
-						@Override
-						public void fixError(final ResourceConfig config, final String propertyName, final String action) {
-							if (!(config instanceof Config)) {
-								ExceptionUtilities.throwCastException(config, Config.class);
-								return;
-							}
-							final Config searcher = (Config) config;
-							validator.setSearcherConfig(searcher);
-							validator.setDaemonConfig(daemon);
-							validator.install(new HashMap<String, String>(0));
-						}
-					})
 					.reference(Database.Factory.TYPE, UiBuilder.NONE_TYPE)
 					.defaultValue(database)
 
