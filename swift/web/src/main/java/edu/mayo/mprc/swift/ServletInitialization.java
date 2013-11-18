@@ -4,10 +4,12 @@ import edu.mayo.mprc.MprcException;
 import edu.mayo.mprc.config.DaemonConfig;
 import edu.mayo.mprc.config.MultiFactory;
 import edu.mayo.mprc.daemon.Daemon;
-import edu.mayo.mprc.daemon.MessageBroker;
 import edu.mayo.mprc.dbcurator.server.CurationWebContext;
 import edu.mayo.mprc.messaging.ServiceFactory;
-import edu.mayo.mprc.swift.commands.*;
+import edu.mayo.mprc.swift.commands.ExitCode;
+import edu.mayo.mprc.swift.commands.SwiftCommand;
+import edu.mayo.mprc.swift.commands.SwiftCommandLine;
+import edu.mayo.mprc.swift.commands.SwiftEnvironment;
 import edu.mayo.mprc.swift.resources.SwiftMonitor;
 import edu.mayo.mprc.swift.resources.WebUi;
 import edu.mayo.mprc.swift.resources.WebUiHolder;
@@ -90,9 +92,6 @@ public final class ServletInitialization implements SwiftCommand, ServletContext
 			System.setProperty("SWIFT_INSTALL", environment.getConfigFile().getAbsolutePath());
 
 			final DaemonConfig daemonConfig = environment.getDaemonConfig();
-
-			// The service factory needs to be initialized by message broker config
-			final MessageBroker.Config messageBroker = SwiftEnvironmentImpl.getMessageBroker(daemonConfig);
 
 			// WebUi needs reference to the actual daemon
 			daemon = environment.createDaemon(daemonConfig);

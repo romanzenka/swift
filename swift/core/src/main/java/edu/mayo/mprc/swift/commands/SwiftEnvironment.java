@@ -3,7 +3,6 @@ package edu.mayo.mprc.swift.commands;
 import edu.mayo.mprc.config.*;
 import edu.mayo.mprc.daemon.Daemon;
 import edu.mayo.mprc.daemon.DaemonConnection;
-import edu.mayo.mprc.daemon.MessageBroker;
 import edu.mayo.mprc.swift.Swift;
 import edu.mayo.mprc.swift.search.SwiftSearcher;
 import joptsimple.OptionParser;
@@ -91,11 +90,6 @@ public interface SwiftEnvironment extends RunningApplicationContext, Lifecycle {
 	 * @return Configuration for the Swift Searcher (core Swift module).
 	 */
 	SwiftSearcher.Config getSwiftSearcher();
-
-	/**
-	 * Shortcut method for obtaining the message broker config. Fails if none or more are defined.
-	 */
-	MessageBroker.Config getMessageBroker();
 
 	/**
 	 * Register an additional command.

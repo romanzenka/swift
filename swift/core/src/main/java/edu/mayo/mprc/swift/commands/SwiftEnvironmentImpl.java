@@ -5,8 +5,6 @@ import edu.mayo.mprc.MprcException;
 import edu.mayo.mprc.config.*;
 import edu.mayo.mprc.daemon.Daemon;
 import edu.mayo.mprc.daemon.DaemonConnection;
-import edu.mayo.mprc.daemon.MessageBroker;
-import edu.mayo.mprc.swift.db.DatabaseFileTokenFactory;
 import edu.mayo.mprc.swift.resources.ResourceTable;
 import edu.mayo.mprc.swift.resources.SwiftConfig;
 import edu.mayo.mprc.swift.search.SwiftSearcher;
@@ -30,7 +28,6 @@ import java.util.*;
 @Component("swiftEnvironment")
 public final class SwiftEnvironmentImpl implements SwiftEnvironment, ApplicationContextAware {
 	public static final String COMMAND_SUFFIX = "-command";
-	private DatabaseFileTokenFactory fileTokenFactory;
 	private Daemon.Factory daemonFactory;
 	private ResourceTable swiftFactory;
 
@@ -133,15 +130,6 @@ public final class SwiftEnvironmentImpl implements SwiftEnvironment, Application
 			}
 		}
 		return Joiner.on(", ").join(commands);
-	}
-
-	public DatabaseFileTokenFactory getFileTokenFactory() {
-		return fileTokenFactory;
-	}
-
-	@Resource(name = "fileTokenFactory")
-	public void setFileTokenFactory(final DatabaseFileTokenFactory fileTokenFactory) {
-		this.fileTokenFactory = fileTokenFactory;
 	}
 
 	public Daemon.Factory getDaemonFactory() {
@@ -264,19 +252,6 @@ public final class SwiftEnvironmentImpl implements SwiftEnvironment, Application
 	}
 
 	@Override
-	public MessageBroker.Config getMessageBroker() {
-		return getMessageBroker(getDaemonConfig());
-	}
-
-	public static MessageBroker.Config getMessageBroker(final DaemonConfig daemonConfig) {
-		final List<MessageBroker.Config> brokers = daemonConfig.getApplicationConfig().getModulesOfConfigType(MessageBroker.Config.class);
-		if (brokers.size() != 1) {
-			throw new MprcException("More than one message broker defined in this Swift install");
-		}
-		return brokers.get(0);
-	}
-
-	@Override
 	public void registerCommand(final String name, final SwiftCommand command) {
 		extraCommands.put(getBeanNameForCommand(name), command);
 	}
@@ -295,7 +270,6 @@ public final class SwiftEnvironmentImpl implements SwiftEnvironment, Application
 	public void start() {
 		if (!isRunning()) {
 			getDaemonFactory().start();
-			getFileTokenFactory().start();
 		}
 	}
 
@@ -303,7 +277,6 @@ public final class SwiftEnvironmentImpl implements SwiftEnvironment, Application
 	public void stop() {
 		if (isRunning()) {
 			getDaemonFactory().stop();
-			getFileTokenFactory().stop();
 		}
 	}
 }
