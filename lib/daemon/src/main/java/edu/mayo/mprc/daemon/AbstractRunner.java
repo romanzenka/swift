@@ -175,8 +175,6 @@ public abstract class AbstractRunner implements Checkable, Installable, Lifecycl
 				}
 			}
 
-			getDaemonConnection().stop();
-
 			synchronized (requestCount) {
 				while (requestCount.get() != 0) {
 					try {
