@@ -96,6 +96,7 @@ public final class SwiftEnvironmentImpl implements SwiftEnvironment, Application
 	@Override
 	public ExitCode runSwiftCommand(final SwiftCommand command, final File configFile) {
 		this.configFile = configFile;
+		commandLine = new SwiftCommandLine("fake-command", new ArrayList<String>(0), configFile, null, null, null);
 
 		if (!isRunning()) {
 			start();

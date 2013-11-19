@@ -77,9 +77,6 @@ public final class ConfigurationDataTest {
 		data.saveConfig(folder);
 		Assert.assertTrue(new File(folder, "conf/").exists(), "Configuration folder must exist");
 		Assert.assertTrue(new File(folder, "conf/swift.conf").exists(), "swift.conf config must exist");
-		Assert.assertTrue(
-				new File(folder, "main-run.bat").exists()
-						|| new File(folder, "main-run.sh").exists(), "Main executable must exist");
 		FileUtilities.quietDelete(folder);
 	}
 
