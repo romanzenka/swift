@@ -4,7 +4,7 @@ import edu.mayo.mprc.MprcException;
 import edu.mayo.mprc.database.Change;
 import edu.mayo.mprc.database.DaoTest;
 import edu.mayo.mprc.dbcurator.model.Curation;
-import edu.mayo.mprc.dbcurator.model.CurationDaoImpl;
+import edu.mayo.mprc.dbcurator.model.impl.CurationDaoImpl;
 import edu.mayo.mprc.fastadb.FastaDbDaoHibernate;
 import edu.mayo.mprc.fastadb.SingleDatabaseTranslator;
 import edu.mayo.mprc.searchdb.dao.*;

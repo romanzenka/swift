@@ -1,7 +1,7 @@
 package edu.mayo.mprc.dbcurator.model.curationsteps;
 
 import edu.mayo.mprc.database.DaoTest;
-import edu.mayo.mprc.dbcurator.model.CurationDaoImpl;
+import edu.mayo.mprc.dbcurator.model.impl.CurationDaoImpl;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 

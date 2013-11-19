@@ -1,9 +1,10 @@
-package edu.mayo.mprc.dbcurator.model;
+package edu.mayo.mprc.dbcurator.model.impl;
 
 import edu.mayo.mprc.MprcException;
 import edu.mayo.mprc.database.Change;
 import edu.mayo.mprc.database.DaoBase;
 import edu.mayo.mprc.database.Database;
+import edu.mayo.mprc.dbcurator.model.*;
 import edu.mayo.mprc.dbcurator.model.curationsteps.MakeDecoyStep;
 import edu.mayo.mprc.dbcurator.model.curationsteps.NewDatabaseInclusion;
 import edu.mayo.mprc.utilities.FileUtilities;
