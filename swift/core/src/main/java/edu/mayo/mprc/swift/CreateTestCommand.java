@@ -1,9 +1,7 @@
 package edu.mayo.mprc.swift;
 
 import com.google.common.collect.ImmutableMap;
-import edu.mayo.mprc.config.ResourceConfig;
 import edu.mayo.mprc.daemon.Daemon;
-import edu.mayo.mprc.database.Database;
 import edu.mayo.mprc.database.DatabaseUtilities;
 import edu.mayo.mprc.swift.commands.ExitCode;
 import edu.mayo.mprc.swift.commands.SwiftCommand;
@@ -19,14 +17,11 @@ public final class CreateTestCommand implements SwiftCommand {
 
 	@Override
 	public String getDescription() {
-		return "Internal command to set up the test database";
+		return "Internal command to set up the test context";
 	}
 
 	@Override
 	public ExitCode run(SwiftEnvironment environment) {
-		ResourceConfig database = environment.getDaemonConfig().firstResourceOfType(Database.Config.class);
-		environment.createResource(database);
-
 		daemon = environment.createDaemon(environment.getDaemonConfig());
 		ImmutableMap<String, String> installMap = new ImmutableMap.Builder<String, String>()
 				.put("action", DatabaseUtilities.SchemaInitialization.CreateDrop.getValue())
