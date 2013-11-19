@@ -263,10 +263,12 @@ public final class WebUi implements Checkable {
 					}
 
 					final Collection<SearchEngine> searchEngines = Lists.newArrayList();
-					for (final SearchEngine.Config engineConfig : searcherConfig.getEngines()) {
-						if (engineConfig.getWorker() != null) {
-							final SearchEngine engine = getSearchEngineFactory().create(engineConfig, dependencies);
-							searchEngines.add(engine);
+					if (searcherConfig.getEngines() != null) {
+						for (final SearchEngine.Config engineConfig : searcherConfig.getEngines()) {
+							if (engineConfig.getWorker() != null) {
+								final SearchEngine engine = getSearchEngineFactory().create(engineConfig, dependencies);
+								searchEngines.add(engine);
+							}
 						}
 					}
 					ui.setSearchEngines(searchEngines);

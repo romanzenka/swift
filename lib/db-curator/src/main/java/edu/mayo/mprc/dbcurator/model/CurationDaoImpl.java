@@ -4,6 +4,10 @@ import edu.mayo.mprc.MprcException;
 import edu.mayo.mprc.database.Change;
 import edu.mayo.mprc.database.DaoBase;
 import edu.mayo.mprc.database.Database;
+import edu.mayo.mprc.dbcurator.model.curationsteps.MakeDecoyStep;
+import edu.mayo.mprc.dbcurator.model.curationsteps.NewDatabaseInclusion;
+import edu.mayo.mprc.utilities.FileUtilities;
+import org.apache.log4j.Logger;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.criterion.Criterion;
@@ -13,6 +17,7 @@ import org.hibernate.criterion.Restrictions;
 import org.joda.time.DateTime;
 import org.springframework.stereotype.Repository;
 
+import javax.annotation.Resource;
 import java.io.File;
 import java.util.*;
 import java.util.regex.Matcher;
@@ -26,10 +31,18 @@ import java.util.regex.Pattern;
  */
 @Repository("curationDao")
 public final class CurationDaoImpl extends DaoBase implements CurationDao {
+	private static final Logger LOGGER = Logger.getLogger(CurationDaoImpl.class);
+
 	private List<Curation> allCurationList = null;
 	private Change legacyCurationChange = null;
+
+	private CurationContext context;
+
 	private static final String MODEL = "edu/mayo/mprc/dbcurator/model/";
 	private static final String STEPS = MODEL + "curationsteps/";
+
+	// Needed for initialization of the database
+	private static final String TEST_URL = "classpath:/edu/mayo/mprc/dbcurator/ShortTest.fasta.gz";
 
 	public CurationDaoImpl() {
 	}
@@ -446,5 +459,146 @@ public final class CurationDaoImpl extends DaoBase implements CurationDao {
 			throw new MprcException("Cannot get database header transformation by url " + forUrl, t);
 		}
 		return (matches == null || matches.isEmpty() ? null : matches.get(0));
+	}
+
+	@Override
+	public String check() {
+		LOGGER.info("Checking database curations");
+		if (countAll(Curation.class) == 0) {
+			return "There needs to be at least one FASTA database defined";
+		}
+		if (rowCount(HeaderTransform.class) == 0) {
+			return "There needs to be at least one FASTA header transformation preset available";
+		}
+		return null;
+	}
+
+	@Override
+	public void install(Map<String, String> params) {
+		LOGGER.info("Installing database curator data");
+
+		HeaderTransform sprotTrans = null;
+		HeaderTransform ipiTrans = null;
+		HeaderTransform ncbiTrans = null;
+		if (rowCount(HeaderTransform.class) == 0) {
+			LOGGER.info("Filling FASTA header transformation steps table");
+			sprotTrans = new HeaderTransform().setName("SwissProt General").setGroupString("^>([^|]*)\\|([^|]*)\\|(.*)$").setSubstitutionPattern(">$3 ($1) ($2)").setCommon(true);
+			addHeaderTransform(sprotTrans);
+			ipiTrans = new HeaderTransform().setName("IPI General").setGroupString("^>IPI:([^.^|^\\s]+)\\S* (Tax_Id=\\S+)?(?:Gene_Symbol=\\S+)?(.*)").setSubstitutionPattern(">$1 $3 $2").setCommon(true);
+			addHeaderTransform(ipiTrans);
+			ncbiTrans = new HeaderTransform().setName("NCBI General").setGroupString("^>(gi\\|([^| ]+)[^\\s]*)\\s([^\\x01\\r\\n]+)(.*)$").setSubstitutionPattern(">gi$2 $3 ;$1 $4").setCommon(true);
+			addHeaderTransform(ncbiTrans);
+		} else {
+			sprotTrans = getHeaderTransformByName("SwissProt General");
+			ipiTrans = getHeaderTransformByName("IPI General");
+			ncbiTrans = getHeaderTransformByName("NCBI General");
+		}
+
+		if (rowCount(FastaSource.class) == 0) {
+			LOGGER.info("Filling FASTA sources");
+			if (sprotTrans != null) {
+				addFastaSource(new FastaSource()
+						.setName("Sprot_complete")
+						.setUrl("ftp://ftp.expasy.org/databases/uniprot/current_release/knowledgebase/complete/uniprot_sprot.fasta.gz")
+						.setCommon(true)
+						.setTransform(sprotTrans));
+			}
+
+			if (ipiTrans != null) {
+				addFastaSource(new FastaSource()
+						.setName("IPI_Human")
+						.setUrl("ftp://ftp.ebi.ac.uk/pub/databases/IPI/current/ipi.HUMAN.fasta.gz")
+						.setCommon(true)
+						.setTransform(ipiTrans));
+
+				addFastaSource(new FastaSource()
+						.setName("IPI_Mouse")
+						.setUrl("ftp://ftp.ebi.ac.uk/pub/databases/IPI/current/ipi.MOUSE.fasta.gz")
+						.setCommon(true)
+						.setTransform(ipiTrans));
+			}
+
+			if (ncbiTrans != null) {
+				addFastaSource(new FastaSource()
+						.setName("NCBInr")
+						.setUrl("ftp://ftp.ncbi.nih.gov/blast/db/FASTA/nr.gz")
+						.setCommon(true)
+						.setTransform(ncbiTrans));
+			}
+
+			addFastaSource(new FastaSource()
+					.setName("ShortTest")
+					.setUrl("classpath:/edu/mayo/mprc/dbcurator/ShortTest.fasta.gz")
+					.setCommon(true)
+					.setTransform(null));
+		}
+		flush();
+
+		if (countAll(Curation.class) == 0) {
+			final Set<Curation> toExecute = new HashSet<Curation>();
+
+			if (TEST_URL != null) {
+				//if the database doesn't have a Sprot database then lets create one.
+				if (getCurationsByShortname("ShortTest").isEmpty()) {
+					LOGGER.debug("Creating Curation 'ShortTest' from " + TEST_URL);
+					final Curation shortTest = new Curation();
+					shortTest.setShortName("ShortTest");
+
+					shortTest.setTitle("Built-in");
+
+					final NewDatabaseInclusion step1 = new NewDatabaseInclusion();
+					step1.setUrl(TEST_URL);
+
+					shortTest.addStep(step1, /*position*/-1);
+
+					final MakeDecoyStep step3 = new MakeDecoyStep();
+					step3.setManipulatorType(MakeDecoyStep.REVERSAL_MANIPULATOR);
+					step3.setOverwriteMode(/*overwrite?*/false);
+					shortTest.addStep(step3, /*position*/-1);
+
+					toExecute.add(shortTest);
+				}
+
+			} else {
+				LOGGER.debug("Could not find a URL to apply to 'ShortTest'");
+			}
+
+			//execute the ones we decided to execute
+			final File localTempFolder = FileUtilities.createTempFolder();
+			try {
+				for (final Curation curation : toExecute) {
+					LOGGER.info("Executing curation: " + curation.getShortName());
+					final CurationExecutor executor = new CurationExecutor(curation, true, this, context.getFastaFolder(), localTempFolder, context.getFastaArchiveFolder());
+					// Execute the curation within our thread
+					executor.executeCuration();
+					final CurationStatus status = executor.getStatusObject();
+
+					for (final String message : status.getMessages()) {
+						LOGGER.debug(message);
+					}
+
+					//if we had a failure then let's figure out why
+					if (status.getFailedStepValidations() != null && !status.getFailedStepValidations().isEmpty()) {
+						LOGGER.error("Could not execute curation: " + curation.getShortName()
+								+ "\nStep validation failed:\n"
+								+ CurationExecutor.failedValidationsToString(status.getFailedStepValidations()));
+					}
+				}
+
+			} finally {
+				FileUtilities.cleanupTempFile(localTempFolder);
+			}
+
+			LOGGER.info("Done seeding Curation database tables.");
+		}
+	}
+
+	public CurationContext getContext() {
+		return context;
+	}
+
+	@Resource(name = "curationContext")
+	public void setContext(final CurationContext context) {
+		this.context = context;
 	}
 }

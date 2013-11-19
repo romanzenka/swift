@@ -9,6 +9,7 @@ import edu.mayo.mprc.swift.commands.SwiftCommandLine;
 import edu.mayo.mprc.swift.commands.SwiftEnvironment;
 import edu.mayo.mprc.swift.db.SwiftDao;
 import edu.mayo.mprc.swift.params2.ParamsDao;
+import edu.mayo.mprc.swift.resources.WebUi;
 import edu.mayo.mprc.swift.search.SwiftSearcher;
 import edu.mayo.mprc.utilities.FileUtilities;
 import org.apache.log4j.Logger;
@@ -101,7 +102,14 @@ public final class TestApplicationContext implements Lifecycle {
 				fastaFolder, fastaArchiveFolder, fastaUploadFolder,
 				null, null, null, null, null, null, null, null, null, null, database);
 
-		daemonConfig.addResource(new ServiceConfig("searcher1", new SimpleRunner.Config(searcherConfig)));
+		ServiceConfig searcherService = new ServiceConfig("searcher1", new SimpleRunner.Config(searcherConfig));
+
+		final WebUi.Config webUiConfig = new WebUi.Config(searcherService, "18080", "Swift Test", tempFolder, tempFolder, null, null);
+
+		daemonConfig.addResource(webUiConfig);
+
+
+		daemonConfig.addResource(searcherService);
 		return daemonConfig;
 	}
 

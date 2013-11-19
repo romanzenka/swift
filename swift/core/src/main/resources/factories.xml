@@ -104,10 +104,6 @@
         <property name="context" ref="swiftEnvironment" />
     </bean>
 
-    <bean id="curationInitializer" class="edu.mayo.mprc.swift.search.CurationInitializer">
-        <property name="curationDao" ref="curationDao" />
-    </bean>
-
     <bean id="messageBrokerFactory" class="edu.mayo.mprc.daemon.MessageBroker$Factory" />
 
     <bean id="searcherRuntimeInitializers" class="java.util.ArrayList">
@@ -116,7 +112,7 @@
                 <ref bean="workspaceDao" />
                 <ref bean="paramsDao" />
                 <ref bean="unimodDao" />
-                <ref bean="curationInitializer" />
+                <ref bean="curationDao" />
                 <ref bean="swiftDao" />
                 <ref bean="searchDbDao" />
             </list>

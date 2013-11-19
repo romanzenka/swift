@@ -1,5 +1,6 @@
 package edu.mayo.mprc.dbcurator.model;
 
+import edu.mayo.mprc.config.RuntimeInitializer;
 import edu.mayo.mprc.database.Change;
 import edu.mayo.mprc.database.Dao;
 import edu.mayo.mprc.database.Evolvable;
@@ -7,7 +8,7 @@ import org.joda.time.DateTime;
 
 import java.util.List;
 
-public interface CurationDao extends Dao {
+public interface CurationDao extends Dao, RuntimeInitializer {
 	/**
 	 * gets a curation with the given ID.  This also loads all associated objects.
 	 * <p/>
