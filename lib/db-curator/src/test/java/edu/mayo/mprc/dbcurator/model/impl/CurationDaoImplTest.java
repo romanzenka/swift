@@ -3,7 +3,7 @@ package edu.mayo.mprc.dbcurator.model.impl;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
-public final class CurationDaoTest {
+public final class CurationDaoImplTest {
 
 	@Test
 	public void shouldExtractUniqueName() {
