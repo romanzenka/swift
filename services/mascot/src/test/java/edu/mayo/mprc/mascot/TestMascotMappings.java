@@ -1,7 +1,6 @@
 package edu.mayo.mprc.mascot;
 
 import edu.mayo.mprc.dbcurator.model.CurationDao;
-import edu.mayo.mprc.dbcurator.model.MockCurationDao;
 import edu.mayo.mprc.swift.params2.MassUnit;
 import edu.mayo.mprc.swift.params2.MockParamsDao;
 import edu.mayo.mprc.swift.params2.ParamsDao;
@@ -15,6 +14,8 @@ import org.testng.annotations.Test;
 
 import java.io.Reader;
 import java.io.StringWriter;
+
+import static org.mockito.Mockito.mock;
 
 public final class TestMascotMappings {
 	private ParamsInfo abstractParamsInfo;
@@ -72,7 +73,7 @@ public final class TestMascotMappings {
 	}
 
 	public static ParamsInfo getAbstractParamsInfo() {
-		final CurationDao curationDao = new MockCurationDao();
+		final CurationDao curationDao = mock(CurationDao.class);
 		final UnimodDao unimodDao = new MockUnimodDao();
 		final ParamsDao paramsDao = new MockParamsDao();
 		return new ParamsInfoImpl(curationDao, unimodDao, paramsDao);

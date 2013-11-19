@@ -32,7 +32,7 @@ public final class MockUnimodDao implements UnimodDao {
 
 	@Override
 	public Unimod getDefaultUnimod() {
-		return null;  //To change body of implemented methods use File | Settings | File Templates.
+		return null;
 	}
 
 	@Override

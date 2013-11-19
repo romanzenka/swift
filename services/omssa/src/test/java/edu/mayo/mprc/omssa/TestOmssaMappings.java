@@ -1,7 +1,6 @@
 package edu.mayo.mprc.omssa;
 
 import edu.mayo.mprc.dbcurator.model.CurationDao;
-import edu.mayo.mprc.dbcurator.model.MockCurationDao;
 import edu.mayo.mprc.swift.params2.MockParamsDao;
 import edu.mayo.mprc.swift.params2.mapping.*;
 import edu.mayo.mprc.unimod.MockUnimodDao;
@@ -18,6 +17,8 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import static org.mockito.Mockito.mock;
+
 public final class TestOmssaMappings {
 
 	private static final Pattern ONE_MOD_PATTERN = Pattern.compile("\\Q<MSSearchSettings_fixed>\\E\\s*" +
@@ -26,7 +27,7 @@ public final class TestOmssaMappings {
 
 	@Test
 	public void shouldSupportLargeAmountOfMods() {
-		final CurationDao dao = new MockCurationDao();
+		final CurationDao dao = mock(CurationDao.class);
 		final ParamsInfo abstractParamsInfo = new ParamsInfoImpl(dao, new MockUnimodDao(), new MockParamsDao());
 		final OmssaMappingFactory mappingFactory = new OmssaMappingFactory();
 		final Mappings mapping = mappingFactory.createMapping();
