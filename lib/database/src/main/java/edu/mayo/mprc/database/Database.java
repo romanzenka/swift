@@ -36,18 +36,17 @@ public final class Database implements RuntimeInitializer, Lifecycle {
 	}
 
 	@Override
-	public void install(Map<String, String> params) {
+	public void install(final Map<String, String> params) {
 		LOGGER.info("Installing database");
 		final DatabaseUtilities.SchemaInitialization action = DatabaseUtilities.SchemaInitialization.getForValue(params.get("action"));
 		initializeSessionFactory(action);
 
 		LOGGER.info("Installing DAOs");
-		final HashMap<String, String> newParams = new HashMap<String, String>(params);
 		try {
 			beginTransaction();
 
 			for (final RuntimeInitializer initializer : runtimeInitializers) {
-				initializer.install(newParams);
+				initializer.install(params);
 				getSession().flush();
 				// We completely wipe out the caches between the initialization steps to prevent
 				// huge memory consumption.
