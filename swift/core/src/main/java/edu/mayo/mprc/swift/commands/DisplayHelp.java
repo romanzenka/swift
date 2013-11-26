@@ -1,6 +1,5 @@
 package edu.mayo.mprc.swift.commands;
 
-import edu.mayo.mprc.ReleaseInfoCore;
 import edu.mayo.mprc.utilities.FileUtilities;
 import org.apache.log4j.Logger;
 import org.springframework.stereotype.Component;
@@ -21,7 +20,6 @@ public class DisplayHelp implements SwiftCommand {
 	@Override
 	public ExitCode run(final SwiftEnvironment environment) {
 		try {
-			FileUtilities.out(ReleaseInfoCore.buildVersion());
 			FileUtilities.out("");
 			FileUtilities.out("This command starts Swift with the provided configuration parameters.");
 			FileUtilities.out("If you do not have a configuration file yet, please run Swift's web configuration first.");

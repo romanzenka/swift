@@ -38,7 +38,7 @@ public final class Swift {
 	static ExitCode runSwift(final String... args) {
 		MainFactoryContext.initialize();
 
-		LOGGER.info(ReleaseInfoCore.buildVersion());
+		LOGGER.info("Swift " + ReleaseInfoCore.buildVersion());
 		final CommandLineParser parser = new CommandLineParser(args);
 		final SwiftCommandLine commandLine = parser.getCommandLine();
 		if (commandLine.getError() != null) {
