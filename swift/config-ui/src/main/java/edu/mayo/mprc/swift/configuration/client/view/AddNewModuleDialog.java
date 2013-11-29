@@ -13,12 +13,17 @@ import java.util.Map;
 public final class AddNewModuleDialog extends DialogBox {
 	private final Map<DaemonModel, RadioButton> daemonRadios = new HashMap<DaemonModel, RadioButton>(3);
 	private final Map<String, RadioButton> typeRadios = new HashMap<String, RadioButton>(3);
-	private final Button okButton = new Button("Ok");
-	private final Button cancelButton = new Button("Cancel");
+	private final Button okButton;
+	private final Button cancelButton;
 	private final Context errorDisplay;
 
 	public AddNewModuleDialog(final ApplicationModel model, final List<String> types, final NewModuleCreatedCallback callback, final Context errorDisplay) {
 		super(false, true);
+		okButton = new Button("Ok");
+		okButton.addStyleName("btn");
+		cancelButton = new Button("Cancel");
+		okButton.addStyleName("btn");
+
 		this.errorDisplay = errorDisplay;
 		setTitle("Add new module");
 

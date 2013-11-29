@@ -1,14 +1,3 @@
-body, tr, th, td {
-    font-family: arial, sans-serif;
-    font-size: 13px;
-}
-
-body {
-    background-color: #fff;
-    border: 0;
-    padding: 5px;
-}
-
 #header {
     text-align: center;
 }
@@ -137,7 +126,7 @@ h1 {
     padding: 0 0 10px 0;
 }
 
-/* ----------------------------- */
+    /* ----------------------------- */
 
 .gwt-TabBar {
     background-color: #fff;
@@ -268,7 +257,7 @@ h1 {
     background: url(task_ok.gif) no-repeat 2px 2px;
 }
 
-/* the outside of the dialog */
+    /* the outside of the dialog */
 .gwt-DialogBox {
     background: #cde;
 }

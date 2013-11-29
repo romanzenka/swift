@@ -38,6 +38,7 @@ public final class ReferenceListBox extends SimplePanel implements SourcesChange
 
 	private void addCreateNewButton() {
 		createNew = new Button("Add new...");
+		createNew.addStyleName("btn");
 		createNew.addClickListener(new ClickListener() {
 			@Override
 			public void onClick(final Widget widget) {

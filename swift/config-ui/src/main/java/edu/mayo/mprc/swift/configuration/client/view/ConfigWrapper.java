@@ -31,6 +31,7 @@ public final class ConfigWrapper extends SimplePanel {
 		daemonsPanel.add(new Label("Daemons"));
 
 		newDaemonButton = new PushButton("Add new");
+		newDaemonButton.addStyleName("btn");
 		newDaemonButton.addStyleName("tree-item-pusbutton");
 		newDaemonButton.addClickListener(new ClickListener() {
 			@Override

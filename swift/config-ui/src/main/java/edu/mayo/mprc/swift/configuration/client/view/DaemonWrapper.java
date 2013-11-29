@@ -66,6 +66,7 @@ public final class DaemonWrapper extends SimplePanel {
 		}
 
 		newModuleButton = new Button("Add new module");
+		newModuleButton.addStyleName("btn");
 		newModuleButton.addStyleName("new-module-button");
 		newModuleButton.addClickListener(new ClickListener() {
 			@Override

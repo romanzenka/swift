@@ -42,6 +42,8 @@ public final class Configuration implements EntryPoint, Context {
 		errorPanel.add(multiErrorPanel = new VerticalPanel());
 
 		saveConfigurationButton = new Button("Save configuration");
+		saveConfigurationButton.addStyleName("btn");
+		saveConfigurationButton.addStyleName("btn-primary");
 		saveConfigurationButton.addClickListener(new ClickListener() {
 			@Override
 			public void onClick(final Widget widget) {

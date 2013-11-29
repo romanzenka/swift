@@ -197,6 +197,7 @@ public final class GwtUiBuilder implements UiBuilderClient {
 		panel.add(this.editor);
 
 		final Button test = new Button("Test");
+		test.addStyleName("btn");
 		panel.add(test);
 
 		final HTML testProgress = new HTML("&nbsp;");
