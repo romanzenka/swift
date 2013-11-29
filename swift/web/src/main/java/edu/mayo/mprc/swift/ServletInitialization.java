@@ -87,27 +87,32 @@ public final class ServletInitialization implements SwiftCommand, ServletContext
 	public ExitCode run(SwiftEnvironment environment) {
 		Daemon daemon = null;
 		try {
-			System.setProperty("SWIFT_INSTALL", environment.getConfigFile().getAbsolutePath());
+			File configFile = environment.getConfigFile();
+			System.setProperty("SWIFT_INSTALL", configFile.getAbsolutePath());
 
-			final DaemonConfig daemonConfig = environment.getDaemonConfig();
+			// Run the daemon only if we have a config file
+			// If no config is available, we need to switch to the config mode.
+			if (configFile.exists() && configFile.isFile() && configFile.canRead()) {
+				final DaemonConfig daemonConfig = environment.getDaemonConfig();
 
-			// WebUi needs reference to the actual daemon
-			daemon = environment.createDaemon(daemonConfig);
+				// WebUi needs reference to the actual daemon
+				daemon = environment.createDaemon(daemonConfig);
 
-			final WebUi webUi = webUiHolder.getWebUi();
+				final WebUi webUi = webUiHolder.getWebUi();
 
-			if (webUi == null) {
-				throw new MprcException("The daemon " + daemonConfig.getName() + " does not define any web interface module.");
+				if (webUi == null) {
+					throw new MprcException("The daemon " + daemonConfig.getName() + " does not define any web interface module.");
+				}
+				webUi.setMainDaemon(daemon);
+				getSwiftSearcherCaller().setSwiftSearcherConnection(webUi.getSwiftSearcherDaemonConnection());
+				getSwiftSearcherCaller().setBrowseRoot(webUi.getBrowseRoot());
+
+				// Start all the services
+				daemon.start();
+
+				// Start the ping monitor
+				getSwiftMonitor().start();
 			}
-			webUi.setMainDaemon(daemon);
-			getSwiftSearcherCaller().setSwiftSearcherConnection(webUi.getSwiftSearcherDaemonConnection());
-			getSwiftSearcherCaller().setBrowseRoot(webUi.getBrowseRoot());
-
-			// Start all the services
-			daemon.start();
-
-			// Start the ping monitor
-			getSwiftMonitor().start();
 
 		} catch (Exception t) {
 			LOGGER.fatal("Swift web application is terminating", t);

@@ -49,8 +49,8 @@ public final class CommandLineParser {
 		if (options.has("?")) {
 			command = DisplayHelp.COMMAND;
 		} else if (!options.has("daemon") && !options.has("sge") && !options.has("run")) {
-			error = "You must specify either the --daemon, --sge or --run options.";
-			command = DisplayHelp.COMMAND;
+			// If nothing is specified, we do the default run
+			command = SwiftCommandLine.DEFAULT_RUN_COMMAND;
 		} else if (options.has("sge") && options.has("run")) {
 			error = "--sge and --run options are mutually exclusive.";
 			command = DisplayHelp.COMMAND;

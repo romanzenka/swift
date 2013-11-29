@@ -9,6 +9,7 @@ import edu.mayo.mprc.swift.resources.WebUi;
 import edu.mayo.mprc.utilities.FileListener;
 import edu.mayo.mprc.utilities.FileMonitor;
 import edu.mayo.mprc.utilities.FileUtilities;
+import edu.mayo.mprc.utilities.MonitorUtilities;
 import org.apache.log4j.Logger;
 import org.mortbay.component.AbstractLifeCycle;
 import org.mortbay.jetty.Connector;
@@ -102,7 +103,12 @@ public final class Launcher implements FileListener {
 	private Server runWebServer(final SwiftEnvironment environment, final boolean configMode) {
 		final File warFile = new File("lib/swift-web-3.5-SNAPSHOT.war");
 
-		final String daemonId = swiftEnvironment.getDaemonConfig().getName();
+		final String daemonId;
+		if (configMode) {
+			daemonId = MonitorUtilities.getShortHostname();
+		} else {
+			daemonId = swiftEnvironment.getDaemonConfig().getName();
+		}
 		final int portNumber = getPortNumber(environment, configMode);
 		final File tempFolder = getTempFolder(environment, configMode);
 
