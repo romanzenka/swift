@@ -26,6 +26,8 @@ public class DisplayHelp implements SwiftCommand {
 			FileUtilities.out("");
 			FileUtilities.out("Usage:");
 			environment.getOptionParser().printHelpOn(System.out);
+			FileUtilities.out("Supported Swift commands:");
+			FileUtilities.out(environment.listSupportedCommands());
 			return ExitCode.Ok;
 		} catch (Exception t) {
 			LOGGER.fatal("Could not display help message.", t);

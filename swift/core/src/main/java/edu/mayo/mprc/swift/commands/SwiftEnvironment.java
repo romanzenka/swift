@@ -107,4 +107,9 @@ public interface SwiftEnvironment extends RunningApplicationContext, Lifecycle {
 	 * @param command Command to be added to the list
 	 */
 	void registerCommand(String name, SwiftCommand command);
+
+	/**
+	 * @return A comma-separated list of command names.
+	 */
+	String listSupportedCommands();
 }

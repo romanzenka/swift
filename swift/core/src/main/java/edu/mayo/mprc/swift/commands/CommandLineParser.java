@@ -26,14 +26,14 @@ public final class CommandLineParser {
 	 */
 	OptionParser setupParser() {
 		parser = new OptionParser();
+		parser.accepts("run", "A Swift command to run. When missing, Swift will run all workers configured for the specified daemon.")
+				.withRequiredArg().describedAs("Swift command").ofType(String.class);
 		parser.accepts("install", "Installation config file. Default is " + Swift.CONFIG_FILE_NAME + ". Please run the Swift configuration to obtain this file.")
 				.withRequiredArg().ofType(File.class);
 		parser.accepts("daemon", "Specify the daemon (this describes the environment of the current run) as it was set up during the configuration. When no name is given, the configuration has to contain exactly one daemon, otherwise an error is produced.")
 				.withOptionalArg().ofType(String.class).describedAs("name");
-		parser.accepts("run", "A Swift command to run. When missing, Swift will run all workers configured for the specified daemon.")
-				.withRequiredArg().describedAs("Swift command").ofType(String.class);
-		parser.accepts("sge", "Process a single work packet and exit. Used for jobs submitted through the Sun Grid Engine (SGE).")
-				.withRequiredArg().describedAs("XML file describing SGE job").ofType(String.class);
+		parser.accepts("sge", "Process a single work packet and exit. Used for jobs submitted through the Sun Grid Engine (SGE). The file contains all input parameters encoded in XML format.")
+				.withRequiredArg().describedAs("XML file").ofType(String.class);
 		parser.acceptsAll(Arrays.asList("help", "?"), "Show this help screen");
 		return parser;
 	}

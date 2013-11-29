@@ -136,7 +136,7 @@ public final class SwiftEnvironmentImpl implements SwiftEnvironment, Application
 	/**
 	 * @return A comma-separated list of command names.
 	 */
-	private String listSupportedCommands() {
+	public String listSupportedCommands() {
 		final String[] commands = applicationContext.getBeanNamesForType(SwiftCommand.class);
 		Arrays.sort(commands);
 		for (int i = 0; i < commands.length; i++) {
