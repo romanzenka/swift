@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="ISO-8859-1"?>
-<MzIdentML xmlns="http://psidev.info/psi/pi/mzIdentML/1.1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" id="$$WORK_DIR$$/$$BASE$$.mgf $$DB$$ MyriMatch 2.1.120" creationDate="$$TIME$$" version="1.1.0" xsi:schemaLocation="http://psidev.info/psi/pi/mzIdentML/1.1 ../schema/mzIdentML1.1.0.xsd">
+<?xml version="1.0" encoding="ISO-8859-1"?><MzIdentML xmlns="http://psidev.info/psi/pi/mzIdentML/1.1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" id="$$WORK_DIR$$/$$BASE$$.mgf $$DB$$ MyriMatch 2.1.120" creationDate="$$TIME$$" version="1.1.0" xsi:schemaLocation="http://psidev.info/psi/pi/mzIdentML/1.1 ../schema/mzIdentML1.1.0.xsd">
 <cvList>
 <cv id="MS" fullName="Proteomics Standards Initiative Mass Spectrometry Ontology" version="3.18.0" uri="http://psidev.cvs.sourceforge.net/*checkout*/psidev/psi/psi-ms/mzML/controlledVocabulary/psi-ms.obo"/>
 <cv id="UNIMOD" fullName="UNIMOD" version="2012-02-15" uri="http://www.unimod.org/obo/unimod.obo"/>
