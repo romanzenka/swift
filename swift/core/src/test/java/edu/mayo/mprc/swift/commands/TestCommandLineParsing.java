@@ -39,8 +39,7 @@ public final class TestCommandLineParsing {
 	public void shouldNoticeMissingParams() {
 		final CommandLineParser parser = new CommandLineParser(new String[]{"?"});
 		final SwiftCommandLine cmd = parser.getCommandLine();
-		Assert.assertEquals(cmd.getCommand(), "help");
-		Assert.assertEquals(cmd.getError(), "You must specify either the --daemon, --sge or --run options.");
+		Assert.assertEquals(cmd.getCommand(), "run-swift");
 	}
 
 	@Test
