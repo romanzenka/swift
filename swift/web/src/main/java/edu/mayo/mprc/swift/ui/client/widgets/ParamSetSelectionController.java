@@ -41,9 +41,6 @@ public final class ParamSetSelectionController implements ChangeListener {
 
 	public void setSelector(final ParamsSelector selector) {
 		this.selector = selector;
-		if (list != null) {
-			selector.update(list.getList(), getDefaultParamSetId());
-		}
 		selector.addChangeListener(this);
 	}
 
@@ -85,27 +82,30 @@ public final class ParamSetSelectionController implements ChangeListener {
 	}
 
 	public void setParamSetList(final ClientParamSetList newList) {
-		final boolean prime = list == null;
 		list = newList;
 		final List<ClientParamSet> arr = list.getList();
 		paramSetIndices.clear();
 		for (int i = 0; i < arr.size(); ++i) {
 			paramSetIndices.put(arr.get(i), i);
 		}
-		selector.update(list.getList(), getDefaultParamSetId());
-		if (prime) {
-			int index = 0;
-			final int defaultParamSetId = getDefaultParamSetId();
-			// Find param set with the default id
-			for (int i = 0; i < arr.size(); i++) {
-				if (arr.get(i).getId() == defaultParamSetId) {
-					index = i;
-					break;
-				}
+	}
+
+	public void setDefaultParameterSet() {
+		if (list == null) {
+			return; // We cannot do this if list is not set
+		}
+		int index = 0;
+		final int defaultParamSetId = getDefaultParamSetId();
+		// Find param set with the default id
+		final List<ClientParamSet> arr = list.getList();
+		for (int i = 0; i < arr.size(); i++) {
+			if (arr.get(i).getId() == defaultParamSetId) {
+				index = i;
+				break;
 			}
-			if (!arr.isEmpty()) {
-				select(arr.get(index));  // bootstrap by selecting the default value.
-			}
+		}
+		if (!arr.isEmpty()) {
+			select(arr.get(index));  // bootstrap by selecting the default value.
 		}
 	}
 

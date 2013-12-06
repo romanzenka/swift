@@ -182,7 +182,7 @@ public final class SimpleParamsEditorPanel implements SourcesChangeEvents {
 			p.add(pb);
 
 			//Add undeployer link if enabled.
-			if(pageData.isDatabaseUndeployerEnabled()) {
+			if (pageData.isDatabaseUndeployerEnabled()) {
 				final PushButton du = new PushButton("Undeploy Database");
 				du.addStyleName(ACTION_LINK);
 				du.setTitle("Click here to undeploy database from search engines.");
@@ -365,6 +365,9 @@ public final class SimpleParamsEditorPanel implements SourcesChangeEvents {
 
 		validationController.setEnabled(false);
 		selectionController.setParamSetList(pageData.getParamSetList());
+		if (pageData.loadedSearch() == null) {
+			selectionController.setDefaultParameterSet();
+		}
 
 		validationController.addChangeListener(new ChangeListener() {
 			@Override
