@@ -1,5 +1,5 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>edu.mayo.mprc</groupId>
     <artifactId>swift-web</artifactId>
@@ -43,13 +43,6 @@
             <groupId>edu.mayo.mprc</groupId>
             <artifactId>swift-core</artifactId>
             <version>3.5-SNAPSHOT</version>
-        </dependency>
-
-        <dependency>
-            <groupId>edu.mayo.mprc.swift</groupId>
-            <artifactId>heme-ui</artifactId>
-            <version>3.5-SNAPSHOT</version>
-            <type>war</type>
         </dependency>
 
         <!-- Supports RSS feed generation -->
@@ -158,7 +151,7 @@
                         <module>edu.mayo.mprc.common.Common</module>
                         <module>edu.mayo.mprc.swift.configuration.Configuration</module>
                     </modules>
-                    <style>OBF</style>
+                    <style>DETAILED</style>
                 </configuration>
             </plugin>
 
@@ -171,16 +164,9 @@
                     <archive>
                         <manifest>
                             <addClasspath>true</addClasspath>
-                            <classpathPrefix/>
+                            <classpathPrefix />
                         </manifest>
                     </archive>
-                    <!-- Overlay the Heme Pathology stuff on top of this project -->
-                    <overlays>
-                        <overlay>
-                            <groupId>edu.mayo.mprc.swift</groupId>
-                            <artifactId>heme-ui</artifactId>
-                        </overlay>
-                    </overlays>
                 </configuration>
             </plugin>
 
@@ -199,6 +185,46 @@
             </plugin>
         </plugins>
     </build>
+
+    <profiles>
+        <profile>
+            <id>heme</id>
+            <dependencies>
+                <dependency>
+                    <groupId>edu.mayo.mprc.swift</groupId>
+                    <artifactId>heme-ui</artifactId>
+                    <version>3.5-SNAPSHOT</version>
+                    <type>war</type>
+                </dependency>
+            </dependencies>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-war-plugin</artifactId>
+                        <configuration>
+                            <!-- We make a skinny war that expects the .jar files on the classpath -->
+                            <packagingExcludes>WEB-INF/lib/*</packagingExcludes>
+                            <archive>
+                                <manifest>
+                                    <addClasspath>true</addClasspath>
+                                    <classpathPrefix />
+                                </manifest>
+                            </archive>
+                            <!-- Overlay the Heme Pathology stuff on top of this project -->
+                            <overlays>
+                                <overlay>
+                                    <groupId>edu.mayo.mprc.swift</groupId>
+                                    <artifactId>heme-ui</artifactId>
+                                </overlay>
+                            </overlays>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
+
     <reporting>
         <plugins>
             <plugin>
