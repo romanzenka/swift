@@ -1,5 +1,6 @@
 package edu.mayo.mprc.swift.configuration.server;
 
+import com.google.common.base.Joiner;
 import edu.mayo.mprc.GWTServiceExceptionFactory;
 import edu.mayo.mprc.MprcException;
 import edu.mayo.mprc.common.client.GWTServiceException;
@@ -20,6 +21,7 @@ import edu.mayo.mprc.swift.resources.WebUi;
 import edu.mayo.mprc.swift.search.SwiftSearcher;
 import edu.mayo.mprc.utilities.FileUtilities;
 import edu.mayo.mprc.utilities.exceptions.ExceptionUtilities;
+import org.apache.log4j.Logger;
 
 import java.io.File;
 import java.text.MessageFormat;
@@ -37,6 +39,8 @@ import java.util.Map;
  * </p>
  */
 public class ConfigurationData {
+	private static final Logger LOGGER = Logger.getLogger(ConfigurationData.class);
+
 	private ApplicationConfig config;
 	private DependencyResolver resolver;
 	private HashMap<ConcreteProperty, PropertyChangeListener> listeners = new HashMap<ConcreteProperty, PropertyChangeListener>(100);
@@ -392,6 +396,14 @@ public class ConfigurationData {
 		final DaemonConfig daemonConfig = createDaemonConfig("main", true);
 
 		final Database.Config database = (Database.Config) createResourceConfig(1, Database.Factory.TYPE, daemonConfig);
+		database.setUrl("jdbc:h2:var/database/swift");
+		database.setUserName("sa");
+		database.setPassword("");
+		database.setDriverClassName("org.h2.Driver");
+		database.setDialect("org.hibernate.dialect.HSQLDialect");
+		database.setSchema("PUBLIC");
+		database.setDefaultSchema("PUBLIC");
+
 		createResourceConfig(1, MessageBroker.TYPE, daemonConfig);
 		final ServiceConfig searcher = (ServiceConfig) createResourceConfig(1, SwiftSearcher.TYPE, daemonConfig);
 		final WebUi.Config webUi = (WebUi.Config) createResourceConfig(1, WebUi.TYPE, daemonConfig);
@@ -422,9 +434,11 @@ public class ConfigurationData {
 			uiChanges.displayPropertyError(applicationConfig, null, error);
 		}
 
-		if (errorList.size() == 0) {
+		if (errorList.isEmpty()) {
 			applicationConfig.save(configFile, getResourceTable());
 			environment.runSwiftCommand(installCommand, configFile);
+		} else {
+			LOGGER.warn("Swift configuration is not valid:\n\t" + Joiner.on("\n\t").join(errorList).toString());
 		}
 
 		return uiChanges.getReplayer();
