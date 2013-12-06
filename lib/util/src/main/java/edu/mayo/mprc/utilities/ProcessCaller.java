@@ -60,6 +60,8 @@ public final class ProcessCaller implements Runnable {
 	private InputStream inputStream;
 	private StreamDrainer outputStreamDrainer;
 	private StreamDrainer errorStreamDrainer;
+	private Thread outputPipe;
+	private Thread errorPipe;
 	private Timer timer;
 	private AtomicLong killAtTime = new AtomicLong();
 	private AtomicLong warnAtTime = new AtomicLong();
@@ -89,12 +91,54 @@ public final class ProcessCaller implements Runnable {
 			throw new MprcException("The process was already started");
 		}
 		try {
-			runProcess();
+			runProcess(false);
 		} catch (Exception t) {
 			throw new MprcException("Process execution failed", t);
 		} finally {
 			clearKillTimeout();
 		}
+	}
+
+	/**
+	 * Execute the process defined by the string builder and exit. The process can be killed subsequently
+	 * by calling the {@link #kill} method that also ensures the proper cleanup.
+	 * candidate to be run within a {@link Thread}.
+	 */
+	public void runInBackground() {
+		if (isAlreadyStarted()) {
+			throw new MprcException("The process was already started");
+		}
+		try {
+			runProcess(true);
+		} catch (Exception t) {
+			throw new MprcException("Process execution failed", t);
+		} finally {
+			clearKillTimeout();
+		}
+	}
+
+	/**
+	 * Kill the process that was running in the background via {@link #runInBackground()}.
+	 * You need to clean up after the process using {@link #waitFor()}.
+	 */
+	public void kill() {
+		if (isAlreadyStarted()) {
+			process.destroy();
+		}
+	}
+
+	/**
+	 * Wait for the process to terminate. Cleanup after it.
+	 * Do not call from {@link LogMonitor} instances.
+	 */
+	public void waitFor() {
+		try {
+			process.waitFor();
+		} catch (InterruptedException e) {
+			// SWALLOWED: We ignore interrupts
+			LOGGER.warn("Interrupted wait for process", e);
+		}
+		finalCleanup();
 	}
 
 	/**
@@ -197,12 +241,10 @@ public final class ProcessCaller implements Runnable {
 		return process == null ? -1 : process.exitValue();
 	}
 
-	private void runProcess() throws InterruptedException {
+	private void runProcess(boolean background) throws InterruptedException {
 		if (outputLogger != null) {
 			LOGGER.info("Running process:" + getCallDescription());
 		}
-		Thread outputPipe = null;
-		Thread errorPipe = null;
 		try {
 			process = builder.start();
 
@@ -227,30 +269,42 @@ public final class ProcessCaller implements Runnable {
 				setupKillTimer();
 			}
 
-			process.waitFor();
+			if (!background) {
+				process.waitFor();
+			}
 		} catch (IOException e) {
 			throw new MprcException(e);
 		} finally {
-			// Wait for the pipes to stop piping - give them up to a minute
-			try {
-				if (outputPipe != null) {
-					outputPipe.join(PIPE_TIMEOUT);
-				}
-				if (errorPipe != null) {
-					errorPipe.join(PIPE_TIMEOUT);
-				}
-			} finally {
-				if (process != null) {
-					FileUtilities.closeQuietly(process.getErrorStream());
-					FileUtilities.closeQuietly(process.getInputStream());
-					FileUtilities.closeQuietly(process.getOutputStream());
-					// Destroy the process
-					process.destroy();
-				}
+			if (!background) {
+				finalCleanup();
 			}
 		}
 		if (killed) {
 			throw new MprcException("The process hung and was killed: " + getFailedCallDescription());
+		}
+	}
+
+	private void finalCleanup() {
+		// Wait for the pipes to stop piping - give them up to a minute
+		try {
+			if (outputPipe != null) {
+				outputPipe.join(PIPE_TIMEOUT);
+			}
+			if (errorPipe != null) {
+				errorPipe.join(PIPE_TIMEOUT);
+			}
+		} catch (InterruptedException e) {
+			// SWALLOWED: Ignore interrupts
+		} finally {
+			if (process != null) {
+				FileUtilities.closeQuietly(process.getErrorStream());
+				FileUtilities.closeQuietly(process.getInputStream());
+				FileUtilities.closeQuietly(process.getOutputStream());
+				// Destroy the process
+				process.destroy();
+				outputPipe = null;
+				errorPipe = null;
+			}
 		}
 	}
 
