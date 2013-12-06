@@ -88,6 +88,7 @@ public final class ParamSetSelectionController implements ChangeListener {
 		for (int i = 0; i < arr.size(); ++i) {
 			paramSetIndices.put(arr.get(i), i);
 		}
+		selector.update(list.getList());
 	}
 
 	public void setDefaultParameterSet() {
