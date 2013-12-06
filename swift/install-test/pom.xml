@@ -23,6 +23,16 @@
             <artifactId>util</artifactId>
             <version>3.5-SNAPSHOT</version>
         </dependency>
+        <dependency>
+            <groupId>edu.mayo.mprc.swift</groupId>
+            <artifactId>swift-config-ui</artifactId>
+            <version>3.5-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>com.gdevelop.syncrpc</groupId>
+            <artifactId>syncproxy</artifactId>
+            <version>0.3</version>
+        </dependency>
     </dependencies>
 
     <build>

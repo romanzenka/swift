@@ -1,0 +1,138 @@
+import com.gdevelop.gwt.syncrpc.SyncProxy;
+import edu.mayo.mprc.MprcException;
+import edu.mayo.mprc.common.client.GWTServiceException;
+import edu.mayo.mprc.swift.configuration.client.model.ConfigurationService;
+import edu.mayo.mprc.utilities.FileUtilities;
+import edu.mayo.mprc.utilities.LogMonitor;
+import edu.mayo.mprc.utilities.ProcessCaller;
+import edu.mayo.mprc.utilities.ResourceUtilities;
+import org.apache.log4j.Logger;
+import org.testng.Assert;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.Test;
+
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Properties;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+/**
+ * @author Roman Zenka
+ */
+@Test(sequential = true)
+public final class SwiftTest {
+	private static final Logger LOGGER = Logger.getLogger(SwiftTest.class);
+
+	public static final long CONFIG_TIMEOUT = (long) (120 * 1000);
+	private static final Pattern URL_PATTERN = Pattern.compile(".*Please point your web client to (.*)");
+	private String url;
+	private Object swiftEvent = new Object();
+	private boolean shouldEnd;
+	private String serverFail;
+
+	private File directory;
+
+	@BeforeClass
+	public void init() {
+		final Properties properties = getPropertiesFromClasspath("classpath:test.properties");
+		directory = new File(properties.getProperty("home"));
+	}
+
+	@Test
+	public void shouldRunHelp() {
+		final ProcessBuilder builder = new ProcessBuilder()
+				.directory(directory)
+				.command("java",
+						"-Dlog4j.configuration=file://" + new File(directory, "conf/log4j.properties").getAbsolutePath(),
+						"-cp", new File(directory, "lib").getAbsolutePath() + "/*",
+						"edu.mayo.mprc.swift.Swift",
+						"--run", "help");
+		final ProcessCaller caller = new ProcessCaller(builder);
+		caller.runAndCheck("swift", 0);
+		System.out.print(caller.getOutputLog());
+	}
+
+	/**
+	 * This should start swift in configuration mode.
+	 */
+	@Test
+	public void shouldConfigure() {
+		final ProcessBuilder builder = new ProcessBuilder()
+				.directory(directory)
+				.command("java",
+						// "-agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=15000",
+						"-Dlog4j.configuration=file://" + new File(directory, "conf/log4j.properties").getAbsolutePath(),
+						"-cp", new File(directory, "lib").getAbsolutePath() + "/*",
+						"edu.mayo.mprc.swift.Swift");
+		final ProcessCaller caller = new ProcessCaller(builder);
+		caller.setKillTimeout(CONFIG_TIMEOUT);
+		caller.setOutputMonitor(new LogMonitor() {
+			@Override
+			public void line(String line) {
+				LOGGER.debug(line);
+				Matcher matcher = URL_PATTERN.matcher(line);
+				if (matcher.matches()) {
+					synchronized (swiftEvent) {
+						url = matcher.group(1);
+						swiftEvent.notifyAll();
+					}
+				} else if (line.contains("Swift web server could not be launched.") || line.contains("Swift configuration is not valid")) {
+					LOGGER.error("The server failed to run: " + line);
+					synchronized (swiftEvent) {
+						shouldEnd = true;
+						serverFail = line;
+						swiftEvent.notifyAll();
+					}
+					caller.kill();
+				}
+			}
+		});
+		caller.runInBackground();
+		while (true) {
+			synchronized (swiftEvent) {
+				try {
+					swiftEvent.wait(CONFIG_TIMEOUT);
+					if (shouldEnd) {
+						break;
+					}
+					if (url != null) {
+						// We started Swift up
+						LOGGER.info(url);
+						ConfigurationService service = (ConfigurationService)
+								SyncProxy.newProxyInstance(ConfigurationService.class, url + "/configuration/", "ConfigurationService");
+						shouldEnd = true;
+						try {
+							service.loadConfiguration();
+							service.saveConfiguration();
+						} catch (GWTServiceException e) {
+							break;
+						}
+					}
+				} catch (InterruptedException ignore) {
+					// Ignore interrupts
+				}
+			}
+		}
+		caller.waitFor();
+		if (serverFail != null) {
+			Assert.fail("Server failed: " + serverFail);
+		}
+
+		System.out.print(caller.getOutputLog());
+	}
+
+	private Properties getPropertiesFromClasspath(final String path) {
+		final Properties properties = new Properties();
+		final InputStream stream = ResourceUtilities.getStream(path, SwiftTest.class);
+		try {
+			properties.load(stream);
+		} catch (IOException e) {
+			throw new MprcException("Failed loading test property file", e);
+		} finally {
+			FileUtilities.closeQuietly(stream);
+		}
+		return properties;
+	}
+}
