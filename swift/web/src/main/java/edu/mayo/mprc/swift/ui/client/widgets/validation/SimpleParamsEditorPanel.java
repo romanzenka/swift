@@ -358,6 +358,9 @@ public final class SimpleParamsEditorPanel implements SourcesChangeEvents {
 
 		validationController.setEnabled(false);
 		selectionController.setParamSetList(pageData.getParamSetList());
+		if (pageData.loadedSearch() == null) {
+			selectionController.setDefaultParameterSet();
+		}
 
 		validationController.addChangeListener(new ChangeListener() {
 			@Override
