@@ -1,7 +1,6 @@
-package edu.mayo.mprc.launcher;
+package edu.mayo.mprc.swift.commands;
 
 import edu.mayo.mprc.config.DaemonConfig;
-import edu.mayo.mprc.swift.commands.SwiftEnvironment;
 import edu.mayo.mprc.swift.resources.WebUi;
 import edu.mayo.mprc.utilities.FileUtilities;
 import edu.mayo.mprc.utilities.TestingUtilities;

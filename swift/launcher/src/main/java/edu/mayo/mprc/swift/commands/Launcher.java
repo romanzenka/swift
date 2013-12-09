@@ -1,10 +1,8 @@
-package edu.mayo.mprc.launcher;
+package edu.mayo.mprc.swift.commands;
 
 import edu.mayo.mprc.MprcException;
 import edu.mayo.mprc.config.DaemonConfig;
 import edu.mayo.mprc.config.ResourceConfig;
-import edu.mayo.mprc.swift.commands.ExitCode;
-import edu.mayo.mprc.swift.commands.SwiftEnvironment;
 import edu.mayo.mprc.swift.resources.WebUi;
 import edu.mayo.mprc.utilities.FileListener;
 import edu.mayo.mprc.utilities.FileMonitor;

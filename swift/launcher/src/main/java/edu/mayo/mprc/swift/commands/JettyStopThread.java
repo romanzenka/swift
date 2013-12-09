@@ -1,4 +1,4 @@
-package edu.mayo.mprc.launcher;
+package edu.mayo.mprc.swift.commands;
 
 import edu.mayo.mprc.utilities.MonitorUtilities;
 import org.apache.log4j.Logger;
