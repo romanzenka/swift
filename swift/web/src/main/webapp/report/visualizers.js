@@ -6,7 +6,7 @@ function AbstractItemVisualizer() {
 
 // Creates a wrapper to hold the rendered item contents, sets its id to the given one
 // and fills it with contents
-AbstractItemVisualizer.prototype.render = function(id, object, elementType) {
+AbstractItemVisualizer.prototype.render = function (id, object, elementType) {
     var element = document.createElement(elementType);
     element.id = id;
     this.fillWithContents(element, id, object);
@@ -14,7 +14,7 @@ AbstractItemVisualizer.prototype.render = function(id, object, elementType) {
 };
 
 // Renders object of given id and data into a given element
-AbstractItemVisualizer.prototype.fillWithContents = function(element, id, object) {
+AbstractItemVisualizer.prototype.fillWithContents = function (element, id, object) {
     var contents;
     if (object != null)
         contents = document.createTextNode("Object '" + id + "' = " + object.toString());
@@ -24,7 +24,7 @@ AbstractItemVisualizer.prototype.fillWithContents = function(element, id, object
 };
 
 // Updates information for already rendered object
-AbstractItemVisualizer.prototype.update = function(element, object) {
+AbstractItemVisualizer.prototype.update = function (element, object) {
     removeChildrenExcept(element, /noRemove/i);
     this.fillWithContents(element, element.id, object);
 };
@@ -34,8 +34,8 @@ function SearchRunItemVisualizer() {
 }
 SearchRunItemVisualizer.prototype = new AbstractItemVisualizer();
 
-SearchRunItemVisualizer.prototype.toggleExpanded = function(evt, id, object) {
-    var element = $(Event.element(evt)).up(3); // a 0-> td 1-> tr 2-> fragment
+SearchRunItemVisualizer.prototype.toggleExpanded = function (evt, id, object) {
+    var element = $(evt.findElement('a')).up(2); // a 1-> td 2-> tr
     Event.stop(evt);
     object.expanded = !object.expanded;
     this.update(element, object);
@@ -44,12 +44,12 @@ SearchRunItemVisualizer.prototype.toggleExpanded = function(evt, id, object) {
         new Ajax.Request('reportupdate',
             {
                 method: 'get',
-                parameters : { action : 'expand', id : objectId }
+                parameters: { action: 'expand', id: objectId }
             });
     }
 };
 
-SearchRunItemVisualizer.prototype.render = function(id, object, elementType) {
+SearchRunItemVisualizer.prototype.render = function (id, object, elementType) {
     var element = document.createElement(elementType);
     this.fillWithContents(element, id, object);
     return element;
@@ -64,11 +64,11 @@ SearchRunItemVisualizer.prototype.multiResultTailTemplate = new Template('</span
     '<a href="#{parentUrl}../qa/index.html" class="qa-link" title="Quality Analysis">QA</a>' +
     '</td></tr></table>');
 
-SearchRunItemVisualizer.prototype.displayTransactionError = function(event, message) {
+SearchRunItemVisualizer.prototype.displayTransactionError = function (event, message) {
     alert(message);
 };
 
-SearchRunItemVisualizer.prototype.getParentFile = function(filename) {
+SearchRunItemVisualizer.prototype.getParentFile = function (filename) {
     var i = filename.lastIndexOf('/');
     if (i < 0) {
         return "";
@@ -76,7 +76,7 @@ SearchRunItemVisualizer.prototype.getParentFile = function(filename) {
     return filename.substr(0, i);
 };
 
-SearchRunItemVisualizer.prototype.confirmRerun = function(event, id, title) {
+SearchRunItemVisualizer.prototype.confirmRerun = function (event, id, title) {
     if (!window.confirm("Are you sure you want to restart search " + title + " (id=" + id + ") ?\n\n"
         + "You should only restart searches that are not currently running."
     )) {
@@ -84,7 +84,7 @@ SearchRunItemVisualizer.prototype.confirmRerun = function(event, id, title) {
     }
 };
 
-SearchRunItemVisualizer.prototype.confirmHide = function(event, id, title) {
+SearchRunItemVisualizer.prototype.confirmHide = function (event, id, title) {
     if (!window.confirm("Are you sure you want to hide search " + title + " (id=" + id + ") ?\n\n"
         + "After a search was hidden, it takes an admin to unhide it again.")) {
         Event.stop(event);
@@ -92,7 +92,7 @@ SearchRunItemVisualizer.prototype.confirmHide = function(event, id, title) {
 };
 
 // Splits a path string into several parts that are set as on the fileinfo object
-SearchRunItemVisualizer.prototype.splitPathIntoParts = function(originalPath, fileInfo) {
+SearchRunItemVisualizer.prototype.splitPathIntoParts = function (originalPath, fileInfo) {
     // The path is absolute, while pathWebPrefix maps to the web root
     // We must trim the path so it is relative to web root
 
@@ -105,7 +105,7 @@ SearchRunItemVisualizer.prototype.splitPathIntoParts = function(originalPath, fi
     return fileInfo;
 };
 
-SearchRunItemVisualizer.prototype.fillWithContents = function(fragment, id, object) {
+SearchRunItemVisualizer.prototype.fillWithContents = function (fragment, id, object) {
     if (object != null) {
         var element = document.createElement("tr");
         element.id = id;
@@ -121,7 +121,7 @@ SearchRunItemVisualizer.prototype.fillWithContents = function(fragment, id, obje
         // ------------------------------------------------------------------
         var tdTitle = document.createElement('td');
         tdTitle.appendChild(document.createTextNode(object.title));
-        if(object.ranTooLong) {
+        if (object.ranTooLong) {
             tdTitle.className = "ran-too-long";
         }
         var title = element.appendChild(tdTitle);
@@ -220,7 +220,7 @@ SearchRunItemVisualizer.prototype.fillWithContents = function(fragment, id, obje
             }
             else {
                 if (object.results && object.results.length > 0) {
-                    results += this.multiResultHeadTemplate.evaluate({id:"file_" + object.id});
+                    results += this.multiResultHeadTemplate.evaluate({id: "file_" + object.id});
                     var fileInfo;
                     for (var i = 0; i < object.results.length; i++) {
                         fileInfo = object.results[i];
@@ -356,7 +356,7 @@ TaskItemVisualizer.prototype.minTime = Number.MAX_VALUE;
 TaskItemVisualizer.prototype.maxTime = 0;
 TaskItemVisualizer.prototype.unknownStatusTemplate = new Template('ERROR: unknown status "#{status}" for object #{title}');
 
-TaskItemVisualizer.prototype.getMinTime = function() {
+TaskItemVisualizer.prototype.getMinTime = function () {
     if (this.minTime == Number.MAX_VALUE) {
         if (this.transaction && this.transaction.details != null) {
             for (var i = 0; i < this.transaction.details.total; i++) {
@@ -373,7 +373,7 @@ TaskItemVisualizer.prototype.getMinTime = function() {
     return this.minTime;
 };
 
-TaskItemVisualizer.prototype.getMaxTime = function() {
+TaskItemVisualizer.prototype.getMaxTime = function () {
     if (this.maxTime == 0) {
         if (this.transaction && this.transaction.details != null) {
             for (var i = 0; i < this.transaction.details.total; i++) {
@@ -387,7 +387,7 @@ TaskItemVisualizer.prototype.getMaxTime = function() {
     return this.maxTime;
 };
 
-RegExp.escape = function(text) {
+RegExp.escape = function (text) {
     if (!arguments.callee.sRE) {
         var specials = [
             '/', '.', '*', '+', '?', '|',
@@ -400,7 +400,7 @@ RegExp.escape = function(text) {
     return text.replace(arguments.callee.sRE, '\\$1');
 };
 
-TaskItemVisualizer.prototype.escapeRegex = function(regex) {
+TaskItemVisualizer.prototype.escapeRegex = function (regex) {
     var specials = [
         '/', '.', '*', '+', '?', '|',
         '(', ')', '[', ']', '{', '}', '\\'
@@ -409,21 +409,21 @@ TaskItemVisualizer.prototype.escapeRegex = function(regex) {
     return regex.replace(sRE, '\\$1');
 };
 
-TaskItemVisualizer.prototype.replacePathsWithHyperlinks = function(text) {
+TaskItemVisualizer.prototype.replacePathsWithHyperlinks = function (text) {
     var prefix = this.escapeRegex(window.pathPrefix);
     var regex = new RegExp("(\\s*)(<file>" + prefix + ")?((?:[^<\\/,]*\\/)+)([^<\\/,]*[^<.,]+)</file>", "ig");
     text = text.replace(regex, '$1<a class="path" href="' + window.pathWebPrefix + '$3$4" title="$3$4">$4</a>');
     return text;
 };
 
-TaskItemVisualizer.prototype.wrapPathIntoHyperlink = function(text, title) {
+TaskItemVisualizer.prototype.wrapPathIntoHyperlink = function (text, title) {
     var prefix = this.escapeRegex(window.pathPrefix);
     var regex = new RegExp("^(<file>" + prefix + ")?((?:[^\\/<]*\\/)+)([^\\/,<]*[^<.,]+)</file>$", "ig");
     text = text.replace(regex, '<a class="path" href="' + window.pathWebPrefix + '$2$3" title="$2$3">' + title + '</a>');
     return text;
 };
 
-TaskItemVisualizer.prototype.fillWithContents = function(element, id, object) {
+TaskItemVisualizer.prototype.fillWithContents = function (element, id, object) {
     element.className = "subtask";
     if (object != null) {
         var row = document.createElement("tr");
