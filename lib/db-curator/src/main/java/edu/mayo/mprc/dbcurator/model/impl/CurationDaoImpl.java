@@ -567,6 +567,7 @@ public final class CurationDaoImpl extends DaoBase implements CurationDao {
 			//execute the ones we decided to execute
 			final File localTempFolder = FileUtilities.createTempFolder();
 			try {
+				ensureFoldersExists();
 				for (final Curation curation : toExecute) {
 					LOGGER.info("Executing curation: " + curation.getShortName());
 					final CurationExecutor executor = new CurationExecutor(curation, true, this, context.getFastaFolder(), localTempFolder, context.getFastaArchiveFolder());
@@ -592,6 +593,15 @@ public final class CurationDaoImpl extends DaoBase implements CurationDao {
 
 			LOGGER.info("Done seeding Curation database tables.");
 		}
+	}
+
+	/**
+	 * The curator needs these folders to exist. Check they are there, if not, create them.
+	 */
+	private void ensureFoldersExists() {
+		FileUtilities.ensureFolderExists(context.getFastaFolder());
+		FileUtilities.ensureFolderExists(context.getFastaArchiveFolder());
+		FileUtilities.ensureFolderExists(context.getFastaUploadFolder());
 	}
 
 	public CurationContext getContext() {
