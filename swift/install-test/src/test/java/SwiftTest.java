@@ -86,6 +86,12 @@ public final class SwiftTest {
 						swiftEvent.notifyAll();
 					}
 					caller.kill();
+				} else if (caller.getExitValue() != -1) {
+					LOGGER.error("The server finished running");
+					synchronized (swiftEvent) {
+						shouldEnd = true;
+						swiftEvent.notifyAll();
+					}
 				}
 			}
 		});
