@@ -415,13 +415,16 @@ public class ConfigurationData {
 	}
 
 	/**
-	 * Save config to the disk. Also create all the daemon runner scripts.
+	 * Save config to the disk. Will save the config file under a new name (appending .new),
+	 * so the existing configuration is not broken by random user actions.
+	 * <p/>
+	 * The administrator is then responsible to replace the actual config file with the new one.
 	 *
-	 * @param parentFolder Where to put the generated scripts and config.
+	 * @param parentFolder Where to put the generated config.
 	 * @return List of UI changes (validations triggered by save).
 	 */
 	public UiChangesReplayer saveConfig(final File parentFolder) {
-		final File configFile = getConfigFile(parentFolder);
+		final File configFile = getConfigFileForSave(parentFolder);
 
 		final SerializingUiChanges uiChanges = new SerializingUiChanges(resolver);
 
@@ -444,8 +447,12 @@ public class ConfigurationData {
 		return uiChanges.getReplayer();
 	}
 
-	private static File getConfigFile(final File parentFolder) {
-		final File configFile = new File(parentFolder, Swift.CONFIG_FILE_NAME).getAbsoluteFile();
+	/**
+	 * @param parentFolder Root folder with Swift install.
+	 * @return File to save the config to. This should not match the config file the data was loaded FROM.
+	 */
+	private static File getConfigFileForSave(final File parentFolder) {
+		final File configFile = new File(parentFolder, Swift.SAVED_CONFIG_FILE_NAME).getAbsoluteFile();
 		if (configFile.getParent() != null) {
 			FileUtilities.ensureFolderExists(configFile.getParentFile());
 		}

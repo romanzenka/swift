@@ -14,6 +14,7 @@ public final class Swift {
 	private static final Logger LOGGER = Logger.getLogger(Swift.class);
 
 	public static final String CONFIG_FILE_NAME = "conf/swift.conf";
+	public static final String SAVED_CONFIG_FILE_NAME = "conf/swift.conf.new";
 
 	private Swift() {
 	}
