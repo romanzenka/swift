@@ -238,7 +238,12 @@ public final class ProcessCaller implements Runnable {
 	 * @return Exit value of the process. Call this only after the run method terminates.
 	 */
 	public int getExitValue() {
-		return process == null ? -1 : process.exitValue();
+		try {
+			return process == null ? -1 : process.exitValue();
+		} catch (IllegalThreadStateException ignore) {
+			// Process has not exited
+			return -1;
+		}
 	}
 
 	private void runProcess(boolean background) throws InterruptedException {
