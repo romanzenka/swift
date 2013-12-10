@@ -161,7 +161,7 @@ public final class DatabaseView extends SimplePanel implements ModuleView {
 
 			customPropertyList.setPropertyValue(URL, H2_URL_PREFIX + properties.get(H2_FILE));
 			customPropertyList.setPropertyValue(USER_NAME, "sa");
-			customPropertyList.setPropertyValue(PASSWORD, "sa");
+			customPropertyList.setPropertyValue(PASSWORD, "");
 			customPropertyList.setPropertyValue(DIALECT, "org.hibernate.dialect.H2Dialect");
 			customPropertyList.setPropertyValue(DRIVER_CLASS_NAME, "org.h2.Driver");
 			customPropertyList.setPropertyValue(DEFAULT_SCHEMA, "");
