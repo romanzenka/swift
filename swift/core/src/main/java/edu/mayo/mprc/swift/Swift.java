@@ -22,7 +22,7 @@ public final class Swift {
 		try {
 			final ExitCode result = runSwift(args);
 			result.exit();
-		} catch (Exception t) {
+		} catch (Throwable t) {
 			FileUtilities.err(MprcException.getDetailedMessage(t));
 		} finally {
 			ExitCode.Error.exit();
