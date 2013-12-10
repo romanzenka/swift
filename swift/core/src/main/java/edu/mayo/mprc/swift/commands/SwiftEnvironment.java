@@ -8,6 +8,7 @@ import edu.mayo.mprc.swift.search.SwiftSearcher;
 import joptsimple.OptionParser;
 
 import java.io.File;
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -112,4 +113,22 @@ public interface SwiftEnvironment extends RunningApplicationContext, Lifecycle {
 	 * @return A comma-separated list of command names.
 	 */
 	String listSupportedCommands();
+
+	/**
+	 * A command can use this facility to log an error message.
+	 * The message is displayed + retained for further retrieval.
+	 *
+	 * @param errorMessage Message to log;
+	 */
+	void logCommandError(String errorMessage);
+
+	/**
+	 * Clear the error message log
+	 */
+	void clearCommandErrorLog();
+
+	/**
+	 * @return Command errors logged since the previous {@link #clearCommandErrorLog()} command.
+	 */
+	Collection<String> getCommandErrors();
 }

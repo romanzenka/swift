@@ -40,7 +40,7 @@ public final class ReformatConfig implements SwiftCommand {
 			try {
 				printWriter = new PrintWriter(new File(pathname));
 			} catch (FileNotFoundException e) {
-				FileUtilities.err("Could not open file for writing: " + pathname + "\n" + MprcException.getDetailedMessage(e));
+				environment.logCommandError("Could not open file for writing: " + pathname + "\n" + MprcException.getDetailedMessage(e));
 				return ExitCode.Error;
 			}
 		} else {

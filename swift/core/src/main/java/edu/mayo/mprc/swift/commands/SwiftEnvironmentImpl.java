@@ -1,6 +1,7 @@
 package edu.mayo.mprc.swift.commands;
 
 import com.google.common.base.Joiner;
+import com.google.common.collect.ImmutableList;
 import edu.mayo.mprc.MprcException;
 import edu.mayo.mprc.config.*;
 import edu.mayo.mprc.daemon.Daemon;
@@ -37,6 +38,7 @@ public final class SwiftEnvironmentImpl implements SwiftEnvironment, Application
 	private SwiftCommandLine commandLine;
 	private ApplicationContext applicationContext;
 	private Map<String, SwiftCommand> extraCommands = new HashMap<String, SwiftCommand>(1);
+	private final ArrayList<String> commandErrorLog = new ArrayList<String>(10);
 
 	public SwiftEnvironmentImpl() {
 	}
@@ -145,6 +147,22 @@ public final class SwiftEnvironmentImpl implements SwiftEnvironment, Application
 			}
 		}
 		return Joiner.on(", ").join(commands);
+	}
+
+	@Override
+	public void logCommandError(String errorMessage) {
+		FileUtilities.err(errorMessage);
+		commandErrorLog.add(errorMessage);
+	}
+
+	@Override
+	public void clearCommandErrorLog() {
+		commandErrorLog.clear();
+	}
+
+	@Override
+	public Collection<String> getCommandErrors() {
+		return ImmutableList.copyOf(commandErrorLog);
 	}
 
 	public Daemon.Factory getDaemonFactory() {

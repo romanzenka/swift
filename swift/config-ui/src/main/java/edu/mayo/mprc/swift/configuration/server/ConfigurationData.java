@@ -439,7 +439,11 @@ public class ConfigurationData {
 
 		if (errorList.isEmpty()) {
 			applicationConfig.save(configFile, getResourceTable());
+			environment.clearCommandErrorLog();
 			environment.runSwiftCommand(installCommand, configFile);
+			for (String error : environment.getCommandErrors()) {
+				uiChanges.displayPropertyError(applicationConfig, null, error);
+			}
 		} else {
 			LOGGER.warn("Swift configuration is not valid:\n\t" + Joiner.on("\n\t").join(errorList).toString());
 		}
