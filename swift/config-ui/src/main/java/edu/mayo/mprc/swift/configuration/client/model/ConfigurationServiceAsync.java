@@ -16,4 +16,6 @@ public interface ConfigurationServiceAsync {
 	void fix(String moduleId, String propertyName, String action, AsyncCallback<Void> async);
 
 	void changeRunner(String serviceId, String newRunnerType, AsyncCallback<Void> async);
+
+	void terminateProgram(AsyncCallback<Void> async);
 }

@@ -1,4 +1,5 @@
 import com.gdevelop.gwt.syncrpc.SyncProxy;
+import com.google.gwt.user.client.rpc.InvocationException;
 import edu.mayo.mprc.MprcException;
 import edu.mayo.mprc.common.client.GWTServiceException;
 import edu.mayo.mprc.swift.configuration.client.model.ConfigurationService;
@@ -68,38 +69,18 @@ public final class SwiftTest {
 						"edu.mayo.mprc.swift.Swift");
 		final ProcessCaller caller = new ProcessCaller(builder);
 		caller.setKillTimeout(CONFIG_TIMEOUT);
-		caller.setOutputMonitor(new LogMonitor() {
+		caller.setOutputMonitor(new MyLogMonitor(caller));
+		caller.setErrorMonitor(new LogMonitor() {
 			@Override
-			public void line(String line) {
-				LOGGER.debug(line);
-				Matcher matcher = URL_PATTERN.matcher(line);
-				if (matcher.matches()) {
-					synchronized (swiftEvent) {
-						url = matcher.group(1);
-						swiftEvent.notifyAll();
-					}
-				} else if (line.contains("Swift web server could not be launched.") || line.contains("Swift configuration is not valid")) {
-					LOGGER.error("The server failed to run: " + line);
-					synchronized (swiftEvent) {
-						shouldEnd = true;
-						serverFail = line;
-						swiftEvent.notifyAll();
-					}
-					caller.kill();
-				} else if (caller.getExitValue() != -1) {
-					LOGGER.error("The server finished running");
-					synchronized (swiftEvent) {
-						shouldEnd = true;
-						swiftEvent.notifyAll();
-					}
-				}
+			public void line(final String line) {
+				LOGGER.error("Swift> " + line);
 			}
 		});
 		caller.runInBackground();
 		while (true) {
 			synchronized (swiftEvent) {
 				try {
-					swiftEvent.wait(CONFIG_TIMEOUT);
+					swiftEvent.wait(1000);
 					if (shouldEnd) {
 						break;
 					}
@@ -112,6 +93,13 @@ public final class SwiftTest {
 						try {
 							service.loadConfiguration();
 							service.saveConfiguration();
+							try {
+								service.terminateProgram();
+								caller.kill();
+								shouldEnd = true;
+							} catch (InvocationException ignore) {
+								// SWALLOWED: Terminating the application is likely to cause RPC exception to be thrown
+							}
 						} catch (GWTServiceException e) {
 							break;
 						}
@@ -140,5 +128,39 @@ public final class SwiftTest {
 			FileUtilities.closeQuietly(stream);
 		}
 		return properties;
+	}
+
+	private class MyLogMonitor implements LogMonitor {
+		private final ProcessCaller caller;
+
+		public MyLogMonitor(ProcessCaller caller) {
+			this.caller = caller;
+		}
+
+		@Override
+		public void line(String line) {
+			LOGGER.debug("Swift> " + line);
+			Matcher matcher = URL_PATTERN.matcher(line);
+			if (matcher.matches()) {
+				synchronized (swiftEvent) {
+					url = matcher.group(1);
+					swiftEvent.notifyAll();
+				}
+			} else if (line.contains("Swift web server could not be launched.") || line.contains("Swift configuration is not valid")) {
+				LOGGER.error("The server failed to run: " + line);
+				synchronized (swiftEvent) {
+					shouldEnd = true;
+					serverFail = line;
+					swiftEvent.notifyAll();
+				}
+				caller.kill();
+			} else if (caller.getExitValue() != -1) {
+				LOGGER.error("The server finished running");
+				synchronized (swiftEvent) {
+					shouldEnd = true;
+					swiftEvent.notifyAll();
+				}
+			}
+		}
 	}
 }

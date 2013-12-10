@@ -119,7 +119,7 @@ public final class TestApplicationContext implements Lifecycle {
 				"sa",
 				"",
 				"org.h2.Driver",
-				"org.hibernate.dialect.HSQLDialect",
+				"org.hibernate.dialect.H2Dialect",
 				"PUBLIC",
 				"PUBLIC");
 	}

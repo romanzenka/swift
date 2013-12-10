@@ -36,6 +36,11 @@ public interface ConfigurationService extends RemoteService {
 	void fix(String moduleId, String propertyName, String action) throws GWTServiceException;
 
 	/**
+	 * Shut down the whole server.
+	 */
+	void terminateProgram();
+
+	/**
 	 * Utility/Convenience class.
 	 * Use ConfigurationService.App.getInstance() to access static instance of ConfigurationServiceAsync
 	 */

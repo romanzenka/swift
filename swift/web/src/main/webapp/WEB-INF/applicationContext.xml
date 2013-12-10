@@ -34,6 +34,7 @@
         <property name="resourceTable" ref="resourceTable" />
         <property name="swiftEnvironment" ref="swiftEnvironment" />
         <property name="installCommand" ref="install-command" />
+        <property name="stopper" ref="servletInitialization" />
     </bean>
 
     <bean id="FileUploadServlet" class="edu.mayo.mprc.dbcurator.server.FASTAFileUploadServlet">

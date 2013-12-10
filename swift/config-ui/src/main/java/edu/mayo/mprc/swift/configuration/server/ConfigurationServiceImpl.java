@@ -4,6 +4,7 @@ import edu.mayo.mprc.GWTServiceExceptionFactory;
 import edu.mayo.mprc.MprcException;
 import edu.mayo.mprc.common.client.GWTServiceException;
 import edu.mayo.mprc.common.server.SpringGwtServlet;
+import edu.mayo.mprc.common.server.WebApplicationStopper;
 import edu.mayo.mprc.config.*;
 import edu.mayo.mprc.daemon.SimpleRunner;
 import edu.mayo.mprc.sge.GridRunner;
@@ -33,6 +34,7 @@ public final class ConfigurationServiceImpl extends SpringGwtServlet implements 
 	private transient ResourceTable resourceTable;
 	private transient SwiftEnvironment swiftEnvironment;
 	private transient SwiftCommand installCommand;
+	private WebApplicationStopper stopper;
 
 	public ConfigurationServiceImpl() {
 		setStorage(new ServletStorage(this));
@@ -109,6 +111,13 @@ public final class ConfigurationServiceImpl extends SpringGwtServlet implements 
 		getData().fix(resourceConfig, propertyName, action);
 	}
 
+	@Override
+	public void terminateProgram() {
+		if (stopper != null) {
+			stopper.stopWebApplication();
+		}
+	}
+
 	private ConfigurationData getData() {
 		final Object obj = getStorage().get("configurationData");
 		if (obj == null) {
@@ -154,5 +163,13 @@ public final class ConfigurationServiceImpl extends SpringGwtServlet implements 
 
 	public void setInstallCommand(SwiftCommand installCommand) {
 		this.installCommand = installCommand;
+	}
+
+	public WebApplicationStopper getStopper() {
+		return stopper;
+	}
+
+	public void setStopper(WebApplicationStopper stopper) {
+		this.stopper = stopper;
 	}
 }

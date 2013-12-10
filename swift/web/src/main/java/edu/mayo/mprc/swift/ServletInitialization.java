@@ -1,6 +1,7 @@
 package edu.mayo.mprc.swift;
 
 import edu.mayo.mprc.MprcException;
+import edu.mayo.mprc.common.server.WebApplicationStopper;
 import edu.mayo.mprc.config.DaemonConfig;
 import edu.mayo.mprc.config.MultiFactory;
 import edu.mayo.mprc.daemon.Daemon;
@@ -33,7 +34,7 @@ import java.util.Arrays;
  * The main reason is that there is code in {@link SwiftEnvironment} that can deal with parsing
  * Swift config files that we need.
  */
-public final class ServletInitialization implements SwiftCommand, ServletContextAware, InitializingBean {
+public final class ServletInitialization implements SwiftCommand, ServletContextAware, InitializingBean, WebApplicationStopper {
 	private static final Logger LOGGER = Logger.getLogger(ServletInitialization.class);
 
 	private static final String SWIFT_INSTALL = "SWIFT_INSTALL";
@@ -71,10 +72,10 @@ public final class ServletInitialization implements SwiftCommand, ServletContext
 
 			final SwiftCommandLine commandLine = new SwiftCommandLine("servlet-initialization", Arrays.asList("action", action), confFile, swiftDaemon, null, null);
 			if (swiftEnvironment.runSwiftCommand(commandLine) != ExitCode.Ok) {
-				stopSwift();
+				stopWebApplication();
 			}
 		} catch (Exception e) {
-			stopSwift();
+			stopWebApplication();
 			throw new RuntimeException("Could not initialize Swift web", e);
 		}
 	}
@@ -239,7 +240,7 @@ public final class ServletInitialization implements SwiftCommand, ServletContext
 		}
 	}
 
-	public void stopSwift() {
+	public void stopWebApplication() {
 
 		int port = getStopPort(servletContext);
 		if (port > 0) {
