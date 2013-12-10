@@ -95,7 +95,8 @@
         <p>
             When the configuration gets saved, the following will happen:
         <ol>
-            <li>config file <code>conf/swift.conf</code> gets created - it defines what services should Swift run, how
+            <li>config file <code>var/conf/swift.conf</code> gets created - it defines what services should Swift run,
+                how
                 and where
             </li>
             <li>config check is run, making sure all parts are configured properly</li>
@@ -105,14 +106,22 @@
         </ol>
 
         <p>
-            When you are done configuring, kill the configuration script and start the provided <code>bin/swift</code>
-            script.
+
+        <p>
+            When you are done configuring:
+
+        <ol>
+            <li>kill the configuration script</li>
+            <li>copy the configuration file from <code>var/conf/swift.conf</code> to <code>conf/swift.conf</code>.
+                <p>This step is done so you have a chance to review the configuration file changes, instead of Swift
+                    simply overwriting the last configuration.</p></li>
+            <li>start the provided <code>bin/swift</code> script</li>
+        </ol>
         </p>
 
         <p>
             Keep in mind that the daemon containing the embedded Message Broker module has to start first, so other
-            modules
-            can use it to communicate.
+            modules can use it to communicate.
         </p>
 
         <a class="btn btn-primary" href="/configuration/config.html">Proceed to Configuration</a>
