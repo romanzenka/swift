@@ -415,7 +415,7 @@ public class ConfigurationData {
 	}
 
 	/**
-	 * Save config to the disk. Will save the config file under a new name (appending .new),
+	 * Save config to the disk. Will save the config file under a new name ({@link Swift#SAVED_CONFIG_FILE_NAME}),
 	 * so the existing configuration is not broken by random user actions.
 	 * <p/>
 	 * The administrator is then responsible to replace the actual config file with the new one.
@@ -450,6 +450,7 @@ public class ConfigurationData {
 	/**
 	 * @param parentFolder Root folder with Swift install.
 	 * @return File to save the config to. This should not match the config file the data was loaded FROM.
+	 *         Typically we want to provide a config file from a folder that Swift has write access to.
 	 */
 	private static File getConfigFileForSave(final File parentFolder) {
 		final File configFile = new File(parentFolder, Swift.SAVED_CONFIG_FILE_NAME).getAbsoluteFile();
