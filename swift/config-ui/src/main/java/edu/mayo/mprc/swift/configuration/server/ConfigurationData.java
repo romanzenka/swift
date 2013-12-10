@@ -400,7 +400,7 @@ public class ConfigurationData {
 		database.setUserName("sa");
 		database.setPassword("");
 		database.setDriverClassName("org.h2.Driver");
-		database.setDialect("org.hibernate.dialect.HSQLDialect");
+		database.setDialect("org.hibernate.dialect.H2Dialect");
 		database.setSchema("PUBLIC");
 		database.setDefaultSchema("PUBLIC");
 

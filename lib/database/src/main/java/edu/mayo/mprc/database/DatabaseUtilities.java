@@ -152,7 +152,7 @@ public final class DatabaseUtilities {
 		return getHibernateConfiguration(
 				//"jdbc:h2:tcp://localhost/~/test",
 				"jdbc:h2:mem:test",
-				"sa", "", "org.hibernate.dialect.HSQLDialect", "org.h2.Driver", "PUBLIC", "PUBLIC", hibernateProperties, mappingResources,
+				"sa", "", "org.hibernate.dialect.H2Dialect", "org.h2.Driver", "PUBLIC", "PUBLIC", hibernateProperties, mappingResources,
 				SchemaInitialization.CreateDrop);
 	}
 
