@@ -81,4 +81,24 @@ public final class WorkspaceDaoTest extends DaoTest {
 			throw t;
 		}
 	}
+
+	@Test
+	public void shouldOrderById() {
+		User u1 = new User();
+		u1.setId(1);
+		User u2 = new User();
+		u2.setId(2);
+		User u3 = new User();
+
+		List<User> list1 = Arrays.asList(u1, u2, u3);
+		List<User> list2 = Arrays.asList(u3, u1, u2);
+		List<User> list3 = Arrays.asList(u2, u1);
+
+		Assert.assertEquals(User.BY_ID.min(list1), u3);
+		Assert.assertEquals(User.BY_ID.max(list1), u2);
+		Assert.assertEquals(User.BY_ID.min(list2), u3);
+		Assert.assertEquals(User.BY_ID.max(list2), u2);
+		Assert.assertEquals(User.BY_ID.min(list3), u1);
+		Assert.assertEquals(User.BY_ID.max(list3), u2);
+	}
 }

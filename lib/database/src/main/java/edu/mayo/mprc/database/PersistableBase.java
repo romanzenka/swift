@@ -1,5 +1,6 @@
 package edu.mayo.mprc.database;
 
+import com.google.common.collect.Ordering;
 import edu.mayo.mprc.MprcException;
 
 /**
@@ -21,4 +22,18 @@ public abstract class PersistableBase {
 		}
 		this.id = id;
 	}
+
+	public static final Ordering<PersistableBase> BY_ID = new Ordering<PersistableBase>() {
+		@Override
+		public int compare(final PersistableBase o1, final PersistableBase o2) {
+			if (o1.getId() == null) {
+				return o2.getId() == null ? 0 : -1;
+			}
+			if (o2.getId() == null) {
+				return o1.getId() == null ? 0 : 1;
+			}
+			return o1.getId().compareTo(o2.getId());
+		}
+	};
+
 }

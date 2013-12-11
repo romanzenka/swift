@@ -4,8 +4,12 @@ import edu.mayo.mprc.MprcException;
 import edu.mayo.mprc.database.Change;
 import edu.mayo.mprc.database.DaoBase;
 import edu.mayo.mprc.database.Database;
+import edu.mayo.mprc.database.PersistableBase;
+import edu.mayo.mprc.dbcurator.model.Curation;
+import edu.mayo.mprc.dbcurator.model.CurationDao;
 import edu.mayo.mprc.unimod.ModSet;
 import edu.mayo.mprc.workspace.User;
+import edu.mayo.mprc.workspace.WorkspaceDao;
 import org.apache.log4j.Logger;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
@@ -16,6 +20,7 @@ import org.hibernate.criterion.SimpleExpression;
 import org.joda.time.DateTime;
 import org.springframework.stereotype.Repository;
 
+import javax.annotation.Resource;
 import java.util.*;
 
 @Repository("paramsDao")
@@ -23,6 +28,9 @@ public final class ParamsDaoHibernate extends DaoBase implements ParamsDao {
 	private static final Logger LOGGER = Logger.getLogger(ParamsDaoHibernate.class);
 
 	private static final String PARAMS_FOLDER = "edu/mayo/mprc/swift/params2/";
+
+	private WorkspaceDao workspaceDao;
+	private CurationDao curationDao;
 
 	public ParamsDaoHibernate() {
 	}
@@ -399,14 +407,18 @@ public final class ParamsDaoHibernate extends DaoBase implements ParamsDao {
 		if (countAll(Protease.class) == 0) {
 			return "No proteases defined";
 		}
+		if (countAll(SavedSearchEngineParameters.class) == 0) {
+			return "No saved search engine parameters";
+		}
 		return null;
 	}
 
 	@Override
-	public void install(Map<String, String> params) {
+	public void install(final Map<String, String> params) {
 		installIonSeries();
 		installInstruments();
 		installProteases();
+		installSavedSearchEngineParameters();
 	}
 
 	private void installIonSeries() {
@@ -440,5 +452,55 @@ public final class ParamsDaoHibernate extends DaoBase implements ParamsDao {
 				updateProtease(protease, change);
 			}
 		}
+	}
+
+	private void installSavedSearchEngineParameters() {
+		if (countAll(SavedSearchEngineParameters.class) == 0) {
+			final Change change = new Change("Installing saved search engine parameters", new DateTime());
+			LOGGER.info(change.getReason());
+			addSavedSearchEngineParameters(getInitialSavedSearchEngineParameters(change), change);
+		}
+	}
+
+	private SavedSearchEngineParameters getInitialSavedSearchEngineParameters(final Change change) {
+		final List<User> users = getWorkspaceDao().getUsers(false);
+		final User user = PersistableBase.BY_ID.min(users);
+
+		final List<Curation> allCurations = getCurationDao().getAllCurations();
+		final Curation curation = PersistableBase.BY_ID.min(allCurations);
+
+		ModSet emptyModSet = updateModSet(new ModSet());
+		final SearchEngineParameters params = new SearchEngineParameters(
+				curation,
+				updateProtease(Protease.getTrypsinAllowP(), change),
+				0,
+				emptyModSet,
+				emptyModSet,
+				new Tolerance(0.5, MassUnit.Da),
+				new Tolerance(10.0, MassUnit.Ppm),
+				getInstrumentByName("Orbi/FT (ESI-FTICR)"),
+				addExtractMsnSettings(ExtractMsnSettings.DEFAULT),
+				addScaffoldSettings(ScaffoldSettings.DEFAULT)
+		);
+		return new SavedSearchEngineParameters("Default parameters", user, params);
+	}
+
+
+	public WorkspaceDao getWorkspaceDao() {
+		return workspaceDao;
+	}
+
+	@Resource(name = "workspaceDao")
+	public void setWorkspaceDao(final WorkspaceDao workspaceDao) {
+		this.workspaceDao = workspaceDao;
+	}
+
+	public CurationDao getCurationDao() {
+		return curationDao;
+	}
+
+	@Resource(name = "curationDao")
+	public void setCurationDao(final CurationDao curationDao) {
+		this.curationDao = curationDao;
 	}
 }

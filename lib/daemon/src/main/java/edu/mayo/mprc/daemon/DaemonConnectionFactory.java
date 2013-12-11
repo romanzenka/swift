@@ -78,6 +78,10 @@ public final class DaemonConnectionFactory extends FactoryBase<ServiceConfig, Da
 	public void start() {
 		if (!isRunning()) {
 			running = true;
+			// Getting a daemon connection requires the file token factory to be operational
+			if (fileTokenFactory instanceof Lifecycle) {
+				((Lifecycle) fileTokenFactory).start();
+			}
 		}
 	}
 
