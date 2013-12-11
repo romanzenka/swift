@@ -635,9 +635,6 @@ public final class SwiftDaoHibernate extends DaoBase implements SwiftDao {
 		if (rowCount(TaskStateData.class) != (long) TaskState.values().length) {
 			return "The task state enumeration is not up to date";
 		}
-		if (rowCount(SearchRun.class) == 0) {
-			return "There were no searches previously run";
-		}
 		return null;
 	}
 
