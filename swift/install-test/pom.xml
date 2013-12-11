@@ -12,6 +12,13 @@
     <artifactId>install-test</artifactId>
     <description>Integration test of the Swift installation</description>
 
+    <properties>
+        <!-- Version of Swift we will obtain by unpacking the installer .tar.gz -->
+        <unpackedVersion>swift-3.6</unpackedVersion>
+        <!-- Where will be the Swift unpacked to -->
+        <unpackedDirectory>${project.build.directory}/swift/${unpackedVersion}</unpackedDirectory>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>org.testng</groupId>
@@ -32,17 +39,6 @@
             <groupId>com.gdevelop.syncrpc</groupId>
             <artifactId>syncproxy</artifactId>
             <version>0.3</version>
-        </dependency>
-        <dependency>
-            <groupId>edu.mayo.mprc.swift</groupId>
-            <artifactId>swift-config-ui</artifactId>
-            <version>3.5-SNAPSHOT</version>
-        </dependency>
-        <dependency>
-            <groupId>edu.mayo.mprc.swift</groupId>
-            <artifactId>swift-config-ui</artifactId>
-            <version>3.5-SNAPSHOT</version>
-            <classifier>sources</classifier>
         </dependency>
         <!-- Make sure we get built after this guy -->
         <dependency>
@@ -95,6 +91,42 @@
             </plugin>
         </plugins>
     </build>
+
+    <profiles>
+        <profile>
+            <!-- This is a hack to directly update the lib folder.
+            This is extra useful when doing incremental changes of Swift, in order to quickly
+            do integration test on them. Otherwise the full process of building the .tar.gz
+            and unpacking it again would need to be invoked.
+            This is to be executed manually using mvn -Pcopy-libs
+            -->
+            <id>copy-libs</id>
+            <build>
+                <defaultGoal>initialize</defaultGoal>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-dependency-plugin</artifactId>
+                        <version>2.8</version>
+                        <executions>
+                            <execution>
+                                <id>copy-libs</id>
+                                <phase>
+                                    initialize
+                                </phase>
+                                <goals>
+                                    <goal>copy-dependencies</goal>
+                                </goals>
+                                <configuration>
+                                    <outputDirectory>${unpackedDirectory}/lib</outputDirectory>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 
     <repositories>
         <repository>
