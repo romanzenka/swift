@@ -1,3 +1,4 @@
+<%@ page import="edu.mayo.mprc.swift.SwiftWebContext" %>
 <!DOCTYPE html>
 <html>
 <head>
@@ -95,9 +96,10 @@
         <p>
             When the configuration gets saved, the following will happen:
         <ol>
-            <li>config file <code>var/conf/swift.conf</code> gets created - it defines what services should Swift run,
-                how
-                and where
+            <li>config file
+                <code><%= SwiftWebContext.getWebUi().getNewConfigFile().getAbsolutePath() %>
+                </code>
+                gets created - it defines what services should Swift run, how and where
             </li>
             <li>config check is run, making sure all parts are configured properly</li>
             <li>installation steps are run, making sure that all requested folders are created, and that the database

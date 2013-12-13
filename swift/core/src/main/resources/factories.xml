@@ -46,6 +46,7 @@
     <bean id="curationContext" class="edu.mayo.mprc.dbcurator.model.CurationContext"></bean>
 
     <bean id="webUiFactory" class="edu.mayo.mprc.swift.resources.WebUi$Factory" autowire="byType">
+        <property name="environment" ref="swiftEnvironment" />
         <property name="swiftMonitor" ref="swiftMonitor" />
         <property name="fileTokenFactory" ref="fileTokenFactory" />
         <property name="swiftDao" ref="swiftDao" />
@@ -73,6 +74,21 @@
                 <entry key="hibernate.c3p0.idle_connection_test_period" value="300" />
                 <entry key="hibernate.connection.provider_class"
                     value="org.hibernate.connection.C3P0ConnectionProvider" />
+            </map>
+        </constructor-arg>
+    </bean>
+
+    <!-- Hibernate properties when creating a new database -->
+    <bean id="hibernateCreationProperties" class="java.util.HashMap">
+        <constructor-arg type="java.util.Map">
+            <map>
+                <entry key="hibernate.show_sql" value="${hibernate.show_sql}" />
+
+                <entry key="hibernate.current_session_context_class"
+                    value="${hibernate.current_session_context_class}" />
+                <entry key="hibernate.transaction.factory_class" value="${hibernate.transaction.factory_class}" />
+                <entry key="hibernate.cache.provider_class" value="${hibernate.cache.provider_class}" />
+                <entry key="hibernate.jdbc.batch_size" value="0" />
             </map>
         </constructor-arg>
     </bean>

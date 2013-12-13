@@ -109,12 +109,18 @@ public final class DatabaseFileTokenFactory extends FileTokenFactory implements 
 		if (!isRunning()) {
 			// Setup the actual daemon
 			final DaemonConfig daemonConfig = applicationContext.getDaemonConfig();
-			setDaemonConfigInfo(daemonConfig.createDaemonConfigInfo());
-			if (daemonConfig.getTempFolderPath() == null) {
-				throw new MprcException("The temporary folder is not configured for this daemon. Swift cannot run.");
+			if (daemonConfig == null) {
+				// We are most likely running without a config file.
+				// Nothing can possibly work, but we must not crash.
+				databaseDaemonConfigInfo = null;
+			} else {
+				setDaemonConfigInfo(daemonConfig.createDaemonConfigInfo());
+				if (daemonConfig.getTempFolderPath() == null) {
+					throw new MprcException("The temporary folder is not configured for this daemon. Swift cannot run.");
+				}
+				final DaemonConfig databaseDaemonConfig = getDatabaseDaemonConfig(applicationContext.getApplicationConfig());
+				databaseDaemonConfigInfo = databaseDaemonConfig.createDaemonConfigInfo();
 			}
-			final DaemonConfig databaseDaemonConfig = getDatabaseDaemonConfig(applicationContext.getApplicationConfig());
-			databaseDaemonConfigInfo = databaseDaemonConfig.createDaemonConfigInfo();
 		}
 	}
 

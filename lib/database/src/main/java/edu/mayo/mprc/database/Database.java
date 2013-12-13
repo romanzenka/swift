@@ -29,6 +29,11 @@ public final class Database implements RuntimeInitializer, Lifecycle {
 	private SessionFactory sessionFactory;
 	private Config config;
 	private Map<String, String> hibernateProperties;
+	/**
+	 * A special set of properties to be used when a new database is being created.
+	 * We had problems with C3P0 messing up H2 database creation.
+	 */
+	private Map<String, String> hibernateCreationProperties;
 	private List<String> mappingResources;
 	private List<RuntimeInitializer> runtimeInitializers;
 
@@ -39,7 +44,7 @@ public final class Database implements RuntimeInitializer, Lifecycle {
 	public void install(final Map<String, String> params) {
 		LOGGER.info("Installing database");
 		final DatabaseUtilities.SchemaInitialization action = DatabaseUtilities.SchemaInitialization.getForValue(params.get("action"));
-		initializeSessionFactory(action);
+		initializeSessionFactory(action, true);
 
 		LOGGER.info("Installing DAOs");
 		try {
@@ -66,10 +71,10 @@ public final class Database implements RuntimeInitializer, Lifecycle {
 		String errors = "";
 		try {
 			// Before checking, update the schema
-			HashMap<String, String> params = new HashMap<String, String>();
+			final HashMap<String, String> params = new HashMap<String, String>();
 			params.put("action", DatabaseUtilities.SchemaInitialization.Update.getValue());
 			final DatabaseUtilities.SchemaInitialization action = DatabaseUtilities.SchemaInitialization.getForValue(params.get("action"));
-			initializeSessionFactory(action);
+			initializeSessionFactory(action, true);
 
 			beginTransaction();
 
@@ -99,7 +104,7 @@ public final class Database implements RuntimeInitializer, Lifecycle {
 		return !errors.isEmpty() ? errors : null;
 	}
 
-	private void initializeSessionFactory(DatabaseUtilities.SchemaInitialization action) {
+	private void initializeSessionFactory(final DatabaseUtilities.SchemaInitialization action, final boolean install) {
 		if (sessionFactory == null) {
 			final SessionFactory sessionFactory1 = DatabaseUtilities.getSessionFactory(config.getUrl()
 					, config.getUserName()
@@ -108,7 +113,7 @@ public final class Database implements RuntimeInitializer, Lifecycle {
 					, config.getDriverClassName()
 					, config.getDefaultSchema()
 					, config.getSchema()
-					, hibernateProperties
+					, install ? hibernateCreationProperties : hibernateProperties
 					, mappingResources,
 					action);
 
@@ -218,7 +223,7 @@ public final class Database implements RuntimeInitializer, Lifecycle {
 		return config;
 	}
 
-	public void setConfig(Config config) {
+	public void setConfig(final Config config) {
 		this.config = config;
 	}
 
@@ -226,15 +231,23 @@ public final class Database implements RuntimeInitializer, Lifecycle {
 		return hibernateProperties;
 	}
 
-	public void setHibernateProperties(Map<String, String> hibernateProperties) {
+	public void setHibernateProperties(final Map<String, String> hibernateProperties) {
 		this.hibernateProperties = hibernateProperties;
+	}
+
+	public Map<String, String> getHibernateCreationProperties() {
+		return hibernateCreationProperties;
+	}
+
+	public void setHibernateCreationProperties(final Map<String, String> hibernateCreationProperties) {
+		this.hibernateCreationProperties = hibernateCreationProperties;
 	}
 
 	public List<String> getMappingResources() {
 		return mappingResources;
 	}
 
-	public void setMappingResources(List<String> mappingResources) {
+	public void setMappingResources(final List<String> mappingResources) {
 		this.mappingResources = mappingResources;
 	}
 
@@ -254,7 +267,7 @@ public final class Database implements RuntimeInitializer, Lifecycle {
 	@Override
 	public void start() {
 		if (!isRunning()) {
-			initializeSessionFactory(DatabaseUtilities.SchemaInitialization.None);
+			initializeSessionFactory(DatabaseUtilities.SchemaInitialization.None, false);
 		}
 	}
 
@@ -280,6 +293,7 @@ public final class Database implements RuntimeInitializer, Lifecycle {
 		public static final String NAME = "Swift SQL Database";
 		public static final String DESC = "Database for storing information about Swift searches and Swift configuration.<p>The database gets created and initialized through the module that uses it (in this case, the Swift Searcher module).<p><b>Important:</b> Swift Searcher and Swift Website have to run within the same daemon as the database.";
 		private Map<String, String> hibernateProperties;
+		private Map<String, String> hibernateCreationProperties;
 		private List<DaoBase> daoList;
 		private Database database;
 		private List<RuntimeInitializer> runtimeInitializers;
@@ -312,6 +326,15 @@ public final class Database implements RuntimeInitializer, Lifecycle {
 		@Resource(name = "hibernateProperties")
 		public void setHibernateProperties(final Map<String, String> hibernateProperties) {
 			this.hibernateProperties = hibernateProperties;
+		}
+
+		public Map<String, String> getHibernateCreationProperties() {
+			return hibernateCreationProperties;
+		}
+
+		@Resource(name = "hibernateCreationProperties")
+		public void setHibernateCreationProperties(final Map<String, String> hibernateCreationProperties) {
+			this.hibernateCreationProperties = hibernateCreationProperties;
 		}
 
 		public List<DaoBase> getDaoList() {
@@ -350,9 +373,10 @@ public final class Database implements RuntimeInitializer, Lifecycle {
 			}
 			final Config localConfig = (Config) config;
 
-			Database placeholder = getDatabase();
+			final Database placeholder = getDatabase();
 			placeholder.setConfig(localConfig);
 			placeholder.setHibernateProperties(getHibernateProperties());
+			placeholder.setHibernateCreationProperties(getHibernateCreationProperties());
 			placeholder.setMappingResources(collectMappingResouces(getDaoList()));
 			placeholder.setRuntimeInitializers(getRuntimeInitializers());
 			return placeholder;

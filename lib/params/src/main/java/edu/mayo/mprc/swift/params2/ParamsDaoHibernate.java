@@ -418,6 +418,11 @@ public final class ParamsDaoHibernate extends DaoBase implements ParamsDao {
 		installIonSeries();
 		installInstruments();
 		installProteases();
+
+		// The search engine parameters depend on these two installs to be done already
+		getWorkspaceDao().install(params);
+		getCurationDao().install(params);
+
 		installSavedSearchEngineParameters();
 	}
 

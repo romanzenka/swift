@@ -11,10 +11,10 @@ import org.apache.log4j.Logger;
  * or SGE Swift instance and runs it.
  */
 public final class Swift {
+	public static final String DEFAULT_NEW_CONFIG_FILE = "var/conf/swift.conf";
 	private static final Logger LOGGER = Logger.getLogger(Swift.class);
 
 	public static final String CONFIG_FILE_NAME = "conf/swift.conf";
-	public static final String SAVED_CONFIG_FILE_NAME = "var/conf/swift.conf";
 
 	private Swift() {
 	}

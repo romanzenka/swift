@@ -1,6 +1,7 @@
 package edu.mayo.mprc.swift.configuration.server;
 
 import com.google.common.base.Joiner;
+import com.google.common.base.Strings;
 import edu.mayo.mprc.GWTServiceExceptionFactory;
 import edu.mayo.mprc.MprcException;
 import edu.mayo.mprc.common.client.GWTServiceException;
@@ -138,7 +139,7 @@ public class ConfigurationData {
 		return mapDaemonConfigToModel(createDaemonConfig(name, local));
 	}
 
-	private DaemonConfig createDaemonConfig(String name, boolean local) {
+	private DaemonConfig createDaemonConfig(final String name, final boolean local) {
 		final DaemonConfig daemon = DaemonConfig.getDefaultDaemonConfig(name, local);
 		getConfig().addDaemon(daemon);
 		return daemon;
@@ -168,7 +169,7 @@ public class ConfigurationData {
 		}
 	}
 
-	private ResourceConfig createResourceConfig(int index, String type, DaemonConfig parent) throws GWTServiceException {
+	private ResourceConfig createResourceConfig(final int index, final String type, final DaemonConfig parent) throws GWTServiceException {
 		final ResourceTable moduleConfigTable = getResourceTable();
 
 		final ResourceConfig resourceConfig = getDefaultResourceConfig(type, parent, moduleConfigTable);
@@ -188,7 +189,7 @@ public class ConfigurationData {
 		return resultConfig;
 	}
 
-	private ServiceConfig createServiceConfig(int index, String type, DaemonConfig parent, ResourceConfig resourceConfig) {
+	private ServiceConfig createServiceConfig(final int index, final String type, final DaemonConfig parent, final ResourceConfig resourceConfig) {
 		// A service needs a runner
 		final ServiceConfig serviceConfig = new ServiceConfig();
 
@@ -199,7 +200,7 @@ public class ConfigurationData {
 		return serviceConfig;
 	}
 
-	private String getName(String type, int index) {
+	private String getName(final String type, final int index) {
 		return type + '_' + index;
 	}
 
@@ -415,7 +416,7 @@ public class ConfigurationData {
 	}
 
 	/**
-	 * Save config to the disk. Will save the config file under a new name ({@link Swift#SAVED_CONFIG_FILE_NAME}),
+	 * Save config to the disk. Will save the config file under a new name,
 	 * so the existing configuration is not broken by random user actions.
 	 * <p/>
 	 * The administrator is then responsible to replace the actual config file with the new one.
@@ -441,7 +442,7 @@ public class ConfigurationData {
 			applicationConfig.save(configFile, getResourceTable());
 			environment.clearCommandErrorLog();
 			environment.runSwiftCommand(installCommand, configFile);
-			for (String error : environment.getCommandErrors()) {
+			for (final String error : environment.getCommandErrors()) {
 				uiChanges.displayPropertyError(applicationConfig, null, error);
 			}
 		} else {
@@ -451,13 +452,29 @@ public class ConfigurationData {
 		return uiChanges.getReplayer();
 	}
 
+	private File extractNewConfigFile(final File parentFolder) {
+		try {
+			List<WebUi.Config> configs = config.getModulesOfConfigType(WebUi.Config.class);
+
+			if (configs != null && configs.size() == 1) {
+				final String file = configs.get(0).getNewConfigFile();
+				if (!Strings.isNullOrEmpty(file)) {
+					return new File(file);
+				}
+			}
+		} catch (Exception ignore) {
+			// SWALLOWED: if this fails, we have a fallback plan
+		}
+		return new File(parentFolder, Swift.DEFAULT_NEW_CONFIG_FILE);
+	}
+
 	/**
 	 * @param parentFolder Root folder with Swift install.
 	 * @return File to save the config to. This should not match the config file the data was loaded FROM.
 	 *         Typically we want to provide a config file from a folder that Swift has write access to.
 	 */
-	private static File getConfigFileForSave(final File parentFolder) {
-		final File configFile = new File(parentFolder, Swift.SAVED_CONFIG_FILE_NAME).getAbsoluteFile();
+	private File getConfigFileForSave(final File parentFolder) {
+		final File configFile = extractNewConfigFile(parentFolder).getAbsoluteFile();
 		if (configFile.getParent() != null) {
 			FileUtilities.ensureFolderExists(configFile.getParentFile());
 		}

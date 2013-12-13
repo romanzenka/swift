@@ -10,6 +10,8 @@ import edu.mayo.mprc.dbcurator.model.CurationContext;
 import edu.mayo.mprc.msmseval.MSMSEvalParamFile;
 import edu.mayo.mprc.msmseval.MSMSEvalWorker;
 import edu.mayo.mprc.msmseval.MsmsEvalCache;
+import edu.mayo.mprc.swift.Swift;
+import edu.mayo.mprc.swift.commands.SwiftEnvironment;
 import edu.mayo.mprc.swift.db.DatabaseFileTokenFactory;
 import edu.mayo.mprc.swift.db.SearchEngine;
 import edu.mayo.mprc.swift.db.SwiftDao;
@@ -38,6 +40,7 @@ public final class WebUi implements Checkable {
 	private DaemonConnection databaseUndeployerDaemonConnection;
 	private DaemonConnection qstatDaemonConnection;
 	private String browseWebRoot;
+	private File newConfigFile;
 	private DaemonConnection swiftSearcherDaemonConnection;
 	private Collection<SearchEngine> searchEngines;
 	private boolean scaffoldReport;
@@ -56,6 +59,7 @@ public final class WebUi implements Checkable {
 	public static final String PORT = "port";
 	public static final String BROWSE_ROOT = "browseRoot";
 	public static final String BROWSE_WEB_ROOT = "browseWebRoot";
+	public static final String NEW_CONFIG_FILE = "newConfigFile";
 	public static final String QSTAT = "qstat";
 	public static final String DATABASE_UNDEPLOYER = "databaseUndeployer";
 
@@ -179,6 +183,14 @@ public final class WebUi implements Checkable {
 		this.workspaceDao = workspaceDao;
 	}
 
+	public File getNewConfigFile() {
+		return newConfigFile;
+	}
+
+	public void setNewConfigFile(File newConfigFile) {
+		this.newConfigFile = newConfigFile;
+	}
+
 	public void stopSwiftMonitor() {
 		if (getSwiftMonitor() != null) {
 			getSwiftMonitor().stop();
@@ -210,6 +222,7 @@ public final class WebUi implements Checkable {
 		private WorkspaceDao workspaceDao;
 		private SearchEngine.Factory searchEngineFactory;
 		private CurationContext curationContext;
+		private SwiftEnvironment environment;
 
 		@Override
 		public WebUi create(final Config config, final DependencyResolver dependencies) {
@@ -219,6 +232,7 @@ public final class WebUi implements Checkable {
 				ui.title = config.getTitle();
 				ui.browseRoot = new File(config.getBrowseRoot());
 				ui.browseWebRoot = config.getBrowseWebRoot();
+				ui.newConfigFile = config.getNewConfigFile() == null ? new File(Swift.DEFAULT_NEW_CONFIG_FILE) : new File(config.getNewConfigFile());
 				ui.swiftMonitor = getSwiftMonitor();
 				ui.setFileTokenFactory(getFileTokenFactory());
 				ui.setSwiftDao(getSwiftDao());
@@ -282,6 +296,14 @@ public final class WebUi implements Checkable {
 				throw new MprcException("Web UI class could not be created.", e);
 			}
 			return ui;
+		}
+
+		public SwiftEnvironment getEnvironment() {
+			return environment;
+		}
+
+		public void setEnvironment(SwiftEnvironment environment) {
+			this.environment = environment;
 		}
 
 		public SwiftMonitor getSwiftMonitor() {
@@ -368,18 +390,22 @@ public final class WebUi implements Checkable {
 		private String title;
 		private String browseRoot;
 		private String browseWebRoot;
+		// This variable is special - it is "secret" in the sense that the UI does not show it
+		// It is used solely as a way for an installer to tweak where does the newly saved config get saved.
+		private String newConfigFile;
 		private ServiceConfig qstat;
 		private ServiceConfig databaseUndeployer;
 
 		public Config() {
 		}
 
-		public Config(final ServiceConfig searcher, final String port, final String title, final String browseRoot, final String browseWebRoot, final ServiceConfig qstat, final ServiceConfig databaseUndeployer) {
+		public Config(final ServiceConfig searcher, final String port, final String title, final String browseRoot, final String browseWebRoot, final String newConfigFile, final ServiceConfig qstat, final ServiceConfig databaseUndeployer) {
 			this.searcher = searcher;
 			this.port = port;
 			this.title = title;
 			this.browseRoot = browseRoot;
 			this.browseWebRoot = browseWebRoot;
+			this.newConfigFile = newConfigFile;
 			this.qstat = qstat;
 			this.databaseUndeployer = databaseUndeployer;
 		}
@@ -399,6 +425,7 @@ public final class WebUi implements Checkable {
 			writer.put(PORT, getPort());
 			writer.put(BROWSE_ROOT, getBrowseRoot());
 			writer.put(BROWSE_WEB_ROOT, getBrowseWebRoot());
+			writer.put(NEW_CONFIG_FILE, getNewConfigFile());
 			writer.put(QSTAT, getQstat());
 			writer.put(DATABASE_UNDEPLOYER, getDatabaseUndeployer());
 		}
@@ -410,6 +437,7 @@ public final class WebUi implements Checkable {
 			port = reader.get(PORT);
 			browseRoot = reader.get(BROWSE_ROOT);
 			browseWebRoot = reader.get(BROWSE_WEB_ROOT);
+			newConfigFile = reader.get(NEW_CONFIG_FILE);
 			qstat = (ServiceConfig) reader.getObject(QSTAT);
 			databaseUndeployer = (ServiceConfig) reader.getObject(DATABASE_UNDEPLOYER);
 		}
@@ -441,6 +469,10 @@ public final class WebUi implements Checkable {
 
 		public ServiceConfig getDatabaseUndeployer() {
 			return databaseUndeployer;
+		}
+
+		public String getNewConfigFile() {
+			return newConfigFile;
 		}
 	}
 

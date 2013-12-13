@@ -61,7 +61,7 @@ SearchRunItemVisualizer.prototype.multiResultEntryTemplate = new Template('<a hr
 SearchRunItemVisualizer.prototype.multiResultEntryAnalysisTemplate = new Template('<a href="/analysis?id=#{reportId}" class="analysis-data-link">Data</a><a href="#{fullUrl}" title="#{filePath}">#{fileName}</a><br clear="left"/>');
 SearchRunItemVisualizer.prototype.multiResultTailTemplate = new Template('</span></td><td class="result-buttons">' +
     '<a href="#{parentUrl}" class="parent-dir-link" title="#{parentPath}">Directory</a>' +
-    '<a href="#{parentUrl}../qa/index.html" class="qa-link" title="Quality Analysis">QA</a>' +
+    '<a href="#{parentUrl}../qa/index.jsp" class="qa-link" title="Quality Analysis">QA</a>' +
     '</td></tr></table>');
 
 SearchRunItemVisualizer.prototype.displayTransactionError = function (event, message) {

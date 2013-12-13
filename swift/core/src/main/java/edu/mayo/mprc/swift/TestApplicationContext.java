@@ -104,7 +104,7 @@ public final class TestApplicationContext implements Lifecycle {
 
 		ServiceConfig searcherService = new ServiceConfig("searcher1", new SimpleRunner.Config(searcherConfig));
 
-		final WebUi.Config webUiConfig = new WebUi.Config(searcherService, "18080", "Swift Test", tempFolder, tempFolder, null, null);
+		final WebUi.Config webUiConfig = new WebUi.Config(searcherService, "18080", "Swift Test", tempFolder, tempFolder, null, null, null);
 
 		daemonConfig.addResource(webUiConfig);
 

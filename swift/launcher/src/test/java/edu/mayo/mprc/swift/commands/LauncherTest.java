@@ -63,7 +63,7 @@ public final class LauncherTest {
 	public void shouldGetPortFromConfig() {
 		environment = mock(SwiftEnvironment.class);
 		final DaemonConfig daemonConfig = new DaemonConfig();
-		daemonConfig.addResource(new WebUi.Config(null, "8123", "", "", "", null, null));
+		daemonConfig.addResource(new WebUi.Config(null, "8123", "", "", "", null, null, null));
 		when(environment.getDaemonConfig()).thenReturn(daemonConfig);
 		when(environment.getParameters()).thenReturn(new ArrayList<String>(0));
 
