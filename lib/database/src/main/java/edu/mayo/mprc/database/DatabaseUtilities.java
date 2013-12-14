@@ -131,7 +131,7 @@ public final class DatabaseUtilities {
 	public static Configuration getTestHibernateConfiguration(final List<String> mappingResources) {
 		LOGGER.debug("Creating test database configuration");
 		final Map<String, String> hibernateProperties = new HashMap<String, String>();
-		hibernateProperties.put("hibernate.show_sql", "true");
+		hibernateProperties.put("hibernate.show_sql", "false");
 		hibernateProperties.put("hibernate.statement_cache.size", "100");
 		hibernateProperties.put("hibernate.jdbc.batch_size", "100");
 		hibernateProperties.put("hibernate.current_session_context_class", "thread");
