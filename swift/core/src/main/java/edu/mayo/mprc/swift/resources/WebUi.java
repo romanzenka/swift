@@ -11,7 +11,6 @@ import edu.mayo.mprc.msmseval.MSMSEvalParamFile;
 import edu.mayo.mprc.msmseval.MSMSEvalWorker;
 import edu.mayo.mprc.msmseval.MsmsEvalCache;
 import edu.mayo.mprc.swift.Swift;
-import edu.mayo.mprc.swift.commands.SwiftEnvironment;
 import edu.mayo.mprc.swift.db.DatabaseFileTokenFactory;
 import edu.mayo.mprc.swift.db.SearchEngine;
 import edu.mayo.mprc.swift.db.SwiftDao;
@@ -222,7 +221,6 @@ public final class WebUi implements Checkable {
 		private WorkspaceDao workspaceDao;
 		private SearchEngine.Factory searchEngineFactory;
 		private CurationContext curationContext;
-		private SwiftEnvironment environment;
 
 		@Override
 		public WebUi create(final Config config, final DependencyResolver dependencies) {
@@ -296,14 +294,6 @@ public final class WebUi implements Checkable {
 				throw new MprcException("Web UI class could not be created.", e);
 			}
 			return ui;
-		}
-
-		public SwiftEnvironment getEnvironment() {
-			return environment;
-		}
-
-		public void setEnvironment(SwiftEnvironment environment) {
-			this.environment = environment;
 		}
 
 		public SwiftMonitor getSwiftMonitor() {
