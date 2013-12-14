@@ -81,6 +81,9 @@ public final class SwiftTest {
 			synchronized (swiftEvent) {
 				try {
 					swiftEvent.wait(1000);
+					if (caller.getExitValue() != -1) {
+						shouldEnd = true;
+					}
 					if (shouldEnd) {
 						break;
 					}
