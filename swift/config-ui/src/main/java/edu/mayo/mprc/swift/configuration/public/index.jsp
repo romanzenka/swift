@@ -114,7 +114,9 @@
 
         <ol>
             <li>kill the configuration script</li>
-            <li>copy the configuration file from <code>var/conf/swift.conf</code> to <code>conf/swift.conf</code>.
+            <li>copy the configuration file from
+                <code><%= SwiftWebContext.getWebUi().getNewConfigFile().getAbsolutePath() %>
+                </code> to <code>conf/swift.conf</code>.
                 <p>This step is done so you have a chance to review the configuration file changes, instead of Swift
                     simply overwriting the last configuration.</p></li>
             <li>start the provided <code>bin/swift</code> script</li>
