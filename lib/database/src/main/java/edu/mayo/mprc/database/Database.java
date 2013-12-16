@@ -36,6 +36,7 @@ public final class Database implements RuntimeInitializer, Lifecycle {
 	private Map<String, String> hibernateCreationProperties;
 	private List<String> mappingResources;
 	private List<RuntimeInitializer> runtimeInitializers;
+	private FileTokenToDatabaseTranslator translator;
 
 	public Database() {
 	}
@@ -115,7 +116,8 @@ public final class Database implements RuntimeInitializer, Lifecycle {
 					, config.getSchema()
 					, install ? hibernateCreationProperties : hibernateProperties
 					, mappingResources,
-					action);
+					action,
+					translator);
 
 			setSessionFactory(sessionFactory1);
 		}
@@ -259,6 +261,14 @@ public final class Database implements RuntimeInitializer, Lifecycle {
 		this.runtimeInitializers = runtimeInitializers;
 	}
 
+	public FileTokenToDatabaseTranslator getTranslator() {
+		return translator;
+	}
+
+	public void setTranslator(FileTokenToDatabaseTranslator translator) {
+		this.translator = translator;
+	}
+
 	@Override
 	public boolean isRunning() {
 		return sessionFactory != null;
@@ -267,6 +277,9 @@ public final class Database implements RuntimeInitializer, Lifecycle {
 	@Override
 	public void start() {
 		if (!isRunning()) {
+			if (getTranslator() instanceof Lifecycle) {
+				((Lifecycle) getTranslator()).start();
+			}
 			initializeSessionFactory(DatabaseUtilities.SchemaInitialization.None, false);
 		}
 	}
@@ -274,6 +287,9 @@ public final class Database implements RuntimeInitializer, Lifecycle {
 	@Override
 	public void stop() {
 		if (isRunning()) {
+			if (getTranslator() instanceof Lifecycle) {
+				((Lifecycle) getTranslator()).stop();
+			}
 			sessionFactory.close();
 		}
 	}
@@ -297,6 +313,7 @@ public final class Database implements RuntimeInitializer, Lifecycle {
 		private List<DaoBase> daoList;
 		private Database database;
 		private List<RuntimeInitializer> runtimeInitializers;
+		private FileTokenToDatabaseTranslator translator;
 
 		public Factory() {
 		}
@@ -364,6 +381,14 @@ public final class Database implements RuntimeInitializer, Lifecycle {
 			this.runtimeInitializers = runtimeInitializers;
 		}
 
+		public FileTokenToDatabaseTranslator getTranslator() {
+			return translator;
+		}
+
+		@Resource(name = "fileTokenFactory")
+		public void setTranslator(final FileTokenToDatabaseTranslator translator) {
+			this.translator = translator;
+		}
 
 		@Override
 		public Database create(final ResourceConfig config, final DependencyResolver dependencies) {
@@ -379,6 +404,7 @@ public final class Database implements RuntimeInitializer, Lifecycle {
 			placeholder.setHibernateCreationProperties(getHibernateCreationProperties());
 			placeholder.setMappingResources(collectMappingResouces(getDaoList()));
 			placeholder.setRuntimeInitializers(getRuntimeInitializers());
+			placeholder.setTranslator(getTranslator());
 			return placeholder;
 		}
 

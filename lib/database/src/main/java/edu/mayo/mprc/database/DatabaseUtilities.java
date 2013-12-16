@@ -55,10 +55,11 @@ public final class DatabaseUtilities {
 	                                               final String defaultSchema, final String schema,
 	                                               final Map<String, String> hibernateProperties,
 	                                               final List<String> mappingResources,
-	                                               final SchemaInitialization initialization) {
+	                                               final SchemaInitialization initialization,
+	                                               final FileTokenToDatabaseTranslator translator) {
 		try {
 			final Configuration cfg = getHibernateConfiguration(url, userName, password, dialect, driverClassName, defaultSchema,
-					schema, hibernateProperties, mappingResources, initialization);
+					schema, hibernateProperties, mappingResources, initialization, translator);
 			return cfg.buildSessionFactory();
 		} catch (Exception t) {
 			throw new MprcException("Could not establish database access", t);
@@ -68,8 +69,9 @@ public final class DatabaseUtilities {
 	public static Configuration getHibernateConfiguration(final String url, final String userName, final String password, final String dialect,
 	                                                      final String driverClassName, final String defaultSchema, final String schema,
 	                                                      final Map<String, String> hibernateProperties, final List<String> mappingResources,
-	                                                      final SchemaInitialization initialization) {
+	                                                      final SchemaInitialization initialization, final FileTokenToDatabaseTranslator translator) {
 		final Configuration cfg = new Configuration();
+		cfg.registerTypeOverride(new FileType(translator), new String[]{"file"});
 
 		for (final String resource : mappingResources) {
 			cfg.addResource(resource);
@@ -153,7 +155,7 @@ public final class DatabaseUtilities {
 				//"jdbc:h2:tcp://localhost/~/test",
 				"jdbc:h2:mem:test",
 				"sa", "", "org.hibernate.dialect.H2Dialect", "org.h2.Driver", "PUBLIC", "PUBLIC", hibernateProperties, mappingResources,
-				SchemaInitialization.CreateDrop);
+				SchemaInitialization.CreateDrop, new DummyFileTokenTranslator());
 	}
 
 	public static SessionFactory getTestSessionFactory(final List<String> mappingResources) {

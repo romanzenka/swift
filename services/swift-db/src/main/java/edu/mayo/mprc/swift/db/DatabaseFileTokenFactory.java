@@ -5,6 +5,7 @@ import edu.mayo.mprc.config.*;
 import edu.mayo.mprc.daemon.files.FileToken;
 import edu.mayo.mprc.daemon.files.FileTokenFactory;
 import edu.mayo.mprc.database.Database;
+import edu.mayo.mprc.database.FileTokenToDatabaseTranslator;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
@@ -18,7 +19,7 @@ import java.util.List;
  * Using this class, links to files can be stored in the database and retrieved as strings.
  */
 @Component("fileTokenFactory")
-public final class DatabaseFileTokenFactory extends FileTokenFactory implements Lifecycle {
+public final class DatabaseFileTokenFactory extends FileTokenFactory implements Lifecycle, FileTokenToDatabaseTranslator {
 	public static final String FILE_TAG = "file";
 
 	private DaemonConfigInfo databaseDaemonConfigInfo;

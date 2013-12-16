@@ -1,5 +1,6 @@
 package edu.mayo.mprc.database;
 
+import edu.mayo.mprc.MprcException;
 import edu.mayo.mprc.utilities.exceptions.ExceptionUtilities;
 import org.hibernate.HibernateException;
 import org.hibernate.type.StandardBasicTypes;
@@ -13,11 +14,17 @@ import java.sql.SQLException;
 import java.sql.Types;
 
 /**
- * Storing {@link File} into database as its absolute path.
+ * Storing {@link File} into database as URI of its absolute path.
  */
 public final class FileType implements UserType {
 
+	private FileTokenToDatabaseTranslator translator;
+
 	public FileType() {
+	}
+
+	public FileType(final FileTokenToDatabaseTranslator translator) {
+		this.translator = translator;
 	}
 
 	@Override
@@ -69,7 +76,14 @@ public final class FileType implements UserType {
 		if (null == value) {
 			preparedStatement.setNull(index, Types.VARCHAR);
 		} else {
-			preparedStatement.setString(index, ((File) value).getAbsolutePath());
+			checkTranslatorNotNull();
+			preparedStatement.setString(index, translator.fileToDatabaseToken((File) value));
+		}
+	}
+
+	private void checkTranslatorNotNull() {
+		if (translator == null) {
+			throw new MprcException(getClass().getName() + " was not initialized with a translator for file tokens.\nUse for instance " + DummyFileTokenTranslator.class.getName() + " before you start storing file paths to database.");
 		}
 	}
 
@@ -89,7 +103,8 @@ public final class FileType implements UserType {
 	@Override
 	public Serializable disassemble(final Object o) throws HibernateException {
 		try {
-			return ((File) o).getAbsolutePath();
+			checkTranslatorNotNull();
+			return translator.fileToDatabaseToken((File) o);
 		} catch (Exception t) {
 			throw new HibernateException(t);
 		}
@@ -102,7 +117,8 @@ public final class FileType implements UserType {
 				ExceptionUtilities.throwCastException(serializable, String.class);
 				return null;
 			}
-			return new File((String) serializable);
+			checkTranslatorNotNull();
+			return translator.databaseTokenToFile((String) serializable);
 		} catch (Exception t) {
 			throw new HibernateException(t);
 		}
