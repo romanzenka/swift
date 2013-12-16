@@ -155,7 +155,10 @@ public final class ServiceFactory implements Lifecycle {
 				LOGGER.warn("Could not close connection when shutting down service", e);
 			}
 			connection = null;
-			getResponseDispatcher().close();
+			if (responseDispatcher != null) {
+				responseDispatcher.close();
+				responseDispatcher = null;
+			}
 			connectionPool.close();
 			connectionPool = null;
 		}
