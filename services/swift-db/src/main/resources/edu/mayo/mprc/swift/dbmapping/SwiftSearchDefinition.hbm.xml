@@ -1,31 +1,28 @@
-<?xml version="1.0" encoding="windows-1252" ?>
-<!DOCTYPE hibernate-mapping PUBLIC
-        "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
-        "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<?xml version="1.0" encoding="windows-1252" ?><!DOCTYPE hibernate-mapping PUBLIC
+    "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+    "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
 
 <hibernate-mapping package="edu.mayo.mprc.swift.dbmapping">
     <class name="SwiftSearchDefinition" table="swift_search_definition" lazy="false">
         <id name="id" column="swift_search_definition_id" type="int">
-            <generator class="native"/>
+            <generator class="native" />
         </id>
 
-        <property name="title" type="string" length="100" column="title"/>
-        <many-to-one name="user" class="edu.mayo.mprc.workspace.User" column="owner" foreign-key="ssd_user_fk"/>
-        <property name="outputFolder" type="edu.mayo.mprc.database.FileType" column="output_folder"/>
-        <many-to-one name="qa" class="SpectrumQa" column="spectrum_qa" foreign-key="ssd_sqa_fk"/>
-        <many-to-one name="peptideReport" class="PeptideReport" column="peptide_report" foreign-key="ssd_pepr_fk"/>
-        <property name="publicMgfFiles" type="boolean" column="public_mgf_files" not-null="false"/>
-        <property name="publicMzxmlFiles" type="boolean" column="public_mzxml_files" not-null="false"/>
-        <property name="publicSearchFiles" type="boolean" column="public_search_files" not-null="false"/>
+        <property name="title" type="string" length="100" column="title" />
+        <many-to-one name="user" class="edu.mayo.mprc.workspace.User" column="owner" foreign-key="ssd_user_fk" />
+        <property name="outputFolder" type="file" column="output_folder" />
+        <many-to-one name="qa" class="SpectrumQa" column="spectrum_qa" foreign-key="ssd_sqa_fk" />
+        <many-to-one name="peptideReport" class="PeptideReport" column="peptide_report" foreign-key="ssd_pepr_fk" />
+        <property name="publicMgfFiles" type="boolean" column="public_mgf_files" not-null="false" />
+        <property name="publicMzxmlFiles" type="boolean" column="public_mzxml_files" not-null="false" />
+        <property name="publicSearchFiles" type="boolean" column="public_search_files" not-null="false" />
         <many-to-one name="searchParameters" class="edu.mayo.mprc.swift.params2.SearchEngineParameters"
-                     column="search_parameters"
-                     not-null="false"
-                     foreign-key="ssd_sp_fk"/>
+            column="search_parameters" not-null="false" foreign-key="ssd_sp_fk" />
 
         <list name="inputFiles" cascade="all" lazy="false">
-            <key column="input_files_id"/>
-            <list-index column="sort_order"/>
-            <one-to-many class="FileSearch"/>
+            <key column="input_files_id" />
+            <list-index column="sort_order" />
+            <one-to-many class="FileSearch" />
         </list>
     </class>
 </hibernate-mapping>

@@ -1,19 +1,19 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
-        "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+    "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
 
 <hibernate-mapping package="edu.mayo.mprc.dbcurator.model">
 
     <class name="SourceDatabaseArchive" table="source_database_archive">
         <id name="id" type="integer" column="source_id">
-            <generator class="native"/>
+            <generator class="native" />
         </id>
 
-        <property name="sourceURL" type="string" length="128" column="source_url"/>
-        <property name="archive" type="edu.mayo.mprc.database.FileType" column="source_path" access="property"/>
+        <property name="sourceURL" type="string" length="128" column="source_url" />
+        <property name="archive" type="file" column="source_path" access="property" />
         <property name="serverDate" type="org.joda.time.contrib.hibernate.PersistentDateTime"
-                  column="server_creation_date"/>
-        <property name="downloadDate" type="org.joda.time.contrib.hibernate.PersistentDateTime" column="download_date"/>
+            column="server_creation_date" />
+        <property name="downloadDate" type="org.joda.time.contrib.hibernate.PersistentDateTime"
+            column="download_date" />
     </class>
 
 </hibernate-mapping>

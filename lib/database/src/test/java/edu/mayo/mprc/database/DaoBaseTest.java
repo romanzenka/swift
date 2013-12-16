@@ -10,7 +10,9 @@ import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
+import java.io.File;
 import java.util.Arrays;
+import java.util.List;
 
 public final class DaoBaseTest extends DaoTest {
 	private DaoBase base;
@@ -146,6 +148,23 @@ public final class DaoBaseTest extends DaoTest {
 		return Restrictions.conjunction()
 				.add(Restrictions.eq("value1", d1.getValue1()))
 				.add(Restrictions.eq("value2", d1.getValue2()));
+	}
+
+	@Test
+	public void shouldSaveFiles() {
+		TestFile f1 = new TestFile(new File("hello.txt").getAbsoluteFile(), null);
+		f1 = base.save(f1, testFileEqualityCriteria(f1), false);
+		nextTransaction();
+		final List<TestFile> list = DaoBase.listAndCast(base.getSession().createCriteria(TestFile.class));
+		Assert.assertEquals(list.size(), 1);
+		Assert.assertEquals(list.get(0).getFile1(), f1.getFile1());
+		Assert.assertEquals(list.get(0).getFile2(), f1.getFile2());
+	}
+
+	private Criterion testFileEqualityCriteria(TestFile f1) {
+		return Restrictions.conjunction()
+				.add(Restrictions.eq("file1", f1.getFile1()))
+				.add(Restrictions.eq("file2", f1.getFile2()));
 	}
 
 

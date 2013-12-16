@@ -19,7 +19,8 @@ public final class TestDaoBaseImpl extends DaoBase {
 				"edu/mayo/mprc/database/TestDouble.hbm.xml",
 				"edu/mayo/mprc/database/TestList.hbm.xml",
 				"edu/mayo/mprc/database/TestSet.hbm.xml",
-				"edu/mayo/mprc/database/TestSetMember.hbm.xml"));
+				"edu/mayo/mprc/database/TestSetMember.hbm.xml",
+				"edu/mayo/mprc/database/TestFile.hbm.xml"));
 		list.addAll(super.getHibernateMappings());
 		return list;
 	}

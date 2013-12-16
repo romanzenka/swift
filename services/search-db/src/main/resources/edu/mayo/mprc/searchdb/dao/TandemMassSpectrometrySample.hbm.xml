@@ -1,27 +1,31 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
-        "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+    "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
 <hibernate-mapping package="edu.mayo.mprc.searchdb.dao" default-lazy="true">
     <class name="TandemMassSpectrometrySample" table="tandem_mass_spec_sample">
         <id name="id" type="integer" column="tandem_mass_spec_sample_id">
-            <generator class="native"/>
+            <generator class="native" />
         </id>
         <properties name="uniqueFileIdentifier" unique="true">
-            <property name="file" type="edu.mayo.mprc.database.FileType" column="file" not-null="true"/>
+            <property name="file" type="file" column="file" not-null="true" />
             <property name="lastModified" type="org.joda.time.contrib.hibernate.PersistentDateTime"
-                      column="last_modified" not-null="true"/>
+                column="last_modified" not-null="true" />
         </properties>
-        <property name="ms1Spectra" type="integer" column="ms1_spectra"/>
-        <property name="ms2Spectra" type="integer" column="ms2_spectra"/>
-        <property name="ms3PlusSpectra" type="integer" column="ms3_plus_spectra"/>
-        <property name="instrumentName" type="string" length="40" column="instrument_name"/>
-        <property name="instrumentSerialNumber" type="string" length="20" column="instrument_serial_number"/>
-        <property name="startTime" type="org.joda.time.contrib.hibernate.PersistentDateTime" column="start_time"/>
-        <property name="runTimeInSeconds" type="double" column="run_time_seconds"/>
-        <property name="comment" type="text" column="comment"/> <!-- TODO: Make binary -->
-        <property name="tuneMethod" type="text" column="tune_method" lazy="true"/> <!-- TODO: Make binary -->
-        <property name="instrumentMethod" type="text" column="instrument_method" lazy="true"/> <!-- TODO: Make binary -->
-        <property name="sampleInformation" type="text" column="sample_information" lazy="true"/> <!-- TODO: Make binary -->
-        <property name="errorLog" type="text" column="error_log" lazy="true"/> <!-- TODO: Make binary -->
+        <property name="ms1Spectra" type="integer" column="ms1_spectra" />
+        <property name="ms2Spectra" type="integer" column="ms2_spectra" />
+        <property name="ms3PlusSpectra" type="integer" column="ms3_plus_spectra" />
+        <property name="instrumentName" type="string" length="40" column="instrument_name" />
+        <property name="instrumentSerialNumber" type="string" length="20" column="instrument_serial_number" />
+        <property name="startTime" type="org.joda.time.contrib.hibernate.PersistentDateTime" column="start_time" />
+        <property name="runTimeInSeconds" type="double" column="run_time_seconds" />
+        <property name="comment" type="text" column="comment" />
+        <!-- TODO: Make binary -->
+        <property name="tuneMethod" type="text" column="tune_method" lazy="true" />
+        <!-- TODO: Make binary -->
+        <property name="instrumentMethod" type="text" column="instrument_method" lazy="true" />
+        <!-- TODO: Make binary -->
+        <property name="sampleInformation" type="text" column="sample_information" lazy="true" />
+        <!-- TODO: Make binary -->
+        <property name="errorLog" type="text" column="error_log" lazy="true" />
+        <!-- TODO: Make binary -->
     </class>
 </hibernate-mapping>

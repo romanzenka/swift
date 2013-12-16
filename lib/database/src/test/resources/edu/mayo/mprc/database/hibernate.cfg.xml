@@ -12,5 +12,6 @@
         <mapping resource="edu/mayo/mprc/database/TestSetMember.hbm.xml" />
         <mapping resource="edu/mayo/mprc/database/TestDouble.hbm.xml" />
         <mapping resource="edu/mayo/mprc/database/TestDate.hbm.xml" />
+        <mapping resource="edu/mayo/mprc/database/TestFile.hbm.xml" />
     </session-factory>
 </hibernate-configuration>

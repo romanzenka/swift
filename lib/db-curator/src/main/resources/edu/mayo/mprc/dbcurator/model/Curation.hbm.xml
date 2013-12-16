@@ -1,35 +1,34 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
-        "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+    "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
 
 <hibernate-mapping package="edu.mayo.mprc.dbcurator.model">
     <class name="Curation" table="curation">
         <id name="id" type="integer" column="curation_id">
-            <generator class="native"/>
+            <generator class="native" />
         </id>
 
-        <property name="shortName" type="string" length="64" column="short_name" not-null="true"/>
+        <property name="shortName" type="string" length="64" column="short_name" not-null="true" />
 
         <property name="firstRunDate" type="org.joda.time.contrib.hibernate.PersistentDateTime"
-                  column="first_run_date"/>
-        <property name="curationFile" type="edu.mayo.mprc.database.FileType" column="curated_filename"/>
-        <property name="title" type="string" length="255" column="title"/>
-        <property name="ownerEmail" type="string" length="32" column="email"/>
-        <property name="runDate" type="org.joda.time.contrib.hibernate.PersistentDateTime" column="run_date"/>
+            column="first_run_date" />
+        <property name="curationFile" type="file" column="curated_filename" />
+        <property name="title" type="string" length="255" column="title" />
+        <property name="ownerEmail" type="string" length="32" column="email" />
+        <property name="runDate" type="org.joda.time.contrib.hibernate.PersistentDateTime" column="run_date" />
         <property name="deploymentDate" type="org.joda.time.contrib.hibernate.PersistentDateTime"
-                  column="deployment_date"/>
-        <property name="notes" type="string" column="notes" length="255"/>
+            column="deployment_date" />
+        <property name="notes" type="string" column="notes" length="255" />
 
         <list name="curationSteps" table="curation_step_list" cascade="all" lazy="true">
-            <key column="curation_id" not-null="true"/>
-            <list-index column="sort_order"/>
-            <many-to-many column="step_id" class="edu.mayo.mprc.dbcurator.model.CurationStep"/>
+            <key column="curation_id" not-null="true" />
+            <list-index column="sort_order" />
+            <many-to-many column="step_id" class="edu.mayo.mprc.dbcurator.model.CurationStep" />
         </list>
 
-        <property name="decoyRegex" type="string" length="200" column="decoy_regex" not-null="false"/>
+        <property name="decoyRegex" type="string" length="200" column="decoy_regex" not-null="false" />
 
-        <many-to-one name="creation" column="creation" class="edu.mayo.mprc.database.Change" lazy="proxy"/>
-        <many-to-one name="deletion" column="deletion" class="edu.mayo.mprc.database.Change" lazy="proxy"/>
+        <many-to-one name="creation" column="creation" class="edu.mayo.mprc.database.Change" lazy="proxy" />
+        <many-to-one name="deletion" column="deletion" class="edu.mayo.mprc.database.Change" lazy="proxy" />
     </class>
 
 </hibernate-mapping>
