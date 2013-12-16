@@ -20,8 +20,11 @@ import edu.mayo.mprc.utilities.TestingUtilities;
 import edu.mayo.mprc.utilities.progress.ProgressInfo;
 import edu.mayo.mprc.utilities.progress.ProgressListener;
 import org.apache.log4j.Logger;
+import org.custommonkey.xmlunit.XMLTestCase;
+import org.custommonkey.xmlunit.XMLUnit;
 import org.testng.Assert;
 import org.testng.annotations.Test;
+import org.xml.sax.SAXException;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -32,7 +35,7 @@ import java.nio.charset.Charset;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public final class MyriMatchTest {
+public final class MyriMatchTest extends XMLTestCase {
 	private static final Logger LOGGER = Logger.getLogger(MyriMatchTest.class);
 	private static final MockUnimodDao UNIMOD_DAO = new MockUnimodDao();
 	public static final Charset CHARSET = Charset.forName("ISO-8859-1");
@@ -203,7 +206,7 @@ public final class MyriMatchTest {
 	}
 
 	@Test
-	public void shouldRunSearch() throws IOException, InterruptedException {
+	public void shouldRunSearch() throws IOException, InterruptedException, SAXException {
 		final File myrimatchExecutable = getMyriMatchExecutable();
 		final File tempFolder = FileUtilities.createTempFolder();
 
@@ -298,7 +301,9 @@ public final class MyriMatchTest {
 			FileUtilities.cleanupTempFile(mgfFile);
 			FileUtilities.cleanupTempFile(tempFolder);
 
-			Assert.assertEquals(resultString, expectedString, "The MyriMatch results do not match expected ones");
+
+			XMLUnit.setIgnoreWhitespace(true);
+			assertXMLEqual("The MyriMatch results do not match expected ones", expectedString, resultString);
 		} finally {
 			tester.stop();
 		}
