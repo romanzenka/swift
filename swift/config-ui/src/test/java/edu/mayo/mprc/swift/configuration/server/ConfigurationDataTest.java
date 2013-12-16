@@ -75,8 +75,8 @@ public final class ConfigurationDataTest {
 	public static void shouldSaveConfig() {
 		final File folder = FileUtilities.createTempFolder();
 		data.saveConfig(folder);
-		Assert.assertTrue(new File(folder, "conf/").exists(), "Configuration folder must exist");
-		Assert.assertTrue(new File(folder, "conf/swift.conf").exists(), "swift.conf config must exist");
+		Assert.assertTrue(new File(folder, "var/conf/").exists(), "Configuration folder must exist");
+		Assert.assertTrue(new File(folder, "var/conf/swift.conf").exists(), "swift.conf config must exist");
 		FileUtilities.quietDelete(folder);
 	}
 
