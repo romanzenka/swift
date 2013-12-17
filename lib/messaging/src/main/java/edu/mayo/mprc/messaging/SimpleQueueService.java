@@ -77,7 +77,10 @@ final class SimpleQueueService implements Service {
 				objectMessage.setJMSCorrelationID(correlationId);
 			}
 
-			LOGGER.debug("Sending message to [" + queueName + "] with content [" + objectMessage.toString() + "] id: [" + objectMessage.getJMSMessageID() + "]");
+			LOGGER.debug("Sending message to [" + queueName + "] with content ["
+					+ objectMessage.toString() + "] id: ["
+					+ objectMessage.getJMSMessageID() + "] correlationId: ["
+					+ objectMessage.getJMSCorrelationID() + "]");
 			messageProducer().send(getRequestDestination(), objectMessage);
 		} catch (JMSException e) {
 			throw new MprcException("Could not send message", e);
