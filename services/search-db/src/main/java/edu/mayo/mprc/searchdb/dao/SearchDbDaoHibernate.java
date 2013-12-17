@@ -245,7 +245,6 @@ public class SearchDbDaoHibernate extends DaoBase implements RuntimeInitializer,
 					resultNum++;
 				}
 				biologicalSample.setSearchResults(addSet(newList));
-				reporter.reportProgress((float) 0 / (float) 0);
 			}
 			return save(biologicalSample, biologicalSampleEqualityCriteria(biologicalSample), false);
 		}
