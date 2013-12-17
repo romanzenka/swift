@@ -81,7 +81,7 @@ public final class ReportUpdate implements HttpRequestHandler {
 		if (qstatJobId != null) {
 			final DaemonConnection connection = getWebUi().getQstatDaemonConnection();
 			resp.setContentType("text/plain");
-			final SgeStatusProgressListener listener = new SgeStatusProgressListener(resp);
+			final SgeStatusProgressListener listener = new SgeStatusProgressListener();
 			connection.sendWork(new QstatWorkPacket(Integer.parseInt(qstatJobId)), listener);
 			try {
 				listener.waitForEvent(QSTAT_TIMEOUT);
