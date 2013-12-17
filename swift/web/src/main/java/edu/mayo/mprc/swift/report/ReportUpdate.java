@@ -88,6 +88,13 @@ public final class ReportUpdate implements HttpRequestHandler {
 			} catch (InterruptedException ignore) {
 				// SWALLOWED: We just exit
 			}
+			try {
+				final ServletOutputStream outputStream = resp.getOutputStream();
+				outputStream.print(listener.getResult());
+			} catch (IOException e) {
+				throw new ServletException(e);
+			}
+
 			return;
 		}
 
@@ -338,12 +345,11 @@ public final class ReportUpdate implements HttpRequestHandler {
 
 	private static final class SgeStatusProgressListener implements ProgressListener {
 		// TODO: This directly prints out messages - unclean
-		private HttpServletResponse response;
 		private boolean finished;
 		private final Object lock = new Object();
+		private String result;
 
-		SgeStatusProgressListener(final HttpServletResponse response) {
-			this.response = response;
+		SgeStatusProgressListener() {
 		}
 
 		@Override
@@ -368,6 +374,12 @@ public final class ReportUpdate implements HttpRequestHandler {
 			signalFinished();
 		}
 
+		private String getResult() {
+			synchronized (lock) {
+				return result;
+			}
+		}
+
 		private void signalFinished() {
 			synchronized (lock) {
 				finished = true;
@@ -378,13 +390,7 @@ public final class ReportUpdate implements HttpRequestHandler {
 		@Override
 		public void requestTerminated(final Exception e) {
 			final String info = e.getMessage();
-			try {
-				final ServletOutputStream output = response.getOutputStream();
-				output.print(info);
-				output.close();
-			} catch (IOException ignore) {
-				// SWALLOWED: Not much we can do
-			}
+			result = info;
 			signalFinished();
 		}
 
@@ -392,13 +398,7 @@ public final class ReportUpdate implements HttpRequestHandler {
 		public void userProgressInformation(final ProgressInfo progressInfo) {
 			if (progressInfo instanceof QstatOutput) {
 				final QstatOutput info = (QstatOutput) progressInfo;
-				try {
-					final ServletOutputStream output = response.getOutputStream();
-					output.print(info.getQstatOutput());
-					output.close();
-				} catch (IOException ignore) {
-					// SWALLOWED: Not much we can do
-				}
+				result = info.getQstatOutput();
 			}
 		}
 	}
