@@ -46,7 +46,7 @@ public final class ResponseDispatcher {
 	 */
 	public static final String LAST_RESPONSE = "is_last";
 
-	private MessageConsumer queueConsumer;
+	private final MessageConsumer queueConsumer;
 
 	/**
 	 * @param connection Connection to the broker.
