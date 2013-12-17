@@ -14,6 +14,7 @@ import java.net.URISyntaxException;
 
 /**
  * Returns a service using a queue of a given name.
+ * This has to be thread-safe as multiple users can start this from different threads.
  */
 public final class ServiceFactory implements Lifecycle {
 	private static final Logger LOGGER = Logger.getLogger(ServiceFactory.class);
@@ -117,30 +118,40 @@ public final class ServiceFactory implements Lifecycle {
 	}
 
 	public Connection getConnection() {
-		return connection;
+		synchronized (this) {
+			return connection;
+		}
 	}
 
 	public ResponseDispatcher getResponseDispatcher() {
-		if (responseDispatcher == null) {
-			throw new MprcException("This service factory does not support response dispatch. This probably because it is not running within a daemon (daemonName is set to " + daemonName + ")");
+		final String daemon = getDaemonName();
+		synchronized (this) {
+			if (responseDispatcher == null) {
+				throw new MprcException("This service factory does not support response dispatch. This probably because it is not running within a daemon (daemon is set to " + daemon + ")");
+			}
+			return responseDispatcher;
 		}
-		return responseDispatcher;
 	}
 
 	@Override
 	public boolean isRunning() {
-		return connection != null;
+		synchronized (this) {
+			return connection != null;
+		}
 	}
 
 	@Override
 	public void start() {
-		if (!isRunning()) {
-			if (connection == null) {
-				final UserInfo info = extractJmsUserinfo(getBrokerUri());
-				connection = getConnectionPool().getConnectionToBroker(getBrokerUri(), info.getUserName(), info.getPassword());
-			}
-			if (responseDispatcher == null && getDaemonName() != null) {
-				responseDispatcher = new ResponseDispatcher(connection, getDaemonName());
+		final String daemon = getDaemonName();
+		synchronized (this) {
+			if (!isRunning()) {
+				if (connection == null) {
+					final UserInfo info = extractJmsUserinfo(getBrokerUri());
+					connection = getConnectionPool().getConnectionToBroker(getBrokerUri(), info.getUserName(), info.getPassword());
+				}
+				if (responseDispatcher == null && daemon != null) {
+					responseDispatcher = new ResponseDispatcher(connection, daemon);
+				}
 			}
 		}
 	}
@@ -148,16 +159,18 @@ public final class ServiceFactory implements Lifecycle {
 	@Override
 	public void stop() {
 		if (isRunning()) {
-			try {
-				connection.close();
-			} catch (JMSException e) {
-				// SWALLOWED
-				LOGGER.warn("Could not close connection when shutting down service", e);
-			}
-			connection = null;
-			if (responseDispatcher != null) {
-				responseDispatcher.close();
-				responseDispatcher = null;
+			synchronized (this) {
+				try {
+					connection.close();
+				} catch (JMSException e) {
+					// SWALLOWED
+					LOGGER.warn("Could not close connection when shutting down service", e);
+				}
+				connection = null;
+				if (responseDispatcher != null) {
+					responseDispatcher.close();
+					responseDispatcher = null;
+				}
 			}
 			connectionPool.close();
 			connectionPool = null;
