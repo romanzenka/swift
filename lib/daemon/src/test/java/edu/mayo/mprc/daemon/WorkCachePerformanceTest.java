@@ -52,7 +52,7 @@ public final class WorkCachePerformanceTest {
 			throw new MprcException(e);
 		}
 		serviceFactory.start();
-		responseDispatcher = new ResponseDispatcher(serviceFactory.getConnection(), "test-daemon");
+		responseDispatcher = new ResponseDispatcher(serviceFactory, "test-daemon");
 		responseDispatcher.start();
 	}
 

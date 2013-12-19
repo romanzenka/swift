@@ -1,5 +1,6 @@
 package edu.mayo.mprc.messaging;
 
+import com.google.common.base.Preconditions;
 import edu.mayo.mprc.MprcException;
 import edu.mayo.mprc.config.Lifecycle;
 import org.apache.log4j.Logger;
@@ -50,7 +51,7 @@ public final class ResponseDispatcher implements Lifecycle {
 	 */
 	private final AtomicLong uniqueId = new AtomicLong(System.currentTimeMillis());
 
-	private final Connection connection;
+	private final ServiceFactory serviceFactory;
 
 	/**
 	 * The very last response to a request is marked with this boolean property set to true.
@@ -58,11 +59,12 @@ public final class ResponseDispatcher implements Lifecycle {
 	public static final String LAST_RESPONSE = "is_last";
 
 	/**
-	 * @param connection Connection to the broker.
-	 * @param daemonName Unique name of the daemon we are running (will be used for the response queue)
+	 * @param serviceFactory Wraps the connections.
+	 * @param daemonName     Unique name of the daemon we are running (will be used for the response queue)
 	 */
-	public ResponseDispatcher(final Connection connection, final String daemonName) {
-		this.connection = connection;
+	public ResponseDispatcher(final ServiceFactory serviceFactory, final String daemonName) {
+		Preconditions.checkNotNull(serviceFactory, "Service factory must not be null");
+		this.serviceFactory = serviceFactory;
 		queueName = "responses-" + daemonName;
 	}
 
@@ -81,6 +83,9 @@ public final class ResponseDispatcher implements Lifecycle {
 	 * @return Correlation ID for messages that should be processed by this listener.
 	 */
 	public String registerMessageListener(final ResponseListener listener) {
+		if (!isRunning()) {
+			start();
+		}
 		final String correlationId = String.valueOf(uniqueId.incrementAndGet());
 		responseMap.put(correlationId, listener);
 		return correlationId;
@@ -100,7 +105,9 @@ public final class ResponseDispatcher implements Lifecycle {
 			if (isRunning()) {
 				return;
 			}
-			session = connection.createSession(/*transacted?*/false, /*acknowledgment*/Session.CLIENT_ACKNOWLEDGE);
+			serviceFactory.start();
+
+			session = serviceFactory.getConnection().createSession(/*transacted?*/false, /*acknowledgment*/Session.CLIENT_ACKNOWLEDGE);
 
 			responseQueue = session.createQueue(queueName);
 			queueConsumer = session.createConsumer(responseQueue);

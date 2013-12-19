@@ -127,7 +127,7 @@ public final class DaemonWorkerTester implements Lifecycle {
 			if (serviceFactory != null) {
 				serviceFactory.start();
 			}
-			responseDispatcher = new ResponseDispatcher(serviceFactory.getConnection(), "test-daemon");
+			responseDispatcher = new ResponseDispatcher(serviceFactory, "test-daemon");
 			responseDispatcher.start();
 			final String queueName = "test_" + testId.incrementAndGet();
 			initializeFromQueueName(queueName);

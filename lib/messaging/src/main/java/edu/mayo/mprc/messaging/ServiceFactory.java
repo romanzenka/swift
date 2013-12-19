@@ -40,9 +40,6 @@ public final class ServiceFactory implements Lifecycle {
 	 * @throws MprcException Service could not be created.
 	 */
 	public Service createService(final String queueName, final ResponseDispatcher responseDispatcher) {
-		if (!isRunning()) {
-			throw new MprcException("Cannot use ServiceFactory if it is not running");
-		}
 		// TODO: This is hardcoded right now. Eventually would allow registering of new URI handlers.
 		if (Strings.isNullOrEmpty(queueName)) {
 			throw new MprcException("queue name must not be empty");
@@ -64,9 +61,6 @@ public final class ServiceFactory implements Lifecycle {
 	 * @return Service based on a simple queue that can be used for both sending and receiving of messages.
 	 */
 	public Service createJmsQueue(final String name, final ResponseDispatcher responseDispatcher) {
-		if (!isRunning()) {
-			throw new MprcException("Cannot use ServiceFactory if it is not running");
-		}
 		return new SimpleQueueService(this, responseDispatcher, name);
 	}
 

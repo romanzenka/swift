@@ -77,9 +77,6 @@ public final class Daemon implements Checkable, Installable {
 	 * Runs all the defined daemons runners.
 	 */
 	public void start() {
-		if (getResponseDispatcher() != null) {
-			getResponseDispatcher().start();
-		}
 		for (final Object resource : resources) {
 			if (resource instanceof Lifecycle) {
 				((Lifecycle) resource).start();
@@ -326,9 +323,8 @@ public final class Daemon implements Checkable, Installable {
 
 			ServiceFactory serviceFactory = getDaemonConnectionFactory().getServiceFactory();
 			daemon.setServiceFactory(serviceFactory);
-			daemon.setResponseDispatcher(new ResponseDispatcher(serviceFactory.getConnection(), daemon.getName()));
+			daemon.setResponseDispatcher(new ResponseDispatcher(serviceFactory, daemon.getName()));
 
-			getDaemonConnectionFactory().start();
 			// We need to set this up before we start to deserialize the daemon configuration
 			getDaemonConnectionFactory().setResponseDispatcher(daemon.getResponseDispatcher());
 

@@ -46,7 +46,7 @@ public abstract class MessagingTestBase {
 		}
 		serviceFactory.start();
 
-		responseDispatcher = new ResponseDispatcher(serviceFactory.getConnection(), "test-messaging-daemon");
+		responseDispatcher = new ResponseDispatcher(serviceFactory, "test-messaging-daemon");
 		responseDispatcher.start();
 
 		try {

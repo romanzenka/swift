@@ -18,7 +18,6 @@ final class SimpleQueueService implements Service {
 
 	private final ServiceFactory serviceFactory;
 
-	private static final MessagingTracker TRACKER = new MessagingTracker();
 	/**
 	 * Each thread using the SimpleQueueService uses a separate session.
 	 * A session for sending messages is separate from the session for receiving messages.
@@ -82,7 +81,6 @@ final class SimpleQueueService implements Service {
 				objectMessage.setJMSCorrelationID(correlationId);
 			}
 
-			TRACKER.sendMessage(objectMessage);
 			messageProducer().send(getRequestDestination(), objectMessage);
 		} catch (JMSException e) {
 			throw new MprcException("Could not send message", e);
@@ -123,7 +121,6 @@ final class SimpleQueueService implements Service {
 				final ObjectMessage responseMessage = receivingSession().createObjectMessage(response);
 				responseMessage.setBooleanProperty(ResponseDispatcher.LAST_RESPONSE, isLast);
 				responseMessage.setJMSCorrelationID(originalMessage.getJMSCorrelationID());
-				TRACKER.sendMessage(responseMessage);
 				messageProducer().send(originalMessage.getJMSReplyTo(), responseMessage);
 			}
 
@@ -137,7 +134,6 @@ final class SimpleQueueService implements Service {
 		try {
 			final Message message = messageConsumer().receive(timeout);
 			if (message != null) {
-				TRACKER.receiveMessage(message);
 				return wrapReceivedMessage(message);
 			} else {
 				return null;

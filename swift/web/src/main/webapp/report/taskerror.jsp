@@ -1,7 +1,7 @@
 <%@ page import="edu.mayo.mprc.MprcException" %>
-<%@ page import="edu.mayo.mprc.daemon.files.FileTokenFactory" %>
 <%@ page import="edu.mayo.mprc.swift.ReportUtils" %>
 <%@ page import="edu.mayo.mprc.swift.SwiftWebContext" %>
+<%@ page import="edu.mayo.mprc.swift.db.DatabaseFileTokenFactory" %>
 <%@ page import="edu.mayo.mprc.swift.dbmapping.SearchRun" %>
 <%@ page import="edu.mayo.mprc.swift.dbmapping.TaskData" %>
 <%@ page import="edu.mayo.mprc.utilities.StringUtilities" %>
@@ -15,7 +15,7 @@
     final File browseRoot = SwiftWebContext.getWebUi().getBrowseRoot();
     final String taskIdString = request.getParameter("id");
     final String searchRunIdString = request.getParameter("tid");
-    final FileTokenFactory tokenFactory = SwiftWebContext.getWebUi().getFileTokenFactory();
+    final DatabaseFileTokenFactory tokenFactory = SwiftWebContext.getWebUi().getFileTokenFactory();
     if (taskIdString == null && searchRunIdString == null) {
 %>
 <h1>Error</h1>

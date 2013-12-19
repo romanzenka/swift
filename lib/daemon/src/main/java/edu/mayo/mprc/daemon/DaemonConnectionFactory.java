@@ -1,6 +1,5 @@
 package edu.mayo.mprc.daemon;
 
-import edu.mayo.mprc.MprcException;
 import edu.mayo.mprc.config.*;
 import edu.mayo.mprc.config.ui.FactoryDescriptor;
 import edu.mayo.mprc.config.ui.ServiceUiFactory;
@@ -39,9 +38,6 @@ public final class DaemonConnectionFactory extends FactoryBase<ServiceConfig, Da
 
 	@Override
 	public DaemonConnection create(final ServiceConfig config, final DependencyResolver dependencies) {
-		if (!isRunning()) {
-			throw new MprcException("The daemon connection factory has to be started before it gets used");
-		}
 		final ServiceFactory factory = getServiceFactory();
 		final Service service = factory.createService(config.getName(), responseDispatcher);
 		return new DirectDaemonConnection(service, fileTokenFactory);
