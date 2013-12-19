@@ -59,4 +59,9 @@ public final class DaemonProgressMessage implements Serializable {
 	public String getHostString() {
 		return host;
 	}
+
+	@Override
+	public String toString() {
+		return progress.name() + "\t" + (progressData == null ? "" : progressData.toString()) + " on " + getHostString();
+	}
 }
