@@ -16,6 +16,7 @@ public abstract class MessagingTestBase {
 	protected MessageBroker broker;
 	protected Service service;
 	protected ServiceFactory serviceFactory;
+	protected ResponseDispatcher responseDispatcher;
 
 	/**
 	 * Null Constructor
@@ -38,7 +39,6 @@ public abstract class MessagingTestBase {
 
 		serviceFactory = new ServiceFactory();
 		serviceFactory.setConnectionPool(new ActiveMQConnectionPool());
-		serviceFactory.setDaemonName("test-messaging-daemon");
 		try {
 			serviceFactory.setBrokerUri(new URI(BROKER + "?create=false&waitForStart=100"));
 		} catch (URISyntaxException e) {
@@ -46,8 +46,11 @@ public abstract class MessagingTestBase {
 		}
 		serviceFactory.start();
 
+		responseDispatcher = new ResponseDispatcher(serviceFactory.getConnection(), "test-messaging-daemon");
+		responseDispatcher.start();
+
 		try {
-			service = serviceFactory.createService(TEST_QUEUE_NAME);
+			service = serviceFactory.createService(TEST_QUEUE_NAME, responseDispatcher);
 			service.start();
 		} catch (Exception t) {
 			throw new MprcException(t);
@@ -56,6 +59,9 @@ public abstract class MessagingTestBase {
 
 	@AfterClass
 	public void stopBroker() {
+		if (responseDispatcher != null) {
+			responseDispatcher.stop();
+		}
 		if (serviceFactory != null) {
 			service.stop();
 			serviceFactory.stop();

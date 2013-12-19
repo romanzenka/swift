@@ -6,6 +6,8 @@ import edu.mayo.mprc.config.*;
 import edu.mayo.mprc.config.ui.FactoryDescriptor;
 import edu.mayo.mprc.config.ui.ServiceUiFactory;
 import edu.mayo.mprc.daemon.monitor.PingDaemonWorker;
+import edu.mayo.mprc.messaging.ResponseDispatcher;
+import edu.mayo.mprc.messaging.ServiceFactory;
 import edu.mayo.mprc.utilities.FileUtilities;
 import edu.mayo.mprc.utilities.exceptions.CompositeException;
 import org.apache.log4j.Logger;
@@ -24,6 +26,7 @@ import java.util.Map;
 public final class Daemon implements Checkable, Installable {
 	private static final Logger LOGGER = Logger.getLogger(Daemon.class);
 
+	private String name;
 	private List<AbstractRunner> runners;
 	private List<Object> resources;
 	private File sharedFileSpace;
@@ -45,6 +48,16 @@ public final class Daemon implements Checkable, Installable {
 	 */
 	private File logOutputFolder;
 
+	/**
+	 * Holder of a connection that allows us to set the response dispatcher.
+	 */
+	private ServiceFactory serviceFactory;
+
+	/**
+	 * Daemon owns the central response dispatcher for messaging.
+	 */
+	private ResponseDispatcher responseDispatcher;
+
 	public Daemon() {
 	}
 
@@ -64,6 +77,9 @@ public final class Daemon implements Checkable, Installable {
 	 * Runs all the defined daemons runners.
 	 */
 	public void start() {
+		if (getResponseDispatcher() != null) {
+			getResponseDispatcher().start();
+		}
 		for (final Object resource : resources) {
 			if (resource instanceof Lifecycle) {
 				((Lifecycle) resource).start();
@@ -95,6 +111,9 @@ public final class Daemon implements Checkable, Installable {
 			if (resource instanceof Lifecycle) {
 				((Lifecycle) resource).stop();
 			}
+		}
+		if (getResponseDispatcher() != null) {
+			getResponseDispatcher().stop();
 		}
 	}
 
@@ -154,8 +173,16 @@ public final class Daemon implements Checkable, Installable {
 
 	@Override
 	public String toString() {
-		return "Daemon running following services: " +
+		return "Daemon [" + getName() + "] running following services: " +
 				Joiner.on(",\n").join(runners);
+	}
+
+	public String getName() {
+		return name;
+	}
+
+	public void setName(final String name) {
+		this.name = name;
 	}
 
 	public List<AbstractRunner> getRunners() {
@@ -210,11 +237,27 @@ public final class Daemon implements Checkable, Installable {
 		this.logOutputFolder = logOutputFolder;
 	}
 
+	public ServiceFactory getServiceFactory() {
+		return serviceFactory;
+	}
+
+	public void setServiceFactory(final ServiceFactory serviceFactory) {
+		this.serviceFactory = serviceFactory;
+	}
+
+	public void setResponseDispatcher(ResponseDispatcher responseDispatcher) {
+		this.responseDispatcher = responseDispatcher;
+	}
+
+	public ResponseDispatcher getResponseDispatcher() {
+		return responseDispatcher;
+	}
+
 	/**
 	 * Runs a daemon from its config.
 	 */
 	@Component("daemonFactory")
-	public static final class Factory extends FactoryBase<DaemonConfig, Daemon> implements FactoryDescriptor, Lifecycle {
+	public static final class Factory extends FactoryBase<DaemonConfig, Daemon> implements FactoryDescriptor {
 		/**
 		 * We need a link to this factory because it needs to be initialized before we run.
 		 */
@@ -279,6 +322,16 @@ public final class Daemon implements Checkable, Installable {
 		@Override
 		public Daemon create(final DaemonConfig config, final DependencyResolver dependencies) {
 			final Daemon daemon = new Daemon();
+			daemon.setName(config.getName());
+
+			ServiceFactory serviceFactory = getDaemonConnectionFactory().getServiceFactory();
+			daemon.setServiceFactory(serviceFactory);
+			daemon.setResponseDispatcher(new ResponseDispatcher(serviceFactory.getConnection(), daemon.getName()));
+
+			getDaemonConnectionFactory().start();
+			// We need to set this up before we start to deserialize the daemon configuration
+			getDaemonConnectionFactory().setResponseDispatcher(daemon.getResponseDispatcher());
+
 			daemon.setDumpErrors(config.isDumpErrors());
 			daemon.setDumpFolder(config.getDumpFolderPath() == null ? null : new File(config.getDumpFolderPath()));
 			if (config.getLogOutputFolder() == null) {
@@ -315,25 +368,6 @@ public final class Daemon implements Checkable, Installable {
 		@Resource(name = "daemonConnectionFactory")
 		public void setDaemonConnectionFactory(final DaemonConnectionFactory daemonConnectionFactory) {
 			this.daemonConnectionFactory = daemonConnectionFactory;
-		}
-
-		@Override
-		public boolean isRunning() {
-			return getDaemonConnectionFactory().isRunning();
-		}
-
-		@Override
-		public void start() {
-			if (!isRunning()) {
-				getDaemonConnectionFactory().start();
-			}
-		}
-
-		@Override
-		public void stop() {
-			if (isRunning()) {
-				getDaemonConnectionFactory().stop();
-			}
 		}
 	}
 }

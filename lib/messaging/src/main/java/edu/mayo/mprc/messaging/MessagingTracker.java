@@ -7,6 +7,7 @@ import edu.mayo.mprc.MprcException;
 import javax.jms.JMSException;
 import javax.jms.Message;
 import javax.jms.ObjectMessage;
+import java.io.Serializable;
 import java.util.Collection;
 import java.util.Map;
 
@@ -25,16 +26,26 @@ import java.util.Map;
 public final class MessagingTracker {
 	private class MessageExchange {
 		private Message message;
+		private Serializable payload;
 		private int sent;
 		private int received;
 
-		public MessageExchange(final Message message, final boolean sent) {
-			this.message = message;
+		private MessageExchange(final boolean sent) {
 			if (sent) {
 				this.sent = 1;
 			} else {
 				received = 1;
 			}
+		}
+
+		public MessageExchange(final Message message, final boolean sent) {
+			this(sent);
+			this.message = message;
+		}
+
+		public MessageExchange(final Serializable payload, final boolean sent) {
+			this(sent);
+			this.payload = payload;
 		}
 
 		public Message getMessage() {
@@ -57,21 +68,46 @@ public final class MessagingTracker {
 			this.received++;
 		}
 
+		public boolean isLast() {
+			try {
+				if (message == null) {
+					return false;
+				}
+				return message.propertyExists(ResponseDispatcher.LAST_RESPONSE) && message.getBooleanProperty(ResponseDispatcher.LAST_RESPONSE);
+			} catch (JMSException e) {
+				throw new MprcException(e);
+			}
+		}
+
 		@Override
 		public String toString() {
 			try {
 				final String sendReceive = isSent() && !isReceived() ? ">>> " : isReceived() && !isSent() ? "<!< " : "    ";
 				if (message instanceof ObjectMessage) {
 					final ObjectMessage objMessage = (ObjectMessage) message;
-					return sendReceive + (objMessage.getObject() == null ? "[null]" : objMessage.getObject().toString());
+					return sendReceive + objectToString(objMessage.getObject());
 				} else {
-					return sendReceive + " non-object message " + message.toString();
+					return sendReceive + "[special] " + (message != null ? message.toString() : payloadToString());
 				}
 			} catch (JMSException e) {
 				throw new MprcException("Could not convert message to string", e);
 			}
 		}
 
+		private String payloadToString() {
+			return payload != null ? payload.toString() : "[null]";
+		}
+
+		private String objectToString(final Serializable object) {
+			if (object == null) {
+				return "[null]";
+			}
+			return object.toString();
+		}
+
+		public boolean isProblem() {
+			return sent != received || sent > 1 || received > 1;
+		}
 	}
 
 	final ListMultimap<String, MessageExchange> messages = LinkedListMultimap.create(100);
@@ -84,6 +120,16 @@ public final class MessagingTracker {
 		recordMessage(message, false);
 	}
 
+	public void serializeMessage(Serializable message, String key) {
+		if (key == null) {
+			// Messages with no correlation IDs get skipped
+			return;
+		}
+		synchronized (messages) {
+			messages.put(key, new MessageExchange(message, true));
+		}
+	}
+
 	private void recordMessage(final Message message, final boolean send) {
 		try {
 			final String key = message.getJMSCorrelationID();
@@ -94,7 +140,7 @@ public final class MessagingTracker {
 			synchronized (messages) {
 				boolean found = false;
 				for (final MessageExchange exchanges : messages.get(key)) {
-					if (exchanges.getMessage().getJMSMessageID().equals(message.getJMSMessageID())) {
+					if (exchanges.getMessage() != null && exchanges.getMessage().getJMSMessageID().equals(message.getJMSMessageID())) {
 						if (send) {
 							exchanges.addSent();
 						} else {
@@ -107,24 +153,39 @@ public final class MessagingTracker {
 				if (!found) {
 					messages.put(key, new MessageExchange(message, send));
 				}
-				if (message.propertyExists(ResponseDispatcher.LAST_RESPONSE)) {
-					if (message.getBooleanProperty(ResponseDispatcher.LAST_RESPONSE)) {
-						messages.removeAll(key);
-					}
-				}
 			}
+			toString();
 		} catch (JMSException e) {
 			throw new MprcException("Error tracking messages", e);
 		}
 	}
 
-	public String dump() {
+	@Override
+	public String toString() {
 		final StringBuilder builder = new StringBuilder(1000);
+		final StringBuilder messageBuilder = new StringBuilder(1000);
 		synchronized (messages) {
 			for (final Map.Entry<String, Collection<MessageExchange>> entry : messages.asMap().entrySet()) {
-				builder.append(entry.getKey()).append(":\n");
+				boolean wasProblem = false;
+				messageBuilder.setLength(0);
+				messageBuilder.append(entry.getKey()).append(":\n");
+				boolean wasClosed = false;
 				for (final MessageExchange message : entry.getValue()) {
-					builder.append('\t').append(message.toString()).append('\n');
+					if (wasClosed) {
+						wasProblem = true;
+					}
+					messageBuilder.append('\t').append(message.toString()).append('\n');
+					if (message.isLast()) {
+						messageBuilder.append("\t-----------\n");
+						wasClosed = true;
+					}
+					if (message.isProblem()) {
+						wasProblem = true;
+					}
+				}
+
+				if (wasProblem) {
+					builder.append(messageBuilder);
 				}
 			}
 		}

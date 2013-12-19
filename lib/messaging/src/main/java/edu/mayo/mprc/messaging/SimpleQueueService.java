@@ -45,6 +45,8 @@ final class SimpleQueueService implements Service {
 	 */
 	private final String queueName;
 
+	private final ResponseDispatcher responseDispatcher;
+
 	/**
 	 * Establishes a link of given name on a given broker.
 	 * Each link consists of two JMS queues - one for sending requests, one (wrapped in ResponseDispatcher) for receiving responses.
@@ -52,8 +54,9 @@ final class SimpleQueueService implements Service {
 	 * @param serviceFactory Service factory
 	 * @param name           Name of the queue.
 	 */
-	SimpleQueueService(final ServiceFactory serviceFactory, final String name) {
+	SimpleQueueService(final ServiceFactory serviceFactory, final ResponseDispatcher responseDispatcher, final String name) {
 		this.serviceFactory = serviceFactory;
+		this.responseDispatcher = responseDispatcher;
 		queueName = name;
 	}
 
@@ -72,9 +75,9 @@ final class SimpleQueueService implements Service {
 
 			if (null != listener) {
 				// Register the new listener on the temporary queue and remember its correlation ID
-				final String correlationId = serviceFactory.getResponseDispatcher().registerMessageListener(listener);
+				final String correlationId = responseDispatcher.registerMessageListener(listener);
 				// Replies go our temporary queue
-				objectMessage.setJMSReplyTo(serviceFactory.getResponseDispatcher().getResponseDestination());
+				objectMessage.setJMSReplyTo(responseDispatcher.getResponseDestination());
 				// Correlation ID matches the responses with the response listener
 				objectMessage.setJMSCorrelationID(correlationId);
 			}

@@ -1,6 +1,7 @@
 package edu.mayo.mprc.messaging;
 
 import edu.mayo.mprc.MprcException;
+import edu.mayo.mprc.config.Lifecycle;
 import org.apache.log4j.Logger;
 
 import javax.jms.*;
@@ -18,19 +19,27 @@ import java.util.concurrent.atomic.AtomicLong;
  * This class is able to:
  * - provide a destination where to send responses
  * - register a listener to process responses matching a unique correlation id
+ * <p/>
+ * Only one instance of the response dispatcher should exist per daemon.
+ * A response dispatcher may be missing, in which case the user cannot send messages that expect responses...
+ * message sending becomes unidirectional.
  *
  * @author Roman Zenka
  */
-public final class ResponseDispatcher {
+public final class ResponseDispatcher implements Lifecycle {
 	private static final Logger LOGGER = Logger.getLogger(ResponseDispatcher.class);
 
-	private final Session session;
+	private Session session;
 
-	private final String queueName;
 	/**
 	 * A temporary queue created on the sending end that will receive responses to requests sent from this service.
 	 */
-	private final Queue responseQueue;
+	private Queue responseQueue;
+
+	private MessageConsumer queueConsumer;
+
+	private final String queueName;
+
 	/**
 	 * Map from correlation ID (request ID) to the response listener. Has to be synchronized, as an entry removal occurs
 	 * asynchronously when message arrives, which could collide with entry adding.
@@ -41,28 +50,20 @@ public final class ResponseDispatcher {
 	 */
 	private final AtomicLong uniqueId = new AtomicLong(System.currentTimeMillis());
 
+	private final Connection connection;
+
 	/**
 	 * The very last response to a request is marked with this boolean property set to true.
 	 */
 	public static final String LAST_RESPONSE = "is_last";
-
-	private final MessageConsumer queueConsumer;
 
 	/**
 	 * @param connection Connection to the broker.
 	 * @param daemonName Unique name of the daemon we are running (will be used for the response queue)
 	 */
 	public ResponseDispatcher(final Connection connection, final String daemonName) {
-		try {
-			session = connection.createSession(/*transacted?*/false, /*acknowledgment*/Session.CLIENT_ACKNOWLEDGE);
-			queueName = "responses-" + daemonName;
-			responseQueue = session.createQueue(queueName);
-			queueConsumer = session.createConsumer(responseQueue);
-			queueConsumer.setMessageListener(new ResponseQueueMessageListener());
-
-		} catch (JMSException e) {
-			throw new MprcException("Could not create response queue", e);
-		}
+		this.connection = connection;
+		queueName = "responses-" + daemonName;
 	}
 
 	public Destination getResponseDestination() {
@@ -86,9 +87,39 @@ public final class ResponseDispatcher {
 	}
 
 	public void close() {
+	}
+
+	@Override
+	public boolean isRunning() {
+		return session != null;
+	}
+
+	@Override
+	public void start() {
 		try {
+			if (isRunning()) {
+				return;
+			}
+			session = connection.createSession(/*transacted?*/false, /*acknowledgment*/Session.CLIENT_ACKNOWLEDGE);
+
+			responseQueue = session.createQueue(queueName);
+			queueConsumer = session.createConsumer(responseQueue);
+			queueConsumer.setMessageListener(new ResponseQueueMessageListener());
+
+		} catch (JMSException e) {
+			throw new MprcException("Could not create response queue", e);
+		}
+	}
+
+	@Override
+	public void stop() {
+		try {
+			if (!isRunning()) {
+				return;
+			}
 			queueConsumer.close();
 			session.close();
+			session = null;
 			if (!responseMap.isEmpty()) {
 				LOGGER.warn("The response dispatcher map of listeners is not empty - not all communication ended properly.");
 				responseMap.clear();

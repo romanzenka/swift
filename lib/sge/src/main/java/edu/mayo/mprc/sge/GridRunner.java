@@ -94,13 +94,9 @@ public final class GridRunner extends AbstractRunner {
 			final SgeMessageListener allocatorListener = new SgeMessageListener(request);
 			final SgePacket gridDaemonAllocatorInputObject =
 					new SgePacket(
-							serviceFactory.serializeRequest(request.getWorkPacket(), allocatorListener)
+							serviceFactory.serializeRequest(request.getWorkPacket(), getDaemon().getResponseDispatcher(), allocatorListener)
 							, workerFactoryConfig
 							, fileTokenFactory.getDaemonConfigInfo());
-
-			if (getSharedTempDirectory() != null) {
-				gridDaemonAllocatorInputObject.setSharedTempDirectory(getSharedTempDirectory().getAbsolutePath());
-			}
 
 			writeWorkerAllocatorInputObject(daemonWorkerAllocatorInputFile, gridDaemonAllocatorInputObject);
 

@@ -84,11 +84,6 @@ public final class SwiftEnvironmentImpl implements SwiftEnvironment, Application
 
 		configFile = commandLine.getInstallFile();
 
-		// We initialize the environment on demand before we run the command
-		if (!isRunning()) {
-			start();
-		}
-
 		return command.run(this);
 	}
 
@@ -99,10 +94,6 @@ public final class SwiftEnvironmentImpl implements SwiftEnvironment, Application
 	public ExitCode runSwiftCommand(final SwiftCommand command, final File configFile) {
 		this.configFile = configFile;
 		commandLine = new SwiftCommandLine("fake-command", new ArrayList<String>(0), configFile, null, null, null);
-
-		if (!isRunning()) {
-			start();
-		}
 
 		return command.run(this);
 	}
@@ -292,24 +283,5 @@ public final class SwiftEnvironmentImpl implements SwiftEnvironment, Application
 	@Override
 	public void setApplicationContext(final ApplicationContext applicationContext) throws BeansException {
 		this.applicationContext = applicationContext;
-	}
-
-	@Override
-	public boolean isRunning() {
-		return getDaemonFactory().isRunning();
-	}
-
-	@Override
-	public void start() {
-		if (!isRunning()) {
-			getDaemonFactory().start();
-		}
-	}
-
-	@Override
-	public void stop() {
-		if (isRunning()) {
-			getDaemonFactory().stop();
-		}
 	}
 }

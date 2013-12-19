@@ -32,7 +32,7 @@ public final class ResponderFirstTest extends MessagingTestBase {
 		ResponseListener listener = mock(ResponseListener.class);
 
 		// Serialize the request, then deserialize it right back
-		SerializedRequest serializedRequest = serviceFactory.serializeRequest(message, listener);
+		SerializedRequest serializedRequest = serviceFactory.serializeRequest(message, responseDispatcher, listener);
 		Request request = serviceFactory.deserializeRequest(serializedRequest);
 
 		String receivedMessage = (String) request.getMessageData();

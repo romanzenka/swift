@@ -6,6 +6,7 @@ import edu.mayo.mprc.daemon.files.FileTokenFactory;
 import edu.mayo.mprc.daemon.worker.WorkPacket;
 import edu.mayo.mprc.daemon.worker.Worker;
 import edu.mayo.mprc.messaging.ActiveMQConnectionPool;
+import edu.mayo.mprc.messaging.ResponseDispatcher;
 import edu.mayo.mprc.messaging.Service;
 import edu.mayo.mprc.messaging.ServiceFactory;
 import edu.mayo.mprc.utilities.FileUtilities;
@@ -40,6 +41,7 @@ public final class WorkCachePerformanceTest {
 	private int workSuccessCount = 0;
 	private final ActiveMQConnectionPool connectionPool = new ActiveMQConnectionPool();
 	private final ServiceFactory serviceFactory = new ServiceFactory();
+	private ResponseDispatcher responseDispatcher;
 
 	@BeforeClass
 	public void init() {
@@ -49,13 +51,15 @@ public final class WorkCachePerformanceTest {
 		} catch (URISyntaxException e) {
 			throw new MprcException(e);
 		}
-		serviceFactory.setDaemonName("test-daemon");
 		serviceFactory.start();
+		responseDispatcher = new ResponseDispatcher(serviceFactory.getConnection(), "test-daemon");
+		responseDispatcher.start();
 	}
 
 	@AfterClass
 	public void shutdown() {
 		serviceFactory.stop();
+		responseDispatcher.stop();
 		connectionPool.close();
 	}
 
@@ -120,7 +124,7 @@ public final class WorkCachePerformanceTest {
 	}
 
 	private SimpleRunner wrapWithRunner(final Worker worker, final String queueName, final File logFolder, final FileTokenFactory fileTokenFactory) throws URISyntaxException {
-		final Service service = serviceFactory.createJmsQueue(queueName);
+		final Service service = serviceFactory.createJmsQueue(queueName, responseDispatcher);
 		final DirectDaemonConnection directConnection = new DirectDaemonConnection(service, fileTokenFactory);
 		final Daemon daemon = new Daemon();
 		daemon.setLogOutputFolder(logFolder);

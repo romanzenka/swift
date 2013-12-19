@@ -8,6 +8,7 @@ import edu.mayo.mprc.daemon.worker.WorkPacket;
 import edu.mayo.mprc.daemon.worker.Worker;
 import edu.mayo.mprc.daemon.worker.WorkerFactory;
 import edu.mayo.mprc.messaging.ActiveMQConnectionPool;
+import edu.mayo.mprc.messaging.ResponseDispatcher;
 import edu.mayo.mprc.messaging.Service;
 import edu.mayo.mprc.messaging.ServiceFactory;
 import edu.mayo.mprc.utilities.FileUtilities;
@@ -29,6 +30,7 @@ public final class DaemonWorkerTester implements Lifecycle {
 	private Service service;
 	private DaemonConnection daemonConnection;
 	private ServiceFactory serviceFactory;
+	private ResponseDispatcher responseDispatcher;
 	private static AtomicInteger testId = new AtomicInteger(0);
 
 	private DaemonWorkerTester() {
@@ -39,7 +41,6 @@ public final class DaemonWorkerTester implements Lifecycle {
 		} catch (URISyntaxException e) {
 			throw new MprcException(e);
 		}
-		serviceFactory.setDaemonName("test-daemon");
 	}
 
 	/**
@@ -49,12 +50,9 @@ public final class DaemonWorkerTester implements Lifecycle {
 	 */
 	public DaemonWorkerTester(final Worker worker) {
 		this();
-		final String queueName = "test_" + testId.incrementAndGet();
-		initializeFromQueueName(queueName);
 		runner = new SimpleRunner();
 		runner.setFactory(new TestWorkerFactory(worker));
 		runner.setExecutorService(getSingleThreadExecutor(worker));
-		runner.setDaemonConnection(daemonConnection);
 		final Daemon daemon = new Daemon();
 		daemon.setLogOutputFolder(FileUtilities.createTempFolder());
 		runner.setDaemon(daemon);
@@ -66,10 +64,11 @@ public final class DaemonWorkerTester implements Lifecycle {
 	}
 
 	private void initializeFromQueueName(final String queueName) {
-		service = serviceFactory.createService(queueName);
+		service = serviceFactory.createService(queueName, responseDispatcher);
 		final FileTokenFactory fileTokenFactory = new FileTokenFactory();
 		fileTokenFactory.setDaemonConfigInfo(new DaemonConfigInfo("daemon1", "shared"));
 		daemonConnection = new DirectDaemonConnection(service, fileTokenFactory);
+		runner.setDaemonConnection(daemonConnection);
 	}
 
 
@@ -81,12 +80,9 @@ public final class DaemonWorkerTester implements Lifecycle {
 	 */
 	public DaemonWorkerTester(final WorkerFactory workerFactory, final int numWorkerThreads) {
 		this();
-		final String queueName = "test_" + testId.incrementAndGet();
-		initializeFromQueueName(queueName);
 		runner = new SimpleRunner();
 		runner.setFactory(workerFactory);
 		runner.setExecutorService(new SimpleThreadPoolExecutor(numWorkerThreads, "test", true));
-		runner.setDaemonConnection(daemonConnection);
 		final Daemon daemon = new Daemon();
 		daemon.setLogOutputFolder(FileUtilities.createTempFolder());
 		runner.setDaemon(daemon);
@@ -131,6 +127,10 @@ public final class DaemonWorkerTester implements Lifecycle {
 			if (serviceFactory != null) {
 				serviceFactory.start();
 			}
+			responseDispatcher = new ResponseDispatcher(serviceFactory.getConnection(), "test-daemon");
+			responseDispatcher.start();
+			final String queueName = "test_" + testId.incrementAndGet();
+			initializeFromQueueName(queueName);
 			runner.start();
 			waitUntilReady(runner);
 			daemonConnection.start();
@@ -145,6 +145,7 @@ public final class DaemonWorkerTester implements Lifecycle {
 		if (isRunning()) {
 			runner.stop();
 			daemonConnection.stop();
+			responseDispatcher.stop();
 			if (serviceFactory != null) {
 				serviceFactory.stop();
 			}

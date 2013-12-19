@@ -5,6 +5,7 @@ import edu.mayo.mprc.config.*;
 import edu.mayo.mprc.config.ui.FactoryDescriptor;
 import edu.mayo.mprc.config.ui.ServiceUiFactory;
 import edu.mayo.mprc.daemon.files.FileTokenFactory;
+import edu.mayo.mprc.messaging.ResponseDispatcher;
 import edu.mayo.mprc.messaging.Service;
 import edu.mayo.mprc.messaging.ServiceFactory;
 
@@ -16,6 +17,8 @@ import edu.mayo.mprc.messaging.ServiceFactory;
 public final class DaemonConnectionFactory extends FactoryBase<ServiceConfig, DaemonConnection> implements FactoryDescriptor, Lifecycle {
 	private FileTokenFactory fileTokenFactory;
 	private ServiceFactory serviceFactory;
+	// The response dispatcher for the daemon we are currently in process of creating
+	private ResponseDispatcher responseDispatcher;
 	private boolean running;
 
 	public FileTokenFactory getFileTokenFactory() {
@@ -40,7 +43,7 @@ public final class DaemonConnectionFactory extends FactoryBase<ServiceConfig, Da
 			throw new MprcException("The daemon connection factory has to be started before it gets used");
 		}
 		final ServiceFactory factory = getServiceFactory();
-		final Service service = factory.createService(config.getName());
+		final Service service = factory.createService(config.getName(), responseDispatcher);
 		return new DirectDaemonConnection(service, fileTokenFactory);
 	}
 
@@ -69,6 +72,14 @@ public final class DaemonConnectionFactory extends FactoryBase<ServiceConfig, Da
 		return null;
 	}
 
+	public ResponseDispatcher getResponseDispatcher() {
+		return responseDispatcher;
+	}
+
+	public void setResponseDispatcher(ResponseDispatcher responseDispatcher) {
+		this.responseDispatcher = responseDispatcher;
+	}
+
 	@Override
 	public boolean isRunning() {
 		return running;
@@ -78,6 +89,9 @@ public final class DaemonConnectionFactory extends FactoryBase<ServiceConfig, Da
 	public void start() {
 		if (!isRunning()) {
 			running = true;
+			if (serviceFactory != null) {
+				serviceFactory.start();
+			}
 			// Getting a daemon connection requires the file token factory to be operational
 			if (fileTokenFactory instanceof Lifecycle) {
 				((Lifecycle) fileTokenFactory).start();

@@ -20,11 +20,9 @@ public final class ServiceFactory implements Lifecycle {
 	private static final Logger LOGGER = Logger.getLogger(ServiceFactory.class);
 
 	private URI brokerUri;
-	private String daemonName;
 
 	private ActiveMQConnectionPool connectionPool;
 	private Connection connection;
-	private ResponseDispatcher responseDispatcher;
 	private RunningApplicationContext context;
 
 	public ServiceFactory() {
@@ -36,17 +34,21 @@ public final class ServiceFactory implements Lifecycle {
 	 * The implementation can be virtually anything. What gets created is determined
 	 * by the URI format that is passed in. So far we implement only simple JMS queues.
 	 *
-	 * @param queueName Name of the queue belonging to the service.
+	 * @param queueName          Name of the queue belonging to the service.
+	 * @param responseDispatcher Dispatcher for responses sent to this service. Can be null for unidirectional messaging.
 	 * @return Service running at the given URI.
 	 * @throws MprcException Service could not be created.
 	 */
-	public Service createService(final String queueName) {
+	public Service createService(final String queueName, final ResponseDispatcher responseDispatcher) {
+		if (!isRunning()) {
+			throw new MprcException("Cannot use ServiceFactory if it is not running");
+		}
 		// TODO: This is hardcoded right now. Eventually would allow registering of new URI handlers.
 		if (Strings.isNullOrEmpty(queueName)) {
 			throw new MprcException("queue name must not be empty");
 		}
 
-		return createJmsQueue(queueName);
+		return createJmsQueue(queueName, responseDispatcher);
 	}
 
 	static UserInfo extractJmsUserinfo(final URI serviceURI) {
@@ -57,10 +59,15 @@ public final class ServiceFactory implements Lifecycle {
 	 * Creates a simple message queue. The queue allows one producer to send messages to one consumer.
 	 * The consumer can send responses back.
 	 *
+	 * @param name               Name of the queue
+	 * @param responseDispatcher The service that can dispatch responses for messages sent to this queue
 	 * @return Service based on a simple queue that can be used for both sending and receiving of messages.
 	 */
-	public Service createJmsQueue(final String name) {
-		return new SimpleQueueService(this, name);
+	public Service createJmsQueue(final String name, final ResponseDispatcher responseDispatcher) {
+		if (!isRunning()) {
+			throw new MprcException("Cannot use ServiceFactory if it is not running");
+		}
+		return new SimpleQueueService(this, responseDispatcher, name);
 	}
 
 	public ActiveMQConnectionPool getConnectionPool() {
@@ -77,17 +84,6 @@ public final class ServiceFactory implements Lifecycle {
 
 	public void setContext(final RunningApplicationContext context) {
 		this.context = context;
-	}
-
-	public String getDaemonName() {
-		if (daemonName == null && context != null) {
-			daemonName = context.getDaemonConfig().getName();
-		}
-		return daemonName;
-	}
-
-	public void setDaemonName(String daemonName) {
-		this.daemonName = daemonName;
 	}
 
 	public URI getBrokerUri() {
@@ -109,8 +105,8 @@ public final class ServiceFactory implements Lifecycle {
 		this.brokerUri = brokerUri;
 	}
 
-	public SerializedRequest serializeRequest(final Serializable message, final ResponseListener listener) {
-		return new SerializedRequest(getResponseDispatcher().getResponseQueueName(), message, getResponseDispatcher().registerMessageListener(listener));
+	public SerializedRequest serializeRequest(final Serializable message, final ResponseDispatcher responseDispatcher, final ResponseListener listener) {
+		return new SerializedRequest(responseDispatcher.getResponseQueueName(), message, responseDispatcher.registerMessageListener(listener));
 	}
 
 	public Request deserializeRequest(final SerializedRequest serializedRequest) {
@@ -123,16 +119,6 @@ public final class ServiceFactory implements Lifecycle {
 		}
 	}
 
-	public ResponseDispatcher getResponseDispatcher() {
-		final String daemon = getDaemonName();
-		synchronized (this) {
-			if (responseDispatcher == null) {
-				throw new MprcException("This service factory does not support response dispatch. This probably because it is not running within a daemon (daemon is set to " + daemon + ")");
-			}
-			return responseDispatcher;
-		}
-	}
-
 	@Override
 	public boolean isRunning() {
 		synchronized (this) {
@@ -142,15 +128,11 @@ public final class ServiceFactory implements Lifecycle {
 
 	@Override
 	public void start() {
-		final String daemon = getDaemonName();
 		synchronized (this) {
 			if (!isRunning()) {
 				if (connection == null) {
 					final UserInfo info = extractJmsUserinfo(getBrokerUri());
 					connection = getConnectionPool().getConnectionToBroker(getBrokerUri(), info.getUserName(), info.getPassword());
-				}
-				if (responseDispatcher == null && daemon != null) {
-					responseDispatcher = new ResponseDispatcher(connection, daemon);
 				}
 			}
 		}
@@ -167,10 +149,6 @@ public final class ServiceFactory implements Lifecycle {
 					LOGGER.warn("Could not close connection when shutting down service", e);
 				}
 				connection = null;
-				if (responseDispatcher != null) {
-					responseDispatcher.close();
-					responseDispatcher = null;
-				}
 			}
 			connectionPool.close();
 			connectionPool = null;

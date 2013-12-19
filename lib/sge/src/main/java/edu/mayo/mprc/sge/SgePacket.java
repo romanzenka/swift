@@ -11,9 +11,10 @@ import edu.mayo.mprc.messaging.SerializedRequest;
 public final class SgePacket {
 
 	private SerializedRequest serializedRequest;
+	// How to create the worker (assumes worker has no dependencies!)
 	private ResourceConfig workerFactoryConfig;
+	// For initializing FileTokenFactory - config of the daemon on whose behalf we run
 	private DaemonConfigInfo daemonConfigInfo;
-	private String sharedTempDirectory;
 
 	public SgePacket() {
 	}
@@ -50,13 +51,5 @@ public final class SgePacket {
 
 	public void setDaemonConfigInfo(final DaemonConfigInfo daemonConfigInfo) {
 		this.daemonConfigInfo = daemonConfigInfo;
-	}
-
-	public String getSharedTempDirectory() {
-		return sharedTempDirectory;
-	}
-
-	public void setSharedTempDirectory(final String sharedTempDirectory) {
-		this.sharedTempDirectory = sharedTempDirectory;
 	}
 }
