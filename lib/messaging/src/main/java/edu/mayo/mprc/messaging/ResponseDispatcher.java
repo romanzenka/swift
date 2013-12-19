@@ -101,9 +101,13 @@ public final class ResponseDispatcher {
 	private class ResponseQueueMessageListener implements MessageListener {
 		@Override
 		public void onMessage(final Message message) {
+			final long start = System.currentTimeMillis();
 			try {
 				processMessage(message);
 			} finally {
+				long duration = System.currentTimeMillis() - start;
+				LOGGER.debug("Response processing took " + duration + " milliseconds");
+
 				acknowledgeMessage(message);
 			}
 		}
