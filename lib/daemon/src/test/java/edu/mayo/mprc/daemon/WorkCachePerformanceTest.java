@@ -124,7 +124,7 @@ public final class WorkCachePerformanceTest {
 	}
 
 	private SimpleRunner wrapWithRunner(final Worker worker, final String queueName, final File logFolder, final FileTokenFactory fileTokenFactory) throws URISyntaxException {
-		final Service service = serviceFactory.createJmsQueue(queueName, responseDispatcher);
+		final Service service = serviceFactory.createService(queueName, responseDispatcher);
 		final DirectDaemonConnection directConnection = new DirectDaemonConnection(service, fileTokenFactory);
 		final Daemon daemon = new Daemon();
 		daemon.setLogOutputFolder(logFolder);

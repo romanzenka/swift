@@ -105,8 +105,6 @@ public final class ResponseDispatcher implements Lifecycle {
 			if (isRunning()) {
 				return;
 			}
-			serviceFactory.start();
-
 			session = serviceFactory.getConnection().createSession(/*transacted?*/false, /*acknowledgment*/Session.CLIENT_ACKNOWLEDGE);
 
 			responseQueue = session.createQueue(queueName);

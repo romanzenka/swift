@@ -97,6 +97,9 @@ public final class DaemonWorkerTester implements Lifecycle {
 	 *         methods.
 	 */
 	public Object sendWork(final WorkPacket workPacket) {
+		if (!isRunning()) {
+			start();
+		}
 		final TestProgressListener listener = new TestProgressListener();
 		daemonConnection.sendWork(workPacket, listener);
 		return listener;
@@ -111,6 +114,9 @@ public final class DaemonWorkerTester implements Lifecycle {
 	 *         methods.
 	 */
 	public Object sendWork(final WorkPacket workPacket, final ProgressListener userListener) {
+		if (!isRunning()) {
+			start();
+		}
 		final TestProgressListener listener = new TestProgressListener(userListener);
 		daemonConnection.sendWork(workPacket, listener);
 		return listener;

@@ -15,6 +15,9 @@ import java.net.URISyntaxException;
 /**
  * Returns a service using a queue of a given name.
  * This has to be thread-safe as multiple users can start this from different threads.
+ * <p/>
+ * The Service is designed to automatically start itself when it is first used. Its lifecycle
+ * can still be managed manually + you should call {@link #stop()} when you are done using it (usually program exiting)
  */
 public final class ServiceFactory implements Lifecycle {
 	private static final Logger LOGGER = Logger.getLogger(ServiceFactory.class);
@@ -40,28 +43,19 @@ public final class ServiceFactory implements Lifecycle {
 	 * @throws MprcException Service could not be created.
 	 */
 	public Service createService(final String queueName, final ResponseDispatcher responseDispatcher) {
+		if (!isRunning()) {
+			start();
+		}
 		// TODO: This is hardcoded right now. Eventually would allow registering of new URI handlers.
 		if (Strings.isNullOrEmpty(queueName)) {
 			throw new MprcException("queue name must not be empty");
 		}
 
-		return createJmsQueue(queueName, responseDispatcher);
+		return new SimpleQueueService(this, responseDispatcher, queueName);
 	}
 
 	static UserInfo extractJmsUserinfo(final URI serviceURI) {
 		return new UserInfo(serviceURI);
-	}
-
-	/**
-	 * Creates a simple message queue. The queue allows one producer to send messages to one consumer.
-	 * The consumer can send responses back.
-	 *
-	 * @param name               Name of the queue
-	 * @param responseDispatcher The service that can dispatch responses for messages sent to this queue
-	 * @return Service based on a simple queue that can be used for both sending and receiving of messages.
-	 */
-	public Service createJmsQueue(final String name, final ResponseDispatcher responseDispatcher) {
-		return new SimpleQueueService(this, responseDispatcher, name);
 	}
 
 	public ActiveMQConnectionPool getConnectionPool() {
@@ -108,6 +102,9 @@ public final class ServiceFactory implements Lifecycle {
 	}
 
 	public Connection getConnection() {
+		if (!isRunning()) {
+			start();
+		}
 		synchronized (this) {
 			return connection;
 		}

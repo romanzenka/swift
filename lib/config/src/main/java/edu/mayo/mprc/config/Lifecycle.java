@@ -9,6 +9,9 @@ package edu.mayo.mprc.config;
  * <p/>
  * This is modelled after Spring's Lifecycle, but is independent on Spring, as we do not want spring to manage
  * the lifecycle of the objects automatically.
+ * <p/>
+ * Since it is currently very difficult to get the control of the lifecycle right, the implementors could be designed
+ * to start themselves up on demand. If that is not possible the object should fail if it is not started.
  *
  * @author Roman Zenka
  */

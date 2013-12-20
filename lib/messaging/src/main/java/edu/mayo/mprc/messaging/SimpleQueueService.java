@@ -175,9 +175,6 @@ final class SimpleQueueService implements Service {
 	private Connection createConnection() {
 		synchronized (this) {
 			if (connection == null) {
-				if (!serviceFactory.isRunning()) {
-					serviceFactory.start();
-				}
 				connection = serviceFactory.getConnection();
 			}
 			return connection;
