@@ -196,9 +196,9 @@ public final class SwiftEnvironmentImpl implements SwiftEnvironment, Application
 	@Override
 	public ApplicationConfig getApplicationConfig() {
 		if (applicationConfig == null) {
-			setApplicationConfig(new ApplicationConfig());
+			setApplicationConfig(new ApplicationConfig(new DependencyResolver(swiftFactory)));
 		}
-		if (applicationConfig.getDaemons().size() == 0) {
+		if (applicationConfig.getDaemons().size() == 0 && configFile.isFile() && configFile.canRead()) {
 			loadSwiftConfig(configFile, getSwiftFactory());
 		}
 		return applicationConfig;

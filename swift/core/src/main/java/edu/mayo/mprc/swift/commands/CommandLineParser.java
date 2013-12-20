@@ -49,8 +49,8 @@ public final class CommandLineParser {
 		if (options.has("?")) {
 			command = DisplayHelp.COMMAND;
 		} else if (!options.has("daemon") && !options.has("sge") && !options.has("run")) {
-			// If nothing is specified, we do the default run
-			command = SwiftCommandLine.DEFAULT_RUN_COMMAND;
+			// We do not know what to run yet - maybe "run", maybe "config"
+			command = SwiftCommandLine.RUN_OR_CONFIG;
 		} else if (options.has("sge") && options.has("run")) {
 			error = "--sge and --run options are mutually exclusive.";
 			command = DisplayHelp.COMMAND;
@@ -62,12 +62,19 @@ public final class CommandLineParser {
 				command = (String) options.valueOf("run");
 				parameters = options.nonOptionArguments();
 			} else {
-				command = SwiftCommandLine.DEFAULT_RUN_COMMAND;
+				command = SwiftCommandLine.RUN_OR_CONFIG;
 			}
 		}
 		File installFile = null;
 		if (!DisplayHelp.COMMAND.equals(command)) {
 			installFile = CommandLine.findFile(options, "install", "installation config file", Swift.CONFIG_FILE_NAME);
+		}
+		if (SwiftCommandLine.RUN_OR_CONFIG.equals(command)) {
+			if (installFile != null) {
+				command = SwiftCommandLine.DEFAULT_RUN_COMMAND;
+			} else {
+				command = SwiftCommandLine.CONFIG_COMMAND;
+			}
 		}
 		final String daemonId = (String) options.valueOf("daemon");
 		commandLine = new SwiftCommandLine(command, parameters, installFile, daemonId, error, parser);

@@ -11,8 +11,9 @@ import java.util.List;
  * @author Roman Zenka
  */
 public final class SwiftCommandLine {
-	public static final String COMMAND_SGE = "sge";
+	public static final String RUN_OR_CONFIG = "run-or-config";
 	public static final String DEFAULT_RUN_COMMAND = "run-swift";
+	public static final String CONFIG_COMMAND = "config";
 
 	private final String command;
 	private final List<String> parameters;
