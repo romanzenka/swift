@@ -3,10 +3,7 @@ import com.google.gwt.user.client.rpc.InvocationException;
 import edu.mayo.mprc.MprcException;
 import edu.mayo.mprc.common.client.GWTServiceException;
 import edu.mayo.mprc.swift.configuration.client.model.ConfigurationService;
-import edu.mayo.mprc.utilities.FileUtilities;
-import edu.mayo.mprc.utilities.LogMonitor;
-import edu.mayo.mprc.utilities.ProcessCaller;
-import edu.mayo.mprc.utilities.ResourceUtilities;
+import edu.mayo.mprc.utilities.*;
 import org.apache.log4j.Logger;
 import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
@@ -55,15 +52,35 @@ public final class SwiftTest {
 		System.out.print(caller.getOutputLog());
 	}
 
+	@Test(enabled = false)
+	public void shouldRunSge() throws IOException {
+		final File sgePacket = TestingUtilities.getTempFileFromResource("/sge_packet.xml", true, null);
+		try {
+			final ProcessBuilder builder = new ProcessBuilder()
+					.directory(directory)
+					.command("java",
+							// "-agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=15001",
+							"-Dlog4j.configuration=file://" + new File(directory, "conf/log4j.properties").getAbsolutePath(),
+							"-cp", new File(directory, "lib").getAbsolutePath() + "/*",
+							"edu.mayo.mprc.swift.Swift",
+							"--sge", sgePacket.getAbsolutePath());
+			final ProcessCaller caller = new ProcessCaller(builder);
+			caller.runAndCheck("swift", 0);
+			System.out.print(caller.getOutputLog());
+		} finally {
+			FileUtilities.cleanupTempFile(sgePacket);
+		}
+	}
+
 	/**
 	 * This should start swift in configuration mode.
 	 */
-	@Test
+	@Test(enabled = false)
 	public void shouldConfigure() {
 		final ProcessBuilder builder = new ProcessBuilder()
 				.directory(directory)
 				.command("java",
-						// "-agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=15000",
+						// "-agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=15001",
 						"-Dlog4j.configuration=file://" + new File(directory, "conf/log4j.properties").getAbsolutePath(),
 						"-cp", new File(directory, "lib").getAbsolutePath() + "/*",
 						"edu.mayo.mprc.swift.Swift");
