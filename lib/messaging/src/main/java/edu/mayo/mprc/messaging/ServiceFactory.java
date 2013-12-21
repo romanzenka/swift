@@ -43,9 +43,6 @@ public final class ServiceFactory implements Lifecycle {
 	 * @throws MprcException Service could not be created.
 	 */
 	public Service createService(final String queueName, final ResponseDispatcher responseDispatcher) {
-		if (!isRunning()) {
-			start();
-		}
 		// TODO: This is hardcoded right now. Eventually would allow registering of new URI handlers.
 		if (Strings.isNullOrEmpty(queueName)) {
 			throw new MprcException("queue name must not be empty");
