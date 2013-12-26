@@ -66,6 +66,9 @@ public final class DatabaseFileTokenFactory extends FileTokenFactory implements 
 	}
 
 	public DaemonConfigInfo getDatabaseDaemonConfigInfo() {
+		if (!isRunning()) {
+			start();
+		}
 		return databaseDaemonConfigInfo;
 	}
 
