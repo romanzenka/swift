@@ -2,6 +2,7 @@ package edu.mayo.mprc.swift.resources;
 
 import com.google.common.collect.Lists;
 import edu.mayo.mprc.MprcException;
+import edu.mayo.mprc.ReleaseInfoCore;
 import edu.mayo.mprc.config.*;
 import edu.mayo.mprc.config.ui.*;
 import edu.mayo.mprc.daemon.Daemon;
@@ -500,7 +501,7 @@ public final class WebUi implements Checkable {
 					.property(TITLE, "Installation Title", "This is displayed as the title of the Swift web pages.<br/>" +
 							"You can use it to distinguish between Swift installs.")
 					.required()
-					.defaultValue("Swift 2.5")
+					.defaultValue("Swift " + ReleaseInfoCore.buildVersion())
 
 					.property("port", "Web server port", "The web interface port." +
 							" Standard HTTP port number is <tt>80</tt>. If your system is already running a web server, port 80 is probably taken, that is why we suggest running Swift at <tt>8080</tt> by default." +
