@@ -154,6 +154,8 @@ public final class Launcher implements FileListener {
 		webAppContext.setContextPath("/");
 		// We must set temp directory, otherwise the app goes to /tmp which will get deleted periodically
 		webAppContext.setTempDirectory(tempFolder);
+		// We try to prevent jetty from extracting the .war file
+		webAppContext.setExtractWAR(false);
 		final Map<String, String> initParams = new HashMap<String, String>(3);
 		if (configFile != null) {
 			initParams.put("SWIFT_CONFIG", configFile.getAbsolutePath());
