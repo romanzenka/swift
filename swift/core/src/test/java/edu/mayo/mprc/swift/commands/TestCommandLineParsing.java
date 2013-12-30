@@ -37,9 +37,10 @@ public final class TestCommandLineParsing {
 
 	@Test
 	public void shouldNoticeMissingParams() {
+		// With config file missing and nothing else specified, swift runs in the config mode
 		final CommandLineParser parser = new CommandLineParser(new String[]{"?"});
 		final SwiftCommandLine cmd = parser.getCommandLine();
-		Assert.assertEquals(cmd.getCommand(), "run-swift");
+		Assert.assertEquals(cmd.getCommand(), "config");
 	}
 
 	@Test
