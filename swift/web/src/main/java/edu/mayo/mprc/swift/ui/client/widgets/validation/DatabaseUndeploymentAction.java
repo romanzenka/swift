@@ -1,14 +1,14 @@
 package edu.mayo.mprc.swift.ui.client.widgets.validation;
 
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.gwt.user.client.ui.ClickListener;
-import com.google.gwt.user.client.ui.Widget;
 import edu.mayo.mprc.swift.ui.client.dialogs.ProgressDialog;
 import edu.mayo.mprc.swift.ui.client.rpc.ClientDatabaseUndeployerProgress;
 import edu.mayo.mprc.swift.ui.client.rpc.ClientSequenceDatabase;
 import edu.mayo.mprc.swift.ui.client.service.ServiceAsync;
 
-public final class DatabaseUndeploymentAction implements ClickListener {
+public final class DatabaseUndeploymentAction implements ClickHandler {
 
 	private ProgressDialog progressDialog;
 	private ServiceAsync serviceAsync;
@@ -20,7 +20,7 @@ public final class DatabaseUndeploymentAction implements ClickListener {
 	}
 
 	@Override
-	public void onClick(final Widget widget) {
+	public void onClick(final ClickEvent event) {
 		final ClientSequenceDatabase csd = (ClientSequenceDatabase) dlb.getSelected();
 
 		progressDialog = new ProgressDialog("Database Undeployment Progress", true);

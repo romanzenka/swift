@@ -1,6 +1,11 @@
 package edu.mayo.mprc.swift.ui.client.widgets;
 
-import com.google.gwt.user.client.ui.*;
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.user.client.ui.CheckBox;
+import com.google.gwt.user.client.ui.HasVerticalAlignment;
+import com.google.gwt.user.client.ui.HorizontalPanel;
+import com.google.gwt.user.client.ui.ListBox;
 import edu.mayo.mprc.swift.ui.client.rpc.ClientSpectrumQa;
 import edu.mayo.mprc.swift.ui.client.rpc.SpectrumQaParamFileInfo;
 
@@ -28,16 +33,16 @@ public final class SpectrumQaSetupPanel extends HorizontalPanel {
 
 	public SpectrumQaSetupPanel(final List<SpectrumQaParamFileInfo> paramFileInfos) {
 		setVerticalAlignment(HasVerticalAlignment.ALIGN_MIDDLE);
-		spectrumQaEnabled.setChecked(true);
+		spectrumQaEnabled.setValue(true);
 
 		for (final SpectrumQaParamFileInfo paramFileInfo : paramFileInfos) {
 			propertyFile.addItem(paramFileInfo.getDescription(), paramFileInfo.getPath());
 		}
 		propertyFile.setSelectedIndex(0);
 
-		spectrumQaEnabled.addClickListener(new ClickListener() {
+		spectrumQaEnabled.addClickHandler(new ClickHandler() {
 			@Override
-			public void onClick(final Widget widget) {
+			public void onClick(final ClickEvent event) {
 				updateEnabledControls();
 			}
 		});
@@ -50,11 +55,11 @@ public final class SpectrumQaSetupPanel extends HorizontalPanel {
 	}
 
 	private void updateEnabledControls() {
-		propertyFile.setEnabled(spectrumQaEnabled.isChecked());
+		propertyFile.setEnabled(Boolean.TRUE.equals(spectrumQaEnabled.getValue()));
 	}
 
 	public ClientSpectrumQa getParameters() {
-		if (!spectrumQaEnabled.isChecked()) {
+		if (!Boolean.TRUE.equals(spectrumQaEnabled.getValue())) {
 			return new ClientSpectrumQa();
 		} else {
 			return new ClientSpectrumQa(propertyFile.getValue(propertyFile.getSelectedIndex()));
@@ -62,7 +67,7 @@ public final class SpectrumQaSetupPanel extends HorizontalPanel {
 	}
 
 	public void setParameters(final ClientSpectrumQa spectrumQa) {
-		spectrumQaEnabled.setChecked(spectrumQa.isEnabled());
+		spectrumQaEnabled.setValue(spectrumQa.isEnabled());
 		selectParamFilePath(spectrumQa.getParamFilePath());
 	}
 

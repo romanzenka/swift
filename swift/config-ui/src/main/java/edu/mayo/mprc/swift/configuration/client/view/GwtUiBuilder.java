@@ -1,5 +1,8 @@
 package edu.mayo.mprc.swift.configuration.client.view;
 
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.dom.client.HasClickHandlers;
 import com.google.gwt.user.client.ui.*;
 import edu.mayo.mprc.swift.configuration.client.model.*;
 import edu.mayo.mprc.swift.configuration.client.validation.local.IntegerValidator;
@@ -146,7 +149,7 @@ public final class GwtUiBuilder implements UiBuilderClient {
 			if (editor instanceof TextBox) {
 				((TextBox) editor).setText(defaultValue);
 			} else if (editor instanceof CheckBox) {
-				((CheckBox) editor).setChecked("true".equals(defaultValue));
+				((CheckBox) editor).setValue("true".equals(defaultValue));
 			}
 			defaultValue = null;
 		}
@@ -174,11 +177,11 @@ public final class GwtUiBuilder implements UiBuilderClient {
 					validator.validate(PropertyList.getEditorValue(sender));
 				}
 			});
-		} else if (editor instanceof SourcesClickEvents) {
-			((SourcesClickEvents) editor).addClickListener(new ClickListener() {
+		} else if (editor instanceof HasClickHandlers) {
+			((HasClickHandlers) editor).addClickHandler(new ClickHandler() {
 				@Override
-				public void onClick(final Widget sender) {
-					validator.validate(PropertyList.getEditorValue(sender));
+				public void onClick(final ClickEvent event) {
+					validator.validate(PropertyList.getEditorValue((Widget) event.getSource()));
 				}
 			});
 		} else {
@@ -213,9 +216,9 @@ public final class GwtUiBuilder implements UiBuilderClient {
 		validationPanel.setTestButton(test);
 		validationPanel.setTestProgress(testProgress);
 		validationPanel.setSuccessIndicator(successIndicator);
-		test.addClickListener(new ClickListener() {
+		test.addClickHandler(new ClickHandler() {
 			@Override
-			public void onClick(final Widget widget) {
+			public void onClick(final ClickEvent event) {
 				validator.runOnDemandValidation(PropertyList.getEditorValue(editor), validationPanel);
 			}
 		});
@@ -229,7 +232,7 @@ public final class GwtUiBuilder implements UiBuilderClient {
 	/**
 	 * Adds change listener to the preceeding property. If the preceeding property is
 	 * represented by a TextBox, the listner must be of the type ChangeListener. If the
-	 * preceeding property is represented by a CheckBox, the listner must be of the type ClickListener.
+	 * preceeding property is represented by a CheckBox, the listner must be of the type ClickHandler.
 	 */
 	public GwtUiBuilder addEventListener(final EventListener listener) {
 		if (editor instanceof TextBox) {
@@ -238,30 +241,10 @@ public final class GwtUiBuilder implements UiBuilderClient {
 			}
 			((TextBox) editor).addChangeListener((ChangeListener) listener);
 		} else if (editor instanceof CheckBox) {
-			if (!(listener instanceof ClickListener)) {
-				throw new RuntimeException("The event listener for CheckBox must be a click listener");
+			if (!(listener instanceof ClickHandler)) {
+				throw new RuntimeException("The event listener for CheckBox must be a click handler");
 			}
-			((CheckBox) editor).addClickListener((ClickListener) listener);
-		}
-		return this;
-	}
-
-	/**
-	 * Removes change listener from the preceeding property. If the preceeding property is
-	 * represented by a TextBox, the listner must be of the type ChangeListener. If the
-	 * preceeding property is represented by a CheckBox, the listner must be of the type ClickListener.
-	 */
-	public GwtUiBuilder removeEventListener(final EventListener listener) {
-		if (editor instanceof TextBox) {
-			if (!(listener instanceof ChangeListener)) {
-				throw new RuntimeException("The event listener for TextBox must be a change listener");
-			}
-			((TextBox) editor).removeChangeListener((ChangeListener) listener);
-		} else if (editor instanceof CheckBox) {
-			if (!(listener instanceof ClickListener)) {
-				throw new RuntimeException("The event listener for CheckBox must be a click listener");
-			}
-			((CheckBox) editor).removeClickListener((ClickListener) listener);
+			((CheckBox) editor).addClickHandler((ClickHandler) listener);
 		}
 		return this;
 	}
@@ -330,14 +313,14 @@ public final class GwtUiBuilder implements UiBuilderClient {
 	public GwtUiBuilder enable(final String propertyName, final boolean synchronous) {
 		if (editor instanceof CheckBox) {
 			final CheckBox checkBox = (CheckBox) editor;
-			checkBox.addClickListener(new ClickListener() {
+			checkBox.addClickHandler(new ClickHandler() {
 
 				@Override
-				public void onClick(final Widget sender) {
-
+				public void onClick(final ClickEvent event) {
+					final Widget sender = (Widget) event.getSource();
 					if (sender instanceof CheckBox) {
 						final CheckBox checkBox = (CheckBox) sender;
-						final boolean enableLink = checkBox.isChecked() == synchronous;
+						final boolean enableLink = Boolean.TRUE.equals(checkBox.getValue()) == synchronous;
 						final Widget editor = propertyList.getWidgetForName(propertyName);
 						if (editor != null && editor instanceof FocusWidget) {
 							((FocusWidget) editor).setEnabled(enableLink);

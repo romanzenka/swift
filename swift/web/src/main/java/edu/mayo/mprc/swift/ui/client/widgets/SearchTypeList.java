@@ -1,5 +1,7 @@
 package edu.mayo.mprc.swift.ui.client.widgets;
 
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.Cookies;
 import com.google.gwt.user.client.ui.*;
 
@@ -7,7 +9,7 @@ import com.google.gwt.user.client.ui.*;
  * Lets the user choose a search type.
  * Fires an on change event when it gets modified by the user.
  */
-public final class SearchTypeList extends ListBox implements SourcesChangeEvents, ClickListener, ChangeListener {
+public final class SearchTypeList extends ListBox implements SourcesChangeEvents, ClickHandler, ChangeListener {
 
 	/**
 	 * Table of offered search types.
@@ -44,7 +46,7 @@ public final class SearchTypeList extends ListBox implements SourcesChangeEvents
 		}
 
 		setSelectedIndex(selectedSearchType.getIndex());
-		addClickListener(this);
+		addClickHandler(this);
 		addChangeListener(this);
 	}
 
@@ -112,7 +114,7 @@ public final class SearchTypeList extends ListBox implements SourcesChangeEvents
 	}
 
 	@Override
-	public void onClick(final Widget widget) {
+	public void onClick(final ClickEvent event) {
 		fireSelectionChanged();
 	}
 

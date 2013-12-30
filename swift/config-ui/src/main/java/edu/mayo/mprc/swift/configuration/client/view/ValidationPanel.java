@@ -1,5 +1,7 @@
 package edu.mayo.mprc.swift.configuration.client.view;
 
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.ui.*;
 import edu.mayo.mprc.config.ui.FixTag;
 
@@ -66,9 +68,9 @@ public final class ValidationPanel extends FlowPanel {
 					final String tagMessage = fixTag.substring(indexOfActionAttrib + ACTIONATTRIB.length() + action.length() + 2);
 
 					final Button link = new Button(tagMessage);
-					link.addClickListener(new ClickListener() {
+					link.addClickHandler(new ClickHandler() {
 						@Override
-						public void onClick(final Widget sender) {
+						public void onClick(final ClickEvent event) {
 							empty();
 							validationStarted();
 							listener.onFix(action, ValidationPanel.this);

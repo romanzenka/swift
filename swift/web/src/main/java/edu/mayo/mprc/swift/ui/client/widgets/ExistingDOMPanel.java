@@ -1,14 +1,14 @@
 package edu.mayo.mprc.swift.ui.client.widgets;
 
+import com.google.gwt.event.logical.shared.CloseEvent;
+import com.google.gwt.event.logical.shared.CloseHandler;
 import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.Element;
 import com.google.gwt.user.client.Window;
-import com.google.gwt.user.client.WindowCloseListener;
 import com.google.gwt.user.client.ui.ComplexPanel;
 import com.google.gwt.user.client.ui.Widget;
 
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 
 /**
@@ -222,28 +222,22 @@ public final class ExistingDOMPanel extends ComplexPanel {
 	}
 
 	private native Element clone(Element e) /*-{
-		return e.cloneNode(true);
-	}-*/;
+        return e.cloneNode(true);
+    }-*/;
 
 	private static void hookWindowClosing() {
 		// Catch the window closing event.
-		Window.addWindowCloseListener(new WindowCloseListener() {
+		Window.addCloseHandler(new CloseHandler<Window>() {
 			@Override
-			public void onWindowClosed() {
+			public void onClose(CloseEvent<Window> event) {
 				// When the window is closing, detach all root panels. This will cause
 				// all of their children's event listeners to be unhooked, which will
 				// avoid potential memory leaks.
-				for (Iterator it = panels.values().iterator(); it.hasNext(); ) {
-					final ExistingDOMPanel gwt = (ExistingDOMPanel) it.next();
+				for (final ExistingDOMPanel gwt : panels.values()) {
 					if (gwt.isAttached()) {
 						gwt.onDetach();
 					}
 				}
-			}
-
-			@Override
-			public String onWindowClosing() {
-				return null;
 			}
 		});
 	}

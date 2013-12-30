@@ -1,9 +1,9 @@
 package edu.mayo.mprc.swift.configuration.client.view;
 
+import com.google.gwt.event.logical.shared.SelectionEvent;
+import com.google.gwt.event.logical.shared.SelectionHandler;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.SimplePanel;
-import com.google.gwt.user.client.ui.SourcesTabEvents;
-import com.google.gwt.user.client.ui.TabListener;
 import com.google.gwt.user.client.ui.TabPanel;
 import edu.mayo.mprc.swift.configuration.client.model.ConfigurationService;
 import edu.mayo.mprc.swift.configuration.client.model.Context;
@@ -20,14 +20,9 @@ public final class RunnerView extends SimplePanel {
 
 	public RunnerView(final Context context, final ResourceModel model) {
 		runnerType = new TabPanel();
-		runnerType.addTabListener(new TabListener() {
+		runnerType.addSelectionHandler(new SelectionHandler<Integer>() {
 			@Override
-			public boolean onBeforeTabSelected(final SourcesTabEvents sender, final int tabIndex) {
-				return true;
-			}
-
-			@Override
-			public void onTabSelected(final SourcesTabEvents sender, final int tabIndex) {
+			public void onSelection(SelectionEvent<Integer> event) {
 				final String newType = runnerType.getTabBar().getSelectedTab() == 0 ? "localRunner" : "sgeRunner";
 				if (newType.equals(model.getType())) {
 					return;

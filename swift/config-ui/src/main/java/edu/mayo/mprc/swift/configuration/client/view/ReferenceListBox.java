@@ -1,5 +1,7 @@
 package edu.mayo.mprc.swift.configuration.client.view;
 
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.ui.*;
 import edu.mayo.mprc.swift.configuration.client.model.*;
 
@@ -39,9 +41,9 @@ public final class ReferenceListBox extends SimplePanel implements SourcesChange
 	private void addCreateNewButton() {
 		createNew = new Button("Add new...");
 		createNew.addStyleName("btn");
-		createNew.addClickListener(new ClickListener() {
+		createNew.addClickHandler(new ClickHandler() {
 			@Override
-			public void onClick(final Widget widget) {
+			public void onClick(final ClickEvent event) {
 				// User wants a new item of this type
 				final AddNewModuleDialog dialog = new AddNewModuleDialog(model, types, new NewModuleCreatedCallback() {
 					@Override
@@ -50,7 +52,7 @@ public final class ReferenceListBox extends SimplePanel implements SourcesChange
 						fireChange();
 					}
 				}, errorDisplay);
-				dialog.setPopupPosition(widget.getAbsoluteLeft(), widget.getAbsoluteTop() + widget.getOffsetHeight());
+				dialog.setPopupPosition(createNew.getAbsoluteLeft(), createNew.getAbsoluteTop() + createNew.getOffsetHeight());
 
 				if (!dialog.skipDisplay()) {
 					dialog.show();

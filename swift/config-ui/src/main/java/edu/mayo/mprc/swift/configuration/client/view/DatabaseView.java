@@ -1,6 +1,11 @@
 package edu.mayo.mprc.swift.configuration.client.view;
 
-import com.google.gwt.user.client.ui.*;
+import com.google.gwt.event.logical.shared.SelectionEvent;
+import com.google.gwt.event.logical.shared.SelectionHandler;
+import com.google.gwt.user.client.ui.ChangeListener;
+import com.google.gwt.user.client.ui.SimplePanel;
+import com.google.gwt.user.client.ui.TabPanel;
+import com.google.gwt.user.client.ui.Widget;
 import edu.mayo.mprc.swift.configuration.client.model.ResourceModel;
 
 import java.util.HashMap;
@@ -88,14 +93,9 @@ public final class DatabaseView extends SimplePanel implements ModuleView {
 		}
 
 		databaseConfiguration.selectTab(0);
-		databaseConfiguration.addTabListener(new TabListener() {
+		databaseConfiguration.addSelectionHandler(new SelectionHandler<Integer>() {
 			@Override
-			public boolean onBeforeTabSelected(final SourcesTabEvents sourcesTabEvents, final int i) {
-				return true;
-			}
-
-			@Override
-			public void onTabSelected(final SourcesTabEvents sourcesTabEvents, final int i) {
+			public void onSelection(final SelectionEvent<Integer> event) {
 				saveUI();
 				// Fire validations for every single resulting property
 				customPropertyList.fireValidations();

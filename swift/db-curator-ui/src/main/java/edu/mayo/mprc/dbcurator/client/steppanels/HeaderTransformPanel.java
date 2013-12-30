@@ -1,6 +1,8 @@
 package edu.mayo.mprc.dbcurator.client.steppanels;
 
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.event.dom.client.ChangeEvent;
+import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.rpc.ServiceDefTarget;
 import com.google.gwt.user.client.ui.*;
@@ -67,10 +69,10 @@ public final class HeaderTransformPanel extends AbstractStepPanel {
 		lstCommonTransforms.setSelectedIndex(0);
 		lstCommonTransforms.setStyleName("steppanel-headertransform-lstcommontransforms");
 		requestTransformers(); //populate the list box making an rpc call if necessary
-		lstCommonTransforms.addChangeListener(new ChangeListener() {
+		lstCommonTransforms.addChangeHandler(new ChangeHandler() {
 			@Override
-			public void onChange(final Widget widget) {
-				final int selectedIndex = ((ListBox) widget).getSelectedIndex();
+			public void onChange(final ChangeEvent event) {
+				final int selectedIndex = lstCommonTransforms.getSelectedIndex();
 				if (selectedIndex == 0) {
 					txtDescription.setText("");
 					txtMatchPattern.setText("");

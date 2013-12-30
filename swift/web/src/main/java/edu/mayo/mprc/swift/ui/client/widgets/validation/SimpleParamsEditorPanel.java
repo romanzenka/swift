@@ -1,5 +1,7 @@
 package edu.mayo.mprc.swift.ui.client.widgets.validation;
 
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.Element;
 import com.google.gwt.user.client.Window;
@@ -101,9 +103,9 @@ public final class SimpleParamsEditorPanel implements SourcesChangeEvents {
 		hp.add(saveButton = new PushButton("Save..."));
 		saveButton.addStyleName(ACTION_LINK);
 		saveButton.addStyleName(SPACE_AFTER);
-		saveButton.addClickListener(new ClickListener() {
+		saveButton.addClickHandler(new ClickHandler() {
 			@Override
-			public void onClick(final Widget widget) {
+			public void onClick(final ClickEvent event) {
 				save();
 			}
 		});
@@ -113,9 +115,9 @@ public final class SimpleParamsEditorPanel implements SourcesChangeEvents {
 		hp.add(button = new PushButton("Preview..."));
 		button.addStyleName(ACTION_LINK);
 		button.addStyleName(SPACE_AFTER);
-		button.addClickListener(new ClickListener() {
+		button.addClickHandler(new ClickHandler() {
 			@Override
-			public void onClick(final Widget widget) {
+			public void onClick(final ClickEvent event) {
 				preview();
 			}
 		});
@@ -124,9 +126,9 @@ public final class SimpleParamsEditorPanel implements SourcesChangeEvents {
 		hp.add(deleteButton = new PushButton("Delete..."));
 		deleteButton.addStyleName(ACTION_LINK);
 		deleteButton.addStyleName(SPACE_AFTER);
-		deleteButton.addClickListener(new ClickListener() {
+		deleteButton.addClickHandler(new ClickHandler() {
 			@Override
-			public void onClick(final Widget widget) {
+			public void onClick(final ClickEvent event) {
 				delete();
 			}
 		});
@@ -165,9 +167,9 @@ public final class SimpleParamsEditorPanel implements SourcesChangeEvents {
 			final PushButton pb = new PushButton("Add or Review Database...");
 			pb.addStyleName(ACTION_LINK);
 			pb.setTitle("Click here to review the selected database and potentially modify it for your own needs.");
-			pb.addClickListener(new ClickListener() {
+			pb.addClickHandler(new ClickHandler() {
 				@Override
-				public void onClick(final Widget widget) {
+				public void onClick(final ClickEvent event) {
 					popupDbCurator();
 				}
 			});
@@ -179,7 +181,7 @@ public final class SimpleParamsEditorPanel implements SourcesChangeEvents {
 				final PushButton du = new PushButton("Undeploy Database");
 				du.addStyleName(ACTION_LINK);
 				du.setTitle("Click here to undeploy database from search engines.");
-				du.addClickListener(new DatabaseUndeploymentAction(serviceAsync, dlb));
+				du.addClickHandler(new DatabaseUndeploymentAction(serviceAsync, dlb));
 				p.add(du);
 			}
 

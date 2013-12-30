@@ -1,6 +1,8 @@
 package edu.mayo.mprc.swift.ui.client.dialogs;
 
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.DeferredCommand;
 import com.google.gwt.user.client.ui.*;
@@ -171,17 +173,17 @@ public final class ValidationPanel extends Composite {
 				hp.add(pb = new HTML("(more)"));
 				pb.addStyleName("actionLink");
 				pb.addStyleName("params-validation");
-				pb.addClickListener(new ClickListener() {
+				pb.addClickHandler(new ClickHandler() {
 					@Override
-					public void onClick(final Widget sender) {
+					public void onClick(final ClickEvent event) {
 						popup();
 					}
 				});
 			}
 
-			fp.addClickListener(new ClickListener() {
+			fp.addClickHandler(new ClickHandler() {
 				@Override
-				public void onClick(final Widget sender) {
+				public void onClick(final ClickEvent event) {
 					focus();
 				}
 			});

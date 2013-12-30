@@ -1,5 +1,7 @@
 package edu.mayo.mprc.swift.configuration.client.view;
 
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.ui.*;
 import edu.mayo.mprc.swift.configuration.client.model.*;
 
@@ -68,9 +70,9 @@ public final class DaemonWrapper extends SimplePanel {
 		newModuleButton = new Button("Add new module");
 		newModuleButton.addStyleName("btn");
 		newModuleButton.addStyleName("new-module-button");
-		newModuleButton.addClickListener(new ClickListener() {
+		newModuleButton.addClickHandler(new ClickHandler() {
 			@Override
-			public void onClick(final Widget sender) {
+			public void onClick(final ClickEvent event) {
 				final int index = newModulePicker.getSelectedIndex();
 				final String type = newModulePicker.getValue(index);
 				DaemonWrapper.this.daemonModel.addNewResource(type, null, context);

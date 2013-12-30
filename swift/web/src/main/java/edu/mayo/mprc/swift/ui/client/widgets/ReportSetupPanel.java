@@ -20,16 +20,16 @@ public final class ReportSetupPanel extends HorizontalPanel {
 
 	public ReportSetupPanel(final boolean enableScaffoldReport) {
 		scaffoldReport = new CheckBox("Generate Peptide Report");
-		scaffoldReport.setChecked(enableScaffoldReport);
+		scaffoldReport.setValue(enableScaffoldReport);
 		add(scaffoldReport);
 	}
 
 	public boolean isScaffoldReportEnable() {
-		return scaffoldReport.isChecked();
+		return Boolean.TRUE.equals(scaffoldReport.getValue());
 	}
 
 	public void setScaffoldReportEnable(final boolean enable) {
-		scaffoldReport.setChecked(enable);
+		scaffoldReport.setValue(enable);
 	}
 
 	public ClientPeptideReport getParameters() {
@@ -37,6 +37,6 @@ public final class ReportSetupPanel extends HorizontalPanel {
 	}
 
 	public void setParameters(final ClientPeptideReport peptideReport) {
-		scaffoldReport.setChecked(peptideReport != null && peptideReport.isScaffoldPeptideReportEnabled());
+		scaffoldReport.setValue(peptideReport != null && peptideReport.isScaffoldPeptideReportEnabled());
 	}
 }

@@ -1,5 +1,7 @@
 package edu.mayo.mprc.swift.ui.client.widgets;
 
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.ui.*;
 import edu.mayo.mprc.swift.ui.client.rpc.ClientFileSearch;
 import edu.mayo.mprc.swift.ui.client.rpc.ClientSearchEngineConfig;
@@ -102,10 +104,10 @@ public final class FileTable extends FlexTable implements SourcesChangeEvents, C
 			header.init(this);
 		}
 
-		((CheckBox) headers[SELECT_COLUMN].getWidget()).addClickListener(new ColumnSelectListener(SELECT_COLUMN, this));
-		((PushButton) headers[REMOVE_COLUMN].getWidget()).addClickListener(new ClickListener() {
+		((CheckBox) headers[SELECT_COLUMN].getWidget()).addClickHandler(new ColumnSelectListener(SELECT_COLUMN, this));
+		((PushButton) headers[REMOVE_COLUMN].getWidget()).addClickHandler(new ClickHandler() {
 			@Override
-			public void onClick(final Widget sender) {
+			public void onClick(final ClickEvent event) {
 				removeSelectedFiles();
 			}
 		});
@@ -140,11 +142,12 @@ public final class FileTable extends FlexTable implements SourcesChangeEvents, C
 			final MutableInteger index = new MutableInteger(lastRow);
 
 			final CheckBox selection = new CheckBox();
-			selection.addClickListener(new ClickListener() {
+			selection.addClickHandler(new ClickHandler() {
 				@Override
-				public void onClick(final Widget sender) {
+				public void onClick(final ClickEvent event) {
+					final Widget sender = (Widget) event.getSource();
 					if (sender instanceof CheckBox) {
-						setChecked(getWidgetRow(sender), SELECT_COLUMN, ((CheckBox) sender).isChecked());
+						setChecked(getWidgetRow(sender), SELECT_COLUMN, Boolean.TRUE.equals(((CheckBox) sender).getValue()));
 					} else {
 						throw new RuntimeException("Programmer error, type mismatch");
 					}
@@ -176,11 +179,12 @@ public final class FileTable extends FlexTable implements SourcesChangeEvents, C
 			final MutableInteger index = new MutableInteger(lastRow);
 
 			final CheckBox selection = new CheckBox();
-			selection.addClickListener(new ClickListener() {
+			selection.addClickHandler(new ClickHandler() {
 				@Override
-				public void onClick(final Widget sender) {
+				public void onClick(final ClickEvent event) {
+					final Widget sender = (Widget) event.getSource();
 					if (sender instanceof CheckBox) {
-						setChecked(getWidgetRow(sender), SELECT_COLUMN, ((CheckBox) sender).isChecked());
+						setChecked(getWidgetRow(sender), SELECT_COLUMN, Boolean.TRUE.equals(((CheckBox) sender).getValue()));
 					} else {
 						throw new RuntimeException("Programmer error, type mismatch");
 					}
@@ -238,7 +242,7 @@ public final class FileTable extends FlexTable implements SourcesChangeEvents, C
 		setWidget(rowNumber, FILE_COLUMN, filePathWidget);
 		setWidget(rowNumber, SIZE_COLUMN, new FileSizeWidget(fileSize));
 		final PushButton removeButton = new PushButton(new Image(REMOVE_IMAGE));
-		removeButton.addClickListener(new RemoveButtonListener(lineIndex));
+		removeButton.addClickHandler(new RemoveButtonListener(lineIndex));
 		setWidget(rowNumber, REMOVE_COLUMN, removeButton);
 
 		final EditableLabel sampleLabel = new EditableLabel(sampleName, new TextChangeListener(SAMPLE_COLUMN, this));
@@ -417,9 +421,9 @@ public final class FileTable extends FlexTable implements SourcesChangeEvents, C
 
 	public void changeColumnText(final int row, final int column, final String text) {
 		// If the row is selected, change text for all selected rows
-		if (getSelectionCheckBox(row).isChecked()) {
+		if (Boolean.TRUE.equals(getSelectionCheckBox(row).getValue())) {
 			for (int i = getFirstDataRow(); i < getRowCount(); i++) {
-				if (getSelectionCheckBox(i).isChecked() && i != row) {
+				if (Boolean.TRUE.equals(getSelectionCheckBox(i).getValue()) && i != row) {
 					final EditableLabel label = (EditableLabel) getWidget(i, column);
 					label.setText(text);
 				}
@@ -461,7 +465,7 @@ public final class FileTable extends FlexTable implements SourcesChangeEvents, C
 
 	public void setChecked(final int row, final int column, final boolean checked) {
 		final CheckBox rowCheckBox = (CheckBox) getWidget(row, column);
-		rowCheckBox.setChecked(checked);
+		rowCheckBox.setValue(checked);
 		// Select column also changes row style
 		if (SELECT_COLUMN == column) {
 			if (checked) {
@@ -506,7 +510,7 @@ public final class FileTable extends FlexTable implements SourcesChangeEvents, C
 		}
 	}
 
-	private class RemoveButtonListener implements ClickListener {
+	private class RemoveButtonListener implements ClickHandler {
 		private MutableInteger rowIndex;
 
 		RemoveButtonListener(final MutableInteger rowIndex) {
@@ -514,7 +518,7 @@ public final class FileTable extends FlexTable implements SourcesChangeEvents, C
 		}
 
 		@Override
-		public void onClick(final Widget sender) {
+		public void onClick(final ClickEvent event) {
 			removeFileAtRow(rowIndex.i);
 		}
 	}

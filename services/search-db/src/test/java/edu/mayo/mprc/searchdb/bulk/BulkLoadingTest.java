@@ -33,6 +33,7 @@ import org.dbunit.dataset.FilteredDataSet;
 import org.dbunit.dataset.IDataSet;
 import org.dbunit.dataset.filter.ITableFilter;
 import org.dbunit.dataset.xml.FlatXmlDataSet;
+import org.dbunit.dataset.xml.FlatXmlDataSetBuilder;
 import org.dbunit.operation.DatabaseOperation;
 import org.hibernate.Transaction;
 import org.hibernate.stat.Statistics;
@@ -107,7 +108,7 @@ public final class BulkLoadingTest extends DaoTest {
 			final Transaction transaction = sessionProvider.getSession().beginTransaction();
 			final IDatabaseConnection connection = new DatabaseConnection(sessionProvider.getSession().connection());
 			IDataSet currentData = connection.createDataSet();
-			FlatXmlDataSet set = new FlatXmlDataSet(new File("/Users/m044910/Documents/devel/swift/services/search-db/src/test/resources/edu/mayo/mprc/searchdb/dump.xml"));
+			FlatXmlDataSet set = new FlatXmlDataSetBuilder().build(new File("/Users/m044910/Documents/devel/swift/services/search-db/src/test/resources/edu/mayo/mprc/searchdb/dump.xml"));
 			DatabaseOperation.CLEAN_INSERT.execute(connection, set);
 			transaction.commit();
 		} catch (Exception e) {

@@ -1,7 +1,12 @@
 package edu.mayo.mprc.swift.ui.client.dialogs;
 
+import com.google.gwt.event.dom.client.KeyUpEvent;
+import com.google.gwt.event.dom.client.KeyUpHandler;
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.gwt.user.client.ui.*;
+import com.google.gwt.user.client.ui.Grid;
+import com.google.gwt.user.client.ui.HorizontalPanel;
+import com.google.gwt.user.client.ui.Label;
+import com.google.gwt.user.client.ui.TextBox;
 import edu.mayo.mprc.swift.ui.client.rpc.ClientParamSet;
 import edu.mayo.mprc.swift.ui.client.rpc.ClientUser;
 import edu.mayo.mprc.swift.ui.client.rpc.ClientValidation;
@@ -44,8 +49,12 @@ public final class SaveDialog extends FrameDialog {
 		l.setStyleName("italic");
 		newName = new TextBox();
 		g.setWidget(1, 1, newName);
-		final KeyListener kl = new KeyListener();
-		newName.addKeyboardListener(kl);
+		newName.addKeyUpHandler(new KeyUpHandler() {
+			@Override
+			public void onKeyUp(final KeyUpEvent event) {
+				setValidStatus();
+			}
+		});
 
 		l = new Label("Owner:");
 		g.setWidget(2, 0, l);
@@ -77,14 +86,6 @@ public final class SaveDialog extends FrameDialog {
 
 		enableOkButton(enabled);
 		return enabled;
-	}
-
-	public final class KeyListener extends KeyboardListenerAdapter {
-		@Override
-		public void onKeyUp(final Widget sender, final char keyCode, final int modifiers) {
-			setValidStatus();
-			super.onKeyUp(sender, keyCode, modifiers);
-		}
 	}
 
 	@Override

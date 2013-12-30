@@ -58,8 +58,8 @@ public final class SequenceManipulationPanel extends AbstractStepPanel {
 	 */
 	@Override
 	public CurationStepStub getContainedStep() {
-		containedStep.manipulationType = (radioReversal.isChecked() ? SequenceManipulationStepStub.REVERSAL : SequenceManipulationStepStub.SCRAMBLE);
-		containedStep.overwrite = !chkRetainOriginal.isChecked();
+		containedStep.manipulationType = Boolean.TRUE.equals(radioReversal.getValue()) ? SequenceManipulationStepStub.REVERSAL : SequenceManipulationStepStub.SCRAMBLE;
+		containedStep.overwrite = !Boolean.TRUE.equals(chkRetainOriginal.getValue());
 		return containedStep;
 	}
 
@@ -97,11 +97,11 @@ public final class SequenceManipulationPanel extends AbstractStepPanel {
 	public void update() {
 
 		if (containedStep.manipulationType.equalsIgnoreCase(SequenceManipulationStepStub.SCRAMBLE)) {
-			radioScramble.setChecked(true);
+			radioScramble.setValue(true);
 		} else {
-			radioReversal.setChecked(true);
+			radioReversal.setValue(true);
 		}
-		chkRetainOriginal.setChecked(!containedStep.overwrite);
+		chkRetainOriginal.setValue(!containedStep.overwrite);
 	}
 
 	@Override

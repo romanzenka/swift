@@ -1,5 +1,7 @@
 package edu.mayo.mprc.swift.ui.client.widgets.validation;
 
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.ui.*;
 import edu.mayo.mprc.common.client.ExceptionUtilities;
 import edu.mayo.mprc.swift.ui.client.dialogs.Validatable;
@@ -10,7 +12,7 @@ import edu.mayo.mprc.swift.ui.client.widgets.ValidatedIntegerTextBox;
 
 import java.util.List;
 
-public final class ScaffoldSettingsEditor extends Composite implements Validatable, ChangeListener, ClickListener {
+public final class ScaffoldSettingsEditor extends Composite implements Validatable, ChangeListener, ClickHandler {
 	private ClientScaffoldSettings scaffoldSettings;
 	private final ChangeListenerCollection changeListenerCollection = new ChangeListenerCollection();
 	private final HorizontalPanel panel;
@@ -60,19 +62,20 @@ public final class ScaffoldSettingsEditor extends Composite implements Validatab
 
 		starredCheckbox = new CheckBox("Stars");
 		starredCheckbox.setStyleName("scaffold-setting-group");
-		starredCheckbox.addClickListener(this);
+		starredCheckbox.addClickHandler(this);
 		panel.add(starredCheckbox);
 
 		starEditor = new Anchor("Edit");
-		starEditor.addClickListener(this);
+		starEditor.addClickHandler(this);
 		panel.add(starEditor);
 
 		goAnnotations = new CheckBox("GO Annotations");
 		goAnnotations.setStyleName("scaffold-setting-group");
-		goAnnotations.addClickListener(new ClickListener() {
+		goAnnotations.addClickHandler(new ClickHandler() {
 			@Override
-			public void onClick(final Widget sender) {
-				onChange(sender);
+			public void onClick(final ClickEvent event) {
+				final Widget source = (Widget) event.getSource();
+				onChange(source);
 			}
 		});
 		panel.add(goAnnotations);
@@ -90,9 +93,10 @@ public final class ScaffoldSettingsEditor extends Composite implements Validatab
 		useIndependentSampleGrouping = new CheckBox("Independent Samples");
 		useIndependentSampleGrouping.setTitle("Samples will be reported as if they were processed in independent Scaffold runs");
 		useIndependentSampleGrouping.setStyleName("scaffold-setting-group");
-		useIndependentSampleGrouping.addClickListener(new ClickListener() {
+		useIndependentSampleGrouping.addClickHandler(new ClickHandler() {
 			@Override
-			public void onClick(final Widget sender) {
+			public void onClick(final ClickEvent event) {
+				final Widget sender = (Widget) event.getSource();
 				onChange(sender);
 			}
 		});
@@ -101,18 +105,20 @@ public final class ScaffoldSettingsEditor extends Composite implements Validatab
 		useFamilyProteinGrouping = new CheckBox("Protein Families");
 		useFamilyProteinGrouping.setTitle("Scaffold will group proteins into families. New in Scaffold 4");
 		useFamilyProteinGrouping.setStyleName("scaffold-setting-group");
-		useFamilyProteinGrouping.addClickListener(new ClickListener() {
+		useFamilyProteinGrouping.addClickHandler(new ClickHandler() {
 			@Override
-			public void onClick(final Widget sender) {
+			public void onClick(final ClickEvent event) {
+				final Widget sender = (Widget) event.getSource();
 				onChange(sender);
 			}
 		});
 		panel.add(useFamilyProteinGrouping);
 
 		starredDialog = new StarredProteinsDialog();
-		starredDialog.setOkListener(new ClickListener() {
+		starredDialog.setOkListener(new ClickHandler() {
 			@Override
-			public void onClick(final Widget sender) {
+			public void onClick(final ClickEvent event) {
+				final Widget sender = (Widget) event.getSource();
 				onChange(sender);
 			}
 		});
@@ -136,8 +142,8 @@ public final class ScaffoldSettingsEditor extends Composite implements Validatab
 		minPeptideCount.setText(String.valueOf(scaffoldSettings.getMinimumPeptideCount()));
 		peptideProbability.setText(String.valueOf(scaffoldSettings.getPeptideProbability() * 100.0));
 		minNTT.setText(String.valueOf(scaffoldSettings.getMinimumNonTrypticTerminii()));
-		starredCheckbox.setChecked(scaffoldSettings.getStarredProteins() != null);
-		goAnnotations.setChecked(scaffoldSettings.isAnnotateWithGOA());
+		starredCheckbox.setValue(scaffoldSettings.getStarredProteins() != null);
+		goAnnotations.setValue(scaffoldSettings.isAnnotateWithGOA());
 		saveSpectra.setSelectedIndex(scaffoldSettings.isSaveNoSpectra() ? 2 : (scaffoldSettings.isSaveOnlyIdentifiedSpectra() ? 1 : 0));
 		starredDialog.setValue(scaffoldSettings);
 		useIndependentSampleGrouping.setValue(scaffoldSettings.isUseIndependentSampleGrouping());
@@ -197,7 +203,7 @@ public final class ScaffoldSettingsEditor extends Composite implements Validatab
 		scaffoldSettings.setConnectToNCBI(goAnnotations.getValue());
 		scaffoldSettings.setSaveNoSpectra("none".equals(saveSpectra.getValue(saveSpectra.getSelectedIndex())));
 		scaffoldSettings.setSaveOnlyIdentifiedSpectra("id".equals(saveSpectra.getValue(saveSpectra.getSelectedIndex())));
-		starredCheckbox.setChecked(scaffoldSettings.getStarredProteins() != null);
+		starredCheckbox.setValue(scaffoldSettings.getStarredProteins() != null);
 		scaffoldSettings.setUseIndependentSampleGrouping(useIndependentSampleGrouping.getValue());
 		scaffoldSettings.setUseFamilyProteinGrouping(useFamilyProteinGrouping.getValue());
 		fireChange();
@@ -208,9 +214,10 @@ public final class ScaffoldSettingsEditor extends Composite implements Validatab
 	}
 
 	@Override
-	public void onClick(final Widget sender) {
+	public void onClick(final ClickEvent event) {
+		final Widget sender = (Widget) event.getSource();
 		if (starredCheckbox.equals(sender)) {
-			if (starredCheckbox.isChecked()) {
+			if (Boolean.TRUE.equals(starredCheckbox.getValue())) {
 				scaffoldSettings.setStarredProteins(starredDialog.getLastValue());
 			} else {
 				scaffoldSettings.setStarredProteins(null);

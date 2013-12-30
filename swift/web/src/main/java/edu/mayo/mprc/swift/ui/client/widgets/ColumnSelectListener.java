@@ -1,10 +1,10 @@
 package edu.mayo.mprc.swift.ui.client.widgets;
 
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.ui.CheckBox;
-import com.google.gwt.user.client.ui.ClickListener;
-import com.google.gwt.user.client.ui.Widget;
 
-public final class ColumnSelectListener implements ClickListener {
+public final class ColumnSelectListener implements ClickHandler {
 	private final int column;
 	private final FileTable table;
 
@@ -14,8 +14,8 @@ public final class ColumnSelectListener implements ClickListener {
 	}
 
 	@Override
-	public void onClick(final Widget widget) {
-		final CheckBox mainCheckBox = (CheckBox) widget;
+	public void onClick(final ClickEvent event) {
+		final CheckBox mainCheckBox = (CheckBox) event.getSource();
 		for (int row = table.getFirstDataRow(); row < table.getRowCount(); row++) {
 			table.setChecked(row, column, mainCheckBox.isChecked());
 		}

@@ -1,8 +1,14 @@
 package edu.mayo.mprc.swift.ui.client.widgets;
 
+import com.google.gwt.event.dom.client.BlurEvent;
+import com.google.gwt.event.dom.client.BlurHandler;
+import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.DeferredCommand;
-import com.google.gwt.user.client.ui.*;
+import com.google.gwt.user.client.ui.Label;
+import com.google.gwt.user.client.ui.PopupPanel;
+import com.google.gwt.user.client.ui.TextBox;
+import com.google.gwt.user.client.ui.Widget;
 
 /*
  *      Copyright 2008 Battams, Derek
@@ -58,11 +64,12 @@ public abstract class ValidatedTextBox extends TextBox {
 	/**
 	 * The FocusListener automatically attached to each instance
 	 */
-	private static class ValidatedTextBoxFocusListener extends FocusListenerAdapter {
+	private static class ValidatedTextBoxFocusListener implements BlurHandler {
 		private PopupPanel p = new PopupPanel();
 
 		@Override
-		public void onLostFocus(final Widget sender) {
+		public void onBlur(BlurEvent event) {
+			Widget sender = (Widget) event.getSource();
 			final ValidatedTextBox vTxtBox = (ValidatedTextBox) sender;
 			if (!vTxtBox.isValueValid()) {
 				vTxtBox.setInvalid(true);
@@ -94,7 +101,7 @@ public abstract class ValidatedTextBox extends TextBox {
 	 */
 	public ValidatedTextBox(final TextBoxValidator v) {
 		validator = v;
-		super.addFocusListener(focusListener);
+		super.addBlurHandler(focusListener);
 	}
 
 	/**
@@ -139,8 +146,8 @@ public abstract class ValidatedTextBox extends TextBox {
 	}
 
 	@Override
-	public final void addFocusListener(final FocusListener listener) {
-		return;
+	public final HandlerRegistration addBlurHandler(final BlurHandler handler) {
+		return null;
 	}
 }
 	

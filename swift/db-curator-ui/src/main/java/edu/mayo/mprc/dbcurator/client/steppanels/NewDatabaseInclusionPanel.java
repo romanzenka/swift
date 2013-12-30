@@ -1,9 +1,14 @@
 package edu.mayo.mprc.dbcurator.client.steppanels;
 
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.event.dom.client.ChangeEvent;
+import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.rpc.ServiceDefTarget;
-import com.google.gwt.user.client.ui.*;
+import com.google.gwt.user.client.ui.Label;
+import com.google.gwt.user.client.ui.ListBox;
+import com.google.gwt.user.client.ui.TextBox;
+import com.google.gwt.user.client.ui.VerticalPanel;
 import edu.mayo.mprc.common.client.ExceptionUtilities;
 
 import java.util.HashMap;
@@ -17,9 +22,9 @@ public final class NewDatabaseInclusionPanel extends AbstractStepPanel {
 
 	private NewDatabaseInclusionStub containedStep = new NewDatabaseInclusionStub();
 
-	private TextBox url = new TextBox();
-	private ListBox lstCommonSites = new ListBox();
-	private Map<String, String> commonSites = new HashMap<String, String>();
+	private final TextBox url = new TextBox();
+	private final ListBox lstCommonSites = new ListBox();
+	private final Map<String, String> commonSites = new HashMap<String, String>(5);
 	public static final String TITLE = "Download Sequence Database";
 
 	public NewDatabaseInclusionPanel() {
@@ -27,15 +32,15 @@ public final class NewDatabaseInclusionPanel extends AbstractStepPanel {
 
 		lstCommonSites.addItem("Manual Entry");
 		getCommonSites(); //generate the list of common sites
-		lstCommonSites.addChangeListener(new ChangeListener() {
+		lstCommonSites.addChangeHandler(new ChangeHandler() {
 			@Override
-			public void onChange(final Widget widget) {
-				final ListBox source = (ListBox) widget;
+			public void onChange(final ChangeEvent event) {
+				final ListBox source = lstCommonSites;
 				final String selection = source.getItemText(source.getSelectedIndex());
-				if (!selection.equalsIgnoreCase("Manual Entry")) {
-					url.setText(commonSites.get(selection));
-				} else {
+				if (selection.equalsIgnoreCase("Manual Entry")) {
 					url.setText("ftp://");
+				} else {
+					url.setText(commonSites.get(selection));
 				}
 			}
 		});

@@ -1,5 +1,9 @@
 package edu.mayo.mprc.swift.configuration.client.view;
 
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.logical.shared.SelectionEvent;
+import com.google.gwt.event.logical.shared.SelectionHandler;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.*;
 import edu.mayo.mprc.swift.configuration.client.model.*;
@@ -33,9 +37,9 @@ public final class ConfigWrapper extends SimplePanel {
 		newDaemonButton = new PushButton("Add new");
 		newDaemonButton.addStyleName("btn");
 		newDaemonButton.addStyleName("tree-item-pusbutton");
-		newDaemonButton.addClickListener(new ClickListener() {
+		newDaemonButton.addClickHandler(new ClickHandler() {
 			@Override
-			public void onClick(final Widget widget) {
+			public void onClick(final ClickEvent event) {
 				ConfigurationService.App.getInstance().createChild(model.getId(), "daemon", new AsyncCallback<ResourceModel>() {
 					@Override
 					public void onFailure(final Throwable throwable) {
@@ -62,9 +66,10 @@ public final class ConfigWrapper extends SimplePanel {
 		model.addListener(new MyApplicationModelListener());
 		initFromData();
 
-		configTree.addTreeListener(new TreeListener() {
+		configTree.addSelectionHandler(new SelectionHandler<TreeItem>() {
 			@Override
-			public void onTreeItemSelected(final TreeItem item) {
+			public void onSelection(final SelectionEvent<TreeItem> event) {
+				final TreeItem item = event.getSelectedItem();
 				if (item != null) {
 					if (isDaemonItem(item)) {
 						uiPanel.setWidget((DaemonWrapper) item.getUserObject());
@@ -84,10 +89,6 @@ public final class ConfigWrapper extends SimplePanel {
 						runnerPanel.clear();
 					}
 				}
-			}
-
-			@Override
-			public void onTreeItemStateChanged(final TreeItem item) {
 			}
 		});
 
@@ -182,9 +183,9 @@ public final class ConfigWrapper extends SimplePanel {
 		final HorizontalPanel daemonItem = new HorizontalPanel();
 		daemonItem.add(new Label(daemon.getName()));
 		final DeleteButton removeDaemonButton = new DeleteButton("Do you really want to remove this daemon?");
-		removeDaemonButton.addClickListener(new ClickListener() {
+		removeDaemonButton.addClickHandler(new ClickHandler() {
 			@Override
-			public void onClick(final Widget sender) {
+			public void onClick(final ClickEvent event) {
 				ConfigurationService.App.getInstance().removeChild(daemon.getId(), new AsyncCallback<Void>() {
 					@Override
 					public void onFailure(final Throwable throwable) {
@@ -262,9 +263,9 @@ public final class ConfigWrapper extends SimplePanel {
 		final HorizontalPanel panel = new HorizontalPanel();
 		panel.add(new Label(resource.getName()));
 		final DeleteButton deleteButton = new DeleteButton("Do you really want to remove this module?");
-		deleteButton.addClickListener(new ClickListener() {
+		deleteButton.addClickHandler(new ClickHandler() {
 			@Override
-			public void onClick(final Widget sender) {
+			public void onClick(final ClickEvent event) {
 				ConfigurationService.App.getInstance().removeChild(resource.getId(), new AsyncCallback<Void>() {
 					@Override
 					public void onFailure(final Throwable throwable) {

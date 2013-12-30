@@ -1,6 +1,10 @@
 package edu.mayo.mprc.swift.ui.client;
 
 import com.google.gwt.core.client.EntryPoint;
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.dom.client.KeyUpEvent;
+import com.google.gwt.event.dom.client.KeyUpHandler;
 import com.google.gwt.user.client.Cookies;
 import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.Window;
@@ -182,10 +186,9 @@ public final class SwiftApp implements EntryPoint, HidesPageContentsWhileLoading
 		final RootPanel titlePanel = RootPanel.get("title");
 		title.setVisibleLength(30);
 		titlePanel.add(title);
-		title.addKeyboardListener(new KeyboardListenerAdapter() {
+		title.addKeyUpHandler(new KeyUpHandler() {
 			@Override
-			public void onKeyUp(final Widget sender, final char keyCode, final int modifiers) {
-				// TODO Validation
+			public void onKeyUp(KeyUpEvent event) {
 				updateOutputLocation();
 			}
 		});
@@ -215,9 +218,9 @@ public final class SwiftApp implements EntryPoint, HidesPageContentsWhileLoading
 		editorToggle.setDown(false);
 		editorToggle.addStyleName("toggle-button");
 		togglePanel.add(editorToggle);
-		editorToggle.addClickListener(new ClickListener() {
+		editorToggle.addClickHandler(new ClickHandler() {
 			@Override
-			public void onClick(final Widget sender) {
+			public void onClick(final ClickEvent event) {
 				paramsEditor.setEditorExpanded(editorToggle.isDown());
 			}
 		});
@@ -400,9 +403,9 @@ public final class SwiftApp implements EntryPoint, HidesPageContentsWhileLoading
 
 	private void initAddFilesButton() {
 		// Add files button produces a dialog
-		addFileButton = new PushButton("", new ClickListener() {
+		addFileButton = new PushButton("", new ClickHandler() {
 			@Override
-			public void onClick(final Widget sender) {
+			public void onClick(final ClickEvent event) {
 				final int clientWidth = Window.getClientWidth();
 				final int clientHeight = Window.getClientHeight();
 				final int popupWidth = clientWidth * 3 / 4;
@@ -480,7 +483,7 @@ public final class SwiftApp implements EntryPoint, HidesPageContentsWhileLoading
 			});
 		}
 
-		runButton.addClickListener(new RunClickListener());
+		runButton.addClickHandler(new RunClickHandler());
 	}
 
 	/**
@@ -581,12 +584,12 @@ public final class SwiftApp implements EntryPoint, HidesPageContentsWhileLoading
         $wnd.location = url;
     }-*/;
 
-	private class RunClickListener implements ClickListener {
-		RunClickListener() {
+	private class RunClickHandler implements ClickHandler {
+		RunClickHandler() {
 		}
 
 		@Override
-		public void onClick(final Widget sender) {
+		public void onClick(final ClickEvent event) {
 			updateUserMessage();
 			updateOutputLocation();
 

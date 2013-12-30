@@ -36,7 +36,7 @@ public final class PropertyList extends FlexTable implements ModuleView {
 		if (editor instanceof TextBox) {
 			value = ((TextBox) editor).getText().trim();
 		} else if (editor instanceof CheckBox) {
-			value = ((CheckBox) editor).isChecked() ? "true" : "false";
+			value = Boolean.TRUE.equals(((CheckBox) editor).getValue()) ? "true" : "false";
 		} else if (editor instanceof ReferenceListBox) {
 			value = ((ReferenceListBox) editor).getValue();
 		} else {

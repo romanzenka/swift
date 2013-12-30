@@ -1,6 +1,12 @@
 package edu.mayo.mprc.swift.ui.client.widgets.validation;
 
-import com.google.gwt.user.client.ui.*;
+import com.google.gwt.event.dom.client.KeyCodes;
+import com.google.gwt.event.dom.client.KeyUpEvent;
+import com.google.gwt.event.dom.client.KeyUpHandler;
+import com.google.gwt.user.client.ui.ChangeListener;
+import com.google.gwt.user.client.ui.ChangeListenerCollection;
+import com.google.gwt.user.client.ui.TextBox;
+import com.google.gwt.user.client.ui.Widget;
 import edu.mayo.mprc.swift.ui.client.dialogs.Validatable;
 import edu.mayo.mprc.swift.ui.client.rpc.ClientValue;
 
@@ -15,12 +21,12 @@ public abstract class ValidatableTextBox extends TextBox implements Validatable 
 		super();
 		this.param = param;
 		listeners = new ChangeListenerCollection();
-		addKeyboardListener(
-				new KeyboardListenerAdapter() {
+		addKeyUpHandler(
+				new KeyUpHandler() {
 					@Override
-					public void onKeyUp(final Widget widget, final char c, final int i) {
-						if (c == KEY_ENTER) {
-							listeners.fireChange(widget);
+					public void onKeyUp(KeyUpEvent event) {
+						if (event.getNativeKeyCode() == KeyCodes.KEY_ENTER) {
+							listeners.fireChange((Widget) event.getSource());
 						}
 					}
 				}
