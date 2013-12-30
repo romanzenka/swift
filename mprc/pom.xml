@@ -174,7 +174,7 @@
                                     <serverId>swift-dev</serverId>
                                     <fromDir>${project.build.directory}</fromDir>
                                     <includes>*.jar</includes>
-                                    <url>scp://node021.mprc.mayo.edu/mnt/mprc/software/swift/dev/lib</url>
+                                    <url>scp://node021.mprc.mayo.edu/usr/lib/swift/swift_dev/lib</url>
                                 </configuration>
                             </execution>
                         </executions>
