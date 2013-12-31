@@ -1,5 +1,6 @@
 package edu.mayo.mprc.swift.search.task;
 
+import com.google.common.base.Objects;
 import edu.mayo.mprc.daemon.DaemonConnection;
 import edu.mayo.mprc.daemon.worker.WorkPacket;
 import edu.mayo.mprc.dbcurator.model.Curation;
@@ -13,8 +14,8 @@ import edu.mayo.mprc.workflow.engine.WorkflowEngine;
  *
  * @author Roman Zenka
  */
-public class FastaDbTask extends AsyncTaskBase {
-	private int curationIdToLoad;
+public final class FastaDbTask extends AsyncTaskBase {
+	private final int curationIdToLoad;
 
 	/**
 	 * Does not require the curation to be loaded at the expense of having uglier description.
@@ -36,14 +37,6 @@ public class FastaDbTask extends AsyncTaskBase {
 		setDescription("Load " + fileTokenFactory.fileToTaggedDatabaseToken(curationToLoad.getCurationFile()) + " to database.");
 	}
 
-	public int getCurationIdToLoad() {
-		return curationIdToLoad;
-	}
-
-	public void setCurationIdToLoad(final int curationIdToLoad) {
-		this.curationIdToLoad = curationIdToLoad;
-	}
-
 	@Override
 	public WorkPacket createWorkPacket() {
 		return new FastaDbWorkPacket(getFullId(), curationIdToLoad);
@@ -55,5 +48,22 @@ public class FastaDbTask extends AsyncTaskBase {
 
 	@Override
 	public void onProgress(final ProgressInfo progressInfo) {
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hashCode(curationIdToLoad);
+	}
+
+	@Override
+	public boolean equals(final Object obj) {
+		if (this == obj) {
+			return true;
+		}
+		if (obj == null || getClass() != obj.getClass()) {
+			return false;
+		}
+		final FastaDbTask other = (FastaDbTask) obj;
+		return Objects.equal(curationIdToLoad, other.curationIdToLoad);
 	}
 }

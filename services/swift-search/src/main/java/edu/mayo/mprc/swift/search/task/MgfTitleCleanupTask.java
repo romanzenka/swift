@@ -1,5 +1,6 @@
 package edu.mayo.mprc.swift.search.task;
 
+import com.google.common.base.Objects;
 import edu.mayo.mprc.daemon.DaemonConnection;
 import edu.mayo.mprc.daemon.worker.WorkPacket;
 import edu.mayo.mprc.mgf2mgf.MgfTitleCleanupResult;
@@ -13,9 +14,11 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 final class MgfTitleCleanupTask extends AsyncTaskBase implements FileProducingTask {
 
-	private boolean cleanupPerformed;
 	private final File mgfToCleanup;
 	private final File cleanedMgf;
+
+	private boolean cleanupPerformed;
+
 	private static final AtomicInteger TASK_ID = new AtomicInteger(0);
 
 	MgfTitleCleanupTask(final WorkflowEngine engine, final DaemonConnection daemon, final File mgfToCleanup, final File cleanedMgf, final DatabaseFileTokenFactory fileTokenFactory, final boolean fromScratch) {
@@ -57,5 +60,22 @@ final class MgfTitleCleanupTask extends AsyncTaskBase implements FileProducingTa
 		} else {
 			return mgfToCleanup;
 		}
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hashCode(mgfToCleanup, cleanedMgf);
+	}
+
+	@Override
+	public boolean equals(final Object obj) {
+		if (this == obj) {
+			return true;
+		}
+		if (obj == null || getClass() != obj.getClass()) {
+			return false;
+		}
+		final MgfTitleCleanupTask other = (MgfTitleCleanupTask) obj;
+		return Objects.equal(mgfToCleanup, other.mgfToCleanup) && Objects.equal(cleanedMgf, other.cleanedMgf);
 	}
 }

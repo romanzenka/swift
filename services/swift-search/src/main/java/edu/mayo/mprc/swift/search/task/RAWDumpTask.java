@@ -15,7 +15,7 @@ import java.io.File;
  * Dumping data from a .RAW file.
  */
 public final class RAWDumpTask extends AsyncTaskBase {
-	private File rawFile;
+	private final File rawFile;
 	private File rawInfoFile;
 	private File rawSpectraFile;
 	private File chromatogramFile;
@@ -23,7 +23,7 @@ public final class RAWDumpTask extends AsyncTaskBase {
 	private File instrumentMethodFile;
 	private File sampleInformationFile;
 	private File errorLogFile;
-	private File outputFolder;
+	private final File outputFolder;
 
 	public static final String RAW_INFO_FILE_SUFFIX = ".info.tsv";
 	public static final String RAW_SPECTRA_FILE_SUFFIX = ".spectra.tsv";
@@ -149,5 +149,25 @@ public final class RAWDumpTask extends AsyncTaskBase {
 			sampleInformationFile = dumpResult.getSampleInformationFile();
 			errorLogFile = dumpResult.getErrorLogFile();
 		}
+	}
+
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (!(o instanceof RAWDumpTask)) return false;
+
+		RAWDumpTask that = (RAWDumpTask) o;
+
+		if (outputFolder != null ? !outputFolder.equals(that.outputFolder) : that.outputFolder != null) return false;
+		if (rawFile != null ? !rawFile.equals(that.rawFile) : that.rawFile != null) return false;
+
+		return true;
+	}
+
+	@Override
+	public int hashCode() {
+		int result = rawFile != null ? rawFile.hashCode() : 0;
+		result = 31 * result + (outputFolder != null ? outputFolder.hashCode() : 0);
+		return result;
 	}
 }

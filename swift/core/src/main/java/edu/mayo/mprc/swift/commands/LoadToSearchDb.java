@@ -1,5 +1,6 @@
 package edu.mayo.mprc.swift.commands;
 
+import com.google.common.base.Objects;
 import edu.mayo.mprc.MprcException;
 import edu.mayo.mprc.config.DaemonConfig;
 import edu.mayo.mprc.config.ServiceConfig;
@@ -411,6 +412,23 @@ public final class LoadToSearchDb implements SwiftCommand {
 			loaded++;
 			LOGGER.info("Loaded " + scaffoldName + " (" + loaded + " out of " + totalToLoad + ")");
 			setState(TaskState.COMPLETED_SUCCESFULLY);
+		}
+
+		@Override
+		public int hashCode() {
+			return Objects.hashCode(scaffoldName);
+		}
+
+		@Override
+		public boolean equals(final Object obj) {
+			if (this == obj) {
+				return true;
+			}
+			if (obj == null || getClass() != obj.getClass()) {
+				return false;
+			}
+			final SuccessfulLoadCounter other = (SuccessfulLoadCounter) obj;
+			return Objects.equal(scaffoldName, other.scaffoldName);
 		}
 	}
 }

@@ -112,4 +112,36 @@ final class DatabaseDeployment extends AsyncTaskBase implements DatabaseDeployme
 	public DeploymentResult getDeploymentResult() {
 		return deploymentResult;
 	}
+
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) {
+			return true;
+		}
+		if (!(o instanceof DatabaseDeployment)) {
+			return false;
+		}
+
+		DatabaseDeployment that = (DatabaseDeployment) o;
+
+		if (dbToDeploy != null ? !dbToDeploy.equals(that.dbToDeploy) : that.dbToDeploy != null) {
+			return false;
+		}
+		if (engineCode != null ? !engineCode.equals(that.engineCode) : that.engineCode != null) {
+			return false;
+		}
+		if (paramsFile != null ? !paramsFile.equals(that.paramsFile) : that.paramsFile != null) {
+			return false;
+		}
+
+		return true;
+	}
+
+	@Override
+	public int hashCode() {
+		int result = engineCode != null ? engineCode.hashCode() : 0;
+		result = 31 * result + (dbToDeploy != null ? dbToDeploy.hashCode() : 0);
+		result = 31 * result + (paramsFile != null ? paramsFile.hashCode() : 0);
+		return result;
+	}
 }

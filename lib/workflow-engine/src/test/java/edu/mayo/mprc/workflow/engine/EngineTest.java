@@ -185,6 +185,26 @@ public final class EngineTest {
 	}
 
 	private static final class SimpleTask extends TaskBase {
+		@Override
+		public boolean equals(Object o) {
+			if (this == o) return true;
+			if (!(o instanceof SimpleTask)) return false;
+
+			SimpleTask that = (SimpleTask) o;
+
+			if (fail != that.fail) return false;
+			if (pause != that.pause) return false;
+
+			return true;
+		}
+
+		@Override
+		public int hashCode() {
+			int result = (pause ? 1 : 0);
+			result = 31 * result + (fail ? 1 : 0);
+			return result;
+		}
+
 		private List<Task> dependencies;
 		private boolean pause;
 		private boolean fail;

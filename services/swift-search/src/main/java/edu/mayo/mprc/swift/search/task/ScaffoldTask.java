@@ -1,5 +1,6 @@
 package edu.mayo.mprc.swift.search.task;
 
+import com.google.common.base.Objects;
 import edu.mayo.mprc.MprcException;
 import edu.mayo.mprc.daemon.DaemonConnection;
 import edu.mayo.mprc.daemon.exception.DaemonException;
@@ -23,8 +24,8 @@ import java.util.*;
 
 final class ScaffoldTask extends AsyncTaskBase implements ScaffoldTaskI {
 
-	private String scaffoldVersion;
-	private String experiment;
+	private final String scaffoldVersion;
+	private final String experiment;
 
 	/**
 	 * Key: Input file search specification.
@@ -224,4 +225,20 @@ final class ScaffoldTask extends AsyncTaskBase implements ScaffoldTaskI {
 	public void onProgress(final ProgressInfo progressInfo) {
 	}
 
+	@Override
+	public int hashCode() {
+		return Objects.hashCode(scaffoldVersion, experiment, outputFolder);
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj) {
+			return true;
+		}
+		if (obj == null || getClass() != obj.getClass()) {
+			return false;
+		}
+		final ScaffoldTask other = (ScaffoldTask) obj;
+		return Objects.equal(this.scaffoldVersion, other.scaffoldVersion) && Objects.equal(this.experiment, other.experiment) && Objects.equal(this.outputFolder, other.outputFolder);
+	}
 }

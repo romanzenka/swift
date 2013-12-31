@@ -131,4 +131,20 @@ public final class QaTask extends AsyncTaskBase {
 		return scaffoldXmlFile.getParentFile().getName().equals("scaffold3") ? "3" : "2";
 	}
 
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (!(o instanceof QaTask)) return false;
+
+		QaTask qaTask = (QaTask) o;
+
+		if (reportFile != null ? !reportFile.equals(qaTask.reportFile) : qaTask.reportFile != null) return false;
+
+		return true;
+	}
+
+	@Override
+	public int hashCode() {
+		return reportFile != null ? reportFile.hashCode() : 0;
+	}
 }

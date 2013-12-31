@@ -355,6 +355,19 @@ public abstract class TaskBase implements Task {
 		}
 	}
 
+	/**
+	 * Two tasks are considered equal if they perform the same work (same input, same parameters).
+	 * Everything else should not be considered.
+	 */
+	@Override
+	public abstract boolean equals(Object o);
+
+	/**
+	 * Hashcode has to reflect the equals - only consider parameters that make the task perform different work.
+	 */
+	@Override
+	public abstract int hashCode();
+
 	@Override
 	public List<Task> getInputs() {
 		return inputs;

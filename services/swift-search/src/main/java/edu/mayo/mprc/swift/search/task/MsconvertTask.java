@@ -1,5 +1,6 @@
 package edu.mayo.mprc.swift.search.task;
 
+import com.google.common.base.Objects;
 import edu.mayo.mprc.daemon.DaemonConnection;
 import edu.mayo.mprc.daemon.worker.WorkPacket;
 import edu.mayo.mprc.msconvert.MsconvertResult;
@@ -14,9 +15,9 @@ import java.io.File;
 final class MsconvertTask extends AsyncTaskBase implements FileProducingTask {
 	private static final Logger LOGGER = Logger.getLogger(MsconvertTask.class);
 
-	private File inputFile;
+	private final File inputFile;
+	private final boolean publicAccess;
 	private File outputFile = null;
-	private boolean publicAccess;
 
 	/**
 	 * @param publicAccess When true, the task requests the cache to give the user access to the .mgf file from the user space.
@@ -94,5 +95,22 @@ final class MsconvertTask extends AsyncTaskBase implements FileProducingTask {
 			outputFile = result.getMgf();
 			updateDescription();
 		}
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hashCode(inputFile, publicAccess);
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj) {
+			return true;
+		}
+		if (obj == null || getClass() != obj.getClass()) {
+			return false;
+		}
+		final MsconvertTask other = (MsconvertTask) obj;
+		return Objects.equal(this.inputFile, other.inputFile) && Objects.equal(this.publicAccess, other.publicAccess);
 	}
 }

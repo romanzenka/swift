@@ -1,5 +1,6 @@
 package edu.mayo.mprc.swift.commands;
 
+import com.google.common.base.Objects;
 import edu.mayo.mprc.MprcException;
 import edu.mayo.mprc.config.ServiceConfig;
 import edu.mayo.mprc.daemon.DaemonConnection;
@@ -196,6 +197,23 @@ public final class LoadRawMetadata implements SwiftCommand {
 			LOGGER.info("Loaded " + file.getAbsolutePath() + " (" + loaded + " out of " + totalToLoad + ")");
 			setState(TaskState.COMPLETED_SUCCESFULLY);
 		}
+
+		@Override
+		public int hashCode() {
+			return Objects.hashCode(file, temp);
+		}
+
+		@Override
+		public boolean equals(final Object obj) {
+			if (this == obj) {
+				return true;
+			}
+			if (obj == null || getClass() != obj.getClass()) {
+				return false;
+			}
+			final SuccessfulLoadCounter other = (SuccessfulLoadCounter) obj;
+			return Objects.equal(file, other.file) && Objects.equal(temp, other.temp);
+		}
 	}
 
 	/**
@@ -223,6 +241,23 @@ public final class LoadRawMetadata implements SwiftCommand {
 				throw new MprcException("Could not load RAW file [" + rawDumpTask.getRawFile().getAbsolutePath() + "] into database", e);
 			}
 			setState(TaskState.COMPLETED_SUCCESFULLY);
+		}
+
+		@Override
+		public int hashCode() {
+			return Objects.hashCode(rawDumpTask, dao);
+		}
+
+		@Override
+		public boolean equals(final Object obj) {
+			if (this == obj) {
+				return true;
+			}
+			if (obj == null || getClass() != obj.getClass()) {
+				return false;
+			}
+			final LoadRawTask other = (LoadRawTask) obj;
+			return Objects.equal(rawDumpTask, other.rawDumpTask) && Objects.equal(dao, other.dao);
 		}
 	}
 }

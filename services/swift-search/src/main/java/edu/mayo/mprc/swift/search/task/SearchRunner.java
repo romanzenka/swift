@@ -65,6 +65,8 @@ public final class SearchRunner implements Runnable, Lifecycle {
 	 */
 	private SearchRun searchRun;
 
+	private final Set<Task> tasks = new LinkedHashSet<Task>();
+
 	/**
 	 * Key: (raw file, raw settings) tuple, obtained by {@link #getRawToMgfConversionHashKey(java.io.File, edu.mayo.mprc.swift.params2.ExtractMsnSettings)}.<br/>
 	 * Value: Raw->MGF conversion task.
