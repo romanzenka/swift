@@ -68,14 +68,7 @@ public class TestSearchRunner {
 
 		final SwiftSearchDefinition definition = defaultSearchDefinition(inputFiles);
 
-		final ProgressReporter reporter = mock(ProgressReporter.class);
-		final ExecutorService service = new SimpleThreadPoolExecutor(1, "testSwiftSearcher", true);
-
-		final SearchRun searchRun = null;
-
-		final SearchRunner runner = makeSearchRunner("task1", false, searchEngines, definition, reporter, service, searchRun);
-
-		runner.initialize();
+		final SearchRunner runner = getSearchRunner(searchEngines, definition);
 
 		final int numEngines = enabledEngines().size();
 		final int tasksPerFile = (numEngines - 1) /* 1 for each engine except Scaffold */
@@ -92,7 +85,7 @@ public class TestSearchRunner {
 				+ numEngines /* DB deploys */ - getEnabledNoDeploy()
 				+ 1 /* Scaffold */;
 
-		int expectedNumTasks = inputFiles.size() * tasksPerFile + tasksPerSearch;
+		final int expectedNumTasks = inputFiles.size() * tasksPerFile + tasksPerSearch;
 
 		// 23 + 2 * 5 + 1
 		Assert.assertEquals(runner.getWorkflowEngine().getNumTasks(), expectedNumTasks);
@@ -104,7 +97,7 @@ public class TestSearchRunner {
 
 		final EnabledEngines engines = new EnabledEngines();
 
-		SearchEngineParameters searchParameters = searchEngineParameters1();
+		final SearchEngineParameters searchParameters = searchEngineParameters1();
 		searchParameters.setExtractMsnSettings(new ExtractMsnSettings("", ExtractMsnSettings.MSCONVERT));
 		final List<FileSearch> inputFiles = Arrays.asList(
 				new FileSearch(raw1, "biosample", "category", "experiment", engines, searchParameters),
@@ -115,14 +108,7 @@ public class TestSearchRunner {
 		definition.setPublicMgfFiles(true);
 		definition.setPublicMzxmlFiles(true);
 
-		final ProgressReporter reporter = mock(ProgressReporter.class);
-		final ExecutorService service = new SimpleThreadPoolExecutor(1, "testSwiftSearcher", true);
-
-		final SearchRun searchRun = null;
-
-		final SearchRunner runner = makeSearchRunner("task1", false, searchEngines, definition, reporter, service, searchRun);
-
-		runner.initialize();
+		final SearchRunner runner = getSearchRunner(searchEngines, definition);
 
 		final int tasksPerFile = 0
 				+ 1 /* Raw->mgf */
@@ -131,7 +117,7 @@ public class TestSearchRunner {
 
 		final int tasksPerSearch = 0;
 
-		int expectedNumTasks = inputFiles.size() * tasksPerFile + tasksPerSearch;
+		final int expectedNumTasks = inputFiles.size() * tasksPerFile + tasksPerSearch;
 
 		Assert.assertEquals(runner.getWorkflowEngine().getNumTasks(), expectedNumTasks);
 	}
@@ -149,14 +135,7 @@ public class TestSearchRunner {
 
 		final SwiftSearchDefinition definition = defaultSearchDefinition(inputFiles);
 
-		final ProgressReporter reporter = mock(ProgressReporter.class);
-		final ExecutorService service = new SimpleThreadPoolExecutor(1, "testSwiftSearcher", true);
-
-		final SearchRun searchRun = null;
-
-		final SearchRunner runner = makeSearchRunner("task1", false, searchEngines, definition, reporter, service, searchRun);
-
-		runner.initialize();
+		final SearchRunner runner = getSearchRunner(searchEngines, definition);
 
 		final int numEngines = enabledEngines().size();
 		final int tasksPerFile = (numEngines - 1) /* 1 for each engine except Scaffold */
@@ -173,7 +152,7 @@ public class TestSearchRunner {
 
 				+ 1 /* Scaffold */;
 
-		int expectedNumTasks = inputFiles.size() * tasksPerFile + tasksPerSearch;
+		final int expectedNumTasks = inputFiles.size() * tasksPerFile + tasksPerSearch;
 
 		Assert.assertEquals(runner.getWorkflowEngine().getNumTasks(), expectedNumTasks);
 	}
@@ -191,14 +170,7 @@ public class TestSearchRunner {
 
 		final SwiftSearchDefinition definition = defaultSearchDefinition(inputFiles);
 
-		final ProgressReporter reporter = mock(ProgressReporter.class);
-		final ExecutorService service = new SimpleThreadPoolExecutor(1, "testSwiftSearcher", true);
-
-		final SearchRun searchRun = null;
-
-		final SearchRunner runner = makeSearchRunner("task1", false, searchEngines, definition, reporter, service, searchRun);
-
-		runner.initialize();
+		final SearchRunner runner = getSearchRunner(searchEngines, definition);
 
 		final int numEngines = enabledEngines().size();
 		final int tasksPerFile = (numEngines - 1) /* 1 for each engine except Scaffold */
@@ -216,7 +188,7 @@ public class TestSearchRunner {
 
 				+ 1 /* Scaffold */;
 
-		int expectedNumTasks = inputFiles.size() * tasksPerFile + tasksPerSearch;
+		final int expectedNumTasks = inputFiles.size() * tasksPerFile + tasksPerSearch;
 
 		Assert.assertEquals(runner.getWorkflowEngine().getNumTasks(), expectedNumTasks);
 	}
@@ -235,14 +207,7 @@ public class TestSearchRunner {
 
 		final SwiftSearchDefinition definition = defaultSearchDefinition(inputFiles);
 
-		final ProgressReporter reporter = mock(ProgressReporter.class);
-		final ExecutorService service = new SimpleThreadPoolExecutor(1, "testSwiftSearcher", true);
-
-		final SearchRun searchRun = null;
-
-		final SearchRunner runner = makeSearchRunner("task1", false, searchEngines, definition, reporter, service, searchRun);
-
-		runner.initialize();
+		final SearchRunner runner = getSearchRunner(searchEngines, definition);
 
 		final int numEngines = enabledEngines().size();
 		final int tasksPerFile = numEngines /* 1 for each engine */
@@ -259,12 +224,61 @@ public class TestSearchRunner {
 				+ numEngines /* DB Deploys */ - getEnabledNoDeploy()
 				+ 1 /* One extra DB deploy for Sequest */;
 
-		int expectedNumTasks = inputFiles.size() * tasksPerFile + tasksPerSearch;
+		final int expectedNumTasks = inputFiles.size() * tasksPerFile + tasksPerSearch;
 
 		Assert.assertEquals(runner.getWorkflowEngine().getNumTasks(), expectedNumTasks);
 	}
 
-	private SearchRunner makeSearchRunner(String taskId, boolean fromScratch, Collection<SearchEngine> searchEngines, SwiftSearchDefinition definition, ProgressReporter reporter, ExecutorService service, SearchRun searchRun) {
+	@Test
+	public void mzMlRunner() throws IOException {
+		final Collection<SearchEngine> searchEngines = searchEngines();
+
+		final EnabledEngines engines = enabledEngines();
+
+		final List<FileSearch> inputFiles = Arrays.asList(
+				new FileSearch(raw1, "biosample", "category", "experiment", engines, searchEngineParametersMzml()),
+				new FileSearch(raw2, "biosample2", "category", "experiment", engines, searchEngineParametersMzml())
+		);
+
+		final SwiftSearchDefinition definition = defaultSearchDefinition(inputFiles);
+
+		final SearchRunner runner = getSearchRunner(searchEngines, definition);
+
+		final int numEngines = enabledEngines().size();
+		final int tasksPerFile = (numEngines - 1) /* 1 for each engine except Scaffold */
+				+ 1 /* Raw->mgf */
+				+ 1 /* RawDump */
+				+ 1 /* no msmsEval */;
+
+		final int tasksPerSearch = 0
+				+ 1 /* Fasta DB load */
+				+ 1 /* Search DB load */
+				+ 1 /* QA Task */
+				+ 1 /* Scaffold report */
+
+				+ numEngines /* DB deploys */ - getEnabledNoDeploy()
+				+ 1 /* Scaffold */;
+
+		final int expectedNumTasks = inputFiles.size() * tasksPerFile + tasksPerSearch;
+
+		// 23 + 2 * 5 + 1
+		Assert.assertEquals(runner.getWorkflowEngine().getNumTasks(), expectedNumTasks);
+	}
+
+	private SearchRunner getSearchRunner(Collection<SearchEngine> searchEngines, SwiftSearchDefinition definition) {
+		final ProgressReporter reporter = mock(ProgressReporter.class);
+		final ExecutorService service = new SimpleThreadPoolExecutor(1, "testSwiftSearcher", true);
+
+		final SearchRun searchRun = null;
+
+		final SearchRunner runner = makeSearchRunner("task1", false, searchEngines, definition, reporter, service, searchRun);
+
+		runner.initialize();
+		return runner;
+	}
+
+
+	private SearchRunner makeSearchRunner(final String taskId, final boolean fromScratch, final Collection<SearchEngine> searchEngines, final SwiftSearchDefinition definition, final ProgressReporter reporter, final ExecutorService service, final SearchRun searchRun) {
 		return new SearchRunner(
 				definition,
 				mock(DaemonConnection.class),
@@ -315,21 +329,21 @@ public class TestSearchRunner {
 	}
 
 	private SearchEngineParameters searchEngineParameters2() {
-		return new SearchEngineParameters(curation2(), Protease.getInitial().get(0),
-				1, new ModSet(), new ModSet(), new Tolerance(10, MassUnit.Ppm),
-				new Tolerance(1, MassUnit.Da), Instrument.ORBITRAP,
-				new ExtractMsnSettings("-M100", ExtractMsnSettings.EXTRACT_MSN),
-				new ScaffoldSettings(0.95, 0.95, 2, 0, new StarredProteins("ALBU_HUMAN", ",", false), false, false, true, true, false, true)
-		);
+		final SearchEngineParameters parameters = searchEngineParameters1();
+		parameters.setDatabase(curation2());
+		return parameters;
 	}
 
 	private SearchEngineParameters searchEngineParameters3() {
-		return new SearchEngineParameters(curation1(), Protease.getInitial().get(10),
-				1, new ModSet(), new ModSet(), new Tolerance(10, MassUnit.Ppm),
-				new Tolerance(1, MassUnit.Da), Instrument.ORBITRAP,
-				new ExtractMsnSettings("-M100", ExtractMsnSettings.EXTRACT_MSN),
-				new ScaffoldSettings(0.95, 0.95, 2, 0, new StarredProteins("ALBU_HUMAN", ",", false), false, false, true, true, false, true)
-		);
+		final SearchEngineParameters parameters = searchEngineParameters1();
+		parameters.setProtease(Protease.getInitial().get(10));
+		return parameters;
+	}
+
+	private SearchEngineParameters searchEngineParametersMzml() {
+		final SearchEngineParameters parameters = searchEngineParameters1();
+		parameters.setExtractMsnSettings(new ExtractMsnSettings(ExtractMsnSettings.MZML_MODE, ExtractMsnSettings.MSCONVERT));
+		return parameters;
 	}
 
 	private Collection<SearchEngine> searchEngines() {
@@ -415,7 +429,7 @@ public class TestSearchRunner {
 	private static class MyMappingFactory implements MappingFactory {
 		private final String code;
 
-		MyMappingFactory(String code) {
+		MyMappingFactory(final String code) {
 			this.code = code;
 		}
 
@@ -425,7 +439,7 @@ public class TestSearchRunner {
 		}
 
 		@Override
-		public String getCanonicalParamFileName(String distinguishingString) {
+		public String getCanonicalParamFileName(final String distinguishingString) {
 			return code + distinguishingString + ".cfg";
 		}
 
@@ -438,55 +452,55 @@ public class TestSearchRunner {
 				}
 
 				@Override
-				public void read(Reader isr) {
+				public void read(final Reader isr) {
 					FileUtilities.closeQuietly(isr);
 				}
 
 				@Override
-				public void write(Reader oldParams, Writer out) {
+				public void write(final Reader oldParams, final Writer out) {
 					FileUtilities.closeQuietly(oldParams);
 					FileUtilities.closeQuietly(out);
 				}
 
 				@Override
-				public void setPeptideTolerance(MappingContext context, Tolerance peptideTolerance) {
+				public void setPeptideTolerance(final MappingContext context, final Tolerance peptideTolerance) {
 				}
 
 				@Override
-				public void setFragmentTolerance(MappingContext context, Tolerance fragmentTolerance) {
+				public void setFragmentTolerance(final MappingContext context, final Tolerance fragmentTolerance) {
 				}
 
 				@Override
-				public void setVariableMods(MappingContext context, ModSet variableMods) {
+				public void setVariableMods(final MappingContext context, final ModSet variableMods) {
 				}
 
 				@Override
-				public void setFixedMods(MappingContext context, ModSet fixedMods) {
+				public void setFixedMods(final MappingContext context, final ModSet fixedMods) {
 				}
 
 				@Override
-				public void setSequenceDatabase(MappingContext context, String shortDatabaseName) {
+				public void setSequenceDatabase(final MappingContext context, final String shortDatabaseName) {
 				}
 
 				@Override
-				public void setProtease(MappingContext context, Protease protease) {
+				public void setProtease(final MappingContext context, final Protease protease) {
 				}
 
 				@Override
-				public void setMissedCleavages(MappingContext context, Integer missedCleavages) {
+				public void setMissedCleavages(final MappingContext context, final Integer missedCleavages) {
 				}
 
 				@Override
-				public void setInstrument(MappingContext context, Instrument instrument) {
+				public void setInstrument(final MappingContext context, final Instrument instrument) {
 				}
 
 				@Override
-				public String getNativeParam(String name) {
+				public String getNativeParam(final String name) {
 					return "";
 				}
 
 				@Override
-				public void setNativeParam(String name, String value) {
+				public void setNativeParam(final String name, final String value) {
 				}
 			};
 		}
