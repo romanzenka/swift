@@ -1,8 +1,7 @@
 package edu.mayo.mprc.swift.configuration.client.view;
 
-import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.event.dom.client.HasClickHandlers;
+import com.google.gwt.event.dom.client.*;
+import com.google.gwt.event.shared.EventHandler;
 import com.google.gwt.user.client.ui.*;
 import edu.mayo.mprc.swift.configuration.client.model.*;
 import edu.mayo.mprc.swift.configuration.client.validation.local.IntegerValidator;
@@ -10,7 +9,6 @@ import edu.mayo.mprc.swift.configuration.client.validation.local.RequiredFieldVa
 import edu.mayo.mprc.swift.configuration.client.validation.local.Validator;
 
 import java.util.Arrays;
-import java.util.EventListener;
 
 /**
  * A library of methods that create various UI components to be shared for the configuration.
@@ -170,11 +168,11 @@ public final class GwtUiBuilder implements UiBuilderClient {
 	}
 
 	private void addEditorValidator(final Widget editor, final MultiValidator validator, final ValidationPanel validationPanel) {
-		if (editor instanceof SourcesChangeEvents) {
-			((SourcesChangeEvents) editor).addChangeListener(new ChangeListener() {
+		if (editor instanceof HasChangeHandlers) {
+			((HasChangeHandlers) editor).addChangeHandler(new ChangeHandler() {
 				@Override
-				public void onChange(final Widget sender) {
-					validator.validate(PropertyList.getEditorValue(sender));
+				public void onChange(final ChangeEvent event) {
+					validator.validate(PropertyList.getEditorValue((Widget) event.getSource()));
 				}
 			});
 		} else if (editor instanceof HasClickHandlers) {
@@ -230,21 +228,21 @@ public final class GwtUiBuilder implements UiBuilderClient {
 	}
 
 	/**
-	 * Adds change listener to the preceeding property. If the preceeding property is
+	 * Adds change handler to the preceeding property. If the preceeding property is
 	 * represented by a TextBox, the listner must be of the type ChangeListener. If the
 	 * preceeding property is represented by a CheckBox, the listner must be of the type ClickHandler.
 	 */
-	public GwtUiBuilder addEventListener(final EventListener listener) {
+	public GwtUiBuilder addEventHandler(final EventHandler handler) {
 		if (editor instanceof TextBox) {
-			if (!(listener instanceof ChangeListener)) {
-				throw new RuntimeException("The event listener for TextBox must be a change listener");
+			if (!(handler instanceof ChangeHandler)) {
+				throw new RuntimeException("The event handler for TextBox must be a change handler");
 			}
-			((TextBox) editor).addChangeListener((ChangeListener) listener);
+			((TextBox) editor).addChangeHandler((ChangeHandler) handler);
 		} else if (editor instanceof CheckBox) {
-			if (!(listener instanceof ClickHandler)) {
-				throw new RuntimeException("The event listener for CheckBox must be a click handler");
+			if (!(handler instanceof ClickHandler)) {
+				throw new RuntimeException("The event handler for CheckBox must be a click handler");
 			}
-			((CheckBox) editor).addClickHandler((ClickHandler) listener);
+			((CheckBox) editor).addClickHandler((ClickHandler) handler);
 		}
 		return this;
 	}

@@ -1,5 +1,10 @@
 package edu.mayo.mprc.swift.ui.client.widgets.validation;
 
+import com.google.gwt.event.dom.client.ChangeEvent;
+import com.google.gwt.event.dom.client.ChangeHandler;
+import com.google.gwt.event.logical.shared.ValueChangeEvent;
+import com.google.gwt.event.logical.shared.ValueChangeHandler;
+import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.user.client.ui.*;
 import edu.mayo.mprc.common.client.ExceptionUtilities;
 import edu.mayo.mprc.swift.ui.client.dialogs.Validatable;
@@ -9,9 +14,8 @@ import edu.mayo.mprc.swift.ui.client.widgets.HelpPopupButton;
 
 import java.util.List;
 
-public final class SpectrumExtractionEditor extends Composite implements Validatable, ChangeListener {
+public final class SpectrumExtractionEditor extends Composite implements Validatable, ChangeHandler {
 	private ClientExtractMsnSettings extractMsnSettings;
-	private ChangeListenerCollection changeListenerCollection = new ChangeListenerCollection();
 	private HorizontalPanel panel;
 	private ListBox engineName;
 	private TextBox settings;
@@ -24,10 +28,10 @@ public final class SpectrumExtractionEditor extends Composite implements Validat
 		engineName.addItem("extract_msn", "extract_msn");
 		engineName.addItem("msconvert", "msconvert");
 		engineName.setSelectedIndex(1);
-		engineName.addChangeListener(this);
+		engineName.addChangeHandler(this);
 		settings = new TextBox();
 		settings.setVisibleLength(50);
-		settings.addChangeListener(this);
+		settings.addChangeHandler(this);
 		help = new HelpPopupButton("<pre> extract_msn v.3, Copyright 1997-2005\n" +
 				"\n" +
 				" extract_msn usage:  extract_msn [options] [datafile]\n" +
@@ -75,7 +79,7 @@ public final class SpectrumExtractionEditor extends Composite implements Validat
 	}
 
 	@Override
-	public ClientValue getClientValue() {
+	public ClientValue getValue() {
 		if (extractMsnSettings == null) {
 			return null;
 		}
@@ -100,6 +104,11 @@ public final class SpectrumExtractionEditor extends Composite implements Validat
 			}
 		}
 		updateInterface();
+	}
+
+	@Override
+	public void setValue(final ClientValue value, final boolean fireEvents) {
+		ClientValueUtils.setValue(this, value, fireEvents);
 	}
 
 	@Override
@@ -128,23 +137,6 @@ public final class SpectrumExtractionEditor extends Composite implements Validat
 		engineName.setEnabled(enabled);
 	}
 
-	@Override
-	public void addChangeListener(final ChangeListener changeListener) {
-		changeListenerCollection.add(changeListener);
-	}
-
-	@Override
-	public void removeChangeListener(final ChangeListener changeListener) {
-		changeListenerCollection.remove(changeListener);
-	}
-
-	@Override
-	public void onChange(final Widget widget) {
-		updateSettings();
-		updateInterface();
-		changeListenerCollection.fireChange(this);
-	}
-
 	private void updateSettings() {
 		extractMsnSettings.setCommandLineSwitches(settings.getText().trim());
 		final String engine = engineName.getValue(engineName.getSelectedIndex());
@@ -159,7 +151,19 @@ public final class SpectrumExtractionEditor extends Composite implements Validat
 		help.setVisible(commandLineVisible);
 	}
 
-	private boolean commandLineSupported(String engine) {
+	private boolean commandLineSupported(final String engine) {
 		return "extract_msn".equals(engine);
+	}
+
+	@Override
+	public HandlerRegistration addValueChangeHandler(final ValueChangeHandler<ClientValue> handler) {
+		return addHandler(handler, ValueChangeEvent.getType());
+	}
+
+	@Override
+	public void onChange(ChangeEvent event) {
+		updateSettings();
+		updateInterface();
+		ValueChangeEvent.fire(this, getValue());
 	}
 }

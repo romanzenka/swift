@@ -1,5 +1,8 @@
 package edu.mayo.mprc.swift.ui.client.widgets.validation;
 
+import com.google.gwt.event.logical.shared.ValueChangeEvent;
+import com.google.gwt.event.logical.shared.ValueChangeHandler;
+import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.user.client.ui.*;
 import edu.mayo.mprc.swift.ui.client.dialogs.Validatable;
 import edu.mayo.mprc.swift.ui.client.rpc.ClientModSpecificity;
@@ -25,9 +28,6 @@ public final class ModificationsLabel extends Composite implements Validatable {
 	private Label modsText;
 
 	private PushButton editCmd;
-
-	private ChangeListenerCollection listeners = new ChangeListenerCollection();
-
 
 	private Panel container;
 	private ModificationSelectionEditor editor;
@@ -130,7 +130,7 @@ public final class ModificationsLabel extends Composite implements Validatable {
 	}
 
 	@Override
-	public ClientValue getClientValue() {
+	public ClientValue getValue() {
 		final List<ClientValue> items = new ArrayList<ClientValue>(selectedValues);
 		return bundle(items);
 	}
@@ -150,10 +150,17 @@ public final class ModificationsLabel extends Composite implements Validatable {
 
 			addModifications(getValues(value));
 			resetText();
-			if (isEnabled()) {
-				listeners.fireChange(this);
-			}
 		}
+	}
+
+	@Override
+	public void setValue(ClientValue value, boolean fireEvents) {
+		ClientValueUtils.setValue(this, value, fireEvents);
+	}
+
+	@Override
+	public HandlerRegistration addValueChangeHandler(ValueChangeHandler<ClientValue> handler) {
+		return addHandler(handler, ValueChangeEvent.getType());
 	}
 
 	@Override
@@ -215,16 +222,6 @@ public final class ModificationsLabel extends Composite implements Validatable {
 	@Override
 	public boolean needsAllowedValues() {
 		return false;
-	}
-
-	@Override
-	public void addChangeListener(final ChangeListener changeListener) {
-		listeners.add(changeListener);
-	}
-
-	@Override
-	public void removeChangeListener(final ChangeListener changeListener) {
-		listeners.remove(changeListener);
 	}
 
 	/**

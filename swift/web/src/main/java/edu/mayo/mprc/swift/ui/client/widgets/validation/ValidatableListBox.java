@@ -1,5 +1,10 @@
 package edu.mayo.mprc.swift.ui.client.widgets.validation;
 
+import com.google.gwt.event.dom.client.ChangeEvent;
+import com.google.gwt.event.dom.client.ChangeHandler;
+import com.google.gwt.event.logical.shared.ValueChangeEvent;
+import com.google.gwt.event.logical.shared.ValueChangeHandler;
+import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.user.client.ui.ListBox;
 import edu.mayo.mprc.swift.ui.client.dialogs.Validatable;
 import edu.mayo.mprc.swift.ui.client.rpc.ClientValue;
@@ -19,6 +24,12 @@ public abstract class ValidatableListBox extends ListBox implements Validatable 
 
 	public ValidatableListBox(final String param, final boolean allowMultiple) {
 		super(allowMultiple);
+		this.addChangeHandler(new ChangeHandler() {
+			@Override
+			public void onChange(ChangeEvent event) {
+				ValueChangeEvent.fire(ValidatableListBox.this, getValue());
+			}
+		});
 		this.param = param;
 	}
 
@@ -33,7 +44,7 @@ public abstract class ValidatableListBox extends ListBox implements Validatable 
 	 * @return the selected values bundled into a
 	 */
 	@Override
-	public ClientValue getClientValue() {
+	public ClientValue getValue() {
 		if (allowedValues == null) {
 			return null;
 		}
@@ -103,7 +114,7 @@ public abstract class ValidatableListBox extends ListBox implements Validatable 
 	 */
 	public void addValue(final ClientValue value, final Comparator<ClientValue> c) {
 		if (isMultipleSelect()) {
-			final ClientValue selected = getClientValue();
+			final ClientValue selected = getValue();
 			addToMultiSelect(value, c);
 			// now set the selected ones
 			setValue(value);
@@ -145,7 +156,7 @@ public abstract class ValidatableListBox extends ListBox implements Validatable 
 	public void addValueWithoutSelecting(final ClientValue value, final Comparator<ClientValue> c) {
 
 		if (isMultipleSelect()) {
-			final ClientValue selected = getClientValue();
+			final ClientValue selected = getValue();
 			addToMultiSelect(value, c);
 
 			setValue(selected);
@@ -215,6 +226,11 @@ public abstract class ValidatableListBox extends ListBox implements Validatable 
 		}
 	}
 
+	@Override
+	public void setValue(final ClientValue value, final boolean fireEvents) {
+		ClientValueUtils.setValue(this, value, fireEvents);
+	}
+
 	public ClientValue getSelected() {
 		return allowedValues.get(getSelectedIndex());
 	}
@@ -224,4 +240,9 @@ public abstract class ValidatableListBox extends ListBox implements Validatable 
 	public abstract ClientValue bundle(List<? extends ClientValue> selected);
 
 	public abstract List<? extends ClientValue> unbundle(ClientValue value);
+
+	@Override
+	public HandlerRegistration addValueChangeHandler(final ValueChangeHandler<ClientValue> handler) {
+		return addHandler(handler, ValueChangeEvent.getType());
+	}
 }

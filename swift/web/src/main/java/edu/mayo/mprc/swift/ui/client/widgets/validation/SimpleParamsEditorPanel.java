@@ -2,6 +2,8 @@ package edu.mayo.mprc.swift.ui.client.widgets.validation;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.logical.shared.ValueChangeEvent;
+import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.Element;
 import com.google.gwt.user.client.Window;
@@ -82,7 +84,7 @@ public final class SimpleParamsEditorPanel implements SourcesChangeEvents {
 	public SimpleParamsEditorPanel(final ServiceAsync serviceAsync, final InitialPageData pageData) {
 		this.serviceAsync = serviceAsync;
 		userInfo = new HashMap<String, ClientUser>();
-		for (ClientUser clientUser : pageData.listUsers()) {
+		for (final ClientUser clientUser : pageData.listUsers()) {
 			userInfo.put(clientUser.getEmail(), clientUser);
 		}
 		selectionController = new ParamSetSelectionController(serviceAsync);
@@ -245,7 +247,7 @@ public final class SimpleParamsEditorPanel implements SourcesChangeEvents {
 			};
 			tdb.setVisibleLength(5);
 			editorElements.add(edp.append("enzyme", LABEL2, label1, editorVisible));
-			editorElements.add(edp.append("enzyme", ENTRY2, tdb, editorVisible));
+			editorElements.add(edp.append("enzyme", ENTRY2, tdb.asWidget(), editorVisible));
 			validationController.add(tdb, "sequence.missed_cleavages", vp);
 
 			editorElements.add(edp.append("enzyme", VALIDATION, vp, editorVisible));
@@ -303,7 +305,7 @@ public final class SimpleParamsEditorPanel implements SourcesChangeEvents {
 
 			final ToleranceBox peptideTolerance;
 			validationController.add(peptideTolerance = new ToleranceBox("tolerance.peptide"), "tolerance.peptide", vp);
-			editorElements.add(edp.append(TOLERANCES, ENTRY1, peptideTolerance, editorVisible));
+			editorElements.add(edp.append(TOLERANCES, ENTRY1, peptideTolerance.asWidget(), editorVisible));
 
 			final Label label1 = new Label("Fragment Tolerance:");
 			editorElements.add(edp.append(TOLERANCES, LABEL2, label1, editorVisible));
@@ -312,7 +314,7 @@ public final class SimpleParamsEditorPanel implements SourcesChangeEvents {
 
 			final ToleranceBox fragmentTolerance;
 			validationController.add(fragmentTolerance = new ToleranceBox("tolerance.fragment"), "tolerance.fragment", vp);
-			editorElements.add(edp.append(TOLERANCES, ENTRY2, fragmentTolerance, editorVisible));
+			editorElements.add(edp.append(TOLERANCES, ENTRY2, fragmentTolerance.asWidget(), editorVisible));
 
 			editorElements.add(edp.append(TOLERANCES, VALIDATION, vp, editorVisible));
 
@@ -364,9 +366,9 @@ public final class SimpleParamsEditorPanel implements SourcesChangeEvents {
 			selectionController.setDefaultParameterSet();
 		}
 
-		validationController.addChangeListener(new ChangeListener() {
+		validationController.addValueChangeHandler(new ValueChangeHandler<ClientValue>() {
 			@Override
-			public void onChange(final Widget widget) {
+			public void onValueChange(final ValueChangeEvent<ClientValue> event) {
 				for (final PushButton button : buttons) {
 					button.setEnabled(isValid());
 				}
@@ -540,7 +542,7 @@ public final class SimpleParamsEditorPanel implements SourcesChangeEvents {
 					@Override
 					public void done() {
 						if (openCurationID != null) {
-							dlb.select(openCurationID, validationController);
+							dlb.select(openCurationID);
 						}
 						dialogBox.hide();
 					}

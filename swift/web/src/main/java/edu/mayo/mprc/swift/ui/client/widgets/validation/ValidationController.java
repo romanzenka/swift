@@ -1,7 +1,14 @@
 package edu.mayo.mprc.swift.ui.client.widgets.validation;
 
+import com.google.gwt.event.logical.shared.HasValueChangeHandlers;
+import com.google.gwt.event.logical.shared.ValueChangeEvent;
+import com.google.gwt.event.logical.shared.ValueChangeHandler;
+import com.google.gwt.event.shared.EventBus;
+import com.google.gwt.event.shared.GwtEvent;
+import com.google.gwt.event.shared.HandlerRegistration;
+import com.google.gwt.event.shared.SimpleEventBus;
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.gwt.user.client.ui.*;
+import com.google.gwt.user.client.ui.UIObject;
 import edu.mayo.mprc.swift.ui.client.dialogs.ErrorDialog;
 import edu.mayo.mprc.swift.ui.client.dialogs.Validatable;
 import edu.mayo.mprc.swift.ui.client.dialogs.ValidationPanel;
@@ -20,12 +27,13 @@ import java.util.*;
  * layout of the various widgets on the screen.
  */
 
-public final class ValidationController implements ChangeListener, SourcesChangeEvents, ParamSetSelectionListener {
+public final class ValidationController implements ValueChangeHandler<ClientValue>, HasValueChangeHandlers<ClientValue>, ParamSetSelectionListener {
 
 	private ClientParamSet paramSet;
 	private ClientParamSetValues values;
 	private ServiceAsync serviceAsync;
 	private ParamSetSelectionController selector;
+	private EventBus eventBus = new SimpleEventBus();
 
 	/**
 	 * Maps parameter id strings one-to-one onto registrations.
@@ -43,11 +51,61 @@ public final class ValidationController implements ChangeListener, SourcesChange
 	 * List of all the registrations with invalid (error or worse) settings.
 	 */
 	private HashSet<ValidationController.Registration> invalid = new HashSet();
-	private ChangeListenerCollection listeners = new ChangeListenerCollection();
 	private Registration awaitingUpdate = null;
 	private ClientValue awaitingUpdateValue = null;
 	// Cached list of allowed values
 	private HashMap<String, List<ClientValue>> allowedValues = new HashMap<String, List<ClientValue>>(10);
+
+	@Override
+	public HandlerRegistration addValueChangeHandler(ValueChangeHandler<ClientValue> handler) {
+		return eventBus.addHandler(ValueChangeEvent.getType(), handler);
+	}
+
+	@Override
+	public void fireEvent(GwtEvent<?> event) {
+		eventBus.fireEventFromSource(event, this);
+	}
+
+	@Override
+	public void onValueChange(ValueChangeEvent<ClientValue> event) {
+		final Validatable v = (Validatable) event.getSource();
+		if (v == null) {
+			throw new RuntimeException("ValidationController received change event for non Validatable widget");
+		}
+		final Registration r = (Registration) byWidget.get(v);
+		if (r == null) {
+			throw new RuntimeException("ValidationController received changed event for unregistered Validatable");
+		}
+
+		if (awaitingUpdate != null) {
+			// ignore duplicate events while we're creating the temporary.
+			return;
+		}
+
+		if (r.getV().getValue() == null) {
+			if (r.getCv() != null) {  // TODO how to deal with locally generated validations?
+				//ignore
+				return;
+			} else {
+				throw new RuntimeException("Widget returned null value for " + r.getParam());
+			}
+		}
+
+		// determine whether we need to make a temporary.
+
+		if (!paramSet.isTemporary()) {
+			setEnabled(false); //prevent users from making more changes while we're doing the
+			// complex machinations of making the temporary paramset.
+			awaitingUpdate = r;
+
+			// must cache the users's requested change so it will be applied to the
+			// correct ParamSet.
+			awaitingUpdateValue = r.getV().getValue();
+			createTemporary(r, r.getV().getValue());
+		} else {
+			doUpdate(r, r.getV().getValue());
+		}
+	}
 
 	/**
 	 * Each widget has a registration that associates the various pieces together.
@@ -106,7 +164,7 @@ public final class ValidationController implements ChangeListener, SourcesChange
 		byParam.put(param, reg);
 		byWidget.put(v, reg);
 		byValidationPanel.put(validation, reg);
-		v.addChangeListener(this);
+		v.addValueChangeHandler(this);
 	}
 
 	public void update(final String paramId, final ClientValidationList cv) {
@@ -165,49 +223,8 @@ public final class ValidationController implements ChangeListener, SourcesChange
 		}
 		final boolean validationDefinesNullValue = value == null && (ccv != null && !ccv.isEmpty());
 		final boolean validationDefinesValue = validationDefinesNullValue || value != null;
-		if (rr.getV().getClientValue() == null || (validationDefinesValue && !rr.getV().getClientValue().equals(value))) {
+		if (rr.getV().getValue() == null || (validationDefinesValue && !rr.getV().getValue().equals(value))) {
 			rr.getV().setValue(value);
-		}
-	}
-
-	@Override
-	public void onChange(final Widget widget) {
-		final Validatable v = (Validatable) widget;
-		if (v == null) {
-			throw new RuntimeException("ValidationController received change event for non Validatable widget");
-		}
-		final Registration r = (Registration) byWidget.get(v);
-		if (r == null) {
-			throw new RuntimeException("ValidationController received changed event for unregistered Validatable");
-		}
-
-		if (awaitingUpdate != null) {
-			// ignore duplicate events while we're creating the temporary.
-			return;
-		}
-
-		if (r.getV().getClientValue() == null) {
-			if (r.getCv() != null) {  // TODO how to deal with locally generated validations?
-				//ignore
-				return;
-			} else {
-				throw new RuntimeException("Widget returned null value for " + r.getParam());
-			}
-		}
-
-		// determine whether we need to make a temporary.
-
-		if (!paramSet.isTemporary()) {
-			setEnabled(false); //prevent users from making more changes while we're doing the
-			// complex machinations of making the temporary paramset.
-			awaitingUpdate = r;
-
-			// must cache the users's requested change so it will be applied to the
-			// correct ParamSet.
-			awaitingUpdateValue = r.getV().getClientValue();
-			createTemporary(r, r.getV().getClientValue());
-		} else {
-			doUpdate(r, r.getV().getClientValue());
 		}
 	}
 
@@ -377,16 +394,6 @@ public final class ValidationController implements ChangeListener, SourcesChange
 		allowedValues.remove(r.getParam());
 	}
 
-	@Override
-	public void addChangeListener(final ChangeListener changeListener) {
-		listeners.add(changeListener);
-	}
-
-	@Override
-	public void removeChangeListener(final ChangeListener changeListener) {
-		listeners.remove(changeListener);
-	}
-
 	/**
 	 * Set the styles on a widget based on a validation severity.
 	 * <p/>
@@ -415,7 +422,7 @@ public final class ValidationController implements ChangeListener, SourcesChange
 	}
 
 	private void finishedUpdating() {
-		listeners.fireChange(null);
+		ValueChangeEvent.fire(this, null);
 		setEnabled(true);
 	}
 

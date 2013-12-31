@@ -1,9 +1,9 @@
 package edu.mayo.mprc.swift.ui.client.widgets.validation;
 
-import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.event.dom.client.KeyUpEvent;
-import com.google.gwt.event.dom.client.KeyUpHandler;
+import com.google.gwt.event.dom.client.*;
+import com.google.gwt.event.logical.shared.ValueChangeEvent;
+import com.google.gwt.event.logical.shared.ValueChangeHandler;
+import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.user.client.ui.*;
 import edu.mayo.mprc.common.client.StringUtilities;
 import edu.mayo.mprc.swift.ui.client.dialogs.Validatable;
@@ -23,7 +23,7 @@ import java.util.*;
  * <ui> Modification Selection lists
  * <ui> Long Description
  */
-public final class ModificationSelectionEditor extends Composite implements SourcesChangeEvents, Validatable {
+public final class ModificationSelectionEditor extends Composite implements Validatable {
 	private static final String VARIABLE_MODS_TITLE = "Variable Modifications :";
 	private static final String FIXED_MODS_TITLE = "Fixed Modifications :";
 	public static final String VARIABLE_MOD_TYPE = "variable";
@@ -47,7 +47,6 @@ public final class ModificationSelectionEditor extends Composite implements Sour
 	 */
 	private Panel container;
 
-	private ChangeListenerCollection changeListeners;
 	public static final List<ClientValue> EMPTY_CLIENT_VALUES = Collections.emptyList();
 	public static final List<ClientModSpecificity> EMPTY_CLIENT_MOD_SPECIFICITY = Collections.emptyList();
 
@@ -73,6 +72,10 @@ public final class ModificationSelectionEditor extends Composite implements Sour
 		initWidget(container);
 	}
 
+	@Override
+	public HandlerRegistration addValueChangeHandler(final ValueChangeHandler<ClientValue> handler) {
+		return addHandler(handler, ValueChangeEvent.getType());
+	}
 
 	/**
 	 * this is used to perform a modifications search
@@ -178,8 +181,8 @@ public final class ModificationSelectionEditor extends Composite implements Sour
 		modsSelected = new ModificationListBox(param, true);
 		modsSelected.setWidth("20em");
 		modsSelected.setVisibleItemCount(20);
-		modsSelected.addChangeListener(new ModificationsChange(modsAvailable, modsSelected, modsDescription));
-		modsAvailable.addChangeListener(new ModificationsChange(modsAvailable, modsSelected, modsDescription));
+		modsSelected.addChangeHandler(new ModificationsChange(modsAvailable, modsSelected, modsDescription));
+		modsAvailable.addChangeHandler(new ModificationsChange(modsAvailable, modsSelected, modsDescription));
 
 		final VerticalPanel col_2 = new VerticalPanel();
 
@@ -213,7 +216,7 @@ public final class ModificationSelectionEditor extends Composite implements Sour
 	 * @return the allowed values as a @ClientModSpecificitySet
 	 */
 	@Override
-	public ClientValue getClientValue() {
+	public ClientValue getValue() {
 		final List<? extends ClientValue> selected = modsSelected.getAllValues();
 		int length = 0;
 		if (selected != null) {
@@ -246,7 +249,7 @@ public final class ModificationSelectionEditor extends Composite implements Sour
 		@Override
 		public void onClick(final ClickEvent event) {
 			// copy contents of the availabe list to the selected list
-			final ClientValue items = available.getClientValue();
+			final ClientValue items = available.getValue();
 			// each item is a ClientModSpecificity
 			selected.addValue(items, new CompareClientModSpecificity());
 		}
@@ -270,7 +273,7 @@ public final class ModificationSelectionEditor extends Composite implements Sour
 		@Override
 		public void onClick(final ClickEvent event) {
 			// remove the selected items in the selected list from the selected list
-			final ClientValue items = selected.getClientValue();
+			final ClientValue items = selected.getValue();
 			if (items != null) {
 				selected.removeValue(items, new CompareClientModSpecificity());
 
@@ -320,7 +323,7 @@ public final class ModificationSelectionEditor extends Composite implements Sour
 	 * when new mods selected in the mods area, need to update the description text area if there
 	 * is a real change
 	 */
-	class ModificationsChange implements ChangeListener {
+	class ModificationsChange implements ChangeHandler {
 		private ModificationListBox available;
 		private ModificationListBox selected;
 		private HTML description;
@@ -332,7 +335,7 @@ public final class ModificationSelectionEditor extends Composite implements Sour
 		}
 
 		@Override
-		public void onChange(final Widget widget) {
+		public void onChange(final ChangeEvent event) {
 			updateModsDescriptionText(available, selected, description);
 		}
 	}
@@ -342,12 +345,12 @@ public final class ModificationSelectionEditor extends Composite implements Sour
 		// find all the selected items and see if they are different than allSelected
 		// if so then change the content of the text area
 		List<? extends ClientValue> availableValues = EMPTY_CLIENT_VALUES;
-		if (available.getClientValue() != null) {
-			availableValues = available.unbundle(available.getClientValue());
+		if (available.getValue() != null) {
+			availableValues = available.unbundle(available.getValue());
 		}
 		List<? extends ClientValue> selectedValues = EMPTY_CLIENT_VALUES;
-		if (selected.getClientValue() != null) {
-			selectedValues = selected.unbundle(selected.getClientValue());
+		if (selected.getValue() != null) {
+			selectedValues = selected.unbundle(selected.getValue());
 		}
 		// add them to a hashset to enure uniqueness then move them to the array
 		final HashSet<ClientValue> h = new HashSet<ClientValue>();
@@ -427,7 +430,7 @@ public final class ModificationSelectionEditor extends Composite implements Sour
 
 		final VerticalPanel newPanel = new VerticalPanel();
 
-		final Anchor cmdAdd = new Anchor("Add-->", "Add");
+		final Anchor cmdAdd = new Anchor("Add-->");
 		cmdAdd.setTitle("To create a new empty curation for you editing.");
 		cmdAdd.setStyleName("command-link");
 		cmdAdd.setWidth("7em");
@@ -440,7 +443,7 @@ public final class ModificationSelectionEditor extends Composite implements Sour
 		newPanel.add(spacer);
 		newPanel.add(cmdAdd);
 
-		final Anchor cmdRemove = new Anchor("<--Remove", "Remove");
+		final Anchor cmdRemove = new Anchor("<--Remove");
 		cmdRemove.setTitle("To make a copy of the currently displayed curation for you own editing.");
 		cmdRemove.setStyleName("command-link");
 		cmdRemove.addClickHandler(new RemoveOnClick(modsAvailable, modsSelected, modsDescription));
@@ -485,26 +488,6 @@ public final class ModificationSelectionEditor extends Composite implements Sour
 		modsSearchDefinition.addKeyUpHandler(new SearchKeyUpHandler(modsAvailable, modsSelected, modsDescription));
 	}
 
-	@Override
-	public void addChangeListener(final ChangeListener listener) {
-		if (changeListeners == null) {
-			changeListeners = new ChangeListenerCollection();
-		}
-		changeListeners.add(listener);
-	}
-
-	@Override
-	public void removeChangeListener(final ChangeListener listener) {
-		if (changeListeners == null) {
-			return;
-		}
-		for (int i = 0; i < changeListeners.size(); i++) {
-			if (changeListeners.get(i).equals(listener)) {
-				changeListeners.remove(i);
-			}
-		}
-	}
-
 	/**
 	 * clear the selected mods
 	 */
@@ -522,6 +505,11 @@ public final class ModificationSelectionEditor extends Composite implements Sour
 		modsSelected.addValueWithoutSelecting(value, new CompareClientModSpecificity());
 		// need to update the description area also
 		updateModsDescriptionText(modsAvailable, modsSelected, modsDescription);
+	}
+
+	@Override
+	public void setValue(ClientValue value, boolean fireEvents) {
+		ClientValueUtils.setValue(this, value, fireEvents);
 	}
 
 	@Override

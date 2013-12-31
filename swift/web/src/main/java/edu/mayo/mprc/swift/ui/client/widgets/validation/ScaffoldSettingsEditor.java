@@ -1,7 +1,12 @@
 package edu.mayo.mprc.swift.ui.client.widgets.validation;
 
+import com.google.gwt.event.dom.client.ChangeEvent;
+import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.logical.shared.ValueChangeEvent;
+import com.google.gwt.event.logical.shared.ValueChangeHandler;
+import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.user.client.ui.*;
 import edu.mayo.mprc.common.client.ExceptionUtilities;
 import edu.mayo.mprc.swift.ui.client.dialogs.Validatable;
@@ -12,9 +17,8 @@ import edu.mayo.mprc.swift.ui.client.widgets.ValidatedIntegerTextBox;
 
 import java.util.List;
 
-public final class ScaffoldSettingsEditor extends Composite implements Validatable, ChangeListener, ClickHandler {
+public final class ScaffoldSettingsEditor extends Composite implements Validatable, ClickHandler, ChangeHandler {
 	private ClientScaffoldSettings scaffoldSettings;
-	private final ChangeListenerCollection changeListenerCollection = new ChangeListenerCollection();
 	private final HorizontalPanel panel;
 	private final ValidatedDoubleTextBox proteinProbability;
 	private final ValidatedIntegerTextBox minPeptideCount;
@@ -39,17 +43,17 @@ public final class ScaffoldSettingsEditor extends Composite implements Validatab
 
 		proteinProbability = new ValidatedDoubleTextBox(0, 100, 95);
 		proteinProbability.setVisibleLength(5);
-		proteinProbability.addChangeListener(this);
+		proteinProbability.addChangeHandler(this);
 		panel.add(proteinProbability);
 
 		minPeptideCount = new ValidatedIntegerTextBox(1, 100, 2);
 		minPeptideCount.setVisibleLength(2);
-		minPeptideCount.addChangeListener(this);
+		minPeptideCount.addChangeHandler(this);
 		panel.add(minPeptideCount);
 
 		peptideProbability = new ValidatedDoubleTextBox(0, 100, 95);
 		peptideProbability.setVisibleLength(5);
-		peptideProbability.addChangeListener(this);
+		peptideProbability.addChangeHandler(this);
 		panel.add(peptideProbability);
 
 		minNTTLabel = new Label("NTT>=");
@@ -57,7 +61,7 @@ public final class ScaffoldSettingsEditor extends Composite implements Validatab
 		panel.add(minNTTLabel);
 		minNTT = new ValidatedIntegerTextBox(0, 2, 1);
 		minNTT.setVisibleLength(2);
-		minNTT.addChangeListener(this);
+		minNTT.addChangeHandler(this);
 		panel.add(minNTT);
 
 		starredCheckbox = new CheckBox("Stars");
@@ -74,8 +78,7 @@ public final class ScaffoldSettingsEditor extends Composite implements Validatab
 		goAnnotations.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(final ClickEvent event) {
-				final Widget source = (Widget) event.getSource();
-				onChange(source);
+				updateAndFireChange();
 			}
 		});
 		panel.add(goAnnotations);
@@ -87,7 +90,7 @@ public final class ScaffoldSettingsEditor extends Composite implements Validatab
 		saveSpectra.addItem("All", "all");
 		saveSpectra.addItem("Identified", "id");
 		saveSpectra.addItem("None", "none");
-		saveSpectra.addChangeListener(this);
+		saveSpectra.addChangeHandler(this);
 		panel.add(saveSpectra);
 
 		useIndependentSampleGrouping = new CheckBox("Independent Samples");
@@ -96,8 +99,7 @@ public final class ScaffoldSettingsEditor extends Composite implements Validatab
 		useIndependentSampleGrouping.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(final ClickEvent event) {
-				final Widget sender = (Widget) event.getSource();
-				onChange(sender);
+				updateAndFireChange();
 			}
 		});
 		panel.add(useIndependentSampleGrouping);
@@ -108,8 +110,7 @@ public final class ScaffoldSettingsEditor extends Composite implements Validatab
 		useFamilyProteinGrouping.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(final ClickEvent event) {
-				final Widget sender = (Widget) event.getSource();
-				onChange(sender);
+				updateAndFireChange();
 			}
 		});
 		panel.add(useFamilyProteinGrouping);
@@ -118,8 +119,7 @@ public final class ScaffoldSettingsEditor extends Composite implements Validatab
 		starredDialog.setOkListener(new ClickHandler() {
 			@Override
 			public void onClick(final ClickEvent event) {
-				final Widget sender = (Widget) event.getSource();
-				onChange(sender);
+				updateAndFireChange();
 			}
 		});
 
@@ -127,7 +127,7 @@ public final class ScaffoldSettingsEditor extends Composite implements Validatab
 	}
 
 	@Override
-	public ClientValue getClientValue() {
+	public ClientValue getValue() {
 		return scaffoldSettings;
 	}
 
@@ -148,6 +148,11 @@ public final class ScaffoldSettingsEditor extends Composite implements Validatab
 		starredDialog.setValue(scaffoldSettings);
 		useIndependentSampleGrouping.setValue(scaffoldSettings.isUseIndependentSampleGrouping());
 		useFamilyProteinGrouping.setValue(scaffoldSettings.isUseFamilyProteinGrouping());
+	}
+
+	@Override
+	public void setValue(final ClientValue value, final boolean fireEvents) {
+		ClientValueUtils.setValue(this, value, fireEvents);
 	}
 
 	@Override
@@ -184,17 +189,11 @@ public final class ScaffoldSettingsEditor extends Composite implements Validatab
 	}
 
 	@Override
-	public void addChangeListener(final ChangeListener changeListener) {
-		changeListenerCollection.add(changeListener);
+	public void onChange(final ChangeEvent event) {
+		updateAndFireChange();
 	}
 
-	@Override
-	public void removeChangeListener(final ChangeListener changeListener) {
-		changeListenerCollection.remove(changeListener);
-	}
-
-	@Override
-	public void onChange(final Widget widget) {
+	private void updateAndFireChange() {
 		scaffoldSettings.setProteinProbability(proteinProbability.getDoubleValue() / 100.0);
 		scaffoldSettings.setMinimumPeptideCount(minPeptideCount.getIntegerValue());
 		scaffoldSettings.setPeptideProbability(peptideProbability.getDoubleValue() / 100.0);
@@ -210,7 +209,7 @@ public final class ScaffoldSettingsEditor extends Composite implements Validatab
 	}
 
 	private void fireChange() {
-		changeListenerCollection.fireChange(this);
+		ValueChangeEvent.fire(this, getValue());
 	}
 
 	@Override
@@ -226,6 +225,11 @@ public final class ScaffoldSettingsEditor extends Composite implements Validatab
 			starredDialog.center();
 			starredDialog.show();
 		}
-		onChange(sender);
+		updateAndFireChange();
+	}
+
+	@Override
+	public HandlerRegistration addValueChangeHandler(final ValueChangeHandler<ClientValue> handler) {
+		return addHandler(handler, ValueChangeEvent.getType());
 	}
 }

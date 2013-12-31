@@ -1,10 +1,9 @@
 package edu.mayo.mprc.swift.ui.client;
 
 import com.google.gwt.core.client.EntryPoint;
-import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.event.dom.client.KeyUpEvent;
-import com.google.gwt.event.dom.client.KeyUpHandler;
+import com.google.gwt.event.dom.client.*;
+import com.google.gwt.event.logical.shared.ValueChangeEvent;
+import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.user.client.Cookies;
 import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.Window;
@@ -188,12 +187,12 @@ public final class SwiftApp implements EntryPoint, HidesPageContentsWhileLoading
 		titlePanel.add(title);
 		title.addKeyUpHandler(new KeyUpHandler() {
 			@Override
-			public void onKeyUp(KeyUpEvent event) {
+			public void onKeyUp(final KeyUpEvent event) {
 				updateOutputLocation();
 			}
 		});
 		titleChangeListener = new TitleChangeListener();
-		title.addChangeListener(titleChangeListener);
+		title.addChangeHandler(titleChangeListener);
 	}
 
 	private void finalizeInitReport(final Boolean reportEnabled) {
@@ -371,9 +370,9 @@ public final class SwiftApp implements EntryPoint, HidesPageContentsWhileLoading
 		// The user listing is downloaded by an async call.
 		final RootPanel userPanel = RootPanel.get("email");
 		userPanel.add(users);
-		users.addChangeListener(new ChangeListener() {
+		users.addChangeHandler(new ChangeHandler() {
 			@Override
-			public void onChange(final Widget widget) {
+			public void onChange(final ChangeEvent event) {
 				userChanged();
 			}
 		});
@@ -434,9 +433,9 @@ public final class SwiftApp implements EntryPoint, HidesPageContentsWhileLoading
 		final RootPanel outputPanel = RootPanel.get("output");
 		output = new TextBox();
 		output.setVisibleLength(150);
-		output.addChangeListener(new ChangeListener() {
+		output.addChangeHandler(new ChangeHandler() {
 			@Override
-			public void onChange(final Widget widget) {
+			public void onChange(final ChangeEvent event) {
 				outputPathUserSpecified = true;
 				updateOutputLocation();
 			}
@@ -458,9 +457,9 @@ public final class SwiftApp implements EntryPoint, HidesPageContentsWhileLoading
 
 	private void connectOutputLocationAndFileTable() {
 		if (files != null) {
-			files.addChangeListener(new ChangeListener() {
+			files.addValueChangeHandler(new ValueChangeHandler<Void>() {
 				@Override
-				public void onChange(final Widget widget) {
+				public void onValueChange(final ValueChangeEvent<Void> event) {
 					updateOutputLocation();
 				}
 			});
@@ -475,9 +474,9 @@ public final class SwiftApp implements EntryPoint, HidesPageContentsWhileLoading
 		runButton.setEnabled(false);
 		// Make params editor disable the runWithCallback button when it is invalid
 		if (paramsEditor != null) {
-			paramsEditor.getValidationController().addChangeListener(new ChangeListener() {
+			paramsEditor.getValidationController().addValueChangeHandler(new ValueChangeHandler<ClientValue>() {
 				@Override
-				public void onChange(final Widget sender) {
+				public void onValueChange(final ValueChangeEvent<ClientValue> event) {
 					runButton.setEnabled(paramsEditor.isValid());
 				}
 			});
@@ -537,15 +536,15 @@ public final class SwiftApp implements EntryPoint, HidesPageContentsWhileLoading
 
 	}
 
-	private void validateOutputPath(String text) {
+	private void validateOutputPath(final String text) {
 		ServiceConnection.instance().outputFolderExists(text, new AsyncCallback<Boolean>() {
 			@Override
-			public void onFailure(Throwable caught) {
+			public void onFailure(final Throwable caught) {
 				outputValidationPanel.removeValidationsFor(output);
 			}
 
 			@Override
-			public void onSuccess(Boolean result) {
+			public void onSuccess(final Boolean result) {
 				outputValidationPanel.removeValidationsFor(output);
 				if (Boolean.TRUE.equals(result)) {
 					outputValidationPanel.addValidation(new ClientValidation("Folder exists, will be overwritten"), output);
@@ -563,7 +562,7 @@ public final class SwiftApp implements EntryPoint, HidesPageContentsWhileLoading
 	 */
 	private void setTitleText(final String title) {
 		this.title.setText(title);
-		titleChangeListener.onChange(this.title);
+		titleChangeListener.onChange(null);
 	}
 
 	/**
@@ -678,9 +677,9 @@ public final class SwiftApp implements EntryPoint, HidesPageContentsWhileLoading
 		}
 	}
 
-	private class TitleChangeListener implements ChangeListener {
+	private class TitleChangeListener implements ChangeHandler {
 		@Override
-		public void onChange(final Widget sender) {
+		public void onChange(final ChangeEvent event) {
 			files.updateSearchTitle(getTitleText());
 		}
 	}

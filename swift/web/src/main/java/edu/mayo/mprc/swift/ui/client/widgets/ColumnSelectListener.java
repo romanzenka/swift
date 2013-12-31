@@ -17,7 +17,7 @@ public final class ColumnSelectListener implements ClickHandler {
 	public void onClick(final ClickEvent event) {
 		final CheckBox mainCheckBox = (CheckBox) event.getSource();
 		for (int row = table.getFirstDataRow(); row < table.getRowCount(); row++) {
-			table.setChecked(row, column, mainCheckBox.isChecked());
+			table.setChecked(row, column, Boolean.TRUE.equals(mainCheckBox.getValue()));
 		}
 	}
 }

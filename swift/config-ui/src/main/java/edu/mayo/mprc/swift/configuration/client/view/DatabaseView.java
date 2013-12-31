@@ -1,8 +1,9 @@
 package edu.mayo.mprc.swift.configuration.client.view;
 
+import com.google.gwt.event.dom.client.ChangeEvent;
+import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.event.logical.shared.SelectionEvent;
 import com.google.gwt.event.logical.shared.SelectionHandler;
-import com.google.gwt.user.client.ui.ChangeListener;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.TabPanel;
 import com.google.gwt.user.client.ui.Widget;
@@ -46,34 +47,34 @@ public final class DatabaseView extends SimplePanel implements ModuleView {
 		{
 			builder.start();
 			builder.property(H2_FILE, "Database file", "Where should the database be stored").required()
-					.defaultValue(DEFAULT_H2_FILE).addEventListener(listener);
+					.defaultValue(DEFAULT_H2_FILE).addEventHandler(listener);
 			h2PropertyList = builder.end();
 			databaseConfiguration.add(h2PropertyList, "Local");
 		}
 
 		{
 			builder.start();
-			builder.property(ORACLE_SERVER, "Server", "Server where the database is hosted").required().addEventListener(listener);
-			builder.property(ORACLE_PORT, "Port", "Database server port").required().addEventListener(listener);
-			builder.property(ORACLE_SID, "SID", "System id").required().addEventListener(listener);
-			builder.property(USER_NAME, "User name", "Database account user name").required().addEventListener(listener);
-			builder.property(PASSWORD, "Password", "Database account password").required().addEventListener(listener);
-			builder.property(DRIVER_CLASS_NAME, "Driver", "Database JDBC driver class<p>Bundled driver: <tt>oracle.jdbc.driver.OracleDriver</tt>").defaultValue("oracle.jdbc.driver.OracleDriver").required().addEventListener(listener);
-			builder.property(DIALECT, "Dialect", "Database dialect<p>Example: <tt>org.hibernate.dialect.Oracle10gDialect</tt>").defaultValue("org.hibernate.dialect.Oracle10gDialect").required().addEventListener(listener);
-			builder.property(DEFAULT_SCHEMA, "Default Schema", "Database default schema name").required().addEventListener(listener);
-			builder.property(SCHEMA, "Schema", "Database schema name").required().addEventListener(listener);
+			builder.property(ORACLE_SERVER, "Server", "Server where the database is hosted").required().addEventHandler(listener);
+			builder.property(ORACLE_PORT, "Port", "Database server port").required().addEventHandler(listener);
+			builder.property(ORACLE_SID, "SID", "System id").required().addEventHandler(listener);
+			builder.property(USER_NAME, "User name", "Database account user name").required().addEventHandler(listener);
+			builder.property(PASSWORD, "Password", "Database account password").required().addEventHandler(listener);
+			builder.property(DRIVER_CLASS_NAME, "Driver", "Database JDBC driver class<p>Bundled driver: <tt>oracle.jdbc.driver.OracleDriver</tt>").defaultValue("oracle.jdbc.driver.OracleDriver").required().addEventHandler(listener);
+			builder.property(DIALECT, "Dialect", "Database dialect<p>Example: <tt>org.hibernate.dialect.Oracle10gDialect</tt>").defaultValue("org.hibernate.dialect.Oracle10gDialect").required().addEventHandler(listener);
+			builder.property(DEFAULT_SCHEMA, "Default Schema", "Database default schema name").required().addEventHandler(listener);
+			builder.property(SCHEMA, "Schema", "Database schema name").required().addEventHandler(listener);
 			oraclePropertyList = builder.end();
 			databaseConfiguration.add(oraclePropertyList, "Oracle");
 		}
 
 		{
 			builder.start();
-			builder.property(MYSQL_URL, "Server", "Database server - <pre>host[:port]</pre>").required().addEventListener(listener);
-			builder.property(USER_NAME, "User name", "Database account user name").required().addEventListener(listener);
-			builder.property(PASSWORD, "Password", "Database account password").required().addEventListener(listener);
-			builder.property(SCHEMA, "Schema", "Database schema name").required().addEventListener(listener);
-			builder.property(DRIVER_CLASS_NAME, "Driver", "Database JDBC driver class<p>Bundled driver: <tt>com.mysql.jdbc.Driver</tt>").defaultValue("com.mysql.jdbc.Driver").required().addEventListener(listener);
-			builder.property(DIALECT, "Dialect", "Database dialect<p>Choose from<ul><li><tt>org.hibernate.dialect.MySQLInnoDBDialect</tt> - InnoDB (preferred)</li><li><tt>org.hibernate.dialect.MySQLMyISAMDialect</tt> - MyISAM</li></ul>").defaultValue("org.hibernate.dialect.MySQLInnoDBDialect").required().addEventListener(listener);
+			builder.property(MYSQL_URL, "Server", "Database server - <pre>host[:port]</pre>").required().addEventHandler(listener);
+			builder.property(USER_NAME, "User name", "Database account user name").required().addEventHandler(listener);
+			builder.property(PASSWORD, "Password", "Database account password").required().addEventHandler(listener);
+			builder.property(SCHEMA, "Schema", "Database schema name").required().addEventHandler(listener);
+			builder.property(DRIVER_CLASS_NAME, "Driver", "Database JDBC driver class<p>Bundled driver: <tt>com.mysql.jdbc.Driver</tt>").defaultValue("com.mysql.jdbc.Driver").required().addEventHandler(listener);
+			builder.property(DIALECT, "Dialect", "Database dialect<p>Choose from<ul><li><tt>org.hibernate.dialect.MySQLInnoDBDialect</tt> - InnoDB (preferred)</li><li><tt>org.hibernate.dialect.MySQLMyISAMDialect</tt> - MyISAM</li></ul>").defaultValue("org.hibernate.dialect.MySQLInnoDBDialect").required().addEventHandler(listener);
 			mysqlPropertyList = builder.end();
 			databaseConfiguration.add(mysqlPropertyList, "MySql");
 		}
@@ -81,13 +82,13 @@ public final class DatabaseView extends SimplePanel implements ModuleView {
 		{
 			// The custom property list is the one that is getting actually loaded/saved
 			builder.start();
-			builder.property(URL, "URL", "Database JDBC URL").required().addEventListener(listener);
-			builder.property(USER_NAME, "User name", "Database account user name").required().addEventListener(listener);
-			builder.property(PASSWORD, "Password", "Database account password").required().addEventListener(listener);
-			builder.property(DRIVER_CLASS_NAME, "Driver", "Database JDBC driver class.<p>The driver has to be available on the classpath, meaning you would have to modify the Swift startup scripts to include the extra drivers.").required().addEventListener(listener);
-			builder.property(DIALECT, "Dialect", "Database dialect").required().addEventListener(listener);
-			builder.property(DEFAULT_SCHEMA, "Default Schema", "Database default schema name").required().addEventListener(listener);
-			builder.property(SCHEMA, "Schema", "Database schema name").required().addEventListener(listener);
+			builder.property(URL, "URL", "Database JDBC URL").required().addEventHandler(listener);
+			builder.property(USER_NAME, "User name", "Database account user name").required().addEventHandler(listener);
+			builder.property(PASSWORD, "Password", "Database account password").required().addEventHandler(listener);
+			builder.property(DRIVER_CLASS_NAME, "Driver", "Database JDBC driver class.<p>The driver has to be available on the classpath, meaning you would have to modify the Swift startup scripts to include the extra drivers.").required().addEventHandler(listener);
+			builder.property(DIALECT, "Dialect", "Database dialect").required().addEventHandler(listener);
+			builder.property(DEFAULT_SCHEMA, "Default Schema", "Database default schema name").required().addEventHandler(listener);
+			builder.property(SCHEMA, "Schema", "Database schema name").required().addEventHandler(listener);
 			customPropertyList = builder.end();
 			databaseConfiguration.add(customPropertyList, "Custom");
 		}
@@ -193,9 +194,9 @@ public final class DatabaseView extends SimplePanel implements ModuleView {
 		return customPropertyList.saveUI();
 	}
 
-	private class PropertyChangeListener implements ChangeListener {
+	private class PropertyChangeListener implements ChangeHandler {
 		@Override
-		public void onChange(final Widget sender) {
+		public void onChange(final ChangeEvent event) {
 			saveUI();
 		}
 	}

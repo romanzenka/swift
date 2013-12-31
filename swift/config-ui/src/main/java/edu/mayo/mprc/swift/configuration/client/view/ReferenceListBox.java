@@ -2,7 +2,14 @@ package edu.mayo.mprc.swift.configuration.client.view;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.user.client.ui.*;
+import com.google.gwt.event.logical.shared.HasValueChangeHandlers;
+import com.google.gwt.event.logical.shared.ValueChangeEvent;
+import com.google.gwt.event.logical.shared.ValueChangeHandler;
+import com.google.gwt.event.shared.HandlerRegistration;
+import com.google.gwt.user.client.ui.Button;
+import com.google.gwt.user.client.ui.HorizontalPanel;
+import com.google.gwt.user.client.ui.ListBox;
+import com.google.gwt.user.client.ui.SimplePanel;
 import edu.mayo.mprc.swift.configuration.client.model.*;
 
 import java.util.ArrayList;
@@ -18,14 +25,13 @@ import java.util.List;
  * The returned value is either an id of the resource, or an id of the service that wraps a module (if the referenced
  * object is a module).
  */
-public final class ReferenceListBox extends SimplePanel implements SourcesChangeEvents {
+public final class ReferenceListBox extends SimplePanel implements HasValueChangeHandlers<String> {
 	private List<String> types;
 	private ApplicationModel model;
 	private ListBox listBox;
 	private Button createNew;
 	private final HorizontalPanel panel = new HorizontalPanel();
 	private final Context errorDisplay;
-	private DelegatingChangeListenerCollection changeListeners;
 
 	public ReferenceListBox(final List<String> types, final ApplicationModel model, final Context errorDisplay) {
 		this.errorDisplay = errorDisplay;
@@ -63,9 +69,7 @@ public final class ReferenceListBox extends SimplePanel implements SourcesChange
 	}
 
 	private void fireChange() {
-		if (changeListeners != null) {
-			changeListeners.fireChange(this);
-		}
+		ValueChangeEvent.fire(this, getValue());
 	}
 
 	private void addListBox(final List<String> types) {
@@ -169,21 +173,9 @@ public final class ReferenceListBox extends SimplePanel implements SourcesChange
 		}
 	}
 
-	// Delegate the change listener to the embedded listbox
 	@Override
-	public void addChangeListener(final ChangeListener changeListener) {
-		if (changeListeners == null) {
-			changeListeners = new DelegatingChangeListenerCollection(this, listBox);
-		}
-		changeListeners.add(changeListener);
-	}
-
-	// Delegate the change listener to the embedded listbox
-	@Override
-	public void removeChangeListener(final ChangeListener changeListener) {
-		if (changeListeners != null) {
-			changeListeners.remove(changeListener);
-		}
+	public HandlerRegistration addValueChangeHandler(ValueChangeHandler<String> handler) {
+		return addHandler(handler, ValueChangeEvent.getType());
 	}
 
 	private static class ResourceModelComparator implements Comparator<ResourceModel> {

@@ -110,30 +110,30 @@ public final class ServerFileReader extends PopupPanel implements ClickHandler {
 		final Panel commandPanel = new HorizontalPanel();
 		commandPanel.setStyleName("serverfilereader_commands");
 
-		cmdNextPage = new Anchor("Next Page", "Next Page");
+		cmdNextPage = new Anchor("Next Page");
 		cmdNextPage.addClickHandler(this);
 		cmdNextPage.setStyleName("serverfilereader_commandbuttons");
 		commandPanel.add(cmdNextPage);
 
-		cmdPrevPage = new Anchor("Previous Page", "Previous Page");
+		cmdPrevPage = new Anchor("Previous Page");
 		cmdPrevPage.addClickHandler(this);
 		cmdPrevPage.setStyleName("serverfilereader_commandbuttons");
 		commandPanel.add(cmdPrevPage);
 
-		cmdFirstPage = new Anchor("First Page", "First Page");
+		cmdFirstPage = new Anchor("First Page");
 		cmdFirstPage.addClickHandler(this);
 		cmdFirstPage.setStyleName("serverfilereader_commandbuttons");
 		commandPanel.add(cmdFirstPage);
 
 		txtGrepExpression = new TextBox();
 		commandPanel.add(txtGrepExpression);
-		cmdApplyGrep = new Anchor("Filter", "Filter");
+		cmdApplyGrep = new Anchor("Filter");
 
 		cmdApplyGrep.addClickHandler(this);
 		cmdApplyGrep.setStyleName("serverfilereader_commandbuttons");
 		commandPanel.add(cmdApplyGrep);
 
-		final Anchor cmdClose = new Anchor("Close", "Close");
+		final Anchor cmdClose = new Anchor("Close");
 		cmdClose.setStyleName("serverfilereader_commandbuttons");
 		cmdClose.addClickHandler(new ClickHandler() {
 			@Override

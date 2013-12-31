@@ -49,8 +49,8 @@ public final class CurationEditor extends Composite {
 	private final Label lblID = new Label();
 	private final Label lblShortNameError = new Label("");
 	private Panel commandPanel;
-	private final Anchor cmdRun = new Anchor("Run", "Run");
-	private Anchor cmdView = new Anchor("View", "View");
+	private final Anchor cmdRun = new Anchor("Run");
+	private Anchor cmdView = new Anchor("View");
 
 	private final TextArea textareaLog = new TextArea();
 	private final TextBox txtShortName = new TextBox();
@@ -480,7 +480,7 @@ public final class CurationEditor extends Composite {
 
 		final Panel newPanel = new VerticalPanel();
 
-		final Anchor cmdCreateNew = new Anchor("New", "New");
+		final Anchor cmdCreateNew = new Anchor("New");
 		cmdCreateNew.setTitle("To create a new empty curation for you editing.");
 		cmdCreateNew.setStyleName("command-link");
 		cmdCreateNew.addClickHandler(new ClickHandler() {
@@ -491,7 +491,7 @@ public final class CurationEditor extends Composite {
 		});
 		newPanel.add(cmdCreateNew);
 
-		final Anchor cmdCopyCurrent = new Anchor("Copy", "Copy");
+		final Anchor cmdCopyCurrent = new Anchor("Copy");
 		cmdCopyCurrent.setTitle("To make a copy of the currently displayed curation for you own editing.");
 		cmdCopyCurrent.setStyleName("command-link");
 		cmdCopyCurrent.addClickHandler(new ClickHandler() {
@@ -544,7 +544,7 @@ public final class CurationEditor extends Composite {
 		});
 		closePanel.add(cmdView);
 
-		final Anchor cmdClose = new Anchor("Close", "Close");
+		final Anchor cmdClose = new Anchor("Close");
 		cmdClose.setTitle("Leave the Curation Editor and return the the main page selecting the current curation.");
 		cmdClose.setStyleName("command-link");
 		cmdClose.addClickHandler(new ClickHandler() {

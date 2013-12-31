@@ -44,7 +44,7 @@ public final class ModificationsLabelRunClick implements ClickHandler {
 		editor.setAllowedValues(proxy.getAllowedValues());
 		if (updateSelectedOnEditor) {
 			editor.setValueClear();
-			editor.setValue(proxy.getClientValue());
+			editor.setValue(proxy.getValue());
 		}
 		p.setParam(param);
 		p.setType(type);
@@ -72,7 +72,7 @@ public final class ModificationsLabelRunClick implements ClickHandler {
 		 */
 		@Override
 		public void onClick(final ClickEvent event) {
-			proxy.setValue(editor.getClientValue());
+			proxy.setValue(editor.getValue(), true);
 		}
 	}
 
