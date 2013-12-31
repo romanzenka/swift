@@ -40,18 +40,31 @@ public class Tolerance implements Serializable {
 		final String trimmed = text.trim();
 		final String lower = trimmed.toLowerCase(Locale.ENGLISH);
 		for (final MassUnit massUnit : MassUnit.values()) {
-			if (lower.length() > massUnit.getCode().length() && lower.endsWith(massUnit.getCode().toLowerCase(Locale.ENGLISH))) {
-				final String number = trimmed.substring(0, trimmed.length() - massUnit.getCode().length());
-				try {
-					value = Double.parseDouble(number);
-					unit = massUnit;
+			final String code = massUnit.getCode();
+			if (tryParseCode(lower, massUnit, code)) {
+				return;
+			}
+			for (final String altName : massUnit.getAlternativeNames()) {
+				if (tryParseCode(lower, massUnit, altName)) {
 					return;
-				} catch (NumberFormatException e) {
-					throw new MprcException("Bad format: '" + number.trim() + "' should be amount of " + massUnit.getDescription(), e);
 				}
 			}
 		}
 		throw new MprcException("Unrecognized unit, please use one of " + MassUnit.getOptions());
+	}
+
+	private boolean tryParseCode(String input, MassUnit unit, String unitName) {
+		if (input.length() > unitName.length() && input.endsWith(unitName.toLowerCase(Locale.ENGLISH))) {
+			final String number = input.substring(0, input.length() - unitName.length());
+			try {
+				value = Double.parseDouble(number);
+				this.unit = unit;
+				return true;
+			} catch (NumberFormatException e) {
+				throw new MprcException("Bad format: '" + number.trim() + "' should be amount of " + unit.getDescription(), e);
+			}
+		}
+		return false;
 	}
 
 	void setValue(final double value) {

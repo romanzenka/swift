@@ -29,6 +29,10 @@ public enum MassUnit {
 		return description;
 	}
 
+	public List<String> getAlternativeNames() {
+		return alternativeNames;
+	}
+
 	@Override
 	public String toString() {
 		return code;
