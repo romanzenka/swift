@@ -43,6 +43,8 @@ import java.util.concurrent.ExecutorService;
  */
 public final class SearchRunner implements Runnable, Lifecycle {
 	private static final Logger LOGGER = Logger.getLogger(SearchRunner.class);
+	public static final String MGF = "mgf";
+	public static final String MZ_ML = "mzML";
 
 	private boolean running;
 	private final boolean fromScratch;
@@ -357,7 +359,7 @@ public final class SearchRunner implements Runnable, Lifecycle {
 	void addInputFileToLists(final FileSearch inputFile, final SearchEngineParameters defaultSearchParameters, final boolean publicSearchFiles) {
 		final SearchEngineParameters searchParameters = inputFile.getSearchParametersWithDefault(defaultSearchParameters);
 
-		final FileProducingTask mgfOutput = addMgfProducingProcess(inputFile);
+		final FileProducingTask mgfOutput = addRawConversionTask(inputFile);
 		addInputAnalysis(inputFile, mgfOutput);
 
 		final SearchEngine scaffold = getScaffoldEngine();
@@ -492,25 +494,29 @@ public final class SearchRunner implements Runnable, Lifecycle {
 	}
 
 	/**
-	 * Add a process that produces an mgf file.
+	 * Add a process that converts a RAW file
 	 * <ul>
-	 * <li>If the file is a .RAW, we perform conversion.</li>
+	 * <li>If the file is a .RAW, we perform conversion either to .mgf or .mzML.</li>
 	 * <li>If the file is already in .mgf format, instead of converting raw->mgf,
 	 * we clean the mgf up, making sure the title contains expected information.</li>
+	 * <li>Dtto for mzML</li>
 	 * </ul>
 	 *
 	 * @param inputFile file to convert.
 	 * @return Task capable of producing an mgf (either by conversion or by cleaning up an existing mgf).
 	 */
-	FileProducingTask addMgfProducingProcess(final FileSearch inputFile) {
+	FileProducingTask addRawConversionTask(final FileSearch inputFile) {
 		final File file = inputFile.getInputFile();
 
 		FileProducingTask mgfOutput = null;
 		// First, make sure we have a valid mgf, no matter what input we got
-		if (file.getName().endsWith(".mgf")) {
+		String extension = FileUtilities.getExtension(file.getName());
+		if (MGF.equals(extension)) {
 			mgfOutput = addMgfCleanupStep(inputFile);
+		} else if (MZ_ML.equals(extension)) {
+			mgfOutput = addMzMlCleanupStep(inputFile);
 		} else {
-			mgfOutput = addRaw2MgfConversionStep(inputFile, searchDefinition.getSearchParameters());
+			mgfOutput = addRawConversionStep(inputFile, searchDefinition.getSearchParameters());
 		}
 		return mgfOutput;
 	}
@@ -524,7 +530,7 @@ public final class SearchRunner implements Runnable, Lifecycle {
 		return existing;
 	}
 
-	private FileProducingTask addRaw2MgfConversionStep(final FileSearch inputFile, final SearchEngineParameters defaultParameters) {
+	private FileProducingTask addRawConversionStep(final FileSearch inputFile, final SearchEngineParameters defaultParameters) {
 		final File file = inputFile.getInputFile();
 		final SearchEngineParameters searchParameters = inputFile.getSearchParametersWithDefault(defaultParameters);
 		final ExtractMsnSettings conversionSettings = searchParameters.getExtractMsnSettings();
@@ -544,13 +550,18 @@ public final class SearchRunner implements Runnable, Lifecycle {
 			}
 
 			return task;
-		} else {
-			final File mgfFile = getMgfFileLocation(inputFile);
+		} else if (ExtractMsnSettings.MSCONVERT.equals(conversionSettings.getCommand())) {
+			final File outputFile;
+			if (conversionSettings.isMzMlMode()) {
+				outputFile = getMzMlFileLocation(inputFile);
+			} else {
+				outputFile = getMgfFileLocation(inputFile);
+			}
 
 			final MsconvertTask task = addTask(new MsconvertTask(workflowEngine,
 						/*Input file*/ file,
-						/*Mgf file location*/ mgfFile,
-					Boolean.TRUE.equals(searchDefinition.getPublicMgfFiles()),
+						/*Output file location*/ outputFile,
+					Boolean.TRUE.equals(searchDefinition.getPublicMgfFiles()), // TODO: We need to rename public MGF files feature to public converted files to produce mzML as well
 					msconvertDaemon, fileTokenFactory, isFromScratch()));
 
 			if (Boolean.TRUE.equals(searchDefinition.getPublicMzxmlFiles())) {
@@ -560,19 +571,27 @@ public final class SearchRunner implements Runnable, Lifecycle {
 			}
 
 			return task;
+		} else {
+			throw new MprcException("Unsupported conversion engine: [" + conversionSettings.getCommand() + "]");
 		}
 	}
 
 	/**
-	 * We have already made .mgf file. Because it can be problematic, we need to clean it up
+	 * We got a pre-made .mgf file. Because it can be problematic, we need to clean it up
 	 */
 	private FileProducingTask addMgfCleanupStep(final FileSearch inputFile) {
 		final File file = inputFile.getInputFile();
 		final File outputFile = getMgfFileLocation(inputFile);
-		FileProducingTask mgfOutput = addTask(
+		return addTask(
 				new MgfTitleCleanupTask(workflowEngine, mgfCleanupDaemon, file, outputFile, fileTokenFactory, isFromScratch())
 		);
-		return mgfOutput;
+	}
+
+	/**
+	 * We got a pre-made .mzML file. Because it can be problematic, we need to clean it up
+	 */
+	private FileProducingTask addMzMlCleanupStep(final FileSearch inputFile) {
+		return addTask(new MzMlCleanupTask(workflowEngine, inputFile.getInputFile(), fileTokenFactory));
 	}
 
 	/**
@@ -678,6 +697,14 @@ public final class SearchRunner implements Runnable, Lifecycle {
 	 */
 	private File getMgfFileLocation(final FileSearch inputFile) {
 		return getOutputFileLocation(inputFile, "dta", ".mgf");
+	}
+
+	/**
+	 * @param inputFile The input file entry from the search definition.
+	 * @return Where does the output file go.
+	 */
+	private File getMzMlFileLocation(final FileSearch inputFile) {
+		return getOutputFileLocation(inputFile, "mzml", ".mzML");
 	}
 
 	/**

@@ -39,6 +39,13 @@ public class ExtractMsnSettings extends PersistableBase {
 		this.command = command == null ? EXTRACT_MSN : command;
 	}
 
+	/**
+	 * @return True if the command line indicates we should produce mzML file.
+	 */
+	public boolean isMzMlMode() {
+		return getCommandLineSwitches().contains(MZML_MODE);
+	}
+
 	@Override
 	public boolean equals(final Object o) {
 		if (this == o) {
