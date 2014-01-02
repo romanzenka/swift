@@ -5,9 +5,9 @@
 package edu.mayo.mprc.io.mgf;
 
 import edu.mayo.mprc.MprcException;
+import edu.mayo.mprc.peaklist.PeakList;
 import edu.mayo.mprc.utilities.FileUtilities;
 import org.proteomecommons.io.Peak;
-import org.proteomecommons.io.mgf.MascotGenericFormatPeakList;
 
 import java.io.BufferedWriter;
 import java.io.Closeable;
@@ -51,10 +51,10 @@ public final class MGFPeakListWriter implements Closeable {
 	 * @param peaklist
 	 * @throws IOException
 	 */
-	public void writePeakList(final MascotGenericFormatPeakList peaklist) {
+	public void writePeakList(final PeakList peaklist) {
 
 		if (peaklist == null) {
-			throw new IllegalArgumentException("MascotGenericFormatPeakList peaklist can not be null.");
+			throw new IllegalArgumentException("peaklist can not be null.");
 		}
 
 		try {

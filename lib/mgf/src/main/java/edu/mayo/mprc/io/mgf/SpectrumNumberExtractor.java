@@ -1,7 +1,6 @@
 package edu.mayo.mprc.io.mgf;
 
 import edu.mayo.mprc.MprcException;
-import org.proteomecommons.io.mgf.MascotGenericFormatPeakList;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -15,11 +14,6 @@ public final class SpectrumNumberExtractor {
 	private static final String WRONG_TITLE_MSG = "The .mgf title does not denote a proper spectrum number.\n" +
 			"We expect the TITLE to end in ([filename].[spectrum_from].[spectrum_to].[charge].dta)\n" +
 			"The spectrum title was:\n\t";
-
-	public int extractSpectrumNumber(final MascotGenericFormatPeakList peakList) {
-		final String title = peakList.getTitle();
-		return extractSpectrumNumberFromTitle(title);
-	}
 
 	public int extractSpectrumNumberFromTitle(final String title) {
 		final Matcher m = TITLE_SPECTRUM_NUMBER.matcher(title);

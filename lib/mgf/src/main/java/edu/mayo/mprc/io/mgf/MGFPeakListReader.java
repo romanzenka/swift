@@ -5,10 +5,10 @@
 package edu.mayo.mprc.io.mgf;
 
 import edu.mayo.mprc.MprcException;
+import edu.mayo.mprc.peaklist.PeakList;
 import edu.mayo.mprc.utilities.FileUtilities;
 import org.proteomecommons.io.GenericPeak;
 import org.proteomecommons.io.Peak;
-import org.proteomecommons.io.mgf.MascotGenericFormatPeakList;
 
 import java.io.BufferedReader;
 import java.io.Closeable;
@@ -59,12 +59,12 @@ public final class MGFPeakListReader implements Closeable {
 	 * @return MascotGenericFormatPeakList object representing the next peak list in the mgf file.
 	 * @throws IOException
 	 */
-	public MascotGenericFormatPeakList nextPeakList() {
+	public PeakList nextPeakList() {
 		boolean foundPeaks = false;
 		String line = null;
 		String[] split = null;
 
-		final MascotGenericFormatPeakList peaklist = new MascotGenericFormatPeakList();
+		final PeakList peaklist = new PeakList();
 
 		final LinkedList<Peak> peaks = new LinkedList<Peak>();
 
