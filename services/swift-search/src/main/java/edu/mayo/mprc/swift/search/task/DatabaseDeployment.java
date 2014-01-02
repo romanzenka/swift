@@ -1,5 +1,6 @@
 package edu.mayo.mprc.swift.search.task;
 
+import com.google.common.base.Objects;
 import edu.mayo.mprc.daemon.DaemonConnection;
 import edu.mayo.mprc.daemon.worker.WorkPacket;
 import edu.mayo.mprc.dbcurator.model.Curation;
@@ -114,34 +115,27 @@ final class DatabaseDeployment extends AsyncTaskBase implements DatabaseDeployme
 	}
 
 	@Override
-	public boolean equals(Object o) {
-		if (this == o) {
-			return true;
+	public int hashCode() {
+		// Only sequest makes the parameter set matter
+		if ("SEQUEST".equalsIgnoreCase(engineCode)) {
+			return Objects.hashCode(engineCode, dbToDeploy, paramsFile);
+		} else {
+			return Objects.hashCode(engineCode, dbToDeploy);
 		}
-		if (!(o instanceof DatabaseDeployment)) {
-			return false;
-		}
-
-		DatabaseDeployment that = (DatabaseDeployment) o;
-
-		if (dbToDeploy != null ? !dbToDeploy.equals(that.dbToDeploy) : that.dbToDeploy != null) {
-			return false;
-		}
-		if (engineCode != null ? !engineCode.equals(that.engineCode) : that.engineCode != null) {
-			return false;
-		}
-		if (paramsFile != null ? !paramsFile.equals(that.paramsFile) : that.paramsFile != null) {
-			return false;
-		}
-
-		return true;
 	}
 
 	@Override
-	public int hashCode() {
-		int result = engineCode != null ? engineCode.hashCode() : 0;
-		result = 31 * result + (dbToDeploy != null ? dbToDeploy.hashCode() : 0);
-		result = 31 * result + (paramsFile != null ? paramsFile.hashCode() : 0);
-		return result;
+	public boolean equals(final Object obj) {
+		if (this == obj) {
+			return true;
+		}
+		if (obj == null || getClass() != obj.getClass()) {
+			return false;
+		}
+		final DatabaseDeployment other = (DatabaseDeployment) obj;
+		// Only sequest makes the parameter set matter
+		return Objects.equal(engineCode, other.engineCode)
+				&& Objects.equal(dbToDeploy, other.dbToDeploy)
+				&& (!"SEQUEST".equalsIgnoreCase(engineCode) || Objects.equal(paramsFile, other.paramsFile));
 	}
 }

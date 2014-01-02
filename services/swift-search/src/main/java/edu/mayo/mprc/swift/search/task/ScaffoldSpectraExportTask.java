@@ -6,6 +6,7 @@ import edu.mayo.mprc.daemon.worker.WorkPacket;
 import edu.mayo.mprc.scaffold.ScaffoldSpectrumExportWorkPacket;
 import edu.mayo.mprc.scaffoldparser.spectra.ScaffoldReportReader;
 import edu.mayo.mprc.swift.db.DatabaseFileTokenFactory;
+import edu.mayo.mprc.swift.dbmapping.ReportData;
 import edu.mayo.mprc.utilities.FileUtilities;
 import edu.mayo.mprc.utilities.progress.ProgressInfo;
 import edu.mayo.mprc.workflow.engine.WorkflowEngine;
@@ -17,9 +18,10 @@ import java.io.File;
  *
  * @author Roman Zenka
  */
-public final class ScaffoldSpectraExportTask extends AsyncTaskBase {
+public final class ScaffoldSpectraExportTask extends AsyncTaskBase implements ScaffoldSpectrumExportProducer {
 	private final File scaffoldFile;
 	private final File spectrumExportFile;
+	private ReportData reportData;
 
 	public ScaffoldSpectraExportTask(final WorkflowEngine engine, DaemonConnection daemon, DatabaseFileTokenFactory fileTokenFactory, boolean fromScratch, File scaffoldFile) {
 		super(engine, daemon, fileTokenFactory, fromScratch);
@@ -34,10 +36,6 @@ public final class ScaffoldSpectraExportTask extends AsyncTaskBase {
 				scaffoldFile.getParentFile(),
 				FileUtilities.getFileNameWithoutExtension(scaffoldFile) + ScaffoldReportReader.SPECTRA_EXTENSION);
 		return scaffoldSpectrumExport;
-	}
-
-	public File getSpectrumExportFile() {
-		return spectrumExportFile;
 	}
 
 	@Override
@@ -70,5 +68,23 @@ public final class ScaffoldSpectraExportTask extends AsyncTaskBase {
 		}
 		final ScaffoldSpectraExportTask other = (ScaffoldSpectraExportTask) obj;
 		return Objects.equal(scaffoldFile, other.scaffoldFile) && Objects.equal(spectrumExportFile, other.spectrumExportFile);
+	}
+
+	@Override
+	public File getScaffoldSpectraFile() {
+		return spectrumExportFile;
+	}
+
+	public ReportData getReportData() {
+		return reportData;
+	}
+
+	public void setReportData(ReportData reportData) {
+		this.reportData = reportData;
+	}
+
+	@Override
+	public File getUnimod() {
+		return null;  //To change body of implemented methods use File | Settings | File Templates.
 	}
 }

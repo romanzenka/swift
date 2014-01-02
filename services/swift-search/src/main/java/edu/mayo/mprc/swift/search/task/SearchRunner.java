@@ -1,7 +1,6 @@
 package edu.mayo.mprc.swift.search.task;
 
 import com.google.common.base.Preconditions;
-import com.google.common.collect.Maps;
 import edu.mayo.mprc.MprcException;
 import edu.mayo.mprc.config.Lifecycle;
 import edu.mayo.mprc.config.ResourceConfig;
@@ -18,7 +17,6 @@ import edu.mayo.mprc.swift.params2.ExtractMsnSettings;
 import edu.mayo.mprc.swift.params2.SearchEngineParameters;
 import edu.mayo.mprc.swift.params2.mapping.ParamsInfo;
 import edu.mayo.mprc.utilities.FileUtilities;
-import edu.mayo.mprc.utilities.Tuple;
 import edu.mayo.mprc.utilities.exceptions.ExceptionUtilities;
 import edu.mayo.mprc.utilities.progress.ProgressReporter;
 import edu.mayo.mprc.workflow.engine.Resumer;
@@ -36,15 +34,9 @@ import java.util.concurrent.ExecutorService;
  * first creates a workflow, that is then being executed by {@link edu.mayo.mprc.workflow.engine.WorkflowEngine}.
  * <h3>Workflow creation</h3>
  * {@link #searchDefinitionToLists(edu.mayo.mprc.swift.dbmapping.SwiftSearchDefinition)} turns
- * the search definition into lists of tasks to do (
- * {@link #rawToMgfConversions},
- * {@link #msconvertConversions},
- * {@link #mgfCleanups},
- * {@link #databaseDeployments},
- * {@link #engineSearches},
- * {@link #scaffoldCalls}) and {@link #spectrumQaTasks}.
+ * the search definition into a list of tasks to do.
  * <p/>
- * The lists of tasks get collected and added to the workflow engine by {@link #collectAllTasks()}.
+ * The list of tasks get collected and added to the workflow engine by {@link #collectAllTasks()}.
  * <h3>Workflow execution</h3>
  * {@link #run()} method performs next step of the search by calling the workflow
  * engine.
@@ -53,84 +45,25 @@ public final class SearchRunner implements Runnable, Lifecycle {
 	private static final Logger LOGGER = Logger.getLogger(SearchRunner.class);
 
 	private boolean running;
-	private boolean fromScratch;
-	private SwiftSearchDefinition searchDefinition;
+	private final boolean fromScratch;
+	private final SwiftSearchDefinition searchDefinition;
 
-	private CurationDao curationDao;
-	private SwiftDao swiftDao;
-	private ParamsInfo paramsInfo;
+	private final CurationDao curationDao;
+	private final SwiftDao swiftDao;
+	private final ParamsInfo paramsInfo;
 
 	/**
 	 * Database record of the search we are currently running.
 	 */
 	private SearchRun searchRun;
 
-	private final Set<Task> tasks = new LinkedHashSet<Task>();
-
-	/**
-	 * Key: (raw file, raw settings) tuple, obtained by {@link #getRawToMgfConversionHashKey(java.io.File, edu.mayo.mprc.swift.params2.ExtractMsnSettings)}.<br/>
-	 * Value: Raw->MGF conversion task.
-	 */
-	private Map<Tuple<String, File>, RawToMgfTask> rawToMgfConversions = new HashMap<Tuple<String, File>, RawToMgfTask>();
-
-	/**
-	 * Key: (raw file, raw settings) tuple, obtained by {@link #getRawToMgfConversionHashKey(java.io.File, edu.mayo.mprc.swift.params2.ExtractMsnSettings)}.<br/>
-	 * Value: Raw->MGF conversion task.
-	 */
-	private Map<Tuple<String, File>, MsconvertTask> msconvertConversions = new HashMap<Tuple<String, File>, MsconvertTask>();
-
-	/**
-	 * Key: .mgf file obtained by {@link #getMgfCleanupHashKey(java.io.File)}.<br/>
-	 * Value: Mgf cleanup task
-	 */
-	private Map<File, FileProducingTask> mgfCleanups = new HashMap<File, FileProducingTask>();
-
-	/**
-	 * Key: raw file<br/>
-	 * Value: RAW dump task
-	 */
-	private Map<File, RAWDumpTask> rawDumpTasks = new HashMap<File, RAWDumpTask>();
+	private final HashMap<Task, Task> tasks = new LinkedHashMap<Task, Task>(20);
 
 	/**
 	 * Key: input file<br/>
-	 * Value: MSMSEvalFilter task
+	 * Value: SpectrumQaTask task
 	 */
-	private Map<File, SpectrumQaTask> spectrumQaTasks = new HashMap<File, SpectrumQaTask>();
-
-	/**
-	 * Key: engine:curationId:param file tuple, obtained by {@link #getDbDeploymentHashKey}.<br/>
-	 * Value: Database deployment task.
-	 */
-	private Map<String, DatabaseDeployment> databaseDeployments = new HashMap<String, DatabaseDeployment>();
-
-	/**
-	 * Key: "engine:input file:parameter file" triple, obtained by {@link #getEngineSearchHashKey}.<br/>
-	 * Value: Engine search task.
-	 */
-	private Map<String, EngineSearchTask> engineSearches = new HashMap<String, EngineSearchTask>();
-
-	/**
-	 * Key: scaffold call specification<br/>
-	 * Value: Scaffold caller task
-	 */
-	private Map<ScaffoldCall, ScaffoldTaskI> scaffoldCalls = new HashMap<ScaffoldCall, ScaffoldTaskI>();
-
-	/**
-	 * Key: input file for IdpQonvert<br/>
-	 * Value: IdpQonvert caller task
-	 */
-	private Map<String, IdpQonvertTask> idpQonvertTasks = Maps.newHashMap();
-
-	/**
-	 * Key: Curation ID
-	 * Value: FastaDb loader (will load FASTA into a relational database)
-	 */
-	private Map<Integer, FastaDbTask> fastaDbCalls = new HashMap<Integer, FastaDbTask>();
-
-	/**
-	 * List of search db tasks, mapped to scaffold calls and corresponding fastaDb calls.
-	 */
-	private Map<File, SearchDbTask> searchDbCalls = new HashMap<File, SearchDbTask>();
+	private final Map<File, SpectrumQaTask> spectrumQaTasks = new HashMap<File, SpectrumQaTask>(10);
 
 	/**
 	 * One and only QA task for the entire search == more practical
@@ -138,31 +71,31 @@ public final class SearchRunner implements Runnable, Lifecycle {
 	private QaTask qaTask;
 
 	/**
-	 * List of tasks producing protein reports.
+	 * Set of all Scaffold tasks
 	 */
-	private List<Task> reportCalls = new LinkedList<Task>();
+	private final Collection<ScaffoldTaskI> scaffoldCalls = new LinkedHashSet<ScaffoldTaskI>(5);
 
-	private DaemonConnection raw2mgfDaemon;
-	private DaemonConnection msconvertDaemon;
-	private DaemonConnection mgfCleanupDaemon;
-	private DaemonConnection rawDumpDaemon;
-	private DaemonConnection msmsEvalDaemon;
-	private DaemonConnection scaffoldReportDaemon;
-	private DaemonConnection qaDaemon;
-	private DaemonConnection fastaDbDaemon;
-	private DaemonConnection searchDbDaemon;
-	private boolean reportDecoyHits;
+	private final DaemonConnection raw2mgfDaemon;
+	private final DaemonConnection msconvertDaemon;
+	private final DaemonConnection mgfCleanupDaemon;
+	private final DaemonConnection rawDumpDaemon;
+	private final DaemonConnection msmsEvalDaemon;
+	private final DaemonConnection scaffoldReportDaemon;
+	private final DaemonConnection qaDaemon;
+	private final DaemonConnection fastaDbDaemon;
+	private final DaemonConnection searchDbDaemon;
+	private final boolean reportDecoyHits;
 
-	private Collection<SearchEngine> searchEngines = null;
+	private final Collection<SearchEngine> searchEngines;
 
 	private final WorkflowEngine workflowEngine;
 
-	private boolean initializationDone = false;
+	private boolean initializationDone;
 
-	private ProgressReporter reporter;
-	private ExecutorService service;
+	private final ProgressReporter reporter;
+	private final ExecutorService service;
 
-	private DatabaseFileTokenFactory fileTokenFactory;
+	private final DatabaseFileTokenFactory fileTokenFactory;
 
 	/**
 	 * Key: {@link SearchEngineParameters} parameter set
@@ -181,7 +114,7 @@ public final class SearchRunner implements Runnable, Lifecycle {
 	/**
 	 * Making files distinct in case the search uses same file name several times.
 	 */
-	private DistinctFiles distinctFiles = new DistinctFiles();
+	private final DistinctFiles distinctFiles = new DistinctFiles();
 	private static final String DEFAULT_SPECTRUM_QA_FOLDER = "spectrum_qa";
 	private static final String DEFAULT_PARAMS_FOLDER = "params";
 
@@ -290,39 +223,12 @@ public final class SearchRunner implements Runnable, Lifecycle {
 
 		assert searchEngines != null : "Search engine set must not be null";
 		if (searchDefinition != null) {
-			assert workflowEngine.getNumTasks() ==
-					databaseDeployments.size() +
-							rawToMgfConversions.size() +
-							msconvertConversions.size() +
-							mgfCleanups.size() +
-							rawDumpTasks.size() +
-							spectrumQaTasks.size() +
-							engineSearches.size() +
-							scaffoldCalls.size() +
-							idpQonvertTasks.size() +
-							fastaDbCalls.size() +
-							reportCalls.size() +
-							searchDbCalls.size() +
-							(qaTask == null ? 0 : 1) : "All tasks must be a collection of *ALL* tasks";
+			assert workflowEngine.getNumTasks() == tasks.size() : "All tasks must be a collection of *ALL* tasks";
 		}
 	}
 
 	private void collectAllTasks() {
-		workflowEngine.addAllTasks(databaseDeployments.values());
-		workflowEngine.addAllTasks(rawToMgfConversions.values());
-		workflowEngine.addAllTasks(msconvertConversions.values());
-		workflowEngine.addAllTasks(mgfCleanups.values());
-		workflowEngine.addAllTasks(rawDumpTasks.values());
-		workflowEngine.addAllTasks(spectrumQaTasks.values());
-		workflowEngine.addAllTasks(engineSearches.values());
-		workflowEngine.addAllTasks(scaffoldCalls.values());
-		workflowEngine.addAllTasks(idpQonvertTasks.values());
-		workflowEngine.addAllTasks(fastaDbCalls.values());
-		workflowEngine.addAllTasks(reportCalls);
-		workflowEngine.addAllTasks(searchDbCalls.values());
-		if (qaTask != null) {
-			workflowEngine.addTask(qaTask);
-		}
+		workflowEngine.addAllTasks(tasks.values());
 	}
 
 	private void addReportTasks(final SwiftSearchDefinition searchDefinition) {
@@ -464,7 +370,7 @@ public final class SearchRunner implements Runnable, Lifecycle {
 		}
 		final SearchEngine idpQonvert = getIdpQonvertEngine();
 
-		ScaffoldTask scaffoldTask = null;
+		ScaffoldSpectrumTask scaffoldTask = null;
 
 		// Go through all possible search engines this file requires
 		for (final SearchEngine engine : searchEngines) {
@@ -609,28 +515,29 @@ public final class SearchRunner implements Runnable, Lifecycle {
 		return mgfOutput;
 	}
 
+	<T extends Task> T addTask(T task) {
+		final T existing = (T) tasks.get(task);
+		if (existing == null) {
+			tasks.put(task, task);
+			return task;
+		}
+		return existing;
+	}
+
 	private FileProducingTask addRaw2MgfConversionStep(final FileSearch inputFile, final SearchEngineParameters defaultParameters) {
 		final File file = inputFile.getInputFile();
 		final SearchEngineParameters searchParameters = inputFile.getSearchParametersWithDefault(defaultParameters);
 		final ExtractMsnSettings conversionSettings = searchParameters.getExtractMsnSettings();
 
-		final Tuple<String, File> hashKey = getRawToMgfConversionHashKey(file, conversionSettings);
-
 		if (ExtractMsnSettings.EXTRACT_MSN.equals(conversionSettings.getCommand())) {
-			RawToMgfTask task = rawToMgfConversions.get(hashKey);
+			final File mgfFile = getMgfFileLocation(inputFile);
 
-			if (task == null) {
-				final File mgfFile = getMgfFileLocation(inputFile);
-
-				task = new RawToMgfTask(workflowEngine,
+			final RawToMgfTask task = addTask(new RawToMgfTask(workflowEngine,
 						/*Input file*/ file,
 						/*Mgf file location*/ mgfFile,
 						/*raw2mgf command line*/ searchParameters.getExtractMsnSettings().getCommandLineSwitches(),
-						Boolean.TRUE.equals(searchDefinition.getPublicMgfFiles()),
-						raw2mgfDaemon, fileTokenFactory, isFromScratch());
-
-				rawToMgfConversions.put(hashKey, task);
-			}
+					Boolean.TRUE.equals(searchDefinition.getPublicMgfFiles()),
+					raw2mgfDaemon, fileTokenFactory, isFromScratch()));
 
 			if (Boolean.TRUE.equals(searchDefinition.getPublicMzxmlFiles())) {
 				throw new MprcException("Cannot provide .mzxml files with extract_msn. Please use msconvert");
@@ -638,31 +545,18 @@ public final class SearchRunner implements Runnable, Lifecycle {
 
 			return task;
 		} else {
-			MsconvertTask task = msconvertConversions.get(hashKey);
+			final File mgfFile = getMgfFileLocation(inputFile);
 
-			if (task == null) {
-				final File mgfFile = getMgfFileLocation(inputFile);
-
-				task = new MsconvertTask(workflowEngine,
+			final MsconvertTask task = addTask(new MsconvertTask(workflowEngine,
 						/*Input file*/ file,
 						/*Mgf file location*/ mgfFile,
-						Boolean.TRUE.equals(searchDefinition.getPublicMgfFiles()),
-						msconvertDaemon, fileTokenFactory, isFromScratch());
-
-				msconvertConversions.put(hashKey, task);
-			}
+					Boolean.TRUE.equals(searchDefinition.getPublicMgfFiles()),
+					msconvertDaemon, fileTokenFactory, isFromScratch()));
 
 			if (Boolean.TRUE.equals(searchDefinition.getPublicMzxmlFiles())) {
-				// WE make a weird key just for the purpose of mzxml conversion
-				final Tuple<String, File> key = getRawToMgfConversionHashKey(new File(file.getParentFile(), file.getName() + ".mzXML"), conversionSettings);
+				final File mzxmlFile = getMzxmlFileLocation(inputFile);
 
-				if (msconvertConversions.get(key) == null) {
-					final File mzxmlFile = getMzxmlFileLocation(inputFile);
-
-					final MsconvertTask msconvertTask = new MsconvertTask(workflowEngine, file, mzxmlFile, true, msconvertDaemon, fileTokenFactory, isFromScratch());
-
-					msconvertConversions.put(key, msconvertTask);
-				}
+				addTask(new MsconvertTask(workflowEngine, file, mzxmlFile, true, msconvertDaemon, fileTokenFactory, isFromScratch()));
 			}
 
 			return task;
@@ -674,12 +568,10 @@ public final class SearchRunner implements Runnable, Lifecycle {
 	 */
 	private FileProducingTask addMgfCleanupStep(final FileSearch inputFile) {
 		final File file = inputFile.getInputFile();
-		FileProducingTask mgfOutput = mgfCleanups.get(getMgfCleanupHashKey(file));
-		if (mgfOutput == null) {
-			final File outputFile = getMgfFileLocation(inputFile);
-			mgfOutput = new MgfTitleCleanupTask(workflowEngine, mgfCleanupDaemon, file, outputFile, fileTokenFactory, isFromScratch());
-			mgfCleanups.put(getMgfCleanupHashKey(file), mgfOutput);
-		}
+		final File outputFile = getMgfFileLocation(inputFile);
+		FileProducingTask mgfOutput = addTask(
+				new MgfTitleCleanupTask(workflowEngine, mgfCleanupDaemon, file, outputFile, fileTokenFactory, isFromScratch())
+		);
 		return mgfOutput;
 	}
 
@@ -701,37 +593,37 @@ public final class SearchRunner implements Runnable, Lifecycle {
 		// TODO: Check for spectrumQa.paramFile to be != null. Current code is kind of a hack.
 		final File file = inputFile.getInputFile();
 
-		if (spectrumQaTasks.get(getSpectrumQaHashKey(file)) == null) {
-			final SpectrumQaTask spectrumQaTask = new SpectrumQaTask(workflowEngine,
-					msmsEvalDaemon,
-					mgf,
-					spectrumQa.paramFile() == null ? null : spectrumQa.paramFile().getAbsoluteFile(),
-					getSpectrumQaOutputFolder(inputFile),
-					fileTokenFactory, isFromScratch());
-			spectrumQaTask.addDependency(mgf);
+		final SpectrumQaTask spectrumQaTask = addTask(new SpectrumQaTask(workflowEngine,
+				msmsEvalDaemon,
+				mgf,
+				spectrumQa.paramFile() == null ? null : spectrumQa.paramFile().getAbsoluteFile(),
+				getSpectrumQaOutputFolder(inputFile),
+				fileTokenFactory, isFromScratch()));
 
-			spectrumQaTasks.put(getSpectrumQaHashKey(file), spectrumQaTask);
-		}
+		spectrumQaTask.addDependency(mgf);
+
+		spectrumQaTasks.put(getSpectrumQaHashKey(file), spectrumQaTask);
 	}
 
 	private void addScaffoldReportStep(final SwiftSearchDefinition searchDefinition) {
 		if (scaffoldVersion(searchDefinition.getInputFiles().iterator().next()) != null) {
 			final List<File> scaffoldOutputFiles = new ArrayList<File>(scaffoldCalls.size());
 
-			for (final ScaffoldTaskI scaffoldTask : scaffoldCalls.values()) {
+			for (final ScaffoldTaskI scaffoldTask : scaffoldCalls) {
 				scaffoldOutputFiles.add(scaffoldTask.getScaffoldSpectraFile());
 			}
 
 			final File peptideReportFile = new File(scaffoldOutputFiles.get(0).getParentFile(), "Swift Peptide Report For " + searchDefinition.getTitle() + ".xls");
 			final File proteinReportFile = new File(scaffoldOutputFiles.get(0).getParentFile(), "Swift Protein Report For " + searchDefinition.getTitle() + ".xls");
 
-			final ScaffoldReportTask scaffoldReportTask = new ScaffoldReportTask(workflowEngine, scaffoldReportDaemon, scaffoldOutputFiles, peptideReportFile, proteinReportFile, fileTokenFactory, isFromScratch());
+			final ScaffoldReportTask scaffoldReportTask = addTask(
+					new ScaffoldReportTask(workflowEngine, scaffoldReportDaemon, scaffoldOutputFiles,
+							peptideReportFile, proteinReportFile, fileTokenFactory, isFromScratch())
+			);
 
-			for (final ScaffoldTaskI scaffoldTask : scaffoldCalls.values()) {
+			for (final ScaffoldTaskI scaffoldTask : scaffoldCalls) {
 				scaffoldReportTask.addDependency(scaffoldTask);
 			}
-
-			reportCalls.add(scaffoldReportTask);
 		}
 	}
 
@@ -742,7 +634,7 @@ public final class SearchRunner implements Runnable, Lifecycle {
 	private void addQaTask(final FileSearch inputFile, final ScaffoldTaskI scaffoldTask, final FileProducingTask mgfOutput) {
 		if (qaDaemon != null) {
 			if (qaTask == null) {
-				qaTask = new QaTask(workflowEngine, qaDaemon, fileTokenFactory, isFromScratch());
+				qaTask = addTask(new QaTask(workflowEngine, qaDaemon, fileTokenFactory, isFromScratch()));
 			}
 
 			// Set up a new experiment dependency. All entries called from now on would be added under that experiment
@@ -773,19 +665,7 @@ public final class SearchRunner implements Runnable, Lifecycle {
 	}
 
 	private RAWDumpTask addRawDumpTask(final File rawFile, final File outputFolder) {
-		RAWDumpTask task = rawDumpTasks.get(rawFile);
-
-		if (task == null) {
-			task = new RAWDumpTask(workflowEngine, rawFile, outputFolder, rawDumpDaemon, fileTokenFactory, isFromScratch());
-		}
-
-		rawDumpTasks.put(rawFile, task);
-
-		return task;
-	}
-
-	private RAWDumpTask getRawDumpTaskForInputFile(final FileSearch inputFile) {
-		return rawDumpTasks.get(inputFile.getInputFile());
+		return addTask(new RAWDumpTask(workflowEngine, rawFile, outputFolder, rawDumpDaemon, fileTokenFactory, isFromScratch()));
 	}
 
 	private static boolean isRawFile(final FileSearch inputFile) {
@@ -864,15 +744,7 @@ public final class SearchRunner implements Runnable, Lifecycle {
 	 * Make a record for db deployment, if we do not have one already
 	 */
 	DatabaseDeployment addDatabaseDeployment(final SearchEngine engine, final File paramFile, final Curation dbToDeploy) {
-		// The DB deployment is defined by engine for which it is done
-		final String hashKey = getDbDeploymentHashKey(engine, dbToDeploy, paramFile);
-
-		DatabaseDeployment deployment = databaseDeployments.get(hashKey);
-		if (deployment == null) {
-			deployment = new DatabaseDeployment(workflowEngine, engine.getCode(), engine.getFriendlyName(), engine.getDbDeployDaemon(), paramFile, dbToDeploy, fileTokenFactory, isFromScratch());
-			databaseDeployments.put(hashKey, deployment);
-		}
-		return deployment;
+		return addTask(new DatabaseDeployment(workflowEngine, engine.getCode(), engine.getFriendlyName(), engine.getDbDeployDaemon(), paramFile, dbToDeploy, fileTokenFactory, isFromScratch()));
 	}
 
 	/**
@@ -883,31 +755,27 @@ public final class SearchRunner implements Runnable, Lifecycle {
 	 * The search also knows about the conversion and db deployment so it can determine when it can run.
 	 */
 	private EngineSearchTask addEngineSearch(final SearchEngine engine, final File paramFile, final File inputFile, final File searchOutputFolder, final FileProducingTask fileProducingTask, final Curation curation, final DatabaseDeploymentResult deploymentResult, final boolean publicSearchFiles) {
-		final String searchKey = getEngineSearchHashKey(engine, inputFile, paramFile);
-		EngineSearchTask search = engineSearches.get(searchKey);
-		if (search == null) {
-			final File outputFile = getSearchResultLocation(engine, searchOutputFolder, inputFile);
-			search = new EngineSearchTask(
-					workflowEngine,
-					engine,
-					inputFile.getName(),
-					fileProducingTask,
-					curation,
-					deploymentResult,
-					outputFile,
-					paramFile,
-					publicSearchFiles,
-					engine.getSearchDaemon(),
-					fileTokenFactory,
-					isFromScratch());
+		final File outputFile = getSearchResultLocation(engine, searchOutputFolder, inputFile);
+		EngineSearchTask search = addTask(new EngineSearchTask(
+				workflowEngine,
+				engine,
+				inputFile.getName(),
+				fileProducingTask,
+				curation,
+				deploymentResult,
+				outputFile,
+				paramFile,
+				publicSearchFiles,
+				engine.getSearchDaemon(),
+				fileTokenFactory,
+				isFromScratch()));
 
-			// Depend on the .mgf to be done and on the database deployment
-			search.addDependency(fileProducingTask);
-			if (deploymentResult instanceof Task) {
-				search.addDependency((Task) deploymentResult);
-			}
-			engineSearches.put(searchKey, search);
+		// Depend on the .mgf to be done and on the database deployment
+		search.addDependency(fileProducingTask);
+		if (deploymentResult instanceof Task) {
+			search.addDependency((Task) deploymentResult);
 		}
+
 		return search;
 	}
 
@@ -915,38 +783,30 @@ public final class SearchRunner implements Runnable, Lifecycle {
 	 * Add a scaffold 3 call (or update existing one) that depends on this input file to be sought through
 	 * the given engine search.
 	 */
-	private ScaffoldTask addScaffoldCall(final String scaffoldVersion, final FileSearch inputFile, final EngineSearchTask search, final DatabaseDeployment scaffoldDbDeployment) {
+	private ScaffoldSpectrumTask addScaffoldCall(final String scaffoldVersion, final FileSearch inputFile, final EngineSearchTask search, final DatabaseDeployment scaffoldDbDeployment) {
 		final String experiment = inputFile.getExperiment();
-		final ScaffoldCall key = new ScaffoldCall(experiment, scaffoldVersion);
-		final ScaffoldTaskI scaffoldTaskI = scaffoldCalls.get(key);
-		if (scaffoldTaskI != null && !(scaffoldTaskI instanceof ScaffoldTask)) {
-			ExceptionUtilities.throwCastException(scaffoldTaskI, ScaffoldTask.class);
-			return null;
-		}
-		ScaffoldTask scaffoldTask = (ScaffoldTask) scaffoldTaskI;
+		final SearchEngine scaffoldEngine = getScaffoldEngine();
+		final File scaffoldUnimod = getScaffoldUnimod(scaffoldEngine);
+		final File scaffoldOutputDir = getOutputFolderForSearchEngine(scaffoldEngine);
+		final ScaffoldSpectrumTask scaffoldTask = addTask(new ScaffoldSpectrumTask(
+				workflowEngine,
+				scaffoldVersion,
+				experiment,
+				searchDefinition,
+				scaffoldEngine.getSearchDaemon(),
+				swiftDao, searchRun,
+				scaffoldUnimod,
+				scaffoldOutputDir,
+				fileTokenFactory,
+				reportDecoyHits,
+				isFromScratch()));
 
-		if (scaffoldTask == null) {
-			final SearchEngine scaffoldEngine = getScaffoldEngine();
-			final File scaffoldUnimod = getScaffoldUnimod(scaffoldEngine);
-			final File scaffoldOutputDir = getOutputFolderForSearchEngine(scaffoldEngine);
-			scaffoldTask = new ScaffoldTask(
-					workflowEngine,
-					scaffoldVersion,
-					experiment,
-					searchDefinition,
-					scaffoldEngine.getSearchDaemon(),
-					swiftDao, searchRun,
-					scaffoldUnimod,
-					scaffoldOutputDir,
-					fileTokenFactory,
-					reportDecoyHits,
-					isFromScratch());
-			scaffoldCalls.put(key, scaffoldTask);
-		}
 		scaffoldTask.addInput(inputFile, search);
 		scaffoldTask.addDatabase(scaffoldDbDeployment.getShortDbName(), scaffoldDbDeployment);
 		scaffoldTask.addDependency(search);
 		scaffoldTask.addDependency(scaffoldDbDeployment);
+
+		scaffoldCalls.add(scaffoldTask);
 
 		return scaffoldTask;
 	}
@@ -967,14 +827,9 @@ public final class SearchRunner implements Runnable, Lifecycle {
 
 	private IdpQonvertTask addIdpQonvertCall(final SearchEngine idpQonvert, final File outputFolder,
 	                                         final EngineSearchTask search) {
-		final String key = search.getOutputFile().getAbsolutePath();
-		if (idpQonvertTasks.containsKey(key)) {
-			return idpQonvertTasks.get(key);
-		}
-		final IdpQonvertTask task = new IdpQonvertTask(workflowEngine, swiftDao, searchRun,
+		final IdpQonvertTask task = addTask(new IdpQonvertTask(workflowEngine, swiftDao, searchRun,
 				getSearchDefinition(), idpQonvert.getSearchDaemon(),
-				search, outputFolder, fileTokenFactory, isFromScratch());
-		idpQonvertTasks.put(key, task);
+				search, outputFolder, fileTokenFactory, isFromScratch()));
 		task.addDependency(search);
 		return task;
 	}
@@ -982,65 +837,28 @@ public final class SearchRunner implements Runnable, Lifecycle {
 
 	private FastaDbTask addFastaDbCall(final Curation curation) {
 		if (fastaDbDaemon != null) {
-			final int id = curation.getId();
-			final FastaDbTask task = fastaDbCalls.get(id);
-			if (task == null) {
-				final FastaDbTask newTask = new FastaDbTask(workflowEngine, fastaDbDaemon, fileTokenFactory, false, curation);
-				fastaDbCalls.put(id, newTask);
-				return newTask;
-			} else {
-				return task;
-			}
+			return addTask(new FastaDbTask(workflowEngine, fastaDbDaemon, fileTokenFactory, false, curation));
 		}
 		return null;
 	}
 
-	private SearchDbTask addSearchDbCall(final ScaffoldTask scaffoldTask, final RAWDumpTask rawDumpTask) {
-		final File file = scaffoldTask.getScaffoldSpectraFile();
-		SearchDbTask searchDbTask = searchDbCalls.get(file);
-		if (searchDbTask == null) {
-			final SearchDbTask task = new SearchDbTask(workflowEngine, searchDbDaemon, fileTokenFactory, false, scaffoldTask);
+	private SearchDbTask addSearchDbCall(final ScaffoldSpectrumTask scaffoldTask, final RAWDumpTask rawDumpTask) {
+		final SearchDbTask searchDbTask = addTask(new SearchDbTask(workflowEngine, searchDbDaemon, fileTokenFactory, false, scaffoldTask));
 
-			for (final FileSearch fileSearch : searchDefinition.getInputFiles()) {
-				FastaDbTask fastaDbTask = addFastaDbCall(fileSearch.getSearchParametersWithDefault(searchDefinition.getSearchParameters()).getDatabase());
-				task.addDependency(fastaDbTask);
-			}
-
-			task.addDependency(scaffoldTask);
-			searchDbCalls.put(file, task);
-			searchDbTask = task;
+		for (final FileSearch fileSearch : searchDefinition.getInputFiles()) {
+			FastaDbTask fastaDbTask = addFastaDbCall(fileSearch.getSearchParametersWithDefault(searchDefinition.getSearchParameters()).getDatabase());
+			searchDbTask.addDependency(fastaDbTask);
 		}
+
+		searchDbTask.addDependency(scaffoldTask);
 		// We depend on all raw dump tasks for loading metadata about the files
 		searchDbTask.addRawDumpTask(rawDumpTask);
 		searchDbTask.addDependency(rawDumpTask);
 		return searchDbTask;
 	}
 
-	private static String getEngineSearchHashKey(final SearchEngine engine, final File file, final File parameterFile) {
-		return engine.getCode() + ':' + file.getAbsolutePath() + ':' + paramFileToString(parameterFile);
-	}
-
-	private static File getMgfCleanupHashKey(final File file) {
-		return file.getAbsoluteFile();
-	}
-
 	private static File getSpectrumQaHashKey(final File file) {
 		return file.getAbsoluteFile();
-	}
-
-	private static Tuple<String, File> getRawToMgfConversionHashKey(final File inputFile, final ExtractMsnSettings extractMsnSettings) {
-		return new Tuple<String, File>(extractMsnSettings.getCommandLineSwitches(), inputFile);
-	}
-
-	/**
-	 * The database deployment does not care about the param file, unless it is Sequest.
-	 */
-	private static String getDbDeploymentHashKey(final SearchEngine engine, final Curation curation, final File paramFile) {
-		return engine.getCode() + ':' + curation.getId() + ":" + ("SEQUEST".equalsIgnoreCase(engine.getCode()) ? paramFileToString(paramFile) : "");
-	}
-
-	private static String paramFileToString(final File paramFile) {
-		return paramFile == null ? "<null>" : paramFile.getAbsolutePath();
 	}
 
 	public SwiftSearchDefinition getSearchDefinition() {
@@ -1081,7 +899,7 @@ public final class SearchRunner implements Runnable, Lifecycle {
 	}
 
 	private static final class MyResumer implements Resumer {
-		private SearchRunner runner;
+		private final SearchRunner runner;
 
 		private MyResumer(final SearchRunner runner) {
 			this.runner = runner;

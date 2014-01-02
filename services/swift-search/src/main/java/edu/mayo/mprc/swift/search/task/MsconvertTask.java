@@ -6,6 +6,7 @@ import edu.mayo.mprc.daemon.worker.WorkPacket;
 import edu.mayo.mprc.msconvert.MsconvertResult;
 import edu.mayo.mprc.msconvert.MsconvertWorkPacket;
 import edu.mayo.mprc.swift.db.DatabaseFileTokenFactory;
+import edu.mayo.mprc.utilities.FileUtilities;
 import edu.mayo.mprc.utilities.progress.ProgressInfo;
 import edu.mayo.mprc.workflow.engine.WorkflowEngine;
 import org.apache.log4j.Logger;
@@ -17,6 +18,7 @@ final class MsconvertTask extends AsyncTaskBase implements FileProducingTask {
 
 	private final File inputFile;
 	private final boolean publicAccess;
+	private final String outputExtension;
 	private File outputFile = null;
 
 	/**
@@ -33,6 +35,7 @@ final class MsconvertTask extends AsyncTaskBase implements FileProducingTask {
 		this.inputFile = inputFile;
 		this.outputFile = outputFile;
 		this.publicAccess = publicAccess;
+		outputExtension = FileUtilities.getExtension(outputFile.getName());
 		setName("msconvert");
 
 		updateDescription();
@@ -99,11 +102,11 @@ final class MsconvertTask extends AsyncTaskBase implements FileProducingTask {
 
 	@Override
 	public int hashCode() {
-		return Objects.hashCode(inputFile, publicAccess);
+		return Objects.hashCode(inputFile, outputExtension, publicAccess);
 	}
 
 	@Override
-	public boolean equals(Object obj) {
+	public boolean equals(final Object obj) {
 		if (this == obj) {
 			return true;
 		}
@@ -111,6 +114,8 @@ final class MsconvertTask extends AsyncTaskBase implements FileProducingTask {
 			return false;
 		}
 		final MsconvertTask other = (MsconvertTask) obj;
-		return Objects.equal(this.inputFile, other.inputFile) && Objects.equal(this.publicAccess, other.publicAccess);
+		return Objects.equal(inputFile, other.inputFile)
+				&& Objects.equal(outputExtension, other.outputExtension)
+				&& Objects.equal(publicAccess, other.publicAccess);
 	}
 }

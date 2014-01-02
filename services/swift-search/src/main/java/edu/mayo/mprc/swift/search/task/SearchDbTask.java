@@ -22,31 +22,16 @@ import java.util.Map;
  */
 public final class SearchDbTask extends AsyncTaskBase {
 
-	private final Long reportId;
-	private final ScaffoldTask scaffoldTask;
-	private File scaffoldSpectraFile;
+	private final ScaffoldSpectrumExportProducer scaffoldTask;
 
 	private final Map<String, RAWDumpTask> rawDumpTaskMap = new HashMap<String, RAWDumpTask>(5);
 
 	/**
-	 * Create the task independently on Scaffold invocation.
-	 */
-	public SearchDbTask(final WorkflowEngine engine, final DaemonConnection daemon, final DatabaseFileTokenFactory fileTokenFactory, final boolean fromScratch, final Long reportId, final File scaffoldSpectraFile) {
-		super(engine, daemon, fileTokenFactory, fromScratch);
-		this.reportId = reportId;
-		scaffoldTask = null;
-		setScaffoldSpectraFile(scaffoldSpectraFile);
-		setName("SearchDb");
-		setDescription("Load " + fileTokenFactory.fileToTaggedDatabaseToken(getScaffoldSpectraFile()) + " into database");
-	}
-
-	/**
 	 * Create the task that depends on Scaffold invocation.
 	 */
-	public SearchDbTask(final WorkflowEngine engine, final DaemonConnection daemon, final DatabaseFileTokenFactory fileTokenFactory, final boolean fromScratch, final ScaffoldTask scaffoldTask) {
+	public SearchDbTask(final WorkflowEngine engine, final DaemonConnection daemon, final DatabaseFileTokenFactory fileTokenFactory, final boolean fromScratch, final ScaffoldSpectrumExportProducer scaffoldTask) {
 		super(engine, daemon, fileTokenFactory, fromScratch);
 		this.scaffoldTask = scaffoldTask;
-		reportId = null;
 		setName("SearchDb");
 		setDescription("Load " + fileTokenFactory.fileToTaggedDatabaseToken(getScaffoldSpectraFile()) + " into database");
 	}
@@ -63,7 +48,7 @@ public final class SearchDbTask extends AsyncTaskBase {
 	}
 
 	private File getScaffoldSpectraFile() {
-		return scaffoldSpectraFile == null ? scaffoldTask.getScaffoldSpectraFile() : scaffoldSpectraFile;
+		return scaffoldTask.getScaffoldSpectraFile();
 	}
 
 	private File getScaffoldUnimodFile() {
@@ -71,17 +56,8 @@ public final class SearchDbTask extends AsyncTaskBase {
 	}
 
 
-	/**
-	 * Override the spectra file if the scaffold task is not available.
-	 *
-	 * @param scaffoldSpectraFile Scaffold spectra file to load.
-	 */
-	public void setScaffoldSpectraFile(final File scaffoldSpectraFile) {
-		this.scaffoldSpectraFile = scaffoldSpectraFile;
-	}
-
 	private Long getReportId() {
-		return reportId == null ? scaffoldTask.getReportData().getId() : reportId;
+		return scaffoldTask.getReportData().getId();
 	}
 
 	@Override
@@ -105,7 +81,7 @@ public final class SearchDbTask extends AsyncTaskBase {
 
 	@Override
 	public int hashCode() {
-		return Objects.hashCode(reportId, scaffoldTask);
+		return Objects.hashCode(scaffoldTask);
 	}
 
 	@Override
@@ -117,6 +93,6 @@ public final class SearchDbTask extends AsyncTaskBase {
 			return false;
 		}
 		final SearchDbTask other = (SearchDbTask) obj;
-		return Objects.equal(reportId, other.reportId) && Objects.equal(scaffoldTask, other.scaffoldTask);
+		return Objects.equal(scaffoldTask, other.scaffoldTask);
 	}
 }

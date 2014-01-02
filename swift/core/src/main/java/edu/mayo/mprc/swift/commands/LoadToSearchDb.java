@@ -221,7 +221,7 @@ public final class LoadToSearchDb implements SwiftCommand {
 			workflowEngine.addTask(scaffoldExportTask);
 
 			// Load scaffold export into database
-			final SearchDbTask searchDbTask = new SearchDbTask(workflowEngine, searchDb, fileTokenFactory, false, reportDataId, scaffoldExportTask.getSpectrumExportFile());
+			final SearchDbTask searchDbTask = new SearchDbTask(workflowEngine, searchDb, fileTokenFactory, false, scaffoldExportTask);
 			searchDbTask.addDependency(scaffoldExportTask);
 			searchDbTask.addDependency(fastaDbTask);
 			workflowEngine.addTask(searchDbTask);

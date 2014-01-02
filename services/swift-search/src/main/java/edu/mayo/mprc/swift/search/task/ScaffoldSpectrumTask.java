@@ -22,7 +22,7 @@ import edu.mayo.mprc.workflow.engine.WorkflowEngine;
 import java.io.File;
 import java.util.*;
 
-final class ScaffoldTask extends AsyncTaskBase implements ScaffoldTaskI {
+final class ScaffoldSpectrumTask extends AsyncTaskBase implements ScaffoldTaskI {
 
 	private final String scaffoldVersion;
 	private final String experiment;
@@ -46,10 +46,10 @@ final class ScaffoldTask extends AsyncTaskBase implements ScaffoldTaskI {
 	private final boolean reportDecoyHits;
 	private final Object lock = new Object();
 
-	ScaffoldTask(final WorkflowEngine engine,
-	             final String scaffoldVersion, final String experiment, final SwiftSearchDefinition definition, final DaemonConnection scaffoldDaemon,
-	             final SwiftDao swiftDao, final SearchRun searchRun, final File scaffoldUnimod,
-	             final File outputFolder, final DatabaseFileTokenFactory fileTokenFactory, final boolean reportDecoyHits, final boolean fromScratch) {
+	ScaffoldSpectrumTask(final WorkflowEngine engine,
+	                     final String scaffoldVersion, final String experiment, final SwiftSearchDefinition definition, final DaemonConnection scaffoldDaemon,
+	                     final SwiftDao swiftDao, final SearchRun searchRun, final File scaffoldUnimod,
+	                     final File outputFolder, final DatabaseFileTokenFactory fileTokenFactory, final boolean reportDecoyHits, final boolean fromScratch) {
 		super(engine, scaffoldDaemon, fileTokenFactory, fromScratch);
 		this.scaffoldVersion = scaffoldVersion;
 		this.experiment = experiment;
@@ -179,7 +179,8 @@ final class ScaffoldTask extends AsyncTaskBase implements ScaffoldTaskI {
 		return new File(outputFolder, experiment + ".xml");
 	}
 
-	File getUnimod() {
+	@Override
+	public File getUnimod() {
 		return unimod;
 	}
 
@@ -238,7 +239,7 @@ final class ScaffoldTask extends AsyncTaskBase implements ScaffoldTaskI {
 		if (obj == null || getClass() != obj.getClass()) {
 			return false;
 		}
-		final ScaffoldTask other = (ScaffoldTask) obj;
+		final ScaffoldSpectrumTask other = (ScaffoldSpectrumTask) obj;
 		return Objects.equal(this.scaffoldVersion, other.scaffoldVersion) && Objects.equal(this.experiment, other.experiment) && Objects.equal(this.outputFolder, other.outputFolder);
 	}
 }
