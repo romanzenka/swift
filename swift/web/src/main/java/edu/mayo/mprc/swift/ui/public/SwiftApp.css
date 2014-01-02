@@ -131,6 +131,10 @@ body {
     background-image: url(images/mgf.png);
 }
 
+.file-mzml {
+    background-image: url(images/mzml.png);
+}
+
 .file-d {
     background-image: url(images/d.png);
 }
@@ -427,7 +431,7 @@ span.itemlabel {
     display: none;
 }
 
-/* Tab panel -------------------------------------------------------------------------------------------------------- */
+    /* Tab panel -------------------------------------------------------------------------------------------------------- */
 
 .gwt-TabPanel {
     margin-top: 4px;
@@ -510,7 +514,7 @@ span.itemlabel {
     cursor: auto;
 }
 
-/* //////////////////////////////////////// */
+    /* //////////////////////////////////////// */
 .dottedBorder {
     border: 1px dashed gray;
 }
@@ -585,31 +589,31 @@ span.itemlabel {
     visibility: hidden;
 }
 
-/*
-.params-border-bottom {
-	border-bottom: 1px black solid;
-}
+    /*
+    .params-border-bottom {
+        border-bottom: 1px black solid;
+    }
 
-.params-border-top-left {
-	border-top: 1px black solid;
-	border-left: 1px black solid;
-}
-.params-border-top-right {
-	border-top: 1px black solid;
-	border-right: 1px black solid;
-}
+    .params-border-top-left {
+        border-top: 1px black solid;
+        border-left: 1px black solid;
+    }
+    .params-border-top-right {
+        border-top: 1px black solid;
+        border-right: 1px black solid;
+    }
 
-.params-border-verytop {
-	height:8px;
-}
+    .params-border-verytop {
+        height:8px;
+    }
 
-.params-row-right {
-	border-right: 1px black solid;
-}
-.params-row-left {
-	border-left: 1px black solid;
-}
-*/
+    .params-row-right {
+        border-right: 1px black solid;
+    }
+    .params-row-left {
+        border-left: 1px black solid;
+    }
+    */
 .params-label {
     font-style: italic;
 }

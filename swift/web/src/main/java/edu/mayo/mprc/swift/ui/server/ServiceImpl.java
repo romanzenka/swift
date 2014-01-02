@@ -57,7 +57,7 @@ public final class ServiceImpl extends SpringGwtServlet implements Service, Appl
 	private static final Logger LOGGER = Logger.getLogger(ServiceImpl.class);
 
 	// String of allowed extensions, separated by | signs. The extensions are case insensitive.
-	private static final String ALLOWED_EXTENSIONS = ".RAW|.raw|.mgf";
+	private static final String ALLOWED_EXTENSIONS = ".RAW|.raw|.mgf|.mzML";
 	public static final InputFileFilter FILTER = new InputFileFilter(ALLOWED_EXTENSIONS, ".d", true);
 	private static final InputFileFilter FILTER_DIRS = new InputFileFilter(ALLOWED_EXTENSIONS, "", true);
 
