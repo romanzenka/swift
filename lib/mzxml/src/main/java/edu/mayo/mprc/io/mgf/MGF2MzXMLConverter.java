@@ -6,6 +6,7 @@ package edu.mayo.mprc.io.mgf;
 
 import edu.mayo.mprc.MprcException;
 import edu.mayo.mprc.io.mzxml.MzXMLPeakListWriter;
+import edu.mayo.mprc.peaklist.PeakListReader;
 import edu.mayo.mprc.utilities.FileUtilities;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
@@ -61,7 +62,7 @@ public final class MGF2MzXMLConverter {
 		 * Reader and writer objects.
 		 */
 		MzXMLPeakListWriter mzXMLWriter = null;
-		MGFPeakListReader mgfReader = null;
+		PeakListReader mgfReader = null;
 		final Map<Integer, String> mzXMLScanToMGFTitle = new HashMap<Integer, String>(1000);
 
 		try {

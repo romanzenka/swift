@@ -4,6 +4,7 @@ import edu.mayo.mprc.MprcException;
 import edu.mayo.mprc.io.mgf.MGFPeakListReader;
 import edu.mayo.mprc.msmseval.MSMSEvalOutputReader;
 import edu.mayo.mprc.myrimatch.MyriMatchPepXmlReader;
+import edu.mayo.mprc.peaklist.PeakListReader;
 import edu.mayo.mprc.scaffoldparser.spectra.ScaffoldQaSpectraReader;
 import edu.mayo.mprc.utilities.FileUtilities;
 import org.apache.log4j.Logger;
@@ -246,7 +247,7 @@ public final class SpectrumInfoJoiner {
 	 */
 	public static void getMgfInformation(final File mgfFile, final Map<String, MgfSpectrum> mgfSpectrumMap, final boolean spectrumNameAsKey) {
 		MgfSpectrum mgfSpectrum = null;
-		MGFPeakListReader peakListReader = null;
+		PeakListReader peakListReader = null;
 		MascotGenericFormatPeakList peakList = null;
 		long spectrumNumber = 0;
 

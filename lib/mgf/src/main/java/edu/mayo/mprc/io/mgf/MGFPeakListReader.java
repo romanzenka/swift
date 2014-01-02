@@ -6,12 +6,12 @@ package edu.mayo.mprc.io.mgf;
 
 import edu.mayo.mprc.MprcException;
 import edu.mayo.mprc.peaklist.PeakList;
+import edu.mayo.mprc.peaklist.PeakListReader;
 import edu.mayo.mprc.utilities.FileUtilities;
 import org.proteomecommons.io.GenericPeak;
 import org.proteomecommons.io.Peak;
 
 import java.io.BufferedReader;
-import java.io.Closeable;
 import java.io.File;
 import java.io.IOException;
 import java.util.LinkedList;
@@ -22,7 +22,7 @@ import java.util.regex.Pattern;
  * Utility class for reading mgf files. The implementation of this class does not check for file extention to be of the type
  * mgf. Also, this class uses a buffered reader to handle the source file.
  */
-public final class MGFPeakListReader implements Closeable {
+public final class MGFPeakListReader implements PeakListReader {
 
 	private final BufferedReader bufferedReader;
 	private final File inputFile;
@@ -59,6 +59,7 @@ public final class MGFPeakListReader implements Closeable {
 	 * @return MascotGenericFormatPeakList object representing the next peak list in the mgf file.
 	 * @throws IOException
 	 */
+	@Override
 	public PeakList nextPeakList() {
 		boolean foundPeaks = false;
 		String line = null;
@@ -185,6 +186,7 @@ public final class MGFPeakListReader implements Closeable {
 		}
 	}
 
+	@Override
 	public boolean isReadPeaks() {
 		return readPeaks;
 	}
@@ -195,6 +197,7 @@ public final class MGFPeakListReader implements Closeable {
 	 *
 	 * @param readPeaks Set to false to skip parsing the peaks themselves.
 	 */
+	@Override
 	public void setReadPeaks(final boolean readPeaks) {
 		this.readPeaks = readPeaks;
 	}
