@@ -28,14 +28,14 @@ public final class MGF2MzXMLConverter {
 	 *
 	 * @param mgfInputFileName     Mgf input file name.
 	 * @param mzXMLOutputFileName  MzXML output file name.
-	 * @param enable64BitPresicion Defines the level of presicion of the peak lists in the mzXML file.
+	 * @param enable64BitPrecision Defines the level of presicion of the peak lists in the mzXML file.
 	 *                             True is 64 bit presicion and false is a 32 bit presicion level.
 	 * @return Returns a map where the keys are the scan ids in mzXML file and the values are the
 	 *         corresponding spectra titles in the mgf file.
 	 */
-	public static Map<Integer, String> convert(final String mgfInputFileName, final String mzXMLOutputFileName, final boolean enable64BitPresicion) {
+	public static Map<Integer, String> convert(final String mgfInputFileName, final String mzXMLOutputFileName, final boolean enable64BitPrecision) {
 
-		return convert(new File(mgfInputFileName), new File(mzXMLOutputFileName), enable64BitPresicion);
+		return convert(new File(mgfInputFileName), new File(mzXMLOutputFileName), enable64BitPrecision);
 	}
 
 	/**
@@ -44,12 +44,12 @@ public final class MGF2MzXMLConverter {
 	 *
 	 * @param mgfInputFile         Mgf input file name.
 	 * @param mzXMLOutputFile      MzXML output file name.
-	 * @param enable64BitPresicion Defines the level of presicion of the peak lists in the mzXML file.
+	 * @param enable64BitPrecision Defines the level of presicion of the peak lists in the mzXML file.
 	 *                             True is 64 bit presicion and false is a 32 bit presicion level.
 	 * @return Returns a map where the keys are the scan ids in mzXML file and the values are the
 	 *         corresponding spectra titles in the mgf file.
 	 */
-	public static Map<Integer, String> convert(final File mgfInputFile, final File mzXMLOutputFile, final boolean enable64BitPresicion) {
+	public static Map<Integer, String> convert(final File mgfInputFile, final File mzXMLOutputFile, final boolean enable64BitPrecision) {
 
 		if (mgfInputFile == null) {
 			throw new IllegalArgumentException("mgfInputFilename parameter can not be null.");
@@ -66,7 +66,7 @@ public final class MGF2MzXMLConverter {
 
 		try {
 			mgfReader = new MGFPeakListReader(mgfInputFile);
-			mzXMLWriter = new MzXMLPeakListWriter(mzXMLOutputFile, enable64BitPresicion);
+			mzXMLWriter = new MzXMLPeakListWriter(mzXMLOutputFile, enable64BitPrecision);
 
 			MascotGenericFormatPeakList peakList = null;
 
