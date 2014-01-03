@@ -22,7 +22,7 @@ import java.util.regex.Pattern;
  * Utility class for reading mgf files. The implementation of this class does not check for file extention to be of the type
  * mgf. Also, this class uses a buffered reader to handle the source file.
  */
-public final class MGFPeakListReader implements PeakListReader {
+public final class MgfPeakListReader implements PeakListReader {
 
 	private final BufferedReader bufferedReader;
 	private final File inputFile;
@@ -31,18 +31,9 @@ public final class MGFPeakListReader implements PeakListReader {
 	/**
 	 * Constructor
 	 *
-	 * @param inputFileName mgf file name.
-	 */
-	public MGFPeakListReader(final String inputFileName) {
-		this(new File(inputFileName));
-	}
-
-	/**
-	 * Constructor
-	 *
 	 * @param inputFile mgf file name.
 	 */
-	public MGFPeakListReader(final File inputFile) {
+	public MgfPeakListReader(final File inputFile) {
 		this.inputFile = inputFile;
 		readPeaks = true;
 		bufferedReader = FileUtilities.getReader(inputFile);

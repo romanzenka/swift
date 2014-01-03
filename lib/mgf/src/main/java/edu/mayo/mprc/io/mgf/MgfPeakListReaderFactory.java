@@ -18,6 +18,6 @@ public final class MgfPeakListReaderFactory implements PeakListReaderFactory {
 
 	@Override
 	public PeakListReader createReader(final File file) {
-		return new MGFPeakListReader(file);
+		return new MgfPeakListReader(file);
 	}
 }
