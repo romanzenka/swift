@@ -9,7 +9,7 @@ import edu.mayo.mprc.mascot.MascotWorkPacket;
 import edu.mayo.mprc.myrimatch.MyriMatchWorkPacket;
 import edu.mayo.mprc.omssa.OmssaWorkPacket;
 import edu.mayo.mprc.searchengine.SearchEngineResult;
-import edu.mayo.mprc.sequest.SequestMGFWorkPacket;
+import edu.mayo.mprc.sequest.SequestWorkPacket;
 import edu.mayo.mprc.swift.db.DatabaseFileTokenFactory;
 import edu.mayo.mprc.swift.db.SearchEngine;
 import edu.mayo.mprc.utilities.progress.ProgressInfo;
@@ -86,7 +86,7 @@ final class EngineSearchTask extends AsyncTaskBase implements FileProducingTask 
 					isFromScratch(),
 					publicSearchFiles);
 		} else if ("SEQUEST".equalsIgnoreCase(engine.getCode())) {
-			workPacket = new SequestMGFWorkPacket(
+			workPacket = new SequestWorkPacket(
 					outputFile,
 					paramsFile,
 					inputFile.getResultingFile(),

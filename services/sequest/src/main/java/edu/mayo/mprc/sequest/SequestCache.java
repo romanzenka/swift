@@ -8,7 +8,7 @@ import edu.mayo.mprc.config.ui.UiBuilder;
 import edu.mayo.mprc.daemon.WorkCache;
 import org.springframework.stereotype.Component;
 
-public final class SequestCache extends WorkCache<SequestMGFWorkPacket> {
+public final class SequestCache extends WorkCache<SequestWorkPacket> {
 
 	public static final String TYPE = "sequestCache";
 	public static final String NAME = "Sequest Cache";
