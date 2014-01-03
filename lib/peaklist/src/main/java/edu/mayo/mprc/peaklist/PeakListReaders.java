@@ -19,6 +19,13 @@ import java.util.Map;
 public final class PeakListReaders {
 	private final Map<String/*extension*/, PeakListReaderFactory> factories = new HashMap<String, PeakListReaderFactory>(2);
 
+	public PeakListReaders() {
+	}
+
+	public PeakListReaders(final Collection<PeakListReaderFactory> factories) {
+		setReaderFactories(factories);
+	}
+
 	public PeakListReader createReader(final File file) {
 		final String extension = FileUtilities.getExtension(file.getName());
 		final PeakListReaderFactory factory = factories.get(extension);
