@@ -12,12 +12,13 @@ import edu.mayo.mprc.daemon.worker.WorkPacket;
 import edu.mayo.mprc.daemon.worker.Worker;
 import edu.mayo.mprc.daemon.worker.WorkerBase;
 import edu.mayo.mprc.daemon.worker.WorkerFactoryBase;
-import edu.mayo.mprc.io.mgf.MGF2MzXMLConverter;
+import edu.mayo.mprc.io.mgf.MzXmlConverter;
 import edu.mayo.mprc.utilities.FileUtilities;
 import edu.mayo.mprc.utilities.progress.UserProgressReporter;
 import org.apache.log4j.Logger;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.Resource;
 import java.io.File;
 import java.util.Arrays;
 import java.util.Map;
@@ -36,6 +37,8 @@ public final class MSMSEvalWorker extends WorkerBase {
 
 	//Flag is set to true is the execution of this worker is skipped.
 	private boolean skippedExecution;
+
+	private MzXmlConverter converter;
 
 	public MSMSEvalWorker() {
 		super();
@@ -88,7 +91,7 @@ public final class MSMSEvalWorker extends WorkerBase {
 		try {
 			LOGGER.info("Converting mgf to mzxml.");
 
-			final Map<Integer, String> mzXMLScanToMGFTitle = MGF2MzXMLConverter.convert(sourceMGFFile, outputMzXMLFile, true);
+			final Map<Integer, String> mzXMLScanToMGFTitle = getConverter().convert(sourceMGFFile, outputMzXMLFile, true);
 
 			LOGGER.info("Convertion mgf to mzxml completed.");
 			LOGGER.info("Created mzxml file: " + outputMzXMLFile.getAbsolutePath());
@@ -134,6 +137,14 @@ public final class MSMSEvalWorker extends WorkerBase {
 		this.msmsEvalExecutable = msmsEvalExecutable;
 	}
 
+	public MzXmlConverter getConverter() {
+		return converter;
+	}
+
+	public void setConverter(MzXmlConverter converter) {
+		this.converter = converter;
+	}
+
 	private void checkFile(final File file, final boolean directory, final String fileDescription) {
 		if (file.exists()) {
 			if (!file.isDirectory() && directory) {
@@ -171,11 +182,23 @@ public final class MSMSEvalWorker extends WorkerBase {
 	 */
 	@Component("msmsEvalWorkerFactory")
 	public static final class Factory extends WorkerFactoryBase<Config> {
+		private MzXmlConverter converter;
+
 		@Override
 		public Worker create(final Config config, final DependencyResolver dependencies) {
 			final MSMSEvalWorker worker = new MSMSEvalWorker();
 			worker.setMsmsEvalExecutable(FileUtilities.getAbsoluteFileForExecutables(new File(config.get(MSMS_EVAL_EXECUTABLE))));
+			worker.setConverter(getConverter());
 			return worker;
+		}
+
+		public MzXmlConverter getConverter() {
+			return converter;
+		}
+
+		@Resource(name = "mzXmlConverter")
+		public void setConverter(final MzXmlConverter converter) {
+			this.converter = converter;
 		}
 	}
 

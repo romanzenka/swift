@@ -1,7 +1,10 @@
 package edu.mayo.mprc.msmseval;
 
 import edu.mayo.mprc.MprcException;
-import edu.mayo.mprc.io.mgf.MGF2MzXMLConverter;
+import edu.mayo.mprc.io.mgf.MgfPeakListReaderFactory;
+import edu.mayo.mprc.io.mgf.MzXmlConverter;
+import edu.mayo.mprc.peaklist.PeakListReaderFactory;
+import edu.mayo.mprc.peaklist.PeakListReaders;
 import edu.mayo.mprc.utilities.FileUtilities;
 import edu.mayo.mprc.utilities.TestingUtilities;
 import org.apache.log4j.Logger;
@@ -10,6 +13,8 @@ import org.testng.annotations.Test;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.Map;
 
 @Test(sequential = true)
@@ -48,7 +53,7 @@ public final class MSMSEvalTest {
 		LOGGER.debug("Temporary folder: " + tempDirectory.getAbsolutePath());
 
 		try {
-			mgfFile = TestingUtilities.getTempFileFromResource(INPUT_MGF, false, tempDirectory);
+			mgfFile = TestingUtilities.getTempFileFromResource(INPUT_MGF, false, tempDirectory, ".mgf");
 			paramFile = TestingUtilities.getTempFileFromResource(INPUT_PARAMS, false, tempDirectory);
 
 			//MSMSEval output file differs a bite between the Windows OS and others.
@@ -74,8 +79,15 @@ public final class MSMSEvalTest {
 	public void mgf2MzXMLConversionlTest() {
 		setup();
 		mzxmlFile = new File(mgfFile.getAbsolutePath() + ".mzxml");
-		scanToTitleMapping = MGF2MzXMLConverter.convert(mgfFile, mzxmlFile, true);
+		final MzXmlConverter converter = getMgfSupportingMzXmlConverter();
+		scanToTitleMapping = converter.convert(mgfFile, mzxmlFile, true);
 		Assert.assertEquals(31, scanToTitleMapping.size(), "Conversion from mgf to mzxml failed.");
+	}
+
+	private static MzXmlConverter getMgfSupportingMzXmlConverter() {
+		final Collection<PeakListReaderFactory> factories = Arrays.asList((PeakListReaderFactory) new MgfPeakListReaderFactory());
+		final PeakListReaders readers = new PeakListReaders(factories);
+		return new MzXmlConverter(readers);
 	}
 
 	@Test(dependsOnMethods = {"mgf2MzXMLConversionlTest"}, enabled = true)
