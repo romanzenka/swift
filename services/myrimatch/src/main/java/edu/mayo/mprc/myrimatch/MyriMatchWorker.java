@@ -132,14 +132,20 @@ public final class MyriMatchWorker extends WorkerBase {
 
 		final File createdResultFile = new File(packet.getWorkFolder(), FileUtilities.stripExtension(packet.getInputFile().getName()) + MZ_IDENT_ML);
 
-		final List<String> titles = MgfTitles.getTitles(inputFile);
-		MzIdentMl.replace(createdResultFile, titles, resultFile);
-
-		if (!resultFile.equals(finalFile)) {
-			FileUtilities.rename(resultFile, finalFile);
+		// We need to cleanup after mgf-based run
+		if ("mgf".equals(FileUtilities.getExtension(inputFile.getName()))) {
+			final List<String> titles = MgfTitles.getTitles(inputFile);
+			MzIdentMl.replace(createdResultFile, titles, resultFile);
+			if (!resultFile.equals(finalFile)) {
+				FileUtilities.rename(resultFile, finalFile);
+			}
+		} else {
+			if (!createdResultFile.equals(finalFile)) {
+				FileUtilities.rename(createdResultFile, finalFile);
+			}
 		}
 
-		if (!createdResultFile.equals(finalFile)) {
+		if (createdResultFile.exists() && !createdResultFile.equals(finalFile)) {
 			FileUtilities.deleteNow(createdResultFile);
 		}
 
