@@ -3,7 +3,7 @@ package edu.mayo.mprc.swift.search.task;
 import edu.mayo.mprc.daemon.DaemonConnection;
 import edu.mayo.mprc.daemon.worker.WorkPacket;
 import edu.mayo.mprc.qa.ExperimentQa;
-import edu.mayo.mprc.qa.MgfQaFiles;
+import edu.mayo.mprc.qa.QaFiles;
 import edu.mayo.mprc.qa.QaWorkPacket;
 import edu.mayo.mprc.swift.db.DatabaseFileTokenFactory;
 import edu.mayo.mprc.utilities.FileUtilities;
@@ -69,10 +69,6 @@ public final class QaTask extends AsyncTaskBase {
 		currentExperiment.addMgfToMsmsEvalEntry(mgfFile, spectrumQaTask);
 	}
 
-	public void addMgfToAdditionalSearchEngineEntry(final FileProducingTask mgfFile, final EngineSearchTask engineSearchTask) {
-		currentExperiment.addAdditionalSearchEntry(mgfFile, engineSearchTask);
-	}
-
 	public File getQaReportFolder() {
 		return qaReportFolder;
 	}
@@ -85,12 +81,12 @@ public final class QaTask extends AsyncTaskBase {
 
 		final List<ExperimentQa> experimentQaList = new ArrayList<ExperimentQa>(experimentList.size());
 		for (final QaTaskExperiment experiment : experimentList) {
-			final List<MgfQaFiles> mgfInputFilePairs = new ArrayList<MgfQaFiles>();
+			final List<QaFiles> inputFilePairs = new ArrayList<QaFiles>();
 
 			for (final Map.Entry<FileProducingTask, QaTaskInputFiles> me : experiment.getMgfToQaMap().entrySet()) {
 				final QaTaskInputFiles value = me.getValue();
-				final MgfQaFiles files = new MgfQaFiles();
-				files.setMgfFile(me.getKey().getResultingFile());
+				final QaFiles files = new QaFiles();
+				files.setInputFile(me.getKey().getResultingFile());
 				files.setRawInputFile(value.getRawInputFile());
 				if (value.getSpectrumQa() != null) {
 					files.setMsmsEvalOutputFile(value.getSpectrumQa().getMsmsEvalOutputFile());
@@ -104,9 +100,9 @@ public final class QaTask extends AsyncTaskBase {
 				for (final EngineSearchTask engineSearchTask : value.getAdditionalSearches()) {
 					files.addAdditionalSearchResult(engineSearchTask.getSearchEngine().getCode(), engineSearchTask.getOutputFile());
 				}
-				mgfInputFilePairs.add(files);
+				inputFilePairs.add(files);
 			}
-			final ExperimentQa experimentQa = new ExperimentQa(experiment.getName(), experiment.getSpectraFile(), mgfInputFilePairs, experiment.getScaffoldVersion());
+			final ExperimentQa experimentQa = new ExperimentQa(experiment.getName(), experiment.getSpectraFile(), inputFilePairs, experiment.getScaffoldVersion());
 			experimentQaList.add(experimentQa);
 		}
 

@@ -6,13 +6,13 @@ import java.io.File;
 import java.util.HashMap;
 
 /**
- * Links an .mgf file to all the related metadata.
+ * Links an input file to all the related metadata.
  */
-public final class MgfQaFiles extends FileHolder {
+public final class QaFiles extends FileHolder {
 	private static final long serialVersionUID = 20101221L;
 
-	// Mgf file
-	private File mgfFile;
+	// Mgf/mzML file
+	private File inputFile;
 
 	// The original .RAW file
 	private File rawInputFile;
@@ -34,15 +34,15 @@ public final class MgfQaFiles extends FileHolder {
 	 */
 	private HashMap<String, File> additionalSearchResults = new HashMap<String, File>(1);
 
-	public MgfQaFiles() {
+	public QaFiles() {
 	}
 
-	public File getMgfFile() {
-		return mgfFile;
+	public File getInputFile() {
+		return inputFile;
 	}
 
-	public void setMgfFile(final File mgfFile) {
-		this.mgfFile = mgfFile;
+	public void setInputFile(final File inputFile) {
+		this.inputFile = inputFile;
 	}
 
 	public File getRawInputFile() {
