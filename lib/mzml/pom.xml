@@ -13,13 +13,62 @@
         <relativePath>../pom.xml</relativePath>
     </parent>
 
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <version>2.8</version>
+                <executions>
+                    <execution>
+                        <id>unpack</id>
+                        <phase>generate-test-resources</phase>
+                        <goals>
+                            <goal>unpack</goal>
+                        </goals>
+                        <configuration>
+                            <artifactItems>
+                                <artifactItem>
+                                    <groupId>edu.mayo.mprc.mzml</groupId>
+                                    <artifactId>mzml-data</artifactId>
+                                    <version>1.0</version>
+                                    <type>zip</type>
+                                </artifactItem>
+                            </artifactItems>
+                            <!-- Will create target/mzml folder from the .zip -->
+                            <outputDirectory>${project.build.testOutputDirectory}</outputDirectory>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+
     <dependencies>
+        <dependency>
+            <groupId>edu.mayo.mprc</groupId>
+            <artifactId>peaklist</artifactId>
+            <version>3.5-SNAPSHOT</version>
+        </dependency>
+
         <dependency>
             <groupId>uk.ac.ebi.jmzml</groupId>
             <artifactId>jmzml</artifactId>
             <version>1.7.1</version>
         </dependency>
+
+        <dependency>
+            <groupId>org.testng</groupId>
+            <artifactId>testng</artifactId>
+            <classifier>jdk15</classifier>
+        </dependency>
+
+        <dependency>
+            <groupId>edu.mayo.mprc.mzml</groupId>
+            <artifactId>mzml-data</artifactId>
+            <version>1.0</version>
+            <type>zip</type>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
-
-
 </project>
