@@ -75,6 +75,7 @@ public final class MzXmlConverter {
 
 		try {
 			inputReader = readers.createReader(inputFile);
+			inputReader.setReadPeaks(true);
 			mzXMLWriter = new MzXMLPeakListWriter(mzXMLOutputFile, enable64BitPrecision);
 
 			PeakList peakList = null;
