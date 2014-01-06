@@ -99,7 +99,7 @@ public final class MzMlPeakListReader implements PeakListReader {
 						for (final CVParam param : precursorIon.getCvParam()) {
 							if (POSSIBLE_CHARGE_STATE.equals(param.getAccession())) {
 								final String charge = param.getValue();
-								queuePeakList(getSpectrumTitle(spectrumTitle, multiplePrecursors, precursorId, true, charge), precursorMz, charge, peaks);
+								queuePeakList(getSpectrumTitle(spectrumTitle, multiplePrecursors, precursorId, true, charge), precursorMz, charge, peaks, msLevel);
 								noChargeStates = false;
 							}
 						}
@@ -107,7 +107,7 @@ public final class MzMlPeakListReader implements PeakListReader {
 							throw new MprcException(spectrumException(" precursor charge state not specified"));
 						}
 					} else {
-						queuePeakList(getSpectrumTitle(spectrumTitle, multiplePrecursors, precursorId, false, chargeState), precursorMz, chargeState, peaks);
+						queuePeakList(getSpectrumTitle(spectrumTitle, multiplePrecursors, precursorId, false, chargeState), precursorMz, chargeState, peaks, msLevel);
 					}
 					precursorId++;
 				}
@@ -120,9 +120,10 @@ public final class MzMlPeakListReader implements PeakListReader {
 		return spectrumTitle + (multiplePrecursors ? " precursor=" + precursorId : "") + (multipleCharges ? " charge=" + charge : "");
 	}
 
-	private void queuePeakList(final String title, final String precursorMz, final String chargeState, final Peak[] peaks) {
+	private void queuePeakList(final String title, final String precursorMz, final String chargeState, final Peak[] peaks, final int msLevel) {
 		final PeakList peakList = new PeakList();
 		peakList.setTitle(title);
+		peakList.setTandemCount(msLevel);
 		peakList.setPepmass("PEPMASS=" + precursorMz);
 		peakList.setCharge("CHARGE=" + chargeState + "+");
 		if (peaks != null) {
