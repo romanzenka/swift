@@ -14,7 +14,7 @@ import org.springframework.stereotype.Component;
 public final class MsconvertCache extends WorkCache<MsconvertWorkPacket> {
 	public static final String TYPE = "msconvertCache";
 	public static final String NAME = "Msconvert Cache";
-	public static final String DESC = "<p>Caches .mgf files previously converted from .RAW using msconvert. This can speed up operation if one file is being processed multiple times.</p>";
+	public static final String DESC = "<p>Caches .mgf/.mzML files previously converted from .RAW using msconvert. This can speed up operation if one file is being processed multiple times.</p>";
 
 	public MsconvertCache() {
 	}

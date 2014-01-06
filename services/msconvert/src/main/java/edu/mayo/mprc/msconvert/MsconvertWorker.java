@@ -99,7 +99,7 @@ public final class MsconvertWorker extends WorkerBase {
 	 * Return the command line to execute msconvert.
 	 *
 	 * @param rawFile    Raw file to convert.
-	 * @param outputFile The resulting mgf file.
+	 * @param outputFile The resulting converted file.
 	 * @param ms2Profile True if the MS2 data are in profile mode.
 	 * @return Command to execute
 	 */

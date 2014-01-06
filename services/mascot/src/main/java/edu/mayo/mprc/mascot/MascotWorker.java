@@ -78,7 +78,7 @@ public final class MascotWorker extends WorkerBase {
 	@Override
 	public void process(final WorkPacket workPacket, final UserProgressReporter progressReporter) {
 		final MascotWorkPacket mascotWorkPacket = (MascotWorkPacket) workPacket;
-		assert mascotWorkPacket.getInputFile() != null : "Mascot search failed: mgf file not specified";
+		assert mascotWorkPacket.getInputFile() != null : "Mascot search failed: input file not specified";
 		assert mascotWorkPacket.getSearchParamsFile() != null : "Mascot search failed: param file not specified";
 		assert mascotWorkPacket.getOutputFile() != null : "Mascot search failed: output file not specified";
 		assert mascotWorkPacket.getShortDbName() != null : "Mascot search failed: short db name not specified";
@@ -312,7 +312,7 @@ public final class MascotWorker extends WorkerBase {
 			mgfChannel = new FileInputStream(data).getChannel();
 			dataLength = mgfChannel.size();
 		} catch (Exception e) {
-			throw new MprcException("Could not open .mgf file for Mascot search " + data, e);
+			throw new MprcException("Could not open input file for Mascot search " + data, e);
 		}
 		final long length = dataLength + buffer.limit() + buffer2.limit() + buffer3.limit();
 
