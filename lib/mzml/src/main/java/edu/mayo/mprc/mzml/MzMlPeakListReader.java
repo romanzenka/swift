@@ -124,7 +124,9 @@ public final class MzMlPeakListReader implements PeakListReader {
 		peakList.setTitle(title);
 		peakList.setPepmass("PEPMASS=" + precursorMz);
 		peakList.setCharge("CHARGE=" + chargeState + "+");
-		peakList.setPeaks(peaks);
+		if (peaks != null) {
+			peakList.setPeaks(peaks);
+		}
 		parsedPeakLists.add(peakList);
 	}
 
