@@ -132,6 +132,9 @@ public final class MsconvertWorker extends WorkerBase {
 		command.add("--filter"); // Charge state predictor
 		command.add("chargeStatePredictor false 4 2 0.9");
 
+		command.add("--filter"); // Only extract MS2 spectra and above
+		command.add("msLevel 2-");
+
 		if (ms2Profile) {
 			command.add("--filter");
 			command.add("peakPicking true 2-"); // Do peak picking on MS2 and higher
