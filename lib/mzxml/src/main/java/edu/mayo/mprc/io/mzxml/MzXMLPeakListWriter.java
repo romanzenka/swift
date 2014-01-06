@@ -225,6 +225,9 @@ public final class MzXMLPeakListWriter implements PeakListWriter {
 	public void close() {
 		if (xmlWriter != null) {
 			try {
+				// Close msRun
+				xmlWriter.writeEndElement();
+				// Close mzXML
 				xmlWriter.writeEndElement();
 				xmlWriter.close();
 				xmlWriter = null;

@@ -74,6 +74,6 @@ public final class TestMzXmlConverter {
 				"<precursorMz precursorIntensity=\"0.0\" precursorCharge=\"2\">234.567</precursorMz>\n" +
 				"<peaks precision=\"64\" byteOrder=\"network\" pairOrder=\"m/z-int\">QFuAAAAAAABAW8AAAAAAAEBrhmZmZmZmQGqJmZmZmZpAdKTMzMzMzUHnRYVio/NN\n" +
 				"</peaks>\n" +
-				"</scan></msRun>", "The output mzXML is different");
+				"</scan></msRun></mzXML>", "The output mzXML is different");
 	}
 }
