@@ -117,6 +117,7 @@ public final class MsconvertWorker extends WorkerBase {
 			command.add("--zlib");
 		} else if ("mzml".equals(extension)) {
 			command.add("--mzML");
+			command.add("--zlib");
 		} else if ("mz5".equals(extension)) {
 			command.add("--mz5");
 		} else {
@@ -142,9 +143,11 @@ public final class MsconvertWorker extends WorkerBase {
 		}
 
 		// Make proper .mgf titles that Swift needs
-		final String filename = FileUtilities.getFileNameWithoutExtension(rawFile);
-		command.add("--filter");
-		command.add("titleMaker " + filename + " scan <ScanNumber> <ScanNumber> (" + filename + ".<ScanNumber>.<ScanNumber>.<ChargeState>.dta)");
+		if ("mgf".equals(extension)) {
+			final String filename = FileUtilities.getFileNameWithoutExtension(rawFile);
+			command.add("--filter");
+			command.add("titleMaker " + filename + " scan <ScanNumber> <ScanNumber> (" + filename + ".<ScanNumber>.<ScanNumber>.<ChargeState>.dta)");
+		}
 
 		command.add("--outfile");
 		command.add(outputFile.getName());
