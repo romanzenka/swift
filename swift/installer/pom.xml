@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>edu.mayo.mprc</groupId>
     <artifactId>swift-installer</artifactId>
@@ -61,6 +61,13 @@
             <version>3.5-SNAPSHOT</version>
         </dependency>
 
+        <!-- mzml is a pure plugin, specifically ask for it otherwise it does not get included -->
+        <dependency>
+            <groupId>edu.mayo.mprc</groupId>
+            <artifactId>mzml</artifactId>
+            <version>3.5-SNAPSHOT</version>
+        </dependency>
+
         <dependency>
             <groupId>edu.mayo.mprc</groupId>
             <artifactId>swift-scripts</artifactId>
@@ -104,17 +111,17 @@
                                 <generatorConfiguration>
                                     <generator>jsw</generator>
                                     <includes>
-                                          <include>linux-x86-32</include>
-                                          <include>linux-x86-64</include>
-                                          <include>windows-x86-32</include>
-                                          <include>windows-x86-64</include>
-                                        </includes>
+                                        <include>linux-x86-32</include>
+                                        <include>linux-x86-64</include>
+                                        <include>windows-x86-32</include>
+                                        <include>windows-x86-64</include>
+                                    </includes>
                                     <configuration>
                                         <!-- TODO: This does not work with the 3.2.3 version of the wrapper -->
                                         <property>
-                                           <name>wrapper.logfile</name>
-                                           <value>var/log/wrapper-%WRAPPER_HOSTNAME%.log</value>
-                                         </property>
+                                            <name>wrapper.logfile</name>
+                                            <value>var/log/wrapper-%WRAPPER_HOSTNAME%.log</value>
+                                        </property>
                                         <!-- Nice title -->
                                         <property>
                                             <name>wrapper.console.title</name>
