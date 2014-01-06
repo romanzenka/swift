@@ -50,6 +50,13 @@ public final class SpectrumInfoJoinerTest {
 		}
 	}
 
+	@Test
+	public void shouldParseTitles() {
+		Assert.assertEquals(SpectrumInfoJoiner.getSpectrum("test1 scan 10 10 (test1.10.10.3.dta)"), "test1.10.10.3.dta");
+		Assert.assertEquals(SpectrumInfoJoiner.getScanId("test1 scan 10 10 (test1.10.10.3.dta)"), 10L);
+		Assert.assertEquals(SpectrumInfoJoiner.getScanIdFromScaffoldSpectrum("test1 scan 10 10 (test1.10.10.3.dta)"), 10L);
+	}
+
 	private SpectrumInfoJoiner spectrumInfoJoiner() {
 		final PeakListReaders readers = new PeakListReaders(Arrays.asList((PeakListReaderFactory) new MgfPeakListReaderFactory()));
 		return new SpectrumInfoJoiner(readers);
