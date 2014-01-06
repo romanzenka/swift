@@ -11,6 +11,9 @@ import java.io.File;
  */
 @Component("mzMlPeakListReaderFactory")
 public final class MzMlPeakListReaderFactory implements PeakListReaderFactory {
+	public MzMlPeakListReaderFactory() {
+	}
+
 	@Override
 	public String getExtension() {
 		return "mzML";

@@ -11,6 +11,9 @@ import java.io.File;
  */
 @Component("mgfPeakListReaderFactory")
 public final class MgfPeakListReaderFactory implements PeakListReaderFactory {
+	public MgfPeakListReaderFactory() {
+	}
+
 	@Override
 	public String getExtension() {
 		return "mgf";
