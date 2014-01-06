@@ -30,5 +30,11 @@
             <artifactId>testng</artifactId>
             <classifier>jdk15</classifier>
         </dependency>
+        <dependency>
+            <groupId>edu.mayo.mprc</groupId>
+            <artifactId>mgf</artifactId>
+            <version>3.5-SNAPSHOT</version>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 </project>

@@ -18,8 +18,7 @@ public final class MzMlPeakListReaderTest {
 	@Test
 	public void shouldFailAtMissingCharge() {
 		final File file = fileFromClasspath("mzml/small.pwiz.1.1.mzML");
-		final PeakListReader reader = factory.createReader(file);
-		reader.setReadPeaks(true);
+		final PeakListReader reader = factory.createReader(file, true);
 		try {
 			while (true) {
 				PeakList peakList = reader.nextPeakList();
@@ -35,8 +34,7 @@ public final class MzMlPeakListReaderTest {
 	@Test
 	public void shouldWorkWithPossibleChargeStates() {
 		final File file = fileFromClasspath("mzml/dta_example.mzML");
-		final PeakListReader reader = factory.createReader(file);
-		reader.setReadPeaks(true);
+		final PeakListReader reader = factory.createReader(file, true);
 		StringBuilder report = new StringBuilder(100);
 		while (true) {
 			PeakList peakList = reader.nextPeakList();

@@ -17,8 +17,7 @@ public final class MgfTitles {
 	 * @return List of all spectra titles.
 	 */
 	public static List<String> getTitles(final File mgf) {
-		PeakListReader sourceMgfReader = new MgfPeakListReader(mgf);
-		sourceMgfReader.setReadPeaks(false);
+		PeakListReader sourceMgfReader = new MgfPeakListReader(mgf, false);
 		List<String> titles = new ArrayList<String>(1000);
 		try {
 			MascotGenericFormatPeakList peakList;

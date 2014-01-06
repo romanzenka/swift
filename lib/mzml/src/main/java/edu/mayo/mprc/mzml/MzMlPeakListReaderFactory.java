@@ -20,7 +20,7 @@ public final class MzMlPeakListReaderFactory implements PeakListReaderFactory {
 	}
 
 	@Override
-	public PeakListReader createReader(final File file) {
-		return new MzMlPeakListReader(file);
+	public PeakListReader createReader(final File file, final boolean readPeaks) {
+		return new MzMlPeakListReader(file, readPeaks);
 	}
 }

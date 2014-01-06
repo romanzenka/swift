@@ -74,8 +74,7 @@ public final class MzXmlConverter {
 		final Map<Integer, String> mzXMLScanToMGFTitle = new HashMap<Integer, String>(1000);
 
 		try {
-			inputReader = readers.createReader(inputFile);
-			inputReader.setReadPeaks(true);
+			inputReader = readers.createReader(inputFile, true);
 			mzXMLWriter = new MzXMLPeakListWriter(mzXMLOutputFile, enable64BitPrecision);
 
 			PeakList peakList = null;

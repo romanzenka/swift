@@ -26,13 +26,13 @@ public final class PeakListReaders {
 		setReaderFactories(factories);
 	}
 
-	public PeakListReader createReader(final File file) {
+	public PeakListReader createReader(final File file, final boolean readPeaks) {
 		final String extension = FileUtilities.getExtension(file.getName());
 		final PeakListReaderFactory factory = factories.get(extension);
 		if (factory == null) {
 			throw new MprcException("No peak list reader able to read [" + file.getAbsolutePath() + "] - unsupported extension [" + extension + "]");
 		}
-		return factory.createReader(file);
+		return factory.createReader(file, readPeaks);
 	}
 
 	public Collection<PeakListReaderFactory> getReaderFactories() {

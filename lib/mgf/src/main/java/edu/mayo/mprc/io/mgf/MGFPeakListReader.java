@@ -33,9 +33,9 @@ public final class MgfPeakListReader implements PeakListReader {
 	 *
 	 * @param inputFile mgf file name.
 	 */
-	public MgfPeakListReader(final File inputFile) {
+	public MgfPeakListReader(final File inputFile, final boolean readPeaks) {
 		this.inputFile = inputFile;
-		readPeaks = true;
+		this.readPeaks = readPeaks;
 		bufferedReader = FileUtilities.getReader(inputFile);
 	}
 

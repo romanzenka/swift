@@ -267,8 +267,7 @@ public final class SpectrumInfoJoiner {
 
 			LOGGER.debug("Reading mgf file [" + mgfPath + "].");
 
-			peakListReader = readers.createReader(inputFile);
-			peakListReader.setReadPeaks(false);
+			peakListReader = readers.createReader(inputFile, false);
 
 			while ((peakList = peakListReader.nextPeakList()) != null) {
 				spectrum = new Spectrum(
@@ -287,16 +286,16 @@ public final class SpectrumInfoJoiner {
 			FileUtilities.closeQuietly(peakListReader);
 		}
 
-		LOGGER.debug("Done reading mgf files.");
+		LOGGER.debug("Done reading input files.");
 	}
 
-	private static long getScanId(final String spectrum) {
+	public static long getScanId(final String spectrum) {
 		String str = spectrum.substring(0, spectrum.lastIndexOf(".dta)"));
 		str = str.substring(0, str.lastIndexOf('.'));
 		return Long.parseLong(str.substring(str.lastIndexOf('.') + 1).trim());
 	}
 
-	private static long getScanIdFromScaffoldSpectrum(final String spectrum) {
+	public static long getScanIdFromScaffoldSpectrum(final String spectrum) {
 		String str = spectrum.substring(0, spectrum.lastIndexOf('.'));
 		str = str.substring(0, str.lastIndexOf('.'));
 		return Long.parseLong(str.substring(str.lastIndexOf('.') + 1).trim());

@@ -39,8 +39,7 @@ public final class MgfPeakListReaderTest {
 	@Test
 	public void shouldReadPeaks() throws IOException {
 		MgfPeakListReaderFactory factory = new MgfPeakListReaderFactory();
-		PeakListReader reader = factory.createReader(file);
-		reader.setReadPeaks(true);
+		PeakListReader reader = factory.createReader(file, true);
 
 		int i = 0;
 		while (true) {

@@ -48,8 +48,9 @@ public final class MzMlPeakListReader implements PeakListReader {
 	// Peak lists we would like to report in the future
 	private Queue<PeakList> parsedPeakLists = new ArrayDeque<PeakList>(10);
 
-	public MzMlPeakListReader(final File file) {
+	public MzMlPeakListReader(final File file, final boolean readPeaks) {
 		this.file = file;
+		this.readPeaks = readPeaks;
 		reader = new MzMLUnmarshaller(file);
 		iterator = reader.unmarshalCollectionFromXpath("/indexedmzML/mzML/run/spectrumList/spectrum", Spectrum.class);
 	}
