@@ -57,8 +57,8 @@ public final class MSMSEvalWorker extends WorkerBase {
 		/**
 		 * MGF source file.
 		 */
-		final File sourceMGFFile = msmsEvalWorkPacket.getSourceMGFFile();
-		checkFile(sourceMGFFile, false, "The source mgf file");
+		final File sourceFile = msmsEvalWorkPacket.getSourceFile();
+		checkFile(sourceFile, false, "The source file");
 
 		/**
 		 * MsmsEval parameter file.
@@ -76,9 +76,9 @@ public final class MSMSEvalWorker extends WorkerBase {
 		/**
 		 * Output files.
 		 */
-		final File outputMzXMLFile = MSMSEvalWorkPacket.getExpectedMzXMLOutputFileName(sourceMGFFile, outputDirectory);
-		final File msmsEvalFormattedOuputFile = MSMSEvalWorkPacket.getExpectedResultFileName(sourceMGFFile, outputDirectory);
-		final File msmsEvalOuputFile = MSMSEvalWorkPacket.getExpectedMsmsEvalOutputFileName(sourceMGFFile, outputDirectory); // Temporary
+		final File outputMzXMLFile = MSMSEvalWorkPacket.getExpectedMzXMLOutputFileName(sourceFile, outputDirectory);
+		final File msmsEvalFormattedOuputFile = MSMSEvalWorkPacket.getExpectedResultFileName(sourceFile, outputDirectory);
+		final File msmsEvalOuputFile = MSMSEvalWorkPacket.getExpectedMsmsEvalOutputFileName(sourceFile, outputDirectory); // Temporary
 
 		//If msmsEval has been executed, skip operation.
 		if (!msmsEvalWorkPacket.isFromScratch() && hasMSMSEvalFilterWorkerRun(msmsEvalFormattedOuputFile)) {
@@ -91,7 +91,7 @@ public final class MSMSEvalWorker extends WorkerBase {
 		try {
 			LOGGER.info("Converting mgf to mzxml.");
 
-			final Map<Integer, String> mzXMLScanToMGFTitle = getConverter().convert(sourceMGFFile, outputMzXMLFile, true);
+			final Map<Integer, String> mzXMLScanToMGFTitle = getConverter().convert(sourceFile, outputMzXMLFile, true);
 
 			LOGGER.info("Convertion mgf to mzxml completed.");
 			LOGGER.info("Created mzxml file: " + outputMzXMLFile.getAbsolutePath());

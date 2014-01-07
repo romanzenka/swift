@@ -26,7 +26,7 @@ public final class XTandemWorkPacket extends EngineWorkPacket {
 		super(inputFile, outputFile, searchParamsFile, databaseFile, publishSearchFiles, taskId, fromScratch);
 
 		if (inputFile == null) {
-			throw new MprcException("X!Tandem request cannot be created: The .mgf file was null");
+			throw new MprcException("X!Tandem request cannot be created: The input file was null");
 		}
 		if (searchParamsFile == null) {
 			throw new MprcException("X!Tandem request cannot be created: The search params file has to be set");

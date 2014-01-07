@@ -18,8 +18,8 @@ public class ExperimentQa extends FileHolder {
 	/**
 	 * @param experimentName      Name of the Scaffold experiment.
 	 * @param scaffoldSpectraFile Scaffold .tsv report with information per each spectrum.
-	 * @param qaFiles             A list of original .mgf files with a collection of QA information about that .mgf file.
-	 *                            Order of the .mgf files matters - they should be reported in the same order as how the user entered them.
+	 * @param qaFiles             A list of original source files (mgf/mzML) with a collection of QA information about that file.
+	 *                            Order of the source files matters - they should be reported in the same order as how the user entered them.
 	 * @param scaffoldVersion     A string denoting the version of Scaffold (e.g. "2" versus "3"). In case the same file is searched by two Scaffolds,
 	 *                            the version is used to separate the data files.
 	 */

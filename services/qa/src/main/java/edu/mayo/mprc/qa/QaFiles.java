@@ -17,7 +17,7 @@ public final class QaFiles extends FileHolder {
 	// The original .RAW file
 	private File rawInputFile;
 
-	// msmsEval information produced from the .mgf file that corresponds to the original .RAW file
+	// msmsEval information produced from the source file that corresponds to the original .RAW file
 	private File msmsEvalOutputFile;
 
 	// Information about the .RAW file as a whole - contains parameters on the file level

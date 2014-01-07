@@ -68,7 +68,7 @@ public final class SpectrumInfoJoiner {
 		try {
 			fileWriter = new FileWriter(outputFile);
 
-			getMgfInformation(inputFile, mgfSpectrumMap, true);
+			getSourceInformation(inputFile, mgfSpectrumMap, true);
 			addScaffoldInformation(scaffold, mgfSpectrumMap, true);
 
 			fileWriter.write("Scan Id\tMz\tZ\tMgf File Name");
@@ -251,10 +251,10 @@ public final class SpectrumInfoJoiner {
 	 * Extract information about MS/MS spectra from a list of mgf/mzML files
 	 *
 	 * @param inputFile         input file to extract information from
-	 * @param mgfSpectrumMap    Map from either spectrum name or scan id to information about MS2 spectrum. The map is being created from scratch, existing values will be overwritten.
+	 * @param spectrumMap       Map from either spectrum name or scan id to information about MS2 spectrum. The map is being created from scratch, existing values will be overwritten.
 	 * @param spectrumNameAsKey If true, the map is indexed by full spectrum name, otherwise it is indexed by scan id
 	 */
-	public void getMgfInformation(final File inputFile, final Map<String, Spectrum> mgfSpectrumMap, final boolean spectrumNameAsKey) {
+	public void getSourceInformation(final File inputFile, final Map<String, Spectrum> spectrumMap, final boolean spectrumNameAsKey) {
 		Spectrum spectrum = null;
 		PeakListReader peakListReader = null;
 		MascotGenericFormatPeakList peakList = null;
@@ -265,7 +265,7 @@ public final class SpectrumInfoJoiner {
 
 			final String mgfPath = inputFile.getAbsolutePath();
 
-			LOGGER.debug("Reading mgf file [" + mgfPath + "].");
+			LOGGER.debug("Reading source file [" + mgfPath + "].");
 
 			peakListReader = readers.createReader(inputFile, false);
 
@@ -279,7 +279,7 @@ public final class SpectrumInfoJoiner {
 						spectrumNumber);
 				spectrumNumber++;
 
-				mgfSpectrumMap.put(spectrumNameAsKey ? spectrum.getSpectrumName() : Long.toString(spectrum.getScanId()), spectrum);
+				spectrumMap.put(spectrumNameAsKey ? spectrum.getSpectrumName() : Long.toString(spectrum.getScanId()), spectrum);
 			}
 
 		} finally {

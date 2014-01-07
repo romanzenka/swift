@@ -61,7 +61,7 @@ final class SpectrumQaTask extends AsyncTaskBase {
 	}
 
 	private void updateDescription() {
-		setDescription("Analyzing mgf file: "
+		setDescription("Analyzing input file: "
 				+ getFileTokenFactory().fileToTaggedDatabaseToken(sourceMGFFile.getResultingFile())
 				+ " using msmsEval parameter file: "
 				+ getFileTokenFactory().fileToTaggedDatabaseToken(msmsEvalParamFile));

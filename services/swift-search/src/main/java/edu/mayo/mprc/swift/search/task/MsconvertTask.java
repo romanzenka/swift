@@ -67,8 +67,8 @@ final class MsconvertTask extends AsyncTaskBase implements FileProducingTask {
 	 */
 	@Override
 	public WorkPacket createWorkPacket() {
-		if (inputFile.getName().endsWith(".mgf")) {
-			LOGGER.info("Skipping msconvert for an mgf file " + inputFile.getAbsolutePath());
+		if (!RawFilesSupported.isRawFile(inputFile)) {
+			LOGGER.info("Skipping msconvert for an input file " + inputFile.getAbsolutePath());
 			outputFile = inputFile;
 			// Nothing to do, signalize success
 			return null;

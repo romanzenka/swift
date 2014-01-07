@@ -91,7 +91,7 @@ final class RawToMgfTask extends AsyncTaskBase implements FileProducingTask {
 	 */
 	@Override
 	public WorkPacket createWorkPacket() {
-		if (inputFile.getName().endsWith(".mgf")) {
+		if (!RawFilesSupported.isRawFile(inputFile)) {
 			LOGGER.info("Skipping Raw2MGF for an mgf file " + inputFile.getAbsolutePath());
 			outputFile = inputFile;
 			// Nothing to do, signalize success

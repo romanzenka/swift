@@ -236,7 +236,7 @@ public final class LoadToSearchDb implements SwiftCommand {
 					final File rawFile = fileSearch.getInputFile();
 					if (!"RAW".equalsIgnoreCase(FileUtilities.getExtension(rawFile.getName()))) {
 						// We have a file that is not raw.
-						throw new MprcException("Could not load search that uses .mgf file: " + rawFile.getAbsolutePath());
+						throw new MprcException("Could not load search that uses source file: " + rawFile.getAbsolutePath());
 					}
 					final RAWDumpTask rawDumpTask = new RAWDumpTask(
 							workflowEngine,
