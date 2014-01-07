@@ -39,6 +39,7 @@ public final class MzMlPeakListReader implements PeakListReader {
 	public static final String MZ_ARRAY = "MS:1000514";
 
 	public static final String INTENSITY_ARRAY = "MS:1000515";
+	public static final double[] NO_DATA = new double[0];
 
 	private boolean readPeaks;
 	private final File file;
@@ -190,23 +191,28 @@ public final class MzMlPeakListReader implements PeakListReader {
 
 	private double[] toDoubleArray(final BinaryDataArray dataArray) {
 		final double[] array;
-		if (dataArray.getArrayLength() != null) {
-			array = new double[dataArray.getArrayLength()];
-			int i = 0;
-			for (final Number number : dataArray.getBinaryDataAsNumberArray()) {
-				array[i] = number.doubleValue();
-				i++;
-			}
+		// Working around a bug in jmzml
+		if (dataArray.needsUncompressing() && dataArray.getEncodedLength() != null && dataArray.getEncodedLength() == 0) {
+			array = NO_DATA;
 		} else {
-			final ArrayList<Double> arrayList = new ArrayList<Double>(1000);
-			int i = 0;
-			for (final Number number : dataArray.getBinaryDataAsNumberArray()) {
-				arrayList.add(number.doubleValue());
-				i++;
-			}
-			array = new double[arrayList.size()];
-			for (int j = 0; j < array.length; j++) {
-				array[j] = arrayList.get(j);
+			if (dataArray.getArrayLength() != null) {
+				array = new double[dataArray.getArrayLength()];
+				int i = 0;
+				for (final Number number : dataArray.getBinaryDataAsNumberArray()) {
+					array[i] = number.doubleValue();
+					i++;
+				}
+			} else {
+				final ArrayList<Double> arrayList = new ArrayList<Double>(1000);
+				int i = 0;
+				for (final Number number : dataArray.getBinaryDataAsNumberArray()) {
+					arrayList.add(number.doubleValue());
+					i++;
+				}
+				array = new double[arrayList.size()];
+				for (int j = 0; j < array.length; j++) {
+					array[j] = arrayList.get(j);
+				}
 			}
 		}
 		return array;
