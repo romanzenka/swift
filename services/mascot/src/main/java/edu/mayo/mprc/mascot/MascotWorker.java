@@ -1,5 +1,6 @@
 package edu.mayo.mprc.mascot;
 
+import com.google.common.collect.ImmutableMap;
 import edu.mayo.mprc.MprcException;
 import edu.mayo.mprc.config.DaemonConfig;
 import edu.mayo.mprc.config.DependencyResolver;
@@ -34,10 +35,7 @@ import java.nio.channels.FileChannel;
 import java.nio.channels.WritableByteChannel;
 import java.nio.charset.Charset;
 import java.text.MessageFormat;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Random;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -68,6 +66,7 @@ public final class MascotWorker extends WorkerBase {
 	private final Charset charset = Charset.forName("UTF-8");
 
 	private static final Pattern DB_TAG_PATTERN = Pattern.compile("\\$\\{(?:DB|DBPath):([^}]+)\\}");
+	private static final Pattern INPUT_FORMAT_PATTERN = Pattern.compile("\\$\\{InputFormat\\}");
 
 	private static final Random RANDOM = new Random();
 	/**
@@ -90,9 +89,22 @@ public final class MascotWorker extends WorkerBase {
 					mascotWorkPacket.getShortDbName()));
 			setMascotOutputFile(mascotWorkPacket.getOutputFile());
 
+			final String extension = FileUtilities.getExtension(mascotWorkPacket.getInputFile().getName()).toLowerCase(Locale.US);
+			final String inputFormat;
+			if ("mgf".equals(extension)) {
+				inputFormat = "Mascot generic";
+			} else if ("mzml".equals(extension)) {
+				inputFormat = "mzML (.mzML)";
+			} else {
+				throw new MprcException("Mascot does not support input file format [" + extension + "] for file [" + mascotWorkPacket.getInputFile().getAbsolutePath() + "]");
+			}
+
 			// We have to modify the mascot params file, replacing the ${DB:whatever} tag with the supplied short db name.
 			final StreamRegExMatcher matcher = new StreamRegExMatcher(DB_TAG_PATTERN, mascotWorkPacket.getSearchParamsFile());
-			matcher.replaceAll(Matcher.quoteReplacement(mascotWorkPacket.getShortDbName()));
+			matcher.replaceAll(new ImmutableMap.Builder<Pattern, String>()
+					.put(DB_TAG_PATTERN, Matcher.quoteReplacement(mascotWorkPacket.getShortDbName()))
+					.put(INPUT_FORMAT_PATTERN, Matcher.quoteReplacement(inputFormat))
+					.build());
 			matcher.writeContentsToFile(mascotWorkPacket.getSearchParamsFile());
 			matcher.close();
 
