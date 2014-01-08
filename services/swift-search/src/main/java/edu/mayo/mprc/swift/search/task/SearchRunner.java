@@ -688,7 +688,8 @@ public final class SearchRunner implements Runnable, Lifecycle {
 	}
 
 	private static boolean isRawFile(final FileSearch inputFile) {
-		return !inputFile.getInputFile().getName().endsWith(".mgf");
+		final String name = inputFile.getInputFile().getName().toLowerCase(Locale.US);
+		return name.endsWith(".raw") || name.endsWith(".d");
 	}
 
 	/**
