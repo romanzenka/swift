@@ -4,6 +4,7 @@ import com.google.common.base.Objects;
 import edu.mayo.mprc.swift.db.DatabaseFileTokenFactory;
 import edu.mayo.mprc.workflow.engine.TaskBase;
 import edu.mayo.mprc.workflow.engine.WorkflowEngine;
+import edu.mayo.mprc.workflow.persistence.TaskState;
 
 import java.io.File;
 
@@ -32,6 +33,7 @@ public final class MzMlCleanupTask extends TaskBase implements FileProducingTask
 	@Override
 	public void run() {
 		// We do not check anything right now, hoping the file is a-ok
+		setState(TaskState.COMPLETED_SUCCESFULLY);
 	}
 
 	@Override
