@@ -1,6 +1,8 @@
 package edu.mayo.mprc.dbcurator.client.steppanels;
 
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.ui.*;
 import edu.mayo.mprc.common.client.ExceptionUtilities;
 import edu.mayo.mprc.common.client.StringUtilities;
@@ -42,34 +44,29 @@ public final class DatabaseUploadPanel extends AbstractStepPanel {
 		form.setAction(GWT.getModuleBaseURL() + (GWT.getModuleBaseURL().endsWith("/") ? "" : "/") + "FileUploadServlet");
 		form.setEncoding(FormPanel.ENCODING_MULTIPART);
 		form.setMethod(FormPanel.METHOD_POST);
-		form.addFormHandler(new FormHandler() {
+		form.addSubmitHandler(new FormPanel.SubmitHandler() {
 			/**
 			 * Whent he form is submitted do some validation on it and indicate that the file is being uploaded.  Unfortunately
 			 * there is no progress indicator for this.  Maybe we can find another widget, someday.
-			 * @param event
 			 */
 			@Override
-			public void onSubmit(final FormSubmitEvent event) {
+			public void onSubmit(final FormPanel.SubmitEvent event) {
 				if (lblClientPath.getText().trim().isEmpty()) {
 					lblNotification.setText("You must select a file first");
-					event.setCancelled(true);
+					event.cancel();
 				} else if (containedStep.getCompletionCount() != null) {
 					lblNotification.setText("You cannot change the file of an already run curation please copy the curation first");
-					event.setCancelled(true);
+					event.cancel();
 				} else {
 					lblNotification.setText("File is being uploaded");
 				}
 			}
-
-			/**
-			 * when the submission is complete look for errors and if there is an error then display the error else
-			 * display the location of the new file on the server
-			 * @param event contains the result (from Response.Writer) which contains ther error messages or the path to the file
-			 */
+		});
+		form.addSubmitCompleteHandler(new FormPanel.SubmitCompleteHandler() {
 			@Override
-			public void onSubmitComplete(final FormSubmitCompleteEvent event) {
+			public void onSubmitComplete(final FormPanel.SubmitCompleteEvent event) {
 				final String results = event.getResults();
-				if (results.indexOf("<Error>") != -1) {
+				if (results.contains("<Error>")) {
 					containedStep.serverFilePath = null;
 					lblNotification.setText(removeTags(results));
 				} else {
@@ -86,14 +83,15 @@ public final class DatabaseUploadPanel extends AbstractStepPanel {
 			 * @param toDeTag the string you want to remove the tags from
 			 * @return the string without the <pre> tags
 			 */
-			private String removeTags(String toDeTag) {
-				if (StringUtilities.toLowerCase(toDeTag).startsWith("<pre>")) {
-					toDeTag = toDeTag.substring("<pre>".length());
+			private String removeTags(final String toDeTag) {
+				String result = toDeTag;
+				if ("<pre>".equals(StringUtilities.toLowerCase(result).substring(0, "<pre>".length()))) {
+					result = result.substring("<pre>".length());
 				}
-				if (StringUtilities.toLowerCase(toDeTag).endsWith("</pre>")) {
-					toDeTag = toDeTag.substring(0, toDeTag.length() - "</pre>".length());
+				if ("</pre>".equals(StringUtilities.toLowerCase(result).substring(0, "</pre>".length()))) {
+					result = result.substring(0, result.length() - "</pre>".length());
 				}
-				return toDeTag;
+				return result;
 			}
 		});
 
@@ -111,9 +109,9 @@ public final class DatabaseUploadPanel extends AbstractStepPanel {
 		mainPanel.add(lblClientPath);
 
 		final Button cmdStart = new Button("Upload");
-		cmdStart.addClickListener(new ClickListener() {
+		cmdStart.addClickHandler(new ClickHandler() {
 			@Override
-			public void onClick(final Widget widget) {
+			public void onClick(final ClickEvent event) {
 				containedStep.clientFilePath = uploadWidget.getFilename();
 				lblClientPath.setText(uploadWidget.getFilename());
 				form.submit();

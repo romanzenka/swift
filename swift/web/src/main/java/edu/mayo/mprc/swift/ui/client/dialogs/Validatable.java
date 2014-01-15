@@ -1,6 +1,7 @@
 package edu.mayo.mprc.swift.ui.client.dialogs;
 
-import com.google.gwt.user.client.ui.SourcesChangeEvents;
+import com.google.gwt.event.logical.shared.HasValueChangeHandlers;
+import com.google.gwt.user.client.ui.HasValue;
 import edu.mayo.mprc.swift.ui.client.rpc.ClientValidation;
 import edu.mayo.mprc.swift.ui.client.rpc.ClientValue;
 
@@ -9,9 +10,9 @@ import java.util.List;
 /**
  * Widgets which can get or set a single, serializable value.
  */
-public interface Validatable extends SourcesChangeEvents {
+public interface Validatable extends HasValueChangeHandlers<ClientValue>, HasValue<ClientValue> {
 
-	ClientValue getClientValue();
+	ClientValue getValue();
 
 	void setValue(ClientValue value);
 

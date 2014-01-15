@@ -1,6 +1,8 @@
 package edu.mayo.mprc.io.mzxml;
 
 
+import com.google.common.base.Charsets;
+import com.google.common.io.Files;
 import edu.mayo.mprc.utilities.FileUtilities;
 import org.proteomecommons.io.mzxml.v2_1.DataProcessing;
 import org.proteomecommons.io.mzxml.v2_1.MsRun;
@@ -86,6 +88,13 @@ public final class TestIOFramework {
 
 
 			w.close();
+
+			String writtenText = Files.toString(mzXmlFile, Charsets.US_ASCII);
+			Assert.assertEquals(writtenText, "<?xml version=\"1.0\" ?><mzXML xmlns=\"http://sashimi.sourceforge.net/schema_revision/mzXML_2.1\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"http://sashimi.sourceforge.net/schema_revision/mzXML_2.1 http://sashimi.sourceforge.net/schema_revision/mzXML_2.1/mzXML_idx_2.1.xsd\"><msRun><dataProcessing><software type=\"processing\" name=\"ProteomeCommons.org IO Framework - http://www.proteomecommons.org\" version=\"6.0\"/></dataProcessing><dataProcessing centroided=\"1\"></dataProcessing>\n" +
+					"<scan num=\"1\" peaksCount=\"1\" scanType=\"Full\" basePeakMz=\"1000.0\" basePeakIntensity=\"10102.0\">\n" +
+					"  <peaks precision=\"32\" byteOrder=\"network\" pairOrder=\"m/z-int\">RHoAAEYd2AA=</peaks></scan>\n" +
+					"<scan num=\"2\" peaksCount=\"1\" scanType=\"Full\" basePeakMz=\"1003.0\" basePeakIntensity=\"10302.0\">\n" +
+					"  <peaks precision=\"32\" byteOrder=\"network\" pairOrder=\"m/z-int\">RHrAAEYg+AA=</peaks></scan></msRun><indexOffset xsi:nil=\"1\"/></mzXML>");
 
 		} catch (Exception t) {
 			Assert.fail("exception in IOFramework", t);

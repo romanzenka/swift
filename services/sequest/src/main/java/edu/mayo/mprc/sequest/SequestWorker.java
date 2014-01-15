@@ -1,5 +1,6 @@
 package edu.mayo.mprc.sequest;
 
+import com.google.common.base.Preconditions;
 import edu.mayo.mprc.config.DaemonConfig;
 import edu.mayo.mprc.config.DependencyResolver;
 import edu.mayo.mprc.config.ResourceConfig;
@@ -38,21 +39,21 @@ public final class SequestWorker extends WorkerBase {
 
 	@Override
 	public void process(final WorkPacket workPacket, final UserProgressReporter progressReporter) {
-		SequestMGFWorkPacket sequestWorkPacket = null;
-		if (workPacket instanceof SequestMGFWorkPacket) {
-			sequestWorkPacket = (SequestMGFWorkPacket) workPacket;
+		SequestWorkPacket sequestWorkPacket = null;
+		if (workPacket instanceof SequestWorkPacket) {
+			sequestWorkPacket = (SequestWorkPacket) workPacket;
 
-			assert sequestWorkPacket.getInputFile() != null : "Sequest search failed: The .mgf file was not specified";
-			assert sequestWorkPacket.getDatabaseFile() != null : "Sequest search failed: The .hdr file was not specified";
-			assert sequestWorkPacket.getOutputFile() != null : "Sequest search failed: The output folder was not specified";
-			assert sequestWorkPacket.getSearchParamsFile() != null : "Sequest search failed: The search parameters were not specified";
+			Preconditions.checkNotNull(sequestWorkPacket.getInputFile(), "Sequest search failed: The input file was not specified");
+			Preconditions.checkNotNull(sequestWorkPacket.getDatabaseFile(), "Sequest search failed: The .hdr file was not specified");
+			Preconditions.checkNotNull(sequestWorkPacket.getOutputFile(), "Sequest search failed: The output folder was not specified");
+			Preconditions.checkNotNull(sequestWorkPacket.getSearchParamsFile(), "Sequest search failed: The search parameters were not specified");
 
 		} else {
-			throw new DaemonException("Unexpected packet type " + workPacket.getClass().getName() + ", expected " + SequestMGFWorkPacket.class.getName());
+			throw new DaemonException("Unexpected packet type " + workPacket.getClass().getName() + ", expected " + SequestWorkPacket.class.getName());
 		}
 
 		LOGGER.debug("Starting sequest search"
-				+ "\n\tmgf file: " + sequestWorkPacket.getInputFile()
+				+ "\n\tinput file: " + sequestWorkPacket.getInputFile()
 				+ "\n\thdr file: " + sequestWorkPacket.getDatabaseFile()
 				+ "\n\toutput file: " + sequestWorkPacket.getOutputFile()
 				+ "\n\tsearch params: " + sequestWorkPacket.getSearchParamsFile());

@@ -1,5 +1,9 @@
 package edu.mayo.mprc.dbcurator.client.steppanels;
 
+import com.google.gwt.event.dom.client.BlurEvent;
+import com.google.gwt.event.dom.client.BlurHandler;
+import com.google.gwt.event.dom.client.FocusEvent;
+import com.google.gwt.event.dom.client.FocusHandler;
 import com.google.gwt.user.client.ui.*;
 import edu.mayo.mprc.common.client.ExceptionUtilities;
 
@@ -27,35 +31,41 @@ public final class ManualInclusionPanel extends AbstractStepPanel {
 		tempPanel.add(arrow);
 		txtHeader.setWidth("100%");
 		txtHeader.setText(WELCOME_HEADER);
-		txtHeader.addFocusListener(new FocusListener() {
+		txtHeader.addFocusHandler(new FocusHandler() {
 			@Override
-			public void onFocus(final Widget widget) {
+			public void onFocus(final FocusEvent event) {
 				txtHeader.selectAll();
 			}
+		});
 
+		txtHeader.addBlurHandler(new BlurHandler() {
 			@Override
-			public void onLostFocus(final Widget widget) {
+			public void onBlur(final BlurEvent event) {
 				txtHeader.setText(stripHeaderChar(txtHeader.getText()));
 			}
 		});
+
 		tempPanel.add(txtHeader);
 		panel.add(tempPanel);
 		panel.add(new Label("Sequence: "));
 		txtSequence.setWidth("100%");
 		txtSequence.setText(WELCOME_SEQUENCE);
-		txtSequence.addFocusListener(new FocusListener() {
+		txtSequence.addFocusHandler(new FocusHandler() {
 			@Override
-			public void onFocus(final Widget widget) {
+			public void onFocus(final FocusEvent event) {
 				txtSequence.selectAll();
 			}
+		});
 
+		txtSequence.addBlurHandler(new BlurHandler() {
 			@Override
-			public void onLostFocus(final Widget widget) {
+			public void onBlur(final BlurEvent event) {
 				if (!txtSequence.getText().equals(WELCOME_SEQUENCE)) {
 					txtSequence.setText(cleanSequence(txtSequence.getText()));
 				}
 			}
 		});
+
 		txtSequence.setVisibleLines(5);
 		panel.add(txtSequence);
 		panel.setSpacing(5);

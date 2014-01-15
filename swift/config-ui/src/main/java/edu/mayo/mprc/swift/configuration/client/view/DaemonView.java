@@ -1,6 +1,7 @@
 package edu.mayo.mprc.swift.configuration.client.view;
 
-import com.google.gwt.user.client.ui.ChangeListener;
+import com.google.gwt.event.dom.client.ChangeEvent;
+import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 import edu.mayo.mprc.swift.configuration.client.model.Context;
@@ -25,15 +26,15 @@ public final class DaemonView extends SimplePanel implements ModuleView {
 		final GwtUiBuilder builder = new GwtUiBuilder(context, daemonModel);
 		builder.start();
 
-		final PropertyChangeListener listener = new PropertyChangeListener();
+		final PropertyChangeHandler handler = new PropertyChangeHandler();
 		builder.property(DAEMON_NAME, "Daemon Name", "Descriptive name used when referring to this daemon.").required()
-				.addEventListener(listener)
+				.addEventHandler(handler)
 				.property(DaemonModel.HOST_NAME, "Host Name", "Host system network name or ip address.").required()
-				.addEventListener(listener)
+				.addEventHandler(handler)
 				.property(DaemonModel.OS_NAME, "Operating System", "Host system operating system name, for example, Windows or Linux.")
-				.addEventListener(listener)
+				.addEventHandler(handler)
 				.property(DaemonModel.OS_ARCH, "Architecture", "Host system architecture, for example, <tt>x86</tt>, <tt>x86_64</tt>, .")
-				.addEventListener(listener)
+				.addEventHandler(handler)
 				.property(DaemonModel.SHARED_FILE_SPACE_PATH, "Shared File Space", "" +
 						"<p>" +
 						"If you plan to run only one daemon, leave this value empty.")
@@ -88,9 +89,9 @@ public final class DaemonView extends SimplePanel implements ModuleView {
 		daemonModel.setProperties(values);
 	}
 
-	private class PropertyChangeListener implements ChangeListener {
+	private class PropertyChangeHandler implements ChangeHandler {
 		@Override
-		public void onChange(final Widget widget) {
+		public void onChange(final ChangeEvent event) {
 			saveUI();
 		}
 	}

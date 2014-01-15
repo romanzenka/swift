@@ -1,5 +1,6 @@
 package edu.mayo.mprc.swift.search.task;
 
+import com.google.common.base.Objects;
 import edu.mayo.mprc.MprcException;
 import edu.mayo.mprc.daemon.DaemonConnection;
 import edu.mayo.mprc.daemon.worker.WorkPacket;
@@ -21,26 +22,14 @@ import java.util.Map;
  */
 public final class SearchDbTask extends AsyncTaskBase {
 
-	private ScaffoldTask scaffoldTask;
-	private Long reportId;
-	private File scaffoldSpectraFile;
-	private Map<String, RAWDumpTask> rawDumpTaskMap = new HashMap<String, RAWDumpTask>(5);
+	private final ScaffoldSpectrumExportProducer scaffoldTask;
 
-	/**
-	 * Create the task independently on Scaffold invocation.
-	 */
-	public SearchDbTask(final WorkflowEngine engine, final DaemonConnection daemon, final DatabaseFileTokenFactory fileTokenFactory, final boolean fromScratch, final Long reportId, final File scaffoldSpectraFile) {
-		super(engine, daemon, fileTokenFactory, fromScratch);
-		setReportId(reportId);
-		setScaffoldSpectraFile(scaffoldSpectraFile);
-		setName("SearchDb");
-		setDescription("Load " + fileTokenFactory.fileToTaggedDatabaseToken(getScaffoldSpectraFile()) + " into database");
-	}
+	private final Map<String, RAWDumpTask> rawDumpTaskMap = new HashMap<String, RAWDumpTask>(5);
 
 	/**
 	 * Create the task that depends on Scaffold invocation.
 	 */
-	public SearchDbTask(final WorkflowEngine engine, final DaemonConnection daemon, final DatabaseFileTokenFactory fileTokenFactory, final boolean fromScratch, final ScaffoldTask scaffoldTask) {
+	public SearchDbTask(final WorkflowEngine engine, final DaemonConnection daemon, final DatabaseFileTokenFactory fileTokenFactory, final boolean fromScratch, final ScaffoldSpectrumExportProducer scaffoldTask) {
 		super(engine, daemon, fileTokenFactory, fromScratch);
 		this.scaffoldTask = scaffoldTask;
 		setName("SearchDb");
@@ -59,7 +48,7 @@ public final class SearchDbTask extends AsyncTaskBase {
 	}
 
 	private File getScaffoldSpectraFile() {
-		return scaffoldSpectraFile == null ? scaffoldTask.getScaffoldSpectraFile() : scaffoldSpectraFile;
+		return scaffoldTask.getScaffoldSpectraFile();
 	}
 
 	private File getScaffoldUnimodFile() {
@@ -67,26 +56,8 @@ public final class SearchDbTask extends AsyncTaskBase {
 	}
 
 
-	/**
-	 * Override the spectra file if the scaffold task is not available.
-	 *
-	 * @param scaffoldSpectraFile Scaffold spectra file to load.
-	 */
-	public void setScaffoldSpectraFile(File scaffoldSpectraFile) {
-		this.scaffoldSpectraFile = scaffoldSpectraFile;
-	}
-
 	private Long getReportId() {
-		return reportId == null ? scaffoldTask.getReportData().getId() : reportId;
-	}
-
-	/**
-	 * Override the report id if scaffold task is not available.
-	 *
-	 * @param reportId Report ID to link to
-	 */
-	public void setReportId(Long reportId) {
-		this.reportId = reportId;
+		return scaffoldTask.getReportData().getId();
 	}
 
 	@Override
@@ -106,5 +77,22 @@ public final class SearchDbTask extends AsyncTaskBase {
 
 	@Override
 	public void onProgress(final ProgressInfo progressInfo) {
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hashCode(scaffoldTask);
+	}
+
+	@Override
+	public boolean equals(final Object obj) {
+		if (this == obj) {
+			return true;
+		}
+		if (obj == null || getClass() != obj.getClass()) {
+			return false;
+		}
+		final SearchDbTask other = (SearchDbTask) obj;
+		return Objects.equal(scaffoldTask, other.scaffoldTask);
 	}
 }

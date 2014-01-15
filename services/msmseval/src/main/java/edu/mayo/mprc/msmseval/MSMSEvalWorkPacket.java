@@ -17,28 +17,28 @@ public final class MSMSEvalWorkPacket extends WorkPacketBase implements Cachable
 	public static final String EM_FILE_SUFFIX = "_em.csv";
 	private static final long serialVersionUID = 20090402L;
 
-	private File sourceMGFFile;
+	private File sourceFile;
 	private File msmsEvalParamFile;
 	private File outputDirectory;
 
 	/**
 	 * The implemntation of this constructor calls constructor:
-	 * MSMSEvalWorkPacket(File sourceMGFFile, File msmsEvalParamFile, File outputDirectory, String taskId, boolean skipIfAlreadyExecuted)
+	 * MSMSEvalWorkPacket(File sourceFile, File msmsEvalParamFile, File outputDirectory, String taskId, boolean skipIfAlreadyExecuted)
 	 * and sets the skipIfAlreadyExecuted flag to a default of true.
 	 *
-	 * @param sourceMGFFile
+	 * @param sourceFile
 	 * @param msmsEvalParamFile
 	 * @param outputDirectory
 	 * @param taskId
 	 */
-	public MSMSEvalWorkPacket(final File sourceMGFFile, final File msmsEvalParamFile, final File outputDirectory, final String taskId) {
-		this(sourceMGFFile, msmsEvalParamFile, outputDirectory, taskId, false);
+	public MSMSEvalWorkPacket(final File sourceFile, final File msmsEvalParamFile, final File outputDirectory, final String taskId) {
+		this(sourceFile, msmsEvalParamFile, outputDirectory, taskId, false);
 	}
 
-	public MSMSEvalWorkPacket(final File sourceMGFFile, final File msmsEvalParamFile, final File outputDirectory, final String taskId, final boolean fromScratch) {
+	public MSMSEvalWorkPacket(final File sourceFile, final File msmsEvalParamFile, final File outputDirectory, final String taskId, final boolean fromScratch) {
 		super(taskId, fromScratch);
 
-		this.sourceMGFFile = sourceMGFFile;
+		this.sourceFile = sourceFile;
 		this.outputDirectory = outputDirectory;
 		this.msmsEvalParamFile = msmsEvalParamFile;
 	}
@@ -65,8 +65,8 @@ public final class MSMSEvalWorkPacket extends WorkPacketBase implements Cachable
 		return new File(outputDirectory, getExpectedMzXMLOutputFileName(sourceMGFFile, outputDirectory).getName() + OUTPUT_FILE_SUFFIX);
 	}
 
-	public File getSourceMGFFile() {
-		return sourceMGFFile;
+	public File getSourceFile() {
+		return sourceFile;
 	}
 
 	public File getMsmsEvalParamFile() {
@@ -94,7 +94,7 @@ public final class MSMSEvalWorkPacket extends WorkPacketBase implements Cachable
 		final StringBuilder description = new StringBuilder();
 		description
 				.append("Input:")
-				.append(getSourceMGFFile().getAbsolutePath())
+				.append(getSourceFile().getAbsolutePath())
 				.append('\n')
 				.append("ParamFile:")
 				.append(getMsmsEvalParamFile().getAbsolutePath())
@@ -105,7 +105,7 @@ public final class MSMSEvalWorkPacket extends WorkPacketBase implements Cachable
 	@Override
 	public WorkPacket translateToWorkInProgressPacket(final File wipFolder) {
 		return new MSMSEvalWorkPacket(
-				getSourceMGFFile(),
+				getSourceFile(),
 				getMsmsEvalParamFile(),
 				wipFolder,
 				getTaskId()
@@ -115,14 +115,14 @@ public final class MSMSEvalWorkPacket extends WorkPacketBase implements Cachable
 	@Override
 	public List<String> getOutputFiles() {
 		return Arrays.asList(
-				getExpectedResultFileName(getSourceMGFFile(), new File(".")).getName(),
-				getExpectedEmOutputFileName(getSourceMGFFile(), new File(".")).getName()
+				getExpectedResultFileName(getSourceFile(), new File(".")).getName(),
+				getExpectedEmOutputFileName(getSourceFile(), new File(".")).getName()
 		);
 	}
 
 	@Override
 	public boolean cacheIsStale(final File subFolder, final List<String> outputFiles) {
-		final long inputFileModified = getSourceMGFFile().lastModified();
+		final long inputFileModified = getSourceFile().lastModified();
 		return inputFileModified > new File(subFolder, outputFiles.get(0)).lastModified() ||
 				inputFileModified > new File(subFolder, outputFiles.get(1)).lastModified();
 	}

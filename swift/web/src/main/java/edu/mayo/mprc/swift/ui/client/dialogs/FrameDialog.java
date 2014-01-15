@@ -1,5 +1,7 @@
 package edu.mayo.mprc.swift.ui.client.dialogs;
 
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.ui.*;
 
 /**
@@ -32,9 +34,9 @@ public abstract class FrameDialog extends DialogBox {
 		if (enableOk) {
 			okayButton = new Button("OK");
 			buttonPanel.add(okayButton);
-			okayButton.addClickListener(new ClickListener() {
+			okayButton.addClickHandler(new ClickHandler() {
 				@Override
-				public void onClick(final Widget widget) {
+				public void onClick(final ClickEvent event) {
 					okay();
 				}
 			});
@@ -43,9 +45,9 @@ public abstract class FrameDialog extends DialogBox {
 		if (enableCancel) {
 			cancelButton = new Button("Cancel");
 			buttonPanel.add(cancelButton);
-			cancelButton.addClickListener(new ClickListener() {
+			cancelButton.addClickHandler(new ClickHandler() {
 				@Override
-				public void onClick(final Widget widget) {
+				public void onClick(final ClickEvent event) {
 					cancel();
 				}
 			});
@@ -91,8 +93,8 @@ public abstract class FrameDialog extends DialogBox {
 	}
 
 
-	public void setOkListener(final ClickListener listener) {
-		okayButton.addClickListener(listener);
+	public void setOkListener(final ClickHandler listener) {
+		okayButton.addClickHandler(listener);
 	}
 
 	protected abstract void okay();

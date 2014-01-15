@@ -1,6 +1,8 @@
 package edu.mayo.mprc.swift.ui.client.widgets;
 
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.Element;
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -15,7 +17,7 @@ import edu.mayo.mprc.swift.ui.client.service.ServiceAsync;
  *
  * @author: Roman Zenka
  */
-public final class FileTreeDialog extends DialogBox implements ClickListener {
+public final class FileTreeDialog extends DialogBox implements ClickHandler {
 	private final Button okButton;
 	private final Button cancelButton;
 	private SelectedFilesListener selectedFilesListener;
@@ -29,11 +31,11 @@ public final class FileTreeDialog extends DialogBox implements ClickListener {
 
 		cancelButton = new Button("Cancel");
 		caption.add(cancelButton, DockPanel.EAST);
-		cancelButton.addClickListener(this);
+		cancelButton.addClickHandler(this);
 
 		okButton = new Button("Ok");
 		caption.add(okButton, DockPanel.EAST);
-		okButton.addClickListener(this);
+		okButton.addClickHandler(this);
 
 		final ScrollPanel panel = new ScrollPanel();
 		panel.setPixelSize(width, height);
@@ -81,8 +83,9 @@ public final class FileTreeDialog extends DialogBox implements ClickListener {
 	}
 
 	@Override
-	public void onClick(final Widget widget) {
-		if (widget.equals(okButton)) {
+	public void onClick(final ClickEvent event) {
+		final Widget sender = (Widget) event.getSource();
+		if (sender.equals(okButton)) {
 			final String selectedFilesHairBall = getSelectedFiles();
 
 			final String[] eachSelectedFile = selectedFilesHairBall.split("\\n");
@@ -104,7 +107,7 @@ public final class FileTreeDialog extends DialogBox implements ClickListener {
 			});
 
 			hide();
-		} else if (widget.equals(cancelButton)) {
+		} else if (sender.equals(cancelButton)) {
 			hide();
 		}
 	}

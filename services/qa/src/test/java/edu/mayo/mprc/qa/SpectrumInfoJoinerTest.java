@@ -2,7 +2,10 @@ package edu.mayo.mprc.qa;
 
 import com.google.common.base.Charsets;
 import com.google.common.io.Files;
+import edu.mayo.mprc.io.mgf.MgfPeakListReaderFactory;
 import edu.mayo.mprc.msmseval.MSMSEvalOutputReader;
+import edu.mayo.mprc.peaklist.PeakListReaderFactory;
+import edu.mayo.mprc.peaklist.PeakListReaders;
 import edu.mayo.mprc.scaffoldparser.spectra.ScaffoldQaSpectraReader;
 import edu.mayo.mprc.utilities.FileUtilities;
 import edu.mayo.mprc.utilities.TestingUtilities;
@@ -11,6 +14,7 @@ import org.testng.annotations.Test;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.regex.Matcher;
 
 public final class SpectrumInfoJoinerTest {
@@ -38,11 +42,30 @@ public final class SpectrumInfoJoinerTest {
 			final RawDumpReader rawDumpReader = new RawDumpReader(rawDumpFile);
 			final MSMSEvalOutputReader msmsEvalReader = new MSMSEvalOutputReader(msmsEvalFile);
 
-			SpectrumInfoJoiner.joinSpectrumData(mgfFile, spectra, rawDumpReader, msmsEvalReader, null, outputFile, null);
+			spectrumInfoJoiner().joinSpectrumData(mgfFile, spectra, rawDumpReader, msmsEvalReader, null, outputFile, null);
 
 			Assert.assertEquals(TestingUtilities.compareFilesByLine(referenceOutputFile, outputFile, true), null, "Output file content is not as expected.");
 		} finally {
 			FileUtilities.cleanupTempFile(tempFolder);
 		}
+	}
+
+	@Test
+	public void shouldParseMgfTitles() {
+		Assert.assertEquals(SpectrumInfoJoiner.getSpectrum("test1 scan 10 10 (test1.10.10.3.dta)"), "test1.10.10.3.dta");
+		Assert.assertEquals(SpectrumInfoJoiner.getScanId("test1 scan 10 10 (test1.10.10.3.dta)"), 10L);
+		Assert.assertEquals(SpectrumInfoJoiner.getScanIdFromScaffoldSpectrum("test1 scan 10 10 (test1.10.10.3.dta)"), 10L);
+	}
+
+	@Test
+	public void shouldParseThermoMzMlTitles() {
+		Assert.assertEquals(SpectrumInfoJoiner.getSpectrum(""), "test1.10.10.3.dta");
+		Assert.assertEquals(SpectrumInfoJoiner.getScanId("test1 scan 10 10 (test1.10.10.3.dta)"), 10L);
+		Assert.assertEquals(SpectrumInfoJoiner.getScanIdFromScaffoldSpectrum("test1 scan 10 10 (test1.10.10.3.dta)"), 10L);
+	}
+
+	private SpectrumInfoJoiner spectrumInfoJoiner() {
+		final PeakListReaders readers = new PeakListReaders(Arrays.asList((PeakListReaderFactory) new MgfPeakListReaderFactory()));
+		return new SpectrumInfoJoiner(readers);
 	}
 }

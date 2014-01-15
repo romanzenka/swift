@@ -1,6 +1,8 @@
 package edu.mayo.mprc.dbcurator.client;
 
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -21,18 +23,18 @@ import edu.mayo.mprc.dbcurator.client.steppanels.CommonDataRequesterAsync;
  * This widget will also supply Grep like capabilities allowing the user to search for lines containing a given
  * search expression.
  */
-public final class ServerFileReader extends PopupPanel implements ClickListener {
+public final class ServerFileReader extends PopupPanel implements ClickHandler {
 
 	private static final int DEFAULT_LINES_PER_PAGE = 50;
 
 	private String fileDisplayed;
 
-	private Hyperlink cmdNextPage;
-	private Hyperlink cmdPrevPage;
-	private Hyperlink cmdFirstPage;
+	private Anchor cmdNextPage;
+	private Anchor cmdPrevPage;
+	private Anchor cmdFirstPage;
 
 	private TextBox txtGrepExpression;
-	private Hyperlink cmdApplyGrep;
+	private Anchor cmdApplyGrep;
 
 	private DockPanel mainPanel;
 	private TextArea contentRenderer;
@@ -108,34 +110,34 @@ public final class ServerFileReader extends PopupPanel implements ClickListener 
 		final Panel commandPanel = new HorizontalPanel();
 		commandPanel.setStyleName("serverfilereader_commands");
 
-		cmdNextPage = new Hyperlink("Next Page", "Next Page");
-		cmdNextPage.addClickListener(this);
+		cmdNextPage = new Anchor("Next Page");
+		cmdNextPage.addClickHandler(this);
 		cmdNextPage.setStyleName("serverfilereader_commandbuttons");
 		commandPanel.add(cmdNextPage);
 
-		cmdPrevPage = new Hyperlink("Previous Page", "Previous Page");
-		cmdPrevPage.addClickListener(this);
+		cmdPrevPage = new Anchor("Previous Page");
+		cmdPrevPage.addClickHandler(this);
 		cmdPrevPage.setStyleName("serverfilereader_commandbuttons");
 		commandPanel.add(cmdPrevPage);
 
-		cmdFirstPage = new Hyperlink("First Page", "First Page");
-		cmdFirstPage.addClickListener(this);
+		cmdFirstPage = new Anchor("First Page");
+		cmdFirstPage.addClickHandler(this);
 		cmdFirstPage.setStyleName("serverfilereader_commandbuttons");
 		commandPanel.add(cmdFirstPage);
 
 		txtGrepExpression = new TextBox();
 		commandPanel.add(txtGrepExpression);
-		cmdApplyGrep = new Hyperlink("Filter", "Filter");
+		cmdApplyGrep = new Anchor("Filter");
 
-		cmdApplyGrep.addClickListener(this);
+		cmdApplyGrep.addClickHandler(this);
 		cmdApplyGrep.setStyleName("serverfilereader_commandbuttons");
 		commandPanel.add(cmdApplyGrep);
 
-		final Hyperlink cmdClose = new Hyperlink("Close", "Close");
+		final Anchor cmdClose = new Anchor("Close");
 		cmdClose.setStyleName("serverfilereader_commandbuttons");
-		cmdClose.addClickListener(new ClickListener() {
+		cmdClose.addClickHandler(new ClickHandler() {
 			@Override
-			public void onClick(final Widget widget) {
+			public void onClick(final ClickEvent event) {
 				if (waitPopup != null && waitPopup.isVisible()) {
 					waitPopup.hide();
 				}
@@ -157,19 +159,20 @@ public final class ServerFileReader extends PopupPanel implements ClickListener 
 	public static final int PAGE_OVERLAP = 5;
 
 	@Override
-	public void onClick(final Widget widget) {
-		if (widget.equals(cmdApplyGrep) && ((Hyperlink) widget).getText().equals("Stop")) {
+	public void onClick(final ClickEvent event) {
+		final Object widget = event.getSource();
+		if (widget == cmdApplyGrep && "Stop".equals(cmdApplyGrep.getText())) {
 			cancelRequest();
 		} else if (!commandsEnabled) {
 			new MessagePopup("Currently retreiving file contents.  Please wait.  Depending on filter criteria this may take a while.", getAbsoluteLeft() + 50, getAbsoluteTop() + 50).show();
 		} else {
-			if (widget.equals(cmdNextPage)) {
+			if (widget == cmdNextPage) {
 				startingLine = startingLine + linesPerPage - PAGE_OVERLAP;
-			} else if (widget.equals(cmdPrevPage)) {
+			} else if (widget == cmdPrevPage) {
 				startingLine = startingLine - linesPerPage + PAGE_OVERLAP;
-			} else if (widget.equals(cmdFirstPage)) {
+			} else if (widget == cmdFirstPage) {
 				startingLine = 0;
-			} else if (widget.equals(cmdApplyGrep)) {
+			} else if (widget == cmdApplyGrep) {
 				startingLine = 0; //change to the first line for less bafflement.
 			}
 			updateContent(startingLine);

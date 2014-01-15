@@ -1,5 +1,6 @@
 package edu.mayo.mprc.swift.commands;
 
+import com.google.common.base.Objects;
 import edu.mayo.mprc.MprcException;
 import edu.mayo.mprc.config.DaemonConfig;
 import edu.mayo.mprc.config.ServiceConfig;
@@ -220,7 +221,7 @@ public final class LoadToSearchDb implements SwiftCommand {
 			workflowEngine.addTask(scaffoldExportTask);
 
 			// Load scaffold export into database
-			final SearchDbTask searchDbTask = new SearchDbTask(workflowEngine, searchDb, fileTokenFactory, false, reportDataId, scaffoldExportTask.getSpectrumExportFile());
+			final SearchDbTask searchDbTask = new SearchDbTask(workflowEngine, searchDb, fileTokenFactory, false, scaffoldExportTask);
 			searchDbTask.addDependency(scaffoldExportTask);
 			searchDbTask.addDependency(fastaDbTask);
 			workflowEngine.addTask(searchDbTask);
@@ -235,7 +236,7 @@ public final class LoadToSearchDb implements SwiftCommand {
 					final File rawFile = fileSearch.getInputFile();
 					if (!"RAW".equalsIgnoreCase(FileUtilities.getExtension(rawFile.getName()))) {
 						// We have a file that is not raw.
-						throw new MprcException("Could not load search that uses .mgf file: " + rawFile.getAbsolutePath());
+						throw new MprcException("Could not load search that uses source file: " + rawFile.getAbsolutePath());
 					}
 					final RAWDumpTask rawDumpTask = new RAWDumpTask(
 							workflowEngine,
@@ -411,6 +412,23 @@ public final class LoadToSearchDb implements SwiftCommand {
 			loaded++;
 			LOGGER.info("Loaded " + scaffoldName + " (" + loaded + " out of " + totalToLoad + ")");
 			setState(TaskState.COMPLETED_SUCCESFULLY);
+		}
+
+		@Override
+		public int hashCode() {
+			return Objects.hashCode(scaffoldName);
+		}
+
+		@Override
+		public boolean equals(final Object obj) {
+			if (this == obj) {
+				return true;
+			}
+			if (obj == null || getClass() != obj.getClass()) {
+				return false;
+			}
+			final SuccessfulLoadCounter other = (SuccessfulLoadCounter) obj;
+			return Objects.equal(scaffoldName, other.scaffoldName);
 		}
 	}
 }

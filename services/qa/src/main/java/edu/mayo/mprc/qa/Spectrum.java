@@ -3,38 +3,38 @@ package edu.mayo.mprc.qa;
 import java.util.LinkedList;
 
 /**
- * MS/MS specific data. This corresponds to an entry in a Mgf file.
+ * MS/MS specific data. This corresponds to an entry in a Mgf or mzML file.
  */
-public final class MgfSpectrum {
+public final class Spectrum {
 	private String spectrumName;
-	private double mgfMz;
-	private int mgfCharge;
+	private double mz;
+	private int charge;
 	private long scanId;
-	private String mgfFileName;
+	private String inputFileName;
 	private long spectrumNumber;
 	private LinkedList<String> scaffoldInfos;
 
-	public MgfSpectrum(final String spectrumName) {
+	public Spectrum(final String spectrumName) {
 		this.spectrumName = spectrumName;
 
 		scaffoldInfos = new LinkedList<String>();
 	}
 
-	public MgfSpectrum(final String spectrumName, final double mgfMz, final int mgfCharge, final long scanId, final String mgfFileName, final long spectrumNumber) {
+	public Spectrum(final String spectrumName, final double mz, final int charge, final long scanId, final String inputFileName, final long spectrumNumber) {
 		this(spectrumName);
-		this.mgfMz = mgfMz;
-		this.mgfCharge = mgfCharge;
+		this.mz = mz;
+		this.charge = charge;
 		this.scanId = scanId;
-		this.mgfFileName = mgfFileName;
+		this.inputFileName = inputFileName;
 		this.spectrumNumber = spectrumNumber;
 	}
 
-	public String getMgfFileName() {
-		return mgfFileName;
+	public String getInputFileName() {
+		return inputFileName;
 	}
 
-	public void setMgfFileName(final String mgfFileName) {
-		this.mgfFileName = mgfFileName;
+	public void setInputFileName(final String inputFileName) {
+		this.inputFileName = inputFileName;
 	}
 
 	/**
@@ -68,19 +68,19 @@ public final class MgfSpectrum {
 		return spectrumName;
 	}
 
-	public double getMgfMz() {
-		return mgfMz;
+	public double getMz() {
+		return mz;
 	}
 
-	public void setMgfMz(final double mgfMz) {
-		this.mgfMz = mgfMz;
+	public void setMz(final double mz) {
+		this.mz = mz;
 	}
 
-	public int getMgfCharge() {
-		return mgfCharge;
+	public int getCharge() {
+		return charge;
 	}
 
-	public void setMgfCharge(final int mgfCharge) {
-		this.mgfCharge = mgfCharge;
+	public void setCharge(final int charge) {
+		this.charge = charge;
 	}
 }

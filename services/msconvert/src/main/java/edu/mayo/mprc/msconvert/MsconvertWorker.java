@@ -99,7 +99,7 @@ public final class MsconvertWorker extends WorkerBase {
 	 * Return the command line to execute msconvert.
 	 *
 	 * @param rawFile    Raw file to convert.
-	 * @param outputFile The resulting mgf file.
+	 * @param outputFile The resulting converted file.
 	 * @param ms2Profile True if the MS2 data are in profile mode.
 	 * @return Command to execute
 	 */
@@ -114,9 +114,10 @@ public final class MsconvertWorker extends WorkerBase {
 			command.add("--mgf"); // We want to convert to .mgf
 		} else if ("mzxml".equals(extension)) {
 			command.add("--mzXML");
-			command.add("--zlib");
+			// command.add("--zlib");
 		} else if ("mzml".equals(extension)) {
 			command.add("--mzML");
+			// command.add("--zlib");
 		} else if ("mz5".equals(extension)) {
 			command.add("--mz5");
 		} else {
@@ -127,6 +128,9 @@ public final class MsconvertWorker extends WorkerBase {
 			command.add("--filter");
 			command.add("peakPicking true 1-");
 		}
+
+		command.add("--filter"); // Only extract MS2 spectra and above
+		command.add("msLevel 2-");
 
 		command.add("--filter"); // Charge state predictor
 		command.add("chargeStatePredictor false 4 2 0.9");
@@ -142,9 +146,11 @@ public final class MsconvertWorker extends WorkerBase {
 		}
 
 		// Make proper .mgf titles that Swift needs
-		final String filename = FileUtilities.getFileNameWithoutExtension(rawFile);
-		command.add("--filter");
-		command.add("titleMaker " + filename + " scan <ScanNumber> <ScanNumber> (" + filename + ".<ScanNumber>.<ScanNumber>.<ChargeState>.dta)");
+		if ("mgf".equals(extension)) {
+			final String filename = FileUtilities.getFileNameWithoutExtension(rawFile);
+			command.add("--filter");
+			command.add("titleMaker " + filename + " scan <ScanNumber> <ScanNumber> (" + filename + ".<ScanNumber>.<ScanNumber>.<ChargeState>.dta)");
+		}
 
 		command.add("--outfile");
 		command.add(outputFile.getName());

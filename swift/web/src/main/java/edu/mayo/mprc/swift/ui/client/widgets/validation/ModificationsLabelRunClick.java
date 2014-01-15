@@ -1,13 +1,13 @@
 package edu.mayo.mprc.swift.ui.client.widgets.validation;
 
-import com.google.gwt.user.client.ui.ClickListener;
-import com.google.gwt.user.client.ui.Widget;
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
 
 /**
  * handles calling a modifications editor popup on a click event
  * It deals with propagating proxy values to the editor and launches the popup
  */
-public final class ModificationsLabelRunClick implements ClickListener {
+public final class ModificationsLabelRunClick implements ClickHandler {
 	private ModificationSelectionEditor editor;
 	private String param;
 	/**
@@ -38,17 +38,17 @@ public final class ModificationsLabelRunClick implements ClickListener {
 	}
 
 	@Override
-	public void onClick(final Widget sender) {
+	public void onClick(final ClickEvent event) {
 		final ModificationDialog p = new ModificationDialog(editor);
 
 		editor.setAllowedValues(proxy.getAllowedValues());
 		if (updateSelectedOnEditor) {
 			editor.setValueClear();
-			editor.setValue(proxy.getClientValue());
+			editor.setValue(proxy.getValue());
 		}
 		p.setParam(param);
 		p.setType(type);
-		final OkClickListener listener = new OkClickListener(editor, proxy);
+		final OkClickHandler listener = new OkClickHandler(editor, proxy);
 		p.setOkListener(listener);
 
 		p.center();
@@ -58,23 +58,21 @@ public final class ModificationsLabelRunClick implements ClickListener {
 	/**
 	 * handles the Ok button click on the Ok button of the Modification Editor
 	 */
-	private static final class OkClickListener implements ClickListener {
+	private static final class OkClickHandler implements ClickHandler {
 		private ModificationSelectionEditor editor;
 		private ModificationsLabel proxy;
 
-		OkClickListener(final ModificationSelectionEditor editor, final ModificationsLabel proxy) {
+		OkClickHandler(final ModificationSelectionEditor editor, final ModificationsLabel proxy) {
 			this.editor = editor;
 			this.proxy = proxy;
 		}
 
 		/**
 		 * copy the selected items to the proxy
-		 *
-		 * @param sender - the Ok button
 		 */
 		@Override
-		public void onClick(final Widget sender) {
-			proxy.setValue(editor.getClientValue());
+		public void onClick(final ClickEvent event) {
+			proxy.setValue(editor.getValue(), true);
 		}
 	}
 

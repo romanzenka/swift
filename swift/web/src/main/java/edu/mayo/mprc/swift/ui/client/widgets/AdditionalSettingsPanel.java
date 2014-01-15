@@ -4,7 +4,7 @@ import com.google.gwt.user.client.ui.CheckBox;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import edu.mayo.mprc.swift.ui.client.rpc.ClientSwiftSearchDefinition;
 
-public class AdditionalSettingsPanel extends HorizontalPanel {
+public final class AdditionalSettingsPanel extends HorizontalPanel {
 	private final CheckBox publicMgfs;
 	private final CheckBox publicMzxmls;
 	private final CheckBox publicSearchFiles;
@@ -22,17 +22,18 @@ public class AdditionalSettingsPanel extends HorizontalPanel {
 	 * Panel constructor.
 	 *
 	 * @param publicMgfs        True if .mgfs should be made public.
+	 * @param publicMzxmls      True if .mzxmls should be made public.
 	 * @param publicSearchFiles True if search files should be made public.
 	 */
 	public AdditionalSettingsPanel(final boolean publicMgfs, final boolean publicMzxmls, final boolean publicSearchFiles) {
 		this.publicMgfs = new CheckBox("Provide .mgf");
 		this.publicMgfs.setTitle("Place converted .mgf files in the output directory of your project");
-		this.publicMgfs.setChecked(publicMgfs);
+		this.publicMgfs.setValue(publicMgfs);
 		add(this.publicMgfs);
 
 		this.publicMzxmls = new CheckBox("Provide .mzxml");
 		this.publicMzxmls.setTitle("Place converted .mzxml files in the output directory of your project");
-		this.publicMzxmls.setChecked(publicMgfs);
+		this.publicMzxmls.setValue(publicMzxmls);
 		add(this.publicMzxmls);
 
 		this.publicSearchFiles = new CheckBox("Provide intermediate search results");
@@ -40,11 +41,11 @@ public class AdditionalSettingsPanel extends HorizontalPanel {
 		add(this.publicSearchFiles);
 
 		fromScratch = new CheckBox("From scratch (no cache)");
-		fromScratch.setChecked(false);
+		fromScratch.setValue(false);
 		add(fromScratch);
 
 		lowPriority = new CheckBox("Low priority");
-		lowPriority.setChecked(false);
+		lowPriority.setValue(false);
 		add(lowPriority);
 	}
 
@@ -52,46 +53,46 @@ public class AdditionalSettingsPanel extends HorizontalPanel {
 	 * @param publicMgfs True if .mgf files should be made public (not kept in cache).
 	 */
 	public void setPublicMgfs(final boolean publicMgfs) {
-		this.publicMgfs.setChecked(publicMgfs);
+		this.publicMgfs.setValue(publicMgfs);
 	}
 
 	/**
 	 * @return True if .mgf file should be made public (not kept in cache).
 	 */
 	public boolean isPublicMgfs() {
-		return publicMgfs.isChecked();
+		return Boolean.TRUE.equals(publicMgfs.getValue());
 	}
 
 	public void setPublicMzxmls(final boolean publicMzxmls) {
-		this.publicMzxmls.setChecked(publicMzxmls);
+		this.publicMzxmls.setValue(publicMzxmls);
 	}
 
 	public boolean isPublicMzxmls() {
-		return publicMzxmls.isChecked();
+		return Boolean.TRUE.equals(publicMzxmls.getValue());
 	}
 
 	public void setPublicSearchFiles(final boolean publicSearchFiles) {
-		this.publicSearchFiles.setChecked(publicSearchFiles);
+		this.publicSearchFiles.setValue(publicSearchFiles);
 	}
 
 	public boolean isPublicSearchFiles() {
-		return publicSearchFiles.isChecked();
+		return Boolean.TRUE.equals(publicSearchFiles.getValue());
 	}
 
 	public void setFromScratch(final boolean fromScratch) {
-		this.fromScratch.setChecked(fromScratch);
+		this.fromScratch.setValue(fromScratch);
 	}
 
 	public boolean isFromScratch() {
-		return fromScratch.isChecked();
+		return Boolean.TRUE.equals(fromScratch.getValue());
 	}
 
 	public void setLowPriority(final boolean lowPriority) {
-		this.lowPriority.setChecked(lowPriority);
+		this.lowPriority.setValue(lowPriority);
 	}
 
 	public boolean isLowPriority() {
-		return lowPriority.isChecked();
+		return Boolean.TRUE.equals(lowPriority.getValue());
 	}
 
 	public void setDefinition(final ClientSwiftSearchDefinition definition) {

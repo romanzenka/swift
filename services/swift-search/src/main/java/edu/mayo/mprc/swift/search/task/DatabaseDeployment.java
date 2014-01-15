@@ -1,5 +1,6 @@
 package edu.mayo.mprc.swift.search.task;
 
+import com.google.common.base.Objects;
 import edu.mayo.mprc.daemon.DaemonConnection;
 import edu.mayo.mprc.daemon.worker.WorkPacket;
 import edu.mayo.mprc.dbcurator.model.Curation;
@@ -111,5 +112,30 @@ final class DatabaseDeployment extends AsyncTaskBase implements DatabaseDeployme
 	@Override
 	public DeploymentResult getDeploymentResult() {
 		return deploymentResult;
+	}
+
+	@Override
+	public int hashCode() {
+		// Only sequest makes the parameter set matter
+		if ("SEQUEST".equalsIgnoreCase(engineCode)) {
+			return Objects.hashCode(engineCode, dbToDeploy, paramsFile);
+		} else {
+			return Objects.hashCode(engineCode, dbToDeploy);
+		}
+	}
+
+	@Override
+	public boolean equals(final Object obj) {
+		if (this == obj) {
+			return true;
+		}
+		if (obj == null || getClass() != obj.getClass()) {
+			return false;
+		}
+		final DatabaseDeployment other = (DatabaseDeployment) obj;
+		// Only sequest makes the parameter set matter
+		return Objects.equal(engineCode, other.engineCode)
+				&& Objects.equal(dbToDeploy, other.dbToDeploy)
+				&& (!"SEQUEST".equalsIgnoreCase(engineCode) || Objects.equal(paramsFile, other.paramsFile));
 	}
 }

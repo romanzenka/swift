@@ -1,5 +1,6 @@
 package edu.mayo.mprc.swift.search.task;
 
+import com.google.common.base.Objects;
 import edu.mayo.mprc.MprcException;
 import edu.mayo.mprc.daemon.DaemonConnection;
 import edu.mayo.mprc.daemon.worker.WorkPacket;
@@ -26,9 +27,12 @@ public final class IdpQonvertTask extends AsyncTaskBase {
 	 * Key: Input file search specification.
 	 * Value: List of searches performed on the file.
 	 */
-	private EngineSearchTask searchTask;
+	private final EngineSearchTask searchTask;
 	private final File outputFolder;
-	private final SwiftSearchDefinition swiftSearchDefinition;
+	private final double maxFDR;
+	private final String decoyPrefix;
+	private final File curationFile;
+
 	private final SwiftDao swiftDao;
 	private final SearchRun searchRun;
 
@@ -42,7 +46,9 @@ public final class IdpQonvertTask extends AsyncTaskBase {
 		super(engine, idpQonvertDaemon, fileTokenFactory, fromScratch);
 		this.swiftDao = swiftDao;
 		this.searchRun = searchRun;
-		swiftSearchDefinition = definition;
+		maxFDR = 1.0 - definition.getSearchParameters().getScaffoldSettings().getProteinProbability();
+		curationFile = definition.getSearchParameters().getDatabase().getCurationFile();
+		decoyPrefix = definition.getSearchParameters().getDatabase().getDatabaseAnnotation().getDecoyRegex();
 		this.outputFolder = outputFolder;
 		this.searchTask = searchTask;
 		setName("IdpQonvert");
@@ -55,12 +61,13 @@ public final class IdpQonvertTask extends AsyncTaskBase {
 	@Override
 	public WorkPacket createWorkPacket() {
 		setDescription("IdpQonvert conversion of " + fileTokenFactory.fileToTaggedDatabaseToken(searchTask.getOutputFile()));
-		IdpQonvertSettings params = new IdpQonvertSettings();
+		final IdpQonvertSettings params = new IdpQonvertSettings();
 		// Max FDR is set to 1- Scaffolds protein probability
-		params.setMaxFDR(1.0 - swiftSearchDefinition.getSearchParameters().getScaffoldSettings().getProteinProbability());
-		params.setDecoyPrefix(swiftSearchDefinition.getSearchParameters().getDatabase().getDatabaseAnnotation().getDecoyRegex());
+		params.setMaxFDR(maxFDR);
+		params.setDecoyPrefix(decoyPrefix);
+
 		return new IdpQonvertWorkPacket(getResultingFile(), params, searchTask.getResultingFile(),
-				swiftSearchDefinition.getSearchParameters().getDatabase().getCurationFile(),
+				curationFile,
 				getFullId(), isFromScratch());
 	}
 
@@ -68,7 +75,7 @@ public final class IdpQonvertTask extends AsyncTaskBase {
 	public void onSuccess() {
 		FileUtilities.waitForFile(getResultingFile(), new FileListener() {
 			@Override
-			public void fileChanged(Collection<File> files, boolean timeout) {
+			public void fileChanged(final Collection<File> files, final boolean timeout) {
 				if (!timeout) {
 					storeReportFile();
 				}
@@ -102,6 +109,27 @@ public final class IdpQonvertTask extends AsyncTaskBase {
 	public File getResultingFile() {
 		final String idpDbFileName = FileUtilities.getFileNameWithoutExtension(searchTask.getResultingFile()) + ".idpDB";
 		return new File(outputFolder, idpDbFileName);
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hashCode(searchTask, outputFolder, maxFDR, decoyPrefix, curationFile);
+	}
+
+	@Override
+	public boolean equals(final Object obj) {
+		if (this == obj) {
+			return true;
+		}
+		if (obj == null || getClass() != obj.getClass()) {
+			return false;
+		}
+		final IdpQonvertTask other = (IdpQonvertTask) obj;
+		return Objects.equal(searchTask, other.searchTask)
+				&& Objects.equal(outputFolder, other.outputFolder)
+				&& Objects.equal(maxFDR, other.maxFDR)
+				&& Objects.equal(decoyPrefix, other.decoyPrefix)
+				&& Objects.equal(curationFile, other.curationFile);
 	}
 }
 

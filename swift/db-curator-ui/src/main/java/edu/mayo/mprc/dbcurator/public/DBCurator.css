@@ -52,7 +52,7 @@
     background-image: url(images/step-icon-filter.png);
 }
 
-/* these styles are for the date picker widget*/
+    /* these styles are for the date picker widget*/
 
 #db-curator TABLE.monthDates TD {
     font-family: tahoma, sans-serif;
@@ -218,7 +218,7 @@
 
 }
 
-/* Drag and  drop styles */
+    /* Drag and  drop styles */
 
 #db-curator .dragdrop-dropTarget {
     /*border: 1px solid blue;*/
@@ -419,36 +419,6 @@
 
 #db-curator .fileupload-mainPanel {
     padding: 10px;
-}
-
-#db-curator .fancyfileupload-pending {
-    font-size: 10px;
-    background: orange;
-    width: 200px;
-}
-
-#db-curator .fancyfileupload-loading {
-    font-size: 10px;
-    background: red;
-    width: 200px;
-}
-
-#db-curator .fancyfileupload-loaded {
-    font-size: 10px;
-    background: lightgreen;
-    width: 200px;
-}
-
-#db-curator .fancyfileupload-failed {
-    font-size: 10px;
-    background: blue;
-    width: 200px;
-}
-
-#db-curator .fancyfileupload-deleted {
-    background: gray;
-    font-size: 10px;
-    width: 200px;
 }
 
 #db-curator .steppanel-headertransform-lstcommontransforms {

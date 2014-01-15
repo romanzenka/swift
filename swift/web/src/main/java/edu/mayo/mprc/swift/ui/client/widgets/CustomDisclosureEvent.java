@@ -19,6 +19,8 @@ import java.util.EventObject;
 
 /**
  * Event object containing information about {@link com.google.gwt.user.client.ui.DisclosurePanel} changes.
+ *
+ * @deprecated We should remove this panel as it is using an old GWT style
  */
 public final class CustomDisclosureEvent extends EventObject {
 	private static final long serialVersionUID = 20071220L;

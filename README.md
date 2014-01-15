@@ -5,7 +5,7 @@ Search multiple tandem mass spec. datafiles using multiple search engines at onc
 
 ### Swift inputs
 
-Swift accepts one or many raw or mgf files. You can process separate files or entire directories.
+Swift accepts one or many raw, mgf, mzML or Agilent .d files. You can process separate files or entire directories.
 
 ### Swift outputs
 

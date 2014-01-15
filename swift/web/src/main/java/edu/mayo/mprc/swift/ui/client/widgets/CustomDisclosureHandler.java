@@ -20,6 +20,7 @@ package edu.mayo.mprc.swift.ui.client.widgets;
  * Event handler interface for {@link com.google.gwt.user.client.ui.DisclosureEvent}.
  *
  * @see com.google.gwt.user.client.ui.DisclosurePanel
+ * @deprecated We should remove this panel as it is using an old GWT style
  */
 public interface CustomDisclosureHandler {
 	/**

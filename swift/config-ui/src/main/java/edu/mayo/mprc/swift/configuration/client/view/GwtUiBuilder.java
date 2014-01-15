@@ -1,5 +1,7 @@
 package edu.mayo.mprc.swift.configuration.client.view;
 
+import com.google.gwt.event.dom.client.*;
+import com.google.gwt.event.shared.EventHandler;
 import com.google.gwt.user.client.ui.*;
 import edu.mayo.mprc.swift.configuration.client.model.*;
 import edu.mayo.mprc.swift.configuration.client.validation.local.IntegerValidator;
@@ -7,7 +9,6 @@ import edu.mayo.mprc.swift.configuration.client.validation.local.RequiredFieldVa
 import edu.mayo.mprc.swift.configuration.client.validation.local.Validator;
 
 import java.util.Arrays;
-import java.util.EventListener;
 
 /**
  * A library of methods that create various UI components to be shared for the configuration.
@@ -146,7 +147,7 @@ public final class GwtUiBuilder implements UiBuilderClient {
 			if (editor instanceof TextBox) {
 				((TextBox) editor).setText(defaultValue);
 			} else if (editor instanceof CheckBox) {
-				((CheckBox) editor).setChecked("true".equals(defaultValue));
+				((CheckBox) editor).setValue("true".equals(defaultValue));
 			}
 			defaultValue = null;
 		}
@@ -167,18 +168,18 @@ public final class GwtUiBuilder implements UiBuilderClient {
 	}
 
 	private void addEditorValidator(final Widget editor, final MultiValidator validator, final ValidationPanel validationPanel) {
-		if (editor instanceof SourcesChangeEvents) {
-			((SourcesChangeEvents) editor).addChangeListener(new ChangeListener() {
+		if (editor instanceof HasChangeHandlers) {
+			((HasChangeHandlers) editor).addChangeHandler(new ChangeHandler() {
 				@Override
-				public void onChange(final Widget sender) {
-					validator.validate(PropertyList.getEditorValue(sender));
+				public void onChange(final ChangeEvent event) {
+					validator.validate(PropertyList.getEditorValue((Widget) event.getSource()));
 				}
 			});
-		} else if (editor instanceof SourcesClickEvents) {
-			((SourcesClickEvents) editor).addClickListener(new ClickListener() {
+		} else if (editor instanceof HasClickHandlers) {
+			((HasClickHandlers) editor).addClickHandler(new ClickHandler() {
 				@Override
-				public void onClick(final Widget sender) {
-					validator.validate(PropertyList.getEditorValue(sender));
+				public void onClick(final ClickEvent event) {
+					validator.validate(PropertyList.getEditorValue((Widget) event.getSource()));
 				}
 			});
 		} else {
@@ -213,9 +214,9 @@ public final class GwtUiBuilder implements UiBuilderClient {
 		validationPanel.setTestButton(test);
 		validationPanel.setTestProgress(testProgress);
 		validationPanel.setSuccessIndicator(successIndicator);
-		test.addClickListener(new ClickListener() {
+		test.addClickHandler(new ClickHandler() {
 			@Override
-			public void onClick(final Widget widget) {
+			public void onClick(final ClickEvent event) {
 				validator.runOnDemandValidation(PropertyList.getEditorValue(editor), validationPanel);
 			}
 		});
@@ -227,41 +228,21 @@ public final class GwtUiBuilder implements UiBuilderClient {
 	}
 
 	/**
-	 * Adds change listener to the preceeding property. If the preceeding property is
+	 * Adds change handler to the preceeding property. If the preceeding property is
 	 * represented by a TextBox, the listner must be of the type ChangeListener. If the
-	 * preceeding property is represented by a CheckBox, the listner must be of the type ClickListener.
+	 * preceeding property is represented by a CheckBox, the listner must be of the type ClickHandler.
 	 */
-	public GwtUiBuilder addEventListener(final EventListener listener) {
+	public GwtUiBuilder addEventHandler(final EventHandler handler) {
 		if (editor instanceof TextBox) {
-			if (!(listener instanceof ChangeListener)) {
-				throw new RuntimeException("The event listener for TextBox must be a change listener");
+			if (!(handler instanceof ChangeHandler)) {
+				throw new RuntimeException("The event handler for TextBox must be a change handler");
 			}
-			((TextBox) editor).addChangeListener((ChangeListener) listener);
+			((TextBox) editor).addChangeHandler((ChangeHandler) handler);
 		} else if (editor instanceof CheckBox) {
-			if (!(listener instanceof ClickListener)) {
-				throw new RuntimeException("The event listener for CheckBox must be a click listener");
+			if (!(handler instanceof ClickHandler)) {
+				throw new RuntimeException("The event handler for CheckBox must be a click handler");
 			}
-			((CheckBox) editor).addClickListener((ClickListener) listener);
-		}
-		return this;
-	}
-
-	/**
-	 * Removes change listener from the preceeding property. If the preceeding property is
-	 * represented by a TextBox, the listner must be of the type ChangeListener. If the
-	 * preceeding property is represented by a CheckBox, the listner must be of the type ClickListener.
-	 */
-	public GwtUiBuilder removeEventListener(final EventListener listener) {
-		if (editor instanceof TextBox) {
-			if (!(listener instanceof ChangeListener)) {
-				throw new RuntimeException("The event listener for TextBox must be a change listener");
-			}
-			((TextBox) editor).removeChangeListener((ChangeListener) listener);
-		} else if (editor instanceof CheckBox) {
-			if (!(listener instanceof ClickListener)) {
-				throw new RuntimeException("The event listener for CheckBox must be a click listener");
-			}
-			((CheckBox) editor).removeClickListener((ClickListener) listener);
+			((CheckBox) editor).addClickHandler((ClickHandler) handler);
 		}
 		return this;
 	}
@@ -330,14 +311,14 @@ public final class GwtUiBuilder implements UiBuilderClient {
 	public GwtUiBuilder enable(final String propertyName, final boolean synchronous) {
 		if (editor instanceof CheckBox) {
 			final CheckBox checkBox = (CheckBox) editor;
-			checkBox.addClickListener(new ClickListener() {
+			checkBox.addClickHandler(new ClickHandler() {
 
 				@Override
-				public void onClick(final Widget sender) {
-
+				public void onClick(final ClickEvent event) {
+					final Widget sender = (Widget) event.getSource();
 					if (sender instanceof CheckBox) {
 						final CheckBox checkBox = (CheckBox) sender;
-						final boolean enableLink = checkBox.isChecked() == synchronous;
+						final boolean enableLink = Boolean.TRUE.equals(checkBox.getValue()) == synchronous;
 						final Widget editor = propertyList.getWidgetForName(propertyName);
 						if (editor != null && editor instanceof FocusWidget) {
 							((FocusWidget) editor).setEnabled(enableLink);

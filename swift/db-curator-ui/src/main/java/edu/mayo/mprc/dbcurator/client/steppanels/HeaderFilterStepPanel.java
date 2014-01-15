@@ -54,14 +54,14 @@ public final class HeaderFilterStepPanel extends AbstractStepPanel {
 		final HorizontalPanel textModePanel = new HorizontalPanel();
 		textModePanel.setSpacing(5);
 		textModePanel.add(new Label("Text search mode: "));
-		radioModeSimple.setChecked(true);
+		radioModeSimple.setValue(true);
 		textModePanel.add(radioModeSimple);
 		textModePanel.add(radioModeRegEx);
 
 		final HorizontalPanel logicModePanel = new HorizontalPanel();
 		logicModePanel.setSpacing(5);
 		logicModePanel.add(new Label("Logical Mode: "));
-		radioLogicalAny.setChecked(true);
+		radioLogicalAny.setValue(true);
 		logicModePanel.add(radioLogicalAny);
 		logicModePanel.add(radioLogicalAll);
 		logicModePanel.add(radioLogicalNone);
@@ -85,10 +85,10 @@ public final class HeaderFilterStepPanel extends AbstractStepPanel {
 		containedStep.criteria = criteria.getText();
 
 		//see which match mode should be used
-		containedStep.textMode = (radioModeSimple.isChecked() ? "simple" : "regex");
+		containedStep.textMode = Boolean.TRUE.equals(radioModeSimple.getValue()) ? "simple" : "regex";
 
 		//look at which mode is checked and set appropriately
-		containedStep.matchMode = (radioLogicalAll.isChecked() ? "all" : (radioLogicalNone.isChecked() ? "none" : "any"));
+		containedStep.matchMode = Boolean.TRUE.equals(radioLogicalAll.getValue()) ? "all" : Boolean.TRUE.equals(radioLogicalNone.getValue()) ? "none" : "any";
 
 		return containedStep;
 	}
@@ -129,17 +129,17 @@ public final class HeaderFilterStepPanel extends AbstractStepPanel {
 
 		final String logicalMode = containedStep.matchMode;
 		if (logicalMode.equalsIgnoreCase("none")) {
-			radioLogicalNone.setChecked(true);
+			radioLogicalNone.setValue(true);
 		} else if (logicalMode.equalsIgnoreCase("all")) {
-			radioLogicalAll.setChecked(true);
+			radioLogicalAll.setValue(true);
 		} else {
-			radioLogicalAny.setChecked(true);
+			radioLogicalAny.setValue(true);
 		}
 
 		if (containedStep.textMode.equalsIgnoreCase("regex")) {
-			radioModeRegEx.setChecked(true);
+			radioModeRegEx.setValue(true);
 		} else {
-			radioModeSimple.setChecked(true);
+			radioModeSimple.setValue(true);
 		}
 	}
 

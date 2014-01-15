@@ -31,6 +31,8 @@ import java.util.NoSuchElementException;
  * This has to be copied because GWT's DisclosurePanel is final. :-(
  * <p/>
  * TODO This just a crude hacking of the GWT version; should be refined eventually.
+ *
+ * @deprecated We should remove this panel as it is using an old GWT style
  */
 public final class CustomDisclosurePanel extends Composite implements
 		HasWidgets {

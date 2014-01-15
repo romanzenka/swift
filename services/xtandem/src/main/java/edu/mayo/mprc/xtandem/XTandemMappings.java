@@ -290,8 +290,8 @@ public final class XTandemMappings implements Mappings {
 			}
 		}
 
-		for (final String s : hasSeries.keySet()) {
-			context.reportWarning("Tandem doesn't support ion series " + s);
+		if (!hasSeries.isEmpty()) {
+			context.reportWarning("Tandem doesn't support ion series " + Joiner.on(", ").join(hasSeries.keySet()));
 		}
 	}
 }

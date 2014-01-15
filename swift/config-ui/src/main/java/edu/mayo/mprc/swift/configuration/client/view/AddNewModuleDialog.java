@@ -1,5 +1,7 @@
 package edu.mayo.mprc.swift.configuration.client.view;
 
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.ui.*;
 import edu.mayo.mprc.swift.configuration.client.model.*;
 
@@ -36,7 +38,7 @@ public final class AddNewModuleDialog extends DialogBox {
 			for (final DaemonModel daemonModel : model.getDaemons()) {
 				final RadioButton radio = new RadioButton("daemonRadioGroup", "Add to " + daemonModel.getName() + " daemon.");
 				if (!wasChecked) {
-					radio.setChecked(true);
+					radio.setValue(true);
 					wasChecked = true;
 				}
 				daemonPanel.add(radio);
@@ -55,7 +57,7 @@ public final class AddNewModuleDialog extends DialogBox {
 				if (!UiBuilderClient.NONE_TYPE.equals(type)) {
 					final RadioButton radio = new RadioButton("typeRadioGroup", "Create " + type + " module.");
 					if (!wasChecked) {
-						radio.setChecked(true);
+						radio.setValue(true);
 						wasChecked = true;
 					}
 					typePanel.add(radio);
@@ -78,16 +80,16 @@ public final class AddNewModuleDialog extends DialogBox {
 		buttonPanel.add(okButton);
 		buttonPanel.add(cancelButton);
 
-		okButton.addClickListener(new ClickListener() {
+		okButton.addClickHandler(new ClickHandler() {
 			@Override
-			public void onClick(final Widget widget) {
+			public void onClick(final ClickEvent event) {
 				okClicked(callback);
 			}
 		});
 
-		cancelButton.addClickListener(new ClickListener() {
+		cancelButton.addClickHandler(new ClickHandler() {
 			@Override
-			public void onClick(final Widget widget) {
+			public void onClick(final ClickEvent event) {
 				hide();
 			}
 		});
@@ -108,7 +110,7 @@ public final class AddNewModuleDialog extends DialogBox {
 	private void okClicked(final NewModuleCreatedCallback callback) {
 		DaemonModel modelToAddTo = null;
 		for (final Map.Entry<DaemonModel, RadioButton> entry : daemonRadios.entrySet()) {
-			if (entry.getValue().isChecked()) {
+			if (Boolean.TRUE.equals(entry.getValue().getValue())) {
 				modelToAddTo = entry.getKey();
 				break;
 			}
@@ -117,7 +119,7 @@ public final class AddNewModuleDialog extends DialogBox {
 
 		String type = null;
 		for (final Map.Entry<String, RadioButton> entry : typeRadios.entrySet()) {
-			if (entry.getValue().isChecked()) {
+			if (Boolean.TRUE.equals(entry.getValue().getValue())) {
 				type = entry.getKey();
 				break;
 			}

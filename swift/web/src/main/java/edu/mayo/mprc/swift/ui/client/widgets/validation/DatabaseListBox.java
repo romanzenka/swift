@@ -46,12 +46,11 @@ public final class DatabaseListBox extends ValidatableListBox {
 		}
 	}
 
-	public void select(final int databaseId, final ValidationController validator) {
+	public void select(final int databaseId) {
 		for (final ClientValue allowedValue : allowedValues) {
 			final ClientSequenceDatabase csd = (ClientSequenceDatabase) allowedValue;
 			if (csd.getId() == databaseId) {
-				setValue(csd);
-				validator.onChange(this);
+				setValue(csd, true);
 				return;
 			}
 

@@ -5,6 +5,7 @@
 package edu.mayo.mprc.io.mzxml;
 
 import edu.mayo.mprc.MprcException;
+import edu.mayo.mprc.peaklist.PeakListWriter;
 import edu.mayo.mprc.utilities.FileUtilities;
 import org.proteomecommons.io.Peak;
 import org.proteomecommons.io.PeakList;
@@ -13,7 +14,6 @@ import org.proteomecommons.io.mzxml.Base64;
 import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
-import java.io.Closeable;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -23,7 +23,7 @@ import java.nio.ByteOrder;
 /**
  * Utility class for creating mzXML files given peak list objects.
  */
-public final class MzXMLPeakListWriter implements Closeable {
+public final class MzXMLPeakListWriter implements PeakListWriter {
 
 	private FileWriter fileWriter;
 	private XMLStreamWriter xmlWriter;
@@ -98,7 +98,8 @@ public final class MzXMLPeakListWriter implements Closeable {
 		xmlWriter.writeStartElement("msRun");
 	}
 
-	public int writePeakList(final PeakList peakList) throws XMLStreamException {
+	@Override
+	public int writePeakList(final PeakList peakList) {
 		final Peak[] peaks = peakList.getPeaks();
 
 		int byteBufferCapacity = 0;
@@ -134,79 +135,84 @@ public final class MzXMLPeakListWriter implements Closeable {
 		 */
 		final String encodedBytes = Base64.encodeBytes(bb.array(), false);
 
-		xmlWriter.writeCharacters("\n");
-		xmlWriter.writeStartElement("scan");
-		xmlWriter.writeAttribute("num", "" + scanNumber);
-
-		scanNumber++;
-
-		if (peakList.getTandemCount() != PeakList.UNKNOWN_TANDEM_COUNT) {
-			xmlWriter.writeAttribute("msLevel", "" + peakList.getTandemCount());
-		}
-
-		xmlWriter.writeAttribute("peaksCount", "" + peaks.length);
-
-		/**
-		 * Write precursor mz info
-		 */
-		if (peakList.getParentPeak() != null) {
-			final Peak parentPeak = peakList.getParentPeak();
-
-			if (parentPeak.getIntensity() == Peak.UNKNOWN_INTENSITY) {
-				throw new IllegalArgumentException("mzXML requires an intensity value for precursor peaks.");
-			}
-
-			if (parentPeak.getMassOverCharge() == Peak.UNKNOWN_MZ) {
-				throw new IllegalArgumentException("mzXML requires an mz value for precursor peaks.");
-			}
-
+		try {
 			xmlWriter.writeCharacters("\n");
-			xmlWriter.writeStartElement("precursorMz");
+			xmlWriter.writeStartElement("scan");
+			final int scanNumberWritten = scanNumber;
+			xmlWriter.writeAttribute("num", "" + scanNumberWritten);
 
-			writeNonNull("precursorIntensity", Float.toString((float) parentPeak.getIntensity()));
+			scanNumber++;
 
-			if (parentPeak.getCharge() != Peak.UNKNOWN_CHARGE) {
-				xmlWriter.writeAttribute("precursorCharge", Integer.toString(parentPeak.getCharge()));
+			if (peakList.getTandemCount() != PeakList.UNKNOWN_TANDEM_COUNT) {
+				xmlWriter.writeAttribute("msLevel", "" + peakList.getTandemCount());
 			}
 
-			xmlWriter.writeCharacters(Float.toString((float) parentPeak.getMassOverCharge()));
+			xmlWriter.writeAttribute("peaksCount", "" + peaks.length);
 
 			/**
-			 * Close the precursorMz element
+			 * Write precursor mz info
 			 */
+			if (peakList.getParentPeak() != null) {
+				final Peak parentPeak = peakList.getParentPeak();
+
+				if (parentPeak.getIntensity() == Peak.UNKNOWN_INTENSITY) {
+					throw new IllegalArgumentException("mzXML requires an intensity value for precursor peaks.");
+				}
+
+				if (parentPeak.getMassOverCharge() == Peak.UNKNOWN_MZ) {
+					throw new IllegalArgumentException("mzXML requires an mz value for precursor peaks.");
+				}
+
+				xmlWriter.writeCharacters("\n");
+				xmlWriter.writeStartElement("precursorMz");
+
+				writeNonNull("precursorIntensity", Float.toString((float) parentPeak.getIntensity()));
+
+				if (parentPeak.getCharge() != Peak.UNKNOWN_CHARGE) {
+					xmlWriter.writeAttribute("precursorCharge", Integer.toString(parentPeak.getCharge()));
+				}
+
+				xmlWriter.writeCharacters(Float.toString((float) parentPeak.getMassOverCharge()));
+
+				/**
+				 * Close the precursorMz element
+				 */
+				xmlWriter.writeEndElement();
+			} else {
+				throw new IllegalArgumentException("mzXML requires an intensity and mz values for precursor peaks.");
+			}
+
+			/**
+			 * Setup peaks element
+			 */
+			xmlWriter.writeCharacters("\n");
+			xmlWriter.writeStartElement("peaks");
+
+			if (!enable64BitPrecision) {
+				xmlWriter.writeAttribute("precision", "32");
+			} else {
+				xmlWriter.writeAttribute("precision", "64");
+			}
+
+			/**
+			 * These two values are always the same
+			 */
+			xmlWriter.writeAttribute("byteOrder", "network");
+			xmlWriter.writeAttribute("pairOrder", "m/z-int");
+			xmlWriter.writeCharacters(encodedBytes);
+
+			/**
+			 * End peaks and scan
+			 */
+			xmlWriter.writeCharacters("\n");
 			xmlWriter.writeEndElement();
-		} else {
-			throw new IllegalArgumentException("mzXML requires an intensity and mz values for precursor peaks.");
+			xmlWriter.writeCharacters("\n");
+			xmlWriter.writeEndElement();
+
+			return scanNumberWritten;
+		} catch (XMLStreamException e) {
+			throw new MprcException("Could not write peaklist to mzXML file", e);
 		}
-
-		/**
-		 * Setup peaks element
-		 */
-		xmlWriter.writeCharacters("\n");
-		xmlWriter.writeStartElement("peaks");
-
-		if (!enable64BitPrecision) {
-			xmlWriter.writeAttribute("precision", "32");
-		} else {
-			xmlWriter.writeAttribute("precision", "64");
-		}
-
-		/**
-		 * These two values are always the same
-		 */
-		xmlWriter.writeAttribute("byteOrder", "network");
-		xmlWriter.writeAttribute("pairOrder", "m/z-int");
-		xmlWriter.writeCharacters(encodedBytes);
-
-		/**
-		 * End peaks and scan
-		 */
-		xmlWriter.writeCharacters("\n");
-		xmlWriter.writeEndElement();
-		xmlWriter.writeCharacters("\n");
-		xmlWriter.writeEndElement();
-
-		return scanNumber - 1;
 	}
 
 	private void writeNonNull(final String name, final String value) throws XMLStreamException {
@@ -219,6 +225,9 @@ public final class MzXMLPeakListWriter implements Closeable {
 	public void close() {
 		if (xmlWriter != null) {
 			try {
+				// Close msRun
+				xmlWriter.writeEndElement();
+				// Close mzXML
 				xmlWriter.writeEndElement();
 				xmlWriter.close();
 				xmlWriter = null;

@@ -21,6 +21,7 @@ import edu.mayo.mprc.utilities.progress.UserProgressReporter;
 import org.apache.log4j.Logger;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.Resource;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -45,6 +46,7 @@ public final class QaWorker extends WorkerBase {
 	private String rExecutable;
 	private File rScript;
 	private File xvfbWrapperScript;
+	private SpectrumInfoJoiner spectrumInfoJoiner;
 
 	private static final String XVFB_WRAPPER_SCRIPT = "xvfbWrapperScript";
 	private static final String R_SCRIPT = "rScript";
@@ -79,8 +81,8 @@ public final class QaWorker extends WorkerBase {
 			final int numFilesTotal = countTotalFiles(experimentQas);
 
 			for (final ExperimentQa experimentQa : experimentQas) {
-				final List<MgfQaFiles> entries = experimentQa.getMgfQaFiles();
-				for (final MgfQaFiles me : entries) {
+				final List<QaFiles> entries = experimentQa.getQaFiles();
+				for (final QaFiles me : entries) {
 					atLeastOneFileMissing = addRScriptInputLine(fileWriter, qaReportFolder, experimentQa, generatedFileList, me, atLeastOneFileMissing);
 					numFilesDone++;
 					reportProgress(numFilesDone * PERCENT_GENERATING_FILES / numFilesTotal, progressReporter);
@@ -111,12 +113,12 @@ public final class QaWorker extends WorkerBase {
 		}
 	}
 
-	private boolean addRScriptInputLine(final FileWriter fileWriter, final File qaReportFolder, final ExperimentQa experimentQa, final LinkedList<File> generatedFiles, final MgfQaFiles qaFiles, boolean atLeastOneFileMissing) throws IOException {
+	private boolean addRScriptInputLine(final FileWriter fileWriter, final File qaReportFolder, final ExperimentQa experimentQa, final LinkedList<File> generatedFiles, final QaFiles qaFiles, boolean atLeastOneFileMissing) throws IOException {
 		final String uniqueMgfAnalysisName;
 		boolean generate;
 		final File msmsEvalDiscriminantFile;
 		final File ticFile;
-		final File mgfFile = qaFiles.getMgfFile();
+		final File mgfFile = qaFiles.getInputFile();
 
 		// The name of the analysis output file is the original .mgf name combined with scaffold version to make it unique
 		uniqueMgfAnalysisName = FileUtilities.getFileNameWithoutExtension(mgfFile) + "." +
@@ -156,7 +158,7 @@ public final class QaWorker extends WorkerBase {
 			final RawDumpReader rawDumpReader = new RawDumpReader(qaFiles.getRawSpectraFile());
 			final MSMSEvalOutputReader msmsEvalReader = new MSMSEvalOutputReader(qaFiles.getMsmsEvalOutputFile());
 			final String rawInputFile = qaFiles.getRawInputFile() != null ? qaFiles.getRawInputFile().getAbsolutePath() : null;
-			generate = SpectrumInfoJoiner.joinSpectrumData(
+			generate = spectrumInfoJoiner.joinSpectrumData(
 					mgfFile,
 					scaffoldParser,
 					rawDumpReader,
@@ -223,7 +225,7 @@ public final class QaWorker extends WorkerBase {
 		return null;
 	}
 
-	private void writeInputLine(final FileWriter fileWriter, final File outputFile, final File idVsPpmFile, final File mzVsPpmFile, final File idVsMzFile, final File sourceCurrentFile, final File msmsEvalDiscriminantFile, final boolean generate, final MgfQaFiles qaFiles, final File pepTolFile, final File ticFile, final File chromatogramFile) throws IOException {
+	private void writeInputLine(final FileWriter fileWriter, final File outputFile, final File idVsPpmFile, final File mzVsPpmFile, final File idVsMzFile, final File sourceCurrentFile, final File msmsEvalDiscriminantFile, final boolean generate, final QaFiles qaFiles, final File pepTolFile, final File ticFile, final File chromatogramFile) throws IOException {
 		fileWriter.write(outputFile.getAbsolutePath());
 		fileWriter.write("\t");
 		fileWriter.write(idVsPpmFile.getAbsolutePath());
@@ -257,7 +259,7 @@ public final class QaWorker extends WorkerBase {
 	private int countTotalFiles(final List<ExperimentQa> experimentQas) {
 		int numFilesTotal = 0;
 		for (final ExperimentQa experimentQa : experimentQas) {
-			numFilesTotal += experimentQa.getMgfQaFiles().size();
+			numFilesTotal += experimentQa.getQaFiles().size();
 		}
 		return numFilesTotal;
 	}
@@ -316,19 +318,39 @@ public final class QaWorker extends WorkerBase {
 		this.xvfbWrapperScript = xvfbWrapperScript;
 	}
 
+	public SpectrumInfoJoiner getSpectrumInfoJoiner() {
+		return spectrumInfoJoiner;
+	}
+
+	public void setSpectrumInfoJoiner(final SpectrumInfoJoiner spectrumInfoJoiner) {
+		this.spectrumInfoJoiner = spectrumInfoJoiner;
+	}
+
 	/**
 	 * A factory capable of creating the worker
 	 */
 	@Component("qaWorkerFactory")
 	public static final class Factory extends WorkerFactoryBase<Config> {
+		private SpectrumInfoJoiner spectrumInfoJoiner;
+
 		@Override
 		public Worker create(final Config config, final DependencyResolver dependencies) {
 			final QaWorker qaWorker = new QaWorker();
 			qaWorker.setRExecutable(config.get(R_EXECUTABLE));
 			qaWorker.setRScript(new File(config.get(R_SCRIPT)));
-			String xvfbWrapperScript = config.get(XVFB_WRAPPER_SCRIPT);
+			final String xvfbWrapperScript = config.get(XVFB_WRAPPER_SCRIPT);
 			qaWorker.setXvfbWrapperScript(xvfbWrapperScript != null && !xvfbWrapperScript.isEmpty() ? new File(xvfbWrapperScript) : null);
+			qaWorker.setSpectrumInfoJoiner(getSpectrumInfoJoiner());
 			return qaWorker;
+		}
+
+		public SpectrumInfoJoiner getSpectrumInfoJoiner() {
+			return spectrumInfoJoiner;
+		}
+
+		@Resource(name = "spectrumInfoJoiner")
+		public void setSpectrumInfoJoiner(final SpectrumInfoJoiner spectrumInfoJoiner) {
+			this.spectrumInfoJoiner = spectrumInfoJoiner;
 		}
 	}
 
@@ -339,7 +361,7 @@ public final class QaWorker extends WorkerBase {
 		public Config() {
 		}
 
-		public Config(String xvfbWrapperScript, String rScript) {
+		public Config(final String xvfbWrapperScript, final String rScript) {
 			put(XVFB_WRAPPER_SCRIPT, xvfbWrapperScript);
 			put(R_SCRIPT, rScript);
 		}

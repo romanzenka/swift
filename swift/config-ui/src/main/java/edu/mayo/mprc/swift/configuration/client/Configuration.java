@@ -1,6 +1,8 @@
 package edu.mayo.mprc.swift.configuration.client;
 
 import com.google.gwt.core.client.EntryPoint;
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.*;
 import edu.mayo.mprc.swift.configuration.client.model.*;
@@ -44,9 +46,9 @@ public final class Configuration implements EntryPoint, Context {
 		saveConfigurationButton = new Button("Save configuration");
 		saveConfigurationButton.addStyleName("btn");
 		saveConfigurationButton.addStyleName("btn-primary");
-		saveConfigurationButton.addClickListener(new ClickListener() {
+		saveConfigurationButton.addClickHandler(new ClickHandler() {
 			@Override
-			public void onClick(final Widget widget) {
+			public void onClick(final ClickEvent event) {
 				clearErrorMessages();
 				displayProgressMessage("Saving...");
 				save();
@@ -93,9 +95,9 @@ public final class Configuration implements EntryPoint, Context {
 			panel.add(errorMessage);
 
 			final Button clearErrorButton = new Button("Clear Error");
-			clearErrorButton.addClickListener(new ClickListener() {
+			clearErrorButton.addClickHandler(new ClickHandler() {
 				@Override
-				public void onClick(final Widget sender) {
+				public void onClick(final ClickEvent event) {
 					multiErrorPanel.remove(panel);
 				}
 			});

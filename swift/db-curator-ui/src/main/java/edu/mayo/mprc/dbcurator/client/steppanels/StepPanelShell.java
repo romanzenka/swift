@@ -1,5 +1,7 @@
 package edu.mayo.mprc.dbcurator.client.steppanels;
 
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.Event;
 import com.google.gwt.user.client.ui.*;
 
@@ -113,17 +115,17 @@ class StepPanelShell extends Composite {
 		header.add(lblStepNumber);
 
 		expandButton = new Image("images/rightarrow.png");
-		expandButton.addClickListener(new ClickListener() {
+		expandButton.addClickHandler(new ClickHandler() {
 			@Override
-			public void onClick(final Widget sender) {
+			public void onClick(final ClickEvent event) {
 				toggleCollapse();
 			}
 		});
 
 		collapseButton = new Image("images/downarrow.png");
-		collapseButton.addClickListener(new ClickListener() {
+		collapseButton.addClickHandler(new ClickHandler() {
 			@Override
-			public void onClick(final Widget sender) {
+			public void onClick(final ClickEvent event) {
 				toggleCollapse();
 			}
 		});
@@ -139,9 +141,9 @@ class StepPanelShell extends Composite {
 		removalButton.setStyleName("stepshell-header-stepremover");
 //		removalButton.setOnStyle("stepshell-header-stepremover");
 //		removalButton.setOffStyle("stepshell-header-stepremover");
-		removalButton.addClickListener(new ClickListener() {
+		removalButton.addClickHandler(new ClickHandler() {
 			@Override
-			public void onClick(final Widget sender) {
+			public void onClick(final ClickEvent event) {
 				if (containedStepPanel.isEditable()) {
 					container.remove(StepPanelShell.this);
 					container.refresh();

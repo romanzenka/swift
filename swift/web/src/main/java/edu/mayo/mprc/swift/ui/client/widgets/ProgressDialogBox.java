@@ -1,10 +1,10 @@
 package edu.mayo.mprc.swift.ui.client.widgets;
 
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Button;
-import com.google.gwt.user.client.ui.ClickListener;
 import com.google.gwt.user.client.ui.DialogBox;
-import com.google.gwt.user.client.ui.Widget;
 
 public final class ProgressDialogBox extends DialogBox {
 
@@ -24,9 +24,9 @@ public final class ProgressDialogBox extends DialogBox {
 		addStyleName(PROGRESS_STYLE);
 		setText(text);
 		final Button cancel = new Button("Cancel");
-		cancel.addClickListener(new ClickListener() {
+		cancel.addClickHandler(new ClickHandler() {
 			@Override
-			public void onClick(final Widget sender) {
+			public void onClick(final ClickEvent event) {
 				hide();
 			}
 		});

@@ -14,10 +14,33 @@ import java.io.File;
 final class RawToMgfTask extends AsyncTaskBase implements FileProducingTask {
 	private static final Logger LOGGER = Logger.getLogger(RawToMgfTask.class);
 
-	private File inputFile;
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (!(o instanceof RawToMgfTask)) return false;
+
+		RawToMgfTask that = (RawToMgfTask) o;
+
+		if (publicAccess != that.publicAccess) return false;
+		if (extractMsnParameters != null ? !extractMsnParameters.equals(that.extractMsnParameters) : that.extractMsnParameters != null)
+			return false;
+		if (inputFile != null ? !inputFile.equals(that.inputFile) : that.inputFile != null) return false;
+
+		return true;
+	}
+
+	@Override
+	public int hashCode() {
+		int result = inputFile != null ? inputFile.hashCode() : 0;
+		result = 31 * result + (extractMsnParameters != null ? extractMsnParameters.hashCode() : 0);
+		result = 31 * result + (publicAccess ? 1 : 0);
+		return result;
+	}
+
+	private final File inputFile;
+	private final String extractMsnParameters;
+	private final boolean publicAccess;
 	private File outputFile = null;
-	private String extractMsnParameters;
-	private boolean publicAccess;
 
 	/**
 	 * @param publicAccess When true, the task requests the cache to give the user access to the .mgf file from the user space.
@@ -68,7 +91,7 @@ final class RawToMgfTask extends AsyncTaskBase implements FileProducingTask {
 	 */
 	@Override
 	public WorkPacket createWorkPacket() {
-		if (inputFile.getName().endsWith(".mgf")) {
+		if (!RawFilesSupported.isRawFile(inputFile)) {
 			LOGGER.info("Skipping Raw2MGF for an mgf file " + inputFile.getAbsolutePath());
 			outputFile = inputFile;
 			// Nothing to do, signalize success

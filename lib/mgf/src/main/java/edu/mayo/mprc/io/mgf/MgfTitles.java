@@ -1,5 +1,6 @@
 package edu.mayo.mprc.io.mgf;
 
+import edu.mayo.mprc.peaklist.PeakListReader;
 import edu.mayo.mprc.utilities.FileUtilities;
 import org.proteomecommons.io.mgf.MascotGenericFormatPeakList;
 
@@ -16,8 +17,7 @@ public final class MgfTitles {
 	 * @return List of all spectra titles.
 	 */
 	public static List<String> getTitles(final File mgf) {
-		MGFPeakListReader sourceMgfReader = new MGFPeakListReader(mgf);
-		sourceMgfReader.setReadPeaks(false);
+		PeakListReader sourceMgfReader = new MgfPeakListReader(mgf, false);
 		List<String> titles = new ArrayList<String>(1000);
 		try {
 			MascotGenericFormatPeakList peakList;

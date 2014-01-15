@@ -28,6 +28,8 @@ public final class FileEntry extends Entry {
 			newItem.addStyleName("file-raw");
 		} else if (getName().endsWith(".mgf")) {
 			newItem.addStyleName("file-mgf");
+		} else if (getName().endsWith(".mzML")) {
+			newItem.addStyleName("file-mzml");
 		} else if (upperCaseName.endsWith(".d")) {
 			newItem.addStyleName("file-d");
 		}

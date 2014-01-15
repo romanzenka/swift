@@ -22,6 +22,8 @@ public final class ToleranceTest {
 		test(".5 da", 0.5, MassUnit.Da, "0.5 Da");
 		test("+2.5 Da", 2.5, MassUnit.Da, "2.5 Da");
 		test("0.0000001 Da", 0.0000001, MassUnit.Da, "0.0000001 Da");
+		test("1 Dalton", 1, MassUnit.Da, "1 Da");
+		test("1 Daltons", 1, MassUnit.Da, "1 Da");
 	}
 
 	@Test

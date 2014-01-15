@@ -10,6 +10,7 @@ import edu.mayo.mprc.messaging.Service;
 import edu.mayo.mprc.utilities.progress.ProgressListener;
 
 import java.io.Serializable;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Wrapper around a Service that represents a connection to a daemon.
@@ -28,7 +29,7 @@ final class DirectDaemonConnection implements DaemonConnection {
 	public static final int NORMAL_PRIORITY = 4;
 
 	private Service service = null;
-	private static int listenerNumber = 0;
+	private static AtomicInteger listenerNumber = new AtomicInteger(0);
 	private FileTokenFactory fileTokenFactory;
 
 	DirectDaemonConnection(final Service service, final FileTokenFactory fileTokenFactory) {
@@ -63,8 +64,8 @@ final class DirectDaemonConnection implements DaemonConnection {
 		workPacket.translateOnSender(fileTokenFactory);
 
 		try {
-			listenerNumber++;
-			service.sendRequest(workPacket, priority, new DaemonResponseListener(listener, "R#" + listenerNumber, this));
+			final int number = listenerNumber.incrementAndGet();
+			service.sendRequest(workPacket, priority, new DaemonResponseListener(listener, "R#" + number, this));
 		} catch (MprcException e) {
 			// SWALLOWED: The exception is reported directly to the listener
 			listener.requestTerminated(new DaemonException(e));

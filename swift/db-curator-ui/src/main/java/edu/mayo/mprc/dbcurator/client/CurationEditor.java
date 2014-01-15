@@ -1,9 +1,10 @@
 package edu.mayo.mprc.dbcurator.client;
 
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.event.dom.client.*;
+import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.Window;
-import com.google.gwt.user.client.WindowCloseListener;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.rpc.ServiceDefTarget;
 import com.google.gwt.user.client.ui.*;
@@ -24,7 +25,7 @@ public final class CurationEditor extends Composite {
 	 * A timer that should be used to cause requests to be made to the server.  We can change how often these updates are made
 	 * this timer will just make a call to the syncCuration method
 	 */
-	private Timer updateTimer = new Timer() {
+	private final Timer updateTimer = new Timer() {
 
 		@Override
 		public void run() {
@@ -39,42 +40,41 @@ public final class CurationEditor extends Composite {
 	private Panel controlPanel;
 
 	private boolean curationIsRunning = false;
-	private boolean curationIsSaving = false;
-	private MessageManager messageManager = new MessageManager();
+	private final MessageManager messageManager = new MessageManager();
 	private CurationStub curation = new CurationStub();
 	private EditorCloseCallback closeCallback = null;
 	private Integer initialCurationID = null;
 
 	//widgets and other UI related things...
-	private Label lblID = new Label();
-	private Label lblShortNameError = new Label("");
+	private final Label lblID = new Label();
+	private final Label lblShortNameError = new Label("");
 	private Panel commandPanel;
-	private Hyperlink cmdRun = new Hyperlink("Run", "Run");
-	private Hyperlink cmdView;
+	private final Anchor cmdRun = new Anchor("Run");
+	private Anchor cmdView = new Anchor("View");
 
-	private TextArea textareaLog = new TextArea();
-	private TextBox txtShortName = new TextBox();
-	private TextBox txtTitle = new TextBox();
-	private TextArea txtNotes = new TextArea();
-	private TextBox txtDecoy = new TextBox();
-	private TextBox txtEmail = new TextBox();
-	private HTML htmlStepSelectionTitle = new HTML();
+	private final TextArea textareaLog = new TextArea();
+	private final TextBox txtShortName = new TextBox();
+	private final TextBox txtTitle = new TextBox();
+	private final TextArea txtNotes = new TextArea();
+	private final TextBox txtDecoy = new TextBox();
+	private final TextBox txtEmail = new TextBox();
+	private final HTML htmlStepSelectionTitle = new HTML();
 	/**
 	 * holds the steps that are already part of the displayed curation
 	 */
 	private StepPanelContainer stepContainer;
-	private Label lblResultFilePath = new Label("Resulting File (click to copy)");
-	private CheckBox chkShowLog = new CheckBox();
-	private ListBox lstStepChoice = new ListBox();
-	private HorizontalPanel appPanel = new HorizontalPanel();
+	private final Label lblResultFilePath = new Label("Resulting File (click to copy)");
+	private final CheckBox chkShowLog = new CheckBox();
+	private final ListBox lstStepChoice = new ListBox();
+	private final HorizontalPanel appPanel = new HorizontalPanel();
 	private Panel stepOperationPanel = new VerticalPanel();
 	private Panel stepInfoPanel = new VerticalPanel();
-	private WindowCloseListener closeHandler = null;
+	private HandlerRegistration closeHandler = null;
 
-	private Map<String, String> userEmailInitialPairs;
-	private String currentUserEmail;
+	private final Map<String, String> userEmailInitialPairs;
+	private final String currentUserEmail;
 
-	private CommonDataRequesterAsync commonDataRequester;
+	private final CommonDataRequesterAsync commonDataRequester;
 
 	/**
 	 * this is an alternatie constructor that will load a given curation and call a callback when the user clicks
@@ -85,7 +85,7 @@ public final class CurationEditor extends Composite {
 	 * @param closeCallback     a method we will call when the user clicks close.  As part of the callback will be the id of the currently open curation.
 	 */
 	public CurationEditor(final Integer curationToDisplay, final String currentUserEmail, final Map<String, String> userEmailInitialPairs, final EditorCloseCallback closeCallback) {
-		commonDataRequester = (CommonDataRequesterAsync) GWT.create(CommonDataRequester.class);
+		commonDataRequester = GWT.create(CommonDataRequester.class);
 		final ServiceDefTarget endpoint = (ServiceDefTarget) commonDataRequester;
 		endpoint.setServiceEntryPoint(GWT.getModuleBaseURL() + "CommonDataRequester");
 
@@ -122,21 +122,16 @@ public final class CurationEditor extends Composite {
 
 	private void setupCloseHandlers() {
 
-		Window.addWindowCloseListener(closeHandler = new WindowCloseListener() {
-
+		closeHandler = Window.addWindowClosingHandler(new Window.ClosingHandler() {
 			@Override
-			public String onWindowClosing() {
+			public void onWindowClosing(final Window.ClosingEvent event) {
 				//if the curation has not been run then make sure they are given a chance to abort.
 				if (curation.hasBeenRun()) {
-					return null; //don't prompt just close
+					event.setMessage(null);
 				} else {
-					return "In order to use this database its curation must be run.\n" +
-							"To do so, press cancel below and then click run.";
+					event.setMessage("In order to use this database its curation must be run.\n" +
+							"To do so, press cancel below and then click run.");
 				}
-			}
-
-			@Override
-			public void onWindowClosed() {
 			}
 		});
 
@@ -264,18 +259,10 @@ public final class CurationEditor extends Composite {
 		shortName.setTitle("A name for submitting to search engines");
 
 		txtShortName.setMaxLength(CurationValidation.SHORTNAME_MAX_LENGTH);
-		txtShortName.addKeyboardListener(new KeyboardListener() {
+		txtShortName.addKeyUpHandler(new KeyUpHandler() {
 			@Override
-			public void onKeyUp(final Widget widget, final char c, final int i) {
+			public void onKeyUp(final KeyUpEvent event) {
 				validateShortName(txtShortName.getText());
-			}
-
-			@Override
-			public void onKeyDown(final Widget widget, final char c, final int i) {
-			}
-
-			@Override
-			public void onKeyPress(final Widget widget, final char c, final int i) {
 			}
 		});
 		propGrid.setWidget(0, 0, shortName);
@@ -315,10 +302,9 @@ public final class CurationEditor extends Composite {
 		propGrid.setWidget(4, 1, txtEmail);
 
 		lblResultFilePath.setStyleName("resultfilepath");
-		lblResultFilePath.addMouseListener(new MouseListener() {
-
+		lblResultFilePath.addMouseDownHandler(new MouseDownHandler() {
 			@Override
-			public void onMouseDown(final Widget widget, final int i, final int i1) {
+			public void onMouseDown(final MouseDownEvent event) {
 				final PopupPanel pop = new PopupPanel(/*autoHide*/true);
 				pop.setPopupPosition(lblResultFilePath.getAbsoluteLeft(), lblResultFilePath.getAbsoluteTop());
 				final TextBox txtPath = new TextBox();
@@ -326,33 +312,13 @@ public final class CurationEditor extends Composite {
 				pop.add(txtPath);
 				pop.show();
 			}
-
-			@Override
-			public void onMouseEnter(final Widget widget) {
-				//ignore
-			}
-
-			@Override
-			public void onMouseLeave(final Widget widget) {
-				//ignore
-			}
-
-			@Override
-			public void onMouseMove(final Widget widget, final int i, final int i1) {
-				//ignore
-			}
-
-			@Override
-			public void onMouseUp(final Widget widget, final int i, final int i1) {
-				//ignore
-			}
 		});
 		controlPanel.add(lblResultFilePath);
 
 
 		controlPanel.add(htmlStepSelectionTitle);
 
-		final StringBuilder sb = new StringBuilder();
+		final StringBuilder sb = new StringBuilder(100);
 		sb.append("Drag the tops of steps to rearrange.<br>");
 		sb.append("Click 'New' to create a new Curation.<br>");
 		sb.append("Click 'Copy' to copy current Curation.<br>");
@@ -368,14 +334,10 @@ public final class CurationEditor extends Composite {
 		controlPanel.add(commandPanel);
 
 		chkShowLog.setText("Show Log:");
-		chkShowLog.addClickListener(new ClickListener() {
+		chkShowLog.addClickHandler(new ClickHandler() {
 			@Override
-			public void onClick(final Widget widget) {
-				if (widget instanceof CheckBox) {
-					textareaLog.setVisible(((CheckBox) widget).isChecked());
-				} else {
-					throw new RuntimeException("Programmer error: incompatible type");
-				}
+			public void onClick(ClickEvent event) {
+				textareaLog.setVisible(Boolean.TRUE.equals(chkShowLog.getValue()));
 			}
 		});
 		controlPanel.add(chkShowLog);
@@ -444,33 +406,28 @@ public final class CurationEditor extends Composite {
 		lstStepChoice.addItem(DatabaseUploadPanel.TITLE);
 		lstStepChoice.addItem(HeaderTransformPanel.TITLE);
 
-		lstStepChoice.addChangeListener(new ChangeListener() {
+		lstStepChoice.addChangeHandler(new ChangeHandler() {
 			@Override
-			public void onChange(final Widget widget) {
-				final int selectedIndex;
-				if (widget instanceof ListBox) {
-					selectedIndex = ((ListBox) widget).getSelectedIndex();
-				} else {
-					throw new RuntimeException("Programmer error: incompatible type");
-				}
+			public void onChange(ChangeEvent event) {
+				final int selectedIndex = lstStepChoice.getSelectedIndex();
 
 				switch (selectedIndex) {
-					case (0):
+					case 0:
 						stepContainer.add(new NewDatabaseInclusionStub());
 						break;
-					case (1):
+					case 1:
 						stepContainer.add(new HeaderFilterStepStub());
 						break;
-					case (2):
+					case 2:
 						stepContainer.add(new SequenceManipulationStepStub());
 						break;
-					case (3):
+					case 3:
 						stepContainer.add(new ManualInclusionStepStub());
 						break;
-					case (4):
+					case 4:
 						stepContainer.add(new DatabaseUploadStepStub());
 						break;
-					case (5):
+					case 5:
 						stepContainer.add(new HeaderTransformStub());
 						break;
 					default:
@@ -478,10 +435,8 @@ public final class CurationEditor extends Composite {
 				}
 
 				//set to none selected (actually using this as a button container...)
-				((ListBox) widget).setSelectedIndex(-1);
+				lstStepChoice.setSelectedIndex(-1);
 			}
-
-
 		});
 
 	}
@@ -521,39 +476,39 @@ public final class CurationEditor extends Composite {
 	 * creates all of the command buttons for dealing with a curation that will appear at the bottom of the screen
 	 */
 	private Panel createCommandPanel() {
-		final HorizontalPanel commandPanel = new HorizontalPanel();
+		final HorizontalPanel cmdPanel = new HorizontalPanel();
 
 		final Panel newPanel = new VerticalPanel();
 
-		final Hyperlink cmdCreateNew = new Hyperlink("New", "New");
+		final Anchor cmdCreateNew = new Anchor("New");
 		cmdCreateNew.setTitle("To create a new empty curation for you editing.");
 		cmdCreateNew.setStyleName("command-link");
-		cmdCreateNew.addClickListener(new ClickListener() {
+		cmdCreateNew.addClickHandler(new ClickHandler() {
 			@Override
-			public void onClick(final Widget widget) {
+			public void onClick(final ClickEvent event) {
 				startNewCuration();
 			}
 		});
 		newPanel.add(cmdCreateNew);
 
-		final Hyperlink cmdCopyCurrent = new Hyperlink("Copy", "Copy");
+		final Anchor cmdCopyCurrent = new Anchor("Copy");
 		cmdCopyCurrent.setTitle("To make a copy of the currently displayed curation for you own editing.");
 		cmdCopyCurrent.setStyleName("command-link");
-		cmdCopyCurrent.addClickListener(new ClickListener() {
+		cmdCopyCurrent.addClickHandler(new ClickHandler() {
 			@Override
-			public void onClick(final Widget widget) {
+			public void onClick(final ClickEvent event) {
 				copyCuration();
 			}
 		});
 		newPanel.add(cmdCopyCurrent);
 
-		commandPanel.add(newPanel);
+		cmdPanel.add(newPanel);
 
 		cmdRun.setStyleName("command-link");
 		cmdRun.setTitle("To run the Curation and generate a FASTA file.");
-		cmdRun.addClickListener(new ClickListener() {
+		cmdRun.addClickHandler(new ClickHandler() {
 			@Override
-			public void onClick(final Widget widget) {
+			public void onClick(final ClickEvent event) {
 				//call the server and perform a validation of the curation.  When the validation is complete then this CurationEditor
 				//will be notified and it will need to tell the StepPanelContainer and it will forward the message to the steps that they
 				//should check for any error messages.
@@ -565,17 +520,15 @@ public final class CurationEditor extends Composite {
 
 		runPanel.add(cmdRun);
 
-		commandPanel.add(runPanel);
+		cmdPanel.add(runPanel);
 
 		final Panel closePanel = new VerticalPanel();
 
-		cmdView = new Hyperlink("View", "View");
 		cmdView.setTitle("To view the contents of the resulting file.  If not yet run then this option will not function.");
 		cmdView.setStyleName("command-link");
-		cmdView.addClickListener(new ClickListener() {
-
+		cmdView.addClickHandler(new ClickHandler() {
 			@Override
-			public void onClick(final Widget widget) {
+			public void onClick(final ClickEvent event) {
 				if (curation.getPathToResult() == null || curation.getPathToResult().isEmpty()) {
 					showPopupMessage("There is not file associated with the curation please run the curation first.");
 					return;
@@ -591,27 +544,26 @@ public final class CurationEditor extends Composite {
 		});
 		closePanel.add(cmdView);
 
-		final Hyperlink cmdClose = new Hyperlink("Close", "Close");
+		final Anchor cmdClose = new Anchor("Close");
 		cmdClose.setTitle("Leave the Curation Editor and return the the main page selecting the current curation.");
 		cmdClose.setStyleName("command-link");
-		cmdClose.addClickListener(new ClickListener() {
-
+		cmdClose.addClickHandler(new ClickHandler() {
 			@Override
-			public void onClick(final Widget widget) {
+			public void onClick(final ClickEvent event) {
 				if (closeCallback != null && (curation.hasBeenRun() || Window.confirm("In order to use a database a curation must be run.\nClick 'OK' to close anyway."))) {
-					Window.removeWindowCloseListener(closeHandler);
+					closeHandler.removeHandler();
 					closeCallback.editorClosed((curation.hasBeenRun() ? curation.getId() : initialCurationID));
 				}
 			}
 		});
 		closePanel.add(cmdClose);
 
-		commandPanel.add(closePanel);
+		cmdPanel.add(closePanel);
 
 		final DockPanel commandContainer = new DockPanel();
 		final Panel spacer = new AbsolutePanel();
 		commandContainer.add(spacer, DockPanel.WEST);
-		commandContainer.add(commandPanel, DockPanel.EAST);
+		commandContainer.add(cmdPanel, DockPanel.EAST);
 
 		return commandContainer;
 	}
@@ -624,8 +576,6 @@ public final class CurationEditor extends Composite {
 	public void runCuration() {
 		if (curationIsRunning) {
 			showPopupMessage("The curation is running.");
-		} else if (curationIsSaving) {
-			showPopupMessage("The curation is being saved, this should take only a moment.");
 		} else if (validateShortName(txtShortName.getText())) {
 			// If short name did not validate, the validateShortName method will indicate that
 			// We do nothing if it does not validate
@@ -699,9 +649,9 @@ public final class CurationEditor extends Composite {
 			}
 		}
 
-		textareaLog.setVisible(chkShowLog.isChecked());
+		textareaLog.setVisible(Boolean.TRUE.equals(chkShowLog.getValue()));
 
-		if (curation.getPathToResult() == null || curation.getPathToResult().equalsIgnoreCase("")) {
+		if (curation.getPathToResult() == null || curation.getPathToResult().isEmpty()) {
 			lblResultFilePath.setTitle("Not yet run");
 		} else {
 			lblResultFilePath.setTitle(curation.getPathToResult());
@@ -771,7 +721,7 @@ public final class CurationEditor extends Composite {
 		public void onFailure(final Throwable throwable) {
 			showPopupMessage("Error retreiving curation from server: " + throwable.getMessage());
 			final String msg = throwable.getMessage();
-			if (msg.indexOf("shortname") != -1) {
+			if (msg.contains("shortname")) {
 				lblShortNameError.setText(msg);
 				lblShortNameError.removeStyleName("warning-label-ok");
 			}
@@ -800,7 +750,7 @@ public final class CurationEditor extends Composite {
 		 */
 		private TextArea toLogTo;
 
-		private List<String> messages = new ArrayList<String>();
+		private final List<String> messages = new ArrayList<String>();
 
 // -------------------------- OTHER METHODS --------------------------
 
@@ -859,7 +809,7 @@ public final class CurationEditor extends Composite {
 			for (final String message : messages) {
 				builder.append(message);
 				builder.append("\n");
-				if (message.indexOf("shortname") != -1) {
+				if (message.contains("shortname")) {
 					lblShortNameError.setText(message);
 					lblShortNameError.removeStyleName("warning-label-ok");
 				}

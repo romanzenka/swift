@@ -1,13 +1,18 @@
 package edu.mayo.mprc.swift.ui.client.widgets;
 
+import com.google.gwt.event.dom.client.ChangeHandler;
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.user.client.Cookies;
-import com.google.gwt.user.client.ui.*;
+import com.google.gwt.user.client.ui.ListBox;
+import com.google.gwt.view.client.SelectionChangeEvent;
 
 /**
  * Lets the user choose a search type.
  * Fires an on change event when it gets modified by the user.
  */
-public final class SearchTypeList extends ListBox implements SourcesChangeEvents, ClickListener, ChangeListener {
+public final class SearchTypeList extends ListBox implements ClickHandler, ChangeHandler, SelectionChangeEvent.HasSelectionChangedHandlers {
 
 	/**
 	 * Table of offered search types.
@@ -20,10 +25,6 @@ public final class SearchTypeList extends ListBox implements SourcesChangeEvents
 	};
 	private static final int DEFAULT_ENTRY = 2; /* ManyToSamples */
 
-	/**
-	 * Listeners interested in hearing about the change in selection.
-	 */
-	private ChangeListenerCollection listeners = new ChangeListenerCollection();
 	private static final String SEARCH_TYPE_COOKIE = "search-type";
 
 	public SearchTypeList() {
@@ -44,8 +45,8 @@ public final class SearchTypeList extends ListBox implements SourcesChangeEvents
 		}
 
 		setSelectedIndex(selectedSearchType.getIndex());
-		addClickListener(this);
-		addChangeListener(this);
+		addClickHandler(this);
+		addChangeHandler(this);
 	}
 
 	/**
@@ -99,26 +100,23 @@ public final class SearchTypeList extends ListBox implements SourcesChangeEvents
 	}
 
 	public void fireSelectionChanged() {
-		listeners.fireChange(this);
+		SelectionChangeEvent.fire(this);
 		storeSelectionInCookie();
 	}
 
-	public void addSelectionChangeListener(final ChangeListener changeListener) {
-		listeners.add(changeListener);
-	}
-
-	public void removeSelectionChangeListener(final ChangeListener changeListener) {
-		listeners.remove(changeListener);
-	}
-
 	@Override
-	public void onClick(final Widget widget) {
+	public void onClick(final ClickEvent event) {
 		fireSelectionChanged();
 	}
 
 	@Override
-	public void onChange(final Widget widget) {
+	public void onChange(com.google.gwt.event.dom.client.ChangeEvent event) {
 		fireSelectionChanged();
+	}
+
+	@Override
+	public HandlerRegistration addSelectionChangeHandler(SelectionChangeEvent.Handler handler) {
+		return addHandler(handler, SelectionChangeEvent.getType());
 	}
 
 	private static final class SearchTypeEntry {

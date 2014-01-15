@@ -1,10 +1,12 @@
 package edu.mayo.mprc.swift.search.task;
 
+import com.google.common.base.Objects;
 import edu.mayo.mprc.daemon.DaemonConnection;
 import edu.mayo.mprc.daemon.worker.WorkPacket;
 import edu.mayo.mprc.msconvert.MsconvertResult;
 import edu.mayo.mprc.msconvert.MsconvertWorkPacket;
 import edu.mayo.mprc.swift.db.DatabaseFileTokenFactory;
+import edu.mayo.mprc.utilities.FileUtilities;
 import edu.mayo.mprc.utilities.progress.ProgressInfo;
 import edu.mayo.mprc.workflow.engine.WorkflowEngine;
 import org.apache.log4j.Logger;
@@ -14,9 +16,10 @@ import java.io.File;
 final class MsconvertTask extends AsyncTaskBase implements FileProducingTask {
 	private static final Logger LOGGER = Logger.getLogger(MsconvertTask.class);
 
-	private File inputFile;
+	private final File inputFile;
+	private final boolean publicAccess;
+	private final String outputExtension;
 	private File outputFile = null;
-	private boolean publicAccess;
 
 	/**
 	 * @param publicAccess When true, the task requests the cache to give the user access to the .mgf file from the user space.
@@ -32,6 +35,7 @@ final class MsconvertTask extends AsyncTaskBase implements FileProducingTask {
 		this.inputFile = inputFile;
 		this.outputFile = outputFile;
 		this.publicAccess = publicAccess;
+		outputExtension = FileUtilities.getExtension(outputFile.getName());
 		setName("msconvert");
 
 		updateDescription();
@@ -63,8 +67,8 @@ final class MsconvertTask extends AsyncTaskBase implements FileProducingTask {
 	 */
 	@Override
 	public WorkPacket createWorkPacket() {
-		if (inputFile.getName().endsWith(".mgf")) {
-			LOGGER.info("Skipping msconvert for an mgf file " + inputFile.getAbsolutePath());
+		if (!RawFilesSupported.isRawFile(inputFile)) {
+			LOGGER.info("Skipping msconvert for an input file " + inputFile.getAbsolutePath());
 			outputFile = inputFile;
 			// Nothing to do, signalize success
 			return null;
@@ -94,5 +98,24 @@ final class MsconvertTask extends AsyncTaskBase implements FileProducingTask {
 			outputFile = result.getMgf();
 			updateDescription();
 		}
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hashCode(inputFile, outputExtension, publicAccess);
+	}
+
+	@Override
+	public boolean equals(final Object obj) {
+		if (this == obj) {
+			return true;
+		}
+		if (obj == null || getClass() != obj.getClass()) {
+			return false;
+		}
+		final MsconvertTask other = (MsconvertTask) obj;
+		return Objects.equal(inputFile, other.inputFile)
+				&& Objects.equal(outputExtension, other.outputExtension)
+				&& Objects.equal(publicAccess, other.publicAccess);
 	}
 }

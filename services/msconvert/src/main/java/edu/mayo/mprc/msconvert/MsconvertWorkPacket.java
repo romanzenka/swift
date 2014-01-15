@@ -28,7 +28,7 @@ public final class MsconvertWorkPacket extends WorkPacketBase implements Cachabl
 	}
 
 	/**
-	 * Request to convert a .RAW file to .mgf file.
+	 * Request to convert a .RAW file to .mgf/.mzml file.
 	 *
 	 * @param outputFile   This is the desired target of the output. The cache can overwrite this to anything it sees fit.
 	 *                     If that happens, a {@link MsconvertResult} class is sent back

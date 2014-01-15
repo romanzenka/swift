@@ -9,7 +9,7 @@ import edu.mayo.mprc.mascot.MascotWorkPacket;
 import edu.mayo.mprc.myrimatch.MyriMatchWorkPacket;
 import edu.mayo.mprc.omssa.OmssaWorkPacket;
 import edu.mayo.mprc.searchengine.SearchEngineResult;
-import edu.mayo.mprc.sequest.SequestMGFWorkPacket;
+import edu.mayo.mprc.sequest.SequestWorkPacket;
 import edu.mayo.mprc.swift.db.DatabaseFileTokenFactory;
 import edu.mayo.mprc.swift.db.SearchEngine;
 import edu.mayo.mprc.utilities.progress.ProgressInfo;
@@ -22,18 +22,19 @@ import java.io.File;
  * A search on one of the saerch engines.
  */
 final class EngineSearchTask extends AsyncTaskBase implements FileProducingTask {
-	private SearchEngine engine;
-	private FileProducingTask inputFile;
-	private Curation curation;
-	private DatabaseDeploymentResult deploymentResult;
+	private final SearchEngine engine;
+	private final FileProducingTask inputFile;
+	private final Curation curation;
+	private final DatabaseDeploymentResult deploymentResult;
+	private final File paramsFile;
+	private final boolean publicSearchFiles;
 	private File outputFile;
-	private File paramsFile;
+
 	/**
 	 * When true, the intermediate search files are provided for the user. In case of caching
 	 * the intermediates, the file is also copied to the resulting directory. When the cache
 	 * is not enabled, this parameter has no effect, as the files are already published.
 	 */
-	private boolean publicSearchFiles;
 
 	EngineSearchTask(
 			final WorkflowEngine workflowEngine,
@@ -85,7 +86,7 @@ final class EngineSearchTask extends AsyncTaskBase implements FileProducingTask 
 					isFromScratch(),
 					publicSearchFiles);
 		} else if ("SEQUEST".equalsIgnoreCase(engine.getCode())) {
-			workPacket = new SequestMGFWorkPacket(
+			workPacket = new SequestWorkPacket(
 					outputFile,
 					paramsFile,
 					inputFile.getResultingFile(),
@@ -192,5 +193,45 @@ final class EngineSearchTask extends AsyncTaskBase implements FileProducingTask 
 	@Override
 	public File getResultingFile() {
 		return outputFile;
+	}
+
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) {
+			return true;
+		}
+		if (!(o instanceof EngineSearchTask)) {
+			return false;
+		}
+
+		EngineSearchTask that = (EngineSearchTask) o;
+
+		if (publicSearchFiles != that.publicSearchFiles) {
+			return false;
+		}
+		if (engine != null ? !engine.equals(that.engine) : that.engine != null) {
+			return false;
+		}
+		if (inputFile != null ? !inputFile.equals(that.inputFile) : that.inputFile != null) {
+			return false;
+		}
+		if (outputFile != null ? !outputFile.equals(that.outputFile) : that.outputFile != null) {
+			return false;
+		}
+		if (paramsFile != null ? !paramsFile.equals(that.paramsFile) : that.paramsFile != null) {
+			return false;
+		}
+
+		return true;
+	}
+
+	@Override
+	public int hashCode() {
+		int result = engine != null ? engine.hashCode() : 0;
+		result = 31 * result + (inputFile != null ? inputFile.hashCode() : 0);
+		result = 31 * result + (paramsFile != null ? paramsFile.hashCode() : 0);
+		result = 31 * result + (outputFile != null ? outputFile.hashCode() : 0);
+		result = 31 * result + (publicSearchFiles ? 1 : 0);
+		return result;
 	}
 }
