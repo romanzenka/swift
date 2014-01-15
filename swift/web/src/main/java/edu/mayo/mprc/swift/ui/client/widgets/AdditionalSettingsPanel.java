@@ -27,7 +27,7 @@ public final class AdditionalSettingsPanel extends HorizontalPanel {
 	 */
 	public AdditionalSettingsPanel(final boolean publicMgfs, final boolean publicMzxmls, final boolean publicSearchFiles) {
 		this.publicMgfs = new CheckBox("Provide .mgf");
-		this.publicMgfs.setTitle("Place converted .mgf files in the output directory of your project");
+		this.publicMgfs.setTitle("Place converted .mgf (or .mzML) files in the output directory of your project");
 		this.publicMgfs.setValue(publicMgfs);
 		add(this.publicMgfs);
 
