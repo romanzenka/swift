@@ -12,6 +12,8 @@ import edu.mayo.mprc.daemon.worker.WorkPacket;
 import edu.mayo.mprc.daemon.worker.Worker;
 import edu.mayo.mprc.daemon.worker.WorkerBase;
 import edu.mayo.mprc.daemon.worker.WorkerFactoryBase;
+import edu.mayo.mprc.searchengine.EngineFactory;
+import edu.mayo.mprc.searchengine.EngineMetadata;
 import edu.mayo.mprc.utilities.FileUtilities;
 import edu.mayo.mprc.utilities.ProcessCaller;
 import edu.mayo.mprc.utilities.progress.UserProgressReporter;
@@ -130,7 +132,14 @@ public final class QuaMeterWorker extends WorkerBase {
 	 * A factory capable of creating the worker
 	 */
 	@Component("quameterWorkerFactory")
-	public static final class Factory extends WorkerFactoryBase<Config> {
+	public static final class Factory extends WorkerFactoryBase<Config> implements EngineFactory<Config, Worker> {
+		private static final EngineMetadata ENGINE_METADATA = new EngineMetadata(
+				"QUAMETER", ".qual.txt", "QuaMeter", false, "quameter", null,
+				new String[]{TYPE},
+				new String[]{QuaMeterCache.TYPE},
+				new String[]{},
+				90, true);
+
 		@Override
 		public Worker create(final Config config, final DependencyResolver dependencies) {
 			QuaMeterWorker worker = null;
@@ -140,6 +149,11 @@ public final class QuaMeterWorker extends WorkerBase {
 				throw new MprcException("QuaMeter worker could not be created.", e);
 			}
 			return worker;
+		}
+
+		@Override
+		public EngineMetadata getEngineMetadata() {
+			return ENGINE_METADATA;
 		}
 	}
 
