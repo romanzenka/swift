@@ -45,6 +45,7 @@ public final class SearchRunner implements Runnable, Lifecycle {
 	private static final Logger LOGGER = Logger.getLogger(SearchRunner.class);
 	public static final String MGF = "mgf";
 	public static final String MZ_ML = "mzML";
+	public static final ExtractMsnSettings MSCONVERT_MZML = new ExtractMsnSettings(ExtractMsnSettings.MZML_MODE, ExtractMsnSettings.MSCONVERT);
 
 	private boolean running;
 	private final boolean fromScratch;
@@ -255,7 +256,7 @@ public final class SearchRunner implements Runnable, Lifecycle {
 
 	private SearchEngine getSearchEngine(final String code) {
 		String version = "";
-		for (SearchEngineConfig config : searchDefinition.getInputFiles().get(0).getEnabledEngines().getEngineConfigs()) {
+		for (final SearchEngineConfig config : searchDefinition.getInputFiles().get(0).getEnabledEngines().getEngineConfigs()) {
 			if (config.getCode().equals(code)) {
 				version = config.getVersion();
 				break;
@@ -268,7 +269,8 @@ public final class SearchRunner implements Runnable, Lifecycle {
 			}
 		}
 
-		// Special case - the version we want is not specified. Pick the newest. This happens for legacy searches
+		// Special case - the version we want is not specified. Pick the newest.
+		// This happens for legacy searches and also for the QuaMeter-enabled MM and IdpQonvert
 		if ("".equals(version)) {
 			SearchEngine bestEngine = null;
 			String bestVersion = "";
@@ -294,6 +296,10 @@ public final class SearchRunner implements Runnable, Lifecycle {
 		return getSearchEngine("IDPQONVERT");
 	}
 
+	private SearchEngine getMyrimatchEngine() {
+		return getSearchEngine("MYRIMATCH");
+	}
+
 	/**
 	 * Save parameter files to the disk.
 	 */
@@ -311,6 +317,8 @@ public final class SearchRunner implements Runnable, Lifecycle {
 			}
 		}
 
+		addEnginesForQualityControl(enabledEngines);
+
 		final File paramFolder = new File(searchDefinition.getOutputFolder(), DEFAULT_PARAMS_FOLDER);
 		FileUtilities.ensureFolderExists(paramFolder);
 		parameterFiles = new HashMap<String, File>();
@@ -324,6 +332,18 @@ public final class SearchRunner implements Runnable, Lifecycle {
 					addParamFile(engineCode, parameterSet.getValue(), file);
 				}
 			}
+		}
+	}
+
+	/**
+	 * Enable extra engines that support the Quality Control (MyriMatch and IdpQonvert)
+	 *
+	 * @param enabledEngines List of currently enabled engines. Will append new ones.
+	 */
+	private void addEnginesForQualityControl(final Set<String> enabledEngines) {
+		if (searchDefinition.getQualityControl()) {
+			enabledEngines.add("MYRIMATCH");
+			enabledEngines.add("IDPQONVERT");
 		}
 	}
 
@@ -352,24 +372,31 @@ public final class SearchRunner implements Runnable, Lifecycle {
 		return resultMap;
 	}
 
-	String getSearchEngineParametersName(SearchEngineParameters parameters) {
+	String getSearchEngineParametersName(final SearchEngineParameters parameters) {
 		return searchEngineParametersNames.get(parameters);
 	}
 
+	/**
+	 * Take an input file and create all the tasks that are processing it.
+	 * That means going through all the search engines, all the file analysis (msmsEval), the raw dumping
+	 * and the qa task.
+	 *
+	 * @param inputFile               File to process (e.g. .RAW, .mgf, .mzML, .d)
+	 * @param defaultSearchParameters What parameters to use when searching, if the file does not specify otherwise.
+	 * @param publicSearchFiles       True when the intermediate search files should be made public.
+	 */
 	void addInputFileToLists(final FileSearch inputFile, final SearchEngineParameters defaultSearchParameters, final boolean publicSearchFiles) {
 		final SearchEngineParameters searchParameters = inputFile.getSearchParametersWithDefault(defaultSearchParameters);
 
-		final FileProducingTask mgfOutput = addRawConversionTask(inputFile);
-		addInputAnalysis(inputFile, mgfOutput);
+		final FileProducingTask conversion = addRawConversionTask(inputFile, null);
+
+		addInputAnalysis(inputFile, conversion);
 
 		final SearchEngine scaffold = getScaffoldEngine();
 		final Curation database = searchParameters.getDatabase();
-		DatabaseDeployment scaffoldDeployment = null;
-		if (scaffold != null && scaffoldVersion(inputFile) != null) {
-			scaffoldDeployment =
-					addDatabaseDeployment(scaffold, null/*scaffold has no param file*/,
-							database);
-		}
+
+		final DatabaseDeployment scaffoldDeployment = addScaffoldDatabaseDeployment(inputFile, scaffold, database);
+
 		final SearchEngine idpQonvert = getIdpQonvertEngine();
 
 		ScaffoldSpectrumTask scaffoldTask = null;
@@ -379,41 +406,12 @@ public final class SearchRunner implements Runnable, Lifecycle {
 			// All 'normal' searches get normal entries
 			// While building these, the Scaffold search entry itself is initialized in a separate list
 			// The IdpQonvert search is special as well, it is set up to process the results of the myrimatch search
-			if (isNormalEngine(engine) && inputFile.getEnabledEngines().isEnabled(new SearchEngineConfig(engine.getCode(), engine.getVersion()))) {
-				final File paramFile = getParamFile(engine, searchParameters);
+			if (isNormalEngine(engine) && engineEnabledForFile(inputFile, engine)) {
+				final EngineSearchTask search = addEngineSearchTask(engine, inputFile, conversion, searchParameters, publicSearchFiles);
 
-				DatabaseDeploymentResult deploymentResult = null;
-				// Sequest deployment is counter-productive for particular input fasta file
-				if (sequest(engine) && noSequestDeployment(inputFile, defaultSearchParameters)) {
-					deploymentResult = new NoSequestDeploymentResult(curationDao.findCuration(database.getShortName()).getCurationFile());
-				} else {
-					if (engine.getDbDeployDaemon() != null) {
-						deploymentResult = addDatabaseDeployment(engine, paramFile, database);
-					} else {
-						deploymentResult = null;
-					}
-				}
-				final File outputFolder = getOutputFolderForSearchEngine(engine);
-				final EngineSearchTask search = addEngineSearch(engine, paramFile, inputFile.getInputFile(), outputFolder, mgfOutput, database, deploymentResult, publicSearchFiles);
-				final String scaffoldVersion = scaffoldVersion(inputFile);
-				if (scaffoldVersion != null && !myrimatch(engine) /* Scaffold cannot process myrimatch inputs correctly, as of 4.0.7 */) {
-					if (scaffoldDeployment == null) {
-						throw new MprcException("Scaffold search submitted without having Scaffold service enabled.");
-					}
-
-					scaffoldTask = addScaffoldCall(scaffoldVersion, inputFile, search, scaffoldDeployment);
-
-					if (searchDefinition.getQa() != null) {
-						addQaTask(inputFile, scaffoldTask, mgfOutput);
-					}
-				}
-				// If IdpQonvert is on, we chain an IdpQonvert call to the output of the previous search engine.
-				// We support MyriMatch only for now
+				scaffoldTask = addScaffoldAndQaTasks(scaffoldTask, inputFile, conversion, scaffoldDeployment, engine, search);
 				if (searchWithIdpQonvert(inputFile) && myrimatch(engine)) {
-					addIdpQonvertCall(
-							idpQonvert,
-							getOutputFolderForSearchEngine(idpQonvert),
-							search);
+					addIdpQonvertTask(idpQonvert, search);
 				}
 			}
 		}
@@ -425,6 +423,76 @@ public final class SearchRunner implements Runnable, Lifecycle {
 				addSearchDbCall(scaffoldTask, rawDumpTask);
 			}
 		}
+
+		if (searchDefinition.getQualityControl()) {
+			final FileProducingTask mzmlFile = addRawConversionTask(inputFile, MSCONVERT_MZML);
+
+			final SearchEngine myrimatch = getMyrimatchEngine();
+			final EngineSearchTask myrimatchSearch = addEngineSearchTask(myrimatch, inputFile, mzmlFile, searchParameters, publicSearchFiles);
+			final IdpQonvertTask idpQonvertTask = addIdpQonvertTask(idpQonvert, myrimatchSearch);
+			addQuaMeterTask(inputFile, idpQonvertTask);
+		}
+	}
+
+	private EngineSearchTask addQuaMeterTask(final FileSearch inputFile, final IdpQonvertTask idpQonvertTask) {
+		return null;
+	}
+
+	private DatabaseDeployment addScaffoldDatabaseDeployment(final FileSearch inputFile, final SearchEngine scaffold, final Curation database) {
+		if (scaffold != null && scaffoldVersion(inputFile) != null) {
+			return addDatabaseDeployment(scaffold, null/*scaffold has no param file*/, database);
+		}
+		return null;
+	}
+
+	private boolean engineEnabledForFile(final FileSearch inputFile, final SearchEngine engine) {
+		return inputFile.getEnabledEngines().isEnabled(new SearchEngineConfig(engine.getCode(), engine.getVersion()));
+	}
+
+	private EngineSearchTask addEngineSearchTask(final SearchEngine engine, final FileSearch inputFile,
+	                                             final FileProducingTask convertedFile, final SearchEngineParameters searchParameters,
+	                                             final boolean publicSearchFiles) {
+		final File paramFile = getParamFile(engine, searchParameters);
+		final Curation database = searchParameters.getDatabase();
+
+		DatabaseDeploymentResult deploymentResult = null;
+		// Sequest deployment is counter-productive for particular input fasta file
+		if (sequest(engine) && noSequestDeployment(searchParameters)) {
+			deploymentResult = new NoSequestDeploymentResult(curationDao.findCuration(database.getShortName()).getCurationFile());
+		} else {
+			if (engine.getDbDeployDaemon() != null) {
+				deploymentResult = addDatabaseDeployment(engine, paramFile, database);
+			}
+		}
+		final File outputFolder = getOutputFolderForSearchEngine(engine);
+		return addEngineSearch(engine, paramFile, inputFile.getInputFile(), outputFolder, convertedFile, database, deploymentResult, publicSearchFiles);
+	}
+
+	private IdpQonvertTask addIdpQonvertTask(final SearchEngine idpQonvert, final EngineSearchTask search) {
+		return addIdpQonvertCall(
+				idpQonvert,
+				getOutputFolderForSearchEngine(idpQonvert),
+				search);
+	}
+
+	private ScaffoldSpectrumTask addScaffoldAndQaTasks(final ScaffoldSpectrumTask previousScaffoldTask,
+	                                                   final FileSearch inputFile, final FileProducingTask conversion,
+	                                                   final DatabaseDeployment scaffoldDeployment,
+	                                                   final SearchEngine engine, final EngineSearchTask search) {
+		ScaffoldSpectrumTask scaffoldTask = previousScaffoldTask;
+		final String scaffoldVersion = scaffoldVersion(inputFile);
+		if (scaffoldVersion != null && !myrimatch(engine) /* Scaffold cannot process myrimatch inputs correctly, as of 4.0.7 */) {
+			if (scaffoldDeployment == null) {
+				throw new MprcException("Scaffold search submitted without having Scaffold service enabled.");
+			}
+
+			scaffoldTask = addScaffoldCall(scaffoldVersion, inputFile, search, scaffoldDeployment);
+
+			if (searchDefinition.getQa() != null) {
+				addQaTask(inputFile, scaffoldTask, conversion);
+			}
+		}
+		return scaffoldTask;
 	}
 
 	private String scaffoldVersion(final FileSearch inputFile) {
@@ -467,15 +535,15 @@ public final class SearchRunner implements Runnable, Lifecycle {
 	 * Adds steps to analyze the contents of the input file. This means spectrum QA (e.g. using msmsEval)
 	 * as well as metadata extraction.
 	 *
-	 * @param inputFile Input file to analyze.
-	 * @param mgf       Mgf of the input file.
+	 * @param inputFile      Input file to analyze.
+	 * @param conversionTask Mgf of the input file.
 	 */
-	private void addInputAnalysis(final FileSearch inputFile, final FileProducingTask mgf) {
+	private void addInputAnalysis(final FileSearch inputFile, final FileProducingTask conversionTask) {
 		// TODO: Extract metadata from the input file
 
 		// Analyze spectrum quality if requested
 		if (searchDefinition.getQa() != null && searchDefinition.getQa().getParamFilePath() != null) {
-			addSpectrumQualityAnalysis(inputFile, mgf);
+			addSpectrumQualityAnalysis(inputFile, conversionTask);
 		}
 	}
 
@@ -486,9 +554,8 @@ public final class SearchRunner implements Runnable, Lifecycle {
 	/**
 	 * @return {@code true} if the input file has Sequest deployment disabled.
 	 */
-	private boolean noSequestDeployment(FileSearch inputFile, SearchEngineParameters defaultParameters) {
+	private boolean noSequestDeployment(final SearchEngineParameters parameters) {
 		// Non-specific proteases (do not define restrictions for Rn-1 and Rn prevent sequest from deploying database index
-		final SearchEngineParameters parameters = inputFile.getSearchParametersWithDefault(defaultParameters);
 		return "".equals(parameters.getProtease().getRn()) &&
 				"".equals(parameters.getProtease().getRnminus1());
 	}
@@ -502,26 +569,38 @@ public final class SearchRunner implements Runnable, Lifecycle {
 	 * <li>Dtto for mzML</li>
 	 * </ul>
 	 *
-	 * @param inputFile file to convert.
+	 * @param inputFile        file to convert.
+	 * @param overrideSettings Conversion settings - if null, the default is used.
 	 * @return Task capable of producing an mgf (either by conversion or by cleaning up an existing mgf).
 	 */
-	FileProducingTask addRawConversionTask(final FileSearch inputFile) {
+	FileProducingTask addRawConversionTask(final FileSearch inputFile, final ExtractMsnSettings overrideSettings) {
 		final File file = inputFile.getInputFile();
 
 		FileProducingTask mgfOutput = null;
 		// First, make sure we have a valid mgf, no matter what input we got
-		String extension = FileUtilities.getExtension(file.getName());
+		final String extension = FileUtilities.getExtension(file.getName());
 		if (MGF.equals(extension)) {
 			mgfOutput = addMgfCleanupStep(inputFile);
 		} else if (MZ_ML.equals(extension)) {
 			mgfOutput = addMzMlCleanupStep(inputFile);
 		} else {
-			mgfOutput = addRawConversionStep(inputFile, searchDefinition.getSearchParameters());
+			mgfOutput = addRawConversionStep(inputFile, getConversionSettings(inputFile, overrideSettings));
 		}
 		return mgfOutput;
 	}
 
-	<T extends Task> T addTask(T task) {
+	private ExtractMsnSettings getConversionSettings(final FileSearch inputFile, final ExtractMsnSettings overrideSettings) {
+		final ExtractMsnSettings conversionSettings;
+		if (overrideSettings == null) {
+			final SearchEngineParameters searchParameters = inputFile.getSearchParametersWithDefault(searchDefinition.getSearchParameters());
+			conversionSettings = searchParameters.getExtractMsnSettings();
+		} else {
+			conversionSettings = overrideSettings;
+		}
+		return conversionSettings;
+	}
+
+	<T extends Task> T addTask(final T task) {
 		final T existing = (T) tasks.get(task);
 		if (existing == null) {
 			tasks.put(task, task);
@@ -530,10 +609,8 @@ public final class SearchRunner implements Runnable, Lifecycle {
 		return existing;
 	}
 
-	private FileProducingTask addRawConversionStep(final FileSearch inputFile, final SearchEngineParameters defaultParameters) {
+	private FileProducingTask addRawConversionStep(final FileSearch inputFile, final ExtractMsnSettings conversionSettings) {
 		final File file = inputFile.getInputFile();
-		final SearchEngineParameters searchParameters = inputFile.getSearchParametersWithDefault(defaultParameters);
-		final ExtractMsnSettings conversionSettings = searchParameters.getExtractMsnSettings();
 
 		if (ExtractMsnSettings.EXTRACT_MSN.equals(conversionSettings.getCommand())) {
 			final File mgfFile = getMgfFileLocation(inputFile);
@@ -541,7 +618,7 @@ public final class SearchRunner implements Runnable, Lifecycle {
 			final RawToMgfTask task = addTask(new RawToMgfTask(workflowEngine,
 						/*Input file*/ file,
 						/*Mgf file location*/ mgfFile,
-						/*raw2mgf command line*/ searchParameters.getExtractMsnSettings().getCommandLineSwitches(),
+						/*raw2mgf command line*/ conversionSettings.getCommandLineSwitches(),
 					Boolean.TRUE.equals(searchDefinition.getPublicMgfFiles()),
 					raw2mgfDaemon, fileTokenFactory, isFromScratch()));
 
@@ -597,10 +674,10 @@ public final class SearchRunner implements Runnable, Lifecycle {
 	/**
 	 * Adds steps needed to analyze quality of the spectra. This can be done with a tool such as msmsEval or similar.
 	 *
-	 * @param inputFile Input file
-	 * @param mgf       .mgf for the input file
+	 * @param inputFile      Input file
+	 * @param conversionTask conversion for the input file
 	 */
-	private void addSpectrumQualityAnalysis(final FileSearch inputFile, final FileProducingTask mgf) {
+	private void addSpectrumQualityAnalysis(final FileSearch inputFile, final FileProducingTask conversionTask) {
 		if (inputFile == null) {
 			throw new MprcException("Bug: Input file must not be null");
 		}
@@ -614,12 +691,12 @@ public final class SearchRunner implements Runnable, Lifecycle {
 
 		final SpectrumQaTask spectrumQaTask = addTask(new SpectrumQaTask(workflowEngine,
 				msmsEvalDaemon,
-				mgf,
+				conversionTask,
 				spectrumQa.paramFile() == null ? null : spectrumQa.paramFile().getAbsoluteFile(),
 				getSpectrumQaOutputFolder(inputFile),
 				fileTokenFactory, isFromScratch()));
 
-		spectrumQaTask.addDependency(mgf);
+		spectrumQaTask.addDependency(conversionTask);
 
 		spectrumQaTasks.put(getSpectrumQaHashKey(file), spectrumQaTask);
 	}
@@ -716,7 +793,7 @@ public final class SearchRunner implements Runnable, Lifecycle {
 		return getOutputFileLocation(inputFile, "mzxml", ".mzXML");
 	}
 
-	private File getOutputFileLocation(FileSearch inputFile, String folder, String extension) {
+	private File getOutputFileLocation(final FileSearch inputFile, final String folder, final String extension) {
 		final File file = inputFile.getInputFile();
 		final String outputDir = new File(
 				new File(searchDefinition.getOutputFolder(), folder),
@@ -782,13 +859,13 @@ public final class SearchRunner implements Runnable, Lifecycle {
 	 * <p/>
 	 * The search also knows about the conversion and db deployment so it can determine when it can run.
 	 */
-	private EngineSearchTask addEngineSearch(final SearchEngine engine, final File paramFile, final File inputFile, final File searchOutputFolder, final FileProducingTask fileProducingTask, final Curation curation, final DatabaseDeploymentResult deploymentResult, final boolean publicSearchFiles) {
+	private EngineSearchTask addEngineSearch(final SearchEngine engine, final File paramFile, final File inputFile, final File searchOutputFolder, final FileProducingTask convertedFile, final Curation curation, final DatabaseDeploymentResult deploymentResult, final boolean publicSearchFiles) {
 		final File outputFile = getSearchResultLocation(engine, searchOutputFolder, inputFile);
-		EngineSearchTask search = addTask(new EngineSearchTask(
+		final EngineSearchTask search = addTask(new EngineSearchTask(
 				workflowEngine,
 				engine,
 				inputFile.getName(),
-				fileProducingTask,
+				convertedFile,
 				curation,
 				deploymentResult,
 				outputFile,
@@ -799,7 +876,7 @@ public final class SearchRunner implements Runnable, Lifecycle {
 				isFromScratch()));
 
 		// Depend on the .mgf to be done and on the database deployment
-		search.addDependency(fileProducingTask);
+		search.addDependency(convertedFile);
 		if (deploymentResult instanceof Task) {
 			search.addDependency((Task) deploymentResult);
 		}
@@ -874,7 +951,7 @@ public final class SearchRunner implements Runnable, Lifecycle {
 		final SearchDbTask searchDbTask = addTask(new SearchDbTask(workflowEngine, searchDbDaemon, fileTokenFactory, false, scaffoldTask));
 
 		for (final FileSearch fileSearch : searchDefinition.getInputFiles()) {
-			FastaDbTask fastaDbTask = addFastaDbCall(fileSearch.getSearchParametersWithDefault(searchDefinition.getSearchParameters()).getDatabase());
+			final FastaDbTask fastaDbTask = addFastaDbCall(fileSearch.getSearchParametersWithDefault(searchDefinition.getSearchParameters()).getDatabase());
 			searchDbTask.addDependency(fastaDbTask);
 		}
 
