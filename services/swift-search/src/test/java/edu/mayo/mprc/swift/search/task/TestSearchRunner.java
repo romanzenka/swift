@@ -290,6 +290,7 @@ public class TestSearchRunner {
 				mock(DaemonConnection.class),
 				mock(DaemonConnection.class),
 				mock(DaemonConnection.class),
+				mock(DaemonConnection.class),
 				searchEngines,
 				reporter,
 				service,

@@ -86,6 +86,7 @@ public final class SearchRunner implements Runnable, Lifecycle {
 	private final DaemonConnection qaDaemon;
 	private final DaemonConnection fastaDbDaemon;
 	private final DaemonConnection searchDbDaemon;
+	private final DaemonConnection quaMeterDaemon;
 	private final boolean reportDecoyHits;
 
 	private final Collection<SearchEngine> searchEngines;
@@ -131,6 +132,7 @@ public final class SearchRunner implements Runnable, Lifecycle {
 			final DaemonConnection qaDaemon,
 			final DaemonConnection fastaDbDaemon,
 			final DaemonConnection searchDbDaemon,
+			final DaemonConnection quaMeterDaemon,
 			final Collection<SearchEngine> searchEngines,
 			final ProgressReporter reporter,
 			final ExecutorService service,
@@ -153,6 +155,7 @@ public final class SearchRunner implements Runnable, Lifecycle {
 		this.qaDaemon = qaDaemon;
 		this.fastaDbDaemon = fastaDbDaemon;
 		this.searchDbDaemon = searchDbDaemon;
+		this.quaMeterDaemon = quaMeterDaemon;
 		this.searchEngines = searchEngines;
 		this.reporter = reporter;
 		this.service = service;
