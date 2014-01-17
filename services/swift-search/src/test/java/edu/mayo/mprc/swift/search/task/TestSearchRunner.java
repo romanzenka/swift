@@ -265,6 +265,48 @@ public class TestSearchRunner {
 		Assert.assertEquals(runner.getWorkflowEngine().getNumTasks(), expectedNumTasks);
 	}
 
+	@Test
+	public void qualityControlRunner() throws IOException {
+		final Collection<SearchEngine> searchEngines = searchEngines();
+
+		final EnabledEngines engines = enabledEngines();
+
+		final List<FileSearch> inputFiles = Arrays.asList(
+				new FileSearch(raw1, "biosample", "category", "experiment", engines, searchEngineParameters1()),
+				new FileSearch(raw2, "biosample2", "category", "experiment", engines, searchEngineParameters1())
+		);
+
+		final SwiftSearchDefinition definition = defaultSearchDefinition(inputFiles);
+
+		definition.setQualityControl(true);
+
+		final SearchRunner runner = getSearchRunner(searchEngines, definition);
+
+		final int numEngines = enabledEngines().size();
+		final int tasksPerFile = (numEngines - 1) /* 1 for each engine except Scaffold */
+				+ 1 /* Raw->mgf */
+				+ 1 /* RawDump */
+				+ 1 /* msmsEval */
+				+ 1 /* Raw->mzML */
+				+ 1 /* Myrimatch */
+				+ 1 /* IdpQonvert */
+				+ 1 /* QuaMeter */;
+
+		final int tasksPerSearch = 0
+				+ 1 /* Fasta DB load */
+				+ 1 /* Search DB load */
+				+ 1 /* QA Task */
+				+ 1 /* Scaffold report */
+
+				+ numEngines /* DB deploys */ - getEnabledNoDeploy()
+				+ 1 /* Scaffold */;
+
+		final int expectedNumTasks = inputFiles.size() * tasksPerFile + tasksPerSearch;
+
+		Assert.assertEquals(runner.getWorkflowEngine().getNumTasks(), expectedNumTasks);
+	}
+
+
 	private SearchRunner getSearchRunner(Collection<SearchEngine> searchEngines, SwiftSearchDefinition definition) {
 		final ProgressReporter reporter = mock(ProgressReporter.class);
 		final ExecutorService service = new SimpleThreadPoolExecutor(1, "testSwiftSearcher", true);
