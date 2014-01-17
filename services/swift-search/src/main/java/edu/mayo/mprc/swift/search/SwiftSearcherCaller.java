@@ -45,7 +45,7 @@ public interface SwiftSearcherCaller extends Lifecycle {
 	SwiftSearchDefinition validateAndSaveSearchDefinition(SwiftSearchDefinition swiftSearch);
 
 	/**
-	 * Just like {@link #startSearch} but blocks for certain amount of time before it either throws
+	 * Blocks for certain amount of time before it either throws
 	 * or returns new search id.
 	 */
 	long submitSearch(int searchId, String batchName, int previousSearchRunId, boolean fromScratch, int priority) throws InterruptedException;
