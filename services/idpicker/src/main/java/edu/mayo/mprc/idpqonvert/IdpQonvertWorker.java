@@ -130,7 +130,7 @@ public final class IdpQonvertWorker extends WorkerBase {
 	@Component("idpQonvertWorkerFactory")
 	public static final class Factory extends WorkerFactoryBase<Config> implements EngineFactory<Config, Worker> {
 		private static final EngineMetadata ENGINE_METADATA = new EngineMetadata(
-				"IDPQONVERT", ".idp", "IdpQonvert", false, "idpqonvert", null,
+				"IDPQONVERT", ".idpDB", "IdpQonvert", false, "idpqonvert", null,
 				new String[]{TYPE},
 				new String[]{IdpQonvertCache.TYPE},
 				new String[]{},
