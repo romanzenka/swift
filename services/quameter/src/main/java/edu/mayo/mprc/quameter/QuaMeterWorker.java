@@ -79,15 +79,17 @@ public final class QuaMeterWorker extends WorkerBase {
 
 		final List<String> parameters = new LinkedList<String>();
 		parameters.add(executable.getPath());
-		parameters.add("--Instrument");
+		parameters.add("-workdir");
+		parameters.add(workFolder.getAbsolutePath());
+		parameters.add("-Instrument");
 		parameters.add(packet.isMonoisotopic() ? "orbi" : "ltq");
-		parameters.add("--RawDataPath");
+		parameters.add("-RawDataPath");
 		parameters.add(rawFile.getParentFile().getAbsolutePath());
-		parameters.add("--RawDataFormat");
+		parameters.add("-RawDataFormat");
 		parameters.add("raw");
-		parameters.add("--ScoreCutoff");
+		parameters.add("-ScoreCutoff");
 		parameters.add(String.valueOf(packet.getFdrScoreCutoff()));
-		parameters.add("--ChromatogramOutput");
+		parameters.add("-ChromatogramOutput");
 		parameters.add("false");
 		parameters.add(idpDbFile.getAbsolutePath());
 
