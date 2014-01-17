@@ -2,7 +2,10 @@ package edu.mayo.mprc.swift.ui.client.widgets;
 
 import com.google.gwt.user.client.ui.CheckBox;
 import com.google.gwt.user.client.ui.HorizontalPanel;
+import edu.mayo.mprc.swift.ui.client.rpc.ClientSearchEngine;
 import edu.mayo.mprc.swift.ui.client.rpc.ClientSwiftSearchDefinition;
+
+import java.util.List;
 
 public final class AdditionalSettingsPanel extends HorizontalPanel {
 	private final CheckBox publicMgfs;
@@ -12,40 +15,27 @@ public final class AdditionalSettingsPanel extends HorizontalPanel {
 	private final CheckBox fromScratch;
 	private final CheckBox lowPriority;
 
-	/**
-	 * Null Constructor
-	 */
-	public AdditionalSettingsPanel() {
-		this(false, false, false, false);
-	}
+	public AdditionalSettingsPanel(final List<ClientSearchEngine> searchEngineList) {
+		publicMgfs = new CheckBox("Provide .mgf");
+		publicMgfs.setTitle("Place converted .mgf files in the output directory of your project");
+		publicMgfs.setValue(false);
+		add(publicMgfs);
 
-	/**
-	 * Panel constructor.
-	 *
-	 * @param publicMgfs        True if .mgfs should be made public.
-	 * @param publicMzxmls      True if .mzxmls should be made public.
-	 * @param publicSearchFiles True if search files should be made public.
-	 */
-	public AdditionalSettingsPanel(final boolean publicMgfs, final boolean publicMzxmls, final boolean publicSearchFiles, final boolean qualityControl) {
-		this.publicMgfs = new CheckBox("Provide .mgf");
-		this.publicMgfs.setTitle("Place converted .mgf files in the output directory of your project");
-		this.publicMgfs.setValue(publicMgfs);
-		add(this.publicMgfs);
+		publicMzxmls = new CheckBox("Provide .mzxml");
+		publicMzxmls.setTitle("Place converted .mzxml files in the output directory of your project");
+		publicMzxmls.setValue(false);
+		add(publicMzxmls);
 
-		this.publicMzxmls = new CheckBox("Provide .mzxml");
-		this.publicMzxmls.setTitle("Place converted .mzxml files in the output directory of your project");
-		this.publicMzxmls.setValue(publicMzxmls);
-		add(this.publicMzxmls);
+		publicSearchFiles = new CheckBox("Provide intermediates");
+		publicSearchFiles.setTitle("Provide intermediate files (search engine results) in the output directory of your project");
+		publicSearchFiles.setValue(false);
+		add(publicSearchFiles);
 
-		this.publicSearchFiles = new CheckBox("Provide intermediates");
-		this.publicSearchFiles.setTitle("Provide intermediate files (search engine results) in the output directory of your project");
-		this.publicSearchFiles.setValue(publicSearchFiles);
-		add(this.publicSearchFiles);
-
-		this.qualityControl = new CheckBox("QC");
-		this.qualityControl.setTitle("Run Quality Control assessment (using quameter)");
-		this.qualityControl.setValue(qualityControl);
-		add(this.publicSearchFiles);
+		qualityControl = new CheckBox("QC");
+		qualityControl.setTitle("Run Quality Control assessment (using quameter)");
+		qualityControl.setValue(false);
+		qualityControl.setVisible(isQualityControlAvailable(searchEngineList));
+		add(qualityControl);
 
 		fromScratch = new CheckBox("From scratch (no cache)");
 		fromScratch.setValue(false);
@@ -54,6 +44,26 @@ public final class AdditionalSettingsPanel extends HorizontalPanel {
 		lowPriority = new CheckBox("Low priority");
 		lowPriority.setValue(false);
 		add(lowPriority);
+	}
+
+	/**
+	 * Quality control switch is only displayed if we have myrimatch and idpqonvert.
+	 *
+	 * @param engines List of all present engines
+	 * @return True if we can run QC
+	 */
+	static boolean isQualityControlAvailable(List<ClientSearchEngine> engines) {
+		boolean idpQonvert = false;
+		boolean myriMatch = false;
+		for (final ClientSearchEngine engine : engines) {
+			final String code = engine.getEngineConfig().getCode();
+			if ("IDPQONVERT".equals(code)) {
+				idpQonvert = true;
+			} else if ("MYRIMATCH".equals(code)) {
+				myriMatch = true;
+			}
+		}
+		return myriMatch && idpQonvert;
 	}
 
 	/**

@@ -79,7 +79,6 @@ public final class SwiftApp implements EntryPoint, HidesPageContentsWhileLoading
 			hidePageContentsWhileLoading();
 
 			final String searchDefinitionId = getQueryString(LOAD_SEARCH_DEFINITION_ID);
-			initPublicMgfs();
 			initTitleEditor();
 			initEditorToggle();
 			initAddFilesButton();
@@ -140,6 +139,7 @@ public final class SwiftApp implements EntryPoint, HidesPageContentsWhileLoading
 				finalizeSpectrumQa(result.getSpectrumQaParamFileInfo());
 				finalizeInitReport(result.isScaffoldReportEnabled());
 				initEnabledEngines(result.getSearchEngines());
+				initAdditionalSettings(result.getSearchEngines());
 				initUserList(result.listUsers());
 				showPageContentsAfterLoad();
 				initMessage(result.getUserMessage());
@@ -155,8 +155,8 @@ public final class SwiftApp implements EntryPoint, HidesPageContentsWhileLoading
 		connectOutputLocationAndFileTable();
 	}
 
-	private void initPublicMgfs() {
-		additionalSettingsPanel = new AdditionalSettingsPanel();
+	private void initAdditionalSettings(final List<ClientSearchEngine> engines) {
+		additionalSettingsPanel = new AdditionalSettingsPanel(engines);
 		final RootPanel panel = RootPanel.get("publicResults");
 		panel.add(additionalSettingsPanel);
 	}
