@@ -19,6 +19,7 @@ public class SwiftSearchDefinition extends PersistableBase {
 	private Boolean publicMgfFiles;
 	private Boolean publicMzxmlFiles;
 	private Boolean publicSearchFiles;
+	private Boolean qualityControl;
 
 	private SearchEngineParameters searchParameters;
 	private List<FileSearch> inputFiles;
@@ -29,7 +30,8 @@ public class SwiftSearchDefinition extends PersistableBase {
 	public SwiftSearchDefinition(final String title, final User user, final File outputFolder, final SpectrumQa qa,
 	                             final PeptideReport peptideReport, final SearchEngineParameters searchParameters,
 	                             final List<FileSearch> inputFiles, final boolean publicMgfFiles,
-	                             final boolean publicMzxmlFiles, final boolean publicSearchFiles) {
+	                             final boolean publicMzxmlFiles, final boolean publicSearchFiles,
+	                             final boolean qualityControl) {
 		this.title = title;
 		this.user = user;
 		this.outputFolder = outputFolder;
@@ -40,6 +42,7 @@ public class SwiftSearchDefinition extends PersistableBase {
 		this.publicMgfFiles = publicMgfFiles;
 		this.publicMzxmlFiles = publicMzxmlFiles;
 		this.publicSearchFiles = publicSearchFiles;
+		this.qualityControl = qualityControl;
 	}
 
 	public String getTitle() {
@@ -122,6 +125,14 @@ public class SwiftSearchDefinition extends PersistableBase {
 		this.publicSearchFiles = publicSearchFiles;
 	}
 
+	public Boolean getQualityControl() {
+		return qualityControl == null ? false : qualityControl;
+	}
+
+	public void setQualityControl(Boolean qualityControl) {
+		this.qualityControl = qualityControl;
+	}
+
 	@Override
 	public boolean equals(final Object o) {
 		if (this == o) {
@@ -163,6 +174,10 @@ public class SwiftSearchDefinition extends PersistableBase {
 			return false;
 		}
 
+		if (getQualityControl() != null ? !getQualityControl().equals(that.getQualityControl()) : that.getQualityControl() != null) {
+			return false;
+		}
+
 		return true;
 	}
 
@@ -177,6 +192,7 @@ public class SwiftSearchDefinition extends PersistableBase {
 		result = 31 * result + (getPublicMgfFiles() != null ? getPublicMgfFiles().hashCode() : 0);
 		result = 31 * result + (getPublicMzxmlFiles() != null ? getPublicMzxmlFiles().hashCode() : 0);
 		result = 31 * result + (getPublicSearchFiles() != null ? getPublicSearchFiles().hashCode() : 0);
+		result = 31 * result + (getQualityControl() != null ? getQualityControl().hashCode() : 0);
 		return result;
 	}
 }

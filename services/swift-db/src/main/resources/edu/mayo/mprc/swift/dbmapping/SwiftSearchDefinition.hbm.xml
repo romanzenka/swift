@@ -16,6 +16,7 @@
         <property name="publicMgfFiles" type="boolean" column="public_mgf_files" not-null="false" />
         <property name="publicMzxmlFiles" type="boolean" column="public_mzxml_files" not-null="false" />
         <property name="publicSearchFiles" type="boolean" column="public_search_files" not-null="false" />
+        <property name="qualityControl" type="boolean" column="quality_control" not-null="false" />
         <many-to-one name="searchParameters" class="edu.mayo.mprc.swift.params2.SearchEngineParameters"
             column="search_parameters" not-null="false" foreign-key="ssd_sp_fk" />
 

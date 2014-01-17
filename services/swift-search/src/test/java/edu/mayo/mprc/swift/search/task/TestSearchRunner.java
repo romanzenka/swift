@@ -316,6 +316,7 @@ public class TestSearchRunner {
 				inputFiles,
 				false,
 				false,
+				false,
 				false
 		);
 	}

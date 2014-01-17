@@ -148,17 +148,17 @@ public final class SwiftDaoTest {
 	public void doubleSaveSearchDefinition() throws Throwable {
 		swiftDao.begin();
 		try {
-			SwiftSearchDefinition blank1 = new SwiftSearchDefinition("Blank search", null, null, null, null, null, new ArrayList<FileSearch>(), false, false, false);
+			SwiftSearchDefinition blank1 = new SwiftSearchDefinition("Blank search", null, null, null, null, null, new ArrayList<FileSearch>(), false, false, false, false);
 			blank1 = swiftDao.addSwiftSearchDefinition(blank1);
-			SwiftSearchDefinition blank2 = new SwiftSearchDefinition("Blank search", null, null, null, null, null, new ArrayList<FileSearch>(), false, false, false);
+			SwiftSearchDefinition blank2 = new SwiftSearchDefinition("Blank search", null, null, null, null, null, new ArrayList<FileSearch>(), false, false, false, false);
 			blank2 = swiftDao.addSwiftSearchDefinition(blank2);
 			Assert.assertEquals(blank2.getId(), blank1.getId(), "Blank searches has to be stored as one");
 
 			final File f = new File("testFolder");
-			final SwiftSearchDefinition folder1 = new SwiftSearchDefinition("Folder search", null, f, null, null, null, new ArrayList<FileSearch>(), false, false, false);
+			final SwiftSearchDefinition folder1 = new SwiftSearchDefinition("Folder search", null, f, null, null, null, new ArrayList<FileSearch>(), false, false, false, false);
 			blank1 = swiftDao.addSwiftSearchDefinition(blank1);
 			final File f2 = new File("testFolder");
-			final SwiftSearchDefinition folder2 = new SwiftSearchDefinition("Folder search", null, f2, null, null, null, new ArrayList<FileSearch>(), false, false, false);
+			final SwiftSearchDefinition folder2 = new SwiftSearchDefinition("Folder search", null, f2, null, null, null, new ArrayList<FileSearch>(), false, false, false, false);
 			blank2 = swiftDao.addSwiftSearchDefinition(blank2);
 			Assert.assertEquals(folder2.getId(), folder1.getId(), "Folder searches has to be stored as one");
 
@@ -179,9 +179,9 @@ public final class SwiftDaoTest {
 			final LinkedList<FileSearch> fileSearches2 = new LinkedList<FileSearch>();
 			fileSearches2.add(fileSearch2);
 
-			SwiftSearchDefinition file1 = new SwiftSearchDefinition("File search", null, null, null, null, null, fileSearches1, false, false, false);
+			SwiftSearchDefinition file1 = new SwiftSearchDefinition("File search", null, null, null, null, null, fileSearches1, false, false, false, false);
 			file1 = swiftDao.addSwiftSearchDefinition(file1);
-			SwiftSearchDefinition file2 = new SwiftSearchDefinition("File search", null, null, null, null, null, fileSearches2, false, false, false);
+			SwiftSearchDefinition file2 = new SwiftSearchDefinition("File search", null, null, null, null, null, fileSearches2, false, false, false, false);
 			file2 = swiftDao.addSwiftSearchDefinition(file2);
 			Assert.assertEquals(file2.getId(), file1.getId(), "File searches have to be stored as one");
 

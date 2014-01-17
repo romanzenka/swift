@@ -6,6 +6,8 @@ import java.io.File;
 import java.util.List;
 
 /**
+ * A simple textual representation of a swift search to be performed.
+ *
  * @author Roman Zenka
  */
 public final class SearchInput {
@@ -25,6 +27,7 @@ public final class SearchInput {
 	private boolean publicMgfFiles;
 	private boolean publicSearchFiles;
 	private boolean publicMzxmlFiles;
+	private boolean qualityControl;
 
 	public SearchInput() {
 	}
@@ -58,6 +61,7 @@ public final class SearchInput {
 		publicMgfFiles = isTrue(searchInputMap, "publicMgfFiles");
 		publicMgfFiles = isTrue(searchInputMap, "publicMzxmlFiles");
 		publicSearchFiles = isTrue(searchInputMap, "publicSearchFiles");
+		qualityControl = isTrue(searchInputMap, "qualityControl");
 	}
 
 	private static boolean isTrue(final MultiValueMap<String, String> searchInputMap, final String key) {
@@ -208,5 +212,13 @@ public final class SearchInput {
 
 	public void setPublicMzxmlFiles(boolean publicMzxmlFiles) {
 		this.publicMzxmlFiles = publicMzxmlFiles;
+	}
+
+	public boolean isQualityControl() {
+		return qualityControl;
+	}
+
+	public void setQualityControl(boolean qualityControl) {
+		this.qualityControl = qualityControl;
 	}
 }

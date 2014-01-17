@@ -8,6 +8,7 @@ public final class AdditionalSettingsPanel extends HorizontalPanel {
 	private final CheckBox publicMgfs;
 	private final CheckBox publicMzxmls;
 	private final CheckBox publicSearchFiles;
+	private final CheckBox qualityControl;
 	private final CheckBox fromScratch;
 	private final CheckBox lowPriority;
 
@@ -15,7 +16,7 @@ public final class AdditionalSettingsPanel extends HorizontalPanel {
 	 * Null Constructor
 	 */
 	public AdditionalSettingsPanel() {
-		this(false, false, false);
+		this(false, false, false, false);
 	}
 
 	/**
@@ -25,7 +26,7 @@ public final class AdditionalSettingsPanel extends HorizontalPanel {
 	 * @param publicMzxmls      True if .mzxmls should be made public.
 	 * @param publicSearchFiles True if search files should be made public.
 	 */
-	public AdditionalSettingsPanel(final boolean publicMgfs, final boolean publicMzxmls, final boolean publicSearchFiles) {
+	public AdditionalSettingsPanel(final boolean publicMgfs, final boolean publicMzxmls, final boolean publicSearchFiles, final boolean qualityControl) {
 		this.publicMgfs = new CheckBox("Provide .mgf");
 		this.publicMgfs.setTitle("Place converted .mgf files in the output directory of your project");
 		this.publicMgfs.setValue(publicMgfs);
@@ -36,8 +37,14 @@ public final class AdditionalSettingsPanel extends HorizontalPanel {
 		this.publicMzxmls.setValue(publicMzxmls);
 		add(this.publicMzxmls);
 
-		this.publicSearchFiles = new CheckBox("Provide intermediate search results");
-		this.publicSearchFiles.setChecked(publicSearchFiles);
+		this.publicSearchFiles = new CheckBox("Provide intermediates");
+		this.publicSearchFiles.setTitle("Provide intermediate files (search engine results) in the output directory of your project");
+		this.publicSearchFiles.setValue(publicSearchFiles);
+		add(this.publicSearchFiles);
+
+		this.qualityControl = new CheckBox("QC");
+		this.qualityControl.setTitle("Run Quality Control assessment (using quameter)");
+		this.qualityControl.setValue(qualityControl);
 		add(this.publicSearchFiles);
 
 		fromScratch = new CheckBox("From scratch (no cache)");
@@ -79,6 +86,14 @@ public final class AdditionalSettingsPanel extends HorizontalPanel {
 		return Boolean.TRUE.equals(publicSearchFiles.getValue());
 	}
 
+	public void setQualityControl(final boolean qualityControl) {
+		this.qualityControl.setValue(qualityControl);
+	}
+
+	public boolean isQualityControl() {
+		return Boolean.TRUE.equals(qualityControl.getValue());
+	}
+
 	public void setFromScratch(final boolean fromScratch) {
 		this.fromScratch.setValue(fromScratch);
 	}
@@ -99,5 +114,6 @@ public final class AdditionalSettingsPanel extends HorizontalPanel {
 		setPublicMgfs(definition.isPublicMgfFiles());
 		setPublicMzxmls(definition.isPublicMzxmlFiles());
 		setPublicSearchFiles(definition.isPublicSearchFiles());
+		setQualityControl(definition.isQualityControl());
 	}
 }
