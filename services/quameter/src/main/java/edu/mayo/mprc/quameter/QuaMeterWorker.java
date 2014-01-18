@@ -86,7 +86,7 @@ public final class QuaMeterWorker extends WorkerBase {
 		parameters.add(executable.getPath());
 		parameters.add("-workdir");
 		parameters.add(workFolder.getAbsolutePath());
-		parameters.add("-OutputFilePath");
+		parameters.add("-OutputFilepath");
 		parameters.add(createdResultFile.getAbsolutePath());
 		parameters.add("-StatusUpdateFrequency");
 		parameters.add("20");
