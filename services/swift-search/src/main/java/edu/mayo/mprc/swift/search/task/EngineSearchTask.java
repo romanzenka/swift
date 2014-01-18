@@ -215,9 +215,6 @@ final class EngineSearchTask extends AsyncTaskBase implements FileProducingTask 
 		if (inputFile != null ? !inputFile.equals(that.inputFile) : that.inputFile != null) {
 			return false;
 		}
-		if (outputFile != null ? !outputFile.equals(that.outputFile) : that.outputFile != null) {
-			return false;
-		}
 		if (paramsFile != null ? !paramsFile.equals(that.paramsFile) : that.paramsFile != null) {
 			return false;
 		}
@@ -230,8 +227,16 @@ final class EngineSearchTask extends AsyncTaskBase implements FileProducingTask 
 		int result = engine != null ? engine.hashCode() : 0;
 		result = 31 * result + (inputFile != null ? inputFile.hashCode() : 0);
 		result = 31 * result + (paramsFile != null ? paramsFile.hashCode() : 0);
-		result = 31 * result + (outputFile != null ? outputFile.hashCode() : 0);
 		result = 31 * result + (publicSearchFiles ? 1 : 0);
 		return result;
+	}
+
+	@Override
+	public String toString() {
+		return "Search " + engine.getCode() + "(" + engine.getVersion() + ") <- " + inputFile.getResultingFile().getName() + "(" + inputFile.getName() + ") -> " + outputFile.getName() + " db " + curation.getShortName();
+	}
+
+	public void setOutputFile(final File outputFile) {
+		this.outputFile = outputFile;
 	}
 }
