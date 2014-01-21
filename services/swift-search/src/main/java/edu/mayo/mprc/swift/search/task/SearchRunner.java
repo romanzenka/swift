@@ -271,6 +271,7 @@ public final class SearchRunner implements Runnable, Lifecycle {
 
 		// Special case - the version we want is not specified. Pick the newest.
 		// This happens for legacy searches and also for the QuaMeter-enabled MM and IdpQonvert
+		// If there is no such engine, return null instead of throwing an exception
 		if ("".equals(version)) {
 			SearchEngine bestEngine = null;
 			String bestVersion = "";
@@ -280,12 +281,10 @@ public final class SearchRunner implements Runnable, Lifecycle {
 					bestEngine = engine;
 				}
 			}
-			if (bestEngine != null) {
-				return bestEngine;
-			}
+			return bestEngine;
+		} else {
+			throw new MprcException("The search engine [" + code + "] version [" + version + "] is no longer available. Please edit the search and try again");
 		}
-
-		throw new MprcException("The search engine [" + code + "] version [" + version + "] is no longer available. Please edit the search and try again");
 	}
 
 	private SearchEngine getScaffoldEngine() {
@@ -450,6 +449,9 @@ public final class SearchRunner implements Runnable, Lifecycle {
 	}
 
 	private boolean engineEnabledForAnyFile(final List<FileSearch> searches, final SearchEngine engine) {
+		if (engine == null) {
+			return false;
+		}
 		for (final FileSearch search : searches) {
 			if (engineEnabledForFile(search, engine)) {
 				return true;
