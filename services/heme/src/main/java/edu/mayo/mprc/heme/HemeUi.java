@@ -454,6 +454,9 @@ public final class HemeUi {
 
 			final int trypsinId;
 			final int chymoId;
+			if (paramsDao instanceof Lifecycle) {
+				((Lifecycle) paramsDao).start();
+			}
 			paramsDao.begin();
 			try {
 				trypsinId = getIdForParameterSet(config.get(TRYPSIN_PARAM_SET_NAME));
