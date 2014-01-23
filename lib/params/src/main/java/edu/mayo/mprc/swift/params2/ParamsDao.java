@@ -1,5 +1,6 @@
 package edu.mayo.mprc.swift.params2;
 
+import edu.mayo.mprc.config.Lifecycle;
 import edu.mayo.mprc.config.RuntimeInitializer;
 import edu.mayo.mprc.database.Change;
 import edu.mayo.mprc.database.Dao;
@@ -8,7 +9,7 @@ import edu.mayo.mprc.workspace.User;
 
 import java.util.List;
 
-public interface ParamsDao extends Dao, RuntimeInitializer {
+public interface ParamsDao extends Dao, RuntimeInitializer, Lifecycle {
 	/**
 	 * @return List of all ion series currently configured (and not deprecated). The series should be treated as read-only.
 	 */

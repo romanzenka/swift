@@ -193,4 +193,17 @@ public final class MockParamsDao implements ParamsDao {
 	@Override
 	public void install(Map<String, String> params) {
 	}
+
+	@Override
+	public boolean isRunning() {
+		return false;
+	}
+
+	@Override
+	public void start() {
+	}
+
+	@Override
+	public void stop() {
+	}
 }

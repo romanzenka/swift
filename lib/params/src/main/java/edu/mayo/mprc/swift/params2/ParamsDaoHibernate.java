@@ -508,4 +508,20 @@ public final class ParamsDaoHibernate extends DaoBase implements ParamsDao {
 	public void setCurationDao(final CurationDao curationDao) {
 		this.curationDao = curationDao;
 	}
+
+	@Override
+	public boolean isRunning() {
+		return getDatabase() != null && getDatabase().isRunning();
+	}
+
+	@Override
+	public void start() {
+		if (getDatabase() != null) {
+			getDatabase().start();
+		}
+	}
+
+	@Override
+	public void stop() {
+	}
 }
