@@ -1,6 +1,9 @@
 package edu.mayo.mprc.swift.configuration.client.view;
 
 import com.google.gwt.event.dom.client.*;
+import com.google.gwt.event.logical.shared.HasValueChangeHandlers;
+import com.google.gwt.event.logical.shared.ValueChangeEvent;
+import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.event.shared.EventHandler;
 import com.google.gwt.user.client.ui.*;
 import edu.mayo.mprc.swift.configuration.client.model.*;
@@ -172,6 +175,13 @@ public final class GwtUiBuilder implements UiBuilderClient {
 			((HasChangeHandlers) editor).addChangeHandler(new ChangeHandler() {
 				@Override
 				public void onChange(final ChangeEvent event) {
+					validator.validate(PropertyList.getEditorValue((Widget) event.getSource()));
+				}
+			});
+		} else if (editor instanceof HasValueChangeHandlers) {
+			((HasValueChangeHandlers) editor).addValueChangeHandler(new ValueChangeHandler() {
+				@Override
+				public void onValueChange(final ValueChangeEvent event) {
 					validator.validate(PropertyList.getEditorValue((Widget) event.getSource()));
 				}
 			});
