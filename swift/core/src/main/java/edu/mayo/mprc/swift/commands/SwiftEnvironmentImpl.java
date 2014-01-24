@@ -217,12 +217,22 @@ public final class SwiftEnvironmentImpl implements SwiftEnvironment, Application
 	@Override
 	public <T extends ResourceConfig> T getSingletonConfig(final Class<T> clazz) {
 		final List<T> matchingConfigs = new ArrayList<T>(2);
-		addMatchingToList(clazz, getDaemonConfig().getResources(), matchingConfigs);
-		addMatchingToList(clazz, getDaemonConfig().getServices(), matchingConfigs);
 
-		final T singleMatchingResource = getSingleMatchingResource(clazz, matchingConfigs);
-		if (singleMatchingResource != null) {
-			return singleMatchingResource;
+		DaemonConfig config;
+		try {
+			config = getDaemonConfig();
+		} catch (MprcException ignore) {
+			// SWALLOWED: We cannot determine the config the user wanted. Keep going, try application-wide
+			config = null;
+		}
+		if (config != null) {
+			addMatchingToList(clazz, config.getResources(), matchingConfigs);
+			addMatchingToList(clazz, config.getServices(), matchingConfigs);
+
+			final T singleMatchingResource = getSingleMatchingResource(clazz, matchingConfigs);
+			if (singleMatchingResource != null) {
+				return singleMatchingResource;
+			}
 		}
 		return getSingleMatchingResource(clazz, getApplicationConfig().getModulesOfConfigType(clazz));
 	}

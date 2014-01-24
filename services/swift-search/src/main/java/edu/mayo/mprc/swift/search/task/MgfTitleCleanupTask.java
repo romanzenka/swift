@@ -15,7 +15,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 final class MgfTitleCleanupTask extends AsyncTaskBase implements FileProducingTask {
 
 	private final File mgfToCleanup;
-	private final File cleanedMgf;
+	private File cleanedMgf;
 
 	private boolean cleanupPerformed;
 
@@ -45,6 +45,10 @@ final class MgfTitleCleanupTask extends AsyncTaskBase implements FileProducingTa
 		// Nothing to do.
 	}
 
+	void setCleanedMgf(final File cleanedMgf) {
+		this.cleanedMgf = cleanedMgf;
+	}
+
 	@Override
 	public synchronized void onProgress(final ProgressInfo progressInfo) {
 		if (progressInfo instanceof MgfTitleCleanupResult) {
@@ -64,7 +68,7 @@ final class MgfTitleCleanupTask extends AsyncTaskBase implements FileProducingTa
 
 	@Override
 	public int hashCode() {
-		return Objects.hashCode(mgfToCleanup, cleanedMgf);
+		return Objects.hashCode(mgfToCleanup);
 	}
 
 	@Override
@@ -76,6 +80,6 @@ final class MgfTitleCleanupTask extends AsyncTaskBase implements FileProducingTa
 			return false;
 		}
 		final MgfTitleCleanupTask other = (MgfTitleCleanupTask) obj;
-		return Objects.equal(mgfToCleanup, other.mgfToCleanup) && Objects.equal(cleanedMgf, other.cleanedMgf);
+		return Objects.equal(mgfToCleanup, other.mgfToCleanup);
 	}
 }

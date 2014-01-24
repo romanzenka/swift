@@ -265,13 +265,14 @@ public class TestSearchRunner {
 		Assert.assertEquals(runner.getWorkflowEngine().getNumTasks(), expectedNumTasks);
 	}
 
+	/**
+	 * We switch QC on and expect extra tasks for mzML conversion, myrimatch, idpqonvert and quameter to pop up
+	 */
 	@Test
 	public void qualityControlRunner() throws IOException {
 		final Collection<SearchEngine> searchEngines = searchEngines();
-		searchEngines.add(searchEngine("QUAMETER"));
 
-		final EnabledEngines engines = enabledEngines();
-		engines.add(createSearchEngineConfig("QUAMETER"));
+		final EnabledEngines engines = enabledEnginesWithQuaMeter();
 
 		final List<FileSearch> inputFiles = Arrays.asList(
 				new FileSearch(raw1, "biosample", "category", "experiment", engines, searchEngineParameters1()),
@@ -287,9 +288,11 @@ public class TestSearchRunner {
 				+ 1 /* Raw->mgf */
 				+ 1 /* RawDump */
 				+ 1 /* msmsEval */
+
 				+ 1 /* Raw->mzML */
-				+ 1 /* Myrimatch */
-				+ 1 /* IdpQonvert */;
+				+ 1 /* Myrimatch mzML */
+				+ 1 /* IdpQonvert mzML */
+				+ 1 /* QuaMeter */;
 
 		final int tasksPerSearch = 0
 				+ 1 /* Fasta DB load */
@@ -305,6 +308,46 @@ public class TestSearchRunner {
 		Assert.assertEquals(runner.getWorkflowEngine().getNumTasks(), expectedNumTasks);
 	}
 
+	/**
+	 * We switch QC on for a mzML-based search. That means we already get mzml conversion, myrimatch and idpqonvert
+	 * for free, so just quameter should be added.
+	 */
+	@Test
+	public void qualityControlRunnerWithMzML() throws IOException {
+		final Collection<SearchEngine> searchEngines = searchEngines();
+
+		final EnabledEngines engines = enabledEnginesWithQuaMeter();
+
+		final List<FileSearch> inputFiles = Arrays.asList(
+				new FileSearch(raw1, "biosample", "category", "experiment", engines, searchEngineParametersMzml()),
+				new FileSearch(raw2, "biosample2", "category", "experiment", engines, searchEngineParametersMzml())
+		);
+
+		final SwiftSearchDefinition definition = defaultSearchDefinition(inputFiles);
+
+		final SearchRunner runner = getSearchRunner(searchEngines, definition);
+
+		final int numEngines = enabledEngines().size();
+		final int tasksPerFile = (numEngines - 1) /* 1 for each engine except Scaffold */
+				+ 1 /* Raw->mzML */
+				+ 1 /* RawDump */
+				+ 1 /* msmsEval */
+
+				+ 1 /* QuaMeter */;
+
+		final int tasksPerSearch = 0
+				+ 1 /* Fasta DB load */
+				+ 1 /* Search DB load */
+				+ 1 /* QA Task */
+				+ 1 /* Scaffold report */
+
+				+ numEngines /* DB deploys */ - getEnabledNoDeploy()
+				+ 1 /* Scaffold */;
+
+		final int expectedNumTasks = inputFiles.size() * tasksPerFile + tasksPerSearch;
+
+		Assert.assertEquals(runner.getWorkflowEngine().getNumTasks(), expectedNumTasks);
+	}
 
 	private SearchRunner getSearchRunner(Collection<SearchEngine> searchEngines, SwiftSearchDefinition definition) {
 		final ProgressReporter reporter = mock(ProgressReporter.class);
@@ -322,7 +365,6 @@ public class TestSearchRunner {
 	private SearchRunner makeSearchRunner(final String taskId, final boolean fromScratch, final Collection<SearchEngine> searchEngines, final SwiftSearchDefinition definition, final ProgressReporter reporter, final ExecutorService service, final SearchRun searchRun) {
 		return new SearchRunner(
 				definition,
-				mock(DaemonConnection.class),
 				mock(DaemonConnection.class),
 				mock(DaemonConnection.class),
 				mock(DaemonConnection.class),
@@ -396,6 +438,7 @@ public class TestSearchRunner {
 		searchEngines.add(searchEngine("MYRIMATCH"));
 		searchEngines.add(searchEngine("SCAFFOLD"));
 		searchEngines.add(searchEngine("IDPQONVERT"));
+		searchEngines.add(searchEngine("QUAMETER"));
 		return searchEngines;
 	}
 
@@ -408,6 +451,12 @@ public class TestSearchRunner {
 		engines.add(createSearchEngineConfig("SCAFFOLD"));
 		engines.add(createSearchEngineConfig("IDPQONVERT"));  // No db deploy
 		return engines;
+	}
+
+	private EnabledEngines enabledEnginesWithQuaMeter() {
+		final EnabledEngines enabledEngines = enabledEngines();
+		enabledEngines.add(createSearchEngineConfig("QUAMETER"));
+		return enabledEngines;
 	}
 
 	private DatabaseFileTokenFactory dummyFileTokenFactory() {
@@ -438,13 +487,17 @@ public class TestSearchRunner {
 	private SearchEngine searchEngine(final String code) {
 		final SearchEngine engine = new SearchEngine();
 		final EngineMetadata metadata = new EngineMetadata(
-				code, null, code, false, code + "_output_dir", mappingFactory(code),
-				new String[]{}, new String[]{}, new String[]{}, 0, code.equals("SCAFFOLD") || code.equals("IDPQONVERT"));
+				code, "." + code, code, false, code + "_output_dir", mappingFactory(code),
+				new String[]{}, new String[]{}, new String[]{}, 0, isAggregator(code));
 		engine.setEngineMetadata(metadata);
 		engine.setSearchDaemon(mock(DaemonConnection.class));
 		engine.setDbDeployDaemon(dbDeployer(code) ? mock(DaemonConnection.class) : null);
 		engine.setConfig(new SearchEngine.Config(code, "1.0", null, null));
 		return engine;
+	}
+
+	private boolean isAggregator(String code) {
+		return code.equals("SCAFFOLD") || code.equals("IDPQONVERT") || code.equals("QUAMETER");
 	}
 
 	private boolean dbDeployer(final String engineCode) {

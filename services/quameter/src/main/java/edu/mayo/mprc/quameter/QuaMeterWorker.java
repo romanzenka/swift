@@ -79,10 +79,17 @@ public final class QuaMeterWorker extends WorkerBase {
 		LOGGER.debug("idpDB file " + idpDbFile.getPath() + " does" + (idpDbFile.exists() && idpDbFile.length() > 0 ? " " : " not ") + "exist.");
 		LOGGER.debug("Final file " + finalFile.getPath() + " does" + (finalFile.exists() && finalFile.length() > 0 ? " " : " not ") + "exist.");
 
+		String resultName = FileUtilities.getFileNameWithoutExtension(idpDbFile);
+		File createdResultFile = new File(workFolder, resultName + RESULT_EXTENSION);
+
 		final List<String> parameters = new LinkedList<String>();
 		parameters.add(executable.getPath());
 		parameters.add("-workdir");
 		parameters.add(workFolder.getAbsolutePath());
+		parameters.add("-OutputFilepath");
+		parameters.add(createdResultFile.getAbsolutePath());
+		parameters.add("-StatusUpdateFrequency");
+		parameters.add("20");
 		parameters.add("-Instrument");
 		parameters.add(packet.isMonoisotopic() ? "orbi" : "ltq");
 		parameters.add("-RawDataPath");
@@ -93,6 +100,8 @@ public final class QuaMeterWorker extends WorkerBase {
 		parameters.add(String.valueOf(packet.getFdrScoreCutoff()));
 		parameters.add("-ChromatogramOutput");
 		parameters.add("false");
+		parameters.add("-dump");
+
 		parameters.add(idpDbFile.getAbsolutePath());
 
 		final ProcessBuilder processBuilder = new ProcessBuilder(parameters);
@@ -102,9 +111,6 @@ public final class QuaMeterWorker extends WorkerBase {
 
 		LOGGER.info("QuaMeter search, " + packet.toString() + ", has been submitted.");
 		processCaller.runAndCheck("quameter");
-
-		String resultName = FileUtilities.getFileNameWithoutExtension(idpDbFile);
-		File createdResultFile = new File(workFolder, resultName + RESULT_EXTENSION);
 
 		if (!createdResultFile.equals(finalFile)) {
 			FileUtilities.rename(createdResultFile, finalFile);

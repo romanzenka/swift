@@ -15,11 +15,11 @@ final class RawToMgfTask extends AsyncTaskBase implements FileProducingTask {
 	private static final Logger LOGGER = Logger.getLogger(RawToMgfTask.class);
 
 	@Override
-	public boolean equals(Object o) {
+	public boolean equals(final Object o) {
 		if (this == o) return true;
 		if (!(o instanceof RawToMgfTask)) return false;
 
-		RawToMgfTask that = (RawToMgfTask) o;
+		final RawToMgfTask that = (RawToMgfTask) o;
 
 		if (publicAccess != that.publicAccess) return false;
 		if (extractMsnParameters != null ? !extractMsnParameters.equals(that.extractMsnParameters) : that.extractMsnParameters != null)
@@ -61,6 +61,11 @@ final class RawToMgfTask extends AsyncTaskBase implements FileProducingTask {
 		this.publicAccess = publicAccess;
 		setName("RAW2mgf");
 
+		updateDescription();
+	}
+
+	void setOutputFile(final File outputFile) {
+		this.outputFile = outputFile;
 		updateDescription();
 	}
 

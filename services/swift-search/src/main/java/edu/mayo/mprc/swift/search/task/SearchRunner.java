@@ -46,7 +46,6 @@ public final class SearchRunner implements Runnable, Lifecycle {
 	public static final String MGF = "mgf";
 	public static final String MZ_ML = "mzML";
 	public static final ExtractMsnSettings MSCONVERT_MZML = new ExtractMsnSettings(ExtractMsnSettings.MZML_MODE, ExtractMsnSettings.MSCONVERT);
-	public static final String QUAMETER = "QUAMETER";
 
 	private boolean running;
 	private final boolean fromScratch;
@@ -88,7 +87,6 @@ public final class SearchRunner implements Runnable, Lifecycle {
 	private final DaemonConnection qaDaemon;
 	private final DaemonConnection fastaDbDaemon;
 	private final DaemonConnection searchDbDaemon;
-	private final DaemonConnection quaMeterDaemon;
 	private final boolean reportDecoyHits;
 
 	private final Collection<SearchEngine> searchEngines;
@@ -134,7 +132,6 @@ public final class SearchRunner implements Runnable, Lifecycle {
 			final DaemonConnection qaDaemon,
 			final DaemonConnection fastaDbDaemon,
 			final DaemonConnection searchDbDaemon,
-			final DaemonConnection quaMeterDaemon,
 			final Collection<SearchEngine> searchEngines,
 			final ProgressReporter reporter,
 			final ExecutorService service,
@@ -157,7 +154,6 @@ public final class SearchRunner implements Runnable, Lifecycle {
 		this.qaDaemon = qaDaemon;
 		this.fastaDbDaemon = fastaDbDaemon;
 		this.searchDbDaemon = searchDbDaemon;
-		this.quaMeterDaemon = quaMeterDaemon;
 		this.searchEngines = searchEngines;
 		this.reporter = reporter;
 		this.service = service;
@@ -275,6 +271,7 @@ public final class SearchRunner implements Runnable, Lifecycle {
 
 		// Special case - the version we want is not specified. Pick the newest.
 		// This happens for legacy searches and also for the QuaMeter-enabled MM and IdpQonvert
+		// If there is no such engine, return null instead of throwing an exception
 		if ("".equals(version)) {
 			SearchEngine bestEngine = null;
 			String bestVersion = "";
@@ -284,12 +281,10 @@ public final class SearchRunner implements Runnable, Lifecycle {
 					bestEngine = engine;
 				}
 			}
-			if (bestEngine != null) {
-				return bestEngine;
-			}
+			return bestEngine;
+		} else {
+			throw new MprcException("The search engine [" + code + "] version [" + version + "] is no longer available. Please edit the search and try again");
 		}
-
-		throw new MprcException("The search engine [" + code + "] version [" + version + "] is no longer available. Please edit the search and try again");
 	}
 
 	private SearchEngine getScaffoldEngine() {
@@ -302,6 +297,10 @@ public final class SearchRunner implements Runnable, Lifecycle {
 
 	private SearchEngine getMyrimatchEngine() {
 		return getSearchEngine("MYRIMATCH");
+	}
+
+	private SearchEngine getQuaMeterEngine() {
+		return getSearchEngine("QUAMETER");
 	}
 
 	/**
@@ -345,10 +344,14 @@ public final class SearchRunner implements Runnable, Lifecycle {
 	 * @param enabledEngines List of currently enabled engines. Will append new ones.
 	 */
 	private void addEnginesForQualityControl(final Set<String> enabledEngines) {
-		if (searchDefinition.getInputFiles().get(0).isSearch(QUAMETER)) {
+		if (isQualityControlEnabled()) {
 			enabledEngines.add("MYRIMATCH");
 			enabledEngines.add("IDPQONVERT");
 		}
+	}
+
+	private boolean isQualityControlEnabled() {
+		return engineEnabledForAnyFile(getSearchDefinition().getInputFiles(), getQuaMeterEngine());
 	}
 
 	/**
@@ -428,18 +431,14 @@ public final class SearchRunner implements Runnable, Lifecycle {
 			}
 		}
 
-		if (inputFile.isSearch(QUAMETER)) {
+		if (isRawFile(inputFile) && isQualityControlEnabled()) {
 			final FileProducingTask mzmlFile = addRawConversionTask(inputFile, MSCONVERT_MZML);
 
 			final SearchEngine myrimatch = getMyrimatchEngine();
 			final EngineSearchTask myrimatchSearch = addEngineSearchTask(myrimatch, inputFile, mzmlFile, searchParameters, publicSearchFiles);
 			final IdpQonvertTask idpQonvertTask = addIdpQonvertTask(idpQonvert, myrimatchSearch);
-			addQuaMeterTask(inputFile, idpQonvertTask);
+			addQuaMeterTask(getQuaMeterEngine(), idpQonvertTask, inputFile.getInputFile());
 		}
-	}
-
-	private EngineSearchTask addQuaMeterTask(final FileSearch inputFile, final IdpQonvertTask idpQonvertTask) {
-		return null;
 	}
 
 	private DatabaseDeployment addScaffoldDatabaseDeployment(final FileSearch inputFile, final SearchEngine scaffold, final Curation database) {
@@ -447,6 +446,18 @@ public final class SearchRunner implements Runnable, Lifecycle {
 			return addDatabaseDeployment(scaffold, null/*scaffold has no param file*/, database);
 		}
 		return null;
+	}
+
+	private boolean engineEnabledForAnyFile(final List<FileSearch> searches, final SearchEngine engine) {
+		if (engine == null) {
+			return false;
+		}
+		for (final FileSearch search : searches) {
+			if (engineEnabledForFile(search, engine)) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	private boolean engineEnabledForFile(final FileSearch inputFile, final SearchEngine engine) {
@@ -478,6 +489,16 @@ public final class SearchRunner implements Runnable, Lifecycle {
 				getOutputFolderForSearchEngine(idpQonvert),
 				search);
 	}
+
+	private QuaMeterTask addQuaMeterTask(final SearchEngine quaMeter, final IdpQonvertTask search, final File rawFile) {
+		final QuaMeterTask task = addTask(
+				new QuaMeterTask(workflowEngine,
+						getSearchDefinition(), quaMeter.getSearchDaemon(),
+						search, rawFile, getOutputFolderForSearchEngine(quaMeter), fileTokenFactory, isFromScratch()));
+		task.addDependency(search);
+		return task;
+	}
+
 
 	private ScaffoldSpectrumTask addScaffoldAndQaTasks(final ScaffoldSpectrumTask previousScaffoldTask,
 	                                                   final FileSearch inputFile, final FileProducingTask conversion,
@@ -617,14 +638,20 @@ public final class SearchRunner implements Runnable, Lifecycle {
 		final File file = inputFile.getInputFile();
 
 		if (ExtractMsnSettings.EXTRACT_MSN.equals(conversionSettings.getCommand())) {
-			final File mgfFile = getMgfFileLocation(inputFile);
 
-			final RawToMgfTask task = addTask(new RawToMgfTask(workflowEngine,
+			final RawToMgfTask rawToMgfTask = new RawToMgfTask(workflowEngine,
 						/*Input file*/ file,
-						/*Mgf file location*/ mgfFile,
+						/*Mgf file location not known yet*/ null,
 						/*raw2mgf command line*/ conversionSettings.getCommandLineSwitches(),
 					Boolean.TRUE.equals(searchDefinition.getPublicMgfFiles()),
-					raw2mgfDaemon, fileTokenFactory, isFromScratch()));
+					raw2mgfDaemon, fileTokenFactory, isFromScratch());
+
+			// Determine where would the mgf file ideally go (distinct files ensured)
+			final File mgfFile = getMgfFileLocation(inputFile, rawToMgfTask);
+
+			rawToMgfTask.setOutputFile(mgfFile);
+
+			final RawToMgfTask task = addTask(rawToMgfTask);
 
 			if (Boolean.TRUE.equals(searchDefinition.getPublicMzxmlFiles())) {
 				throw new MprcException("Cannot provide .mzxml files with extract_msn. Please use msconvert");
@@ -632,23 +659,26 @@ public final class SearchRunner implements Runnable, Lifecycle {
 
 			return task;
 		} else if (ExtractMsnSettings.MSCONVERT.equals(conversionSettings.getCommand())) {
-			final File outputFile;
-			if (conversionSettings.isMzMlMode()) {
-				outputFile = getMzMlFileLocation(inputFile);
-			} else {
-				outputFile = getMgfFileLocation(inputFile);
-			}
+			final MsconvertTask msconvertTask = new MsconvertTask(workflowEngine,
+							/*Input file*/ file,
+							/*Output file location not known, but must provide correct extension */ getOutputFile(inputFile, conversionSettings, null),
+					Boolean.TRUE.equals(searchDefinition.getPublicMgfFiles()),
+					msconvertDaemon, fileTokenFactory, isFromScratch());
 
-			final MsconvertTask task = addTask(new MsconvertTask(workflowEngine,
-						/*Input file*/ file,
-						/*Output file location*/ outputFile,
-					Boolean.TRUE.equals(searchDefinition.getPublicMgfFiles()), // TODO: We need to rename public MGF files feature to public converted files to produce mzML as well
-					msconvertDaemon, fileTokenFactory, isFromScratch()));
+
+			final File outputFile = getOutputFile(inputFile, conversionSettings, msconvertTask);
+			msconvertTask.setOutputFile(outputFile);
+
+			final MsconvertTask task = addTask(msconvertTask);
 
 			if (Boolean.TRUE.equals(searchDefinition.getPublicMzxmlFiles())) {
-				final File mzxmlFile = getMzxmlFileLocation(inputFile);
+				final MsconvertTask mzxmlTask = new MsconvertTask(workflowEngine, file, new File("dummy.mzXML"), true, msconvertDaemon, fileTokenFactory, isFromScratch());
 
-				addTask(new MsconvertTask(workflowEngine, file, mzxmlFile, true, msconvertDaemon, fileTokenFactory, isFromScratch()));
+				final File mzxmlFile = getMzxmlFileLocation(inputFile, mzxmlTask);
+
+				mzxmlTask.setOutputFile(mzxmlFile);
+
+				addTask(mzxmlTask);
 			}
 
 			return task;
@@ -657,15 +687,28 @@ public final class SearchRunner implements Runnable, Lifecycle {
 		}
 	}
 
+	private File getOutputFile(final FileSearch inputFile, final ExtractMsnSettings conversionSettings, final MsconvertTask msconvertTask) {
+		final File outputFile;
+		if (conversionSettings.isMzMlMode()) {
+			outputFile = getMzMlFileLocation(inputFile, msconvertTask);
+		} else {
+			outputFile = getMgfFileLocation(inputFile, msconvertTask);
+		}
+		return outputFile;
+	}
+
 	/**
 	 * We got a pre-made .mgf file. Because it can be problematic, we need to clean it up
 	 */
 	private FileProducingTask addMgfCleanupStep(final FileSearch inputFile) {
 		final File file = inputFile.getInputFile();
-		final File outputFile = getMgfFileLocation(inputFile);
-		return addTask(
-				new MgfTitleCleanupTask(workflowEngine, mgfCleanupDaemon, file, outputFile, fileTokenFactory, isFromScratch())
-		);
+		final MgfTitleCleanupTask cleanupTask = new MgfTitleCleanupTask(workflowEngine, mgfCleanupDaemon, file, null, fileTokenFactory, isFromScratch());
+
+		final File outputFile = getMgfFileLocation(inputFile, cleanupTask);
+
+		cleanupTask.setCleanedMgf(outputFile);
+
+		return addTask(cleanupTask);
 	}
 
 	/**
@@ -777,34 +820,44 @@ public final class SearchRunner implements Runnable, Lifecycle {
 	 * @param inputFile The input file entry from the search definition.
 	 * @return Where does the output file go.
 	 */
-	private File getMgfFileLocation(final FileSearch inputFile) {
-		return getOutputFileLocation(inputFile, "dta", ".mgf");
+	private File getMgfFileLocation(final FileSearch inputFile, final FileProducingTask task) {
+		return getOutputFileLocation(inputFile, "dta", ".mgf", task);
 	}
 
 	/**
 	 * @param inputFile The input file entry from the search definition.
 	 * @return Where does the output file go.
 	 */
-	private File getMzMlFileLocation(final FileSearch inputFile) {
-		return getOutputFileLocation(inputFile, "mzml", ".mzML");
+	private File getMzMlFileLocation(final FileSearch inputFile, final FileProducingTask task) {
+		return getOutputFileLocation(inputFile, "mzml", ".mzML", task);
 	}
 
 	/**
 	 * @param inputFile The input file entry from the search definition.
 	 * @return Where does the output file go.
 	 */
-	private File getMzxmlFileLocation(final FileSearch inputFile) {
-		return getOutputFileLocation(inputFile, "mzxml", ".mzXML");
+	private File getMzxmlFileLocation(final FileSearch inputFile, final FileProducingTask task) {
+		return getOutputFileLocation(inputFile, "mzxml", ".mzXML", task);
 	}
 
-	private File getOutputFileLocation(final FileSearch inputFile, final String folder, final String extension) {
+	/**
+	 * This will give location of an output file for given input one. When the task producing the output file is known,
+	 * this is taken into consideration when attempting to make output file names distinct, Otherwise, when the task is set
+	 * to null, we do not try to get a distinct filename.
+	 */
+	private File getOutputFileLocation(final FileSearch inputFile, final String folder, final String extension, final FileProducingTask task) {
 		final File file = inputFile.getInputFile();
 		final String outputDir = new File(
 				new File(searchDefinition.getOutputFolder(), folder),
 				getFileTitle(file)).getPath();
 		final File outputFile = new File(outputDir, replaceFileExtension(file, extension).getName());
-		// Make sure we never produce same mgf file twice (for instance when we get two identical input mgf file names as input that differ only in the folder).
-		return distinctFiles.getDistinctFile(outputFile);
+		if (task == null) {
+			// We are just getting preliminary file output. Do not try to get a distinct path
+			return outputFile;
+		}
+		// Make sure we never produce same file twice (for instance when we get two identical input mgf file names as input that differ only in the folder).
+		// However, if the file to be produced is the result of an identical task, then it is okay to reuse the same name
+		return distinctFiles.getDistinctFile(outputFile, task);
 	}
 
 	/**
@@ -820,7 +873,7 @@ public final class SearchRunner implements Runnable, Lifecycle {
 						msmsEvalFolder,
 						getFileTitle(file));
 		// Make sure we never produce same folder twice (for instance when we get two identical input mgf file names that should be processed with different params).
-		return distinctFiles.getDistinctFile(outputFolder);
+		return distinctFiles.getDistinctFile(outputFolder, inputFile);
 	}
 
 	/**
@@ -833,12 +886,12 @@ public final class SearchRunner implements Runnable, Lifecycle {
 	/**
 	 * Returns output file given search engine, search output folder and name of the input file.
 	 */
-	private File getSearchResultLocation(final SearchEngine engine, final File searchOutputFolder, final File file) {
+	private File getSearchResultLocation(final SearchEngine engine, final File searchOutputFolder, final File file, final Task task) {
 		final String fileTitle = FileUtilities.stripExtension(file.getName());
 		final String newFileName = fileTitle + engine.getResultExtension();
 		final File resultFile = new File(searchOutputFolder, newFileName);
 		// Make sure we never produce two identical result files.
-		return distinctFiles.getDistinctFile(resultFile);
+		return distinctFiles.getDistinctFile(resultFile, task);
 	}
 
 	private static String getFileTitle(final File file) {
@@ -864,20 +917,23 @@ public final class SearchRunner implements Runnable, Lifecycle {
 	 * The search also knows about the conversion and db deployment so it can determine when it can run.
 	 */
 	private EngineSearchTask addEngineSearch(final SearchEngine engine, final File paramFile, final File inputFile, final File searchOutputFolder, final FileProducingTask convertedFile, final Curation curation, final DatabaseDeploymentResult deploymentResult, final boolean publicSearchFiles) {
-		final File outputFile = getSearchResultLocation(engine, searchOutputFolder, inputFile);
-		final EngineSearchTask search = addTask(new EngineSearchTask(
+		EngineSearchTask searchEngineTask = new EngineSearchTask(
 				workflowEngine,
 				engine,
 				inputFile.getName(),
 				convertedFile,
 				curation,
 				deploymentResult,
-				outputFile,
+				null,
 				paramFile,
 				publicSearchFiles,
 				engine.getSearchDaemon(),
 				fileTokenFactory,
-				isFromScratch()));
+				isFromScratch());
+		final File outputFile = getSearchResultLocation(engine, searchOutputFolder, inputFile, searchEngineTask);
+		searchEngineTask.setOutputFile(outputFile);
+
+		final EngineSearchTask search = addTask(searchEngineTask);
 
 		// Depend on the .mgf to be done and on the database deployment
 		search.addDependency(convertedFile);
@@ -942,7 +998,6 @@ public final class SearchRunner implements Runnable, Lifecycle {
 		task.addDependency(search);
 		return task;
 	}
-
 
 	private FastaDbTask addFastaDbCall(final Curation curation) {
 		if (fastaDbDaemon != null) {

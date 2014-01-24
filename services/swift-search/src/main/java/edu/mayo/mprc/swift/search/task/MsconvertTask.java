@@ -118,4 +118,9 @@ final class MsconvertTask extends AsyncTaskBase implements FileProducingTask {
 				&& Objects.equal(outputExtension, other.outputExtension)
 				&& Objects.equal(publicAccess, other.publicAccess);
 	}
+
+	void setOutputFile(final File outputFile) {
+		this.outputFile = outputFile;
+		updateDescription();
+	}
 }
