@@ -22,7 +22,6 @@ public final class ClientSwiftSearchDefinition implements Serializable {
 	private boolean publicMgfFiles;
 	private boolean publicMzxmlFiles;
 	private boolean publicSearchFiles;
-	private boolean qualityControl;
 
 	private boolean fromScratch; // Rerun everything from scratch, no caching
 
@@ -54,7 +53,7 @@ public final class ClientSwiftSearchDefinition implements Serializable {
 	                                   final ClientParamSet paramSet, final List<ClientFileSearch> inputFiles,
 	                                   final ClientSpectrumQa spectrumQa, final ClientPeptideReport peptideReport,
 	                                   final boolean publicMgfFiles, final boolean publicMzxmlFiles, final boolean publicSearchFiles,
-	                                   final boolean qualityControl, final int previousSearchRunId) {
+	                                   final int previousSearchRunId) {
 		this.searchTitle = searchTitle;
 		this.user = user;
 		this.outputFolder = outputFolder;
@@ -65,7 +64,6 @@ public final class ClientSwiftSearchDefinition implements Serializable {
 		this.publicMgfFiles = publicMgfFiles;
 		this.publicMzxmlFiles = publicMzxmlFiles;
 		this.publicSearchFiles = publicSearchFiles;
-		this.qualityControl = qualityControl;
 		this.previousSearchRunId = previousSearchRunId;
 		fromScratch = false;
 	}
@@ -120,14 +118,6 @@ public final class ClientSwiftSearchDefinition implements Serializable {
 
 	public void setFromScratch(final boolean fromScratch) {
 		this.fromScratch = fromScratch;
-	}
-
-	public boolean isQualityControl() {
-		return qualityControl;
-	}
-
-	public void setQualityControl(final boolean qualityControl) {
-		this.qualityControl = qualityControl;
 	}
 
 	public boolean isLowPriority() {

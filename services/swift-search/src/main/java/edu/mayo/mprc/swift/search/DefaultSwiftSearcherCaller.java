@@ -139,8 +139,8 @@ public final class DefaultSwiftSearcherCaller implements SwiftSearcherCaller {
 				user, outputFolder, qa, report, getSearchEngineParameters(searchInput.getParamSetId()), inputFiles,
 				searchInput.isPublicMgfFiles(),
 				searchInput.isPublicMzxmlFiles(),
-				searchInput.isPublicSearchFiles(),
-				searchInput.isQualityControl());
+				searchInput.isPublicSearchFiles()
+		);
 	}
 
 	private SearchEngineParameters getSearchEngineParameters(final int paramSetId) {

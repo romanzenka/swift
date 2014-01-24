@@ -268,8 +268,10 @@ public class TestSearchRunner {
 	@Test
 	public void qualityControlRunner() throws IOException {
 		final Collection<SearchEngine> searchEngines = searchEngines();
+		searchEngines.add(searchEngine("QUAMETER"));
 
 		final EnabledEngines engines = enabledEngines();
+		engines.add(createSearchEngineConfig("QUAMETER"));
 
 		final List<FileSearch> inputFiles = Arrays.asList(
 				new FileSearch(raw1, "biosample", "category", "experiment", engines, searchEngineParameters1()),
@@ -277,8 +279,6 @@ public class TestSearchRunner {
 		);
 
 		final SwiftSearchDefinition definition = defaultSearchDefinition(inputFiles);
-
-		definition.setQualityControl(true);
 
 		final SearchRunner runner = getSearchRunner(searchEngines, definition);
 
@@ -289,8 +289,7 @@ public class TestSearchRunner {
 				+ 1 /* msmsEval */
 				+ 1 /* Raw->mzML */
 				+ 1 /* Myrimatch */
-				+ 1 /* IdpQonvert */
-				+ 1 /* QuaMeter */;
+				+ 1 /* IdpQonvert */;
 
 		final int tasksPerSearch = 0
 				+ 1 /* Fasta DB load */
@@ -356,7 +355,6 @@ public class TestSearchRunner {
 				new PeptideReport(),
 				searchEngineParameters1(),
 				inputFiles,
-				false,
 				false,
 				false,
 				false

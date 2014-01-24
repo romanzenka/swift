@@ -652,7 +652,6 @@ public final class SwiftApp implements EntryPoint, HidesPageContentsWhileLoading
 						additionalSettingsPanel.isPublicMgfs(),
 						additionalSettingsPanel.isPublicMzxmls(),
 						additionalSettingsPanel.isPublicSearchFiles(),
-						additionalSettingsPanel.isQualityControl(),
 						previousSearchRunId
 				);
 				def.setFromScratch(additionalSettingsPanel.isFromScratch());

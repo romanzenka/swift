@@ -46,6 +46,7 @@ public final class SearchRunner implements Runnable, Lifecycle {
 	public static final String MGF = "mgf";
 	public static final String MZ_ML = "mzML";
 	public static final ExtractMsnSettings MSCONVERT_MZML = new ExtractMsnSettings(ExtractMsnSettings.MZML_MODE, ExtractMsnSettings.MSCONVERT);
+	public static final String QUAMETER = "QUAMETER";
 
 	private boolean running;
 	private final boolean fromScratch;
@@ -344,7 +345,7 @@ public final class SearchRunner implements Runnable, Lifecycle {
 	 * @param enabledEngines List of currently enabled engines. Will append new ones.
 	 */
 	private void addEnginesForQualityControl(final Set<String> enabledEngines) {
-		if (searchDefinition.getQualityControl()) {
+		if (searchDefinition.getInputFiles().get(0).isSearch(QUAMETER)) {
 			enabledEngines.add("MYRIMATCH");
 			enabledEngines.add("IDPQONVERT");
 		}
@@ -427,7 +428,7 @@ public final class SearchRunner implements Runnable, Lifecycle {
 			}
 		}
 
-		if (searchDefinition.getQualityControl()) {
+		if (inputFile.isSearch(QUAMETER)) {
 			final FileProducingTask mzmlFile = addRawConversionTask(inputFile, MSCONVERT_MZML);
 
 			final SearchEngine myrimatch = getMyrimatchEngine();

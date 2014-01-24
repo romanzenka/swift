@@ -11,7 +11,6 @@ public final class AdditionalSettingsPanel extends HorizontalPanel {
 	private final CheckBox publicMgfs;
 	private final CheckBox publicMzxmls;
 	private final CheckBox publicSearchFiles;
-	private final CheckBox qualityControl;
 	private final CheckBox fromScratch;
 	private final CheckBox lowPriority;
 
@@ -30,12 +29,6 @@ public final class AdditionalSettingsPanel extends HorizontalPanel {
 		publicSearchFiles.setTitle("Provide intermediate files (search engine results) in the output directory of your project");
 		publicSearchFiles.setValue(false);
 		add(publicSearchFiles);
-
-		qualityControl = new CheckBox("QC");
-		qualityControl.setTitle("Run Quality Control assessment (using quameter)");
-		qualityControl.setValue(false);
-		qualityControl.setVisible(isQualityControlAvailable(searchEngineList));
-		add(qualityControl);
 
 		fromScratch = new CheckBox("From scratch (no cache)");
 		fromScratch.setValue(false);
@@ -96,14 +89,6 @@ public final class AdditionalSettingsPanel extends HorizontalPanel {
 		return Boolean.TRUE.equals(publicSearchFiles.getValue());
 	}
 
-	public void setQualityControl(final boolean qualityControl) {
-		this.qualityControl.setValue(qualityControl);
-	}
-
-	public boolean isQualityControl() {
-		return Boolean.TRUE.equals(qualityControl.getValue());
-	}
-
 	public void setFromScratch(final boolean fromScratch) {
 		this.fromScratch.setValue(fromScratch);
 	}
@@ -124,6 +109,5 @@ public final class AdditionalSettingsPanel extends HorizontalPanel {
 		setPublicMgfs(definition.isPublicMgfFiles());
 		setPublicMzxmls(definition.isPublicMzxmlFiles());
 		setPublicSearchFiles(definition.isPublicSearchFiles());
-		setQualityControl(definition.isQualityControl());
 	}
 }
