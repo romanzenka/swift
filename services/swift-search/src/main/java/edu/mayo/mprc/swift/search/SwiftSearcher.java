@@ -24,8 +24,6 @@ import edu.mayo.mprc.msmseval.MsmsEvalCache;
 import edu.mayo.mprc.qa.QaWorker;
 import edu.mayo.mprc.qa.RAWDumpCache;
 import edu.mayo.mprc.qa.RAWDumpWorker;
-import edu.mayo.mprc.quameter.QuaMeterCache;
-import edu.mayo.mprc.quameter.QuaMeterWorker;
 import edu.mayo.mprc.raw2mgf.RawToMgfCache;
 import edu.mayo.mprc.raw2mgf.RawToMgfWorker;
 import edu.mayo.mprc.scaffold.report.ScaffoldReportWorker;
@@ -77,7 +75,6 @@ public final class SwiftSearcher implements Worker, Lifecycle {
 	private DaemonConnection qaDaemon;
 	private DaemonConnection fastaDbDaemon;
 	private DaemonConnection searchDbDaemon;
-	private DaemonConnection quaMeterDaemon;
 	private static final ExecutorService service = new SimpleThreadPoolExecutor(1, "swiftSearcher", false/* do not block*/);
 	private boolean reportDecoyHits;
 
@@ -92,7 +89,6 @@ public final class SwiftSearcher implements Worker, Lifecycle {
 	private static final String MSCONVERT = "msconvert";
 	private static final String MGF_2_MGF = "mgf2mgf";
 	private static final String RAWDUMP = "rawdump";
-	private static final String QUAMETER = "quameter";
 
 	private static final String SCAFFOLD_REPORT = "scaffoldReport";
 	private static final String QA = "qa";
@@ -206,14 +202,6 @@ public final class SwiftSearcher implements Worker, Lifecycle {
 		this.searchDbDaemon = searchDbDaemon;
 	}
 
-	public DaemonConnection getQuaMeterDaemon() {
-		return quaMeterDaemon;
-	}
-
-	public void setQuaMeterDaemon(final DaemonConnection quaMeterDaemon) {
-		this.quaMeterDaemon = quaMeterDaemon;
-	}
-
 	public boolean isReportDecoyHits() {
 		return reportDecoyHits;
 	}
@@ -268,7 +256,6 @@ public final class SwiftSearcher implements Worker, Lifecycle {
 					qaDaemon,
 					fastaDbDaemon,
 					searchDbDaemon,
-					quaMeterDaemon,
 					supportedEngines,
 					progressReporter,
 					service,
@@ -438,9 +425,6 @@ public final class SwiftSearcher implements Worker, Lifecycle {
 			if (config.rawdump != null) {
 				worker.setRawDumpDaemon((DaemonConnection) dependencies.createSingleton(config.rawdump));
 			}
-			if (config.getQuameter() != null) {
-				worker.setQuaMeterDaemon((DaemonConnection) dependencies.createSingleton(config.getQuameter()));
-			}
 			if (config.msmsEval != null) {
 				worker.setMsmsEvalDaemon((DaemonConnection) dependencies.createSingleton(config.msmsEval));
 			}
@@ -523,7 +507,6 @@ public final class SwiftSearcher implements Worker, Lifecycle {
 		private ServiceConfig msconvert;
 		private ServiceConfig mgf2mgf;
 		private ServiceConfig rawdump;
-		private ServiceConfig quameter;
 
 		private Collection<SearchEngine.Config> engines;
 
@@ -542,7 +525,6 @@ public final class SwiftSearcher implements Worker, Lifecycle {
 		public Config(final String fastaPath, final String fastaArchivePath, final String fastaUploadPath
 				, final ServiceConfig raw2mgf, final ServiceConfig msconvert
 				, final ServiceConfig mgf2mgf, final ServiceConfig rawdump
-				, final ServiceConfig quameter
 				, final Collection<SearchEngine.Config> engines
 				, final ServiceConfig scaffoldReport, final ServiceConfig qa
 				, final ServiceConfig fastaDb, final ServiceConfig searchDb
@@ -555,7 +537,6 @@ public final class SwiftSearcher implements Worker, Lifecycle {
 			this.msconvert = msconvert;
 			this.mgf2mgf = mgf2mgf;
 			this.rawdump = rawdump;
-			this.quameter = quameter;
 			this.engines = engines;
 			this.scaffoldReport = scaffoldReport;
 			this.qa = qa;
@@ -596,10 +577,6 @@ public final class SwiftSearcher implements Worker, Lifecycle {
 
 		public ServiceConfig getRawdump() {
 			return rawdump;
-		}
-
-		public ServiceConfig getQuameter() {
-			return quameter;
 		}
 
 		public ServiceConfig getScaffoldReport() {
@@ -643,7 +620,6 @@ public final class SwiftSearcher implements Worker, Lifecycle {
 			writer.put(MSCONVERT, writer.save(getMsconvert()));
 			writer.put(MGF_2_MGF, writer.save(getMgf2mgf()));
 			writer.put(RAWDUMP, writer.save(getRawdump()));
-			writer.put(QUAMETER, writer.save(getQuameter()));
 
 			int i = 0;
 			for (final SearchEngine.Config engineConfig : getEngines()) {
@@ -672,7 +648,6 @@ public final class SwiftSearcher implements Worker, Lifecycle {
 			msconvert = (ServiceConfig) reader.getObject(MSCONVERT);
 			mgf2mgf = (ServiceConfig) reader.getObject(MGF_2_MGF);
 			rawdump = (ServiceConfig) reader.getObject(RAWDUMP);
-			quameter = (ServiceConfig) reader.getObject(QUAMETER);
 
 
 			final Map<Integer, SearchEngine.Config> engineConfigs = Maps.newTreeMap();
@@ -757,11 +732,7 @@ public final class SwiftSearcher implements Worker, Lifecycle {
 					.reference(MgfToMgfWorker.TYPE, UiBuilder.NONE_TYPE)
 
 					.property(RAWDUMP, RAWDumpWorker.NAME, "Extracts information about experiment and spectra from RAW files.")
-					.reference(RAWDumpWorker.TYPE, RAWDumpCache.TYPE, UiBuilder.NONE_TYPE)
-
-					.property(QUAMETER, QuaMeterWorker.NAME, "Runs QuaMeter to determine spectrum quality (needs MyriMatch and IDPQonvert to be set up)")
-					.reference(QuaMeterWorker.TYPE, QuaMeterCache.TYPE, UiBuilder.NONE_TYPE);
-
+					.reference(RAWDumpWorker.TYPE, RAWDumpCache.TYPE, UiBuilder.NONE_TYPE);
 
 			// Engines here
 			int i = 0;

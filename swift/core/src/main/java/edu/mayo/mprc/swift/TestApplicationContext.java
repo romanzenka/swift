@@ -99,7 +99,7 @@ public final class TestApplicationContext implements Lifecycle {
 
 		final SwiftSearcher.Config searcherConfig = new SwiftSearcher.Config(
 				fastaFolder, fastaArchiveFolder, fastaUploadFolder,
-				null, null, null, null, null, null, null, null, null, null, null, database);
+				null, null, null, null, null, null, null, null, null, null, database);
 
 		ServiceConfig searcherService = new ServiceConfig("searcher1", new SimpleRunner.Config(searcherConfig));
 
