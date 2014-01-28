@@ -437,7 +437,7 @@ public final class SearchRunner implements Runnable, Lifecycle {
 			final SearchEngine myrimatch = getMyrimatchEngine();
 			final EngineSearchTask myrimatchSearch = addEngineSearchTask(myrimatch, inputFile, mzmlFile, searchParameters, publicSearchFiles);
 			final IdpQonvertTask idpQonvertTask = addIdpQonvertTask(idpQonvert, myrimatchSearch);
-			addQuaMeterTask(getQuaMeterEngine(), idpQonvertTask, inputFile.getInputFile());
+			addQuaMeterTask(getQuaMeterEngine(), idpQonvertTask, inputFile.getInputFile(), publicSearchFiles);
 		}
 	}
 
@@ -490,11 +490,11 @@ public final class SearchRunner implements Runnable, Lifecycle {
 				search);
 	}
 
-	private QuaMeterTask addQuaMeterTask(final SearchEngine quaMeter, final IdpQonvertTask search, final File rawFile) {
+	private QuaMeterTask addQuaMeterTask(final SearchEngine quaMeter, final IdpQonvertTask search, final File rawFile, final boolean publicSearchFiles) {
 		final QuaMeterTask task = addTask(
 				new QuaMeterTask(workflowEngine,
 						getSearchDefinition(), quaMeter.getSearchDaemon(),
-						search, rawFile, getOutputFolderForSearchEngine(quaMeter), fileTokenFactory, isFromScratch()));
+						search, rawFile, getOutputFolderForSearchEngine(quaMeter), fileTokenFactory, isFromScratch(), publicSearchFiles));
 		task.addDependency(search);
 		return task;
 	}

@@ -56,7 +56,6 @@ public abstract class EngineWorkPacket extends WorkPacketBase implements Cachabl
 		super(taskId, fromScratch);
 
 		assert outputFile != null : "output file was null.";
-		assert searchParamsFile != null : "search params file was null.";
 		assert inputFile != null : "input file was null";
 
 		this.outputFile = outputFile;

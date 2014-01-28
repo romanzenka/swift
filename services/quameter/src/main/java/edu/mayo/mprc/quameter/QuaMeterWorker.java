@@ -65,7 +65,7 @@ public final class QuaMeterWorker extends WorkerBase {
 		final File workFolder = packet.getOutputFile().getParentFile().getAbsoluteFile();
 		FileUtilities.ensureFolderExists(workFolder);
 
-		final File rawFile = packet.getRawFile().getAbsoluteFile();
+		final File rawFile = packet.getInputFile().getAbsoluteFile();
 		final File idpDbFile = packet.getIdpDbFile().getAbsoluteFile();
 		final File finalFile = packet.getOutputFile().getAbsoluteFile();
 
@@ -120,7 +120,7 @@ public final class QuaMeterWorker extends WorkerBase {
 	}
 
 	private void checkPacketCorrectness(final QuaMeterWorkPacket packet) {
-		if (packet.getRawFile() == null) {
+		if (packet.getInputFile() == null) {
 			throw new MprcException("Raw file must not be null");
 		}
 		if (packet.getIdpDbFile() == null) {

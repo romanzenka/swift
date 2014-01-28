@@ -4,6 +4,7 @@ import com.google.common.base.Objects;
 import edu.mayo.mprc.daemon.DaemonConnection;
 import edu.mayo.mprc.daemon.worker.WorkPacket;
 import edu.mayo.mprc.quameter.QuaMeterWorkPacket;
+import edu.mayo.mprc.searchengine.SearchEngineResult;
 import edu.mayo.mprc.swift.db.DatabaseFileTokenFactory;
 import edu.mayo.mprc.swift.dbmapping.SwiftSearchDefinition;
 import edu.mayo.mprc.utilities.FileUtilities;
@@ -19,8 +20,9 @@ public final class QuaMeterTask extends AsyncTaskBase {
 
 	private final IdpQonvertTask idpQonvertTask;
 	private final File rawFile;
-	private final File outputFolder;
+	private File outputFolder;
 	private final double maxFDR;
+	private final boolean publicSearchFiles;
 
 	public QuaMeterTask(final WorkflowEngine engine,
 	                    final SwiftSearchDefinition definition,
@@ -28,12 +30,14 @@ public final class QuaMeterTask extends AsyncTaskBase {
 	                    final IdpQonvertTask idpQonvertTask,
 	                    final File rawFile,
 	                    final File outputFolder,
-	                    final DatabaseFileTokenFactory fileTokenFactory, final boolean fromScratch) {
+	                    final DatabaseFileTokenFactory fileTokenFactory, final boolean fromScratch,
+	                    final boolean publicSearchFiles) {
 		super(engine, quaMeterDaemon, fileTokenFactory, fromScratch);
 		this.rawFile = rawFile;
 		maxFDR = 1.0 - definition.getSearchParameters().getScaffoldSettings().getProteinProbability();
 		this.outputFolder = outputFolder;
 		this.idpQonvertTask = idpQonvertTask;
+		this.publicSearchFiles = publicSearchFiles;
 		setName("QuaMeter");
 	}
 
@@ -47,7 +51,7 @@ public final class QuaMeterTask extends AsyncTaskBase {
 				+ " with search results " + fileTokenFactory.fileToTaggedDatabaseToken(idpQonvertTask.getResultingFile()));
 
 		return new QuaMeterWorkPacket(getFullId(), isFromScratch(),
-				rawFile, idpQonvertTask.getResultingFile(), true, maxFDR, getResultingFile());
+				rawFile, idpQonvertTask.getResultingFile(), true, maxFDR, getResultingFile(), publicSearchFiles);
 	}
 
 	@Override
@@ -57,6 +61,11 @@ public final class QuaMeterTask extends AsyncTaskBase {
 
 	@Override
 	public void onProgress(final ProgressInfo progressInfo) {
+		// The search engine produced the output file at a different location than where we asked it to
+		if (progressInfo instanceof SearchEngineResult) {
+			final SearchEngineResult searchEngineResult = (SearchEngineResult) progressInfo;
+			outputFolder = searchEngineResult.getResultFile().getParentFile().getAbsoluteFile();
+		}
 	}
 
 	public File getResultingFile() {

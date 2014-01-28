@@ -1,9 +1,7 @@
 package edu.mayo.mprc.quameter;
 
-import com.google.common.collect.Lists;
-import edu.mayo.mprc.daemon.CachableWorkPacket;
 import edu.mayo.mprc.daemon.worker.WorkPacket;
-import edu.mayo.mprc.daemon.worker.WorkPacketBase;
+import edu.mayo.mprc.searchengine.EngineWorkPacket;
 import edu.mayo.mprc.utilities.progress.ProgressReporter;
 
 import java.io.File;
@@ -12,13 +10,8 @@ import java.util.List;
 /**
  * @author Roman Zenka
  */
-public final class QuaMeterWorkPacket extends WorkPacketBase implements CachableWorkPacket {
+public final class QuaMeterWorkPacket extends EngineWorkPacket {
 	private static final long serialVersionUID = 3243861715951582089L;
-
-	/**
-	 * The .RAW file we are measuring the quality of.
-	 */
-	private File rawFile;
 
 	/**
 	 * Idpqonvert database corresponding to the input RAW file.
@@ -35,22 +28,15 @@ public final class QuaMeterWorkPacket extends WorkPacketBase implements Cachable
 	 */
 	private double fdrScoreCutoff;
 
-	/**
-	 * The resulting quality metrics file.
-	 */
-	private File outputFile;
-
 	public QuaMeterWorkPacket(final String taskId, final boolean fromScratch) {
 		super(taskId, fromScratch);
 	}
 
-	public QuaMeterWorkPacket(final String taskId, final boolean fromScratch, final File rawFile, final File idpDbFile, final boolean monoisotopic, final double fdrScoreCutoff, final File outputFile) {
-		super(taskId, fromScratch);
-		this.rawFile = rawFile;
+	public QuaMeterWorkPacket(final String taskId, final boolean fromScratch, final File rawFile, final File idpDbFile, final boolean monoisotopic, final double fdrScoreCutoff, final File outputFile, final boolean publishResultFiles) {
+		super(rawFile, outputFile, null, null, publishResultFiles, taskId, fromScratch);
 		this.idpDbFile = idpDbFile;
 		this.monoisotopic = monoisotopic;
 		this.fdrScoreCutoff = fdrScoreCutoff;
-		this.outputFile = outputFile;
 	}
 
 	@Override
@@ -59,13 +45,8 @@ public final class QuaMeterWorkPacket extends WorkPacketBase implements Cachable
 	}
 
 	@Override
-	public File getOutputFile() {
-		return outputFile;
-	}
-
-	@Override
 	public String getStringDescriptionOfTask() {
-		return "RAW:\n" + getRawFile().getAbsolutePath() + "\n\n" +
+		return "RAW:\n" + getInputFile().getAbsolutePath() + "\n\n" +
 				"idpDB:\n" + getIdpDbFile().getAbsolutePath() + "\n\n" +
 				"FDR cutoff:\n" + getFdrScoreCutoff() + "\n\n" +
 				"Monoisotopic:\n" + isMonoisotopic() + "\n\n";
@@ -74,27 +55,18 @@ public final class QuaMeterWorkPacket extends WorkPacketBase implements Cachable
 	@Override
 	public WorkPacket translateToWorkInProgressPacket(final File wipFolder) {
 		return new QuaMeterWorkPacket(getTaskId(), isFromScratch(),
-				getRawFile(), getIdpDbFile(), isMonoisotopic(), getFdrScoreCutoff(), new File(wipFolder, getOutputFile().getName()));
-	}
-
-	@Override
-	public List<String> getOutputFiles() {
-		return Lists.newArrayList(getOutputFile().getName());
+				getInputFile(), getIdpDbFile(), isMonoisotopic(), getFdrScoreCutoff(), new File(wipFolder, getOutputFile().getName()), isPublishResultFiles());
 	}
 
 	@Override
 	public boolean cacheIsStale(final File subFolder, final List<String> outputFiles) {
 		final long outputFileModified = new File(subFolder, outputFiles.get(0)).lastModified();
-		return getRawFile().lastModified() > outputFileModified ||
+		return getInputFile().lastModified() > outputFileModified ||
 				getIdpDbFile().lastModified() > outputFileModified;
 	}
 
 	@Override
 	public void reportCachedResult(final ProgressReporter reporter, final File targetFolder, final List<String> outputFiles) {
-	}
-
-	public File getRawFile() {
-		return rawFile;
 	}
 
 	public File getIdpDbFile() {
@@ -112,11 +84,11 @@ public final class QuaMeterWorkPacket extends WorkPacketBase implements Cachable
 	@Override
 	public String toString() {
 		return "QuaMeterWorkPacket{" +
-				"rawFile=" + rawFile +
+				"rawFile=" + getInputFile() +
 				", idpDbFile=" + idpDbFile +
 				", monoisotopic=" + monoisotopic +
 				", fdrScoreCutoff=" + fdrScoreCutoff +
-				", outputFile=" + outputFile +
+				", outputFile=" + getOutputFile() +
 				'}';
 	}
 }
