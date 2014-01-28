@@ -72,11 +72,16 @@ public final class HemeUi {
 	private final HemeDao hemeDao;
 	private final SwiftDao swiftDao;
 	private final FastaDbDao fastaDbDao;
+	private final ParamsDao paramsDao;
 	private SwiftSearcherCaller swiftSearcherCaller;
+	private final String trypsinParameterSetName;
+	private final String chymoParameterSetName;
+
 	/**
 	 * Id of {@link SearchEngineParameters} for the {@link #TRYPSIN_SUFFIX} searches.
 	 */
 	private int trypsinParameterSetId;
+
 	/**
 	 * Id of {@link SearchEngineParameters} for the {@link #CHYMO_SUFFIX} searches.
 	 */
@@ -84,17 +89,21 @@ public final class HemeUi {
 	private String userEmail;
 	private String[] searchEngines;
 
-	public HemeUi(final File data, final File results, final HemeDao hemeDao, final SwiftDao swiftDao, final FastaDbDao fastaDbDao, final SwiftSearcherCaller swiftSearcherCaller,
-	              final int trypsinParameterSetId, final int chymoParameterSetId, final String userEmail,
+	public HemeUi(final File data, final File results, final HemeDao hemeDao, final SwiftDao swiftDao,
+	              final FastaDbDao fastaDbDao,
+	              final ParamsDao paramsDao,
+	              final SwiftSearcherCaller swiftSearcherCaller,
+	              final String trypsinParameterSetName, final String chymoParameterSetName, final String userEmail,
 	              final String[] searchEngines) {
 		this.data = data;
 		this.results = results;
 		this.hemeDao = hemeDao;
 		this.swiftDao = swiftDao;
 		this.fastaDbDao = fastaDbDao;
+		this.paramsDao = paramsDao;
 		this.swiftSearcherCaller = swiftSearcherCaller;
-		this.trypsinParameterSetId = trypsinParameterSetId;
-		this.chymoParameterSetId = chymoParameterSetId;
+		this.trypsinParameterSetName = trypsinParameterSetName;
+		this.chymoParameterSetName = chymoParameterSetName;
 		this.userEmail = userEmail;
 		this.searchEngines = searchEngines == null ? NO_ENGINES : searchEngines.clone();
 	}
@@ -171,6 +180,8 @@ public final class HemeUi {
 		begin();
 		final HemeTest test;
 		try {
+			findParameterSetIds();
+
 			test = getHemeDao().getTestForId(testId);
 
 			final String title = test.getName();
@@ -232,6 +243,15 @@ public final class HemeUi {
 		}
 
 		return searchId;
+	}
+
+	private void findParameterSetIds() {
+		try {
+			trypsinParameterSetId = getIdForParameterSet(trypsinParameterSetName);
+			chymoParameterSetId = getIdForParameterSet(chymoParameterSetName);
+		} catch (Exception e) {
+			throw new MprcException("Could not translate saved parameter sets", e);
+		}
 	}
 
 	private String relativeToBrowseRoot(final File file) {
@@ -326,6 +346,14 @@ public final class HemeUi {
 				return from.getPath();
 			}
 		});
+	}
+
+	private int getIdForParameterSet(final String name) {
+		final SavedSearchEngineParameters parameters = paramsDao.findSavedSearchEngineParameters(name);
+		if (parameters == null) {
+			throw new MprcException("HemeUi cannot find parameter set named " + name);
+		}
+		return parameters.getId();
 	}
 
 	public File getData() {
@@ -452,21 +480,6 @@ public final class HemeUi {
 			final File resultDir = new File(rootDir, config.get(RESULT_PATH));
 			FileUtilities.ensureFolderExists(resultDir);
 
-			final int trypsinId;
-			final int chymoId;
-			if (paramsDao instanceof Lifecycle) {
-				((Lifecycle) paramsDao).start();
-			}
-			paramsDao.begin();
-			try {
-				trypsinId = getIdForParameterSet(config.get(TRYPSIN_PARAM_SET_NAME));
-				chymoId = getIdForParameterSet(config.get(CHYMO_PARAM_SET_NAME));
-				paramsDao.commit();
-			} catch (Exception e) {
-				paramsDao.rollback();
-				throw new MprcException("Could not translate saved parameter sets", e);
-			}
-
 			final String[] engines = splitEngineString(config.get(SEARCH_ENGINES));
 
 			return new HemeUi(dataDir,
@@ -474,8 +487,10 @@ public final class HemeUi {
 					getHemeDao(),
 					getSwiftDao(),
 					getFastaDbDao(),
+					getParamsDao(),
 					getSwiftSearcherCaller(),
-					trypsinId, chymoId,
+					config.get(TRYPSIN_PARAM_SET_NAME),
+					config.get(CHYMO_PARAM_SET_NAME),
 					config.get(USER_EMAIL),
 					engines);
 		}
@@ -484,14 +499,6 @@ public final class HemeUi {
 			final ArrayList<String> strings = Lists.newArrayList(Splitter.on(' ').omitEmptyStrings().trimResults().split(engines));
 			final String[] result = new String[strings.size()];
 			return strings.toArray(result);
-		}
-
-		private int getIdForParameterSet(final String name) {
-			final SavedSearchEngineParameters parameters = paramsDao.findSavedSearchEngineParameters(name);
-			if (parameters == null) {
-				throw new MprcException("HemeUi cannot find parameter set named " + name);
-			}
-			return parameters.getId();
 		}
 	}
 
