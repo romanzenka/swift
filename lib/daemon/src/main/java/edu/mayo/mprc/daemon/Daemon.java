@@ -268,6 +268,15 @@ public final class Daemon implements Checkable, Installable {
 			}
 		}
 
+		/**
+		 * There are some resources that each daemon uses, although they are not explicitly listed.
+		 *
+		 * @param resources List to add the extra resources to.
+		 */
+		private void addInternalResources(final List<Object> resources) {
+			resources.add(daemonConnectionFactory);
+		}
+
 		private void addRunnersToList(final Daemon daemon, final List<AbstractRunner> runners, final List<ServiceConfig> services, final DependencyResolver dependencies) {
 			for (final ServiceConfig serviceConfig : services) {
 				if (serviceConfig == null) {
@@ -339,6 +348,8 @@ public final class Daemon implements Checkable, Installable {
 			daemon.setTempFolder(config.getTempFolderPath() == null ? FileUtilities.getDefaultTempDirectory() : new File(config.getTempFolderPath()));
 			// Create daemon resources
 			final List<Object> resources = new ArrayList<Object>(config.getResources().size());
+
+			addInternalResources(resources);
 			addResourcesToList(resources, config.getResources(), dependencies);
 			daemon.setResources(resources);
 
