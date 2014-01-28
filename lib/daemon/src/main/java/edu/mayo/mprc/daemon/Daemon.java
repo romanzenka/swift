@@ -349,8 +349,9 @@ public final class Daemon implements Checkable, Installable {
 			// Create daemon resources
 			final List<Object> resources = new ArrayList<Object>(config.getResources().size());
 
-			addInternalResources(resources);
 			addResourcesToList(resources, config.getResources(), dependencies);
+			addInternalResources(resources);
+
 			daemon.setResources(resources);
 
 			// Create runners
