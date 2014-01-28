@@ -6,6 +6,7 @@ import edu.mayo.mprc.heme.HemeEntry;
 import edu.mayo.mprc.heme.HemeTestStatus;
 import edu.mayo.mprc.heme.HemeUi;
 import edu.mayo.mprc.swift.db.SwiftDao;
+import edu.mayo.mprc.swift.params2.ParamsDao;
 import edu.mayo.mprc.swift.search.SwiftSearcherCaller;
 import edu.mayo.mprc.utilities.FileUtilities;
 import org.joda.time.DateTime;
@@ -30,6 +31,7 @@ public final class HemeUiTest {
 	private HemeDao hemeDao;
 	private SwiftDao swiftDao;
 	private FastaDbDao fastaDbDao;
+	private ParamsDao paramsDao;
 	private SwiftSearcherCaller swiftSearcherCaller;
 
 	@BeforeTest
@@ -59,10 +61,12 @@ public final class HemeUiTest {
 		swiftDao = mock(SwiftDao.class);
 		swiftSearcherCaller = mock(SwiftSearcherCaller.class);
 
+		paramsDao = mock(ParamsDao.class);
+
 		fastaDbDao = mock(FastaDbDao.class);
 		stub(fastaDbDao.getProteinDescription(any(Curation.class), anyString())).toReturn("Protein description");
 
-		hemeUi = new HemeUi(data, results, hemeDao, swiftDao, fastaDbDao, swiftSearcherCaller, 1, 2, "zenka.roman@mayo.edu", new String[]{"MASCOT-2.4", "SCAFFOLD-4.0.7"});
+		hemeUi = new HemeUi(data, results, hemeDao, swiftDao, fastaDbDao, paramsDao, swiftSearcherCaller, "1", "2", "zenka.roman@mayo.edu", new String[]{"MASCOT-2.4", "SCAFFOLD-4.0.7"});
 	}
 
 	private void createValidEntry(String name, String date) {
