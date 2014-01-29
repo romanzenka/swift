@@ -11,12 +11,12 @@ import org.springframework.stereotype.Component;
 /**
  * @author Roman Zenka
  */
-public final class QuaMeterCache extends WorkCache<QuaMeterWorkPacket> {
+public final class QuameterCache extends WorkCache<QuameterWorkPacket> {
 	public static final String TYPE = "quameterCache";
 	public static final String NAME = "QuaMeter Cache";
 	public static final String DESC = "Caches previous QuaMeter search results. <p>Speeds up consecutive QuaMeter searches if the same file with same parameters is processed multiple times.</p>";
 
-	public QuaMeterCache() {
+	public QuameterCache() {
 	}
 
 	public static final class Config extends WorkCache.CacheConfig {
@@ -28,7 +28,7 @@ public final class QuaMeterCache extends WorkCache<QuaMeterWorkPacket> {
 	public static final class Factory extends WorkCache.Factory<Config> {
 		@Override
 		public WorkCache createCache(final Config config, final DependencyResolver dependencies) {
-			return new QuaMeterCache();
+			return new QuameterCache();
 		}
 	}
 

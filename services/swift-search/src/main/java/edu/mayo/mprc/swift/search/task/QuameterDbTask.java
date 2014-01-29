@@ -14,14 +14,14 @@ import edu.mayo.mprc.workflow.engine.WorkflowEngine;
  */
 public final class QuameterDbTask extends AsyncTaskBase {
 	private SearchDbTask searchDbTask;
-	private QuaMeterTask quaMeterTask;
+	private QuameterTask quameterTask;
 	private FileSearch fileSearch;
 
-	public QuameterDbTask(WorkflowEngine engine, DaemonConnection daemon, DatabaseFileTokenFactory fileTokenFactory, boolean fromScratch, SearchDbTask searchDbTask, QuaMeterTask quaMeterTask, FileSearch fileSearch) {
+	public QuameterDbTask(WorkflowEngine engine, DaemonConnection daemon, DatabaseFileTokenFactory fileTokenFactory, boolean fromScratch, SearchDbTask searchDbTask, QuameterTask quameterTask, FileSearch fileSearch) {
 		super(engine, daemon, fileTokenFactory, fromScratch);
 		this.searchDbTask = searchDbTask;
 		this.fileSearch = fileSearch;
-		this.quaMeterTask = quaMeterTask;
+		this.quameterTask = quameterTask;
 		setName("quameter");
 		setDescription("Load QuaMeter metadata from " + fileTokenFactory.fileToTaggedDatabaseToken(fileSearch.getInputFile()));
 	}
@@ -32,7 +32,7 @@ public final class QuameterDbTask extends AsyncTaskBase {
 				isFromScratch(),
 				searchDbTask.getLoadedTandemFileMetadata().get(fileSearch.getInputFile().getName()),
 				fileSearch.getId(),
-				quaMeterTask.getResultingFile()
+				quameterTask.getResultingFile()
 		);
 	}
 
@@ -46,7 +46,7 @@ public final class QuameterDbTask extends AsyncTaskBase {
 
 	@Override
 	public int hashCode() {
-		return Objects.hashCode(searchDbTask, quaMeterTask, fileSearch.getId());
+		return Objects.hashCode(searchDbTask, quameterTask, fileSearch.getId());
 	}
 
 	@Override
@@ -59,7 +59,7 @@ public final class QuameterDbTask extends AsyncTaskBase {
 		}
 		final QuameterDbTask other = (QuameterDbTask) obj;
 		return Objects.equal(this.searchDbTask, other.searchDbTask)
-				&& Objects.equal(this.quaMeterTask, other.quaMeterTask)
+				&& Objects.equal(this.quameterTask, other.quameterTask)
 				&& Objects.equal(this.fileSearch.getId(), other.fileSearch.getId());
 	}
 }

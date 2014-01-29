@@ -495,11 +495,11 @@ public final class SearchRunner implements Runnable, Lifecycle {
 				search);
 	}
 
-	private QuaMeterTask addQuaMeterTask(final SearchEngine quaMeter, final IdpQonvertTask search, final File rawFile,
+	private QuameterTask addQuaMeterTask(final SearchEngine quaMeter, final IdpQonvertTask search, final File rawFile,
 	                                     final SearchDbTask searchDbTask, final FileSearch fileSearch,
 	                                     final boolean publicSearchFiles) {
-		final QuaMeterTask task = addTask(
-				new QuaMeterTask(workflowEngine,
+		final QuameterTask task = addTask(
+				new QuameterTask(workflowEngine,
 						getSearchDefinition(), quaMeter.getSearchDaemon(),
 						search, rawFile, getOutputFolderForSearchEngine(quaMeter), fileTokenFactory, isFromScratch(), publicSearchFiles));
 		task.addDependency(search);

@@ -3,7 +3,7 @@ package edu.mayo.mprc.swift.search.task;
 import com.google.common.base.Objects;
 import edu.mayo.mprc.daemon.DaemonConnection;
 import edu.mayo.mprc.daemon.worker.WorkPacket;
-import edu.mayo.mprc.quameter.QuaMeterWorkPacket;
+import edu.mayo.mprc.quameter.QuameterWorkPacket;
 import edu.mayo.mprc.searchengine.SearchEngineResult;
 import edu.mayo.mprc.swift.db.DatabaseFileTokenFactory;
 import edu.mayo.mprc.swift.dbmapping.SwiftSearchDefinition;
@@ -16,7 +16,7 @@ import java.io.File;
 /**
  * @author Roman Zenka
  */
-public final class QuaMeterTask extends AsyncTaskBase {
+public final class QuameterTask extends AsyncTaskBase {
 
 	private final IdpQonvertTask idpQonvertTask;
 	private final File rawFile;
@@ -24,7 +24,7 @@ public final class QuaMeterTask extends AsyncTaskBase {
 	private final double maxFDR;
 	private final boolean publicSearchFiles;
 
-	public QuaMeterTask(final WorkflowEngine engine,
+	public QuameterTask(final WorkflowEngine engine,
 	                    final SwiftSearchDefinition definition,
 	                    final DaemonConnection quaMeterDaemon,
 	                    final IdpQonvertTask idpQonvertTask,
@@ -50,7 +50,7 @@ public final class QuaMeterTask extends AsyncTaskBase {
 		setDescription("QuaMeter analysis of " + fileTokenFactory.fileToTaggedDatabaseToken(rawFile)
 				+ " with search results " + fileTokenFactory.fileToTaggedDatabaseToken(idpQonvertTask.getResultingFile()));
 
-		return new QuaMeterWorkPacket(getFullId(), isFromScratch(),
+		return new QuameterWorkPacket(getFullId(), isFromScratch(),
 				rawFile, idpQonvertTask.getResultingFile(), true, maxFDR, getResultingFile(), publicSearchFiles);
 	}
 
@@ -86,7 +86,7 @@ public final class QuaMeterTask extends AsyncTaskBase {
 		if (obj == null || getClass() != obj.getClass()) {
 			return false;
 		}
-		final QuaMeterTask other = (QuaMeterTask) obj;
+		final QuameterTask other = (QuameterTask) obj;
 		return Objects.equal(idpQonvertTask, other.idpQonvertTask) && Objects.equal(rawFile, other.rawFile) && Objects.equal(outputFolder, other.outputFolder) && Objects.equal(maxFDR, other.maxFDR);
 	}
 }

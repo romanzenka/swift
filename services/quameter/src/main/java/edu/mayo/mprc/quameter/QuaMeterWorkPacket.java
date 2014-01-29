@@ -9,7 +9,7 @@ import java.util.List;
 /**
  * @author Roman Zenka
  */
-public final class QuaMeterWorkPacket extends EngineWorkPacket {
+public final class QuameterWorkPacket extends EngineWorkPacket {
 	private static final long serialVersionUID = 3243861715951582089L;
 
 	/**
@@ -27,11 +27,11 @@ public final class QuaMeterWorkPacket extends EngineWorkPacket {
 	 */
 	private double fdrScoreCutoff;
 
-	public QuaMeterWorkPacket(final String taskId, final boolean fromScratch) {
+	public QuameterWorkPacket(final String taskId, final boolean fromScratch) {
 		super(taskId, fromScratch);
 	}
 
-	public QuaMeterWorkPacket(final String taskId, final boolean fromScratch, final File rawFile, final File idpDbFile, final boolean monoisotopic, final double fdrScoreCutoff, final File outputFile, final boolean publishResultFiles) {
+	public QuameterWorkPacket(final String taskId, final boolean fromScratch, final File rawFile, final File idpDbFile, final boolean monoisotopic, final double fdrScoreCutoff, final File outputFile, final boolean publishResultFiles) {
 		super(rawFile, outputFile, null, null, publishResultFiles, taskId, fromScratch);
 		this.idpDbFile = idpDbFile;
 		this.monoisotopic = monoisotopic;
@@ -53,7 +53,7 @@ public final class QuaMeterWorkPacket extends EngineWorkPacket {
 
 	@Override
 	public WorkPacket translateToWorkInProgressPacket(final File wipFolder) {
-		return new QuaMeterWorkPacket(getTaskId(), isFromScratch(),
+		return new QuameterWorkPacket(getTaskId(), isFromScratch(),
 				getInputFile(), getIdpDbFile(), isMonoisotopic(), getFdrScoreCutoff(), new File(wipFolder, getOutputFile().getName()), isPublishResultFiles());
 	}
 
@@ -78,7 +78,7 @@ public final class QuaMeterWorkPacket extends EngineWorkPacket {
 
 	@Override
 	public String toString() {
-		return "QuaMeterWorkPacket{" +
+		return "QuameterWorkPacket{" +
 				"rawFile=" + getInputFile() +
 				", idpDbFile=" + idpDbFile +
 				", monoisotopic=" + monoisotopic +

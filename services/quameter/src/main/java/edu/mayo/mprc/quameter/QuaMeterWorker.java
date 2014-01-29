@@ -28,8 +28,8 @@ import java.util.List;
 /**
  * @author Roman Zenka
  */
-public final class QuaMeterWorker extends WorkerBase {
-	private static final Logger LOGGER = Logger.getLogger(QuaMeterWorker.class);
+public final class QuameterWorker extends WorkerBase {
+	private static final Logger LOGGER = Logger.getLogger(QuameterWorker.class);
 	public static final String TYPE = "quameter";
 	public static final String NAME = "QuaMeter";
 	public static final String DESC = "QuaMeter quality metrics support. <p>QuaMeter is freely available at <a href=\"http://fenchurch.mc.vanderbilt.edu/software.php#QuaMeter\">http://fenchurch.mc.vanderbilt.edu/software.php#QuaMeter</a>.</p>";
@@ -40,7 +40,7 @@ public final class QuaMeterWorker extends WorkerBase {
 
 	public static final String EXECUTABLE = "executable";
 
-	public QuaMeterWorker(final File executable) {
+	public QuameterWorker(final File executable) {
 		this.executable = executable;
 	}
 
@@ -54,11 +54,11 @@ public final class QuaMeterWorker extends WorkerBase {
 
 	@Override
 	public void process(WorkPacket workPacket, UserProgressReporter progressReporter) {
-		if (!(workPacket instanceof QuaMeterWorkPacket)) {
-			throw new DaemonException("Unexpected packet type " + workPacket.getClass().getName() + ", expected " + QuaMeterWorkPacket.class.getName());
+		if (!(workPacket instanceof QuameterWorkPacket)) {
+			throw new DaemonException("Unexpected packet type " + workPacket.getClass().getName() + ", expected " + QuameterWorkPacket.class.getName());
 		}
 
-		final QuaMeterWorkPacket packet = (QuaMeterWorkPacket) workPacket;
+		final QuameterWorkPacket packet = (QuameterWorkPacket) workPacket;
 
 		checkPacketCorrectness(packet);
 
@@ -119,7 +119,7 @@ public final class QuaMeterWorker extends WorkerBase {
 		LOGGER.info("QuaMeter search, " + packet.toString() + ", has been successfully completed.");
 	}
 
-	private void checkPacketCorrectness(final QuaMeterWorkPacket packet) {
+	private void checkPacketCorrectness(final QuameterWorkPacket packet) {
 		if (packet.getInputFile() == null) {
 			throw new MprcException("Raw file must not be null");
 		}
@@ -142,15 +142,15 @@ public final class QuaMeterWorker extends WorkerBase {
 		private static final EngineMetadata ENGINE_METADATA = new EngineMetadata(
 				"QUAMETER", ".qual.txt", "QuaMeter", false, "quameter", null,
 				new String[]{TYPE},
-				new String[]{QuaMeterCache.TYPE},
+				new String[]{QuameterCache.TYPE},
 				new String[]{},
 				90, true);
 
 		@Override
 		public Worker create(final Config config, final DependencyResolver dependencies) {
-			QuaMeterWorker worker = null;
+			QuameterWorker worker = null;
 			try {
-				worker = new QuaMeterWorker(FileUtilities.getAbsoluteFileForExecutables(new File(config.get(EXECUTABLE))));
+				worker = new QuameterWorker(FileUtilities.getAbsoluteFileForExecutables(new File(config.get(EXECUTABLE))));
 			} catch (Exception e) {
 				throw new MprcException("QuaMeter worker could not be created.", e);
 			}

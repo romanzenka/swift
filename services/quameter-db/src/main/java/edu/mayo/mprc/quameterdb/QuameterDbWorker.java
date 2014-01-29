@@ -31,8 +31,8 @@ public final class QuameterDbWorker extends WorkerBase {
 	private QuameterDao dao;
 
 	public static final String TYPE = "quameter-db";
-	public static final String NAME = "Quameter Result Loader";
-	public static final String DESC = "Loads the quameter results into a database.";
+	public static final String NAME = "QuaMeter Result Loader";
+	public static final String DESC = "Loads the QuaMeter results into a database.";
 
 	private static final String DATABASE = "database";
 
