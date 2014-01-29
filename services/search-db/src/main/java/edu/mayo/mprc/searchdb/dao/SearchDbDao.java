@@ -101,4 +101,6 @@ public interface SearchDbDao extends Dao {
 	 *         that contains the input file (there should be just one).
 	 */
 	int getScaffoldProteinGroupCount(String inputFile, Iterable<ReportData> reports);
+
+	TandemMassSpectrometrySample getTandemMassSpectrometrySampleForId(int tandemMassSpectrometrySampleId);
 }

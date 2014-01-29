@@ -587,6 +587,19 @@ public final class SwiftDaoHibernate extends DaoBase implements SwiftDao {
 		}
 	}
 
+	@Override
+	public FileSearch getFileSearchForId(final int fileSearchId) {
+		try {
+			final FileSearch data = (FileSearch) getSession().get(FileSearch.class, fileSearchId);
+			if (data == null) {
+				throw new MprcException("getFileSearchForId : file search id=" + fileSearchId + " was not found.");
+			}
+			return data;
+		} catch (Exception t) {
+			throw new MprcException("Cannot obtain file search for id " + fileSearchId, t);
+		}
+	}
+
 	private void renameFileReferences(final File from, final File to, final String table, final String field) {
 		LOGGER.info("Renaming all " + table + "." + field);
 		final Query query = getSession().createQuery("update " + table + " as f set f." + field + "=:file where f.id=:id");
@@ -639,7 +652,7 @@ public final class SwiftDaoHibernate extends DaoBase implements SwiftDao {
 	}
 
 	@Override
-	public void install(Map<String, String> params) {
+	public void install(final Map<String, String> params) {
 		LOGGER.info("Installing Swift DAO");
 		// Initialize the dependent DAO
 		workspaceDao.install(new HashMap<String, String>(0));

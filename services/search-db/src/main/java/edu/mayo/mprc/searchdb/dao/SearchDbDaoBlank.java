@@ -72,6 +72,11 @@ public abstract class SearchDbDaoBlank implements SearchDbDao {
 	}
 
 	@Override
+	public TandemMassSpectrometrySample getTandemMassSpectrometrySampleForId(final int tandemMassSpectrometrySampleId) {
+		return null;
+	}
+
+	@Override
 	public void begin() {
 		throw new UnsupportedOperationException();
 	}

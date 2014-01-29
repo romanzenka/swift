@@ -173,4 +173,6 @@ public interface SwiftDao extends Dao, RuntimeInitializer {
 	 * @param outputFolder Output folder. Searches where this matches get hidden.
 	 */
 	void hideSearchesWithOutputFolder(File outputFolder);
+
+	FileSearch getFileSearchForId(int fileSearchId);
 }
