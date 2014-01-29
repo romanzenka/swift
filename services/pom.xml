@@ -35,6 +35,7 @@
         <module>myrimatch</module>
         <module>omssa</module>
         <module>qa</module>
+        <module>quameter-db</module>
         <module>qstat</module>
         <module>quameter</module>
         <module>raw2mgf</module>
