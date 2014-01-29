@@ -2,7 +2,6 @@ package edu.mayo.mprc.quameter;
 
 import edu.mayo.mprc.daemon.worker.WorkPacket;
 import edu.mayo.mprc.searchengine.EngineWorkPacket;
-import edu.mayo.mprc.utilities.progress.ProgressReporter;
 
 import java.io.File;
 import java.util.List;
@@ -63,10 +62,6 @@ public final class QuaMeterWorkPacket extends EngineWorkPacket {
 		final long outputFileModified = new File(subFolder, outputFiles.get(0)).lastModified();
 		return getInputFile().lastModified() > outputFileModified ||
 				getIdpDbFile().lastModified() > outputFileModified;
-	}
-
-	@Override
-	public void reportCachedResult(final ProgressReporter reporter, final File targetFolder, final List<String> outputFiles) {
 	}
 
 	public File getIdpDbFile() {
