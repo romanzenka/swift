@@ -7,6 +7,6 @@
         </id>
         <many-to-one name="fileSearch" class="edu.mayo.mprc.swift.dbmapping.FileSearch" column="file_search_id" />
         <many-to-one name="sample" class="edu.mayo.mprc.searchdb.dao.TandemMassSpectrometrySample" column="sample_id" />
-        <property name="jsonData" class="String" column="json_data" />
+        <property name="jsonData" type="string" length="2000" column="json_data" />
     </class>
 </hibernate-mapping>
