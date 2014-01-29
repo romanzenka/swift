@@ -2,6 +2,8 @@ package edu.mayo.mprc.searchdb.builder;
 
 import edu.mayo.mprc.searchdb.dao.TandemMassSpectrometrySample;
 
+import java.util.Map;
+
 /**
  * For given biological sample name and name of a fraction, obtains a full information about the tandem mass spectrometry
  * sample (.RAW file or .mgf).
@@ -15,4 +17,6 @@ public interface MassSpecDataExtractor {
 	 * @return Full information about the mass spectrometry sample.
 	 */
 	TandemMassSpectrometrySample getTandemMassSpectrometrySample(String biologicalSampleName, String msmsSampleName);
+
+	Map<String, TandemMassSpectrometrySample> getMap();
 }

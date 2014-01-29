@@ -24,6 +24,7 @@ import edu.mayo.mprc.msmseval.MsmsEvalCache;
 import edu.mayo.mprc.qa.QaWorker;
 import edu.mayo.mprc.qa.RAWDumpCache;
 import edu.mayo.mprc.qa.RAWDumpWorker;
+import edu.mayo.mprc.quameterdb.QuameterDbWorker;
 import edu.mayo.mprc.raw2mgf.RawToMgfCache;
 import edu.mayo.mprc.raw2mgf.RawToMgfWorker;
 import edu.mayo.mprc.scaffold.report.ScaffoldReportWorker;
@@ -75,6 +76,7 @@ public final class SwiftSearcher implements Worker, Lifecycle {
 	private DaemonConnection qaDaemon;
 	private DaemonConnection fastaDbDaemon;
 	private DaemonConnection searchDbDaemon;
+	private DaemonConnection quameterDbDaemon;
 	private static final ExecutorService service = new SimpleThreadPoolExecutor(1, "swiftSearcher", false/* do not block*/);
 	private boolean reportDecoyHits;
 
@@ -96,6 +98,7 @@ public final class SwiftSearcher implements Worker, Lifecycle {
 	private static final String DATABASE = "database";
 	private static final String FASTA_DB = "fastaDb";
 	private static final String SEARCH_DB = "searchDb";
+	private static final String QUAMETER_DB = "quameterDb";
 	private static final String REPORT_DECOY_HITS = "reportDecoyHits";
 
 	private DatabaseFileTokenFactory fileTokenFactory;
@@ -202,6 +205,14 @@ public final class SwiftSearcher implements Worker, Lifecycle {
 		this.searchDbDaemon = searchDbDaemon;
 	}
 
+	public DaemonConnection getQuameterDbDaemon() {
+		return quameterDbDaemon;
+	}
+
+	public void setQuameterDbDaemon(DaemonConnection quameterDbDaemon) {
+		this.quameterDbDaemon = quameterDbDaemon;
+	}
+
 	public boolean isReportDecoyHits() {
 		return reportDecoyHits;
 	}
@@ -256,6 +267,7 @@ public final class SwiftSearcher implements Worker, Lifecycle {
 					qaDaemon,
 					fastaDbDaemon,
 					searchDbDaemon,
+					quameterDbDaemon,
 					supportedEngines,
 					progressReporter,
 					service,
@@ -440,6 +452,9 @@ public final class SwiftSearcher implements Worker, Lifecycle {
 			if (config.searchDb != null) {
 				worker.setSearchDbDaemon((DaemonConnection) dependencies.createSingleton(config.searchDb));
 			}
+			if (config.quameterDb != null) {
+				worker.setQuameterDbDaemon((DaemonConnection) dependencies.createSingleton(config.quameterDb));
+			}
 			if (config.fastaDb != null && config.searchDb != null) {
 			}
 
@@ -515,6 +530,7 @@ public final class SwiftSearcher implements Worker, Lifecycle {
 		private ServiceConfig qa;
 		private ServiceConfig fastaDb;
 		private ServiceConfig searchDb;
+		private ServiceConfig quameterDb;
 		private ServiceConfig msmsEval;
 		private Database.Config database;
 
@@ -528,6 +544,7 @@ public final class SwiftSearcher implements Worker, Lifecycle {
 				, final Collection<SearchEngine.Config> engines
 				, final ServiceConfig scaffoldReport, final ServiceConfig qa
 				, final ServiceConfig fastaDb, final ServiceConfig searchDb
+				, final ServiceConfig quameterDb
 				, final ServiceConfig msmsEval
 				, final Database.Config database) {
 			this.fastaPath = fastaPath;
@@ -542,6 +559,7 @@ public final class SwiftSearcher implements Worker, Lifecycle {
 			this.qa = qa;
 			this.fastaDb = fastaDb;
 			this.searchDb = searchDb;
+			this.quameterDb = quameterDb;
 			this.msmsEval = msmsEval;
 			this.database = database;
 			reportDecoyHits = true;
@@ -595,6 +613,10 @@ public final class SwiftSearcher implements Worker, Lifecycle {
 			return searchDb;
 		}
 
+		public ServiceConfig getQuameterDb() {
+			return quameterDb;
+		}
+
 		public void setDatabase(final Database.Config database) {
 			this.database = database;
 		}
@@ -634,6 +656,7 @@ public final class SwiftSearcher implements Worker, Lifecycle {
 			writer.put(QA, writer.save(getQa()));
 			writer.put(FASTA_DB, writer.save(getFastaDb()));
 			writer.put(SEARCH_DB, writer.save(getSearchDb()));
+			writer.put(QUAMETER_DB, writer.save(getQuameterDb()));
 			writer.put(MSMS_EVAL, writer.save(getMsmsEval()));
 			writer.put(DATABASE, writer.save(getDatabase()));
 			writer.put(REPORT_DECOY_HITS, isReportDecoyHits());
@@ -664,6 +687,7 @@ public final class SwiftSearcher implements Worker, Lifecycle {
 			qa = (ServiceConfig) reader.getObject(QA);
 			fastaDb = (ServiceConfig) reader.getObject(FASTA_DB);
 			searchDb = (ServiceConfig) reader.getObject(SEARCH_DB);
+			quameterDb = (ServiceConfig) reader.getObject(QUAMETER_DB);
 			msmsEval = (ServiceConfig) reader.getObject(MSMS_EVAL);
 			database = (Database.Config) reader.getObject(DATABASE);
 			reportDecoyHits = reader.getBoolean(REPORT_DECOY_HITS);
@@ -768,7 +792,10 @@ public final class SwiftSearcher implements Worker, Lifecycle {
 					.reference(FastaDbWorker.TYPE, UiBuilder.NONE_TYPE)
 
 					.property(SEARCH_DB, SearchDbWorker.NAME, "Load Scaffold search results into a database")
-					.reference(SearchDbWorker.TYPE, UiBuilder.NONE_TYPE);
+					.reference(SearchDbWorker.TYPE, UiBuilder.NONE_TYPE)
+
+					.property(QUAMETER_DB, QuameterDbWorker.NAME, "Load QuaMeter results into a database")
+					.reference(QuameterDbWorker.TYPE, UiBuilder.NONE_TYPE);
 		}
 	}
 }

@@ -253,7 +253,7 @@ public final class TestDaemonFactory {
 		final SwiftSearcher.Config searcherConfig = new SwiftSearcher.Config(
 				"fastaPath", "fastaArchivePath",
 				"fastaUploadPath", raw2mgf, msconvert, mgfToMgf, rawDump,
-				engineConfigs, scaffoldReport, qa, null, null, msmsEval, null);
+				engineConfigs, scaffoldReport, qa, null, null, null, msmsEval, null);
 		final SimpleRunner.Config runner76 = new SimpleRunner.Config();
 		runner76.setNumThreads(1);
 		runner76.setWorkerConfiguration(searcherConfig);

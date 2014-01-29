@@ -3,6 +3,7 @@ package edu.mayo.mprc.searchdb.builder;
 import edu.mayo.mprc.searchdb.dao.TandemMassSpectrometrySample;
 
 import java.util.Map;
+import java.util.TreeMap;
 
 /**
  * Extract mass spec data from a map of {@link RawFileMetaData} objects embedded in the work packet.
@@ -13,6 +14,7 @@ public class MapMassSpecDataExtractor implements MassSpecDataExtractor {
 
 	public static final String MUDPIT_PREFIX = "Mudpit_";
 	private final Map<String/*msmsSampleName*/, RawFileMetaData> metaDataMap;
+	private final Map<String/*msmsSampleName*/, TandemMassSpectrometrySample> sampleMap = new TreeMap<String, TandemMassSpectrometrySample>();
 
 	public MapMassSpecDataExtractor(final Map<String, RawFileMetaData> metaDataMap) {
 		this.metaDataMap = metaDataMap;
@@ -24,8 +26,15 @@ public class MapMassSpecDataExtractor implements MassSpecDataExtractor {
 		if (rawFileMetaData == null) {
 			return null;
 		} else {
-			return rawFileMetaData.parse();
+			final TandemMassSpectrometrySample result = rawFileMetaData.parse();
+			sampleMap.put(msmsSampleName, result);
+			return result;
 		}
+	}
+
+	@Override
+	public Map<String, TandemMassSpectrometrySample> getMap() {
+		return sampleMap;
 	}
 
 	/**

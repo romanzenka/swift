@@ -17,6 +17,7 @@ import edu.mayo.mprc.searchdb.builder.MapMassSpecDataExtractor;
 import edu.mayo.mprc.searchdb.builder.MassSpecDataExtractor;
 import edu.mayo.mprc.searchdb.builder.ScaffoldSpectraSummarizer;
 import edu.mayo.mprc.searchdb.bulk.BulkSearchDbDao;
+import edu.mayo.mprc.searchdb.dao.TandemMassSpectrometrySample;
 import edu.mayo.mprc.swift.db.SwiftDao;
 import edu.mayo.mprc.swift.dbmapping.ReportData;
 import edu.mayo.mprc.unimod.Unimod;
@@ -27,6 +28,8 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
 import java.io.File;
+import java.util.Map;
+import java.util.TreeMap;
 
 /**
  * Loads search results from a given Swift experiment into the database.
@@ -85,7 +88,11 @@ public final class SearchDbWorker extends WorkerBase {
 			summarizer.load(workPacket.getScaffoldSpectrumReport(), "3", reporter);
 
 			dao.addAnalysis(summarizer.getAnalysisBuilder(), reportData, reporter);
+
+			final Map<String, Integer> massSpecMap = getSavedMassSpecSampleMap(dataExtractor);
+
 			dao.commit();
+			reporter.reportProgress(new SearchDbResult(massSpecMap));
 		} catch (Exception e) {
 			dao.rollback();
 			throw new MprcException(
@@ -93,6 +100,15 @@ public final class SearchDbWorker extends WorkerBase {
 							+ ((SearchDbWorkPacket) wp).getScaffoldSpectrumReport().getAbsolutePath()
 							+ "]", e);
 		}
+	}
+
+	private Map<String, Integer> getSavedMassSpecSampleMap(final MassSpecDataExtractor dataExtractor) {
+		final Map<String, Integer> massSpecMap = new TreeMap<String, Integer>();
+		for (final Map.Entry<String, TandemMassSpectrometrySample> entry : dataExtractor.getMap().entrySet()) {
+			final TandemMassSpectrometrySample tandemMassSpectrometrySample = dao.updateTandemMassSpectrometrySample(entry.getValue());
+			massSpecMap.put(entry.getKey(), tandemMassSpectrometrySample.getId());
+		}
+		return massSpecMap;
 	}
 
 	/**

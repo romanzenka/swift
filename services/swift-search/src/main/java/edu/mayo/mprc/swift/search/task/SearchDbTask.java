@@ -4,6 +4,7 @@ import com.google.common.base.Objects;
 import edu.mayo.mprc.MprcException;
 import edu.mayo.mprc.daemon.DaemonConnection;
 import edu.mayo.mprc.daemon.worker.WorkPacket;
+import edu.mayo.mprc.searchdb.SearchDbResult;
 import edu.mayo.mprc.searchdb.SearchDbWorkPacket;
 import edu.mayo.mprc.searchdb.builder.RawFileMetaData;
 import edu.mayo.mprc.swift.db.DatabaseFileTokenFactory;
@@ -25,6 +26,7 @@ public final class SearchDbTask extends AsyncTaskBase {
 	private final ScaffoldSpectrumExportProducer scaffoldTask;
 
 	private final Map<String, RAWDumpTask> rawDumpTaskMap = new HashMap<String, RAWDumpTask>(5);
+	private Map<String, Integer> loadedTandemFileMetadata;
 
 	/**
 	 * Create the task that depends on Scaffold invocation.
@@ -60,6 +62,10 @@ public final class SearchDbTask extends AsyncTaskBase {
 		return scaffoldTask.getReportData().getId();
 	}
 
+	public Map<String, Integer> getLoadedTandemFileMetadata() {
+		return loadedTandemFileMetadata;
+	}
+
 	@Override
 	public WorkPacket createWorkPacket() {
 		final HashMap<String, RawFileMetaData> metaDataMap = new HashMap<String, RawFileMetaData>(rawDumpTaskMap.size());
@@ -77,6 +83,9 @@ public final class SearchDbTask extends AsyncTaskBase {
 
 	@Override
 	public void onProgress(final ProgressInfo progressInfo) {
+		if (progressInfo instanceof SearchDbResult) {
+			loadedTandemFileMetadata = ((SearchDbResult) progressInfo).getLoadedRawFileMetadata();
+		}
 	}
 
 	@Override

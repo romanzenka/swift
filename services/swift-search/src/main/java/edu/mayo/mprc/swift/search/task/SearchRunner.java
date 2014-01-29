@@ -87,6 +87,7 @@ public final class SearchRunner implements Runnable, Lifecycle {
 	private final DaemonConnection qaDaemon;
 	private final DaemonConnection fastaDbDaemon;
 	private final DaemonConnection searchDbDaemon;
+	private final DaemonConnection quameterDbDaemon;
 	private final boolean reportDecoyHits;
 
 	private final Collection<SearchEngine> searchEngines;
@@ -132,6 +133,7 @@ public final class SearchRunner implements Runnable, Lifecycle {
 			final DaemonConnection qaDaemon,
 			final DaemonConnection fastaDbDaemon,
 			final DaemonConnection searchDbDaemon,
+			final DaemonConnection quameterDbDaemon,
 			final Collection<SearchEngine> searchEngines,
 			final ProgressReporter reporter,
 			final ExecutorService service,
@@ -154,6 +156,7 @@ public final class SearchRunner implements Runnable, Lifecycle {
 		this.qaDaemon = qaDaemon;
 		this.fastaDbDaemon = fastaDbDaemon;
 		this.searchDbDaemon = searchDbDaemon;
+		this.quameterDbDaemon = quameterDbDaemon;
 		this.searchEngines = searchEngines;
 		this.reporter = reporter;
 		this.service = service;
@@ -423,11 +426,13 @@ public final class SearchRunner implements Runnable, Lifecycle {
 			}
 		}
 
+
+		SearchDbTask searchDbTask = null;
 		if (searchDbDaemon != null && rawDumpDaemon != null && scaffoldTask != null) {
 			// Ask for dumping the .RAW file since the QA might be disabled
 			if (isRawFile(inputFile)) {
 				final RAWDumpTask rawDumpTask = addRawDumpTask(inputFile.getInputFile(), QaTask.getQaSubdirectory(scaffoldTask.getScaffoldXmlFile()));
-				addSearchDbCall(scaffoldTask, rawDumpTask);
+				searchDbTask = addSearchDbCall(scaffoldTask, rawDumpTask);
 			}
 		}
 
@@ -437,7 +442,7 @@ public final class SearchRunner implements Runnable, Lifecycle {
 			final SearchEngine myrimatch = getMyrimatchEngine();
 			final EngineSearchTask myrimatchSearch = addEngineSearchTask(myrimatch, inputFile, mzmlFile, searchParameters, publicSearchFiles);
 			final IdpQonvertTask idpQonvertTask = addIdpQonvertTask(idpQonvert, myrimatchSearch);
-			addQuaMeterTask(getQuaMeterEngine(), idpQonvertTask, inputFile.getInputFile(), publicSearchFiles);
+			addQuaMeterTask(getQuaMeterEngine(), idpQonvertTask, inputFile.getInputFile(), searchDbTask, inputFile, publicSearchFiles);
 		}
 	}
 
@@ -490,12 +495,26 @@ public final class SearchRunner implements Runnable, Lifecycle {
 				search);
 	}
 
-	private QuaMeterTask addQuaMeterTask(final SearchEngine quaMeter, final IdpQonvertTask search, final File rawFile, final boolean publicSearchFiles) {
+	private QuaMeterTask addQuaMeterTask(final SearchEngine quaMeter, final IdpQonvertTask search, final File rawFile,
+	                                     final SearchDbTask searchDbTask, final FileSearch fileSearch,
+	                                     final boolean publicSearchFiles) {
 		final QuaMeterTask task = addTask(
 				new QuaMeterTask(workflowEngine,
 						getSearchDefinition(), quaMeter.getSearchDaemon(),
 						search, rawFile, getOutputFolderForSearchEngine(quaMeter), fileTokenFactory, isFromScratch(), publicSearchFiles));
 		task.addDependency(search);
+		if (searchDbTask != null) {
+			final QuameterDbTask dbTask = addTask(
+					new QuameterDbTask(workflowEngine,
+							quameterDbDaemon,
+							fileTokenFactory,
+							isFromScratch(),
+							searchDbTask,
+							task,
+							fileSearch));
+			dbTask.addDependency(task);
+			dbTask.addDependency(searchDbTask);
+		}
 		return task;
 	}
 

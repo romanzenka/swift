@@ -4,6 +4,7 @@ import edu.mayo.mprc.searchdb.dao.TandemMassSpectrometrySample;
 import org.joda.time.DateTime;
 
 import java.io.File;
+import java.util.Map;
 
 /**
  * Produces dummy information about mass spec files.
@@ -35,5 +36,10 @@ public class DummyMassSpecDataExtractor implements MassSpecDataExtractor {
 				"",
 				""
 		);
+	}
+
+	@Override
+	public Map<String, TandemMassSpectrometrySample> getMap() {
+		return null;
 	}
 }
