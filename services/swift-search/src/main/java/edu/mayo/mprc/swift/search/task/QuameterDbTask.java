@@ -7,6 +7,7 @@ import edu.mayo.mprc.daemon.worker.WorkPacket;
 import edu.mayo.mprc.quameterdb.QuameterDbWorkPacket;
 import edu.mayo.mprc.swift.db.DatabaseFileTokenFactory;
 import edu.mayo.mprc.swift.dbmapping.FileSearch;
+import edu.mayo.mprc.utilities.FileUtilities;
 import edu.mayo.mprc.utilities.progress.ProgressInfo;
 import edu.mayo.mprc.workflow.engine.WorkflowEngine;
 
@@ -20,7 +21,7 @@ public final class QuameterDbTask extends AsyncTaskBase {
 	private QuameterTask quameterTask;
 	private FileSearch fileSearch;
 
-	public QuameterDbTask(WorkflowEngine engine, DaemonConnection daemon, DatabaseFileTokenFactory fileTokenFactory, boolean fromScratch, SearchDbTask searchDbTask, QuameterTask quameterTask, FileSearch fileSearch) {
+	public QuameterDbTask(final WorkflowEngine engine, final DaemonConnection daemon, final DatabaseFileTokenFactory fileTokenFactory, final boolean fromScratch, final SearchDbTask searchDbTask, final QuameterTask quameterTask, final FileSearch fileSearch) {
 		super(engine, daemon, fileTokenFactory, fromScratch);
 		this.searchDbTask = searchDbTask;
 		this.fileSearch = fileSearch;
@@ -36,9 +37,13 @@ public final class QuameterDbTask extends AsyncTaskBase {
 		Preconditions.checkNotNull(metadata, "Search-db task did not produce raw file metadata");
 		Preconditions.checkNotNull(fileSearch, "Input file not set");
 		Preconditions.checkNotNull(quameterTask, "QuaMeter task not set");
+		final String fileName = FileUtilities.getFileNameWithoutExtension(fileSearch.getInputFile());
+		final Integer tandemMassSpectrometrySampleId = metadata.get(fileName);
+		Preconditions.checkNotNull(tandemMassSpectrometrySampleId, "There must be sample id recorded for file name [" + fileName + "]");
+
 		return new QuameterDbWorkPacket(getFullId(),
 				isFromScratch(),
-				metadata.get(fileSearch.getInputFile().getName()),
+				tandemMassSpectrometrySampleId,
 				fileSearch.getId(),
 				quameterTask.getResultingFile()
 		);
@@ -58,7 +63,7 @@ public final class QuameterDbTask extends AsyncTaskBase {
 	}
 
 	@Override
-	public boolean equals(Object obj) {
+	public boolean equals(final Object obj) {
 		if (this == obj) {
 			return true;
 		}
