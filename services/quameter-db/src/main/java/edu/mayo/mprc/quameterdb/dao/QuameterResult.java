@@ -1,6 +1,7 @@
 package edu.mayo.mprc.quameterdb.dao;
 
 import com.google.common.base.Joiner;
+import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableMap;
 import edu.mayo.mprc.MprcException;
@@ -800,5 +801,22 @@ public final class QuameterResult extends PersistableBase {
 
 	public void setP_3(final double p_3) {
 		this.p_3 = p_3;
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hashCode(sample, fileSearch);
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj) {
+			return true;
+		}
+		if (obj == null || getClass() != obj.getClass()) {
+			return false;
+		}
+		final QuameterResult other = (QuameterResult) obj;
+		return Objects.equal(this.sample, other.sample) && Objects.equal(this.fileSearch, other.fileSearch);
 	}
 }

@@ -57,12 +57,6 @@
             <version>3.5-SNAPSHOT</version>
         </dependency>
 
-        <dependency>
-            <groupId>edu.mayo.mprc</groupId>
-            <artifactId>quameter-db</artifactId>
-            <version>3.5-SNAPSHOT</version>
-        </dependency>
-
         <!-- Database drivers bundled in -->
         <dependency>
             <groupId>com.oracle</groupId>
