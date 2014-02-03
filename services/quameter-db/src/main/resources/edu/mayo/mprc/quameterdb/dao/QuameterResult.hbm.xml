@@ -7,6 +7,47 @@
         </id>
         <many-to-one name="fileSearch" class="edu.mayo.mprc.swift.dbmapping.FileSearch" column="file_search_id" />
         <many-to-one name="sample" class="edu.mayo.mprc.searchdb.dao.TandemMassSpectrometrySample" column="sample_id" />
-        <property name="jsonData" type="string" length="2000" column="json_data" />
+        <property name="c_1a" type="double" column="c_1a" />
+        <property name="c_1b" type="double" column="c_1b" />
+        <property name="c_2a" type="double" column="c_2a" />
+        <property name="c_2b" type="double" column="c_2b" />
+        <property name="c_3a" type="double" column="c_3a" />
+        <property name="c_3b" type="double" column="c_3b" />
+        <property name="c_4a" type="double" column="c_4a" />
+        <property name="c_4b" type="double" column="c_4b" />
+        <property name="c_4c" type="double" column="c_4c" />
+        <property name="ds_1a" type="double" column="ds_1a" />
+        <property name="ds_1b" type="double" column="ds_1b" />
+        <property name="ds_2a" type="double" column="ds_2a" />
+        <property name="ds_2b" type="double" column="ds_2b" />
+        <property name="ds_3a" type="double" column="ds_3a" />
+        <property name="ds_3b" type="double" column="ds_3b" />
+        <property name="is_1a" type="double" column="is_1a" />
+        <property name="is_1b" type="double" column="is_1b" />
+        <property name="is_2" type="double" column="is_2" />
+        <property name="is_3a" type="double" column="is_3a" />
+        <property name="is_3b" type="double" column="is_3b" />
+        <property name="is_3c" type="double" column="is_3c" />
+        <property name="ms1_1" type="double" column="ms1_1" />
+        <property name="ms1_2a" type="double" column="Ms1_2a" />
+        <property name="ms1_2b" type="double" column="Ms1_2b" />
+        <property name="ms1_3a" type="double" column="Ms1_3a" />
+        <property name="ms1_3b" type="double" column="Ms1_3b" />
+        <property name="ms1_5a" type="double" column="Ms1_5a" />
+        <property name="ms1_5b" type="double" column="Ms1_5b" />
+        <property name="ms1_5c" type="double" column="Ms1_5c" />
+        <property name="ms1_5d" type="double" column="Ms1_5d" />
+        <property name="ms2_1" type="double" column="ms2_1" />
+        <property name="ms2_2" type="double" column="ms2_2" />
+        <property name="ms2_3" type="double" column="ms2_3" />
+        <property name="ms2_4a" type="double" column="Ms2_4a" />
+        <property name="ms2_4b" type="double" column="Ms2_4b" />
+        <property name="ms2_4c" type="double" column="Ms2_4c" />
+        <property name="ms2_4d" type="double" column="Ms2_4d" />
+        <property name="p_1" type="double" column="p_1" />
+        <property name="p_2a" type="double" column="p_2a" />
+        <property name="p_2b" type="double" column="p_2b" />
+        <property name="p_2c" type="double" column="p_2c" />
+        <property name="p_3" type="double" column="p_3" />
     </class>
 </hibernate-mapping>

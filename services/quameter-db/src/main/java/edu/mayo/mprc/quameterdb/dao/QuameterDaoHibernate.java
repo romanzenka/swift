@@ -35,8 +35,7 @@ public final class QuameterDaoHibernate extends DaoBase implements QuameterDao {
 	private Criterion quameterResultEqualityCriteria(final QuameterResult result) {
 		return Restrictions.conjunction()
 				.add(associationEq("fileSearch", result.getFileSearch()))
-				.add(associationEq("sample", result.getSample()))
-				.add(nullSafeEq("jsonData", result.getJsonData()));
+				.add(associationEq("sample", result.getSample()));
 	}
 
 	@Override

@@ -10,6 +10,8 @@ import edu.mayo.mprc.swift.dbmapping.FileSearch;
 import edu.mayo.mprc.utilities.progress.ProgressInfo;
 import edu.mayo.mprc.workflow.engine.WorkflowEngine;
 
+import java.util.Map;
+
 /**
  * @author Roman Zenka
  */
@@ -30,12 +32,13 @@ public final class QuameterDbTask extends AsyncTaskBase {
 	@Override
 	public WorkPacket createWorkPacket() {
 		Preconditions.checkNotNull(searchDbTask, "Unset search-db task");
-		Preconditions.checkNotNull(searchDbTask.getLoadedTandemFileMetadata(), "Search-db task did not produce raw file metadata");
+		final Map<String, Integer> metadata = searchDbTask.getLoadedTandemFileMetadata();
+		Preconditions.checkNotNull(metadata, "Search-db task did not produce raw file metadata");
 		Preconditions.checkNotNull(fileSearch, "Input file not set");
 		Preconditions.checkNotNull(quameterTask, "QuaMeter task not set");
 		return new QuameterDbWorkPacket(getFullId(),
 				isFromScratch(),
-				searchDbTask.getLoadedTandemFileMetadata().get(fileSearch.getInputFile().getName()),
+				metadata.get(fileSearch.getInputFile().getName()),
 				fileSearch.getId(),
 				quameterTask.getResultingFile()
 		);
