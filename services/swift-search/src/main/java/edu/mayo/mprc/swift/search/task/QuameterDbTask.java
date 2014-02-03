@@ -1,6 +1,7 @@
 package edu.mayo.mprc.swift.search.task;
 
 import com.google.common.base.Objects;
+import com.google.common.base.Preconditions;
 import edu.mayo.mprc.daemon.DaemonConnection;
 import edu.mayo.mprc.daemon.worker.WorkPacket;
 import edu.mayo.mprc.quameterdb.QuameterDbWorkPacket;
@@ -28,6 +29,10 @@ public final class QuameterDbTask extends AsyncTaskBase {
 
 	@Override
 	public WorkPacket createWorkPacket() {
+		Preconditions.checkNotNull(searchDbTask, "Unset search-db task");
+		Preconditions.checkNotNull(searchDbTask.getLoadedTandemFileMetadata(), "Search-db task did not produce raw file metadata");
+		Preconditions.checkNotNull(fileSearch, "Input file not set");
+		Preconditions.checkNotNull(quameterTask, "QuaMeter task not set");
 		return new QuameterDbWorkPacket(getFullId(),
 				isFromScratch(),
 				searchDbTask.getLoadedTandemFileMetadata().get(fileSearch.getInputFile().getName()),
