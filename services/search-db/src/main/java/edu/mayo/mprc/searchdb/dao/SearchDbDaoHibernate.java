@@ -8,7 +8,6 @@ import edu.mayo.mprc.database.*;
 import edu.mayo.mprc.fastadb.FastaDbDao;
 import edu.mayo.mprc.fastadb.ProteinSequence;
 import edu.mayo.mprc.swift.db.SwiftDao;
-import edu.mayo.mprc.swift.dbmapping.FileSearch;
 import edu.mayo.mprc.swift.dbmapping.ReportData;
 import edu.mayo.mprc.swift.dbmapping.SwiftSearchDefinition;
 import edu.mayo.mprc.utilities.FileUtilities;
@@ -418,7 +417,7 @@ public class SearchDbDaoHibernate extends DaoBase implements RuntimeInitializer,
 	@Override
 	public TandemMassSpectrometrySample getTandemMassSpectrometrySampleForId(final int tandemMassSpectrometrySampleId) {
 		try {
-			final TandemMassSpectrometrySample data = (TandemMassSpectrometrySample) getSession().get(FileSearch.class, tandemMassSpectrometrySampleId);
+			final TandemMassSpectrometrySample data = (TandemMassSpectrometrySample) getSession().get(TandemMassSpectrometrySample.class, tandemMassSpectrometrySampleId);
 			if (data == null) {
 				throw new MprcException("tandem mass spec sample id=" + tandemMassSpectrometrySampleId + " was not found.");
 			}
