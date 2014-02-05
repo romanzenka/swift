@@ -18,4 +18,9 @@ public interface ScaffoldTaskI extends Task, ScaffoldSpectrumExportProducer {
 	 * Which input file/search parameters tuple gets outputs from which engine search.
 	 */
 	void addDatabase(String id, DatabaseDeployment dbDeployment);
+
+	/**
+	 * @return The first database that was used to produce the output. Typically there will be just one.
+	 */
+	DatabaseDeployment getMainDatabase();
 }

@@ -478,7 +478,9 @@ public final class SearchRunner implements Runnable, Lifecycle {
 		DatabaseDeploymentResult deploymentResult = null;
 		// Sequest deployment is counter-productive for particular input fasta file
 		if (sequest(engine) && noSequestDeployment(searchParameters)) {
-			deploymentResult = new NoSequestDeploymentResult(curationDao.findCuration(database.getShortName()).getCurationFile());
+			deploymentResult = new NoSequestDeploymentResult(
+					curationDao.findCuration(database.getShortName()).getCurationFile(),
+					database);
 		} else {
 			if (engine.getDbDeployDaemon() != null) {
 				deploymentResult = addDatabaseDeployment(engine, paramFile, database);
@@ -800,7 +802,7 @@ public final class SearchRunner implements Runnable, Lifecycle {
 			}
 
 			// Set up a new experiment dependency. All entries called from now on would be added under that experiment
-			qaTask.addExperiment(scaffoldTask.getScaffoldXmlFile(), scaffoldTask.getScaffoldSpectraFile());
+			qaTask.addExperiment(scaffoldTask);
 			qaTask.addDependency(scaffoldTask);
 			qaTask.addDependency(mgfOutput);
 

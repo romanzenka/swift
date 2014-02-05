@@ -1,6 +1,7 @@
 package edu.mayo.mprc.swift.search.task;
 
 
+import edu.mayo.mprc.dbcurator.model.Curation;
 import edu.mayo.mprc.enginedeployment.DeploymentResult;
 
 import java.io.File;
@@ -9,9 +10,16 @@ import java.util.List;
 
 final class NoSequestDeploymentResult implements DatabaseDeploymentResult {
 	private File fastaFile;
+	private Curation dbToDeploy;
 
-	NoSequestDeploymentResult(final File fastaFile) {
+	NoSequestDeploymentResult(final File fastaFile, final Curation dbToDeploy) {
 		this.fastaFile = fastaFile;
+		this.dbToDeploy = dbToDeploy;
+	}
+
+	@Override
+	public Curation getDbToDeploy() {
+		return dbToDeploy;
 	}
 
 	@Override

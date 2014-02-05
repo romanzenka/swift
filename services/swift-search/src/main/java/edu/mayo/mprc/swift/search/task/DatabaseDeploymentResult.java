@@ -1,6 +1,7 @@
 package edu.mayo.mprc.swift.search.task;
 
 
+import edu.mayo.mprc.dbcurator.model.Curation;
 import edu.mayo.mprc.enginedeployment.DeploymentResult;
 
 import java.io.File;
@@ -13,6 +14,11 @@ import java.util.List;
  * TODO: Simplify this/get rid of it. Too confusing.
  */
 interface DatabaseDeploymentResult {
+	/**
+	 * @return The database to be deployed.
+	 */
+	Curation getDbToDeploy();
+
 	/**
 	 * Mascot and Tandem short database name.
 	 *

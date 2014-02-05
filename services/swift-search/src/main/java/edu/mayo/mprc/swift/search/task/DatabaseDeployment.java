@@ -85,6 +85,11 @@ final class DatabaseDeployment extends AsyncTaskBase implements DatabaseDeployme
 	}
 
 	@Override
+	public Curation getDbToDeploy() {
+		return dbToDeploy;
+	}
+
+	@Override
 	public String getShortDbName() {
 		return dbToDeploy.getShortName();
 	}

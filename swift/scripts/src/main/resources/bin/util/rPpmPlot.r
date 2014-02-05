@@ -8,6 +8,7 @@ require("caTools")
 args<-commandArgs(TRUE)
 inputFile<-args[1]
 reportFileName<-args[2]
+decoyRegex<-args[3] # Currently treated just as a plain prefix
 
 # Setup the colors
 colorsByCharge<-c("lightgray","red","darkgreen","blue","orange","yellow","pink","purple")
@@ -91,7 +92,7 @@ spectrum.rev.title <- "Reverse Hit"
 spectrum.rev.col <- "orange"
 spectrum.rev.colHtml <- "#c80"
 spectrum.rev.border <- "orange"
-spectrum.rev.test <- function(sequence) { substring(sequence, 1, nchar("Reversed_"))=="Reversed_" }
+spectrum.rev.test <- function(sequence) { substring(sequence, 1, nchar(decoyRegex))==decoyRegex }
 spectrum.rev.symbol <- 4 # X for reverse hits
 
 # Spectra identified as polymers  

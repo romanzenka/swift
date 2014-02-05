@@ -22,17 +22,25 @@ public final class QaTask extends AsyncTaskBase {
 	private File qaReportFolder;
 	// Name of the HTML report to be generated
 	private File reportFile;
+	// Reverse database entry prefix
+	private String decoyRegex;
 
 	public static final String QA_SUBDIRECTORY = "qa";
 
-	public QaTask(final WorkflowEngine engine, final DaemonConnection daemonConnection, final DatabaseFileTokenFactory fileTokenFactory, final boolean fromScratch) {
+	public QaTask(final WorkflowEngine engine,
+	              final DaemonConnection daemonConnection,
+	              final DatabaseFileTokenFactory fileTokenFactory,
+	              final boolean fromScratch) {
 		super(engine, daemonConnection, fileTokenFactory, fromScratch);
 
 		experimentList = new ArrayList<QaTaskExperiment>(1);
 		setName("Quality Assurance");
 	}
 
-	public void addExperiment(final File scaffoldXmlFile, final File spectraFile) {
+	public void addExperiment(ScaffoldTaskI scaffoldTask) {
+		final File scaffoldXmlFile = scaffoldTask.getScaffoldXmlFile();
+		final File spectraFile = scaffoldTask.getScaffoldSpectraFile();
+		decoyRegex = scaffoldTask.getMainDatabase().getDbToDeploy().getDecoyRegex();
 		final QaTaskExperiment e = new QaTaskExperiment(
 				getExperimentName(scaffoldXmlFile),
 				spectraFile,
@@ -106,7 +114,7 @@ public final class QaTask extends AsyncTaskBase {
 			experimentQaList.add(experimentQa);
 		}
 
-		return new QaWorkPacket(experimentQaList, qaReportFolder, reportFile, getFullId(), isFromScratch());
+		return new QaWorkPacket(experimentQaList, qaReportFolder, reportFile, decoyRegex, getFullId(), isFromScratch());
 	}
 
 	@Override

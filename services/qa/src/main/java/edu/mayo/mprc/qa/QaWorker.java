@@ -58,6 +58,7 @@ public final class QaWorker extends WorkerBase {
 
 		final File reportFile = qaWorkPacket.getReportFile();
 		final File qaReportFolder = qaWorkPacket.getQaReportFolder();
+		final String decoyRegex = qaWorkPacket.getDecoyRegex();
 		FileUtilities.ensureFolderExists(qaReportFolder);
 
 		final File rScriptInputFile = new File(qaReportFolder, "rInputData.tsv");
@@ -94,7 +95,7 @@ public final class QaWorker extends WorkerBase {
 
 			if (atLeastOneFileMissing) {
 				LOGGER.info("Running R script [" + getRScript().getAbsolutePath() + "] for output file [" + reportFile + "]");
-				runRScript(rScriptInputFile, reportFile);
+				runRScript(rScriptInputFile, reportFile, decoyRegex);
 			}
 
 			for (final File file : generatedFileList) {
@@ -276,7 +277,7 @@ public final class QaWorker extends WorkerBase {
 		return file != null && file.exists() && file.length() > 0;
 	}
 
-	private void runRScript(final File inputFile, final File reportFile) {
+	private void runRScript(final File inputFile, final File reportFile, final String decoyRegex) {
 
 		final List<String> result = new ArrayList<String>();
 
@@ -288,6 +289,7 @@ public final class QaWorker extends WorkerBase {
 		result.add(getRScript().getAbsolutePath());
 		result.add(inputFile.getAbsolutePath());
 		result.add(reportFile.getAbsolutePath());
+		result.add(decoyRegex);
 
 		final ProcessBuilder builder = new ProcessBuilder(result.toArray(new String[result.size()]));
 		final ProcessCaller caller = new ProcessCaller(builder);

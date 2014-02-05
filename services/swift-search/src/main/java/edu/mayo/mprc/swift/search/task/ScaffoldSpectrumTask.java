@@ -82,6 +82,14 @@ final class ScaffoldSpectrumTask extends AsyncTaskBase implements ScaffoldTaskI 
 	}
 
 	@Override
+	public DatabaseDeployment getMainDatabase() {
+		if (databases.values().size() >= 1) {
+			return databases.values().iterator().next();
+		}
+		throw new MprcException("No databases were set for " + this.getDescription());
+	}
+
+	@Override
 	public void setReportData(final ReportData reportData) {
 		// Data is being set asynchronously after the file appears
 		synchronized (lock) {
