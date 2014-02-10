@@ -44,21 +44,25 @@ public abstract class DaoBase implements Dao, SessionProvider {
 
 	@Override
 	public final Session getSession() {
+		database.start();
 		return database.getSession();
 	}
 
 	@Override
 	public final void begin() {
+		database.start();
 		database.begin();
 	}
 
 	@Override
 	public final void commit() {
+		database.start();
 		database.commit();
 	}
 
 	@Override
 	public final void rollback() {
+		database.start();
 		database.rollback();
 	}
 
