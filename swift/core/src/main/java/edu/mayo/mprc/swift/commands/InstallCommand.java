@@ -34,7 +34,7 @@ public final class InstallCommand implements SwiftCommand {
 				return ExitCode.Error;
 			}
 		} catch (MprcException e) {
-			environment.logCommandError(e.getMessage());
+			environment.logCommandError(MprcException.getDetailedMessage(e));
 			return ExitCode.Error;
 		}
 		FileUtilities.out("Check passed, Swift is successfully installed");
