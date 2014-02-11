@@ -162,6 +162,7 @@ final StringWriter writer = new StringWriter(10000);
                 }
             ];
 
+            var blockRedraw = false;
             for (var i = 0; i < views.length; i++) {
                 var v = views[i];
                 var view = new google.visualization.DataView(data);
