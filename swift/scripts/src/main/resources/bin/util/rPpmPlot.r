@@ -609,8 +609,8 @@ imageGenerator<-function(dataFile, msmsEvalDataFile, infoFile, spectrumFile, chr
         scanXlim <- c(0, 1000)
         mzXlim <- c(400, 1600)
         if (length(dataTab$Scan.Id)!=0) {
-            scanXlim <- range(dataTab$Scan.Id)
-            mzXlim <- range(dataTab$Observed.m.z)
+            scanXlim <- range(0, dataTab$Scan.Id)
+            mzXlim <- range(0, dataTab$Observed.m.z)
         }
 
         xAxisTitleScanOrRT <- ifelse(spectrumInfoAvailable, "Retention Time (min)", "Scan Id")
