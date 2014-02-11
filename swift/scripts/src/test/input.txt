@@ -1,0 +1,2 @@
+Data File	Id File	Mz File	IdVsMz File	Source Current File	msmsEval Discriminant File	Generate Files	Raw File	msmsEval Output	Raw Info File	Raw Spectra File	Peptide Tolerance File	TIC File	Chromatogram File
+

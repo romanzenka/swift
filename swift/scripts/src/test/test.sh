@@ -1,3 +1,3 @@
 #!/bin/bash
 
-RScript ../main/resources/bin/util/rPpmPlot.r
+Rscript ../main/resources/bin/util/rPpmPlot.r input.txt output.html Rev_
