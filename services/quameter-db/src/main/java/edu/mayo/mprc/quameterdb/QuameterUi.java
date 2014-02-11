@@ -38,7 +38,7 @@ public final class QuameterUi implements Dao {
 
 	private final QuameterDao quameterDao;
 	private final Pattern searchFilter;
-	private static final DateTimeFormatter DATE_FORMAT = DateTimeFormat.forPattern("'Date('yyyy, MM, dd, HH, mm, ss, SSS')'").withLocale(Locale.US);
+	private static final DateTimeFormatter DATE_FORMAT = DateTimeFormat.forPattern("'Date('yyyy, M, d, H, m, s, S')'").withLocale(Locale.US);
 
 	public QuameterUi(final QuameterDao quameterDao, final Pattern searchFilter) {
 		this.quameterDao = quameterDao;
@@ -145,7 +145,7 @@ public final class QuameterUi implements Dao {
 	}
 
 	private void writeValue(final JsonWriter writer, final DateTime value) throws IOException {
-		writeValue(writer, value.toString(DATE_FORMAT) + ")");
+		writeValue(writer, value.toString(DATE_FORMAT));
 	}
 
 	public static final class Config extends ResourceConfigBase {
