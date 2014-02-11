@@ -64,7 +64,8 @@ public final class QuameterUi implements Dao {
 		final List<QuameterResult> quameterResults = quameterDao.listAllResults(searchFilter);
 
 		final JsonWriter w = new JsonWriter(writer);
-		w.setIndent("  ");
+		w.setIndent("");
+
 		try {
 			w.beginObject();
 			writeCols(w);
