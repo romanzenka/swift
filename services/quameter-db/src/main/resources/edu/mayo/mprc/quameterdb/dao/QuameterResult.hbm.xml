@@ -5,8 +5,10 @@
         <id name="id" type="integer" column="quameter_result_id">
             <generator class="native" />
         </id>
-        <many-to-one name="fileSearch" class="edu.mayo.mprc.swift.dbmapping.FileSearch" column="file_search_id" />
-        <many-to-one name="sample" class="edu.mayo.mprc.searchdb.dao.TandemMassSpectrometrySample" column="sample_id" />
+        <many-to-one name="fileSearch" class="edu.mayo.mprc.swift.dbmapping.FileSearch" column="file_search_id"
+            lazy="false" />
+        <many-to-one name="sample" class="edu.mayo.mprc.searchdb.dao.TandemMassSpectrometrySample" column="sample_id"
+            lazy="false" />
         <property name="c_1a" type="double" column="c_1a" />
         <property name="c_1b" type="double" column="c_1b" />
         <property name="c_2a" type="double" column="c_2a" />

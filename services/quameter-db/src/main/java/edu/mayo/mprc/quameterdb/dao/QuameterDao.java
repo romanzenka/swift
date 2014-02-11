@@ -4,7 +4,9 @@ import edu.mayo.mprc.database.Dao;
 import edu.mayo.mprc.searchdb.dao.TandemMassSpectrometrySample;
 import edu.mayo.mprc.swift.dbmapping.FileSearch;
 
+import java.util.List;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 /**
  * @author Roman Zenka
@@ -18,4 +20,6 @@ public interface QuameterDao extends Dao {
 	 * @param values                         Quameter scores
 	 */
 	QuameterResult addQuameterScores(final int tandemMassSpectrometrySampleId, final int fileSearchId, final Map<String, Double> values);
+
+	List<QuameterResult> listAllResults(Pattern searchFilter);
 }

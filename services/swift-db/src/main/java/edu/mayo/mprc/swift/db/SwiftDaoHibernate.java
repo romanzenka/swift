@@ -272,7 +272,7 @@ public final class SwiftDaoHibernate extends DaoBase implements SwiftDao {
 		}
 	}
 
-	private FileSearch addFileSearch(final FileSearch fileSearch) {
+	public FileSearch addFileSearch(final FileSearch fileSearch) {
 		try {
 			fileSearch.setEnabledEngines(addEnabledEngines(fileSearch.getEnabledEngines()));
 			return save(fileSearch, getFileSearchEqualityCriteria(fileSearch), false);

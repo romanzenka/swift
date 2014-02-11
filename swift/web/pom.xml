@@ -74,6 +74,12 @@
             <version>1.9.2</version>
         </dependency>
 
+        <dependency>
+            <groupId>edu.mayo.mprc.swift</groupId>
+            <artifactId>quameter-ui</artifactId>
+            <version>3.5-SNAPSHOT</version>
+            <type>war</type>
+        </dependency>
 
         <!--  GWT deps (from central repo) -->
         <dependency>
@@ -167,6 +173,13 @@
                             <classpathPrefix />
                         </manifest>
                     </archive>
+                    <!-- Overlay the Quameter UI on top of this project -->
+                    <overlays>
+                        <overlay>
+                            <groupId>edu.mayo.mprc.swift</groupId>
+                            <artifactId>quameter-ui</artifactId>
+                        </overlay>
+                    </overlays>
                 </configuration>
             </plugin>
 
@@ -213,6 +226,10 @@
                             </archive>
                             <!-- Overlay the Heme Pathology stuff on top of this project -->
                             <overlays>
+                                <overlay>
+                                    <groupId>edu.mayo.mprc.swift</groupId>
+                                    <artifactId>quameter-ui</artifactId>
+                                </overlay>
                                 <overlay>
                                     <groupId>edu.mayo.mprc.swift</groupId>
                                     <artifactId>heme-ui</artifactId>

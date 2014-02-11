@@ -12,6 +12,7 @@ import edu.mayo.mprc.config.ui.FactoryDescriptor;
 import edu.mayo.mprc.config.ui.ResourceConfigBase;
 import edu.mayo.mprc.config.ui.ServiceUiFactory;
 import edu.mayo.mprc.config.ui.UiBuilder;
+import edu.mayo.mprc.database.Dao;
 import edu.mayo.mprc.fastadb.FastaDbDao;
 import edu.mayo.mprc.heme.dao.HemeDao;
 import edu.mayo.mprc.heme.dao.HemeTest;
@@ -39,7 +40,7 @@ import java.util.regex.Pattern;
  *
  * @author Roman Zenka
  */
-public final class HemeUi {
+public final class HemeUi implements Dao {
 	public static final String TYPE = "hemeUi";
 	public static final String NAME = "HemePathology User Interface";
 	public static final String DESC = "Specialized interface for Heme Pathology";
@@ -108,14 +109,17 @@ public final class HemeUi {
 		this.searchEngines = searchEngines == null ? NO_ENGINES : searchEngines.clone();
 	}
 
+	@Override
 	public void begin() {
 		getHemeDao().begin();
 	}
 
+	@Override
 	public void commit() {
 		getHemeDao().commit();
 	}
 
+	@Override
 	public void rollback() {
 		getHemeDao().rollback();
 	}

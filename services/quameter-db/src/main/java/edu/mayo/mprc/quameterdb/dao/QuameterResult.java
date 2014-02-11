@@ -164,7 +164,7 @@ public final class QuameterResult extends PersistableBase {
 		}
 	}
 
-	private String getColumnName(final QuameterColumn column) {
+	public static String getColumnName(final QuameterColumn column) {
 		return column.name().toUpperCase(Locale.US).replace('_', '-');
 	}
 
@@ -318,7 +318,7 @@ public final class QuameterResult extends PersistableBase {
 		return getValue(column);
 	}
 
-	private double getValue(final QuameterColumn column) {
+	public double getValue(final QuameterColumn column) {
 		switch (column) {
 			case c_1a:
 				return getC_1a();

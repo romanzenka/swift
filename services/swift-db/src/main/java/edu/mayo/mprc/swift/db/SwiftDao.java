@@ -178,4 +178,9 @@ public interface SwiftDao extends Dao, RuntimeInitializer {
 	 * Just return {@link FileSearch} object for given id.
 	 */
 	FileSearch getFileSearchForId(int fileSearchId);
+
+	/**
+	 * Add a file search object (for testing purposes).
+	 */
+	FileSearch addFileSearch(final FileSearch fileSearch);
 }
