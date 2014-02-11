@@ -8,193 +8,219 @@
 <% final ResourceConfig quameterUiConfig = MainFactoryContext.getSwiftEnvironment().getSingletonConfig(QuameterUi.Config.class); %>
 <html lang="en">
 <head>
-    <title>QuaMeter Data | <%=SwiftWebContext.getWebUi().getTitle()%>
-    </title>
+<title>QuaMeter Data | <%=SwiftWebContext.getWebUi().getTitle()%>
+</title>
 
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link href="/common/bootstrap/css/bootstrap.min.css" rel="stylesheet" media="screen">
-    <style type="text/css">
-            /* http://stackoverflow.com/questions/3790935/can-i-hide-the-html5-number-inputs-spin-box */
-        input::-webkit-outer-spin-button,
-        input::-webkit-inner-spin-button {
-            /* display: none; <- Crashes Chrome on hover */
-            -webkit-appearance: none;
-            margin: 0; /* <-- Apparently some margin are still there even though it's hidden */
-        }
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link href="/common/bootstrap/css/bootstrap.min.css" rel="stylesheet" media="screen">
+<style type="text/css">
+        /* http://stackoverflow.com/questions/3790935/can-i-hide-the-html5-number-inputs-spin-box */
+    input::-webkit-outer-spin-button,
+    input::-webkit-inner-spin-button {
+        /* display: none; <- Crashes Chrome on hover */
+        -webkit-appearance: none;
+        margin: 0; /* <-- Apparently some margin are still there even though it's hidden */
+    }
 
-        .graph {
-            width: 100%;
-            height: 320px;
-            margin-bottom: 10px;
-        }
+    h4 {
+        text-align: center;
+    }
 
-    </style>
-    <!-- HTML5 shim, for IE6-8 support of HTML5 elements -->
-    <!--[if lt IE 9]>
-    <script src="/common/bootstrap/js/html5shiv.js"></script>
-    <![endif]-->
+    .legend dt {
+        float: left;
+        margin-right: 0.5em;
+    }
 
-    <script type="text/javascript" src="/common/bootstrap/js/jquery_1.9.0.min.js"></script>
+    .dygraph-legend > span.highlight {
+        background-color: #f9f500;
+    }
 
-    <script type="text/javascript" src="dygraph-combined.js"></script>
+    .dygraph-legend > span > b {
+        white-space: nowrap;
+    }
 
-    <!--Load the AJAX API-->
-    <script type="text/javascript" src="https://www.google.com/jsapi"></script>
-    <script type="text/javascript">
+    .graph {
+        width: 100%;
+        height: 320px;
+        margin-bottom: 10px;
+    }
 
-        // Load the Visualization API and the core package.
-        google.load('visualization', '1.0', {'packages': ['corechart']});
+</style>
+<!-- HTML5 shim, for IE6-8 support of HTML5 elements -->
+<!--[if lt IE 9]>
+<script src="/common/bootstrap/js/html5shiv.js"></script>
+<![endif]-->
 
-        // Set a callback to run when the Google Visualization API is loaded.
-        google.setOnLoadCallback(drawChart);
+<script type="text/javascript" src="/common/bootstrap/js/jquery_1.9.0.min.js"></script>
 
-        // Callback that creates and populates a data table,
-        // instantiates the pie chart, passes in the data and
-        // draws it.
-        function drawChart() {
+<script type="text/javascript" src="dygraph-combined.js"></script>
 
-            // Create the data table.
-            var data = new google.visualization.DataTable(
-                    <%
+<!--Load the AJAX API-->
+<script type="text/javascript" src="https://www.google.com/jsapi"></script>
+<script type="text/javascript">
+
+    // Load the Visualization API and the core package.
+    google.load('visualization', '1.0', {'packages': ['corechart']});
+
+    // Set a callback to run when the Google Visualization API is loaded.
+    google.setOnLoadCallback(drawChart);
+
+    // Callback that creates and populates a data table,
+    // instantiates the pie chart, passes in the data and
+    // draws it.
+    function drawChart() {
+
+        // Create the data table.
+        var data = new google.visualization.DataTable(
+                <%
 
 if(quameterUiConfig!=null) {
 final QuameterUi quameterUi = (QuameterUi) MainFactoryContext.getSwiftEnvironment().createResource(quameterUiConfig);
 quameterUi.begin();
 try {
 final StringWriter writer = new StringWriter(10000);
-   quameterUi.dataTableJson(writer);
-   quameterUi.commit();
-   out.print(writer.toString());
+quameterUi.dataTableJson(writer);
+quameterUi.commit();
+out.print(writer.toString());
 } catch (Exception e) {
-   quameterUi.rollback();
-   throw new MprcException(e);
+quameterUi.rollback();
+throw new MprcException(e);
 }
 } else {
 
 %>
-                    null
-                    <%
-                   }
-                   %>
-                    , 0.6);
+                null
+                <%
+               }
+               %>
+                , 0.6);
 
-            function col(id) {
-                for (var i = 0; i < data.getNumberOfColumns(); i++) {
-                    if (data.getColumnId(i) == id) {
-                        return i;
-                    }
+        function col(id) {
+            for (var i = 0; i < data.getNumberOfColumns(); i++) {
+                if (data.getColumnId(i) == id) {
+                    return i;
                 }
-                alert("Column " + id + " does not exist");
             }
-
-            views = [
-                { "view": "tails",
-                    "columns": ["c_1a", "c_1b"]
-                },
-                { "view": "retention",
-                    "columns": ["c_2a", "duration"]
-                },
-                { "view": "idRate",
-                    "columns": ["c_2b"]
-                },
-                { "view": "peakBroadening",
-                    "columns": ["c_3a", "c_3b", "c_4a", "c_4b", "c_4c"]
-                },
-                { "view": "oversampling",
-                    "columns": ["ds_1a", "ds_1b"]
-                },
-                { "view": "samplingRate",
-                    "columns": ["ds_2a", "ds_2b"]
-                },
-                { "view": "peakSampling",
-                    "columns": ["ds_3a", "ds_3b"]
-                },
-                { "view": "electrospray",
-                    "columns": ["is_1a", "is_1b"]
-                },
-                { "view": "tuning",
-                    "columns": ["is_2"]
-                },
-                { "view": "chargeState",
-                    "columns": ["is_3a", "is_3b", "is_3c"]
-                },
-                { "view": "ms1Time",
-                    "columns": ["ms1_1"]
-                },
-                { "view": "ms1SigToNoise",
-                    "columns": ["ms1_2a", "ms1_3a"]
-                },
-                { "view": "ms1Tic",
-                    "columns": ["ms1_2b"]
-                },
-                { "view": "ms1PrecError",
-                    "columns": ["ms1_5a", "ms1_5b"]
-                },
-                { "view": "ms1PrecErrorPpm",
-                    "columns": ["ms1_5c", "ms1_5d"]
-                },
-                { "view": "ms2Time",
-                    "columns": ["ms2_1"]
-                },
-                { "view": "ms2SigToNoise",
-                    "columns": ["ms2_2"]
-                },
-                { "view": "ms2NumPeaks",
-                    "columns": ["ms2_3"]
-                },
-                { "view": "ms2IdRatio",
-                    "columns": ["ms2_4a", "ms2_4b", "ms2_4c", "ms2_4d"]
-                },
-                { "view": "searchScore",
-                    "columns": ["p_1"]
-                },
-                { "view": "trypticMs2",
-                    "columns": ["p_2a"]
-                },
-                { "view": "trypticPeptides",
-                    "columns": ["p_2b"]
-                },
-                { "view": "distinctPeptides",
-                    "columns": ["p_2c"]
-                },
-                { "view": "semiToTryptic",
-                    "columns": ["p_3"]
-                }
-            ];
-
-            var blockRedraw = false;
-            for (var i = 0; i < views.length; i++) {
-                var v = views[i];
-                var view = new google.visualization.DataView(data);
-                var cols = [];
-                cols.push(col("startTime"));
-                for (var j = 0; j < v.columns.length; j++) {
-                    cols.push(col(v.columns[j]))
-                }
-                view.setColumns(cols);
-                gs = [];
-                gs.push(
-                        new Dygraph(
-                                document.getElementById(v.view),
-                                view,
-                                {
-                                    drawCallback: function (me, initial) {
-                                        if (blockRedraw || initial) return;
-                                        blockRedraw = true;
-                                        var range = me.xAxisRange();
-                                        for (var j = 0; j < views.length; j++) {
-                                            if (gs[j] == me) continue;
-                                            gs[j].updateOptions({
-                                                dateWindow: range
-                                            });
-                                        }
-                                        blockRedraw = false;
-                                    }
-                                }
-                        ));
-            }
+            alert("Column " + id + " does not exist");
         }
-    </script>
+
+        views = [
+            { "view": "tails",
+                "columns": ["c_1a", "c_1b"]
+            },
+            { "view": "elution",
+                "columns": ["c_2a", "duration"]
+            },
+            { "view": "idRate",
+                "columns": ["c_2b"]
+            },
+            { "view": "peakBroadening",
+                "columns": ["c_3a", "c_3b", "c_4a", "c_4b", "c_4c"]
+            },
+            { "view": "oversampling",
+                "columns": ["ds_1a", "ds_1b"]
+            },
+            { "view": "samplingRate",
+                "columns": ["ds_2a", "ds_2b"]
+            },
+            { "view": "peakSampling",
+                "columns": ["ds_3a", "ds_3b"]
+            },
+            { "view": "electrospray",
+                "columns": ["is_1a", "is_1b"]
+            },
+            { "view": "tuning",
+                "columns": ["is_2"]
+            },
+            { "view": "chargeState",
+                "columns": ["is_3a", "is_3b", "is_3c"]
+            },
+            { "view": "ms1Time",
+                "columns": ["ms1_1"]
+            },
+            { "view": "ms1SigToNoise",
+                "columns": ["ms1_2a", "ms1_3a"]
+            },
+            { "view": "ms1Tic",
+                "columns": ["ms1_2b"]
+            },
+            { "view": "ms1PrecError",
+                "columns": ["ms1_5a", "ms1_5b"]
+            },
+            { "view": "ms1PrecErrorPpm",
+                "columns": ["ms1_5c", "ms1_5d"]
+            },
+            { "view": "ms2Time",
+                "columns": ["ms2_1"]
+            },
+            { "view": "ms2SigToNoise",
+                "columns": ["ms2_2"]
+            },
+            { "view": "ms2NumPeaks",
+                "columns": ["ms2_3"]
+            },
+            { "view": "ms2IdRatio",
+                "columns": ["ms2_4a", "ms2_4b", "ms2_4c", "ms2_4d"]
+            },
+            { "view": "searchScore",
+                "columns": ["p_1"]
+            },
+            { "view": "trypticMs2",
+                "columns": ["p_2a"]
+            },
+            { "view": "trypticPeptides",
+                "columns": ["p_2b"]
+            },
+            { "view": "distinctPeptides",
+                "columns": ["p_2c"]
+            },
+            { "view": "semiToTryptic",
+                "columns": ["p_3"]
+            }
+        ];
+
+        var blockRedraw = false;
+        gs = [];
+
+        for (var i = 0; i < views.length; i++) {
+            var v = views[i];
+            var view = new google.visualization.DataView(data);
+            var cols = [];
+            cols.push(col("startTime"));
+            for (var j = 0; j < v.columns.length; j++) {
+                cols.push(col(v.columns[j]))
+            }
+            view.setColumns(cols);
+            gs.push(
+                    new Dygraph(
+                            document.getElementById(v.view),
+                            view,
+                            {
+                                drawCallback: function (me, initial) {
+                                    if (blockRedraw || initial) return;
+                                    blockRedraw = true;
+                                    var range = me.xAxisRange();
+                                    for (var j = 0; j < views.length; j++) {
+                                        if (gs[j] == me) continue;
+                                        gs[j].updateOptions({
+                                            dateWindow: range
+                                        });
+                                    }
+                                    blockRedraw = false;
+                                },
+                                drawPoints: true,
+                                pointSize: 2,
+                                strokeWidth: 0.4,
+                                highlightSeriesOpts: {
+                                    strokeWidth: 2,
+                                    strokeBorderWidth: 1,
+                                    highlightCircleSize: 4,
+                                }
+                            }
+                    ));
+        }
+    }
+</script>
 
 </head>
 <body>
@@ -234,9 +260,9 @@ final StringWriter writer = new StringWriter(10000);
         </div>
     </div>
     <div class="span3">
-        <h4>Retention</h4>
+        <h4>Elution</h4>
 
-        <div id="retention" class="graph"></div>
+        <div id="elution" class="graph"></div>
         <div class="legend">
             <dl>
                 <dt>C-2A</dt>
@@ -302,10 +328,10 @@ final StringWriter writer = new StringWriter(10000);
         <div class="legend">
             <dl>
                 <dt>DS-1A</dt>
-                <dd>Ratio of singly to doubly identified peptide ions. If no doubly identified, ratio reported as 1
+                <dd>Ratio of singly to doubly identified peptide ions.
                 </dd>
                 <dt>DS-1B</dt>
-                <dd>Ratio of doubly to triply identified peptide ions. If no triply identified, ratio reported as 1
+                <dd>Ratio of doubly to triply identified peptide ions.
                 </dd>
             </dl>
         </div>
