@@ -648,7 +648,8 @@ imageGenerator<-function(dataFile, msmsEvalDataFile, infoFile, spectrumFile, chr
             plot(xAxis, ms2Only$Mz, type="n",
                         main=c(plotName, mz.title),
                         xlab=xAxisTitleScanOrRT, 
-                        ylab="Measured m/z")
+                        ylab="Measured m/z",
+                        xlim=range(0, xAxisMs, xAxis))
 
             if(!is.null(chromatogram)) {
                 image(
