@@ -288,10 +288,13 @@ fitAndPpmPlots<-function(plotType, dataTab, spectrumInfo, curveColor, shadeColor
     dataTabSubset <- dataTab[toProcess,]
     subsetContainsData <- sum(toProcess)!=0
 
+    xLim <- c(0, 1) # Default limit so we do not crash on empty data
+
     if(is.null(spectrumInfo)) {
         timeDimension <- dataTab$Scan.Id;
     } else {
         timeDimension <- spectrumInfo$RT[match(dataTab$Scan.Id, spectrumInfo$Scan.Id)];
+        xLim <- range(spectrumInfo$RT) # Our X-axis is the entire range of all retention times
     }
     timeDimensionSubset <- timeDimension[toProcess]    
 
@@ -301,7 +304,6 @@ fitAndPpmPlots<-function(plotType, dataTab, spectrumInfo, curveColor, shadeColor
     if (plotType == idVsPpm) {        
         fullX <- timeDimension
         x <- timeDimensionSubset
-        xLim <- c(0, 1000) # Default limit
     } else {
         fullX <- mzDimension
         x <- mzDimensionSubset
@@ -309,7 +311,11 @@ fitAndPpmPlots<-function(plotType, dataTab, spectrumInfo, curveColor, shadeColor
     }
 
     if (length(fullX)>0) {
-        xLim <- range(0, fullX)
+        if (plotType == idVsPpm) {
+            xLim <- range(xLim, fullX)
+        } else {
+            xLim <- range(fullX)
+        }
     }    
 
     if(yLimUnit == "ppm") {    
