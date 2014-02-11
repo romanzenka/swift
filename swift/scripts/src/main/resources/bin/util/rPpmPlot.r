@@ -309,7 +309,7 @@ fitAndPpmPlots<-function(plotType, dataTab, spectrumInfo, curveColor, shadeColor
     }
 
     if (length(fullX)>0) {
-        xLim <- range(fullX)
+        xLim <- range(0, fullX)
     }    
 
     if(yLimUnit == "ppm") {    
@@ -994,21 +994,22 @@ startReportFile(reportFile)
 print("Generating image files and report file.")
 
 for(i in 1:length(inputDataTab$Data.File)) {
+    line <- inputDataTab[i,]
     row <- imageGenerator(
-        inputDataTab$Data.File[i], 
-        inputDataTab$msmsEval.Output[i], 
-        inputDataTab$Raw.Info.File[i],
-        inputDataTab$Raw.Spectra.File[i],
-        inputDataTab$Chromatogram.File[i],
+        line$Data.File,
+        line$msmsEval.Output,
+        line$Raw.Info.File,
+        line$Raw.Spectra.File,
+        line$Chromatogram.File,
         list(
-            lockmass.file = inputDataTab$Id.File[i], 
-            calibration.file = inputDataTab$Mz.File[i], 
-            mz.file = inputDataTab$IdVsMz.File[i], 
-            source.current.file = inputDataTab$Source.Current.File[i], 
-            msmsEval.file = inputDataTab$msmsEval.Discriminant.File[i],
-            pepTol.file = inputDataTab$Peptide.Tolerance.File[i],
-            tic.file = inputDataTab$TIC.File[i]),
-        inputDataTab$Generate.Files[i])
+            lockmass.file = line$Id.File,
+            calibration.file = line$Mz.File,
+            mz.file = line$IdVsMz.File,
+            source.current.file = line$Source.Current.File,
+            msmsEval.file = line$msmsEval.Discriminant.File,
+            pepTol.file = line$Peptide.Tolerance.File,
+            tic.file = line$TIC.File),
+        line$Generate.Files)
 
     addRowToReportFile(reportFile, row)
 
