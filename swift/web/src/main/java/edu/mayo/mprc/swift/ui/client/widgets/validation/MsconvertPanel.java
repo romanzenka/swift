@@ -45,7 +45,7 @@ public final class MsconvertPanel extends EnginePanel {
 
 	@Override
 	public void resetToDefault() {
-		setValue(MZML_OPTION);
+		setValue("");
 	}
 
 	@Override
