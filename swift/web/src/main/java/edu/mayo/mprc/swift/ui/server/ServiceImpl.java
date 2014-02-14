@@ -625,7 +625,9 @@ public final class ServiceImpl extends SpringGwtServlet implements Service, Appl
 				isDatabaseUndeployerEnabled(),
 				listSearchEngines(),
 				listSpectrumQaParamFiles(),
-				isScaffoldReportEnabled());
+				isScaffoldReportEnabled(),
+				isExtractMsnEnabled(),
+				isMsconvertEnabled());
 	}
 
 	@Override
@@ -747,6 +749,14 @@ public final class ServiceImpl extends SpringGwtServlet implements Service, Appl
 	@Override
 	public void setApplicationContext(final ApplicationContext applicationContext) throws BeansException {
 		MainFactoryContext.setContext(applicationContext);
+	}
+
+	public boolean isExtractMsnEnabled() {
+		return getWebUi().isExtractMsn();
+	}
+
+	public boolean isMsconvertEnabled() {
+		return getWebUi().isMsconvert();
 	}
 
 	private class Resolver implements ClientParamSetResolver {

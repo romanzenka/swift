@@ -29,16 +29,22 @@ public final class SpectrumExtractionEditor extends Composite implements Validat
 
 	private Map<String, EnginePanel> engineToPanel = new HashMap<String, EnginePanel>(2);
 
-	public SpectrumExtractionEditor() {
+	public SpectrumExtractionEditor(boolean extractMsnAvailable, boolean msconvertAvailable) {
 		panel = new HorizontalPanel();
 		panel.setVerticalAlignment(HasVerticalAlignment.ALIGN_MIDDLE);
 		engineName = new ListBox();
-		engineName.addItem("extract_msn", "extract_msn");
-		engineToPanel.put("extract_msn", extractMsnPanel);
-		engineName.addItem("msconvert", "msconvert");
-		engineToPanel.put("msconvert", msconvertPanel);
+		int msConvertIndex = 0;
+		if (extractMsnAvailable) {
+			engineName.addItem("extract_msn", "extract_msn");
+			engineToPanel.put("extract_msn", extractMsnPanel);
+			msConvertIndex++;
+		}
+		if (msconvertAvailable) {
+			engineName.addItem("msconvert", "msconvert");
+			engineToPanel.put("msconvert", msconvertPanel);
+		}
 
-		engineName.setSelectedIndex(1);
+		engineName.setSelectedIndex(msConvertIndex);
 		engineName.addChangeHandler(this);
 		panel.add(engineName);
 

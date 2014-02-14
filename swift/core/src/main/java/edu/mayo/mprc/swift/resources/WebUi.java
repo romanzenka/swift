@@ -62,6 +62,8 @@ public final class WebUi implements Checkable {
 	public static final String NEW_CONFIG_FILE = "newConfigFile";
 	public static final String QSTAT = "qstat";
 	public static final String DATABASE_UNDEPLOYER = "databaseUndeployer";
+	private boolean extractMsn;
+	private boolean msconvert;
 
 	public WebUi() {
 		USER_MESSAGE.setMessage("Swift's new database deployment has been temporarily disabled. Swift needs to be upgraded to support Mascot's Database Manager. If you need a new database, please ask Roman.");
@@ -212,6 +214,14 @@ public final class WebUi implements Checkable {
 		return null;
 	}
 
+	public boolean isExtractMsn() {
+		return extractMsn;
+	}
+
+	public boolean isMsconvert() {
+		return msconvert;
+	}
+
 	/**
 	 * A factory capable of creating the web ui class.
 	 */
@@ -269,6 +279,14 @@ public final class WebUi implements Checkable {
 							final MSMSEvalWorker.Config msmsEvalConfig = (MSMSEvalWorker.Config) msmsEvalWorkerConfig;
 							ui.spectrumQaParamFiles = parseSpectrumQaParamFiles(msmsEvalConfig.get(MSMSEvalWorker.PARAM_FILES));
 						}
+					}
+
+					if (searcherConfig.getRaw2mgf() != null) {
+						ui.extractMsn = true;
+					}
+
+					if (searcherConfig.getMsconvert() != null) {
+						ui.msconvert = true;
 					}
 
 					if (searcherConfig.getScaffoldReport() != null) {

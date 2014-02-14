@@ -19,6 +19,8 @@ public final class InitialPageData implements Serializable {
 	private List<ClientSearchEngine> searchEngines;
 	private List<SpectrumQaParamFileInfo> spectrumQaParamFileInfo;
 	private boolean scaffoldReportEnabled;
+	private boolean extractMsnEnabled;
+	private boolean msConvertEnabled;
 
 	public InitialPageData() {
 	}
@@ -31,7 +33,9 @@ public final class InitialPageData implements Serializable {
 	                       boolean databaseUndeployerEnabled,
 	                       List<ClientSearchEngine> searchEngines,
 	                       List<SpectrumQaParamFileInfo> spectrumQaParamFileInfo,
-	                       boolean scaffoldReportEnabled) {
+	                       boolean scaffoldReportEnabled,
+	                       boolean extractMsnEnabled,
+	                       boolean msConvertEnabled) {
 		this.users = new ClientUser[users.length];
 		System.arraycopy(users, 0, this.users, 0, users.length);
 		this.loadedSearch = loadedSearch;
@@ -42,6 +46,8 @@ public final class InitialPageData implements Serializable {
 		this.searchEngines = searchEngines;
 		this.spectrumQaParamFileInfo = spectrumQaParamFileInfo;
 		this.scaffoldReportEnabled = scaffoldReportEnabled;
+		this.extractMsnEnabled = extractMsnEnabled;
+		this.msConvertEnabled = msConvertEnabled;
 	}
 
 	public List<ClientSearchEngine> getSearchEngines() {
@@ -78,5 +84,13 @@ public final class InitialPageData implements Serializable {
 
 	public boolean isScaffoldReportEnabled() {
 		return scaffoldReportEnabled;
+	}
+
+	public boolean isExtractMsnEnabled() {
+		return extractMsnEnabled;
+	}
+
+	public boolean isMsConvertEnabled() {
+		return msConvertEnabled;
 	}
 }
