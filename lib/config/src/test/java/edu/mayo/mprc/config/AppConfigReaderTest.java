@@ -48,4 +48,16 @@ public final class AppConfigReaderTest {
 		Assert.assertNotNull(service.getRunner());
 		Assert.assertTrue(service.getRunner().getWorkerConfiguration() instanceof TestResource);
 	}
+
+	@Test
+	public void shouldLoadWithTabs() {
+		AppConfigReader reader = new AppConfigReader(new StringReader("<testResource2 _testResource2_1>\n" +
+				"        # dummyComment\n" +
+				"        dummy\t\tdummyVal\n" +
+				"</testResource2>"), MULTI_FACTORY);
+		final ApplicationConfig config = new ApplicationConfig();
+		reader.load(config);
+		// We would assert-fail in the loading step of the testResource2 if things went wrong
+	}
+
 }

@@ -10,6 +10,8 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Reads configs written with {@link AppConfigWriter}.
@@ -17,6 +19,7 @@ import java.util.Map;
  * @author Roman Zenka
  */
 public final class AppConfigReader implements Closeable {
+	public static final Pattern WHITESPACE = Pattern.compile("\\s+");
 	private BufferedReader reader;
 	private ReaderFactory readerFactory;
 	private DependencyResolver dependencyResolver;
@@ -93,10 +96,11 @@ public final class AppConfigReader implements Closeable {
 						values.clear();
 					}
 				} else {
-					final int firstSpace = unescapedLine.indexOf(' ');
-					if (firstSpace < 0) {
+					final Matcher matcher = WHITESPACE.matcher(unescapedLine);
+					if (!matcher.find()) {
 						values.put(unescapedLine, "");
 					} else {
+						final int firstSpace = matcher.start();
 						final String key = unescapedLine.substring(0, firstSpace);
 						final String value = unescapedLine.substring(firstSpace).trim();
 						values.put(key, value);
