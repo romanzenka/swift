@@ -13,7 +13,7 @@ public class ExtractMsnSettings extends PersistableBase {
 	public static final String EXTRACT_MSN = "extract_msn";
 	public static final String MSCONVERT = "msconvert";
 	public static final String MZML_MODE = "--mzML";
-	public static final ExtractMsnSettings MSCONVERT_SETTINGS = new ExtractMsnSettings(MZML_MODE, MSCONVERT);
+	public static final ExtractMsnSettings MSCONVERT_SETTINGS = new ExtractMsnSettings("", MSCONVERT);
 	public static final ExtractMsnSettings EXTRACT_MSN_SETTINGS = new ExtractMsnSettings("-E100 -S1 -I10 -G1", EXTRACT_MSN);
 	public static final ExtractMsnSettings DEFAULT = MSCONVERT_SETTINGS;
 
