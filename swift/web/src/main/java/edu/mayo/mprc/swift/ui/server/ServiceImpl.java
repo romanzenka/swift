@@ -16,12 +16,11 @@ import edu.mayo.mprc.swift.db.SearchEngine;
 import edu.mayo.mprc.swift.db.SwiftDao;
 import edu.mayo.mprc.swift.dbmapping.SearchRun;
 import edu.mayo.mprc.swift.dbmapping.SwiftSearchDefinition;
-import edu.mayo.mprc.swift.params2.ParamName;
-import edu.mayo.mprc.swift.params2.ParamsDao;
-import edu.mayo.mprc.swift.params2.SavedSearchEngineParameters;
-import edu.mayo.mprc.swift.params2.SearchEngineParameters;
+import edu.mayo.mprc.swift.params2.*;
 import edu.mayo.mprc.swift.params2.mapping.ParamsInfo;
 import edu.mayo.mprc.swift.params2.mapping.ParamsValidations;
+import edu.mayo.mprc.swift.params2.mapping.Validation;
+import edu.mayo.mprc.swift.params2.mapping.ValidationSeverity;
 import edu.mayo.mprc.swift.resources.WebUi;
 import edu.mayo.mprc.swift.resources.WebUiHolder;
 import edu.mayo.mprc.swift.search.SwiftSearcherCaller;
@@ -519,6 +518,7 @@ public final class ServiceImpl extends SpringGwtServlet implements Service, Appl
 				final ParamName name = ParamName.getById(param);
 				ps.setValue(name, getClientProxyGenerator().convert(value, getParamsInfo().getAllowedValues(name)));
 				final ParamsValidations validations = SearchEngine.validate(ps, getSearchEngines(), paramsInfo);
+				validateAdditionalSettings(validations, name, value);
 				final ClientParamsValidations validationList = getClientProxyGenerator().convertTo(validations);
 				getParamsDao().commit();
 				return validationList;
@@ -531,6 +531,19 @@ public final class ServiceImpl extends SpringGwtServlet implements Service, Appl
 			getParamsDao().rollback();
 			LOGGER.error("Could not update parameter set", e);
 			throw GWTServiceExceptionFactory.createException("Could not update parameter set", e);
+		}
+	}
+
+	private void validateAdditionalSettings(final ParamsValidations validations, final ParamName name, final ClientValue value) {
+		if (ParamName.ExtractMsnSettings == name && value instanceof ClientExtractMsnSettings) {
+			final String command = ((ClientExtractMsnSettings) value).getCommand();
+			if (ExtractMsnSettings.MSCONVERT.equals(command) && !isMsconvertEnabled()) {
+				validations.addValidation(name, new Validation("msconvert is not supported", ValidationSeverity.ERROR, name,
+						ExtractMsnSettings.EXTRACT_MSN_SETTINGS, null));
+			} else if (ExtractMsnSettings.EXTRACT_MSN.equals(command) && !isExtractMsnEnabled()) {
+				validations.addValidation(name, new Validation("extract_msn is not supported", ValidationSeverity.ERROR, name,
+						ExtractMsnSettings.MSCONVERT_SETTINGS, null));
+			}
 		}
 	}
 

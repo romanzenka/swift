@@ -340,7 +340,7 @@ public final class SimpleParamsEditorPanel implements SourcesChangeEvents {
 			editorElements.add(edp.append(INSTRUMENT, LABEL2, label, editorVisible));
 			label.setHorizontalAlignment(HasHorizontalAlignment.ALIGN_RIGHT);
 			label.setStyleName(PARAMS_LABEL);
-			final SpectrumExtractionEditor ed = new SpectrumExtractionEditor(pageData.isExtractMsnEnabled(), pageData.isMsConvertEnabled());
+			final SpectrumExtractionEditor ed = new SpectrumExtractionEditor();
 			validationController.add(ed, "extractMsnSettings", instrumentVp);
 			editorElements.add(edp.append(INSTRUMENT, ENTRY2, ed, editorVisible));
 		}
