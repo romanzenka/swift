@@ -302,7 +302,7 @@ public final class SearchRunner implements Runnable, Lifecycle {
 		return getSearchEngine("MYRIMATCH");
 	}
 
-	private SearchEngine getQuaMeterEngine() {
+	private SearchEngine getQuameterEngine() {
 		return getSearchEngine("QUAMETER");
 	}
 
@@ -354,7 +354,7 @@ public final class SearchRunner implements Runnable, Lifecycle {
 	}
 
 	private boolean isQualityControlEnabled() {
-		return engineEnabledForAnyFile(getSearchDefinition().getInputFiles(), getQuaMeterEngine());
+		return engineEnabledForAnyFile(getSearchDefinition().getInputFiles(), getQuameterEngine());
 	}
 
 	/**
@@ -442,7 +442,7 @@ public final class SearchRunner implements Runnable, Lifecycle {
 			final SearchEngine myrimatch = getMyrimatchEngine();
 			final EngineSearchTask myrimatchSearch = addEngineSearchTask(myrimatch, inputFile, mzmlFile, searchParameters, publicSearchFiles);
 			final IdpQonvertTask idpQonvertTask = addIdpQonvertTask(idpQonvert, myrimatchSearch);
-			addQuaMeterTask(getQuaMeterEngine(), idpQonvertTask, inputFile.getInputFile(), searchDbTask, inputFile, publicSearchFiles);
+			addQuameterTask(getQuameterEngine(), idpQonvertTask, inputFile.getInputFile(), searchDbTask, inputFile, publicSearchFiles);
 		}
 	}
 
@@ -497,7 +497,7 @@ public final class SearchRunner implements Runnable, Lifecycle {
 				search);
 	}
 
-	private QuameterTask addQuaMeterTask(final SearchEngine quaMeter, final IdpQonvertTask search, final File rawFile,
+	private QuameterTask addQuameterTask(final SearchEngine quaMeter, final IdpQonvertTask search, final File rawFile,
 	                                     final SearchDbTask searchDbTask, final FileSearch fileSearch,
 	                                     final boolean publicSearchFiles) {
 		final QuameterTask task = addTask(

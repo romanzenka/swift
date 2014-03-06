@@ -272,7 +272,7 @@ public class TestSearchRunner {
 	public void qualityControlRunner() throws IOException {
 		final Collection<SearchEngine> searchEngines = searchEngines();
 
-		final EnabledEngines engines = enabledEnginesWithQuaMeter();
+		final EnabledEngines engines = enabledEnginesWithQuameter();
 
 		final List<FileSearch> inputFiles = Arrays.asList(
 				new FileSearch(raw1, "biosample", "category", "experiment", engines, searchEngineParameters1()),
@@ -316,7 +316,7 @@ public class TestSearchRunner {
 	public void qualityControlRunnerWithMzML() throws IOException {
 		final Collection<SearchEngine> searchEngines = searchEngines();
 
-		final EnabledEngines engines = enabledEnginesWithQuaMeter();
+		final EnabledEngines engines = enabledEnginesWithQuameter();
 
 		final List<FileSearch> inputFiles = Arrays.asList(
 				new FileSearch(raw1, "biosample", "category", "experiment", engines, searchEngineParametersMzml()),
@@ -454,7 +454,7 @@ public class TestSearchRunner {
 		return engines;
 	}
 
-	private EnabledEngines enabledEnginesWithQuaMeter() {
+	private EnabledEngines enabledEnginesWithQuameter() {
 		final EnabledEngines enabledEngines = enabledEngines();
 		enabledEngines.add(createSearchEngineConfig("QUAMETER"));
 		return enabledEngines;
