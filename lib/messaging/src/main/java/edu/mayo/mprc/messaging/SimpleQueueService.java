@@ -15,8 +15,9 @@ import java.io.Serializable;
  */
 final class SimpleQueueService implements Service {
 	private static final Logger LOGGER = Logger.getLogger(SimpleQueueService.class);
+    private static final String EXCLUSIVE_CONSUMER = "consumer.exclusive=true";
 
-	private final ServiceFactory serviceFactory;
+    private final ServiceFactory serviceFactory;
 
 	/**
 	 * Each thread using the SimpleQueueService uses a separate session.
@@ -188,6 +189,15 @@ final class SimpleQueueService implements Service {
 		}
 	}
 
+    /** We want only a single consumer for the messages at a time */
+    String decorateQueueName(final String queueName) {
+        if(queueName.contains("?")) {
+            return queueName + "&" + EXCLUSIVE_CONSUMER;
+        } else {
+            return queueName + "?" + EXCLUSIVE_CONSUMER;
+        }
+    }
+
 	@Override
 	public void start() {
 		synchronized (this) {
@@ -195,7 +205,8 @@ final class SimpleQueueService implements Service {
 				try {
 					createConnection();
 
-					setRequestDestination(sendingSession().createQueue(queueName));
+                    final String decoratedQueueName = decorateQueueName(queueName);
+					setRequestDestination(sendingSession().createQueue(decoratedQueueName));
 
 					LOGGER.debug("Connected to JMS broker: " + connection.getClientID() + " queue: " + queueName);
 				} catch (JMSException e) {
