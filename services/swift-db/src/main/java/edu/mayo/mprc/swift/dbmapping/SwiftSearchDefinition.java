@@ -6,6 +6,7 @@ import edu.mayo.mprc.workspace.User;
 
 import java.io.File;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Describes a basic Swift search, exactly as the user entered it in the UI.
@@ -22,6 +23,7 @@ public class SwiftSearchDefinition extends PersistableBase {
 
 	private SearchEngineParameters searchParameters;
 	private List<FileSearch> inputFiles;
+	private Map<String, String> metadata;
 
 	public SwiftSearchDefinition() {
 	}
@@ -98,6 +100,14 @@ public class SwiftSearchDefinition extends PersistableBase {
 		this.inputFiles = inputFiles;
 	}
 
+	public Map<String, String> getMetadata() {
+		return metadata;
+	}
+
+	public void setMetadata(Map<String, String> metadata) {
+		this.metadata = metadata;
+	}
+
 	public Boolean getPublicMgfFiles() {
 		return publicMgfFiles;
 	}
@@ -163,6 +173,10 @@ public class SwiftSearchDefinition extends PersistableBase {
 			return false;
 		}
 
+		if (getMetadata() != null ? !getMetadata().equals(that.getMetadata()) : that.getMetadata() != null) {
+			return false;
+		}
+
 		return true;
 	}
 
@@ -177,6 +191,7 @@ public class SwiftSearchDefinition extends PersistableBase {
 		result = 31 * result + (getPublicMgfFiles() != null ? getPublicMgfFiles().hashCode() : 0);
 		result = 31 * result + (getPublicMzxmlFiles() != null ? getPublicMzxmlFiles().hashCode() : 0);
 		result = 31 * result + (getPublicSearchFiles() != null ? getPublicSearchFiles().hashCode() : 0);
+		result = 31 * result + (getMetadata() != null ? getMetadata().hashCode() : 0);
 		return result;
 	}
 }
