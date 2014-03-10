@@ -165,6 +165,13 @@ public final class GridRunner extends AbstractRunner {
 		// TODO: We will need to submit an 'installing packet' to the grid and collect response
 	}
 
+	@Override
+	public void provideConfiguration(Map<String, String> currentConfiguration) {
+		if (workerFactoryConfig instanceof UiConfigurationProvider) {
+			((UiConfigurationProvider) workerFactoryConfig).provideConfiguration(currentConfiguration);
+		}
+	}
+
 	/**
 	 * Listens to RMI calls from the process running within SGE. None of the messages is final.
 	 */

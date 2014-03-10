@@ -5,8 +5,10 @@ import edu.mayo.mprc.MprcException;
 import edu.mayo.mprc.ReleaseInfoCore;
 import edu.mayo.mprc.config.*;
 import edu.mayo.mprc.config.ui.*;
+import edu.mayo.mprc.daemon.AbstractRunner;
 import edu.mayo.mprc.daemon.Daemon;
 import edu.mayo.mprc.daemon.DaemonConnection;
+import edu.mayo.mprc.daemon.UiConfigurationProvider;
 import edu.mayo.mprc.dbcurator.model.CurationContext;
 import edu.mayo.mprc.msmseval.MSMSEvalParamFile;
 import edu.mayo.mprc.msmseval.MSMSEvalWorker;
@@ -22,9 +24,7 @@ import org.apache.log4j.Logger;
 
 import java.io.File;
 import java.text.MessageFormat;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
 
 /**
  * A class holding information about WebUI configuration.
@@ -220,6 +220,25 @@ public final class WebUi implements Checkable {
 
 	public boolean isMsconvert() {
 		return msconvert;
+	}
+
+	/**
+	 * @return A map containing the collected user interface configuration.
+	 *         This is done by collecting all configuration elements across
+	 *         all the resources/plugins for this daemon.
+	 */
+	public Map<String, String> getUiConfiguration() {
+		final Map<String, String> uiConfiguration = new HashMap<String, String>(10);
+		for (final Object resource : getMainDaemon().getResources()) {
+			if (resource instanceof UiConfigurationProvider) {
+				final UiConfigurationProvider provider = (UiConfigurationProvider) resource;
+				provider.provideConfiguration(uiConfiguration);
+			}
+		}
+		for (final AbstractRunner runner : getMainDaemon().getRunners()) {
+			runner.provideConfiguration(uiConfiguration);
+		}
+		return uiConfiguration;
 	}
 
 	/**

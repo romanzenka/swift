@@ -7,12 +7,27 @@ import edu.mayo.mprc.swift.ui.client.rpc.ClientSearchEngineConfig;
 import java.util.*;
 
 /**
+ * The enabled engines panel is pretty generic, with an exception of
+ * the QuaMeter panel. That one also contains a combo box for selecting which
+ * category does the search belong to.
+ *
  * @author Roman Zenka
  */
 public final class EnabledEnginesPanel extends HorizontalPanel {
 	private final Map<String/*code*/, EngineVersionSelector> engines;
+	private QuameterCategorySelector quameterCategorySelector;
 
-	public EnabledEnginesPanel(final List<ClientSearchEngine> availableEngines) {
+	/**
+	 * The enabled engines panel needs access not only to a list of available engines,
+	 * but also to metadata so it can offer special combo-box for QuaMeter search category.
+	 *
+	 * @param availableEngines List of available engines.
+	 * @param searchMetadata   Generic metadata associated with the search.
+	 * @param uiConfiguration  Configuration of the user interface itself.
+	 */
+	public EnabledEnginesPanel(final Collection<ClientSearchEngine> availableEngines,
+	                           final SearchMetadata searchMetadata,
+	                           final UiConfiguration uiConfiguration) {
 		engines = new HashMap<String, EngineVersionSelector>(availableEngines.size());
 
 		for (final ClientSearchEngine engine : availableEngines) {
@@ -32,6 +47,10 @@ public final class EnabledEnginesPanel extends HorizontalPanel {
 		Collections.sort(list);
 		for (final EngineVersionSelector selector : list) {
 			add(selector);
+			if ("QUAMETER".equals(selector.getCode())) {
+				quameterCategorySelector = new QuameterCategorySelector(uiConfiguration, searchMetadata);
+				add(quameterCategorySelector);
+			}
 		}
 	}
 
@@ -51,7 +70,7 @@ public final class EnabledEnginesPanel extends HorizontalPanel {
 		return result;
 	}
 
-	public void setCurrentEngines(final ArrayList<ClientSearchEngineConfig> enabledEngines) {
+	public void setCurrentEngines(final Iterable<ClientSearchEngineConfig> enabledEngines) {
 		if (enabledEngines == null || engines == null) {
 			return;
 		}

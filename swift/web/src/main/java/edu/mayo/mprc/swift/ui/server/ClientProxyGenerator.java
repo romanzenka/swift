@@ -265,6 +265,7 @@ public final class ClientProxyGenerator {
 				Boolean.TRUE.equals(definition.getPublicMgfFiles()),
 				Boolean.TRUE.equals(definition.getPublicMzxmlFiles()),
 				Boolean.TRUE.equals(definition.getPublicSearchFiles()),
+				new HashMap<String, String>(definition.getMetadata()),
 				0
 		);
 	}

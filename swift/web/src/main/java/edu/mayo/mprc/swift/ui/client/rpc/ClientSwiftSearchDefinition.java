@@ -3,6 +3,7 @@ package edu.mayo.mprc.swift.ui.client.rpc;
 import edu.mayo.mprc.swift.dbmapping.SwiftSearchDefinition;
 
 import java.io.Serializable;
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -31,6 +32,9 @@ public final class ClientSwiftSearchDefinition implements Serializable {
 	private int previousSearchRunId;
 	private boolean lowPriority;
 
+	// Generic metadata - can be used for extending the search information
+	private HashMap<String, String> metadata;
+
 	public ClientSwiftSearchDefinition() {
 	}
 
@@ -47,12 +51,14 @@ public final class ClientSwiftSearchDefinition implements Serializable {
 	 * @param publicMgfFiles    True if the mgf files are to be published.
 	 * @param publicMzxmlFiles  True if the mzxml files are to be published.
 	 * @param publicSearchFiles True if the intermediate search results are to be published.
+	 * @param metadata          Metadata associated with this search (can be used for filtering)
 	 * @param publicSearchFiles
 	 */
 	public ClientSwiftSearchDefinition(final String searchTitle, final ClientUser user, final String outputFolder,
 	                                   final ClientParamSet paramSet, final List<ClientFileSearch> inputFiles,
 	                                   final ClientSpectrumQa spectrumQa, final ClientPeptideReport peptideReport,
 	                                   final boolean publicMgfFiles, final boolean publicMzxmlFiles, final boolean publicSearchFiles,
+	                                   final HashMap<String, String> metadata,
 	                                   final int previousSearchRunId) {
 		this.searchTitle = searchTitle;
 		this.user = user;
@@ -64,6 +70,7 @@ public final class ClientSwiftSearchDefinition implements Serializable {
 		this.publicMgfFiles = publicMgfFiles;
 		this.publicMzxmlFiles = publicMzxmlFiles;
 		this.publicSearchFiles = publicSearchFiles;
+		this.metadata = metadata;
 		this.previousSearchRunId = previousSearchRunId;
 		fromScratch = false;
 	}
@@ -126,6 +133,14 @@ public final class ClientSwiftSearchDefinition implements Serializable {
 
 	public void setLowPriority(final boolean lowPriority) {
 		this.lowPriority = lowPriority;
+	}
+
+	public HashMap<String, String> getMetadata() {
+		return metadata;
+	}
+
+	public void setMetadata(HashMap<String, String> metadata) {
+		this.metadata = metadata;
 	}
 }
 

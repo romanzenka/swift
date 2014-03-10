@@ -25,7 +25,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  *
  * @author Roman Zenka
  */
-public abstract class AbstractRunner implements Checkable, Installable, Lifecycle {
+public abstract class AbstractRunner implements Checkable, Installable, Lifecycle, UiConfigurationProvider {
 
 	private static final Logger LOGGER = Logger.getLogger(AbstractRunner.class);
 

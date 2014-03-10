@@ -175,9 +175,10 @@ public final class QuameterWorker extends WorkerBase {
 
 		@Override
 		public void createUI(final DaemonConfig daemon, final ResourceConfig resource, final UiBuilder builder) {
-			builder.property(EXECUTABLE, "Executable Path", "<p>QuaMeter executable path. QuaMeter executables can be " +
-					"<br/>found at <a href=\"http://fenchurch.mc.vanderbilt.edu/software.php#QuaMeter/\"/>http://fenchurch.mc.vanderbilt.edu/software.php#QuaMeter</a></p>" +
-					"<p>Use a wrapper script when running on Linux that takes care of calling Wine.</p>")
+			builder
+					.property(EXECUTABLE, "Executable Path", "<p>QuaMeter executable path. QuaMeter executables can be " +
+							"<br/>found at <a href=\"http://fenchurch.mc.vanderbilt.edu/software.php#QuaMeter/\"/>http://fenchurch.mc.vanderbilt.edu/software.php#QuaMeter</a></p>" +
+							"<p>Use a wrapper script when running on Linux that takes care of calling Wine.</p>")
 					.required()
 					.executable(Arrays.asList("-v"))
 					.defaultValue("quameter.exe");

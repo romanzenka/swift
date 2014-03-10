@@ -5,6 +5,7 @@ import edu.mayo.mprc.swift.ui.client.rpc.*;
 import edu.mayo.mprc.swift.ui.client.rpc.files.Entry;
 import edu.mayo.mprc.swift.ui.client.rpc.files.FileInfo;
 
+import java.util.HashMap;
 import java.util.List;
 
 public interface ServiceAsync {
@@ -58,13 +59,6 @@ public interface ServiceAsync {
 	 *
 	 */
 	void isScaffoldReportEnabled(AsyncCallback<Boolean> async);
-
-	/**
-	 * @return Message to be displayed for the user.
-	 * @throws edu.mayo.mprc.common.client.GWTServiceException
-	 *
-	 */
-	void getUserMessage(AsyncCallback<String> async);
 
 	/**
 	 * Logins in to the Service, which sets a random session cookie that is used later to
@@ -185,4 +179,6 @@ public interface ServiceAsync {
 	 * @return True if the given output folder exists. The folder is entered relative to browse root.
 	 */
 	void outputFolderExists(String outputFolder, AsyncCallback<Boolean> async);
+
+	void getUiConfig(AsyncCallback<HashMap<String, String>> asyncCallback);
 }

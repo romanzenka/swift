@@ -10,9 +10,9 @@ import java.util.List;
 public final class InitialPageData implements Serializable {
 	private static final long serialVersionUID = 6769766487310788649L;
 
+	private HashMap<String, String> uiConfiguration;
 	private ClientUser[] users;
 	private ClientLoadedSearch loadedSearch;
-	private String userMessage;
 	private ClientParamSetList paramSetList;
 	private HashMap<String, List<ClientValue>> allowedValues;
 	private boolean databaseUndeployerEnabled;
@@ -25,9 +25,9 @@ public final class InitialPageData implements Serializable {
 	public InitialPageData() {
 	}
 
-	public InitialPageData(final ClientUser[] users,
+	public InitialPageData(final HashMap<String, String> uiConfiguration,
+	                       final ClientUser[] users,
 	                       final ClientLoadedSearch loadedSearch,
-	                       final String userMessage,
 	                       final ClientParamSetList paramSetList,
 	                       final HashMap<String, List<ClientValue>> allowedValues,
 	                       final boolean databaseUndeployerEnabled,
@@ -36,10 +36,10 @@ public final class InitialPageData implements Serializable {
 	                       final boolean scaffoldReportEnabled,
 	                       final boolean extractMsnEnabled,
 	                       final boolean msConvertEnabled) {
+		this.uiConfiguration = uiConfiguration;
 		this.users = new ClientUser[users.length];
 		System.arraycopy(users, 0, this.users, 0, users.length);
 		this.loadedSearch = loadedSearch;
-		this.userMessage = userMessage;
 		this.paramSetList = paramSetList;
 		this.allowedValues = allowedValues;
 		this.databaseUndeployerEnabled = databaseUndeployerEnabled;
@@ -60,10 +60,6 @@ public final class InitialPageData implements Serializable {
 
 	public ClientLoadedSearch loadedSearch() {
 		return loadedSearch;
-	}
-
-	public String getUserMessage() {
-		return userMessage;
 	}
 
 	public ClientParamSetList getParamSetList() {
@@ -92,5 +88,9 @@ public final class InitialPageData implements Serializable {
 
 	public boolean isMsConvertEnabled() {
 		return msConvertEnabled;
+	}
+
+	public HashMap<String, String> getUiConfiguration() {
+		return uiConfiguration;
 	}
 }

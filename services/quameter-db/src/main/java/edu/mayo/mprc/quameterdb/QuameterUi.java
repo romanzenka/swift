@@ -8,6 +8,7 @@ import edu.mayo.mprc.config.DependencyResolver;
 import edu.mayo.mprc.config.FactoryBase;
 import edu.mayo.mprc.config.ResourceConfig;
 import edu.mayo.mprc.config.ui.*;
+import edu.mayo.mprc.daemon.UiConfigurationProvider;
 import edu.mayo.mprc.database.Dao;
 import edu.mayo.mprc.quameterdb.dao.QuameterDao;
 import edu.mayo.mprc.quameterdb.dao.QuameterResult;
@@ -22,13 +23,14 @@ import java.io.IOException;
 import java.io.Writer;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
 /**
  * @author Roman Zenka
  */
-public final class QuameterUi implements Dao {
+public final class QuameterUi implements Dao, UiConfigurationProvider {
 	public static final String TYPE = "quameterUi";
 	public static final String NAME = "QuaMeter User Interface";
 	public static final String DESC = "Specialized interface for browsing QuaMeter database";
@@ -38,11 +40,22 @@ public final class QuameterUi implements Dao {
 
 	private final QuameterDao quameterDao;
 	private final Pattern searchFilter;
+	private final String categories;
 	private static final DateTimeFormatter DATE_FORMAT = DateTimeFormat.forPattern("'Date('yyyy, M, d, H, m, s, S')'").withLocale(Locale.US);
 
-	public QuameterUi(final QuameterDao quameterDao, final Pattern searchFilter) {
+	public static final String CATEGORIES = "categories";
+
+	/**
+	 * Use this constant to get to a list of quameter categories from the user interface
+	 */
+	public static final String UI_QUAMETER_CATEGORIES = "swift.quameter.categories";
+
+	public QuameterUi(final QuameterDao quameterDao,
+	                  final Pattern searchFilter,
+	                  final String categories) {
 		this.quameterDao = quameterDao;
 		this.searchFilter = searchFilter;
+		this.categories = categories;
 	}
 
 	@Override
@@ -149,6 +162,11 @@ public final class QuameterUi implements Dao {
 		writeValue(writer, value.toString(DATE_FORMAT));
 	}
 
+	@Override
+	public void provideConfiguration(Map<String, String> currentConfiguration) {
+		currentConfiguration.put(UI_QUAMETER_CATEGORIES, categories);
+	}
+
 	public static final class Config extends ResourceConfigBase {
 		public Config() {
 		}
@@ -191,8 +209,9 @@ public final class QuameterUi implements Dao {
 		@Override
 		public QuameterUi create(final Config config, final DependencyResolver dependencies) {
 			final String filterString = config.get(SEARCH_FILTER);
+			final String categories = config.get(CATEGORIES);
 			final Pattern filter = compileFilter(filterString);
-			return new QuameterUi(getQuameterDao(), filter);
+			return new QuameterUi(getQuameterDao(), filter, categories);
 		}
 
 		public QuameterDao getQuameterDao() {
@@ -236,7 +255,14 @@ public final class QuameterUi implements Dao {
 						@Override
 						public void fixError(final ResourceConfig config, final String propertyName, final String action) {
 						}
-					});
+					})
+
+					.property(CATEGORIES, "Categories", "Categories for the different QuaMeter quality checks." +
+							"<p>You can assign a category to each search. The QuaMeter user interface will then allow you to pick a category" +
+							"to filter all the results. The categories are comma-separated. Use a dash in front of a category to form sub-categories.</p>" +
+							"<p>Example: <tt>animal,-cat,--siamese,-dog,--chihuahua</tt></p>")
+					.defaultValue("no-category");
+
 		}
 	}
 

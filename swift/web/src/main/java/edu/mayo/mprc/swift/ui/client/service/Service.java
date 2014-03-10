@@ -7,6 +7,7 @@ import edu.mayo.mprc.swift.ui.client.rpc.files.Entry;
 import edu.mayo.mprc.swift.ui.client.rpc.files.ErrorEntry;
 import edu.mayo.mprc.swift.ui.client.rpc.files.FileInfo;
 
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -103,12 +104,6 @@ public interface Service extends RemoteService {
 	boolean isScaffoldReportEnabled() throws GWTServiceException;
 
 	/**
-	 * @return Message to be displayed for the user.
-	 * @throws GWTServiceException
-	 */
-	String getUserMessage() throws GWTServiceException;
-
-	/**
 	 * Save a copy of the given parameter set (either as a temporary or as a permanent).
 	 *
 	 * @param toCopy        the existing ClientParamSet to save a copy of.
@@ -200,4 +195,9 @@ public interface Service extends RemoteService {
 	 * @return True if the given output folder exists. The folder is entered relative to browse root.
 	 */
 	boolean outputFolderExists(String outputFolder) throws GWTServiceException;
+
+	/**
+	 * @return Updated version of the user interface configuration.
+	 */
+	HashMap<String, String> getUiConfig();
 }

@@ -233,12 +233,6 @@ public final class ServiceImpl extends SpringGwtServlet implements Service, Appl
 	}
 
 	@Override
-	public String getUserMessage() throws GWTServiceException {
-		// TODO - re-add support for user messages
-		return null;
-	}
-
-	@Override
 	public FileInfo[] findFiles(final String[] relativePaths) throws GWTServiceException {
 		try {
 			// Filter paths so we never have both parent and a child in the list.
@@ -630,9 +624,9 @@ public final class ServiceImpl extends SpringGwtServlet implements Service, Appl
 		}
 
 		return new InitialPageData(
+				new HashMap<String, String>(getWebUi().getUiConfiguration()),
 				listUsers(),
 				previousSearchId == null ? null : loadSearch(previousSearchId),
-				getUserMessage(),
 				getParamSetList(),
 				map,
 				isDatabaseUndeployerEnabled(),
@@ -647,6 +641,11 @@ public final class ServiceImpl extends SpringGwtServlet implements Service, Appl
 	public boolean outputFolderExists(final String outputFolder) throws GWTServiceException {
 		final File file = new File(getBrowseRoot(), outputFolder);
 		return file.exists();
+	}
+
+	@Override
+	public HashMap<String, String> getUiConfig() {
+		return new HashMap<String, String>(getWebUi().getUiConfiguration());
 	}
 
 	/**

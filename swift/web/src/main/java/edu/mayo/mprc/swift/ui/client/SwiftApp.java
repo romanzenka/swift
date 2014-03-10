@@ -24,10 +24,11 @@ import java.util.Map;
 /**
  * * Entry point classes define {@code onModuleLoad()}.
  */
-public final class SwiftApp implements EntryPoint, HidesPageContentsWhileLoading {
+public final class SwiftApp implements EntryPoint, HidesPageContentsWhileLoading, SearchMetadata, UiConfiguration {
 
 	private static final String SELECT_USER_STRING = "<Select User>";
 	private static final String TITLE_ALLOWED = "^[a-zA-Z0-9-+._()\\[\\]{}=# ]*$";
+	public static final String USER_MESSAGE = "user.message";
 
 	private ListBox users = new ListBox();
 	private TextBox title = new TextBox();
@@ -45,6 +46,15 @@ public final class SwiftApp implements EntryPoint, HidesPageContentsWhileLoading
 	private ReportSetupPanel reportSetupPanel;
 	private AdditionalSettingsPanel additionalSettingsPanel;
 	private EnabledEnginesPanel enabledEnginesPanel;
+	/**
+	 * Metadata associated with the search
+	 */
+	private HashMap<String, String> searchMetadata = new HashMap<String, String>();
+
+	/**
+	 * User interface configuration
+	 */
+	private HashMap<String, String> uiConfiguration = new HashMap<String, String>();
 
 	private Map<String, ClientUser> userInfo = new HashMap<String, ClientUser>();
 
@@ -134,6 +144,7 @@ public final class SwiftApp implements EntryPoint, HidesPageContentsWhileLoading
 			@Override
 			public void onSuccess(final InitialPageData result) {
 				previousSearchRunId = result.loadedSearch() == null ? -1 : result.loadedSearch().getSearchId();
+				initUiConfiguration(result.getUiConfiguration());
 				initParamsEditor(result);
 				finalizeFileTableInit();
 				finalizeSpectrumQa(result.getSpectrumQaParamFileInfo());
@@ -141,11 +152,16 @@ public final class SwiftApp implements EntryPoint, HidesPageContentsWhileLoading
 				initEnabledEngines(result.getSearchEngines());
 				initAdditionalSettings(result.getSearchEngines());
 				initUserList(result.listUsers());
+				initSearchMetadata(result.loadedSearch() == null ? new HashMap<String, String>() : result.loadedSearch().getDefinition().getMetadata());
 				showPageContentsAfterLoad();
-				initMessage(result.getUserMessage());
+				initMessage(getConfigurationSetting(USER_MESSAGE));
 				loadPreviousSearch(result.loadedSearch());
 			}
 		});
+	}
+
+	private void initUiConfiguration(final HashMap<String, String> uiConfiguration) {
+		this.uiConfiguration = uiConfiguration;
 	}
 
 	private void finalizeFileTableInit() {
@@ -162,7 +178,7 @@ public final class SwiftApp implements EntryPoint, HidesPageContentsWhileLoading
 	}
 
 	private void initEnabledEngines(final List<ClientSearchEngine> enabledEngines) {
-		enabledEnginesPanel = new EnabledEnginesPanel(enabledEngines);
+		enabledEnginesPanel = new EnabledEnginesPanel(enabledEngines, this, this);
 		final RootPanel panel = RootPanel.get("enginesPanel");
 		if (panel != null) {
 			panel.add(enabledEnginesPanel);
@@ -344,15 +360,16 @@ public final class SwiftApp implements EntryPoint, HidesPageContentsWhileLoading
 	}
 
 	private void updateUserMessage() {
-		ServiceConnection.instance().getUserMessage(new AsyncCallback<String>() {
+		ServiceConnection.instance().getUiConfig(new AsyncCallback<HashMap<String, String>>() {
 			@Override
 			public void onFailure(final Throwable throwable) {
 				displayMessage("");
 			}
 
 			@Override
-			public void onSuccess(final String message) {
-				displayMessage(message);
+			public void onSuccess(final HashMap<String, String> uiConfig) {
+				final String message = uiConfig.get(USER_MESSAGE);
+				displayMessage(message == null ? "" : message);
 			}
 		});
 	}
@@ -386,6 +403,24 @@ public final class SwiftApp implements EntryPoint, HidesPageContentsWhileLoading
 		// Select the user according to the cookie stored
 		final String userEmail = Cookies.getCookie("email");
 		selectUser(userEmail);
+	}
+
+	private void initSearchMetadata(final HashMap<String, String> metadata) {
+		this.searchMetadata = metadata;
+	}
+
+	public HashMap<String, String> getSearchMetadata() {
+		return searchMetadata;
+	}
+
+	@Override
+	public void setSearchMetadata(final String key, final String value) {
+		searchMetadata.put(key, value);
+	}
+
+	@Override
+	public String getSearchMetadata(final String key) {
+		return searchMetadata.get(key);
 	}
 
 	private void selectUser(final String userEmail) {
@@ -583,6 +618,11 @@ public final class SwiftApp implements EntryPoint, HidesPageContentsWhileLoading
         $wnd.location = url;
     }-*/;
 
+	@Override
+	public String getConfigurationSetting(String key) {
+		return uiConfiguration.get(key);
+	}
+
 	private class RunClickHandler implements ClickHandler {
 		RunClickHandler() {
 		}
@@ -652,6 +692,7 @@ public final class SwiftApp implements EntryPoint, HidesPageContentsWhileLoading
 						additionalSettingsPanel.isPublicMgfs(),
 						additionalSettingsPanel.isPublicMzxmls(),
 						additionalSettingsPanel.isPublicSearchFiles(),
+						getSearchMetadata(),
 						previousSearchRunId
 				);
 				def.setFromScratch(additionalSettingsPanel.isFromScratch());

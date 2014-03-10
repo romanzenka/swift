@@ -143,6 +143,13 @@ public final class SimpleRunner extends AbstractRunner {
 		}
 	}
 
+	@Override
+	public void provideConfiguration(Map<String, String> currentConfiguration) {
+		if (config instanceof UiConfigurationProvider) {
+			((UiConfigurationProvider) config).provideConfiguration(currentConfiguration);
+		}
+	}
+
 	private final class MyProgressReporter implements ProgressReporter {
 		private final DaemonRequest request;
 		private final LoggingSetup loggingSetup;
