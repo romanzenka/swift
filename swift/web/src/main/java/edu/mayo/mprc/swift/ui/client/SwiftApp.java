@@ -145,6 +145,7 @@ public final class SwiftApp implements EntryPoint, HidesPageContentsWhileLoading
 			public void onSuccess(final InitialPageData result) {
 				previousSearchRunId = result.loadedSearch() == null ? -1 : result.loadedSearch().getSearchId();
 				initUiConfiguration(result.getUiConfiguration());
+				initSearchMetadata(result.loadedSearch() == null ? new HashMap<String, String>() : result.loadedSearch().getDefinition().getMetadata());
 				initParamsEditor(result);
 				finalizeFileTableInit();
 				finalizeSpectrumQa(result.getSpectrumQaParamFileInfo());
@@ -152,7 +153,6 @@ public final class SwiftApp implements EntryPoint, HidesPageContentsWhileLoading
 				initEnabledEngines(result.getSearchEngines());
 				initAdditionalSettings(result.getSearchEngines());
 				initUserList(result.listUsers());
-				initSearchMetadata(result.loadedSearch() == null ? new HashMap<String, String>() : result.loadedSearch().getDefinition().getMetadata());
 				showPageContentsAfterLoad();
 				initMessage(getConfigurationSetting(USER_MESSAGE));
 				loadPreviousSearch(result.loadedSearch());
