@@ -25,17 +25,17 @@ public final class InitialPageData implements Serializable {
 	public InitialPageData() {
 	}
 
-	public InitialPageData(ClientUser[] users,
-	                       ClientLoadedSearch loadedSearch,
-	                       String userMessage,
-	                       ClientParamSetList paramSetList,
-	                       HashMap<String, List<ClientValue>> allowedValues,
-	                       boolean databaseUndeployerEnabled,
-	                       List<ClientSearchEngine> searchEngines,
-	                       List<SpectrumQaParamFileInfo> spectrumQaParamFileInfo,
-	                       boolean scaffoldReportEnabled,
-	                       boolean extractMsnEnabled,
-	                       boolean msConvertEnabled) {
+	public InitialPageData(final ClientUser[] users,
+	                       final ClientLoadedSearch loadedSearch,
+	                       final String userMessage,
+	                       final ClientParamSetList paramSetList,
+	                       final HashMap<String, List<ClientValue>> allowedValues,
+	                       final boolean databaseUndeployerEnabled,
+	                       final List<ClientSearchEngine> searchEngines,
+	                       final List<SpectrumQaParamFileInfo> spectrumQaParamFileInfo,
+	                       final boolean scaffoldReportEnabled,
+	                       final boolean extractMsnEnabled,
+	                       final boolean msConvertEnabled) {
 		this.users = new ClientUser[users.length];
 		System.arraycopy(users, 0, this.users, 0, users.length);
 		this.loadedSearch = loadedSearch;
