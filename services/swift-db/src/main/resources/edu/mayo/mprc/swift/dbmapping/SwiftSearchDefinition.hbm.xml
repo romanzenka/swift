@@ -27,8 +27,8 @@
 
         <map name="metadata" cascade="all-delete-orphan" lazy="true" table="search_metadata">
             <key column="swift_search_definition_id" />
-            <map-key type="string" column="key" />
-            <element type="string" column="value" />
+            <map-key type="string" column="metadata_key" />
+            <element type="string" column="metadata_value" />
         </map>
     </class>
 </hibernate-mapping>
