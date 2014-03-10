@@ -368,7 +368,8 @@ public final class ClientProxyGenerator {
 				fileEntries,
 				definition.isPublicMgfFiles(),
 				definition.isPublicMzxmlFiles(),
-				definition.isPublicSearchFiles()
+				definition.isPublicSearchFiles(),
+				definition.getMetadata()
 		);
 	}
 

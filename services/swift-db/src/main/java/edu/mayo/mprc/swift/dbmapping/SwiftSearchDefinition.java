@@ -5,6 +5,7 @@ import edu.mayo.mprc.swift.params2.SearchEngineParameters;
 import edu.mayo.mprc.workspace.User;
 
 import java.io.File;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -31,7 +32,8 @@ public class SwiftSearchDefinition extends PersistableBase {
 	public SwiftSearchDefinition(final String title, final User user, final File outputFolder, final SpectrumQa qa,
 	                             final PeptideReport peptideReport, final SearchEngineParameters searchParameters,
 	                             final List<FileSearch> inputFiles, final boolean publicMgfFiles,
-	                             final boolean publicMzxmlFiles, final boolean publicSearchFiles) {
+	                             final boolean publicMzxmlFiles, final boolean publicSearchFiles,
+	                             final Map<String, String> metadata) {
 		this.title = title;
 		this.user = user;
 		this.outputFolder = outputFolder;
@@ -42,6 +44,7 @@ public class SwiftSearchDefinition extends PersistableBase {
 		this.publicMgfFiles = publicMgfFiles;
 		this.publicMzxmlFiles = publicMzxmlFiles;
 		this.publicSearchFiles = publicSearchFiles;
+		this.metadata = new HashMap<String, String>(metadata);
 	}
 
 	public String getTitle() {

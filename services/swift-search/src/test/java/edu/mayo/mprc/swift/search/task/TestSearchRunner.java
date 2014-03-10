@@ -25,10 +25,7 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import java.io.*;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.ExecutorService;
 
 import static org.mockito.Mockito.mock;
@@ -400,7 +397,8 @@ public class TestSearchRunner {
 				inputFiles,
 				false,
 				false,
-				false
+				false,
+				new HashMap<String, String>(0)
 		);
 	}
 
