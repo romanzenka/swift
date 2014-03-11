@@ -18,6 +18,11 @@ import java.util.Map;
 public final class QuameterResult extends PersistableBase {
 	private TandemMassSpectrometrySample sample;
 	private FileSearch fileSearch;
+	/**
+	 * This is not serialized to the database, but the DAO fills this item for convenience.
+	 * It is the category for the file search
+	 */
+	private String category;
 
 	public enum QuameterColumn {
 		c_1a,
@@ -801,6 +806,14 @@ public final class QuameterResult extends PersistableBase {
 
 	public void setP_3(final double p_3) {
 		this.p_3 = p_3;
+	}
+
+	public String getCategory() {
+		return category;
+	}
+
+	public void setCategory(String category) {
+		this.category = category;
 	}
 
 	@Override

@@ -5,6 +5,7 @@ import edu.mayo.mprc.searchdb.dao.SearchDbDao;
 import edu.mayo.mprc.searchdb.dao.TandemMassSpectrometrySample;
 import edu.mayo.mprc.swift.db.SwiftDao;
 import edu.mayo.mprc.swift.dbmapping.FileSearch;
+import org.hibernate.Hibernate;
 import org.hibernate.Query;
 import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.Restrictions;
@@ -45,10 +46,29 @@ public final class QuameterDaoHibernate extends DaoBase implements QuameterDao {
 
 	@Override
 	public List<QuameterResult> listAllResults(final Pattern searchFilter) {
-		final Query query = getSession().createQuery("from QuameterResult as q");
-		final List<QuameterResult> raw = listAndCast(query);
+		final Query query = getSession().createSQLQuery("" +
+				"SELECT {q.*}, m.metadata_value AS v " +
+				" FROM `transaction` AS r, " +
+				" file_search AS f, " +
+				" quameter_result AS q, " +
+				" swift_search_definition AS d," +
+				" search_metadata AS m " +
+				" WHERE " +
+				" r.hidden=0 AND " +
+				" r.swift_search = d.swift_search_definition_id AND " +
+				" f.input_files_id = d.swift_search_definition_id AND " +
+				" q.file_search_id = f.file_search_id AND " +
+				" m.swift_search_definition_id = d.swift_search_definition_id AND " +
+				" m.metadata_key='quameter.category'")
+				.addEntity("q", QuameterResult.class)
+				.addScalar("v", Hibernate.STRING);
+		final List raw = query.list();
 		final List<QuameterResult> filtered = new ArrayList<QuameterResult>(Math.min(raw.size(), 1000));
-		for (final QuameterResult r : raw) {
+		for (final Object o : raw) {
+			final Object[] array = (Object[]) o;
+			final QuameterResult r = (QuameterResult) array[0];
+			final String category = (String) array[1];
+			r.setCategory(category);
 			if (searchFilter.matcher(r.getFileSearch().getExperiment()).find()) {
 				filtered.add(r);
 			}

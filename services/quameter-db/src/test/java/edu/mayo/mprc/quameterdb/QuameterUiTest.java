@@ -2,6 +2,7 @@ package edu.mayo.mprc.quameterdb;
 
 import com.google.common.collect.ImmutableMap;
 import edu.mayo.mprc.config.DependencyResolver;
+import edu.mayo.mprc.database.Change;
 import edu.mayo.mprc.database.DaoTest;
 import edu.mayo.mprc.fastadb.FastaDbDaoHibernate;
 import edu.mayo.mprc.quameterdb.dao.QuameterDaoHibernate;
@@ -11,8 +12,12 @@ import edu.mayo.mprc.searchdb.dao.TandemMassSpectrometrySample;
 import edu.mayo.mprc.swift.db.SwiftDaoHibernate;
 import edu.mayo.mprc.swift.dbmapping.EnabledEngines;
 import edu.mayo.mprc.swift.dbmapping.FileSearch;
+import edu.mayo.mprc.swift.dbmapping.SearchRun;
+import edu.mayo.mprc.swift.dbmapping.SwiftSearchDefinition;
 import edu.mayo.mprc.swift.params2.ParamsDaoHibernate;
 import edu.mayo.mprc.utilities.FileUtilities;
+import edu.mayo.mprc.workspace.User;
+import edu.mayo.mprc.workspace.WorkspaceDaoHibernate;
 import org.joda.time.DateTime;
 import org.testng.Assert;
 import org.testng.annotations.AfterMethod;
@@ -21,8 +26,7 @@ import org.testng.annotations.Test;
 
 import java.io.File;
 import java.io.StringWriter;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 import java.util.regex.Pattern;
 
 /**
@@ -34,6 +38,7 @@ public final class QuameterUiTest extends DaoTest {
 	SwiftDaoHibernate swiftDao;
 	FastaDbDaoHibernate fastaDbDao;
 	ParamsDaoHibernate paramsDao;
+	WorkspaceDaoHibernate workspaceDao;
 
 	QuameterUi quameterUi;
 
@@ -49,7 +54,8 @@ public final class QuameterUiTest extends DaoTest {
 		searchDbDao = new SearchDbDaoHibernate(swiftDao, fastaDbDao, getDatabase());
 		paramsDao = new ParamsDaoHibernate();
 		quameterDao = new QuameterDaoHibernate(swiftDao, searchDbDao);
-		initializeDatabase(Arrays.asList(swiftDao, fastaDbDao, quameterDao, searchDbDao, paramsDao));
+		workspaceDao = new WorkspaceDaoHibernate();
+		initializeDatabase(Arrays.asList(swiftDao, fastaDbDao, quameterDao, searchDbDao, paramsDao, workspaceDao));
 
 		searchDbDao.begin();
 		sample1 = searchDbDao.addTandemMassSpectrometrySample(
@@ -89,12 +95,28 @@ public final class QuameterUiTest extends DaoTest {
 
 		fileSearch1 = swiftDao.addFileSearch(new FileSearch(new File("test.RAW"), "bioSample", "category", "experiment", new EnabledEngines(), null));
 		fileSearch2 = swiftDao.addFileSearch(new FileSearch(new File("test2.RAW"), "bioSample2", "category2", "experiment2", new EnabledEngines(), null));
+		final List<FileSearch> fileSearches = Arrays.asList(fileSearch1, fileSearch2);
+		final Map<String, String> metadata = new HashMap<String, String>(1);
+		metadata.put("quameter.category", "AL-Kappa");
+
+		User user = workspaceDao.addNewUser("Tester", "Testin", "test@test.tst", new Change("testing", new DateTime()));
+
+		final SwiftSearchDefinition definition = swiftDao.addSwiftSearchDefinition(
+				new SwiftSearchDefinition("test", user, null, null, null, null, fileSearches,
+						false, false, false, metadata));
+
+		final SearchRun searchRun = swiftDao.fillSearchRun(definition);
+		searchRun.setHidden(0);
+		searchRun.setErrorCode(0);
+		searchRun.setNumTasks(10);
+		searchRun.setTasksCompleted(10);
+		searchRun.setEndTimestamp(new Date());
 
 		searchDbDao.commit();
 
-		QuameterUi.Config config = new QuameterUi.Config();
+		final QuameterUi.Config config = new QuameterUi.Config();
 		config.setSearchFilter(".*");
-		QuameterUi.Factory factory = new QuameterUi.Factory();
+		final QuameterUi.Factory factory = new QuameterUi.Factory();
 		factory.setQuameterDao(quameterDao);
 		quameterUi = factory.create(config, new DependencyResolver(null));
 	}
@@ -108,13 +130,13 @@ public final class QuameterUiTest extends DaoTest {
 	public void shouldAddResult() {
 		quameterDao.begin();
 
-		QuameterResult quameterResult = addResult1();
+		final QuameterResult quameterResult = addResult1();
 
 		nextTransaction();
 
 		Assert.assertEquals(quameterResult.getMs2_4a(), 1.22);
 
-		List<QuameterResult> quameterResults = quameterDao.listAllResults(Pattern.compile(".*"));
+		final List<QuameterResult> quameterResults = quameterDao.listAllResults(Pattern.compile(".*"));
 		Assert.assertEquals(quameterResults.size(), 1);
 
 		quameterDao.commit();
@@ -132,13 +154,13 @@ public final class QuameterUiTest extends DaoTest {
 
 		nextTransaction();
 
-		List<QuameterResult> quameterResults = quameterDao.listAllResults(Pattern.compile(".*"));
+		final List<QuameterResult> quameterResults = quameterDao.listAllResults(Pattern.compile(".*"));
 		Assert.assertEquals(quameterResults.size(), 2);
 
-		List<QuameterResult> quameterResults2 = quameterDao.listAllResults(Pattern.compile("ment2$"));
+		final List<QuameterResult> quameterResults2 = quameterDao.listAllResults(Pattern.compile("ment2$"));
 		Assert.assertEquals(quameterResults2.size(), 1);
 
-		List<QuameterResult> quameterResults3 = quameterDao.listAllResults(Pattern.compile("^blah$"));
+		final List<QuameterResult> quameterResults3 = quameterDao.listAllResults(Pattern.compile("^blah$"));
 		Assert.assertEquals(quameterResults3.size(), 0);
 
 		quameterDao.commit();
@@ -153,7 +175,7 @@ public final class QuameterUiTest extends DaoTest {
 
 		nextTransaction();
 
-		StringWriter writer = new StringWriter(1000);
+		final StringWriter writer = new StringWriter(1000);
 		try {
 			quameterUi.dataTableJson(writer);
 		} finally {
