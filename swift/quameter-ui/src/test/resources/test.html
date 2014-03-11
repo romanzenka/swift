@@ -46,6 +46,8 @@
 <![endif]-->
 
 <script type="text/javascript" src="/common/bootstrap/js/jquery_1.9.0.min.js"></script>
+<script type="text/javascript" src="/common/bootstrap/js/bootstrap.js"></script>
+
 
 <script type="text/javascript" src="/quameter/dygraph-combined.js"></script>
 
@@ -63,7 +65,6 @@ google.setOnLoadCallback(drawChart);
 // instantiates the pie chart, passes in the data and
 // draws it.
 function drawChart() {
-
     // Create the data table.
     var data = new google.visualization.DataTable(
             {"cols": [
@@ -71,6 +72,7 @@ function drawChart() {
                 {"id": "path", "label": "Path", "type": "string"},
                 {"id": "duration", "label": "Duration (min)", "type": "number"},
                 {"id": "instrument", "label": "Instrument", "type": "string"},
+                {"id": "category", "label": "Category", "type": "string"},
                 {"id": "searchParameters", "label": "Search parameters ID", "type": "number"},
                 {"id": "c_1a", "label": "C-1A", "type": "number"},
                 {"id": "c_1b", "label": "C-1B", "type": "number"},
@@ -120,6 +122,7 @@ function drawChart() {
                     {"v": "/mnt/atlas/ResearchandDevelopment/QE_Method Development/Isolation_Width_20140130/PooledSAA2_QE_20140131_0ptimized_Isolation1mz_Inj1.raw"},
                     {"v": 48.001666666666665},
                     {"v": "Exactive Series slot #1"},
+                    {"v": "AL-Lambda"},
                     {"v": 0},
                     {"v": 0.00328947},
                     {"v": 0.256579},
@@ -169,6 +172,7 @@ function drawChart() {
                     {"v": "/mnt/atlas/ResearchandDevelopment/QE_Method Development/Isolation_Width_20140130/PooledSAA2_QE_20140131_0ptimized_Isolation2mz_Inj2.raw"},
                     {"v": 47.003166666666665},
                     {"v": "Q Exactive Plus 3093"},
+                    {"v": "AL-Kappa"},
                     {"v": 0},
                     {"v": 0.0037037},
                     {"v": 0.248148},
@@ -218,6 +222,7 @@ function drawChart() {
                     {"v": "/mnt/atlas/ResearchandDevelopment/QE_Method Development/Isolation_Width_20140130/PooledSAA2_QE_20140131_0ptimized_Isolation4mz_Inj4.raw"},
                     {"v": 46.99883333333333},
                     {"v": "Q Exactive Plus 3093"},
+                    {"v": "ATTR"},
                     {"v": 0},
                     {"v": 0.0809717},
                     {"v": 0.129555},
@@ -267,6 +272,7 @@ function drawChart() {
                     {"v": "/mnt/atlas/ResearchandDevelopment/QE_Method Development/Isolation_Width_20140130/PooledSAA2_QE_20140131_0ptimized_Isolation1mz_Inj1_140203133059.raw"},
                     {"v": 48.00016666666667},
                     {"v": "Q Exactive Plus 3093"},
+                    {"v": "ATTR"},
                     {"v": 0},
                     {"v": 0.0},
                     {"v": 0.195455},
@@ -316,6 +322,7 @@ function drawChart() {
                     {"v": "/mnt/atlas/ResearchandDevelopment/QE_Method Development/Isolation_Width_20140130/PooledSAA2_QE_20140131_0ptimized_Isolation3mz_Inj3.raw"},
                     {"v": 46.99883333333333},
                     {"v": "Q Exactive Plus 3093"},
+                    {"v": "ATTR"},
                     {"v": 0},
                     {"v": 0.0757576},
                     {"v": 0.155303},
@@ -373,7 +380,7 @@ function drawChart() {
         alert("Column " + id + " does not exist");
     }
 
-    views = [
+    var views = [
         { "view": "tails",
             "columns": ["c_1a", "c_1b"]
         },
@@ -460,34 +467,86 @@ function drawChart() {
             cols.push(col(v.columns[j]))
         }
         view.setColumns(cols);
-        gs.push(
-                new Dygraph(
-                        document.getElementById(v.view),
-                        view,
-                        {
-                            drawCallback: function (me, initial) {
-                                if (blockRedraw || initial) return;
-                                blockRedraw = true;
-                                var range = me.xAxisRange();
-                                for (var j = 0; j < views.length; j++) {
-                                    if (gs[j] == me) continue;
-                                    gs[j].updateOptions({
-                                        dateWindow: range
-                                    });
-                                }
-                                blockRedraw = false;
-                            },
-                            drawPoints: true,
-                            pointSize: 2,
-                            strokeWidth: 0.4,
-                            highlightSeriesOpts: {
-                                strokeWidth: 2,
-                                strokeBorderWidth: 1,
-                                highlightCircleSize: 4,
-                            }
+        views[i].dataView = view;
+        views[i].dygraph = new Dygraph(
+                document.getElementById(v.view),
+                views[i].dataView,
+                {
+                    drawCallback: function (me, initial) {
+                        if (blockRedraw || initial) return;
+                        blockRedraw = true;
+                        var range = me.xAxisRange();
+                        for (var j = 0; j < views.length; j++) {
+                            if (gs[j] == me) continue;
+                            gs[j].updateOptions({
+                                dateWindow: range
+                            });
                         }
-                ));
+                        blockRedraw = false;
+                    },
+                    drawPoints: true,
+                    pointSize: 2,
+                    strokeWidth: 0.4,
+                    highlightSeriesOpts: {
+                        strokeWidth: 2,
+                        strokeBorderWidth: 1,
+                        highlightCircleSize: 4,
+                    }
+                }
+        );
+        gs.push(views[i].dygraph);
+
     }
+    $('.btn').button();
+    $('#filter-buttons .btn').click(function (event) {
+        if (!event.shiftKey) {
+            $("#filter-buttons .btn").removeClass("active");
+        }
+        addThis = false;
+        var selected = [];
+        var current = $(this);
+        if (!current.hasClass("active")) {
+            addThis = true;
+        }
+        if (addThis) {
+            selected.push(current.text());
+        }
+        $("#filter-buttons .btn").each(function () {
+            if ($(this).hasClass('active') && !$(this).is(current)) {
+                selected.push($(this).text());
+            }
+        });
+
+        var categoryColumnIndex = -1;
+        var instrumentColumnIndex = -1;
+        for (var column = 0; column < data.getNumberOfColumns(); column++) {
+            var columnId = data.getColumnId(column);
+            switch (columnId) {
+                case "category":
+                    categoryColumnIndex = column;
+                    break;
+                case "instrument":
+                    instrumentColumnIndex = column;
+                    break;
+            }
+        }
+        var filteredRows = [];
+        for (var row = 0; row < data.getNumberOfRows(); row++) {
+            var category = data.getValue(row, categoryColumnIndex);
+            if ($.inArray(category, selected) >= 0) {
+                filteredRows.push(row);
+            }
+        }
+
+        alert("Filtered rows " + filteredRows);
+
+        for (var i = 0; i < views.length; i++) {
+            views[i].dataView.setRows(filteredRows);
+            views[i].dygraph.updateOptions({file: views[i].dataView});
+            views[i].resetZoom();
+        }
+
+    });
 }
 </script>
 
@@ -495,6 +554,14 @@ function drawChart() {
 <body>
 <div class="container-fluid">
 <h2>QuaMeter Results</h2>
+
+<div class="btn-group" id="filter-buttons" data-toggle="buttons-checkbox">
+    <button type="button" class="btn">AL-Lambda</button>
+    <button type="button" class="btn">AL-Kappa</button>
+    <button type="button" class="btn">ATTR</button>
+    <button type="button" class="btn">Testing</button>
+</div>
+
 
 <h3>Chromatography</h3>
 
