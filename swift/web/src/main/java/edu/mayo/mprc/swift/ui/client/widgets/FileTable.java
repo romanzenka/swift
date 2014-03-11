@@ -447,6 +447,19 @@ public final class FileTable extends FlexTable implements HasValueChangeHandlers
 		}
 	}
 
+	public List<String> getFileNames() {
+		final List<String> results = new ArrayList<String>(getRowCount() - getFirstDataRow());
+
+		for (int row = getFirstDataRow(); row < getRowCount(); row++) {
+
+			final EditableLabel w = (EditableLabel) getWidget(row, SAMPLE_COLUMN);
+			final String sampleName = w.getText();
+			results.add(sampleName);
+		}
+		return results;
+
+	}
+
 	public List<ClientFileSearch> getData(final ArrayList<ClientSearchEngineConfig> enabledEngines) {
 		final List<ClientFileSearch> results = new ArrayList<ClientFileSearch>(getRowCount() - getFirstDataRow());
 

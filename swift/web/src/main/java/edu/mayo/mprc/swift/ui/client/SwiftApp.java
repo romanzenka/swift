@@ -18,6 +18,7 @@ import edu.mayo.mprc.swift.ui.client.widgets.validation.ParamsEditorApp;
 import edu.mayo.mprc.swift.ui.client.widgets.validation.SimpleParamsEditorPanel;
 
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -32,6 +33,7 @@ public final class SwiftApp implements EntryPoint, HidesPageContentsWhileLoading
 
 	private ListBox users = new ListBox();
 	private TextBox title = new TextBox();
+	private boolean userEditedTitle = false;
 	private HTML messageDisplay = new HTML("");
 
 	private FileTable files;
@@ -169,6 +171,7 @@ public final class SwiftApp implements EntryPoint, HidesPageContentsWhileLoading
 		final RootPanel filePanel = RootPanel.get("fileTable");
 		filePanel.add(files);
 		connectOutputLocationAndFileTable();
+		connectTitleAndFileTable();
 	}
 
 	private void initAdditionalSettings(final List<ClientSearchEngine> engines) {
@@ -204,6 +207,7 @@ public final class SwiftApp implements EntryPoint, HidesPageContentsWhileLoading
 		title.addKeyUpHandler(new KeyUpHandler() {
 			@Override
 			public void onKeyUp(final KeyUpEvent event) {
+				userEditedTitle = true;
 				updateOutputLocation();
 			}
 		});
@@ -501,6 +505,41 @@ public final class SwiftApp implements EntryPoint, HidesPageContentsWhileLoading
 		}
 	}
 
+	private void connectTitleAndFileTable() {
+		if (files != null) {
+			files.addValueChangeHandler(new ValueChangeHandler<Void>() {
+				@Override
+				public void onValueChange(final ValueChangeEvent<Void> event) {
+					updateTitleFromFileTable();
+				}
+			});
+		}
+	}
+
+	private void updateTitleFromFileTable() {
+		// User edited the title field. We have no business here
+		if (userEditedTitle) {
+			return;
+		}
+		List<String> names = files.getFileNames();
+		if (names.size() == 0) {
+			setTitleText("");
+		} else {
+			Iterator<String> iterator = names.iterator();
+			String longestPrefix = iterator.next();
+			while (iterator.hasNext()) {
+				String next = iterator.next();
+				for (int i = 0; i < Math.min(longestPrefix.length(), next.length()); i++) {
+					if (next.charAt(i) != longestPrefix.charAt(i)) {
+						longestPrefix = longestPrefix.substring(0, i);
+						break;
+					}
+				}
+			}
+			setTitleText(longestPrefix);
+		}
+
+	}
 
 	private void initRunButton() {
 		// Run Button ////////////////////////////////////////////
