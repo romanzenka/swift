@@ -41,7 +41,8 @@ public final class QuameterUi implements Dao, UiConfigurationProvider {
 	private final QuameterDao quameterDao;
 	private final Pattern searchFilter;
 	private final String categories;
-	private static final DateTimeFormatter DATE_FORMAT = DateTimeFormat.forPattern("'Date('yyyy, M, d, H, m, s, S')'").withLocale(Locale.US);
+	private static final DateTimeFormatter DATE_FORMAT_1 = DateTimeFormat.forPattern("'Date('yyyy, ").withLocale(Locale.US);
+	private static final DateTimeFormatter DATE_FORMAT_2 = DateTimeFormat.forPattern(", d, H, m, s, S')'").withLocale(Locale.US);
 
 	public static final String CATEGORIES = "categories";
 
@@ -159,7 +160,7 @@ public final class QuameterUi implements Dao, UiConfigurationProvider {
 	}
 
 	private void writeValue(final JsonWriter writer, final DateTime value) throws IOException {
-		writeValue(writer, value.toString(DATE_FORMAT));
+		writeValue(writer, value.toString(DATE_FORMAT_1) + (value.getMonthOfYear() - 1) + value.toString(DATE_FORMAT_2));
 	}
 
 	@Override
