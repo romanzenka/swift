@@ -17,6 +17,7 @@ import edu.mayo.mprc.swift.params2.ExtractMsnSettings;
 import edu.mayo.mprc.swift.params2.SearchEngineParameters;
 import edu.mayo.mprc.swift.params2.mapping.ParamsInfo;
 import edu.mayo.mprc.utilities.FileUtilities;
+import edu.mayo.mprc.utilities.StringUtilities;
 import edu.mayo.mprc.utilities.exceptions.ExceptionUtilities;
 import edu.mayo.mprc.utilities.progress.ProgressReporter;
 import edu.mayo.mprc.workflow.engine.Resumer;
@@ -520,6 +521,10 @@ public final class SearchRunner implements Runnable, Lifecycle {
 		return task;
 	}
 
+	public boolean scaffoldShouldUseEngine(final SearchEngine engine, final String scaffoldVersion) {
+		/* Scaffold cannot process myrimatch inputs correctly, fixed 4.3.2 */
+		return !myrimatch(engine) || StringUtilities.compareVersions(scaffoldVersion, "4.3.2") >= 0;
+	}
 
 	private ScaffoldSpectrumTask addScaffoldAndQaTasks(final ScaffoldSpectrumTask previousScaffoldTask,
 	                                                   final FileSearch inputFile, final FileProducingTask conversion,
@@ -527,7 +532,7 @@ public final class SearchRunner implements Runnable, Lifecycle {
 	                                                   final SearchEngine engine, final EngineSearchTask search) {
 		ScaffoldSpectrumTask scaffoldTask = previousScaffoldTask;
 		final String scaffoldVersion = scaffoldVersion(inputFile);
-		if (scaffoldVersion != null && !myrimatch(engine) /* Scaffold cannot process myrimatch inputs correctly, as of 4.0.7 */) {
+		if (scaffoldVersion != null && scaffoldShouldUseEngine(engine, scaffoldVersion)) {
 			if (scaffoldDeployment == null) {
 				throw new MprcException("Scaffold search submitted without having Scaffold service enabled.");
 			}
@@ -938,7 +943,7 @@ public final class SearchRunner implements Runnable, Lifecycle {
 	 * The search also knows about the conversion and db deployment so it can determine when it can run.
 	 */
 	private EngineSearchTask addEngineSearch(final SearchEngine engine, final File paramFile, final File inputFile, final File searchOutputFolder, final FileProducingTask convertedFile, final Curation curation, final DatabaseDeploymentResult deploymentResult, final boolean publicSearchFiles) {
-		EngineSearchTask searchEngineTask = new EngineSearchTask(
+		final EngineSearchTask searchEngineTask = new EngineSearchTask(
 				workflowEngine,
 				engine,
 				inputFile.getName(),

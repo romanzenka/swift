@@ -130,4 +130,14 @@ public final class StringUtilitiesTest {
 	public void shouldFormatMessages() {
 		Assert.assertEquals(MessageFormat.format("{0,number,#}", 123456), "123456");
 	}
+
+	@Test
+	public void shouldCompareVersions() {
+		Assert.assertEquals(StringUtilities.compareVersions("1", "1.1"), -1);
+		Assert.assertEquals(StringUtilities.compareVersions("1.1", "1.1"), 0);
+		Assert.assertEquals(StringUtilities.compareVersions("1.1", "1"), 1);
+		Assert.assertEquals(StringUtilities.compareVersions("4.3.2", "4.3.2"), 0);
+		Assert.assertEquals(StringUtilities.compareVersions("3.4.2", "4.3.2"), -1);
+		Assert.assertEquals(StringUtilities.compareVersions("4.3.12", "4.3.2"), 1);
+	}
 }
