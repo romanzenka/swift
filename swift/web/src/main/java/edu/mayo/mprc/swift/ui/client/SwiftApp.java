@@ -524,7 +524,6 @@ public final class SwiftApp implements EntryPoint, HidesPageContentsWhileLoading
 		List<String> names = files.getFileNames();
 		if (names.size() == 0) {
 			setTitleText("");
-			files.updateSearchTitle("");
 		} else {
 			Iterator<String> iterator = names.iterator();
 			String longestPrefix = iterator.next();
@@ -538,9 +537,8 @@ public final class SwiftApp implements EntryPoint, HidesPageContentsWhileLoading
 				}
 			}
 			setTitleText(longestPrefix);
-			files.updateSearchTitle(longestPrefix);
 		}
-
+		updateOutputLocation();
 	}
 
 	private void initRunButton() {
