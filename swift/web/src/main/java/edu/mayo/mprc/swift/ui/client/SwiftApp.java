@@ -536,6 +536,7 @@ public final class SwiftApp implements EntryPoint, HidesPageContentsWhileLoading
 					}
 				}
 			}
+			longestPrefix = longestPrefix.replaceAll("[-_.]+$", "");
 			setTitleText(longestPrefix);
 		}
 		updateOutputLocation();
