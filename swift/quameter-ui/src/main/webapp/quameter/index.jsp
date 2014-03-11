@@ -1,10 +1,10 @@
-<!DOCTYPE html>
 <%@ page import="edu.mayo.mprc.MprcException" %>
 <%@ page import="edu.mayo.mprc.config.ResourceConfig" %>
 <%@ page import="edu.mayo.mprc.quameterdb.QuameterUi" %>
 <%@ page import="edu.mayo.mprc.swift.MainFactoryContext" %>
 <%@ page import="edu.mayo.mprc.swift.SwiftWebContext" %>
 <%@ page import="java.io.StringWriter" %>
+<!DOCTYPE html>
 <% final ResourceConfig quameterUiConfig = MainFactoryContext.getSwiftEnvironment().getSingletonConfig(QuameterUi.Config.class); %>
 <html lang="en">
 <head>
@@ -22,6 +22,16 @@
         margin: 0; /* <-- Apparently some margin are still there even though it's hidden */
     }
 
+    body {
+        margin-top: 90px;
+    }
+
+    .graph {
+        width: 100%;
+        height: 320px;
+        margin-bottom: 10px;
+    }
+
     h4 {
         text-align: center;
     }
@@ -29,6 +39,10 @@
     .legend dt {
         float: left;
         margin-right: 0.5em;
+    }
+
+    .dygraph-legend {
+        background-color: rgba(255, 255, 255, 0.4) !important;
     }
 
     .dygraph-legend > span.highlight {
@@ -39,10 +53,8 @@
         white-space: nowrap;
     }
 
-    .graph {
-        width: 100%;
-        height: 320px;
-        margin-bottom: 10px;
+    button.highlight {
+        color: #ff0;
     }
 
 </style>
@@ -52,6 +64,7 @@
 <![endif]-->
 
 <script type="text/javascript" src="/common/bootstrap/js/jquery_1.9.0.min.js"></script>
+<script type="text/javascript" src="/common/bootstrap/js/bootstrap.js"></script>
 
 <script type="text/javascript" src="dygraph-combined.js"></script>
 
@@ -59,173 +72,291 @@
 <script type="text/javascript" src="https://www.google.com/jsapi"></script>
 <script type="text/javascript">
 
-    // Load the Visualization API and the core package.
-    google.load('visualization', '1.0', {'packages': ['corechart']});
+// Load the Visualization API and the core package.
+google.load('visualization', '1.0', {'packages': ['corechart']});
 
-    // Set a callback to run when the Google Visualization API is loaded.
-    google.setOnLoadCallback(drawChart);
+// Set a callback to run when the Google Visualization API is loaded.
+google.setOnLoadCallback(drawChart);
 
-    // Callback that creates and populates a data table,
-    // instantiates the pie chart, passes in the data and
-    // draws it.
-    function drawChart() {
+function columnIndex(id, data) {
+    for (var i = 0; i < data.getNumberOfColumns(); i++) {
+        if (data.getColumnId(i) == id) {
+            return i;
+        }
+    }
+    alert("Column " + id + " does not exist");
+}
 
-        // Create the data table.
-        var data = new google.visualization.DataTable(
-                <%
+// Add buttons to given div, one for each unique value from a given column
+// div should be jQuery-enriched element
+function addButtons(div, data, columnId) {
+    var column = columnIndex(columnId, data);
+
+    var names = {};
+    for (var row = 0; row < data.getNumberOfRows(); row++) {
+        var value = data.getValue(row, column);
+        names[value] = 1;
+    }
+    var keys = $.map(names,function (element, index) {
+        return index
+    }).sort();
+
+    $.each(keys, function (index, value) {
+        div.append('<button type="button" class="btn btn-primary" value="' + value + '">' + value + '<' + '/button>');
+    });
+}
+
+// Callback that creates and populates a data table,
+// instantiates the pie chart, passes in the data and
+// draws it.
+function drawChart() {
+    // Create the data table.
+    var data = new google.visualization.DataTable(
+            <%
 
 if(quameterUiConfig!=null) {
-final QuameterUi quameterUi = (QuameterUi) MainFactoryContext.getSwiftEnvironment().createResource(quameterUiConfig);
-quameterUi.begin();
-try {
-final StringWriter writer = new StringWriter(10000);
-quameterUi.dataTableJson(writer);
-quameterUi.commit();
-out.print(writer.toString());
-} catch (Exception e) {
-quameterUi.rollback();
-throw new MprcException(e);
-}
+    final QuameterUi quameterUi = (QuameterUi) MainFactoryContext.getSwiftEnvironment().createResource(quameterUiConfig);
+    quameterUi.begin();
+    try {
+        final StringWriter writer = new StringWriter(10000);
+        quameterUi.dataTableJson(writer);
+        quameterUi.commit();
+        out.print(writer.toString());
+    } catch (Exception e) {
+        quameterUi.rollback();
+        throw new MprcException(e);
+    }
 } else {
 
 %>
-                null
-                <%
-               }
-               %>
-                , 0.6);
+            null
+            <%
+           }
+           %>
+            , 0.6);
 
-        function col(id) {
-            for (var i = 0; i < data.getNumberOfColumns(); i++) {
-                if (data.getColumnId(i) == id) {
-                    return i;
+    var views = [
+        { "view": "tails",
+            "columns": ["c_1a", "c_1b"]
+        },
+        { "view": "elution",
+            "columns": ["c_2a", "duration"]
+        },
+        { "view": "idRate",
+            "columns": ["c_2b"]
+        },
+        { "view": "peakBroadening",
+            "columns": ["c_3a", "c_3b", "c_4a", "c_4b", "c_4c"]
+        },
+        { "view": "oversampling",
+            "columns": ["ds_1a", "ds_1b"]
+        },
+        { "view": "samplingRate",
+            "columns": ["ds_2a", "ds_2b"]
+        },
+        { "view": "peakSampling",
+            "columns": ["ds_3a", "ds_3b"]
+        },
+        { "view": "electrospray",
+            "columns": ["is_1a", "is_1b"]
+        },
+        { "view": "tuning",
+            "columns": ["is_2"]
+        },
+        { "view": "chargeState",
+            "columns": ["is_3a", "is_3b", "is_3c"]
+        },
+        { "view": "ms1Time",
+            "columns": ["ms1_1"]
+        },
+        { "view": "ms1SigToNoise",
+            "columns": ["ms1_2a", "ms1_3a"]
+        },
+        { "view": "ms1Tic",
+            "columns": ["ms1_2b"]
+        },
+        { "view": "ms1PrecError",
+            "columns": ["ms1_5a", "ms1_5b"]
+        },
+        { "view": "ms1PrecErrorPpm",
+            "columns": ["ms1_5c", "ms1_5d"]
+        },
+        { "view": "ms2Time",
+            "columns": ["ms2_1"]
+        },
+        { "view": "ms2SigToNoise",
+            "columns": ["ms2_2"]
+        },
+        { "view": "ms2NumPeaks",
+            "columns": ["ms2_3"]
+        },
+        { "view": "ms2IdRatio",
+            "columns": ["ms2_4a", "ms2_4b", "ms2_4c", "ms2_4d"]
+        },
+        { "view": "searchScore",
+            "columns": ["p_1"]
+        },
+        { "view": "trypticMs2",
+            "columns": ["p_2a"]
+        },
+        { "view": "trypticPeptides",
+            "columns": ["p_2b"]
+        },
+        { "view": "distinctPeptides",
+            "columns": ["p_2c"]
+        },
+        { "view": "semiToTryptic",
+            "columns": ["p_3"]
+        }
+    ];
+
+    var blockRedraw = false;
+    gs = [];
+
+    function col(id) {
+        return columnIndex(id, data);
+    }
+
+    var selectedPath = $('#selected-path');
+    var pathColumnIndex = col('path');
+
+    // Make buttons
+    var categoryDiv = $('#category-buttons');
+    addButtons(categoryDiv, data, 'category');
+
+    var instrumentDiv = $('#instrument-buttons');
+    addButtons(instrumentDiv, data, 'instrument');
+
+    var categoryButtons = categoryDiv.find('.btn');
+    var categoryColumnIndex = col('category');
+    var instrumentButtons = instrumentDiv.find('.btn');
+    var instrumentColumnIndex = col('instrument');
+
+    for (var i = 0; i < views.length; i++) {
+        var v = views[i];
+        var view = new google.visualization.DataView(data);
+        var cols = [];
+        cols.push(col("startTime"));
+        for (var j = 0; j < v.columns.length; j++) {
+            cols.push(col(v.columns[j]))
+        }
+        view.setColumns(cols);
+        views[i].dataView = view;
+        views[i].dygraph = new Dygraph(
+                document.getElementById(v.view),
+                views[i].dataView,
+                {
+                    drawCallback: function (me, initial) {
+                        if (blockRedraw || initial) return;
+                        blockRedraw = true;
+                        var range = me.xAxisRange();
+                        for (var j = 0; j < views.length; j++) {
+                            if (gs[j] == me) continue;
+                            gs[j].updateOptions({
+                                dateWindow: range
+                            });
+                        }
+                        blockRedraw = false;
+                    },
+                    drawPoints: true,
+                    pointSize: 2,
+                    strokeWidth: 0.4,
+                    highlightSeriesOpts: {
+                        strokeWidth: 2,
+                        strokeBorderWidth: 1,
+                        highlightCircleSize: 4
+                    },
+                    highlightCallback: function (event, x, points, row, seriesName) {
+                        selectedPath.val(data.getValue(row, pathColumnIndex));
+                        instrumentButtons.removeClass("highlight");
+                        categoryButtons.removeClass("highlight");
+
+                        var instrument = data.getValue(row, instrumentColumnIndex);
+                        instrumentButtons.filter("[value='" + instrument + "']").addClass("highlight");
+
+                        var category = data.getValue(row, categoryColumnIndex);
+                        categoryButtons.filter("[value='" + category + "']").addClass("highlight");
+                    },
+                    unhighlightCallback: function (event) {
+                        selectedPath.val(null);
+                        instrumentButtons.removeClass("highlight");
+                        categoryButtons.removeClass("highlight");
+                    }
                 }
-            }
-            alert("Column " + id + " does not exist");
+        );
+        gs.push(views[i].dygraph);
+
+    }
+
+    $('.btn').button();
+    $.merge(categoryButtons, instrumentButtons).click(function (event) {
+        var current = $(this);
+
+        if (!event.shiftKey) {
+            current.siblings().removeClass("btn-primary");
+            current.removeClass("btn-primary");
         }
 
-        views = [
-            { "view": "tails",
-                "columns": ["c_1a", "c_1b"]
-            },
-            { "view": "elution",
-                "columns": ["c_2a", "duration"]
-            },
-            { "view": "idRate",
-                "columns": ["c_2b"]
-            },
-            { "view": "peakBroadening",
-                "columns": ["c_3a", "c_3b", "c_4a", "c_4b", "c_4c"]
-            },
-            { "view": "oversampling",
-                "columns": ["ds_1a", "ds_1b"]
-            },
-            { "view": "samplingRate",
-                "columns": ["ds_2a", "ds_2b"]
-            },
-            { "view": "peakSampling",
-                "columns": ["ds_3a", "ds_3b"]
-            },
-            { "view": "electrospray",
-                "columns": ["is_1a", "is_1b"]
-            },
-            { "view": "tuning",
-                "columns": ["is_2"]
-            },
-            { "view": "chargeState",
-                "columns": ["is_3a", "is_3b", "is_3c"]
-            },
-            { "view": "ms1Time",
-                "columns": ["ms1_1"]
-            },
-            { "view": "ms1SigToNoise",
-                "columns": ["ms1_2a", "ms1_3a"]
-            },
-            { "view": "ms1Tic",
-                "columns": ["ms1_2b"]
-            },
-            { "view": "ms1PrecError",
-                "columns": ["ms1_5a", "ms1_5b"]
-            },
-            { "view": "ms1PrecErrorPpm",
-                "columns": ["ms1_5c", "ms1_5d"]
-            },
-            { "view": "ms2Time",
-                "columns": ["ms2_1"]
-            },
-            { "view": "ms2SigToNoise",
-                "columns": ["ms2_2"]
-            },
-            { "view": "ms2NumPeaks",
-                "columns": ["ms2_3"]
-            },
-            { "view": "ms2IdRatio",
-                "columns": ["ms2_4a", "ms2_4b", "ms2_4c", "ms2_4d"]
-            },
-            { "view": "searchScore",
-                "columns": ["p_1"]
-            },
-            { "view": "trypticMs2",
-                "columns": ["p_2a"]
-            },
-            { "view": "trypticPeptides",
-                "columns": ["p_2b"]
-            },
-            { "view": "distinctPeptides",
-                "columns": ["p_2c"]
-            },
-            { "view": "semiToTryptic",
-                "columns": ["p_3"]
-            }
-        ];
+        current.toggleClass("btn-primary");
 
-        var blockRedraw = false;
-        gs = [];
+        var selectedCategory = [];
+        categoryButtons.each(function () {
+            if ($(this).hasClass('btn-primary')) {
+                selectedCategory.push($(this).attr("value"));
+            }
+        });
+
+        var selectedInstrument = [];
+        instrumentButtons.each(function () {
+            if ($(this).hasClass('btn-primary')) {
+                selectedInstrument.push($(this).attr("value"));
+            }
+        });
+
+        var filteredRows = [];
+        for (var row = 0; row < data.getNumberOfRows(); row++) {
+            var category = data.getValue(row, categoryColumnIndex);
+            var instrument = data.getValue(row, instrumentColumnIndex);
+            if (0 <= $.inArray(category, selectedCategory) && 0 <= $.inArray(instrument, selectedInstrument)) {
+                filteredRows.push(row);
+            }
+        }
 
         for (var i = 0; i < views.length; i++) {
-            var v = views[i];
-            var view = new google.visualization.DataView(data);
-            var cols = [];
-            cols.push(col("startTime"));
-            for (var j = 0; j < v.columns.length; j++) {
-                cols.push(col(v.columns[j]))
-            }
-            view.setColumns(cols);
-            gs.push(
-                    new Dygraph(
-                            document.getElementById(v.view),
-                            view,
-                            {
-                                drawCallback: function (me, initial) {
-                                    if (blockRedraw || initial) return;
-                                    blockRedraw = true;
-                                    var range = me.xAxisRange();
-                                    for (var j = 0; j < views.length; j++) {
-                                        if (gs[j] == me) continue;
-                                        gs[j].updateOptions({
-                                            dateWindow: range
-                                        });
-                                    }
-                                    blockRedraw = false;
-                                },
-                                drawPoints: true,
-                                pointSize: 2,
-                                strokeWidth: 0.4,
-                                highlightSeriesOpts: {
-                                    strokeWidth: 2,
-                                    strokeBorderWidth: 1,
-                                    highlightCircleSize: 4,
-                                }
-                            }
-                    ));
+            views[i].dataView.setRows(filteredRows);
+            views[i].dygraph.updateOptions({file: views[i].dataView});
         }
-    }
+
+    });
+}
 </script>
 
 </head>
 <body>
 <div class="container-fluid">
-<h2>QuaMeter Results</h2>
+<div class="navbar navbar-fixed-top navbar-inverse">
+    <div class="navbar-inner">
+        <a href="#" class="brand">QuaMeter Results</a>
+
+        <div class="btn-toolbar pull-left span5">
+            <div class="btn-group" id="category-buttons">
+            </div>
+        </div>
+
+        <div class="btn-toolbar pull-left span5 ">
+            <div class="btn-group" id="instrument-buttons">
+            </div>
+
+        </div>
+
+        <br clear="left"/>
+
+        <form class="navbar-form row-fluid" id="selected-point">
+            <input type="text" id="selected-path" class="span12" placeholder="File path"/>
+        </form>
+    </div>
+</div>
+
 <% if (quameterUiConfig == null) {
 %>
 <div class="alert">
@@ -236,9 +367,9 @@ throw new MprcException(e);
         </code> daemon.</p>
 </div>
 
-
 <% } else {
 %>
+
 <h3>Chromatography</h3>
 
 <div class="row-fluid">

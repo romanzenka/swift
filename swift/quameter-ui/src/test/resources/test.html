@@ -16,6 +16,10 @@
         margin: 0; /* <-- Apparently some margin are still there even though it's hidden */
     }
 
+    body {
+        margin-top: 90px;
+    }
+
     .graph {
         width: 100%;
         height: 320px;
@@ -31,12 +35,20 @@
         margin-right: 0.5em;
     }
 
+    .dygraph-legend {
+        background-color: rgba(255, 255, 255, 0.4) !important;
+    }
+
     .dygraph-legend > span.highlight {
         background-color: #f9f500;
     }
 
     .dygraph-legend > span > b {
         white-space: nowrap;
+    }
+
+    button.highlight {
+        color: #ff0;
     }
 
 </style>
@@ -60,6 +72,34 @@ google.load('visualization', '1.0', {'packages': ['corechart']});
 
 // Set a callback to run when the Google Visualization API is loaded.
 google.setOnLoadCallback(drawChart);
+
+function columnIndex(id, data) {
+    for (var i = 0; i < data.getNumberOfColumns(); i++) {
+        if (data.getColumnId(i) == id) {
+            return i;
+        }
+    }
+    alert("Column " + id + " does not exist");
+}
+
+// Add buttons to given div, one for each unique value from a given column
+// div should be jQuery-enriched element
+function addButtons(div, data, columnId) {
+    var column = columnIndex(columnId, data);
+
+    var names = {};
+    for (var row = 0; row < data.getNumberOfRows(); row++) {
+        var value = data.getValue(row, column);
+        names[value] = 1;
+    }
+    var keys = $.map(names,function (element, index) {
+        return index
+    }).sort();
+
+    $.each(keys, function (index, value) {
+        div.append('<button type="button" class="btn btn-primary" value="' + value + '">' + value + '<' + '/button>');
+    });
+}
 
 // Callback that creates and populates a data table,
 // instantiates the pie chart, passes in the data and
@@ -370,21 +410,11 @@ function drawChart() {
             ]}
             , 0.6);
 
-
-    function col(id) {
-        for (var i = 0; i < data.getNumberOfColumns(); i++) {
-            if (data.getColumnId(i) == id) {
-                return i;
-            }
-        }
-        alert("Column " + id + " does not exist");
-    }
-
     var views = [
         { "view": "tails",
             "columns": ["c_1a", "c_1b"]
         },
-        { "view": "retention",
+        { "view": "elution",
             "columns": ["c_2a", "duration"]
         },
         { "view": "idRate",
@@ -458,6 +488,25 @@ function drawChart() {
     var blockRedraw = false;
     gs = [];
 
+    function col(id) {
+        return columnIndex(id, data);
+    }
+
+    var selectedPath = $('#selected-path');
+    var pathColumnIndex = col('path');
+
+    // Make buttons
+    var categoryDiv = $('#category-buttons');
+    addButtons(categoryDiv, data, 'category');
+
+    var instrumentDiv = $('#instrument-buttons');
+    addButtons(instrumentDiv, data, 'instrument');
+
+    var categoryButtons = categoryDiv.find('.btn');
+    var categoryColumnIndex = col('category');
+    var instrumentButtons = instrumentDiv.find('.btn');
+    var instrumentColumnIndex = col('instrument');
+
     for (var i = 0; i < views.length; i++) {
         var v = views[i];
         var view = new google.visualization.DataView(data);
@@ -491,59 +540,66 @@ function drawChart() {
                         strokeWidth: 2,
                         strokeBorderWidth: 1,
                         highlightCircleSize: 4,
+                    },
+                    highlightCallback: function (event, x, points, row, seriesName) {
+                        selectedPath.val(data.getValue(row, pathColumnIndex));
+                        instrumentButtons.removeClass("highlight");
+                        categoryButtons.removeClass("highlight");
+
+                        var instrument = data.getValue(row, instrumentColumnIndex);
+                        instrumentButtons.filter("[value='" + instrument + "']").addClass("highlight");
+
+                        var category = data.getValue(row, categoryColumnIndex);
+                        categoryButtons.filter("[value='" + category + "']").addClass("highlight");
+                    },
+                    unhighlightCallback: function (event) {
+                        selectedPath.val(null);
+                        instrumentButtons.removeClass("highlight");
+                        categoryButtons.removeClass("highlight");
                     }
                 }
         );
         gs.push(views[i].dygraph);
 
     }
+
     $('.btn').button();
-    $('#filter-buttons .btn').click(function (event) {
-        if (!event.shiftKey) {
-            $("#filter-buttons .btn").removeClass("active");
-        }
-        addThis = false;
-        var selected = [];
+    $.merge(categoryButtons, instrumentButtons).click(function (event) {
         var current = $(this);
-        if (!current.hasClass("active")) {
-            addThis = true;
+
+        if (!event.shiftKey) {
+            current.siblings().removeClass("btn-primary");
+            current.removeClass("btn-primary");
         }
-        if (addThis) {
-            selected.push(current.text());
-        }
-        $("#filter-buttons .btn").each(function () {
-            if ($(this).hasClass('active') && !$(this).is(current)) {
-                selected.push($(this).text());
+
+        current.toggleClass("btn-primary");
+
+        var selectedCategory = [];
+        categoryButtons.each(function () {
+            if ($(this).hasClass('btn-primary')) {
+                selectedCategory.push($(this).attr("value"));
             }
         });
 
-        var categoryColumnIndex = -1;
-        var instrumentColumnIndex = -1;
-        for (var column = 0; column < data.getNumberOfColumns(); column++) {
-            var columnId = data.getColumnId(column);
-            switch (columnId) {
-                case "category":
-                    categoryColumnIndex = column;
-                    break;
-                case "instrument":
-                    instrumentColumnIndex = column;
-                    break;
+        var selectedInstrument = [];
+        instrumentButtons.each(function () {
+            if ($(this).hasClass('btn-primary')) {
+                selectedInstrument.push($(this).attr("value"));
             }
-        }
+        });
+
         var filteredRows = [];
         for (var row = 0; row < data.getNumberOfRows(); row++) {
             var category = data.getValue(row, categoryColumnIndex);
-            if ($.inArray(category, selected) >= 0) {
+            var instrument = data.getValue(row, instrumentColumnIndex);
+            if (0 <= $.inArray(category, selectedCategory) && 0 <= $.inArray(instrument, selectedInstrument)) {
                 filteredRows.push(row);
             }
         }
 
-        alert("Filtered rows " + filteredRows);
-
         for (var i = 0; i < views.length; i++) {
             views[i].dataView.setRows(filteredRows);
             views[i].dygraph.updateOptions({file: views[i].dataView});
-            views[i].resetZoom();
         }
 
     });
@@ -553,15 +609,28 @@ function drawChart() {
 </head>
 <body>
 <div class="container-fluid">
-<h2>QuaMeter Results</h2>
+<div class="navbar navbar-fixed-top navbar-inverse">
+    <div class="navbar-inner">
+        <a href="#" class="brand">QuaMeter Results</a>
 
-<div class="btn-group" id="filter-buttons" data-toggle="buttons-checkbox">
-    <button type="button" class="btn">AL-Lambda</button>
-    <button type="button" class="btn">AL-Kappa</button>
-    <button type="button" class="btn">ATTR</button>
-    <button type="button" class="btn">Testing</button>
+        <div class="btn-toolbar pull-left span5">
+            <div class="btn-group" id="category-buttons">
+            </div>
+        </div>
+
+        <div class="btn-toolbar pull-left span5 ">
+            <div class="btn-group" id="instrument-buttons">
+            </div>
+
+        </div>
+
+        <br clear="left"/>
+
+        <form class="navbar-form row-fluid" id="selected-point">
+            <input type="text" id="selected-path" class="span12" placeholder="File path"/>
+        </form>
+    </div>
 </div>
-
 
 <h3>Chromatography</h3>
 
@@ -584,9 +653,9 @@ function drawChart() {
         </div>
     </div>
     <div class="span3">
-        <h4>Retention</h4>
+        <h4>Elution</h4>
 
-        <div id="retention" class="graph"></div>
+        <div id="elution" class="graph"></div>
         <div class="legend">
             <dl>
                 <dt>C-2A</dt>
