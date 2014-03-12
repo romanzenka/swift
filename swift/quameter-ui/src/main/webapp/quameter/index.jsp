@@ -8,7 +8,7 @@
 <% final ResourceConfig quameterUiConfig = MainFactoryContext.getSwiftEnvironment().getSingletonConfig(QuameterUi.Config.class); %>
 <html lang="en">
 <head>
-<title>QuaMeter Data | <%=SwiftWebContext.getWebUi().getTitle()%>
+<title>QuaMeter Results | <%=SwiftWebContext.getWebUi().getTitle()%>
 </title>
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
