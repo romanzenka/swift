@@ -202,7 +202,7 @@ public final class SwiftApp implements EntryPoint, HidesPageContentsWhileLoading
 
 	private void initTitleEditor() {
 		final RootPanel titlePanel = RootPanel.get("title");
-		title.setVisibleLength(30);
+		title.setVisibleLength(60);
 		titlePanel.add(title);
 		title.addKeyUpHandler(new KeyUpHandler() {
 			@Override
