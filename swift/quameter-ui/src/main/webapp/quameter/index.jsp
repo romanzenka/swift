@@ -383,6 +383,7 @@ if(quameterUiConfig!=null) {
         <div class="btn-toolbar pull-left span5 ">
             <div class="btn-group" id="instrument-buttons">
             </div>
+
         </div>
 
         <div class="row-fluid">
