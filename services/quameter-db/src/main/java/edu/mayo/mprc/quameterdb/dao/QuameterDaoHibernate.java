@@ -53,7 +53,7 @@ public final class QuameterDaoHibernate extends DaoBase implements QuameterDao {
 				" quameter_result AS q, " +
 				" swift_search_definition AS d," +
 				" search_metadata AS m," +
-				" tandem_mass_spectrometry_sample AS t" +
+				" tandem_mass_spec_sample AS t" +
 				" WHERE " +
 				" r.hidden=0 AND " +
 				" r.swift_search = d.swift_search_definition_id AND " +
@@ -61,7 +61,7 @@ public final class QuameterDaoHibernate extends DaoBase implements QuameterDao {
 				" q.file_search_id = f.file_search_id AND " +
 				" m.swift_search_definition_id = d.swift_search_definition_id AND " +
 				" m.metadata_key='quameter.category' AND" +
-				" t.tandem_mass_spec_sample_id = q.tandem_mass_spec_sample_id" +
+				" t.tandem_mass_spec_sample_id = q.sample_id" +
 				" ORDER BY t.start_time")
 				.addEntity("q", QuameterResult.class)
 				.addScalar("v", Hibernate.STRING);
