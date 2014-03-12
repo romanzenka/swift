@@ -171,6 +171,13 @@ if(quameterUiConfig!=null) {
            %>
             , 0.6);
 
+    var viewMetadata = {};
+    var allRows = Array(data.getNumberOfRows());
+    for (var i = 0; i < data.getNumberOfRows(); i++) {
+        allRows[i] = i;
+    }
+    viewMetadata.filteredRows = allRows;
+
     var views = [
         { "view": "tails",
             "columns": ["c_1a", "c_1b"]
@@ -302,7 +309,8 @@ if(quameterUiConfig!=null) {
                         strokeBorderWidth: 1,
                         highlightCircleSize: 4
                     },
-                    highlightCallback: function (event, x, points, row, seriesName) {
+                    highlightCallback: function (event, x, points, viewRow, seriesName) {
+                        var row = viewMetadata['filteredRows'][viewRow];
                         var path = data.getValue(row, pathColumnIndex);
 
                         var pathChunks = /(.*\/)([^\/\\]+)(\.[^.]+)/.exec(path);
@@ -363,6 +371,7 @@ if(quameterUiConfig!=null) {
             }
         }
 
+        viewMetadata['filteredRows'] = filteredRows;
         for (var i = 0; i < views.length; i++) {
             views[i].dataView.setRows(filteredRows);
             views[i].dygraph.updateOptions({file: views[i].dataView});

@@ -195,7 +195,7 @@ function drawChart() {
             ], "rows": [
                 {"c": [
                     {"v": "Date(2014, 2, 1, 3, 30, 53, 0)"},
-                    {"v": "/mnt/atlas/ResearchandDevelopment/QE_Method Development/Isolation_Width_20140130/PooledSAA2_QE_20140131_0ptimized_Isolation1mz_Inj1.raw"},
+                    {"v": "/mnt/atlas/ResearchandDevelopment/QE_Method Development/Isolation_Width_20140130/PooledSAA2_QE_20140131_0ptimized_Isolation1mz_Inj1_LAMBDA.raw"},
                     {"v": 48.001666666666665},
                     {"v": "Exactive Series slot #1"},
                     {"v": "AL-Lambda"},
@@ -245,7 +245,7 @@ function drawChart() {
                 ]},
                 {"c": [
                     {"v": "Date(2014, 2, 3, 15, 53, 33, 0)"},
-                    {"v": "/mnt/atlas/ResearchandDevelopment/QE_Method Development/Isolation_Width_20140130/PooledSAA2_QE_20140131_0ptimized_Isolation2mz_Inj2.raw"},
+                    {"v": "/mnt/atlas/ResearchandDevelopment/QE_Method Development/Isolation_Width_20140130/PooledSAA2_QE_20140131_0ptimized_Isolation2mz_Inj2_KAPPA.raw"},
                     {"v": 47.003166666666665},
                     {"v": "Q Exactive Plus 3093"},
                     {"v": "AL-Kappa"},
@@ -295,7 +295,7 @@ function drawChart() {
                 ]},
                 {"c": [
                     {"v": "Date(2014, 2, 3, 20, 38, 43, 0)"},
-                    {"v": "/mnt/atlas/ResearchandDevelopment/QE_Method Development/Isolation_Width_20140130/PooledSAA2_QE_20140131_0ptimized_Isolation4mz_Inj4.raw"},
+                    {"v": "/mnt/atlas/ResearchandDevelopment/QE_Method Development/Isolation_Width_20140130/PooledSAA2_QE_20140131_0ptimized_Isolation4mz_Inj4_ATTR.raw"},
                     {"v": 46.99883333333333},
                     {"v": "Q Exactive Plus 3093"},
                     {"v": "ATTR"},
@@ -345,7 +345,7 @@ function drawChart() {
                 ]},
                 {"c": [
                     {"v": "Date(2014, 2, 3, 13, 30, 59, 0)"},
-                    {"v": "/mnt/atlas/ResearchandDevelopment/QE_Method Development/Isolation_Width_20140130/PooledSAA2_QE_20140131_0ptimized_Isolation1mz_Inj1_140203133059.raw"},
+                    {"v": "/mnt/atlas/ResearchandDevelopment/QE_Method Development/Isolation_Width_20140130/PooledSAA2_QE_20140131_0ptimized_Isolation1mz_Inj1_140203133059_ATTR.raw"},
                     {"v": 48.00016666666667},
                     {"v": "Q Exactive Plus 3093"},
                     {"v": "ATTR"},
@@ -395,7 +395,7 @@ function drawChart() {
                 ]},
                 {"c": [
                     {"v": "Date(2014, 2, 3, 18, 16, 6, 0)"},
-                    {"v": "/mnt/atlas/ResearchandDevelopment/QE_Method Development/Isolation_Width_20140130/PooledSAA2_QE_20140131_0ptimized_Isolation3mz_Inj3.raw"},
+                    {"v": "/mnt/atlas/ResearchandDevelopment/QE_Method Development/Isolation_Width_20140130/PooledSAA2_QE_20140131_0ptimized_Isolation3mz_Inj3_ATTR.raw"},
                     {"v": 46.99883333333333},
                     {"v": "Q Exactive Plus 3093"},
                     {"v": "ATTR"},
@@ -445,6 +445,13 @@ function drawChart() {
                 ]}
             ]}
             , 0.6);
+
+    var viewMetadata = {};
+    var allRows = Array(data.getNumberOfRows());
+    for (var i = 0; i < data.getNumberOfRows(); i++) {
+        allRows[i] = i;
+    }
+    viewMetadata.filteredRows = allRows;
 
     var views = [
         { "view": "tails",
@@ -577,7 +584,8 @@ function drawChart() {
                         strokeBorderWidth: 1,
                         highlightCircleSize: 4
                     },
-                    highlightCallback: function (event, x, points, row, seriesName) {
+                    highlightCallback: function (event, x, points, viewRow, seriesName) {
+                        var row = viewMetadata['filteredRows'][viewRow];
                         var path = data.getValue(row, pathColumnIndex);
 
                         var pathChunks = /(.*\/)([^\/\\]+)(\.[^.]+)/.exec(path);
@@ -638,6 +646,7 @@ function drawChart() {
             }
         }
 
+        viewMetadata['filteredRows'] = filteredRows;
         for (var i = 0; i < views.length; i++) {
             views[i].dataView.setRows(filteredRows);
             views[i].dygraph.updateOptions({file: views[i].dataView});
