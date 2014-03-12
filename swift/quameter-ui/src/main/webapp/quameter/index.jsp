@@ -69,6 +69,9 @@
         min-height: 25px;
         font-family: Monaco, Menlo, Consolas, "Courier New", monospace;
         font-size: 13px;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        overflow: hidden;
     }
 
     #selected-path span {
