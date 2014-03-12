@@ -1,9 +1,3 @@
-<%@ page import="edu.mayo.mprc.MprcException" %>
-<%@ page import="edu.mayo.mprc.config.ResourceConfig" %>
-<%@ page import="edu.mayo.mprc.quameterdb.QuameterUi" %>
-<%@ page import="edu.mayo.mprc.swift.MainFactoryContext" %>
-<%@ page import="edu.mayo.mprc.swift.SwiftWebContext" %>
-<%@ page import="java.io.StringWriter" %>
 <!DOCTYPE html>
 <% final ResourceConfig quameterUiConfig = MainFactoryContext.getSwiftEnvironment().getSingletonConfig(QuameterUi.Config.class); %>
 <html lang="en">
@@ -23,12 +17,18 @@
     }
 
     body {
-        margin-top: 90px;
+        margin-top: 60px;
     }
 
     .graph {
         width: 100%;
         height: 320px;
+        margin-bottom: 10px;
+    }
+
+    .simple-graph {
+        width: 100%;
+        height: 200px;
         margin-bottom: 10px;
     }
 
@@ -60,6 +60,10 @@
     .btn-toolbar {
         margin-top: 0;
         margin-bottom: 0;
+    }
+
+    .btn-group {
+        margin-right: 5px;
     }
 
     #selected-path {
@@ -134,6 +138,40 @@ function addButtons(div, data, columnId) {
         div.append('<button type="button" class="btn btn-primary" value="' + value + '">' + value + ' (' + names[value] + ')<' + '/button>');
     });
 }
+
+function prePostCategory(path) {
+    if (/_Pre[^.]+/.test(path)) {
+        return "Pre";
+    } else if (/_Post[^.]+/.test(path)) {
+        return "Post";
+    } else {
+        return "Sample";
+    }
+}
+
+// Same as above for the paths
+function addPrePostButtons(div, data, columnId) {
+    var column = columnIndex(columnId, data);
+
+    var names = {};
+    for (var row = 0; row < data.getNumberOfRows(); row++) {
+        var value = data.getValue(row, column);
+        var category = prePostCategory(value);
+        if (names[category]) {
+            names[category]++;
+        } else {
+            names[category] = 1;
+        }
+    }
+    var keys = $.map(names,function (element, index) {
+        return index
+    }).sort();
+
+    $.each(keys, function (index, value) {
+        div.append('<button type="button" class="btn btn-primary" value="' + value + '">' + value + ' (' + names[value] + ')<' + '/button>');
+    });
+}
+
 
 // Tokenize by underscore, wrap tokens in <span>
 function spanAllUnderscoreTokens(s) {
@@ -250,6 +288,41 @@ if(quameterUiConfig!=null) {
         },
         { "view": "semiToTryptic",
             "columns": ["p_3"]
+        },
+
+        // Simplified views
+        { "view": "simpleChroma1",
+            "columns": ["c_3a"]
+        },
+        { "view": "simpleChroma2",
+            "columns": ["c_3b"]
+        },
+        { "view": "simpleChroma3",
+            "columns": ["c_2b"]
+        },
+        { "view": "simpleIon1",
+            "columns": ["is_2"]
+        },
+        { "view": "simpleMs1",
+            "columns": ["ms1_2a"]
+        },
+        { "view": "simpleMs2",
+            "columns": ["ms1_2b"]
+        },
+        { "view": "simpleMsMs1",
+            "columns": ["ms2_3"]
+        },
+        { "view": "simpleMsMs2",
+            "columns": ["ms2_2"]
+        },
+        { "view": "simpleIds1",
+            "columns": ["p_3"]
+        },
+        { "view": "simpleIds2",
+            "columns": ["p_1"]
+        },
+        { "view": "simpleIds3",
+            "columns": ["ms1_5c"]
         }
     ];
 
@@ -270,10 +343,15 @@ if(quameterUiConfig!=null) {
     var instrumentDiv = $('#instrument-buttons');
     addButtons(instrumentDiv, data, 'instrument');
 
+    var prePostDiv = $('#prepost-buttons');
+    addPrePostButtons(prePostDiv, data, 'path');
+
     var categoryButtons = categoryDiv.find('.btn');
     var categoryColumnIndex = col('category');
     var instrumentButtons = instrumentDiv.find('.btn');
     var instrumentColumnIndex = col('instrument');
+    var prePostButtons = prePostDiv.find('.btn');
+    var prePostColumnIndex = col('path');
 
     for (var i = 0; i < views.length; i++) {
         var v = views[i];
@@ -338,7 +416,7 @@ if(quameterUiConfig!=null) {
     }
 
     $('.btn').button();
-    $.merge(categoryButtons, instrumentButtons).click(function (event) {
+    $.merge(categoryButtons, $.merge(instrumentButtons, prePostButtons)).click(function (event) {
         var current = $(this);
 
         if (!event.shiftKey) {
@@ -362,11 +440,21 @@ if(quameterUiConfig!=null) {
             }
         });
 
+        var selectedPrePost = [];
+        prePostButtons.each(function () {
+            if ($(this).hasClass('btn-primary')) {
+                selectedPrePost.push($(this).attr("value"));
+            }
+        });
+
         var filteredRows = [];
         for (var row = 0; row < data.getNumberOfRows(); row++) {
             var category = data.getValue(row, categoryColumnIndex);
             var instrument = data.getValue(row, instrumentColumnIndex);
-            if (0 <= $.inArray(category, selectedCategory) && 0 <= $.inArray(instrument, selectedInstrument)) {
+            var prePost = prePostCategory(data.getValue(row, prePostColumnIndex));
+            if (0 <= $.inArray(category, selectedCategory)
+                    && 0 <= $.inArray(instrument, selectedInstrument)
+                    && 0 <= $.inArray(prePost, selectedPrePost)) {
                 filteredRows.push(row);
             }
         }
@@ -376,8 +464,22 @@ if(quameterUiConfig!=null) {
             views[i].dataView.setRows(filteredRows);
             views[i].dygraph.updateOptions({file: views[i].dataView});
         }
-
     });
+
+    $("#compact-button").click(function (event) {
+        var current = $(this);
+        if (current.hasClass("btn-info")) {
+            current.removeClass("btn-info");
+            $('#detailedGraphs').css("display", "block");
+            $('#simpleGraphs').css("display", "none");
+        } else {
+            current.addClass("btn-info");
+            $('#detailedGraphs').css("display", "none");
+            $('#simpleGraphs').css("display", "block");
+        }
+    });
+
+    $('#detailedGraphs').css("display", "none");
 }
 </script>
 
@@ -388,15 +490,25 @@ if(quameterUiConfig!=null) {
     <div class="navbar-inner">
         <a href="#" class="brand">QuaMeter Results</a>
 
-        <div class="btn-toolbar pull-left span5">
+        <div class="btn-toolbar pull-left">
             <div class="btn-group" id="category-buttons">
             </div>
         </div>
 
-        <div class="btn-toolbar pull-left span5 ">
+        <div class="btn-toolbar pull-left">
             <div class="btn-group" id="instrument-buttons">
             </div>
+        </div>
 
+        <div class="btn-toolbar pull-left">
+            <div class="btn-group" id="prepost-buttons">
+            </div>
+        </div>
+
+        <div class="btn-toolbar pull-left">
+            <div class="btn-group" id="view-buttons">
+                <div class="btn btn-info" id="compact-button">Simple</div>
+            </div>
         </div>
 
         <div class="row-fluid">
@@ -417,6 +529,8 @@ if(quameterUiConfig!=null) {
 
 <% } else {
 %>
+
+<div id="detailedGraphs">
 
 <h3>Chromatography</h3>
 
@@ -810,6 +924,78 @@ if(quameterUiConfig!=null) {
                 <dd>Ratio of semitryptic/tryptic peptides
                 </dd>
             </dl>
+        </div>
+    </div>
+</div>
+</div>
+<div id="simpleGraphs">
+    <h3>Chromatography</h3>
+
+    <div class="row-fluid">
+        <div class="span12"><b>C-3A</b> Median identified peak width
+            <div id="simpleChroma1" class="simple-graph"></div>
+        </div>
+    </div>
+    <div class="row-fluid">
+        <div class="span12"><b>C-3B</b> Interquantile range for peak widths
+            <div id="simpleChroma2" class="simple-graph"></div>
+        </div>
+    </div>
+    <div class="row-fluid">
+        <div class="span12"><b>C-2B</b> Rate of peptide identification during the C-2A time range
+            <div id="simpleChroma3" class="simple-graph"></div>
+        </div>
+    </div>
+
+    <h3>Ion Source</h3>
+
+    <div class="row-fluid">
+        <div class="span12"><b>IS-2</b> Median precursor of identified peptide ions
+            <div id="simpleIon1" class="simple-graph"></div>
+        </div>
+    </div>
+
+    <h3>MS1</h3>
+
+    <div class="row-fluid">
+        <div class="span12"><b>MS1-2A</b> Ratio of maximum to median signal in MS1 spectra
+            <div id="simpleMs1" class="simple-graph"></div>
+        </div>
+    </div>
+    <div class="row-fluid">
+        <div class="span12"><b>MS1-2B</b> Median MS1 Total Ion Current
+            <div id="simpleMs2" class="simple-graph"></div>
+        </div>
+    </div>
+
+    <h3>MS2</h3>
+
+    <div class="row-fluid">
+        <div class="span12"><b>MS2-3</b> Median number of MS2 peaks
+            <div id="simpleMsMs1" class="simple-graph"></div>
+        </div>
+    </div>
+    <div class="row-fluid">
+        <div class="span12"><b>MS2-2</b> Ratio of maximum to median signal in MS2 spectra
+            <div id="simpleMsMs2" class="simple-graph"></div>
+        </div>
+    </div>
+
+    <h3>IDs</h3>
+
+    <div class="row-fluid">
+        <div class="span12"><b>P-3</b> Ratio of semitryptic/tryptic peptides
+            <div id="simpleIds1" class="simple-graph"></div>
+        </div>
+    </div>
+    <div class="row-fluid">
+        <div class="span12"><b>P-1</b> Median peptide ID score
+            <div id="simpleIds2" class="simple-graph"></div>
+        </div>
+    </div>
+    <div class="row-fluid">
+        <div class="span12"><b>MS1-5C</b> Median precursor mass error in PPM
+            <div id="simpleIds3" class="simple-graph"></div>
         </div>
     </div>
 </div>
