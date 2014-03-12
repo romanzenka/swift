@@ -146,6 +146,9 @@ public final class SwiftApp implements EntryPoint, HidesPageContentsWhileLoading
 			@Override
 			public void onSuccess(final InitialPageData result) {
 				previousSearchRunId = result.loadedSearch() == null ? -1 : result.loadedSearch().getSearchId();
+				if (previousSearchRunId != -1) {
+					userEditedTitle = true;
+				}
 				initUiConfiguration(result.getUiConfiguration());
 				initSearchMetadata(result.loadedSearch() == null ? new HashMap<String, String>() : result.loadedSearch().getDefinition().getMetadata());
 				initParamsEditor(result);
