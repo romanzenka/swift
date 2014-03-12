@@ -536,7 +536,18 @@ public final class SwiftApp implements EntryPoint, HidesPageContentsWhileLoading
 					}
 				}
 			}
-			longestPrefix = longestPrefix.replaceAll("[-_.]+$", "");
+			// The users like to name files with underscores separating different fields.
+			// If we detect more than 1 underscore, we will try to remove everything beyond the last underscore
+			// That takes care of test_S1, test_S2, test_S3 or test_Inj1, test_Inj2 type of repeats, resulting
+			// with just "test".
+
+			// If there is just one underscore, we remove it if it is the last one.
+			int numUnderscores = longestPrefix.length() - longestPrefix.replaceAll("_", "").length();
+			if (numUnderscores <= 1) {
+				longestPrefix = longestPrefix.replaceAll("_$", "");
+			} else {
+				longestPrefix = longestPrefix.replaceAll("_[^_]*$", "");
+			}
 			setTitleText(longestPrefix);
 		}
 		updateOutputLocation();
