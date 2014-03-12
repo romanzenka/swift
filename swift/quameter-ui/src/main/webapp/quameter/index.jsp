@@ -372,22 +372,22 @@ if(quameterUiConfig!=null) {
 <body>
 <div class="container-fluid">
 <div class="navbar navbar-fixed-top navbar-inverse">
-<div class="navbar-inner">
-    <a href="#" class="brand">QuaMeter Results</a>
+    <div class="navbar-inner">
+        <a href="#" class="brand">QuaMeter Results</a>
 
-    <div class="btn-toolbar pull-left span5">
-        <div class="btn-group" id="category-buttons">
-        </div>
-    </div>
-
-    <div class="btn-toolbar pull-left span5 ">
-        <div class="btn-group" id="instrument-buttons">
+        <div class="btn-toolbar pull-left span5">
+            <div class="btn-group" id="category-buttons">
+            </div>
         </div>
 
-    </div>
+        <div class="btn-toolbar pull-left span5 ">
+            <div class="btn-group" id="instrument-buttons">
+            </div>
+        </div>
 
-    <div class="row-fluid">
-        <div id="selected-path" class="span12"></div>
+        <div class="row-fluid">
+            <div id="selected-path" class="span12"></div>
+        </div>
     </div>
 </div>
 
