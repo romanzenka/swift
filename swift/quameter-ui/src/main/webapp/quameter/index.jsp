@@ -120,14 +120,18 @@ function addButtons(div, data, columnId) {
     var names = {};
     for (var row = 0; row < data.getNumberOfRows(); row++) {
         var value = data.getValue(row, column);
-        names[value] = 1;
+        if (names[value]) {
+            names[value]++;
+        } else {
+            names[value] = 1;
+        }
     }
     var keys = $.map(names,function (element, index) {
         return index
     }).sort();
 
     $.each(keys, function (index, value) {
-        div.append('<button type="button" class="btn btn-primary" value="' + value + '">' + value + '<' + '/button>');
+        div.append('<button type="button" class="btn btn-primary" value="' + value + '">' + value + ' (' + names[value] + ')<' + '/button>');
     });
 }
 
