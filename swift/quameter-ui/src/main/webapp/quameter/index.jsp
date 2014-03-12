@@ -54,7 +54,29 @@
     }
 
     button.highlight {
-        color: #ff0;
+        color: #bff;
+    }
+
+    .btn-toolbar {
+        margin-top: 0;
+        margin-bottom: 0;
+    }
+
+    #selected-path {
+        margin: 0 5px 0 5px;
+        color: #888;
+        height: 25px;
+        min-height: 25px;
+        font-family: Monaco, Menlo, Consolas, "Courier New", monospace;
+        font-size: 13px;
+    }
+
+    #selected-path span {
+        color: #bff;
+    }
+
+    .navbar a.brand {
+        margin-left: -15px;
     }
 
 </style>
@@ -104,6 +126,13 @@ function addButtons(div, data, columnId) {
     $.each(keys, function (index, value) {
         div.append('<button type="button" class="btn btn-primary" value="' + value + '">' + value + '<' + '/button>');
     });
+}
+
+// Tokenize by underscore, wrap tokens in <span>
+function spanAllUnderscoreTokens(s) {
+    return s.split("_").map(function (item) {
+        return '<span>' + item + '</span>'
+    }).join('_');
 }
 
 // Callback that creates and populates a data table,
@@ -267,7 +296,12 @@ if(quameterUiConfig!=null) {
                         highlightCircleSize: 4
                     },
                     highlightCallback: function (event, x, points, row, seriesName) {
-                        selectedPath.val(data.getValue(row, pathColumnIndex));
+                        var path = data.getValue(row, pathColumnIndex);
+
+                        var pathChunks = /(.*\/)([^\/\\]+)(\.[^.]+)/.exec(path);
+                        var pathHtml = pathChunks[1] + spanAllUnderscoreTokens(pathChunks[2]) + pathChunks[3];
+
+                        selectedPath.html(pathHtml);
                         instrumentButtons.removeClass("highlight");
                         categoryButtons.removeClass("highlight");
 
@@ -278,7 +312,7 @@ if(quameterUiConfig!=null) {
                         categoryButtons.filter("[value='" + category + "']").addClass("highlight");
                     },
                     unhighlightCallback: function (event) {
-                        selectedPath.val(null);
+                        selectedPath.text("");
                         instrumentButtons.removeClass("highlight");
                         categoryButtons.removeClass("highlight");
                     }
@@ -335,25 +369,22 @@ if(quameterUiConfig!=null) {
 <body>
 <div class="container-fluid">
 <div class="navbar navbar-fixed-top navbar-inverse">
-    <div class="navbar-inner">
-        <a href="#" class="brand">QuaMeter Results</a>
+<div class="navbar-inner">
+    <a href="#" class="brand">QuaMeter Results</a>
 
-        <div class="btn-toolbar pull-left span5">
-            <div class="btn-group" id="category-buttons">
-            </div>
+    <div class="btn-toolbar pull-left span5">
+        <div class="btn-group" id="category-buttons">
+        </div>
+    </div>
+
+    <div class="btn-toolbar pull-left span5 ">
+        <div class="btn-group" id="instrument-buttons">
         </div>
 
-        <div class="btn-toolbar pull-left span5 ">
-            <div class="btn-group" id="instrument-buttons">
-            </div>
+    </div>
 
-        </div>
-
-        <br clear="left"/>
-
-        <form class="navbar-form row-fluid" id="selected-point">
-            <input type="text" id="selected-path" class="span12" placeholder="File path"/>
-        </form>
+    <div class="row-fluid">
+        <div id="selected-path" class="span12"></div>
     </div>
 </div>
 

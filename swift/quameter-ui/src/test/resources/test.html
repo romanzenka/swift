@@ -36,7 +36,7 @@
     }
 
     .dygraph-legend {
-        background-color: rgba(255, 255, 255, 0.4) !important;
+        background-color: rgba(255, 255, 255, 0.7) !important;
     }
 
     .dygraph-legend > span.highlight {
@@ -48,7 +48,29 @@
     }
 
     button.highlight {
-        color: #ff0;
+        color: #bff;
+    }
+
+    .btn-toolbar {
+        margin-top: 0;
+        margin-bottom: 0;
+    }
+
+    #selected-path {
+        margin: 0 5px 0 5px;
+        color: #888;
+        height: 25px;
+        min-height: 25px;
+        font-family: Monaco, Menlo, Consolas, "Courier New", monospace;
+        font-size: 13px;
+    }
+
+    #selected-path span {
+        color: #bff;
+    }
+
+    .navbar a.brand {
+        margin-left: -15px;
     }
 
 </style>
@@ -99,6 +121,13 @@ function addButtons(div, data, columnId) {
     $.each(keys, function (index, value) {
         div.append('<button type="button" class="btn btn-primary" value="' + value + '">' + value + '<' + '/button>');
     });
+}
+
+// Tokenize by underscore, wrap tokens in <span>
+function spanAllUnderscoreTokens(s) {
+    return s.split("_").map(function (item) {
+        return '<span>' + item + '</span>'
+    }).join('_');
 }
 
 // Callback that creates and populates a data table,
@@ -539,10 +568,15 @@ function drawChart() {
                     highlightSeriesOpts: {
                         strokeWidth: 2,
                         strokeBorderWidth: 1,
-                        highlightCircleSize: 4,
+                        highlightCircleSize: 4
                     },
                     highlightCallback: function (event, x, points, row, seriesName) {
-                        selectedPath.val(data.getValue(row, pathColumnIndex));
+                        var path = data.getValue(row, pathColumnIndex);
+
+                        var pathChunks = /(.*\/)([^\/\\]+)(\.[^.]+)/.exec(path);
+                        var pathHtml = pathChunks[1] + spanAllUnderscoreTokens(pathChunks[2]) + pathChunks[3];
+
+                        selectedPath.html(pathHtml);
                         instrumentButtons.removeClass("highlight");
                         categoryButtons.removeClass("highlight");
 
@@ -553,7 +587,7 @@ function drawChart() {
                         categoryButtons.filter("[value='" + category + "']").addClass("highlight");
                     },
                     unhighlightCallback: function (event) {
-                        selectedPath.val(null);
+                        selectedPath.text("");
                         instrumentButtons.removeClass("highlight");
                         categoryButtons.removeClass("highlight");
                     }
@@ -624,11 +658,9 @@ function drawChart() {
 
         </div>
 
-        <br clear="left"/>
-
-        <form class="navbar-form row-fluid" id="selected-point">
-            <input type="text" id="selected-path" class="span12" placeholder="File path"/>
-        </form>
+        <div class="row-fluid">
+            <div id="selected-path" class="span12"></div>
+        </div>
     </div>
 </div>
 
@@ -721,10 +753,10 @@ function drawChart() {
         <div class="legend">
             <dl>
                 <dt>DS-1A</dt>
-                <dd>Ratio of singly to doubly identified peptide ions. If no doubly identified, ratio reported as 1
+                <dd>Ratio of singly to doubly identified peptide ions.
                 </dd>
                 <dt>DS-1B</dt>
-                <dd>Ratio of doubly to triply identified peptide ions. If no triply identified, ratio reported as 1
+                <dd>Ratio of doubly to triply identified peptide ions.
                 </dd>
             </dl>
         </div>
