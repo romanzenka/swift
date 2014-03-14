@@ -186,9 +186,20 @@ function spanAllUnderscoreTokens(s) {
     }).join('_');
 }
 
+// When true, redraws of graphs will not trigger more redraws
+var blockRedraw = false;
+
 // Callback that creates and populates a data table,
 // instantiates the pie chart, passes in the data and
 // draws it.
+function updateAllViews(views, filteredRows) {
+    blockRedraw = true;
+    for (var i = 0; i < views.length; i++) {
+        views[i].dataView.setRows(filteredRows);
+        views[i].dygraph.updateOptions({file: views[i].dataView});
+    }
+    blockRedraw = false;
+}
 function drawChart() {
     // Create the data table.
     var data = new google.visualization.DataTable(
@@ -332,7 +343,6 @@ if(quameterUiConfig!=null) {
         }
     ];
 
-    var blockRedraw = false;
     gs = [];
 
     function col(id) {
@@ -422,7 +432,8 @@ if(quameterUiConfig!=null) {
     }
 
     $('.btn').button();
-    $.merge(categoryButtons, $.merge(instrumentButtons, prePostButtons)).click(function (event) {
+    var allButtons = $.merge(categoryButtons, $.merge(instrumentButtons, prePostButtons));
+    allButtons.click(function (event) {
         var current = $(this);
 
         if (!event.shiftKey) {
@@ -453,23 +464,25 @@ if(quameterUiConfig!=null) {
             }
         });
 
-        var filteredRows = [];
-        for (var row = 0; row < data.getNumberOfRows(); row++) {
-            var category = data.getValue(row, categoryColumnIndex);
-            var instrument = data.getValue(row, instrumentColumnIndex);
-            var prePost = prePostCategory(data.getValue(row, prePostColumnIndex));
-            if (0 <= $.inArray(category, selectedCategory)
-                    && 0 <= $.inArray(instrument, selectedInstrument)
-                    && 0 <= $.inArray(prePost, selectedPrePost)) {
-                filteredRows.push(row);
+        function filterRows() {
+            var filteredRows = [];
+            for (var row = 0; row < data.getNumberOfRows(); row++) {
+                var category = data.getValue(row, categoryColumnIndex);
+                var instrument = data.getValue(row, instrumentColumnIndex);
+                var prePost = prePostCategory(data.getValue(row, prePostColumnIndex));
+                if (0 <= $.inArray(category, selectedCategory)
+                        && 0 <= $.inArray(instrument, selectedInstrument)
+                        && 0 <= $.inArray(prePost, selectedPrePost)) {
+                    filteredRows.push(row);
+                }
             }
+            return filteredRows;
         }
 
+        var filteredRows = filterRows();
+
         viewMetadata['filteredRows'] = filteredRows;
-        for (var i = 0; i < views.length; i++) {
-            views[i].dataView.setRows(filteredRows);
-            views[i].dygraph.updateOptions({file: views[i].dataView});
-        }
+        updateAllViews(views, filteredRows);
     });
 
     $("#compact-button").click(function (event) {
