@@ -369,6 +369,8 @@ if(quameterUiConfig!=null) {
     var prePostButtons = prePostDiv.find('.btn');
     var prePostColumnIndex = col('path');
 
+    blockRedraw = true;
+
     for (var i = 0; i < views.length; i++) {
         var v = views[i];
         var view = new google.visualization.DataView(data);
@@ -430,6 +432,8 @@ if(quameterUiConfig!=null) {
         gs.push(views[i].dygraph);
 
     }
+
+    blockRedraw = false;
 
     $('.btn').button();
     var allButtons = $.merge(categoryButtons, $.merge(instrumentButtons, prePostButtons));
