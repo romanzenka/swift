@@ -27,7 +27,7 @@ public final class SampleReportData {
 	private static final List<String> FIXED_HEADER = Arrays.asList(
 			"File", "Last Modified",
 			"Ms1 Spectra", "Ms2 Spectra", "Ms3+ Spectra", "Instrument Name",
-			"Instrument Serial #", "Start Time", "Run Time (seconds)", "Comment", "Error Log");
+			"Instrument Serial #", "Start Time", "Run Time (seconds)", "Comment");
 	public static final int DYNAMIC_HEADER_OFFSET = FIXED_HEADER.size();
 
 	/**
@@ -79,7 +79,6 @@ public final class SampleReportData {
 	 * Prints a given sample to provided writer.
 	 */
 	static final class SamplePrinter implements QueryCallback {
-		public static final int MAX_ERROR_LOG_LENGTH = 1024;
 		private final String[] headers;
 		private final CsvWriter writer;
 		private final String[] row;
@@ -109,10 +108,6 @@ public final class SampleReportData {
 				row[7] = DATE_FORMAT.print(sample.getStartTime());
 				row[8] = String.valueOf(sample.getRunTimeInSeconds());
 				row[9] = sample.getComment();
-				row[10] = sample.getErrorLog();
-				if (row[10].length() > MAX_ERROR_LOG_LENGTH) {
-					row[10] = row[10].substring(0, MAX_ERROR_LOG_LENGTH - 3) + "...";
-				}
 
 				for (int i = DYNAMIC_HEADER_OFFSET; i < row.length; i++) {
 					final String header = headers[i];

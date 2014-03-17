@@ -67,28 +67,9 @@ public class TandemMassSpectrometrySample extends PersistableBase {
 	private String comment;
 
 	/**
-	 * A long, instrument specific text containing all the information about how was the instrument tuned for this
-	 * sample - what kind of voltages were set where, what calibration parameters were used, etc.
-	 */
-	private String tuneMethod;
-
-	/**
-	 * Information about the method that was used to collect the sample. How many MS2 scans were utilized, with what settings,
-	 * what was the isolation window, etc. While {@link #tuneMethod} is about how the instrument was tuned,
-	 * this is about what the instrument was told to do on a particular sample.
-	 */
-	private String instrumentMethod;
-
-	/**
 	 * Information about the sample being processed. Who entered it, what vial it was in, what was the volume, etc.
 	 */
 	private String sampleInformation;
-
-	/**
-	 * Were there any errors in processing? To save us space, if the error log contains only "No errors" message,
-	 * null should be stored here.
-	 */
-	private String errorLog;
 
 	/**
 	 * Empty constructor for Hibernate.
@@ -96,7 +77,7 @@ public class TandemMassSpectrometrySample extends PersistableBase {
 	public TandemMassSpectrometrySample() {
 	}
 
-	public TandemMassSpectrometrySample(final File file, final DateTime lastModified, final int ms1Spectra, final int ms2Spectra, final int ms3PlusSpectra, final String instrumentName, final String instrumentSerialNumber, final DateTime startTime, final double runTimeInSeconds, final String comment, final String tuneMethod, final String instrumentMethod, final String sampleInformation, final String errorLog) {
+	public TandemMassSpectrometrySample(final File file, final DateTime lastModified, final int ms1Spectra, final int ms2Spectra, final int ms3PlusSpectra, final String instrumentName, final String instrumentSerialNumber, final DateTime startTime, final double runTimeInSeconds, final String comment, final String sampleInformation) {
 		this.file = file;
 		this.lastModified = lastModified;
 		this.ms1Spectra = ms1Spectra;
@@ -107,10 +88,7 @@ public class TandemMassSpectrometrySample extends PersistableBase {
 		this.startTime = startTime;
 		this.runTimeInSeconds = runTimeInSeconds;
 		this.comment = comment;
-		this.tuneMethod = tuneMethod;
-		this.instrumentMethod = instrumentMethod;
 		this.sampleInformation = sampleInformation;
-		this.errorLog = errorLog;
 	}
 
 	public File getFile() {
@@ -193,36 +171,12 @@ public class TandemMassSpectrometrySample extends PersistableBase {
 		this.comment = comment;
 	}
 
-	public String getTuneMethod() {
-		return tuneMethod;
-	}
-
-	public void setTuneMethod(final String tuneMethod) {
-		this.tuneMethod = tuneMethod;
-	}
-
-	public String getInstrumentMethod() {
-		return instrumentMethod;
-	}
-
-	public void setInstrumentMethod(final String instrumentMethod) {
-		this.instrumentMethod = instrumentMethod;
-	}
-
 	public String getSampleInformation() {
 		return sampleInformation;
 	}
 
 	public void setSampleInformation(final String sampleInformation) {
 		this.sampleInformation = sampleInformation;
-	}
-
-	public String getErrorLog() {
-		return errorLog;
-	}
-
-	public void setErrorLog(final String errorLog) {
-		this.errorLog = errorLog;
 	}
 
 	@Override
