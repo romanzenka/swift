@@ -76,9 +76,9 @@
         </dependency>
 
         <dependency>
-            <groupId>com.microsoft</groupId>
-            <artifactId>sqljdbc4</artifactId>
-            <version>3.0</version>
+            <groupId>net.sourceforge.jtds</groupId>
+            <artifactId>jtds</artifactId>
+            <version>1.2.6</version>
         </dependency>
 
         <dependency>
