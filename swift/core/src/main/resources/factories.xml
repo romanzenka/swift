@@ -73,6 +73,7 @@
                 <entry key="hibernate.c3p0.idle_connection_test_period" value="300" />
                 <entry key="hibernate.connection.provider_class"
                     value="org.hibernate.connection.C3P0ConnectionProvider" />
+                <entry key="hibernate.globally_quoted_identifiers" value="true" />
             </map>
         </constructor-arg>
     </bean>
