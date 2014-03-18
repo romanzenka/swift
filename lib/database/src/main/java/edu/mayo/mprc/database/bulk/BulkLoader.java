@@ -8,6 +8,7 @@ import org.hibernate.*;
 import java.text.MessageFormat;
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.regex.Pattern;
 
 /**
  * Load a large list of values into the database.
@@ -44,6 +45,10 @@ public abstract class BulkLoader<T extends PersistableBase> {
 		return getTableName() + "_id";
 	}
 
+	/**
+	 * Get equality string. The references to the tables are simplified to &lt;s>. and &lt;t>.
+	 * These will get replaced with the original table name (s) and the temp table name (t)
+	 */
 	public abstract String getEqualityString();
 
 	/**
@@ -121,9 +126,14 @@ public abstract class BulkLoader<T extends PersistableBase> {
 		final String table = getTableName();
 		final String tableId = getTableIdColumn();
 		final String tempTableName = getTempTableName();
-		final String equalityString = getEqualityString();
+		final String equalityString = getEqualityString()
+				.replaceAll(Pattern.quote("<t>"), tempTableName)
+				.replaceAll(Pattern.quote("<s>"), "s");
 
-		final SQLQuery sqlQuery = getSession().createSQLQuery("UPDATE " + tempTableName + " AS t SET t.new_id = (select s." + tableId + " from " + table + " as s where " + equalityString + " and t.job = :job LIMIT 1) where t.job = :job");
+		final SQLQuery sqlQuery = getSession().createSQLQuery(
+				MessageFormat.format(
+						"UPDATE {0} SET {0}.new_id = (select s.{1} from {2} as s where {3} and {0}.job = :job LIMIT 1) where {0}.job = :job",
+						tempTableName, tableId, table, equalityString));
 		sqlQuery.setParameter("job", bulkLoadJob.getId()).setReadOnly(true);
 		final int update1 = sqlQuery.executeUpdate();
 		return update1;

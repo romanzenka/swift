@@ -28,7 +28,7 @@ public final class SequenceBulkLoader extends BulkLoader<Sequence> {
 
 	@Override
 	public String getEqualityString() {
-		return "t.sequence = s.sequence";
+		return "<t>.sequence = <s>.sequence";
 	}
 
 	@Override

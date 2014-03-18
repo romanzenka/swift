@@ -27,7 +27,7 @@ public final class IdentifiedPeptideLoader extends BulkLoader<IdentifiedPeptide>
 
 	@Override
 	public String getEqualityString() {
-		return "s.peptide_sequence_id=t.peptide_sequence_id and s.localized_mod_list_id = t.localized_mod_list_id";
+		return "<s>.peptide_sequence_id=<t>.peptide_sequence_id and <s>.localized_mod_list_id = <t>.localized_mod_list_id";
 	}
 
 	@Override

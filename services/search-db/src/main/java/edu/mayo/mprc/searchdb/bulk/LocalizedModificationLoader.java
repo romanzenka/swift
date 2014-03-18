@@ -27,7 +27,7 @@ public final class LocalizedModificationLoader extends BulkLoader<LocalizedModif
 
 	@Override
 	public String getEqualityString() {
-		return "t.specificity_id = s.specificity_id and t.position = s.position and t.residue = s.residue";
+		return "<t>.specificity_id = <s>.specificity_id and <t>.position = <s>.position and <t>.residue = <s>.residue";
 	}
 
 	@Override

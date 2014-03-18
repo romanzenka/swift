@@ -37,16 +37,16 @@ public abstract class BulkHashedSetLoader<T extends PersistableHashedSetBase<? e
 	@Override
 	public String getEqualityString() {
 		return MessageFormat.format("" +
-				"t.hash = s.hash " +
+				"<t>.hash = <s>.hash " +
 				"and not exists (" +
 
 				"select * from {0} as tm " +
 				"left join {1} as sm " +
 				"on tm.value = sm.{2} " +
 				"   where " +
-				"tm.job = t.job " +
-				"and tm.data_order = t.data_order " +
-				"and s.{3} = sm.{4} " +
+				"tm.job = <t>.job " +
+				"and tm.data_order = <t>.data_order " +
+				"and <s>.{3} = sm.{4} " +
 				"and sm.{2} is null " +
 
 				"union all " +
@@ -55,9 +55,9 @@ public abstract class BulkHashedSetLoader<T extends PersistableHashedSetBase<? e
 				"left join {0} as tm " +
 				"on tm.value = sm.{2} " +
 				"   where " +
-				"tm.job = t.job " +
-				"and tm.data_order = t.data_order " +
-				"and s.{3} = sm.{4} " +
+				"tm.job = <t>.job " +
+				"and tm.data_order = <t>.data_order " +
+				"and <s>.{3} = sm.{4} " +
 				"and tm.value is null " +
 				")",
 				TEMP_MEMBERS,
