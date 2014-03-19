@@ -29,7 +29,8 @@
                 <span class="icon-bar"></span>
                 <span class="icon-bar"></span>
             </button>
-            <a class="brand" href="/"><%=SwiftWebContext.getWebUi().getTitle()%></a>
+            <a class="brand" href="/"><%=SwiftWebContext.getWebUi().getTitle()%>
+            </a>
 
             <div class="nav-collapse collapse">
                 <ul class="nav">
@@ -114,21 +115,38 @@
     </p>
 
     <p>
-        <a class="btn" href="/iphone">iPhone interface</a>
-    </p>
-
-    <p>
         <a class="btn" href="/monitor.jsp">Component Monitor</a>
     </p>
 
     <h3>About</h3>
 
     <table class="table">
-        <tr><th>User-set Title</th><td> <%=StringUtilities.escapeHtml(SwiftWebContext.getWebUi().getTitle())%></td></tr>
-        <tr><th>Build Version</th><td><%=StringUtilities.escapeHtml(ReleaseInfoCore.buildVersion())%></td></tr>
-        <tr><th>Build Revision</th><td><%= StringUtilities.escapeHtml(ReleaseInfoCore.buildRevision())%></td></tr>
-        <tr><th>Build Timestamp</th><td><%= StringUtilities.escapeHtml(ReleaseInfoCore.buildTimestamp())%></td></tr>
-        <tr><th>Build Link</th><td><a href="<%= StringUtilities.escapeHtml(ReleaseInfoCore.buildLink())%>"><%= StringUtilities.escapeHtml(ReleaseInfoCore.buildLink())%></a></td></tr>
+        <tr>
+            <th>User-set Title</th>
+            <td><%=StringUtilities.escapeHtml(SwiftWebContext.getWebUi().getTitle())%>
+            </td>
+        </tr>
+        <tr>
+            <th>Build Version</th>
+            <td><%=StringUtilities.escapeHtml(ReleaseInfoCore.buildVersion())%>
+            </td>
+        </tr>
+        <tr>
+            <th>Build Revision</th>
+            <td><%= StringUtilities.escapeHtml(ReleaseInfoCore.buildRevision())%>
+            </td>
+        </tr>
+        <tr>
+            <th>Build Timestamp</th>
+            <td><%= StringUtilities.escapeHtml(ReleaseInfoCore.buildTimestamp())%>
+            </td>
+        </tr>
+        <tr>
+            <th>Build Link</th>
+            <td>
+                <a href="<%= StringUtilities.escapeHtml(ReleaseInfoCore.buildLink())%>"><%= StringUtilities.escapeHtml(ReleaseInfoCore.buildLink())%>
+                </a></td>
+        </tr>
     </table>
 
 </div>
