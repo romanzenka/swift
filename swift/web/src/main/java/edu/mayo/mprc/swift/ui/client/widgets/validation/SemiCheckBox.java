@@ -28,7 +28,7 @@ public final class SemiCheckBox implements Validatable, IsWidget {
 
 	@Override
 	public ClientValue getValue() {
-		return null;  // TODO: Implement this method
+		return new ClientInteger(checkBox.getValue() ? 1 : 2);
 	}
 
 	@Override
