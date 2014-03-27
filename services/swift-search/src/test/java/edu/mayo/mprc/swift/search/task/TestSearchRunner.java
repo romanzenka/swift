@@ -346,7 +346,7 @@ public class TestSearchRunner {
 		Assert.assertEquals(runner.getWorkflowEngine().getNumTasks(), expectedNumTasks);
 	}
 
-	private SearchRunner getSearchRunner(Collection<SearchEngine> searchEngines, SwiftSearchDefinition definition) {
+	private SearchRunner getSearchRunner(final Collection<SearchEngine> searchEngines, final SwiftSearchDefinition definition) {
 		final ProgressReporter reporter = mock(ProgressReporter.class);
 		final ExecutorService service = new SimpleThreadPoolExecutor(1, "testSwiftSearcher", true);
 
@@ -404,7 +404,7 @@ public class TestSearchRunner {
 
 	private SearchEngineParameters searchEngineParameters1() {
 		return new SearchEngineParameters(curation1(), Protease.getInitial().get(0),
-				1, new ModSet(), new ModSet(), new Tolerance(10, MassUnit.Ppm),
+				2, 1, new ModSet(), new ModSet(), new Tolerance(10, MassUnit.Ppm),
 				new Tolerance(1, MassUnit.Da), Instrument.ORBITRAP,
 				new ExtractMsnSettings("-M100", ExtractMsnSettings.EXTRACT_MSN),
 				new ScaffoldSettings(0.95, 0.95, 2, 0, new StarredProteins("ALBU_HUMAN", ",", false), false, false, true, true, false, true)
@@ -495,7 +495,7 @@ public class TestSearchRunner {
 		return engine;
 	}
 
-	private boolean isAggregator(String code) {
+	private boolean isAggregator(final String code) {
 		return code.equals("SCAFFOLD") || code.equals("IDPQONVERT") || code.equals("QUAMETER");
 	}
 
@@ -578,6 +578,10 @@ public class TestSearchRunner {
 
 				@Override
 				public void setProtease(final MappingContext context, final Protease protease) {
+				}
+
+				@Override
+				public void setMinTerminiCleavages(final MappingContext context, final Integer minTerminiCleavages) {
 				}
 
 				@Override

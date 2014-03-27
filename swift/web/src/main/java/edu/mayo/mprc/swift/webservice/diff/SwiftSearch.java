@@ -27,6 +27,7 @@ public final class SwiftSearch {
 	private final String[] engines;
 	private final String curationName;
 	private final String enzymeName;
+	private final int minTerminiCleavages;
 	private final int missedCleavages;
 	private final String[] fixedModifications;
 	private final String[] variableModifications;
@@ -53,6 +54,7 @@ public final class SwiftSearch {
 		engines = enginesToString(searchDefinition.getInputFiles().iterator().next().getEnabledEngines().getEngineConfigs());
 		curationName = params.getDatabase().getShortName();
 		enzymeName = params.getProtease().getName();
+		minTerminiCleavages = params.getMinTerminiCleavages();
 		missedCleavages = params.getMissedCleavages();
 		fixedModifications = modsToString(params.getFixedModifications().getModifications());
 		variableModifications = modsToString(params.getVariableModifications().getModifications());

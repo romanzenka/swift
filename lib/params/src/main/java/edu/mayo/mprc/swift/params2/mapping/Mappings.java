@@ -105,6 +105,15 @@ public interface Mappings {
 	void setProtease(MappingContext context, Protease protease);
 
 	/**
+	 * Set the minimum number of protease cleavages at the peptide terminus.
+	 * 2 cleavages are common digest, 1 for semitryptic, 0 for no enzyme (any site can be cleaved)
+	 *
+	 * @param context             See {@link MappingContext}
+	 * @param minTerminiCleavages Minimum number of protease-caused termini cleavages
+	 */
+	void setMinTerminiCleavages(MappingContext context, Integer minTerminiCleavages);
+
+	/**
 	 * Set the maximum number of missed cleavages. A missed cleavage occurs when a protease fails
 	 * to cleave at a particular site. The number of this events increases the search space.
 	 *

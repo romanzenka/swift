@@ -56,10 +56,12 @@ public final class XTandemMappings implements Mappings {
 			FIXED_MODS,
 			ENZYME,
 			MISSED_CLEAVAGES));
+	public static final String CLEAVAGE_SEMI = "protein, cleavage semi";
 
 	private Map<String, String> nativeParams = new HashMap<String, String>();
 	private static final int ALLOW_NON_SPECIFIC_CLEAVAGES = 50;
 	private static final String DALTONS = "Daltons";
+	private Integer minTerminiCleavages;
 
 	public XTandemMappings() {
 	}
@@ -226,7 +228,7 @@ public final class XTandemMappings implements Mappings {
 		String rnminus1 = protease.getRnminus1();
 		String rn = protease.getRn();
 
-		if (rn.isEmpty() && rnminus1.isEmpty()) {
+		if (0 == minTerminiCleavages || (rn.isEmpty() && rnminus1.isEmpty())) {
 			rnminus1 = "X";
 			rn = "X";
 			// handle the case where we set to 50 in allow non-specific cleavages
@@ -253,6 +255,16 @@ public final class XTandemMappings implements Mappings {
 			cle += "[" + rn + "]";
 		}
 		setNativeParam(ENZYME, cle);
+	}
+
+	@Override
+	public void setMinTerminiCleavages(final MappingContext context, final Integer minTerminiCleavages) {
+		this.minTerminiCleavages = minTerminiCleavages;
+		if (minTerminiCleavages == 1) {
+			setNativeParam(CLEAVAGE_SEMI, "yes");
+		} else {
+			setNativeParam(CLEAVAGE_SEMI, "no");
+		}
 	}
 
 	@Override

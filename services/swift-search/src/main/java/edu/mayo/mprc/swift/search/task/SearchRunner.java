@@ -309,6 +309,9 @@ public final class SearchRunner implements Runnable, Lifecycle {
 
 	/**
 	 * Save parameter files to the disk.
+	 * <p/>
+	 * This used to be here because the search engines actually used the parameter files.
+	 * Now it is just a dump of files for the user.
 	 */
 	private void createParameterFiles() {
 		searchEngineParametersNames = nameSearchEngineParameters(searchDefinition.getInputFiles(), searchDefinition.getSearchParameters());

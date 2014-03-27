@@ -3,12 +3,13 @@ package edu.mayo.mprc.swift.params2;
 import edu.mayo.mprc.MprcException;
 
 /**
- * Enum of all supported parameter names that can be stored in {@link edu.mayo.mprc.swift.params2.SearchEngineParameters}.
+ * Enum of all supported parameter names that can be stored in {@link SearchEngineParameters}.
  * This is useful if we want to iterate over them, or refer to them by their name.
  */
 public enum ParamName {
 	PeptideTolerance("tolerance.peptide", "Peptide Parent Ion Mass Tolerance", "A candidate theoretical peptide must differ in mass from the experimental, parent mass by less than this tolerance."),
 	FragmentTolerance("tolerance.fragment", "Fragment Ion Mass Tolerance", "Fragment Ion Mass Tolerance"),
+	MinTerminiCleavages("sequence.min_termini_cleavages", "Minimum Termini Cleavages", "The minimum amount of termini cleaved by a protease"),
 	MissedCleavages("sequence.missed_cleavages", "Allowed Missed Cleavages", "The max number of missed cleavages to allow."),
 	Database("sequence.database", "Amino Acid Sequence Database", "Amino Acid Sequence Database"),
 	Enzyme("sequence.enzyme", "Endoprotease", "Endoprotease"),
@@ -44,7 +45,7 @@ public enum ParamName {
 	 * Get abstract parameter value by its name.
 	 *
 	 * @param params Set of abstract parameters.
-	 * @return Value of the parameter. Use one of the getters whenever you can, such as {@link edu.mayo.mprc.swift.params2.SearchEngineParameters#getProtease}. This method
+	 * @return Value of the parameter. Use one of the getters whenever you can, such as {@link SearchEngineParameters#getProtease}. This method
 	 *         is meant to be used mainly in loops which go over all parameters.
 	 */
 	public Object getParamValue(final SearchEngineParameters params) {
@@ -57,6 +58,8 @@ public enum ParamName {
 				return params.getFragmentTolerance();
 			case Instrument:
 				return params.getInstrument();
+			case MinTerminiCleavages:
+				return params.getMinTerminiCleavages();
 			case MissedCleavages:
 				return params.getMissedCleavages();
 			case PeptideTolerance:

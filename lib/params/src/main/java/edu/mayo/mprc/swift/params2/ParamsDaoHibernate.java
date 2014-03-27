@@ -298,6 +298,7 @@ public final class ParamsDaoHibernate extends DaoBase implements ParamsDao {
 		}
 		criteria.add(associationEq("protease", parameters.getProtease()))
 				.add(Restrictions.eq("missedCleavages", parameters.getMissedCleavages()))
+				.add(Restrictions.eq("minTerminiCleavages", parameters.getMinTerminiCleavages()))
 				.add(associationEq("fixedModifications", parameters.getFixedModifications()))
 				.add(associationEq("variableModifications", parameters.getVariableModifications()))
 				.add(Restrictions.eq("peptideTolerance", parameters.getPeptideTolerance()))
@@ -478,6 +479,7 @@ public final class ParamsDaoHibernate extends DaoBase implements ParamsDao {
 		final SearchEngineParameters params = new SearchEngineParameters(
 				curation,
 				updateProtease(Protease.getTrypsinAllowP(), change),
+				2,
 				0,
 				emptyModSet,
 				emptyModSet,

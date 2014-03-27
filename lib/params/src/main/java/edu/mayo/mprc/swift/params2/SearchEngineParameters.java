@@ -25,6 +25,20 @@ public class SearchEngineParameters extends PersistableBase {
 	private Protease protease;
 
 	/**
+	 * How many cleavages have to be due to the protease?
+	 * <p/>
+	 * <table>
+	 * <tr><th>2</th><td>a proper cleavage on both ends of the peptide (default)</td></tr>
+	 * <tr><th>1</th><td>semitryptic cleavage</td></tr>
+	 * <tr><th>0</th><td>non-specific cleavage (protease no longer matters)</td></tr>
+	 * </table>
+	 * <p/>
+	 * This is similar to numTrypticTerminii, however, the protease in question does not have
+	 * to be Trypsin.
+	 */
+	private int minTerminiCleavages;
+
+	/**
 	 * Maximum amount of missed cleavages to be considered when searching.
 	 */
 	private int missedCleavages;
@@ -69,9 +83,10 @@ public class SearchEngineParameters extends PersistableBase {
 	public SearchEngineParameters() {
 	}
 
-	public SearchEngineParameters(final Curation database, final Protease protease, final int missedCleavages, final ModSet fixed, final ModSet variable, final Tolerance peptideTolerance, final Tolerance fragmentTolerance, final Instrument instrument, final ExtractMsnSettings extractMsnSettings, final ScaffoldSettings scaffoldSettings) {
+	public SearchEngineParameters(final Curation database, final Protease protease, final Integer minTerminiCleavages, final int missedCleavages, final ModSet fixed, final ModSet variable, final Tolerance peptideTolerance, final Tolerance fragmentTolerance, final Instrument instrument, final ExtractMsnSettings extractMsnSettings, final ScaffoldSettings scaffoldSettings) {
 		this.database = database;
 		this.protease = protease;
+		this.minTerminiCleavages = minTerminiCleavages;
 		this.missedCleavages = missedCleavages;
 		fixedModifications = fixed;
 		variableModifications = variable;
@@ -114,6 +129,17 @@ public class SearchEngineParameters extends PersistableBase {
 		}
 
 		this.protease = protease;
+	}
+
+	public int getMinTerminiCleavages() {
+		return minTerminiCleavages;
+	}
+
+	public void setMinTerminiCleavages(final int minTerminiCleavages) {
+		if (checkImmutability(getMinTerminiCleavages(), minTerminiCleavages)) {
+			return;
+		}
+		this.minTerminiCleavages = minTerminiCleavages;
 	}
 
 	public int getMissedCleavages() {
@@ -213,6 +239,9 @@ public class SearchEngineParameters extends PersistableBase {
 			return getId().equals(other.getId());
 		}
 
+		if (!Objects.equal(getMinTerminiCleavages(), other.getMinTerminiCleavages())) {
+			return false;
+		}
 		if (!Objects.equal(getMissedCleavages(), other.getMissedCleavages())) {
 			return false;
 		}
@@ -251,6 +280,7 @@ public class SearchEngineParameters extends PersistableBase {
 	public int hashCode() {
 		int result = getDatabase().hashCode();
 		result = 31 * result + getProtease().hashCode();
+		result = 31 * result + getMinTerminiCleavages();
 		result = 31 * result + getMissedCleavages();
 		result = 31 * result + getFixedModifications().hashCode();
 		result = 31 * result + getVariableModifications().hashCode();
@@ -272,6 +302,7 @@ public class SearchEngineParameters extends PersistableBase {
 		return new SearchEngineParameters(
 				database1,
 				getProtease().copy(),
+				getMinTerminiCleavages(),
 				getMissedCleavages(),
 				getFixedModifications().copy(),
 				getVariableModifications().copy(),
@@ -289,6 +320,9 @@ public class SearchEngineParameters extends PersistableBase {
 				break;
 			case FragmentTolerance:
 				setFragmentTolerance((Tolerance) o);
+				break;
+			case MinTerminiCleavages:
+				setMinTerminiCleavages((Integer) o);
 				break;
 			case MissedCleavages:
 				setMissedCleavages((Integer) o);
@@ -325,6 +359,8 @@ public class SearchEngineParameters extends PersistableBase {
 				return getPeptideTolerance();
 			case FragmentTolerance:
 				return getFragmentTolerance();
+			case MinTerminiCleavages:
+				return getMinTerminiCleavages();
 			case MissedCleavages:
 				return getMissedCleavages();
 			case Database:

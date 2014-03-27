@@ -53,6 +53,7 @@ public final class MascotMappings implements Mappings {
 
 	private Map<String, String> nativeParams = new HashMap<String, String>();
 	private static final Pattern COMMA_SPLIT = Pattern.compile(",");
+	private Integer minTerminiCleavages;
 
 	public MascotMappings(final ParamsInfo info) {
 		// params name : mascot name
@@ -275,14 +276,28 @@ public final class MascotMappings implements Mappings {
 	@Override
 	public void setProtease(final MappingContext context, final Protease protease) {
 		final String cle;
-		if (!mascotNamesByEnzyme.containsKey(protease)) {
-			cle = "Trypsin/P";
-			context.reportWarning("Mascot doesn't support " + (protease == null ? "null enzyme" : protease.getName()) + ", using Trypsin (allow P)");
-		} else {
-			cle = mascotNamesByEnzyme.get(protease);
+		if (2 == minTerminiCleavages || null == minTerminiCleavages) {
+			if (!mascotNamesByEnzyme.containsKey(protease)) {
+				cle = "Trypsin/P";
+				context.reportWarning("Mascot doesn't support " + (protease == null ? "null enzyme" : protease.getName()) + ", using Trypsin (allow P)");
+			} else {
+				cle = mascotNamesByEnzyme.get(protease);
+			}
+			setNativeParam(ENZYME, cle);
 		}
+		// Otherwise the protease setting already took care of everything
+	}
 
-		setNativeParam(ENZYME, cle);
+	@Override
+	public void setMinTerminiCleavages(MappingContext context, Integer minTerminiCleavages) {
+		this.minTerminiCleavages = minTerminiCleavages;
+		if (0 == minTerminiCleavages) {
+			// Set non-specific protease
+			setProtease(context, new Protease("Non-Specific", "", ""));
+		} else if (1 == minTerminiCleavages) {
+			setNativeParam(ENZYME, "semiTrypsin");
+			context.reportWarning("Mascot only supports semiTrypsin (no other proteases)");
+		}
 	}
 
 	@Override

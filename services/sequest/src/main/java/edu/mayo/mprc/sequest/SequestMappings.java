@@ -452,6 +452,13 @@ public final class SequestMappings implements Mappings, Cloneable {
 	}
 
 	@Override
+	public void setMinTerminiCleavages(MappingContext context, Integer minTerminiCleavages) {
+		if (minTerminiCleavages == 1) {
+			context.reportWarning("Sequest semitryptic not supported yet");
+		}
+	}
+
+	@Override
 	public void setMissedCleavages(final MappingContext context, final Integer missedCleavages) {
 		String value = String.valueOf(missedCleavages);
 		if (missedCleavages > 12) {

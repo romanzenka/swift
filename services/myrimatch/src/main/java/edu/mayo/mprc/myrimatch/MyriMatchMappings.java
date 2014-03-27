@@ -36,6 +36,7 @@ public final class MyriMatchMappings implements Mappings {
 	private Map<String, String> nativeParams;
 	private static final String VARIABLE_MODS_MARKERS = "*^@%~&?!:;|+-/";
 	private static final Pattern INTEGER = Pattern.compile("^[0-9]+$");
+	private Integer minTerminiCleavages;
 
 	public MyriMatchMappings() {
 		nativeParams = initNativeParams();
@@ -262,13 +263,23 @@ public final class MyriMatchMappings implements Mappings {
 	 * </table>
 	 *
 	 * Example: Trypsin <pre>(?<=[KR])(?!P)</pre>
+	 *
+	 * Protease has priority over the min termini cleavages setting (protease is being set later)
 	 */
 	public void setProtease(final MappingContext context, final Protease protease) {
-		nativeParams.put(CLEAVAGE_RULES, enzymeToString(protease));
 		if (isNonSpecificEnzyme(protease)) {
+			// We pretend to use Trypsin, but we switch off the termini cleavages
+			nativeParams.put(CLEAVAGE_RULES, enzymeToString(Protease.getTrypsinAllowP()));
 			nativeParams.put(NUM_MIN_TERMINI_CLEAVAGES, "0");
 		} else {
-			nativeParams.put(NUM_MIN_TERMINI_CLEAVAGES, "2");
+			nativeParams.put(CLEAVAGE_RULES, enzymeToString(protease));
+			if (minTerminiCleavages != null) {
+				// We restore min termini cleavages from our last value if there was one set before
+				nativeParams.put(NUM_MIN_TERMINI_CLEAVAGES, String.valueOf(minTerminiCleavages));
+			} else {
+				// We use the default (2)
+				nativeParams.put(NUM_MIN_TERMINI_CLEAVAGES, String.valueOf(2));
+			}
 		}
 	}
 
@@ -310,7 +321,7 @@ public final class MyriMatchMappings implements Mappings {
 		return result.toString();
 	}
 
-	private static boolean isNonSpecificEnzyme(Protease enzyme) {
+	private static boolean isNonSpecificEnzyme(final Protease enzyme) {
 		return "".equals(enzyme.getRnminus1()) && "".equals(enzyme.getRn());
 	}
 
@@ -319,6 +330,12 @@ public final class MyriMatchMappings implements Mappings {
 			return group;
 		}
 		return "[" + group + "]";
+	}
+
+	@Override
+	public void setMinTerminiCleavages(final MappingContext context, final Integer minTerminiCleavages) {
+		this.minTerminiCleavages = minTerminiCleavages;
+		nativeParams.put(NUM_MIN_TERMINI_CLEAVAGES, String.valueOf(minTerminiCleavages));
 	}
 
 	@Override

@@ -1,20 +1,19 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
-        "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+    "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
 <hibernate-mapping package="edu.mayo.mprc.swift.params2" default-access="field">
     <!-- We use field access because the class is to be immutable by the setters once saved -->
     <class name="SearchEngineParameters" table="search_parameters" lazy="false">
         <id name="id" type="integer" column="search_parameter_id">
-            <generator class="native"/>
+            <generator class="native" />
         </id>
-        <many-to-one name="database" column="curation" class="edu.mayo.mprc.dbcurator.model.Curation"
-                     lazy="proxy"/>
-        <many-to-one name="protease" column="protease" class="Protease" lazy="false"/>
-        <property name="missedCleavages" column="missed_cleavages"/>
-        <many-to-one name="fixedModifications" column="fixed_mods"/>
-        <many-to-one name="variableModifications" column="variable_mods"/>
+        <many-to-one name="database" column="curation" class="edu.mayo.mprc.dbcurator.model.Curation" lazy="proxy" />
+        <many-to-one name="protease" column="protease" class="Protease" lazy="false" />
+        <property name="minTerminiCleavages" column="min_termini_cleavages" />
+        <property name="missedCleavages" column="missed_cleavages" />
+        <many-to-one name="fixedModifications" column="fixed_mods" />
+        <many-to-one name="variableModifications" column="variable_mods" />
         <component name="peptideTolerance" class="Tolerance">
-            <property name="value" type="double" column="peptide_tolerance_value"/>
+            <property name="value" type="double" column="peptide_tolerance_value" />
             <property name="unit" length="10" column="peptide_tolerance_unit">
                 <type name="edu.mayo.mprc.database.EnumUserType">
                     <param name="enumClassName">edu.mayo.mprc.swift.params2.MassUnit</param>
@@ -22,17 +21,17 @@
             </property>
         </component>
         <component name="fragmentTolerance" class="Tolerance">
-            <property name="value" type="double" column="fragment_tolerance_value"/>
+            <property name="value" type="double" column="fragment_tolerance_value" />
             <property name="unit" length="10" column="fragment_tolerance_unit">
                 <type name="edu.mayo.mprc.database.EnumUserType">
                     <param name="enumClassName">edu.mayo.mprc.swift.params2.MassUnit</param>
                 </type>
             </property>
         </component>
-        <many-to-one name="instrument" column="instrument" class="Instrument" lazy="false"/>
+        <many-to-one name="instrument" column="instrument" class="Instrument" lazy="false" />
         <many-to-one name="extractMsnSettings" column="extract_msn_settings" class="ExtractMsnSettings" not-null="false"
-                     lazy="false"/>
+            lazy="false" />
         <many-to-one name="scaffoldSettings" column="scaffold_settings" class="ScaffoldSettings" not-null="false"
-                     lazy="false"/>
+            lazy="false" />
     </class>
 </hibernate-mapping>

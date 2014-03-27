@@ -134,7 +134,7 @@ public final class MyriMatchTest extends XMLTestCase {
 		Assert.assertEquals(MyriMatchMappings.enzymeToString(new Protease("V8-DE", "BDEZ", "!P")), "(?<=[BDEZ])(?!P)");
 		Assert.assertEquals(MyriMatchMappings.enzymeToString(new Protease("V8-E", "EZ", "!P")), "(?<=[EZ])(?!P)");
 		Assert.assertEquals(MyriMatchMappings.enzymeToString(new Protease("ChymoAndGluC", "FYWLE", "")), "(?<=[FYWLE])");
-		// Non-specific is implemented as trypsin with min terminii cleavages set to 0
+		// Non-specific is implemented as trypsin with min termini cleavages set to 0
 		Assert.assertEquals(MyriMatchMappings.enzymeToString(new Protease("Non-Specific", "", "")), "(?<=[KR])");
 		Assert.assertEquals(MyriMatchMappings.enzymeToString(new Protease("DoubleNeg", "!A", "!EF")), "(?<!A)(?![EF])");
 	}
@@ -146,12 +146,32 @@ public final class MyriMatchTest extends XMLTestCase {
 
 		mappings.setProtease(mappingContext, new Protease("Non-Specific", "", ""));
 		Assert.assertEquals(mappings.getNativeParam(MyriMatchMappings.CLEAVAGE_RULES), "(?<=[KR])"); // Trypsin-P
-		Assert.assertEquals(mappings.getNativeParam(MyriMatchMappings.NUM_MIN_TERMINI_CLEAVAGES), "0"); // 0 terminii cleavages
+		Assert.assertEquals(mappings.getNativeParam(MyriMatchMappings.NUM_MIN_TERMINI_CLEAVAGES), "0"); // 0 termini cleavages
 
 		mappings.setProtease(mappingContext, new Protease("Arg-C", "R", "!P"));
 		Assert.assertEquals(mappings.getNativeParam(MyriMatchMappings.CLEAVAGE_RULES), "(?<=R)(?!P)"); // Trypsin-P
-		Assert.assertEquals(mappings.getNativeParam(MyriMatchMappings.NUM_MIN_TERMINI_CLEAVAGES), "2"); // 0 terminii cleavages
+		Assert.assertEquals(mappings.getNativeParam(MyriMatchMappings.NUM_MIN_TERMINI_CLEAVAGES), "2"); // 0 termini cleavages
 	}
+
+	@Test
+	public void shouldHonorSemitryptic() {
+		final MyriMatchMappings mappings = createMappings();
+		final MappingContext mappingContext = createMappingContext();
+
+		mappings.setMinTerminiCleavages(mappingContext, 1);
+		mappings.setProtease(mappingContext, new Protease("Arg-C", "R", "!P"));
+		Assert.assertEquals(mappings.getNativeParam(MyriMatchMappings.CLEAVAGE_RULES), "(?<=R)(?!P)"); // Trypsin-P
+		Assert.assertEquals(mappings.getNativeParam(MyriMatchMappings.NUM_MIN_TERMINI_CLEAVAGES), "1"); // 1 termini cleavages		
+
+		mappings.setProtease(mappingContext, new Protease("Non-Specific", "", ""));
+		Assert.assertEquals(mappings.getNativeParam(MyriMatchMappings.CLEAVAGE_RULES), "(?<=[KR])"); // Trypsin-P
+		Assert.assertEquals(mappings.getNativeParam(MyriMatchMappings.NUM_MIN_TERMINI_CLEAVAGES), "0"); // 0 termini cleavages
+
+		mappings.setProtease(mappingContext, new Protease("Arg-C", "R", "!P"));
+		Assert.assertEquals(mappings.getNativeParam(MyriMatchMappings.CLEAVAGE_RULES), "(?<=R)(?!P)"); // Trypsin-P
+		Assert.assertEquals(mappings.getNativeParam(MyriMatchMappings.NUM_MIN_TERMINI_CLEAVAGES), "1"); // 1 termini cleavages restored
+	}
+
 
 	@Test
 	public void shouldMapPeptideTolerance() {

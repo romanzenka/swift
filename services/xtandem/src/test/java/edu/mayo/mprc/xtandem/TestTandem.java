@@ -154,6 +154,7 @@ public class TestTandem {
 		// TODO: Excercise all mappings
 		mapping.setProtease(context, new Protease("Trypsin (allow P)", "KR", ""));
 		mapping.setInstrument(context, Instrument.ORBITRAP);
+		mapping.setMinTerminiCleavages(context, 2);
 		mapping.setMissedCleavages(context, 2);
 		mapping.setPeptideTolerance(context, new Tolerance(10, MassUnit.Ppm));
 		mapping.setFragmentTolerance(context, new Tolerance(0.5, MassUnit.Da));

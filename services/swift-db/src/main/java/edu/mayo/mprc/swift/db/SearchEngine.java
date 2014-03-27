@@ -166,6 +166,9 @@ public final class SearchEngine implements Comparable<SearchEngine> {
 		context.startMapping(ParamName.FragmentTolerance);
 		mapping.setFragmentTolerance(context, params.getFragmentTolerance());
 
+		context.startMapping(ParamName.MinTerminiCleavages);
+		mapping.setMinTerminiCleavages(context, params.getMinTerminiCleavages());
+
 		context.startMapping(ParamName.MissedCleavages);
 		mapping.setMissedCleavages(context, params.getMissedCleavages());
 

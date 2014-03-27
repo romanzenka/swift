@@ -177,6 +177,11 @@ public final class OmssaMappings implements Mappings {
 	}
 
 	@Override
+	public void setMinTerminiCleavages(final MappingContext context, final Integer minTerminiCleavages) {
+		// TODO: Add support for OMSSA
+	}
+
+	@Override
 	public void setMissedCleavages(final MappingContext context, final Integer missedCleavages) {
 		String value = null;
 		try {

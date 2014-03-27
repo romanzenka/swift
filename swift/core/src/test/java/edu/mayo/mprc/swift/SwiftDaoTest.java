@@ -200,7 +200,7 @@ public final class SwiftDaoTest {
 		final Protease protease = paramsDao.getProteaseByName("Trypsin (allow P)");
 
 
-		return new SearchEngineParameters(null, protease, 1, fixedModifications, variableModifications,
+		return new SearchEngineParameters(null, protease, 2, 1, fixedModifications, variableModifications,
 				new Tolerance(1, MassUnit.Da), new Tolerance(10, MassUnit.Ppm), orbi,
 				ExtractMsnSettings.DEFAULT,
 				ScaffoldSettings.DEFAULT);
