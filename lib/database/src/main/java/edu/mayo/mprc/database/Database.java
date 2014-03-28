@@ -265,7 +265,7 @@ public final class Database implements RuntimeInitializer, Lifecycle {
 		return translator;
 	}
 
-	public void setTranslator(FileTokenToDatabaseTranslator translator) {
+	public void setTranslator(final FileTokenToDatabaseTranslator translator) {
 		this.translator = translator;
 	}
 
@@ -400,12 +400,28 @@ public final class Database implements RuntimeInitializer, Lifecycle {
 
 			final Database placeholder = getDatabase();
 			placeholder.setConfig(localConfig);
-			placeholder.setHibernateProperties(getHibernateProperties());
+			final Map<String, String> properties = getHibernateProperties();
+			fixMsSqlKeywords(localConfig, properties);
+			placeholder.setHibernateProperties(properties);
 			placeholder.setHibernateCreationProperties(getHibernateCreationProperties());
 			placeholder.setMappingResources(collectMappingResouces(getDaoList()));
 			placeholder.setRuntimeInitializers(getRuntimeInitializers());
 			placeholder.setTranslator(getTranslator());
 			return placeholder;
+		}
+
+		/**
+		 * MS SQL has keywords that clash with our schema.
+		 * Switch hibernate to quote all table names.
+		 * This makes H2 fail, sadly.
+		 *
+		 * @param localConfig Configuration of the database.
+		 * @param properties  Hibernate properties to be patched.
+		 */
+		private void fixMsSqlKeywords(final Config localConfig, final Map<String, String> properties) {
+			if (localConfig.getDialect().contains("SQLServer2008Dialect")) {
+				properties.put("hibernate.globally_quoted_identifiers", "true");
+			}
 		}
 
 		@Override
