@@ -89,7 +89,7 @@ public final class OmssaMappings implements Mappings {
 		if (!MassUnit.Da.equals(peptideTolerance.getUnit()) && !MassUnit.Ppm.equals(peptideTolerance.getUnit())) {
 			//the user is trying to use ppm or an unsupported unit
 			setNativeParam(PEP_TOL, "1");
-			context.reportWarning("OMSSA does not support '" + peptideTolerance.getUnit() + "' tolerances; using 1 Dalton instead.");
+			context.reportWarning("OMSSA does not support '" + peptideTolerance.getUnit() + "' tolerances; using 1 Dalton instead.", null);
 			return;
 		}
 
@@ -103,7 +103,7 @@ public final class OmssaMappings implements Mappings {
 			//convert ppm to Da assuming a average peptide mass of 1000 Da
 			final double normMass = AVG_PEPTIDE_MASS;
 			value = value * normMass / MILLION;
-			context.reportWarning("Converted to " + value + " Da for OMSSA.");
+			context.reportWarning("Converted to " + value + " Da for OMSSA.", null);
 		}
 		return value;
 	}
@@ -113,7 +113,7 @@ public final class OmssaMappings implements Mappings {
 		if (!fragmentTolerance.getUnit().equals(MassUnit.Da)) {
 			//the user is trying to use ppm or an unsupported unit
 			setNativeParam(FRAG_TOL, "1");
-			context.reportWarning("OMSSA does not support '" + fragmentTolerance.getUnit() + "' tolerances; using 1 Dalton instead.");
+			context.reportWarning("OMSSA does not support '" + fragmentTolerance.getUnit() + "' tolerances; using 1 Dalton instead.", null);
 		}
 		//we can have a nice straight-forward conversion to Da from mmu
 		final double value = convertToDalton(context, false, fragmentTolerance);
@@ -136,7 +136,7 @@ public final class OmssaMappings implements Mappings {
 		try {
 			converter.convertUnimodToOmssa(/*fixed*/ true, fixedMods.getModifications(), nativeParamsDocument);
 		} catch (Exception t) {
-			context.reportError(t.getMessage(), t);
+			context.reportError(t.getMessage(), t, null);
 		}
 	}
 
@@ -150,7 +150,7 @@ public final class OmssaMappings implements Mappings {
 		final String omssaId = EnzymeLookup.mapEnzymeAbstractToOmssa(protease.getName());
 
 		if (omssaId == null) {
-			context.reportWarning("OMSSA cannot support the enzyme " + protease.getName() + " so please disable OMSSA if you want this enzyme.");
+			context.reportWarning("OMSSA cannot support the enzyme " + protease.getName() + " so please disable OMSSA if you want this enzyme.", null);
 			return; //don't change the enzyme
 		}
 
@@ -207,7 +207,7 @@ public final class OmssaMappings implements Mappings {
 			}
 		}
 		if (!unsupportedIons.isEmpty()) {
-			context.reportWarning("OMSSA does not support ions: " + Joiner.on(", ").join(unsupportedIons));
+			context.reportWarning("OMSSA does not support ions: " + Joiner.on(", ").join(unsupportedIons), null);
 		}
 		final Element elemIons = (Element) nativeParams.get("ionstosearch");
 		// Empty this element
@@ -220,6 +220,10 @@ public final class OmssaMappings implements Mappings {
 			newIon.setTextContent(id);
 			elemIons.appendChild(newIon);
 		}
+	}
+
+	@Override
+	public void checkValidity(MappingContext context) {
 	}
 }
 

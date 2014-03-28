@@ -406,18 +406,18 @@ public final class MyriMatchTest extends XMLTestCase {
 			}
 
 			@Override
-			public void reportError(final String s, final Throwable throwable) {
+			public void reportError(final String s, final Throwable throwable, ParamName paramName) {
 				LOGGER.error("Mapping error: " + s, throwable);
 				noErrors = false;
 			}
 
 			@Override
-			public void reportWarning(final String s) {
+			public void reportWarning(final String s, ParamName paramName) {
 				LOGGER.debug("Mapping warning: " + s);
 			}
 
 			@Override
-			public void reportInfo(final String s) {
+			public void reportInfo(final String s, ParamName paramName) {
 				LOGGER.debug("Mapping info: " + s);
 			}
 

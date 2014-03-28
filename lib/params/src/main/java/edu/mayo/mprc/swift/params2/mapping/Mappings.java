@@ -131,6 +131,15 @@ public interface Mappings {
 	void setInstrument(MappingContext context, Instrument instrument);
 
 	/**
+	 * A global check making sure that all parameters work together.
+	 * You do not have to repeat checks on each separate variable that are performed when the variable itself is set.
+	 * This is useful to see if two or more parameters clash with each other.
+	 *
+	 * @param context See {@link MappingContext}
+	 */
+	void checkValidity(MappingContext context);
+
+	/**
 	 * Used for testing purposes. Lets the user obtain a different native param value.
 	 *
 	 * @param name Native param name.

@@ -187,6 +187,9 @@ public final class SearchEngine implements Comparable<SearchEngine> {
 		context.startMapping(ParamName.Instrument);
 		mapping.setInstrument(context, params.getInstrument());
 
+		// Final validity check
+		mapping.checkValidity(context);
+
 		if (!context.noErrors()) {
 			// Errors detected with this parameter set.
 			throw new MprcException("Search engine parameters have following errors:\n" + validations.toString(ValidationSeverity.ERROR));

@@ -593,6 +593,10 @@ public class TestSearchRunner {
 				}
 
 				@Override
+				public void checkValidity(final MappingContext context) {
+				}
+
+				@Override
 				public String getNativeParam(final String name) {
 					return "";
 				}

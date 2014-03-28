@@ -198,7 +198,7 @@ public final class MyriMatchMappings implements Mappings {
 
 		for (final ModSpecificity specificity : variableMods.getModifications()) {
 			if (!warnedUnsupportedProteinOnly && specificity.isPositionProteinSpecific()) {
-				context.reportWarning("Protein terminus-only mods are not supported. Will allow modification at peptide terminus.");
+				context.reportWarning("Protein terminus-only mods are not supported. Will allow modification at peptide terminus.", null);
 				warnedUnsupportedProteinOnly = true;
 			}
 
@@ -220,7 +220,7 @@ public final class MyriMatchMappings implements Mappings {
 
 			index++;
 			if (variableMods.size() >= VARIABLE_MODS_MARKERS.length()) {
-				context.reportWarning("MyriMatch supports only " + VARIABLE_MODS_MARKERS.length() + " modifications.");
+				context.reportWarning("MyriMatch supports only " + VARIABLE_MODS_MARKERS.length() + " modifications.", null);
 				break;
 			}
 		}
@@ -349,6 +349,11 @@ public final class MyriMatchMappings implements Mappings {
 		nativeParams.put(PRECURSOR_MZ_TOLERANCE_RULE, Instrument.ORBITRAP.equals(instrument) ? "mono" : "avg");
 		final String series = Joiner.on(",").join(Sets.<IonSeries>newTreeSet(instrument.getSeries()));
 		nativeParams.put(FRAGMENTATION_RULE, "manual:" + series);
+	}
+
+	@Override
+	public void checkValidity(MappingContext context) {
+		// TODO: Implement this method
 	}
 
 	@Override

@@ -249,7 +249,7 @@ public final class SequestMappings implements Mappings, Cloneable {
 		if (fragmentTolerance.getUnit() == MassUnit.Ppm) {
 			final double value = fragmentTolerance.getValue() / PPM_TO_DALTON;
 			newTolerance = new Tolerance(value, MassUnit.Da);
-			context.reportWarning("Sequest does not support '" + fragmentTolerance.getUnit() + "' fragment tolerances; using " + newTolerance.getValue() + " " + newTolerance.getUnit().getCode() + " instead.");
+			context.reportWarning("Sequest does not support '" + fragmentTolerance.getUnit() + "' fragment tolerances; using " + newTolerance.getValue() + " " + newTolerance.getUnit().getCode() + " instead.", null);
 			setNativeParam(FRAG_TOL_VALUE, String.valueOf(newTolerance.getValue()));
 		} else {
 			newTolerance = fragmentTolerance;
@@ -257,7 +257,7 @@ public final class SequestMappings implements Mappings, Cloneable {
 		final Tolerance clampedTolerance;
 		if (newTolerance.getValue() < MIN_FRAGMENT_TOLERANCE) {
 			clampedTolerance = new Tolerance(MIN_FRAGMENT_TOLERANCE, MassUnit.Da);
-			context.reportWarning("Sequest runs too slow with fragment tolerance below " + MIN_FRAGMENT_TOLERANCE + " Da, using " + MIN_FRAGMENT_TOLERANCE + " Da instead.");
+			context.reportWarning("Sequest runs too slow with fragment tolerance below " + MIN_FRAGMENT_TOLERANCE + " Da, using " + MIN_FRAGMENT_TOLERANCE + " Da instead.", null);
 		} else {
 			clampedTolerance = newTolerance;
 		}
@@ -286,7 +286,7 @@ public final class SequestMappings implements Mappings, Cloneable {
 
 			if (notSupportedMod(ms)) {
 				context.reportWarning("Sequest does not support variable modification with specific site '" +
-						ms.getSite() + "' limited to " + ms.getTerm() + ", skipping " + title);
+						ms.getSite() + "' limited to " + ms.getTerm() + ", skipping " + title, null);
 
 			} else if (ms.isPositionNTerminus()) {
 				if (nterm != null) {
@@ -326,19 +326,19 @@ public final class SequestMappings implements Mappings, Cloneable {
 		setNativeParam(VAR_MODS, sb.toString());
 		setNativeParam(VAR_MODS_TERMINUS, (cterm == null ? "0.0" : cterm) + " " + (nterm == null ? "0.0" : nterm));
 		if (skippedMods.length() != 0) {
-			context.reportWarning("Sequest supports up to 6 variable modifications, skipping " + skippedMods);
+			context.reportWarning("Sequest supports up to 6 variable modifications, skipping " + skippedMods, null);
 		}
 
 		if (skippedNterm.length() != 0) {
-			context.reportWarning("Sequest does not support multiple variable modifications at N-terminal, skipping " + skippedNterm);
+			context.reportWarning("Sequest does not support multiple variable modifications at N-terminal, skipping " + skippedNterm, null);
 		}
 
 		if (skippedCterm.length() != 0) {
-			context.reportWarning("Sequest does not support multiple variable modifications at C-terminal, skipping " + skippedCterm);
+			context.reportWarning("Sequest does not support multiple variable modifications at C-terminal, skipping " + skippedCterm, null);
 		}
 
 		if (proteinSpecificMod) {
-			context.reportWarning("Sequest does not support variable modifications specific only to protein terminus. These mods will be used for peptide terminii as well.");
+			context.reportWarning("Sequest does not support variable modifications specific only to protein terminus. These mods will be used for peptide terminii as well.", null);
 		}
 
 	}
@@ -382,7 +382,7 @@ public final class SequestMappings implements Mappings, Cloneable {
 				key = "Nterm_" + (ms.isProteinOnly() ? "protein" : "peptide");
 			} else {
 				context.reportWarning("Sequest does not support modification with position '" +
-						ms.getTerm() + "' and site '" + ms.getSite() + "', dropping " + title);
+						ms.getTerm() + "' and site '" + ms.getSite() + "', dropping " + title, null);
 				return;
 			}
 
@@ -454,7 +454,7 @@ public final class SequestMappings implements Mappings, Cloneable {
 	@Override
 	public void setMinTerminiCleavages(MappingContext context, Integer minTerminiCleavages) {
 		if (minTerminiCleavages == 1) {
-			context.reportWarning("Sequest semitryptic not supported yet");
+			context.reportWarning("Sequest semitryptic not supported yet", null);
 		}
 	}
 
@@ -463,7 +463,7 @@ public final class SequestMappings implements Mappings, Cloneable {
 		String value = String.valueOf(missedCleavages);
 		if (missedCleavages > 12) {
 			value = "12";
-			context.reportWarning("Sequest doesn't support > 12 missed cleavages");
+			context.reportWarning("Sequest doesn't support > 12 missed cleavages", null);
 		}
 		setNativeParam(MISSED_CLEAVAGES, value);
 	}
@@ -482,7 +482,7 @@ public final class SequestMappings implements Mappings, Cloneable {
 			if (seriesset.contains(is.getName())) {
 				hasseries.put(is.getName(), is);
 			} else {
-				context.reportWarning("Sequest doesn't support ion series " + is.getName());
+				context.reportWarning("Sequest doesn't support ion series " + is.getName(), null);
 			}
 		}
 
@@ -509,6 +509,10 @@ public final class SequestMappings implements Mappings, Cloneable {
 		}
 
 		setNativeParam(ION_SERIES, sb.toString());
+	}
+
+	@Override
+	public void checkValidity(MappingContext context) {
 	}
 
 

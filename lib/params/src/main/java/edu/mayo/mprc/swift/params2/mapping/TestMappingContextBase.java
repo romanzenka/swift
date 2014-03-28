@@ -25,17 +25,17 @@ public class TestMappingContextBase implements MappingContext {
 	}
 
 	@Override
-	public void reportError(final String message, final Throwable t) {
+	public void reportError(final String message, final Throwable t, ParamName paramName) {
 		throw new MprcException(message, t);
 	}
 
 	@Override
-	public void reportWarning(final String message) {
+	public void reportWarning(final String message, ParamName paramName) {
 		throw new MprcException(message);
 	}
 
 	@Override
-	public void reportInfo(final String message) {
+	public void reportInfo(final String message, ParamName paramName) {
 		throw new MprcException(message);
 	}
 

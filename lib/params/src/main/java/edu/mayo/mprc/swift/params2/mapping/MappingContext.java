@@ -25,24 +25,27 @@ public interface MappingContext {
 	/**
 	 * Adds a message to the mapping that is currently being processed.
 	 *
-	 * @param message Error message to add.
-	 * @param t       Exception, in case we have any - null otherwise.
+	 * @param message   Error message to add.
+	 * @param t         Exception, in case we have any - null otherwise.
+	 * @param paramName Parameter that this error pertains to. Null - whatever we are processing now.
 	 */
-	void reportError(String message, Throwable t);
+	void reportError(String message, Throwable t, ParamName paramName);
 
 	/**
 	 * Adds a message to the mapping that is currently being processed.
 	 *
-	 * @param message Warning message to add.
+	 * @param message   Warning message to add.
+	 * @param paramName Parameter that this warning pertains to. Null - whatever we are processing now.
 	 */
-	void reportWarning(String message);
+	void reportWarning(String message, ParamName paramName);
 
 	/**
 	 * Adds a message to the mapping that is currently being processed.
 	 *
-	 * @param message Informational message to add.
+	 * @param message   Informational message to add.
+	 * @param paramName Parameter that this message pertains to. Null - whatever we are processing now.
 	 */
-	void reportInfo(String message);
+	void reportInfo(String message, ParamName paramName);
 
 	/**
 	 * @return True if no errors occured since last call to a mapping method.

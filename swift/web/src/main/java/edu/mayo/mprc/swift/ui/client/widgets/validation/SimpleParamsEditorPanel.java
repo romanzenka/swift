@@ -208,10 +208,10 @@ public final class SimpleParamsEditorPanel implements SourcesChangeEvents {
 			validationController.add(tb = new ProteaseListBox("sequence.enzyme"), "sequence.enzyme", vp);
 
 			final SemiCheckBox sb;
-			validationController.add(sb = new SemiCheckBox(), "sequence.min_termini_cleavages", vp);
+			validationController.add(sb = new SemiCheckBox(tb), "sequence.min_termini_cleavages", vp);
 
 			editorElements.add(edp.append("enzyme", ENTRY1, tb, editorVisible));
-			editorElements.add(edp.append("semi", ENTRY1, sb.asWidget(), editorVisible));
+			editorElements.add(edp.append("enzyme", ENTRY1, sb.asWidget(), editorVisible));
 
 			final Label label1 = new Label("Missed Cleavages:");
 			label1.setStyleName(PARAMS_LABEL);

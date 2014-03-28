@@ -13,6 +13,7 @@ import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 import edu.mayo.mprc.swift.ui.client.dialogs.Validatable;
 import edu.mayo.mprc.swift.ui.client.rpc.ClientInteger;
+import edu.mayo.mprc.swift.ui.client.rpc.ClientProtease;
 import edu.mayo.mprc.swift.ui.client.rpc.ClientValue;
 
 import java.util.List;
@@ -24,11 +25,22 @@ import java.util.List;
  */
 public final class SemiCheckBox implements Validatable, IsWidget {
 
-	private CheckBox checkBox;
+	private final CheckBox checkBox;
 	private final EventBus eventBus = new SimpleEventBus();
 
-	public SemiCheckBox() {
+	public SemiCheckBox(ProteaseListBox proteaseListBox) {
 		checkBox = new CheckBox("Semi");
+		proteaseListBox.addValueChangeHandler(new ValueChangeHandler<ClientValue>() {
+			@Override
+			public void onValueChange(ValueChangeEvent<ClientValue> event) {
+				if (event.getValue() instanceof ClientProtease) {
+					ClientProtease protease = (ClientProtease) event.getValue();
+					if ("Non-Specific".equals(protease.getName()) && Boolean.TRUE.equals(checkBox.getValue())) {
+						setValue(new ClientInteger(0), true);
+					}
+				}
+			}
+		});
 		checkBox.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
@@ -44,6 +56,9 @@ public final class SemiCheckBox implements Validatable, IsWidget {
 
 	@Override
 	public void setValue(final ClientValue value) {
+		if (value == null) {
+			return;
+		}
 		if (value instanceof ClientInteger) {
 			checkBox.setValue(1 == ((ClientInteger) value).getValue());
 		} else {
@@ -88,7 +103,7 @@ public final class SemiCheckBox implements Validatable, IsWidget {
 
 	@Override
 	public void fireEvent(final GwtEvent<?> event) {
-		eventBus.fireEvent(event);
+		eventBus.fireEventFromSource(event, this);
 	}
 
 	@Override

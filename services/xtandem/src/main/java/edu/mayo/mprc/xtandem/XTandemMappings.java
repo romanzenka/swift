@@ -163,7 +163,7 @@ public final class XTandemMappings implements Mappings {
 		if (!MassUnit.Da.equals(fragmentTolerance.getUnit())) {
 			setNativeParam(FRAG_TOL_VALUE, "1");
 			setNativeParam(FRAG_TOL_UNIT, DALTONS);
-			context.reportWarning("Tandem does not support '" + fragmentTolerance.toString() + "' fragment tolerances; using 1 Da instead.");
+			context.reportWarning("Tandem does not support '" + fragmentTolerance.toString() + "' fragment tolerances; using 1 Da instead.", null);
 			return;
 		}
 		setNativeParam(FRAG_TOL_VALUE, String.valueOf(fragmentTolerance.getValue()));
@@ -195,7 +195,7 @@ public final class XTandemMappings implements Mappings {
 			if ((ms.getTerm() != null) && (specificAminoAcidAtNorCterminus || proteinNcTerm)) {
 
 				context.reportWarning("Tandem does not support " + (VAR_MODS.equals(modVariable) ? "variable" : "fixed") + " modification with position '" +
-						ms.getTerm() + "' and site '" + ms.getSite() + "', dropping " + title);
+						ms.getTerm() + "' and site '" + ms.getSite() + "', dropping " + title, null);
 			} else {
 				String site = String.valueOf(ms.getSite());
 				if (ms.isPositionNTerminus()) {
@@ -278,7 +278,7 @@ public final class XTandemMappings implements Mappings {
 			}
 		} catch (NumberFormatException ignore) {
 			// SWALLOWED
-			context.reportWarning("Can't understand tandem missed cleavages: " + missedCleavages);
+			context.reportWarning("Can't understand tandem missed cleavages: " + missedCleavages, null);
 		}
 
 		if (value != null) {
@@ -303,7 +303,11 @@ public final class XTandemMappings implements Mappings {
 		}
 
 		if (!hasSeries.isEmpty()) {
-			context.reportWarning("Tandem doesn't support ion series " + Joiner.on(", ").join(hasSeries.keySet()));
+			context.reportWarning("Tandem doesn't support ion series " + Joiner.on(", ").join(hasSeries.keySet()), null);
 		}
+	}
+
+	@Override
+	public void checkValidity(MappingContext context) {
 	}
 }

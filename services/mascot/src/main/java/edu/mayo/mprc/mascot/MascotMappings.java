@@ -2,10 +2,7 @@ package edu.mayo.mprc.mascot;
 
 import com.google.common.collect.ImmutableMap;
 import edu.mayo.mprc.MprcException;
-import edu.mayo.mprc.swift.params2.Instrument;
-import edu.mayo.mprc.swift.params2.MassUnit;
-import edu.mayo.mprc.swift.params2.Protease;
-import edu.mayo.mprc.swift.params2.Tolerance;
+import edu.mayo.mprc.swift.params2.*;
 import edu.mayo.mprc.swift.params2.mapping.MappingContext;
 import edu.mayo.mprc.swift.params2.mapping.Mappings;
 import edu.mayo.mprc.swift.params2.mapping.ParamsInfo;
@@ -206,7 +203,7 @@ public final class MascotMappings implements Mappings {
 		if (fragmentTolerance.getUnit() == MassUnit.Ppm) {
 			final double value = fragmentTolerance.getValue() / PPM_TO_DALTON;
 			final Tolerance newTolerance = new Tolerance(value, MassUnit.Da);
-			context.reportWarning("Mascot does not support '" + fragmentTolerance.getUnit() + "' fragment tolerances; using " + newTolerance.getValue() + " " + newTolerance.getUnit().getCode() + " instead.");
+			context.reportWarning("Mascot does not support '" + fragmentTolerance.getUnit() + "' fragment tolerances; using " + newTolerance.getValue() + " " + newTolerance.getUnit().getCode() + " instead.", null);
 			mapToleranceToNative(context, newTolerance, FRAG_TOL_VALUE, FRAG_TOL_UNIT);
 		} else {
 			mapToleranceToNative(context, fragmentTolerance, FRAG_TOL_VALUE, FRAG_TOL_UNIT);
@@ -231,7 +228,7 @@ public final class MascotMappings implements Mappings {
 
 		if (droppedMods.length() > 0) {
 			droppedMods.setLength(droppedMods.length() - 2);
-			context.reportWarning("Mascot supports up to " + MAX_VARIABLE_MODS + " variable modifications; dropping " + droppedMods.toString());
+			context.reportWarning("Mascot supports up to " + MAX_VARIABLE_MODS + " variable modifications; dropping " + droppedMods.toString(), null);
 		}
 
 		setNativeMods(context, VAR_MODS, mods);
@@ -249,7 +246,7 @@ public final class MascotMappings implements Mappings {
 				mods.add(ms.toMascotString());
 			}
 		} catch (Exception t) {
-			context.reportError("Problem obtaining mascot fixed modifications", t);
+			context.reportError("Problem obtaining mascot fixed modifications", t, null);
 		}
 
 		setNativeMods(context, FIXED_MODS, mods);
@@ -276,28 +273,17 @@ public final class MascotMappings implements Mappings {
 	@Override
 	public void setProtease(final MappingContext context, final Protease protease) {
 		final String cle;
-		if (2 == minTerminiCleavages || null == minTerminiCleavages) {
-			if (!mascotNamesByEnzyme.containsKey(protease)) {
-				cle = "Trypsin/P";
-				context.reportWarning("Mascot doesn't support " + (protease == null ? "null enzyme" : protease.getName()) + ", using Trypsin (allow P)");
-			} else {
-				cle = mascotNamesByEnzyme.get(protease);
-			}
-			setNativeParam(ENZYME, cle);
+		if (!mascotNamesByEnzyme.containsKey(protease)) {
+			cle = "Trypsin/P";
+		} else {
+			cle = mascotNamesByEnzyme.get(protease);
 		}
-		// Otherwise the protease setting already took care of everything
+		setNativeParam(ENZYME, cle);
 	}
 
 	@Override
 	public void setMinTerminiCleavages(MappingContext context, Integer minTerminiCleavages) {
 		this.minTerminiCleavages = minTerminiCleavages;
-		if (0 == minTerminiCleavages) {
-			// Set non-specific protease
-			setProtease(context, new Protease("Non-Specific", "", ""));
-		} else if (1 == minTerminiCleavages) {
-			setNativeParam(ENZYME, "semiTrypsin");
-			context.reportWarning("Mascot only supports semiTrypsin (no other proteases)");
-		}
 	}
 
 	@Override
@@ -311,6 +297,18 @@ public final class MascotMappings implements Mappings {
 	public void setInstrument(final MappingContext context, final Instrument instrument) {
 		final String instName = instrument.getMascotName();
 		setNativeParam(INSTRUMENT, instName);
+	}
+
+	@Override
+	public void checkValidity(final MappingContext context) {
+		if (1 == minTerminiCleavages &&
+				!("semiTrypsin".equals(getNativeParam(ENZYME))
+						|| "Trypsin".equals(getNativeParam(ENZYME)))) {
+			context.reportWarning("Mascot will use semiTrypsin (restrict P)", ParamName.Enzyme);
+			setNativeParam(ENZYME, "semiTrypsin");
+		} else if (0 == minTerminiCleavages && !"None".equals(getNativeParam(ENZYME))) {
+			setProtease(context, new Protease("Non-Specific", "", ""));
+		}
 	}
 
 	private void setNativeMods(final MappingContext context, final String nativeParamName, final Set<String> mods) {
@@ -357,7 +355,7 @@ public final class MascotMappings implements Mappings {
 			}
 
 			if (repeatMods != null) {
-				context.reportError((numRepeatMods == 1 ? "Modification" : "Modifications") + " " + repeatMods + " cannot be both fixed and variable", null);
+				context.reportError((numRepeatMods == 1 ? "Modification" : "Modifications") + " " + repeatMods + " cannot be both fixed and variable", null, null);
 			}
 		}
 	}
@@ -371,7 +369,7 @@ public final class MascotMappings implements Mappings {
 				}
 			}
 			if (!specificities.toString().isEmpty()) {
-				context.reportWarning("Mascot will search additional site (" + specificities.toString() + ") for modification " + ms.toString());
+				context.reportWarning("Mascot will search additional site (" + specificities.toString() + ") for modification " + ms.toString(), null);
 			}
 		}
 	}
@@ -380,7 +378,7 @@ public final class MascotMappings implements Mappings {
 		if (!Arrays.asList("ppm", "Da", "mmu").contains(unit.getUnit().getCode())) {
 			setNativeParam(tolName, "1");
 			setNativeParam(tolUnitName, "Da");
-			context.reportWarning("Mascot does not support '" + unit + "' tolerances; using 1 Da instead.");
+			context.reportWarning("Mascot does not support '" + unit + "' tolerances; using 1 Da instead.", null);
 		} else {
 			setNativeParam(tolName, String.valueOf(unit.getValue()));
 			setNativeParam(tolUnitName, unit.getUnit().getCode());

@@ -1,5 +1,6 @@
 package edu.mayo.mprc.sequest;
 
+import edu.mayo.mprc.swift.params2.ParamName;
 import edu.mayo.mprc.swift.params2.mapping.MockParamsInfo;
 import edu.mayo.mprc.swift.params2.mapping.TestMappingContextBase;
 import edu.mayo.mprc.unimod.ModSet;
@@ -147,7 +148,7 @@ public final class TestSequestVariableMods {
 		}
 
 		@Override
-		public void reportWarning(final String message) {
+		public void reportWarning(final String message, ParamName paramName) {
 			Assert.assertEquals(message, expectedWarnings[index], "Got unexpected warning");
 			index++;
 		}

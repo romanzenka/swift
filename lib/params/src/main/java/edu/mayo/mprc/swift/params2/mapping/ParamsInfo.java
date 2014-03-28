@@ -64,6 +64,7 @@ public abstract class ParamsInfo {
 			case Instrument:
 				return getInstrumentAllowedValues();
 			case FragmentTolerance:
+			case MinTerminiCleavages:
 			case MissedCleavages:
 			case PeptideTolerance:
 			case ExtractMsnSettings:

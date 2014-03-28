@@ -1,10 +1,7 @@
 package edu.mayo.mprc.mascot;
 
 import edu.mayo.mprc.dbcurator.model.CurationDao;
-import edu.mayo.mprc.swift.params2.MassUnit;
-import edu.mayo.mprc.swift.params2.MockParamsDao;
-import edu.mayo.mprc.swift.params2.ParamsDao;
-import edu.mayo.mprc.swift.params2.Tolerance;
+import edu.mayo.mprc.swift.params2.*;
 import edu.mayo.mprc.swift.params2.mapping.*;
 import edu.mayo.mprc.unimod.*;
 import edu.mayo.mprc.utilities.ResourceUtilities;
@@ -95,7 +92,7 @@ public final class TestMascotMappings {
 		}
 
 		@Override
-		public void reportWarning(final String message) {
+		public void reportWarning(final String message, ParamName paramName) {
 			Assert.assertTrue(message.matches("Mascot will search additional site \\([ST]\\) for modification Phospho \\([ST]\\)"), "Unexpected warning");
 		}
 	}
@@ -106,7 +103,7 @@ public final class TestMascotMappings {
 		}
 
 		@Override
-		public void reportWarning(final String message) {
+		public void reportWarning(final String message, ParamName paramName) {
 			Assert.assertTrue(message.matches("Mascot does not support 'ppm' fragment tolerances; using \\d+\\.\\d* Da instead."));
 		}
 	}

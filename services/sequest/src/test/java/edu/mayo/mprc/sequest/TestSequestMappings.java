@@ -2,6 +2,7 @@ package edu.mayo.mprc.sequest;
 
 import com.google.common.base.Joiner;
 import edu.mayo.mprc.swift.params2.MassUnit;
+import edu.mayo.mprc.swift.params2.ParamName;
 import edu.mayo.mprc.swift.params2.Tolerance;
 import edu.mayo.mprc.swift.params2.mapping.MockParamsInfo;
 import edu.mayo.mprc.swift.params2.mapping.TestMappingContextBase;
@@ -79,12 +80,12 @@ public final class TestSequestMappings {
 		}
 
 		@Override
-		public void reportError(final String message, final Throwable t) {
+		public void reportError(final String message, final Throwable t, ParamName paramName) {
 			Assert.fail(message, t);
 		}
 
 		@Override
-		public void reportWarning(final String message) {
+		public void reportWarning(final String message, ParamName paramName) {
 			if (expectWarnings != null) {
 
 				for (final String warning : expectWarnings) {

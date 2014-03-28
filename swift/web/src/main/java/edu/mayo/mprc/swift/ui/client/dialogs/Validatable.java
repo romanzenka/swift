@@ -14,6 +14,11 @@ public interface Validatable extends HasValueChangeHandlers<ClientValue>, HasVal
 
 	ClientValue getValue();
 
+	/**
+	 * When the new value is set to null, it means we do not want the control to change.
+	 *
+	 * @param value Value to set.
+	 */
 	void setValue(ClientValue value);
 
 	/**

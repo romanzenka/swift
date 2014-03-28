@@ -209,10 +209,13 @@ public abstract class ValidatableListBox extends ListBox implements Validatable 
 			}
 		} else {
 			if (value == null) {
-				addItem("");
-				setSelectedIndex(getItemCount() - 1);
-				hasNull = true;
-				return;
+				return; // This is badly designed. Improve
+//				if (!hasNull) {
+//					addItem("");
+//					setSelectedIndex(getItemCount() - 1);
+//					hasNull = true;
+//				}
+//				return;
 			} else if (hasNull) {
 				removeItem(getItemCount() - 1);
 				hasNull = false;

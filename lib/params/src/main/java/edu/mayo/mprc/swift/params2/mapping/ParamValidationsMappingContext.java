@@ -19,6 +19,7 @@ public class ParamValidationsMappingContext implements MappingContext {
 		if (paramsInfo == null) {
 			throw new MprcException("The mapping context cannot be initialized with paramsInfo==null");
 		}
+		noErrors = true;
 	}
 
 	@Override
@@ -27,22 +28,25 @@ public class ParamValidationsMappingContext implements MappingContext {
 	}
 
 	@Override
-	public void reportError(final String message, final Throwable t) {
-		final Validation v = new Validation(message, ValidationSeverity.ERROR, currentParam, null, t);
-		validations.addValidation(currentParam, v);
+	public void reportError(final String message, final Throwable t, final ParamName paramName) {
+		final ParamName param = paramName == null ? currentParam : paramName;
+		final Validation v = new Validation(message, ValidationSeverity.ERROR, param, null, t);
+		validations.addValidation(param, v);
 		noErrors = false;
 	}
 
 	@Override
-	public void reportWarning(final String message) {
-		final Validation v = new Validation(message, ValidationSeverity.WARNING, currentParam, null, null);
-		validations.addValidation(currentParam, v);
+	public void reportWarning(final String message, final ParamName paramName) {
+		final ParamName param = paramName == null ? currentParam : paramName;
+		final Validation v = new Validation(message, ValidationSeverity.WARNING, param, null, null);
+		validations.addValidation(param, v);
 	}
 
 	@Override
-	public void reportInfo(final String message) {
-		final Validation v = new Validation(message, ValidationSeverity.INFO, currentParam, null, null);
-		validations.addValidation(currentParam, v);
+	public void reportInfo(final String message, final ParamName paramName) {
+		final ParamName param = paramName == null ? currentParam : paramName;
+		final Validation v = new Validation(message, ValidationSeverity.INFO, param, null, null);
+		validations.addValidation(param, v);
 	}
 
 	/**
@@ -62,6 +66,5 @@ public class ParamValidationsMappingContext implements MappingContext {
 	@Override
 	public void startMapping(final ParamName paramName) {
 		currentParam = paramName;
-		noErrors = true;
 	}
 }
