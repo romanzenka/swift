@@ -1,15 +1,13 @@
 package edu.mayo.mprc.swift.search.task;
 
 import edu.mayo.mprc.swift.db.SearchEngine;
-import edu.mayo.mprc.swift.dbmapping.FileSearch;
-import edu.mayo.mprc.swift.dbmapping.SearchEngineConfig;
-import edu.mayo.mprc.swift.dbmapping.SwiftSearchDefinition;
 import edu.mayo.mprc.swift.params2.SearchEngineParameters;
 import edu.mayo.mprc.swift.params2.mapping.ParamsInfo;
 import edu.mayo.mprc.utilities.FileUtilities;
 
 import java.io.File;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * A collection of all parameters anyone has given to our search engines to process.
@@ -17,12 +15,9 @@ import java.util.*;
  * For each set of parameters and engine it is capable of producing a file name of file that contains
  * the search engine parameters, serialized to the disk.
  * <p/>
- * A default parameters folder is used for saving these files. The tool makes sure that if same engine
+ * A parameters folder is created for saving these files. The tool makes sure that if same engine
  * needs multiple different parameter sets, the file names will not collide and the files will appear in the order
- * in which the search was requested.
- * <p/>
- * TODO: currently the whole system gets all information in advance and it spews out all config files at once.
- * This needs to change to work on-demand. It would simplify the design and make it more extensible.
+ * in which the search was requested (==deterministic)
  *
  * @author Roman Zenka
  */
@@ -33,118 +28,49 @@ public final class SearchEngineParametersCollection {
 	 * Key: {@link SearchEngineParameters} parameter set
 	 * Value: A string uniquely identifying the parameter set.
 	 * <p/>
-	 * When there is just one parameter set, the string would be "".
-	 * When there are more, the string would be '1' for the first parameter set mentioned by first input file, '2' for second and so on.
+	 * For the first parameter set, the string is "".
+	 * Second parameter set gets '2', and so on.
 	 */
-	private Map<SearchEngineParameters, String> searchEngineParametersNames;
+	private Map<SearchEngineParameters, String> parameterSuffix;
 	/**
-	 * Key: search engine:{@link #getSearchEngineParametersName}
+	 * Key: {@link #getParamFileHash(SearchEngine, String)}
 	 * Value: parameter file name
 	 */
-	private Map<String, File> parameterFiles;
-	private final boolean qualityControlEnabled;
-	private final SearchEngineList searchEngineList;
+	private final Map<String, File> parameterFiles;
 	private final ParamsInfo paramsInfo;
+	private final File paramsFolder;
 
-	public SearchEngineParametersCollection(final boolean qualityControlEnabled, final SearchEngineList searchEngineList, final ParamsInfo paramsInfo) {
-		this.qualityControlEnabled = qualityControlEnabled;
-		this.searchEngineList = searchEngineList;
+	public SearchEngineParametersCollection(final File outputFolder, final ParamsInfo paramsInfo) {
 		this.paramsInfo = paramsInfo;
-	}
+		paramsFolder = new File(outputFolder, DEFAULT_PARAMS_FOLDER);
+		parameterSuffix = new HashMap<SearchEngineParameters, String>(10);
+		parameterFiles = new HashMap<String, File>(10);
 
-	/**
-	 * Save parameter files to the disk.
-	 */
-	public void createParameterFiles(final SwiftSearchDefinition searchDefinition) {
-		searchEngineParametersNames = nameSearchEngineParameters(searchDefinition.getInputFiles(), searchDefinition.getSearchParameters());
-
-		// Obtain a set of all search engines that were requested
-		// This way we only create config files that we need
-		final Set<String> enabledEngines = new HashSet<String>();
-		for (final FileSearch fileSearch : searchDefinition.getInputFiles()) {
-			if (fileSearch != null) {
-				for (final SearchEngineConfig config : fileSearch.getEnabledEngines().getEngineConfigs()) {
-					enabledEngines.add(config.getCode());
-				}
-			}
-		}
-
-		addEnginesForQualityControl(enabledEngines);
-
-		final File paramFolder = new File(searchDefinition.getOutputFolder(), DEFAULT_PARAMS_FOLDER);
-		FileUtilities.ensureFolderExists(paramFolder);
-		parameterFiles = new HashMap<String, File>();
-		if (!enabledEngines.isEmpty()) {
-			FileUtilities.ensureFolderExists(paramFolder);
-			for (final String engineCode : enabledEngines) {
-				final SearchEngine engine = searchEngineList.getSearchEngine(engineCode);
-				for (final Map.Entry<SearchEngineParameters, String> parameterSet : searchEngineParametersNames.entrySet()) {
-					final File file = engine.writeSearchEngineParameterFile(
-							paramFolder, parameterSet.getKey(), parameterSet.getValue(), null /*We do not validate, validation should be already done*/, paramsInfo);
-					addParamFile(engineCode, parameterSet.getValue(), file);
-				}
-			}
-		}
+		FileUtilities.ensureFolderExists(paramsFolder);
 	}
 
 	public File getParamFile(final SearchEngine engine, final SearchEngineParameters parameters) {
-		return parameterFiles.get(getParamFileHash(engine, parameters));
-	}
-
-	private String getSearchEngineParametersName(final SearchEngineParameters parameters) {
-		return searchEngineParametersNames.get(parameters);
-	}
-
-	private void addParamFile(final String engineCode, final String parametersName, final File file) {
-		parameterFiles.put(getParamFileHash(engineCode, parametersName), file);
-	}
-
-	private String getParamFileHash(final SearchEngine engine, final SearchEngineParameters parameters) {
-		return getParamFileHash(engine.getCode(), getSearchEngineParametersName(parameters));
-	}
-
-	private static String getParamFileHash(final String engineCode, final String parametersName) {
-		return engineCode + ":" + parametersName;
-	}
-
-	/**
-	 * Enable extra engines that support the Quality Control (MyriMatch and IdpQonvert)
-	 *
-	 * @param enabledEngines List of currently enabled engines. Will append new ones.
-	 */
-	private void addEnginesForQualityControl(final Set<String> enabledEngines) {
-		if (isQualityControlEnabled()) {
-			enabledEngines.add("MYRIMATCH");
-			enabledEngines.add("IDPQONVERT");
+		final String suffix = getParameterSuffix(parameters);
+		final String hash = getParamFileHash(engine, suffix);
+		File result = parameterFiles.get(hash);
+		if (result == null) {
+			result = engine.writeSearchEngineParameterFile(
+					paramsFolder, parameters, suffix, null /*We do not validate, validation should be already done*/, paramsInfo);
+			parameterFiles.put(hash, result);
 		}
+		return result;
 	}
 
-	/**
-	 * Create a map from all used search engine parameters to short names that distinguish them.
-	 */
-	private static Map<SearchEngineParameters, String> nameSearchEngineParameters(final List<FileSearch> searches, final SearchEngineParameters defaultParameters) {
-		final List<SearchEngineParameters> parameters = new ArrayList<SearchEngineParameters>(10);
-		final Collection<SearchEngineParameters> seenParameters = new HashSet<SearchEngineParameters>(10);
-		for (final FileSearch fileSearch : searches) {
-			final SearchEngineParameters searchParameters = fileSearch.getSearchParametersWithDefault(defaultParameters);
-			if (!seenParameters.contains(searchParameters)) {
-				seenParameters.add(searchParameters);
-				parameters.add(searchParameters);
-			}
+	private String getParameterSuffix(final SearchEngineParameters parameters) {
+		String suffix = parameterSuffix.get(parameters);
+		if (suffix == null) {
+			suffix = parameterSuffix.isEmpty() ? "" : String.valueOf(parameterSuffix.size());
+			parameterSuffix.put(parameters, suffix);
 		}
-		// Now we have a list of unique search parameters in same order as they appear in files
-		final Map<SearchEngineParameters, String> resultMap = new HashMap<SearchEngineParameters, String>(parameters.size());
-		if (parameters.size() == 1) {
-			resultMap.put(parameters.get(0), "");
-		} else {
-			for (int i = 0; i < parameters.size(); i++) {
-				resultMap.put(parameters.get(i), String.valueOf(i + 1));
-			}
-		}
-		return resultMap;
+		return suffix;
 	}
 
-	private boolean isQualityControlEnabled() {
-		return qualityControlEnabled;
+	private static String getParamFileHash(final SearchEngine searchEngine, final String parametersName) {
+		return searchEngine.getCode() + ":" + searchEngine.getVersion() + ":" + parametersName;
 	}
 }

@@ -161,8 +161,7 @@ public final class SearchRunner implements Runnable, Lifecycle {
 	public void initialize() {
 		if (!initializationDone) {
 			LOGGER.debug("Initializing search " + searchDefinition.getTitle());
-			parameterFiles = new SearchEngineParametersCollection(isQualityControlEnabled(), engines, paramsInfo);
-			parameterFiles.createParameterFiles(getSearchDefinition());
+			parameterFiles = new SearchEngineParametersCollection(searchDefinition.getOutputFolder(), paramsInfo);
 			searchDefinitionToTasks(searchDefinition);
 			addReportTasks(searchDefinition);
 			collectAllTasks();
@@ -306,10 +305,22 @@ public final class SearchRunner implements Runnable, Lifecycle {
 			final FileProducingTask mzmlFile = addRawConversionTask(inputFile, MSCONVERT_MZML);
 
 			final SearchEngine myrimatch = engines.getMyrimatchEngine();
-			final EngineSearchTask myrimatchSearch = addEngineSearchTask(myrimatch, inputFile, mzmlFile, searchParameters, publicSearchFiles);
+			final EngineSearchTask myrimatchSearch = addEngineSearchTask(myrimatch, inputFile, mzmlFile, getSemiParameters(searchParameters), publicSearchFiles);
 			final IdpQonvertTask idpQonvertTask = addIdpQonvertTask(idpQonvert, myrimatchSearch);
 			addQuameterTask(engines.getQuameterEngine(), idpQonvertTask, inputFile.getInputFile(), searchDbTask, inputFile, publicSearchFiles);
 		}
+	}
+
+	/**
+	 * Create a semitryptic version of input parameters.
+	 *
+	 * @param searchParameters Input parameters.
+	 * @return Semi-tryptic version.
+	 */
+	private SearchEngineParameters getSemiParameters(final SearchEngineParameters searchParameters) {
+		final SearchEngineParameters semiTrypticParameters = searchParameters.copy();
+		semiTrypticParameters.setMinTerminiCleavages(1);
+		return semiTrypticParameters;
 	}
 
 	private DatabaseDeployment addScaffoldDatabaseDeployment(final FileSearch inputFile, final SearchEngine scaffold, final Curation database) {
