@@ -64,7 +64,7 @@ public final class SearchEngineParametersCollection {
 	private String getParameterSuffix(final SearchEngineParameters parameters) {
 		String suffix = parameterSuffix.get(parameters);
 		if (suffix == null) {
-			suffix = parameterSuffix.isEmpty() ? "" : String.valueOf(parameterSuffix.size());
+			suffix = parameterSuffix.isEmpty() ? "" : String.valueOf(parameterSuffix.size() + 1);
 			parameterSuffix.put(parameters, suffix);
 		}
 		return suffix;
