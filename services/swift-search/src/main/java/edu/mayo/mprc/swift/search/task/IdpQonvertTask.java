@@ -36,13 +36,21 @@ public final class IdpQonvertTask extends AsyncTaskBase {
 	private final SwiftDao swiftDao;
 	private final SearchRun searchRun;
 
+	/**
+	 * Only when true the resulting idpDB file gets published.
+	 * This is done to switch off publishing of results created solely for QuaMeter's purpose.
+	 */
+	private final boolean publishResult;
+
 	public IdpQonvertTask(final WorkflowEngine engine,
 	                      final SwiftDao swiftDao,
 	                      final SearchRun searchRun,
 	                      final SwiftSearchDefinition definition,
 	                      final DaemonConnection idpQonvertDaemon,
 	                      final EngineSearchTask searchTask,
-	                      final File outputFolder, final DatabaseFileTokenFactory fileTokenFactory, final boolean fromScratch) {
+	                      final File outputFolder,
+	                      final boolean publishResult,
+	                      final DatabaseFileTokenFactory fileTokenFactory, final boolean fromScratch) {
 		super(engine, idpQonvertDaemon, fileTokenFactory, fromScratch);
 		this.swiftDao = swiftDao;
 		this.searchRun = searchRun;
@@ -51,6 +59,7 @@ public final class IdpQonvertTask extends AsyncTaskBase {
 		decoyPrefix = definition.getSearchParameters().getDatabase().getDatabaseAnnotation().getDecoyRegex();
 		this.outputFolder = outputFolder;
 		this.searchTask = searchTask;
+		this.publishResult = publishResult;
 		setName("IdpQonvert");
 	}
 
@@ -90,14 +99,16 @@ public final class IdpQonvertTask extends AsyncTaskBase {
 	 * or if it was done previously).
 	 */
 	private void storeReportFile() {
-		swiftDao.begin();
-		try {
-			// Scaffold finished. Store the resulting file.
-			swiftDao.storeReport(searchRun.getId(), getResultingFile());
-			swiftDao.commit();
-		} catch (Exception t) {
-			swiftDao.rollback();
-			throw new MprcException("Could not store change in task information", t);
+		if (publishResult) {
+			swiftDao.begin();
+			try {
+				// Scaffold finished. Store the resulting file.
+				swiftDao.storeReport(searchRun.getId(), getResultingFile());
+				swiftDao.commit();
+			} catch (Exception t) {
+				swiftDao.rollback();
+				throw new MprcException("Could not store change in task information", t);
+			}
 		}
 	}
 
@@ -113,7 +124,7 @@ public final class IdpQonvertTask extends AsyncTaskBase {
 
 	@Override
 	public int hashCode() {
-		return Objects.hashCode(searchTask, outputFolder, maxFDR, decoyPrefix, curationFile);
+		return Objects.hashCode(searchTask, outputFolder, maxFDR, decoyPrefix, curationFile, publishResult);
 	}
 
 	@Override
@@ -129,7 +140,8 @@ public final class IdpQonvertTask extends AsyncTaskBase {
 				&& Objects.equal(outputFolder, other.outputFolder)
 				&& Objects.equal(maxFDR, other.maxFDR)
 				&& Objects.equal(decoyPrefix, other.decoyPrefix)
-				&& Objects.equal(curationFile, other.curationFile);
+				&& Objects.equal(curationFile, other.curationFile)
+				&& Objects.equal(publishResult, other.publishResult);
 	}
 }
 

@@ -286,7 +286,7 @@ public final class SearchRunner implements Runnable, Lifecycle {
 
 				scaffoldTask = addScaffoldAndQaTasks(scaffoldTask, inputFile, conversion, scaffoldDeployment, engine, search);
 				if (searchWithIdpQonvert(inputFile) && myrimatch(engine)) {
-					addIdpQonvertTask(idpQonvert, search);
+					addIdpQonvertTask(idpQonvert, search, true);
 				}
 			}
 		}
@@ -306,7 +306,7 @@ public final class SearchRunner implements Runnable, Lifecycle {
 
 			final SearchEngine myrimatch = engines.getMyrimatchEngine();
 			final EngineSearchTask myrimatchSearch = addEngineSearchTask(myrimatch, inputFile, mzmlFile, getSemiParameters(searchParameters), publicSearchFiles);
-			final IdpQonvertTask idpQonvertTask = addIdpQonvertTask(idpQonvert, myrimatchSearch);
+			final IdpQonvertTask idpQonvertTask = addIdpQonvertTask(idpQonvert, myrimatchSearch, false/* Do not publish the idpDB file, temp only*/);
 			addQuameterTask(engines.getQuameterEngine(), idpQonvertTask, inputFile.getInputFile(), searchDbTask, inputFile, publicSearchFiles);
 		}
 	}
@@ -367,11 +367,12 @@ public final class SearchRunner implements Runnable, Lifecycle {
 		return addEngineSearch(engine, paramFile, inputFile.getInputFile(), outputFolder, convertedFile, database, deploymentResult, publicSearchFiles);
 	}
 
-	private IdpQonvertTask addIdpQonvertTask(final SearchEngine idpQonvert, final EngineSearchTask search) {
-		return addIdpQonvertCall(
-				idpQonvert,
-				getOutputFolderForSearchEngine(idpQonvert),
-				search);
+	private IdpQonvertTask addIdpQonvertTask(final SearchEngine idpQonvert, final EngineSearchTask search, final boolean publishResult) {
+		final IdpQonvertTask task = addTask(new IdpQonvertTask(workflowEngine, swiftDao, searchRun,
+				getSearchDefinition(), idpQonvert.getSearchDaemon(),
+				search, getOutputFolderForSearchEngine(idpQonvert), publishResult, fileTokenFactory, isFromScratch()));
+		task.addDependency(search);
+		return task;
 	}
 
 	private QuameterTask addQuameterTask(final SearchEngine quaMeter, final IdpQonvertTask search, final File rawFile,
@@ -874,15 +875,6 @@ public final class SearchRunner implements Runnable, Lifecycle {
 			return scaffoldUnimod;
 		}
 		return null;
-	}
-
-	private IdpQonvertTask addIdpQonvertCall(final SearchEngine idpQonvert, final File outputFolder,
-	                                         final EngineSearchTask search) {
-		final IdpQonvertTask task = addTask(new IdpQonvertTask(workflowEngine, swiftDao, searchRun,
-				getSearchDefinition(), idpQonvert.getSearchDaemon(),
-				search, outputFolder, fileTokenFactory, isFromScratch()));
-		task.addDependency(search);
-		return task;
 	}
 
 	private FastaDbTask addFastaDbCall(final Curation curation) {
