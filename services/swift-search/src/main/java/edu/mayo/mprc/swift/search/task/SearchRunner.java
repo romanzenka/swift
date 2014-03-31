@@ -34,7 +34,7 @@ import java.util.concurrent.ExecutorService;
  * Performs swift search, one {@link #run()} call at a time. To do that, it
  * first creates a workflow, that is then being executed by {@link edu.mayo.mprc.workflow.engine.WorkflowEngine}.
  * <h3>Workflow creation</h3>
- * {@link #searchDefinitionToLists(edu.mayo.mprc.swift.dbmapping.SwiftSearchDefinition)} turns
+ * {@link #searchDefinitionToTasks(edu.mayo.mprc.swift.dbmapping.SwiftSearchDefinition)} turns
  * the search definition into a list of tasks to do.
  * <p/>
  * The list of tasks get collected and added to the workflow engine by {@link #collectAllTasks()}.
@@ -91,8 +91,6 @@ public final class SearchRunner implements Runnable, Lifecycle {
 	private final DaemonConnection quameterDbDaemon;
 	private final boolean reportDecoyHits;
 
-	private final Collection<SearchEngine> searchEngines;
-
 	private final WorkflowEngine workflowEngine;
 
 	private boolean initializationDone;
@@ -101,27 +99,14 @@ public final class SearchRunner implements Runnable, Lifecycle {
 	private final ExecutorService service;
 
 	private final DatabaseFileTokenFactory fileTokenFactory;
-
-	/**
-	 * Key: {@link SearchEngineParameters} parameter set
-	 * Value: A string uniquely identifying the parameter set.
-	 * <p/>
-	 * When there is just one parameter set, the string would be "".
-	 * When there are more, the string would be '1' for the first parameter set mentioned by first input file, '2' for second and so on.
-	 */
-	private Map<SearchEngineParameters, String> searchEngineParametersNames;
-	/**
-	 * Key: search engine:{@link #getSearchEngineParametersName}
-	 * Value: parameter file name
-	 */
-	private Map<String, File> parameterFiles;
+	private SearchEngineParametersCollection parameterFiles;
+	private final SearchEngineList engines;
 
 	/**
 	 * Making files distinct in case the search uses same file name several times.
 	 */
 	private final DistinctFiles distinctFiles = new DistinctFiles();
 	private static final String DEFAULT_SPECTRUM_QA_FOLDER = "spectrum_qa";
-	private static final String DEFAULT_PARAMS_FOLDER = "params";
 
 	public SearchRunner(
 			final SwiftSearchDefinition searchDefinition,
@@ -158,7 +143,6 @@ public final class SearchRunner implements Runnable, Lifecycle {
 		this.fastaDbDaemon = fastaDbDaemon;
 		this.searchDbDaemon = searchDbDaemon;
 		this.quameterDbDaemon = quameterDbDaemon;
-		this.searchEngines = searchEngines;
 		this.reporter = reporter;
 		this.service = service;
 		this.curationDao = curationDao;
@@ -170,14 +154,16 @@ public final class SearchRunner implements Runnable, Lifecycle {
 		workflowEngine.setPriority(priority);
 		this.paramsInfo = paramsInfo;
 		this.fromScratch = fromScratch;
+		engines = new SearchEngineList(searchEngines, searchDefinition);
 		assertValid();
 	}
 
 	public void initialize() {
 		if (!initializationDone) {
 			LOGGER.debug("Initializing search " + searchDefinition.getTitle());
-			createParameterFiles();
-			searchDefinitionToLists(searchDefinition);
+			parameterFiles = new SearchEngineParametersCollection(isQualityControlEnabled(), engines, paramsInfo);
+			parameterFiles.createParameterFiles(getSearchDefinition());
+			searchDefinitionToTasks(searchDefinition);
 			addReportTasks(searchDefinition);
 			collectAllTasks();
 			assertValid();
@@ -228,7 +214,6 @@ public final class SearchRunner implements Runnable, Lifecycle {
 		Preconditions.checkNotNull(curationDao, "Curation DAO has to be set up");
 		Preconditions.checkNotNull(swiftDao, "Swift DAO has to be set up");
 
-		assert searchEngines != null : "Search engine set must not be null";
 		if (searchDefinition != null) {
 			assert workflowEngine.getNumTasks() == tasks.size() : "All tasks must be a collection of *ALL* tasks";
 		}
@@ -244,150 +229,27 @@ public final class SearchRunner implements Runnable, Lifecycle {
 		}
 	}
 
-	private void searchDefinitionToLists(final SwiftSearchDefinition searchDefinition) {
+	/**
+	 * Will implement the search by creating all the tasks that are needed to run it.
+	 *
+	 * @param searchDefinition Search to run.
+	 */
+	private void searchDefinitionToTasks(final SwiftSearchDefinition searchDefinition) {
 		// Now let us fill in all the lists
 		File file = null;
 
 		for (final FileSearch inputFile : searchDefinition.getInputFiles()) {
 			file = inputFile.getInputFile();
 			if (file.exists()) {
-				addInputFileToLists(inputFile, searchDefinition.getSearchParameters(), Boolean.TRUE.equals(searchDefinition.getPublicSearchFiles()));
+				inputFileToTasks(inputFile, searchDefinition.getSearchParameters(), Boolean.TRUE.equals(searchDefinition.getPublicSearchFiles()));
 			} else {
 				LOGGER.info("Skipping nonexistent input file [" + file.getAbsolutePath() + "]");
 			}
 		}
 	}
 
-	private SearchEngine getSearchEngine(final String code) {
-		String version = "";
-		for (final SearchEngineConfig config : searchDefinition.getInputFiles().get(0).getEnabledEngines().getEngineConfigs()) {
-			if (config.getCode().equals(code)) {
-				version = config.getVersion();
-				break;
-			}
-		}
-
-		for (final SearchEngine engine : searchEngines) {
-			if (engine.getCode().equalsIgnoreCase(code) && engine.getVersion().equalsIgnoreCase(version)) {
-				return engine;
-			}
-		}
-
-		// Special case - the version we want is not specified. Pick the newest.
-		// This happens for legacy searches and also for the QuaMeter-enabled MM and IdpQonvert
-		// If there is no such engine, return null instead of throwing an exception
-		if ("".equals(version)) {
-			SearchEngine bestEngine = null;
-			String bestVersion = "";
-			for (final SearchEngine engine : searchEngines) {
-				if (engine.getCode().equalsIgnoreCase(code) && engine.getVersion().compareTo(bestVersion) > 0) {
-					bestVersion = version;
-					bestEngine = engine;
-				}
-			}
-			return bestEngine;
-		} else {
-			throw new MprcException("The search engine [" + code + "] version [" + version + "] is no longer available. Please edit the search and try again");
-		}
-	}
-
-	private SearchEngine getScaffoldEngine() {
-		return getSearchEngine("SCAFFOLD");
-	}
-
-	private SearchEngine getIdpQonvertEngine() {
-		return getSearchEngine("IDPQONVERT");
-	}
-
-	private SearchEngine getMyrimatchEngine() {
-		return getSearchEngine("MYRIMATCH");
-	}
-
-	private SearchEngine getQuameterEngine() {
-		return getSearchEngine("QUAMETER");
-	}
-
-	/**
-	 * Save parameter files to the disk.
-	 * <p/>
-	 * This used to be here because the search engines actually used the parameter files.
-	 * Now it is just a dump of files for the user.
-	 */
-	private void createParameterFiles() {
-		searchEngineParametersNames = nameSearchEngineParameters(searchDefinition.getInputFiles(), searchDefinition.getSearchParameters());
-
-		// Obtain a set of all search engines that were requested
-		// This way we only create config files that we need
-		final Set<String> enabledEngines = new HashSet<String>();
-		for (final FileSearch fileSearch : searchDefinition.getInputFiles()) {
-			if (fileSearch != null) {
-				for (final SearchEngineConfig config : fileSearch.getEnabledEngines().getEngineConfigs()) {
-					enabledEngines.add(config.getCode());
-				}
-			}
-		}
-
-		addEnginesForQualityControl(enabledEngines);
-
-		final File paramFolder = new File(searchDefinition.getOutputFolder(), DEFAULT_PARAMS_FOLDER);
-		FileUtilities.ensureFolderExists(paramFolder);
-		parameterFiles = new HashMap<String, File>();
-		if (!enabledEngines.isEmpty()) {
-			FileUtilities.ensureFolderExists(paramFolder);
-			for (final String engineCode : enabledEngines) {
-				final SearchEngine engine = getSearchEngine(engineCode);
-				for (final Map.Entry<SearchEngineParameters, String> parameterSet : searchEngineParametersNames.entrySet()) {
-					final File file = engine.
-							writeSearchEngineParameterFile(paramFolder, parameterSet.getKey(), parameterSet.getValue(), null /*We do not validate, validation should be already done*/, paramsInfo);
-					addParamFile(engineCode, parameterSet.getValue(), file);
-				}
-			}
-		}
-	}
-
-	/**
-	 * Enable extra engines that support the Quality Control (MyriMatch and IdpQonvert)
-	 *
-	 * @param enabledEngines List of currently enabled engines. Will append new ones.
-	 */
-	private void addEnginesForQualityControl(final Set<String> enabledEngines) {
-		if (isQualityControlEnabled()) {
-			enabledEngines.add("MYRIMATCH");
-			enabledEngines.add("IDPQONVERT");
-		}
-	}
-
 	private boolean isQualityControlEnabled() {
-		return engineEnabledForAnyFile(getSearchDefinition().getInputFiles(), getQuameterEngine());
-	}
-
-	/**
-	 * Create a map from all used search engine parameters to short names that distinguish them.
-	 */
-	private static Map<SearchEngineParameters, String> nameSearchEngineParameters(final List<FileSearch> searches, final SearchEngineParameters defaultParameters) {
-		final List<SearchEngineParameters> parameters = new ArrayList<SearchEngineParameters>(10);
-		final Collection<SearchEngineParameters> seenParameters = new HashSet<SearchEngineParameters>(10);
-		for (final FileSearch fileSearch : searches) {
-			final SearchEngineParameters searchParameters = fileSearch.getSearchParametersWithDefault(defaultParameters);
-			if (!seenParameters.contains(searchParameters)) {
-				seenParameters.add(searchParameters);
-				parameters.add(searchParameters);
-			}
-		}
-		// Now we have a list of unique search parameters in same order as they appear in files
-		final Map<SearchEngineParameters, String> resultMap = new HashMap<SearchEngineParameters, String>(parameters.size());
-		if (parameters.size() == 1) {
-			resultMap.put(parameters.get(0), "");
-		} else {
-			for (int i = 0; i < parameters.size(); i++) {
-				resultMap.put(parameters.get(i), String.valueOf(i + 1));
-			}
-		}
-		return resultMap;
-	}
-
-	String getSearchEngineParametersName(final SearchEngineParameters parameters) {
-		return searchEngineParametersNames.get(parameters);
+		return engineEnabledForAnyFile(getSearchDefinition().getInputFiles(), engines.getQuameterEngine());
 	}
 
 	/**
@@ -399,26 +261,26 @@ public final class SearchRunner implements Runnable, Lifecycle {
 	 * @param defaultSearchParameters What parameters to use when searching, if the file does not specify otherwise.
 	 * @param publicSearchFiles       True when the intermediate search files should be made public.
 	 */
-	void addInputFileToLists(final FileSearch inputFile, final SearchEngineParameters defaultSearchParameters, final boolean publicSearchFiles) {
+	void inputFileToTasks(final FileSearch inputFile, final SearchEngineParameters defaultSearchParameters, final boolean publicSearchFiles) {
 		final SearchEngineParameters searchParameters = inputFile.getSearchParametersWithDefault(defaultSearchParameters);
 
 		final FileProducingTask conversion = addRawConversionTask(inputFile, null);
 
 		addInputAnalysis(inputFile, conversion);
 
-		final SearchEngine scaffold = getScaffoldEngine();
+		final SearchEngine scaffold = engines.getScaffoldEngine();
 		final Curation database = searchParameters.getDatabase();
 
 		final DatabaseDeployment scaffoldDeployment = addScaffoldDatabaseDeployment(inputFile, scaffold, database);
 
-		final SearchEngine idpQonvert = getIdpQonvertEngine();
+		final SearchEngine idpQonvert = engines.getIdpQonvertEngine();
 
 		ScaffoldSpectrumTask scaffoldTask = null;
 
 		// Go through all possible search engines this file requires
-		for (final SearchEngine engine : searchEngines) {
+		for (final SearchEngine engine : engines.getEngines()) {
 			// All 'normal' searches get normal entries
-			// While building these, the Scaffold search entry itself is initialized in a separate list
+			// While building these, the Scaffold search entry itself is initialized
 			// The IdpQonvert search is special as well, it is set up to process the results of the myrimatch search
 			if (isNormalEngine(engine) && engineEnabledForFile(inputFile, engine)) {
 				final EngineSearchTask search = addEngineSearchTask(engine, inputFile, conversion, searchParameters, publicSearchFiles);
@@ -443,10 +305,10 @@ public final class SearchRunner implements Runnable, Lifecycle {
 		if (isRawFile(inputFile) && isQualityControlEnabled()) {
 			final FileProducingTask mzmlFile = addRawConversionTask(inputFile, MSCONVERT_MZML);
 
-			final SearchEngine myrimatch = getMyrimatchEngine();
+			final SearchEngine myrimatch = engines.getMyrimatchEngine();
 			final EngineSearchTask myrimatchSearch = addEngineSearchTask(myrimatch, inputFile, mzmlFile, searchParameters, publicSearchFiles);
 			final IdpQonvertTask idpQonvertTask = addIdpQonvertTask(idpQonvert, myrimatchSearch);
-			addQuameterTask(getQuameterEngine(), idpQonvertTask, inputFile.getInputFile(), searchDbTask, inputFile, publicSearchFiles);
+			addQuameterTask(engines.getQuameterEngine(), idpQonvertTask, inputFile.getInputFile(), searchDbTask, inputFile, publicSearchFiles);
 		}
 	}
 
@@ -476,7 +338,7 @@ public final class SearchRunner implements Runnable, Lifecycle {
 	private EngineSearchTask addEngineSearchTask(final SearchEngine engine, final FileSearch inputFile,
 	                                             final FileProducingTask convertedFile, final SearchEngineParameters searchParameters,
 	                                             final boolean publicSearchFiles) {
-		final File paramFile = getParamFile(engine, searchParameters);
+		final File paramFile = parameterFiles.getParamFile(engine, searchParameters);
 		final Curation database = searchParameters.getDatabase();
 
 		DatabaseDeploymentResult deploymentResult = null;
@@ -567,22 +429,6 @@ public final class SearchRunner implements Runnable, Lifecycle {
 
 	private boolean isNormalEngine(final SearchEngine engine) {
 		return !engine.getEngineMetadata().isAggregator();
-	}
-
-	private void addParamFile(final String engineCode, final String parametersName, final File file) {
-		parameterFiles.put(getParamFileHash(engineCode, parametersName), file);
-	}
-
-	private File getParamFile(final SearchEngine engine, final SearchEngineParameters parameters) {
-		return parameterFiles.get(getParamFileHash(engine, parameters));
-	}
-
-	private String getParamFileHash(final SearchEngine engine, final SearchEngineParameters parameters) {
-		return getParamFileHash(engine.getCode(), getSearchEngineParametersName(parameters));
-	}
-
-	private static String getParamFileHash(final String engineCode, final String parametersName) {
-		return engineCode + ":" + parametersName;
 	}
 
 	/**
@@ -979,7 +825,7 @@ public final class SearchRunner implements Runnable, Lifecycle {
 	 */
 	private ScaffoldSpectrumTask addScaffoldCall(final String scaffoldVersion, final FileSearch inputFile, final EngineSearchTask search, final DatabaseDeployment scaffoldDbDeployment) {
 		final String experiment = inputFile.getExperiment();
-		final SearchEngine scaffoldEngine = getScaffoldEngine();
+		final SearchEngine scaffoldEngine = engines.getScaffoldEngine();
 		final File scaffoldUnimod = getScaffoldUnimod(scaffoldEngine);
 		final File scaffoldOutputDir = getOutputFolderForSearchEngine(scaffoldEngine);
 		final ScaffoldSpectrumTask scaffoldTask = addTask(new ScaffoldSpectrumTask(

@@ -289,7 +289,8 @@ public class TestSearchRunner {
 				+ 1 /* Raw->mzML */
 				+ 1 /* Myrimatch mzML */
 				+ 1 /* IdpQonvert mzML */
-				+ 1 /* QuaMeter */;
+				+ 1 /* QuaMeter */
+				+ 1 /* QuaMeter DB load */;
 
 		final int tasksPerSearch = 0
 				+ 1 /* Fasta DB load */
@@ -330,7 +331,8 @@ public class TestSearchRunner {
 				+ 1 /* RawDump */
 				+ 1 /* msmsEval */
 
-				+ 1 /* QuaMeter */;
+				+ 1 /* QuaMeter */
+				+ 1 /* QuaMeter db load */;
 
 		final int tasksPerSearch = 0
 				+ 1 /* Fasta DB load */
