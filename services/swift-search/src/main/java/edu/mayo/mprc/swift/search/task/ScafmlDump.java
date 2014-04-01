@@ -157,7 +157,8 @@ class ScafmlDump {
 				star != null ? star.getDelimiter() : "",
 				star != null && star.isRegularExpression(),
 				scaffoldSettings.isSaveOnlyIdentifiedSpectra(), // Spectra
-				scaffoldSettings.isSaveNoSpectra()
+				scaffoldSettings.isSaveNoSpectra(),
+				scaffoldSettings.isMzIdentMlReport()
 		);
 		se.setExport(export);
 

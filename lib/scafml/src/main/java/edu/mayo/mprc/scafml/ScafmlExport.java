@@ -10,6 +10,7 @@ import java.util.regex.Pattern;
 public final class ScafmlExport extends FileHolder {
 	private static final long serialVersionUID = 7906225867829407626L;
 	private static final Pattern SCAFFOLD_4 = Pattern.compile("^[^0-9]*4(\\..*|$)");
+	public static final String MZIDENTML_EXTENSION = ".mzid";
 	// Version of Scaffold
 	private String scaffoldVersion;
 
@@ -18,6 +19,7 @@ public final class ScafmlExport extends FileHolder {
 
 	// Additional exports
 	private boolean exportSpectra;
+	private boolean exportMzIdentMl;
 
 	// Thresholds
 	private double proteinProbability;
@@ -37,7 +39,7 @@ public final class ScafmlExport extends FileHolder {
 	public ScafmlExport() {
 	}
 
-	public ScafmlExport(final String scaffoldVersion, final String experimentName, final File scaffoldOutputDir, final boolean exportSpectra, final double proteinProbability, final double peptideProbability, final int minimumPeptideCount, final int minimumNonTrypticTerminii, final String starred, final String delimiter, final boolean regularExpression, final boolean saveOnlyIdentifiedSpectra, final boolean saveNoSpectra) {
+	public ScafmlExport(final String scaffoldVersion, final String experimentName, final File scaffoldOutputDir, final boolean exportSpectra, final double proteinProbability, final double peptideProbability, final int minimumPeptideCount, final int minimumNonTrypticTerminii, final String starred, final String delimiter, final boolean regularExpression, final boolean saveOnlyIdentifiedSpectra, final boolean saveNoSpectra, final boolean exportMzIdentMl) {
 		this.scaffoldVersion = scaffoldVersion;
 		this.experimentName = experimentName;
 		this.scaffoldOutputDir = scaffoldOutputDir;
@@ -51,6 +53,7 @@ public final class ScafmlExport extends FileHolder {
 		this.regularExpression = regularExpression;
 		this.saveOnlyIdentifiedSpectra = saveOnlyIdentifiedSpectra;
 		this.saveNoSpectra = saveNoSpectra;
+		this.exportMzIdentMl = exportMzIdentMl;
 	}
 
 	public boolean isScaffold4() {
@@ -90,6 +93,13 @@ public final class ScafmlExport extends FileHolder {
 			result
 					.append(indent)
 					.append("<Export type=\"spectrum\" thresholds=\"thresh\" path=\"").append(scaffoldOutputDir.getAbsolutePath()).append("\"/>\n");
+		}
+
+		if (exportMzIdentMl) {
+			result
+					.append(indent)
+					.append("<Export type=\"mzIdentML\" thresholds=\"thresh\" path=\"").append(
+					new File(scaffoldOutputDir, experimentName + MZIDENTML_EXTENSION).getAbsolutePath()).append("\"/>\n");
 		}
 
 		if (starred != null && !starred.trim().isEmpty()) {
