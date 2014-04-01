@@ -48,6 +48,11 @@ public final class MockUnimodDao implements UnimodDao {
 	}
 
 	@Override
+	public String qualifyTableName(String table) {
+		return table;
+	}
+
+	@Override
 	public String check() {
 		return null;
 	}

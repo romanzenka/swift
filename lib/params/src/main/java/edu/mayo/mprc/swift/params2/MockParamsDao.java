@@ -186,12 +186,17 @@ public final class MockParamsDao implements ParamsDao {
 	}
 
 	@Override
+	public String qualifyTableName(final String table) {
+		return table;
+	}
+
+	@Override
 	public String check() {
 		return null;
 	}
 
 	@Override
-	public void install(Map<String, String> params) {
+	public void install(final Map<String, String> params) {
 	}
 
 	@Override

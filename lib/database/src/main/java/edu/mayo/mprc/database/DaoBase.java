@@ -72,6 +72,11 @@ public abstract class DaoBase implements Dao, SessionProvider {
 		database.rollback();
 	}
 
+	@Override
+	public String qualifyTableName(final String table) {
+		return getDatabase().getQualifiedTableName(table);
+	}
+
 	public static <T> List<T> listAndCast(final Criteria criteria) {
 		@SuppressWarnings("unchecked")
 		List list = criteria.list();

@@ -460,6 +460,13 @@ public final class Database implements RuntimeInitializer, Lifecycle {
 		throw new MprcException("Cannot determine dialect of the database");
 	}
 
+	public String getQualifiedTableName(final String name) {
+		if (config == null) {
+			return name;
+		}
+		return config.getSchema() + "." + name;
+	}
+
 	/**
 	 * Configuration for the factory
 	 */

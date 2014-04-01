@@ -4,7 +4,12 @@ import edu.mayo.mprc.MprcException;
 import edu.mayo.mprc.database.PersistableBase;
 import edu.mayo.mprc.database.SessionProvider;
 import org.hibernate.*;
+import org.hibernate.dialect.SQLServerDialect;
+import org.hibernate.jdbc.Work;
 
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.text.MessageFormat;
 import java.util.Collection;
 import java.util.Iterator;
@@ -27,7 +32,7 @@ public abstract class BulkLoader<T extends PersistableBase> {
 	public static final int BATCH_SIZE = 100;
 
 	private final BulkLoadJobStarter jobStarter;
-	private final SessionProvider sessionProvider;
+	protected final SessionProvider sessionProvider;
 
 	protected BulkLoader(final BulkLoadJobStarter jobStarter, final SessionProvider sessionProvider) {
 		this.jobStarter = jobStarter;
@@ -132,7 +137,7 @@ public abstract class BulkLoader<T extends PersistableBase> {
 
 		final String subSelect =
 				MessageFormat.format("SELECT s.{1} from {2} as s where {3} and {0}.job = :job",
-						tempTableName, tableId, table, equalityString);
+						sessionProvider.qualifyTableName(tempTableName), tableId, sessionProvider.qualifyTableName(table), equalityString);
 
 		// This is absolutely hideous.
 		// We ask hibernate dialect to figure out how to do the limit operation.
@@ -145,7 +150,7 @@ public abstract class BulkLoader<T extends PersistableBase> {
 		final SQLQuery sqlQuery = getSession().createSQLQuery(
 				MessageFormat.format(
 						"UPDATE {0} SET {0}.new_id = ({1}) where {0}.job = :job",
-						tempTableName, limitedSubSelect));
+						sessionProvider.qualifyTableName(tempTableName), limitedSubSelect));
 		sqlQuery.setParameter("job", bulkLoadJob.getId()).setReadOnly(true);
 		final int update1 = sqlQuery.executeUpdate();
 		return update1;
@@ -157,7 +162,7 @@ public abstract class BulkLoader<T extends PersistableBase> {
 
 		try {
 			final Integer lastId = (Integer) getSession()
-					.createSQLQuery("select max(" + tableId + ") from " + table)
+					.createSQLQuery("select max(" + tableId + ") from " + sessionProvider.qualifyTableName(table))
 					.uniqueResult();
 			if (lastId == null) {
 				return 0;
@@ -174,13 +179,16 @@ public abstract class BulkLoader<T extends PersistableBase> {
 		final String tempTableName = getTempTableName();
 		final String columnsToTranfer = getColumnsToTransfer();
 		try {
+			identityOn(table);
 			final Query query = getSession()
 					.createSQLQuery(
 							MessageFormat.format(
 									"INSERT INTO {0} ({1}, {2}) select data_order+{3,number,#}, {4} from {5} where job = :job and new_id is null",
-									table, tableId, columnsToTranfer, lastId, columnsToTranfer, tempTableName))
+									sessionProvider.qualifyTableName(table), tableId, columnsToTranfer, lastId, columnsToTranfer,
+									sessionProvider.qualifyTableName(tempTableName)))
 					.setParameter("job", bulkLoadJob.getId());
 			query.executeUpdate();
+			identityOff(table);
 		} catch (Exception e) {
 			throw new MprcException("Cannot insert new data to " + table, e);
 		}
@@ -190,11 +198,35 @@ public abstract class BulkLoader<T extends PersistableBase> {
 					.createSQLQuery(
 							MessageFormat.format(
 									"UPDATE {0} SET new_id = data_order+{1,number,#} where job = :job and new_id is null",
-									tempTableName, lastId))
+									sessionProvider.qualifyTableName(tempTableName), lastId))
 					.setParameter("job", bulkLoadJob.getId());
 			query2.executeUpdate();
 		} catch (Exception e) {
 			throw new MprcException("Cannot update existing data in " + tempTableName, e);
+		}
+	}
+
+	protected void identityOff(final String table) {
+		if (sessionProvider.getDialect() instanceof SQLServerDialect) {
+			getSession().doWork(new Work() {
+				@Override
+				public void execute(Connection connection) throws SQLException {
+					Statement statement = connection.createStatement();
+					statement.execute("SET IDENTITY_INSERT " + sessionProvider.qualifyTableName(table) + " OFF;");
+				}
+			});
+		}
+	}
+
+	protected void identityOn(final String table) {
+		if (sessionProvider.getDialect() instanceof SQLServerDialect) {
+			getSession().doWork(new Work() {
+				@Override
+				public void execute(Connection connection) throws SQLException {
+					Statement statement = connection.createStatement();
+					statement.execute("SET IDENTITY_INSERT " + sessionProvider.qualifyTableName(table) + " ON;");
+				}
+			});
 		}
 	}
 
@@ -203,7 +235,7 @@ public abstract class BulkLoader<T extends PersistableBase> {
 		final Query query = getSession().createSQLQuery(
 				MessageFormat.format(
 						"SELECT new_id FROM {0} t WHERE t.job = :job ORDER BY t.data_order",
-						tempTableName));
+						sessionProvider.qualifyTableName(tempTableName)));
 
 		query.setParameter("job", bulkLoadJob.getId()).setReadOnly(true);
 		query.setReadOnly(true);
@@ -230,7 +262,7 @@ public abstract class BulkLoader<T extends PersistableBase> {
 		final String tempTableName = getTempTableName();
 		final SQLQuery deleteQuery = getSession().createSQLQuery(
 				MessageFormat.format(
-						"DELETE FROM {0} WHERE job=:job", tempTableName));
+						"DELETE FROM {0} WHERE job=:job", sessionProvider.qualifyTableName(tempTableName)));
 		deleteQuery.setParameter("job", bulkLoadJob.getId()).setReadOnly(true);
 		final int numDeleted = deleteQuery.executeUpdate();
 		if (numDeleted != numAddedValues) {

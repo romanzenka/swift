@@ -16,4 +16,9 @@ public interface SessionProvider {
 	 * @return Current database dialect.
 	 */
 	Dialect getDialect();
+
+	/**
+	 * Return fully qualified name for given table (using schema)
+	 */
+	String qualifyTableName(String table);
 }

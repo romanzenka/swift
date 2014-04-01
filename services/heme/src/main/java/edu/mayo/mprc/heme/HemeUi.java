@@ -124,6 +124,11 @@ public final class HemeUi implements Dao {
 		getHemeDao().rollback();
 	}
 
+	@Override
+	public String qualifyTableName(final String table) {
+		return getHemeDao().qualifyTableName(table);
+	}
+
 	public List<HemeEntry> getCurrentEntries() {
 		final List<HemeEntry> result = new ArrayList<HemeEntry>((int) getHemeDao().countTests());
 		for (final HemeTest test : getHemeDao().getAllTests()) {

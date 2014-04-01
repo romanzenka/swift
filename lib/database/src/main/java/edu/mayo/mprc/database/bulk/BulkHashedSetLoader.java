@@ -60,8 +60,8 @@ public abstract class BulkHashedSetLoader<T extends PersistableHashedSetBase<? e
 				"and <s>.{3} = sm.{4} " +
 				"and tm.value is null " +
 				")",
-				TEMP_MEMBERS,
-				getMemberTableName(),
+				sessionProvider.qualifyTableName(TEMP_MEMBERS),
+				sessionProvider.qualifyTableName(getMemberTableName()),
 				getMemberTableValue(),
 				getTableIdColumn(),
 				getMemberTableKey());
@@ -97,7 +97,7 @@ public abstract class BulkHashedSetLoader<T extends PersistableHashedSetBase<? e
 	protected void deleteTemp(final BulkLoadJob bulkLoadJob, final int numAddedValues) {
 		final SQLQuery deleteQuery = getSession().createSQLQuery(
 				MessageFormat.format(
-						"DELETE FROM {0} WHERE job=:job", TEMP_MEMBERS));
+						"DELETE FROM {0} WHERE job=:job", sessionProvider.qualifyTableName(TEMP_MEMBERS)));
 		deleteQuery.setParameter("job", bulkLoadJob.getId()).setReadOnly(true);
 		deleteQuery.executeUpdate();
 
@@ -114,13 +114,15 @@ public abstract class BulkHashedSetLoader<T extends PersistableHashedSetBase<? e
 		final String tempTableName = getTempTableName();
 		final String columnsToTranfer = getColumnsToTransfer();
 		try {
+			identityOn(table);
 			final Query query = getSession()
 					.createSQLQuery(
 							MessageFormat.format(
 									"INSERT INTO {0} ({1}, {2}) select data_order+{3,number,#}, {4} from {5} where job = :job and new_id is null",
-									table, tableId, columnsToTranfer, lastId, columnsToTranfer, tempTableName))
+									sessionProvider.qualifyTableName(table), tableId, columnsToTranfer, lastId, columnsToTranfer, sessionProvider.qualifyTableName(tempTableName)))
 					.setParameter("job", bulkLoadJob.getId());
 			query.executeUpdate();
+			identityOff(table);
 		} catch (Exception e) {
 			throw new MprcException("Cannot insert new data to " + table, e);
 		}
@@ -130,7 +132,8 @@ public abstract class BulkHashedSetLoader<T extends PersistableHashedSetBase<? e
 					.createSQLQuery(
 							MessageFormat.format(
 									"INSERT INTO {0} ({1}, {2}) select m.data_order+{3,number,#}, m.value from {4} as m inner join {5} as t on m.job=t.job and m.data_order=t.data_order where t.job = :job and t.new_id is null",
-									getMemberTableName(), getMemberTableKey(), getMemberTableValue(), lastId, TEMP_MEMBERS, TEMP_TABLE))
+									sessionProvider.qualifyTableName(getMemberTableName()), getMemberTableKey(), getMemberTableValue(), lastId,
+									sessionProvider.qualifyTableName(TEMP_MEMBERS), sessionProvider.qualifyTableName(TEMP_TABLE)))
 					.setParameter("job", bulkLoadJob.getId());
 			query.executeUpdate();
 		} catch (Exception e) {
@@ -142,7 +145,7 @@ public abstract class BulkHashedSetLoader<T extends PersistableHashedSetBase<? e
 					.createSQLQuery(
 							MessageFormat.format(
 									"UPDATE {0} SET new_id = data_order+{1,number,#} where job = :job and new_id is null",
-									tempTableName, lastId))
+									sessionProvider.qualifyTableName(tempTableName), lastId))
 					.setParameter("job", bulkLoadJob.getId());
 			query2.executeUpdate();
 		} catch (Exception e) {

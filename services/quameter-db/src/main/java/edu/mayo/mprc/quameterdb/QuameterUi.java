@@ -74,6 +74,11 @@ public final class QuameterUi implements Dao, UiConfigurationProvider {
 		quameterDao.rollback();
 	}
 
+	@Override
+	public String qualifyTableName(final String table) {
+		return quameterDao.qualifyTableName(table);
+	}
+
 	public void dataTableJson(final Writer writer) {
 		final List<QuameterResult> quameterResults = quameterDao.listAllResults(searchFilter);
 

@@ -90,4 +90,9 @@ public abstract class SearchDbDaoBlank implements SearchDbDao {
 	public void rollback() {
 		throw new UnsupportedOperationException();
 	}
+
+	@Override
+	public String qualifyTableName(final String table) {
+		return table;
+	}
 }
