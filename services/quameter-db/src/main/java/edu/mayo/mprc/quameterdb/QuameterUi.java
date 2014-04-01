@@ -177,6 +177,10 @@ public final class QuameterUi implements Dao, UiConfigurationProvider {
 		void setSearchFilter(final String searchFilter) {
 			put(SEARCH_FILTER, searchFilter);
 		}
+
+		public String getCategories() {
+			return get(CATEGORIES);
+		}
 	}
 
 	@Component("quameterUiFactory")
