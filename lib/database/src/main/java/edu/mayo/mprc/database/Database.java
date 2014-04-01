@@ -12,6 +12,7 @@ import org.apache.log4j.Logger;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.dialect.Dialect;
+import org.hibernate.dialect.SQLServerDialect;
 import org.hibernate.engine.SessionFactoryImplementor;
 import org.springframework.stereotype.Component;
 
@@ -461,7 +462,7 @@ public final class Database implements RuntimeInitializer, Lifecycle {
 	}
 
 	public String getQualifiedTableName(final String name) {
-		if (config == null) {
+		if (config == null || !(getDialect() instanceof SQLServerDialect)) {
 			return name;
 		}
 		return config.getSchema() + "." + name;
