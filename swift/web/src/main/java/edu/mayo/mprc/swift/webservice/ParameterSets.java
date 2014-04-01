@@ -20,19 +20,19 @@ public final class ParameterSets {
 	@Resource(name = "paramsDao")
 	private ParamsDao paramsDao;
 
-	@RequestMapping(value="/parameter-sets", method = RequestMethod.GET)
+	@RequestMapping(value = "/parameter-sets", method = RequestMethod.GET)
 	public ModelAndView listParameterSets() {
 		try {
 			getParamsDao().begin();
 			final List<SavedSearchEngineParameters> params = getParamsDao().savedSearchEngineParameters();
 			final ArrayList<ParameterSet> result =
 					new ArrayList<ParameterSet>(params.size());
-			for(final SavedSearchEngineParameters parameterSet : params) {
+			for (final SavedSearchEngineParameters parameterSet : params) {
 				result.add(new ParameterSet(parameterSet));
 			}
 
 			getParamsDao().commit();
-			ModelAndView modelAndView=new ModelAndView();
+			ModelAndView modelAndView = new ModelAndView();
 			modelAndView.addObject("params", result);
 			return modelAndView;
 		} catch (Exception t) {
