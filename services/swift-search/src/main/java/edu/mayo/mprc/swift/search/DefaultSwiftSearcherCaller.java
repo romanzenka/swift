@@ -141,7 +141,7 @@ public final class DefaultSwiftSearcherCaller implements SwiftSearcherCaller {
 				searchInput.isPublicMgfFiles(),
 				searchInput.isPublicMzxmlFiles(),
 				searchInput.isPublicSearchFiles(),
-				new HashMap<String, String>()
+				new HashMap<String, String>(searchInput.getUserParameters())
 		);
 	}
 

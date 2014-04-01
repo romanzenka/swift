@@ -1,9 +1,12 @@
 package edu.mayo.mprc.swift.search;
 
+import edu.mayo.mprc.MprcException;
 import org.springframework.util.MultiValueMap;
 
 import java.io.File;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * A simple textual representation of a swift search to be performed.
@@ -11,6 +14,7 @@ import java.util.List;
  * @author Roman Zenka
  */
 public final class SearchInput {
+	public static final String USER_KEY_PREFIX = "user.";
 	private String title;
 	private String userEmail;
 	private String outputFolderName;
@@ -28,6 +32,7 @@ public final class SearchInput {
 	private boolean publicSearchFiles;
 	private boolean publicMzxmlFiles;
 	private boolean qualityControl;
+	private Map<String, String> user;
 
 	public SearchInput() {
 	}
@@ -62,6 +67,20 @@ public final class SearchInput {
 		publicMgfFiles = isTrue(searchInputMap, "publicMzxmlFiles");
 		publicSearchFiles = isTrue(searchInputMap, "publicSearchFiles");
 		qualityControl = isTrue(searchInputMap, "qualityControl");
+		user = new LinkedHashMap<String, String>(1);
+
+		for (final Map.Entry<String, List<String>> entry : searchInputMap.entrySet()) {
+			final String key = entry.getKey();
+			if (key.startsWith(USER_KEY_PREFIX)) {
+				final String name = key.substring(USER_KEY_PREFIX.length());
+				final List<String> list = entry.getValue();
+				if (list.size() == 1) {
+					user.put(name, list.get(0));
+				} else {
+					throw new MprcException("User value " + key + " must not be submitted " + list.size() + " times");
+				}
+			}
+		}
 	}
 
 	private static boolean isTrue(final MultiValueMap<String, String> searchInputMap, final String key) {
@@ -122,7 +141,7 @@ public final class SearchInput {
 		return paramSetIds;
 	}
 
-	public void setParamSetIds(int[] paramSetIds) {
+	public void setParamSetIds(final int[] paramSetIds) {
 		this.paramSetIds = paramSetIds.clone();
 	}
 
@@ -162,7 +181,7 @@ public final class SearchInput {
 		return enabledEngines;
 	}
 
-	public void setEnabledEngines(String[] enabledEngines) {
+	public void setEnabledEngines(final String[] enabledEngines) {
 		this.enabledEngines = enabledEngines;
 	}
 
@@ -210,7 +229,7 @@ public final class SearchInput {
 		return publicMzxmlFiles;
 	}
 
-	public void setPublicMzxmlFiles(boolean publicMzxmlFiles) {
+	public void setPublicMzxmlFiles(final boolean publicMzxmlFiles) {
 		this.publicMzxmlFiles = publicMzxmlFiles;
 	}
 
@@ -218,7 +237,18 @@ public final class SearchInput {
 		return qualityControl;
 	}
 
-	public void setQualityControl(boolean qualityControl) {
+	public void setQualityControl(final boolean qualityControl) {
 		this.qualityControl = qualityControl;
+	}
+
+	/**
+	 * @return User-defined search parameters (not predefined). Anything starting with {@link #USER_KEY_PREFIX} goes here.
+	 */
+	public Map<String, String> getUserParameters() {
+		return user;
+	}
+
+	public void setUser(Map<String, String> user) {
+		this.user = user;
 	}
 }
