@@ -89,6 +89,9 @@ public final class SearchInput {
 
 	private static String[] getStringArray(final MultiValueMap<String, String> searchInputMap, final String key) {
 		final List<String> strings = searchInputMap.get(key);
+		if (strings == null) {
+			throw new MprcException("Missing parameter " + key);
+		}
 		final String[] result = new String[strings.size()];
 		strings.toArray(result);
 		return result;
