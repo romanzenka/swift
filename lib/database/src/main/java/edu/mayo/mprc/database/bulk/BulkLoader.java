@@ -130,10 +130,22 @@ public abstract class BulkLoader<T extends PersistableBase> {
 				.replaceAll(Pattern.quote("<t>"), tempTableName)
 				.replaceAll(Pattern.quote("<s>"), "s");
 
+		final String subSelect =
+				MessageFormat.format("SELECT s.{1} from {2} as s where {3} and {0}.job = :job",
+						tempTableName, tableId, table, equalityString);
+
+		// This is absolutely hideous.
+		// We ask hibernate dialect to figure out how to do the limit operation.
+		// Hibernate will return a string with ? in place of the number 1 (we hope)
+		// We replace that ? with the number 1
+		// This is all done because MS SQL does not support LIMIT operation, instead it needs TOP
+		final String limitedSubSelect =
+				sessionProvider.getDialect().getLimitString(subSelect, 0, 1).replace('?', '1');
+
 		final SQLQuery sqlQuery = getSession().createSQLQuery(
 				MessageFormat.format(
-						"UPDATE {0} SET {0}.new_id = (select s.{1} from {2} as s where {3} and {0}.job = :job LIMIT 1) where {0}.job = :job",
-						tempTableName, tableId, table, equalityString));
+						"UPDATE {0} SET {0}.new_id = ({1}) where {0}.job = :job",
+						tempTableName, limitedSubSelect));
 		sqlQuery.setParameter("job", bulkLoadJob.getId()).setReadOnly(true);
 		final int update1 = sqlQuery.executeUpdate();
 		return update1;

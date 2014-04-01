@@ -8,6 +8,7 @@ import org.hibernate.criterion.Conjunction;
 import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
+import org.hibernate.dialect.Dialect;
 
 import javax.annotation.Resource;
 import java.util.Arrays;
@@ -46,6 +47,11 @@ public abstract class DaoBase implements Dao, SessionProvider {
 	public final Session getSession() {
 		database.start();
 		return database.getSession();
+	}
+
+	@Override
+	public Dialect getDialect() {
+		return database.getDialect();
 	}
 
 	@Override

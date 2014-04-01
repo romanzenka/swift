@@ -11,6 +11,8 @@ import edu.mayo.mprc.utilities.exceptions.ExceptionUtilities;
 import org.apache.log4j.Logger;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.hibernate.dialect.Dialect;
+import org.hibernate.engine.SessionFactoryImplementor;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
@@ -448,7 +450,14 @@ public final class Database implements RuntimeInitializer, Lifecycle {
 		public ServiceUiFactory getServiceUiFactory() {
 			return new Ui();
 		}
+	}
 
+	public Dialect getDialect() {
+		if (sessionFactory instanceof SessionFactoryImplementor) {
+			final SessionFactoryImplementor implementor = (SessionFactoryImplementor) sessionFactory;
+			return implementor.getDialect();
+		}
+		throw new MprcException("Cannot determine dialect of the database");
 	}
 
 	/**
