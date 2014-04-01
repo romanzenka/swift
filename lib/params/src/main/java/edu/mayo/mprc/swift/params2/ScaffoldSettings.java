@@ -20,6 +20,7 @@ public class ScaffoldSettings extends PersistableBase {
 	private boolean annotateWithGOA;
 	private boolean useIndependentSampleGrouping;
 	private boolean useFamilyProteinGrouping;
+	private boolean mzIdentMlReport;
 
 	public static final double PROBABILITY_PRECISION = 1E-5;
 
@@ -40,11 +41,12 @@ public class ScaffoldSettings extends PersistableBase {
 			false,
 			false,
 			false,
-			true
+			true,
+			false
 	);
 
 	public ScaffoldSettings(final double proteinProbability, final double peptideProbability, final int minimumPeptideCount, final int minimumNonTrypticTerminii, final StarredProteins starredProteins, final boolean saveOnlyIdentifiedSpectra, final boolean saveNoSpectra, final boolean connectToNCBI, final boolean annotateWithGOA,
-	                        final boolean useIndependentSampleGrouping, final boolean useFamilyProteinGrouping) {
+	                        final boolean useIndependentSampleGrouping, final boolean useFamilyProteinGrouping, final boolean mzIdentMlReport) {
 		this.proteinProbability = proteinProbability;
 		this.peptideProbability = peptideProbability;
 		this.minimumPeptideCount = minimumPeptideCount;
@@ -56,6 +58,7 @@ public class ScaffoldSettings extends PersistableBase {
 		this.annotateWithGOA = annotateWithGOA;
 		this.useIndependentSampleGrouping = useIndependentSampleGrouping;
 		this.useFamilyProteinGrouping = useFamilyProteinGrouping;
+		this.mzIdentMlReport = mzIdentMlReport;
 	}
 
 	public double getProteinProbability() {
@@ -146,6 +149,14 @@ public class ScaffoldSettings extends PersistableBase {
 		this.useFamilyProteinGrouping = useFamilyProteinGrouping;
 	}
 
+	public boolean isMzIdentMlReport() {
+		return mzIdentMlReport;
+	}
+
+	public void setMzIdentMlReport(boolean mzIdentMlReport) {
+		this.mzIdentMlReport = mzIdentMlReport;
+	}
+
 	@Override
 	public boolean equals(final Object obj) {
 		if (this == obj) {
@@ -166,7 +177,8 @@ public class ScaffoldSettings extends PersistableBase {
 				Objects.equal(isSaveOnlyIdentifiedSpectra(), that.isSaveOnlyIdentifiedSpectra()) &&
 				Objects.equal(getStarredProteins(), that.getStarredProteins()) &&
 				Objects.equal(isUseIndependentSampleGrouping(), that.isUseIndependentSampleGrouping()) &&
-				Objects.equal(isUseFamilyProteinGrouping(), that.isUseFamilyProteinGrouping());
+				Objects.equal(isUseFamilyProteinGrouping(), that.isUseFamilyProteinGrouping()) &&
+				Objects.equal(isMzIdentMlReport(), that.isMzIdentMlReport());
 	}
 
 	@Override
@@ -181,7 +193,8 @@ public class ScaffoldSettings extends PersistableBase {
 				isConnectToNCBI(),
 				isAnnotateWithGOA(),
 				isUseIndependentSampleGrouping(),
-				isUseFamilyProteinGrouping());
+				isUseFamilyProteinGrouping(),
+				isMzIdentMlReport());
 	}
 
 	public ScaffoldSettings copy() {
@@ -195,7 +208,8 @@ public class ScaffoldSettings extends PersistableBase {
 				isConnectToNCBI(),
 				isAnnotateWithGOA(),
 				isUseIndependentSampleGrouping(),
-				isUseFamilyProteinGrouping());
+				isUseFamilyProteinGrouping(),
+				isMzIdentMlReport());
 		scaffoldSettings.setId(getId());
 		return scaffoldSettings;
 	}

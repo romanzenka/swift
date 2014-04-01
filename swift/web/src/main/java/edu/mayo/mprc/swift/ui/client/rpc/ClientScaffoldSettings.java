@@ -20,12 +20,13 @@ public final class ClientScaffoldSettings implements ClientValue {
 	private boolean annotateWithGOA;
 	private boolean useIndependentSampleGrouping;
 	private boolean useFamilyProteinGrouping;
+	private boolean mzIdentMlReport;
 
 	public ClientScaffoldSettings() {
 	}
 
 	public ClientScaffoldSettings(final double proteinProbability, final double peptideProbability, final int minimumPeptideCount, final int minimumNonTrypticTerminii, final ClientStarredProteins starredProteins, final boolean saveOnlyIdentifiedSpectra, final boolean saveNoSpectra, final boolean connectToNCBI, final boolean annotateWithGOA,
-	                              final boolean useIndependentSampleGrouping, final boolean useFamilyProteinGrouping) {
+	                              final boolean useIndependentSampleGrouping, final boolean useFamilyProteinGrouping, final boolean mzIdentMlReport) {
 		this.proteinProbability = proteinProbability;
 		this.peptideProbability = peptideProbability;
 		this.minimumPeptideCount = minimumPeptideCount;
@@ -37,6 +38,7 @@ public final class ClientScaffoldSettings implements ClientValue {
 		this.annotateWithGOA = annotateWithGOA;
 		this.useIndependentSampleGrouping = useIndependentSampleGrouping;
 		this.useFamilyProteinGrouping = useFamilyProteinGrouping;
+		this.mzIdentMlReport = mzIdentMlReport;
 	}
 
 	public double getProteinProbability() {
@@ -125,5 +127,13 @@ public final class ClientScaffoldSettings implements ClientValue {
 
 	public void setUseFamilyProteinGrouping(boolean useFamilyProteinGrouping) {
 		this.useFamilyProteinGrouping = useFamilyProteinGrouping;
+	}
+
+	public boolean isMzIdentMlReport() {
+		return mzIdentMlReport;
+	}
+
+	public void setMzIdentMlReport(boolean mzIdentMlReport) {
+		this.mzIdentMlReport = mzIdentMlReport;
 	}
 }

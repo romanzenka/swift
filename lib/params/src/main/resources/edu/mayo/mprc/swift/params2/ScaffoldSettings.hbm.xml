@@ -1,26 +1,26 @@
-<?xml version="1.0" encoding="windows-1252" ?>
-<!DOCTYPE hibernate-mapping PUBLIC
-        "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
-        "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<?xml version="1.0" encoding="windows-1252" ?><!DOCTYPE hibernate-mapping PUBLIC
+    "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+    "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
 
 <hibernate-mapping package="edu.mayo.mprc.swift.params2">
     <class name="ScaffoldSettings" table="scaffold_settings" lazy="false">
         <id name="id" column="scaffold_settings_id" type="int">
-            <generator class="native"/>
+            <generator class="native" />
         </id>
 
-        <property name="proteinProbability" type="double" column="protein_probability"/>
-        <property name="peptideProbability" type="double" column="peptide_probability"/>
-        <property name="minimumPeptideCount" type="integer" column="minimum_peptide_count"/>
-        <property name="minimumNonTrypticTerminii" type="integer" column="minimum_non_tryptic_terminii"/>
+        <property name="proteinProbability" type="double" column="protein_probability" />
+        <property name="peptideProbability" type="double" column="peptide_probability" />
+        <property name="minimumPeptideCount" type="integer" column="minimum_peptide_count" />
+        <property name="minimumNonTrypticTerminii" type="integer" column="minimum_non_tryptic_terminii" />
 
-        <many-to-one name="starredProteins" class="StarredProteins" column="starred_proteins" lazy="false"/>
+        <many-to-one name="starredProteins" class="StarredProteins" column="starred_proteins" lazy="false" />
 
-        <property name="saveOnlyIdentifiedSpectra" type="boolean" column="save_only_identified_spectra"/>
-        <property name="saveNoSpectra" type="boolean" column="save_no_spectra"/>
-        <property name="connectToNCBI" type="boolean" column="connect_to_ncbi"/>
-        <property name="annotateWithGOA" type="boolean" column="annotate_with_goa"/>
-        <property name="useFamilyProteinGrouping" type="boolean" column="use_family_protein_grouping"/>
-        <property name="useIndependentSampleGrouping" type="boolean" column="use_independent_sample_grouping"/>
+        <property name="saveOnlyIdentifiedSpectra" type="boolean" column="save_only_identified_spectra" />
+        <property name="saveNoSpectra" type="boolean" column="save_no_spectra" />
+        <property name="connectToNCBI" type="boolean" column="connect_to_ncbi" />
+        <property name="annotateWithGOA" type="boolean" column="annotate_with_goa" />
+        <property name="useFamilyProteinGrouping" type="boolean" column="use_family_protein_grouping" />
+        <property name="useIndependentSampleGrouping" type="boolean" column="use_independent_sample_grouping" />
+        <property name="mzIdentMlReport" type="boolean" column="mz_ident_ml_report" />
     </class>
 </hibernate-mapping>

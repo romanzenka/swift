@@ -294,7 +294,8 @@ public final class ClientProxyGenerator {
 				scaffoldSettings.isConnectToNCBI(),
 				scaffoldSettings.isAnnotateWithGOA(),
 				scaffoldSettings.isUseIndependentSampleGrouping(),
-				scaffoldSettings.isUseFamilyProteinGrouping()
+				scaffoldSettings.isUseFamilyProteinGrouping(),
+				scaffoldSettings.isMzIdentMlReport()
 		);
 	}
 
@@ -337,7 +338,8 @@ public final class ClientProxyGenerator {
 				scaffoldSettings.isConnectToNCBI(),
 				scaffoldSettings.isAnnotateWithGOA(),
 				scaffoldSettings.isUseIndependentSampleGrouping(),
-				scaffoldSettings.isUseFamilyProteinGrouping()
+				scaffoldSettings.isUseFamilyProteinGrouping(),
+				scaffoldSettings.isMzIdentMlReport()
 		);
 	}
 

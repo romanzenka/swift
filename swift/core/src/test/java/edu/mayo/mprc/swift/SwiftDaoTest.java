@@ -75,12 +75,12 @@ public final class SwiftDaoTest {
 		swiftDao.begin();
 		try {
 
-			ScaffoldSettings settings = new ScaffoldSettings(0.95, 0.95, 2, 1, null, false, false, false, false, false, true);
+			ScaffoldSettings settings = new ScaffoldSettings(0.95, 0.95, 2, 1, null, false, false, false, false, false, true, false);
 			settings = paramsDao.addScaffoldSettings(settings);
 
 			final List list = swiftDao.getDatabase().getSession().createQuery("from ScaffoldSettings").list();
 
-			ScaffoldSettings settings2 = new ScaffoldSettings(0.95, 0.95, 2, 1, null, false, false, false, false, false, true);
+			ScaffoldSettings settings2 = new ScaffoldSettings(0.95, 0.95, 2, 1, null, false, false, false, false, false, true, false);
 			settings2 = paramsDao.addScaffoldSettings(settings2);
 
 			Assert.assertEquals(settings.getId(), settings2.getId(), "Same objects have to get the same id");
@@ -102,10 +102,10 @@ public final class SwiftDaoTest {
 			starredProteins.setRegularExpression(false);
 			starredProteins = paramsDao.addStarredProteins(starredProteins);
 
-			ScaffoldSettings settings = new ScaffoldSettings(0.95, 0.95, 2, 1, starredProteins, false, false, false, false, false, true);
+			ScaffoldSettings settings = new ScaffoldSettings(0.95, 0.95, 2, 1, starredProteins, false, false, false, false, false, true, false);
 			settings = paramsDao.addScaffoldSettings(settings);
 
-			ScaffoldSettings settings2 = new ScaffoldSettings(0.95, 0.95, 2, 1, starredProteins, false, false, false, false, false, true);
+			ScaffoldSettings settings2 = new ScaffoldSettings(0.95, 0.95, 2, 1, starredProteins, false, false, false, false, false, true, false);
 			settings2 = paramsDao.addScaffoldSettings(settings2);
 
 			Assert.assertEquals(settings.getId(), settings2.getId(), "Same objects have to get the same id");

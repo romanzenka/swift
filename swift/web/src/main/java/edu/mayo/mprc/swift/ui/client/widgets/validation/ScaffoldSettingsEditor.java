@@ -36,6 +36,7 @@ public final class ScaffoldSettingsEditor extends Composite implements Validatab
 	private final ListBox saveSpectra;
 	private final CheckBox useIndependentSampleGrouping;
 	private final CheckBox useFamilyProteinGrouping;
+	private final CheckBox mzIdentMlReport;
 
 	public ScaffoldSettingsEditor() {
 		panel = new HorizontalPanel();
@@ -113,6 +114,17 @@ public final class ScaffoldSettingsEditor extends Composite implements Validatab
 				updateAndFireChange();
 			}
 		});
+
+		mzIdentMlReport = new CheckBox("mzIdentML");
+		mzIdentMlReport.setTitle("Scaffold will report mzIdentML for perSPECtvies");
+		mzIdentMlReport.setStyleName("scaffold-setting-group");
+		mzIdentMlReport.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(final ClickEvent event) {
+				updateAndFireChange();
+			}
+		});
+
 		panel.add(useFamilyProteinGrouping);
 
 		starredDialog = new StarredProteinsDialog();
@@ -205,6 +217,7 @@ public final class ScaffoldSettingsEditor extends Composite implements Validatab
 		starredCheckbox.setValue(scaffoldSettings.getStarredProteins() != null);
 		scaffoldSettings.setUseIndependentSampleGrouping(useIndependentSampleGrouping.getValue());
 		scaffoldSettings.setUseFamilyProteinGrouping(useFamilyProteinGrouping.getValue());
+		scaffoldSettings.setMzIdentMlReport(mzIdentMlReport.getValue());
 		fireChange();
 	}
 
