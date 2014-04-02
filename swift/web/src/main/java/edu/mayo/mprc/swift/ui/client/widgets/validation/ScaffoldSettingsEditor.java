@@ -114,6 +114,7 @@ public final class ScaffoldSettingsEditor extends Composite implements Validatab
 				updateAndFireChange();
 			}
 		});
+		panel.add(useFamilyProteinGrouping);
 
 		mzIdentMlReport = new CheckBox("mzIdentML");
 		mzIdentMlReport.setTitle("Scaffold will report mzIdentML for perSPECtvies");
@@ -124,8 +125,7 @@ public final class ScaffoldSettingsEditor extends Composite implements Validatab
 				updateAndFireChange();
 			}
 		});
-
-		panel.add(useFamilyProteinGrouping);
+		panel.add(mzIdentMlReport);
 
 		starredDialog = new StarredProteinsDialog();
 		starredDialog.setOkListener(new ClickHandler() {
