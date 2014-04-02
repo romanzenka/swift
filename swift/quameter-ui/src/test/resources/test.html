@@ -196,7 +196,7 @@ function updateAllViews(views, filteredRows) {
     blockRedraw = false;
 }
 function addDygraph(views, viewIndex, view, viewId, viewMetadata, data, pathColumnIndex, selectedPath, instrumentButtons, categoryButtons, instrumentColumnIndex, categoryColumnIndex) {
-    views[viewIndex] = { dataView: view };
+    views[viewIndex] = { dataView: view, minHighlightY: -0.5, maxHighlightY: 0.5 };
     views[viewIndex].dygraph = new Dygraph(
             document.getElementById(viewId),
             views[viewIndex].dataView,
@@ -242,6 +242,23 @@ function addDygraph(views, viewIndex, view, viewId, viewMetadata, data, pathColu
                     selectedPath.text("");
                     instrumentButtons.removeClass("highlight");
                     categoryButtons.removeClass("highlight");
+                },
+                underlayCallback: function (canvas, area, g) {
+                    var view;
+                    for (var j = 0; j < views.length; j++) {
+                        if (views[j].dygraph == g) {
+                            view = views[j];
+                        }
+                    }
+                    if (!view) {
+                        return;
+                    }
+
+                    var bottom = g.toDomYCoord(view.minHighlightY);
+                    var top = g.toDomYCoord(view.maxHighlightY);
+
+                    canvas.fillStyle = "rgba(255, 255, 102, 1.0)";
+                    canvas.fillRect(area.x, top, area.w, bottom - top);
                 }
             }
     );
