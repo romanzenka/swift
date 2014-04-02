@@ -160,6 +160,7 @@ public final class ScaffoldSettingsEditor extends Composite implements Validatab
 		starredDialog.setValue(scaffoldSettings);
 		useIndependentSampleGrouping.setValue(scaffoldSettings.isUseIndependentSampleGrouping());
 		useFamilyProteinGrouping.setValue(scaffoldSettings.isUseFamilyProteinGrouping());
+		mzIdentMlReport.setValue(scaffoldSettings.isMzIdentMlReport());
 	}
 
 	@Override
