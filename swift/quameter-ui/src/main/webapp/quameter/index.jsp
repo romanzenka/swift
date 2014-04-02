@@ -195,13 +195,41 @@ var blockRedraw = false;
 function updateAllViews(views, filteredRows) {
     blockRedraw = true;
     for (var i = 0; i < views.length; i++) {
+        views[i].metricId;
+        var sum = 0;
+        var count = filteredRows.length;
+        var values = new Array(count);
+        var j;
+        for (j = 0; j < count; j++) {
+            values[j] = views[i].dataView.getValue(j, 1);
+        }
+        // Remove the outlier 5% from each end
+        values.sort();
+
+        var percentRemoved = 5;
+        values = values.slice(count * percentRemoved / 100, count * (100 - percentRemoved) / 100);
+        count = values.length;
+
+        for (j = 0; j < count; j++) {
+            sum += values[j];
+        }
+        var average = count > 0 ? sum / count : 0;
+        var sumSquares = 0;
+        for (var j = 0; j < count; j++) {
+            var delta = values[j] - average;
+            sumSquares += delta * delta;
+        }
+        var stdev = count > 1 ? Math.sqrt(sumSquares / (count - 1)) : 1;
+
+        views[i].minHighlightY = average - 3 * stdev;
+        views[i].maxHighlightY = average + 3 * stdev;
         views[i].dataView.setRows(filteredRows);
         views[i].dygraph.updateOptions({file: views[i].dataView});
     }
     blockRedraw = false;
 }
-function addDygraph(views, viewIndex, view, viewId, viewMetadata, data, pathColumnIndex, selectedPath, instrumentButtons, categoryButtons, instrumentColumnIndex, categoryColumnIndex) {
-    views[viewIndex] = { dataView: view };
+function addDygraph(views, viewIndex, view, viewId, metricId, metrics, viewMetadata, data, pathColumnIndex, selectedPath, instrumentButtons, categoryButtons, instrumentColumnIndex, categoryColumnIndex) {
+    views[viewIndex] = { dataView: view, minHighlightY: -0.5, maxHighlightY: 0.5, metricId: metricId };
     views[viewIndex].dygraph = new Dygraph(
             document.getElementById(viewId),
             views[viewIndex].dataView,
@@ -247,6 +275,36 @@ function addDygraph(views, viewIndex, view, viewId, viewMetadata, data, pathColu
                     selectedPath.text("");
                     instrumentButtons.removeClass("highlight");
                     categoryButtons.removeClass("highlight");
+                },
+                underlayCallback: function (canvas, area, g) {
+                    var view;
+                    for (var j = 0; j < views.length; j++) {
+                        if (views[j].dygraph == g) {
+                            view = views[j];
+                        }
+                    }
+                    if (!view) {
+                        return;
+                    }
+
+                    var metricIndex = 0;
+                    for (var i = 0; i < metrics.length; i++) {
+                        if (metrics.code == view.metricId) {
+                            metricIndex = i;
+                        }
+                    }
+
+                    var bottom = g.toDomYCoord(view.minHighlightY);
+                    var top = g.toDomYCoord(view.maxHighlightY);
+
+                    var good = metrics[metricIndex].good;
+                    canvas.fillStyle = "rgba(255, 235, 235, 1.0)";
+                    if (good == "range" || good == "low") {
+                        canvas.fillRect(area.x, area.y, area.w, top);
+                    }
+                    if (good == "range" || good == "high") {
+                        canvas.fillRect(area.x, bottom, area.w, area.h - (bottom - area.y));
+                    }
                 }
             }
     );
@@ -375,10 +433,11 @@ if(quameterUiConfig!=null) {
     for (var i = 0; i < metrics.length; i++) {
         var metric = metrics[i];
         var categoryCode;
-        if ("duration" == metric.code) {
+        var metricId = metric.code;
+        if ("duration" == metricId) {
             categoryCode = "c";
         } else {
-            categoryCode = metric.code.split("_", 2)[0];
+            categoryCode = metricId.split("_", 2)[0];
         }
         if (categoryCode != previousCategory) {
             $('<h3>' + metricCategories[categoryCode] + '</h3>').appendTo("#detailedGraphs");
@@ -389,9 +448,9 @@ if(quameterUiConfig!=null) {
         var view = new google.visualization.DataView(data);
         var cols = [];
         cols.push(col("startTime"));
-        cols.push(col(metric.code));
+        cols.push(col(metricId));
         view.setColumns(cols);
-        var viewId = "graph-" + metric.code;
+        var viewId = "graph-" + metricId;
         $('<div class="row-fluid">' +
                 '<div class="span12">' +
                 '<b>' + metric.name + '</b> '
@@ -400,10 +459,10 @@ if(quameterUiConfig!=null) {
                 '</div></div>')
                 .appendTo("#detailedGraphs");
         viewIndex = addDygraph(
-                views, viewIndex, view, viewId, viewMetadata, data, pathColumnIndex, selectedPath, instrumentButtons, categoryButtons, instrumentColumnIndex, categoryColumnIndex);
+                views, viewIndex, view, viewId, metricId, metrics, viewMetadata, data, pathColumnIndex, selectedPath, instrumentButtons, categoryButtons, instrumentColumnIndex, categoryColumnIndex);
 
-        if (metric.simple == 1) {
-            viewId = "simpleGraph-" + metric.code;
+        if (1 == metric.simple) {
+            viewId = "simpleGraph-" + metricId;
             $('<div class="row-fluid">' +
                     '<div class="span12">' +
                     '<b>' + metric.name + '</b> '
@@ -412,7 +471,7 @@ if(quameterUiConfig!=null) {
                     '</div></div>')
                     .appendTo("#simpleGraphs");
             viewIndex = addDygraph(
-                    views, viewIndex, view, viewId, viewMetadata, data, pathColumnIndex, selectedPath, instrumentButtons, categoryButtons, instrumentColumnIndex, categoryColumnIndex);
+                    views, viewIndex, view, viewId, metricId, metrics, viewMetadata, data, pathColumnIndex, selectedPath, instrumentButtons, categoryButtons, instrumentColumnIndex, categoryColumnIndex);
         }
     }
 
