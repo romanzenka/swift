@@ -195,9 +195,9 @@ var blockRedraw = false;
 function updateAllViews(views, filteredRows) {
     blockRedraw = true;
     for (var i = 0; i < views.length; i++) {
-        views[i].metricId;
+        views[i].dataView.setRows(filteredRows);
         var sum = 0;
-        var count = filteredRows.length;
+        var count = views[i].dataView.getNumberOfRows();
         var values = new Array(count);
         var j;
         for (j = 0; j < count; j++) {
@@ -223,7 +223,7 @@ function updateAllViews(views, filteredRows) {
 
         views[i].minHighlightY = average - 3 * stdev;
         views[i].maxHighlightY = average + 3 * stdev;
-        views[i].dataView.setRows(filteredRows);
+
         views[i].dygraph.updateOptions({file: views[i].dataView});
     }
     blockRedraw = false;
