@@ -10,7 +10,7 @@ import java.util.regex.Pattern;
 public final class ScafmlExport extends FileHolder {
 	private static final long serialVersionUID = 7906225867829407626L;
 	private static final Pattern SCAFFOLD_4 = Pattern.compile("^[^0-9]*4(\\..*|$)");
-	public static final String MZIDENTML_EXTENSION = ".mzid";
+	public static final String MZIDENTML_FOLDER = "mzid";
 	// Version of Scaffold
 	private String scaffoldVersion;
 
@@ -99,7 +99,7 @@ public final class ScafmlExport extends FileHolder {
 			result
 					.append(indent)
 					.append("<Export type=\"mzIdentML\" thresholds=\"thresh\" path=\"").append(
-					new File(scaffoldOutputDir, experimentName + MZIDENTML_EXTENSION).getAbsolutePath()).append("\"/>\n");
+					new File(scaffoldOutputDir, MZIDENTML_FOLDER).getAbsolutePath()).append("\"/>\n");
 		}
 
 		if (starred != null && !starred.trim().isEmpty()) {
