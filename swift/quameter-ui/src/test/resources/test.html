@@ -195,6 +195,61 @@ function updateAllViews(views, filteredRows) {
     }
     blockRedraw = false;
 }
+function addDygraph(views, viewIndex, view, viewId, viewMetadata, data, pathColumnIndex, selectedPath, instrumentButtons, categoryButtons, instrumentColumnIndex, categoryColumnIndex) {
+    views[viewIndex] = { dataView: view };
+    views[viewIndex].dygraph = new Dygraph(
+            document.getElementById(viewId),
+            views[viewIndex].dataView,
+            {
+                drawCallback: function (me, initial) {
+                    if (blockRedraw || initial) return;
+                    blockRedraw = true;
+                    var range = me.xAxisRange();
+                    for (var j = 0; j < views.length; j++) {
+                        if (gs[j] == me) continue;
+                        gs[j].updateOptions({
+                            dateWindow: range
+                        });
+                    }
+                    blockRedraw = false;
+                },
+                drawPoints: true,
+                pointSize: 2,
+                strokeWidth: 0.4,
+                highlightSeriesOpts: {
+                    strokeWidth: 2,
+                    strokeBorderWidth: 1,
+                    highlightCircleSize: 4
+                },
+                highlightCallback: function (event, x, points, viewRow, seriesName) {
+                    var row = viewMetadata['filteredRows'][viewRow];
+                    var path = data.getValue(row, pathColumnIndex);
+
+                    var pathChunks = /(.*\/)([^\/\\]+)(\.[^.]+)/.exec(path);
+                    var pathHtml = pathChunks[1] + spanAllUnderscoreTokens(pathChunks[2]) + pathChunks[3];
+
+                    selectedPath.html(pathHtml);
+                    instrumentButtons.removeClass("highlight");
+                    categoryButtons.removeClass("highlight");
+
+                    var instrument = data.getValue(row, instrumentColumnIndex);
+                    instrumentButtons.filter("[value='" + instrument + "']").addClass("highlight");
+
+                    var category = data.getValue(row, categoryColumnIndex);
+                    categoryButtons.filter("[value='" + category + "']").addClass("highlight");
+                },
+                unhighlightCallback: function (event) {
+                    selectedPath.text("");
+                    instrumentButtons.removeClass("highlight");
+                    categoryButtons.removeClass("highlight");
+                }
+            }
+    );
+    gs.push(views[viewIndex].dygraph);
+
+    viewIndex++;
+    return viewIndex;
+}
 function drawChart() {
     // Create the data table.
     var data = new google.visualization.DataTable(
@@ -507,115 +562,59 @@ function drawChart() {
         allRows[i] = i;
     }
     viewMetadata.filteredRows = allRows;
+    var views = [];
 
-    var views = [
-        { "view": "tails",
-            "columns": ["c_1a", "c_1b"]
-        },
-        { "view": "elution",
-            "columns": ["c_2a", "duration"]
-        },
-        { "view": "idRate",
-            "columns": ["c_2b"]
-        },
-        { "view": "peakBroadening",
-            "columns": ["c_3a", "c_3b", "c_4a", "c_4b", "c_4c"]
-        },
-        { "view": "oversampling",
-            "columns": ["ds_1a", "ds_1b"]
-        },
-        { "view": "samplingRate",
-            "columns": ["ds_2a", "ds_2b"]
-        },
-        { "view": "peakSampling",
-            "columns": ["ds_3a", "ds_3b"]
-        },
-        { "view": "electrospray",
-            "columns": ["is_1a", "is_1b"]
-        },
-        { "view": "tuning",
-            "columns": ["is_2"]
-        },
-        { "view": "chargeState",
-            "columns": ["is_3a", "is_3b", "is_3c"]
-        },
-        { "view": "ms1Time",
-            "columns": ["ms1_1"]
-        },
-        { "view": "ms1SigToNoise",
-            "columns": ["ms1_2a", "ms1_3a"]
-        },
-        { "view": "ms1Tic",
-            "columns": ["ms1_2b"]
-        },
-        { "view": "ms1PrecError",
-            "columns": ["ms1_5a", "ms1_5b"]
-        },
-        { "view": "ms1PrecErrorPpm",
-            "columns": ["ms1_5c", "ms1_5d"]
-        },
-        { "view": "ms2Time",
-            "columns": ["ms2_1"]
-        },
-        { "view": "ms2SigToNoise",
-            "columns": ["ms2_2"]
-        },
-        { "view": "ms2NumPeaks",
-            "columns": ["ms2_3"]
-        },
-        { "view": "ms2IdRatio",
-            "columns": ["ms2_4a", "ms2_4b", "ms2_4c", "ms2_4d"]
-        },
-        { "view": "searchScore",
-            "columns": ["p_1"]
-        },
-        { "view": "trypticMs2",
-            "columns": ["p_2a"]
-        },
-        { "view": "trypticPeptides",
-            "columns": ["p_2b"]
-        },
-        { "view": "distinctPeptides",
-            "columns": ["p_2c"]
-        },
-        { "view": "semiToTryptic",
-            "columns": ["p_3"]
-        },
-
-        // Simplified views
-        { "view": "simpleChroma1",
-            "columns": ["c_3a"]
-        },
-        { "view": "simpleChroma2",
-            "columns": ["c_3b"]
-        },
-        { "view": "simpleChroma3",
-            "columns": ["c_2b"]
-        },
-        { "view": "simpleIon1",
-            "columns": ["is_2"]
-        },
-        { "view": "simpleMs1",
-            "columns": ["ms1_2a"]
-        },
-        { "view": "simpleMs2",
-            "columns": ["ms1_2b"]
-        },
-        { "view": "simpleMsMs1",
-            "columns": ["ms2_3"]
-        },
-        { "view": "simpleMsMs2",
-            "columns": ["ms2_2"]
-        },
-        { "view": "simpleIds1",
-            "columns": ["p_3"]
-        },
-        { "view": "simpleIds2",
-            "columns": ["p_1"]
-        },
-        { "view": "simpleIds3",
-            "columns": ["ms1_5c"]
-        }
+    var metricCategories = {
+        c: "Chromatography",
+        ds: "Dynamic Sampling",
+        is: "Ion Source",
+        ms1: "MS1 Signal",
+        ms2: "MS2 Signal",
+        p: "Protease"
+    };
+    var metrics = [
+        { code: "c_1a", label: "C-1A", name: "Bleed Ratio", good: "low", simple: 0, desc: "Fraction of peptides with repeat identifications >4 min earlier than identification closest to the chromatographic maximum" },
+        { code: "c_1b", label: "C-1B", name: "Peak Tailing Ratio", good: "low", simple: 0, desc: "Fraction of peptides with repeat identifications >4 min later than identification closest to the chromatographic maximum" },
+        { code: "c_2a", label: "C-2A", name: "Retention Window", good: "high", simple: 0, desc: "Retention time period over which the middle 50% of the identified peptides eluted (minutes)" },
+        { code: "duration", label: "Duration", name: "Duration", good: "range", simple: 0, desc: "Acquisition duration (minutes)" },
+        { code: "c_2b", label: "C-2B", name: "ID Rate", good: "high", simple: 1, desc: "Rate of peptide identification during the C-2A time range" },
+        { code: "c_3a", label: "C-3A", name: "Peak Width", good: "low", simple: 1, desc: "Median identified peak width" },
+        { code: "c_3b", label: "C-3B", name: "Peak Width Spread", good: "low", simple: 1, desc: "Interquantile range for peak widths" },
+        { code: "c_4a", label: "C-4A", name: "Late Peak Width", good: "low", simple: 0, desc: "Median peak width over <i>last 10%</i> of the elution time" },
+        { code: "c_4b", label: "C-4B", name: "Early Peak Width", good: "low", simple: 0, desc: "Median peak width over <i>first 10%</i> of the elution time" },
+        { code: "c_4c", label: "C-4C", name: "Middle Peak Width", good: "low", simple: 0, desc: "Median peak width over <i>middle 10%</i> of the elution time" },
+        { code: "ds_1a", label: "DS-1A", name: "Singly Identified", good: "high", simple: 0, desc: "Ratio of singly to doubly identified peptide ions." },
+        { code: "ds_1b", label: "DS-1B", name: "Triply Identified", good: "high", simple: 0, desc: "Ratio of doubly to triply identified peptide ions." },
+        { code: "ds_2a", label: "DS-2A", name: "MS1 Scans", good: "range", simple: 0, desc: "Number of MS1 scans acquired during the C-2A time range" },
+        { code: "ds_2b", label: "DS-2B", name: "MS2 Scans", good: "high", simple: 0, desc: "Number of MS2 scans acquired during the C-2A time range" },
+        { code: "ds_3a", label: "DS-3A", name: "Peak Sampling", good: "low", simple: 0, desc: "Median ratio of the maximum MS1 peak intensity over the MS1 intensity at the sampling time for all identified peptides. We want to capture peak at its apex." },
+        { code: "ds_3b", label: "DS-3B", name: "Low Peak Sampling", good: "low", simple: 0, desc: "Median ratio of the maximum MS1 peak intensity over the MS1 intensity at the sampling time for peptides with peak intensity in bottom 50%. We want to capture peak at its apex even for low-intensity peptides." },
+        { code: "is_1a", label: "IS-1A", name: "TIC Drop", good: "low", simple: 0, desc: "TIC dropped more than 10x in two consecutive MS1 scans (within the C-2A time range)" },
+        { code: "is_1b", label: "IS-1B", name: "TIC Jump", good: "low", simple: 0, desc: "TIC jumped more than 10x in two consecutive MS1 scans (within the C-2A time range)" },
+        { code: "is_2", label: "IS-2", name: "Precursor", good: "range", simple: 1, desc: "Median precursor of identified peptide ions" },
+        { code: "is_3a", label: "IS-3A", name: "1+ charge", good: "low", simple: 0, desc: "Ratio of 1+/2+ identified peptides" },
+        { code: "is_3b", label: "IS-3B", name: "3+ charge", good: "low", simple: 0, desc: "Ratio of 3+/2+ identified peptides" },
+        { code: "is_3c", label: "IS-3C", name: "4+ charge", good: "low", simple: 0, desc: "Ratio of 4+/2+ identified peptides" },
+        { code: "ms1_1", label: "MS1-1", name: "MS1 Injection", good: "low", simple: 0, desc: "Median injection time for MS1 spectra" },
+        { code: "ms1_2a", label: "MS1-2A", name: "MS1 S/N", good: "high", simple: 1, desc: "Ratio of maximum to median signal in MS1 spectra" },
+        { code: "ms1_3a", label: "MS1-3A", name: "MS1 Dynamic Range", good: "high", simple: 0, desc: "Dynamic range - ratio of 95th and 5th percentile of MS1 maximum identities for identified peptides in C-2A time range" },
+        { code: "ms1_2b", label: "MS1-2B", name: "MS1 TIC", good: "high", simple: 1, desc: "Median MS1 Total Ion Current" },
+        { code: "ms1_5a", label: "MS1-5A", name: "AMU Error Median", good: "0", simple: 0, desc: "Median difference between the theoretical precursor m/z and the measured precursor m/z value as reported in the scan header" },
+        { code: "ms1_5b", label: "MS1-5B", name: "AMU Error Mean", good: "0", simple: 0, desc: "Mean absolute difference between the theoretical precursor m/z and the measured precursor m/z value as reported in the scan header" },
+        { code: "ms1_5c", label: "MS1-5C", name: "PPM Error", good: "0", simple: 1, desc: "Median precursor mass error in PPM" },
+        { code: "ms1_5d", label: "MS1-5D", name: "PPM Error Range", good: "0", simple: 0, desc: "Interquartile range for mass error in PPM" },
+        { code: "ms2_1", label: "MS2-1", name: "MS2 Injection", good: "low", simple: 0, desc: "Median injection time for MS2 spectra" },
+        { code: "ms2_2", label: "MS2-2", name: "MS2 S/N", good: "high", simple: 1, desc: "Ratio of maximum to median signal in MS2 spectra" },
+        { code: "ms2_3", label: "MS2-3", name: "MS2 Peaks#", good: "range", simple: 1, desc: "Median number of MS2 peaks" },
+        { code: "ms2_4a", label: "MS2-4A", name: "MS2 ID 1", good: "range", simple: 0, desc: "Fraction of MS2 scans identified in the 1st quartile of peptides sorted by MS1 max intensity" },
+        { code: "ms2_4b", label: "MS2-4B", name: "MS2 ID 2", good: "range", simple: 0, desc: "Fraction of MS2 scans identified in the 2nd quartile of peptides sorted by MS1 max intensity" },
+        { code: "ms2_4c", label: "MS2-4C", name: "MS2 ID 3", good: "range", simple: 0, desc: "Fraction of MS2 scans identified in the 3rd quartile of peptides sorted by MS1 max intensity" },
+        { code: "ms2_4d", label: "MS2-4D", name: "MS2 ID 4", good: "range", simple: 0, desc: "Fraction of MS2 scans identified in the 4th quartile of peptides sorted by MS1 max intensity" },
+        { code: "p_1", label: "P-1", name: "Search Score", good: "high", simple: 1, desc: "Median peptide ID score" },
+        { code: "p_2a", label: "P-2A", name: "MS2 Tryptic Spectra", good: "high", simple: 0, desc: "Number of MS2 spectra identifying tryptic peptide ions" },
+        { code: "p_2b", label: "P-2B", name: "MS2 Tryptic Ions", good: "high", simple: 0, desc: "Number of tryptic peptide ions identified" },
+        { code: "p_2c", label: "P-2C", name: "Distinct Peptides", good: "high", simple: 0, desc: "Number of distinct identified tryptic peptide sequences, ignoring modifications and charge state" },
+        { code: "p_3", label: "P-3", name: "Semitryptic Ratio", good: "low", simple: 1, desc: "Ratio of semitryptic/tryptic peptides" }
     ];
 
     gs = [];
@@ -646,66 +645,50 @@ function drawChart() {
 
     blockRedraw = true;
 
-    for (var i = 0; i < views.length; i++) {
-        var v = views[i];
+    var viewIndex = 0;
+    var previousCategory = '';
+    for (var i = 0; i < metrics.length; i++) {
+        var metric = metrics[i];
+        var categoryCode;
+        if ("duration" == metric.code) {
+            categoryCode = "c";
+        } else {
+            categoryCode = metric.code.split("_", 2)[0];
+        }
+        if (categoryCode != previousCategory) {
+            $('<h3>' + metricCategories[categoryCode] + '</h3>').appendTo("#detailedGraphs");
+            $('<h3>' + metricCategories[categoryCode] + '</h3>').appendTo("#simpleGraphs");
+            previousCategory = categoryCode;
+        }
+
         var view = new google.visualization.DataView(data);
         var cols = [];
         cols.push(col("startTime"));
-        for (var j = 0; j < v.columns.length; j++) {
-            cols.push(col(v.columns[j]))
-        }
+        cols.push(col(metric.code));
         view.setColumns(cols);
-        views[i].dataView = view;
-        views[i].dygraph = new Dygraph(
-                document.getElementById(v.view),
-                views[i].dataView,
-                {
-                    drawCallback: function (me, initial) {
-                        if (blockRedraw || initial) return;
-                        blockRedraw = true;
-                        var range = me.xAxisRange();
-                        for (var j = 0; j < views.length; j++) {
-                            if (gs[j] == me) continue;
-                            gs[j].updateOptions({
-                                dateWindow: range
-                            });
-                        }
-                        blockRedraw = false;
-                    },
-                    drawPoints: true,
-                    pointSize: 2,
-                    strokeWidth: 0.4,
-                    highlightSeriesOpts: {
-                        strokeWidth: 2,
-                        strokeBorderWidth: 1,
-                        highlightCircleSize: 4
-                    },
-                    highlightCallback: function (event, x, points, viewRow, seriesName) {
-                        var row = viewMetadata['filteredRows'][viewRow];
-                        var path = data.getValue(row, pathColumnIndex);
+        var viewId = "graph-" + metric.code;
+        $('<div class="row-fluid">' +
+                '<div class="span12">' +
+                '<b>' + metric.name + '</b> '
+                + metric.desc
+                + '<div id="' + viewId + '" class="simple-graph"></div>' +
+                '</div></div>')
+                .appendTo("#detailedGraphs");
+        viewIndex = addDygraph(
+                views, viewIndex, view, viewId, viewMetadata, data, pathColumnIndex, selectedPath, instrumentButtons, categoryButtons, instrumentColumnIndex, categoryColumnIndex);
 
-                        var pathChunks = /(.*\/)([^\/\\]+)(\.[^.]+)/.exec(path);
-                        var pathHtml = pathChunks[1] + spanAllUnderscoreTokens(pathChunks[2]) + pathChunks[3];
-
-                        selectedPath.html(pathHtml);
-                        instrumentButtons.removeClass("highlight");
-                        categoryButtons.removeClass("highlight");
-
-                        var instrument = data.getValue(row, instrumentColumnIndex);
-                        instrumentButtons.filter("[value='" + instrument + "']").addClass("highlight");
-
-                        var category = data.getValue(row, categoryColumnIndex);
-                        categoryButtons.filter("[value='" + category + "']").addClass("highlight");
-                    },
-                    unhighlightCallback: function (event) {
-                        selectedPath.text("");
-                        instrumentButtons.removeClass("highlight");
-                        categoryButtons.removeClass("highlight");
-                    }
-                }
-        );
-        gs.push(views[i].dygraph);
-
+        if (metric.simple == 1) {
+            viewId = "simpleGraph-" + metric.code;
+            $('<div class="row-fluid">' +
+                    '<div class="span12">' +
+                    '<b>' + metric.name + '</b> '
+                    + metric.desc
+                    + '<div id="' + viewId + '" class="simple-graph"></div>' +
+                    '</div></div>')
+                    .appendTo("#simpleGraphs");
+            viewIndex = addDygraph(
+                    views, viewIndex, view, viewId, viewMetadata, data, pathColumnIndex, selectedPath, instrumentButtons, categoryButtons, instrumentColumnIndex, categoryColumnIndex);
+        }
     }
 
     blockRedraw = false;
@@ -784,508 +767,42 @@ function drawChart() {
 </head>
 <body>
 <div class="container-fluid">
-<div class="navbar navbar-fixed-top navbar-inverse">
-    <div class="navbar-inner">
-        <a href="#" class="brand">QuaMeter Results</a>
+    <div class="navbar navbar-fixed-top navbar-inverse">
+        <div class="navbar-inner">
+            <a href="#" class="brand">QuaMeter Results</a>
 
-        <div class="btn-toolbar pull-left">
-            <div class="btn-group" id="category-buttons">
+            <div class="btn-toolbar pull-left">
+                <div class="btn-group" id="category-buttons">
+                </div>
+            </div>
+
+            <div class="btn-toolbar pull-left">
+                <div class="btn-group" id="instrument-buttons">
+                </div>
+            </div>
+
+            <div class="btn-toolbar pull-left">
+                <div class="btn-group" id="prepost-buttons">
+                </div>
+            </div>
+
+            <div class="btn-toolbar pull-left">
+                <div class="btn-group" id="view-buttons">
+                    <div class="btn btn-info" id="compact-button">Simple</div>
+                </div>
+            </div>
+
+            <div class="row-fluid">
+                <div id="selected-path" class="span12"></div>
             </div>
         </div>
-
-        <div class="btn-toolbar pull-left">
-            <div class="btn-group" id="instrument-buttons">
-            </div>
-        </div>
-
-        <div class="btn-toolbar pull-left">
-            <div class="btn-group" id="prepost-buttons">
-            </div>
-        </div>
-
-        <div class="btn-toolbar pull-left">
-            <div class="btn-group" id="view-buttons">
-                <div class="btn btn-info" id="compact-button">Simple</div>
-            </div>
-        </div>
-
-        <div class="row-fluid">
-            <div id="selected-path" class="span12"></div>
-        </div>
-    </div>
-</div>
-
-<div id="detailedGraphs">
-
-<h3>Chromatography</h3>
-
-<div class="row-fluid">
-    <div class="span3">
-        <h4>Peak Tails</h4>
-
-        <div id="tails" class="graph"></div>
-        <div class="legend">
-            <dl>
-                <dt>C-1A <span>Bleed Ratio</span></dt>
-                <dd>Fraction of peptides with repeat identifications >4 min earlier than identification closest to
-                    the chromatographic maximum
-                </dd>
-                <dt>C-1B <span>Peak Tailing Ratio</span></dt>
-                <dd>Fraction of peptides with repeat identifications >4 min later than identification closest to the
-                    chromatographic maximum
-                </dd>
-            </dl>
-        </div>
-    </div>
-    <div class="span3">
-        <h4>Elution</h4>
-
-        <div id="elution" class="graph"></div>
-        <div class="legend">
-            <dl>
-                <dt>C-2A</dt>
-                <dd>Retention time period over which the middle 50% of the identified peptides eluted (minutes)
-                </dd>
-                <dt>Duration</dt>
-                <dd>Acquisition duration (minutes)
-                </dd>
-
-            </dl>
-        </div>
     </div>
 
-    <div class="span3">
-        <h4>ID Rate</h4>
-
-        <div id="idRate" class="graph"></div>
-        <div class="legend">
-            <dl>
-                <dt>C-2B</dt>
-                <dd>Rate of peptide identification during the C-2A time range
-                </dd>
-            </dl>
-        </div>
+    <div id="detailedGraphs">
     </div>
 
-    <div class="span3">
-        <h4>Peak Broadening</h4>
-
-        <div id="peakBroadening" class="graph"></div>
-        <div class="legend">
-            <dl>
-                <dt>C-3A</dt>
-                <dd>Median identified peak width
-                </dd>
-                <dt>C-3B</dt>
-                <dd>Interquantile range for peak widths
-                </dd>
-
-                <dt>C-4A</dt>
-                <dd>Median peak width over <i>last 10%</i> of the elution time
-                </dd>
-                <dt>C-4B</dt>
-                <dd>Median peak width over <i>first 10%</i> of the elution time
-                </dd>
-                <dt>C-4C</dt>
-                <dd>Median peak width over <i>middle 10%</i> of the elution time
-                </dd>
-            </dl>
-        </div>
+    <div id="simpleGraphs">
     </div>
-
-
-</div>
-
-<h3>Dynamic Sampling</h3>
-
-<div class="row-fluid">
-    <div class="span4">
-        <h4>Oversampling</h4>
-
-        <div id="oversampling" class="graph"></div>
-        <div class="legend">
-            <dl>
-                <dt>DS-1A</dt>
-                <dd>Ratio of singly to doubly identified peptide ions.
-                </dd>
-                <dt>DS-1B</dt>
-                <dd>Ratio of doubly to triply identified peptide ions.
-                </dd>
-            </dl>
-        </div>
-    </div>
-
-    <div class="span4">
-        <h4>Sampling Rate</h4>
-
-        <div id="samplingRate" class="graph"></div>
-        <div class="legend">
-            <dl>
-                <dt>DS-2A</dt>
-                <dd>Number of MS1 scans acquired during the C-2A time range
-                </dd>
-                <dt>DS-2B</dt>
-                <dd>Number of MS2 scans acquired during the C-2A time range
-                </dd>
-            </dl>
-        </div>
-    </div>
-
-    <div class="span4">
-        <h4>Peak Sampling</h4>
-
-        <div id="peakSampling" class="graph"></div>
-        <div class="legend">
-            <dl>
-                <dt>DS-3A</dt>
-                <dd>Median ratio of the maximum MS1 peak intensity over the MS1 intensity at the sampling time for all
-                    identified peptides.
-                    We want to capture peak at its apex.
-                </dd>
-                <dt>DS-3B</dt>
-                <dd>Median ratio of the maximum MS1 peak intensity over the MS1 intensity at the sampling time for
-                    peptides with peak intensity in bottom 50%.
-                    We want to capture peak at its apex even for low-intensity peptides.
-                </dd>
-            </dl>
-        </div>
-    </div>
-</div>
-
-<h3>Ion Source</h3>
-
-<div class="row-fluid">
-    <div class="span4">
-        <h4>Electrospray Instability</h4>
-
-        <div id="electrospray" class="graph"></div>
-        <div class="legend">
-            <dl>
-                <dt>IS-1A</dt>
-                <dd>TIC dropped more than 10x in two consecutive MS1 scans (within the C-2A time range)
-                </dd>
-                <dt>IS-1B</dt>
-                <dd>TIC jumped more than 10x in two consecutive MS1 scans (within the C-2A time range)
-                </dd>
-            </dl>
-        </div>
-    </div>
-
-    <div class="span4">
-        <h4>Tuning</h4>
-
-        <div id="tuning" class="graph"></div>
-        <div class="legend">
-            <dl>
-                <dt>IS-2</dt>
-                <dd>Median precursor of identified peptide ions
-                </dd>
-            </dl>
-        </div>
-    </div>
-
-    <div class="span4">
-        <h4>Charge State</h4>
-
-        <div id="chargeState" class="graph"></div>
-        <div class="legend">
-            <dl>
-                <dt>IS-3A</dt>
-                <dd>Ratio of 1+/2+ identified peptides
-                </dd>
-                <dt>IS-3B</dt>
-                <dd>Ratio of 3+/2+ identified peptides
-                </dd>
-                <dt>IS-3C</dt>
-                <dd>Ratio of 4+/2+ identified peptides
-                </dd>
-
-            </dl>
-        </div>
-    </div>
-</div>
-
-
-<h3>MS1 Signal</h3>
-
-<div class="row-fluid">
-    <div class="span4">
-        <h4>MS1 Time</h4>
-
-        <div id="ms1Time" class="graph"></div>
-        <div class="legend">
-            <dl>
-                <dt>MS1-1</dt>
-                <dd>Median injection time for MS1 spectra
-                </dd>
-            </dl>
-        </div>
-    </div>
-
-    <div class="span4">
-        <h4>MS1 Signal to Noise</h4>
-
-        <div id="ms1SigToNoise" class="graph"></div>
-        <div class="legend">
-            <dl>
-                <dt>MS1-2A</dt>
-                <dd>Ratio of maximum to median signal in MS1 spectra
-                </dd>
-                <dt>MS1-3A</dt>
-                <dd>Dynamic range - ratio of 95th and 5th percentile of MS1 maximum identities for identified peptides
-                    in C-2A time range
-                </dd>
-            </dl>
-        </div>
-    </div>
-
-    <div class="span4">
-        <h4>MS1 Total Ion Current</h4>
-
-        <div id="ms1Tic" class="graph"></div>
-        <div class="legend">
-            <dl>
-                <dt>MS1-2B</dt>
-                <dd>Median MS1 Total Ion Current
-                </dd>
-            </dl>
-        </div>
-    </div>
-</div>
-
-<div class="row-fluid">
-    <div class="span4">
-        <h4>MS1 Precursor Error</h4>
-
-        <div id="ms1PrecError" class="graph"></div>
-        <div class="legend">
-            <dl>
-                <dt>MS1-5A</dt>
-                <dd>Median difference between the theoretical precursor m/z and the measured precursor m/z value as
-                    reported in the scan header
-                </dd>
-                <dt>MS1-5B</dt>
-                <dd>Mean absolute difference between the theoretical precursor m/z and the measured precursor m/z value
-                    as reported in the scan header
-                </dd>
-            </dl>
-        </div>
-    </div>
-
-    <div class="span4">
-        <h4>MS1 Precursor Error (PPM)</h4>
-
-        <div id="ms1PrecErrorPpm" class="graph"></div>
-        <div class="legend">
-            <dl>
-                <dt>MS1-5C</dt>
-                <dd>Median precursor mass error in PPM
-                </dd>
-                <dt>MS1-5D</dt>
-                <dd>Interquartile range for mass error in PPM
-                </dd>
-            </dl>
-        </div>
-    </div>
-</div>
-
-<h3>MS2 Signal</h3>
-
-<div class="row-fluid">
-    <div class="span4">
-        <h4>MS2 Time</h4>
-
-        <div id="ms2Time" class="graph"></div>
-        <div class="legend">
-            <dl>
-                <dt>MS2-1</dt>
-                <dd>Median injection time for MS2 spectra
-                </dd>
-            </dl>
-        </div>
-    </div>
-
-    <div class="span4">
-        <h4>MS2 Signal to Noise</h4>
-
-        <div id="ms2SigToNoise" class="graph"></div>
-        <div class="legend">
-            <dl>
-                <dt>MS2-2</dt>
-                <dd>Ratio of maximum to median signal in MS2 spectra
-                </dd>
-            </dl>
-        </div>
-    </div>
-
-    <div class="span4">
-        <h4>MS2 Number of Peaks</h4>
-
-        <div id="ms2NumPeaks" class="graph"></div>
-        <div class="legend">
-            <dl>
-                <dt>MS2-3</dt>
-                <dd>Median number of MS2 peaks
-                </dd>
-            </dl>
-        </div>
-    </div>
-</div>
-
-<div class="row-fluid">
-    <div class="span4">
-        <h4>MS2 ID Ratio</h4>
-
-        <div id="ms2IdRatio" class="graph"></div>
-        <div class="legend">
-            <dl>
-                <dt>MS2-4(A-D)</dt>
-                <dd>Fraction of MS2 scans identified in the 1st-4th quartile of peptides sorted by MS1 max intensity
-                </dd>
-            </dl>
-        </div>
-    </div>
-
-    <div class="span4">
-        <h4>Search Score</h4>
-
-        <div id="searchScore" class="graph"></div>
-        <div class="legend">
-            <dl>
-                <dt>P-1</dt>
-                <dd>Median peptide ID score
-                </dd>
-            </dl>
-        </div>
-    </div>
-</div>
-
-<h3>MS2 - Tryptic Peptides</h3>
-
-<div class="row-fluid">
-    <div class="span3">
-        <h4>Tryptic MS2</h4>
-
-        <div id="trypticMs2" class="graph"></div>
-        <div class="legend">
-            <dl>
-                <dt>P-2A</dt>
-                <dd>Number of MS2 spectra identifying tryptic peptide ions
-                </dd>
-            </dl>
-        </div>
-    </div>
-    <div class="span3">
-        <h4>Tryptic Peptides</h4>
-
-        <div id="trypticPeptides" class="graph"></div>
-        <div class="legend">
-            <dl>
-                <dt>P-2B</dt>
-                <dd>Number of tryptic peptide ions identified
-                </dd>
-            </dl>
-        </div>
-    </div>
-    <div class="span3">
-        <h4>Distinct Peptides</h4>
-
-        <div id="distinctPeptides" class="graph"></div>
-        <div class="legend">
-            <dl>
-                <dt>P-2C</dt>
-                <dd>Number of distinct identified tryptic peptide sequences, ignoring modifications and charge state
-                </dd>
-            </dl>
-        </div>
-    </div>
-    <div class="span3">
-        <h4>Semitryptic Ratio</h4>
-
-        <div id="semiToTryptic" class="graph"></div>
-        <div class="legend">
-            <dl>
-                <dt>P-3</dt>
-                <dd>Ratio of semitryptic/tryptic peptides
-                </dd>
-            </dl>
-        </div>
-    </div>
-</div>
-</div>
-<div id="simpleGraphs">
-    <h3>Chromatography</h3>
-
-    <div class="row-fluid">
-        <div class="span12"><b>C-3A</b> Median identified peak width
-            <div id="simpleChroma1" class="simple-graph"></div>
-        </div>
-    </div>
-    <div class="row-fluid">
-        <div class="span12"><b>C-3B</b> Interquantile range for peak widths
-            <div id="simpleChroma2" class="simple-graph"></div>
-        </div>
-    </div>
-    <div class="row-fluid">
-        <div class="span12"><b>C-2B</b> Rate of peptide identification during the C-2A time range
-            <div id="simpleChroma3" class="simple-graph"></div>
-        </div>
-    </div>
-
-    <h3>Ion Source</h3>
-
-    <div class="row-fluid">
-        <div class="span12"><b>IS-2</b> Median precursor of identified peptide ions
-            <div id="simpleIon1" class="simple-graph"></div>
-        </div>
-    </div>
-
-    <h3>MS1</h3>
-
-    <div class="row-fluid">
-        <div class="span12"><b>MS1-2A</b> Ratio of maximum to median signal in MS1 spectra
-            <div id="simpleMs1" class="simple-graph"></div>
-        </div>
-    </div>
-    <div class="row-fluid">
-        <div class="span12"><b>MS1-2B</b> Median MS1 Total Ion Current
-            <div id="simpleMs2" class="simple-graph"></div>
-        </div>
-    </div>
-
-    <h3>MS2</h3>
-
-    <div class="row-fluid">
-        <div class="span12"><b>MS2-3</b> Median number of MS2 peaks
-            <div id="simpleMsMs1" class="simple-graph"></div>
-        </div>
-    </div>
-    <div class="row-fluid">
-        <div class="span12"><b>MS2-2</b> Ratio of maximum to median signal in MS2 spectra
-            <div id="simpleMsMs2" class="simple-graph"></div>
-        </div>
-    </div>
-
-    <h3>IDs</h3>
-
-    <div class="row-fluid">
-        <div class="span12"><b>P-3</b> Ratio of semitryptic/tryptic peptides
-            <div id="simpleIds1" class="simple-graph"></div>
-        </div>
-    </div>
-    <div class="row-fluid">
-        <div class="span12"><b>P-1</b> Median peptide ID score
-            <div id="simpleIds2" class="simple-graph"></div>
-        </div>
-    </div>
-    <div class="row-fluid">
-        <div class="span12"><b>MS1-5C</b> Median precursor mass error in PPM
-            <div id="simpleIds3" class="simple-graph"></div>
-        </div>
-    </div>
-</div>
-
-</div>
 
 </body>
 </html>
