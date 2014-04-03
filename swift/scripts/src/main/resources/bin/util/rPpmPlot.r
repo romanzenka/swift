@@ -1,6 +1,9 @@
 # Make sure the warnings get displayed
 options(warn=1)
 
+# Make everything go to stdout so we do not overwhelm the logs
+sink(type = "message")
+
 library("gam")
 require("png")
 require("caTools")
