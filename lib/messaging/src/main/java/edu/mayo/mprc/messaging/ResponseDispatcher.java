@@ -161,7 +161,7 @@ public final class ResponseDispatcher implements Lifecycle {
 				listener = responseMap.get(listenerId);
 				isLast = objectMessage.getBooleanProperty(LAST_RESPONSE);
 				if (listener == null) {
-					LOGGER.error("No registered listener for response");
+					LOGGER.error("No registered listener for response with ID " + listenerId + " [" + messageData + "]");
 				} else {
 					if (isLast) {
 						responseMap.remove(listenerId);
