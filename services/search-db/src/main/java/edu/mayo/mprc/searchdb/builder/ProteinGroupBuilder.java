@@ -5,6 +5,8 @@ import edu.mayo.mprc.fastadb.ProteinSequence;
 import edu.mayo.mprc.searchdb.dao.ProteinGroup;
 import edu.mayo.mprc.searchdb.dao.ProteinSequenceList;
 
+import java.util.Locale;
+
 /**
  * @author Roman Zenka
  */
@@ -104,21 +106,22 @@ public class ProteinGroupBuilder implements Builder<ProteinGroup> {
 	}
 
 	public String[] getFlankingAminoAcids(final String peptideSequence) {
+		final String needle = peptideSequence.toUpperCase(Locale.US);
 		for (final ProteinSequence sequence : proteinSequences.getList()) {
-			final String ps = sequence.getSequence();
-			final int index = ps.indexOf(peptideSequence);
-			if (index >= 0 && peptideSequence.length() + index <= ps.length()) {
+			final String haystack = sequence.getSequence().toUpperCase(Locale.US);
+			final int index = haystack.indexOf(needle);
+			if (index >= 0 && needle.length() + index <= haystack.length()) {
 				final int prevIndex = index - 1;
-				final int nextIndex = index + peptideSequence.length();
+				final int nextIndex = index + needle.length();
 				return new String[]{
-						String.valueOf(prevIndex >= 0 ? ps.charAt(prevIndex) : '-'),
-						String.valueOf(nextIndex < ps.length() ? ps.charAt(nextIndex) : '-')
+						String.valueOf(prevIndex >= 0 ? haystack.charAt(prevIndex) : '-'),
+						String.valueOf(nextIndex < haystack.length() ? haystack.charAt(nextIndex) : '-')
 				};
 			}
 		}
 		throw new MprcException(
 				String.format("Could not determine flanking amino acid sequences for peptide [%s] in protein [%s]",
-						peptideSequence,
+						needle,
 						proteinSequences.getList().iterator().next().getSequence()));
 	}
 }
