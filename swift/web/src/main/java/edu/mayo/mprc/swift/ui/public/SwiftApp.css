@@ -734,6 +734,7 @@ span.itemlabel {
 
 .scaffold-setting-group {
     margin-left: 10px;
+    white-space: nowrap;
 }
 
 .help-html-popup {
