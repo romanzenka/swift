@@ -143,9 +143,10 @@ public class ScaffoldSpectraSummarizer extends ScaffoldReportReader {
 		fillCurrentLine(line);
 		final BiologicalSampleBuilder biologicalSample = analysis.getBiologicalSamples().getBiologicalSample(currentLine[biologicalSampleName], currentLine[biologicalSampleCategory]);
 		final SearchResultBuilder searchResult = biologicalSample.getSearchResults().getTandemMassSpecResult(FileUtilities.stripGzippedExtension(currentLine[msmsSampleName]));
+		String databaseSources = Strings.isNullOrEmpty(currentLine[this.databaseSources]) ? databaseName : currentLine[this.databaseSources];
 		final ProteinGroupBuilder proteinGroup = searchResult.getProteinGroups().getProteinGroup(
 				currentLine[proteinAccessionNumbers],
-				Strings.isNullOrEmpty(currentLine[databaseSources]) ? databaseName : currentLine[databaseSources],
+				databaseSources,
 
 				parseInt(currentLine[numberOfTotalSpectra]),
 				parseInt(currentLine[numberOfUniquePeptides]),
@@ -154,14 +155,25 @@ public class ScaffoldSpectraSummarizer extends ScaffoldReportReader {
 				parseDouble(currentLine[percentageSequenceCoverage]) / HUNDRED_PERCENT,
 				parseDouble(currentLine[proteinIdentificationProbability]) / HUNDRED_PERCENT);
 
+		final String sequence = currentLine[peptideSequence];
+		String previousAminoAcidCode = currentLine[previousAminoAcid];
+		String nextAminoAcidCode = currentLine[nextAminoAcid];
+
+		if ("?".equals(previousAminoAcidCode) || "?".equals(nextAminoAcidCode)) {
+			// Scaffold failed. We need to look up the protein sequences to determine
+			// what are the flanking amino acids
+			final String[] flankingAminoAcids = proteinGroup.getFlankingAminoAcids(sequence);
+			previousAminoAcidCode = flankingAminoAcids[0];
+			nextAminoAcidCode = flankingAminoAcids[1];
+		}
 
 		final PeptideSpectrumMatchBuilder peptideSpectrumMatch = proteinGroup.getPeptideSpectrumMatches().getPeptideSpectrumMatch(
-				currentLine[peptideSequence],
+				sequence,
 				currentLine[fixedModifications],
 				currentLine[variableModifications],
 
-				parseAminoAcid(currentLine[previousAminoAcid]),
-				parseAminoAcid(currentLine[nextAminoAcid]),
+				parseAminoAcid(previousAminoAcidCode),
+				parseAminoAcid(nextAminoAcidCode),
 				parseInt(currentLine[numberOfEnzymaticTerminii]));
 
 		peptideSpectrumMatch.recordSpectrum(

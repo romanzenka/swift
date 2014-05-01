@@ -1,5 +1,7 @@
 package edu.mayo.mprc.searchdb.builder;
 
+import edu.mayo.mprc.MprcException;
+import edu.mayo.mprc.fastadb.ProteinSequence;
 import edu.mayo.mprc.searchdb.dao.ProteinGroup;
 import edu.mayo.mprc.searchdb.dao.ProteinSequenceList;
 
@@ -99,5 +101,24 @@ public class ProteinGroupBuilder implements Builder<ProteinGroup> {
 
 	public void setPercentageSequenceCoverage(final double percentageSequenceCoverage) {
 		this.percentageSequenceCoverage = percentageSequenceCoverage;
+	}
+
+	public String[] getFlankingAminoAcids(final String peptideSequence) {
+		for (final ProteinSequence sequence : proteinSequences.getList()) {
+			final String ps = sequence.getSequence();
+			final int index = ps.indexOf(peptideSequence);
+			if (index >= 0 && peptideSequence.length() + index <= ps.length()) {
+				final int prevIndex = index - 1;
+				final int nextIndex = index + peptideSequence.length();
+				return new String[]{
+						String.valueOf(prevIndex >= 0 ? ps.charAt(prevIndex) : '-'),
+						String.valueOf(nextIndex < ps.length() ? ps.charAt(nextIndex) : '-')
+				};
+			}
+		}
+		throw new MprcException(
+				String.format("Could not determine flanking amino acid sequences for peptide [%s] in protein [%s]",
+						peptideSequence,
+						proteinSequences.getList().iterator().next().getSequence()));
 	}
 }
