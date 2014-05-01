@@ -142,6 +142,8 @@ class ScafmlDump {
 		se.setAnnotateWithGOA(scaffoldSettings.isAnnotateWithGOA());
 		se.setUseFamilyProteinGrouping(scaffoldSettings.isUseFamilyProteinGrouping());
 		se.setUseIndependentSampleGrouping(scaffoldSettings.isUseIndependentSampleGrouping());
+		se.setHighMassAccuracyScoring(scaffoldSettings.isHighMassAccuracyScoring());
+		se.setUse3xScoring(scaffoldSettings.isUse3xScoring());
 
 		final StarredProteins star = scaffoldSettings.getStarredProteins();
 		final ScafmlExport export = new ScafmlExport(

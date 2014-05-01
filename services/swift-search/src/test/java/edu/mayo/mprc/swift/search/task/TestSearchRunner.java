@@ -409,7 +409,7 @@ public class TestSearchRunner {
 				2, 1, new ModSet(), new ModSet(), new Tolerance(10, MassUnit.Ppm),
 				new Tolerance(1, MassUnit.Da), Instrument.ORBITRAP,
 				new ExtractMsnSettings("-M100", ExtractMsnSettings.EXTRACT_MSN),
-				new ScaffoldSettings(0.95, 0.95, 2, 0, new StarredProteins("ALBU_HUMAN", ",", false), false, false, true, true, false, true, false)
+				new ScaffoldSettingsBuilder().setMinimumNonTrypticTerminii(0).setStarredProteins(new StarredProteins("ALBU_HUMAN", ",", false)).setSaveOnlyIdentifiedSpectra(false).setConnectToNCBI(true).setAnnotateWithGOA(true).createScaffoldSettings()
 		);
 	}
 

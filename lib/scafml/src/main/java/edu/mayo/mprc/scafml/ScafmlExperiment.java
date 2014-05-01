@@ -37,6 +37,16 @@ public final class ScafmlExperiment extends FileHolder {
 	 */
 	private boolean useFamilyProteinGrouping = true;
 
+	/**
+	 * Switches on the high mass accuracy scoring tweak.
+	 */
+	private boolean highMassAccuracyScoring;
+
+	/**
+	 * When set to true, forces the old scoring algorithms (not LFDR)
+	 */
+	private boolean use3xScoring;
+
 	public ScafmlExperiment(final String name) {
 		biologicalSamples = new LinkedHashMap<String, ScafmlBiologicalSample>(1);
 		scafmlFastaDatabases = new HashMap<String, ScafmlFastaDatabase>(1);
@@ -136,6 +146,7 @@ public final class ScafmlExperiment extends FileHolder {
 		this.useFamilyProteinGrouping = useFamilyProteinGrouping;
 	}
 
+
 	public void appendToDocument(final StringBuilder result, final String indent, final ScafmlScaffold scaffold) {
 		result
 				.append(indent)
@@ -145,7 +156,9 @@ public final class ScafmlExperiment extends FileHolder {
 				.append(XMLUtilities.wrapatt("annotateWithGOA", isAnnotateWithGOA() ? "true" : "false"))
 				.append(XMLUtilities.wrapatt("useIndependentSampleGrouping", isUseIndependentSampleGrouping() ? "true" : "false"))
 				.append(XMLUtilities.wrapatt("useFamilyProteinGrouping", isUseFamilyProteinGrouping() ? "true" : "false"))
-				.append(XMLUtilities.wrapatt("spectrumNameRegEx", "([^ /(]+\\.dta)"));
+				.append(XMLUtilities.wrapatt("spectrumNameRegEx", "([^ /(]+\\.dta)"))
+				.append(XMLUtilities.wrapatt("highMassAccuracyScoring", isHighMassAccuracyScoring() ? "true" : "false"))
+				.append(XMLUtilities.wrapatt("use3xScoring", isUse3xScoring() ? "true" : "false"));
 
 		if (scaffold.getVersionMajor() >= 3) {
 			result
@@ -169,6 +182,22 @@ public final class ScafmlExperiment extends FileHolder {
 		getExport().appendToDocument(result, indent + "\t");
 
 		result.append(indent + "</" + "Experiment" + ">\n");
+	}
+
+	public boolean isHighMassAccuracyScoring() {
+		return highMassAccuracyScoring;
+	}
+
+	public void setHighMassAccuracyScoring(boolean highMassAccuracyScoring) {
+		this.highMassAccuracyScoring = highMassAccuracyScoring;
+	}
+
+	public boolean isUse3xScoring() {
+		return use3xScoring;
+	}
+
+	public void setUse3xScoring(boolean use3xScoring) {
+		this.use3xScoring = use3xScoring;
 	}
 }
 

@@ -22,5 +22,7 @@
         <property name="useFamilyProteinGrouping" type="boolean" column="use_family_protein_grouping" />
         <property name="useIndependentSampleGrouping" type="boolean" column="use_independent_sample_grouping" />
         <property name="mzIdentMlReport" type="boolean" column="mz_ident_ml_report" />
+        <property name="highMassAccuracyScoring" type="boolean" column="high_mass_accuracy_scoring" />
+        <property name="use3xScoring" type="boolean" column="use_3x_scoring" />
     </class>
 </hibernate-mapping>

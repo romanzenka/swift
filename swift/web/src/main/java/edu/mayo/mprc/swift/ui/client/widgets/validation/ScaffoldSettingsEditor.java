@@ -19,7 +19,7 @@ import java.util.List;
 
 public final class ScaffoldSettingsEditor extends Composite implements Validatable, ClickHandler, ChangeHandler {
 	private ClientScaffoldSettings scaffoldSettings;
-	private final HorizontalPanel panel;
+	private final FlowPanel panel;
 	private final ValidatedDoubleTextBox proteinProbability;
 	private final ValidatedIntegerTextBox minPeptideCount;
 	private final ValidatedDoubleTextBox peptideProbability;
@@ -37,10 +37,18 @@ public final class ScaffoldSettingsEditor extends Composite implements Validatab
 	private final CheckBox useIndependentSampleGrouping;
 	private final CheckBox useFamilyProteinGrouping;
 	private final CheckBox mzIdentMlReport;
+	private final CheckBox highMassAccuracyScoring;
+	private final CheckBox use3xScoring;
 
 	public ScaffoldSettingsEditor() {
-		panel = new HorizontalPanel();
-		panel.setVerticalAlignment(HasVerticalAlignment.ALIGN_MIDDLE);
+		panel = new FlowPanel();
+
+		final ClickHandler updateAndFireChange = new ClickHandler() {
+			@Override
+			public void onClick(final ClickEvent event) {
+				updateAndFireChange();
+			}
+		};
 
 		proteinProbability = new ValidatedDoubleTextBox(0, 100, 95);
 		proteinProbability.setVisibleLength(5);
@@ -57,7 +65,7 @@ public final class ScaffoldSettingsEditor extends Composite implements Validatab
 		peptideProbability.addChangeHandler(this);
 		panel.add(peptideProbability);
 
-		minNTTLabel = new Label("NTT>=");
+		minNTTLabel = new InlineLabel("NTT>=");
 		minNTTLabel.setStyleName("scaffold-setting-group");
 		panel.add(minNTTLabel);
 		minNTT = new ValidatedIntegerTextBox(0, 2, 1);
@@ -65,7 +73,7 @@ public final class ScaffoldSettingsEditor extends Composite implements Validatab
 		minNTT.addChangeHandler(this);
 		panel.add(minNTT);
 
-		starredCheckbox = new CheckBox("Stars");
+		starredCheckbox = new CheckBox("Stars ");
 		starredCheckbox.setStyleName("scaffold-setting-group");
 		starredCheckbox.addClickHandler(this);
 		panel.add(starredCheckbox);
@@ -76,15 +84,10 @@ public final class ScaffoldSettingsEditor extends Composite implements Validatab
 
 		goAnnotations = new CheckBox("GO Annotations");
 		goAnnotations.setStyleName("scaffold-setting-group");
-		goAnnotations.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(final ClickEvent event) {
-				updateAndFireChange();
-			}
-		});
+		goAnnotations.addClickHandler(updateAndFireChange);
 		panel.add(goAnnotations);
 
-		saveSpectraLabel = new Label("Save spectra:", false);
+		saveSpectraLabel = new InlineLabel("Save spectra:");
 		saveSpectraLabel.addStyleName("scaffold-setting-group");
 		panel.add(saveSpectraLabel);
 		saveSpectra = new ListBox();
@@ -97,43 +100,35 @@ public final class ScaffoldSettingsEditor extends Composite implements Validatab
 		useIndependentSampleGrouping = new CheckBox("Independent Samples");
 		useIndependentSampleGrouping.setTitle("Samples will be reported as if they were processed in independent Scaffold runs");
 		useIndependentSampleGrouping.setStyleName("scaffold-setting-group");
-		useIndependentSampleGrouping.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(final ClickEvent event) {
-				updateAndFireChange();
-			}
-		});
+		useIndependentSampleGrouping.addClickHandler(updateAndFireChange);
 		panel.add(useIndependentSampleGrouping);
 
 		useFamilyProteinGrouping = new CheckBox("Protein Families");
 		useFamilyProteinGrouping.setTitle("Scaffold will group proteins into families. New in Scaffold 4");
 		useFamilyProteinGrouping.setStyleName("scaffold-setting-group");
-		useFamilyProteinGrouping.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(final ClickEvent event) {
-				updateAndFireChange();
-			}
-		});
+		useFamilyProteinGrouping.addClickHandler(updateAndFireChange);
 		panel.add(useFamilyProteinGrouping);
 
 		mzIdentMlReport = new CheckBox("mzIdentML");
 		mzIdentMlReport.setTitle("Scaffold will report mzIdentML for perSPECtvies");
 		mzIdentMlReport.setStyleName("scaffold-setting-group");
-		mzIdentMlReport.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(final ClickEvent event) {
-				updateAndFireChange();
-			}
-		});
+		mzIdentMlReport.addClickHandler(updateAndFireChange);
 		panel.add(mzIdentMlReport);
 
+		highMassAccuracyScoring = new CheckBox("HMA");
+		highMassAccuracyScoring.setTitle("High mass accuracy scoring");
+		highMassAccuracyScoring.setStyleName("scaffold-setting-group");
+		highMassAccuracyScoring.addClickHandler(updateAndFireChange);
+		panel.add(highMassAccuracyScoring);
+
+		use3xScoring = new CheckBox("3x score");
+		use3xScoring.setTitle("Old scoring system from Scaffold 3.x (does not use LFDR)");
+		use3xScoring.setStyleName("scaffold-setting-group");
+		use3xScoring.addClickHandler(updateAndFireChange);
+		panel.add(use3xScoring);
+
 		starredDialog = new StarredProteinsDialog();
-		starredDialog.setOkListener(new ClickHandler() {
-			@Override
-			public void onClick(final ClickEvent event) {
-				updateAndFireChange();
-			}
-		});
+		starredDialog.setOkListener(updateAndFireChange);
 
 		initWidget(panel);
 	}
@@ -161,6 +156,8 @@ public final class ScaffoldSettingsEditor extends Composite implements Validatab
 		useIndependentSampleGrouping.setValue(scaffoldSettings.isUseIndependentSampleGrouping());
 		useFamilyProteinGrouping.setValue(scaffoldSettings.isUseFamilyProteinGrouping());
 		mzIdentMlReport.setValue(scaffoldSettings.isMzIdentMlReport());
+		highMassAccuracyScoring.setValue(scaffoldSettings.isHighMassAccuracyScoring());
+		use3xScoring.setValue(scaffoldSettings.isUse3xScoring());
 	}
 
 	@Override
@@ -219,6 +216,8 @@ public final class ScaffoldSettingsEditor extends Composite implements Validatab
 		scaffoldSettings.setUseIndependentSampleGrouping(useIndependentSampleGrouping.getValue());
 		scaffoldSettings.setUseFamilyProteinGrouping(useFamilyProteinGrouping.getValue());
 		scaffoldSettings.setMzIdentMlReport(mzIdentMlReport.getValue());
+		scaffoldSettings.setHighMassAccuracyScoring(highMassAccuracyScoring.getValue());
+		scaffoldSettings.setUse3xScoring(use3xScoring.getValue());
 		fireChange();
 	}
 

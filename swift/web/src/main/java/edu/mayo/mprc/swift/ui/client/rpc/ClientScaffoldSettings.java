@@ -21,12 +21,16 @@ public final class ClientScaffoldSettings implements ClientValue {
 	private boolean useIndependentSampleGrouping;
 	private boolean useFamilyProteinGrouping;
 	private boolean mzIdentMlReport;
+	private boolean use3xScoring;
+	private boolean highMassAccuracyScoring;
 
 	public ClientScaffoldSettings() {
 	}
 
 	public ClientScaffoldSettings(final double proteinProbability, final double peptideProbability, final int minimumPeptideCount, final int minimumNonTrypticTerminii, final ClientStarredProteins starredProteins, final boolean saveOnlyIdentifiedSpectra, final boolean saveNoSpectra, final boolean connectToNCBI, final boolean annotateWithGOA,
-	                              final boolean useIndependentSampleGrouping, final boolean useFamilyProteinGrouping, final boolean mzIdentMlReport) {
+	                              final boolean useIndependentSampleGrouping, final boolean useFamilyProteinGrouping,
+	                              final boolean mzIdentMlReport, final boolean use3xScoring,
+	                              final boolean highMassAccuracyScoring) {
 		this.proteinProbability = proteinProbability;
 		this.peptideProbability = peptideProbability;
 		this.minimumPeptideCount = minimumPeptideCount;
@@ -39,6 +43,8 @@ public final class ClientScaffoldSettings implements ClientValue {
 		this.useIndependentSampleGrouping = useIndependentSampleGrouping;
 		this.useFamilyProteinGrouping = useFamilyProteinGrouping;
 		this.mzIdentMlReport = mzIdentMlReport;
+		this.use3xScoring = use3xScoring;
+		this.highMassAccuracyScoring = highMassAccuracyScoring;
 	}
 
 	public double getProteinProbability() {
@@ -117,7 +123,7 @@ public final class ClientScaffoldSettings implements ClientValue {
 		return useIndependentSampleGrouping;
 	}
 
-	public void setUseIndependentSampleGrouping(boolean useIndependentSampleGrouping) {
+	public void setUseIndependentSampleGrouping(final boolean useIndependentSampleGrouping) {
 		this.useIndependentSampleGrouping = useIndependentSampleGrouping;
 	}
 
@@ -125,7 +131,7 @@ public final class ClientScaffoldSettings implements ClientValue {
 		return useFamilyProteinGrouping;
 	}
 
-	public void setUseFamilyProteinGrouping(boolean useFamilyProteinGrouping) {
+	public void setUseFamilyProteinGrouping(final boolean useFamilyProteinGrouping) {
 		this.useFamilyProteinGrouping = useFamilyProteinGrouping;
 	}
 
@@ -133,7 +139,23 @@ public final class ClientScaffoldSettings implements ClientValue {
 		return mzIdentMlReport;
 	}
 
-	public void setMzIdentMlReport(boolean mzIdentMlReport) {
+	public void setMzIdentMlReport(final boolean mzIdentMlReport) {
 		this.mzIdentMlReport = mzIdentMlReport;
+	}
+
+	public boolean isUse3xScoring() {
+		return use3xScoring;
+	}
+
+	public void setUse3xScoring(final boolean use3xScoring) {
+		this.use3xScoring = use3xScoring;
+	}
+
+	public boolean isHighMassAccuracyScoring() {
+		return highMassAccuracyScoring;
+	}
+
+	public void setHighMassAccuracyScoring(final boolean highMassAccuracyScoring) {
+		this.highMassAccuracyScoring = highMassAccuracyScoring;
 	}
 }

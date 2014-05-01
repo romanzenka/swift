@@ -23,30 +23,19 @@ public class ScaffoldSettings extends PersistableBase {
 	private boolean mzIdentMlReport;
 
 	public static final double PROBABILITY_PRECISION = 1E-5;
+	private boolean highMassAccuracyScoring;
+	private boolean use3xScoring;
 
 	public ScaffoldSettings() {
 	}
 
-	private static final double DEFAULT_PEPTIDE_PROBABILITY = 0.95;
-	private static final double DEFAULT_PROTEIN_PROBABILITY = 0.95;
-
-	public static final ScaffoldSettings DEFAULT = new ScaffoldSettings(
-			DEFAULT_PROTEIN_PROBABILITY,
-			DEFAULT_PEPTIDE_PROBABILITY,
-			2,
-			1,
-			null,
-			false,
-			false,
-			false,
-			false,
-			false,
-			true,
-			false
-	);
+	public static final ScaffoldSettings DEFAULT = new ScaffoldSettingsBuilder()
+			.createScaffoldSettings();
 
 	public ScaffoldSettings(final double proteinProbability, final double peptideProbability, final int minimumPeptideCount, final int minimumNonTrypticTerminii, final StarredProteins starredProteins, final boolean saveOnlyIdentifiedSpectra, final boolean saveNoSpectra, final boolean connectToNCBI, final boolean annotateWithGOA,
-	                        final boolean useIndependentSampleGrouping, final boolean useFamilyProteinGrouping, final boolean mzIdentMlReport) {
+	                        final boolean useIndependentSampleGrouping, final boolean useFamilyProteinGrouping,
+	                        final boolean mzIdentMlReport, final boolean highMassAccuracyScoring,
+	                        final boolean use3xScoring) {
 		this.proteinProbability = proteinProbability;
 		this.peptideProbability = peptideProbability;
 		this.minimumPeptideCount = minimumPeptideCount;
@@ -59,6 +48,8 @@ public class ScaffoldSettings extends PersistableBase {
 		this.useIndependentSampleGrouping = useIndependentSampleGrouping;
 		this.useFamilyProteinGrouping = useFamilyProteinGrouping;
 		this.mzIdentMlReport = mzIdentMlReport;
+		this.highMassAccuracyScoring = highMassAccuracyScoring;
+		this.use3xScoring = use3xScoring;
 	}
 
 	public double getProteinProbability() {
@@ -137,7 +128,7 @@ public class ScaffoldSettings extends PersistableBase {
 		return useIndependentSampleGrouping;
 	}
 
-	public void setUseIndependentSampleGrouping(boolean useIndependentSampleGrouping) {
+	public void setUseIndependentSampleGrouping(final boolean useIndependentSampleGrouping) {
 		this.useIndependentSampleGrouping = useIndependentSampleGrouping;
 	}
 
@@ -145,7 +136,7 @@ public class ScaffoldSettings extends PersistableBase {
 		return useFamilyProteinGrouping;
 	}
 
-	public void setUseFamilyProteinGrouping(boolean useFamilyProteinGrouping) {
+	public void setUseFamilyProteinGrouping(final boolean useFamilyProteinGrouping) {
 		this.useFamilyProteinGrouping = useFamilyProteinGrouping;
 	}
 
@@ -153,7 +144,7 @@ public class ScaffoldSettings extends PersistableBase {
 		return mzIdentMlReport;
 	}
 
-	public void setMzIdentMlReport(boolean mzIdentMlReport) {
+	public void setMzIdentMlReport(final boolean mzIdentMlReport) {
 		this.mzIdentMlReport = mzIdentMlReport;
 	}
 
@@ -178,7 +169,9 @@ public class ScaffoldSettings extends PersistableBase {
 				Objects.equal(getStarredProteins(), that.getStarredProteins()) &&
 				Objects.equal(isUseIndependentSampleGrouping(), that.isUseIndependentSampleGrouping()) &&
 				Objects.equal(isUseFamilyProteinGrouping(), that.isUseFamilyProteinGrouping()) &&
-				Objects.equal(isMzIdentMlReport(), that.isMzIdentMlReport());
+				Objects.equal(isMzIdentMlReport(), that.isMzIdentMlReport()) &&
+				Objects.equal(isHighMassAccuracyScoring(), that.isHighMassAccuracyScoring()) &&
+				Objects.equal(isUse3xScoring(), that.isUse3xScoring());
 	}
 
 	@Override
@@ -194,23 +187,30 @@ public class ScaffoldSettings extends PersistableBase {
 				isAnnotateWithGOA(),
 				isUseIndependentSampleGrouping(),
 				isUseFamilyProteinGrouping(),
-				isMzIdentMlReport());
+				isMzIdentMlReport(),
+				isHighMassAccuracyScoring(),
+				isUse3xScoring());
 	}
 
 	public ScaffoldSettings copy() {
-		final ScaffoldSettings scaffoldSettings = new ScaffoldSettings(getProteinProbability(),
-				getPeptideProbability(),
-				getMinimumPeptideCount(),
-				getMinimumNonTrypticTerminii(),
-				getStarredProteins(),
-				isSaveOnlyIdentifiedSpectra(),
-				isSaveNoSpectra(),
-				isConnectToNCBI(),
-				isAnnotateWithGOA(),
-				isUseIndependentSampleGrouping(),
-				isUseFamilyProteinGrouping(),
-				isMzIdentMlReport());
+		final ScaffoldSettings scaffoldSettings = new ScaffoldSettingsBuilder().setProteinProbability(getProteinProbability()).setPeptideProbability(getPeptideProbability()).setMinimumPeptideCount(getMinimumPeptideCount()).setMinimumNonTrypticTerminii(getMinimumNonTrypticTerminii()).setStarredProteins(getStarredProteins()).setSaveOnlyIdentifiedSpectra(isSaveOnlyIdentifiedSpectra()).setSaveNoSpectra(isSaveNoSpectra()).setConnectToNCBI(isConnectToNCBI()).setAnnotateWithGOA(isAnnotateWithGOA()).setUseIndependentSampleGrouping(isUseIndependentSampleGrouping()).setUseFamilyProteinGrouping(isUseFamilyProteinGrouping()).setMzIdentMlReport(isMzIdentMlReport()).setHighMassAccuracyScoring(isHighMassAccuracyScoring()).setUse3xScoring(isUse3xScoring()).createScaffoldSettings();
 		scaffoldSettings.setId(getId());
 		return scaffoldSettings;
+	}
+
+	public boolean isHighMassAccuracyScoring() {
+		return highMassAccuracyScoring;
+	}
+
+	public void setHighMassAccuracyScoring(final boolean highMassAccuracyScoring) {
+		this.highMassAccuracyScoring = highMassAccuracyScoring;
+	}
+
+	public boolean isUse3xScoring() {
+		return use3xScoring;
+	}
+
+	public void setUse3xScoring(final boolean use3xScoring) {
+		this.use3xScoring = use3xScoring;
 	}
 }

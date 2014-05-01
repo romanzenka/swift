@@ -295,7 +295,9 @@ public final class ClientProxyGenerator {
 				scaffoldSettings.isAnnotateWithGOA(),
 				scaffoldSettings.isUseIndependentSampleGrouping(),
 				scaffoldSettings.isUseFamilyProteinGrouping(),
-				scaffoldSettings.isMzIdentMlReport()
+				scaffoldSettings.isMzIdentMlReport(),
+				scaffoldSettings.isHighMassAccuracyScoring(),
+				scaffoldSettings.isUse3xScoring()
 		);
 	}
 
@@ -327,20 +329,7 @@ public final class ClientProxyGenerator {
 		if (scaffoldSettings == null) {
 			return ScaffoldSettings.DEFAULT;
 		}
-		return new ScaffoldSettings(
-				scaffoldSettings.getProteinProbability(),
-				scaffoldSettings.getPeptideProbability(),
-				scaffoldSettings.getMinimumPeptideCount(),
-				scaffoldSettings.getMinimumNonTrypticTerminii(),
-				convertFrom(scaffoldSettings.getStarredProteins()),
-				scaffoldSettings.isSaveOnlyIdentifiedSpectra(),
-				scaffoldSettings.isSaveNoSpectra(),
-				scaffoldSettings.isConnectToNCBI(),
-				scaffoldSettings.isAnnotateWithGOA(),
-				scaffoldSettings.isUseIndependentSampleGrouping(),
-				scaffoldSettings.isUseFamilyProteinGrouping(),
-				scaffoldSettings.isMzIdentMlReport()
-		);
+		return new ScaffoldSettingsBuilder().setProteinProbability(scaffoldSettings.getProteinProbability()).setPeptideProbability(scaffoldSettings.getPeptideProbability()).setMinimumPeptideCount(scaffoldSettings.getMinimumPeptideCount()).setMinimumNonTrypticTerminii(scaffoldSettings.getMinimumNonTrypticTerminii()).setStarredProteins(convertFrom(scaffoldSettings.getStarredProteins())).setSaveOnlyIdentifiedSpectra(scaffoldSettings.isSaveOnlyIdentifiedSpectra()).setSaveNoSpectra(scaffoldSettings.isSaveNoSpectra()).setConnectToNCBI(scaffoldSettings.isConnectToNCBI()).setAnnotateWithGOA(scaffoldSettings.isAnnotateWithGOA()).setUseIndependentSampleGrouping(scaffoldSettings.isUseIndependentSampleGrouping()).setUseFamilyProteinGrouping(scaffoldSettings.isUseFamilyProteinGrouping()).setMzIdentMlReport(scaffoldSettings.isMzIdentMlReport()).setHighMassAccuracyScoring(scaffoldSettings.isHighMassAccuracyScoring()).setUse3xScoring(scaffoldSettings.isUse3xScoring()).createScaffoldSettings();
 	}
 
 	private StarredProteins convertFrom(final ClientStarredProteins starredProteins) {
