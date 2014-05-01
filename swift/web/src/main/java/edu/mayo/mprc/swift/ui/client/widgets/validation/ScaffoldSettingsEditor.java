@@ -121,7 +121,7 @@ public final class ScaffoldSettingsEditor extends Composite implements Validatab
 		highMassAccuracyScoring.addClickHandler(updateAndFireChange);
 		panel.add(highMassAccuracyScoring);
 
-		use3xScoring = new CheckBox("3x score");
+		use3xScoring = new CheckBox("3x&nbsp;score", true);
 		use3xScoring.setTitle("Old scoring system from Scaffold 3.x (does not use LFDR)");
 		use3xScoring.setStyleName("scaffold-setting-group");
 		use3xScoring.addClickHandler(updateAndFireChange);
