@@ -353,6 +353,9 @@ public final class FileUtilities {
 	/**
 	 * creates a copy of one File to another File. Throws an exception when the copy operation fails.
 	 * Use {@link #tryCopyFile} if you do not want to be bothered with exceptions.
+	 * <p/>
+	 * Since we use this to copy files from where they were created into a target directory,
+	 * we set the last modified time of the file to the last modified time of the original file.
 	 *
 	 * @param copyFrom  the file we want to copy from.
 	 * @param copyTo    the file we want to create.
@@ -389,6 +392,7 @@ public final class FileUtilities {
 			if (!copyTo.exists()) {
 				throw new MprcException(copyErrorPrefix + "the target file was not created.");
 			}
+			copyTo.setLastModified(copyFrom.lastModified());
 		} catch (IOException e) {
 			throw new MprcException(copyErrorPrefix + "I/O exception", e);
 		}
