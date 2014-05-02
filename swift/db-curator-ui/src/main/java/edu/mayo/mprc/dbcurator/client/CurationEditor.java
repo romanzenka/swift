@@ -146,7 +146,8 @@ public final class CurationEditor extends Composite {
 	}
 
 	private void showPopupMessage(final String message) {
-		new MessagePopup(message, getAbsoluteLeft() + 100, getAbsoluteTop() + 100);
+		MessagePopup popup = new MessagePopup(message, getAbsoluteLeft() + 100, getAbsoluteTop() + 100);
+		popup.show(4000);
 	}
 
 	/**
@@ -574,43 +575,43 @@ public final class CurationEditor extends Composite {
 	 * ability to run a curation when the use just wants to test it since running will prohibit any future changes.
 	 */
 	public void runCuration() {
-		if (curationIsRunning) {
-			showPopupMessage("The curation is running.");
-		} else if (validateShortName(txtShortName.getText())) {
-			// If short name did not validate, the validateShortName method will indicate that
-			// We do nothing if it does not validate
-			if (curation.hasBeenRun()) {
-				if (!Window.confirm("This curation has already been run.  Please confirm this action to run again.")) {
-					return;
-				} else {
-					curation.setPathToResult("");
+		if (!curationIsRunning) {
+			if (validateShortName(txtShortName.getText())) {
+				// If short name did not validate, the validateShortName method will indicate that
+				// We do nothing if it does not validate
+				if (curation.hasBeenRun()) {
+					if (!Window.confirm("This curation has already been run.  Please confirm this action to run again.")) {
+						return;
+					} else {
+						curation.setPathToResult("");
+					}
 				}
+
+				messageManager.clearMessages();
+
+				messageManager.addMessage("Curation run has started");
+				curationIsRunning = true;
+				auditEditState();
+				updateTimer.scheduleRepeating(2500);
+
+				updateCurationFromForm();
+
+				commonDataRequester.runCuration(curation, new AsyncCallback<CurationStub>() {
+
+					@Override
+					public void onFailure(final Throwable throwable) {
+						curationIsRunning = false;
+						showPopupMessage(throwable.getMessage());
+					}
+
+					@Override
+					public void onSuccess(final CurationStub o) {
+						curationIsRunning = false;
+						setCuration(o, false);
+						retreiveCuration(curation.getId());
+					}
+				});
 			}
-
-			messageManager.clearMessages();
-
-			messageManager.addMessage("Curation run has started");
-			curationIsRunning = true;
-			auditEditState();
-			updateTimer.scheduleRepeating(2500);
-
-			updateCurationFromForm();
-
-			commonDataRequester.runCuration(curation, new AsyncCallback<CurationStub>() {
-
-				@Override
-				public void onFailure(final Throwable throwable) {
-					curationIsRunning = false;
-					showPopupMessage(throwable.getMessage());
-				}
-
-				@Override
-				public void onSuccess(final CurationStub o) {
-					curationIsRunning = false;
-					setCuration(o, false);
-					retreiveCuration(curation.getId());
-				}
-			});
 		}
 	}
 

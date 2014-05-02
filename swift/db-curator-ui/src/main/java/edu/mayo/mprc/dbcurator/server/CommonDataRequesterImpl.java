@@ -1,5 +1,6 @@
 package edu.mayo.mprc.dbcurator.server;
 
+import edu.mayo.mprc.MprcException;
 import edu.mayo.mprc.common.client.GWTServiceException;
 import edu.mayo.mprc.common.server.SpringGwtServlet;
 import edu.mayo.mprc.dbcurator.client.steppanels.CommonDataRequester;
@@ -83,8 +84,12 @@ public final class CommonDataRequesterImpl extends SpringGwtServlet implements C
 	 * @param toRun the curation you want to have run
 	 */
 	@Override
-	public CurationStub runCuration(final CurationStub toRun) {
-		return intializeLogic().runCuration(toRun);
+	public CurationStub runCuration(final CurationStub toRun) throws GWTServiceException {
+		try {
+			return intializeLogic().runCuration(toRun);
+		} catch (Exception e) {
+			throw new GWTServiceException(MprcException.getDetailedMessage(e), e.getStackTrace().toString());
+		}
 	}
 
 	@Override
