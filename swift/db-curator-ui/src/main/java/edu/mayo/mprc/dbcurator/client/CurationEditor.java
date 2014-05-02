@@ -146,8 +146,8 @@ public final class CurationEditor extends Composite {
 	}
 
 	private void showPopupMessage(final String message) {
-		MessagePopup popup = new MessagePopup(message, getAbsoluteLeft() + 100, getAbsoluteTop() + 100);
-		popup.show(4000);
+		final MessagePopup popup = new MessagePopup(message, getAbsoluteLeft() + 100, getAbsoluteTop() + 100);
+		popup.show(0);
 	}
 
 	/**
@@ -337,7 +337,7 @@ public final class CurationEditor extends Composite {
 		chkShowLog.setText("Show Log:");
 		chkShowLog.addClickHandler(new ClickHandler() {
 			@Override
-			public void onClick(ClickEvent event) {
+			public void onClick(final ClickEvent event) {
 				textareaLog.setVisible(Boolean.TRUE.equals(chkShowLog.getValue()));
 			}
 		});
@@ -409,7 +409,7 @@ public final class CurationEditor extends Composite {
 
 		lstStepChoice.addChangeHandler(new ChangeHandler() {
 			@Override
-			public void onChange(ChangeEvent event) {
+			public void onChange(final ChangeEvent event) {
 				final int selectedIndex = lstStepChoice.getSelectedIndex();
 
 				switch (selectedIndex) {
