@@ -1,5 +1,6 @@
 package edu.mayo.mprc.dbcurator.server;
 
+import edu.mayo.mprc.MprcException;
 import edu.mayo.mprc.dbcurator.client.CurationValidation;
 import edu.mayo.mprc.dbcurator.client.steppanels.*;
 import edu.mayo.mprc.dbcurator.model.*;
@@ -10,7 +11,6 @@ import org.apache.log4j.Logger;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 
-import javax.servlet.http.HttpSession;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
@@ -25,32 +25,6 @@ import java.util.List;
  * This class will also handle operations on curations
  */
 public final class CurationHandler {
-	/**
-	 * looks for a CurationHandler titled "curationHandler" in the given session object and returns it.  If it is not found
-	 * then a new one is created and placed on the given session with the given name ("curationHandler").
-	 *
-	 * @param session the HttpSession that we want to look for the CurationHandler on
-	 * @return the curation handler that was on the session or a new one that has been put on the session
-	 */
-	public static CurationHandler getInstance(final HttpSession session, CurationDao curationDao, CurationContext context) {
-
-		CurationHandler perSession = null;
-		try {
-			perSession = (CurationHandler) session.getAttribute("curationHandler");
-		} catch (Exception e) {
-			LOGGER.warn("Error getting a curation handler", e);
-			perSession = null;
-		}
-
-		if (perSession == null) {
-			perSession = new CurationHandler();
-			session.setAttribute("curationHandler", perSession);
-		}
-		perSession.setCurationDao(curationDao);
-		perSession.setCurationContext(context);
-		return perSession;
-	}
-
 	/**
 	 * a cache of a single Curation that is used to reduce hits to the database.  Only a single instance is cached to minimize
 	 * risk of collision with persisted objects.
@@ -483,7 +457,13 @@ public final class CurationHandler {
 		cache = curation;
 
 		// do a sync to make sure the stub matches current state
-		return syncCuration(toExecute);
+		CurationStub result = syncCuration(toExecute);
+
+		if (lastRunStatus.getGlobalError() != null) {
+			throw new MprcException("Could not execute curation " + toExecute.getShortName(), lastRunStatus.getGlobalError());
+		}
+
+		return result;
 	}
 
 	private static final Logger LOGGER = Logger.getLogger(CurationHandler.class);

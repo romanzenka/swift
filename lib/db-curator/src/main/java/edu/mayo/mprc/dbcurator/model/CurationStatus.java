@@ -46,6 +46,11 @@ public interface CurationStatus {
 	List<StepValidation> getFailedStepValidations();
 
 	/**
+	 * @return An error occuring outside all the separate steps
+	 */
+	Exception getGlobalError();
+
+	/**
 	 * call this when you want to find out if the executor is finished.
 	 *
 	 * @return true if the executor is in progress else false

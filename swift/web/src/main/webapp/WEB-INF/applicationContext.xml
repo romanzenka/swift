@@ -42,9 +42,14 @@
     </bean>
 
     <bean id="CommonDataRequester" class="edu.mayo.mprc.dbcurator.server.CommonDataRequesterImpl">
+        <property name="logic" ref="CommonDataRequesterLogic" />
+    </bean>
+
+    <bean id="CommonDataRequesterLogic" class="edu.mayo.mprc.dbcurator.server.CommonDataRequesterLogic">
         <property name="curationDao" ref="curationDao" />
         <property name="curationContext" ref="curationContext" />
     </bean>
+
 
     <bean id="Feed" class="edu.mayo.mprc.swift.report.RssStatusFeeder">
         <property name="swiftDao" ref="swiftDao" />

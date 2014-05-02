@@ -113,6 +113,7 @@ public final class CurationExecutor implements Runnable {
 
 			curationDao.commit();
 		} catch (Exception t) {
+			status.setGlobalError(t);
 			curationDao.rollback();
 			LOGGER.error(t);
 		} finally {
@@ -362,6 +363,11 @@ public final class CurationExecutor implements Runnable {
 		private boolean interrupt = false;
 
 		/**
+		 * A global error that occurred.
+		 */
+		private Exception globalError;
+
+		/**
 		 * get the messages that have been added the messages are then removed form so they won't be hurd from again
 		 *
 		 * @return the list of messages that have been added
@@ -454,6 +460,11 @@ public final class CurationExecutor implements Runnable {
 			return Collections.unmodifiableList(failedStepValidations);
 		}
 
+		@Override
+		public Exception getGlobalError() {
+			return globalError;
+		}
+
 		/**
 		 * A method that can be called to see if this executor is still executing or not
 		 *
@@ -511,6 +522,11 @@ public final class CurationExecutor implements Runnable {
 				return -1;
 			}
 			return completedStepValidations.get(completedStepValidations.size() - 1).getCompletionCount();
+		}
+
+
+		public void setGlobalError(Exception globalError) {
+			this.globalError = globalError;
 		}
 	}
 
