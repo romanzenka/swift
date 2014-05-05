@@ -316,16 +316,6 @@ function addDygraph(views, viewIndex, view, viewId, metricId, metrics, viewMetad
                     }
                 },
                 underlayCallback: function (canvas, area, g) {
-                    var view;
-                    for (var j = 0; j < views.length; j++) {
-                        if (views[j].dygraph == g) {
-                            view = views[j];
-                        }
-                    }
-                    if (!view) {
-                        return;
-                    }
-
                     var metricIndex = 0;
                     for (var i = 0; i < metrics.length; i++) {
                         if (metrics.code == currentView.metricId) {
@@ -473,7 +463,7 @@ if(quameterUiConfig!=null) {
         window.open('/start/?load=' + selectedTransaction);
     });
     $('#qa-link').click(function (event) {
-        window.open('/report/?qa=' + selectedTransaction);
+        window.open('/report/reportupdate?qa=' + selectedTransaction);
     });
 
     var selectedPath = $('#selected-path');
