@@ -124,9 +124,9 @@ public final class QuameterUi implements Dao, UiConfigurationProvider {
 		writeValue(writer, result.getSample().getRunTimeInSeconds() / SEC_TO_MIN); // duration
 		writeValue(writer, result.getSample().getInstrumentSerialNumber()); // instrument
 		writeValue(writer, result.getCategory());
-		writeValue(writer, result.getTransaction());
 		final SearchEngineParameters parameters = result.getFileSearch().getSearchParameters();
 		writeValue(writer, parameters != null ? parameters.getId() : 0); // search parameters id
+		writeValue(writer, result.getTransaction());
 
 		for (final QuameterResult.QuameterColumn column : QuameterResult.QuameterColumn.values()) {
 			writeValue(writer, result.getValue(column));
