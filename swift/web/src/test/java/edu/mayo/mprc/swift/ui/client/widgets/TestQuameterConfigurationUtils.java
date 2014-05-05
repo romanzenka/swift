@@ -19,10 +19,10 @@ public final class TestQuameterConfigurationUtils {
 		Assert.assertEquals(map,
 				new ImmutableMap.Builder<String, String>()
 						.put("animal", "animal")
-						.put("\tcat", "cat")
-						.put("\t\tsiamese", "siamese")
-						.put("\tdog", "dog")
-						.put("\t\tchihuahua", "chihuahua")
+						.put(" - cat", "cat")
+						.put(" -  - siamese", "siamese")
+						.put(" - dog", "dog")
+						.put(" -  - chihuahua", "chihuahua")
 						.build());
 	}
 
