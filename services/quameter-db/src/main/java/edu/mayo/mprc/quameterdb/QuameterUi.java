@@ -105,6 +105,7 @@ public final class QuameterUi implements Dao, UiConfigurationProvider {
 		writeCol(writer, "instrument", "Instrument", "string");
 		writeCol(writer, "category", "Category", "string");
 		writeCol(writer, "searchParameters", "Search parameters ID", "number");
+		writeCol(writer, "transaction", "Transaction ID", "number");
 
 		for (final QuameterResult.QuameterColumn column : QuameterResult.QuameterColumn.values()) {
 			writeCol(writer, column.name(), QuameterResult.getColumnName(column), "number");
@@ -123,6 +124,7 @@ public final class QuameterUi implements Dao, UiConfigurationProvider {
 		writeValue(writer, result.getSample().getRunTimeInSeconds() / SEC_TO_MIN); // duration
 		writeValue(writer, result.getSample().getInstrumentSerialNumber()); // instrument
 		writeValue(writer, result.getCategory());
+		writeValue(writer, result.getTransaction());
 		final SearchEngineParameters parameters = result.getFileSearch().getSearchParameters();
 		writeValue(writer, parameters != null ? parameters.getId() : 0); // search parameters id
 

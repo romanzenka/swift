@@ -47,7 +47,7 @@ public final class QuameterDaoHibernate extends DaoBase implements QuameterDao {
 	@Override
 	public List<QuameterResult> listAllResults(final Pattern searchFilter) {
 		final Query query = getSession().createSQLQuery("" +
-				"SELECT {q.*}, m.metadata_value AS v " +
+				"SELECT {q.*}, m.metadata_value AS v, r.transaction_id AS ti" +
 				" FROM `" + swiftDao.qualifyTableName("transaction") + "` AS r, " +
 				" " + swiftDao.qualifyTableName("file_search") + " AS f, " +
 				" " + swiftDao.qualifyTableName("quameter_result") + " AS q, " +
@@ -64,7 +64,8 @@ public final class QuameterDaoHibernate extends DaoBase implements QuameterDao {
 				" t.tandem_mass_spec_sample_id = q.sample_id" +
 				" ORDER BY t.start_time")
 				.addEntity("q", QuameterResult.class)
-				.addScalar("v", Hibernate.STRING);
+				.addScalar("v", Hibernate.STRING)
+				.addScalar("ti", Hibernate.INTEGER);
 		final List raw = query.list();
 		final List<QuameterResult> filtered = new ArrayList<QuameterResult>(Math.min(raw.size(), 1000));
 		for (final Object o : raw) {
@@ -72,6 +73,8 @@ public final class QuameterDaoHibernate extends DaoBase implements QuameterDao {
 			final QuameterResult r = (QuameterResult) array[0];
 			final String category = (String) array[1];
 			r.setCategory(category);
+			final Integer transactionId = (Integer) array[2];
+			r.setTransaction(transactionId);
 			if (searchFilter.matcher(r.getFileSearch().getExperiment()).find()) {
 				filtered.add(r);
 			}

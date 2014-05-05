@@ -23,6 +23,7 @@ public final class QuameterResult extends PersistableBase {
 	 * It is the category for the file search
 	 */
 	private String category;
+	private int transaction;
 
 	public enum QuameterColumn {
 		c_1a,
@@ -812,8 +813,16 @@ public final class QuameterResult extends PersistableBase {
 		return category;
 	}
 
-	public void setCategory(String category) {
+	public void setCategory(final String category) {
 		this.category = category;
+	}
+
+	public int getTransaction() {
+		return transaction;
+	}
+
+	public void setTransaction(final int transaction) {
+		this.transaction = transaction;
 	}
 
 	@Override
@@ -822,7 +831,7 @@ public final class QuameterResult extends PersistableBase {
 	}
 
 	@Override
-	public boolean equals(Object obj) {
+	public boolean equals(final Object obj) {
 		if (this == obj) {
 			return true;
 		}

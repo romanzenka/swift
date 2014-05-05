@@ -189,11 +189,21 @@ function spanAllUnderscoreTokens(s) {
 // When true, redraws of graphs will not trigger more redraws
 var blockRedraw = false;
 
-// Callback that creates and populates a data table,
-// instantiates the pie chart, passes in the data and
-// draws it.
+// Row of the selected point
+var pointSelected = -1;
+
+// Row of the highlighted point
+var pointHighlighted = -1;
+
+// Transaction currently selected
+var selectedTransaction = -1;
+
+// Callback that filters all the views, updating the stdev ranges
 function updateAllViews(views, filteredRows) {
     blockRedraw = true;
+    // We deselect the user-selected point
+    pointSelected = -1;
+    pointHighlighted = -1;
     for (var i = 0; i < views.length; i++) {
         views[i].dataView.setRows(filteredRows);
         var sum = 0;
@@ -228,9 +238,48 @@ function updateAllViews(views, filteredRows) {
     }
     blockRedraw = false;
 }
+
+function selectPoint(data, dataRow) {
+    if (dataRow == -1) {
+        $('#icons').hide();
+        selectedTransaction = -1;
+    } else {
+        $('#icons').show();
+        var transactionColumnIndex = columnIndex("transaction", data);
+        selectedTransaction = data.getValue(dataRow, transactionColumnIndex);
+    }
+}
+
 function addDygraph(views, viewIndex, view, viewId, metricId, metrics, viewMetadata, data, pathColumnIndex, selectedPath, instrumentButtons, categoryButtons, instrumentColumnIndex, categoryColumnIndex) {
-    views[viewIndex] = { dataView: view, minHighlightY: -0.5, maxHighlightY: 0.5, metricId: metricId };
-    views[viewIndex].dygraph = new Dygraph(
+    views[viewIndex] = { dataView: view, minHighlightY: 1, maxHighlightY: -1, metricId: metricId };
+    var currentView = views[viewIndex];
+
+    // Row - the row in the original dataset
+    function highlightRow(row) {
+        if (row == -1) {
+            selectedPath.text("");
+            instrumentButtons.removeClass("highlight");
+            categoryButtons.removeClass("highlight");
+            return;
+        }
+        var path = data.getValue(row, pathColumnIndex);
+
+        var pathChunks = /(.*\/)([^\/\\]+)(\.[^.]+)/.exec(path);
+        var pathHtml = pathChunks[1] + spanAllUnderscoreTokens(pathChunks[2]) + pathChunks[3];
+
+        selectedPath.html(pathHtml);
+
+        instrumentButtons.removeClass("highlight");
+        categoryButtons.removeClass("highlight");
+
+        var instrument = data.getValue(row, instrumentColumnIndex);
+        instrumentButtons.filter("[value='" + instrument + "']").addClass("highlight");
+
+        var category = data.getValue(row, categoryColumnIndex);
+        categoryButtons.filter("[value='" + category + "']").addClass("highlight");
+    }
+
+    var dygraph = new Dygraph(
             document.getElementById(viewId),
             views[viewIndex].dataView,
             {
@@ -255,26 +304,16 @@ function addDygraph(views, viewIndex, view, viewId, metricId, metrics, viewMetad
                     highlightCircleSize: 4
                 },
                 highlightCallback: function (event, x, points, viewRow, seriesName) {
-                    var row = viewMetadata['filteredRows'][viewRow];
-                    var path = data.getValue(row, pathColumnIndex);
-
-                    var pathChunks = /(.*\/)([^\/\\]+)(\.[^.]+)/.exec(path);
-                    var pathHtml = pathChunks[1] + spanAllUnderscoreTokens(pathChunks[2]) + pathChunks[3];
-
-                    selectedPath.html(pathHtml);
-                    instrumentButtons.removeClass("highlight");
-                    categoryButtons.removeClass("highlight");
-
-                    var instrument = data.getValue(row, instrumentColumnIndex);
-                    instrumentButtons.filter("[value='" + instrument + "']").addClass("highlight");
-
-                    var category = data.getValue(row, categoryColumnIndex);
-                    categoryButtons.filter("[value='" + category + "']").addClass("highlight");
+                    pointHighlighted = viewRow;
+                    var row = viewMetadata.filteredRows[viewRow];
+                    if (pointSelected == -1) {
+                        highlightRow(row);
+                    }
                 },
                 unhighlightCallback: function (event) {
-                    selectedPath.text("");
-                    instrumentButtons.removeClass("highlight");
-                    categoryButtons.removeClass("highlight");
+                    if (pointSelected == -1) {
+                        highlightRow(-1);
+                    }
                 },
                 underlayCallback: function (canvas, area, g) {
                     var view;
@@ -289,25 +328,48 @@ function addDygraph(views, viewIndex, view, viewId, metricId, metrics, viewMetad
 
                     var metricIndex = 0;
                     for (var i = 0; i < metrics.length; i++) {
-                        if (metrics.code == view.metricId) {
+                        if (metrics.code == currentView.metricId) {
                             metricIndex = i;
                         }
                     }
 
-                    var bottom = g.toDomYCoord(view.minHighlightY);
-                    var top = g.toDomYCoord(view.maxHighlightY);
+                    if (currentView.minHighlightY < currentView.maxHighlightY) {
+                        var bottom = g.toDomYCoord(currentView.minHighlightY);
+                        var top = g.toDomYCoord(currentView.maxHighlightY);
 
-                    var good = metrics[metricIndex].good;
-                    canvas.fillStyle = "rgba(255, 235, 235, 1.0)";
-                    if (good == "range" || good == "low") {
-                        canvas.fillRect(area.x, area.y, area.w, top);
+                        var good = metrics[metricIndex].good;
+                        canvas.fillStyle = "rgba(255, 235, 235, 1.0)";
+                        if (good == "range" || good == "low") {
+                            canvas.fillRect(area.x, area.y, area.w, top);
+                        }
+                        if (good == "range" || good == "high") {
+                            canvas.fillRect(area.x, bottom, area.w, area.h - (bottom - area.y));
+                        }
                     }
-                    if (good == "range" || good == "high") {
-                        canvas.fillRect(area.x, bottom, area.w, area.h - (bottom - area.y));
+                    if (pointSelected >= 0) {
+                        // Date to be selected
+                        var date = currentView.dataView.getValue(pointSelected, 0);
+                        var xcoord = g.toDomXCoord(date);
+                        canvas.fillStyle = "rgba(10, 120, 255, 1.0)";
+                        canvas.fillRect(xcoord - 2, area.y, 4, area.h);
                     }
+                },
+                pointClickCallback: function (event, point) {
+                    // Select a point
+                    if (pointSelected != pointHighlighted) {
+                        pointSelected = pointHighlighted;
+                    } else {
+                        pointSelected = -1;
+                    }
+                    selectPoint(data, pointSelected == -1 ? -1 : viewMetadata.filteredRows[pointSelected]);
+                    var row = viewMetadata.filteredRows[pointHighlighted];
+                    highlightRow(row);
+
+                    dygraph.updateOptions({file: currentView.dataView});
                 }
             }
     );
+    views[viewIndex].dygraph = dygraph;
     gs.push(views[viewIndex].dygraph);
 
     viewIndex++;
@@ -405,6 +467,14 @@ if(quameterUiConfig!=null) {
     function col(id) {
         return columnIndex(id, data);
     }
+
+    selectPoint(data, -1);
+    $('#search-link').click(function (event) {
+        window.open('/start/?load=' + selectedTransaction);
+    });
+    $('#qa-link').click(function (event) {
+        window.open('/report/?qa=' + selectedTransaction);
+    });
 
     var selectedPath = $('#selected-path');
     var pathColumnIndex = col('path');
@@ -577,32 +647,37 @@ if(quameterUiConfig!=null) {
             </div>
 
             <div class="row-fluid">
-                <div id="selected-path" class="span12"></div>
+                <div class="span12">
+                    <span id="icons">
+                        <img src="/report/search_edit.gif" id="search-link">
+                        <img src="/report/search.gif" id="qa-link">
+                    </span>
+                    <span id="selected-path"></span>
+                </div>
             </div>
         </div>
+
+        <% if (quameterUiConfig == null) {
+        %>
+        <div class="alert">
+            <p><strong>Warning</strong> The QuaMeter module is not configured.</p>
+
+            <p>You need to add the QuaMeterUi resource to the
+                <code><%= MainFactoryContext.getSwiftEnvironment().getDaemonConfig().getName() %>
+                </code> daemon.</p>
+        </div>
+
+        <% } else {
+        %>
+
+        <div id="detailedGraphs">
+        </div>
+
+        <div id="simpleGraphs">
+        </div>
+
+        <% } %>
     </div>
-
-    <% if (quameterUiConfig == null) {
-    %>
-    <div class="alert">
-        <p><strong>Warning</strong> The QuaMeter module is not configured.</p>
-
-        <p>You need to add the QuaMeterUi resource to the
-            <code><%= MainFactoryContext.getSwiftEnvironment().getDaemonConfig().getName() %>
-            </code> daemon.</p>
-    </div>
-
-    <% } else {
-    %>
-
-    <div id="detailedGraphs">
-    </div>
-
-    <div id="simpleGraphs">
-    </div>
-
-    <% } %>
-</div>
 
 </body>
 </html>

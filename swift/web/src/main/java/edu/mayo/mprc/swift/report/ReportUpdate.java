@@ -10,6 +10,7 @@ import edu.mayo.mprc.swift.db.SearchRunFilter;
 import edu.mayo.mprc.swift.db.SwiftDao;
 import edu.mayo.mprc.swift.dbmapping.ReportData;
 import edu.mayo.mprc.swift.dbmapping.SearchRun;
+import edu.mayo.mprc.swift.dbmapping.SwiftSearchDefinition;
 import edu.mayo.mprc.swift.resources.WebUi;
 import edu.mayo.mprc.swift.resources.WebUiHolder;
 import edu.mayo.mprc.swift.search.AssignedSearchRunId;
@@ -55,7 +56,7 @@ public final class ReportUpdate implements HttpRequestHandler {
 	}
 
 	@Override
-	public void handleRequest(HttpServletRequest req, HttpServletResponse resp) throws ServletException {
+	public void handleRequest(final HttpServletRequest req, final HttpServletResponse resp) throws ServletException {
 		resp.setHeader("Cache-Control", "no-cache");
 
 		// If there is a rerun parameter, we want to rerun the given search run, otherwise we produce data
@@ -73,6 +74,24 @@ public final class ReportUpdate implements HttpRequestHandler {
 			swiftDao.begin(); // Transaction-per-request
 			hideSearch(req, resp, hide);
 			swiftDao.commit();
+			return;
+		}
+
+		// If there is a qa parameter, we want to redirect to QA for the given transaction
+		final String qa = req.getParameter("qa");
+		if (qa != null) {
+			swiftDao.begin(); // Transaction-per-request
+			final SearchRun searchRun = swiftDao.getSearchRunForId(Integer.valueOf(qa));
+			final int swiftSearchId = searchRun.getSwiftSearch();
+			final SwiftSearchDefinition swiftSearchDefinition = swiftDao.getSwiftSearchDefinition(swiftSearchId);
+			final File indexHtmlLocation = new File(new File(swiftSearchDefinition.getOutputFolder(), "qa"), "index.html");
+			final String link = getWebUi().fileToUserLink(indexHtmlLocation);
+			swiftDao.commit();
+			try {
+				resp.sendRedirect(link);
+			} catch (IOException e) {
+				throw new ServletException("Could not redirect the user to QA directory", e);
+			}
 			return;
 		}
 
@@ -323,7 +342,7 @@ public final class ReportUpdate implements HttpRequestHandler {
 		return swiftDao;
 	}
 
-	public void setSwiftDao(SwiftDao swiftDao) {
+	public void setSwiftDao(final SwiftDao swiftDao) {
 		this.swiftDao = swiftDao;
 	}
 
@@ -331,7 +350,7 @@ public final class ReportUpdate implements HttpRequestHandler {
 		return searchDbDao;
 	}
 
-	public void setSearchDbDao(SearchDbDao searchDbDao) {
+	public void setSearchDbDao(final SearchDbDao searchDbDao) {
 		this.searchDbDao = searchDbDao;
 	}
 
@@ -339,7 +358,7 @@ public final class ReportUpdate implements HttpRequestHandler {
 		return fileTokenFactory;
 	}
 
-	public void setFileTokenFactory(DatabaseFileTokenFactory fileTokenFactory) {
+	public void setFileTokenFactory(final DatabaseFileTokenFactory fileTokenFactory) {
 		this.fileTokenFactory = fileTokenFactory;
 	}
 
@@ -407,7 +426,7 @@ public final class ReportUpdate implements HttpRequestHandler {
 		return webUiHolder;
 	}
 
-	public void setWebUiHolder(WebUiHolder webUiHolder) {
+	public void setWebUiHolder(final WebUiHolder webUiHolder) {
 		this.webUiHolder = webUiHolder;
 	}
 
@@ -415,7 +434,7 @@ public final class ReportUpdate implements HttpRequestHandler {
 		return swiftSearcherCaller;
 	}
 
-	public void setSwiftSearcherCaller(SwiftSearcherCaller swiftSearcherCaller) {
+	public void setSwiftSearcherCaller(final SwiftSearcherCaller swiftSearcherCaller) {
 		this.swiftSearcherCaller = swiftSearcherCaller;
 	}
 

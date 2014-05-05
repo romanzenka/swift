@@ -190,6 +190,9 @@ var pointSelected = -1;
 // Row of the highlighted point
 var pointHighlighted = -1;
 
+// Transaction currently selected
+var selectedTransaction = -1;
+
 // Callback that filters all the views, updating the stdev ranges
 function updateAllViews(views, filteredRows) {
     blockRedraw = true;
@@ -234,8 +237,11 @@ function updateAllViews(views, filteredRows) {
 function selectPoint(data, dataRow) {
     if (dataRow == -1) {
         $('#icons').hide();
+        selectedTransaction = -1;
     } else {
         $('#icons').show();
+        var transactionColumnIndex = columnIndex("transaction", data);
+        selectedTransaction = data.getValue(dataRow, transactionColumnIndex);
     }
 }
 
@@ -364,6 +370,7 @@ function drawChart() {
                 {"id": "instrument", "label": "Instrument", "type": "string"},
                 {"id": "category", "label": "Category", "type": "string"},
                 {"id": "searchParameters", "label": "Search parameters ID", "type": "number"},
+                {"id": "transaction", "label": "Transaction ID", "type": "number"},
                 {"id": "c_1a", "label": "C-1A", "type": "number"},
                 {"id": "c_1b", "label": "C-1B", "type": "number"},
                 {"id": "c_2a", "label": "C-2A", "type": "number"},
@@ -414,6 +421,7 @@ function drawChart() {
                     {"v": "Exactive Series slot #1"},
                     {"v": "AL-Lambda"},
                     {"v": 0},
+                    {"v": 274282},
                     {"v": 0.00328947},
                     {"v": 0.256579},
                     {"v": 14.1452},
@@ -464,6 +472,7 @@ function drawChart() {
                     {"v": "Q Exactive Plus 3093"},
                     {"v": "AL-Kappa"},
                     {"v": 0},
+                    {"v": 274276},
                     {"v": 0.0037037},
                     {"v": 0.248148},
                     {"v": 15.6734},
@@ -514,6 +523,7 @@ function drawChart() {
                     {"v": "Q Exactive Plus 3093"},
                     {"v": "ATTR"},
                     {"v": 0},
+                    {"v": 274266},
                     {"v": 0.0809717},
                     {"v": 0.129555},
                     {"v": 15.777},
@@ -564,6 +574,7 @@ function drawChart() {
                     {"v": "Q Exactive Plus 3093"},
                     {"v": "ATTR"},
                     {"v": 0},
+                    {"v": 274265},
                     {"v": 0.0},
                     {"v": 0.195455},
                     {"v": 14.7587},
@@ -614,6 +625,7 @@ function drawChart() {
                     {"v": "Q Exactive Plus 3093"},
                     {"v": "ATTR"},
                     {"v": 0},
+                    {"v": 274264},
                     {"v": 0.0757576},
                     {"v": 0.155303},
                     {"v": 15.899},
@@ -729,10 +741,10 @@ function drawChart() {
 
     selectPoint(data, -1);
     $('#search-link').click(function (event) {
-        window.open('/report/report.jsp');
+        window.open('/start/?load=' + selectedTransaction);
     });
     $('#qa-link').click(function (event) {
-
+        window.open('/report/?qa=' + selectedTransaction);
     });
 
     var selectedPath = $('#selected-path');
