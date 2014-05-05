@@ -83,7 +83,7 @@ public final class TestMascotMappings {
 	}
 
 	private static Reader getMascotParamReader() {
-		return ResourceUtilities.getReader("classpath:edu/mayo/mprc/swift/params/Orbitrap_Sprot_Latest_CarbC_OxM/mascot.params", TestMascotMappings.class);
+		return ResourceUtilities.getReader("classpath:edu/mayo/mprc/swift/params/base.mascot.params", TestMascotMappings.class);
 	}
 
 	private static final class PhosphoStContext extends TestMappingContextBase {
