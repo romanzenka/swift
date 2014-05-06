@@ -66,7 +66,7 @@ public final class SwiftSearch {
 		scaffoldMinimumPeptideCount = String.valueOf(params.getScaffoldSettings().getMinimumPeptideCount());
 		scaffoldMinimumNonTrypticTerminii = String.valueOf(params.getScaffoldSettings().getMinimumNonTrypticTerminii());
 		if (searchDefinition.getOutputFolder() != null && searchDefinition.getOutputFolder().isDirectory()) {
-			qaUrl = String.format("/service/qa/%d/index.html", searchDefinition.getId());
+			qaUrl = String.format("/service/qa/%d/index.html", id);
 		} else {
 			qaUrl = null;
 		}
