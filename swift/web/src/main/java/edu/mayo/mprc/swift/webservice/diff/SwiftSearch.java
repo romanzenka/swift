@@ -10,7 +10,6 @@ import edu.mayo.mprc.swift.params2.SearchEngineParameters;
 import edu.mayo.mprc.swift.resources.WebUi;
 import edu.mayo.mprc.unimod.ModSpecificity;
 
-import java.io.File;
 import java.util.Date;
 import java.util.Set;
 
@@ -67,7 +66,7 @@ public final class SwiftSearch {
 		scaffoldMinimumPeptideCount = String.valueOf(params.getScaffoldSettings().getMinimumPeptideCount());
 		scaffoldMinimumNonTrypticTerminii = String.valueOf(params.getScaffoldSettings().getMinimumNonTrypticTerminii());
 		if (searchDefinition.getOutputFolder() != null && searchDefinition.getOutputFolder().isDirectory()) {
-			qaUrl = webUi.fileToUserLink(new File(searchDefinition.getOutputFolder(), "qa/index.html"));
+			qaUrl = String.format("/service/qa/%d/index.html", searchDefinition.getId());
 		} else {
 			qaUrl = null;
 		}
