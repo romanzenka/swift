@@ -37,7 +37,7 @@ public final class QaReport {
 		return defaultMap;
 	}
 
-	@RequestMapping(value = "/qa/{searchRunId}/{fileName}", method = RequestMethod.GET)
+	@RequestMapping(value = "/qa/{searchRunId}/{fileName:.*}", method = RequestMethod.GET)
 	public void getQaResource(@PathVariable final int searchRunId,
 	                          @PathVariable final String fileName,
 	                          final HttpServletResponse response) {
