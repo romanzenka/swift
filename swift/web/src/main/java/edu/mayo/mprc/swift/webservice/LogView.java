@@ -10,8 +10,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
 import javax.annotation.Resource;
+import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
 import java.io.File;
+import java.io.IOException;
 
 /**
  * Sends a log file to the user, eventually with nice formatting etc.
@@ -41,6 +43,14 @@ public final class LogView {
 		final File file = fileTokenFactory.databaseTokenToFile(token);
 
 		response.setContentType("text/plain");
+
+		try {
+			final ServletOutputStream outputStream = response.getOutputStream();
+			outputStream.println("Log file for task " + taskId + " at " + file.getAbsolutePath());
+			outputStream.println();
+		} catch (IOException e) {
+			throw new MprcException(e);
+		}
 
 		QaReport.streamFileToResponse(response, file);
 	}
