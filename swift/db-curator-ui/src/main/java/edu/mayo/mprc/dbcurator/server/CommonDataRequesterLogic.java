@@ -217,20 +217,21 @@ public final class CommonDataRequesterLogic {
 		}
 	}
 
-	public String[] getLines(final String sharedPath, final int startLineInclusive, final int numberOfLines, String pattern) throws GWTServiceException {
+	public String[] getLines(final String sharedPath, final int startLineInclusive, final int numberOfLines, final String pattern) throws GWTServiceException {
 		RandomAccessFile raf = null;
 		try {
 			setCancelMessage(false);
 			clearResults();
 
 			Pattern compiledPattern = null;
-			if (pattern != null && !pattern.isEmpty()) {
-				pattern = ".*" + pattern + ".*";
-				pattern = pattern.replace("\\", "\\\\");
-				compiledPattern = Pattern.compile(pattern, Pattern.CASE_INSENSITIVE);
+			String newPattern = pattern;
+			if (newPattern != null && !newPattern.isEmpty()) {
+				newPattern = ".*" + newPattern + ".*";
+				newPattern = newPattern.replace("\\", "\\\\");
+				compiledPattern = Pattern.compile(newPattern, Pattern.CASE_INSENSITIVE);
 			}
 
-			final SortedMap<Integer, Long> currentPositionMap = getCurrentPositionMap(sharedPath, pattern);
+			final SortedMap<Integer, Long> currentPositionMap = getCurrentPositionMap(sharedPath, newPattern);
 
 			raf = new RandomAccessFile(new File(sharedPath), "r");
 			Long startLinePosition = currentPositionMap.get(startLineInclusive);
