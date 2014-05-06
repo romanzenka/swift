@@ -61,7 +61,7 @@ SearchRunItemVisualizer.prototype.multiResultEntryTemplate = new Template('<a hr
 SearchRunItemVisualizer.prototype.multiResultEntryAnalysisTemplate = new Template('<a href="/analysis?id=#{reportId}" class="analysis-data-link">Data</a><a href="#{fullUrl}" title="#{filePath}">#{fileName}</a><br clear="left"/>');
 SearchRunItemVisualizer.prototype.multiResultTailTemplate = new Template('</span></td><td class="result-buttons">' +
     '<a href="#{parentUrl}" class="parent-dir-link" title="#{parentPath}">Directory</a>' +
-    '<a href="/service/qa/#{reportId}/index.html" class="qa-link" title="Quality Analysis">QA</a>' +
+    '<a href="/service/qa/#{searchId}/index.html" class="qa-link" title="Quality Analysis">QA</a>' +
     '</td></tr></table>');
 
 SearchRunItemVisualizer.prototype.displayTransactionError = function (event, message) {
@@ -225,13 +225,14 @@ SearchRunItemVisualizer.prototype.fillWithContents = function (fragment, id, obj
                     for (var i = 0; i < object.results.length; i++) {
                         fileInfo = object.results[i];
                         this.splitPathIntoParts(fileInfo.path, fileInfo);
+                        fileInfo['searchId'] = object.id;
                         if (fileInfo.analysis == 0) {
                             results += this.multiResultEntryTemplate.evaluate(fileInfo);
                         } else {
                             results += this.multiResultEntryAnalysisTemplate.evaluate(fileInfo);
                         }
                     }
-                    results += this.multiResultTailTemplate.evaluate(fileInfo);
+                    results += this.multiResultTailTemplate.evaluate(object);
                 } else {
                     results += "<span class='result-status'>" + statusMessage + "</span>";
                 }
