@@ -244,9 +244,11 @@ function selectPoint(data, dataRow) {
         $('#icons').hide();
         selectedTransaction = -1;
     } else {
-        $('#icons').show();
         var transactionColumnIndex = columnIndex("transaction", data);
         selectedTransaction = data.getValue(dataRow, transactionColumnIndex);
+        $('#search-link').attr("href", '/start/?load=' + selectedTransaction);
+        $('#qa-link').attr("href", '/service/qa/' + selectedTransaction + "/index.html");
+        $('#icons').show();
     }
 }
 
@@ -459,12 +461,6 @@ if(quameterUiConfig!=null) {
     }
 
     selectPoint(data, -1);
-    $('#search-link').click(function (event) {
-        window.open('/start/?load=' + selectedTransaction);
-    });
-    $('#qa-link').click(function (event) {
-        window.open('/service/qa/' + selectedTransaction + "/index.html");
-    });
 
     var selectedPath = $('#selected-path');
     var pathColumnIndex = col('path');
@@ -639,8 +635,8 @@ if(quameterUiConfig!=null) {
             <div class="row-fluid">
                 <div class="span12">
                     <span id="icons">
-                        <img src="/report/search_edit.gif" id="search-link">
-                        <img src="/report/search.gif" id="qa-link">
+                        <a href="#" id="search-link"><img src="/report/search_edit.gif" style="border: 0"></a>
+                        <a href="#" id="qa-link"><img src="/report/search.gif" style="border: 0"></a>
                     </span>
                     <span id="selected-path"></span>
                 </div>
