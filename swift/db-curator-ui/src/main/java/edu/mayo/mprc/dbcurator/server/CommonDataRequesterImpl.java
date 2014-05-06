@@ -88,7 +88,7 @@ public final class CommonDataRequesterImpl extends SpringGwtServlet implements C
 		try {
 			return intializeLogic().runCuration(toRun);
 		} catch (Exception e) {
-			throw new GWTServiceException(MprcException.getDetailedMessage(e), e.getStackTrace().toString());
+			throw new GWTServiceException(MprcException.getDetailedMessage(e), "");
 		}
 	}
 
