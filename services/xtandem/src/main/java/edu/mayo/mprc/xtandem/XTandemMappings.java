@@ -228,7 +228,7 @@ public final class XTandemMappings implements Mappings {
 		String rnminus1 = protease.getRnminus1();
 		String rn = protease.getRn();
 
-		if (0 == minTerminiCleavages || (rn.isEmpty() && rnminus1.isEmpty())) {
+		if ((null != minTerminiCleavages && 0 == minTerminiCleavages) || (rn.isEmpty() && rnminus1.isEmpty())) {
 			rnminus1 = "X";
 			rn = "X";
 			// handle the case where we set to 50 in allow non-specific cleavages
