@@ -232,7 +232,7 @@ SearchRunItemVisualizer.prototype.fillWithContents = function (fragment, id, obj
                             results += this.multiResultEntryAnalysisTemplate.evaluate(fileInfo);
                         }
                     }
-                    results += this.multiResultTailTemplate.evaluate(object);
+                    results += this.multiResultTailTemplate.evaluate(fileInfo);
                 } else {
                     results += "<span class='result-status'>" + statusMessage + "</span>";
                 }
