@@ -25,7 +25,7 @@ import java.io.*;
 @Controller
 public final class QaReport {
 	@Resource(name = "swiftDao")
-	SwiftDao dao;
+	private SwiftDao swiftDao;
 
 	public static FileTypeMap typeMap = getDefaultFileTypeMap();
 
@@ -59,19 +59,19 @@ public final class QaReport {
 
 	private SwiftSearchDefinition getSearchDefinition(final int searchRunId) {
 		final SwiftSearchDefinition searchDefinition;
-		dao.begin();
+		swiftDao.begin();
 		try {
-			final SearchRun searchRun = dao.getSearchRunForId(searchRunId);
-			searchDefinition = dao.getSwiftSearchDefinition(searchRun.getSwiftSearch());
-			dao.commit();
+			final SearchRun searchRun = swiftDao.getSearchRunForId(searchRunId);
+			searchDefinition = swiftDao.getSwiftSearchDefinition(searchRun.getSwiftSearch());
+			swiftDao.commit();
 		} catch (Exception e) {
-			dao.rollback();
+			swiftDao.rollback();
 			throw new MprcException(String.format("Could not serve QA files for search %d", searchRunId), e);
 		}
 		return searchDefinition;
 	}
 
-	private void streamFileToResponse(final HttpServletResponse response, final File file) {
+	public static void streamFileToResponse(final HttpServletResponse response, final File file) {
 		BufferedInputStream bis = null;
 		try {
 			bis = new BufferedInputStream(new FileInputStream(file));

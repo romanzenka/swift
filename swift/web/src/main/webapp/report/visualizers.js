@@ -507,9 +507,11 @@ TaskItemVisualizer.prototype.fillWithContents = function (element, id, object) {
             for (var log = 0; log < object.logs.length; log++) {
                 var logInfo = object.logs[log];
                 var logType = logInfo.type;
-                var longName = logInfo.longname;
-
-                longName = this.wrapPathIntoHyperlink(longName, logType == 'STD_OUT' ? 'out' : 'err');
+                longName = '<a class="path" href="'
+                    + '/service/task-log/' + object.taskid + '/' + (logType == 'STD_OUT' ? 'out' : 'err')
+                    + '">'
+                    + (logType == 'STD_OUT' ? 'out' : 'err')
+                    + '</a>';
                 new Insertion.Bottom(logs, longName + ' ');
             }
         }
