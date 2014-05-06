@@ -42,7 +42,8 @@ public interface SwiftEnvironment extends RunningApplicationContext {
 	List<String> getParameters();
 
 	/**
-	 * User specifies which environment to run within using the --daemon command line switch.
+	 * User specifies which environment to run within using the
+	 * --daemon command line switch.
 	 * Daemons are configured in the main Swift configuration file, by default in {@link Swift#CONFIG_FILE_NAME}.
 	 *
 	 * @return Configuration of the current daemon. A daemon specifies a particular environment

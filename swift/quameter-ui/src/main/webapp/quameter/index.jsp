@@ -463,7 +463,7 @@ if(quameterUiConfig!=null) {
         window.open('/start/?load=' + selectedTransaction);
     });
     $('#qa-link').click(function (event) {
-        window.open('/report/reportupdate?qa=' + selectedTransaction);
+        window.open('/service/qa/' + selectedTransaction + "/index.html");
     });
 
     var selectedPath = $('#selected-path');
