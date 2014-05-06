@@ -1,6 +1,5 @@
 package edu.mayo.mprc.swift.report;
 
-import edu.mayo.mprc.swift.db.DatabaseFileTokenFactory;
 import edu.mayo.mprc.swift.db.LogInfo;
 import edu.mayo.mprc.swift.dbmapping.SearchRun;
 import edu.mayo.mprc.swift.dbmapping.TaskData;
@@ -235,11 +234,11 @@ public final class JsonWriter {
 			builder.append("\"logs\":[");
 
 			if (status.getOutputLogDatabaseToken() != null) {
-				appendLogInfo(builder, new LogInfo(LogInfo.STD_OUT_LOG_TYPE, DatabaseFileTokenFactory.tagDatabaseToken(status.getOutputLogDatabaseToken())));
+				appendLogInfo(builder, new LogInfo(LogInfo.STD_OUT_LOG_TYPE));
 			}
 
 			if (status.getErrorLogDatabaseToken() != null) {
-				appendLogInfo(builder, new LogInfo(LogInfo.STD_ERR_LOG_TYPE, DatabaseFileTokenFactory.tagDatabaseToken(status.getErrorLogDatabaseToken())));
+				appendLogInfo(builder, new LogInfo(LogInfo.STD_ERR_LOG_TYPE));
 			}
 
 			builder.append(']');
@@ -346,7 +345,6 @@ public final class JsonWriter {
 		appendComma(builder);
 		builder.append('{');
 		appendKeyString(builder, "type", info.getType());
-		appendKeyString(builder, "longname", info.getTaggedDatabaseToken());
 		builder.append('}');
 	}
 

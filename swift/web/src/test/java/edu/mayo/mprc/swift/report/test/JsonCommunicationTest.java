@@ -40,7 +40,7 @@ public final class JsonCommunicationTest {
 	private TaskData status;
 	private static final String STATUS_JSON =
 			"{\"_\":0, \"taskid\":123, \"title\":\"'Mascot Search'\", \"status\":\"Completed Successfully\", \"time\":\"Actual time: 0:00:01 after 0:00:02 spent in queue\", \"queuestamp\":1182963939000, \"startstamp\":1182963941000, \"endstamp\":1182963942000, \"errormsg\":\"error\\nmessage\", \"warningmsg\":\"warning message\", \"jobid\":\"12345\", \"host\":\"foo\", \"percentDone\":null, " +
-					"\"logs\":[{\"type\":\"" + LogInfo.STD_OUT_LOG_TYPE + "\", \"longname\":\"<file>shared:/out.txt</file>\"}, {\"type\":\"" + LogInfo.STD_ERR_LOG_TYPE + "\", \"longname\":\"<file>shared:/err.txt</file>\"}]}";
+					"\"logs\":[{\"type\":\"" + LogInfo.STD_OUT_LOG_TYPE + "\"}, {\"type\":\"" + LogInfo.STD_ERR_LOG_TYPE + "\"}]}";
 
 	@BeforeMethod
 	public void init() {
