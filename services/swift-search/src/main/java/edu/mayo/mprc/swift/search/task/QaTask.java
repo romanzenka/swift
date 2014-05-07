@@ -18,6 +18,8 @@ import java.util.Map;
 public final class QaTask extends AsyncTaskBase {
 	private List<QaTaskExperiment> experimentList;
 	private QaTaskExperiment currentExperiment;
+	// Name of the QA report
+	private String searchRunName;
 	// Folder where to put all the intermediate data
 	private File qaReportFolder;
 	// Name of the HTML report to be generated
@@ -30,9 +32,11 @@ public final class QaTask extends AsyncTaskBase {
 	public QaTask(final WorkflowEngine engine,
 	              final DaemonConnection daemonConnection,
 	              final DatabaseFileTokenFactory fileTokenFactory,
+	              final String searchRunName,
 	              final boolean fromScratch) {
 		super(engine, daemonConnection, fileTokenFactory, fromScratch);
 
+		this.searchRunName = searchRunName;
 		experimentList = new ArrayList<QaTaskExperiment>(1);
 		setName("Quality Assurance");
 	}
@@ -114,7 +118,7 @@ public final class QaTask extends AsyncTaskBase {
 			experimentQaList.add(experimentQa);
 		}
 
-		return new QaWorkPacket(experimentQaList, qaReportFolder, reportFile, decoyRegex, getFullId(), isFromScratch());
+		return new QaWorkPacket(searchRunName, experimentQaList, qaReportFolder, reportFile, decoyRegex, getFullId(), isFromScratch());
 	}
 
 	@Override

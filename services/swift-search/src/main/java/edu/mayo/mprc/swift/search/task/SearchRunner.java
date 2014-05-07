@@ -664,7 +664,7 @@ public final class SearchRunner implements Runnable, Lifecycle {
 	private void addQaTask(final FileSearch inputFile, final ScaffoldTaskI scaffoldTask, final FileProducingTask mgfOutput) {
 		if (qaDaemon != null) {
 			if (qaTask == null) {
-				qaTask = addTask(new QaTask(workflowEngine, qaDaemon, fileTokenFactory, isFromScratch()));
+				qaTask = addTask(new QaTask(workflowEngine, qaDaemon, fileTokenFactory, getSearchRun().getTitle(), isFromScratch()));
 			}
 
 			// Set up a new experiment dependency. All entries called from now on would be added under that experiment
