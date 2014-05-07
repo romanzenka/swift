@@ -10,8 +10,9 @@ import java.util.List;
  */
 public final class QaWorkPacket extends WorkPacketBase {
 
-	private static final long serialVersionUID = 20101025L;
+	private static final long serialVersionUID = 20140507L;
 
+	private String searchRunName;
 	private List<ExperimentQa> experimentQaTokens;
 	private File qaReportFolderFile;
 	private File reportFile;
@@ -20,20 +21,26 @@ public final class QaWorkPacket extends WorkPacketBase {
 	/**
 	 * Create a new work packet.
 	 *
+	 * @param searchRunName      Name of the entire search run. This will be used for naming the summary spreadsheet to prevent confusion.
 	 * @param experimentQas      A list of all experiment QA information objects, one per each Scaffold file produced.
 	 * @param qaReportFolderFile A folder to put the QA files into (the images and extracted data files)
 	 * @param reportFile         Name of the master report file (.html)
 	 * @param decoyRegex         The prefix the database uses to mark reverse entries.
 	 * @param taskId             Id of this task, see {@link WorkPacketBase}.
 	 */
-	public QaWorkPacket(final List<ExperimentQa> experimentQas, final File qaReportFolderFile, final File reportFile, final String decoyRegex, final String taskId, final boolean fromScratch) {
+	public QaWorkPacket(final String searchRunName, final List<ExperimentQa> experimentQas, final File qaReportFolderFile, final File reportFile, final String decoyRegex, final String taskId, final boolean fromScratch) {
 		super(taskId, fromScratch);
 
+		this.searchRunName = searchRunName;
 		experimentQaTokens = experimentQas;
 
 		this.qaReportFolderFile = qaReportFolderFile;
 		this.reportFile = reportFile;
 		this.decoyRegex = decoyRegex;
+	}
+
+	public String getSearchRunName() {
+		return searchRunName;
 	}
 
 	public List<ExperimentQa> getExperimentQas() {

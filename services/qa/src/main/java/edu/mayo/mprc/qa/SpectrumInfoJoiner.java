@@ -13,7 +13,6 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
 import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -36,7 +35,7 @@ public final class SpectrumInfoJoiner {
 	private SpectrumInfoJoiner() {
 	}
 
-	public SpectrumInfoJoiner(PeakListReaders readers) {
+	public SpectrumInfoJoiner(final PeakListReaders readers) {
 		this.readers = readers;
 	}
 
@@ -55,41 +54,19 @@ public final class SpectrumInfoJoiner {
 	 * @param scaffold       Access to information about Scaffold results
 	 * @param rawDumpReader  Access to information about .RAW spectra
 	 * @param msmsEvalReader Access to information from msmsEval
-	 * @param outputFile     A file that will contain information about every spectrum in the .mgf files, enriched by Scaffold identifications
-	 * @param rawFileName
+	 * @param sink           The joined spectrum data will be written to this sink.
+	 * @param rawFileName    Name of the RAW file that all this output originated from
 	 * @return Number of rows in output file, not including the column headers.
 	 */
-	public int joinSpectrumData(final File inputFile, final ScaffoldQaSpectraReader scaffold, final RawDumpReader rawDumpReader, final MSMSEvalOutputReader msmsEvalReader, final MyriMatchPepXmlReader myrimatchReader, final File outputFile, final String rawFileName) {
-		FileWriter fileWriter = null;
-
+	public int joinSpectrumData(final File inputFile, final ScaffoldQaSpectraReader scaffold, final RawDumpReader rawDumpReader, final MSMSEvalOutputReader msmsEvalReader, final MyriMatchPepXmlReader myrimatchReader, final SpectrumInfoSink sink, final String rawFileName) {
 		int rowCount = 0;
 		final Map<String, Spectrum> mgfSpectrumMap = new HashMap<String, Spectrum>();
 
 		try {
-			fileWriter = new FileWriter(outputFile);
-
 			getSourceInformation(inputFile, mgfSpectrumMap, true);
 			addScaffoldInformation(scaffold, mgfSpectrumMap, true);
 
-			fileWriter.write("Scan Id\tMz\tZ\tMgf File Name");
-			if (scaffold != null) {
-				fileWriter.write('\t');
-				fileWriter.write(scaffold.getHeaderLine());
-				fileWriter.write('\t');
-				fileWriter.write("Scaffold version");
-			}
-			fileWriter.write('\t');
-			fileWriter.write(msmsEvalReader.getHeaderLine());
-			fileWriter.write('\t');
-			if (rawFileName != null) {
-				fileWriter.write("Raw File\t");
-			}
-			fileWriter.write(rawDumpReader.getHeaderLine());
-			if (myrimatchReader != null) {
-				fileWriter.write('\t');
-				fileWriter.write(myrimatchReader.getHeaderLine());
-			}
-			fileWriter.write("\n");
+			sink.initialize(scaffold, rawDumpReader, msmsEvalReader, myrimatchReader, rawFileName);
 
 			if (!rawDumpReader.emptyFile()) {
 				// We have a raw output file, use it to drive the output
@@ -100,27 +77,26 @@ public final class SpectrumInfoJoiner {
 					final List<Spectrum> matchingSpectra = mgfMapByScanId.get(scanId);
 					if (matchingSpectra == null) {
 						writeSpectrumLine(
-								fileWriter,
+								sink,
 								msmsEvalReader,
 								rawDumpReader,
 								myrimatchReader,
 								scanIdStr,
 								null,
-								scaffold != null ? scaffold.getEmptyLine() : "", rawFileName,
+								scaffold != null ? scaffold.getEmptyLine() : "",
 								scaffoldVersion);
 						rowCount++;
 					} else {
 						for (final Spectrum spectrum : matchingSpectra) {
 							rowCount = writeMgfWithScaffoldInfos(
 									scaffold,
-									fileWriter,
+									sink,
 									rowCount,
 									msmsEvalReader,
 									rawDumpReader,
 									myrimatchReader,
 									scanIdStr,
-									spectrum,
-									rawFileName);
+									spectrum);
 						}
 					}
 				}
@@ -130,49 +106,46 @@ public final class SpectrumInfoJoiner {
 				for (final Spectrum spectrum : mgfSpectrumMap.values()) {
 					rowCount = writeMgfWithScaffoldInfos(
 							scaffold,
-							fileWriter,
+							sink,
 							rowCount,
 							msmsEvalReader,
 							rawDumpReader,
 							myrimatchReader,
 							String.valueOf(spectrum.getScanId()),
-							spectrum,
-							rawFileName);
+							spectrum);
 				}
 			}
 		} catch (IOException e) {
-			throw new MprcException("Failed to generated QA output file [" + outputFile.getAbsolutePath() + "]", e);
+			throw new MprcException("Failed to join QA spectra and write into [" + sink.getDescription() + "]", e);
 		} finally {
-			FileUtilities.closeQuietly(fileWriter);
+			FileUtilities.closeQuietly(sink);
 		}
 		return rowCount;
 	}
 
-	private static int writeMgfWithScaffoldInfos(final ScaffoldQaSpectraReader scaffold, final FileWriter fileWriter, int rowCount, final MSMSEvalOutputReader msmsEvalReader, final RawDumpReader rawDumpReader, final MyriMatchPepXmlReader myrimatchReader, final String scanId, final Spectrum spectrum, final String rawFileName) throws IOException {
+	private static int writeMgfWithScaffoldInfos(final ScaffoldQaSpectraReader scaffold, final SpectrumInfoSink sink, int rowCount, final MSMSEvalOutputReader msmsEvalReader, final RawDumpReader rawDumpReader, final MyriMatchPepXmlReader myrimatchReader, final String scanId, final Spectrum spectrum) throws IOException {
 		final String scaffoldVersion = scaffold == null ? null : scaffold.getScaffoldVersion();
 		if (spectrum.getScaffoldInfos() == null || spectrum.getScaffoldInfos().isEmpty()) {
 			writeSpectrumLine(
-					fileWriter,
+					sink,
 					msmsEvalReader,
 					rawDumpReader,
 					myrimatchReader,
 					scanId,
 					spectrum,
 					scaffold != null ? scaffold.getEmptyLine() : null,
-					rawFileName,
 					scaffoldVersion);
 			rowCount++;
 		} else {
 			for (final String scaffoldInfo : spectrum.getScaffoldInfos()) {
 				writeSpectrumLine(
-						fileWriter,
+						sink,
 						msmsEvalReader,
 						rawDumpReader,
 						myrimatchReader,
 						scanId,
 						spectrum,
 						scaffoldInfo,
-						rawFileName,
 						scaffoldVersion);
 				rowCount++;
 			}
@@ -181,35 +154,25 @@ public final class SpectrumInfoJoiner {
 	}
 
 	private static void writeSpectrumLine(
-			final FileWriter fileWriter,
+			final SpectrumInfoSink sink,
 			final MSMSEvalOutputReader msmsEvalReader,
 			final RawDumpReader rawDumpReader,
 			final MyriMatchPepXmlReader myrimatchReader,
 			final String scanIdStr,
 			final Spectrum spectrum,
 			final String scaffoldInfo,
-			final String rawFileName,
 			final String scaffoldVersion) throws IOException {
-		fileWriter.write(scanIdStr
-				+ "\t" + (spectrum != null ? spectrum.getMz() : "")
-				+ "\t" + (spectrum != null ? spectrum.getCharge() : "")
-				+ "\t" + (spectrum != null ? spectrum.getInputFileName() : "")
-				+ (scaffoldInfo != null ? ("\t" + scaffoldInfo + "\t" + scaffoldVersion) : "")
-				+ "\t");
-
 		// msmsEval part (even if no msmsEval data is present, we produce a consistent format)
-		fileWriter.write(msmsEvalReader.getLineForKey(scanIdStr));
-		fileWriter.write('\t');
-		if (rawFileName != null) {
-			fileWriter.write(rawFileName);
-			fileWriter.write('\t');
-		}
-		fileWriter.write(rawDumpReader.getLineForKey(scanIdStr));
+		final String msmsEvalData = msmsEvalReader.getLineForKey(scanIdStr);
+		final String rawDumpReaderData = rawDumpReader.getLineForKey(scanIdStr);
+		final String myrimatchReaderData;
 		if (myrimatchReader != null && spectrum != null) {
-			fileWriter.write('\t');
-			fileWriter.write(myrimatchReader.getLineForKey(String.valueOf(spectrum.getSpectrumNumber())));
+			myrimatchReaderData = myrimatchReader.getLineForKey(String.valueOf(spectrum.getSpectrumNumber()));
+		} else {
+			myrimatchReaderData = null;
 		}
-		fileWriter.write("\n");
+
+		sink.writeSpectrumInfo(scanIdStr, spectrum, scaffoldInfo, scaffoldVersion, msmsEvalData, rawDumpReaderData, myrimatchReaderData);
 	}
 
 	private static Map<Long, List<Spectrum>> indexMgfSpectraByScanId(final Map<String, Spectrum> mgfSpectrumMap) {

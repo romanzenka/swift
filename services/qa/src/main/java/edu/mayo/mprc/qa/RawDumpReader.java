@@ -34,7 +34,7 @@ public final class RawDumpReader implements KeyedTsvReader, Iterable<String> {
 	private static final String SCAN_NUM_HEADER = "Scan Id";
 	private int firstSpectrum;
 	private int lastSpectrum;
-	private static final String MS_LEVEL = "MS Level";
+	public static final String MS_LEVEL = "MS Level";
 	/**
 	 * Header without the first {@link #SCAN_NUM_HEADER} column.
 	 */

@@ -41,8 +41,9 @@ public final class SpectrumInfoJoinerTest {
 			spectra.load(scaffoldSpectra, "2", null);
 			final RawDumpReader rawDumpReader = new RawDumpReader(rawDumpFile);
 			final MSMSEvalOutputReader msmsEvalReader = new MSMSEvalOutputReader(msmsEvalFile);
+			final FileSpectrumInfoSink sink = new FileSpectrumInfoSink(outputFile);
 
-			spectrumInfoJoiner().joinSpectrumData(mgfFile, spectra, rawDumpReader, msmsEvalReader, null, outputFile, null);
+			spectrumInfoJoiner().joinSpectrumData(mgfFile, spectra, rawDumpReader, msmsEvalReader, null, sink, null);
 
 			Assert.assertEquals(TestingUtilities.compareFilesByLine(referenceOutputFile, outputFile, true), null, "Output file content is not as expected.");
 		} finally {

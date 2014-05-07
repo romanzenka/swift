@@ -159,13 +159,14 @@ public final class QaWorker extends WorkerBase {
 			final RawDumpReader rawDumpReader = new RawDumpReader(qaFiles.getRawSpectraFile());
 			final MSMSEvalOutputReader msmsEvalReader = new MSMSEvalOutputReader(qaFiles.getMsmsEvalOutputFile());
 			final String rawInputFile = qaFiles.getRawInputFile() != null ? qaFiles.getRawInputFile().getAbsolutePath() : null;
+			final FileSpectrumInfoSink sink = new FileSpectrumInfoSink(outputFile);
 			generate = spectrumInfoJoiner.joinSpectrumData(
 					mgfFile,
 					scaffoldParser,
 					rawDumpReader,
 					msmsEvalReader,
 					myrimatchReader,
-					outputFile,
+					sink,
 					rawInputFile) > 0;
 
 			if (generate) {
