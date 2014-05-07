@@ -36,6 +36,8 @@ public final class QuameterCategorySelector extends HorizontalPanel {
 		}
 
 		final String searchCategory = getSearchCategory();
+		// If we happened to be null, we overwrite the value to the default
+		setSearchCategory(searchCategory);
 		selectByValue(searchCategory);
 
 		category.addChangeHandler(new ChangeHandler() {
@@ -56,8 +58,6 @@ public final class QuameterCategorySelector extends HorizontalPanel {
 			val = QuameterConfigurationUtils.getDefaultCategory(getCategoryString(uiConfiguration));
 			if (val == null) {
 				category.setSelectedIndex(0);
-				// When selecting default value, override the category
-				setSearchCategory(category.getValue(category.getSelectedIndex()));
 				return;
 			}
 		} else {
