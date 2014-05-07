@@ -642,28 +642,29 @@ if(quameterUiConfig!=null) {
                 </div>
             </div>
         </div>
-
-        <% if (quameterUiConfig == null) {
-        %>
-        <div class="alert">
-            <p><strong>Warning</strong> The QuaMeter module is not configured.</p>
-
-            <p>You need to add the QuaMeterUi resource to the
-                <code><%= MainFactoryContext.getSwiftEnvironment().getDaemonConfig().getName() %>
-                </code> daemon.</p>
-        </div>
-
-        <% } else {
-        %>
-
-        <div id="detailedGraphs">
-        </div>
-
-        <div id="simpleGraphs">
-        </div>
-
-        <% } %>
     </div>
+
+    <% if (quameterUiConfig == null) {
+    %>
+    <div class="alert">
+        <p><strong>Warning</strong> The QuaMeter module is not configured.</p>
+
+        <p>You need to add the QuaMeterUi resource to the
+            <code><%= MainFactoryContext.getSwiftEnvironment().getDaemonConfig().getName() %>
+            </code> daemon.</p>
+    </div>
+
+    <% } else {
+    %>
+
+    <div id="detailedGraphs">
+    </div>
+
+    <div id="simpleGraphs">
+    </div>
+
+    <% } %>
+</div>
 
 </body>
 </html>
