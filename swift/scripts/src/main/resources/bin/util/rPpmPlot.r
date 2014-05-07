@@ -8,11 +8,6 @@ library("gam")
 require("png")
 require("caTools")
 
-args<-commandArgs(TRUE)
-inputFile<-args[1]
-reportFileName<-args[2]
-decoyRegex<-args[3] # Currently treated just as a plain prefix
-
 # Setup the colors
 colorsByCharge<-c("lightgray","red","darkgreen","blue","orange","yellow","pink","purple")
 legendForCharge<-c("0","1","2","3","4","5","6","7","8")
@@ -95,7 +90,7 @@ spectrum.rev.title <- "Reverse Hit"
 spectrum.rev.col <- "orange"
 spectrum.rev.colHtml <- "#c80"
 spectrum.rev.border <- "orange"
-spectrum.rev.test <- function(sequence) { substring(sequence, 1, nchar(decoyRegex))==decoyRegex }
+spectrum.rev.test <- function(sequence, decoyRegex) { substring(sequence, 1, nchar(decoyRegex))==decoyRegex }
 spectrum.rev.symbol <- 4 # X for reverse hits
 
 # Spectra identified as polymers  
@@ -438,7 +433,7 @@ addQaColumn<-function(columns, name, type) {
     columns
 }
 
-readQaFile<-function(dataFile) {
+readQaFile<-function(dataFile, decoyRegex) {
     print(paste("Reading QA data file: ", dataFile))
 
         header<-read.delim(dataFile, header=TRUE, sep="\t", nrows=1, fileEncoding="UTF-8", quote="")
@@ -469,7 +464,7 @@ readQaFile<-function(dataFile) {
 
         # Add a few calculated columns
         dataTabFull$identified <- dataTabFull$Protein.accession.numbers!=""
-        dataTabFull$rev <- spectrum.rev.test(dataTabFull$Protein.accession.numbers)
+        dataTabFull$rev <- spectrum.rev.test(dataTabFull$Protein.accession.numbers, decoyRegex)
         dataTabFull$polymer <- spectrum.polymer.test(dataTabFull$Polymer.Segment.Size, dataTabFull$Polymer.p.value) 
         if("Base.Peak.Intensity" %in% names(dataTabFull)) {
             dataTabFull$unfrag <- spectrum.unfrag.test(
@@ -502,7 +497,7 @@ movingAverage <- function(x,n=5){
 }
 
 # Generates series of images for one .RAW file
-imageGenerator<-function(dataFile, msmsEvalDataFile, infoFile, spectrumFile, chromatogramFile, outputImages, generate) {
+imageGenerator<-function(dataFile, msmsEvalDataFile, infoFile, spectrumFile, chromatogramFile, outputImages, generate, decoyRegex) {
     # We return the passed file names as a part of our result
     result<-outputImages
     result$data.file <- dataFile
@@ -580,7 +575,7 @@ imageGenerator<-function(dataFile, msmsEvalDataFile, infoFile, spectrumFile, chr
         }
         spectrumInfoAvailable<-!is.null(spectrumInfo)
 
-        dataTabFull <- readQaFile(dataFile)
+        dataTabFull <- readQaFile(dataFile, decoyRegex)
     
         # Filter out all the MS data - hack because our format has changed
         result$spectrum.all.count <- length(unique(dataTabFull$Scan.Id))
@@ -996,40 +991,54 @@ endReportFile<-function(reportFile) {
     , file=reportFile)
 }
 
-inputDataTab<-read.delim(inputFile, header=TRUE, sep="\t", colClasses="character", fileEncoding="UTF-8")
-reportFile<-file(reportFileName, "w")
-
-startReportFile(reportFile)
-
-print("Generating image files and report file.")
-
-for(i in 1:length(inputDataTab$Data.File)) {
-    line <- inputDataTab[i,]
-    row <- imageGenerator(
-        line$Data.File,
-        line$msmsEval.Output,
-        line$Raw.Info.File,
-        line$Raw.Spectra.File,
-        line$Chromatogram.File,
-        list(
-            lockmass.file = line$Id.File,
-            calibration.file = line$Mz.File,
-            mz.file = line$IdVsMz.File,
-            source.current.file = line$Source.Current.File,
-            msmsEval.file = line$msmsEval.Discriminant.File,
-            pepTol.file = line$Peptide.Tolerance.File,
-            tic.file = line$TIC.File),
-        line$Generate.Files)
-
-    addRowToReportFile(reportFile, row)
-
+# Main function that does all the work
+# inputFile - a file describing all input files and where to put the images
+# reportFileName - path to index.html file that will be generated
+# decoyRegex - how to detect reverse hits
+run <- function(inputFile, reportFileName, decoyRegex) {
+  inputDataTab<-read.delim(inputFile, header=TRUE, sep="\t", colClasses="character", fileEncoding="UTF-8")
+  reportFile<-file(reportFileName, "w")
+  
+  startReportFile(reportFile)
+  
+  print("Generating image files and report file.")
+  
+  for(i in 1:length(inputDataTab$Data.File)) {
+      line <- inputDataTab[i,]
+      row <- imageGenerator(
+          line$Data.File,          
+          line$msmsEval.Output,
+          line$Raw.Info.File,
+          line$Raw.Spectra.File,
+          line$Chromatogram.File,
+          list(
+              lockmass.file = line$Id.File,
+              calibration.file = line$Mz.File,
+              mz.file = line$IdVsMz.File,
+              source.current.file = line$Source.Current.File,
+              msmsEval.file = line$msmsEval.Discriminant.File,
+              pepTol.file = line$Peptide.Tolerance.File,
+              tic.file = line$TIC.File),
+          line$Generate.Files,
+          decoyRegex)
+  
+      addRowToReportFile(reportFile, row)
+  
+  }
+  
+  endReportFile(reportFile)
+  
+  print("Closing report file.")
+  
+  close(reportFile)
 }
 
-endReportFile(reportFile)
+args<-commandArgs(TRUE)
+inputFile<-args[1]
+reportFileName<-args[2]
+decoyRegex<-args[3] # Currently treated just as a plain prefix
 
-print("Closing report file.")
-
-close(reportFile)
-
+run(inputFile, reportFileName, decoyRegex)
+  
 # vi: set filetype=R expandtab tabstop=4 shiftwidth=4 autoindent smartindent:
 
