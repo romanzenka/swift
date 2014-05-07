@@ -56,6 +56,8 @@ public final class QuameterCategorySelector extends HorizontalPanel {
 			val = QuameterConfigurationUtils.getDefaultCategory(getCategoryString(uiConfiguration));
 			if (val == null) {
 				category.setSelectedIndex(0);
+				// When selecting default value, override the category
+				setSearchCategory(category.getValue(category.getSelectedIndex()));
 				return;
 			}
 		} else {
