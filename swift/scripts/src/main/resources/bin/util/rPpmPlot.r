@@ -459,6 +459,9 @@ readQaFile<-function(dataFile, decoyRegex) {
         colClasses<-addQaColumn(colClasses, "Base.Peak.m.z", "numeric")
         colClasses<-addQaColumn(colClasses, "Base.Peak.Intensity", "numeric")
         colClasses<-addQaColumn(colClasses, "Second.Peak.Intensity", "numeric")
+        colClasses<-addQaColumn(colClasses, "Source.Current..uA.", "numeric")
+        colClasses<-addQaColumn(colClasses, "Lock.Mass.Found", "numeric")    
+        colClasses<-addQaColumn(colClasses, "Lock.Mass.Shift", "numeric")    
 
         dataTabFull<-read.delim(dataFile, header=TRUE, sep="\t", colClasses=colClasses, fileEncoding="UTF-8", quote="")
 
@@ -501,7 +504,6 @@ imageGenerator<-function(dataFile, msmsEvalDataFile, infoFile, spectrumFile, chr
     # We return the passed file names as a part of our result
     result<-outputImages
     result$data.file <- dataFile
-    result$spectrum.file <- spectrumFile
 
     if ("true" == generate || "TRUE" == generate) {
 
@@ -509,10 +511,10 @@ imageGenerator<-function(dataFile, msmsEvalDataFile, infoFile, spectrumFile, chr
         plotNameLen <- nchar(plotName)
         plotName <- substr(plotName, 1, plotNameLen-nchar(".sfX.sfs"))
 
-        spectrumInfo <- NULL
-        if(file.exists(spectrumFile)) {             
-            print(paste("Reading spectrum data file: ", spectrumFile))
-            spectrumInfo <- read.delim(spectrumFile, header=TRUE, sep="\t", fileEncoding="UTF-8")
+        dataTabFull <- readQaFile(dataFile, decoyRegex)        
+        
+        spectrumInfo <- dataTabFull[,c("Scan.Id", "MS.Level", "RT", "TIC", "Source.Current..uA.", "Lock.Mass.Found", "Lock.Mass.Shift")]        
+        if(sum(!is.na(spectrumInfo$RT))>0) {             
             ### Total Ion Current plot 
             startPlot(tic.title, outputImages$tic.file)
 
@@ -574,8 +576,6 @@ imageGenerator<-function(dataFile, msmsEvalDataFile, infoFile, spectrumFile, chr
             dev.off()
         }
         spectrumInfoAvailable<-!is.null(spectrumInfo)
-
-        dataTabFull <- readQaFile(dataFile, decoyRegex)
     
         # Filter out all the MS data - hack because our format has changed
         result$spectrum.all.count <- length(unique(dataTabFull$Scan.Id))
@@ -776,89 +776,84 @@ imageGenerator<-function(dataFile, msmsEvalDataFile, infoFile, spectrumFile, chr
             
         dev.off()
          
+        msmsDataTab <- dataTabFull[!is.na(dataTabFull$discriminant), c("Scan.Id", "discriminant")]
+        duplicatedMsmsDataRows <- duplicated(msmsDataTab$Scan.Id)
+        msmsDataTab <- msmsDataTab[!duplicatedMsmsDataRows,]
 
-        print(paste("Reading msmsEval data file: ", msmsEvalDataFile))
+        if (nrow(msmsDataTab)>0) {
+              startPlot(msmsEval.title, outputImages$msmsEval.file)
 
-        if (file.exists(msmsEvalDataFile)) {
-            msmsDataTab <- read.delim(msmsEvalDataFile, header=TRUE, sep=",", fileEncoding="UTF-8")
+          		# We use fixed range for the discriminant scores to make the graphs visually comparable
+              msmsEval.xlim <- c(-15, 20)
+	            # First and last bin extend to +-1E5 and are catching the outliers
+              histogramBreakPoints <- c(-1E5, seq(msmsEval.xlim[1], msmsEval.xlim[2], length.out=106), 1E5)
 
-            if (length(msmsDataTab$discriminant) > 0) {
-                startPlot(msmsEval.title, outputImages$msmsEval.file)
+              spectrum.dat.count <- length(msmsDataTab$discriminant)
 
-        		# We use fixed range for the discriminant scores to make the graphs visually comparable
-                msmsEval.xlim <- c(-15, 20)
-		        # First and last bin extend to +-1E5 and are catching the outliers
-                histogramBreakPoints <- c(-1E5, seq(msmsEval.xlim[1], msmsEval.xlim[2], length.out=106), 1E5)
+              result$spectrum.dat.count <- spectrum.dat.count
 
-                spectrum.dat.count <- length(msmsDataTab$discriminant)
+              histData <- hist(
+                              msmsDataTab$discriminant, 
+                              main=c(plotName, msmsEval.title), 
+                              xlab="msmsEval Discriminant", 
+                              col=spectrum.dat.col, 
+                              border=spectrum.dat.border, 
+                              breaks=histogramBreakPoints, 
+                              xlim=msmsEval.xlim, 
+                              freq=F)
 
-                result$spectrum.dat.count <- spectrum.dat.count
+              if (length(dataTab$Scan.Id) > 0) {
+                  spectrum.id.scans <- (msmsDataTab$Scan.Id %in% dataTab$Scan.Id)                    
+                  reverseScanIds <- dataTab$Scan.Id[dataTab$rev]
+                  spectrum.rev.scans <- (msmsDataTab$Scan.Id %in% reverseScanIds)
+                  unfragScanIds <- dataTabFull$Scan.Id[dataTabFull$unfrag]
+                  spectrum.unfrag.scans <- (msmsDataTab$Scan.Id %in% unfragScanIds)
+                  domfragScanIds <- dataTabFull$Scan.Id[dataTabFull$domfrag]
+                  spectrum.domfrag.scans <- (msmsDataTab$Scan.Id %in% domfragScanIds)
 
-                histData <- hist(
-                                msmsDataTab$discriminant, 
-                                main=c(plotName, msmsEval.title), 
-                                xlab="msmsEval Discriminant", 
-                                col=spectrum.dat.col, 
-                                border=spectrum.dat.border, 
-                                breaks=histogramBreakPoints, 
-                                xlim=msmsEval.xlim, 
-                                freq=F)
+                  # Plots a part (boolean vector) of all data as additional histogram
+                  msmsEvalSubHist <- function(part, col, border) {
+                      subCount <- subHistogramWithGaussian(
+                                      points = msmsDataTab$discriminant[part],
+                                      xlim = msmsEval.xlim,
+                                      breaks = histogramBreakPoints,
+                                      totalPoints = spectrum.dat.count,
+                                      col = col,
+                                      border = border)                    
+                      return (subCount)
+                  }
 
-                if (length(dataTab$Scan.Id) > 0) {
-                    spectrum.id.scans <- (msmsDataTab$Scan.. %in% dataTab$Scan.Id)                    
-                    reverseScanIds <- dataTab$Scan.Id[dataTab$rev]
-                    spectrum.rev.scans <- (msmsDataTab$Scan.. %in% reverseScanIds)
-                    unfragScanIds <- dataTabFull$Scan.Id[dataTabFull$unfrag]
-                    spectrum.unfrag.scans <- (msmsDataTab$Scan.. %in% unfragScanIds)
-                    domfragScanIds <- dataTabFull$Scan.Id[dataTabFull$domfrag]
-                    spectrum.domfrag.scans <- (msmsDataTab$Scan.. %in% domfragScanIds)
+                  # Non-IDed spectra
+                  spectrum.nonid.count<-msmsEvalSubHist(part = !spectrum.id.scans, col = spectrum.nonid.col, border = spectrum.nonid.border)
+                  result$spectrum.nonid.count<-spectrum.nonid.count
+                  # Unfragmented spectra
+                  spectrum.unfrag.count<-msmsEvalSubHist(part = spectrum.unfrag.scans, col = spectrum.unfrag.col, border = spectrum.unfrag.border)                   
+                  # Dominant fragment spectra
+                  spectrum.domfrag.count<-msmsEvalSubHist(part = spectrum.domfrag.scans, col = spectrum.domfrag.col, border = spectrum.domfrag.border)                   
+                  # IDed spectra
+                  spectrum.id.count<-msmsEvalSubHist(part = spectrum.id.scans, col = spectrum.id.col, border = spectrum.id.border)
+                  result$spectrum.id.count<-spectrum.id.count
+                  # IDed reverse spectra
+                  spectrum.rev.count<-msmsEvalSubHist(part = spectrum.rev.scans, col = spectrum.rev.col, border = spectrum.rev.border)
+                  result$spectrum.rev.count<-spectrum.rev.count
 
-                    # Plots a part (boolean vector) of all data as additional histogram
-                    msmsEvalSubHist <- function(part, col, border) {
-                        subCount <- subHistogramWithGaussian(
-                                        points = msmsDataTab$discriminant[part],
-                                        xlim = msmsEval.xlim,
-                                        breaks = histogramBreakPoints,
-                                        totalPoints = spectrum.dat.count,
-                                        col = col,
-                                        border = border)                    
-                        return (subCount)
-                    }
+                  legendPercents <- function(title, count) { paste(title, toPercentString(count, spectrum.dat.count)) }
+                  legend("topright", 
+                      c(legendPercents(spectrum.dat.title, spectrum.dat.count), 
+                        legendPercents(spectrum.id.title, spectrum.id.count), 
+                        legendPercents(spectrum.rev.title, spectrum.rev.count), 
+                        legendPercents(spectrum.nonid.title, spectrum.nonid.count),
+                        legendPercents(spectrum.unfrag.title, spectrum.unfrag.count),
+                        legendPercents(spectrum.domfrag.title, spectrum.domfrag.count)), 
 
-                    # Non-IDed spectra
-                    spectrum.nonid.count<-msmsEvalSubHist(part = !spectrum.id.scans, col = spectrum.nonid.col, border = spectrum.nonid.border)
-                    result$spectrum.nonid.count<-spectrum.nonid.count
-                    # Unfragmented spectra
-                    spectrum.unfrag.count<-msmsEvalSubHist(part = spectrum.unfrag.scans, col = spectrum.unfrag.col, border = spectrum.unfrag.border)                   
-                    # Dominant fragment spectra
-                    spectrum.domfrag.count<-msmsEvalSubHist(part = spectrum.domfrag.scans, col = spectrum.domfrag.col, border = spectrum.domfrag.border)                   
-                    # IDed spectra
-                    spectrum.id.count<-msmsEvalSubHist(part = spectrum.id.scans, col = spectrum.id.col, border = spectrum.id.border)
-                    result$spectrum.id.count<-spectrum.id.count
-                    # IDed reverse spectra
-                    spectrum.rev.count<-msmsEvalSubHist(part = spectrum.rev.scans, col = spectrum.rev.col, border = spectrum.rev.border)
-                    result$spectrum.rev.count<-spectrum.rev.count
-
-                    legendPercents <- function(title, count) { paste(title, toPercentString(count, spectrum.dat.count)) }
-                    legend("topright", 
-                        c(legendPercents(spectrum.dat.title, spectrum.dat.count), 
-                          legendPercents(spectrum.id.title, spectrum.id.count), 
-                          legendPercents(spectrum.rev.title, spectrum.rev.count), 
-                          legendPercents(spectrum.nonid.title, spectrum.nonid.count),
-                          legendPercents(spectrum.unfrag.title, spectrum.unfrag.count),
-                          legendPercents(spectrum.domfrag.title, spectrum.domfrag.count)), 
-
-                        fill=c(spectrum.dat.col, spectrum.id.col, spectrum.rev.col, spectrum.nonid.col, spectrum.unfrag.col, spectrum.domfrag.col), 
-                        title="Histograms")
-                } else {
-                    legend("topright", c(paste(spectrum.dat.title, spectrum.dat.count)), fill=c(spectrum.dat.col), title="Histograms")
-                }
+                      fill=c(spectrum.dat.col, spectrum.id.col, spectrum.rev.col, spectrum.nonid.col, spectrum.unfrag.col, spectrum.domfrag.col), 
+                      title="Histograms")
+              } else {
+                  legend("topright", c(paste(spectrum.dat.title, spectrum.dat.count)), fill=c(spectrum.dat.col), title="Histograms")
+              }
 
 
-                dev.off()
-            } else {
-                print("Skipping generation of msmsEval image because msmsEval data file is empty.")
-            }
+              dev.off()
         } else {
            print("Skipping generation of msmsEval image file because msmsEval data file does not exist.")
         }
@@ -868,7 +863,8 @@ imageGenerator<-function(dataFile, msmsEvalDataFile, infoFile, spectrumFile, chr
 }
 
 helpLink<-function(topic) {
-	paste("&nbsp;<a class=\"help-link\" href=\"http://delphi.mayo.edu/wiki/trac.cgi/wiki/", topic, "\">?</a>", sep="")
+## TODO: Re-establish help
+  ###	paste("&nbsp;<a class=\"help-link\" href=\"http://delphi.mayo.edu/wiki/trac.cgi/wiki/", topic, "\">?</a>", sep="")
 }
 
 colorSpan <- function(text, color) {
@@ -899,6 +895,7 @@ startReportFile<-function(reportFile) {
     </head>
     <body>
     <h2>Swift QA", helpLink("swiftQa"), "</h2>
+    <a href=\"summary.xls\">summary.xls</a>
     <table>
     <tr><th>Data files", helpLink("swiftQaDataFile"),
     "</th><th colspan=\"2\" class=\"protein\">Proteins",
@@ -998,6 +995,9 @@ endReportFile<-function(reportFile) {
 run <- function(inputFile, reportFileName, decoyRegex) {
   inputDataTab<-read.delim(inputFile, header=TRUE, sep="\t", colClasses="character", fileEncoding="UTF-8")
   reportFile<-file(reportFileName, "w")
+    
+  excelSummaryFile<-file(file.path(dirname(reportFileName), "summary.xls"), "w")
+  cat("raw file name\tproteins\treverse proteins\tpeptides\treverse peptides\tall spectra\tmsn spectra\t.dat spectra\tidentified spectra\treverse hit spectra\tpolymer spectra\tunfragmented spectra\tdominant fragment spectra\n" , file=excelSummaryFile)
   
   startReportFile(reportFile)
   
@@ -1023,7 +1023,21 @@ run <- function(inputFile, reportFileName, decoyRegex) {
           decoyRegex)
   
       addRowToReportFile(reportFile, row)
-  
+      cat(line$Raw.File, 
+          row$proteins.all.count, 
+          row$proteins.rev.count, 
+          row$peptides.all.count,
+          row$peptides.rev.count,
+          row$spectrum.all.count,
+          row$spectrum.msn.count,
+          row$spectrum.dat.count,
+          row$spectrum.id.count,
+          row$spectrum.rev.count,
+          row$spectrum.polymer.count,
+          row$spectrum.unfrag.count,
+          row$spectrum.domfrag.count,
+          file=excelSummaryFile, sep="\t")  
+      cat("\n", file=excelSummaryFile)
   }
   
   endReportFile(reportFile)
@@ -1031,6 +1045,9 @@ run <- function(inputFile, reportFileName, decoyRegex) {
   print("Closing report file.")
   
   close(reportFile)
+  
+  cat("END OF FILE\n", file=excelSummaryFile)
+  close(excelSummaryFile)
 }
 
 args<-commandArgs(TRUE)
@@ -1042,3 +1059,4 @@ run(inputFile, reportFileName, decoyRegex)
   
 # vi: set filetype=R expandtab tabstop=4 shiftwidth=4 autoindent smartindent:
 
+  
