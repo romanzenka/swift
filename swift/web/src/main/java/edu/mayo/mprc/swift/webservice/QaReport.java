@@ -33,6 +33,8 @@ public final class QaReport {
 		final MimetypesFileTypeMap defaultMap = new MimetypesFileTypeMap();
 
 		defaultMap.addMimeTypes("image/png png PNG");
+		defaultMap.addMimeTypes("image/jpeg jpg jpeg JPG JPEG");
+		defaultMap.addMimeTypes("application/vnd.ms-excel xls");
 
 		return defaultMap;
 	}
