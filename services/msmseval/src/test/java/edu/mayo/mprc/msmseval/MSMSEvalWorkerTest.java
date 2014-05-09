@@ -37,7 +37,7 @@ public final class MSMSEvalWorkerTest {
 		tempDirectory = FileUtilities.createTempFolder();
 
 		try {
-			mgfFile = TestingUtilities.getTempFileFromResource(INPUT_MGF, false, tempDirectory);
+			mgfFile = TestingUtilities.getTempFileFromResource(INPUT_MGF, false, tempDirectory, ".mgf");
 			paramFile = TestingUtilities.getTempFileFromResource(INPUT_PARAMS, false, tempDirectory);
 		} catch (IOException e) {
 			throw new MprcException("Failed creating files in: [" + tempDirectory.getAbsolutePath() + "]", e);
