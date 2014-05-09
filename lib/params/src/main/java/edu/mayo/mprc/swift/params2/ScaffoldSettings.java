@@ -29,9 +29,6 @@ public class ScaffoldSettings extends PersistableBase {
 	public ScaffoldSettings() {
 	}
 
-	public static final ScaffoldSettings DEFAULT = new ScaffoldSettingsBuilder()
-			.createScaffoldSettings();
-
 	public ScaffoldSettings(final double proteinProbability, final double peptideProbability, final int minimumPeptideCount, final int minimumNonTrypticTerminii, final StarredProteins starredProteins, final boolean saveOnlyIdentifiedSpectra, final boolean saveNoSpectra, final boolean connectToNCBI, final boolean annotateWithGOA,
 	                        final boolean useIndependentSampleGrouping, final boolean useFamilyProteinGrouping,
 	                        final boolean mzIdentMlReport, final boolean highMassAccuracyScoring,
@@ -50,6 +47,11 @@ public class ScaffoldSettings extends PersistableBase {
 		this.mzIdentMlReport = mzIdentMlReport;
 		this.highMassAccuracyScoring = highMassAccuracyScoring;
 		this.use3xScoring = use3xScoring;
+	}
+
+	public static ScaffoldSettings defaultScaffoldSettings() {
+		return new ScaffoldSettingsBuilder()
+				.createScaffoldSettings();
 	}
 
 	public double getProteinProbability() {
