@@ -267,6 +267,11 @@ public abstract class TaskBase implements Task {
 		}
 	}
 
+	@Override
+	public void upgrade(final Task other) {
+		// Do nothing by default
+	}
+
 	public void setWarning(final String warning) {
 		synchronized (stateLock) {
 			lastWarning = warning;

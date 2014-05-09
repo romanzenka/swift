@@ -53,6 +53,15 @@ public interface Task {
 
 	void setError(Throwable error);
 
+	/**
+	 * If two tasks end up being "equal" - meaning only one execution is needed,
+	 * there is still a possibility that the other task does MORE. In that case the upgrade method is called
+	 * to make the current task upgrade its responsibilities.
+	 *
+	 * @param other Task to upgrade from.
+	 */
+	void upgrade(Task other);
+
 	Throwable getLastError();// Resumes given context when file appears.
 
 	/**

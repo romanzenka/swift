@@ -22,9 +22,11 @@ import edu.mayo.mprc.workspace.User;
 import org.testng.Assert;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
+import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
 import java.io.*;
+import java.lang.reflect.Method;
 import java.util.*;
 import java.util.concurrent.ExecutorService;
 
@@ -306,22 +308,34 @@ public class TestSearchRunner {
 		Assert.assertEquals(runner.getWorkflowEngine().getNumTasks(), expectedNumTasks);
 	}
 
+	@DataProvider(name = "twoBools")
+	public Object[][] createData(Method m) {
+		return new Object[][]{new Object[]{Boolean.FALSE}, new Object[]{Boolean.TRUE}};
+	}
+
 	/**
-	 * We switch QC on for a mzML-based search. That means we already get mzml conversion, myrimatch and idpqonvert
-	 * for free, so just quameter should be added.
+	 * We switch QC on for a mzML-based search. That means we already get mzml conversion for free.
+	 * Myrimatch, Idpicker and quameter should be added, because myrimatch will operate with different settings
+	 * (semi-tryptic).
 	 */
-	@Test
-	public void qualityControlRunnerWithMzML() throws IOException {
+	@Test(dataProvider = "twoBools")
+	public void qualityControlRunnerWithMzML(final Boolean doSemiTryptic) throws IOException {
 		final Collection<SearchEngine> searchEngines = searchEngines();
 
 		final EnabledEngines engines = enabledEnginesWithQuameter();
 
+		SearchEngineParameters parameters = searchEngineParametersMzml();
+		if (doSemiTryptic) {
+			parameters.setMinTerminiCleavages(1);
+		}
+
 		final List<FileSearch> inputFiles = Arrays.asList(
-				new FileSearch(raw1, "biosample", "category", "experiment", engines, searchEngineParametersMzml()),
-				new FileSearch(raw2, "biosample2", "category", "experiment", engines, searchEngineParametersMzml())
+				new FileSearch(raw1, "biosample", "category", "experiment", engines, parameters),
+				new FileSearch(raw2, "biosample2", "category", "experiment", engines, parameters)
 		);
 
 		final SwiftSearchDefinition definition = defaultSearchDefinition(inputFiles);
+		definition.setSearchParameters(parameters);
 
 		final SearchRunner runner = getSearchRunner(searchEngines, definition);
 
@@ -331,6 +345,7 @@ public class TestSearchRunner {
 				+ 1 /* RawDump */
 				+ 1 /* msmsEval */
 
+				+ (doSemiTryptic ? 0 : 2 /* tryptic means we need extra semitryptic myrimatch and idpicker */)
 				+ 1 /* QuaMeter */
 				+ 1 /* QuaMeter db load */;
 
@@ -352,7 +367,8 @@ public class TestSearchRunner {
 		final ProgressReporter reporter = mock(ProgressReporter.class);
 		final ExecutorService service = new SimpleThreadPoolExecutor(1, "testSwiftSearcher", true);
 
-		final SearchRun searchRun = null;
+		final SearchRun searchRun = new SearchRun("Test search", null, definition, new Date(), null, 0, null, 0, 0, 0, 0, false);
+
 
 		final SearchRunner runner = makeSearchRunner("task1", false, searchEngines, definition, reporter, service, searchRun);
 
@@ -389,7 +405,7 @@ public class TestSearchRunner {
 	}
 
 	private SwiftSearchDefinition defaultSearchDefinition(final List<FileSearch> inputFiles) {
-		return new SwiftSearchDefinition(
+		SwiftSearchDefinition swiftSearchDefinition = new SwiftSearchDefinition(
 				"Test search",
 				new User("Tester", "Testov", "test", "pwd"),
 				outputFolder,
@@ -402,6 +418,9 @@ public class TestSearchRunner {
 				false,
 				new HashMap<String, String>(0)
 		);
+		// Pretend we are in the database already
+		swiftSearchDefinition.setId(1);
+		return swiftSearchDefinition;
 	}
 
 	private SearchEngineParameters searchEngineParameters1() {

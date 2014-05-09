@@ -13,6 +13,7 @@ import edu.mayo.mprc.swift.dbmapping.SwiftSearchDefinition;
 import edu.mayo.mprc.utilities.FileListener;
 import edu.mayo.mprc.utilities.FileUtilities;
 import edu.mayo.mprc.utilities.progress.ProgressInfo;
+import edu.mayo.mprc.workflow.engine.Task;
 import edu.mayo.mprc.workflow.engine.WorkflowEngine;
 
 import java.io.File;
@@ -40,7 +41,7 @@ public final class IdpQonvertTask extends AsyncTaskBase {
 	 * Only when true the resulting idpDB file gets published.
 	 * This is done to switch off publishing of results created solely for QuaMeter's purpose.
 	 */
-	private final boolean publishResult;
+	private boolean publishResult;
 
 	public IdpQonvertTask(final WorkflowEngine engine,
 	                      final SwiftDao swiftDao,
@@ -122,11 +123,26 @@ public final class IdpQonvertTask extends AsyncTaskBase {
 		return new File(outputFolder, idpDbFileName);
 	}
 
-	@Override
-	public int hashCode() {
-		return Objects.hashCode(searchTask, outputFolder, maxFDR, decoyPrefix, curationFile, publishResult);
+	public void upgrade(final Task other) {
+		if (other instanceof IdpQonvertTask) {
+			if (((IdpQonvertTask) other).publishResult) {
+				publishResult = true;
+			}
+		}
 	}
 
+	@Override
+	public int hashCode() {
+		return Objects.hashCode(searchTask, outputFolder, maxFDR, decoyPrefix, curationFile);
+	}
+
+	/**
+	 * Two idpicker tasks are considered equal even if they do not have the publishResults set.
+	 * One is "subset" of the other.
+	 * <p/>
+	 * That is why we define the method {@link #upgrade} that takes the other tasks that we are equal to and ensures
+	 * that we set publish to true when needed.
+	 */
 	@Override
 	public boolean equals(final Object obj) {
 		if (this == obj) {
@@ -140,8 +156,7 @@ public final class IdpQonvertTask extends AsyncTaskBase {
 				&& Objects.equal(outputFolder, other.outputFolder)
 				&& Objects.equal(maxFDR, other.maxFDR)
 				&& Objects.equal(decoyPrefix, other.decoyPrefix)
-				&& Objects.equal(curationFile, other.curationFile)
-				&& Objects.equal(publishResult, other.publishResult);
+				&& Objects.equal(curationFile, other.curationFile);
 	}
 }
 

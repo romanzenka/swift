@@ -517,6 +517,11 @@ public final class SearchRunner implements Runnable, Lifecycle {
 		if (existing == null) {
 			tasks.put(task, task);
 			return task;
+		} else {
+			// We already have a task that is equal to the new one
+			// However, the new "equal" task can be set to do more work
+			// Upgrade the original task to do all work that is needed
+			existing.upgrade(task);
 		}
 		return existing;
 	}
