@@ -320,7 +320,7 @@ public final class ClientProxyGenerator {
 
 	public ExtractMsnSettings convertFrom(final ClientExtractMsnSettings extractMsnSettings) {
 		if (extractMsnSettings == null) {
-			return ExtractMsnSettings.DEFAULT;
+			return ExtractMsnSettings.getDefaultExtractMsnSettings();
 		}
 		return new ExtractMsnSettings(extractMsnSettings.getCommandLineSwitches(), extractMsnSettings.getCommand());
 	}

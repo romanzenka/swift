@@ -533,10 +533,10 @@ public final class ServiceImpl extends SpringGwtServlet implements Service, Appl
 			final String command = ((ClientExtractMsnSettings) value).getCommand();
 			if (ExtractMsnSettings.MSCONVERT.equals(command) && !isMsconvertEnabled()) {
 				validations.addValidation(name, new Validation("msconvert is not supported", ValidationSeverity.ERROR, name,
-						ExtractMsnSettings.EXTRACT_MSN_SETTINGS, null));
+						ExtractMsnSettings.getExtractMsnSettings(), null));
 			} else if (ExtractMsnSettings.EXTRACT_MSN.equals(command) && !isExtractMsnEnabled()) {
 				validations.addValidation(name, new Validation("extract_msn is not supported", ValidationSeverity.ERROR, name,
-						ExtractMsnSettings.MSCONVERT_SETTINGS, null));
+						ExtractMsnSettings.getMsconvertSettings(), null));
 			}
 		}
 	}

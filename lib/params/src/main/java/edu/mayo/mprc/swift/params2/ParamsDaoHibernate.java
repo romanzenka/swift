@@ -487,7 +487,7 @@ public final class ParamsDaoHibernate extends DaoBase implements ParamsDao {
 				new Tolerance(0.5, MassUnit.Da),
 				new Tolerance(10.0, MassUnit.Ppm),
 				getInstrumentByName("Orbi/FT (ESI-FTICR)"),
-				addExtractMsnSettings(ExtractMsnSettings.DEFAULT),
+				addExtractMsnSettings(ExtractMsnSettings.getDefaultExtractMsnSettings()),
 				addScaffoldSettings(ScaffoldSettings.DEFAULT)
 		);
 		return new SavedSearchEngineParameters("Default parameters", user, params);

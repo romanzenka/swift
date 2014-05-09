@@ -202,7 +202,7 @@ public final class SwiftDaoTest {
 
 		return new SearchEngineParameters(null, protease, 2, 1, fixedModifications, variableModifications,
 				new Tolerance(1, MassUnit.Da), new Tolerance(10, MassUnit.Ppm), orbi,
-				ExtractMsnSettings.DEFAULT,
+				ExtractMsnSettings.getDefaultExtractMsnSettings(),
 				ScaffoldSettings.DEFAULT);
 	}
 
