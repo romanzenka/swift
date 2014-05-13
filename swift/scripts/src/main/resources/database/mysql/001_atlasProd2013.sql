@@ -1,19 +1,22 @@
 -- Initial version of Swift's database as deployed to Atlas Production in 2013
 -- This is the basis on which we build extra features
+
 CREATE TABLE analysis
 (
   analysis_id               INT PRIMARY KEY NOT NULL AUTO_INCREMENT,
   report_id                 BIGINT,
   scaffold_version          VARCHAR(20),
   analysis_date             DATETIME,
-  biological_sample_list_id INT
+  biological_sample_list_id INT,
+  UNIQUE KEY `uniqueness` (`report_id`, `scaffold_version`, `analysis_date`, `biological_sample_list_id`)
 );
 CREATE TABLE biological_sample
 (
   biological_sample_id  INT PRIMARY KEY NOT NULL AUTO_INCREMENT,
   category              VARCHAR(200),
   sample_name           VARCHAR(200),
-  search_result_list_id INT
+  search_result_list_id INT,
+  UNIQUE KEY `uniqueness` (`category`, `sample_name`, `search_result_list_id`)
 );
 CREATE TABLE biological_sample_list
 (
@@ -53,7 +56,8 @@ CREATE TABLE curation_data_source
   name           VARCHAR(50),
   url            VARCHAR(255),
   is_common      CHAR(1),
-  auto_transform INT
+  auto_transform INT,
+  UNIQUE KEY `name` (`name`)
 );
 CREATE TABLE curation_header_transform
 (
@@ -127,7 +131,8 @@ CREATE TABLE enabled_engines_set
 CREATE TABLE extract_msn_settings
 (
   extract_msn_settings_id INT PRIMARY KEY NOT NULL AUTO_INCREMENT,
-  command_line_switches   VARCHAR(200)
+  command_line_switches   VARCHAR(200),
+  UNIQUE KEY `command_line_switches` (`command_line_switches`)
 );
 CREATE TABLE file_search
 (
@@ -139,13 +144,15 @@ CREATE TABLE file_search
   search_parameters INT,
   enabled_engines   INT,
   input_files_id    INT,
-  sort_order        INT
+  sort_order        INT,
+  UNIQUE KEY `input_file` (`input_file`, `biological_sample`, `category_name`, `experiment`, `search_parameters`, `enabled_engines`)
 );
 CREATE TABLE identified_peptide
 (
   identified_peptide_id INT PRIMARY KEY NOT NULL AUTO_INCREMENT,
   peptide_sequence_id   INT             NOT NULL,
-  localized_mod_list_id INT             NOT NULL
+  localized_mod_list_id INT             NOT NULL,
+  UNIQUE KEY `unique` (`peptide_sequence_id`, `localized_mod_list_id`)
 );
 CREATE TABLE instrument
 (
@@ -166,7 +173,8 @@ CREATE TABLE ion_series
   ion_series_id INT PRIMARY KEY NOT NULL AUTO_INCREMENT,
   name          VARCHAR(20),
   deletion      INT,
-  creation      INT
+  creation      INT,
+  UNIQUE KEY `name` (`name`, `deletion`)
 );
 CREATE TABLE localized_mod_list
 (
@@ -183,7 +191,8 @@ CREATE TABLE localized_modification
   localized_modification_id INT PRIMARY KEY NOT NULL AUTO_INCREMENT,
   specificity_id            INT,
   position                  INT,
-  residue                   CHAR(1)
+  residue                   CHAR(1),
+  UNIQUE KEY `uniqueness` (`specificity_id`, `position`, `residue`)
 );
 CREATE TABLE `mod`
 (
@@ -195,7 +204,8 @@ CREATE TABLE `mod`
   deletion     INT,
   mass_mono    DOUBLE,
   mass_average DOUBLE,
-  creation     INT
+  creation     INT,
+  UNIQUE KEY `title` (`title`, `full_name`, `record_id`, `composition`, `deletion`)
 );
 CREATE TABLE mod_alt_names
 (
@@ -231,7 +241,8 @@ CREATE TABLE peptide_sequence
 (
   peptide_sequence_id INT PRIMARY KEY NOT NULL AUTO_INCREMENT,
   mass                DOUBLE,
-  sequence            LONGTEXT
+  sequence            LONGTEXT,
+  KEY `sequence` (`sequence`(70), `peptide_sequence_id`) USING HASH
 );
 CREATE TABLE peptide_spectrum_match
 (
@@ -240,28 +251,19 @@ CREATE TABLE peptide_spectrum_match
   previous_aa               CHAR(1)         NOT NULL,
   next_aa                   CHAR(1)         NOT NULL,
   best_id_probability       DOUBLE          NOT NULL,
-  mascot_delta_ion_score    DOUBLE,
-  mascot_homology_score     DOUBLE,
-  mascot_identity_score     DOUBLE,
-  mascot_ion_score          DOUBLE,
-  sequest_dcn_score         DOUBLE,
-  sequest_peptides_matched  DOUBLE,
-  sequest_sp_rank           DOUBLE,
-  sequest_sp_score          DOUBLE,
-  sequest_xcorr_score       DOUBLE,
-  tandem_hyper_score        DOUBLE,
-  tandem_ladder_score       DOUBLE,
   total_identified_spectra  INT             NOT NULL,
   identified_1h_spectra     INT             NOT NULL,
   identified_2h_spectra     INT             NOT NULL,
   identified_3h_spectra     INT             NOT NULL,
   identified_4h_spectra     INT             NOT NULL,
-  num_enzymatic_terminii    INT             NOT NULL
+  num_enzymatic_terminii    INT             NOT NULL,
+  KEY `faster_equality_index` (`identified_peptide_id`, `total_identified_spectra`)
 );
 CREATE TABLE peptide_spectrum_match_list
 (
   peptide_spectrum_match_list_id INT PRIMARY KEY NOT NULL AUTO_INCREMENT,
-  hash                           BIGINT          NOT NULL
+  hash                           BIGINT          NOT NULL,
+  KEY `hash` (`hash`, `peptide_spectrum_match_list_id`)
 );
 CREATE TABLE peptide_spectrum_match_list_members
 (
@@ -283,7 +285,9 @@ CREATE TABLE protein_database_entry
   curation_id               INT,
   accession_number          VARCHAR(80)     NOT NULL,
   description               LONGTEXT,
-  protein_sequence_id       INT             NOT NULL
+  protein_sequence_id       INT             NOT NULL,
+  KEY `lookup_sequence` (`curation_id`, `accession_number`, `protein_sequence_id`),
+  KEY `lookup_accession` (`protein_sequence_id`, `curation_id`, `accession_number`)
 );
 CREATE TABLE protein_group
 (
@@ -300,7 +304,8 @@ CREATE TABLE protein_group
 CREATE TABLE protein_group_list
 (
   protein_group_list_id INT PRIMARY KEY NOT NULL AUTO_INCREMENT,
-  hash                  BIGINT          NOT NULL
+  hash                  BIGINT          NOT NULL,
+  KEY `hash` (`hash`, `protein_group_list_id`)
 );
 CREATE TABLE protein_group_list_members
 (
@@ -312,12 +317,14 @@ CREATE TABLE protein_sequence
   protein_sequence_id INT PRIMARY KEY NOT NULL AUTO_INCREMENT,
   mass                DOUBLE,
   sequence            LONGTEXT,
-  accession_number    VARCHAR(80)
+  accession_number    VARCHAR(80),
+  KEY `sequence` (`sequence`(200), `protein_sequence_id`) USING HASH
 );
 CREATE TABLE protein_sequence_list
 (
   protein_sequence_list_id INT PRIMARY KEY NOT NULL AUTO_INCREMENT,
-  hash                     BIGINT          NOT NULL
+  hash                     BIGINT          NOT NULL,
+  KEY `hash` (`hash`, `protein_sequence_list_id`)
 );
 CREATE TABLE protein_sequence_list_members
 (
@@ -329,7 +336,8 @@ CREATE TABLE report
   report_id      BIGINT PRIMARY KEY NOT NULL AUTO_INCREMENT,
   report_file    LONGTEXT,
   date_created   DATETIME,
-  transaction_id INT
+  transaction_id INT,
+  KEY `Report_transaction_index` (`transaction_id`)
 );
 CREATE TABLE saved_parameters
 (
@@ -380,7 +388,8 @@ CREATE TABLE search_result
 (
   search_result_id           INT PRIMARY KEY NOT NULL AUTO_INCREMENT,
   protein_group_list_id      INT,
-  tandem_mass_spec_sample_id INT
+  tandem_mass_spec_sample_id INT,
+  UNIQUE KEY `uniqueness` (`protein_group_list_id`, `tandem_mass_spec_sample_id`)
 );
 CREATE TABLE search_result_list
 (
@@ -416,8 +425,9 @@ CREATE TABLE starred_proteins
 );
 CREATE TABLE swift_db_version
 (
-  id         INT NOT NULL,
-  db_version INT NOT NULL
+  id         INT PRIMARY KEY NOT NULL AUTO_INCREMENT,
+  db_version INT             NOT NULL,
+  UNIQUE KEY `db_version` (`db_version`)
 );
 CREATE TABLE swift_search_definition
 (
@@ -446,7 +456,9 @@ CREATE TABLE tandem_mass_spec_sample
   start_time                 DATETIME,
   run_time_seconds           DOUBLE,
   comment                    LONGTEXT,
-  sample_information         LONGTEXT
+  sample_information         LONGTEXT,
+  UNIQUE KEY `file` (`file`, `last_modified`),
+  UNIQUE KEY `uniqueness` (`file`, `last_modified`)
 );
 CREATE TABLE task
 (
@@ -465,7 +477,9 @@ CREATE TABLE task
   out_log          LONGTEXT,
   err_log          LONGTEXT,
   host             VARCHAR(255),
-  percent_done     REAL
+  percent_done     REAL,
+  KEY `task_transaction_index` (`transaction_id`),
+  KEY `task_start_timestamp_index` (`start_timestamp`)
 );
 CREATE TABLE task_state
 (
@@ -487,7 +501,9 @@ CREATE TABLE transaction
   tasks_with_warning INT,
   tasks_failed       INT,
   tasks_completed    INT,
-  hidden             INT
+  hidden             INT,
+  KEY `transaction_start_timestamp_index` (`start_timestamp`),
+  KEY `transaction_hidden_index` (`hidden`)
 );
 CREATE TABLE user_preferences
 (
@@ -509,16 +525,13 @@ CREATE TABLE workflow_user
 );
 ALTER TABLE analysis ADD FOREIGN KEY (report_id) REFERENCES report (report_id);
 ALTER TABLE analysis ADD FOREIGN KEY (biological_sample_list_id) REFERENCES biological_sample_list (biological_sample_list_id);
-CREATE UNIQUE INDEX uniqueness ON analysis (report_id, scaffold_version, analysis_date, biological_sample_list_id);
 ALTER TABLE biological_sample ADD FOREIGN KEY (search_result_list_id) REFERENCES search_result_list (search_result_list_id);
-CREATE UNIQUE INDEX uniqueness ON biological_sample (category, sample_name, search_result_list_id);
 ALTER TABLE biological_sample_list_members ADD FOREIGN KEY (biological_sample_id) REFERENCES biological_sample (biological_sample_id);
 ALTER TABLE biological_sample_list_members ADD FOREIGN KEY (biological_sample_list_id) REFERENCES biological_sample_list (biological_sample_list_id);
 ALTER TABLE curation ADD FOREIGN KEY (deletion) REFERENCES change_audit (change_audit_id);
 ALTER TABLE curation ADD FOREIGN KEY (creation) REFERENCES change_audit (change_audit_id);
 ALTER TABLE curation_data_source ADD FOREIGN KEY (auto_transform) REFERENCES curation_header_transform (header_transform_id);
 ALTER TABLE curation_data_source ADD FOREIGN KEY (auto_transform) REFERENCES curation_header_transform (header_transform_id);
-CREATE UNIQUE INDEX name ON curation_data_source (name);
 ALTER TABLE curation_step_database_upload ADD FOREIGN KEY (upload_id) REFERENCES curation_step (step_id);
 ALTER TABLE curation_step_database_upload ADD FOREIGN KEY (upload_id) REFERENCES curation_step (step_id);
 ALTER TABLE curation_step_header_filter ADD FOREIGN KEY (header_filter_id) REFERENCES curation_step (step_id);

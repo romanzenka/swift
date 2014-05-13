@@ -190,16 +190,6 @@ INSERT INTO `mod_alt_names`
     `atlas_prod`.`mod_alt_names`
   ORDER BY alt_name_id;
 
-INSERT INTO `instrument_series`
-(`instrument_id`,
- `ion_series_id`)
-  SELECT
-    `instrument_id`,
-    `ion_series_id`
-  FROM
-    `atlas_prod`.instrument_series
-  ORDER BY instrument_id;
-
 INSERT INTO `mod_specificity`
 (`specificity_id`,
  `mod_id`,
@@ -559,17 +549,6 @@ INSERT INTO `peptide_spectrum_match`
  `previous_aa`,
  `next_aa`,
  `best_id_probability`,
- `mascot_delta_ion_score`,
- `mascot_homology_score`,
- `mascot_identity_score`,
- `mascot_ion_score`,
- `sequest_dcn_score`,
- `sequest_peptides_matched`,
- `sequest_sp_rank`,
- `sequest_sp_score`,
- `sequest_xcorr_score`,
- `tandem_hyper_score`,
- `tandem_ladder_score`,
  `total_identified_spectra`,
  `identified_1h_spectra`,
  `identified_2h_spectra`,
@@ -582,17 +561,6 @@ INSERT INTO `peptide_spectrum_match`
     `previous_aa`,
     `next_aa`,
     `best_id_probability`,
-    `mascot_delta_ion_score`,
-    `mascot_homology_score`,
-    `mascot_identity_score`,
-    `mascot_ion_score`,
-    `sequest_dcn_score`,
-    `sequest_peptides_matched`,
-    `sequest_sp_rank`,
-    `sequest_sp_score`,
-    `sequest_xcorr_score`,
-    `tandem_hyper_score`,
-    `tandem_ladder_score`,
     `total_identified_spectra`,
     `identified_1h_spectra`,
     `identified_2h_spectra`,
