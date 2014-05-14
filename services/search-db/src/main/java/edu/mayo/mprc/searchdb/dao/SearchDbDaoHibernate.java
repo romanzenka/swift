@@ -33,10 +33,6 @@ public class SearchDbDaoHibernate extends DaoBase implements RuntimeInitializer,
 	private FastaDbDao fastaDbDao;
 
 	private static final String MAP = "edu/mayo/mprc/searchdb/dao/";
-	/**
-	 * Max delta for storing the protein/peptide probability.
-	 */
-	private static final double PROBABILITY_DELTA = 1E-4;
 
 	public SearchDbDaoHibernate() {
 	}

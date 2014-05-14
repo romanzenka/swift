@@ -12,7 +12,7 @@ import java.io.File;
 public final class TestQaResources {
 	@Test
 	public void shouldUseReasonableDefaultTypeMap() {
-		FileTypeMap map = QaReport.typeMap;
+		FileTypeMap map = QaReport.TYPE_MAP;
 		Assert.assertEquals(map.getContentType(new File("hello.png")), "image/png");
 		Assert.assertEquals(map.getContentType(new File("hello.jpg")), "image/jpeg");
 		Assert.assertEquals(map.getContentType(new File("hello.html")), "text/html");

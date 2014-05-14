@@ -27,7 +27,7 @@ public final class QaReport {
 	@Resource(name = "swiftDao")
 	private SwiftDao swiftDao;
 
-	public static FileTypeMap typeMap = getDefaultFileTypeMap();
+	public static final FileTypeMap TYPE_MAP = getDefaultFileTypeMap();
 
 	static FileTypeMap getDefaultFileTypeMap() {
 		final MimetypesFileTypeMap defaultMap = new MimetypesFileTypeMap();
@@ -54,7 +54,7 @@ public final class QaReport {
 		}
 
 		final File file = new File(qaFolder, fileName);
-		final String contentType = typeMap.getContentType(file);
+		final String contentType = TYPE_MAP.getContentType(file);
 		response.setContentType(contentType);
 
 		streamFileToResponse(response, file);
