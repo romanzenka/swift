@@ -47,4 +47,27 @@ CREATE TABLE quameter_result
   sample_id          INT,
   FOREIGN KEY (sample_id) REFERENCES tandem_mass_spec_sample (tandem_mass_spec_sample_id),
   FOREIGN KEY (file_search_id) REFERENCES file_search (file_search_id)
-)
+);
+
+ALTER TABLE `swift_search_definition`
+ADD COLUMN `public_mzxml_files` BIT NULL
+AFTER `search_parameters`,
+ADD COLUMN `quality_control` BIT NULL
+AFTER `public_mzxml_files`;
+
+UPDATE swift_search_definition
+SET public_mzxml_files = 0, quality_control = 0
+WHERE 1 = 1;
+
+-- @UNDO
+
+ALTER TABLE `swift_search_definition`
+DROP COLUMN `quality_control`,
+DROP COLUMN `public_mzxml_files`;
+
+DROP TABLE quameter_result;
+
+
+
+
+
