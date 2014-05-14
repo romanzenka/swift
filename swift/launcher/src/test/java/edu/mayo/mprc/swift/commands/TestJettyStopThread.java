@@ -1,6 +1,7 @@
 package edu.mayo.mprc.swift.commands;
 
 import edu.mayo.mprc.utilities.MonitorUtilities;
+import org.mortbay.component.LifeCycle;
 import org.mortbay.jetty.Server;
 import org.testng.Assert;
 import org.testng.annotations.Test;
@@ -11,16 +12,34 @@ import org.testng.annotations.Test;
 public final class TestJettyStopThread {
 	@Test(timeOut = 10000)
 	public void shouldTerminateJetty() throws Exception {
-		Server server = new Server(38080);
+		final Server server = new Server(38080);
+		server.addLifeCycleListener(new LifeCycle.Listener() {
+			@Override
+			public void lifeCycleStarting(LifeCycle event) {
+			}
+
+			@Override
+			public void lifeCycleStarted(LifeCycle event) {
+				JettyStopThread stopThread = new JettyStopThread(server);
+				stopThread.start();
+				stopThread.getPort();
+
+				MonitorUtilities.sendStopSignal(stopThread.getPort());
+			}
+
+			@Override
+			public void lifeCycleFailure(LifeCycle event, Throwable cause) {
+			}
+
+			@Override
+			public void lifeCycleStopping(LifeCycle event) {
+			}
+
+			@Override
+			public void lifeCycleStopped(LifeCycle event) {
+			}
+		});
 		server.start();
-		Thread.sleep(300);
-		Assert.assertTrue(server.isStarted(), "Server did not start properly");
-
-		JettyStopThread stopThread = new JettyStopThread(server);
-		stopThread.start();
-		stopThread.getPort();
-
-		MonitorUtilities.sendStopSignal(stopThread.getPort());
 
 		server.join();
 
