@@ -508,12 +508,7 @@ ALTER TABLE mod_set_specificities ADD FOREIGN KEY (set_id) REFERENCES mod_set (m
 ALTER TABLE mod_specificity ADD FOREIGN KEY (mod_id) REFERENCES `mod` (mod_id);
 ALTER TABLE protease ADD FOREIGN KEY (deletion) REFERENCES change_audit (change_audit_id);
 ALTER TABLE protease ADD FOREIGN KEY (creation) REFERENCES change_audit (change_audit_id);
-ALTER TABLE protein_entry ADD FOREIGN KEY (protein_accnum_id) REFERENCES protein_accnum (protein_accnum_id);
-ALTER TABLE protein_entry ADD FOREIGN KEY (protein_sequence_id) REFERENCES protein_sequence (protein_sequence_id);
-ALTER TABLE protein_entry ADD FOREIGN KEY (protein_description_id) REFERENCES protein_description (protein_description_id);
-ALTER TABLE protein_entry ADD FOREIGN KEY (curation_id) REFERENCES curation (curation_id);
 ALTER TABLE protein_group ADD FOREIGN KEY (protein_sequence_list_id) REFERENCES protein_sequence_list (protein_sequence_list_id);
-ALTER TABLE protein_group ADD FOREIGN KEY (peptide_spectrum_match_list_id) REFERENCES peptide_spectrum_match_list (peptide_spectrum_match_list_id);
 ALTER TABLE protein_group_list_members ADD FOREIGN KEY (protein_group_id) REFERENCES protein_group (protein_group_id);
 ALTER TABLE protein_group_list_members ADD FOREIGN KEY (protein_group_list_id) REFERENCES protein_group_list (protein_group_list_id);
 ALTER TABLE protein_sequence_list_members ADD FOREIGN KEY (protein_sequence_id) REFERENCES protein_sequence (protein_sequence_id);
@@ -530,7 +525,6 @@ ALTER TABLE scaffold_settings ADD FOREIGN KEY (starred_proteins) REFERENCES star
 ALTER TABLE scaffold_settings ADD FOREIGN KEY (starred_proteins) REFERENCES starred_proteins (starred_proteins_id);
 ALTER TABLE search_engine ADD FOREIGN KEY (deletion) REFERENCES change_audit (change_audit_id);
 ALTER TABLE search_engine ADD FOREIGN KEY (creation) REFERENCES change_audit (change_audit_id);
-ALTER TABLE search_metadata ADD FOREIGN KEY (swift_search_definition_id) REFERENCES swift_search_definition (swift_search_definition_id);
 ALTER TABLE search_parameters ADD FOREIGN KEY (variable_mods) REFERENCES mod_set (mod_set_id);
 ALTER TABLE search_parameters ADD FOREIGN KEY (scaffold_settings) REFERENCES scaffold_settings (scaffold_settings_id);
 ALTER TABLE search_parameters ADD FOREIGN KEY (fixed_mods) REFERENCES mod_set (mod_set_id);
@@ -552,13 +546,8 @@ ALTER TABLE swift_search_definition ADD FOREIGN KEY (owner) REFERENCES workflow_
 ALTER TABLE task ADD FOREIGN KEY (transaction_id) REFERENCES transaction (transaction_id);
 ALTER TABLE task ADD FOREIGN KEY (task_state) REFERENCES task_state (task_state_id);
 ALTER TABLE task ADD FOREIGN KEY (transaction_id) REFERENCES transaction (transaction_id);
-ALTER TABLE temp_identified_peptide ADD FOREIGN KEY (peptide_sequence_id) REFERENCES peptide_sequence (peptide_sequence_id);
-ALTER TABLE temp_identified_peptide ADD FOREIGN KEY (localized_mod_list_id) REFERENCES localized_mod_list (localized_mod_list_id);
-ALTER TABLE temp_localized_modification ADD FOREIGN KEY (specificity_id) REFERENCES mod_specificity (specificity_id);
-ALTER TABLE temp_peptide_spectrum_match ADD FOREIGN KEY (identified_peptide_id) REFERENCES identified_peptide (identified_peptide_id);
 ALTER TABLE transaction ADD FOREIGN KEY (submitting_user) REFERENCES workflow_user (workflow_user_id);
 ALTER TABLE transaction ADD FOREIGN KEY (swift_search) REFERENCES swift_search_definition (swift_search_definition_id);
-ALTER TABLE transaction_qa ADD FOREIGN KEY (transaction_id) REFERENCES transaction (transaction_id);
 ALTER TABLE user_preferences ADD FOREIGN KEY (user_id) REFERENCES workflow_user (workflow_user_id);
 ALTER TABLE workflow_user ADD FOREIGN KEY (deletion) REFERENCES change_audit (change_audit_id);
 ALTER TABLE workflow_user ADD FOREIGN KEY (creation) REFERENCES change_audit (change_audit_id);
