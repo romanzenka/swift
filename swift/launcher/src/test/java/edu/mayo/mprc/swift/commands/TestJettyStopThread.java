@@ -15,12 +15,12 @@ public final class TestJettyStopThread {
 		final Server server = new Server(38080);
 		server.addLifeCycleListener(new LifeCycle.Listener() {
 			@Override
-			public void lifeCycleStarting(LifeCycle event) {
+			public void lifeCycleStarting(final LifeCycle event) {
 			}
 
 			@Override
-			public void lifeCycleStarted(LifeCycle event) {
-				JettyStopThread stopThread = new JettyStopThread(server);
+			public void lifeCycleStarted(final LifeCycle event) {
+				final JettyStopThread stopThread = new JettyStopThread(server);
 				stopThread.start();
 				stopThread.getPort();
 
@@ -28,15 +28,15 @@ public final class TestJettyStopThread {
 			}
 
 			@Override
-			public void lifeCycleFailure(LifeCycle event, Throwable cause) {
+			public void lifeCycleFailure(final LifeCycle event, final Throwable cause) {
 			}
 
 			@Override
-			public void lifeCycleStopping(LifeCycle event) {
+			public void lifeCycleStopping(final LifeCycle event) {
 			}
 
 			@Override
-			public void lifeCycleStopped(LifeCycle event) {
+			public void lifeCycleStopped(final LifeCycle event) {
 			}
 		});
 		server.start();
