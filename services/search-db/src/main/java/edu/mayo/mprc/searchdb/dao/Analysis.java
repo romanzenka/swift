@@ -89,7 +89,7 @@ public final class Analysis extends PersistableBase {
 						"Number of Unique Spectra\t" +
 						"Number of Total Spectra\t" +
 						"Percentage of Total Spectra\t" +
-						"Percentage Sequence Coverage\t");
+						"Percentage Sequence Coverage\n");
 		for (final BiologicalSample sample : getBiologicalSamples()) {
 			for (final SearchResult result : sample.getSearchResults()) {
 				for (final ProteinGroup proteinGroup : result.getProteinGroups()) {

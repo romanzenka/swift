@@ -1,19 +1,6 @@
-Biological sample category	Biological sample name	Protein identification probability	Number of Unique Peptides	Number of Unique Spectra	Number of Total Spectra	Percentage of Total Spectra	Percentage Sequence Coverage	Peptide Sequence	Peptide Modifications	Previous Amino Acid	Next Amino Acid	Best Peptide Identification Probability	Number of identified +1H spectra	Number of identified +2H spectra	Number of identified +3H spectra	Number of identified +4H spectra	Number of enzymatic termini
-none	test1	99.80%	2	3	5	6.76%	3.88%	NMQDMVEDYR		K	N	0.95	0	2	0	0	2
-none	test1	99.80%	2	3	5	6.76%	3.88%	QISNLQQSISDAEQR		K	G	0.95	0	2	1	0	2
-none	test1	99.80%	2	2	3	4.05%	1.80%	EVDIGIPDATGR		R	L	0.95	0	2	0	0	2
-none	test1	99.80%	2	2	3	4.05%	1.80%	FDREVDIGIPDATGR		R	L	0.95	0	0	1	0	2
-none	test1	99.90%	2	2	2	2.70%	3.05%	IKFEMEQNLR		R	Q	0.95	0	0	1	0	2
-none	test1	99.90%	2	2	2	2.70%	3.05%	TLLDIDNTR		K	M	0.95	0	1	0	0	2
-none	test1	100.00%	10	13	26	35.10%	14.50%	AHVIVMAATNRPNSIDPALR		R	R	0.95	0	1	2	0	2
-none	test1	100.00%	10	13	26	35.10%	14.50%	EAVCIVLSDDTCSDEK	c4: Carbamidomethyl (C), c12: Carbamidomethyl (C)	R	I	0.95	0	4	0	0	2
-none	test1	100.00%	10	13	26	35.10%	14.50%	EDEEESLNEVGYDDIGGCR	c18: Carbamidomethyl (C)	R	K	0.95	0	3	1	0	2
-none	test1	100.00%	10	13	26	35.10%	14.50%	EDEEESLNEVGYDDIGGCRK	c18: Carbamidomethyl (C)	R	Q	0.95	0	0	2	0	2
-none	test1	100.00%	10	13	26	35.10%	14.50%	ELQELVQYPVEHPDK		R	F	0.95	0	2	2	0	2
-none	test1	100.00%	10	13	26	35.10%	14.50%	KGDIFLVR		R	G	0.95	0	3	0	0	2
-none	test1	100.00%	10	13	26	35.10%	14.50%	KYEMFAQTLQQSR		R	G	0.95	0	1	0	0	2
-none	test1	100.00%	10	13	26	35.10%	14.50%	LEILQIHTK		R	N	0.95	0	2	0	0	2
-none	test1	100.00%	10	13	26	35.10%	14.50%	REAVCIVLSDDTCSDEK	c5: Carbamidomethyl (C), c13: Carbamidomethyl (C)	R	I	0.95	0	0	2	0	2
-none	test1	100.00%	10	13	26	35.10%	14.50%	VINQILTEMDGMSTK	m9: Oxidation (M)	R	K	0.95	0	1	0	0	2
-none	test1	99.80%	2	2	4	5.41%	4.56%	QSLEASLAETEGR		K	Y	0.95	0	2	0	0	2
-none	test1	99.80%	2	2	4	5.41%	4.56%	QSVEADINGLR		R	R	0.95	0	2	0	0	2
+Biological sample category	Biological sample name	Protein identification probability	Number of Unique Peptides	Number of Unique Spectra	Number of Total Spectra	Percentage of Total Spectra	Percentage Sequence Coverage
+none	test1	99.80%	2	3	5	6.76%	3.88%
+none	test1	99.80%	2	2	3	4.05%	1.80%
+none	test1	99.90%	2	2	2	2.70%	3.05%
+none	test1	100.00%	10	13	26	35.10%	14.50%
+none	test1	99.80%	2	2	4	5.41%	4.56%
