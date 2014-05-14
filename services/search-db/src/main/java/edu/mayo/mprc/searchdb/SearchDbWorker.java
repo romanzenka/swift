@@ -20,14 +20,10 @@ import edu.mayo.mprc.searchdb.bulk.BulkSearchDbDao;
 import edu.mayo.mprc.searchdb.dao.TandemMassSpectrometrySample;
 import edu.mayo.mprc.swift.db.SwiftDao;
 import edu.mayo.mprc.swift.dbmapping.ReportData;
-import edu.mayo.mprc.unimod.Unimod;
-import edu.mayo.mprc.unimod.UnimodDao;
-import edu.mayo.mprc.utilities.FileUtilities;
 import edu.mayo.mprc.utilities.progress.UserProgressReporter;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
-import java.io.File;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -38,10 +34,7 @@ public final class SearchDbWorker extends WorkerBase {
 	private BulkSearchDbDao dao;
 	private FastaDbDao fastaDbDao;
 	private CurationDao curationDao;
-	private UnimodDao unimodDao;
 	private SwiftDao swiftDao;
-	private Unimod databaseUnimod;
-	private Unimod scaffoldUnimod;
 
 	public static final String TYPE = "search-db";
 	public static final String NAME = "Search Result Loader";
@@ -49,29 +42,11 @@ public final class SearchDbWorker extends WorkerBase {
 
 	private static final String DATABASE = "database";
 
-	public SearchDbWorker(final BulkSearchDbDao dao, final FastaDbDao fastaDbDao, final CurationDao curationDao, final UnimodDao unimodDao, final SwiftDao swiftDao) {
+	public SearchDbWorker(final BulkSearchDbDao dao, final FastaDbDao fastaDbDao, final CurationDao curationDao, final SwiftDao swiftDao) {
 		this.dao = dao;
 		this.fastaDbDao = fastaDbDao;
 		this.curationDao = curationDao;
-		this.unimodDao = unimodDao;
 		this.swiftDao = swiftDao;
-		loadDatabaseUnimod();
-	}
-
-	private void loadDatabaseUnimod() {
-		unimodDao.begin();
-		try {
-			databaseUnimod = unimodDao.load();
-			unimodDao.commit();
-		} catch (Exception e) {
-			unimodDao.rollback();
-			throw new MprcException("Could not load unimod from the database", e);
-		}
-	}
-
-	private void loadScaffoldUnimod(final File scaffoldModSet) {
-		scaffoldUnimod = new Unimod();
-		scaffoldUnimod.parseUnimodXML(FileUtilities.getInputStream(scaffoldModSet));
 	}
 
 	@Override
@@ -79,7 +54,6 @@ public final class SearchDbWorker extends WorkerBase {
 		final SearchDbWorkPacket workPacket = (SearchDbWorkPacket) wp;
 		dao.begin();
 		try {
-			loadScaffoldUnimod(workPacket.getScaffoldUnimod());
 			final ReportData reportData = swiftDao.getReportForId(workPacket.getReportDataId());
 
 			final ProteinSequenceTranslator translator = new SingleDatabaseTranslator(fastaDbDao, curationDao);
@@ -119,7 +93,6 @@ public final class SearchDbWorker extends WorkerBase {
 		private BulkSearchDbDao searchDbDao;
 		private FastaDbDao fastaDbDao;
 		private CurationDao curationDao;
-		private UnimodDao unimodDao;
 		private SwiftDao swiftDao;
 
 		public BulkSearchDbDao getSearchDbDao() {
@@ -149,15 +122,6 @@ public final class SearchDbWorker extends WorkerBase {
 			this.curationDao = curationDao;
 		}
 
-		public UnimodDao getUnimodDao() {
-			return unimodDao;
-		}
-
-		@Resource(name = "unimodDao")
-		public void setUnimodDao(final UnimodDao unimodDao) {
-			this.unimodDao = unimodDao;
-		}
-
 		public SwiftDao getSwiftDao() {
 			return swiftDao;
 		}
@@ -169,7 +133,7 @@ public final class SearchDbWorker extends WorkerBase {
 
 		@Override
 		public Worker create(final Config config, final DependencyResolver dependencies) {
-			final SearchDbWorker worker = new SearchDbWorker(getSearchDbDao(), getFastaDbDao(), getCurationDao(), getUnimodDao(), getSwiftDao());
+			final SearchDbWorker worker = new SearchDbWorker(getSearchDbDao(), getFastaDbDao(), getCurationDao(), getSwiftDao());
 			return worker;
 		}
 	}
