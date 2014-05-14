@@ -6,8 +6,6 @@ import edu.mayo.mprc.chem.AminoAcidSet;
 import edu.mayo.mprc.fastadb.ProteinSequenceTranslator;
 import edu.mayo.mprc.scaffoldparser.spectra.ScaffoldReportReader;
 import edu.mayo.mprc.scaffoldparser.spectra.ScaffoldSpectraVersion;
-import edu.mayo.mprc.searchdb.dao.ScaffoldModificationFormat;
-import edu.mayo.mprc.unimod.IndexedModSet;
 import edu.mayo.mprc.utilities.FileUtilities;
 import org.joda.time.DateTime;
 
@@ -35,10 +33,6 @@ public class ScaffoldSpectraSummarizer extends ScaffoldReportReader {
 	private static final double HUNDRED_PERCENT = 100.0;
 	private static final AminoAcidSet SUPPORTED_AMINO_ACIDS = AminoAcidSet.DEFAULT;
 
-	/**
-	 * To parse Scaffold-reported mods.
-	 */
-	private ScaffoldModificationFormat format;
 	private AnalysisBuilder analysis;
 	// Name of the database from the file header
 	private String databaseName;
@@ -66,15 +60,12 @@ public class ScaffoldSpectraSummarizer extends ScaffoldReportReader {
 	private int peptideIdentificationProbability;
 
 	/**
-	 * @param modSet                List of modifications as stored in our database.
-	 * @param scaffoldModSet        List of modifications as configured within Scaffold.
 	 * @param translator            Can translate accession number + database name into a protein sequence.
 	 * @param massSpecDataExtractor Can obtain metadata about the .RAW files.
 	 */
-	public ScaffoldSpectraSummarizer(final IndexedModSet modSet, final IndexedModSet scaffoldModSet, final ProteinSequenceTranslator translator,
+	public ScaffoldSpectraSummarizer(final ProteinSequenceTranslator translator,
 	                                 final MassSpecDataExtractor massSpecDataExtractor) {
-		format = new ScaffoldModificationFormat(modSet, scaffoldModSet);
-		analysis = new AnalysisBuilder(format, translator, massSpecDataExtractor);
+		analysis = new AnalysisBuilder(translator, massSpecDataExtractor);
 	}
 
 	/**
@@ -144,7 +135,7 @@ public class ScaffoldSpectraSummarizer extends ScaffoldReportReader {
 		final BiologicalSampleBuilder biologicalSample = analysis.getBiologicalSamples().getBiologicalSample(currentLine[biologicalSampleName], currentLine[biologicalSampleCategory]);
 		final SearchResultBuilder searchResult = biologicalSample.getSearchResults().getTandemMassSpecResult(FileUtilities.stripGzippedExtension(currentLine[msmsSampleName]));
 		String databaseSources = Strings.isNullOrEmpty(currentLine[this.databaseSources]) ? databaseName : currentLine[this.databaseSources];
-		final ProteinGroupBuilder proteinGroup = searchResult.getProteinGroups().getProteinGroup(
+		searchResult.getProteinGroups().getProteinGroup(
 				currentLine[proteinAccessionNumbers],
 				databaseSources,
 
@@ -155,50 +146,7 @@ public class ScaffoldSpectraSummarizer extends ScaffoldReportReader {
 				parseDouble(currentLine[percentageSequenceCoverage]) / HUNDRED_PERCENT,
 				parseDouble(currentLine[proteinIdentificationProbability]) / HUNDRED_PERCENT);
 
-		final String sequence = currentLine[peptideSequence];
-		String previousAminoAcidCode = currentLine[previousAminoAcid];
-		String nextAminoAcidCode = currentLine[nextAminoAcid];
-
-		if ("?".equals(previousAminoAcidCode) || "?".equals(nextAminoAcidCode)) {
-			// Scaffold failed. We need to look up the protein sequences to determine
-			// what are the flanking amino acids
-			final String[] flankingAminoAcids = proteinGroup.getFlankingAminoAcids(sequence);
-			previousAminoAcidCode = flankingAminoAcids[0];
-			nextAminoAcidCode = flankingAminoAcids[1];
-		}
-
-		final PeptideSpectrumMatchBuilder peptideSpectrumMatch = proteinGroup.getPeptideSpectrumMatches().getPeptideSpectrumMatch(
-				sequence,
-				currentLine[fixedModifications],
-				currentLine[variableModifications],
-
-				parseAminoAcid(previousAminoAcidCode),
-				parseAminoAcid(nextAminoAcidCode),
-				parseInt(currentLine[numberOfEnzymaticTerminii]));
-
-		peptideSpectrumMatch.recordSpectrum(
-				currentLine[spectrumName],
-				parseInt(currentLine[spectrumCharge]),
-				parseDouble(currentLine[peptideIdentificationProbability]) / HUNDRED_PERCENT
-		);
 		return true;
-	}
-
-	/**
-	 * Check that the string corresponds to a single known amino acid.
-	 *
-	 * @param s String to check.
-	 * @return One-char amino acid code.
-	 */
-	private char parseAminoAcid(final String s) {
-		if (s == null || s.length() != 1) {
-			throw new MprcException("Wrong single-letter format for an amino acid: [" + s + "]");
-		}
-		final char aminoAcid = s.charAt(0);
-		if (aminoAcid != '-' && SUPPORTED_AMINO_ACIDS.getForSingleLetterCode(s) == null) {
-			throw new MprcException("Unsupported amino acid code [" + aminoAcid + "]");
-		}
-		return Character.toUpperCase(aminoAcid);
 	}
 
 	/**

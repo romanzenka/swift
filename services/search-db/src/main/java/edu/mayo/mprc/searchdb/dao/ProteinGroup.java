@@ -25,11 +25,6 @@ public class ProteinGroup extends PersistableBase {
 	private ProteinSequenceList proteinSequences;
 
 	/**
-	 * List of peptides matched to spectra that belong to this protein group.
-	 */
-	private PsmList peptideSpectrumMatches;
-
-	/**
 	 * Scaffold's calculated probability that the protein identification is correct. 100% probability is stored as 1.0
 	 */
 	private double proteinIdentificationProbability;
@@ -64,9 +59,8 @@ public class ProteinGroup extends PersistableBase {
 	public ProteinGroup() {
 	}
 
-	public ProteinGroup(final ProteinSequenceList proteinSequences, final PsmList peptideSpectrumMatches, final double proteinIdentificationProbability, final int numberOfUniquePeptides, final int numberOfUniqueSpectra, final int numberOfTotalSpectra, final double percentageOfTotalSpectra, final double percentageSequenceCoverage) {
+	public ProteinGroup(final ProteinSequenceList proteinSequences, final double proteinIdentificationProbability, final int numberOfUniquePeptides, final int numberOfUniqueSpectra, final int numberOfTotalSpectra, final double percentageOfTotalSpectra, final double percentageSequenceCoverage) {
 		this.proteinSequences = proteinSequences;
-		this.peptideSpectrumMatches = peptideSpectrumMatches;
 		this.proteinIdentificationProbability = proteinIdentificationProbability;
 		this.numberOfUniquePeptides = numberOfUniquePeptides;
 		this.numberOfUniqueSpectra = numberOfUniqueSpectra;
@@ -81,14 +75,6 @@ public class ProteinGroup extends PersistableBase {
 
 	public void setProteinSequences(final ProteinSequenceList proteinSequences) {
 		this.proteinSequences = proteinSequences;
-	}
-
-	public PsmList getPeptideSpectrumMatches() {
-		return peptideSpectrumMatches;
-	}
-
-	public void setPeptideSpectrumMatches(final PsmList peptideSpectrumMatches) {
-		this.peptideSpectrumMatches = peptideSpectrumMatches;
 	}
 
 	public double getProteinIdentificationProbability() {
@@ -168,9 +154,6 @@ public class ProteinGroup extends PersistableBase {
 		if (!MprcDoubles.within(that.getProteinIdentificationProbability(), getProteinIdentificationProbability(), PERCENT_TOLERANCE)) {
 			return false;
 		}
-		if (getPeptideSpectrumMatches() != null ? !getPeptideSpectrumMatches().equals(that.getPeptideSpectrumMatches()) : that.getPeptideSpectrumMatches() != null) {
-			return false;
-		}
 		if (getProteinSequences() != null ? !getProteinSequences().equals(that.getProteinSequences()) : that.getProteinSequences() != null) {
 			return false;
 		}
@@ -183,7 +166,6 @@ public class ProteinGroup extends PersistableBase {
 		int result;
 		long temp;
 		result = getProteinSequences() != null ? getProteinSequences().hashCode() : 0;
-		result = 31 * result + (getPeptideSpectrumMatches() != null ? getPeptideSpectrumMatches().hashCode() : 0);
 		temp = getProteinIdentificationProbability() != +0.0d ? Double.doubleToLongBits(getProteinIdentificationProbability()) : 0L;
 		result = 31 * result + (int) (temp ^ (temp >>> 32));
 		result = 31 * result + getNumberOfUniquePeptides();

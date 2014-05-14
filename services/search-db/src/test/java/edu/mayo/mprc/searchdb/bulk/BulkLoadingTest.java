@@ -8,9 +8,11 @@ import edu.mayo.mprc.fastadb.FastaDbDao;
 import edu.mayo.mprc.fastadb.FastaDbDaoHibernate;
 import edu.mayo.mprc.fastadb.ProteinSequence;
 import edu.mayo.mprc.fastadb.ProteinSequenceTranslator;
-import edu.mayo.mprc.searchdb.builder.*;
+import edu.mayo.mprc.searchdb.builder.AnalysisBuilder;
+import edu.mayo.mprc.searchdb.builder.DummyMassSpecDataExtractor;
+import edu.mayo.mprc.searchdb.builder.SearchResultBuilder;
+import edu.mayo.mprc.searchdb.builder.SearchResultListBuilder;
 import edu.mayo.mprc.searchdb.dao.Analysis;
-import edu.mayo.mprc.searchdb.dao.ScaffoldModificationFormat;
 import edu.mayo.mprc.swift.db.SwiftDao;
 import edu.mayo.mprc.swift.db.SwiftDaoHibernate;
 import edu.mayo.mprc.swift.dbmapping.*;
@@ -159,7 +161,6 @@ public final class BulkLoadingTest extends DaoTest {
 		ReportData reportData = swiftDao.storeReport(searchRun.getId(), new File("test.sf3"), new DateTime(2013, 8, 20, 20, 30, 40, 50));
 
 		Unimod defaultUnimod = unimodDao.getDefaultUnimod();
-		ScaffoldModificationFormat format = new ScaffoldModificationFormat(defaultUnimod, defaultUnimod);
 
 		// Add all the protein sequences
 		Collection<ProteinSequence> sequences = new ArrayList<ProteinSequence>(100);
@@ -173,15 +174,12 @@ public final class BulkLoadingTest extends DaoTest {
 		searchDbDao.begin();
 
 		// Start building the analysis
-		AnalysisBuilder builder = new AnalysisBuilder(format, new DummyTranslator(), new DummyMassSpecDataExtractor(new DateTime(2013, 9, 22, 10, 20, 30, 0)));
+		AnalysisBuilder builder = new AnalysisBuilder(new DummyTranslator(), new DummyMassSpecDataExtractor(new DateTime(2013, 9, 22, 10, 20, 30, 0)));
 		builder.setReportData(reportData);
 		SearchResultListBuilder searchResults = builder.getBiologicalSamples().getBiologicalSample("sample", "category").getSearchResults();
 		SearchResultBuilder tandemMassSpecResult = searchResults.getTandemMassSpecResult("test.RAW");
 		for (int i = 0; i < 100; i++) {
-			ProteinGroupBuilder group = tandemMassSpecResult.getProteinGroups().getProteinGroup("AC" + i, "database", 1, 1, 1, 0.1, 0.2, 0.3);
-			PsmListBuilder peptideSpectrumMatches = group.getPeptideSpectrumMatches();
-			PeptideSpectrumMatchBuilder peptideSpectrumMatch = peptideSpectrumMatches.getPeptideSpectrumMatch(getRandomSequence("AC" + i, 3, 10), "", "", 'R', 'S', 0);
-			peptideSpectrumMatch.recordSpectrum("spectrum" + i, 2, 0.95);
+			tandemMassSpecResult.getProteinGroups().getProteinGroup("AC" + i, "database", 1, 1, 1, 0.1, 0.2, 0.3);
 		}
 
 		searchDbDao.commit();

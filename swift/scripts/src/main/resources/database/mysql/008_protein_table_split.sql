@@ -50,6 +50,27 @@ INSERT INTO protein_entry (protein_entry_id, curation_id, protein_accnum_id, pro
   WHERE e.accession_number = a.accession_number AND e.description = d.description
   ORDER BY e.protein_database_entry_id;
 
+CREATE DEFINER =`root`@`%` PROCEDURE `update_canonical_protein_names`()
+  BEGIN
+
+-- Define a stored procedure that associates "canonical" accession numbers ot our protein sequences
+    UPDATE protein_sequence AS ps
+
+    SET ps.accession_number = (SELECT
+                                 pa2.accession_number AS newAccnum
+                               FROM protein_accnum AS pa2 INNER JOIN
+                                 protein_entry AS pe2
+                                   ON pe2.protein_accnum_id = pa2.protein_accnum_id
+                               WHERE pe2.protein_sequence_id = ps.protein_sequence_id
+                               ORDER BY pa2.protein_accnum_id
+                               LIMIT 1)
+
+    WHERE ps.accession_number IS null;
+  END;
+
+CALL update_canonical_protein_names();
+
+-- Finally drop the obsolete table
 DROP TABLE protein_database_entry;
 
 -- @UNDO

@@ -147,13 +147,6 @@ CREATE TABLE file_search
   sort_order        INT,
   UNIQUE KEY `input_file` (`input_file`, `biological_sample`, `category_name`, `experiment`, `search_parameters`, `enabled_engines`)
 );
-CREATE TABLE identified_peptide
-(
-  identified_peptide_id INT PRIMARY KEY NOT NULL AUTO_INCREMENT,
-  peptide_sequence_id   INT             NOT NULL,
-  localized_mod_list_id INT             NOT NULL,
-  UNIQUE KEY `unique` (`peptide_sequence_id`, `localized_mod_list_id`)
-);
 CREATE TABLE instrument
 (
   instrument_id INT PRIMARY KEY NOT NULL AUTO_INCREMENT,
@@ -175,24 +168,6 @@ CREATE TABLE ion_series
   deletion      INT,
   creation      INT,
   UNIQUE KEY `name` (`name`, `deletion`)
-);
-CREATE TABLE localized_mod_list
-(
-  localized_mod_list_id INT PRIMARY KEY NOT NULL AUTO_INCREMENT,
-  hash                  BIGINT          NOT NULL
-);
-CREATE TABLE localized_mod_list_members
-(
-  localized_mod_list_id     INT NOT NULL,
-  localized_modification_id INT NOT NULL
-);
-CREATE TABLE localized_modification
-(
-  localized_modification_id INT PRIMARY KEY NOT NULL AUTO_INCREMENT,
-  specificity_id            INT,
-  position                  INT,
-  residue                   CHAR(1),
-  UNIQUE KEY `uniqueness` (`specificity_id`, `position`, `residue`)
 );
 CREATE TABLE `mod`
 (
@@ -237,39 +212,6 @@ CREATE TABLE peptide_report
 (
   peptide_report_id INT PRIMARY KEY NOT NULL AUTO_INCREMENT
 );
-CREATE TABLE peptide_sequence
-(
-  peptide_sequence_id INT PRIMARY KEY NOT NULL AUTO_INCREMENT,
-  mass                DOUBLE,
-  sequence            LONGTEXT,
-  KEY `sequence` (`sequence`(70), `peptide_sequence_id`) USING HASH
-);
-CREATE TABLE peptide_spectrum_match
-(
-  peptide_spectrum_match_id INT PRIMARY KEY NOT NULL AUTO_INCREMENT,
-  identified_peptide_id     INT             NOT NULL,
-  previous_aa               CHAR(1)         NOT NULL,
-  next_aa                   CHAR(1)         NOT NULL,
-  best_id_probability       DOUBLE          NOT NULL,
-  total_identified_spectra  INT             NOT NULL,
-  identified_1h_spectra     INT             NOT NULL,
-  identified_2h_spectra     INT             NOT NULL,
-  identified_3h_spectra     INT             NOT NULL,
-  identified_4h_spectra     INT             NOT NULL,
-  num_enzymatic_terminii    INT             NOT NULL,
-  KEY `faster_equality_index` (`identified_peptide_id`, `total_identified_spectra`)
-);
-CREATE TABLE peptide_spectrum_match_list
-(
-  peptide_spectrum_match_list_id INT PRIMARY KEY NOT NULL AUTO_INCREMENT,
-  hash                           BIGINT          NOT NULL,
-  KEY `hash` (`hash`, `peptide_spectrum_match_list_id`)
-);
-CREATE TABLE peptide_spectrum_match_list_members
-(
-  peptide_spectrum_match_list_id INT NOT NULL,
-  peptide_spectrum_match_id      INT NOT NULL
-);
 CREATE TABLE protease
 (
   protease_id INT PRIMARY KEY NOT NULL AUTO_INCREMENT,
@@ -293,7 +235,6 @@ CREATE TABLE protein_group
 (
   protein_group_id                   INT PRIMARY KEY NOT NULL AUTO_INCREMENT,
   protein_sequence_list_id           INT,
-  peptide_spectrum_match_list_id     INT,
   protein_identification_probability DOUBLE,
   unique_peptides                    INT,
   unique_spectra                     INT,
@@ -553,16 +494,12 @@ ALTER TABLE enabled_engines_set ADD FOREIGN KEY (search_engine_id) REFERENCES se
 ALTER TABLE file_search ADD FOREIGN KEY (search_parameters) REFERENCES search_parameters (search_parameter_id);
 ALTER TABLE file_search ADD FOREIGN KEY (enabled_engines) REFERENCES enabled_engines (enabled_engines_id);
 ALTER TABLE file_search ADD FOREIGN KEY (input_files_id) REFERENCES swift_search_definition (swift_search_definition_id);
-ALTER TABLE identified_peptide ADD FOREIGN KEY (peptide_sequence_id) REFERENCES peptide_sequence (peptide_sequence_id);
-ALTER TABLE identified_peptide ADD FOREIGN KEY (localized_mod_list_id) REFERENCES localized_mod_list (localized_mod_list_id);
 ALTER TABLE instrument ADD FOREIGN KEY (deletion) REFERENCES change_audit (change_audit_id);
 ALTER TABLE instrument ADD FOREIGN KEY (creation) REFERENCES change_audit (change_audit_id);
 ALTER TABLE instrument_series ADD FOREIGN KEY (ion_series_id) REFERENCES ion_series (ion_series_id);
 ALTER TABLE instrument_series ADD FOREIGN KEY (instrument_id) REFERENCES instrument (instrument_id);
 ALTER TABLE ion_series ADD FOREIGN KEY (deletion) REFERENCES change_audit (change_audit_id);
 ALTER TABLE ion_series ADD FOREIGN KEY (creation) REFERENCES change_audit (change_audit_id);
-ALTER TABLE localized_mod_list_members ADD FOREIGN KEY (localized_modification_id) REFERENCES localized_modification (localized_modification_id);
-ALTER TABLE localized_mod_list_members ADD FOREIGN KEY (localized_mod_list_id) REFERENCES localized_mod_list (localized_mod_list_id);
 
 -- Initial database version is to be instantly updated by the DbMigrator script
 INSERT INTO swift_db_version (id, db_version) VALUES (1, 1);
@@ -589,23 +526,15 @@ DROP TABLE enabled_engines;
 DROP TABLE enabled_engines_set;
 DROP TABLE extract_msn_settings;
 DROP TABLE file_search;
-DROP TABLE identified_peptide;
 DROP TABLE instrument;
 DROP TABLE instrument_series;
 DROP TABLE ion_series;
-DROP TABLE localized_mod_list;
-DROP TABLE localized_mod_list_members;
-DROP TABLE localized_modification;
 DROP TABLE `mod`;
 DROP TABLE mod_alt_names;
 DROP TABLE mod_set;
 DROP TABLE mod_set_specificities;
 DROP TABLE mod_specificity;
 DROP TABLE peptide_report;
-DROP TABLE peptide_sequence;
-DROP TABLE peptide_spectrum_match;
-DROP TABLE peptide_spectrum_match_list;
-DROP TABLE peptide_spectrum_match_list_members;
 DROP TABLE protease;
 DROP TABLE protein_database_entry;
 DROP TABLE protein_group;

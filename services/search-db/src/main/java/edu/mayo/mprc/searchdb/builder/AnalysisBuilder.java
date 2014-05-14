@@ -1,27 +1,21 @@
 package edu.mayo.mprc.searchdb.builder;
 
-import com.google.common.base.Function;
-import com.google.common.collect.Lists;
 import edu.mayo.mprc.MprcException;
-import edu.mayo.mprc.fastadb.PeptideSequence;
 import edu.mayo.mprc.fastadb.ProteinSequence;
 import edu.mayo.mprc.fastadb.ProteinSequenceTranslator;
 import edu.mayo.mprc.searchdb.dao.*;
 import edu.mayo.mprc.swift.dbmapping.ReportData;
 import org.joda.time.DateTime;
 
-import javax.annotation.Nullable;
-import java.util.*;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 /**
  * @author Roman Zenka
  */
 public class AnalysisBuilder implements Builder<Analysis> {
-	/**
-	 * To translate the Scaffold mods into actual Mod objects
-	 */
-	private ScaffoldModificationFormat format;
-
 	/**
 	 * To translate protein accession numbers into protein sequences.
 	 */
@@ -64,35 +58,9 @@ public class AnalysisBuilder implements Builder<Analysis> {
 	 */
 	private Map<String/*sequence*/, ProteinSequence> proteinSequencesBySequence = new HashMap<String, ProteinSequence>();
 
-	/**
-	 * Cache of all peptide sequences.
-	 */
-	private Map<String/*uppercase sequence*/, PeptideSequence> peptideSequences = new HashMap<String, PeptideSequence>();
-
-	/**
-	 * Cache of all localized mods.
-	 */
-	private Map<LocalizedModification, LocalizedModification> localizedModifications = new HashMap<LocalizedModification, LocalizedModification>(100);
-
-	/**
-	 * Cache of all localized mod bags
-	 */
-	private Map<LocalizedModBag, LocalizedModBag> localizedModBags = new HashMap<LocalizedModBag, LocalizedModBag>(1000);
-
-	/**
-	 * Cache of all peptide spectrum matches.
-	 */
-	private Map<PeptideSpectrumMatch, PeptideSpectrumMatch> peptideSpectrumMatches = new HashMap<PeptideSpectrumMatch, PeptideSpectrumMatch>(1000);
-
-	/**
-	 * Cache of all identified peptides.
-	 */
-	private Map<IdentifiedPeptide, IdentifiedPeptide> identifiedPeptides = new HashMap<IdentifiedPeptide, IdentifiedPeptide>(1000);
-
 	private Analysis analysis;
 
-	public AnalysisBuilder(final ScaffoldModificationFormat format, final ProteinSequenceTranslator translator, final MassSpecDataExtractor massSpecDataExtractor) {
-		this.format = format;
+	public AnalysisBuilder(final ProteinSequenceTranslator translator, final MassSpecDataExtractor massSpecDataExtractor) {
 		this.translator = translator;
 		this.massSpecDataExtractor = massSpecDataExtractor;
 	}
@@ -117,18 +85,6 @@ public class AnalysisBuilder implements Builder<Analysis> {
 		return proteinSequencesBySequence.values();
 	}
 
-	public Collection<PeptideSequence> getPeptideSequences() {
-		return peptideSequences.values();
-	}
-
-	public Collection<LocalizedModification> getLocalizedModifications() {
-		return localizedModifications.values();
-	}
-
-	public Collection<IdentifiedPeptide> getIdentifiedPeptides() {
-		return identifiedPeptides.values();
-	}
-
 	ProteinSequence getProteinSequence(final String accessionNumber, final String databaseSources) {
 		final ProteinSequence proteinSequence = proteinSequencesByAccnum.get(accessionNumber);
 		if (proteinSequence == null) {
@@ -142,108 +98,6 @@ public class AnalysisBuilder implements Builder<Analysis> {
 			return result;
 		}
 		return proteinSequence;
-	}
-
-	/**
-	 * @param peptideSequence Peptide sequence to cache and translate.
-	 * @return The corresponding PeptideSequence object. The sequence is canonicalized to uppercase.
-	 */
-	PeptideSequence getPeptideSequence(final String peptideSequence) {
-		final String upperCaseSequence = peptideSequence.toUpperCase(Locale.US);
-		final PeptideSequence sequence = peptideSequences.get(upperCaseSequence);
-		if (sequence == null) {
-			final PeptideSequence newSequence = new PeptideSequence(upperCaseSequence);
-			peptideSequences.put(upperCaseSequence, newSequence);
-			return newSequence;
-		}
-		return sequence;
-	}
-
-	/**
-	 * Get identified peptide.
-	 *
-	 * @param peptideSequence       The sequence of the peptide.
-	 * @param fixedModifications    Fixed modifications parseable by {@link ScaffoldModificationFormat}.
-	 * @param variableModifications Variable modifications parseable by {@link ScaffoldModificationFormat}.
-	 * @return Unique identified peptide entry.
-	 */
-	IdentifiedPeptide getIdentifiedPeptide(
-			final PeptideSequence peptideSequence,
-			final String fixedModifications,
-			final String variableModifications) {
-		final Collection<LocalizedModification> mods = format.parseModifications(peptideSequence.getSequence(), fixedModifications, variableModifications);
-		final LocalizedModBag mappedMods = new LocalizedModBag(Lists.transform(Lists.newArrayList(mods), mapLocalizedModification));
-
-		final IdentifiedPeptide key = new IdentifiedPeptide(peptideSequence, mappedMods);
-		final IdentifiedPeptide peptide = identifiedPeptides.get(key);
-		if (peptide == null) {
-			identifiedPeptides.put(key, key);
-			return key;
-		}
-		return peptide;
-	}
-
-	/**
-	 * Store each localized modification only once.
-	 */
-	private final Function<LocalizedModification, LocalizedModification> mapLocalizedModification = new Function<LocalizedModification, LocalizedModification>() {
-		@Override
-		public LocalizedModification apply(@Nullable final LocalizedModification from) {
-			final LocalizedModification result = localizedModifications.get(from);
-			if (result != null) {
-				return result;
-			}
-			localizedModifications.put(from, from);
-			return from;
-		}
-	};
-
-	private LocalizedModBag addLocalizedModBag(final LocalizedModBag bag) {
-		bag.calculateHash();
-		final LocalizedModBag existing = localizedModBags.get(bag);
-		if (existing != null) {
-			return existing;
-		}
-		localizedModBags.put(bag, bag);
-		return bag;
-	}
-
-	/**
-	 * @return All localized mod bag objects from the analysis. The hash code is pre-calculated.
-	 *         This has to be called AFTER all {@link LocalizedModification} objects have been saved and have
-	 *         their id associated, but BEFORE the identified peptides get saved.
-	 */
-	public Collection<LocalizedModBag> calculateLocalizedModBags() {
-		for (final IdentifiedPeptide peptide : getIdentifiedPeptides()) {
-			final LocalizedModBag bag = peptide.getModifications();
-			final LocalizedModBag replacedBag = addLocalizedModBag(bag);
-			peptide.setModifications(replacedBag);
-		}
-		return localizedModBags.values();
-	}
-
-	/**
-	 * @return A list of all {@link PsmList} objects in the Analysis, each listed only once.
-	 *         The duplicities are resolved within the existing analysis.
-	 */
-	public Collection<PsmList> calculatePsmLists() {
-		final LinkedHashMap<PsmList, PsmList> map = new LinkedHashMap<PsmList, PsmList>();
-
-		for (final BiologicalSample sample : getAnalysis().getBiologicalSamples()) {
-			for (final SearchResult result : sample.getSearchResults()) {
-				for (final ProteinGroup proteinGroup : result.getProteinGroups()) {
-					final PsmList list = proteinGroup.getPeptideSpectrumMatches();
-					list.calculateHash();
-					final PsmList existing = map.get(list);
-					if (existing == null) {
-						map.put(list, list);
-					} else {
-						proteinGroup.setPeptideSpectrumMatches(existing);
-					}
-				}
-			}
-		}
-		return map.values();
 	}
 
 	/**
@@ -305,19 +159,6 @@ public class AnalysisBuilder implements Builder<Analysis> {
 
 	public MassSpecDataExtractor getMassSpecDataExtractor() {
 		return massSpecDataExtractor;
-	}
-
-	public PeptideSpectrumMatch addPeptideSpectrumMatch(final PeptideSpectrumMatch match) {
-		final PeptideSpectrumMatch peptideSpectrumMatch = peptideSpectrumMatches.get(match);
-		if (peptideSpectrumMatch != null) {
-			return peptideSpectrumMatch;
-		}
-		peptideSpectrumMatches.put(match, match);
-		return match;
-	}
-
-	public Collection<PeptideSpectrumMatch> getPeptideSpectrumMatches() {
-		return peptideSpectrumMatches.values();
 	}
 
 	@Override

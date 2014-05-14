@@ -14,7 +14,6 @@ public class ProteinGroupBuilder implements Builder<ProteinGroup> {
 	private SearchResultBuilder searchResult;
 
 	private ProteinSequenceList proteinSequences;
-	private PsmListBuilder peptideSpectrumMatches;
 	private double proteinIdentificationProbability;
 	private int numberOfUniquePeptides;
 	private int numberOfUniqueSpectra;
@@ -24,7 +23,6 @@ public class ProteinGroupBuilder implements Builder<ProteinGroup> {
 
 	public ProteinGroupBuilder(final SearchResultBuilder searchResult, final double proteinIdentificationProbability, final int numberOfUniquePeptides, final int numberOfUniqueSpectra, final int numberOfTotalSpectra, final double percentageOfTotalSpectra, final double percentageSequenceCoverage) {
 		this.searchResult = searchResult;
-		peptideSpectrumMatches = new PsmListBuilder(this);
 		this.proteinIdentificationProbability = proteinIdentificationProbability;
 		this.numberOfUniquePeptides = numberOfUniquePeptides;
 		this.numberOfUniqueSpectra = numberOfUniqueSpectra;
@@ -35,7 +33,7 @@ public class ProteinGroupBuilder implements Builder<ProteinGroup> {
 
 	@Override
 	public ProteinGroup build() {
-		return new ProteinGroup(proteinSequences, peptideSpectrumMatches.build(),
+		return new ProteinGroup(proteinSequences,
 				proteinIdentificationProbability, numberOfUniquePeptides,
 				numberOfUniqueSpectra, numberOfTotalSpectra, percentageOfTotalSpectra,
 				percentageSequenceCoverage);
@@ -51,10 +49,6 @@ public class ProteinGroupBuilder implements Builder<ProteinGroup> {
 
 	public void setProteinSequences(final ProteinSequenceList proteinSequences) {
 		this.proteinSequences = proteinSequences;
-	}
-
-	public PsmListBuilder getPeptideSpectrumMatches() {
-		return peptideSpectrumMatches;
 	}
 
 	public double getProteinIdentificationProbability() {

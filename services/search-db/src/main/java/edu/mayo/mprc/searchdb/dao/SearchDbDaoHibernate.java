@@ -74,76 +74,9 @@ public class SearchDbDaoHibernate extends DaoBase implements RuntimeInitializer,
 	public void install(Map<String, String> params) {
 	}
 
-	public LocalizedModification addLocalizedModification(final LocalizedModification mod) {
-		if (mod.getId() == null) {
-			return save(mod, localizedModificationEqualityCriteria(mod), false);
-		}
-		return mod;
-	}
-
-	private static Criterion localizedModificationEqualityCriteria(final LocalizedModification mod) {
-		return Restrictions.conjunction()
-				.add(nullSafeEq("position", mod.getPosition()))
-				.add(nullSafeEq("residue", mod.getResidue()))
-				.add(associationEq("modSpecificity", mod.getModSpecificity()));
-	}
-
-	public IdentifiedPeptide addIdentifiedPeptide(final IdentifiedPeptide peptide) {
-		if (peptide.getId() == null) {
-			final LocalizedModBag originalList = peptide.getModifications();
-			if (originalList.getId() == null) {
-				final LocalizedModBag newList = new LocalizedModBag(originalList.size());
-				for (final LocalizedModification item : originalList) {
-					newList.add(addLocalizedModification(item));
-				}
-				peptide.setModifications(addBag(newList));
-			}
-
-			peptide.setSequence(fastaDbDao.addPeptideSequence(peptide.getSequence()));
-			try {
-				return save(peptide, identifiedPeptideEqualityCriteria(peptide), false);
-			} catch (Exception e) {
-				throw new MprcException("Could not add identified peptide", e);
-			}
-		}
-		return peptide;
-	}
-
-	private static Criterion identifiedPeptideEqualityCriteria(final IdentifiedPeptide peptide) {
-		return Restrictions.conjunction()
-				.add(associationEq("sequence", peptide.getSequence()))
-				.add(associationEq("modifications", peptide.getModifications()));
-	}
-
-	public PeptideSpectrumMatch addPeptideSpectrumMatch(final PeptideSpectrumMatch match) {
-		if (match.getId() == null) {
-			match.setPeptide(addIdentifiedPeptide(match.getPeptide()));
-			return save(match, matchEqualityCriteria(match), false);
-		}
-		return match;
-	}
-
-	private static Criterion matchEqualityCriteria(final PeptideSpectrumMatch match) {
-		return Restrictions.conjunction()
-				.add(associationEq("peptide", match.getPeptide()))
-				.add(nullSafeEq("previousAminoAcid", match.getPreviousAminoAcid()))
-				.add(nullSafeEq("nextAminoAcid", match.getNextAminoAcid()))
-				.add(doubleEq("bestPeptideIdentificationProbability", match.getBestPeptideIdentificationProbability(), PROBABILITY_DELTA))
-
-				.add(Restrictions.eq("spectrumIdentificationCounts.numberOfIdentifiedSpectra", match.getSpectrumIdentificationCounts().getNumberOfIdentifiedSpectra()))
-				.add(Restrictions.eq("spectrumIdentificationCounts.numberOfIdentified1HSpectra", match.getSpectrumIdentificationCounts().getNumberOfIdentified1HSpectra()))
-				.add(Restrictions.eq("spectrumIdentificationCounts.numberOfIdentified2HSpectra", match.getSpectrumIdentificationCounts().getNumberOfIdentified2HSpectra()))
-				.add(Restrictions.eq("spectrumIdentificationCounts.numberOfIdentified3HSpectra", match.getSpectrumIdentificationCounts().getNumberOfIdentified3HSpectra()))
-				.add(Restrictions.eq("spectrumIdentificationCounts.numberOfIdentified4HSpectra", match.getSpectrumIdentificationCounts().getNumberOfIdentified4HSpectra()))
-
-				.add(nullSafeEq("spectrumIdentificationCounts", match.getSpectrumIdentificationCounts()))
-				.add(nullSafeEq("numberOfEnzymaticTerminii", match.getNumberOfEnzymaticTerminii()));
-
-	}
-
 	public ProteinGroup addProteinGroup(final ProteinGroup group, final PercentRangeReporter reporter) {
 		if (group.getId() == null) {
-			final int size = group.getProteinSequences().size() + group.getPeptideSpectrumMatches().size();
+			final int size = group.getProteinSequences().size();
 			int itemsSaved = 0;
 			{
 				final ProteinSequenceList originalList = group.getProteinSequences();
@@ -158,19 +91,6 @@ public class SearchDbDaoHibernate extends DaoBase implements RuntimeInitializer,
 				}
 			}
 
-			{
-				final PsmList originalList = group.getPeptideSpectrumMatches();
-				if (originalList.getId() == null) {
-					final PsmList newList = new PsmList(originalList.size());
-					for (final PeptideSpectrumMatch item : originalList) {
-						newList.add(addPeptideSpectrumMatch(item));
-						itemsSaved++;
-						reporter.reportProgress((float) itemsSaved / (float) size);
-					}
-					group.setPeptideSpectrumMatches(addSet(newList));
-				}
-			}
-
 			return save(group, proteinGroupEqualityCriteria(group), false);
 		}
 		return group;
@@ -179,7 +99,6 @@ public class SearchDbDaoHibernate extends DaoBase implements RuntimeInitializer,
 	private static Criterion proteinGroupEqualityCriteria(final ProteinGroup group) {
 		return Restrictions.conjunction()
 				.add(associationEq("proteinSequences", group.getProteinSequences()))
-				.add(associationEq("peptideSpectrumMatches", group.getPeptideSpectrumMatches()))
 				.add(nullSafeEq("proteinIdentificationProbability", group.getProteinIdentificationProbability()))
 				.add(nullSafeEq("numberOfUniquePeptides", group.getNumberOfUniquePeptides()))
 				.add(nullSafeEq("numberOfUniqueSpectra", group.getNumberOfUniqueSpectra()))
@@ -494,20 +413,12 @@ public class SearchDbDaoHibernate extends DaoBase implements RuntimeInitializer,
 				MAP + "Analysis.hbm.xml",
 				MAP + "BiologicalSample.hbm.xml",
 				MAP + "BiologicalSampleList.hbm.xml",
-				MAP + "IdentifiedPeptide.hbm.xml",
-				MAP + "LocalizedModification.hbm.xml",
-				MAP + "LocalizedModList.hbm.xml",
-				MAP + "PeptideSpectrumMatch.hbm.xml",
 				MAP + "ProteinGroup.hbm.xml",
 				MAP + "ProteinGroupList.hbm.xml",
 				MAP + "ProteinSequenceList.hbm.xml",
-				MAP + "PsmList.hbm.xml",
 				MAP + "SearchResult.hbm.xml",
 				MAP + "SearchResultList.hbm.xml",
-				MAP + "TandemMassSpectrometrySample.hbm.xml",
-				MAP + "TempLocalizedModification.hbm.xml",
-				MAP + "TempIdentifiedPeptide.hbm.xml",
-				MAP + "TempPeptideSpectrumMatch.hbm.xml"
+				MAP + "TandemMassSpectrometrySample.hbm.xml"
 		));
 		list.addAll(super.getHibernateMappings());
 		return list;

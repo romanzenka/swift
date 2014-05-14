@@ -89,42 +89,20 @@ public final class Analysis extends PersistableBase {
 						"Number of Unique Spectra\t" +
 						"Number of Total Spectra\t" +
 						"Percentage of Total Spectra\t" +
-						"Percentage Sequence Coverage\t" +
-						"Peptide Sequence\t" +
-						"Peptide Modifications\t" +
-						"Previous Amino Acid\t" +
-						"Next Amino Acid\t" +
-						"Best Peptide Identification Probability\t" +
-						"Number of identified +1H spectra\t" +
-						"Number of identified +2H spectra\t" +
-						"Number of identified +3H spectra\t" +
-						"Number of identified +4H spectra\t" +
-						"Number of enzymatic termini\n");
-		final DecimalFormat percentDecimalFormat = new DecimalFormat("0.######");
+						"Percentage Sequence Coverage\t");
 		for (final BiologicalSample sample : getBiologicalSamples()) {
 			for (final SearchResult result : sample.getSearchResults()) {
 				for (final ProteinGroup proteinGroup : result.getProteinGroups()) {
-					for (final PeptideSpectrumMatch psm : proteinGroup.getPeptideSpectrumMatches()) {
-						builder
-								.append(sample.getCategory()).append('\t')
-								.append(sample.getSampleName()).append('\t')
-								.append(percent(proteinGroup.getProteinIdentificationProbability())).append('\t')
-								.append(proteinGroup.getNumberOfUniquePeptides()).append('\t')
-								.append(proteinGroup.getNumberOfUniqueSpectra()).append('\t')
-								.append(proteinGroup.getNumberOfTotalSpectra()).append('\t')
-								.append(percent(proteinGroup.getPercentageOfTotalSpectra())).append('\t')
-								.append(percent(proteinGroup.getPercentageSequenceCoverage())).append('\t')
-								.append(psm.getPeptide().getSequence().getSequence()).append('\t')
-								.append(psm.getPeptide().getModificationsAsString()).append('\t')
-								.append(psm.getPreviousAminoAcid()).append('\t')
-								.append(psm.getNextAminoAcid()).append('\t')
-								.append(percentDecimalFormat.format(psm.getBestPeptideIdentificationProbability())).append('\t')
-								.append(psm.getSpectrumIdentificationCounts().getNumberOfIdentified1HSpectra()).append('\t')
-								.append(psm.getSpectrumIdentificationCounts().getNumberOfIdentified2HSpectra()).append('\t')
-								.append(psm.getSpectrumIdentificationCounts().getNumberOfIdentified3HSpectra()).append('\t')
-								.append(psm.getSpectrumIdentificationCounts().getNumberOfIdentified4HSpectra()).append('\t')
-								.append(psm.getNumberOfEnzymaticTerminii()).append('\n');
-					}
+					builder
+							.append(sample.getCategory()).append('\t')
+							.append(sample.getSampleName()).append('\t')
+							.append(percent(proteinGroup.getProteinIdentificationProbability())).append('\t')
+							.append(proteinGroup.getNumberOfUniquePeptides()).append('\t')
+							.append(proteinGroup.getNumberOfUniqueSpectra()).append('\t')
+							.append(proteinGroup.getNumberOfTotalSpectra()).append('\t')
+							.append(percent(proteinGroup.getPercentageOfTotalSpectra())).append('\t')
+							.append(percent(proteinGroup.getPercentageSequenceCoverage()))
+							.append('\n');
 				}
 			}
 		}

@@ -84,7 +84,7 @@ public final class SearchDbWorker extends WorkerBase {
 
 			final ProteinSequenceTranslator translator = new SingleDatabaseTranslator(fastaDbDao, curationDao);
 			final MassSpecDataExtractor dataExtractor = new MapMassSpecDataExtractor(workPacket.getFileMetaDataMap());
-			final ScaffoldSpectraSummarizer summarizer = new ScaffoldSpectraSummarizer(databaseUnimod, scaffoldUnimod, translator, dataExtractor);
+			final ScaffoldSpectraSummarizer summarizer = new ScaffoldSpectraSummarizer(translator, dataExtractor);
 			summarizer.load(workPacket.getScaffoldSpectrumReport(), "3", reporter);
 
 			dao.addAnalysis(summarizer.getAnalysisBuilder(), reportData, reporter);

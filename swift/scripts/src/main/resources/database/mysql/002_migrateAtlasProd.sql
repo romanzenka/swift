@@ -1,5 +1,8 @@
 -- Migrate the atlas_prod database, table by table, into this schema
 
+SET UNIQUE_CHECKS = 0;
+SET FOREIGN_KEY_CHECKS = 0;
+
 INSERT INTO user_preferences (user_id, preference_value, preference_name)
   SELECT
     `user_preferences`.`user_id`,
@@ -82,15 +85,6 @@ INSERT INTO `peptide_report` (`peptide_report_id`)
     `peptide_report_id`
   FROM `atlas_prod`.peptide_report
   ORDER BY peptide_report_id;
-
-INSERT INTO `peptide_sequence` (`peptide_sequence_id`, `mass`, `sequence`)
-  SELECT
-    `peptide_sequence_id`,
-    `mass`,
-    `sequence`
-  FROM
-    `atlas_prod`.peptide_sequence
-  ORDER BY peptide_sequence_id;
 
 INSERT INTO `tandem_mass_spec_sample` (`tandem_mass_spec_sample_id`, `file`, `last_modified`,
                                        `ms1_spectra`, `ms2_spectra`, `ms3_plus_spectra`, `instrument_name`,
@@ -214,41 +208,6 @@ INSERT INTO `mod_specificity`
     `atlas_prod`.mod_specificity
   ORDER BY specificity_id;
 
-INSERT INTO `localized_modification`
-(`localized_modification_id`,
- `specificity_id`,
- `position`,
- `residue`)
-  SELECT
-    `localized_modification_id`,
-    `specificity_id`,
-    `position`,
-    `residue`
-  FROM
-    `atlas_prod`.localized_modification
-  ORDER BY localized_modification_id;
-
-INSERT INTO `localized_mod_list`
-(`localized_mod_list_id`,
- `hash`)
-  SELECT
-    `localized_mod_list_id`,
-    `hash`
-  FROM
-    `atlas_prod`.localized_mod_list
-  ORDER BY
-    localized_mod_list_id;
-
-INSERT INTO `localized_mod_list_members`
-(`localized_mod_list_id`,
- `localized_modification_id`)
-  SELECT
-    `localized_mod_list_id`,
-    `localized_modification_id`
-  FROM
-    `atlas_prod`.localized_mod_list_members
-  ORDER BY localized_mod_list_id, localized_modification_id;
-
 INSERT INTO `mod_set`
 (`mod_set_id`)
   SELECT
@@ -266,18 +225,6 @@ INSERT INTO `mod_set_specificities`
   FROM
     `atlas_prod`.mod_set_specificities
   ORDER BY set_id;
-
-INSERT INTO `identified_peptide`
-(`identified_peptide_id`,
- `peptide_sequence_id`,
- `localized_mod_list_id`)
-  SELECT
-    `identified_peptide_id`,
-    `peptide_sequence_id`,
-    `localized_mod_list_id`
-  FROM
-    `atlas_prod`.identified_peptide
-  ORDER BY identified_peptide_id;
 
 INSERT INTO `extract_msn_settings`
 (`extract_msn_settings_id`,
@@ -505,6 +452,141 @@ INSERT INTO `protein_sequence`
     `accession_number`
   FROM
     `atlas_prod`.protein_sequence
+  WHERE 0 < protein_sequence_id AND protein_sequence_id <= 100000
+  ORDER BY protein_sequence_id;
+
+INSERT INTO `protein_sequence`
+(`protein_sequence_id`,
+ `mass`,
+ `sequence`,
+ `accession_number`)
+  SELECT
+    `protein_sequence_id`,
+    `mass`,
+    `sequence`,
+    `accession_number`
+  FROM
+    `atlas_prod`.protein_sequence
+  WHERE 100000 < protein_sequence_id AND protein_sequence_id <= 200000
+  ORDER BY protein_sequence_id;
+
+INSERT INTO `protein_sequence`
+(`protein_sequence_id`,
+ `mass`,
+ `sequence`,
+ `accession_number`)
+  SELECT
+    `protein_sequence_id`,
+    `mass`,
+    `sequence`,
+    `accession_number`
+  FROM
+    `atlas_prod`.protein_sequence
+  WHERE 200000 < protein_sequence_id AND protein_sequence_id <= 300000
+  ORDER BY protein_sequence_id;
+
+INSERT INTO `protein_sequence`
+(`protein_sequence_id`,
+ `mass`,
+ `sequence`,
+ `accession_number`)
+  SELECT
+    `protein_sequence_id`,
+    `mass`,
+    `sequence`,
+    `accession_number`
+  FROM
+    `atlas_prod`.protein_sequence
+  WHERE 300000 < protein_sequence_id AND protein_sequence_id <= 400000
+  ORDER BY protein_sequence_id;
+
+INSERT INTO `protein_sequence`
+(`protein_sequence_id`,
+ `mass`,
+ `sequence`,
+ `accession_number`)
+  SELECT
+    `protein_sequence_id`,
+    `mass`,
+    `sequence`,
+    `accession_number`
+  FROM
+    `atlas_prod`.protein_sequence
+  WHERE 400000 < protein_sequence_id AND protein_sequence_id <= 500000
+  ORDER BY protein_sequence_id;
+
+INSERT INTO `protein_sequence`
+(`protein_sequence_id`,
+ `mass`,
+ `sequence`,
+ `accession_number`)
+  SELECT
+    `protein_sequence_id`,
+    `mass`,
+    `sequence`,
+    `accession_number`
+  FROM
+    `atlas_prod`.protein_sequence
+  WHERE 500000 < protein_sequence_id AND protein_sequence_id <= 600000
+  ORDER BY protein_sequence_id;
+
+INSERT INTO `protein_sequence`
+(`protein_sequence_id`,
+ `mass`,
+ `sequence`,
+ `accession_number`)
+  SELECT
+    `protein_sequence_id`,
+    `mass`,
+    `sequence`,
+    `accession_number`
+  FROM
+    `atlas_prod`.protein_sequence
+  WHERE 600000 < protein_sequence_id AND protein_sequence_id <= 700000
+  ORDER BY protein_sequence_id;
+
+INSERT INTO `protein_sequence`
+(`protein_sequence_id`, `mass`, `sequence`, `accession_number`)
+  SELECT
+    `protein_sequence_id`,
+    `mass`,
+    `sequence`,
+    `accession_number`
+  FROM `atlas_prod`.protein_sequence
+  WHERE 700000 < protein_sequence_id AND protein_sequence_id <= 800000
+  ORDER BY protein_sequence_id;
+
+INSERT INTO `protein_sequence`
+(`protein_sequence_id`, `mass`, `sequence`, `accession_number`)
+  SELECT
+    `protein_sequence_id`,
+    `mass`,
+    `sequence`,
+    `accession_number`
+  FROM `atlas_prod`.protein_sequence
+  WHERE 800000 < protein_sequence_id AND protein_sequence_id <= 900000
+  ORDER BY protein_sequence_id;
+
+INSERT INTO `protein_sequence`
+(`protein_sequence_id`, `mass`, `sequence`, `accession_number`)
+  SELECT
+    `protein_sequence_id`,
+    `mass`,
+    `sequence`,
+    `accession_number`
+  FROM `atlas_prod`.protein_sequence
+  WHERE 900000 < protein_sequence_id AND protein_sequence_id <= 1000000
+  ORDER BY protein_sequence_id;
+
+INSERT INTO `protein_sequence`
+(`protein_sequence_id`, `mass`, `sequence`, `accession_number`)
+  SELECT
+    `protein_sequence_id`,
+    `mass`,
+    `sequence`,
+    `accession_number`
+  FROM `atlas_prod`.protein_sequence
+  WHERE 1000000 < protein_sequence_id
   ORDER BY protein_sequence_id;
 
 INSERT INTO `protein_database_entry`
@@ -543,53 +625,6 @@ INSERT INTO `protein_sequence_list_members`
     `atlas_prod`.protein_sequence_list_members
   ORDER BY protein_sequence_list_id;
 
-INSERT INTO `peptide_spectrum_match`
-(`peptide_spectrum_match_id`,
- `identified_peptide_id`,
- `previous_aa`,
- `next_aa`,
- `best_id_probability`,
- `total_identified_spectra`,
- `identified_1h_spectra`,
- `identified_2h_spectra`,
- `identified_3h_spectra`,
- `identified_4h_spectra`,
- `num_enzymatic_terminii`)
-  SELECT
-    `peptide_spectrum_match_id`,
-    `identified_peptide_id`,
-    `previous_aa`,
-    `next_aa`,
-    `best_id_probability`,
-    `total_identified_spectra`,
-    `identified_1h_spectra`,
-    `identified_2h_spectra`,
-    `identified_3h_spectra`,
-    `identified_4h_spectra`,
-    `num_enzymatic_terminii`
-  FROM
-    `atlas_prod`.peptide_spectrum_match
-  ORDER BY peptide_spectrum_match_id;
-
-INSERT INTO `peptide_spectrum_match_list`
-(`peptide_spectrum_match_list_id`,
- `hash`)
-  SELECT
-    `peptide_spectrum_match_list_id`,
-    `hash`
-  FROM
-    `atlas_prod`.peptide_spectrum_match_list
-  ORDER BY peptide_spectrum_match_list_id;
-
-INSERT INTO `peptide_spectrum_match_list_members`
-(`peptide_spectrum_match_list_id`,
- `peptide_spectrum_match_id`)
-  SELECT
-    `peptide_spectrum_match_list_id`,
-    `peptide_spectrum_match_id`
-  FROM
-    `atlas_prod`.peptide_spectrum_match_list_members
-  ORDER BY peptide_spectrum_match_list_id;
 
 INSERT INTO `search_parameters`
 (`search_parameter_id`,
@@ -644,7 +679,6 @@ INSERT INTO `saved_parameters`
 INSERT INTO `protein_group`
 (`protein_group_id`,
  `protein_sequence_list_id`,
- `peptide_spectrum_match_list_id`,
  `protein_identification_probability`,
  `unique_peptides`,
  `unique_spectra`,
@@ -654,7 +688,6 @@ INSERT INTO `protein_group`
   SELECT
     `protein_group_id`,
     `protein_sequence_list_id`,
-    `peptide_spectrum_match_list_id`,
     `protein_identification_probability`,
     `unique_peptides`,
     `unique_spectra`,
@@ -905,6 +938,9 @@ INSERT INTO `analysis`
     `atlas_prod`.analysis
   ORDER BY analysis_id;
 
+SET UNIQUE_CHECKS = 1;
+SET FOREIGN_KEY_CHECKS = 1;
+
 
 -- @UNDO
 SET foreign_key_checks = 0;
@@ -918,7 +954,6 @@ TRUNCATE TABLE `ion_series`;
 TRUNCATE TABLE `instrument`;
 TRUNCATE TABLE `instrument_series`;
 TRUNCATE TABLE `peptide_report`;
-TRUNCATE TABLE `peptide_sequence`;
 TRUNCATE TABLE `tandem_mass_spec_sample`;
 TRUNCATE TABLE `starred_proteins`;
 TRUNCATE TABLE `enabled_engines`;
@@ -930,11 +965,8 @@ TRUNCATE TABLE `mod_alt_names`;
 TRUNCATE TABLE `instrument_series`;
 TRUNCATE TABLE `mod_specificity`;
 TRUNCATE TABLE `localized_modification`;
-TRUNCATE TABLE `localized_mod_list`;
-TRUNCATE TABLE `localized_mod_list_members`;
 TRUNCATE TABLE `mod_set`;
 TRUNCATE TABLE `mod_set_specificities`;
-TRUNCATE TABLE `identified_peptide`;
 TRUNCATE TABLE `extract_msn_settings`;
 TRUNCATE TABLE `scaffold_settings`;
 TRUNCATE TABLE `curation_header_transform`;
@@ -953,9 +985,6 @@ TRUNCATE TABLE `protein_sequence`;
 TRUNCATE TABLE `protein_database_entry`;
 TRUNCATE TABLE `protein_sequence_list`;
 TRUNCATE TABLE `protein_sequence_list_members`;
-TRUNCATE TABLE `peptide_spectrum_match`;
-TRUNCATE TABLE `peptide_spectrum_match_list`;
-TRUNCATE TABLE `peptide_spectrum_match_list_members`;
 TRUNCATE TABLE `search_parameters`;
 TRUNCATE TABLE `saved_parameters`;
 TRUNCATE TABLE `protein_group`;

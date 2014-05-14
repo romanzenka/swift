@@ -1,7 +1,6 @@
 package edu.mayo.mprc.searchdb.builder;
 
 import edu.mayo.mprc.MprcException;
-import edu.mayo.mprc.database.Change;
 import edu.mayo.mprc.database.DaoTest;
 import edu.mayo.mprc.dbcurator.model.Curation;
 import edu.mayo.mprc.dbcurator.model.impl.CurationDaoImpl;
@@ -12,8 +11,6 @@ import edu.mayo.mprc.swift.db.SwiftDaoHibernate;
 import edu.mayo.mprc.swift.dbmapping.ReportData;
 import edu.mayo.mprc.swift.dbmapping.SearchRun;
 import edu.mayo.mprc.swift.params2.ParamsDaoHibernate;
-import edu.mayo.mprc.unimod.MockUnimodDao;
-import edu.mayo.mprc.unimod.Unimod;
 import edu.mayo.mprc.unimod.UnimodDaoHibernate;
 import edu.mayo.mprc.utilities.FileUtilities;
 import edu.mayo.mprc.utilities.ResourceUtilities;
@@ -44,8 +41,6 @@ import java.util.Map;
  */
 public class TestSearchDbDao extends DaoTest {
 	private SearchDbDaoHibernate searchDbDao;
-	private Unimod unimod;
-	private Unimod scaffoldUnimod;
 	private CurationDaoImpl curationDao;
 	private UnimodDaoHibernate unimodDao;
 	private SwiftDaoHibernate swiftDao;
@@ -83,19 +78,6 @@ public class TestSearchDbDao extends DaoTest {
 		initializeDatabase(Arrays.asList(swiftDao, unimodDao, paramsDao, curationDao, searchDbDao, fastaDbDao));
 	}
 
-	private void loadScaffoldUnimod() {
-		scaffoldUnimod = new Unimod();
-		scaffoldUnimod.parseUnimodXML(ResourceUtilities.getStream("classpath:edu/mayo/mprc/searchdb/scaffold_unimod.xml", Unimod.class));
-	}
-
-	private void loadUnimod() {
-		unimodDao.begin();
-		final MockUnimodDao mockUnimodDao = new MockUnimodDao();
-		unimod = mockUnimodDao.load();
-		unimodDao.upgrade(unimod, new Change("Initial Unimod install", new DateTime()));
-		unimodDao.commit();
-	}
-
 	@AfterMethod
 	public void teardown() {
 		teardownDatabase();
@@ -103,8 +85,6 @@ public class TestSearchDbDao extends DaoTest {
 
 	@Test
 	public void shouldSaveSmallAnalysis() throws DatabaseUnitException, SQLException, IOException {
-		loadUnimod();
-		loadScaffoldUnimod();
 		loadFasta("/edu/mayo/mprc/searchdb/currentSp.fasta", "Current_SP");
 
 		searchDbDao.begin();
@@ -141,7 +121,7 @@ public class TestSearchDbDao extends DaoTest {
 	private Analysis loadAnalysis(final DateTime now, final String reportToLoad, final ReportData reportData) {
 		final InputStream stream = ResourceUtilities.getStream(reportToLoad, TestScaffoldSpectraSummarizer.class);
 
-		final ScaffoldSpectraSummarizer summarizer = new ScaffoldSpectraSummarizer(unimod, scaffoldUnimod,
+		final ScaffoldSpectraSummarizer summarizer = new ScaffoldSpectraSummarizer(
 				new SingleDatabaseTranslator(fastaDbDao, curationDao),
 				new DummyMassSpecDataExtractor(now));
 		summarizer.load(stream, -1, reportToLoad, "3", null);
@@ -182,14 +162,9 @@ public class TestSearchDbDao extends DaoTest {
 		counts.add(Analysis.class);
 		counts.add(BiologicalSample.class);
 		counts.add(BiologicalSampleList.class);
-		counts.add(IdentifiedPeptide.class);
-		counts.add(LocalizedModification.class);
-		counts.add(LocalizedModBag.class);
-		counts.add(PeptideSpectrumMatch.class);
 		counts.add(ProteinGroup.class);
 		counts.add(ProteinGroupList.class);
 		counts.add(ProteinSequenceList.class);
-		counts.add(PsmList.class);
 		counts.add(SearchResult.class);
 		counts.add(SearchResultList.class);
 		counts.add(TandemMassSpectrometrySample.class);
@@ -201,8 +176,6 @@ public class TestSearchDbDao extends DaoTest {
 	 */
 	@Test(dataProvider = "reports")
 	public void saveShouldBeIdempotent(final String report) throws DatabaseUnitException, SQLException, IOException {
-		loadUnimod();
-		loadScaffoldUnimod();
 		loadFasta("/edu/mayo/mprc/searchdb/currentSp.fasta", "Current_SP");
 
 		final DateTime now = new DateTime();

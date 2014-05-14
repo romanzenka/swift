@@ -1,21 +1,19 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
-        "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+    "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
 <hibernate-mapping package="edu.mayo.mprc.searchdb.dao" default-lazy="true">
     <class name="ProteinGroup" table="protein_group" mutable="false">
         <id name="id" type="integer" column="protein_group_id">
-            <generator class="native"/>
+            <generator class="native" />
         </id>
-        <many-to-one name="proteinSequences" class="ProteinSequenceList" column="protein_sequence_list_id"/>
-        <many-to-one name="peptideSpectrumMatches" class="PsmList" column="peptide_spectrum_match_list_id"/>
+        <many-to-one name="proteinSequences" class="ProteinSequenceList" column="protein_sequence_list_id" />
         <property name="proteinIdentificationProbability" type="edu.mayo.mprc.database.NullNanDoubleType"
-                  not-null="false" column="protein_identification_probability"/>
-        <property name="numberOfUniquePeptides" type="integer" column="unique_peptides"/>
-        <property name="numberOfUniqueSpectra" type="integer" column="unique_spectra"/>
-        <property name="numberOfTotalSpectra" type="integer" column="total_spectra"/>
+            not-null="false" column="protein_identification_probability" />
+        <property name="numberOfUniquePeptides" type="integer" column="unique_peptides" />
+        <property name="numberOfUniqueSpectra" type="integer" column="unique_spectra" />
+        <property name="numberOfTotalSpectra" type="integer" column="total_spectra" />
         <property name="percentageOfTotalSpectra" type="edu.mayo.mprc.database.NullNanDoubleType"
-                  column="percentage_total_spectra"/>
+            column="percentage_total_spectra" />
         <property name="percentageSequenceCoverage" type="edu.mayo.mprc.database.NullNanDoubleType"
-                  column="percentage_sequence_coverage"/>
+            column="percentage_sequence_coverage" />
     </class>
 </hibernate-mapping>
