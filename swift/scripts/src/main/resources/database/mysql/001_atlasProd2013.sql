@@ -252,7 +252,8 @@ CREATE TABLE protein_group_list
 CREATE TABLE protein_group_list_members
 (
   protein_group_list_id INT NOT NULL,
-  protein_group_id      INT NOT NULL
+  protein_group_id      INT NOT NULL,
+  PRIMARY KEY (protein_group_list_id, protein_group_id)
 );
 CREATE TABLE protein_sequence
 (
@@ -271,7 +272,8 @@ CREATE TABLE protein_sequence_list
 CREATE TABLE protein_sequence_list_members
 (
   protein_sequence_list_id INT NOT NULL,
-  protein_sequence_id      INT NOT NULL
+  protein_sequence_id      INT NOT NULL,
+  PRIMARY KEY (protein_sequence_list_id, protein_sequence_id)
 );
 CREATE TABLE report
 (
@@ -367,7 +369,7 @@ CREATE TABLE starred_proteins
 );
 CREATE TABLE swift_db_version
 (
-  id         INT PRIMARY KEY NOT NULL AUTO_INCREMENT,
+  id         INT PRIMARY KEY NOT NULL,
   db_version INT             NOT NULL,
   UNIQUE KEY `db_version` (`db_version`)
 );
@@ -399,7 +401,6 @@ CREATE TABLE tandem_mass_spec_sample
   run_time_seconds           DOUBLE,
   comment                    LONGTEXT,
   sample_information         LONGTEXT,
-  UNIQUE KEY `file` (`file`, `last_modified`),
   UNIQUE KEY `uniqueness` (`file`, `last_modified`)
 );
 CREATE TABLE task
@@ -419,9 +420,7 @@ CREATE TABLE task
   out_log          LONGTEXT,
   err_log          LONGTEXT,
   host             VARCHAR(255),
-  percent_done     REAL,
-  KEY `task_transaction_index` (`transaction_id`),
-  KEY `task_start_timestamp_index` (`start_timestamp`)
+  percent_done     REAL
 );
 CREATE TABLE task_state
 (
@@ -451,7 +450,8 @@ CREATE TABLE user_preferences
 (
   user_id          INT         NOT NULL,
   preference_value LONGTEXT,
-  preference_name  VARCHAR(40) NOT NULL
+  preference_name  VARCHAR(40) NOT NULL,
+  PRIMARY KEY (user_id, preference_name)
 );
 CREATE TABLE workflow_user
 (
@@ -542,11 +542,10 @@ ALTER TABLE swift_search_definition ADD FOREIGN KEY (peptide_report) REFERENCES 
 ALTER TABLE swift_search_definition ADD FOREIGN KEY (search_parameters) REFERENCES search_parameters (search_parameter_id);
 ALTER TABLE swift_search_definition ADD FOREIGN KEY (spectrum_qa) REFERENCES spectrum_qa (spectrum_qa_id);
 ALTER TABLE swift_search_definition ADD FOREIGN KEY (owner) REFERENCES workflow_user (workflow_user_id);
-ALTER TABLE task ADD FOREIGN KEY (transaction_id) REFERENCES transaction (transaction_id);
 ALTER TABLE task ADD FOREIGN KEY (task_state) REFERENCES task_state (task_state_id);
-ALTER TABLE task ADD FOREIGN KEY (transaction_id) REFERENCES transaction (transaction_id);
-ALTER TABLE transaction ADD FOREIGN KEY (submitting_user) REFERENCES workflow_user (workflow_user_id);
-ALTER TABLE transaction ADD FOREIGN KEY (swift_search) REFERENCES swift_search_definition (swift_search_definition_id);
+ALTER TABLE task ADD FOREIGN KEY (transaction_id) REFERENCES `transaction` (transaction_id);
+ALTER TABLE `transaction` ADD FOREIGN KEY (submitting_user) REFERENCES workflow_user (workflow_user_id);
+ALTER TABLE `transaction` ADD FOREIGN KEY (swift_search) REFERENCES swift_search_definition (swift_search_definition_id);
 ALTER TABLE user_preferences ADD FOREIGN KEY (user_id) REFERENCES workflow_user (workflow_user_id);
 ALTER TABLE workflow_user ADD FOREIGN KEY (deletion) REFERENCES change_audit (change_audit_id);
 ALTER TABLE workflow_user ADD FOREIGN KEY (creation) REFERENCES change_audit (change_audit_id);
