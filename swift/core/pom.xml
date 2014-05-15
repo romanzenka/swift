@@ -1,15 +1,14 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>edu.mayo.mprc</groupId>
     <artifactId>swift-core</artifactId>
-    <version>3.5-SNAPSHOT</version>
+    <version>3.7</version>
     <packaging>jar</packaging>
     <name>swift-core</name>
     <parent>
         <groupId>edu.mayo.mprc</groupId>
         <artifactId>swift</artifactId>
-        <version>3.5-SNAPSHOT</version>
+        <version>3.7</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
@@ -17,44 +16,44 @@
         <dependency>
             <groupId>edu.mayo.mprc</groupId>
             <artifactId>sge</artifactId>
-            <version>3.5-SNAPSHOT</version>
+            <version>3.7</version>
         </dependency>
 
         <dependency>
             <groupId>edu.mayo.mprc</groupId>
             <artifactId>integration</artifactId>
-            <version>3.5-SNAPSHOT</version>
+            <version>3.7</version>
             <scope>test</scope>
         </dependency>
 
         <dependency>
             <groupId>edu.mayo.mprc</groupId>
             <artifactId>commandline</artifactId>
-            <version>3.5-SNAPSHOT</version>
+            <version>3.7</version>
         </dependency>
 
         <dependency>
             <groupId>edu.mayo.mprc</groupId>
             <artifactId>qstat</artifactId>
-            <version>3.5-SNAPSHOT</version>
+            <version>3.7</version>
         </dependency>
 
         <dependency>
             <groupId>edu.mayo.mprc</groupId>
             <artifactId>quameter</artifactId>
-            <version>3.5-SNAPSHOT</version>
+            <version>3.7</version>
         </dependency>
 
         <dependency>
             <groupId>edu.mayo.mprc</groupId>
             <artifactId>db-undeploy</artifactId>
-            <version>3.5-SNAPSHOT</version>
+            <version>3.7</version>
         </dependency>
 
         <dependency>
             <groupId>edu.mayo.mprc</groupId>
             <artifactId>swift-search</artifactId>
-            <version>3.5-SNAPSHOT</version>
+            <version>3.7</version>
         </dependency>
 
         <!-- Database drivers bundled in -->

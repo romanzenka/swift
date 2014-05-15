@@ -2,14 +2,14 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>edu.mayo.mprc</groupId>
     <artifactId>daemon</artifactId>
-    <version>3.5-SNAPSHOT</version>
+    <version>3.7</version>
     <name>daemon</name>
     <description>A daemon performs work it obtains over a messaging service and returns results.</description>
 
     <parent>
         <groupId>edu.mayo.mprc</groupId>
         <artifactId>lib</artifactId>
-        <version>3.5-SNAPSHOT</version>
+        <version>3.7</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
@@ -21,18 +21,18 @@
         <dependency>
             <groupId>edu.mayo.mprc</groupId>
             <artifactId>config</artifactId>
-            <version>3.5-SNAPSHOT</version>
+            <version>3.7</version>
         </dependency>
 
         <dependency>
             <groupId>edu.mayo.mprc</groupId>
             <artifactId>messaging</artifactId>
-            <version>3.5-SNAPSHOT</version>
+            <version>3.7</version>
         </dependency>
         <dependency>
             <groupId>edu.mayo.mprc</groupId>
             <artifactId>util</artifactId>
-            <version>3.5-SNAPSHOT</version>
+            <version>3.7</version>
         </dependency>
         <dependency>
             <groupId>org.testng</groupId>
