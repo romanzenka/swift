@@ -1,4 +1,5 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>edu.mayo.mprc</groupId>
     <artifactId>mprc</artifactId>
@@ -60,7 +61,8 @@
                         <phase>compile</phase>
                         <configuration>
                             <rules>
-                                <NoPackageCyclesRule implementation="de.andrena.tools.nopackagecycles.NoPackageCyclesRule" />
+                                <NoPackageCyclesRule
+                                    implementation="de.andrena.tools.nopackagecycles.NoPackageCyclesRule" />
                             </rules>
                         </configuration>
                     </execution>
@@ -503,7 +505,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-project-info-reports-plugin</artifactId>
-                <version>2.6</version>
+                <version>2.7</version>
                 <configuration>
                     <!-- Workaround the http://jira.codehaus.org/browse/MPIR-251 issue -->
                     <dependencyDetailsEnabled>false</dependencyDetailsEnabled>
@@ -514,19 +516,19 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jxr-plugin</artifactId>
-                <version>2.2</version>
+                <version>2.4</version>
             </plugin>
             <!-- Surefire test reports -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-report-plugin</artifactId>
-                <version>2.8.1</version>
+                <version>2.17</version>
             </plugin>
             <!-- Javadoc -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
-                <version>2.8</version>
+                <version>2.9.1</version>
                 <reportSets>
                     <reportSet>
                         <id>html</id>
@@ -545,7 +547,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-pmd-plugin</artifactId>
-                <version>2.5</version>
+                <version>3.1</version>
                 <configuration>
                     <linkXRef>true</linkXRef>
                     <sourceEncoding>utf-8</sourceEncoding>
@@ -611,7 +613,7 @@
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>cobertura-maven-plugin</artifactId>
-                <version>2.4</version>
+                <version>2.6</version>
                 <configuration>
                     <formats>
                         <format>xml</format>
@@ -621,7 +623,7 @@
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>findbugs-maven-plugin</artifactId>
-                <version>2.3.2</version>
+                <version>2.5.3</version>
             </plugin>
         </plugins>
 
