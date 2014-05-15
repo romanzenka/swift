@@ -194,7 +194,8 @@ CREATE TABLE mod_set
 CREATE TABLE mod_set_specificities
 (
   set_id         INT NOT NULL,
-  specificity_id INT NOT NULL
+  specificity_id INT NOT NULL,
+  PRIMARY KEY (set_id, specificity_id)
 );
 CREATE TABLE mod_specificity
 (
