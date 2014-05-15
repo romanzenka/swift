@@ -99,7 +99,7 @@ public final class Launcher implements FileListener {
 	}
 
 	private Server runWebServer(final SwiftEnvironment environment, final boolean configMode) {
-		final File warFile = new File("lib/swift-web-3.5-SNAPSHOT.war");
+		final File warFile = new File("lib/swift-web-3.8-SNAPSHOT.war");
 
 		final String daemonId;
 		if (configMode) {
