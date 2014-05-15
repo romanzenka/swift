@@ -52,7 +52,7 @@ public class AnalysisReport implements HttpRequestHandler {
 						"<link href='http://fonts.googleapis.com/css?family=PT+Sans' rel='stylesheet' type='text/css'>\n" +
 						"</head><body>\n");
 				writer.write("<h1>Scaffold Report</h1>\n");
-				analysis.htmlReport(new Report(writer), searchDbDao, highlight);
+				analysis.htmlReport(new Report(writer), reportForId, searchDbDao, highlight);
 
 				searchDbDao.commit();
 			} catch (Exception e) {

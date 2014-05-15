@@ -27,7 +27,7 @@ public abstract class SearchDbDaoBlank implements SearchDbDao {
 	}
 
 	@Override
-	public SwiftSearchDefinition getSearchDefinition(final long analysisId) {
+	public SwiftSearchDefinition getSearchDefinition(final long reportId) {
 		return null;
 	}
 

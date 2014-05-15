@@ -1,6 +1,7 @@
 package edu.mayo.mprc.searchdb.dao;
 
 import edu.mayo.mprc.database.PersistableBase;
+import edu.mayo.mprc.swift.dbmapping.ReportData;
 import edu.mayo.mprc.swift.dbmapping.SwiftSearchDefinition;
 import edu.mayo.mprc.swift.params2.StarMatcher;
 import edu.mayo.mprc.swift.params2.StarredProteins;
@@ -148,7 +149,7 @@ public final class Analysis extends PersistableBase {
 	/**
 	 * Report information about entire analysis into a given writer in HTML format.
 	 */
-	public void htmlReport(final Report r, final SearchDbDao searchDbDao, final String highlight) {
+	public void htmlReport(final Report r, final ReportData reportData, final SearchDbDao searchDbDao, final String highlight) {
 		r
 				.startTable("Scaffold run")
 				.addKeyValueTable("Date", getAnalysisDate().toString("YYYY-MM-dd"))
@@ -157,7 +158,7 @@ public final class Analysis extends PersistableBase {
 
 		r.startTable("Results"); // -- Results
 
-		final SwiftSearchDefinition searchDefinition = searchDbDao.getSearchDefinition(getId());
+		final SwiftSearchDefinition searchDefinition = searchDbDao.getSearchDefinition(reportData.getId());
 		// TODO: Theoretically we can have different starred proteins for two different input files
 		final StarredProteins starredProteins =
 				searchDefinition != null && searchDefinition.getSearchParameters() != null &&

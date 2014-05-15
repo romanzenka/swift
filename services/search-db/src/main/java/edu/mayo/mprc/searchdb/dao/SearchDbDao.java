@@ -33,12 +33,12 @@ public interface SearchDbDao extends Dao {
 	Analysis getAnalysis(int analysisId);
 
 	/**
-	 * Get parameters for Swift search that belongs to a particular analysis.
+	 * Get parameters for Swift search that belongs to a particular report.
 	 *
-	 * @param analysisId ID of the {@link Analysis} to get the parameters for.
+	 * @param reportId ID of the {@link ReportData} to get the parameters for.
 	 * @return Swift saerch definition.
 	 */
-	SwiftSearchDefinition getSearchDefinition(long analysisId);
+	SwiftSearchDefinition getSearchDefinition(long reportId);
 
 	/**
 	 * List accession numbers for a protein group.
