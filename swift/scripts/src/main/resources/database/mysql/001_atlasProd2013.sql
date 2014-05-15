@@ -513,8 +513,6 @@ ALTER TABLE protein_group_list_members ADD FOREIGN KEY (protein_group_id) REFERE
 ALTER TABLE protein_group_list_members ADD FOREIGN KEY (protein_group_list_id) REFERENCES protein_group_list (protein_group_list_id);
 ALTER TABLE protein_sequence_list_members ADD FOREIGN KEY (protein_sequence_id) REFERENCES protein_sequence (protein_sequence_id);
 ALTER TABLE protein_sequence_list_members ADD FOREIGN KEY (protein_sequence_list_id) REFERENCES protein_sequence_list (protein_sequence_list_id);
-ALTER TABLE quameter_result ADD FOREIGN KEY (sample_id) REFERENCES tandem_mass_spec_sample (tandem_mass_spec_sample_id);
-ALTER TABLE quameter_result ADD FOREIGN KEY (file_search_id) REFERENCES file_search (file_search_id);
 ALTER TABLE report ADD FOREIGN KEY (transaction_id) REFERENCES transaction (transaction_id);
 ALTER TABLE report ADD FOREIGN KEY (transaction_id) REFERENCES transaction (transaction_id);
 ALTER TABLE saved_parameters ADD FOREIGN KEY (owner) REFERENCES workflow_user (workflow_user_id);
