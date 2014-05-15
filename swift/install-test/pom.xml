@@ -3,7 +3,7 @@
     <parent>
         <artifactId>swift</artifactId>
         <groupId>edu.mayo.mprc</groupId>
-        <version>3.7</version>
+        <version>3.8-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
     <modelVersion>4.0.0</modelVersion>
@@ -27,12 +27,12 @@
         <dependency>
             <groupId>edu.mayo.mprc</groupId>
             <artifactId>util</artifactId>
-            <version>3.7</version>
+            <version>3.8-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>edu.mayo.mprc.swift</groupId>
             <artifactId>swift-config-ui</artifactId>
-            <version>3.7</version>
+            <version>3.8-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>com.gdevelop.syncrpc</groupId>
@@ -43,7 +43,7 @@
         <dependency>
             <groupId>edu.mayo.mprc</groupId>
             <artifactId>swift-installer</artifactId>
-            <version>3.7</version>
+            <version>3.8-SNAPSHOT</version>
             <classifier>install</classifier>
             <type>tar.gz</type>
             <scope>test</scope>

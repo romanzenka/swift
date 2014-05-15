@@ -2,7 +2,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>edu.mayo.mprc</groupId>
     <artifactId>launcher</artifactId>
-    <version>3.7</version>
+    <version>3.8-SNAPSHOT</version>
     <packaging>jar</packaging>
     <name>launcher</name>
 
@@ -13,7 +13,7 @@
     <parent>
         <groupId>edu.mayo.mprc</groupId>
         <artifactId>swift</artifactId>
-        <version>3.7</version>
+        <version>3.8-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
@@ -21,12 +21,12 @@
         <dependency>
             <groupId>edu.mayo.mprc</groupId>
             <artifactId>swift-core</artifactId>
-            <version>3.7</version>
+            <version>3.8-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>edu.mayo.mprc</groupId>
             <artifactId>swift-web</artifactId>
-            <version>3.7</version>
+            <version>3.8-SNAPSHOT</version>
             <type>war</type>
         </dependency>
 
@@ -39,13 +39,13 @@
         <dependency>
             <groupId>edu.mayo.mprc</groupId>
             <artifactId>db-curator-ui</artifactId>
-            <version>3.7</version>
+            <version>3.8-SNAPSHOT</version>
         </dependency>
 
         <dependency>
             <groupId>edu.mayo.mprc.swift</groupId>
             <artifactId>swift-config-ui</artifactId>
-            <version>3.7</version>
+            <version>3.8-SNAPSHOT</version>
         </dependency>
 
         <!-- Supports RSS feed generation -->

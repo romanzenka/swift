@@ -3,7 +3,7 @@
     <groupId>edu.mayo.mprc</groupId>
     <artifactId>services</artifactId>
     <packaging>pom</packaging>
-    <version>3.7</version>
+    <version>3.8-SNAPSHOT</version>
 
     <parent>
         <groupId>edu.mayo.mprc</groupId>
@@ -46,8 +46,4 @@
         <module>xtandem</module>
         <module>heme</module>
     </modules>
-
-  <scm>
-    <tag>swift-aggregator-3.7</tag>
-  </scm>
 </project>

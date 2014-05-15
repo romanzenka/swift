@@ -3,14 +3,14 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>edu.mayo.mprc</groupId>
     <artifactId>swift-search</artifactId>
-    <version>3.7</version>
+    <version>3.8-SNAPSHOT</version>
     <name>swift-search</name>
     <description>TODO: fill in the module description</description>
 
     <parent>
         <groupId>edu.mayo.mprc</groupId>
         <artifactId>services</artifactId>
-        <version>3.7</version>
+        <version>3.8-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
@@ -18,32 +18,32 @@
         <dependency>
             <groupId>edu.mayo.mprc</groupId>
             <artifactId>workflow-engine</artifactId>
-            <version>3.7</version>
+            <version>3.8-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>edu.mayo.mprc</groupId>
             <artifactId>mascot</artifactId>
-            <version>3.7</version>
+            <version>3.8-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>edu.mayo.mprc</groupId>
             <artifactId>omssa</artifactId>
-            <version>3.7</version>
+            <version>3.8-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>edu.mayo.mprc</groupId>
             <artifactId>xtandem</artifactId>
-            <version>3.7</version>
+            <version>3.8-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>edu.mayo.mprc</groupId>
             <artifactId>myrimatch</artifactId>
-            <version>3.7</version>
+            <version>3.8-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>edu.mayo.mprc</groupId>
             <artifactId>idpicker</artifactId>
-            <version>3.7</version>
+            <version>3.8-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>org.testng</groupId>
@@ -53,57 +53,57 @@
         <dependency>
             <groupId>edu.mayo.mprc</groupId>
             <artifactId>scaffold</artifactId>
-            <version>3.7</version>
+            <version>3.8-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>edu.mayo.mprc</groupId>
             <artifactId>msmseval</artifactId>
-            <version>3.7</version>
+            <version>3.8-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>edu.mayo.mprc</groupId>
             <artifactId>mgf2mgf</artifactId>
-            <version>3.7</version>
+            <version>3.8-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>edu.mayo.mprc</groupId>
             <artifactId>sequest</artifactId>
-            <version>3.7</version>
+            <version>3.8-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>edu.mayo.mprc</groupId>
             <artifactId>raw2mgf</artifactId>
-            <version>3.7</version>
+            <version>3.8-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>edu.mayo.mprc</groupId>
             <artifactId>msconvert</artifactId>
-            <version>3.7</version>
+            <version>3.8-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>edu.mayo.mprc</groupId>
             <artifactId>quameter</artifactId>
-            <version>3.7</version>
+            <version>3.8-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>edu.mayo.mprc</groupId>
             <artifactId>quameter-db</artifactId>
-            <version>3.7</version>
+            <version>3.8-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>edu.mayo.mprc</groupId>
             <artifactId>qa</artifactId>
-            <version>3.7</version>
+            <version>3.8-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>edu.mayo.mprc</groupId>
             <artifactId>fasta-db</artifactId>
-            <version>3.7</version>
+            <version>3.8-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>edu.mayo.mprc</groupId>
             <artifactId>search-db</artifactId>
-            <version>3.7</version>
+            <version>3.8-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>org.mockito</groupId>
