@@ -41,9 +41,9 @@ Once you have Java and Maven setup, you can build Swift as follows:
 
 You are ready to install Swift.
 
-* Copy the swift/installer/target/swift-3.6-install.tar.gz to your target machine.
+* Copy the swift/installer/target/swift-3.8-install.tar.gz to your target machine.
 * Unzip it
 * Install instructions are in
-	swift-3.6/INSTALL.txt
+	swift-3.8/INSTALL.txt
 
 Please mail zenka.roman@mayo.edu if you have any problems!
