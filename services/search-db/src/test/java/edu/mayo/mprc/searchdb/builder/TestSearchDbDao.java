@@ -89,14 +89,15 @@ public class TestSearchDbDao extends DaoTest {
 
 		searchDbDao.begin();
 
-		final Analysis analysis = loadAnalysis(new DateTime(), SINGLE, saveNewReportData());
+		ReportData reportData = saveNewReportData();
+		final Analysis analysis = loadAnalysis(new DateTime(), SINGLE, reportData);
 
 		getDatabase().getSession().flush();
 
 		final StringWriter writer = new StringWriter();
 		final Report r = new Report(writer);
 
-		analysis.htmlReport(r, searchDbDao, null);
+		analysis.htmlReport(r, reportData, searchDbDao, null);
 
 		// TODO: Check that the analysis is saved properly
 //        DatabaseConnection databaseConnection = new DatabaseConnection(getDatabase().getSession().connection());
