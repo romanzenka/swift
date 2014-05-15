@@ -205,6 +205,7 @@ public class SearchDbDaoHibernate extends DaoBase implements RuntimeInitializer,
 	public SwiftSearchDefinition getSearchDefinition(final long analysisId) {
 		final Object searchDefinition = getSession().createQuery("select d from SwiftSearchDefinition d, ReportData r, SearchRun sr where " +
 				"r.searchRun = sr and sr.swiftSearch = d.id and r.analysisId = :analysisId")
+				.setMaxResults(1)
 				.setLong("analysisId", analysisId)
 				.uniqueResult();
 		if (searchDefinition instanceof SwiftSearchDefinition) {
