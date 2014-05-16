@@ -412,6 +412,7 @@ CREATE TABLE task
   end_timestamp    DATETIME,
   error_code       INT,
   error_message    LONGTEXT,
+  warning_message LONGTEXT,
   exception        LONGTEXT,
   transaction_id   INT,
   task_state       BIGINT,
