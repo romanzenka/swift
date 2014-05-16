@@ -18,9 +18,7 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
 import java.io.File;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -52,7 +50,7 @@ public final class DefaultSwiftSearcherCaller implements SwiftSearcherCaller {
 		try {
 			final String sBatchName = td.getTitle();
 			sendCallToDispatcher(getSwiftSearcherConnection(), td.getSwiftSearch(), sBatchName, false, 0, td.getId(), listener);
-		} catch (Exception t) {
+		} catch (final Exception t) {
 			throw new MprcException("resubmitSearchRun : failure sending call to dispatcher, " + t.getMessage(), t);
 		}
 	}
@@ -74,7 +72,7 @@ public final class DefaultSwiftSearcherCaller implements SwiftSearcherCaller {
 					searchInput.isLowPriority() ? -1 : 0);
 			getSwiftDao().commit();
 			return searchRunId;
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			getSwiftDao().rollback();
 			throw new MprcException("New Swift search could not be started", e);
 		}
@@ -105,6 +103,33 @@ public final class DefaultSwiftSearcherCaller implements SwiftSearcherCaller {
 		validateTitleCharacters(title, "Search title");
 		for (final FileSearch fileSearch : swiftSearch.getInputFiles()) {
 			validateTitleCharacters(fileSearch.getExperiment(), "Experiment name " + fileSearch.getExperiment());
+		}
+
+		validateQuaMeterAndMudpit(swiftSearch);
+	}
+
+	/**
+	 * This will throw an exception if:
+	 * 1) QuaMeter is enabled
+	 * 2) Two or more input files go into the same Scaffold column
+	 *
+	 * @param swiftSearch Search definition
+	 */
+	private static void validateQuaMeterAndMudpit(final SwiftSearchDefinition swiftSearch) {
+		final Set<String> quameterSampleExperimentNames = new HashSet<String>(10);
+		for (final FileSearch fileSearch : swiftSearch.getInputFiles()) {
+			if (fileSearch.getEnabledEngines().isEnabled("QUAMETER")) {
+				final String sampleExperiment =
+						fileSearch.getBiologicalSample() +
+								">><<" +
+								fileSearch.getExperiment();
+				// Check that we do not have a sample like so already
+				if (quameterSampleExperimentNames.contains(sampleExperiment)) {
+					throw new MprcException("QuaMeter needs each input file to go to a separate Scaffold column. Switch QuaMeter off, or set Scaffold to separate samples per input file.");
+				}
+				// Make a not we saw this before
+				quameterSampleExperimentNames.add(sampleExperiment);
+			}
 		}
 	}
 
@@ -247,7 +272,7 @@ public final class DefaultSwiftSearcherCaller implements SwiftSearcherCaller {
 		return browseRoot;
 	}
 
-	public void setBrowseRoot(File browseRoot) {
+	public void setBrowseRoot(final File browseRoot) {
 		this.browseRoot = browseRoot;
 	}
 
