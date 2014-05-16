@@ -21,6 +21,7 @@ import java.util.*;
  */
 public final class Analysis extends PersistableBase {
 	private static final DecimalFormat PERCENT_FORMAT = new DecimalFormat("0.00%", DecimalFormatSymbols.getInstance(Locale.US));
+	public static final String UNKNOWN_ACCESSION = "???";
 
 	/**
 	 * Scaffold version as a string. Can be null if the version could not be determined.
@@ -90,7 +91,8 @@ public final class Analysis extends PersistableBase {
 						"Number of Unique Spectra\t" +
 						"Number of Total Spectra\t" +
 						"Percentage of Total Spectra\t" +
-						"Percentage Sequence Coverage\n");
+						"Percentage Sequence Coverage\n"
+		);
 		for (final BiologicalSample sample : getBiologicalSamples()) {
 			for (final SearchResult result : sample.getSearchResults()) {
 				for (final ProteinGroup proteinGroup : result.getProteinGroups()) {
@@ -289,15 +291,20 @@ public final class Analysis extends PersistableBase {
 		for (final ProteinSequenceList proteinSequences : allProteinGroups.values()) {
 			final TableRow row = new TableRow();
 			row.accnums = accnumMap.get(proteinSequences.getId());
-			if (matcher != null) {
-				for (final String accnum : row.accnums) {
-					if (matcher.matches(accnum)) {
-						row.star = true;
-						break;
+			if (row.accnums == null) {
+				row.accnums = new ArrayList<String>(1);
+				row.accnums.add(UNKNOWN_ACCESSION);
+			} else {
+				if (matcher != null) {
+					for (final String accnum : row.accnums) {
+						if (matcher.matches(accnum)) {
+							row.star = true;
+							break;
+						}
 					}
 				}
+				Collections.sort(row.accnums, new AccnumComparator());
 			}
-			Collections.sort(row.accnums, new AccnumComparator());
 			row.spectra = new int[totalColumns];
 			row.totalSpectra = 0;
 
