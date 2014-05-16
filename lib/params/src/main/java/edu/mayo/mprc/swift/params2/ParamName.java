@@ -42,42 +42,6 @@ public enum ParamName {
 		return desc;
 	}
 
-	/**
-	 * Get abstract parameter value by its name.
-	 *
-	 * @param params Set of abstract parameters.
-	 * @return Value of the parameter. Use one of the getters whenever you can, such as {@link SearchEngineParameters#getProtease}. This method
-	 * is meant to be used mainly in loops which go over all parameters.
-	 */
-	public Object getParamValue(final SearchEngineParameters params) {
-		switch (this) {
-			case Database:
-				return params.getDatabase();
-			case FixedMods:
-				return params.getFixedModifications();
-			case FragmentTolerance:
-				return params.getFragmentTolerance();
-			case Instrument:
-				return params.getInstrument();
-			case MinTerminiCleavages:
-				return params.getMinTerminiCleavages();
-			case MissedCleavages:
-				return params.getMissedCleavages();
-			case PeptideTolerance:
-				return params.getPeptideTolerance();
-			case Enzyme:
-				return params.getProtease();
-			case VariableMods:
-				return params.getVariableModifications();
-			case ExtractMsnSettings:
-				return params.getExtractMsnSettings();
-			case ScaffoldSettings:
-				return params.getScaffoldSettings();
-			default:
-				throw new MprcException("Unsupported parameter " + toString());
-		}
-	}
-
 	public static ParamName getById(final String id) {
 		for (final ParamName param : ParamName.values()) {
 			if (param.getId().equals(id)) {

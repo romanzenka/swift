@@ -30,10 +30,10 @@ public abstract class ParamsInfo {
 
 	/**
 	 * @return Fixed list of allowed instruments, based on the Mascot provided ion series
-	 *         that are available in other search engines.  This is pretty cheesy but I
-	 *         spent a bunch of time thinking about how to do this and the limited ion series
-	 *         support in other engines makes it less attractive to try to, for example,
-	 *         automatically import the mascot instruments...
+	 * that are available in other search engines.  This is pretty cheesy but I
+	 * spent a bunch of time thinking about how to do this and the limited ion series
+	 * support in other engines makes it less attractive to try to, for example,
+	 * automatically import the mascot instruments...
 	 */
 	public abstract List<Instrument> getInstrumentAllowedValues();
 
@@ -69,6 +69,7 @@ public abstract class ParamsInfo {
 			case PeptideTolerance:
 			case ExtractMsnSettings:
 			case ScaffoldSettings:
+			case EnabledEngines:
 				return null;
 			default:
 				throw new MprcException("Unsupported parameter " + param.toString());
