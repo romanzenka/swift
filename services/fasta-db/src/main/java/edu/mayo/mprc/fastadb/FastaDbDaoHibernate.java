@@ -187,11 +187,6 @@ public final class FastaDbDaoHibernate extends BulkDaoBase implements FastaDbDao
 		addSequences(proteinSequences, "protein_sequence");
 	}
 
-	@Override
-	public void addPeptideSequences(final Collection<PeptideSequence> peptideSequences) {
-		addSequences(peptideSequences, "peptide_sequence");
-	}
-
 	private void addSequences(final Collection<? extends Sequence> sequences, final String table) {
 		SequenceBulkLoader loader = new SequenceBulkLoader(this, this, table);
 		loader.addObjects(sequences);
@@ -200,7 +195,6 @@ public final class FastaDbDaoHibernate extends BulkDaoBase implements FastaDbDao
 	@Override
 	public Collection<String> getHibernateMappings() {
 		final List<String> list = new ArrayList<String>(Arrays.asList(
-				HBM_HOME + "PeptideSequence.hbm.xml",
 				HBM_HOME + "ProteinSequence.hbm.xml",
 				HBM_HOME + "ProteinEntry.hbm.xml",
 				HBM_HOME + "ProteinAccnum.hbm.xml",

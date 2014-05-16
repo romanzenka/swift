@@ -964,7 +964,6 @@ TRUNCATE TABLE `mod`;
 TRUNCATE TABLE `mod_alt_names`;
 TRUNCATE TABLE `instrument_series`;
 TRUNCATE TABLE `mod_specificity`;
-TRUNCATE TABLE `localized_modification`;
 TRUNCATE TABLE `mod_set`;
 TRUNCATE TABLE `mod_set_specificities`;
 TRUNCATE TABLE `extract_msn_settings`;

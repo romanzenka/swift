@@ -91,13 +91,6 @@ public interface FastaDbDao extends BulkLoadJobStarter {
 	void addProteinSequences(Collection<ProteinSequence> proteinSequences);
 
 	/**
-	 * Add all peptide sequences as fast as possible.
-	 *
-	 * @param peptideSequences List of protein sequences to add.
-	 */
-	void addPeptideSequences(Collection<PeptideSequence> peptideSequences);
-
-	/**
 	 * @return New job to start.
 	 */
 	BulkLoadJob startNewJob();
