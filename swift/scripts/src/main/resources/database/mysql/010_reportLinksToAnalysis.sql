@@ -3,6 +3,8 @@
 ALTER TABLE report ADD COLUMN `analysis_id` INT(11) NULL DEFAULT NULL
 AFTER `transaction_id`;
 
+ALTER TABLE report ADD FOREIGN KEY (analysis_id) REFERENCES analysis (analysis_id);
+
 UPDATE report AS r LEFT JOIN analysis AS a
     ON a.report_id = r.report_id
 SET
