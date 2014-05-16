@@ -240,7 +240,7 @@ public final class SearchRunner implements Runnable, Lifecycle {
 		for (final FileSearch inputFile : searchDefinition.getInputFiles()) {
 			file = inputFile.getInputFile();
 			if (file.exists()) {
-				inputFileToTasks(inputFile, searchDefinition.getSearchParameters(), Boolean.TRUE.equals(searchDefinition.getPublicSearchFiles()));
+				inputFileToTasks(inputFile, searchDefinition.getEnabledEngines(), searchDefinition.getSearchParameters(), Boolean.TRUE.equals(searchDefinition.getPublicSearchFiles()));
 			} else {
 				LOGGER.info("Skipping nonexistent input file [" + file.getAbsolutePath() + "]");
 			}
@@ -248,7 +248,7 @@ public final class SearchRunner implements Runnable, Lifecycle {
 	}
 
 	private boolean isQualityControlEnabled() {
-		return engineEnabledForAnyFile(getSearchDefinition().getInputFiles(), engines.getQuameterEngine());
+		return getSearchDefinition().getEnabledEngines().isEnabled(engines.getQuameterEngine());
 	}
 
 	/**
@@ -260,7 +260,7 @@ public final class SearchRunner implements Runnable, Lifecycle {
 	 * @param defaultSearchParameters What parameters to use when searching, if the file does not specify otherwise.
 	 * @param publicSearchFiles       True when the intermediate search files should be made public.
 	 */
-	void inputFileToTasks(final FileSearch inputFile, final SearchEngineParameters defaultSearchParameters, final boolean publicSearchFiles) {
+	void inputFileToTasks(final FileSearch inputFile, final EnabledEngines enabledEngines, final SearchEngineParameters defaultSearchParameters, final boolean publicSearchFiles) {
 		final SearchEngineParameters searchParameters = inputFile.getSearchParametersWithDefault(defaultSearchParameters);
 
 		final FileProducingTask conversion = addRawConversionTask(inputFile, null);
@@ -281,11 +281,11 @@ public final class SearchRunner implements Runnable, Lifecycle {
 			// All 'normal' searches get normal entries
 			// While building these, the Scaffold search entry itself is initialized
 			// The IdpQonvert search is special as well, it is set up to process the results of the myrimatch search
-			if (isNormalEngine(engine) && engineEnabledForFile(inputFile, engine)) {
+			if (isNormalEngine(engine) && enabledEngines.isEnabled(engine)) {
 				final EngineSearchTask search = addEngineSearchTask(engine, inputFile, conversion, searchParameters, publicSearchFiles);
 
 				scaffoldTask = addScaffoldAndQaTasks(scaffoldTask, inputFile, conversion, scaffoldDeployment, engine, search);
-				if (searchWithIdpQonvert(inputFile) && myrimatch(engine)) {
+				if (searchWithIdpQonvert() && myrimatch(engine)) {
 					addIdpQonvertTask(idpQonvert, search, true);
 				}
 			}
@@ -324,26 +324,10 @@ public final class SearchRunner implements Runnable, Lifecycle {
 	}
 
 	private DatabaseDeployment addScaffoldDatabaseDeployment(final FileSearch inputFile, final SearchEngine scaffold, final Curation database) {
-		if (scaffold != null && scaffoldVersion(inputFile) != null) {
+		if (scaffold != null && scaffoldVersion() != null) {
 			return addDatabaseDeployment(scaffold, null/*scaffold has no param file*/, database);
 		}
 		return null;
-	}
-
-	private boolean engineEnabledForAnyFile(final List<FileSearch> searches, final SearchEngine engine) {
-		if (engine == null) {
-			return false;
-		}
-		for (final FileSearch search : searches) {
-			if (engineEnabledForFile(search, engine)) {
-				return true;
-			}
-		}
-		return false;
-	}
-
-	private boolean engineEnabledForFile(final FileSearch inputFile, final SearchEngine engine) {
-		return inputFile.getEnabledEngines().isEnabled(new SearchEngineConfig(engine.getCode(), engine.getVersion()));
 	}
 
 	private EngineSearchTask addEngineSearchTask(final SearchEngine engine, final FileSearch inputFile,
@@ -381,7 +365,8 @@ public final class SearchRunner implements Runnable, Lifecycle {
 		final QuameterTask task = addTask(
 				new QuameterTask(workflowEngine,
 						getSearchDefinition(), quaMeter.getSearchDaemon(),
-						search, rawFile, getOutputFolderForSearchEngine(quaMeter), fileTokenFactory, isFromScratch(), publicSearchFiles));
+						search, rawFile, getOutputFolderForSearchEngine(quaMeter), fileTokenFactory, isFromScratch(), publicSearchFiles)
+		);
 		task.addDependency(search);
 		if (searchDbTask != null) {
 			final QuameterDbTask dbTask = addTask(
@@ -391,7 +376,8 @@ public final class SearchRunner implements Runnable, Lifecycle {
 							isFromScratch(),
 							searchDbTask,
 							task,
-							fileSearch));
+							fileSearch)
+			);
 			dbTask.addDependency(task);
 			dbTask.addDependency(searchDbTask);
 		}
@@ -408,7 +394,7 @@ public final class SearchRunner implements Runnable, Lifecycle {
 	                                                   final DatabaseDeployment scaffoldDeployment,
 	                                                   final SearchEngine engine, final EngineSearchTask search) {
 		ScaffoldSpectrumTask scaffoldTask = previousScaffoldTask;
-		final String scaffoldVersion = scaffoldVersion(inputFile);
+		final String scaffoldVersion = scaffoldVersion();
 		if (scaffoldVersion != null && scaffoldShouldUseEngine(engine, scaffoldVersion)) {
 			if (scaffoldDeployment == null) {
 				throw new MprcException("Scaffold search submitted without having Scaffold service enabled.");
@@ -423,12 +409,12 @@ public final class SearchRunner implements Runnable, Lifecycle {
 		return scaffoldTask;
 	}
 
-	private String scaffoldVersion(final FileSearch inputFile) {
-		return inputFile.searchVersion("SCAFFOLD");
+	private String scaffoldVersion() {
+		return getSearchDefinition().getEnabledEngines().getEngineVersion("SCAFFOLD");
 	}
 
-	private boolean searchWithIdpQonvert(final FileSearch inputFile) {
-		return inputFile.isSearch("IDPQONVERT");
+	private boolean searchWithIdpQonvert() {
+		return getSearchDefinition().getEnabledEngines().isEnabled("IDPQONVERT");
 	}
 
 	private boolean sequest(final SearchEngine engine) {
@@ -641,7 +627,7 @@ public final class SearchRunner implements Runnable, Lifecycle {
 	}
 
 	private void addScaffoldReportStep(final SwiftSearchDefinition searchDefinition) {
-		if (scaffoldVersion(searchDefinition.getInputFiles().iterator().next()) != null) {
+		if (scaffoldVersion() != null) {
 			final List<File> scaffoldOutputFiles = new ArrayList<File>(scaffoldCalls.size());
 
 			for (final ScaffoldTaskI scaffoldTask : scaffoldCalls) {

@@ -68,7 +68,8 @@ class ScafmlDump {
 				throw new DaemonException(
 						"Cannot find fasta db path for database " + fastaDbId
 								+ " in the table of deployed databases:\n"
-								+ deployedDatabaseTableToString(deployedDatabases));
+								+ deployedDatabaseTableToString(deployedDatabases)
+				);
 			}
 			String dbId = null;
 			// Generate db id for given fasta file.
@@ -117,8 +118,8 @@ class ScafmlDump {
 					final String engineCode = result.getKey();
 					// We add the particular search only if it is enabled for given engine
 					if (file != null
-							&& inputFile.isSearch(engineCode)
-							&& isProcessedByScaffold(inputFile)) {
+							&& definition.isSearch(engineCode)
+							&& definition.isSearch("SCAFFOLD")) {
 						// Add input file
 						final ScafmlInputFile scafmlInputFile = new ScafmlInputFile();
 						scafmlInputFile.setID(inputFile.getId() + '_' + String.valueOf(i));
@@ -165,10 +166,6 @@ class ScafmlDump {
 		se.setExport(export);
 
 		return sc;
-	}
-
-	private static boolean isProcessedByScaffold(final FileSearch inputFile) {
-		return inputFile.isSearch("SCAFFOLD");
 	}
 
 	static String deployedDatabaseTableToString(final Map<String, File> deployedDatabases) {

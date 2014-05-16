@@ -196,7 +196,6 @@ public final class ClientProxyGenerator {
 				entry.getBiologicalSample().trim(),
 				entry.getCategoryName().trim(),
 				entry.getExperiment().trim(),
-				convertFrom(entry.getEnabledEngines()),
 				null);
 	}
 
@@ -248,7 +247,6 @@ public final class ClientProxyGenerator {
 					fileSearch.getBiologicalSample(),
 					fixedCategoryName(fileSearch),
 					fileSearch.getExperiment(),
-					convertTo(fileSearch.getEnabledEngines()),
 					inputFileSize);
 
 			clientInputFiles.add(search);
@@ -259,6 +257,7 @@ public final class ClientProxyGenerator {
 				convertTo(definition.getUser()),
 				relativeOutputFolderPath,
 				resolver.resolve(definition.getSearchParameters(), definition.getUser()),
+				convertTo(definition.getEnabledEngines()),
 				clientInputFiles,
 				convertTo(definition.getQa()),
 				convertTo(definition.getPeptideReport()),
@@ -356,6 +355,7 @@ public final class ClientProxyGenerator {
 				convertFrom(definition.getSpectrumQa()),
 				convertFrom(definition.getPeptideReport()),
 				parameters,
+				convertFrom(definition.getEnabledEngines()),
 				fileEntries,
 				definition.isPublicMgfFiles(),
 				definition.isPublicMzxmlFiles(),

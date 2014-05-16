@@ -274,7 +274,6 @@ public final class SwiftDaoHibernate extends DaoBase implements SwiftDao {
 
 	public FileSearch addFileSearch(final FileSearch fileSearch) {
 		try {
-			fileSearch.setEnabledEngines(addEnabledEngines(fileSearch.getEnabledEngines()));
 			return save(fileSearch, getFileSearchEqualityCriteria(fileSearch), false);
 		} catch (Exception t) {
 			throw new MprcException("Could not add file search information", t);
@@ -287,7 +286,6 @@ public final class SwiftDaoHibernate extends DaoBase implements SwiftDao {
 				.add(DaoBase.nullSafeEq("biologicalSample", fileSearch.getBiologicalSample()))
 				.add(DaoBase.nullSafeEq("categoryName", fileSearch.getCategoryName()))
 				.add(DaoBase.nullSafeEq("experiment", fileSearch.getExperiment()))
-				.add(DaoBase.associationEq("enabledEngines", fileSearch.getEnabledEngines()))
 				.add(DaoBase.nullSafeEq("swiftSearchDefinitionId", fileSearch.getSwiftSearchDefinitionId()));
 	}
 

@@ -152,8 +152,9 @@ public final class BulkLoadingTest extends DaoTest {
 		}
 
 		List<FileSearch> inputFiles = new ArrayList<FileSearch>(1);
-		inputFiles.add(new FileSearch(new File("input.mgf"), "sample", "category", "experiment", new EnabledEngines(), null));
-		SwiftSearchDefinition searchDefinition = new SwiftSearchDefinition("test", user, new File("out"), null, null, null, inputFiles, false, false, false, new HashMap<String, String>(0));
+		EnabledEngines enabledEngines = new EnabledEngines();
+		inputFiles.add(new FileSearch(new File("input.mgf"), "sample", "category", "experiment", null));
+		SwiftSearchDefinition searchDefinition = new SwiftSearchDefinition("test", user, new File("out"), null, null, null, enabledEngines, inputFiles, false, false, false, new HashMap<String, String>(0));
 		searchDefinition = swiftDao.addSwiftSearchDefinition(searchDefinition);
 
 		SearchRun searchRun = swiftDao.fillSearchRun(searchDefinition);

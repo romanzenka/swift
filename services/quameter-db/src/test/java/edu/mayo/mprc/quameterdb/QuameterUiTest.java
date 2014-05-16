@@ -70,7 +70,8 @@ public final class QuameterUiTest extends DaoTest {
 						new DateTime(2014, 1, 10, 10, 20, 30, 0),
 						60.0,
 						"comment",
-						"sample Information"));
+						"sample Information")
+		);
 
 		sample2 = searchDbDao.addTandemMassSpectrometrySample(
 				new TandemMassSpectrometrySample(
@@ -84,11 +85,12 @@ public final class QuameterUiTest extends DaoTest {
 						new DateTime(2014, 2, 12, 12, 21, 22, 23),
 						120.0,
 						"comment 2",
-						"sample Information 2"));
+						"sample Information 2")
+		);
 
 
-		fileSearch1 = swiftDao.addFileSearch(new FileSearch(new File("test.RAW"), "bioSample", "category", "experiment", new EnabledEngines(), null));
-		fileSearch2 = swiftDao.addFileSearch(new FileSearch(new File("test2.RAW"), "bioSample2", "category2", "experiment2", new EnabledEngines(), null));
+		fileSearch1 = swiftDao.addFileSearch(new FileSearch(new File("test.RAW"), "bioSample", "category", "experiment", null));
+		fileSearch2 = swiftDao.addFileSearch(new FileSearch(new File("test2.RAW"), "bioSample2", "category2", "experiment2", null));
 		final List<FileSearch> fileSearches = Arrays.asList(fileSearch1, fileSearch2);
 		final Map<String, String> metadata = new HashMap<String, String>(1);
 		metadata.put("quameter.category", "AL-Kappa");
@@ -96,8 +98,9 @@ public final class QuameterUiTest extends DaoTest {
 		User user = workspaceDao.addNewUser("Tester", "Testin", "test@test.tst", new Change("testing", new DateTime()));
 
 		final SwiftSearchDefinition definition = swiftDao.addSwiftSearchDefinition(
-				new SwiftSearchDefinition("test", user, null, null, null, null, fileSearches,
-						false, false, false, metadata));
+				new SwiftSearchDefinition("test", user, null, null, null, null, new EnabledEngines(), fileSearches,
+						false, false, false, metadata)
+		);
 
 		final SearchRun searchRun = swiftDao.fillSearchRun(definition);
 		searchRun.setHidden(0);

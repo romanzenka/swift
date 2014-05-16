@@ -11,7 +11,7 @@ import java.util.Collection;
 
 /**
  * Manages a set of search engines, given search definition it can produce
- * search engine with a version as specified by the first input file.
+ * search engine with a particular version.
  *
  * @author Roman Zenka
  */
@@ -82,10 +82,6 @@ public final class SearchEngineList {
 	 * Enabled engines are those that the first searched file enables (for now)
 	 */
 	private EnabledEngines getEnabledEngines() {
-		return searchDefinition.getInputFiles().get(0).getEnabledEngines();
-	}
-
-	public void assertValid() {
-		assert searchEngines != null : "Search engine set must not be null";
+		return searchDefinition.getEnabledEngines();
 	}
 }

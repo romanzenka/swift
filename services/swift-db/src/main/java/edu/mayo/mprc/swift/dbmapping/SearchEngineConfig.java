@@ -2,6 +2,7 @@ package edu.mayo.mprc.swift.dbmapping;
 
 import edu.mayo.mprc.MprcException;
 import edu.mayo.mprc.database.PersistableBase;
+import edu.mayo.mprc.swift.db.SearchEngine;
 
 /**
  * User-editable information about a supported search engine.
@@ -42,7 +43,7 @@ public class SearchEngineConfig extends PersistableBase {
 		return version;
 	}
 
-	public void setVersion(String version) {
+	public void setVersion(final String version) {
 		if (version == null) {
 			throw new MprcException("Search engine version cannot be null");
 		}
@@ -50,7 +51,7 @@ public class SearchEngineConfig extends PersistableBase {
 	}
 
 	@Override
-	public boolean equals(Object o) {
+	public boolean equals(final Object o) {
 		if (this == o) {
 			return true;
 		}
@@ -58,7 +59,7 @@ public class SearchEngineConfig extends PersistableBase {
 			return false;
 		}
 
-		SearchEngineConfig that = (SearchEngineConfig) o;
+		final SearchEngineConfig that = (SearchEngineConfig) o;
 
 		if (!code.equals(that.code)) {
 			return false;
@@ -75,5 +76,13 @@ public class SearchEngineConfig extends PersistableBase {
 		int result = code.hashCode();
 		result = 31 * result + version.hashCode();
 		return result;
+	}
+
+	/**
+	 * @param engine Engine to check for match
+	 * @return True if the config matches an actual engine.
+	 */
+	public boolean isMatching(final SearchEngine engine) {
+		return code.equals(engine.getCode()) && version.equals(engine.getVersion());
 	}
 }

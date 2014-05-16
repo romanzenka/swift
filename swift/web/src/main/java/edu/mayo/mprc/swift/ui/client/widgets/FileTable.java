@@ -11,7 +11,6 @@ import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.user.client.ui.*;
 import com.google.gwt.view.client.SelectionChangeEvent;
 import edu.mayo.mprc.swift.ui.client.rpc.ClientFileSearch;
-import edu.mayo.mprc.swift.ui.client.rpc.ClientSearchEngineConfig;
 import edu.mayo.mprc.swift.ui.client.rpc.files.FileInfo;
 
 import java.util.ArrayList;
@@ -460,7 +459,7 @@ public final class FileTable extends FlexTable implements HasValueChangeHandlers
 
 	}
 
-	public List<ClientFileSearch> getData(final ArrayList<ClientSearchEngineConfig> enabledEngines) {
+	public List<ClientFileSearch> getData() {
 		final List<ClientFileSearch> results = new ArrayList<ClientFileSearch>(getRowCount() - getFirstDataRow());
 
 		for (int row = getFirstDataRow(); row < getRowCount(); row++) {
@@ -478,7 +477,6 @@ public final class FileTable extends FlexTable implements HasValueChangeHandlers
 					sampleName,
 					categoryName,
 					experimentName,
-					enabledEngines,
 					null));
 		}
 		return results;

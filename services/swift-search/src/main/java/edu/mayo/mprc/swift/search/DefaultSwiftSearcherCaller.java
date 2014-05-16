@@ -118,7 +118,7 @@ public final class DefaultSwiftSearcherCaller implements SwiftSearcherCaller {
 	private static void validateQuaMeterAndMudpit(final SwiftSearchDefinition swiftSearch) {
 		final Set<String> quameterSampleExperimentNames = new HashSet<String>(10);
 		for (final FileSearch fileSearch : swiftSearch.getInputFiles()) {
-			if (fileSearch.getEnabledEngines().isEnabled("QUAMETER")) {
+			if (swiftSearch.isSearch("QUAMETER")) {
 				final String sampleExperiment =
 						fileSearch.getBiologicalSample() +
 								">><<" +
@@ -158,11 +158,13 @@ public final class DefaultSwiftSearcherCaller implements SwiftSearcherCaller {
 			final String categoryName = searchInput.getCategoryNames()[i];
 			final String experiment = searchInput.getExperiments()[i];
 
-			inputFiles.add(new FileSearch(inputFile, biologicalSample, categoryName, experiment, enabledEngines, getSearchEngineParameters(paramSetIds[i])));
+			inputFiles.add(new FileSearch(inputFile, biologicalSample, categoryName, experiment, getSearchEngineParameters(paramSetIds[i])));
 		}
 
 		return new SwiftSearchDefinition(searchInput.getTitle(),
-				user, outputFolder, qa, report, getSearchEngineParameters(searchInput.getParamSetId()), inputFiles,
+				user, outputFolder, qa, report, getSearchEngineParameters(searchInput.getParamSetId()),
+				enabledEngines,
+				inputFiles,
 				searchInput.isPublicMgfFiles(),
 				searchInput.isPublicMzxmlFiles(),
 				searchInput.isPublicSearchFiles(),

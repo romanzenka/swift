@@ -26,11 +26,6 @@ public class FileSearch extends PersistableBase {
 	 */
 	private String experiment;
 
-	/**
-	 * Set of requested search engines.
-	 */
-	private EnabledEngines enabledEngines;
-
 	private Integer swiftSearchDefinitionId;
 
 	private SearchEngineParameters searchParameters;
@@ -38,12 +33,11 @@ public class FileSearch extends PersistableBase {
 	public FileSearch() {
 	}
 
-	public FileSearch(final File inputFile, final String biologicalSample, final String categoryName, final String experiment, final EnabledEngines enabledEngines, final SearchEngineParameters searchParameters) {
+	public FileSearch(final File inputFile, final String biologicalSample, final String categoryName, final String experiment, final SearchEngineParameters searchParameters) {
 		this.inputFile = inputFile;
 		this.biologicalSample = biologicalSample;
 		this.categoryName = categoryName;
 		this.experiment = experiment;
-		this.enabledEngines = enabledEngines;
 		this.searchParameters = searchParameters;
 	}
 
@@ -77,14 +71,6 @@ public class FileSearch extends PersistableBase {
 
 	void setExperiment(final String experiment) {
 		this.experiment = experiment;
-	}
-
-	public EnabledEngines getEnabledEngines() {
-		return enabledEngines;
-	}
-
-	public void setEnabledEngines(final EnabledEngines enabledEngines) {
-		this.enabledEngines = enabledEngines;
 	}
 
 	public Integer getSwiftSearchDefinitionId() {
@@ -124,9 +110,6 @@ public class FileSearch extends PersistableBase {
 		if (getCategoryName() != null ? !getCategoryName().equals(that.getCategoryName()) : that.getCategoryName() != null) {
 			return false;
 		}
-		if (getEnabledEngines() != null ? !getEnabledEngines().equals(that.getEnabledEngines()) : that.getEnabledEngines() != null) {
-			return false;
-		}
 		if (getExperiment() != null ? !getExperiment().equals(that.getExperiment()) : that.getExperiment() != null) {
 			return false;
 		}
@@ -149,17 +132,8 @@ public class FileSearch extends PersistableBase {
 		result = 31 * result + (getBiologicalSample() != null ? getBiologicalSample().hashCode() : 0);
 		result = 31 * result + (getCategoryName() != null ? getCategoryName().hashCode() : 0);
 		result = 31 * result + (getExperiment() != null ? getExperiment().hashCode() : 0);
-		result = 31 * result + (getEnabledEngines() != null ? getEnabledEngines().hashCode() : 0);
 		result = 31 * result + (getSwiftSearchDefinitionId() != null ? getSwiftSearchDefinitionId().hashCode() : 0);
 		result = 31 * result + (getSearchParameters() != null ? getSearchParameters().hashCode() : 0);
 		return result;
-	}
-
-	public boolean isSearch(final String searchEngineCode) {
-		return enabledEngines != null && enabledEngines.isEnabled(searchEngineCode);
-	}
-
-	public String searchVersion(final String searchEngineCode) {
-		return enabledEngines != null ? enabledEngines.enabledVersion(searchEngineCode) : null;
 	}
 }

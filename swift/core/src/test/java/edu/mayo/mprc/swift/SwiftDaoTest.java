@@ -148,40 +148,40 @@ public final class SwiftDaoTest {
 	public void doubleSaveSearchDefinition() throws Throwable {
 		swiftDao.begin();
 		try {
-			SwiftSearchDefinition blank1 = new SwiftSearchDefinition("Blank search", null, null, null, null, null, new ArrayList<FileSearch>(), false, false, false, new HashMap<String, String>(0));
-			blank1 = swiftDao.addSwiftSearchDefinition(blank1);
-			SwiftSearchDefinition blank2 = new SwiftSearchDefinition("Blank search", null, null, null, null, null, new ArrayList<FileSearch>(), false, false, false, new HashMap<String, String>(0));
-			blank2 = swiftDao.addSwiftSearchDefinition(blank2);
-			Assert.assertEquals(blank2.getId(), blank1.getId(), "Blank searches has to be stored as one");
-
-			final File f = new File("testFolder");
-			final SwiftSearchDefinition folder1 = new SwiftSearchDefinition("Folder search", null, f, null, null, null, new ArrayList<FileSearch>(), false, false, false, new HashMap<String, String>(0));
-			blank1 = swiftDao.addSwiftSearchDefinition(blank1);
-			final File f2 = new File("testFolder");
-			final SwiftSearchDefinition folder2 = new SwiftSearchDefinition("Folder search", null, f2, null, null, null, new ArrayList<FileSearch>(), false, false, false, new HashMap<String, String>(0));
-			blank2 = swiftDao.addSwiftSearchDefinition(blank2);
-			Assert.assertEquals(folder2.getId(), folder1.getId(), "Folder searches has to be stored as one");
-
 			SearchEngineConfig searchEngineConfig = new SearchEngineConfig("MASCOT", "2.4");
 			searchEngineConfig = swiftDao.addSearchEngineConfig(searchEngineConfig);
 			final EnabledEngines engines = new EnabledEngines();
 			engines.add(searchEngineConfig);
 
+			SwiftSearchDefinition blank1 = new SwiftSearchDefinition("Blank search", null, null, null, null, null, engines, new ArrayList<FileSearch>(), false, false, false, new HashMap<String, String>(0));
+			blank1 = swiftDao.addSwiftSearchDefinition(blank1);
+			SwiftSearchDefinition blank2 = new SwiftSearchDefinition("Blank search", null, null, null, null, null, engines, new ArrayList<FileSearch>(), false, false, false, new HashMap<String, String>(0));
+			blank2 = swiftDao.addSwiftSearchDefinition(blank2);
+			Assert.assertEquals(blank2.getId(), blank1.getId(), "Blank searches has to be stored as one");
+
+			final File f = new File("testFolder");
+			final SwiftSearchDefinition folder1 = new SwiftSearchDefinition("Folder search", null, f, null, null, null, engines, new ArrayList<FileSearch>(), false, false, false, new HashMap<String, String>(0));
+			blank1 = swiftDao.addSwiftSearchDefinition(blank1);
+			final File f2 = new File("testFolder");
+			final SwiftSearchDefinition folder2 = new SwiftSearchDefinition("Folder search", null, f2, null, null, null, engines, new ArrayList<FileSearch>(), false, false, false, new HashMap<String, String>(0));
+			blank2 = swiftDao.addSwiftSearchDefinition(blank2);
+			Assert.assertEquals(folder2.getId(), folder1.getId(), "Folder searches has to be stored as one");
+
 			SearchEngineParameters parameters = getSearchEngineParameters();
 
 			parameters = paramsDao.addSearchEngineParameters(parameters);
 
-			final FileSearch fileSearch1 = new FileSearch(new File("input.RAW"), "bio sample", null, "experiment", engines, parameters);
-			final FileSearch fileSearch2 = new FileSearch(new File("input.RAW"), "bio sample", null, "experiment", engines, parameters);
+			final FileSearch fileSearch1 = new FileSearch(new File("input.RAW"), "bio sample", null, "experiment", parameters);
+			final FileSearch fileSearch2 = new FileSearch(new File("input.RAW"), "bio sample", null, "experiment", parameters);
 
 			final LinkedList<FileSearch> fileSearches1 = new LinkedList<FileSearch>();
 			fileSearches1.add(fileSearch1);
 			final LinkedList<FileSearch> fileSearches2 = new LinkedList<FileSearch>();
 			fileSearches2.add(fileSearch2);
 
-			SwiftSearchDefinition file1 = new SwiftSearchDefinition("File search", null, null, null, null, null, fileSearches1, false, false, false, new HashMap<String, String>(0));
+			SwiftSearchDefinition file1 = new SwiftSearchDefinition("File search", null, null, null, null, null, engines, fileSearches1, false, false, false, new HashMap<String, String>(0));
 			file1 = swiftDao.addSwiftSearchDefinition(file1);
-			SwiftSearchDefinition file2 = new SwiftSearchDefinition("File search", null, null, null, null, null, fileSearches2, false, false, false, new HashMap<String, String>(0));
+			SwiftSearchDefinition file2 = new SwiftSearchDefinition("File search", null, null, null, null, null, engines, fileSearches2, false, false, false, new HashMap<String, String>(0));
 			file2 = swiftDao.addSwiftSearchDefinition(file2);
 			Assert.assertEquals(file2.getId(), file1.getId(), "File searches have to be stored as one");
 

@@ -324,11 +324,7 @@ public final class SwiftApp implements EntryPoint, HidesPageContentsWhileLoading
 
 		// Determine search type
 		SearchType searchType = null;
-		ClientFileSearch firstSearch = null;
 		for (final ClientFileSearch clientFileSearch : definition.getInputFiles()) {
-			if (firstSearch == null) {
-				firstSearch = clientFileSearch;
-			}
 			final String fileNamefileNameWithoutExtension = FilePathWidget.getFileNameWithoutExtension(clientFileSearch.getPath());
 			final SearchType newSearchType = SearchTypeList.getSearchTypeFromSetup(
 					definition.getSearchTitle(),
@@ -361,7 +357,7 @@ public final class SwiftApp implements EntryPoint, HidesPageContentsWhileLoading
 		selectUser(definition.getUser().getEmail());
 
 		additionalSettingsPanel.setDefinition(definition);
-		enabledEnginesPanel.setCurrentEngines(firstSearch.getEnabledEngines());
+		enabledEnginesPanel.setCurrentEngines(definition.getEnabledEngines());
 
 		showPageContentsAfterLoad();
 	}
@@ -643,7 +639,7 @@ public final class SwiftApp implements EntryPoint, HidesPageContentsWhileLoading
 	}
 
 	private List<ClientFileSearch> getFileSearches() {
-		return files != null ? files.getData(enabledEnginesPanel.getEnabledEngines()) : null;
+		return files != null ? files.getData() : null;
 	}
 
 	/**
@@ -727,7 +723,7 @@ public final class SwiftApp implements EntryPoint, HidesPageContentsWhileLoading
 			dialog.showModal();
 
 			try {
-				final List<ClientFileSearch> entries = files.getData(enabledEnginesPanel.getEnabledEngines());
+				final List<ClientFileSearch> entries = files.getData();
 
 				final ClientSpectrumQa clientSpectrumQa;
 				if (spectrumQaSetupPanel != null) {
@@ -740,6 +736,7 @@ public final class SwiftApp implements EntryPoint, HidesPageContentsWhileLoading
 						userInfo.get(users.getValue(users.getSelectedIndex())),
 						effectiveOutputPath,
 						paramsEditor.getSelectedParamSet(),
+						enabledEnginesPanel.getEnabledEngines(),
 						entries,
 						clientSpectrumQa,
 						reportSetupPanel == null ? new ClientPeptideReport(false) : reportSetupPanel.getParameters(),

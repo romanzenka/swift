@@ -3,7 +3,6 @@ package edu.mayo.mprc.swift.ui.client.rpc;
 import edu.mayo.mprc.swift.dbmapping.FileSearch;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 
 /**
  * One entry in the table of files. UI equivalent of {@link FileSearch}
@@ -19,7 +18,6 @@ public final class ClientFileSearch implements Serializable {
 	private String biologicalSample;
 	private String categoryName;
 	private String experiment;
-	private ArrayList<ClientSearchEngineConfig> enabledEngines;
 	// Optional - does not have to be filled in. Used to transfer file sizes when search is loaded
 	// When negative, it means the file could not be found on the filesystem
 	private Long fileSize;
@@ -34,14 +32,12 @@ public final class ClientFileSearch implements Serializable {
 	 * @param biologicalSample Name of the biological sample.
 	 * @param categoryName     Name of the category.
 	 * @param experiment       Name of the experiment.
-	 * @param enabledEngines   List of engines enabled for this file search
 	 */
-	public ClientFileSearch(final String inputFilePath, final String biologicalSample, final String categoryName, final String experiment, final ArrayList<ClientSearchEngineConfig> enabledEngines, final Long fileSize) {
+	public ClientFileSearch(final String inputFilePath, final String biologicalSample, final String categoryName, final String experiment, final Long fileSize) {
 		path = inputFilePath;
 		this.biologicalSample = biologicalSample;
 		this.categoryName = categoryName;
 		this.experiment = experiment;
-		this.enabledEngines = enabledEngines;
 		this.fileSize = fileSize;
 	}
 
@@ -59,10 +55,6 @@ public final class ClientFileSearch implements Serializable {
 
 	public String getCategoryName() {
 		return categoryName;
-	}
-
-	public ArrayList<ClientSearchEngineConfig> getEnabledEngines() {
-		return enabledEngines;
 	}
 
 	public Long getFileSize() {

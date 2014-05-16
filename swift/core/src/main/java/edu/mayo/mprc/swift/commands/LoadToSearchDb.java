@@ -230,9 +230,9 @@ public final class LoadToSearchDb implements SwiftCommand {
 			counter.addDependency(searchDbTask);
 			workflowEngine.addTask(counter);
 
-			for (final FileSearch fileSearch : swiftSearchDefinition.getInputFiles()) {
-				// Only load files that made it to Scaffold
-				if (fileSearch.isSearch("SCAFFOLD")) {
+			// Only load files when Scaffold was enabled
+			if (swiftSearchDefinition.isSearch("SCAFFOLD")) {
+				for (final FileSearch fileSearch : swiftSearchDefinition.getInputFiles()) {
 					final File rawFile = fileSearch.getInputFile();
 					if (!"RAW".equalsIgnoreCase(FileUtilities.getExtension(rawFile.getName()))) {
 						// We have a file that is not raw.

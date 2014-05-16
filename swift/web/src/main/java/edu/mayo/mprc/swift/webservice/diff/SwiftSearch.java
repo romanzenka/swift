@@ -50,7 +50,7 @@ public final class SwiftSearch {
 		}
 		startTimestamp = run.getStartTimestamp();
 		final SearchEngineParameters params = searchDefinition.getSearchParameters();
-		engines = enginesToString(searchDefinition.getInputFiles().iterator().next().getEnabledEngines().getEngineConfigs());
+		engines = enginesToString(searchDefinition.getEnabledEngines().getEngineConfigs());
 		curationName = params.getDatabase().getShortName();
 		enzymeName = params.getProtease().getName();
 		minTerminiCleavages = params.getMinTerminiCleavages();

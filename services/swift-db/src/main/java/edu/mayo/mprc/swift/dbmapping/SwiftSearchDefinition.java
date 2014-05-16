@@ -23,6 +23,7 @@ public class SwiftSearchDefinition extends PersistableBase {
 	private Boolean publicSearchFiles;
 
 	private SearchEngineParameters searchParameters;
+	private EnabledEngines enabledEngines;
 	private List<FileSearch> inputFiles;
 	private Map<String, String> metadata;
 
@@ -31,6 +32,7 @@ public class SwiftSearchDefinition extends PersistableBase {
 
 	public SwiftSearchDefinition(final String title, final User user, final File outputFolder, final SpectrumQa qa,
 	                             final PeptideReport peptideReport, final SearchEngineParameters searchParameters,
+	                             final EnabledEngines enabledEngines,
 	                             final List<FileSearch> inputFiles, final boolean publicMgfFiles,
 	                             final boolean publicMzxmlFiles, final boolean publicSearchFiles,
 	                             final Map<String, String> metadata) {
@@ -40,6 +42,7 @@ public class SwiftSearchDefinition extends PersistableBase {
 		this.qa = qa;
 		this.peptideReport = peptideReport;
 		this.searchParameters = searchParameters;
+		this.enabledEngines = enabledEngines;
 		this.inputFiles = inputFiles;
 		this.publicMgfFiles = publicMgfFiles;
 		this.publicMzxmlFiles = publicMzxmlFiles;
@@ -95,6 +98,14 @@ public class SwiftSearchDefinition extends PersistableBase {
 		this.searchParameters = searchParameters;
 	}
 
+	public EnabledEngines getEnabledEngines() {
+		return enabledEngines;
+	}
+
+	public void setEnabledEngines(EnabledEngines enabledEngines) {
+		this.enabledEngines = enabledEngines;
+	}
+
 	public List<FileSearch> getInputFiles() {
 		return inputFiles;
 	}
@@ -133,6 +144,14 @@ public class SwiftSearchDefinition extends PersistableBase {
 
 	public void setPublicSearchFiles(final Boolean publicSearchFiles) {
 		this.publicSearchFiles = publicSearchFiles;
+	}
+
+	public boolean isSearch(final String searchEngineCode) {
+		return enabledEngines != null && enabledEngines.isEnabled(searchEngineCode);
+	}
+
+	public String searchVersion(final String searchEngineCode) {
+		return enabledEngines != null ? enabledEngines.enabledVersion(searchEngineCode) : null;
 	}
 
 	@Override

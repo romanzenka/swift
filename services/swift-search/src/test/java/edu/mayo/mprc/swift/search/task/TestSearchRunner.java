@@ -61,8 +61,8 @@ public class TestSearchRunner {
 		final EnabledEngines engines = enabledEngines();
 
 		final List<FileSearch> inputFiles = Arrays.asList(
-				new FileSearch(raw1, "biosample", "category", "experiment", engines, searchEngineParameters1()),
-				new FileSearch(raw2, "biosample2", "category", "experiment", engines, searchEngineParameters1())
+				new FileSearch(raw1, "biosample", "category", "experiment", searchEngineParameters1()),
+				new FileSearch(raw2, "biosample2", "category", "experiment", searchEngineParameters1())
 		);
 
 		final SwiftSearchDefinition definition = defaultSearchDefinition(inputFiles);
@@ -99,8 +99,8 @@ public class TestSearchRunner {
 		final SearchEngineParameters searchParameters = searchEngineParameters1();
 		searchParameters.setExtractMsnSettings(new ExtractMsnSettings("", ExtractMsnSettings.MSCONVERT));
 		final List<FileSearch> inputFiles = Arrays.asList(
-				new FileSearch(raw1, "biosample", "category", "experiment", engines, searchParameters),
-				new FileSearch(raw2, "biosample2", "category", "experiment", engines, searchParameters)
+				new FileSearch(raw1, "biosample", "category", "experiment", searchParameters),
+				new FileSearch(raw2, "biosample2", "category", "experiment", searchParameters)
 		);
 
 		final SwiftSearchDefinition definition = defaultSearchDefinition(inputFiles);
@@ -128,8 +128,8 @@ public class TestSearchRunner {
 		final EnabledEngines engines = enabledEngines();
 
 		final List<FileSearch> inputFiles = Arrays.asList(
-				new FileSearch(raw1, "biosample", "category", "experiment", engines, searchEngineParameters1()),
-				new FileSearch(raw2, "biosample2", "category", "experiment", engines, searchEngineParameters2())
+				new FileSearch(raw1, "biosample", "category", "experiment", searchEngineParameters1()),
+				new FileSearch(raw2, "biosample2", "category", "experiment", searchEngineParameters2())
 		);
 
 		final SwiftSearchDefinition definition = defaultSearchDefinition(inputFiles);
@@ -163,8 +163,8 @@ public class TestSearchRunner {
 		final EnabledEngines engines = enabledEngines();
 
 		final List<FileSearch> inputFiles = Arrays.asList(
-				new FileSearch(raw1, "biosample", "category", "experiment", engines, searchEngineParameters1()),
-				new FileSearch(raw2, "biosample2", "category", "experiment", engines, searchEngineParameters3())
+				new FileSearch(raw1, "biosample", "category", "experiment", searchEngineParameters1()),
+				new FileSearch(raw2, "biosample2", "category", "experiment", searchEngineParameters3())
 		);
 
 		final SwiftSearchDefinition definition = defaultSearchDefinition(inputFiles);
@@ -200,8 +200,8 @@ public class TestSearchRunner {
 		final EnabledEngines engines = enabledEngines();
 
 		final List<FileSearch> inputFiles = Arrays.asList(
-				new FileSearch(raw1, "biosample", "category", "experiment1", engines, searchEngineParameters1()),
-				new FileSearch(raw2, "biosample2", "category", "experiment2", engines, searchEngineParameters1())
+				new FileSearch(raw1, "biosample", "category", "experiment1", searchEngineParameters1()),
+				new FileSearch(raw2, "biosample2", "category", "experiment2", searchEngineParameters1())
 		);
 
 		final SwiftSearchDefinition definition = defaultSearchDefinition(inputFiles);
@@ -235,8 +235,8 @@ public class TestSearchRunner {
 		final EnabledEngines engines = enabledEngines();
 
 		final List<FileSearch> inputFiles = Arrays.asList(
-				new FileSearch(raw1, "biosample", "category", "experiment", engines, searchEngineParametersMzml()),
-				new FileSearch(raw2, "biosample2", "category", "experiment", engines, searchEngineParametersMzml())
+				new FileSearch(raw1, "biosample", "category", "experiment", searchEngineParametersMzml()),
+				new FileSearch(raw2, "biosample2", "category", "experiment", searchEngineParametersMzml())
 		);
 
 		final SwiftSearchDefinition definition = defaultSearchDefinition(inputFiles);
@@ -274,8 +274,8 @@ public class TestSearchRunner {
 		final EnabledEngines engines = enabledEnginesWithQuameter();
 
 		final List<FileSearch> inputFiles = Arrays.asList(
-				new FileSearch(raw1, "biosample", "category", "experiment", engines, searchEngineParameters1()),
-				new FileSearch(raw2, "biosample2", "category", "experiment", engines, searchEngineParameters1())
+				new FileSearch(raw1, "biosample", "category", "experiment", searchEngineParameters1()),
+				new FileSearch(raw2, "biosample2", "category", "experiment", searchEngineParameters1())
 		);
 
 		final SwiftSearchDefinition definition = defaultSearchDefinition(inputFiles);
@@ -330,8 +330,8 @@ public class TestSearchRunner {
 		}
 
 		final List<FileSearch> inputFiles = Arrays.asList(
-				new FileSearch(raw1, "biosample", "category", "experiment", engines, parameters),
-				new FileSearch(raw2, "biosample2", "category", "experiment", engines, parameters)
+				new FileSearch(raw1, "biosample", "category", "experiment", parameters),
+				new FileSearch(raw2, "biosample2", "category", "experiment", parameters)
 		);
 
 		final SwiftSearchDefinition definition = defaultSearchDefinition(inputFiles);
@@ -412,6 +412,7 @@ public class TestSearchRunner {
 				new SpectrumQa("orbitrap", "msmsEval"),
 				new PeptideReport(),
 				searchEngineParameters1(),
+				enabledEngines(),
 				inputFiles,
 				false,
 				false,
