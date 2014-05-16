@@ -80,6 +80,8 @@ public class SearchEngineParameters extends PersistableBase {
 	 */
 	private ScaffoldSettings scaffoldSettings;
 
+	private EnabledEngines enabledEngines;
+
 	public SearchEngineParameters() {
 	}
 
@@ -222,6 +224,14 @@ public class SearchEngineParameters extends PersistableBase {
 
 	public void setScaffoldSettings(final ScaffoldSettings scaffoldSettings) {
 		this.scaffoldSettings = scaffoldSettings;
+	}
+
+	public EnabledEngines getEnabledEngines() {
+		return enabledEngines;
+	}
+
+	public void setEnabledEngines(EnabledEngines enabledEngines) {
+		this.enabledEngines = enabledEngines;
 	}
 
 	@Override

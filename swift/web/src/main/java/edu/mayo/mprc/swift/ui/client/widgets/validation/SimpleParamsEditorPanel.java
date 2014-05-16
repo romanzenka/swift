@@ -50,6 +50,7 @@ public final class SimpleParamsEditorPanel implements SourcesChangeEvents {
 	public static final String TOLERANCES = "tolerances";
 	public static final String INSTRUMENT = "instrument";
 	public static final String SCAFFOLD_SETTINGS = "scaffoldSettings";
+	public static final String ENABLED_ENGINES = "enabledEngines";
 
 	private ChangeListenerCollection listeners = new ChangeListenerCollection();
 
@@ -64,6 +65,7 @@ public final class SimpleParamsEditorPanel implements SourcesChangeEvents {
 	private boolean editorErrorMessageVisible = true;
 	private ModificationsLabel fixedMods;
 	private ModificationsLabel varMods;
+	private EnabledEnginesEditor enabledEngines;
 
 	//Current user
 	private ClientUser user;
@@ -364,6 +366,21 @@ public final class SimpleParamsEditorPanel implements SourcesChangeEvents {
 			editorElements.add(row.append(SCAFFOLD_SETTINGS, "scaffoldValidation", vp, editorVisible));
 		}
 
+		// enabled engines ////////////////////////////////////////////
+		{
+			final ExistingDOMPanel row = new ExistingDOMPanel("enginesRow");
+
+			final Label label = new Label("Engines:");
+			editorElements.add(row.append(ENABLED_ENGINES, "enginesLabel", label, editorVisible));
+			label.setHorizontalAlignment(HasHorizontalAlignment.ALIGN_RIGHT);
+			label.setStyleName(PARAMS_LABEL);
+			final ValidationPanel vp = new ValidationPanel(10);
+			final EnabledEnginesEditor ed = new EnabledEnginesEditor(pageData.getSearchEngines());
+			validationController.add(ed, ENABLED_ENGINES, vp);
+			editorElements.add(row.append(ENABLED_ENGINES, "enginesEntry", ed, editorVisible));
+			editorElements.add(row.append(ENABLED_ENGINES, "enginesValidation", vp, editorVisible));
+		}
+
 		validationController.setEnabled(false);
 		selectionController.setParamSetList(pageData.getParamSetList());
 		if (pageData.loadedSearch() == null) {
@@ -484,7 +501,7 @@ public final class SimpleParamsEditorPanel implements SourcesChangeEvents {
 
 	/**
 	 * @return true if it's possible to call flushParamsFiles(), that is, if the current parameter
-	 *         selections validate with no errors.
+	 * selections validate with no errors.
 	 */
 	public boolean isValid() {
 		return validationController.isValid();
@@ -498,7 +515,8 @@ public final class SimpleParamsEditorPanel implements SourcesChangeEvents {
 						selectionController.refresh();
 
 					}
-				});
+				}
+		);
 	}
 
 	private void preview() {
@@ -513,16 +531,17 @@ public final class SimpleParamsEditorPanel implements SourcesChangeEvents {
 			if (Window.confirm("Do you really want to delete parameter set " + setToDelete.getName() + "?")) {
 				serviceAsync.delete(
 						selector.getSelectedParamSet(), new AsyncCallback<Void>() {
-					@Override
-					public void onFailure(final Throwable throwable) {
-						ErrorDialog.handleGlobalError(throwable);
-					}
+							@Override
+							public void onFailure(final Throwable throwable) {
+								ErrorDialog.handleGlobalError(throwable);
+							}
 
-					@Override
-					public void onSuccess(final Void aVoid) {
-						selectionController.refresh();
-					}
-				});
+							@Override
+							public void onSuccess(final Void aVoid) {
+								selectionController.refresh();
+							}
+						}
+				);
 			}
 		}
 	}

@@ -12,7 +12,11 @@ import edu.mayo.mprc.scaffold.ScaffoldWorker;
 import edu.mayo.mprc.swift.db.DatabaseFileTokenFactory;
 import edu.mayo.mprc.swift.db.SearchEngine;
 import edu.mayo.mprc.swift.db.SwiftDao;
-import edu.mayo.mprc.swift.dbmapping.*;
+import edu.mayo.mprc.swift.dbmapping.FileSearch;
+import edu.mayo.mprc.swift.dbmapping.SearchRun;
+import edu.mayo.mprc.swift.dbmapping.SpectrumQa;
+import edu.mayo.mprc.swift.dbmapping.SwiftSearchDefinition;
+import edu.mayo.mprc.swift.params2.EnabledEngines;
 import edu.mayo.mprc.swift.params2.ExtractMsnSettings;
 import edu.mayo.mprc.swift.params2.SearchEngineParameters;
 import edu.mayo.mprc.swift.params2.mapping.ParamsInfo;
@@ -248,7 +252,7 @@ public final class SearchRunner implements Runnable, Lifecycle {
 	}
 
 	private boolean isQualityControlEnabled() {
-		return getSearchDefinition().getEnabledEngines().isEnabled(engines.getQuameterEngine());
+		return getSearchDefinition().getSearchParameters().getEnabledEngines().isEnabled(engines.getQuameterEngine().getEngineConfig());
 	}
 
 	/**
@@ -281,7 +285,7 @@ public final class SearchRunner implements Runnable, Lifecycle {
 			// All 'normal' searches get normal entries
 			// While building these, the Scaffold search entry itself is initialized
 			// The IdpQonvert search is special as well, it is set up to process the results of the myrimatch search
-			if (isNormalEngine(engine) && enabledEngines.isEnabled(engine)) {
+			if (isNormalEngine(engine) && enabledEngines.isEnabled(engine.getEngineConfig())) {
 				final EngineSearchTask search = addEngineSearchTask(engine, inputFile, conversion, searchParameters, publicSearchFiles);
 
 				scaffoldTask = addScaffoldAndQaTasks(scaffoldTask, inputFile, conversion, scaffoldDeployment, engine, search);

@@ -3,7 +3,10 @@ package edu.mayo.mprc.swift.ui.server;
 import edu.mayo.mprc.MprcException;
 import edu.mayo.mprc.dbcurator.model.Curation;
 import edu.mayo.mprc.swift.db.SwiftDao;
-import edu.mayo.mprc.swift.dbmapping.*;
+import edu.mayo.mprc.swift.dbmapping.FileSearch;
+import edu.mayo.mprc.swift.dbmapping.PeptideReport;
+import edu.mayo.mprc.swift.dbmapping.SpectrumQa;
+import edu.mayo.mprc.swift.dbmapping.SwiftSearchDefinition;
 import edu.mayo.mprc.swift.params2.*;
 import edu.mayo.mprc.swift.params2.mapping.ParamsInfo;
 import edu.mayo.mprc.swift.params2.mapping.ParamsValidations;
@@ -180,9 +183,9 @@ public final class ClientProxyGenerator {
 		return new SearchEngineConfig(config.getCode(), config.getVersion());
 	}
 
-	public EnabledEngines convertFrom(final Iterable<ClientSearchEngineConfig> configs) {
+	public EnabledEngines convertFrom(final ClientEnabledEngines engines) {
 		final EnabledEngines enabledEngines = new EnabledEngines();
-		for (final ClientSearchEngineConfig engineInstance : configs) {
+		for (final ClientSearchEngineConfig engineInstance : engines.getEnabledEngines()) {
 			if (engineInstance != null) {
 				enabledEngines.add(convertFrom(engineInstance));
 			}
@@ -217,12 +220,12 @@ public final class ClientProxyGenerator {
 		return new ClientSearchEngineConfig(config.getCode(), config.getVersion());
 	}
 
-	public ArrayList<ClientSearchEngineConfig> convertTo(final EnabledEngines enabledEngines) {
+	public ClientEnabledEngines convertTo(final EnabledEngines enabledEngines) {
 		final ArrayList<ClientSearchEngineConfig> searchEngineConfigs = new ArrayList<ClientSearchEngineConfig>(enabledEngines.getEngineConfigs().size());
 		for (final SearchEngineConfig config : enabledEngines.getEngineConfigs()) {
 			searchEngineConfigs.add(convertTo(config));
 		}
-		return searchEngineConfigs;
+		return new ClientEnabledEngines(searchEngineConfigs);
 	}
 
 	public ClientSwiftSearchDefinition convertTo(final SwiftSearchDefinition definition, final ClientParamSetResolver resolver) {
@@ -257,7 +260,6 @@ public final class ClientProxyGenerator {
 				convertTo(definition.getUser()),
 				relativeOutputFolderPath,
 				resolver.resolve(definition.getSearchParameters(), definition.getUser()),
-				convertTo(definition.getEnabledEngines()),
 				clientInputFiles,
 				convertTo(definition.getQa()),
 				convertTo(definition.getPeptideReport()),
@@ -355,7 +357,6 @@ public final class ClientProxyGenerator {
 				convertFrom(definition.getSpectrumQa()),
 				convertFrom(definition.getPeptideReport()),
 				parameters,
-				convertFrom(definition.getEnabledEngines()),
 				fileEntries,
 				definition.isPublicMgfFiles(),
 				definition.isPublicMzxmlFiles(),
@@ -437,6 +438,8 @@ public final class ClientProxyGenerator {
 			return convertTo((ExtractMsnSettings) val);
 		} else if (val instanceof ScaffoldSettings) {
 			return convertTo((ScaffoldSettings) val);
+		} else if (val instanceof EnabledEngines) {
+			return convertTo((EnabledEngines) val);
 		} else if (val instanceof Integer) {
 			return new ClientInteger((Integer) val);
 		} else {
@@ -468,7 +471,8 @@ public final class ClientProxyGenerator {
 		} else if (val instanceof ClientProtease) {
 			return convertFrom((ClientProtease) val,
 					(Iterable<Protease>) allowedValues);
-
+		} else if (val instanceof ClientEnabledEngines) {
+			return convertFrom((ClientEnabledEngines) val);
 		} else {
 			throw new MprcException("Can't convert " + val.getClass().getName() + " from client proxy");
 		}

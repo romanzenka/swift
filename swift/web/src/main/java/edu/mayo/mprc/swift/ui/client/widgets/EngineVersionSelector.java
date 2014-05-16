@@ -109,4 +109,8 @@ public final class EngineVersionSelector extends HorizontalPanel implements Comp
 	public String getCode() {
 		return code;
 	}
+
+	public void focus() {
+		checkBox.setFocus(true);
+	}
 }

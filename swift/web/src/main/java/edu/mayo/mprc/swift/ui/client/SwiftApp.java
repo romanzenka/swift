@@ -46,8 +46,8 @@ public final class SwiftApp implements EntryPoint, HidesPageContentsWhileLoading
 	private ToggleButton editorToggle;
 	private SpectrumQaSetupPanel spectrumQaSetupPanel;
 	private ReportSetupPanel reportSetupPanel;
+	private QuameterCategorySelector quameterCategorySelector;
 	private AdditionalSettingsPanel additionalSettingsPanel;
-	private EnabledEnginesPanel enabledEnginesPanel;
 	/**
 	 * Metadata associated with the search
 	 */
@@ -155,7 +155,6 @@ public final class SwiftApp implements EntryPoint, HidesPageContentsWhileLoading
 				finalizeFileTableInit();
 				finalizeSpectrumQa(result.getSpectrumQaParamFileInfo());
 				finalizeInitReport(result.isScaffoldReportEnabled());
-				initEnabledEngines(result.getSearchEngines());
 				initAdditionalSettings(result.getSearchEngines());
 				initUserList(result.listUsers());
 				showPageContentsAfterLoad();
@@ -181,14 +180,6 @@ public final class SwiftApp implements EntryPoint, HidesPageContentsWhileLoading
 		additionalSettingsPanel = new AdditionalSettingsPanel(engines);
 		final RootPanel panel = RootPanel.get("publicResults");
 		panel.add(additionalSettingsPanel);
-	}
-
-	private void initEnabledEngines(final List<ClientSearchEngine> enabledEngines) {
-		enabledEnginesPanel = new EnabledEnginesPanel(enabledEngines, this, this);
-		final RootPanel panel = RootPanel.get("enginesPanel");
-		if (panel != null) {
-			panel.add(enabledEnginesPanel);
-		}
 	}
 
 	private void finalizeSpectrumQa(final List<SpectrumQaParamFileInfo> list) {
@@ -221,7 +212,8 @@ public final class SwiftApp implements EntryPoint, HidesPageContentsWhileLoading
 	private void finalizeInitReport(final Boolean reportEnabled) {
 		if (reportEnabled) {
 			DOM.setStyleAttribute(DOM.getElementById("reportingRow"), "display", "");
-			reportSetupPanel = new ReportSetupPanel();
+			quameterCategorySelector = new QuameterCategorySelector(this, this);
+			reportSetupPanel = new ReportSetupPanel(quameterCategorySelector);
 			final RootPanel rootPanel = RootPanel.get("report");
 			rootPanel.add(reportSetupPanel);
 		} else {
@@ -357,7 +349,6 @@ public final class SwiftApp implements EntryPoint, HidesPageContentsWhileLoading
 		selectUser(definition.getUser().getEmail());
 
 		additionalSettingsPanel.setDefinition(definition);
-		enabledEnginesPanel.setCurrentEngines(definition.getEnabledEngines());
 
 		showPageContentsAfterLoad();
 	}
@@ -736,7 +727,6 @@ public final class SwiftApp implements EntryPoint, HidesPageContentsWhileLoading
 						userInfo.get(users.getValue(users.getSelectedIndex())),
 						effectiveOutputPath,
 						paramsEditor.getSelectedParamSet(),
-						enabledEnginesPanel.getEnabledEngines(),
 						entries,
 						clientSpectrumQa,
 						reportSetupPanel == null ? new ClientPeptideReport(false) : reportSetupPanel.getParameters(),

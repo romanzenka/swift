@@ -412,7 +412,6 @@ public class TestSearchRunner {
 				new SpectrumQa("orbitrap", "msmsEval"),
 				new PeptideReport(),
 				searchEngineParameters1(),
-				enabledEngines(),
 				inputFiles,
 				false,
 				false,

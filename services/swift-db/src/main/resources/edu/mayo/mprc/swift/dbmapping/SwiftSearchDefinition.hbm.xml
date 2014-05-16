@@ -19,8 +19,6 @@
         <many-to-one name="searchParameters" class="edu.mayo.mprc.swift.params2.SearchEngineParameters"
             column="search_parameters" not-null="false" foreign-key="ssd_sp_fk" />
 
-        <many-to-one name="enabledEngines" class="EnabledEngines" column="enabled_engines" lazy="false" />
-
         <list name="inputFiles" cascade="all" lazy="false">
             <key column="input_files_id" />
             <list-index column="sort_order" />

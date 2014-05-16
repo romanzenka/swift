@@ -64,18 +64,6 @@ public interface SwiftDao extends Dao, RuntimeInitializer {
 
 	SearchRun getSearchRunForId(int searchRunId);
 
-	/**
-	 * Adds a search engine config. If the config already exists, the object gets updated.
-	 * Returns a serialized version of the config.
-	 *
-	 * @param config Search engine config.
-	 */
-	SearchEngineConfig addSearchEngineConfig(SearchEngineConfig config);
-
-	EnabledEngines addEnabledEngineSet(Iterable<SearchEngineConfig> searchEngineConfigs);
-
-	EnabledEngines addEnabledEngines(EnabledEngines engines);
-
 	SpectrumQa addSpectrumQa(SpectrumQa spectrumQa);
 
 	PeptideReport addPeptideReport(PeptideReport peptideReport);

@@ -3,9 +3,9 @@ package edu.mayo.mprc.swift.search.task;
 import edu.emory.mathcs.backport.java.util.Collections;
 import edu.mayo.mprc.MprcException;
 import edu.mayo.mprc.swift.db.SearchEngine;
-import edu.mayo.mprc.swift.dbmapping.EnabledEngines;
-import edu.mayo.mprc.swift.dbmapping.SearchEngineConfig;
 import edu.mayo.mprc.swift.dbmapping.SwiftSearchDefinition;
+import edu.mayo.mprc.swift.params2.EnabledEngines;
+import edu.mayo.mprc.swift.params2.SearchEngineConfig;
 
 import java.util.Collection;
 

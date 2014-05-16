@@ -1,5 +1,6 @@
 package edu.mayo.mprc.swift.params2;
 
+import com.google.common.base.Preconditions;
 import edu.mayo.mprc.MprcException;
 import edu.mayo.mprc.database.Change;
 import edu.mayo.mprc.database.DaoBase;
@@ -58,7 +59,10 @@ public final class ParamsDaoHibernate extends DaoBase implements ParamsDao {
 				PARAMS_FOLDER + "SavedSearchEngineParameters.hbm.xml",
 				PARAMS_FOLDER + "ExtractMsnSettings.hbm.xml",
 				PARAMS_FOLDER + "ScaffoldSettings.hbm.xml",
-				PARAMS_FOLDER + "StarredProteins.hbm.xml"
+				PARAMS_FOLDER + "StarredProteins.hbm.xml",
+				PARAMS_FOLDER + "EnabledEngines.hbm.xml",
+				PARAMS_FOLDER + "SearchEngineConfig.hbm.xml"
+
 		));
 		list.addAll(super.getHibernateMappings());
 		return list;
@@ -209,6 +213,7 @@ public final class ParamsDaoHibernate extends DaoBase implements ParamsDao {
 				.add(nullSafeEq("command", extractMsnSettings.getCommand()));
 	}
 
+
 	@Override
 	public ExtractMsnSettings addExtractMsnSettings(final ExtractMsnSettings extractMsnSettings) {
 		try {
@@ -262,6 +267,56 @@ public final class ParamsDaoHibernate extends DaoBase implements ParamsDao {
 		}
 	}
 
+	private static Criterion getSearchEngineEqualityCriteria(final SearchEngineConfig searchEngineConfig) {
+		return Restrictions.and(
+				DaoBase.nullSafeEq("code", searchEngineConfig.getCode()),
+				DaoBase.nullSafeEq("version", searchEngineConfig.getVersion())
+		);
+	}
+
+	@Override
+	public SearchEngineConfig addSearchEngineConfig(final SearchEngineConfig config) {
+		try {
+			return save(config, getSearchEngineEqualityCriteria(config), false);
+		} catch (Exception t) {
+			throw new MprcException("Cannot add new search engine config '" + config.getCode() + "'", t);
+		}
+	}
+
+	@Override
+	public EnabledEngines addEnabledEngineSet(final Iterable<SearchEngineConfig> searchEngineConfigs) {
+		try {
+			final EnabledEngines engines = new EnabledEngines();
+			for (final SearchEngineConfig config : searchEngineConfigs) {
+				final SearchEngineConfig searchEngineConfig = addSearchEngineConfig(config);
+				engines.add(searchEngineConfig);
+			}
+
+			return updateCollection(engines, engines.getEngineConfigs(), "engineConfigs");
+
+		} catch (Exception t) {
+			throw new MprcException("Could not add search engine set", t);
+		}
+	}
+
+	@Override
+	public EnabledEngines addEnabledEngines(final EnabledEngines engines) {
+		if (engines.getId() != null) {
+			return engines;
+		}
+		Preconditions.checkNotNull(engines, "Enabled engine list must not be null");
+		try {
+			final EnabledEngines result = new EnabledEngines();
+			result.setId(engines.getId());
+			for (final SearchEngineConfig searchEngineConfig : engines.getEngineConfigs()) {
+				result.add(addSearchEngineConfig(searchEngineConfig));
+			}
+			return updateCollection(result, result.getEngineConfigs(), "engineConfigs");
+		} catch (Exception t) {
+			throw new MprcException("Could not add search engine set", t);
+		}
+	}
+
 	@Override
 	public ModSet updateModSet(final ModSet modSet) {
 		if (modSet.getId() != null) {
@@ -290,6 +345,7 @@ public final class ParamsDaoHibernate extends DaoBase implements ParamsDao {
 		parameters.setVariableModifications(updateModSet(parameters.getVariableModifications()));
 		parameters.setExtractMsnSettings(addExtractMsnSettings(parameters.getExtractMsnSettings()));
 		parameters.setScaffoldSettings(addScaffoldSettings(parameters.getScaffoldSettings()));
+		parameters.setEnabledEngines(addEnabledEngines(parameters.getEnabledEngines()));
 
 		final Criteria criteria = session.createCriteria(SearchEngineParameters.class);
 		if (parameters.getDatabase() != null) {
@@ -307,6 +363,7 @@ public final class ParamsDaoHibernate extends DaoBase implements ParamsDao {
 				.add(associationEq("instrument", parameters.getInstrument()))
 				.add(associationEq("extractMsnSettings", parameters.getExtractMsnSettings()))
 				.add(associationEq("scaffoldSettings", parameters.getScaffoldSettings()))
+				.add(associationEq("enabledEngines", parameters.getEnabledEngines()))
 		;
 		final List<SearchEngineParameters> parameterList = listAndCast(criteria);
 		final SearchEngineParameters existing =
@@ -335,7 +392,8 @@ public final class ParamsDaoHibernate extends DaoBase implements ParamsDao {
 		try {
 			return listAndCast(
 					allCriteria(SavedSearchEngineParameters.class)
-							.addOrder(Order.asc("name").ignoreCase()));
+							.addOrder(Order.asc("name").ignoreCase())
+			);
 
 		} catch (Exception t) {
 			throw new MprcException("Cannot list all saved search parameters", t);
@@ -377,7 +435,8 @@ public final class ParamsDaoHibernate extends DaoBase implements ParamsDao {
 		try {
 			final List<SavedSearchEngineParameters> list = listAndCast(
 					allCriteria(SavedSearchEngineParameters.class)
-							.add(Restrictions.eq("parameters", parameters)));
+							.add(Restrictions.eq("parameters", parameters))
+			);
 			if (list.isEmpty()) {
 				return null;
 			}

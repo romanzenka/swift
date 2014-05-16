@@ -3,7 +3,6 @@ package edu.mayo.mprc.swift.ui.client.rpc;
 import edu.mayo.mprc.swift.dbmapping.SwiftSearchDefinition;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
@@ -27,7 +26,6 @@ public final class ClientSwiftSearchDefinition implements Serializable {
 
 	private boolean fromScratch; // Rerun everything from scratch, no caching
 
-	private ArrayList<ClientSearchEngineConfig> enabledEngines;
 	private List<ClientFileSearch> inputFiles;
 
 	// Search run id in case this search was previously run
@@ -47,7 +45,6 @@ public final class ClientSwiftSearchDefinition implements Serializable {
 	 * @param user              User.
 	 * @param outputFolder      Output folder. Relative to browse root - the folder that is root for the UI.
 	 *                          Example "/instruments/search1234"
-	 * @param enabledEngines    Enabled engines
 	 * @param inputFiles        Table of files to be searched + information about how to search them.
 	 * @param spectrumQa        Parameters for spectrum QA.
 	 * @param peptideReport     Parameters for peptide report
@@ -58,7 +55,6 @@ public final class ClientSwiftSearchDefinition implements Serializable {
 	 */
 	public ClientSwiftSearchDefinition(final String searchTitle, final ClientUser user, final String outputFolder,
 	                                   final ClientParamSet paramSet,
-	                                   final ArrayList<ClientSearchEngineConfig> enabledEngines,
 	                                   final List<ClientFileSearch> inputFiles,
 	                                   final ClientSpectrumQa spectrumQa, final ClientPeptideReport peptideReport,
 	                                   final boolean publicMgfFiles, final boolean publicMzxmlFiles, final boolean publicSearchFiles,
@@ -68,7 +64,6 @@ public final class ClientSwiftSearchDefinition implements Serializable {
 		this.user = user;
 		this.outputFolder = outputFolder;
 		this.paramSet = paramSet;
-		this.enabledEngines = enabledEngines;
 		this.inputFiles = inputFiles;
 		clientSpectrumQa = spectrumQa;
 		clientPeptideReport = peptideReport;
@@ -90,10 +85,6 @@ public final class ClientSwiftSearchDefinition implements Serializable {
 
 	public String getOutputFolder() {
 		return outputFolder;
-	}
-
-	public ArrayList<ClientSearchEngineConfig> getEnabledEngines() {
-		return enabledEngines;
 	}
 
 	public List<ClientFileSearch> getInputFiles() {

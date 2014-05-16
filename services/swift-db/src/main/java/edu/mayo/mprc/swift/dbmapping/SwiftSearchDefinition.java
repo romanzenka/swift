@@ -1,6 +1,7 @@
 package edu.mayo.mprc.swift.dbmapping;
 
 import edu.mayo.mprc.database.PersistableBase;
+import edu.mayo.mprc.swift.params2.EnabledEngines;
 import edu.mayo.mprc.swift.params2.SearchEngineParameters;
 import edu.mayo.mprc.workspace.User;
 
@@ -23,7 +24,6 @@ public class SwiftSearchDefinition extends PersistableBase {
 	private Boolean publicSearchFiles;
 
 	private SearchEngineParameters searchParameters;
-	private EnabledEngines enabledEngines;
 	private List<FileSearch> inputFiles;
 	private Map<String, String> metadata;
 
@@ -32,7 +32,6 @@ public class SwiftSearchDefinition extends PersistableBase {
 
 	public SwiftSearchDefinition(final String title, final User user, final File outputFolder, final SpectrumQa qa,
 	                             final PeptideReport peptideReport, final SearchEngineParameters searchParameters,
-	                             final EnabledEngines enabledEngines,
 	                             final List<FileSearch> inputFiles, final boolean publicMgfFiles,
 	                             final boolean publicMzxmlFiles, final boolean publicSearchFiles,
 	                             final Map<String, String> metadata) {
@@ -42,7 +41,6 @@ public class SwiftSearchDefinition extends PersistableBase {
 		this.qa = qa;
 		this.peptideReport = peptideReport;
 		this.searchParameters = searchParameters;
-		this.enabledEngines = enabledEngines;
 		this.inputFiles = inputFiles;
 		this.publicMgfFiles = publicMgfFiles;
 		this.publicMzxmlFiles = publicMzxmlFiles;
@@ -99,11 +97,7 @@ public class SwiftSearchDefinition extends PersistableBase {
 	}
 
 	public EnabledEngines getEnabledEngines() {
-		return enabledEngines;
-	}
-
-	public void setEnabledEngines(EnabledEngines enabledEngines) {
-		this.enabledEngines = enabledEngines;
+		return searchParameters.getEnabledEngines();
 	}
 
 	public List<FileSearch> getInputFiles() {
@@ -147,11 +141,11 @@ public class SwiftSearchDefinition extends PersistableBase {
 	}
 
 	public boolean isSearch(final String searchEngineCode) {
-		return enabledEngines != null && enabledEngines.isEnabled(searchEngineCode);
+		return getEnabledEngines() != null && getEnabledEngines().isEnabled(searchEngineCode);
 	}
 
 	public String searchVersion(final String searchEngineCode) {
-		return enabledEngines != null ? enabledEngines.enabledVersion(searchEngineCode) : null;
+		return getEnabledEngines() != null ? getEnabledEngines().enabledVersion(searchEngineCode) : null;
 	}
 
 	@Override

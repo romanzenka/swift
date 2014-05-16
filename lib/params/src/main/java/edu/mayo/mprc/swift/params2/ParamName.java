@@ -17,7 +17,8 @@ public enum ParamName {
 	FixedMods("modifications.fixed", "Fixed Modifications", "Fixed Modifications"),
 	Instrument("instrument", "Instrument", "Instrument"),
 	ExtractMsnSettings("extractMsnSettings", "Extract_msn Settings", "How to obtain the MS2 spectrum list to send to the engine"),
-	ScaffoldSettings("scaffoldSettings", "Scaffold Settings", "How to filter the output of the search engine");
+	ScaffoldSettings("scaffoldSettings", "Scaffold Settings", "How to filter the output of the search engine"),
+	EnabledEngines("enabledEngines", "Enabled Engines", "Which engines we should use for the search");
 
 	private final String id;
 	private final String name;
@@ -46,7 +47,7 @@ public enum ParamName {
 	 *
 	 * @param params Set of abstract parameters.
 	 * @return Value of the parameter. Use one of the getters whenever you can, such as {@link SearchEngineParameters#getProtease}. This method
-	 *         is meant to be used mainly in loops which go over all parameters.
+	 * is meant to be used mainly in loops which go over all parameters.
 	 */
 	public Object getParamValue(final SearchEngineParameters params) {
 		switch (this) {

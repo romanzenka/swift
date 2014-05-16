@@ -614,6 +614,7 @@ public final class ServiceImpl extends SpringGwtServlet implements Service, Appl
 				"instrument",
 				"extractMsnSettings",
 				"scaffoldSettings",
+				"enabledEngines"
 		};
 		final List<List<ClientValue>> allowedValues = getAllowedValues(params);
 		final HashMap<String, List<ClientValue>> map = new HashMap<String, List<ClientValue>>(params.length);

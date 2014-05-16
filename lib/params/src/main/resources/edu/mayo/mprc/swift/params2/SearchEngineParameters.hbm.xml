@@ -33,5 +33,8 @@
             lazy="false" />
         <many-to-one name="scaffoldSettings" column="scaffold_settings" class="ScaffoldSettings" not-null="false"
             lazy="false" />
+
+        <many-to-one name="enabledEngines" class="EnabledEngines" column="enabled_engines" lazy="false" />
+
     </class>
 </hibernate-mapping>

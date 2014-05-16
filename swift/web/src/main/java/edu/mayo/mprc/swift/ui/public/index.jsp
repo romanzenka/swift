@@ -114,6 +114,14 @@
             </tbody>
 
             <tbody>
+            <tr id="enginesRow" class="shrink">
+                <td id="enginesLabel" colspan="2" class="params-row-left"></td>
+                <td id="enginesEntry" colspan="3"></td>
+                <td id="enginesValidation" class="rightcol params-row-right" colspan="2"></td>
+            </tr>
+            </tbody>
+
+            <tbody>
 
             <tr>
                 <td class="params-border-bottom" colspan="7"></td>
@@ -155,16 +163,6 @@
                 </td>
                 <td class="rightcol" colspan="2">
                     <div class="warning" id="publicMgfsWarning"></div>
-                </td>
-            </tr>
-
-            <tr class="shrink" id="enginesRow">
-                <th class="leftcol" colspan="2">Engines:</th>
-                <td colspan="3">
-                    <div id="enginesPanel"></div>
-                </td>
-                <td class="rightcol" colspan="2">
-                    <div class="warning" id="enginesPanelWarning"></div>
                 </td>
             </tr>
 

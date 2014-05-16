@@ -1,6 +1,8 @@
 package edu.mayo.mprc.swift.dbmapping;
 
 import edu.mayo.mprc.MprcException;
+import edu.mayo.mprc.swift.params2.EnabledEngines;
+import edu.mayo.mprc.swift.params2.SearchEngineConfig;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
@@ -19,7 +21,7 @@ public final class EnabledEnginesTest {
 		try {
 			engines.getEngineVersion("MASCOT");
 			Assert.fail("Exception should have been thrown");
-		} catch(MprcException e) {
+		} catch (MprcException e) {
 			Assert.assertTrue(e.getMessage().contains("versions: 2.2, 2.3"));
 		}
 	}

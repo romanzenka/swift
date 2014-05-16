@@ -14,6 +14,7 @@ import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
@@ -316,4 +317,55 @@ public final class ParamsDaoTest extends DaoTest {
 		params3 = dao.addSearchEngineParameters(params3);
 		Assert.assertNotSame(params3.getId(), params.getId(), "Must save as different object");
 	}
+
+	@Test
+	public void addSearchEngine() throws Throwable {
+		dao.begin();
+		try {
+			SearchEngineConfig config = new SearchEngineConfig("TEST_ENGINE", "v1.0");
+			config = dao.addSearchEngineConfig(config);
+			Assert.assertNotNull(config.getId(), "Save did not work");
+
+			SearchEngineConfig config2 = new SearchEngineConfig("TEST_ENGINE", "v1.0");
+			Assert.assertTrue(config.equals(config2), "The two changes must be identical");
+
+			config2 = dao.addSearchEngineConfig(config2);
+			Assert.assertEquals(config2.getId(), config.getId(), "Save must produce same id");
+
+			dao.commit();
+		} catch (Exception t) {
+			dao.rollback();
+			throw t;
+		}
+	}
+
+	@Test
+	public void addEnabledEngines() throws Throwable {
+		dao.begin();
+		try {
+			SearchEngineConfig engine1 = new SearchEngineConfig("TEST_ENGINE1", "v1.0");
+			SearchEngineConfig engine2 = new SearchEngineConfig("TEST_ENGINE2", "v1.1");
+			engine1 = dao.addSearchEngineConfig(engine1);
+			engine2 = dao.addSearchEngineConfig(engine2);
+
+			final EnabledEngines engines = new EnabledEngines();
+			engines.add(engine1);
+			engines.add(engine2);
+
+			final EnabledEngines engines1 = dao.addEnabledEngineSet(Arrays.asList(engine1, engine2));
+			final EnabledEngines engines2 = dao.addEnabledEngineSet(Arrays.asList(engine2, engine1));
+			final EnabledEngines engines3 = dao.addEnabledEngineSet(new ArrayList<SearchEngineConfig>());
+			final EnabledEngines engines4 = dao.addEnabledEngineSet(new ArrayList<SearchEngineConfig>());
+
+			Assert.assertEquals(engines2, engines1, "Have to be identical sets");
+			Assert.assertNotSame(engines3, engines1, "Empty engine set has to be different");
+			Assert.assertEquals(engines4, engines3, "Empty sets have to be identical");
+
+			dao.commit();
+		} catch (Exception t) {
+			dao.rollback();
+			throw t;
+		}
+	}
+
 }

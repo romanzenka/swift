@@ -1,8 +1,7 @@
-package edu.mayo.mprc.swift.dbmapping;
+package edu.mayo.mprc.swift.params2;
 
 import edu.mayo.mprc.MprcException;
 import edu.mayo.mprc.database.PersistableBase;
-import edu.mayo.mprc.swift.db.SearchEngine;
 
 /**
  * User-editable information about a supported search engine.
@@ -76,13 +75,5 @@ public class SearchEngineConfig extends PersistableBase {
 		int result = code.hashCode();
 		result = 31 * result + version.hashCode();
 		return result;
-	}
-
-	/**
-	 * @param engine Engine to check for match
-	 * @return True if the config matches an actual engine.
-	 */
-	public boolean isMatching(final SearchEngine engine) {
-		return code.equals(engine.getCode()) && version.equals(engine.getVersion());
 	}
 }

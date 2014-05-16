@@ -1,6 +1,5 @@
 package edu.mayo.mprc.swift.db;
 
-import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 import edu.mayo.mprc.MprcException;
 import edu.mayo.mprc.daemon.AssignedTaskData;
@@ -49,11 +48,9 @@ public final class SwiftDaoHibernate extends DaoBase implements SwiftDao {
 	@Override
 	public Collection<String> getHibernateMappings() {
 		final List<String> list = new ArrayList<String>(Arrays.asList(
-				MAP + "EnabledEngines.hbm.xml",
 				MAP + "FileSearch.hbm.xml",
 				MAP + "PeptideReport.hbm.xml",
 				MAP + "ReportData.hbm.xml",
-				MAP + "SearchEngineConfig.hbm.xml",
 				MAP + "SearchRun.hbm.xml",
 				MAP + "SpectrumQa.hbm.xml",
 				MAP + "SwiftDBVersion.hbm.xml",
@@ -191,56 +188,6 @@ public final class SwiftDaoHibernate extends DaoBase implements SwiftDao {
 			return data;
 		} catch (Exception t) {
 			throw new MprcException("Cannot obtain search run for id " + searchRunId, t);
-		}
-	}
-
-	private static Criterion getSearchEngineEqualityCriteria(final SearchEngineConfig searchEngineConfig) {
-		return Restrictions.and(
-				DaoBase.nullSafeEq("code", searchEngineConfig.getCode()),
-				DaoBase.nullSafeEq("version", searchEngineConfig.getVersion())
-		);
-	}
-
-	@Override
-	public SearchEngineConfig addSearchEngineConfig(final SearchEngineConfig config) {
-		try {
-			return save(config, getSearchEngineEqualityCriteria(config), false);
-		} catch (Exception t) {
-			throw new MprcException("Cannot add new search engine config '" + config.getCode() + "'", t);
-		}
-	}
-
-	@Override
-	public EnabledEngines addEnabledEngineSet(final Iterable<SearchEngineConfig> searchEngineConfigs) {
-		try {
-			final EnabledEngines engines = new EnabledEngines();
-			for (final SearchEngineConfig config : searchEngineConfigs) {
-				final SearchEngineConfig searchEngineConfig = addSearchEngineConfig(config);
-				engines.add(searchEngineConfig);
-			}
-
-			return updateCollection(engines, engines.getEngineConfigs(), "engineConfigs");
-
-		} catch (Exception t) {
-			throw new MprcException("Could not add search engine set", t);
-		}
-	}
-
-	@Override
-	public EnabledEngines addEnabledEngines(final EnabledEngines engines) {
-		if (engines.getId() != null) {
-			return engines;
-		}
-		Preconditions.checkNotNull(engines, "Enabled engine list must not be null");
-		try {
-			final EnabledEngines result = new EnabledEngines();
-			result.setId(engines.getId());
-			for (final SearchEngineConfig searchEngineConfig : engines.getEngineConfigs()) {
-				result.add(addSearchEngineConfig(searchEngineConfig));
-			}
-			return updateCollection(result, result.getEngineConfigs(), "engineConfigs");
-		} catch (Exception t) {
-			throw new MprcException("Could not add search engine set", t);
 		}
 	}
 

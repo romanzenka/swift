@@ -1,11 +1,10 @@
-package edu.mayo.mprc.swift.dbmapping;
+package edu.mayo.mprc.swift.params2;
 
 import com.google.common.base.Joiner;
 import com.google.common.base.Objects;
 import com.google.common.collect.Lists;
 import edu.mayo.mprc.MprcException;
 import edu.mayo.mprc.database.PersistableBase;
-import edu.mayo.mprc.swift.db.SearchEngine;
 
 import java.util.Collections;
 import java.util.HashSet;
@@ -47,15 +46,6 @@ public class EnabledEngines extends PersistableBase {
 	public boolean isEnabled(final String code) {
 		for (final SearchEngineConfig config : engineConfigs) {
 			if (config.getCode().equals(code)) {
-				return true;
-			}
-		}
-		return false;
-	}
-
-	public boolean isEnabled(SearchEngine engine) {
-		for (final SearchEngineConfig config : engineConfigs) {
-			if (config.isMatching(engine)) {
 				return true;
 			}
 		}

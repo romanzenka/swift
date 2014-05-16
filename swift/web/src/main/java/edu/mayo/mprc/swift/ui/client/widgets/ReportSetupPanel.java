@@ -11,17 +11,22 @@ public final class ReportSetupPanel extends HorizontalPanel {
 
 	private final CheckBox scaffoldReport;
 
+	private final QuameterCategorySelector quameterCategorySelector;
+
 	/**
 	 * Null Constructor
 	 */
-	public ReportSetupPanel() {
-		this(false);
+	public ReportSetupPanel(final QuameterCategorySelector quameterCategorySelector) {
+		this(false, quameterCategorySelector);
 	}
 
-	public ReportSetupPanel(final boolean enableScaffoldReport) {
+	public ReportSetupPanel(final boolean enableScaffoldReport, final QuameterCategorySelector quameterCategorySelector) {
 		scaffoldReport = new CheckBox("Generate Peptide Report");
 		scaffoldReport.setValue(enableScaffoldReport);
 		add(scaffoldReport);
+
+		this.quameterCategorySelector = quameterCategorySelector;
+		add(this.quameterCategorySelector);
 	}
 
 	public boolean isScaffoldReportEnable() {

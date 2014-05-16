@@ -148,22 +148,17 @@ public final class SwiftDaoTest {
 	public void doubleSaveSearchDefinition() throws Throwable {
 		swiftDao.begin();
 		try {
-			SearchEngineConfig searchEngineConfig = new SearchEngineConfig("MASCOT", "2.4");
-			searchEngineConfig = swiftDao.addSearchEngineConfig(searchEngineConfig);
-			final EnabledEngines engines = new EnabledEngines();
-			engines.add(searchEngineConfig);
-
-			SwiftSearchDefinition blank1 = new SwiftSearchDefinition("Blank search", null, null, null, null, null, engines, new ArrayList<FileSearch>(), false, false, false, new HashMap<String, String>(0));
+			SwiftSearchDefinition blank1 = new SwiftSearchDefinition("Blank search", null, null, null, null, null, new ArrayList<FileSearch>(), false, false, false, new HashMap<String, String>(0));
 			blank1 = swiftDao.addSwiftSearchDefinition(blank1);
-			SwiftSearchDefinition blank2 = new SwiftSearchDefinition("Blank search", null, null, null, null, null, engines, new ArrayList<FileSearch>(), false, false, false, new HashMap<String, String>(0));
+			SwiftSearchDefinition blank2 = new SwiftSearchDefinition("Blank search", null, null, null, null, null, new ArrayList<FileSearch>(), false, false, false, new HashMap<String, String>(0));
 			blank2 = swiftDao.addSwiftSearchDefinition(blank2);
 			Assert.assertEquals(blank2.getId(), blank1.getId(), "Blank searches has to be stored as one");
 
 			final File f = new File("testFolder");
-			final SwiftSearchDefinition folder1 = new SwiftSearchDefinition("Folder search", null, f, null, null, null, engines, new ArrayList<FileSearch>(), false, false, false, new HashMap<String, String>(0));
+			final SwiftSearchDefinition folder1 = new SwiftSearchDefinition("Folder search", null, f, null, null, null, new ArrayList<FileSearch>(), false, false, false, new HashMap<String, String>(0));
 			blank1 = swiftDao.addSwiftSearchDefinition(blank1);
 			final File f2 = new File("testFolder");
-			final SwiftSearchDefinition folder2 = new SwiftSearchDefinition("Folder search", null, f2, null, null, null, engines, new ArrayList<FileSearch>(), false, false, false, new HashMap<String, String>(0));
+			final SwiftSearchDefinition folder2 = new SwiftSearchDefinition("Folder search", null, f2, null, null, null, new ArrayList<FileSearch>(), false, false, false, new HashMap<String, String>(0));
 			blank2 = swiftDao.addSwiftSearchDefinition(blank2);
 			Assert.assertEquals(folder2.getId(), folder1.getId(), "Folder searches has to be stored as one");
 
@@ -179,9 +174,9 @@ public final class SwiftDaoTest {
 			final LinkedList<FileSearch> fileSearches2 = new LinkedList<FileSearch>();
 			fileSearches2.add(fileSearch2);
 
-			SwiftSearchDefinition file1 = new SwiftSearchDefinition("File search", null, null, null, null, null, engines, fileSearches1, false, false, false, new HashMap<String, String>(0));
+			SwiftSearchDefinition file1 = new SwiftSearchDefinition("File search", null, null, null, null, null, fileSearches1, false, false, false, new HashMap<String, String>(0));
 			file1 = swiftDao.addSwiftSearchDefinition(file1);
-			SwiftSearchDefinition file2 = new SwiftSearchDefinition("File search", null, null, null, null, null, engines, fileSearches2, false, false, false, new HashMap<String, String>(0));
+			SwiftSearchDefinition file2 = new SwiftSearchDefinition("File search", null, null, null, null, null, fileSearches2, false, false, false, new HashMap<String, String>(0));
 			file2 = swiftDao.addSwiftSearchDefinition(file2);
 			Assert.assertEquals(file2.getId(), file1.getId(), "File searches have to be stored as one");
 
@@ -204,56 +199,6 @@ public final class SwiftDaoTest {
 				new Tolerance(1, MassUnit.Da), new Tolerance(10, MassUnit.Ppm), orbi,
 				ExtractMsnSettings.getDefaultExtractMsnSettings(),
 				ScaffoldSettings.defaultScaffoldSettings());
-	}
-
-	@Test
-	public void addSearchEngine() throws Throwable {
-		swiftDao.begin();
-		try {
-			SearchEngineConfig config = new SearchEngineConfig("TEST_ENGINE", "v1.0");
-			config = swiftDao.addSearchEngineConfig(config);
-			Assert.assertNotNull(config.getId(), "Save did not work");
-
-			SearchEngineConfig config2 = new SearchEngineConfig("TEST_ENGINE", "v1.0");
-			Assert.assertTrue(config.equals(config2), "The two changes must be identical");
-
-			config2 = swiftDao.addSearchEngineConfig(config2);
-			Assert.assertEquals(config2.getId(), config.getId(), "Save must produce same id");
-
-			swiftDao.commit();
-		} catch (Exception t) {
-			swiftDao.rollback();
-			throw t;
-		}
-	}
-
-	@Test
-	public void addEnabledEngines() throws Throwable {
-		swiftDao.begin();
-		try {
-			SearchEngineConfig engine1 = new SearchEngineConfig("TEST_ENGINE1", "v1.0");
-			SearchEngineConfig engine2 = new SearchEngineConfig("TEST_ENGINE2", "v1.1");
-			engine1 = swiftDao.addSearchEngineConfig(engine1);
-			engine2 = swiftDao.addSearchEngineConfig(engine2);
-
-			final EnabledEngines engines = new EnabledEngines();
-			engines.add(engine1);
-			engines.add(engine2);
-
-			final EnabledEngines engines1 = swiftDao.addEnabledEngineSet(Arrays.asList(engine1, engine2));
-			final EnabledEngines engines2 = swiftDao.addEnabledEngineSet(Arrays.asList(engine2, engine1));
-			final EnabledEngines engines3 = swiftDao.addEnabledEngineSet(new ArrayList<SearchEngineConfig>());
-			final EnabledEngines engines4 = swiftDao.addEnabledEngineSet(new ArrayList<SearchEngineConfig>());
-
-			Assert.assertEquals(engines2, engines1, "Have to be identical sets");
-			Assert.assertNotSame(engines3, engines1, "Empty engine set has to be different");
-			Assert.assertEquals(engines4, engines3, "Empty sets have to be identical");
-
-			swiftDao.commit();
-		} catch (Exception t) {
-			swiftDao.rollback();
-			throw t;
-		}
 	}
 
 	@Test

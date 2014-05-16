@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+    "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="edu.mayo.mprc.swift.dbmapping">
+    <class name="edu.mayo.mprc.swift.params2.EnabledEngines" table="enabled_engines">
+        <id name="id" type="integer" column="enabled_engines_id">
+            <generator class="native" />
+        </id>
+
+        <set name="engineConfigs" table="enabled_engines_set" lazy="false" cascade="none">
+            <key column="set_id" />
+            <many-to-many column="search_engine_id" class="edu.mayo.mprc.swift.params2.SearchEngineConfig" />
+        </set>
+    </class>
+</hibernate-mapping>

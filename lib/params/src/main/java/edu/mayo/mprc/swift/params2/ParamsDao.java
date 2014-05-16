@@ -66,6 +66,18 @@ public interface ParamsDao extends Dao, RuntimeInitializer, Lifecycle {
 	ScaffoldSettings addScaffoldSettings(ScaffoldSettings scaffoldSettings);
 
 	/**
+	 * Adds a search engine config. If the config already exists, the object gets updated.
+	 * Returns a serialized version of the config.
+	 *
+	 * @param config Search engine config.
+	 */
+	SearchEngineConfig addSearchEngineConfig(SearchEngineConfig config);
+
+	EnabledEngines addEnabledEngineSet(Iterable<SearchEngineConfig> searchEngineConfigs);
+
+	EnabledEngines addEnabledEngines(EnabledEngines engines);
+
+	/**
 	 * Modification sets are not {@link edu.mayo.mprc.database.Evolvable} because they are never to be modified...
 	 * only new ones get created.
 	 */

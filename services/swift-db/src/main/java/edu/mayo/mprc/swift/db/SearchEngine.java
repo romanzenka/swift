@@ -7,6 +7,7 @@ import edu.mayo.mprc.config.ui.ServiceUiFactory;
 import edu.mayo.mprc.daemon.DaemonConnection;
 import edu.mayo.mprc.searchengine.EngineMetadata;
 import edu.mayo.mprc.swift.params2.ParamName;
+import edu.mayo.mprc.swift.params2.SearchEngineConfig;
 import edu.mayo.mprc.swift.params2.SearchEngineParameters;
 import edu.mayo.mprc.swift.params2.mapping.*;
 import edu.mayo.mprc.utilities.FileUtilities;
@@ -225,7 +226,7 @@ public final class SearchEngine implements Comparable<SearchEngine> {
 	}
 
 	/**
-	 * @return Engine code (e.g. MASCOT). Same as {@link edu.mayo.mprc.swift.dbmapping.SearchEngineConfig#code}
+	 * @return Engine code (e.g. MASCOT). Same as {@link edu.mayo.mprc.swift.params2.SearchEngineConfig#code}
 	 */
 	public String getCode() {
 		if (getEngineMetadata().getCode() != null) {
@@ -309,6 +310,10 @@ public final class SearchEngine implements Comparable<SearchEngine> {
 	public int compareTo(final SearchEngine o) {
 		final int comparison = getCode().compareTo(o.getCode());
 		return comparison == 0 ? getVersion().compareTo(o.getVersion()) : comparison;
+	}
+
+	public SearchEngineConfig getEngineConfig() {
+		return new SearchEngineConfig(getCode(), getVersion());
 	}
 
 	@Component("searchEngineFactory")

@@ -10,7 +10,6 @@ import edu.mayo.mprc.quameterdb.dao.QuameterResult;
 import edu.mayo.mprc.searchdb.dao.SearchDbDaoHibernate;
 import edu.mayo.mprc.searchdb.dao.TandemMassSpectrometrySample;
 import edu.mayo.mprc.swift.db.SwiftDaoHibernate;
-import edu.mayo.mprc.swift.dbmapping.EnabledEngines;
 import edu.mayo.mprc.swift.dbmapping.FileSearch;
 import edu.mayo.mprc.swift.dbmapping.SearchRun;
 import edu.mayo.mprc.swift.dbmapping.SwiftSearchDefinition;
@@ -98,7 +97,7 @@ public final class QuameterUiTest extends DaoTest {
 		User user = workspaceDao.addNewUser("Tester", "Testin", "test@test.tst", new Change("testing", new DateTime()));
 
 		final SwiftSearchDefinition definition = swiftDao.addSwiftSearchDefinition(
-				new SwiftSearchDefinition("test", user, null, null, null, null, new EnabledEngines(), fileSearches,
+				new SwiftSearchDefinition("test", user, null, null, null, null, fileSearches,
 						false, false, false, metadata)
 		);
 

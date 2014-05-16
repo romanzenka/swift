@@ -121,6 +121,24 @@ public final class MockParamsDao implements ParamsDao {
 	}
 
 	@Override
+	public SearchEngineConfig addSearchEngineConfig(SearchEngineConfig config) {
+		notModifiable();
+		return null;
+	}
+
+	@Override
+	public EnabledEngines addEnabledEngineSet(Iterable<SearchEngineConfig> searchEngineConfigs) {
+		notModifiable();
+		return null;
+	}
+
+	@Override
+	public EnabledEngines addEnabledEngines(EnabledEngines engines) {
+		notModifiable();
+		return null;
+	}
+
+	@Override
 	public ModSet updateModSet(final ModSet modSet) {
 		notModifiable();
 		return null;

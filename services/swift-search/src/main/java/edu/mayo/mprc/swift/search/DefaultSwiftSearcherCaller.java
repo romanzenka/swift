@@ -6,9 +6,7 @@ import edu.mayo.mprc.daemon.DaemonConnection;
 import edu.mayo.mprc.daemon.DaemonUtilities;
 import edu.mayo.mprc.swift.db.SwiftDao;
 import edu.mayo.mprc.swift.dbmapping.*;
-import edu.mayo.mprc.swift.params2.ParamsDao;
-import edu.mayo.mprc.swift.params2.SavedSearchEngineParameters;
-import edu.mayo.mprc.swift.params2.SearchEngineParameters;
+import edu.mayo.mprc.swift.params2.*;
 import edu.mayo.mprc.utilities.progress.ProgressInfo;
 import edu.mayo.mprc.utilities.progress.ProgressListener;
 import edu.mayo.mprc.workspace.User;
@@ -148,7 +146,6 @@ public final class DefaultSwiftSearcherCaller implements SwiftSearcherCaller {
 		final PeptideReport report = searchInput.isPeptideReport() ? new PeptideReport() : null;
 
 		final List<FileSearch> inputFiles = new ArrayList<FileSearch>(searchInput.getInputFilePaths().length);
-		final EnabledEngines enabledEngines = getEnabledEngines(searchInput.getEnabledEngines());
 		final int[] paramSetIds = searchInput.getParamSetIds();
 
 		for (int i = 0; i < searchInput.getInputFilePaths().length; i++) {
@@ -163,7 +160,6 @@ public final class DefaultSwiftSearcherCaller implements SwiftSearcherCaller {
 
 		return new SwiftSearchDefinition(searchInput.getTitle(),
 				user, outputFolder, qa, report, getSearchEngineParameters(searchInput.getParamSetId()),
-				enabledEngines,
 				inputFiles,
 				searchInput.isPublicMgfFiles(),
 				searchInput.isPublicMzxmlFiles(),

@@ -15,7 +15,10 @@ import edu.mayo.mprc.searchdb.builder.SearchResultListBuilder;
 import edu.mayo.mprc.searchdb.dao.Analysis;
 import edu.mayo.mprc.swift.db.SwiftDao;
 import edu.mayo.mprc.swift.db.SwiftDaoHibernate;
-import edu.mayo.mprc.swift.dbmapping.*;
+import edu.mayo.mprc.swift.dbmapping.FileSearch;
+import edu.mayo.mprc.swift.dbmapping.ReportData;
+import edu.mayo.mprc.swift.dbmapping.SearchRun;
+import edu.mayo.mprc.swift.dbmapping.SwiftSearchDefinition;
 import edu.mayo.mprc.swift.params2.ParamsDao;
 import edu.mayo.mprc.swift.params2.ParamsDaoHibernate;
 import edu.mayo.mprc.unimod.Unimod;
@@ -152,9 +155,8 @@ public final class BulkLoadingTest extends DaoTest {
 		}
 
 		List<FileSearch> inputFiles = new ArrayList<FileSearch>(1);
-		EnabledEngines enabledEngines = new EnabledEngines();
 		inputFiles.add(new FileSearch(new File("input.mgf"), "sample", "category", "experiment", null));
-		SwiftSearchDefinition searchDefinition = new SwiftSearchDefinition("test", user, new File("out"), null, null, null, enabledEngines, inputFiles, false, false, false, new HashMap<String, String>(0));
+		SwiftSearchDefinition searchDefinition = new SwiftSearchDefinition("test", user, new File("out"), null, null, null, inputFiles, false, false, false, new HashMap<String, String>(0));
 		searchDefinition = swiftDao.addSwiftSearchDefinition(searchDefinition);
 
 		SearchRun searchRun = swiftDao.fillSearchRun(searchDefinition);

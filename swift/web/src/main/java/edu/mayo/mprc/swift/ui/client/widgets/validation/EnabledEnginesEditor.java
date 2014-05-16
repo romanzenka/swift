@@ -1,8 +1,15 @@
-package edu.mayo.mprc.swift.ui.client.widgets;
+package edu.mayo.mprc.swift.ui.client.widgets.validation;
 
+import com.google.gwt.event.logical.shared.ValueChangeEvent;
+import com.google.gwt.event.logical.shared.ValueChangeHandler;
+import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.user.client.ui.HorizontalPanel;
+import edu.mayo.mprc.swift.ui.client.dialogs.Validatable;
+import edu.mayo.mprc.swift.ui.client.rpc.ClientEnabledEngines;
 import edu.mayo.mprc.swift.ui.client.rpc.ClientSearchEngine;
 import edu.mayo.mprc.swift.ui.client.rpc.ClientSearchEngineConfig;
+import edu.mayo.mprc.swift.ui.client.rpc.ClientValue;
+import edu.mayo.mprc.swift.ui.client.widgets.EngineVersionSelector;
 
 import java.util.*;
 
@@ -13,21 +20,16 @@ import java.util.*;
  *
  * @author Roman Zenka
  */
-public final class EnabledEnginesPanel extends HorizontalPanel {
+public final class EnabledEnginesEditor extends HorizontalPanel implements Validatable {
 	private final Map<String/*code*/, EngineVersionSelector> engines;
-	private QuameterCategorySelector quameterCategorySelector;
 
 	/**
 	 * The enabled engines panel needs access not only to a list of available engines,
 	 * but also to metadata so it can offer special combo-box for QuaMeter search category.
 	 *
 	 * @param availableEngines List of available engines.
-	 * @param searchMetadata   Generic metadata associated with the search.
-	 * @param uiConfiguration  Configuration of the user interface itself.
 	 */
-	public EnabledEnginesPanel(final Collection<ClientSearchEngine> availableEngines,
-	                           final SearchMetadata searchMetadata,
-	                           final UiConfiguration uiConfiguration) {
+	public EnabledEnginesEditor(final Collection<ClientSearchEngine> availableEngines) {
 		engines = new HashMap<String, EngineVersionSelector>(availableEngines.size());
 
 		for (final ClientSearchEngine engine : availableEngines) {
@@ -47,19 +49,15 @@ public final class EnabledEnginesPanel extends HorizontalPanel {
 		Collections.sort(list);
 		for (final EngineVersionSelector selector : list) {
 			add(selector);
-			if ("QUAMETER".equals(selector.getCode())) {
-				quameterCategorySelector = new QuameterCategorySelector(uiConfiguration, searchMetadata);
-				add(quameterCategorySelector);
-			}
 		}
 	}
 
 	/**
 	 * @return All the engines the user enabled, together with versions they picked.
 	 */
-	public ArrayList<ClientSearchEngineConfig> getEnabledEngines() {
+	public ClientEnabledEngines getEnabledEngines() {
 		if (engines == null) {
-			return new ArrayList<ClientSearchEngineConfig>(0);
+			return new ClientEnabledEngines();
 		}
 		final ArrayList<ClientSearchEngineConfig> result = new ArrayList<ClientSearchEngineConfig>(engines.size());
 		for (final EngineVersionSelector selector : engines.values()) {
@@ -67,10 +65,10 @@ public final class EnabledEnginesPanel extends HorizontalPanel {
 				result.add(new ClientSearchEngineConfig(selector.getCode(), selector.getVersion()));
 			}
 		}
-		return result;
+		return new ClientEnabledEngines(result);
 	}
 
-	public void setCurrentEngines(final Iterable<ClientSearchEngineConfig> enabledEngines) {
+	public void setCurrentEngines(final ClientEnabledEngines enabledEngines) {
 		if (enabledEngines == null || engines == null) {
 			return;
 		}
@@ -79,7 +77,7 @@ public final class EnabledEnginesPanel extends HorizontalPanel {
 			selector.setEnabled(false);
 		}
 		// Enable selected
-		for (final ClientSearchEngineConfig config : enabledEngines) {
+		for (final ClientSearchEngineConfig config : enabledEngines.getEnabledEngines()) {
 			final String code = config.getCode();
 			final EngineVersionSelector selector = engines.get(code);
 			if (selector == null) {
@@ -96,5 +94,55 @@ public final class EnabledEnginesPanel extends HorizontalPanel {
 	private void reportWarning(final String warning) {
 		// Do nothing now
 		int i = 0;
+	}
+
+	@Override
+	public ClientValue getValue() {
+		return getEnabledEngines();
+	}
+
+	@Override
+	public void setValue(final ClientValue value) {
+		if (value instanceof ClientEnabledEngines) {
+			setCurrentEngines((ClientEnabledEngines) value);
+		}
+	}
+
+	@Override
+	public void setValue(ClientValue value, boolean fireEvents) {
+		ClientValueUtils.setValue(this, value, fireEvents);
+	}
+
+	@Override
+	public void focus() {
+		if (!engines.isEmpty()) {
+			engines.values().iterator().next().focus();
+		}
+	}
+
+	@Override
+	public void setValidationSeverity(int validationSeverity) {
+		ValidationController.setValidationSeverity(validationSeverity, asWidget());
+	}
+
+	@Override
+	public boolean needsAllowedValues() {
+		return false;
+	}
+
+	@Override
+	public void setAllowedValues(List<? extends ClientValue> values) {
+	}
+
+	@Override
+	public void setEnabled(final boolean enabled) {
+		for (EngineVersionSelector selector : engines.values()) {
+			selector.setEnabled(enabled);
+		}
+	}
+
+	@Override
+	public HandlerRegistration addValueChangeHandler(ValueChangeHandler<ClientValue> handler) {
+		return addHandler(handler, ValueChangeEvent.getType());
 	}
 }

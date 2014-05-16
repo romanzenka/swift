@@ -4,8 +4,8 @@
         "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
 
 <hibernate-mapping>
-    <class name="edu.mayo.mprc.swift.dbmapping.SearchEngineConfig" table="search_engine" lazy="false">
-        <id name="id" column="search_engine_id" type="int">
+    <class name="edu.mayo.mprc.swift.params2.SearchEngineConfig" table="search_engine" lazy="false">
+    <id name="id" column="search_engine_id" type="int">
             <generator class="native"/>
         </id>
 
