@@ -190,7 +190,7 @@
                             <goal>single</goal>
                         </goals>
                         <configuration>
-                            <finalName>swift-3.8</finalName>
+                            <finalName>swift-${project.version}</finalName>
                             <descriptors>
                                 <descriptor>assembly.xml</descriptor>
                             </descriptors>

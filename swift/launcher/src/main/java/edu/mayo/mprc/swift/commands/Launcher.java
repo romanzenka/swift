@@ -15,11 +15,10 @@ import org.mortbay.jetty.Server;
 import org.mortbay.jetty.webapp.WebAppContext;
 
 import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
 import java.net.InetAddress;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.Callable;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
@@ -98,8 +97,32 @@ public final class Launcher implements FileListener {
 		return restart;
 	}
 
+	/**
+	 * Get version of the project as specified in the resource files.
+	 *
+	 * @return Project version.
+	 */
+	public static String getVersion() {
+		final InputStream resourceAsStream = Launcher.class.getResourceAsStream("/edu/mayo/mprc/swift/version.properties");
+		try {
+			final Properties properties = new Properties();
+			properties.load(resourceAsStream);
+			final String version = properties.getProperty("swift.version");
+			if (version == null) {
+				throw new MprcException("Version is not defined. Please set 'swift.version' property in edu/mayo/mprc/swift/version.properties");
+			}
+			return version;
+		} catch (IOException e) {
+			throw new MprcException("Could not determine version of Swift", e);
+		} finally {
+			FileUtilities.closeQuietly(resourceAsStream);
+		}
+	}
+
 	private Server runWebServer(final SwiftEnvironment environment, final boolean configMode) {
-		final File warFile = new File("lib/swift-web-3.8-SNAPSHOT.war");
+		final String version = getVersion();
+		final String warFilePath = String.format("lib/swift-web-%s.war", version);
+		final File warFile = new File(warFilePath);
 
 		final String daemonId;
 		if (configMode) {

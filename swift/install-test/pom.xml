@@ -14,7 +14,7 @@
 
     <properties>
         <!-- Version of Swift we will obtain by unpacking the installer .tar.gz -->
-        <unpackedVersion>swift-3.8</unpackedVersion>
+        <unpackedVersion>swift-${project.version}</unpackedVersion>
         <!-- Where will be the Swift unpacked to -->
         <unpackedDirectory>${project.build.directory}/swift/${unpackedVersion}</unpackedDirectory>
     </properties>

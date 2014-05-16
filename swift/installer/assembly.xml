@@ -7,7 +7,7 @@
         <format>zip</format>
     </formats>
     <includeBaseDirectory>true</includeBaseDirectory>
-    <baseDirectory>swift-3.8</baseDirectory>
+    <baseDirectory>swift-${project.version}</baseDirectory>
     <includeSiteDirectory>false</includeSiteDirectory>
     <fileSets>
         <fileSet>

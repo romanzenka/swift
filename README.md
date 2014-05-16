@@ -26,13 +26,13 @@ Once you have Java and Maven setup, you can build Swift as follows:
 
 	git clone git://github.com/romanzenka/swift.git
 
-#### Create swift-3.0-install.tar.gz
+#### Create swift-$VER-install.tar.gz
 
 	cd swift
 	mvn install -DskipTests
 	cd swift/installer/target
 	ls
-	# You should see swift-3.0-install.tar.gz
+	# You should see swift-$VER-install.tar.gz
 
 * If you want to run all the unit tests, feel free to omit the -DskipTests clause!
 
@@ -41,9 +41,9 @@ Once you have Java and Maven setup, you can build Swift as follows:
 
 You are ready to install Swift.
 
-* Copy the swift/installer/target/swift-3.8-install.tar.gz to your target machine.
+* Copy the swift/installer/target/swift-$VER-install.tar.gz to your target machine.
 * Unzip it
 * Install instructions are in
-	swift-3.8/INSTALL.txt
+	swift-$VER/INSTALL.txt
 
 Please mail zenka.roman@mayo.edu if you have any problems!
