@@ -289,8 +289,13 @@ public final class Analysis extends PersistableBase {
 		final List<TableRow> tableRows = new ArrayList<TableRow>(allProteinGroups.size());
 
 		for (final ProteinSequenceList proteinSequences : allProteinGroups.values()) {
+			if (proteinSequences == null) {
+				// Fix issues with null sequences in the list
+				continue;
+			}
 			final TableRow row = new TableRow();
-			row.accnums = accnumMap.get(proteinSequences.getId());
+			final Integer proteinSequencesId = proteinSequences.getId();
+			row.accnums = accnumMap.get(proteinSequencesId);
 			if (row.accnums == null) {
 				row.accnums = new ArrayList<String>(1);
 				row.accnums.add(UNKNOWN_ACCESSION);
@@ -313,7 +318,7 @@ public final class Analysis extends PersistableBase {
 				for (final SearchResult result : sample.getSearchResults()) {
 					ProteinGroup matchingGroup = null;
 					for (final ProteinGroup g : result.getProteinGroups()) {
-						if (proteinSequences.getId().equals(g.getProteinSequences().getId())) {
+						if (proteinSequencesId.equals(g.getProteinSequences().getId())) {
 							matchingGroup = g;
 							break;
 						}
