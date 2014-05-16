@@ -125,7 +125,7 @@ public final class DefaultSwiftSearcherCaller implements SwiftSearcherCaller {
 								fileSearch.getExperiment();
 				// Check that we do not have a sample like so already
 				if (quameterSampleExperimentNames.contains(sampleExperiment)) {
-					throw new MprcException("QuaMeter needs each input file to go to a separate Scaffold column. Switch QuaMeter off, or set Scaffold to separate samples per input file.");
+					throw new MprcException("QuaMeter needs each input file to go to a separate Scaffold column (biological sample).\nSwitch QuaMeter off, or set Scaffold to separate samples per input file.");
 				}
 				// Make a not we saw this before
 				quameterSampleExperimentNames.add(sampleExperiment);
