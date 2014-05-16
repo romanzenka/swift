@@ -200,7 +200,7 @@ public final class SearchEngine implements Comparable<SearchEngine> {
 
 		try {
 			writer.close();
-		} catch (IOException e) {
+		} catch (final IOException e) {
 			throw new MprcException("Could not close the output stream when mapping search engine parameters", e);
 		}
 	}
@@ -316,12 +316,16 @@ public final class SearchEngine implements Comparable<SearchEngine> {
 		return new SearchEngineConfig(getCode(), getVersion());
 	}
 
+	public boolean matchesConfig(final SearchEngineConfig config) {
+		return getCode().equals(config.getCode()) && getVersion().equals(config.getVersion());
+	}
+
 	@Component("searchEngineFactory")
 	public static final class Factory extends FactoryBase<Config, SearchEngine> implements FactoryDescriptor {
 		EngineFactoriesList engineFactoriesList;
 
 		@Override
-		public SearchEngine create(Config config, DependencyResolver dependencies) {
+		public SearchEngine create(final Config config, final DependencyResolver dependencies) {
 			final EngineMetadata metadata = getEngineFactoriesList().getEngineMetadataForCode(config.getCode());
 			if (metadata == null) {
 				throw new MprcException("Could not find engine for code [" + config.getCode() + "]");

@@ -426,15 +426,17 @@ public final class ServiceImpl extends SpringGwtServlet implements Service, Appl
 			getParamsDao().begin();
 			final ParameterSetCache cache = new ParameterSetCache(session, getParamsDao());
 			final SearchEngineParameters ps = cache.getFromCache(paramSet);
-			final ClientParamFile[] files = new ClientParamFile[getSearchEngines().size()];
+			Collection<SearchEngine> allEngines = getSearchEngines();
+			final List<ClientParamFile> files = new ArrayList<ClientParamFile>(allEngines.size());
 
-			int i = 0;
-			for (final SearchEngine engine : getSearchEngines()) {
-				final String parameters = engine.writeSearchEngineParameterString(ps, null, paramsInfo);
-				files[i++] = new ClientParamFile(engine.getFriendlyName(), parameters);
+			for (final SearchEngine engine : allEngines) {
+				if (ps.getEnabledEngines().isEnabled(engine.getEngineConfig())) {
+					final String parameters = engine.writeSearchEngineParameterString(ps, null, paramsInfo);
+					files.add(new ClientParamFile(engine.getFriendlyName(), parameters));
+				}
 			}
 			getParamsDao().commit();
-			return files;
+			return (ClientParamFile[]) files.toArray();
 		} catch (Exception e) {
 			getParamsDao().rollback();
 			LOGGER.error("Could not get parameter files", e);
@@ -449,7 +451,8 @@ public final class ServiceImpl extends SpringGwtServlet implements Service, Appl
 			getParamsDao().begin();
 			final ParameterSetCache cache = new ParameterSetCache(session, getParamsDao());
 			final SearchEngineParameters ps = cache.getFromCache(paramSet);
-			final ParamsValidations paramsValidations = SearchEngine.validate(ps, getSearchEngines(), paramsInfo);
+			Collection<SearchEngine> enabledSearchEngines = getEnabledSearchEngines(ps);
+			final ParamsValidations paramsValidations = SearchEngine.validate(ps, enabledSearchEngines, paramsInfo);
 			final ClientParamSetValues clientParamSetValues = getClientProxyGenerator().convertValues(ps, paramsValidations);
 			getParamsDao().commit();
 			return clientParamSetValues;
@@ -458,6 +461,19 @@ public final class ServiceImpl extends SpringGwtServlet implements Service, Appl
 			LOGGER.error("Could not get parameter set values", e);
 			throw GWTServiceExceptionFactory.createException("Could not get parameter set values", e);
 		}
+	}
+
+	private Collection<SearchEngine> getEnabledSearchEngines(SearchEngineParameters ps) {
+		Collection<SearchEngine> enabledSearchEngines = new ArrayList<SearchEngine>();
+		Collection<SearchEngine> allEngines = getSearchEngines();
+		for (SearchEngineConfig config : ps.getEnabledEngines().getEngineConfigs()) {
+			for (SearchEngine engine : allEngines) {
+				if (engine.matchesConfig(config)) {
+					enabledSearchEngines.add(engine);
+				}
+			}
+		}
+		return enabledSearchEngines;
 	}
 
 	@Override
@@ -511,7 +527,7 @@ public final class ServiceImpl extends SpringGwtServlet implements Service, Appl
 			try {
 				final ParamName name = ParamName.getById(param);
 				ps.setValue(name, getClientProxyGenerator().convert(value, getParamsInfo().getAllowedValues(name)));
-				final ParamsValidations validations = SearchEngine.validate(ps, getSearchEngines(), paramsInfo);
+				final ParamsValidations validations = SearchEngine.validate(ps, getEnabledSearchEngines(ps), paramsInfo);
 				validateAdditionalSettings(validations, name, value);
 				final ClientParamsValidations validationList = getClientProxyGenerator().convertTo(validations);
 				getParamsDao().commit();
