@@ -19,23 +19,25 @@ CREATE TABLE protein_entry
   protein_accnum_id      INT,
   protein_description_id INT,
   protein_sequence_id    INT,
-  FOREIGN KEY (protein_accnum_id) REFERENCES protein_accnum (protein_accnum_id),
-  FOREIGN KEY (protein_sequence_id) REFERENCES protein_sequence (protein_sequence_id),
-  FOREIGN KEY (protein_description_id) REFERENCES protein_description (protein_description_id),
-  FOREIGN KEY (curation_id) REFERENCES curation (curation_id)
+  FOREIGN KEY protein_entry_ibfk_1 (protein_accnum_id) REFERENCES protein_accnum (protein_accnum_id),
+  FOREIGN KEY protein_entry_ibfk_2 (protein_sequence_id) REFERENCES protein_sequence (protein_sequence_id),
+  FOREIGN KEY protein_entry_ibfk_3 (protein_description_id) REFERENCES protein_description (protein_description_id),
+  FOREIGN KEY protein_entry_ibfk_4 (curation_id) REFERENCES curation (curation_id)
 );
 CREATE UNIQUE INDEX index3 ON protein_entry (curation_id, protein_accnum_id, protein_description_id, protein_sequence_id);
 
 -- Split the protein_database_entry into parts
 INSERT INTO protein_accnum (accession_number)
   SELECT
-    DISTINCT accession_number
+    DISTINCT
+    accession_number
   FROM `protein_database_entry`
   ORDER BY accession_number;
 
 INSERT INTO protein_description (description)
   SELECT
-    DISTINCT description
+    DISTINCT
+    description
   FROM `protein_database_entry`
   ORDER BY description;
 

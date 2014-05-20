@@ -45,8 +45,8 @@ CREATE TABLE quameter_result
   p_2c               DOUBLE,
   p_3                DOUBLE,
   sample_id          INT,
-  FOREIGN KEY (sample_id) REFERENCES tandem_mass_spec_sample (tandem_mass_spec_sample_id),
-  FOREIGN KEY (file_search_id) REFERENCES file_search (file_search_id)
+  FOREIGN KEY quameter_result_ibfk_1 (sample_id) REFERENCES tandem_mass_spec_sample (tandem_mass_spec_sample_id),
+  FOREIGN KEY quameter_result_ibfk_2 (file_search_id) REFERENCES file_search (file_search_id)
 );
 
 ALTER TABLE `swift_search_definition`

@@ -9,7 +9,7 @@ CREATE TABLE heme_test
   name                 LONGTEXT        NOT NULL,
   path                 LONGTEXT        NOT NULL,
   search_run           INT,
-  FOREIGN KEY (search_run) REFERENCES transaction (transaction_id)
+  FOREIGN KEY heme_test_ibfk_1 (search_run) REFERENCES transaction (transaction_id)
 );
 
 
