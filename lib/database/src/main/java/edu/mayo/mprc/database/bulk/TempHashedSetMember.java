@@ -1,6 +1,9 @@
 package edu.mayo.mprc.database.bulk;
 
+import edu.mayo.mprc.database.DaoBase;
 import edu.mayo.mprc.database.PersistableBase;
+import org.hibernate.criterion.Criterion;
+import org.hibernate.criterion.Restrictions;
 
 import java.io.Serializable;
 
@@ -62,5 +65,12 @@ public final class TempHashedSetMember extends PersistableBase implements Serial
 		result = 31 * result + dataOrder;
 		result = 31 * result + getId();
 		return result;
+	}
+
+	@Override
+	public Criterion getEqualityCriteria() {
+		return Restrictions.conjunction()
+				.add(DaoBase.nullSafeEq("job", getJob()))
+				.add(DaoBase.nullSafeEq("dataOrder", getDataOrder()));
 	}
 }

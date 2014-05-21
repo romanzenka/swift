@@ -267,6 +267,20 @@ public abstract class DaoBase implements Dao, SessionProvider {
 		return set;
 	}
 
+	/**
+	 * Save any kind of set into the database, making sure we do not save the same set twice.
+	 *
+	 * @param set List to save.
+	 * @param <T> Type of the list, must extend {@link PersistableBagBase}
+	 * @return Saved list (or the same one in case it was saved already).
+	 */
+	protected <T extends PersistableHashedSetBase<?>> T addSet(final T set) {
+		if (set.getId() == null) {
+			return updateHashedSet(set);
+		}
+		return set;
+	}
+
 	private PersistableBase getMatchingEmptyCollection(final String setField, final String className) {
 		final List ts = getSession().createQuery(
 				"select s from " + className + " as s where s." + setField + ".size = 0")
@@ -286,7 +300,8 @@ public abstract class DaoBase implements Dao, SessionProvider {
 		final List ts = session.createQuery(
 				"select s from " + className + " as s join s." + setField + " as m where m.id in (:ids) and s.id in ("
 						+ "select s.id from " + className + " where s." + setField + ".size = :ids_count "
-						+ ") group by s.id having count(m)=:ids_count")
+						+ ") group by s.id having count(m)=:ids_count"
+		)
 				.setParameterList("ids", ids)
 				.setParameter("ids_count", ids.length)
 				.list();
@@ -341,17 +356,15 @@ public abstract class DaoBase implements Dao, SessionProvider {
 
 	/**
 	 * Save an item. If identical item already exists, update it.
-	 *
-	 * @param item             The item to create (in database)
+	 *  @param item             The item to create (in database)
 	 * @param change           What change is this save related to.
-	 * @param equalityCriteria Criteria to find identical, already existing item. Do not need to check for the item class and deletion.
 	 * @param createNew        New object must be created.
 	 */
-	protected final <T extends Evolvable> T save(final T item, final Change change, final Criterion equalityCriteria, final boolean createNew) {
+	protected final <T extends Evolvable> T save(final T item, final Change change, final boolean createNew) {
 		final Session session = getSession();
 		final Evolvable existingObject = (Evolvable)
 				allCriteria(item.getClass()) // It is not deprecated already
-						.add(equalityCriteria)
+						.add(item.getEqualityCriteria())
 						.uniqueResult();
 
 		if (existingObject != null) {
@@ -385,13 +398,13 @@ public abstract class DaoBase implements Dao, SessionProvider {
 	/**
 	 * Save an item. If identical item already exists, update the current item.
 	 *
-	 * @param item             The item to create (in database)
-	 * @param equalityCriteria Criteria to find identical, already existing item. Do not need to check for the item class and deletion.
-	 * @param createNew        New object must be created.
+	 * @param item      The item to create (in database)
+	 * @param createNew New object must be created.
 	 * @return The saved object. This can be either the newly saved item (it did not exist in the database yet), or a result of Hibernate's merge operation.
 	 */
-	public final <T extends PersistableBase> T save(final T item, final Criterion equalityCriteria, final boolean createNew) {
+	public final <T extends PersistableBase> T save(final T item, final boolean createNew) {
 		final Session session = getSession();
+		final Criterion equalityCriteria = item.getEqualityCriteria();
 		@SuppressWarnings("unchecked")
 		final List<T> existingObjects = session
 				.createCriteria(item.getClass())

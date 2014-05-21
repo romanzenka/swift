@@ -1,6 +1,9 @@
 package edu.mayo.mprc.swift.params2;
 
+import edu.mayo.mprc.database.DaoBase;
 import edu.mayo.mprc.database.PersistableBase;
+import org.hibernate.criterion.Criterion;
+import org.hibernate.criterion.Restrictions;
 
 /**
  * Defines a list of starred proteins.
@@ -80,5 +83,13 @@ public class StarredProteins extends PersistableBase {
 		result = 31 * result + (getDelimiter() != null ? getDelimiter().hashCode() : 0);
 		result = 31 * result + (isRegularExpression() ? 1 : 0);
 		return result;
+	}
+
+	@Override
+	public Criterion getEqualityCriteria() {
+		return Restrictions.conjunction()
+				.add(DaoBase.nullSafeEq("starred", getStarred()))
+				.add(DaoBase.nullSafeEq("delimiter", getDelimiter()))
+				.add(DaoBase.nullSafeEq("regularExpression", isRegularExpression()));
 	}
 }

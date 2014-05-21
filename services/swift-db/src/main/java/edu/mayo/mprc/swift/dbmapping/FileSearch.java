@@ -1,14 +1,18 @@
 package edu.mayo.mprc.swift.dbmapping;
 
+import edu.mayo.mprc.database.DaoBase;
+import edu.mayo.mprc.database.EqualityCriteria;
 import edu.mayo.mprc.database.PersistableBase;
 import edu.mayo.mprc.swift.params2.SearchEngineParameters;
+import org.hibernate.criterion.Criterion;
+import org.hibernate.criterion.Restrictions;
 
 import java.io.File;
 
 /**
  * Information about how to search a single input file.
  */
-public class FileSearch extends PersistableBase {
+public class FileSearch extends PersistableBase implements EqualityCriteria {
 	/**
 	 * File to be searched.
 	 */
@@ -136,4 +140,15 @@ public class FileSearch extends PersistableBase {
 		result = 31 * result + (getSearchParameters() != null ? getSearchParameters().hashCode() : 0);
 		return result;
 	}
+
+	public Criterion getEqualityCriteria() {
+		return Restrictions.conjunction()
+				.add(DaoBase.nullSafeEq("inputFile", getInputFile()))
+				.add(DaoBase.nullSafeEq("biologicalSample", getBiologicalSample()))
+				.add(DaoBase.nullSafeEq("categoryName", getCategoryName()))
+				.add(DaoBase.nullSafeEq("experiment", getExperiment()))
+				.add(DaoBase.nullSafeEq("swiftSearchDefinitionId", getSwiftSearchDefinitionId()))
+				.add(DaoBase.associationEq("searchParameters", getSearchParameters()));
+	}
+
 }

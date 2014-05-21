@@ -1,5 +1,7 @@
 package edu.mayo.mprc.database;
 
+import org.hibernate.criterion.Criterion;
+import org.hibernate.criterion.Restrictions;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
@@ -85,6 +87,12 @@ public class TestPersistableSet {
 		@Override
 		public int hashCode() {
 			return value;
+		}
+
+		@Override
+		public Criterion getEqualityCriteria() {
+			return Restrictions.conjunction()
+					.add(DaoBase.nullSafeEq("id", getId()));
 		}
 	}
 

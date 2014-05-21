@@ -1,6 +1,8 @@
 package edu.mayo.mprc.database;
 
 import com.google.common.collect.LinkedHashMultiset;
+import edu.mayo.mprc.MprcException;
+import org.hibernate.criterion.Criterion;
 
 import java.util.Collection;
 import java.util.Iterator;
@@ -139,5 +141,10 @@ public abstract class PersistableBagBase<T extends PersistableBase> extends Pers
 	@Override
 	public int hashCode() {
 		return getList() != null ? makeMultiset(getList()).hashCode() : 0;
+	}
+
+	@Override
+	public Criterion getEqualityCriteria() {
+		throw new MprcException("Bag does not provide equality criteria. You need to save it through addBag method");
 	}
 }

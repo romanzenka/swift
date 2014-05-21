@@ -8,7 +8,6 @@ import edu.mayo.mprc.database.Database;
 import org.apache.log4j.Logger;
 import org.hibernate.Criteria;
 import org.hibernate.FetchMode;
-import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
 import org.joda.time.DateTime;
@@ -71,15 +70,11 @@ public final class WorkspaceDaoHibernate extends DaoBase implements WorkspaceDao
 	public User addNewUser(final String firstName, final String lastName, final String email, final Change change) {
 		try {
 			User user = new User(firstName, lastName, email, "database");
-			user = save(user, getUserEqualityCriteria(user), true);
+			user = save(user, true);
 			return user;
 		} catch (Exception t) {
 			throw new MprcException("Cannot create new user " + firstName + " " + lastName, t);
 		}
-	}
-
-	private Criterion getUserEqualityCriteria(final User user) {
-		return Restrictions.eq("userName", user.getUserName());
 	}
 
 	@Override
@@ -99,7 +94,7 @@ public final class WorkspaceDaoHibernate extends DaoBase implements WorkspaceDao
 		LOGGER.info("Installing workspace DAO");
 		if (countAll(User.class) == 0) {
 			final User user = new User("Mprc", "Test", "mprctest@localhost", "mt", "database");
-			save(user, new Change("Creating a test user - no users were defined", new DateTime()), getUserEqualityCriteria(user), true);
+			save(user, new Change("Creating a test user - no users were defined", new DateTime()), true);
 		}
 
 		addUserInitials();

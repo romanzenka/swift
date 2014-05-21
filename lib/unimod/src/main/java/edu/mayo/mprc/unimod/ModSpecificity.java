@@ -2,8 +2,10 @@ package edu.mayo.mprc.unimod;
 
 import com.google.common.base.Objects;
 import com.google.common.base.Strings;
+import edu.mayo.mprc.MprcException;
 import edu.mayo.mprc.database.PersistableBase;
 import edu.mayo.mprc.utilities.ComparisonChain;
+import org.hibernate.criterion.Criterion;
 
 import java.util.*;
 
@@ -259,7 +261,11 @@ public class ModSpecificity extends PersistableBase implements Comparable<ModSpe
 			return false;
 		}
 		return getTerm() == other.getTerm();
+	}
 
+	@Override
+	public Criterion getEqualityCriteria() {
+		throw new MprcException("ModSpecificity does not define equality criteria, is saved differently");
 	}
 
 	@Override
@@ -311,7 +317,7 @@ public class ModSpecificity extends PersistableBase implements Comparable<ModSpe
 
 	/**
 	 * @return True if this modification can occur at C terminus. This means either the C terminus is requested,
-	 *         or the modification can occur anywhere in the sequence.
+	 * or the modification can occur anywhere in the sequence.
 	 */
 	public boolean isSiteCTerminus() {
 		if (site != null) {
@@ -323,7 +329,7 @@ public class ModSpecificity extends PersistableBase implements Comparable<ModSpe
 
 	/**
 	 * @return True if this modification can occur at N terminus. This means either the N terminus is requested,
-	 *         or the modification can occur anywhere in the sequence.
+	 * or the modification can occur anywhere in the sequence.
 	 */
 	public boolean isSiteNTerminus() {
 		if (site != null) {

@@ -1,6 +1,8 @@
 package edu.mayo.mprc.workspace;
 
 import edu.mayo.mprc.database.EvolvableBase;
+import org.hibernate.criterion.Criterion;
+import org.hibernate.criterion.Restrictions;
 
 import java.io.Serializable;
 import java.text.MessageFormat;
@@ -210,6 +212,11 @@ public class User extends EvolvableBase implements Serializable {
 		result = 31 * result + (getUserPassword() != null ? getUserPassword().hashCode() : 0);
 		result = 31 * result + (getUserName() != null ? getUserName().hashCode() : 0);
 		return result;
+	}
+
+	@Override
+	public Criterion getEqualityCriteria() {
+		return Restrictions.eq("userName", getUserName());
 	}
 
 	public String toString() {

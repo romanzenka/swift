@@ -5,6 +5,8 @@ import com.google.common.base.Strings;
 import edu.mayo.mprc.MprcException;
 import edu.mayo.mprc.database.EvolvableBase;
 import edu.mayo.mprc.utilities.ComparisonChain;
+import org.hibernate.criterion.Criterion;
+import org.hibernate.criterion.Restrictions;
 
 import java.io.Serializable;
 import java.util.Arrays;
@@ -67,6 +69,7 @@ public class Protease extends EvolvableBase implements Serializable, Comparable<
 		this.rnminus1 = Strings.nullToEmpty(rnminus1);
 	}
 
+	@Override
 	public boolean equals(final Object o) {
 		if (!(o instanceof Protease)) {
 			return false;
@@ -76,11 +79,18 @@ public class Protease extends EvolvableBase implements Serializable, Comparable<
 				Objects.equal(p.getRnminus1(), getRnminus1());
 	}
 
+	@Override
 	public int hashCode() {
 		return (getName() != null ? getName().hashCode() : 0) + (getRnminus1() != null ? getRnminus1().hashCode() : 0)
 				+ (getRn() != null ? getRn().hashCode() : 0);
 	}
 
+	@Override
+	public Criterion getEqualityCriteria() {
+		return Restrictions.eq("name", getName());
+	}
+
+	@Override
 	public String toString() {
 		return getName() + ": " + rnminus1 + " " + rn;
 	}

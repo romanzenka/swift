@@ -2,8 +2,6 @@ package edu.mayo.mprc.database;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
-import org.hibernate.criterion.Criterion;
-import org.hibernate.criterion.Restrictions;
 import org.joda.time.DateTime;
 import org.testng.Assert;
 import org.testng.annotations.AfterClass;
@@ -34,14 +32,14 @@ public final class DaoBaseTest extends DaoTest {
 
 	private TestSet s(final TestSet set) {
 		LOGGER.debug("  // Saving set " + set.getSetName());
-		base.save(set, Restrictions.eq("setName", set.getSetName()), true);
+		base.save(set, true);
 		LOGGER.debug("  \\ Saved set " + set.getSetName());
 		return set;
 	}
 
 	private TestSetMember s(final TestSetMember m) {
 		LOGGER.debug("    // Saving member " + m.getMemberName());
-		base.save(m, Restrictions.eq("memberName", m.getMemberName()), false);
+		base.save(m, false);
 		LOGGER.debug("    \\ Saved member " + m.getMemberName());
 		return m;
 	}
@@ -102,13 +100,13 @@ public final class DaoBaseTest extends DaoTest {
 	@Test
 	public void shouldIdempotentlySaveDoubles() {
 		TestDouble d1 = new TestDouble(10, 20);
-		d1 = base.save(d1, testDoubleEqualityCriteria(d1), false);
+		d1 = base.save(d1, false);
 		nextTransaction();
 		TestDouble d2 = new TestDouble(10.0001, 19.9999);
-		d2 = base.save(d2, testDoubleEqualityCriteria(d2), false);
+		d2 = base.save(d2, false);
 		Assert.assertEquals(d2.getId(), d1.getId(), "Must be the same object");
 		TestDouble d3 = new TestDouble(10.0001, Double.NaN);
-		d3 = base.save(d3, testDoubleEqualityCriteria(d3), false);
+		d3 = base.save(d3, false);
 		Assert.assertNotSame(d2.getId(), d3.getId(), "Must not be the same object");
 	}
 
@@ -118,54 +116,34 @@ public final class DaoBaseTest extends DaoTest {
 	@Test
 	public void shouldIdempotentlySaveNaNDoubles() {
 		TestDouble d1 = new TestDouble(10, Double.NaN);
-		d1 = base.save(d1, testDoubleEqualityCriteria(d1), false);
+		d1 = base.save(d1, false);
 		nextTransaction();
 		TestDouble d2 = new TestDouble(10.0001, Double.NaN);
-		d2 = base.save(d2, testDoubleEqualityCriteria(d2), false);
+		d2 = base.save(d2, false);
 		Assert.assertEquals(d2.getId(), d1.getId(), "Must be the same object");
 		TestDouble d3 = new TestDouble(Double.NaN, Double.NaN);
-		d3 = base.save(d3, testDoubleEqualityCriteria(d3), false);
+		d3 = base.save(d3, false);
 		Assert.assertNotSame(d2.getId(), d3.getId(), "Must not be the same object");
-	}
-
-	private Criterion testDoubleEqualityCriteria(final TestDouble d1) {
-		return Restrictions.conjunction()
-				.add(DaoBase.doubleEq("value1", d1.getValue1(), 0.1))
-				.add(DaoBase.doubleEq("value2", d1.getValue2(), 0.1));
 	}
 
 	@Test
 	public void shouldSaveDateTimes() {
 		TestDate d1 = new TestDate(new DateTime(2012, 2, 29, 10, 20, 30, 0), new DateTime(2010, 10, 30, 13, 45, 59, 0));
-		d1 = base.save(d1, testDateEqualityCriteria(d1), false);
+		d1 = base.save(d1, false);
 		nextTransaction();
 		TestDate d2 = new TestDate(new DateTime(2012, 2, 29, 10, 20, 30, 0), new DateTime(2010, 10, 30, 13, 45, 59, 0));
-		d2 = base.save(d2, testDateEqualityCriteria(d2), false);
+		d2 = base.save(d2, false);
 		Assert.assertEquals(d2.getId(), d1.getId(), "Must be the same object");
-	}
-
-	private Criterion testDateEqualityCriteria(final TestDate d1) {
-		return Restrictions.conjunction()
-				.add(Restrictions.eq("value1", d1.getValue1()))
-				.add(Restrictions.eq("value2", d1.getValue2()));
 	}
 
 	@Test
 	public void shouldSaveFiles() {
 		TestFile f1 = new TestFile(new File("hello.txt").getAbsoluteFile(), null);
-		f1 = base.save(f1, testFileEqualityCriteria(f1), false);
+		f1 = base.save(f1, false);
 		nextTransaction();
 		final List<TestFile> list = DaoBase.listAndCast(base.getSession().createCriteria(TestFile.class));
 		Assert.assertEquals(list.size(), 1);
 		Assert.assertEquals(list.get(0).getFile1(), f1.getFile1());
 		Assert.assertEquals(list.get(0).getFile2(), f1.getFile2());
 	}
-
-	private Criterion testFileEqualityCriteria(TestFile f1) {
-		return Restrictions.conjunction()
-				.add(Restrictions.eq("file1", f1.getFile1()))
-				.add(Restrictions.eq("file2", f1.getFile2()));
-	}
-
-
 }

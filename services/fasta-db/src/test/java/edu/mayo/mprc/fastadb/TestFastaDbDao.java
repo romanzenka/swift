@@ -91,30 +91,6 @@ public class TestFastaDbDao extends DaoTest {
 	}
 
 	@Test
-	public void shouldSaveUniquePeptide() {
-		fastaDbDao.begin();
-		final PeptideSequence seq1 = new PeptideSequence("\t  bBBZ  ");
-		final PeptideSequence seq2 = new PeptideSequence(" Bbbz* ");
-		Assert.assertEquals(seq1, seq2, "Same sequence written in two ways");
-
-		final PeptideSequence seq1saved = fastaDbDao.addPeptideSequence(seq1);
-		final PeptideSequence seq2saved = fastaDbDao.addPeptideSequence(seq2);
-
-		Assert.assertEquals(seq1saved.getId(), seq2saved.getId(), "Two sequences saved as single row in database");
-
-		final Integer seq1savedId = seq1saved.getId();
-		fastaDbDao.addPeptideSequence(seq1saved);
-		Assert.assertEquals(seq1saved.getId(), seq1savedId, "The ID does not change on double save");
-
-		fastaDbDao.commit();
-
-		fastaDbDao.begin();
-		final PeptideSequence seq1Loaded = fastaDbDao.getPeptideSequence(seq1savedId);
-		Assert.assertEquals(seq1Loaded, seq1, "Load has to work");
-		fastaDbDao.commit();
-	}
-
-	@Test
 	public void shouldTranslateAccessionNumbers() {
 		loadFasta("/edu/mayo/mprc/fastadb/test.fasta", "Current_SP");
 		fastaDbDao.begin();
@@ -129,7 +105,8 @@ public class TestFastaDbDao extends DaoTest {
 							"KTLNDMRQEYEQLIAKNRKDIENQYETQITQIEHEVSSSGQEVQSSAKEVTQLRHGVQELEIELQSQLSKKAALEKSLED" +
 							"TKNRYCGQLQMIQEQISNLEAQITDVRQEIECQNQEYSLLLSIKMRLEKEIETYHNLLEGGQEDFESSGAGKIGLGGRGG" +
 							"SGGSYGRGSRGGSGGSYGGGGSGGGYGGGSGSRGGSGGSYGGGSGSGGGSGGGYGGGSGGGHSGGSGGGHSGGSGGNYGG" +
-							"GSGSGGGSGGGYGGGSGSRGGSGGSHGGGSGFGGESGGSYGGGEEASGSGGGYGGGSGKSSHS");
+							"GSGSGGGSGGGYGGGSGSRGGSGGSHGGGSGFGGESGGSYGGGEEASGSGGGYGGGSGKSSHS"
+			);
 
 			final ProteinSequence sequence2 = translator.getProteinSequence("nonexistent", "Current_SP");
 			Assert.assertNull(sequence2, "No sequence found means null should be returned");
@@ -156,7 +133,8 @@ public class TestFastaDbDao extends DaoTest {
 							"KTLNDMRQEYEQLIAKNRKDIENQYETQITQIEHEVSSSGQEVQSSAKEVTQLRHGVQELEIELQSQLSKKAALEKSLED" +
 							"TKNRYCGQLQMIQEQISNLEAQITDVRQEIECQNQEYSLLLSIKMRLEKEIETYHNLLEGGQEDFESSGAGKIGLGGRGG" +
 							"SGGSYGRGSRGGSGGSYGGGGSGGGYGGGSGSRGGSGGSYGGGSGSGGGSGGGYGGGSGGGHSGGSGGGHSGGSGGNYGG" +
-							"GSGSGGGSGGGYGGGSGSRGGSGGSHGGGSGFGGESGGSYGGGEEASGSGGGYGGGSGKSSHS");
+							"GSGSGGGSGGGYGGGSGSRGGSGGSHGGGSGFGGESGGSYGGGEEASGSGGGYGGGSGKSSHS"
+			);
 
 			final ProteinSequence sequence2 = translator.getProteinSequence("nonexistent", "Current_SP_20120716");
 			Assert.assertNull(sequence2, "No sequence found means null should be returned");

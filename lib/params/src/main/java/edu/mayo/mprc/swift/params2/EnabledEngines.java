@@ -5,6 +5,7 @@ import com.google.common.base.Objects;
 import com.google.common.collect.Lists;
 import edu.mayo.mprc.MprcException;
 import edu.mayo.mprc.database.PersistableBase;
+import org.hibernate.criterion.Criterion;
 
 import java.util.Collections;
 import java.util.HashSet;
@@ -103,5 +104,10 @@ public class EnabledEngines extends PersistableBase {
 		}
 		Collections.sort(versions);
 		throw new MprcException("The search engine " + code + " has multiple matching versions: " + Joiner.on(", ").join(versions));
+	}
+
+	@Override
+	public Criterion getEqualityCriteria() {
+		throw new MprcException("EnabledEngines does not support equality testing");
 	}
 }

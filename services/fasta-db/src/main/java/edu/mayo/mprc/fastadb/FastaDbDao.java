@@ -53,23 +53,6 @@ public interface FastaDbDao extends BulkLoadJobStarter {
 	String getProteinDescription(Curation database, String accessionNumber);
 
 	/**
-	 * Look up given peptide sequence in the database.
-	 * If the sequence does not exist in the database, it is added.
-	 * ID of the peptide sequence is updated to match the database id.
-	 *
-	 * @param peptideSequence Sequence to add.
-	 */
-	PeptideSequence addPeptideSequence(PeptideSequence peptideSequence);
-
-	/**
-	 * Return a protein sequence for given ID.
-	 *
-	 * @param peptideId Id of the sequence to return.
-	 * @return Sequence from the database.
-	 */
-	PeptideSequence getPeptideSequence(int peptideId);
-
-	/**
 	 * @param database FASTA database to check.
 	 * @return How many accession numbers are associated with given curation.
 	 */

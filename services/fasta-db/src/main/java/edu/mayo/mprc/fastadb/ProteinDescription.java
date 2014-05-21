@@ -1,6 +1,9 @@
 package edu.mayo.mprc.fastadb;
 
+import edu.mayo.mprc.database.DaoBase;
 import edu.mayo.mprc.database.PersistableBase;
+import org.hibernate.criterion.Criterion;
+import org.hibernate.criterion.Restrictions;
 
 /**
  * @author Roman Zenka
@@ -51,5 +54,11 @@ public final class ProteinDescription extends PersistableBase {
 	@Override
 	public int hashCode() {
 		return description.hashCode();
+	}
+
+	@Override
+	public Criterion getEqualityCriteria() {
+		return Restrictions.conjunction()
+				.add(DaoBase.nullSafeEq("description", getDescription()));
 	}
 }

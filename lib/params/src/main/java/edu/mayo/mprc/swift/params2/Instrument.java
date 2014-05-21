@@ -2,6 +2,8 @@ package edu.mayo.mprc.swift.params2;
 
 import edu.mayo.mprc.MprcException;
 import edu.mayo.mprc.database.EvolvableBase;
+import org.hibernate.criterion.Criterion;
+import org.hibernate.criterion.Restrictions;
 
 import java.util.Arrays;
 import java.util.HashSet;
@@ -91,6 +93,11 @@ public class Instrument extends EvolvableBase {
 		int result = getName() != null ? getName().hashCode() : 0;
 		result = 31 * result + (getSeries() != null ? getSeries().hashCode() : 0);
 		return result;
+	}
+
+	@Override
+	public Criterion getEqualityCriteria() {
+		return Restrictions.eq("name", getName());
 	}
 
 	public String toString() {

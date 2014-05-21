@@ -1,6 +1,9 @@
 package edu.mayo.mprc.swift.params2;
 
+import edu.mayo.mprc.database.DaoBase;
 import edu.mayo.mprc.database.PersistableBase;
+import org.hibernate.criterion.Criterion;
+import org.hibernate.criterion.Restrictions;
 
 /**
  * Settings for raw->mgf convertor.
@@ -83,6 +86,14 @@ public class ExtractMsnSettings extends PersistableBase {
 		result = 31 * result + (command != null ? command.hashCode() : 0);
 		return result;
 	}
+
+	@Override
+	public Criterion getEqualityCriteria() {
+		return Restrictions.conjunction()
+				.add(DaoBase.nullSafeEq("commandLineSwitches", getCommandLineSwitches()))
+				.add(DaoBase.nullSafeEq("command", getCommand()));
+	}
+
 
 	public ExtractMsnSettings copy() {
 		final ExtractMsnSettings msnSettings = new ExtractMsnSettings(getCommandLineSwitches(), getCommand());

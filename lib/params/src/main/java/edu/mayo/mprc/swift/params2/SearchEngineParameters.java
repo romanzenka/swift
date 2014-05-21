@@ -2,9 +2,12 @@ package edu.mayo.mprc.swift.params2;
 
 import com.google.common.base.Objects;
 import edu.mayo.mprc.MprcException;
+import edu.mayo.mprc.database.DaoBase;
 import edu.mayo.mprc.database.PersistableBase;
 import edu.mayo.mprc.dbcurator.model.Curation;
 import edu.mayo.mprc.unimod.ModSet;
+import org.hibernate.criterion.Criterion;
+import org.hibernate.criterion.Restrictions;
 
 /**
  * Describes a set of parameters for running a database search.
@@ -80,6 +83,9 @@ public class SearchEngineParameters extends PersistableBase {
 	 */
 	private ScaffoldSettings scaffoldSettings;
 
+	/**
+	 * Search engine parameters include a list of enabled engines.
+	 */
 	private EnabledEngines enabledEngines;
 
 	public SearchEngineParameters() {
@@ -282,6 +288,9 @@ public class SearchEngineParameters extends PersistableBase {
 		if (!Objects.equal(getScaffoldSettings(), other.getScaffoldSettings())) {
 			return false;
 		}
+		if (!Objects.equal(getEnabledEngines(), other.getEnabledEngines())) {
+			return false;
+		}
 
 		return true;
 	}
@@ -299,7 +308,26 @@ public class SearchEngineParameters extends PersistableBase {
 		result = 31 * result + getInstrument().hashCode();
 		result = 31 * result + getExtractMsnSettings().hashCode();
 		result = 31 * result + getScaffoldSettings().hashCode();
+		result = 31 * result + getEnabledEngines().hashCode();
 		return result;
+	}
+
+	@Override
+	public Criterion getEqualityCriteria() {
+		return Restrictions.conjunction()
+				.add(DaoBase.associationEq("database", getDatabase()))
+				.add(DaoBase.associationEq("protease", getProtease()))
+				.add(Restrictions.eq("missedCleavages", getMissedCleavages()))
+				.add(Restrictions.eq("minTerminiCleavages", getMinTerminiCleavages()))
+				.add(DaoBase.associationEq("fixedModifications", getFixedModifications()))
+				.add(DaoBase.associationEq("variableModifications", getVariableModifications()))
+				.add(Restrictions.eq("peptideTolerance", getPeptideTolerance()))
+				.add(Restrictions.eq("fragmentTolerance", getFragmentTolerance()))
+				.add(DaoBase.associationEq("instrument", getInstrument()))
+				.add(DaoBase.associationEq("extractMsnSettings", getExtractMsnSettings()))
+				.add(DaoBase.associationEq("scaffoldSettings", getScaffoldSettings()))
+				.add(DaoBase.associationEq("enabledEngines", getEnabledEngines()))
+				;
 	}
 
 	/**

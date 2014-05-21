@@ -1,7 +1,9 @@
 package edu.mayo.mprc.fastadb;
 
 import edu.mayo.mprc.chem.AminoAcidSet;
+import edu.mayo.mprc.database.DaoBase;
 import edu.mayo.mprc.database.PersistableBase;
+import org.hibernate.criterion.Criterion;
 
 import java.util.Locale;
 
@@ -83,5 +85,10 @@ public abstract class Sequence extends PersistableBase {
 	@Override
 	public int hashCode() {
 		return getSequence() == null ? 0 : getSequence().hashCode();
+	}
+
+	@Override
+	public Criterion getEqualityCriteria() {
+		return DaoBase.nullSafeEq("sequence", getSequence());
 	}
 }

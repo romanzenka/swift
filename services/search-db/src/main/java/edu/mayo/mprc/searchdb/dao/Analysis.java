@@ -1,11 +1,14 @@
 package edu.mayo.mprc.searchdb.dao;
 
+import edu.mayo.mprc.database.DaoBase;
 import edu.mayo.mprc.database.PersistableBase;
 import edu.mayo.mprc.swift.dbmapping.ReportData;
 import edu.mayo.mprc.swift.dbmapping.SwiftSearchDefinition;
 import edu.mayo.mprc.swift.params2.StarMatcher;
 import edu.mayo.mprc.swift.params2.StarredProteins;
 import edu.mayo.mprc.utilities.StringUtilities;
+import org.hibernate.criterion.Criterion;
+import org.hibernate.criterion.Restrictions;
 import org.joda.time.DateTime;
 
 import java.text.DecimalFormat;
@@ -147,6 +150,15 @@ public final class Analysis extends PersistableBase {
 		result = 31 * result + (getBiologicalSamples() != null ? getBiologicalSamples().hashCode() : 0);
 		return result;
 	}
+
+	@Override
+	public Criterion getEqualityCriteria() {
+		return Restrictions.conjunction()
+				.add(DaoBase.nullSafeEq("scaffoldVersion", getScaffoldVersion()))
+				.add(DaoBase.nullSafeEq("analysisDate", getAnalysisDate()))
+				.add(DaoBase.associationEq("biologicalSamples", getBiologicalSamples()));
+	}
+
 
 	/**
 	 * Report information about entire analysis into a given writer in HTML format.

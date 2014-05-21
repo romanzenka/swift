@@ -1,6 +1,9 @@
 package edu.mayo.mprc.searchdb.dao;
 
+import edu.mayo.mprc.database.DaoBase;
 import edu.mayo.mprc.database.PersistableBase;
+import org.hibernate.criterion.Criterion;
+import org.hibernate.criterion.Restrictions;
 
 /**
  * A list of search results for a particular tandem mass spectrometry sample.
@@ -77,4 +80,12 @@ public class SearchResult extends PersistableBase {
 		result = 31 * result + (getProteinGroups() != null ? getProteinGroups().hashCode() : 0);
 		return result;
 	}
+
+	@Override
+	public Criterion getEqualityCriteria() {
+		return Restrictions.conjunction()
+				.add(DaoBase.associationEq("massSpecSample", getMassSpecSample()))
+				.add(DaoBase.associationEq("proteinGroups", getProteinGroups()));
+	}
+
 }

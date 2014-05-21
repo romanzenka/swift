@@ -1,5 +1,8 @@
 package edu.mayo.mprc.database;
 
+import org.hibernate.criterion.Criterion;
+import org.hibernate.criterion.Restrictions;
+
 /**
  * A double holder.
  *
@@ -64,4 +67,12 @@ public class TestDouble extends PersistableBase {
 		result = 31 * result + (int) (temp ^ (temp >>> 32));
 		return result;
 	}
+
+	@Override
+	public Criterion getEqualityCriteria() {
+		return Restrictions.conjunction()
+				.add(DaoBase.doubleEq("value1", getValue1(), 0.1))
+				.add(DaoBase.doubleEq("value2", getValue2(), 0.1));
+	}
+
 }

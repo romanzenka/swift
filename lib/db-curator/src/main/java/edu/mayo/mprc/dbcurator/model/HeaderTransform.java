@@ -2,6 +2,8 @@ package edu.mayo.mprc.dbcurator.model;
 
 import edu.mayo.mprc.database.PersistableBase;
 import org.apache.log4j.Logger;
+import org.hibernate.criterion.Criterion;
+import org.hibernate.criterion.Restrictions;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -128,4 +130,10 @@ public class HeaderTransform extends PersistableBase {
 		result = 31 * result + (getCommon() != null ? getCommon().hashCode() : 0);
 		return result;
 	}
+
+	@Override
+	public Criterion getEqualityCriteria() {
+		return Restrictions.eq("name", getName());
+	}
+
 }

@@ -2,6 +2,8 @@ package edu.mayo.mprc.swift.params2;
 
 import edu.mayo.mprc.database.EvolvableBase;
 import edu.mayo.mprc.workspace.User;
+import org.hibernate.criterion.Criterion;
+import org.hibernate.criterion.Restrictions;
 
 /**
  * A parameter set that was saved and named by a user.
@@ -74,5 +76,10 @@ public class SavedSearchEngineParameters extends EvolvableBase {
 		result = 31 * result + (getUser() != null ? getUser().hashCode() : 0);
 		result = 31 * result + (getParameters() != null ? getParameters().hashCode() : 0);
 		return result;
+	}
+
+	@Override
+	public Criterion getEqualityCriteria() {
+		return Restrictions.eq("name", getName());
 	}
 }

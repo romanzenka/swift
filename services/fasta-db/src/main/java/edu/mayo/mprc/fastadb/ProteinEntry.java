@@ -1,7 +1,10 @@
 package edu.mayo.mprc.fastadb;
 
+import edu.mayo.mprc.database.DaoBase;
 import edu.mayo.mprc.database.PersistableBase;
 import edu.mayo.mprc.dbcurator.model.Curation;
+import org.hibernate.criterion.Criterion;
+import org.hibernate.criterion.Restrictions;
 
 /**
  * @author Roman Zenka
@@ -105,4 +108,12 @@ public final class ProteinEntry extends PersistableBase {
 		return result;
 	}
 
+	@Override
+	public Criterion getEqualityCriteria() {
+		return Restrictions.conjunction()
+				.add(DaoBase.associationEq("database", getDatabase()))
+				.add(DaoBase.associationEq("accessionNumber", getAccessionNumber()))
+				.add(DaoBase.associationEq("description", getDescription()))
+				.add(DaoBase.associationEq("sequence", getSequence()));
+	}
 }

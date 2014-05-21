@@ -1,6 +1,8 @@
 package edu.mayo.mprc.swift.dbmapping;
 
 import edu.mayo.mprc.database.PersistableBase;
+import org.hibernate.criterion.Criterion;
+import org.hibernate.criterion.Restrictions;
 
 /**
  * Settings for generating a peptide report. Currently no settings are needed.
@@ -19,5 +21,10 @@ public class PeptideReport extends PersistableBase {
 	@Override
 	public int hashCode() {
 		return 1;
+	}
+
+	@Override
+	public Criterion getEqualityCriteria() {
+		return Restrictions.isNotNull("id");
 	}
 }

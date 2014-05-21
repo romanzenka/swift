@@ -6,7 +6,7 @@ package edu.mayo.mprc.database;
  * The values however evolve over time. This interface allows marking old values as deprecated, and provide a reason why.
  * Since it is possible to evolve objects, these objects should not be mutable.
  */
-public interface Evolvable {
+public interface Evolvable extends EqualityCriteria {
 	/**
 	 * Set id for hibernate. This is not to be used by the code itself.
 	 *

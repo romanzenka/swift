@@ -5,9 +5,12 @@ import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableMap;
 import edu.mayo.mprc.MprcException;
+import edu.mayo.mprc.database.DaoBase;
 import edu.mayo.mprc.database.PersistableBase;
 import edu.mayo.mprc.searchdb.dao.TandemMassSpectrometrySample;
 import edu.mayo.mprc.swift.dbmapping.FileSearch;
+import org.hibernate.criterion.Criterion;
+import org.hibernate.criterion.Restrictions;
 
 import java.util.Locale;
 import java.util.Map;
@@ -841,4 +844,12 @@ public final class QuameterResult extends PersistableBase {
 		final QuameterResult other = (QuameterResult) obj;
 		return Objects.equal(this.sample, other.sample) && Objects.equal(this.fileSearch, other.fileSearch);
 	}
+
+	@Override
+	public Criterion getEqualityCriteria() {
+		return Restrictions.conjunction()
+				.add(DaoBase.associationEq("fileSearch", getFileSearch()))
+				.add(DaoBase.associationEq("sample", getSample()));
+	}
+
 }

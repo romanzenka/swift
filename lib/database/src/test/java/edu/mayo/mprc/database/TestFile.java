@@ -1,5 +1,8 @@
 package edu.mayo.mprc.database;
 
+import org.hibernate.criterion.Criterion;
+import org.hibernate.criterion.Restrictions;
+
 import java.io.File;
 
 /**
@@ -31,5 +34,12 @@ public class TestFile extends PersistableBase {
 
 	public void setFile2(File file2) {
 		this.file2 = file2;
+	}
+
+	@Override
+	public Criterion getEqualityCriteria() {
+		return Restrictions.conjunction()
+				.add(DaoBase.nullSafeEq("file1", getFile1()))
+				.add(DaoBase.nullSafeEq("file2", getFile2()));
 	}
 }

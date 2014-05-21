@@ -15,7 +15,6 @@ import edu.mayo.mprc.utilities.exceptions.ExceptionUtilities;
 import edu.mayo.mprc.utilities.progress.PercentProgressReporter;
 import edu.mayo.mprc.utilities.progress.PercentRangeReporter;
 import org.hibernate.Query;
-import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.Restrictions;
 
 import javax.annotation.Resource;
@@ -87,20 +86,9 @@ public class SearchDbDaoHibernate extends DaoBase implements RuntimeInitializer,
 				}
 			}
 
-			return save(group, proteinGroupEqualityCriteria(group), false);
+			return save(group, false);
 		}
 		return group;
-	}
-
-	private static Criterion proteinGroupEqualityCriteria(final ProteinGroup group) {
-		return Restrictions.conjunction()
-				.add(associationEq("proteinSequences", group.getProteinSequences()))
-				.add(nullSafeEq("proteinIdentificationProbability", group.getProteinIdentificationProbability()))
-				.add(nullSafeEq("numberOfUniquePeptides", group.getNumberOfUniquePeptides()))
-				.add(nullSafeEq("numberOfUniqueSpectra", group.getNumberOfUniqueSpectra()))
-				.add(nullSafeEq("numberOfTotalSpectra", group.getNumberOfTotalSpectra()))
-				.add(doubleEq("percentageOfTotalSpectra", group.getPercentageOfTotalSpectra(), ProteinGroup.PERCENT_TOLERANCE))
-				.add(doubleEq("percentageSequenceCoverage", group.getPercentageSequenceCoverage(), ProteinGroup.PERCENT_TOLERANCE));
 	}
 
 	public TandemMassSpectrometrySample addTandemMassSpectrometrySample(final TandemMassSpectrometrySample sample) {
@@ -108,19 +96,9 @@ public class SearchDbDaoHibernate extends DaoBase implements RuntimeInitializer,
 			return null;
 		}
 		if (sample.getId() == null) {
-			return save(sample, sampleEqualityCriteria(sample), false);
+			return save(sample, false);
 		}
 		return sample;
-	}
-
-	/**
-	 * Two {@link TandemMassSpectrometrySample} objects are considered identical if they point to the same file.
-	 * This way it is possible to update an older extraction of metadata for a file.
-	 */
-	private static Criterion sampleEqualityCriteria(final TandemMassSpectrometrySample sample) {
-		return Restrictions.conjunction()
-				.add(nullSafeEq("file", sample.getFile()))
-				.add(nullSafeEq("lastModified", sample.getLastModified()));
 	}
 
 	public SearchResult addSearchResult(final SearchResult searchResult, final PercentRangeReporter reporter) {
@@ -137,15 +115,9 @@ public class SearchDbDaoHibernate extends DaoBase implements RuntimeInitializer,
 				}
 				searchResult.setProteinGroups(addSet(newList));
 			}
-			return save(searchResult, searchResultEqualityCriteria(searchResult), false);
+			return save(searchResult, false);
 		}
 		return searchResult;
-	}
-
-	private static Criterion searchResultEqualityCriteria(final SearchResult searchResult) {
-		return Restrictions.conjunction()
-				.add(associationEq("massSpecSample", searchResult.getMassSpecSample()))
-				.add(associationEq("proteinGroups", searchResult.getProteinGroups()));
 	}
 
 	public BiologicalSample addBiologicalSample(final BiologicalSample biologicalSample, final PercentRangeReporter reporter) {
@@ -161,16 +133,9 @@ public class SearchDbDaoHibernate extends DaoBase implements RuntimeInitializer,
 				}
 				biologicalSample.setSearchResults(addSet(newList));
 			}
-			return save(biologicalSample, biologicalSampleEqualityCriteria(biologicalSample), false);
+			return save(biologicalSample, false);
 		}
 		return biologicalSample;
-	}
-
-	private static Criterion biologicalSampleEqualityCriteria(final BiologicalSample biologicalSample) {
-		return Restrictions.conjunction()
-				.add(nullSafeEq("sampleName", biologicalSample.getSampleName()))
-				.add(nullSafeEq("category", biologicalSample.getCategory()))
-				.add(associationEq("searchResults", biologicalSample.getSearchResults()));
 	}
 
 	@Override
@@ -189,7 +154,7 @@ public class SearchDbDaoHibernate extends DaoBase implements RuntimeInitializer,
 				}
 				analysis.setBiologicalSamples(addSet(newList));
 			}
-			savedAnalysis = save(analysis, analysisEqualityCriteria(analysis), false);
+			savedAnalysis = save(analysis, false);
 		}
 		getSession().saveOrUpdate(reportData);
 		reportData.setAnalysisId(savedAnalysis.getId());
@@ -368,13 +333,6 @@ public class SearchDbDaoHibernate extends DaoBase implements RuntimeInitializer,
 		return allProteinGroups;
 	}
 
-	private static Criterion analysisEqualityCriteria(final Analysis analysis) {
-		return Restrictions.conjunction()
-				.add(nullSafeEq("scaffoldVersion", analysis.getScaffoldVersion()))
-				.add(nullSafeEq("analysisDate", analysis.getAnalysisDate()))
-				.add(associationEq("biologicalSamples", analysis.getBiologicalSamples()));
-	}
-
 	/**
 	 * Save any kind of set into the database.
 	 *
@@ -387,20 +345,6 @@ public class SearchDbDaoHibernate extends DaoBase implements RuntimeInitializer,
 			return updateHashedBag(bag);
 		}
 		return bag;
-	}
-
-	/**
-	 * Save any kind of set into the database.
-	 *
-	 * @param set List to save.
-	 * @param <T> Type of the list, must extend {@link PersistableBagBase}
-	 * @return Saved list (or the same one in case it was saved already).
-	 */
-	private <T extends PersistableHashedSetBase<?>> T addSet(final T set) {
-		if (set.getId() == null) {
-			return updateHashedSet(set);
-		}
-		return set;
 	}
 
 	@Override

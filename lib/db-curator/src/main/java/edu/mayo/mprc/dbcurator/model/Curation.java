@@ -4,6 +4,8 @@ import edu.mayo.mprc.MprcException;
 import edu.mayo.mprc.database.EvolvableBase;
 import edu.mayo.mprc.fasta.DatabaseAnnotation;
 import edu.mayo.mprc.fasta.FastaFile;
+import org.hibernate.criterion.Criterion;
+import org.hibernate.criterion.Restrictions;
 import org.joda.time.DateTime;
 
 import java.io.File;
@@ -242,7 +244,7 @@ public class Curation extends EvolvableBase implements Serializable {
 
 	/**
 	 * @return Regular expression (Scaffold-supported) describing all decoy accession numbers. If the expression was not specified,
-	 *         the default {@link DatabaseAnnotation#DEFAULT_DECOY_REGEX} is used.
+	 * the default {@link DatabaseAnnotation#DEFAULT_DECOY_REGEX} is used.
 	 */
 	public String getDecoyRegex() {
 		if (decoyRegex == null || decoyRegex.isEmpty()) {
@@ -476,6 +478,11 @@ public class Curation extends EvolvableBase implements Serializable {
 		result = 31 * result + (getDeploymentDate() != null ? getDeploymentDate().hashCode() : 0);
 		result = 31 * result + getDecoyRegex().hashCode();
 		return result;
+	}
+
+	@Override
+	public Criterion getEqualityCriteria() {
+		return Restrictions.eq("shortName", getShortName());
 	}
 
 	public String toString() {

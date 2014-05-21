@@ -7,8 +7,6 @@ import edu.mayo.mprc.swift.db.SwiftDao;
 import edu.mayo.mprc.swift.dbmapping.FileSearch;
 import org.hibernate.Hibernate;
 import org.hibernate.Query;
-import org.hibernate.criterion.Criterion;
-import org.hibernate.criterion.Restrictions;
 import org.springframework.stereotype.Repository;
 
 import javax.annotation.Resource;
@@ -41,7 +39,7 @@ public final class QuameterDaoHibernate extends DaoBase implements QuameterDao {
 		final FileSearch fileSearch = getSwiftDao().getFileSearchForId(fileSearchId);
 		final QuameterResult result = new QuameterResult(sample, fileSearch, values);
 
-		return save(result, quameterResultEqualityCriteria(result), false);
+		return save(result, false);
 	}
 
 	@Override
@@ -80,12 +78,6 @@ public final class QuameterDaoHibernate extends DaoBase implements QuameterDao {
 			}
 		}
 		return filtered;
-	}
-
-	private Criterion quameterResultEqualityCriteria(final QuameterResult result) {
-		return Restrictions.conjunction()
-				.add(associationEq("fileSearch", result.getFileSearch()))
-				.add(associationEq("sample", result.getSample()));
 	}
 
 	@Override

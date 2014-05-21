@@ -1,7 +1,10 @@
 package edu.mayo.mprc.fastadb;
 
 import edu.mayo.mprc.MprcException;
+import edu.mayo.mprc.database.DaoBase;
 import edu.mayo.mprc.database.PersistableBase;
+import org.hibernate.criterion.Criterion;
+import org.hibernate.criterion.Restrictions;
 
 /**
  * @author Roman Zenka
@@ -50,5 +53,11 @@ public final class ProteinAccnum extends PersistableBase {
 	@Override
 	public int hashCode() {
 		return accnum.hashCode();
+	}
+
+	@Override
+	public Criterion getEqualityCriteria() {
+		return Restrictions.conjunction()
+				.add(DaoBase.nullSafeEq("accnum", getAccnum()));
 	}
 }

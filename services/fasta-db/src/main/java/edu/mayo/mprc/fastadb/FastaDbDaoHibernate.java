@@ -69,7 +69,7 @@ public final class FastaDbDaoHibernate extends BulkDaoBase implements FastaDbDao
 	@Override
 	public ProteinSequence addProteinSequence(final ProteinSequence proteinSequence) {
 		if (null == proteinSequence.getId()) {
-			return save(proteinSequence, nullSafeEq("sequence", proteinSequence.getSequence()), false);
+			return save(proteinSequence, false);
 		}
 		return proteinSequence;
 	}
@@ -98,19 +98,6 @@ public final class FastaDbDaoHibernate extends BulkDaoBase implements FastaDbDao
 	@Override
 	public ProteinSequence getProteinSequence(final int proteinId) {
 		return (ProteinSequence) getSession().get(ProteinSequence.class, proteinId);
-	}
-
-	@Override
-	public PeptideSequence addPeptideSequence(final PeptideSequence peptideSequence) {
-		if (null == peptideSequence.getId()) {
-			return save(peptideSequence, nullSafeEq("sequence", peptideSequence.getSequence()), false);
-		}
-		return peptideSequence;
-	}
-
-	@Override
-	public PeptideSequence getPeptideSequence(final int peptideId) {
-		return (PeptideSequence) getSession().get(PeptideSequence.class, peptideId);
 	}
 
 	@Override

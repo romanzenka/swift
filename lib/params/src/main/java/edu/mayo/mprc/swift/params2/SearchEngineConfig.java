@@ -1,7 +1,10 @@
 package edu.mayo.mprc.swift.params2;
 
 import edu.mayo.mprc.MprcException;
+import edu.mayo.mprc.database.DaoBase;
 import edu.mayo.mprc.database.PersistableBase;
+import org.hibernate.criterion.Criterion;
+import org.hibernate.criterion.Restrictions;
 
 /**
  * User-editable information about a supported search engine.
@@ -75,5 +78,13 @@ public class SearchEngineConfig extends PersistableBase {
 		int result = code.hashCode();
 		result = 31 * result + version.hashCode();
 		return result;
+	}
+
+	@Override
+	public Criterion getEqualityCriteria() {
+		return Restrictions.and(
+				DaoBase.nullSafeEq("code", getCode()),
+				DaoBase.nullSafeEq("version", getVersion())
+		);
 	}
 }

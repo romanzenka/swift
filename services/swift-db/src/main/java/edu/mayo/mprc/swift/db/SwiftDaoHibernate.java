@@ -17,7 +17,6 @@ import org.hibernate.Criteria;
 import org.hibernate.FetchMode;
 import org.hibernate.Query;
 import org.hibernate.Session;
-import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.LogicalExpression;
 import org.hibernate.criterion.Restrictions;
 import org.joda.time.DateTime;
@@ -191,29 +190,19 @@ public final class SwiftDaoHibernate extends DaoBase implements SwiftDao {
 		}
 	}
 
-	private Criterion getSpectrumQaEqualityCriteria(final SpectrumQa spectrumQa) {
-		return Restrictions.and(
-				DaoBase.nullSafeEq("engine", spectrumQa.getEngine()),
-				DaoBase.nullSafeEq("paramFilePath", spectrumQa.getParamFilePath()));
-	}
-
 	@Override
 	public SpectrumQa addSpectrumQa(final SpectrumQa spectrumQa) {
 		try {
-			return save(spectrumQa, getSpectrumQaEqualityCriteria(spectrumQa), false);
+			return save(spectrumQa, false);
 		} catch (Exception t) {
 			throw new MprcException("Could not add spectrum QA", t);
 		}
 	}
 
-	private Criterion getPeptideReportEqualityCriteria(final PeptideReport peptideReport) {
-		return Restrictions.isNotNull("id");
-	}
-
 	@Override
 	public PeptideReport addPeptideReport(final PeptideReport peptideReport) {
 		try {
-			return save(peptideReport, getPeptideReportEqualityCriteria(peptideReport), false);
+			return save(peptideReport, false);
 		} catch (Exception t) {
 			throw new MprcException("Could not add peptide report", t);
 		}
@@ -221,28 +210,10 @@ public final class SwiftDaoHibernate extends DaoBase implements SwiftDao {
 
 	public FileSearch addFileSearch(final FileSearch fileSearch) {
 		try {
-			return save(fileSearch, getFileSearchEqualityCriteria(fileSearch), false);
+			return save(fileSearch, false);
 		} catch (Exception t) {
 			throw new MprcException("Could not add file search information", t);
 		}
-	}
-
-	private Criterion getFileSearchEqualityCriteria(final FileSearch fileSearch) {
-		return Restrictions.conjunction()
-				.add(DaoBase.nullSafeEq("inputFile", fileSearch.getInputFile()))
-				.add(DaoBase.nullSafeEq("biologicalSample", fileSearch.getBiologicalSample()))
-				.add(DaoBase.nullSafeEq("categoryName", fileSearch.getCategoryName()))
-				.add(DaoBase.nullSafeEq("experiment", fileSearch.getExperiment()))
-				.add(DaoBase.nullSafeEq("swiftSearchDefinitionId", fileSearch.getSwiftSearchDefinitionId()));
-	}
-
-	private Criterion getSwiftSearchDefinitionEqualityCriteria(final SwiftSearchDefinition definition) {
-		return Restrictions.conjunction()
-				.add(DaoBase.nullSafeEq("title", definition.getTitle()))
-				.add(DaoBase.associationEq("user", definition.getUser()))
-				.add(DaoBase.nullSafeEq("outputFolder", definition.getOutputFolder()))
-				.add(DaoBase.associationEq("qa", definition.getQa()))
-				.add(DaoBase.associationEq("peptideReport", definition.getPeptideReport()));
 	}
 
 	@Override
@@ -265,7 +236,7 @@ public final class SwiftDaoHibernate extends DaoBase implements SwiftDao {
 					inputFiles.add(addFileSearch(fileSearch));
 				}
 				definition.setInputFiles(inputFiles);
-				definition = saveLaxEquality(definition, getSwiftSearchDefinitionEqualityCriteria(definition), false);
+				definition = saveLaxEquality(definition, definition.getEqualityCriteria(), false);
 			}
 			return definition;
 
@@ -374,15 +345,11 @@ public final class SwiftDaoHibernate extends DaoBase implements SwiftDao {
 			return;
 		}
 		final TaskStateData taskStateData = new TaskStateData(state.getText());
-		save(taskStateData, getTaskStateDataEqualityCriteria(taskStateData), true);
+		save(taskStateData, true);
 		synchronized (taskStatesLock) {
 			// Flush the cache
 			taskStates = null;
 		}
-	}
-
-	private Criterion getTaskStateDataEqualityCriteria(final TaskStateData taskStateData) {
-		return DaoBase.nullSafeEq("description", taskStateData.getDescription());
 	}
 
 	@Override

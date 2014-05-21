@@ -3,6 +3,7 @@ package edu.mayo.mprc.unimod;
 import com.google.common.base.Objects;
 import edu.mayo.mprc.MprcException;
 import edu.mayo.mprc.database.PersistableBase;
+import org.hibernate.criterion.Criterion;
 
 import java.util.Collection;
 import java.util.Iterator;
@@ -99,5 +100,10 @@ public class ModSet extends PersistableBase implements Comparable<ModSet> {
 
 	public int hashCode() {
 		return getModifications().hashCode();
+	}
+
+	@Override
+	public Criterion getEqualityCriteria() {
+		throw new MprcException("ModSet does not implement equality criteria, it is saved separately.");
 	}
 }

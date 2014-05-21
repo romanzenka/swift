@@ -1,5 +1,8 @@
 package edu.mayo.mprc.database;
 
+import edu.mayo.mprc.MprcException;
+import org.hibernate.criterion.Criterion;
+
 import java.util.HashSet;
 import java.util.Set;
 
@@ -53,5 +56,10 @@ public class TestSet extends PersistableBase {
 	@Override
 	public int hashCode() {
 		return getMembers() != null ? getMembers().hashCode() : 0;
+	}
+
+	@Override
+	public Criterion getEqualityCriteria() {
+		throw new MprcException("A set does not implement equality criteria");
 	}
 }

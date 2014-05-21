@@ -1,5 +1,7 @@
 package edu.mayo.mprc.database;
 
+import org.hibernate.criterion.Criterion;
+import org.hibernate.criterion.Restrictions;
 import org.joda.time.DateTime;
 
 /**
@@ -61,5 +63,12 @@ public class TestDate extends PersistableBase {
 		int result = value1 != null ? value1.hashCode() : 0;
 		result = 31 * result + (value2 != null ? value2.hashCode() : 0);
 		return result;
+	}
+
+	@Override
+	public Criterion getEqualityCriteria() {
+		return Restrictions.conjunction()
+				.add(Restrictions.eq("value1", getValue1()))
+				.add(Restrictions.eq("value2", getValue2()));
 	}
 }

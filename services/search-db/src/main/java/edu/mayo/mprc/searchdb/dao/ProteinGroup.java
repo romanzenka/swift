@@ -1,7 +1,10 @@
 package edu.mayo.mprc.searchdb.dao;
 
+import edu.mayo.mprc.database.DaoBase;
 import edu.mayo.mprc.database.PersistableBase;
 import edu.mayo.mprc.utilities.MprcDoubles;
+import org.hibernate.criterion.Criterion;
+import org.hibernate.criterion.Restrictions;
 
 /**
  * Maps the following columns from the Scaffold spectrum report:
@@ -177,4 +180,17 @@ public class ProteinGroup extends PersistableBase {
 		result = 31 * result + (int) (temp ^ (temp >>> 32));
 		return result;
 	}
+
+	@Override
+	public Criterion getEqualityCriteria() {
+		return Restrictions.conjunction()
+				.add(DaoBase.associationEq("proteinSequences", getProteinSequences()))
+				.add(DaoBase.nullSafeEq("proteinIdentificationProbability", getProteinIdentificationProbability()))
+				.add(DaoBase.nullSafeEq("numberOfUniquePeptides", getNumberOfUniquePeptides()))
+				.add(DaoBase.nullSafeEq("numberOfUniqueSpectra", getNumberOfUniqueSpectra()))
+				.add(DaoBase.nullSafeEq("numberOfTotalSpectra", getNumberOfTotalSpectra()))
+				.add(DaoBase.doubleEq("percentageOfTotalSpectra", getPercentageOfTotalSpectra(), PERCENT_TOLERANCE))
+				.add(DaoBase.doubleEq("percentageSequenceCoverage", getPercentageSequenceCoverage(), PERCENT_TOLERANCE));
+	}
+
 }

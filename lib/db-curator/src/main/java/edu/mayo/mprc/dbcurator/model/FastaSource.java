@@ -1,6 +1,8 @@
 package edu.mayo.mprc.dbcurator.model;
 
 import edu.mayo.mprc.database.PersistableBase;
+import org.hibernate.criterion.Criterion;
+import org.hibernate.criterion.Restrictions;
 
 public class FastaSource extends PersistableBase {
 	private String name;
@@ -94,5 +96,10 @@ public class FastaSource extends PersistableBase {
 		result = 31 * result + (getTransform() != null ? getTransform().hashCode() : 0);
 		result = 31 * result + (getCommon() != null ? getCommon().hashCode() : 0);
 		return result;
+	}
+
+	@Override
+	public Criterion getEqualityCriteria() {
+		return Restrictions.eq("name", getName());
 	}
 }

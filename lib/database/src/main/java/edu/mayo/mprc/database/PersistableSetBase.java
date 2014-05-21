@@ -1,5 +1,8 @@
 package edu.mayo.mprc.database;
 
+import edu.mayo.mprc.MprcException;
+import org.hibernate.criterion.Criterion;
+
 import java.util.*;
 
 /**
@@ -136,5 +139,10 @@ public abstract class PersistableSetBase<T extends PersistableBase> extends Pers
 	@Override
 	public int hashCode() {
 		return getList() != null ? makeSet(getList()).hashCode() : 0;
+	}
+
+	@Override
+	public Criterion getEqualityCriteria() {
+		throw new MprcException("A set does not define equality criteria. Update it through addSet method.");
 	}
 }

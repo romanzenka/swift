@@ -6,7 +6,7 @@ import edu.mayo.mprc.MprcException;
 /**
  * For objects that are persistable into the database.
  */
-public abstract class PersistableBase {
+public abstract class PersistableBase implements EqualityCriteria {
 	/**
 	 * Id for hibernate.
 	 */

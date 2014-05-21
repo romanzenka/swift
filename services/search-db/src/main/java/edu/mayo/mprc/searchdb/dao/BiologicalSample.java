@@ -1,6 +1,9 @@
 package edu.mayo.mprc.searchdb.dao;
 
+import edu.mayo.mprc.database.DaoBase;
 import edu.mayo.mprc.database.PersistableBase;
+import org.hibernate.criterion.Criterion;
+import org.hibernate.criterion.Restrictions;
 
 /**
  * Information about a single Scaffold biological sample.
@@ -80,7 +83,10 @@ public class BiologicalSample extends PersistableBase {
 
 		final BiologicalSample that = (BiologicalSample) o;
 
-		if (!keyEquals(that)) {
+		if (getCategory() != null ? !getCategory().equals(that.getCategory()) : that.getCategory() != null) {
+			return false;
+		}
+		if (getSampleName() != null ? !getSampleName().equals(that.getSampleName()) : that.getSampleName() != null) {
 			return false;
 		}
 		if (getSearchResults() != null ? !getSearchResults().equals(that.getSearchResults()) : that.getSearchResults() != null) {
@@ -91,25 +97,18 @@ public class BiologicalSample extends PersistableBase {
 	}
 
 	@Override
+	public Criterion getEqualityCriteria() {
+		return Restrictions.conjunction()
+				.add(DaoBase.nullSafeEq("sampleName", getSampleName()))
+				.add(DaoBase.nullSafeEq("category", getCategory()))
+				.add(DaoBase.associationEq("searchResults", getSearchResults()));
+	}
+
+	@Override
 	public int hashCode() {
-		int result = keyHashCode();
-		result = 31 * result + (getSearchResults() != null ? getSearchResults().hashCode() : 0);
-		return result;
-	}
-
-	public boolean keyEquals(final BiologicalSample that) {
-		if (getCategory() != null ? !getCategory().equals(that.getCategory()) : that.getCategory() != null) {
-			return false;
-		}
-		if (getSampleName() != null ? !getSampleName().equals(that.getSampleName()) : that.getSampleName() != null) {
-			return false;
-		}
-		return true;
-	}
-
-	public int keyHashCode() {
 		int result = getSampleName() != null ? getSampleName().hashCode() : 0;
 		result = 31 * result + (getCategory() != null ? getCategory().hashCode() : 0);
+		result = 31 * result + (getSearchResults() != null ? getSearchResults().hashCode() : 0);
 		return result;
 	}
 }

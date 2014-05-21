@@ -1,6 +1,9 @@
 package edu.mayo.mprc.swift.dbmapping;
 
+import edu.mayo.mprc.database.DaoBase;
 import edu.mayo.mprc.database.PersistableBase;
+import org.hibernate.criterion.Criterion;
+import org.hibernate.criterion.Restrictions;
 
 import java.io.File;
 
@@ -75,5 +78,12 @@ public class SpectrumQa extends PersistableBase {
 		int result = getEngine() != null ? getEngine().hashCode() : 0;
 		result = 31 * result + (getParamFilePath() != null ? getParamFilePath().hashCode() : 0);
 		return result;
+	}
+
+	@Override
+	public Criterion getEqualityCriteria() {
+		return Restrictions.and(
+				DaoBase.nullSafeEq("engine", getEngine()),
+				DaoBase.nullSafeEq("paramFilePath", getParamFilePath()));
 	}
 }

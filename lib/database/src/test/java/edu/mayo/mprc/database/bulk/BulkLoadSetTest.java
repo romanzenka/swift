@@ -3,8 +3,6 @@ package edu.mayo.mprc.database.bulk;
 import edu.mayo.mprc.database.DaoTest;
 import edu.mayo.mprc.database.TestList;
 import edu.mayo.mprc.database.TestSetMember;
-import org.hibernate.criterion.Criterion;
-import org.hibernate.criterion.Restrictions;
 import org.testng.Assert;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
@@ -40,7 +38,7 @@ public final class BulkLoadSetTest extends DaoTest {
 		final List<TestSetMember> members = new ArrayList<TestSetMember>(VALUES / 10);
 		for (int i = 0; i < VALUES / 10; i++) {
 			TestSetMember member = new TestSetMember("member #" + i);
-			member = dao.save(member, testMemberEqualityCriteria(member), true);
+			member = dao.save(member, true);
 			members.add(member);
 		}
 		dao.commit();
@@ -68,10 +66,5 @@ public final class BulkLoadSetTest extends DaoTest {
 		}
 
 		dao.commit();
-	}
-
-	private Criterion testMemberEqualityCriteria(final TestSetMember member) {
-		return Restrictions.conjunction()
-				.add(Restrictions.eq("memberName", member.getMemberName()));
 	}
 }

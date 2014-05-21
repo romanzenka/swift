@@ -1,7 +1,9 @@
 package edu.mayo.mprc.swift.dbmapping;
 
+import edu.mayo.mprc.MprcException;
 import edu.mayo.mprc.database.PersistableBase;
 import edu.mayo.mprc.workspace.User;
+import org.hibernate.criterion.Criterion;
 
 import java.io.Serializable;
 import java.util.Date;
@@ -212,5 +214,10 @@ public class SearchRun extends PersistableBase implements Serializable {
 
 	public String toString() {
 		return getId() + ": " + getTitle() + " (" + getSubmittingUser() + ")";
+	}
+
+	@Override
+	public Criterion getEqualityCriteria() {
+		throw new MprcException("SearchRun does not support equality checking");
 	}
 }

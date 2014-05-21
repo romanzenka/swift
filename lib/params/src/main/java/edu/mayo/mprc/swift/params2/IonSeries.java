@@ -1,6 +1,8 @@
 package edu.mayo.mprc.swift.params2;
 
+import edu.mayo.mprc.database.DaoBase;
 import edu.mayo.mprc.database.EvolvableBase;
+import org.hibernate.criterion.Criterion;
 
 import java.util.Arrays;
 import java.util.List;
@@ -80,5 +82,10 @@ public class IonSeries extends EvolvableBase implements Comparable<IonSeries> {
 	@Override
 	public int compareTo(IonSeries o) {
 		return String.CASE_INSENSITIVE_ORDER.compare(getName(), o.getName());
+	}
+
+	@Override
+	public Criterion getEqualityCriteria() {
+		return DaoBase.nullSafeEq("name", getName());
 	}
 }

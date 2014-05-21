@@ -1,9 +1,13 @@
 package edu.mayo.mprc.swift.dbmapping;
 
+import edu.mayo.mprc.database.DaoBase;
+import edu.mayo.mprc.database.EqualityCriteria;
 import edu.mayo.mprc.database.PersistableBase;
 import edu.mayo.mprc.swift.params2.EnabledEngines;
 import edu.mayo.mprc.swift.params2.SearchEngineParameters;
 import edu.mayo.mprc.workspace.User;
+import org.hibernate.criterion.Criterion;
+import org.hibernate.criterion.Restrictions;
 
 import java.io.File;
 import java.util.HashMap;
@@ -13,7 +17,7 @@ import java.util.Map;
 /**
  * Describes a basic Swift search, exactly as the user entered it in the UI.
  */
-public class SwiftSearchDefinition extends PersistableBase {
+public class SwiftSearchDefinition extends PersistableBase implements EqualityCriteria {
 	private String title;
 	private User user;
 	private File outputFolder;
@@ -209,5 +213,15 @@ public class SwiftSearchDefinition extends PersistableBase {
 		result = 31 * result + (getPublicSearchFiles() != null ? getPublicSearchFiles().hashCode() : 0);
 		result = 31 * result + (getMetadata() != null ? getMetadata().hashCode() : 0);
 		return result;
+	}
+
+	@Override
+	public Criterion getEqualityCriteria() {
+		return Restrictions.conjunction()
+				.add(DaoBase.nullSafeEq("title", getTitle()))
+				.add(DaoBase.associationEq("user", getUser()))
+				.add(DaoBase.nullSafeEq("outputFolder", getOutputFolder()))
+				.add(DaoBase.associationEq("qa", getQa()))
+				.add(DaoBase.associationEq("peptideReport", getPeptideReport()));
 	}
 }

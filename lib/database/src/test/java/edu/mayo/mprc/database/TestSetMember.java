@@ -1,5 +1,8 @@
 package edu.mayo.mprc.database;
 
+import org.hibernate.criterion.Criterion;
+import org.hibernate.criterion.Restrictions;
+
 public class TestSetMember extends PersistableBase {
 
 	private String memberName;
@@ -40,5 +43,11 @@ public class TestSetMember extends PersistableBase {
 	@Override
 	public int hashCode() {
 		return getMemberName() != null ? getMemberName().hashCode() : 0;
+	}
+
+	@Override
+	public Criterion getEqualityCriteria() {
+		return Restrictions.conjunction()
+				.add(DaoBase.nullSafeEq("memberName", getMemberName()));
 	}
 }

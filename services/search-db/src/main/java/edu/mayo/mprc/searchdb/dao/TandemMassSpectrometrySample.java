@@ -1,6 +1,9 @@
 package edu.mayo.mprc.searchdb.dao;
 
+import edu.mayo.mprc.database.DaoBase;
 import edu.mayo.mprc.database.PersistableBase;
+import org.hibernate.criterion.Criterion;
+import org.hibernate.criterion.Restrictions;
 import org.joda.time.DateTime;
 
 import java.io.File;
@@ -207,6 +210,18 @@ public class TandemMassSpectrometrySample extends PersistableBase {
 		result = 31 * result + (getLastModified() != null ? getLastModified().hashCode() : 0);
 		return result;
 	}
+
+	/**
+	 * Two {@link TandemMassSpectrometrySample} objects are considered identical if they point to the same file.
+	 * This way it is possible to update an older extraction of metadata for a file.
+	 */
+	@Override
+	public Criterion getEqualityCriteria() {
+		return Restrictions.conjunction()
+				.add(DaoBase.nullSafeEq("file", getFile()))
+				.add(DaoBase.nullSafeEq("lastModified", getLastModified()));
+	}
+
 }
 
 

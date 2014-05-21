@@ -1,7 +1,10 @@
 package edu.mayo.mprc.heme.dao;
 
+import edu.mayo.mprc.database.DaoBase;
 import edu.mayo.mprc.database.PersistableBase;
 import edu.mayo.mprc.swift.dbmapping.SearchRun;
+import org.hibernate.criterion.Criterion;
+import org.hibernate.criterion.Restrictions;
 
 import java.util.Date;
 
@@ -122,6 +125,21 @@ public class HemeTest extends PersistableBase {
 		result = 31 * result + (path != null ? path.hashCode() : 0);
 		return result;
 	}
+
+	/**
+	 * The two objects are equivalent iff their date and path match.
+	 * Name does not have to match since it is contained in the path.
+	 * Also, the path is what matters.
+	 *
+	 * @return Hibernate criteria matching all records equal to the provided one.
+	 */
+	@Override
+	public Criterion getEqualityCriteria() {
+		return Restrictions.and(
+				DaoBase.nullSafeEq("date", getDate()),
+				DaoBase.nullSafeEq("path", getPath()));
+	}
+
 
 	@Override
 	public String toString() {

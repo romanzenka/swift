@@ -5,6 +5,7 @@ import com.google.common.collect.ImmutableSet;
 import edu.mayo.mprc.MprcException;
 import edu.mayo.mprc.database.EvolvableBase;
 import edu.mayo.mprc.utilities.ComparisonChain;
+import org.hibernate.criterion.Criterion;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -33,19 +34,16 @@ public class Mod extends EvolvableBase implements Comparable<Mod> {
 	}
 
 	public Mod(final String title, final String fullName, final Integer recordID, final Double massMono, final Double massAverage, final String composition, final Set<String> altNames, final Set<ModSpecificity> modSpecificities) {
-		super();
 		setVariables(title, fullName, recordID, massMono, massAverage, composition, altNames);
 		setModSpecificities(modSpecificities);
 	}
 
 	public Mod(final String title, final String fullName, final Integer recordID, final Double massMono, final Double massAverage, final String composition, final Set<String> altNames, final Set<SpecificityBuilder> specificityBuilders, final boolean ignore) {
-		super();
 		setVariables(title, fullName, recordID, massMono, massAverage, composition, altNames);
 		setModSpecificities(buildersToSpecificities(specificityBuilders));
 	}
 
 	public Mod(final String title, final String fullName, final Integer recordID, final Double massMono, final Double massAverage, final String composition, final Set<String> altNames, final SpecificityBuilder specificityBuilder) {
-		super();
 		setVariables(title, fullName, recordID, massMono, massAverage, composition, altNames);
 		setModSpecificities(new ImmutableSet.Builder<ModSpecificity>().add(specificityBuilder.build(this)).build());
 	}
@@ -225,5 +223,10 @@ public class Mod extends EvolvableBase implements Comparable<Mod> {
 				.compare(getFullName(), o.getFullName())
 				.compare(getRecordID(), o.getRecordID())
 				.result();
+	}
+
+	@Override
+	public Criterion getEqualityCriteria() {
+		throw new MprcException("Mods are not saved using equality criteria");
 	}
 }

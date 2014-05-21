@@ -11,7 +11,6 @@ import edu.mayo.mprc.utilities.FileUtilities;
 import org.apache.log4j.Logger;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
-import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.Example;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
@@ -318,13 +317,9 @@ public final class CurationDaoImpl extends DaoBase implements CurationDao {
 		}
 	}
 
-	private Criterion getHeaderTransformEqualityCriteria(final HeaderTransform transform) {
-		return Restrictions.eq("name", transform.getName());
-	}
-
 	@Override
 	public void addHeaderTransform(final HeaderTransform sprotTrans) {
-		save(sprotTrans, getHeaderTransformEqualityCriteria(sprotTrans), true);
+		save(sprotTrans, true);
 	}
 
 	@Override
@@ -348,20 +343,16 @@ public final class CurationDaoImpl extends DaoBase implements CurationDao {
 		curation.setTitle("Legacy database " + legacyName);
 		curation.setOwnerEmail("mprctest@mayo.edu");
 		curation.setCurationFile(new File(legacyName + ".fasta"));
-		curation = save(curation, legacyCurationChange, getCurationEqualityCriteria(curation), false);
+		curation = save(curation, legacyCurationChange, false);
 		if (allCurationList != null) {
 			allCurationList.add(curation);
 		}
 		return curation;
 	}
 
-	private Criterion getFastaSourceEqualityCriteria(final FastaSource source) {
-		return Restrictions.eq("name", source.getName());
-	}
-
 	@Override
 	public void addFastaSource(final FastaSource source) {
-		save(source, getFastaSourceEqualityCriteria(source), true);
+		save(source, true);
 	}
 
 	@Override
@@ -372,7 +363,7 @@ public final class CurationDaoImpl extends DaoBase implements CurationDao {
 	@Override
 	public void addCuration(final Curation toSave) {
 		try {
-			save(toSave, new Change("Adding database " + toSave.getShortName(), new DateTime()), getCurationEqualityCriteria(toSave), true);
+			save(toSave, new Change("Adding database " + toSave.getShortName(), new DateTime()), true);
 		} catch (Exception t) {
 			throw new MprcException("Could not save an object to hibernate.", t);
 		}
@@ -390,10 +381,6 @@ public final class CurationDaoImpl extends DaoBase implements CurationDao {
 	@Override
 	public void deleteCuration(final Curation curation, final Change change) {
 		delete(curation, change);
-	}
-
-	private Criterion getCurationEqualityCriteria(final Curation curation) {
-		return Restrictions.eq("shortName", curation.getShortName());
 	}
 
 	public void delete(final Object o) {

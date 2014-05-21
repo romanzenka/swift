@@ -1,7 +1,10 @@
 package edu.mayo.mprc.swift.params2;
 
 import com.google.common.base.Objects;
+import edu.mayo.mprc.database.DaoBase;
 import edu.mayo.mprc.database.PersistableBase;
+import org.hibernate.criterion.Criterion;
+import org.hibernate.criterion.Restrictions;
 
 /**
  * Scaffold settings - thresholds, starred proteins, exports.
@@ -192,6 +195,23 @@ public class ScaffoldSettings extends PersistableBase {
 				isMzIdentMlReport(),
 				isHighMassAccuracyScoring(),
 				isUse3xScoring());
+	}
+
+	@Override
+	public Criterion getEqualityCriteria() {
+		return Restrictions.conjunction()
+				.add(Restrictions.between("proteinProbability", getProteinProbability() - PROBABILITY_PRECISION, getProteinProbability() + PROBABILITY_PRECISION))
+				.add(Restrictions.between("peptideProbability", getPeptideProbability() - PROBABILITY_PRECISION, getPeptideProbability() + PROBABILITY_PRECISION))
+				.add(Restrictions.eq("minimumPeptideCount", getMinimumPeptideCount()))
+				.add(Restrictions.eq("minimumNonTrypticTerminii", getMinimumNonTrypticTerminii()))
+				.add(Restrictions.eq("saveOnlyIdentifiedSpectra", isSaveOnlyIdentifiedSpectra()))
+				.add(Restrictions.eq("saveNoSpectra", isSaveNoSpectra()))
+				.add(Restrictions.eq("connectToNCBI", isConnectToNCBI()))
+				.add(Restrictions.eq("annotateWithGOA", isAnnotateWithGOA()))
+				.add(Restrictions.eq("useFamilyProteinGrouping", isUseFamilyProteinGrouping()))
+				.add(Restrictions.eq("useIndependentSampleGrouping", isUseIndependentSampleGrouping()))
+				.add(Restrictions.eq("mzIdentMlReport", isMzIdentMlReport()))
+				.add(DaoBase.associationEq("starredProteins", getStarredProteins()));
 	}
 
 	public ScaffoldSettings copy() {
