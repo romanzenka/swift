@@ -309,7 +309,7 @@ public class TestSearchRunner {
 	}
 
 	@DataProvider(name = "twoBools")
-	public Object[][] createData(Method m) {
+	public Object[][] createData(final Method m) {
 		return new Object[][]{new Object[]{Boolean.FALSE}, new Object[]{Boolean.TRUE}};
 	}
 
@@ -324,7 +324,7 @@ public class TestSearchRunner {
 
 		final EnabledEngines engines = enabledEnginesWithQuameter();
 
-		SearchEngineParameters parameters = searchEngineParametersMzml();
+		final SearchEngineParameters parameters = searchEngineParametersMzml();
 		if (doSemiTryptic) {
 			parameters.setMinTerminiCleavages(1);
 		}
@@ -405,7 +405,7 @@ public class TestSearchRunner {
 	}
 
 	private SwiftSearchDefinition defaultSearchDefinition(final List<FileSearch> inputFiles) {
-		SwiftSearchDefinition swiftSearchDefinition = new SwiftSearchDefinition(
+		final SwiftSearchDefinition swiftSearchDefinition = new SwiftSearchDefinition(
 				"Test search",
 				new User("Tester", "Testov", "test", "pwd"),
 				outputFolder,
@@ -424,11 +424,19 @@ public class TestSearchRunner {
 	}
 
 	private SearchEngineParameters searchEngineParameters1() {
+		final ScaffoldSettings scaffoldSettings = new ScaffoldSettingsBuilder()
+				.setMinimumNonTrypticTerminii(0)
+				.setStarredProteins(new StarredProteins("ALBU_HUMAN", ",", false))
+				.setSaveOnlyIdentifiedSpectra(false)
+				.setConnectToNCBI(true)
+				.setAnnotateWithGOA(true)
+				.createScaffoldSettings();
 		return new SearchEngineParameters(curation1(), Protease.getInitial().get(0),
 				2, 1, new ModSet(), new ModSet(), new Tolerance(10, MassUnit.Ppm),
 				new Tolerance(1, MassUnit.Da), Instrument.ORBITRAP,
 				new ExtractMsnSettings("-M100", ExtractMsnSettings.EXTRACT_MSN),
-				new ScaffoldSettingsBuilder().setMinimumNonTrypticTerminii(0).setStarredProteins(new StarredProteins("ALBU_HUMAN", ",", false)).setSaveOnlyIdentifiedSpectra(false).setConnectToNCBI(true).setAnnotateWithGOA(true).createScaffoldSettings()
+				scaffoldSettings,
+				new EnabledEngines()
 		);
 	}
 
