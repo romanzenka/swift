@@ -182,10 +182,88 @@ INSERT INTO temp_search_definition (swift_search_definition_id, enabled_engines_
         AND t.enabled_engines_id = f.enabled_engines
         AND t.saved_candidate = 0;
 
--- clone all the new search definitions
+-- clone the search definitions where enabled_engines is not the most prevalent one
+INSERT INTO swift_search_definition (
+  swift_search_definition_id,
+  title,
+  owner,
+  output_folder,
+  spectrum_qa,
+  peptide_report,
+  extract_msn_settings,
+  scaffold_settings,
+  public_mgf_files,
+  public_mzxml_files,
+  public_search_files,
+  search_parameters)
+  SELECT
+    t.new_swift_search_definition_id,
+    s.title,
+    s.owner,
+    s.output_folder,
+    s.spectrum_qa,
+    s.peptide_report,
+    s.extract_msn_settings,
+    s.scaffold_settings,
+    s.public_mgf_files,
+    s.public_mzxml_files,
+    s.public_search_files,
+    p.new_search_parameters_id
+  FROM
+    temp_search_definition AS t,
+    swift_search_definition AS s,
+    temp_saved_enabled_counts AS p
+  WHERE
+    t.swift_search_definition_id = s.swift_search_definition_id
+    AND t.enabled_engines_id = p.enabled_engines_id
+    AND p.search_parameters_id = s.search_parameters
+    AND t.swift_search_definition_id != t.new_swift_search_definition_id;
+-- to be newly created, the new id must differ
 
+-- Redirect all the transaction search parameters to the newly created ones
+UPDATE
+    transaction AS t,
+    swift_search_definition AS d,
+    file_search AS f,
+    temp_search_definition AS td
+SET
+  t.swift_search = td.new_swift_search_definition_id
+WHERE
+  f.swift_search_definition_id = d.swift_search_definition_id
+  AND t.swift_search = d.swift_search_definition_id
+  AND td.enabled_engines_id = f.enabled_engines
+  AND td.swift_search_definition_id = d.swift_search_definition_id;
+
+-- Redirect all the file_search to the new swift search definitions
+UPDATE
+    file_search AS f,
+    temp_search_definition AS td
+SET
+  f.swift_search_definition_id = td.new_swift_search_definition_id
+WHERE
+  f.swift_search_definition_id = td.swift_search_definition_id
+  AND f.enabled_engines = td.enabled_engines_id;
+
+-- Now we can drop link from file_search to enabled_engines
+
+ALTER TABLE file_search
+DROP FOREIGN KEY file_search_ibfk_2;
+ALTER TABLE file_search
+DROP COLUMN enabled_engines,
+DROP INDEX enabled_engines,
+DROP INDEX input_file,
+ADD UNIQUE INDEX input_file
+  (input_file ASC,
+   biological_sample ASC,
+   category_name ASC,
+   experiment ASC,
+   search_parameters ASC,
+   swift_search_definition_id ASC);
+
+-- And drop the temp tables
+DROP TABLE temp_saved_enabled_counts;
+DROP TABLE temp_search_definition;
 
 -- @UNDO
 
-DROP TABLE temp_saved_enabled_counts;
-DROP TABLE temp_search_definition;
+-- No way I am writing this
