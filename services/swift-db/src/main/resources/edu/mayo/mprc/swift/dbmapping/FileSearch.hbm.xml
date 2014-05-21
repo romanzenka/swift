@@ -15,7 +15,7 @@
             <property name="experiment" type="string" length="128" column="experiment" />
             <property name="swiftSearchDefinitionId" type="integer" column="swift_search_definition_id" />
             <many-to-one name="searchParameters" class="edu.mayo.mprc.swift.params2.SearchEngineParameters"
-                column="search_parameters" not-null="false" lazy="proxy" foreign-key="fs_sp_fk" />
+                column="search_parameters" not-null="false" lazy="proxy" />
         </properties>
     </class>
 </hibernate-mapping>
