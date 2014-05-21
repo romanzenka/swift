@@ -21,6 +21,10 @@ public class EnabledEngines extends PersistableBase {
 	public EnabledEngines() {
 	}
 
+	public EnabledEngines(final Set<SearchEngineConfig> engineConfigs) {
+		setEngineConfigs(engineConfigs);
+	}
+
 	public Set<SearchEngineConfig> getEngineConfigs() {
 		return engineConfigs;
 	}
@@ -109,5 +113,9 @@ public class EnabledEngines extends PersistableBase {
 	@Override
 	public Criterion getEqualityCriteria() {
 		throw new MprcException("EnabledEngines does not support equality testing");
+	}
+
+	public EnabledEngines copy() {
+		return new EnabledEngines(getEngineConfigs());
 	}
 }

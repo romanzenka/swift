@@ -91,7 +91,12 @@ public class SearchEngineParameters extends PersistableBase {
 	public SearchEngineParameters() {
 	}
 
-	public SearchEngineParameters(final Curation database, final Protease protease, final Integer minTerminiCleavages, final int missedCleavages, final ModSet fixed, final ModSet variable, final Tolerance peptideTolerance, final Tolerance fragmentTolerance, final Instrument instrument, final ExtractMsnSettings extractMsnSettings, final ScaffoldSettings scaffoldSettings) {
+	public SearchEngineParameters(final Curation database, final Protease protease,
+	                              final Integer minTerminiCleavages, final int missedCleavages,
+	                              final ModSet fixed, final ModSet variable,
+	                              final Tolerance peptideTolerance, final Tolerance fragmentTolerance,
+	                              final Instrument instrument, final ExtractMsnSettings extractMsnSettings,
+	                              final ScaffoldSettings scaffoldSettings, final EnabledEngines enabledEngines) {
 		this.database = database;
 		this.protease = protease;
 		this.minTerminiCleavages = minTerminiCleavages;
@@ -103,6 +108,7 @@ public class SearchEngineParameters extends PersistableBase {
 		this.instrument = instrument;
 		this.extractMsnSettings = extractMsnSettings;
 		this.scaffoldSettings = scaffoldSettings;
+		this.enabledEngines = enabledEngines;
 	}
 
 	public Curation getDatabase() {
@@ -348,7 +354,8 @@ public class SearchEngineParameters extends PersistableBase {
 				getFragmentTolerance().copy(),
 				getInstrument().copy(),
 				getExtractMsnSettings().copy(),
-				getScaffoldSettings().copy());
+				getScaffoldSettings().copy(),
+				getEnabledEngines().copy());
 	}
 
 	public void setValue(final ParamName name, final Object o) {
@@ -386,6 +393,9 @@ public class SearchEngineParameters extends PersistableBase {
 			case ScaffoldSettings:
 				setScaffoldSettings((ScaffoldSettings) o);
 				break;
+			case EnabledEngines:
+				setEnabledEngines((EnabledEngines) o);
+				break;
 			default:
 				break;
 		}
@@ -415,6 +425,8 @@ public class SearchEngineParameters extends PersistableBase {
 				return getExtractMsnSettings();
 			case ScaffoldSettings:
 				return getScaffoldSettings();
+			case EnabledEngines:
+				return getEnabledEngines();
 			default:
 				throw new MprcException("Unknown parameter name " + paramName.getName());
 		}
