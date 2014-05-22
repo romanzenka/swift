@@ -16,7 +16,6 @@ import edu.mayo.mprc.swift.dbmapping.FileSearch;
 import edu.mayo.mprc.swift.dbmapping.SearchRun;
 import edu.mayo.mprc.swift.dbmapping.SpectrumQa;
 import edu.mayo.mprc.swift.dbmapping.SwiftSearchDefinition;
-import edu.mayo.mprc.swift.params2.EnabledEngines;
 import edu.mayo.mprc.swift.params2.ExtractMsnSettings;
 import edu.mayo.mprc.swift.params2.SearchEngineParameters;
 import edu.mayo.mprc.swift.params2.mapping.ParamsInfo;
@@ -189,7 +188,7 @@ public final class SearchRunner implements Runnable, Lifecycle {
 					workflowEngine.resumeOnWork(new MyResumer(this));
 					break;
 				}
-			} catch (Exception t) {
+			} catch (final Exception t) {
 				workflowEngine.reportError(t);
 				reporter.reportFailure(t);
 				break;
@@ -244,7 +243,7 @@ public final class SearchRunner implements Runnable, Lifecycle {
 		for (final FileSearch inputFile : searchDefinition.getInputFiles()) {
 			file = inputFile.getInputFile();
 			if (file.exists()) {
-				inputFileToTasks(inputFile, searchDefinition.getEnabledEngines(), searchDefinition.getSearchParameters(), Boolean.TRUE.equals(searchDefinition.getPublicSearchFiles()));
+				inputFileToTasks(inputFile, searchDefinition.getSearchParameters(), Boolean.TRUE.equals(searchDefinition.getPublicSearchFiles()));
 			} else {
 				LOGGER.info("Skipping nonexistent input file [" + file.getAbsolutePath() + "]");
 			}
@@ -264,7 +263,7 @@ public final class SearchRunner implements Runnable, Lifecycle {
 	 * @param defaultSearchParameters What parameters to use when searching, if the file does not specify otherwise.
 	 * @param publicSearchFiles       True when the intermediate search files should be made public.
 	 */
-	void inputFileToTasks(final FileSearch inputFile, final EnabledEngines enabledEngines, final SearchEngineParameters defaultSearchParameters, final boolean publicSearchFiles) {
+	void inputFileToTasks(final FileSearch inputFile, final SearchEngineParameters defaultSearchParameters, final boolean publicSearchFiles) {
 		final SearchEngineParameters searchParameters = inputFile.getSearchParametersWithDefault(defaultSearchParameters);
 
 		final FileProducingTask conversion = addRawConversionTask(inputFile, null);
@@ -285,7 +284,7 @@ public final class SearchRunner implements Runnable, Lifecycle {
 			// All 'normal' searches get normal entries
 			// While building these, the Scaffold search entry itself is initialized
 			// The IdpQonvert search is special as well, it is set up to process the results of the myrimatch search
-			if (isNormalEngine(engine) && enabledEngines.isEnabled(engine.getEngineConfig())) {
+			if (isNormalEngine(engine) && isEngineEnabled(engine, inputFile, defaultSearchParameters)) {
 				final EngineSearchTask search = addEngineSearchTask(engine, inputFile, conversion, searchParameters, publicSearchFiles);
 
 				scaffoldTask = addScaffoldAndQaTasks(scaffoldTask, inputFile, conversion, scaffoldDeployment, engine, search);
@@ -313,6 +312,14 @@ public final class SearchRunner implements Runnable, Lifecycle {
 			final IdpQonvertTask idpQonvertTask = addIdpQonvertTask(idpQonvert, myrimatchSearch, false/* Do not publish the idpDB file, temp only*/);
 			addQuameterTask(engines.getQuameterEngine(), idpQonvertTask, inputFile.getInputFile(), searchDbTask, inputFile, publicSearchFiles);
 		}
+	}
+
+	private boolean isEngineEnabled(final SearchEngine engine, final FileSearch inputFile, final SearchEngineParameters defaultParameters) {
+		if (inputFile.getSearchParameters() != null) {
+			return inputFile.getSearchParameters().getEnabledEngines().isEnabled(engine.getEngineConfig());
+		}
+		return defaultParameters.getEnabledEngines().isEnabled(engine.getEngineConfig());
+
 	}
 
 	/**

@@ -58,8 +58,6 @@ public class TestSearchRunner {
 	public void singleExperimentRunner() throws IOException {
 		final Collection<SearchEngine> searchEngines = searchEngines();
 
-		final EnabledEngines engines = enabledEngines();
-
 		final List<FileSearch> inputFiles = Arrays.asList(
 				new FileSearch(raw1, "biosample", "category", "experiment", searchEngineParameters1()),
 				new FileSearch(raw2, "biosample2", "category", "experiment", searchEngineParameters1())
@@ -94,9 +92,7 @@ public class TestSearchRunner {
 	public void onlyProvideMgfAndMzxmlRunner() throws IOException {
 		final Collection<SearchEngine> searchEngines = searchEngines();
 
-		final EnabledEngines engines = new EnabledEngines();
-
-		final SearchEngineParameters searchParameters = searchEngineParameters1();
+		final SearchEngineParameters searchParameters = searchEngineParameters1(new EnabledEngines());
 		searchParameters.setExtractMsnSettings(new ExtractMsnSettings("", ExtractMsnSettings.MSCONVERT));
 		final List<FileSearch> inputFiles = Arrays.asList(
 				new FileSearch(raw1, "biosample", "category", "experiment", searchParameters),
@@ -104,6 +100,7 @@ public class TestSearchRunner {
 		);
 
 		final SwiftSearchDefinition definition = defaultSearchDefinition(inputFiles);
+		definition.setSearchParameters(searchParameters);
 		definition.setPublicMgfFiles(true);
 		definition.setPublicMzxmlFiles(true);
 
@@ -124,8 +121,6 @@ public class TestSearchRunner {
 	@Test
 	public void singleExperimentTwoDatabasesRunner() throws IOException {
 		final Collection<SearchEngine> searchEngines = searchEngines();
-
-		final EnabledEngines engines = enabledEngines();
 
 		final List<FileSearch> inputFiles = Arrays.asList(
 				new FileSearch(raw1, "biosample", "category", "experiment", searchEngineParameters1()),
@@ -159,8 +154,6 @@ public class TestSearchRunner {
 	@Test
 	public void singleExperimentTwoProteasesRunner() throws IOException {
 		final Collection<SearchEngine> searchEngines = searchEngines();
-
-		final EnabledEngines engines = enabledEngines();
 
 		final List<FileSearch> inputFiles = Arrays.asList(
 				new FileSearch(raw1, "biosample", "category", "experiment", searchEngineParameters1()),
@@ -197,8 +190,6 @@ public class TestSearchRunner {
 	public void multipleExperimentRunner() throws IOException {
 		final Collection<SearchEngine> searchEngines = searchEngines();
 
-		final EnabledEngines engines = enabledEngines();
-
 		final List<FileSearch> inputFiles = Arrays.asList(
 				new FileSearch(raw1, "biosample", "category", "experiment1", searchEngineParameters1()),
 				new FileSearch(raw2, "biosample2", "category", "experiment2", searchEngineParameters1())
@@ -231,8 +222,6 @@ public class TestSearchRunner {
 	@Test
 	public void mzMlRunner() throws IOException {
 		final Collection<SearchEngine> searchEngines = searchEngines();
-
-		final EnabledEngines engines = enabledEngines();
 
 		final List<FileSearch> inputFiles = Arrays.asList(
 				new FileSearch(raw1, "biosample", "category", "experiment", searchEngineParametersMzml()),
@@ -273,12 +262,14 @@ public class TestSearchRunner {
 
 		final EnabledEngines engines = enabledEnginesWithQuameter();
 
+		final SearchEngineParameters searchParameters = searchEngineParameters1(engines);
 		final List<FileSearch> inputFiles = Arrays.asList(
-				new FileSearch(raw1, "biosample", "category", "experiment", searchEngineParameters1()),
-				new FileSearch(raw2, "biosample2", "category", "experiment", searchEngineParameters1())
+				new FileSearch(raw1, "biosample", "category", "experiment", searchParameters),
+				new FileSearch(raw2, "biosample2", "category", "experiment", searchParameters)
 		);
 
 		final SwiftSearchDefinition definition = defaultSearchDefinition(inputFiles);
+		definition.setSearchParameters(searchParameters);
 
 		final SearchRunner runner = getSearchRunner(searchEngines, definition);
 
@@ -325,6 +316,7 @@ public class TestSearchRunner {
 		final EnabledEngines engines = enabledEnginesWithQuameter();
 
 		final SearchEngineParameters parameters = searchEngineParametersMzml();
+		parameters.setEnabledEngines(engines);
 		if (doSemiTryptic) {
 			parameters.setMinTerminiCleavages(1);
 		}
@@ -424,6 +416,10 @@ public class TestSearchRunner {
 	}
 
 	private SearchEngineParameters searchEngineParameters1() {
+		return searchEngineParameters1(enabledEngines());
+	}
+
+	private SearchEngineParameters searchEngineParameters1(final EnabledEngines enabledEngines) {
 		final ScaffoldSettings scaffoldSettings = new ScaffoldSettingsBuilder()
 				.setMinimumNonTrypticTerminii(0)
 				.setStarredProteins(new StarredProteins("ALBU_HUMAN", ",", false))
@@ -436,7 +432,7 @@ public class TestSearchRunner {
 				new Tolerance(1, MassUnit.Da), Instrument.ORBITRAP,
 				new ExtractMsnSettings("-M100", ExtractMsnSettings.EXTRACT_MSN),
 				scaffoldSettings,
-				new EnabledEngines()
+				enabledEngines
 		);
 	}
 
