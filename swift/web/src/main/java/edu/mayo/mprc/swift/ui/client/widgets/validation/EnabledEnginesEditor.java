@@ -61,7 +61,7 @@ public final class EnabledEnginesEditor extends HorizontalPanel implements Valid
 		}
 		final ArrayList<ClientSearchEngineConfig> result = new ArrayList<ClientSearchEngineConfig>(engines.size());
 		for (final EngineVersionSelector selector : engines.values()) {
-			if (selector.isEnabled()) {
+			if (selector.isChecked()) {
 				result.add(new ClientSearchEngineConfig(selector.getCode(), selector.getVersion()));
 			}
 		}
@@ -74,7 +74,7 @@ public final class EnabledEnginesEditor extends HorizontalPanel implements Valid
 		}
 		// Disable all
 		for (final EngineVersionSelector selector : engines.values()) {
-			selector.setEnabled(false);
+			selector.setChecked(false);
 		}
 		// Enable selected
 		for (final ClientSearchEngineConfig config : enabledEngines.getEnabledEngines()) {
@@ -86,7 +86,7 @@ public final class EnabledEnginesEditor extends HorizontalPanel implements Valid
 				if (!selector.selectVersion(config.getVersion())) {
 					reportWarning("Requested " + code + " version " + config.getVersion() + " not available. Using " + selector.getVersion() + " instead.");
 				}
-				selector.setEnabled(true);
+				selector.setChecked(true);
 			}
 		}
 	}

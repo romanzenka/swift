@@ -85,12 +85,12 @@ public final class EngineVersionSelector extends HorizontalPanel implements Comp
 		}
 	}
 
-	public boolean isEnabled() {
+	public boolean isChecked() {
 		return Boolean.TRUE.equals(checkBox.getValue());
 	}
 
-	public void setEnabled(boolean enabled) {
-		checkBox.setValue(enabled);
+	public void setChecked(boolean checked) {
+		checkBox.setValue(checked);
 	}
 
 	public String getVersion() {
@@ -112,5 +112,12 @@ public final class EngineVersionSelector extends HorizontalPanel implements Comp
 
 	public void focus() {
 		checkBox.setFocus(true);
+	}
+
+	public void setEnabled(final boolean enabled) {
+		checkBox.setEnabled(enabled);
+		if (versions != null) {
+			versions.setEnabled(enabled);
+		}
 	}
 }
