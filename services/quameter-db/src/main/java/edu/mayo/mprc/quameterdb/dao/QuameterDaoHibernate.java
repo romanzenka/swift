@@ -55,7 +55,7 @@ public final class QuameterDaoHibernate extends DaoBase implements QuameterDao {
 				" WHERE " +
 				" r.hidden=0 AND " +
 				" r.swift_search = d.swift_search_definition_id AND " +
-				" f.input_files_id = d.swift_search_definition_id AND " +
+				" f.swift_search_definition_id = d.swift_search_definition_id AND " +
 				" q.file_search_id = f.file_search_id AND " +
 				" m.swift_search_definition_id = d.swift_search_definition_id AND " +
 				" m.metadata_key='quameter.category' AND" +
