@@ -19,6 +19,7 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 
+@Test(sequential = true)
 public final class ParamsDaoTest extends DaoTest {
 	private static final Logger LOGGER = Logger.getLogger(ParamsDaoTest.class);
 
@@ -228,6 +229,7 @@ public final class ParamsDaoTest extends DaoTest {
 	@Test
 	public void shouldAddSearchParameters() {
 		SearchEngineParameters params = new SearchEngineParameters();
+		params.setEnabledEngines(new EnabledEngines());
 		final Curation database = new Curation();
 		database.setTitle("Test Curation");
 		database.setShortName("test");
@@ -280,6 +282,7 @@ public final class ParamsDaoTest extends DaoTest {
 		Assert.assertEquals(variableMods.getId(), variableMods2.getId(), "Empty mod set has to have identical ID");
 
 		SearchEngineParameters params2 = new SearchEngineParameters();
+		params2.setEnabledEngines(new EnabledEngines());
 		params2.setExtractMsnSettings(new ExtractMsnSettings("-Z10", "extract_msn"));
 		params2.setScaffoldSettings(new ScaffoldSettingsBuilder()
 				.setMinimumNonTrypticTerminii(2)
@@ -299,6 +302,7 @@ public final class ParamsDaoTest extends DaoTest {
 		Assert.assertEquals(params2.getId(), params.getId(), "Must save as the same object");
 
 		SearchEngineParameters params3 = new SearchEngineParameters();
+		params3.setEnabledEngines(new EnabledEngines());
 		params3.setExtractMsnSettings(new ExtractMsnSettings("-Z10", "extract_msn"));
 		params3.setScaffoldSettings(new ScaffoldSettingsBuilder()
 				.setMinimumNonTrypticTerminii(2)
@@ -320,52 +324,36 @@ public final class ParamsDaoTest extends DaoTest {
 
 	@Test
 	public void addSearchEngine() throws Throwable {
-		dao.begin();
-		try {
-			SearchEngineConfig config = new SearchEngineConfig("TEST_ENGINE", "v1.0");
-			config = dao.addSearchEngineConfig(config);
-			Assert.assertNotNull(config.getId(), "Save did not work");
+		SearchEngineConfig config = new SearchEngineConfig("TEST_ENGINE", "v1.0");
+		config = dao.addSearchEngineConfig(config);
+		Assert.assertNotNull(config.getId(), "Save did not work");
 
-			SearchEngineConfig config2 = new SearchEngineConfig("TEST_ENGINE", "v1.0");
-			Assert.assertTrue(config.equals(config2), "The two changes must be identical");
+		SearchEngineConfig config2 = new SearchEngineConfig("TEST_ENGINE", "v1.0");
+		Assert.assertTrue(config.equals(config2), "The two changes must be identical");
 
-			config2 = dao.addSearchEngineConfig(config2);
-			Assert.assertEquals(config2.getId(), config.getId(), "Save must produce same id");
-
-			dao.commit();
-		} catch (Exception t) {
-			dao.rollback();
-			throw t;
-		}
+		config2 = dao.addSearchEngineConfig(config2);
+		Assert.assertEquals(config2.getId(), config.getId(), "Save must produce same id");
 	}
 
 	@Test
 	public void addEnabledEngines() throws Throwable {
-		dao.begin();
-		try {
-			SearchEngineConfig engine1 = new SearchEngineConfig("TEST_ENGINE1", "v1.0");
-			SearchEngineConfig engine2 = new SearchEngineConfig("TEST_ENGINE2", "v1.1");
-			engine1 = dao.addSearchEngineConfig(engine1);
-			engine2 = dao.addSearchEngineConfig(engine2);
+		SearchEngineConfig engine1 = new SearchEngineConfig("TEST_ENGINE1", "v1.0");
+		SearchEngineConfig engine2 = new SearchEngineConfig("TEST_ENGINE2", "v1.1");
+		engine1 = dao.addSearchEngineConfig(engine1);
+		engine2 = dao.addSearchEngineConfig(engine2);
 
-			final EnabledEngines engines = new EnabledEngines();
-			engines.add(engine1);
-			engines.add(engine2);
+		final EnabledEngines engines = new EnabledEngines();
+		engines.add(engine1);
+		engines.add(engine2);
 
-			final EnabledEngines engines1 = dao.addEnabledEngineSet(Arrays.asList(engine1, engine2));
-			final EnabledEngines engines2 = dao.addEnabledEngineSet(Arrays.asList(engine2, engine1));
-			final EnabledEngines engines3 = dao.addEnabledEngineSet(new ArrayList<SearchEngineConfig>());
-			final EnabledEngines engines4 = dao.addEnabledEngineSet(new ArrayList<SearchEngineConfig>());
+		final EnabledEngines engines1 = dao.addEnabledEngineSet(Arrays.asList(engine1, engine2));
+		final EnabledEngines engines2 = dao.addEnabledEngineSet(Arrays.asList(engine2, engine1));
+		final EnabledEngines engines3 = dao.addEnabledEngineSet(new ArrayList<SearchEngineConfig>());
+		final EnabledEngines engines4 = dao.addEnabledEngineSet(new ArrayList<SearchEngineConfig>());
 
-			Assert.assertEquals(engines2, engines1, "Have to be identical sets");
-			Assert.assertNotSame(engines3, engines1, "Empty engine set has to be different");
-			Assert.assertEquals(engines4, engines3, "Empty sets have to be identical");
-
-			dao.commit();
-		} catch (Exception t) {
-			dao.rollback();
-			throw t;
-		}
+		Assert.assertEquals(engines2, engines1, "Have to be identical sets");
+		Assert.assertNotSame(engines3, engines1, "Empty engine set has to be different");
+		Assert.assertEquals(engines4, engines3, "Empty sets have to be identical");
 	}
 
 }
