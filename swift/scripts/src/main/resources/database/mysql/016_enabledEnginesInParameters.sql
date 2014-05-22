@@ -127,6 +127,23 @@ UPDATE search_parameters AS p,
 SET p.enabled_engines = c.enabled_engines_id
 WHERE p.search_parameter_id = c.new_search_parameters_id;
 
+-- There are still some search_parameter sets that have enabled_engines as null
+-- Those are the instances where a parameter set was saved, but no searches ran against it
+-- Select the enabled engines that appear the most times and then replace all the nulls with the
+-- most popular choice
+
+SELECT
+  @most_common_enabled_engines := max(enabled_engines)
+FROM search_parameters
+GROUP BY enabled_engines
+HAVING enabled_engines IS NOT NULL
+ORDER BY count(enabled_engines) DESC
+LIMIT 1;
+
+UPDATE search_parameters
+SET enabled_engines = @most_common_enabled_engines
+WHERE enabled_engines IS NULL;
+
 -- Renumber the file_search table direct parameter names
 UPDATE
     file_search AS f,
@@ -244,7 +261,7 @@ WHERE
   f.swift_search_definition_id = td.swift_search_definition_id
   AND f.enabled_engines = td.enabled_engines_id;
 
--- Now we can drop link from file_search to enabled_engines
+-- Drop link from file_search to enabled_engines
 
 ALTER TABLE file_search
 DROP FOREIGN KEY file_search_ibfk_2;
