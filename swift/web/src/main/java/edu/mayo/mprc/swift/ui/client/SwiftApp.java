@@ -221,7 +221,6 @@ public final class SwiftApp implements EntryPoint, HidesPageContentsWhileLoading
 			final RootPanel rootPanel = RootPanel.get("report");
 			if (quameterEnabled) {
 				quameterCategorySelector = new QuameterCategorySelector(this, this);
-				rootPanel.add(new Label("QuaMeter:"));
 				rootPanel.add(quameterCategorySelector);
 			}
 			if (reportEnabled) {

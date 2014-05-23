@@ -3,6 +3,7 @@ package edu.mayo.mprc.swift.ui.client.widgets;
 import com.google.gwt.event.dom.client.ChangeEvent;
 import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.user.client.ui.HorizontalPanel;
+import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.ListBox;
 
 import java.util.LinkedHashMap;
@@ -46,6 +47,7 @@ public final class QuameterCategorySelector extends HorizontalPanel {
 				setSearchCategory(category.getValue(category.getSelectedIndex()));
 			}
 		});
+		this.add(new Label("QuaMeter:"));
 		this.add(category);
 	}
 
