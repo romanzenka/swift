@@ -14,7 +14,7 @@ public final class AdditionalSettingsPanel extends HorizontalPanel {
 	private final CheckBox fromScratch;
 	private final CheckBox lowPriority;
 
-	public AdditionalSettingsPanel(final List<ClientSearchEngine> searchEngineList) {
+	public AdditionalSettingsPanel() {
 		publicMgfs = new CheckBox("Provide .mgf");
 		publicMgfs.setTitle("Place converted .mgf files in the output directory of your project");
 		publicMgfs.setValue(false);

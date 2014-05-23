@@ -154,8 +154,8 @@ public final class SwiftApp implements EntryPoint, HidesPageContentsWhileLoading
 				initParamsEditor(result);
 				finalizeFileTableInit();
 				finalizeSpectrumQa(result.getSpectrumQaParamFileInfo());
-				finalizeInitReport(result.isScaffoldReportEnabled());
-				initAdditionalSettings(result.getSearchEngines());
+				finalizeInitReport(result.isScaffoldReportEnabled(), result.getSearchEngines());
+				initAdditionalSettings();
 				initUserList(result.listUsers());
 				showPageContentsAfterLoad();
 				initMessage(getConfigurationSetting(USER_MESSAGE));
@@ -176,8 +176,8 @@ public final class SwiftApp implements EntryPoint, HidesPageContentsWhileLoading
 		connectTitleAndFileTable();
 	}
 
-	private void initAdditionalSettings(final List<ClientSearchEngine> engines) {
-		additionalSettingsPanel = new AdditionalSettingsPanel(engines);
+	private void initAdditionalSettings() {
+		additionalSettingsPanel = new AdditionalSettingsPanel();
 		final RootPanel panel = RootPanel.get("publicResults");
 		panel.add(additionalSettingsPanel);
 	}
@@ -209,13 +209,25 @@ public final class SwiftApp implements EntryPoint, HidesPageContentsWhileLoading
 		title.addChangeHandler(titleChangeListener);
 	}
 
-	private void finalizeInitReport(final Boolean reportEnabled) {
-		if (reportEnabled) {
+	private void finalizeInitReport(final Boolean reportEnabled, List<ClientSearchEngine> searchEngines) {
+		boolean quameterEnabled = false;
+		for (ClientSearchEngine engine : searchEngines) {
+			if ("QUAMETER".equals(engine.getEngineConfig().getCode())) {
+				quameterEnabled = true;
+			}
+		}
+		if (reportEnabled || quameterEnabled) {
 			DOM.setStyleAttribute(DOM.getElementById("reportingRow"), "display", "");
-			quameterCategorySelector = new QuameterCategorySelector(this, this);
-			reportSetupPanel = new ReportSetupPanel(quameterCategorySelector);
 			final RootPanel rootPanel = RootPanel.get("report");
-			rootPanel.add(reportSetupPanel);
+			if (quameterEnabled) {
+				quameterCategorySelector = new QuameterCategorySelector(this, this);
+				rootPanel.add(new Label("QuaMeter:"));
+				rootPanel.add(quameterCategorySelector);
+			}
+			if (reportEnabled) {
+				reportSetupPanel = new ReportSetupPanel(quameterCategorySelector);
+				rootPanel.add(reportSetupPanel);
+			}
 		} else {
 			DOM.setStyleAttribute(DOM.getElementById("reportingRow"), "display", "none");
 		}
