@@ -436,7 +436,8 @@ public final class ServiceImpl extends SpringGwtServlet implements Service, Appl
 				}
 			}
 			getParamsDao().commit();
-			return (ClientParamFile[]) files.toArray();
+			final ClientParamFile[] result = new ClientParamFile[files.size()];
+			return files.toArray(result);
 		} catch (Exception e) {
 			getParamsDao().rollback();
 			LOGGER.error("Could not get parameter files", e);
