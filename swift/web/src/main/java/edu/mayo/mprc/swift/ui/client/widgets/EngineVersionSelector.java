@@ -1,5 +1,14 @@
 package edu.mayo.mprc.swift.ui.client.widgets;
 
+import com.google.gwt.event.dom.client.ChangeEvent;
+import com.google.gwt.event.dom.client.ChangeHandler;
+import com.google.gwt.event.logical.shared.HasValueChangeHandlers;
+import com.google.gwt.event.logical.shared.ValueChangeEvent;
+import com.google.gwt.event.logical.shared.ValueChangeHandler;
+import com.google.gwt.event.shared.EventBus;
+import com.google.gwt.event.shared.GwtEvent;
+import com.google.gwt.event.shared.HandlerRegistration;
+import com.google.gwt.event.shared.SimpleEventBus;
 import com.google.gwt.user.client.ui.CheckBox;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.ListBox;
@@ -12,12 +21,13 @@ import java.util.List;
 /**
  * @author Roman Zenka
  */
-public final class EngineVersionSelector extends HorizontalPanel implements Comparable<EngineVersionSelector> {
+public final class EngineVersionSelector extends HorizontalPanel implements Comparable<EngineVersionSelector>, HasValueChangeHandlers<String> {
 	private final String code;
 	private final CheckBox checkBox;
 	private ListBox versions;
 	private final List<String> versionList;
 	private final int order;
+	private final EventBus eventBus = new SimpleEventBus();
 
 	public EngineVersionSelector(final ClientSearchEngine engine) {
 		code = engine.getEngineConfig().getCode();
@@ -27,6 +37,18 @@ public final class EngineVersionSelector extends HorizontalPanel implements Comp
 		versionList = new ArrayList<String>(2);
 		versionList.add(engine.getEngineConfig().getVersion());
 		setStyleName("engine-version-selector", true);
+		checkBox.addValueChangeHandler(new ValueChangeHandler<Boolean>() {
+			@Override
+			public void onValueChange(ValueChangeEvent<Boolean> booleanValueChangeEvent) {
+				ValueChangeEvent.fire(EngineVersionSelector.this, getValue());
+			}
+		});
+		versions.addChangeHandler(new ChangeHandler() {
+			@Override
+			public void onChange(ChangeEvent changeEvent) {
+				ValueChangeEvent.fire(EngineVersionSelector.this, getValue());
+			}
+		});
 	}
 
 	public void addEngine(final ClientSearchEngine engine) {
@@ -101,6 +123,13 @@ public final class EngineVersionSelector extends HorizontalPanel implements Comp
 		}
 	}
 
+	public String getValue() {
+		if (isChecked()) {
+			return getVersion();
+		}
+		return null;
+	}
+
 	@Override
 	public int compareTo(EngineVersionSelector o) {
 		return order < o.order ? -1 : (order == o.order ? 0 : 1);
@@ -120,4 +149,16 @@ public final class EngineVersionSelector extends HorizontalPanel implements Comp
 			versions.setEnabled(enabled);
 		}
 	}
+
+	@Override
+	public HandlerRegistration addValueChangeHandler(ValueChangeHandler<String> handler) {
+		return eventBus.addHandler(ValueChangeEvent.getType(), handler);
+	}
+
+	@Override
+	public void fireEvent(GwtEvent<?> event) {
+		eventBus.fireEventFromSource(event, this);
+	}
 }
+
+

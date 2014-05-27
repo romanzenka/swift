@@ -37,15 +37,21 @@ public final class EnabledEnginesEditor extends HorizontalPanel implements Valid
 			if (engines.containsKey(code)) {
 				engines.get(code).addEngine(engine);
 			} else {
-				EngineVersionSelector selector = new EngineVersionSelector(engine);
+				final EngineVersionSelector selector = new EngineVersionSelector(engine);
 				engines.put(code, selector);
 			}
 		}
 		for (final EngineVersionSelector selector : engines.values()) {
 			selector.done();
+			selector.addValueChangeHandler(new ValueChangeHandler<String>() {
+				@Override
+				public void onValueChange(final ValueChangeEvent<String> event) {
+					ValueChangeEvent.fire(EnabledEnginesEditor.this, getValue());
+				}
+			});
 		}
 
-		List<EngineVersionSelector> list = new ArrayList<EngineVersionSelector>(engines.values());
+		final List<EngineVersionSelector> list = new ArrayList<EngineVersionSelector>(engines.values());
 		Collections.sort(list);
 		for (final EngineVersionSelector selector : list) {
 			add(selector);
@@ -93,7 +99,7 @@ public final class EnabledEnginesEditor extends HorizontalPanel implements Valid
 
 	private void reportWarning(final String warning) {
 		// Do nothing now
-		int i = 0;
+		final int i = 0;
 	}
 
 	@Override
@@ -109,7 +115,7 @@ public final class EnabledEnginesEditor extends HorizontalPanel implements Valid
 	}
 
 	@Override
-	public void setValue(ClientValue value, boolean fireEvents) {
+	public void setValue(final ClientValue value, final boolean fireEvents) {
 		ClientValueUtils.setValue(this, value, fireEvents);
 	}
 
@@ -121,7 +127,7 @@ public final class EnabledEnginesEditor extends HorizontalPanel implements Valid
 	}
 
 	@Override
-	public void setValidationSeverity(int validationSeverity) {
+	public void setValidationSeverity(final int validationSeverity) {
 		ValidationController.setValidationSeverity(validationSeverity, asWidget());
 	}
 
@@ -131,18 +137,18 @@ public final class EnabledEnginesEditor extends HorizontalPanel implements Valid
 	}
 
 	@Override
-	public void setAllowedValues(List<? extends ClientValue> values) {
+	public void setAllowedValues(final List<? extends ClientValue> values) {
 	}
 
 	@Override
 	public void setEnabled(final boolean enabled) {
-		for (EngineVersionSelector selector : engines.values()) {
+		for (final EngineVersionSelector selector : engines.values()) {
 			selector.setEnabled(enabled);
 		}
 	}
 
 	@Override
-	public HandlerRegistration addValueChangeHandler(ValueChangeHandler<ClientValue> handler) {
+	public HandlerRegistration addValueChangeHandler(final ValueChangeHandler<ClientValue> handler) {
 		return addHandler(handler, ValueChangeEvent.getType());
 	}
 }
