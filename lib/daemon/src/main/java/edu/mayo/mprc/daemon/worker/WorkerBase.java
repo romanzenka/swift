@@ -35,7 +35,9 @@ public abstract class WorkerBase implements Worker {
 		try {
 			progressReporter.reportStart(MonitorUtilities.getHostInformation());
 			final File tempWorkFolder = createTempWorkFolder();
-			LOGGER.debug("Temporary work folder at: " + tempWorkFolder.getAbsolutePath());
+			if (tempWorkFolder != null) {
+				LOGGER.debug("Temporary work folder at: " + tempWorkFolder.getAbsolutePath());
+			}
 			process(workPacket, tempWorkFolder, progressReporter);
 			cleanTempWorkFolder(tempWorkFolder);
 			progressReporter.reportSuccess();
