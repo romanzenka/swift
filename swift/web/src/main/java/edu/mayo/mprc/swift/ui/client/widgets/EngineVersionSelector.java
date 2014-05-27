@@ -37,18 +37,6 @@ public final class EngineVersionSelector extends HorizontalPanel implements Comp
 		versionList = new ArrayList<String>(2);
 		versionList.add(engine.getEngineConfig().getVersion());
 		setStyleName("engine-version-selector", true);
-		checkBox.addValueChangeHandler(new ValueChangeHandler<Boolean>() {
-			@Override
-			public void onValueChange(ValueChangeEvent<Boolean> booleanValueChangeEvent) {
-				ValueChangeEvent.fire(EngineVersionSelector.this, getValue());
-			}
-		});
-		versions.addChangeHandler(new ChangeHandler() {
-			@Override
-			public void onChange(ChangeEvent changeEvent) {
-				ValueChangeEvent.fire(EngineVersionSelector.this, getValue());
-			}
-		});
 	}
 
 	public void addEngine(final ClientSearchEngine engine) {
@@ -72,10 +60,22 @@ public final class EngineVersionSelector extends HorizontalPanel implements Comp
 			versions.setSelectedIndex(versions.getItemCount() - 1);
 			add(checkBox);
 			add(versions);
+			versions.addChangeHandler(new ChangeHandler() {
+				@Override
+				public void onChange(ChangeEvent changeEvent) {
+					ValueChangeEvent.fire(EngineVersionSelector.this, getValue());
+				}
+			});
 		} else {
 			checkBox.setText(checkBox.getText() + " " + versionList.get(0));
 			add(checkBox);
 		}
+		checkBox.addValueChangeHandler(new ValueChangeHandler<Boolean>() {
+			@Override
+			public void onValueChange(ValueChangeEvent<Boolean> booleanValueChangeEvent) {
+				ValueChangeEvent.fire(EngineVersionSelector.this, getValue());
+			}
+		});
 	}
 
 	/**
