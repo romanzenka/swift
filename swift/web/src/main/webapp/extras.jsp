@@ -93,10 +93,11 @@
     </p>
 
     <p>
-        Preview the settings Swift uses internall when sending searches to search engines.
+        Preview the settings Swift uses internally when sending searches to search engines.
     </p>
 
     <p>
+        <a class="btn" href="/amino-acids">Defined Amino Acids</a>
         <a class="btn" href="/amino-acids">Defined Amino Acids</a>
         <a class="btn" href="/mods">Defined Modifications</a>
     </p>

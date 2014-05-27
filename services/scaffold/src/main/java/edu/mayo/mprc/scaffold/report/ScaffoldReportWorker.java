@@ -33,16 +33,18 @@ public final class ScaffoldReportWorker extends WorkerBase {
 	}
 
 	@Override
-	public void process(final WorkPacket workPacket, final UserProgressReporter progressReporter) {
+	public void process(final WorkPacket workPacket, final File tempWorkFolder, final UserProgressReporter progressReporter) {
 		if (workPacket instanceof ScaffoldReportWorkPacket) {
 
 			final ScaffoldReportWorkPacket scaffoldReportWorkPacket = ScaffoldReportWorkPacket.class.cast(workPacket);
 
-			final File peptideReport = scaffoldReportWorkPacket.getPeptideReportFile();
-			final File proteinReport = scaffoldReportWorkPacket.getProteinReportFile();
+			final File finalPeptideReport = scaffoldReportWorkPacket.getPeptideReportFile();
+			final File finalProteinReport = scaffoldReportWorkPacket.getProteinReportFile();
+			final File peptideReport = getTempOutputFile(tempWorkFolder, finalPeptideReport);
+			final File proteinReport = getTempOutputFile(tempWorkFolder, finalProteinReport);
 
-			if (peptideReport.exists() && peptideReport.length() > 0 && proteinReport.exists() && proteinReport.length() > 0) {
-				LOGGER.info("Scaffold report output files: " + peptideReport.getName() + " and " + proteinReport.getName() + " already exist. Skipping scaffold report generation.");
+			if (finalPeptideReport.exists() && finalPeptideReport.length() > 0 && finalProteinReport.exists() && finalProteinReport.length() > 0) {
+				LOGGER.info("Scaffold report output files: " + finalPeptideReport.getName() + " and " + finalProteinReport.getName() + " already exist. Skipping scaffold report generation.");
 				return;
 			}
 
@@ -54,6 +56,8 @@ public final class ScaffoldReportWorker extends WorkerBase {
 
 			try {
 				ScaffoldReportBuilder.buildReport(fileArrayList, peptideReport, proteinReport);
+				publish(peptideReport, finalPeptideReport);
+				publish(proteinReport, finalProteinReport);
 			} catch (IOException e) {
 				throw new MprcException("Failed to process scaffold report work packet.", e);
 			}

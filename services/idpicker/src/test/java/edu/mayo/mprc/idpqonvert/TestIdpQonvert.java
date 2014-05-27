@@ -74,7 +74,7 @@ public final class TestIdpQonvert {
 			params.setDecoyPrefix("REVERSE_");
 
 			final IdpQonvertWorkPacket workPacket = new IdpQonvertWorkPacket(outputFile, params, inputFile, fastaFile, "idp-test", true);
-			worker.process(workPacket, new UserProgressReporter() {
+			worker.process(workPacket, outputFile.getParentFile(), new UserProgressReporter() {
 				@Override
 				public void reportProgress(final ProgressInfo progressInfo) {
 					LOGGER.debug(progressInfo.toString());

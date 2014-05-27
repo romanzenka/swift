@@ -53,7 +53,7 @@ public final class QaWorker extends WorkerBase {
 	private static final String R_EXECUTABLE = "rExecutable";
 
 	@Override
-	public void process(final WorkPacket workPacket, final UserProgressReporter progressReporter) {
+	public void process(final WorkPacket workPacket, final File tempWorkFolder, final UserProgressReporter progressReporter) {
 		final QaWorkPacket qaWorkPacket = (QaWorkPacket) workPacket;
 
 		final File reportFile = qaWorkPacket.getReportFile();
@@ -112,6 +112,14 @@ public final class QaWorker extends WorkerBase {
 				FileUtilities.closeObjectQuietly(fileWriter);
 			}
 		}
+	}
+
+	/**
+	 * TODO: We do not publish QA results properly just yet
+	 */
+	@Override
+	public File createTempWorkFolder() {
+		return null;
 	}
 
 	private boolean addRScriptInputLine(final FileWriter fileWriter, final File qaReportFolder, final ExperimentQa experimentQa, final LinkedList<File> generatedFiles, final QaFiles qaFiles, boolean atLeastOneFileMissing) throws IOException {

@@ -47,7 +47,7 @@ public final class MSMSEvalWorker extends WorkerBase {
 	}
 
 	@Override
-	public void process(final WorkPacket workPacket, final UserProgressReporter reporter) {
+	public void process(final WorkPacket workPacket, final File tempWorkFolder, final UserProgressReporter reporter) {
 		if (!MSMSEvalWorkPacket.class.isInstance(workPacket)) {
 			throw new DaemonException("Unknown request type [" + workPacket.getClass().getName() + "] expecting [" + MSMSEvalWorkPacket.class.getName() + "]");
 		}
@@ -76,12 +76,17 @@ public final class MSMSEvalWorker extends WorkerBase {
 		/**
 		 * Output files.
 		 */
-		final File outputMzXMLFile = MSMSEvalWorkPacket.getExpectedMzXMLOutputFileName(sourceFile, outputDirectory);
-		final File msmsEvalFormattedOuputFile = MSMSEvalWorkPacket.getExpectedResultFileName(sourceFile, outputDirectory);
-		final File msmsEvalOuputFile = MSMSEvalWorkPacket.getExpectedMsmsEvalOutputFileName(sourceFile, outputDirectory); // Temporary
+		final File outputMzXMLFile = MSMSEvalWorkPacket.getExpectedMzXMLOutputFileName(sourceFile, tempWorkFolder); // Temporary
+		final File msmsEvalOutputFile = MSMSEvalWorkPacket.getExpectedMsmsEvalOutputFileName(sourceFile, tempWorkFolder); // Temporary
+
+		/**
+		 * Files to be published.
+		 */
+		final File finalOutputFile = MSMSEvalWorkPacket.getExpectedResultFileName(sourceFile, outputDirectory);
+		final File outputFile = getTempOutputFile(tempWorkFolder, finalOutputFile);
 
 		//If msmsEval has been executed, skip operation.
-		if (!msmsEvalWorkPacket.isFromScratch() && hasMSMSEvalFilterWorkerRun(msmsEvalFormattedOuputFile)) {
+		if (!msmsEvalWorkPacket.isFromScratch() && hasMSMSEvalFilterWorkerRun(finalOutputFile)) {
 			skippedExecution = true;
 			return;
 		}
@@ -106,15 +111,17 @@ public final class MSMSEvalWorker extends WorkerBase {
 
 			LOGGER.info("Formatting msmsEval output file with mgf scan numbers.");
 
-			MSMSEvalOutputFileFormatter.replaceMzXMLScanIdsWithMgfNumbers(msmsEvalOuputFile, msmsEvalFormattedOuputFile, mzXMLScanToMGFTitle);
+			MSMSEvalOutputFileFormatter.replaceMzXMLScanIdsWithMgfNumbers(msmsEvalOutputFile, outputFile, mzXMLScanToMGFTitle);
 
-			LOGGER.info("Formatted msmsEval output file " + msmsEvalFormattedOuputFile.getAbsolutePath() + " created.");
+			LOGGER.info("Formatted msmsEval output file " + outputFile.getAbsolutePath() + " created.");
+
+			publish(msmsEvalOutputFile, finalOutputFile);
 		} catch (Exception e) {
 			throw new DaemonException(e);
 		} finally {
 			//Clean up.
-			LOGGER.info("Deleting files: [" + msmsEvalOuputFile.getAbsolutePath() + ", " + outputMzXMLFile.getAbsolutePath() + "]");
-			FileUtilities.deleteNow(msmsEvalOuputFile);
+			LOGGER.info("Deleting files: [" + msmsEvalOutputFile.getAbsolutePath() + ", " + outputMzXMLFile.getAbsolutePath() + "]");
+			FileUtilities.deleteNow(msmsEvalOutputFile);
 			FileUtilities.deleteNow(outputMzXMLFile);
 		}
 	}

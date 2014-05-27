@@ -17,6 +17,7 @@ import org.apache.log4j.Logger;
 import org.joda.time.DateTime;
 
 import javax.annotation.Resource;
+import java.io.File;
 
 /**
  * Worker that processes database undeployment request. Given a request, it processes
@@ -89,7 +90,7 @@ public final class DatabaseUndeployerWorker extends WorkerBase {
 	}
 
 	@Override
-	public void process(final WorkPacket workPacket, final UserProgressReporter progressReporter) {
+	public void process(final WorkPacket workPacket, final File tempWorkFolder, final UserProgressReporter progressReporter) {
 		final DatabaseUndeployerWorkPacket undeployerWorkPacket = (DatabaseUndeployerWorkPacket) workPacket;
 
 		final DatabaseUndeployerRunner undeployerRunner = new DatabaseUndeployerRunner(undeployerWorkPacket
@@ -121,6 +122,12 @@ public final class DatabaseUndeployerWorker extends WorkerBase {
 		}
 
 		progressReporter.reportProgress(undeployerResult);
+	}
+
+	@Override
+	public File createTempWorkFolder() {
+		// No folder needed
+		return null;
 	}
 
 	/**

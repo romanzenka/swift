@@ -63,7 +63,6 @@ public final class XTandemWorker extends WorkerBase {
 		parser.accepts(SEARCH_PARAMS_FILE, "X!Tandem search parameters").withRequiredArg().ofType(File.class);
 		parser.accepts(DATABASE_FILE, "X!Tandem database").withRequiredArg().ofType(File.class);
 		parser.accepts(OUTPUT_FILE, "Where to put the results of X!Tandem search").withRequiredArg().ofType(File.class);
-		parser.accepts(WORK_FOLDER, "Where to execute X!Tandem").withRequiredArg().ofType(File.class);
 
 		final OptionSet options = parser.parse(args);
 		final String tandemExecutable = getParameterString(TANDEM_EXECUTABLE, options);
@@ -71,13 +70,12 @@ public final class XTandemWorker extends WorkerBase {
 		final File searchParamsFile = getParameter(SEARCH_PARAMS_FILE, options);
 		final File databaseFile = getParameter(DATABASE_FILE, options);
 		final File outputFile = getParameter(OUTPUT_FILE, options);
-		final File workFolder = getParameter(WORK_FOLDER, options);
 
 		final Factory factory = new Factory();
 		final Config config = new Config(tandemExecutable);
 		final Worker worker = factory.create(config, null);
 
-		final XTandemWorkPacket packet = new XTandemWorkPacket(inputFile, searchParamsFile, outputFile, workFolder, databaseFile, false, "1", false);
+		final XTandemWorkPacket packet = new XTandemWorkPacket(inputFile, searchParamsFile, outputFile, databaseFile, false, "1", false);
 
 		worker.processRequest(packet, new ProgressReporter() {
 			@Override
@@ -124,63 +122,75 @@ public final class XTandemWorker extends WorkerBase {
 	}
 
 	@Override
-	public void process(final WorkPacket workPacket, final UserProgressReporter progressReporter) {
+	public void process(final WorkPacket workPacket, final File tempWorkFolder, final UserProgressReporter progressReporter) {
 		if (!(workPacket instanceof XTandemWorkPacket)) {
 			throw new DaemonException("Unexpected packet type " + workPacket.getClass().getName() + ", expected " + XTandemWorkPacket.class.getName());
 		}
 
 		final XTandemWorkPacket packet = (XTandemWorkPacket) workPacket;
 
-		try {
-			LOGGER.info("X!Tandem parameters:\n"
-					+ "--" + TANDEM_EXECUTABLE + " '" + tandemExecutable.getPath() + "' "
-					+ "--" + INPUT_FILE + " '" + packet.getInputFile().getPath() + "' "
-					+ "--" + OUTPUT_FILE + " '" + packet.getOutputFile().getPath() + "' "
-					+ "--" + SEARCH_PARAMS_FILE + " '" + packet.getSearchParamsFile().getPath() + "' "
-					+ "--" + DATABASE_FILE + " '" + packet.getDatabaseFile().getPath() + "' "
-					+ "--" + WORK_FOLDER + " '" + packet.getWorkFolder().getPath() + "' ");
-			checkPacketCorrectness(packet);
+		final File finalOutputFile = packet.getOutputFile();
+		final File outputFile = getTempOutputFile(tempWorkFolder, finalOutputFile);
 
-			FileUtilities.ensureFolderExists(packet.getWorkFolder());
+		LOGGER.info("X!Tandem parameters:\n"
+				+ "--" + TANDEM_EXECUTABLE + " '" + tandemExecutable.getPath() + "' "
+				+ "--" + INPUT_FILE + " '" + packet.getInputFile().getPath() + "' "
+				+ "--" + OUTPUT_FILE + " '" + outputFile.getPath() + "' "
+				+ "--" + SEARCH_PARAMS_FILE + " '" + packet.getSearchParamsFile().getPath() + "' "
+				+ "--" + DATABASE_FILE + " '" + packet.getDatabaseFile().getPath() + "' ");
+		checkPacketCorrectness(packet);
 
-			final File taxonomyXmlFile = createTaxonomyXmlFile(packet);
+		final File taxonomyXmlFile = createTaxonomyXmlFile(packet.getDatabaseFile(), outputFile);
 
-			createDefaultInputXml(packet);
+		createDefaultInputXml(packet);
 
-			final int initialThreads = getNumThreads();
-			ProcessCaller processCaller = runTandemSearch(packet, taxonomyXmlFile, initialThreads);
-			if (processCaller.getExitValue() != 0 && initialThreads > 1) {
-				// Failure, try running with fewer threads
-				LOGGER.warn("X!Tandem failed, rerunning with fewer threads");
-				processCaller = runTandemSearch(packet, taxonomyXmlFile, 1);
-			}
-
-			if (processCaller.getExitValue() != 0) {
-				throw new MprcException("Execution of tandem search engine failed. Error: " + processCaller.getFailedCallDescription());
-			}
-			if (!packet.getOutputFile().exists()) {
-				throw new MprcException("Tandem call completed, but the output file was not created. Error: " + processCaller.getFailedCallDescription());
-			}
-			LOGGER.info("Tandem search, " + packet.toString() + ", has been successfully completed.");
-		} finally {
-			cleanUp(packet);
+		final int initialThreads = getNumThreads();
+		ProcessCaller processCaller = runTandemSearch(
+				packet.getDatabaseFile(),
+				packet.getInputFile(),
+				packet.getSearchParamsFile(),
+				tempWorkFolder,
+				outputFile,
+				taxonomyXmlFile,
+				initialThreads);
+		if (processCaller.getExitValue() != 0 && initialThreads > 1) {
+			// Failure, try running with fewer threads
+			LOGGER.warn("X!Tandem failed, rerunning with one thread");
+			processCaller = runTandemSearch(
+					packet.getDatabaseFile(),
+					packet.getInputFile(),
+					packet.getSearchParamsFile(),
+					tempWorkFolder,
+					outputFile,
+					taxonomyXmlFile,
+					1);
 		}
+
+		if (processCaller.getExitValue() != 0) {
+			throw new MprcException("Execution of tandem search engine failed. Error: " + processCaller.getFailedCallDescription());
+		}
+		if (!outputFile.exists()) {
+			throw new MprcException("Tandem call completed, but the output file was not created. Error: " + processCaller.getFailedCallDescription());
+		}
+		publish(outputFile, finalOutputFile);
+		LOGGER.info("Tandem search, " + packet.toString() + ", has been successfully completed.");
 	}
 
-	private ProcessCaller runTandemSearch(final XTandemWorkPacket packet, final File taxonomyXmlFile, final int threads) {
-		final File fastaFile = packet.getDatabaseFile();
-		final File inputFile = packet.getInputFile();
-		final File paramsFile = packet.getSearchParamsFile();
+	private ProcessCaller runTandemSearch(
+			final File fastaFile,
+			final File inputFile,
+			final File paramsFile,
+			final File workFolder, final File outputFile, final File taxonomyXmlFile, final int threads) {
 
-		LOGGER.info("Running tandem search using " + threads + " threads: " + packet.toString());
+		LOGGER.info("Running tandem search using " + threads + " threads");
 		LOGGER.info("\tFasta file " + fastaFile.getAbsolutePath() + " does" + (fastaFile.exists() && fastaFile.length() > 0 ? " " : " not ") + "exist.");
 		LOGGER.info("\tInput file " + inputFile.getAbsolutePath() + " does" + (inputFile.exists() && inputFile.length() > 0 ? " " : " not ") + "exist.");
 		LOGGER.info("\tParameter file " + paramsFile.getAbsolutePath() + " does" + (paramsFile.exists() && paramsFile.length() > 0 ? " " : " not ") + "exist.");
 
 		final File paramFile = createTransformedTemplate(
 				paramsFile,
-				packet.getWorkFolder(),
-				packet.getOutputFile(),
+				workFolder,
+				outputFile,
 				inputFile,
 				taxonomyXmlFile,
 				XTandemMappings.DATABASE_TAXON,
@@ -192,7 +202,7 @@ public final class XTandemWorker extends WorkerBase {
 		parameters.add(paramFile.getAbsolutePath());
 
 		final ProcessBuilder processBuilder = new ProcessBuilder(parameters);
-		processBuilder.directory(packet.getWorkFolder());
+		processBuilder.directory(workFolder);
 
 		final ProcessCaller processCaller = new ProcessCaller(processBuilder);
 
@@ -200,11 +210,10 @@ public final class XTandemWorker extends WorkerBase {
 		return processCaller;
 	}
 
-	private File createTaxonomyXmlFile(final XTandemWorkPacket packet) {
-		final File fastaFile = packet.getDatabaseFile();
-		final String resultFileName = packet.getOutputFile().getName();
+	private File createTaxonomyXmlFile(final File fastaFile, final File outputFile) {
+		final String resultFileName = outputFile.getName();
 		final String resultFileNameWithoutExtension = resultFileName.substring(0, resultFileName.length() - ".xml".length());
-		final File taxonomyXmlFile = new File(packet.getOutputFile().getParentFile(), resultFileNameWithoutExtension + ".taxonomy.xml");
+		final File taxonomyXmlFile = new File(outputFile.getParentFile(), resultFileNameWithoutExtension + ".taxonomy.xml");
 		final String taxonomyContents = "<?xml version=\"1.0\"?>\n" +
 				"<bioml label=\"x! taxon-to-file matching list\">\n" +
 				"\t<taxon label=\"" + XTandemMappings.DATABASE_TAXON + "\">\n" +
@@ -229,9 +238,6 @@ public final class XTandemWorker extends WorkerBase {
 	private void checkPacketCorrectness(final XTandemWorkPacket packet) {
 		if (packet.getSearchParamsFile() == null) {
 			throw new MprcException("Params file must not be null");
-		}
-		if (packet.getWorkFolder() == null) {
-			throw new MprcException("Work folder must not be null");
 		}
 		if (packet.getOutputFile() == null) {
 			throw new MprcException("Result file must not be null");
@@ -283,12 +289,6 @@ public final class XTandemWorker extends WorkerBase {
 				matcher.close();
 			}
 		}
-	}
-
-	private void cleanUp(final WorkPacket workPacket) {
-		final XTandemWorkPacket packet = (XTandemWorkPacket) workPacket;
-		final File outputFolder = packet.getWorkFolder();
-		FileUtilities.restoreUmaskRights(outputFolder, true);
 	}
 
 	private static final String XML_EXTENSION = ".xml";

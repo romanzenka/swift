@@ -24,6 +24,7 @@ import edu.mayo.mprc.utilities.progress.UserProgressReporter;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
+import java.io.File;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -50,7 +51,7 @@ public final class SearchDbWorker extends WorkerBase {
 	}
 
 	@Override
-	public void process(final WorkPacket wp, final UserProgressReporter reporter) {
+	public void process(final WorkPacket wp, final File tempWorkFolder, final UserProgressReporter reporter) {
 		final SearchDbWorkPacket workPacket = (SearchDbWorkPacket) wp;
 		dao.begin();
 		try {
@@ -74,6 +75,14 @@ public final class SearchDbWorker extends WorkerBase {
 							+ ((SearchDbWorkPacket) wp).getScaffoldSpectrumReport().getAbsolutePath()
 							+ "]", e);
 		}
+	}
+
+	/**
+	 * No temp files created, it is all going into the database.
+	 */
+	@Override
+	public File createTempWorkFolder() {
+		return null;
 	}
 
 	private Map<String, Integer> getSavedMassSpecSampleMap(final MassSpecDataExtractor dataExtractor) {

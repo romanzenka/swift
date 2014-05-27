@@ -54,7 +54,7 @@ public final class MyriMatchWorker extends WorkerBase {
 	}
 
 	@Override
-	public void process(WorkPacket workPacket, UserProgressReporter progressReporter) {
+	public void process(final WorkPacket workPacket, final File tempWorkFolder, final UserProgressReporter progressReporter) {
 		if (!(workPacket instanceof MyriMatchWorkPacket)) {
 			throw new DaemonException("Unexpected packet type " + workPacket.getClass().getName() + ", expected " + MyriMatchWorkPacket.class.getName());
 		}
@@ -63,17 +63,18 @@ public final class MyriMatchWorker extends WorkerBase {
 
 		checkPacketCorrectness(packet);
 
-		FileUtilities.ensureFolderExists(packet.getWorkFolder());
-
 		final File fastaFile = packet.getDatabaseFile();
 
 		final File inputFile = packet.getInputFile();
 		final File paramsFile = packet.getSearchParamsFile();
-		final File resultFile = new File(packet.getOutputFile().getParentFile(), packet.getOutputFile().getName() + ".tmp");
-		// The final file has the spectra id replaced with titles of spectra from the .mgf file
-		final File finalFile = new File(packet.getOutputFile().getParentFile(), packet.getOutputFile().getName());
 
-		if (finalFile.exists() && inputFile.exists() && finalFile.lastModified() >= inputFile.lastModified()) {
+		final File finalOutputFile = packet.getOutputFile();
+		final File outputFile = getTempOutputFile(tempWorkFolder, finalOutputFile);
+
+		final File resultFile = new File(outputFile, outputFile.getName() + ".tmp");
+		// The final file has the spectra id replaced with titles of spectra from the .mgf file
+
+		if (finalOutputFile.exists() && inputFile.exists() && finalOutputFile.lastModified() >= inputFile.lastModified()) {
 			return;
 		}
 
@@ -81,7 +82,7 @@ public final class MyriMatchWorker extends WorkerBase {
 		LOGGER.debug("Input file " + inputFile.getAbsolutePath() + " does" + (inputFile.exists() && inputFile.length() > 0 ? " " : " not ") + "exist.");
 		LOGGER.debug("Parameter file " + paramsFile.getAbsolutePath() + " does" + (paramsFile.exists() && paramsFile.length() > 0 ? " " : " not ") + "exist.");
 
-		File modifiedParamsFile = MyriMatchMappingFactory.resultingParamsFile(paramsFile);
+		final File modifiedParamsFile = MyriMatchMappingFactory.resultingParamsFile(paramsFile);
 		if (!modifiedParamsFile.exists() || modifiedParamsFile.lastModified() < paramsFile.lastModified()) {
 
 			try {
@@ -104,7 +105,7 @@ public final class MyriMatchWorker extends WorkerBase {
 
 				Files.write(Joiner.on('\n').join(lines), modifiedParamsFile, Charsets.US_ASCII);
 
-			} catch (IOException e) {
+			} catch (final IOException e) {
 				throw new MprcException("Could not append information to parameter file " + paramsFile.getAbsolutePath(), e);
 			}
 		}
@@ -118,36 +119,38 @@ public final class MyriMatchWorker extends WorkerBase {
 		parameters.add(inputFile.getAbsolutePath());
 
 		final ProcessBuilder processBuilder = new ProcessBuilder(parameters);
-		processBuilder.directory(packet.getWorkFolder());
+		processBuilder.directory(tempWorkFolder);
 
 		final ProcessCaller processCaller = new ProcessCaller(processBuilder);
 
 		LOGGER.info("MyriMatch search, " + packet.toString() + ", has been submitted.");
 		processCaller.setOutputMonitor(new
 
-				MyriMatchLogMonitor(progressReporter)
+						MyriMatchLogMonitor(progressReporter)
 
 		);
 		processCaller.runAndCheck("myrimatch");
 
-		final File createdResultFile = new File(packet.getWorkFolder(), FileUtilities.stripExtension(packet.getInputFile().getName()) + MZ_IDENT_ML);
+		final File createdResultFile = new File(tempWorkFolder, FileUtilities.stripExtension(packet.getInputFile().getName()) + MZ_IDENT_ML);
 
 		// We need to cleanup after mgf-based run
 		if ("mgf".equals(FileUtilities.getExtension(inputFile.getName()))) {
 			final List<String> titles = MgfTitles.getTitles(inputFile);
 			MzIdentMl.replace(createdResultFile, titles, resultFile);
-			if (!resultFile.equals(finalFile)) {
-				FileUtilities.rename(resultFile, finalFile);
+			if (!resultFile.equals(outputFile)) {
+				FileUtilities.rename(resultFile, outputFile);
 			}
 		} else {
-			if (!createdResultFile.equals(finalFile)) {
-				FileUtilities.rename(createdResultFile, finalFile);
+			if (!createdResultFile.equals(outputFile)) {
+				FileUtilities.rename(createdResultFile, outputFile);
 			}
 		}
 
-		if (createdResultFile.exists() && !createdResultFile.equals(finalFile)) {
+		if (createdResultFile.exists() && !createdResultFile.equals(outputFile)) {
 			FileUtilities.deleteNow(createdResultFile);
 		}
+
+		publish(outputFile, finalOutputFile);
 
 		LOGGER.info("MyriMatch search, " + packet.toString() + ", has been successfully completed.");
 	}
@@ -155,9 +158,6 @@ public final class MyriMatchWorker extends WorkerBase {
 	private void checkPacketCorrectness(final MyriMatchWorkPacket packet) {
 		if (packet.getSearchParamsFile() == null) {
 			throw new MprcException("Params file must not be null");
-		}
-		if (packet.getWorkFolder() == null) {
-			throw new MprcException("Work folder must not be null");
 		}
 		if (packet.getOutputFile() == null) {
 			throw new MprcException("Result file must not be null");
@@ -184,7 +184,7 @@ public final class MyriMatchWorker extends WorkerBase {
 			MyriMatchWorker worker = null;
 			try {
 				worker = new MyriMatchWorker(FileUtilities.getAbsoluteFileForExecutables(new File(config.get(EXECUTABLE))));
-			} catch (Exception e) {
+			} catch (final Exception e) {
 				throw new MprcException("MyriMatch worker could not be created.", e);
 			}
 			return worker;

@@ -14,6 +14,8 @@ import edu.mayo.mprc.enginedeployment.DeploymentResult;
 import edu.mayo.mprc.utilities.progress.UserProgressReporter;
 import org.springframework.stereotype.Component;
 
+import java.io.File;
+
 /**
  * Test-only mascot deployment. Creates extremely simplistic {@link edu.mayo.mprc.enginedeployment.DeploymentResult}
  * for given request.
@@ -27,8 +29,13 @@ public final class MockMascotDeploymentService extends WorkerBase {
 	}
 
 	@Override
-	protected void process(WorkPacket workPacket, UserProgressReporter progressReporter) {
+	protected void process(WorkPacket workPacket, File tempWorkFolder, UserProgressReporter progressReporter) {
 		progressReporter.reportProgress(new DeploymentResult());
+	}
+
+	@Override
+	public File createTempWorkFolder() {
+		return null;
 	}
 
 	/**

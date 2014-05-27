@@ -2,7 +2,6 @@ package edu.mayo.mprc.idpqonvert;
 
 import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
-import com.google.common.io.Files;
 import edu.mayo.mprc.MprcException;
 import edu.mayo.mprc.config.DaemonConfig;
 import edu.mayo.mprc.config.DependencyResolver;
@@ -45,7 +44,7 @@ public final class IdpQonvertWorker extends WorkerBase {
 	private File idpQonvertExecutable;
 
 	@Override
-	public void process(final WorkPacket workPacket, final UserProgressReporter progressReporter) {
+	public void process(final WorkPacket workPacket, final File tempWorkFolder, final UserProgressReporter progressReporter) {
 		if (!(workPacket instanceof IdpQonvertWorkPacket)) {
 			ExceptionUtilities.throwCastException(workPacket, IdpQonvertWorkPacket.class);
 			return;
@@ -53,7 +52,9 @@ public final class IdpQonvertWorker extends WorkerBase {
 
 		final IdpQonvertWorkPacket batchWorkPacket = (IdpQonvertWorkPacket) workPacket;
 
-		LOGGER.debug("Running IdpQonvert: [" + batchWorkPacket.getInputFile().getAbsolutePath() + "] -> " + batchWorkPacket.getOutputFile());
+		final File finalOutputFile = batchWorkPacket.getOutputFile();
+
+		LOGGER.debug("Running IdpQonvert: [" + batchWorkPacket.getInputFile().getAbsolutePath() + "] -> " + finalOutputFile);
 
 		//  check if already exists (skip condition)
 		if (isConversionDone(batchWorkPacket)) {
@@ -79,17 +80,11 @@ public final class IdpQonvertWorker extends WorkerBase {
 		final File from = new File(batchWorkPacket.getInputFile().getParentFile(),
 				FileUtilities.stripExtension(batchWorkPacket.getInputFile().getName()) + ".idpDB");
 
-		try {
-			FileUtilities.ensureFolderExists(batchWorkPacket.getOutputFile().getParentFile());
-			Files.move(
-					from,
-					batchWorkPacket.getOutputFile());
-		} catch (Exception e) {
-			throw new MprcException("Failed to move the resulting file from [" + from.getAbsolutePath() + "] to [" + batchWorkPacket.getOutputFile() + "]", e);
+		if (!from.exists() || !from.canRead() || !from.isFile()) {
+			throw new MprcException("idpQonvert failed to create file: " + from.getAbsolutePath());
 		}
-		if (!batchWorkPacket.getOutputFile().exists() || !batchWorkPacket.getOutputFile().canRead() || !batchWorkPacket.getOutputFile().isFile()) {
-			throw new MprcException("idpQonvert failed to create file: " + batchWorkPacket.getOutputFile().getAbsolutePath());
-		}
+
+		publish(from, finalOutputFile);
 	}
 
 	private static int getNumThreads() {

@@ -67,7 +67,6 @@ public class TestTandem {
 			final File tandemOut = new File(tandemTemp, "out");
 			FileUtilities.ensureFolderExists(tandemOut);
 
-
 			final File tandemParamFile = getTandemParams();
 
 			String tandemExecutable = new File(tandemInstallFolder, "tandem.exe").getAbsolutePath();
@@ -85,7 +84,7 @@ public class TestTandem {
 
 			final File resultFile = new File(tandemOut, "tandemResult.xml");
 
-			final XTandemWorkPacket workPacket = new XTandemWorkPacket(inputMgfFile, tandemParamFile, resultFile, tandemOut, fastaFile, false, "0", false);
+			final XTandemWorkPacket workPacket = new XTandemWorkPacket(inputMgfFile, tandemParamFile, resultFile, fastaFile, false, "0", false);
 			WorkPacketBase.simulateTransfer(workPacket);
 
 			worker.processRequest(workPacket, new ProgressReporter() {

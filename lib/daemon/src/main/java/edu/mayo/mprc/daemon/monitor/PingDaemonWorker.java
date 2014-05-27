@@ -11,6 +11,8 @@ import edu.mayo.mprc.daemon.worker.*;
 import edu.mayo.mprc.utilities.progress.UserProgressReporter;
 import org.springframework.stereotype.Component;
 
+import java.io.File;
+
 /**
  * Responds to ping requests.
  *
@@ -22,7 +24,7 @@ public final class PingDaemonWorker extends WorkerBase implements NoLoggingWorke
 	public static final String DESC = "Responds to pings with status information. Automatically set for each daemon.";
 
 	@Override
-	public void process(final WorkPacket workPacket, final UserProgressReporter reporter) {
+	public void process(final WorkPacket workPacket, final File tempWorkFolder, final UserProgressReporter reporter) {
 		if (!(workPacket instanceof PingWorkPacket)) {
 			throw new DaemonException("Unknown input format: " + workPacket.getClass().getName() + " expected string");
 		}
@@ -31,6 +33,12 @@ public final class PingDaemonWorker extends WorkerBase implements NoLoggingWorke
 
 	public String toString() {
 		return "ping monitoring support";
+	}
+
+	@Override
+	public File createTempWorkFolder() {
+		// Ping needs no temp work folder
+		return null;
 	}
 
 	/**

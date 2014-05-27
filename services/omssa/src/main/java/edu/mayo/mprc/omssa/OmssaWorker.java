@@ -52,11 +52,12 @@ public final class OmssaWorker extends WorkerBase {
 	}
 
 	@Override
-	public void process(final WorkPacket workPacket, final UserProgressReporter progressReporter) {
+	public void process(final WorkPacket workPacket, final File tempWorkFolder, final UserProgressReporter progressReporter) {
 		final OmssaWorkPacket omssaWorkPacket = (OmssaWorkPacket) workPacket;
 		LOGGER.info("Starting OMSSA search: " + omssaWorkPacket.toString());
 
-		final File outputFile = omssaWorkPacket.getOutputFile();
+		final File finalOutputFile = omssaWorkPacket.getOutputFile();
+		final File outputFile = getTempOutputFile(tempWorkFolder, finalOutputFile);
 		final File modOutputFile = new File(outputFile.getParentFile(), outputFile.getName() + ".org");
 		File tempFolder = null;
 
@@ -95,14 +96,14 @@ public final class OmssaWorker extends WorkerBase {
 			// and then removed the temporary uncompressed file
 			FileUtilities.quietDelete(modOutputFile);
 
-			FileUtilities.restoreUmaskRights(outputFile.getParentFile(), true);
-
 			FileUtilities.quietDelete(userModsFile);
 			FileUtilities.quietDelete(completeParamsFile);
 
 		} catch (Exception t) {
 			throw new MprcException(t);
 		}
+
+		publish(outputFile, finalOutputFile);
 	}
 
 	/**

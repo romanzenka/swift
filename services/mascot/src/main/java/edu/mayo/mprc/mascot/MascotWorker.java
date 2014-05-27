@@ -75,7 +75,7 @@ public final class MascotWorker extends WorkerBase {
 	public static final String MASCOT_CGI = "cgi/nph-mascot.exe?1";
 
 	@Override
-	public void process(final WorkPacket workPacket, final UserProgressReporter progressReporter) {
+	public void process(final WorkPacket workPacket, final File tempWorkFolder, final UserProgressReporter progressReporter) {
 		final MascotWorkPacket mascotWorkPacket = (MascotWorkPacket) workPacket;
 		assert mascotWorkPacket.getInputFile() != null : "Mascot search failed: input file not specified";
 		assert mascotWorkPacket.getSearchParamsFile() != null : "Mascot search failed: param file not specified";
@@ -83,11 +83,14 @@ public final class MascotWorker extends WorkerBase {
 		assert mascotWorkPacket.getShortDbName() != null : "Mascot search failed: short db name not specified";
 
 		try {
+			final File finalOutputFile = mascotWorkPacket.getOutputFile();
+			final File outputFile = getTempOutputFile(tempWorkFolder, finalOutputFile);
+
 			LOGGER.debug(MessageFormat.format("Mascot search starting:\n\t{0} -> {1}\n\t(db name: {2})",
 					mascotWorkPacket.getInputFile().getAbsolutePath(),
-					mascotWorkPacket.getOutputFile().getAbsolutePath(),
+					outputFile.getAbsolutePath(),
 					mascotWorkPacket.getShortDbName()));
-			setMascotOutputFile(mascotWorkPacket.getOutputFile());
+			setMascotOutputFile(outputFile);
 
 			final String extension = FileUtilities.getExtension(mascotWorkPacket.getInputFile().getName()).toLowerCase(Locale.US);
 			final String inputFormat;
@@ -113,7 +116,9 @@ public final class MascotWorker extends WorkerBase {
 					mascotWorkPacket.getSearchParamsFile().getAbsolutePath(),
 					mascotWorkPacket.getInputFile().getAbsolutePath(),
 					progressReporter);
-		} catch (Exception e) {
+
+			publish(outputFile, finalOutputFile);
+		} catch (final Exception e) {
 			throw new DaemonException("Mascot search failed", e);
 		}
 		// When the search completes, we are done.
@@ -134,7 +139,7 @@ public final class MascotWorker extends WorkerBase {
 	static URL mascotCgiUrl(final URL mascotBaseUrl) {
 		try {
 			return new URL(mascotBaseUrl, MASCOT_CGI);
-		} catch (MalformedURLException e) {
+		} catch (final MalformedURLException e) {
 			throw new MprcException("Cannot obtain mascot CGI url from base url " + mascotBaseUrl.toString(), e);
 		}
 	}
@@ -173,7 +178,7 @@ public final class MascotWorker extends WorkerBase {
 	public void setupPOSTConnection(final int len) {
 		try {
 			connection = (HttpURLConnection) datFileBaseUrl.openConnection();
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			die("Couldn't setup POST connection", e);
 		}
 
@@ -189,7 +194,7 @@ public final class MascotWorker extends WorkerBase {
 			connection.setRequestProperty("Content-Length", Integer.toString(len));
 			connection.setRequestProperty("Connection", "Keep-Alive");
 			connection.setRequestProperty("Keep-Alive", "300");
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			die("POST error", e);
 		}
 	}
@@ -228,7 +233,7 @@ public final class MascotWorker extends WorkerBase {
 			if (url != null) {
 				return url;
 			}
-		} catch (Exception t) {
+		} catch (final Exception t) {
 			die("Exception while reading response: ", t);
 		} finally {
 			FileUtilities.closeQuietly(rreader);
@@ -242,7 +247,7 @@ public final class MascotWorker extends WorkerBase {
 			try {
 				final float value = Float.parseFloat(percentMatcher.group(1));
 				progressReporter.reportProgress(new PercentDone(value));
-			} catch (NumberFormatException ignore) {
+			} catch (final NumberFormatException ignore) {
 				// SWALLOWED: Not a big deal
 				LOGGER.debug("Cannot parse Mascot progress" + logLine);
 			}
@@ -269,7 +274,7 @@ public final class MascotWorker extends WorkerBase {
 					out.write(buffer, 0, read);
 				}
 			}
-		} catch (Exception t) {
+		} catch (final Exception t) {
 			throw new MprcException("Could not obtain Mascot .dat file from " + url.toString() + " as " + outputFile.getAbsolutePath(), t);
 		} finally {
 			FileUtilities.closeQuietly(out);
@@ -295,11 +300,11 @@ public final class MascotWorker extends WorkerBase {
 		try {
 			reader = new BufferedReader(new InputStreamReader(new FileInputStream(parameters.trim()), "UTF-8"));
 			hash = readParameters(reader);
-		} catch (FileNotFoundException e) {
+		} catch (final FileNotFoundException e) {
 			throw new MprcException("Cannot find Mascot parameters file " + parameters, e);
-		} catch (UnsupportedEncodingException e) {
+		} catch (final UnsupportedEncodingException e) {
 			throw new MprcException("Unsupported mascot parameter file encoding", e);
-		} catch (IOException e) {
+		} catch (final IOException e) {
 			throw new MprcException("Exception accessing mascot parameter file " + parameters, e);
 		} finally {
 			FileUtilities.closeQuietly(reader);
@@ -323,7 +328,7 @@ public final class MascotWorker extends WorkerBase {
 		try {
 			mgfChannel = new FileInputStream(data).getChannel();
 			dataLength = mgfChannel.size();
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			throw new MprcException("Could not open input file for Mascot search " + data, e);
 		}
 		final long length = dataLength + buffer.limit() + buffer2.limit() + buffer3.limit();
@@ -344,13 +349,13 @@ public final class MascotWorker extends WorkerBase {
 					amount = mgfChannel.transferTo(position, dataLength - position, channel);
 					position += amount;
 				}
-			} catch (Exception t) {
+			} catch (final Exception t) {
 				LOGGER.debug("transferred " + position + "bytes, last chunk was " + amount + " bytes.");
 				throw new MprcException("nio approach failed, " + t.getMessage(), t);
 			}
 
 			channel.write(buffer3);
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			throw new MprcException("nio channel write failed, " + e.getMessage(), e);
 		} finally {
 			FileUtilities.closeQuietly(mgfChannel);
@@ -363,7 +368,7 @@ public final class MascotWorker extends WorkerBase {
 					new MascotResultUrl(
 							new URL(publicBaseUrl, "cgi/master_results.pl?file=" + filePath).toString()));
 			getDatFile(new URL(datFileBaseUrl, filePath), getOutputFile());
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			throw new MprcException("Cannot obtain mascot result", e);
 		}
 	}
@@ -418,7 +423,7 @@ public final class MascotWorker extends WorkerBase {
 				} else {
 					worker.setPublicUrl(mascotUrl);
 				}
-			} catch (MalformedURLException e) {
+			} catch (final MalformedURLException e) {
 				throw new MprcException("Not a valid mascot url: " + config.get(MASCOT_URL), e);
 			}
 			return worker;
@@ -429,7 +434,7 @@ public final class MascotWorker extends WorkerBase {
 		}
 
 		@Resource(name = "mascotMappingFactory")
-		public void setMappingFactory(MascotMappingFactory mappingFactory) {
+		public void setMappingFactory(final MascotMappingFactory mappingFactory) {
 			this.mappingFactory = mappingFactory;
 		}
 

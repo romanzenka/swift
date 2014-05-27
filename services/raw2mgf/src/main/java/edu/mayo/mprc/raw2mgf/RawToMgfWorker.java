@@ -74,7 +74,7 @@ public final class RawToMgfWorker extends WorkerBase {
 	}
 
 	@Override
-	public void process(final WorkPacket workPacket, final UserProgressReporter progressReporter) {
+	public void process(final WorkPacket workPacket, final File tempWorkFolder, final UserProgressReporter progressReporter) {
 		if (!(workPacket instanceof RawToMgfWorkPacket)) {
 			throw new DaemonException("Unknown request type: " + workPacket.getClass().getName());
 		}
@@ -85,7 +85,8 @@ public final class RawToMgfWorker extends WorkerBase {
 		//	call the extract_msn utility to convert from raw to dta
 		//	call dta to mgf converter to make the mgf file
 
-		final File mgfFile = batchWorkPacket.getOutputFile();
+		final File outMgfFile = batchWorkPacket.getOutputFile();
+		final File mgfFile = getTempOutputFile(tempWorkFolder, outMgfFile);
 
 		final String origParams = batchWorkPacket.getParams();
 		final Long firstSpectrum = getParamValue("-F", origParams);
@@ -145,7 +146,10 @@ public final class RawToMgfWorker extends WorkerBase {
 					lastSpectrumInBatch = Math.min(lastSpectrumInBatch, lastSpectrum);
 				}
 			}
-		} catch (Exception we) {
+
+			// Publish the resulting file safely
+			publish(mgfFile, outMgfFile);
+		} catch (final Exception we) {
 			throw new DaemonException("Error extracting dta files from " + batchWorkPacket.getInputFile(), we);
 		} finally {
 			shortener.cleanup();
@@ -161,7 +165,7 @@ public final class RawToMgfWorker extends WorkerBase {
 				if (!value.isEmpty() && value.charAt(0) >= '0' && value.charAt(0) <= '9') {
 					try {
 						return Long.valueOf(value);
-					} catch (NumberFormatException e) {
+					} catch (final NumberFormatException e) {
 						// SWALLOWED: We keep going - maybe there is another instance on the command line where the parameter is defined
 						LOGGER.warn("Could not parse parameter " + paramName + " - expected numeric value, got " + parameter + ". " + e.getMessage());
 					}
@@ -227,7 +231,7 @@ public final class RawToMgfWorker extends WorkerBase {
 
 		try {
 			extractMsn.run();
-		} catch (Exception we) {
+		} catch (final Exception we) {
 			throw new DaemonException("Error extracting dta files from " + rawfile, we);
 		}
 	}
@@ -257,7 +261,7 @@ public final class RawToMgfWorker extends WorkerBase {
 			deleteDTAFiles(thermoOutputDir);
 			// copy remaining files in folder to pBatchInfo.Output_Dir
 			copyRemainingFiles(thermoOutputDir, finalOutputDir);
-		} catch (Exception t) {
+		} catch (final Exception t) {
 			throw new MprcException("dta to MGF conversion failed", t);
 		}
 		final File file = pDTAtoMGF.getResultFile();
@@ -278,7 +282,7 @@ public final class RawToMgfWorker extends WorkerBase {
 			final File localfile = new File(fromfolder, fromfile);
 			try {
 				FileUtilities.copyFile(localfile, to, true);
-			} catch (Exception e) {
+			} catch (final Exception e) {
 				throw new MprcException("Error moving remaining files in batch converter", e);
 			}
 			FileUtilities.quietDelete(localfile);
@@ -289,7 +293,7 @@ public final class RawToMgfWorker extends WorkerBase {
 	private static File getMirrorFolderonTemp(final File tempfolder) {
 		try {
 			return FileUtilities.createTempFolder(tempfolder, "raw2mgf", false);
-		} catch (Exception t) {
+		} catch (final Exception t) {
 			throw new DaemonException("Cannot create temporary folder for raw->mgf conversion", t);
 		}
 	}

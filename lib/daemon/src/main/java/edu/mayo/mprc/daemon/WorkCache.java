@@ -20,7 +20,9 @@ import edu.mayo.mprc.utilities.progress.ProgressReporter;
 import org.apache.log4j.Logger;
 
 import java.io.File;
+import java.io.FilenameFilter;
 import java.util.*;
+import java.util.regex.Pattern;
 
 /**
  * Base class for implementing caches. A cache remembers previous work and can provide results fast.
@@ -38,6 +40,7 @@ import java.util.*;
 public abstract class WorkCache<T extends WorkPacket> implements NoLoggingWorker, Installable {
 	private static final Logger LOGGER = Logger.getLogger(WorkCache.class);
 	public static final int MAX_CACHE_FOLDERS = 1000 * 10;
+	private static final Pattern CACHE_DATA_FOLDER = Pattern.compile("[0-9a-f][0-9a-f]");
 	private File cacheFolder;
 	private DaemonConnection daemon;
 	private final Map<String, CacheProgressReporter> workInProgress = new HashMap<String, CacheProgressReporter>(10);
@@ -113,6 +116,11 @@ public abstract class WorkCache<T extends WorkPacket> implements NoLoggingWorker
 	}
 
 	private void process(final WorkPacket workPacket, final ProgressReporter progressReporter) {
+		if (workPacket instanceof CleanupCacheWorkPacket) {
+			cleanupCache();
+			return;
+		}
+
 		final T typedWorkPacket = (T) workPacket;
 		final CachableWorkPacket cachableWorkPacket;
 		if (workPacket instanceof CachableWorkPacket) {
@@ -204,6 +212,16 @@ public abstract class WorkCache<T extends WorkPacket> implements NoLoggingWorker
 	}
 
 	/**
+	 * Delete everything in the cache.
+	 */
+	private void cleanupCache() {
+		final File[] files = getCacheFolder().listFiles(new CacheFolderFilter());
+		for (final File file : files) {
+			FileUtilities.deleteNow(file);
+		}
+	}
+
+	/**
 	 * Checks whether the work packet requested publishing the intermediate files.
 	 * If so, copy the intermediate files to the originally requested target.
 	 */
@@ -236,6 +254,13 @@ public abstract class WorkCache<T extends WorkPacket> implements NoLoggingWorker
 	 */
 	boolean isWorkInProgress() {
 		return !workInProgress.isEmpty();
+	}
+
+	private static class CacheFolderFilter implements FilenameFilter {
+		@Override
+		public boolean accept(final File dir, final String name) {
+			return CACHE_DATA_FOLDER.matcher(name).matches();
+		}
 	}
 
 	private final class MyProgressListener implements ProgressListener {

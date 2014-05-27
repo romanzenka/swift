@@ -53,7 +53,7 @@ public final class QuameterWorker extends WorkerBase {
 	}
 
 	@Override
-	public void process(WorkPacket workPacket, UserProgressReporter progressReporter) {
+	public void process(final WorkPacket workPacket, final File tempWorkFolder, final UserProgressReporter progressReporter) {
 		if (!(workPacket instanceof QuameterWorkPacket)) {
 			throw new DaemonException("Unexpected packet type " + workPacket.getClass().getName() + ", expected " + QuameterWorkPacket.class.getName());
 		}
@@ -62,30 +62,29 @@ public final class QuameterWorker extends WorkerBase {
 
 		checkPacketCorrectness(packet);
 
-		final File workFolder = packet.getOutputFile().getParentFile().getAbsoluteFile();
-		FileUtilities.ensureFolderExists(workFolder);
+		final File finalOutputFile = packet.getOutputFile().getAbsoluteFile();
+		final File outputFile = getTempOutputFile(tempWorkFolder, finalOutputFile);
 
 		final File rawFile = packet.getInputFile().getAbsoluteFile();
 		final File idpDbFile = packet.getIdpDbFile().getAbsoluteFile();
-		final File finalFile = packet.getOutputFile().getAbsoluteFile();
 
-		if (finalFile.exists() && rawFile.exists() && idpDbFile.exists()
-				&& finalFile.lastModified() >= rawFile.lastModified()
-				&& finalFile.lastModified() >= idpDbFile.lastModified()) {
+		if (finalOutputFile.exists() && rawFile.exists() && idpDbFile.exists()
+				&& finalOutputFile.lastModified() >= rawFile.lastModified()
+				&& finalOutputFile.lastModified() >= idpDbFile.lastModified()) {
 			return;
 		}
 
 		LOGGER.debug("RAW file " + rawFile.getPath() + " does" + (rawFile.exists() && rawFile.length() > 0 ? " " : " not ") + "exist.");
 		LOGGER.debug("idpDB file " + idpDbFile.getPath() + " does" + (idpDbFile.exists() && idpDbFile.length() > 0 ? " " : " not ") + "exist.");
-		LOGGER.debug("Final file " + finalFile.getPath() + " does" + (finalFile.exists() && finalFile.length() > 0 ? " " : " not ") + "exist.");
+		LOGGER.debug("Final file " + outputFile.getPath() + " does" + (outputFile.exists() && outputFile.length() > 0 ? " " : " not ") + "exist.");
 
-		String resultName = FileUtilities.getFileNameWithoutExtension(idpDbFile);
-		File createdResultFile = new File(workFolder, resultName + RESULT_EXTENSION);
+		final String resultName = FileUtilities.getFileNameWithoutExtension(idpDbFile);
+		final File createdResultFile = new File(tempWorkFolder, resultName + RESULT_EXTENSION);
 
 		final List<String> parameters = new LinkedList<String>();
 		parameters.add(executable.getPath());
 		parameters.add("-workdir");
-		parameters.add(workFolder.getAbsolutePath());
+		parameters.add(tempWorkFolder.getAbsolutePath());
 		parameters.add("-OutputFilepath");
 		parameters.add(createdResultFile.getAbsolutePath());
 		parameters.add("-StatusUpdateFrequency");
@@ -105,16 +104,18 @@ public final class QuameterWorker extends WorkerBase {
 		parameters.add(idpDbFile.getAbsolutePath());
 
 		final ProcessBuilder processBuilder = new ProcessBuilder(parameters);
-		processBuilder.directory(workFolder);
+		processBuilder.directory(tempWorkFolder);
 
 		final ProcessCaller processCaller = new ProcessCaller(processBuilder);
 
 		LOGGER.info("QuaMeter search, " + packet.toString() + ", has been submitted.");
 		processCaller.runAndCheck("quameter");
 
-		if (!createdResultFile.equals(finalFile)) {
-			FileUtilities.rename(createdResultFile, finalFile);
+		if (!createdResultFile.equals(outputFile)) {
+			FileUtilities.rename(createdResultFile, outputFile);
 		}
+
+		publish(outputFile, finalOutputFile);
 
 		LOGGER.info("QuaMeter search, " + packet.toString() + ", has been successfully completed.");
 	}
@@ -151,7 +152,7 @@ public final class QuameterWorker extends WorkerBase {
 			QuameterWorker worker = null;
 			try {
 				worker = new QuameterWorker(FileUtilities.getAbsoluteFileForExecutables(new File(config.get(EXECUTABLE))));
-			} catch (Exception e) {
+			} catch (final Exception e) {
 				throw new MprcException("QuaMeter worker could not be created.", e);
 			}
 			return worker;

@@ -67,21 +67,27 @@ public final class RAWDumpWorker extends WorkerBase {
 	}
 
 	@Override
-	public void process(final WorkPacket workPacket, UserProgressReporter progressReporter) {
+	public void process(final WorkPacket workPacket, final File tempWorkFolder, UserProgressReporter progressReporter) {
 		try {
 			final RAWDumpWorkPacket rawDumpWorkPacket = (RAWDumpWorkPacket) workPacket;
 
-			final File rawInfo = rawDumpWorkPacket.getRawInfoFile();
-			final File rawSpectra = rawDumpWorkPacket.getRawSpectraFile();
 			final File rawFile = rawDumpWorkPacket.getRawFile();
-			final File chromatogramFile = rawDumpWorkPacket.getChromatogramFile();
-			final File tuneFile = rawDumpWorkPacket.getTuneMethodFile();
-			final File instrumentMethodFile = rawDumpWorkPacket.getInstrumentMethodFile();
-			final File sampleInformationFile = rawDumpWorkPacket.getSampleInformationFile();
-			final File errorLogFile = rawDumpWorkPacket.getErrorLogFile();
 
-			FileUtilities.ensureFolderExists(rawInfo.getParentFile());
-			FileUtilities.ensureFolderExists(rawSpectra.getParentFile());
+			final File finalRawInfo = rawDumpWorkPacket.getRawInfoFile();
+			final File finalRawSpectra = rawDumpWorkPacket.getRawSpectraFile();
+			final File finalChromatogramFile = rawDumpWorkPacket.getChromatogramFile();
+			final File finalTuneFile = rawDumpWorkPacket.getTuneMethodFile();
+			final File finalInstrumentMethodFile = rawDumpWorkPacket.getInstrumentMethodFile();
+			final File finalSampleInformationFile = rawDumpWorkPacket.getSampleInformationFile();
+			final File finalErrorLogFile = rawDumpWorkPacket.getErrorLogFile();
+
+			final File rawInfo = getTempOutputFile(tempWorkFolder, finalRawInfo);
+			final File rawSpectra = getTempOutputFile(tempWorkFolder, finalRawSpectra);
+			final File chromatogramFile = getTempOutputFile(tempWorkFolder, finalChromatogramFile);
+			final File tuneFile = getTempOutputFile(tempWorkFolder, finalTuneFile);
+			final File instrumentMethodFile = getTempOutputFile(tempWorkFolder, finalInstrumentMethodFile);
+			final File sampleInformationFile = getTempOutputFile(tempWorkFolder, finalSampleInformationFile);
+			final File errorLogFile = getTempOutputFile(tempWorkFolder, finalErrorLogFile);
 
 			File shortenedRawFile = null;
 			if (rawFile.getAbsolutePath().length() > MAX_UNSHORTENED_PATH_LENGTH) {
@@ -107,6 +113,14 @@ public final class RAWDumpWorker extends WorkerBase {
 			if (!isFileOk(rawSpectra)) {
 				throw new MprcException("Raw dump has failed to create raw spectra file: " + rawSpectra.getAbsolutePath() + "\n" + caller.getFailedCallDescription());
 			}
+
+			publish(rawInfo, finalRawInfo);
+			publish(rawSpectra, finalRawSpectra);
+			publish(chromatogramFile, finalChromatogramFile);
+			publish(tuneFile, finalTuneFile);
+			publish(instrumentMethodFile, finalInstrumentMethodFile);
+			publish(sampleInformationFile, finalSampleInformationFile);
+			publish(errorLogFile, finalErrorLogFile);
 		} finally {
 			FileUtilities.deleteNow(tempParamFile);
 		}

@@ -15,7 +15,6 @@ import edu.mayo.mprc.daemon.worker.WorkerFactoryBase;
 import edu.mayo.mprc.searchengine.EngineFactory;
 import edu.mayo.mprc.searchengine.EngineMetadata;
 import edu.mayo.mprc.sequest.core.Mgf2SequestCaller;
-import edu.mayo.mprc.utilities.FileUtilities;
 import edu.mayo.mprc.utilities.progress.UserProgressReporter;
 import org.apache.log4j.Logger;
 import org.springframework.stereotype.Component;
@@ -38,7 +37,7 @@ public final class SequestWorker extends WorkerBase {
 	private static final String SEQUEST_COMMAND = "sequestCommand";
 
 	@Override
-	public void process(final WorkPacket workPacket, final UserProgressReporter progressReporter) {
+	public void process(final WorkPacket workPacket, final File tempWorkFolder, final UserProgressReporter progressReporter) {
 		SequestWorkPacket sequestWorkPacket = null;
 		if (workPacket instanceof SequestWorkPacket) {
 			sequestWorkPacket = (SequestWorkPacket) workPacket;
@@ -52,13 +51,14 @@ public final class SequestWorker extends WorkerBase {
 			throw new DaemonException("Unexpected packet type " + workPacket.getClass().getName() + ", expected " + SequestWorkPacket.class.getName());
 		}
 
+		final File finalOutputFile = sequestWorkPacket.getOutputFile();
+		final File outputFile = getTempOutputFile(tempWorkFolder, finalOutputFile);
+
 		LOGGER.debug("Starting sequest search"
 				+ "\n\tinput file: " + sequestWorkPacket.getInputFile()
 				+ "\n\thdr file: " + sequestWorkPacket.getDatabaseFile()
-				+ "\n\toutput file: " + sequestWorkPacket.getOutputFile()
+				+ "\n\toutput file: " + outputFile
 				+ "\n\tsearch params: " + sequestWorkPacket.getSearchParamsFile());
-
-		FileUtilities.ensureFolderExists(sequestWorkPacket.getOutputFile().getParentFile());
 
 		final Mgf2SequestCaller m = new Mgf2SequestCaller();
 
@@ -66,7 +66,7 @@ public final class SequestWorker extends WorkerBase {
 		m.setSequestExe(sequestCommand);
 
 		m.callSequest(
-				sequestWorkPacket.getOutputFile(),
+				outputFile,
 				sequestWorkPacket.getSearchParamsFile(),
 				sequestWorkPacket.getInputFile(),
 				120 * 1000/* start timeout */,
@@ -74,7 +74,7 @@ public final class SequestWorker extends WorkerBase {
 				sequestWorkPacket.getDatabaseFile()
 		);
 
-		FileUtilities.restoreUmaskRights(sequestWorkPacket.getOutputFile().getParentFile(), true);
+		publish(outputFile, finalOutputFile);
 
 		LOGGER.debug("Sequest search done");
 	}

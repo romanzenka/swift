@@ -23,14 +23,17 @@ public final class MgfToMgfWorker extends WorkerBase {
 	public static final String DESC = "Swift expects <tt>.mgf</tt> headers to be in certain format (indicate the spectrum), so the results of the search engines can be more easily pieced together. If you want to search .mgf files directly, the cleaner has to check that the headers are okay and modify them if they are not. Without this module, Swift cannot process <tt>.mgf</tt> files.";
 
 	@Override
-	public void process(final WorkPacket wp, final UserProgressReporter reporter) {
+	public void process(final WorkPacket wp, final File tempWorkFolder, final UserProgressReporter reporter) {
 		final MgfTitleCleanupWorkPacket workPacket = (MgfTitleCleanupWorkPacket) wp;
 		final File mgfFile = workPacket.getMgfToCleanup();
-		final File cleanedMgf = workPacket.getCleanedMgf();
+		final File outCleanedMgf = workPacket.getCleanedMgf();
+		final File cleanedMgf = getTempOutputFile(tempWorkFolder, outCleanedMgf);
 
 		boolean cleanupNeeded = false;
-		if (!cleanedMgf.exists()) {
+		// If we do not have a file, or it is too old
+		if (!outCleanedMgf.exists() || outCleanedMgf.lastModified() < mgfFile.lastModified()) {
 			cleanupNeeded = new MgfCleanup(mgfFile).produceCleanedMgf(cleanedMgf);
+			publish(cleanedMgf, outCleanedMgf);
 		} else {
 			// The mgf is already there, therefore it must have been cleaned before, therefore cleanup WAS needed.
 			// We must return true, otherwise the caller would use the mgfFile instead of cleanedMgf, although we

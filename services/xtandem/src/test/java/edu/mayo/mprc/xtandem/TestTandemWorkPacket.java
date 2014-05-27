@@ -14,9 +14,8 @@ public final class TestTandemWorkPacket {
 	public static void shouldXStreamSerialize() throws IOException {
 		final XTandemWorkPacket packet = new XTandemWorkPacket(
 				new File("input"),
-				new File("output"),
 				new File("search"),
-				new File("workfolder"),
+				new File("output"),
 				new File("database"),
 				true,
 				"task",

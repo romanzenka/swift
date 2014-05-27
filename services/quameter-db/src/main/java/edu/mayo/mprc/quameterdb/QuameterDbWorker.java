@@ -41,7 +41,7 @@ public final class QuameterDbWorker extends WorkerBase {
 	}
 
 	@Override
-	public void process(final WorkPacket wp, final UserProgressReporter reporter) {
+	public void process(final WorkPacket wp, final File tempWorkFolder, final UserProgressReporter reporter) {
 		final QuameterDbWorkPacket workPacket = (QuameterDbWorkPacket) wp;
 		dao.begin();
 		try {
@@ -57,6 +57,14 @@ public final class QuameterDbWorker extends WorkerBase {
 							+ workPacket.getQuameterResultFile()
 							+ "]", e);
 		}
+	}
+
+	/**
+	 * No output files are being published.
+	 */
+	@Override
+	public File createTempWorkFolder() {
+		return null;
 	}
 
 	static Map<String, Double> loadQuameterResultFile(final File quameterFile) {

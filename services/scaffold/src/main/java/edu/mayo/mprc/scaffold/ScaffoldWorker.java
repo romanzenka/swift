@@ -53,8 +53,16 @@ public final class ScaffoldWorker extends WorkerBase {
 		return null;
 	}
 
+	/**
+	 * TODO: We need to modify Scaffold worker to explicitly publish the files it generates
+	 * <p/>
+	 * Scaffold currently takes a work packet with the scafml document that fully drives the entire process.
+	 * The scafml document lists output folder and all the reports to be generated.
+	 * This needs to be changed to go into a temp work folder, and only when Scaffold finishes, all the resulting
+	 * files get moved to their target location.
+	 */
 	@Override
-	public void process(WorkPacket workPacket, UserProgressReporter progressReporter) {
+	public void process(final WorkPacket workPacket, final File tempWorkFolder, final UserProgressReporter progressReporter) {
 		if (workPacket instanceof ScaffoldWorkPacket) {
 			processSearch((ScaffoldWorkPacket) workPacket, progressReporter);
 		} else if (workPacket instanceof ScaffoldSpectrumExportWorkPacket) {
@@ -146,7 +154,7 @@ public final class ScaffoldWorker extends WorkerBase {
 
 		try {
 			caller.runAndCheck("Scaffold3");
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			throw new MprcException(e);
 		}
 
@@ -182,7 +190,7 @@ public final class ScaffoldWorker extends WorkerBase {
 		final String contents;
 		try {
 			contents = getScafmlSpectrumExport(work);
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			throw new MprcException("Could not export " + scafmlFile.getAbsolutePath(), e);
 		}
 
@@ -232,7 +240,7 @@ public final class ScaffoldWorker extends WorkerBase {
 			outputProperties.setProperty(OutputKeys.STANDALONE, "yes");
 
 			return builder.asString(outputProperties);
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			throw new MprcException("Could not create .scafml for spectrum export", e);
 		}
 	}
@@ -246,7 +254,7 @@ public final class ScaffoldWorker extends WorkerBase {
 		this.scaffoldBatchScript = scaffoldBatchScript;
 	}
 
-	public void setScaffoldUnimod(File scaffoldUnimod) {
+	public void setScaffoldUnimod(final File scaffoldUnimod) {
 		this.scaffoldUnimod = scaffoldUnimod;
 	}
 

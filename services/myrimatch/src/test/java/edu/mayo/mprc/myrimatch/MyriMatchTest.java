@@ -250,7 +250,7 @@ public final class MyriMatchTest extends XMLTestCase {
 
 		final File resultFile = new File(tempFolder, "result.pepXML");
 
-		final MyriMatchWorkPacket work = new MyriMatchWorkPacket(resultFile, configFile, mgfFile, tempFolder, fastaFile, "Rev_", false, "Test MyriMatch run", false);
+		final MyriMatchWorkPacket work = new MyriMatchWorkPacket(resultFile, configFile, mgfFile, fastaFile, "Rev_", false, "Test MyriMatch run", false);
 
 		final MyriMatchWorker worker = new MyriMatchWorker(myrimatchExecutable);
 
@@ -298,7 +298,7 @@ public final class MyriMatchTest extends XMLTestCase {
 			Assert.assertTrue(resultFile.exists() && resultFile.isFile() && resultFile.length() > 0, "MyriMatch did not produce valid result file");
 			String resultString = Files.toString(resultFile, CHARSET);
 			resultString = replace(resultString, fastaFile.getAbsolutePath(), "$$DB$$");
-			resultString = replace(resultString, work.getWorkFolder().getAbsolutePath(), "$$WORK_DIR$$");
+			resultString = replace(resultString, tempFolder.getAbsolutePath(), "$$WORK_DIR$$");
 			resultString = replace(resultString, FileUtilities.stripExtension(mgfFile.getName()), "$$BASE$$");
 			resultString = replaceTime(resultString, "creationDate=");
 			resultString = replaceTime(resultString, "activityDate=");

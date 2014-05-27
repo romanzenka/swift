@@ -69,7 +69,7 @@ final class EngineSearchTask extends AsyncTaskBase implements FileProducingTask 
 
 	/**
 	 * @return Work packet to be sent asynchronously. If it returns null, it means the work was done without a need
-	 *         to send a work packet.
+	 * to send a work packet.
 	 */
 	@Override
 	public WorkPacket createWorkPacket() {
@@ -99,7 +99,6 @@ final class EngineSearchTask extends AsyncTaskBase implements FileProducingTask 
 					inputFile.getResultingFile(),
 					paramsFile,
 					outputFile,
-					outputFile.getParentFile(),
 					curation.getCurationFile(),
 					publicSearchFiles,
 					getFullId(),
@@ -117,7 +116,6 @@ final class EngineSearchTask extends AsyncTaskBase implements FileProducingTask 
 		} else if ("MYRIMATCH".equalsIgnoreCase(engine.getCode())) {
 			workPacket = new MyriMatchWorkPacket(
 					outputFile, paramsFile, inputFile.getResultingFile(),
-					outputFile.getParentFile(),
 					curation.getCurationFile(),
 					curation.getDecoyRegex(),
 					publicSearchFiles, getFullId(),

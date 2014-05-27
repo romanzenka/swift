@@ -15,6 +15,7 @@ import edu.mayo.mprc.utilities.progress.UserProgressReporter;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
+import java.io.File;
 
 /**
  * Wrapper around the {@link FastaDbDao#addFastaDatabase} API.
@@ -43,7 +44,7 @@ public class FastaDbWorker extends WorkerBase {
 	}
 
 	@Override
-	public void process(final WorkPacket wp, final UserProgressReporter reporter) {
+	public void process(final WorkPacket wp, final File tempWorkFolder, final UserProgressReporter reporter) {
 		final FastaDbWorkPacket workPacket = (FastaDbWorkPacket) wp;
 		curationDao.begin();
 		try {
@@ -57,6 +58,12 @@ public class FastaDbWorker extends WorkerBase {
 			curationDao.rollback();
 			throw new MprcException("Could not load curation #" + workPacket.getCurationId() + " into the database", e);
 		}
+	}
+
+	@Override
+	public File createTempWorkFolder() {
+		// No work folder needed.
+		return null;
 	}
 
 	/**

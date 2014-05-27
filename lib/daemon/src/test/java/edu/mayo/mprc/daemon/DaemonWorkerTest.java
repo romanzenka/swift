@@ -9,6 +9,7 @@ import edu.mayo.mprc.utilities.progress.UserProgressReporter;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
+import java.io.File;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
@@ -82,7 +83,7 @@ public final class DaemonWorkerTest {
 			private AtomicInteger concurrentRequests = new AtomicInteger(0);
 
 			@Override
-			public void process(final WorkPacket wp, final UserProgressReporter progressReporter) {
+			public void process(final WorkPacket wp, final File tempWorkFolder, final UserProgressReporter progressReporter) {
 				Assert.assertEquals(concurrentRequests.incrementAndGet(), 1, "The amount of requests must start at 1. The worker calls are not serialized.");
 				try {
 					Thread.sleep(1);
@@ -90,6 +91,11 @@ public final class DaemonWorkerTest {
 					throw new DaemonException(e);
 				}
 				Assert.assertEquals(concurrentRequests.decrementAndGet(), 0, "The amount of requests must end at 0. The worker calls are not serialized.");
+			}
+
+			@Override
+			public File createTempWorkFolder() {
+				return null;
 			}
 
 			@Override

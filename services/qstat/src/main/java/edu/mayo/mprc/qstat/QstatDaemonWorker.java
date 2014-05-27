@@ -16,6 +16,8 @@ import edu.mayo.mprc.utilities.progress.UserProgressReporter;
 import org.apache.log4j.Logger;
 import org.springframework.stereotype.Component;
 
+import java.io.File;
+
 
 /**
  * Simple worker that accepts a string with grid engine id and sends back a String with results of the qstat call.
@@ -28,7 +30,7 @@ public final class QstatDaemonWorker extends WorkerBase {
 	public static final String DESC = "A trivial daemon running <tt>qstat</tt> command to retrieve status of a job running in Sun Grid Engine. This is used only in the web interface and is provided for convenience only. The module has to be enabled on a computer that is Sun Grid Engine submit host.";
 
 	@Override
-	public void process(final WorkPacket workPacket, final UserProgressReporter reporter) {
+	public void process(final WorkPacket workPacket, final File tempWorkFolder, final UserProgressReporter progressReporter) {
 		if (!(workPacket instanceof QstatWorkPacket)) {
 			throw new DaemonException("Unknown input format: " + workPacket.getClass().getName() + " expected string");
 		}
@@ -43,7 +45,7 @@ public final class QstatDaemonWorker extends WorkerBase {
 			throw new DaemonException(t);
 		}
 
-		reporter.reportProgress(new QstatOutput(caller.getOutputLog()));
+		progressReporter.reportProgress(new QstatOutput(caller.getOutputLog()));
 	}
 
 	public String toString() {
@@ -62,6 +64,12 @@ public final class QstatDaemonWorker extends WorkerBase {
 			// SWALLOWED: We return a string
 			return e.getMessage();
 		}
+		return null;
+	}
+
+	@Override
+	public File createTempWorkFolder() {
+		// No temp work folder needed
 		return null;
 	}
 
