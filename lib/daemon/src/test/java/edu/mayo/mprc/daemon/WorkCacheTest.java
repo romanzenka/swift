@@ -90,7 +90,7 @@ public final class WorkCacheTest {
 		Assert.assertEquals(allValues.get(count++).getRequest(), "request6");  // Stale cache caused recalculation of request 6
 		Assert.assertEquals(allValues.get(count++).getRequest(), "cache:request6");
 
-		Assert.assertEquals(cacheFolder.listFiles().length, 3, "There should be two result folders (two hashes fold into one) and wip folder");
+		Assert.assertEquals(cacheFolder.listFiles().length, 2, "There should be two result folders (two hashes fold into one)");
 		Assert.assertFalse(workCache.isWorkInProgress(), "There should be no work in progress anymore");
 
 		connection.stop();

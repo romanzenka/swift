@@ -1,8 +1,6 @@
 package edu.mayo.mprc.daemon;
 
-import com.google.common.base.Charsets;
 import com.google.common.base.Joiner;
-import com.google.common.io.Files;
 import edu.mayo.mprc.MprcException;
 import edu.mayo.mprc.config.*;
 import edu.mayo.mprc.daemon.worker.NoLoggingWorker;
@@ -12,7 +10,6 @@ import edu.mayo.mprc.daemon.worker.WorkerFactoryBase;
 import edu.mayo.mprc.utilities.FileListener;
 import edu.mayo.mprc.utilities.FileUtilities;
 import edu.mayo.mprc.utilities.MonitorUtilities;
-import edu.mayo.mprc.utilities.StringUtilities;
 import edu.mayo.mprc.utilities.exceptions.ExceptionUtilities;
 import edu.mayo.mprc.utilities.progress.ProgressInfo;
 import edu.mayo.mprc.utilities.progress.ProgressListener;
@@ -20,9 +17,7 @@ import edu.mayo.mprc.utilities.progress.ProgressReporter;
 import org.apache.log4j.Logger;
 
 import java.io.File;
-import java.io.FilenameFilter;
 import java.util.*;
-import java.util.regex.Pattern;
 
 /**
  * Base class for implementing caches. A cache remembers previous work and can provide results fast.
@@ -39,21 +34,19 @@ import java.util.regex.Pattern;
  */
 public abstract class WorkCache<T extends WorkPacket> implements NoLoggingWorker, Installable {
 	private static final Logger LOGGER = Logger.getLogger(WorkCache.class);
-	public static final int MAX_CACHE_FOLDERS = 1000 * 10;
-	private static final Pattern CACHE_DATA_FOLDER = Pattern.compile("[0-9a-f][0-9a-f]");
-	private File cacheFolder;
 	private DaemonConnection daemon;
 	private final Map<String, CacheProgressReporter> workInProgress = new HashMap<String, CacheProgressReporter>(10);
+	private final CacheFolder cacheFolder = new CacheFolder();
 
 	public WorkCache() {
 	}
 
 	public final File getCacheFolder() {
-		return cacheFolder;
+		return cacheFolder.getCacheFolder();
 	}
 
 	public final void setCacheFolder(final File cacheFolder) {
-		this.cacheFolder = cacheFolder;
+		this.cacheFolder.setCacheFolder(cacheFolder);
 	}
 
 	public final DaemonConnection getDaemon() {
@@ -72,7 +65,7 @@ public abstract class WorkCache<T extends WorkPacket> implements NoLoggingWorker
 	public final void processRequest(final WorkPacket workPacket, final ProgressReporter progressReporter) {
 		try {
 			process(workPacket, progressReporter);
-		} catch (Exception t) {
+		} catch (final Exception t) {
 			progressReporter.reportFailure(t);
 		}
 	}
@@ -80,39 +73,13 @@ public abstract class WorkCache<T extends WorkPacket> implements NoLoggingWorker
 	@Override
 	public String check() {
 		LOGGER.info("Checking cache for " + getDaemon().getConnectionName());
-		if (!cacheFolder.isDirectory() || !cacheFolder.canWrite()) {
-			return "The cache folder is not writeable: " + cacheFolder.getAbsolutePath();
-		}
-		return null;
+		return cacheFolder.check();
 	}
 
 	@Override
-	public void install(Map<String, String> params) {
+	public void install(final Map<String, String> params) {
 		LOGGER.info("Installing cache for " + getDaemon().getConnectionName());
-		FileUtilities.ensureFolderExists(cacheFolder);
-	}
-
-	/**
-	 * By default returns folder based on the hash code of the task description.
-	 * Your cache can override this implementation.
-	 *
-	 * @param taskDescription Description of the task.
-	 * @return Relative path to the cache folder to store the task results in.
-	 */
-	protected String getFolderForTaskDescription(final String taskDescription) {
-		final int code = taskDescription.hashCode();
-		return "" +
-				StringUtilities.toHex(code >> 28) +
-				StringUtilities.toHex(code >> 24) +
-				"/" +
-				StringUtilities.toHex(code >> 20) +
-				StringUtilities.toHex(code >> 16) +
-				"/" +
-				StringUtilities.toHex(code >> 12) +
-				StringUtilities.toHex(code >> 8) +
-				"/" +
-				StringUtilities.toHex(code >> 4) +
-				StringUtilities.toHex(code);
+		cacheFolder.install();
 	}
 
 	private void process(final WorkPacket workPacket, final ProgressReporter progressReporter) {
@@ -121,7 +88,6 @@ public abstract class WorkCache<T extends WorkPacket> implements NoLoggingWorker
 			return;
 		}
 
-		final T typedWorkPacket = (T) workPacket;
 		final CachableWorkPacket cachableWorkPacket;
 		if (workPacket instanceof CachableWorkPacket) {
 			cachableWorkPacket = (CachableWorkPacket) workPacket;
@@ -130,95 +96,68 @@ public abstract class WorkCache<T extends WorkPacket> implements NoLoggingWorker
 			return;
 		}
 
+		// Find existing cache subfolder with data matching the work packet.
+		final File existingEntry = cacheFolder.lookup(cachableWorkPacket);
+
+		if (existingEntry != null) {
+			reportCachedValues(progressReporter, cachableWorkPacket, existingEntry);
+			return;
+		}
+
 		// A string describing the request. If two descriptions are the same,
 		// the tasks are the same
 		final String taskDescription = cachableWorkPacket.getStringDescriptionOfTask();
 
-		// The file that will store the task input parameters
-		final String taskDescriptionFileName = "_task_description";
-
-		// Obtain a list of files we expect as a result of this task
-		final List<String> outputFiles = cachableWorkPacket.getOutputFiles();
-
-		// Request hashcode
-		// Folder is derived from the hash code
-		final File targetCacheFolder = new File(cacheFolder, getFolderForTaskDescription(taskDescription));
-		// We make sure the target folder can be created - fail early
-		FileUtilities.ensureFolderExists(targetCacheFolder);
-
-		// Now we check the cache.
-		// There can be multiple files of the same name in the same cache bucket.
-		// We pick the one which has a corresponding file that matches our params
-		// We go through all subfolders of the output folder
-		final File[] files = targetCacheFolder.listFiles();
-		for (final File subFolder : files) {
-			final File taskDescriptionFile = new File(subFolder, taskDescriptionFileName);
-			if (allFilesExist(subFolder, outputFiles) && taskDescriptionFile.exists()) {
-				// We found an output file with matching file name and a params file!
-				// Check the params file
-				String cachedTaskDescription = null;
-				try {
-					cachedTaskDescription = Files.toString(taskDescriptionFile, Charsets.UTF_8);
-				} catch (Exception t) {
-					LOGGER.error("Cache cannot read request file " + taskDescriptionFile.getAbsolutePath(), t);
-					continue;
-				}
-				if (taskDescription.equals(cachedTaskDescription)) {
-					// We found a match. Shall we use it? We must not want to process from scratch, and we must not
-					// have stale cache entry.
-					if (!typedWorkPacket.isFromScratch() && !cachableWorkPacket.cacheIsStale(subFolder, outputFiles)) {
-						// The output was created after our input file, thus it is useable
-						LOGGER.info("Using cached values from: " + subFolder.getAbsolutePath());
-						progressReporter.reportStart(MonitorUtilities.getHostInformation());
-						cachableWorkPacket.reportCachedResult(progressReporter, subFolder, outputFiles);
-						publishResultFiles(cachableWorkPacket, subFolder, outputFiles);
-						progressReporter.reportSuccess();
-						return;
-					} else {
-						// The output is older than the source.
-						// Wipe the cache for the file, continue searching.
-						LOGGER.info("Cache deleting stale entry " +
-								(typedWorkPacket.isFromScratch() ? "(user requested rerun from scratch)" : "(input is of newer date than the output)") + ": " + subFolder.getAbsolutePath());
-						FileUtilities.deleteNow(subFolder);
-					}
-				}
-			}
-		}
-
 		// We have not found a suitable cache entry
-		// But maybe someone is working on this right now
+		// But maybe someone is working on this exact task right now
 		final CacheProgressReporter cacheProgressReporter;
 		final CacheProgressReporter newReporter = new CacheProgressReporter();
 		synchronized (workInProgress) {
 			cacheProgressReporter = workInProgress.get(taskDescription);
 			if (cacheProgressReporter == null) {
+				// Nobody is working yet, register the new reporter
 				workInProgress.put(taskDescription, newReporter);
 				newReporter.addProgressReporter(progressReporter);
 			} else {
+				// We already are doing work. Register the new caller and quit
 				cacheProgressReporter.addProgressReporter(progressReporter);
+				return;
 			}
 		}
 
-		if (cacheProgressReporter == null) {
-			// Make a work-in-progress folder
-			final File wipBase = new File(cacheFolder, "wip");
-			final File wipFolder = FileUtilities.createTempFolder(wipBase, "wip", true);
+		// Nobody is doing this work, we need to do it ourselves
+		// First establish a work-in-progress folder for this operation
+		// The deal is to put all the output files there, and finally create the task description file to mark the cache as completed
 
-			final WorkPacket modifiedWorkPacket = cachableWorkPacket.translateToWorkInProgressPacket(wipFolder);
+		// Make a work-in-progress folder
+		final File wipFolder = cacheFolder.makeWorkFolder(cachableWorkPacket);
 
-			final MyProgressListener listener = new MyProgressListener(cachableWorkPacket, wipFolder, targetCacheFolder, outputFiles, taskDescriptionFileName, taskDescription, newReporter);
-			daemon.sendWork(modifiedWorkPacket, listener);
-		}
+		final WorkPacket modifiedWorkPacket = cachableWorkPacket.translateToWorkInProgressPacket(wipFolder);
+
+		final MyProgressListener listener = new MyProgressListener(cachableWorkPacket, wipFolder, newReporter);
+		daemon.sendWork(modifiedWorkPacket, listener);
+	}
+
+	/**
+	 * We found a non-stale cache folder with all the files in it.
+	 * Publish this finding directly to the caller.
+	 */
+	private void reportCachedValues(final ProgressReporter progressReporter, final CachableWorkPacket cachableWorkPacket, final File cacheFolder) {
+		final List<String> outputFiles = cachableWorkPacket.getOutputFiles();
+
+		// The output was created after our input file, thus it is useable
+		LOGGER.info("Using cached values from: " + cacheFolder.getAbsolutePath());
+		progressReporter.reportStart(MonitorUtilities.getHostInformation());
+		cachableWorkPacket.reportCachedResult(progressReporter, cacheFolder, outputFiles);
+		publishResultFiles(cachableWorkPacket, cacheFolder, outputFiles);
+		progressReporter.reportSuccess();
 	}
 
 	/**
 	 * Delete everything in the cache.
 	 */
 	private void cleanupCache() {
-		final File[] files = getCacheFolder().listFiles(new CacheFolderFilter());
-		for (final File file : files) {
-			FileUtilities.deleteNow(file);
-		}
+		cacheFolder.cleanup();
 	}
 
 	/**
@@ -236,50 +175,29 @@ public abstract class WorkCache<T extends WorkPacket> implements NoLoggingWorker
 	}
 
 	/**
-	 * @param folder      Base folder
-	 * @param outputFiles List of file names to check
-	 * @return True if all files exist.
-	 */
-	private boolean allFilesExist(final File folder, final List<String> outputFiles) {
-		for (final String file : outputFiles) {
-			if (!new File(folder, file).exists()) {
-				return false;
-			}
-		}
-		return true;
-	}
-
-	/**
 	 * For test writing purposes. Access to class internals.
 	 */
 	boolean isWorkInProgress() {
 		return !workInProgress.isEmpty();
 	}
 
-	private static class CacheFolderFilter implements FilenameFilter {
-		@Override
-		public boolean accept(final File dir, final String name) {
-			return CACHE_DATA_FOLDER.matcher(name).matches();
+	private void finishedWorking(final String taskDescription) {
+		synchronized (workInProgress) {
+			workInProgress.remove(taskDescription);
 		}
 	}
 
 	private final class MyProgressListener implements ProgressListener {
 		private final CachableWorkPacket workPacket;
 		private final File wipFolder;
-		private final List<String> outputFiles;
-		private final String taskDescriptionFile;
-		private final String taskDescription;
-		private final File targetFolder;
 		private final ProgressReporter reporter;
+		private final String taskDescription;
 
-		private MyProgressListener(final CachableWorkPacket workPacket, final File wipFolder, final File targetCacheFolder, final List<String> outputFiles, final String taskDescriptionFile, final String taskDescription, final ProgressReporter reporter) {
+		private MyProgressListener(final CachableWorkPacket workPacket, final File wipFolder, final ProgressReporter reporter) {
 			this.workPacket = workPacket;
 			this.wipFolder = wipFolder;
-			targetFolder = targetCacheFolder;
-			this.outputFiles = outputFiles;
-			this.taskDescriptionFile = taskDescriptionFile;
-			this.taskDescription = taskDescription;
 			this.reporter = reporter;
+			taskDescription = workPacket.getStringDescriptionOfTask();
 		}
 
 		@Override
@@ -293,7 +211,8 @@ public abstract class WorkCache<T extends WorkPacket> implements NoLoggingWorker
 
 		@Override
 		public void requestProcessingFinished() {
-			final File target = createNewFolder(targetFolder);
+
+			final List<String> outputFiles = workPacket.getOutputFiles();
 			final ArrayList<File> toWaitFor = new ArrayList<File>(outputFiles.size());
 			for (final String outputFile : outputFiles) {
 				final File wipFile = new File(wipFolder, outputFile);
@@ -310,66 +229,20 @@ public abstract class WorkCache<T extends WorkPacket> implements NoLoggingWorker
 							return;
 						}
 
-						for (final String outputFile : outputFiles) {
-							// Move the work in progress folder to its final location
-							final File wipFile = new File(wipFolder, outputFile);
-							final File resultingOutputFile = new File(target, outputFile);
-
-							LOGGER.info("Caching output file: " + resultingOutputFile.getAbsolutePath());
-
-							// We move the output file
-							FileUtilities.rename(wipFile, resultingOutputFile);
-						}
-
-						// We write out the parameters used for creating the output file
-						FileUtilities.writeStringToFile(new File(target, taskDescriptionFile), taskDescription, true);
-						// And the wip folder is no longer needed
-						FileUtilities.deleteNow(wipFolder);
+						File target = cacheFolder.insert(workPacket, wipFolder);
 
 						// Now we only need to notify the requestor that the output file was produced elsewhere
 						workPacket.reportCachedResult(reporter, target, outputFiles);
 						publishResultFiles(workPacket, target, outputFiles);
-					} catch (Exception t) {
+					} catch (final Exception t) {
 						reporter.reportFailure(t);
 						return;
 					} finally {
-						synchronized (workInProgress) {
-							workInProgress.remove(taskDescription);
-						}
+						finishedWorking(taskDescription);
 					}
 					reporter.reportSuccess();
 				}
 			});
-		}
-
-		/**
-		 * Create new folder within parent. The folder name is simply a number, starting at 1.
-		 *
-		 * @param parent Parent folder to create a new folder in.
-		 * @return The new folder created.
-		 */
-
-		private File createNewFolder(final File parent) {
-			final int numFiles = parent.listFiles().length;
-			if (numFiles > MAX_CACHE_FOLDERS) {
-				throw new MprcException("Too many cached folders in " + parent.getAbsolutePath() + ": " + numFiles);
-			}
-			if (!parent.canWrite()) {
-				throw new MprcException("The cache directory [" + parent.getAbsolutePath() + "] is not writeable.");
-			}
-			int i = numFiles + 1;
-			while (true) {
-				final File newFolder = new File(parent, String.valueOf(i));
-				if (!newFolder.exists()) {
-					FileUtilities.ensureFolderExists(newFolder);
-					break;
-				}
-				i += 1;
-				if (i > MAX_CACHE_FOLDERS) {
-					throw new MprcException("Could not create a new folder in " + parent.getAbsolutePath() + ": " + i + " attempts failed");
-				}
-			}
-			return new File(parent, String.valueOf(i));
 		}
 
 		@Override
@@ -379,9 +252,7 @@ public abstract class WorkCache<T extends WorkPacket> implements NoLoggingWorker
 				FileUtilities.deleteNow(wipFolder);
 				reporter.reportFailure(e);
 			} finally {
-				synchronized (workInProgress) {
-					workInProgress.remove(taskDescription);
-				}
+				finishedWorking(taskDescription);
 			}
 		}
 
