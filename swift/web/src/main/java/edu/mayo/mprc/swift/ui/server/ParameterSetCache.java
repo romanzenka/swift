@@ -39,7 +39,7 @@ public final class ParameterSetCache {
 	}
 
 	private synchronized void addToCache(final ClientParamSet clientParamSet, final SearchEngineParameters serverParamSet) {
-		final Map<Integer, SearchEngineParameters> cache = getCache(clientParamSet.getId());
+		final Map<Integer, SearchEngineParameters> cache = getCache(clientParamSet);
 		if (serverParamSet.getId() != null) {
 			throw new MprcException("Cache can only store objects detached from Hibernate");
 		}
@@ -50,27 +50,32 @@ public final class ParameterSetCache {
 	}
 
 	public synchronized void removeFromCache(final ClientParamSet clientParamSet) {
-		getCache(clientParamSet.getId()).remove(clientParamSet.getId());
+		getCache(clientParamSet).remove(clientParamSet.getId());
 		if (clientParamSet.isTemporary()) {
 			getTemporaryClientParamList().remove(clientParamSet);
 		}
 	}
 
 	/**
-	 * Return a cached set of search engine parameters. Since the parameters are immutable, the set is not attached to the session
+	 * Return a cached set of search engine parameters.
+	 * Since the parameters are immutable, the set is not attached to the session.
+	 * The user is allowed to do whatever they want with it
+	 * without breaking the internal cache copy.
 	 *
-	 * @param paramSet
-	 * @return
+	 * @param paramSet Requested parameter set.
+	 * @return A cloned, detached copy of the parameter set data.
 	 */
 	public synchronized SearchEngineParameters getFromCache(final ClientParamSet paramSet) {
-		SearchEngineParameters ps = null;
-		final Map<Integer, SearchEngineParameters> cache = getCache(paramSet.getId());
+		final Map<Integer, SearchEngineParameters> cache = getCache(paramSet);
 
 		final Integer key = paramSet.getId();
 
-		if (!cache.containsKey(key)) {
+		final SearchEngineParameters ps = cache.get(key);
+		SearchEngineParameters result = null;
 
-			if (key < 0) {
+		if (ps == null) {
+
+			if (paramSet.isTemporary()) {
 				throw new MprcException("Can't find temporary search definition " + key);
 			}
 			final SavedSearchEngineParameters saved = paramsDao.getSavedSearchEngineParameters(key);
@@ -80,28 +85,31 @@ public final class ParameterSetCache {
 			}
 
 			// We copy the parameters so they are no longer connected to the session.
-			ps = saved.getParameters().copy();
-			addToCache(paramSet, ps);
+			result = saved.getParameters().copy(); // Always copy
+			addToCache(paramSet, result);
 		} else {
-			ps = cache.get(key);
+			result = ps.copy(); // Copy data out
 		}
-		return ps;
+		return result;
 	}
 
 	/**
-	 * Get parameter set from cache. When the parameter set corresponds to a saved parameter set,
-	 * load it from database instead of relying on cached value.
+	 * Get parameter set from cache.
+	 * When the parameter set corresponds to a saved parameter set,
+	 * load it from database instead of relying on cached value and provide the non-detached object.
+	 * <p/>
+	 * Otherwise, if it is a temporary entry, provide a clean copy so user can mess with it.
 	 */
 	public SearchEngineParameters getFromCacheHibernate(final ClientParamSet paramSet) {
 		final Integer key = paramSet.getId();
 
 		if (paramSet.isTemporary()) {
-			final Map<Integer, SearchEngineParameters> cache = getCache(paramSet.getId());
-
-			if (!cache.containsKey(key)) {
+			final Map<Integer, SearchEngineParameters> cache = getCache(paramSet);
+			final SearchEngineParameters params = cache.get(key);
+			if (params == null) {
 				throw new MprcException("Can't find temporary search definition " + key);
 			} else {
-				return cache.get(key);
+				return params.copy();
 			}
 		} else {
 			final SavedSearchEngineParameters saved = paramsDao.getSavedSearchEngineParameters(key);
@@ -113,9 +121,11 @@ public final class ParameterSetCache {
 		}
 	}
 
-
-	private Map<Integer, SearchEngineParameters> getCache(final Integer id) {
-		if (id < 0) {
+	/**
+	 * Get a proper cache for given param set. If caches are missing, establish them in the session.
+	 */
+	private Map<Integer, SearchEngineParameters> getCache(final ClientParamSet paramSet) {
+		if (paramSet.isTemporary()) {
 			if (temporaryCache == null) {
 				temporaryCache = (Map<Integer, SearchEngineParameters>) session.getAttribute(TEMPORARY_PARAM_SETS);
 				if (temporaryCache == null) {
