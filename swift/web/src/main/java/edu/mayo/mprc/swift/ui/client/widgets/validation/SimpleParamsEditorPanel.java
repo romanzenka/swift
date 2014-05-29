@@ -180,15 +180,6 @@ public final class SimpleParamsEditorPanel implements SourcesChangeEvents {
 			validationController.add(dlb, "sequence.database", vp);
 			p.add(pb);
 
-			//Add undeployer link if enabled.
-			if (pageData.isDatabaseUndeployerEnabled()) {
-				final PushButton du = new PushButton("Undeploy Database");
-				du.addStyleName(ACTION_LINK);
-				du.setTitle("Click here to undeploy database from search engines.");
-				du.addClickHandler(new DatabaseUndeploymentAction(serviceAsync, dlb));
-				p.add(du);
-			}
-
 			editorElements.add(dbrow.append("database", "paramDbEntry", p, editorVisible));
 
 			editorElements.add(dbrow.append("database", "paramDbValidation", vp, editorVisible));

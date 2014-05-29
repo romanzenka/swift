@@ -15,7 +15,6 @@ public final class InitialPageData implements Serializable {
 	private ClientLoadedSearch loadedSearch;
 	private ClientParamSetList paramSetList;
 	private HashMap<String, List<ClientValue>> allowedValues;
-	private boolean databaseUndeployerEnabled;
 	private List<ClientSearchEngine> searchEngines;
 	private List<SpectrumQaParamFileInfo> spectrumQaParamFileInfo;
 	private boolean scaffoldReportEnabled;
@@ -30,7 +29,6 @@ public final class InitialPageData implements Serializable {
 	                       final ClientLoadedSearch loadedSearch,
 	                       final ClientParamSetList paramSetList,
 	                       final HashMap<String, List<ClientValue>> allowedValues,
-	                       final boolean databaseUndeployerEnabled,
 	                       final List<ClientSearchEngine> searchEngines,
 	                       final List<SpectrumQaParamFileInfo> spectrumQaParamFileInfo,
 	                       final boolean scaffoldReportEnabled,
@@ -42,7 +40,6 @@ public final class InitialPageData implements Serializable {
 		this.loadedSearch = loadedSearch;
 		this.paramSetList = paramSetList;
 		this.allowedValues = allowedValues;
-		this.databaseUndeployerEnabled = databaseUndeployerEnabled;
 		this.searchEngines = searchEngines;
 		this.spectrumQaParamFileInfo = spectrumQaParamFileInfo;
 		this.scaffoldReportEnabled = scaffoldReportEnabled;
@@ -68,10 +65,6 @@ public final class InitialPageData implements Serializable {
 
 	public HashMap<String, List<ClientValue>> getAllowedValues() {
 		return allowedValues;
-	}
-
-	public boolean isDatabaseUndeployerEnabled() {
-		return databaseUndeployerEnabled;
 	}
 
 	public List<SpectrumQaParamFileInfo> getSpectrumQaParamFileInfo() {

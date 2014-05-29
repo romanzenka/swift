@@ -37,7 +37,6 @@ public final class WebUi implements Checkable {
 	public static final String DESC = "Swift's web user interface.<p>The daemon that contains the web interface will run within a web server.</p>";
 	public static final UserMessage USER_MESSAGE = new UserMessage();
 	private File browseRoot;
-	private DaemonConnection databaseUndeployerDaemonConnection;
 	private DaemonConnection qstatDaemonConnection;
 	private String browseWebRoot;
 	private File newConfigFile;
@@ -61,7 +60,6 @@ public final class WebUi implements Checkable {
 	public static final String BROWSE_WEB_ROOT = "browseWebRoot";
 	public static final String NEW_CONFIG_FILE = "newConfigFile";
 	public static final String QSTAT = "qstat";
-	public static final String DATABASE_UNDEPLOYER = "databaseUndeployer";
 	private boolean extractMsn;
 	private boolean msconvert;
 
@@ -106,7 +104,7 @@ public final class WebUi implements Checkable {
 
 	/**
 	 * @return All the search engines that are available to the {@link SwiftSearcher} that
-	 *         is pointed to by this web ui.
+	 * is pointed to by this web ui.
 	 */
 	public Collection<SearchEngine> getSearchEngines() {
 		return searchEngines;
@@ -122,10 +120,6 @@ public final class WebUi implements Checkable {
 
 	public boolean isScaffoldReport() {
 		return scaffoldReport;
-	}
-
-	public boolean isDatabaseUndeployerEnabled() {
-		return databaseUndeployerDaemonConnection != null;
 	}
 
 	public List<MSMSEvalParamFile> getSpectrumQaParamFiles() {
@@ -146,10 +140,6 @@ public final class WebUi implements Checkable {
 
 	public void setFileTokenFactory(DatabaseFileTokenFactory fileTokenFactory) {
 		this.fileTokenFactory = fileTokenFactory;
-	}
-
-	public DaemonConnection getDatabaseUndeployerDaemonConnection() {
-		return databaseUndeployerDaemonConnection;
 	}
 
 	public UserMessage getUserMessage() {
@@ -224,8 +214,8 @@ public final class WebUi implements Checkable {
 
 	/**
 	 * @return A map containing the collected user interface configuration.
-	 *         This is done by collecting all configuration elements across
-	 *         all the resources/plugins for this daemon.
+	 * This is done by collecting all configuration elements across
+	 * all the resources/plugins for this daemon.
 	 */
 	public Map<String, String> getUiConfiguration() {
 		final Map<String, String> uiConfiguration = new HashMap<String, String>(10);
@@ -323,11 +313,6 @@ public final class WebUi implements Checkable {
 					}
 					ui.setSearchEngines(searchEngines);
 				}
-
-				if (config.getDatabaseUndeployer() != null) {
-					ui.databaseUndeployerDaemonConnection = (DaemonConnection) dependencies.createSingleton(config.getDatabaseUndeployer());
-				}
-
 			} catch (Exception e) {
 				throw new MprcException("Web UI class could not be created.", e);
 			}
@@ -422,7 +407,6 @@ public final class WebUi implements Checkable {
 		// It is used solely as a way for an installer to tweak where does the newly saved config get saved.
 		private String newConfigFile;
 		private ServiceConfig qstat;
-		private ServiceConfig databaseUndeployer;
 
 		public Config() {
 		}
@@ -435,7 +419,6 @@ public final class WebUi implements Checkable {
 			this.browseWebRoot = browseWebRoot;
 			this.newConfigFile = newConfigFile;
 			this.qstat = qstat;
-			this.databaseUndeployer = databaseUndeployer;
 		}
 
 		public void setSearcher(ServiceConfig searcher) {
@@ -455,7 +438,6 @@ public final class WebUi implements Checkable {
 			writer.put(BROWSE_WEB_ROOT, getBrowseWebRoot());
 			writer.put(NEW_CONFIG_FILE, getNewConfigFile());
 			writer.put(QSTAT, getQstat());
-			writer.put(DATABASE_UNDEPLOYER, getDatabaseUndeployer());
 		}
 
 		@Override
@@ -467,7 +449,6 @@ public final class WebUi implements Checkable {
 			browseWebRoot = reader.get(BROWSE_WEB_ROOT);
 			newConfigFile = reader.get(NEW_CONFIG_FILE);
 			qstat = (ServiceConfig) reader.getObject(QSTAT);
-			databaseUndeployer = (ServiceConfig) reader.getObject(DATABASE_UNDEPLOYER);
 		}
 
 		@Override
@@ -493,10 +474,6 @@ public final class WebUi implements Checkable {
 
 		public ServiceConfig getQstat() {
 			return qstat;
-		}
-
-		public ServiceConfig getDatabaseUndeployer() {
-			return databaseUndeployer;
 		}
 
 		public String getNewConfigFile() {
@@ -567,9 +544,6 @@ public final class WebUi implements Checkable {
 					.required()
 					.reference("searcher", UiBuilder.NONE_TYPE)
 					.defaultValue(swiftSearcher)
-
-					.property(DATABASE_UNDEPLOYER, "Database Undeployer", "The module that performs search engine database undeployments.")
-					.reference("databaseUndeployer", UiBuilder.NONE_TYPE)
 
 					.property(QSTAT, "Qstat", "If you are running in Sun Grid Engine and want to have the job status available from the web interface, add a Qstat module. This is completely optional and provided solely for user convenience.")
 					.reference("qstat", UiBuilder.NONE_TYPE)

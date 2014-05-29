@@ -4,12 +4,8 @@ import edu.mayo.mprc.GWTServiceExceptionFactory;
 import edu.mayo.mprc.MprcException;
 import edu.mayo.mprc.common.client.GWTServiceException;
 import edu.mayo.mprc.common.server.SpringGwtServlet;
-import edu.mayo.mprc.daemon.DaemonConnection;
 import edu.mayo.mprc.database.Change;
-import edu.mayo.mprc.dbcurator.model.Curation;
 import edu.mayo.mprc.dbcurator.model.CurationDao;
-import edu.mayo.mprc.dbundeploy.DatabaseUndeployerCaller;
-import edu.mayo.mprc.dbundeploy.DatabaseUndeployerProgress;
 import edu.mayo.mprc.msmseval.MSMSEvalParamFile;
 import edu.mayo.mprc.swift.MainFactoryContext;
 import edu.mayo.mprc.swift.db.SearchEngine;
@@ -593,33 +589,6 @@ public final class ServiceImpl extends SpringGwtServlet implements Service, Appl
 	}
 
 	@Override
-	public ClientDatabaseUndeployerProgress undeployDatabase(final String dbToUndeploy) throws GWTServiceException {
-		try {
-			getCurationDao().begin();
-			final Curation curation = getCurationDao().findCuration(dbToUndeploy);
-			final DatabaseUndeployerProgress progressMessage = DatabaseUndeployerCaller.callDatabaseUndeployer(getDatabaseUndeployerDaemonConnection(), curation);
-			getCurationDao().commit();
-
-			return getDbUndeployerProgressMessageProxy(progressMessage);
-		} catch (Exception e) {
-			getCurationDao().rollback();
-			final String errMsg = "Could not undeploy database " + dbToUndeploy;
-			LOGGER.error(errMsg, e);
-			throw GWTServiceExceptionFactory.createException(errMsg, e);
-		}
-	}
-
-	@Override
-	public ClientDatabaseUndeployerProgress getProgressMessageForDatabaseUndeployment(final Long taskId) throws GWTServiceException {
-		return getDbUndeployerProgressMessageProxy(DatabaseUndeployerCaller.getMessageFromQueue(taskId));
-	}
-
-	@Override
-	public boolean isDatabaseUndeployerEnabled() throws GWTServiceException {
-		return getWebUi().isDatabaseUndeployerEnabled();
-	}
-
-	@Override
 	public InitialPageData getInitialPageData(final Integer previousSearchId) throws GWTServiceException {
 		final String[] params = {
 				"sequence.database",
@@ -648,7 +617,6 @@ public final class ServiceImpl extends SpringGwtServlet implements Service, Appl
 				previousSearchId == null ? null : loadSearch(previousSearchId),
 				getParamSetList(),
 				map,
-				isDatabaseUndeployerEnabled(),
 				listSearchEngines(),
 				listSpectrumQaParamFiles(),
 				isScaffoldReportEnabled(),
@@ -675,10 +643,6 @@ public final class ServiceImpl extends SpringGwtServlet implements Service, Appl
 	 */
 	private HttpSession getSession() {
 		return getThreadLocalRequest().getSession();
-	}
-
-	private ClientDatabaseUndeployerProgress getDbUndeployerProgressMessageProxy(final DatabaseUndeployerProgress progressMessage) {
-		return new ClientDatabaseUndeployerProgress(progressMessage.getDatabaseUndeployerTaskId(), progressMessage.getProgressMessage(), progressMessage.isLast());
 	}
 
 	public WebUiHolder getWebUiHolder() {
@@ -747,10 +711,6 @@ public final class ServiceImpl extends SpringGwtServlet implements Service, Appl
 
 	public void setSwiftSearcherCaller(SwiftSearcherCaller swiftSearcherCaller) {
 		this.swiftSearcherCaller = swiftSearcherCaller;
-	}
-
-	public DaemonConnection getDatabaseUndeployerDaemonConnection() {
-		return getWebUi().getDatabaseUndeployerDaemonConnection();
 	}
 
 	public ClientProxyGenerator getClientProxyGenerator() {

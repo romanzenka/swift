@@ -91,7 +91,7 @@ public interface Service extends RemoteService {
 
 	/**
 	 * @return A list of {@link SpectrumQaParamFileInfo} objects defining the spectrum QA parameter files.
-	 *         The returned list can be empty, in which case the spectrum QA service should be disabled.
+	 * The returned list can be empty, in which case the spectrum QA service should be disabled.
 	 * @throws GWTServiceException
 	 */
 	List<SpectrumQaParamFileInfo> listSpectrumQaParamFiles() throws GWTServiceException;
@@ -164,29 +164,6 @@ public interface Service extends RemoteService {
 	 * @return array of client param files
 	 */
 	ClientParamFile[] getFiles(ClientParamSet paramSet) throws GWTServiceException;
-
-	/**
-	 * Undeploys database idenfify by given dbToUndeploy paramater.
-	 * dbToUndeploy parameter value is used to find Curation object to be undeployed
-	 * by calling findCuration(dbToUndeploy) on the global CurationDao object.
-	 *
-	 * @param dbToUndeploy
-	 * @return returns progress message.
-	 * @throws GWTServiceException
-	 */
-	ClientDatabaseUndeployerProgress undeployDatabase(String dbToUndeploy) throws GWTServiceException;
-
-	/**
-	 * Gets next progress message on queue from given database undeployment task id.
-	 * taskId parameter value is obtained by calling first undeployDatabase(String dbToUndeploy) first
-	 * to start a undeployment task.
-	 *
-	 * @param taskId
-	 * @throws GWTServiceException
-	 */
-	ClientDatabaseUndeployerProgress getProgressMessageForDatabaseUndeployment(Long taskId) throws GWTServiceException;
-
-	boolean isDatabaseUndeployerEnabled() throws GWTServiceException;
 
 	InitialPageData getInitialPageData(Integer previousSearchId) throws GWTServiceException;
 
