@@ -180,19 +180,29 @@ public final class ParameterSetCache {
 
 		final String name = getUniqueTemporaryName(originalName, temporaryClientParamSets);
 
-		// Find the minimum temporary id. Set our new id as one less the minimum (--> uniqueness)
+		final int newId = findNewTemporaryId(temporaryClientParamSets);
+
+		final ClientParamSet clientParamSet = new ClientParamSet(newId, name, ownerEmail, ownerInitials);
+
+		addToCache(clientParamSet, serverParamSet);
+
+		return clientParamSet;
+	}
+
+	/**
+	 * Find the minimum temporary id. Set our new id as one less the minimum (--> uniqueness)
+	 *
+	 * @param temporaryClientParamSets Current parameter sets.
+	 * @return New available id.
+	 */
+	private static int findNewTemporaryId(final List<ClientParamSet> temporaryClientParamSets) {
 		int minId = 0;
 		for (final ClientParamSet cps : temporaryClientParamSets) {
 			if (cps.getId() < minId) {
 				minId = cps.getId();
 			}
 		}
-
-		final ClientParamSet clientParamSet = new ClientParamSet(minId - 1, name, ownerEmail, ownerInitials);
-
-		addToCache(clientParamSet, serverParamSet);
-
-		return clientParamSet;
+		return minId - 1;
 	}
 
 	private String getUniqueTemporaryName(final String paramSetName, final List<ClientParamSet> temporaryClientParamSets) {
