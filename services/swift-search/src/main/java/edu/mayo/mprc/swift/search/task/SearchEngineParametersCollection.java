@@ -25,13 +25,13 @@ public final class SearchEngineParametersCollection {
 	private static final String DEFAULT_PARAMS_FOLDER = "params";
 
 	/**
-	 * Key: {@link SearchEngineParameters} parameter set
+	 * Key: Saved parameter set string
 	 * Value: A string uniquely identifying the parameter set.
 	 * <p/>
 	 * For the first parameter set, the string is "".
 	 * Second parameter set gets '2', and so on.
 	 */
-	private Map<SearchEngineParameters, String> parameterSuffix;
+	private Map<String, String> parameterSuffix;
 	/**
 	 * Key: {@link #getParamFileHash(SearchEngine, String)}
 	 * Value: parameter file name
@@ -43,29 +43,47 @@ public final class SearchEngineParametersCollection {
 	public SearchEngineParametersCollection(final File outputFolder, final ParamsInfo paramsInfo) {
 		this.paramsInfo = paramsInfo;
 		paramsFolder = new File(outputFolder, DEFAULT_PARAMS_FOLDER);
-		parameterSuffix = new HashMap<SearchEngineParameters, String>(10);
+		parameterSuffix = new HashMap<String, String>(10);
 		parameterFiles = new HashMap<String, File>(10);
 
 		FileUtilities.ensureFolderExists(paramsFolder);
 	}
 
-	public File getParamFile(final SearchEngine engine, final SearchEngineParameters parameters) {
-		final String suffix = getParameterSuffix(parameters);
+	/**
+	 * Saves a parameter file.
+	 *
+	 * @param engine      Engine for which to save the parameters.
+	 * @param paramString Saved parameters
+	 * @return Where were the parameters saved to
+	 */
+	public File saveParamFile(final SearchEngine engine, final String paramString) {
+		final String suffix = getParameterSuffix(paramString);
 		final String hash = getParamFileHash(engine, suffix);
 		File result = parameterFiles.get(hash);
 		if (result == null) {
-			result = engine.writeSearchEngineParameterFile(
-					paramsFolder, parameters, suffix, null /*We do not validate, validation should be already done*/, paramsInfo);
+			result = engine.getParameterFile(paramsFolder, suffix);
+			FileUtilities.writeStringToFile(result, paramString, true);
 			parameterFiles.put(hash, result);
 		}
 		return result;
 	}
 
-	private String getParameterSuffix(final SearchEngineParameters parameters) {
-		String suffix = parameterSuffix.get(parameters);
+	/**
+	 * Just get the parameter string.
+	 *
+	 * @param engine     Engine to get the string for
+	 * @param parameters Parameters to turn to string
+	 * @return Parameters serialized into a single string
+	 */
+	public String getParamString(final SearchEngine engine, final SearchEngineParameters parameters) {
+		return engine.parametersToString(parameters, null, paramsInfo);
+	}
+
+	private String getParameterSuffix(final String paramString) {
+		String suffix = parameterSuffix.get(paramString);
 		if (suffix == null) {
 			suffix = parameterSuffix.isEmpty() ? "" : String.valueOf(parameterSuffix.size() + 1);
-			parameterSuffix.put(parameters, suffix);
+			parameterSuffix.put(paramString, suffix);
 		}
 		return suffix;
 	}

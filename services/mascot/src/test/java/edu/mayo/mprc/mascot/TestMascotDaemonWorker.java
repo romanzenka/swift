@@ -1,7 +1,5 @@
 package edu.mayo.mprc.mascot;
 
-import com.google.common.base.Charsets;
-import com.google.common.io.Files;
 import edu.mayo.mprc.MprcException;
 import edu.mayo.mprc.daemon.worker.WorkPacketBase;
 import edu.mayo.mprc.daemon.worker.Worker;
@@ -21,6 +19,7 @@ import org.testng.annotations.Test;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.StringWriter;
 import java.net.MalformedURLException;
 import java.net.URL;
 
@@ -48,17 +47,17 @@ public final class TestMascotDaemonWorker {
 	@Test
 	public void shouldProvideCorrectCgiUrl() throws MalformedURLException {
 		Assert.assertEquals(MascotWorker.mascotCgiUrl(
-				new URL("http://mascot.mayo.edu/")),
+						new URL("http://mascot.mayo.edu/")),
 				new URL("http://mascot.mayo.edu/" + MascotWorker.MASCOT_CGI),
 				"Mascot CGI script path generated incorrectly");
 		Assert.assertEquals(MascotWorker.mascotCgiUrl(
-				new URL("http://crick4.mayo.edu:2080/mascot/")),
+						new URL("http://crick4.mayo.edu:2080/mascot/")),
 				new URL("http://crick4.mayo.edu:2080/mascot/" + MascotWorker.MASCOT_CGI),
 				"Mascot CGI script path generated incorrectly");
 
 		// CAREFUL! You always MUST provide the trailing slash
 		Assert.assertEquals(MascotWorker.mascotCgiUrl(
-				new URL("http://crick4.mayo.edu:2080/mascot")),
+						new URL("http://crick4.mayo.edu:2080/mascot")),
 				new URL("http://crick4.mayo.edu:2080/" + MascotWorker.MASCOT_CGI),
 				"Mascot CGI script path generated incorrectly");
 
@@ -68,14 +67,14 @@ public final class TestMascotDaemonWorker {
 	public void runMascotWorker() throws IOException {
 		final File mascotOut = new File(mascotTemp, "mascot.dat");
 
-		final File mascotParamFile = createMascotParamFile();
+		final String mascotParams = createMascotParams();
 		final MascotWorker.Config config = new MascotWorker.Config();
 		config.put(MascotWorker.MASCOT_URL, MASCOT_URL);
 		final MascotWorker.Factory factory = new MascotWorker.Factory();
 
 		final Worker worker = factory.create(config, null);
 
-		final MascotWorkPacket workPacket = new MascotWorkPacket(mascotOut, mascotParamFile, inputMgfFile, TEST_MASCOT_DB, "0", false, false);
+		final MascotWorkPacket workPacket = new MascotWorkPacket(mascotOut, mascotParams, inputMgfFile, TEST_MASCOT_DB, "0", false, false);
 		WorkPacketBase.simulateTransfer(workPacket);
 
 		worker.processRequest(workPacket, new ProgressReporter() {
@@ -101,7 +100,7 @@ public final class TestMascotDaemonWorker {
 		});
 	}
 
-	private File createMascotParamFile() throws IOException {
+	private String createMascotParams() {
 		final ParamsInfo paramsInfo = TestMascotMappings.getAbstractParamsInfo();
 		final MascotMappingFactory factory = new MascotMappingFactory();
 		factory.setParamsInfo(paramsInfo);
@@ -111,9 +110,9 @@ public final class TestMascotDaemonWorker {
 		mapping.read(mapping.baseSettings());
 		mapping.setSequenceDatabase(context, TEST_MASCOT_DB);
 
-		final File result = new File(mascotTemp, factory.getCanonicalParamFileName(""));
-		mapping.write(mapping.baseSettings(), Files.newWriter(result, Charsets.UTF_8));
+		StringWriter writer = new StringWriter(100);
+		mapping.write(mapping.baseSettings(), writer);
 
-		return result;
+		return writer.toString();
 	}
 }

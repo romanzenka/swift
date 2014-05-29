@@ -2,7 +2,6 @@ package edu.mayo.mprc.mascot;
 
 import com.google.common.base.Charsets;
 import com.google.common.io.Files;
-import edu.mayo.mprc.MprcException;
 import edu.mayo.mprc.daemon.worker.WorkPacket;
 import edu.mayo.mprc.searchengine.EngineWorkPacket;
 import edu.mayo.mprc.searchengine.SearchEngineResult;
@@ -33,13 +32,13 @@ public final class MascotWorkPacket extends EngineWorkPacket {
 		super(taskId, fromScratch);
 	}
 
-	public MascotWorkPacket(final File outputFile, final File searchParamsFile, final File inputFile, final String shortDbName, final String taskId, final boolean fromScratch, final boolean publishSearchFiles) {
-		super(inputFile, outputFile, searchParamsFile, null, publishSearchFiles, taskId, fromScratch);
+	public MascotWorkPacket(final File outputFile, final String searchParams, final File inputFile, final String shortDbName, final String taskId, final boolean fromScratch, final boolean publishSearchFiles) {
+		super(inputFile, outputFile, searchParams, null, publishSearchFiles, taskId, fromScratch);
 
 		assert inputFile != null : "Mascot request cannot be created: The input file was null";
 		assert shortDbName != null : "Mascot request cannot be created: Short database name was null";
 		assert outputFile != null : "Mascot request cannot be created: The output file was null";
-		assert searchParamsFile != null : "Mascot request cannot be created: The search params file has to be set";
+		assert searchParams != null : "Mascot request cannot be created: The search params have to be set";
 
 		this.shortDbName = shortDbName;
 	}
@@ -51,12 +50,7 @@ public final class MascotWorkPacket extends EngineWorkPacket {
 	@Override
 	public String getStringDescriptionOfTask() {
 		final StringBuilder description = new StringBuilder(100);
-		String paramString = "";
-		try {
-			paramString = Files.toString(getSearchParamsFile(), Charsets.UTF_8);
-		} catch (IOException e) {
-			throw new MprcException("Could not read Mascot parameter file: " + getSearchParamsFile().getAbsolutePath(), e);
-		}
+		String paramString = getSearchParams();
 		paramString = DELETE_HEADERS.matcher(paramString).replaceAll("");
 		description
 				.append("Input:")
@@ -75,7 +69,7 @@ public final class MascotWorkPacket extends EngineWorkPacket {
 	public WorkPacket translateToWorkInProgressPacket(final File wipFolder) {
 		return new MascotWorkPacket(
 				new File(wipFolder, getOutputFile().getName()),
-				getSearchParamsFile(),
+				getSearchParams(),
 				getInputFile(),
 				getShortDbName(),
 				getTaskId(),

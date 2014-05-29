@@ -26,7 +26,7 @@ final class EngineSearchTask extends AsyncTaskBase implements FileProducingTask 
 	private final FileProducingTask inputFile;
 	private final Curation curation;
 	private final DatabaseDeploymentResult deploymentResult;
-	private final File paramsFile;
+	private final String params;
 	private final boolean publicSearchFiles;
 	private File outputFile;
 
@@ -44,13 +44,13 @@ final class EngineSearchTask extends AsyncTaskBase implements FileProducingTask 
 			final Curation curation,
 			final DatabaseDeploymentResult deploymentResult,
 			final File outputFile,
-			final File paramsFile,
+			final String params,
 			final boolean publicSearchFiles,
 			final DaemonConnection searchEngineDaemon, final DatabaseFileTokenFactory fileTokenFactory, final boolean fromScratch) {
 		super(workflowEngine, searchEngineDaemon, fileTokenFactory, fromScratch);
 		this.engine = engine;
 		this.outputFile = outputFile;
-		this.paramsFile = paramsFile;
+		this.params = params;
 		this.inputFile = inputFile;
 		this.curation = curation;
 		this.deploymentResult = deploymentResult;
@@ -79,7 +79,7 @@ final class EngineSearchTask extends AsyncTaskBase implements FileProducingTask 
 		if ("MASCOT".equalsIgnoreCase(engine.getCode())) {
 			workPacket = new MascotWorkPacket(
 					outputFile,
-					paramsFile,
+					params,
 					inputFile.getResultingFile(),
 					deploymentResult.getShortDbName(),
 					getFullId(),
@@ -88,7 +88,7 @@ final class EngineSearchTask extends AsyncTaskBase implements FileProducingTask 
 		} else if ("SEQUEST".equalsIgnoreCase(engine.getCode())) {
 			workPacket = new SequestWorkPacket(
 					outputFile,
-					paramsFile,
+					params,
 					inputFile.getResultingFile(),
 					getSequestDatabase(),
 					publicSearchFiles,
@@ -97,7 +97,7 @@ final class EngineSearchTask extends AsyncTaskBase implements FileProducingTask 
 		} else if ("TANDEM".equalsIgnoreCase(engine.getCode())) {
 			workPacket = new XTandemWorkPacket(
 					inputFile.getResultingFile(),
-					paramsFile,
+					params,
 					outputFile,
 					curation.getCurationFile(),
 					publicSearchFiles,
@@ -106,7 +106,7 @@ final class EngineSearchTask extends AsyncTaskBase implements FileProducingTask 
 		} else if ("OMSSA".equalsIgnoreCase(engine.getCode())) {
 			workPacket = new OmssaWorkPacket(
 					outputFile,
-					paramsFile,
+					params,
 					inputFile.getResultingFile(),
 					deploymentResult.getFastaFile(),
 					deploymentResult.getGeneratedFiles(),
@@ -115,7 +115,7 @@ final class EngineSearchTask extends AsyncTaskBase implements FileProducingTask 
 					isFromScratch());
 		} else if ("MYRIMATCH".equalsIgnoreCase(engine.getCode())) {
 			workPacket = new MyriMatchWorkPacket(
-					outputFile, paramsFile, inputFile.getResultingFile(),
+					outputFile, params, inputFile.getResultingFile(),
 					curation.getCurationFile(),
 					curation.getDecoyRegex(),
 					publicSearchFiles, getFullId(),
@@ -148,7 +148,6 @@ final class EngineSearchTask extends AsyncTaskBase implements FileProducingTask 
 
 		setDescription(engine.getFriendlyName() + " search: "
 				+ fileTokenFactory.fileToTaggedDatabaseToken(inputFile.getResultingFile())
-				+ " params: " + fileTokenFactory.fileToTaggedDatabaseToken(paramsFile)
 				+ " db: " + deployedFileDbString
 				+ (mascotResultLink != null ? " <a href=\"" + mascotResultLink + "\">Open in Mascot</a>" : ""));
 	}
@@ -213,7 +212,7 @@ final class EngineSearchTask extends AsyncTaskBase implements FileProducingTask 
 		if (inputFile != null ? !inputFile.equals(that.inputFile) : that.inputFile != null) {
 			return false;
 		}
-		if (paramsFile != null ? !paramsFile.equals(that.paramsFile) : that.paramsFile != null) {
+		if (params != null ? !params.equals(that.params) : that.params != null) {
 			return false;
 		}
 
@@ -224,7 +223,7 @@ final class EngineSearchTask extends AsyncTaskBase implements FileProducingTask 
 	public int hashCode() {
 		int result = engine != null ? engine.hashCode() : 0;
 		result = 31 * result + (inputFile != null ? inputFile.hashCode() : 0);
-		result = 31 * result + (paramsFile != null ? paramsFile.hashCode() : 0);
+		result = 31 * result + (params != null ? params.hashCode() : 0);
 		result = 31 * result + (publicSearchFiles ? 1 : 0);
 		return result;
 	}

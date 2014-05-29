@@ -1,14 +1,10 @@
 package edu.mayo.mprc.searchengine;
 
-import com.google.common.base.Charsets;
-import com.google.common.io.Files;
-import edu.mayo.mprc.MprcException;
 import edu.mayo.mprc.daemon.CachableWorkPacket;
 import edu.mayo.mprc.daemon.worker.WorkPacketBase;
 import edu.mayo.mprc.utilities.progress.ProgressReporter;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 
@@ -17,33 +13,28 @@ import java.util.List;
  * <ul>
  * <li>an input file to be processed</li>
  * <li>an output file to be generated that contains results of the processing</li>
- * <li>A parameter file. This contains all the search engine settings, the idea is that if you run the same engine on the
- * same input file with the same parameter file, you should get the same output.</li>
+ * <li>A parameter string. This contains all the search engine settings, the idea is that if you run the same engine on the
+ * same input file with the same parameters, you should get the same output. The string will be typically written to a
+ * file prior to invoking the search engine, it can be modified (e.g. for tandem we use the locally available cores).
+ * However, for purposes of checking if two engines did the same work, only the original string representation is used.</li>
  * <li>a link to the FASTA database file to do the processing with (can be omitted for engines like Mascot)</li>
  * <li>a flag whether to publish the resulting files or keep them in a cache. This is ignored by the search engine itself,
  * the caches act upon this information.</li>
  * </ul>
  * <p/>
- * The concept of the parameter file can quite confusing. We are basically splitting the search engine implementation into two parts:
+ * The concept of the parameter string can quite confusing. We are basically splitting the search engine implementation into two parts:
  * <ul>
- * <li>the first part creates the parameter file using one of the Mappings classes.</li>
- * <li>the search engine gets this pre-chewed information in a form of a parameter file and just does the search</li>
+ * <li>the first part creates the parameter string using one of the Mappings classes.</li>
+ * <li>the search engine gets this pre-chewed information in a form of a parameter string and just does the search</li>
  * </ul>
- * Why is this done this way? Much simpler solution would be to actually send the input parameters directly to the search engine.
  * <p/>
- * The reasons are following:
- * <ul>
- * <li>Parameter files are very important to the scientist. They document exactly what was the search engine told to do.
- * Because of that, the files are available even before the search starts, so they can be reviewed.</li>
- * <li>Having the parameters serialized before search is started enables a generic caching mechanism to check whether
- * the work was already done before or not. The cache needs to store the parameters in a serialized form anyway.</li>
- * </ul>
+ * The parameter string helps us implement some functionality, such as caching (where parameters need to be compared).
  */
 public abstract class EngineWorkPacket extends WorkPacketBase implements CachableWorkPacket {
 	private static final long serialVersionUID = 20090402L;
 
 	private File outputFile; //will use the parent File as the work folder
-	private File searchParamsFile;
+	private String searchParams;
 	private File databaseFile;
 	private File inputFile;
 	private boolean publishResultFiles;
@@ -52,14 +43,14 @@ public abstract class EngineWorkPacket extends WorkPacketBase implements Cachabl
 		super(taskId, fromScratch);
 	}
 
-	public EngineWorkPacket(final File inputFile, final File outputFile, final File searchParamsFile, final File databaseFile, final boolean publishResultFiles, final String taskId, final boolean fromScratch) {
+	public EngineWorkPacket(final File inputFile, final File outputFile, final String searchParams, final File databaseFile, final boolean publishResultFiles, final String taskId, final boolean fromScratch) {
 		super(taskId, fromScratch);
 
 		assert outputFile != null : "output file was null.";
 		assert inputFile != null : "input file was null";
 
 		this.outputFile = outputFile;
-		this.searchParamsFile = searchParamsFile;
+		this.searchParams = searchParams;
 		this.inputFile = inputFile;
 		this.databaseFile = databaseFile;
 		this.publishResultFiles = publishResultFiles;
@@ -78,15 +69,14 @@ public abstract class EngineWorkPacket extends WorkPacketBase implements Cachabl
 		return outputFile;
 	}
 
+	public String getSearchParams() {
+		return searchParams;
+	}
+
 	@Override
 	public String getStringDescriptionOfTask() {
 		final StringBuilder description = new StringBuilder();
-		String paramString = "";
-		try {
-			paramString = Files.toString(getSearchParamsFile(), Charsets.UTF_8);
-		} catch (IOException e) {
-			throw new MprcException("Could not read parameter file: " + getSearchParamsFile().getAbsolutePath(), e);
-		}
+		String paramString = searchParams;
 		description
 				.append("Input:")
 				.append(getInputFile().getAbsolutePath())
@@ -98,7 +88,7 @@ public abstract class EngineWorkPacket extends WorkPacketBase implements Cachabl
 					.append('\n');
 		}
 
-		description.append("ParamFile:\n---\n")
+		description.append("Params:\n---\n")
 				.append(paramString)
 				.append("---\n");
 		return description.toString();
@@ -120,10 +110,6 @@ public abstract class EngineWorkPacket extends WorkPacketBase implements Cachabl
 	@Override
 	public void reportCachedResult(final ProgressReporter reporter, final File targetFolder, final List<String> outputFiles) {
 		reporter.reportProgress(new SearchEngineResult(new File(targetFolder, outputFiles.get(0))));
-	}
-
-	public File getSearchParamsFile() {
-		return searchParamsFile;
 	}
 
 	@Override
@@ -154,7 +140,7 @@ public abstract class EngineWorkPacket extends WorkPacketBase implements Cachabl
 		if (outputFile != null ? !outputFile.equals(that.outputFile) : that.outputFile != null) {
 			return false;
 		}
-		if (searchParamsFile != null ? !searchParamsFile.equals(that.searchParamsFile) : that.searchParamsFile != null) {
+		if (searchParams != null ? !searchParams.equals(that.searchParams) : that.searchParams != null) {
 			return false;
 		}
 
@@ -164,7 +150,7 @@ public abstract class EngineWorkPacket extends WorkPacketBase implements Cachabl
 	@Override
 	public int hashCode() {
 		int result = outputFile != null ? outputFile.hashCode() : 0;
-		result = 31 * result + (searchParamsFile != null ? searchParamsFile.hashCode() : 0);
+		result = 31 * result + (searchParams != null ? searchParams.hashCode() : 0);
 		result = 31 * result + (databaseFile != null ? databaseFile.hashCode() : 0);
 		result = 31 * result + (inputFile != null ? inputFile.hashCode() : 0);
 		result = 31 * result + (publishResultFiles ? 1 : 0);
@@ -174,7 +160,6 @@ public abstract class EngineWorkPacket extends WorkPacketBase implements Cachabl
 	public String toString() {
 		return "\n\tinput file: " + getInputFile()
 				+ "\n\tfasta file: " + getDatabaseFile()
-				+ "\n\toutput file: " + getOutputFile()
-				+ "\n\tsearch params: " + getSearchParamsFile();
+				+ "\n\toutput file: " + getOutputFile();
 	}
 }

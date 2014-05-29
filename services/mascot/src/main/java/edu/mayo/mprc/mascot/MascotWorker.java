@@ -78,7 +78,7 @@ public final class MascotWorker extends WorkerBase {
 	public void process(final WorkPacket workPacket, final File tempWorkFolder, final UserProgressReporter progressReporter) {
 		final MascotWorkPacket mascotWorkPacket = (MascotWorkPacket) workPacket;
 		assert mascotWorkPacket.getInputFile() != null : "Mascot search failed: input file not specified";
-		assert mascotWorkPacket.getSearchParamsFile() != null : "Mascot search failed: param file not specified";
+		assert mascotWorkPacket.getSearchParams() != null : "Mascot search failed: params not specified";
 		assert mascotWorkPacket.getOutputFile() != null : "Mascot search failed: output file not specified";
 		assert mascotWorkPacket.getShortDbName() != null : "Mascot search failed: short db name not specified";
 
@@ -103,17 +103,18 @@ public final class MascotWorker extends WorkerBase {
 			}
 
 			// We have to modify the mascot params file, replacing the ${DB:whatever} tag with the supplied short db name.
-			final StreamRegExMatcher matcher = new StreamRegExMatcher(DB_TAG_PATTERN, mascotWorkPacket.getSearchParamsFile());
+			final StreamRegExMatcher matcher = new StreamRegExMatcher(DB_TAG_PATTERN, mascotWorkPacket.getSearchParams());
 			matcher.replaceAll(new ImmutableMap.Builder<Pattern, String>()
 					.put(DB_TAG_PATTERN, Matcher.quoteReplacement(mascotWorkPacket.getShortDbName()))
 					.put(INPUT_FORMAT_PATTERN, Matcher.quoteReplacement(inputFormat))
 					.build());
-			matcher.writeContentsToFile(mascotWorkPacket.getSearchParamsFile());
+
+			final String mascotParams = matcher.getContents();
 			matcher.close();
 
 			// Now we can run the search
 			search(
-					mascotWorkPacket.getSearchParamsFile().getAbsolutePath(),
+					mascotParams,
 					mascotWorkPacket.getInputFile().getAbsolutePath(),
 					progressReporter);
 
@@ -287,23 +288,16 @@ public final class MascotWorker extends WorkerBase {
 	}
 
 	public void search(final String parameters, final String data, final UserProgressReporter progressReporter) {
-		if (!new File(parameters.trim()).exists()) {
-			throw new MprcException("parameters file does not exist: " + parameters.trim());
-		}
 		if (!new File(data.trim()).exists()) {
 			throw new MprcException("data file does not exist: " + data.trim());
 		}
 
-		LOGGER.debug("Searching " + data + " with parameters " + parameters);
+		LOGGER.debug("Searching " + data);
 		BufferedReader reader = null;
 		Map<String, String> hash = null;
 		try {
-			reader = new BufferedReader(new InputStreamReader(new FileInputStream(parameters.trim()), "UTF-8"));
+			reader = new BufferedReader(new StringReader(parameters));
 			hash = readParameters(reader);
-		} catch (final FileNotFoundException e) {
-			throw new MprcException("Cannot find Mascot parameters file " + parameters, e);
-		} catch (final UnsupportedEncodingException e) {
-			throw new MprcException("Unsupported mascot parameter file encoding", e);
 		} catch (final IOException e) {
 			throw new MprcException("Exception accessing mascot parameter file " + parameters, e);
 		} finally {

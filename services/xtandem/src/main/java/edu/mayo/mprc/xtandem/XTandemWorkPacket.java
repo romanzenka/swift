@@ -16,17 +16,17 @@ public final class XTandemWorkPacket extends EngineWorkPacket {
 	/**
 	 * Encapsulates a packet of work for X!Tandem.
 	 *
-	 * @param searchParamsFile Parameter template that is used to generate specific X!Tandem input file.
-	 * @param outputFile       Where should X!Tandem put the results to.
+	 * @param searchParams Parameter template that is used to generate specific X!Tandem input file.
+	 * @param outputFile   Where should X!Tandem put the results to.
 	 */
-	public XTandemWorkPacket(final File inputFile, final File searchParamsFile, final File outputFile, final File databaseFile, final boolean publishSearchFiles, final String taskId, final boolean fromScratch) {
-		super(inputFile, outputFile, searchParamsFile, databaseFile, publishSearchFiles, taskId, fromScratch);
+	public XTandemWorkPacket(final File inputFile, final String searchParams, final File outputFile, final File databaseFile, final boolean publishSearchFiles, final String taskId, final boolean fromScratch) {
+		super(inputFile, outputFile, searchParams, databaseFile, publishSearchFiles, taskId, fromScratch);
 
 		if (inputFile == null) {
 			throw new MprcException("X!Tandem request cannot be created: The input file was null");
 		}
-		if (searchParamsFile == null) {
-			throw new MprcException("X!Tandem request cannot be created: The search params file has to be set");
+		if (searchParams == null) {
+			throw new MprcException("X!Tandem request cannot be created: The search params have to be set");
 		}
 		if (outputFile == null) {
 			throw new MprcException("X!Tandem request cannot be created: The resulting file was null");
@@ -40,7 +40,7 @@ public final class XTandemWorkPacket extends EngineWorkPacket {
 	public WorkPacket translateToWorkInProgressPacket(final File wipFolder) {
 		return new XTandemWorkPacket(
 				getInputFile(),
-				getSearchParamsFile(),
+				getSearchParams(),
 				new File(wipFolder, getOutputFile().getName()),
 				getDatabaseFile(),
 				isPublishResultFiles(),

@@ -11,15 +11,15 @@ import java.io.File;
 public final class SequestWorkPacket extends EngineWorkPacket {
 	private static final long serialVersionUID = 20101221L;
 
-	public SequestWorkPacket(final File outputFile, final File searchParamsFile, final File inputFile, final File databaseFile, final boolean publishSearchFiles, final String taskId, final boolean fromScratch) {
-		super(inputFile, outputFile, searchParamsFile, databaseFile, publishSearchFiles, taskId, fromScratch);
+	public SequestWorkPacket(final File outputFile, final String searchParams, final File inputFile, final File databaseFile, final boolean publishSearchFiles, final String taskId, final boolean fromScratch) {
+		super(inputFile, outputFile, searchParams, databaseFile, publishSearchFiles, taskId, fromScratch);
 	}
 
 	@Override
 	public WorkPacket translateToWorkInProgressPacket(final File wipFolder) {
 		return new SequestWorkPacket(
 				new File(wipFolder, getOutputFile().getName()),
-				getSearchParamsFile(),
+				getSearchParams(),
 				getInputFile(),
 				getDatabaseFile(),
 				isPublishResultFiles(),

@@ -1,7 +1,5 @@
 package edu.mayo.mprc.omssa;
 
-import com.google.common.base.Charsets;
-import com.google.common.io.Files;
 import edu.mayo.mprc.MprcException;
 import edu.mayo.mprc.daemon.worker.WorkPacketBase;
 import edu.mayo.mprc.dbcurator.model.Curation;
@@ -18,10 +16,10 @@ import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-import java.io.BufferedWriter;
 import java.io.File;
 import java.io.IOException;
 import java.io.Reader;
+import java.io.StringWriter;
 import java.util.LinkedList;
 
 public class TestOmssaWorker {
@@ -97,7 +95,7 @@ public class TestOmssaWorker {
 			final File omssaOut = new File(omssaTemp, "omssa.out");
 			final File inputMgfFile = new File(mgfFolder, "test.mgf");
 
-			final File omssaParamFile = makeParamsFile();
+			final String omssaParams = makeParams();
 
 			String omssaclPath = null;
 
@@ -116,7 +114,7 @@ public class TestOmssaWorker {
 
 			final OmssaWorker omssaWorker = (OmssaWorker) factory.create(omssaConfig, null);
 
-			final OmssaWorkPacket workPacket = new OmssaWorkPacket(omssaOut, omssaParamFile, inputMgfFile, omssaDeployedFile, new LinkedList<File>(), false, "0", false);
+			final OmssaWorkPacket workPacket = new OmssaWorkPacket(omssaOut, omssaParams, inputMgfFile, omssaDeployedFile, new LinkedList<File>(), false, "0", false);
 			WorkPacketBase.simulateTransfer(workPacket);
 
 			omssaWorker.processRequest(workPacket, new ProgressReporter() {
@@ -145,21 +143,19 @@ public class TestOmssaWorker {
 		}
 	}
 
-	private File makeParamsFile() throws IOException {
+	private String makeParams() {
 		final OmssaMappingFactory mappingFactory = new OmssaMappingFactory();
 		final Mappings mapping = mappingFactory.createMapping();
 		final Reader isr = mapping.baseSettings();
 		mapping.read(isr);
 		FileUtilities.closeQuietly(isr);
 
-		final File omssaParamFile = new File(omssaTemp, mappingFactory.getCanonicalParamFileName(""));
-
-		final BufferedWriter writer = Files.newWriter(omssaParamFile, Charsets.UTF_8);
+		final StringWriter writer = new StringWriter(100);
 		final Reader oldParams = mapping.baseSettings();
 		mapping.write(oldParams, writer);
 		FileUtilities.closeQuietly(oldParams);
 		FileUtilities.closeQuietly(writer);
-		return omssaParamFile;
+		return writer.toString();
 	}
 
 }

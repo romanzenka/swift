@@ -2,6 +2,7 @@ package edu.mayo.mprc.myrimatch;
 
 import com.google.common.base.Charsets;
 import com.google.common.base.Joiner;
+import com.google.common.base.Splitter;
 import com.google.common.io.Files;
 import edu.mayo.mprc.MprcException;
 import edu.mayo.mprc.config.DaemonConfig;
@@ -26,9 +27,11 @@ import org.springframework.stereotype.Component;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.regex.Pattern;
 
 public final class MyriMatchWorker extends WorkerBase {
 	private static final Logger LOGGER = Logger.getLogger(MyriMatchWorker.class);
@@ -66,7 +69,7 @@ public final class MyriMatchWorker extends WorkerBase {
 		final File fastaFile = packet.getDatabaseFile();
 
 		final File inputFile = packet.getInputFile();
-		final File paramsFile = packet.getSearchParamsFile();
+		final String params = packet.getSearchParams();
 
 		final File finalOutputFile = packet.getOutputFile();
 		final File outputFile = getTempOutputFile(tempWorkFolder, finalOutputFile);
@@ -80,33 +83,35 @@ public final class MyriMatchWorker extends WorkerBase {
 
 		LOGGER.debug("Fasta file " + fastaFile.getAbsolutePath() + " does" + (fastaFile.exists() && fastaFile.length() > 0 ? " " : " not ") + "exist.");
 		LOGGER.debug("Input file " + inputFile.getAbsolutePath() + " does" + (inputFile.exists() && inputFile.length() > 0 ? " " : " not ") + "exist.");
-		LOGGER.debug("Parameter file " + paramsFile.getAbsolutePath() + " does" + (paramsFile.exists() && paramsFile.length() > 0 ? " " : " not ") + "exist.");
 
-		final File modifiedParamsFile = MyriMatchMappingFactory.resultingParamsFile(paramsFile);
-		if (!modifiedParamsFile.exists() || modifiedParamsFile.lastModified() < paramsFile.lastModified()) {
+		final File modifiedParamsFile = new File(tempWorkFolder, "myrimatch.cfg");
+		if (!modifiedParamsFile.exists()) {
 
 			try {
-				final List<String> lines = Files.readLines(paramsFile, Charsets.US_ASCII);
+				final Iterable<String> lines = Splitter.on(Pattern.compile("\\n|\\r")).omitEmptyStrings().trimResults().split(params);
 				int i = 0;
 				boolean wasDecoyPrefix = false;
+				final List<String> result = new ArrayList<String>(100);
 				for (final String line : lines) {
 					if (line.startsWith("DecoyPrefix")) {
 						wasDecoyPrefix = true;
-						lines.set(i, "DecoyPrefix = \"" + packet.getDecoySequencePrefix() + "\"");
+						result.add("DecoyPrefix = \"" + packet.getDecoySequencePrefix() + "\"");
+					} else {
+						result.add(line);
 					}
 
 					i++;
 				}
 				if (!wasDecoyPrefix) {
-					lines.add("");
-					lines.add("# Decoy sequence prefix is appended to all decoy matches");
-					lines.add("DecoyPrefix = " + packet.getDecoySequencePrefix());
+					result.add("");
+					result.add("# Decoy sequence prefix is appended to all decoy matches");
+					result.add("DecoyPrefix = " + packet.getDecoySequencePrefix());
 				}
 
 				Files.write(Joiner.on('\n').join(lines), modifiedParamsFile, Charsets.US_ASCII);
 
 			} catch (final IOException e) {
-				throw new MprcException("Could not append information to parameter file " + paramsFile.getAbsolutePath(), e);
+				throw new MprcException("Could not append information to parameter file " + modifiedParamsFile.getAbsolutePath(), e);
 			}
 		}
 
@@ -156,8 +161,8 @@ public final class MyriMatchWorker extends WorkerBase {
 	}
 
 	private void checkPacketCorrectness(final MyriMatchWorkPacket packet) {
-		if (packet.getSearchParamsFile() == null) {
-			throw new MprcException("Params file must not be null");
+		if (packet.getSearchParams() == null) {
+			throw new MprcException("Params must not be null");
 		}
 		if (packet.getOutputFile() == null) {
 			throw new MprcException("Result file must not be null");

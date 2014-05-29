@@ -27,7 +27,6 @@ import org.testng.annotations.Test;
 import org.xml.sax.SAXException;
 
 import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.net.URL;
@@ -235,13 +234,13 @@ public final class MyriMatchTest extends XMLTestCase {
 		mappings.setProtease(mappingContext, new Protease("Trypsin (allow P)", "KR", ""));
 		mappings.setMissedCleavages(mappingContext, 2);
 
-		final File configFile = new File(tempFolder, "myrimatch.cfg");
-		final FileWriter writer = new FileWriter(configFile);
+		final StringWriter writer = new StringWriter(100);
 		try {
 			mappings.write(mappings.baseSettings(), writer);
 		} finally {
 			FileUtilities.closeQuietly(writer);
 		}
+		final String config = writer.toString();
 
 		final File fastaFile =
 				TestingUtilities.getTempFileFromResource(MyriMatchTest.class, "/edu/mayo/mprc/myrimatch/database.fasta", false, tempFolder, ".fasta");
@@ -250,7 +249,7 @@ public final class MyriMatchTest extends XMLTestCase {
 
 		final File resultFile = new File(tempFolder, "result.pepXML");
 
-		final MyriMatchWorkPacket work = new MyriMatchWorkPacket(resultFile, configFile, mgfFile, fastaFile, "Rev_", false, "Test MyriMatch run", false);
+		final MyriMatchWorkPacket work = new MyriMatchWorkPacket(resultFile, config, mgfFile, fastaFile, "Rev_", false, "Test MyriMatch run", false);
 
 		final MyriMatchWorker worker = new MyriMatchWorker(myrimatchExecutable);
 
@@ -314,7 +313,6 @@ public final class MyriMatchTest extends XMLTestCase {
 			String expectedString = Resources.toString(resource, CHARSET);
 			expectedString = expectedString.replaceAll("\r\n", "\n");
 
-			FileUtilities.cleanupTempFile(configFile);
 			FileUtilities.cleanupTempFile(fastaFile);
 			FileUtilities.cleanupTempFile(resultFile);
 			FileUtilities.cleanupTempFile(new File(tempFolder, fastaFile.getName() + ".index"));
@@ -450,10 +448,4 @@ public final class MyriMatchTest extends XMLTestCase {
 
 		return (MyriMatchWorker) factory.create(config, resolver);
 	}
-
-	@Test
-	public void shouldProvideProperTemplateName() {
-		Assert.assertEquals(MyriMatchMappingFactory.resultingParamsFile(new File("/a/b/test1.template.cfg.template.cfg")), new File("/a/b/test1.template.cfg.cfg"));
-	}
-
 }

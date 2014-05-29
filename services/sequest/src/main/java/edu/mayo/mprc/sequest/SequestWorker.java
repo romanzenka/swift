@@ -15,6 +15,7 @@ import edu.mayo.mprc.daemon.worker.WorkerFactoryBase;
 import edu.mayo.mprc.searchengine.EngineFactory;
 import edu.mayo.mprc.searchengine.EngineMetadata;
 import edu.mayo.mprc.sequest.core.Mgf2SequestCaller;
+import edu.mayo.mprc.utilities.FileUtilities;
 import edu.mayo.mprc.utilities.progress.UserProgressReporter;
 import org.apache.log4j.Logger;
 import org.springframework.stereotype.Component;
@@ -45,7 +46,7 @@ public final class SequestWorker extends WorkerBase {
 			Preconditions.checkNotNull(sequestWorkPacket.getInputFile(), "Sequest search failed: The input file was not specified");
 			Preconditions.checkNotNull(sequestWorkPacket.getDatabaseFile(), "Sequest search failed: The .hdr file was not specified");
 			Preconditions.checkNotNull(sequestWorkPacket.getOutputFile(), "Sequest search failed: The output folder was not specified");
-			Preconditions.checkNotNull(sequestWorkPacket.getSearchParamsFile(), "Sequest search failed: The search parameters were not specified");
+			Preconditions.checkNotNull(sequestWorkPacket.getSearchParams(), "Sequest search failed: The search parameters were not specified");
 
 		} else {
 			throw new DaemonException("Unexpected packet type " + workPacket.getClass().getName() + ", expected " + SequestWorkPacket.class.getName());
@@ -57,17 +58,19 @@ public final class SequestWorker extends WorkerBase {
 		LOGGER.debug("Starting sequest search"
 				+ "\n\tinput file: " + sequestWorkPacket.getInputFile()
 				+ "\n\thdr file: " + sequestWorkPacket.getDatabaseFile()
-				+ "\n\toutput file: " + outputFile
-				+ "\n\tsearch params: " + sequestWorkPacket.getSearchParamsFile());
+				+ "\n\toutput file: " + outputFile);
 
 		final Mgf2SequestCaller m = new Mgf2SequestCaller();
 
 		m.setHostsFile(pvmHosts);
 		m.setSequestExe(sequestCommand);
 
+		final File searchParamsFile = new File(tempWorkFolder, "sequest.params");
+		FileUtilities.writeStringToFile(searchParamsFile, sequestWorkPacket.getSearchParams(), true);
+
 		m.callSequest(
 				outputFile,
-				sequestWorkPacket.getSearchParamsFile(),
+				searchParamsFile,
 				sequestWorkPacket.getInputFile(),
 				120 * 1000/* start timeout */,
 				10 * 60 * 1000 /* watchdog timeout */,

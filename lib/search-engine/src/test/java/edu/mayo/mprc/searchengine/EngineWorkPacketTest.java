@@ -16,7 +16,7 @@ public final class EngineWorkPacketTest {
 		final EngineWorkPacket packet = new TestEngineWorkPacket(
 				new File("input"),
 				new File("output"),
-				new File("search"),
+				"search parameters",
 				new File("database"),
 				true,
 				"task",
@@ -33,8 +33,8 @@ public final class EngineWorkPacketTest {
 
 		private static final long serialVersionUID = 4029468324506386517L;
 
-		TestEngineWorkPacket(final File inputFile, final File outputFile, final File searchParamsFile, final File databaseFile, final boolean publishResultFiles, final String taskId, final boolean fromScratch) {
-			super(inputFile, outputFile, searchParamsFile, databaseFile, publishResultFiles, taskId, fromScratch);
+		TestEngineWorkPacket(final File inputFile, final File outputFile, final String searchParams, final File databaseFile, final boolean publishResultFiles, final String taskId, final boolean fromScratch) {
+			super(inputFile, outputFile, searchParams, databaseFile, publishResultFiles, taskId, fromScratch);
 		}
 
 		@Override

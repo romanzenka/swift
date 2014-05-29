@@ -20,8 +20,8 @@ public final class OmssaWorkPacket extends EngineWorkPacket {
 		super(taskId, fromScratch);
 	}
 
-	public OmssaWorkPacket(final File outputFile, final File searchParamsFile, final File mgfFile, final File databaseFile, final List<File> databaseRelatedFiles, final boolean publishSearchFiles, final String taskId, final boolean fromScratch) {
-		super(mgfFile, outputFile, searchParamsFile, databaseFile, publishSearchFiles, taskId, fromScratch);
+	public OmssaWorkPacket(final File outputFile, final String searchParams, final File mgfFile, final File databaseFile, final List<File> databaseRelatedFiles, final boolean publishSearchFiles, final String taskId, final boolean fromScratch) {
+		super(mgfFile, outputFile, searchParams, databaseFile, publishSearchFiles, taskId, fromScratch);
 
 		this.databaseRelatedFiles = databaseRelatedFiles;
 	}
@@ -38,7 +38,7 @@ public final class OmssaWorkPacket extends EngineWorkPacket {
 	public WorkPacket translateToWorkInProgressPacket(final File wipFolder) {
 		return new OmssaWorkPacket(
 				new File(wipFolder, getOutputFile().getName()),
-				getSearchParamsFile(),
+				getSearchParams(),
 				getInputFile(),
 				getDatabaseFile(),
 				getDatabaseRelatedFiles(),

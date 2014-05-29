@@ -1,7 +1,5 @@
 package edu.mayo.mprc.xtandem;
 
-import com.google.common.base.Charsets;
-import com.google.common.io.Files;
 import edu.mayo.mprc.MprcException;
 import edu.mayo.mprc.daemon.worker.WorkPacketBase;
 import edu.mayo.mprc.daemon.worker.Worker;
@@ -22,6 +20,7 @@ import org.testng.annotations.Test;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.StringWriter;
 
 public class TestTandem {
 	private static final Logger LOGGER = Logger.getLogger(TestTandem.class);
@@ -67,7 +66,7 @@ public class TestTandem {
 			final File tandemOut = new File(tandemTemp, "out");
 			FileUtilities.ensureFolderExists(tandemOut);
 
-			final File tandemParamFile = getTandemParams();
+			final String tandemParams = getTandemParams();
 
 			String tandemExecutable = new File(tandemInstallFolder, "tandem.exe").getAbsolutePath();
 
@@ -84,7 +83,7 @@ public class TestTandem {
 
 			final File resultFile = new File(tandemOut, "tandemResult.xml");
 
-			final XTandemWorkPacket workPacket = new XTandemWorkPacket(inputMgfFile, tandemParamFile, resultFile, fastaFile, false, "0", false);
+			final XTandemWorkPacket workPacket = new XTandemWorkPacket(inputMgfFile, tandemParams, resultFile, fastaFile, false, "0", false);
 			WorkPacketBase.simulateTransfer(workPacket);
 
 			worker.processRequest(workPacket, new ProgressReporter() {
@@ -123,13 +122,14 @@ public class TestTandem {
 		createTestMappings(mappingFactory);
 	}
 
-	private File getTandemParams() throws IOException {
+	private String getTandemParams() throws IOException {
 		final Mappings mapping = createTestMappings(mappingFactory);
 
 		final File paramFile = new File(tandemTemp, mappingFactory.getCanonicalParamFileName(""));
-		mapping.write(mapping.baseSettings(), Files.newWriter(paramFile, Charsets.UTF_8));
+		StringWriter writer = new StringWriter(100);
+		mapping.write(mapping.baseSettings(), writer);
 
-		return paramFile;
+		return writer.toString();
 	}
 
 	private Mappings createTestMappings(final XTandemMappingFactory mappingFactory) {

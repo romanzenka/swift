@@ -34,6 +34,16 @@ public final class StreamRegExMatcher {
 		contents = new StringBuilder(Files.toString(file, Charsets.UTF_8));
 	}
 
+	public StreamRegExMatcher(final String toMatchIn) {
+		this(null, toMatchIn);
+	}
+
+	public StreamRegExMatcher(final Pattern toLookFor, final String toMatchIn) {
+		pattern = toLookFor;
+		contents = new StringBuilder(toMatchIn);
+	}
+
+
 	public StreamRegExMatcher(final File toMatchIn) throws IOException {
 		this(null, toMatchIn);
 	}

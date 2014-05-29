@@ -19,15 +19,15 @@ public final class MyriMatchWorkPacket extends EngineWorkPacket {
 	/**
 	 * Encapsulates a packet of work for MyriMatch.
 	 */
-	public MyriMatchWorkPacket(final File outputFile, final File searchParamsFile, final File inputFile, final File databaseFile,
+	public MyriMatchWorkPacket(final File outputFile, final String searchParams, final File inputFile, final File databaseFile,
 	                           final String decoySequencePrefix, final boolean publishSearchFiles, final String taskId, final boolean fromScratch) {
-		super(inputFile, outputFile, searchParamsFile, databaseFile, publishSearchFiles, taskId, fromScratch);
+		super(inputFile, outputFile, searchParams, databaseFile, publishSearchFiles, taskId, fromScratch);
 
 		if (inputFile == null) {
 			throw new MprcException("MyriMatch request cannot be created: The .mgf file was null");
 		}
-		if (searchParamsFile == null) {
-			throw new MprcException("MyriMatch request cannot be created: The search params file has to be set");
+		if (searchParams == null) {
+			throw new MprcException("MyriMatch request cannot be created: The search params have to be set");
 		}
 		if (outputFile == null) {
 			throw new MprcException("MyriMatch request cannot be created: The resulting file was null");
@@ -46,7 +46,9 @@ public final class MyriMatchWorkPacket extends EngineWorkPacket {
 	@Override
 	public WorkPacket translateToWorkInProgressPacket(final File wipFolder) {
 		return new MyriMatchWorkPacket(
-				new File(wipFolder, getOutputFile().getName()), getSearchParamsFile(), getInputFile(),
+				new File(wipFolder, getOutputFile().getName()),
+				getSearchParams(),
+				getInputFile(),
 				getDatabaseFile(),
 				getDecoySequencePrefix(),
 				isPublishResultFiles(),

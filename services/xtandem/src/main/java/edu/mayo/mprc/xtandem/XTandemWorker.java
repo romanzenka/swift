@@ -2,6 +2,7 @@ package edu.mayo.mprc.xtandem;
 
 import com.google.common.base.Charsets;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.io.Files;
 import edu.mayo.mprc.MprcException;
 import edu.mayo.mprc.config.DaemonConfig;
 import edu.mayo.mprc.config.DependencyResolver;
@@ -75,7 +76,14 @@ public final class XTandemWorker extends WorkerBase {
 		final Config config = new Config(tandemExecutable);
 		final Worker worker = factory.create(config, null);
 
-		final XTandemWorkPacket packet = new XTandemWorkPacket(inputFile, searchParamsFile, outputFile, databaseFile, false, "1", false);
+		final String searchParams;
+		try {
+			searchParams = Files.toString(searchParamsFile, Charsets.UTF_8);
+		} catch (IOException e) {
+			throw new MprcException("Could not read parameters file " + searchParamsFile.getAbsolutePath(), e);
+		}
+
+		final XTandemWorkPacket packet = new XTandemWorkPacket(inputFile, searchParams, outputFile, databaseFile, false, "1", false);
 
 		worker.processRequest(packet, new ProgressReporter() {
 			@Override
@@ -136,7 +144,6 @@ public final class XTandemWorker extends WorkerBase {
 				+ "--" + TANDEM_EXECUTABLE + " '" + tandemExecutable.getPath() + "' "
 				+ "--" + INPUT_FILE + " '" + packet.getInputFile().getPath() + "' "
 				+ "--" + OUTPUT_FILE + " '" + outputFile.getPath() + "' "
-				+ "--" + SEARCH_PARAMS_FILE + " '" + packet.getSearchParamsFile().getPath() + "' "
 				+ "--" + DATABASE_FILE + " '" + packet.getDatabaseFile().getPath() + "' ");
 		checkPacketCorrectness(packet);
 
@@ -148,7 +155,7 @@ public final class XTandemWorker extends WorkerBase {
 		ProcessCaller processCaller = runTandemSearch(
 				packet.getDatabaseFile(),
 				packet.getInputFile(),
-				packet.getSearchParamsFile(),
+				packet.getSearchParams(),
 				tempWorkFolder,
 				outputFile,
 				taxonomyXmlFile,
@@ -159,7 +166,7 @@ public final class XTandemWorker extends WorkerBase {
 			processCaller = runTandemSearch(
 					packet.getDatabaseFile(),
 					packet.getInputFile(),
-					packet.getSearchParamsFile(),
+					packet.getSearchParams(),
 					tempWorkFolder,
 					outputFile,
 					taxonomyXmlFile,
@@ -179,16 +186,15 @@ public final class XTandemWorker extends WorkerBase {
 	private ProcessCaller runTandemSearch(
 			final File fastaFile,
 			final File inputFile,
-			final File paramsFile,
+			final String params,
 			final File workFolder, final File outputFile, final File taxonomyXmlFile, final int threads) {
 
 		LOGGER.info("Running tandem search using " + threads + " threads");
 		LOGGER.info("\tFasta file " + fastaFile.getAbsolutePath() + " does" + (fastaFile.exists() && fastaFile.length() > 0 ? " " : " not ") + "exist.");
 		LOGGER.info("\tInput file " + inputFile.getAbsolutePath() + " does" + (inputFile.exists() && inputFile.length() > 0 ? " " : " not ") + "exist.");
-		LOGGER.info("\tParameter file " + paramsFile.getAbsolutePath() + " does" + (paramsFile.exists() && paramsFile.length() > 0 ? " " : " not ") + "exist.");
 
 		final File paramFile = createTransformedTemplate(
-				paramsFile,
+				params,
 				workFolder,
 				outputFile,
 				inputFile,
@@ -236,8 +242,8 @@ public final class XTandemWorker extends WorkerBase {
 	}
 
 	private void checkPacketCorrectness(final XTandemWorkPacket packet) {
-		if (packet.getSearchParamsFile() == null) {
-			throw new MprcException("Params file must not be null");
+		if (packet.getSearchParams() == null) {
+			throw new MprcException("Params must not be null");
 		}
 		if (packet.getOutputFile() == null) {
 			throw new MprcException("Result file must not be null");
@@ -247,7 +253,7 @@ public final class XTandemWorker extends WorkerBase {
 		}
 	}
 
-	private File createTransformedTemplate(final File templateFile, final File outFolder, final File resultFile, final File inputFile, final File taxonXmlFilePath, final String databaseName, final int threads) {
+	private File createTransformedTemplate(final String params, final File outFolder, final File resultFile, final File inputFile, final File taxonXmlFilePath, final String databaseName, final int threads) {
 		// The XTandem templates retardedly append .xml to the resulting file name
 		// We have to chop it off.
 
@@ -276,9 +282,9 @@ public final class XTandemWorker extends WorkerBase {
 		StreamRegExMatcher matcher = null;
 
 		try {
-			matcher = new StreamRegExMatcher(templateFile);
+			matcher = new StreamRegExMatcher(params);
 			matcher.replaceAll(replacements);
-			final File resultingParamsFile = XTandemMappingFactory.resultingParamsFile(templateFile);
+			final File resultingParamsFile = new File(outFolder, "tandem.xml");
 			FileUtilities.quietDelete(resultingParamsFile);
 			matcher.writeContentsToFile(resultingParamsFile);
 			return resultingParamsFile;

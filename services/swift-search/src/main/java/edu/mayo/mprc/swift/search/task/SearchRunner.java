@@ -344,7 +344,13 @@ public final class SearchRunner implements Runnable, Lifecycle {
 	private EngineSearchTask addEngineSearchTask(final SearchEngine engine, final FileSearch inputFile,
 	                                             final FileProducingTask convertedFile, final SearchEngineParameters searchParameters,
 	                                             final boolean publicSearchFiles) {
-		final File paramFile = parameterFiles.getParamFile(engine, searchParameters);
+
+		// Get the parameter string
+		final String param = parameterFiles.getParamString(engine, searchParameters);
+
+		// Create a dump of the parameters on the disk
+		final File paramFile = parameterFiles.saveParamFile(engine, param);
+
 		final Curation database = searchParameters.getDatabase();
 
 		DatabaseDeploymentResult deploymentResult = null;
@@ -359,7 +365,7 @@ public final class SearchRunner implements Runnable, Lifecycle {
 			}
 		}
 		final File outputFolder = getOutputFolderForSearchEngine(engine);
-		return addEngineSearch(engine, paramFile, inputFile.getInputFile(), outputFolder, convertedFile, database, deploymentResult, publicSearchFiles);
+		return addEngineSearch(engine, param, inputFile.getInputFile(), outputFolder, convertedFile, database, deploymentResult, publicSearchFiles);
 	}
 
 	private IdpQonvertTask addIdpQonvertTask(final SearchEngine idpQonvert, final EngineSearchTask search, final boolean publishResult) {
@@ -805,7 +811,7 @@ public final class SearchRunner implements Runnable, Lifecycle {
 	 * <p/>
 	 * The search also knows about the conversion and db deployment so it can determine when it can run.
 	 */
-	private EngineSearchTask addEngineSearch(final SearchEngine engine, final File paramFile, final File inputFile, final File searchOutputFolder, final FileProducingTask convertedFile, final Curation curation, final DatabaseDeploymentResult deploymentResult, final boolean publicSearchFiles) {
+	private EngineSearchTask addEngineSearch(final SearchEngine engine, final String param, final File inputFile, final File searchOutputFolder, final FileProducingTask convertedFile, final Curation curation, final DatabaseDeploymentResult deploymentResult, final boolean publicSearchFiles) {
 		final EngineSearchTask searchEngineTask = new EngineSearchTask(
 				workflowEngine,
 				engine,
@@ -814,7 +820,7 @@ public final class SearchRunner implements Runnable, Lifecycle {
 				curation,
 				deploymentResult,
 				null,
-				paramFile,
+				param,
 				publicSearchFiles,
 				engine.getSearchDaemon(),
 				fileTokenFactory,

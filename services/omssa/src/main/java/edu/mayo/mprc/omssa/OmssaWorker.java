@@ -79,7 +79,7 @@ public final class OmssaWorker extends WorkerBase {
 		commandLine.add(userModsFile.getAbsolutePath());
 
 		final ProcessBuilder procBuilder = new ProcessBuilder();
-		procBuilder.directory(omssaWorkPacket.getSearchParamsFile().getParentFile());
+		procBuilder.directory(omssaWorkPacket.getInputFile().getParentFile());
 		procBuilder.command(commandLine);
 
 		final ProcessCaller caller = new ProcessCaller(procBuilder);
@@ -113,7 +113,7 @@ public final class OmssaWorker extends WorkerBase {
 	 * @return the complete params file that should be used for searching.
 	 */
 	private File finishParamsFile(final String folderPath, final OmssaWorkPacket workPacket, final File outputFile) {
-		final File rawParamsFile = workPacket.getSearchParamsFile();
+		final String rawParams = workPacket.getSearchParams();
 		final File mgfFile = workPacket.getInputFile();
 		final File databaseFile = workPacket.getDatabaseFile();
 
@@ -127,9 +127,9 @@ public final class OmssaWorker extends WorkerBase {
 
 		StreamRegExMatcher matcher = null;
 		try {
-			matcher = new StreamRegExMatcher(rawParamsFile);
+			matcher = new StreamRegExMatcher(rawParams);
 			matcher.replaceAll(replacements);
-			final File outFile = new File(new File(folderPath), rawParamsFile.getName() + ".final." + System.currentTimeMillis());
+			final File outFile = new File(new File(folderPath), "omssa.params.final." + System.currentTimeMillis());
 			matcher.writeContentsToFile(outFile);
 			return outFile;
 		} catch (IOException e) {

@@ -14,7 +14,9 @@ import edu.mayo.mprc.utilities.FileUtilities;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
-import java.io.*;
+import java.io.File;
+import java.io.Reader;
+import java.io.StringWriter;
 import java.util.Collection;
 
 /**
@@ -83,40 +85,14 @@ public final class SearchEngine implements Comparable<SearchEngine> {
 	}
 
 	/**
-	 * Produce a parameter file for the search engine, with default name, in the given folder.
+	 * Return a file to store the parameters into
 	 *
-	 * @param folder             Folder to put the param file to.
-	 * @param params             Generic search engine parameter set.
-	 * @param distinguishingName A name to distinguish different parameter files within the same folder
-	 * @param validations        Object to be filled with parameter file validations
-	 * @return The generated parameter file.
+	 * @param folder             Folder where the file should go
+	 * @param distinguishingName A name to distinguish the particular parameter set from others from the same engine
+	 * @return File to save the parameters to.
 	 */
-	public File writeSearchEngineParameterFile(final File folder, final SearchEngineParameters params, final String distinguishingName, final ParamsValidations validations, final ParamsInfo paramsInfo) {
-		if (getMappingFactory() == null) {
-			// This engine does not support mapping (e.g. Scaffold).
-			return null;
-		}
-
-		final File paramFile = new File(folder, getMappingFactory().getCanonicalParamFileName(distinguishingName));
-		final Writer writer = FileUtilities.getWriter(paramFile);
-
-		writeSearchEngineParameters(params, validations, writer, paramsInfo);
-
-		return paramFile;
-	}
-
-	/**
-	 * Same as {@link #writeSearchEngineParameterFile} only writes the parameters into a string.
-	 */
-	public String writeSearchEngineParameterString(final SearchEngineParameters parameters, final ParamsValidations validations, final ParamsInfo paramsInfo) {
-		if (getMappingFactory() == null) {
-			// This engine does not support mapping (e.g. Scaffold).
-			return null;
-		}
-
-		final StringWriter writer = new StringWriter();
-		writeSearchEngineParameters(parameters, validations, writer, paramsInfo);
-		return writer.toString();
+	public File getParameterFile(final File folder, final String distinguishingName) {
+		return new File(folder, getMappingFactory().getCanonicalParamFileName(distinguishingName));
 	}
 
 	/**
@@ -128,27 +104,15 @@ public final class SearchEngine implements Comparable<SearchEngine> {
 			return;
 		}
 
-		/** Pass a dummy writer that does nothing */
-		final Writer writer = new Writer() {
-			@Override
-			public void write(final char[] cbuf, final int off, final int len) throws IOException {
-				// Do nothing
-			}
-
-			@Override
-			public void flush() throws IOException {
-				// Do nothing
-			}
-
-			@Override
-			public void close() throws IOException {
-				// Do nothing
-			}
-		};
-		writeSearchEngineParameters(parameters, validations, writer, paramsInfo);
+		parametersToString(parameters, validations, paramsInfo);
 	}
 
-	private void writeSearchEngineParameters(final SearchEngineParameters params, ParamsValidations validations, final Writer writer, final ParamsInfo paramsInfo) {
+	public String parametersToString(final SearchEngineParameters params, ParamsValidations validations, final ParamsInfo paramsInfo) {
+		if (getMappingFactory() == null) {
+			// This engine does not support mapping (e.g. Scaffold).
+			return null;
+		}
+
 		if (validations == null) {
 			validations = new ParamsValidations();
 		}
@@ -196,13 +160,10 @@ public final class SearchEngine implements Comparable<SearchEngine> {
 			throw new MprcException("Search engine parameters have following errors:\n" + validations.toString(ValidationSeverity.ERROR));
 		}
 
+		final StringWriter writer = new StringWriter(100);
 		mapping.write(mapping.baseSettings(), writer);
-
-		try {
-			writer.close();
-		} catch (final IOException e) {
-			throw new MprcException("Could not close the output stream when mapping search engine parameters", e);
-		}
+		FileUtilities.closeQuietly(writer);
+		return writer.toString();
 	}
 
 	public EngineMetadata getEngineMetadata() {
