@@ -200,12 +200,7 @@ public final class ParameterSetCache {
 		final String origName = COPIED_PARAM_SET.matcher(paramSetName).replaceAll("");
 
 		// The name must be different than all saved names
-		final HashSet<String> persNames;
-		final List<SavedSearchEngineParameters> engineParametersList = paramsDao.savedSearchEngineParameters();
-		persNames = new HashSet<String>(engineParametersList.size());
-		for (final SavedSearchEngineParameters saved : engineParametersList) {
-			persNames.add(saved.getName());
-		}
+		final HashSet<String> persNames = collectAllParameterNames();
 
 		// The name must be different from all current temp names
 		final HashSet<String> tempNames = new HashSet<String>();
@@ -223,6 +218,15 @@ public final class ParameterSetCache {
 			n++;
 		}
 		return name;
+	}
+
+	private HashSet<String> collectAllParameterNames() {
+		final List<SavedSearchEngineParameters> engineParametersList = paramsDao.savedSearchEngineParameters();
+		final HashSet<String> persNames = new HashSet<String>(engineParametersList.size());
+		for (final SavedSearchEngineParameters saved : engineParametersList) {
+			persNames.add(saved.getName());
+		}
+		return persNames;
 	}
 
 	public ClientParamSet findMatchingTemporaryParamSet(final SearchEngineParameters parameters) {
