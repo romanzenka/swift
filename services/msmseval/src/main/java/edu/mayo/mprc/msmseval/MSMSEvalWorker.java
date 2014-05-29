@@ -115,7 +115,7 @@ public final class MSMSEvalWorker extends WorkerBase {
 
 			LOGGER.info("Formatted msmsEval output file " + outputFile.getAbsolutePath() + " created.");
 
-			publish(msmsEvalOutputFile, finalOutputFile);
+			publish(outputFile, finalOutputFile);
 		} catch (Exception e) {
 			throw new DaemonException(e);
 		} finally {
