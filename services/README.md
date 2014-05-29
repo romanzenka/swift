@@ -15,14 +15,12 @@ Services
 
 * mascot - support for Matrix Software Mascot, uses web scraping to submit searches
 * myrimatch - support for MyriMatch search engine
-* omssa - support for OMSSA search engine
 * peaks-online - incomplete support for submitting Peaks Online searches
 * sequest - Sequest search engine support
 * xtandem - X!Tandem search engine support
 
 ### Additional support
 
-* db-undeploy - Database undeployer - can remove a database deployed to Mascot/Sequest, etc...
 * mgf2mgf - ensures that input .mgf files have proper metadata in their titles that the rest of search engines (and Scaffold) depend on
 * msmseval - support for msmsEval tool for determining spectral quality
 * qa - Quality Assurance - calculates statistics about the quality of .RAW files

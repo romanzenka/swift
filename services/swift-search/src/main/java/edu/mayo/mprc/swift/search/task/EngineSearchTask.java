@@ -7,7 +7,6 @@ import edu.mayo.mprc.dbcurator.model.Curation;
 import edu.mayo.mprc.mascot.MascotResultUrl;
 import edu.mayo.mprc.mascot.MascotWorkPacket;
 import edu.mayo.mprc.myrimatch.MyriMatchWorkPacket;
-import edu.mayo.mprc.omssa.OmssaWorkPacket;
 import edu.mayo.mprc.searchengine.SearchEngineResult;
 import edu.mayo.mprc.sequest.SequestWorkPacket;
 import edu.mayo.mprc.swift.db.DatabaseFileTokenFactory;
@@ -103,16 +102,6 @@ final class EngineSearchTask extends AsyncTaskBase implements FileProducingTask 
 					publicSearchFiles,
 					getFullId(),
 					isFromScratch());
-		} else if ("OMSSA".equalsIgnoreCase(engine.getCode())) {
-			workPacket = new OmssaWorkPacket(
-					outputFile,
-					params,
-					inputFile.getResultingFile(),
-					deploymentResult.getFastaFile(),
-					deploymentResult.getGeneratedFiles(),
-					publicSearchFiles,
-					getFullId(),
-					isFromScratch());
 		} else if ("MYRIMATCH".equalsIgnoreCase(engine.getCode())) {
 			workPacket = new MyriMatchWorkPacket(
 					outputFile, params, inputFile.getResultingFile(),
@@ -159,9 +148,6 @@ final class EngineSearchTask extends AsyncTaskBase implements FileProducingTask 
 			return getSequestDatabase().getAbsolutePath();
 		} else if ("TANDEM".equalsIgnoreCase(engine.getCode())) {
 			return curation.getShortName();
-		} else if ("OMSSA".equalsIgnoreCase(engine.getCode())) {
-			// TODO: OMSSA might be deploying other file types
-			return deploymentResult.getShortDbName();
 		} else if ("MYRIMATCH".equalsIgnoreCase(engine.getCode())) {
 			return curation.getShortName();
 		} else {

@@ -122,7 +122,7 @@
     </div>
 
     <p>Search multiple tandem mass spec. datafiles using <b>multiple search engines at once</b>: Mascot, Sequest,
-        X!Tandem, OMSSA and MyriMatch.</p>
+        X!Tandem and MyriMatch.</p>
 
     <h2>Swift inputs</h2>
 

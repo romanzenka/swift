@@ -12,8 +12,6 @@ import edu.mayo.mprc.mascot.MockMascotDeploymentService;
 import edu.mayo.mprc.mgf2mgf.MgfToMgfWorker;
 import edu.mayo.mprc.msconvert.MsconvertWorker;
 import edu.mayo.mprc.msmseval.MSMSEvalWorker;
-import edu.mayo.mprc.omssa.OmssaDeploymentService;
-import edu.mayo.mprc.omssa.OmssaWorker;
 import edu.mayo.mprc.qa.QaWorker;
 import edu.mayo.mprc.qa.RAWDumpWorker;
 import edu.mayo.mprc.qstat.QstatDaemonWorker;
@@ -143,18 +141,6 @@ public final class TestDaemonFactory {
 		final ServiceConfig mascotDeployer = new ServiceConfig("mascotDeployer", runner8);
 		main.addResource(mascotDeployer);
 
-		final SimpleRunner.Config runner2 = new SimpleRunner.Config();
-		runner2.setNumThreads(2);
-		runner2.setWorkerConfiguration(new OmssaWorker.Config("omssacl"));
-		final ServiceConfig omssa = new ServiceConfig("omssa", runner2);
-		main.addResource(omssa);
-
-		final SimpleRunner.Config runner9 = new SimpleRunner.Config();
-		runner9.setNumThreads(2);
-		runner9.setWorkerConfiguration(new OmssaDeploymentService.Config("formatDbExe", DATABASE_DEPLOYMENT_DIR + "deployableDbFolder"));
-		final ServiceConfig omssaDeployer = new ServiceConfig("omssaDeployer", runner9);
-		main.addResource(omssaDeployer);
-
 		final SimpleRunner.Config runner22 = new SimpleRunner.Config();
 		runner22.setNumThreads(2);
 		runner22.setWorkerConfiguration(new SequestWorker.Config("sequestCommand", "pvmHosts"));
@@ -247,7 +233,6 @@ public final class TestDaemonFactory {
 				new SearchEngine.Config("MASCOT", "2.4", mascot, mascotDeployer),
 				new SearchEngine.Config("SEQUEST", "v27", sequest, sequestDeployer),
 				new SearchEngine.Config("TANDEM", "2013.2.01", tandem, null),
-				new SearchEngine.Config("OMSSA", "0.1", omssa, omssaDeployer),
 				new SearchEngine.Config("SCAFFOLD", "2.6.0", scaffold, scaffoldDeployer)
 		);
 		final SwiftSearcher.Config searcherConfig = new SwiftSearcher.Config(

@@ -31,7 +31,6 @@
         <module>msmseval</module>
         <module>msconvert</module>
         <module>myrimatch</module>
-        <module>omssa</module>
         <module>qa</module>
         <module>quameter-db</module>
         <module>qstat</module>

@@ -49,7 +49,7 @@
         </p>
 
         <p>
-            Swift can run multiple search engines (Mascot, Sequest, Tandem, Omssa and MyriMatch) and combine their
+            Swift can run multiple search engines (Mascot, Sequest, Tandem and MyriMatch) and combine their
             results
             into a single Scaffold file. Swift can run on a single computer,
             multiple computers or an entire cluster. This page lets you set that all up.
