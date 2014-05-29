@@ -1,5 +1,6 @@
 package edu.mayo.mprc.swift.search.task;
 
+import edu.mayo.mprc.MprcException;
 import edu.mayo.mprc.config.DaemonConfigInfo;
 import edu.mayo.mprc.daemon.DaemonConnection;
 import edu.mayo.mprc.daemon.SimpleThreadPoolExecutor;
@@ -565,6 +566,8 @@ public class TestSearchRunner {
 		@Override
 		public Mappings createMapping() {
 			return new Mappings() {
+				private String str;
+
 				@Override
 				public Reader baseSettings() {
 					return new StringReader("");
@@ -577,44 +580,58 @@ public class TestSearchRunner {
 
 				@Override
 				public void write(final Reader oldParams, final Writer out) {
+					try {
+						out.write(str);
+					} catch (IOException e) {
+						throw new MprcException("Could not write params out");
+					}
 					FileUtilities.closeQuietly(oldParams);
 					FileUtilities.closeQuietly(out);
 				}
 
 				@Override
 				public void setPeptideTolerance(final MappingContext context, final Tolerance peptideTolerance) {
+					str += peptideTolerance.toString();
 				}
 
 				@Override
 				public void setFragmentTolerance(final MappingContext context, final Tolerance fragmentTolerance) {
+					str += fragmentTolerance.toString();
 				}
 
 				@Override
 				public void setVariableMods(final MappingContext context, final ModSet variableMods) {
+					str += variableMods.toString();
 				}
 
 				@Override
 				public void setFixedMods(final MappingContext context, final ModSet fixedMods) {
+					str += fixedMods.toString();
 				}
 
 				@Override
 				public void setSequenceDatabase(final MappingContext context, final String shortDatabaseName) {
+					str += shortDatabaseName;
 				}
 
 				@Override
 				public void setProtease(final MappingContext context, final Protease protease) {
+					str += protease;
 				}
 
 				@Override
 				public void setMinTerminiCleavages(final MappingContext context, final Integer minTerminiCleavages) {
+					str += minTerminiCleavages;
 				}
 
 				@Override
 				public void setMissedCleavages(final MappingContext context, final Integer missedCleavages) {
+					str += missedCleavages;
 				}
 
 				@Override
 				public void setInstrument(final MappingContext context, final Instrument instrument) {
+					str += instrument;
 				}
 
 				@Override
