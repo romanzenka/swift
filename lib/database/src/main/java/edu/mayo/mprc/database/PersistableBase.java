@@ -35,5 +35,4 @@ public abstract class PersistableBase implements EqualityCriteria {
 			return o1.getId().compareTo(o2.getId());
 		}
 	};
-
 }

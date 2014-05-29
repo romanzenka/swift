@@ -338,12 +338,13 @@ public class SearchEngineParameters extends PersistableBase {
 
 	/**
 	 * @return Deep copy, independent on hibernate to be stored in the session cache.
+	 * Hibernate IDs are fully retained, only the parameter object has its id set to null.
 	 */
-	public SearchEngineParameters copy() {
+	public SearchEngineParameters copyNullId() {
 		final Curation database1 = getDatabase().copyFull();
 		// Retain the database ID
 		database1.setId(getDatabase().getId());
-		SearchEngineParameters searchEngineParameters = new SearchEngineParameters(
+		return new SearchEngineParameters(
 				database1,
 				getProtease().copy(),
 				getMinTerminiCleavages(),
@@ -356,8 +357,6 @@ public class SearchEngineParameters extends PersistableBase {
 				getExtractMsnSettings().copy(),
 				getScaffoldSettings().copy(),
 				getEnabledEngines().copy());
-		searchEngineParameters.setId(getId());
-		return searchEngineParameters;
 	}
 
 	public void setValue(final ParamName name, final Object o) {

@@ -104,11 +104,10 @@ public final class ParameterSetCache {
 			}
 
 			// We copy the parameters so they are no longer connected to the session.
-			result = saved.getParameters().copy(); // Always copy
-			result.setId(null); // Clear its id
+			result = saved.getParameters().copyNullId(); // Always copy
 			addToCache(paramSet, result);
 		} else {
-			result = ps.copy(); // Copy data out
+			result = ps.copyNullId(); // Copy data out
 		}
 		return result;
 	}
@@ -184,8 +183,7 @@ public final class ParameterSetCache {
 		if (orig == null) {
 			throw new MprcException("Cannot load paramset " + paramSet.getId() + " for cloning to temp");
 		}
-		final SearchEngineParameters serverParamSet = orig.copy();
-		serverParamSet.setId(null);
+		final SearchEngineParameters serverParamSet = orig.copyNullId();
 
 		return installTemporary(paramSetName, paramSetOwnerEmail, paramSetOwnerInitials, serverParamSet);
 	}

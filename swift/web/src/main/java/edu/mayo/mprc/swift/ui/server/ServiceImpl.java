@@ -821,8 +821,7 @@ public final class ServiceImpl extends SpringGwtServlet implements Service, Appl
 
 			// We will make a plain temporary parameter set and return that one
 			clientParamSetListChanged = true;
-			SearchEngineParameters copy = parameters.copy();
-			copy.setId(null); // Detach from hibernate
+			SearchEngineParameters copy = parameters.copyNullId();
 			return cache.installTemporary("Previous search parameters", user.getUserName(), user.getInitials(), copy);
 		}
 
