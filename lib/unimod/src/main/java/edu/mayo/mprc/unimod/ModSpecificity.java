@@ -344,7 +344,7 @@ public class ModSpecificity extends PersistableBase implements Comparable<ModSpe
 	}
 
 	public ModSpecificity copy() {
-		return new ModSpecificity(
+		ModSpecificity modSpecificity = new ModSpecificity(
 				getModification().copy(),
 				getSite(),
 				getTerm(),
@@ -353,6 +353,8 @@ public class ModSpecificity extends PersistableBase implements Comparable<ModSpe
 				getClassification(),
 				getSpecificityGroup(),
 				getComments());
+		modSpecificity.setId(getId());
+		return modSpecificity;
 	}
 
 	/**

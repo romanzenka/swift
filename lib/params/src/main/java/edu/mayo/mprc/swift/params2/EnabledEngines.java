@@ -116,6 +116,9 @@ public class EnabledEngines extends PersistableBase {
 	}
 
 	public EnabledEngines copy() {
-		return new EnabledEngines(getEngineConfigs());
+		EnabledEngines enabledEngines = new EnabledEngines(getEngineConfigs());
+		enabledEngines.setId(getId());
+		return enabledEngines;
+
 	}
 }

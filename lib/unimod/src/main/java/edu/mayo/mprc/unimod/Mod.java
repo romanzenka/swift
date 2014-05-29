@@ -202,7 +202,7 @@ public class Mod extends EvolvableBase implements Comparable<Mod> {
 	}
 
 	public Mod copy() {
-		return new Mod(
+		Mod mod = new Mod(
 				getTitle(),
 				getFullName(),
 				getRecordID(),
@@ -211,6 +211,8 @@ public class Mod extends EvolvableBase implements Comparable<Mod> {
 				getComposition(),
 				getAltNames(),
 				getModSpecificities());
+		mod.setId(getId());
+		return mod;
 	}
 
 	/**

@@ -330,6 +330,7 @@ public final class SearchRunner implements Runnable, Lifecycle {
 	 */
 	private SearchEngineParameters getSemiParameters(final SearchEngineParameters searchParameters) {
 		final SearchEngineParameters semiTrypticParameters = searchParameters.copy();
+		semiTrypticParameters.setId(null); // Detach from hibernate
 		semiTrypticParameters.setMinTerminiCleavages(1);
 		return semiTrypticParameters;
 	}
