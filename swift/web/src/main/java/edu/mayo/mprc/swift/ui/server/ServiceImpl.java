@@ -386,7 +386,7 @@ public final class ServiceImpl extends SpringGwtServlet implements Service, Appl
 			SearchEngineParameters ps = cache.getFromCacheHibernate(toCopy);
 			final ClientParamSet ret;
 			if (!permanent) {
-				ret = cache.installTemporary(toCopy);
+				ret = cache.cloneTemporary(toCopy);
 			} else {
 				final Change change = new Change("Saving parameter set " + newName, new DateTime());
 

@@ -76,11 +76,11 @@ public final class ParameterSetCache {
 		if (ps == null) {
 
 			if (paramSet.isTemporary()) {
-				throw new MprcException("Can't find temporary search definition " + key);
+				throw new MprcException("Cannot find temporary search definition " + key);
 			}
 			final SavedSearchEngineParameters saved = paramsDao.getSavedSearchEngineParameters(key);
 			if (saved == null) {
-				throw new MprcException("Can't load Swift search parameters " + paramSet.getName()
+				throw new MprcException("Cannot load Swift search parameters " + paramSet.getName()
 						+ " (" + key + ") from database");
 			}
 
@@ -97,24 +97,17 @@ public final class ParameterSetCache {
 	 * Get parameter set from cache.
 	 * When the parameter set corresponds to a saved parameter set,
 	 * load it from database instead of relying on cached value and provide the non-detached object.
-	 * <p/>
-	 * Otherwise, if it is a temporary entry, provide a clean copy so user can mess with it.
 	 */
 	public SearchEngineParameters getFromCacheHibernate(final ClientParamSet paramSet) {
 		final Integer key = paramSet.getId();
 
 		if (paramSet.isTemporary()) {
-			final Map<Integer, SearchEngineParameters> cache = getCache(paramSet);
-			final SearchEngineParameters params = cache.get(key);
-			if (params == null) {
-				throw new MprcException("Can't find temporary search definition " + key);
-			} else {
-				return params.copy();
-			}
+			// Same behavior as normal on temporary sets
+			return getFromCache(paramSet);
 		} else {
 			final SavedSearchEngineParameters saved = paramsDao.getSavedSearchEngineParameters(key);
 			if (saved == null) {
-				throw new MprcException("Can't load Swift search parameters " + paramSet.getName()
+				throw new MprcException("Cannot load Swift search parameters " + paramSet.getName()
 						+ " (" + key + ") from database");
 			}
 			return saved.getParameters();
@@ -162,14 +155,14 @@ public final class ParameterSetCache {
 	/**
 	 * Make a new temporary parameter set based on the already existing one
 	 */
-	public synchronized ClientParamSet installTemporary(final ClientParamSet paramSet) {
+	public synchronized ClientParamSet cloneTemporary(final ClientParamSet paramSet) {
 		final String paramSetName = paramSet.getName();
 		final String paramSetOwnerEmail = paramSet.getOwnerEmail();
 		final String paramSetOwnerInitials = paramSet.getInitials();
 
 		final SearchEngineParameters orig = getFromCache(paramSet);
 		if (orig == null) {
-			throw new MprcException("Can't load paramset " + paramSet.getId() + " for cloning to temp");
+			throw new MprcException("Cannot load paramset " + paramSet.getId() + " for cloning to temp");
 		}
 		final SearchEngineParameters serverParamSet = orig.copy();
 
