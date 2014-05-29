@@ -164,7 +164,22 @@ public final class ParameterSetCacheTest {
 		} catch (MprcException e) {
 			Assert.assertTrue(e.getMessage().contains("Cannot find"));
 		}
+	}
 
+	@Test
+	public void shouldUpdateCache() {
+		final SearchEngineParameters params = makeParams();
+		final ClientParamSet clientParamSet = cache.installTemporary("Hello", "owner@owner.com", "OO", params);
+		Assert.assertEquals(clientParamSet.getId(), -1);
+
+		final SearchEngineParameters params2 = makeParams();
+		params2.setInstrument(Instrument.MALDI_TOF_TOF);
+		Assert.assertFalse(params.equals(params2), "The parameters must be different");
+
+		cache.updateCache(clientParamSet, params2);
+
+		SearchEngineParameters modifiedParameters = cache.getFromCache(clientParamSet);
+		Assert.assertEquals(modifiedParameters.getInstrument(), Instrument.MALDI_TOF_TOF);
 	}
 
 	private SearchEngineParameters makeParams() {

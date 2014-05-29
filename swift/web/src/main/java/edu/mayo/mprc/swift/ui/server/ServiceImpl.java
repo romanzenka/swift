@@ -532,6 +532,7 @@ public final class ServiceImpl extends SpringGwtServlet implements Service, Appl
 				validateAdditionalSettings(validations, name, value);
 				final ClientParamsValidations validationList = getClientProxyGenerator().convertTo(validations);
 				getParamsDao().commit();
+				cache.updateCache(paramSet, ps);
 				return validationList;
 			} catch (ClientProxyGenerator.ConversionException e) {
 				return getValidationForException(param, e.getCause());

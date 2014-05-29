@@ -38,14 +38,33 @@ public final class ParameterSetCache {
 		this.paramsDao = paramsDao;
 	}
 
+	/**
+	 * Update temporary client parameter set in the cache with new values.
+	 *
+	 * @param clientParamSet Temporary parameter set (for permanent, exception is thrown).
+	 * @param parameters     New set of parameters.
+	 */
+	public void updateCache(final ClientParamSet clientParamSet, final SearchEngineParameters parameters) {
+		if (!clientParamSet.isTemporary()) {
+			throw new MprcException("Only temporary parameter sets can be changed");
+		}
+		checkDetached(parameters);
+		final Map<Integer, SearchEngineParameters> cache = getCache(clientParamSet);
+		cache.put(clientParamSet.getId(), parameters);
+	}
+
 	private synchronized void addToCache(final ClientParamSet clientParamSet, final SearchEngineParameters serverParamSet) {
 		final Map<Integer, SearchEngineParameters> cache = getCache(clientParamSet);
-		if (serverParamSet.getId() != null) {
-			throw new MprcException("Cache can only store objects detached from Hibernate");
-		}
+		checkDetached(serverParamSet);
 		cache.put(clientParamSet.getId(), serverParamSet);
 		if (clientParamSet.isTemporary()) {
 			getTemporaryClientParamList().add(clientParamSet);
+		}
+	}
+
+	private void checkDetached(SearchEngineParameters serverParamSet) {
+		if (serverParamSet.getId() != null) {
+			throw new MprcException("Cache can only store objects detached from Hibernate");
 		}
 	}
 
