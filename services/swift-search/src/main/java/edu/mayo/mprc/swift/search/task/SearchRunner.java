@@ -554,9 +554,11 @@ public final class SearchRunner implements Runnable, Lifecycle {
 
 			return task;
 		} else if (ExtractMsnSettings.MSCONVERT.equals(conversionSettings.getCommand())) {
-			final MsconvertTask msconvertTask = new MsconvertTask(workflowEngine,
+			final MsconvertTask msconvertTask = new MsconvertTask(
+					workflowEngine,
 							/*Input file*/ file,
 							/*Output file location not known, but must provide correct extension */ getOutputFile(inputFile, conversionSettings, null),
+					false /* No MS1 */,
 					Boolean.TRUE.equals(searchDefinition.getPublicMgfFiles()),
 					msconvertDaemon, fileTokenFactory, isFromScratch());
 
@@ -567,7 +569,12 @@ public final class SearchRunner implements Runnable, Lifecycle {
 			final MsconvertTask task = addTask(msconvertTask);
 
 			if (Boolean.TRUE.equals(searchDefinition.getPublicMzxmlFiles())) {
-				final MsconvertTask mzxmlTask = new MsconvertTask(workflowEngine, file, new File("dummy.mzXML"), true, msconvertDaemon, fileTokenFactory, isFromScratch());
+				final MsconvertTask mzxmlTask = new MsconvertTask(
+						workflowEngine, file,
+						new File("dummy.mzXML") /* we will patch it below */,
+						true,
+						false /* No MS1 */,
+						msconvertDaemon, fileTokenFactory, isFromScratch());
 
 				final File mzxmlFile = getMzxmlFileLocation(inputFile, mzxmlTask);
 

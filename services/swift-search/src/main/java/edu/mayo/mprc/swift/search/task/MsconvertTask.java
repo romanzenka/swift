@@ -20,6 +20,7 @@ final class MsconvertTask extends AsyncTaskBase implements FileProducingTask {
 	private final boolean publicAccess;
 	private final String outputExtension;
 	private File outputFile = null;
+	private final boolean includeMs1;
 
 	/**
 	 * @param publicAccess When true, the task requests the cache to give the user access to the .mgf file from the user space.
@@ -28,12 +29,15 @@ final class MsconvertTask extends AsyncTaskBase implements FileProducingTask {
 			final WorkflowEngine engine,
 			final File inputFile,
 			final File outputFile,
-			final boolean publicAccess, final DaemonConnection raw2mgfDaemon, final DatabaseFileTokenFactory fileTokenFactory, final boolean fromScratch
+			final boolean includeMs1,
+			final boolean publicAccess,
+			final DaemonConnection raw2mgfDaemon, final DatabaseFileTokenFactory fileTokenFactory, final boolean fromScratch
 
 	) {
 		super(engine, raw2mgfDaemon, fileTokenFactory, fromScratch);
 		this.inputFile = inputFile;
 		this.outputFile = outputFile;
+		this.includeMs1 = includeMs1;
 		this.publicAccess = publicAccess;
 		outputExtension = FileUtilities.getExtension(outputFile.getName());
 		setName("msconvert");
@@ -45,7 +49,8 @@ final class MsconvertTask extends AsyncTaskBase implements FileProducingTask {
 		setDescription(
 				"Converting "
 						+ getFileTokenFactory().fileToTaggedDatabaseToken(inputFile)
-						+ " to " + getFileTokenFactory().fileToTaggedDatabaseToken(outputFile));
+						+ " to " + getFileTokenFactory().fileToTaggedDatabaseToken(outputFile)
+						+ (includeMs1 ? " (including MS1)" : ""));
 	}
 
 	private static String getFileReference(final File rawFile) {
@@ -63,7 +68,7 @@ final class MsconvertTask extends AsyncTaskBase implements FileProducingTask {
 
 	/**
 	 * @return Work packet to be sent asynchronously. If it returns null, it means the work was done without a need
-	 *         to send a work packet.
+	 * to send a work packet.
 	 */
 	@Override
 	public WorkPacket createWorkPacket() {
@@ -80,6 +85,7 @@ final class MsconvertTask extends AsyncTaskBase implements FileProducingTask {
 					outputFile,
 					true,
 					inputFile,
+					includeMs1,
 					getFullId(),
 					isFromScratch(),
 					publicAccess);
@@ -102,7 +108,7 @@ final class MsconvertTask extends AsyncTaskBase implements FileProducingTask {
 
 	@Override
 	public int hashCode() {
-		return Objects.hashCode(inputFile, outputExtension, publicAccess);
+		return Objects.hashCode(inputFile, outputExtension, publicAccess, includeMs1);
 	}
 
 	@Override
@@ -116,7 +122,8 @@ final class MsconvertTask extends AsyncTaskBase implements FileProducingTask {
 		final MsconvertTask other = (MsconvertTask) obj;
 		return Objects.equal(inputFile, other.inputFile)
 				&& Objects.equal(outputExtension, other.outputExtension)
-				&& Objects.equal(publicAccess, other.publicAccess);
+				&& Objects.equal(publicAccess, other.publicAccess)
+				&& Objects.equal(includeMs1, other.includeMs1);
 	}
 
 	void setOutputFile(final File outputFile) {

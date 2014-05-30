@@ -22,6 +22,7 @@ public final class MsconvertWorkPacket extends WorkPacketBase implements Cachabl
 	private boolean skipIfExists;
 	private File inputFile;
 	private boolean publicAccess;
+	private boolean includeMs1;
 
 	public MsconvertWorkPacket(final String taskId, final boolean fromScratch) {
 		super(taskId, fromScratch);
@@ -39,6 +40,7 @@ public final class MsconvertWorkPacket extends WorkPacketBase implements Cachabl
 	public MsconvertWorkPacket(final File outputFile,
 	                           final boolean bSkipIfExists,
 	                           final File inputFile,
+	                           final boolean includeMs1,
 	                           final String taskId,
 	                           final boolean fromScratch,
 	                           final boolean publicAccess) {
@@ -50,6 +52,7 @@ public final class MsconvertWorkPacket extends WorkPacketBase implements Cachabl
 		this.outputFile = outputFile;
 		skipIfExists = bSkipIfExists;
 		this.inputFile = inputFile;
+		this.includeMs1 = includeMs1;
 		this.publicAccess = publicAccess;
 	}
 
@@ -75,11 +78,17 @@ public final class MsconvertWorkPacket extends WorkPacketBase implements Cachabl
 		return publicAccess;
 	}
 
+	public boolean isIncludeMs1() {
+		return includeMs1;
+	}
+
 	@Override
 	public String getStringDescriptionOfTask() {
 		final File sourceFile = getInputFile();
 		final String resultExtension = FileUtilities.getExtension(getOutputFile().getName());
-		return "Input:" + sourceFile.getAbsolutePath() + "\nExtension:" + resultExtension;
+		return "Input:" + sourceFile.getAbsolutePath()
+				+ "\nExtension:" + resultExtension
+				+ (isIncludeMs1() ? "\nincludeMs1: true" : "");
 	}
 
 	@Override
@@ -89,6 +98,7 @@ public final class MsconvertWorkPacket extends WorkPacketBase implements Cachabl
 				new File(wipFolder, getOutputFile().getName()),
 				isSkipIfExists(),
 				getInputFile(),
+				isIncludeMs1(),
 				getTaskId(),
 				isFromScratch(),
 				/*public access*/false);
