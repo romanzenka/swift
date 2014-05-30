@@ -28,6 +28,8 @@ public final class MSMSEvalWorkerTest {
 	private static final String INPUT_PARAMS = "/edu/mayo/mprc/msmseval/msmsEval_orbi.params";
 	private File mgfFile;
 	private File tempDirectory;
+	private File outputFile;
+	private File emFile;
 	private File paramFile;
 
 	@Test(enabled = true)
@@ -42,6 +44,9 @@ public final class MSMSEvalWorkerTest {
 		} catch (IOException e) {
 			throw new MprcException("Failed creating files in: [" + tempDirectory.getAbsolutePath() + "]", e);
 		}
+
+		outputFile = MSMSEvalWorkPacket.getExpectedResultFileName(mgfFile, tempDirectory);
+		emFile = MSMSEvalWorkPacket.getExpectedEmOutputFileName(mgfFile, tempDirectory);
 
 		LOGGER.info("Files created:\n" +
 				mgfFile.getAbsolutePath() +
@@ -77,7 +82,7 @@ public final class MSMSEvalWorkerTest {
 		final DaemonWorkerTester daemonWorkerTester = new DaemonWorkerTester(msmsEvalWorker);
 		try {
 			daemonWorkerTester.start();
-			final Object workerToken = daemonWorkerTester.sendWork(new MSMSEvalWorkPacket(mgfFile, paramFile, tempDirectory, "0"), null);
+			final Object workerToken = daemonWorkerTester.sendWork(new MSMSEvalWorkPacket(mgfFile, paramFile, outputFile, emFile, "0", false), null);
 
 			while (!daemonWorkerTester.isDone(workerToken)) {
 				try {
@@ -112,7 +117,7 @@ public final class MSMSEvalWorkerTest {
 		try {
 			daemonWorkerTester.start();
 
-			final Object workerToken = daemonWorkerTester.sendWork(new MSMSEvalWorkPacket(mgfFile, paramFile, tempDirectory, "0", false), null);
+			final Object workerToken = daemonWorkerTester.sendWork(new MSMSEvalWorkPacket(mgfFile, paramFile, outputFile, emFile, "0", false), null);
 
 			while (!daemonWorkerTester.isDone(workerToken)) {
 				try {

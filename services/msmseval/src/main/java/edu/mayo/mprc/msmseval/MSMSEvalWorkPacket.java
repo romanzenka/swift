@@ -19,27 +19,18 @@ public final class MSMSEvalWorkPacket extends WorkPacketBase implements Cachable
 
 	private File sourceFile;
 	private File msmsEvalParamFile;
-	private File outputDirectory;
+	private File outputFile;
+	private File outputEmFile;
 
-	/**
-	 * The implemntation of this constructor calls constructor:
-	 * MSMSEvalWorkPacket(File sourceFile, File msmsEvalParamFile, File outputDirectory, String taskId, boolean skipIfAlreadyExecuted)
-	 * and sets the skipIfAlreadyExecuted flag to a default of true.
-	 *
-	 * @param sourceFile
-	 * @param msmsEvalParamFile
-	 * @param outputDirectory
-	 * @param taskId
-	 */
-	public MSMSEvalWorkPacket(final File sourceFile, final File msmsEvalParamFile, final File outputDirectory, final String taskId) {
-		this(sourceFile, msmsEvalParamFile, outputDirectory, taskId, false);
-	}
-
-	public MSMSEvalWorkPacket(final File sourceFile, final File msmsEvalParamFile, final File outputDirectory, final String taskId, final boolean fromScratch) {
+	public MSMSEvalWorkPacket(final File sourceFile, final File msmsEvalParamFile,
+	                          final File outputFile,
+	                          final File outputEmFile,
+	                          final String taskId, final boolean fromScratch) {
 		super(taskId, fromScratch);
 
 		this.sourceFile = sourceFile;
-		this.outputDirectory = outputDirectory;
+		this.outputFile = outputFile;
+		this.outputEmFile = outputEmFile;
 		this.msmsEvalParamFile = msmsEvalParamFile;
 	}
 
@@ -73,20 +64,19 @@ public final class MSMSEvalWorkPacket extends WorkPacketBase implements Cachable
 		return msmsEvalParamFile;
 	}
 
-	public File getOutputDirectory() {
-		return outputDirectory;
+	@Override
+	public File getOutputFile() {
+		return outputFile;
+	}
+
+	public File getOutputEmFile() {
+		return outputEmFile;
 	}
 
 	@Override
 	public boolean isPublishResultFiles() {
 		// We never publish msmsEval results to the end user - they are fine in the cache folder
 		return false;
-	}
-
-	@Override
-	public File getOutputFile() {
-		// We do not need to provide output file as we never publish the result
-		return null;
 	}
 
 	@Override
@@ -107,8 +97,10 @@ public final class MSMSEvalWorkPacket extends WorkPacketBase implements Cachable
 		return new MSMSEvalWorkPacket(
 				getSourceFile(),
 				getMsmsEvalParamFile(),
-				wipFolder,
-				getTaskId()
+				new File(wipFolder, getOutputFile().getName()),
+				new File(wipFolder, getOutputEmFile().getName()),
+				getTaskId(),
+				isFromScratch()
 		);
 	}
 

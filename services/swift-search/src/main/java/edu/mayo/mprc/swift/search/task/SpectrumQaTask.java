@@ -47,7 +47,8 @@ final class SpectrumQaTask extends AsyncTaskBase {
 
 	public static final String TASK_NAME = "MSMSEval Filter";
 
-	SpectrumQaTask(final WorkflowEngine engine, final DaemonConnection daemon, final FileProducingTask sourceMGFFile, final File msmsEvalParamFile, final File outputDirectory, final DatabaseFileTokenFactory fileTokenFactory, final boolean fromScratch) {
+	SpectrumQaTask(final WorkflowEngine engine, final DaemonConnection daemon, final FileProducingTask sourceMGFFile, final File msmsEvalParamFile,
+	               final File outputDirectory, final DatabaseFileTokenFactory fileTokenFactory, final boolean fromScratch) {
 		super(engine, daemon, fileTokenFactory, fromScratch);
 		this.outputDirectory = outputDirectory;
 		this.sourceMGFFile = sourceMGFFile;
@@ -69,7 +70,7 @@ final class SpectrumQaTask extends AsyncTaskBase {
 
 	/**
 	 * @return Work packet to be sent asynchronously. If it returns null, it means the work was done without a need
-	 *         to send a work packet.
+	 * to send a work packet.
 	 */
 	@Override
 	public WorkPacket createWorkPacket() {
@@ -79,7 +80,7 @@ final class SpectrumQaTask extends AsyncTaskBase {
 			return null;
 		}
 
-		return new MSMSEvalWorkPacket(sourceMGFFile.getResultingFile(), msmsEvalParamFile, outputDirectory, getFullId());
+		return new MSMSEvalWorkPacket(sourceMGFFile.getResultingFile(), msmsEvalParamFile, outputFile, emFile, getFullId(), false);
 	}
 
 	@Override

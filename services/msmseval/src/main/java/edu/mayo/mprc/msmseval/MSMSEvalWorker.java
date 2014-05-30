@@ -69,21 +69,24 @@ public final class MSMSEvalWorker extends WorkerBase {
 		/**
 		 * Output directory.
 		 */
-		final File outputDirectory = msmsEvalWorkPacket.getOutputDirectory();
+		final File outputDirectory = msmsEvalWorkPacket.getOutputFile().getParentFile();
 		FileUtilities.ensureFolderExists(outputDirectory);
 		checkFile(outputDirectory, true, "The msmsEval output directory");
 
 		/**
-		 * Output files.
+		 * Temporary files.
 		 */
-		final File outputMzXMLFile = MSMSEvalWorkPacket.getExpectedMzXMLOutputFileName(sourceFile, tempWorkFolder); // Temporary
-		final File msmsEvalOutputFile = MSMSEvalWorkPacket.getExpectedMsmsEvalOutputFileName(sourceFile, tempWorkFolder); // Temporary
+		final File outputMzXMLFile = MSMSEvalWorkPacket.getExpectedMzXMLOutputFileName(sourceFile, tempWorkFolder);
+		final File msmsEvalOutputFile = MSMSEvalWorkPacket.getExpectedMsmsEvalOutputFileName(sourceFile, tempWorkFolder);
 
 		/**
 		 * Files to be published.
 		 */
-		final File finalOutputFile = MSMSEvalWorkPacket.getExpectedResultFileName(sourceFile, outputDirectory);
+		final File finalOutputFile = msmsEvalWorkPacket.getOutputFile();
 		final File outputFile = getTempOutputFile(tempWorkFolder, finalOutputFile);
+
+		final File finalEmFile = msmsEvalWorkPacket.getOutputEmFile();
+		final File emFile = getTempOutputFile(tempWorkFolder, finalEmFile);
 
 		//If msmsEval has been executed, skip operation.
 		if (!msmsEvalWorkPacket.isFromScratch() && hasMSMSEvalFilterWorkerRun(finalOutputFile)) {
@@ -116,6 +119,7 @@ public final class MSMSEvalWorker extends WorkerBase {
 			LOGGER.info("Formatted msmsEval output file " + outputFile.getAbsolutePath() + " created.");
 
 			publish(outputFile, finalOutputFile);
+			publish(emFile, finalEmFile);
 		} catch (Exception e) {
 			throw new DaemonException(e);
 		} finally {

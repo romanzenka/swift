@@ -39,15 +39,13 @@ public interface ServiceAsync {
 	 *
 	 * @return List of {@link edu.mayo.mprc.swift.ui.client.rpc.ClientSearchEngine}
 	 * @throws edu.mayo.mprc.common.client.GWTServiceException
-	 *
 	 */
 	void listSearchEngines(AsyncCallback<List<ClientSearchEngine>> async);
 
 	/**
 	 * @return A list of {@link edu.mayo.mprc.swift.ui.client.rpc.SpectrumQaParamFileInfo} objects defining the spectrum QA parameter files.
-	 *         The returned list can be empty, in which case the spectrum QA service should be disabled.
+	 * The returned list can be empty, in which case the spectrum QA service should be disabled.
 	 * @throws edu.mayo.mprc.common.client.GWTServiceException
-	 *
 	 */
 	void listSpectrumQaParamFiles(AsyncCallback<List<SpectrumQaParamFileInfo>> async);
 
@@ -56,7 +54,6 @@ public interface ServiceAsync {
 	 *
 	 * @return
 	 * @throws edu.mayo.mprc.common.client.GWTServiceException
-	 *
 	 */
 	void isScaffoldReportEnabled(AsyncCallback<Boolean> async);
 
@@ -110,7 +107,6 @@ public interface ServiceAsync {
 	 *
 	 * @param paramSet the {@link edu.mayo.mprc.swift.ui.client.rpc.ClientParamSet} object to delete
 	 * @throws edu.mayo.mprc.common.client.GWTServiceException
-	 *
 	 */
 	void delete(ClientParamSet paramSet, AsyncCallback<Void> async);
 
@@ -123,42 +119,10 @@ public interface ServiceAsync {
 	void getFiles(ClientParamSet paramSet, AsyncCallback<ClientParamFile[]> async);
 
 	/**
-	 * Undeploys database idenfify by given dbToUndeploy paramater.
-	 * dbToUndeploy parameter value is used to find Curation object to be undeployed
-	 * by calling findCuration(dbToUndeploy) on the global CurationDao object.
-	 *
-	 * @param dbToUndeploy
-	 * @return returns progress message.
-	 * @throws edu.mayo.mprc.common.client.GWTServiceException
-	 *
-	 */
-	void undeployDatabase(String dbToUndeploy, AsyncCallback<ClientDatabaseUndeployerProgress> async);
-
-	/**
-	 * Gets next progress message on queue from given database undeployment task id.
-	 * taskId parameter value is obtained by calling first undeployDatabase(String dbToUndeploy) first
-	 * to start a undeployment task.
-	 *
-	 * @param taskId
-	 * @return
-	 * @throws edu.mayo.mprc.common.client.GWTServiceException
-	 *
-	 */
-	void getProgressMessageForDatabaseUndeployment(Long taskId, AsyncCallback<ClientDatabaseUndeployerProgress> async);
-
-	/**
-	 * @return
-	 * @throws edu.mayo.mprc.common.client.GWTServiceException
-	 *
-	 */
-	void isDatabaseUndeployerEnabled(AsyncCallback<Boolean> async);
-
-	/**
 	 * Starts search for given definition.
 	 *
 	 * @param def Search definition.
-	 * @throws edu.mayo.mprc.common.client.GWTServiceException
-	 *          When anything fails.
+	 * @throws edu.mayo.mprc.common.client.GWTServiceException When anything fails.
 	 */
 	void startSearch(ClientSwiftSearchDefinition def, AsyncCallback<Void> async);
 
@@ -167,8 +131,7 @@ public interface ServiceAsync {
 	 *
 	 * @param searchRunId Id of a search run to load
 	 * @return Search definition
-	 * @throws edu.mayo.mprc.common.client.GWTServiceException
-	 *          Typically when the given search definition does not exist.
+	 * @throws edu.mayo.mprc.common.client.GWTServiceException Typically when the given search definition does not exist.
 	 */
 	void loadSearch(int searchRunId, AsyncCallback<ClientLoadedSearch> async);
 
