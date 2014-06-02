@@ -43,5 +43,6 @@
         <module>swift-search</module>
         <module>xtandem</module>
         <module>heme</module>
+        <module>comet</module>
     </modules>
 </project>
