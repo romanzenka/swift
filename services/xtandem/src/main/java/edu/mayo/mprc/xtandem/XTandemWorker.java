@@ -149,7 +149,7 @@ public final class XTandemWorker extends WorkerBase {
 
 		final File taxonomyXmlFile = createTaxonomyXmlFile(packet.getDatabaseFile(), outputFile);
 
-		createDefaultInputXml(packet);
+		createDefaultInputXml(packet, tempWorkFolder);
 
 		final int initialThreads = getNumThreads();
 		ProcessCaller processCaller = runTandemSearch(
@@ -234,11 +234,11 @@ public final class XTandemWorker extends WorkerBase {
 	/**
 	 * Create default_input.xml required for new version of XTandem.
 	 */
-	private void createDefaultInputXml(final XTandemWorkPacket packet) {
+	private void createDefaultInputXml(final XTandemWorkPacket packet, final File tempWorkFolder) {
 		final String defaultInputContent = "<?xml version=\"1.0\"?>\n" +
 				"<?xml-stylesheet type=\"text/xsl\" href=\"tandem-input-style.xsl\"?>\n" +
 				"<bioml></bioml>";
-		FileUtilities.writeStringToFile(new File(packet.getOutputFile().getParentFile(), "default_input.xml"), defaultInputContent, true);
+		FileUtilities.writeStringToFile(new File(tempWorkFolder, "default_input.xml"), defaultInputContent, true);
 	}
 
 	private void checkPacketCorrectness(final XTandemWorkPacket packet) {
