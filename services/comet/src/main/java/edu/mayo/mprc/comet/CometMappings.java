@@ -27,6 +27,7 @@ public final class CometMappings implements Mappings {
 
 	private static final String PEP_TOL_UNIT = "peptide_mass_units";
 	private static final String PEP_TOL_VALUE = "peptide_mass_tolerance";
+	private static final String MISSED_CLEAVAGES = "allowed_missed_cleavage";
 
 	private static final String DATABASE = "database_name";
 
@@ -299,14 +300,10 @@ public final class CometMappings implements Mappings {
 			rn = rn.substring(1);
 		} else if (!rn.isEmpty()) { // RN.length = 0 is fine, allowed
 			// can't deal with this enzyme
-			throw new MprcException("Enzyme " + protease.getName() + " cannot be used by Sequest");
+			throw new MprcException("Enzyme " + protease.getName() + " cannot be used by Comet");
 		}
 
-
-		setNativeParam(ENZYME,
-				name + "\t" + direction + "\t" +
-						(rnminus1.equals("") ? "-" : rnminus1) + "\t" +
-						(rn.equals("") ? "-" : rn));
+		// TODO: Set enzymes
 	}
 
 	@Override
@@ -319,9 +316,9 @@ public final class CometMappings implements Mappings {
 	@Override
 	public void setMissedCleavages(final MappingContext context, final Integer missedCleavages) {
 		String value = String.valueOf(missedCleavages);
-		if (missedCleavages > 12) {
-			value = "12";
-			context.reportWarning("Sequest doesn't support > 12 missed cleavages", null);
+		if (missedCleavages > 5) {
+			value = "5";
+			context.reportWarning("Comet doesn't support > 5 missed cleavages", null);
 		}
 		setNativeParam(MISSED_CLEAVAGES, value);
 	}
@@ -366,7 +363,7 @@ public final class CometMappings implements Mappings {
 			}
 		}
 
-		setNativeParam(ION_SERIES, sb.toString());
+		// TODO: Set the ions
 	}
 
 	@Override
@@ -376,9 +373,11 @@ public final class CometMappings implements Mappings {
 
 	@Override
 	public Object clone() throws CloneNotSupportedException {
-		final SequestMappings mappings = (SequestMappings) super.clone();
+		final CometMappings mappings = (CometMappings) super.clone();
 		mappings.nativeParams = new LinkedHashMap<String, String>(nativeParams.size());
 		mappings.nativeParams.putAll(nativeParams);
+		mappings.enzymes = new LinkedHashMap<String, String>(enzymes.size());
+		mappings.enzymes.putAll(enzymes);
 		return mappings;
 	}
 }

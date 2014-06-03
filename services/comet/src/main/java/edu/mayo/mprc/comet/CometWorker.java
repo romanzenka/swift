@@ -54,7 +54,7 @@ public final class CometWorker extends WorkerBase {
 
 		final List<String> parameters = new LinkedList<String>();
 		parameters.add(cometExecutable.getPath());
-		parameters.add(paramFile.getAbsolutePath());
+		// parameters.add(paramFile.getAbsolutePath());
 
 		final ProcessBuilder processBuilder = new ProcessBuilder(parameters);
 		processBuilder.directory(tempWorkFolder);
@@ -62,8 +62,6 @@ public final class CometWorker extends WorkerBase {
 		final ProcessCaller processCaller = new ProcessCaller(processBuilder);
 
 		processCaller.run();
-		return processCaller;
-
 
 		publish(outputFile, finalOutputFile);
 
