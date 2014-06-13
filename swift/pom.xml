@@ -23,8 +23,6 @@
         <module>gwt-common</module>
         <module>scripts</module>
         <module>installer</module>
-        <module>heme-ui</module>
-        <module>quameter-ui</module>
         <module>install-test</module>
     </modules>
 </project>

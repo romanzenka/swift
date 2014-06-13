@@ -6,3 +6,4 @@ target
 *.ids
 *.class
 /activemq-data/
+.idea
