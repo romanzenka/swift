@@ -1,11 +1,15 @@
 package edu.mayo.mprc.comet;
 
 import com.google.common.base.Joiner;
+import edu.mayo.mprc.MprcException;
+import edu.mayo.mprc.chem.AminoAcid;
+import edu.mayo.mprc.chem.AminoAcidSet;
 import edu.mayo.mprc.swift.params2.*;
 import edu.mayo.mprc.swift.params2.mapping.Mappings;
 import edu.mayo.mprc.swift.params2.mapping.MockParamsInfo;
 import edu.mayo.mprc.swift.params2.mapping.TestMappingContextBase;
-import edu.mayo.mprc.unimod.ModSet;
+import edu.mayo.mprc.unimod.*;
+import edu.mayo.mprc.utilities.ResourceUtilities;
 import org.testng.Assert;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
@@ -25,6 +29,10 @@ public final class TestCometMappings {
 	}
 
 
+	private void assertParam(String param, String value) {
+		Assert.assertEquals(mappings.getNativeParam(param), value, "Value for " + param + " does not match");
+	}
+
 	@Test
 	public void shouldSupportPeptideTolerance() {
 		mappings.read(mappings.baseSettings());
@@ -33,25 +41,35 @@ public final class TestCometMappings {
 		Tolerance da = new Tolerance(0.3, MassUnit.Da);
 		mappings.setPeptideTolerance(context, da);
 
-		Assert.assertEquals(mappings.getNativeParam("peptide_mass_tolerance"), "0.3");
-		Assert.assertEquals(mappings.getNativeParam("peptide_mass_units"), "0" /* 0-amu */);
+		assertParam("peptide_mass_tolerance", "0.3");
+		assertParam("peptide_mass_units", "0");
 
 		// 12 ppm
 		Tolerance ppm = new Tolerance(12, MassUnit.Ppm);
 		mappings.setPeptideTolerance(context, ppm);
 
-		Assert.assertEquals(mappings.getNativeParam("peptide_mass_tolerance"), "12");
-		Assert.assertEquals(mappings.getNativeParam("peptide_mass_units"), "2" /* 2-ppm */);
+		assertParam("peptide_mass_tolerance", "12.0");
+		assertParam("peptide_mass_units", "2");
 	}
 
 	@Test
 	public void shouldSupportFragmentTolerance() {
+		context.setExpectWarnings(new String[]{"does not support ppm, using"});
+
 		mappings.read(mappings.baseSettings());
 
-		Tolerance fragmentTolerance = new Tolerance(10, MassUnit.Ppm);
-		mappings.setFragmentTolerance(context, fragmentTolerance);
-	}
+		Tolerance ppm = new Tolerance(10, MassUnit.Ppm);
+		mappings.setFragmentTolerance(context, ppm);
 
+		assertParam("fragment_bin_tol", "0.01"); // 10 ppm at 1000
+		assertParam("fragment_bin_offset", "0.0"); // Offset == 0 for anything under 0.8 dalton, otherwise 0.4
+
+		Tolerance da = new Tolerance(1, MassUnit.Da);
+		mappings.setFragmentTolerance(context, da);
+
+		assertParam("fragment_bin_tol", "1.0"); // 1 dalton bin
+		assertParam("fragment_bin_offset", "0.4"); // Offset is 0.4 (for no particular reason)
+	}
 
 	@Test
 	public void shouldSupportFixedMods() {
@@ -59,6 +77,48 @@ public final class TestCometMappings {
 
 		ModSet fixedMods = new ModSet();
 		mappings.setFixedMods(context, fixedMods);
+
+		assertParam("add_C_cysteine", "0.0");
+
+		// Carbamidomethylation of cysteine
+		// Carbamidomethyl		57.021464	57.0513	Carboxyamidomethylation	H(3) C(2) N O	*	Nterm	false	Artefact	true	3
+		SpecificityBuilder b = new SpecificityBuilder(AminoAcidSet.DEFAULT.getForSingleLetterCode("C"), Terminus.Anywhere, false, false, "", 0);
+		Mod mod = new Mod("Carbamidomethyl", "Iodoacetamide derivative", 1, 57.021464, 57.0513, "H(3) C(2) N O", null, b);
+		fixedMods.add(b.build(mod));
+
+		mappings.setFixedMods(context, fixedMods);
+		assertParam("add_C_cysteine", "57.021464");
+
+		// Back to 0
+		fixedMods = new ModSet();
+		mappings.setFixedMods(context, fixedMods);
+		assertParam("add_C_cysteine", "0.0");
+
+		// Protein N-term mod
+		b = new SpecificityBuilder(null, Terminus.Nterm, true, false, "", 0);
+		mod = new Mod("Acetyl", "Acetylation", 2, 42.010565, 42.0367, "H(2) C(2) O", null, b);
+		fixedMods = new ModSet();
+		fixedMods.add(b.build(mod));
+		mappings.setFixedMods(context, fixedMods);
+		assertParam("add_Nterm_protein", "42.010565");
+
+		// Peptide C-term mod
+		b = new SpecificityBuilder(null, Terminus.Cterm, false, false, "", 0);
+		mod = new Mod("Acetyl", "Acetylation", 2, 42.010565, 42.0367, "H(2) C(2) O", null, b);
+		fixedMods = new ModSet();
+		fixedMods.add(b.build(mod));
+		mappings.setFixedMods(context, fixedMods);
+		assertParam("add_Cterm_peptide", "42.010565");
+
+		// Protein N-term mod + specific site - G - should not be supported
+		context.setExpectWarnings(new String[]{"Comet does not support modification with position 'Nterm' and site 'G', dropping Acetyl (Protein N-term G)"});
+		b = new SpecificityBuilder(AminoAcidSet.DEFAULT.getForSingleLetterCode("G"), Terminus.Nterm, true, false, "", 0);
+		mod = new Mod("Acetyl", "Acetylation", 2, 42.010565, 42.0367, "H(2) C(2) O", null, b);
+		fixedMods = new ModSet();
+		fixedMods.add(b.build(mod));
+		mappings.setFixedMods(context, fixedMods);
+		context.failIfNoWarnings();
+
 	}
 
 	@Test
@@ -67,6 +127,8 @@ public final class TestCometMappings {
 
 		ModSet variableMods = new ModSet();
 		mappings.setVariableMods(context, variableMods);
+
+		Assert.fail("Implement me");
 	}
 
 	@Test
@@ -75,6 +137,8 @@ public final class TestCometMappings {
 
 		Instrument instrument = Instrument.ORBITRAP;
 		mappings.setInstrument(context, instrument);
+
+		Assert.fail("Implement me");
 	}
 
 	@Test
@@ -82,6 +146,8 @@ public final class TestCometMappings {
 		mappings.read(mappings.baseSettings());
 
 		mappings.setMinTerminiCleavages(context, 1);
+
+		Assert.fail("Implement me");
 	}
 
 	@Test
@@ -89,6 +155,8 @@ public final class TestCometMappings {
 		mappings.read(mappings.baseSettings());
 
 		mappings.setMissedCleavages(context, 3);
+
+		Assert.fail("Implement me");
 	}
 
 	@Test
@@ -97,6 +165,8 @@ public final class TestCometMappings {
 
 		Protease protease = Protease.getTrypsinAllowP();
 		mappings.setProtease(context, protease);
+
+		Assert.fail("Implement me");
 	}
 
 	@Test
@@ -105,6 +175,8 @@ public final class TestCometMappings {
 
 		String databaseName = "hello";
 		mappings.setSequenceDatabase(context, databaseName);
+
+		Assert.fail("Implement me");
 	}
 
 	/**
@@ -113,6 +185,7 @@ public final class TestCometMappings {
 	private static final class CometContext extends TestMappingContextBase {
 
 		private String[] expectWarnings;
+		private boolean warningsFound;
 
 		/**
 		 * Create basic context with mocked parameter info.
@@ -122,7 +195,15 @@ public final class TestCometMappings {
 		}
 
 		public void setExpectWarnings(String[] expectWarnings) {
+
 			this.expectWarnings = expectWarnings;
+			warningsFound = false;
+		}
+
+		public void failIfNoWarnings() {
+			if (!warningsFound) {
+				throw new MprcException("The expected warnings were not given: [" + Joiner.on("], [").join(expectWarnings) + "]");
+			}
 		}
 
 		@Override
@@ -136,6 +217,7 @@ public final class TestCometMappings {
 
 				for (final String warning : expectWarnings) {
 					if (message.contains(warning)) {
+						warningsFound = true;
 						return;
 					}
 				}

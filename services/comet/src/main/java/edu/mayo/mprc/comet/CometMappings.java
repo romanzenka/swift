@@ -21,13 +21,19 @@ public final class CometMappings implements Mappings {
 	private static final Pattern WHITESPACE = Pattern.compile("^\\s*$");
 	private static final Pattern COMMENT = Pattern.compile("^\\s*(#.*)$");
 	private static final Pattern EQUALS = Pattern.compile("^.*\\=.*$");
-	private static final Pattern PARSE_LINE = Pattern.compile("^\\s*([^\\s=]+)\\s*=\\s*([^;]*)(\\s*;.*)?$");
+	private static final Pattern PARSE_LINE = Pattern.compile("^\\s*([^\\s=]+)\\s*=\\s*([^#]*)(\\s*#.*)?$");
 	private static final Pattern ENZYME_SECTION = Pattern.compile("^\\s*\\[COMET_ENZYME_INFO\\].*$");
-	private static final Pattern ENZYME_ROW = Pattern.compile("^\\s*()");
+
+	// Number, Name, direction, before, NOT after
+	// 1. Trypsin 1 KR P
+	private static final Pattern ENZYME_ROW = Pattern.compile("^\\s*(\\d+)\\.\\s+(\\S+)\\s+(\\d+)\\s+(\\S+)\\s+(\\S+).*$");
 
 	private static final String PEP_TOL_UNIT = "peptide_mass_units";
 	private static final String PEP_TOL_VALUE = "peptide_mass_tolerance";
 	private static final String MISSED_CLEAVAGES = "allowed_missed_cleavage";
+
+	private static final String FRAGMENT_BIN_TOL = "fragment_bin_tol";
+	private static final String FRAGMENT_BIN_OFFSET = "fragment_bin_offset";
 
 	private static final String DATABASE = "database_name";
 
@@ -37,26 +43,27 @@ public final class CometMappings implements Mappings {
 			"add_Cterm_protein",
 			"add_Nterm_peptide",
 			"add_Nterm_protein",
-			"add_G_Glycine",
-			"add_A_Alanine",
-			"add_S_Serine",
-			"add_P_Proline",
-			"add_V_Valine",
-			"add_T_Threonine",
-			"add_C_Cysteine",
-			"add_L_Leucine",
-			"add_I_Isoleucine",
-			"add_N_Asparagine",
-			"add_O_Ornithine",
-			"add_Q_Glutamine",
-			"add_K_Lysine",
-			"add_E_Glutamic_Acid",
-			"add_M_Methionine",
-			"add_H_Histidine",
-			"add_F_Phenylalanine",
-			"add_R_Arginine",
-			"add_Y_Tyrosine",
-			"add_W_Tryptophan",
+			"add_G_glycine",
+			"add_A_alanine",
+			"add_S_serine",
+			"add_P_proline",
+			"add_V_valine",
+			"add_T_threonine",
+			"add_C_cysteine",
+			"add_L_leucine",
+			"add_I_isoleucine",
+			"add_N_asparagine",
+			"add_D_aspartic_acid",
+			"add_O_ornithine",
+			"add_Q_glutamine",
+			"add_K_lysine",
+			"add_E_glutamic_acid",
+			"add_M_methionine",
+			"add_H_histidine",
+			"add_F_phenylalanine",
+			"add_R_arginine",
+			"add_Y_tyrosine",
+			"add_W_tryptophan",
 			"add_B_user_amino_acid",
 			"add_J_user_amino_acid",
 			"add_U_user_amino_acid",
@@ -69,7 +76,7 @@ public final class CometMappings implements Mappings {
 	 */
 	private LinkedHashMap<String, String> nativeParams = new LinkedHashMap<String, String>();
 
-	private LinkedHashMap<String, String> enzymes = new LinkedHashMap<String, String>(11);
+	private LinkedHashMap<String, Protease> enzymes = new LinkedHashMap<String, Protease>(11);
 
 	@Override
 	public Reader baseSettings() {
@@ -79,6 +86,7 @@ public final class CometMappings implements Mappings {
 	@Override
 	public void read(final Reader isr) {
 		final BufferedReader reader = new BufferedReader(isr);
+		boolean enzymeSection = false;
 		try {
 			while (true) {
 				final String it = reader.readLine();
@@ -88,6 +96,34 @@ public final class CometMappings implements Mappings {
 
 				if (WHITESPACE.matcher(it).matches() || COMMENT.matcher(it).matches()) {
 					// Comment, ignore
+					continue;
+				}
+
+				if (enzymeSection) {
+					Matcher row = ENZYME_ROW.matcher(it);
+					if (row.matches()) {
+						// Number, Name, direction, before, after
+						final String number = row.group(1);
+						final String name = row.group(2);
+						final String direction = row.group(3); // 1 - before==towards N, 0 - before==towards C
+						final String before = row.group(4); // What amino acids allowed BEFORE the cleavage point
+						final String notAfter = row.group(5); // What amino acids NOT allowed AFTER the cleavage point
+
+						Protease protease;
+						if ("1".equals(direction)) {
+							// before == N end
+							protease = new Protease(name, before, "!" + notAfter);
+						} else {
+							protease = new Protease(name, "!" + notAfter, before);
+						}
+						enzymes.put(number, protease);
+					}
+					continue;
+				}
+
+				if (ENZYME_SECTION.matcher(it).matches()) {
+					// We are entering the enzyme definition section
+					enzymeSection = true;
 					continue;
 				}
 
@@ -102,6 +138,8 @@ public final class CometMappings implements Mappings {
 					String value = matcher.group(2);
 					if (value == null) {
 						value = "";
+					} else {
+						value = value.trim();
 					}
 
 					// We store absolutely all parameters, because makedb depends on it
@@ -209,6 +247,13 @@ public final class CometMappings implements Mappings {
 
 	@Override
 	public void setFragmentTolerance(final MappingContext context, final Tolerance fragmentTolerance) {
+		double value = fragmentTolerance.getValue();
+		if (fragmentTolerance.getUnit() == MassUnit.Ppm) {
+			value = value / 1000.0;
+			context.reportWarning("Comet does not support ppm, using " + value + " Da", ParamName.FragmentTolerance);
+		}
+		setNativeParam(FRAGMENT_BIN_TOL, String.valueOf(value));
+		setNativeParam(FRAGMENT_BIN_OFFSET, value <= 0.8 ? "0.0" : "0.4");
 	}
 
 	@Override
@@ -236,10 +281,10 @@ public final class CometMappings implements Mappings {
 			final String key;
 			if (ms.isPositionAnywhere() && ms.isSiteSpecificAminoAcid()) {
 				key = String.valueOf(ms.getSite()); // The key is single letter corresponding to the amino acid
-			} else if (ms.isPositionCTerminus()) {
-				key = "add_Cterm_" + (ms.isProteinOnly() ? "protein" : "peptide");
-			} else if (ms.isPositionNTerminus()) {
-				key = "add_Nterm_" + (ms.isProteinOnly() ? "protein" : "peptide");
+			} else if (ms.isPositionCTerminus() && !ms.isSiteSpecificAminoAcid()) {
+				key = "Cterm_" + (ms.isProteinOnly() ? "protein" : "peptide");
+			} else if (ms.isPositionNTerminus() && !ms.isSiteSpecificAminoAcid()) {
+				key = "Nterm_" + (ms.isProteinOnly() ? "protein" : "peptide");
 			} else {
 				context.reportWarning("Comet does not support modification with position '" +
 						ms.getTerm() + "' and site '" + ms.getSite() + "', dropping " + title, null);
@@ -376,7 +421,7 @@ public final class CometMappings implements Mappings {
 		final CometMappings mappings = (CometMappings) super.clone();
 		mappings.nativeParams = new LinkedHashMap<String, String>(nativeParams.size());
 		mappings.nativeParams.putAll(nativeParams);
-		mappings.enzymes = new LinkedHashMap<String, String>(enzymes.size());
+		mappings.enzymes = new LinkedHashMap<String, Protease>(enzymes.size());
 		mappings.enzymes.putAll(enzymes);
 		return mappings;
 	}
