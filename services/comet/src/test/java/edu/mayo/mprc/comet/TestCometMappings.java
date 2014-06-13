@@ -119,6 +119,21 @@ public final class TestCometMappings {
 		mappings.setFixedMods(context, fixedMods);
 		context.failIfNoWarnings();
 
+
+		// Stacked mods
+		context.setExpectWarnings(null);
+		b = new SpecificityBuilder(AminoAcidSet.DEFAULT.getForSingleLetterCode("G"), Terminus.Anywhere, true, false, "", 0);
+		mod = new Mod("Acetyl", "Acetylation", 2, 42.010565, 42.0367, "H(2) C(2) O", null, b);
+
+		SpecificityBuilder b2 = new SpecificityBuilder(AminoAcidSet.DEFAULT.getForSingleLetterCode("G"), Terminus.Anywhere, true, false, "", 0);
+		Mod mod2 = new Mod("Special mod", "Specialization", 2, 10.0, 42.0367, "H(10)", null, b2);
+
+		fixedMods = new ModSet();
+		fixedMods.add(b.build(mod));
+		fixedMods.add(b2.build(mod2));
+
+		mappings.setFixedMods(context, fixedMods);
+		assertParam("add_G_glycine", "52.010565");
 	}
 
 	@Test
