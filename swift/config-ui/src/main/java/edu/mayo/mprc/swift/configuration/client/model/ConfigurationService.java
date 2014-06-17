@@ -5,6 +5,8 @@ import com.google.gwt.user.client.rpc.RemoteService;
 import com.google.gwt.user.client.rpc.ServiceDefTarget;
 import edu.mayo.mprc.common.client.GWTServiceException;
 
+import java.io.File;
+
 public interface ConfigurationService extends RemoteService {
 
 	/**
@@ -39,6 +41,10 @@ public interface ConfigurationService extends RemoteService {
 	 * Shut down the whole server.
 	 */
 	void terminateProgram();
+
+	File getSwiftHome();
+
+	void setSwiftHome(File swiftHome);
 
 	/**
 	 * Utility/Convenience class.

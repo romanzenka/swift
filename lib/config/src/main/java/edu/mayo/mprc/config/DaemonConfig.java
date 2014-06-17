@@ -3,6 +3,7 @@ package edu.mayo.mprc.config;
 import edu.mayo.mprc.MprcException;
 import edu.mayo.mprc.utilities.FileUtilities;
 
+import java.io.File;
 import java.util.*;
 
 /**
@@ -75,14 +76,15 @@ public final class DaemonConfig implements ResourceConfig, NamedResource {
 	 * @param local If true, the daemon is expected to run on the local computer.
 	 * @return Default daemon setup.
 	 */
-	public static DaemonConfig getDefaultDaemonConfig(final String name, final boolean local) {
+	public static DaemonConfig getDefaultDaemonConfig(final String name, final boolean local, final File home) {
 		final DaemonConfig daemon = new DaemonConfig();
 		daemon.setName(name);
 		daemon.setOsName(System.getProperty("os.name"));
 		daemon.setOsArch(System.getProperty("os.arch"));
-		daemon.setTempFolderPath("var/tmp");
+		daemon.setTempFolderPath(getFolderPath(home, "var/tmp"));
+		daemon.setLogOutputFolder(getFolderPath(home, "var/log"));
 		daemon.setDumpErrors(false);
-		daemon.setDumpFolderPath("var/tmp/dump");
+		daemon.setDumpFolderPath(getFolderPath(home, "var/tmp/dump"));
 		daemon.setSharedFileSpacePath("/");
 
 		if (local) {
@@ -92,6 +94,10 @@ public final class DaemonConfig implements ResourceConfig, NamedResource {
 		}
 
 		return daemon;
+	}
+
+	private static String getFolderPath(File home, String folder) {
+		return home != null ? new File(home, folder).getAbsolutePath() : folder;
 	}
 
 	@Override
@@ -231,7 +237,7 @@ public final class DaemonConfig implements ResourceConfig, NamedResource {
 
 	/**
 	 * @return A wrapper script that executes a windows command that needs a graphical console on linux (using Xvfb) -
-	 *         virtual frame buffer. On windows not necessary - return empty string.
+	 * virtual frame buffer. On windows not necessary - return empty string.
 	 */
 	public String getXvfbWrapperScript() {
 		if (isWindows()) {

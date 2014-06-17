@@ -250,7 +250,7 @@ public final class WebUi implements Checkable {
 				ui.title = config.getTitle();
 				ui.browseRoot = new File(config.getBrowseRoot());
 				ui.browseWebRoot = config.getBrowseWebRoot();
-				ui.newConfigFile = config.getNewConfigFile() == null ? new File(Swift.DEFAULT_NEW_CONFIG_FILE) : new File(config.getNewConfigFile());
+				ui.newConfigFile = config.getNewConfigFile() == null ? null : new File(config.getNewConfigFile());
 				ui.swiftMonitor = getSwiftMonitor();
 				ui.setFileTokenFactory(getFileTokenFactory());
 				ui.setSwiftDao(getSwiftDao());
@@ -474,6 +474,10 @@ public final class WebUi implements Checkable {
 
 		public ServiceConfig getQstat() {
 			return qstat;
+		}
+
+		public void setNewConfigFile(final String newConfigFile) {
+			this.newConfigFile = newConfigFile;
 		}
 
 		public String getNewConfigFile() {

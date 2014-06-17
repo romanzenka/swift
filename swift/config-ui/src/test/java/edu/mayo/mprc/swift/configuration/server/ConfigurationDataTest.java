@@ -34,7 +34,7 @@ public final class ConfigurationDataTest {
 				(ResourceTable) MainFactoryContext.getContext().getBean("resourceTable"),
 				(SwiftEnvironment) MainFactoryContext.getContext().getBean("swiftEnvironment"),
 				(SwiftCommand) MainFactoryContext.getContext().getBean("install-command"));
-		data.loadDefaultConfig();
+		data.loadDefaultConfig(new File(".").getAbsoluteFile());
 	}
 
 	@Test

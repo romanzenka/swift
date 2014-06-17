@@ -9,6 +9,7 @@
         <property name="swiftMonitor" ref="swiftMonitor" />
         <property name="swiftSearcherCaller" ref="swiftSearcherCaller" />
         <property name="webUiHolder" ref="webUiHolder" />
+        <property name="configurationService" ref="ConfigurationService" />
     </bean>
 
     <bean id="SwiftAppService" class="edu.mayo.mprc.swift.ui.server.ServiceImpl">

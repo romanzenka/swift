@@ -3,8 +3,11 @@ package edu.mayo.mprc.swift.resources;
 import edu.mayo.mprc.MprcException;
 import edu.mayo.mprc.config.ResourceConfig;
 import edu.mayo.mprc.config.RunningApplicationContext;
+import edu.mayo.mprc.swift.Swift;
 import edu.mayo.mprc.utilities.exceptions.ExceptionUtilities;
 import org.apache.log4j.Logger;
+
+import java.io.File;
 
 /**
  * @author Roman Zenka
@@ -12,6 +15,7 @@ import org.apache.log4j.Logger;
 public class WebUiHolder {
 	private static final Logger LOGGER = Logger.getLogger(WebUiHolder.class);
 	private RunningApplicationContext context;
+	private File swiftHome = new File(".").getAbsoluteFile();
 
 	public WebUi getWebUi() {
 		final RunningApplicationContext context = getContext();
@@ -24,7 +28,7 @@ public class WebUiHolder {
 		}
 		if (webUiConfig == null) {
 			// Config file does not define web ui. Return the default one
-			webUiConfig = new WebUi.Config(null, "8080", "Swift", "/", "/", "var/conf/swift.conf", null, null);
+			webUiConfig = new WebUi.Config(null, "8080", "Swift", "/", "/", new File(getSwiftHome(), Swift.DEFAULT_NEW_CONFIG_FILE).getAbsolutePath(), null, null);
 		}
 		final Object resource = context.createResource(webUiConfig);
 		if (!(resource instanceof WebUi)) {
@@ -32,7 +36,6 @@ public class WebUiHolder {
 			return null;
 		}
 		return (WebUi) resource;
-
 	}
 
 	public void stopSwiftMonitor() {
@@ -47,5 +50,16 @@ public class WebUiHolder {
 
 	public void setContext(final RunningApplicationContext context) {
 		this.context = context;
+	}
+
+	public File getSwiftHome() {
+		return swiftHome;
+	}
+
+	/**
+	 * This can be reset by the servlet initialization process, otherwise cwd is used.
+	 */
+	public void setSwiftHome(File swiftHome) {
+		this.swiftHome = swiftHome;
 	}
 }

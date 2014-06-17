@@ -10,6 +10,10 @@ import edu.mayo.mprc.swift.commands.ExitCode;
 import edu.mayo.mprc.swift.commands.SwiftCommand;
 import edu.mayo.mprc.swift.commands.SwiftCommandLine;
 import edu.mayo.mprc.swift.commands.SwiftEnvironment;
+import edu.mayo.mprc.swift.configuration.client.Configuration;
+import edu.mayo.mprc.swift.configuration.client.model.ConfigurationService;
+import edu.mayo.mprc.swift.configuration.client.model.ConfigurationServiceAsync;
+import edu.mayo.mprc.swift.configuration.server.ConfigurationServiceImpl;
 import edu.mayo.mprc.swift.resources.SwiftMonitor;
 import edu.mayo.mprc.swift.resources.WebUi;
 import edu.mayo.mprc.swift.resources.WebUiHolder;
@@ -42,6 +46,7 @@ public final class ServletInitialization implements SwiftCommand, ServletContext
 	private static final String SWIFT_CONF_RELATIVE_PATH = Swift.CONFIG_FILE_NAME;
 
 	private WebUiHolder webUiHolder;
+	private ConfigurationService configurationService;
 	private MultiFactory factoryTable;
 	private ServiceFactory serviceFactory;
 	private SwiftMonitor swiftMonitor;
@@ -64,6 +69,10 @@ public final class ServletInitialization implements SwiftCommand, ServletContext
 			final String action = getAction(servletContext);
 			final File confFile = getConfigFile(servletContext);
 			final String swiftDaemon = getSwiftDaemon(servletContext);
+
+			final File home = getSwiftHome(servletContext);
+			webUiHolder.setSwiftHome(home);
+			getConfigurationService().setSwiftHome(home);
 
 			final SwiftEnvironment swiftEnvironment = MainFactoryContext.getSwiftEnvironment();
 			// Simulate command line being passed to Swift
@@ -169,6 +178,14 @@ public final class ServletInitialization implements SwiftCommand, ServletContext
 		this.swiftSearcherCaller = swiftSearcherCaller;
 	}
 
+	public ConfigurationService getConfigurationService() {
+		return configurationService;
+	}
+
+	public void setConfigurationService(ConfigurationService configurationService) {
+		this.configurationService = configurationService;
+	}
+
 	public ServletInitialization() {
 	}
 
@@ -193,32 +210,23 @@ public final class ServletInitialization implements SwiftCommand, ServletContext
 	 * @param context Servlet context (can define properties that point to Swift config file).
 	 * @return The Swift config file.
 	 */
-	private static File getConfigFile(final ServletContext context) {
-		File confFile = null;
-		if (getSwiftHome(context) == null) {
-			String swiftHome = System.getenv(SWIFT_HOME);
-			if (swiftHome == null) {
-				swiftHome = System.getProperty(SWIFT_HOME);
-			}
-			if (swiftHome != null) {
-				confFile = new File(swiftHome, SWIFT_CONF_RELATIVE_PATH).getAbsoluteFile();
-			}
-			if (confFile == null || !confFile.exists()) {
-				confFile = new File(SWIFT_CONF_RELATIVE_PATH).getAbsoluteFile();
-			}
-		} else {
-			confFile = getSwiftHome(context);
-		}
-		return confFile;
+	public static File getConfigFile(final ServletContext context) {
+		return new File(getSwiftHome(context), SWIFT_CONF_RELATIVE_PATH);
 	}
 
 	/**
 	 * @return Location of Swift home directory as the user specified. If the location was not specified, returns null.
 	 */
-	private static File getSwiftHome(final ServletContext context) {
-		final String swiftInstall = context.getInitParameter(SWIFT_INSTALL);
+	public static File getSwiftHome(final ServletContext context) {
+		String swiftInstall = context.getInitParameter(SWIFT_INSTALL);
 		if (swiftInstall == null) {
-			return null;
+			swiftInstall = System.getenv(SWIFT_HOME);
+			if (swiftInstall == null) {
+				swiftInstall = System.getProperty(SWIFT_HOME);
+			}
+			if (swiftInstall == null) {
+				swiftInstall = new File(".").getAbsolutePath();
+			}
 		}
 		return new File(swiftInstall);
 	}
