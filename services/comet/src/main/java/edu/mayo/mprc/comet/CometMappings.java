@@ -258,6 +258,18 @@ public final class CometMappings implements Mappings {
 
 	@Override
 	public void setVariableMods(final MappingContext context, final ModSet variableMods) {
+
+		int modNumber = 0;
+		for (ModSpecificity specificity : variableMods.getModifications()) {
+			modNumber++;
+			if (modNumber > 6) {
+				context.reportWarning("Comet supports 6 variable modifications. The list will be truncated", ParamName.VariableMods);
+				break;
+			}
+
+			String modString = specificity.getModification().getMassMono() + " " + specificity.getSite() + " 0 3";
+			setNativeParam("variable_mod" + modNumber, modString);
+		}
 	}
 
 	/**

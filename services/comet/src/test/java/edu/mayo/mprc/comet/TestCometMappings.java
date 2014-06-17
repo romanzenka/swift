@@ -82,9 +82,7 @@ public final class TestCometMappings {
 
 		// Carbamidomethylation of cysteine
 		// Carbamidomethyl		57.021464	57.0513	Carboxyamidomethylation	H(3) C(2) N O	*	Nterm	false	Artefact	true	3
-		SpecificityBuilder b = new SpecificityBuilder(AminoAcidSet.DEFAULT.getForSingleLetterCode("C"), Terminus.Anywhere, false, false, "", 0);
-		Mod mod = new Mod("Carbamidomethyl", "Iodoacetamide derivative", 1, 57.021464, 57.0513, "H(3) C(2) N O", null, b);
-		fixedMods.add(b.build(mod));
+		fixedMods.add(getCarbC());
 
 		mappings.setFixedMods(context, fixedMods);
 		assertParam("add_C_cysteine", "57.021464");
@@ -95,6 +93,8 @@ public final class TestCometMappings {
 		assertParam("add_C_cysteine", "0.0");
 
 		// Protein N-term mod
+		SpecificityBuilder b;
+		Mod mod;
 		b = new SpecificityBuilder(null, Terminus.Nterm, true, false, "", 0);
 		mod = new Mod("Acetyl", "Acetylation", 2, 42.010565, 42.0367, "H(2) C(2) O", null, b);
 		fixedMods = new ModSet();
@@ -136,12 +136,32 @@ public final class TestCometMappings {
 		assertParam("add_G_glycine", "52.010565");
 	}
 
+	private ModSpecificity getCarbC() {
+		SpecificityBuilder b = new SpecificityBuilder(AminoAcidSet.DEFAULT.getForSingleLetterCode("C"), Terminus.Anywhere, false, false, "", 0);
+		Mod mod = new Mod("Carbamidomethyl", "Iodoacetamide derivative", 1, 57.021464, 57.0513, "H(3) C(2) N O", null, b);
+		return b.build(mod);
+	}
+
 	@Test
 	public void shouldSupportVariableMods() {
 		mappings.read(mappings.baseSettings());
 
 		ModSet variableMods = new ModSet();
 		mappings.setVariableMods(context, variableMods);
+
+		assertParam("variable_mod1", "0.0 X 0 3");
+		assertParam("variable_mod2", "0.0 X 0 3");
+		assertParam("variable_mod3", "0.0 X 0 3");
+		assertParam("variable_mod4", "0.0 X 0 3");
+		assertParam("variable_mod5", "0.0 X 0 3");
+		assertParam("variable_mod6", "0.0 X 0 3");
+		assertParam("max_variable_mods_in_peptide", "5");
+
+
+		variableMods.add(getCarbC());
+
+		assertParam("variable_mod1", "57.021464 C 0 3");
+
 
 		Assert.fail("Implement me");
 	}
