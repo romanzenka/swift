@@ -111,8 +111,10 @@ public final class SwiftConfig {
 					throw new MprcException("There is more than one daemon specified in this configuration, none matches the hostname.\n"
 							+ "Run Swift with --daemon set to one of: " + joinDaemonNames(swiftConfig));
 				}
-			} else {
+			} else if (swiftConfig.getDaemons().size() == 1) {
 				daemonIdToLoad = swiftConfig.getDaemons().get(0).getName();
+			} else {
+				return null;
 			}
 		} else {
 			daemonIdToLoad = daemonId;
