@@ -72,7 +72,6 @@ public final class ServletInitialization implements SwiftCommand, ServletContext
 
 			final File home = getSwiftHome(servletContext);
 			webUiHolder.setSwiftHome(home);
-			getConfigurationService().setSwiftHome(home);
 
 			final SwiftEnvironment swiftEnvironment = MainFactoryContext.getSwiftEnvironment();
 			// Simulate command line being passed to Swift
