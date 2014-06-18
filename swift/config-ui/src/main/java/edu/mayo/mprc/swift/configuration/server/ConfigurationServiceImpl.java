@@ -35,7 +35,6 @@ public final class ConfigurationServiceImpl extends SpringGwtServlet implements 
 	private transient SwiftEnvironment swiftEnvironment;
 	private transient SwiftCommand installCommand;
 	private WebApplicationStopper stopper;
-	private File swiftHome = new File(".").getAbsoluteFile();
 
 	public ConfigurationServiceImpl() {
 		setStorage(new ServletStorage(this));
@@ -70,7 +69,7 @@ public final class ConfigurationServiceImpl extends SpringGwtServlet implements 
 				ApplicationConfig.load(config, configFile, getResourceTable());
 				getData().setConfig(config);
 			} else {
-				getData().loadDefaultConfig(getSwiftHome());
+				getData().loadDefaultConfig();
 			}
 			return getData().getModel();
 		} catch (Exception t) {
@@ -172,13 +171,5 @@ public final class ConfigurationServiceImpl extends SpringGwtServlet implements 
 
 	public void setStopper(WebApplicationStopper stopper) {
 		this.stopper = stopper;
-	}
-
-	public File getSwiftHome() {
-		return swiftHome;
-	}
-
-	public void setSwiftHome(File swiftHome) {
-		this.swiftHome = swiftHome;
 	}
 }

@@ -88,7 +88,7 @@ public final class TestApplicationContext implements Lifecycle {
 		final String fastaUploadFolder = FileUtilities.createTempFolder().getAbsolutePath();
 		final String tempFolder = FileUtilities.createTempFolder().getAbsolutePath();
 
-		final DaemonConfig daemonConfig = DaemonConfig.getDefaultDaemonConfig("test", true, new File("."));
+		final DaemonConfig daemonConfig = DaemonConfig.getDefaultDaemonConfig("test", true);
 		daemonConfig.setTempFolderPath(tempFolder);
 		application.addDaemon(daemonConfig);
 

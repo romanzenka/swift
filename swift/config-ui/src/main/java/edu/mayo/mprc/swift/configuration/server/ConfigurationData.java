@@ -96,7 +96,7 @@ public class ConfigurationData {
 		if (parent instanceof DaemonConfig) {
 			return createResource(index, type, (DaemonConfig) parent);
 		} else if (parent instanceof ApplicationConfig) {
-			return createDaemon(MessageFormat.format("Daemon {0}", index), false, null);
+			return createDaemon(MessageFormat.format("Daemon {0}", index), false);
 		}
 		return null;
 	}
@@ -135,12 +135,12 @@ public class ConfigurationData {
 	 *
 	 * @param local If the daemon is to run on the local machine.
 	 */
-	private DaemonModel createDaemon(final String name, final boolean local, File home) {
-		return mapDaemonConfigToModel(createDaemonConfig(name, local, home));
+	private DaemonModel createDaemon(final String name, final boolean local) {
+		return mapDaemonConfigToModel(createDaemonConfig(name, local));
 	}
 
-	private DaemonConfig createDaemonConfig(final String name, final boolean local, final File home) {
-		final DaemonConfig daemon = DaemonConfig.getDefaultDaemonConfig(name, local, home);
+	private DaemonConfig createDaemonConfig(final String name, final boolean local) {
+		final DaemonConfig daemon = DaemonConfig.getDefaultDaemonConfig(name, local);
 		getConfig().addDaemon(daemon);
 		return daemon;
 	}
@@ -392,12 +392,12 @@ public class ConfigurationData {
 	 * Since we are calling the service methods that need a counterpart running on the UI side,
 	 * we are responsible for properly adding the daemon and resources as children.
 	 */
-	public void loadDefaultConfig(File swiftHome) throws GWTServiceException {
+	public void loadDefaultConfig() throws GWTServiceException {
 		config.clear();
-		final DaemonConfig daemonConfig = createDaemonConfig("main", true, swiftHome);
+		final DaemonConfig daemonConfig = createDaemonConfig("main", true);
 
 		final Database.Config database = (Database.Config) createResourceConfig(1, Database.Factory.TYPE, daemonConfig);
-		database.setUrl("jdbc:h2:" + new File(swiftHome, "var/database/swift").getAbsolutePath());
+		database.setUrl("jdbc:h2:var/database/swift");
 		database.setUserName("sa");
 		database.setPassword("");
 		database.setDriverClassName("org.h2.Driver");
@@ -408,7 +408,6 @@ public class ConfigurationData {
 		createResourceConfig(1, MessageBroker.TYPE, daemonConfig);
 		final ServiceConfig searcher = (ServiceConfig) createResourceConfig(1, SwiftSearcher.TYPE, daemonConfig);
 		final WebUi.Config webUi = (WebUi.Config) createResourceConfig(1, WebUi.TYPE, daemonConfig);
-		webUi.setNewConfigFile(new File(swiftHome, Swift.DEFAULT_NEW_CONFIG_FILE).getAbsolutePath());
 
 		webUi.setSearcher(searcher);
 		((SwiftSearcher.Config) searcher.getRunner().getWorkerConfiguration()).setDatabase(database);
@@ -472,7 +471,7 @@ public class ConfigurationData {
 	/**
 	 * @param parentFolder Root folder with Swift install.
 	 * @return File to save the config to. This should not match the config file the data was loaded FROM.
-	 * Typically we want to provide a config file from a folder that Swift has write access to.
+	 *         Typically we want to provide a config file from a folder that Swift has write access to.
 	 */
 	private File getConfigFileForSave(final File parentFolder) {
 		final File configFile = extractNewConfigFile(parentFolder).getAbsoluteFile();
