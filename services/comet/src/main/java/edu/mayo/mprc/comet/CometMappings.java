@@ -6,6 +6,7 @@ import edu.mayo.mprc.swift.params2.mapping.MappingContext;
 import edu.mayo.mprc.swift.params2.mapping.Mappings;
 import edu.mayo.mprc.unimod.ModSet;
 import edu.mayo.mprc.unimod.ModSpecificity;
+import edu.mayo.mprc.unimod.Terminus;
 import edu.mayo.mprc.utilities.FileUtilities;
 import edu.mayo.mprc.utilities.ResourceUtilities;
 
@@ -258,17 +259,40 @@ public final class CometMappings implements Mappings {
 
 	@Override
 	public void setVariableMods(final MappingContext context, final ModSet variableMods) {
+		// Sort the mods to get consistent output
+		List<ModSpecificity> mods = new ArrayList<ModSpecificity>(variableMods.getModifications());
+		Collections.sort(mods);
 
-		int modNumber = 0;
-		for (ModSpecificity specificity : variableMods.getModifications()) {
-			modNumber++;
+		int modNumber = 1;
+		for (ModSpecificity specificity : mods) {
 			if (modNumber > 6) {
 				context.reportWarning("Comet supports 6 variable modifications. The list will be truncated", ParamName.VariableMods);
 				break;
 			}
 
+			if (specificity.isSiteCTerminus()) {
+				context.reportWarning("Comet skipped unsupported C-term mod " + specificity.toString(), ParamName.VariableMods);
+				break;
+			}
+
+			if (specificity.isSiteNTerminus()) {
+				context.reportWarning("Comet skipped unsupported N-term mod " + specificity.toString(), ParamName.VariableMods);
+				break;
+			}
+
+			if (!specificity.isSiteSpecificAminoAcid()) {
+				context.reportWarning("Comet skipped unlocalized variable mod " + specificity.toString(), ParamName.VariableMods);
+				break;
+			}
+
+			if (specificity.isPositionProteinSpecific() || specificity.isPositionNTerminus() || specificity.isPositionCTerminus()) {
+				final ModSpecificity copy = new ModSpecificity(specificity.getModification(), specificity.getSite(), Terminus.Anywhere, false, specificity.getHidden(), specificity.getClassification(), specificity.getSpecificityGroup(), specificity.getComments());
+				context.reportWarning("Comet replaced " + specificity.toString() + " mod with " + copy.toString(), ParamName.VariableMods);
+			}
+
 			String modString = specificity.getModification().getMassMono() + " " + specificity.getSite() + " 0 3";
 			setNativeParam("variable_mod" + modNumber, modString);
+			modNumber++;
 		}
 	}
 

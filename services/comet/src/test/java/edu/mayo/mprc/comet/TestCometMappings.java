@@ -112,28 +112,42 @@ public final class TestCometMappings {
 
 		// Protein N-term mod + specific site - G - should not be supported
 		context.setExpectWarnings(new String[]{"Comet does not support modification with position 'Nterm' and site 'G', dropping Acetyl (Protein N-term G)"});
-		b = new SpecificityBuilder(AminoAcidSet.DEFAULT.getForSingleLetterCode("G"), Terminus.Nterm, true, false, "", 0);
-		mod = new Mod("Acetyl", "Acetylation", 2, 42.010565, 42.0367, "H(2) C(2) O", null, b);
+		ModSpecificity nTermAcetyl = getNtermAcetyl();
 		fixedMods = new ModSet();
-		fixedMods.add(b.build(mod));
+		fixedMods.add(nTermAcetyl);
 		mappings.setFixedMods(context, fixedMods);
 		context.failIfNoWarnings();
 
 
 		// Stacked mods
 		context.setExpectWarnings(null);
-		b = new SpecificityBuilder(AminoAcidSet.DEFAULT.getForSingleLetterCode("G"), Terminus.Anywhere, true, false, "", 0);
-		mod = new Mod("Acetyl", "Acetylation", 2, 42.010565, 42.0367, "H(2) C(2) O", null, b);
+		ModSpecificity acetylG = getAcetylG();
 
 		SpecificityBuilder b2 = new SpecificityBuilder(AminoAcidSet.DEFAULT.getForSingleLetterCode("G"), Terminus.Anywhere, true, false, "", 0);
 		Mod mod2 = new Mod("Special mod", "Specialization", 2, 10.0, 42.0367, "H(10)", null, b2);
 
 		fixedMods = new ModSet();
-		fixedMods.add(b.build(mod));
+		fixedMods.add(acetylG);
 		fixedMods.add(b2.build(mod2));
 
 		mappings.setFixedMods(context, fixedMods);
 		assertParam("add_G_glycine", "52.010565");
+	}
+
+	private ModSpecificity getNtermAcetyl() {
+		SpecificityBuilder b;
+		Mod mod;
+		b = new SpecificityBuilder(AminoAcidSet.DEFAULT.getForSingleLetterCode("G"), Terminus.Nterm, true, false, "", 0);
+		mod = new Mod("Acetyl", "Acetylation", 2, 42.010565, 42.0367, "H(2) C(2) O", null, b);
+		return b.build(mod);
+	}
+
+	private ModSpecificity getAcetylG() {
+		SpecificityBuilder b;
+		Mod mod;
+		b = new SpecificityBuilder(AminoAcidSet.DEFAULT.getForSingleLetterCode("G"), Terminus.Anywhere, true, false, "", 0);
+		mod = new Mod("Acetyl", "Acetylation", 2, 42.010565, 42.0367, "H(2) C(2) O", null, b);
+		return b.build(mod);
 	}
 
 	private ModSpecificity getCarbC() {
@@ -145,25 +159,39 @@ public final class TestCometMappings {
 	@Test
 	public void shouldSupportVariableMods() {
 		mappings.read(mappings.baseSettings());
+		{
+			ModSet variableMods = new ModSet();
+			mappings.setVariableMods(context, variableMods);
 
-		ModSet variableMods = new ModSet();
-		mappings.setVariableMods(context, variableMods);
+			assertParam("variable_mod1", "0.0 X 0 3");
+			assertParam("variable_mod2", "0.0 X 0 3");
+			assertParam("variable_mod3", "0.0 X 0 3");
+			assertParam("variable_mod4", "0.0 X 0 3");
+			assertParam("variable_mod5", "0.0 X 0 3");
+			assertParam("variable_mod6", "0.0 X 0 3");
+			assertParam("max_variable_mods_in_peptide", "5");
+		}
 
-		assertParam("variable_mod1", "0.0 X 0 3");
-		assertParam("variable_mod2", "0.0 X 0 3");
-		assertParam("variable_mod3", "0.0 X 0 3");
-		assertParam("variable_mod4", "0.0 X 0 3");
-		assertParam("variable_mod5", "0.0 X 0 3");
-		assertParam("variable_mod6", "0.0 X 0 3");
-		assertParam("max_variable_mods_in_peptide", "5");
+		{
+			ModSet variableMods = new ModSet();
 
+			variableMods.add(getCarbC());
+			variableMods.add(getAcetylG());
+			mappings.setVariableMods(context, variableMods);
 
-		variableMods.add(getCarbC());
+			assertParam("variable_mod1", "42.010565 G 0 3");
+			assertParam("variable_mod2", "57.021464 C 0 3");
+		}
 
-		assertParam("variable_mod1", "57.021464 C 0 3");
+		{
+			ModSet variableMods = new ModSet();
+			variableMods.add(getNtermAcetyl());
+			context.setExpectWarnings(new String[] { "replaced" });
+			mappings.setVariableMods(context, variableMods);
+			context.failIfNoWarnings();
 
-
-		Assert.fail("Implement me");
+			assertParam("variable_mod1", "42.010565 G 0 3");
+		}
 	}
 
 	@Test
