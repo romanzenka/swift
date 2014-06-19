@@ -1,5 +1,6 @@
 package edu.mayo.mprc.comet;
 
+import com.google.common.collect.ImmutableSet;
 import edu.mayo.mprc.MprcException;
 import edu.mayo.mprc.swift.params2.*;
 import edu.mayo.mprc.swift.params2.mapping.MappingContext;
@@ -271,27 +272,33 @@ public final class CometMappings implements Mappings {
 			}
 
 			if (specificity.isSiteCTerminus()) {
-				context.reportWarning("Comet skipped unsupported C-term mod " + specificity.toString(), ParamName.VariableMods);
+				context.reportWarning("Comet skipped unsupported C-term mod '" + specificity.toString() + "'", ParamName.VariableMods);
 				break;
 			}
 
 			if (specificity.isSiteNTerminus()) {
-				context.reportWarning("Comet skipped unsupported N-term mod " + specificity.toString(), ParamName.VariableMods);
+				context.reportWarning("Comet skipped unsupported N-term mod '" + specificity.toString() + "'", ParamName.VariableMods);
 				break;
 			}
 
 			if (!specificity.isSiteSpecificAminoAcid()) {
-				context.reportWarning("Comet skipped unlocalized variable mod " + specificity.toString(), ParamName.VariableMods);
+				context.reportWarning("Comet skipped unlocalized variable mod '" + specificity.toString() + "'", ParamName.VariableMods);
 				break;
 			}
 
 			if (specificity.isPositionProteinSpecific() || specificity.isPositionNTerminus() || specificity.isPositionCTerminus()) {
 				final ModSpecificity copy = new ModSpecificity(specificity.getModification(), specificity.getSite(), Terminus.Anywhere, false, specificity.getHidden(), specificity.getClassification(), specificity.getSpecificityGroup(), specificity.getComments());
-				context.reportWarning("Comet replaced " + specificity.toString() + " mod with " + copy.toString(), ParamName.VariableMods);
+				context.reportWarning("Comet replaced '" + specificity.toString() + "' mod with '" + copy.toString() + "'", ParamName.VariableMods);
 			}
 
 			String modString = specificity.getModification().getMassMono() + " " + specificity.getSite() + " 0 3";
 			setNativeParam("variable_mod" + modNumber, modString);
+			modNumber++;
+		}
+
+		// Wipe the rest
+		while (modNumber <= 6) {
+			setNativeParam("variable_mod" + modNumber, "0.0 X 0 3 ");
 			modNumber++;
 		}
 	}
@@ -313,7 +320,6 @@ public final class CometMappings implements Mappings {
 		// We sum all the fixed mod contributions
 		final Map<String, Double> masses = new HashMap<String, Double>();
 		for (final ModSpecificity ms : fixedMods.getModifications()) {
-			final String title = ms.toString();
 			final String key;
 			if (ms.isPositionAnywhere() && ms.isSiteSpecificAminoAcid()) {
 				key = String.valueOf(ms.getSite()); // The key is single letter corresponding to the amino acid
@@ -322,9 +328,8 @@ public final class CometMappings implements Mappings {
 			} else if (ms.isPositionNTerminus() && !ms.isSiteSpecificAminoAcid()) {
 				key = "Nterm_" + (ms.isProteinOnly() ? "protein" : "peptide");
 			} else {
-				context.reportWarning("Comet does not support modification with position '" +
-						ms.getTerm() + "' and site '" + ms.getSite() + "', dropping " + title, null);
-				return;
+				context.reportWarning("Comet does not support fixed mod '" + ms.toString() + "' - skipping", null);
+				break;
 			}
 
 			final double mass = ms.getModification().getMassMono();
@@ -404,47 +409,24 @@ public final class CometMappings implements Mappings {
 		setNativeParam(MISSED_CLEAVAGES, value);
 	}
 
-	// The series matches the pattern.
-	private static final String[] INSTRUMENT_SERIES = "a      b      y      a           b           c           d           v           w           x           y           z".split("\\s+");
+	private final Set<String> ALLOWED_SERIES = new ImmutableSet.Builder<String>().add("a", "b", "c", "x", "y", "z").build();
 
-	@Override
 	public void setInstrument(final MappingContext context, final Instrument it) {
-		final Map<String, IonSeries> hasseries = new HashMap<String, IonSeries>();
-		final StringBuilder sb = new StringBuilder();
-
-		final HashSet<String> seriesset = new HashSet<String>();
-		seriesset.addAll(Arrays.asList(INSTRUMENT_SERIES));
-		for (final IonSeries is : it.getSeries()) {
-			if (seriesset.contains(is.getName())) {
-				hasseries.put(is.getName(), is);
+		for(String series : ALLOWED_SERIES) {
+			setNativeParam(seriesVariableName(series), "0");
+		}
+		for (IonSeries series : it.getSeries()) {
+			final String name = series.getName();
+			if (ALLOWED_SERIES.contains(name)) {
+				setNativeParam(seriesVariableName(name), "1");
 			} else {
-				context.reportWarning("Sequest doesn't support ion series " + is.getName(), null);
+				context.reportWarning("Comet does not support ion series '" + series.getName() + "', dropping", ParamName.Instrument);
 			}
 		}
+	}
 
-		final HashSet<String> first = new HashSet<String>();
-		for (final String ss : INSTRUMENT_SERIES) {
-			if (sb.length() != 0) {
-				sb.append(" ");
-			}
-			if (hasseries.containsKey(ss)) {
-				if (("a".equals(ss) || "b".equals(ss) || "y".equals(ss)) && !first.contains(ss)) {
-					sb.append("1");
-					first.add(ss);
-				} else {
-					sb.append("1.0");
-				}
-			} else {
-				if (("a".equals(ss) || "b".equals(ss) || "y".equals(ss)) && !first.contains(ss)) {
-					sb.append("0");
-					first.add(ss);
-				} else {
-					sb.append("0.0");
-				}
-			}
-		}
-
-		// TODO: Set the ions
+	private String seriesVariableName(String series) {
+		return "use_" + series.toUpperCase(Locale.US) + "_ions";
 	}
 
 	@Override

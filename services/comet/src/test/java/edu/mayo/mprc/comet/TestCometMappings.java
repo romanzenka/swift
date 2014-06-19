@@ -2,14 +2,12 @@ package edu.mayo.mprc.comet;
 
 import com.google.common.base.Joiner;
 import edu.mayo.mprc.MprcException;
-import edu.mayo.mprc.chem.AminoAcid;
 import edu.mayo.mprc.chem.AminoAcidSet;
 import edu.mayo.mprc.swift.params2.*;
 import edu.mayo.mprc.swift.params2.mapping.Mappings;
 import edu.mayo.mprc.swift.params2.mapping.MockParamsInfo;
 import edu.mayo.mprc.swift.params2.mapping.TestMappingContextBase;
 import edu.mayo.mprc.unimod.*;
-import edu.mayo.mprc.utilities.ResourceUtilities;
 import org.testng.Assert;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
@@ -75,85 +73,67 @@ public final class TestCometMappings {
 	public void shouldSupportFixedMods() {
 		mappings.read(mappings.baseSettings());
 
-		ModSet fixedMods = new ModSet();
-		mappings.setFixedMods(context, fixedMods);
+		{
+			ModSet fixedMods = new ModSet();
+			mappings.setFixedMods(context, fixedMods);
 
-		assertParam("add_C_cysteine", "0.0");
+			assertParam("add_C_cysteine", "0.0");
+		}
 
-		// Carbamidomethylation of cysteine
-		// Carbamidomethyl		57.021464	57.0513	Carboxyamidomethylation	H(3) C(2) N O	*	Nterm	false	Artefact	true	3
-		fixedMods.add(getCarbC());
+		{
+			ModSet fixedMods = new ModSet();
+			fixedMods.add(getCarbC());
 
-		mappings.setFixedMods(context, fixedMods);
-		assertParam("add_C_cysteine", "57.021464");
+			mappings.setFixedMods(context, fixedMods);
+			assertParam("add_C_cysteine", "57.021464");
+		}
 
-		// Back to 0
-		fixedMods = new ModSet();
-		mappings.setFixedMods(context, fixedMods);
-		assertParam("add_C_cysteine", "0.0");
+		{
+			// Return back to zero
+			ModSet fixedMods = new ModSet();
+			mappings.setFixedMods(context, fixedMods);
+			assertParam("add_C_cysteine", "0.0");
+		}
 
-		// Protein N-term mod
-		SpecificityBuilder b;
-		Mod mod;
-		b = new SpecificityBuilder(null, Terminus.Nterm, true, false, "", 0);
-		mod = new Mod("Acetyl", "Acetylation", 2, 42.010565, 42.0367, "H(2) C(2) O", null, b);
-		fixedMods = new ModSet();
-		fixedMods.add(b.build(mod));
-		mappings.setFixedMods(context, fixedMods);
-		assertParam("add_Nterm_protein", "42.010565");
+		{
+			ModSet fixedMods = new ModSet();
+			fixedMods.add(acetylAnyAcidProteinNTerm());
 
-		// Peptide C-term mod
-		b = new SpecificityBuilder(null, Terminus.Cterm, false, false, "", 0);
-		mod = new Mod("Acetyl", "Acetylation", 2, 42.010565, 42.0367, "H(2) C(2) O", null, b);
-		fixedMods = new ModSet();
-		fixedMods.add(b.build(mod));
-		mappings.setFixedMods(context, fixedMods);
-		assertParam("add_Cterm_peptide", "42.010565");
+			mappings.setFixedMods(context, fixedMods);
+			assertParam("add_Nterm_protein", "42.010565");
+		}
 
-		// Protein N-term mod + specific site - G - should not be supported
-		context.setExpectWarnings(new String[]{"Comet does not support modification with position 'Nterm' and site 'G', dropping Acetyl (Protein N-term G)"});
-		ModSpecificity nTermAcetyl = getNtermAcetyl();
-		fixedMods = new ModSet();
-		fixedMods.add(nTermAcetyl);
-		mappings.setFixedMods(context, fixedMods);
-		context.failIfNoWarnings();
+		{
+			ModSet fixedMods = new ModSet();
+			fixedMods.add(getAcetylAnyPeptideCTerm());
+
+			mappings.setFixedMods(context, fixedMods);
+			assertParam("add_Cterm_peptide", "42.010565");
+		}
+
+		{
+			ModSet fixedMods = new ModSet();
+			// Protein N-term mod + specific site - G - should not be supported
+			context.setExpectWarnings(new String[]{"Comet does not support fixed mod 'Acetyl (Protein N-term G)' - skipping"});
+
+			fixedMods.add(getNtermAcetyl());
+			mappings.setFixedMods(context, fixedMods);
+			context.failIfNoWarnings();
+		}
 
 
-		// Stacked mods
-		context.setExpectWarnings(null);
-		ModSpecificity acetylG = getAcetylG();
+		{
+			ModSet fixedMods = new ModSet();
+			// Stacked mods
 
-		SpecificityBuilder b2 = new SpecificityBuilder(AminoAcidSet.DEFAULT.getForSingleLetterCode("G"), Terminus.Anywhere, true, false, "", 0);
-		Mod mod2 = new Mod("Special mod", "Specialization", 2, 10.0, 42.0367, "H(10)", null, b2);
+			context.setExpectWarnings(null);
 
-		fixedMods = new ModSet();
-		fixedMods.add(acetylG);
-		fixedMods.add(b2.build(mod2));
+			fixedMods.add(getAcetylG());
+			fixedMods.add(getSpecialMod());
 
-		mappings.setFixedMods(context, fixedMods);
-		assertParam("add_G_glycine", "52.010565");
-	}
-
-	private ModSpecificity getNtermAcetyl() {
-		SpecificityBuilder b;
-		Mod mod;
-		b = new SpecificityBuilder(AminoAcidSet.DEFAULT.getForSingleLetterCode("G"), Terminus.Nterm, true, false, "", 0);
-		mod = new Mod("Acetyl", "Acetylation", 2, 42.010565, 42.0367, "H(2) C(2) O", null, b);
-		return b.build(mod);
-	}
-
-	private ModSpecificity getAcetylG() {
-		SpecificityBuilder b;
-		Mod mod;
-		b = new SpecificityBuilder(AminoAcidSet.DEFAULT.getForSingleLetterCode("G"), Terminus.Anywhere, true, false, "", 0);
-		mod = new Mod("Acetyl", "Acetylation", 2, 42.010565, 42.0367, "H(2) C(2) O", null, b);
-		return b.build(mod);
-	}
-
-	private ModSpecificity getCarbC() {
-		SpecificityBuilder b = new SpecificityBuilder(AminoAcidSet.DEFAULT.getForSingleLetterCode("C"), Terminus.Anywhere, false, false, "", 0);
-		Mod mod = new Mod("Carbamidomethyl", "Iodoacetamide derivative", 1, 57.021464, 57.0513, "H(3) C(2) N O", null, b);
-		return b.build(mod);
+			mappings.setFixedMods(context, fixedMods);
+			assertParam("add_G_glycine", "52.010565");
+		}
 	}
 
 	@Test
@@ -186,11 +166,31 @@ public final class TestCometMappings {
 		{
 			ModSet variableMods = new ModSet();
 			variableMods.add(getNtermAcetyl());
-			context.setExpectWarnings(new String[] { "replaced" });
+			context.setExpectWarnings(new String[]{"replaced"});
 			mappings.setVariableMods(context, variableMods);
 			context.failIfNoWarnings();
 
 			assertParam("variable_mod1", "42.010565 G 0 3");
+		}
+
+		{
+			ModSet variableMods = new ModSet();
+			variableMods.add(getAebs());
+			context.setExpectWarnings(new String[]{"skipped unsupported N-term"});
+			mappings.setVariableMods(context, variableMods);
+			context.failIfNoWarnings();
+
+			assertParam("variable_mod1", "0.0 X 0 3");
+		}
+
+		{
+			ModSet variableMods = new ModSet();
+			variableMods.add(getAcetylAnyPeptideCTerm());
+			context.setExpectWarnings(new String[]{"skipped unsupported C-term mod 'Acetyl (C-term)'"});
+			mappings.setVariableMods(context, variableMods);
+			context.failIfNoWarnings();
+
+			assertParam("variable_mod1", "0.0 X 0 3");
 		}
 	}
 
@@ -198,10 +198,17 @@ public final class TestCometMappings {
 	public void shouldSupportInstrument() {
 		mappings.read(mappings.baseSettings());
 
-		Instrument instrument = Instrument.ORBITRAP;
-		mappings.setInstrument(context, instrument);
+		{
+			Instrument instrument = Instrument.ORBITRAP;
+			mappings.setInstrument(context, instrument);
 
-		Assert.fail("Implement me");
+			assertParam("use_A_ions", "0");
+			assertParam("use_B_ions", "1");
+			assertParam("use_C_ions", "0");
+			assertParam("use_X_ions", "0");
+			assertParam("use_Y_ions", "1");
+			assertParam("use_Z_ions", "0");
+		}
 	}
 
 	@Test
@@ -291,5 +298,53 @@ public final class TestCometMappings {
 		}
 	}
 
+	private ModSpecificity getNtermAcetyl() {
+		SpecificityBuilder b;
+		Mod mod;
+		b = new SpecificityBuilder(AminoAcidSet.DEFAULT.getForSingleLetterCode("G"), Terminus.Nterm, true, false, "", 0);
+		mod = new Mod("Acetyl", "Acetylation", 2, 42.010565, 42.0367, "H(2) C(2) O", null, b);
+		return b.build(mod);
+	}
 
+	private ModSpecificity acetylAnyAcidProteinNTerm() {
+		SpecificityBuilder b;
+		Mod mod;
+		b = new SpecificityBuilder(null, Terminus.Nterm, true, false, "", 0);
+		mod = new Mod("Acetyl", "Acetylation", 2, 42.010565, 42.0367, "H(2) C(2) O", null, b);
+
+		return b.build(mod);
+	}
+
+	private ModSpecificity getAcetylG() {
+		SpecificityBuilder b;
+		Mod mod;
+		b = new SpecificityBuilder(AminoAcidSet.DEFAULT.getForSingleLetterCode("G"), Terminus.Anywhere, true, false, "", 0);
+		mod = new Mod("Acetyl", "Acetylation", 2, 42.010565, 42.0367, "H(2) C(2) O", null, b);
+		return b.build(mod);
+	}
+
+	private ModSpecificity getCarbC() {
+		SpecificityBuilder b = new SpecificityBuilder(AminoAcidSet.DEFAULT.getForSingleLetterCode("C"), Terminus.Anywhere, false, false, "", 0);
+		Mod mod = new Mod("Carbamidomethyl", "Iodoacetamide derivative", 1, 57.021464, 57.0513, "H(3) C(2) N O", null, b);
+		return b.build(mod);
+	}
+
+	private ModSpecificity getAebs() {
+		SpecificityBuilder b = new SpecificityBuilder(null, Terminus.Nterm, true, false, "", 0);
+		Mod mod = new Mod("AEBS", "Aminoethylbenzensulfonylation", 1, 183.034399, 183.2276, "H(9) C(8) N O(2) S", null, b);
+		return b.build(mod);
+	}
+
+	private ModSpecificity getSpecialMod() {
+		SpecificityBuilder b2 = new SpecificityBuilder(AminoAcidSet.DEFAULT.getForSingleLetterCode("G"), Terminus.Anywhere, true, false, "", 0);
+		Mod mod2 = new Mod("Special mod", "Specialization", 2, 10.0, 42.0367, "H(10)", null, b2);
+		return b2.build(mod2);
+	}
+
+	private ModSpecificity getAcetylAnyPeptideCTerm() {
+		// Peptide C-term mod
+		SpecificityBuilder b = new SpecificityBuilder(null, Terminus.Cterm, false, false, "", 0);
+		Mod mod = new Mod("Acetyl", "Acetylation", 2, 42.010565, 42.0367, "H(2) C(2) O", null, b);
+		return b.build(mod);
+	}
 }

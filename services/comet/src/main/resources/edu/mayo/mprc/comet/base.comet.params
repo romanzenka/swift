@@ -46,10 +46,10 @@ fragment_bin_tol = 1.0005              # binning to use on fragment ions
 fragment_bin_offset = 0.4              # offset position to start the binning (0.0 to 1.0)
 theoretical_fragment_ions = 1          # 0=use flanking peaks, 1=M peak only
 use_A_ions = 0
-use_B_ions = 1
+use_B_ions = 0
 use_C_ions = 0
 use_X_ions = 0
-use_Y_ions = 1
+use_Y_ions = 0
 use_Z_ions = 0
 use_NL_ions = 1                        # 0=no, 1=yes to consider NH3/H2O neutral loss peaks
 use_sparse_matrix = 0
