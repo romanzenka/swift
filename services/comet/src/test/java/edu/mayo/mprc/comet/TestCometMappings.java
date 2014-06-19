@@ -209,6 +209,23 @@ public final class TestCometMappings {
 			assertParam("use_Y_ions", "1");
 			assertParam("use_Z_ions", "0");
 		}
+
+		{
+			Instrument instrument = Instrument.MALDI_TOF_TOF;
+
+			context.setExpectWarnings(new String[]{"does not support ion series 'd', 'v', 'w'"});
+			mappings.setInstrument(context, instrument);
+			context.failIfNoWarnings();
+
+			assertParam("use_A_ions", "1");
+			assertParam("use_B_ions", "1");
+			assertParam("use_C_ions", "0");
+			assertParam("use_X_ions", "0");
+			assertParam("use_Y_ions", "1");
+			assertParam("use_Z_ions", "0");
+
+		}
+
 	}
 
 	@Test
@@ -216,8 +233,14 @@ public final class TestCometMappings {
 		mappings.read(mappings.baseSettings());
 
 		mappings.setMinTerminiCleavages(context, 1);
+		assertParam("num_enzyme_termini", "1");
 
-		Assert.fail("Implement me");
+		mappings.setMinTerminiCleavages(context, 2);
+		assertParam("num_enzyme_termini", "2");
+
+		context.setExpectWarnings(new String[]{"not support"});
+		mappings.setMinTerminiCleavages(context, 0);
+		context.failIfNoWarnings();
 	}
 
 	@Test

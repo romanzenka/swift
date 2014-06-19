@@ -1,5 +1,6 @@
 package edu.mayo.mprc.comet;
 
+import com.google.common.base.Joiner;
 import com.google.common.collect.ImmutableSet;
 import edu.mayo.mprc.MprcException;
 import edu.mayo.mprc.swift.params2.*;
@@ -38,6 +39,8 @@ public final class CometMappings implements Mappings {
 	private static final String FRAGMENT_BIN_OFFSET = "fragment_bin_offset";
 
 	private static final String DATABASE = "database_name";
+
+	private static final String NUM_ENZYME_TERMINI = "num_enzyme_termini";
 
 	private static final Pattern FIXED = Pattern.compile("^add_([A-Z]|Nterm|Cterm)_(.*)");
 	private static final String[] FIXED_MODS = new String[]{
@@ -394,9 +397,13 @@ public final class CometMappings implements Mappings {
 
 	@Override
 	public void setMinTerminiCleavages(MappingContext context, Integer minTerminiCleavages) {
-		if (minTerminiCleavages == 1) {
-			context.reportWarning("Sequest semitryptic not supported yet", null);
+		if (minTerminiCleavages == 0) {
+			context.reportWarning("Comet does not support non-specific enzymes", ParamName.Enzyme);
 		}
+		if (minTerminiCleavages > 2) {
+			context.reportWarning("Number of tryptic termini must be <= 2", ParamName.Enzyme);
+		}
+		setNativeParam(NUM_ENZYME_TERMINI, String.valueOf(minTerminiCleavages));
 	}
 
 	@Override
@@ -412,16 +419,21 @@ public final class CometMappings implements Mappings {
 	private final Set<String> ALLOWED_SERIES = new ImmutableSet.Builder<String>().add("a", "b", "c", "x", "y", "z").build();
 
 	public void setInstrument(final MappingContext context, final Instrument it) {
-		for(String series : ALLOWED_SERIES) {
+		for (String series : ALLOWED_SERIES) {
 			setNativeParam(seriesVariableName(series), "0");
 		}
+		final List<String> droppedSeries = new ArrayList<String>(3);
 		for (IonSeries series : it.getSeries()) {
 			final String name = series.getName();
 			if (ALLOWED_SERIES.contains(name)) {
 				setNativeParam(seriesVariableName(name), "1");
 			} else {
-				context.reportWarning("Comet does not support ion series '" + series.getName() + "', dropping", ParamName.Instrument);
+				droppedSeries.add(series.getName());
 			}
+		}
+		if (droppedSeries.size() > 0) {
+			Collections.sort(droppedSeries);
+			context.reportWarning("Comet does not support ion series '" + Joiner.on("', '").join(droppedSeries) + "', dropping", ParamName.Instrument);
 		}
 	}
 
