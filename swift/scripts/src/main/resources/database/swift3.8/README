@@ -1,0 +1,4 @@
+This directory contains scripts that bring Swift production
+to the version 3.8.
+
+Once we unify on the 3.8 version, the new changes would be done the same way for all environments.
