@@ -11,6 +11,7 @@ import edu.mayo.mprc.unimod.ModSpecificity;
 import edu.mayo.mprc.unimod.Terminus;
 import edu.mayo.mprc.utilities.FileUtilities;
 import edu.mayo.mprc.utilities.ResourceUtilities;
+import edu.mayo.mprc.utilities.StringUtilities;
 
 import java.io.BufferedReader;
 import java.io.PrintWriter;
@@ -81,7 +82,20 @@ public final class CometMappings implements Mappings {
 	 */
 	private LinkedHashMap<String, String> nativeParams = new LinkedHashMap<String, String>();
 
-	private LinkedHashMap<String, Protease> enzymes = new LinkedHashMap<String, Protease>(11);
+	/**
+	 * Holds all the default enzymes Comets defines by default.
+	 */
+	private LinkedHashMap<String, Protease> defaultEnzymes = new LinkedHashMap<String, Protease>(11);
+
+	/**
+	 * The extra custom enzyme if the default set was not enough or null otherwise.
+	 */
+	private Protease customEnzyme = null;
+
+	/**
+	 * Number to use for the custom enzyme.
+	 */
+	private int customEnzymeNumber = -1;
 
 	@Override
 	public Reader baseSettings() {
@@ -121,7 +135,11 @@ public final class CometMappings implements Mappings {
 						} else {
 							protease = new Protease(name, "!" + notAfter, before);
 						}
-						enzymes.put(number, protease);
+						defaultEnzymes.put(number, protease);
+						int num = Integer.valueOf(number);
+						if (this.customEnzymeNumber < num + 1) {
+							this.customEnzymeNumber = num + 1;
+						}
 					}
 					continue;
 				}
@@ -175,6 +193,37 @@ public final class CometMappings implements Mappings {
 
 				if (WHITESPACE.matcher(it).matches() || COMMENT.matcher(it).matches()) {
 					pw.println(it);
+				} else if (ENZYME_SECTION.matcher(it).matches()) {
+					// We are entering the enzyme definition section
+
+					for (Map.Entry<String, Protease> entry : defaultEnzymes.entrySet()) {
+						final Protease enzyme = entry.getValue();
+						final String direction;
+						final String prev;
+						final String next;
+						if (enzyme.getRnminus1().startsWith("!")) {
+							direction = "1";
+							prev = enzyme.getRn();
+							next = enzyme.getRnminus1().substring(1);
+						} else {
+							direction = "0";
+							prev = enzyme.getRnminus1();
+							if (enzyme.getRn().startsWith("!")) {
+								next = enzyme.getRn().substring(1);
+							} else {
+								next = enzyme.getRn();
+							}
+						}
+
+						pw.println(spaces(4, entry.getKey() + ".")
+								+ spaces(23, enzyme.getName())
+								+ spaces(7, direction)
+								+ spaces(12, prev)
+								+ next);
+					}
+
+					// This is the last section. Quit now
+					break;
 				} else if (EQUALS.matcher(it).matches()) {
 					// basically, we want to match: a keyword followed by equals followed by an optional value
 					// followed by optional whitespace and comment.
@@ -208,6 +257,19 @@ public final class CometMappings implements Mappings {
 			FileUtilities.closeQuietly(reader);
 			FileUtilities.closeQuietly(pw);
 		}
+	}
+
+	/**
+	 * @param columns How many columns we need to take total
+	 * @param s       What are we printing
+	 * @return s + as many spaces as it takes to get to required columns
+	 */
+	private String spaces(int columns, String s) {
+		int extra = columns - s.length();
+		if (extra > 0) {
+			return s + StringUtilities.repeat(' ', extra);
+		}
+		return s;
 	}
 
 	/**
@@ -411,7 +473,7 @@ public final class CometMappings implements Mappings {
 		String value = String.valueOf(missedCleavages);
 		if (missedCleavages > 5) {
 			value = "5";
-			context.reportWarning("Comet doesn't support > 5 missed cleavages", null);
+			context.reportWarning("Comet does not support > 5 missed cleavages", null);
 		}
 		setNativeParam(MISSED_CLEAVAGES, value);
 	}
@@ -451,8 +513,8 @@ public final class CometMappings implements Mappings {
 		final CometMappings mappings = (CometMappings) super.clone();
 		mappings.nativeParams = new LinkedHashMap<String, String>(nativeParams.size());
 		mappings.nativeParams.putAll(nativeParams);
-		mappings.enzymes = new LinkedHashMap<String, Protease>(enzymes.size());
-		mappings.enzymes.putAll(enzymes);
+		mappings.defaultEnzymes = new LinkedHashMap<String, Protease>(defaultEnzymes.size());
+		mappings.defaultEnzymes.putAll(defaultEnzymes);
 		return mappings;
 	}
 }

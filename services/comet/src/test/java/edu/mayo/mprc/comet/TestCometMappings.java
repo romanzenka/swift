@@ -247,29 +247,43 @@ public final class TestCometMappings {
 	public void shouldSupportMissedCleavages() {
 		mappings.read(mappings.baseSettings());
 
-		mappings.setMissedCleavages(context, 3);
+		{
+			mappings.setMissedCleavages(context, 5);
+			assertParam("allowed_missed_cleavage", "5");
+		}
 
-		Assert.fail("Implement me");
+		{
+			context.setExpectWarnings(new String[]{"not support > 5 missed cleavages"});
+			mappings.setMissedCleavages(context, 6);
+			context.failIfNoWarnings();
+			assertParam("allowed_missed_cleavage", "5");
+		}
 	}
 
 	@Test
 	public void shouldSupportProtease() {
 		mappings.read(mappings.baseSettings());
 
-		Protease protease = Protease.getTrypsinAllowP();
-		mappings.setProtease(context, protease);
+		{
+			Protease protease = Protease.getTrypsinAllowP();
+			mappings.setProtease(context, protease);
 
-		Assert.fail("Implement me");
+			assertParam("search_enzyme_number", "1");
+			assertParam("sample_enzyme_number", "1");
+		}
 	}
 
 	@Test
 	public void shouldSupportSequenceDatabase() {
 		mappings.read(mappings.baseSettings());
 
-		String databaseName = "hello";
-		mappings.setSequenceDatabase(context, databaseName);
-
-		Assert.fail("Implement me");
+		{
+			// The database name gets mapped as a placeholder.
+			// When the search runs, the actual path to the database will be written over this
+			String databaseName = "hello";
+			mappings.setSequenceDatabase(context, databaseName);
+			assertParam("database_name", "${DB:hello}");
+		}
 	}
 
 	/**
