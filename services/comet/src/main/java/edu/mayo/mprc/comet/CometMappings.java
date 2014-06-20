@@ -1,6 +1,7 @@
 package edu.mayo.mprc.comet;
 
 import com.google.common.base.Joiner;
+import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableSet;
 import edu.mayo.mprc.MprcException;
 import edu.mayo.mprc.swift.params2.*;
@@ -43,6 +44,9 @@ public final class CometMappings implements Mappings {
 
 	private static final String NUM_ENZYME_TERMINI = "num_enzyme_termini";
 
+	private static final String SEARCH_ENZYME_NUMBER = "search_enzyme_number";
+	private static final String SAMPLE_ENZYME_NUMBER = "sample_enzyme_number";
+
 	private static final Pattern FIXED = Pattern.compile("^add_([A-Z]|Nterm|Cterm)_(.*)");
 	private static final String[] FIXED_MODS = new String[]{
 			"add_Cterm_peptide",
@@ -76,6 +80,7 @@ public final class CometMappings implements Mappings {
 			"add_X_user_amino_acid",
 			"add_Z_user_amino_acid",
 	};
+	private static final Pattern SPACE = Pattern.compile("\\s");
 
 	/**
 	 * Native params are stored in order in which they were defined.
@@ -119,24 +124,30 @@ public final class CometMappings implements Mappings {
 				}
 
 				if (enzymeSection) {
-					Matcher row = ENZYME_ROW.matcher(it);
+					final Matcher row = ENZYME_ROW.matcher(it);
 					if (row.matches()) {
 						// Number, Name, direction, before, after
 						final String number = row.group(1);
 						final String name = row.group(2);
 						final String direction = row.group(3); // 1 - before==towards N, 0 - before==towards C
 						final String before = row.group(4); // What amino acids allowed BEFORE the cleavage point
-						final String notAfter = row.group(5); // What amino acids NOT allowed AFTER the cleavage point
+						String notAfter = row.group(5); // What amino acids NOT allowed AFTER the cleavage point
 
-						Protease protease;
+						if ("-".equals(notAfter)) {
+							notAfter = "";
+						} else {
+							notAfter = "!" + notAfter;
+						}
+
+						final Protease protease;
 						if ("1".equals(direction)) {
 							// before == N end
-							protease = new Protease(name, before, "!" + notAfter);
+							protease = new Protease(name, before, notAfter);
 						} else {
-							protease = new Protease(name, "!" + notAfter, before);
+							protease = new Protease(name, notAfter, before);
 						}
 						defaultEnzymes.put(number, protease);
-						int num = Integer.valueOf(number);
+						final int num = Integer.valueOf(number);
 						if (this.customEnzymeNumber < num + 1) {
 							this.customEnzymeNumber = num + 1;
 						}
@@ -171,8 +182,8 @@ public final class CometMappings implements Mappings {
 					throw new MprcException("Can't understand '" + it + "'");
 				}
 			}
-		} catch (Exception t) {
-			throw new MprcException("Failure reading sequest parameter collection", t);
+		} catch (final Exception t) {
+			throw new MprcException("Failure reading comet parameter collection", t);
 		} finally {
 			FileUtilities.closeQuietly(reader);
 		}
@@ -195,31 +206,15 @@ public final class CometMappings implements Mappings {
 					pw.println(it);
 				} else if (ENZYME_SECTION.matcher(it).matches()) {
 					// We are entering the enzyme definition section
+					pw.println(it);
 
-					for (Map.Entry<String, Protease> entry : defaultEnzymes.entrySet()) {
-						final Protease enzyme = entry.getValue();
-						final String direction;
-						final String prev;
-						final String next;
-						if (enzyme.getRnminus1().startsWith("!")) {
-							direction = "1";
-							prev = enzyme.getRn();
-							next = enzyme.getRnminus1().substring(1);
-						} else {
-							direction = "0";
-							prev = enzyme.getRnminus1();
-							if (enzyme.getRn().startsWith("!")) {
-								next = enzyme.getRn().substring(1);
-							} else {
-								next = enzyme.getRn();
-							}
-						}
+					for (final Map.Entry<String, Protease> entry : defaultEnzymes.entrySet()) {
+						final String proteaseLine = proteaseToCometString(entry.getKey(), entry.getValue());
+						pw.println(proteaseLine);
+					}
 
-						pw.println(spaces(4, entry.getKey() + ".")
-								+ spaces(23, enzyme.getName())
-								+ spaces(7, direction)
-								+ spaces(12, prev)
-								+ next);
+					if (customEnzyme != null) {
+						pw.println(proteaseToCometString(String.valueOf(customEnzymeNumber), customEnzyme));
 					}
 
 					// This is the last section. Quit now
@@ -229,18 +224,16 @@ public final class CometMappings implements Mappings {
 					// followed by optional whitespace and comment.
 					final Matcher matcher = PARSE_LINE.matcher(it);
 					if (!matcher.matches()) {
-						throw new MprcException("Can't understand '" + it + "'");
+						throw new MprcException("Can not understand '" + it + "'");
 					}
 					final String id = matcher.group(1);
 					if (nativeParams.keySet().contains(id)) {
-						// Replace the value
 						if (matcher.group(2) != null) {
-							// We have the value defined
-							pw.print(it.substring(0, matcher.start(2)));
-							pw.print(nativeParams.get(id));
+							final int commentColumn = it.indexOf("#");
+							pw.print(spaces(commentColumn, it.substring(0, matcher.start(2)) + nativeParams.get(id)));
 							pw.println(it.substring(matcher.end(2)));
 						} else {
-							// The value is missing
+							// The comment is missing
 							pw.print(it.trim());
 							pw.println(nativeParams.get(id));
 						}
@@ -251,8 +244,8 @@ public final class CometMappings implements Mappings {
 					pw.println(it);
 				}
 			}
-		} catch (Exception t) {
-			throw new MprcException("Failure reading sequest parameter collection", t);
+		} catch (final Exception t) {
+			throw new MprcException("Failure reading comet parameter collection", t);
 		} finally {
 			FileUtilities.closeQuietly(reader);
 			FileUtilities.closeQuietly(pw);
@@ -260,12 +253,53 @@ public final class CometMappings implements Mappings {
 	}
 
 	/**
+	 * Converts a protease into a comet string.
+	 *
+	 * @param proteaseNumber Number to output.
+	 * @param enzyme         Protease name
+	 * @return String to put into Comet's config file that represents the protease.
+	 */
+	public static String proteaseToCometString(final String proteaseNumber, final Protease enzyme) {
+		final String direction;
+		final String prev;
+		final String next;
+		String rn1 = enzyme.getRnminus1();
+		if (rn1.isEmpty() || rn1.startsWith("!")) {
+			direction = "0";
+			prev = emptyToDash(enzyme.getRn());
+			next = emptyToDash(rn1.isEmpty() ? "" : rn1.substring(1));
+		} else {
+			direction = "1";
+			prev = emptyToDash(rn1);
+			if (enzyme.getRn().startsWith("!")) {
+				next = emptyToDash(enzyme.getRn().substring(1));
+			} else {
+				next = emptyToDash(enzyme.getRn());
+			}
+		}
+
+		final String name = SPACE.matcher(enzyme.getName()).replaceAll("_");
+		return spaces(4, proteaseNumber + ".")
+				+ spaces(23, name)
+				+ spaces(7, direction)
+				+ spaces(12, prev)
+				+ next;
+	}
+
+	private static String emptyToDash(final String s) {
+		if (Strings.isNullOrEmpty(s)) {
+			return "-";
+		}
+		return s;
+	}
+
+	/**
 	 * @param columns How many columns we need to take total
 	 * @param s       What are we printing
 	 * @return s + as many spaces as it takes to get to required columns
 	 */
-	private String spaces(int columns, String s) {
-		int extra = columns - s.length();
+	private static String spaces(final int columns, final String s) {
+		final int extra = columns - s.length();
 		if (extra > 0) {
 			return s + StringUtilities.repeat(' ', extra);
 		}
@@ -317,7 +351,7 @@ public final class CometMappings implements Mappings {
 		double value = fragmentTolerance.getValue();
 		if (fragmentTolerance.getUnit() == MassUnit.Ppm) {
 			value = value / 1000.0;
-			context.reportWarning("Comet does not support ppm, using " + value + " Da", ParamName.FragmentTolerance);
+			context.reportWarning(String.format("Comet does not support ppm, using %s Da", value), ParamName.FragmentTolerance);
 		}
 		setNativeParam(FRAGMENT_BIN_TOL, String.valueOf(value));
 		setNativeParam(FRAGMENT_BIN_OFFSET, value <= 0.8 ? "0.0" : "0.4");
@@ -326,37 +360,37 @@ public final class CometMappings implements Mappings {
 	@Override
 	public void setVariableMods(final MappingContext context, final ModSet variableMods) {
 		// Sort the mods to get consistent output
-		List<ModSpecificity> mods = new ArrayList<ModSpecificity>(variableMods.getModifications());
+		final List<ModSpecificity> mods = new ArrayList<ModSpecificity>(variableMods.getModifications());
 		Collections.sort(mods);
 
 		int modNumber = 1;
-		for (ModSpecificity specificity : mods) {
+		for (final ModSpecificity specificity : mods) {
 			if (modNumber > 6) {
 				context.reportWarning("Comet supports 6 variable modifications. The list will be truncated", ParamName.VariableMods);
 				break;
 			}
 
 			if (specificity.isSiteCTerminus()) {
-				context.reportWarning("Comet skipped unsupported C-term mod '" + specificity.toString() + "'", ParamName.VariableMods);
+				context.reportWarning(String.format("Comet skipped unsupported C-term mod '%s'", specificity.toString()), ParamName.VariableMods);
 				break;
 			}
 
 			if (specificity.isSiteNTerminus()) {
-				context.reportWarning("Comet skipped unsupported N-term mod '" + specificity.toString() + "'", ParamName.VariableMods);
+				context.reportWarning(String.format("Comet skipped unsupported N-term mod '%s'", specificity.toString()), ParamName.VariableMods);
 				break;
 			}
 
 			if (!specificity.isSiteSpecificAminoAcid()) {
-				context.reportWarning("Comet skipped unlocalized variable mod '" + specificity.toString() + "'", ParamName.VariableMods);
+				context.reportWarning(String.format("Comet skipped unlocalized variable mod '%s'", specificity.toString()), ParamName.VariableMods);
 				break;
 			}
 
 			if (specificity.isPositionProteinSpecific() || specificity.isPositionNTerminus() || specificity.isPositionCTerminus()) {
 				final ModSpecificity copy = new ModSpecificity(specificity.getModification(), specificity.getSite(), Terminus.Anywhere, false, specificity.getHidden(), specificity.getClassification(), specificity.getSpecificityGroup(), specificity.getComments());
-				context.reportWarning("Comet replaced '" + specificity.toString() + "' mod with '" + copy.toString() + "'", ParamName.VariableMods);
+				context.reportWarning(String.format("Comet replaced '%s' mod with '%s'", specificity.toString(), copy.toString()), ParamName.VariableMods);
 			}
 
-			String modString = specificity.getModification().getMassMono() + " " + specificity.getSite() + " 0 3";
+			final String modString = specificity.getModification().getMassMono() + " " + specificity.getSite() + " 0 3";
 			setNativeParam("variable_mod" + modNumber, modString);
 			modNumber++;
 		}
@@ -366,17 +400,6 @@ public final class CometMappings implements Mappings {
 			setNativeParam("variable_mod" + modNumber, "0.0 X 0 3 ");
 			modNumber++;
 		}
-	}
-
-	/**
-	 * @param builder Builder to append next string to.
-	 * @param text    String to append. Strings are separated by {@code ", "}
-	 */
-	private void appendCommaSeparated(final StringBuilder builder, final String text) {
-		if (builder.length() > 0) {
-			builder.append(", ");
-		}
-		builder.append(text);
 	}
 
 	@Override
@@ -393,7 +416,7 @@ public final class CometMappings implements Mappings {
 			} else if (ms.isPositionNTerminus() && !ms.isSiteSpecificAminoAcid()) {
 				key = "Nterm_" + (ms.isProteinOnly() ? "protein" : "peptide");
 			} else {
-				context.reportWarning("Comet does not support fixed mod '" + ms.toString() + "' - skipping", null);
+				context.reportWarning(String.format("Comet does not support fixed mod '%s' - skipping", ms.toString()), null);
 				break;
 			}
 
@@ -427,38 +450,41 @@ public final class CometMappings implements Mappings {
 
 	@Override
 	public void setSequenceDatabase(final MappingContext context, final String shortDatabaseName) {
-		setNativeParam(DATABASE, "${DB:" + shortDatabaseName + "}");
+		setNativeParam(DATABASE, String.format("${DB:%s}", shortDatabaseName));
 	}
 
 	@Override
 	public void setProtease(final MappingContext context, final Protease protease) {
 
-		final String name = protease.getName().replaceAll("\\s", "_");
-		String direction = "1"; // Forward (cut C-terminus from the residue) or reverse (cut N-terminus)
-		String rn = protease.getRn();
-		String rnminus1 = protease.getRnminus1();
-
-		// how do we recognize sense == 0 (ie inverted match)?
-		if ("Non-Specific".equals(protease.getName())) {
-			direction = "0";
-		} else if (rnminus1.isEmpty()) {
-			// if there's no rnminus1, then we assume this is an inverted match
-			direction = "0";
-			final String swap = rn;
-			rn = rnminus1;
-			rnminus1 = swap;
-		} else if (rn.startsWith("!")) {
-			rn = rn.substring(1);
-		} else if (!rn.isEmpty()) { // RN.length = 0 is fine, allowed
-			// can't deal with this enzyme
-			throw new MprcException("Enzyme " + protease.getName() + " cannot be used by Comet");
+		// We only support proteases that are allowed on one side and NOT allowed on the other...
+		final boolean notRn = protease.getRn().startsWith("!") || protease.getRn().isEmpty();
+		final boolean notRn1 = protease.getRnminus1().startsWith("!") || protease.getRnminus1().isEmpty();
+		if (notRn == notRn1) {
+			context.reportError(String.format("Protease %s is not supported by Comet", protease.toString()), null, ParamName.Enzyme);
+			return;
 		}
 
-		// TODO: Set enzymes
+		for (final Map.Entry<String, Protease> entry : defaultEnzymes.entrySet()) {
+			final Protease defProtease = entry.getValue();
+			if (defProtease.getRnminus1().equals(protease.getRnminus1()) &&
+					defProtease.getRn().equals(protease.getRn())) {
+				setEnzymeNumbers(entry.getKey());
+				customEnzyme = null;
+				return;
+			}
+		}
+
+		customEnzyme = protease;
+		setEnzymeNumbers(String.valueOf(customEnzymeNumber));
+	}
+
+	private void setEnzymeNumbers(final String number) {
+		setNativeParam(SEARCH_ENZYME_NUMBER, number);
+		setNativeParam(SAMPLE_ENZYME_NUMBER, number);
 	}
 
 	@Override
-	public void setMinTerminiCleavages(MappingContext context, Integer minTerminiCleavages) {
+	public void setMinTerminiCleavages(final MappingContext context, final Integer minTerminiCleavages) {
 		if (minTerminiCleavages == 0) {
 			context.reportWarning("Comet does not support non-specific enzymes", ParamName.Enzyme);
 		}
@@ -481,11 +507,11 @@ public final class CometMappings implements Mappings {
 	private final Set<String> ALLOWED_SERIES = new ImmutableSet.Builder<String>().add("a", "b", "c", "x", "y", "z").build();
 
 	public void setInstrument(final MappingContext context, final Instrument it) {
-		for (String series : ALLOWED_SERIES) {
+		for (final String series : ALLOWED_SERIES) {
 			setNativeParam(seriesVariableName(series), "0");
 		}
 		final List<String> droppedSeries = new ArrayList<String>(3);
-		for (IonSeries series : it.getSeries()) {
+		for (final IonSeries series : it.getSeries()) {
 			final String name = series.getName();
 			if (ALLOWED_SERIES.contains(name)) {
 				setNativeParam(seriesVariableName(name), "1");
@@ -495,16 +521,16 @@ public final class CometMappings implements Mappings {
 		}
 		if (droppedSeries.size() > 0) {
 			Collections.sort(droppedSeries);
-			context.reportWarning("Comet does not support ion series '" + Joiner.on("', '").join(droppedSeries) + "', dropping", ParamName.Instrument);
+			context.reportWarning(String.format("Comet does not support ion series '%s', dropping", Joiner.on("', '").join(droppedSeries)), ParamName.Instrument);
 		}
 	}
 
-	private String seriesVariableName(String series) {
-		return "use_" + series.toUpperCase(Locale.US) + "_ions";
+	private String seriesVariableName(final String series) {
+		return String.format("use_%s_ions", series.toUpperCase(Locale.US));
 	}
 
 	@Override
-	public void checkValidity(MappingContext context) {
+	public void checkValidity(final MappingContext context) {
 	}
 
 
@@ -515,6 +541,8 @@ public final class CometMappings implements Mappings {
 		mappings.nativeParams.putAll(nativeParams);
 		mappings.defaultEnzymes = new LinkedHashMap<String, Protease>(defaultEnzymes.size());
 		mappings.defaultEnzymes.putAll(defaultEnzymes);
+		mappings.customEnzyme = customEnzyme;
+		mappings.customEnzymeNumber = customEnzymeNumber;
 		return mappings;
 	}
 }

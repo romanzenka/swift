@@ -8,9 +8,12 @@ import edu.mayo.mprc.swift.params2.mapping.Mappings;
 import edu.mayo.mprc.swift.params2.mapping.MockParamsInfo;
 import edu.mayo.mprc.swift.params2.mapping.TestMappingContextBase;
 import edu.mayo.mprc.unimod.*;
+import edu.mayo.mprc.utilities.TestingUtilities;
 import org.testng.Assert;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
+
+import java.io.StringWriter;
 
 /**
  * @author Roman Zenka
@@ -27,7 +30,7 @@ public final class TestCometMappings {
 	}
 
 
-	private void assertParam(String param, String value) {
+	private void assertParam(final String param, final String value) {
 		Assert.assertEquals(mappings.getNativeParam(param), value, "Value for " + param + " does not match");
 	}
 
@@ -36,14 +39,14 @@ public final class TestCometMappings {
 		mappings.read(mappings.baseSettings());
 
 		// 0.3 Da
-		Tolerance da = new Tolerance(0.3, MassUnit.Da);
+		final Tolerance da = new Tolerance(0.3, MassUnit.Da);
 		mappings.setPeptideTolerance(context, da);
 
 		assertParam("peptide_mass_tolerance", "0.3");
 		assertParam("peptide_mass_units", "0");
 
 		// 12 ppm
-		Tolerance ppm = new Tolerance(12, MassUnit.Ppm);
+		final Tolerance ppm = new Tolerance(12, MassUnit.Ppm);
 		mappings.setPeptideTolerance(context, ppm);
 
 		assertParam("peptide_mass_tolerance", "12.0");
@@ -56,13 +59,13 @@ public final class TestCometMappings {
 
 		mappings.read(mappings.baseSettings());
 
-		Tolerance ppm = new Tolerance(10, MassUnit.Ppm);
+		final Tolerance ppm = new Tolerance(10, MassUnit.Ppm);
 		mappings.setFragmentTolerance(context, ppm);
 
 		assertParam("fragment_bin_tol", "0.01"); // 10 ppm at 1000
 		assertParam("fragment_bin_offset", "0.0"); // Offset == 0 for anything under 0.8 dalton, otherwise 0.4
 
-		Tolerance da = new Tolerance(1, MassUnit.Da);
+		final Tolerance da = new Tolerance(1, MassUnit.Da);
 		mappings.setFragmentTolerance(context, da);
 
 		assertParam("fragment_bin_tol", "1.0"); // 1 dalton bin
@@ -74,14 +77,14 @@ public final class TestCometMappings {
 		mappings.read(mappings.baseSettings());
 
 		{
-			ModSet fixedMods = new ModSet();
+			final ModSet fixedMods = new ModSet();
 			mappings.setFixedMods(context, fixedMods);
 
 			assertParam("add_C_cysteine", "0.0");
 		}
 
 		{
-			ModSet fixedMods = new ModSet();
+			final ModSet fixedMods = new ModSet();
 			fixedMods.add(getCarbC());
 
 			mappings.setFixedMods(context, fixedMods);
@@ -90,13 +93,13 @@ public final class TestCometMappings {
 
 		{
 			// Return back to zero
-			ModSet fixedMods = new ModSet();
+			final ModSet fixedMods = new ModSet();
 			mappings.setFixedMods(context, fixedMods);
 			assertParam("add_C_cysteine", "0.0");
 		}
 
 		{
-			ModSet fixedMods = new ModSet();
+			final ModSet fixedMods = new ModSet();
 			fixedMods.add(acetylAnyAcidProteinNTerm());
 
 			mappings.setFixedMods(context, fixedMods);
@@ -104,7 +107,7 @@ public final class TestCometMappings {
 		}
 
 		{
-			ModSet fixedMods = new ModSet();
+			final ModSet fixedMods = new ModSet();
 			fixedMods.add(getAcetylAnyPeptideCTerm());
 
 			mappings.setFixedMods(context, fixedMods);
@@ -112,7 +115,7 @@ public final class TestCometMappings {
 		}
 
 		{
-			ModSet fixedMods = new ModSet();
+			final ModSet fixedMods = new ModSet();
 			// Protein N-term mod + specific site - G - should not be supported
 			context.setExpectWarnings(new String[]{"Comet does not support fixed mod 'Acetyl (Protein N-term G)' - skipping"});
 
@@ -123,7 +126,7 @@ public final class TestCometMappings {
 
 
 		{
-			ModSet fixedMods = new ModSet();
+			final ModSet fixedMods = new ModSet();
 			// Stacked mods
 
 			context.setExpectWarnings(null);
@@ -140,7 +143,7 @@ public final class TestCometMappings {
 	public void shouldSupportVariableMods() {
 		mappings.read(mappings.baseSettings());
 		{
-			ModSet variableMods = new ModSet();
+			final ModSet variableMods = new ModSet();
 			mappings.setVariableMods(context, variableMods);
 
 			assertParam("variable_mod1", "0.0 X 0 3");
@@ -153,7 +156,7 @@ public final class TestCometMappings {
 		}
 
 		{
-			ModSet variableMods = new ModSet();
+			final ModSet variableMods = new ModSet();
 
 			variableMods.add(getCarbC());
 			variableMods.add(getAcetylG());
@@ -164,7 +167,7 @@ public final class TestCometMappings {
 		}
 
 		{
-			ModSet variableMods = new ModSet();
+			final ModSet variableMods = new ModSet();
 			variableMods.add(getNtermAcetyl());
 			context.setExpectWarnings(new String[]{"replaced"});
 			mappings.setVariableMods(context, variableMods);
@@ -174,7 +177,7 @@ public final class TestCometMappings {
 		}
 
 		{
-			ModSet variableMods = new ModSet();
+			final ModSet variableMods = new ModSet();
 			variableMods.add(getAebs());
 			context.setExpectWarnings(new String[]{"skipped unsupported N-term"});
 			mappings.setVariableMods(context, variableMods);
@@ -184,7 +187,7 @@ public final class TestCometMappings {
 		}
 
 		{
-			ModSet variableMods = new ModSet();
+			final ModSet variableMods = new ModSet();
 			variableMods.add(getAcetylAnyPeptideCTerm());
 			context.setExpectWarnings(new String[]{"skipped unsupported C-term mod 'Acetyl (C-term)'"});
 			mappings.setVariableMods(context, variableMods);
@@ -199,7 +202,7 @@ public final class TestCometMappings {
 		mappings.read(mappings.baseSettings());
 
 		{
-			Instrument instrument = Instrument.ORBITRAP;
+			final Instrument instrument = Instrument.ORBITRAP;
 			mappings.setInstrument(context, instrument);
 
 			assertParam("use_A_ions", "0");
@@ -211,7 +214,7 @@ public final class TestCometMappings {
 		}
 
 		{
-			Instrument instrument = Instrument.MALDI_TOF_TOF;
+			final Instrument instrument = Instrument.MALDI_TOF_TOF;
 
 			context.setExpectWarnings(new String[]{"does not support ion series 'd', 'v', 'w'"});
 			mappings.setInstrument(context, instrument);
@@ -261,16 +264,55 @@ public final class TestCometMappings {
 	}
 
 	@Test
+	public void shouldConvertProteases() {
+		Assert.assertEquals(CometMappings.proteaseToCometString("2", Protease.getTrypsinAllowP()),
+				"2.  Trypsin_(allow_P)      1      KR          -");
+
+		Assert.assertEquals(CometMappings.proteaseToCometString("6", aspN()),
+				"6.  Asp_N                  0      D           -");
+	}
+
+	@Test
 	public void shouldSupportProtease() {
 		mappings.read(mappings.baseSettings());
 
 		{
-			Protease protease = Protease.getTrypsinAllowP();
+			final Protease protease = Protease.getTrypsinAllowP();
+			mappings.setProtease(context, protease);
+
+			assertParam("search_enzyme_number", "2");
+			assertParam("sample_enzyme_number", "2");
+		}
+
+		{
+			final Protease protease = new Protease("Trypsin", "KR", "!P");
 			mappings.setProtease(context, protease);
 
 			assertParam("search_enzyme_number", "1");
 			assertParam("sample_enzyme_number", "1");
 		}
+		{
+			final Protease protease = aspN();
+			mappings.setProtease(context, protease);
+
+			assertParam("search_enzyme_number", "6");
+			assertParam("sample_enzyme_number", "6");
+		}
+		{
+			final Protease protease = new Protease("Asp N", "", "BD");
+			mappings.setProtease(context, protease);
+
+			assertParam("search_enzyme_number", "11");
+			assertParam("sample_enzyme_number", "11");
+
+			final StringWriter writer = new StringWriter(1000);
+			mappings.write(mappings.baseSettings(), writer);
+			Assert.assertEquals(writer.toString(), TestingUtilities.resourceToString("edu/mayo/mprc/comet/customEnzyme.params"));
+		}
+	}
+
+	private Protease aspN() {
+		return new Protease("Asp_N", "", "D");
 	}
 
 	@Test
@@ -280,7 +322,7 @@ public final class TestCometMappings {
 		{
 			// The database name gets mapped as a placeholder.
 			// When the search runs, the actual path to the database will be written over this
-			String databaseName = "hello";
+			final String databaseName = "hello";
 			mappings.setSequenceDatabase(context, databaseName);
 			assertParam("database_name", "${DB:hello}");
 		}
@@ -301,7 +343,7 @@ public final class TestCometMappings {
 			super(new MockParamsInfo());
 		}
 
-		public void setExpectWarnings(String[] expectWarnings) {
+		public void setExpectWarnings(final String[] expectWarnings) {
 
 			this.expectWarnings = expectWarnings;
 			warningsFound = false;
@@ -314,12 +356,12 @@ public final class TestCometMappings {
 		}
 
 		@Override
-		public void reportError(final String message, final Throwable t, ParamName paramName) {
+		public void reportError(final String message, final Throwable t, final ParamName paramName) {
 			Assert.fail(message, t);
 		}
 
 		@Override
-		public void reportWarning(final String message, ParamName paramName) {
+		public void reportWarning(final String message, final ParamName paramName) {
 			if (expectWarnings != null) {
 
 				for (final String warning : expectWarnings) {
@@ -336,16 +378,16 @@ public final class TestCometMappings {
 	}
 
 	private ModSpecificity getNtermAcetyl() {
-		SpecificityBuilder b;
-		Mod mod;
+		final SpecificityBuilder b;
+		final Mod mod;
 		b = new SpecificityBuilder(AminoAcidSet.DEFAULT.getForSingleLetterCode("G"), Terminus.Nterm, true, false, "", 0);
 		mod = new Mod("Acetyl", "Acetylation", 2, 42.010565, 42.0367, "H(2) C(2) O", null, b);
 		return b.build(mod);
 	}
 
 	private ModSpecificity acetylAnyAcidProteinNTerm() {
-		SpecificityBuilder b;
-		Mod mod;
+		final SpecificityBuilder b;
+		final Mod mod;
 		b = new SpecificityBuilder(null, Terminus.Nterm, true, false, "", 0);
 		mod = new Mod("Acetyl", "Acetylation", 2, 42.010565, 42.0367, "H(2) C(2) O", null, b);
 
@@ -353,35 +395,35 @@ public final class TestCometMappings {
 	}
 
 	private ModSpecificity getAcetylG() {
-		SpecificityBuilder b;
-		Mod mod;
+		final SpecificityBuilder b;
+		final Mod mod;
 		b = new SpecificityBuilder(AminoAcidSet.DEFAULT.getForSingleLetterCode("G"), Terminus.Anywhere, true, false, "", 0);
 		mod = new Mod("Acetyl", "Acetylation", 2, 42.010565, 42.0367, "H(2) C(2) O", null, b);
 		return b.build(mod);
 	}
 
 	private ModSpecificity getCarbC() {
-		SpecificityBuilder b = new SpecificityBuilder(AminoAcidSet.DEFAULT.getForSingleLetterCode("C"), Terminus.Anywhere, false, false, "", 0);
-		Mod mod = new Mod("Carbamidomethyl", "Iodoacetamide derivative", 1, 57.021464, 57.0513, "H(3) C(2) N O", null, b);
+		final SpecificityBuilder b = new SpecificityBuilder(AminoAcidSet.DEFAULT.getForSingleLetterCode("C"), Terminus.Anywhere, false, false, "", 0);
+		final Mod mod = new Mod("Carbamidomethyl", "Iodoacetamide derivative", 1, 57.021464, 57.0513, "H(3) C(2) N O", null, b);
 		return b.build(mod);
 	}
 
 	private ModSpecificity getAebs() {
-		SpecificityBuilder b = new SpecificityBuilder(null, Terminus.Nterm, true, false, "", 0);
-		Mod mod = new Mod("AEBS", "Aminoethylbenzensulfonylation", 1, 183.034399, 183.2276, "H(9) C(8) N O(2) S", null, b);
+		final SpecificityBuilder b = new SpecificityBuilder(null, Terminus.Nterm, true, false, "", 0);
+		final Mod mod = new Mod("AEBS", "Aminoethylbenzensulfonylation", 1, 183.034399, 183.2276, "H(9) C(8) N O(2) S", null, b);
 		return b.build(mod);
 	}
 
 	private ModSpecificity getSpecialMod() {
-		SpecificityBuilder b2 = new SpecificityBuilder(AminoAcidSet.DEFAULT.getForSingleLetterCode("G"), Terminus.Anywhere, true, false, "", 0);
-		Mod mod2 = new Mod("Special mod", "Specialization", 2, 10.0, 42.0367, "H(10)", null, b2);
+		final SpecificityBuilder b2 = new SpecificityBuilder(AminoAcidSet.DEFAULT.getForSingleLetterCode("G"), Terminus.Anywhere, true, false, "", 0);
+		final Mod mod2 = new Mod("Special mod", "Specialization", 2, 10.0, 42.0367, "H(10)", null, b2);
 		return b2.build(mod2);
 	}
 
 	private ModSpecificity getAcetylAnyPeptideCTerm() {
 		// Peptide C-term mod
-		SpecificityBuilder b = new SpecificityBuilder(null, Terminus.Cterm, false, false, "", 0);
-		Mod mod = new Mod("Acetyl", "Acetylation", 2, 42.010565, 42.0367, "H(2) C(2) O", null, b);
+		final SpecificityBuilder b = new SpecificityBuilder(null, Terminus.Cterm, false, false, "", 0);
+		final Mod mod = new Mod("Acetyl", "Acetylation", 2, 42.010565, 42.0367, "H(2) C(2) O", null, b);
 		return b.build(mod);
 	}
 }
