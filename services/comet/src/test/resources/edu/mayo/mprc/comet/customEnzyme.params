@@ -34,7 +34,7 @@ variable_mod3 = 0.0 X 0 3
 variable_mod4 = 0.0 X 0 3
 variable_mod5 = 0.0 X 0 3
 variable_mod6 = 0.0 X 0 3
-max_variable_mods_in_peptide = 5
+max_variable_mods_in_peptide = 3
 
 #
 # fragment ions
@@ -58,13 +58,13 @@ use_sparse_matrix = 0
 # output
 #
 output_sqtstream = 0                   # 0=no, 1=yes  write sqt to standard output
-output_sqtfile = 0                     # 0=no, 1=yes  write sqt file
+output_sqtfile = 1                     # 0=no, 1=yes  write sqt file
 output_txtfile = 0                     # 0=no, 1=yes  write tab-delimited txt file
-output_pepxmlfile = 1                  # 0=no, 1=yes  write pep.xml file
+output_pepxmlfile = 0                  # 0=no, 1=yes  write pep.xml file
 output_pinxmlfile = 0                  # 0=no, 1=yes  write pin.xml file
 output_outfiles = 0                    # 0=no, 1=yes  write .out files
 print_expect_score = 1                 # 0=no, 1=yes to replace Sp with expect in out & sqt
-num_output_lines = 5                   # num peptide results to show
+num_output_lines = 10                  # num peptide results to show
 show_fragment_ions = 0                 # 0=no, 1=yes for out files only
 
 sample_enzyme_number = 11              # Sample enzyme which is possibly different than the one applied to the search.

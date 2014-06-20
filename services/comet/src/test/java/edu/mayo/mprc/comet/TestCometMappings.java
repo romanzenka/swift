@@ -38,19 +38,27 @@ public final class TestCometMappings {
 	public void shouldSupportPeptideTolerance() {
 		mappings.read(mappings.baseSettings());
 
-		// 0.3 Da
-		final Tolerance da = new Tolerance(0.3, MassUnit.Da);
-		mappings.setPeptideTolerance(context, da);
+		// 0.3 Da - low precision
+		{
+			final Tolerance da = new Tolerance(0.3, MassUnit.Da);
+			mappings.setPeptideTolerance(context, da);
 
-		assertParam("peptide_mass_tolerance", "0.3");
-		assertParam("peptide_mass_units", "0");
+			assertParam("peptide_mass_tolerance", "0.3");
+			assertParam("peptide_mass_units", "0");
+			assertParam("precursor_tolerance_type", "0");
+			assertParam("isotope_error", "0");
+		}
 
-		// 12 ppm
-		final Tolerance ppm = new Tolerance(12, MassUnit.Ppm);
-		mappings.setPeptideTolerance(context, ppm);
+		// 12 ppm - high precision
+		{
+			final Tolerance ppm = new Tolerance(12, MassUnit.Ppm);
+			mappings.setPeptideTolerance(context, ppm);
 
-		assertParam("peptide_mass_tolerance", "12.0");
-		assertParam("peptide_mass_units", "2");
+			assertParam("peptide_mass_tolerance", "12.0");
+			assertParam("peptide_mass_units", "2");
+			assertParam("precursor_tolerance_type", "1");
+			assertParam("isotope_error", "1");
+		}
 	}
 
 	@Test
@@ -59,17 +67,23 @@ public final class TestCometMappings {
 
 		mappings.read(mappings.baseSettings());
 
-		final Tolerance ppm = new Tolerance(10, MassUnit.Ppm);
-		mappings.setFragmentTolerance(context, ppm);
+		{
+			final Tolerance ppm = new Tolerance(10, MassUnit.Ppm);
+			mappings.setFragmentTolerance(context, ppm);
 
-		assertParam("fragment_bin_tol", "0.01"); // 10 ppm at 1000
-		assertParam("fragment_bin_offset", "0.0"); // Offset == 0 for anything under 0.8 dalton, otherwise 0.4
+			assertParam("fragment_bin_tol", "0.01"); // 10 ppm at 1000
+			assertParam("fragment_bin_offset", "0.0"); // Offset == 0 for anything under 0.8 dalton, otherwise 0.4
+			assertParam("theoretical_fragment_ions", "0");
+		}
 
-		final Tolerance da = new Tolerance(1, MassUnit.Da);
-		mappings.setFragmentTolerance(context, da);
+		{
+			final Tolerance da = new Tolerance(1, MassUnit.Da);
+			mappings.setFragmentTolerance(context, da);
 
-		assertParam("fragment_bin_tol", "1.0"); // 1 dalton bin
-		assertParam("fragment_bin_offset", "0.4"); // Offset is 0.4 (for no particular reason)
+			assertParam("fragment_bin_tol", "1.0"); // 1 dalton bin
+			assertParam("fragment_bin_offset", "0.4"); // Offset is 0.4 (for no particular reason)
+			assertParam("theoretical_fragment_ions", "1");
+		}
 	}
 
 	@Test
@@ -152,7 +166,7 @@ public final class TestCometMappings {
 			assertParam("variable_mod4", "0.0 X 0 3");
 			assertParam("variable_mod5", "0.0 X 0 3");
 			assertParam("variable_mod6", "0.0 X 0 3");
-			assertParam("max_variable_mods_in_peptide", "5");
+			assertParam("max_variable_mods_in_peptide", "3");
 		}
 
 		{

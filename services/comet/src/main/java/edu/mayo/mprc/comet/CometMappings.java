@@ -341,8 +341,15 @@ public final class CometMappings implements Mappings {
 		if (MassUnit.Da.equals(peptideTolerance.getUnit())) {
 			setNativeParam(PEP_TOL_UNIT, "0");
 			// MMU = 1 but we never use MMU
+			setNativeParam("precursor_tolerance_type", "0");
+			setNativeParam("isotope_error", "0");
 		} else if (MassUnit.Ppm.equals(peptideTolerance.getUnit())) {
 			setNativeParam(PEP_TOL_UNIT, "2");
+			// PPM - high precision
+			// We expect the precursor to be the monoisotopic peak
+			// We will allow looking around for -1, 0, 1, 2 Da peaks
+			setNativeParam("precursor_tolerance_type", "1");
+			setNativeParam("isotope_error", "1");
 		}
 	}
 
@@ -355,6 +362,11 @@ public final class CometMappings implements Mappings {
 		}
 		setNativeParam(FRAGMENT_BIN_TOL, String.valueOf(value));
 		setNativeParam(FRAGMENT_BIN_OFFSET, value <= 0.8 ? "0.0" : "0.4");
+		if (value < 0.03) {
+			setNativeParam("theoretical_fragment_ions", "0"); // Use flanking peaks
+		} else {
+			setNativeParam("theoretical_fragment_ions", "1"); // 1 M peak only
+		}
 	}
 
 	@Override
