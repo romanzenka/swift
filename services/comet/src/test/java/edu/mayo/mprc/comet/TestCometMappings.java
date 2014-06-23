@@ -334,11 +334,11 @@ public final class TestCometMappings {
 		mappings.read(mappings.baseSettings());
 
 		{
-			// The database name gets mapped as a placeholder.
-			// When the search runs, the actual path to the database will be written over this
+			// We pass the database directly from command line
+			// Ignore the config file contents
 			final String databaseName = "hello";
 			mappings.setSequenceDatabase(context, databaseName);
-			assertParam("database_name", "${DB:hello}");
+			assertParam("database_name", "pass_from_command_line");
 		}
 	}
 

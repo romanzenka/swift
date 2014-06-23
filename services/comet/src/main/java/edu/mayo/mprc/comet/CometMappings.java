@@ -462,7 +462,7 @@ public final class CometMappings implements Mappings {
 
 	@Override
 	public void setSequenceDatabase(final MappingContext context, final String shortDatabaseName) {
-		setNativeParam(DATABASE, String.format("${DB:%s}", shortDatabaseName));
+		setNativeParam(DATABASE, "pass_from_command_line");
 	}
 
 	@Override
