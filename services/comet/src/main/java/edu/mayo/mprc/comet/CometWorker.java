@@ -17,6 +17,7 @@ import edu.mayo.mprc.searchengine.EngineFactory;
 import edu.mayo.mprc.searchengine.EngineMetadata;
 import edu.mayo.mprc.utilities.FileUtilities;
 import edu.mayo.mprc.utilities.ProcessCaller;
+import edu.mayo.mprc.utilities.StreamRegExMatcher;
 import edu.mayo.mprc.utilities.progress.UserProgressReporter;
 import org.apache.log4j.Logger;
 import org.springframework.stereotype.Component;
@@ -26,6 +27,7 @@ import java.io.File;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.regex.Pattern;
 
 public final class CometWorker extends WorkerBase {
 	private static final Logger LOGGER = Logger.getLogger(CometWorker.class);
@@ -51,10 +53,16 @@ public final class CometWorker extends WorkerBase {
 
 		final File finalOutputFile = packet.getOutputFile();
 		final File outputFile = getTempOutputFile(tempWorkFolder, finalOutputFile);
+		final File parameterFile = new File(tempWorkFolder, "comet.parameters");
+
+		// Replace the database path and write parameters out
+		FileUtilities.writeStringToFile(parameterFile, packet.getSearchParams(), true);
 
 		final List<String> parameters = new LinkedList<String>();
 		parameters.add(cometExecutable.getPath());
-		// parameters.add(paramFile.getAbsolutePath());
+		parameters.add("-P" + parameterFile.getAbsolutePath());
+		parameters.add("-D" + packet.getDatabaseFile().getAbsolutePath());
+		parameters.add(packet.getInputFile().getAbsolutePath());
 
 		final ProcessBuilder processBuilder = new ProcessBuilder(parameters);
 		processBuilder.directory(tempWorkFolder);
@@ -63,7 +71,13 @@ public final class CometWorker extends WorkerBase {
 
 		processCaller.run();
 
+		if (processCaller.getExitValue() != 0) {
+			throw new MprcException("Comet execution failed:\n" + processCaller.getFailedCallDescription());
+		}
+
 		publish(outputFile, finalOutputFile);
+
+		FileUtilities.quietDelete(parameterFile);
 
 		LOGGER.info("Comet search, " + packet.toString() + ", has been successfully completed.");
 	}
