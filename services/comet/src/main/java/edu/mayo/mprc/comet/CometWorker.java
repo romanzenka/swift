@@ -32,6 +32,7 @@ public final class CometWorker extends WorkerBase {
 	public static final String TYPE = "comet";
 	public static final String NAME = "Comet";
 	public static final String DESC = "Comet search engine support. <p>Comet is freely available at <a href=\"http://sourceforge.net/projects/comet-ms/\">http://sourceforge.net/projects/comet-ms/</a>.</p>";
+	public static final String PEP_XML = ".pep.xml";
 
 	private File cometExecutable;
 
@@ -86,17 +87,16 @@ public final class CometWorker extends WorkerBase {
 	 * Given an output file name, creates a "name prefix" to be passed to Comet that would fool
 	 * comet into generating the required output file.
 	 * <p/>
-	 * This can fail if the requested output file suffix does not match SQT.
+	 * This can fail if the requested output file suffix does not match .pep.xml.
 	 *
 	 * @param outputFile Name of the output file.
 	 * @return String to pass to Comet as a {@code -N} parameter.
 	 */
 	private String getResultFileName(File outputFile) {
-		String extension = FileUtilities.getExtension(outputFile.getName());
-		if (!"sqt".equals(extension)) {
-			throw new MprcException("Swift only supports Comet generating a .sqt output file");
+		if (!outputFile.getName().endsWith(PEP_XML)) {
+			throw new MprcException("Swift only supports Comet generating a " + PEP_XML + " output file");
 		}
-		return new File(outputFile.getParentFile(), FileUtilities.getFileNameWithoutExtension(outputFile)).getAbsolutePath();
+		return new File(outputFile.getParentFile(), outputFile.getName().substring(0, outputFile.getName().length() - PEP_XML.length())).getAbsolutePath();
 	}
 
 	@Override

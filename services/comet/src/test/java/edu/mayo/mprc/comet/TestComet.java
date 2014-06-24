@@ -84,7 +84,7 @@ public class TestComet {
 			final CometWorker.Factory factory = new CometWorker.Factory();
 			final Worker worker = factory.create(cometConfig, null);
 
-			final File resultFile = new File(cometOut, "result.sqt");
+			final File resultFile = new File(cometOut, "result.pep.xml");
 
 			final CometWorkPacket workPacket = new CometWorkPacket(inputMzmlFile, cometParams, resultFile, fastaFile, false, "0", false);
 			WorkPacketBase.simulateTransfer(workPacket);

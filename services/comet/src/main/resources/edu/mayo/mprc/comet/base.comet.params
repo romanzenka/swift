@@ -59,9 +59,9 @@ use_sparse_matrix = 0
 # output
 #
 output_sqtstream = 0                   # 0=no, 1=yes  write sqt to standard output
-output_sqtfile = 1                     # 0=no, 1=yes  write sqt file
+output_sqtfile = 0                     # 0=no, 1=yes  write sqt file
 output_txtfile = 0                     # 0=no, 1=yes  write tab-delimited txt file
-output_pepxmlfile = 0                  # 0=no, 1=yes  write pep.xml file
+output_pepxmlfile = 1                  # 0=no, 1=yes  write pep.xml file
 output_pinxmlfile = 0                  # 0=no, 1=yes  write pin.xml file
 output_outfiles = 0                    # 0=no, 1=yes  write .out files
 print_expect_score = 1                 # 0=no, 1=yes to replace Sp with expect in out & sqt
