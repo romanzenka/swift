@@ -17,7 +17,6 @@ import edu.mayo.mprc.searchengine.EngineFactory;
 import edu.mayo.mprc.searchengine.EngineMetadata;
 import edu.mayo.mprc.utilities.FileUtilities;
 import edu.mayo.mprc.utilities.ProcessCaller;
-import edu.mayo.mprc.utilities.StreamRegExMatcher;
 import edu.mayo.mprc.utilities.progress.UserProgressReporter;
 import org.apache.log4j.Logger;
 import org.springframework.stereotype.Component;
@@ -27,7 +26,6 @@ import java.io.File;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.regex.Pattern;
 
 public final class CometWorker extends WorkerBase {
 	private static final Logger LOGGER = Logger.getLogger(CometWorker.class);
@@ -53,6 +51,7 @@ public final class CometWorker extends WorkerBase {
 
 		final File finalOutputFile = packet.getOutputFile();
 		final File outputFile = getTempOutputFile(tempWorkFolder, finalOutputFile);
+		final String resultFileName = getResultFileName(outputFile);
 		final File parameterFile = new File(tempWorkFolder, "comet.parameters");
 
 		// Replace the database path and write parameters out
@@ -60,9 +59,10 @@ public final class CometWorker extends WorkerBase {
 
 		final List<String> parameters = new LinkedList<String>();
 		parameters.add(cometExecutable.getPath());
-		parameters.add("-P" + parameterFile.getAbsolutePath());
-		parameters.add("-D" + packet.getDatabaseFile().getAbsolutePath());
-		parameters.add(packet.getInputFile().getAbsolutePath());
+		parameters.add("-P" + parameterFile.getAbsolutePath()); // Parameter file
+		parameters.add("-D" + packet.getDatabaseFile().getAbsolutePath()); // Database file
+		parameters.add("-N" + resultFileName); // Result file
+		parameters.add(packet.getInputFile().getAbsolutePath()); // Input file
 
 		final ProcessBuilder processBuilder = new ProcessBuilder(parameters);
 		processBuilder.directory(tempWorkFolder);
@@ -80,6 +80,23 @@ public final class CometWorker extends WorkerBase {
 		FileUtilities.quietDelete(parameterFile);
 
 		LOGGER.info("Comet search, " + packet.toString() + ", has been successfully completed.");
+	}
+
+	/**
+	 * Given an output file name, creates a "name prefix" to be passed to Comet that would fool
+	 * comet into generating the required output file.
+	 * <p/>
+	 * This can fail if the requested output file suffix does not match SQT.
+	 *
+	 * @param outputFile Name of the output file.
+	 * @return String to pass to Comet as a {@code -N} parameter.
+	 */
+	private String getResultFileName(File outputFile) {
+		String extension = FileUtilities.getExtension(outputFile.getName());
+		if (!"sqt".equals(extension)) {
+			throw new MprcException("Swift only supports Comet generating a .sqt output file");
+		}
+		return new File(outputFile.getParentFile(), FileUtilities.getFileNameWithoutExtension(outputFile)).getAbsolutePath();
 	}
 
 	@Override

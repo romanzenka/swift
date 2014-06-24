@@ -33,8 +33,8 @@ public class TestComet {
 	private File cometTemp;
 
 	private static final String DATABASE_SHORT_NAME = "SprotYeast";
-	private File inputMgfFolder;
-	private File inputMgfFile;
+	private File inputMzmlFolder;
+	private File inputMzmlFile;
 	private File fastaFolder;
 	private File fastaFile;
 	private File cometInstallFolder;
@@ -44,8 +44,8 @@ public class TestComet {
 	public void setup() throws IOException {
 		cometInstallFolder = Installer.getDirectory("SWIFT_TEST_COMET_FOLDER", "comet");
 		tempRootDir = FileUtilities.createTempFolder();
-		inputMgfFolder = Installer.mgfFiles(null, Installer.Action.INSTALL);
-		inputMgfFile = new File(inputMgfFolder, "test.mgf");
+		inputMzmlFolder = Installer.mzmlFiles(null, Installer.Action.INSTALL);
+		inputMzmlFile = new File(inputMzmlFolder, "test.mzML");
 		fastaFolder = Installer.yeastFastaFiles(null, Installer.Action.INSTALL);
 		fastaFile = new File(fastaFolder, DATABASE_SHORT_NAME + ".fasta");
 	}
@@ -53,7 +53,7 @@ public class TestComet {
 	@AfterClass()
 	public void cleanup() {
 		FileUtilities.cleanupTempFile(tempRootDir);
-		Installer.mgfFiles(inputMgfFolder, Installer.Action.UNINSTALL);
+		Installer.mzmlFiles(inputMzmlFolder, Installer.Action.UNINSTALL);
 		Installer.yeastFastaFiles(fastaFolder, Installer.Action.UNINSTALL);
 	}
 
@@ -84,9 +84,9 @@ public class TestComet {
 			final CometWorker.Factory factory = new CometWorker.Factory();
 			final Worker worker = factory.create(cometConfig, null);
 
-			final File resultFile = new File(cometOut, "cometResult.xml");
+			final File resultFile = new File(cometOut, "result.sqt");
 
-			final CometWorkPacket workPacket = new CometWorkPacket(inputMgfFile, cometParams, resultFile, fastaFile, false, "0", false);
+			final CometWorkPacket workPacket = new CometWorkPacket(inputMzmlFile, cometParams, resultFile, fastaFile, false, "0", false);
 			WorkPacketBase.simulateTransfer(workPacket);
 
 			worker.processRequest(workPacket, new ProgressReporter() {

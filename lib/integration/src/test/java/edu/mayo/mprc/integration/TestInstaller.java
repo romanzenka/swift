@@ -37,4 +37,12 @@ public class TestInstaller {
 		Installer.mgfFiles(folder, Installer.Action.UNINSTALL);
 		Assert.assertTrue(!folder.exists(), "Folder must be deleted");
 	}
+
+	@Test
+	public static void shouldInstallTestMzxml() {
+		final File folder = Installer.mzmlFiles(null, Installer.Action.INSTALL);
+		Assert.assertTrue(folder.exists(), "mzML folder must exist");
+		Installer.mzmlFiles(folder, Installer.Action.UNINSTALL);
+		Assert.assertTrue(!folder.exists(), "Folder must be deleted");
+	}
 }
