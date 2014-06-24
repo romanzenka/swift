@@ -102,7 +102,7 @@ public class TestComet {
 
 				@Override
 				public void reportSuccess() {
-					Assert.assertTrue(resultFile.length() > 0, "Comet result file is empty.");
+					Assert.assertTrue(resultFile.length() > 70000, "Comet result file is too small.");
 				}
 
 				@Override
