@@ -106,6 +106,20 @@
         </dependency>
     </dependencies>
 
+    <profiles>
+        <profile>
+            <id>local-testing</id>
+            <dependencies>
+                <dependency>
+                      <groupId>aspectj</groupId>
+                      <artifactId>aspectjtools</artifactId>
+                      <version>1.2</version>
+                      <scope>provided</scope>
+                </dependency>
+            </dependencies>
+        </profile>
+    </profiles>
+
     <build>
         <finalName>swift-ui</finalName>
         <plugins>
@@ -154,7 +168,7 @@
                         <module>edu.mayo.mprc.common.Common</module>
                         <module>edu.mayo.mprc.swift.configuration.Configuration</module>
                     </modules>
-                    <style>OBF</style>
+                    <style>PRETTY</style>
                 </configuration>
             </plugin>
 
