@@ -102,18 +102,15 @@ public final class CometWorker extends WorkerBase {
 	@Override
 	public String check() {
 		LOGGER.info("Checking Comet worker");
-		try {
-			final List<String> parameters = new LinkedList<String>();
-			parameters.add(cometExecutable.getPath());
+		if (cometExecutable == null) {
+			throw new MprcException("Comet excecutable not set!");
+		}
+		if (!cometExecutable.isFile()) {
+			throw new MprcException(String.format("Comet executable not present [%s]", cometExecutable.getAbsolutePath()));
+		}
 
-			final ProcessBuilder processBuilder = new ProcessBuilder(parameters);
-			final ProcessCaller processCaller = new ProcessCaller(processBuilder);
-			processCaller.setKillTimeout(1000);
-			final ByteArrayInputStream stream = new ByteArrayInputStream("\n".getBytes(Charsets.US_ASCII));
-			processCaller.setInputStream(stream);
-			processCaller.runAndCheck("Comet", 255);
-		} catch (Exception e) {
-			return e.getMessage();
+		if (!cometExecutable.canExecute()) {
+			throw new MprcException(String.format("Comet file does not have executable flag set [%s]", cometExecutable.getAbsolutePath()));
 		}
 		return null;
 	}
