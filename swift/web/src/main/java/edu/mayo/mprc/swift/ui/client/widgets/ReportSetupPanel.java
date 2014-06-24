@@ -26,7 +26,9 @@ public final class ReportSetupPanel extends HorizontalPanel {
 		add(scaffoldReport);
 
 		this.quameterCategorySelector = quameterCategorySelector;
-		add(this.quameterCategorySelector);
+		if (quameterCategorySelector != null) {
+			add(this.quameterCategorySelector);
+		}
 	}
 
 	public boolean isScaffoldReportEnable() {
