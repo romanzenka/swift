@@ -173,7 +173,6 @@ public class TestSearchRunner {
 
 		final int tasksPerSearch = 0
 				+ numEngines /* DB deploys */ - getEnabledNoDeploy()
-				+ 1 /* One extra Sequest db deployment due to different protease */
 				+ 1 /* Search DB load */
 				+ 1 /* QA Task */
 				+ 1 /* Scaffold report */
@@ -306,8 +305,11 @@ public class TestSearchRunner {
 	}
 
 	/**
-	 * We switch QC on for a mzML-based search. That means we already get mzml conversion for free.
-	 * Myrimatch, Idpicker and quameter should be added, because myrimatch will operate with different settings
+	 * We switch QC on for a mzML-based search. While we did mzML conversion before, we need
+	 * to do an extra conversion to obtain mzML containing MS1 spectra. This conversion is a superset
+	 * of the common conversion, which allows us to do less work.
+	 * <p/>
+	 * msconvert, Comet, Idpicker and quameter should be added, because comet will operate with different settings
 	 * (semi-tryptic).
 	 */
 	@Test(dataProvider = "twoBools")
@@ -338,7 +340,9 @@ public class TestSearchRunner {
 				+ 1 /* RawDump */
 				+ 1 /* msmsEval */
 
-				+ (doSemiTryptic ? 0 : 2 /* tryptic means we need extra semitryptic myrimatch and idpicker */)
+				+ (doSemiTryptic ?
+					1 : /* semitryptic means we can reuse comet, but idpicker needs to run due to forced FDR */
+					2 /* tryptic means we need extra semitryptic comet and idpicker */)
 				+ 1 /* QuaMeter */
 				+ 1 /* QuaMeter db load */;
 
@@ -458,7 +462,7 @@ public class TestSearchRunner {
 	private Collection<SearchEngine> searchEngines() {
 		final Collection<SearchEngine> searchEngines = new ArrayList<SearchEngine>();
 		searchEngines.add(searchEngine("MASCOT"));
-		searchEngines.add(searchEngine("SEQUEST"));
+		searchEngines.add(searchEngine("COMET"));
 		searchEngines.add(searchEngine("TANDEM"));
 		searchEngines.add(searchEngine("MYRIMATCH"));
 		searchEngines.add(searchEngine("SCAFFOLD"));
@@ -470,7 +474,7 @@ public class TestSearchRunner {
 	private EnabledEngines enabledEngines() {
 		final EnabledEngines engines = new EnabledEngines();
 		engines.add(createSearchEngineConfig("MASCOT"));
-		engines.add(createSearchEngineConfig("SEQUEST"));
+		engines.add(createSearchEngineConfig("COMET"));
 		engines.add(createSearchEngineConfig("TANDEM")); // No db deploy
 		engines.add(createSearchEngineConfig("MYRIMATCH")); // No db deploy
 		engines.add(createSearchEngineConfig("SCAFFOLD"));
@@ -526,7 +530,8 @@ public class TestSearchRunner {
 	}
 
 	private boolean dbDeployer(final String engineCode) {
-		return !("TANDEM".equals(engineCode) || "MYRIMATCH".equals(engineCode) || "IDPQONVERT".equals(engineCode));
+		return !("TANDEM".equals(engineCode) || "MYRIMATCH".equals(engineCode)
+				|| "IDPQONVERT".equals(engineCode) || "COMET".equals(engineCode));
 	}
 
 	/**
@@ -534,7 +539,7 @@ public class TestSearchRunner {
 	 * See {@link #dbDeployer(String)}.
 	 */
 	private int getEnabledNoDeploy() {
-		return 3; // TANDEM, MYRIMATCH, IDPQONVERT
+		return 4; // TANDEM, MYRIMATCH, IDPQONVERT, COMET
 	}
 
 	private MappingFactory mappingFactory(final String code) {

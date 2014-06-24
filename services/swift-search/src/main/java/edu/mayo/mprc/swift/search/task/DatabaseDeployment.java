@@ -143,4 +143,9 @@ final class DatabaseDeployment extends AsyncTaskBase implements DatabaseDeployme
 				&& Objects.equal(dbToDeploy, other.dbToDeploy)
 				&& (!"SEQUEST".equalsIgnoreCase(engineCode) || Objects.equal(paramsFile, other.paramsFile));
 	}
+
+	@Override
+	public String toString() {
+		return "Deploy " + engineFriendlyName;
+	}
 }

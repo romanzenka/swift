@@ -8,6 +8,7 @@ import edu.mayo.mprc.msconvert.MsconvertWorkPacket;
 import edu.mayo.mprc.swift.db.DatabaseFileTokenFactory;
 import edu.mayo.mprc.utilities.FileUtilities;
 import edu.mayo.mprc.utilities.progress.ProgressInfo;
+import edu.mayo.mprc.workflow.engine.Task;
 import edu.mayo.mprc.workflow.engine.WorkflowEngine;
 import org.apache.log4j.Logger;
 
@@ -20,7 +21,7 @@ final class MsconvertTask extends AsyncTaskBase implements FileProducingTask {
 	private final boolean publicAccess;
 	private final String outputExtension;
 	private File outputFile = null;
-	private final boolean includeMs1;
+	private boolean includeMs1;
 
 	/**
 	 * @param publicAccess When true, the task requests the cache to give the user access to the .mgf file from the user space.
@@ -107,8 +108,17 @@ final class MsconvertTask extends AsyncTaskBase implements FileProducingTask {
 	}
 
 	@Override
+	public void upgrade(final Task other) {
+		if (other instanceof MsconvertTask) {
+			if (((MsconvertTask) other).includeMs1) {
+				includeMs1 = true;
+			}
+		}
+	}
+
+	@Override
 	public int hashCode() {
-		return Objects.hashCode(inputFile, outputExtension, publicAccess, includeMs1);
+		return Objects.hashCode(inputFile, outputExtension, publicAccess);
 	}
 
 	@Override
@@ -122,8 +132,7 @@ final class MsconvertTask extends AsyncTaskBase implements FileProducingTask {
 		final MsconvertTask other = (MsconvertTask) obj;
 		return Objects.equal(inputFile, other.inputFile)
 				&& Objects.equal(outputExtension, other.outputExtension)
-				&& Objects.equal(publicAccess, other.publicAccess)
-				&& Objects.equal(includeMs1, other.includeMs1);
+				&& Objects.equal(publicAccess, other.publicAccess);
 	}
 
 	void setOutputFile(final File outputFile) {

@@ -50,6 +50,10 @@ public final class SearchRunner implements Runnable, Lifecycle {
 	public static final String MGF = "mgf";
 	public static final String MZ_ML = "mzML";
 	public static final ExtractMsnSettings MSCONVERT_MZML = new ExtractMsnSettings(ExtractMsnSettings.MZML_MODE, ExtractMsnSettings.MSCONVERT);
+	/**
+	 * We idpQonvert tasks with specific FDR for QuaMeter. This is hardcoded, does not reflect how are actual searches run.
+	 */
+	public static final double QUAMETER_FDR = 0.02;
 
 	private boolean running;
 	private final boolean fromScratch;
@@ -266,7 +270,7 @@ public final class SearchRunner implements Runnable, Lifecycle {
 	void inputFileToTasks(final FileSearch inputFile, final SearchEngineParameters defaultSearchParameters, final boolean publicSearchFiles) {
 		final SearchEngineParameters searchParameters = inputFile.getSearchParametersWithDefault(defaultSearchParameters);
 
-		final FileProducingTask conversion = addRawConversionTask(inputFile, null);
+		final FileProducingTask conversion = addRawConversionTask(inputFile, null, false);
 
 		addInputAnalysis(inputFile, conversion);
 
@@ -305,11 +309,16 @@ public final class SearchRunner implements Runnable, Lifecycle {
 		}
 
 		if (isRawFile(inputFile) && isQualityControlEnabled()) {
-			final FileProducingTask mzmlFile = addRawConversionTask(inputFile, MSCONVERT_MZML);
+			final FileProducingTask mzmlFile = addRawConversionTask(inputFile, MSCONVERT_MZML, true/* We need MS1 for Comet and IdpQonvert */);
 
-			final SearchEngine myrimatch = engines.getMyrimatchEngine();
-			final EngineSearchTask myrimatchSearch = addEngineSearchTask(myrimatch, inputFile, mzmlFile, getSemiParameters(searchParameters), publicSearchFiles);
-			final IdpQonvertTask idpQonvertTask = addIdpQonvertTask(idpQonvert, myrimatchSearch, false/* Do not publish the idpDB file, temp only*/);
+			final SearchEngine comet = engines.getCometEngine();
+			if (comet == null) {
+				throw new MprcException("The Comet search engine must be available for Quality Control to function");
+			}
+			final EngineSearchTask cometSearch = addEngineSearchTask(comet, inputFile, mzmlFile, getSemiParameters(searchParameters), publicSearchFiles);
+			final IdpQonvertTask idpQonvertTask = addIdpQonvertTask(idpQonvert, cometSearch, false/* Do not publish the idpDB file, temp only*/);
+			idpQonvertTask.setEmbedSpectrumScanTimes(true);
+			idpQonvertTask.setMaxFDR(QUAMETER_FDR);
 			addQuameterTask(engines.getQuameterEngine(), idpQonvertTask, inputFile.getInputFile(), searchDbTask, inputFile, publicSearchFiles);
 		}
 	}
@@ -488,7 +497,7 @@ public final class SearchRunner implements Runnable, Lifecycle {
 	 * @param overrideSettings Conversion settings - if null, the default is used.
 	 * @return Task capable of producing an mgf (either by conversion or by cleaning up an existing mgf).
 	 */
-	FileProducingTask addRawConversionTask(final FileSearch inputFile, final ExtractMsnSettings overrideSettings) {
+	FileProducingTask addRawConversionTask(final FileSearch inputFile, final ExtractMsnSettings overrideSettings, final boolean includeMs1) {
 		final File file = inputFile.getInputFile();
 
 		FileProducingTask mgfOutput = null;
@@ -499,7 +508,7 @@ public final class SearchRunner implements Runnable, Lifecycle {
 		} else if (MZ_ML.equals(extension)) {
 			mgfOutput = addMzMlCleanupStep(inputFile);
 		} else {
-			mgfOutput = addRawConversionStep(inputFile, getConversionSettings(inputFile, overrideSettings));
+			mgfOutput = addRawConversionStep(inputFile, getConversionSettings(inputFile, overrideSettings), includeMs1);
 		}
 		return mgfOutput;
 	}
@@ -529,7 +538,13 @@ public final class SearchRunner implements Runnable, Lifecycle {
 		return existing;
 	}
 
-	private FileProducingTask addRawConversionStep(final FileSearch inputFile, final ExtractMsnSettings conversionSettings) {
+	/**
+	 * @param inputFile          The file to convert
+	 * @param conversionSettings How to convert the file
+	 * @param includeMs1         Include MS1 spectra in the output
+	 * @return A file that produces the converted output
+	 */
+	private FileProducingTask addRawConversionStep(final FileSearch inputFile, final ExtractMsnSettings conversionSettings, final boolean includeMs1) {
 		final File file = inputFile.getInputFile();
 
 		if (ExtractMsnSettings.EXTRACT_MSN.equals(conversionSettings.getCommand())) {
@@ -558,7 +573,7 @@ public final class SearchRunner implements Runnable, Lifecycle {
 					workflowEngine,
 							/*Input file*/ file,
 							/*Output file location not known, but must provide correct extension */ getOutputFile(inputFile, conversionSettings, null),
-					false /* No MS1 */,
+					includeMs1,
 					Boolean.TRUE.equals(searchDefinition.getPublicMgfFiles()),
 					msconvertDaemon, fileTokenFactory, isFromScratch());
 
@@ -569,11 +584,12 @@ public final class SearchRunner implements Runnable, Lifecycle {
 			final MsconvertTask task = addTask(msconvertTask);
 
 			if (Boolean.TRUE.equals(searchDefinition.getPublicMzxmlFiles())) {
+				// We specifically want mzXML output
 				final MsconvertTask mzxmlTask = new MsconvertTask(
 						workflowEngine, file,
 						new File("dummy.mzXML") /* we will patch it below */,
 						true,
-						false /* No MS1 */,
+						false /* The mzXML output has no MS1 data */,
 						msconvertDaemon, fileTokenFactory, isFromScratch());
 
 				final File mzxmlFile = getMzxmlFileLocation(inputFile, mzxmlTask);

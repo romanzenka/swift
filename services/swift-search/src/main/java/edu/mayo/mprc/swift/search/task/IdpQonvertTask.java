@@ -30,9 +30,11 @@ public final class IdpQonvertTask extends AsyncTaskBase {
 	 */
 	private final EngineSearchTask searchTask;
 	private final File outputFolder;
-	private final double maxFDR;
 	private final String decoyPrefix;
 	private final File curationFile;
+
+	private boolean embedSpectrumScanTimes;
+	private double maxFDR;
 
 	private final SwiftDao swiftDao;
 	private final SearchRun searchRun;
@@ -51,7 +53,8 @@ public final class IdpQonvertTask extends AsyncTaskBase {
 	                      final EngineSearchTask searchTask,
 	                      final File outputFolder,
 	                      final boolean publishResult,
-	                      final DatabaseFileTokenFactory fileTokenFactory, final boolean fromScratch) {
+	                      final DatabaseFileTokenFactory fileTokenFactory,
+	                      final boolean fromScratch) {
 		super(engine, idpQonvertDaemon, fileTokenFactory, fromScratch);
 		this.swiftDao = swiftDao;
 		this.searchRun = searchRun;
@@ -61,19 +64,21 @@ public final class IdpQonvertTask extends AsyncTaskBase {
 		this.outputFolder = outputFolder;
 		this.searchTask = searchTask;
 		this.publishResult = publishResult;
+		this.embedSpectrumScanTimes = false;
 		setName("IdpQonvert");
 	}
 
 	/**
 	 * @return Work packet to be sent asynchronously. If it returns null, it means the work was done without a need
-	 *         to send a work packet.
+	 * to send a work packet.
 	 */
 	@Override
 	public WorkPacket createWorkPacket() {
 		setDescription("IdpQonvert conversion of " + fileTokenFactory.fileToTaggedDatabaseToken(searchTask.getOutputFile()));
 		final IdpQonvertSettings params = new IdpQonvertSettings();
 		// Max FDR is set to 1- Scaffolds protein probability
-		params.setMaxFDR(maxFDR);
+		params.setMaxFDR(getMaxFDR());
+		params.setEmbedSpectrumScanTimes(isEmbedSpectrumScanTimes());
 		params.setDecoyPrefix(decoyPrefix);
 
 		return new IdpQonvertWorkPacket(getResultingFile(), params, searchTask.getResultingFile(),
@@ -131,9 +136,30 @@ public final class IdpQonvertTask extends AsyncTaskBase {
 		}
 	}
 
+	public double getMaxFDR() {
+		return maxFDR;
+	}
+
+	/**
+	 * Override maxFDR that was taken from the search definition.
+	 *
+	 * @param maxFDR FDR to override the value with.
+	 */
+	public void setMaxFDR(double maxFDR) {
+		this.maxFDR = maxFDR;
+	}
+
+	public boolean isEmbedSpectrumScanTimes() {
+		return embedSpectrumScanTimes;
+	}
+
+	public void setEmbedSpectrumScanTimes(boolean embedSpectrumScanTimes) {
+		this.embedSpectrumScanTimes = embedSpectrumScanTimes;
+	}
+
 	@Override
 	public int hashCode() {
-		return Objects.hashCode(searchTask, outputFolder, maxFDR, decoyPrefix, curationFile);
+		return Objects.hashCode(searchTask, outputFolder, maxFDR, embedSpectrumScanTimes, decoyPrefix, curationFile);
 	}
 
 	/**
@@ -155,8 +181,14 @@ public final class IdpQonvertTask extends AsyncTaskBase {
 		return Objects.equal(searchTask, other.searchTask)
 				&& Objects.equal(outputFolder, other.outputFolder)
 				&& Objects.equal(maxFDR, other.maxFDR)
+				&& Objects.equal(embedSpectrumScanTimes, other.embedSpectrumScanTimes)
 				&& Objects.equal(decoyPrefix, other.decoyPrefix)
 				&& Objects.equal(curationFile, other.curationFile);
+	}
+
+	@Override
+	public String toString() {
+		return "maxFDR=" + maxFDR;
 	}
 }
 
