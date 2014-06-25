@@ -94,7 +94,7 @@ public final class CometWorker extends WorkerBase {
 	 */
 	private String getResultFileName(File outputFile) {
 		if (!outputFile.getName().endsWith(PEP_XML)) {
-			throw new MprcException("Swift only supports Comet generating a " + PEP_XML + " output file");
+			throw new MprcException(String.format("Swift only supports Comet generating a %s output file. Requested file was %s", PEP_XML, outputFile.getName()));
 		}
 		return new File(outputFile.getParentFile(), outputFile.getName().substring(0, outputFile.getName().length() - PEP_XML.length())).getAbsolutePath();
 	}
@@ -122,7 +122,7 @@ public final class CometWorker extends WorkerBase {
 	public static final class Factory extends WorkerFactoryBase<Config> implements EngineFactory<Config, Worker> {
 
 		private static final EngineMetadata ENGINE_METADATA = new EngineMetadata(
-				"COMET", ".xml", "Comet", true, "comet", new CometMappingFactory(),
+				"COMET", ".pep.xml", "Comet", true, "comet", new CometMappingFactory(),
 				new String[]{TYPE},
 				new String[]{CometCache.TYPE},
 				new String[]{},

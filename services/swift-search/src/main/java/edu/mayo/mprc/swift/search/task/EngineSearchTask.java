@@ -156,12 +156,9 @@ final class EngineSearchTask extends AsyncTaskBase implements FileProducingTask 
 			return deploymentResult.getShortDbName();
 		} else if ("SEQUEST".equalsIgnoreCase(engine.getCode())) {
 			return getSequestDatabase().getAbsolutePath();
-		} else if ("TANDEM".equalsIgnoreCase(engine.getCode())) {
-			return curation.getShortName();
-		} else if ("MYRIMATCH".equalsIgnoreCase(engine.getCode())) {
-			return curation.getShortName();
 		} else {
-			throw new MprcException("Unsupported engine: " + engine.getFriendlyName());
+			// All other engines do no real deployment
+			return curation.getShortName();
 		}
 	}
 
