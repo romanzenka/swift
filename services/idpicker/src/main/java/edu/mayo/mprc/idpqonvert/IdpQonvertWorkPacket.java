@@ -33,6 +33,14 @@ public final class IdpQonvertWorkPacket extends WorkPacketBase implements Cachab
 	 */
 	private File fastaFile;
 
+	/**
+	 * Where to look for the input files referenced by the .pepXML file.
+	 * <p/>
+	 * The .pepXML is typically generated in a temporary location and then moved over to its final resting place.
+	 * That means that paths embedded in that pepXML can be broken.
+	 */
+	private File referencedFileFolder;
+
 	public IdpQonvertWorkPacket(final String taskId, final boolean fromScratch) {
 		super(taskId, fromScratch);
 	}
@@ -46,6 +54,7 @@ public final class IdpQonvertWorkPacket extends WorkPacketBase implements Cachab
 	 */
 	public IdpQonvertWorkPacket(final File outputFile, final IdpQonvertSettings params, final File inputFile,
 	                            final File fastaFile,
+	                            final File referencedFileFolder,
 	                            final String taskId,
 	                            final boolean fromScratch) {
 		super(taskId, fromScratch);
@@ -54,6 +63,7 @@ public final class IdpQonvertWorkPacket extends WorkPacketBase implements Cachab
 		this.params = params;
 		this.outputFile = outputFile;
 		this.fastaFile = fastaFile;
+		this.referencedFileFolder = referencedFileFolder;
 	}
 
 	@Override
@@ -78,6 +88,10 @@ public final class IdpQonvertWorkPacket extends WorkPacketBase implements Cachab
 		return fastaFile;
 	}
 
+	public File getReferencedFileFolder() {
+		return referencedFileFolder;
+	}
+
 	@Override
 	public String getStringDescriptionOfTask() {
 		final String paramString = getParams().toConfigFile();
@@ -85,13 +99,14 @@ public final class IdpQonvertWorkPacket extends WorkPacketBase implements Cachab
 		return "Inputs:\n" + getInputFile().getAbsolutePath() + "\n\n" +
 				"Output:\n" + outputFile.getAbsolutePath() + "\n\n" +
 				"Fasta:\n" + fastaFile.getAbsolutePath() + "\n\n" +
+				"ReferencedFileFolder:\n" + referencedFileFolder.getAbsolutePath() + "\n\n" +
 				"Parameters:\n" + paramString + "\n\n";
 	}
 
 	@Override
 	public WorkPacket translateToWorkInProgressPacket(final File wipFolder) {
 		return new IdpQonvertWorkPacket(new File(wipFolder, getOutputFile().getName()), getParams(), inputFile,
-				fastaFile, getTaskId(), isFromScratch());
+				fastaFile, referencedFileFolder, getTaskId(), isFromScratch());
 	}
 
 	@Override

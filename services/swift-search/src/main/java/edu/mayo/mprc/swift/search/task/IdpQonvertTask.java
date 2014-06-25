@@ -81,9 +81,13 @@ public final class IdpQonvertTask extends AsyncTaskBase {
 		params.setEmbedSpectrumScanTimes(isEmbedSpectrumScanTimes());
 		params.setDecoyPrefix(decoyPrefix);
 
-		return new IdpQonvertWorkPacket(getResultingFile(), params, searchTask.getResultingFile(),
+		return new IdpQonvertWorkPacket(
+				getResultingFile(), params,
+				searchTask.getResultingFile(),
 				curationFile,
-				getFullId(), isFromScratch());
+				searchTask.getInputFile().getResultingFile(),
+				getFullId(),
+				isFromScratch());
 	}
 
 	@Override

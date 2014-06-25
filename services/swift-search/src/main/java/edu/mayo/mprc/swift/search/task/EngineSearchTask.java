@@ -229,4 +229,14 @@ final class EngineSearchTask extends AsyncTaskBase implements FileProducingTask 
 	public void setOutputFile(final File outputFile) {
 		this.outputFile = outputFile;
 	}
+
+	/**
+	 * This is important for IdpQonvert which needs to know not only the output file of a search engine,
+	 * but where is the input file that is referenced in the output file.
+	 *
+	 * @return Input file for the search engine.
+	 */
+	public FileProducingTask getInputFile() {
+		return inputFile;
+	}
 }
