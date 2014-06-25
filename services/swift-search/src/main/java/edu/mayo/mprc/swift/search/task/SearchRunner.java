@@ -822,7 +822,8 @@ public final class SearchRunner implements Runnable, Lifecycle {
 		final String newFileName = fileTitle + engine.getResultExtension();
 		final File resultFile = new File(searchOutputFolder, newFileName);
 		// Make sure we never produce two identical result files.
-		return distinctFiles.getDistinctFile(resultFile, task);
+		// We suggest what the extension is, to prevent turning e.g. a.pep.xml into a.pep_2.xml instead of a_2.pep.xml
+		return distinctFiles.getDistinctFile(resultFile, task, engine.getResultExtension());
 	}
 
 	private static String getFileTitle(final File file) {
