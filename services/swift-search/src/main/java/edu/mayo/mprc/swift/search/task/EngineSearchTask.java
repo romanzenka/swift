@@ -1,6 +1,7 @@
 package edu.mayo.mprc.swift.search.task;
 
 import edu.mayo.mprc.MprcException;
+import edu.mayo.mprc.comet.CometWorkPacket;
 import edu.mayo.mprc.daemon.DaemonConnection;
 import edu.mayo.mprc.daemon.worker.WorkPacket;
 import edu.mayo.mprc.dbcurator.model.Curation;
@@ -110,6 +111,15 @@ final class EngineSearchTask extends AsyncTaskBase implements FileProducingTask 
 					publicSearchFiles, getFullId(),
 					isFromScratch()
 			);
+		} else if ("COMET".equalsIgnoreCase(engine.getCode())) {
+			workPacket = new CometWorkPacket(
+					inputFile.getResultingFile(),
+					params,
+					outputFile,
+					curation.getCurationFile(),
+					publicSearchFiles,
+					getFullId(),
+					isFromScratch());
 		} else {
 			throw new MprcException("Unsupported engine: " + engine.getFriendlyName());
 		}
