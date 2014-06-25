@@ -788,7 +788,7 @@ public final class SearchRunner implements Runnable, Lifecycle {
 		}
 		// Make sure we never produce same file twice (for instance when we get two identical input mgf file names as input that differ only in the folder).
 		// However, if the file to be produced is the result of an identical task, then it is okay to reuse the same name
-		return distinctFiles.getDistinctFile(outputFile, task);
+		return distinctFiles.getDistinctFile(outputFile, task, extension);
 	}
 
 	/**
