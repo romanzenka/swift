@@ -93,12 +93,12 @@ public final class MSMSEvalWorkPacket extends WorkPacketBase implements Cachable
 	}
 
 	@Override
-	public WorkPacket translateToWorkInProgressPacket(final File wipFolder) {
+	public WorkPacket translateToCachePacket(final File cacheFolder) {
 		return new MSMSEvalWorkPacket(
 				getSourceFile(),
 				getMsmsEvalParamFile(),
-				new File(wipFolder, getOutputFile().getName()),
-				new File(wipFolder, getOutputEmFile().getName()),
+				new File(cacheFolder, getExpectedMsmsEvalOutputFileName(getSourceFile(), cacheFolder).getName()),
+				new File(cacheFolder, getExpectedEmOutputFileName(getSourceFile(), cacheFolder).getName()),
 				getTaskId(),
 				isFromScratch()
 		);

@@ -1,8 +1,10 @@
 package edu.mayo.mprc.idpqonvert;
 
 import edu.mayo.mprc.daemon.CachableWorkPacket;
+import edu.mayo.mprc.daemon.WorkCache;
 import edu.mayo.mprc.daemon.worker.WorkPacket;
 import edu.mayo.mprc.daemon.worker.WorkPacketBase;
+import edu.mayo.mprc.utilities.FileUtilities;
 import edu.mayo.mprc.utilities.progress.ProgressReporter;
 
 import java.io.File;
@@ -97,16 +99,22 @@ public final class IdpQonvertWorkPacket extends WorkPacketBase implements Cachab
 		final String paramString = getParams().toConfigFile();
 
 		return "Inputs:\n" + getInputFile().getAbsolutePath() + "\n\n" +
-				"Output:\n" + outputFile.getAbsolutePath() + "\n\n" +
 				"Fasta:\n" + fastaFile.getAbsolutePath() + "\n\n" +
 				"ReferencedFileFolder:\n" + referencedFileFolder.getAbsolutePath() + "\n\n" +
 				"Parameters:\n" + paramString + "\n\n";
 	}
 
 	@Override
-	public WorkPacket translateToWorkInProgressPacket(final File wipFolder) {
-		return new IdpQonvertWorkPacket(new File(wipFolder, getOutputFile().getName()), getParams(), inputFile,
-				fastaFile, referencedFileFolder, getTaskId(), isFromScratch());
+	public WorkPacket translateToCachePacket(final File cacheFolder) {
+		final String canonicalOutput = WorkCache.getCanonicalOutput(getInputFile(), getOutputFile());
+		return new IdpQonvertWorkPacket(
+				new File(cacheFolder, canonicalOutput),
+				getParams(),
+				inputFile,
+				fastaFile,
+				referencedFileFolder,
+				getTaskId(),
+				isFromScratch());
 	}
 
 	@Override

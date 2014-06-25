@@ -1,6 +1,7 @@
 package edu.mayo.mprc.searchengine;
 
 import edu.mayo.mprc.daemon.CachableWorkPacket;
+import edu.mayo.mprc.daemon.WorkCache;
 import edu.mayo.mprc.daemon.worker.WorkPacketBase;
 import edu.mayo.mprc.utilities.progress.ProgressReporter;
 
@@ -110,6 +111,10 @@ public abstract class EngineWorkPacket extends WorkPacketBase implements Cachabl
 	@Override
 	public void reportCachedResult(final ProgressReporter reporter, final File targetFolder, final List<String> outputFiles) {
 		reporter.reportProgress(new SearchEngineResult(new File(targetFolder, outputFiles.get(0))));
+	}
+
+	public File canonicalOutput(final File cacheFolder) {
+		return new File(cacheFolder, WorkCache.getCanonicalOutput(getInputFile(), getOutputFile()));
 	}
 
 	@Override

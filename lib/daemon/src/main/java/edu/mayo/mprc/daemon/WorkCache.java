@@ -61,6 +61,19 @@ public abstract class WorkCache<T extends WorkPacket> implements NoLoggingWorker
 		// Do nothing
 	}
 
+	/**
+	 * Strip extension from input file, replace with extension from output file.
+	 * <p/>
+	 * The result is the file name of the output file that is canonical in a sense.
+	 */
+	public static String getCanonicalOutput(final File inputFile, final File outputFile) {
+		return
+				FileUtilities.stripGzippedExtension(inputFile.getName())
+						+ "."
+						+ FileUtilities.getGzippedExtension(outputFile.getName());
+
+	}
+
 	@Override
 	public final void processRequest(final WorkPacket workPacket, final ProgressReporter progressReporter) {
 		try {
@@ -90,7 +103,9 @@ public abstract class WorkCache<T extends WorkPacket> implements NoLoggingWorker
 
 		final CachableWorkPacket cachableWorkPacket;
 		if (workPacket instanceof CachableWorkPacket) {
-			cachableWorkPacket = (CachableWorkPacket) workPacket;
+			// We translate the output files in our work packet to files going against a dummy folder
+			// This will allow us to look up a matching cache entry, instead of looking for outputs that our users want
+			cachableWorkPacket = (CachableWorkPacket) ((CachableWorkPacket) workPacket).translateToCachePacket(new File("/dummy"));
 		} else {
 			ExceptionUtilities.throwCastException(workPacket, CachableWorkPacket.class);
 			return;
@@ -132,7 +147,7 @@ public abstract class WorkCache<T extends WorkPacket> implements NoLoggingWorker
 		// Make a work-in-progress folder
 		final File wipFolder = cacheFolder.makeWorkFolder(cachableWorkPacket);
 
-		final WorkPacket modifiedWorkPacket = cachableWorkPacket.translateToWorkInProgressPacket(wipFolder);
+		final WorkPacket modifiedWorkPacket = cachableWorkPacket.translateToCachePacket(wipFolder);
 
 		final MyProgressListener listener = new MyProgressListener(cachableWorkPacket, wipFolder, newReporter);
 		daemon.sendWork(modifiedWorkPacket, listener);

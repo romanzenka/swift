@@ -2,6 +2,7 @@ package edu.mayo.mprc.quameter;
 
 import edu.mayo.mprc.daemon.worker.WorkPacket;
 import edu.mayo.mprc.searchengine.EngineWorkPacket;
+import edu.mayo.mprc.utilities.FileUtilities;
 
 import java.io.File;
 import java.util.List;
@@ -52,9 +53,15 @@ public final class QuameterWorkPacket extends EngineWorkPacket {
 	}
 
 	@Override
-	public WorkPacket translateToWorkInProgressPacket(final File wipFolder) {
-		return new QuameterWorkPacket(getTaskId(), isFromScratch(),
-				getInputFile(), getIdpDbFile(), isMonoisotopic(), getFdrScoreCutoff(), new File(wipFolder, getOutputFile().getName()), isPublishResultFiles());
+	public WorkPacket translateToCachePacket(final File cacheFolder) {
+		return new QuameterWorkPacket(getTaskId(),
+				isFromScratch(),
+				getInputFile(),
+				getIdpDbFile(),
+				isMonoisotopic(),
+				getFdrScoreCutoff(),
+				canonicalOutput(cacheFolder),
+				isPublishResultFiles());
 	}
 
 	@Override

@@ -1,8 +1,10 @@
 package edu.mayo.mprc.myrimatch;
 
 import edu.mayo.mprc.MprcException;
+import edu.mayo.mprc.daemon.WorkCache;
 import edu.mayo.mprc.daemon.worker.WorkPacket;
 import edu.mayo.mprc.searchengine.EngineWorkPacket;
+import edu.mayo.mprc.utilities.FileUtilities;
 
 import java.io.File;
 
@@ -44,9 +46,9 @@ public final class MyriMatchWorkPacket extends EngineWorkPacket {
 	}
 
 	@Override
-	public WorkPacket translateToWorkInProgressPacket(final File wipFolder) {
+	public WorkPacket translateToCachePacket(final File cacheFolder) {
 		return new MyriMatchWorkPacket(
-				new File(wipFolder, getOutputFile().getName()),
+				canonicalOutput(cacheFolder),
 				getSearchParams(),
 				getInputFile(),
 				getDatabaseFile(),

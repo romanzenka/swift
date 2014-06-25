@@ -224,8 +224,8 @@ public final class WorkCacheTest {
 		}
 
 		@Override
-		public WorkPacket translateToWorkInProgressPacket(final File wipFolder) {
-			return new TestWorkPacket(getTaskId(), getRequest(), wipFolder);
+		public WorkPacket translateToCachePacket(final File cacheFolder) {
+			return new TestWorkPacket(getTaskId(), getRequest(), cacheFolder);
 		}
 
 		@Override

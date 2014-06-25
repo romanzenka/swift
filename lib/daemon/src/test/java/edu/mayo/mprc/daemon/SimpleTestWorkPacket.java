@@ -45,9 +45,9 @@ public class SimpleTestWorkPacket extends WorkPacketBase implements Serializable
 	}
 
 	@Override
-	public WorkPacket translateToWorkInProgressPacket(final File wipFolder) {
+	public WorkPacket translateToCachePacket(final File cacheFolder) {
 		final SimpleTestWorkPacket translatedPacket = new SimpleTestWorkPacket("WIP:" + getTaskId(), false);
-		translatedPacket.setResultFile(new File(wipFolder, getResultFile().getName()));
+		translatedPacket.setResultFile(new File(cacheFolder, getResultFile().getName()));
 		return translatedPacket;
 	}
 

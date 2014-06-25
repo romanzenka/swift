@@ -16,9 +16,9 @@ public final class SequestWorkPacket extends EngineWorkPacket {
 	}
 
 	@Override
-	public WorkPacket translateToWorkInProgressPacket(final File wipFolder) {
+	public WorkPacket translateToCachePacket(final File cacheFolder) {
 		return new SequestWorkPacket(
-				new File(wipFolder, getOutputFile().getName()),
+				canonicalOutput(cacheFolder),
 				getSearchParams(),
 				getInputFile(),
 				getDatabaseFile(),

@@ -27,13 +27,13 @@ import java.util.List;
 public interface CachableWorkPacket extends WorkPacket {
 	/**
 	 * @return True if the results of this work packet should be made publicly available to the user
-	 *         (not just stored in the intermediate result cache).
+	 * (not just stored in the intermediate result cache).
 	 */
 	boolean isPublishResultFiles();
 
 	/**
 	 * @return The main resulting output file. Its parent folder is the destination to put all the cached results
-	 *         to in case the user asks for {@link #isPublishResultFiles()}
+	 * to in case the user asks for {@link #isPublishResultFiles()}
 	 */
 	File getOutputFile();
 
@@ -47,11 +47,14 @@ public interface CachableWorkPacket extends WorkPacket {
 	/**
 	 * The original work packet requested files somewhere.
 	 * Translate the work packet to one that requests the files to be put into the work in progress folder of the cache.
+	 * This translation should also make the ouput file name canonical - depending solely on the input parameters.
+	 * This way if user requests two runs with two differently named output files, we can hit the same cache and rename
+	 * the files for them if they so desire.
 	 *
-	 * @param wipFolder The folder where the work-in-progress copy should go
+	 * @param cacheFolder The folder where the cache copy should go
 	 * @return New work packet that puts files into the WIP folder of the cache
 	 */
-	WorkPacket translateToWorkInProgressPacket(File wipFolder);
+	WorkPacket translateToCachePacket(File cacheFolder);
 
 	/**
 	 * @return A list of all output files that are expected to be a result of processing this work packet. Just names, no paths.

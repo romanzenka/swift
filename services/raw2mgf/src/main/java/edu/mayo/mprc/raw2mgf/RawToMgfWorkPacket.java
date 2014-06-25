@@ -1,8 +1,10 @@
 package edu.mayo.mprc.raw2mgf;
 
 import edu.mayo.mprc.daemon.CachableWorkPacket;
+import edu.mayo.mprc.daemon.WorkCache;
 import edu.mayo.mprc.daemon.worker.WorkPacket;
 import edu.mayo.mprc.daemon.worker.WorkPacketBase;
+import edu.mayo.mprc.utilities.FileUtilities;
 import edu.mayo.mprc.utilities.progress.ProgressReporter;
 
 import java.io.File;
@@ -90,17 +92,16 @@ public final class RawToMgfWorkPacket extends WorkPacketBase implements Cachable
 	}
 
 	@Override
-	public WorkPacket translateToWorkInProgressPacket(final File wipFolder) {
-		final WorkPacket modifiedWorkPacket;
-		modifiedWorkPacket = new RawToMgfWorkPacket(
+	public WorkPacket translateToCachePacket(final File cacheFolder) {
+		final String canonicalOutput = WorkCache.getCanonicalOutput(getInputFile(), getOutputFile());
+		return new RawToMgfWorkPacket(
 				getParams(),
-				new File(wipFolder, getOutputFile().getName()),
+				new File(cacheFolder, canonicalOutput),
 				isSkipIfExists(),
 				getInputFile(),
 				getTaskId(),
 				isFromScratch(),
 				/*public access*/false);
-		return modifiedWorkPacket;
 	}
 
 	@Override

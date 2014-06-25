@@ -25,26 +25,18 @@ public final class RAWDumpTask extends AsyncTaskBase {
 	private File errorLogFile;
 	private final File outputFolder;
 
-	public static final String RAW_INFO_FILE_SUFFIX = ".info.tsv";
-	public static final String RAW_SPECTRA_FILE_SUFFIX = ".spectra.tsv";
-	public static final String CHROMATOGRAM_FILE_SUFFIX = ".chroma.gif";
-	public static final String TUNE_METHOD_FILE_SUFFIX = ".tune.tsv";
-	public static final String INSTRUMENT_METHOD_FILE_SUFFIX = ".instrument.tsv";
-	public static final String SAMPLE_INFORMATION_FILE_SUFFIX = ".sample.tsv";
-	public static final String ERROR_LOG_FILE_SUFFIX = ".error.tsv";
-
 	public RAWDumpTask(final WorkflowEngine engine, final File rawFile, final File outputFolder, final DaemonConnection daemonConnection, final DatabaseFileTokenFactory fileTokenFactory, final boolean fromScratch) {
 		super(engine, daemonConnection, fileTokenFactory, fromScratch);
 
 		this.rawFile = rawFile;
 		this.outputFolder = outputFolder;
-		rawInfoFile = getExpectedRawInfoFile();
-		rawSpectraFile = getExpectedRawSpectraFile();
-		chromatogramFile = getExpectedChromatogramFile();
-		tuneMethodFile = getExpectedTuneMethodFile();
-		instrumentMethodFile = getExpectedInstrumentMethodFile();
-		sampleInformationFile = getExpectedSampleInformationFile();
-		errorLogFile = getExpectedErrorLogFile();
+		rawInfoFile = RAWDumpWorkPacket.getExpectedRawInfoFile(outputFolder, rawFile);
+		rawSpectraFile = RAWDumpWorkPacket.getExpectedRawSpectraFile(outputFolder, rawFile);
+		chromatogramFile = RAWDumpWorkPacket.getExpectedChromatogramFile(outputFolder, rawFile);
+		tuneMethodFile = RAWDumpWorkPacket.getExpectedTuneMethodFile(outputFolder, rawFile);
+		instrumentMethodFile = RAWDumpWorkPacket.getExpectedInstrumentMethodFile(outputFolder, rawFile);
+		sampleInformationFile = RAWDumpWorkPacket.getExpectedSampleInformationFile(outputFolder, rawFile);
+		errorLogFile = RAWDumpWorkPacket.getExpectedErrorLogFile(outputFolder, rawFile);
 
 		setName("RAW Dump");
 		updateDescription();
@@ -67,33 +59,6 @@ public final class RAWDumpTask extends AsyncTaskBase {
 		return outputFolder;
 	}
 
-	public File getExpectedRawInfoFile() {
-		return new File(outputFolder, rawFile.getName() + RAW_INFO_FILE_SUFFIX);
-	}
-
-	public File getExpectedRawSpectraFile() {
-		return new File(outputFolder, rawFile.getName() + RAW_SPECTRA_FILE_SUFFIX);
-	}
-
-	public File getExpectedChromatogramFile() {
-		return new File(outputFolder, rawFile.getName() + CHROMATOGRAM_FILE_SUFFIX);
-	}
-
-	public File getExpectedTuneMethodFile() {
-		return new File(outputFolder, rawFile.getName() + TUNE_METHOD_FILE_SUFFIX);
-	}
-
-	public File getExpectedInstrumentMethodFile() {
-		return new File(outputFolder, rawFile.getName() + INSTRUMENT_METHOD_FILE_SUFFIX);
-	}
-
-	public File getExpectedSampleInformationFile() {
-		return new File(outputFolder, rawFile.getName() + SAMPLE_INFORMATION_FILE_SUFFIX);
-	}
-
-	public File getExpectedErrorLogFile() {
-		return new File(outputFolder, rawFile.getName() + ERROR_LOG_FILE_SUFFIX);
-	}
 
 	public File getRawFile() {
 		return rawFile;

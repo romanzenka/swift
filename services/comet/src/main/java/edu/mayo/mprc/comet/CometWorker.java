@@ -53,7 +53,7 @@ public final class CometWorker extends WorkerBase {
 		final File finalOutputFile = packet.getOutputFile();
 		final File outputFile = getTempOutputFile(tempWorkFolder, finalOutputFile);
 		final String resultFileName = getResultFileName(outputFile);
-		final File parameterFile = new File(tempWorkFolder, "comet.parameters");
+ 		final File parameterFile = new File(tempWorkFolder, "comet.parameters");
 
 		// Replace the database path and write parameters out
 		FileUtilities.writeStringToFile(parameterFile, packet.getSearchParams(), true);
