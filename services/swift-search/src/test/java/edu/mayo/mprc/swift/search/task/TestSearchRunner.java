@@ -71,6 +71,7 @@ public class TestSearchRunner {
 		final int numEngines = enabledEngines().size();
 		final int tasksPerFile = (numEngines - 1) /* 1 for each engine except Scaffold */
 				+ 1 /* Raw->mgf */
+				+ 1 /* Raw->mzML for comet */
 				+ 1 /* RawDump */
 				+ 1 /* msmsEval */;
 
@@ -135,6 +136,7 @@ public class TestSearchRunner {
 		final int numEngines = enabledEngines().size();
 		final int tasksPerFile = (numEngines - 1) /* 1 for each engine except Scaffold */
 				+ 1 /* Raw->mgf */
+				+ 1 /* Raw->mzML for comet */
 				+ 1 /* RawDump */
 				+ 1 /* msmsEval */
 				+ 1 /* Fasta DB load (two different DBs) */
@@ -168,6 +170,7 @@ public class TestSearchRunner {
 		final int numEngines = enabledEngines().size();
 		final int tasksPerFile = (numEngines - 1) /* 1 for each engine except Scaffold */
 				+ 1 /* Raw->mgf */
+				+ 1 /* Raw->mzML for comet */
 				+ 1 /* RawDump */
 				+ 1 /* msmsEval */;
 
@@ -202,6 +205,7 @@ public class TestSearchRunner {
 		final int numEngines = enabledEngines().size();
 		final int tasksPerFile = numEngines /* 1 for each engine */
 				+ 1 /* Raw->mgf */
+				+ 1 /* Raw->mzML for comet */
 				+ 1 /* RawDump */
 				+ 1 /* msmsEval */;
 
@@ -221,6 +225,7 @@ public class TestSearchRunner {
 
 	@Test
 	public void mzMlRunner() throws IOException {
+		// msconvert with mzml
 		final Collection<SearchEngine> searchEngines = searchEngines();
 
 		final List<FileSearch> inputFiles = Arrays.asList(
@@ -234,7 +239,7 @@ public class TestSearchRunner {
 
 		final int numEngines = enabledEngines().size();
 		final int tasksPerFile = (numEngines - 1) /* 1 for each engine except Scaffold */
-				+ 1 /* Raw->mgf */
+				+ 1 /* Raw->mzML can be used by Comet directly */
 				+ 1 /* RawDump */
 				+ 1 /* no msmsEval */;
 
@@ -276,11 +281,11 @@ public class TestSearchRunner {
 		final int numEngines = enabledEngines().size();
 		final int tasksPerFile = (numEngines - 1) /* 1 for each engine except Scaffold */
 				+ 1 /* Raw->mgf */
+				+ 1 /* Raw->mzML for comet */
 				+ 1 /* RawDump */
 				+ 1 /* msmsEval */
 
-				+ 1 /* Raw->mzML */
-				+ 1 /* Myrimatch mzML */
+				+ 1 /* Comet mzML */
 				+ 1 /* IdpQonvert mzML */
 				+ 1 /* QuaMeter */
 				+ 1 /* QuaMeter DB load */;

@@ -374,7 +374,16 @@ public final class SearchRunner implements Runnable, Lifecycle {
 			}
 		}
 		final File outputFolder = getOutputFolderForSearchEngine(engine);
-		return addEngineSearch(engine, param, inputFile.getInputFile(), outputFolder, convertedFile, database, deploymentResult, publicSearchFiles);
+
+		final FileProducingTask converted;
+		if (comet(engine)) {
+			// Comet is special. It requires a mzML file as input
+			converted = addRawConversionTask(inputFile, MSCONVERT_MZML, false);
+		} else {
+			converted = convertedFile;
+		}
+
+		return addEngineSearch(engine, param, inputFile.getInputFile(), outputFolder, converted, database, deploymentResult, publicSearchFiles);
 	}
 
 	private IdpQonvertTask addIdpQonvertTask(final SearchEngine idpQonvert, final EngineSearchTask search, final boolean publishResult) {
@@ -449,6 +458,10 @@ public final class SearchRunner implements Runnable, Lifecycle {
 
 	private boolean myrimatch(final SearchEngine engine) {
 		return "MYRIMATCH".equalsIgnoreCase(engine.getCode());
+	}
+
+	private boolean comet(final SearchEngine engine) {
+		return "COMET".equalsIgnoreCase(engine.getCode());
 	}
 
 	private boolean isNormalEngine(final SearchEngine engine) {
