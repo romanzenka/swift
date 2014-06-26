@@ -39,7 +39,6 @@ public final class TestIdpQonvertWorkPacket {
 		final String desc = packet.getStringDescriptionOfTask();
 		Assert.assertTrue(desc.contains("ChargeStateHandling=\"Partition\"\n"), "Packet does not serialize properly");
 		Assert.assertTrue(desc.contains(input.getAbsolutePath()), "Packet does not serialize properly");
-		Assert.assertTrue(desc.contains(output.getAbsolutePath()), "Packet does not serialize properly");
 		Assert.assertTrue(desc.contains(fasta.getAbsolutePath()), "Packet does not serialize properly");
 	}
 }
