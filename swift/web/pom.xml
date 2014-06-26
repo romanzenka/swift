@@ -111,18 +111,42 @@
             <id>local-testing</id>
             <dependencies>
                 <dependency>
-                      <groupId>aspectj</groupId>
-                      <artifactId>aspectjtools</artifactId>
-                      <version>1.2</version>
-                      <scope>provided</scope>
+                    <groupId>aspectj</groupId>
+                    <artifactId>aspectjtools</artifactId>
+                    <version>1.2</version>
+                    <scope>provided</scope>
                 </dependency>
             </dependencies>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-compiler-plugin</artifactId>
+                        <configuration>
+                            <includes>
+                                <!-- Hack to make GWT work locally -->
+                                <include>edu/mayo/mprc/swift/JDTCompiler15.java</include>
+                            </includes>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
         </profile>
     </profiles>
 
     <build>
         <finalName>swift-ui</finalName>
         <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <excludes>
+                        <!-- This file is excluded from compilation by default -->
+                        <exclude>edu/mayo/mprc/swift/JDTCompiler15.java</exclude>
+                    </excludes>
+                </configuration>
+            </plugin>
             <!--  configure the GWT-Maven plugin -->
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
