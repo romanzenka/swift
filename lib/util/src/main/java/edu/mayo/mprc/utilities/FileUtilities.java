@@ -520,6 +520,29 @@ public final class FileUtilities {
 	 * @return the filename minus extension
 	 */
 	public static String stripExtension(final String filename) {
+		return stripExtension(filename, NO_EXTENSIONS);
+	}
+
+	/**
+	 * Remove extension from filename. Support multi-part extensions. If you provide
+	 * {@code pep.xml} in the extensions parameter, you get the following behavior:
+	 * <pre>
+	 *     foo.txt -> foo
+	 *     foo.bla.xml -> foo.bla
+	 *     foo.pep.xml -> foo
+	 * </pre>
+	 *
+	 * @param filename   Filename to remove extension from.
+	 * @param extensions Extra multi-part extensions, such as {@code pep.xml}, to be honored
+	 * @return the filename minus extension
+	 */
+	public static String stripExtension(final String filename, final String[] extensions) {
+		for (final String extension : extensions) {
+			if (filename.endsWith("." + extension)) {
+				return filename.substring(0, filename.length() - extension.length() - 1);
+			}
+		}
+
 		final int index = filename.lastIndexOf('.');
 		if (-1 == index) {
 			return filename;

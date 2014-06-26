@@ -129,6 +129,7 @@ public final class FileUtilitiesTest {
 		Assert.assertEquals(FileUtilities.stripExtension("a/b/c.jpg"), "a/b/c");
 		Assert.assertEquals(FileUtilities.stripExtension("a/b/c"), "a/b/c");
 		Assert.assertEquals(FileUtilities.stripExtension("a/b/c.tar.gz"), "a/b/c.tar");
+		Assert.assertEquals(FileUtilities.stripExtension("a/b/c.pep.xml", new String[]{"pep.xml"}), "a/b/c");
 	}
 
 	@Test

@@ -80,7 +80,7 @@ public final class IdpQonvertWorker extends WorkerBase {
 		final ProcessCaller caller = new ProcessCaller(builder);
 		caller.runAndCheck("idpQonvert");
 		final File from = new File(batchWorkPacket.getInputFile().getParentFile(),
-				FileUtilities.stripExtension(batchWorkPacket.getInputFile().getName()) + ".idpDB");
+				FileUtilities.stripExtension(batchWorkPacket.getInputFile().getName(), new String[]{"pep.xml"}) + ".idpDB");
 
 		if (!from.exists() || !from.canRead() || !from.isFile()) {
 			throw new MprcException("idpQonvert failed to create file: " + from.getAbsolutePath());
