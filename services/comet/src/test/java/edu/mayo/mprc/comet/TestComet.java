@@ -37,12 +37,12 @@ public class TestComet {
 	private File inputMzmlFile;
 	private File fastaFolder;
 	private File fastaFile;
-	private File cometInstallFolder;
+	private File cometExecutable;
 	private static final CometMappingFactory mappingFactory = new CometMappingFactory();
 
 	@BeforeClass()
 	public void setup() throws IOException {
-		cometInstallFolder = Installer.getDirectory("SWIFT_TEST_COMET_FOLDER", "comet");
+		cometExecutable = Installer.getExecutable("SWIFT_TEST_COMET_EXECUTABLE", "comet executable");
 		tempRootDir = FileUtilities.createTempFolder();
 		inputMzmlFolder = Installer.mzmlFiles(null, Installer.Action.INSTALL);
 		inputMzmlFile = new File(inputMzmlFolder, "test.mzML");
@@ -59,7 +59,7 @@ public class TestComet {
 
 	@Test
 	public void runCometWorker() {
-		if (cometInstallFolder == null) {
+		if (cometExecutable == null) {
 			return;
 		}
 		try {
@@ -71,7 +71,7 @@ public class TestComet {
 
 			final String cometParams = getCometParams();
 
-			String cometExecutable = new File(cometInstallFolder, "comet.exe").getAbsolutePath();
+			String cometExecutable = this.cometExecutable.getAbsolutePath();
 
 			if (!new File(cometExecutable).exists()) {
 				LOGGER.warn("Could not find comet executable in " + cometExecutable + ", trying Comet on the path.");
