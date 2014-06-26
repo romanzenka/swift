@@ -49,6 +49,14 @@ public class MapMassSpecDataExtractor implements MassSpecDataExtractor {
 		if (metaData != null) {
 			return metaData;
 		}
+		// For some strange reason, Scaffold sometimes refers to the sample using parentheses around its name
+		// We need to strip those
+		if (msmsSampleName.startsWith("(") && msmsSampleName.endsWith(")")) {
+			final RawFileMetaData metaNoParens = metaDataMap.get(msmsSampleName.substring(1, msmsSampleName.length() - 1));
+			if (metaNoParens != null) {
+				return metaNoParens;
+			}
+		}
 		if (msmsSampleName.startsWith(MUDPIT_PREFIX)) {
 			final RawFileMetaData mudpitMetaData = metaDataMap.get(msmsSampleName.substring(MUDPIT_PREFIX.length()));
 			if (mudpitMetaData != null) {
