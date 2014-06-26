@@ -1,0 +1,13 @@
+<?xml version='1.0' encoding='utf-8'?><!-- this file has been replaced by programmatic setup in HibernateSetup class --><!DOCTYPE hibernate-configuration PUBLIC
+    "-//Hibernate/Hibernate Configuration DTD 3.0//EN"
+    "http://www.hibernate.org/dtd/hibernate-configuration-3.0.dtd">
+<hibernate-configuration>
+    <session-factory>
+        <mapping resource="../../main/resources/edu/mayo/mprc/dbcurator/model/Curation.hbm.xml" />
+        <mapping resource="../../main/resources/edu/mayo/mprc/dbcurator/model/SourceDatabaseArchive.hbm.xml" />
+        <mapping resource="../../main/resources/edu/mayo/mprc/dbcurator/model/curationsteps/CurationStep.hbm.xml" />
+        <mapping resource="../../main/resources/edu/mayo/mprc/dbcurator/model/curationsteps/DataSource.hbm.xml" />
+        <mapping resource="../../main/resources/edu/mayo/mprc/dbcurator/model/curationsteps/HeaderTransform.hbm.xml" />
+    </session-factory>
+</hibernate-configuration>
+

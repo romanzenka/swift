@@ -1,0 +1,18 @@
+<?xml version='1.0' encoding='utf-8'?><!DOCTYPE hibernate-configuration PUBLIC
+    "-//Hibernate/Hibernate Configuration DTD//EN"
+    "http://www.hibernate.org/dtd/hibernate-configuration-3.0.dtd">
+
+<hibernate-configuration>
+    <session-factory>
+        <!-- Mapping files -->
+        <mapping resource="edu/mayo/mprc/swift/dbmapping/FileSearch.hbm.xml" />
+        <mapping resource="edu/mayo/mprc/swift/dbmapping/PeptideReport.hbm.xml" />
+        <mapping resource="edu/mayo/mprc/swift/dbmapping/ReportData.hbm.xml" />
+        <mapping resource="edu/mayo/mprc/swift/dbmapping/SearchRun.hbm.xml" />
+        <mapping resource="edu/mayo/mprc/swift/dbmapping/SpectrumQa.hbm.xml" />
+        <mapping resource="edu/mayo/mprc/swift/dbmapping/SwiftDBVersion.hbm.xml" />
+        <mapping resource="edu/mayo/mprc/swift/dbmapping/SwiftSearchDefinition.hbm.xml" />
+        <mapping resource="edu/mayo/mprc/swift/dbmapping/TaskData.hbm.xml" />
+        <mapping resource="edu/mayo/mprc/swift/dbmapping/TaskStateData.hbm.xml" />
+    </session-factory>
+</hibernate-configuration>
