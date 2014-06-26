@@ -143,6 +143,12 @@ public final class FileUtilitiesTest {
 	}
 
 	@Test
+	public void shouldSupportPepXml() {
+		Assert.assertEquals(FileUtilities.stripGzippedExtension("foo.pep.xml", new String[]{"hello.world"}), "foo.pep");
+		Assert.assertEquals(FileUtilities.stripGzippedExtension("foo.pep.xml", new String[]{"hello.world", "pep.xml"}), "foo");
+	}
+
+	@Test
 	public void shouldDestroyContents() throws IOException {
 		final File file = File.createTempFile("test", ".txt");
 		Files.write("hello world", file, Charsets.UTF_8);

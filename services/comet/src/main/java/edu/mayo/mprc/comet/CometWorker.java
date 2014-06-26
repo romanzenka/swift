@@ -1,6 +1,5 @@
 package edu.mayo.mprc.comet;
 
-import com.google.common.base.Charsets;
 import edu.mayo.mprc.MprcException;
 import edu.mayo.mprc.config.DaemonConfig;
 import edu.mayo.mprc.config.DependencyResolver;
@@ -21,7 +20,6 @@ import edu.mayo.mprc.utilities.progress.UserProgressReporter;
 import org.apache.log4j.Logger;
 import org.springframework.stereotype.Component;
 
-import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.util.Arrays;
 import java.util.LinkedList;

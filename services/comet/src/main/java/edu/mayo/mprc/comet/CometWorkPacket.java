@@ -20,6 +20,17 @@ public final class CometWorkPacket extends EngineWorkPacket {
 		super(inputFile, outputFile, searchParams, databaseFile, publishSearchFiles, taskId, fromScratch);
 	}
 
+	/**
+	 * We need to take care of .pep.xml extension that does not register as a file extension otherwise (only .xml gets chopped off)
+	 */
+	@Override
+	public File canonicalOutput(final File cacheFolder) {
+		final String name = FileUtilities.stripGzippedExtension(getInputFile().getName())
+				+ "."
+				+ FileUtilities.getGzippedExtension(getOutputFile().getName(), new String[]{"pep.xml"});
+		return new File(cacheFolder, name);
+	}
+
 	@Override
 	public WorkPacket translateToCachePacket(final File cacheFolder) {
 		return new CometWorkPacket(
