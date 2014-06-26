@@ -128,7 +128,9 @@ public final class IdpQonvertTask extends AsyncTaskBase {
 	}
 
 	public File getResultingFile() {
-		final String idpDbFileName = FileUtilities.getFileNameWithoutExtension(searchTask.getResultingFile()) + ".idpDB";
+		final String idpDbFileName =
+				FileUtilities.stripExtension(searchTask.getResultingFile().getName(), new String[]{"pep.xml"})
+						+ ".idpDB";
 		return new File(outputFolder, idpDbFileName);
 	}
 
