@@ -1,5 +1,6 @@
 package edu.mayo.mprc.quameter;
 
+import edu.mayo.mprc.daemon.WorkCache;
 import edu.mayo.mprc.daemon.worker.WorkPacket;
 import edu.mayo.mprc.searchengine.EngineWorkPacket;
 import edu.mayo.mprc.utilities.FileUtilities;
@@ -12,6 +13,7 @@ import java.util.List;
  */
 public final class QuameterWorkPacket extends EngineWorkPacket {
 	private static final long serialVersionUID = 3243861715951582089L;
+	public static final String[] QUAL_TXT_EXTENSION = new String[]{"qual.txt"};
 
 	/**
 	 * Idpqonvert database corresponding to the input RAW file.
@@ -50,6 +52,11 @@ public final class QuameterWorkPacket extends EngineWorkPacket {
 				"idpDB:\n" + getIdpDbFile().getAbsolutePath() + "\n\n" +
 				"FDR cutoff:\n" + getFdrScoreCutoff() + "\n\n" +
 				"Monoisotopic:\n" + isMonoisotopic() + "\n\n";
+	}
+
+	@Override
+	public File canonicalOutput(final File cacheFolder) {
+		return new File(cacheFolder, WorkCache.getCanonicalOutput(getInputFile(), getOutputFile(), QUAL_TXT_EXTENSION));
 	}
 
 	@Override

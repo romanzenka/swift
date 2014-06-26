@@ -67,10 +67,23 @@ public abstract class WorkCache<T extends WorkPacket> implements NoLoggingWorker
 	 * The result is the file name of the output file that is canonical in a sense.
 	 */
 	public static String getCanonicalOutput(final File inputFile, final File outputFile) {
+		return getCanonicalOutput(inputFile, outputFile, FileUtilities.NO_EXTENSIONS);
+	}
+
+	/**
+	 * Same as {@link #getCanonicalOutput(java.io.File, java.io.File)} only it also considers
+	 * a provided list of multi-part extensions.
+	 *
+	 * @param inputFile  File to use for the name itself.
+	 * @param outputFile File to get the extension from.
+	 * @param extensions List of multi-part extensions to strip from both input and output.
+	 * @return Output file created by using the input file name and output file extension.
+	 */
+	public static String getCanonicalOutput(final File inputFile, final File outputFile, final String[] extensions) {
 		return
-				FileUtilities.stripGzippedExtension(inputFile.getName())
+				FileUtilities.stripGzippedExtension(inputFile.getName(), extensions)
 						+ "."
-						+ FileUtilities.getGzippedExtension(outputFile.getName());
+						+ FileUtilities.getGzippedExtension(outputFile.getName(), extensions);
 
 	}
 
