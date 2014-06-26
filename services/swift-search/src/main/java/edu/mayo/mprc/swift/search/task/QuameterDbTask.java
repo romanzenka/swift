@@ -26,7 +26,7 @@ public final class QuameterDbTask extends AsyncTaskBase {
 		this.searchDbTask = searchDbTask;
 		this.fileSearch = fileSearch;
 		this.quameterTask = quameterTask;
-		setName("quameter");
+		setName("quameter-db");
 		setDescription("Load QuaMeter metadata from " + fileTokenFactory.fileToTaggedDatabaseToken(fileSearch.getInputFile()));
 	}
 
