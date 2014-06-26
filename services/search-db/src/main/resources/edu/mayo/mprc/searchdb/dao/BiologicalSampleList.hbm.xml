@@ -10,8 +10,9 @@
         <property name="hash" column="hash" not-null="true"/>
 
         <bag name="list" table="biological_sample_list_members" mutable="false">
-            <key column="biological_sample_list_id"/>
-            <many-to-many column="biological_sample_id" class="BiologicalSample" lazy="proxy"/>
+            <key column="biological_sample_list_id" foreign-key="biological_sample_list_members_ibfk_2"/>
+            <many-to-many column="biological_sample_id" class="BiologicalSample" lazy="proxy"
+                foreign-key="biological_sample_list_members_ibfk_1"/>
         </bag>
     </class>
 </hibernate-mapping>

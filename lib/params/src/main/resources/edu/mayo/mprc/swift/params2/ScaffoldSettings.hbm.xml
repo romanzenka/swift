@@ -13,7 +13,8 @@
         <property name="minimumPeptideCount" type="integer" column="minimum_peptide_count" />
         <property name="minimumNonTrypticTerminii" type="integer" column="minimum_non_tryptic_terminii" />
 
-        <many-to-one name="starredProteins" class="StarredProteins" column="starred_proteins" lazy="false" />
+        <many-to-one name="starredProteins" class="StarredProteins" column="starred_proteins" lazy="false"
+            foreign-key="scaffold_settings_ibfk_1"/>
 
         <property name="saveOnlyIdentifiedSpectra" type="boolean" column="save_only_identified_spectra" />
         <property name="saveNoSpectra" type="boolean" column="save_no_spectra" />

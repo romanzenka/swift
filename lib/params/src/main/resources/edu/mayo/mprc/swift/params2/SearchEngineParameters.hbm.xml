@@ -6,12 +6,16 @@
         <id name="id" type="integer" column="search_parameter_id">
             <generator class="native" />
         </id>
-        <many-to-one name="database" column="curation" class="edu.mayo.mprc.dbcurator.model.Curation" lazy="proxy" />
-        <many-to-one name="protease" column="protease" class="Protease" lazy="false" />
+        <many-to-one name="database" column="curation" class="edu.mayo.mprc.dbcurator.model.Curation" lazy="proxy"
+            foreign-key="search_parameter_ibfk_6"/>
+        <many-to-one name="protease" column="protease" class="Protease" lazy="false"
+            foreign-key="search_parameter_ibfk_4"/>
         <property name="minTerminiCleavages" column="min_termini_cleavages" />
         <property name="missedCleavages" column="missed_cleavages" />
-        <many-to-one name="fixedModifications" column="fixed_mods" />
-        <many-to-one name="variableModifications" column="variable_mods" />
+        <many-to-one name="fixedModifications" column="fixed_mods"
+            foreign-key="search_parameter_ibfk_3"/>
+        <many-to-one name="variableModifications" column="variable_mods"
+            foreign-key="search_parameter_ibfk_1"/>
         <component name="peptideTolerance" class="Tolerance">
             <property name="value" type="double" column="peptide_tolerance_value" />
             <property name="unit" length="10" column="peptide_tolerance_unit">
@@ -28,13 +32,15 @@
                 </type>
             </property>
         </component>
-        <many-to-one name="instrument" column="instrument" class="Instrument" lazy="false" />
+        <many-to-one name="instrument" column="instrument" class="Instrument" lazy="false"
+            foreign-key="search_parameter_ibfk_5"/>
         <many-to-one name="extractMsnSettings" column="extract_msn_settings" class="ExtractMsnSettings" not-null="false"
-            lazy="false" />
+            lazy="false" foreign-key="search_parameter_ibfk_7"/>
         <many-to-one name="scaffoldSettings" column="scaffold_settings" class="ScaffoldSettings" not-null="false"
-            lazy="false" />
+            lazy="false" foreign-key="search_parameter_ibfk_2"/>
 
-        <many-to-one name="enabledEngines" class="EnabledEngines" column="enabled_engines" lazy="false" />
+        <many-to-one name="enabledEngines" class="EnabledEngines" column="enabled_engines" lazy="false"
+            foreign-key="search_parameter_ibfk_9"/>
 
     </class>
 </hibernate-mapping>

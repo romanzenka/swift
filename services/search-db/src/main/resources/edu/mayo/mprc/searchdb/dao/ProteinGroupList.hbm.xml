@@ -1,17 +1,17 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
-        "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+    "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
 <hibernate-mapping package="edu.mayo.mprc.searchdb.dao" default-lazy="true">
     <class name="ProteinGroupList" table="protein_group_list" mutable="false">
         <id name="id" type="integer" column="protein_group_list_id">
-            <generator class="native"/>
+            <generator class="native" />
         </id>
 
-        <property name="hash" column="hash" not-null="true"/>
+        <property name="hash" column="hash" not-null="true" />
 
         <set name="list" table="protein_group_list_members" mutable="false">
-            <key column="protein_group_list_id"/>
-            <many-to-many column="protein_group_id" class="ProteinGroup"/>
+            <key column="protein_group_list_id" foreign-key="protein_group_list_members_ibfk_2" />
+            <many-to-many column="protein_group_id" class="ProteinGroup"
+                foreign-key="protein_group_list_members_ibfk_1" />
         </set>
     </class>
 </hibernate-mapping>

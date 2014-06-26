@@ -5,7 +5,8 @@
         <id name="id" type="integer" column="protein_group_id">
             <generator class="native" />
         </id>
-        <many-to-one name="proteinSequences" class="ProteinSequenceList" column="protein_sequence_list_id" />
+        <many-to-one name="proteinSequences" class="ProteinSequenceList" column="protein_sequence_list_id"
+            foreign-key="protein_group_ibfk_1"/>
         <property name="proteinIdentificationProbability" type="edu.mayo.mprc.database.NullNanDoubleType"
             not-null="false" column="protein_identification_probability" />
         <property name="numberOfUniquePeptides" type="integer" column="unique_peptides" />

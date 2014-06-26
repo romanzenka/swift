@@ -13,8 +13,10 @@
         <property name="title" column="title" length="100"/>
         <many-to-one name="submittingUser" class="edu.mayo.mprc.workspace.User"
                      column="submitting_user"
-                     lazy="false"/>
-        <!-- ID of the swift search. This is a hack to optimize loading of the objects -->
+                     lazy="false" foreign-key="transaction_ibfk_1"/>
+        <!-- ID of the swift search. This is a hack to optimize loading of the objects
+        Corresponds to foreign key transaction_ibfk_2
+        -->
         <property name="swiftSearch" type="integer" column="swift_search"/>
         <property name="startTimestamp" column="start_timestamp" index="transaction_start_timestamp_index"/>
         <property name="endTimestamp" column="end_timestamp"/>

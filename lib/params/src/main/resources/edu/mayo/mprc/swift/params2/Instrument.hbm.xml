@@ -1,21 +1,23 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
-        "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+    "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
 <hibernate-mapping package="edu.mayo.mprc.swift.params.values">
     <class name="edu.mayo.mprc.swift.params2.Instrument" table="instrument">
         <id name="id" type="integer" column="instrument_id">
-            <generator class="native"/>
+            <generator class="native" />
         </id>
 
-        <property name="name" type="string" length="20" column="name"/>
-        <property name="mascotName" type="string" length="20" column="mascot_name"/>
+        <property name="name" type="string" length="20" column="name" />
+        <property name="mascotName" type="string" length="20" column="mascot_name" />
 
         <set name="series" table="instrument_series" lazy="false">
-            <key column="instrument_id"/>
-            <many-to-many column="ion_series_id" class="edu.mayo.mprc.swift.params2.IonSeries"/>
+            <key column="instrument_id" foreign-key="instrument_series_ibfk_2" />
+            <many-to-many column="ion_series_id" class="edu.mayo.mprc.swift.params2.IonSeries"
+                foreign-key="instrument_series_ibfk_1" />
         </set>
 
-        <many-to-one name="creation" column="creation" class="edu.mayo.mprc.database.Change" lazy="proxy"/>
-        <many-to-one name="deletion" column="deletion" class="edu.mayo.mprc.database.Change" lazy="proxy"/>
+        <many-to-one name="creation" column="creation" class="edu.mayo.mprc.database.Change" lazy="proxy"
+            foreign-key="instrument_ibfk_2" />
+        <many-to-one name="deletion" column="deletion" class="edu.mayo.mprc.database.Change" lazy="proxy"
+            foreign-key="instrument_ibfk_1" />
     </class>
 </hibernate-mapping>

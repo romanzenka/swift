@@ -9,7 +9,9 @@
         <property name="name" column="name" type="string" length="50" access="property"/>
         <property name="rn" column="rn" type="string" length="40" access="property"/>
         <property name="rnminus1" column="rn_minus_1" type="string" length="40" access="property"/>
-        <many-to-one name="creation" column="creation" class="edu.mayo.mprc.database.Change" lazy="proxy"/>
-        <many-to-one name="deletion" column="deletion" class="edu.mayo.mprc.database.Change" lazy="proxy"/>
+        <many-to-one name="creation" column="creation" class="edu.mayo.mprc.database.Change" lazy="proxy"
+            foreign-key="protease_ibfk_2"/>
+        <many-to-one name="deletion" column="deletion" class="edu.mayo.mprc.database.Change" lazy="proxy"
+            foreign-key="protease_ibfk_1"/>
     </class>
 </hibernate-mapping>

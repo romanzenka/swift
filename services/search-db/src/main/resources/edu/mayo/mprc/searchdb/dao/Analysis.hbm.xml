@@ -1,13 +1,14 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
-        "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+    "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
 <hibernate-mapping package="edu.mayo.mprc.searchdb.dao" default-lazy="true">
     <class name="Analysis" table="analysis" mutable="false">
         <id name="id" type="integer" column="analysis_id">
-            <generator class="native"/>
+            <generator class="native" />
         </id>
-        <property name="scaffoldVersion" type="string" length="20" column="scaffold_version"/>
-        <property name="analysisDate" type="org.joda.time.contrib.hibernate.PersistentDateTime" column="analysis_date"/>
-        <many-to-one name="biologicalSamples" class="BiologicalSampleList" column="biological_sample_list_id"/>
+        <property name="scaffoldVersion" type="string" length="20" column="scaffold_version" />
+        <property name="analysisDate" type="org.joda.time.contrib.hibernate.PersistentDateTime"
+            column="analysis_date" />
+        <many-to-one name="biologicalSamples" class="BiologicalSampleList" column="biological_sample_list_id"
+            foreign-key="analysis_ibfk_2" />
     </class>
 </hibernate-mapping>

@@ -15,14 +15,16 @@
         <property name="initials" column="initials" length="6" />
 
         <map name="preferences" table="user_preferences" cascade="all" lazy="true" batch-size="50">
-            <key column="user_id" />
+            <key column="user_id" foreign-key="user_preferences_ibfk_1" />
             <index column="preference_name" type="string" length="40" />
             <element column="preference_value" type="text" />
             <!-- TODO: Make binary -->
         </map>
 
-        <many-to-one name="creation" column="creation" class="edu.mayo.mprc.database.Change" lazy="proxy" />
-        <many-to-one name="deletion" column="deletion" class="edu.mayo.mprc.database.Change" lazy="proxy" />
+        <many-to-one name="creation" column="creation" class="edu.mayo.mprc.database.Change" lazy="proxy"
+            foreign-key="workflow_user_ibfk_2" />
+        <many-to-one name="deletion" column="deletion" class="edu.mayo.mprc.database.Change" lazy="proxy"
+            foreign-key="workflow_user_ibfk_1" />
     </class>
 
 </hibernate-mapping>

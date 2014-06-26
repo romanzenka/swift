@@ -6,8 +6,9 @@
         <id name="id" type="integer" column="search_result_id">
             <generator class="native"/>
         </id>
-        <many-to-one name="proteinGroups" class="ProteinGroupList" column="protein_group_list_id" lazy="proxy"/>
+        <many-to-one name="proteinGroups" class="ProteinGroupList" column="protein_group_list_id" lazy="proxy"
+            foreign-key="search_result_ibfk_1"/>
         <many-to-one name="massSpecSample" class="TandemMassSpectrometrySample" column="tandem_mass_spec_sample_id"
-                     not-null="false" lazy="proxy"/>
+                     not-null="false" lazy="proxy" foreign-key="search_result_ibfk_2/>
     </class>
 </hibernate-mapping>

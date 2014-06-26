@@ -1,20 +1,19 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
-        "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+    "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
 
 <hibernate-mapping package="edu.mayo.mprc.dbcurator.model.curationsteps">
 
     <class name="edu.mayo.mprc.dbcurator.model.FastaSource" table="curation_data_source">
         <id name="id" type="integer" column="data_source_id">
-            <generator class="native"/>
+            <generator class="native" />
         </id>
 
-        <property name="name" type="string" length="50" column="name" unique="true"/>
-        <property name="url" type="string" column="url"/>
-        <property name="common" type="true_false" column="is_common"/>
+        <property name="name" type="string" length="50" column="name" unique="true" />
+        <property name="url" type="string" column="url" />
+        <property name="common" type="true_false" column="is_common" />
 
         <many-to-one name="transform" class="edu.mayo.mprc.dbcurator.model.HeaderTransform" cascade="all" lazy="false"
-                     column="auto_transform"/>
+            column="auto_transform" foreign-key="curation_data_source_ibfk_1" />
 
     </class>
 

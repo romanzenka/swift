@@ -11,7 +11,7 @@
         <property name="lastRunCompletionCount" type="integer" column="last_run_completion_count" />
 
         <joined-subclass name="HeaderFilterStep" table="curation_step_header_filter">
-            <key column="header_filter_id" />
+            <key column="header_filter_id" foreign-key="curation_step_header_filter_ibfk_1" />
             <property name="criteriaString" type="string" length="1024" column="criteria_string" />
             <property name="textMode"
                 column="text_mode"> <!-- A enum so it needs a special mapping using a UserType implementation -->
@@ -28,33 +28,33 @@
         </joined-subclass>
 
         <joined-subclass name="ManualInclusionStep" table="curation_step_manual_inclusion">
-            <key column="manual_inclusion_id" />
+            <key column="manual_inclusion_id" foreign-key="curation_step_manual_inclusion_ibfk_1" />
             <property name="header" type="text" length="512" column="inclusion_header" />
             <property name="sequence" type="text" length="1500" column="inclusion_sequence" />
         </joined-subclass>
 
         <joined-subclass name="NewDatabaseInclusion" table="curation_step_new_db">
-            <key column="new_database_id" />
+            <key column="new_database_id" foreign-key="curation_step_new_db_ibfk_2" />
             <property name="url" type="string" length="1024" column="url" />
             <many-to-one name="source" class="edu.mayo.mprc.dbcurator.model.SourceDatabaseArchive" column="source_db"
-                cascade="all" lazy="false" not-null="false" />
+                cascade="all" lazy="false" not-null="false" foreign-key="curation_step_new_db_ibfk_1" />
         </joined-subclass>
 
         <joined-subclass name="MakeDecoyStep" table="curation_step_make_decoy">
-            <key column="sequence_manipulation_id" />
+            <key column="sequence_manipulation_id" foreign-key="curation_step_make_decoy_ibfk_1" />
             <property name="overwriteMode" type="boolean" column="overwrite_mode" />
             <property name="manipulatorType" type="integer" column="manipulator_type" />
         </joined-subclass>
 
         <joined-subclass name="DatabaseUploadStep" table="curation_step_database_upload">
-            <key column="upload_id" />
+            <key column="upload_id" foreign-key="curation_step_database_upload_ibfk_1" />
             <property name="pathToUploadedFile" type="file" column="server_path" />
             <property name="fileName" type="string" column="client_path" />
             <property name="md5CheckSum" type="binary" column="md5_checksum" />
         </joined-subclass>
 
         <joined-subclass name="HeaderTransformStep" table="curation_step_header_transform">
-            <key column="header_transform_id" />
+            <key column="header_transform_id" foreign-key="curation_step_header_transform_ibfk_1" />
             <property name="description" type="string" column="description" />
             <property name="matchPattern" type="string" column="match_pattern" />
             <property name="substitutionPattern" type="string" column="substitution_pattern" />

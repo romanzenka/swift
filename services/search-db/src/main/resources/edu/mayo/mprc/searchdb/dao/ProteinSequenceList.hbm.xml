@@ -10,8 +10,9 @@
         <property name="hash" column="hash" not-null="true"/>
 
         <set name="list" table="protein_sequence_list_members" mutable="false">
-            <key column="protein_sequence_list_id"/>
-            <many-to-many column="protein_sequence_id" class="edu.mayo.mprc.fastadb.ProteinSequence"/>
+            <key column="protein_sequence_list_id" foreign-key="protein_sequence_list_members_ibfk_2"/>
+            <many-to-many column="protein_sequence_id" class="edu.mayo.mprc.fastadb.ProteinSequence"
+                foreign-key="protein_sequence_list_members_ibfk_1"/>
         </set>
     </class>
 </hibernate-mapping>

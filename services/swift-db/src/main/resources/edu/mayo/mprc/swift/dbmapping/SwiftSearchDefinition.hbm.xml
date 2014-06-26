@@ -9,15 +9,17 @@
         </id>
 
         <property name="title" type="string" length="100" column="title" />
-        <many-to-one name="user" class="edu.mayo.mprc.workspace.User" column="owner" />
+        <many-to-one name="user" class="edu.mayo.mprc.workspace.User" column="owner"
+            foreign-key="swift_search_definition_ibfk_4" />
         <property name="outputFolder" type="file" column="output_folder" />
-        <many-to-one name="qa" class="SpectrumQa" column="spectrum_qa" />
-        <many-to-one name="peptideReport" class="PeptideReport" column="peptide_report" />
+        <many-to-one name="qa" class="SpectrumQa" column="spectrum_qa" foreign-key="swift_search_definition_ibfk_3" />
+        <many-to-one name="peptideReport" class="PeptideReport" column="peptide_report"
+            foreign-key="swift_search_definition_ibfk_1" />
         <property name="publicMgfFiles" type="boolean" column="public_mgf_files" not-null="false" />
         <property name="publicMzxmlFiles" type="boolean" column="public_mzxml_files" not-null="false" />
         <property name="publicSearchFiles" type="boolean" column="public_search_files" not-null="false" />
         <many-to-one name="searchParameters" class="edu.mayo.mprc.swift.params2.SearchEngineParameters"
-            column="search_parameters" not-null="false" />
+            column="search_parameters" not-null="false" foreign-key="swift_search_definition_ibfk_2" />
 
         <list name="inputFiles" cascade="all" lazy="false">
             <key column="swift_search_definition_id" />
@@ -26,7 +28,7 @@
         </list>
 
         <map name="metadata" cascade="all-delete-orphan" lazy="true" table="search_metadata">
-            <key column="swift_search_definition_id" />
+            <key column="swift_search_definition_id" foreign-key="search_metadata_ibfk_1" />
             <map-key type="string" column="metadata_key" />
             <element type="string" column="metadata_value" />
         </map>

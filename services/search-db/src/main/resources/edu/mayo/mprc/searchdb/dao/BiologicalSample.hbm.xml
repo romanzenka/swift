@@ -1,13 +1,13 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
-        "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+    "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
 <hibernate-mapping package="edu.mayo.mprc.searchdb.dao" default-lazy="true">
     <class name="BiologicalSample" table="biological_sample" mutable="false">
         <id name="id" type="integer" column="biological_sample_id">
-            <generator class="native"/>
+            <generator class="native" />
         </id>
-        <property name="category" type="string" length="200" column="category"/>
-        <property name="sampleName" type="string" length="200" column="sample_name"/>
-        <many-to-one name="searchResults" class="SearchResultList" column="search_result_list_id" lazy="proxy"/>
+        <property name="category" type="string" length="200" column="category" />
+        <property name="sampleName" type="string" length="200" column="sample_name" />
+        <many-to-one name="searchResults" class="SearchResultList" column="search_result_list_id" lazy="proxy"
+            foreign-key="biological_sample_ibfk_1" />
     </class>
 </hibernate-mapping>
