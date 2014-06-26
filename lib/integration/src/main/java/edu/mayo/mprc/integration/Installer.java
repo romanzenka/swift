@@ -93,6 +93,10 @@ public class Installer {
 			"/test.mgf"
 	);
 
+	private static final List<String> MZML_TEST = Arrays.asList(
+			"/test.mzML"
+	);
+
 	private static final List<String> RAW_FILES = Arrays.asList(
 			"/test.RAW"
 	);
@@ -179,6 +183,10 @@ public class Installer {
 
 	public static File mgfFiles(final File folder, final Action action) {
 		return processList(folder, "mgf", MGF_TEST, action);
+	}
+
+	public static File mzmlFiles(final File folder, final Action action) {
+		return processList(folder, "mzml", MZML_TEST, action);
 	}
 
 	public static File rawFiles(final File folder, final Action action) {

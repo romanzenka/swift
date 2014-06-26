@@ -3,6 +3,7 @@ package edu.mayo.mprc.qa;
 import edu.mayo.mprc.daemon.CachableWorkPacket;
 import edu.mayo.mprc.daemon.worker.WorkPacket;
 import edu.mayo.mprc.daemon.worker.WorkPacketBase;
+import edu.mayo.mprc.utilities.FileUtilities;
 import edu.mayo.mprc.utilities.progress.ProgressReporter;
 
 import java.io.File;
@@ -24,6 +25,14 @@ public final class RAWDumpWorkPacket extends WorkPacketBase implements CachableW
 	private File instrumentMethodFile;
 	private File sampleInformationFile;
 	private File errorLogFile;
+	
+	public static final String RAW_INFO_FILE_SUFFIX = ".info.tsv";
+	public static final String RAW_SPECTRA_FILE_SUFFIX = ".spectra.tsv";
+	public static final String CHROMATOGRAM_FILE_SUFFIX = ".chroma.gif";
+	public static final String TUNE_METHOD_FILE_SUFFIX = ".tune.tsv";
+	public static final String INSTRUMENT_METHOD_FILE_SUFFIX = ".instrument.tsv";
+	public static final String SAMPLE_INFORMATION_FILE_SUFFIX = ".sample.tsv";
+	public static final String ERROR_LOG_FILE_SUFFIX = ".error.tsv";	
 
 	public RAWDumpWorkPacket(final String taskId, final boolean fromScratch) {
 		super(taskId, fromScratch);
@@ -104,17 +113,46 @@ public final class RAWDumpWorkPacket extends WorkPacketBase implements CachableW
 		return description.toString();
 	}
 
+	public static File getExpectedRawInfoFile(final File outputFolder, final File rawFile) {
+		return new File(outputFolder, rawFile.getName() + RAW_INFO_FILE_SUFFIX);
+	}
+
+	public static File getExpectedRawSpectraFile(final File outputFolder, final File rawFile) {
+		return new File(outputFolder, rawFile.getName() + RAW_SPECTRA_FILE_SUFFIX);
+	}
+
+	public static File getExpectedChromatogramFile(final File outputFolder, final File rawFile) {
+		return new File(outputFolder, rawFile.getName() + CHROMATOGRAM_FILE_SUFFIX);
+	}
+
+	public static File getExpectedTuneMethodFile(final File outputFolder, final File rawFile) {
+		return new File(outputFolder, rawFile.getName() + TUNE_METHOD_FILE_SUFFIX);
+	}
+
+	public static File getExpectedInstrumentMethodFile(final File outputFolder, final File rawFile) {
+		return new File(outputFolder, rawFile.getName() + INSTRUMENT_METHOD_FILE_SUFFIX);
+	}
+
+	public static File getExpectedSampleInformationFile(final File outputFolder, final File rawFile) {
+		return new File(outputFolder, rawFile.getName() + SAMPLE_INFORMATION_FILE_SUFFIX);
+	}
+
+	public static File getExpectedErrorLogFile(final File outputFolder, final File rawFile) {
+		return new File(outputFolder, rawFile.getName() + ERROR_LOG_FILE_SUFFIX);
+	}
+
+
 	@Override
-	public WorkPacket translateToWorkInProgressPacket(final File wipFolder) {
+	public WorkPacket translateToCachePacket(final File cacheFolder) {
 		return new RAWDumpWorkPacket(
 				getRawFile(),
-				new File(wipFolder, getRawInfoFile().getName()),
-				new File(wipFolder, getRawSpectraFile().getName()),
-				new File(wipFolder, getChromatogramFile().getName()),
-				new File(wipFolder, getTuneMethodFile().getName()),
-				new File(wipFolder, getInstrumentMethodFile().getName()),
-				new File(wipFolder, getSampleInformationFile().getName()),
-				new File(wipFolder, getErrorLogFile().getName()),
+				getExpectedRawInfoFile(cacheFolder, getRawFile()),
+				getExpectedRawSpectraFile(cacheFolder, getRawFile()),
+				getExpectedChromatogramFile(cacheFolder, getRawFile()),
+				getExpectedTuneMethodFile(cacheFolder, getRawFile()),
+				getExpectedInstrumentMethodFile(cacheFolder, getRawFile()),
+				getExpectedSampleInformationFile(cacheFolder, getRawFile()),
+				getExpectedErrorLogFile(cacheFolder, getRawFile()),
 				getTaskId(),
 				isFromScratch()
 		);

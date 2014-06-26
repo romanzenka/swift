@@ -47,6 +47,14 @@ public final class TestDistinctFiles {
 		check(d, "test.txt", 2, "test_2_2.txt");
 	}
 
+	@Test
+	public void shouldSupportCustomExtensions() {
+		final DistinctFiles d = new DistinctFiles();
+		check(d, "test.long.extension", 1, ".long.extension", "test.long.extension");
+		check(d, "test.long.extension", 1, ".long.extension", "test.long.extension");
+		check(d, "test.long.extension", 2, ".long.extension", "test_2.long.extension");
+	}
+
 	private void check(final DistinctFiles distinctFiles, final String file, final String expected) {
 		Assert.assertEquals(distinctFiles.getDistinctFile(new File(file)), new File(expected).getAbsoluteFile());
 	}
@@ -55,4 +63,7 @@ public final class TestDistinctFiles {
 		Assert.assertEquals(distinctFiles.getDistinctFile((File) new File(file), meaning), new File(expected).getAbsoluteFile());
 	}
 
+	private void check(final DistinctFiles distinctFiles, final String file, final Object meaning, final String extension, final String expected) {
+		Assert.assertEquals(distinctFiles.getDistinctFile((File) new File(file), meaning, extension), new File(expected).getAbsoluteFile());
+	}
 }

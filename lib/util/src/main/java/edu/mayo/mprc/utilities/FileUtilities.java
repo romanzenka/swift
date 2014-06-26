@@ -59,6 +59,7 @@ public final class FileUtilities {
 	public static final int NFS_FILE_TIMEOUT_MILLIS = 2 * 60 * 1000;
 
 	private static final FileMonitor FILE_MONITOR = new FileMonitor(1000);
+	public static final String[] NO_EXTENSIONS = new String[]{};
 
 	private FileUtilities() {
 
@@ -430,6 +431,37 @@ public final class FileUtilities {
 	 * @see #getGzippedExtension(String) for extensions supporting the .gz suffix
 	 */
 	public static String getExtension(final String filename) {
+		return getExtension(filename, NO_EXTENSIONS);
+	}
+
+	/**
+	 * Get extension from filename. ie
+	 * <pre>
+	 * foo.txt    --> "txt"
+	 * a\b\c.jpg --> "jpg"
+	 * a\b\c     --> ""
+	 * </pre>
+	 * <p/>
+	 * You can ask for specific multi-part extensions to be detected. If extensions = "pep.xml" for instance, you get
+	 * this:
+	 * <pre>
+	 * foo.txt -> "txt"
+	 * foo.bla.xml -> "xml"
+	 * foo.pep.xml -> "pep.xml"
+	 * </pre>
+	 *
+	 * @param filename   the filename
+	 * @param extensions Extra extensions (with multiple dots) to consider when stripping the extension
+	 * @return the extension of filename or "" if none
+	 * @see #getGzippedExtension(String) for extensions supporting the .gz suffix
+	 */
+	public static String getExtension(final String filename, final String[] extensions) {
+		for (final String extension : extensions) {
+			if (filename.endsWith("." + extension)) {
+				return extension;
+			}
+		}
+
 		final int index = filename.lastIndexOf('.');
 
 		if (-1 == index) {
@@ -451,10 +483,21 @@ public final class FileUtilities {
 	 * @return The extension of the file, "" if none, special treatment of ".gz" able to correctly detect "tar.gz" case.
 	 */
 	public static String getGzippedExtension(final String filename) {
-		final String extension = getExtension(filename);
+		return getGzippedExtension(filename, NO_EXTENSIONS);
+	}
+
+	/**
+	 * Same as {@link #getGzippedExtension(String)}, only also considers multi-part extensions that are passed in.
+	 *
+	 * @param filename   File to extract extension from.
+	 * @param extensions Array of extra extensions to consider
+	 * @return The extension of the file, "" if none, special treatment of ".gz" able to correctly detect "tar.gz" case.
+	 */
+	public static String getGzippedExtension(final String filename, final String[] extensions) {
+		final String extension = getExtension(filename, extensions);
 		if (extension.equalsIgnoreCase(GZIP_EXTENSION)) {
 			final String base = filename.substring(0, filename.length() - 1 - GZIP_EXTENSION.length());
-			final String prevExtension = getExtension(base);
+			final String prevExtension = getExtension(base, extensions);
 			if (prevExtension.isEmpty()) {
 				return extension;
 			} else {
@@ -463,6 +506,7 @@ public final class FileUtilities {
 		}
 		return extension;
 	}
+
 
 	/**
 	 * Remove extension from filename. ie
@@ -476,6 +520,29 @@ public final class FileUtilities {
 	 * @return the filename minus extension
 	 */
 	public static String stripExtension(final String filename) {
+		return stripExtension(filename, NO_EXTENSIONS);
+	}
+
+	/**
+	 * Remove extension from filename. Support multi-part extensions. If you provide
+	 * {@code pep.xml} in the extensions parameter, you get the following behavior:
+	 * <pre>
+	 *     foo.txt -> foo
+	 *     foo.bla.xml -> foo.bla
+	 *     foo.pep.xml -> foo
+	 * </pre>
+	 *
+	 * @param filename   Filename to remove extension from.
+	 * @param extensions Extra multi-part extensions, such as {@code pep.xml}, to be honored
+	 * @return the filename minus extension
+	 */
+	public static String stripExtension(final String filename, final String[] extensions) {
+		for (final String extension : extensions) {
+			if (filename.endsWith("." + extension)) {
+				return filename.substring(0, filename.length() - extension.length() - 1);
+			}
+		}
+
 		final int index = filename.lastIndexOf('.');
 		if (-1 == index) {
 			return filename;
@@ -1576,6 +1643,21 @@ public final class FileUtilities {
 	}
 
 	/**
+	 * Get file name by trimming the extension including the .gz (e.g. .fasta or .fasta.gz)
+	 * <p/>
+	 * Same as {@link #getGzippedExtension(String)} only allows extra extensions to be considered
+	 * so we support {@code .pep.xml} as a single extension.
+	 *
+	 * @param fileName   Name of the file.
+	 * @param extensions Extra extensions (with multiple dots) to consider when stripping the extension
+	 * @return The name without the .ext or .ext.gz
+	 */
+	public static String stripGzippedExtension(final String fileName, final String[] extensions) {
+		final String extension = getGzippedExtension(fileName, extensions);
+		return fileName.substring(0, fileName.length() - extension.length() - (/*dot*/!extension.isEmpty() ? 1 : 0));
+	}
+
+	/**
 	 * Throw an exception if the given file does not exist, is not a file, or is not readable.
 	 *
 	 * @param fileDescription Description of the file to use in the exception.
@@ -1698,7 +1780,7 @@ public final class FileUtilities {
 	 *
 	 * @param file File to make canonical.
 	 * @return Canonical file on Windows, do nothing on Linux. Used to resolve upper/lower case problem issues that do not
-	 *         manifest themselves on case-sensitive filesystem like Linux.
+	 * manifest themselves on case-sensitive filesystem like Linux.
 	 */
 	public static File getCanonicalFileNoLinks(final File file) {
 		if (file == null) {

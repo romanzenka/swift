@@ -2,6 +2,7 @@ package edu.mayo.mprc.swift.search.task;
 
 import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
+import edu.mayo.mprc.MprcException;
 import edu.mayo.mprc.utilities.FileUtilities;
 
 import java.io.File;
@@ -63,6 +64,25 @@ final class DistinctFiles {
 	 * @return Distinct file.
 	 */
 	public synchronized File getDistinctFile(final File file, final Object meaning) {
+		String extension = FileUtilities.getGzippedExtension(file.getName());
+		if (!extension.isEmpty()) {
+			extension = "." + extension;
+		}
+
+		return getDistinctFile(file, meaning, extension);
+	}
+
+	/**
+	 * Same as {@link #getDistinctFile(File, Object)} but allows the user to explicitly specify
+	 * the file extension instead of "guessing" it using {@link FileUtilities#getGzippedExtension}.
+	 * The extension provided should contain the '.'
+	 *
+	 * @param file      File to distinguish.
+	 * @param meaning   Meaning of the file, or <c>null</c> when the meaning is unique.
+	 * @param extension Extension of the file we are distinguishing. Should contain the .
+	 * @return Distinct file.
+	 */
+	public synchronized File getDistinctFile(final File file, final Object meaning, final String extension) {
 		String resultingPath = file.getAbsolutePath();
 
 		final FileMeaning fileMeaning;
@@ -85,9 +105,8 @@ final class DistinctFiles {
 			fileNameDisambiguation.put(resultingPath, newCount);
 
 			// Form a hypothesis - this new path should be okay. But we still need to test it in the next loop.
-			String extension = FileUtilities.getGzippedExtension(new File(resultingPath).getName());
-			if (!extension.isEmpty()) {
-				extension = "." + extension;
+			if (!resultingPath.endsWith(extension)) {
+				throw new MprcException(String.format("File [%s] does not have expected extension [%s]", resultingPath, extension));
 			}
 
 			final String basePath = resultingPath.substring(0, resultingPath.length() - extension.length());
@@ -103,6 +122,7 @@ final class DistinctFiles {
 		}
 		return result;
 	}
+
 
 	private class FileMeaning {
 		/**

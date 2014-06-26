@@ -62,14 +62,16 @@ public final class IdpQonvertWorker extends WorkerBase {
 		}
 
 		// Make sure the database is set properly
-		batchWorkPacket.getParams().setProteinDatabase(batchWorkPacket.getFastaFile().getAbsolutePath());
+		final IdpQonvertSettings params = batchWorkPacket.getParams();
+		params.setSourceSearchPath(batchWorkPacket.getReferencedFileFolder().getAbsolutePath());
+		params.setProteinDatabase(batchWorkPacket.getFastaFile().getAbsolutePath());
 		final List<String> commandLine = new ArrayList<String>();
 		commandLine.add(FileUtilities.getAbsoluteFileForExecutables(getIdpQonvertExecutable()).getPath());
 		commandLine.add("-cpus");
 		commandLine.add(String.valueOf(getNumThreads()));
 		commandLine.add("-workdir");
 		commandLine.add(batchWorkPacket.getInputFile().getParentFile().getAbsolutePath());
-		commandLine.addAll(batchWorkPacket.getParams().toCommandLine());
+		commandLine.addAll(params.toCommandLine());
 		commandLine.add(batchWorkPacket.getInputFile().getName());
 		LOGGER.info("Running idpQonvert:\n\t" + Joiner.on("\n\t").join(commandLine).toString());
 
@@ -78,7 +80,7 @@ public final class IdpQonvertWorker extends WorkerBase {
 		final ProcessCaller caller = new ProcessCaller(builder);
 		caller.runAndCheck("idpQonvert");
 		final File from = new File(batchWorkPacket.getInputFile().getParentFile(),
-				FileUtilities.stripExtension(batchWorkPacket.getInputFile().getName()) + ".idpDB");
+				FileUtilities.stripExtension(batchWorkPacket.getInputFile().getName(), new String[]{"pep.xml"}) + ".idpDB");
 
 		if (!from.exists() || !from.canRead() || !from.isFile()) {
 			throw new MprcException("idpQonvert failed to create file: " + from.getAbsolutePath());

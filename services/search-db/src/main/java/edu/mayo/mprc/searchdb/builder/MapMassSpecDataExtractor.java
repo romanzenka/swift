@@ -22,14 +22,34 @@ public class MapMassSpecDataExtractor implements MassSpecDataExtractor {
 
 	@Override
 	public TandemMassSpectrometrySample getTandemMassSpectrometrySample(final String biologicalSampleName, final String msmsSampleName) {
-		final RawFileMetaData rawFileMetaData = getMetadata(msmsSampleName);
+		final String cleanedMsmsSampleName = cleanMsmsSampleName(msmsSampleName);
+
+		final RawFileMetaData rawFileMetaData = getMetadata(cleanedMsmsSampleName);
 		if (rawFileMetaData == null) {
 			return null;
 		} else {
 			final TandemMassSpectrometrySample result = rawFileMetaData.parse();
-			sampleMap.put(msmsSampleName, result);
+			sampleMap.put(cleanedMsmsSampleName, result);
 			return result;
 		}
+	}
+
+	/**
+	 * For some strange reason, Scaffold sometimes refers to the sample using parentheses around its name
+	 * We need to strip those
+	 *
+	 * @param msmsSampleName Sample name, possibly with parentheses around
+	 * @return Same name without parentheses
+	 */
+	private String cleanMsmsSampleName(final String msmsSampleName) {
+		final String cleanedMsmsSampleName;
+
+		if (msmsSampleName.startsWith("(") && msmsSampleName.endsWith(")")) {
+			cleanedMsmsSampleName = msmsSampleName.substring(1, msmsSampleName.length() - 1);
+		} else {
+			cleanedMsmsSampleName = msmsSampleName;
+		}
+		return cleanedMsmsSampleName;
 	}
 
 	@Override

@@ -1,6 +1,7 @@
 package edu.mayo.mprc.msconvert;
 
 import edu.mayo.mprc.daemon.CachableWorkPacket;
+import edu.mayo.mprc.daemon.WorkCache;
 import edu.mayo.mprc.daemon.worker.WorkPacket;
 import edu.mayo.mprc.daemon.worker.WorkPacketBase;
 import edu.mayo.mprc.utilities.FileUtilities;
@@ -92,17 +93,17 @@ public final class MsconvertWorkPacket extends WorkPacketBase implements Cachabl
 	}
 
 	@Override
-	public WorkPacket translateToWorkInProgressPacket(final File wipFolder) {
-		final WorkPacket modifiedWorkPacket;
-		modifiedWorkPacket = new MsconvertWorkPacket(
-				new File(wipFolder, getOutputFile().getName()),
+	public WorkPacket translateToCachePacket(final File cacheFolder) {
+		final String canonicalOutput = WorkCache.getCanonicalOutput(getInputFile(), getOutputFile());
+
+		return new MsconvertWorkPacket(
+				new File(cacheFolder, canonicalOutput),
 				isSkipIfExists(),
 				getInputFile(),
 				isIncludeMs1(),
 				getTaskId(),
 				isFromScratch(),
 				/*public access*/false);
-		return modifiedWorkPacket;
 	}
 
 	@Override

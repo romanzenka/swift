@@ -61,6 +61,32 @@ public abstract class WorkCache<T extends WorkPacket> implements NoLoggingWorker
 		// Do nothing
 	}
 
+	/**
+	 * Strip extension from input file, replace with extension from output file.
+	 * <p/>
+	 * The result is the file name of the output file that is canonical in a sense.
+	 */
+	public static String getCanonicalOutput(final File inputFile, final File outputFile) {
+		return getCanonicalOutput(inputFile, outputFile, FileUtilities.NO_EXTENSIONS);
+	}
+
+	/**
+	 * Same as {@link #getCanonicalOutput(java.io.File, java.io.File)} only it also considers
+	 * a provided list of multi-part extensions.
+	 *
+	 * @param inputFile  File to use for the name itself.
+	 * @param outputFile File to get the extension from.
+	 * @param extensions List of multi-part extensions to strip from both input and output.
+	 * @return Output file created by using the input file name and output file extension.
+	 */
+	public static String getCanonicalOutput(final File inputFile, final File outputFile, final String[] extensions) {
+		return
+				FileUtilities.stripGzippedExtension(inputFile.getName(), extensions)
+						+ "."
+						+ FileUtilities.getGzippedExtension(outputFile.getName(), extensions);
+
+	}
+
 	@Override
 	public final void processRequest(final WorkPacket workPacket, final ProgressReporter progressReporter) {
 		try {
@@ -88,25 +114,29 @@ public abstract class WorkCache<T extends WorkPacket> implements NoLoggingWorker
 			return;
 		}
 
-		final CachableWorkPacket cachableWorkPacket;
+		final CachableWorkPacket originalPacket;
+		final CachableWorkPacket lookupPacket;
 		if (workPacket instanceof CachableWorkPacket) {
-			cachableWorkPacket = (CachableWorkPacket) workPacket;
+			// We translate the output files in our work packet to files going against a dummy folder
+			// This will allow us to look up a matching cache entry, instead of looking for outputs that our users want
+			originalPacket = (CachableWorkPacket) workPacket;
+			lookupPacket = (CachableWorkPacket) originalPacket.translateToCachePacket(new File("/dummy"));
 		} else {
 			ExceptionUtilities.throwCastException(workPacket, CachableWorkPacket.class);
 			return;
 		}
 
 		// Find existing cache subfolder with data matching the work packet.
-		final File existingEntry = cacheFolder.lookup(cachableWorkPacket);
+		final File existingEntry = cacheFolder.lookup(lookupPacket);
 
 		if (existingEntry != null) {
-			reportCachedValues(progressReporter, cachableWorkPacket, existingEntry);
+			reportCachedValues(progressReporter, originalPacket, lookupPacket, existingEntry);
 			return;
 		}
 
 		// A string describing the request. If two descriptions are the same,
 		// the tasks are the same
-		final String taskDescription = cachableWorkPacket.getStringDescriptionOfTask();
+		final String taskDescription = originalPacket.getStringDescriptionOfTask();
 
 		// We have not found a suitable cache entry
 		// But maybe someone is working on this exact task right now
@@ -130,11 +160,11 @@ public abstract class WorkCache<T extends WorkPacket> implements NoLoggingWorker
 		// The deal is to put all the output files there, and finally create the task description file to mark the cache as completed
 
 		// Make a work-in-progress folder
-		final File wipFolder = cacheFolder.makeWorkFolder(cachableWorkPacket);
+		final File wipFolder = cacheFolder.makeWorkFolder(originalPacket);
 
-		final WorkPacket modifiedWorkPacket = cachableWorkPacket.translateToWorkInProgressPacket(wipFolder);
+		final WorkPacket modifiedWorkPacket = originalPacket.translateToCachePacket(wipFolder);
 
-		final MyProgressListener listener = new MyProgressListener(cachableWorkPacket, wipFolder, newReporter);
+		final MyProgressListener listener = new MyProgressListener(lookupPacket, originalPacket, wipFolder, newReporter);
 		daemon.sendWork(modifiedWorkPacket, listener);
 	}
 
@@ -142,14 +172,17 @@ public abstract class WorkCache<T extends WorkPacket> implements NoLoggingWorker
 	 * We found a non-stale cache folder with all the files in it.
 	 * Publish this finding directly to the caller.
 	 */
-	private void reportCachedValues(final ProgressReporter progressReporter, final CachableWorkPacket cachableWorkPacket, final File cacheFolder) {
-		final List<String> outputFiles = cachableWorkPacket.getOutputFiles();
+	private void reportCachedValues(final ProgressReporter progressReporter,
+	                                final CachableWorkPacket originalPacket,
+	                                final CachableWorkPacket cachePacket,
+	                                final File cacheFolder) {
+		final List<String> cachedFiles = cachePacket.getOutputFiles();
 
 		// The output was created after our input file, thus it is useable
 		LOGGER.info("Using cached values from: " + cacheFolder.getAbsolutePath());
 		progressReporter.reportStart(MonitorUtilities.getHostInformation());
-		cachableWorkPacket.reportCachedResult(progressReporter, cacheFolder, outputFiles);
-		publishResultFiles(cachableWorkPacket, cacheFolder, outputFiles);
+		originalPacket.reportCachedResult(progressReporter, cacheFolder, cachedFiles);
+		publishResultFiles(cacheFolder, cachedFiles, originalPacket);
 		progressReporter.reportSuccess();
 	}
 
@@ -164,12 +197,16 @@ public abstract class WorkCache<T extends WorkPacket> implements NoLoggingWorker
 	 * Checks whether the work packet requested publishing the intermediate files.
 	 * If so, copy the intermediate files to the originally requested target.
 	 */
-	private void publishResultFiles(final CachableWorkPacket workPacket, final File outputFolder, final List<String> outputFiles) {
-		if (workPacket.isPublishResultFiles()) {
-			final File targetFolder = workPacket.getOutputFile().getParentFile();
+	private void publishResultFiles(final File cacheFolder, final List<String> cacheOutputFiles, final CachableWorkPacket originalWorkPacket) {
+		final List<String> originalOutputs = originalWorkPacket.getOutputFiles();
+
+		if (originalWorkPacket.isPublishResultFiles()) {
+			final File targetFolder = originalWorkPacket.getOutputFile().getParentFile();
 			FileUtilities.ensureFolderExists(targetFolder);
-			for (final String outputFile : outputFiles) {
-				FileUtilities.copyFile(new File(outputFolder, outputFile), new File(targetFolder, outputFile), true);
+			for (int i = 0; i < originalOutputs.size(); i++) {
+				final File fromFile = new File(cacheFolder, cacheOutputFiles.get(i));
+				final File toFile = new File(targetFolder, originalOutputs.get(i));
+				FileUtilities.copyFile(fromFile, toFile, true);
 			}
 		}
 	}
@@ -189,12 +226,14 @@ public abstract class WorkCache<T extends WorkPacket> implements NoLoggingWorker
 
 	private final class MyProgressListener implements ProgressListener {
 		private final CachableWorkPacket workPacket;
+		private final CachableWorkPacket originalPacket;
 		private final File wipFolder;
 		private final ProgressReporter reporter;
 		private final String taskDescription;
 
-		private MyProgressListener(final CachableWorkPacket workPacket, final File wipFolder, final ProgressReporter reporter) {
+		private MyProgressListener(final CachableWorkPacket workPacket, final CachableWorkPacket originalPacket, final File wipFolder, final ProgressReporter reporter) {
 			this.workPacket = workPacket;
+			this.originalPacket = originalPacket;
 			this.wipFolder = wipFolder;
 			this.reporter = reporter;
 			taskDescription = workPacket.getStringDescriptionOfTask();
@@ -233,7 +272,7 @@ public abstract class WorkCache<T extends WorkPacket> implements NoLoggingWorker
 
 						// Now we only need to notify the requestor that the output file was produced elsewhere
 						workPacket.reportCachedResult(reporter, target, outputFiles);
-						publishResultFiles(workPacket, target, outputFiles);
+						publishResultFiles(target, outputFiles, originalPacket);
 					} catch (final Exception t) {
 						reporter.reportFailure(t);
 						return;

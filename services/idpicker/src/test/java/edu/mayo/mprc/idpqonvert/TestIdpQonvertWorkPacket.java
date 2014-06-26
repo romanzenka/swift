@@ -33,7 +33,7 @@ public final class TestIdpQonvertWorkPacket {
 
 		final File fasta = new File(tempFolder, "test.fasta");
 		final IdpQonvertWorkPacket packet = new IdpQonvertWorkPacket(
-				output, settings, input, fasta, "Idpqonvert-1", false
+				output, settings, input, fasta, input.getParentFile(), "Idpqonvert-1", false
 		);
 
 		final String desc = packet.getStringDescriptionOfTask();

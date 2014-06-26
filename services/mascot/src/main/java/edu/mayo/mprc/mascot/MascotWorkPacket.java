@@ -5,6 +5,7 @@ import com.google.common.io.Files;
 import edu.mayo.mprc.daemon.worker.WorkPacket;
 import edu.mayo.mprc.searchengine.EngineWorkPacket;
 import edu.mayo.mprc.searchengine.SearchEngineResult;
+import edu.mayo.mprc.utilities.FileUtilities;
 import edu.mayo.mprc.utilities.progress.ProgressReporter;
 import org.apache.log4j.Logger;
 
@@ -66,9 +67,9 @@ public final class MascotWorkPacket extends EngineWorkPacket {
 	}
 
 	@Override
-	public WorkPacket translateToWorkInProgressPacket(final File wipFolder) {
+	public WorkPacket translateToCachePacket(final File cacheFolder) {
 		return new MascotWorkPacket(
-				new File(wipFolder, getOutputFile().getName()),
+				canonicalOutput(cacheFolder),
 				getSearchParams(),
 				getInputFile(),
 				getShortDbName(),

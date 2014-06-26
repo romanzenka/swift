@@ -38,7 +38,7 @@ public final class EngineWorkPacketTest {
 		}
 
 		@Override
-		public WorkPacket translateToWorkInProgressPacket(final File wipFolder) {
+		public WorkPacket translateToCachePacket(final File cacheFolder) {
 			return null; //TODO: implement me
 		}
 	}

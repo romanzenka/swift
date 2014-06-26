@@ -67,7 +67,7 @@ public final class ScaffoldWorkPacket extends WorkPacketBase implements Cachable
 	}
 
 	@Override
-	public WorkPacket translateToWorkInProgressPacket(File wipFolder) {
+	public WorkPacket translateToCachePacket(File cacheFolder) {
 		// Not used as we do not actually run this through a cache
 		return this;
 	}

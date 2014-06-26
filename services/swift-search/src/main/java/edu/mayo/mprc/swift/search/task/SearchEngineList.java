@@ -78,6 +78,10 @@ public final class SearchEngineList {
 		return getSearchEngine("QUAMETER");
 	}
 
+	public SearchEngine getCometEngine() {
+		return getSearchEngine("COMET");
+	}
+
 	/**
 	 * Enabled engines are those that the first searched file enables (for now)
 	 */

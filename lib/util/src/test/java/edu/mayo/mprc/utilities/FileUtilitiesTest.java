@@ -129,6 +129,7 @@ public final class FileUtilitiesTest {
 		Assert.assertEquals(FileUtilities.stripExtension("a/b/c.jpg"), "a/b/c");
 		Assert.assertEquals(FileUtilities.stripExtension("a/b/c"), "a/b/c");
 		Assert.assertEquals(FileUtilities.stripExtension("a/b/c.tar.gz"), "a/b/c.tar");
+		Assert.assertEquals(FileUtilities.stripExtension("a/b/c.pep.xml", new String[]{"pep.xml"}), "a/b/c");
 	}
 
 	@Test
@@ -140,6 +141,12 @@ public final class FileUtilitiesTest {
 		Assert.assertEquals(FileUtilities.stripGzippedExtension("foo.txt.gz"), "foo");
 		Assert.assertEquals(FileUtilities.stripGzippedExtension("a/b/c.jpg.gz"), "a/b/c");
 		Assert.assertEquals(FileUtilities.stripGzippedExtension("a/b/c.gz"), "a/b/c");
+	}
+
+	@Test
+	public void shouldSupportPepXml() {
+		Assert.assertEquals(FileUtilities.stripGzippedExtension("foo.pep.xml", new String[]{"hello.world"}), "foo.pep");
+		Assert.assertEquals(FileUtilities.stripGzippedExtension("foo.pep.xml", new String[]{"hello.world", "pep.xml"}), "foo");
 	}
 
 	@Test

@@ -1,6 +1,7 @@
 package edu.mayo.mprc.swift.search.task;
 
 import edu.mayo.mprc.MprcException;
+import edu.mayo.mprc.comet.CometWorkPacket;
 import edu.mayo.mprc.daemon.DaemonConnection;
 import edu.mayo.mprc.daemon.worker.WorkPacket;
 import edu.mayo.mprc.dbcurator.model.Curation;
@@ -110,6 +111,15 @@ final class EngineSearchTask extends AsyncTaskBase implements FileProducingTask 
 					publicSearchFiles, getFullId(),
 					isFromScratch()
 			);
+		} else if ("COMET".equalsIgnoreCase(engine.getCode())) {
+			workPacket = new CometWorkPacket(
+					inputFile.getResultingFile(),
+					params,
+					outputFile,
+					curation.getCurationFile(),
+					publicSearchFiles,
+					getFullId(),
+					isFromScratch());
 		} else {
 			throw new MprcException("Unsupported engine: " + engine.getFriendlyName());
 		}
@@ -146,12 +156,9 @@ final class EngineSearchTask extends AsyncTaskBase implements FileProducingTask 
 			return deploymentResult.getShortDbName();
 		} else if ("SEQUEST".equalsIgnoreCase(engine.getCode())) {
 			return getSequestDatabase().getAbsolutePath();
-		} else if ("TANDEM".equalsIgnoreCase(engine.getCode())) {
-			return curation.getShortName();
-		} else if ("MYRIMATCH".equalsIgnoreCase(engine.getCode())) {
-			return curation.getShortName();
 		} else {
-			throw new MprcException("Unsupported engine: " + engine.getFriendlyName());
+			// All other engines do no real deployment
+			return curation.getShortName();
 		}
 	}
 
@@ -221,5 +228,15 @@ final class EngineSearchTask extends AsyncTaskBase implements FileProducingTask 
 
 	public void setOutputFile(final File outputFile) {
 		this.outputFile = outputFile;
+	}
+
+	/**
+	 * This is important for IdpQonvert which needs to know not only the output file of a search engine,
+	 * but where is the input file that is referenced in the output file.
+	 *
+	 * @return Input file for the search engine.
+	 */
+	public FileProducingTask getInputFile() {
+		return inputFile;
 	}
 }

@@ -81,6 +81,14 @@ public class SearchEngineConfig extends PersistableBase {
 	}
 
 	@Override
+	public String toString() {
+		return "SearchEngineConfig{" +
+				"code='" + code + '\'' +
+				", version='" + version + '\'' +
+				'}';
+	}
+
+	@Override
 	public Criterion getEqualityCriteria() {
 		return Restrictions.and(
 				DaoBase.nullSafeEq("code", getCode()),
