@@ -97,7 +97,7 @@ public final class MSMSEvalWorkPacket extends WorkPacketBase implements Cachable
 		return new MSMSEvalWorkPacket(
 				getSourceFile(),
 				getMsmsEvalParamFile(),
-				new File(cacheFolder, getExpectedMsmsEvalOutputFileName(getSourceFile(), cacheFolder).getName()),
+				new File(cacheFolder, getExpectedResultFileName(getSourceFile(), cacheFolder).getName()),
 				new File(cacheFolder, getExpectedEmOutputFileName(getSourceFile(), cacheFolder).getName()),
 				getTaskId(),
 				isFromScratch()
