@@ -81,6 +81,14 @@ public final class CometMappings implements Mappings {
 			"add_Z_user_amino_acid",
 	};
 	private static final Pattern SPACE = Pattern.compile("\\s");
+	/**
+	 * If fragment tolerance less than this Da, we use a sparse matrix representation
+	 */
+	private static final double SPARSE_MATRIX_TRESHOLD = 0.05;
+	/**
+	 * If fragment tolerance less than this, we use flanking peaks in MS2 spectra
+	 */
+	private static final double FLANKING_PEAKS_USE_THRESHOLD = 0.03;
 
 	/**
 	 * Native params are stored in order in which they were defined.
@@ -362,10 +370,16 @@ public final class CometMappings implements Mappings {
 		}
 		setNativeParam(FRAGMENT_BIN_TOL, String.valueOf(value));
 		setNativeParam(FRAGMENT_BIN_OFFSET, value <= 0.8 ? "0.0" : "0.4");
-		if (value < 0.03) {
+		if (value < FLANKING_PEAKS_USE_THRESHOLD) {
 			setNativeParam("theoretical_fragment_ions", "0"); // Use flanking peaks
 		} else {
 			setNativeParam("theoretical_fragment_ions", "1"); // 1 M peak only
+		}
+
+		if (value < SPARSE_MATRIX_TRESHOLD) {
+			setNativeParam("use_sparse_matrix", "1");
+		} else {
+			setNativeParam("use_sparse_matrix", "0");
 		}
 	}
 

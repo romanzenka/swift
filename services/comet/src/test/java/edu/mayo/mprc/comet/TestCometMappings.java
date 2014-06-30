@@ -74,6 +74,7 @@ public final class TestCometMappings {
 			assertParam("fragment_bin_tol", "0.01"); // 10 ppm at 1000
 			assertParam("fragment_bin_offset", "0.0"); // Offset == 0 for anything under 0.8 dalton, otherwise 0.4
 			assertParam("theoretical_fragment_ions", "0");
+			assertParam("use_sparse_matrix", "1");
 		}
 
 		{
@@ -83,6 +84,7 @@ public final class TestCometMappings {
 			assertParam("fragment_bin_tol", "1.0"); // 1 dalton bin
 			assertParam("fragment_bin_offset", "0.4"); // Offset is 0.4 (for no particular reason)
 			assertParam("theoretical_fragment_ions", "1");
+			assertParam("use_sparse_matrix", "0");
 		}
 	}
 
