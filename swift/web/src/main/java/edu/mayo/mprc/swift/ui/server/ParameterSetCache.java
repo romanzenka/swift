@@ -107,7 +107,9 @@ public final class ParameterSetCache {
 			result = saved.getParameters().copyNullId(); // Always copy
 			addToCache(paramSet, result);
 		} else {
-			result = ps.copyNullId(); // Copy data out
+			// We had something in the cache, but it may be detached
+			// We need to re-attach, then copy the data out
+			result = paramsDao.mergeParameterSet(ps).copyNullId(); // Copy data out
 		}
 		return result;
 	}
