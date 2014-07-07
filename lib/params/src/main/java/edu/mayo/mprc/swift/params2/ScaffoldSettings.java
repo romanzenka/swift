@@ -211,6 +211,8 @@ public class ScaffoldSettings extends PersistableBase {
 				.add(Restrictions.eq("useFamilyProteinGrouping", isUseFamilyProteinGrouping()))
 				.add(Restrictions.eq("useIndependentSampleGrouping", isUseIndependentSampleGrouping()))
 				.add(Restrictions.eq("mzIdentMlReport", isMzIdentMlReport()))
+				.add(Restrictions.eq("highMassAccuracyScoring", isHighMassAccuracyScoring()))
+				.add(Restrictions.eq("use_3x_scoring", isUse3xScoring()))
 				.add(DaoBase.associationEq("starredProteins", getStarredProteins()));
 	}
 
