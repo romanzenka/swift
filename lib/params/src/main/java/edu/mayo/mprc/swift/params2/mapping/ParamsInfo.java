@@ -15,6 +15,10 @@ import java.util.Set;
 
 public abstract class ParamsInfo {
 
+	/**
+	 * @return The list of allowed curations has to be extricated from Hibernate, as we will be using it later in the
+	 * program when we are no longer in hibernate session.
+	 */
 	public abstract List<Curation> getDatabaseAllowedValues();
 
 	public abstract List<Protease> getEnzymeAllowedValues();

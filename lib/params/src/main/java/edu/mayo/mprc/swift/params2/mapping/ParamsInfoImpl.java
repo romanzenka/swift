@@ -50,7 +50,7 @@ public final class ParamsInfoImpl extends ParamsInfo {
 			if (!c.hasBeenRun()) {
 				continue;
 			}
-			dbs.add(c);
+			dbs.add(c.copyFull());
 		}
 		Collections.sort(dbs, new Comparator<Curation>() {
 			@Override
