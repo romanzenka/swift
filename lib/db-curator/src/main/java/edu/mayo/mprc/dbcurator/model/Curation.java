@@ -316,7 +316,7 @@ public class Curation extends EvolvableBase implements Serializable {
 	 * @param toMoveTo where you want to add the step to
 	 */
 	public Curation addStep(final CurationStep toAdd, final int toMoveTo) {
-		curationSteps.add(translateStepIndex(toMoveTo), toAdd);
+		getCurationSteps().add(translateStepIndex(toMoveTo), toAdd);
 		return this;
 	}
 
@@ -324,7 +324,7 @@ public class Curation extends EvolvableBase implements Serializable {
 	 * Remove all steps from the curation.
 	 */
 	public void clearSteps() {
-		curationSteps.clear();
+		getCurationSteps().clear();
 	}
 
 	/**
@@ -354,7 +354,7 @@ public class Curation extends EvolvableBase implements Serializable {
 	 * @return the step that you requested
 	 */
 	public CurationStep getStepByIndex(final int index) {
-		return curationSteps.get(translateStepIndex(index));
+		return getCurationSteps().get(translateStepIndex(index));
 	}
 
 	/**
