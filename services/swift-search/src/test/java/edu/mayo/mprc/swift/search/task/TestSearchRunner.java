@@ -652,10 +652,6 @@ public class TestSearchRunner {
 				public String getNativeParam(final String name) {
 					return "";
 				}
-
-				@Override
-				public void setNativeParam(final String name, final String value) {
-				}
 			};
 		}
 	}

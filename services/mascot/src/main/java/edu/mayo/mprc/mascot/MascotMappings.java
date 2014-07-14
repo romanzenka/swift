@@ -257,8 +257,7 @@ public final class MascotMappings implements Mappings {
 		return nativeParams.get(name);
 	}
 
-	@Override
-	public void setNativeParam(final String name, final String value) {
+	private void setNativeParam(final String name, final String value) {
 		nativeParams.put(name, value);
 	}
 

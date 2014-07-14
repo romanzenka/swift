@@ -24,7 +24,7 @@ import java.io.Writer;
 public interface Mappings {
 	/**
 	 * @return Reader from which the base set of parameters can be read. This can be passed to {@link #read}
-	 *         and {@link #write} for easy parameter mapping.
+	 * and {@link #write} for easy parameter mapping.
 	 */
 	Reader baseSettings();
 
@@ -146,12 +146,4 @@ public interface Mappings {
 	 * @return Native param value.
 	 */
 	String getNativeParam(String name);
-
-	/**
-	 * Used for testing purposes. Lets the user change a native param value.
-	 *
-	 * @param name  Native param name.
-	 * @param value Native param value.
-	 */
-	void setNativeParam(String name, String value);
 }

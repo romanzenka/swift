@@ -48,7 +48,7 @@ public final class CometMappings implements Mappings {
 	private static final String SAMPLE_ENZYME_NUMBER = "sample_enzyme_number";
 
 	private static final Pattern FIXED = Pattern.compile("^add_([A-Z]|Nterm|Cterm)_(.*)");
-	private static final String[] FIXED_MODS = new String[]{
+	private static final String[] FIXED_MODS = {
 			"add_Cterm_peptide",
 			"add_Cterm_protein",
 			"add_Nterm_peptide",
@@ -93,12 +93,12 @@ public final class CometMappings implements Mappings {
 	/**
 	 * Native params are stored in order in which they were defined.
 	 */
-	private LinkedHashMap<String, String> nativeParams = new LinkedHashMap<String, String>();
+	private Map<String, String> nativeParams = new LinkedHashMap<String, String>(50);
 
 	/**
 	 * Holds all the default enzymes Comets defines by default.
 	 */
-	private LinkedHashMap<String, Protease> defaultEnzymes = new LinkedHashMap<String, Protease>(11);
+	private Map<String, Protease> defaultEnzymes = new LinkedHashMap<String, Protease>(11);
 
 	/**
 	 * The extra custom enzyme if the default set was not enough or null otherwise.
@@ -144,7 +144,7 @@ public final class CometMappings implements Mappings {
 						if ("-".equals(notAfter)) {
 							notAfter = "";
 						} else {
-							notAfter = "!" + notAfter;
+							notAfter = '!' + notAfter;
 						}
 
 						final Protease protease;
@@ -271,7 +271,7 @@ public final class CometMappings implements Mappings {
 		final String direction;
 		final String prev;
 		final String next;
-		String rn1 = enzyme.getRnminus1();
+		final String rn1 = enzyme.getRnminus1();
 		if (rn1.isEmpty() || rn1.startsWith("!")) {
 			direction = "0";
 			prev = emptyToDash(enzyme.getRn());
@@ -287,7 +287,7 @@ public final class CometMappings implements Mappings {
 		}
 
 		final String name = SPACE.matcher(enzyme.getName()).replaceAll("_");
-		return spaces(4, proteaseNumber + ".")
+		return spaces(4, proteaseNumber + '.')
 				+ spaces(23, name)
 				+ spaces(7, direction)
 				+ spaces(12, prev)
@@ -315,13 +315,6 @@ public final class CometMappings implements Mappings {
 	}
 
 	/**
-	 * @return The complete map of native parameters.
-	 */
-	public Map<String, String> getNativeParams() {
-		return Collections.unmodifiableMap(nativeParams);
-	}
-
-	/**
 	 * Returns value of a given native parameter.
 	 *
 	 * @param name Name of the parameter.
@@ -338,20 +331,20 @@ public final class CometMappings implements Mappings {
 	 * @param name  Name of the native parameter.
 	 * @param value Value of the native parameter.
 	 */
-	@Override
-	public void setNativeParam(final String name, final String value) {
+	private void setNativeParam(final String name, final String value) {
 		nativeParams.put(name, value);
 	}
 
 	@Override
 	public void setPeptideTolerance(final MappingContext context, final Tolerance peptideTolerance) {
 		setNativeParam(PEP_TOL_VALUE, String.valueOf(peptideTolerance.getValue()));
-		if (MassUnit.Da.equals(peptideTolerance.getUnit())) {
+		final MassUnit unit = peptideTolerance.getUnit();
+		if (MassUnit.Da == unit) {
 			setNativeParam(PEP_TOL_UNIT, "0");
 			// MMU = 1 but we never use MMU
 			setNativeParam("precursor_tolerance_type", "0");
 			setNativeParam("isotope_error", "0");
-		} else if (MassUnit.Ppm.equals(peptideTolerance.getUnit())) {
+		} else if (MassUnit.Ppm.equals(unit)) {
 			setNativeParam(PEP_TOL_UNIT, "2");
 			// PPM - high precision
 			// We expect the precursor to be the monoisotopic peak
@@ -365,7 +358,7 @@ public final class CometMappings implements Mappings {
 	public void setFragmentTolerance(final MappingContext context, final Tolerance fragmentTolerance) {
 		double value = fragmentTolerance.getValue();
 		if (fragmentTolerance.getUnit() == MassUnit.Ppm) {
-			value = value / 1000.0;
+			value /= 1000.0;
 			context.reportWarning(String.format("Comet does not support ppm, using %s Da", value), ParamName.FragmentTolerance);
 		}
 		setNativeParam(FRAGMENT_BIN_TOL, String.valueOf(value));
@@ -483,9 +476,9 @@ public final class CometMappings implements Mappings {
 	public void setProtease(final MappingContext context, final Protease protease) {
 
 		// We only support proteases that are allowed on one side and NOT allowed on the other...
-		final boolean notRn = protease.getRn().startsWith("!") || protease.getRn().isEmpty();
-		final boolean notRn1 = protease.getRnminus1().startsWith("!") || protease.getRnminus1().isEmpty();
-		if (notRn == notRn1) {
+		final boolean rn = !protease.getRn().startsWith("!") && !protease.getRn().isEmpty();
+		final boolean rn1 = !protease.getRnminus1().startsWith("!") && !protease.getRnminus1().isEmpty();
+		if (rn == rn1) {
 			context.reportError(String.format("Protease %s is not supported by Comet", protease.toString()), null, ParamName.Enzyme);
 			return;
 		}
@@ -530,14 +523,15 @@ public final class CometMappings implements Mappings {
 		setNativeParam(MISSED_CLEAVAGES, value);
 	}
 
-	private final Set<String> ALLOWED_SERIES = new ImmutableSet.Builder<String>().add("a", "b", "c", "x", "y", "z").build();
+	private static final Set<String> ALLOWED_SERIES = new ImmutableSet.Builder<String>().add("a", "b", "c", "x", "y", "z").build();
 
-	public void setInstrument(final MappingContext context, final Instrument it) {
+	@Override
+	public void setInstrument(final MappingContext context, final Instrument instrument) {
 		for (final String series : ALLOWED_SERIES) {
 			setNativeParam(seriesVariableName(series), "0");
 		}
 		final List<String> droppedSeries = new ArrayList<String>(3);
-		for (final IonSeries series : it.getSeries()) {
+		for (final IonSeries series : instrument.getSeries()) {
 			final String name = series.getName();
 			if (ALLOWED_SERIES.contains(name)) {
 				setNativeParam(seriesVariableName(name), "1");
@@ -545,13 +539,13 @@ public final class CometMappings implements Mappings {
 				droppedSeries.add(series.getName());
 			}
 		}
-		if (droppedSeries.size() > 0) {
+		if (!droppedSeries.isEmpty()) {
 			Collections.sort(droppedSeries);
 			context.reportWarning(String.format("Comet does not support ion series '%s', dropping", Joiner.on("', '").join(droppedSeries)), ParamName.Instrument);
 		}
 	}
 
-	private String seriesVariableName(final String series) {
+	private static String seriesVariableName(final String series) {
 		return String.format("use_%s_ions", series.toUpperCase(Locale.US));
 	}
 

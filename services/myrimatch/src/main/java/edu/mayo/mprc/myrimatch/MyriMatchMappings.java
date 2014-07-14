@@ -360,9 +360,4 @@ public final class MyriMatchMappings implements Mappings {
 	public String getNativeParam(final String name) {
 		return nativeParams.get(name);
 	}
-
-	@Override
-	public void setNativeParam(final String name, final String value) {
-		nativeParams.put(name, value);
-	}
 }
