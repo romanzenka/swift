@@ -120,7 +120,7 @@ public abstract class WorkCache<T extends WorkPacket> implements NoLoggingWorker
 			// We translate the output files in our work packet to files going against a dummy folder
 			// This will allow us to look up a matching cache entry, instead of looking for outputs that our users want
 			originalPacket = (CachableWorkPacket) workPacket;
-			lookupPacket = (CachableWorkPacket) originalPacket.translateToCachePacket(new File("/dummy"));
+			lookupPacket = (CachableWorkPacket) originalPacket.translateToCachePacket(new File("."));
 		} else {
 			ExceptionUtilities.throwCastException(workPacket, CachableWorkPacket.class);
 			return;
