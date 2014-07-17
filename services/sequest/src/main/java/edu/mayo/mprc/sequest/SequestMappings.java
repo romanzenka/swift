@@ -227,7 +227,7 @@ public final class SequestMappings implements Mappings, Cloneable {
 	 * @param name  Name of the native parameter.
 	 * @param value Value of the native parameter.
 	 */
-	private void setNativeParam(final String name, final String value) {
+	public void setNativeParam(final String name, final String value) {
 		nativeParams.put(name, value);
 	}
 
