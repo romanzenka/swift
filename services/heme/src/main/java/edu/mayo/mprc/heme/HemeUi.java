@@ -520,12 +520,14 @@ public final class HemeUi implements Dao {
 
 		@Override
 		public void createUI(final DaemonConfig daemon, final ResourceConfig resource, final UiBuilder builder) {
-			builder.property(DATA_PATH, "Data path", "Folder containing the heme pathology test data. Every sub-folder in this folder will be displayed")
+			builder.property(DATA_PATH, "Data path", "Folder containing the heme pathology test data. Every sub-folder in this folder will be displayed. " +
+					"<p>The path is relative to the shared folder</p>")
 					.required()
 					.existingDirectory()
 					.defaultValue("data")
 
-					.property(RESULT_PATH, "Result path", "Folder where the search results will be stored")
+					.property(RESULT_PATH, "Result path", "Folder where the search results will be stored." +
+							"<p>The path is relative to the shared folder</p>")
 					.required()
 					.existingDirectory()
 					.defaultValue("results")
