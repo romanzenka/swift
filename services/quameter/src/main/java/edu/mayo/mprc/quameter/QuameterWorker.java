@@ -94,7 +94,11 @@ public final class QuameterWorker extends WorkerBase {
 		parameters.add("-RawDataPath");
 		parameters.add(rawFile.getParentFile().getAbsolutePath());
 		parameters.add("-RawDataFormat");
-		parameters.add("raw");
+		if(rawFile.getName().endsWith(".mzML")) {
+			parameters.add("mzML");
+		} else {
+			parameters.add("raw");
+		}
 		parameters.add("-ScoreCutoff");
 		parameters.add(String.valueOf(packet.getFdrScoreCutoff()));
 		parameters.add("-ChromatogramOutput");
