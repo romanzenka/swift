@@ -63,10 +63,8 @@ public final class HemeUi implements Dao {
 	private static final String TRYPSIN_PARAM_SET_NAME = "trypsinParamSetName";
 	private static final String CHYMO_PARAM_SET_NAME = "chymoParamSetName";
 	private static final String USER_EMAIL = "userEmail";
-	private static final String SEARCH_ENGINES = "searchEngines";
 	public static final String SPECTRA_EXTENSION = ".spectra.txt";
 	public static final double DEFAULT_MASS_DELTA_TOLERANCE = 0.5;
-	public static final String[] NO_ENGINES = new String[0];
 
 	private final File data;
 	private final File results;
@@ -94,8 +92,7 @@ public final class HemeUi implements Dao {
 	              final FastaDbDao fastaDbDao,
 	              final ParamsDao paramsDao,
 	              final SwiftSearcherCaller swiftSearcherCaller,
-	              final String trypsinParameterSetName, final String chymoParameterSetName, final String userEmail,
-	              final String[] searchEngines) {
+	              final String trypsinParameterSetName, final String chymoParameterSetName, final String userEmail) {
 		this.data = data;
 		this.results = results;
 		this.hemeDao = hemeDao;
@@ -106,7 +103,6 @@ public final class HemeUi implements Dao {
 		this.trypsinParameterSetName = trypsinParameterSetName;
 		this.chymoParameterSetName = chymoParameterSetName;
 		this.userEmail = userEmail;
-		this.searchEngines = searchEngines == null ? NO_ENGINES : searchEngines.clone();
 	}
 
 	@Override
@@ -218,8 +214,6 @@ public final class HemeUi implements Dao {
 					title,
 					title
 			});
-
-			searchInput.setEnabledEngines(getSearchEngines());
 
 			searchInput.setParamSetIds(new int[]{
 					trypsinParameterSetId,
@@ -389,10 +383,6 @@ public final class HemeUi implements Dao {
 		return userEmail;
 	}
 
-	public String[] getSearchEngines() {
-		return searchEngines;
-	}
-
 	@Component("hemeUiFactory")
 	public static final class Factory extends FactoryBase<Config, HemeUi> implements FactoryDescriptor {
 		private HemeDao hemeDao;
@@ -489,8 +479,6 @@ public final class HemeUi implements Dao {
 			final File resultDir = new File(rootDir, config.get(RESULT_PATH));
 			FileUtilities.ensureFolderExists(resultDir);
 
-			final String[] engines = splitEngineString(config.get(SEARCH_ENGINES));
-
 			return new HemeUi(dataDir,
 					resultDir,
 					getHemeDao(),
@@ -500,8 +488,7 @@ public final class HemeUi implements Dao {
 					getSwiftSearcherCaller(),
 					config.get(TRYPSIN_PARAM_SET_NAME),
 					config.get(CHYMO_PARAM_SET_NAME),
-					config.get(USER_EMAIL),
-					engines);
+					config.get(USER_EMAIL));
 		}
 
 		private String[] splitEngineString(final String engines) {
@@ -539,11 +526,7 @@ public final class HemeUi implements Dao {
 					.required()
 
 					.property(USER_EMAIL, "User email", "Email of the user to run searches as. Identifies the user uniquely. See http://&lt;swift url&gt;/service/users.xml for a list.")
-					.required()
-
-					.property(SEARCH_ENGINES, "Search engines", "Space separated list of search engine codes in <code>[engine]-[version]</code> format. See http://&lt;swift url&gt;/service/engines.xml for a list.")
-					.required()
-					.defaultValue("MASCOT-2.4 SEQUEST-v.27 TANDEM-2013.06.15 SCAFFOLD-4.0.7");
+					.required();
 		}
 	}
 
