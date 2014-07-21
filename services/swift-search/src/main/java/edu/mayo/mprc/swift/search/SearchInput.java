@@ -23,7 +23,6 @@ public final class SearchInput {
 	private String[] biologicalSamples;
 	private String[] categoryNames;
 	private String[] experiments;
-	private String[] enabledEngines;
 	private int[] paramSetIds;
 	private boolean peptideReport;
 	private boolean fromScratch;
@@ -49,7 +48,6 @@ public final class SearchInput {
 		biologicalSamples = getStringArray(searchInputMap, "biologicalSamples");
 		categoryNames = getStringArray(searchInputMap, "categoryNames");
 		experiments = getStringArray(searchInputMap, "experiments");
-		enabledEngines = getStringArray(searchInputMap, "enabledEngines");
 		if (searchInputMap.get("paramSetIds") != null) {
 			// If set, use the values
 			paramSetIds = getIntArray(searchInputMap, "paramSetIds");
@@ -178,14 +176,6 @@ public final class SearchInput {
 
 	public void setExperiments(final String[] experiments) {
 		this.experiments = experiments;
-	}
-
-	public String[] getEnabledEngines() {
-		return enabledEngines;
-	}
-
-	public void setEnabledEngines(final String[] enabledEngines) {
-		this.enabledEngines = enabledEngines;
 	}
 
 	public boolean isPeptideReport() {
