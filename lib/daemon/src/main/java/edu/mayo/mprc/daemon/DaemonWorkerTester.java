@@ -7,6 +7,7 @@ import edu.mayo.mprc.daemon.files.FileTokenFactory;
 import edu.mayo.mprc.daemon.worker.WorkPacket;
 import edu.mayo.mprc.daemon.worker.Worker;
 import edu.mayo.mprc.daemon.worker.WorkerFactory;
+import edu.mayo.mprc.daemon.worker.log.DaemonLoggerFactory;
 import edu.mayo.mprc.messaging.ActiveMQConnectionPool;
 import edu.mayo.mprc.messaging.ResponseDispatcher;
 import edu.mayo.mprc.messaging.Service;
@@ -16,6 +17,7 @@ import edu.mayo.mprc.utilities.progress.ProgressInfo;
 import edu.mayo.mprc.utilities.progress.ProgressListener;
 import org.apache.log4j.Logger;
 
+import java.io.File;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.concurrent.ExecutorService;
@@ -66,8 +68,9 @@ public final class DaemonWorkerTester implements Lifecycle {
 	private void initializeFromQueueName(final String queueName) {
 		service = serviceFactory.createService(queueName, responseDispatcher);
 		final FileTokenFactory fileTokenFactory = new FileTokenFactory();
-		fileTokenFactory.setDaemonConfigInfo(new DaemonConfigInfo("daemon1", "shared"));
-		daemonConnection = new DirectDaemonConnection(service, fileTokenFactory);
+		String logFolder = "shared/log";
+		fileTokenFactory.setDaemonConfigInfo(new DaemonConfigInfo("daemon1", "shared", logFolder));
+		daemonConnection = new DirectDaemonConnection(service, fileTokenFactory, new DaemonLoggerFactory(new File(logFolder)));
 		runner.setDaemonConnection(daemonConnection);
 	}
 
@@ -94,7 +97,7 @@ public final class DaemonWorkerTester implements Lifecycle {
 	 *
 	 * @param workPacket Data to be processed.
 	 * @return Token for this work packet. The token is an opaque object to be used by {@link #isDone}, {@link #isSuccess} and {@link #getLastError}
-	 *         methods.
+	 * methods.
 	 */
 	public Object sendWork(final WorkPacket workPacket) {
 		if (!isRunning()) {
@@ -111,7 +114,7 @@ public final class DaemonWorkerTester implements Lifecycle {
 	 * @param workPacket   Data to be processed.
 	 * @param userListener Listener to be called as the worker progresses.
 	 * @return Token for this work packet. The token is an opaque object to be used by {@link #isDone}, {@link #isSuccess} and {@link #getLastError}
-	 *         methods.
+	 * methods.
 	 */
 	public Object sendWork(final WorkPacket workPacket, final ProgressListener userListener) {
 		if (!isRunning()) {

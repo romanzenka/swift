@@ -8,6 +8,9 @@ import edu.mayo.mprc.daemon.worker.WorkPacketBase;
 import edu.mayo.mprc.daemon.worker.Worker;
 import edu.mayo.mprc.integration.Installer;
 import edu.mayo.mprc.utilities.FileUtilities;
+import edu.mayo.mprc.utilities.log.ChildLog;
+import edu.mayo.mprc.utilities.log.ParentLog;
+import edu.mayo.mprc.utilities.log.SimpleParentLog;
 import edu.mayo.mprc.utilities.progress.ProgressInfo;
 import edu.mayo.mprc.utilities.progress.ProgressReporter;
 import org.apache.log4j.Logger;
@@ -105,6 +108,11 @@ public class TestRawToMgf {
 				@Override
 				public void reportFailure(final Throwable t) {
 					throw new MprcException("Raw2Mgf worker failed to process work packet.", t);
+				}
+
+				@Override
+				public ParentLog getParentLog() {
+					return new SimpleParentLog();
 				}
 			});
 		} catch (Exception e) {

@@ -1,5 +1,7 @@
 package edu.mayo.mprc.utilities.progress;
 
+import edu.mayo.mprc.utilities.log.ParentLog;
+
 /**
  * A reporter that can be used to provide updates about how the work is going.
  * <p/>
@@ -16,4 +18,13 @@ public interface UserProgressReporter {
 	 * @param progressInfo Information about the progress, e.g. an Integer containing the amount of percent done.
 	 */
 	void reportProgress(ProgressInfo progressInfo);
+
+	/**
+	 * When reporting progress, you can get access to the parent log, which allows you to spawn a child log
+	 * in case you are spawning children. The fact that a child was spawned
+	 * will be communicated to the caller as a progress message.
+	 *
+	 * @return An object that allows you to spawn a child log.
+	 */
+	ParentLog getParentLog();
 }

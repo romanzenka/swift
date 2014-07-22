@@ -102,7 +102,7 @@ public final class FileTokenFactoryTest {
 	}
 
 	private DatabaseFileTokenFactory makeDaemonTokenFactory(final String daemonSharedFolder, final String daemonName) {
-		final DaemonConfigInfo mainDaemon = new DaemonConfigInfo(daemonName, daemonSharedFolder);
+		final DaemonConfigInfo mainDaemon = new DaemonConfigInfo(daemonName, daemonSharedFolder, daemonSharedFolder);
 		final DatabaseFileTokenFactory factory = new DatabaseFileTokenFactory(mainDaemon);
 		factory.setDatabaseDaemonConfigInfo(mainDaemon);
 		return factory;

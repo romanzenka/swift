@@ -19,7 +19,7 @@ public abstract class WorkPacketBase extends FileHolder implements WorkPacket {
 	 * Supports {@link #simulateTransfer(FileTokenHolder)} by providing a dummy token factory that is set
 	 * to a local daemon that shares everything.
 	 */
-	private static final FileTokenFactory NULL_TOKEN_FACTORY = new FileTokenFactory(new DaemonConfigInfo("null daemon", ""));
+	private static final FileTokenFactory NULL_TOKEN_FACTORY = new FileTokenFactory(new DaemonConfigInfo("null daemon", "", ""));
 
 	/**
 	 * @param taskId      Task identifier to be used for nested diagnostic context when logging.

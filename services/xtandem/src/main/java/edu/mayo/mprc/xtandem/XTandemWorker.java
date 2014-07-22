@@ -18,6 +18,8 @@ import edu.mayo.mprc.searchengine.EngineMetadata;
 import edu.mayo.mprc.utilities.FileUtilities;
 import edu.mayo.mprc.utilities.ProcessCaller;
 import edu.mayo.mprc.utilities.StreamRegExMatcher;
+import edu.mayo.mprc.utilities.log.ParentLog;
+import edu.mayo.mprc.utilities.log.SimpleParentLog;
 import edu.mayo.mprc.utilities.progress.ProgressInfo;
 import edu.mayo.mprc.utilities.progress.ProgressReporter;
 import edu.mayo.mprc.utilities.progress.UserProgressReporter;
@@ -99,6 +101,11 @@ public final class XTandemWorker extends WorkerBase {
 			@Override
 			public void reportFailure(final Throwable t) {
 				LOGGER.error("Could not run X!Tandem", t);
+			}
+
+			@Override
+			public ParentLog getParentLog() {
+				return new SimpleParentLog();
 			}
 
 			@Override

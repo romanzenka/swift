@@ -4,6 +4,8 @@ import edu.mayo.mprc.MprcException;
 import edu.mayo.mprc.config.DependencyResolver;
 import edu.mayo.mprc.integration.Installer;
 import edu.mayo.mprc.utilities.FileUtilities;
+import edu.mayo.mprc.utilities.log.ParentLog;
+import edu.mayo.mprc.utilities.log.SimpleParentLog;
 import edu.mayo.mprc.utilities.progress.ProgressInfo;
 import edu.mayo.mprc.utilities.progress.UserProgressReporter;
 import org.apache.log4j.Logger;
@@ -79,6 +81,11 @@ public final class TestIdpQonvert {
 				@Override
 				public void reportProgress(final ProgressInfo progressInfo) {
 					LOGGER.debug(progressInfo.toString());
+				}
+
+				@Override
+				public ParentLog getParentLog() {
+					return new SimpleParentLog();
 				}
 			});
 		}

@@ -1,5 +1,6 @@
 package edu.mayo.mprc.daemon;
 
+import edu.mayo.mprc.utilities.log.ParentLog;
 import edu.mayo.mprc.utilities.progress.ProgressInfo;
 import edu.mayo.mprc.utilities.progress.ProgressReporter;
 
@@ -69,5 +70,17 @@ final class CacheProgressReporter implements ProgressReporter {
 		for (final ProgressReporter reporter : reporters) {
 			reporter.reportFailure(failureReported);
 		}
+	}
+
+	@Override
+	/**
+	 * The parent log is the parent log of the very first requestor.
+	 * Every newcomer should only reference the same parent log.
+	 */
+	public synchronized ParentLog getParentLog() {
+		if (reporters.size() == 0) {
+			return null;
+		}
+		return reporters.get(0).getParentLog();
 	}
 }

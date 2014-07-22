@@ -3,12 +3,11 @@ package edu.mayo.mprc.daemon;
 import edu.mayo.mprc.config.*;
 import edu.mayo.mprc.config.ui.FactoryDescriptor;
 import edu.mayo.mprc.config.ui.ServiceUiFactory;
-import edu.mayo.mprc.daemon.exception.DaemonException;
-import edu.mayo.mprc.daemon.worker.NoLoggingWorker;
 import edu.mayo.mprc.daemon.worker.Worker;
 import edu.mayo.mprc.daemon.worker.WorkerFactory;
 import edu.mayo.mprc.daemon.worker.WorkerFactoryBase;
-import edu.mayo.mprc.daemon.worker.log.LoggingSetup;
+import edu.mayo.mprc.utilities.log.ChildLog;
+import edu.mayo.mprc.utilities.log.ParentLog;
 import edu.mayo.mprc.utilities.progress.ProgressInfo;
 import edu.mayo.mprc.utilities.progress.ProgressReporter;
 import org.apache.log4j.Logger;
@@ -152,17 +151,16 @@ public final class SimpleRunner extends AbstractRunner {
 
 	private final class MyProgressReporter implements ProgressReporter {
 		private final DaemonRequest request;
-		private final LoggingSetup loggingSetup;
+		private final ParentLog parentLog;
 
-		private MyProgressReporter(final DaemonRequest request, final LoggingSetup loggingSetup) {
+		private MyProgressReporter(final DaemonRequest request, final ParentLog parentLog) {
 			this.request = request;
-			this.loggingSetup = loggingSetup;
+			this.parentLog = parentLog;
 		}
 
 		@Override
 		public void reportStart(final String hostString) {
 			sendResponse(request, new DaemonProgressMessage(hostString), false);
-			reportLogFiles();
 		}
 
 		@Override
@@ -172,21 +170,17 @@ public final class SimpleRunner extends AbstractRunner {
 
 		@Override
 		public void reportSuccess() {
-			reportLogFiles();
 			sendResponse(request, new DaemonProgressMessage(DaemonProgress.RequestCompleted), true);
 		}
 
 		@Override
 		public void reportFailure(final Throwable t) {
-			reportLogFiles();
 			sendResponse(request, t, true);
 		}
 
-		private void reportLogFiles() {
-			if (loggingSetup != null) {
-				sendResponse(request, new DaemonProgressMessage(DaemonProgress.UserSpecificProgressInfo,
-						new AssignedTaskData(loggingSetup.getStandardOutFile(), loggingSetup.getStandardErrorFile())), false);
-			}
+		@Override
+		public ParentLog getParentLog() {
+			return parentLog;
 		}
 	}
 
@@ -293,24 +287,15 @@ public final class SimpleRunner extends AbstractRunner {
 
 		@Override
 		public void run() {
-			final LoggingSetup logging;
-
-			if (worker instanceof NoLoggingWorker) {
-				logging = null;
-			} else {
-				logging = new LoggingSetup(getLogDirectory());
-				try {
-					logging.startLogging();
-				} catch (Exception e) {
-					sendResponse(request, new DaemonException("Cannot establish logging for request", e), true);
-				}
-
-			}
+			// As we run, all that we log via Log4j will be reported within the child log files
+			// We pass the child logger onto the worker, so it can spawn its own children with their own logs
+			final ChildLog childLog = request.getParentLog().createChildLog();
+			childLog.startLogging();
 			try {
 				if (worker instanceof Lifecycle) {
 					((Lifecycle) worker).start();
 				}
-				worker.processRequest(request.getWorkPacket(), new MyProgressReporter(request, logging));
+				worker.processRequest(request.getWorkPacket(), new MyProgressReporter(request, childLog));
 				if (worker instanceof Lifecycle) {
 					((Lifecycle) worker).stop();
 				}
@@ -318,9 +303,7 @@ public final class SimpleRunner extends AbstractRunner {
 				// SWALLOWED
 				LOGGER.error("Exception was thrown when processing a request - that means a communication error, or badly implemented worker.\nWorkers must never thrown an exception - they must report a failure.", t);
 			} finally {
-				if (logging != null) {
-					logging.stopLogging();
-				}
+				childLog.stopLogging();
 			}
 		}
 

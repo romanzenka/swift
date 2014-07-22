@@ -11,11 +11,13 @@ import edu.mayo.mprc.daemon.files.FileTokenFactory;
 import edu.mayo.mprc.daemon.files.FileTokenHolder;
 import edu.mayo.mprc.daemon.worker.WorkPacket;
 import edu.mayo.mprc.daemon.worker.Worker;
+import edu.mayo.mprc.daemon.worker.log.DaemonLoggerFactory;
 import edu.mayo.mprc.messaging.Request;
 import edu.mayo.mprc.messaging.ServiceFactory;
 import edu.mayo.mprc.sge.SgePacket;
 import edu.mayo.mprc.swift.resources.ResourceTable;
 import edu.mayo.mprc.utilities.FileUtilities;
+import edu.mayo.mprc.utilities.log.ParentLog;
 import edu.mayo.mprc.utilities.progress.ProgressInfo;
 import edu.mayo.mprc.utilities.progress.ProgressReporter;
 import org.apache.log4j.Logger;
@@ -39,6 +41,7 @@ public class RunSge implements SwiftCommand {
 
 	private ResourceTable resourceTable;
 	private ServiceFactory serviceFactory;
+	private DaemonLoggerFactory daemonLoggerFactory;
 
 	@Override
 	public String getDescription() {
@@ -88,10 +91,12 @@ public class RunSge implements SwiftCommand {
 				final FileTokenFactory fileTokenFactory = new FileTokenFactory(sgePacket.getDaemonConfigInfo());
 				fileTokenHolder.translateOnReceiver(fileTokenFactory, null);
 			}
+			daemonLoggerFactory = new DaemonLoggerFactory(new File(sgePacket.getDaemonConfigInfo().getSharedLogPath()));
 
 			final DependencyResolver dependencies = new DependencyResolver(resourceTable);
 			final Worker daemonWorker = (Worker) resourceTable.createSingleton(sgePacket.getWorkerFactoryConfig(), dependencies);
-			daemonWorker.processRequest((WorkPacket) sgePacket.getWorkPacket(), new DaemonWorkerProgressReporter(request));
+			final ParentLog parentLog = daemonLoggerFactory.createLog(request);
+			daemonWorker.processRequest((WorkPacket) sgePacket.getWorkPacket(), new DaemonWorkerProgressReporter(request, parentLog));
 		} catch (Exception e) {
 			final String errorMessage = "Failed to process work packet " + ((sgePacket == null || sgePacket.getWorkPacket() == null) ? "null" : sgePacket.getWorkPacket().toString());
 			LOGGER.error(errorMessage, e);
@@ -144,9 +149,11 @@ public class RunSge implements SwiftCommand {
 
 	class DaemonWorkerProgressReporter implements ProgressReporter {
 		private Request request;
+		private ParentLog parentLog;
 
-		DaemonWorkerProgressReporter(final Request request) {
+		DaemonWorkerProgressReporter(final Request request, final ParentLog parentLog) {
 			this.request = request;
+			this.parentLog = parentLog;
 		}
 
 		@Override
@@ -172,6 +179,11 @@ public class RunSge implements SwiftCommand {
 				LOGGER.error("Error reporting daemon worker progress.", e);
 				//SWALLOWED
 			}
+		}
+
+		@Override
+		public ParentLog getParentLog() {
+			return parentLog;
 		}
 
 		@Override
