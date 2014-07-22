@@ -19,6 +19,7 @@ import java.util.Map;
 /**
  * @author Roman Zenka
  */
+//TODO: DEPRECATE
 public final class HemeReportView implements View {
 	@Override
 	public String getContentType() {

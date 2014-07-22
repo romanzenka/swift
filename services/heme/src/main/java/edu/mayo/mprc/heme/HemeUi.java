@@ -13,6 +13,7 @@ import edu.mayo.mprc.config.ui.ResourceConfigBase;
 import edu.mayo.mprc.config.ui.ServiceUiFactory;
 import edu.mayo.mprc.config.ui.UiBuilder;
 import edu.mayo.mprc.database.Dao;
+import edu.mayo.mprc.dbcurator.model.Curation;
 import edu.mayo.mprc.fastadb.FastaDbDao;
 import edu.mayo.mprc.heme.dao.HemeDao;
 import edu.mayo.mprc.heme.dao.HemeTest;
@@ -67,8 +68,9 @@ public final class HemeUi implements Dao {
 	public static final String SPECTRA_EXTENSION = ".spectra.txt";
 	public static final double DEFAULT_MASS_DELTA_TOLERANCE = 0.5;
 	public static final String[] NO_ENGINES = new String[0];
+    private static final String FASTA_DB_CACHE= "fastaDbCache";
 
-	private final File data;
+    private final File data;
 	private final File results;
 	private final HemeDao hemeDao;
 	private final SwiftDao swiftDao;
@@ -89,12 +91,14 @@ public final class HemeUi implements Dao {
 	private int chymoParameterSetId;
 	private String userEmail;
 	private String[] searchEngines;
+    private File fastaDbCache;
 
 	public HemeUi(final File data, final File results, final HemeDao hemeDao, final SwiftDao swiftDao,
 	              final FastaDbDao fastaDbDao,
 	              final ParamsDao paramsDao,
 	              final SwiftSearcherCaller swiftSearcherCaller,
 	              final String trypsinParameterSetName, final String chymoParameterSetName, final String userEmail,
+                  final File fastaDbCache,
 	              final String[] searchEngines) {
 		this.data = data;
 		this.results = results;
@@ -106,7 +110,11 @@ public final class HemeUi implements Dao {
 		this.trypsinParameterSetName = trypsinParameterSetName;
 		this.chymoParameterSetName = chymoParameterSetName;
 		this.userEmail = userEmail;
+        this.fastaDbCache = fastaDbCache;
 		this.searchEngines = searchEngines == null ? NO_ENGINES : searchEngines.clone();
+
+
+
 	}
 
 	@Override
@@ -302,8 +310,13 @@ public final class HemeUi implements Dao {
 		final File resultFolder = new File(getResults(), path);
 		final File scaffoldFolder = new File(resultFolder, "scaffold");
 		final File scaffoldFile = new File(scaffoldFolder, test.getName() + SPECTRA_EXTENSION);
+
 		final SwiftSearchDefinition swiftSearchDefinition = swiftDao.getSwiftSearchDefinition(test.getSearchRun().getSwiftSearch());
-		final HemeScaffoldReader reader = new HemeScaffoldReader(fastaDbDao, swiftSearchDefinition.getSearchParameters().getDatabase());
+
+		final Curation dummyDatabase = new Curation();
+        dummyDatabase.setCurationFile(new File("/Users/m088378/Desktop/newHemePathDatabase2.fasta"));
+        final HemeScaffoldReader reader = new HemeScaffoldReader(fastaDbDao, dummyDatabase); // TODO - remove before deployment
+        // final HemeScaffoldReader reader = new HemeScaffoldReader(fastaDbDao, swiftSearchDefinition.getSearchParameters().getDatabase());
 		reader.load(scaffoldFile, "3", null);
 		final Collection<HemeReportEntry> entries = reader.getEntries();
 
@@ -501,6 +514,7 @@ public final class HemeUi implements Dao {
 					config.get(TRYPSIN_PARAM_SET_NAME),
 					config.get(CHYMO_PARAM_SET_NAME),
 					config.get(USER_EMAIL),
+                    new File(config.get(FASTA_DB_CACHE)),
 					engines);
 		}
 
@@ -518,7 +532,8 @@ public final class HemeUi implements Dao {
 
 	public static final class Ui implements ServiceUiFactory {
 
-		@Override
+
+        @Override
 		public void createUI(final DaemonConfig daemon, final ResourceConfig resource, final UiBuilder builder) {
 			builder.property(DATA_PATH, "Data path", "Folder containing the heme pathology test data. Every sub-folder in this folder will be displayed")
 					.required()
@@ -541,7 +556,12 @@ public final class HemeUi implements Dao {
 
 					.property(SEARCH_ENGINES, "Search engines", "Space separated list of search engine codes in <code>[engine]-[version]</code> format. See http://&lt;swift url&gt;/service/engines.xml for a list.")
 					.required()
-					.defaultValue("MASCOT-2.4 SEQUEST-v.27 TANDEM-2013.06.15 SCAFFOLD-4.0.7");
+					.defaultValue("MASCOT-2.4 SEQUEST-v.27 TANDEM-2013.06.15 SCAFFOLD-4.0.7")
+
+
+                    .property(FASTA_DB_CACHE, "Fasta Database Cache", "Caches the fasta decriptive titles by protein accession, for fast lookup.")
+                    .required()
+                    .defaultValue("var/cache/heme");
 		}
 	}
 

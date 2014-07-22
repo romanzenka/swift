@@ -67,7 +67,7 @@
         <tr>
             <th>Patient</th>
             <th>Date</th>
-            <th>Mass &Delta;</th>
+            <th>Isotopic Mass<!--&Delta;--></th>
             <th>Action</th>
         </tr>
         <%
@@ -80,10 +80,10 @@
             <td><%=entry.getTest().getDate().toString()%>
             </td>
             <td>
-                <input class="mass-delta-value" data-id="<%= id %>" type="number" step="any" style="width: 3em"
+                <input class="mass-delta-value" data-id="<%= id %>" type="number" step="any" style="width: 75px;"
                        value="<%= entry.getTest().getMassDelta() %>">&nbsp;&nbsp;&plusmn;&nbsp;
                 <span class="input-append"><input class="mass-delta-tolerance-value" data-id="<%= id %>" type="number"
-                                                  step="any" style="width: 2em" maxlength="8"
+                                                  step="any" style="width: 30px" maxlength="8"
                                                   value="<%= entry.getTest().getMassDeltaTolerance() %>">
                     <span class="add-on">Da</span></span>
                 <span class="ajax-progress" id="save-<%= id %>">&nbsp;</span>

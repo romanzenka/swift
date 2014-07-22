@@ -72,7 +72,8 @@ public class HemeScaffoldReader extends ScaffoldReportReader {
 	 * Get description for a protein of given accession number
 	 */
 	private String getDescription(final String accNum) {
-		return fastaDao.getProteinDescription(database, accNum);
+//		return fastaDao.getProteinDescription(database, accNum);    //TODO - uncomment for PROD
+        return "?";
 	}
 
 	private static Double getMassDelta(final CharSequence description) {

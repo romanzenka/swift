@@ -14,7 +14,7 @@
         <property name="path" type="text" length="500" column="path" not-null="true"/>
         <property name="massDelta" type="double" column="mass_delta" not-null="true"/>
         <property name="massDeltaTolerance" type="double" column="mass_delta_tolerance" not-null="true"/>
-        <many-to-one name="searchRun" column="search_run" not-null="false" lazy="proxy"
-            foreign-key="heme_test_ibfk_1"/>
+        <!--<many-to-one name="searchRun" column="search_run" not-null="false" lazy="proxy"-->
+            <!--foreign-key="heme_test_ibfk_1"/>-->
     </class>
 </hibernate-mapping>
