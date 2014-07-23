@@ -1,7 +1,6 @@
 package edu.mayo.mprc.daemon.worker.log;
 
 import edu.mayo.mprc.MprcException;
-import edu.mayo.mprc.daemon.NewLogFiles;
 import edu.mayo.mprc.messaging.Request;
 import edu.mayo.mprc.utilities.FileUtilities;
 import edu.mayo.mprc.utilities.log.ChildLog;

@@ -3,7 +3,6 @@ package edu.mayo.mprc.swift.db;
 import com.google.common.collect.Lists;
 import edu.mayo.mprc.MprcException;
 import edu.mayo.mprc.daemon.AssignedTaskData;
-import edu.mayo.mprc.daemon.NewLogFiles;
 import edu.mayo.mprc.daemon.files.FileTokenFactory;
 import edu.mayo.mprc.database.DaoBase;
 import edu.mayo.mprc.database.Database;
@@ -25,7 +24,6 @@ import org.springframework.stereotype.Repository;
 
 import javax.annotation.Resource;
 import java.io.File;
-import java.io.Serializable;
 import java.util.*;
 
 @Repository("swiftDao")

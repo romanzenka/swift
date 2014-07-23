@@ -1,4 +1,4 @@
-package edu.mayo.mprc.daemon;
+package edu.mayo.mprc.daemon.worker.log;
 
 import edu.mayo.mprc.daemon.files.FileHolder;
 import edu.mayo.mprc.utilities.progress.ProgressInfo;

@@ -2,7 +2,7 @@ package edu.mayo.mprc.swift.search;
 
 import edu.mayo.mprc.MprcException;
 import edu.mayo.mprc.daemon.AssignedTaskData;
-import edu.mayo.mprc.daemon.NewLogFiles;
+import edu.mayo.mprc.daemon.worker.log.NewLogFiles;
 import edu.mayo.mprc.daemon.TaskWarning;
 import edu.mayo.mprc.swift.db.SwiftDao;
 import edu.mayo.mprc.swift.dbmapping.LogData;
