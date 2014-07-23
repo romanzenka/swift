@@ -7,6 +7,7 @@ import edu.mayo.mprc.workflow.persistence.TaskState;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.Date;
+import java.util.List;
 
 public class TaskData {
 	private Integer id;
@@ -15,8 +16,6 @@ public class TaskData {
 	private Date startTimestamp;
 	private Date endTimestamp;
 	private int errorCode;
-	private String outputLogDatabaseToken;
-	private String errorLogDatabaseToken;
 
 	private String errorMessage;
 	private SearchRun searchRun;
@@ -27,6 +26,7 @@ public class TaskData {
 	private String exceptionString;
 	private String warningMessage;
 	private Float percentDone;
+	private List<LogData> logs;
 
 	public TaskData() {
 		setTaskState(new TaskStateData(TaskState.UNINITIALIZED.getText()));
@@ -132,22 +132,6 @@ public class TaskData {
 		this.errorMessage = errorMessage;
 	}
 
-	public void setOutputLogDatabaseToken(final String outputLogDatabaseToken) {
-		this.outputLogDatabaseToken = outputLogDatabaseToken;
-	}
-
-	public String getOutputLogDatabaseToken() {
-		return outputLogDatabaseToken;
-	}
-
-	public String getErrorLogDatabaseToken() {
-		return errorLogDatabaseToken;
-	}
-
-	public void setErrorLogDatabaseToken(final String errorLogDatabaseToken) {
-		this.errorLogDatabaseToken = errorLogDatabaseToken;
-	}
-
 	public String getGridJobId() {
 		return gridJobId;
 	}
@@ -186,6 +170,14 @@ public class TaskData {
 
 	public void setPercentDone(final Float percentDone) {
 		this.percentDone = percentDone;
+	}
+
+	public List<LogData> getLogs() {
+		return logs;
+	}
+
+	public void setLogs(List<LogData> logs) {
+		this.logs = logs;
 	}
 
 	public void setException(final Throwable t) {
@@ -248,8 +240,6 @@ public class TaskData {
 				", startTimestamp=" + getStartTimestamp() +
 				", endTimestamp=" + getEndTimestamp() +
 				", errorCode=" + getErrorCode() +
-				", outputLogDatabaseToken=" + getOutputLogDatabaseToken() +
-				", errorLogDatabaseToken=" + getErrorLogDatabaseToken() +
 				", errorMessage='" + getErrorMessage() + '\'' +
 				", searchRun=" + getSearchRun() +
 				", taskState=" + getTaskState() +

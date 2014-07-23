@@ -229,17 +229,13 @@ public final class JsonWriter {
 		appendKeyString(builder, "host", status.getHostString());
 		appendKeyNumberNull(builder, "percentDone", status.getPercentDone());
 
-		if (status.getOutputLogDatabaseToken() != null || status.getErrorLogDatabaseToken() != null) {
+
+		{ // TODO: how to enable this only when we actually have the log?
 			appendComma(builder);
 			builder.append("\"logs\":[");
 
-			if (status.getOutputLogDatabaseToken() != null) {
-				appendLogInfo(builder, new LogInfo(LogInfo.STD_OUT_LOG_TYPE));
-			}
-
-			if (status.getErrorLogDatabaseToken() != null) {
-				appendLogInfo(builder, new LogInfo(LogInfo.STD_ERR_LOG_TYPE));
-			}
+			appendLogInfo(builder, new LogInfo(LogInfo.STD_OUT_LOG_TYPE));
+			appendLogInfo(builder, new LogInfo(LogInfo.STD_ERR_LOG_TYPE));
 
 			builder.append(']');
 		}

@@ -3,7 +3,7 @@ package edu.mayo.mprc.swift.db;
 import com.google.common.collect.Lists;
 import edu.mayo.mprc.MprcException;
 import edu.mayo.mprc.daemon.AssignedTaskData;
-import edu.mayo.mprc.daemon.NewLogFile;
+import edu.mayo.mprc.daemon.NewLogFiles;
 import edu.mayo.mprc.daemon.files.FileTokenFactory;
 import edu.mayo.mprc.database.DaoBase;
 import edu.mayo.mprc.database.Database;
@@ -25,6 +25,7 @@ import org.springframework.stereotype.Repository;
 
 import javax.annotation.Resource;
 import java.io.File;
+import java.io.Serializable;
 import java.util.*;
 
 @Repository("swiftDao")
@@ -49,6 +50,7 @@ public final class SwiftDaoHibernate extends DaoBase implements SwiftDao {
 	public Collection<String> getHibernateMappings() {
 		final List<String> list = new ArrayList<String>(Arrays.asList(
 				MAP + "FileSearch.hbm.xml",
+				MAP + "LogData.hbm.xml",
 				MAP + "PeptideReport.hbm.xml",
 				MAP + "ReportData.hbm.xml",
 				MAP + "SearchRun.hbm.xml",
@@ -215,6 +217,14 @@ public final class SwiftDaoHibernate extends DaoBase implements SwiftDao {
 		} catch (Exception t) {
 			throw new MprcException("Could not add file search information", t);
 		}
+	}
+
+	@Override
+	public List<LogData> getLogsForTask(final TaskData data) {
+		final Session session = getSession();
+		final Criteria criteria = session.createCriteria(LogData.class)
+				.add(nullSafeEq("task", data));
+		return listAndCast(criteria);
 	}
 
 	@Override
@@ -439,16 +449,9 @@ public final class SwiftDaoHibernate extends DaoBase implements SwiftDao {
 	}
 
 	@Override
-	public void storeLogData(final TaskData taskData, final NewLogFile logData) {
-		try {
-			// TODO: Store the whole structure of logs for a given task
-			if (logData.getParentLogId() == 0) {
-				taskData.setOutputLogDatabaseToken(fileTokenFactory.fileToDatabaseToken(logData.getOutputLogFile()));
-				taskData.setErrorLogDatabaseToken(fileTokenFactory.fileToDatabaseToken(logData.getErrorLogFile()));
-			}
-		} catch (Exception t) {
-			throw new MprcException("Cannot store task log data " + logData.getLogId() + " for task " + taskData, t);
-		}
+	public LogData storeLogData(final LogData logData) {
+		getSession().saveOrUpdate(logData);
+		return logData;
 	}
 
 	@Override

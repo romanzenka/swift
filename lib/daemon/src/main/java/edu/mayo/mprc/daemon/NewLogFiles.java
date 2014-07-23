@@ -12,17 +12,20 @@ import java.io.File;
  * the root log).
  * <p/>
  * As child logs are created, they will refer to their parent using the parent's id.
+ * <p/>
+ * The goal is that each log has an unique id within the persistence context, which is typically
+ * a single task.
  *
  * @author Roman Zenka
  */
-public final class NewLogFile extends FileHolder implements ProgressInfo {
+public final class NewLogFiles extends FileHolder implements ProgressInfo {
 	private static final long serialVersionUID = 20140722;
 	private final long parentLogId;
 	private final long logId;
 	private final File errorLogFile;
 	private final File outputLogFile;
 
-	public NewLogFile(final long parentLogId, final long logId, final File outputLogFile, final File errorLogFile) {
+	public NewLogFiles(final long parentLogId, final long logId, final File outputLogFile, final File errorLogFile) {
 		this.parentLogId = parentLogId;
 		this.logId = logId;
 		this.outputLogFile = outputLogFile;

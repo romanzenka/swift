@@ -75,6 +75,10 @@ public final class QaReport {
 	}
 
 	public static void streamFileToResponse(final HttpServletResponse response, final File file) {
+		streamFileToResponse(response, file, true);
+	}
+
+	public static void streamFileToResponse(final HttpServletResponse response, final File file, final boolean close) {
 		BufferedInputStream bis = null;
 		try {
 			bis = new BufferedInputStream(new FileInputStream(file));
@@ -88,7 +92,9 @@ public final class QaReport {
 		} catch (IOException ex) {
 			throw new MprcException(String.format("Could not send data for file %s", file.getAbsolutePath()), ex);
 		} finally {
-			FileUtilities.closeQuietly(bis);
+			if (close) {
+				FileUtilities.closeQuietly(bis);
+			}
 		}
 	}
 }

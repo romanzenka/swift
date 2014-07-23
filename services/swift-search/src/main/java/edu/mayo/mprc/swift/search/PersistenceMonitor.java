@@ -2,9 +2,10 @@ package edu.mayo.mprc.swift.search;
 
 import edu.mayo.mprc.MprcException;
 import edu.mayo.mprc.daemon.AssignedTaskData;
-import edu.mayo.mprc.daemon.NewLogFile;
+import edu.mayo.mprc.daemon.NewLogFiles;
 import edu.mayo.mprc.daemon.TaskWarning;
 import edu.mayo.mprc.swift.db.SwiftDao;
+import edu.mayo.mprc.swift.dbmapping.LogData;
 import edu.mayo.mprc.swift.dbmapping.TaskData;
 import edu.mayo.mprc.swift.search.task.AsyncTaskBase;
 import edu.mayo.mprc.utilities.progress.PercentDone;
@@ -20,6 +21,7 @@ public final class PersistenceMonitor implements SearchMonitor {
 
 	private int searchRunId;
 	private SwiftDao swiftDao;
+	private final LogMap logMap = new LogMap();
 
 	public PersistenceMonitor(final int searchRunId, final SwiftDao swiftDao) {
 		this.swiftDao = swiftDao;
@@ -32,7 +34,7 @@ public final class PersistenceMonitor implements SearchMonitor {
 		try {
 			swiftDao.reportSearchRunProgress(searchRunId, report);
 			swiftDao.commit();
-		} catch (Exception t) {
+		} catch (final Exception t) {
 			swiftDao.rollback();
 			throw new MprcException("Could not store search progress information to the database", t);
 		}
@@ -49,7 +51,7 @@ public final class PersistenceMonitor implements SearchMonitor {
 		try {
 			syncTaskBase(task, task.getState());
 			swiftDao.commit();
-		} catch (Exception t) {
+		} catch (final Exception t) {
 			throw new MprcException("Could not store change in task information", t);
 		}
 	}
@@ -60,7 +62,7 @@ public final class PersistenceMonitor implements SearchMonitor {
 		try {
 			syncTaskBase(task, TaskState.RUN_FAILED);
 			swiftDao.commit();
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			// SWALLOWED: just log
 			LOGGER.error("Could not store " + task.getName() + " task exception into the database (" + t.getMessage() + ").", e);
 			swiftDao.rollback();
@@ -79,7 +81,7 @@ public final class PersistenceMonitor implements SearchMonitor {
 		try {
 			swiftDao.searchRunFailed(searchRunId, message);
 			swiftDao.commit();
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			// SWALLOWED: just log
 			LOGGER.error("Could not store " + searchRunId + " search run exception into the database (" + t.getMessage() + ").", e);
 			swiftDao.rollback();
@@ -98,29 +100,35 @@ public final class PersistenceMonitor implements SearchMonitor {
 				try {
 					swiftDao.storeAssignedTaskData(data, (AssignedTaskData) progressInfo);
 					swiftDao.commit();
-				} catch (Exception t) {
+				} catch (final Exception t) {
 					// SWALLOWED: just log
 					LOGGER.error("Could not store " + task.getName() + " assigned task data into the database (" + t.getMessage() + ").", t);
 					swiftDao.rollback();
 				}
-			} else if (progressInfo instanceof NewLogFile) {
+			} else if (progressInfo instanceof NewLogFiles) {
 				swiftDao.begin();
 				final TaskData data = syncTaskBase(task, task.getState());
 				try {
-					swiftDao.storeLogData(data, (NewLogFile) progressInfo);
+					final LogData logData = new LogData(
+							data,
+							logMap.getLogData(data, ((NewLogFiles) progressInfo).getParentLogId()),
+							((NewLogFiles) progressInfo).getOutputLogFile(),
+							((NewLogFiles) progressInfo).getErrorLogFile());
+					final LogData savedLogData = swiftDao.storeLogData(logData);
+					logMap.addLogData(((NewLogFiles) progressInfo).getLogId(), savedLogData);
 					swiftDao.commit();
-				} catch (Exception t) {
+				} catch (final Exception t) {
 					// SWALLOWED: just log
 					LOGGER.error("Could not store " + task.getName() + " log data into the database (" + t.getMessage() + ").", t);
 					swiftDao.rollback();
 				}
-
 			} else if (progressInfo instanceof TaskWarning) {
+				swiftDao.begin();
 				final TaskData data = syncTaskBase(task, task.getState());
 				try {
 					data.setWarningMessage(((TaskWarning) progressInfo).getWarningMessage());
 					swiftDao.commit();
-				} catch (Exception t) {
+				} catch (final Exception t) {
 					// SWALLOWED: just log
 					LOGGER.error("Could not store " + task.getName() + " assigned task data into the database (" + t.getMessage() + ").", t);
 					swiftDao.rollback();
@@ -136,7 +144,7 @@ public final class PersistenceMonitor implements SearchMonitor {
 						data.setPercentDone(done.getPercentDone());
 					}
 					swiftDao.commit();
-				} catch (Exception t) {
+				} catch (final Exception t) {
 					// SWALLOWED: just log
 					LOGGER.error("Could not store " + task.getName() + " task progress into the database (" + t.getMessage() + ").", t);
 					swiftDao.rollback();
@@ -175,6 +183,9 @@ public final class PersistenceMonitor implements SearchMonitor {
 		}
 		data.setEndTimestamp(task.getExecutionFinished());
 		data.setHostString(task.getExecutedOnHost());
+		if (task.isDone()) {
+			logMap.removeTask(data);
+		}
 		return data;
 	}
 

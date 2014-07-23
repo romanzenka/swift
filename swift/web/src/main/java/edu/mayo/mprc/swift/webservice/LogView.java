@@ -3,7 +3,9 @@ package edu.mayo.mprc.swift.webservice;
 import edu.mayo.mprc.MprcException;
 import edu.mayo.mprc.swift.db.DatabaseFileTokenFactory;
 import edu.mayo.mprc.swift.db.SwiftDao;
+import edu.mayo.mprc.swift.dbmapping.LogData;
 import edu.mayo.mprc.swift.dbmapping.TaskData;
+import edu.mayo.mprc.utilities.StringUtilities;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -14,6 +16,7 @@ import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
 
 /**
  * Sends a log file to the user, eventually with nice formatting etc.
@@ -38,21 +41,35 @@ public final class LogView {
 	                          @PathVariable final String logType,
 	                          final HttpServletResponse response) {
 
-		final LogType type = getLogTypeFromString(logType);
-		final String token = getLogFileToken(taskId, type);
-		final File file = fileTokenFactory.databaseTokenToFile(token);
+		final List<LogData> logList = getLogData(taskId);
+		LogType type = getLogTypeFromString(logType);
 
 		response.setContentType("text/plain");
 
 		try {
 			final ServletOutputStream outputStream = response.getOutputStream();
-			outputStream.println("Log file for task " + taskId + " at " + file.getAbsolutePath());
+			outputStream.println("Log files for task " + taskId);
 			outputStream.println();
-		} catch (IOException e) {
+
+			for (final LogData data : logList) {
+
+				final File logFile;
+				if (type == LogType.OUTPUT_LOG) {
+					logFile = data.getOutputLog();
+				} else {
+					logFile = data.getErrorLog();
+				}
+
+				outputStream.println(StringUtilities.repeat('-', 80));
+				outputStream.println("Log file " + logFile.getAbsolutePath());
+				outputStream.println();
+				QaReport.streamFileToResponse(response, logFile, false);
+			}
+		} catch (final IOException e) {
 			throw new MprcException(e);
 		}
 
-		QaReport.streamFileToResponse(response, file);
+
 	}
 
 	private static LogType getLogTypeFromString(final String logType) {
@@ -65,27 +82,18 @@ public final class LogView {
 		throw new MprcException(String.format("Unknown log type %s", logType));
 	}
 
-	private String getLogFileToken(final int taskId, final LogType log) {
-		final String token;
+	private List<LogData> getLogData(final int taskId) {
+		final List<LogData> result;
 		swiftDao.begin();
 		try {
 			final TaskData data = swiftDao.getTaskData(taskId);
-			switch (log) {
-				case OUTPUT_LOG:
-					token = data.getOutputLogDatabaseToken();
-					break;
-				case ERROR_LOG:
-					token = data.getErrorLogDatabaseToken();
-					break;
-				default:
-					throw new MprcException(String.format("Unknown log type %s", log));
-			}
+			result = swiftDao.getLogsForTask(data);
 			swiftDao.commit();
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			swiftDao.rollback();
 			throw new MprcException(String.format("Could not serve log file for task %d", taskId), e);
 		}
-		return token;
+		return result;
 	}
 
 }

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="windows-1252" ?><!DOCTYPE hibernate-mapping PUBLIC
+    "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+    "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping package="edu.mayo.mprc.swift.dbmapping">
+
+    <class name="LogData" table="log" lazy="false">
+        <id name="id" column="log_id" type="int">
+            <generator class="native" />
+        </id>
+
+        <many-to-one name="task" class="TaskData" column="task_id" foreign-key="log_data_ibfk_1" lazy="proxy" />
+        <many-to-one name="parentLog" class="LogData" column="parent_log_id" foreign-key="log_data_ibfk_2"
+            lazy="proxy" />
+        <property name="outputLog" type="file" column="out_log" />
+        <property name="errorLog" type="file" column="err_log" />
+    </class>
+
+</hibernate-mapping>

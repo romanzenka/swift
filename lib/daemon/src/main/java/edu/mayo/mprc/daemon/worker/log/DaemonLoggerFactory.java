@@ -1,7 +1,7 @@
 package edu.mayo.mprc.daemon.worker.log;
 
 import edu.mayo.mprc.MprcException;
-import edu.mayo.mprc.daemon.NewLogFile;
+import edu.mayo.mprc.daemon.NewLogFiles;
 import edu.mayo.mprc.messaging.Request;
 import edu.mayo.mprc.utilities.FileUtilities;
 import edu.mayo.mprc.utilities.log.ChildLog;
@@ -97,7 +97,7 @@ public final class DaemonLoggerFactory {
 			standardErrorFile = errorLogFile;
 
 			// Let the caller know that we have new logs
-			request.sendResponse(new NewLogFile(parentLogId, logFileId, getStandardOutFile(), getStandardErrorFile()), false);
+			request.sendResponse(new NewLogFiles(parentLogId, logFileId, getStandardOutFile(), getStandardErrorFile()), false);
 		}
 
 		/**
