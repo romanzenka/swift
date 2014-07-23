@@ -12,6 +12,7 @@ import edu.mayo.mprc.daemon.files.FileTokenFactory;
 import edu.mayo.mprc.messaging.ResponseListener;
 import edu.mayo.mprc.messaging.ServiceFactory;
 import edu.mayo.mprc.utilities.FileUtilities;
+import edu.mayo.mprc.utilities.log.ChildLog;
 import org.apache.log4j.Logger;
 import org.springframework.stereotype.Component;
 
@@ -111,14 +112,13 @@ public final class GridRunner extends AbstractRunner {
 			final String requestId = manager.passToGridEngine(gridWorkPacket);
 
 			// Report the information about the running task to the caller, making sure they get the task id and the logs
-			final AssignedTaskData data = new AssignedTaskData(requestId, gridWorkPacket.getOutputLogFilePath(), gridWorkPacket.getErrorLogFilePath());
+			final AssignedTaskData data = new AssignedTaskData(requestId);
 
-			// The listener will report the task information on failure/success so the logs have a chance to get
-			// transferred.
-			listener.setTaskData(data);
+			// Report the assigned ID
+			sendResponse(request, new DaemonProgressMessage(DaemonProgress.UserSpecificProgressInfo, data), false);
 
-			// Report the assigned ID and log files. Since the logs are not filled in yet, they would be available on the caller only if it shares disk space
-			reportTaskData(request, data);
+			// Report that we spawned a child with its own SGE log
+			request.getParentLog().createChildLog(gridWorkPacket.getOutputLogFilePath(), gridWorkPacket.getErrorLogFilePath());
 
 			// We are not done yet! The grid work packet's progress listener will get called when the state of the task changes,
 			// and either mark the task failed or successful.
@@ -134,14 +134,6 @@ public final class GridRunner extends AbstractRunner {
 	public String check() {
 		// TODO: We will need to submit a 'checking packet' to the grid and collect response
 		return null;
-	}
-
-	void reportTaskData(final DaemonRequest request, final AssignedTaskData data) {
-		// Clone the data object to make sure the file tokens get updated (files might come into existence that
-		// did not exist before).
-		final AssignedTaskData clonedTaskData = new AssignedTaskData(data.getAssignedId(), data.getOutputLogFile(), data.getErrorLogFile());
-		sendResponse(request, new DaemonProgressMessage(DaemonProgress.UserSpecificProgressInfo,
-				clonedTaskData), false);
 	}
 
 	private static void writeWorkerAllocatorInputObject(final File file, final SgePacket object) throws IOException {
@@ -212,11 +204,6 @@ public final class GridRunner extends AbstractRunner {
 		private final File sgePacketFile;
 		private final SgeMessageListener allocatorListener;
 
-		/**
-		 * Needs to be synchronized - being set from different thread
-		 */
-		private AssignedTaskData taskData;
-
 		MyWorkPacketStateListener(final DaemonRequest request, final File sgePacketFile, final SgeMessageListener allocatorListener) {
 			reported = false;
 			this.request = request;
@@ -238,13 +225,6 @@ public final class GridRunner extends AbstractRunner {
 			// We report state change just once.
 			if (!reported) {
 				try {
-					// First, re-report the output and error logs.
-					// If we are running on a different machine, the logs are now complete
-					// and need to be uploaded to the caller.
-					final AssignedTaskData toReport = getTaskData();
-					if (toReport != null) {
-						reportTaskData(request, toReport);
-					}
 					if (w.getPassed()) {
 						// This is the last response we will send - request is completed.
 						// There might have been an error from RMI, check that
@@ -272,14 +252,6 @@ public final class GridRunner extends AbstractRunner {
 					}
 				}
 			}
-		}
-
-		public synchronized AssignedTaskData getTaskData() {
-			return taskData;
-		}
-
-		public synchronized void setTaskData(final AssignedTaskData taskData) {
-			this.taskData = taskData;
 		}
 	}
 

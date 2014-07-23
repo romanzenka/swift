@@ -3,6 +3,7 @@ package edu.mayo.mprc.swift.db;
 import com.google.common.collect.Lists;
 import edu.mayo.mprc.MprcException;
 import edu.mayo.mprc.daemon.AssignedTaskData;
+import edu.mayo.mprc.daemon.NewLogFile;
 import edu.mayo.mprc.daemon.files.FileTokenFactory;
 import edu.mayo.mprc.database.DaoBase;
 import edu.mayo.mprc.database.Database;
@@ -430,10 +431,23 @@ public final class SwiftDaoHibernate extends DaoBase implements SwiftDao {
 	public void storeAssignedTaskData(final TaskData taskData, final AssignedTaskData assignedTaskData) {
 		try {
 			taskData.setGridJobId(assignedTaskData.getAssignedId());
-			taskData.setOutputLogDatabaseToken(fileTokenFactory.fileToDatabaseToken(assignedTaskData.getOutputLogFile()));
-			taskData.setErrorLogDatabaseToken(fileTokenFactory.fileToDatabaseToken(assignedTaskData.getErrorLogFile()));
+//			taskData.setOutputLogDatabaseToken(fileTokenFactory.fileToDatabaseToken(assignedTaskData.getOutputLogFile()));
+//			taskData.setErrorLogDatabaseToken(fileTokenFactory.fileToDatabaseToken(assignedTaskData.getErrorLogFile()));
 		} catch (Exception t) {
 			throw new MprcException("Cannot store task grid request id " + assignedTaskData.getAssignedId() + " for task " + taskData, t);
+		}
+	}
+
+	@Override
+	public void storeLogData(final TaskData taskData, final NewLogFile logData) {
+		try {
+			// TODO: Store the whole structure of logs for a given task
+			if (logData.getParentLogId() == 0) {
+				taskData.setOutputLogDatabaseToken(fileTokenFactory.fileToDatabaseToken(logData.getOutputLogFile()));
+				taskData.setErrorLogDatabaseToken(fileTokenFactory.fileToDatabaseToken(logData.getErrorLogFile()));
+			}
+		} catch (Exception t) {
+			throw new MprcException("Cannot store task log data " + logData.getLogId() + " for task " + taskData, t);
 		}
 	}
 

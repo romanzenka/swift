@@ -19,4 +19,6 @@ public interface ParentLog extends Serializable {
 	 * @return A new object for accessing the log.
 	 */
 	ChildLog createChildLog();
+
+	ChildLog createChildLog(String outputLogFilePath, String errorLogFilePath);
 }

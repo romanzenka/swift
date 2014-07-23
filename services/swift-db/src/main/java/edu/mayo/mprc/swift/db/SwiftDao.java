@@ -2,6 +2,7 @@ package edu.mayo.mprc.swift.db;
 
 import edu.mayo.mprc.config.RuntimeInitializer;
 import edu.mayo.mprc.daemon.AssignedTaskData;
+import edu.mayo.mprc.daemon.NewLogFile;
 import edu.mayo.mprc.database.Dao;
 import edu.mayo.mprc.swift.dbmapping.*;
 import edu.mayo.mprc.utilities.progress.ProgressReport;
@@ -123,6 +124,14 @@ public interface SwiftDao extends Dao, RuntimeInitializer {
 	ReportData getReportForId(long reportDataId);
 
 	void storeAssignedTaskData(TaskData taskData, AssignedTaskData assignedTaskData);
+
+	/**
+	 * For a given task, store information about one of its logs or sub-logs.
+	 *
+	 * @param taskData Task whose log we are storing.
+	 * @param logData  Information about the log files.
+	 */
+	void storeLogData(final TaskData taskData, final NewLogFile logData);
 
 	void searchRunFailed(int searchRunId, String message);
 

@@ -38,6 +38,11 @@ public final class SimpleParentLog implements ChildLog {
 	}
 
 	@Override
+	public ChildLog createChildLog(String outputLogFilePath, String errorLogFilePath) {
+		return createChildLog();
+	}
+
+	@Override
 	public void startLogging() {
 		LOGGER.debug(path + " started logging");
 	}

@@ -23,7 +23,7 @@ public final class DaemonLoggerFactory {
 	private File logOutputFolder;
 	private static final AtomicLong UNIQUE_LOG_FILE_ID = new AtomicLong(System.currentTimeMillis());
 
-	public DaemonLoggerFactory(File logOutputFolder) {
+	public DaemonLoggerFactory(final File logOutputFolder) {
 		this.logOutputFolder = logOutputFolder;
 	}
 
@@ -35,23 +35,25 @@ public final class DaemonLoggerFactory {
 	 * @param request Request that arrived to this daemon
 	 * @return A parent log corresponding to the request sender.
 	 */
-	public ParentLog createLog(Request request) {
+	public ParentLog createLog(final Request request) {
 		return new RequestParentLog(request);
 	}
 
 	private final class RequestParentLog implements ParentLog {
 		private Request request;
 
-		private RequestParentLog(Request request) {
+		private RequestParentLog(final Request request) {
 			this.request = request;
 		}
 
 		@Override
 		public ChildLog createChildLog() {
-			/* We are the topmost parent, so our log id is 0 */
-			RequestChildLog childLog = new RequestChildLog(logOutputFolder, request, 0);
+			return new RequestChildLog(logOutputFolder, request, 0);
+		}
 
-			return childLog;
+		@Override
+		public ChildLog createChildLog(final String outputLogFilePath, final String errorLogFilePath) {
+			return new RequestChildLog(outputLogFilePath, errorLogFilePath, request, 0);
 		}
 	}
 
@@ -64,8 +66,7 @@ public final class DaemonLoggerFactory {
 		private File standardErrorFile;
 		private String mdcKey;
 		private Request request;
-		final long parentLogId;
-		final long logFileId = UNIQUE_LOG_FILE_ID.incrementAndGet();
+		private long logFileId;
 
 		private static final String STD_ERR_FILE_PREFIX = "e";
 		private static final String STD_OUT_FILE_PREFIX = "o";
@@ -75,13 +76,25 @@ public final class DaemonLoggerFactory {
 		 * Create standard output and error log files
 		 */
 		public RequestChildLog(final File logOutputFolder, final Request request, final long parentLogId) {
-			this.request = request;
-			this.parentLogId = parentLogId;
-
 			final Date date = new Date();
+			logFileId = UNIQUE_LOG_FILE_ID.incrementAndGet();
+
 			final File logSubFolder = FileUtilities.getDateBasedDirectory(logOutputFolder, date);
-			standardOutFile = new File(logSubFolder, STD_OUT_FILE_PREFIX + logFileId + LOG_FILE_EXTENSION);
-			standardErrorFile = new File(logSubFolder, STD_ERR_FILE_PREFIX + logFileId + LOG_FILE_EXTENSION);
+			initialize(
+					new File(logSubFolder, STD_OUT_FILE_PREFIX + logFileId + LOG_FILE_EXTENSION),
+					new File(logSubFolder, STD_ERR_FILE_PREFIX + logFileId + LOG_FILE_EXTENSION),
+					request, parentLogId);
+		}
+
+		public RequestChildLog(final String outputLogFilePath, final String errorLogFilePath, final Request request, final long parentLogId) {
+			initialize(new File(outputLogFilePath), new File(errorLogFilePath), request, parentLogId);
+		}
+
+		private void initialize(final File outputLogFile, final File errorLogFile, final Request request, final long parentLogId) {
+			this.request = request;
+
+			standardOutFile = outputLogFile;
+			standardErrorFile = errorLogFile;
 
 			// Let the caller know that we have new logs
 			request.sendResponse(new NewLogFile(parentLogId, logFileId, getStandardOutFile(), getStandardErrorFile()), false);
@@ -108,7 +121,7 @@ public final class DaemonLoggerFactory {
 		private LogWriterAppender newOutWriterAppender() {
 			try {
 				return new LogWriterAppender(new FileWriter(standardOutFile.getAbsoluteFile()));
-			} catch (IOException e) {
+			} catch (final IOException e) {
 				throw new MprcException("Could not start logging", e);
 			}
 		}
@@ -116,7 +129,7 @@ public final class DaemonLoggerFactory {
 		private LogWriterAppender newErrorWriterAppender() {
 			try {
 				return new LogWriterAppender(new FileWriter(standardErrorFile.getAbsoluteFile()));
-			} catch (IOException e) {
+			} catch (final IOException e) {
 				throw new MprcException("Could not start logging", e);
 			}
 		}
@@ -167,6 +180,11 @@ public final class DaemonLoggerFactory {
 		@Override
 		public ChildLog createChildLog() {
 			return new RequestChildLog(logOutputFolder, request, logFileId);
+		}
+
+		@Override
+		public ChildLog createChildLog(final String outputLogFilePath, final String errorLogFilePath) {
+			return new RequestChildLog(outputLogFilePath, errorLogFilePath, request, logFileId);
 		}
 	}
 
