@@ -77,7 +77,7 @@ public final class IdpQonvertWorker extends WorkerBase {
 
 		final ProcessBuilder builder = new ProcessBuilder(commandLine);
 		builder.directory(idpQonvertExecutable.getParentFile());
-		final ProcessCaller caller = new ProcessCaller(builder);
+		final ProcessCaller caller = new ProcessCaller(builder, progressReporter.getParentLog());
 		caller.runAndCheck("idpQonvert");
 		final File from = new File(batchWorkPacket.getInputFile().getParentFile(),
 				FileUtilities.stripExtension(batchWorkPacket.getInputFile().getName(), new String[]{"pep.xml"}) + ".idpDB");

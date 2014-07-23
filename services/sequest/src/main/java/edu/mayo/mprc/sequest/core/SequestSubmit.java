@@ -5,6 +5,7 @@ import edu.mayo.mprc.tar.TarReader;
 import edu.mayo.mprc.tar.TarWriter;
 import edu.mayo.mprc.utilities.FileUtilities;
 import edu.mayo.mprc.utilities.GZipUtilities;
+import edu.mayo.mprc.utilities.progress.UserProgressReporter;
 import org.apache.log4j.Logger;
 
 import java.io.File;
@@ -71,7 +72,10 @@ final class SequestSubmit implements SequestSubmitterInterface {
 
 	private long creationTime;
 
-	SequestSubmit(final long maxLineLength, final File paramsFile, final File workingDir, final File tarFile, final File hostsFile) {
+	private UserProgressReporter progressReporter;
+
+	SequestSubmit(final long maxLineLength, final File paramsFile, final File workingDir, final File tarFile,
+	              final File hostsFile, final UserProgressReporter progressReporter) {
 		// this needs to be grabbed from the system
 		this.maxLineLength = (int) maxLineLength;
 		this.paramsFile = paramsFile;
@@ -80,6 +84,7 @@ final class SequestSubmit implements SequestSubmitterInterface {
 		this.tarFile = tarFile;
 		this.hostsFile = hostsFile;
 		creationTime = new Date().getTime();
+		this.progressReporter = progressReporter;
 	}
 
 
@@ -173,7 +178,7 @@ final class SequestSubmit implements SequestSubmitterInterface {
 		LOGGER.debug("tar file name=" + tarFile);
 		TarWriter tt = null;
 		try {
-			tt = new TarWriter(tarFile);
+			tt = new TarWriter(tarFile, progressReporter);
 			// .out and .dta files are in the working  dir for sequest
 			final List<String> dtasToTar = new ArrayList<String>();
 			final List<File> sequestDtaSnapshot = new ArrayList<File>(getSequestDtaFiles());
@@ -228,10 +233,10 @@ final class SequestSubmit implements SequestSubmitterInterface {
 		SequestRunner sequestRunner = null;
 		// make the call to sequest
 		if (sequestCaller == null) {
-			sequestCaller = new SequestRunner(outputDir, paramsFile, dtaFiles, hostsFile);
+			sequestCaller = new SequestRunner(outputDir, paramsFile, dtaFiles, hostsFile, progressReporter);
 			sequestRunner = (SequestRunner) sequestCaller;
 		} else {
-			sequestRunner = (SequestRunner) sequestCaller.createInstance(sequestCaller.getWorkingDir(), paramsFile, dtaFiles, hostsFile);
+			sequestRunner = (SequestRunner) sequestCaller.createInstance(sequestCaller.getWorkingDir(), paramsFile, dtaFiles, hostsFile, progressReporter);
 			sequestRunner.setStartTimeOut(sequestCaller.getStartTimeOut());
 			sequestRunner.setWatchDogTimeOut(sequestCaller.getWatchDogTimeOut());
 			sequestRunner.setSearchResultsFolder(sequestCaller.getSearchResultsFolder());

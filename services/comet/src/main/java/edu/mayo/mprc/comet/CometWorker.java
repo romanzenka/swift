@@ -66,7 +66,7 @@ public final class CometWorker extends WorkerBase {
 		final ProcessBuilder processBuilder = new ProcessBuilder(parameters);
 		processBuilder.directory(tempWorkFolder);
 
-		final ProcessCaller processCaller = new ProcessCaller(processBuilder);
+		final ProcessCaller processCaller = new ProcessCaller(processBuilder, progressReporter.getParentLog());
 
 		processCaller.run();
 

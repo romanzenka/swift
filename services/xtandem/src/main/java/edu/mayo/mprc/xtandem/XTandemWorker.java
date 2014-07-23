@@ -166,7 +166,8 @@ public final class XTandemWorker extends WorkerBase {
 				tempWorkFolder,
 				outputFile,
 				taxonomyXmlFile,
-				initialThreads);
+				initialThreads,
+				progressReporter);
 		if (processCaller.getExitValue() != 0 && initialThreads > 1) {
 			// Failure, try running with fewer threads
 			LOGGER.warn("X!Tandem failed, rerunning with one thread");
@@ -177,7 +178,8 @@ public final class XTandemWorker extends WorkerBase {
 					tempWorkFolder,
 					outputFile,
 					taxonomyXmlFile,
-					1);
+					1,
+					progressReporter);
 		}
 
 		if (processCaller.getExitValue() != 0) {
@@ -194,7 +196,8 @@ public final class XTandemWorker extends WorkerBase {
 			final File fastaFile,
 			final File inputFile,
 			final String params,
-			final File workFolder, final File outputFile, final File taxonomyXmlFile, final int threads) {
+			final File workFolder, final File outputFile, final File taxonomyXmlFile, final int threads,
+			final UserProgressReporter progressReporter) {
 
 		LOGGER.info("Running tandem search using " + threads + " threads");
 		LOGGER.info("\tFasta file " + fastaFile.getAbsolutePath() + " does" + (fastaFile.exists() && fastaFile.length() > 0 ? " " : " not ") + "exist.");
@@ -217,7 +220,7 @@ public final class XTandemWorker extends WorkerBase {
 		final ProcessBuilder processBuilder = new ProcessBuilder(parameters);
 		processBuilder.directory(workFolder);
 
-		final ProcessCaller processCaller = new ProcessCaller(processBuilder);
+		final ProcessCaller processCaller = new ProcessCaller(processBuilder, progressReporter.getParentLog());
 
 		processCaller.run();
 		return processCaller;

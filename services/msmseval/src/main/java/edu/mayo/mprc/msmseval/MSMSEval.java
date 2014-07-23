@@ -6,6 +6,7 @@ package edu.mayo.mprc.msmseval;
 
 import edu.mayo.mprc.MprcException;
 import edu.mayo.mprc.utilities.ProcessCaller;
+import edu.mayo.mprc.utilities.progress.UserProgressReporter;
 import org.apache.log4j.Logger;
 
 import java.io.File;
@@ -74,17 +75,14 @@ public final class MSMSEval {
 	/**
 	 * Executes the msmsEval external command.
 	 *
-	 * @param writeMSMSEvalOutputToLogger
 	 * @return int value which represents the exit value of the command, By convention, a return value of 0 means command run successfully.
 	 */
-	public void execute(final boolean writeMSMSEvalOutputToLogger) {
+	public void execute(UserProgressReporter reporter) {
 		if (processBuilder != null) {
 
 			ProcessCaller processCaller = null;
 
-			processCaller = new ProcessCaller(processBuilder);
-			processCaller.setRetainLogs(writeMSMSEvalOutputToLogger);
-			processCaller.setLogToConsole(writeMSMSEvalOutputToLogger);
+			processCaller = new ProcessCaller(processBuilder, reporter.getParentLog());
 
 			processCaller.runAndCheck("msmseval");
 		} else {

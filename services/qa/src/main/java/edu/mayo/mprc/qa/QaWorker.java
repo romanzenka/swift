@@ -95,7 +95,7 @@ public final class QaWorker extends WorkerBase {
 
 			if (atLeastOneFileMissing) {
 				LOGGER.info("Running R script [" + getRScript().getAbsolutePath() + "] for output file [" + reportFile + "]");
-				runRScript(rScriptInputFile, reportFile, decoyRegex);
+				runRScript(rScriptInputFile, reportFile, decoyRegex, progressReporter);
 			}
 
 			for (final File file : generatedFileList) {
@@ -286,7 +286,7 @@ public final class QaWorker extends WorkerBase {
 		return file != null && file.exists() && file.length() > 0;
 	}
 
-	private void runRScript(final File inputFile, final File reportFile, final String decoyRegex) {
+	private void runRScript(final File inputFile, final File reportFile, final String decoyRegex, final UserProgressReporter reporter) {
 
 		final List<String> result = new ArrayList<String>();
 
@@ -301,7 +301,7 @@ public final class QaWorker extends WorkerBase {
 		result.add(decoyRegex);
 
 		final ProcessBuilder builder = new ProcessBuilder(result.toArray(new String[result.size()]));
-		final ProcessCaller caller = new ProcessCaller(builder);
+		final ProcessCaller caller = new ProcessCaller(builder, reporter.getParentLog());
 		caller.runAndCheck("QA R script");
 	}
 

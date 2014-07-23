@@ -3,6 +3,7 @@ package edu.mayo.mprc.raw2mgf;
 import edu.mayo.mprc.MprcException;
 import edu.mayo.mprc.utilities.FileUtilities;
 import edu.mayo.mprc.utilities.ProcessCaller;
+import edu.mayo.mprc.utilities.progress.UserProgressReporter;
 import org.apache.log4j.Logger;
 
 import java.io.File;
@@ -80,7 +81,7 @@ public final class ExtractMsnWrapper {
 	/**
 	 * call the executable to make the conversion from a raw file to dta files
 	 */
-	public void run() {
+	public void run(final UserProgressReporter reporter) {
 		final File folder = outputdir;
 		LOGGER.debug("Extract_msn output files will go to " + folder.getAbsolutePath() + " which " + (folder.exists() ? "exists" : "does not exist."));
 		if (!folder.exists()) {
@@ -94,7 +95,7 @@ public final class ExtractMsnWrapper {
 
 		final String[] theCall = getCall();
 		final ProcessBuilder builder = new ProcessBuilder(theCall).directory(folder);
-		final ProcessCaller caller = new ProcessCaller(builder);
+		final ProcessCaller caller = new ProcessCaller(builder, reporter.getParentLog());
 		caller.runAndCheck("extract_msn");
 		if (folder.listFiles().length == 0) {
 			throw new MprcException("The folder with .dta files is empty: " + folder.getAbsolutePath() + "\nextract_msn call:\n"

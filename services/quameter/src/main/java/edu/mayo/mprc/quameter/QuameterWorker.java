@@ -110,7 +110,7 @@ public final class QuameterWorker extends WorkerBase {
 		final ProcessBuilder processBuilder = new ProcessBuilder(parameters);
 		processBuilder.directory(tempWorkFolder);
 
-		final ProcessCaller processCaller = new ProcessCaller(processBuilder);
+		final ProcessCaller processCaller = new ProcessCaller(processBuilder, progressReporter.getParentLog());
 
 		LOGGER.info("QuaMeter search, " + packet.toString() + ", has been submitted.");
 		processCaller.runAndCheck("quameter");

@@ -74,7 +74,8 @@ public final class SequestWorker extends WorkerBase {
 				sequestWorkPacket.getInputFile(),
 				120 * 1000/* start timeout */,
 				10 * 60 * 1000 /* watchdog timeout */,
-				sequestWorkPacket.getDatabaseFile()
+				sequestWorkPacket.getDatabaseFile(),
+				progressReporter
 		);
 
 		publish(outputFile, finalOutputFile);

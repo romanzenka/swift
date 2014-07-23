@@ -1,5 +1,7 @@
 package edu.mayo.mprc.sequest.core;
 
+import edu.mayo.mprc.utilities.progress.TestProgressReporter;
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
@@ -13,7 +15,7 @@ import java.util.List;
  */
 public final class SequestRunnerStub extends SequestRunner {
 	public SequestRunnerStub(final File workingDir, final File paramsFile, final List<File> sequestDtaFiles, final File hostsFile) {
-		super(workingDir, paramsFile, sequestDtaFiles, hostsFile);
+		super(workingDir, paramsFile, sequestDtaFiles, hostsFile, new TestProgressReporter());
 		setCommand("echo");
 		final List<String> someArgs = new ArrayList<String>();
 		someArgs.add("hi");

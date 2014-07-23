@@ -4,6 +4,7 @@ package edu.mayo.mprc.tar;
 import edu.mayo.mprc.MprcException;
 import edu.mayo.mprc.utilities.FileUtilities;
 import edu.mayo.mprc.utilities.TestingUtilities;
+import edu.mayo.mprc.utilities.progress.TestProgressReporter;
 import org.apache.log4j.Logger;
 import org.testng.Assert;
 import org.testng.annotations.Test;
@@ -52,7 +53,7 @@ public final class TestTarWriter {
 			final File tar = File.createTempFile("mytarfile", ".tar");
 			tarName = tar.getAbsolutePath();
 
-			final TarWriter tt = new TarWriter(tar);
+			final TarWriter tt = new TarWriter(tar, new TestProgressReporter());
 
 			LOGGER.debug("wrote tar at " + tar.getAbsolutePath());
 
@@ -118,7 +119,7 @@ public final class TestTarWriter {
 			final File tar = File.createTempFile("mytarfile2", ".tar");
 			tarName = tar.getAbsolutePath();
 
-			final TarWriter tt = new TarWriter(tar);
+			final TarWriter tt = new TarWriter(tar, new TestProgressReporter());
 
 			LOGGER.debug("wrote tar at " + tar.getAbsolutePath());
 
@@ -158,7 +159,7 @@ public final class TestTarWriter {
 
 			final File tar = File.createTempFile("mytarfileall", ".tar");
 
-			final TarWriter tt = new TarWriter(tar);
+			final TarWriter tt = new TarWriter(tar, new TestProgressReporter());
 
 			LOGGER.debug("wrote tar at " + tar.getAbsolutePath());
 
@@ -197,7 +198,7 @@ public final class TestTarWriter {
 
 			final File tar = File.createTempFile("mytarfile2", ".tar");
 
-			final TarWriter tt = new TarWriter(tar);
+			final TarWriter tt = new TarWriter(tar, new TestProgressReporter());
 
 			LOGGER.debug("wrote tar at " + tar.getAbsolutePath());
 
