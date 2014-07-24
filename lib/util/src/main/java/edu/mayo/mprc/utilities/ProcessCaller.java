@@ -271,7 +271,7 @@ public final class ProcessCaller implements Runnable {
 		try {
 			process = builder.start();
 
-			outputStreamDrainer = new StreamDrainer(process.getInputStream(), outputLogger, Level.DEBUG,
+			outputStreamDrainer = new StreamDrainer(process.getInputStream(), outputLogger, Level.INFO,
 					retainedLogLines(), outputMonitor);
 			outputPipe = new Thread(outputStreamDrainer, "Process stdout drain");
 			outputPipe.start();

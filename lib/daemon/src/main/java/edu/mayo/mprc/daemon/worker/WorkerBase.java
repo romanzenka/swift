@@ -1,5 +1,6 @@
 package edu.mayo.mprc.daemon.worker;
 
+import edu.mayo.mprc.MprcException;
 import edu.mayo.mprc.utilities.FileUtilities;
 import edu.mayo.mprc.utilities.MonitorUtilities;
 import edu.mayo.mprc.utilities.progress.ProgressInfo;
@@ -42,6 +43,7 @@ public abstract class WorkerBase implements Worker {
 			cleanTempWorkFolder(tempWorkFolder);
 			progressReporter.reportSuccess();
 		} catch (final Exception t) {
+			LOGGER.error(String.format("Processing failed: %s", MprcException.getDetailedMessage(t)));
 			progressReporter.reportFailure(t);
 		}
 	}

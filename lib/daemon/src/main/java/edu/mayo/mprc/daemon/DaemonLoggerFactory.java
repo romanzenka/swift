@@ -12,6 +12,7 @@ import edu.mayo.mprc.utilities.progress.UserProgressReporter;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.apache.log4j.MDC;
+import org.apache.log4j.PatternLayout;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -28,6 +29,8 @@ public final class DaemonLoggerFactory {
 	 * UUID for a root object
 	 */
 	public static final UUID ROOT = UUID.fromString("00000000-0000-0000-0000-000000000000");
+
+	private static final Logger LOGGER = Logger.getLogger(DaemonLoggerFactory.class);
 
 	private File logOutputFolder;
 
@@ -122,6 +125,7 @@ public final class DaemonLoggerFactory {
 			final NewLogFiles data = new NewLogFiles(parentLogId, logFileId,
 					getStandardOutFile(), getStandardErrorFile());
 
+			LOGGER.info(String.format("Child log with id %s", logFileId.toString()));
 			reporter.reportProgress(data);
 		}
 
@@ -146,7 +150,9 @@ public final class DaemonLoggerFactory {
 
 		private LogWriterAppender newOutWriterAppender() {
 			try {
-				return new LogWriterAppender(new FileWriter(standardOutFile.getAbsoluteFile()));
+				final LogWriterAppender logWriterAppender = new LogWriterAppender(new FileWriter(standardOutFile.getAbsoluteFile()));
+				logWriterAppender.setLayout(new PatternLayout("%d{ISO8601}\t%m\n"));
+				return logWriterAppender;
 			} catch (final IOException e) {
 				throw new MprcException("Could not start logging", e);
 			}
@@ -154,7 +160,9 @@ public final class DaemonLoggerFactory {
 
 		private LogWriterAppender newErrorWriterAppender() {
 			try {
-				return new LogWriterAppender(new FileWriter(standardErrorFile.getAbsoluteFile()));
+				final LogWriterAppender logWriterAppender = new LogWriterAppender(new FileWriter(standardErrorFile.getAbsoluteFile()));
+				logWriterAppender.setLayout(new PatternLayout("%d{ISO8601}\t%m\n"));
+				return logWriterAppender;
 			} catch (final IOException e) {
 				throw new MprcException("Could not start logging", e);
 			}
