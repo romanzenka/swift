@@ -110,7 +110,7 @@ public class TestRawToMgf {
 				}
 
 				@Override
-				public ParentLog getParentLog() {
+				public ParentLog getLog() {
 					return new SimpleParentLog();
 				}
 			});

@@ -84,7 +84,7 @@ public final class TestIdpQonvert {
 				}
 
 				@Override
-				public ParentLog getParentLog() {
+				public ParentLog getLog() {
 					return new SimpleParentLog();
 				}
 			});

@@ -300,7 +300,7 @@ public final class DaemonConfig implements ResourceConfig, NamedResource {
 			final List<? extends ResourceConfig> resourcesList = reader.getResourceList(RESOURCES);
 			resources.clear();
 			for (final ResourceConfig resource : resourcesList) {
-				resources.add(resource);
+				addResource(resource);
 			}
 		}
 
@@ -309,7 +309,7 @@ public final class DaemonConfig implements ResourceConfig, NamedResource {
 			services.clear();
 			for (final ResourceConfig config : servicesList) {
 				final ServiceConfig service = (ServiceConfig) config;
-				services.add(service);
+				addResource(service);
 			}
 		}
 	}

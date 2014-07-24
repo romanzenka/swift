@@ -95,7 +95,7 @@ public final class ExtractMsnWrapper {
 
 		final String[] theCall = getCall();
 		final ProcessBuilder builder = new ProcessBuilder(theCall).directory(folder);
-		final ProcessCaller caller = new ProcessCaller(builder, reporter.getParentLog());
+		final ProcessCaller caller = new ProcessCaller(builder, reporter.getLog());
 		caller.runAndCheck("extract_msn");
 		if (folder.listFiles().length == 0) {
 			throw new MprcException("The folder with .dta files is empty: " + folder.getAbsolutePath() + "\nextract_msn call:\n"

@@ -301,7 +301,7 @@ public final class QaWorker extends WorkerBase {
 		result.add(decoyRegex);
 
 		final ProcessBuilder builder = new ProcessBuilder(result.toArray(new String[result.size()]));
-		final ProcessCaller caller = new ProcessCaller(builder, reporter.getParentLog());
+		final ProcessCaller caller = new ProcessCaller(builder, reporter.getLog());
 		caller.runAndCheck("QA R script");
 	}
 

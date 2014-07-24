@@ -18,7 +18,7 @@ public final class TestProgressReporter implements UserProgressReporter {
 	}
 
 	@Override
-	public ParentLog getParentLog() {
+	public ParentLog getLog() {
 		return new SimpleParentLog();
 	}
 }

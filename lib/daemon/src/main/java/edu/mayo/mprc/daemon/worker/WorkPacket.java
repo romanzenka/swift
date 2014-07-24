@@ -13,9 +13,17 @@ import java.util.UUID;
  */
 public interface WorkPacket extends FileTokenHolder, PrioritizedData {
 	/**
-	 * @return ID of the task. This is used to seed the parent log.
+	 * @return ID of the task. This is used to seed the parent log. The ID should be automatically created
+	 * when a new task is made.
 	 */
 	UUID getTaskId();
+
+	/**
+	 * In rare cases, we might have to force the ID on the given work packet as provided from elsewhere.
+	 *
+	 * @param taskId New task ID
+	 */
+	void setTaskId(UUID taskId);
 
 	/**
 	 * @return True if the work requested should be redone from scratch, ignoring any previous cached results.

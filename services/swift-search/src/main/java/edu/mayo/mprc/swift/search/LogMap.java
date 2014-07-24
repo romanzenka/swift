@@ -30,7 +30,11 @@ public final class LogMap {
 	 * saved to the database.
 	 */
 	public void addLogData(final UUID id, final LogData data) {
-		final LogInfo info = map.putIfAbsent(data.getTask(), new LogInfo());
+		LogInfo newInfo = new LogInfo();
+		LogInfo info = map.putIfAbsent(data.getTask(), newInfo);
+		if (info == null) {
+			info = newInfo;
+		}
 		info.add(id, data);
 	}
 

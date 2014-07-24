@@ -107,7 +107,7 @@ public final class MSMSEvalTest {
 			}
 
 			@Override
-			public ParentLog getParentLog() {
+			public ParentLog getLog() {
 				return new SimpleParentLog();
 			}
 		});

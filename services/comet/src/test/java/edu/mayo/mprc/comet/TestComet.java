@@ -103,7 +103,7 @@ public class TestComet {
 				}
 
 				@Override
-				public ParentLog getParentLog() {
+				public ParentLog getLog() {
 					return new SimpleParentLog();
 				}
 

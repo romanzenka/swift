@@ -88,7 +88,7 @@ final class CacheProgressReporter implements ProgressReporter {
 	 * The parent log is the parent log of the very first requestor.
 	 * Every newcomer should only reference the same parent log.
 	 */
-	public synchronized ParentLog getParentLog() {
+	public synchronized ParentLog getLog() {
 		throw new MprcException("The cache progress reporter does not define parent log");
 	}
 }

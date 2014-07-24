@@ -27,7 +27,7 @@ public abstract class WorkPacketBase extends FileHolder implements WorkPacket {
 	 * @param fromScratch
 	 */
 	public WorkPacketBase(final boolean fromScratch) {
-		this.taskId = UUID.randomUUID();
+		setTaskId(UUID.randomUUID());
 		this.fromScratch = fromScratch;
 	}
 
@@ -47,6 +47,11 @@ public abstract class WorkPacketBase extends FileHolder implements WorkPacket {
 	@Override
 	public UUID getTaskId() {
 		return taskId;
+	}
+
+	@Override
+	public void setTaskId(final UUID taskId) {
+		this.taskId = taskId;
 	}
 
 	@Override

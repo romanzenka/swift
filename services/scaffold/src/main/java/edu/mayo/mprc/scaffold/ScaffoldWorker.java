@@ -18,7 +18,6 @@ import edu.mayo.mprc.searchengine.EngineFactory;
 import edu.mayo.mprc.searchengine.EngineMetadata;
 import edu.mayo.mprc.utilities.FileUtilities;
 import edu.mayo.mprc.utilities.ProcessCaller;
-import edu.mayo.mprc.utilities.log.ParentLog;
 import edu.mayo.mprc.utilities.progress.UserProgressReporter;
 import org.apache.log4j.Logger;
 import org.springframework.stereotype.Component;
@@ -150,7 +149,7 @@ public final class ScaffoldWorker extends WorkerBase {
 		final ProcessBuilder processBuilder = new ProcessBuilder(getScaffoldBatchScript().getAbsolutePath(), scafmlFile.getAbsolutePath())
 				.directory(scaffoldWorkFolder);
 
-		final ProcessCaller caller = new ProcessCaller(processBuilder, progressReporter.getParentLog());
+		final ProcessCaller caller = new ProcessCaller(processBuilder, progressReporter.getLog());
 		caller.setOutputMonitor(new ScaffoldLogMonitor(progressReporter));
 
 		try {

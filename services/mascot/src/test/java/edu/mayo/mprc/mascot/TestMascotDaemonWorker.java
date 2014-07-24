@@ -91,7 +91,7 @@ public final class TestMascotDaemonWorker {
 			}
 
 			@Override
-			public ParentLog getParentLog() {
+			public ParentLog getLog() {
 				return new SimpleParentLog();
 			}
 

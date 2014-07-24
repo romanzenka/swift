@@ -44,7 +44,7 @@ public final class RunnerProgressReporter implements ProgressReporter {
 	}
 
 	@Override
-	public ParentLog getParentLog() {
+	public ParentLog getLog() {
 		return parentLog;
 	}
 }

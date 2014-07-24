@@ -151,7 +151,7 @@ public final class BulkLoadingTest extends DaoTest {
 			}
 
 			@Override
-			public ParentLog getParentLog() {
+			public ParentLog getLog() {
 				return new SimpleParentLog();
 			}
 		};

@@ -7,6 +7,7 @@ import org.apache.log4j.spi.ErrorHandler;
 import org.apache.log4j.spi.Filter;
 import org.apache.log4j.spi.LoggingEvent;
 
+import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
@@ -19,22 +20,20 @@ public final class SimpleParentLog implements ChildLog {
 	private static final Logger LOGGER = Logger.getLogger(SimpleParentLog.class);
 	private static final long serialVersionUID = -291080842199803090L;
 
-	private static AtomicInteger logsCreated = new AtomicInteger(0);
-	private AtomicInteger childrenCreated = new AtomicInteger(0);
-	private String path = "";
+	private final UUID id = UUID.randomUUID();
 
 	public SimpleParentLog() {
-		this("log" + logsCreated.incrementAndGet());
+
 	}
 
-	private SimpleParentLog(final String path) {
-		this.path = path;
+	@Override
+	public UUID getLogId() {
+		return id;
 	}
 
 	@Override
 	public ChildLog createChildLog() {
-		final int childId = childrenCreated.incrementAndGet();
-		return new SimpleParentLog(path + '.' + childId);
+		return new SimpleParentLog();
 	}
 
 	@Override
@@ -44,12 +43,12 @@ public final class SimpleParentLog implements ChildLog {
 
 	@Override
 	public void startLogging() {
-		LOGGER.debug(path + " started logging");
+		LOGGER.debug(id.toString() + " started logging");
 	}
 
 	@Override
 	public void stopLogging() {
-		LOGGER.debug(path + " stopped logging");
+		LOGGER.debug(id.toString() + " stopped logging");
 	}
 
 	@Override

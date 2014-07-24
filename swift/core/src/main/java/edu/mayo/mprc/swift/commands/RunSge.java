@@ -188,7 +188,7 @@ public class RunSge implements SwiftCommand {
 		}
 
 		@Override
-		public ParentLog getParentLog() {
+		public ParentLog getLog() {
 			return parentLog;
 		}
 

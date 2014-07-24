@@ -20,11 +20,11 @@ public interface UserProgressReporter {
 	void reportProgress(ProgressInfo progressInfo);
 
 	/**
-	 * When reporting progress, you can get access to the parent log, which allows you to spawn a child log
+	 * When reporting progress, you can get access to the current log, which allows you to spawn a child log
 	 * in case you are spawning children. The fact that a child was spawned
 	 * will be communicated to the caller as a progress message.
 	 *
 	 * @return An object that allows you to spawn a child log.
 	 */
-	ParentLog getParentLog();
+	ParentLog getLog();
 }

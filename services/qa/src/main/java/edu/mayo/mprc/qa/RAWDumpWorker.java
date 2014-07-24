@@ -245,7 +245,7 @@ public final class RAWDumpWorker extends WorkerBase {
 		LOGGER.info("Running command from the following parameters " + parameters.toString());
 
 		final ProcessBuilder builder = new ProcessBuilder(parameters.toArray(new String[parameters.size()]));
-		final ProcessCaller caller = new ProcessCaller(builder, reporter.getParentLog());
+		final ProcessCaller caller = new ProcessCaller(builder, reporter.getLog());
 		caller.runAndCheck("rawdump");
 
 		return caller;

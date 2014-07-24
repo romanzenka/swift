@@ -40,7 +40,7 @@ public final class DaemonLoggerFactory {
 	 * <p/>
 	 * This log will notify the requester about each child log created
 	 *
-	 * @param id       ID of the parent log. Use {@link #ROOT} for root logger
+	 * @param id       ID of the parent log. Use {@link #ROOT} for root logger (if needed)
 	 * @param reporter A means of reporting progress (in this case the fact we created child logs)
 	 * @return A parent log corresponding to the request sender.
 	 */
@@ -52,14 +52,8 @@ public final class DaemonLoggerFactory {
 		return logOutputFolder;
 	}
 
-	/**
-	 * Does this log id correspond to root logger?
-	 */
-	public boolean isRoot(final UUID logId) {
-		return ROOT.equals(logId);
-	}
-
 	private final class RequestParentLog implements ParentLog {
+		private static final long serialVersionUID = 6391153716801269497L;
 		private UUID id;
 		private UserProgressReporter reporter;
 
@@ -77,9 +71,15 @@ public final class DaemonLoggerFactory {
 		public ChildLog createChildLog(final String outputLogFilePath, final String errorLogFilePath) {
 			return new RequestChildLog(outputLogFilePath, errorLogFilePath, reporter, id);
 		}
+
+		@Override
+		public UUID getLogId() {
+			return id;
+		}
 	}
 
 	private final class RequestChildLog implements ChildLog {
+		private static final long serialVersionUID = -4428747725005957176L;
 		private LogWriterAppender outLogWriterAppender;
 		private LogWriterAppender errorLogWriterAppender;
 		private Logger outLogger;
@@ -210,6 +210,11 @@ public final class DaemonLoggerFactory {
 		@Override
 		public ChildLog createChildLog(final String outputLogFilePath, final String errorLogFilePath) {
 			return new RequestChildLog(outputLogFilePath, errorLogFilePath, reporter, logFileId);
+		}
+
+		@Override
+		public UUID getLogId() {
+			return logFileId;
 		}
 	}
 

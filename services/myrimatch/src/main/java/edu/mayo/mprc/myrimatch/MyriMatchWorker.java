@@ -126,7 +126,7 @@ public final class MyriMatchWorker extends WorkerBase {
 		final ProcessBuilder processBuilder = new ProcessBuilder(parameters);
 		processBuilder.directory(tempWorkFolder);
 
-		final ProcessCaller processCaller = new ProcessCaller(processBuilder, progressReporter.getParentLog());
+		final ProcessCaller processCaller = new ProcessCaller(processBuilder, progressReporter.getLog());
 
 		LOGGER.info("MyriMatch search, " + packet.toString() + ", has been submitted.");
 		processCaller.setOutputMonitor(new

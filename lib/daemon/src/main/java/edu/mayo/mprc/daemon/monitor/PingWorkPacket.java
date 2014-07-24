@@ -32,6 +32,11 @@ public final class PingWorkPacket implements WorkPacket {
 	}
 
 	@Override
+	public void setTaskId(final UUID taskId) {
+		this.taskId = taskId;
+	}
+
+	@Override
 	public boolean isFromScratch() {
 		return true;
 	}

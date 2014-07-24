@@ -82,7 +82,7 @@ public final class MSMSEval {
 
 			ProcessCaller processCaller = null;
 
-			processCaller = new ProcessCaller(processBuilder, reporter.getParentLog());
+			processCaller = new ProcessCaller(processBuilder, reporter.getLog());
 
 			processCaller.runAndCheck("msmseval");
 		} else {

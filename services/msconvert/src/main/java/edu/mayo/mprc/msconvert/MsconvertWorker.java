@@ -17,8 +17,6 @@ import edu.mayo.mprc.utilities.FilePathShortener;
 import edu.mayo.mprc.utilities.FileUtilities;
 import edu.mayo.mprc.utilities.ProcessCaller;
 import edu.mayo.mprc.utilities.exceptions.ExceptionUtilities;
-import edu.mayo.mprc.utilities.progress.ProgressReport;
-import edu.mayo.mprc.utilities.progress.ProgressReporter;
 import edu.mayo.mprc.utilities.progress.UserProgressReporter;
 import org.apache.log4j.Logger;
 import org.springframework.stereotype.Component;
@@ -87,7 +85,7 @@ public final class MsconvertWorker extends WorkerBase {
 
 			final ProcessBuilder builder = new ProcessBuilder(getMsconvertCall(rawFile, outputFile, ms2Profile, includeMs1));
 			builder.directory(msaccessExecutable.getParentFile().getAbsoluteFile());
-			final ProcessCaller caller = new ProcessCaller(builder, progressReporter.getParentLog());
+			final ProcessCaller caller = new ProcessCaller(builder, progressReporter.getLog());
 			caller.runAndCheck("msconvert");
 			if (!outputFile.exists() || !outputFile.isFile() || !outputFile.canRead()) {
 				throw new MprcException("msconvert failed to create file: " + outputFile.getAbsolutePath());
@@ -179,7 +177,7 @@ public final class MsconvertWorker extends WorkerBase {
 	private boolean ms2SpectraInProfileMode(final File rawFile, final File tempFolder, final UserProgressReporter progressReporter) {
 		final ProcessBuilder builder = new ProcessBuilder(msaccessExecutable.getPath(), "-x", "metadata", "-o", tempFolder.getAbsolutePath(), rawFile.getName());
 		builder.directory(rawFile.getParentFile().getAbsoluteFile());
-		final ProcessCaller caller = new ProcessCaller(builder, progressReporter.getParentLog());
+		final ProcessCaller caller = new ProcessCaller(builder, progressReporter.getLog());
 		caller.runAndCheck("msaccess");
 
 		final File expectedResultFile = new File(tempFolder, rawFile.getName() + MSACCESS_SUFFIX);

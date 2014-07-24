@@ -164,6 +164,7 @@ public final class Daemon implements Checkable, Installable {
 				new ServiceConfig(
 						config.getName() + "-ping",
 						new SimpleRunner.Config(pingConfig));
+		config.addResource(pingServiceConfig);
 		return pingServiceConfig;
 
 	}

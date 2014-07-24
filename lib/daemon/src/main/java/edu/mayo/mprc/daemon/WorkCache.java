@@ -163,6 +163,9 @@ public abstract class WorkCache<T extends WorkPacket> implements NoLoggingWorker
 		final File wipFolder = cacheFolder.makeWorkFolder(originalPacket);
 
 		final WorkPacket modifiedWorkPacket = originalPacket.translateToCachePacket(wipFolder);
+		//  Our new packet will bear ID of our current log. That would ensure that its child logs
+		// will be properly hooked as children of our task.
+		modifiedWorkPacket.setTaskId(progressReporter.getLog().getLogId());
 
 		final ProgressListener listener = new MyProgressListener(lookupPacket, originalPacket, wipFolder, newReporter);
 		daemon.sendWork(modifiedWorkPacket, listener);

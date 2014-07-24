@@ -104,7 +104,7 @@ public final class XTandemWorker extends WorkerBase {
 			}
 
 			@Override
-			public ParentLog getParentLog() {
+			public ParentLog getLog() {
 				return new SimpleParentLog();
 			}
 
@@ -220,7 +220,7 @@ public final class XTandemWorker extends WorkerBase {
 		final ProcessBuilder processBuilder = new ProcessBuilder(parameters);
 		processBuilder.directory(workFolder);
 
-		final ProcessCaller processCaller = new ProcessCaller(processBuilder, progressReporter.getParentLog());
+		final ProcessCaller processCaller = new ProcessCaller(processBuilder, progressReporter.getLog());
 
 		processCaller.run();
 		return processCaller;

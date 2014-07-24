@@ -5,8 +5,6 @@ import edu.mayo.mprc.MprcException;
 import edu.mayo.mprc.utilities.FileUtilities;
 import edu.mayo.mprc.utilities.LogMonitor;
 import edu.mayo.mprc.utilities.ProcessCaller;
-import edu.mayo.mprc.utilities.progress.ProgressReport;
-import edu.mayo.mprc.utilities.progress.ProgressReporter;
 import edu.mayo.mprc.utilities.progress.UserProgressReporter;
 import org.apache.log4j.Logger;
 
@@ -256,7 +254,7 @@ class SequestRunner implements Runnable, SequestCallerInterface {
 		}
 
 		final ProcessBuilder builder = createProcess();
-		final ProcessCaller caller = new ProcessCaller(builder, reporter.getParentLog());
+		final ProcessCaller caller = new ProcessCaller(builder, reporter.getLog());
 		caller.setLogToConsole(false);
 		// Sequest will get killed after the given timeout unless we do something
 		caller.setKillTimeout(getStartTimeOut());
