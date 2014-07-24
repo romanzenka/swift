@@ -130,6 +130,7 @@ public abstract class WorkCache<T extends WorkPacket> implements NoLoggingWorker
 		final File existingEntry = cacheFolder.lookup(lookupPacket);
 
 		if (existingEntry != null) {
+			LOGGER.info(String.format("Found existing entry in cache: %s", existingEntry.getAbsolutePath()));
 			reportCachedValues(progressReporter, originalPacket, lookupPacket, existingEntry);
 			return;
 		}
@@ -149,6 +150,7 @@ public abstract class WorkCache<T extends WorkPacket> implements NoLoggingWorker
 				workInProgress.put(taskDescription, newReporter);
 				newReporter.addProgressReporter(progressReporter);
 			} else {
+				LOGGER.info(String.format("Cache already working on this. Will report progress"));
 				// We already are doing work. Register the new caller and quit
 				cacheProgressReporter.addProgressReporter(progressReporter);
 				return;
@@ -168,6 +170,7 @@ public abstract class WorkCache<T extends WorkPacket> implements NoLoggingWorker
 		modifiedWorkPacket.setTaskId(progressReporter.getLog().getLogId());
 
 		final ProgressListener listener = new MyProgressListener(lookupPacket, originalPacket, wipFolder, newReporter);
+		LOGGER.info(String.format(String.format("Cache submitting work to %s", getDaemon().getConnectionName())));
 		daemon.sendWork(modifiedWorkPacket, listener);
 	}
 
@@ -193,7 +196,9 @@ public abstract class WorkCache<T extends WorkPacket> implements NoLoggingWorker
 	 * Delete everything in the cache.
 	 */
 	private void cleanupCache() {
+		LOGGER.info(String.format("Cleaning up cache folder %s", cacheFolder.getCacheFolder().getAbsolutePath()));
 		cacheFolder.cleanup();
+		LOGGER.info(String.format("Cleaned cache folder %s", cacheFolder.getCacheFolder().getAbsolutePath()));
 	}
 
 	/**

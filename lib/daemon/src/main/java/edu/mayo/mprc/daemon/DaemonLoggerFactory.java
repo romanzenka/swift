@@ -135,12 +135,13 @@ public final class DaemonLoggerFactory {
 
 			outLogWriterAppender = newOutWriterAppender();
 			outLogWriterAppender.setAllowedMDCKey(mdcKey, mdcKey);
-			Logger.getRootLogger().addAppender(outLogWriterAppender);
+			final Logger root = Logger.getLogger("edu.mayo.mprc");
+			root.addAppender(outLogWriterAppender);
 
 			errorLogWriterAppender = newErrorWriterAppender();
 			errorLogWriterAppender.addAllowedLevel(Level.ERROR);
 			errorLogWriterAppender.setAllowedMDCKey(mdcKey, mdcKey);
-			Logger.getRootLogger().addAppender(errorLogWriterAppender);
+			root.addAppender(errorLogWriterAppender);
 		}
 
 		private LogWriterAppender newOutWriterAppender() {
@@ -164,14 +165,15 @@ public final class DaemonLoggerFactory {
 		 */
 		public void stopLogging() {
 			MDC.remove(mdcKey);
+			final Logger root = Logger.getLogger("edu.mayo.mprc");
 
 			if (outLogWriterAppender != null) {
-				Logger.getRootLogger().removeAppender(outLogWriterAppender);
+				root.removeAppender(outLogWriterAppender);
 				FileUtilities.closeObjectQuietly(outLogWriterAppender);
 			}
 
 			if (errorLogWriterAppender != null) {
-				Logger.getRootLogger().removeAppender(errorLogWriterAppender);
+				root.removeAppender(errorLogWriterAppender);
 				FileUtilities.closeObjectQuietly(errorLogWriterAppender);
 			}
 		}
@@ -188,6 +190,8 @@ public final class DaemonLoggerFactory {
 		public Logger getOutputLogger() {
 			if (outLogger == null) {
 				outLogger = Logger.getLogger(STD_OUT_FILE_PREFIX + logFileId);
+				outLogger.setLevel(Level.INFO);
+				outLogger.setAdditivity(false);
 				outLogger.addAppender(newOutWriterAppender());
 			}
 			return outLogger;
@@ -197,6 +201,8 @@ public final class DaemonLoggerFactory {
 		public Logger getErrorLogger() {
 			if (errorLogger == null) {
 				errorLogger = Logger.getLogger(STD_ERR_FILE_PREFIX + logFileId);
+				errorLogger.setLevel(Level.ERROR);
+				errorLogger.setAdditivity(false);
 				errorLogger.addAppender(newErrorWriterAppender());
 			}
 			return errorLogger;
