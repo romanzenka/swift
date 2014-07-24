@@ -9,6 +9,8 @@ import edu.mayo.mprc.utilities.progress.UserProgressReporter;
 import org.apache.log4j.Logger;
 import org.mockito.ArgumentCaptor;
 import org.testng.Assert;
+import org.testng.annotations.AfterTest;
+import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Test;
 
 import java.io.File;
@@ -22,46 +24,73 @@ import static org.mockito.Mockito.*;
 public final class TestDaemonLoggerFactory {
 	private static final Logger LOGGER = Logger.getLogger(TestDaemonLoggerFactory.class);
 
+	File logFolder;
+	DaemonLoggerFactory factory;
+	UUID id;
+	UserProgressReporter reporter;
+
+	ParentLog log;
+	ChildLog childLog;
+	ArgumentCaptor<NewLogFiles> logFiles;
+
+	@BeforeTest
+	public void setup() {
+		logFolder = FileUtilities.createTempFolder();
+		factory = new DaemonLoggerFactory(logFolder);
+		id = UUID.randomUUID();
+		reporter = mock(UserProgressReporter.class);
+
+		log = factory.createLog(id, reporter);
+		childLog = log.createChildLog();
+		logFiles = ArgumentCaptor.forClass(NewLogFiles.class);
+		verify(reporter, times(1)).reportProgress(logFiles.capture());
+	}
+
+	@AfterTest
+	public void teardown() {
+		FileUtilities.cleanupTempFile(logFolder);
+	}
+
 	@Test
-	public void shouldLog() {
-		final File logFolder = FileUtilities.createTempFolder();
-		try {
-			final DaemonLoggerFactory factory = new DaemonLoggerFactory(logFolder);
-			final UUID id = UUID.randomUUID();
-			final UserProgressReporter reporter = mock(UserProgressReporter.class);
+	public void shouldReportLogCreation() {
+		Assert.assertEquals(logFiles.getValue().getParentLogId(), id);
+		Assert.assertEquals(logFiles.getValue().getLogId(), childLog.getLogId());
+	}
 
-			final ParentLog log = factory.createLog(id, reporter);
-			final ChildLog childLog = log.createChildLog();
+	@Test
+	public void shouldStartStopLogging() {
+		childLog.startLogging();
+		LOGGER.info("A sample log message");
+		LOGGER.error("A sample error message");
 
-			// We must report to the caller
-			final ArgumentCaptor<NewLogFiles> logFiles = ArgumentCaptor.forClass(NewLogFiles.class);
-			verify(reporter, times(1))
-					.reportProgress(logFiles.capture());
+		childLog.stopLogging();
 
-			Assert.assertEquals(logFiles.getValue().getParentLogId(), id);
-			Assert.assertEquals(logFiles.getValue().getLogId(), childLog.getLogId());
+		final String out = getOutputLogContents();
+		Assert.assertTrue(out.contains("A sample log message"));
 
-			childLog.startLogging();
-			LOGGER.info("A sample log message");
-			LOGGER.error("A sample error message");
+		final String err = getErrorLogContents();
+		Assert.assertTrue(err.contains("A sample error message"));
+	}
 
-			childLog.getOutputLogger().info("--- direct through logger ---");
-			childLog.getErrorLogger().error("--- error direct through logger ---");
+	@Test
+	public void shouldProvideLogger() {
+		childLog.getOutputLogger().info("--- direct through logger ---");
+		childLog.getErrorLogger().error("--- error direct through logger ---");
 
-			childLog.stopLogging();
+		final String out = getOutputLogContents();
+		Assert.assertTrue(out.contains("--- direct through logger ---"));
 
-			final File outputLog = logFiles.getValue().getOutputLogFile();
-			final String out = FileUtilities.toString(outputLog, Charsets.UTF_8, 10000);
-			Assert.assertTrue(out.contains("A sample log message"));
-			Assert.assertTrue(out.contains("--- direct through logger ---"));
+		final String err = getErrorLogContents();
+		Assert.assertTrue(err.contains("--- error direct through logger ---"));
+	}
 
-			final File errorLog = logFiles.getValue().getErrorLogFile();
-			final String err = FileUtilities.toString(outputLog, Charsets.UTF_8, 10000);
-			Assert.assertTrue(err.contains("A sample error message"));
-			Assert.assertTrue(err.contains("--- error direct through logger ---"));
+	private String getErrorLogContents() {
+		final File errorLog = logFiles.getValue().getErrorLogFile();
+		return FileUtilities.toString(errorLog, Charsets.UTF_8, 10000);
+	}
 
-		} finally {
-			FileUtilities.cleanupTempFile(logFolder);
-		}
+	private String getOutputLogContents() {
+		final File outputLog = logFiles.getValue().getOutputLogFile();
+		return FileUtilities.toString(outputLog, Charsets.UTF_8, 10000);
 	}
 }
