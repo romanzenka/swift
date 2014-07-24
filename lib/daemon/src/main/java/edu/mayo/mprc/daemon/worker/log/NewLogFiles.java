@@ -52,4 +52,23 @@ public final class NewLogFiles extends FileHolder implements ProgressInfo {
 		return outputLogFile;
 	}
 
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (!(o instanceof NewLogFiles)) return false;
+
+		NewLogFiles that = (NewLogFiles) o;
+
+		if (logId != null ? !logId.equals(that.logId) : that.logId != null) return false;
+		if (parentLogId != null ? !parentLogId.equals(that.parentLogId) : that.parentLogId != null) return false;
+
+		return true;
+	}
+
+	@Override
+	public int hashCode() {
+		int result = parentLogId != null ? parentLogId.hashCode() : 0;
+		result = 31 * result + (logId != null ? logId.hashCode() : 0);
+		return result;
+	}
 }
