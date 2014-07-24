@@ -5,7 +5,6 @@ import com.google.common.io.Files;
 import edu.mayo.mprc.daemon.worker.WorkPacket;
 import edu.mayo.mprc.searchengine.EngineWorkPacket;
 import edu.mayo.mprc.searchengine.SearchEngineResult;
-import edu.mayo.mprc.utilities.FileUtilities;
 import edu.mayo.mprc.utilities.progress.ProgressReporter;
 import org.apache.log4j.Logger;
 
@@ -29,12 +28,12 @@ public final class MascotWorkPacket extends EngineWorkPacket {
 
 	public static final String MASCOT_URL_FILENAME = "mascot_url.txt";
 
-	public MascotWorkPacket(final String taskId, final boolean fromScratch) {
-		super(taskId, fromScratch);
+	public MascotWorkPacket(final boolean fromScratch) {
+		super(fromScratch);
 	}
 
-	public MascotWorkPacket(final File outputFile, final String searchParams, final File inputFile, final String shortDbName, final String taskId, final boolean fromScratch, final boolean publishSearchFiles) {
-		super(inputFile, outputFile, searchParams, null, publishSearchFiles, taskId, fromScratch);
+	public MascotWorkPacket(final File outputFile, final String searchParams, final File inputFile, final String shortDbName, final boolean fromScratch, final boolean publishSearchFiles) {
+		super(inputFile, outputFile, searchParams, null, publishSearchFiles, fromScratch);
 
 		assert inputFile != null : "Mascot request cannot be created: The input file was null";
 		assert shortDbName != null : "Mascot request cannot be created: Short database name was null";
@@ -73,7 +72,6 @@ public final class MascotWorkPacket extends EngineWorkPacket {
 				getSearchParams(),
 				getInputFile(),
 				getShortDbName(),
-				getTaskId(),
 				isFromScratch(),
 				false);
 	}

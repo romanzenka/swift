@@ -4,6 +4,7 @@ import edu.mayo.mprc.swift.dbmapping.LogData;
 import edu.mayo.mprc.swift.dbmapping.TaskData;
 
 import java.util.Map;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -28,12 +29,12 @@ public final class LogMap {
 	 * Add a freshly created LogData object. This object should have been already
 	 * saved to the database.
 	 */
-	public void addLogData(final long id, final LogData data) {
+	public void addLogData(final UUID id, final LogData data) {
 		final LogInfo info = map.putIfAbsent(data.getTask(), new LogInfo());
 		info.add(id, data);
 	}
 
-	public LogData getLogData(final TaskData task, final long id) {
+	public LogData getLogData(final TaskData task, final UUID id) {
 		final LogInfo logInfo = map.get(task);
 		if (logInfo != null) {
 			return logInfo.get(id);
@@ -42,13 +43,13 @@ public final class LogMap {
 	}
 
 	private static final class LogInfo {
-		private final Map<Long, LogData> map = new ConcurrentHashMap<Long, LogData>(5);
+		private final Map<UUID, LogData> map = new ConcurrentHashMap<UUID, LogData>(5);
 
-		public void add(final long id, final LogData data) {
+		public void add(final UUID id, final LogData data) {
 			map.put(id, data);
 		}
 
-		public LogData get(final long id) {
+		public LogData get(final UUID id) {
 			return map.get(id);
 		}
 	}

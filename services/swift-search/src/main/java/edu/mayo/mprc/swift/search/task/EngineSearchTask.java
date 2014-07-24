@@ -82,7 +82,6 @@ final class EngineSearchTask extends AsyncTaskBase implements FileProducingTask 
 					params,
 					inputFile.getResultingFile(),
 					deploymentResult.getShortDbName(),
-					getFullId(),
 					isFromScratch(),
 					publicSearchFiles);
 		} else if ("SEQUEST".equalsIgnoreCase(engine.getCode())) {
@@ -92,7 +91,6 @@ final class EngineSearchTask extends AsyncTaskBase implements FileProducingTask 
 					inputFile.getResultingFile(),
 					getSequestDatabase(),
 					publicSearchFiles,
-					getFullId(),
 					isFromScratch());
 		} else if ("TANDEM".equalsIgnoreCase(engine.getCode())) {
 			workPacket = new XTandemWorkPacket(
@@ -101,14 +99,13 @@ final class EngineSearchTask extends AsyncTaskBase implements FileProducingTask 
 					outputFile,
 					curation.getCurationFile(),
 					publicSearchFiles,
-					getFullId(),
 					isFromScratch());
 		} else if ("MYRIMATCH".equalsIgnoreCase(engine.getCode())) {
 			workPacket = new MyriMatchWorkPacket(
 					outputFile, params, inputFile.getResultingFile(),
 					curation.getCurationFile(),
 					curation.getDecoyRegex(),
-					publicSearchFiles, getFullId(),
+					publicSearchFiles,
 					isFromScratch()
 			);
 		} else if ("COMET".equalsIgnoreCase(engine.getCode())) {
@@ -118,7 +115,6 @@ final class EngineSearchTask extends AsyncTaskBase implements FileProducingTask 
 					outputFile,
 					curation.getCurationFile(),
 					publicSearchFiles,
-					getFullId(),
 					isFromScratch());
 		} else {
 			throw new MprcException("Unsupported engine: " + engine.getFriendlyName());

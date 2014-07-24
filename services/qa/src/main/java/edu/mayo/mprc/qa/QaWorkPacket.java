@@ -29,7 +29,7 @@ public final class QaWorkPacket extends WorkPacketBase {
 	 * @param taskId             Id of this task, see {@link WorkPacketBase}.
 	 */
 	public QaWorkPacket(final String searchRunName, final List<ExperimentQa> experimentQas, final File qaReportFolderFile, final File reportFile, final String decoyRegex, final String taskId, final boolean fromScratch) {
-		super(taskId, fromScratch);
+		super(fromScratch);
 
 		this.searchRunName = searchRunName;
 		experimentQaTokens = experimentQas;

@@ -1,10 +1,14 @@
-package edu.mayo.mprc.daemon.worker.log;
+package edu.mayo.mprc.daemon;
 
 import edu.mayo.mprc.MprcException;
+import edu.mayo.mprc.daemon.files.SenderTokenTranslator;
+import edu.mayo.mprc.daemon.worker.log.LogWriterAppender;
+import edu.mayo.mprc.daemon.worker.log.NewLogFiles;
 import edu.mayo.mprc.messaging.Request;
 import edu.mayo.mprc.utilities.FileUtilities;
 import edu.mayo.mprc.utilities.log.ChildLog;
 import edu.mayo.mprc.utilities.log.ParentLog;
+import edu.mayo.mprc.utilities.progress.UserProgressReporter;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.apache.log4j.MDC;
@@ -13,14 +17,19 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Date;
+import java.util.UUID;
 import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * @author Roman Zenka
  */
 public final class DaemonLoggerFactory {
+	/**
+	 * UUID for a root object
+	 */
+	public static final UUID ROOT = UUID.fromString("00000000-0000-0000-0000-000000000000");
+
 	private File logOutputFolder;
-	private static final AtomicLong UNIQUE_LOG_FILE_ID = new AtomicLong(System.currentTimeMillis());
 
 	public DaemonLoggerFactory(final File logOutputFolder) {
 		this.logOutputFolder = logOutputFolder;
@@ -31,28 +40,42 @@ public final class DaemonLoggerFactory {
 	 * <p/>
 	 * This log will notify the requester about each child log created
 	 *
-	 * @param request Request that arrived to this daemon
+	 * @param id       ID of the parent log. Use {@link #ROOT} for root logger
+	 * @param reporter A means of reporting progress (in this case the fact we created child logs)
 	 * @return A parent log corresponding to the request sender.
 	 */
-	public ParentLog createLog(final Request request) {
-		return new RequestParentLog(request);
+	public ParentLog createLog(final UUID id, final UserProgressReporter reporter) {
+		return new RequestParentLog(id, reporter);
+	}
+
+	public File getLogFolder() {
+		return logOutputFolder;
+	}
+
+	/**
+	 * Does this log id correspond to root logger?
+	 */
+	public boolean isRoot(final UUID logId) {
+		return ROOT.equals(logId);
 	}
 
 	private final class RequestParentLog implements ParentLog {
-		private Request request;
+		private UUID id;
+		private UserProgressReporter reporter;
 
-		private RequestParentLog(final Request request) {
-			this.request = request;
+		private RequestParentLog(final UUID id, final UserProgressReporter reporter) {
+			this.id = id;
+			this.reporter = reporter;
 		}
 
 		@Override
 		public ChildLog createChildLog() {
-			return new RequestChildLog(logOutputFolder, request, 0);
+			return new RequestChildLog(logOutputFolder, reporter, id);
 		}
 
 		@Override
 		public ChildLog createChildLog(final String outputLogFilePath, final String errorLogFilePath) {
-			return new RequestChildLog(outputLogFilePath, errorLogFilePath, request, 0);
+			return new RequestChildLog(outputLogFilePath, errorLogFilePath, reporter, id);
 		}
 	}
 
@@ -64,8 +87,8 @@ public final class DaemonLoggerFactory {
 		private File standardOutFile;
 		private File standardErrorFile;
 		private String mdcKey;
-		private Request request;
-		private long logFileId;
+		private UserProgressReporter reporter;
+		private UUID logFileId;
 
 		private static final String STD_ERR_FILE_PREFIX = "e";
 		private static final String STD_OUT_FILE_PREFIX = "o";
@@ -74,29 +97,32 @@ public final class DaemonLoggerFactory {
 		/**
 		 * Create standard output and error log files
 		 */
-		public RequestChildLog(final File logOutputFolder, final Request request, final long parentLogId) {
+		public RequestChildLog(final File logOutputFolder, final UserProgressReporter reporter, final UUID parentLogId) {
 			final Date date = new Date();
-			logFileId = UNIQUE_LOG_FILE_ID.incrementAndGet();
+			logFileId = UUID.randomUUID();
 
 			final File logSubFolder = FileUtilities.getDateBasedDirectory(logOutputFolder, date);
 			initialize(
 					new File(logSubFolder, STD_OUT_FILE_PREFIX + logFileId + LOG_FILE_EXTENSION),
 					new File(logSubFolder, STD_ERR_FILE_PREFIX + logFileId + LOG_FILE_EXTENSION),
-					request, parentLogId);
+					reporter, parentLogId);
 		}
 
-		public RequestChildLog(final String outputLogFilePath, final String errorLogFilePath, final Request request, final long parentLogId) {
-			initialize(new File(outputLogFilePath), new File(errorLogFilePath), request, parentLogId);
+		public RequestChildLog(final String outputLogFilePath, final String errorLogFilePath, final UserProgressReporter reporter, final UUID parentLogId) {
+			initialize(new File(outputLogFilePath), new File(errorLogFilePath), reporter, parentLogId);
 		}
 
-		private void initialize(final File outputLogFile, final File errorLogFile, final Request request, final long parentLogId) {
-			this.request = request;
+		private void initialize(final File outputLogFile, final File errorLogFile, final UserProgressReporter reporter, final UUID parentLogId) {
+			this.reporter = reporter;
 
 			standardOutFile = outputLogFile;
 			standardErrorFile = errorLogFile;
 
 			// Let the caller know that we have new logs
-			request.sendResponse(new NewLogFiles(parentLogId, logFileId, getStandardOutFile(), getStandardErrorFile()), false);
+			final NewLogFiles data = new NewLogFiles(parentLogId, logFileId,
+					getStandardOutFile(), getStandardErrorFile());
+
+			reporter.reportProgress(data);
 		}
 
 		/**
@@ -104,7 +130,7 @@ public final class DaemonLoggerFactory {
 		 * Make sure to call {@link #stopLogging()} when done, preferably in a finally section.
 		 */
 		public void startLogging() {
-			mdcKey = Long.toString(logFileId);
+			mdcKey = logFileId.toString();
 			MDC.put(mdcKey, mdcKey);
 
 			outLogWriterAppender = newOutWriterAppender();
@@ -178,12 +204,12 @@ public final class DaemonLoggerFactory {
 
 		@Override
 		public ChildLog createChildLog() {
-			return new RequestChildLog(logOutputFolder, request, logFileId);
+			return new RequestChildLog(logOutputFolder, reporter, logFileId);
 		}
 
 		@Override
 		public ChildLog createChildLog(final String outputLogFilePath, final String errorLogFilePath) {
-			return new RequestChildLog(outputLogFilePath, errorLogFilePath, request, logFileId);
+			return new RequestChildLog(outputLogFilePath, errorLogFilePath, reporter, logFileId);
 		}
 	}
 

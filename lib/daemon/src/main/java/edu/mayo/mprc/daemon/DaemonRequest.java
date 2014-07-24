@@ -12,14 +12,6 @@ public interface DaemonRequest {
 	WorkPacket getWorkPacket();
 
 	/**
-	 * @return The log as set up on the sender side.
-	 * <p/>
-	 * The obtained {@link ParentLog} object should be set up in such way that when its {@link edu.mayo.mprc.utilities.log.ParentLog#createChildLog()}
-	 * method is run, the sender of the daemon request will be notified about this.
-	 */
-	ParentLog getParentLog();
-
-	/**
 	 * Sends an object response to the sender of the request.
 	 * There can be more than one response to a request, the last one has to have the isLast parameter
 	 * set to true.

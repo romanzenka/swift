@@ -50,7 +50,7 @@ public final class QuameterTask extends AsyncTaskBase {
 		setDescription("QuaMeter analysis of " + fileTokenFactory.fileToTaggedDatabaseToken(rawFile.getResultingFile())
 				+ " with search results " + fileTokenFactory.fileToTaggedDatabaseToken(idpQonvertTask.getResultingFile()));
 
-		return new QuameterWorkPacket(getFullId(), isFromScratch(),
+		return new QuameterWorkPacket(isFromScratch(),
 				rawFile.getResultingFile(), idpQonvertTask.getResultingFile(), true, maxFDR, getResultingFile(), publicSearchFiles);
 	}
 

@@ -12,7 +12,7 @@ import edu.mayo.mprc.daemon.files.FileTokenFactory;
 import edu.mayo.mprc.messaging.ResponseListener;
 import edu.mayo.mprc.messaging.ServiceFactory;
 import edu.mayo.mprc.utilities.FileUtilities;
-import edu.mayo.mprc.utilities.log.ChildLog;
+import edu.mayo.mprc.utilities.log.ParentLog;
 import org.apache.log4j.Logger;
 import org.springframework.stereotype.Component;
 
@@ -97,7 +97,8 @@ public final class GridRunner extends AbstractRunner {
 					new SgePacket(
 							serviceFactory.serializeRequest(request.getWorkPacket(), getDaemon().getResponseDispatcher(), allocatorListener)
 							, workerFactoryConfig
-							, fileTokenFactory.getDaemonConfigInfo());
+							, fileTokenFactory.getDaemonConfigInfo(),
+							getDaemonLoggerFactory().getLogFolder());
 
 			writeWorkerAllocatorInputObject(daemonWorkerAllocatorInputFile, gridDaemonAllocatorInputObject);
 
@@ -114,11 +115,15 @@ public final class GridRunner extends AbstractRunner {
 			// Report the information about the running task to the caller, making sure they get the task id and the logs
 			final AssignedTaskData data = new AssignedTaskData(requestId);
 
-			// Report the assigned ID
-			sendResponse(request, new DaemonProgressMessage(DaemonProgress.UserSpecificProgressInfo, data), false);
+			final RunnerProgressReporter reporter = new RunnerProgressReporter(this, request);
 
-			// Report that we spawned a child with its own SGE log
-			request.getParentLog().createChildLog(gridWorkPacket.getOutputLogFilePath(), gridWorkPacket.getErrorLogFilePath());
+			// Report the assigned ID
+			reporter.reportProgress(data);
+
+			final ParentLog log = getDaemonLoggerFactory().createLog(request.getWorkPacket().getTaskId(), reporter);
+
+			// Report that we spawned a child with its own SGE log, we use the SGE-based log paths for this
+			log.createChildLog(gridWorkPacket.getOutputLogFilePath(), gridWorkPacket.getErrorLogFilePath());
 
 			// We are not done yet! The grid work packet's progress listener will get called when the state of the task changes,
 			// and either mark the task failed or successful.
@@ -273,7 +278,7 @@ public final class GridRunner extends AbstractRunner {
 		gridWorkPacket.setMemoryRequirement(memoryRequirement);
 
 		gridWorkPacket.setWorkingFolder(new File(".").getAbsolutePath());
-		gridWorkPacket.setLogFolder(FileUtilities.getDateBasedDirectory(getLogDirectory(), new Date()).getAbsolutePath());
+		gridWorkPacket.setLogFolder(FileUtilities.getDateBasedDirectory(getDaemonLoggerFactory().getLogFolder(), new Date()).getAbsolutePath());
 
 		return gridWorkPacket;
 	}
@@ -460,6 +465,7 @@ public final class GridRunner extends AbstractRunner {
 			runner.setWrapperScript(getAbsoluteExecutablePath(config));
 			runner.setWorkerFactoryConfig(config.getWorkerConfiguration());
 			runner.setFileTokenFactory(fileTokenFactory);
+			runner.setDaemonLoggerFactory(new DaemonLoggerFactory(new File(config.getLogOutputFolder())));
 
 			return runner;
 		}

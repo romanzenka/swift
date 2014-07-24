@@ -76,7 +76,7 @@ public final class TestMascotDaemonWorker {
 
 		final Worker worker = factory.create(config, null);
 
-		final MascotWorkPacket workPacket = new MascotWorkPacket(mascotOut, mascotParams, inputMgfFile, TEST_MASCOT_DB, "0", false, false);
+		final MascotWorkPacket workPacket = new MascotWorkPacket(mascotOut, mascotParams, inputMgfFile, TEST_MASCOT_DB, false, false);
 		WorkPacketBase.simulateTransfer(workPacket);
 
 		worker.processRequest(workPacket, new ProgressReporter() {

@@ -2,6 +2,8 @@ package edu.mayo.mprc.daemon;
 
 import edu.mayo.mprc.daemon.worker.WorkPacketBase;
 
+import java.util.UUID;
+
 /**
  * When a cache gets this packet, it removes its cached data.
  *
@@ -9,10 +11,10 @@ import edu.mayo.mprc.daemon.worker.WorkPacketBase;
  */
 public final class CleanupCacheWorkPacket extends WorkPacketBase {
 	/**
-	 * @param taskId      Task identifier to be used for nested diagnostic context when logging.
+	 * @param taskId      Task identifier for logging.
 	 * @param fromScratch
 	 */
-	public CleanupCacheWorkPacket(String taskId, boolean fromScratch) {
-		super(taskId, fromScratch);
+	public CleanupCacheWorkPacket(UUID taskId, boolean fromScratch) {
+		super(fromScratch);
 	}
 }

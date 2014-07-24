@@ -4,7 +4,6 @@ import edu.mayo.mprc.daemon.CachableWorkPacket;
 import edu.mayo.mprc.daemon.WorkCache;
 import edu.mayo.mprc.daemon.worker.WorkPacket;
 import edu.mayo.mprc.daemon.worker.WorkPacketBase;
-import edu.mayo.mprc.utilities.FileUtilities;
 import edu.mayo.mprc.utilities.progress.ProgressReporter;
 
 import java.io.File;
@@ -25,27 +24,24 @@ public final class RawToMgfWorkPacket extends WorkPacketBase implements Cachable
 	private File inputFile;
 	private boolean publicAccess;
 
-	public RawToMgfWorkPacket(final String taskId, final boolean fromScratch) {
-		super(taskId, fromScratch);
+	public RawToMgfWorkPacket(final boolean fromScratch) {
+		super(fromScratch);
 	}
 
 	/**
 	 * Request to convert a .RAW file to .mgf file.
-	 *
-	 * @param outputFile   This is the desired target of the output. The cache can overwrite this to anything it sees fit.
-	 *                     If that happens, a {@link edu.mayo.mprc.raw2mgf.RawToMgfResult} class is sent back
+	 *  @param outputFile   This is the desired target of the output. The cache can overwrite this to anything it sees fit.
+	 *                     If that happens, a {@link RawToMgfResult} class is sent back
 	 *                     as progress report.
 	 * @param publicAccess If the .mgf caching is enabled, the files will never be visible to the end user.
-	 *                     This parameter ensures the file will be provided.
 	 */
 	public RawToMgfWorkPacket(final String params,
 	                          final File outputFile,
 	                          final boolean bSkipIfExists,
 	                          final File inputFile,
-	                          final String taskId,
 	                          final boolean fromScratch,
 	                          final boolean publicAccess) {
-		super(taskId, fromScratch);
+		super(fromScratch);
 
 		assert params != null : "Raw2MGF request cannot be created: parameters are null";
 		assert outputFile != null : "Raw2MGF request cannot be created: output file is null";
@@ -99,7 +95,6 @@ public final class RawToMgfWorkPacket extends WorkPacketBase implements Cachable
 				new File(cacheFolder, canonicalOutput),
 				isSkipIfExists(),
 				getInputFile(),
-				getTaskId(),
 				isFromScratch(),
 				/*public access*/false);
 	}

@@ -14,8 +14,8 @@ public final class ReportUtilsTest {
 
 	@Test
 	public void shouldConvertTokens() {
-		final DaemonConfigInfo info = new DaemonConfigInfo("my daemon", "/mnt/raid1", "/tmp/log");
-		final DaemonConfigInfo dbInfo = new DaemonConfigInfo("database daemon", "/mnt/raid1", "/tmp/log");
+		final DaemonConfigInfo info = new DaemonConfigInfo("my daemon", "/mnt/raid1");
+		final DaemonConfigInfo dbInfo = new DaemonConfigInfo("database daemon", "/mnt/raid1");
 		final DatabaseFileTokenFactory tokenFactory = new DatabaseFileTokenFactory(info);
 		tokenFactory.setDatabaseDaemonConfigInfo(dbInfo);
 		Assert.assertEquals(

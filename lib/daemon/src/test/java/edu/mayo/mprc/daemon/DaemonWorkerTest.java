@@ -69,7 +69,7 @@ public final class DaemonWorkerTest {
 		private String value;
 
 		private StringWorkPacket(final String value) {
-			super(value, false);
+			super(false);
 			this.value = value;
 		}
 

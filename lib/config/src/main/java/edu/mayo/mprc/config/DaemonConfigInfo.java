@@ -13,15 +13,13 @@ public final class DaemonConfigInfo implements Serializable {
 	private static final long serialVersionUID = 20101119L;
 	private String daemonId;
 	private String sharedFileSpacePath;
-	private String sharedLogPath;
 
 	public DaemonConfigInfo() {
 	}
 
-	public DaemonConfigInfo(final String daemonId, final String sharedFileSpacePath, final String sharedLogPath) {
+	public DaemonConfigInfo(final String daemonId, final String sharedFileSpacePath) {
 		this.daemonId = daemonId;
 		setSharedFileSpacePath(sharedFileSpacePath);
-		setSharedLogPath(sharedLogPath);
 	}
 
 	private static String toCanonical(final String path) {
@@ -53,17 +51,6 @@ public final class DaemonConfigInfo implements Serializable {
 
 	public void setSharedFileSpacePath(final String sharedFileSpacePath) {
 		this.sharedFileSpacePath = toCanonical(sharedFileSpacePath);
-	}
-
-	public String getSharedLogPath() {
-		if (sharedLogPath != null && sharedLogPath.isEmpty()) {
-			sharedLogPath = null;
-		}
-		return sharedLogPath;
-	}
-
-	public void setSharedLogPath(final String sharedLogPath) {
-		this.sharedLogPath = toCanonical(sharedLogPath);
 	}
 
 	@Override

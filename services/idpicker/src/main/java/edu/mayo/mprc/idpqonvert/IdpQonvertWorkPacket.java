@@ -4,7 +4,6 @@ import edu.mayo.mprc.daemon.CachableWorkPacket;
 import edu.mayo.mprc.daemon.WorkCache;
 import edu.mayo.mprc.daemon.worker.WorkPacket;
 import edu.mayo.mprc.daemon.worker.WorkPacketBase;
-import edu.mayo.mprc.utilities.FileUtilities;
 import edu.mayo.mprc.utilities.progress.ProgressReporter;
 
 import java.io.File;
@@ -43,23 +42,22 @@ public final class IdpQonvertWorkPacket extends WorkPacketBase implements Cachab
 	 */
 	private File referencedFileFolder;
 
-	public IdpQonvertWorkPacket(final String taskId, final boolean fromScratch) {
-		super(taskId, fromScratch);
+	public IdpQonvertWorkPacket(final boolean fromScratch) {
+		super(fromScratch);
 	}
 
 	/**
 	 * Request to convert a .pepXML file into .idp file
 	 *
 	 * @param outputFile This is the desired target of the output. The cache can overwrite this to anything it sees fit.
-	 *                   If that happens, a {@link IdpQonvertResult} class is sent back
+	 *                   If that happens, a {@link edu.mayo.mprc.idpqonvert.IdpQonvertResult} class is sent back
 	 *                   as progress report.
 	 */
 	public IdpQonvertWorkPacket(final File outputFile, final IdpQonvertSettings params, final File inputFile,
 	                            final File fastaFile,
 	                            final File referencedFileFolder,
-	                            final String taskId,
 	                            final boolean fromScratch) {
-		super(taskId, fromScratch);
+		super(fromScratch);
 
 		this.inputFile = inputFile;
 		this.params = params;
@@ -113,7 +111,6 @@ public final class IdpQonvertWorkPacket extends WorkPacketBase implements Cachab
 				inputFile,
 				fastaFile,
 				referencedFileFolder,
-				getTaskId(),
 				isFromScratch());
 	}
 

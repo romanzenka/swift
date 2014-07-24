@@ -85,7 +85,7 @@ public class TestTandem {
 
 			final File resultFile = new File(tandemOut, "tandemResult.xml");
 
-			final XTandemWorkPacket workPacket = new XTandemWorkPacket(inputMgfFile, tandemParams, resultFile, fastaFile, false, "0", false);
+			final XTandemWorkPacket workPacket = new XTandemWorkPacket(inputMgfFile, tandemParams, resultFile, fastaFile, false, false);
 			WorkPacketBase.simulateTransfer(workPacket);
 
 			worker.processRequest(workPacket, new ProgressReporter() {

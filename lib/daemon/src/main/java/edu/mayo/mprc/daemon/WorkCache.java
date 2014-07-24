@@ -164,7 +164,7 @@ public abstract class WorkCache<T extends WorkPacket> implements NoLoggingWorker
 
 		final WorkPacket modifiedWorkPacket = originalPacket.translateToCachePacket(wipFolder);
 
-		final MyProgressListener listener = new MyProgressListener(lookupPacket, originalPacket, wipFolder, newReporter);
+		final ProgressListener listener = new MyProgressListener(lookupPacket, originalPacket, wipFolder, newReporter);
 		daemon.sendWork(modifiedWorkPacket, listener);
 	}
 
@@ -297,6 +297,7 @@ public abstract class WorkCache<T extends WorkPacket> implements NoLoggingWorker
 
 		@Override
 		public void userProgressInformation(final ProgressInfo progressInfo) {
+			// When we get progress info about
 			// Let the cache know what happened
 			WorkCache.this.userProgressInformation(wipFolder, progressInfo);
 			reporter.reportProgress(progressInfo);

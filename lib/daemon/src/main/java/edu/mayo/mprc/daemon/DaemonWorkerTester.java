@@ -7,7 +7,6 @@ import edu.mayo.mprc.daemon.files.FileTokenFactory;
 import edu.mayo.mprc.daemon.worker.WorkPacket;
 import edu.mayo.mprc.daemon.worker.Worker;
 import edu.mayo.mprc.daemon.worker.WorkerFactory;
-import edu.mayo.mprc.daemon.worker.log.DaemonLoggerFactory;
 import edu.mayo.mprc.messaging.ActiveMQConnectionPool;
 import edu.mayo.mprc.messaging.ResponseDispatcher;
 import edu.mayo.mprc.messaging.Service;
@@ -69,7 +68,7 @@ public final class DaemonWorkerTester implements Lifecycle {
 		service = serviceFactory.createService(queueName, responseDispatcher);
 		final FileTokenFactory fileTokenFactory = new FileTokenFactory();
 		String logFolder = "shared/log";
-		fileTokenFactory.setDaemonConfigInfo(new DaemonConfigInfo("daemon1", "shared", logFolder));
+		fileTokenFactory.setDaemonConfigInfo(new DaemonConfigInfo("daemon1", "shared"));
 		daemonConnection = new DirectDaemonConnection(service, fileTokenFactory, new DaemonLoggerFactory(new File(logFolder)));
 		runner.setDaemonConnection(daemonConnection);
 	}

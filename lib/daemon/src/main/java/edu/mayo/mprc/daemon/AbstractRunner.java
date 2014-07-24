@@ -35,6 +35,7 @@ public abstract class AbstractRunner implements Checkable, Installable, Lifecycl
 	private Daemon daemon;
 	private ExecutorService executorService;
 	private SynchronousRequestReceiver receiver;
+	private DaemonLoggerFactory daemonLoggerFactory;
 
 	public abstract boolean isEnabled();
 
@@ -115,7 +116,7 @@ public abstract class AbstractRunner implements Checkable, Installable, Lifecycl
 			return;
 		}
 		try {
-			NDC.push(request.getWorkPacket().getTaskId());
+			NDC.push(request.getWorkPacket().getTaskId().toString());
 			requestCount.incrementAndGet();
 
 			sendResponse(request, new DaemonProgressMessage(DaemonProgress.RequestEnqueued), false);
@@ -191,15 +192,19 @@ public abstract class AbstractRunner implements Checkable, Installable, Lifecycl
 		}
 	}
 
-	public File getLogDirectory() {
-		return getDaemon().getLogOutputFolder();
-	}
-
 	public Daemon getDaemon() {
 		return daemon;
 	}
 
 	public void setDaemon(final Daemon daemon) {
 		this.daemon = daemon;
+	}
+
+	public DaemonLoggerFactory getDaemonLoggerFactory() {
+		return daemonLoggerFactory;
+	}
+
+	public void setDaemonLoggerFactory(final DaemonLoggerFactory daemonLoggerFactory) {
+		this.daemonLoggerFactory = daemonLoggerFactory;
 	}
 }

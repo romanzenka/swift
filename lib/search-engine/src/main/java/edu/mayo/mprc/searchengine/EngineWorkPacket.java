@@ -40,12 +40,12 @@ public abstract class EngineWorkPacket extends WorkPacketBase implements Cachabl
 	private File inputFile;
 	private boolean publishResultFiles;
 
-	public EngineWorkPacket(final String taskId, final boolean fromScratch) {
-		super(taskId, fromScratch);
+	public EngineWorkPacket(final boolean fromScratch) {
+		super(fromScratch);
 	}
 
-	public EngineWorkPacket(final File inputFile, final File outputFile, final String searchParams, final File databaseFile, final boolean publishResultFiles, final String taskId, final boolean fromScratch) {
-		super(taskId, fromScratch);
+	public EngineWorkPacket(final File inputFile, final File outputFile, final String searchParams, final File databaseFile, final boolean publishResultFiles, final boolean fromScratch) {
+		super(fromScratch);
 
 		assert outputFile != null : "output file was null.";
 		assert inputFile != null : "input file was null";

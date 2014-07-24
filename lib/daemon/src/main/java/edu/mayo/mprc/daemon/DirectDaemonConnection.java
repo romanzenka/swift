@@ -5,10 +5,8 @@ import edu.mayo.mprc.daemon.exception.DaemonException;
 import edu.mayo.mprc.daemon.files.FileTokenFactory;
 import edu.mayo.mprc.daemon.files.FileTokenHolder;
 import edu.mayo.mprc.daemon.worker.WorkPacket;
-import edu.mayo.mprc.daemon.worker.log.DaemonLoggerFactory;
 import edu.mayo.mprc.messaging.Request;
 import edu.mayo.mprc.messaging.Service;
-import edu.mayo.mprc.utilities.log.ParentLog;
 import edu.mayo.mprc.utilities.progress.ProgressListener;
 
 import java.io.Serializable;
@@ -74,7 +72,7 @@ final class DirectDaemonConnection implements DaemonConnection {
 		try {
 			final int number = listenerNumber.incrementAndGet();
 			service.sendRequest(workPacket, priority, new DaemonResponseListener(listener, "R#" + number, this));
-		} catch (MprcException e) {
+		} catch (final MprcException e) {
 			// SWALLOWED: The exception is reported directly to the listener
 			listener.requestTerminated(new DaemonException(e));
 		}
@@ -88,7 +86,7 @@ final class DirectDaemonConnection implements DaemonConnection {
 
 		final Request request = service.receiveRequest(timeout);
 		if (request != null) {
-			return new MyDaemonRequest(request, fileTokenFactory, daemonLoggerFactory.createLog(request));
+			return new MyDaemonRequest(request, fileTokenFactory);
 		}
 		return null;
 	}
@@ -114,11 +112,9 @@ final class DirectDaemonConnection implements DaemonConnection {
 
 	private static final class MyDaemonRequest implements DaemonRequest {
 		private Request request;
-		private ParentLog parentLog;
 
-		private MyDaemonRequest(final Request request, final FileTokenFactory fileTokenFactory, final ParentLog parentLog) {
+		private MyDaemonRequest(final Request request, final FileTokenFactory fileTokenFactory) {
 			this.request = request;
-			this.parentLog = parentLog;
 
 			if (request.getMessageData() instanceof FileTokenHolder) {
 				final FileTokenHolder fileTokenHolder = (FileTokenHolder) request.getMessageData();
@@ -129,11 +125,6 @@ final class DirectDaemonConnection implements DaemonConnection {
 		@Override
 		public WorkPacket getWorkPacket() {
 			return (WorkPacket) request.getMessageData();
-		}
-
-		@Override
-		public ParentLog getParentLog() {
-			return parentLog.createChildLog();
 		}
 
 		@Override

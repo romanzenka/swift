@@ -85,7 +85,7 @@ public final class XTandemWorker extends WorkerBase {
 			throw new MprcException("Could not read parameters file " + searchParamsFile.getAbsolutePath(), e);
 		}
 
-		final XTandemWorkPacket packet = new XTandemWorkPacket(inputFile, searchParams, outputFile, databaseFile, false, "1", false);
+		final XTandemWorkPacket packet = new XTandemWorkPacket(inputFile, searchParams, outputFile, databaseFile, false, false);
 
 		worker.processRequest(packet, new ProgressReporter() {
 			@Override

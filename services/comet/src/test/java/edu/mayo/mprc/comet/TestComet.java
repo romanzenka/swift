@@ -88,7 +88,7 @@ public class TestComet {
 
 			final File resultFile = new File(cometOut, "result.pep.xml");
 
-			final CometWorkPacket workPacket = new CometWorkPacket(inputMzmlFile, cometParams, resultFile, fastaFile, false, "0", false);
+			final CometWorkPacket workPacket = new CometWorkPacket(inputMzmlFile, cometParams, resultFile, fastaFile, false, false);
 			WorkPacketBase.simulateTransfer(workPacket);
 
 			worker.processRequest(workPacket, new ProgressReporter() {

@@ -47,7 +47,7 @@ public interface CachableWorkPacket extends WorkPacket {
 	/**
 	 * The original work packet requested files somewhere.
 	 * Translate the work packet to one that requests the files to be put into the work in progress folder of the cache.
-	 * This translation should also make the ouput file name canonical - depending solely on the input parameters.
+	 * This translation should also make the output file name canonical - depending solely on the input parameters.
 	 * This way if user requests two runs with two differently named output files, we can hit the same cache and rename
 	 * the files for them if they so desire.
 	 *

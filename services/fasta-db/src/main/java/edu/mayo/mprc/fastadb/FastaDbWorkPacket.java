@@ -13,7 +13,7 @@ public final class FastaDbWorkPacket extends WorkPacketBase {
 	private int curationId;
 
 	public FastaDbWorkPacket(final String taskId, final boolean fromScratch) {
-		super(taskId, fromScratch);
+		super(fromScratch);
 	}
 
 	/**
@@ -21,7 +21,7 @@ public final class FastaDbWorkPacket extends WorkPacketBase {
 	 * @param curationId ID of the curation to deploy.
 	 */
 	public FastaDbWorkPacket(final String taskId, final int curationId) {
-		super(taskId, false);
+		super(false);
 		this.curationId = curationId;
 	}
 

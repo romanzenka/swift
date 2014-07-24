@@ -8,7 +8,6 @@ import edu.mayo.mprc.daemon.worker.WorkPacketBase;
 import edu.mayo.mprc.daemon.worker.Worker;
 import edu.mayo.mprc.integration.Installer;
 import edu.mayo.mprc.utilities.FileUtilities;
-import edu.mayo.mprc.utilities.log.ChildLog;
 import edu.mayo.mprc.utilities.log.ParentLog;
 import edu.mayo.mprc.utilities.log.SimpleParentLog;
 import edu.mayo.mprc.utilities.progress.ProgressInfo;
@@ -84,7 +83,7 @@ public class TestRawToMgf {
 
 			final String params = "-Z -V -MP100.00 -F1 -L20000 -EA100 -S1 -I10 -G1";
 
-			final RawToMgfWorkPacket workPacket = new RawToMgfWorkPacket(params, mgfFile, false, rawFile, "0", false, false);
+			final RawToMgfWorkPacket workPacket = new RawToMgfWorkPacket(params, mgfFile, false, rawFile, false, false);
 			WorkPacketBase.simulateTransfer(workPacket);
 
 			simpleDaemonWorker.processRequest(workPacket, new ProgressReporter() {

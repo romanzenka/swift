@@ -3,7 +3,6 @@ package edu.mayo.mprc.qa;
 import edu.mayo.mprc.daemon.CachableWorkPacket;
 import edu.mayo.mprc.daemon.worker.WorkPacket;
 import edu.mayo.mprc.daemon.worker.WorkPacketBase;
-import edu.mayo.mprc.utilities.FileUtilities;
 import edu.mayo.mprc.utilities.progress.ProgressReporter;
 
 import java.io.File;
@@ -34,14 +33,14 @@ public final class RAWDumpWorkPacket extends WorkPacketBase implements CachableW
 	public static final String SAMPLE_INFORMATION_FILE_SUFFIX = ".sample.tsv";
 	public static final String ERROR_LOG_FILE_SUFFIX = ".error.tsv";	
 
-	public RAWDumpWorkPacket(final String taskId, final boolean fromScratch) {
-		super(taskId, fromScratch);
+	public RAWDumpWorkPacket(final boolean fromScratch) {
+		super(fromScratch);
 	}
 
 	public RAWDumpWorkPacket(final File rawFile, final File rawInfoFile, final File rawSpectraFile, final File chromatogramFile,
 	                         final File tuneMethodFile, final File instrumentMethodFile, final File sampleInformationFile, final File errorLogFile,
-	                         final String taskId, final boolean fromScratch) {
-		super(taskId, fromScratch);
+	                         final boolean fromScratch) {
+		super(fromScratch);
 
 		assert rawFile != null : "Raw input file can not be null.";
 		assert rawInfoFile != null : "Info output file must be defined.";
@@ -153,7 +152,6 @@ public final class RAWDumpWorkPacket extends WorkPacketBase implements CachableW
 				getExpectedInstrumentMethodFile(cacheFolder, getRawFile()),
 				getExpectedSampleInformationFile(cacheFolder, getRawFile()),
 				getExpectedErrorLogFile(cacheFolder, getRawFile()),
-				getTaskId(),
 				isFromScratch()
 		);
 	}
