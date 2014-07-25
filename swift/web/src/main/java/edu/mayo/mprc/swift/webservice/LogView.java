@@ -126,7 +126,7 @@ public final class LogView {
 			for (final String line : lines) {
 				final Matcher matcher = TIME_STAMP.matcher(line);
 				if (matcher.matches()) {
-					final String dateTime = matcher.group(1);
+					final String dateTime = matcher.group(1) + ' ' + matcher.group(2);
 					try {
 						final Date date = DATE_FORMAT.parse(dateTime);
 						if (date.before(min)) {
@@ -134,7 +134,7 @@ public final class LogView {
 						}
 						if (max == null) {
 							max = date;
-						} else if (max.after(date)) {
+						} else if (max.before(date)) {
 							max = date;
 						}
 					} catch (final ParseException ignore) {
