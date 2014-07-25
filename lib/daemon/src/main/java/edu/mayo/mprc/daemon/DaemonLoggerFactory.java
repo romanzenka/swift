@@ -152,7 +152,7 @@ public final class DaemonLoggerFactory {
 		private LogWriterAppender newOutWriterAppender() {
 			try {
 				final LogWriterAppender logWriterAppender = new LogWriterAppender(new FileWriter(standardOutFile.getAbsoluteFile()));
-				logWriterAppender.setLayout(new PatternLayout("%d{ISO8601}\t%m\n"));
+				logWriterAppender.setLayout(new PatternLayout("%d{ISO8601} %m\n"));
 				return logWriterAppender;
 			} catch (final IOException e) {
 				throw new MprcException("Could not start logging", e);
@@ -162,7 +162,7 @@ public final class DaemonLoggerFactory {
 		private LogWriterAppender newErrorWriterAppender() {
 			try {
 				final LogWriterAppender logWriterAppender = new LogWriterAppender(new FileWriter(standardErrorFile.getAbsoluteFile()));
-				logWriterAppender.setLayout(new PatternLayout("%d{ISO8601}\t%m\n"));
+				logWriterAppender.setLayout(new PatternLayout("%d{ISO8601} %m\n"));
 				return logWriterAppender;
 			} catch (final IOException e) {
 				throw new MprcException("Could not start logging", e);
