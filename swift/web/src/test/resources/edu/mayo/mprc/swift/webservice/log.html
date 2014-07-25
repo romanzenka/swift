@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title>Log file for task</title>
+    <style type="text/css">
+        log {
+            font-family: Consolas, Monaco, Lucida Console, monospace;
+            font-size: 12px;
+        }
+
+        row {
+            position: relative;
+            display: block;
+        }
+
+        prg {
+            display: block;
+            background-color: #efe;
+            position: absolute;
+            left: 0px;
+            top: 0px;
+            z-index: -1;
+            height: 12px;
+        }
+
+        time {
+            display: inline;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+<h3>File %s</h3>
+<log>
+    <row>
+        <time title="%date%">%time%</time>
+        %row%
+        <prg style="width: 200px"></prg>
+    </row>
+    <row>
+        <time title="%date%">%time%</time>
+        %row%
+        <prg style="width: 200px"></prg>
+    </row>
+</log>
+</body>
+</html>
