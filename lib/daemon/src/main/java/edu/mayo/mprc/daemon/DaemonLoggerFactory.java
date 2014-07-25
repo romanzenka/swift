@@ -112,6 +112,7 @@ public final class DaemonLoggerFactory {
 		}
 
 		public RequestChildLog(final String outputLogFilePath, final String errorLogFilePath, final UserProgressReporter reporter, final UUID parentLogId) {
+			logFileId = UUID.randomUUID();
 			initialize(new File(outputLogFilePath), new File(errorLogFilePath), reporter, parentLogId);
 		}
 

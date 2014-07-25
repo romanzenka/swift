@@ -3,6 +3,7 @@ package edu.mayo.mprc.sge;
 import com.google.common.base.Strings;
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.xml.DomDriver;
+import edu.mayo.mprc.MprcException;
 import edu.mayo.mprc.config.*;
 import edu.mayo.mprc.config.ui.FactoryDescriptor;
 import edu.mayo.mprc.config.ui.ServiceUiFactory;
@@ -130,6 +131,7 @@ public final class GridRunner extends AbstractRunner {
 		} catch (Exception t) {
 			FileUtilities.quietDelete(daemonWorkerAllocatorInputFile);
 			final DaemonException daemonException = new DaemonException("Failed passing work packet " + gridWorkPacket.toString() + " to grid engine", t);
+			LOGGER.error(MprcException.getDetailedMessage(daemonException), daemonException);
 			sendResponse(request, daemonException, true);
 			throw daemonException;
 		}
