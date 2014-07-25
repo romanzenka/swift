@@ -37,7 +37,7 @@ public final class LogView {
 	@Resource(name = "fileTokenFactory")
 	private DatabaseFileTokenFactory fileTokenFactory;
 
-	private static final Pattern TIME_STAMP = Pattern.compile("^(\\d{1,4}-\\d{1,2}-\\d{1,2}) (\\d{1,2}:\\d{1,2}:\\d{1,2},\\d{1,3}) (.*)");
+	private static final Pattern TIME_STAMP = Pattern.compile("^(\\d{1,4}-\\d{1,2}-\\d{1,2}) (\\d{1,2}:\\d{1,2}:\\d{1,2},\\d{1,3})\\s(.*)");
 	private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss,SSS");
 
 	enum LogType {
