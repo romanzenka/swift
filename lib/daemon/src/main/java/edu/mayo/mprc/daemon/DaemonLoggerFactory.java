@@ -6,6 +6,7 @@ import edu.mayo.mprc.daemon.worker.log.LogWriterAppender;
 import edu.mayo.mprc.daemon.worker.log.NewLogFiles;
 import edu.mayo.mprc.messaging.Request;
 import edu.mayo.mprc.utilities.FileUtilities;
+import edu.mayo.mprc.utilities.MonitorUtilities;
 import edu.mayo.mprc.utilities.log.ChildLog;
 import edu.mayo.mprc.utilities.log.ParentLog;
 import edu.mayo.mprc.utilities.progress.UserProgressReporter;
@@ -147,6 +148,8 @@ public final class DaemonLoggerFactory {
 			errorLogWriterAppender.addAllowedLevel(Level.ERROR);
 			errorLogWriterAppender.setAllowedMDCKey(mdcKey, mdcKey);
 			root.addAppender(errorLogWriterAppender);
+
+			LOGGER.info("Logging from " + MonitorUtilities.getHostInformation());
 		}
 
 		private LogWriterAppender newOutWriterAppender(final boolean fullFormat) {
