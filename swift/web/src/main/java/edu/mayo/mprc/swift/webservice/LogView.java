@@ -75,7 +75,7 @@ public final class LogView {
 					"\n" +
 					"        prg {\n" +
 					"            display: block;\n" +
-					"            background-color: #efe;\n" +
+					"            background-color: #dfd;\n" +
 					"            position: absolute;\n" +
 					"            left: 0px;\n" +
 					"            top: 0px;\n" +
@@ -110,7 +110,10 @@ public final class LogView {
 		}
 	}
 
-	private void printLogFile(final HttpServletResponse response, final ServletOutputStream outputStream, final File logFile) throws IOException {
+	/**
+	 * Print one log file.
+	 */
+	void printLogFile(final HttpServletResponse response, final ServletOutputStream outputStream, final File logFile) throws IOException {
 		outputStream.println(String.format("<h3>Log file %s</h3>", logFile.getAbsolutePath()));
 		outputStream.println("<log>");
 
@@ -143,13 +146,13 @@ public final class LogView {
 				}
 			}
 			final long minTime = min.getTime();
-			final long maxTime = max != null ? max.getTime() + 1 : new Date().getTime() + 1;
+			final long maxTime = max != null ? max.getTime() : new Date().getTime();
 			long prevTime = minTime;
 			long time = minTime;
 
 			for (final String line : lines) {
 				final Matcher matcher = TIME_STAMP.matcher(line);
-				if (matcher.matches()) {
+				if (matcher.matches() && maxTime > minTime) {
 					final String dateTime = matcher.group(1) + ' ' + matcher.group(2);
 					final String row = matcher.group(3);
 					Date date = null;
@@ -159,9 +162,11 @@ public final class LogView {
 						time = date.getTime();
 					} catch (final ParseException ignore) {
 						// SWALLOWED: We do not care
+						// Reset time to a reasonable value
+						time = prevTime;
 					}
 
-					final long width = (int) (1000.0 * (prevTime - minTime) / (maxTime - minTime));
+					final long width = (int) (1000.0 * (time - minTime) / (maxTime - minTime));
 					outputStream.println("<row>" +
 							"<time title=\"" + dateTime + "\">" + matcher.group(2) + "</time>" +
 							row +
