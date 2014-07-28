@@ -51,13 +51,22 @@ public final class DaemonWorkerTester implements Lifecycle {
 	 */
 	public DaemonWorkerTester(final Worker worker) {
 		this();
-		runner = new SimpleRunner();
+		initalizeRunner();
 		runner.setFactory(new TestWorkerFactory(worker));
 		runner.setExecutorService(getSingleThreadExecutor(worker));
-		final Daemon daemon = new Daemon();
-		daemon.setLogOutputFolder(FileUtilities.createTempFolder());
-		runner.setDaemon(daemon);
-		runner.setEnabled(true);
+	}
+
+	/**
+	 * Creates a test runner that runs given worker. Automatically starts running.
+	 *
+	 * @param workerFactory    Creates workers to run
+	 * @param numWorkerThreads How many threads does the worker run in
+	 */
+	public DaemonWorkerTester(final WorkerFactory workerFactory, final int numWorkerThreads) {
+		this();
+		initalizeRunner();
+		runner.setFactory(workerFactory);
+		runner.setExecutorService(new SimpleThreadPoolExecutor(numWorkerThreads, "test", true));
 	}
 
 	private static ExecutorService getSingleThreadExecutor(Worker worker) {
@@ -73,23 +82,13 @@ public final class DaemonWorkerTester implements Lifecycle {
 		runner.setDaemonConnection(daemonConnection);
 	}
 
-
-	/**
-	 * Creates a test runner that runs given worker. Automatically starts running.
-	 *
-	 * @param workerFactory    Creates workers to run
-	 * @param numWorkerThreads How many threads does the worker run in
-	 */
-	public DaemonWorkerTester(final WorkerFactory workerFactory, final int numWorkerThreads) {
-		this();
+	private void initalizeRunner() {
 		runner = new SimpleRunner();
-		runner.setFactory(workerFactory);
-		runner.setExecutorService(new SimpleThreadPoolExecutor(numWorkerThreads, "test", true));
 		final Daemon daemon = new Daemon();
 		daemon.setLogOutputFolder(FileUtilities.createTempFolder());
 		runner.setDaemon(daemon);
-		runner.setDaemonLoggerFactory(new DaemonLoggerFactory(daemon.getLogOutputFolder()));
 		runner.setEnabled(true);
+		runner.setDaemonLoggerFactory(new DaemonLoggerFactory(daemon.getLogOutputFolder()));
 	}
 
 	/**
