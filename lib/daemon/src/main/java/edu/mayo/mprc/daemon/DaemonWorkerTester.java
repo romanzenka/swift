@@ -88,6 +88,7 @@ public final class DaemonWorkerTester implements Lifecycle {
 		final Daemon daemon = new Daemon();
 		daemon.setLogOutputFolder(FileUtilities.createTempFolder());
 		runner.setDaemon(daemon);
+		runner.setDaemonLoggerFactory(new DaemonLoggerFactory(daemon.getLogOutputFolder()));
 		runner.setEnabled(true);
 	}
 

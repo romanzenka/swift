@@ -138,34 +138,42 @@ public final class DaemonLoggerFactory {
 			mdcKey = logFileId.toString();
 			MDC.put(mdcKey, mdcKey);
 
-			outLogWriterAppender = newOutWriterAppender();
+			outLogWriterAppender = newOutWriterAppender(true);
 			outLogWriterAppender.setAllowedMDCKey(mdcKey, mdcKey);
 			final Logger root = Logger.getLogger("edu.mayo.mprc");
 			root.addAppender(outLogWriterAppender);
 
-			errorLogWriterAppender = newErrorWriterAppender();
+			errorLogWriterAppender = newErrorWriterAppender(true);
 			errorLogWriterAppender.addAllowedLevel(Level.ERROR);
 			errorLogWriterAppender.setAllowedMDCKey(mdcKey, mdcKey);
 			root.addAppender(errorLogWriterAppender);
 		}
 
-		private LogWriterAppender newOutWriterAppender() {
+		private LogWriterAppender newOutWriterAppender(final boolean fullFormat) {
 			try {
 				final LogWriterAppender logWriterAppender = new LogWriterAppender(new FileWriter(standardOutFile.getAbsoluteFile()));
-				logWriterAppender.setLayout(new PatternLayout("%d{ISO8601} %m\n"));
+				setFormat(logWriterAppender, fullFormat);
 				return logWriterAppender;
 			} catch (final IOException e) {
 				throw new MprcException("Could not start logging", e);
 			}
 		}
 
-		private LogWriterAppender newErrorWriterAppender() {
+		private LogWriterAppender newErrorWriterAppender(final boolean fullFormat) {
 			try {
 				final LogWriterAppender logWriterAppender = new LogWriterAppender(new FileWriter(standardErrorFile.getAbsoluteFile()));
-				logWriterAppender.setLayout(new PatternLayout("%d{ISO8601} %m\n"));
+				setFormat(logWriterAppender, fullFormat);
 				return logWriterAppender;
 			} catch (final IOException e) {
 				throw new MprcException("Could not start logging", e);
+			}
+		}
+
+		private void setFormat(LogWriterAppender logWriterAppender, final boolean fullFormat) {
+			if (fullFormat) {
+				logWriterAppender.setLayout(new PatternLayout("%d{ISO8601} - %-5p %c{2} %M:%L %x - %m\n"));
+			} else {
+				logWriterAppender.setLayout(new PatternLayout("%d{ISO8601} %m\n"));
 			}
 		}
 
@@ -201,7 +209,7 @@ public final class DaemonLoggerFactory {
 				outLogger = Logger.getLogger(STD_OUT_FILE_PREFIX + logFileId);
 				outLogger.setLevel(Level.INFO);
 				outLogger.setAdditivity(false);
-				outLogger.addAppender(newOutWriterAppender());
+				outLogger.addAppender(newOutWriterAppender(false));
 			}
 			return outLogger;
 		}
@@ -212,7 +220,7 @@ public final class DaemonLoggerFactory {
 				errorLogger = Logger.getLogger(STD_ERR_FILE_PREFIX + logFileId);
 				errorLogger.setLevel(Level.ERROR);
 				errorLogger.setAdditivity(false);
-				errorLogger.addAppender(newErrorWriterAppender());
+				errorLogger.addAppender(newErrorWriterAppender(false));
 			}
 			return errorLogger;
 		}
