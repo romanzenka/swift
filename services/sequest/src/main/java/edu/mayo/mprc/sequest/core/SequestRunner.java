@@ -81,7 +81,7 @@ class SequestRunner implements Runnable, SequestCallerInterface {
 			newArgs.add(dta.getName());
 		}
 
-		LOGGER.debug("sequest caller processing " + sequestDtaFiles.size() + " dta files");
+		LOGGER.info("sequest caller processing " + sequestDtaFiles.size() + " dta files");
 
 		setArgs(newArgs);
 	}
@@ -282,7 +282,7 @@ class SequestRunner implements Runnable, SequestCallerInterface {
 		}
 		assert hostsFile != null : "Path to pvm_hosts file is not set";
 		final String userName = System.getProperties().getProperty("user.name");
-		LOGGER.debug("validating pvm for user [" + userName + "]");
+		LOGGER.info("validating pvm for user [" + userName + "]");
 		final PvmUtilities pvm = new PvmUtilities();
 		pvm.makeSurePVMOk(userName, hostsFile.getAbsolutePath(), PVM_DAEMON, "/tmp");
 	}

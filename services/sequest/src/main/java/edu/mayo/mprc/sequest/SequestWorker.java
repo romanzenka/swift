@@ -55,7 +55,7 @@ public final class SequestWorker extends WorkerBase {
 		final File finalOutputFile = sequestWorkPacket.getOutputFile();
 		final File outputFile = getTempOutputFile(tempWorkFolder, finalOutputFile);
 
-		LOGGER.debug("Starting sequest search"
+		LOGGER.info("Starting sequest search"
 				+ "\n\tinput file: " + sequestWorkPacket.getInputFile()
 				+ "\n\thdr file: " + sequestWorkPacket.getDatabaseFile()
 				+ "\n\toutput file: " + outputFile);
@@ -80,7 +80,7 @@ public final class SequestWorker extends WorkerBase {
 
 		publish(outputFile, finalOutputFile);
 
-		LOGGER.debug("Sequest search done");
+		LOGGER.info("Sequest search done");
 	}
 
 	public File getPvmHosts() {
