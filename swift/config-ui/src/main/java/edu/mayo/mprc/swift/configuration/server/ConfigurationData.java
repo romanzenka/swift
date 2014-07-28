@@ -8,6 +8,7 @@ import edu.mayo.mprc.common.client.GWTServiceException;
 import edu.mayo.mprc.config.*;
 import edu.mayo.mprc.config.ui.PropertyChangeListener;
 import edu.mayo.mprc.config.ui.ServiceUiFactory;
+import edu.mayo.mprc.config.ui.StringPropertyValues;
 import edu.mayo.mprc.daemon.MessageBroker;
 import edu.mayo.mprc.daemon.SimpleRunner;
 import edu.mayo.mprc.database.Database;
@@ -224,7 +225,7 @@ public class ConfigurationData {
 			final Map<String, String> initialValues = MapConfigWriter.save(resourceConfig, resolver);
 			final DefaultSettingUiBuilder builder = new DefaultSettingUiBuilder(initialValues, resolver);
 			uiFactory.createUI(parent, resourceConfig, builder);
-			MapConfigReader.load(resourceConfig, builder.getValues(), resolver);
+			MapConfigReader.load(resourceConfig, builder, resolver);
 		}
 		return resourceConfig;
 	}
@@ -471,7 +472,7 @@ public class ConfigurationData {
 	/**
 	 * @param parentFolder Root folder with Swift install.
 	 * @return File to save the config to. This should not match the config file the data was loaded FROM.
-	 *         Typically we want to provide a config file from a folder that Swift has write access to.
+	 * Typically we want to provide a config file from a folder that Swift has write access to.
 	 */
 	private File getConfigFileForSave(final File parentFolder) {
 		final File configFile = extractNewConfigFile(parentFolder).getAbsoluteFile();
@@ -486,7 +487,7 @@ public class ConfigurationData {
 		// Set the property on the config
 		final Map<String, String> data = MapConfigWriter.save(resourceConfig, resolver);
 		data.put(propertyName, newValue);
-		MapConfigReader.load(resourceConfig, data, resolver);
+		MapConfigReader.load(resourceConfig, new StringPropertyValues(data), resolver);
 
 		// Set the property on the corresponding model
 		final ResourceModel model = (ResourceModel) resolver.getDependencyFromId(resolver.getIdFromConfig(resourceConfig));

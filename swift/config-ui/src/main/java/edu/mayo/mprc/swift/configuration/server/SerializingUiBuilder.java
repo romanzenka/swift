@@ -54,6 +54,21 @@ public class SerializingUiBuilder implements UiBuilder, Serializable {
 	}
 
 	@Override
+	public UiBuilder propertyArray(String prefix, String displayName, String description) {
+		commands.add(UiBuilderReplayer.PROPERTY_ARRAY);
+		commands.add(prefix);
+		commands.add(displayName);
+		commands.add(description);
+		return this;
+	}
+
+	@Override
+	public UiBuilder propertyArrayEnd() {
+		commands.add(UiBuilderReplayer.PROPERTY_ARRAY_END);
+		return this;
+	}
+
+	@Override
 	public UiBuilder required() {
 		commands.add(UiBuilderReplayer.REQUIRED);
 		return this;
