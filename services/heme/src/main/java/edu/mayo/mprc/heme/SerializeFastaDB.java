@@ -15,6 +15,27 @@ import java.util.HashMap;
  */
 public class SerializeFastaDB {
 
+    public static void generate(File inFasta, String outObjPath){
+        try {
+            HashMap<String, String> cache = new HashMap<String, String>();
+            String strRead;
+            BufferedReader readbuffer = new BufferedReader( new FileReader(inFasta) );
+            while((strRead = readbuffer.readLine()) != null) {
+                if( strRead.charAt(0) == '>' )  {
+                    String[] definitionArr = strRead.split("\\s+");
+                    cache.put(definitionArr[0].substring(1), strRead);
+                }
+            }
+
+            ObjectOutputStream out = new ObjectOutputStream( new FileOutputStream(outObjPath) );
+            out.writeObject(cache);
+            out.close();
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
     public static void generate(String inFastaPath, String outObjPath){
         try {
             HashMap<String, String> cache = new HashMap<String, String>();
@@ -34,6 +55,20 @@ public class SerializeFastaDB {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    public static HashMap<String, String> load(String path){
+        HashMap<String, String> loadedObj = null;
+        try{
+            ObjectInputStream input = new ObjectInputStream( new FileInputStream(path) );
+            loadedObj = (HashMap<String, String>) input.readObject();
+        }
+        catch (IOException e) {
+            e.printStackTrace();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+        }
+        return loadedObj;
     }
 
 

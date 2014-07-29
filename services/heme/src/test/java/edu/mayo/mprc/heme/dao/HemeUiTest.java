@@ -104,7 +104,7 @@ public final class HemeUiTest {
 		HemeEntry hemeEntry = currentEntries.get(0);
 		Assert.assertEquals(hemeEntry.getTest().getName(), "PT1");
 		Assert.assertEquals(hemeEntry.getTest().getPath(), "20130905/PT1");
-		Assert.assertEquals(hemeEntry.getTest().getMassDelta(), 40.0);
+		Assert.assertEquals(hemeEntry.getTest().getMass(), 40.0);
 		Assert.assertEquals(hemeEntry.getStatus(), HemeTestStatus.NOT_STARTED);
 		Assert.assertEquals(hemeEntry.getDuration(), null);
 	}

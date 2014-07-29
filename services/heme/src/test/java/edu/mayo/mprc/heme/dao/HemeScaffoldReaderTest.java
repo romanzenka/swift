@@ -33,7 +33,7 @@ public final class HemeScaffoldReaderTest {
 			FastaDbDao fastaDbDao = mock(FastaDbDao.class);
 			stub(fastaDbDao.getProteinDescription(eq(database), anyString())).toReturn("Description of protein ##DeltaMass:1.0##");
 
-			HemeScaffoldReader reader = new HemeScaffoldReader(fastaDbDao, database);
+			HemeScaffoldReader reader = new HemeScaffoldReader(new File("cache.obj"));  // TODO -> change to cache file
 			reader.load(spectra, "3", null);
 			Collection<HemeReportEntry> entries = reader.getEntries();
 			Assert.assertEquals(entries.size(), 18);

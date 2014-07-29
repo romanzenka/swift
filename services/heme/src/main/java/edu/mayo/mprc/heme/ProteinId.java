@@ -24,7 +24,7 @@ public final class ProteinId {
 		return description;
 	}
 
-	public Double getMassDelta() {
+	public Double getMass() {
 		return massDelta;
 	}
 }

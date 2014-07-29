@@ -20,8 +20,8 @@ public final class HemeReport {
 	public HemeReport(final HemeTest hemeTest, final List<HemeReportEntry> withinRange, final List<HemeReportEntry> haveMassDelta, final List<HemeReportEntry> allOthers) {
 		this.name = hemeTest.getName();
 		this.date = hemeTest.getDate();
-		this.mass = hemeTest.getMassDelta();
-		this.massTolerance = hemeTest.getMassDeltaTolerance();
+		this.mass = hemeTest.getMass();
+		this.massTolerance = hemeTest.getMassTolerance();
 		this.withinRange = withinRange;
 		this.haveMassDelta = haveMassDelta;
 		this.allOthers = allOthers;
@@ -56,6 +56,6 @@ public final class HemeReport {
 	}
 
 	public boolean isMatch(final ProteinId id) {
-		return id.getMassDelta() != null && Math.abs(id.getMassDelta() - getMass()) <= getMassTolerance();
+		return id.getMass() != null && Math.abs(id.getMass() - getMass()) <= getMassTolerance();
 	}
 }

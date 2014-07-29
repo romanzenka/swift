@@ -94,12 +94,12 @@ public final class HemeService {
 		hemeUi.begin();
 		try {
 			HemeReport report = hemeUi.createReport(entry);
-            modelAndView.setViewName("heme/heme_report"); //Migrated to JSP
             modelAndView.addObject("report", report);
+            modelAndView.setViewName("heme/heme_report"); //Migrated to JSP
 			hemeUi.commit();
 		} catch (Exception e) {
 			hemeUi.rollback();
-			throw new MprcException("Could not start Swift search", e);
+			throw new MprcException("Could not view report for entry " + entry, e);
 		}
 
 		return modelAndView;

@@ -284,7 +284,7 @@ public final class HemeUi implements Dao {
 	 */
 	public void setMassDelta(final int testId, final double massDelta) {
 		final HemeTest test = getHemeDao().getTestForId(testId);
-		test.setMassDelta(massDelta);
+		test.setMass(massDelta);
 	}
 
 	/**
@@ -295,7 +295,7 @@ public final class HemeUi implements Dao {
 	 */
 	public void setMassDeltaTolerance(final int testId, final double massDeltaTolerance) {
 		final HemeTest test = getHemeDao().getTestForId(testId);
-		test.setMassDeltaTolerance(massDeltaTolerance);
+		test.setMassTolerance(massDeltaTolerance);
 	}
 
 	/**
@@ -314,10 +314,19 @@ public final class HemeUi implements Dao {
 		final SwiftSearchDefinition swiftSearchDefinition = swiftDao.getSwiftSearchDefinition(test.getSearchRun().getSwiftSearch());
 
 		final Curation dummyDatabase = new Curation();
-        dummyDatabase.setCurationFile(new File("/Users/m088378/Desktop/newHemePathDatabase2.fasta"));
-        final HemeScaffoldReader reader = new HemeScaffoldReader(fastaDbDao, dummyDatabase); // TODO - remove before deployment
+        //dummyDatabase.setCurationFile(new File("/Users/m088378/Desktop/newHemePathDatabase2.fasta"));
+        dummyDatabase.setCurationFile(new File("/Users/m088378/heme-data/HbVar-Unipro-1.0.fasta"));
+        File dbCache = new File("/Users/m088378/heme-data/HbVar-Unipro.obj");
+        if( !dbCache.exists() ){
+            SerializeFastaDB.generate(dummyDatabase.getFastaFile().getFile(), dbCache.toString());
+        }
+
+
+     //   final HemeScaffoldReader reader = new HemeScaffoldReader(fastaDbCache); // TODO - double check before deployment
+        final HemeScaffoldReader reader = new HemeScaffoldReader(dbCache); // TODO - double check before deployment
         // final HemeScaffoldReader reader = new HemeScaffoldReader(fastaDbDao, swiftSearchDefinition.getSearchParameters().getDatabase());
 		reader.load(scaffoldFile, "3", null);
+
 		final Collection<HemeReportEntry> entries = reader.getEntries();
 
 		// We split all entries into three:
@@ -327,13 +336,15 @@ public final class HemeUi implements Dao {
 		final List<HemeReportEntry> haveMassDelta = new ArrayList<HemeReportEntry>();
 		// Everyone else (contaminants?):
 		final List<HemeReportEntry> allOthers = new ArrayList<HemeReportEntry>();
-		for (final HemeReportEntry entry : entries) {
+
+        for (final HemeReportEntry entry : entries) {
 			boolean isInRange = false;
 			boolean hasMassDelta = false;
-			for (final ProteinId proteinId : entry.getProteinIds()) {
-				if (proteinId.getMassDelta() != null) {
+
+            for (final ProteinId proteinId : entry.getProteinIds()) {
+				if (proteinId.getMass() != null) {
 					hasMassDelta = true;
-					if (Math.abs(proteinId.getMassDelta() - test.getMassDelta()) <= test.getMassDeltaTolerance()) {
+					if (Math.abs(proteinId.getMass() - test.getMass()) <= test.getMassTolerance()) {
 						isInRange = true;
 						break;
 					}

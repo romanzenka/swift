@@ -78,7 +78,7 @@ public final class HemeReportView implements View {
 				}
 				outputStream.print("<td>" + id.getAccNum() + "</td>");
 				outputStream.print("<td>" + clearDeltaMass(id.getDescription()) + "</td>");
-				outputStream.print("<td>" + (id.getMassDelta() == null ? "" : id.getMassDelta()) + "</td>");
+				outputStream.print("<td>" + (id.getMass() == null ? "" : id.getMass()) + "</td>");
 				outputStream.print("</tr>");
 			}
 		}

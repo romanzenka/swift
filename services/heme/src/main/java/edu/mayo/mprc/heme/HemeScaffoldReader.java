@@ -1,9 +1,9 @@
 package edu.mayo.mprc.heme;
 
-import edu.mayo.mprc.dbcurator.model.Curation;
-import edu.mayo.mprc.fastadb.FastaDbDao;
 import edu.mayo.mprc.scaffoldparser.spectra.ScaffoldReportReader;
+import org.apache.log4j.Logger;
 
+import java.io.File;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -12,15 +12,19 @@ import java.util.regex.Pattern;
  * @author Roman Zenka
  */
 public class HemeScaffoldReader extends ScaffoldReportReader {
-	private int proteinAccessionNumbers;
-	private int numberOfTotalSpectra;
-	private static final Pattern DELTA_PATTERN = Pattern.compile(".*#DeltaMass:([^#]+)#.*");
-	private FastaDbDao fastaDao;
-	private Curation database;
+    private static final Logger LOGGER = Logger.getLogger(ScaffoldReportReader.class);
 
-	public HemeScaffoldReader(FastaDbDao fastaDao, Curation database) {
-		this.fastaDao = fastaDao;
-		this.database = database;
+    private int proteinAccessionNumbers;
+	private int numberOfTotalSpectra;
+//    private static final Pattern DELTA_PATTERN = Pattern.compile(".*#DeltaMass:([^#]+)#.*");
+    private static final Pattern MASS_PATTERN = Pattern.compile("(\\d+\\.\\d+)?"); //last double on line
+	private HashMap<String, String> databaseCache;
+
+	public HemeScaffoldReader(File cache) {
+
+
+        this.databaseCache = SerializeFastaDB.load(cache.getAbsolutePath());
+        //TODO - add code to check if cache exists? and if not create it? or somewhere else?
 	}
 
 	private Map<String, HemeReportEntry> entries = new HashMap<String, HemeReportEntry>(100);
@@ -50,17 +54,24 @@ public class HemeScaffoldReader extends ScaffoldReportReader {
 		final List<ProteinId> ids = new ArrayList<ProteinId>();
 		String accnumString = currentLine[proteinAccessionNumbers];
 		final Iterable<String> accNums = PROTEIN_ACCESSION_SPLITTER.split(accnumString);
-		for (final String accNum : accNums) {
+
+        for (final String accNum : accNums) {
 			final String description = getDescription(accNum);
-			final ProteinId id = new ProteinId(accNum, description, getMassDelta(description));
+            if(description == null){
+                LOGGER.warn(String.format("Database does not contain entry for accession number [%s]", accNum));
+                continue;
+            }
+			final ProteinId id = new ProteinId(accNum, description, getMassIsotopic(description)); //missing desc -> null results in error chain
 			ids.add(id);
 		}
 		final int totalSpectra = parseInt(currentLine[numberOfTotalSpectra]);
 
 		HemeReportEntry entry = entries.get(accnumString);
 		if (entry == null) {
-			entry = new HemeReportEntry(ids, totalSpectra);
-			entries.put(accnumString, entry);
+            if(!ids.isEmpty()) {
+		    	entry = new HemeReportEntry(ids, totalSpectra);
+			    entries.put(accnumString, entry);
+            }
 		} else {
 			entry.checkSpectra(totalSpectra);
 		}
@@ -72,16 +83,16 @@ public class HemeScaffoldReader extends ScaffoldReportReader {
 	 * Get description for a protein of given accession number
 	 */
 	private String getDescription(final String accNum) {
-//		return fastaDao.getProteinDescription(database, accNum);    //TODO - uncomment for PROD
-        return "?";
+        return databaseCache.get(accNum);
 	}
 
-	private static Double getMassDelta(final CharSequence description) {
-		final Matcher matcher = DELTA_PATTERN.matcher(description);
+	private static Double getMassIsotopic(final CharSequence description) {
+        final Matcher matcher = MASS_PATTERN.matcher(description);
 		if (matcher.matches()) {
-			final String delta = matcher.group(1);
+			final String isomass = matcher.group(1);
+            System.out.println(isomass);
 			try {
-				return Double.parseDouble(delta);
+				return Double.parseDouble(isomass);
 			} catch (NumberFormatException e) {
 				// SWALLOWED: this is expected
 				return null;
