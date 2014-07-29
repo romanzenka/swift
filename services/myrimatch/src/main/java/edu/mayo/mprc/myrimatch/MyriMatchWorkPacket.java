@@ -1,10 +1,8 @@
 package edu.mayo.mprc.myrimatch;
 
 import edu.mayo.mprc.MprcException;
-import edu.mayo.mprc.daemon.WorkCache;
 import edu.mayo.mprc.daemon.worker.WorkPacket;
 import edu.mayo.mprc.searchengine.EngineWorkPacket;
-import edu.mayo.mprc.utilities.FileUtilities;
 
 import java.io.File;
 
@@ -14,16 +12,16 @@ public final class MyriMatchWorkPacket extends EngineWorkPacket {
 
 	private String decoySequencePrefix;
 
-	public MyriMatchWorkPacket(final String taskId, final boolean fromScratch) {
-		super(taskId, fromScratch);
+	public MyriMatchWorkPacket(final boolean fromScratch) {
+		super(fromScratch);
 	}
 
 	/**
 	 * Encapsulates a packet of work for MyriMatch.
 	 */
 	public MyriMatchWorkPacket(final File outputFile, final String searchParams, final File inputFile, final File databaseFile,
-	                           final String decoySequencePrefix, final boolean publishSearchFiles, final String taskId, final boolean fromScratch) {
-		super(inputFile, outputFile, searchParams, databaseFile, publishSearchFiles, taskId, fromScratch);
+	                           final String decoySequencePrefix, final boolean publishSearchFiles, final boolean fromScratch) {
+		super(inputFile, outputFile, searchParams, databaseFile, publishSearchFiles, fromScratch);
 
 		if (inputFile == null) {
 			throw new MprcException("MyriMatch request cannot be created: The .mgf file was null");
@@ -54,7 +52,6 @@ public final class MyriMatchWorkPacket extends EngineWorkPacket {
 				getDatabaseFile(),
 				getDecoySequencePrefix(),
 				isPublishResultFiles(),
-				getTaskId(),
 				isFromScratch()
 		);
 	}

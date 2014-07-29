@@ -1,5 +1,7 @@
 package edu.mayo.mprc.config;
 
+import edu.mayo.mprc.MprcException;
+
 /**
  * The service manager allows the application to send a service a work packet. The service does the work
  * and responds.
@@ -7,21 +9,22 @@ package edu.mayo.mprc.config;
  * A service configuration on its own does not define how is the service provided. It is just an identified endpoint.
  * How the service is run is defined by a runner, which contains a link to the worker itself.
  */
-public final class ServiceConfig implements ResourceConfig, NamedResource {
+public final class ServiceConfig implements ResourceConfig, NamedResource, HierarchicalResource {
 	public static final String RUNNER = "runner";
 	public static final String NAME = "name";
 	public static final String TYPE = "service";
 
 	private String name;
 
+	private DaemonConfig parent;
 	private RunnerConfig runner;
 
 	public ServiceConfig() {
 	}
 
 	public ServiceConfig(final String name, final RunnerConfig runner) {
-		this.name = name;
-		this.runner = runner;
+		setName(name);
+		setRunner(runner);
 	}
 
 	@Override
@@ -40,6 +43,21 @@ public final class ServiceConfig implements ResourceConfig, NamedResource {
 
 	public void setRunner(final RunnerConfig runner) {
 		this.runner = runner;
+		this.runner.setParentConfig(this);
+	}
+
+	@Override
+	public DaemonConfig getParentConfig() {
+		return parent;
+	}
+
+	@Override
+	public void setParentConfig(final ResourceConfig parent) {
+		if (parent instanceof DaemonConfig) {
+			this.parent = (DaemonConfig) parent;
+		} else {
+			throw new MprcException(String.format("Service %s: the parent can only be a deamon, was given %s", getName(), parent.getClass().getName()));
+		}
 	}
 
 	@Override

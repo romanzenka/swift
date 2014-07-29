@@ -5,13 +5,15 @@ import edu.mayo.mprc.daemon.files.FileHolder;
 import edu.mayo.mprc.daemon.files.FileTokenFactory;
 import edu.mayo.mprc.daemon.files.FileTokenHolder;
 
+import java.util.UUID;
+
 /**
  * A base for all messaging packets.
  * Contains task identifier to be used in the nested diagnostic context.
  */
 public abstract class WorkPacketBase extends FileHolder implements WorkPacket {
 	private static final long serialVersionUID = 20071228L;
-	private String taskId;
+	private UUID taskId;
 	private int priority;
 	private boolean fromScratch;
 
@@ -22,11 +24,10 @@ public abstract class WorkPacketBase extends FileHolder implements WorkPacket {
 	private static final FileTokenFactory NULL_TOKEN_FACTORY = new FileTokenFactory(new DaemonConfigInfo("null daemon", ""));
 
 	/**
-	 * @param taskId      Task identifier to be used for nested diagnostic context when logging.
 	 * @param fromScratch
 	 */
-	public WorkPacketBase(final String taskId, final boolean fromScratch) {
-		this.taskId = taskId;
+	public WorkPacketBase(final boolean fromScratch) {
+		setTaskId(UUID.randomUUID());
 		this.fromScratch = fromScratch;
 	}
 
@@ -44,8 +45,13 @@ public abstract class WorkPacketBase extends FileHolder implements WorkPacket {
 	}
 
 	@Override
-	public String getTaskId() {
+	public UUID getTaskId() {
 		return taskId;
+	}
+
+	@Override
+	public void setTaskId(final UUID taskId) {
+		this.taskId = taskId;
 	}
 
 	@Override

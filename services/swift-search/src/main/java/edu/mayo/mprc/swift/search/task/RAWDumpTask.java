@@ -52,7 +52,7 @@ public final class RAWDumpTask extends AsyncTaskBase {
 		return new RAWDumpWorkPacket(rawFile,
 				rawInfoFile, rawSpectraFile, chromatogramFile,
 				tuneMethodFile, instrumentMethodFile, sampleInformationFile, errorLogFile,
-				getFullId(), isFromScratch());
+				isFromScratch());
 	}
 
 	public File getOutputFolder() {

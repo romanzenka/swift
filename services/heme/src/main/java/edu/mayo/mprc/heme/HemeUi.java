@@ -64,12 +64,10 @@ public final class HemeUi implements Dao {
 	private static final String TRYPSIN_PARAM_SET_NAME = "trypsinParamSetName";
 	private static final String CHYMO_PARAM_SET_NAME = "chymoParamSetName";
 	private static final String USER_EMAIL = "userEmail";
-	private static final String SEARCH_ENGINES = "searchEngines";
 	public static final String SPECTRA_EXTENSION = ".spectra.txt";
 	public static final double DEFAULT_MASS_DELTA_TOLERANCE = 0.5;
-	public static final String[] NO_ENGINES = new String[0];
     private static final String FASTA_DB_CACHE= "fastaDbCache";
-
+    
     private final File data;
 	private final File results;
 	private final HemeDao hemeDao;
@@ -98,8 +96,7 @@ public final class HemeUi implements Dao {
 	              final ParamsDao paramsDao,
 	              final SwiftSearcherCaller swiftSearcherCaller,
 	              final String trypsinParameterSetName, final String chymoParameterSetName, final String userEmail,
-                  final File fastaDbCache,
-	              final String[] searchEngines) {
+                  final File fastaDbCache) {
 		this.data = data;
 		this.results = results;
 		this.hemeDao = hemeDao;
@@ -111,10 +108,6 @@ public final class HemeUi implements Dao {
 		this.chymoParameterSetName = chymoParameterSetName;
 		this.userEmail = userEmail;
         this.fastaDbCache = fastaDbCache;
-		this.searchEngines = searchEngines == null ? NO_ENGINES : searchEngines.clone();
-
-
-
 	}
 
 	@Override
@@ -226,8 +219,6 @@ public final class HemeUi implements Dao {
 					title,
 					title
 			});
-
-			searchInput.setEnabledEngines(getSearchEngines());
 
 			searchInput.setParamSetIds(new int[]{
 					trypsinParameterSetId,
@@ -413,10 +404,6 @@ public final class HemeUi implements Dao {
 		return userEmail;
 	}
 
-	public String[] getSearchEngines() {
-		return searchEngines;
-	}
-
 	@Component("hemeUiFactory")
 	public static final class Factory extends FactoryBase<Config, HemeUi> implements FactoryDescriptor {
 		private HemeDao hemeDao;
@@ -513,8 +500,6 @@ public final class HemeUi implements Dao {
 			final File resultDir = new File(rootDir, config.get(RESULT_PATH));
 			FileUtilities.ensureFolderExists(resultDir);
 
-			final String[] engines = splitEngineString(config.get(SEARCH_ENGINES));
-
 			return new HemeUi(dataDir,
 					resultDir,
 					getHemeDao(),
@@ -525,8 +510,7 @@ public final class HemeUi implements Dao {
 					config.get(TRYPSIN_PARAM_SET_NAME),
 					config.get(CHYMO_PARAM_SET_NAME),
 					config.get(USER_EMAIL),
-                    new File(config.get(FASTA_DB_CACHE)),
-					engines);
+                    new File(config.get(FASTA_DB_CACHE)));
 		}
 
 		private String[] splitEngineString(final String engines) {
@@ -546,12 +530,14 @@ public final class HemeUi implements Dao {
 
         @Override
 		public void createUI(final DaemonConfig daemon, final ResourceConfig resource, final UiBuilder builder) {
-			builder.property(DATA_PATH, "Data path", "Folder containing the heme pathology test data. Every sub-folder in this folder will be displayed")
+			builder.property(DATA_PATH, "Data path", "Folder containing the heme pathology test data. Every sub-folder in this folder will be displayed. " +
+					"<p>The path is relative to the shared folder</p>")
 					.required()
 					.existingDirectory()
 					.defaultValue("data")
 
-					.property(RESULT_PATH, "Result path", "Folder where the search results will be stored")
+					.property(RESULT_PATH, "Result path", "Folder where the search results will be stored." +
+							"<p>The path is relative to the shared folder</p>")
 					.required()
 					.existingDirectory()
 					.defaultValue("results")
@@ -564,11 +550,6 @@ public final class HemeUi implements Dao {
 
 					.property(USER_EMAIL, "User email", "Email of the user to run searches as. Identifies the user uniquely. See http://&lt;swift url&gt;/service/users.xml for a list.")
 					.required()
-
-					.property(SEARCH_ENGINES, "Search engines", "Space separated list of search engine codes in <code>[engine]-[version]</code> format. See http://&lt;swift url&gt;/service/engines.xml for a list.")
-					.required()
-					.defaultValue("MASCOT-2.4 SEQUEST-v.27 TANDEM-2013.06.15 SCAFFOLD-4.0.7")
-
 
                     .property(FASTA_DB_CACHE, "Fasta Database Cache", "Caches the fasta decriptive titles by protein accession, for fast lookup.")
                     .required()

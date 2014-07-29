@@ -18,7 +18,6 @@ public final class TestTandemWorkPacket {
 				new File("output"),
 				new File("database"),
 				true,
-				"task",
 				false);
 
 		final XStream xStream = new XStream(new DomDriver());

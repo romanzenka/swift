@@ -7,6 +7,7 @@ import edu.mayo.mprc.daemon.worker.WorkPacket;
 import javax.annotation.Nullable;
 import java.io.File;
 import java.util.Set;
+import java.util.UUID;
 
 /**
  * @author Roman Zenka
@@ -14,14 +15,25 @@ import java.util.Set;
 public final class PingWorkPacket implements WorkPacket {
 	private static final long serialVersionUID = 4327500764702975292L;
 
+	private UUID taskId;
+
+	public PingWorkPacket() {
+		taskId = UUID.randomUUID();
+	}
+
 	/**
 	 * Low ping priority.
 	 */
 	private int priority = -1;
 
 	@Override
-	public String getTaskId() {
-		return "ping";
+	public UUID getTaskId() {
+		return taskId;
+	}
+
+	@Override
+	public void setTaskId(final UUID taskId) {
+		this.taskId = taskId;
 	}
 
 	@Override

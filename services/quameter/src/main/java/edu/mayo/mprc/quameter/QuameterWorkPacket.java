@@ -3,7 +3,6 @@ package edu.mayo.mprc.quameter;
 import edu.mayo.mprc.daemon.WorkCache;
 import edu.mayo.mprc.daemon.worker.WorkPacket;
 import edu.mayo.mprc.searchengine.EngineWorkPacket;
-import edu.mayo.mprc.utilities.FileUtilities;
 
 import java.io.File;
 import java.util.List;
@@ -30,12 +29,12 @@ public final class QuameterWorkPacket extends EngineWorkPacket {
 	 */
 	private double fdrScoreCutoff;
 
-	public QuameterWorkPacket(final String taskId, final boolean fromScratch) {
-		super(taskId, fromScratch);
+	public QuameterWorkPacket(final boolean fromScratch) {
+		super(fromScratch);
 	}
 
-	public QuameterWorkPacket(final String taskId, final boolean fromScratch, final File rawFile, final File idpDbFile, final boolean monoisotopic, final double fdrScoreCutoff, final File outputFile, final boolean publishResultFiles) {
-		super(rawFile, outputFile, null, null, publishResultFiles, taskId, fromScratch);
+	public QuameterWorkPacket(final boolean fromScratch, final File rawFile, final File idpDbFile, final boolean monoisotopic, final double fdrScoreCutoff, final File outputFile, final boolean publishResultFiles) {
+		super(rawFile, outputFile, null, null, publishResultFiles, fromScratch);
 		this.idpDbFile = idpDbFile;
 		this.monoisotopic = monoisotopic;
 		this.fdrScoreCutoff = fdrScoreCutoff;
@@ -61,7 +60,7 @@ public final class QuameterWorkPacket extends EngineWorkPacket {
 
 	@Override
 	public WorkPacket translateToCachePacket(final File cacheFolder) {
-		return new QuameterWorkPacket(getTaskId(),
+		return new QuameterWorkPacket(
 				isFromScratch(),
 				getInputFile(),
 				getIdpDbFile(),

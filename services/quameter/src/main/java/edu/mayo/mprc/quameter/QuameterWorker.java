@@ -94,7 +94,11 @@ public final class QuameterWorker extends WorkerBase {
 		parameters.add("-RawDataPath");
 		parameters.add(rawFile.getParentFile().getAbsolutePath());
 		parameters.add("-RawDataFormat");
-		parameters.add("raw");
+		if(rawFile.getName().endsWith(".mzML")) {
+			parameters.add("mzML");
+		} else {
+			parameters.add("raw");
+		}
 		parameters.add("-ScoreCutoff");
 		parameters.add(String.valueOf(packet.getFdrScoreCutoff()));
 		parameters.add("-ChromatogramOutput");
@@ -106,7 +110,7 @@ public final class QuameterWorker extends WorkerBase {
 		final ProcessBuilder processBuilder = new ProcessBuilder(parameters);
 		processBuilder.directory(tempWorkFolder);
 
-		final ProcessCaller processCaller = new ProcessCaller(processBuilder);
+		final ProcessCaller processCaller = new ProcessCaller(processBuilder, progressReporter.getLog());
 
 		LOGGER.info("QuaMeter search, " + packet.toString() + ", has been submitted.");
 		processCaller.runAndCheck("quameter");

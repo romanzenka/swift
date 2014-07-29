@@ -121,7 +121,9 @@ public final class RawToMgfWorker extends WorkerBase {
 
 			long totalSpectraExtracted = 0;
 			while (currentSpectrum <= lastSpectrumInBatch) {
-				runExtractMsnJob(executable, fulltempfolder, params, rawFile, currentSpectrum, lastSpectrumInBatch, wrapperScript, xvfbWrapperScript == null ? null : xvfbWrapperScript.getAbsolutePath());
+				runExtractMsnJob(executable, fulltempfolder, params, rawFile, currentSpectrum, lastSpectrumInBatch,
+						wrapperScript, xvfbWrapperScript == null ? null : xvfbWrapperScript.getAbsolutePath(),
+						progressReporter);
 
 				// Extract .dta files
 				final File[] dtaFiles = getDtaFiles(fulltempfolder);
@@ -224,13 +226,14 @@ public final class RawToMgfWorker extends WorkerBase {
 	 * @param rawfile         - the raw file
 	 * @return Number of extracted spectra. If there are genuinely no spectra, returns 0. Throws an exception if things go wrong.
 	 */
-	synchronized void runExtractMsnJob(final File fileToExec, final File thermoOutputDir, final String params, final File rawfile, final long firstSpectrum, final long lastSpectrum, final String wrapperScript, final String xvfbWrapperScript) {
+	synchronized void runExtractMsnJob(final File fileToExec, final File thermoOutputDir, final String params, final File rawfile, final long firstSpectrum, final long lastSpectrum, final String wrapperScript, final String xvfbWrapperScript,
+	                                   final UserProgressReporter reporter) {
 		final String spectrumRangeParams = (params.isEmpty() ? "" : params + " ") + "-F" + firstSpectrum + " -L" + lastSpectrum;
 		final ExtractMsnWrapper extractMsn = new ExtractMsnWrapper(fileToExec, spectrumRangeParams, rawfile, wrapperScript, xvfbWrapperScript);
 		extractMsn.setOutputDir(thermoOutputDir);
 
 		try {
-			extractMsn.run();
+			extractMsn.run(reporter);
 		} catch (final Exception we) {
 			throw new DaemonException("Error extracting dta files from " + rawfile, we);
 		}

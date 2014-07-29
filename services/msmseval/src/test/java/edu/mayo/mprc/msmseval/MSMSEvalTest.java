@@ -7,6 +7,10 @@ import edu.mayo.mprc.peaklist.PeakListReaderFactory;
 import edu.mayo.mprc.peaklist.PeakListReaders;
 import edu.mayo.mprc.utilities.FileUtilities;
 import edu.mayo.mprc.utilities.TestingUtilities;
+import edu.mayo.mprc.utilities.log.ParentLog;
+import edu.mayo.mprc.utilities.log.SimpleParentLog;
+import edu.mayo.mprc.utilities.progress.ProgressInfo;
+import edu.mayo.mprc.utilities.progress.UserProgressReporter;
 import org.apache.log4j.Logger;
 import org.testng.Assert;
 import org.testng.annotations.Test;
@@ -97,7 +101,16 @@ public final class MSMSEvalTest {
 		// TODO: Add TestAppContext support
 		final File msmsEvalExecutable = getMsmsEvalExecutable();
 		msmsEval = new MSMSEval(mzxmlFile, paramFile, msmsEvalExecutable);
-		msmsEval.execute(true);
+		msmsEval.execute(new UserProgressReporter() {
+			@Override
+			public void reportProgress(ProgressInfo progressInfo) {
+			}
+
+			@Override
+			public ParentLog getLog() {
+				return new SimpleParentLog();
+			}
+		});
 
 		LOGGER.info("Command msmsEval executed.");
 	}

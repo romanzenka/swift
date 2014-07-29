@@ -25,27 +25,24 @@ public final class MsconvertWorkPacket extends WorkPacketBase implements Cachabl
 	private boolean publicAccess;
 	private boolean includeMs1;
 
-	public MsconvertWorkPacket(final String taskId, final boolean fromScratch) {
-		super(taskId, fromScratch);
+	public MsconvertWorkPacket(final boolean fromScratch) {
+		super(fromScratch);
 	}
 
 	/**
 	 * Request to convert a .RAW file to .mgf/.mzml file.
-	 *
-	 * @param outputFile   This is the desired target of the output. The cache can overwrite this to anything it sees fit.
-	 *                     If that happens, a {@link MsconvertResult} class is sent back
+	 *  @param outputFile   This is the desired target of the output. The cache can overwrite this to anything it sees fit.
+	 *                     If that happens, a {@link edu.mayo.mprc.msconvert.MsconvertResult} class is sent back
 	 *                     as progress report.
 	 * @param publicAccess If the .mgf caching is enabled, the files will never be visible to the end user.
-	 *                     This parameter ensures the file will be provided.
 	 */
 	public MsconvertWorkPacket(final File outputFile,
 	                           final boolean bSkipIfExists,
 	                           final File inputFile,
 	                           final boolean includeMs1,
-	                           final String taskId,
 	                           final boolean fromScratch,
 	                           final boolean publicAccess) {
-		super(taskId, fromScratch);
+		super(fromScratch);
 
 		assert outputFile != null : "msconvert request cannot be created: output file is null";
 		assert inputFile != null : "msconvert request cannot be created: input file is null";
@@ -101,7 +98,6 @@ public final class MsconvertWorkPacket extends WorkPacketBase implements Cachabl
 				isSkipIfExists(),
 				getInputFile(),
 				isIncludeMs1(),
-				getTaskId(),
 				isFromScratch(),
 				/*public access*/false);
 	}

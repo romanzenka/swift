@@ -3,6 +3,7 @@ package edu.mayo.mprc.sequest.core;
 
 import edu.mayo.mprc.MprcException;
 import edu.mayo.mprc.utilities.FileUtilities;
+import edu.mayo.mprc.utilities.progress.UserProgressReporter;
 import org.apache.log4j.Logger;
 
 import java.io.BufferedReader;
@@ -22,7 +23,8 @@ class Mgf2SequestCallerStubbed implements Mgf2SequestInterface {
 	private int maxCommandLineLength;
 
 	@Override
-	public void callSequest(final File tarFile, final File paramsFile, final File mgfFile, final long startTimeOut, final long watchDogTimeOut, final File hdrFile) {
+	public void callSequest(final File tarFile, final File paramsFile, final File mgfFile, final long startTimeOut, final long watchDogTimeOut, final File hdrFile,
+	                        final UserProgressReporter progressReporter) {
 
 		// validate that mgf file exists
 		final boolean havemgf = mgfFile.isFile();
@@ -52,7 +54,8 @@ class Mgf2SequestCallerStubbed implements Mgf2SequestInterface {
 			maxCommandLength = 100;
 		}
 
-		final SequestSubmitterInterface s = new SequestSubmit(100, paramsFile, outputDir, new File(outputDir, "mytar.tar"), hostsFile);
+		final SequestSubmitterInterface s = new SequestSubmit(100, paramsFile, outputDir, new File(outputDir, "mytar.tar"), hostsFile,
+				progressReporter);
 
 		final SequestRunnerStub sc = new SequestRunnerStub(tempfolder, null, new ArrayList<File>(), hostsFile);
 

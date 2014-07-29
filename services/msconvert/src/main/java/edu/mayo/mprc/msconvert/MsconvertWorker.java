@@ -80,12 +80,12 @@ public final class MsconvertWorker extends WorkerBase {
 		rawFile = shortener.getShortenedFile();
 
 		try {
-			final boolean ms2Profile = ms2SpectraInProfileMode(rawFile, tempWorkFolder);
+			final boolean ms2Profile = ms2SpectraInProfileMode(rawFile, tempWorkFolder, progressReporter);
 			final boolean includeMs1 = batchWorkPacket.isIncludeMs1();
 
 			final ProcessBuilder builder = new ProcessBuilder(getMsconvertCall(rawFile, outputFile, ms2Profile, includeMs1));
 			builder.directory(msaccessExecutable.getParentFile().getAbsoluteFile());
-			final ProcessCaller caller = new ProcessCaller(builder);
+			final ProcessCaller caller = new ProcessCaller(builder, progressReporter.getLog());
 			caller.runAndCheck("msconvert");
 			if (!outputFile.exists() || !outputFile.isFile() || !outputFile.canRead()) {
 				throw new MprcException("msconvert failed to create file: " + outputFile.getAbsolutePath());
@@ -174,10 +174,10 @@ public final class MsconvertWorker extends WorkerBase {
 	 * @param rawFile    Which file to check.
 	 * @param tempFolder Where to put temporary data.
 	 */
-	private boolean ms2SpectraInProfileMode(final File rawFile, final File tempFolder) {
+	private boolean ms2SpectraInProfileMode(final File rawFile, final File tempFolder, final UserProgressReporter progressReporter) {
 		final ProcessBuilder builder = new ProcessBuilder(msaccessExecutable.getPath(), "-x", "metadata", "-o", tempFolder.getAbsolutePath(), rawFile.getName());
 		builder.directory(rawFile.getParentFile().getAbsoluteFile());
-		final ProcessCaller caller = new ProcessCaller(builder);
+		final ProcessCaller caller = new ProcessCaller(builder, progressReporter.getLog());
 		caller.runAndCheck("msaccess");
 
 		final File expectedResultFile = new File(tempFolder, rawFile.getName() + MSACCESS_SUFFIX);

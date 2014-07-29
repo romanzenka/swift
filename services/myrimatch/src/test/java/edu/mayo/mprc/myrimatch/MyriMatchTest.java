@@ -249,7 +249,7 @@ public final class MyriMatchTest extends XMLTestCase {
 
 		final File resultFile = new File(tempFolder, "result.pepXML");
 
-		final MyriMatchWorkPacket work = new MyriMatchWorkPacket(resultFile, config, mgfFile, fastaFile, "Rev_", false, "Test MyriMatch run", false);
+		final MyriMatchWorkPacket work = new MyriMatchWorkPacket(resultFile, config, mgfFile, fastaFile, "Rev_", false, false);
 
 		final MyriMatchWorker worker = new MyriMatchWorker(myrimatchExecutable);
 

@@ -364,15 +364,10 @@ public final class DefaultSwiftSearcherCaller implements SwiftSearcherCaller {
 			synchronized (monitor) {
 				if (progressInfo instanceof AssignedSearchRunId) {
 					searchId = ((AssignedSearchRunId) progressInfo).getSearchRunId();
-				}
 
-				// First ProgressInfo object must be the AssignedTaskData
-				if (progressInfo instanceof AssignedTaskData) {
-					return;
+					ready = true;
+					monitor.notifyAll();
 				}
-
-				ready = true;
-				monitor.notifyAll();
 			}
 		}
 	}

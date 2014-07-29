@@ -13,7 +13,7 @@ import java.util.Set;
 /**
  * Class appends filtered log to a given file.
  */
-class LogWriterAppender extends WriterAppender {
+public class LogWriterAppender extends WriterAppender {
 
 	private String allowedMDCKey;
 	private Object mdcValue;
@@ -34,11 +34,11 @@ class LogWriterAppender extends WriterAppender {
 		}
 	}
 
-	LogWriterAppender(final OutputStream outputStream) {
+	public LogWriterAppender(final OutputStream outputStream) {
 		this(new OutputStreamWriter(outputStream));
 	}
 
-	LogWriterAppender(final Writer writer) {
+	public LogWriterAppender(final Writer writer) {
 		super(appenderLayout, writer);
 
 		allowedThreadNames = new HashSet<String>(4);

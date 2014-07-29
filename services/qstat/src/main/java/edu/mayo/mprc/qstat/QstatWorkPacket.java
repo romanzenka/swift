@@ -10,7 +10,7 @@ public final class QstatWorkPacket extends WorkPacketBase {
 	private int jobId;
 
 	public QstatWorkPacket(final int jobId) {
-		super("qstat:" + jobId, true);
+		super(true);
 		this.jobId = jobId;
 	}
 

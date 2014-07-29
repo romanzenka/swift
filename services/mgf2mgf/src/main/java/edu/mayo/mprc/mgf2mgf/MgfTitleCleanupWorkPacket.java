@@ -12,7 +12,7 @@ public final class MgfTitleCleanupWorkPacket extends WorkPacketBase {
 	private File cleanedMgf;
 
 	public MgfTitleCleanupWorkPacket(final File mgfToCleanup, final File cleanedMgf, final String taskId, final boolean fromScratch) {
-		super(taskId, fromScratch);
+		super(fromScratch);
 		this.mgfToCleanup = mgfToCleanup;
 		this.cleanedMgf = cleanedMgf;
 		if (mgfToCleanup == cleanedMgf) {

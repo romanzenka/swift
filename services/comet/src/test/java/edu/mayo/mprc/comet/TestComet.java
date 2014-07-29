@@ -10,6 +10,8 @@ import edu.mayo.mprc.swift.params2.mapping.Mappings;
 import edu.mayo.mprc.swift.params2.mapping.MockParamsInfo;
 import edu.mayo.mprc.swift.params2.mapping.TestMappingContextBase;
 import edu.mayo.mprc.utilities.FileUtilities;
+import edu.mayo.mprc.utilities.log.ParentLog;
+import edu.mayo.mprc.utilities.log.SimpleParentLog;
 import edu.mayo.mprc.utilities.progress.ProgressInfo;
 import edu.mayo.mprc.utilities.progress.ProgressReporter;
 import org.apache.log4j.Logger;
@@ -86,7 +88,7 @@ public class TestComet {
 
 			final File resultFile = new File(cometOut, "result.pep.xml");
 
-			final CometWorkPacket workPacket = new CometWorkPacket(inputMzmlFile, cometParams, resultFile, fastaFile, false, "0", false);
+			final CometWorkPacket workPacket = new CometWorkPacket(inputMzmlFile, cometParams, resultFile, fastaFile, false, false);
 			WorkPacketBase.simulateTransfer(workPacket);
 
 			worker.processRequest(workPacket, new ProgressReporter() {
@@ -98,6 +100,11 @@ public class TestComet {
 				@Override
 				public void reportProgress(final ProgressInfo progressInfo) {
 					LOGGER.info(progressInfo);
+				}
+
+				@Override
+				public ParentLog getLog() {
+					return new SimpleParentLog();
 				}
 
 				@Override

@@ -3,6 +3,8 @@ package edu.mayo.mprc.utilities;
 import com.google.common.base.CharMatcher;
 import com.google.common.io.ByteStreams;
 import edu.mayo.mprc.MprcException;
+import edu.mayo.mprc.utilities.log.ChildLog;
+import edu.mayo.mprc.utilities.log.ParentLog;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 
@@ -66,6 +68,7 @@ public final class ProcessCaller implements Runnable {
 	private AtomicLong killAtTime = new AtomicLong();
 	private AtomicLong warnAtTime = new AtomicLong();
 	private boolean killed;
+	private ChildLog childLog;
 
 	private static final NumberFormat KILL_TIME_FORMAT = new DecimalFormat("#0.00");
 
@@ -79,6 +82,21 @@ public final class ProcessCaller implements Runnable {
 	 */
 	public ProcessCaller(final ProcessBuilder builder) {
 		this.builder = builder;
+	}
+
+	/**
+	 * Same as {@link #ProcessCaller(ProcessBuilder)} except the logging is set up using
+	 * the {@link ParentLog} object. A child log is spawned and configured to point to the executing
+	 * program's standard output and standard error.
+	 *
+	 * @param builder   {@link ProcessBuilder} that defines what to execute.
+	 * @param parentLog {@link ParentLog} that allows us to set up a child logging facility
+	 */
+	public ProcessCaller(final ProcessBuilder builder, final ParentLog parentLog) {
+		this.builder = builder;
+		childLog = parentLog.createChildLog();
+		outputLogger = childLog.getOutputLogger();
+		errorLogger = childLog.getErrorLogger();
 	}
 
 	/**
@@ -253,7 +271,7 @@ public final class ProcessCaller implements Runnable {
 		try {
 			process = builder.start();
 
-			outputStreamDrainer = new StreamDrainer(process.getInputStream(), outputLogger, Level.DEBUG,
+			outputStreamDrainer = new StreamDrainer(process.getInputStream(), outputLogger, Level.INFO,
 					retainedLogLines(), outputMonitor);
 			outputPipe = new Thread(outputStreamDrainer, "Process stdout drain");
 			outputPipe.start();

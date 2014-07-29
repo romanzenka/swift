@@ -65,8 +65,6 @@ public final class JsonCommunicationTest {
 		status.setWarningMessage("warning message");
 		status.setGridJobId("12345");
 		status.setHostString("foo");
-		status.setOutputLogDatabaseToken("shared:/out.txt");
-		status.setErrorLogDatabaseToken("shared:/err.txt");
 	}
 
 	private void setUpSearchRun() {

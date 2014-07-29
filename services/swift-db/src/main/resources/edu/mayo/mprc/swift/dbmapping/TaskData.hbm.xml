@@ -26,8 +26,6 @@
         <property name="descriptionLong" column="description_long" type="text" />
         <!-- TODO: Make binary -->
         <property name="gridJobId" column="grid_job_id" length="25" />
-        <property name="outputLogDatabaseToken" column="out_log" length="256" />
-        <property name="errorLogDatabaseToken" column="err_log" length="256" />
         <property name="hostString" column="host" />
         <property name="percentDone" column="percent_done" not-null="false" type="float" />
     </class>

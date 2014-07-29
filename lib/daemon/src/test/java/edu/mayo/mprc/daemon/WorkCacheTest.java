@@ -191,11 +191,13 @@ public final class WorkCacheTest {
 	private class TestWorkPacket extends WorkPacketBase implements CachableWorkPacket {
 		private static final long serialVersionUID = -4723515359638194382L;
 
+		private String name;
 		private String request;
 		private File folder;
 
-		private TestWorkPacket(final String taskId, final String request, final File folder) {
-			super(taskId, false);
+		private TestWorkPacket(final String name, final String request, final File folder) {
+			super(false);
+			this.name = name;
 			this.request = request;
 			this.folder = folder;
 		}
@@ -220,12 +222,12 @@ public final class WorkCacheTest {
 
 		@Override
 		public String getStringDescriptionOfTask() {
-			return getTaskId();
+			return getTaskId().toString();
 		}
 
 		@Override
 		public WorkPacket translateToCachePacket(final File cacheFolder) {
-			return new TestWorkPacket(getTaskId(), getRequest(), cacheFolder);
+			return new TestWorkPacket(this.name, getRequest(), cacheFolder);
 		}
 
 		@Override

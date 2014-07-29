@@ -148,14 +148,16 @@ final class PvmUtilities {
 	 *                 Note : essentially are constructing <ssh> <hostname> <call>
 	 */
 	public static List<String> getSshResult(final String hostName, final String call) {
+		LOGGER.info(String.format("Sequest ssh call: ssh %s %s", hostName, call));
 		final List<String> args = new ArrayList<String>();
 		args.add("ssh");
 		args.add(hostName);
 		args.add(call);
 
-		return getCmdResult(args);
+		List<String> cmdResult = getCmdResult(args);
 
-
+		LOGGER.info("Sequest ssh call returned " + cmdResult.size() + " lines");
+		return cmdResult;
 	}
 
 	/**
@@ -189,7 +191,7 @@ final class PvmUtilities {
 		} catch (Exception t) {
 			if (t.getMessage().contains("not found") || t.getMessage().contains("No such")) {
 				// ignore it
-				LOGGER.debug("failure getting temporary file names", t);
+				LOGGER.warn("failure getting temporary file names", t);
 				return tempFiles;
 			}
 		}

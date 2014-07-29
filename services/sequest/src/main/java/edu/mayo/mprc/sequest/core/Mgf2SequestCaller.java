@@ -18,6 +18,7 @@ import edu.mayo.mprc.sequest.SequestDeploymentService;
 import edu.mayo.mprc.utilities.FileUtilities;
 import edu.mayo.mprc.utilities.MaxCommandLine;
 import edu.mayo.mprc.utilities.StreamRegExMatcher;
+import edu.mayo.mprc.utilities.progress.UserProgressReporter;
 import org.apache.log4j.Logger;
 
 import java.io.*;
@@ -99,7 +100,9 @@ public final class Mgf2SequestCaller implements Mgf2SequestInterface {
 	 * @param watchDogTimeOut - the watch dog time out
 	 */
 	@Override
-	public void callSequest(final File tarFile, final File paramsFile, final File mgfFile, final long startTimeOut, final long watchDogTimeOut, final File hdrFile) {
+	public void callSequest(
+			final File tarFile, final File paramsFile, final File mgfFile, final long startTimeOut, final long watchDogTimeOut, final File hdrFile,
+			final UserProgressReporter progressReporter) {
 		assert hostsFile != null : "Path to pvm_hosts file is not set.";
 		validateInputsToSequestCaller(mgfFile, paramsFile, hdrFile);
 
@@ -118,9 +121,11 @@ public final class Mgf2SequestCaller implements Mgf2SequestInterface {
 		}
 
 		final File tarFileName = prepareTarFileLocation(tarFile);
-		final SequestSubmitterInterface s = new SequestSubmit(maxCommandLineLength, searchParamsFile, outputDir, tarFileName, hostsFile);
+		final SequestSubmitterInterface s = new SequestSubmit(maxCommandLineLength, searchParamsFile,
+				outputDir, tarFileName, hostsFile, progressReporter);
 
-		final SequestRunner sc = new SequestRunner(tempFolder, paramsFile, new ArrayList<File>(), hostsFile);
+		final SequestRunner sc = new SequestRunner(tempFolder, paramsFile, new ArrayList<File>(), hostsFile,
+				progressReporter);
 
 		sc.setSequestExe(sequestExe);
 		sc.setWatchDogTimeOut(watchDogTimeOut);

@@ -87,7 +87,6 @@ final class MsconvertTask extends AsyncTaskBase implements FileProducingTask {
 					true,
 					inputFile,
 					includeMs1,
-					getFullId(),
 					isFromScratch(),
 					publicAccess);
 		}

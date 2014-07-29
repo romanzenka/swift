@@ -178,10 +178,12 @@ public final class DaemonConfig implements ResourceConfig, NamedResource {
 
 	public DaemonConfig addResource(final ResourceConfig resource) {
 		if (resource instanceof ServiceConfig) {
+			ServiceConfig service = (ServiceConfig) resource;
 			if (services.contains(resource)) {
-				throw new MprcException("Daemon " + getName() + " already contains service " + ((ServiceConfig) resource).getName());
+				throw new MprcException("Daemon " + getName() + " already contains service " + service.getName());
 			}
-			services.add((ServiceConfig) resource);
+			services.add(service);
+			service.setParentConfig(this);
 		} else {
 			if (resources.contains(resource)) {
 				throw new MprcException("Daemon " + getName() + " already contains resource " + resource.toString());
@@ -231,7 +233,7 @@ public final class DaemonConfig implements ResourceConfig, NamedResource {
 
 	/**
 	 * @return A wrapper script that executes a windows command that needs a graphical console on linux (using Xvfb) -
-	 *         virtual frame buffer. On windows not necessary - return empty string.
+	 * virtual frame buffer. On windows not necessary - return empty string.
 	 */
 	public String getXvfbWrapperScript() {
 		if (isWindows()) {
@@ -298,7 +300,7 @@ public final class DaemonConfig implements ResourceConfig, NamedResource {
 			final List<? extends ResourceConfig> resourcesList = reader.getResourceList(RESOURCES);
 			resources.clear();
 			for (final ResourceConfig resource : resourcesList) {
-				resources.add(resource);
+				addResource(resource);
 			}
 		}
 
@@ -307,7 +309,7 @@ public final class DaemonConfig implements ResourceConfig, NamedResource {
 			services.clear();
 			for (final ResourceConfig config : servicesList) {
 				final ServiceConfig service = (ServiceConfig) config;
-				services.add(service);
+				addResource(service);
 			}
 		}
 	}

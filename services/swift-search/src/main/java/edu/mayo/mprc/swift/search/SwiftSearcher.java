@@ -278,7 +278,7 @@ public final class SwiftSearcher implements Worker, Lifecycle {
 					reportDecoyHits,
 					swiftSearchWorkPacket.getPriority(),
 					paramsInfo,
-					swiftSearchWorkPacket.getTaskId(),
+					swiftSearchWorkPacket.getTaskId().toString(),
 					swiftSearchWorkPacket.isFromScratch());
 
 			searchRunner.initialize();

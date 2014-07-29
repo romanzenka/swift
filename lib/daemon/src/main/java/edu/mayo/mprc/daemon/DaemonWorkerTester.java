@@ -16,6 +16,7 @@ import edu.mayo.mprc.utilities.progress.ProgressInfo;
 import edu.mayo.mprc.utilities.progress.ProgressListener;
 import org.apache.log4j.Logger;
 
+import java.io.File;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.concurrent.ExecutorService;
@@ -50,27 +51,10 @@ public final class DaemonWorkerTester implements Lifecycle {
 	 */
 	public DaemonWorkerTester(final Worker worker) {
 		this();
-		runner = new SimpleRunner();
+		initalizeRunner();
 		runner.setFactory(new TestWorkerFactory(worker));
 		runner.setExecutorService(getSingleThreadExecutor(worker));
-		final Daemon daemon = new Daemon();
-		daemon.setLogOutputFolder(FileUtilities.createTempFolder());
-		runner.setDaemon(daemon);
-		runner.setEnabled(true);
 	}
-
-	private static ExecutorService getSingleThreadExecutor(Worker worker) {
-		return new SimpleThreadPoolExecutor(1, worker.getClass().getSimpleName() + "-runner", true);
-	}
-
-	private void initializeFromQueueName(final String queueName) {
-		service = serviceFactory.createService(queueName, responseDispatcher);
-		final FileTokenFactory fileTokenFactory = new FileTokenFactory();
-		fileTokenFactory.setDaemonConfigInfo(new DaemonConfigInfo("daemon1", "shared"));
-		daemonConnection = new DirectDaemonConnection(service, fileTokenFactory);
-		runner.setDaemonConnection(daemonConnection);
-	}
-
 
 	/**
 	 * Creates a test runner that runs given worker. Automatically starts running.
@@ -80,13 +64,31 @@ public final class DaemonWorkerTester implements Lifecycle {
 	 */
 	public DaemonWorkerTester(final WorkerFactory workerFactory, final int numWorkerThreads) {
 		this();
-		runner = new SimpleRunner();
+		initalizeRunner();
 		runner.setFactory(workerFactory);
 		runner.setExecutorService(new SimpleThreadPoolExecutor(numWorkerThreads, "test", true));
+	}
+
+	private static ExecutorService getSingleThreadExecutor(Worker worker) {
+		return new SimpleThreadPoolExecutor(1, worker.getClass().getSimpleName() + "-runner", true);
+	}
+
+	private void initializeFromQueueName(final String queueName) {
+		service = serviceFactory.createService(queueName, responseDispatcher);
+		final FileTokenFactory fileTokenFactory = new FileTokenFactory();
+		String logFolder = "shared/log";
+		fileTokenFactory.setDaemonConfigInfo(new DaemonConfigInfo("daemon1", "shared"));
+		daemonConnection = new DirectDaemonConnection(service, fileTokenFactory, new DaemonLoggerFactory(new File(logFolder)));
+		runner.setDaemonConnection(daemonConnection);
+	}
+
+	private void initalizeRunner() {
+		runner = new SimpleRunner();
 		final Daemon daemon = new Daemon();
 		daemon.setLogOutputFolder(FileUtilities.createTempFolder());
 		runner.setDaemon(daemon);
 		runner.setEnabled(true);
+		runner.setDaemonLoggerFactory(new DaemonLoggerFactory(daemon.getLogOutputFolder()));
 	}
 
 	/**
@@ -94,7 +96,7 @@ public final class DaemonWorkerTester implements Lifecycle {
 	 *
 	 * @param workPacket Data to be processed.
 	 * @return Token for this work packet. The token is an opaque object to be used by {@link #isDone}, {@link #isSuccess} and {@link #getLastError}
-	 *         methods.
+	 * methods.
 	 */
 	public Object sendWork(final WorkPacket workPacket) {
 		if (!isRunning()) {
@@ -111,7 +113,7 @@ public final class DaemonWorkerTester implements Lifecycle {
 	 * @param workPacket   Data to be processed.
 	 * @param userListener Listener to be called as the worker progresses.
 	 * @return Token for this work packet. The token is an opaque object to be used by {@link #isDone}, {@link #isSuccess} and {@link #getLastError}
-	 *         methods.
+	 * methods.
 	 */
 	public Object sendWork(final WorkPacket workPacket, final ProgressListener userListener) {
 		if (!isRunning()) {

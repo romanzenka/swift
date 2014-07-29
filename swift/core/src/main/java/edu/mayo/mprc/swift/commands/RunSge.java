@@ -11,11 +11,13 @@ import edu.mayo.mprc.daemon.files.FileTokenFactory;
 import edu.mayo.mprc.daemon.files.FileTokenHolder;
 import edu.mayo.mprc.daemon.worker.WorkPacket;
 import edu.mayo.mprc.daemon.worker.Worker;
+import edu.mayo.mprc.daemon.DaemonLoggerFactory;
 import edu.mayo.mprc.messaging.Request;
 import edu.mayo.mprc.messaging.ServiceFactory;
 import edu.mayo.mprc.sge.SgePacket;
 import edu.mayo.mprc.swift.resources.ResourceTable;
 import edu.mayo.mprc.utilities.FileUtilities;
+import edu.mayo.mprc.utilities.log.ParentLog;
 import edu.mayo.mprc.utilities.progress.ProgressInfo;
 import edu.mayo.mprc.utilities.progress.ProgressReporter;
 import org.apache.log4j.Logger;
@@ -39,6 +41,7 @@ public class RunSge implements SwiftCommand {
 
 	private ResourceTable resourceTable;
 	private ServiceFactory serviceFactory;
+	private DaemonLoggerFactory daemonLoggerFactory;
 
 	@Override
 	public String getDescription() {
@@ -62,7 +65,7 @@ public class RunSge implements SwiftCommand {
 
 		try {
 			LOGGER.info("Running grid job in host: " + InetAddress.getLocalHost().getHostName());
-		} catch (UnknownHostException e) {
+		} catch (final UnknownHostException e) {
 			LOGGER.error("Could not get host name.", e);
 		}
 
@@ -79,7 +82,7 @@ public class RunSge implements SwiftCommand {
 
 			sgePacket = (SgePacket) xStream.fromXML(fileInputStream);
 
-			request = serviceFactory.deserializeRequest(sgePacket.getSerializedRequest());
+			request = getServiceFactory().deserializeRequest(sgePacket.getSerializedRequest());
 
 			//If the work packet is an instance of a FileTokenHolder, set the the FileTokenFactory on it. The FileTokenFactory object
 			//needs to be reset because it is a transient object.
@@ -88,17 +91,22 @@ public class RunSge implements SwiftCommand {
 				final FileTokenFactory fileTokenFactory = new FileTokenFactory(sgePacket.getDaemonConfigInfo());
 				fileTokenHolder.translateOnReceiver(fileTokenFactory, null);
 			}
+			daemonLoggerFactory = new DaemonLoggerFactory(sgePacket.getLogFolder());
 
 			final DependencyResolver dependencies = new DependencyResolver(resourceTable);
 			final Worker daemonWorker = (Worker) resourceTable.createSingleton(sgePacket.getWorkerFactoryConfig(), dependencies);
-			daemonWorker.processRequest((WorkPacket) sgePacket.getWorkPacket(), new DaemonWorkerProgressReporter(request));
-		} catch (Exception e) {
+			final DaemonWorkerProgressReporter progressReporter = new DaemonWorkerProgressReporter(request);
+			final WorkPacket workPacket = (WorkPacket) sgePacket.getWorkPacket();
+			final ParentLog parentLog = daemonLoggerFactory.createLog(workPacket.getTaskId(), progressReporter);
+			progressReporter.setParentLog(parentLog);
+			daemonWorker.processRequest(workPacket, progressReporter);
+		} catch (final Exception e) {
 			final String errorMessage = "Failed to process work packet " + ((sgePacket == null || sgePacket.getWorkPacket() == null) ? "null" : sgePacket.getWorkPacket().toString());
 			LOGGER.error(errorMessage, e);
 
 			try {
 				reportProgress(request, e);
-			} catch (Exception ex) {
+			} catch (final Exception ex) {
 				LOGGER.error("Error sending exception " + MprcException.getDetailedMessage(e) + " to GridRunner", ex);
 				// SWALLOWED
 			}
@@ -108,12 +116,12 @@ public class RunSge implements SwiftCommand {
 			if (fileInputStream != null) {
 				try {
 					fileInputStream.close();
-				} catch (IOException e) {
+				} catch (final IOException e) {
 					LOGGER.warn("Error closing file input stream.", e);
 					// SWALLOWED
 				}
 			}
-			serviceFactory.stop();
+			getServiceFactory().stop();
 		}
 
 		LOGGER.info("Work packet " + sgePacket.getWorkPacket().toString() + " successfully processed.");
@@ -134,7 +142,7 @@ public class RunSge implements SwiftCommand {
 	}
 
 	@Resource(name = "serviceFactory")
-	public void setServiceFactory(ServiceFactory serviceFactory) {
+	public void setServiceFactory(final ServiceFactory serviceFactory) {
 		this.serviceFactory = serviceFactory;
 	}
 
@@ -144,6 +152,7 @@ public class RunSge implements SwiftCommand {
 
 	class DaemonWorkerProgressReporter implements ProgressReporter {
 		private Request request;
+		private ParentLog parentLog;
 
 		DaemonWorkerProgressReporter(final Request request) {
 			this.request = request;
@@ -153,10 +162,10 @@ public class RunSge implements SwiftCommand {
 		public void reportStart(final String hostString) {
 			try {
 				RunSge.reportProgress(request, new DaemonProgressMessage(hostString));
-			} catch (Exception t) {
+			} catch (final Exception t) {
 				try {
 					RunSge.reportProgress(request, t);
-				} catch (Exception ex) {
+				} catch (final Exception ex) {
 					LOGGER.error("Error sending exception " + MprcException.getDetailedMessage(t) + " to GridRunner", ex);
 					// SWALLOWED
 				}
@@ -168,10 +177,19 @@ public class RunSge implements SwiftCommand {
 		public void reportProgress(final ProgressInfo progressInfo) {
 			try {
 				RunSge.reportProgress(request, new DaemonProgressMessage(DaemonProgress.UserSpecificProgressInfo, progressInfo));
-			} catch (Exception e) {
+			} catch (final Exception e) {
 				LOGGER.error("Error reporting daemon worker progress.", e);
 				//SWALLOWED
 			}
+		}
+
+		public void setParentLog(final ParentLog parentLog) {
+			this.parentLog = parentLog;
+		}
+
+		@Override
+		public ParentLog getLog() {
+			return parentLog;
 		}
 
 		@Override
@@ -183,7 +201,7 @@ public class RunSge implements SwiftCommand {
 		public void reportFailure(final Throwable t) {
 			try {
 				RunSge.reportProgress(request, t);
-			} catch (Exception e) {
+			} catch (final Exception e) {
 				LOGGER.error("Error reporting daemon worker failure.", e);
 				//SWALLOWED
 			}

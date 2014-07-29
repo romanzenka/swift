@@ -1,0 +1,7 @@
+2014-07-28 08:50:00,000 DEBUG Log line 1
+2014-07-28 08:50:01,000 INFO Log line 2 (1 second later)
+2014-07-28 08:50:01,500 WARN Log line 3 (0.5 seconds later)
+2014-07-28 08:50:02,000 ERROR Log line 4 (0.5 seconds later)
+Garbled line
+More garbled input
+2014-07-28 08:50:03,000 ERROR Log line 5 (1 seconds later)

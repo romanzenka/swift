@@ -10,6 +10,8 @@ import edu.mayo.mprc.swift.params2.mapping.Mappings;
 import edu.mayo.mprc.swift.params2.mapping.MockParamsInfo;
 import edu.mayo.mprc.swift.params2.mapping.TestMappingContextBase;
 import edu.mayo.mprc.utilities.FileUtilities;
+import edu.mayo.mprc.utilities.log.ParentLog;
+import edu.mayo.mprc.utilities.log.SimpleParentLog;
 import edu.mayo.mprc.utilities.progress.ProgressInfo;
 import edu.mayo.mprc.utilities.progress.ProgressReporter;
 import org.apache.log4j.Logger;
@@ -83,7 +85,7 @@ public class TestTandem {
 
 			final File resultFile = new File(tandemOut, "tandemResult.xml");
 
-			final XTandemWorkPacket workPacket = new XTandemWorkPacket(inputMgfFile, tandemParams, resultFile, fastaFile, false, "0", false);
+			final XTandemWorkPacket workPacket = new XTandemWorkPacket(inputMgfFile, tandemParams, resultFile, fastaFile, false, false);
 			WorkPacketBase.simulateTransfer(workPacket);
 
 			worker.processRequest(workPacket, new ProgressReporter() {
@@ -105,6 +107,11 @@ public class TestTandem {
 				@Override
 				public void reportFailure(final Throwable t) {
 					throw new MprcException("Tandem worker failed to process work packet.", t);
+				}
+
+				@Override
+				public ParentLog getLog() {
+					return new SimpleParentLog();
 				}
 			});
 		} catch (Exception e) {

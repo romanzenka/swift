@@ -4,6 +4,8 @@ import edu.mayo.mprc.MprcException;
 import edu.mayo.mprc.config.DependencyResolver;
 import edu.mayo.mprc.integration.Installer;
 import edu.mayo.mprc.utilities.FileUtilities;
+import edu.mayo.mprc.utilities.log.ParentLog;
+import edu.mayo.mprc.utilities.log.SimpleParentLog;
 import edu.mayo.mprc.utilities.progress.ProgressInfo;
 import edu.mayo.mprc.utilities.progress.UserProgressReporter;
 import org.apache.log4j.Logger;
@@ -74,11 +76,16 @@ public final class TestIdpQonvert {
 			params.setDecoyPrefix("REVERSE_");
 
 			final IdpQonvertWorkPacket workPacket = new IdpQonvertWorkPacket(
-					outputFile, params, inputFile, fastaFile, inputFile.getParentFile(), "idp-test", true);
+					outputFile, params, inputFile, fastaFile, inputFile.getParentFile(), true);
 			worker.process(workPacket, outputFile.getParentFile(), new UserProgressReporter() {
 				@Override
 				public void reportProgress(final ProgressInfo progressInfo) {
 					LOGGER.debug(progressInfo.toString());
+				}
+
+				@Override
+				public ParentLog getLog() {
+					return new SimpleParentLog();
 				}
 			});
 		}

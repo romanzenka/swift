@@ -82,7 +82,7 @@ public final class MSMSEvalWorkerTest {
 		final DaemonWorkerTester daemonWorkerTester = new DaemonWorkerTester(msmsEvalWorker);
 		try {
 			daemonWorkerTester.start();
-			final Object workerToken = daemonWorkerTester.sendWork(new MSMSEvalWorkPacket(mgfFile, paramFile, outputFile, emFile, "0", false), null);
+			final Object workerToken = daemonWorkerTester.sendWork(new MSMSEvalWorkPacket(mgfFile, paramFile, outputFile, emFile, false), null);
 
 			while (!daemonWorkerTester.isDone(workerToken)) {
 				try {
@@ -117,7 +117,7 @@ public final class MSMSEvalWorkerTest {
 		try {
 			daemonWorkerTester.start();
 
-			final Object workerToken = daemonWorkerTester.sendWork(new MSMSEvalWorkPacket(mgfFile, paramFile, outputFile, emFile, "0", false), null);
+			final Object workerToken = daemonWorkerTester.sendWork(new MSMSEvalWorkPacket(mgfFile, paramFile, outputFile, emFile, false), null);
 
 			while (!daemonWorkerTester.isDone(workerToken)) {
 				try {

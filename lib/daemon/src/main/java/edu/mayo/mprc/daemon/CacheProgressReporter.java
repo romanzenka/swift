@@ -1,10 +1,16 @@
 package edu.mayo.mprc.daemon;
 
+import edu.mayo.mprc.MprcException;
+import edu.mayo.mprc.daemon.worker.WorkPacket;
+import edu.mayo.mprc.daemon.worker.log.NewLogFiles;
+import edu.mayo.mprc.utilities.log.ParentLog;
 import edu.mayo.mprc.utilities.progress.ProgressInfo;
+import edu.mayo.mprc.utilities.progress.ProgressReport;
 import edu.mayo.mprc.utilities.progress.ProgressReporter;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 /**
  * Holds progress reporters for a particular work in progress.
@@ -50,8 +56,14 @@ final class CacheProgressReporter implements ProgressReporter {
 	@Override
 	public synchronized void reportProgress(final ProgressInfo progressInfo) {
 		lastProgressInfo = progressInfo;
-		for (final ProgressReporter reporter : reporters) {
-			reporter.reportProgress(progressInfo);
+		if (progressInfo instanceof NewLogFiles) {
+			// We only pass the log info on our first reporter.
+			// Others should get info that another task is doing their work
+			reporters.get(0).reportProgress(progressInfo);
+		} else {
+			for (final ProgressReporter reporter : reporters) {
+				reporter.reportProgress(progressInfo);
+			}
 		}
 	}
 
@@ -69,5 +81,14 @@ final class CacheProgressReporter implements ProgressReporter {
 		for (final ProgressReporter reporter : reporters) {
 			reporter.reportFailure(failureReported);
 		}
+	}
+
+	@Override
+	/**
+	 * The parent log is the parent log of the very first requestor.
+	 * Every newcomer should only reference the same parent log.
+	 */
+	public synchronized ParentLog getLog() {
+		throw new MprcException("The cache progress reporter does not define parent log");
 	}
 }

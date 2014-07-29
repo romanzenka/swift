@@ -19,18 +19,18 @@ public final class DaemonConfigInfo implements Serializable {
 
 	public DaemonConfigInfo(final String daemonId, final String sharedFileSpacePath) {
 		this.daemonId = daemonId;
-		storeCanonical(sharedFileSpacePath);
+		setSharedFileSpacePath(sharedFileSpacePath);
 	}
 
-	private void storeCanonical(final String sharedFileSpacePath) {
-		if (sharedFileSpacePath != null) {
-			if (!sharedFileSpacePath.isEmpty()) {
-				this.sharedFileSpacePath = FileUtilities.canonicalDirectoryPath(new File(sharedFileSpacePath));
+	private static String toCanonical(final String path) {
+		if (path != null) {
+			if (!path.isEmpty()) {
+				return FileUtilities.canonicalDirectoryPath(new File(path));
 			} else {
-				this.sharedFileSpacePath = "";
+				return "";
 			}
 		} else {
-			throw new MprcException("The daemon cannot have its shared file space path set to null");
+			throw new MprcException("The daemon cannot have file space or log paths set to null");
 		}
 	}
 
@@ -46,12 +46,11 @@ public final class DaemonConfigInfo implements Serializable {
 		if (sharedFileSpacePath != null && sharedFileSpacePath.isEmpty()) {
 			sharedFileSpacePath = null;
 		}
-
 		return sharedFileSpacePath;
 	}
 
 	public void setSharedFileSpacePath(final String sharedFileSpacePath) {
-		storeCanonical(sharedFileSpacePath);
+		this.sharedFileSpacePath = toCanonical(sharedFileSpacePath);
 	}
 
 	@Override

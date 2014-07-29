@@ -38,7 +38,7 @@ public final class DeploymentRequest extends WorkPacketBase {
 
 	protected DeploymentRequest(final String taskId) {
 		// Deployment is always done with caching (so far).
-		super(taskId, false);
+		super(false);
 	}
 
 	/**

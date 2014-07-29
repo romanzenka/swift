@@ -19,7 +19,7 @@ import java.io.File;
 public final class QuameterTask extends AsyncTaskBase {
 
 	private final IdpQonvertTask idpQonvertTask;
-	private final File rawFile;
+	private final FileProducingTask rawFile;
 	private File outputFolder;
 	private final double maxFDR;
 	private final boolean publicSearchFiles;
@@ -28,7 +28,7 @@ public final class QuameterTask extends AsyncTaskBase {
 	                    final SwiftSearchDefinition definition,
 	                    final DaemonConnection quaMeterDaemon,
 	                    final IdpQonvertTask idpQonvertTask,
-	                    final File rawFile,
+	                    final FileProducingTask rawFile,
 	                    final File outputFolder,
 	                    final DatabaseFileTokenFactory fileTokenFactory, final boolean fromScratch,
 	                    final boolean publicSearchFiles) {
@@ -43,15 +43,15 @@ public final class QuameterTask extends AsyncTaskBase {
 
 	/**
 	 * @return Work packet to be sent asynchronously. If it returns null, it means the work was done without a need
-	 *         to send a work packet.
+	 * to send a work packet.
 	 */
 	@Override
 	public WorkPacket createWorkPacket() {
-		setDescription("QuaMeter analysis of " + fileTokenFactory.fileToTaggedDatabaseToken(rawFile)
+		setDescription("QuaMeter analysis of " + fileTokenFactory.fileToTaggedDatabaseToken(rawFile.getResultingFile())
 				+ " with search results " + fileTokenFactory.fileToTaggedDatabaseToken(idpQonvertTask.getResultingFile()));
 
-		return new QuameterWorkPacket(getFullId(), isFromScratch(),
-				rawFile, idpQonvertTask.getResultingFile(), true, maxFDR, getResultingFile(), publicSearchFiles);
+		return new QuameterWorkPacket(isFromScratch(),
+				rawFile.getResultingFile(), idpQonvertTask.getResultingFile(), true, maxFDR, getResultingFile(), publicSearchFiles);
 	}
 
 	@Override

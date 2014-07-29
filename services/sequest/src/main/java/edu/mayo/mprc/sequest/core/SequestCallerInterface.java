@@ -1,5 +1,7 @@
 package edu.mayo.mprc.sequest.core;
 
+import edu.mayo.mprc.utilities.progress.UserProgressReporter;
+
 import java.io.File;
 import java.util.List;
 
@@ -8,7 +10,8 @@ import java.util.List;
  */
 interface SequestCallerInterface {
 
-	SequestCallerInterface createInstance(File workingDir, File paramsFile, List<File> sequestDtaFiles, File hostsFile);
+	SequestCallerInterface createInstance(File workingDir, File paramsFile, List<File> sequestDtaFiles, File hostsFile,
+	                                      UserProgressReporter progressReporter);
 
 	String getCall();
 

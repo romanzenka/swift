@@ -38,7 +38,7 @@ public final class SearchDbWorkPacket extends WorkPacketBase {
 	                          final File scaffoldSpectrumReport,
 	                          final File scaffoldUnimod,
 	                          final Map<String, RawFileMetaData> fileMetaDataMap) {
-		super(taskId, fromScratch);
+		super(fromScratch);
 		this.reportDataId = reportDataId;
 		this.scaffoldSpectrumReport = scaffoldSpectrumReport;
 		this.scaffoldUnimod = scaffoldUnimod;

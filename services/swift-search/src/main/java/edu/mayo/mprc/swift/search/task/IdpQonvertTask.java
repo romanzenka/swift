@@ -86,7 +86,6 @@ public final class IdpQonvertTask extends AsyncTaskBase {
 				searchTask.getResultingFile(),
 				curationFile,
 				searchTask.getInputFile().getResultingFile().getParentFile(),
-				getFullId(),
 				isFromScratch());
 	}
 

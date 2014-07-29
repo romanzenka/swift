@@ -7,6 +7,11 @@ import edu.mayo.mprc.tar.TarWriter;
 import edu.mayo.mprc.utilities.FileUtilities;
 import edu.mayo.mprc.utilities.ProcessCaller;
 import edu.mayo.mprc.utilities.TestingUtilities;
+import edu.mayo.mprc.utilities.log.ParentLog;
+import edu.mayo.mprc.utilities.log.SimpleParentLog;
+import edu.mayo.mprc.utilities.progress.ProgressInfo;
+import edu.mayo.mprc.utilities.progress.TestProgressReporter;
+import edu.mayo.mprc.utilities.progress.UserProgressReporter;
 import org.apache.log4j.Logger;
 import org.testng.Assert;
 import org.testng.annotations.Test;
@@ -50,7 +55,9 @@ public final class TestSequestSubmission {
 		try {
 
 			LOGGER.debug("in submit under");
-			final SequestSubmit s = new SequestSubmit(120, new File("myparams"), folder, new File(folder, "mytar.tar"), getHostsFile());
+			final SequestSubmit s = new SequestSubmit(
+					120, new File("myparams"), folder, new File(folder, "mytar.tar"), getHostsFile(),
+					new TestProgressReporter());
 
 
 			LOGGER.debug("maxlinelength=" + s.getMaxLineLength());
@@ -121,7 +128,9 @@ public final class TestSequestSubmission {
 		try {
 
 
-			final SequestSubmit s = new SequestSubmit(100, new File("myparams"), folder, new File(folder, "mytar.tar"), getHostsFile());
+			final SequestSubmit s = new SequestSubmit(
+					100, new File("myparams"), folder, new File(folder, "mytar.tar"), getHostsFile(),
+					new TestProgressReporter());
 
 			final SequestRunnerStub scs = new SequestRunnerStub(folder, null, new ArrayList<File>(), getHostsFile());
 			scs.setStartTimeOut(10 * 1000);
@@ -172,7 +181,9 @@ public final class TestSequestSubmission {
 		final String folderName = folder.getAbsolutePath();
 		try {
 
-			final SequestSubmit s = new SequestSubmit(100, new File("myparams"), folder, new File(folder, "mytar.tar"), getHostsFile());
+			final SequestSubmit s = new SequestSubmit(
+					100, new File("myparams"), folder, new File(folder, "mytar.tar"), getHostsFile(),
+					new TestProgressReporter());
 
 			final SequestRunnerStub sc = new SequestRunnerStub(folder, null, new ArrayList<File>(), getHostsFile());
 			sc.setWatchDogTimeOut(10 * 1000);
@@ -264,7 +275,8 @@ public final class TestSequestSubmission {
 	}
 
 	private SequestSubmit getSequestSubmit(final File folder) {
-		return new SequestSubmit(100, new File("myparams"), folder, new File(folder, "mytar.tar"), getHostsFile());
+		return new SequestSubmit(100, new File("myparams"), folder, new File(folder, "mytar.tar"), getHostsFile(),
+				new TestProgressReporter());
 	}
 
 	/**
@@ -653,7 +665,7 @@ public final class TestSequestSubmission {
 	}
 
 	private SequestRunner getSequestRunner(final File temp, final List<File> dtafiles) {
-		return new SequestRunner(temp, new File("myparams"), dtafiles, getHostsFile());
+		return new SequestRunner(temp, new File("myparams"), dtafiles, getHostsFile(), new TestProgressReporter());
 	}
 
 
@@ -698,7 +710,7 @@ public final class TestSequestSubmission {
 
 		try {
 
-			c = new SequestRunner(folder, null, dtafiles, getHostsFile());
+			c = new SequestRunner(folder, null, dtafiles, getHostsFile(), new TestProgressReporter());
 			c.getCall();
 
 		} catch (MprcException m) {
@@ -778,7 +790,8 @@ public final class TestSequestSubmission {
 
 			m.setHostsFile(getHostsFile());
 
-			m.callSequest(new File(outputDir, "tarfile.tar"), params, mgf, 10 * 1000, 10 * 1000, hdrFile);
+			m.callSequest(new File(outputDir, "tarfile.tar"), params, mgf, 10 * 1000, 10 * 1000, hdrFile,
+					new TestProgressReporter());
 
 
 		} catch (Exception t) {
@@ -807,7 +820,8 @@ public final class TestSequestSubmission {
 			m.setSequestExe("c:sequestsequest27.exe");
 			m.setHostsFile(getHostsFile());
 
-			m.callSequest(new File(outputDir, "tarfile.tar"), params, mgf, 120 * 1000, 120 * 1000, hdrFile);
+			m.callSequest(new File(outputDir, "tarfile.tar"), params, mgf, 120 * 1000, 120 * 1000, hdrFile,
+					new TestProgressReporter());
 
 		} catch (Exception t) {
 			Assert.fail("exception occurred", t);
@@ -841,7 +855,8 @@ public final class TestSequestSubmission {
 			m.setSequestExe(getSequestExe());
 			m.setHostsFile(getHostsFile());
 
-			m.callSequest(new File(outputDir, "tarfile.tar"), fparams, fmgf, 120 * 1000, 120 * 1000, hdrFile);
+			m.callSequest(new File(outputDir, "tarfile.tar"), fparams, fmgf, 120 * 1000, 120 * 1000, hdrFile,
+					new TestProgressReporter());
 		} catch (Exception t) {
 			Assert.fail("exception occurred", t);
 		} finally {
@@ -886,7 +901,8 @@ public final class TestSequestSubmission {
 			m.setSequestExe(getSequestExe());
 			m.setHostsFile(getHostsFile());
 
-			m.callSequest(new File(outputDir, "tarfile.tar"), fparams, fmgf, 10 * 1000, 10 * 1000, hdrFile);
+			m.callSequest(new File(outputDir, "tarfile.tar"), fparams, fmgf, 10 * 1000, 10 * 1000, hdrFile,
+					new TestProgressReporter());
 		} catch (Exception t) {
 			Assert.fail("exception occurred", t);
 		} finally {
@@ -927,7 +943,8 @@ public final class TestSequestSubmission {
 
 			LOGGER.debug("outputDir=" + outputDir.getAbsolutePath());
 			try {
-				m.callSequest(new File(outputDir, "mytar.tar"), params, mgf, 10 * 1000, 10 * 1000, hdrFile);
+				m.callSequest(new File(outputDir, "mytar.tar"), params, mgf, 10 * 1000, 10 * 1000, hdrFile,
+						new TestProgressReporter());
 			} catch (MprcException me) {
 				LOGGER.debug("exception=" + me.getMessage());
 				final String detailedMessage = MprcException.getDetailedMessage(me);
@@ -997,7 +1014,8 @@ public final class TestSequestSubmission {
 
 			final long startTime = System.currentTimeMillis();
 			try {
-				m.callSequest(new File(outputDir, "mytar.tar"), fparams, fmgf, 2 * 1000, 2 * 1000, hdrFile);
+				m.callSequest(new File(outputDir, "mytar.tar"), fparams, fmgf, 2 * 1000, 2 * 1000, hdrFile,
+						new TestProgressReporter());
 			} catch (MprcException me) {
 				LOGGER.debug("exception=" + me.getMessage());
 				final String message = MprcException.getDetailedMessage(me);
@@ -1052,7 +1070,8 @@ public final class TestSequestSubmission {
 			m.setHostsFile(getHostsFile());
 
 			try {
-				m.callSequest(new File(outputDir, "mytar.tar"), paramsFile, mgf, 10 * 1000, 10 * 1000, hdrFile);
+				m.callSequest(new File(outputDir, "mytar.tar"), paramsFile, mgf, 10 * 1000, 10 * 1000, hdrFile,
+						new TestProgressReporter());
 			} catch (MprcException me) {
 				LOGGER.debug("exception=" + me.getMessage());
 				final String message = MprcException.getDetailedMessage(me);
@@ -1089,11 +1108,12 @@ public final class TestSequestSubmission {
 			final Mgf2SequestCallerStubbed m = new Mgf2SequestCallerStubbed();
 			m.setHostsFile(getHostsFile());
 
-			m.callSequest(new File(outputDir, "tarfile.tar"), params, mgf, 10 * 1000, 10 * 1000, hdrFile);
+			m.callSequest(new File(outputDir, "tarfile.tar"), params, mgf, 10 * 1000, 10 * 1000, hdrFile,
+					new TestProgressReporter());
 
 			// mgf file has 150 sections so the tar file should also;
 			// tar name is mytar.tar;
-			final TarWriter t = new TarWriter(new File(outputDir, "mytar.tar"));
+			final TarWriter t = new TarWriter(new File(outputDir, "mytar.tar"), new TestProgressReporter());
 			// now read number of sections;
 			final int numheaders = TarReader.readNumberHeaders(t.getTarFile());
 			//Assert.assertEquals (300, numheaders, "number of headers not correct");
@@ -1125,11 +1145,12 @@ public final class TestSequestSubmission {
 
 			m.setMaxCommandLineLength(10000);
 
-			m.callSequest(new File(outputDir, "tarfile.tar"), fparams, fmgf, 10 * 1000, 10 * 1000, hdrFile);
+			m.callSequest(new File(outputDir, "tarfile.tar"), fparams, fmgf, 10 * 1000, 10 * 1000, hdrFile,
+					new TestProgressReporter());
 
 			// mgf file has 150 sections so the tar file should also;
 			// tar name is mytar.tar;
-			final TarWriter t = new TarWriter(new File(outputDir, "mytar.tar"));
+			final TarWriter t = new TarWriter(new File(outputDir, "mytar.tar"), new TestProgressReporter());
 			// now read number of sections;
 			final int numheaders = TarReader.readNumberHeaders(t.getTarFile());
 			//Assert.assertEquals (300, numheaders, "number of headers not correct");

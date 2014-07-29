@@ -66,7 +66,7 @@ public final class HemeUiTest {
 		fastaDbDao = mock(FastaDbDao.class);
 		stub(fastaDbDao.getProteinDescription(any(Curation.class), anyString())).toReturn("Protein description");
 
-		hemeUi = new HemeUi(data, results, hemeDao, swiftDao, fastaDbDao, paramsDao, swiftSearcherCaller, "1", "2", "zenka.roman@mayo.edu", new File("test_cache.obj"), new String[]{"MASCOT-2.4", "SCAFFOLD-4.0.7"});
+		hemeUi = new HemeUi(data, results, hemeDao, swiftDao, fastaDbDao, paramsDao, swiftSearcherCaller, "1", "2", "zenka.roman@mayo.edu", new File("test_cache.obj"));
 	}
 
 	private void createValidEntry(String name, String date) {

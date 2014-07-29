@@ -5,6 +5,7 @@ import edu.mayo.mprc.tar.TarReader;
 import edu.mayo.mprc.tar.TarWriter;
 import edu.mayo.mprc.utilities.FileUtilities;
 import edu.mayo.mprc.utilities.GZipUtilities;
+import edu.mayo.mprc.utilities.progress.UserProgressReporter;
 import org.apache.log4j.Logger;
 
 import java.io.File;
@@ -71,7 +72,10 @@ final class SequestSubmit implements SequestSubmitterInterface {
 
 	private long creationTime;
 
-	SequestSubmit(final long maxLineLength, final File paramsFile, final File workingDir, final File tarFile, final File hostsFile) {
+	private UserProgressReporter progressReporter;
+
+	SequestSubmit(final long maxLineLength, final File paramsFile, final File workingDir, final File tarFile,
+	              final File hostsFile, final UserProgressReporter progressReporter) {
 		// this needs to be grabbed from the system
 		this.maxLineLength = (int) maxLineLength;
 		this.paramsFile = paramsFile;
@@ -80,6 +84,7 @@ final class SequestSubmit implements SequestSubmitterInterface {
 		this.tarFile = tarFile;
 		this.hostsFile = hostsFile;
 		creationTime = new Date().getTime();
+		this.progressReporter = progressReporter;
 	}
 
 
@@ -133,7 +138,7 @@ final class SequestSubmit implements SequestSubmitterInterface {
 		}
 		final Date endZip = new Date();
 		final long zipTime = endZip.getTime() - startZip.getTime();
-		LOGGER.debug("ziptime = " + zipTime);
+		LOGGER.info("ziptime = " + zipTime);
 
 		// remove the tar file as no longer needed
 		FileUtilities.quietDelete(tarFile);
@@ -148,7 +153,7 @@ final class SequestSubmit implements SequestSubmitterInterface {
 	 */
 	private void submitFilesToSequest() {
 
-		LOGGER.debug("start submitting batch of files to sequest, after " + (new Date().getTime() - creationTime) + " ms of preprocessing");
+		LOGGER.info("start submitting batch of files to sequest, after " + (new Date().getTime() - creationTime) + " ms of preprocessing");
 
 		submitCount++;
 		// see if a sequest.log exists
@@ -170,10 +175,10 @@ final class SequestSubmit implements SequestSubmitterInterface {
 		}
 
 		// now the tar
-		LOGGER.debug("tar file name=" + tarFile);
+		LOGGER.info("tar file name=" + tarFile);
 		TarWriter tt = null;
 		try {
-			tt = new TarWriter(tarFile);
+			tt = new TarWriter(tarFile, progressReporter);
 			// .out and .dta files are in the working  dir for sequest
 			final List<String> dtasToTar = new ArrayList<String>();
 			final List<File> sequestDtaSnapshot = new ArrayList<File>(getSequestDtaFiles());
@@ -189,7 +194,7 @@ final class SequestSubmit implements SequestSubmitterInterface {
 			final Date endTar = new Date();
 			final long tarTime = endTar.getTime() - startTar.getTime();
 
-			LOGGER.debug("tartime = " + tarTime);
+			LOGGER.info("Tarring finished, tar time: " + tarTime);
 		} finally {
 			if (tt != null) {
 				try {
@@ -203,7 +208,7 @@ final class SequestSubmit implements SequestSubmitterInterface {
 			validateTarFile(tarFile);
 		}
 
-		LOGGER.debug("tar file = " + tt.getTarFile() + " has " + TarReader.readNumberHeaders(tt.getTarFile()) + " headers");
+		LOGGER.info("tar file = " + tt.getTarFile() + " has " + TarReader.readNumberHeaders(tt.getTarFile()) + " headers");
 
 		// then remove the files
 		sequestDtaFiles = new ArrayList<File>();
@@ -228,10 +233,10 @@ final class SequestSubmit implements SequestSubmitterInterface {
 		SequestRunner sequestRunner = null;
 		// make the call to sequest
 		if (sequestCaller == null) {
-			sequestCaller = new SequestRunner(outputDir, paramsFile, dtaFiles, hostsFile);
+			sequestCaller = new SequestRunner(outputDir, paramsFile, dtaFiles, hostsFile, progressReporter);
 			sequestRunner = (SequestRunner) sequestCaller;
 		} else {
-			sequestRunner = (SequestRunner) sequestCaller.createInstance(sequestCaller.getWorkingDir(), paramsFile, dtaFiles, hostsFile);
+			sequestRunner = (SequestRunner) sequestCaller.createInstance(sequestCaller.getWorkingDir(), paramsFile, dtaFiles, hostsFile, progressReporter);
 			sequestRunner.setStartTimeOut(sequestCaller.getStartTimeOut());
 			sequestRunner.setWatchDogTimeOut(sequestCaller.getWatchDogTimeOut());
 			sequestRunner.setSearchResultsFolder(sequestCaller.getSearchResultsFolder());
@@ -251,7 +256,7 @@ final class SequestSubmit implements SequestSubmitterInterface {
 		}
 		final Date endSearch = new Date();
 		final long searchTime = endSearch.getTime() - startSearch.getTime();
-		LOGGER.debug("searchtime = " + searchTime);
+		LOGGER.info("Sequest search done. Time: " + searchTime);
 
 
 		if (exceptionThrown != null) {

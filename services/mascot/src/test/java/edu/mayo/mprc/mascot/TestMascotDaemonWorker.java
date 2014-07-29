@@ -9,6 +9,8 @@ import edu.mayo.mprc.swift.params2.mapping.Mappings;
 import edu.mayo.mprc.swift.params2.mapping.ParamsInfo;
 import edu.mayo.mprc.swift.params2.mapping.TestMappingContextBase;
 import edu.mayo.mprc.utilities.FileUtilities;
+import edu.mayo.mprc.utilities.log.ParentLog;
+import edu.mayo.mprc.utilities.log.SimpleParentLog;
 import edu.mayo.mprc.utilities.progress.ProgressInfo;
 import edu.mayo.mprc.utilities.progress.ProgressReporter;
 import org.apache.log4j.Logger;
@@ -74,7 +76,7 @@ public final class TestMascotDaemonWorker {
 
 		final Worker worker = factory.create(config, null);
 
-		final MascotWorkPacket workPacket = new MascotWorkPacket(mascotOut, mascotParams, inputMgfFile, TEST_MASCOT_DB, "0", false, false);
+		final MascotWorkPacket workPacket = new MascotWorkPacket(mascotOut, mascotParams, inputMgfFile, TEST_MASCOT_DB, false, false);
 		WorkPacketBase.simulateTransfer(workPacket);
 
 		worker.processRequest(workPacket, new ProgressReporter() {
@@ -86,6 +88,11 @@ public final class TestMascotDaemonWorker {
 			@Override
 			public void reportProgress(final ProgressInfo progressInfo) {
 				LOGGER.info(progressInfo);
+			}
+
+			@Override
+			public ParentLog getLog() {
+				return new SimpleParentLog();
 			}
 
 			@Override

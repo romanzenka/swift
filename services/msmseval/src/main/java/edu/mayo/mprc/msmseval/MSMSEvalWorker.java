@@ -108,7 +108,7 @@ public final class MSMSEvalWorker extends WorkerBase {
 
 			msmsEval = new MSMSEval(outputMzXMLFile, msmsEvalParamFile, msmsEvalExecutable);
 
-			msmsEval.execute(true);
+			msmsEval.execute(reporter);
 
 			LOGGER.info("Command msmsEval execution completed.");
 

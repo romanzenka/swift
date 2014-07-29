@@ -4,6 +4,7 @@ package edu.mayo.mprc.tar;
 import edu.mayo.mprc.MprcException;
 import edu.mayo.mprc.utilities.FileUtilities;
 import edu.mayo.mprc.utilities.ProcessCaller;
+import edu.mayo.mprc.utilities.progress.UserProgressReporter;
 import org.apache.log4j.Logger;
 import org.apache.tools.tar.TarEntry;
 import org.apache.tools.tar.TarOutputStream;
@@ -53,14 +54,15 @@ public final class TarWriter {
 	 */
 	private boolean written;
 	private boolean rolled;
+	private UserProgressReporter progressReporter;
 
 	private static final String ROLL_OVER_EXTENSION = ".1.tar";
 
 	/**
 	 * if the tar file exists it rolls it otherwise creates it
 	 */
-	public TarWriter(final File tarFile) {
-		initialize(tarFile);
+	public TarWriter(final File tarFile, UserProgressReporter progressReporter) {
+		initialize(tarFile, progressReporter);
 	}
 
 	/**
@@ -68,8 +70,9 @@ public final class TarWriter {
 	 *
 	 * @param file
 	 */
-	private void initialize(final File file) {
+	private void initialize(final File file, final UserProgressReporter progressReporter) {
 		tarFile = file;
+		this.progressReporter = progressReporter;
 		if (tarFile.exists()) {
 			// backup the existing one to the file with name tarFileName + ROLL_OVER_EXTENSION
 			FileUtilities.rename(tarFile, getRolloverFile());
@@ -160,17 +163,18 @@ public final class TarWriter {
 	/**
 	 * concatenate the tar files
 	 *
-	 * @param to   append to this file
-	 * @param from contents of this appended to 'to'
+	 * @param to       append to this file
+	 * @param from     contents of this appended to 'to'
+	 * @param reporter Object to help with reporting progress (specifically log files)
 	 */
-	public static void concatenateTars(final File to, final File from) {
+	public static void concatenateTars(final File to, final File from, final UserProgressReporter reporter) {
 		if (to.getName().equals(from.getName())) {
 			return;
 		}
 		LOGGER.debug("concatenating tars, " + to.getAbsolutePath() + " << " + from.getAbsolutePath());
 		final List<String> command = Arrays.asList("tar", "-A", "-f", to.getAbsolutePath(), from.getAbsolutePath());
 		final ProcessBuilder builder = new ProcessBuilder(command);
-		final ProcessCaller caller = new ProcessCaller(builder);
+		final ProcessCaller caller = new ProcessCaller(builder, reporter.getLog());
 		caller.setLogToConsole(false);
 		caller.runAndCheck("tar file concatenation");
 		FileUtilities.quietDelete(from);
@@ -196,7 +200,7 @@ public final class TarWriter {
 			// tar concatenate example : <tar --concatenate --file foo.tar fooadd.tar>
 			final File newTar = getRolloverFile();
 			if (newTar.exists()) {
-				concatenateTars(tarFile, newTar);
+				concatenateTars(tarFile, newTar, progressReporter);
 			}
 		}
 	}

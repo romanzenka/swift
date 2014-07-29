@@ -149,7 +149,7 @@ public final class ScaffoldWorker extends WorkerBase {
 		final ProcessBuilder processBuilder = new ProcessBuilder(getScaffoldBatchScript().getAbsolutePath(), scafmlFile.getAbsolutePath())
 				.directory(scaffoldWorkFolder);
 
-		final ProcessCaller caller = new ProcessCaller(processBuilder);
+		final ProcessCaller caller = new ProcessCaller(processBuilder, progressReporter.getLog());
 		caller.setOutputMonitor(new ScaffoldLogMonitor(progressReporter));
 
 		try {

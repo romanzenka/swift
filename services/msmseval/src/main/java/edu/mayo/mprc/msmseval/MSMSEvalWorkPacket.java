@@ -25,8 +25,8 @@ public final class MSMSEvalWorkPacket extends WorkPacketBase implements Cachable
 	public MSMSEvalWorkPacket(final File sourceFile, final File msmsEvalParamFile,
 	                          final File outputFile,
 	                          final File outputEmFile,
-	                          final String taskId, final boolean fromScratch) {
-		super(taskId, fromScratch);
+	                          final boolean fromScratch) {
+		super(fromScratch);
 
 		this.sourceFile = sourceFile;
 		this.outputFile = outputFile;
@@ -99,7 +99,6 @@ public final class MSMSEvalWorkPacket extends WorkPacketBase implements Cachable
 				getMsmsEvalParamFile(),
 				new File(cacheFolder, getExpectedResultFileName(getSourceFile(), cacheFolder).getName()),
 				new File(cacheFolder, getExpectedEmOutputFileName(getSourceFile(), cacheFolder).getName()),
-				getTaskId(),
 				isFromScratch()
 		);
 	}

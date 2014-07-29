@@ -31,13 +31,19 @@ final class DirectDaemonConnection implements DaemonConnection {
 	private Service service = null;
 	private static AtomicInteger listenerNumber = new AtomicInteger(0);
 	private FileTokenFactory fileTokenFactory;
+	/**
+	 * We will use this parent log to create child loggers for each separate request as they arrive.
+	 * This parent logger needs to be set up in such way that it will notify the sender of a request
+	 */
+	private DaemonLoggerFactory daemonLoggerFactory;
 
-	DirectDaemonConnection(final Service service, final FileTokenFactory fileTokenFactory) {
+	DirectDaemonConnection(final Service service, final FileTokenFactory fileTokenFactory, final DaemonLoggerFactory daemonLoggerFactory) {
 		if (service == null) {
 			throw new MprcException("The service must not be null");
 		}
 		this.service = service;
 		this.fileTokenFactory = fileTokenFactory;
+		this.daemonLoggerFactory = daemonLoggerFactory;
 	}
 
 	@Override
@@ -66,7 +72,7 @@ final class DirectDaemonConnection implements DaemonConnection {
 		try {
 			final int number = listenerNumber.incrementAndGet();
 			service.sendRequest(workPacket, priority, new DaemonResponseListener(listener, "R#" + number, this));
-		} catch (MprcException e) {
+		} catch (final MprcException e) {
 			// SWALLOWED: The exception is reported directly to the listener
 			listener.requestTerminated(new DaemonException(e));
 		}

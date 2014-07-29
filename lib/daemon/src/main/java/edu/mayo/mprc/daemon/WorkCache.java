@@ -130,6 +130,7 @@ public abstract class WorkCache<T extends WorkPacket> implements NoLoggingWorker
 		final File existingEntry = cacheFolder.lookup(lookupPacket);
 
 		if (existingEntry != null) {
+			LOGGER.info(String.format("Found existing entry in cache: %s", existingEntry.getAbsolutePath()));
 			reportCachedValues(progressReporter, originalPacket, lookupPacket, existingEntry);
 			return;
 		}
@@ -149,6 +150,7 @@ public abstract class WorkCache<T extends WorkPacket> implements NoLoggingWorker
 				workInProgress.put(taskDescription, newReporter);
 				newReporter.addProgressReporter(progressReporter);
 			} else {
+				LOGGER.info(String.format("Cache already working on this. Will report progress"));
 				// We already are doing work. Register the new caller and quit
 				cacheProgressReporter.addProgressReporter(progressReporter);
 				return;
@@ -163,8 +165,12 @@ public abstract class WorkCache<T extends WorkPacket> implements NoLoggingWorker
 		final File wipFolder = cacheFolder.makeWorkFolder(originalPacket);
 
 		final WorkPacket modifiedWorkPacket = originalPacket.translateToCachePacket(wipFolder);
+		//  Our new packet will bear ID of our current log. That would ensure that its child logs
+		// will be properly hooked as children of our task.
+		modifiedWorkPacket.setTaskId(progressReporter.getLog().getLogId());
 
-		final MyProgressListener listener = new MyProgressListener(lookupPacket, originalPacket, wipFolder, newReporter);
+		final ProgressListener listener = new MyProgressListener(lookupPacket, originalPacket, wipFolder, newReporter);
+		LOGGER.info(String.format(String.format("Cache submitting work to %s", getDaemon().getConnectionName())));
 		daemon.sendWork(modifiedWorkPacket, listener);
 	}
 
@@ -190,7 +196,9 @@ public abstract class WorkCache<T extends WorkPacket> implements NoLoggingWorker
 	 * Delete everything in the cache.
 	 */
 	private void cleanupCache() {
+		LOGGER.info(String.format("Cleaning up cache folder %s", cacheFolder.getCacheFolder().getAbsolutePath()));
 		cacheFolder.cleanup();
+		LOGGER.info(String.format("Cleaned cache folder %s", cacheFolder.getCacheFolder().getAbsolutePath()));
 	}
 
 	/**
@@ -297,6 +305,7 @@ public abstract class WorkCache<T extends WorkPacket> implements NoLoggingWorker
 
 		@Override
 		public void userProgressInformation(final ProgressInfo progressInfo) {
+			// When we get progress info about
 			// Let the cache know what happened
 			WorkCache.this.userProgressInformation(wipFolder, progressInfo);
 			reporter.reportProgress(progressInfo);

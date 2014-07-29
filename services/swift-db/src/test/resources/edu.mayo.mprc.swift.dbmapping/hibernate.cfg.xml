@@ -13,6 +13,7 @@
         <mapping resource="edu/mayo/mprc/swift/dbmapping/SwiftDBVersion.hbm.xml" />
         <mapping resource="edu/mayo/mprc/swift/dbmapping/SwiftSearchDefinition.hbm.xml" />
         <mapping resource="edu/mayo/mprc/swift/dbmapping/TaskData.hbm.xml" />
+        <mapping resource="edu/mayo/mprc/swift/dbmapping/LogData.hbm.xml" />
         <mapping resource="edu/mayo/mprc/swift/dbmapping/TaskStateData.hbm.xml" />
     </session-factory>
 </hibernate-configuration>

@@ -48,6 +48,7 @@ public final class SwiftDaoHibernate extends DaoBase implements SwiftDao {
 	public Collection<String> getHibernateMappings() {
 		final List<String> list = new ArrayList<String>(Arrays.asList(
 				MAP + "FileSearch.hbm.xml",
+				MAP + "LogData.hbm.xml",
 				MAP + "PeptideReport.hbm.xml",
 				MAP + "ReportData.hbm.xml",
 				MAP + "SearchRun.hbm.xml",
@@ -214,6 +215,14 @@ public final class SwiftDaoHibernate extends DaoBase implements SwiftDao {
 		} catch (Exception t) {
 			throw new MprcException("Could not add file search information", t);
 		}
+	}
+
+	@Override
+	public List<LogData> getLogsForTask(final TaskData data) {
+		final Session session = getSession();
+		final Criteria criteria = session.createCriteria(LogData.class)
+				.add(nullSafeEq("task", data));
+		return listAndCast(criteria);
 	}
 
 	@Override
@@ -430,11 +439,17 @@ public final class SwiftDaoHibernate extends DaoBase implements SwiftDao {
 	public void storeAssignedTaskData(final TaskData taskData, final AssignedTaskData assignedTaskData) {
 		try {
 			taskData.setGridJobId(assignedTaskData.getAssignedId());
-			taskData.setOutputLogDatabaseToken(fileTokenFactory.fileToDatabaseToken(assignedTaskData.getOutputLogFile()));
-			taskData.setErrorLogDatabaseToken(fileTokenFactory.fileToDatabaseToken(assignedTaskData.getErrorLogFile()));
+//			taskData.setOutputLogDatabaseToken(fileTokenFactory.fileToDatabaseToken(assignedTaskData.getOutputLogFile()));
+//			taskData.setErrorLogDatabaseToken(fileTokenFactory.fileToDatabaseToken(assignedTaskData.getErrorLogFile()));
 		} catch (Exception t) {
 			throw new MprcException("Cannot store task grid request id " + assignedTaskData.getAssignedId() + " for task " + taskData, t);
 		}
+	}
+
+	@Override
+	public LogData storeLogData(final LogData logData) {
+		getSession().saveOrUpdate(logData);
+		return logData;
 	}
 
 	@Override

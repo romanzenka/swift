@@ -70,7 +70,8 @@ public final class WorkCachePerformanceTest {
 		final File cacheLogFolder = new File(cacheFolder, "cache_log");
 		FileUtilities.ensureFolderExists(cacheLogFolder);
 
-		final DaemonConfigInfo daemonConfigInfo = new DaemonConfigInfo("test", FileUtilities.getDefaultTempDirectory().getAbsolutePath());
+		String tempFolder = FileUtilities.getDefaultTempDirectory().getAbsolutePath();
+		final DaemonConfigInfo daemonConfigInfo = new DaemonConfigInfo("test", tempFolder);
 		final FileTokenFactory fileTokenFactory = new FileTokenFactory(daemonConfigInfo);
 
 		final TestWorker worker = new TestWorker();
@@ -125,7 +126,7 @@ public final class WorkCachePerformanceTest {
 
 	private SimpleRunner wrapWithRunner(final Worker worker, final String queueName, final File logFolder, final FileTokenFactory fileTokenFactory) throws URISyntaxException {
 		final Service service = serviceFactory.createService(queueName, responseDispatcher);
-		final DirectDaemonConnection directConnection = new DirectDaemonConnection(service, fileTokenFactory);
+		final DirectDaemonConnection directConnection = new DirectDaemonConnection(service, fileTokenFactory, new DaemonLoggerFactory(logFolder));
 		final Daemon daemon = new Daemon();
 		daemon.setLogOutputFolder(logFolder);
 		final SimpleRunner runner = new SimpleRunner();

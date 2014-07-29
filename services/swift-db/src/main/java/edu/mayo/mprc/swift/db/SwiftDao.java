@@ -124,6 +124,12 @@ public interface SwiftDao extends Dao, RuntimeInitializer {
 
 	void storeAssignedTaskData(TaskData taskData, AssignedTaskData assignedTaskData);
 
+	/**
+	 * @param logData Log data to save.
+	 * @return Freshly saved {@link LogData} object.
+	 */
+	LogData storeLogData(final LogData logData);
+
 	void searchRunFailed(int searchRunId, String message);
 
 	/**
@@ -171,4 +177,9 @@ public interface SwiftDao extends Dao, RuntimeInitializer {
 	 * Add a file search object (for testing purposes).
 	 */
 	FileSearch addFileSearch(final FileSearch fileSearch);
+
+	/**
+	 * Get a list of all LogData objects for given task.
+	 */
+	List<LogData> getLogsForTask(TaskData data);
 }

@@ -5,6 +5,7 @@ import edu.mayo.mprc.MprcException;
 import edu.mayo.mprc.utilities.FileUtilities;
 import edu.mayo.mprc.utilities.LogMonitor;
 import edu.mayo.mprc.utilities.ProcessCaller;
+import edu.mayo.mprc.utilities.progress.UserProgressReporter;
 import org.apache.log4j.Logger;
 
 import java.io.File;
@@ -48,6 +49,7 @@ class SequestRunner implements Runnable, SequestCallerInterface {
 	private List<String> args;
 	private long watchDogTimeOut;
 	private long startTimeOut;
+	private UserProgressReporter reporter;
 
 
 	/**
@@ -59,11 +61,14 @@ class SequestRunner implements Runnable, SequestCallerInterface {
 	 * @param sequestDtaFiles - the list of '.dta' files for this call to the sequest executable
 	 * @param hostsFile       - pvm.hosts file location. Needed for checking whether pvm operates ok.
 	 */
-	SequestRunner(final File workingdir, final File paramsFile, final List<File> sequestDtaFiles, final File hostsFile) {
+	SequestRunner(final File workingdir,
+	              final File paramsFile, final List<File> sequestDtaFiles, final File hostsFile,
+	              final UserProgressReporter progressReporter) {
 		setWorkingDir(workingdir);
 		this.paramsFile = paramsFile;
 		this.sequestDtaFiles = sequestDtaFiles;
 		this.hostsFile = hostsFile;
+		this.reporter = progressReporter;
 
 		final List<String> newArgs = new ArrayList<String>();
 
@@ -76,7 +81,7 @@ class SequestRunner implements Runnable, SequestCallerInterface {
 			newArgs.add(dta.getName());
 		}
 
-		LOGGER.debug("sequest caller processing " + sequestDtaFiles.size() + " dta files");
+		LOGGER.info("sequest caller processing " + sequestDtaFiles.size() + " dta files");
 
 		setArgs(newArgs);
 	}
@@ -134,8 +139,10 @@ class SequestRunner implements Runnable, SequestCallerInterface {
 
 
 	@Override
-	public SequestCallerInterface createInstance(final File workingdir, final File paramsFile, final List<File> sequestDtaFiles, final File hostsFile) {
-		final SequestRunner runner = new SequestRunner(workingdir, paramsFile, sequestDtaFiles, this.hostsFile);
+	public SequestCallerInterface createInstance(final File workingdir,
+	                                             final File paramsFile, final List<File> sequestDtaFiles, final File hostsFile,
+	                                             UserProgressReporter progressReporter) {
+		final SequestRunner runner = new SequestRunner(workingdir, paramsFile, sequestDtaFiles, this.hostsFile, progressReporter);
 		runner.setWatchDogTimeOut(getWatchDogTimeOut());
 		runner.setStartTimeOut(getStartTimeOut());
 		if (getCommand() != null) {
@@ -247,7 +254,7 @@ class SequestRunner implements Runnable, SequestCallerInterface {
 		}
 
 		final ProcessBuilder builder = createProcess();
-		final ProcessCaller caller = new ProcessCaller(builder);
+		final ProcessCaller caller = new ProcessCaller(builder, reporter.getLog());
 		caller.setLogToConsole(false);
 		// Sequest will get killed after the given timeout unless we do something
 		caller.setKillTimeout(getStartTimeOut());
@@ -275,7 +282,7 @@ class SequestRunner implements Runnable, SequestCallerInterface {
 		}
 		assert hostsFile != null : "Path to pvm_hosts file is not set";
 		final String userName = System.getProperties().getProperty("user.name");
-		LOGGER.debug("validating pvm for user [" + userName + "]");
+		LOGGER.info("validating pvm for user [" + userName + "]");
 		final PvmUtilities pvm = new PvmUtilities();
 		pvm.makeSurePVMOk(userName, hostsFile.getAbsolutePath(), PVM_DAEMON, "/tmp");
 	}

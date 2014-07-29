@@ -1,10 +1,14 @@
 package edu.mayo.mprc.daemon;
 
 import edu.mayo.mprc.daemon.worker.WorkPacket;
+import edu.mayo.mprc.utilities.log.ParentLog;
 
 import java.io.Serializable;
 
 public interface DaemonRequest {
+	/**
+	 * @return Information about the work to be done.
+	 */
 	WorkPacket getWorkPacket();
 
 	/**

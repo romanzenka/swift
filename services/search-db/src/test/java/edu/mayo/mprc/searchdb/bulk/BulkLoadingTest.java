@@ -25,6 +25,8 @@ import edu.mayo.mprc.unimod.Unimod;
 import edu.mayo.mprc.unimod.UnimodDao;
 import edu.mayo.mprc.unimod.UnimodDaoHibernate;
 import edu.mayo.mprc.utilities.FileUtilities;
+import edu.mayo.mprc.utilities.log.ParentLog;
+import edu.mayo.mprc.utilities.log.SimpleParentLog;
 import edu.mayo.mprc.utilities.progress.ProgressInfo;
 import edu.mayo.mprc.utilities.progress.UserProgressReporter;
 import edu.mayo.mprc.workspace.User;
@@ -146,6 +148,11 @@ public final class BulkLoadingTest extends DaoTest {
 			@Override
 			public void reportProgress(ProgressInfo progressInfo) {
 
+			}
+
+			@Override
+			public ParentLog getLog() {
+				return new SimpleParentLog();
 			}
 		};
 		searchDbDao.begin();

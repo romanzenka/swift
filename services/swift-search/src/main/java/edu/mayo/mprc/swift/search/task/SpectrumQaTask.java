@@ -80,7 +80,7 @@ final class SpectrumQaTask extends AsyncTaskBase {
 			return null;
 		}
 
-		return new MSMSEvalWorkPacket(sourceMGFFile.getResultingFile(), msmsEvalParamFile, outputFile, emFile, getFullId(), false);
+		return new MSMSEvalWorkPacket(sourceMGFFile.getResultingFile(), msmsEvalParamFile, outputFile, emFile, false);
 	}
 
 	@Override

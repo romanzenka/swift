@@ -110,7 +110,6 @@ final class RawToMgfTask extends AsyncTaskBase implements FileProducingTask {
 					outputFile,
 					true,
 					inputFile,
-					getFullId(),
 					isFromScratch(),
 					publicAccess);
 		}

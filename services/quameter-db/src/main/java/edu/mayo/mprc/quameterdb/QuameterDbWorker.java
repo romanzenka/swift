@@ -13,6 +13,7 @@ import edu.mayo.mprc.database.Database;
 import edu.mayo.mprc.quameterdb.dao.QuameterDao;
 import edu.mayo.mprc.utilities.FileUtilities;
 import edu.mayo.mprc.utilities.progress.UserProgressReporter;
+import org.apache.log4j.Logger;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
@@ -28,6 +29,7 @@ import java.util.TreeMap;
  * @author Roman Zenka
  */
 public final class QuameterDbWorker extends WorkerBase {
+	private static final Logger LOGGER = Logger.getLogger(QuameterDbWorker.class);
 	private QuameterDao dao;
 
 	public static final String TYPE = "quameter-db";
@@ -68,7 +70,10 @@ public final class QuameterDbWorker extends WorkerBase {
 	}
 
 	static Map<String, Double> loadQuameterResultFile(final File quameterFile) {
-		return loadQuameterResultFile(FileUtilities.getReader(quameterFile));
+		LOGGER.info(String.format("Loading Quameter result file from %s", quameterFile.getAbsolutePath()));
+		Map<String, Double> stringDoubleMap = loadQuameterResultFile(FileUtilities.getReader(quameterFile));
+		LOGGER.info(String.format("Loaded %d key-value pairs", stringDoubleMap.size()));
+		return stringDoubleMap;
 	}
 
 	static Map<String, Double> loadQuameterResultFile(final Reader reader) {

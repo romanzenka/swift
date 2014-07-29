@@ -18,6 +18,8 @@ import edu.mayo.mprc.searchengine.EngineMetadata;
 import edu.mayo.mprc.utilities.FileUtilities;
 import edu.mayo.mprc.utilities.ProcessCaller;
 import edu.mayo.mprc.utilities.StreamRegExMatcher;
+import edu.mayo.mprc.utilities.log.ParentLog;
+import edu.mayo.mprc.utilities.log.SimpleParentLog;
 import edu.mayo.mprc.utilities.progress.ProgressInfo;
 import edu.mayo.mprc.utilities.progress.ProgressReporter;
 import edu.mayo.mprc.utilities.progress.UserProgressReporter;
@@ -83,7 +85,7 @@ public final class XTandemWorker extends WorkerBase {
 			throw new MprcException("Could not read parameters file " + searchParamsFile.getAbsolutePath(), e);
 		}
 
-		final XTandemWorkPacket packet = new XTandemWorkPacket(inputFile, searchParams, outputFile, databaseFile, false, "1", false);
+		final XTandemWorkPacket packet = new XTandemWorkPacket(inputFile, searchParams, outputFile, databaseFile, false, false);
 
 		worker.processRequest(packet, new ProgressReporter() {
 			@Override
@@ -99,6 +101,11 @@ public final class XTandemWorker extends WorkerBase {
 			@Override
 			public void reportFailure(final Throwable t) {
 				LOGGER.error("Could not run X!Tandem", t);
+			}
+
+			@Override
+			public ParentLog getLog() {
+				return new SimpleParentLog();
 			}
 
 			@Override
@@ -159,7 +166,8 @@ public final class XTandemWorker extends WorkerBase {
 				tempWorkFolder,
 				outputFile,
 				taxonomyXmlFile,
-				initialThreads);
+				initialThreads,
+				progressReporter);
 		if (processCaller.getExitValue() != 0 && initialThreads > 1) {
 			// Failure, try running with fewer threads
 			LOGGER.warn("X!Tandem failed, rerunning with one thread");
@@ -170,7 +178,8 @@ public final class XTandemWorker extends WorkerBase {
 					tempWorkFolder,
 					outputFile,
 					taxonomyXmlFile,
-					1);
+					1,
+					progressReporter);
 		}
 
 		if (processCaller.getExitValue() != 0) {
@@ -187,7 +196,8 @@ public final class XTandemWorker extends WorkerBase {
 			final File fastaFile,
 			final File inputFile,
 			final String params,
-			final File workFolder, final File outputFile, final File taxonomyXmlFile, final int threads) {
+			final File workFolder, final File outputFile, final File taxonomyXmlFile, final int threads,
+			final UserProgressReporter progressReporter) {
 
 		LOGGER.info("Running tandem search using " + threads + " threads");
 		LOGGER.info("\tFasta file " + fastaFile.getAbsolutePath() + " does" + (fastaFile.exists() && fastaFile.length() > 0 ? " " : " not ") + "exist.");
@@ -210,7 +220,7 @@ public final class XTandemWorker extends WorkerBase {
 		final ProcessBuilder processBuilder = new ProcessBuilder(parameters);
 		processBuilder.directory(workFolder);
 
-		final ProcessCaller processCaller = new ProcessCaller(processBuilder);
+		final ProcessCaller processCaller = new ProcessCaller(processBuilder, progressReporter.getLog());
 
 		processCaller.run();
 		return processCaller;

@@ -74,7 +74,7 @@ public final class TestingUtilities {
 	 * gets a temporary file by looking for a given resource using the ClassLoader.
 	 *
 	 * @param clazz      the class you want to use to start ClassLoader search from.
-	 * @param resource   the resource we will try to find using the ClassLoader
+	 * @param resource   the resource we will try to find using the ClassLoader, e.g. {@code "/edu/mayo/mprc/.../file.txt"}
 	 * @param autoDelete
 	 * @return the temporary file created from that stream
 	 * @throws IOException there were any io related issues.

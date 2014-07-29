@@ -3,16 +3,14 @@ package edu.mayo.mprc.daemon;
 import edu.mayo.mprc.config.*;
 import edu.mayo.mprc.config.ui.FactoryDescriptor;
 import edu.mayo.mprc.config.ui.ServiceUiFactory;
-import edu.mayo.mprc.daemon.exception.DaemonException;
-import edu.mayo.mprc.daemon.worker.NoLoggingWorker;
 import edu.mayo.mprc.daemon.worker.Worker;
 import edu.mayo.mprc.daemon.worker.WorkerFactory;
 import edu.mayo.mprc.daemon.worker.WorkerFactoryBase;
-import edu.mayo.mprc.daemon.worker.log.LoggingSetup;
-import edu.mayo.mprc.utilities.progress.ProgressInfo;
-import edu.mayo.mprc.utilities.progress.ProgressReporter;
+import edu.mayo.mprc.utilities.log.ChildLog;
+import edu.mayo.mprc.utilities.log.ParentLog;
 import org.apache.log4j.Logger;
 
+import java.io.File;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
 
@@ -30,11 +28,13 @@ public final class SimpleRunner extends AbstractRunner {
 	private WorkerFactory<ResourceConfig, Worker> factory;
 	private ExecutorService executorService;
 	private DaemonConnection daemonConnection = null;
+	/**
+	 * Configuration for a worker
+	 */
 	private ResourceConfig config;
 	private DependencyResolver dependencies;
 
 	public SimpleRunner() {
-		super();
 	}
 
 	@Override
@@ -47,7 +47,7 @@ public final class SimpleRunner extends AbstractRunner {
 		final Worker worker;
 		try {
 			worker = getFactory().create(config, dependencies);
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			request.sendResponse(e, true);
 			return;
 		}
@@ -112,7 +112,7 @@ public final class SimpleRunner extends AbstractRunner {
 		this.daemonConnection = daemonConnection;
 	}
 
-	public void setConfig(ResourceConfig config) {
+	public void setConfig(final ResourceConfig config) {
 		this.config = config;
 	}
 
@@ -120,7 +120,7 @@ public final class SimpleRunner extends AbstractRunner {
 		return config;
 	}
 
-	public void setDependencies(DependencyResolver dependencies) {
+	public void setDependencies(final DependencyResolver dependencies) {
 		this.dependencies = dependencies;
 	}
 
@@ -129,7 +129,7 @@ public final class SimpleRunner extends AbstractRunner {
 	}
 
 	@Override
-	public void install(Map<String, String> params) {
+	public void install(final Map<String, String> params) {
 		LOGGER.info("Installing runner for " + getDaemonConnection().getConnectionName());
 		// First check if the factory we hold needs installing
 		if (factory instanceof Installable) {
@@ -144,49 +144,9 @@ public final class SimpleRunner extends AbstractRunner {
 	}
 
 	@Override
-	public void provideConfiguration(Map<String, String> currentConfiguration) {
+	public void provideConfiguration(final Map<String, String> currentConfiguration) {
 		if (config instanceof UiConfigurationProvider) {
 			((UiConfigurationProvider) config).provideConfiguration(currentConfiguration);
-		}
-	}
-
-	private final class MyProgressReporter implements ProgressReporter {
-		private final DaemonRequest request;
-		private final LoggingSetup loggingSetup;
-
-		private MyProgressReporter(final DaemonRequest request, final LoggingSetup loggingSetup) {
-			this.request = request;
-			this.loggingSetup = loggingSetup;
-		}
-
-		@Override
-		public void reportStart(final String hostString) {
-			sendResponse(request, new DaemonProgressMessage(hostString), false);
-			reportLogFiles();
-		}
-
-		@Override
-		public void reportProgress(final ProgressInfo progressInfo) {
-			sendResponse(request, new DaemonProgressMessage(DaemonProgress.UserSpecificProgressInfo, progressInfo), false);
-		}
-
-		@Override
-		public void reportSuccess() {
-			reportLogFiles();
-			sendResponse(request, new DaemonProgressMessage(DaemonProgress.RequestCompleted), true);
-		}
-
-		@Override
-		public void reportFailure(final Throwable t) {
-			reportLogFiles();
-			sendResponse(request, t, true);
-		}
-
-		private void reportLogFiles() {
-			if (loggingSetup != null) {
-				sendResponse(request, new DaemonProgressMessage(DaemonProgress.UserSpecificProgressInfo,
-						new AssignedTaskData(loggingSetup.getStandardOutFile(), loggingSetup.getStandardErrorFile())), false);
-			}
 		}
 	}
 
@@ -238,6 +198,7 @@ public final class SimpleRunner extends AbstractRunner {
 			runner.setDependencies(dependencies);
 			final int numThreads = config.getNumThreads();
 			runner.setExecutorService(new SimpleThreadPoolExecutor(numThreads, runner.getFactory().getUserName(), true));
+			runner.setDaemonLoggerFactory(new DaemonLoggerFactory(new File(config.getLogOutputFolder())));
 
 			return runner;
 		}
@@ -293,34 +254,32 @@ public final class SimpleRunner extends AbstractRunner {
 
 		@Override
 		public void run() {
-			final LoggingSetup logging;
+			// As we run, all that we log via Log4j will be reported within the child log files
+			// We pass the child logger onto the worker, so it can spawn its own children with their own logs
+			final RunnerProgressReporter progressReporter = new RunnerProgressReporter(SimpleRunner.this, request);
+			// Root logger - we have to start from scratch as we currently do not pass the parent log over the wire
+			final ParentLog log = getDaemonLoggerFactory().createLog(request.getWorkPacket().getTaskId(), progressReporter);
 
-			if (worker instanceof NoLoggingWorker) {
-				logging = null;
-			} else {
-				logging = new LoggingSetup(getLogDirectory());
-				try {
-					logging.startLogging();
-				} catch (Exception e) {
-					sendResponse(request, new DaemonException("Cannot establish logging for request", e), true);
-				}
+			// Here we send a progress message that new log file was established
+			final ChildLog childLog = log.createChildLog();
 
-			}
+			childLog.startLogging();
 			try {
 				if (worker instanceof Lifecycle) {
 					((Lifecycle) worker).start();
 				}
-				worker.processRequest(request.getWorkPacket(), new MyProgressReporter(request, logging));
+
+				// Set the log in the progress reporter to the newly spawned child
+				progressReporter.setParentLog(childLog);
+				worker.processRequest(request.getWorkPacket(), progressReporter);
 				if (worker instanceof Lifecycle) {
 					((Lifecycle) worker).stop();
 				}
-			} catch (Exception t) {
+			} catch (final Exception t) {
 				// SWALLOWED
 				LOGGER.error("Exception was thrown when processing a request - that means a communication error, or badly implemented worker.\nWorkers must never thrown an exception - they must report a failure.", t);
 			} finally {
-				if (logging != null) {
-					logging.stopLogging();
-				}
+				childLog.stopLogging();
 			}
 		}
 
