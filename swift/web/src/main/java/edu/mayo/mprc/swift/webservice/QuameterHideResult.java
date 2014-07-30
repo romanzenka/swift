@@ -20,12 +20,11 @@ public final class QuameterHideResult {
 
 	@RequestMapping(value = "/quameter-hide/{quameterResultId}", method = RequestMethod.POST)
 	@ResponseBody
-	public String hideQuameterResult(@PathVariable final int quameterResultId) {
+	public void hideQuameterResult(@PathVariable final int quameterResultId) {
 		quameterDao.begin();
 		try {
 			quameterDao.hideQuameterResult(quameterResultId);
 			quameterDao.commit();
-			return "Ok";
 		} catch (Exception e) {
 			quameterDao.rollback();
 			throw new MprcException("Could not hide quameter result " + quameterResultId, e);

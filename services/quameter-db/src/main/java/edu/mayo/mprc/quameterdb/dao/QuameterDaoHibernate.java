@@ -88,6 +88,7 @@ public final class QuameterDaoHibernate extends DaoBase implements QuameterDao {
 	public void hideQuameterResult(final int quameterResultId) {
 		final QuameterResult quameterResult = (QuameterResult) getSession().get(QuameterResult.class, quameterResultId);
 		quameterResult.setHidden(true);
+		getSession().saveOrUpdate(quameterResult);
 	}
 
 	@Override

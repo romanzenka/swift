@@ -5,6 +5,7 @@ import com.google.gson.stream.JsonWriter;
 import edu.mayo.mprc.MprcException;
 import edu.mayo.mprc.config.*;
 import edu.mayo.mprc.config.ui.*;
+import edu.mayo.mprc.daemon.SimpleRunner;
 import edu.mayo.mprc.daemon.UiConfigurationProvider;
 import edu.mayo.mprc.database.Dao;
 import edu.mayo.mprc.quameterdb.dao.QuameterDao;
@@ -208,6 +209,10 @@ public final class QuameterUi implements Dao, UiConfigurationProvider {
 
 		public String getSearchFilter() {
 			return searchFilter;
+		}
+
+		public void setQuameterConfig(QuameterDbWorker.Config quameterConfig) {
+			this.quameterConfig = new ServiceConfig("quameter", new SimpleRunner.Config(quameterConfig));
 		}
 
 		public QuameterDbWorker.Config getQuameterConfig() {

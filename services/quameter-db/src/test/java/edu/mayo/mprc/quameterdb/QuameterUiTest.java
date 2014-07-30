@@ -110,8 +110,12 @@ public final class QuameterUiTest extends DaoTest {
 
 		searchDbDao.commit();
 
+		final QuameterDbWorker.Config quameterDbConfig = new QuameterDbWorker.Config();
+
 		final QuameterUi.Config config = new QuameterUi.Config();
 		config.setSearchFilter(".*");
+		config.setQuameterConfig(quameterDbConfig);
+
 		final QuameterUi.Factory factory = new QuameterUi.Factory();
 		factory.setQuameterDao(quameterDao);
 		quameterUi = factory.create(config, new DependencyResolver(null));
@@ -136,6 +140,25 @@ public final class QuameterUiTest extends DaoTest {
 		Assert.assertEquals(quameterResults.size(), 1);
 
 		quameterDao.commit();
+	}
+
+	@Test
+	public void shouldHideResult() {
+		quameterDao.begin();
+
+		final QuameterResult quameterResult = addResult1();
+
+		nextTransaction();
+
+		quameterDao.hideQuameterResult(quameterResult.getId());
+
+		nextTransaction();
+
+		final List<QuameterResult> quameterResults = quameterDao.listAllResults(Pattern.compile(".*"));
+		Assert.assertEquals(quameterResults.size(), 0);
+
+		quameterDao.commit();
+
 	}
 
 	@Test

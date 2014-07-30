@@ -856,7 +856,7 @@ public final class QuameterResult extends PersistableBase {
 
 	@Override
 	public int hashCode() {
-		return Objects.hashCode(sample, fileSearch);
+		return Objects.hashCode(sample, fileSearch, hidden);
 	}
 
 	@Override
@@ -868,7 +868,8 @@ public final class QuameterResult extends PersistableBase {
 			return false;
 		}
 		final QuameterResult other = (QuameterResult) obj;
-		return Objects.equal(this.sample, other.sample) && Objects.equal(this.fileSearch, other.fileSearch);
+		return Objects.equal(this.sample, other.sample) && Objects.equal(this.fileSearch, other.fileSearch)
+				&& Objects.equal(this.hidden, other.hidden);
 	}
 
 	@Override
