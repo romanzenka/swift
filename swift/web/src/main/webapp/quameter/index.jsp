@@ -407,7 +407,8 @@ if(quameterUiConfig!=null) {
         is: "Ion Source",
         ms1: "MS1 Signal",
         ms2: "MS2 Signal",
-        p: "Protease"
+        p: "Protease",
+        id: "Protein ID"
     };
     var metrics = [
         { code: "c_1a", label: "C-1A", name: "Bleed Ratio", good: "low", simple: 0, desc: "Fraction of peptides with repeat identifications >4 min earlier than identification closest to the chromatographic maximum" },
@@ -451,7 +452,8 @@ if(quameterUiConfig!=null) {
         { code: "p_2a", label: "P-2A", name: "MS2 Tryptic Spectra", good: "high", simple: 0, desc: "Number of MS2 spectra identifying tryptic peptide ions" },
         { code: "p_2b", label: "P-2B", name: "MS2 Tryptic Ions", good: "high", simple: 0, desc: "Number of tryptic peptide ions identified" },
         { code: "p_2c", label: "P-2C", name: "Distinct Peptides", good: "high", simple: 0, desc: "Number of distinct identified tryptic peptide sequences, ignoring modifications and charge state" },
-        { code: "p_3", label: "P-3", name: "Semitryptic Ratio", good: "low", simple: 1, desc: "Ratio of semitryptic/tryptic peptides" }
+        { code: "p_3", label: "P-3", name: "Semitryptic Ratio", good: "low", simple: 1, desc: "Ratio of semitryptic/tryptic peptides" },
+        { code: "id_1", label: "ID-1", name: "Identified Spectra", good: "low", simple: 1, desc: "Number of identified spectra matching requested proteins for given category" }
     ];
 
     gs = [];

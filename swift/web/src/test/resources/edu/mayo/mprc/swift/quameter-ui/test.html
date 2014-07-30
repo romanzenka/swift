@@ -414,7 +414,8 @@ function drawChart() {
                 {"id": "p_2a", "label": "P-2A", "type": "number"},
                 {"id": "p_2b", "label": "P-2B", "type": "number"},
                 {"id": "p_2c", "label": "P-2C", "type": "number"},
-                {"id": "p_3", "label": "P-3", "type": "number"}
+                {"id": "p_3", "label": "P-3", "type": "number"},
+                {"id": "id_1", "label": "ID-1", "type": "number"}
             ], "rows": [
                 {"c": [
                     {"v": "Date(2001, 0, 1, 1, 1, 1, 0)"},
@@ -465,7 +466,8 @@ function drawChart() {
                     {"v": 609.0},
                     {"v": 306.0},
                     {"v": 274.0},
-                    {"v": 0.0}
+                    {"v": 0.0},
+                    {"v": 10},
                 ]},
                 {"c": [
                     {"v": "Date(2002, 1, 2, 2, 2, 2, 0)"},
@@ -516,7 +518,8 @@ function drawChart() {
                     {"v": 573.0},
                     {"v": 304.0},
                     {"v": 269.0},
-                    {"v": 0.0}
+                    {"v": 0.0},
+                    {"v": 20},
                 ]},
                 {"c": [
                     {"v": "Date(2003, 2, 3, 3, 3, 3, 0)"},
@@ -567,7 +570,8 @@ function drawChart() {
                     {"v": 516.0},
                     {"v": 270.0},
                     {"v": 239.0},
-                    {"v": 0.0}
+                    {"v": 0.0},
+                    {"v": 30},
                 ]},
                 {"c": [
                     {"v": "Date(2004, 3, 4, 4, 4, 4, 0)"},
@@ -618,7 +622,8 @@ function drawChart() {
                     {"v": 490.0},
                     {"v": 271.0},
                     {"v": 243.0},
-                    {"v": 0.0}
+                    {"v": 0.0},
+                    {"v": 15},
                 ]},
                 {"c": [
                     {"v": "Date(2005, 4, 5, 5, 5, 5, 0)"},
@@ -669,7 +674,8 @@ function drawChart() {
                     {"v": 558.0},
                     {"v": 295.0},
                     {"v": 263.0},
-                    {"v": 0.0}
+                    {"v": 0.0},
+                    {"v": 23},
                 ]}
             ]}
             , 0.6);
@@ -688,7 +694,8 @@ function drawChart() {
         is: "Ion Source",
         ms1: "MS1 Signal",
         ms2: "MS2 Signal",
-        p: "Protease"
+        p: "Protease",
+        id: "Protein ID"
     };
     var metrics = [
         { code: "c_1a", label: "C-1A", name: "Bleed Ratio", good: "low", simple: 0, desc: "Fraction of peptides with repeat identifications >4 min earlier than identification closest to the chromatographic maximum" },
@@ -732,7 +739,8 @@ function drawChart() {
         { code: "p_2a", label: "P-2A", name: "MS2 Tryptic Spectra", good: "high", simple: 0, desc: "Number of MS2 spectra identifying tryptic peptide ions" },
         { code: "p_2b", label: "P-2B", name: "MS2 Tryptic Ions", good: "high", simple: 0, desc: "Number of tryptic peptide ions identified" },
         { code: "p_2c", label: "P-2C", name: "Distinct Peptides", good: "high", simple: 0, desc: "Number of distinct identified tryptic peptide sequences, ignoring modifications and charge state" },
-        { code: "p_3", label: "P-3", name: "Semitryptic Ratio", good: "low", simple: 1, desc: "Ratio of semitryptic/tryptic peptides" }
+        { code: "p_3", label: "P-3", name: "Semitryptic Ratio", good: "low", simple: 1, desc: "Ratio of semitryptic/tryptic peptides" },
+        { code: "id_1", label: "ID-1", name: "Identified Spectra", good: "low", simple: 1, desc: "Number of identified spectra matching requested proteins for given category" }
     ];
 
     gs = [];

@@ -107,6 +107,8 @@ public final class QuameterUi implements Dao, UiConfigurationProvider {
 			writeCol(writer, column.name(), QuameterResult.getColumnName(column), "number");
 		}
 
+		writeCol(writer, "id_1", "ID-1", "number");
+
 		writer.endArray();
 	}
 
@@ -128,6 +130,7 @@ public final class QuameterUi implements Dao, UiConfigurationProvider {
 			writeValue(writer, result.getValue(column));
 		}
 
+		writeValue(writer, result.getIdentifiedSpectra());
 
 		writer.endArray();
 		writer.endObject();
