@@ -26,7 +26,7 @@ public final class QuameterCategories {
 	public ModelAndView listParameterSets() {
 		try {
 			final QuameterUi.Config config = getRunningApplicationContext().getSingletonConfig(QuameterUi.Config.class);
-			final LinkedHashMap<String, String> categoryMap = QuameterConfigurationUtils.parseCategories(config.getCategories());
+			final LinkedHashMap<String, String> categoryMap = QuameterConfigurationUtils.parseCategories(config.getQuameterConfig().getCategories());
 
 			final ArrayList<QuameterCategory> result = new ArrayList<QuameterCategory>(categoryMap.size());
 			for (final Map.Entry<String, String> category : categoryMap.entrySet()) {

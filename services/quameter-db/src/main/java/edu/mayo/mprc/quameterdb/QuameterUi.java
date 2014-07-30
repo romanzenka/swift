@@ -175,7 +175,7 @@ public final class QuameterUi implements Dao, UiConfigurationProvider {
 
 	public static final class Config implements ResourceConfig {
 		private String searchFilter;
-		private QuameterDbWorker.Config quameterConfig;
+		private ServiceConfig quameterConfig;
 
 		public Config() {
 		}
@@ -189,7 +189,7 @@ public final class QuameterUi implements Dao, UiConfigurationProvider {
 		@Override
 		public void load(ConfigReader reader) {
 			searchFilter = reader.get(SEARCH_FILTER);
-			quameterConfig = (QuameterDbWorker.Config) reader.getObject(QUAMETER_DB_WORKER);
+			quameterConfig = (ServiceConfig) reader.getObject(QUAMETER_DB_WORKER);
 		}
 
 		@Override
@@ -206,7 +206,7 @@ public final class QuameterUi implements Dao, UiConfigurationProvider {
 		}
 
 		public QuameterDbWorker.Config getQuameterConfig() {
-			return quameterConfig;
+			return (QuameterDbWorker.Config) quameterConfig.getRunner().getWorkerConfiguration();
 		}
 	}
 
@@ -289,7 +289,10 @@ public final class QuameterUi implements Dao, UiConfigurationProvider {
 						@Override
 						public void fixError(final ResourceConfig config, final String propertyName, final String action) {
 						}
-					});
+					})
+
+					.property(QUAMETER_DB_WORKER, "Quamered Db", "Reference to the worker that loads QuaMeter data to the database")
+					.reference(QuameterDbWorker.TYPE, UiBuilder.NONE_TYPE);
 		}
 	}
 
