@@ -32,7 +32,7 @@ import java.util.List;
 public final class WorkCachePerformanceTest {
 	private static final Logger LOGGER = Logger.getLogger(WorkCachePerformanceTest.class);
 	// How long for the entire run
-	private static final int RUN_TIME = 2000;
+	private static final int RUN_TIME = 500000;
 
 	// How much will each task take
 	private static final int TASK_RUNTIME = 500;
@@ -48,7 +48,7 @@ public final class WorkCachePerformanceTest {
 		serviceFactory.setConnectionPool(connectionPool);
 		try {
 			serviceFactory.setBrokerUri(new URI("vm://test?broker.useJmx=false&broker.persistent=false"));
-		} catch (URISyntaxException e) {
+		} catch (final URISyntaxException e) {
 			throw new MprcException(e);
 		}
 		serviceFactory.start();
@@ -70,7 +70,7 @@ public final class WorkCachePerformanceTest {
 		final File cacheLogFolder = new File(cacheFolder, "cache_log");
 		FileUtilities.ensureFolderExists(cacheLogFolder);
 
-		String tempFolder = FileUtilities.getDefaultTempDirectory().getAbsolutePath();
+		final String tempFolder = FileUtilities.getDefaultTempDirectory().getAbsolutePath();
 		final DaemonConfigInfo daemonConfigInfo = new DaemonConfigInfo("test", tempFolder);
 		final FileTokenFactory fileTokenFactory = new FileTokenFactory(daemonConfigInfo);
 
@@ -92,7 +92,7 @@ public final class WorkCachePerformanceTest {
 		final MyProgressListener listener = new MyProgressListener();
 
 		for (int i = 0; i < TOTAL_MESSAGES; i++) {
-			final SimpleTestWorkPacket workPacket = new SimpleTestWorkPacket("task1-test", false);
+			final SimpleTestWorkPacket workPacket = new SimpleTestWorkPacket("task" + i + "-test", false);
 			workPacket.setResultFile(new File("text.txt"));
 			connection.sendWork(workPacket, listener);
 		}
@@ -116,7 +116,7 @@ public final class WorkCachePerformanceTest {
 			Assert.assertEquals(workSuccessCount, TOTAL_MESSAGES, "Wrong amount of successfully processed work packets");
 		}
 
-		Assert.assertEquals(listener.getProgressInfos().size(), TOTAL_MESSAGES * 2); /* Each task sends two progress messages to make sure logs are updated */
+		Assert.assertEquals(listener.getProgressInfos().size(), TOTAL_MESSAGES + 1); /* One for each cache log + one for the work itself */
 
 		FileUtilities.cleanupTempFile(logFolder);
 		FileUtilities.cleanupTempFile(cacheFolder);
@@ -134,6 +134,7 @@ public final class WorkCachePerformanceTest {
 		runner.setFactory(new TestWorkerFactory(worker));
 		runner.setExecutorService(new SimpleThreadPoolExecutor(1, worker.getClass().getSimpleName() + "-runner", true));
 		runner.setDaemonConnection(directConnection);
+		runner.setDaemonLoggerFactory(new DaemonLoggerFactory(logFolder));
 		return runner;
 	}
 
@@ -149,7 +150,7 @@ public final class WorkCachePerformanceTest {
 				LOGGER.debug("Request completed");
 				final SimpleTestWorkPacket testWorkPacket = (SimpleTestWorkPacket) workPacket;
 				FileUtilities.ensureFileExists(testWorkPacket.getResultFile());
-			} catch (InterruptedException e) {
+			} catch (final InterruptedException e) {
 				throw new MprcException(e);
 			}
 			progressReporter.reportSuccess();
@@ -162,7 +163,7 @@ public final class WorkCachePerformanceTest {
 	}
 
 	private class MyProgressListener implements ProgressListener {
-		private List<ProgressInfo> progressInfos = new ArrayList<ProgressInfo>();
+		private final List<ProgressInfo> progressInfos = new ArrayList<ProgressInfo>();
 
 		@Override
 		public void requestEnqueued(final String hostString) {
@@ -190,11 +191,15 @@ public final class WorkCachePerformanceTest {
 
 		@Override
 		public void userProgressInformation(final ProgressInfo progressInfo) {
-			progressInfos.add(progressInfo);
+			synchronized (progressInfos) {
+				progressInfos.add(progressInfo);
+			}
 		}
 
 		public List<ProgressInfo> getProgressInfos() {
-			return progressInfos;
+			synchronized (progressInfos) {
+				return progressInfos;
+			}
 		}
 	}
 }

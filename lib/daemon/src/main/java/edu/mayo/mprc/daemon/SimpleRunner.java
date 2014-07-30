@@ -1,8 +1,10 @@
 package edu.mayo.mprc.daemon;
 
+import edu.mayo.mprc.MprcException;
 import edu.mayo.mprc.config.*;
 import edu.mayo.mprc.config.ui.FactoryDescriptor;
 import edu.mayo.mprc.config.ui.ServiceUiFactory;
+import edu.mayo.mprc.daemon.exception.DaemonException;
 import edu.mayo.mprc.daemon.monitor.PingWorkPacket;
 import edu.mayo.mprc.daemon.worker.Worker;
 import edu.mayo.mprc.daemon.worker.WorkerFactory;
@@ -259,17 +261,7 @@ public final class SimpleRunner extends AbstractRunner {
 			// We pass the child logger onto the worker, so it can spawn its own children with their own logs
 			final RunnerProgressReporter progressReporter = new RunnerProgressReporter(SimpleRunner.this, request);
 
-			final ChildLog childLog;
-			if (logPacket()) {
-				// Root logger - we have to start from scratch as we currently do not pass the parent log over the wire
-				final ParentLog log = getDaemonLoggerFactory().createLog(request.getWorkPacket().getTaskId(), progressReporter);
-
-				// Here we send a progress message that new log file was established
-				childLog = log.createChildLog();
-				childLog.startLogging();
-			} else {
-				childLog = null;
-			}
+			final ChildLog childLog = startLogging(progressReporter);
 			try {
 				if (worker instanceof Lifecycle) {
 					((Lifecycle) worker).start();
@@ -288,6 +280,27 @@ public final class SimpleRunner extends AbstractRunner {
 				if (childLog != null) {
 					childLog.stopLogging();
 				}
+			}
+		}
+
+		private ChildLog startLogging(final RunnerProgressReporter progressReporter) {
+			ChildLog childLog = null;
+			boolean logging = false;
+			try {
+				if (logPacket()) {
+					// Root logger - we have to start from scratch as we currently do not pass the parent log over the wire
+					final ParentLog log = getDaemonLoggerFactory().createLog(request.getWorkPacket().getTaskId(), progressReporter);
+
+					// Here we send a progress message that new log file was established
+					childLog = log.createChildLog();
+					childLog.startLogging();
+				} else {
+					childLog = null;
+				}
+				return childLog;
+			} catch (Exception e) {
+				progressReporter.reportFailure(new DaemonException("Failed to establish logging", e));
+				throw new MprcException("Could not start logging", e);
 			}
 		}
 
