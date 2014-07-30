@@ -33,7 +33,7 @@ public final class QuameterUi implements Dao, UiConfigurationProvider {
 	public static final String DESC = "Specialized interface for browsing QuaMeter database";
 
 	private static final String SEARCH_FILTER = "searchFilter";
-	private static final String QUAMETER_DB_WORKER = "quameterDbWorker";
+	private static final String QUAMETER_DB_WORKER = "quameterDb";
 	public static final double SEC_TO_MIN = 60.0;
 
 	private final QuameterDao quameterDao;
