@@ -1,6 +1,7 @@
 package edu.mayo.mprc.config.ui;
 
 import edu.mayo.mprc.MprcException;
+import edu.mayo.mprc.config.PropertyValues;
 import edu.mayo.mprc.config.ResourceConfig;
 import edu.mayo.mprc.utilities.exceptions.ExceptionUtilities;
 

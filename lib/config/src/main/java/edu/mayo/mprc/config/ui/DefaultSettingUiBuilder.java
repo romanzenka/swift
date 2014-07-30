@@ -1,7 +1,7 @@
-package edu.mayo.mprc.config;
+package edu.mayo.mprc.config.ui;
 
-import edu.mayo.mprc.config.ui.HierarchicalUiBuilder;
-import edu.mayo.mprc.config.ui.UiBuilder;
+import edu.mayo.mprc.config.DependencyResolver;
+import edu.mayo.mprc.config.ResourceConfig;
 
 import java.util.HashMap;
 import java.util.Map;

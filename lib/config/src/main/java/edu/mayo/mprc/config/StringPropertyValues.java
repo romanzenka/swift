@@ -1,4 +1,4 @@
-package edu.mayo.mprc.config.ui;
+package edu.mayo.mprc.config;
 
 import java.util.Map;
 

@@ -3,7 +3,6 @@ package edu.mayo.mprc.config;
 import com.google.common.base.CharMatcher;
 import com.google.common.base.Splitter;
 import edu.mayo.mprc.MprcException;
-import edu.mayo.mprc.config.ui.StringPropertyValues;
 import edu.mayo.mprc.utilities.FileUtilities;
 
 import java.io.*;

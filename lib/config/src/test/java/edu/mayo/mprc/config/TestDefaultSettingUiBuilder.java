@@ -1,6 +1,7 @@
 package edu.mayo.mprc.config;
 
 import com.google.common.collect.ImmutableMap;
+import edu.mayo.mprc.config.ui.DefaultSettingUiBuilder;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 

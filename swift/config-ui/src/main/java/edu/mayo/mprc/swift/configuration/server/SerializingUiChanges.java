@@ -4,7 +4,7 @@ import edu.mayo.mprc.config.DependencyResolver;
 import edu.mayo.mprc.config.MapConfigReader;
 import edu.mayo.mprc.config.MapConfigWriter;
 import edu.mayo.mprc.config.ResourceConfig;
-import edu.mayo.mprc.config.ui.StringPropertyValues;
+import edu.mayo.mprc.config.StringPropertyValues;
 import edu.mayo.mprc.config.ui.UiResponse;
 import edu.mayo.mprc.swift.configuration.client.model.UiChangesReplayer;
 

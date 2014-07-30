@@ -1,7 +1,5 @@
 package edu.mayo.mprc.config;
 
-import edu.mayo.mprc.config.ui.PropertyValues;
-
 /**
  * A reader that can load a given config using a map of key->value pairs.
  *
