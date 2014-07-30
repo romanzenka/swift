@@ -7,6 +7,7 @@ import edu.mayo.mprc.daemon.files.FileTokenFactory;
 import edu.mayo.mprc.daemon.worker.WorkPacket;
 import edu.mayo.mprc.daemon.worker.WorkPacketBase;
 import edu.mayo.mprc.utilities.FileUtilities;
+import edu.mayo.mprc.utilities.log.SimpleParentLog;
 import edu.mayo.mprc.utilities.progress.ProgressInfo;
 import edu.mayo.mprc.utilities.progress.ProgressListener;
 import edu.mayo.mprc.utilities.progress.ProgressReporter;
@@ -31,6 +32,7 @@ public final class WorkCacheTest {
 		connection.start();
 
 		final ProgressReporter reporter = mock(ProgressReporter.class);
+		when(reporter.getLog()).thenReturn(new SimpleParentLog());
 		cacheFolder = FileUtilities.createTempFolder();
 
 		final TestWorkCache workCache = new TestWorkCache();
@@ -222,7 +224,7 @@ public final class WorkCacheTest {
 
 		@Override
 		public String getStringDescriptionOfTask() {
-			return getTaskId().toString();
+			return name;
 		}
 
 		@Override
