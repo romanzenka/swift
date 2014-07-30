@@ -26,4 +26,6 @@ public interface QuameterDao extends Dao {
 	                                 final int identifedSpectra);
 
 	List<QuameterResult> listAllResults(Pattern searchFilter);
+
+	void hideQuameterResult(int quameterResultId);
 }

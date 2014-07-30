@@ -14,7 +14,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link href="/common/bootstrap/css/bootstrap.min.css" rel="stylesheet" media="screen">
 <style type="text/css">
-        /* http://stackoverflow.com/questions/3790935/can-i-hide-the-html5-number-inputs-spin-box */
+    /* http://stackoverflow.com/questions/3790935/can-i-hide-the-html5-number-inputs-spin-box */
     input::-webkit-outer-spin-button,
     input::-webkit-inner-spin-button {
         /* display: none; <- Crashes Chrome on hover */
@@ -136,7 +136,7 @@ function addButtons(div, data, columnId) {
             names[value] = 1;
         }
     }
-    var keys = $.map(names,function (element, index) {
+    var keys = $.map(names, function (element, index) {
         return index
     }).sort();
 
@@ -169,7 +169,7 @@ function addPrePostButtons(div, data, columnId) {
             names[category] = 1;
         }
     }
-    var keys = $.map(names,function (element, index) {
+    var keys = $.map(names, function (element, index) {
         return index
     }).sort();
 
@@ -197,6 +197,12 @@ var pointHighlighted = -1;
 
 // Transaction currently selected
 var selectedTransaction = -1;
+
+// ID of the Quameter result currently selected
+var selectedId = -1;
+
+// Array that contains true for every quameter result id that is to be hidden
+var hiddenIds = new Object();
 
 // Callback that filters all the views, updating the stdev ranges
 function updateAllViews(views, filteredRows) {
@@ -243,9 +249,12 @@ function selectPoint(data, dataRow) {
     if (dataRow == -1) {
         $('#icons').hide();
         selectedTransaction = -1;
+        selectedId = -1;
     } else {
         var transactionColumnIndex = columnIndex("transaction", data);
         selectedTransaction = data.getValue(dataRow, transactionColumnIndex);
+        var idColumnIndex = columnIndex("id", data);
+        selectedId = data.getValue(dataRow, idColumnIndex);
         $('#search-link').attr("href", '/start/?load=' + selectedTransaction);
         $('#qa-link').attr("href", '/service/qa/' + selectedTransaction + "/index.html");
         $('#icons').show();
@@ -481,6 +490,7 @@ if(quameterUiConfig!=null) {
     var categoryColumnIndex = col('category');
     var instrumentButtons = instrumentDiv.find('.btn');
     var instrumentColumnIndex = col('instrument');
+    var idColumnIndex = col('id');
     var prePostButtons = prePostDiv.find('.btn');
     var prePostColumnIndex = col('path');
 
@@ -535,6 +545,52 @@ if(quameterUiConfig!=null) {
 
     blockRedraw = false;
 
+    function refilterRows() {
+
+        var selectedCategory = [];
+         categoryButtons.each(function () {
+             if ($(this).hasClass('btn-primary')) {
+                 selectedCategory.push($(this).attr("value"));
+             }
+         });
+
+         var selectedInstrument = [];
+         instrumentButtons.each(function () {
+             if ($(this).hasClass('btn-primary')) {
+                 selectedInstrument.push($(this).attr("value"));
+             }
+         });
+
+         var selectedPrePost = [];
+         prePostButtons.each(function () {
+             if ($(this).hasClass('btn-primary')) {
+                 selectedPrePost.push($(this).attr("value"));
+             }
+         });
+
+         function filterRows() {
+             var filteredRows = [];
+             for (var row = 0; row < data.getNumberOfRows(); row++) {
+                 var category = data.getValue(row, categoryColumnIndex);
+                 var instrument = data.getValue(row, instrumentColumnIndex);
+                 var rowId = data.getValue(row, idColumnIndex)
+                 var prePost = prePostCategory(data.getValue(row, prePostColumnIndex));
+                 if (0 <= $.inArray(category, selectedCategory)
+                         && 0 <= $.inArray(instrument, selectedInstrument)
+                         && 0 <= $.inArray(prePost, selectedPrePost)
+                         && !hiddenIds["id"+rowId]) {
+                     filteredRows.push(row);
+                 }
+             }
+             return filteredRows;
+         }
+
+         var filteredRows = filterRows();
+
+         viewMetadata['filteredRows'] = filteredRows;
+         updateAllViews(views, filteredRows);
+    }
+
     $('.btn').button();
     var allButtons = $.merge(categoryButtons, $.merge(instrumentButtons, prePostButtons));
     allButtons.click(function (event) {
@@ -547,46 +603,7 @@ if(quameterUiConfig!=null) {
 
         current.toggleClass("btn-primary");
 
-        var selectedCategory = [];
-        categoryButtons.each(function () {
-            if ($(this).hasClass('btn-primary')) {
-                selectedCategory.push($(this).attr("value"));
-            }
-        });
-
-        var selectedInstrument = [];
-        instrumentButtons.each(function () {
-            if ($(this).hasClass('btn-primary')) {
-                selectedInstrument.push($(this).attr("value"));
-            }
-        });
-
-        var selectedPrePost = [];
-        prePostButtons.each(function () {
-            if ($(this).hasClass('btn-primary')) {
-                selectedPrePost.push($(this).attr("value"));
-            }
-        });
-
-        function filterRows() {
-            var filteredRows = [];
-            for (var row = 0; row < data.getNumberOfRows(); row++) {
-                var category = data.getValue(row, categoryColumnIndex);
-                var instrument = data.getValue(row, instrumentColumnIndex);
-                var prePost = prePostCategory(data.getValue(row, prePostColumnIndex));
-                if (0 <= $.inArray(category, selectedCategory)
-                        && 0 <= $.inArray(instrument, selectedInstrument)
-                        && 0 <= $.inArray(prePost, selectedPrePost)) {
-                    filteredRows.push(row);
-                }
-            }
-            return filteredRows;
-        }
-
-        var filteredRows = filterRows();
-
-        viewMetadata['filteredRows'] = filteredRows;
-        updateAllViews(views, filteredRows);
+        refilterRows();
     });
 
     $("#compact-button").click(function (event) {
@@ -601,6 +618,13 @@ if(quameterUiConfig!=null) {
             $('#simpleGraphs').css("display", "block");
         }
     });
+
+    $('#hide-entry').click(function(event) {
+        event.stopPropagation();
+        $.post("/service/quameter-hide/" + selectedId);
+        hiddenIds["id"+selectedId] = true;
+        refilterRows();
+      });
 
     $('#detailedGraphs').css("display", "none");
 }

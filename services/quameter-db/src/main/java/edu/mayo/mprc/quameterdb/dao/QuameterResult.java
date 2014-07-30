@@ -140,6 +140,9 @@ public final class QuameterResult extends PersistableBase {
 	/* Number of identified spectra matching a given protein accnum pattern */
 	private int identifiedSpectra;
 
+	/* User can mark the particular value as hidden */
+	private boolean hidden;
+
 	public QuameterResult() {
 	}
 
@@ -841,6 +844,14 @@ public final class QuameterResult extends PersistableBase {
 
 	public void setTransaction(final int transaction) {
 		this.transaction = transaction;
+	}
+
+	public boolean isHidden() {
+		return hidden;
+	}
+
+	public void setHidden(boolean hidden) {
+		this.hidden = hidden;
 	}
 
 	@Override

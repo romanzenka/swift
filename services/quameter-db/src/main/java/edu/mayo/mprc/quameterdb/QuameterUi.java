@@ -95,6 +95,7 @@ public final class QuameterUi implements Dao, UiConfigurationProvider {
 		writer.name("cols");
 		writer.beginArray();
 
+		writeCol(writer, "id", "ID", "number"); // Id of the entry
 		writeCol(writer, "startTime", "Start Time", "datetime");
 		writeCol(writer, "path", "Path", "string");
 		writeCol(writer, "duration", "Duration (min)", "number");
@@ -117,6 +118,7 @@ public final class QuameterUi implements Dao, UiConfigurationProvider {
 				.name("c");
 		writer.beginArray();
 
+		writeValue(writer, result.getId()); // Id of the entry (for hiding)
 		writeValue(writer, result.getSample().getStartTime()); // startTime
 		writeValue(writer, result.getSample().getFile().getAbsolutePath()); // path
 		writeValue(writer, result.getSample().getRunTimeInSeconds() / SEC_TO_MIN); // duration

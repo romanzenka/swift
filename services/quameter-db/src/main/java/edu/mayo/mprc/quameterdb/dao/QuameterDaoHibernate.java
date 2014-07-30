@@ -56,6 +56,7 @@ public final class QuameterDaoHibernate extends DaoBase implements QuameterDao {
 				" " + swiftDao.qualifyTableName("search_metadata") + " AS m," +
 				" " + swiftDao.qualifyTableName("tandem_mass_spec_sample") + " AS t" +
 				" WHERE " +
+				" q.hidden=0 AND " +
 				" r.hidden=0 AND " +
 				" r.swift_search = d.swift_search_definition_id AND " +
 				" f.swift_search_definition_id = d.swift_search_definition_id AND " +
@@ -81,6 +82,12 @@ public final class QuameterDaoHibernate extends DaoBase implements QuameterDao {
 			}
 		}
 		return filtered;
+	}
+
+	@Override
+	public void hideQuameterResult(final int quameterResultId) {
+		final QuameterResult quameterResult = (QuameterResult) getSession().get(QuameterResult.class, quameterResultId);
+		quameterResult.setHidden(true);
 	}
 
 	@Override
