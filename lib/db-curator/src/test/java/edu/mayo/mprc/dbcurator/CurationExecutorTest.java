@@ -121,7 +121,7 @@ public final class CurationExecutorTest extends CurationDaoTestBase {
 
 			Assert.assertEquals(status.getCompletedStepValidations().size(), 1);
 			Assert.assertEquals(status.getFailedStepValidations().size(), 1);
-			Assert.assertEquals(status.getFailedStepValidations().get(0).getMessages().get(0), "Duplicate accession number: [MyManualInclusion_HUMAN]");
+			Assert.assertEquals(status.getFailedStepValidations().get(0).getMessages().get(0), "Duplicate accession number: [MyManualInclusion_HUMAN] (line #3)");
 
 			//get the final messages from the executor
 			LOGGER.info(status.getMessages());
