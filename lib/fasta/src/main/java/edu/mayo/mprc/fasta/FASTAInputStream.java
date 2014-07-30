@@ -32,6 +32,11 @@ public final class FASTAInputStream implements DBInputStream {
 	private File fastaFile;
 
 	/**
+	 * Number of lines we have read so far
+	 */
+	private int line;
+
+	/**
 	 * A reader to access the above file
 	 */
 	private BufferedReader reader;
@@ -57,6 +62,11 @@ public final class FASTAInputStream implements DBInputStream {
 	private String currentSequence;
 
 	/**
+	 * Line that the current header is on
+	 */
+	private int currentLine;
+
+	/**
 	 * the header that comes next and will become the currentHeader when next is called
 	 */
 	private String nextHeader;
@@ -72,13 +82,13 @@ public final class FASTAInputStream implements DBInputStream {
 	 * create a new stream with the given file
 	 *
 	 * @param file the file that you want to create an input stream of
-	 *             ¬
 	 */
 	public FASTAInputStream(final File file) {
 		fastaFile = file;
 	}
 
 	private void reopenReader() throws IOException {
+		line = 0;
 		totalBytesToRead = fastaFile.length();
 		countingInputStream = new CountingInputStream(new FileInputStream(fastaFile));
 		if (GZipUtilities.isGZipped(fastaFile)) {
@@ -97,10 +107,21 @@ public final class FASTAInputStream implements DBInputStream {
 		try {
 			FileUtilities.closeQuietly(reader);
 			reopenReader();
-			nextHeader = reader.readLine();
+			nextHeader = getNextLine();
 		} catch (Exception e) {
 			throw new MprcException("Cannot open FASTA file [" + fastaFile.getAbsolutePath() + "]", e);
 		}
+	}
+
+	private String getNextLine() {
+		try {
+			final String nextLine = reader.readLine();
+			line++;
+			return nextLine;
+		} catch (IOException e) {
+			throw new MprcException("Error reading line " + line + " from " + fastaFile.getAbsolutePath(), e);
+		}
+
 	}
 
 	/**
@@ -111,6 +132,7 @@ public final class FASTAInputStream implements DBInputStream {
 	 */
 	@Override
 	public boolean gotoNextSequence() {
+		currentLine = line;
 		if (reader == null) {
 			throw new MprcException("FASTA stream not initalized properly. Call beforeFirst() before reading first sequence");
 		}
@@ -124,28 +146,16 @@ public final class FASTAInputStream implements DBInputStream {
 		//read in lines until we reach the next header
 		final StringBuilder sequenceBuilder = new StringBuilder();
 		String nextLine = null;
-		try {
-			nextLine = reader.readLine();
-		} catch (IOException e) {
-			LOGGER.warn(e);
-		}
+		nextLine = getNextLine();
 		//if the next line is not a header or an end of line then append it to the sequence
 		while (isSequence(nextLine)) {
 			sequenceBuilder.append(cleanupSequence(nextLine));
-			try {
-				//read in the next line
-				nextLine = reader.readLine();
-			} catch (IOException e) {
-				LOGGER.warn(e);
-			}
+			//read in the next line
+			nextLine = getNextLine();
 		}
 
 		while (nextLine != null && !isHeader(nextLine)) {
-			try {
-				nextLine = reader.readLine();
-			} catch (IOException e) {
-				LOGGER.warn(e);
-			}
+			nextLine = getNextLine();
 		}
 		nextHeader = nextLine;
 
@@ -238,13 +248,13 @@ public final class FASTAInputStream implements DBInputStream {
 					final String accNum = getAccNum(header);
 					final String error = checkHeader(header, accNum, checkHeaderLength);
 					if (error != null) {
-						return error;
+						return error + " " + in.getCurrentLineInfo();
 					}
 					if (!accessionNumbers.add(accNum)) {
-						return "Duplicate accession number: [" + accNum + "]";
+						return "Duplicate accession number: [" + accNum + "] " + in.getCurrentLineInfo();
 					}
 				} else {
-					return "Invalid header [" + header + "]";
+					return "Invalid header [" + header + "] " + in.getCurrentLineInfo();
 				}
 			}
 			if (sequenceCount == 0) {
@@ -257,6 +267,11 @@ public final class FASTAInputStream implements DBInputStream {
 			FileUtilities.closeQuietly(in);
 		}
 		return null;
+	}
+
+	@Override
+	public String getCurrentLineInfo() {
+		return "(line #" + currentLine + ")";
 	}
 
 	/**
@@ -274,11 +289,11 @@ public final class FASTAInputStream implements DBInputStream {
 		String error = null;
 		if (accNum.length() > MAX_ACCNUM_LENGTH) {
 			error = "Accession number too long: [" + accNum + "]. Length: " + accNum.length() + ", max: " + MAX_ACCNUM_LENGTH;
-		}
-		if (checkHeaderLength && header != null && header.length() - 1 > MAX_HEADER_LENGTH) {
+		} else if (accNum.isEmpty()) {
+			error = "Empty accession number";
+		} else if (checkHeaderLength && header != null && header.length() - 1 > MAX_HEADER_LENGTH) {
 			error = "Sequence header for accession number: [" + accNum + "] too long: " + header.length() + ", max: " + MAX_HEADER_LENGTH;
-		}
-		if (!VALID_ACCNUM.matcher(accNum).matches()) {
+		} else if (!VALID_ACCNUM.matcher(accNum).matches()) {
 			error = "Invalid accession number: [" + accNum + "], allowed characters: " + VALID_CHARACTERS;
 		}
 		return error;

@@ -41,4 +41,11 @@ public interface DBInputStream extends Closeable {
 	 */
 	@Override
 	void close();
+
+	/**
+	 * Get information about the line we are currently reading.
+	 *
+	 * @return Line number to help the user resolve issues.
+	 */
+	String getCurrentLineInfo();
 }
