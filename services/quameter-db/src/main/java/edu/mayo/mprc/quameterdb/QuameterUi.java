@@ -197,6 +197,10 @@ public final class QuameterUi implements Dao, UiConfigurationProvider {
 			return 0;
 		}
 
+		public void setSearchFilter(String searchFilter) {
+			this.searchFilter = searchFilter;
+		}
+
 		public String getSearchFilter() {
 			return searchFilter;
 		}
