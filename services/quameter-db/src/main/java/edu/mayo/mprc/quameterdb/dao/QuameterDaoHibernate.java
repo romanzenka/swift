@@ -80,7 +80,7 @@ public final class QuameterDaoHibernate extends DaoBase implements QuameterDao {
 			r.setCategory(category);
 			final Integer transactionId = (Integer) array[2];
 			r.setTransaction(transactionId);
-			if (searchFilter.matcher(r.getFileSearch().getExperiment()).find()) {
+			if (r.resultMatches(searchFilter)) {
 				filtered.add(r);
 			}
 		}

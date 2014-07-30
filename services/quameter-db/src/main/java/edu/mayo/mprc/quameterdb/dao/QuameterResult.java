@@ -14,11 +14,17 @@ import org.hibernate.criterion.Restrictions;
 
 import java.util.Locale;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 /**
  * @author Roman Zenka
  */
 public final class QuameterResult extends PersistableBase {
+	/**
+	 * Files that have _Pre or _Post after the standard prefix (copath, patient, date) are ignored.
+	 */
+	private static final Pattern PRE_POST = Pattern.compile("^.{14}.*_(Pre|Post).*$");
+
 	private TandemMassSpectrometrySample sample;
 	private FileSearch fileSearch;
 	/**
@@ -484,6 +490,26 @@ public final class QuameterResult extends PersistableBase {
 		for (final Map.Entry<String, Double> entry : values.entrySet()) {
 			setValue(entry.getKey(), entry.getValue());
 		}
+	}
+
+	/**
+	 * Determine if given QuameterResult should be listed.
+	 *
+	 * @param searchFilter Filter for the search names.
+	 * @return True if the result should be displayed in the UI.
+	 */
+	public boolean resultMatches(final Pattern searchFilter) {
+		// Experiment name must match
+		final String experimentName = getFileSearch().getExperiment();
+		if (!searchFilter.matcher(experimentName).find()) {
+			return false;
+		}
+
+		// We must not be a Pre or Postblank file
+		if (PRE_POST.matcher(getFileSearch().getInputFile().getName()).find()) {
+			return false;
+		}
+		return true;
 	}
 
 	public double getC_1a() {
