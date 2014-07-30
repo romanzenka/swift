@@ -72,7 +72,6 @@ public final class HemeUi implements Dao {
 	private final File results;
 	private final HemeDao hemeDao;
 	private final SwiftDao swiftDao;
-	private final FastaDbDao fastaDbDao;
 	private final ParamsDao paramsDao;
 	private SwiftSearcherCaller swiftSearcherCaller;
 	private final String trypsinParameterSetName;
@@ -88,11 +87,9 @@ public final class HemeUi implements Dao {
 	 */
 	private int chymoParameterSetId;
 	private String userEmail;
-	private String[] searchEngines;
     private File fastaDbCache;
 
 	public HemeUi(final File data, final File results, final HemeDao hemeDao, final SwiftDao swiftDao,
-	              final FastaDbDao fastaDbDao,
 	              final ParamsDao paramsDao,
 	              final SwiftSearcherCaller swiftSearcherCaller,
 	              final String trypsinParameterSetName, final String chymoParameterSetName, final String userEmail,
@@ -101,7 +98,6 @@ public final class HemeUi implements Dao {
 		this.results = results;
 		this.hemeDao = hemeDao;
 		this.swiftDao = swiftDao;
-		this.fastaDbDao = fastaDbDao;
 		this.paramsDao = paramsDao;
 		this.swiftSearcherCaller = swiftSearcherCaller;
 		this.trypsinParameterSetName = trypsinParameterSetName;
@@ -383,7 +379,6 @@ public final class HemeUi implements Dao {
 		private HemeDao hemeDao;
 		private ParamsDao paramsDao;
 		private SwiftDao swiftDao;
-		private FastaDbDao fastaDbDao;
 		private SwiftSearcherCaller swiftSearcherCaller;
 		private RunningApplicationContext runningApplicationContext;
 
@@ -412,15 +407,6 @@ public final class HemeUi implements Dao {
 		@Resource(name = "paramsDao")
 		public void setParamsDao(final ParamsDao paramsDao) {
 			this.paramsDao = paramsDao;
-		}
-
-		public FastaDbDao getFastaDbDao() {
-			return fastaDbDao;
-		}
-
-		@Resource(name = "fastaDbDao")
-		public void setFastaDbDao(FastaDbDao fastaDbDao) {
-			this.fastaDbDao = fastaDbDao;
 		}
 
 		public SwiftSearcherCaller getSwiftSearcherCaller() {
@@ -478,7 +464,6 @@ public final class HemeUi implements Dao {
 					resultDir,
 					getHemeDao(),
 					getSwiftDao(),
-					getFastaDbDao(),
 					getParamsDao(),
 					getSwiftSearcherCaller(),
 					config.get(TRYPSIN_PARAM_SET_NAME),
