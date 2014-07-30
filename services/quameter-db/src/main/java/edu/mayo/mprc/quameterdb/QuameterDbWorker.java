@@ -48,9 +48,10 @@ public final class QuameterDbWorker extends WorkerBase {
 		dao.begin();
 		try {
 			final Map<String, Double> map = loadQuameterResultFile(workPacket.getQuameterResultFile());
+			final int identifiedSpectra = 0;
 			dao.addQuameterScores(workPacket.getTandemMassSpectrometrySampleId(),
 					workPacket.getFileSearchId(),
-					map);
+					map, identifiedSpectra);
 			dao.commit();
 		} catch (Exception e) {
 			dao.rollback();

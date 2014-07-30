@@ -34,10 +34,13 @@ public final class QuameterDaoHibernate extends DaoBase implements QuameterDao {
 	}
 
 	@Override
-	public QuameterResult addQuameterScores(final int tandemMassSpectrometrySampleId, final int fileSearchId, final Map<String, Double> values) {
+	public QuameterResult addQuameterScores(
+			final int tandemMassSpectrometrySampleId, final int fileSearchId,
+			final Map<String, Double> values,
+			final int identifiedSpectra) {
 		final TandemMassSpectrometrySample sample = getSearchDbDao().getTandemMassSpectrometrySampleForId(tandemMassSpectrometrySampleId);
 		final FileSearch fileSearch = getSwiftDao().getFileSearchForId(fileSearchId);
-		final QuameterResult result = new QuameterResult(sample, fileSearch, values);
+		final QuameterResult result = new QuameterResult(sample, fileSearch, values, identifiedSpectra);
 
 		return save(result, false);
 	}

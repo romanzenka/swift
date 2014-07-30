@@ -51,5 +51,6 @@
         <property name="p_2b" type="double" column="p_2b" />
         <property name="p_2c" type="double" column="p_2c" />
         <property name="p_3" type="double" column="p_3" />
+        <property name="identifiedSpectra" type="integer" column="identified_spectra" />
     </class>
 </hibernate-mapping>

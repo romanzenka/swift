@@ -18,8 +18,12 @@ public interface QuameterDao extends Dao {
 	 * @param tandemMassSpectrometrySampleId Id of the serialized {@link TandemMassSpectrometrySample} object. Metadata for the (usually) .raw file the scores refer to.
 	 * @param fileSearchId                   Id of the serialized {@link FileSearch} object. Information about how the file was searched.
 	 * @param values                         Quameter scores
+	 * @param identifedSpectra               Number of identified spectra for specific list of proteins
 	 */
-	QuameterResult addQuameterScores(final int tandemMassSpectrometrySampleId, final int fileSearchId, final Map<String, Double> values);
+	QuameterResult addQuameterScores(final int tandemMassSpectrometrySampleId,
+	                                 final int fileSearchId,
+	                                 final Map<String, Double> values,
+	                                 final int identifedSpectra);
 
 	List<QuameterResult> listAllResults(Pattern searchFilter);
 }

@@ -14,13 +14,13 @@ public final class QuameterResultTest {
 				ImmutableMap.Builder<String, Double>()
 				.put("MS2-4A", 1.22)
 				.put("C-1A", 0.0)
-				.build());
+				.build(), 0);
 		Assert.assertEquals(result.getValues().get("MS2-4A"), 1.22);
 	}
 
 	@Test
 	public void shouldSetValues() {
-		final QuameterResult result = new QuameterResult(null, null, null);
+		final QuameterResult result = new QuameterResult(null, null, null, 0);
 		result.setValue("C-1A", 0.0);
 		result.setValue("MS2-4A", 1.33);
 		Assert.assertEquals(result.getValues().get("C-1A"), 0.0);

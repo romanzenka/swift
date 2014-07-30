@@ -41,10 +41,12 @@ public final class QuameterUi implements Dao, UiConfigurationProvider {
 	private final QuameterDao quameterDao;
 	private final Pattern searchFilter;
 	private final String categories;
+	private final String proteins;
 	private static final DateTimeFormatter DATE_FORMAT_1 = DateTimeFormat.forPattern("'Date('yyyy, ").withLocale(Locale.US);
 	private static final DateTimeFormatter DATE_FORMAT_2 = DateTimeFormat.forPattern(", d, H, m, s, S')'").withLocale(Locale.US);
 
 	public static final String CATEGORIES = "categories";
+	public static final String PROTEINS = "proteins";
 
 	/**
 	 * Use this constant to get to a list of quameter categories from the user interface
@@ -53,10 +55,12 @@ public final class QuameterUi implements Dao, UiConfigurationProvider {
 
 	public QuameterUi(final QuameterDao quameterDao,
 	                  final Pattern searchFilter,
-	                  final String categories) {
+	                  final String categories,
+	                  final String proteins) {
 		this.quameterDao = quameterDao;
 		this.searchFilter = searchFilter;
 		this.categories = categories;
+		this.proteins = proteins;
 	}
 
 	@Override
@@ -188,6 +192,10 @@ public final class QuameterUi implements Dao, UiConfigurationProvider {
 		public String getCategories() {
 			return get(CATEGORIES);
 		}
+
+		public String getProteins() {
+			return get(PROTEINS);
+		}
 	}
 
 	@Component("quameterUiFactory")
@@ -224,8 +232,9 @@ public final class QuameterUi implements Dao, UiConfigurationProvider {
 		public QuameterUi create(final Config config, final DependencyResolver dependencies) {
 			final String filterString = config.get(SEARCH_FILTER);
 			final String categories = config.get(CATEGORIES);
+			final String proteins = config.get(PROTEINS);
 			final Pattern filter = compileFilter(filterString);
-			return new QuameterUi(getQuameterDao(), filter, categories);
+			return new QuameterUi(getQuameterDao(), filter, categories, proteins);
 		}
 
 		public QuameterDao getQuameterDao() {
@@ -275,8 +284,13 @@ public final class QuameterUi implements Dao, UiConfigurationProvider {
 							"<p>You can assign a category to each search. The QuaMeter user interface will then allow you to pick a category" +
 							"to filter all the results. The categories are comma-separated. Use a dash in front of a category to form sub-categories.</p>" +
 							"<p>Example: <tt>animal,-cat,--siamese,-dog,--chihuahua</tt></p>")
-					.defaultValue("no-category");
+					.defaultValue("no-category")
 
+					.property(PROTEINS, "Proteins", "Each category from the upper list needs a regular expression that selects" +
+							" protein accessions from that category. The regular expressions are separated by commas." +
+							" This enables QuaMeter display to list number of spectra assigned to proteins of interest" +
+							"<p>Example: <tt>ANIMAL1|ANIMAL2,CAT1|CAT2|CATS_.*,SIAMESE.*,DOG1|DOG2,CHIHUAHUA_\\d+</tt>")
+					.defaultValue(".*");
 		}
 	}
 

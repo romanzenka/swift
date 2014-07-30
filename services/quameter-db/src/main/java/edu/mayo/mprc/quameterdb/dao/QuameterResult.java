@@ -137,13 +137,20 @@ public final class QuameterResult extends PersistableBase {
 	private double p_2c;
 	private double p_3;
 
+	/* Number of identified spectra matching a given protein accnum pattern */
+	private int identifiedSpectra;
+
 	public QuameterResult() {
 	}
 
-	public QuameterResult(final TandemMassSpectrometrySample sample, final FileSearch fileSearch, final Map<String, Double> values) {
+	public QuameterResult(final TandemMassSpectrometrySample sample,
+	                      final FileSearch fileSearch,
+	                      final Map<String, Double> values,
+	                      final int identifiedSpectra) {
 		this.sample = sample;
 		this.fileSearch = fileSearch;
 		setValues(values);
+		setIdentifiedSpectra(identifiedSpectra);
 	}
 
 	public TandemMassSpectrometrySample getSample() {
@@ -167,7 +174,7 @@ public final class QuameterResult extends PersistableBase {
 		final String canonicalName = name.toLowerCase(Locale.US).replace('-', '_');
 		try {
 			return QuameterColumn.valueOf(canonicalName);
-		} catch (IllegalArgumentException e) {
+		} catch (final IllegalArgumentException e) {
 			throw new MprcException("Could not find QuaMeter column with name [" + name + "]. Available names are " +
 					Joiner.on(", ").join(QuameterColumn.values()), e);
 		}
@@ -818,6 +825,14 @@ public final class QuameterResult extends PersistableBase {
 
 	public void setCategory(final String category) {
 		this.category = category;
+	}
+
+	public int getIdentifiedSpectra() {
+		return identifiedSpectra;
+	}
+
+	public void setIdentifiedSpectra(final int identifiedSpectra) {
+		this.identifiedSpectra = identifiedSpectra;
 	}
 
 	public int getTransaction() {

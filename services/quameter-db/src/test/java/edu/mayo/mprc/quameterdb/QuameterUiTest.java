@@ -188,14 +188,14 @@ public final class QuameterUiTest extends DaoTest {
 		return quameterDao.addQuameterScores(sample1.getId(), fileSearch1.getId(), new ImmutableMap.Builder<String, Double>()
 				.put("MS2-4A", 1.22)
 				.put("C-1A", 0.0)
-				.build());
+				.build(), 0);
 	}
 
 	private QuameterResult addResult2() {
 		return quameterDao.addQuameterScores(sample2.getId(), fileSearch2.getId(), new ImmutableMap.Builder<String, Double>()
 				.put("MS2-4A", 2.33)
 				.put("C-1A", 1.2)
-				.build());
+				.build(), 0);
 	}
 
 
