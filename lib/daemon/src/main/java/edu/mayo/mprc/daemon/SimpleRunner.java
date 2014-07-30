@@ -3,6 +3,7 @@ package edu.mayo.mprc.daemon;
 import edu.mayo.mprc.config.*;
 import edu.mayo.mprc.config.ui.FactoryDescriptor;
 import edu.mayo.mprc.config.ui.ServiceUiFactory;
+import edu.mayo.mprc.daemon.monitor.PingWorkPacket;
 import edu.mayo.mprc.daemon.worker.Worker;
 import edu.mayo.mprc.daemon.worker.WorkerFactory;
 import edu.mayo.mprc.daemon.worker.WorkerFactoryBase;
@@ -257,13 +258,18 @@ public final class SimpleRunner extends AbstractRunner {
 			// As we run, all that we log via Log4j will be reported within the child log files
 			// We pass the child logger onto the worker, so it can spawn its own children with their own logs
 			final RunnerProgressReporter progressReporter = new RunnerProgressReporter(SimpleRunner.this, request);
-			// Root logger - we have to start from scratch as we currently do not pass the parent log over the wire
-			final ParentLog log = getDaemonLoggerFactory().createLog(request.getWorkPacket().getTaskId(), progressReporter);
 
-			// Here we send a progress message that new log file was established
-			final ChildLog childLog = log.createChildLog();
+			final ChildLog childLog;
+			if (logPacket()) {
+				// Root logger - we have to start from scratch as we currently do not pass the parent log over the wire
+				final ParentLog log = getDaemonLoggerFactory().createLog(request.getWorkPacket().getTaskId(), progressReporter);
 
-			childLog.startLogging();
+				// Here we send a progress message that new log file was established
+				childLog = log.createChildLog();
+				childLog.startLogging();
+			} else {
+				childLog = null;
+			}
 			try {
 				if (worker instanceof Lifecycle) {
 					((Lifecycle) worker).start();
@@ -279,8 +285,19 @@ public final class SimpleRunner extends AbstractRunner {
 				// SWALLOWED
 				LOGGER.error("Exception was thrown when processing a request - that means a communication error, or badly implemented worker.\nWorkers must never thrown an exception - they must report a failure.", t);
 			} finally {
-				childLog.stopLogging();
+				if (childLog != null) {
+					childLog.stopLogging();
+				}
 			}
+		}
+
+		/**
+		 * Determine whether this request should be logged.
+		 *
+		 * @return true if we should start a log for this request
+		 */
+		private boolean logPacket() {
+			return !(request.getWorkPacket() instanceof PingWorkPacket);
 		}
 
 	}
