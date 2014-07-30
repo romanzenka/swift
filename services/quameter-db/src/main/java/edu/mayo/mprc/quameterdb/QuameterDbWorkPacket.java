@@ -14,11 +14,11 @@ public final class QuameterDbWorkPacket extends WorkPacketBase {
 	private int fileSearchId;
 	private File quameterResultFile;
 
-	public QuameterDbWorkPacket(final String taskId, final boolean fromScratch) {
+	public QuameterDbWorkPacket(final boolean fromScratch) {
 		super(fromScratch);
 	}
 
-	public QuameterDbWorkPacket(final String taskId, final boolean fromScratch,
+	public QuameterDbWorkPacket(final boolean fromScratch,
 	                            final int tandemMassSpectrometrySampleId, final int fileSearchId, final File quameterResultFile) {
 		super(fromScratch);
 		this.tandemMassSpectrometrySampleId = tandemMassSpectrometrySampleId;

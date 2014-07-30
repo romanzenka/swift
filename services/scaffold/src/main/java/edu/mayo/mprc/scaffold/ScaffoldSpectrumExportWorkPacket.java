@@ -15,11 +15,11 @@ public final class ScaffoldSpectrumExportWorkPacket extends WorkPacketBase {
 	private File scaffoldFile;
 	private File spectrumExportFile;
 
-	public ScaffoldSpectrumExportWorkPacket(final String taskId, final boolean fromScratch) {
+	public ScaffoldSpectrumExportWorkPacket(final boolean fromScratch) {
 		super(fromScratch);
 	}
 
-	public ScaffoldSpectrumExportWorkPacket(final String taskId, final boolean fromScratch, final File scaffoldFile, final File spectrumExportFile) {
+	public ScaffoldSpectrumExportWorkPacket(final boolean fromScratch, final File scaffoldFile, final File spectrumExportFile) {
 		super(fromScratch);
 		this.scaffoldFile = scaffoldFile;
 		this.spectrumExportFile = spectrumExportFile;

@@ -8,7 +8,6 @@ public final class SwiftSearchWorkPacket extends WorkPacketBase {
 	private int previousSearchRunId; // For reruns
 
 	public SwiftSearchWorkPacket(final int swiftSearchId,
-	                             final String taskId,
 	                             final boolean fromScratch,
 	                             final int previousSearchRunId) {
 		super(fromScratch);

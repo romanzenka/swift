@@ -22,11 +22,11 @@ public final class ScaffoldWorkPacket extends WorkPacketBase implements Cachable
 	private ScafmlScaffold scafmlFile;
 	private static final Logger LOGGER = Logger.getLogger(ScaffoldWorkPacket.class);
 
-	public ScaffoldWorkPacket(final String taskId, final boolean fromScratch) {
+	public ScaffoldWorkPacket(final boolean fromScratch) {
 		super(fromScratch);
 	}
 
-	public ScaffoldWorkPacket(final File outputFolder, final ScafmlScaffold scafmlFile, final String experimentName, final String taskId, final boolean fromScratch) {
+	public ScaffoldWorkPacket(final File outputFolder, final ScafmlScaffold scafmlFile, final String experimentName, final boolean fromScratch) {
 		super(fromScratch);
 
 		assert outputFolder != null : "Scaffold request cannot be created: Work folder was null";

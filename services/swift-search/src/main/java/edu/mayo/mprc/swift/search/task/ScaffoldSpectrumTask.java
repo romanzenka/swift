@@ -147,7 +147,6 @@ final class ScaffoldSpectrumTask extends AsyncTaskBase implements ScaffoldTaskI 
 				outputFolder,
 				scafmlFile,
 				experiment,
-				getFullId(),
 				isFromScratch());
 
 		if (isScaffoldValid(workPacket, scaffoldFile)) {

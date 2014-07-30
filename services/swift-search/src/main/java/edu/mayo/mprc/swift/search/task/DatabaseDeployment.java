@@ -52,7 +52,7 @@ final class DatabaseDeployment extends AsyncTaskBase implements DatabaseDeployme
 	 */
 	@Override
 	public WorkPacket createWorkPacket() {
-		final DeploymentRequest workPacket = new DeploymentRequest(getFullId(), dbToDeploy.getFastaFile());
+		final DeploymentRequest workPacket = new DeploymentRequest(dbToDeploy.getFastaFile());
 		if ("SEQUEST".equalsIgnoreCase(engineCode)) {
 			// Sequest needs the param file path as a parameter
 			workPacket.addProperty(

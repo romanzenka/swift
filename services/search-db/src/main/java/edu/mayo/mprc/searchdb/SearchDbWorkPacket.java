@@ -34,7 +34,7 @@ public final class SearchDbWorkPacket extends WorkPacketBase {
 	 */
 	private Map<String, RawFileMetaData> fileMetaDataMap;
 
-	public SearchDbWorkPacket(final String taskId, final boolean fromScratch, final long reportDataId,
+	public SearchDbWorkPacket(final boolean fromScratch, final long reportDataId,
 	                          final File scaffoldSpectrumReport,
 	                          final File scaffoldUnimod,
 	                          final Map<String, RawFileMetaData> fileMetaDataMap) {

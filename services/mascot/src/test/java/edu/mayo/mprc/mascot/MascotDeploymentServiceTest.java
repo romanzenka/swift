@@ -55,7 +55,7 @@ public final class MascotDeploymentServiceTest {
 			final Curation toDeploy = new Curation();
 			toDeploy.setShortName("test_in");
 			toDeploy.setCurationFile(fakeFASTAFileToDeploy);
-			final DeploymentRequest request = new DeploymentRequest(getClass().getSimpleName(), toDeploy.getFastaFile());
+			final DeploymentRequest request = new DeploymentRequest(toDeploy.getFastaFile());
 			WorkPacketBase.simulateTransfer(request);
 
 			final DeploymentResult result = service.performDeployment(request);

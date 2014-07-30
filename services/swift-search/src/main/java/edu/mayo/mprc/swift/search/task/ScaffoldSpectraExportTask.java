@@ -40,7 +40,7 @@ public final class ScaffoldSpectraExportTask extends AsyncTaskBase implements Sc
 
 	@Override
 	public WorkPacket createWorkPacket() {
-		return new ScaffoldSpectrumExportWorkPacket(getFullId(), isFromScratch(), scaffoldFile, spectrumExportFile);
+		return new ScaffoldSpectrumExportWorkPacket(isFromScratch(), scaffoldFile, spectrumExportFile);
 	}
 
 	@Override

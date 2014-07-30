@@ -138,7 +138,6 @@ public abstract class HierarchicalUiBuilder<T> implements UiBuilder, PropertyVal
 			if (value != null) {
 				return value.getValue(subPropertyName);
 			}
-			ExceptionUtilities.throwCastException(value, HierarchicalUiBuilder.class);
 			return null;
 		}
 	}

@@ -44,7 +44,7 @@ final class ScaffoldReportTask extends AsyncTaskBase {
 			return null;
 		}
 
-		return new ScaffoldReportWorkPacket(scaffoldOutputFiles, peptideReportFile, proteinReportFile, getFullId(), isFromScratch());
+		return new ScaffoldReportWorkPacket(scaffoldOutputFiles, peptideReportFile, proteinReportFile, isFromScratch());
 	}
 
 	@Override

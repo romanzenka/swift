@@ -40,7 +40,7 @@ public final class QuameterDbTask extends AsyncTaskBase {
 		final String fileName = FileUtilities.getFileNameWithoutExtension(fileSearch.getInputFile());
 		final Integer tandemMassSpectrometrySampleId = metadata.get(fileName);
 		Preconditions.checkNotNull(tandemMassSpectrometrySampleId, "There must be sample id recorded for file name [" + fileName + "]");
-		return new QuameterDbWorkPacket(getFullId(),
+		return new QuameterDbWorkPacket(
 				isFromScratch(),
 				tandemMassSpectrometrySampleId,
 				fileSearch.getId(),
