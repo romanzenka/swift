@@ -6,6 +6,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.annotation.Resource;
 
@@ -18,11 +19,13 @@ public final class QuameterHideResult {
 	private QuameterDao quameterDao;
 
 	@RequestMapping(value = "/quameter-hide/{quameterResultId}", method = RequestMethod.POST)
-	public void hideQuameterResult(@PathVariable final int quameterResultId) {
+	@ResponseBody
+	public String hideQuameterResult(@PathVariable final int quameterResultId) {
 		quameterDao.begin();
 		try {
 			quameterDao.hideQuameterResult(quameterResultId);
 			quameterDao.commit();
+			return "Ok";
 		} catch (Exception e) {
 			quameterDao.rollback();
 			throw new MprcException("Could not hide quameter result " + quameterResultId, e);
