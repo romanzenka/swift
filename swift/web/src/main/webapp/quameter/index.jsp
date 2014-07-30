@@ -663,6 +663,7 @@ if(quameterUiConfig!=null) {
                     <span id="icons">
                         <a href="#" id="search-link"><img src="/report/search_edit.gif" style="border: 0"></a>
                         <a href="#" id="qa-link"><img src="/report/search.gif" style="border: 0"></a>
+                        <a id="hide-entry"><img src="/report/search_hide.gif" style="border: 0"></a>
                     </span>
                     <span id="selected-path"></span>
                 </div>
