@@ -37,9 +37,18 @@ public final class QuameterDbWorker extends WorkerBase {
 	public static final String DESC = "Loads the QuaMeter results into a database.";
 
 	private static final String DATABASE = "database";
+	public static final String CATEGORIES = "categories";
+	public static final String PROTEINS = "proteins";
 
-	public QuameterDbWorker(final QuameterDao quameterDao) {
+	private final String categories;
+	private final String proteins;
+
+	public QuameterDbWorker(final QuameterDao quameterDao,
+	                        final String categories,
+	                        final String proteins) {
 		this.dao = quameterDao;
+		this.categories = categories;
+		this.proteins = proteins;
 	}
 
 	@Override
@@ -129,7 +138,7 @@ public final class QuameterDbWorker extends WorkerBase {
 
 		@Override
 		public Worker create(final Config config, final DependencyResolver dependencies) {
-			return new QuameterDbWorker(getQuameterDao());
+			return new QuameterDbWorker(getQuameterDao(), config.getCategories(), config.getProteins());
 		}
 	}
 
@@ -138,6 +147,8 @@ public final class QuameterDbWorker extends WorkerBase {
 	 */
 	public static final class Config implements ResourceConfig {
 		private Database.Config database;
+		private String categories;
+		private String proteins;
 
 		public Database.Config getDatabase() {
 			return database;
@@ -146,16 +157,28 @@ public final class QuameterDbWorker extends WorkerBase {
 		@Override
 		public void save(final ConfigWriter writer) {
 			writer.put(DATABASE, writer.save(getDatabase()));
+			writer.put(CATEGORIES, categories);
+			writer.put(PROTEINS, proteins);
 		}
 
 		@Override
 		public void load(final ConfigReader reader) {
 			database = (Database.Config) reader.getObject(DATABASE);
+			categories = reader.get(CATEGORIES);
+			proteins = reader.get(PROTEINS);
 		}
 
 		@Override
 		public int getPriority() {
 			return 0;
+		}
+
+		public String getCategories() {
+			return categories;
+		}
+
+		public String getProteins() {
+			return proteins;
 		}
 	}
 
@@ -167,7 +190,20 @@ public final class QuameterDbWorker extends WorkerBase {
 
 			builder.property(DATABASE, "Database", "Database we will be storing data into")
 					.reference(Database.Factory.TYPE, UiBuilder.NONE_TYPE)
-					.defaultValue(database);
+					.defaultValue(database)
+
+					.property(CATEGORIES, "Categories", "Categories for the different QuaMeter quality checks." +
+							"<p>You can assign a category to each search. The QuaMeter user interface will then allow you to pick a category" +
+							"to filter all the results. The categories are comma-separated. Use a dash in front of a category to form sub-categories.</p>" +
+							"<p>Example: <tt>animal,-cat,--siamese,-dog,--chihuahua</tt></p>")
+					.defaultValue("no-category")
+
+					.property(PROTEINS, "Proteins", "Each category from the upper list needs a regular expression that selects" +
+							" protein accessions from that category. The regular expressions are separated by commas." +
+							" This enables QuaMeter display to list number of spectra assigned to proteins of interest" +
+							"<p>Example: <tt>ANIMAL1|ANIMAL2,CAT1|CAT2|CATS_.*,SIAMESE.*,DOG1|DOG2,CHIHUAHUA_\\d+</tt>")
+					.defaultValue(".*");
+
 		}
 	}
 

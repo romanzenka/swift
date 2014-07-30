@@ -3,10 +3,7 @@ package edu.mayo.mprc.quameterdb;
 import com.google.common.base.Strings;
 import com.google.gson.stream.JsonWriter;
 import edu.mayo.mprc.MprcException;
-import edu.mayo.mprc.config.DaemonConfig;
-import edu.mayo.mprc.config.DependencyResolver;
-import edu.mayo.mprc.config.FactoryBase;
-import edu.mayo.mprc.config.ResourceConfig;
+import edu.mayo.mprc.config.*;
 import edu.mayo.mprc.config.ui.*;
 import edu.mayo.mprc.daemon.UiConfigurationProvider;
 import edu.mayo.mprc.database.Dao;
@@ -36,17 +33,14 @@ public final class QuameterUi implements Dao, UiConfigurationProvider {
 	public static final String DESC = "Specialized interface for browsing QuaMeter database";
 
 	private static final String SEARCH_FILTER = "searchFilter";
+	private static final String QUAMETER_DB_WORKER = "quameterDbWorker";
 	public static final double SEC_TO_MIN = 60.0;
 
 	private final QuameterDao quameterDao;
 	private final Pattern searchFilter;
-	private final String categories;
-	private final String proteins;
+	private final QuameterDbWorker.Config dbWorkerConfig;
 	private static final DateTimeFormatter DATE_FORMAT_1 = DateTimeFormat.forPattern("'Date('yyyy, ").withLocale(Locale.US);
 	private static final DateTimeFormatter DATE_FORMAT_2 = DateTimeFormat.forPattern(", d, H, m, s, S')'").withLocale(Locale.US);
-
-	public static final String CATEGORIES = "categories";
-	public static final String PROTEINS = "proteins";
 
 	/**
 	 * Use this constant to get to a list of quameter categories from the user interface
@@ -55,12 +49,10 @@ public final class QuameterUi implements Dao, UiConfigurationProvider {
 
 	public QuameterUi(final QuameterDao quameterDao,
 	                  final Pattern searchFilter,
-	                  final String categories,
-	                  final String proteins) {
+	                  final QuameterDbWorker.Config dbWorkerConfig) {
 		this.quameterDao = quameterDao;
 		this.searchFilter = searchFilter;
-		this.categories = categories;
-		this.proteins = proteins;
+		this.dbWorkerConfig = dbWorkerConfig;
 	}
 
 	@Override
@@ -178,23 +170,39 @@ public final class QuameterUi implements Dao, UiConfigurationProvider {
 
 	@Override
 	public void provideConfiguration(Map<String, String> currentConfiguration) {
-		currentConfiguration.put(UI_QUAMETER_CATEGORIES, categories);
+		currentConfiguration.put(UI_QUAMETER_CATEGORIES, dbWorkerConfig.getCategories());
 	}
 
-	public static final class Config extends ResourceConfigBase {
+	public static final class Config implements ResourceConfig {
+		private String searchFilter;
+		private QuameterDbWorker.Config quameterConfig;
+
 		public Config() {
 		}
 
-		void setSearchFilter(final String searchFilter) {
-			put(SEARCH_FILTER, searchFilter);
+		@Override
+		public void save(ConfigWriter writer) {
+			writer.put(SEARCH_FILTER, searchFilter);
+			writer.put(QUAMETER_DB_WORKER, writer.save(quameterConfig));
 		}
 
-		public String getCategories() {
-			return get(CATEGORIES);
+		@Override
+		public void load(ConfigReader reader) {
+			searchFilter = reader.get(SEARCH_FILTER);
+			quameterConfig = (QuameterDbWorker.Config) reader.getObject(QUAMETER_DB_WORKER);
 		}
 
-		public String getProteins() {
-			return get(PROTEINS);
+		@Override
+		public int getPriority() {
+			return 0;
+		}
+
+		public String getSearchFilter() {
+			return searchFilter;
+		}
+
+		public QuameterDbWorker.Config getQuameterConfig() {
+			return quameterConfig;
 		}
 	}
 
@@ -230,11 +238,10 @@ public final class QuameterUi implements Dao, UiConfigurationProvider {
 
 		@Override
 		public QuameterUi create(final Config config, final DependencyResolver dependencies) {
-			final String filterString = config.get(SEARCH_FILTER);
-			final String categories = config.get(CATEGORIES);
-			final String proteins = config.get(PROTEINS);
+			final String filterString = config.getSearchFilter();
 			final Pattern filter = compileFilter(filterString);
-			return new QuameterUi(getQuameterDao(), filter, categories, proteins);
+			final QuameterDbWorker.Config dbConfig = config.getQuameterConfig();
+			return new QuameterUi(getQuameterDao(), filter, dbConfig);
 		}
 
 		public QuameterDao getQuameterDao() {
@@ -278,19 +285,7 @@ public final class QuameterUi implements Dao, UiConfigurationProvider {
 						@Override
 						public void fixError(final ResourceConfig config, final String propertyName, final String action) {
 						}
-					})
-
-					.property(CATEGORIES, "Categories", "Categories for the different QuaMeter quality checks." +
-							"<p>You can assign a category to each search. The QuaMeter user interface will then allow you to pick a category" +
-							"to filter all the results. The categories are comma-separated. Use a dash in front of a category to form sub-categories.</p>" +
-							"<p>Example: <tt>animal,-cat,--siamese,-dog,--chihuahua</tt></p>")
-					.defaultValue("no-category")
-
-					.property(PROTEINS, "Proteins", "Each category from the upper list needs a regular expression that selects" +
-							" protein accessions from that category. The regular expressions are separated by commas." +
-							" This enables QuaMeter display to list number of spectra assigned to proteins of interest" +
-							"<p>Example: <tt>ANIMAL1|ANIMAL2,CAT1|CAT2|CATS_.*,SIAMESE.*,DOG1|DOG2,CHIHUAHUA_\\d+</tt>")
-					.defaultValue(".*");
+					});
 		}
 	}
 
