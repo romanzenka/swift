@@ -55,13 +55,13 @@ public abstract class RunnerConfig implements ResourceConfig, HierarchicalResour
 	@Override
 	public void save(final ConfigWriter writer) {
 		writer.put(WORKER, getWorkerConfiguration());
-		writer.put(LOG_OUTPUT_FOLDER, logOutputFolder);
+		writer.put(LOG_OUTPUT_FOLDER, logOutputFolder, "", "Where to put logs for this runner");
 	}
 
 	@Override
 	public void load(final ConfigReader reader) {
 		setWorkerConfiguration(reader.getObject(WORKER));
-		setLogOutputFolder(reader.get(LOG_OUTPUT_FOLDER));
+		setLogOutputFolder(reader.get(LOG_OUTPUT_FOLDER, ""));
 	}
 
 	@Override
