@@ -623,6 +623,7 @@ if(quameterUiConfig!=null) {
         event.stopPropagation();
         $.post("/service/quameter-hide/" + selectedId);
         hiddenIds["id"+selectedId] = true;
+        selectPoint(data, -1);
         refilterRows();
       });
 
