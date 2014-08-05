@@ -2,6 +2,8 @@ package edu.mayo.mprc.heme;
 
 import java.io.*;
 import java.util.HashMap;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Created with IntelliJ IDEA.
@@ -14,8 +16,9 @@ import java.util.HashMap;
  * Should be used as an optional class, to generate LookUp object when renewing DB or orig is missing
  */
 public class SerializeFastaDB {
+    private static final Pattern MASS_PATTERN = Pattern.compile(".+ (\\d+\\.\\d+)?"); //last double on line
 
-    public static void generate(File inFasta, String outObjPath){
+    public static void generateDesc(File inFasta, String outObjPath){
         try {
             HashMap<String, String> cache = new HashMap<String, String>();
             String strRead;
@@ -36,7 +39,7 @@ public class SerializeFastaDB {
         }
     }
 
-    public static void generate(String inFastaPath, String outObjPath){
+    public static void generateDesc(String inFastaPath, String outObjPath){
         try {
             HashMap<String, String> cache = new HashMap<String, String>();
             String strRead;
@@ -45,6 +48,40 @@ public class SerializeFastaDB {
                 if( strRead.charAt(0) == '>' )  {
                     String[] definitionArr = strRead.split("\\s+");
                     cache.put(definitionArr[0].substring(1), strRead);
+                }
+            }
+
+            ObjectOutputStream out = new ObjectOutputStream( new FileOutputStream(outObjPath) );
+            out.writeObject(cache);
+            out.close();
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+
+    public static void generateSequence(File inFasta, String outObjPath){
+        try {
+            HashMap<String, String> cache = new HashMap<String, String>();
+            String strRead;
+            boolean isMut = false;
+            String lastAcc = "";
+            BufferedReader readbuffer = new BufferedReader( new FileReader(inFasta) );
+            while((strRead = readbuffer.readLine()) != null) {
+                if( strRead.charAt(0) == '>' )  {
+                    Matcher matcher = MASS_PATTERN.matcher(strRead);
+                    if (matcher.matches()) {
+                        String[] definitionArr = strRead.split("\\s+");
+                        lastAcc = definitionArr[0].substring(1);
+                        isMut=true;
+                    }
+                    else{
+                        isMut=false;
+                    }
+                }
+                else if(isMut){
+                    cache.put(lastAcc, strRead);
                 }
             }
 
@@ -66,7 +103,7 @@ public class SerializeFastaDB {
         catch (IOException e) {
             e.printStackTrace();
         } catch (ClassNotFoundException e) {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+            e.printStackTrace();
         }
         return loadedObj;
     }

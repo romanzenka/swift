@@ -94,9 +94,10 @@ public final class HemeService {
 		hemeUi.begin();
 		try {
 			HemeReport report = hemeUi.createReport(entry);
-            modelAndView.addObject("report", report);
             modelAndView.setViewName("heme/heme_report"); //Migrated to JSP
-			hemeUi.commit();
+            modelAndView.addObject("report", report);
+
+            hemeUi.commit();
 		} catch (Exception e) {
 			hemeUi.rollback();
 			throw new MprcException("Could not view report for entry " + entry, e);

@@ -16,21 +16,17 @@ public class HemeScaffoldReader extends ScaffoldReportReader {
 
     private int proteinAccessionNumbers;
 	private int numberOfTotalSpectra;
-//    private static final Pattern DELTA_PATTERN = Pattern.compile(".*#DeltaMass:([^#]+)#.*");
-    private static final Pattern MASS_PATTERN = Pattern.compile("(\\d+\\.\\d+)?"); //last double on line
-	private HashMap<String, String> databaseCache;
+    private int peptideSeq;
+    private static final Pattern MASS_PATTERN = Pattern.compile(".+ (\\d+\\.\\d+)?"); //last double on line
+    private HemeReport report;
+    private HashMap<String, String> databaseCache;
+    private HashMap<String, String> mutationSequenceCache;
 
-	public HemeScaffoldReader(File cache) {
-
-
+    public HemeScaffoldReader(File cache, File mutCache, HemeReport myNewReport) {
         this.databaseCache = SerializeFastaDB.load(cache.getAbsolutePath());
-        //TODO - add code to check if cache exists? and if not create it? or somewhere else?
-	}
+        this.mutationSequenceCache = SerializeFastaDB.load(mutCache.getAbsolutePath());
+        this.report = myNewReport;
 
-	private Map<String, HemeReportEntry> entries = new HashMap<String, HemeReportEntry>(100);
-
-	public Collection<HemeReportEntry> getEntries() {
-		return entries.values();
 	}
 
 	public boolean processMetadata(final String key, final String value) {
@@ -41,17 +37,17 @@ public class HemeScaffoldReader extends ScaffoldReportReader {
 	public boolean processHeader(final String line) {
 		final Map<String, Integer> map = buildColumnMap(line);
 		initializeCurrentLine(map);
-
 		// Store the column numbers for faster parsing
 		proteinAccessionNumbers = getColumn(map, ScaffoldReportReader.PROTEIN_ACCESSION_NUMBERS);
-		numberOfTotalSpectra = getColumn(map, ScaffoldReportReader.NUMBER_OF_TOTAL_SPECTRA);
+        numberOfTotalSpectra = getColumn(map, ScaffoldReportReader.NUMBER_OF_TOTAL_SPECTRA);
+        peptideSeq = getColumn(map, ScaffoldReportReader.PEPTIDE_SEQUENCE);
 		return true;
 	}
 
 	@Override
 	public boolean processRow(final String line) {
 		fillCurrentLine(line);
-		final List<ProteinId> ids = new ArrayList<ProteinId>();
+		//final List<ProteinEntity> ids = new ArrayList<ProteinEntity>();
 		String accnumString = currentLine[proteinAccessionNumbers];
 		final Iterable<String> accNums = PROTEIN_ACCESSION_SPLITTER.split(accnumString);
 
@@ -61,25 +57,41 @@ public class HemeScaffoldReader extends ScaffoldReportReader {
                 LOGGER.warn(String.format("Database does not contain entry for accession number [%s]", accNum));
                 continue;
             }
-			final ProteinId id = new ProteinId(accNum, description, getMassIsotopic(description)); //missing desc -> null results in error chain
-			ids.add(id);
-		}
-		final int totalSpectra = parseInt(currentLine[numberOfTotalSpectra]);
 
-		HemeReportEntry entry = entries.get(accnumString);
-		if (entry == null) {
-            if(!ids.isEmpty()) {
-		    	entry = new HemeReportEntry(ids, totalSpectra);
-			    entries.put(accnumString, entry);
+            //missing desc -> null results in error chain
+			final ProteinEntity prot = report.find_or_create_ProteinEntity(accNum, description, getMassIsotopic(description));
+            prot.setTotalSpectra( parseInt(currentLine[numberOfTotalSpectra]) );
+
+            // Everyone else category (contaminants & non-mutated proteins):
+            if( prot.getMass() == null ){
+                prot.setFilter(ProteinEntity.Filter.OTHER);
+                continue;
             }
-		} else {
-			entry.checkSpectra(totalSpectra);
+
+            PeptideEntity newPep = new PeptideEntity( currentLine[peptideSeq] );
+            boolean massCheck = isWithingMassRange(report.getMass(), prot.getMass(), report.getMassTolerance());
+            boolean mutationCheck = hasOverlappingMutation(newPep, mutationSequenceCache.get(accNum), prot.getCigar());
+            prot.appendPeptide(newPep);
+
+            /* Must be inside Mass Range & Have cooresponding mutation */
+            if(massCheck && mutationCheck){
+                prot.setSequence(mutationSequenceCache.get(accNum));
+                prot.setFilter(ProteinEntity.Filter.MUTATION_CONFIRMED);
+            }
+            // Else: Mutation Proteins either outside of mass range or completely missing the target mutation
+            else if(mutationCheck){
+                prot.setFilter(ProteinEntity.Filter.RELATED_MUTANT);
+            }
+
+
 		}
 
+        //TODO - DEPRICATE HemeReportEntry
 		return true;
 	}
 
-	/**
+
+    /**
 	 * Get description for a protein of given accession number
 	 */
 	private String getDescription(final String accNum) {
@@ -90,7 +102,7 @@ public class HemeScaffoldReader extends ScaffoldReportReader {
         final Matcher matcher = MASS_PATTERN.matcher(description);
 		if (matcher.matches()) {
 			final String isomass = matcher.group(1);
-            System.out.println(isomass);
+            //System.out.println(isomass);
 			try {
 				return Double.parseDouble(isomass);
 			} catch (NumberFormatException e) {
@@ -100,4 +112,48 @@ public class HemeScaffoldReader extends ScaffoldReportReader {
 		}
 		return null;
 	}
+
+    private boolean isWithingMassRange(double target, double self, double tolerance){
+        boolean check = false;
+        if (Math.abs(target - self) <= tolerance) {
+            check = true;
+        }
+        return check;
+    }
+
+    private boolean hasOverlappingMutation(PeptideEntity peptideSeq, String dbSequence, String cigar) {
+        int pepStart = dbSequence.indexOf(peptideSeq.getSequence());
+        // If peptide does not match protein string
+        if(pepStart == -1){
+            return false;
+        }
+
+        peptideSeq.setStart(pepStart); //Store this info for FrontEnd Viz
+        int pepEnd = pepStart + peptideSeq.getSequence().length();
+        peptideSeq.setStop(pepEnd);
+
+
+        //Get cigar element types parsed
+        String[] letter = cigar.replaceAll("[0-9]","").split("");
+        //Get cigar lengths parsed
+        String[] numericTmp = cigar.split("[MIDNSHPX]");
+        int mutPosition = 0;
+        for(int i=0; i<numericTmp.length;i++){
+            mutPosition += Integer.parseInt(numericTmp[i]);
+            if( ! letter[i+1].equals("M") ){
+                break;
+            }
+        }
+
+        if(pepStart < mutPosition && mutPosition < pepEnd){
+            peptideSeq.setHasMutation(true);
+            return true;
+        }
+        else{
+            return false;
+        }
+
+
+    }
+
 }
