@@ -28,4 +28,14 @@ public interface QuameterDao extends Dao {
 	List<QuameterResult> listAllResults(Pattern searchFilter);
 
 	void hideQuameterResult(int quameterResultId);
+
+	/**
+	 * For given file search id and a list of categories and their corresponding proteins,
+	 * count all the spectra corresponding to the protein set for the particular file search.
+	 *
+	 * @param fileSearchId Saved info about file search
+	 * @param categoryToProteins Map of QuaMeter category name to list of proteins
+	 * @return Count of spectra corresponding to proteins for given file search
+	 */
+	int getIdentifiedSpectra(int fileSearchId, Map<String, Pattern> categoryToProteins);
 }

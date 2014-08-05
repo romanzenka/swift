@@ -5,6 +5,9 @@ import edu.mayo.mprc.searchdb.dao.SearchDbDao;
 import edu.mayo.mprc.searchdb.dao.TandemMassSpectrometrySample;
 import edu.mayo.mprc.swift.db.SwiftDao;
 import edu.mayo.mprc.swift.dbmapping.FileSearch;
+import edu.mayo.mprc.swift.dbmapping.SwiftSearchDefinition;
+import edu.mayo.mprc.swift.params2.SearchEngineParameters;
+import org.apache.log4j.Logger;
 import org.hibernate.Hibernate;
 import org.hibernate.Query;
 import org.springframework.stereotype.Repository;
@@ -18,7 +21,7 @@ import java.util.regex.Pattern;
  */
 @Repository("quameterDao")
 public final class QuameterDaoHibernate extends DaoBase implements QuameterDao {
-
+	private static final Logger LOGGER = Logger.getLogger(QuameterDaoHibernate.class);
 	private static final String MAP = "edu/mayo/mprc/quameterdb/dao/";
 
 	private SwiftDao swiftDao;
@@ -89,6 +92,21 @@ public final class QuameterDaoHibernate extends DaoBase implements QuameterDao {
 		final QuameterResult quameterResult = (QuameterResult) getSession().get(QuameterResult.class, quameterResultId);
 		quameterResult.setHidden(true);
 		getSession().saveOrUpdate(quameterResult);
+	}
+
+	@Override
+	public int getIdentifiedSpectra(int fileSearchId, Map<String, Pattern> categoryToProteins) {
+		final FileSearch fileSearch = swiftDao.getFileSearchForId(fileSearchId);
+		final SwiftSearchDefinition swiftSearchDefinition = swiftDao.getSwiftSearchDefinition(fileSearch.getSwiftSearchDefinitionId());
+		final SearchEngineParameters searchParameters = fileSearch.getSearchParametersWithDefault(swiftSearchDefinition.getSearchParameters());
+
+		final String category = swiftSearchDefinition.getMetadata().get("quameter.category");
+		if (category == null) {
+			LOGGER.warn("No category defined for file search id " + fileSearchId);
+			return 0;
+		}
+
+		return 0;  // TODO: Implement this method
 	}
 
 	@Override

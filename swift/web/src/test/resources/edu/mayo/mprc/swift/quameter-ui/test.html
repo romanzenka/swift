@@ -140,9 +140,9 @@ function addButtons(div, data, columnId) {
 }
 
 function prePostCategory(path) {
-    if (/_Pre[^.]+/.test(path)) {
+    if (/.{15}_Pre[^.]+/.test(path)) {
         return "Pre";
-    } else if (/_Post[^.]+/.test(path)) {
+    } else if (/.{15}       _Post[^.]+/.test(path)) {
         return "Post";
     } else {
         return "Sample";
@@ -162,7 +162,7 @@ function addPrePostButtons(div, data, columnId) {
         } else {
             names[category] = 1;
         }
-    }
+    }                                                                                                b
     var keys = $.map(names, function (element, index) {
         return index
     }).sort();

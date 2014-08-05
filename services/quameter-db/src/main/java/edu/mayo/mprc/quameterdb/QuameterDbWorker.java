@@ -1,6 +1,10 @@
 package edu.mayo.mprc.quameterdb;
 
+import com.google.common.base.Function;
 import com.google.common.base.Splitter;
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Iterators;
+import com.google.common.collect.Lists;
 import edu.mayo.mprc.MprcException;
 import edu.mayo.mprc.config.*;
 import edu.mayo.mprc.config.ui.ServiceUiFactory;
@@ -10,20 +14,22 @@ import edu.mayo.mprc.daemon.worker.Worker;
 import edu.mayo.mprc.daemon.worker.WorkerBase;
 import edu.mayo.mprc.daemon.worker.WorkerFactoryBase;
 import edu.mayo.mprc.database.Database;
+import edu.mayo.mprc.fastadb.FastaDbDao;
 import edu.mayo.mprc.quameterdb.dao.QuameterDao;
+import edu.mayo.mprc.searchdb.dao.SearchDbDao;
 import edu.mayo.mprc.utilities.FileUtilities;
 import edu.mayo.mprc.utilities.progress.UserProgressReporter;
 import org.apache.log4j.Logger;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.Nullable;
 import javax.annotation.Resource;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.Reader;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.TreeMap;
+import java.util.*;
+import java.util.regex.Pattern;
 
 /**
  * @author Roman Zenka
@@ -40,14 +46,11 @@ public final class QuameterDbWorker extends WorkerBase {
 	public static final String CATEGORIES = "categories";
 	public static final String PROTEINS = "proteins";
 
-	private final String categories;
-	private final String proteins;
+	private final Map<String, Pattern> proteins;
 
 	public QuameterDbWorker(final QuameterDao quameterDao,
-	                        final String categories,
-	                        final String proteins) {
+	                        final Map<String, Pattern> proteins) {
 		this.dao = quameterDao;
-		this.categories = categories;
 		this.proteins = proteins;
 	}
 
@@ -57,12 +60,14 @@ public final class QuameterDbWorker extends WorkerBase {
 		dao.begin();
 		try {
 			final Map<String, Double> map = loadQuameterResultFile(workPacket.getQuameterResultFile());
-			final int identifiedSpectra = 0;
+
+			final int identifiedSpectra = dao.getIdentifiedSpectra(workPacket.getFileSearchId(), proteins);
+
 			dao.addQuameterScores(workPacket.getTandemMassSpectrometrySampleId(),
 					workPacket.getFileSearchId(),
 					map, identifiedSpectra);
 			dao.commit();
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			dao.rollback();
 			throw new MprcException(
 					"Could not load QuaMeter results from ["
@@ -81,7 +86,7 @@ public final class QuameterDbWorker extends WorkerBase {
 
 	static Map<String, Double> loadQuameterResultFile(final File quameterFile) {
 		LOGGER.info(String.format("Loading Quameter result file from %s", quameterFile.getAbsolutePath()));
-		Map<String, Double> stringDoubleMap = loadQuameterResultFile(FileUtilities.getReader(quameterFile));
+		final Map<String, Double> stringDoubleMap = loadQuameterResultFile(FileUtilities.getReader(quameterFile));
 		LOGGER.info(String.format("Loaded %d key-value pairs", stringDoubleMap.size()));
 		return stringDoubleMap;
 	}
@@ -107,12 +112,12 @@ public final class QuameterDbWorker extends WorkerBase {
 				try {
 					final double valueDouble = Double.parseDouble(value);
 					map.put(key, valueDouble);
-				} catch (NumberFormatException e) {
+				} catch (final NumberFormatException e) {
 					throw new MprcException("Value for key [" + key + "] is not numeric: [" + value + "]", e);
 				}
 			}
 
-		} catch (IOException e) {
+		} catch (final IOException e) {
 			throw new MprcException("Could not read QuaMeter data", e);
 		} finally {
 			FileUtilities.closeQuietly(bufferedReader);
@@ -138,7 +143,22 @@ public final class QuameterDbWorker extends WorkerBase {
 
 		@Override
 		public Worker create(final Config config, final DependencyResolver dependencies) {
-			return new QuameterDbWorker(getQuameterDao(), config.getCategories(), config.getProteins());
+			return new QuameterDbWorker(getQuameterDao(),
+					parseConfigProteins(config.getCategories(), config.getProteins()));
+		}
+
+		private Map<String, Pattern> parseConfigProteins(final String categories, final String proteins) {
+			final Iterable<String> categorySplit = Splitter.on(',').trimResults().split(categories);
+
+//			final Iterable<String> split = Splitter.on(',').trimResults().split(proteins);
+//			final Function<String, Pattern> stringPatternFunction = new Function<String, Pattern>() {
+//				@Override
+//				public Pattern apply(final String s) {
+//					return Pattern.compile(s);
+//				}
+//			};
+//			return Lists.newArrayList(Iterables.transform(split, stringPatternFunction));
+			return new HashMap<String, Pattern>(0);
 		}
 	}
 
