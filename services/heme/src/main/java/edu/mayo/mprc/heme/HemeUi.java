@@ -304,17 +304,16 @@ public final class HemeUi implements Dao {
 
 		final SwiftSearchDefinition swiftSearchDefinition = swiftDao.getSwiftSearchDefinition(test.getSearchRun().getSwiftSearch());
 
-		final Curation dummyDatabase = new Curation();
-        //dummyDatabase.setCurationFile(new File("/Users/m088378/Desktop/newHemePathDatabase2.fasta"));
-        dummyDatabase.setCurationFile(new File("/Users/m088378/heme-data/HbVar-Unipro-1.0.fasta"));
-        File dbCache = new File("/Users/m088378/heme-data/HbVar-Unipro.obj");
+		final Curation database = swiftSearchDefinition.getSearchParameters().getDatabase();
+		String fastaName = FileUtilities.stripGzippedExtension(database.getCurationFile().getName());
+		File dbCache = new File(fastaDbCache, fastaName+"-desc.obj");
         if( !dbCache.exists() ){
-            SerializeFastaDB.generateDesc(dummyDatabase.getFastaFile().getFile(), dbCache.toString());
+            SerializeFastaDB.generateDesc(database.getCurationFile(), dbCache.toString());
         }
 
-        File seqCache = new File("/Users/m088378/heme-data/HbVar-MutationSeq.obj");
+        File seqCache = new File(fastaDbCache, fastaName+"-seq.obj");
         if( !seqCache.exists() ){
-            SerializeFastaDB.generateSequence(dummyDatabase.getFastaFile().getFile(), seqCache.toString());
+            SerializeFastaDB.generateSequence(database.getFastaFile().getFile(), seqCache.toString());
         }
         HemeReport myNewReport = new HemeReport(test);
 
@@ -512,7 +511,7 @@ public final class HemeUi implements Dao {
 					.defaultValue("data")
 
 					.property(RESULT_PATH, "Result path", "Folder where the search results will be stored." +
-                            "<p>The path is relative to the shared folder</p>")
+							"<p>The path is relative to the shared folder</p>")
 					.required()
 					.existingDirectory()
 					.defaultValue("results")
