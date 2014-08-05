@@ -35,12 +35,12 @@ public class HemeTest extends PersistableBase {
 	/**
 	 * Expected mass delta in Daltons.
 	 */
-	private double massDelta;
+	private double mass;
 
 	/**
 	 * The mass delta tolerance (in Daltons). Any mass +- the tolerance is to be considered.
 	 */
-	private double massDeltaTolerance;
+	private double massTolerance;
 
 	/**
 	 * Search run that is associated with this test.
@@ -50,12 +50,12 @@ public class HemeTest extends PersistableBase {
 	public HemeTest() {
 	}
 
-	public HemeTest(final String name, final Date date, final String path, final double massDelta, final double massDeltaTolerance) {
+	public HemeTest(final String name, final Date date, final String path, final double mass, final double massDelta) {
 		this.name = name;
 		this.date = date;
 		this.path = path;
-		this.massDelta = massDelta;
-		this.massDeltaTolerance = massDeltaTolerance;
+		this.mass = mass;
+		this.massTolerance = massDelta;
 	}
 
 	public String getPath() {
@@ -82,24 +82,24 @@ public class HemeTest extends PersistableBase {
 		this.date = date;
 	}
 
-	public double getMassDelta() {
-		return massDelta;
+	public double getMass() {
+		return mass;
 	}
 
-	public void setMassDelta(final double massDelta) {
-		this.massDelta = massDelta;
+	public void setMass(final double mass) {
+		this.mass = mass;
 	}
 
-	public double getMassDeltaTolerance() {
-		return massDeltaTolerance;
+	public double getMassTolerance() {
+		return massTolerance;
 	}
 
-	public void setMassDeltaTolerance(final double massDeltaTolerance) {
-		this.massDeltaTolerance = massDeltaTolerance;
+	public void setMassTolerance(final double massTolerance) {
+		this.massTolerance = massTolerance;
 	}
 
 	public SearchRun getSearchRun() {
-		return searchRun;
+		return new SearchRun(); // TODO - remove before deployment
 	}
 
 	public void setSearchRun(SearchRun searchRun) {
@@ -147,8 +147,8 @@ public class HemeTest extends PersistableBase {
 				"name='" + name + '\'' +
 				", date=" + date +
 				", path='" + path + '\'' +
-				", massDelta=" + massDelta +
-				", massDeltaTolerance=" + massDeltaTolerance +
+				", massDelta=" + mass +
+				", massDeltaTolerance=" + massTolerance +
 				'}';
 	}
 }

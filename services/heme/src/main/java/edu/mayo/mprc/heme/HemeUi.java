@@ -13,6 +13,7 @@ import edu.mayo.mprc.config.ui.ResourceConfigBase;
 import edu.mayo.mprc.config.ui.ServiceUiFactory;
 import edu.mayo.mprc.config.ui.UiBuilder;
 import edu.mayo.mprc.database.Dao;
+import edu.mayo.mprc.dbcurator.model.Curation;
 import edu.mayo.mprc.fastadb.FastaDbDao;
 import edu.mayo.mprc.heme.dao.HemeDao;
 import edu.mayo.mprc.heme.dao.HemeTest;
@@ -65,8 +66,9 @@ public final class HemeUi implements Dao {
 	private static final String USER_EMAIL = "userEmail";
 	public static final String SPECTRA_EXTENSION = ".spectra.txt";
 	public static final double DEFAULT_MASS_DELTA_TOLERANCE = 0.5;
-
-	private final File data;
+    private static final String FASTA_DB_CACHE= "fastaDbCache";
+    
+    private final File data;
 	private final File results;
 	private final HemeDao hemeDao;
 	private final SwiftDao swiftDao;
@@ -87,12 +89,14 @@ public final class HemeUi implements Dao {
 	private int chymoParameterSetId;
 	private String userEmail;
 	private String[] searchEngines;
+    private File fastaDbCache;
 
 	public HemeUi(final File data, final File results, final HemeDao hemeDao, final SwiftDao swiftDao,
 	              final FastaDbDao fastaDbDao,
 	              final ParamsDao paramsDao,
 	              final SwiftSearcherCaller swiftSearcherCaller,
-	              final String trypsinParameterSetName, final String chymoParameterSetName, final String userEmail) {
+	              final String trypsinParameterSetName, final String chymoParameterSetName, final String userEmail,
+                  final File fastaDbCache) {
 		this.data = data;
 		this.results = results;
 		this.hemeDao = hemeDao;
@@ -103,6 +107,7 @@ public final class HemeUi implements Dao {
 		this.trypsinParameterSetName = trypsinParameterSetName;
 		this.chymoParameterSetName = chymoParameterSetName;
 		this.userEmail = userEmail;
+        this.fastaDbCache = fastaDbCache;
 	}
 
 	@Override
@@ -270,7 +275,7 @@ public final class HemeUi implements Dao {
 	 */
 	public void setMassDelta(final int testId, final double massDelta) {
 		final HemeTest test = getHemeDao().getTestForId(testId);
-		test.setMassDelta(massDelta);
+		test.setMass(massDelta);
 	}
 
 	/**
@@ -281,7 +286,7 @@ public final class HemeUi implements Dao {
 	 */
 	public void setMassDeltaTolerance(final int testId, final double massDeltaTolerance) {
 		final HemeTest test = getHemeDao().getTestForId(testId);
-		test.setMassDeltaTolerance(massDeltaTolerance);
+		test.setMassTolerance(massDeltaTolerance);
 	}
 
 	/**
@@ -296,39 +301,30 @@ public final class HemeUi implements Dao {
 		final File resultFolder = new File(getResults(), path);
 		final File scaffoldFolder = new File(resultFolder, "scaffold");
 		final File scaffoldFile = new File(scaffoldFolder, test.getName() + SPECTRA_EXTENSION);
-		final SwiftSearchDefinition swiftSearchDefinition = swiftDao.getSwiftSearchDefinition(test.getSearchRun().getSwiftSearch());
-		final HemeScaffoldReader reader = new HemeScaffoldReader(fastaDbDao, swiftSearchDefinition.getSearchParameters().getDatabase());
-		reader.load(scaffoldFile, "3", null);
-		final Collection<HemeReportEntry> entries = reader.getEntries();
 
-		// We split all entries into three:
-		// These are within the specified range (at least one hit):
-		final List<HemeReportEntry> withinRange = new ArrayList<HemeReportEntry>();
-		// These have mass delta specified (are some kind of hemoglobin), but they are not within the threshold:
-		final List<HemeReportEntry> haveMassDelta = new ArrayList<HemeReportEntry>();
-		// Everyone else (contaminants?):
-		final List<HemeReportEntry> allOthers = new ArrayList<HemeReportEntry>();
-		for (final HemeReportEntry entry : entries) {
-			boolean isInRange = false;
-			boolean hasMassDelta = false;
-			for (final ProteinId proteinId : entry.getProteinIds()) {
-				if (proteinId.getMassDelta() != null) {
-					hasMassDelta = true;
-					if (Math.abs(proteinId.getMassDelta() - test.getMassDelta()) <= test.getMassDeltaTolerance()) {
-						isInRange = true;
-						break;
-					}
-				}
-			}
-			if (isInRange) {
-				withinRange.add(entry);
-			} else if (hasMassDelta) {
-				haveMassDelta.add(entry);
-			} else {
-				allOthers.add(entry);
-			}
-		}
-		return new HemeReport(test, withinRange, haveMassDelta, allOthers);
+		final SwiftSearchDefinition swiftSearchDefinition = swiftDao.getSwiftSearchDefinition(test.getSearchRun().getSwiftSearch());
+
+		final Curation dummyDatabase = new Curation();
+        //dummyDatabase.setCurationFile(new File("/Users/m088378/Desktop/newHemePathDatabase2.fasta"));
+        dummyDatabase.setCurationFile(new File("/Users/m088378/heme-data/HbVar-Unipro-1.0.fasta"));
+        File dbCache = new File("/Users/m088378/heme-data/HbVar-Unipro.obj");
+        if( !dbCache.exists() ){
+            SerializeFastaDB.generateDesc(dummyDatabase.getFastaFile().getFile(), dbCache.toString());
+        }
+
+        File seqCache = new File("/Users/m088378/heme-data/HbVar-MutationSeq.obj");
+        if( !seqCache.exists() ){
+            SerializeFastaDB.generateSequence(dummyDatabase.getFastaFile().getFile(), seqCache.toString());
+        }
+        HemeReport myNewReport = new HemeReport(test);
+
+        // final HemeScaffoldReader reader = new HemeScaffoldReader(fastaDbCache); // TODO - double check before deployment
+        final HemeScaffoldReader reader = new HemeScaffoldReader(dbCache, seqCache, myNewReport); // TODO - double check before deployment
+        // final HemeScaffoldReader reader = new HemeScaffoldReader(fastaDbDao, swiftSearchDefinition.getSearchParameters().getDatabase());
+		reader.load(scaffoldFile, "3", null);
+
+
+        return myNewReport;
 	}
 
 	private String extractPatientName(final File patient) {
@@ -343,12 +339,12 @@ public final class HemeUi implements Dao {
 
 	private ImmutableMap<String, HemeTest> getTestsByPath() {
 		return Maps.uniqueIndex(getHemeDao().getAllTests(), new Function<HemeTest, String>() {
-			@Override
-			public String apply(@Nullable final HemeTest from) {
-				Preconditions.checkNotNull(from, "Programmer error - the heme test was null");
-				return from.getPath();
-			}
-		});
+            @Override
+            public String apply(@Nullable final HemeTest from) {
+                Preconditions.checkNotNull(from, "Programmer error - the heme test was null");
+                return from.getPath();
+            }
+        });
 	}
 
 	private int getIdForParameterSet(final String name) {
@@ -488,7 +484,8 @@ public final class HemeUi implements Dao {
 					getSwiftSearcherCaller(),
 					config.get(TRYPSIN_PARAM_SET_NAME),
 					config.get(CHYMO_PARAM_SET_NAME),
-					config.get(USER_EMAIL));
+					config.get(USER_EMAIL),
+                    new File(config.get(FASTA_DB_CACHE)));
 		}
 
 		private String[] splitEngineString(final String engines) {
@@ -505,16 +502,17 @@ public final class HemeUi implements Dao {
 
 	public static final class Ui implements ServiceUiFactory {
 
-		@Override
+
+        @Override
 		public void createUI(final DaemonConfig daemon, final ResourceConfig resource, final UiBuilder builder) {
 			builder.property(DATA_PATH, "Data path", "Folder containing the heme pathology test data. Every sub-folder in this folder will be displayed. " +
-					"<p>The path is relative to the shared folder</p>")
+                    "<p>The path is relative to the shared folder</p>")
 					.required()
 					.existingDirectory()
 					.defaultValue("data")
 
 					.property(RESULT_PATH, "Result path", "Folder where the search results will be stored." +
-							"<p>The path is relative to the shared folder</p>")
+                            "<p>The path is relative to the shared folder</p>")
 					.required()
 					.existingDirectory()
 					.defaultValue("results")
@@ -526,7 +524,11 @@ public final class HemeUi implements Dao {
 					.required()
 
 					.property(USER_EMAIL, "User email", "Email of the user to run searches as. Identifies the user uniquely. See http://&lt;swift url&gt;/service/users.xml for a list.")
-					.required();
+					.required()
+
+                    .property(FASTA_DB_CACHE, "Fasta Database Cache", "Caches the fasta decriptive titles by protein accession, for fast lookup.")
+                    .required()
+                    .defaultValue("var/cache/heme");
 		}
 	}
 

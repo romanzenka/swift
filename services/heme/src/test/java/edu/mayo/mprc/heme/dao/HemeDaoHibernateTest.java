@@ -75,7 +75,7 @@ public final class HemeDaoHibernateTest extends DaoTest {
 	public void shouldNotDoubleAdd() {
 		final HemeTest test = addSampleTest();
 		HemeTest test2 = sampleTest();
-		test2.setMassDelta(1234.0);
+		test2.setMass(1234.0);
 		hemeDao.addTest(test2);
 		hemeDao.commit();
 	}
