@@ -66,7 +66,7 @@ public final class HemeUiTest {
 		fastaDbDao = mock(FastaDbDao.class);
 		stub(fastaDbDao.getProteinDescription(any(Curation.class), anyString())).toReturn("Protein description");
 
-		hemeUi = new HemeUi(data, results, hemeDao, swiftDao, fastaDbDao, paramsDao, swiftSearcherCaller, "1", "2", "zenka.roman@mayo.edu");
+		hemeUi = new HemeUi(data, results, hemeDao, swiftDao, fastaDbDao, paramsDao, swiftSearcherCaller, "1", "2", "zenka.roman@mayo.edu", new File("test_cache.obj"));
 	}
 
 	private void createValidEntry(String name, String date) {
@@ -104,7 +104,7 @@ public final class HemeUiTest {
 		HemeEntry hemeEntry = currentEntries.get(0);
 		Assert.assertEquals(hemeEntry.getTest().getName(), "PT1");
 		Assert.assertEquals(hemeEntry.getTest().getPath(), "20130905/PT1");
-		Assert.assertEquals(hemeEntry.getTest().getMassDelta(), 40.0);
+		Assert.assertEquals(hemeEntry.getTest().getMass(), 40.0);
 		Assert.assertEquals(hemeEntry.getStatus(), HemeTestStatus.NOT_STARTED);
 		Assert.assertEquals(hemeEntry.getDuration(), null);
 	}

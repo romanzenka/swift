@@ -85,6 +85,7 @@ public final class HemeService {
 		return modelAndView;
 	}
 
+    //GET from HemePath list when button is "Result" -> to the report.
 	@RequestMapping(value = "/heme/data/{entry}/report.*", method = RequestMethod.GET)
 	public ModelAndView viewReport(@PathVariable final int entry) {
 		final HemeUi hemeUi = getHemeUi();
@@ -93,12 +94,13 @@ public final class HemeService {
 		hemeUi.begin();
 		try {
 			HemeReport report = hemeUi.createReport(entry);
-			modelAndView.addObject("report", report);
-			modelAndView.setView(new HemeReportView());
-			hemeUi.commit();
+            modelAndView.setViewName("heme/heme_report"); //Migrated to JSP
+            modelAndView.addObject("report", report);
+
+            hemeUi.commit();
 		} catch (Exception e) {
 			hemeUi.rollback();
-			throw new MprcException("Could not start Swift search", e);
+			throw new MprcException("Could not view report for entry " + entry, e);
 		}
 
 		return modelAndView;
@@ -117,4 +119,6 @@ public final class HemeService {
 	public void setApplicationContext(final RunningApplicationContext applicationContext) {
 		this.applicationContext = applicationContext;
 	}
+
+
 }

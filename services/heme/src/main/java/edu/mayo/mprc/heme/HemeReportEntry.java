@@ -7,20 +7,37 @@ import java.util.List;
 /**
  * @author Roman Zenka
  */
-public final class HemeReportEntry {
-	private List<ProteinId> proteinIds;
-	private int totalSpectra;
+//TODO - DEPRICATE HemeReportEntry
 
-	public HemeReportEntry(List<ProteinId> proteinIds, int totalSpectra) {
+public final class HemeReportEntry {
+	private List<ProteinEntity> proteinIds;
+	private int totalSpectra;
+    private Filter filter;
+
+    // Define Enum to Streaming Sort the collection of entities
+    public enum Filter {
+        MUTATION_CONFIRMED, MASS_IN_RANGE, OTHER;
+    };
+
+
+    public Filter getFilter() {
+        return filter;
+    }
+
+    public void setFilter(Filter filter) {
+        this.filter = filter;
+    }
+
+	public HemeReportEntry(List<ProteinEntity> proteinIds, int totalSpectra) {
 		this.proteinIds = proteinIds;
 		this.totalSpectra = totalSpectra;
 	}
 
-	public List<ProteinId> getProteinIds() {
+	public List<ProteinEntity> getProteinIds() {
 		return proteinIds;
 	}
 
-	public void setProteinIds(List<ProteinId> proteinIds) {
+	public void setProteinIds(List<ProteinEntity> proteinIds) {
 		this.proteinIds = proteinIds;
 	}
 
