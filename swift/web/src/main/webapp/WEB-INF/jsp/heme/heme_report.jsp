@@ -6,7 +6,7 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <% HemeReport report = (HemeReport) request.getAttribute("report");
     final SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
-    List<ProteinEntity> confirmedList = report.get_ProteinEntities_by_filter(ProteinEntity.Filter.MUTATION_CONFIRMED);
+    List<ProteinEntity>     confirmedList = report.get_ProteinEntities_by_filter(ProteinEntity.Filter.MUTATION_CONFIRMED);
     List<ProteinEntity> relatedList = report.get_ProteinEntities_by_filter(ProteinEntity.Filter.RELATED_MUTANT);
     List<ProteinEntity> otherList = report.get_ProteinEntities_by_filter(ProteinEntity.Filter.OTHER);
 
@@ -25,7 +25,7 @@
             else{
                 htmlEmbedded += "<span class=\"warn\">"+seq.substring( index, tail )+"</span>";
             }
-            index = Integer.parseInt(nums[i]);
+            index += Integer.parseInt(nums[i]);
         }
         return htmlEmbedded;
     }
