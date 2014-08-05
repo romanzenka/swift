@@ -44,19 +44,19 @@ public final class HemeReport {
 	}
 
     // Keeps a collection of proteins in HemeReport -> return it if exists...create a new one if it doesn't
-    public ProteinEntity find_or_create_ProteinEntity(String accNum, String description, Double massIsotopic) {
+    public ProteinEntity find_or_create_ProteinEntity(String accNum, String description, Double massIsotopic, String seq) {
         ProteinEntity thisPE = allmyProteins.get(accNum);
         if( thisPE == null ){
-            thisPE = new ProteinEntity(accNum,description,massIsotopic);
+            thisPE = new ProteinEntity(accNum,description,massIsotopic,seq);
             allmyProteins.put(accNum,thisPE);
         }
         return thisPE;
     }
 
     public List<ProteinEntity> get_ProteinEntities_by_filter( ProteinEntity.Filter f){
-        List<ProteinEntity> pe = new ArrayList<ProteinEntity>();;
+        List<ProteinEntity> pe = new ArrayList<ProteinEntity>();
         for (ProteinEntity value : allmyProteins.values()) {
-            if( value.getFilter().equals(f) ){
+            if( f.equals(value.getFilter()) ){
                 pe.add(value);
             }
         }

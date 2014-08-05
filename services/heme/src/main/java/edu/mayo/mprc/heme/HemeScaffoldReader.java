@@ -59,7 +59,7 @@ public class HemeScaffoldReader extends ScaffoldReportReader {
             }
 
             //missing desc -> null results in error chain
-			final ProteinEntity prot = report.find_or_create_ProteinEntity(accNum, description, getMassIsotopic(description));
+			final ProteinEntity prot = report.find_or_create_ProteinEntity(accNum, description, getMassIsotopic(description), mutationSequenceCache.get(accNum));
             prot.setTotalSpectra( parseInt(currentLine[numberOfTotalSpectra]) );
 
             // Everyone else category (contaminants & non-mutated proteins):
@@ -70,12 +70,12 @@ public class HemeScaffoldReader extends ScaffoldReportReader {
 
             PeptideEntity newPep = new PeptideEntity( currentLine[peptideSeq] );
             boolean massCheck = isWithingMassRange(report.getMass(), prot.getMass(), report.getMassTolerance());
-            boolean mutationCheck = hasOverlappingMutation(newPep, mutationSequenceCache.get(accNum), prot.getCigar());
+            boolean mutationCheck = hasOverlappingMutation(newPep, prot.getSequence(), prot.getCigar());
             prot.appendPeptide(newPep);
 
             /* Must be inside Mass Range & Have cooresponding mutation */
             if(massCheck && mutationCheck){
-                prot.setSequence(mutationSequenceCache.get(accNum));
+                //prot.setSequence(mutationSequenceCache.get(accNum));
                 prot.setFilter(ProteinEntity.Filter.MUTATION_CONFIRMED);
             }
             // Else: Mutation Proteins either outside of mass range or completely missing the target mutation

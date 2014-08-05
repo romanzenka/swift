@@ -39,7 +39,7 @@
     }
 
     public String arrows(){
-        return "<div style=\"width:14px;float:right;\"> <img src=\"/arrow_up_down.png\">  </div>";
+        return "<div style=\"width:14px;float:right;\"> <img src=\"/common/arrow_up_down.png\">  </div>";
     }
 
 %>
@@ -82,6 +82,7 @@
 
 
     <table id="confirmed" class="table table-striped">
+        <thead>
         <tr>
             <th>Protein <%=arrows()%></th>
             <th>Peptides <%=arrows()%></th>
@@ -90,6 +91,7 @@
             <th>Mass <%=arrows()%></th>
             <th></th>
         </tr>
+        </thead>
         <% for (ProteinEntity p : confirmedList) {%>
         <tr>
             <td><%=p.getAccNum()%></td>
@@ -157,7 +159,7 @@
     <div id="modal_<%=p.getAccNum()%>" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
       <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
-        <h3 id="myModalLabel"><%=p.getAccNum()%> &nbsp;&nbsp;<small>[<%=p.getCigar()%>]</small></h3>
+        <h3 id="myModalLabel"><%=p.getAccNum()%></h3>
       </div>
       <div class="modal-body">
           </br>

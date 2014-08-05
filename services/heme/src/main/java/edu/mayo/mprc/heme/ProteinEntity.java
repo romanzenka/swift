@@ -26,10 +26,11 @@ public final class ProteinEntity {
     };
 
 
-	public ProteinEntity(String accNum, String description, Double massDelta) {
+	public ProteinEntity(String accNum, String description, Double massDelta, String seq) {
 		this.accNum = accNum;
 		this.description = description;
 		this.mass = massDelta;
+        this.sequence = seq;
         this.peptides = new ArrayList<PeptideEntity>(10);
 	}
 
