@@ -1,6 +1,7 @@
 <%@ page import="edu.mayo.mprc.heme.HemeReport" %>
 <%@ page import="edu.mayo.mprc.heme.PeptideEntity" %>
 <%@ page import="edu.mayo.mprc.heme.ProteinEntity" %>
+<%@ page import="edu.mayo.mprc.swift.helper.HemeHelper" %>
 <%@ page import="java.text.SimpleDateFormat" %>
 <%@ page import="java.util.List" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
@@ -9,38 +10,6 @@
     List<ProteinEntity>     confirmedList = report.get_ProteinEntities_by_filter(ProteinEntity.Filter.MUTATION_CONFIRMED);
     List<ProteinEntity> relatedList = report.get_ProteinEntities_by_filter(ProteinEntity.Filter.RELATED_MUTANT);
     List<ProteinEntity> otherList = report.get_ProteinEntities_by_filter(ProteinEntity.Filter.OTHER);
-
-%>
-<%!
-    public String colorizeSequence(String cigar, String seq) {
-        String[] letter = cigar.replaceAll("[0-9]","").split("");
-        String[] nums = cigar.split("[MIDNSHPX]");
-        int index = 0;
-        String htmlEmbedded = "";
-        for(int i=0; i<nums.length;i++){
-            int tail = Integer.parseInt(nums[i]) + index;
-            if( letter[i+1].equals("M") ){
-                htmlEmbedded += seq.substring(index, tail);
-            }
-            else{
-                htmlEmbedded += "<span class=\"warn\">"+seq.substring( index, tail )+"</span>";
-            }
-            index += Integer.parseInt(nums[i]);
-        }
-        return htmlEmbedded;
-    }
-
-    public String nonBlankSpaces(int n){
-        String ret="";
-        for(int i=0;i<n;i++){
-            ret += "&nbsp;";
-        }
-        return ret;
-    }
-
-    public String arrows(){
-        return "<div style=\"width:14px;float:right;\"> <img src=\"/common/arrow_up_down.png\">  </div>";
-    }
 
 %>
 <html>
@@ -84,11 +53,11 @@
     <table id="confirmed" class="table table-striped">
         <thead>
         <tr>
-            <th>Protein <%=arrows()%></th>
-            <th>Peptides <%=arrows()%></th>
-            <th>Spectra <%=arrows()%></th>
-            <th>Description <%=arrows()%></th>
-            <th>Mass <%=arrows()%></th>
+            <th>Protein <%=HemeHelper.arrows()%></th>
+            <th>Peptides <%=HemeHelper.arrows()%></th>
+            <th>Spectra <%=HemeHelper.arrows()%></th>
+            <th>Description <%=HemeHelper.arrows()%></th>
+            <th>Mass <%=HemeHelper.arrows()%></th>
             <th></th>
         </tr>
         </thead>
@@ -112,10 +81,14 @@
 
 
     <table id="related" class="table table-striped">
-                    <th>Protein</th>
-                    <th>Spectra</th>
-                    <th>Description</th>
-                    <th>Mass</th>
+        <thead>
+        <tr>
+        <th>Protein <%=HemeHelper.arrows()%></th>
+                    <th>Spectra <%=HemeHelper.arrows()%></th>
+                    <th>Description <%=HemeHelper.arrows()%></th>
+                    <th>Mass <%=HemeHelper.arrows()%></th>
+            </tr>
+        </thead>
         <% for (ProteinEntity p : relatedList) { %>
         <tr>
             <td><%=p.getAccNum()%></td>
@@ -133,10 +106,13 @@
     </blockquote>
 
     <table id="other" class="table table-striped">
-         <th>Protein</th>
-         <th>Spectra</th>
-         <th>Description</th>
-
+        <thead>
+        <tr>
+         <th>Protein <%=HemeHelper.arrows()%></th>
+         <th>Spectra <%=HemeHelper.arrows()%></th>
+         <th>Description <%=HemeHelper.arrows()%></th>
+        </tr>
+        </thead>
         <% for (ProteinEntity p : otherList) {%>
         <tr>
             <td><a href="http://www.genome.jp/dbget-bin/www_bget?sp:<%=p.getAccNum()%>"><%=p.getAccNum()%></a></td>
@@ -163,9 +139,9 @@
       </div>
       <div class="modal-body">
           </br>
-          <p class="monoText" style="font-weight: bold;"><%=colorizeSequence(p.getCigar(), p.getSequence())%></p>
+          <p class="monoText" style="font-weight: bold;"><%=HemeHelper.colorizeSequence(p.getCigar(), p.getSequence())%></p>
              <% for (PeptideEntity pep : p.getPeptides()) { %>
-                 <p class="monoText"><%= nonBlankSpaces(pep.getStart()) %><%=pep.getSequence()%></p>
+                 <p class="monoText"><%= HemeHelper.nonBlankSpaces(pep.getStart()) %><%=pep.getSequence()%></p>
              <%}%>
       </div>
       <div class="modal-footer">
