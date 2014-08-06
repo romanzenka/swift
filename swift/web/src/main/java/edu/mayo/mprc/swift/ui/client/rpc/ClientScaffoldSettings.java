@@ -29,8 +29,8 @@ public final class ClientScaffoldSettings implements ClientValue {
 
 	public ClientScaffoldSettings(final double proteinProbability, final double peptideProbability, final int minimumPeptideCount, final int minimumNonTrypticTerminii, final ClientStarredProteins starredProteins, final boolean saveOnlyIdentifiedSpectra, final boolean saveNoSpectra, final boolean connectToNCBI, final boolean annotateWithGOA,
 	                              final boolean useIndependentSampleGrouping, final boolean useFamilyProteinGrouping,
-	                              final boolean mzIdentMlReport, final boolean use3xScoring,
-	                              final boolean highMassAccuracyScoring) {
+	                              final boolean mzIdentMlReport, final boolean highMassAccuracyScoring,
+	                              final boolean use3xScoring) {
 		this.proteinProbability = proteinProbability;
 		this.peptideProbability = peptideProbability;
 		this.minimumPeptideCount = minimumPeptideCount;
