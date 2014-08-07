@@ -1,0 +1,85 @@
+a.modLink{
+    color: inherit !important;
+    font-size:1.3em !important;
+}
+a.modLink:hover{
+    text-decoration:none !important; 
+}
+
+/* http://stackoverflow.com/questions/3790935/can-i-hide-the-html5-number-inputs-spin-box */
+    input::-webkit-outer-spin-button,
+    input::-webkit-inner-spin-button {
+        /* display: none; <- Crashes Chrome on hover */
+        -webkit-appearance: none;
+        margin: 0; /* <-- Apparently some margin are still there even though it's hidden */
+    }
+
+    body {
+        margin-top: 60px;
+    }
+
+    .graph {
+        width: 100%;
+        height: 320px;
+        margin-bottom: 10px;
+    }
+
+    .simple-graph {
+        width: 100%;
+        height: 200px;
+        margin-bottom: 10px;
+    }
+
+    h4 {
+        text-align: center;
+    }
+
+    .legend dt {
+        float: left;
+        margin-right: 0.5em;
+    }
+
+    .dygraph-legend {
+        background-color: rgba(255, 255, 255, 0.7) !important;
+    }
+
+    .dygraph-legend > span.highlight {
+        background-color: #f9f500;
+    }
+
+    .dygraph-legend > span > b {
+        white-space: nowrap;
+    }
+
+    button.highlight {
+        color: #bff;
+    }
+
+    .btn-toolbar {
+        margin-top: 0;
+        margin-bottom: 0;
+    }
+
+    .btn-group {
+        margin-right: 5px;
+    }
+
+    #selected-path {
+        margin: 0 5px 0 5px;
+        color: #888;
+        height: 25px;
+        min-height: 25px;
+        font-family: Monaco, Menlo, Consolas, "Courier New", monospace;
+        font-size: 13px;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        overflow: hidden;
+    }
+
+    #selected-path span {
+        color: #bff;
+    }
+
+    .navbar a.brand {
+        margin-left: -15px;
+    }

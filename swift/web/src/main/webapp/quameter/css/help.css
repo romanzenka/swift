@@ -1,0 +1,57 @@
+a {
+	text-decoration:none;
+	color: #336633;
+	font-weight: bold;
+}
+a:hover {text-decoration: underline;}
+
+#content {
+	width: 80%;
+	margin-top: 10px;
+	margin-right: auto;
+	margin-bottom: 0;
+	margin-left: auto;
+}
+#main #content p{
+	padding: 4px 20px 8px;
+	font-size: 13.5px; clear: both;
+	margin-bottom:10px;
+	margin-right: 30px;
+
+}
+#content .block {padding: 4px 20px 8px;}
+#content .heading {font-size: 22px; font-family: 'Lucida Grande', Arial, Verdana; font-weight: bold; border-bottom: 5px solid #316D47; width: 95%; margin: 10px 0;}
+#content .blurb {font-size: 13.5px; clear: both;}
+#content h2 {
+	font-size: 18px;
+	font-family: 'Lucida Grande', Arial, Verdana;
+	border-bottom: 2px solid #316D47;
+	width: 100%;
+	margin-top: 10px;
+	margin-right: 0;
+	margin-bottom: 10px;
+	margin-left: 0;
+	padding-top: 4px;
+	padding-right: 20px;
+	padding-bottom: 8px;
+	padding-left: 0px;
+}
+
+#content ul {margin: 8px 0;}
+#content li {
+	list-style-position: outside;
+	font-size: 13.5px;
+	line-height: 20px;
+	margin-right: 30px;
+}
+#content .image_block {margin: 0 8px 10px;}
+#content .image_block img {float: left;}
+#content .image_block .caption {text-align: center; font-style: italic; margin: 5px; clear: both; width: 250px; margin: 0 auto;}
+#content .block .thumb1 {width: 150px; margin: 8px;}
+#content .block .thumb2 {width: 250px; margin: 8px;}
+#content .block .thumb3 {width: 350px; margin: 8px;}
+#content .block .thumb4 {width: 450px; margin: 8px;}
+/* content block position based on even or odd class */
+#content .even .heading {float: left;}
+#content .odd .heading {float: right; text-align: right;}
+#content .even .image {float: right;}

@@ -104,8 +104,7 @@
     google.setOnLoadCallback( drawChart(graphDataSrvr) );
     $("body").tooltip({ selector: '[data-toggle="tooltip"]' });
 </script>
-
-
+<!--  Help Docs come from: http://massqc.proteomesoftware.com/help/metrics.php  -->
 
 </body>
 </html>
