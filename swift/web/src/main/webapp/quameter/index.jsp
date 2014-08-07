@@ -105,6 +105,7 @@
     $("body").tooltip({ selector: '[data-toggle="tooltip"]' });
 </script>
 <!--  Help Docs come from: http://massqc.proteomesoftware.com/help/metrics.php  -->
+<!-- Need to add troubleshooting? http://massqc.proteomesoftware.com/help/troubleshooting.php -->
 
 </body>
 </html>

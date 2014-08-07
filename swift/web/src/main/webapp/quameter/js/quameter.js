@@ -30,7 +30,6 @@ function addButtons(div, data, columnId) {
     });
 }
 
-
 function getMetricTitle(n){
     var hLink, qLink;
     if(metrics[n].hasOwnProperty('link')){
@@ -338,10 +337,10 @@ function drawChart(graphObj) {
                  var category = data.getValue(row, categoryColumnIndex);
                  var instrument = data.getValue(row, instrumentColumnIndex);
                  var rowId = data.getValue(row, idColumnIndex)
-                 var prePost = prePostCategory(data.getValue(row, prePostColumnIndex));
+                 //var prePost = prePostCategory(data.getValue(row, prePostColumnIndex));
                  if (0 <= $.inArray(category, selectedCategory)
                          && 0 <= $.inArray(instrument, selectedInstrument)
-                         && 0 <= $.inArray(prePost, selectedPrePost)
+                        // && 0 <= $.inArray(prePost, selectedPrePost)
                          && !hiddenIds["id"+rowId]) {
                      filteredRows.push(row);
                  }
