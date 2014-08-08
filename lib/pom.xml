@@ -42,5 +42,6 @@
         <module>workspace</module>
         <module>fasta</module>
         <module>peaklist</module>
+        <module>sqt</module>
     </modules>
 </project>
