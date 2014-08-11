@@ -142,7 +142,7 @@ public final class CometWorker extends WorkerBase {
 	public static final class Factory extends WorkerFactoryBase<Config> implements EngineFactory<Config, Worker> {
 
 		private static final EngineMetadata ENGINE_METADATA = new EngineMetadata(
-				"COMET", ".pep.xml", "Comet", true, "comet", new CometMappingFactory(),
+				"COMET", ".sqt", "Comet", true, "comet", new CometMappingFactory(),
 				new String[]{TYPE},
 				new String[]{CometCache.TYPE},
 				new String[]{},

@@ -31,14 +31,14 @@ public final class CometWorkPacket extends EngineWorkPacket {
 		if ("pep.xml".equals(extension)) {
 			final Matcher matcher = PEPXML_LINE.matcher(searchParams);
 			if (!matcher.find()) {
-				throw new MprcException("Malformed Comet parameter file is missing output_pepxmlfile option");
+				throw new MprcException("Malformed Comet parameter file - missing output_pepxmlfile option");
 			}
 			final String result = matcher.replaceFirst(matcher.group(1) + "1");
 			return result;
 		} else if ("sqt".equals(extension)) {
 			final Matcher matcher = SQT_LINE.matcher(searchParams);
 			if (!matcher.find()) {
-				throw new MprcException("Malformed Comet parameter file is missing output_sqtfile option");
+				throw new MprcException("Malformed Comet parameter file - missing output_sqtfile option");
 			}
 			final String result = matcher.replaceFirst(matcher.group(1) + "1");
 			return result;
