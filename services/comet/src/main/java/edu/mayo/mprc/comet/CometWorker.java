@@ -31,6 +31,7 @@ public final class CometWorker extends WorkerBase {
 	public static final String NAME = "Comet";
 	public static final String DESC = "Comet search engine support. <p>Comet is freely available at <a href=\"http://sourceforge.net/projects/comet-ms/\">http://sourceforge.net/projects/comet-ms/</a>.</p>";
 	public static final String PEP_XML = ".pep.xml";
+	public static final String SQT = ".sqt";
 
 	private File cometExecutable;
 
@@ -51,10 +52,7 @@ public final class CometWorker extends WorkerBase {
 		final File finalOutputFile = packet.getOutputFile();
 		final File outputFile = getTempOutputFile(tempWorkFolder, finalOutputFile);
 		final String resultFileName = getResultFileName(outputFile);
- 		final File parameterFile = new File(tempWorkFolder, "comet.parameters");
-
-		// Replace the database path and write parameters out
-		FileUtilities.writeStringToFile(parameterFile, packet.getSearchParams(), true);
+		final File parameterFile = makeParameterFile(tempWorkFolder, packet);
 
 		final List<String> parameters = new LinkedList<String>();
 		parameters.add(cometExecutable.getPath());
@@ -82,19 +80,43 @@ public final class CometWorker extends WorkerBase {
 	}
 
 	/**
+	 * Make parameter file for comet. This involves tweaking the input parameter string based on
+	 * requested output file.
+	 *
+	 * @param tempWorkFolder
+	 * @param packet
+	 * @return
+	 */
+	private File makeParameterFile(final File tempWorkFolder, final CometWorkPacket packet) {
+		final File parameterFile = new File(tempWorkFolder, "comet.parameters");
+
+		// Replace the database path and write parameters out
+		FileUtilities.writeStringToFile(parameterFile, packet.getSearchParams(), true);
+		return parameterFile;
+	}
+
+	/**
 	 * Given an output file name, creates a "name prefix" to be passed to Comet that would fool
-	 * comet into generating the required output file.
+	 * Comet into generating the required output file.
 	 * <p/>
-	 * This can fail if the requested output file suffix does not match .pep.xml.
+	 * This can fail if the requested output file suffix does not match .pep.xml or .sqt
 	 *
 	 * @param outputFile Name of the output file.
 	 * @return String to pass to Comet as a {@code -N} parameter.
 	 */
-	private String getResultFileName(File outputFile) {
-		if (!outputFile.getName().endsWith(PEP_XML)) {
-			throw new MprcException(String.format("Swift only supports Comet generating a %s output file. Requested file was %s", PEP_XML, outputFile.getName()));
+	private String getResultFileName(final File outputFile) {
+		if (outputFile.getAbsolutePath().endsWith(PEP_XML)) {
+			return trimExtension(outputFile, PEP_XML);
+		} else if (outputFile.getAbsolutePath().endsWith(SQT)) {
+			return trimExtension(outputFile, SQT);
+		} else {
+			throw new MprcException(String.format("Swift only supports Comet generating a %s output files. Requested file was %s", PEP_XML + ", " + SQT, outputFile.getName()));
 		}
-		return new File(outputFile.getParentFile(), outputFile.getName().substring(0, outputFile.getName().length() - PEP_XML.length())).getAbsolutePath();
+	}
+
+	private String trimExtension(final File outputFile, final String extension) {
+		return new File(outputFile.getParentFile(),
+				outputFile.getName().substring(0, outputFile.getName().length() - extension.length())).getAbsolutePath();
 	}
 
 	@Override
@@ -132,7 +154,7 @@ public final class CometWorker extends WorkerBase {
 			CometWorker worker = null;
 			try {
 				worker = new CometWorker(FileUtilities.getAbsoluteFileForExecutables(new File(config.get(COMET_EXECUTABLE))));
-			} catch (Exception e) {
+			} catch (final Exception e) {
 				throw new MprcException("Comet worker could not be created.", e);
 			}
 			return worker;

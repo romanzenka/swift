@@ -27,7 +27,7 @@ import java.io.StringWriter;
 /**
  * @author Roman Zenka
  */
-public class TestComet {
+public final class TestComet {
 	private static final Logger LOGGER = Logger.getLogger(TestComet.class);
 
 	private static File tempRootDir;
