@@ -86,3 +86,17 @@ var metrics = [
         { code: "p_3", label: "P-3", name: "Semitryptic Ratio", good: "low", simple: 1, desc: "Ratio of semitryptic/tryptic peptides" },
         { code: "id_1", label: "ID-1", name: "Identified Spectra", good: "low", simple: 1, desc: "Number of identified spectra matching requested proteins for given category" }
     ];
+
+
+/**
+ * Array.prototype.[method name] allows you to define/overwrite an objects method
+ * needle is the item you are searching for
+ * this is a special variable that refers to "this" instance of an Array.
+ * returns true if needle is in the array, and false otherwise
+ */
+Array.prototype.contains = function ( element ) {
+    for (i in this) {
+        if (this[i] === element) return true;
+    }
+    return false;
+}

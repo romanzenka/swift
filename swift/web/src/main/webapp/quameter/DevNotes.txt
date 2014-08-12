@@ -1,0 +1,12 @@
+01475b - Orbi
+Exactive Seri.. => QE1
+LTQ3.. => LTQ-Velos
+Merging Q Exect -> Exe
+
+By default, select just Orbi
+
+
+Add a comment -> right click add a comment.
+Tie the comment to the raw file & persist
+
+Get documentation terms & definitions from MassQC and display - tied to each graph

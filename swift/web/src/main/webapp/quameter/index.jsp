@@ -51,6 +51,7 @@
                     <span id="icons">
                         <a href="#" id="search-link"><img src="/report/search_edit.gif" style="border: 0"></a>
                         <a href="#" id="qa-link"><img src="/report/search.gif" style="border: 0"></a>
+                        <a id="hide-entry"><img src="/report/search_hide.gif" style="border: 0"></a>
                     </span>
                     <span id="selected-path"></span>
                 </div>
@@ -66,9 +67,7 @@
             </code> daemon.</p>
     </div>
     <% } else { %>
-
-        <div id="detailedGraphs"></div>
-
+        <div id="detailedGraphs" style="margin-top: 50px"></div>
         <div id="simpleGraphs" style="margin-top: 50px"></div>
 
     <% } %>
@@ -84,7 +83,7 @@
 <script type="text/javascript" src="js/quameter-definitions.js"></script>
 <script type="text/javascript" src="js/quameter.js"></script>
 <script type="text/javascript">
-    //  var graphDataSrvr = <%
+    var graphDataSrvr = <%
     if(quameterUiConfig!=null) {
         final QuameterUi quameterUi = (QuameterUi) MainFactoryContext.getSwiftEnvironment().createResource(quameterUiConfig);
         quameterUi.begin();
