@@ -14,11 +14,17 @@ import org.hibernate.criterion.Restrictions;
 
 import java.util.Locale;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 /**
  * @author Roman Zenka
  */
 public final class QuameterResult extends PersistableBase {
+	/**
+	 * Files that have _Pre or _Post after the standard prefix (copath, patient, date) are ignored.
+	 */
+	private static final Pattern PRE_POST = Pattern.compile("^.{14}.*_(Pre|Post).*$");
+
 	private TandemMassSpectrometrySample sample;
 	private FileSearch fileSearch;
 	/**
@@ -137,13 +143,23 @@ public final class QuameterResult extends PersistableBase {
 	private double p_2c;
 	private double p_3;
 
+	/* Number of identified spectra matching a given protein accnum pattern */
+	private int identifiedSpectra;
+
+	/* User can mark the particular value as hidden */
+	private boolean hidden;
+
 	public QuameterResult() {
 	}
 
-	public QuameterResult(final TandemMassSpectrometrySample sample, final FileSearch fileSearch, final Map<String, Double> values) {
+	public QuameterResult(final TandemMassSpectrometrySample sample,
+	                      final FileSearch fileSearch,
+	                      final Map<String, Double> values,
+	                      final int identifiedSpectra) {
 		this.sample = sample;
 		this.fileSearch = fileSearch;
 		setValues(values);
+		setIdentifiedSpectra(identifiedSpectra);
 	}
 
 	public TandemMassSpectrometrySample getSample() {
@@ -167,7 +183,7 @@ public final class QuameterResult extends PersistableBase {
 		final String canonicalName = name.toLowerCase(Locale.US).replace('-', '_');
 		try {
 			return QuameterColumn.valueOf(canonicalName);
-		} catch (IllegalArgumentException e) {
+		} catch (final IllegalArgumentException e) {
 			throw new MprcException("Could not find QuaMeter column with name [" + name + "]. Available names are " +
 					Joiner.on(", ").join(QuameterColumn.values()), e);
 		}
@@ -474,6 +490,26 @@ public final class QuameterResult extends PersistableBase {
 		for (final Map.Entry<String, Double> entry : values.entrySet()) {
 			setValue(entry.getKey(), entry.getValue());
 		}
+	}
+
+	/**
+	 * Determine if given QuameterResult should be listed.
+	 *
+	 * @param searchFilter Filter for the search names.
+	 * @return True if the result should be displayed in the UI.
+	 */
+	public boolean resultMatches(final Pattern searchFilter) {
+		// Experiment name must match
+		final String experimentName = getFileSearch().getExperiment();
+		if (!searchFilter.matcher(experimentName).find()) {
+			return false;
+		}
+
+		// We must not be a Pre or Postblank file
+		if (PRE_POST.matcher(getFileSearch().getInputFile().getName()).find()) {
+			return false;
+		}
+		return true;
 	}
 
 	public double getC_1a() {
@@ -820,6 +856,14 @@ public final class QuameterResult extends PersistableBase {
 		this.category = category;
 	}
 
+	public int getIdentifiedSpectra() {
+		return identifiedSpectra;
+	}
+
+	public void setIdentifiedSpectra(final int identifiedSpectra) {
+		this.identifiedSpectra = identifiedSpectra;
+	}
+
 	public int getTransaction() {
 		return transaction;
 	}
@@ -828,9 +872,17 @@ public final class QuameterResult extends PersistableBase {
 		this.transaction = transaction;
 	}
 
+	public boolean isHidden() {
+		return hidden;
+	}
+
+	public void setHidden(boolean hidden) {
+		this.hidden = hidden;
+	}
+
 	@Override
 	public int hashCode() {
-		return Objects.hashCode(sample, fileSearch);
+		return Objects.hashCode(sample, fileSearch, hidden);
 	}
 
 	@Override
@@ -842,7 +894,8 @@ public final class QuameterResult extends PersistableBase {
 			return false;
 		}
 		final QuameterResult other = (QuameterResult) obj;
-		return Objects.equal(this.sample, other.sample) && Objects.equal(this.fileSearch, other.fileSearch);
+		return Objects.equal(this.sample, other.sample) && Objects.equal(this.fileSearch, other.fileSearch)
+				&& Objects.equal(this.hidden, other.hidden);
 	}
 
 	@Override

@@ -16,7 +16,7 @@ public final class TestScaffoldWorker {
 	public void testSpectrumExport() {
 		final File input = new File("/scaffold.sfd");
 		final File output = new File("/spectrum.spectra.txt");
-		final ScaffoldSpectrumExportWorkPacket work = new ScaffoldSpectrumExportWorkPacket("task1", false, input, output);
+		final ScaffoldSpectrumExportWorkPacket work = new ScaffoldSpectrumExportWorkPacket(false, input, output);
 		final String result = ScaffoldWorker.getScafmlSpectrumExport(work);
 		Assert.assertEquals(result, "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n" +
 				"<Scaffold version=\"1.5\">\n" +

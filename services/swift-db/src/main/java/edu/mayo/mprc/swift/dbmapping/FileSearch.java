@@ -73,7 +73,7 @@ public class FileSearch extends PersistableBase implements EqualityCriteria {
 		return experiment;
 	}
 
-	void setExperiment(final String experiment) {
+	public void setExperiment(final String experiment) {
 		this.experiment = experiment;
 	}
 

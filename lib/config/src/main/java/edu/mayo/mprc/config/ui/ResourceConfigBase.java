@@ -8,7 +8,6 @@ import edu.mayo.mprc.config.DaemonConfig;
 import edu.mayo.mprc.config.ResourceConfig;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -59,21 +58,21 @@ public abstract class ResourceConfigBase implements ResourceConfig {
 
 	@Override
 	public void save(final ConfigWriter writer) {
-		final Map<String, String> descriptions = getFieldDescriptions();
+		DescriptionCollectingUiBuilder descriptions = getFieldDescriptions();
 
 		for (final Map.Entry<String, String> entry : data.entrySet()) {
 			final String key = entry.getKey();
 			final String value = entry.getValue();
 			if (!Strings.isNullOrEmpty(value)) {
-				writer.put(key, value, Strings.nullToEmpty(descriptions.get(key)));
+				writer.put(key, value, Strings.nullToEmpty(descriptions.getValue(key)));
 			}
 		}
 	}
 
-	private Map<String, String> getFieldDescriptions() {
+	private DescriptionCollectingUiBuilder getFieldDescriptions() {
 		final DescriptionCollectingUiBuilder builder = new DescriptionCollectingUiBuilder();
 		getUiFactory().createUI(new DaemonConfig(), this, builder);
-		return builder.getDescriptions();
+		return builder;
 	}
 
 	@Override
@@ -90,87 +89,4 @@ public abstract class ResourceConfigBase implements ResourceConfig {
 		return 0;
 	}
 
-	private static class DescriptionCollectingUiBuilder implements UiBuilder {
-		private Map<String, String> descriptions = new HashMap<String, String>();
-
-		private Map<String, String> getDescriptions() {
-			return descriptions;
-		}
-
-		@Override
-		public UiBuilder nativeInterface(final String className) {
-			return this;
-		}
-
-		@Override
-		public UiBuilder property(final String name, final String displayName, final String description) {
-			descriptions.put(name, displayName);
-			return this;
-		}
-
-		@Override
-		public UiBuilder required() {
-			return this;
-		}
-
-		@Override
-		public UiBuilder defaultValue(final String value) {
-			return this;
-		}
-
-		@Override
-		public UiBuilder defaultValue(final ResourceConfig value) {
-			return this;
-		}
-
-		@Override
-		public UiBuilder addChangeListener(final PropertyChangeListener listener) {
-			return this;
-		}
-
-		@Override
-		public UiBuilder addDaemonChangeListener(final PropertyChangeListener listener) {
-			return this;
-		}
-
-		@Override
-		public UiBuilder validateOnDemand(final PropertyChangeListener validator) {
-			return this;
-		}
-
-		@Override
-		public UiBuilder boolValue() {
-			return this;
-		}
-
-		@Override
-		public UiBuilder existingDirectory() {
-			return this;
-		}
-
-		@Override
-		public UiBuilder existingFile() {
-			return this;
-		}
-
-		@Override
-		public UiBuilder integerValue(final Integer minimum, final Integer maximum) {
-			return this;
-		}
-
-		@Override
-		public UiBuilder executable(final List<String> commandLineParams) {
-			return this;
-		}
-
-		@Override
-		public UiBuilder reference(final String... type) {
-			return this;
-		}
-
-		@Override
-		public UiBuilder enable(final String propertyName, final boolean synchronous) {
-			return this;
-		}
-	}
 }

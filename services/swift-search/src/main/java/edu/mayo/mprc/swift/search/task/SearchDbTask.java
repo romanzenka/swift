@@ -74,7 +74,7 @@ public final class SearchDbTask extends AsyncTaskBase {
 			metaDataMap.put(entry.getKey(), task.getRawFileMetadata());
 		}
 
-		return new SearchDbWorkPacket(getFullId(), isFromScratch(), getReportId(), getScaffoldSpectraFile(), getScaffoldUnimodFile(), metaDataMap);
+		return new SearchDbWorkPacket(isFromScratch(), getReportId(), getScaffoldSpectraFile(), getScaffoldUnimodFile(), metaDataMap);
 	}
 
 	@Override

@@ -90,7 +90,7 @@ public final class AppConfigReader implements Closeable {
 							for (final Map.Entry<String, String> entry : values.entrySet()) {
 								save.put(entry.getKey(), entry.getValue());
 							}
-							MapConfigReader.load(config, save, dependencyResolver);
+							MapConfigReader.load(config, new StringPropertyValues(save), dependencyResolver);
 						}
 
 						values.clear();
@@ -190,7 +190,7 @@ public final class AppConfigReader implements Closeable {
 		} catch (Exception e) {
 			throw new MprcException("Could not create instance of config: " + configClass.getName(), e);
 		}
-		resourceConfig.load(new MapConfigReader(dependencyResolver, values));
+		resourceConfig.load(new MapConfigReader(dependencyResolver, new StringPropertyValues(values)));
 		dependencyResolver.addConfig(name, resourceConfig);
 		return resourceConfig;
 	}
@@ -261,4 +261,5 @@ public final class AppConfigReader implements Closeable {
 	public void close() throws IOException {
 		FileUtilities.closeQuietly(reader);
 	}
+
 }

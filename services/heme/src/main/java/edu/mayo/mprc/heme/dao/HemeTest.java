@@ -99,7 +99,7 @@ public class HemeTest extends PersistableBase {
 	}
 
 	public SearchRun getSearchRun() {
-		return new SearchRun(); // TODO - remove before deployment
+		return searchRun;
 	}
 
 	public void setSearchRun(SearchRun searchRun) {

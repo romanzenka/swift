@@ -4,6 +4,7 @@ import edu.mayo.mprc.config.DependencyResolver;
 import edu.mayo.mprc.config.MapConfigReader;
 import edu.mayo.mprc.config.MapConfigWriter;
 import edu.mayo.mprc.config.ResourceConfig;
+import edu.mayo.mprc.config.StringPropertyValues;
 import edu.mayo.mprc.config.ui.UiResponse;
 import edu.mayo.mprc.swift.configuration.client.model.UiChangesReplayer;
 
@@ -38,7 +39,7 @@ public class SerializingUiChanges implements UiResponse {
 		config.save(writer);
 		final Map<String, String> values = writer.getMap();
 		values.put(propertyName, newValue);
-		MapConfigReader reader = new MapConfigReader(resolver, values);
+		MapConfigReader reader = new MapConfigReader(resolver, new StringPropertyValues(values));
 		config.load(reader);
 	}
 

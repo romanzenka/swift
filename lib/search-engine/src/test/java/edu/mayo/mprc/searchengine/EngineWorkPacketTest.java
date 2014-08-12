@@ -19,7 +19,6 @@ public final class EngineWorkPacketTest {
 				"search parameters",
 				new File("database"),
 				true,
-				"task",
 				false);
 
 		final XStream xStream = new XStream(new DomDriver());
@@ -33,7 +32,7 @@ public final class EngineWorkPacketTest {
 
 		private static final long serialVersionUID = 4029468324506386517L;
 
-		TestEngineWorkPacket(final File inputFile, final File outputFile, final String searchParams, final File databaseFile, final boolean publishResultFiles, final String taskId, final boolean fromScratch) {
+		TestEngineWorkPacket(final File inputFile, final File outputFile, final String searchParams, final File databaseFile, final boolean publishResultFiles, final boolean fromScratch) {
 			super(inputFile, outputFile, searchParams, databaseFile, publishResultFiles, fromScratch);
 		}
 

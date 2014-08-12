@@ -118,7 +118,7 @@ public final class QaTask extends AsyncTaskBase {
 			experimentQaList.add(experimentQa);
 		}
 
-		return new QaWorkPacket(searchRunName, experimentQaList, qaReportFolder, reportFile, decoyRegex, getFullId(), isFromScratch());
+		return new QaWorkPacket(searchRunName, experimentQaList, qaReportFolder, reportFile, decoyRegex, isFromScratch());
 	}
 
 	@Override

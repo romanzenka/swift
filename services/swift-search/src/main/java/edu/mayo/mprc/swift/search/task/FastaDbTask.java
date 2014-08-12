@@ -39,7 +39,7 @@ public final class FastaDbTask extends AsyncTaskBase {
 
 	@Override
 	public WorkPacket createWorkPacket() {
-		return new FastaDbWorkPacket(getFullId(), curationIdToLoad);
+		return new FastaDbWorkPacket(curationIdToLoad);
 	}
 
 	@Override

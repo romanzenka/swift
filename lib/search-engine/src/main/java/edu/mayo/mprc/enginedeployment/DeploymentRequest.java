@@ -36,7 +36,7 @@ public final class DeploymentRequest extends WorkPacketBase {
 	 */
 	private Map<String, Serializable> properties;
 
-	protected DeploymentRequest(final String taskId) {
+	protected DeploymentRequest() {
 		// Deployment is always done with caching (so far).
 		super(false);
 	}
@@ -44,8 +44,8 @@ public final class DeploymentRequest extends WorkPacketBase {
 	/**
 	 * makes a request out of a curation but copies only the essential information to send to the deployer.
 	 */
-	public DeploymentRequest(final String taskid, final FastaFile fastaFile) {
-		this(taskid);
+	public DeploymentRequest(final FastaFile fastaFile) {
+		this();
 		assert fastaFile.getFile() != null : "The deployment request must have a valid Curation.";
 
 		this.fastaFile = fastaFile;

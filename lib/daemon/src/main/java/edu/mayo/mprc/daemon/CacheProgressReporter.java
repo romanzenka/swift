@@ -55,12 +55,12 @@ final class CacheProgressReporter implements ProgressReporter {
 
 	@Override
 	public synchronized void reportProgress(final ProgressInfo progressInfo) {
-		lastProgressInfo = progressInfo;
 		if (progressInfo instanceof NewLogFiles) {
 			// We only pass the log info on our first reporter.
 			// Others should get info that another task is doing their work
 			reporters.get(0).reportProgress(progressInfo);
 		} else {
+			lastProgressInfo = progressInfo;
 			for (final ProgressReporter reporter : reporters) {
 				reporter.reportProgress(progressInfo);
 			}

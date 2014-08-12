@@ -1,14 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?><!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
     "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
 <hibernate-mapping package="edu.mayo.mprc.quameterdb.dao" default-lazy="true">
-    <class name="QuameterResult" table="quameter_result" mutable="false">
+    <class name="QuameterResult" table="quameter_result" mutable="true">
         <id name="id" type="integer" column="quameter_result_id">
             <generator class="native" />
         </id>
-        <many-to-one name="fileSearch" column="file_search_id" lazy="false"
-            foreign-key="quameter_result_ibfk_2"/>
-        <many-to-one name="sample" column="sample_id" lazy="false"
-            foreign-key="quameter_result_ibfk_1"/>
+        <many-to-one name="fileSearch" column="file_search_id" lazy="false" foreign-key="quameter_result_ibfk_2" />
+        <many-to-one name="sample" column="sample_id" lazy="false" foreign-key="quameter_result_ibfk_1" />
+        <property name="hidden" type="boolean" column="hidden" />
         <property name="c_1a" type="double" column="c_1a" />
         <property name="c_1b" type="double" column="c_1b" />
         <property name="c_2a" type="double" column="c_2a" />
@@ -51,5 +50,6 @@
         <property name="p_2b" type="double" column="p_2b" />
         <property name="p_2c" type="double" column="p_2c" />
         <property name="p_3" type="double" column="p_3" />
+        <property name="identifiedSpectra" type="integer" column="identified_spectra" />
     </class>
 </hibernate-mapping>

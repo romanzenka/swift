@@ -1,6 +1,7 @@
 package edu.mayo.mprc.fasta;
 
 import com.google.common.base.Strings;
+import edu.mayo.mprc.MprcException;
 import edu.mayo.mprc.integration.Installer;
 import edu.mayo.mprc.utilities.FileUtilities;
 import edu.mayo.mprc.utilities.TestingUtilities;
@@ -92,6 +93,24 @@ public final class FastaTest {
 	}
 
 	@Test
+	public void testEmptyAccnum() throws IOException {
+		final File malformedFile = createTempFileWithString(">OKAY desc\nGGGGG\n> empty accnum\nSEQUENCE\n");
+		Assert.assertEquals(FASTAInputStream.isFASTAFileValid(malformedFile, true), "Empty accession number (line #3)", "Should fail");
+		FileUtilities.cleanupTempFile(malformedFile);
+	}
+
+	private File createTempFileWithString(final String contents) {
+		final File malformedFile;
+		try {
+			malformedFile = File.createTempFile("malformed", ".fasta");
+		} catch (final IOException e) {
+			throw new MprcException("Could not create temp file", e);
+		}
+		FileUtilities.writeStringToFile(malformedFile, contents, true);
+		return malformedFile;
+	}
+
+	@Test
 	public void shouldDetectDuplicateAccnums() throws IOException {
 		final File inFile = new File(fastaFileFolder, "test_in_dups.fasta");
 		final String errorMessage = FASTAInputStream.isFASTAFileValid(inFile, true);
@@ -101,10 +120,9 @@ public final class FastaTest {
 
 	@Test
 	public void shouldDetectLongAccnum() {
-		final File inFile = new File(fastaFileFolder, "test_in_dups.fasta");
-		final String errorMessage = FASTAInputStream.isFASTAFileValid(inFile, true);
-		Assert.assertTrue(errorMessage.contains("Q4U9M9|104K_THEAN"), "Message [" + errorMessage + "] must mention duplicate accnum");
-		Assert.assertTrue(errorMessage.toLowerCase(Locale.US).contains("duplicate"), "Must mention duplicity: " + errorMessage);
+		final File malformedFile = createTempFileWithString(">ABCDE012345678901234567890123456789 desc\nGGGGG\n");
+		Assert.assertEquals(FASTAInputStream.isFASTAFileValid(malformedFile, true), "Accession number too long: [ABCDE012345678901234567890123456789]. Length: 35, max: 34 (line #1)", "Should fail");
+		FileUtilities.cleanupTempFile(malformedFile);
 	}
 
 	@Test
@@ -120,9 +138,9 @@ public final class FastaTest {
 		assertErrorContains(">strange<>*/chars Not-supported characters", "invalid");
 		assertErrorContains(">abcABC0129|_+*. Ok", null);
 		assertErrorContains(">M99641|IGHV1-18*01|98-AA|98+0=98| Ok", null);
-		assertErrorContains(">LONG_DESC "+ Strings.repeat("0123456789", 20), "too long");
-		assertErrorContains(">LONG_DESC "+ Strings.repeat("X", 1+200-">LONG_DESC ".length()), null);
-		assertErrorContains(">LONG_DESC "+ Strings.repeat("X", 1+200-">LONG_DESC ".length()+1), "too long");
+		assertErrorContains(">LONG_DESC " + Strings.repeat("0123456789", 20), "too long");
+		assertErrorContains(">LONG_DESC " + Strings.repeat("X", 1 + 200 - ">LONG_DESC ".length()), null);
+		assertErrorContains(">LONG_DESC " + Strings.repeat("X", 1 + 200 - ">LONG_DESC ".length() + 1), "too long");
 	}
 
 	@Test
@@ -137,12 +155,12 @@ public final class FastaTest {
 		Assert.assertEquals(FASTAOutputStream.cleanupHeader(">abcdefghi", 8), ">abc...hi");
 	}
 
-	private void assertErrorContains(String sequence, String error) {
+	private void assertErrorContains(final String sequence, final String error) {
 		final String actualError = FASTAInputStream.checkHeader(sequence, FASTAInputStream.getAccNum(sequence), true);
 		if (actualError == null) {
 			Assert.assertNull(error, "No error was produced while expected '" + error + "'");
 			return;
 		}
-		Assert.assertTrue(error != null && actualError.toLowerCase().contains(error.toLowerCase()), "error must mention '" + error + "', was '"+actualError+"'");
+		Assert.assertTrue(error != null && actualError.toLowerCase().contains(error.toLowerCase()), "error must mention '" + error + "', was '" + actualError + "'");
 	}
 }

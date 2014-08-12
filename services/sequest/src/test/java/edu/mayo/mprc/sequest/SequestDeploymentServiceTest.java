@@ -59,7 +59,7 @@ public final class SequestDeploymentServiceTest {
 				toDeploy.setShortName(shortName);
 				toDeploy.setCurationFile(fakeFASTAFileToDeploy);
 
-				request = new DeploymentRequest(getClass().getSimpleName(), toDeploy.getFastaFile());
+				request = new DeploymentRequest(toDeploy.getFastaFile());
 				request.addProperty(SequestDeploymentService.SEQUEST_PARAMS_FILE, fakeParamsFile);
 			} catch (IOException e) {
 				throw new MprcException(e);
@@ -210,7 +210,7 @@ public final class SequestDeploymentServiceTest {
 		toDeploy.setShortName(shortName);
 		toDeploy.setCurationFile(fakeFASTAFileToDeploy);
 
-		final DeploymentRequest request = new DeploymentRequest(getClass().getSimpleName(), toDeploy.getFastaFile());
+		final DeploymentRequest request = new DeploymentRequest(toDeploy.getFastaFile());
 
 		request.addProperty(SequestDeploymentService.SEQUEST_PARAMS_FILE, fakeParamsFile);
 		return request;

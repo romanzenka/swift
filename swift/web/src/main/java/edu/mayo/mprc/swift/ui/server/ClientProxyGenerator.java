@@ -330,7 +330,22 @@ public final class ClientProxyGenerator {
 		if (scaffoldSettings == null) {
 			return ScaffoldSettings.defaultScaffoldSettings();
 		}
-		return new ScaffoldSettingsBuilder().setProteinProbability(scaffoldSettings.getProteinProbability()).setPeptideProbability(scaffoldSettings.getPeptideProbability()).setMinimumPeptideCount(scaffoldSettings.getMinimumPeptideCount()).setMinimumNonTrypticTerminii(scaffoldSettings.getMinimumNonTrypticTerminii()).setStarredProteins(convertFrom(scaffoldSettings.getStarredProteins())).setSaveOnlyIdentifiedSpectra(scaffoldSettings.isSaveOnlyIdentifiedSpectra()).setSaveNoSpectra(scaffoldSettings.isSaveNoSpectra()).setConnectToNCBI(scaffoldSettings.isConnectToNCBI()).setAnnotateWithGOA(scaffoldSettings.isAnnotateWithGOA()).setUseIndependentSampleGrouping(scaffoldSettings.isUseIndependentSampleGrouping()).setUseFamilyProteinGrouping(scaffoldSettings.isUseFamilyProteinGrouping()).setMzIdentMlReport(scaffoldSettings.isMzIdentMlReport()).setHighMassAccuracyScoring(scaffoldSettings.isHighMassAccuracyScoring()).setUse3xScoring(scaffoldSettings.isUse3xScoring()).createScaffoldSettings();
+		return new ScaffoldSettingsBuilder()
+				.setProteinProbability(scaffoldSettings.getProteinProbability())
+				.setPeptideProbability(scaffoldSettings.getPeptideProbability())
+				.setMinimumPeptideCount(scaffoldSettings.getMinimumPeptideCount())
+				.setMinimumNonTrypticTerminii(scaffoldSettings.getMinimumNonTrypticTerminii())
+				.setStarredProteins(convertFrom(scaffoldSettings.getStarredProteins()))
+				.setSaveOnlyIdentifiedSpectra(scaffoldSettings.isSaveOnlyIdentifiedSpectra())
+				.setSaveNoSpectra(scaffoldSettings.isSaveNoSpectra())
+				.setConnectToNCBI(scaffoldSettings.isConnectToNCBI())
+				.setAnnotateWithGOA(scaffoldSettings.isAnnotateWithGOA())
+				.setUseIndependentSampleGrouping(scaffoldSettings.isUseIndependentSampleGrouping())
+				.setUseFamilyProteinGrouping(scaffoldSettings.isUseFamilyProteinGrouping())
+				.setMzIdentMlReport(scaffoldSettings.isMzIdentMlReport())
+				.setHighMassAccuracyScoring(scaffoldSettings.isHighMassAccuracyScoring())
+				.setUse3xScoring(scaffoldSettings.isUse3xScoring())
+				.createScaffoldSettings();
 	}
 
 	private StarredProteins convertFrom(final ClientStarredProteins starredProteins) {

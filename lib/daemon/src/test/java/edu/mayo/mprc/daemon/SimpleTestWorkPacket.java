@@ -40,7 +40,7 @@ public class SimpleTestWorkPacket extends WorkPacketBase implements Serializable
 
 	@Override
 	public String getStringDescriptionOfTask() {
-		return getTaskId().toString();
+		return resultFile.getPath();
 	}
 
 	@Override

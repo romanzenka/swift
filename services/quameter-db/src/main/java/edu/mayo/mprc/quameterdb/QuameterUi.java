@@ -3,11 +3,9 @@ package edu.mayo.mprc.quameterdb;
 import com.google.common.base.Strings;
 import com.google.gson.stream.JsonWriter;
 import edu.mayo.mprc.MprcException;
-import edu.mayo.mprc.config.DaemonConfig;
-import edu.mayo.mprc.config.DependencyResolver;
-import edu.mayo.mprc.config.FactoryBase;
-import edu.mayo.mprc.config.ResourceConfig;
+import edu.mayo.mprc.config.*;
 import edu.mayo.mprc.config.ui.*;
+import edu.mayo.mprc.daemon.SimpleRunner;
 import edu.mayo.mprc.daemon.UiConfigurationProvider;
 import edu.mayo.mprc.database.Dao;
 import edu.mayo.mprc.quameterdb.dao.QuameterDao;
@@ -36,15 +34,14 @@ public final class QuameterUi implements Dao, UiConfigurationProvider {
 	public static final String DESC = "Specialized interface for browsing QuaMeter database";
 
 	private static final String SEARCH_FILTER = "searchFilter";
+	private static final String QUAMETER_DB_WORKER = "quameterDb";
 	public static final double SEC_TO_MIN = 60.0;
 
 	private final QuameterDao quameterDao;
 	private final Pattern searchFilter;
-	private final String categories;
+	private final QuameterDbWorker.Config dbWorkerConfig;
 	private static final DateTimeFormatter DATE_FORMAT_1 = DateTimeFormat.forPattern("'Date('yyyy, ").withLocale(Locale.US);
 	private static final DateTimeFormatter DATE_FORMAT_2 = DateTimeFormat.forPattern(", d, H, m, s, S')'").withLocale(Locale.US);
-
-	public static final String CATEGORIES = "categories";
 
 	/**
 	 * Use this constant to get to a list of quameter categories from the user interface
@@ -53,10 +50,10 @@ public final class QuameterUi implements Dao, UiConfigurationProvider {
 
 	public QuameterUi(final QuameterDao quameterDao,
 	                  final Pattern searchFilter,
-	                  final String categories) {
+	                  final QuameterDbWorker.Config dbWorkerConfig) {
 		this.quameterDao = quameterDao;
 		this.searchFilter = searchFilter;
-		this.categories = categories;
+		this.dbWorkerConfig = dbWorkerConfig;
 	}
 
 	@Override
@@ -99,6 +96,7 @@ public final class QuameterUi implements Dao, UiConfigurationProvider {
 		writer.name("cols");
 		writer.beginArray();
 
+		writeCol(writer, "id", "ID", "number"); // Id of the entry
 		writeCol(writer, "startTime", "Start Time", "datetime");
 		writeCol(writer, "path", "Path", "string");
 		writeCol(writer, "duration", "Duration (min)", "number");
@@ -111,6 +109,8 @@ public final class QuameterUi implements Dao, UiConfigurationProvider {
 			writeCol(writer, column.name(), QuameterResult.getColumnName(column), "number");
 		}
 
+		writeCol(writer, "id_1", "ID-1", "number");
+
 		writer.endArray();
 	}
 
@@ -119,6 +119,7 @@ public final class QuameterUi implements Dao, UiConfigurationProvider {
 				.name("c");
 		writer.beginArray();
 
+		writeValue(writer, result.getId()); // Id of the entry (for hiding)
 		writeValue(writer, result.getSample().getStartTime()); // startTime
 		writeValue(writer, result.getSample().getFile().getAbsolutePath()); // path
 		writeValue(writer, result.getSample().getRunTimeInSeconds() / SEC_TO_MIN); // duration
@@ -132,6 +133,7 @@ public final class QuameterUi implements Dao, UiConfigurationProvider {
 			writeValue(writer, result.getValue(column));
 		}
 
+		writeValue(writer, result.getIdentifiedSpectra());
 
 		writer.endArray();
 		writer.endObject();
@@ -174,19 +176,47 @@ public final class QuameterUi implements Dao, UiConfigurationProvider {
 
 	@Override
 	public void provideConfiguration(Map<String, String> currentConfiguration) {
-		currentConfiguration.put(UI_QUAMETER_CATEGORIES, categories);
+		currentConfiguration.put(UI_QUAMETER_CATEGORIES, dbWorkerConfig.getCategories());
 	}
 
-	public static final class Config extends ResourceConfigBase {
+	public static final class Config implements ResourceConfig {
+		private String searchFilter;
+		private ServiceConfig quameterConfig;
+
 		public Config() {
 		}
 
-		void setSearchFilter(final String searchFilter) {
-			put(SEARCH_FILTER, searchFilter);
+		@Override
+		public void save(ConfigWriter writer) {
+			writer.put(SEARCH_FILTER, searchFilter);
+			writer.put(QUAMETER_DB_WORKER, writer.save(quameterConfig));
 		}
 
-		public String getCategories() {
-			return get(CATEGORIES);
+		@Override
+		public void load(ConfigReader reader) {
+			searchFilter = reader.get(SEARCH_FILTER);
+			quameterConfig = (ServiceConfig) reader.getObject(QUAMETER_DB_WORKER);
+		}
+
+		@Override
+		public int getPriority() {
+			return 0;
+		}
+
+		public void setSearchFilter(String searchFilter) {
+			this.searchFilter = searchFilter;
+		}
+
+		public String getSearchFilter() {
+			return searchFilter;
+		}
+
+		public void setQuameterConfig(QuameterDbWorker.Config quameterConfig) {
+			this.quameterConfig = new ServiceConfig("quameter", new SimpleRunner.Config(quameterConfig));
+		}
+
+		public QuameterDbWorker.Config getQuameterConfig() {
+			return (QuameterDbWorker.Config) quameterConfig.getRunner().getWorkerConfiguration();
 		}
 	}
 
@@ -222,10 +252,10 @@ public final class QuameterUi implements Dao, UiConfigurationProvider {
 
 		@Override
 		public QuameterUi create(final Config config, final DependencyResolver dependencies) {
-			final String filterString = config.get(SEARCH_FILTER);
-			final String categories = config.get(CATEGORIES);
+			final String filterString = config.getSearchFilter();
 			final Pattern filter = compileFilter(filterString);
-			return new QuameterUi(getQuameterDao(), filter, categories);
+			final QuameterDbWorker.Config dbConfig = config.getQuameterConfig();
+			return new QuameterUi(getQuameterDao(), filter, dbConfig);
 		}
 
 		public QuameterDao getQuameterDao() {
@@ -271,12 +301,8 @@ public final class QuameterUi implements Dao, UiConfigurationProvider {
 						}
 					})
 
-					.property(CATEGORIES, "Categories", "Categories for the different QuaMeter quality checks." +
-							"<p>You can assign a category to each search. The QuaMeter user interface will then allow you to pick a category" +
-							"to filter all the results. The categories are comma-separated. Use a dash in front of a category to form sub-categories.</p>" +
-							"<p>Example: <tt>animal,-cat,--siamese,-dog,--chihuahua</tt></p>")
-					.defaultValue("no-category");
-
+					.property(QUAMETER_DB_WORKER, "Quamered Db", "Reference to the worker that loads QuaMeter data to the database")
+					.reference(QuameterDbWorker.TYPE, UiBuilder.NONE_TYPE);
 		}
 	}
 

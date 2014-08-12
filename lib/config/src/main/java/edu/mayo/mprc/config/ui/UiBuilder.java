@@ -28,6 +28,25 @@ public interface UiBuilder {
 	UiBuilder property(String name, String displayName, String description);
 
 	/**
+	 * Start a property array definition. A property array is stored simply by outputting the properties in
+	 * the {@code array_name . index . property_name } format, for example {@code engine.3.name}
+	 * <p/>
+	 * After a property array is started, each subsequently defined property is used as a template.
+	 * The UI then should show the array as a list with add/remove buttons.
+	 *
+	 * @param prefix      Prefix of the properties within this array.
+	 * @param displayName Name of the property array.
+	 * @param description Description of the property array.
+	 */
+	UiBuilder propertyArray(String prefix, String displayName, String description);
+
+	/**
+	 * Terminate previous {@link #propertyArray} call. The subsequent properties are not a part of the array
+	 * anymore.
+	 */
+	UiBuilder propertyArrayEnd();
+
+	/**
 	 * This property is required - will be marked with an asterisk in the UI.
 	 */
 	UiBuilder required();

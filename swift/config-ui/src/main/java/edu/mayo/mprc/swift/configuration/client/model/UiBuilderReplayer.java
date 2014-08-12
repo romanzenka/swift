@@ -22,6 +22,8 @@ public class UiBuilderReplayer implements Serializable {
 	public static final String EXECUTABLE = "executable";
 	public static final String REFERENCE = "reference";
 	public static final String ENABLE = "enable";
+	public static final String PROPERTY_ARRAY = "propertyArray";
+	public static final String PROPERTY_ARRAY_END = "propertyArrayEnd";
 	private static final long serialVersionUID = -993067491662935412L;
 
 	private ArrayList<String> commands = new ArrayList<String>(20);

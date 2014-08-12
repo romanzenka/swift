@@ -37,7 +37,7 @@ final class MgfTitleCleanupTask extends AsyncTaskBase implements FileProducingTa
 			cleanupPerformed = true;
 			return null;
 		}
-		return new MgfTitleCleanupWorkPacket(mgfToCleanup, cleanedMgf, "Mgf Cleanup #" + TASK_ID.incrementAndGet(), false);
+		return new MgfTitleCleanupWorkPacket(mgfToCleanup, cleanedMgf, false);
 	}
 
 	@Override

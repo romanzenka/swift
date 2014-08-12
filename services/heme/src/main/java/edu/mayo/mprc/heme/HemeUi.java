@@ -72,7 +72,6 @@ public final class HemeUi implements Dao {
 	private final File results;
 	private final HemeDao hemeDao;
 	private final SwiftDao swiftDao;
-	private final FastaDbDao fastaDbDao;
 	private final ParamsDao paramsDao;
 	private SwiftSearcherCaller swiftSearcherCaller;
 	private final String trypsinParameterSetName;
@@ -88,11 +87,9 @@ public final class HemeUi implements Dao {
 	 */
 	private int chymoParameterSetId;
 	private String userEmail;
-	private String[] searchEngines;
     private File fastaDbCache;
 
 	public HemeUi(final File data, final File results, final HemeDao hemeDao, final SwiftDao swiftDao,
-	              final FastaDbDao fastaDbDao,
 	              final ParamsDao paramsDao,
 	              final SwiftSearcherCaller swiftSearcherCaller,
 	              final String trypsinParameterSetName, final String chymoParameterSetName, final String userEmail,
@@ -101,7 +98,6 @@ public final class HemeUi implements Dao {
 		this.results = results;
 		this.hemeDao = hemeDao;
 		this.swiftDao = swiftDao;
-		this.fastaDbDao = fastaDbDao;
 		this.paramsDao = paramsDao;
 		this.swiftSearcherCaller = swiftSearcherCaller;
 		this.trypsinParameterSetName = trypsinParameterSetName;
@@ -304,17 +300,16 @@ public final class HemeUi implements Dao {
 
 		final SwiftSearchDefinition swiftSearchDefinition = swiftDao.getSwiftSearchDefinition(test.getSearchRun().getSwiftSearch());
 
-		final Curation dummyDatabase = new Curation();
-        //dummyDatabase.setCurationFile(new File("/Users/m088378/Desktop/newHemePathDatabase2.fasta"));
-        dummyDatabase.setCurationFile(new File("/Users/m088378/heme-data/HbVar-Unipro-1.0.fasta"));
-        File dbCache = new File("/Users/m088378/heme-data/HbVar-Unipro.obj");
+		final Curation database = swiftSearchDefinition.getSearchParameters().getDatabase();
+		String fastaName = FileUtilities.stripGzippedExtension(database.getCurationFile().getName());
+		File dbCache = new File(fastaDbCache, fastaName+"-desc.obj");
         if( !dbCache.exists() ){
-            SerializeFastaDB.generateDesc(dummyDatabase.getFastaFile().getFile(), dbCache.toString());
+            SerializeFastaDB.generateDesc(database.getCurationFile(), dbCache.toString());
         }
 
-        File seqCache = new File("/Users/m088378/heme-data/HbVar-MutationSeq.obj");
+        File seqCache = new File(fastaDbCache, fastaName+"-seq.obj");
         if( !seqCache.exists() ){
-            SerializeFastaDB.generateSequence(dummyDatabase.getFastaFile().getFile(), seqCache.toString());
+            SerializeFastaDB.generateSequence(database.getFastaFile().getFile(), seqCache.toString());
         }
         HemeReport myNewReport = new HemeReport(test);
 
@@ -384,7 +379,6 @@ public final class HemeUi implements Dao {
 		private HemeDao hemeDao;
 		private ParamsDao paramsDao;
 		private SwiftDao swiftDao;
-		private FastaDbDao fastaDbDao;
 		private SwiftSearcherCaller swiftSearcherCaller;
 		private RunningApplicationContext runningApplicationContext;
 
@@ -413,15 +407,6 @@ public final class HemeUi implements Dao {
 		@Resource(name = "paramsDao")
 		public void setParamsDao(final ParamsDao paramsDao) {
 			this.paramsDao = paramsDao;
-		}
-
-		public FastaDbDao getFastaDbDao() {
-			return fastaDbDao;
-		}
-
-		@Resource(name = "fastaDbDao")
-		public void setFastaDbDao(FastaDbDao fastaDbDao) {
-			this.fastaDbDao = fastaDbDao;
 		}
 
 		public SwiftSearcherCaller getSwiftSearcherCaller() {
@@ -479,7 +464,6 @@ public final class HemeUi implements Dao {
 					resultDir,
 					getHemeDao(),
 					getSwiftDao(),
-					getFastaDbDao(),
 					getParamsDao(),
 					getSwiftSearcherCaller(),
 					config.get(TRYPSIN_PARAM_SET_NAME),
@@ -512,7 +496,7 @@ public final class HemeUi implements Dao {
 					.defaultValue("data")
 
 					.property(RESULT_PATH, "Result path", "Folder where the search results will be stored." +
-                            "<p>The path is relative to the shared folder</p>")
+							"<p>The path is relative to the shared folder</p>")
 					.required()
 					.existingDirectory()
 					.defaultValue("results")

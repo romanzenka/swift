@@ -1,7 +1,6 @@
 package edu.mayo.mprc.swift.search;
 
 import edu.mayo.mprc.MprcException;
-import edu.mayo.mprc.daemon.AssignedTaskData;
 import edu.mayo.mprc.daemon.DaemonConnection;
 import edu.mayo.mprc.daemon.DaemonUtilities;
 import edu.mayo.mprc.swift.db.SwiftDao;
@@ -225,7 +224,7 @@ public final class DefaultSwiftSearcherCaller implements SwiftSearcherCaller {
 
 	private static void sendCallToDispatcher(final DaemonConnection connection, final Integer swiftSearchId, final String sBatchName, final boolean fromScratch, final int priority, final int previousSearchId, final ProgressListener listener) {
 		// Send work. We are not interested in progress at all, but we must specify progress listener
-		final SwiftSearchWorkPacket workPacket = new SwiftSearchWorkPacket(swiftSearchId, sBatchName, fromScratch, previousSearchId);
+		final SwiftSearchWorkPacket workPacket = new SwiftSearchWorkPacket(swiftSearchId, fromScratch, previousSearchId);
 		workPacket.setPriority(priority);
 		connection.sendWork(workPacket, listener);
 	}

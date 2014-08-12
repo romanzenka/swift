@@ -29,15 +29,20 @@ public final class SpectrumExtractionEditor extends Composite implements Validat
 
 	private Map<String, EnginePanel> engineToPanel = new HashMap<String, EnginePanel>(2);
 
-	public SpectrumExtractionEditor() {
+	public SpectrumExtractionEditor(final boolean extractMsnEnabled, final boolean msconvertEnabled) {
 		panel = new HorizontalPanel();
 		panel.setVerticalAlignment(HasVerticalAlignment.ALIGN_MIDDLE);
 		engineName = new ListBox();
-		engineName.addItem("extract_msn", "extract_msn");
-		engineToPanel.put("extract_msn", extractMsnPanel);
 
-		engineName.addItem("msconvert", "msconvert");
-		engineToPanel.put("msconvert", msconvertPanel);
+		if (extractMsnEnabled) {
+			engineName.addItem("extract_msn", "extract_msn");
+			engineToPanel.put("extract_msn", extractMsnPanel);
+		}
+
+		if (msconvertEnabled) {
+			engineName.addItem("msconvert", "msconvert");
+			engineToPanel.put("msconvert", msconvertPanel);
+		}
 
 		engineName.setSelectedIndex(1);
 		engineName.addChangeHandler(this);
@@ -80,7 +85,7 @@ public final class SpectrumExtractionEditor extends Composite implements Validat
 		}
 		updateInterface();
 		// Only the current engine gets the value set. Everybody else resets their value
-		for (EnginePanel enginePanel : engineToPanel.values()) {
+		for (final EnginePanel enginePanel : engineToPanel.values()) {
 			enginePanel.resetToDefault();
 		}
 		currentEnginePanel().setValue(settings.getCommandLineSwitches());
@@ -166,7 +171,7 @@ public final class SpectrumExtractionEditor extends Composite implements Validat
 	}
 
 	@Override
-	public void onChange(ChangeEvent event) {
+	public void onChange(final ChangeEvent event) {
 		valueChanged();
 	}
 }
