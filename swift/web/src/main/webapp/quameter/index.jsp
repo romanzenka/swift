@@ -43,7 +43,7 @@
             </div>
             <div class="btn-toolbar pull-left">
                 <div class="btn-group" id="view-buttons">
-                    <div class="btn btn-info" id="compact-button">Simple</div>
+                    <div class="btn btn-info" id="compact-button">Details</div>
                 </div>
             </div>
             <div class="row-fluid">
@@ -59,7 +59,7 @@
         </div>
     </div>
 
-    <% if (quameterUiConfig != null) { %>  <!-- REMOVE NOT -->
+    <% if (quameterUiConfig != null) { %>  <!-- TODO REMOVE NOT BEFORE COMMIT -->
     <div class="alert">
         <p><strong>Warning</strong> The QuaMeter module is not configured.</p>
         <p>You need to add the QuaMeterUi resource to the
@@ -67,7 +67,7 @@
             </code> daemon.</p>
     </div>
     <% } else { %>
-        <div id="detailedGraphs" style="margin-top: 50px"></div>
+        <div id="detailedGraphs" style="margin-top: 50px; display: none"></div>
         <div id="simpleGraphs" style="margin-top: 50px"></div>
 
     <% } %>
@@ -84,12 +84,12 @@
 <script type="text/javascript" src="/common/bootstrap/js/bootstrap.js"></script>
 
 <!-- Graph Dependancies -->
-<script type="text/javascript" src="js/tmp.js"></script>
+<script type="text/javascript" src="js/tmp.js"></script> <!-- TODO REMOVE LINE BEFORE COMMIT -->
 <script type="text/javascript" src="js/dygraph-combined.js"></script>
 <script type="text/javascript" src="js/quameter-definitions.js"></script>
 <script type="text/javascript" src="js/quameter.js"></script>
 <script type="text/javascript">
-    //var graphDataSrvr = <%
+    //var graphDataSrvr = <%  // TODO remove commment before commit
     if(quameterUiConfig!=null) {
         final QuameterUi quameterUi = (QuameterUi) MainFactoryContext.getSwiftEnvironment().createResource(quameterUiConfig);
         quameterUi.begin();

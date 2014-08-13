@@ -1,7 +1,7 @@
 /** Global Vars to hack Google DataViews **/
 rawInsturmentNames=[];
-var defaultSelectedInsturmentNames=['01475B']; // By Default only Show Orbi
-var views = [];
+// var defaultSelectedInsturmentNames=['01475B']; // By Default only Show Orbi
+views = [];
 
 function populateInstArray(dt){
     for(var r=0; r < dt.getNumberOfRows(); r++) {
@@ -49,6 +49,16 @@ function addButtons(div, data, columnId) {
     });
 }
 
+function instrumentButtons(){
+    var instrumentDiv = $('#instrument-buttons');
+    return instrumentDiv.find('.btn');
+}
+
+function categoryButtons(){
+    var categoryDiv = $('#category-buttons');
+    return categoryDiv.find('.btn');
+}
+
 function createNewAnnotationForm(mX,mY,parentName){
     var metricCode = parentName.split("-")[-1];
     $('<input>').attr({
@@ -81,12 +91,13 @@ function spanAllUnderscoreTokens(s) {
 }
 
 // Callback that filters all the views, updating the stdev ranges
-function updateAllViews(views, filteredRows) {
+function updateAllViews(filteredRows) {
     blockRedraw = true;
     // We deselect the user-selected point
     pointSelected = -1;
     pointHighlighted = -1;
     for (var i = 0; i < views.length; i++) {
+        if(views[i] === undefined){continue} //empty for detail graphs
         views[i].dataView.setRows(filteredRows);
         var sum = 0;
         var count = views[i].dataView.getNumberOfRows();
@@ -138,19 +149,19 @@ function selectPoint(data, dataRow) {
 }
 
 
-function addDygraph( viewIndex, view, viewId, metricId, viewMetadata, data, pathColumnIndex, selectedPath, instrumentButtons, categoryButtons, instrumentColumnIndex, categoryColumnIndex) {
+function addDygraph( viewIndex, view, viewId, metricId, viewMetadata, data, pathColumnIndex, selectedPath) {
     views[viewIndex] = { dataView: view, minHighlightY: 1, maxHighlightY: -1, metricId: metricId };
     var currentView = views[viewIndex];
 
-    var instrumentText=  $.map( instrumentButtons, function( val, i ) { return val.firstChild.data });
+    var instrumentText=  $.map( instrumentButtons(), function( val, i ) { return val.firstChild.data });
     instrumentText.unshift("Date");
 
     // Row - the row in the original dataset
     function highlightRow(row) {
         if (row == -1) {
             selectedPath.text("");
-            instrumentButtons.removeClass("highlight");
-            categoryButtons.removeClass("highlight");
+            instrumentButtons().removeClass("highlight");
+            categoryButtons().removeClass("highlight");
             return;
         }
         var path = data.getValue(row, pathColumnIndex);
@@ -160,14 +171,14 @@ function addDygraph( viewIndex, view, viewId, metricId, viewMetadata, data, path
 
         selectedPath.html(pathHtml);
 
-        instrumentButtons.removeClass("highlight");
-        categoryButtons.removeClass("highlight");
+        instrumentButtons().removeClass("highlight");
+        categoryButtons().removeClass("highlight");
 
-        var instrument = data.getValue(row, instrumentColumnIndex);
-        instrumentButtons.filter("[value='" + instrument + "']").addClass("highlight");
+        var instrument = data.getValue(row, columnIndex('instrument',data) );
+        instrumentButtons().filter("[value='" + instrument + "']").addClass("highlight");
 
-        var category = data.getValue(row, categoryColumnIndex);
-        categoryButtons.filter("[value='" + category + "']").addClass("highlight");
+        var category = data.getValue(row, columnIndex('category', data) );
+        categoryButtons().filter("[value='" + category + "']").addClass("highlight");
     }
 
     var dygraph = new Dygraph(
@@ -257,15 +268,15 @@ function addDygraph( viewIndex, view, viewId, metricId, viewMetadata, data, path
     );
     views[viewIndex].dygraph = dygraph;
     gs.push(views[viewIndex].dygraph);
-
-    viewIndex++;
-    return viewIndex;
 }
 
 
 
 
-function drawGraphsByMetrics(){
+//  Important basic graphing functions
+function drawGraphsByMetrics(data, renderDetailGraphs, viewMetadata){
+    var pathColumnIndex = columnIndex('path', data);
+    var selectedPath = $('#selected-path');
 
     var viewIndex = 0;
     var previousCategory = '';
@@ -279,35 +290,37 @@ function drawGraphsByMetrics(){
             categoryCode = metricId.split("_", 2)[0];
         }
         if (categoryCode != previousCategory) {
-            $('<h3>' + metricCategories[categoryCode] + '</h3>').appendTo("#detailedGraphs");
-            $('<h3>' + metricCategories[categoryCode] + '</h3>').appendTo("#simpleGraphs");
+            if( renderDetailGraphs ){
+                $('<h3>' + metricCategories[categoryCode] + '</h3>').appendTo("#detailedGraphs");
+            }
+            else {
+                $('<h3>' + metricCategories[categoryCode] + '</h3>').appendTo("#simpleGraphs");
+            }
             previousCategory = categoryCode;
         }
 
         var view = new google.visualization.DataView(data);
-        var cols = [ col("startTime") ];
+        var cols = [ columnIndex("startTime", data) ];
 
         for(j=0; j<rawInsturmentNames.length; j++){
             cols.push({type:'number', label: getNiceName(rawInsturmentNames[j]),
                 calc: (function (iterJ, metID) {
                     return function (dt, row) {
-                        return (dt.getValue(row, 4) === rawInsturmentNames[iterJ]) ?  dt.getValue(row, col(metID)) : null;                    }
+                        return (dt.getValue(row, 4) === rawInsturmentNames[iterJ]) ?  dt.getValue(row, columnIndex(metID,dt)) : null;                    }
                 })(j,metricId)
             });
         };
-
         view.setColumns(cols);
 
-        // var myView = google.visualization.DataView.fromJSON(data, view.toJSON())
         if( renderDetailGraphs ){
             var viewId = "graph-" + metricId;
+            console.log(viewId);  // TODO remove
             $('<div class="row-fluid"><div class="span12">' +
-                getMetricTitle(i)
-                + '<div id="' + viewId + '" class="simple-graph"></div>' +
-                '</div></div>')
-                .appendTo("#detailedGraphs");
-            viewIndex = addDygraph(
-                viewIndex, view, viewId, metricId, viewMetadata, data, pathColumnIndex, selectedPath, instrumentButtons, categoryButtons, instrumentColumnIndex, categoryColumnIndex);
+                getMetricTitle(i) +
+                '<div id="'+viewId+'" class="simple-graph"></div>' +
+                '</div></div>'
+            ).appendTo("#detailedGraphs");
+            addDygraph( viewIndex, view, viewId, metricId, viewMetadata, data, pathColumnIndex, selectedPath);
         }
         else{
             if (1 == metric.simple) {
@@ -316,12 +329,12 @@ function drawGraphsByMetrics(){
                     '<div class="span12">' +
                     getMetricTitle(i)
                     + '<div id="' + viewId + '" class="simple-graph"></div>' +
-                    '</div></div>')
-                    .appendTo("#simpleGraphs");
-                viewIndex = addDygraph(
-                    viewIndex, view, viewId, metricId, viewMetadata, data, pathColumnIndex, selectedPath, instrumentButtons, categoryButtons, instrumentColumnIndex, categoryColumnIndex);
+                    '</div></div>'
+                ).appendTo("#simpleGraphs");
+                addDygraph( viewIndex, view, viewId, metricId, viewMetadata, data, pathColumnIndex, selectedPath);
             }
         }
+        viewIndex++;
     }
 
 
@@ -341,7 +354,6 @@ function initSimpleCharts(graphObj) {
     populateInstArray(data);
 
     var viewMetadata = {};
-    var views = [];
     gs = [];
     // Populate array with index to every row
     var allRows = Array(data.getNumberOfRows());
@@ -349,32 +361,19 @@ function initSimpleCharts(graphObj) {
     viewMetadata.filteredRows = allRows;
 
 
-
-    function col(id) {
-        return columnIndex(id, data);
-    }
-
     selectPoint(data, -1);
 
-    var selectedPath = $('#selected-path');
-    var pathColumnIndex = col('path');
 
     // Make buttons
     var categoryDiv = $('#category-buttons');
     addButtons(categoryDiv, data, 'category');
-
     var instrumentDiv = $('#instrument-buttons');
     addButtons(instrumentDiv, data, 'instrument');
 
-    var categoryButtons = categoryDiv.find('.btn');
-    var categoryColumnIndex = col('category');
-    var instrumentButtons = instrumentDiv.find('.btn');
-    var instrumentColumnIndex = col('instrument');
-    var idColumnIndex = col('id');
-
+    var idColumnIndex = columnIndex('id',data);
     blockRedraw = true;
 
-    drawGraphsByMetrics();
+    drawGraphsByMetrics(data, false, viewMetadata);
 
 
     blockRedraw = false;
@@ -382,14 +381,14 @@ function initSimpleCharts(graphObj) {
     function refilterRows() {
 
         var selectedCategory = [];
-         categoryButtons.each(function () {
+         categoryButtons().each(function () {
              if ($(this).hasClass('btn-primary')) {
                  selectedCategory.push($(this).attr("value"));
              }
          });
 
          var selectedInstrument = [];
-         instrumentButtons.each(function () {
+         instrumentButtons().each(function () {
              if ($(this).hasClass('btn-primary')) {
                  selectedInstrument.push($(this).attr("value"));
              }
@@ -398,8 +397,8 @@ function initSimpleCharts(graphObj) {
          function filterRows() {
              var filteredRows = [];
              for (var row = 0; row < data.getNumberOfRows(); row++) {
-                 var category = data.getValue(row, categoryColumnIndex);
-                 var instrument = data.getValue(row, instrumentColumnIndex);
+                 var category = data.getValue(row, columnIndex('category', data) );
+                 var instrument = data.getValue(row, columnIndex('instrument',data) );
                  var rowId = data.getValue(row, idColumnIndex)
                  if (0 <= $.inArray(category, selectedCategory)
                          && 0 <= $.inArray(instrument, selectedInstrument)
@@ -413,12 +412,12 @@ function initSimpleCharts(graphObj) {
          var filteredRows = filterRows();
 
          viewMetadata.filteredRows = filteredRows;
-         updateAllViews(views, filteredRows);
+         updateAllViews(filteredRows);
     }
 
     // Change button Colors then Filter based on value
     $('.btn').button();
-    var filterButtons = $.merge(categoryButtons,instrumentButtons);
+    var filterButtons = $.merge(categoryButtons(),instrumentButtons());
     filterButtons.click(function (event) {
         var current = $(this);
         if (!event.shiftKey) {
@@ -433,18 +432,18 @@ function initSimpleCharts(graphObj) {
     $("#compact-button").click(function (event) {
         var current = $(this);
         if(!detailsExist){
-            // add ability to draw additional
-            alert('Details need to be drawn');
+            drawGraphsByMetrics(data, true, viewMetadata);
+            detailsExist=true;
         }
 
         if (current.hasClass("btn-info")) {
             current.removeClass("btn-info");
-            current.value("Simple");
+            current.text("Simple");
             $('#detailedGraphs').css("display", "block");
             $('#simpleGraphs').css("display", "none");
         } else {
             current.addClass("btn-info");
-            current.value("Details");
+            current.text("Details");
             $('#detailedGraphs').css("display", "none");
             $('#simpleGraphs').css("display", "block");
         }
@@ -461,8 +460,8 @@ function initSimpleCharts(graphObj) {
 
     // Create dummy array to display thresholds for all values on init()
     // var allRowsIndex = $.map($(Array(data.getNumberOfRows())),function(val, i) { return i; }) // already created at start
-    updateAllViews(views, allRows);
-    $('#detailedGraphs').css("display", "none");
+    updateAllViews(allRows);
+    //$('#detailedGraphs').css("display", "none");
 }
 
 
