@@ -114,7 +114,7 @@ public final class MsconvertWorkPacket extends WorkPacketBase implements Cachabl
 
 	@Override
 	public void reportCachedResult(final ProgressReporter reporter, final File targetFolder, final List<String> outputFiles) {
-		final File cachedMgf = new File(targetFolder, outputFiles.get(0));
-		reporter.reportProgress(new MsconvertResult(cachedMgf));
+		final File cachedOutput = new File(targetFolder, outputFiles.get(0));
+		reporter.reportProgress(new MsconvertResult(cachedOutput));
 	}
 }
