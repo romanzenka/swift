@@ -200,7 +200,11 @@ public final class CometWorker extends WorkerBase {
 			CometWorker worker = null;
 			try {
 				worker = new CometWorker(FileUtilities.getAbsoluteFileForExecutables(config.getCometExecutable()));
-				worker.setMsconvertDaemon((DaemonConnection) dependencies.createSingleton(config.getMsconvert()));
+				if(config.getMsconvert()!=null) {
+					worker.setMsconvertDaemon((DaemonConnection) dependencies.createSingleton(config.getMsconvert()));
+				} else {
+					worker.setMsconvertDaemon(null);
+				}
 			} catch (final Exception e) {
 				throw new MprcException("Comet worker could not be created.", e);
 			}
