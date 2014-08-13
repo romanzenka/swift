@@ -251,6 +251,10 @@ public final class CometWorker extends WorkerBase {
 		public ServiceConfig getMsconvert() {
 			return msconvert;
 		}
+
+		public void setCometExecutable(String cometExecutable) {
+			this.cometExecutable = cometExecutable;
+		}
 	}
 
 	public static final class Ui implements ServiceUiFactory {

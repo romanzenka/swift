@@ -81,7 +81,7 @@ public final class TestComet {
 			}
 
 			final CometWorker.Config cometConfig = new CometWorker.Config();
-			cometConfig.put(CometWorker.COMET_EXECUTABLE, cometExecutable);
+			cometConfig.setCometExecutable(cometExecutable);
 
 			final CometWorker.Factory factory = new CometWorker.Factory();
 			final Worker worker = factory.create(cometConfig, null);
