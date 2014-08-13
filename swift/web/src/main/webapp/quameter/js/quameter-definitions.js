@@ -19,6 +19,8 @@ var hiddenIds = new Object();
 //Place holder to determine if Detailed graphs are drawn yet.
 var detailsExist = false;
 
+// var defaultSelectedInsturmentNames=['01475B']; // By Default only Show Orbi
+
 //Categories for Drawing graphs in series
 var metricCategories = {
         c: "Chromatography",
@@ -51,11 +53,11 @@ function getNiceName( str ){
 var metrics = [
         { code: "c_1a", label: "C-1A", name: "Bleed Ratio", good: "low", simple: 0, desc: "Fraction of peptides with repeat identifications >4 min earlier than identification closest to the chromatographic maximum" },
         { code: "c_1b", label: "C-1B", name: "Peak Tailing Ratio", good: "low", simple: 0, desc: "Fraction of peptides with repeat identifications >4 min later than identification closest to the chromatographic maximum" },
-        { code: "c_2a", label: "C-2A", name: "Retention Window", good: "high", simple: 0, desc: "Retention time period over which the middle 50% of the identified peptides eluted (minutes)" },
+        { code: "c_2a", label: "C-2A", name: "Retention Window", good: "high", simple: 0, link: 'help/retention_spread.html', desc: "Retention time period over which the middle 50% of the identified peptides eluted (minutes)" },
         { code: "duration", label: "Duration", name: "Duration", good: "range", simple: 0, desc: "Acquisition duration (minutes)" },
         { code: "c_2b", label: "C-2B", name: "ID Rate", good: "high", simple: 1, link: 'help/peptides_per_minute.html', desc: "Rate of peptide identification during the C-2A time range" },
-        { code: "c_3a", label: "C-3A", name: "Peak Width", good: "low", simple: 1, desc: "Median identified peak width" },
-        { code: "c_3b", label: "C-3B", name: "Peak Width Spread", good: "low", simple: 1, desc: "Interquantile range for peak widths" },
+        { code: "c_3a", label: "C-3A", name: "Peak Width", good: "low", simple: 1, range: [0,40], link: 'help/peak_width.html', desc: "Median identified peak width" },
+        { code: "c_3b", label: "C-3B", name: "Peak Width Spread", good: "low", simple: 1, range: [0,40], link: 'help/peak_width_variability.html', desc: "Interquantile range for peak widths" },
         { code: "c_4a", label: "C-4A", name: "Late Peak Width", good: "low", simple: 0, desc: "Median peak width over <i>last 10%</i> of the elution time" },
         { code: "c_4b", label: "C-4B", name: "Early Peak Width", good: "low", simple: 0, desc: "Median peak width over <i>first 10%</i> of the elution time" },
         { code: "c_4c", label: "C-4C", name: "Middle Peak Width", good: "low", simple: 0, desc: "Median peak width over <i>middle 10%</i> of the elution time" },
@@ -93,6 +95,14 @@ var metrics = [
         { code: "p_3", label: "P-3", name: "Semitryptic Ratio", good: "low", simple: 1, desc: "Ratio of semitryptic/tryptic peptides" },
         { code: "id_1", label: "ID-1", name: "Identified Spectra", good: "low", simple: 1, desc: "Number of identified spectra matching requested proteins for given category" }
     ];
+
+function getMetricByCode(cc){
+    for(m in metrics){
+        if(metrics[m].code === cc){
+            return metrics[m];
+        }
+    }
+}
 
 
 /**

@@ -67,7 +67,7 @@
             </code> daemon.</p>
     </div>
     <% } else { %>
-        <div id="detailedGraphs" style="margin-top: 50px; display: none"></div>
+        <div id="detailedGraphs" style="margin-top: 50px;"></div>
         <div id="simpleGraphs" style="margin-top: 50px"></div>
 
     <% } %>

@@ -1,7 +1,7 @@
 /** Global Vars to hack Google DataViews **/
 rawInsturmentNames=[];
-// var defaultSelectedInsturmentNames=['01475B']; // By Default only Show Orbi
-views = [];
+views = [], gs = [];
+numberOfSimpleGraphs = 0;
 
 function populateInstArray(dt){
     for(var r=0; r < dt.getNumberOfRows(); r++) {
@@ -59,7 +59,7 @@ function categoryButtons(){
     return categoryDiv.find('.btn');
 }
 
-function createNewAnnotationForm(mX,mY,parentName){
+function createNewAnnotationForm(parentName){
     var metricCode = parentName.split("-")[-1];
     $('<input>').attr({
         type: 'hidden',
@@ -97,7 +97,8 @@ function updateAllViews(filteredRows) {
     pointSelected = -1;
     pointHighlighted = -1;
     for (var i = 0; i < views.length; i++) {
-        if(views[i] === undefined){continue} //empty for detail graphs
+        if(views[i] === undefined){continue} //empty for detail graphs until generated
+
         views[i].dataView.setRows(filteredRows);
         var sum = 0;
         var count = views[i].dataView.getNumberOfRows();
@@ -127,7 +128,9 @@ function updateAllViews(filteredRows) {
         views[i].minHighlightY = average - 5 * stdev;
         views[i].maxHighlightY = average + 5 * stdev;
 
-        views[i].dygraph.updateOptions({file: views[i].dataView});
+
+        views[i].dygraph.updateOptions({file: views[i].dataView, valueRange: getMetricByCode(views[i].metricId).range });
+
     }
     blockRedraw = false;
 }
@@ -149,9 +152,10 @@ function selectPoint(data, dataRow) {
 }
 
 
-function addDygraph( viewIndex, view, viewId, metricId, viewMetadata, data, pathColumnIndex, selectedPath) {
+function addDygraph( viewIndex, view, viewId, metricId, viewMetadata, data, range) {
     views[viewIndex] = { dataView: view, minHighlightY: 1, maxHighlightY: -1, metricId: metricId };
     var currentView = views[viewIndex];
+    var selectedPath = $('#selected-path');
 
     var instrumentText=  $.map( instrumentButtons(), function( val, i ) { return val.firstChild.data });
     instrumentText.unshift("Date");
@@ -164,7 +168,7 @@ function addDygraph( viewIndex, view, viewId, metricId, viewMetadata, data, path
             categoryButtons().removeClass("highlight");
             return;
         }
-        var path = data.getValue(row, pathColumnIndex);
+        var path = data.getValue(row, columnIndex('path', data));
 
         var pathChunks = /(.*\/)([^\/\\]+)(\.[^.]+)/.exec(path);
         var pathHtml = pathChunks[1] + spanAllUnderscoreTokens(pathChunks[2]) + pathChunks[3];
@@ -180,6 +184,7 @@ function addDygraph( viewIndex, view, viewId, metricId, viewMetadata, data, path
         var category = data.getValue(row, columnIndex('category', data) );
         categoryButtons().filter("[value='" + category + "']").addClass("highlight");
     }
+
 
     var dygraph = new Dygraph(
             document.getElementById(viewId),
@@ -199,7 +204,6 @@ function addDygraph( viewIndex, view, viewId, metricId, viewMetadata, data, path
                 },
                 drawPoints: true,
                 connectSeparatedPoints: true,
-                //labels: instrumentText,
                 pointSize: 2,
                 strokeWidth: 0.4,
                 highlightSeriesOpts: {
@@ -259,13 +263,13 @@ function addDygraph( viewIndex, view, viewId, metricId, viewMetadata, data, path
                     var row = viewMetadata.filteredRows[pointHighlighted];
                     highlightRow(row);
 
-                   // console.log(); //.offsetParent());
-                    createNewAnnotationForm(event.pageX, event.pageY, event.target.parentNode.parentNode.id);
+                    createNewAnnotationForm(event.target.parentNode.parentNode.id);
 
                     dygraph.updateOptions({file: currentView.dataView});
                 }
             }
     );
+
     views[viewIndex].dygraph = dygraph;
     gs.push(views[viewIndex].dygraph);
 }
@@ -275,10 +279,10 @@ function addDygraph( viewIndex, view, viewId, metricId, viewMetadata, data, path
 
 //  Important basic graphing functions
 function drawGraphsByMetrics(data, renderDetailGraphs, viewMetadata){
-    var pathColumnIndex = columnIndex('path', data);
-    var selectedPath = $('#selected-path');
+
 
     var viewIndex = 0;
+    if( renderDetailGraphs ){ viewIndex=numberOfSimpleGraphs+1 }
     var previousCategory = '';
     for (var i = 0; i < metrics.length; i++) {
         var metric = metrics[i];
@@ -314,30 +318,30 @@ function drawGraphsByMetrics(data, renderDetailGraphs, viewMetadata){
 
         if( renderDetailGraphs ){
             var viewId = "graph-" + metricId;
-            console.log(viewId);  // TODO remove
             $('<div class="row-fluid"><div class="span12">' +
                 getMetricTitle(i) +
                 '<div id="'+viewId+'" class="simple-graph"></div>' +
                 '</div></div>'
             ).appendTo("#detailedGraphs");
-            addDygraph( viewIndex, view, viewId, metricId, viewMetadata, data, pathColumnIndex, selectedPath);
+            addDygraph( viewIndex, view, viewId, metricId, viewMetadata, data, metric.range);
+            viewIndex++;
         }
         else{
             if (1 == metric.simple) {
-                viewId = "simpleGraph-" + metricId;
+                var viewId = "simpleGraph-" + metricId;
                 $('<div class="row-fluid">' +
                     '<div class="span12">' +
                     getMetricTitle(i)
                     + '<div id="' + viewId + '" class="simple-graph"></div>' +
                     '</div></div>'
                 ).appendTo("#simpleGraphs");
-                addDygraph( viewIndex, view, viewId, metricId, viewMetadata, data, pathColumnIndex, selectedPath);
+                addDygraph( viewIndex, view, viewId, metricId, viewMetadata, data, metric.range);
+                viewIndex++;
             }
         }
-        viewIndex++;
     }
 
-
+    if( !renderDetailGraphs ){ numberOfSimpleGraphs=viewIndex }
 
 
 }
@@ -354,7 +358,6 @@ function initSimpleCharts(graphObj) {
     populateInstArray(data);
 
     var viewMetadata = {};
-    gs = [];
     // Populate array with index to every row
     var allRows = Array(data.getNumberOfRows());
     for (var i = 0; i < data.getNumberOfRows(); i++) { allRows[i] = i; }
@@ -433,6 +436,7 @@ function initSimpleCharts(graphObj) {
         var current = $(this);
         if(!detailsExist){
             drawGraphsByMetrics(data, true, viewMetadata);
+            updateAllViews(allRows);
             detailsExist=true;
         }
 
@@ -461,7 +465,6 @@ function initSimpleCharts(graphObj) {
     // Create dummy array to display thresholds for all values on init()
     // var allRowsIndex = $.map($(Array(data.getNumberOfRows())),function(val, i) { return i; }) // already created at start
     updateAllViews(allRows);
-    //$('#detailedGraphs').css("display", "none");
 }
 
 
