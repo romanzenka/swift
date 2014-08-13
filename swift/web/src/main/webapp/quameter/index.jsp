@@ -74,6 +74,12 @@
 </div>
 
 
+<div id="annotFormDiv" class="annotationDiv">
+    <form id="annotForm" action="form2.html" method="post">
+        <textarea name="text" cols="50" rows="3" style="margin: 1px"></textarea></br>
+        <input type="submit" value="Submit" style="float:right">
+    </form>
+</div>
 
 <script type="text/javascript" src="/common/bootstrap/js/bootstrap.js"></script>
 
@@ -83,7 +89,7 @@
 <script type="text/javascript" src="js/quameter-definitions.js"></script>
 <script type="text/javascript" src="js/quameter.js"></script>
 <script type="text/javascript">
-    var graphDataSrvr = <%
+    //var graphDataSrvr = <%
     if(quameterUiConfig!=null) {
         final QuameterUi quameterUi = (QuameterUi) MainFactoryContext.getSwiftEnvironment().createResource(quameterUiConfig);
         quameterUi.begin();
@@ -100,8 +106,9 @@
     null
     <% } %>
     // Set a callback to run when the Google Visualization API is loaded.
-    google.setOnLoadCallback( drawChart(graphDataSrvr) );
+    google.setOnLoadCallback( initSimpleCharts(graphDataSrvr) );
     $("body").tooltip({ selector: '[data-toggle="tooltip"]' });
+
 </script>
 <!--  Help Docs come from: http://massqc.proteomesoftware.com/help/metrics.php  -->
 <!-- Need to add troubleshooting? http://massqc.proteomesoftware.com/help/troubleshooting.php -->

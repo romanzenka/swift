@@ -31,4 +31,9 @@ public final class QuameterHideResult {
 		}
 
 	}
+
+
+ //   @RequestMapping(value = "/quameter/new-annotation/{quameterResultId}", method = RequestMethod.POST)
+
+
 }

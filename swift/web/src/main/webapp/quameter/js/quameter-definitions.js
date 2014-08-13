@@ -16,6 +16,9 @@ var selectedId = -1;
 // Array that contains true for every quameter result id that is to be hidden
 var hiddenIds = new Object();
 
+//Place holder to determine if Detailed graphs are drawn yet.
+var detailsExist = false;
+
 //Categories for Drawing graphs in series
 var metricCategories = {
         c: "Chromatography",
@@ -90,9 +93,7 @@ var metrics = [
 
 /**
  * Array.prototype.[method name] allows you to define/overwrite an objects method
- * needle is the item you are searching for
- * this is a special variable that refers to "this" instance of an Array.
- * returns true if needle is in the array, and false otherwise
+ * returns true if element is in the array, and false otherwise
  */
 Array.prototype.contains = function ( element ) {
     for (i in this) {
