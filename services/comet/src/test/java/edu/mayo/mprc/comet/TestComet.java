@@ -27,7 +27,7 @@ import java.io.StringWriter;
 /**
  * @author Roman Zenka
  */
-public class TestComet {
+public final class TestComet {
 	private static final Logger LOGGER = Logger.getLogger(TestComet.class);
 
 	private static File tempRootDir;
@@ -81,7 +81,7 @@ public class TestComet {
 			}
 
 			final CometWorker.Config cometConfig = new CometWorker.Config();
-			cometConfig.put(CometWorker.COMET_EXECUTABLE, cometExecutable);
+			cometConfig.setCometExecutable(cometExecutable);
 
 			final CometWorker.Factory factory = new CometWorker.Factory();
 			final Worker worker = factory.create(cometConfig, null);

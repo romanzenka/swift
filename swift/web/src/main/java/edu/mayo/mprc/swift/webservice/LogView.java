@@ -6,7 +6,6 @@ import edu.mayo.mprc.swift.db.SwiftDao;
 import edu.mayo.mprc.swift.dbmapping.LogData;
 import edu.mayo.mprc.swift.dbmapping.TaskData;
 import edu.mayo.mprc.utilities.FileUtilities;
-import edu.mayo.mprc.utilities.StringUtilities;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -33,9 +32,6 @@ import java.util.regex.Pattern;
 public final class LogView {
 	@Resource(name = "swiftDao")
 	private SwiftDao swiftDao;
-
-	@Resource(name = "fileTokenFactory")
-	private DatabaseFileTokenFactory fileTokenFactory;
 
 	private static final Pattern TIME_STAMP = Pattern.compile("^(\\d{1,4}-\\d{1,2}-\\d{1,2}) (\\d{1,2}:\\d{1,2}:\\d{1,2},\\d{1,3})\\s(.*)");
 	private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss,SSS");
@@ -117,66 +113,70 @@ public final class LogView {
 		outputStream.println(String.format("<h3>Log file %s</h3>", logFile.getAbsolutePath()));
 		outputStream.println("<log>");
 
-		// Long logs are just dumped
-		if (logFile.length() > 5000000) {
-			QaReport.streamFileToResponse(response, logFile, false);
+		if (logFile.exists()) {
+			// Long logs are just dumped
+			if (logFile.length() > 5000000) {
+				QaReport.streamFileToResponse(response, logFile, false);
+			} else {
+				final List<String> lines = FileUtilities.readLines(logFile);
+
+				// Establish min and max date
+				Date min = new Date();
+				Date max = null;
+				for (final String line : lines) {
+					final Matcher matcher = TIME_STAMP.matcher(line);
+					if (matcher.matches()) {
+						final String dateTime = matcher.group(1) + ' ' + matcher.group(2);
+						try {
+							final Date date = DATE_FORMAT.parse(dateTime);
+							if (date.before(min)) {
+								min = date;
+							}
+							if (max == null) {
+								max = date;
+							} else if (max.before(date)) {
+								max = date;
+							}
+						} catch (final ParseException ignore) {
+							// SWALLOWED: We do not care
+						}
+					}
+				}
+				final long minTime = min.getTime();
+				final long maxTime = max != null ? max.getTime() : new Date().getTime();
+				long prevTime = minTime;
+				long time = minTime;
+
+				for (final String line : lines) {
+					final Matcher matcher = TIME_STAMP.matcher(line);
+					if (matcher.matches() && maxTime > minTime) {
+						final String dateTime = matcher.group(1) + ' ' + matcher.group(2);
+						final String row = matcher.group(3);
+						Date date = null;
+						try {
+							date = DATE_FORMAT.parse(dateTime);
+							prevTime = time;
+							time = date.getTime();
+						} catch (final ParseException ignore) {
+							// SWALLOWED: We do not care
+							// Reset time to a reasonable value
+							time = prevTime;
+						}
+
+						final long width = (int) (1000.0 * (time - minTime) / (maxTime - minTime));
+						outputStream.println("<row>" +
+								"<time title=\"" + dateTime + "\">" + matcher.group(2) + "</time>" +
+								row +
+								"<prg style=\"width: " + width + "px\"></prg>" +
+								"</row>");
+					} else {
+						outputStream.println("<row>" + line + "</row>");
+					}
+
+				}
+			}
 		} else {
-			final List<String> lines = FileUtilities.readLines(logFile);
-
-			// Establish min and max date
-			Date min = new Date();
-			Date max = null;
-			for (final String line : lines) {
-				final Matcher matcher = TIME_STAMP.matcher(line);
-				if (matcher.matches()) {
-					final String dateTime = matcher.group(1) + ' ' + matcher.group(2);
-					try {
-						final Date date = DATE_FORMAT.parse(dateTime);
-						if (date.before(min)) {
-							min = date;
-						}
-						if (max == null) {
-							max = date;
-						} else if (max.before(date)) {
-							max = date;
-						}
-					} catch (final ParseException ignore) {
-						// SWALLOWED: We do not care
-					}
-				}
-			}
-			final long minTime = min.getTime();
-			final long maxTime = max != null ? max.getTime() : new Date().getTime();
-			long prevTime = minTime;
-			long time = minTime;
-
-			for (final String line : lines) {
-				final Matcher matcher = TIME_STAMP.matcher(line);
-				if (matcher.matches() && maxTime > minTime) {
-					final String dateTime = matcher.group(1) + ' ' + matcher.group(2);
-					final String row = matcher.group(3);
-					Date date = null;
-					try {
-						date = DATE_FORMAT.parse(dateTime);
-						prevTime = time;
-						time = date.getTime();
-					} catch (final ParseException ignore) {
-						// SWALLOWED: We do not care
-						// Reset time to a reasonable value
-						time = prevTime;
-					}
-
-					final long width = (int) (1000.0 * (time - minTime) / (maxTime - minTime));
-					outputStream.println("<row>" +
-							"<time title=\"" + dateTime + "\">" + matcher.group(2) + "</time>" +
-							row +
-							"<prg style=\"width: " + width + "px\"></prg>" +
-							"</row>");
-				} else {
-					outputStream.println("<row>" + line + "</row>");
-				}
-
-			}
+			outputStream.println("(log file does not exist)");
 		}
 		outputStream.println("</log>");
 	}

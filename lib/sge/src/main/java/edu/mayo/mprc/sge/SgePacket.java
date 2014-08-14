@@ -1,9 +1,7 @@
 package edu.mayo.mprc.sge;
 
 import edu.mayo.mprc.config.DaemonConfigInfo;
-import edu.mayo.mprc.config.ResourceConfig;
 import edu.mayo.mprc.daemon.files.FileHolder;
-import edu.mayo.mprc.daemon.files.FileTokenHolder;
 import edu.mayo.mprc.messaging.SerializedRequest;
 
 import java.io.File;
@@ -15,8 +13,8 @@ import java.io.File;
 public final class SgePacket extends FileHolder {
 
 	private SerializedRequest serializedRequest;
-	// How to create the worker (assumes worker has no dependencies!)
-	private ResourceConfig workerFactoryConfig;
+	// Id of the worker to invoke (has to match Swift's configuration)
+	private String serviceName;
 	// For initializing FileTokenFactory - config of the daemon on whose behalf we run
 	private DaemonConfigInfo daemonConfigInfo;
 
@@ -26,10 +24,10 @@ public final class SgePacket extends FileHolder {
 	public SgePacket() {
 	}
 
-	public SgePacket(final SerializedRequest serializedRequest, final ResourceConfig workerFactoryConfig, final DaemonConfigInfo daemonConfigInfo,
+	public SgePacket(final SerializedRequest serializedRequest, final String serviceName, final DaemonConfigInfo daemonConfigInfo,
 	                 final File logFolder) {
 		setSerializedRequest(serializedRequest);
-		setWorkerFactoryConfig(workerFactoryConfig);
+		setServiceName(serviceName);
 		setDaemonConfigInfo(daemonConfigInfo);
 		setLogFolder(logFolder);
 	}
@@ -38,19 +36,19 @@ public final class SgePacket extends FileHolder {
 		return serializedRequest.getMessage();
 	}
 
-	public ResourceConfig getWorkerFactoryConfig() {
-		return workerFactoryConfig;
+	public String getServiceName() {
+		return serviceName;
 	}
 
-	public void setWorkerFactoryConfig(final ResourceConfig workerFactoryConfig) {
-		this.workerFactoryConfig = workerFactoryConfig;
+	public void setServiceName(final String serviceName) {
+		this.serviceName = serviceName;
 	}
 
 	public SerializedRequest getSerializedRequest() {
 		return serializedRequest;
 	}
 
-	public void setSerializedRequest(SerializedRequest serializedRequest) {
+	public void setSerializedRequest(final SerializedRequest serializedRequest) {
 		this.serializedRequest = serializedRequest;
 	}
 
@@ -66,7 +64,7 @@ public final class SgePacket extends FileHolder {
 		return logFolder;
 	}
 
-	public void setLogFolder(File logFolder) {
+	public void setLogFolder(final File logFolder) {
 		this.logFolder = logFolder;
 	}
 }

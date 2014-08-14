@@ -4,7 +4,7 @@ import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.xml.DomDriver;
 import edu.mayo.mprc.MprcException;
 import edu.mayo.mprc.ReleaseInfoCore;
-import edu.mayo.mprc.config.DependencyResolver;
+import edu.mayo.mprc.config.*;
 import edu.mayo.mprc.daemon.DaemonProgress;
 import edu.mayo.mprc.daemon.DaemonProgressMessage;
 import edu.mayo.mprc.daemon.files.FileTokenFactory;
@@ -51,7 +51,7 @@ public class RunSge implements SwiftCommand {
 	@Override
 	public ExitCode run(final SwiftEnvironment environment) {
 		final String xmlConfigFilePath = environment.getParameters().get(0);
-		return run(new File(xmlConfigFilePath));
+		return run(new File(xmlConfigFilePath), environment.getApplicationConfig());
 	}
 
 	/**
@@ -59,7 +59,7 @@ public class RunSge implements SwiftCommand {
 	 *
 	 * @param workPacketXmlFile File containing the serialized work packet.
 	 */
-	public ExitCode run(final File workPacketXmlFile) {
+	public ExitCode run(final File workPacketXmlFile, final ApplicationConfig applicationConfig) {
 		// Wait for the work packet to fully materialize in case it was transferred over a shared filesystem
 		FileUtilities.waitForFileBlocking(workPacketXmlFile);
 
@@ -94,7 +94,9 @@ public class RunSge implements SwiftCommand {
 			daemonLoggerFactory = new DaemonLoggerFactory(sgePacket.getLogFolder());
 
 			final DependencyResolver dependencies = new DependencyResolver(resourceTable);
-			final Worker daemonWorker = (Worker) resourceTable.createSingleton(sgePacket.getWorkerFactoryConfig(), dependencies);
+
+			final ResourceConfig config = getConfigForServiceName(applicationConfig, sgePacket.getServiceName());
+			final Worker daemonWorker = (Worker) resourceTable.createSingleton(config, dependencies);
 			final DaemonWorkerProgressReporter progressReporter = new DaemonWorkerProgressReporter(request);
 			final WorkPacket workPacket = (WorkPacket) sgePacket.getWorkPacket();
 			final ParentLog parentLog = daemonLoggerFactory.createLog(workPacket.getTaskId(), progressReporter);
@@ -126,6 +128,17 @@ public class RunSge implements SwiftCommand {
 
 		LOGGER.info("Work packet " + sgePacket.getWorkPacket().toString() + " successfully processed.");
 		return ExitCode.Ok;
+	}
+
+	private ResourceConfig getConfigForServiceName(final ApplicationConfig applicationConfig, final String serviceName) {
+		for (final DaemonConfig daemonConfig : applicationConfig.getDaemons()) {
+			for (final ServiceConfig service : daemonConfig.getServices()) {
+				if (service.getName().equals(serviceName)) {
+					return service.getRunner().getWorkerConfiguration();
+				}
+			}
+		}
+		throw new MprcException(String.format("No service named %s found", serviceName));
 	}
 
 	public ResourceTable getResourceTable() {

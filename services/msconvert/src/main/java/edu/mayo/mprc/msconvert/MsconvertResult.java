@@ -10,13 +10,13 @@ import java.io.File;
  */
 public final class MsconvertResult extends FileHolder implements ProgressInfo {
 	private static final long serialVersionUID = 20101025l;
-	private File mgf;
+	private File outputFile;
 
-	public MsconvertResult(final File mgfFile) {
-		mgf = mgfFile;
+	public MsconvertResult(final File outputFile) {
+		this.outputFile = outputFile;
 	}
 
-	public File getMgf() {
-		return mgf;
+	public File getOutputFile() {
+		return outputFile;
 	}
 }

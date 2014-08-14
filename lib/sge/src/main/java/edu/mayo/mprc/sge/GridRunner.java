@@ -97,7 +97,7 @@ public final class GridRunner extends AbstractRunner {
 			final SgePacket gridDaemonAllocatorInputObject =
 					new SgePacket(
 							serviceFactory.serializeRequest(request.getWorkPacket(), getDaemon().getResponseDispatcher(), allocatorListener)
-							, workerFactoryConfig
+							, daemonConnection.getConnectionName()
 							, fileTokenFactory.getDaemonConfigInfo(),
 							getDaemonLoggerFactory().getLogFolder());
 
