@@ -83,3 +83,15 @@ a.modLink:hover{
     .navbar a.brand {
         margin-left: -15px;
     }
+
+
+    .annotationDiv{
+        display: none;
+        background-color:darkgray;
+        padding:2px;
+        z-index:2;
+        top:75px;
+        right:15px;
+        position:fixed;
+        border:1px solid black;
+    }

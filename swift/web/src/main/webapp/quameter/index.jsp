@@ -43,7 +43,7 @@
             </div>
             <div class="btn-toolbar pull-left">
                 <div class="btn-group" id="view-buttons">
-                    <div class="btn btn-info" id="compact-button">Simple</div>
+                    <div class="btn btn-info" id="compact-button">Details</div>
                 </div>
             </div>
             <div class="row-fluid">
@@ -59,7 +59,7 @@
         </div>
     </div>
 
-    <% if (quameterUiConfig == null) { %>
+    <% if (quameterUiConfig != null) { %>  <!-- TODO REMOVE NOT BEFORE COMMIT -->
     <div class="alert">
         <p><strong>Warning</strong> The QuaMeter module is not configured.</p>
         <p>You need to add the QuaMeterUi resource to the
@@ -67,23 +67,29 @@
             </code> daemon.</p>
     </div>
     <% } else { %>
-        <div id="detailedGraphs" style="margin-top: 50px"></div>
+        <div id="detailedGraphs" style="margin-top: 50px;"></div>
         <div id="simpleGraphs" style="margin-top: 50px"></div>
 
     <% } %>
 </div>
 
 
+<div id="annotFormDiv" class="annotationDiv">
+    <form id="annotForm" action="/service/new-annotation/" method="post">
+        <textarea name="text" cols="50" rows="3" style="margin: 1px"></textarea></br>
+        <input type="submit" value="Submit" style="float:right">
+    </form>
+</div>
 
 <script type="text/javascript" src="/common/bootstrap/js/bootstrap.js"></script>
 
 <!-- Graph Dependancies -->
-<script type="text/javascript" src="js/tmp.js"></script>
+<script type="text/javascript" src="js/tmp.js"></script> <!-- TODO REMOVE LINE BEFORE COMMIT -->
 <script type="text/javascript" src="js/dygraph-combined.js"></script>
 <script type="text/javascript" src="js/quameter-definitions.js"></script>
 <script type="text/javascript" src="js/quameter.js"></script>
 <script type="text/javascript">
-    var graphDataSrvr = <%
+    //var graphDataSrvr = <%  // TODO remove commment before commit
     if(quameterUiConfig!=null) {
         final QuameterUi quameterUi = (QuameterUi) MainFactoryContext.getSwiftEnvironment().createResource(quameterUiConfig);
         quameterUi.begin();
@@ -100,8 +106,9 @@
     null
     <% } %>
     // Set a callback to run when the Google Visualization API is loaded.
-    google.setOnLoadCallback( drawChart(graphDataSrvr) );
+    google.setOnLoadCallback( initSimpleCharts(graphDataSrvr) );
     $("body").tooltip({ selector: '[data-toggle="tooltip"]' });
+
 </script>
 <!--  Help Docs come from: http://massqc.proteomesoftware.com/help/metrics.php  -->
 <!-- Need to add troubleshooting? http://massqc.proteomesoftware.com/help/troubleshooting.php -->
