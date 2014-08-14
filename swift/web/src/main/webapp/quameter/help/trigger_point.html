@@ -1,0 +1,38 @@
+<link rel="stylesheet" href="../css/help.css" type="text/css" media="screen" charset="utf-8"/>
+<script src="../js/AC_RunActiveContent.js" type="text/javascript"></script>
+
+<div id="content">
+    <div class="heading">Trigger Point</div>
+    <p>The <strong>Trigger Point</strong> is the intensity on the<strong> extracted ion current (XIC) chromatogram  </strong> where the MS2 scan is triggered.</p>
+    <p>High <strong>Trigger Point</strong> mean that the mass spectrometer is efficiently sampling the signal for the MS2 scans. A low <strong>Trigger Point</strong> means that only a small portion of the available signal is being used for peptide identification.</p>
+    <p>The <strong>Trigger Point</strong> metric is the percentage of the maximum MS1 peak which is sampled for MS2. The metric is the median value of this measurement over all the times that MS2 is sampled.</p>
+    <script type="text/javascript">
+        AC_FL_RunContent( 'codebase','http://download.macromedia.com/pub/shockwave/cabs/flash/swflash.cab#version=7,0,19,0','width','400','height','300','title','MassQC Trigger Point','src','swf/MS2TriggerPoint','quality','high','pluginspage','http://www.macromedia.com/go/getflashplayer','movie','swf/MS2TriggerPoint' ); //end AC code
+    </script>
+    <!-- <embed width="400" height="300" title="MassQC Trigger Point" src="swf/MS2TriggerPoint.swf" quality="high" pluginspage="http://www.macromedia.com/go/getflashplayer" type="application/x-shockwave-flash"> <noscript>&lt;object classid="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000" codebase="http://download.macromedia.com/pub/shockwave/cabs/flash/swflash.cab#version=7,0,19,0" width="400" height="300" title="MassQC Trigger Point"&gt;
+   &lt;param name="movie" value="swf/MS2TriggerPoint.swf"&gt;
+   &lt;param name="quality" value="high"&gt;
+   &lt;embed src="swf/MS2TriggerPoint.swf" quality="high" pluginspage="http://www.macromedia.com/go/getflashplayer" type="application/x-shockwave-flash" width="400" height="300"&gt;&lt;/embed&gt;
+   &lt;/object&gt;</noscript>-->
+    <div class="heading">Units:</div>
+    <p><strong> Percent (%)</strong>
+    </p><div class="heading">Optimal:</div>
+    <p><strong>Higher</strong>
+    </p><p>The most reproducible <strong>LC-MS</strong> performance is when this metric remains in a narrow range over a series of runs. Wide variability in any metric means your process is not reproducible.
+    </p>
+    <div class="heading">What the Metric Detects:</div>
+    <p>Under ideal circumstances, chromatographic peaks would be  sampled at their maximum intensity.  That is, the <strong>Trigger Point</strong> metric would be 100%.
+        If the <strong>Trigger Point</strong> is too low, there may be insufficient ion current for the MS2 spectrum to have a <strong>signal-to-noise</strong> ratio that is adequate for successful peptide identification.
+    </p><p>Since the <strong>Trigger Point</strong> is a percentage of the peak height, an unusually high <strong>Trigger Point</strong> may indicate that there are many peaks just above the <strong>Trigger Point</strong>. In other words, the <strong>MS/MS</strong> is triggering on noise.
+    </p>
+    <div class="heading">Related Metrics: </div>
+    <p>The <strong>Trigger Point</strong> is calculated for all the MS2 spectra attached to peptides. The <a href="low_intensity_trigger_point.php">Low Intensity Trigger Point </a>is the same as the <strong>Trigger Point</strong> except it is calculated only for the MS1 peaks with low intensity, i.e., lowest 50% in abundance.
+    </p><p>If the <strong>MS/MS</strong> instrument is set to trigger MS2 scans at a very low intensity, then the MS2 may  often be triggered on noise. This circumstance might be detected by the MS1 <a href="ms1_signal_to_noise.php">Signal to Noise</a> Metric.
+    </p>
+    <div class="heading">Related Troubleshooting Topics:</div>
+    <ul>
+        <li><a href="/help/troubleshooting/multiple_failures.php">Multiple Failures</a></li>
+        <li><a href="/help/troubleshooting/dynamic_exclusion_settings.php">Dynamic Exclusion - Ion Trap Settings</a></li>
+    </ul>
+    </p>
+</div>

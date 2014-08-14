@@ -94,7 +94,20 @@ public final class QuameterDaoHibernate extends DaoBase implements QuameterDao {
 		getSession().saveOrUpdate(quameterResult);
 	}
 
-	@Override
+    @Override
+    public List<QuameterAnnotation> listAnnotations() {
+        ///// Add dummy code -
+        // TODO: Roman to add actual code
+        return null;  //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    @Override
+    public void createQuameterAnntation(QuameterAnnotation q) {
+        //TODO: raymond added to appease compile
+        //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    @Override
 	public int getIdentifiedSpectra(int fileSearchId, Map<String, Pattern> categoryToProteins) {
 		final FileSearch fileSearch = swiftDao.getFileSearchForId(fileSearchId);
 		final SwiftSearchDefinition swiftSearchDefinition = swiftDao.getSwiftSearchDefinition(fileSearch.getSwiftSearchDefinitionId());

@@ -41,11 +41,12 @@ function addButtons(div, data, columnId) {
     }).sort();
 
     $.each(keys, function (index, value) {
+        var niceName = getNiceName(value);
         var btnClass = 'btn-primary';
-//        if(columnId === 'instrument' && !defaultSelectedInsturmentNames.contains(value)){
-//            btnClass = 'btn-default';
-//        }
-        div.append('<button type="button" class="btn '+btnClass+' value="' + value + '">' + getNiceName(value) + ' (' + names[value] + ')<' + '/button>');
+        if( !niceName.match(/^Orbi/) && columnId === 'instrument'){
+            btnClass = 'btn-default';
+        }
+        div.append('<button type="button" class="btn '+btnClass+'" value="'+value+'">'+niceName+' ('+names[value]+')<' + '/button>');
     });
 }
 
@@ -63,7 +64,7 @@ function createNewAnnotationForm(parentName){
     var metricCode = parentName.split("-")[-1];
     $('<input>').attr({
         type: 'hidden',
-        id: 'code',
+        id: 'metricCode',
         name: metricCode
     }).appendTo('#annotForm');
     $('#annotFormDiv').show();//.appendTo('body')
@@ -90,16 +91,56 @@ function spanAllUnderscoreTokens(s) {
     }).join('_');
 }
 
+
+function activeCatagoriesFilters(){
+    var selectedCategory = [];
+    categoryButtons().each(function () {
+        if ($(this).hasClass('btn-primary')) {
+            selectedCategory.push($(this).attr("value"));
+        }
+    });
+    return selectedCategory;
+}
+
+function activeInstrumentFilters(){
+    var selectedCategory = [];
+    instrumentButtons().each(function () {
+        if ($(this).hasClass('btn-primary')) {
+            selectedCategory.push($(this).attr("value"));
+        }
+    });
+    return selectedCategory;
+}
+
+
+
+
+
 // Callback that filters all the views, updating the stdev ranges
-function updateAllViews(filteredRows) {
+function updateAllViews(data) {
     blockRedraw = true;
     // We deselect the user-selected point
     pointSelected = -1;
     pointHighlighted = -1;
+
+    activeCats = activeCatagoriesFilters();
+
+
+    var filteredRows = [];
+    for (var r=0; r<data.getNumberOfRows(); r++) {
+        var category = data.getValue(r, columnIndex('category', data) );
+        var rowId = data.getValue(r, columnIndex("id", data))
+        if ( activeCats.contains(category) && !hiddenIds["id"+rowId]) {
+            filteredRows.push(r)
+        }
+    }
+
     for (var i = 0; i < views.length; i++) {
-        if(views[i] === undefined){continue} //empty for detail graphs until generated
+       if(views[i] === undefined){console.log(i);continue;} //empty for detail graphs until generated
 
         views[i].dataView.setRows(filteredRows);
+        views[i].dataView.setColumns( getSmartColumns(columnIndex("startTime",data),views[i].metricId) );
+
         var sum = 0;
         var count = views[i].dataView.getNumberOfRows();
         var values = new Array(count);
@@ -143,8 +184,7 @@ function selectPoint(data, dataRow) {
     } else {
         var transactionColumnIndex = columnIndex("transaction", data);
         selectedTransaction = data.getValue(dataRow, transactionColumnIndex);
-        var idColumnIndex = columnIndex("id", data);
-        selectedId = data.getValue(dataRow, idColumnIndex);
+        selectedId = data.getValue(dataRow, columnIndex("id", data));
         $('#search-link').attr("href", '/start/?load=' + selectedTransaction);
         $('#qa-link').attr("href", '/service/qa/' + selectedTransaction + "/index.html");
         $('#icons').show();
@@ -196,6 +236,7 @@ function addDygraph( viewIndex, view, viewId, metricId, viewMetadata, data, rang
                     var range = me.xAxisRange();
                     for (var j = 0; j < views.length; j++) {
                         if (gs[j] == me) continue;
+                        if(gs[j] === undefined){console.log(j,gs)} //TODO errant lookup
                         gs[j].updateOptions({
                             dateWindow: range
                         });
@@ -282,7 +323,7 @@ function drawGraphsByMetrics(data, renderDetailGraphs, viewMetadata){
 
 
     var viewIndex = 0;
-    if( renderDetailGraphs ){ viewIndex=numberOfSimpleGraphs+1 }
+    if( renderDetailGraphs ){ viewIndex=numberOfSimpleGraphs }
     var previousCategory = '';
     for (var i = 0; i < metrics.length; i++) {
         var metric = metrics[i];
@@ -304,17 +345,8 @@ function drawGraphsByMetrics(data, renderDetailGraphs, viewMetadata){
         }
 
         var view = new google.visualization.DataView(data);
-        var cols = [ columnIndex("startTime", data) ];
 
-        for(j=0; j<rawInsturmentNames.length; j++){
-            cols.push({type:'number', label: getNiceName(rawInsturmentNames[j]),
-                calc: (function (iterJ, metID) {
-                    return function (dt, row) {
-                        return (dt.getValue(row, 4) === rawInsturmentNames[iterJ]) ?  dt.getValue(row, columnIndex(metID,dt)) : null;                    }
-                })(j,metricId)
-            });
-        };
-        view.setColumns(cols);
+        view.setColumns( getSmartColumns(columnIndex("startTime",data),metricId) );
 
         if( renderDetailGraphs ){
             var viewId = "graph-" + metricId;
@@ -340,14 +372,8 @@ function drawGraphsByMetrics(data, renderDetailGraphs, viewMetadata){
             }
         }
     }
-
     if( !renderDetailGraphs ){ numberOfSimpleGraphs=viewIndex }
-
-
 }
-
-
-
 
 
 
@@ -363,9 +389,7 @@ function initSimpleCharts(graphObj) {
     for (var i = 0; i < data.getNumberOfRows(); i++) { allRows[i] = i; }
     viewMetadata.filteredRows = allRows;
 
-
     selectPoint(data, -1);
-
 
     // Make buttons
     var categoryDiv = $('#category-buttons');
@@ -373,50 +397,11 @@ function initSimpleCharts(graphObj) {
     var instrumentDiv = $('#instrument-buttons');
     addButtons(instrumentDiv, data, 'instrument');
 
-    var idColumnIndex = columnIndex('id',data);
     blockRedraw = true;
 
     drawGraphsByMetrics(data, false, viewMetadata);
 
-
     blockRedraw = false;
-
-    function refilterRows() {
-
-        var selectedCategory = [];
-         categoryButtons().each(function () {
-             if ($(this).hasClass('btn-primary')) {
-                 selectedCategory.push($(this).attr("value"));
-             }
-         });
-
-         var selectedInstrument = [];
-         instrumentButtons().each(function () {
-             if ($(this).hasClass('btn-primary')) {
-                 selectedInstrument.push($(this).attr("value"));
-             }
-         });
-
-         function filterRows() {
-             var filteredRows = [];
-             for (var row = 0; row < data.getNumberOfRows(); row++) {
-                 var category = data.getValue(row, columnIndex('category', data) );
-                 var instrument = data.getValue(row, columnIndex('instrument',data) );
-                 var rowId = data.getValue(row, idColumnIndex)
-                 if (0 <= $.inArray(category, selectedCategory)
-                         && 0 <= $.inArray(instrument, selectedInstrument)
-                         && !hiddenIds["id"+rowId]) {
-                     filteredRows.push(row);
-                 }
-             }
-             return filteredRows;
-         }
-
-         var filteredRows = filterRows();
-
-         viewMetadata.filteredRows = filteredRows;
-         updateAllViews(filteredRows);
-    }
 
     // Change button Colors then Filter based on value
     $('.btn').button();
@@ -428,7 +413,7 @@ function initSimpleCharts(graphObj) {
             current.removeClass("btn-primary");
         }
         current.toggleClass("btn-primary");
-        refilterRows();
+        updateAllViews(data);
     });
 
     // Simple/Detailed Button
@@ -436,7 +421,7 @@ function initSimpleCharts(graphObj) {
         var current = $(this);
         if(!detailsExist){
             drawGraphsByMetrics(data, true, viewMetadata);
-            updateAllViews(allRows);
+            updateAllViews(data);
             detailsExist=true;
         }
 
@@ -459,12 +444,30 @@ function initSimpleCharts(graphObj) {
         $.post("/service/quameter-hide/" + selectedId);
         hiddenIds["id"+selectedId] = true;
         selectPoint(data, -1);
-        refilterRows();
+        updateAllViews(data);
       });
 
     // Create dummy array to display thresholds for all values on init()
     // var allRowsIndex = $.map($(Array(data.getNumberOfRows())),function(val, i) { return i; }) // already created at start
-    updateAllViews(allRows);
+
+    //Looks at the butons and filters rows & columns based on selection
+    updateAllViews(data);
 }
 
 
+
+
+
+function getSmartColumns(dataIdx, metricId){
+    var cols = [ dataIdx ];
+    var rawInsturmentNames = activeInstrumentFilters();
+    for(j=0; j<rawInsturmentNames.length; j++){
+        cols.push({type:'number', label: getNiceName(rawInsturmentNames[j]),
+            calc: (function (iterJ, metID) {
+                return function (dt, row) {
+                    return (dt.getValue(row, 4) === rawInsturmentNames[iterJ]) ?  dt.getValue(row, columnIndex(metID,dt)) : null;                    }
+            })(j,metricId)
+        });
+    };
+    return cols;
+}

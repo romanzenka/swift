@@ -1,6 +1,7 @@
 package edu.mayo.mprc.swift.webservice;
 
 import edu.mayo.mprc.MprcException;
+import edu.mayo.mprc.quameterdb.dao.QuameterAnnotation;
 import edu.mayo.mprc.quameterdb.dao.QuameterDao;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -33,7 +34,23 @@ public final class QuameterHideResult {
 	}
 
 
- //   @RequestMapping(value = "/quameter/new-annotation/{quameterResultId}", method = RequestMethod.POST)
+
+    @RequestMapping(value = "/new-annotation/{form}", method = RequestMethod.POST)
+    @ResponseBody
+    public void createQuameterAnnotation(QuameterAnnotation input) {
+       System.out.println(input);
+       /* quameterDao.begin();
+        try {
+            quameterDao.hideQuameterResult(quameterResultId);
+            quameterDao.commit();
+        } catch (Exception e) {
+            quameterDao.rollback();
+            throw new MprcException("Could not hide quameter result " + quameterResultId, e);
+        }*/
+
+    }
+    //quameterDao.listAnnotations() // use the interface to access
+
 
 
 }

@@ -19,7 +19,8 @@ var hiddenIds = new Object();
 //Place holder to determine if Detailed graphs are drawn yet.
 var detailsExist = false;
 
-// var defaultSelectedInsturmentNames=['01475B']; // By Default only Show Orbi
+//Global list of ids that should NOT be displayed
+var hiddenIds = {};
 
 //Categories for Drawing graphs in series
 var metricCategories = {
@@ -47,27 +48,24 @@ function getNiceName( str ){
     }
 }
 
-/// Peak width y range (0 to 30sec) & peak spread
-/// Duration y range (0 60 sec)
-
 var metrics = [
         { code: "c_1a", label: "C-1A", name: "Bleed Ratio", good: "low", simple: 0, desc: "Fraction of peptides with repeat identifications >4 min earlier than identification closest to the chromatographic maximum" },
         { code: "c_1b", label: "C-1B", name: "Peak Tailing Ratio", good: "low", simple: 0, desc: "Fraction of peptides with repeat identifications >4 min later than identification closest to the chromatographic maximum" },
         { code: "c_2a", label: "C-2A", name: "Retention Window", good: "high", simple: 0, link: 'help/retention_spread.html', desc: "Retention time period over which the middle 50% of the identified peptides eluted (minutes)" },
-        { code: "duration", label: "Duration", name: "Duration", good: "range", simple: 0, desc: "Acquisition duration (minutes)" },
+        { code: "duration", label: "Duration", name: "Duration", good: "range", simple: 0, range: [0,60], desc: "Acquisition duration (minutes)" },
         { code: "c_2b", label: "C-2B", name: "ID Rate", good: "high", simple: 1, link: 'help/peptides_per_minute.html', desc: "Rate of peptide identification during the C-2A time range" },
         { code: "c_3a", label: "C-3A", name: "Peak Width", good: "low", simple: 1, range: [0,40], link: 'help/peak_width.html', desc: "Median identified peak width" },
-        { code: "c_3b", label: "C-3B", name: "Peak Width Spread", good: "low", simple: 1, range: [0,40], link: 'help/peak_width_variability.html', desc: "Interquantile range for peak widths" },
+        { code: "c_3b", label: "C-3B", name: "Peak Width Spread", good: "low", simple: 1, range: [0,30], link: 'help/peak_width_variability.html', desc: "Interquantile range for peak widths" },
         { code: "c_4a", label: "C-4A", name: "Late Peak Width", good: "low", simple: 0, desc: "Median peak width over <i>last 10%</i> of the elution time" },
         { code: "c_4b", label: "C-4B", name: "Early Peak Width", good: "low", simple: 0, desc: "Median peak width over <i>first 10%</i> of the elution time" },
         { code: "c_4c", label: "C-4C", name: "Middle Peak Width", good: "low", simple: 0, desc: "Median peak width over <i>middle 10%</i> of the elution time" },
         { code: "ds_1a", label: "DS-1A", name: "Singly Identified", good: "high", simple: 0, desc: "Ratio of singly to doubly identified peptide ions." },
         { code: "ds_1b", label: "DS-1B", name: "Triply Identified", good: "high", simple: 0, desc: "Ratio of doubly to triply identified peptide ions." },
-        { code: "ds_2a", label: "DS-2A", name: "MS1 Scans", good: "range", simple: 0, desc: "Number of MS1 scans acquired during the C-2A time range" },
-        { code: "ds_2b", label: "DS-2B", name: "MS2 Scans", good: "high", simple: 0, desc: "Number of MS2 scans acquired during the C-2A time range" },
-        { code: "ds_3a", label: "DS-3A", name: "Peak Sampling", good: "low", simple: 0, desc: "Median ratio of the maximum MS1 peak intensity over the MS1 intensity at the sampling time for all identified peptides. We want to capture peak at its apex." },
-        { code: "ds_3b", label: "DS-3B", name: "Low Peak Sampling", good: "low", simple: 0, desc: "Median ratio of the maximum MS1 peak intensity over the MS1 intensity at the sampling time for peptides with peak intensity in bottom 50%. We want to capture peak at its apex even for low-intensity peptides." },
-        { code: "is_1a", label: "IS-1A", name: "TIC Drop", good: "low", simple: 0, desc: "TIC dropped more than 10x in two consecutive MS1 scans (within the C-2A time range)" },
+        { code: "ds_2a", label: "DS-2A", name: "MS1 Scans", good: "range", simple: 0, link: 'help/ms1_spectra.html', desc: "Number of MS1 scans acquired during the C-2A time range" },
+        { code: "ds_2b", label: "DS-2B", name: "MS2 Scans", good: "high", simple: 0, link: 'help/ms2_spectra.html', desc: "Number of MS2 scans acquired during the C-2A time range" },
+        { code: "ds_3a", label: "DS-3A", name: "Peak Sampling", good: "low", simple: 0, link:'help/trigger_point.html', desc: "Median ratio of the maximum MS1 peak intensity over the MS1 intensity at the sampling time for all identified peptides. We want to capture peak at its apex." },
+        { code: "ds_3b", label: "DS-3B", name: "Low Peak Sampling", good: "low", simple: 0, link: 'help/low_intensity_trigger_point.html',desc: "Median ratio of the maximum MS1 peak intensity over the MS1 intensity at the sampling time for peptides with peak intensity in bottom 50%. We want to capture peak at its apex even for low-intensity peptides." },
+        { code: "is_1a", label: "IS-1A", name: "TIC Drop", good: "low", simple: 0, link: 'help/spray_instability.html', desc: "TIC dropped more than 10x in two consecutive MS1 scans (within the C-2A time range)" },
         { code: "is_1b", label: "IS-1B", name: "TIC Jump", good: "low", simple: 0, desc: "TIC jumped more than 10x in two consecutive MS1 scans (within the C-2A time range)" },
         { code: "is_2", label: "IS-2", name: "Precursor", good: "range", simple: 1, desc: "Median precursor of identified peptide ions" },
         { code: "is_3a", label: "IS-3A", name: "1+ charge", good: "low", simple: 0, desc: "Ratio of 1+/2+ identified peptides" },
