@@ -63,9 +63,9 @@ public final class ReportUpdate implements HttpRequestHandler {
 		final String rerun = req.getParameter("rerun");
 		if (rerun != null) {
 			swiftDao.begin(); // Transaction-per-request
-			final String onlyFailedString = req.getParameter("onlyFailed");
-			final boolean onlyFailed = "true".equals(onlyFailedString);
-			rerunSearch(req, resp, rerun, onlyFailed);
+			final String skipSuccessfulParam = req.getParameter("skipSuccessful");
+			final boolean skipSuccessful = "true".equals(skipSuccessfulParam);
+			rerunSearch(req, resp, rerun, skipSuccessful);
 			swiftDao.commit();
 			return;
 		}
@@ -200,7 +200,7 @@ public final class ReportUpdate implements HttpRequestHandler {
 		return getWebUiHolder().getWebUi();
 	}
 
-	private void rerunSearch(final HttpServletRequest req, final HttpServletResponse resp, final String rerun, final boolean onlyFailed) throws ServletException {
+	private void rerunSearch(final HttpServletRequest req, final HttpServletResponse resp, final String rerun, final boolean skipSuccessful) throws ServletException {
 		PrintWriter output;
 		try {
 			output = resp.getWriter();
@@ -209,8 +209,8 @@ public final class ReportUpdate implements HttpRequestHandler {
 			output = new PrintWriter(System.out);
 		}
 		final SearchRun td = getSearchRunForId(rerun);
-		// If we did not actually fail and onlyFailed is true, we do not restart
-		if (td.getTasksFailed() != 0 || !onlyFailed) {
+		// If are successful and skipSuccessful is true, we do not restart
+		if (!skipSuccessful || !td.isCompleted() || td.getTasksFailed() != 0) {
 			final ResubmitProgressListener listener = new ResubmitProgressListener();
 
 			try {
