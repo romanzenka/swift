@@ -63,7 +63,9 @@ public final class ReportUpdate implements HttpRequestHandler {
 		final String rerun = req.getParameter("rerun");
 		if (rerun != null) {
 			swiftDao.begin(); // Transaction-per-request
-			rerunSearch(req, resp, rerun);
+			final String onlyFailedString = req.getParameter("onlyFailed");
+			final boolean onlyFailed = "true".equals(onlyFailedString);
+			rerunSearch(req, resp, rerun, onlyFailed);
 			swiftDao.commit();
 			return;
 		}
@@ -198,7 +200,7 @@ public final class ReportUpdate implements HttpRequestHandler {
 		return getWebUiHolder().getWebUi();
 	}
 
-	private void rerunSearch(final HttpServletRequest req, final HttpServletResponse resp, final String rerun) throws ServletException {
+	private void rerunSearch(final HttpServletRequest req, final HttpServletResponse resp, final String rerun, final boolean onlyFailed) throws ServletException {
 		PrintWriter output;
 		try {
 			output = resp.getWriter();
@@ -207,28 +209,30 @@ public final class ReportUpdate implements HttpRequestHandler {
 			output = new PrintWriter(System.out);
 		}
 		final SearchRun td = getSearchRunForId(rerun);
+		// If we did not actually fail and onlyFailed is true, we do not restart
+		if (td.getTasksFailed() != 0 || !onlyFailed) {
+			final ResubmitProgressListener listener = new ResubmitProgressListener();
 
-		final ResubmitProgressListener listener = new ResubmitProgressListener();
-
-		try {
-			swiftSearcherCaller.resubmitSearchRun(td, listener);
-		} catch (Exception t) {
-			throw new ServletException(t);
-		}
-
-		try {
-			listener.waitForResubmit(60 * 1000);
-		} catch (InterruptedException e) {
-			throw new ServletException("Resubmit was interrupted", e);
-		}
-
-		if (listener.getAssignedId() == -1) {
-			if (listener.getLastException() != null) {
-				printError(output, "Rerun failed", listener.getLastException());
-			} else {
-				printError(output, "Timeout passed and rerun did not report success", null);
+			try {
+				swiftSearcherCaller.resubmitSearchRun(td, listener);
+			} catch (Exception t) {
+				throw new ServletException(t);
 			}
-			return;
+
+			try {
+				listener.waitForResubmit(60 * 1000);
+			} catch (InterruptedException e) {
+				throw new ServletException("Resubmit was interrupted", e);
+			}
+
+			if (listener.getAssignedId() == -1) {
+				if (listener.getLastException() != null) {
+					printError(output, "Rerun failed", listener.getLastException());
+				} else {
+					printError(output, "Timeout passed and rerun did not report success", null);
+				}
+				return;
+			}
 		}
 		forwardToReportPage(req, resp);
 	}
