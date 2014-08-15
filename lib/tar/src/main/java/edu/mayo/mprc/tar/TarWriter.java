@@ -175,7 +175,6 @@ public final class TarWriter {
 		final List<String> command = Arrays.asList("tar", "-A", "-f", to.getAbsolutePath(), from.getAbsolutePath());
 		final ProcessBuilder builder = new ProcessBuilder(command);
 		final ProcessCaller caller = new ProcessCaller(builder, reporter.getLog());
-		caller.setLogToConsole(false);
 		caller.runAndCheck("tar file concatenation");
 		FileUtilities.quietDelete(from);
 	}
