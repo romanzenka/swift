@@ -392,6 +392,9 @@ public final class ProcessCaller implements Runnable {
 	}
 
 	public void setLogToConsole(final boolean logToConsole) {
+		if (childLog != null) {
+			throw new MprcException("The process caller was set to log into separate files already.");
+		}
 		if (logToConsole) {
 			outputLogger = LOGGER;
 			errorLogger = LOGGER;
