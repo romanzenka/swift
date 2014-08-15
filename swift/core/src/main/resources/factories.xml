@@ -114,7 +114,7 @@
         <property name="serviceFactory" ref="serviceFactory" />
     </bean>
 
-    <bean id="serviceFactory" class="edu.mayo.mprc.messaging.ServiceFactory">
+    <bean id="serviceFactory" class="edu.mayo.mprc.messaging.ServiceFactoryImpl">
         <property name="connectionPool" ref="connectionPool" />
         <property name="context" ref="swiftEnvironment" />
     </bean>
