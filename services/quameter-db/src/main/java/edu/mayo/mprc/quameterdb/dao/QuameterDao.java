@@ -29,6 +29,10 @@ public interface QuameterDao extends Dao {
 
 	void hideQuameterResult(int quameterResultId);
 
+    List<QuameterAnnotation> listAnnotations();
+
+    void createQuameterAnntation(QuameterAnnotation q);
+
 	/**
 	 * For given file search id and a list of categories and their corresponding proteins,
 	 * count all the spectra corresponding to the protein set for the particular file search.
