@@ -15,7 +15,7 @@ public abstract class MessagingTestBase {
 	public static final String BROKER = "vm://messaging-test-broker";
 	protected MessageBroker broker;
 	protected Service service;
-	protected ServiceFactory serviceFactory;
+	protected ServiceFactoryImpl serviceFactory;
 	protected ResponseDispatcher responseDispatcher;
 
 	/**
@@ -37,7 +37,7 @@ public abstract class MessagingTestBase {
 		broker.start();
 
 
-		serviceFactory = new ServiceFactory();
+		serviceFactory = new ServiceFactoryImpl();
 		serviceFactory.setConnectionPool(new ActiveMQConnectionPool());
 		try {
 			serviceFactory.setBrokerUri(new URI(BROKER + "?create=false&waitForStart=100"));

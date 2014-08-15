@@ -10,7 +10,7 @@ public final class UriParsingTest {
 	@Test
 	public void shouldParseUserCredentialUris() throws URISyntaxException {
 		final URI uri = new URI("vm://user:passwd@localhost");
-		final UserInfo info = ServiceFactory.extractJmsUserinfo(uri);
+		final UserInfo info = ServiceFactoryImpl.extractJmsUserinfo(uri);
 		Assert.assertEquals(info.getUserName(), "user");
 		Assert.assertEquals(info.getPassword(), "passwd");
 	}
@@ -18,7 +18,7 @@ public final class UriParsingTest {
 	@Test
 	public void shouldNotParseWrappedUserCredentialUris() throws URISyntaxException {
 		final URI uri = new URI("failover://(vm://user:passwd@localhost)?a=b");
-		final UserInfo info = ServiceFactory.extractJmsUserinfo(uri);
+		final UserInfo info = ServiceFactoryImpl.extractJmsUserinfo(uri);
 		Assert.assertEquals(info.getUserName(), null);
 		Assert.assertEquals(info.getPassword(), null);
 	}
@@ -26,7 +26,7 @@ public final class UriParsingTest {
 	@Test
 	public void shouldParseNoUserCredentialUris() throws URISyntaxException {
 		final URI uri = new URI("vm://localhost");
-		final UserInfo info = ServiceFactory.extractJmsUserinfo(uri);
+		final UserInfo info = ServiceFactoryImpl.extractJmsUserinfo(uri);
 		Assert.assertEquals(info.getUserName(), null);
 		Assert.assertEquals(info.getPassword(), null);
 	}

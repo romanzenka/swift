@@ -101,7 +101,7 @@
     </bean>
 
     <!-- SGE -->
-    <bean id="gridEngineJobManager" class="edu.mayo.mprc.sge.GridEngineJobManager" scope="singleton"
+    <bean id="gridEngineJobManager" class="edu.mayo.mprc.sge.GridEngineJobManagerImpl" scope="singleton"
         lazy-init="true"></bean>
 
     <bean id="gridScriptFactory" class="edu.mayo.mprc.sge.GridScriptFactory">

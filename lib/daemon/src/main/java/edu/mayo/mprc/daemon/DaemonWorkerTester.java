@@ -7,10 +7,7 @@ import edu.mayo.mprc.daemon.files.FileTokenFactory;
 import edu.mayo.mprc.daemon.worker.WorkPacket;
 import edu.mayo.mprc.daemon.worker.Worker;
 import edu.mayo.mprc.daemon.worker.WorkerFactory;
-import edu.mayo.mprc.messaging.ActiveMQConnectionPool;
-import edu.mayo.mprc.messaging.ResponseDispatcher;
-import edu.mayo.mprc.messaging.Service;
-import edu.mayo.mprc.messaging.ServiceFactory;
+import edu.mayo.mprc.messaging.*;
 import edu.mayo.mprc.utilities.FileUtilities;
 import edu.mayo.mprc.utilities.progress.ProgressInfo;
 import edu.mayo.mprc.utilities.progress.ProgressListener;
@@ -30,12 +27,12 @@ public final class DaemonWorkerTester implements Lifecycle {
 	private SimpleRunner runner;
 	private Service service;
 	private DaemonConnection daemonConnection;
-	private ServiceFactory serviceFactory;
+	private ServiceFactoryImpl serviceFactory;
 	private ResponseDispatcher responseDispatcher;
 	private static AtomicInteger testId = new AtomicInteger(0);
 
 	private DaemonWorkerTester() {
-		serviceFactory = new ServiceFactory();
+		serviceFactory = new ServiceFactoryImpl();
 		serviceFactory.setConnectionPool(new ActiveMQConnectionPool());
 		try {
 			serviceFactory.setBrokerUri(new URI("vm://broker1?broker.useJmx=false&broker.persistent=false"));
