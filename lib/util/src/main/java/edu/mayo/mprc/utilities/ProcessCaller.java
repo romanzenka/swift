@@ -321,6 +321,7 @@ public final class ProcessCaller implements Runnable {
 			// SWALLOWED: Ignore interrupts
 		} finally {
 			if (process != null) {
+				cleanupChildLoggers();
 				FileUtilities.closeQuietly(process.getErrorStream());
 				FileUtilities.closeQuietly(process.getInputStream());
 				FileUtilities.closeQuietly(process.getOutputStream());
@@ -329,7 +330,6 @@ public final class ProcessCaller implements Runnable {
 				outputPipe = null;
 				errorPipe = null;
 			}
-			cleanupChildLoggers();
 		}
 	}
 
