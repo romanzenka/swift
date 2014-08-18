@@ -23,7 +23,7 @@ public interface QuameterDao extends Dao {
 	QuameterResult addQuameterScores(final int tandemMassSpectrometrySampleId,
 	                                 final int fileSearchId,
 	                                 final Map<String, Double> values,
-	                                 final int identifedSpectra);
+	                                 final Map<QuameterProteinGroup, Integer> identifedSpectra);
 
 	List<QuameterResult> listAllResults(Pattern searchFilter);
 
@@ -51,8 +51,8 @@ public interface QuameterDao extends Dao {
 	 * count all the spectra corresponding to the protein set for the particular file search.
 	 *
 	 * @param fileSearchId       Saved info about file search
-	 * @param categoryToProteins Map of QuaMeter category name to list of proteins
-	 * @return Count of spectra corresponding to proteins for given file search
+	 * @param proteinGroups Currently defined protein groups
+	 * @return Count of spectra corresponding to protein groups for given file search
 	 */
-	int getIdentifiedSpectra(int fileSearchId, Map<String, Pattern> categoryToProteins);
+	Map<QuameterProteinGroup, Integer> getIdentifiedSpectra(int fileSearchId, List<QuameterProteinGroup> proteinGroups);
 }

@@ -16,6 +16,7 @@ import edu.mayo.mprc.daemon.worker.WorkerFactoryBase;
 import edu.mayo.mprc.database.Database;
 import edu.mayo.mprc.fastadb.FastaDbDao;
 import edu.mayo.mprc.quameterdb.dao.QuameterDao;
+import edu.mayo.mprc.quameterdb.dao.QuameterProteinGroup;
 import edu.mayo.mprc.searchdb.dao.SearchDbDao;
 import edu.mayo.mprc.utilities.FileUtilities;
 import edu.mayo.mprc.utilities.progress.UserProgressReporter;
@@ -46,10 +47,10 @@ public final class QuameterDbWorker extends WorkerBase {
 	public static final String CATEGORIES = "categories";
 	public static final String PROTEINS = "proteins";
 
-	private final Map<String, Pattern> proteins;
+	private final List<QuameterProteinGroup> proteins;
 
 	public QuameterDbWorker(final QuameterDao quameterDao,
-	                        final Map<String, Pattern> proteins) {
+	                        final List<QuameterProteinGroup> proteins) {
 		this.dao = quameterDao;
 		this.proteins = proteins;
 	}
@@ -61,7 +62,7 @@ public final class QuameterDbWorker extends WorkerBase {
 		try {
 			final Map<String, Double> map = loadQuameterResultFile(workPacket.getQuameterResultFile());
 
-			final int identifiedSpectra = dao.getIdentifiedSpectra(workPacket.getFileSearchId(), proteins);
+			final Map<QuameterProteinGroup, Integer> identifiedSpectra = dao.getIdentifiedSpectra(workPacket.getFileSearchId(), proteins);
 
 			dao.addQuameterScores(workPacket.getTandemMassSpectrometrySampleId(),
 					workPacket.getFileSearchId(),
@@ -147,7 +148,7 @@ public final class QuameterDbWorker extends WorkerBase {
 					parseConfigProteins(config.getCategories(), config.getProteins()));
 		}
 
-		private Map<String, Pattern> parseConfigProteins(final String categories, final String proteins) {
+		private List<QuameterProteinGroup> parseConfigProteins(final String categories, final String proteins) {
 			final Iterable<String> categorySplit = Splitter.on(',').trimResults().split(categories);
 
 //			final Iterable<String> split = Splitter.on(',').trimResults().split(proteins);
@@ -158,7 +159,7 @@ public final class QuameterDbWorker extends WorkerBase {
 //				}
 //			};
 //			return Lists.newArrayList(Iterables.transform(split, stringPatternFunction));
-			return new HashMap<String, Pattern>(0);
+			return new ArrayList<QuameterProteinGroup>(0);
 		}
 	}
 

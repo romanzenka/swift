@@ -133,7 +133,7 @@ public final class QuameterUi implements Dao, UiConfigurationProvider {
 			writeValue(writer, result.getValue(column));
 		}
 
-		writeValue(writer, result.getIdentifiedSpectra());
+		writeValue(writer, 0); // TODO - write all the values for protein groups
 
 		writer.endArray();
 		writer.endObject();

@@ -143,11 +143,13 @@ public final class QuameterResult extends PersistableBase {
 	private double p_2c;
 	private double p_3;
 
-	/* Number of identified spectra matching a given protein accnum pattern */
-	private int identifiedSpectra;
-
 	/* User can mark the particular value as hidden */
 	private boolean hidden;
+
+	/**
+	 * How many spectra total did we identify for a particular protein group
+	 */
+	private Map<QuameterProteinGroup, Integer> identifiedSpectra;
 
 	public QuameterResult() {
 	}
@@ -155,11 +157,11 @@ public final class QuameterResult extends PersistableBase {
 	public QuameterResult(final TandemMassSpectrometrySample sample,
 	                      final FileSearch fileSearch,
 	                      final Map<String, Double> values,
-	                      final int identifiedSpectra) {
+	                      final Map<QuameterProteinGroup, Integer> identifiedSpectra) {
 		this.sample = sample;
 		this.fileSearch = fileSearch;
+		this.identifiedSpectra = identifiedSpectra;
 		setValues(values);
-		setIdentifiedSpectra(identifiedSpectra);
 	}
 
 	public TandemMassSpectrometrySample getSample() {
@@ -854,14 +856,6 @@ public final class QuameterResult extends PersistableBase {
 
 	public void setCategory(final String category) {
 		this.category = category;
-	}
-
-	public int getIdentifiedSpectra() {
-		return identifiedSpectra;
-	}
-
-	public void setIdentifiedSpectra(final int identifiedSpectra) {
-		this.identifiedSpectra = identifiedSpectra;
 	}
 
 	public int getTransaction() {

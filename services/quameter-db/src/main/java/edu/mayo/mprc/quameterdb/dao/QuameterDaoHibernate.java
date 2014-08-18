@@ -40,7 +40,7 @@ public final class QuameterDaoHibernate extends DaoBase implements QuameterDao {
 	public QuameterResult addQuameterScores(
 			final int tandemMassSpectrometrySampleId, final int fileSearchId,
 			final Map<String, Double> values,
-			final int identifiedSpectra) {
+			final Map<QuameterProteinGroup, Integer> identifiedSpectra) {
 		final TandemMassSpectrometrySample sample = getSearchDbDao().getTandemMassSpectrometrySampleForId(tandemMassSpectrometrySampleId);
 		final FileSearch fileSearch = getSwiftDao().getFileSearchForId(fileSearchId);
 		final QuameterResult result = new QuameterResult(sample, fileSearch, values, identifiedSpectra);
@@ -108,7 +108,7 @@ public final class QuameterDaoHibernate extends DaoBase implements QuameterDao {
 	}
 
 	@Override
-	public int getIdentifiedSpectra(int fileSearchId, Map<String, Pattern> categoryToProteins) {
+	public Map<QuameterProteinGroup, Integer> getIdentifiedSpectra(int fileSearchId, List<QuameterProteinGroup> proteinGroups) {
 		final FileSearch fileSearch = swiftDao.getFileSearchForId(fileSearchId);
 		final SwiftSearchDefinition swiftSearchDefinition = swiftDao.getSwiftSearchDefinition(fileSearch.getSwiftSearchDefinitionId());
 		final SearchEngineParameters searchParameters = fileSearch.getSearchParametersWithDefault(swiftSearchDefinition.getSearchParameters());
@@ -116,10 +116,10 @@ public final class QuameterDaoHibernate extends DaoBase implements QuameterDao {
 		final String category = swiftSearchDefinition.getMetadata().get("quameter.category");
 		if (category == null) {
 			LOGGER.warn("No category defined for file search id " + fileSearchId);
-			return 0;
+			return new HashMap<QuameterProteinGroup, Integer>(0);
 		}
 
-		return 0;  // TODO: Implement this method
+		return new HashMap<QuameterProteinGroup, Integer>(0);  // TODO: Implement this method
 	}
 
 	@Override
