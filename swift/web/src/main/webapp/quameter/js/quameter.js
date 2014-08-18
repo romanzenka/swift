@@ -60,13 +60,12 @@ function categoryButtons(){
     return categoryDiv.find('.btn');
 }
 
-function createNewAnnotationForm(parentName){
-    var metricCode = parentName.split("-")[-1];
-    $('<input>').attr({
-        type: 'hidden',
-        id: 'metricCode',
-        name: metricCode
-    }).appendTo('#annotForm');
+function createNewAnnotationForm(parentName, dbID){
+    console.log(parentName, dbID);
+    var metricCode = parentName.split("-")[1];
+    console.log(metricCode);
+    $('#hiddenMetricCode').val( metricCode );
+    $('#hiddenRowid').val( dbID );
     $('#annotFormDiv').show();//.appendTo('body')
 }
 
@@ -111,10 +110,6 @@ function activeInstrumentFilters(){
     });
     return selectedCategory;
 }
-
-
-
-
 
 // Callback that filters all the views, updating the stdev ranges
 function updateAllViews(data) {
@@ -304,7 +299,8 @@ function addDygraph( viewIndex, view, viewId, metricId, viewMetadata, data, rang
                     var row = viewMetadata.filteredRows[pointHighlighted];
                     highlightRow(row);
 
-                    createNewAnnotationForm(event.target.parentNode.parentNode.id);
+
+                    createNewAnnotationForm(event.target.parentNode.parentNode.id, data.getValue(row, columnIndex("id", data)));
 
                     dygraph.updateOptions({file: currentView.dataView});
                 }
