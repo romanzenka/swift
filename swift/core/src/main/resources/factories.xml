@@ -101,7 +101,7 @@
     </bean>
 
     <!-- SGE -->
-    <bean id="gridEngineJobManager" class="edu.mayo.mprc.sge.GridEngineJobManager" scope="singleton"
+    <bean id="gridEngineJobManager" class="edu.mayo.mprc.sge.GridEngineJobManagerImpl" scope="singleton"
         lazy-init="true"></bean>
 
     <bean id="gridScriptFactory" class="edu.mayo.mprc.sge.GridScriptFactory">
@@ -114,7 +114,7 @@
         <property name="serviceFactory" ref="serviceFactory" />
     </bean>
 
-    <bean id="serviceFactory" class="edu.mayo.mprc.messaging.ServiceFactory">
+    <bean id="serviceFactory" class="edu.mayo.mprc.messaging.ServiceFactoryImpl">
         <property name="connectionPool" ref="connectionPool" />
         <property name="context" ref="swiftEnvironment" />
     </bean>

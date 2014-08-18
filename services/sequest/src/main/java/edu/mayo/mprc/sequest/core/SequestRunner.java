@@ -255,7 +255,6 @@ class SequestRunner implements Runnable, SequestCallerInterface {
 
 		final ProcessBuilder builder = createProcess();
 		final ProcessCaller caller = new ProcessCaller(builder, reporter.getLog());
-		caller.setLogToConsole(false);
 		// Sequest will get killed after the given timeout unless we do something
 		caller.setKillTimeout(getStartTimeOut());
 		final SequestLogMonitor outputMonitor = new SequestLogMonitor(caller);

@@ -5,10 +5,7 @@ import edu.mayo.mprc.config.DaemonConfigInfo;
 import edu.mayo.mprc.daemon.files.FileTokenFactory;
 import edu.mayo.mprc.daemon.worker.WorkPacket;
 import edu.mayo.mprc.daemon.worker.Worker;
-import edu.mayo.mprc.messaging.ActiveMQConnectionPool;
-import edu.mayo.mprc.messaging.ResponseDispatcher;
-import edu.mayo.mprc.messaging.Service;
-import edu.mayo.mprc.messaging.ServiceFactory;
+import edu.mayo.mprc.messaging.*;
 import edu.mayo.mprc.utilities.FileUtilities;
 import edu.mayo.mprc.utilities.progress.ProgressInfo;
 import edu.mayo.mprc.utilities.progress.ProgressListener;
@@ -40,7 +37,7 @@ public final class WorkCachePerformanceTest {
 	private final Object workSuccess = new Object();
 	private int workSuccessCount = 0;
 	private final ActiveMQConnectionPool connectionPool = new ActiveMQConnectionPool();
-	private final ServiceFactory serviceFactory = new ServiceFactory();
+	private final ServiceFactoryImpl serviceFactory = new ServiceFactoryImpl();
 	private ResponseDispatcher responseDispatcher;
 
 	@BeforeClass

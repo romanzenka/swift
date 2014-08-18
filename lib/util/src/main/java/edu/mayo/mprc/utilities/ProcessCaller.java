@@ -8,6 +8,7 @@ import edu.mayo.mprc.utilities.log.ParentLog;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 
+import java.io.Closeable;
 import java.io.IOException;
 import java.io.InputStream;
 import java.text.DecimalFormat;
@@ -320,6 +321,7 @@ public final class ProcessCaller implements Runnable {
 			// SWALLOWED: Ignore interrupts
 		} finally {
 			if (process != null) {
+				cleanupChildLoggers();
 				FileUtilities.closeQuietly(process.getErrorStream());
 				FileUtilities.closeQuietly(process.getInputStream());
 				FileUtilities.closeQuietly(process.getOutputStream());
@@ -327,6 +329,17 @@ public final class ProcessCaller implements Runnable {
 				process.destroy();
 				outputPipe = null;
 				errorPipe = null;
+			}
+		}
+	}
+
+	private void cleanupChildLoggers() {
+		if (childLog != null) {
+			if (outputLogger instanceof Closeable) {
+				FileUtilities.closeQuietly((Closeable) outputLogger);
+			}
+			if (errorLogger instanceof Closeable) {
+				FileUtilities.closeQuietly((Closeable) errorLogger);
 			}
 		}
 	}
@@ -379,6 +392,9 @@ public final class ProcessCaller implements Runnable {
 	}
 
 	public void setLogToConsole(final boolean logToConsole) {
+		if (childLog != null) {
+			throw new MprcException("The process caller was set to log into separate files already.");
+		}
 		if (logToConsole) {
 			outputLogger = LOGGER;
 			errorLogger = LOGGER;
