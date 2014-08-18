@@ -2,6 +2,7 @@
 rawInsturmentNames=[];
 views = [], gs = [];
 numberOfSimpleGraphs = 0;
+dyViewsByCode={};
 
 function populateInstArray(dt){
     for(var r=0; r < dt.getNumberOfRows(); r++) {
@@ -61,14 +62,21 @@ function categoryButtons(){
 }
 
 function createNewAnnotationForm(parentName, dbID){
-    console.log(parentName, dbID);
     var metricCode = parentName.split("-")[1];
-    console.log(metricCode);
     $('#hiddenMetricCode').val( metricCode );
     $('#hiddenRowid').val( dbID );
-    $('#annotFormDiv').show();//.appendTo('body')
+    $('#annotFormDiv').show();
 }
 
+function getXaxisById(data, dbId){
+    for (var i = 0; i < data.getNumberOfRows(); i++) {
+        //console.log(i,columnIndex("id", data),data.getValue(i, columnIndex("id", data)),dbId);
+        if(data.getValue(i, columnIndex("id", data)).toString() === dbId) {
+            return data.getValue(i, columnIndex("startTime", data));
+        }
+    }
+    alert("Id " + dbId + " does not exist");
+}
 
 function getMetricTitle(n){
     var hLink, qLink;
@@ -132,6 +140,7 @@ function updateAllViews(data) {
 
     for (var i = 0; i < views.length; i++) {
        if(views[i] === undefined){console.log(i);continue;} //empty for detail graphs until generated
+        dyViewsByCode[views[i].metricId]=i;
 
         views[i].dataView.setRows(filteredRows);
         views[i].dataView.setColumns( getSmartColumns(columnIndex("startTime",data),views[i].metricId) );
@@ -443,8 +452,36 @@ function initSimpleCharts(graphObj) {
         updateAllViews(data);
       });
 
-    // Create dummy array to display thresholds for all values on init()
-    // var allRowsIndex = $.map($(Array(data.getNumberOfRows())),function(val, i) { return i; }) // already created at start
+
+    // Async form for submitting
+    $("#submitAnnotation").click(function(){
+        $.ajax({
+            type: 'POST',
+            url: "/service/new-annotation",
+            data: $('#annotForm').serialize(),
+            success: function(response) {
+                $('#annotFormDiv').hide();
+                //console.log($('#annotForm')['text']);
+                var nthView = dyViewsByCode[$('#annotForm').find('input[name="metricCode"]').val()];
+                var nthxDate = getXaxisById(data, $('#annotForm').find('input[name="dbId"]').val());
+
+                console.log(nthView,nthxDate,views[nthView].dygraph);
+                views[nthView].dygraph.setAnnotations([
+                    {
+                        series: "Orbi",
+                        x: nthxDate,
+                        shortText: "*",
+                        text: $('#annotForm').find('input[name="metricCode"]').val()
+                    }
+                ]);
+
+
+            },
+            error: function() {
+                alert("There was an error submitting this annotation comment!");
+            }
+        });
+    });
 
     //Looks at the butons and filters rows & columns based on selection
     updateAllViews(data);

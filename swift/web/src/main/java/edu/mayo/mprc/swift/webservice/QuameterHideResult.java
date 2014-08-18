@@ -2,6 +2,7 @@ package edu.mayo.mprc.swift.webservice;
 
 import edu.mayo.mprc.MprcException;
 import edu.mayo.mprc.quameterdb.dao.QuameterDao;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.*;
@@ -33,7 +34,7 @@ public final class QuameterHideResult {
 
 
     @RequestMapping(value = "/new-annotation", method = RequestMethod.POST)
-    @ResponseBody
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     public void createQuameterAnnotation( @RequestBody final MultiValueMap<String, String> inputMap ) {
 
         System.out.println(inputMap.toString());

@@ -3,7 +3,6 @@ package edu.mayo.mprc.quameterdb.dao;
 import edu.mayo.mprc.MprcException;
 import edu.mayo.mprc.database.PersistableBase;
 import org.hibernate.criterion.Criterion;
-import org.springframework.beans.factory.annotation.Autowire;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
