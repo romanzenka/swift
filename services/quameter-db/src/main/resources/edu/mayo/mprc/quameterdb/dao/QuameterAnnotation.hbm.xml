@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+    "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="edu.mayo.mprc.quameterdb.dao" default-lazy="true">
+    <class name="QuameterAnnotation" table="quameter_annotation" mutable="true">
+        <id name="id" type="integer" column="quameter_annotation_id">
+            <generator class="native" />
+        </id>
+
+        <property name="metricCode" column="metric_code" type="string" />
+        <property name="quameterResultId" column="quameter_result_id" type="integer" />
+        <property name="text" column="annotation_text" type="string" />
+    </class>
+</hibernate-mapping>
