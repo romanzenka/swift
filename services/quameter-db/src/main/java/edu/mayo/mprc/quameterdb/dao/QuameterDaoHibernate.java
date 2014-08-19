@@ -94,20 +94,20 @@ public final class QuameterDaoHibernate extends DaoBase implements QuameterDao {
 		getSession().saveOrUpdate(quameterResult);
 	}
 
-    @Override
-    public List<QuameterAnnotation> listAnnotations() {
-        ///// Add dummy code -
-        // TODO: Roman to add actual code
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
-    }
+	@Override
+	public List<QuameterAnnotation> listAnnotations() {
+		// Only list annotations that belong to non-hidden quameter results
+		return listAndCast(getSession().createQuery("select q " +
+				"from QuameterAnnotation as q, QuameterResult as r " +
+				"WHERE q.quameterResultId = r.id AND r.hidden = false"));
+	}
 
-    @Override
-    public void createQuameterAnntation(QuameterAnnotation q) {
-        //TODO: raymond added to appease compile
-        //To change body of implemented methods use File | Settings | File Templates.
-    }
+	@Override
+	public QuameterAnnotation addAnnotation(QuameterAnnotation annotation) {
+		return save(annotation, false);
+	}
 
-    @Override
+	@Override
 	public int getIdentifiedSpectra(int fileSearchId, Map<String, Pattern> categoryToProteins) {
 		final FileSearch fileSearch = swiftDao.getFileSearchForId(fileSearchId);
 		final SwiftSearchDefinition swiftSearchDefinition = swiftDao.getSwiftSearchDefinition(fileSearch.getSwiftSearchDefinitionId());
@@ -125,7 +125,8 @@ public final class QuameterDaoHibernate extends DaoBase implements QuameterDao {
 	@Override
 	public Collection<String> getHibernateMappings() {
 		final List<String> list = new ArrayList<String>(Arrays.asList(
-				MAP + "QuameterResult.hbm.xml"
+				MAP + "QuameterResult.hbm.xml",
+				MAP + "QuameterAnnotation.hbm.xml"
 		));
 		list.addAll(super.getHibernateMappings());
 		return list;

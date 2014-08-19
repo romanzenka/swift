@@ -5,6 +5,7 @@ import edu.mayo.mprc.config.DependencyResolver;
 import edu.mayo.mprc.database.Change;
 import edu.mayo.mprc.database.DaoTest;
 import edu.mayo.mprc.fastadb.FastaDbDaoHibernate;
+import edu.mayo.mprc.quameterdb.dao.QuameterAnnotation;
 import edu.mayo.mprc.quameterdb.dao.QuameterDaoHibernate;
 import edu.mayo.mprc.quameterdb.dao.QuameterResult;
 import edu.mayo.mprc.searchdb.dao.SearchDbDaoHibernate;
@@ -204,6 +205,81 @@ public final class QuameterUiTest extends DaoTest {
 		Assert.assertTrue(writer.toString().length() > 100);
 
 		quameterUi.commit();
+	}
+
+	@Test
+	public void shouldAddAnnotation() {
+		quameterDao.begin();
+
+		final QuameterResult quameterResult = addResult1();
+
+		nextTransaction();
+
+		QuameterAnnotation annotation = new QuameterAnnotation(QuameterResult.QuameterColumn.c_3a, quameterResult.getId(), "annotation text");
+		quameterDao.addAnnotation(annotation);
+
+		nextTransaction();
+
+		List<QuameterAnnotation> quameterAnnotations = quameterDao.listAnnotations();
+		Assert.assertEquals(quameterAnnotations.size(), 1, "Must get 1 annotation that was just added");
+		Assert.assertEquals(quameterAnnotations.get(0).getText(), "annotation text", "Annotation text must be stored properly");
+
+		quameterDao.commit();
+	}
+
+	@Test
+	public void shouldReplaceAnnotation() {
+		quameterDao.begin();
+
+		final QuameterResult quameterResult = addResult1();
+
+		nextTransaction();
+
+		QuameterAnnotation annotation = new QuameterAnnotation(QuameterResult.QuameterColumn.c_3a, quameterResult.getId(), "annotation text");
+		quameterDao.addAnnotation(annotation);
+
+		nextTransaction();
+
+		// Replace annotation
+		QuameterAnnotation annotation2 = new QuameterAnnotation(QuameterResult.QuameterColumn.c_3a, quameterResult.getId(), "annotation text replacement");
+		quameterDao.addAnnotation(annotation2);
+
+		nextTransaction();
+
+		List<QuameterAnnotation> quameterAnnotations = quameterDao.listAnnotations();
+		Assert.assertEquals(quameterAnnotations.size(), 1, "Must get 1 annotation that was just added");
+		Assert.assertEquals(quameterAnnotations.get(0).getText(), "annotation text replacement", "The existing annotation must be replaced");
+
+		quameterDao.commit();
+	}
+
+	@Test
+	public void shouldNotListAnnotationOnHiddenResults() {
+		quameterDao.begin();
+
+		final QuameterResult quameterResult1 = addResult1();
+		final QuameterResult quameterResult2 = addResult2();
+
+		nextTransaction();
+
+		QuameterAnnotation annotation = new QuameterAnnotation(QuameterResult.QuameterColumn.c_3a, quameterResult1.getId(), "annotation text shown");
+		quameterDao.addAnnotation(annotation);
+
+		QuameterAnnotation annotation2 = new QuameterAnnotation(QuameterResult.QuameterColumn.c_3a, quameterResult2.getId(), "annotation text hidden");
+		quameterDao.addAnnotation(annotation2);
+
+		nextTransaction();
+
+		// Hiden result 2
+		quameterDao.hideQuameterResult(quameterResult2.getId());
+
+		nextTransaction();
+
+		List<QuameterAnnotation> quameterAnnotations = quameterDao.listAnnotations();
+		Assert.assertEquals(quameterAnnotations.size(), 1, "Must get 1 annotation only (1 is hidden)");
+		Assert.assertEquals(quameterAnnotations.get(0).getText(), "annotation text shown", "Only the shown result must be listed");
+
+		quameterDao.commit();
 	}
 
 

@@ -320,8 +320,8 @@ public final class ProcessCaller implements Runnable {
 		} catch (InterruptedException e) {
 			// SWALLOWED: Ignore interrupts
 		} finally {
+			cleanupChildLoggers();
 			if (process != null) {
-				cleanupChildLoggers();
 				FileUtilities.closeQuietly(process.getErrorStream());
 				FileUtilities.closeQuietly(process.getInputStream());
 				FileUtilities.closeQuietly(process.getOutputStream());

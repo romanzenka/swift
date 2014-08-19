@@ -29,15 +29,28 @@ public interface QuameterDao extends Dao {
 
 	void hideQuameterResult(int quameterResultId);
 
-    List<QuameterAnnotation> listAnnotations();
+	/**
+	 * Add an annotation. The annotation is uniquely identified by its
+	 * data point + metric. Adding an annotation for the same metric+data point
+	 * rewrites the old annotation.
+	 *
+	 * @param annotation Annotation to add.
+	 * @return Saved version of the annotation. You can typically ignore this return value.
+	 */
+	QuameterAnnotation addAnnotation(QuameterAnnotation annotation);
 
-    void createQuameterAnntation(QuameterAnnotation q);
+	/**
+	 * List all annotations present in the system.
+	 *
+	 * @return List of all annotations.
+	 */
+	List<QuameterAnnotation> listAnnotations();
 
 	/**
 	 * For given file search id and a list of categories and their corresponding proteins,
 	 * count all the spectra corresponding to the protein set for the particular file search.
 	 *
-	 * @param fileSearchId Saved info about file search
+	 * @param fileSearchId       Saved info about file search
 	 * @param categoryToProteins Map of QuaMeter category name to list of proteins
 	 * @return Count of spectra corresponding to proteins for given file search
 	 */
