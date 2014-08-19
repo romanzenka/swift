@@ -59,7 +59,7 @@
         </div>
     </div>
 
-    <% if (quameterUiConfig != null) { %>  <!-- TODO REMOVE NOT BEFORE COMMIT -->
+    <% if (quameterUiConfig == null) { %>
     <div class="alert">
         <p><strong>Warning</strong> The QuaMeter module is not configured.</p>
         <p>You need to add the QuaMeterUi resource to the
