@@ -113,7 +113,7 @@ public final class QuameterUi implements Dao, UiConfigurationProvider {
 			writeCol(writer, column.name(), QuameterResult.getColumnName(column), "number");
 		}
 
-		int proteinGroupId = 0;
+		int proteinGroupId = 1;
 		for (final QuameterProteinGroup proteinGroup : proteinGroups) {
 			writeCol(writer, "id_" + proteinGroupId, proteinGroup.getName(), "number");
 			proteinGroupId++;
