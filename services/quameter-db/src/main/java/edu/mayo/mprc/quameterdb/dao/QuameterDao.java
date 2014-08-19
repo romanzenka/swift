@@ -23,8 +23,12 @@ public interface QuameterDao extends Dao {
 	QuameterResult addQuameterScores(final int tandemMassSpectrometrySampleId,
 	                                 final int fileSearchId,
 	                                 final Map<String, Double> values,
-	                                 final int identifedSpectra);
+	                                 final Map<QuameterProteinGroup, Integer> identifedSpectra);
 
+	/**
+	 * @param searchFilter Filter the search names by this regex.
+	 * @return All the Quameter results that match given search name filter, with all values populated.
+	 */
 	List<QuameterResult> listAllResults(Pattern searchFilter);
 
 	void hideQuameterResult(int quameterResultId);
@@ -50,9 +54,38 @@ public interface QuameterDao extends Dao {
 	 * For given file search id and a list of categories and their corresponding proteins,
 	 * count all the spectra corresponding to the protein set for the particular file search.
 	 *
-	 * @param fileSearchId       Saved info about file search
-	 * @param categoryToProteins Map of QuaMeter category name to list of proteins
-	 * @return Count of spectra corresponding to proteins for given file search
+	 * @param fileSearchId  Saved info about file search
+	 * @param proteinGroups Currently defined protein groups
+	 * @return Count of spectra corresponding to protein groups for given file search
 	 */
-	int getIdentifiedSpectra(int fileSearchId, Map<String, Pattern> categoryToProteins);
+	Map<QuameterProteinGroup, Integer> getIdentifiedSpectra(int fileSearchId, List<QuameterProteinGroup> proteinGroups);
+
+	/**
+	 * Take a list of protein groups as it came from the config.
+	 * <p/>
+	 * Make sure that our database contains only the listed protein groups and nothing else.
+	 * <p/>
+	 * Return the serialized protein groups as currently in the database.
+	 *
+	 * @param groups List of groups to set the database to.
+	 * @return Serialized protein groups.
+	 */
+	List<QuameterProteinGroup> updateProteinGroups(List<QuameterProteinGroup> groups);
+
+
+	/**
+	 * @return List of currently active protein groups.
+	 */
+	List<QuameterProteinGroup> listProteinGroups();
+
+	/**
+	 * When the user changes definitions of the protein groups, the numbers of proteins become inconsistent.
+	 * <p/>
+	 * The old protein counts would refer to old definitions of the protein groups.
+	 * <p/>
+	 * At this point we need to recalculate the protein counts on the entire database, to bring all the counts
+	 * up to date.
+	 */
+	void recalculateProteinCounts();
+
 }

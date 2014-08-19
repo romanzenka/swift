@@ -18,13 +18,13 @@ public final class QuameterResultTest {
 				ImmutableMap.Builder<String, Double>()
 				.put("MS2-4A", 1.22)
 				.put("C-1A", 0.0)
-				.build(), 0);
+				.build(), null);
 		Assert.assertEquals(result.getValues().get("MS2-4A"), 1.22);
 	}
 
 	@Test
 	public void shouldSetValues() {
-		final QuameterResult result = new QuameterResult(null, null, null, 0);
+		final QuameterResult result = new QuameterResult(null, null, null, null);
 		result.setValue("C-1A", 0.0);
 		result.setValue("MS2-4A", 1.33);
 		Assert.assertEquals(result.getValues().get("C-1A"), 0.0);
@@ -33,7 +33,7 @@ public final class QuameterResultTest {
 
 	@Test
 	public void shouldMatchPatientNamedPost() {
-		final QuameterResult result = new QuameterResult(null, null, null, 0);
+		final QuameterResult result = new QuameterResult(null, null, null, null);
 		final FileSearch fileSearch = new FileSearch();
 		fileSearch.setInputFile(new File("HR04-689_Post_20140806_Y30_QE.raw"));
 		fileSearch.setExperiment("Test experiment name");
@@ -44,7 +44,7 @@ public final class QuameterResultTest {
 
 	@Test
 	public void shouldNotMatchPre() {
-		final QuameterResult result = new QuameterResult(null, null, null, 0);
+		final QuameterResult result = new QuameterResult(null, null, null, null);
 		final FileSearch fileSearch = new FileSearch();
 		fileSearch.setInputFile(new File("HR04-689_Post_20140806_Y30_QE_PreS1.raw"));
 		fileSearch.setExperiment("Test experiment name");

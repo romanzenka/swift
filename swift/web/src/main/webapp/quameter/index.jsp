@@ -59,7 +59,7 @@
         </div>
     </div>
 
-    <% if (quameterUiConfig != null) { %>  <!-- TODO REMOVE NOT BEFORE COMMIT -->
+    <% if (quameterUiConfig == null) { %>
     <div class="alert">
         <p><strong>Warning</strong> The QuaMeter module is not configured.</p>
         <p>You need to add the QuaMeterUi resource to the
@@ -86,12 +86,11 @@
 <script type="text/javascript" src="/common/bootstrap/js/bootstrap.js"></script>
 
 <!-- Graph Dependancies -->
-<script type="text/javascript" src="js/tmp.js"></script> <!-- TODO REMOVE LINE BEFORE COMMIT -->
 <script type="text/javascript" src="js/dygraph-combined.js"></script>
 <script type="text/javascript" src="js/quameter-definitions.js"></script>
 <script type="text/javascript" src="js/quameter.js"></script>
 <script type="text/javascript">
-    //var graphDataSrvr = <%  // TODO remove commment before commit
+    var graphDataSrvr = <%
     if(quameterUiConfig!=null) {
         final QuameterUi quameterUi = (QuameterUi) MainFactoryContext.getSwiftEnvironment().createResource(quameterUiConfig);
         quameterUi.begin();

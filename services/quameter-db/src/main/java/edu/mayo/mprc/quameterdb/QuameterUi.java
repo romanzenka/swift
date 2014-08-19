@@ -9,7 +9,9 @@ import edu.mayo.mprc.daemon.SimpleRunner;
 import edu.mayo.mprc.daemon.UiConfigurationProvider;
 import edu.mayo.mprc.database.Dao;
 import edu.mayo.mprc.quameterdb.dao.QuameterDao;
+import edu.mayo.mprc.quameterdb.dao.QuameterProteinGroup;
 import edu.mayo.mprc.quameterdb.dao.QuameterResult;
+import edu.mayo.mprc.searchdb.dao.ProteinGroupList;
 import edu.mayo.mprc.swift.params2.SearchEngineParameters;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
@@ -77,6 +79,8 @@ public final class QuameterUi implements Dao, UiConfigurationProvider {
 	}
 
 	public void dataTableJson(final Writer writer) {
+
+		final List<QuameterProteinGroup> proteinGroups = quameterDao.listProteinGroups();
 		final List<QuameterResult> quameterResults = quameterDao.listAllResults(searchFilter);
 
 		final JsonWriter w = new JsonWriter(writer);
@@ -84,15 +88,15 @@ public final class QuameterUi implements Dao, UiConfigurationProvider {
 
 		try {
 			w.beginObject();
-			writeCols(w);
-			writeRows(w, quameterResults);
+			writeCols(w, proteinGroups);
+			writeRows(w, quameterResults, proteinGroups);
 			w.endObject();
-		} catch (IOException e) {
+		} catch (final IOException e) {
 			throw new MprcException("Could not render QuaMeter data", e);
 		}
 	}
 
-	private void writeCols(final JsonWriter writer) throws IOException {
+	private void writeCols(final JsonWriter writer, final List<QuameterProteinGroup> proteinGroups) throws IOException {
 		writer.name("cols");
 		writer.beginArray();
 
@@ -109,12 +113,16 @@ public final class QuameterUi implements Dao, UiConfigurationProvider {
 			writeCol(writer, column.name(), QuameterResult.getColumnName(column), "number");
 		}
 
-		writeCol(writer, "id_1", "ID-1", "number");
+		int proteinGroupId = 1;
+		for (final QuameterProteinGroup proteinGroup : proteinGroups) {
+			writeCol(writer, "id_" + proteinGroupId, proteinGroup.getName(), "number");
+			proteinGroupId++;
+		}
 
 		writer.endArray();
 	}
 
-	private void writeRow(final JsonWriter writer, final QuameterResult result) throws IOException {
+	private void writeRow(final JsonWriter writer, final QuameterResult result, final List<QuameterProteinGroup> proteinGroups) throws IOException {
 		writer.beginObject()
 				.name("c");
 		writer.beginArray();
@@ -133,7 +141,11 @@ public final class QuameterUi implements Dao, UiConfigurationProvider {
 			writeValue(writer, result.getValue(column));
 		}
 
-		writeValue(writer, result.getIdentifiedSpectra());
+		final Map<QuameterProteinGroup, Integer> identifiedSpectra = result.getIdentifiedSpectra();
+		for (final QuameterProteinGroup proteinGroup : proteinGroups) {
+			final Integer numSpectra = identifiedSpectra.get(proteinGroup);
+			writeValue(writer, numSpectra != null ? numSpectra : 0);
+		}
 
 		writer.endArray();
 		writer.endObject();
@@ -147,12 +159,12 @@ public final class QuameterUi implements Dao, UiConfigurationProvider {
 				.endObject();
 	}
 
-	private void writeRows(final JsonWriter writer, final List<QuameterResult> results) throws IOException {
+	private void writeRows(final JsonWriter writer, final List<QuameterResult> results, final List<QuameterProteinGroup> proteinGroups) throws IOException {
 		writer.name("rows");
 		writer.beginArray();
 
 		for (final QuameterResult result : results) {
-			writeRow(writer, result);
+			writeRow(writer, result, proteinGroups);
 		}
 
 		writer.endArray();
@@ -175,7 +187,7 @@ public final class QuameterUi implements Dao, UiConfigurationProvider {
 	}
 
 	@Override
-	public void provideConfiguration(Map<String, String> currentConfiguration) {
+	public void provideConfiguration(final Map<String, String> currentConfiguration) {
 		currentConfiguration.put(UI_QUAMETER_CATEGORIES, dbWorkerConfig.getCategories());
 	}
 
@@ -187,13 +199,13 @@ public final class QuameterUi implements Dao, UiConfigurationProvider {
 		}
 
 		@Override
-		public void save(ConfigWriter writer) {
+		public void save(final ConfigWriter writer) {
 			writer.put(SEARCH_FILTER, searchFilter);
 			writer.put(QUAMETER_DB_WORKER, writer.save(quameterConfig));
 		}
 
 		@Override
-		public void load(ConfigReader reader) {
+		public void load(final ConfigReader reader) {
 			searchFilter = reader.get(SEARCH_FILTER);
 			quameterConfig = (ServiceConfig) reader.getObject(QUAMETER_DB_WORKER);
 		}
@@ -203,7 +215,7 @@ public final class QuameterUi implements Dao, UiConfigurationProvider {
 			return 0;
 		}
 
-		public void setSearchFilter(String searchFilter) {
+		public void setSearchFilter(final String searchFilter) {
 			this.searchFilter = searchFilter;
 		}
 
@@ -211,7 +223,7 @@ public final class QuameterUi implements Dao, UiConfigurationProvider {
 			return searchFilter;
 		}
 
-		public void setQuameterConfig(QuameterDbWorker.Config quameterConfig) {
+		public void setQuameterConfig(final QuameterDbWorker.Config quameterConfig) {
 			this.quameterConfig = new ServiceConfig("quameter", new SimpleRunner.Config(quameterConfig));
 		}
 
@@ -271,7 +283,7 @@ public final class QuameterUi implements Dao, UiConfigurationProvider {
 		final Pattern filter;
 		try {
 			filter = Pattern.compile(Strings.isNullOrEmpty(filterString) ? ".*" : filterString);
-		} catch (PatternSyntaxException e) {
+		} catch (final PatternSyntaxException e) {
 			throw new MprcException("The pattern syntax [" + filterString + "] is incorrect", e);
 		}
 		return filter;
@@ -290,7 +302,7 @@ public final class QuameterUi implements Dao, UiConfigurationProvider {
 							if (propertyName.equals(SEARCH_FILTER) && validationRequested) {
 								try {
 									compileFilter(newValue);
-								} catch (MprcException e) {
+								} catch (final MprcException e) {
 									response.displayPropertyError(config, propertyName, MprcException.getDetailedMessage(e));
 								}
 							}

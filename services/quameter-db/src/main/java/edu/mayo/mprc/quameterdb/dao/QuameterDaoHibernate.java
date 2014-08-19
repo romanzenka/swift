@@ -1,5 +1,7 @@
 package edu.mayo.mprc.quameterdb.dao;
 
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Lists;
 import edu.mayo.mprc.database.DaoBase;
 import edu.mayo.mprc.searchdb.dao.SearchDbDao;
 import edu.mayo.mprc.searchdb.dao.TandemMassSpectrometrySample;
@@ -40,7 +42,7 @@ public final class QuameterDaoHibernate extends DaoBase implements QuameterDao {
 	public QuameterResult addQuameterScores(
 			final int tandemMassSpectrometrySampleId, final int fileSearchId,
 			final Map<String, Double> values,
-			final int identifiedSpectra) {
+			final Map<QuameterProteinGroup, Integer> identifiedSpectra) {
 		final TandemMassSpectrometrySample sample = getSearchDbDao().getTandemMassSpectrometrySampleForId(tandemMassSpectrometrySampleId);
 		final FileSearch fileSearch = getSwiftDao().getFileSearchForId(fileSearchId);
 		final QuameterResult result = new QuameterResult(sample, fileSearch, values, identifiedSpectra);
@@ -48,8 +50,20 @@ public final class QuameterDaoHibernate extends DaoBase implements QuameterDao {
 		return save(result, false);
 	}
 
+	public List<QuameterProteinGroup> listProteinGroups() {
+		//AL-Lambda*,-AL-Kappa,-ATTR,-SAA
+		return Lists.newArrayList(
+				new QuameterProteinGroup("AL-Lambda", ".*"),
+				new QuameterProteinGroup("AL-Kappa", ".*"),
+				new QuameterProteinGroup("ATTR", ".*"),
+				new QuameterProteinGroup("SAA", ".*")
+		);
+	}
+
 	@Override
 	public List<QuameterResult> listAllResults(final Pattern searchFilter) {
+		final List<QuameterProteinGroup> activeProteinGroups = listProteinGroups();
+
 		final Query query = getSession().createSQLQuery("" +
 				"SELECT {q.*}, m.metadata_value AS v, r.transaction_id AS ti" +
 				" FROM `" + swiftDao.qualifyTableName("transaction") + "` AS r, " +
@@ -80,6 +94,13 @@ public final class QuameterDaoHibernate extends DaoBase implements QuameterDao {
 			r.setCategory(category);
 			final Integer transactionId = (Integer) array[2];
 			r.setTransaction(transactionId);
+
+			ImmutableMap.Builder<QuameterProteinGroup, Integer> builder = new ImmutableMap.Builder<QuameterProteinGroup, Integer>();
+			for (QuameterProteinGroup group : activeProteinGroups) {
+				// Fake some data up
+				builder.put(group, (int)(Math.random()*60.0));
+			}
+			r.setIdentifiedSpectra(builder.build());
 			if (r.resultMatches(searchFilter)) {
 				filtered.add(r);
 			}
@@ -108,7 +129,7 @@ public final class QuameterDaoHibernate extends DaoBase implements QuameterDao {
 	}
 
 	@Override
-	public int getIdentifiedSpectra(int fileSearchId, Map<String, Pattern> categoryToProteins) {
+	public Map<QuameterProteinGroup, Integer> getIdentifiedSpectra(int fileSearchId, List<QuameterProteinGroup> proteinGroups) {
 		final FileSearch fileSearch = swiftDao.getFileSearchForId(fileSearchId);
 		final SwiftSearchDefinition swiftSearchDefinition = swiftDao.getSwiftSearchDefinition(fileSearch.getSwiftSearchDefinitionId());
 		final SearchEngineParameters searchParameters = fileSearch.getSearchParametersWithDefault(swiftSearchDefinition.getSearchParameters());
@@ -116,10 +137,20 @@ public final class QuameterDaoHibernate extends DaoBase implements QuameterDao {
 		final String category = swiftSearchDefinition.getMetadata().get("quameter.category");
 		if (category == null) {
 			LOGGER.warn("No category defined for file search id " + fileSearchId);
-			return 0;
+			return new HashMap<QuameterProteinGroup, Integer>(0);
 		}
 
-		return 0;  // TODO: Implement this method
+		return new HashMap<QuameterProteinGroup, Integer>(0);  // TODO: Implement this method
+	}
+
+	@Override
+	public List<QuameterProteinGroup> updateProteinGroups(List<QuameterProteinGroup> groups) {
+		return null;  // TODO: Implement this method
+	}
+
+	@Override
+	public void recalculateProteinCounts() {
+		// TODO: Implement this method
 	}
 
 	@Override
