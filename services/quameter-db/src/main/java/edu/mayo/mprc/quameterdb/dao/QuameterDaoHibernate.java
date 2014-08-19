@@ -98,7 +98,7 @@ public final class QuameterDaoHibernate extends DaoBase implements QuameterDao {
 			ImmutableMap.Builder<QuameterProteinGroup, Integer> builder = new ImmutableMap.Builder<QuameterProteinGroup, Integer>();
 			for (QuameterProteinGroup group : activeProteinGroups) {
 				// Fake some data up
-				builder.put(group, (int) (Math.sin(r.getId() / (100.0 + (double)group.getName().length() * 5.0)) * 30.0 + 30.0));
+				builder.put(group, (int)(Math.random()*60.0));
 			}
 			r.setIdentifiedSpectra(builder.build());
 			if (r.resultMatches(searchFilter)) {
