@@ -91,7 +91,10 @@ var metrics = [
         { code: "p_2b", label: "P-2B", name: "MS2 Tryptic Ions", good: "high", simple: 0, desc: "Number of tryptic peptide ions identified" },
         { code: "p_2c", label: "P-2C", name: "Distinct Peptides", good: "high", simple: 0, desc: "Number of distinct identified tryptic peptide sequences, ignoring modifications and charge state" },
         { code: "p_3", label: "P-3", name: "Semitryptic Ratio", good: "low", simple: 1, desc: "Ratio of semitryptic/tryptic peptides" },
-        { code: "id_1", label: "ID-1", name: "Identified Spectra", good: "low", simple: 1, desc: "Number of identified spectra matching requested proteins for given category" }
+        { code: "id_1", label: "AL-Lambda", name: "AL-Lambda IDs", good: "low", simple: 1, desc: "Number of identified spectra matching requested proteins for given category" },
+        { code: "id_2", label: "AL-Kappa", name: "AL-Kappa IDs", good: "low", simple: 1, desc: "Number of identified spectra matching requested proteins for given category" },
+        { code: "id_3", label: "ATTR", name: "ATTR IDs", good: "low", simple: 1, desc: "Number of identified spectra matching requested proteins for given category" },
+        { code: "id_4", label: "SAA", name: "SAA IDs", good: "low", simple: 1, desc: "Number of identified spectra matching requested proteins for given category" }
     ];
 
 function getMetricByCode(cc){

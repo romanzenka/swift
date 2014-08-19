@@ -1,6 +1,7 @@
 package edu.mayo.mprc.quameterdb.dao;
 
 import com.google.common.base.Objects;
+import com.thoughtworks.xstream.annotations.XStreamAlias;
 import edu.mayo.mprc.database.DaoBase;
 import edu.mayo.mprc.database.PersistableBase;
 import org.hibernate.criterion.Criterion;
@@ -9,6 +10,7 @@ import org.hibernate.criterion.Restrictions;
 /**
  * @author Raymond Moore
  */
+@XStreamAlias("quameterannotation")
 public class QuameterAnnotation extends PersistableBase {
 	private String metricCode;
 	private Integer quameterResultId;

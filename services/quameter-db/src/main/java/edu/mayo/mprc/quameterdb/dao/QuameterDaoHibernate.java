@@ -99,7 +99,7 @@ public final class QuameterDaoHibernate extends DaoBase implements QuameterDao {
 		// Only list annotations that belong to non-hidden quameter results
 		return listAndCast(getSession().createQuery("select q " +
 				"from QuameterAnnotation as q, QuameterResult as r " +
-				"WHERE q.quameterResultId = r.id AND r.hidden = false"));
+                "WHERE q.quameterResultId = r.id AND r.hidden = false"));
 	}
 
 	@Override
