@@ -1,5 +1,5 @@
 CREATE TABLE `quameter_annotation` (
-  `quameter_annotation_id` INT NOT NULL,
+  `quameter_annotation_id` INT NOT NULL AUTO_INCREMENT,
   `metric_code` VARCHAR(10) NULL,
   `quameter_result_id` INT NULL,
   `annotation_text` TEXT NULL,
