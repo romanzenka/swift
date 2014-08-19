@@ -1,5 +1,7 @@
 package edu.mayo.mprc.quameterdb.dao;
 
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Lists;
 import edu.mayo.mprc.database.DaoBase;
 import edu.mayo.mprc.searchdb.dao.SearchDbDao;
 import edu.mayo.mprc.searchdb.dao.TandemMassSpectrometrySample;
@@ -48,8 +50,20 @@ public final class QuameterDaoHibernate extends DaoBase implements QuameterDao {
 		return save(result, false);
 	}
 
+	public List<QuameterProteinGroup> listProteinGroups() {
+		//AL-Lambda*,-AL-Kappa,-ATTR,-SAA
+		return Lists.newArrayList(
+				new QuameterProteinGroup("AL-Lambda", ".*"),
+				new QuameterProteinGroup("AL-Kappa", ".*"),
+				new QuameterProteinGroup("ATTR", ".*"),
+				new QuameterProteinGroup("SAA", ".*")
+		);
+	}
+
 	@Override
 	public List<QuameterResult> listAllResults(final Pattern searchFilter) {
+		final List<QuameterProteinGroup> activeProteinGroups = listProteinGroups();
+
 		final Query query = getSession().createSQLQuery("" +
 				"SELECT {q.*}, m.metadata_value AS v, r.transaction_id AS ti" +
 				" FROM `" + swiftDao.qualifyTableName("transaction") + "` AS r, " +
@@ -80,6 +94,13 @@ public final class QuameterDaoHibernate extends DaoBase implements QuameterDao {
 			r.setCategory(category);
 			final Integer transactionId = (Integer) array[2];
 			r.setTransaction(transactionId);
+
+			ImmutableMap.Builder<QuameterProteinGroup, Integer> builder = new ImmutableMap.Builder<QuameterProteinGroup, Integer>();
+			for (QuameterProteinGroup group : activeProteinGroups) {
+				// Fake some data up
+				builder.put(group, (int) (Math.sin(r.getId() / (100.0 + (double)group.getName().length() * 5.0)) * 30.0 + 30.0));
+			}
+			r.setIdentifiedSpectra(builder.build());
 			if (r.resultMatches(searchFilter)) {
 				filtered.add(r);
 			}
@@ -120,6 +141,16 @@ public final class QuameterDaoHibernate extends DaoBase implements QuameterDao {
 		}
 
 		return new HashMap<QuameterProteinGroup, Integer>(0);  // TODO: Implement this method
+	}
+
+	@Override
+	public List<QuameterProteinGroup> updateProteinGroups(List<QuameterProteinGroup> groups) {
+		return null;  // TODO: Implement this method
+	}
+
+	@Override
+	public void recalculateProteinCounts() {
+		// TODO: Implement this method
 	}
 
 	@Override

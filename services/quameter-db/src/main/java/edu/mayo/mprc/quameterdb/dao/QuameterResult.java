@@ -866,6 +866,14 @@ public final class QuameterResult extends PersistableBase {
 		this.transaction = transaction;
 	}
 
+	public Map<QuameterProteinGroup, Integer> getIdentifiedSpectra() {
+		return identifiedSpectra;
+	}
+
+	public void setIdentifiedSpectra(Map<QuameterProteinGroup, Integer> identifiedSpectra) {
+		this.identifiedSpectra = identifiedSpectra;
+	}
+
 	public boolean isHidden() {
 		return hidden;
 	}

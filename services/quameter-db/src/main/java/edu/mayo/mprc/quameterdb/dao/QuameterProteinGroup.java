@@ -21,6 +21,14 @@ public final class QuameterProteinGroup extends EvolvableBase {
 	private String name;
 	private String regex;
 
+	public QuameterProteinGroup() {
+	}
+
+	public QuameterProteinGroup(final String name, final String regex) {
+		this.name = name;
+		this.regex = regex;
+	}
+
 	@Override
 	public Criterion getEqualityCriteria() {
 		return Restrictions.conjunction()
@@ -34,7 +42,7 @@ public final class QuameterProteinGroup extends EvolvableBase {
 	}
 
 	@Override
-	public boolean equals(Object obj) {
+	public boolean equals(final Object obj) {
 		if (this == obj) {
 			return true;
 		}
@@ -49,7 +57,7 @@ public final class QuameterProteinGroup extends EvolvableBase {
 		return name;
 	}
 
-	public void setName(String name) {
+	public void setName(final String name) {
 		this.name = name;
 	}
 
@@ -57,7 +65,7 @@ public final class QuameterProteinGroup extends EvolvableBase {
 		return regex;
 	}
 
-	public void setRegex(String regex) {
+	public void setRegex(final String regex) {
 		this.regex = regex;
 	}
 }
