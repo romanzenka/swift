@@ -75,11 +75,11 @@
 
 
 <div id="annotFormDiv" class="annotationDiv">
-    <form id="annotForm" action="/service/new-annotation" method="post">
+    <form id="annotForm" action="/service/new-annotation" method="post" onsubmit="return false;">
         <textarea name="text" cols="50" rows="3" style="margin: 1px"></textarea></br>
         <input type="hidden" id="hiddenMetricCode" name="metricCode">
         <input type="hidden" id="hiddenRowid" name="dbId">
-        <input type="submit" value="Submit" style="float:right">
+        <input type="submit" id="submitAnnotation" value="Submit" style="float:right">
     </form>
 </div>
 

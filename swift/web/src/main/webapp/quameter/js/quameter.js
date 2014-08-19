@@ -2,6 +2,7 @@
 rawInsturmentNames=[];
 views = [], gs = [];
 numberOfSimpleGraphs = 0;
+dyViewsByCode={};
 
 function populateInstArray(dt){
     for(var r=0; r < dt.getNumberOfRows(); r++) {
@@ -61,14 +62,41 @@ function categoryButtons(){
 }
 
 function createNewAnnotationForm(parentName, dbID){
-    console.log(parentName, dbID);
     var metricCode = parentName.split("-")[1];
-    console.log(metricCode);
     $('#hiddenMetricCode').val( metricCode );
     $('#hiddenRowid').val( dbID );
-    $('#annotFormDiv').show();//.appendTo('body')
+    $('#annotFormDiv').show();
 }
 
+function getXaxisNseriesById(data, dbId){
+    for (var i = 0; i < data.getNumberOfRows(); i++) {
+       // console.log(i,columnIndex("id", data),data.getValue(i, columnIndex("id", data)),dbId);
+        if(data.getValue(i, columnIndex("id", data)).toString() === dbId.toString()) {
+            return [data.getValue(i, columnIndex("startTime", data)), data.getValue(i, columnIndex("instrument", data))];
+        }
+    }
+    alert("Id " + dbId + " does not exist");
+}
+
+function buildCollection(collection, data,  metricCode){
+    var arrayForDYgraphs = [];
+    for(var o in collection){
+        if(collection[o].metricCode === metricCode){
+           // console.log( collection[o]);
+            var nthx = getXaxisNseriesById(data, collection[o].quameterResultId);
+            arrayForDYgraphs.push(
+                {
+                    series: getNiceName(nthx[1]),
+                    x: nthx[0].toString(),
+                    shortText: "A",
+                    text: collection[o].text
+                }
+            )
+
+        }
+    }
+    return arrayForDYgraphs;
+}
 
 function getMetricTitle(n){
     var hLink, qLink;
@@ -94,8 +122,21 @@ function spanAllUnderscoreTokens(s) {
 function activeCatagoriesFilters(){
     var selectedCategory = [];
     categoryButtons().each(function () {
+        var wrapperId = "#wrapper-"+$(this).attr("value"); //for protein id, hide entire graph when excluded
         if ($(this).hasClass('btn-primary')) {
             selectedCategory.push($(this).attr("value"));
+
+            if( $(wrapperId).length ) // use this if you are using id to check
+            {
+                $(wrapperId).show();
+            }
+
+        }
+        else{
+            if( $(wrapperId).length ) // use this if you are using id to check
+            {
+                $(wrapperId).hide();
+            }
         }
     });
     return selectedCategory;
@@ -132,6 +173,7 @@ function updateAllViews(data) {
 
     for (var i = 0; i < views.length; i++) {
        if(views[i] === undefined){console.log(i);continue;} //empty for detail graphs until generated
+        dyViewsByCode[views[i].metricId]=i;
 
         views[i].dataView.setRows(filteredRows);
         views[i].dataView.setColumns( getSmartColumns(columnIndex("startTime",data),views[i].metricId) );
@@ -187,7 +229,7 @@ function selectPoint(data, dataRow) {
 }
 
 
-function addDygraph( viewIndex, view, viewId, metricId, viewMetadata, data, range) {
+function addDygraph( viewIndex, view, viewId, metricId, viewMetadata, data, range, annotCollection) {
     views[viewIndex] = { dataView: view, minHighlightY: 1, maxHighlightY: -1, metricId: metricId };
     var currentView = views[viewIndex];
     var selectedPath = $('#selected-path');
@@ -231,17 +273,17 @@ function addDygraph( viewIndex, view, viewId, metricId, viewMetadata, data, rang
                     var range = me.xAxisRange();
                     for (var j = 0; j < views.length; j++) {
                         if (gs[j] == me) continue;
-                        if(gs[j] === undefined){console.log(j,gs)} //TODO errant lookup
+                        if(gs[j] === undefined){console.log("Errand LOOKUP",j,gs)}
                         gs[j].updateOptions({
                             dateWindow: range
                         });
                     }
                     blockRedraw = false;
                 },
-                drawPoints: true,
+                //drawPoints: true,
                 connectSeparatedPoints: true,
                 pointSize: 2,
-                strokeWidth: 0.4,
+                strokeWidth: 0.7,
                 highlightSeriesOpts: {
                     strokeWidth: 2,
                     strokeBorderWidth: 1,
@@ -307,6 +349,8 @@ function addDygraph( viewIndex, view, viewId, metricId, viewMetadata, data, rang
             }
     );
 
+    var annotArr = buildCollection(annotCollection, data, metricId);
+    dygraph.setAnnotations(annotArr);
     views[viewIndex].dygraph = dygraph;
     gs.push(views[viewIndex].dygraph);
 }
@@ -319,6 +363,7 @@ function drawGraphsByMetrics(data, renderDetailGraphs, viewMetadata){
 
 
     var viewIndex = 0;
+    var annotCollection = getAnnotationCollection();
     if( renderDetailGraphs ){ viewIndex=numberOfSimpleGraphs }
     var previousCategory = '';
     for (var i = 0; i < metrics.length; i++) {
@@ -346,24 +391,24 @@ function drawGraphsByMetrics(data, renderDetailGraphs, viewMetadata){
 
         if( renderDetailGraphs ){
             var viewId = "graph-" + metricId;
-            $('<div class="row-fluid"><div class="span12">' +
+            $('<div id="wrapper-'+metric.label+'" class="row-fluid"><div class="span12">' +
                 getMetricTitle(i) +
                 '<div id="'+viewId+'" class="simple-graph"></div>' +
                 '</div></div>'
             ).appendTo("#detailedGraphs");
-            addDygraph( viewIndex, view, viewId, metricId, viewMetadata, data, metric.range);
+            addDygraph( viewIndex, view, viewId, metricId, viewMetadata, data, metric.range, annotCollection);
             viewIndex++;
         }
         else{
             if (1 == metric.simple) {
                 var viewId = "simpleGraph-" + metricId;
-                $('<div class="row-fluid">' +
+                $('<div id="wrapper-'+metric.label+'" class="row-fluid">' +
                     '<div class="span12">' +
                     getMetricTitle(i)
-                    + '<div id="' + viewId + '" class="simple-graph"></div>' +
+                    + '<div id="'+viewId+'" class="simple-graph"></div>' +
                     '</div></div>'
                 ).appendTo("#simpleGraphs");
-                addDygraph( viewIndex, view, viewId, metricId, viewMetadata, data, metric.range);
+                addDygraph( viewIndex, view, viewId, metricId, viewMetadata, data, metric.range, annotCollection);
                 viewIndex++;
             }
         }
@@ -443,8 +488,38 @@ function initSimpleCharts(graphObj) {
         updateAllViews(data);
       });
 
-    // Create dummy array to display thresholds for all values on init()
-    // var allRowsIndex = $.map($(Array(data.getNumberOfRows())),function(val, i) { return i; }) // already created at start
+
+    // Async form for submitting
+    $("#submitAnnotation").click(function(){
+        $.ajax({
+            type: 'POST',
+            url: "/service/new-annotation",
+            data: $('#annotForm').serialize(),
+            success: function(response) {
+                $('#annotFormDiv').hide();
+
+                var nthView = dyViewsByCode[$('#annotForm').find('input[name="metricCode"]').val()];
+                var nthx = getXaxisNseriesById(data, $('#annotForm').find('input[name="dbId"]').val()) ;
+
+                var annotations = views[nthView].dygraph.annotations();
+                annotations.push(
+                    {
+                        series: getNiceName(nthx[1]),
+                        x: nthx[0].toString(),
+                        shortText: "A",
+                        text: $('#annotForm').find('input[name="text"]').val()
+                    }
+                );
+
+                views[nthView].dygraph.setAnnotations( annotations );
+
+
+            },
+            error: function() {
+                alert("There was an error submitting this annotation comment!");
+            }
+        });
+    });
 
     //Looks at the butons and filters rows & columns based on selection
     updateAllViews(data);
@@ -452,6 +527,19 @@ function initSimpleCharts(graphObj) {
 
 
 
+
+function getAnnotationCollection(){
+    var jsonData;
+    $.ajax({
+        dataType: "json",
+        async: false,
+        url: "/service/list-annotation.json",
+        success: function(response) {
+            jsonData = response['quameterannotation'];
+        }
+    });
+    return jsonData;
+}
 
 
 function getSmartColumns(dataIdx, metricId){
@@ -467,3 +555,6 @@ function getSmartColumns(dataIdx, metricId){
     };
     return cols;
 }
+
+
+
