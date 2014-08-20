@@ -1,5 +1,5 @@
 CREATE TABLE `quameter_annotation` (
-  `quameter_annotation_id` INT NOT NULL,
+  `quameter_annotation_id` INT NOT NULL AUTO_INCREMENT,
   `metric_code` VARCHAR(10) NULL,
   `quameter_result_id` INT NULL,
   `annotation_text` TEXT NULL,
@@ -8,6 +8,7 @@ CREATE TABLE `quameter_annotation` (
 ALTER TABLE `quameter_annotation`
 ADD INDEX `quameter_result_ibfk_1_idx` (`quameter_result_id` ASC);
 ALTER TABLE `quameter_annotation`
+ADD KEY `quameter_result_idx_1` (`quameter_result_id`),
 ADD CONSTRAINT `quameter_result_ibfk_1`
   FOREIGN KEY (`quameter_result_id`)
   REFERENCES `quameter_result` (`quameter_result_id`)
