@@ -3,6 +3,8 @@ rawInsturmentNames=[];
 views = [], gs = [];
 numberOfSimpleGraphs = 0;
 dyViewsByCode={};
+viewMetadata = {};
+
 
 function populateInstArray(dt){
     for(var r=0; r < dt.getNumberOfRows(); r++) {
@@ -160,23 +162,29 @@ function updateAllViews(data) {
     pointHighlighted = -1;
 
     activeCats = activeCatagoriesFilters();
-
+    console.log("Active Cats", activeCats);
 
     var filteredRows = [];
     for (var r=0; r<data.getNumberOfRows(); r++) {
         var category = data.getValue(r, columnIndex('category', data) );
+        console.log(category);
         var rowId = data.getValue(r, columnIndex("id", data))
-        if ( activeCats.contains(category) && !hiddenIds["id"+rowId]) {
+        console.log(r, category,activeCats.contains(category),rowId, !hiddenIds["id"+rowId]);
+        if( activeCats.contains(category) && !hiddenIds["id"+rowId] ){
             filteredRows.push(r)
         }
     }
+
+    viewMetadata.filteredRows = filteredRows;
 
     for (var i = 0; i < views.length; i++) {
        if(views[i] === undefined){console.log(i);continue;} //empty for detail graphs until generated
         dyViewsByCode[views[i].metricId]=i;
 
-        views[i].dataView.setRows(filteredRows);
         views[i].dataView.setColumns( getSmartColumns(columnIndex("startTime",data),views[i].metricId) );
+        views[i].dataView.setRows(filteredRows);
+        console.log(views[i]);
+        console.log(filteredRows);
 
         var sum = 0;
         var count = views[i].dataView.getNumberOfRows();
@@ -341,7 +349,7 @@ function addDygraph( viewIndex, view, viewId, metricId, viewMetadata, data, rang
                     var row = viewMetadata.filteredRows[pointHighlighted];
                     highlightRow(row);
 
-
+                    console.log(event)
                     createNewAnnotationForm(event.target.parentNode.parentNode.id, data.getValue(row, columnIndex("id", data)));
 
                     dygraph.updateOptions({file: currentView.dataView});
@@ -360,8 +368,6 @@ function addDygraph( viewIndex, view, viewId, metricId, viewMetadata, data, rang
 
 //  Important basic graphing functions
 function drawGraphsByMetrics(data, renderDetailGraphs, viewMetadata){
-
-
     var viewIndex = 0;
     var annotCollection = getAnnotationCollection();
     if( renderDetailGraphs ){ viewIndex=numberOfSimpleGraphs }
@@ -424,7 +430,6 @@ function initSimpleCharts(graphObj) {
     var data = new google.visualization.DataTable( graphObj, 0.6 );
     populateInstArray(data);
 
-    var viewMetadata = {};
     // Populate array with index to every row
     var allRows = Array(data.getNumberOfRows());
     for (var i = 0; i < data.getNumberOfRows(); i++) { allRows[i] = i; }
@@ -496,29 +501,27 @@ function initSimpleCharts(graphObj) {
             url: "/service/new-annotation",
             data: $('#annotForm').serialize(),
             success: function(response) {
-                $('#annotFormDiv').hide();
-
                 var nthView = dyViewsByCode[$('#annotForm').find('input[name="metricCode"]').val()];
                 var nthx = getXaxisNseriesById(data, $('#annotForm').find('input[name="dbId"]').val()) ;
-
+                var txt = $(this).closest('form').find("input[type=text], textarea").val();
+                console.log("Text:",txt);
                 var annotations = views[nthView].dygraph.annotations();
                 annotations.push(
                     {
                         series: getNiceName(nthx[1]),
                         x: nthx[0].toString(),
                         shortText: "A",
-                        text: $('#annotForm').find('input[name="text"]').val()
+                        text: txt
                     }
                 );
-
                 views[nthView].dygraph.setAnnotations( annotations );
-
-
             },
             error: function() {
                 alert("There was an error submitting this annotation comment!");
             }
         });
+        $(this).closest('form').find("input[type=text], textarea").val("");
+        $('#annotFormDiv').hide();
     });
 
     //Looks at the butons and filters rows & columns based on selection
