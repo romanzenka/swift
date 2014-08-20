@@ -16,3 +16,11 @@ Adding Graph Ranges
 /// Peak width y range (0 to 30sec) & peak spread
 /// Duration y range (0 60 sec)
 
+
+annotation -> not disappering
+  -> not about to write over
+  -> text not showing up until refresh
+
+  insturments not correct, when shown independantly
+
+  buttons to dygraph line colors
