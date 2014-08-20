@@ -9,7 +9,7 @@ import java.io.File;
  */
 interface Mgf2SequestInterface {
 	void callSequest(File outputFile, File paramsFile, File mgfFile, long startTimeOut, long watchDogTimeOut, File hdrFile,
-	                 UserProgressReporter progressReporter);
+	                 UserProgressReporter progressReporter, PvmUtilities pvmUtilities);
 
 	void setSequestExe(String sequestExe);
 

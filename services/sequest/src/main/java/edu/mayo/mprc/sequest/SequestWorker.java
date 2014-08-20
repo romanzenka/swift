@@ -15,6 +15,7 @@ import edu.mayo.mprc.daemon.worker.WorkerFactoryBase;
 import edu.mayo.mprc.searchengine.EngineFactory;
 import edu.mayo.mprc.searchengine.EngineMetadata;
 import edu.mayo.mprc.sequest.core.Mgf2SequestCaller;
+import edu.mayo.mprc.sequest.core.PvmUtilities;
 import edu.mayo.mprc.utilities.FileUtilities;
 import edu.mayo.mprc.utilities.progress.UserProgressReporter;
 import org.apache.log4j.Logger;
@@ -75,7 +76,8 @@ public final class SequestWorker extends WorkerBase {
 				120 * 1000/* start timeout */,
 				10 * 60 * 1000 /* watchdog timeout */,
 				sequestWorkPacket.getDatabaseFile(),
-				progressReporter
+				progressReporter,
+				new PvmUtilities()
 		);
 
 		publish(outputFile, finalOutputFile);

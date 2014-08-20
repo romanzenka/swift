@@ -27,6 +27,7 @@ class SequestRunner implements Runnable, SequestCallerInterface {
 	//static final String PVM_DAEMON = '/usr/share/pvm3/lib/LINUX64/pvmd3'
 	private static final String PVM_DAEMON = "pvmd3";
 
+	private PvmUtilities pvm;
 
 	/**
 	 * use this to override the sequest exe (can include path)
@@ -63,8 +64,9 @@ class SequestRunner implements Runnable, SequestCallerInterface {
 	 */
 	SequestRunner(final File workingdir,
 	              final File paramsFile, final List<File> sequestDtaFiles, final File hostsFile,
-	              final UserProgressReporter progressReporter) {
+	              final UserProgressReporter progressReporter, final PvmUtilities pvmUtilities) {
 		setWorkingDir(workingdir);
+		this.pvm = pvmUtilities;
 		this.paramsFile = paramsFile;
 		this.sequestDtaFiles = sequestDtaFiles;
 		this.hostsFile = hostsFile;
@@ -141,8 +143,8 @@ class SequestRunner implements Runnable, SequestCallerInterface {
 	@Override
 	public SequestCallerInterface createInstance(final File workingdir,
 	                                             final File paramsFile, final List<File> sequestDtaFiles, final File hostsFile,
-	                                             UserProgressReporter progressReporter) {
-		final SequestRunner runner = new SequestRunner(workingdir, paramsFile, sequestDtaFiles, this.hostsFile, progressReporter);
+	                                             UserProgressReporter progressReporter, PvmUtilities pvmUtilities) {
+		final SequestRunner runner = new SequestRunner(workingdir, paramsFile, sequestDtaFiles, this.hostsFile, progressReporter, pvmUtilities);
 		runner.setWatchDogTimeOut(getWatchDogTimeOut());
 		runner.setStartTimeOut(getStartTimeOut());
 		if (getCommand() != null) {
@@ -282,7 +284,6 @@ class SequestRunner implements Runnable, SequestCallerInterface {
 		assert hostsFile != null : "Path to pvm_hosts file is not set";
 		final String userName = System.getProperties().getProperty("user.name");
 		LOGGER.info("validating pvm for user [" + userName + "]");
-		final PvmUtilities pvm = new PvmUtilities();
 		pvm.makeSurePVMOk(userName, hostsFile.getAbsolutePath(), PVM_DAEMON, "/tmp");
 	}
 

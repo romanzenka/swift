@@ -24,7 +24,7 @@ class Mgf2SequestCallerStubbed implements Mgf2SequestInterface {
 
 	@Override
 	public void callSequest(final File tarFile, final File paramsFile, final File mgfFile, final long startTimeOut, final long watchDogTimeOut, final File hdrFile,
-	                        final UserProgressReporter progressReporter) {
+	                        final UserProgressReporter progressReporter, PvmUtilities pvmUtilities) {
 
 		// validate that mgf file exists
 		final boolean havemgf = mgfFile.isFile();
@@ -55,7 +55,7 @@ class Mgf2SequestCallerStubbed implements Mgf2SequestInterface {
 		}
 
 		final SequestSubmitterInterface s = new SequestSubmit(100, paramsFile, outputDir, new File(outputDir, "mytar.tar"), hostsFile,
-				progressReporter);
+				progressReporter, pvmUtilities);
 
 		final SequestRunnerStub sc = new SequestRunnerStub(tempfolder, null, new ArrayList<File>(), hostsFile);
 

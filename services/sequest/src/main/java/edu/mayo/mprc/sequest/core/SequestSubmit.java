@@ -74,8 +74,10 @@ final class SequestSubmit implements SequestSubmitterInterface {
 
 	private UserProgressReporter progressReporter;
 
+	private PvmUtilities pvmUtilities;
+
 	SequestSubmit(final long maxLineLength, final File paramsFile, final File workingDir, final File tarFile,
-	              final File hostsFile, final UserProgressReporter progressReporter) {
+	              final File hostsFile, final UserProgressReporter progressReporter, final PvmUtilities pvmUtilities) {
 		// this needs to be grabbed from the system
 		this.maxLineLength = (int) maxLineLength;
 		this.paramsFile = paramsFile;
@@ -85,6 +87,7 @@ final class SequestSubmit implements SequestSubmitterInterface {
 		this.hostsFile = hostsFile;
 		creationTime = new Date().getTime();
 		this.progressReporter = progressReporter;
+		this.pvmUtilities = pvmUtilities;
 	}
 
 
@@ -233,10 +236,10 @@ final class SequestSubmit implements SequestSubmitterInterface {
 		SequestRunner sequestRunner = null;
 		// make the call to sequest
 		if (sequestCaller == null) {
-			sequestCaller = new SequestRunner(outputDir, paramsFile, dtaFiles, hostsFile, progressReporter);
+			sequestCaller = new SequestRunner(outputDir, paramsFile, dtaFiles, hostsFile, progressReporter, pvmUtilities);
 			sequestRunner = (SequestRunner) sequestCaller;
 		} else {
-			sequestRunner = (SequestRunner) sequestCaller.createInstance(sequestCaller.getWorkingDir(), paramsFile, dtaFiles, hostsFile, progressReporter);
+			sequestRunner = (SequestRunner) sequestCaller.createInstance(sequestCaller.getWorkingDir(), paramsFile, dtaFiles, hostsFile, progressReporter, pvmUtilities);
 			sequestRunner.setStartTimeOut(sequestCaller.getStartTimeOut());
 			sequestRunner.setWatchDogTimeOut(sequestCaller.getWatchDogTimeOut());
 			sequestRunner.setSearchResultsFolder(sequestCaller.getSearchResultsFolder());
