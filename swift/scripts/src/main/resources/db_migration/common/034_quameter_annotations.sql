@@ -5,15 +5,15 @@ CREATE TABLE `quameter_annotation` (
   `annotation_text` TEXT NULL,
   PRIMARY KEY (`quameter_annotation_id`));
 
-ALTER TABLE `quameter_annotation`
-ADD INDEX `quameter_result_ibfk_1_idx` (`quameter_result_id` ASC);
-ALTER TABLE `quameter_annotation`
-ADD KEY `quameter_result_idx_1` (`quameter_result_id`),
-ADD CONSTRAINT `quameter_result_ibfk_1`
+ALTER TABLE `atlas_migration`.`quameter_annotation`
+ADD INDEX `quameter_annotation_idx_1` (`quameter_result_id` ASC);
+ALTER TABLE .`quameter_annotation`
+ADD CONSTRAINT `quameter_annotation_ibfk_1`
   FOREIGN KEY (`quameter_result_id`)
-  REFERENCES `quameter_result` (`quameter_result_id`)
+  REFERENCES `atlas_migration`.`quameter_result` (`quameter_result_id`)
   ON DELETE NO ACTION
   ON UPDATE NO ACTION;
+
 
 -- @UNDO
 

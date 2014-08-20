@@ -10,7 +10,7 @@
 
         <property name="reportFile" column="report_file" type="file" length="1500" />
         <property name="dateCreated" type="org.joda.time.contrib.hibernate.PersistentDateTime" column="date_created" />
-        <many-to-one name="searchRun" class="SearchRun" column="transaction_id" index="Report_transaction_index"
+        <many-to-one name="searchRun" class="SearchRun" column="transaction_id" index="report_idx_1"
             not-null="true" foreign-key="report_ibfk_1" />
         <!-- A foreign key report_ibfk_2 is manually added -->
         <property name="analysisId" type="int" column="analysis_id" not-null="false" />
