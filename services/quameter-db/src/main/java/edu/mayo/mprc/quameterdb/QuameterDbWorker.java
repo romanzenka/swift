@@ -1,10 +1,10 @@
 package edu.mayo.mprc.quameterdb;
 
-import com.google.common.base.Function;
 import com.google.common.base.Splitter;
-import com.google.common.collect.Iterables;
-import com.google.common.collect.Iterators;
-import com.google.common.collect.Lists;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+import com.google.gson.JsonSyntaxException;
 import edu.mayo.mprc.MprcException;
 import edu.mayo.mprc.config.*;
 import edu.mayo.mprc.config.ui.ServiceUiFactory;
@@ -14,16 +14,13 @@ import edu.mayo.mprc.daemon.worker.Worker;
 import edu.mayo.mprc.daemon.worker.WorkerBase;
 import edu.mayo.mprc.daemon.worker.WorkerFactoryBase;
 import edu.mayo.mprc.database.Database;
-import edu.mayo.mprc.fastadb.FastaDbDao;
 import edu.mayo.mprc.quameterdb.dao.QuameterDao;
 import edu.mayo.mprc.quameterdb.dao.QuameterProteinGroup;
-import edu.mayo.mprc.searchdb.dao.SearchDbDao;
 import edu.mayo.mprc.utilities.FileUtilities;
 import edu.mayo.mprc.utilities.progress.UserProgressReporter;
 import org.apache.log4j.Logger;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.Nullable;
 import javax.annotation.Resource;
 import java.io.BufferedReader;
 import java.io.File;
@@ -46,11 +43,13 @@ public final class QuameterDbWorker extends WorkerBase {
 	private static final String DATABASE = "database";
 	public static final String CATEGORIES = "categories";
 	public static final String PROTEINS = "proteins";
+	public static final String INSTRUMENT_NAME_MAP = "instrumentNameMap";
 
 	private final List<QuameterProteinGroup> proteins;
 
 	public QuameterDbWorker(final QuameterDao quameterDao,
-	                        final List<QuameterProteinGroup> proteins) {
+	                        final List<QuameterProteinGroup> proteins,
+	                        final Map<String, String> instrumentNameMap) {
 		this.dao = quameterDao;
 		this.proteins = proteins;
 	}
@@ -145,21 +144,8 @@ public final class QuameterDbWorker extends WorkerBase {
 		@Override
 		public Worker create(final Config config, final DependencyResolver dependencies) {
 			return new QuameterDbWorker(getQuameterDao(),
-					parseConfigProteins(config.getCategories(), config.getProteins()));
-		}
-
-		private List<QuameterProteinGroup> parseConfigProteins(final String categories, final String proteins) {
-			final Iterable<String> categorySplit = Splitter.on(',').trimResults().split(categories);
-
-//			final Iterable<String> split = Splitter.on(',').trimResults().split(proteins);
-//			final Function<String, Pattern> stringPatternFunction = new Function<String, Pattern>() {
-//				@Override
-//				public Pattern apply(final String s) {
-//					return Pattern.compile(s);
-//				}
-//			};
-//			return Lists.newArrayList(Iterables.transform(split, stringPatternFunction));
-			return new ArrayList<QuameterProteinGroup>(0);
+					config.getProteins(),
+					config.getInstrumentNameMap());
 		}
 	}
 
@@ -170,6 +156,71 @@ public final class QuameterDbWorker extends WorkerBase {
 		private Database.Config database;
 		private String categories;
 		private String proteins;
+		private String instrumentNameMap;
+
+		public static Map<String, String> parseInstrumentNameMap(final String instrumentNameMap) {
+			try {
+				return parseMap(instrumentNameMap);
+			} catch (final Exception e) {
+				throw new MprcException("Could not parse instrument name map", e);
+			}
+		}
+
+		public static List<QuameterProteinGroup> parseConfigProteins(final String proteins) {
+			try {
+				final Map<String, String> proteinMap = parseMap(proteins);
+				final List<QuameterProteinGroup> groups = new ArrayList<QuameterProteinGroup>(proteinMap.size());
+				for (final Map.Entry<String, String> entry : proteinMap.entrySet()) {
+					final String key = entry.getKey();
+					final String value = entry.getValue();
+					checkEntry(key, value);
+					groups.add(new QuameterProteinGroup(key, value));
+				}
+				return groups;
+			} catch (final Exception e) {
+				throw new MprcException("Could not parse protein map", e);
+			}
+		}
+
+		private static void checkEntry(final String key, final String value) {
+			try {
+				Pattern.compile(value);
+			} catch (final Exception e) {
+				throw new MprcException(String.format("Bad pattern for key [%s]", key), e);
+			}
+		}
+
+		/**
+		 * Parse a map stored as key=value, comma separated.
+		 * Backslash serves as an escape sequence for = or commas that have to be embedded in the values.
+		 *
+		 * @param map Map to parse.
+		 * @return Parsed map.
+		 */
+		private static Map<String, String> parseMap(final String map) {
+			final Map<String, String> result = new LinkedHashMap<String, String>();
+			final JsonElement parse;
+			try {
+				parse = new JsonParser().parse(map);
+			} catch (final JsonSyntaxException e) {
+				throw new MprcException("Could not parse map from given JSON string", e);
+			}
+
+			if (!parse.isJsonObject()) {
+				throw new MprcException("We expected a JSON map");
+			}
+			final JsonObject jsonObject = parse.getAsJsonObject();
+			for (final Map.Entry<String, JsonElement> entries : jsonObject.entrySet()) {
+				final String key = entries.getKey();
+				final JsonElement jsonValue = entries.getValue();
+				if (!jsonValue.isJsonPrimitive() || !jsonValue.getAsJsonPrimitive().isString()) {
+					throw new MprcException(String.format("The map value for key [%s] is not a string", key));
+				}
+				final String value = jsonValue.getAsJsonPrimitive().getAsString();
+				result.put(key, value);
+			}
+			return result;
+		}
 
 		public Database.Config getDatabase() {
 			return database;
@@ -180,6 +231,7 @@ public final class QuameterDbWorker extends WorkerBase {
 			writer.put(DATABASE, writer.save(getDatabase()));
 			writer.put(CATEGORIES, categories);
 			writer.put(PROTEINS, proteins);
+			writer.put(INSTRUMENT_NAME_MAP, instrumentNameMap);
 		}
 
 		@Override
@@ -187,6 +239,7 @@ public final class QuameterDbWorker extends WorkerBase {
 			database = (Database.Config) reader.getObject(DATABASE);
 			categories = reader.get(CATEGORIES);
 			proteins = reader.get(PROTEINS);
+			instrumentNameMap = reader.get(INSTRUMENT_NAME_MAP);
 		}
 
 		@Override
@@ -198,8 +251,12 @@ public final class QuameterDbWorker extends WorkerBase {
 			return categories;
 		}
 
-		public String getProteins() {
-			return proteins;
+		public List<QuameterProteinGroup> getProteins() {
+			return parseConfigProteins(proteins);
+		}
+
+		public Map<String, String> getInstrumentNameMap() {
+			return parseInstrumentNameMap(instrumentNameMap);
 		}
 	}
 
@@ -215,15 +272,32 @@ public final class QuameterDbWorker extends WorkerBase {
 
 					.property(CATEGORIES, "Categories", "Categories for the different QuaMeter quality checks." +
 							"<p>You can assign a category to each search. The QuaMeter user interface will then allow you to pick a category" +
-							"to filter all the results. The categories are comma-separated. Use a dash in front of a category to form sub-categories.</p>" +
+							"to filter all the results. The categories are comma-separated. Use a dash (or multiple dashes) in front of a category to form sub-categories." +
+							"An asterisk <tt>*</tt> after the category name designates a default category.</p>" +
 							"<p>Example: <tt>animal,-cat,--siamese,-dog,--chihuahua</tt></p>")
 					.defaultValue("no-category")
 
-					.property(PROTEINS, "Proteins", "Each category from the upper list needs a regular expression that selects" +
-							" protein accessions from that category. The regular expressions are separated by commas." +
-							" This enables QuaMeter display to list number of spectra assigned to proteins of interest" +
-							"<p>Example: <tt>ANIMAL1|ANIMAL2,CAT1|CAT2|CATS_.*,SIAMESE.*,DOG1|DOG2,CHIHUAHUA_\\d+</tt>")
-					.defaultValue(".*");
+					.property(PROTEINS, "Proteins", "You can define multiple patterns for matching proteins." +
+							" This enables QuaMeter display to list number of spectra assigned to proteins of interest." +
+							" <p>" +
+							" The patterns are named. A pattern named after a category is associated with that category." +
+							" A pattern with a different name will produce additional graphs in the QuaMeter user interface," +
+							" that are independent on categories.</p>" +
+							"" +
+							" <p>The map is stored in JSON format as map of string->string. " +
+							" You can use a <a href=\"http://jsonformatter.curiousconcept.com/\">validator</a> to check your syntax." +
+							" Keep in mind that backslashes, for instance <tt>\\d</tt> need to be doubled: <tt>\\\\d</t></p>" +
+							" " +
+							"<p>Example: <tt>{\"cat\":\"CAT1|CAT2|CATS_.*\", \"siamese\":\"SIAMESE.*\", \"dog\":\"DOG1|DOG2\", \"contaminants\":\"ALBU_\\\\d*\"}</tt> will" +
+							" turn into <tt>cat, siamese, dog</tt> graphs associated with the categories, and <tt>contaminants</tt> graph" +
+							" that will be always visible.</p>")
+					.defaultValue("")
+
+					.property(INSTRUMENT_NAME_MAP, "Instrument Name Map", "You can rename instruments as stored in .RAW files using this map. " +
+							"The instruments not listed will retain their names." +
+							"<p>The instrument map is stored in JSON format as map of string->string." +
+							"<p>Example: <tt>{\"01475B\":\"Orbi\", \"Exactive Serie 3093\":\"QE1\"}</tt></p>")
+					.defaultValue("");
 
 		}
 	}

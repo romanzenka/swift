@@ -11,7 +11,6 @@ import edu.mayo.mprc.database.Dao;
 import edu.mayo.mprc.quameterdb.dao.QuameterDao;
 import edu.mayo.mprc.quameterdb.dao.QuameterProteinGroup;
 import edu.mayo.mprc.quameterdb.dao.QuameterResult;
-import edu.mayo.mprc.searchdb.dao.ProteinGroupList;
 import edu.mayo.mprc.swift.params2.SearchEngineParameters;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
@@ -42,6 +41,7 @@ public final class QuameterUi implements Dao, UiConfigurationProvider {
 	private final QuameterDao quameterDao;
 	private final Pattern searchFilter;
 	private final QuameterDbWorker.Config dbWorkerConfig;
+	private final Map<String, String> instrumentMap;
 	private static final DateTimeFormatter DATE_FORMAT_1 = DateTimeFormat.forPattern("'Date('yyyy, ").withLocale(Locale.US);
 	private static final DateTimeFormatter DATE_FORMAT_2 = DateTimeFormat.forPattern(", d, H, m, s, S')'").withLocale(Locale.US);
 
@@ -56,6 +56,7 @@ public final class QuameterUi implements Dao, UiConfigurationProvider {
 		this.quameterDao = quameterDao;
 		this.searchFilter = searchFilter;
 		this.dbWorkerConfig = dbWorkerConfig;
+		this.instrumentMap = dbWorkerConfig.getInstrumentNameMap();
 	}
 
 	@Override
@@ -131,7 +132,7 @@ public final class QuameterUi implements Dao, UiConfigurationProvider {
 		writeValue(writer, result.getSample().getStartTime()); // startTime
 		writeValue(writer, result.getSample().getFile().getAbsolutePath()); // path
 		writeValue(writer, result.getSample().getRunTimeInSeconds() / SEC_TO_MIN); // duration
-		writeValue(writer, result.getSample().getInstrumentSerialNumber()); // instrument
+		writeValue(writer, mapInstrument(result.getSample().getInstrumentSerialNumber())); // instrument
 		writeValue(writer, result.getCategory());
 		final SearchEngineParameters parameters = result.getFileSearch().getSearchParameters();
 		writeValue(writer, parameters != null ? parameters.getId() : 0); // search parameters id
@@ -149,6 +150,11 @@ public final class QuameterUi implements Dao, UiConfigurationProvider {
 
 		writer.endArray();
 		writer.endObject();
+	}
+
+	private String mapInstrument(final String instrumentSerialNumber) {
+		final String result = instrumentMap.get(instrumentSerialNumber);
+		return result == null ? instrumentSerialNumber : result;
 	}
 
 	private void writeCol(final JsonWriter writer, final String id, final String label, final String type) throws IOException {

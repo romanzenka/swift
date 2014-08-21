@@ -32,21 +32,6 @@ var metricCategories = {
         p: "Protease",
         id: "Protein ID"
     };
- 
-function getNiceName( str ){   
-    var niceNames = {
-        "01475B" : "Orbi",
-        "Exactive Serie 3093" : "QE1",
-        "Q Exactive Plus 3093" : "QE1",
-        "LTQ30471" : "LTQ-Velos"
-    }
-    if(str in niceNames){
-        return niceNames[str];
-    }
-    else{
-        return str;
-    }
-}
 
 var metrics = [
         { code: "c_1a", label: "C-1A", name: "Bleed Ratio", good: "low", simple: 0, desc: "Fraction of peptides with repeat identifications >4 min earlier than identification closest to the chromatographic maximum" },
