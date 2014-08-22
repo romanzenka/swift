@@ -7,6 +7,7 @@ import edu.mayo.mprc.database.DaoTest;
 import edu.mayo.mprc.fastadb.FastaDbDaoHibernate;
 import edu.mayo.mprc.quameterdb.dao.QuameterAnnotation;
 import edu.mayo.mprc.quameterdb.dao.QuameterDaoHibernate;
+import edu.mayo.mprc.quameterdb.dao.QuameterProteinGroup;
 import edu.mayo.mprc.quameterdb.dao.QuameterResult;
 import edu.mayo.mprc.searchdb.dao.SearchDbDaoHibernate;
 import edu.mayo.mprc.searchdb.dao.TandemMassSpectrometrySample;
@@ -95,7 +96,7 @@ public final class QuameterUiTest extends DaoTest {
 		final Map<String, String> metadata = new HashMap<String, String>(1);
 		metadata.put("quameter.category", "AL-Kappa");
 
-		User user = workspaceDao.addNewUser("Tester", "Testin", "test@test.tst", new Change("testing", new DateTime()));
+		final User user = workspaceDao.addNewUser("Tester", "Testin", "test@test.tst", new Change("testing", new DateTime()));
 
 		final SwiftSearchDefinition definition = swiftDao.addSwiftSearchDefinition(
 				new SwiftSearchDefinition("test", user, null, null, null, null, fileSearches,
@@ -111,7 +112,7 @@ public final class QuameterUiTest extends DaoTest {
 
 		searchDbDao.commit();
 
-		final QuameterDbWorker.Config quameterDbConfig = new QuameterDbWorker.Config();
+		final QuameterDbWorker.Config quameterDbConfig = new QuameterDbWorker.Config(null, "animal,-cat*,-dog", "", "");
 
 		final QuameterUi.Config config = new QuameterUi.Config();
 		config.setSearchFilter(".*");
@@ -215,12 +216,12 @@ public final class QuameterUiTest extends DaoTest {
 
 		nextTransaction();
 
-		QuameterAnnotation annotation = new QuameterAnnotation(QuameterResult.QuameterColumn.c_3a, quameterResult.getId(), "annotation text");
+		final QuameterAnnotation annotation = new QuameterAnnotation(QuameterResult.QuameterColumn.c_3a, quameterResult.getId(), "annotation text");
 		quameterDao.addAnnotation(annotation);
 
 		nextTransaction();
 
-		List<QuameterAnnotation> quameterAnnotations = quameterDao.listAnnotations();
+		final List<QuameterAnnotation> quameterAnnotations = quameterDao.listAnnotations();
 		Assert.assertEquals(quameterAnnotations.size(), 1, "Must get 1 annotation that was just added");
 		Assert.assertEquals(quameterAnnotations.get(0).getText(), "annotation text", "Annotation text must be stored properly");
 
@@ -235,18 +236,18 @@ public final class QuameterUiTest extends DaoTest {
 
 		nextTransaction();
 
-		QuameterAnnotation annotation = new QuameterAnnotation(QuameterResult.QuameterColumn.c_3a, quameterResult.getId(), "annotation text");
+		final QuameterAnnotation annotation = new QuameterAnnotation(QuameterResult.QuameterColumn.c_3a, quameterResult.getId(), "annotation text");
 		quameterDao.addAnnotation(annotation);
 
 		nextTransaction();
 
 		// Replace annotation
-		QuameterAnnotation annotation2 = new QuameterAnnotation(QuameterResult.QuameterColumn.c_3a, quameterResult.getId(), "annotation text replacement");
+		final QuameterAnnotation annotation2 = new QuameterAnnotation(QuameterResult.QuameterColumn.c_3a, quameterResult.getId(), "annotation text replacement");
 		quameterDao.addAnnotation(annotation2);
 
 		nextTransaction();
 
-		List<QuameterAnnotation> quameterAnnotations = quameterDao.listAnnotations();
+		final List<QuameterAnnotation> quameterAnnotations = quameterDao.listAnnotations();
 		Assert.assertEquals(quameterAnnotations.size(), 1, "Must get 1 annotation that was just added");
 		Assert.assertEquals(quameterAnnotations.get(0).getText(), "annotation text replacement", "The existing annotation must be replaced");
 
@@ -262,10 +263,10 @@ public final class QuameterUiTest extends DaoTest {
 
 		nextTransaction();
 
-		QuameterAnnotation annotation = new QuameterAnnotation(QuameterResult.QuameterColumn.c_3a, quameterResult1.getId(), "annotation text shown");
+		final QuameterAnnotation annotation = new QuameterAnnotation(QuameterResult.QuameterColumn.c_3a, quameterResult1.getId(), "annotation text shown");
 		quameterDao.addAnnotation(annotation);
 
-		QuameterAnnotation annotation2 = new QuameterAnnotation(QuameterResult.QuameterColumn.c_3a, quameterResult2.getId(), "annotation text hidden");
+		final QuameterAnnotation annotation2 = new QuameterAnnotation(QuameterResult.QuameterColumn.c_3a, quameterResult2.getId(), "annotation text hidden");
 		quameterDao.addAnnotation(annotation2);
 
 		nextTransaction();
@@ -275,9 +276,40 @@ public final class QuameterUiTest extends DaoTest {
 
 		nextTransaction();
 
-		List<QuameterAnnotation> quameterAnnotations = quameterDao.listAnnotations();
+		final List<QuameterAnnotation> quameterAnnotations = quameterDao.listAnnotations();
 		Assert.assertEquals(quameterAnnotations.size(), 1, "Must get 1 annotation only (1 is hidden)");
 		Assert.assertEquals(quameterAnnotations.get(0).getText(), "annotation text shown", "Only the shown result must be listed");
+
+		quameterDao.commit();
+	}
+
+	@Test
+	public void shouldManageQuameterProteinGroups() {
+		quameterDao.begin(); // Initial load
+
+		final List<QuameterProteinGroup> groups = Arrays.asList(
+				new QuameterProteinGroup("hello", "world"),
+				new QuameterProteinGroup("group2", "regex2")
+		);
+		quameterDao.updateProteinGroups(groups);
+
+		nextTransaction(); // List what is in database
+
+		final List<QuameterProteinGroup> proteinGroups = quameterDao.listProteinGroups();
+		Assert.assertEquals(proteinGroups.size(), 2);
+
+		nextTransaction(); // Update list
+
+		final List<QuameterProteinGroup> groups2 = Arrays.asList(
+				new QuameterProteinGroup("hello", "world"),
+				new QuameterProteinGroup("group3", "regex3")
+		);
+		quameterDao.updateProteinGroups(groups2);
+
+		nextTransaction(); // List what is in database
+
+		final List<QuameterProteinGroup> proteinGroups2 = quameterDao.listProteinGroups();
+		Assert.assertEquals(proteinGroups.size(), 2);
 
 		quameterDao.commit();
 	}

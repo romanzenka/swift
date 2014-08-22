@@ -230,7 +230,6 @@ public class SearchDbDaoHibernate extends DaoBase implements RuntimeInitializer,
 
 	@Override
 	public Map<Integer, List<String>> getAccessionNumbersMapForProteinSequences(final Set<Integer> proteinSequenceLists, final Integer databaseId) {
-		final HashMap<Integer, List<String>> result = Maps.newHashMap();
 		final Query query = getSession().createQuery("select distinct psl.id, pa.accnum from" +
 				" ProteinSequenceList as psl" +
 				" inner join psl.list as ps," +
@@ -245,7 +244,39 @@ public class SearchDbDaoHibernate extends DaoBase implements RuntimeInitializer,
 		if (databaseId != null) {
 			query.setParameter("databaseId", databaseId);
 		}
+		return makeAccnumMap(query);
+	}
+
+	@Override
+	public Map<Integer, List<String>> getAccessionNumbersMapForProteinGroups(Set<Integer> proteinGroupIds, Integer databaseId) {
+		final Query query = getSession().createQuery("select distinct psl.id, pa.accnum from" +
+				" ProteinGroup as pg " +
+				" inner join pg.proteinSequences as psl" +
+				" inner join psl.list as ps," +
+				" ProteinEntry as pe," +
+				" ProteinAccnum as pa" +
+				" where pe.sequence = ps" +
+				" and pe.accessionNumber = pa" +
+				(databaseId != null ? " and pe.database.id = :databaseId" : "") +
+				" and pg.id in (:ids)")
+				.setParameterList("ids", proteinGroupIds.toArray());
+
+		if (databaseId != null) {
+			query.setParameter("databaseId", databaseId);
+		}
+		return makeAccnumMap(query);
+	}
+
+	/**
+	 * For given query producing two columns - id and accession number, return a map from
+	 * protein id to a list of all accession numbers that belong to it.
+	 * @param query Query to execute
+	 * @return Resulting map.
+	 */
+	private static Map<Integer, List<String>> makeAccnumMap(final Query query) {
 		final List<Object> list = listAndCast(query);
+
+		final Map<Integer, List<String>> result = Maps.newHashMap();
 
 		int lastGroup = -1;
 		final Collection<String> numbers = new ArrayList<String>(20);
@@ -329,6 +360,28 @@ public class SearchDbDaoHibernate extends DaoBase implements RuntimeInitializer,
 		final TreeMap<Integer, ProteinSequenceList> allProteinGroups = new TreeMap<Integer, ProteinSequenceList>();
 		for (final ProteinSequenceList psl : list) {
 			allProteinGroups.put(psl.getId(), psl);
+		}
+		return allProteinGroups;
+	}
+
+	@Override
+	public TreeMap<Integer, ProteinGroup> getProteinGroupsForSample(final Analysis analysis, final TandemMassSpectrometrySample sample) {
+		final List<ProteinGroup> list = listAndCast(getSession().createQuery("select distinct pg from" +
+						" Analysis a" +
+						" inner join a.biologicalSamples as bsl" +
+						" inner join bsl.list as b" +
+						" inner join b.searchResults as srl" +
+						" inner join srl.list as r" +
+						" inner join r.proteinGroups as pgl" +
+						" inner join pgl.list as pg" +
+						" where a=:a and r.massSpecSample=:sample")
+						.setParameter("a", analysis)
+						.setParameter("sample", sample)
+		);
+
+		final TreeMap<Integer, ProteinGroup> allProteinGroups = new TreeMap<Integer, ProteinGroup>();
+		for (final ProteinGroup pg : list) {
+			allProteinGroups.put(pg.getId(), pg);
 		}
 		return allProteinGroups;
 	}

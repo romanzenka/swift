@@ -62,6 +62,16 @@ public abstract class SearchDbDaoBlank implements SearchDbDao {
 	}
 
 	@Override
+	public TreeMap<Integer, ProteinGroup> getProteinGroupsForSample(Analysis analysis, TandemMassSpectrometrySample sample) {
+		return null;
+	}
+
+	@Override
+	public Map<Integer, List<String>> getAccessionNumbersMapForProteinGroups(Set<Integer> proteinGroupIds, Integer databaseId) {
+		return null;
+	}
+
+	@Override
 	public Map<Integer, List<String>> getAccessionNumbersMapForProteinSequences(final Set<Integer> proteinSequenceLists, final Integer databaseId) {
 		return null;
 	}

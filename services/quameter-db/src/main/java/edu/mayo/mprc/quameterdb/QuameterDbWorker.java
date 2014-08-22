@@ -32,7 +32,7 @@ import java.util.regex.Pattern;
 /**
  * @author Roman Zenka
  */
-public final class QuameterDbWorker extends WorkerBase {
+public final class QuameterDbWorker extends WorkerBase implements Lifecycle {
 	private static final Logger LOGGER = Logger.getLogger(QuameterDbWorker.class);
 	private QuameterDao dao;
 
@@ -45,7 +45,9 @@ public final class QuameterDbWorker extends WorkerBase {
 	public static final String PROTEINS = "proteins";
 	public static final String INSTRUMENT_NAME_MAP = "instrumentNameMap";
 
-	private final List<QuameterProteinGroup> proteins;
+	private List<QuameterProteinGroup> proteins;
+
+	private boolean running;
 
 	public QuameterDbWorker(final QuameterDao quameterDao,
 	                        final List<QuameterProteinGroup> proteins,
@@ -61,7 +63,11 @@ public final class QuameterDbWorker extends WorkerBase {
 		try {
 			final Map<String, Double> map = loadQuameterResultFile(workPacket.getQuameterResultFile());
 
-			final Map<QuameterProteinGroup, Integer> identifiedSpectra = dao.getIdentifiedSpectra(workPacket.getFileSearchId(), proteins);
+			final Map<QuameterProteinGroup, Integer> identifiedSpectra = dao.getIdentifiedSpectra(
+					workPacket.getAnalysisId(),
+					workPacket.getFileSearchId(),
+					workPacket.getTandemMassSpectrometrySampleId(),
+					proteins);
 
 			dao.addQuameterScores(workPacket.getTandemMassSpectrometrySampleId(),
 					workPacket.getFileSearchId(),
@@ -125,6 +131,33 @@ public final class QuameterDbWorker extends WorkerBase {
 		return map;
 	}
 
+	@Override
+	public boolean isRunning() {
+		return running;
+	}
+
+	@Override
+	public void start() {
+		if (!isRunning()) {
+			// On start we take our protein groups and store them in the database
+			dao.begin();
+			try {
+				proteins = dao.updateProteinGroups(proteins);
+				dao.commit();
+			} catch (Exception e) {
+				dao.rollback();
+			}
+			running = true;
+		}
+	}
+
+	@Override
+	public void stop() {
+		if (isRunning()) {
+			running = false;
+		}
+	}
+
 	/**
 	 * A factory capable of creating the worker
 	 */
@@ -157,6 +190,16 @@ public final class QuameterDbWorker extends WorkerBase {
 		private String categories;
 		private String proteins;
 		private String instrumentNameMap;
+
+		public Config() {
+		}
+
+		public Config(final Database.Config database, final String categories, final String proteins, final String instrumentNameMap) {
+			this.database = database;
+			this.categories = categories;
+			this.proteins = proteins;
+			this.instrumentNameMap = instrumentNameMap;
+		}
 
 		public static Map<String, String> parseInstrumentNameMap(final String instrumentNameMap) {
 			try {
@@ -206,6 +249,9 @@ public final class QuameterDbWorker extends WorkerBase {
 				throw new MprcException("Could not parse map from given JSON string", e);
 			}
 
+			if (parse.isJsonNull()) {
+				return result;
+			}
 			if (!parse.isJsonObject()) {
 				throw new MprcException("We expected a JSON map");
 			}

@@ -11,16 +11,18 @@ public final class SearchDbResult implements ProgressInfo {
 	private static final long serialVersionUID = 20130129L;
 
 	private Map<String, Integer> loadedRawFileMetadata;
+	private Integer analysisId;
 
-	public SearchDbResult(Map<String, Integer> loadedRawFileMetadata) {
+	public SearchDbResult(final Map<String, Integer> loadedRawFileMetadata, final int analysisId) {
 		this.loadedRawFileMetadata = loadedRawFileMetadata;
+		this.analysisId = analysisId;
 	}
 
 	public Map<String, Integer> getLoadedRawFileMetadata() {
 		return loadedRawFileMetadata;
 	}
 
-	public void setLoadedRawFileMetadata(Map<String, Integer> loadedRawFileMetadata) {
-		this.loadedRawFileMetadata = loadedRawFileMetadata;
+	public Integer getAnalysisId() {
+		return analysisId;
 	}
 }

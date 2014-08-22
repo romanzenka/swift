@@ -27,6 +27,10 @@ public final class SearchDbTask extends AsyncTaskBase {
 
 	private final Map<String, RAWDumpTask> rawDumpTaskMap = new HashMap<String, RAWDumpTask>(5);
 	private Map<String, Integer> loadedTandemFileMetadata;
+	/**
+	 * The scaffold report gets loaded into an analysis object. This is the analysis ID.
+	 */
+	private Integer analysisId;
 
 	/**
 	 * Create the task that depends on Scaffold invocation.
@@ -66,6 +70,10 @@ public final class SearchDbTask extends AsyncTaskBase {
 		return loadedTandemFileMetadata;
 	}
 
+	public Integer getAnalysisId() {
+		return analysisId;
+	}
+
 	@Override
 	public WorkPacket createWorkPacket() {
 		final HashMap<String, RawFileMetaData> metaDataMap = new HashMap<String, RawFileMetaData>(rawDumpTaskMap.size());
@@ -84,7 +92,9 @@ public final class SearchDbTask extends AsyncTaskBase {
 	@Override
 	public void onProgress(final ProgressInfo progressInfo) {
 		if (progressInfo instanceof SearchDbResult) {
-			loadedTandemFileMetadata = ((SearchDbResult) progressInfo).getLoadedRawFileMetadata();
+			final SearchDbResult result = (SearchDbResult) progressInfo;
+			analysisId = result.getAnalysisId();
+			loadedTandemFileMetadata = result.getLoadedRawFileMetadata();
 		}
 	}
 
