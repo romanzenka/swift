@@ -105,4 +105,13 @@ public abstract class SearchDbDaoBlank implements SearchDbDao {
 	public String qualifyTableName(final String table) {
 		return table;
 	}
+
+	@Override
+	public String check() {
+		return null;
+	}
+
+	@Override
+	public void install(Map<String, String> params) {
+	}
 }

@@ -1,6 +1,7 @@
 package edu.mayo.mprc.quameterdb.dao;
 
 import com.google.common.collect.*;
+import edu.mayo.mprc.config.RuntimeInitializer;
 import edu.mayo.mprc.database.Change;
 import edu.mayo.mprc.database.DaoBase;
 import edu.mayo.mprc.searchdb.dao.Analysis;
@@ -24,7 +25,7 @@ import java.util.regex.Pattern;
  * @author Roman Zenka
  */
 @Repository("quameterDao")
-public final class QuameterDaoHibernate extends DaoBase implements QuameterDao {
+public final class QuameterDaoHibernate extends DaoBase implements QuameterDao, RuntimeInitializer {
 	private static final Logger LOGGER = Logger.getLogger(QuameterDaoHibernate.class);
 	private static final String MAP = "edu/mayo/mprc/quameterdb/dao/";
 
@@ -229,5 +230,16 @@ public final class QuameterDaoHibernate extends DaoBase implements QuameterDao {
 	@Resource(name = "swiftDao")
 	public void setSwiftDao(final SwiftDao swiftDao) {
 		this.swiftDao = swiftDao;
+	}
+
+	@Override
+	public String check() {
+		return null;  // TODO: Implement this method
+	}
+
+	@Override
+	public void install(Map<String, String> params) {
+		swiftDao.install(params);
+		searchDbDao.install(params);
 	}
 }

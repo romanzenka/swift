@@ -39,7 +39,7 @@ public final class TestSwiftDaoHibernate extends DaoTest {
 	private CurationDaoHibernate curationDao;
 	private ParamsDaoHibernate paramsDao;
 	private UnimodDaoHibernate unimodDao;
-	SwiftDaoHibernate swiftDao;
+	private SwiftDaoHibernate swiftDao;
 
 	@BeforeTest
 	public void init() {
@@ -81,14 +81,31 @@ public final class TestSwiftDaoHibernate extends DaoTest {
 	public void shouldCheckExistingSearches() {
 		swiftDao.begin();
 		try {
-			SearchRunFilter filter = new SearchRunFilter();
-			filter.setCount("1000");
 
-			List<SearchRun> searchRunList = swiftDao.getSearchRunList(filter, true);
+			List<SearchRun> searchRunList = swiftDao.getSearchRunList(runFilter(), true);
 			swiftDao.commit();
 
 			Assert.assertEquals(searchRunList.size(), 1, "We have 1 search run by default");
 			Assert.assertEquals(searchRunList.get(0).getReports().size(), 0, "There are no reports");
+		} catch (Exception e) {
+			swiftDao.rollback();
+			throw new MprcException(e);
+		}
+	}
+
+	private SearchRunFilter runFilter() {
+		SearchRunFilter filter = new SearchRunFilter();
+		filter.setCount("1000");
+		return filter;
+	}
+
+	@Test
+	public void shouldGetNumberOfRunningTasks() {
+		swiftDao.begin();
+		try {
+			SearchRun searchRun = swiftDao.getSearchRunList(runFilter(), true).get(0);
+			Assert.assertEquals(swiftDao.getNumberRunningTasksForSearchRun(searchRun), 0, "The run has nothing running at the moment");
+			swiftDao.commit();
 		} catch (Exception e) {
 			swiftDao.rollback();
 			throw new MprcException(e);

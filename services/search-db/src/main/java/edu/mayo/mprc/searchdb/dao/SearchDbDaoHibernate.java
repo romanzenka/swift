@@ -3,12 +3,15 @@ package edu.mayo.mprc.searchdb.dao;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import edu.mayo.mprc.MprcException;
-import edu.mayo.mprc.config.RuntimeInitializer;
 import edu.mayo.mprc.database.*;
 import edu.mayo.mprc.fastadb.FastaDbDao;
 import edu.mayo.mprc.fastadb.ProteinSequence;
+import edu.mayo.mprc.fastadb.ProteinSequenceTranslator;
+import edu.mayo.mprc.searchdb.builder.AnalysisBuilder;
+import edu.mayo.mprc.searchdb.builder.MassSpecDataExtractor;
 import edu.mayo.mprc.swift.db.SwiftDao;
 import edu.mayo.mprc.swift.dbmapping.ReportData;
+import edu.mayo.mprc.swift.dbmapping.SearchRun;
 import edu.mayo.mprc.swift.dbmapping.SwiftSearchDefinition;
 import edu.mayo.mprc.utilities.FileUtilities;
 import edu.mayo.mprc.utilities.exceptions.ExceptionUtilities;
@@ -16,6 +19,7 @@ import edu.mayo.mprc.utilities.progress.PercentProgressReporter;
 import edu.mayo.mprc.utilities.progress.PercentRangeReporter;
 import org.hibernate.Query;
 import org.hibernate.criterion.Restrictions;
+import org.joda.time.DateTime;
 
 import javax.annotation.Resource;
 import java.io.File;
@@ -27,13 +31,18 @@ import java.util.*;
  *
  * @author Roman Zenka
  */
-public class SearchDbDaoHibernate extends DaoBase implements RuntimeInitializer, SearchDbDao {
+public class SearchDbDaoHibernate extends DaoBase implements SearchDbDao {
 	private SwiftDao swiftDao;
 	private FastaDbDao fastaDbDao;
 
 	private static final String MAP = "edu/mayo/mprc/searchdb/dao/";
 
 	public SearchDbDaoHibernate() {
+	}
+
+	public SearchDbDaoHibernate(SwiftDao swiftDao, FastaDbDao fastaDbDao) {
+		this.swiftDao = swiftDao;
+		this.fastaDbDao = fastaDbDao;
 	}
 
 	public SearchDbDaoHibernate(final SwiftDao swiftDao, final FastaDbDao fastaDbDao, final Database database) {
@@ -67,6 +76,24 @@ public class SearchDbDaoHibernate extends DaoBase implements RuntimeInitializer,
 
 	@Override
 	public void install(Map<String, String> params) {
+		swiftDao.install(params);
+		fastaDbDao.install(params);
+		if (params.containsKey("test")) {
+
+			// Build results of two sample analyses
+			ProteinSequenceTranslator proteinSequenceTranslator = null; // TODO
+			MassSpecDataExtractor massSpecDataExtractor = null; // TODO
+			AnalysisBuilder builder = new AnalysisBuilder(proteinSequenceTranslator, massSpecDataExtractor);
+			SearchRun searchRun = null; // TODO
+			ReportData reportData = new ReportData(new File("dummy.sf3"), new DateTime(), searchRun);
+
+//			addAnalysis(builder.build(), reportData, new PercentProgressReporter() {
+//				@Override
+//				public void reportProgress(float percent) {
+//					// Do nothing at the moment
+//				}
+//			});
+		}
 	}
 
 	public ProteinGroup addProteinGroup(final ProteinGroup group, final PercentRangeReporter reporter) {
@@ -270,6 +297,7 @@ public class SearchDbDaoHibernate extends DaoBase implements RuntimeInitializer,
 	/**
 	 * For given query producing two columns - id and accession number, return a map from
 	 * protein id to a list of all accession numbers that belong to it.
+	 *
 	 * @param query Query to execute
 	 * @return Resulting map.
 	 */

@@ -1,5 +1,6 @@
 package edu.mayo.mprc.searchdb.dao;
 
+import edu.mayo.mprc.config.RuntimeInitializer;
 import edu.mayo.mprc.database.Dao;
 import edu.mayo.mprc.database.QueryCallback;
 import edu.mayo.mprc.swift.dbmapping.ReportData;
@@ -15,7 +16,7 @@ import java.util.TreeMap;
  * This dao should be implemented in an efficient manner. Typically a large amount of queries (10000x per input file)
  * is going to be run when adding peptide/protein sequences.
  */
-public interface SearchDbDao extends Dao {
+public interface SearchDbDao extends Dao, RuntimeInitializer {
 	/**
 	 * Add analysis.
 	 *
