@@ -3,7 +3,6 @@ package edu.mayo.mprc.dbcurator.model;
 import edu.mayo.mprc.config.RuntimeInitializer;
 import edu.mayo.mprc.database.Change;
 import edu.mayo.mprc.database.Dao;
-import edu.mayo.mprc.database.Evolvable;
 import org.joda.time.DateTime;
 
 import java.util.List;
@@ -40,8 +39,6 @@ public interface CurationDao extends Dao, RuntimeInitializer {
 
 	HeaderTransform getHeaderTransformByUrl(String url);
 
-	HeaderTransform getHeaderTransformByName(String name);
-
 	/**
 	 * @return All curations.
 	 */
@@ -74,30 +71,11 @@ public interface CurationDao extends Dao, RuntimeInitializer {
 	 */
 	Curation getLegacyCuration(final String uniqueName);
 
-	List<Curation> getCurationsByShortname(String curationShortName);
-
 	List<Curation> getCurationsByShortname(final String shortname, final boolean ignoreCase);
 
 	List<FastaSource> getCommonSources();
 
-	void addHeaderTransform(HeaderTransform sprotTrans);
-
 	List<HeaderTransform> getCommonHeaderTransforms();
-
-	long countAll(Class<? extends Evolvable> clazz);
-
-	long rowCount(Class<?> clazz);
-
-	/**
-	 * Adds a "legacy" curation entry into the database. This is to support importing legacy data into Swift.
-	 * We know the curation name, but not anything else.
-	 *
-	 * @param legacyName Name of the curation
-	 * @return Newly added curation.
-	 */
-	Curation addLegacyCuration(String legacyName);
-
-	void addFastaSource(FastaSource source);
 
 	void flush();
 }

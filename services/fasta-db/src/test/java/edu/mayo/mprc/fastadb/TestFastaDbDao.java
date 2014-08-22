@@ -3,7 +3,7 @@ package edu.mayo.mprc.fastadb;
 import edu.mayo.mprc.MprcException;
 import edu.mayo.mprc.database.DaoTest;
 import edu.mayo.mprc.dbcurator.model.Curation;
-import edu.mayo.mprc.dbcurator.model.impl.CurationDaoImpl;
+import edu.mayo.mprc.dbcurator.model.impl.CurationDaoHibernate;
 import edu.mayo.mprc.utilities.FileUtilities;
 import edu.mayo.mprc.utilities.TestingUtilities;
 import org.testng.Assert;
@@ -23,12 +23,12 @@ import java.util.Arrays;
  */
 public class TestFastaDbDao extends DaoTest {
 	private FastaDbDaoHibernate fastaDbDao;
-	private CurationDaoImpl curationDao;
+	private CurationDaoHibernate curationDao;
 
 	@BeforeMethod
 	public void setup() {
 		fastaDbDao = new FastaDbDaoHibernate();
-		curationDao = new CurationDaoImpl();
+		curationDao = new CurationDaoHibernate();
 
 		initializeDatabase(Arrays.asList(fastaDbDao, curationDao));
 	}
