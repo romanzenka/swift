@@ -3,10 +3,11 @@ package edu.mayo.mprc.workspace;
 import edu.mayo.mprc.config.RuntimeInitializer;
 import edu.mayo.mprc.database.Change;
 import edu.mayo.mprc.database.Dao;
+import edu.mayo.mprc.database.TestDataProvider;
 
 import java.util.List;
 
-public interface WorkspaceDao extends Dao, RuntimeInitializer {
+public interface WorkspaceDao extends Dao, RuntimeInitializer, TestDataProvider {
 	/**
 	 * @return List of users recognized by the system. The user list should be treated as read-only - you cannot
 	 *         modify the user information.

@@ -16,8 +16,8 @@
         </set>
 
         <many-to-one name="creation" column="creation" class="edu.mayo.mprc.database.Change" lazy="proxy"
-            foreign-key="instrument_ibfk_2" />
+            index="instrument_idx_2" foreign-key="instrument_ibfk_2" />
         <many-to-one name="deletion" column="deletion" class="edu.mayo.mprc.database.Change" lazy="proxy"
-            foreign-key="instrument_ibfk_1" />
+            index="instrument_idx_1" foreign-key="instrument_ibfk_1" />
     </class>
 </hibernate-mapping>

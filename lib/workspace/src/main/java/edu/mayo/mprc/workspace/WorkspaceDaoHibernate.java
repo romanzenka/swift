@@ -1,7 +1,6 @@
 package edu.mayo.mprc.workspace;
 
 import edu.mayo.mprc.MprcException;
-import edu.mayo.mprc.config.RuntimeInitializer;
 import edu.mayo.mprc.database.Change;
 import edu.mayo.mprc.database.DaoBase;
 import edu.mayo.mprc.database.Database;
@@ -16,7 +15,7 @@ import org.springframework.stereotype.Repository;
 import java.util.*;
 
 @Repository("workspaceDao")
-public final class WorkspaceDaoHibernate extends DaoBase implements WorkspaceDao, RuntimeInitializer {
+public final class WorkspaceDaoHibernate extends DaoBase implements WorkspaceDao {
 	private static final Logger LOGGER = Logger.getLogger(WorkspaceDaoHibernate.class);
 
 	public WorkspaceDaoHibernate() {
@@ -121,5 +120,14 @@ public final class WorkspaceDaoHibernate extends DaoBase implements WorkspaceDao
 		} catch (Exception t) {
 			throw new MprcException("Cannot obtain list of users", t);
 		}
+	}
+
+	@Override
+	public void installTestData(final Map<String, String> params) {
+		final Change change = new Change("Creating a test data set", new DateTime());
+		final User user = new User("John", "Doe", "joedoe@localhost", "mt", "database");
+		save(user, change, true);
+		final User user2 = new User("Donald", "Vines", "DonaldLVines@localhost", "mt", "database");
+		save(user2, change, true);
 	}
 }
