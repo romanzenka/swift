@@ -6,8 +6,6 @@ import edu.mayo.mprc.database.Dao;
 import edu.mayo.mprc.swift.dbmapping.*;
 import edu.mayo.mprc.utilities.progress.ProgressReport;
 import edu.mayo.mprc.workflow.persistence.TaskState;
-import edu.mayo.mprc.workspace.User;
-import org.hibernate.Session;
 import org.joda.time.DateTime;
 
 import java.io.File;
@@ -16,15 +14,6 @@ import java.util.List;
 import java.util.Set;
 
 public interface SwiftDao extends Dao, RuntimeInitializer {
-	/**
-	 * see if a title already exists
-	 *
-	 * @param title Title of the search (as the user entered it)
-	 * @param user  The user to run the search.
-	 * @return true when the given user already entered transaction of given title.
-	 */
-	boolean isExistingTitle(String title, User user);
-
 	/**
 	 * retrieve the tasks data list for given search run id.
 	 * <p/>
@@ -64,10 +53,6 @@ public interface SwiftDao extends Dao, RuntimeInitializer {
 
 	SearchRun getSearchRunForId(int searchRunId);
 
-	SpectrumQa addSpectrumQa(SpectrumQa spectrumQa);
-
-	PeptideReport addPeptideReport(PeptideReport peptideReport);
-
 	SwiftSearchDefinition addSwiftSearchDefinition(SwiftSearchDefinition definition);
 
 	SwiftSearchDefinition getSwiftSearchDefinition(Integer swiftSearchId);
@@ -83,28 +68,12 @@ public interface SwiftDao extends Dao, RuntimeInitializer {
 	SearchRun fillSearchRun(SwiftSearchDefinition swiftSearch);
 
 	/**
-	 * @param task Task to update in the database.
-	 * @return The updated version of the task.
-	 */
-	TaskData updateTask(TaskData task);
-
-	TaskStateData getTaskState(Session session, TaskState state);
-
-	/**
 	 * Loads the entire task state table into a hash map so it can function at reasonable speeed.
 	 *
 	 * @param state State to translate to {@link TaskStateData}
 	 * @return {@link TaskStateData} for given {@link TaskState}.
 	 */
 	TaskStateData getTaskState(TaskState state);
-
-	/**
-	 * Add a new task state (if it does not exist already in the database).
-	 * Flushes the task state cache (for now).
-	 *
-	 * @param state State to be added.
-	 */
-	void addTaskState(final TaskState state);
 
 	TaskData createTask(int searchRunId, String name, String descriptionLong, TaskState taskState);
 
@@ -172,11 +141,6 @@ public interface SwiftDao extends Dao, RuntimeInitializer {
 	 * Just return {@link FileSearch} object for given id.
 	 */
 	FileSearch getFileSearchForId(int fileSearchId);
-
-	/**
-	 * Add a file search object (for testing purposes).
-	 */
-	FileSearch addFileSearch(final FileSearch fileSearch);
 
 	/**
 	 * Get a list of all LogData objects for given task.

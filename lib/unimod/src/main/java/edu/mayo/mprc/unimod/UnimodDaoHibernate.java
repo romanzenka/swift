@@ -103,5 +103,4 @@ public final class UnimodDaoHibernate extends DaoBase implements UnimodDao {
 		}
 		return unimod;
 	}
-
 }

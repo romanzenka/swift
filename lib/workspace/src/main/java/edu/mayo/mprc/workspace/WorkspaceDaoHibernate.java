@@ -17,6 +17,8 @@ import java.util.*;
 @Repository("workspaceDao")
 public final class WorkspaceDaoHibernate extends DaoBase implements WorkspaceDao {
 	private static final Logger LOGGER = Logger.getLogger(WorkspaceDaoHibernate.class);
+	public static final String USER1_EMAIL = "joedoe@localhost";
+	public static final String USER2_EMAIL = "DonaldLVines@localhost";
 
 	public WorkspaceDaoHibernate() {
 	}
@@ -91,11 +93,24 @@ public final class WorkspaceDaoHibernate extends DaoBase implements WorkspaceDao
 	@Override
 	public void install(Map<String, String> params) {
 		LOGGER.info("Installing workspace DAO");
-		if (countAll(User.class) == 0) {
-			final User user = new User("Mprc", "Test", "mprctest@localhost", "mt", "database");
-			save(user, new Change("Creating a test user - no users were defined", new DateTime()), true);
-		}
 
+		if (params.containsKey("test")) {
+			// Install two users for testing purposes
+			final List<User> users = getUsers(false);
+			if (!users.isEmpty()) {
+				return;
+			}
+			final Change change = new Change("Creating a test data set", new DateTime());
+			final User user = new User("John", "Doe", USER1_EMAIL, "mt", "database");
+			save(user, change, true);
+			final User user2 = new User("Donald", "Vines", USER2_EMAIL, "mt", "database");
+			save(user2, change, true);
+		} else {
+			if (countAll(User.class) == 0) {
+				final User user = new User("Mprc", "Test", "mprctest@localhost", "mt", "database");
+				save(user, new Change("Creating a test user - no users were defined", new DateTime()), true);
+			}
+		}
 		addUserInitials();
 	}
 
@@ -120,14 +135,5 @@ public final class WorkspaceDaoHibernate extends DaoBase implements WorkspaceDao
 		} catch (Exception t) {
 			throw new MprcException("Cannot obtain list of users", t);
 		}
-	}
-
-	@Override
-	public void installTestData(final Map<String, String> params) {
-		final Change change = new Change("Creating a test data set", new DateTime());
-		final User user = new User("John", "Doe", "joedoe@localhost", "mt", "database");
-		save(user, change, true);
-		final User user2 = new User("Donald", "Vines", "DonaldLVines@localhost", "mt", "database");
-		save(user2, change, true);
 	}
 }

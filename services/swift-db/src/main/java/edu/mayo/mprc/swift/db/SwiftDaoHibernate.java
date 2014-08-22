@@ -1,17 +1,25 @@
 package edu.mayo.mprc.swift.db;
 
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import edu.mayo.mprc.MprcException;
 import edu.mayo.mprc.daemon.AssignedTaskData;
 import edu.mayo.mprc.daemon.files.FileTokenFactory;
 import edu.mayo.mprc.database.DaoBase;
 import edu.mayo.mprc.database.Database;
+import edu.mayo.mprc.dbcurator.model.CurationDao;
 import edu.mayo.mprc.swift.dbmapping.*;
+import edu.mayo.mprc.swift.params2.*;
+import edu.mayo.mprc.unimod.ModSet;
+import edu.mayo.mprc.unimod.ModSpecificity;
+import edu.mayo.mprc.unimod.Unimod;
+import edu.mayo.mprc.unimod.UnimodDao;
 import edu.mayo.mprc.utilities.FileUtilities;
 import edu.mayo.mprc.utilities.progress.ProgressReport;
 import edu.mayo.mprc.workflow.persistence.TaskState;
 import edu.mayo.mprc.workspace.User;
 import edu.mayo.mprc.workspace.WorkspaceDao;
+import edu.mayo.mprc.workspace.WorkspaceDaoHibernate;
 import org.apache.log4j.Logger;
 import org.hibernate.Criteria;
 import org.hibernate.FetchMode;
@@ -35,6 +43,9 @@ public final class SwiftDaoHibernate extends DaoBase implements SwiftDao {
 	private final Object taskStatesLock = new Object();
 	private Map<TaskState, TaskStateData> taskStates = null;
 	private WorkspaceDao workspaceDao;
+	private CurationDao curationDao;
+	private ParamsDao paramsDao;
+	private UnimodDao unimodDao;
 
 	public SwiftDaoHibernate() {
 		super(null);
@@ -42,6 +53,13 @@ public final class SwiftDaoHibernate extends DaoBase implements SwiftDao {
 
 	public SwiftDaoHibernate(final Database database) {
 		super(database);
+	}
+
+	public SwiftDaoHibernate(final WorkspaceDao workspaceDao, final CurationDao curationDao, final ParamsDao paramsDao, final UnimodDao unimodDao) {
+		this.workspaceDao = workspaceDao;
+		this.curationDao = curationDao;
+		this.paramsDao = paramsDao;
+		this.unimodDao = unimodDao;
 	}
 
 	@Override
@@ -63,25 +81,12 @@ public final class SwiftDaoHibernate extends DaoBase implements SwiftDao {
 	}
 
 	@Override
-	public boolean isExistingTitle(final String title, final User user) {
-		try {
-			final Number qusers = (Number) getSession().createQuery("select count(*) from edu.mayo.mprc.swift.dbmapping.SearchRun t where t.title=:title and t.submittingUser.id=:userId")
-					.setString("title", title)
-					.setParameter("userId", user.getId())
-					.uniqueResult();
-			return qusers.intValue() > 0;
-		} catch (Exception t) {
-			throw new MprcException("Cannot determine whether title " + title + " exists for user " + user, t);
-		}
-	}
-
-	@Override
 	public List<TaskData> getTaskDataList(final int searchRunId) {
 		try {
 			return (List<TaskData>) getSession().createQuery("from TaskData t where t.searchRun.id=:searchRunId order by t.startTimestamp desc")
 					.setInteger("searchRunId", searchRunId)
 					.list();
-		} catch (Exception t) {
+		} catch (final Exception t) {
 			throw new MprcException("Cannot obtain task status list", t);
 		}
 	}
@@ -90,7 +95,7 @@ public final class SwiftDaoHibernate extends DaoBase implements SwiftDao {
 	public TaskData getTaskData(final Integer taskId) {
 		try {
 			return (TaskData) getSession().get(TaskData.class, taskId);
-		} catch (Exception t) {
+		} catch (final Exception t) {
 			throw new MprcException("Cannot obtain task data for id " + taskId, t);
 		}
 	}
@@ -101,13 +106,13 @@ public final class SwiftDaoHibernate extends DaoBase implements SwiftDao {
 			final Criteria criteria = getSession().createCriteria(SearchRun.class);
 			filter.updateCriteria(criteria);
 			if (withReports) {
-				criteria.setFetchMode("reports", FetchMode.SELECT);
+				criteria.setFetchMode("reports", FetchMode.JOIN);
 			}
 			criteria.setCacheable(true)
 					.setReadOnly(true);
 
 			return criteria.list();
-		} catch (Exception t) {
+		} catch (final Exception t) {
 			throw new MprcException("Cannot obtain search run status list for filter: " + filter, t);
 		}
 	}
@@ -123,7 +128,7 @@ public final class SwiftDaoHibernate extends DaoBase implements SwiftDao {
 					.setParameter("searchRun", searchRun)
 					.uniqueResult();
 			return (int) howmanyrunning;
-		} catch (Exception t) {
+		} catch (final Exception t) {
 			throw new MprcException("Cannot determine number of running tasks for search run " + searchRun.getTitle(), t);
 		}
 	}
@@ -171,7 +176,7 @@ public final class SwiftDaoHibernate extends DaoBase implements SwiftDao {
 				resultSet.addAll(criteriaQuery.list());
 			}
 
-		} catch (Exception t) {
+		} catch (final Exception t) {
 			throw new MprcException("Cannot obtain a list search runs from the database.", t);
 		}
 
@@ -186,33 +191,34 @@ public final class SwiftDaoHibernate extends DaoBase implements SwiftDao {
 				throw new MprcException("getSearchRunForId : search run id=" + searchRunId + " was not found.");
 			}
 			return data;
-		} catch (Exception t) {
+		} catch (final Exception t) {
 			throw new MprcException("Cannot obtain search run for id " + searchRunId, t);
 		}
 	}
 
-	@Override
 	public SpectrumQa addSpectrumQa(final SpectrumQa spectrumQa) {
 		try {
 			return save(spectrumQa, false);
-		} catch (Exception t) {
+		} catch (final Exception t) {
 			throw new MprcException("Could not add spectrum QA", t);
 		}
 	}
 
-	@Override
 	public PeptideReport addPeptideReport(final PeptideReport peptideReport) {
 		try {
 			return save(peptideReport, false);
-		} catch (Exception t) {
+		} catch (final Exception t) {
 			throw new MprcException("Could not add peptide report", t);
 		}
 	}
 
+	/**
+	 * Add a file search object (for testing purposes).
+	 */
 	public FileSearch addFileSearch(final FileSearch fileSearch) {
 		try {
 			return save(fileSearch, false);
-		} catch (Exception t) {
+		} catch (final Exception t) {
 			throw new MprcException("Could not add file search information", t);
 		}
 	}
@@ -249,7 +255,7 @@ public final class SwiftDaoHibernate extends DaoBase implements SwiftDao {
 			}
 			return definition;
 
-		} catch (Exception t) {
+		} catch (final Exception t) {
 			throw new MprcException("Could not add swift search definition", t);
 		}
 	}
@@ -261,7 +267,7 @@ public final class SwiftDaoHibernate extends DaoBase implements SwiftDao {
 		}
 		try {
 			return (SwiftSearchDefinition) getSession().load(SwiftSearchDefinition.class, swiftSearchId);
-		} catch (Exception t) {
+		} catch (final Exception t) {
 			throw new MprcException("Cannot obtain swift search definition for id " + swiftSearchId, t);
 		}
 	}
@@ -278,7 +284,7 @@ public final class SwiftDaoHibernate extends DaoBase implements SwiftDao {
 			searchRun.setTasksCompleted(progress.getSucceeded());
 			searchRun.setTasksFailed(progress.getFailed() - progress.getInitFailed());
 			searchRun.setTasksWithWarning(progress.getWarning());
-		} catch (Exception t) {
+		} catch (final Exception t) {
 			throw new MprcException("Cannot persist search run progress", t);
 		}
 	}
@@ -316,21 +322,20 @@ public final class SwiftDaoHibernate extends DaoBase implements SwiftDao {
 
 			try {
 				getSession().saveOrUpdate(data);
-			} catch (Exception t) {
+			} catch (final Exception t) {
 				throw new MprcException("Cannot update search run [" + data.getTitle() + "] in the database", t);
 			}
 			return data;
-		} catch (Exception t) {
+		} catch (final Exception t) {
 			throw new MprcException("Cannot fill search run", t);
 		}
 	}
 
-	@Override
 	public TaskData updateTask(final TaskData task) {
 		LOGGER.debug("Updating task\t'" + task.getTaskName());
 		try {
 			getSession().saveOrUpdate(task);
-		} catch (Exception t) {
+		} catch (final Exception t) {
 			throw new MprcException("Cannot update task " + task, t);
 		}
 
@@ -347,8 +352,13 @@ public final class SwiftDaoHibernate extends DaoBase implements SwiftDao {
 		}
 	}
 
-	@Override
-	public void addTaskState(final TaskState state) {
+	/**
+	 * Add a new task state (if it does not exist already in the database).
+	 * Flushes the task state cache (for now).
+	 *
+	 * @param state State to be added.
+	 */
+	private void addTaskState(final TaskState state) {
 		final TaskStateData taskState = getTaskState(state);
 		if (taskState != null) {
 			return;
@@ -361,8 +371,7 @@ public final class SwiftDaoHibernate extends DaoBase implements SwiftDao {
 		}
 	}
 
-	@Override
-	public TaskStateData getTaskState(final Session session, final TaskState state) {
+	private TaskStateData getTaskState(final Session session, final TaskState state) {
 		synchronized (taskStatesLock) {
 			if (taskStates == null) {
 				listToTaskStateMap(session.createQuery("from TaskStateData").list());
@@ -379,7 +388,7 @@ public final class SwiftDaoHibernate extends DaoBase implements SwiftDao {
 				List<?> list = null;
 				try {
 					list = (List<?>) getSession().createQuery("from TaskStateData").list();
-				} catch (Exception t) {
+				} catch (final Exception t) {
 					throw new MprcException("", t);
 				}
 				listToTaskStateMap(list);
@@ -406,7 +415,7 @@ public final class SwiftDaoHibernate extends DaoBase implements SwiftDao {
 			session.saveOrUpdate(task);
 			return task;
 
-		} catch (Exception t) {
+		} catch (final Exception t) {
 			throw new MprcException("Cannot create a new task " + name + " (" + descriptionLong + ")", t);
 		}
 	}
@@ -424,7 +433,7 @@ public final class SwiftDaoHibernate extends DaoBase implements SwiftDao {
 			searchRun.getReports().add(r);
 			getSession().saveOrUpdate(r);
 			return r;
-		} catch (Exception t) {
+		} catch (final Exception t) {
 			throw new MprcException("Cannot store search run " + searchRunId, t);
 		}
 	}
@@ -441,7 +450,7 @@ public final class SwiftDaoHibernate extends DaoBase implements SwiftDao {
 			taskData.setGridJobId(assignedTaskData.getAssignedId());
 //			taskData.setOutputLogDatabaseToken(fileTokenFactory.fileToDatabaseToken(assignedTaskData.getOutputLogFile()));
 //			taskData.setErrorLogDatabaseToken(fileTokenFactory.fileToDatabaseToken(assignedTaskData.getErrorLogFile()));
-		} catch (Exception t) {
+		} catch (final Exception t) {
 			throw new MprcException("Cannot store task grid request id " + assignedTaskData.getAssignedId() + " for task " + taskData, t);
 		}
 	}
@@ -522,7 +531,7 @@ public final class SwiftDaoHibernate extends DaoBase implements SwiftDao {
 				throw new MprcException("getFileSearchForId : file search id=" + fileSearchId + " was not found.");
 			}
 			return data;
-		} catch (Exception t) {
+		} catch (final Exception t) {
 			throw new MprcException("Cannot obtain file search for id " + fileSearchId, t);
 		}
 	}
@@ -582,9 +591,82 @@ public final class SwiftDaoHibernate extends DaoBase implements SwiftDao {
 	public void install(final Map<String, String> params) {
 		LOGGER.info("Installing Swift DAO");
 		// Initialize the dependent DAO
-		workspaceDao.install(new HashMap<String, String>(0));
+		workspaceDao.install(params);
+		curationDao.install(params);
+		paramsDao.install(params);
+		unimodDao.install(params);
 
-		if (rowCount(TaskStateData.class) != (long) TaskState.values().length) {
+		installTaskStates();
+
+		if (params.containsKey("test")) {
+			// Install the test data
+
+			final File outputFolder = new File("output-folder");
+
+			final SpectrumQa spectrumQa = addSpectrumQa(new SpectrumQa(
+					"orbitrap.param", "Orbi"
+			));
+
+			final PeptideReport peptideReport = addPeptideReport(new PeptideReport());
+
+			final Unimod mods = unimodDao.load();
+			final List<ModSpecificity> carbC = mods.getSpecificitiesByMascotName("Carbamidomethyl (C)");
+			final ModSet fixed = new ModSet();
+			fixed.addAll(carbC);
+
+			final ModSet variable = new ModSet();
+
+			EnabledEngines enabledEngines = new EnabledEngines();
+			enabledEngines.add(new SearchEngineConfig("MASCOT", "2.4"));
+			enabledEngines.add(new SearchEngineConfig("SCAFFOLD", "4.3.3"));
+			enabledEngines = paramsDao.addEnabledEngines(enabledEngines);
+
+			final SearchEngineParameters searchParameters = paramsDao.addSearchEngineParameters(
+					new SearchEngineParameters(
+							getCurationDao().findCuration("ShortTest"),
+							paramsDao.getProteaseByName(Protease.getTrypsinAllowP().getName()),
+							2,
+							1,
+							fixed,
+							variable,
+							new Tolerance(0.5, MassUnit.Da),
+							new Tolerance(10, MassUnit.Ppm),
+							paramsDao.getInstrumentByName(Instrument.ORBITRAP.getName()),
+							ExtractMsnSettings.getMsconvertSettings(),
+							new ScaffoldSettingsBuilder().createScaffoldSettings(),
+							enabledEngines));
+
+			final List<FileSearch> inputFiles = Lists.newArrayList();
+			inputFiles.add(new FileSearch(new File("input1.RAW"), "sample1", "none", "experiment", null));
+			inputFiles.add(new FileSearch(new File("input2.RAW"), "sample2", "none", "experiment", null));
+
+			final Map<String, String> metadata = Maps.newHashMap();
+
+			final User user = workspaceDao.getUserByEmail(WorkspaceDaoHibernate.USER1_EMAIL);
+			if(user==null) {
+				throw new MprcException("There is no user with e-mail "+WorkspaceDaoHibernate.USER1_EMAIL);
+			}
+			final SwiftSearchDefinition definition =
+					addSwiftSearchDefinition(
+							new SwiftSearchDefinition("Test Search 1",
+									user,
+									outputFolder,
+									spectrumQa,
+									peptideReport,
+									searchParameters,
+									inputFiles,
+									false,
+									false,
+									false,
+									metadata));
+
+			final SearchRun run = fillSearchRun(definition);
+
+		}
+	}
+
+	private void installTaskStates() {
+		if (rowCount(TaskStateData.class) != TaskState.values().length) {
 			LOGGER.info("Initializing task state enumeration");
 			for (final TaskState state : TaskState.values()) {
 				addTaskState(state);
@@ -599,5 +681,32 @@ public final class SwiftDaoHibernate extends DaoBase implements SwiftDao {
 	@Resource(name = "workspaceDao")
 	public void setWorkspaceDao(final WorkspaceDao workspaceDao) {
 		this.workspaceDao = workspaceDao;
+	}
+
+	public CurationDao getCurationDao() {
+		return curationDao;
+	}
+
+	@Resource(name = "curationDao")
+	public void setCurationDao(final CurationDao curationDao) {
+		this.curationDao = curationDao;
+	}
+
+	public ParamsDao getParamsDao() {
+		return paramsDao;
+	}
+
+	@Resource(name = "paramsDao")
+	public void setParamsDao(final ParamsDao paramsDao) {
+		this.paramsDao = paramsDao;
+	}
+
+	public UnimodDao getUnimodDao() {
+		return unimodDao;
+	}
+
+	@Resource(name = "unimodDao")
+	public void setUnimodDao(final UnimodDao unimodDao) {
+		this.unimodDao = unimodDao;
 	}
 }

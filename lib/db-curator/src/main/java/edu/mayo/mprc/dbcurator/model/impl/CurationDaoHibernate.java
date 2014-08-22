@@ -50,6 +50,10 @@ public final class CurationDaoHibernate extends DaoBase implements CurationDao {
 		super(database);
 	}
 
+	public CurationDaoHibernate(final CurationContext context) {
+		this.context = context;
+	}
+
 	@Override
 	public Collection<String> getHibernateMappings() {
 		final List<String> list = new ArrayList<String>(Arrays.asList(
@@ -440,6 +444,8 @@ public final class CurationDaoHibernate extends DaoBase implements CurationDao {
 	@Override
 	public void install(Map<String, String> params) {
 		LOGGER.info("Installing database curator data");
+
+		final boolean test = params.containsKey("test");
 
 		HeaderTransform sprotTrans = null;
 		HeaderTransform ipiTrans = null;

@@ -35,6 +35,11 @@ public final class ParamsDaoHibernate extends DaoBase implements ParamsDao {
 	public ParamsDaoHibernate() {
 	}
 
+	public ParamsDaoHibernate(final WorkspaceDao workspaceDao, final CurationDao curationDao) {
+		this.workspaceDao = workspaceDao;
+		this.curationDao = curationDao;
+	}
+
 	public ParamsDaoHibernate(final Database database) {
 		super(database);
 	}
@@ -42,15 +47,6 @@ public final class ParamsDaoHibernate extends DaoBase implements ParamsDao {
 	@Override
 	public Collection<String> getHibernateMappings() {
 		final Collection<String> list = new ArrayList<String>(Arrays.asList(
-				"edu/mayo/mprc/dbcurator/model/Curation.hbm.xml",
-				"edu/mayo/mprc/dbcurator/model/SourceDatabaseArchive.hbm.xml",
-				"edu/mayo/mprc/dbcurator/model/curationsteps/CurationStep.hbm.xml",
-				"edu/mayo/mprc/dbcurator/model/curationsteps/DataSource.hbm.xml",
-				"edu/mayo/mprc/dbcurator/model/curationsteps/HeaderTransform.hbm.xml",
-				"edu/mayo/mprc/unimod/Mod.hbm.xml",
-				"edu/mayo/mprc/unimod/ModSet.hbm.xml",
-				"edu/mayo/mprc/unimod/ModSpecificity.hbm.xml",
-				"edu/mayo/mprc/workspace/User.hbm.xml",
 				PARAMS_FOLDER + "IonSeries.hbm.xml",
 				PARAMS_FOLDER + "Instrument.hbm.xml",
 				PARAMS_FOLDER + "Protease.hbm.xml",
