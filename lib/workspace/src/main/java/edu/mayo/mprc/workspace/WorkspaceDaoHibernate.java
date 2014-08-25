@@ -92,26 +92,29 @@ public final class WorkspaceDaoHibernate extends DaoBase implements WorkspaceDao
 
 	@Override
 	public void install(Map<String, String> params) {
-		LOGGER.info("Installing workspace DAO");
-
 		if (params.containsKey("test")) {
+
 			// Install two users for testing purposes
 			final List<User> users = getUsers(false);
 			if (!users.isEmpty()) {
 				return;
 			}
+
+			LOGGER.info("Installing test data for " + getClass().getName());
+
 			final Change change = new Change("Creating a test data set", new DateTime());
 			final User user = new User("John", "Doe", USER1_EMAIL, "mt", "database");
 			save(user, change, true);
 			final User user2 = new User("Donald", "Vines", USER2_EMAIL, "mt", "database");
 			save(user2, change, true);
 		} else {
+			LOGGER.info("Installing " + getClass().getName());
 			if (countAll(User.class) == 0) {
 				final User user = new User("Mprc", "Test", "mprctest@localhost", "mt", "database");
 				save(user, new Change("Creating a test user - no users were defined", new DateTime()), true);
 			}
+			addUserInitials();
 		}
-		addUserInitials();
 	}
 
 	private void addUserInitials() {

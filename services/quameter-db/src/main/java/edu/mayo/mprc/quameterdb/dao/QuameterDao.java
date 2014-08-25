@@ -6,7 +6,6 @@ import edu.mayo.mprc.swift.dbmapping.FileSearch;
 
 import java.util.List;
 import java.util.Map;
-import java.util.regex.Pattern;
 
 /**
  * @author Roman Zenka
@@ -26,10 +25,9 @@ public interface QuameterDao extends Dao {
 	                                 final Map<QuameterProteinGroup, Integer> identifedSpectra);
 
 	/**
-	 * @param searchFilter Filter the search names by this regex.
 	 * @return All the Quameter results that match given search name filter, with all values populated.
 	 */
-	List<QuameterResult> listAllResults(Pattern searchFilter);
+	List<QuameterResult> listAllResults();
 
 	void hideQuameterResult(int quameterResultId);
 

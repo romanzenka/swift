@@ -87,6 +87,37 @@ public class SearchDbDaoHibernate extends DaoBase implements SearchDbDao {
 			SearchRun searchRun = null; // TODO
 			ReportData reportData = new ReportData(new File("dummy.sf3"), new DateTime(), searchRun);
 
+			TandemMassSpectrometrySample sample1 = addTandemMassSpectrometrySample(
+					new TandemMassSpectrometrySample(
+							new File("test.RAW"),
+							new DateTime(2014, 1, 10, 9, 10, 11, 0),
+							100,
+							1000,
+							0,
+							"instrument",
+							"Orbi123",
+							new DateTime(2014, 1, 10, 10, 20, 30, 0),
+							60.0,
+							"comment",
+							"sample Information")
+			);
+
+			TandemMassSpectrometrySample sample2 = addTandemMassSpectrometrySample(
+					new TandemMassSpectrometrySample(
+							new File("test2.RAW"),
+							new DateTime(2014, 2, 12, 11, 20, 30, 40),
+							200,
+							2000,
+							0,
+							"instrument",
+							"Orbi123",
+							new DateTime(2014, 2, 12, 12, 21, 22, 23),
+							120.0,
+							"comment 2",
+							"sample Information 2")
+			);
+
+
 //			addAnalysis(builder.build(), reportData, new PercentProgressReporter() {
 //				@Override
 //				public void reportProgress(float percent) {

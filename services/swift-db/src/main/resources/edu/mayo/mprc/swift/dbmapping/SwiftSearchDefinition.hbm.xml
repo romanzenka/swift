@@ -22,7 +22,7 @@
             column="search_parameters" not-null="false" foreign-key="swift_search_definition_ibfk_2" />
 
         <list name="inputFiles" cascade="all" lazy="false">
-            <key column="swift_search_definition_id" />
+            <key column="swift_search_definition_id" not-null="true"/>
             <list-index column="sort_order" />
             <one-to-many class="FileSearch" />
         </list>

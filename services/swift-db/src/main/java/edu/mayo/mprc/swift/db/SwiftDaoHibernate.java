@@ -217,6 +217,9 @@ public final class SwiftDaoHibernate extends DaoBase implements SwiftDao {
 	 */
 	public FileSearch addFileSearch(final FileSearch fileSearch) {
 		try {
+			if(fileSearch.getSwiftSearchDefinition()==null) {
+				throw new MprcException("FileSearch must be a part of SwiftSearchDefinition");
+			}
 			return save(fileSearch, false);
 		} catch (final Exception t) {
 			throw new MprcException("Could not add file search information", t);
@@ -246,11 +249,6 @@ public final class SwiftDaoHibernate extends DaoBase implements SwiftDao {
 					definition.setPeptideReport(addPeptideReport(definition.getPeptideReport()));
 				}
 
-				final List<FileSearch> inputFiles = new ArrayList<FileSearch>();
-				for (final FileSearch fileSearch : definition.getInputFiles()) {
-					inputFiles.add(addFileSearch(fileSearch));
-				}
-				definition.setInputFiles(inputFiles);
 				definition = saveLaxEquality(definition, definition.getEqualityCriteria(), false);
 			}
 			return definition;
@@ -589,17 +587,22 @@ public final class SwiftDaoHibernate extends DaoBase implements SwiftDao {
 
 	@Override
 	public void install(final Map<String, String> params) {
-		LOGGER.info("Installing Swift DAO");
 		// Initialize the dependent DAO
-		workspaceDao.install(params);
-		curationDao.install(params);
-		paramsDao.install(params);
+		paramsDao.install(params); // Initialized curation and workspace
 		unimodDao.install(params);
 
 		installTaskStates();
 
 		if (params.containsKey("test")) {
-			// Install the test data
+			LOGGER.info("Installing test data for "+getClass().getName());
+
+			if (rowCount(SpectrumQa.class) != 0) {
+				// We have already done our work
+				return;
+			}
+
+			LOGGER.info("Installing test data for "+this.getClass().getName());
+			// Install the test data - a sample search that successfully ran with mascot and scaffold
 
 			final File outputFolder = new File("output-folder");
 
@@ -637,15 +640,19 @@ public final class SwiftDaoHibernate extends DaoBase implements SwiftDao {
 							enabledEngines));
 
 			final List<FileSearch> inputFiles = Lists.newArrayList();
-			inputFiles.add(new FileSearch(new File("input1.RAW"), "sample1", "none", "experiment", null));
-			inputFiles.add(new FileSearch(new File("input2.RAW"), "sample2", "none", "experiment", null));
+			FileSearch fileSearch1 = new FileSearch(new File("test.RAW"), "sample1", "none", "Test Search 1", null);
+			FileSearch fileSearch2 = new FileSearch(new File("test2.RAW"), "sample2", "none", "Test Search 1", null);
+			inputFiles.add(fileSearch1);
+			inputFiles.add(fileSearch2);
 
 			final Map<String, String> metadata = Maps.newHashMap();
+			metadata.put("quameter.category", "AL-Kappa");
 
 			final User user = workspaceDao.getUserByEmail(WorkspaceDaoHibernate.USER1_EMAIL);
-			if(user==null) {
-				throw new MprcException("There is no user with e-mail "+WorkspaceDaoHibernate.USER1_EMAIL);
+			if (user == null) {
+				throw new MprcException("There is no user with e-mail " + WorkspaceDaoHibernate.USER1_EMAIL);
 			}
+
 			final SwiftSearchDefinition definition =
 					addSwiftSearchDefinition(
 							new SwiftSearchDefinition("Test Search 1",
@@ -661,7 +668,15 @@ public final class SwiftDaoHibernate extends DaoBase implements SwiftDao {
 									metadata));
 
 			final SearchRun run = fillSearchRun(definition);
+			run.setNumTasks(2);
 
+			TaskData task1 = new TaskData("mascot", new Date(), new Date(), new Date(), run, getTaskState(TaskState.COMPLETED_SUCCESFULLY), "Mascot search");
+			TaskData task2 = new TaskData("scaffold", new Date(), new Date(), new Date(), run, getTaskState(TaskState.COMPLETED_SUCCESFULLY), "Scaffold search");
+			updateTask(task1);
+			updateTask(task2);
+
+			run.setTasksCompleted(2);
+			LOGGER.debug("Test data for "+getClass().getName()+" installed");
 		}
 	}
 

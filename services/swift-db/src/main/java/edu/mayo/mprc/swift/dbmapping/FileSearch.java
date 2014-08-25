@@ -30,7 +30,7 @@ public class FileSearch extends PersistableBase implements EqualityCriteria {
 	 */
 	private String experiment;
 
-	private Integer swiftSearchDefinitionId;
+	private SwiftSearchDefinition swiftSearchDefinition;
 
 	private SearchEngineParameters searchParameters;
 
@@ -77,12 +77,12 @@ public class FileSearch extends PersistableBase implements EqualityCriteria {
 		this.experiment = experiment;
 	}
 
-	public Integer getSwiftSearchDefinitionId() {
-		return swiftSearchDefinitionId;
+	public SwiftSearchDefinition getSwiftSearchDefinition() {
+		return swiftSearchDefinition;
 	}
 
-	public void setSwiftSearchDefinitionId(final Integer id) {
-		swiftSearchDefinitionId = id;
+	public void setSwiftSearchDefinition(SwiftSearchDefinition swiftSearchDefinition) {
+		this.swiftSearchDefinition = swiftSearchDefinition;
 	}
 
 	public SearchEngineParameters getSearchParameters() {
@@ -120,7 +120,7 @@ public class FileSearch extends PersistableBase implements EqualityCriteria {
 		if (getInputFile() != null ? !getInputFile().equals(that.getInputFile()) : that.getInputFile() != null) {
 			return false;
 		}
-		if (getSwiftSearchDefinitionId() != null ? !getSwiftSearchDefinitionId().equals(that.getSwiftSearchDefinitionId()) : that.getSwiftSearchDefinitionId() != null) {
+		if (getSwiftSearchDefinition() != null ? !getSwiftSearchDefinition().equals(that.getSwiftSearchDefinition()) : that.getSwiftSearchDefinition() != null) {
 			return false;
 		}
 		if (getSearchParameters() != null ? !getSearchParameters().equals(that.getSearchParameters()) : that.getSearchParameters() != null) {
@@ -136,7 +136,7 @@ public class FileSearch extends PersistableBase implements EqualityCriteria {
 		result = 31 * result + (getBiologicalSample() != null ? getBiologicalSample().hashCode() : 0);
 		result = 31 * result + (getCategoryName() != null ? getCategoryName().hashCode() : 0);
 		result = 31 * result + (getExperiment() != null ? getExperiment().hashCode() : 0);
-		result = 31 * result + (getSwiftSearchDefinitionId() != null ? getSwiftSearchDefinitionId().hashCode() : 0);
+		result = 31 * result + (getSwiftSearchDefinition() != null ? getSwiftSearchDefinition().hashCode() : 0);
 		result = 31 * result + (getSearchParameters() != null ? getSearchParameters().hashCode() : 0);
 		return result;
 	}
@@ -147,7 +147,7 @@ public class FileSearch extends PersistableBase implements EqualityCriteria {
 				.add(DaoBase.nullSafeEq("biologicalSample", getBiologicalSample()))
 				.add(DaoBase.nullSafeEq("categoryName", getCategoryName()))
 				.add(DaoBase.nullSafeEq("experiment", getExperiment()))
-				.add(DaoBase.nullSafeEq("swiftSearchDefinitionId", getSwiftSearchDefinitionId()))
+				.add(DaoBase.associationEq("swiftSearchDefinition", getSwiftSearchDefinition()))
 				.add(DaoBase.associationEq("searchParameters", getSearchParameters()));
 	}
 

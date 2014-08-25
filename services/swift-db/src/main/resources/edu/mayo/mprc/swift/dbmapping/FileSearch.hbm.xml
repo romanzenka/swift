@@ -13,11 +13,8 @@
             <property name="biologicalSample" type="string" length="128" column="biological_sample" />
             <property name="categoryName" type="string" length="128" column="category_name" />
             <property name="experiment" type="string" length="128" column="experiment" />
-            <!--  swiftSearchDefinitionId has a foreign key constraint, although we store it just as a number
-            for efficiency
-            The name of the constraint is file_search_ibfk_3
-            -->
-            <property name="swiftSearchDefinitionId" type="integer" column="swift_search_definition_id" />
+            <many-to-one name="swiftSearchDefinition" class="SwiftSearchDefinition" column="swift_search_definition_id"
+                not-null="true" lazy="proxy" foreign-key="file_search_ibfk_3" insert="false" update="false"/>
             <many-to-one name="searchParameters" class="edu.mayo.mprc.swift.params2.SearchEngineParameters"
                 column="search_parameters" not-null="false" lazy="proxy" foreign-key="file_search_ibfk_1" />
         </properties>

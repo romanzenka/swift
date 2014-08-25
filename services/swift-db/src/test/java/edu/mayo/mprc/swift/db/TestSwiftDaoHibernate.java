@@ -9,14 +9,6 @@ import edu.mayo.mprc.swift.params2.ParamsDaoHibernate;
 import edu.mayo.mprc.unimod.UnimodDaoHibernate;
 import edu.mayo.mprc.utilities.FileUtilities;
 import edu.mayo.mprc.workspace.WorkspaceDaoHibernate;
-import org.dbunit.database.DatabaseConnection;
-import org.dbunit.database.DatabaseSequenceFilter;
-import org.dbunit.database.IDatabaseConnection;
-import org.dbunit.dataset.FilteredDataSet;
-import org.dbunit.dataset.IDataSet;
-import org.dbunit.dataset.filter.ITableFilter;
-import org.dbunit.dataset.xml.FlatXmlDataSet;
-import org.hibernate.Transaction;
 import org.testng.Assert;
 import org.testng.annotations.AfterTest;
 import org.testng.annotations.BeforeTest;
@@ -24,7 +16,6 @@ import org.testng.annotations.Test;
 import org.testng.v6.Maps;
 
 import java.io.File;
-import java.io.FileOutputStream;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -109,23 +100,6 @@ public final class TestSwiftDaoHibernate extends DaoTest {
 		} catch (Exception e) {
 			swiftDao.rollback();
 			throw new MprcException(e);
-		}
-	}
-
-	private void dumpXml() {
-		FileOutputStream out = null;
-		try {
-			out = new FileOutputStream("/Users/m044910/Documents/devel/swift/dump.xml");
-			final Transaction transaction = swiftDao.getSession().beginTransaction();
-			final IDatabaseConnection conn = new DatabaseConnection(swiftDao.getSession().connection());
-			ITableFilter filter = new DatabaseSequenceFilter(conn);
-			IDataSet dataset = new FilteredDataSet(filter, conn.createDataSet());
-			FlatXmlDataSet.write(dataset, out);
-			transaction.commit();
-		} catch (Exception e) {
-			throw new MprcException("Could not dump database XML", e);
-		} finally {
-			FileUtilities.closeQuietly(out);
 		}
 	}
 }

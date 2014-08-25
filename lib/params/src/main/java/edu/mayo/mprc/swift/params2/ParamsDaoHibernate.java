@@ -410,13 +410,13 @@ public final class ParamsDaoHibernate extends DaoBase implements ParamsDao {
 
 	@Override
 	public void install(final Map<String, String> params) {
-		installIonSeries();
-		installInstruments();
-		installProteases();
-
 		// The search engine parameters depend on these two installs to be done already
 		getWorkspaceDao().install(params);
 		getCurationDao().install(params);
+
+		installIonSeries();
+		installInstruments();
+		installProteases();
 
 		installSavedSearchEngineParameters();
 	}

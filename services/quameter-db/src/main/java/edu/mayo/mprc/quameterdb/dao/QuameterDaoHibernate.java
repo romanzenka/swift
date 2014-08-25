@@ -19,7 +19,6 @@ import org.springframework.stereotype.Repository;
 
 import javax.annotation.Resource;
 import java.util.*;
-import java.util.regex.Pattern;
 
 /**
  * @author Roman Zenka
@@ -58,7 +57,7 @@ public final class QuameterDaoHibernate extends DaoBase implements QuameterDao, 
 	}
 
 	@Override
-	public List<QuameterResult> listAllResults(final Pattern searchFilter) {
+	public List<QuameterResult> listAllResults() {
 		final List<QuameterProteinGroup> activeProteinGroups = listProteinGroups();
 
 		final Query query = getSession().createSQLQuery("" +
@@ -98,9 +97,7 @@ public final class QuameterDaoHibernate extends DaoBase implements QuameterDao, 
 				builder.put(group, (int) (Math.random() * 60.0));
 			}
 			r.setIdentifiedSpectra(builder.build());
-			if (r.resultMatches(searchFilter)) {
-				filtered.add(r);
-			}
+			filtered.add(r);
 		}
 		return filtered;
 	}
@@ -132,7 +129,7 @@ public final class QuameterDaoHibernate extends DaoBase implements QuameterDao, 
 			final int tandemMassSpectrometrySampleId,
 			final List<QuameterProteinGroup> quameterProteinGroups) {
 		final FileSearch fileSearch = swiftDao.getFileSearchForId(fileSearchId);
-		final SwiftSearchDefinition swiftSearchDefinition = swiftDao.getSwiftSearchDefinition(fileSearch.getSwiftSearchDefinitionId());
+		final SwiftSearchDefinition swiftSearchDefinition = fileSearch.getSwiftSearchDefinition();
 		// Now we know the database in our context
 
 		final TandemMassSpectrometrySample sample = searchDbDao.getTandemMassSpectrometrySampleForId(tandemMassSpectrometrySampleId);

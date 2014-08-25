@@ -1,10 +1,11 @@
 package edu.mayo.mprc.quameterdb;
 
-import com.google.common.base.Strings;
 import com.google.gson.stream.JsonWriter;
 import edu.mayo.mprc.MprcException;
 import edu.mayo.mprc.config.*;
-import edu.mayo.mprc.config.ui.*;
+import edu.mayo.mprc.config.ui.FactoryDescriptor;
+import edu.mayo.mprc.config.ui.ServiceUiFactory;
+import edu.mayo.mprc.config.ui.UiBuilder;
 import edu.mayo.mprc.daemon.SimpleRunner;
 import edu.mayo.mprc.daemon.UiConfigurationProvider;
 import edu.mayo.mprc.database.Dao;
@@ -23,8 +24,6 @@ import java.io.Writer;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.regex.Pattern;
-import java.util.regex.PatternSyntaxException;
 
 /**
  * @author Roman Zenka
@@ -34,12 +33,10 @@ public final class QuameterUi implements Dao, UiConfigurationProvider {
 	public static final String NAME = "QuaMeter User Interface";
 	public static final String DESC = "Specialized interface for browsing QuaMeter database";
 
-	private static final String SEARCH_FILTER = "searchFilter";
 	private static final String QUAMETER_DB_WORKER = "quameterDb";
 	public static final double SEC_TO_MIN = 60.0;
 
 	private final QuameterDao quameterDao;
-	private final Pattern searchFilter;
 	private final QuameterDbWorker.Config dbWorkerConfig;
 	private final Map<String, String> instrumentMap;
 	private static final DateTimeFormatter DATE_FORMAT_1 = DateTimeFormat.forPattern("'Date('yyyy, ").withLocale(Locale.US);
@@ -51,10 +48,8 @@ public final class QuameterUi implements Dao, UiConfigurationProvider {
 	public static final String UI_QUAMETER_CATEGORIES = "swift.quameter.categories";
 
 	public QuameterUi(final QuameterDao quameterDao,
-	                  final Pattern searchFilter,
 	                  final QuameterDbWorker.Config dbWorkerConfig) {
 		this.quameterDao = quameterDao;
-		this.searchFilter = searchFilter;
 		this.dbWorkerConfig = dbWorkerConfig;
 		this.instrumentMap = dbWorkerConfig.getInstrumentNameMap();
 	}
@@ -82,10 +77,10 @@ public final class QuameterUi implements Dao, UiConfigurationProvider {
 	public void dataTableJson(final Writer writer) {
 
 		final List<QuameterProteinGroup> proteinGroups = quameterDao.listProteinGroups();
-		final List<QuameterResult> quameterResults = quameterDao.listAllResults(searchFilter);
+		final List<QuameterResult> quameterResults = quameterDao.listAllResults();
 
 		final JsonWriter w = new JsonWriter(writer);
-		w.setIndent("");
+		w.setIndent("   ");
 
 		try {
 			w.beginObject();
@@ -198,7 +193,6 @@ public final class QuameterUi implements Dao, UiConfigurationProvider {
 	}
 
 	public static final class Config implements ResourceConfig {
-		private String searchFilter;
 		private ServiceConfig quameterConfig;
 
 		public Config() {
@@ -206,27 +200,17 @@ public final class QuameterUi implements Dao, UiConfigurationProvider {
 
 		@Override
 		public void save(final ConfigWriter writer) {
-			writer.put(SEARCH_FILTER, searchFilter);
 			writer.put(QUAMETER_DB_WORKER, writer.save(quameterConfig));
 		}
 
 		@Override
 		public void load(final ConfigReader reader) {
-			searchFilter = reader.get(SEARCH_FILTER);
 			quameterConfig = (ServiceConfig) reader.getObject(QUAMETER_DB_WORKER);
 		}
 
 		@Override
 		public int getPriority() {
 			return 0;
-		}
-
-		public void setSearchFilter(final String searchFilter) {
-			this.searchFilter = searchFilter;
-		}
-
-		public String getSearchFilter() {
-			return searchFilter;
 		}
 
 		public void setQuameterConfig(final QuameterDbWorker.Config quameterConfig) {
@@ -270,10 +254,8 @@ public final class QuameterUi implements Dao, UiConfigurationProvider {
 
 		@Override
 		public QuameterUi create(final Config config, final DependencyResolver dependencies) {
-			final String filterString = config.getSearchFilter();
-			final Pattern filter = compileFilter(filterString);
 			final QuameterDbWorker.Config dbConfig = config.getQuameterConfig();
-			return new QuameterUi(getQuameterDao(), filter, dbConfig);
+			return new QuameterUi(getQuameterDao(), dbConfig);
 		}
 
 		public QuameterDao getQuameterDao() {
@@ -285,40 +267,11 @@ public final class QuameterUi implements Dao, UiConfigurationProvider {
 		}
 	}
 
-	private static Pattern compileFilter(final String filterString) {
-		final Pattern filter;
-		try {
-			filter = Pattern.compile(Strings.isNullOrEmpty(filterString) ? ".*" : filterString);
-		} catch (final PatternSyntaxException e) {
-			throw new MprcException("The pattern syntax [" + filterString + "] is incorrect", e);
-		}
-		return filter;
-	}
-
 	public static final class Ui implements ServiceUiFactory {
 
 		@Override
 		public void createUI(final DaemonConfig daemon, final ResourceConfig resource, final UiBuilder builder) {
-			builder.property(SEARCH_FILTER, "Search filter", "Only searches whose name matches this regular expression will be considered")
-					.required()
-					.defaultValue(".*")
-					.addChangeListener(new PropertyChangeListener() {
-						@Override
-						public void propertyChanged(final ResourceConfig config, final String propertyName, final String newValue, final UiResponse response, final boolean validationRequested) {
-							if (propertyName.equals(SEARCH_FILTER) && validationRequested) {
-								try {
-									compileFilter(newValue);
-								} catch (final MprcException e) {
-									response.displayPropertyError(config, propertyName, MprcException.getDetailedMessage(e));
-								}
-							}
-						}
-
-						@Override
-						public void fixError(final ResourceConfig config, final String propertyName, final String action) {
-						}
-					})
-
+			builder
 					.property(QUAMETER_DB_WORKER, "Quamered Db", "Reference to the worker that loads QuaMeter data to the database")
 					.reference(QuameterDbWorker.TYPE, UiBuilder.NONE_TYPE);
 		}
