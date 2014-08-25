@@ -7,8 +7,6 @@ import edu.mayo.mprc.database.*;
 import edu.mayo.mprc.fastadb.FastaDbDao;
 import edu.mayo.mprc.fastadb.ProteinSequence;
 import edu.mayo.mprc.fastadb.ProteinSequenceTranslator;
-import edu.mayo.mprc.searchdb.builder.AnalysisBuilder;
-import edu.mayo.mprc.searchdb.builder.MassSpecDataExtractor;
 import edu.mayo.mprc.swift.db.SwiftDao;
 import edu.mayo.mprc.swift.dbmapping.ReportData;
 import edu.mayo.mprc.swift.dbmapping.SearchRun;
@@ -82,8 +80,6 @@ public class SearchDbDaoHibernate extends DaoBase implements SearchDbDao {
 
 			// Build results of two sample analyses
 			ProteinSequenceTranslator proteinSequenceTranslator = null; // TODO
-			MassSpecDataExtractor massSpecDataExtractor = null; // TODO
-			AnalysisBuilder builder = new AnalysisBuilder(proteinSequenceTranslator, massSpecDataExtractor);
 			SearchRun searchRun = null; // TODO
 			ReportData reportData = new ReportData(new File("dummy.sf3"), new DateTime(), searchRun);
 
@@ -116,14 +112,6 @@ public class SearchDbDaoHibernate extends DaoBase implements SearchDbDao {
 							"comment 2",
 							"sample Information 2")
 			);
-
-
-//			addAnalysis(builder.build(), reportData, new PercentProgressReporter() {
-//				@Override
-//				public void reportProgress(float percent) {
-//					// Do nothing at the moment
-//				}
-//			});
 		}
 	}
 
