@@ -12,6 +12,7 @@ import edu.mayo.mprc.swift.db.SwiftDao;
 import edu.mayo.mprc.swift.dbmapping.FileSearch;
 import edu.mayo.mprc.swift.dbmapping.SwiftSearchDefinition;
 import org.apache.log4j.Logger;
+import org.hibernate.Hibernate;
 import org.hibernate.Query;
 import org.hibernate.type.StandardBasicTypes;
 import org.joda.time.DateTime;

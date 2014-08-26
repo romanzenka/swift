@@ -45,7 +45,7 @@ function addButtons(div, data, columnId) {
 
     var iter=1;
     $.each(keys, function (index, value) {
-        var niceName = getNiceName(value);
+        var niceName = value;
         var btnClass = 'btn-orig'+iter;
         if( !niceName.match(/^Orbi/) && columnId === 'instrument'){
             btnClass = 'btn-default';
@@ -88,7 +88,6 @@ function buildCollection(collection, data,  metricCode){
     var arrayForDYgraphs = [];
     for(var o in collection){
         if(collection[o].metricCode === metricCode){
-           // console.log( collection[o]);
             var nthx = getXaxisNseriesById(data, collection[o].quameterResultId);
             arrayForDYgraphs.push(
                 {
@@ -380,7 +379,7 @@ function addDygraph( viewIndex, view, viewId, metricId, viewMetadata, data, rang
 function drawGraphsByMetrics(data, renderDetailGraphs, viewMetadata){
     var viewIndex = 0;
     var annotCollection = getAnnotationCollection();
-    if( renderDetailGraphs ){ viewIndex=numberOfSimpleGraphs }
+    if( renderDetailGraphs ){ viewIndex=numberOfSimpleGraphs-1 }
     var previousCategory = '';
     for (var i = 0; i < metrics.length; i++) {
         var metric = metrics[i];
@@ -487,12 +486,6 @@ function initSimpleCharts(graphObj) {
     // Simple/Detailed Button
     $("#compact-button").click(function (event) {
         var current = $(this);
-        if(!detailsExist){
-            drawGraphsByMetrics(data, true, viewMetadata);
-            updateAllViews(data);
-            detailsExist=true;
-        }
-
         if (current.hasClass("btn-info")) {
             current.removeClass("btn-info");
             current.text("Simple");
@@ -504,6 +497,13 @@ function initSimpleCharts(graphObj) {
             $('#detailedGraphs').css("display", "none");
             $('#simpleGraphs').css("display", "block");
         }
+
+        if(!detailsExist){
+            drawGraphsByMetrics(data, true, viewMetadata);
+            updateAllViews(data);
+            detailsExist=true;
+        }
+
     });
 
     //Little Hide Icon, when point on a graph is selected
