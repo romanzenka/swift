@@ -29,9 +29,17 @@ public interface QuameterDao extends Dao {
 	 */
 	List<QuameterResult> listAllResults();
 
-	void hideQuameterResult(int quameterResultId);
 
-	/**
+    /**
+     */
+    List<QuameterResult> listHiddenResults();
+
+    void hideQuameterResult(int quameterResultId);
+
+    void unhideQuameterResult(int quameterResultId);
+
+
+    /**
 	 * Add an annotation. The annotation is uniquely identified by its
 	 * data point + metric. Adding an annotation for the same metric+data point
 	 * rewrites the old annotation.

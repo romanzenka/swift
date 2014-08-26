@@ -192,6 +192,10 @@ public final class QuameterUi implements Dao, UiConfigurationProvider {
 		currentConfiguration.put(UI_QUAMETER_CATEGORIES, dbWorkerConfig.getCategories());
 	}
 
+    public QuameterDao getQuameterDao() {
+        return quameterDao;
+    }
+
 	public static final class Config implements ResourceConfig {
 		private ServiceConfig quameterConfig;
 

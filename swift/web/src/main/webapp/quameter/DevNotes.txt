@@ -24,3 +24,18 @@ annotation -> not disappering
   insturments not correct, when shown independantly
 
   buttons to dygraph line colors
+
+
+
+
+
+  Notes from meeting:
+ 1. merge QE1 machinces together.
+ 2. add UI for displaying hidden ids...grant ability to undo the hide.
+ 3. undefined annotation upon immediate note.
+ 4. plot SAE and APOe protein markers
+ x. change Std Dev for data point show be less...3?
+ 6. make this a tab on swift header
+ 7. color code button to insturment line
+ x. progressing red highlights Std Dev, lighter @ 3 & darker @ 5|6
+ 9 require a comment to hide a point - for that specific metric

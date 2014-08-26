@@ -67,8 +67,9 @@
             </code> daemon.</p>
     </div>
     <% } else { %>
-        <div id="detailedGraphs" style="margin-top: 50px;"></div>
-        <div id="simpleGraphs" style="margin-top: 50px"></div>
+        </br><a href="/quameter/unhide.jsp" class="pull-right">Unhide</a>
+        <div id="detailedGraphs" style="margin-top: 40px; display: none;"></div>
+        <div id="simpleGraphs" style="margin-top: 40px"></div>
 
     <% } %>
 </div>
@@ -86,7 +87,7 @@
 <script type="text/javascript" src="/common/bootstrap/js/bootstrap.js"></script>
 
 <!-- Graph Dependancies -->
-<script type="text/javascript" src="js/tmp.js"></script>
+<%--<script type="text/javascript" src="js/tmp.js"></script>--%>
 
 <script type="text/javascript" src="js/dygraph-combined.js"></script>
 <script type="text/javascript" src="js/quameter-definitions.js"></script>

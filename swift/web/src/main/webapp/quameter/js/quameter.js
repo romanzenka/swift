@@ -43,13 +43,18 @@ function addButtons(div, data, columnId) {
         return index
     }).sort();
 
+    var iter=1;
     $.each(keys, function (index, value) {
         var niceName = value;
-        var btnClass = 'btn-primary';
+        var btnClass = 'btn-orig'+iter;
         if( !niceName.match(/^Orbi/) && columnId === 'instrument'){
             btnClass = 'btn-default';
         }
-        div.append('<button type="button" class="btn '+btnClass+'" value="'+value+'">'+niceName+' ('+names[value]+')<' + '/button>');
+        else if(columnId !== 'instrument'){
+            var btnClass = 'btn-primary';
+        }
+        div.append('<button type="button" class="btn '+btnClass+'" value="'+value+'" data-num='+iter+' data-enum="'+columnId+'">'+niceName+' ('+names[value]+')<' + '/button>');
+        iter++;
     });
 }
 
@@ -72,7 +77,6 @@ function createNewAnnotationForm(parentName, dbID){
 
 function getXaxisNseriesById(data, dbId){
     for (var i = 0; i < data.getNumberOfRows(); i++) {
-       // console.log(i,columnIndex("id", data),data.getValue(i, columnIndex("id", data)),dbId);
         if(data.getValue(i, columnIndex("id", data)).toString() === dbId.toString()) {
             return [data.getValue(i, columnIndex("startTime", data)), data.getValue(i, columnIndex("instrument", data))];
         }
@@ -84,7 +88,6 @@ function buildCollection(collection, data,  metricCode){
     var arrayForDYgraphs = [];
     for(var o in collection){
         if(collection[o].metricCode === metricCode){
-           // console.log( collection[o]);
             var nthx = getXaxisNseriesById(data, collection[o].quameterResultId);
             arrayForDYgraphs.push(
                 {
@@ -147,7 +150,7 @@ function activeCatagoriesFilters(){
 function activeInstrumentFilters(){
     var selectedCategory = [];
     instrumentButtons().each(function () {
-        if ($(this).hasClass('btn-primary')) {
+        if (!$(this).hasClass('btn-default')) {
             selectedCategory.push($(this).attr("value"));
         }
     });
@@ -162,14 +165,11 @@ function updateAllViews(data) {
     pointHighlighted = -1;
 
     activeCats = activeCatagoriesFilters();
-    console.log("Active Cats", activeCats);
 
     var filteredRows = [];
     for (var r=0; r<data.getNumberOfRows(); r++) {
         var category = data.getValue(r, columnIndex('category', data) );
-        console.log(category);
         var rowId = data.getValue(r, columnIndex("id", data))
-        console.log(r, category,activeCats.contains(category),rowId, !hiddenIds["id"+rowId]);
         if( activeCats.contains(category) && !hiddenIds["id"+rowId] ){
             filteredRows.push(r)
         }
@@ -183,8 +183,6 @@ function updateAllViews(data) {
 
         views[i].dataView.setColumns( getSmartColumns(columnIndex("startTime",data),views[i].metricId) );
         views[i].dataView.setRows(filteredRows);
-        console.log(views[i]);
-        console.log(filteredRows);
 
         var sum = 0;
         var count = views[i].dataView.getNumberOfRows();
@@ -211,11 +209,13 @@ function updateAllViews(data) {
         }
         var stdev = count > 1 ? Math.sqrt(sumSquares / (count - 1)) : 1;
 
-        views[i].minHighlightY = average - 5 * stdev;
-        views[i].maxHighlightY = average + 5 * stdev;
+        views[i].minHighlightY = average - 3 * stdev;
+        views[i].maxHighlightY = average + 3 * stdev;
+        views[i].minHighlightY2 = average - 5 * stdev;
+        views[i].maxHighlightY2 = average + 5 * stdev;
 
 
-        views[i].dygraph.updateOptions({file: views[i].dataView, valueRange: getMetricByCode(views[i].metricId).range });
+        views[i].dygraph.updateOptions({file: views[i].dataView, valueRange: getMetricByCode(views[i].metricId).range, colors: getSmartColors()});
 
     }
     blockRedraw = false;
@@ -238,7 +238,7 @@ function selectPoint(data, dataRow) {
 
 
 function addDygraph( viewIndex, view, viewId, metricId, viewMetadata, data, range, annotCollection) {
-    views[viewIndex] = { dataView: view, minHighlightY: 1, maxHighlightY: -1, metricId: metricId };
+    views[viewIndex] = { dataView: view, minHighlightY: 1, maxHighlightY: -1, minHighlightY2: 1, maxHighlightY2: -1, metricId: metricId };
     var currentView = views[viewIndex];
     var selectedPath = $('#selected-path');
 
@@ -281,7 +281,7 @@ function addDygraph( viewIndex, view, viewId, metricId, viewMetadata, data, rang
                     var range = me.xAxisRange();
                     for (var j = 0; j < views.length; j++) {
                         if (gs[j] == me) continue;
-                        if(gs[j] === undefined){console.log("Errand LOOKUP",j,gs)}
+                        if(gs[j] === undefined){console.log("Errant LOOKUP",j,gs)}
                         gs[j].updateOptions({
                             dateWindow: range
                         });
@@ -320,6 +320,8 @@ function addDygraph( viewIndex, view, viewId, metricId, viewMetadata, data, rang
                     if (currentView.minHighlightY < currentView.maxHighlightY) {
                         var bottom = g.toDomYCoord(currentView.minHighlightY);
                         var top = g.toDomYCoord(currentView.maxHighlightY);
+                        var bottom2 = g.toDomYCoord(currentView.minHighlightY2);
+                        var top2 = g.toDomYCoord(currentView.maxHighlightY2);
 
                         var good = metrics[metricIndex].good;
                         canvas.fillStyle = "rgba(255, 235, 235, 1.0)";
@@ -329,6 +331,14 @@ function addDygraph( viewIndex, view, viewId, metricId, viewMetadata, data, rang
                         if (good == "range" || good == "high") {
                             canvas.fillRect(area.x, bottom, area.w, area.h - (bottom - area.y));
                         }
+                        canvas.fillStyle = "rgba(250, 189, 189, 1.0)";
+                        if (good == "range" || good == "low") {
+                            canvas.fillRect(area.x, area.y, area.w, top2);
+                        }
+                        if (good == "range" || good == "high") {
+                            canvas.fillRect(area.x, bottom2, area.w, area.h - (bottom2 - area.y));
+                        }
+
                     }
                     if (pointSelected >= 0) {
                         // Date to be selected
@@ -349,7 +359,6 @@ function addDygraph( viewIndex, view, viewId, metricId, viewMetadata, data, rang
                     var row = viewMetadata.filteredRows[pointHighlighted];
                     highlightRow(row);
 
-                    console.log(event)
                     createNewAnnotationForm(event.target.parentNode.parentNode.id, data.getValue(row, columnIndex("id", data)));
 
                     dygraph.updateOptions({file: currentView.dataView});
@@ -370,7 +379,7 @@ function addDygraph( viewIndex, view, viewId, metricId, viewMetadata, data, rang
 function drawGraphsByMetrics(data, renderDetailGraphs, viewMetadata){
     var viewIndex = 0;
     var annotCollection = getAnnotationCollection();
-    if( renderDetailGraphs ){ viewIndex=numberOfSimpleGraphs }
+    if( renderDetailGraphs ){ viewIndex=numberOfSimpleGraphs-1 }
     var previousCategory = '';
     for (var i = 0; i < metrics.length; i++) {
         var metric = metrics[i];
@@ -455,22 +464,28 @@ function initSimpleCharts(graphObj) {
     filterButtons.click(function (event) {
         var current = $(this);
         if (!event.shiftKey) {
-            current.siblings().removeClass("btn-primary");
-            current.removeClass("btn-primary");
+            current.siblings().each(function() {
+                var classList = $(this)[0].className.split(' ');
+                if(classList[1] !== "btn-default" ){
+                    $(this).removeClass(classList[1]);
+                    $(this).addClass("btn-default");
+                }
+            });
         }
-        current.toggleClass("btn-primary");
+        current.removeClass("btn-default");
+
+        if(current[0].dataset.enum === 'instrument'){
+            current.toggleClass('btn-orig'+current[0].dataset.num);
+        } else {
+            current.toggleClass("btn-primary");
+        }
         updateAllViews(data);
     });
+
 
     // Simple/Detailed Button
     $("#compact-button").click(function (event) {
         var current = $(this);
-        if(!detailsExist){
-            drawGraphsByMetrics(data, true, viewMetadata);
-            updateAllViews(data);
-            detailsExist=true;
-        }
-
         if (current.hasClass("btn-info")) {
             current.removeClass("btn-info");
             current.text("Simple");
@@ -482,6 +497,13 @@ function initSimpleCharts(graphObj) {
             $('#detailedGraphs').css("display", "none");
             $('#simpleGraphs').css("display", "block");
         }
+
+        if(!detailsExist){
+            drawGraphsByMetrics(data, true, viewMetadata);
+            updateAllViews(data);
+            detailsExist=true;
+        }
+
     });
 
     //Little Hide Icon, when point on a graph is selected
@@ -504,7 +526,6 @@ function initSimpleCharts(graphObj) {
                 var nthView = dyViewsByCode[$('#annotForm').find('input[name="metricCode"]').val()];
                 var nthx = getXaxisNseriesById(data, $('#annotForm').find('input[name="dbId"]').val()) ;
                 var txt = $(this).closest('form').find("input[type=text], textarea").val();
-                console.log("Text:",txt);
                 var annotations = views[nthView].dygraph.annotations();
                 annotations.push(
                     {
@@ -560,4 +581,17 @@ function getSmartColumns(dataIdx, metricId){
 }
 
 
+
+/*
+ * Color the lines by instrument
+ */
+function getSmartColors(){
+    var colors = [];
+    instrumentButtons().each(function () {
+        if (!$(this).hasClass('btn-default')) {
+            colors.push( $(this).css('background-color') );
+        }
+    });
+    return colors;
+}
 
