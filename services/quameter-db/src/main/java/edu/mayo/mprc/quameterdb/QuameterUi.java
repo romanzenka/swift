@@ -11,7 +11,6 @@ import edu.mayo.mprc.database.Dao;
 import edu.mayo.mprc.quameterdb.dao.QuameterDao;
 import edu.mayo.mprc.quameterdb.dao.QuameterProteinGroup;
 import edu.mayo.mprc.quameterdb.dao.QuameterResult;
-import edu.mayo.mprc.searchdb.dao.ProteinGroupList;
 import edu.mayo.mprc.swift.params2.SearchEngineParameters;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
@@ -191,7 +190,11 @@ public final class QuameterUi implements Dao, UiConfigurationProvider {
 		currentConfiguration.put(UI_QUAMETER_CATEGORIES, dbWorkerConfig.getCategories());
 	}
 
-	public static final class Config implements ResourceConfig {
+    public QuameterDao getQuameterDao() {
+        return quameterDao;
+    }
+
+    public static final class Config implements ResourceConfig {
 		private String searchFilter;
 		private ServiceConfig quameterConfig;
 

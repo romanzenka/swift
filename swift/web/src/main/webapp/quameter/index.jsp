@@ -67,8 +67,9 @@
             </code> daemon.</p>
     </div>
     <% } else { %>
-        <div id="detailedGraphs" style="margin-top: 50px;"></div>
-        <div id="simpleGraphs" style="margin-top: 50px"></div>
+        </br><a href="/quameter/unhide.jsp" class="pull-right">Unhide</a>
+        <div id="detailedGraphs" style="margin-top: 40px;"></div>
+        <div id="simpleGraphs" style="margin-top: 40px"></div>
 
     <% } %>
 </div>
