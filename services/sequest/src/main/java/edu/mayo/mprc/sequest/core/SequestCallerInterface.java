@@ -11,7 +11,7 @@ import java.util.List;
 interface SequestCallerInterface {
 
 	SequestCallerInterface createInstance(File workingDir, File paramsFile, List<File> sequestDtaFiles, File hostsFile,
-	                                      UserProgressReporter progressReporter);
+	                                      UserProgressReporter progressReporter, PvmUtilities pvmUtilities);
 
 	String getCall();
 

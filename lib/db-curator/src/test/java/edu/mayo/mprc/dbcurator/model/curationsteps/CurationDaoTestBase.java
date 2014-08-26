@@ -1,7 +1,7 @@
 package edu.mayo.mprc.dbcurator.model.curationsteps;
 
 import edu.mayo.mprc.database.DaoTest;
-import edu.mayo.mprc.dbcurator.model.impl.CurationDaoImpl;
+import edu.mayo.mprc.dbcurator.model.impl.CurationDaoHibernate;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 
@@ -11,11 +11,11 @@ import org.testng.annotations.BeforeClass;
  * @author Roman Zenka
  */
 public abstract class CurationDaoTestBase extends DaoTest {
-	protected CurationDaoImpl curationDao;
+	protected CurationDaoHibernate curationDao;
 
 	@BeforeClass()
 	public void setup() {
-		curationDao = new CurationDaoImpl();
+		curationDao = new CurationDaoHibernate();
 		initializeDatabase(curationDao);
 	}
 

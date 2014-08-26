@@ -3,7 +3,7 @@ package edu.mayo.mprc.searchdb.builder;
 import edu.mayo.mprc.MprcException;
 import edu.mayo.mprc.database.DaoTest;
 import edu.mayo.mprc.dbcurator.model.Curation;
-import edu.mayo.mprc.dbcurator.model.impl.CurationDaoImpl;
+import edu.mayo.mprc.dbcurator.model.impl.CurationDaoHibernate;
 import edu.mayo.mprc.fastadb.FastaDbDaoHibernate;
 import edu.mayo.mprc.fastadb.SingleDatabaseTranslator;
 import edu.mayo.mprc.searchdb.dao.*;
@@ -41,7 +41,7 @@ import java.util.Map;
  */
 public class TestSearchDbDao extends DaoTest {
 	private SearchDbDaoHibernate searchDbDao;
-	private CurationDaoImpl curationDao;
+	private CurationDaoHibernate curationDao;
 	private UnimodDaoHibernate unimodDao;
 	private SwiftDaoHibernate swiftDao;
 	private FastaDbDaoHibernate fastaDbDao;
@@ -67,7 +67,7 @@ public class TestSearchDbDao extends DaoTest {
 	public void setup() {
 		final ParamsDaoHibernate paramsDao = new ParamsDaoHibernate();
 		unimodDao = new UnimodDaoHibernate();
-		curationDao = new CurationDaoImpl();
+		curationDao = new CurationDaoHibernate();
 		fastaDbDao = new FastaDbDaoHibernate();
 		swiftDao = new SwiftDaoHibernate();
 

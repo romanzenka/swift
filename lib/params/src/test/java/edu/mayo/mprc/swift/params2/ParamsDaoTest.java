@@ -5,8 +5,9 @@ import edu.mayo.mprc.chem.AminoAcidSet;
 import edu.mayo.mprc.database.Change;
 import edu.mayo.mprc.database.DaoTest;
 import edu.mayo.mprc.dbcurator.model.Curation;
-import edu.mayo.mprc.dbcurator.model.impl.CurationDaoImpl;
+import edu.mayo.mprc.dbcurator.model.impl.CurationDaoHibernate;
 import edu.mayo.mprc.unimod.*;
+import edu.mayo.mprc.workspace.WorkspaceDaoHibernate;
 import org.apache.log4j.Logger;
 import org.joda.time.DateTime;
 import org.testng.Assert;
@@ -25,7 +26,8 @@ public final class ParamsDaoTest extends DaoTest {
 
 	private ParamsDaoHibernate dao;
 	private UnimodDaoHibernate unimodDao;
-	private CurationDaoImpl curationDao;
+	private CurationDaoHibernate curationDao;
+	private WorkspaceDaoHibernate workspaceDao;
 
 	private Mod mod1;
 	private Mod mod2;
@@ -43,9 +45,10 @@ public final class ParamsDaoTest extends DaoTest {
 	public void setup() {
 		dao = new ParamsDaoHibernate();
 		unimodDao = new UnimodDaoHibernate();
-		curationDao = new CurationDaoImpl();
+		curationDao = new CurationDaoHibernate();
+		workspaceDao = new WorkspaceDaoHibernate();
 
-		initializeDatabase(Arrays.asList(dao, unimodDao, curationDao));
+		initializeDatabase(Arrays.asList(dao, unimodDao, curationDao, workspaceDao));
 
 		dao.begin();
 

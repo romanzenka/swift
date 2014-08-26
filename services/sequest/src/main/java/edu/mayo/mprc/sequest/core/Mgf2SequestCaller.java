@@ -102,7 +102,7 @@ public final class Mgf2SequestCaller implements Mgf2SequestInterface {
 	@Override
 	public void callSequest(
 			final File tarFile, final File paramsFile, final File mgfFile, final long startTimeOut, final long watchDogTimeOut, final File hdrFile,
-			final UserProgressReporter progressReporter) {
+			final UserProgressReporter progressReporter, final PvmUtilities pvmUtilities) {
 		assert hostsFile != null : "Path to pvm_hosts file is not set.";
 		validateInputsToSequestCaller(mgfFile, paramsFile, hdrFile);
 
@@ -122,10 +122,10 @@ public final class Mgf2SequestCaller implements Mgf2SequestInterface {
 
 		final File tarFileName = prepareTarFileLocation(tarFile);
 		final SequestSubmitterInterface s = new SequestSubmit(maxCommandLineLength, searchParamsFile,
-				outputDir, tarFileName, hostsFile, progressReporter);
+				outputDir, tarFileName, hostsFile, progressReporter, pvmUtilities);
 
 		final SequestRunner sc = new SequestRunner(tempFolder, paramsFile, new ArrayList<File>(), hostsFile,
-				progressReporter);
+				progressReporter, pvmUtilities);
 
 		sc.setSequestExe(sequestExe);
 		sc.setWatchDogTimeOut(watchDogTimeOut);

@@ -88,10 +88,11 @@ function buildCollection(collection, data,  metricCode){
     var arrayForDYgraphs = [];
     for(var o in collection){
         if(collection[o].metricCode === metricCode){
+           // console.log( collection[o]);
             var nthx = getXaxisNseriesById(data, collection[o].quameterResultId);
             arrayForDYgraphs.push(
                 {
-                    series: getNiceName(nthx[1]),
+                    series: nthx[1],
                     x: nthx[0].toString(),
                     shortText: "A",
                     text: collection[o].text
@@ -528,7 +529,7 @@ function initSimpleCharts(graphObj) {
                 var annotations = views[nthView].dygraph.annotations();
                 annotations.push(
                     {
-                        series: getNiceName(nthx[1]),
+                        series: nthx[1],
                         x: nthx[0].toString(),
                         shortText: "A",
                         text: txt
@@ -569,7 +570,7 @@ function getSmartColumns(dataIdx, metricId){
     var cols = [ dataIdx ];
     var rawInsturmentNames = activeInstrumentFilters();
     for(j=0; j<rawInsturmentNames.length; j++){
-        cols.push({type:'number', label: getNiceName(rawInsturmentNames[j]),
+        cols.push({type:'number', label: rawInsturmentNames[j],
             calc: (function (iterJ, metID) {
                 return function (dt, row) {
                     return (dt.getValue(row, 4) === rawInsturmentNames[iterJ]) ?  dt.getValue(row, columnIndex(metID,dt)) : null;                    }

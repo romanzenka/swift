@@ -1,7 +1,6 @@
 package edu.mayo.mprc.workspace;
 
 import edu.mayo.mprc.MprcException;
-import edu.mayo.mprc.config.RuntimeInitializer;
 import edu.mayo.mprc.database.Change;
 import edu.mayo.mprc.database.DaoBase;
 import edu.mayo.mprc.database.Database;
@@ -16,8 +15,10 @@ import org.springframework.stereotype.Repository;
 import java.util.*;
 
 @Repository("workspaceDao")
-public final class WorkspaceDaoHibernate extends DaoBase implements WorkspaceDao, RuntimeInitializer {
+public final class WorkspaceDaoHibernate extends DaoBase implements WorkspaceDao {
 	private static final Logger LOGGER = Logger.getLogger(WorkspaceDaoHibernate.class);
+	public static final String USER1_EMAIL = "joedoe@localhost";
+	public static final String USER2_EMAIL = "DonaldLVines@localhost";
 
 	public WorkspaceDaoHibernate() {
 	}
@@ -91,13 +92,29 @@ public final class WorkspaceDaoHibernate extends DaoBase implements WorkspaceDao
 
 	@Override
 	public void install(Map<String, String> params) {
-		LOGGER.info("Installing workspace DAO");
-		if (countAll(User.class) == 0) {
-			final User user = new User("Mprc", "Test", "mprctest@localhost", "mt", "database");
-			save(user, new Change("Creating a test user - no users were defined", new DateTime()), true);
-		}
+		if (params.containsKey("test")) {
 
-		addUserInitials();
+			// Install two users for testing purposes
+			final List<User> users = getUsers(false);
+			if (!users.isEmpty()) {
+				return;
+			}
+
+			LOGGER.info("Installing test data for " + getClass().getName());
+
+			final Change change = new Change("Creating a test data set", new DateTime());
+			final User user = new User("John", "Doe", USER1_EMAIL, "mt", "database");
+			save(user, change, true);
+			final User user2 = new User("Donald", "Vines", USER2_EMAIL, "mt", "database");
+			save(user2, change, true);
+		} else {
+			LOGGER.info("Installing " + getClass().getName());
+			if (countAll(User.class) == 0) {
+				final User user = new User("Mprc", "Test", "mprctest@localhost", "mt", "database");
+				save(user, new Change("Creating a test user - no users were defined", new DateTime()), true);
+			}
+			addUserInitials();
+		}
 	}
 
 	private void addUserInitials() {

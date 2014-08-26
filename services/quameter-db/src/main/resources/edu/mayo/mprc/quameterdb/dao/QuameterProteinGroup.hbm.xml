@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+    "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="edu.mayo.mprc.quameterdb.dao" default-lazy="true">
+    <class name="QuameterProteinGroup" table="quameter_pg" mutable="true">
+        <id name="id" type="integer" column="quameter_pg_id">
+            <generator class="native" />
+        </id>
+
+        <property name="name" column="name" type="string" length="40" />
+        <property name="regex" column="regex" type="text" />
+
+        <many-to-one name="creation" column="creation" class="edu.mayo.mprc.database.Change" lazy="proxy"
+            index="quameter_pg_idx_2" foreign-key="quameter_pg_ibfk_2" />
+        <many-to-one name="deletion" column="deletion" class="edu.mayo.mprc.database.Change" lazy="proxy"
+            index="quameter_pg_idx_1" foreign-key="quameter_pg_ibfk_1" />
+
+    </class>
+</hibernate-mapping>

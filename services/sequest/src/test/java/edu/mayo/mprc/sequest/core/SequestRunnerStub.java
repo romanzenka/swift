@@ -15,7 +15,7 @@ import java.util.List;
  */
 public final class SequestRunnerStub extends SequestRunner {
 	public SequestRunnerStub(final File workingDir, final File paramsFile, final List<File> sequestDtaFiles, final File hostsFile) {
-		super(workingDir, paramsFile, sequestDtaFiles, hostsFile, new TestProgressReporter());
+		super(workingDir, paramsFile, sequestDtaFiles, hostsFile, new TestProgressReporter(), new PvmUtilities());
 		setCommand("echo");
 		final List<String> someArgs = new ArrayList<String>();
 		someArgs.add("hi");

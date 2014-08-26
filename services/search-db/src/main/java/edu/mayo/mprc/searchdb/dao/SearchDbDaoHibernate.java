@@ -3,12 +3,13 @@ package edu.mayo.mprc.searchdb.dao;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import edu.mayo.mprc.MprcException;
-import edu.mayo.mprc.config.RuntimeInitializer;
 import edu.mayo.mprc.database.*;
 import edu.mayo.mprc.fastadb.FastaDbDao;
 import edu.mayo.mprc.fastadb.ProteinSequence;
+import edu.mayo.mprc.fastadb.ProteinSequenceTranslator;
 import edu.mayo.mprc.swift.db.SwiftDao;
 import edu.mayo.mprc.swift.dbmapping.ReportData;
+import edu.mayo.mprc.swift.dbmapping.SearchRun;
 import edu.mayo.mprc.swift.dbmapping.SwiftSearchDefinition;
 import edu.mayo.mprc.utilities.FileUtilities;
 import edu.mayo.mprc.utilities.exceptions.ExceptionUtilities;
@@ -16,6 +17,7 @@ import edu.mayo.mprc.utilities.progress.PercentProgressReporter;
 import edu.mayo.mprc.utilities.progress.PercentRangeReporter;
 import org.hibernate.Query;
 import org.hibernate.criterion.Restrictions;
+import org.joda.time.DateTime;
 
 import javax.annotation.Resource;
 import java.io.File;
@@ -27,13 +29,18 @@ import java.util.*;
  *
  * @author Roman Zenka
  */
-public class SearchDbDaoHibernate extends DaoBase implements RuntimeInitializer, SearchDbDao {
+public class SearchDbDaoHibernate extends DaoBase implements SearchDbDao {
 	private SwiftDao swiftDao;
 	private FastaDbDao fastaDbDao;
 
 	private static final String MAP = "edu/mayo/mprc/searchdb/dao/";
 
 	public SearchDbDaoHibernate() {
+	}
+
+	public SearchDbDaoHibernate(SwiftDao swiftDao, FastaDbDao fastaDbDao) {
+		this.swiftDao = swiftDao;
+		this.fastaDbDao = fastaDbDao;
 	}
 
 	public SearchDbDaoHibernate(final SwiftDao swiftDao, final FastaDbDao fastaDbDao, final Database database) {
@@ -67,6 +74,45 @@ public class SearchDbDaoHibernate extends DaoBase implements RuntimeInitializer,
 
 	@Override
 	public void install(Map<String, String> params) {
+		swiftDao.install(params);
+		fastaDbDao.install(params);
+		if (params.containsKey("test")) {
+
+			// Build results of two sample analyses
+			ProteinSequenceTranslator proteinSequenceTranslator = null; // TODO
+			SearchRun searchRun = null; // TODO
+			ReportData reportData = new ReportData(new File("dummy.sf3"), new DateTime(), searchRun);
+
+			TandemMassSpectrometrySample sample1 = addTandemMassSpectrometrySample(
+					new TandemMassSpectrometrySample(
+							new File("test.RAW"),
+							new DateTime(2014, 1, 10, 9, 10, 11, 0),
+							100,
+							1000,
+							0,
+							"instrument",
+							"Orbi123",
+							new DateTime(2014, 1, 10, 10, 20, 30, 0),
+							60.0,
+							"comment",
+							"sample Information")
+			);
+
+			TandemMassSpectrometrySample sample2 = addTandemMassSpectrometrySample(
+					new TandemMassSpectrometrySample(
+							new File("test2.RAW"),
+							new DateTime(2014, 2, 12, 11, 20, 30, 40),
+							200,
+							2000,
+							0,
+							"instrument",
+							"Orbi123",
+							new DateTime(2014, 2, 12, 12, 21, 22, 23),
+							120.0,
+							"comment 2",
+							"sample Information 2")
+			);
+		}
 	}
 
 	public ProteinGroup addProteinGroup(final ProteinGroup group, final PercentRangeReporter reporter) {
@@ -230,7 +276,6 @@ public class SearchDbDaoHibernate extends DaoBase implements RuntimeInitializer,
 
 	@Override
 	public Map<Integer, List<String>> getAccessionNumbersMapForProteinSequences(final Set<Integer> proteinSequenceLists, final Integer databaseId) {
-		final HashMap<Integer, List<String>> result = Maps.newHashMap();
 		final Query query = getSession().createQuery("select distinct psl.id, pa.accnum from" +
 				" ProteinSequenceList as psl" +
 				" inner join psl.list as ps," +
@@ -245,7 +290,40 @@ public class SearchDbDaoHibernate extends DaoBase implements RuntimeInitializer,
 		if (databaseId != null) {
 			query.setParameter("databaseId", databaseId);
 		}
+		return makeAccnumMap(query);
+	}
+
+	@Override
+	public Map<Integer, List<String>> getAccessionNumbersMapForProteinGroups(Set<Integer> proteinGroupIds, Integer databaseId) {
+		final Query query = getSession().createQuery("select distinct psl.id, pa.accnum from" +
+				" ProteinGroup as pg " +
+				" inner join pg.proteinSequences as psl" +
+				" inner join psl.list as ps," +
+				" ProteinEntry as pe," +
+				" ProteinAccnum as pa" +
+				" where pe.sequence = ps" +
+				" and pe.accessionNumber = pa" +
+				(databaseId != null ? " and pe.database.id = :databaseId" : "") +
+				" and pg.id in (:ids)")
+				.setParameterList("ids", proteinGroupIds.toArray());
+
+		if (databaseId != null) {
+			query.setParameter("databaseId", databaseId);
+		}
+		return makeAccnumMap(query);
+	}
+
+	/**
+	 * For given query producing two columns - id and accession number, return a map from
+	 * protein id to a list of all accession numbers that belong to it.
+	 *
+	 * @param query Query to execute
+	 * @return Resulting map.
+	 */
+	private static Map<Integer, List<String>> makeAccnumMap(final Query query) {
 		final List<Object> list = listAndCast(query);
+
+		final Map<Integer, List<String>> result = Maps.newHashMap();
 
 		int lastGroup = -1;
 		final Collection<String> numbers = new ArrayList<String>(20);
@@ -329,6 +407,28 @@ public class SearchDbDaoHibernate extends DaoBase implements RuntimeInitializer,
 		final TreeMap<Integer, ProteinSequenceList> allProteinGroups = new TreeMap<Integer, ProteinSequenceList>();
 		for (final ProteinSequenceList psl : list) {
 			allProteinGroups.put(psl.getId(), psl);
+		}
+		return allProteinGroups;
+	}
+
+	@Override
+	public TreeMap<Integer, ProteinGroup> getProteinGroupsForSample(final Analysis analysis, final TandemMassSpectrometrySample sample) {
+		final List<ProteinGroup> list = listAndCast(getSession().createQuery("select distinct pg from" +
+						" Analysis a" +
+						" inner join a.biologicalSamples as bsl" +
+						" inner join bsl.list as b" +
+						" inner join b.searchResults as srl" +
+						" inner join srl.list as r" +
+						" inner join r.proteinGroups as pgl" +
+						" inner join pgl.list as pg" +
+						" where a=:a and r.massSpecSample=:sample")
+						.setParameter("a", analysis)
+						.setParameter("sample", sample)
+		);
+
+		final TreeMap<Integer, ProteinGroup> allProteinGroups = new TreeMap<Integer, ProteinGroup>();
+		for (final ProteinGroup pg : list) {
+			allProteinGroups.put(pg.getId(), pg);
 		}
 		return allProteinGroups;
 	}

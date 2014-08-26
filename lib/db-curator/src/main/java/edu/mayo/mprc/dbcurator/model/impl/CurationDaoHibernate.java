@@ -30,11 +30,10 @@ import java.util.regex.Pattern;
  * A singleton accessed by the get() method
  */
 @Repository("curationDao")
-public final class CurationDaoImpl extends DaoBase implements CurationDao {
-	private static final Logger LOGGER = Logger.getLogger(CurationDaoImpl.class);
+public final class CurationDaoHibernate extends DaoBase implements CurationDao {
+	private static final Logger LOGGER = Logger.getLogger(CurationDaoHibernate.class);
 
 	private List<Curation> allCurationList = null;
-	private Change legacyCurationChange = null;
 
 	private CurationContext context;
 
@@ -44,11 +43,15 @@ public final class CurationDaoImpl extends DaoBase implements CurationDao {
 	// Needed for initialization of the database
 	private static final String TEST_URL = "classpath:/edu/mayo/mprc/dbcurator/ShortTest.fasta.gz";
 
-	public CurationDaoImpl() {
+	public CurationDaoHibernate() {
 	}
 
-	public CurationDaoImpl(final Database database) {
+	public CurationDaoHibernate(final Database database) {
 		super(database);
+	}
+
+	public CurationDaoHibernate(final CurationContext context) {
+		this.context = context;
 	}
 
 	@Override
@@ -197,7 +200,6 @@ public final class CurationDaoImpl extends DaoBase implements CurationDao {
 		return match;
 	}
 
-	@Override
 	public List<Curation> getCurationsByShortname(final String shortname) {
 		return getCurationsByShortname(shortname, false);
 	}
@@ -317,7 +319,6 @@ public final class CurationDaoImpl extends DaoBase implements CurationDao {
 		}
 	}
 
-	@Override
 	public void addHeaderTransform(final HeaderTransform sprotTrans) {
 		save(sprotTrans, true);
 	}
@@ -331,26 +332,6 @@ public final class CurationDaoImpl extends DaoBase implements CurationDao {
 		}
 	}
 
-	@Override
-	public synchronized Curation addLegacyCuration(final String legacyName) {
-		if (legacyCurationChange == null) {
-			legacyCurationChange = new Change("Adding legacy databases", new DateTime());
-		}
-
-		Curation curation = new Curation();
-		curation.setShortName(legacyName);
-		curation.setNotes("Legacy database");
-		curation.setTitle("Legacy database " + legacyName);
-		curation.setOwnerEmail("mprctest@mayo.edu");
-		curation.setCurationFile(new File(legacyName + ".fasta"));
-		curation = save(curation, legacyCurationChange, false);
-		if (allCurationList != null) {
-			allCurationList.add(curation);
-		}
-		return curation;
-	}
-
-	@Override
 	public void addFastaSource(final FastaSource source) {
 		save(source, true);
 	}
@@ -421,7 +402,6 @@ public final class CurationDaoImpl extends DaoBase implements CurationDao {
 		return matches == null || matches.isEmpty() ? null : matches.get(0);
 	}
 
-	@Override
 	public HeaderTransform getHeaderTransformByName(final String name) {
 		List<HeaderTransform> matches = null;
 		try {
@@ -464,6 +444,8 @@ public final class CurationDaoImpl extends DaoBase implements CurationDao {
 	@Override
 	public void install(Map<String, String> params) {
 		LOGGER.info("Installing database curator data");
+
+		final boolean test = params.containsKey("test");
 
 		HeaderTransform sprotTrans = null;
 		HeaderTransform ipiTrans = null;

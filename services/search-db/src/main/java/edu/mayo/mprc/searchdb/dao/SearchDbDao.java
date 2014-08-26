@@ -1,5 +1,6 @@
 package edu.mayo.mprc.searchdb.dao;
 
+import edu.mayo.mprc.config.RuntimeInitializer;
 import edu.mayo.mprc.database.Dao;
 import edu.mayo.mprc.database.QueryCallback;
 import edu.mayo.mprc.swift.dbmapping.ReportData;
@@ -15,7 +16,7 @@ import java.util.TreeMap;
  * This dao should be implemented in an efficient manner. Typically a large amount of queries (10000x per input file)
  * is going to be run when adding peptide/protein sequences.
  */
-public interface SearchDbDao extends Dao {
+public interface SearchDbDao extends Dao, RuntimeInitializer {
 	/**
 	 * Add analysis.
 	 *
@@ -58,7 +59,7 @@ public interface SearchDbDao extends Dao {
 
 	/**
 	 * @return List of all report ids  that do not have the analysis object attached. Only reports with defined search
-	 *         parameters are listed (does not make sense to list them otherwise, as results cannot be loaded in that case).
+	 * parameters are listed (does not make sense to list them otherwise, as results cannot be loaded in that case).
 	 */
 	List<Long> getReportIdsWithoutAnalysis();
 
@@ -77,10 +78,27 @@ public interface SearchDbDao extends Dao {
 	 */
 	TandemMassSpectrometrySample updateTandemMassSpectrometrySample(TandemMassSpectrometrySample sample);
 
+	/**
+	 * Get a map of protein sequence list id -> {@link edu.mayo.mprc.searchdb.dao.ProteinSequenceList}
+	 * for every single protein sequence list identified in given analysis.
+	 *
+	 * @param analysis Analysis to load protein sequences from.
+	 * @return List of protein sequences from the analysis.
+	 */
 	TreeMap<Integer, ProteinSequenceList> getAllProteinSequences(Analysis analysis);
 
 	/**
-	 * Look at all protein given {@link ProteinSequenceList} ids. For each protein sequence list
+	 * Get a map of protein sequence list id -> {@link edu.mayo.mprc.searchdb.dao.ProteinGroup}
+	 * for every single protein group identified in given analysis associated with a given sample file.
+	 *
+	 * @param analysis Analysis to load protein sequences from.
+	 * @param sample   Mass spec sample to limit ourselves to.
+	 * @return List of protein groups associated with the given mass spec sample for given analysis.
+	 */
+	TreeMap<Integer, ProteinGroup> getProteinGroupsForSample(Analysis analysis, TandemMassSpectrometrySample sample);
+
+	/**
+	 * Look at all proteins given {@link ProteinSequenceList} ids. For each protein sequence list
 	 * load all accession numbers associated with it and put them in a map keyed by their id.
 	 * Only limit yourself to accession numbers from a given database.
 	 *
@@ -90,6 +108,17 @@ public interface SearchDbDao extends Dao {
 	 */
 	Map<Integer, List<String>> getAccessionNumbersMapForProteinSequences(Set<Integer> proteinSequenceLists, Integer databaseId);
 
+	/**
+	 * Look at all proteins given {@link edu.mayo.mprc.searchdb.dao.ProteinGroup} ids. For each protein group
+	 * load all accession numbers associated with it and put them in a map keyed by the group id.
+	 * Only limit yourself to accession numbers from a given database.
+	 *
+	 * @param proteinGroupIds Ids of protein sequence lists to load the ids for.
+	 * @param databaseId           Database to get the  accession numbers from. If null, all matching accnums are returned.
+	 * @return Map from {@link ProteinSequenceList} id to list of accession numbers for that group.
+	 */
+	Map<Integer, List<String>> getAccessionNumbersMapForProteinGroups(Set<Integer> proteinGroupIds, Integer databaseId);
+
 
 	/**
 	 * Return the number of protein groups identified for a specified raw file
@@ -98,7 +127,7 @@ public interface SearchDbDao extends Dao {
 	 * @param inputFile File to check
 	 * @param reports   Reports to check
 	 * @return How many protein groups were identified for the given input file in the first Scaffold report
-	 *         that contains the input file (there should be just one).
+	 * that contains the input file (there should be just one).
 	 */
 	int getScaffoldProteinGroupCount(String inputFile, Iterable<ReportData> reports);
 

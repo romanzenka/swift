@@ -17,10 +17,7 @@ import org.springframework.stereotype.Repository;
 import javax.annotation.Nullable;
 import java.io.File;
 import java.text.MessageFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
 
 /**
  * Hibernate implementation of {@link FastaDbDao}.
@@ -191,5 +188,14 @@ public final class FastaDbDaoHibernate extends BulkDaoBase implements FastaDbDao
 		list.addAll(super.getHibernateMappings());
 		return list;
 
+	}
+
+	@Override
+	public String check() {
+		return null;
+	}
+
+	@Override
+	public void install(final Map<String, String> params) {
 	}
 }

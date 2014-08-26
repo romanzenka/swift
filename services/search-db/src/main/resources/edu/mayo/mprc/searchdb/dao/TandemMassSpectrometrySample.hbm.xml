@@ -6,7 +6,7 @@
             <generator class="native" />
         </id>
         <properties name="uniqueFileIdentifier" unique="true">
-            <property name="file" type="file" column="`file`" not-null="true" />
+            <property name="file" type="file" column="sample_file" not-null="true" />
             <property name="lastModified" type="org.joda.time.contrib.hibernate.PersistentDateTime"
                 column="last_modified" not-null="true" />
         </properties>

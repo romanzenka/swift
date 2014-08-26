@@ -266,12 +266,11 @@ WHERE
 
 ALTER TABLE file_search
 DROP KEY file_search_idx_2,
-DROP FOREIGN KEY file_search_ibfk_2;
+DROP FOREIGN KEY file_search_ibfk_2,
+DROP COLUMN enabled_engines,
+DROP INDEX input_file;
 
 ALTER TABLE file_search
-DROP COLUMN enabled_engines,
-DROP INDEX file_search_idx_2,
-DROP INDEX file_search_idx_3,
 ADD UNIQUE INDEX input_file
   (input_file ASC,
    biological_sample ASC,

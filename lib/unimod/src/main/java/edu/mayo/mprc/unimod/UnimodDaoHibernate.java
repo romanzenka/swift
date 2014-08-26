@@ -82,11 +82,12 @@ public final class UnimodDaoHibernate extends DaoBase implements UnimodDao {
 
 	@Override
 	public void install(Map<String, String> params) {
-		LOGGER.info("Installing unimod DAO");
 		if (countAll(Mod.class) == 0) {
+			LOGGER.info("Installing unimod DAO");
 			final Change change = new Change("Installing initial unimod modifications", new DateTime());
 			LOGGER.info(change.getReason());
-			final Unimod unimod = getDefaultUnimod();
+			// Load short version of unimod
+			final Unimod unimod = unimodFromResource("classpath:edu/mayo/mprc/unimod/unimod_short.xml");
 
 			final UnimodUpgrade upgrade = upgrade(unimod, change);
 			LOGGER.debug("Unimod install results: " + upgrade.toString());
@@ -95,13 +96,16 @@ public final class UnimodDaoHibernate extends DaoBase implements UnimodDao {
 
 	@Override
 	public Unimod getDefaultUnimod() {
+		return unimodFromResource("classpath:edu/mayo/mprc/unimod/unimod.xml");
+	}
+
+	private Unimod unimodFromResource(String sourcePath) {
 		final Unimod unimod = new Unimod();
 		try {
-			unimod.parseUnimodXML(ResourceUtilities.getStream("classpath:edu/mayo/mprc/unimod/unimod.xml", Unimod.class));
+			unimod.parseUnimodXML(ResourceUtilities.getStream(sourcePath, Unimod.class));
 		} catch (Exception t) {
-			throw new MprcException("Unable to parse default unimod set", t);
+			throw new MprcException(String.format("Unable to parse unimod set from [%s]", sourcePath), t);
 		}
 		return unimod;
 	}
-
 }

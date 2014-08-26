@@ -16,7 +16,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 
-final class PvmUtilities {
+public class PvmUtilities {
 	private static final Logger LOGGER = Logger.getLogger(PvmUtilities.class);
 	/**
 	 * daemon for sequest slave
@@ -42,7 +42,7 @@ final class PvmUtilities {
 	 *
 	 * @param pvmHostFileName - the pvmhosts file, contains names of the slaves
 	 */
-	public static List<String> getSlaveNodes(final String pvmHostFileName) {
+	public List<String> getSlaveNodes(final String pvmHostFileName) {
 		final List<String> hosts = new ArrayList<String>();
 		final File f = new File(pvmHostFileName);
 		if (!f.exists()) {
@@ -74,7 +74,7 @@ final class PvmUtilities {
 	 * look up the pvmhosts filenmae,
 	 * then grab the node names
 	 */
-	public static List<String> getSlaveNodes(final File hostsFile) {
+	public List<String> getSlaveNodes(final File hostsFile) {
 		return getSlaveNodes(hostsFile.getAbsolutePath());
 	}
 
@@ -89,7 +89,7 @@ final class PvmUtilities {
 	 * @param lines  - the result from ssh
 	 * @param pvmExe - the pvm command
 	 */
-	public static long getProcessID(final List<String> lines, final String pvmExe) {
+	public long getProcessID(final List<String> lines, final String pvmExe) {
 		long id = 0;
 		// find the line that contains pvmd
 		for (final String line : lines) {
@@ -100,7 +100,7 @@ final class PvmUtilities {
 		return id;
 	}
 
-	private static long parseProcessId(final String line, final String exe) {
+	private long parseProcessId(final String line, final String exe) {
 		long id = 0;
 		if (line.contains(exe)) {
 			final Matcher match = PROCESS_ID_PATTERN.matcher(line);
@@ -121,7 +121,7 @@ final class PvmUtilities {
 	 * @param lines - the result from ssh
 	 * @param exe   - the pvm command
 	 */
-	public static List<Long> getProcessIDs(final List<String> lines, final String exe) {
+	public List<Long> getProcessIDs(final List<String> lines, final String exe) {
 		long id = 0;
 		final List<Long> ids;
 		ids = new ArrayList<Long>();
@@ -147,7 +147,7 @@ final class PvmUtilities {
 	 * @param call     - the call to pass to ssh
 	 *                 Note : essentially are constructing <ssh> <hostname> <call>
 	 */
-	public static List<String> getSshResult(final String hostName, final String call) {
+	public List<String> getSshResult(final String hostName, final String call) {
 		LOGGER.info(String.format("Sequest ssh call: ssh %s %s", hostName, call));
 		final List<String> args = new ArrayList<String>();
 		args.add("ssh");
@@ -163,7 +163,7 @@ final class PvmUtilities {
 	/**
 	 * @param cmd - command to run
 	 */
-	public static List<String> getCmdResult(final List<String> cmd) {
+	public List<String> getCmdResult(final List<String> cmd) {
 		final ProcessBuilder builder = new ProcessBuilder(cmd);
 		final ProcessCaller caller = new ProcessCaller(builder);
 		caller.setLogToConsole(false);
@@ -183,7 +183,7 @@ final class PvmUtilities {
 	 * @param userName - for this user
 	 * @return the names of temporary files for pvm that were found
 	 */
-	public static List<String> getPvmTempFileNamesviaSsh(final String hostName, final String folder, final String userName) {
+	public List<String> getPvmTempFileNamesviaSsh(final String hostName, final String folder, final String userName) {
 		List<String> tempFiles = null;
 		final List<String> fileNames = new ArrayList<String>();
 		try {
@@ -198,7 +198,7 @@ final class PvmUtilities {
 		return parsePvmFileNames(fileNames, tempFiles, userName);
 	}
 
-	private static List<String> parsePvmFileNames(final List<String> fileNames, final List<String> tempFiles, final String userName) {
+	private List<String> parsePvmFileNames(final List<String> fileNames, final List<String> tempFiles, final String userName) {
 
 		if (tempFiles == null) {
 			return tempFiles;
@@ -212,7 +212,7 @@ final class PvmUtilities {
 		return pvmTempFiles;
 	}
 
-	private static void getFileNamesForUser(final List<String> fileNames, final List<String> tempFiles, final String userName) {
+	private void getFileNamesForUser(final List<String> fileNames, final List<String> tempFiles, final String userName) {
 
 		if (tempFiles != null) {
 			for (final String line : tempFiles) {
@@ -229,7 +229,7 @@ final class PvmUtilities {
 		}
 	}
 
-	private static void getPvmFileNames(final List<String> fileNames, final List<String> pvmTempFiles) {
+	private void getPvmFileNames(final List<String> fileNames, final List<String> pvmTempFiles) {
 		for (final String fileName : fileNames) {
 			final Matcher m = PVM_PATTERN.matcher(fileName);
 			if (m.matches()) {
@@ -240,7 +240,7 @@ final class PvmUtilities {
 
 	// get pvm temp files, local
 
-	public static List<String> getPvmTempFileNames(final String folder, final String userName) {
+	public List<String> getPvmTempFileNames(final String folder, final String userName) {
 
 		// this needs to use /bin/bash -c
 		List<String> tempFiles = null;
@@ -260,7 +260,7 @@ final class PvmUtilities {
 		return parsePvmFileNames(fileNames, tempFiles, userName);
 	}
 
-	private static void getProcessesForUser(final List<String> processes, final List<String> tempProcesses, final String userName) {
+	private void getProcessesForUser(final List<String> processes, final List<String> tempProcesses, final String userName) {
 
 		if (tempProcesses != null) {
 			for (final String line : tempProcesses) {
@@ -281,7 +281,7 @@ final class PvmUtilities {
 	 * find the process id for a given hostname, exe
 	 * and user
 	 */
-	public static long findProcessIDforExe(final String hostName, final String userName, final String exe) {
+	public long findProcessIDforExe(final String hostName, final String userName, final String exe) {
 		final List<String> psResult;
 		// find the pvm process id on the node
 
@@ -290,7 +290,7 @@ final class PvmUtilities {
 		return parseProcessListforPid(psResult, exe, userName);
 	}
 
-	private static long parseProcessListforPid(final List<String> psResult, final String exe, final String userName) {
+	private long parseProcessListforPid(final List<String> psResult, final String exe, final String userName) {
 
 
 		if (psResult == null) {
@@ -312,7 +312,7 @@ final class PvmUtilities {
 	 * find the process id for a given  exe
 	 * and user
 	 */
-	public static long findProcessIDforExe(final String userName, final String exe) {
+	public long findProcessIDforExe(final String userName, final String exe) {
 		final List<String> psArgs = Arrays.asList("ps", "auwx");
 		final List<String> grepArgs = Arrays.asList("grep", userName);
 		final List<String> psResult = processPipedCommand(psArgs, grepArgs);
@@ -324,7 +324,7 @@ final class PvmUtilities {
 	/**
 	 * is pvm daemon (pvmd) running
 	 */
-	public static long isPVMRunning(final String userName) {
+	public long isPVMRunning(final String userName) {
 		return findProcessIDforExe(userName, "pvmd");
 
 	}
@@ -334,7 +334,7 @@ final class PvmUtilities {
 	/**
 	 * is pvm running with state matching configuration
 	 */
-	public static boolean isPVMRunningCorrectly(final String userName, final String hostFileName) {
+	public boolean isPVMRunningCorrectly(final String userName, final String hostFileName) {
 		final long pid = isPVMRunning(userName);
 		if (pid == 0) {
 			LOGGER.debug("pvmd3 daemon is not running");
@@ -392,7 +392,7 @@ final class PvmUtilities {
 	 * @param slaves Names of slave servers.
 	 * @return True if localhost is one of the slaves.
 	 */
-	private static boolean localhostInList(List<String> slaves) {
+	private boolean localhostInList(List<String> slaves) {
 		boolean containsLocalhost = false;
 		final String hostname = MonitorUtilities.getFullHostname();
 		for (final String slave : slaves) {
@@ -416,7 +416,7 @@ final class PvmUtilities {
 	 * @param nodeTempFolder - the pvm temporary folder on the node, usually '/tmp'
 	 * @param master         - indicates if master node, only use if master is to be ssh'ed to
 	 */
-	public static void killPVMonNode(final String hostName, final String userName, final String pvmdName, final String nodeTempFolder, final boolean master) {
+	public void killPVMonNode(final String hostName, final String userName, final String pvmdName, final String nodeTempFolder, final boolean master) {
 		final List<String> psResult;
 		// find the pvm process id on the node
 		psResult = getSshResult(hostName, "ps auwx | grep " + userName);
@@ -480,7 +480,7 @@ final class PvmUtilities {
 	 * @param pvmdName       - name of the pvm daemon, usually 'pvmd'
 	 * @param nodeTempFolder - location of the temp folder for pvm on the slaves (usually '/tmp)
 	 */
-	public static void killPVMonSlaveNodes(final String hostsFile, final String userName, final String pvmdName, final String nodeTempFolder) {
+	public void killPVMonSlaveNodes(final String hostsFile, final String userName, final String pvmdName, final String nodeTempFolder) {
 		final List<String> slaves = getSlaveNodes(hostsFile);
 		// now do a clean of pvm on each slave
 		for (final String slave : slaves) {
@@ -495,7 +495,7 @@ final class PvmUtilities {
 	 * @param pvmdName       - name of the pvm daemon, usually 'pvmd'
 	 * @param nodeTempFolder - location of the temp folder for pvm on the slaves (usually '/tmp)
 	 */
-	public static void killPVMonMasterNode(final String userName, final String pvmdName, final String nodeTempFolder) {
+	public void killPVMonMasterNode(final String userName, final String pvmdName, final String nodeTempFolder) {
 		final List<String> psArgs = Arrays.asList("ps", "auwx");
 		final List<String> grepArgs = Arrays.asList("grep", userName);
 
@@ -521,7 +521,7 @@ final class PvmUtilities {
 
 	}
 
-	private static void killProcesses(final List<String> processes, final String daemon) {
+	private void killProcesses(final List<String> processes, final String daemon) {
 		final List<Long> pidseqs = getProcessIDs(processes, daemon);
 		for (final long pidseq : pidseqs) {
 
@@ -536,7 +536,7 @@ final class PvmUtilities {
 		}
 	}
 
-	public static void deleteFile(final String nodeTempFolder, final String fileName) {
+	public void deleteFile(final String nodeTempFolder, final String fileName) {
 		try {
 			if (!fileName.isEmpty()) {
 				final File f = new File(new File(nodeTempFolder), fileName);
@@ -563,7 +563,7 @@ final class PvmUtilities {
 	/**
 	 *
 	 */
-	public static void deleteFileRemote(final String nodeTempFolder, final String fileName, final String hostName) {
+	public void deleteFileRemote(final String nodeTempFolder, final String fileName, final String hostName) {
 		if (!fileName.isEmpty()) {
 
 			final List<String> lines;
@@ -590,7 +590,7 @@ final class PvmUtilities {
 		}
 	}
 
-	private static List<String> getLastLinesRemote(final long howMany, final String fileName, final String hostName) {
+	private List<String> getLastLinesRemote(final long howMany, final String fileName, final String hostName) {
 		final List<String> result = new ArrayList<String>();
 		try {
 			final List<String> lines = getSshResult(hostName, "tail -" + howMany + " " + fileName);
@@ -608,7 +608,7 @@ final class PvmUtilities {
 	 * @howmany - how many bytes to grab, will be less if file does not have them
 	 * @bytes - char array of at least size 'howmany'
 	 */
-	private static List<String> getLastLines(final long howMany, final File f) {
+	private List<String> getLastLines(final long howMany, final File f) {
 		// will navigate the log file to get the last block of bytes
 		final List<String> lines = new ArrayList<String>();
 
@@ -653,7 +653,7 @@ final class PvmUtilities {
 	}
 
 
-	private static List<String> processPipedCommand(final List<String> cmd1, final List<String> cmd2) {
+	private List<String> processPipedCommand(final List<String> cmd1, final List<String> cmd2) {
 		final String psIntermResult = processCommandtoString(cmd1);
 
 		// write to a temporary file
@@ -687,7 +687,7 @@ final class PvmUtilities {
 	}
 
 
-	private static List<String> processPipedCommandwithPipe(final List<String> cmd1, final List<String> cmd2) {
+	private List<String> processPipedCommandwithPipe(final List<String> cmd1, final List<String> cmd2) {
 		final String interimResult = processCommandtoString(cmd1);
 
 		final BufferedInputStream input;
@@ -704,7 +704,7 @@ final class PvmUtilities {
 	}
 
 
-	private static List<String> processCommandwithPipe(final List<String> cmd, final BufferedInputStream input) {
+	private List<String> processCommandwithPipe(final List<String> cmd, final BufferedInputStream input) {
 		final ProcessBuilder builder = new ProcessBuilder(cmd);
 		final ProcessCaller caller = new ProcessCaller(builder);
 		caller.setLogToConsole(false);
@@ -715,7 +715,7 @@ final class PvmUtilities {
 		return outputMonitor.getLines();
 	}
 
-	private static String processCommandtoString(final List<String> cmd) {
+	private String processCommandtoString(final List<String> cmd) {
 		final List<String> cmdResult = getCmdResult(cmd);
 		return Joiner.on('\n').join(cmdResult);
 	}
@@ -723,7 +723,7 @@ final class PvmUtilities {
 	/**
 	 *
 	 */
-	public static void restartPvm(final String pvmdName, final String hostFileName) {
+	public void restartPvm(final String pvmdName, final String hostFileName) {
 		// run <pvmd /etc/pvmhosts> via bash shell
 		List<String> result = null;
 		try {
@@ -748,7 +748,7 @@ final class PvmUtilities {
 	 * @param pvmdName
 	 * @param nodeTempFolder
 	 */
-	private static void pvmRestart(final String userName, final String hostFileName, final String pvmdName, final String nodeTempFolder) {
+	private void pvmRestart(final String userName, final String hostFileName, final String pvmdName, final String nodeTempFolder) {
 
 		// kill pvm on master node
 		killPVMonMasterNode(userName, pvmdName, nodeTempFolder);
@@ -766,7 +766,7 @@ final class PvmUtilities {
 	 * @param pvmdName       - the executable name for pvm daemon <pvmd>
 	 * @param nodeTempFolder - temporary folder where the pvm temp file appear
 	 */
-	public static void makeSurePVMOk(final String userName, final String hostFileName, final String pvmdName, final String nodeTempFolder) {
+	public void makeSurePVMOk(final String userName, final String hostFileName, final String pvmdName, final String nodeTempFolder) {
 		try {
 			if (isPVMRunningCorrectly(userName, hostFileName)) {
 				// pvm running ok, so nothing to do

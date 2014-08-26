@@ -1,5 +1,6 @@
 package edu.mayo.mprc.fastadb;
 
+import edu.mayo.mprc.config.RuntimeInitializer;
 import edu.mayo.mprc.database.bulk.BulkLoadJob;
 import edu.mayo.mprc.database.bulk.BulkLoadJobStarter;
 import edu.mayo.mprc.dbcurator.model.Curation;
@@ -16,7 +17,7 @@ import java.util.Collection;
  *
  * @author Roman Zenka
  */
-public interface FastaDbDao extends BulkLoadJobStarter {
+public interface FastaDbDao extends BulkLoadJobStarter, RuntimeInitializer {
 	/**
 	 * Look up given protein sequence in the database.
 	 * If the sequence does not exist in the database, it is added.

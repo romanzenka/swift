@@ -6,6 +6,9 @@ import edu.mayo.mprc.database.EvolvableBase;
 import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.Restrictions;
 
+import java.util.Collection;
+import java.util.regex.Pattern;
+
 /**
  * Stores information about a named protein group.
  * <p/>
@@ -20,13 +23,14 @@ import org.hibernate.criterion.Restrictions;
 public final class QuameterProteinGroup extends EvolvableBase {
 	private String name;
 	private String regex;
+	private transient Pattern compiledRegex;
 
 	public QuameterProteinGroup() {
 	}
 
 	public QuameterProteinGroup(final String name, final String regex) {
 		this.name = name;
-		this.regex = regex;
+		setRegex(regex);
 	}
 
 	@Override
@@ -67,5 +71,19 @@ public final class QuameterProteinGroup extends EvolvableBase {
 
 	public void setRegex(final String regex) {
 		this.regex = regex;
+		this.compiledRegex = Pattern.compile(this.regex);
+	}
+
+	/**
+	 * @param accnums List of accession numbers in a protein group
+	 * @return True if any of the accession numbers match regex for this group. false otherwise
+	 */
+	public boolean matches(final Collection<String> accnums) {
+		for (final String accnum : accnums) {
+			if (compiledRegex.matcher(accnum).matches()) {
+				return true;
+			}
+		}
+		return false;
 	}
 }

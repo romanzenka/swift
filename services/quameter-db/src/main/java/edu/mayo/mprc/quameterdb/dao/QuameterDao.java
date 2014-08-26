@@ -6,7 +6,6 @@ import edu.mayo.mprc.swift.dbmapping.FileSearch;
 
 import java.util.List;
 import java.util.Map;
-import java.util.regex.Pattern;
 
 /**
  * @author Roman Zenka
@@ -26,10 +25,9 @@ public interface QuameterDao extends Dao {
 	                                 final Map<QuameterProteinGroup, Integer> identifedSpectra);
 
 	/**
-	 * @param searchFilter Filter the search names by this regex.
 	 * @return All the Quameter results that match given search name filter, with all values populated.
 	 */
-	List<QuameterResult> listAllResults(Pattern searchFilter);
+	List<QuameterResult> listAllResults();
 
 
     /**
@@ -62,11 +60,13 @@ public interface QuameterDao extends Dao {
 	 * For given file search id and a list of categories and their corresponding proteins,
 	 * count all the spectra corresponding to the protein set for the particular file search.
 	 *
-	 * @param fileSearchId  Saved info about file search
-	 * @param proteinGroups Currently defined protein groups
+	 * @param analysisId                     Id of the loaded analysis (Scaffold report) that contains the file.
+	 * @param fileSearchId                   Saved info about file search that was used to process the input file
+	 * @param tandemMassSpectrometrySampleId Direct link to the mass spectrometry metadata for the file.
+	 * @param proteinGroups                  Currently defined protein groups
 	 * @return Count of spectra corresponding to protein groups for given file search
 	 */
-	Map<QuameterProteinGroup, Integer> getIdentifiedSpectra(int fileSearchId, List<QuameterProteinGroup> proteinGroups);
+	Map<QuameterProteinGroup, Integer> getIdentifiedSpectra(int analysisId, int fileSearchId, int tandemMassSpectrometrySampleId, List<QuameterProteinGroup> proteinGroups);
 
 	/**
 	 * Take a list of protein groups as it came from the config.

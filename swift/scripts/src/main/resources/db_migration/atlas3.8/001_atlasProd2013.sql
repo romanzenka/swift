@@ -421,7 +421,8 @@ CREATE TABLE task
   out_log          LONGTEXT,
   err_log          LONGTEXT,
   host             VARCHAR(255),
-  percent_done     REAL
+  percent_done     REAL,
+  KEY `task_start_timestamp_index` (`start_timestamp`)
 );
 CREATE TABLE task_state
 (

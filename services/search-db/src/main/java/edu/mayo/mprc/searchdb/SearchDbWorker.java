@@ -17,6 +17,7 @@ import edu.mayo.mprc.searchdb.builder.MapMassSpecDataExtractor;
 import edu.mayo.mprc.searchdb.builder.MassSpecDataExtractor;
 import edu.mayo.mprc.searchdb.builder.ScaffoldSpectraSummarizer;
 import edu.mayo.mprc.searchdb.bulk.BulkSearchDbDao;
+import edu.mayo.mprc.searchdb.dao.Analysis;
 import edu.mayo.mprc.searchdb.dao.TandemMassSpectrometrySample;
 import edu.mayo.mprc.swift.db.SwiftDao;
 import edu.mayo.mprc.swift.dbmapping.ReportData;
@@ -62,12 +63,12 @@ public final class SearchDbWorker extends WorkerBase {
 			final ScaffoldSpectraSummarizer summarizer = new ScaffoldSpectraSummarizer(translator, dataExtractor);
 			summarizer.load(workPacket.getScaffoldSpectrumReport(), "3", reporter);
 
-			dao.addAnalysis(summarizer.getAnalysisBuilder(), reportData, reporter);
+			final Analysis analysis = dao.addAnalysis(summarizer.getAnalysisBuilder(), reportData, reporter);
 
 			final Map<String, Integer> massSpecMap = getSavedMassSpecSampleMap(dataExtractor);
 
 			dao.commit();
-			reporter.reportProgress(new SearchDbResult(massSpecMap));
+			reporter.reportProgress(new SearchDbResult(massSpecMap, analysis.getId()));
 		} catch (Exception e) {
 			dao.rollback();
 			throw new MprcException(

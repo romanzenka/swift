@@ -1,5 +1,6 @@
 package edu.mayo.mprc.swift.dbmapping;
 
+import com.google.common.collect.Lists;
 import edu.mayo.mprc.database.DaoBase;
 import edu.mayo.mprc.database.EqualityCriteria;
 import edu.mayo.mprc.database.PersistableBase;
@@ -45,7 +46,7 @@ public class SwiftSearchDefinition extends PersistableBase implements EqualityCr
 		this.qa = qa;
 		this.peptideReport = peptideReport;
 		this.searchParameters = searchParameters;
-		this.inputFiles = inputFiles;
+		setInputFiles(inputFiles);
 		this.publicMgfFiles = publicMgfFiles;
 		this.publicMzxmlFiles = publicMzxmlFiles;
 		this.publicSearchFiles = publicSearchFiles;
@@ -109,7 +110,10 @@ public class SwiftSearchDefinition extends PersistableBase implements EqualityCr
 	}
 
 	public void setInputFiles(final List<FileSearch> inputFiles) {
-		this.inputFiles = inputFiles;
+		this.inputFiles = Lists.newArrayList(inputFiles);
+		for (final FileSearch search : inputFiles) {
+			search.setSwiftSearchDefinition(this);
+		}
 	}
 
 	public Map<String, String> getMetadata() {
