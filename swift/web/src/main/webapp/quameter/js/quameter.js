@@ -281,7 +281,7 @@ function addDygraph( viewIndex, view, viewId, metricId, viewMetadata, data, rang
                     var range = me.xAxisRange();
                     for (var j = 0; j < views.length; j++) {
                         if (gs[j] == me) continue;
-                        if(gs[j] === undefined){console.log("Errand LOOKUP",j,gs)}
+                        if(gs[j] === undefined){console.log("Errant LOOKUP",j,gs)}
                         gs[j].updateOptions({
                             dateWindow: range
                         });
