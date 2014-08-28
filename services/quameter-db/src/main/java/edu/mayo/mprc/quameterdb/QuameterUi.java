@@ -28,7 +28,7 @@ import java.util.Map;
 /**
  * @author Roman Zenka
  */
-public final class QuameterUi implements Dao, UiConfigurationProvider {
+public final class QuameterUi implements Dao, UiConfigurationProvider, Lifecycle {
 	public static final String TYPE = "quameterUi";
 	public static final String NAME = "QuaMeter User Interface";
 	public static final String DESC = "Specialized interface for browsing QuaMeter database";
@@ -41,6 +41,8 @@ public final class QuameterUi implements Dao, UiConfigurationProvider {
 	private final Map<String, String> instrumentMap;
 	private static final DateTimeFormatter DATE_FORMAT_1 = DateTimeFormat.forPattern("'Date('yyyy, ").withLocale(Locale.US);
 	private static final DateTimeFormatter DATE_FORMAT_2 = DateTimeFormat.forPattern(", d, H, m, s, S')'").withLocale(Locale.US);
+
+	private boolean running;
 
 	/**
 	 * Use this constant to get to a list of quameter categories from the user interface
@@ -192,9 +194,42 @@ public final class QuameterUi implements Dao, UiConfigurationProvider {
 		currentConfiguration.put(UI_QUAMETER_CATEGORIES, dbWorkerConfig.getCategories());
 	}
 
-    public QuameterDao getQuameterDao() {
-        return quameterDao;
-    }
+	public QuameterDao getQuameterDao() {
+		return quameterDao;
+	}
+
+	public void initialize() {
+		QuameterDao dao = getQuameterDao();
+		List<QuameterProteinGroup> proteins = dbWorkerConfig.getProteins();
+		// On start we take our protein groups and store them in the database
+		dao.begin();
+		try {
+			proteins = dao.updateProteinGroups(proteins);
+			dao.commit();
+		} catch (Exception e) {
+			dao.rollback();
+		}
+	}
+
+	@Override
+	public boolean isRunning() {
+		return running;
+	}
+
+	@Override
+	public void start() {
+		if(!isRunning()) {
+			initialize();
+			running = true;
+		}
+	}
+
+	@Override
+	public void stop() {
+		if(isRunning()) {
+			running = false;
+		}
+	}
 
 	public static final class Config implements ResourceConfig {
 		private ServiceConfig quameterConfig;

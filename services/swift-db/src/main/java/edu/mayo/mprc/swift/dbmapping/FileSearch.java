@@ -120,7 +120,7 @@ public class FileSearch extends PersistableBase implements EqualityCriteria {
 		if (getInputFile() != null ? !getInputFile().equals(that.getInputFile()) : that.getInputFile() != null) {
 			return false;
 		}
-		if (getSwiftSearchDefinition() != null ? !getSwiftSearchDefinition().equals(that.getSwiftSearchDefinition()) : that.getSwiftSearchDefinition() != null) {
+		if (getSwiftSearchDefinition() != null ? !getSwiftSearchDefinition().shallowEquals(that.getSwiftSearchDefinition()) : that.getSwiftSearchDefinition() != null) {
 			return false;
 		}
 		if (getSearchParameters() != null ? !getSearchParameters().equals(that.getSearchParameters()) : that.getSearchParameters() != null) {
@@ -136,7 +136,6 @@ public class FileSearch extends PersistableBase implements EqualityCriteria {
 		result = 31 * result + (getBiologicalSample() != null ? getBiologicalSample().hashCode() : 0);
 		result = 31 * result + (getCategoryName() != null ? getCategoryName().hashCode() : 0);
 		result = 31 * result + (getExperiment() != null ? getExperiment().hashCode() : 0);
-		result = 31 * result + (getSwiftSearchDefinition() != null ? getSwiftSearchDefinition().hashCode() : 0);
 		result = 31 * result + (getSearchParameters() != null ? getSearchParameters().hashCode() : 0);
 		return result;
 	}

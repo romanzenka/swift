@@ -32,7 +32,7 @@ import java.util.regex.Pattern;
 /**
  * @author Roman Zenka
  */
-public final class QuameterDbWorker extends WorkerBase implements Lifecycle {
+public final class QuameterDbWorker extends WorkerBase {
 	private static final Logger LOGGER = Logger.getLogger(QuameterDbWorker.class);
 	private QuameterDao dao;
 
@@ -131,33 +131,6 @@ public final class QuameterDbWorker extends WorkerBase implements Lifecycle {
 		return map;
 	}
 
-	@Override
-	public boolean isRunning() {
-		return running;
-	}
-
-	@Override
-	public void start() {
-		if (!isRunning()) {
-			// On start we take our protein groups and store them in the database
-			dao.begin();
-			try {
-				proteins = dao.updateProteinGroups(proteins);
-				dao.commit();
-			} catch (Exception e) {
-				dao.rollback();
-			}
-			running = true;
-		}
-	}
-
-	@Override
-	public void stop() {
-		if (isRunning()) {
-			running = false;
-		}
-	}
-
 	/**
 	 * A factory capable of creating the worker
 	 */
@@ -176,9 +149,10 @@ public final class QuameterDbWorker extends WorkerBase implements Lifecycle {
 
 		@Override
 		public Worker create(final Config config, final DependencyResolver dependencies) {
-			return new QuameterDbWorker(getQuameterDao(),
+			QuameterDbWorker quameterDbWorker = new QuameterDbWorker(getQuameterDao(),
 					config.getProteins(),
 					config.getInstrumentNameMap());
+			return quameterDbWorker;
 		}
 	}
 

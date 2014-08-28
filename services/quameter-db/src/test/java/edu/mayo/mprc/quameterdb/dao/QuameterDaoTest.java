@@ -29,7 +29,7 @@ import java.util.Map;
 /**
  * @author Roman Zenka
  */
-public final class QuameterDaoHibernateTest extends DaoTest {
+public final class QuameterDaoTest extends DaoTest {
 	private File tempFolder;
 
 	private WorkspaceDaoHibernate workspaceDao;
