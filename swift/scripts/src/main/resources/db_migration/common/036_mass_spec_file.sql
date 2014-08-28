@@ -35,6 +35,26 @@ and sr.tandem_mass_spec_sample_id = ts.tandem_mass_spec_sample_id
 and re.analysis_id = a.analysis_id
 and t.transaction_id = re.transaction_id;
 
+CREATE OR REPLACE VIEW proteins_per_transaction AS
+select
+  title,
+  sample_name,
+  category,
+  sample_file,
+  unique_peptides,
+  unique_spectra,
+  total_spectra,
+  percentage_total_spectra,
+  percentage_sequence_coverage,
+  protein_group_id,
+  protein_sequence_id,
+  accession_number
+from
+  analysis_to_proteins as a,
+    protein_sequences_per_group as pg
+where a.protein_group_list_id=pg.protein_group_list_id;
+
+
 -- @UNDO
 
 ALTER TABLE tandem_mass_spec_sample
@@ -73,3 +93,23 @@ and srlm.search_result_id = sr.search_result_id
 and sr.tandem_mass_spec_sample_id = ts.tandem_mass_spec_sample_id
 and re.analysis_id = a.analysis_id
 and t.transaction_id = re.transaction_id;
+
+CREATE OR REPLACE VIEW proteins_per_transaction AS
+select
+  title,
+  sample_name,
+  category,
+  file,
+  unique_peptides,
+  unique_spectra,
+  total_spectra,
+  percentage_total_spectra,
+  percentage_sequence_coverage,
+  protein_group_id,
+  protein_sequence_id,
+  accession_number
+from
+  analysis_to_proteins as a,
+    protein_sequences_per_group as pg
+where a.protein_group_list_id=pg.protein_group_list_id;
+
