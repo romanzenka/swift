@@ -44,7 +44,8 @@
             }
 
             for(QuameterResult qr : myList){
-                out.print("<li>"+qr.getSample()+"<a href=\"/quameter-unhide/"+ qr.getTransaction() +"\">Unhide This</></li>");
+                out.print("<li>"+qr.getSample().getFile().getAbsolutePath()+" <a href=\"/quameter-unhide/"+ qr.getTransaction() +"\">Unhide This</></li>");
+
             }
 
        }
