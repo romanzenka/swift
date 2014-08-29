@@ -497,16 +497,9 @@ public final class QuameterResult extends PersistableBase {
 	/**
 	 * Determine if given QuameterResult should be listed.
 	 *
-	 * @param searchFilter Filter for the search names.
 	 * @return True if the result should be displayed in the UI.
 	 */
-	public boolean resultMatches(final Pattern searchFilter) {
-		// Experiment name must match
-		final String experimentName = getFileSearch().getExperiment();
-		if (!searchFilter.matcher(experimentName).find()) {
-			return false;
-		}
-
+	public boolean resultMatches() {
 		// We must not be a Pre or Postblank file
 		if (PRE_POST.matcher(getFileSearch().getInputFile().getName()).find()) {
 			return false;

@@ -98,56 +98,60 @@ public final class QuameterDaoHibernate extends DaoBase implements QuameterDao, 
 				builder.put(group, (int) (Math.random() * 60.0));
 			}
 			r.setIdentifiedSpectra(builder.build());
-			filtered.add(r);
+			if (r.resultMatches()) {
+				filtered.add(r);
+			}
 		}
 		return filtered;
 	}
 
-    @Override
-    public List<QuameterResult> listHiddenResults() {
-        final List<QuameterProteinGroup> activeProteinGroups = listProteinGroups();
+	@Override
+	public List<QuameterResult> listHiddenResults() {
+		final List<QuameterProteinGroup> activeProteinGroups = listProteinGroups();
 
-        final Query query = getSession().createSQLQuery("" +
-                "SELECT {q.*}, m.metadata_value AS v, r.transaction_id AS ti" +
-                " FROM `" + swiftDao.qualifyTableName("transaction") + "` AS r, " +
-                " " + swiftDao.qualifyTableName("file_search") + " AS f, " +
-                " " + swiftDao.qualifyTableName("quameter_result") + " AS q, " +
-                " " + swiftDao.qualifyTableName("swift_search_definition") + " AS d," +
-                " " + swiftDao.qualifyTableName("search_metadata") + " AS m," +
-                " " + swiftDao.qualifyTableName("tandem_mass_spec_sample") + " AS t" +
-                " WHERE " +
-                " q.hidden=1 AND " +
-                " r.hidden=0 AND " +
-                " r.swift_search = d.swift_search_definition_id AND " +
-                " f.swift_search_definition_id = d.swift_search_definition_id AND " +
-                " q.file_search_id = f.file_search_id AND " +
-                " m.swift_search_definition_id = d.swift_search_definition_id AND " +
-                " m.metadata_key='quameter.category' AND" +
-                " t.tandem_mass_spec_sample_id = q.sample_id" +
-                " ORDER BY t.start_time")
-                .addEntity("q", QuameterResult.class)
-                .addScalar("v", Hibernate.STRING)
-                .addScalar("ti", Hibernate.INTEGER);
-        final List raw = query.list();
-        final List<QuameterResult> filtered = new ArrayList<QuameterResult>(Math.min(raw.size(), 1000));
-        for (final Object o : raw) {
-            final Object[] array = (Object[]) o;
-            final QuameterResult r = (QuameterResult) array[0];
-            final String category = (String) array[1];
-            r.setCategory(category);
-            final Integer transactionId = (Integer) array[2];
-            r.setTransaction(transactionId);
+		final Query query = getSession().createSQLQuery("" +
+				"SELECT {q.*}, m.metadata_value AS v, r.transaction_id AS ti" +
+				" FROM `" + swiftDao.qualifyTableName("transaction") + "` AS r, " +
+				" " + swiftDao.qualifyTableName("file_search") + " AS f, " +
+				" " + swiftDao.qualifyTableName("quameter_result") + " AS q, " +
+				" " + swiftDao.qualifyTableName("swift_search_definition") + " AS d," +
+				" " + swiftDao.qualifyTableName("search_metadata") + " AS m," +
+				" " + swiftDao.qualifyTableName("tandem_mass_spec_sample") + " AS t" +
+				" WHERE " +
+				" q.hidden=1 AND " +
+				" r.hidden=0 AND " +
+				" r.swift_search = d.swift_search_definition_id AND " +
+				" f.swift_search_definition_id = d.swift_search_definition_id AND " +
+				" q.file_search_id = f.file_search_id AND " +
+				" m.swift_search_definition_id = d.swift_search_definition_id AND " +
+				" m.metadata_key='quameter.category' AND" +
+				" t.tandem_mass_spec_sample_id = q.sample_id" +
+				" ORDER BY t.start_time")
+				.addEntity("q", QuameterResult.class)
+				.addScalar("v", Hibernate.STRING)
+				.addScalar("ti", Hibernate.INTEGER);
+		final List raw = query.list();
+		final List<QuameterResult> filtered = new ArrayList<QuameterResult>(Math.min(raw.size(), 1000));
+		for (final Object o : raw) {
+			final Object[] array = (Object[]) o;
+			final QuameterResult r = (QuameterResult) array[0];
+			final String category = (String) array[1];
+			r.setCategory(category);
+			final Integer transactionId = (Integer) array[2];
+			r.setTransaction(transactionId);
 
-            ImmutableMap.Builder<QuameterProteinGroup, Integer> builder = new ImmutableMap.Builder<QuameterProteinGroup, Integer>();
-            for (QuameterProteinGroup group : activeProteinGroups) {
-                // Fake some data up
-                builder.put(group, (int)(Math.random()*60.0));
-            }
-            r.setIdentifiedSpectra(builder.build());
-            filtered.add(r);
-        }
-        return filtered;
-    }
+			ImmutableMap.Builder<QuameterProteinGroup, Integer> builder = new ImmutableMap.Builder<QuameterProteinGroup, Integer>();
+			for (QuameterProteinGroup group : activeProteinGroups) {
+				// Fake some data up
+				builder.put(group, (int) (Math.random() * 60.0));
+			}
+			r.setIdentifiedSpectra(builder.build());
+			if (r.resultMatches()) {
+				filtered.add(r);
+			}
+		}
+		return filtered;
+	}
 
 	@Override
 	public void hideQuameterResult(final int quameterResultId) {
@@ -156,12 +160,12 @@ public final class QuameterDaoHibernate extends DaoBase implements QuameterDao, 
 		getSession().saveOrUpdate(quameterResult);
 	}
 
-    @Override
-    public void unhideQuameterResult(final int quameterResultId) {
-        final QuameterResult quameterResult = (QuameterResult) getSession().get(QuameterResult.class, quameterResultId);
-        quameterResult.setHidden(false);
-        getSession().saveOrUpdate(quameterResult);
-    }
+	@Override
+	public void unhideQuameterResult(final int quameterResultId) {
+		final QuameterResult quameterResult = (QuameterResult) getSession().get(QuameterResult.class, quameterResultId);
+		quameterResult.setHidden(false);
+		getSession().saveOrUpdate(quameterResult);
+	}
 
 	@Override
 	public List<QuameterAnnotation> listAnnotations() {
@@ -285,7 +289,7 @@ public final class QuameterDaoHibernate extends DaoBase implements QuameterDao, 
 
 	@Override
 	public String check() {
-		return null;  // TODO: Implement this method
+		return null;
 	}
 
 	@Override
