@@ -6,7 +6,6 @@ import org.testng.Assert;
 import org.testng.annotations.Test;
 
 import java.io.File;
-import java.util.regex.Pattern;
 
 /**
  * @author Roman Zenka
@@ -39,7 +38,7 @@ public final class QuameterResultTest {
 		fileSearch.setExperiment("Test experiment name");
 		result.setFileSearch(fileSearch);
 
-		Assert.assertTrue(result.resultMatches(Pattern.compile(".*")), "Should match although the file contains Post as patient name");
+		Assert.assertTrue(result.resultMatches(), "Should match although the file contains Post as patient name");
 	}
 
 	@Test
@@ -50,7 +49,7 @@ public final class QuameterResultTest {
 		fileSearch.setExperiment("Test experiment name");
 		result.setFileSearch(fileSearch);
 
-		Assert.assertFalse(result.resultMatches(Pattern.compile(".*")), "Should not match Pre file");
+		Assert.assertFalse(result.resultMatches(), "Should not match Pre file");
 	}
 
 }
