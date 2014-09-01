@@ -39,7 +39,14 @@
                     myList = quameterUi.getQuameterDao().listHiddenResults();
 
                     for (QuameterResult qr : myList) {
-                        out.print("<li>" + qr.getSearchResult().getMassSpecSample().getFile().getAbsolutePath() + " <a href=\"/quameter-unhide/" + qr.getTransaction() + "\">Unhide This</a></li>");
+        %>
+        <li>
+            <form action="/service/quameter-unhide/<%= qr.getId() %>" method="post">
+                <%= qr.getSearchResult().getMassSpecSample().getFile().getAbsolutePath() %>
+                <input type="submit" value="Unhide This">
+            </form>
+        </li>
+        <%
                     }
 
                     quameterUi.commit();
