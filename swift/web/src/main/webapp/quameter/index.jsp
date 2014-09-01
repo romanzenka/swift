@@ -86,8 +86,7 @@
 
 <script type="text/javascript" src="/common/bootstrap/js/bootstrap.js"></script>
 
-<!-- Graph Dependancies -->
-<%--<script type="text/javascript" src="js/tmp.js"></script>--%>
+<!-- Graph Dependencies -->
 
 <script type="text/javascript" src="js/dygraph-combined.js"></script>
 <script type="text/javascript" src="js/quameter-definitions.js"></script>
