@@ -37,18 +37,17 @@
                 quameterUi.begin();
                 try {
                     myList = quameterUi.getQuameterDao().listHiddenResults();
+
+                    for (QuameterResult qr : myList) {
+                        out.print("<li>" + qr.getSearchResult().getMassSpecSample().getFile().getAbsolutePath() + " <a href=\"/quameter-unhide/" + qr.getTransaction() + "\">Unhide This</></li>");
+                    }
+
                     quameterUi.commit();
 
                 } catch (Exception e) {
                     quameterUi.rollback();
                     throw new MprcException(e);
                 }
-
-                for (QuameterResult qr : myList) {
-                    out.print("<li>" + qr.getSearchResult().getMassSpecSample().getFile().getAbsolutePath() + " <a href=\"/quameter-unhide/" + qr.getTransaction() + "\">Unhide This</></li>");
-
-                }
-
             }
         %>
     </ul>
