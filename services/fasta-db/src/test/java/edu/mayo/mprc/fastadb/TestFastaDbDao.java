@@ -27,8 +27,8 @@ public class TestFastaDbDao extends DaoTest {
 
 	@BeforeMethod
 	public void setup() {
-		fastaDbDao = new FastaDbDaoHibernate();
 		curationDao = new CurationDaoHibernate();
+		fastaDbDao = new FastaDbDaoHibernate(curationDao);
 
 		initializeDatabase(Arrays.asList(fastaDbDao, curationDao));
 	}

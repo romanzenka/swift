@@ -30,6 +30,8 @@ import java.util.Map;
  * @author Roman Zenka
  */
 public final class QuameterDaoTest extends DaoTest {
+	public static final QuameterProteinGroup ALBUMIN_GROUP = new QuameterProteinGroup("albumin", "ALBU_HUMAN");
+	public static final QuameterProteinGroup KERATIN_GROUP = new QuameterProteinGroup("keratin", "K1C10_BOVIN");
 	private File tempFolder;
 
 	private WorkspaceDaoHibernate workspaceDao;
@@ -45,8 +47,6 @@ public final class QuameterDaoTest extends DaoTest {
 	private TandemMassSpectrometrySample sample2;
 	private FileSearch fileSearch1;
 	private FileSearch fileSearch2;
-
-	private boolean dumped = false;
 
 	@BeforeMethod
 	public void init() {
@@ -64,7 +64,7 @@ public final class QuameterDaoTest extends DaoTest {
 		paramsDao = new ParamsDaoHibernate(workspaceDao, curationDao);
 		unimodDao = new UnimodDaoHibernate();
 		swiftDao = new SwiftDaoHibernate(workspaceDao, curationDao, paramsDao, unimodDao);
-		fastaDbDao = new FastaDbDaoHibernate();
+		fastaDbDao = new FastaDbDaoHibernate(curationDao);
 		searchDbDao = new SearchDbDaoHibernate(swiftDao, fastaDbDao);
 		quameterDao = new QuameterDaoHibernate(swiftDao, searchDbDao);
 
@@ -83,10 +83,6 @@ public final class QuameterDaoTest extends DaoTest {
 			fileSearch1 = swiftDao.getFileSearchForId(1);
 			fileSearch2 = swiftDao.getFileSearchForId(2);
 			quameterDao.commit();
-			if (!dumped) {
-				dumpXml();
-				dumped = true;
-			}
 		} catch (final Exception e) {
 			quameterDao.rollback();
 			throw new MprcException(e);
@@ -100,8 +96,8 @@ public final class QuameterDaoTest extends DaoTest {
 
 	List<QuameterProteinGroup> quameterProteinGroups() {
 		return Lists.newArrayList(
-				new QuameterProteinGroup("albumin", "ALBU_HUMAN"),
-				new QuameterProteinGroup("keratin", "K1C1_HUMAN"));
+				ALBUMIN_GROUP,
+				KERATIN_GROUP);
 	}
 
 	@Test
@@ -292,28 +288,21 @@ public final class QuameterDaoTest extends DaoTest {
 		}
 	}
 
-	private void dumpXml() {
+	@Test
+	public void shouldCalculateProteinCounts() {
 		quameterDao.begin();
-		try {
-			quameterDao.getSession().createSQLQuery("SCRIPT TO '/Users/m044910/Documents/devel/swift/dump.sql'").list();
-			quameterDao.commit();
-		} catch (Exception e) {
-			quameterDao.rollback();
-			throw new MprcException("Failed to dump test databse contents", e);
-		}
-//		FileOutputStream out = null;
-//		try {
-//			out = new FileOutputStream("/Users/m044910/Documents/devel/swift/dump.xml");
-//			final Transaction transaction = swiftDao.getSession().beginTransaction();
-//			final IDatabaseConnection conn = new DatabaseConnection(swiftDao.getSession().connection());
-//			ITableFilter filter = new DatabaseSequenceFilter(conn);
-//			IDataSet dataset = new FilteredDataSet(filter, conn.createDataSet());
-//			FlatXmlDataSet.write(dataset, out);
-//			transaction.commit();
-//		} catch (Exception e) {
-//			throw new MprcException("Could not dump database XML", e);
-//		} finally {
-//			FileUtilities.closeQuietly(out);
-//		}
+
+		quameterDao.updateProteinGroups(quameterProteinGroups());
+
+		nextTransaction();
+
+		List<QuameterProteinGroup> proteinGroups = quameterDao.listProteinGroups();
+		final Map<QuameterProteinGroup, Integer> identifiedSpectra = quameterDao.getIdentifiedSpectra(1, 1, 1, proteinGroups);
+
+		quameterDao.commit();
+
+		Assert.assertEquals(identifiedSpectra.size(), 2, "We need count for each protein group");
+		Assert.assertEquals(identifiedSpectra.get(ALBUMIN_GROUP), Integer.valueOf(0), "Number of albumin spectra must match");
+		Assert.assertEquals(identifiedSpectra.get(KERATIN_GROUP), Integer.valueOf(2), "Number of keratin spectra must match");
 	}
 }

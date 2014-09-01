@@ -1,6 +1,9 @@
 package edu.mayo.mprc.quameterdb.dao;
 
-import com.google.common.collect.*;
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 import edu.mayo.mprc.config.RuntimeInitializer;
 import edu.mayo.mprc.database.Change;
 import edu.mayo.mprc.database.DaoBase;
@@ -35,7 +38,6 @@ public final class QuameterDaoHibernate extends DaoBase implements QuameterDao, 
 	}
 
 	public QuameterDaoHibernate(final SwiftDao swiftDao, final SearchDbDao searchDbDao) {
-		super();
 		this.swiftDao = swiftDao;
 		this.searchDbDao = searchDbDao;
 	}
@@ -174,7 +176,7 @@ public final class QuameterDaoHibernate extends DaoBase implements QuameterDao, 
 		}
 
 
-		final ImmutableMap.Builder<QuameterProteinGroup, Integer> resultBuilder = new ImmutableBiMap.Builder<QuameterProteinGroup, Integer>();
+		final ImmutableMap.Builder<QuameterProteinGroup, Integer> resultBuilder = new ImmutableMap.Builder<QuameterProteinGroup, Integer>();
 		for (int i = 0; i < counts.length; i++) {
 			resultBuilder.put(quameterProteinGroups.get(i), counts[i]);
 		}

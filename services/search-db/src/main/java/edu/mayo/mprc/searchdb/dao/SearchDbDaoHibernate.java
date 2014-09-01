@@ -6,13 +6,13 @@ import edu.mayo.mprc.MprcException;
 import edu.mayo.mprc.database.*;
 import edu.mayo.mprc.fastadb.FastaDbDao;
 import edu.mayo.mprc.fastadb.ProteinSequence;
-import edu.mayo.mprc.fastadb.ProteinSequenceTranslator;
 import edu.mayo.mprc.swift.db.SwiftDao;
 import edu.mayo.mprc.swift.dbmapping.ReportData;
 import edu.mayo.mprc.swift.dbmapping.SearchRun;
 import edu.mayo.mprc.swift.dbmapping.SwiftSearchDefinition;
 import edu.mayo.mprc.utilities.FileUtilities;
 import edu.mayo.mprc.utilities.exceptions.ExceptionUtilities;
+import edu.mayo.mprc.utilities.progress.DummyProgressReporter;
 import edu.mayo.mprc.utilities.progress.PercentProgressReporter;
 import edu.mayo.mprc.utilities.progress.PercentRangeReporter;
 import org.hibernate.Query;
@@ -79,9 +79,6 @@ public class SearchDbDaoHibernate extends DaoBase implements SearchDbDao {
 		if (params.containsKey("test")) {
 
 			// Build results of two sample analyses
-			ProteinSequenceTranslator proteinSequenceTranslator = null; // TODO
-			SearchRun searchRun = null; // TODO
-			ReportData reportData = new ReportData(new File("dummy.sf3"), new DateTime(), searchRun);
 
 			TandemMassSpectrometrySample sample1 = addTandemMassSpectrometrySample(
 					new TandemMassSpectrometrySample(
@@ -112,6 +109,34 @@ public class SearchDbDaoHibernate extends DaoBase implements SearchDbDao {
 							"comment 2",
 							"sample Information 2")
 			);
+
+
+			ProteinSequenceList sequenceList1 = new ProteinSequenceList();
+			// Sequence of K1C10_BOVIN from ShortTest.fasta
+			ProteinSequence sequence1 = new ProteinSequence("MSVRYSSSKQYSSSRSGGGGGGGSSLRISSSKGSLGGGYSSGGFSGGSFSRGSSAGGCFGGSSSIYGGGLGSGFGGGYGS" +
+					"SFGGSYGGSFGGGYGGGGFGGGSFGGGSFGGGLGGGFGDGGLISGNQKITMQNLNDRLASYLDKVRALEESNYELEVKIK" +
+					"EWYEKYGNSRQREPRDYSKYYQTIDDLKNQIFNLTTDNANILIQVDNARLAADDFRLKYENEVTLRQSVEADINGLRRVL" +
+					"DELTLTKTDLEMQIESLTEELAYLKKNHEEEMRDLQNVSTGDVNVEMNAAPGVDLTELLNNMRSQYEQLAEKNRRDAEAW" +
+					"FNEKSKELTTEINSNLEQVSSHKSEITELRRTIQGLEIELQSQLALKQSLEASLAETEGRYCVQLSQIQSQISSLEEQLQ" +
+					"QIRAETECQNAEYQQLLDIKIRLENEIQTYRSLLEGEGSSGGGSYGGGRGYGGSSGGGGGGYGGGSSSGGYGGGSSSGGG" +
+					"HGGSSGGSYGGGSSSGGGHGGGSSSGGHKSTTTGSVGESSSKGPRY");
+			sequenceList1.add(sequence1);
+			ProteinGroup proteinGroup1 = new ProteinGroup(sequenceList1, 0.95, 1, 2, 3, 0.3, 0.2);
+			ProteinGroupList proteinGroups1 = new ProteinGroupList();
+			proteinGroups1.add(proteinGroup1);
+			SearchResult searchResult1 = new SearchResult(sample1, proteinGroups1);
+			SearchResultList searchResultList1 = new SearchResultList();
+			searchResultList1.add(searchResult1);
+
+			BiologicalSample biologicalSample1 = new BiologicalSample("Sample 1", "none", searchResultList1);
+			BiologicalSampleList biologicalSampleList = new BiologicalSampleList();
+			biologicalSampleList.add(biologicalSample1);
+
+			Analysis a = new Analysis("Scaffold_4.3.3", new DateTime(), biologicalSampleList);
+
+			SearchRun searchRun = swiftDao.getSearchRunForId(1);
+			ReportData reportData = new ReportData(new File("."), new DateTime(), searchRun);
+			addAnalysis(a, reportData, new DummyProgressReporter());
 		}
 	}
 
@@ -125,7 +150,9 @@ public class SearchDbDaoHibernate extends DaoBase implements SearchDbDao {
 					final ProteinSequenceList newList = new ProteinSequenceList(size);
 					for (final ProteinSequence item : originalList) {
 						newList.add(fastaDbDao.addProteinSequence(item));
-						reporter.reportProgress((float) itemsSaved / (float) size);
+						if (reporter != null) {
+							reporter.reportProgress((float) itemsSaved / (float) size);
+						}
 						itemsSaved++;
 					}
 					group.setProteinSequences(addSet(newList));
@@ -295,6 +322,9 @@ public class SearchDbDaoHibernate extends DaoBase implements SearchDbDao {
 
 	@Override
 	public Map<Integer, List<String>> getAccessionNumbersMapForProteinGroups(Set<Integer> proteinGroupIds, Integer databaseId) {
+		if (proteinGroupIds.isEmpty()) {
+			return Maps.newHashMap();
+		}
 		final Query query = getSession().createQuery("select distinct psl.id, pa.accnum from" +
 				" ProteinGroup as pg " +
 				" inner join pg.proteinSequences as psl" +
@@ -316,6 +346,9 @@ public class SearchDbDaoHibernate extends DaoBase implements SearchDbDao {
 	/**
 	 * For given query producing two columns - id and accession number, return a map from
 	 * protein id to a list of all accession numbers that belong to it.
+	 *
+	 * The results are sorted by the accession number, so whenever that number changes,
+	 * we emit a new group.
 	 *
 	 * @param query Query to execute
 	 * @return Resulting map.
