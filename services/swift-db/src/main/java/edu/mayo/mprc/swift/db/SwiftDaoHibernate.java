@@ -50,7 +50,7 @@ public final class SwiftDaoHibernate extends DaoBase implements SwiftDao {
 	/**
 	 * The version of the Swift database we are expecting to see.
 	 */
-	private final int CURRENT_DATABASE_VERSION = 37;
+	private final int CURRENT_DATABASE_VERSION = 38;
 
 	public SwiftDaoHibernate() {
 		super(null);

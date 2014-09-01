@@ -305,4 +305,20 @@ public final class QuameterDaoTest extends DaoTest {
 		Assert.assertEquals(identifiedSpectra.get(ALBUMIN_GROUP), Integer.valueOf(0), "Number of albumin spectra must match");
 		Assert.assertEquals(identifiedSpectra.get(KERATIN_GROUP), Integer.valueOf(2), "Number of keratin spectra must match");
 	}
+
+	@Test
+	public void shouldStoreCounts() {
+		quameterDao.begin();
+
+		quameterDao.updateProteinGroups(quameterProteinGroups());
+
+		nextTransaction();
+
+		final List<QuameterResult> quameterResults = quameterDao.listShownResults();
+		Assert.assertEquals(quameterResults.size(), 2, "There is a result for each test input file");
+		Assert.assertEquals(quameterResults.get(0).getIdentifiedSpectra().size(), 2, "Two protein groups have attached data");
+
+		quameterDao.commit();
+	}
+
 }

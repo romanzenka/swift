@@ -210,6 +210,7 @@ public final class QuameterUi implements Dao, UiConfigurationProvider, Lifecycle
 			dao.commit();
 		} catch (Exception e) {
 			dao.rollback();
+			throw new MprcException("Could not initialize Quameter", e);
 		}
 	}
 

@@ -159,7 +159,7 @@ public final class QuameterResult extends PersistableBase {
 	/**
 	 * How many spectra total did we identify for a particular protein group
 	 */
-	private Map<QuameterProteinGroup, Integer> identifiedSpectra;
+	private Map<QuameterProteinGroup, Integer/* Unique spectra */> identifiedSpectra;
 
 	public QuameterResult() {
 	}

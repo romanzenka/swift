@@ -342,7 +342,7 @@ public class SearchDbDaoHibernate extends DaoBase implements SearchDbDao {
 		if (proteinGroupIds.isEmpty()) {
 			return Maps.newHashMap();
 		}
-		final Query query = getSession().createQuery("select distinct psl.id, pa.accnum from" +
+		final Query query = getSession().createQuery("select distinct pg.id, pa.accnum from" +
 				" ProteinGroup as pg " +
 				" inner join pg.proteinSequences as psl" +
 				" inner join psl.list as ps," +

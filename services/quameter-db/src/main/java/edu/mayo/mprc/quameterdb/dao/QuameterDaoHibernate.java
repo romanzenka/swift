@@ -129,13 +129,6 @@ public final class QuameterDaoHibernate extends DaoBase implements QuameterDao, 
 			r.setCategory(category);
 			final Integer transactionId = (Integer) array[2];
 			r.setTransaction(transactionId);
-
-			final ImmutableMap.Builder<QuameterProteinGroup, Integer> builder = new ImmutableMap.Builder<QuameterProteinGroup, Integer>();
-			for (final QuameterProteinGroup group : activeProteinGroups) {
-				// Fake some data up
-				builder.put(group, (int) (Math.random() * 60.0));
-			}
-			r.setIdentifiedSpectra(builder.build());
 			if (r.resultMatches()) {
 				filtered.add(r);
 			}
@@ -258,7 +251,7 @@ public final class QuameterDaoHibernate extends DaoBase implements QuameterDao, 
 
 		final List<QuameterResult> quameterResults = listResults(ListItems.ALL);
 		int step = 0;
-		final PercentProgressReporter reporter = new PercentDoneReporter(null, "Updating quameter results");
+		final PercentProgressReporter reporter = new PercentDoneReporter(null, "Updating quameter results: ");
 		for (final QuameterResult result : quameterResults) {
 			final Map<QuameterProteinGroup, Integer> identifiedSpectra = getIdentifiedSpectra(
 					result.getFileSearch().getId(),
@@ -267,6 +260,7 @@ public final class QuameterDaoHibernate extends DaoBase implements QuameterDao, 
 			for (final QuameterProteinGroup group : toAdd) {
 				result.getIdentifiedSpectra().put(group, identifiedSpectra.get(group));
 			}
+			step++;
 			reporter.reportProgress((float) step / (float) quameterResults.size());
 			if (step % 100 == 0) {
 				getSession().flush();
