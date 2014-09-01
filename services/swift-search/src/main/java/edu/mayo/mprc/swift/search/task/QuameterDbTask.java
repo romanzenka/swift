@@ -33,18 +33,18 @@ public final class QuameterDbTask extends AsyncTaskBase {
 	@Override
 	public WorkPacket createWorkPacket() {
 		Preconditions.checkNotNull(searchDbTask, "Unset search-db task");
-		final Map<String, Integer> metadata = searchDbTask.getLoadedTandemFileMetadata();
+		final Map<String, Integer> metadata = searchDbTask.getLoadedSearchResults();
 		Preconditions.checkNotNull(metadata, "Search-db task did not produce raw file metadata");
 		Preconditions.checkNotNull(fileSearch, "Input file not set");
 		Preconditions.checkNotNull(quameterTask, "QuaMeter task not set");
 		final String fileName = FileUtilities.getFileNameWithoutExtension(fileSearch.getInputFile());
 		final Integer analysisId = searchDbTask.getAnalysisId();
-		final Integer tandemMassSpectrometrySampleId = metadata.get(fileName);
-		Preconditions.checkNotNull(tandemMassSpectrometrySampleId, "There must be sample id recorded for file name [" + fileName + "]");
+		final Integer searchResultId = metadata.get(fileName);
+		Preconditions.checkNotNull(searchResultId, "There must be search result id recorded for file name [" + fileName + "]");
 		return new QuameterDbWorkPacket(
 				isFromScratch(),
 				analysisId,
-				tandemMassSpectrometrySampleId,
+				searchResultId,
 				fileSearch.getId(),
 				quameterTask.getResultingFile()
 		);

@@ -89,13 +89,12 @@ public interface SearchDbDao extends Dao, RuntimeInitializer {
 
 	/**
 	 * Get a map of protein sequence list id -> {@link edu.mayo.mprc.searchdb.dao.ProteinGroup}
-	 * for every single protein group identified in given analysis associated with a given sample file.
+	 * for every single protein group identified in given search result.
 	 *
-	 * @param analysis Analysis to load protein sequences from.
-	 * @param sample   Mass spec sample to limit ourselves to.
-	 * @return List of protein groups associated with the given mass spec sample for given analysis.
+	 * @param searchResult Search result to look up.
+	 * @return List of protein groups associated with the given search result.
 	 */
-	TreeMap<Integer, ProteinGroup> getProteinGroupsForSample(Analysis analysis, TandemMassSpectrometrySample sample);
+	TreeMap<Integer, ProteinGroup> getProteinGroups(SearchResult searchResult);
 
 	/**
 	 * Look at all proteins given {@link ProteinSequenceList} ids. For each protein sequence list
@@ -114,7 +113,7 @@ public interface SearchDbDao extends Dao, RuntimeInitializer {
 	 * Only limit yourself to accession numbers from a given database.
 	 *
 	 * @param proteinGroupIds Ids of protein sequence lists to load the ids for.
-	 * @param databaseId           Database to get the  accession numbers from. If null, all matching accnums are returned.
+	 * @param databaseId      Database to get the  accession numbers from. If null, all matching accnums are returned.
 	 * @return Map from {@link ProteinSequenceList} id to list of accession numbers for that group.
 	 */
 	Map<Integer, List<String>> getAccessionNumbersMapForProteinGroups(Set<Integer> proteinGroupIds, Integer databaseId);
@@ -131,5 +130,9 @@ public interface SearchDbDao extends Dao, RuntimeInitializer {
 	 */
 	int getScaffoldProteinGroupCount(String inputFile, Iterable<ReportData> reports);
 
-	TandemMassSpectrometrySample getTandemMassSpectrometrySampleForId(int tandemMassSpectrometrySampleId);
+	/**
+	 * @param searchResultId id of {@link SearchResult}
+	 * @return {@link SearchResult} for given id
+	 */
+	SearchResult getSearchResult(int searchResultId);
 }

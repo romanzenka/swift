@@ -146,4 +146,9 @@ public interface SwiftDao extends Dao, RuntimeInitializer {
 	 * Get a list of all LogData objects for given task.
 	 */
 	List<LogData> getLogsForTask(TaskData data);
+
+	/**
+	 * @return Current database version or 0 if the version is not known.
+	 */
+	int getDatabaseVersion();
 }

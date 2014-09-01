@@ -12,6 +12,7 @@ import edu.mayo.mprc.database.Dao;
 import edu.mayo.mprc.quameterdb.dao.QuameterDao;
 import edu.mayo.mprc.quameterdb.dao.QuameterProteinGroup;
 import edu.mayo.mprc.quameterdb.dao.QuameterResult;
+import edu.mayo.mprc.searchdb.dao.TandemMassSpectrometrySample;
 import edu.mayo.mprc.swift.params2.SearchEngineParameters;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
@@ -79,7 +80,7 @@ public final class QuameterUi implements Dao, UiConfigurationProvider, Lifecycle
 	public void dataTableJson(final Writer writer) {
 
 		final List<QuameterProteinGroup> proteinGroups = quameterDao.listProteinGroups();
-		final List<QuameterResult> quameterResults = quameterDao.listAllResults();
+		final List<QuameterResult> quameterResults = quameterDao.listShownResults();
 
 		final JsonWriter w = new JsonWriter(writer);
 		w.setIndent("   ");
@@ -126,10 +127,11 @@ public final class QuameterUi implements Dao, UiConfigurationProvider, Lifecycle
 		writer.beginArray();
 
 		writeValue(writer, result.getId()); // Id of the entry (for hiding)
-		writeValue(writer, result.getSample().getStartTime()); // startTime
-		writeValue(writer, result.getSample().getFile().getAbsolutePath()); // path
-		writeValue(writer, result.getSample().getRunTimeInSeconds() / SEC_TO_MIN); // duration
-		writeValue(writer, mapInstrument(result.getSample().getInstrumentSerialNumber())); // instrument
+		final TandemMassSpectrometrySample massSpecSample = result.getSearchResult().getMassSpecSample();
+		writeValue(writer, massSpecSample.getStartTime()); // startTime
+		writeValue(writer, massSpecSample.getFile().getAbsolutePath()); // path
+		writeValue(writer, massSpecSample.getRunTimeInSeconds() / SEC_TO_MIN); // duration
+		writeValue(writer, mapInstrument(massSpecSample.getInstrumentSerialNumber())); // instrument
 		writeValue(writer, result.getCategory());
 		final SearchEngineParameters parameters = result.getFileSearch().getSearchParameters();
 		writeValue(writer, parameters != null ? parameters.getId() : 0); // search parameters id
@@ -204,7 +206,7 @@ public final class QuameterUi implements Dao, UiConfigurationProvider, Lifecycle
 		// On start we take our protein groups and store them in the database
 		dao.begin();
 		try {
-			proteins = dao.updateProteinGroups(proteins);
+			dao.updateProteinGroups(proteins);
 			dao.commit();
 		} catch (Exception e) {
 			dao.rollback();
@@ -218,7 +220,7 @@ public final class QuameterUi implements Dao, UiConfigurationProvider, Lifecycle
 
 	@Override
 	public void start() {
-		if(!isRunning()) {
+		if (!isRunning()) {
 			initialize();
 			running = true;
 		}
@@ -226,7 +228,7 @@ public final class QuameterUi implements Dao, UiConfigurationProvider, Lifecycle
 
 	@Override
 	public void stop() {
-		if(isRunning()) {
+		if (isRunning()) {
 			running = false;
 		}
 	}

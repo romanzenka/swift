@@ -8,7 +8,7 @@ import edu.mayo.mprc.dbcurator.model.CurationContext;
 import edu.mayo.mprc.dbcurator.model.impl.CurationDaoHibernate;
 import edu.mayo.mprc.fastadb.FastaDbDaoHibernate;
 import edu.mayo.mprc.searchdb.dao.SearchDbDaoHibernate;
-import edu.mayo.mprc.searchdb.dao.TandemMassSpectrometrySample;
+import edu.mayo.mprc.searchdb.dao.SearchResult;
 import edu.mayo.mprc.swift.db.SwiftDaoHibernate;
 import edu.mayo.mprc.swift.dbmapping.FileSearch;
 import edu.mayo.mprc.swift.params2.ParamsDaoHibernate;
@@ -43,8 +43,8 @@ public final class QuameterDaoTest extends DaoTest {
 	private SearchDbDaoHibernate searchDbDao;
 	private QuameterDaoHibernate quameterDao;
 
-	private TandemMassSpectrometrySample sample1;
-	private TandemMassSpectrometrySample sample2;
+	private SearchResult searchResult1;
+	private SearchResult searchResult2;
 	private FileSearch fileSearch1;
 	private FileSearch fileSearch2;
 
@@ -77,8 +77,8 @@ public final class QuameterDaoTest extends DaoTest {
 			quameterDao.install(testMap);
 
 			/* Load existing samples */
-			sample1 = searchDbDao.getTandemMassSpectrometrySampleForId(1);
-			sample2 = searchDbDao.getTandemMassSpectrometrySampleForId(2);
+			searchResult1 = searchDbDao.getSearchResult(1);
+			searchResult2 = searchDbDao.getSearchResult(2);
 
 			fileSearch1 = swiftDao.getFileSearchForId(1);
 			fileSearch2 = swiftDao.getFileSearchForId(2);
@@ -96,8 +96,8 @@ public final class QuameterDaoTest extends DaoTest {
 
 	List<QuameterProteinGroup> quameterProteinGroups() {
 		return Lists.newArrayList(
-				ALBUMIN_GROUP,
-				KERATIN_GROUP);
+				ALBUMIN_GROUP.clone(),
+				KERATIN_GROUP.clone());
 	}
 
 	@Test
@@ -110,7 +110,7 @@ public final class QuameterDaoTest extends DaoTest {
 
 		Assert.assertEquals(quameterResult.getMs2_4a(), 1.22);
 
-		final List<QuameterResult> quameterResults = quameterDao.listAllResults();
+		final List<QuameterResult> quameterResults = quameterDao.listShownResults();
 		Assert.assertEquals(quameterResults.size(), 1);
 
 		quameterDao.commit();
@@ -128,7 +128,7 @@ public final class QuameterDaoTest extends DaoTest {
 
 		nextTransaction();
 
-		final List<QuameterResult> quameterResults = quameterDao.listAllResults();
+		final List<QuameterResult> quameterResults = quameterDao.listShownResults();
 		Assert.assertEquals(quameterResults.size(), 0);
 
 		quameterDao.commit();
@@ -146,7 +146,7 @@ public final class QuameterDaoTest extends DaoTest {
 
 		nextTransaction();
 
-		final List<QuameterResult> quameterResults = quameterDao.listAllResults();
+		final List<QuameterResult> quameterResults = quameterDao.listShownResults();
 		Assert.assertEquals(quameterResults.size(), 2);
 
 		quameterDao.commit();
@@ -259,14 +259,14 @@ public final class QuameterDaoTest extends DaoTest {
 	}
 
 	private QuameterResult addResult1() {
-		return quameterDao.addQuameterScores(sample1.getId(), fileSearch1.getId(), new ImmutableMap.Builder<String, Double>()
+		return quameterDao.addQuameterScores(searchResult1.getId(), fileSearch1.getId(), new ImmutableMap.Builder<String, Double>()
 				.put("MS2-4A", 1.22)
 				.put("C-1A", 0.0)
 				.build(), null);
 	}
 
 	private QuameterResult addResult2() {
-		return quameterDao.addQuameterScores(sample2.getId(), fileSearch2.getId(), new ImmutableMap.Builder<String, Double>()
+		return quameterDao.addQuameterScores(searchResult2.getId(), fileSearch2.getId(), new ImmutableMap.Builder<String, Double>()
 				.put("MS2-4A", 2.33)
 				.put("C-1A", 1.2)
 				.build(), null);
@@ -297,7 +297,7 @@ public final class QuameterDaoTest extends DaoTest {
 		nextTransaction();
 
 		List<QuameterProteinGroup> proteinGroups = quameterDao.listProteinGroups();
-		final Map<QuameterProteinGroup, Integer> identifiedSpectra = quameterDao.getIdentifiedSpectra(1, 1, 1, proteinGroups);
+		final Map<QuameterProteinGroup, Integer> identifiedSpectra = quameterDao.getIdentifiedSpectra(1, 1, proteinGroups);
 
 		quameterDao.commit();
 

@@ -62,12 +62,12 @@ public abstract class SearchDbDaoBlank implements SearchDbDao {
 	}
 
 	@Override
-	public TreeMap<Integer, ProteinGroup> getProteinGroupsForSample(Analysis analysis, TandemMassSpectrometrySample sample) {
+	public TreeMap<Integer, ProteinGroup> getProteinGroups(final SearchResult searchResult) {
 		return null;
 	}
 
 	@Override
-	public Map<Integer, List<String>> getAccessionNumbersMapForProteinGroups(Set<Integer> proteinGroupIds, Integer databaseId) {
+	public Map<Integer, List<String>> getAccessionNumbersMapForProteinGroups(final Set<Integer> proteinGroupIds, final Integer databaseId) {
 		return null;
 	}
 
@@ -82,7 +82,7 @@ public abstract class SearchDbDaoBlank implements SearchDbDao {
 	}
 
 	@Override
-	public TandemMassSpectrometrySample getTandemMassSpectrometrySampleForId(final int tandemMassSpectrometrySampleId) {
+	public SearchResult getSearchResult(final int searchResultId) {
 		return null;
 	}
 
@@ -112,6 +112,6 @@ public abstract class SearchDbDaoBlank implements SearchDbDao {
 	}
 
 	@Override
-	public void install(Map<String, String> params) {
+	public void install(final Map<String, String> params) {
 	}
 }

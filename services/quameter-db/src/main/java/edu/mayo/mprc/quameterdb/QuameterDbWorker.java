@@ -64,12 +64,11 @@ public final class QuameterDbWorker extends WorkerBase {
 			final Map<String, Double> map = loadQuameterResultFile(workPacket.getQuameterResultFile());
 
 			final Map<QuameterProteinGroup, Integer> identifiedSpectra = dao.getIdentifiedSpectra(
-					workPacket.getAnalysisId(),
 					workPacket.getFileSearchId(),
-					workPacket.getTandemMassSpectrometrySampleId(),
+					workPacket.getSearchResultId(),
 					proteins);
 
-			dao.addQuameterScores(workPacket.getTandemMassSpectrometrySampleId(),
+			dao.addQuameterScores(workPacket.getSearchResultId(),
 					workPacket.getFileSearchId(),
 					map, identifiedSpectra);
 			dao.commit();

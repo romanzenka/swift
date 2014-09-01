@@ -7,7 +7,7 @@ import com.google.common.collect.ImmutableMap;
 import edu.mayo.mprc.MprcException;
 import edu.mayo.mprc.database.DaoBase;
 import edu.mayo.mprc.database.PersistableBase;
-import edu.mayo.mprc.searchdb.dao.TandemMassSpectrometrySample;
+import edu.mayo.mprc.searchdb.dao.SearchResult;
 import edu.mayo.mprc.swift.dbmapping.FileSearch;
 import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.Restrictions;
@@ -25,7 +25,17 @@ public final class QuameterResult extends PersistableBase {
 	 */
 	private static final Pattern PRE_POST = Pattern.compile("^.{14}.*_(Pre|Post).*$");
 
-	private TandemMassSpectrometrySample sample;
+	/**
+	 * A search result points to {@link edu.mayo.mprc.searchdb.dao.TandemMassSpectrometrySample} and
+	 * {@link edu.mayo.mprc.searchdb.dao.ProteinGroupList} which makes it a great candidate
+	 * to get to all metadata about one particular {@code .RAW} file.
+	 */
+	private SearchResult searchResult;
+
+	/**
+	 * We also keep information about the settings for the particular file. This is our link for Swift's
+	 * search settings.
+	 */
 	private FileSearch fileSearch;
 	/**
 	 * This is not serialized to the database, but the DAO fills this item for convenience.
@@ -154,22 +164,22 @@ public final class QuameterResult extends PersistableBase {
 	public QuameterResult() {
 	}
 
-	public QuameterResult(final TandemMassSpectrometrySample sample,
+	public QuameterResult(final SearchResult searchResult,
 	                      final FileSearch fileSearch,
 	                      final Map<String, Double> values,
 	                      final Map<QuameterProteinGroup, Integer> identifiedSpectra) {
-		this.sample = sample;
+		this.searchResult = searchResult;
 		this.fileSearch = fileSearch;
 		this.identifiedSpectra = identifiedSpectra;
 		setValues(values);
 	}
 
-	public TandemMassSpectrometrySample getSample() {
-		return sample;
+	public SearchResult getSearchResult() {
+		return searchResult;
 	}
 
-	public void setSample(final TandemMassSpectrometrySample sample) {
-		this.sample = sample;
+	public void setSearchResult(SearchResult searchResult) {
+		this.searchResult = searchResult;
 	}
 
 	public FileSearch getFileSearch() {
@@ -877,7 +887,7 @@ public final class QuameterResult extends PersistableBase {
 
 	@Override
 	public int hashCode() {
-		return Objects.hashCode(sample, fileSearch, hidden);
+		return Objects.hashCode(searchResult, fileSearch, hidden);
 	}
 
 	@Override
@@ -889,7 +899,7 @@ public final class QuameterResult extends PersistableBase {
 			return false;
 		}
 		final QuameterResult other = (QuameterResult) obj;
-		return Objects.equal(this.sample, other.sample) && Objects.equal(this.fileSearch, other.fileSearch)
+		return Objects.equal(this.searchResult, other.searchResult) && Objects.equal(this.fileSearch, other.fileSearch)
 				&& Objects.equal(this.hidden, other.hidden);
 	}
 
@@ -897,7 +907,7 @@ public final class QuameterResult extends PersistableBase {
 	public Criterion getEqualityCriteria() {
 		return Restrictions.conjunction()
 				.add(DaoBase.associationEq("fileSearch", getFileSearch()))
-				.add(DaoBase.associationEq("sample", getSample()));
+				.add(DaoBase.associationEq("searchResult", getSearchResult()));
 	}
 
 }

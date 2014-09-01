@@ -11,7 +11,7 @@ import edu.mayo.mprc.utilities.progress.UserProgressReporter;
  */
 public interface BulkSearchDbDao extends SearchDbDao {
 	/**
-	 * Just like {@link #addAnalysis(edu.mayo.mprc.searchdb.dao.Analysis, edu.mayo.mprc.swift.dbmapping.ReportData, edu.mayo.mprc.utilities.progress.UserProgressReporter)},
+	 * Just like {@link SearchDbDao#addAnalysis},
 	 * only uses bulk loading for getting the analysis data into the database. To do so, the
 	 * {@link edu.mayo.mprc.searchdb.builder.AnalysisBuilder} is required, as we want to add the data before the whole analysis is fully built.
 	 */

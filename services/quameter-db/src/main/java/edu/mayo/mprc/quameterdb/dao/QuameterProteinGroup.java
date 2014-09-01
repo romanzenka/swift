@@ -20,7 +20,7 @@ import java.util.regex.Pattern;
  *
  * @author Roman Zenka
  */
-public final class QuameterProteinGroup extends EvolvableBase {
+public final class QuameterProteinGroup extends EvolvableBase implements Cloneable {
 	private String name;
 	private String regex;
 	private transient Pattern compiledRegex;
@@ -85,5 +85,9 @@ public final class QuameterProteinGroup extends EvolvableBase {
 			}
 		}
 		return false;
+	}
+
+	public QuameterProteinGroup clone() {
+		return new QuameterProteinGroup(getName(), getRegex());
 	}
 }

@@ -11,7 +11,7 @@ public final class QuameterDbWorkPacket extends WorkPacketBase {
 	private static final long serialVersionUID = 20140129L;
 
 	private int analysisId;
-	private int tandemMassSpectrometrySampleId;
+	private int searchResultId;
 	private int fileSearchId;
 	private File quameterResultFile;
 
@@ -21,10 +21,10 @@ public final class QuameterDbWorkPacket extends WorkPacketBase {
 
 	public QuameterDbWorkPacket(final boolean fromScratch,
 	                            final int analysisId,
-	                            final int tandemMassSpectrometrySampleId, final int fileSearchId, final File quameterResultFile) {
+	                            final int searchResultId, final int fileSearchId, final File quameterResultFile) {
 		super(fromScratch);
 		this.analysisId = analysisId;
-		this.tandemMassSpectrometrySampleId = tandemMassSpectrometrySampleId;
+		this.searchResultId = searchResultId;
 		this.fileSearchId = fileSearchId;
 		this.quameterResultFile = quameterResultFile;
 	}
@@ -33,8 +33,8 @@ public final class QuameterDbWorkPacket extends WorkPacketBase {
 		return analysisId;
 	}
 
-	public int getTandemMassSpectrometrySampleId() {
-		return tandemMassSpectrometrySampleId;
+	public int getSearchResultId() {
+		return searchResultId;
 	}
 
 	public int getFileSearchId() {

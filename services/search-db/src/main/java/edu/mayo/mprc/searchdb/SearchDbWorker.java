@@ -1,5 +1,6 @@
 package edu.mayo.mprc.searchdb;
 
+import com.google.common.collect.Lists;
 import edu.mayo.mprc.MprcException;
 import edu.mayo.mprc.config.*;
 import edu.mayo.mprc.config.ui.ServiceUiFactory;
@@ -18,7 +19,8 @@ import edu.mayo.mprc.searchdb.builder.MassSpecDataExtractor;
 import edu.mayo.mprc.searchdb.builder.ScaffoldSpectraSummarizer;
 import edu.mayo.mprc.searchdb.bulk.BulkSearchDbDao;
 import edu.mayo.mprc.searchdb.dao.Analysis;
-import edu.mayo.mprc.searchdb.dao.TandemMassSpectrometrySample;
+import edu.mayo.mprc.searchdb.dao.BiologicalSample;
+import edu.mayo.mprc.searchdb.dao.SearchResult;
 import edu.mayo.mprc.swift.db.SwiftDao;
 import edu.mayo.mprc.swift.dbmapping.ReportData;
 import edu.mayo.mprc.utilities.progress.UserProgressReporter;
@@ -26,8 +28,7 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
 import java.io.File;
-import java.util.Map;
-import java.util.TreeMap;
+import java.util.List;
 
 /**
  * Loads search results from a given Swift experiment into the database.
@@ -65,10 +66,10 @@ public final class SearchDbWorker extends WorkerBase {
 
 			final Analysis analysis = dao.addAnalysis(summarizer.getAnalysisBuilder(), reportData, reporter);
 
-			final Map<String, Integer> massSpecMap = getSavedMassSpecSampleMap(dataExtractor);
+			final List<SearchDbResultEntry> searchDbResultList = getSavedSearchResults(analysis);
 
 			dao.commit();
-			reporter.reportProgress(new SearchDbResult(massSpecMap, analysis.getId()));
+			reporter.reportProgress(new SearchDbResult(searchDbResultList, analysis.getId()));
 		} catch (Exception e) {
 			dao.rollback();
 			throw new MprcException(
@@ -86,13 +87,21 @@ public final class SearchDbWorker extends WorkerBase {
 		return null;
 	}
 
-	private Map<String, Integer> getSavedMassSpecSampleMap(final MassSpecDataExtractor dataExtractor) {
-		final Map<String, Integer> massSpecMap = new TreeMap<String, Integer>();
-		for (final Map.Entry<String, TandemMassSpectrometrySample> entry : dataExtractor.getMap().entrySet()) {
-			final TandemMassSpectrometrySample tandemMassSpectrometrySample = dao.updateTandemMassSpectrometrySample(entry.getValue());
-			massSpecMap.put(entry.getKey(), tandemMassSpectrometrySample.getId());
+	/**
+	 * @param analysis Saved analysis
+	 * @return a map from .RAW file to ID of the saved {@link edu.mayo.mprc.searchdb.dao.SearchResult} for that file.
+	 */
+	private List<SearchDbResultEntry> getSavedSearchResults(final Analysis analysis) {
+		final List<SearchDbResultEntry> searchResultList = Lists.newArrayList();
+		for (BiologicalSample biologicalSample : analysis.getBiologicalSamples()) {
+			for (SearchResult searchResult : biologicalSample.getSearchResults()) {
+				if (searchResult.getId() == null) {
+					throw new MprcException("Programmer error - the search result should have been already saved.");
+				}
+				searchResultList.add(new SearchDbResultEntry(searchResult.getMassSpecSample().getFile(), searchResult.getId()));
+			}
 		}
-		return massSpecMap;
+		return searchResultList;
 	}
 
 	/**

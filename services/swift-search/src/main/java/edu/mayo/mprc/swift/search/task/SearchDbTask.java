@@ -1,10 +1,12 @@
 package edu.mayo.mprc.swift.search.task;
 
 import com.google.common.base.Objects;
+import com.google.common.collect.Maps;
 import edu.mayo.mprc.MprcException;
 import edu.mayo.mprc.daemon.DaemonConnection;
 import edu.mayo.mprc.daemon.worker.WorkPacket;
 import edu.mayo.mprc.searchdb.SearchDbResult;
+import edu.mayo.mprc.searchdb.SearchDbResultEntry;
 import edu.mayo.mprc.searchdb.SearchDbWorkPacket;
 import edu.mayo.mprc.searchdb.builder.RawFileMetaData;
 import edu.mayo.mprc.swift.db.DatabaseFileTokenFactory;
@@ -26,7 +28,10 @@ public final class SearchDbTask extends AsyncTaskBase {
 	private final ScaffoldSpectrumExportProducer scaffoldTask;
 
 	private final Map<String, RAWDumpTask> rawDumpTaskMap = new HashMap<String, RAWDumpTask>(5);
-	private Map<String, Integer> loadedTandemFileMetadata;
+	/**
+	 * A map from input .RAW file name to an id of {@link edu.mayo.mprc.searchdb.dao.SearchResult} object.
+	 */
+	private Map<String, Integer> loadedSearchResults;
 	/**
 	 * The scaffold report gets loaded into an analysis object. This is the analysis ID.
 	 */
@@ -66,8 +71,8 @@ public final class SearchDbTask extends AsyncTaskBase {
 		return scaffoldTask.getReportData().getId();
 	}
 
-	public Map<String, Integer> getLoadedTandemFileMetadata() {
-		return loadedTandemFileMetadata;
+	public Map<String, Integer> getLoadedSearchResults() {
+		return loadedSearchResults;
 	}
 
 	public Integer getAnalysisId() {
@@ -94,7 +99,10 @@ public final class SearchDbTask extends AsyncTaskBase {
 		if (progressInfo instanceof SearchDbResult) {
 			final SearchDbResult result = (SearchDbResult) progressInfo;
 			analysisId = result.getAnalysisId();
-			loadedTandemFileMetadata = result.getLoadedRawFileMetadata();
+			loadedSearchResults = Maps.newTreeMap();
+			for (SearchDbResultEntry entry : result.getLoadedSearchResults()) {
+				loadedSearchResults.put(entry.getInputFile().getAbsolutePath(), entry.getSearchResultId());
+			}
 		}
 	}
 
