@@ -80,7 +80,7 @@ public final class QuameterUi implements Dao, UiConfigurationProvider, Lifecycle
 	public void dataTableJson(final Writer writer) {
 
 		final List<QuameterProteinGroup> proteinGroups = quameterDao.listProteinGroups();
-		final List<QuameterResult> quameterResults = quameterDao.listShownResults();
+		final List<QuameterResult> quameterResults = quameterDao.listVisibleResults();
 
 		final JsonWriter w = new JsonWriter(writer);
 		w.setIndent("   ");

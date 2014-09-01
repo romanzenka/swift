@@ -110,7 +110,7 @@ public final class QuameterDaoTest extends DaoTest {
 
 		Assert.assertEquals(quameterResult.getMs2_4a(), 1.22);
 
-		final List<QuameterResult> quameterResults = quameterDao.listShownResults();
+		final List<QuameterResult> quameterResults = quameterDao.listVisibleResults();
 		Assert.assertEquals(quameterResults.size(), 1);
 
 		quameterDao.commit();
@@ -128,7 +128,7 @@ public final class QuameterDaoTest extends DaoTest {
 
 		nextTransaction();
 
-		final List<QuameterResult> quameterResults = quameterDao.listShownResults();
+		final List<QuameterResult> quameterResults = quameterDao.listVisibleResults();
 		Assert.assertEquals(quameterResults.size(), 0);
 
 		quameterDao.commit();
@@ -146,7 +146,7 @@ public final class QuameterDaoTest extends DaoTest {
 
 		nextTransaction();
 
-		final List<QuameterResult> quameterResults = quameterDao.listShownResults();
+		final List<QuameterResult> quameterResults = quameterDao.listVisibleResults();
 		Assert.assertEquals(quameterResults.size(), 2);
 
 		quameterDao.commit();
@@ -310,13 +310,19 @@ public final class QuameterDaoTest extends DaoTest {
 	public void shouldStoreCounts() {
 		quameterDao.begin();
 
+		addResult1();
+		addResult2();
+
 		quameterDao.updateProteinGroups(quameterProteinGroups());
 
 		nextTransaction();
 
-		final List<QuameterResult> quameterResults = quameterDao.listShownResults();
+		final List<QuameterResult> quameterResults = quameterDao.listVisibleResults();
 		Assert.assertEquals(quameterResults.size(), 2, "There is a result for each test input file");
-		Assert.assertEquals(quameterResults.get(0).getIdentifiedSpectra().size(), 2, "Two protein groups have attached data");
+		final QuameterResult firstResult = quameterResults.get(0);
+		Assert.assertEquals(firstResult.getIdentifiedSpectra().size(), 2, "Two protein groups have attached data");
+		Assert.assertEquals(firstResult.getIdentifiedSpectra().get(ALBUMIN_GROUP), Integer.valueOf(0), "There should be 2 spectra for keratin");
+		Assert.assertEquals(firstResult.getIdentifiedSpectra().get(KERATIN_GROUP), Integer.valueOf(2), "There should be 2 spectra for keratin");
 
 		quameterDao.commit();
 	}

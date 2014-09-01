@@ -40,7 +40,7 @@ public final class QuameterUiTest {
 	public void setup() {
 		quameterDao = mock(QuameterDao.class);
 		when(quameterDao.listProteinGroups()).thenReturn(quameterProteinGroups());
-		when(quameterDao.listShownResults()).thenReturn(quameterResults());
+		when(quameterDao.listVisibleResults()).thenReturn(quameterResults());
 
 		final QuameterDbWorker.Config quameterDbConfig = new QuameterDbWorker.Config(null, "animal,-cat*,-dog", "", "");
 

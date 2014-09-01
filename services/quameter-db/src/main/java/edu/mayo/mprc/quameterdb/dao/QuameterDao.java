@@ -25,12 +25,12 @@ public interface QuameterDao extends Dao {
 	                                 final Map<QuameterProteinGroup, Integer> identifedSpectra);
 
 	/**
-	 * @return All the Quameter results that match given search name filter, with all values populated.
+	 * @return All Quameter results that are not hidden. Limit to last 1 year
 	 */
-	List<QuameterResult> listShownResults();
-
+	List<QuameterResult> listVisibleResults();
 
 	/**
+	 * @return Only hidden Quameter results.
 	 */
 	List<QuameterResult> listHiddenResults();
 

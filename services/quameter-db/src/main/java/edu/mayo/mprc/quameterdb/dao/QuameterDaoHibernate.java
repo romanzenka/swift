@@ -70,7 +70,7 @@ public final class QuameterDaoHibernate extends DaoBase implements QuameterDao, 
 	}
 
 	@Override
-	public List<QuameterResult> listShownResults() {
+	public List<QuameterResult> listVisibleResults() {
 		return listResults(ListItems.SHOWN);
 	}
 
@@ -97,6 +97,9 @@ public final class QuameterDaoHibernate extends DaoBase implements QuameterDao, 
 				throw new MprcException(String.format("Programmer error - unknown ListItems parameter [%s]", listedItems));
 		}
 
+		// We only care about 1 year old data max
+		final DateTime lowerDateLimit = new DateTime().minusYears(1);
+
 		final Query query = getSession().createSQLQuery("" +
 				"SELECT {q.*}, m.metadata_value AS v, r.transaction_id AS ti" +
 				" FROM `" + swiftDao.qualifyTableName("transaction") + "` AS r, "
@@ -115,11 +118,13 @@ public final class QuameterDaoHibernate extends DaoBase implements QuameterDao, 
 				+ " m.swift_search_definition_id = d.swift_search_definition_id AND"
 				+ " m.metadata_key='quameter.category' AND"
 				+ " t.tandem_mass_spec_sample_id = sr.tandem_mass_spec_sample_id AND"
-				+ " sr.search_result_id = q.search_result_id "
+				+ " sr.search_result_id = q.search_result_id AND"
+				+ " t.start_time >= :timeStart"
 				+ " ORDER BY t.start_time")
 				.addEntity("q", QuameterResult.class)
 				.addScalar("v", StandardBasicTypes.STRING)
-				.addScalar("ti", StandardBasicTypes.INTEGER);
+				.addScalar("ti", StandardBasicTypes.INTEGER)
+				.setParameter("timeStart", lowerDateLimit.toDate(), StandardBasicTypes.DATE);
 		final List raw = query.list();
 		final List<QuameterResult> filtered = new ArrayList<QuameterResult>(Math.min(raw.size(), 1000));
 		for (final Object o : raw) {
@@ -257,8 +262,12 @@ public final class QuameterDaoHibernate extends DaoBase implements QuameterDao, 
 					result.getFileSearch().getId(),
 					result.getSearchResult().getId(),
 					toAdd);
-			for (final QuameterProteinGroup group : toAdd) {
-				result.getIdentifiedSpectra().put(group, identifiedSpectra.get(group));
+			if (result.getIdentifiedSpectra() == null) {
+				result.setIdentifiedSpectra(identifiedSpectra);
+			} else {
+				for (final QuameterProteinGroup group : toAdd) {
+					result.getIdentifiedSpectra().put(group, identifiedSpectra.get(group));
+				}
 			}
 			step++;
 			reporter.reportProgress((float) step / (float) quameterResults.size());
