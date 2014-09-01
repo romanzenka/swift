@@ -1,16 +1,16 @@
 /** Global Vars to hack Google DataViews **/
-rawInsturmentNames=[];
+rawInsturmentNames = [];
 views = [], gs = [];
 numberOfSimpleGraphs = 0;
-dyViewsByCode={};
+dyViewsByCode = {};
 viewMetadata = {};
 
 
-function populateInstArray(dt){
-    for(var r=0; r < dt.getNumberOfRows(); r++) {
+function populateInstArray(dt) {
+    for (var r = 0; r < dt.getNumberOfRows(); r++) {
         // Column 4 = Instrument Name
         var val = dt.getValue(r, 4);
-        if ( ! rawInsturmentNames.contains(val)  ) {
+        if (!rawInsturmentNames.contains(val)) {
             rawInsturmentNames.push(val);
         }
     }
@@ -18,7 +18,7 @@ function populateInstArray(dt){
 
 function columnIndex(id, data) {
     for (var i = 0; i < data.getNumberOfColumns(); i++) {
-        if(data.getColumnId(i) === id) {
+        if (data.getColumnId(i) === id) {
             return i;
         }
     }
@@ -43,77 +43,83 @@ function addButtons(div, data, columnId) {
         return index
     }).sort();
 
-    var iter=1;
+    var iter = 1;
     $.each(keys, function (index, value) {
         var niceName = value;
-        var btnClass = 'btn-orig'+iter;
-        if( !niceName.match(/^Orbi/) && columnId === 'instrument'){
+        var btnClass = 'btn-orig' + iter;
+        if (!niceName.match(/^Orbi/) && columnId === 'instrument') {
             btnClass = 'btn-default';
         }
-        else if(columnId !== 'instrument'){
+        else if (columnId !== 'instrument') {
             var btnClass = 'btn-primary';
         }
-        div.append('<button type="button" class="btn '+btnClass+'" value="'+value+'" data-num='+iter+' data-enum="'+columnId+'">'+niceName+' ('+names[value]+')<' + '/button>');
+        div.append('<button type="button" class="btn ' + btnClass + '" value="' + value + '" data-num=' + iter + ' data-enum="' + columnId + '">' + niceName + ' (' + names[value] + ')<' + '/button>');
         iter++;
     });
 }
 
-function instrumentButtons(){
+function instrumentButtons() {
     var instrumentDiv = $('#instrument-buttons');
     return instrumentDiv.find('.btn');
 }
 
-function categoryButtons(){
+function categoryButtons() {
     var categoryDiv = $('#category-buttons');
     return categoryDiv.find('.btn');
 }
 
-function createNewAnnotationForm(parentName, dbID){
+function createNewAnnotationForm(parentName, dbID) {
     var metricCode = parentName.split("-")[1];
-    $('#hiddenMetricCode').val( metricCode );
-    $('#hiddenRowid').val( dbID );
+    $('#hiddenMetricCode').val(metricCode);
+    $('#hiddenRowid').val(dbID);
     $('#annotFormDiv').show();
 }
 
-function getXaxisNseriesById(data, dbId){
+function getXaxisNseriesById(data, dbId) {
     for (var i = 0; i < data.getNumberOfRows(); i++) {
-        if(data.getValue(i, columnIndex("id", data)).toString() === dbId.toString()) {
+        if (data.getValue(i, columnIndex("id", data)).toString() === dbId.toString()) {
             return [data.getValue(i, columnIndex("startTime", data)), data.getValue(i, columnIndex("instrument", data))];
         }
     }
-    alert("Id " + dbId + " does not exist");
+    // Annotation can be older than 1 year, no longer shows
+    return -1;
 }
 
-function buildCollection(collection, data,  metricCode){
+// Make a list of annotations for dygraph.
+// collection - annotations coming from the client
+// data - all the data from the client
+// metricCode - which metric are we making dygraph for
+function buildCollection(collection, data, metricCode) {
     var arrayForDYgraphs = [];
-    for(var o in collection){
-        if(collection[o].metricCode === metricCode){
+    for (var o in collection) {
+        if (collection[o].metricCode === metricCode) {
             var nthx = getXaxisNseriesById(data, collection[o].quameterResultId);
-            arrayForDYgraphs.push(
-                {
-                    series: nthx[1],
-                    x: nthx[0].toString(),
-                    shortText: "A",
-                    text: collection[o].text
-                }
-            )
-
+            if (nthx >= 0) {
+                arrayForDYgraphs.push(
+                    {
+                        series: nthx[1],
+                        x: nthx[0].toString(),
+                        shortText: String.trim(collection[0].text)[0],
+                        text: collection[o].text
+                    }
+                )
+            }
         }
     }
     return arrayForDYgraphs;
 }
 
-function getMetricTitle(n){
+function getMetricTitle(n) {
     var hLink, qLink;
-    if(metrics[n].hasOwnProperty('link')){
-        hLink = 'href="'+metrics[n].link+'" target="_blank"';    
-        qLink = '&nbsp; <i class="icon-large icon-question-sign"></i>';    
+    if (metrics[n].hasOwnProperty('link')) {
+        hLink = 'href="' + metrics[n].link + '" target="_blank"';
+        qLink = '&nbsp; <i class="icon-large icon-question-sign"></i>';
     }
-    else{
-        hLink = 'href="#"';    
-        qLink = '';    
+    else {
+        hLink = 'href="#"';
+        qLink = '';
     }
-    return '<a '+hLink+' data-toggle="tooltip" data-placement="right" title="'+metrics[n].desc+'" class="modLink" >'+metrics[n].name+qLink+'</a>'
+    return '<a ' + hLink + ' data-toggle="tooltip" data-placement="right" title="' + metrics[n].desc + '" class="modLink" >' + metrics[n].name + qLink + '</a>'
 }
 
 // Tokenize by underscore, wrap tokens in <span>
@@ -124,21 +130,21 @@ function spanAllUnderscoreTokens(s) {
 }
 
 
-function activeCatagoriesFilters(){
+function activeCatagoriesFilters() {
     var selectedCategory = [];
     categoryButtons().each(function () {
-        var wrapperId = "#wrapper-"+$(this).attr("value"); //for protein id, hide entire graph when excluded
+        var wrapperId = "#wrapper-" + $(this).attr("value"); //for protein id, hide entire graph when excluded
         if ($(this).hasClass('btn-primary')) {
             selectedCategory.push($(this).attr("value"));
 
-            if( $(wrapperId).length ) // use this if you are using id to check
+            if ($(wrapperId).length) // use this if you are using id to check
             {
                 $(wrapperId).show();
             }
 
         }
-        else{
-            if( $(wrapperId).length ) // use this if you are using id to check
+        else {
+            if ($(wrapperId).length) // use this if you are using id to check
             {
                 $(wrapperId).hide();
             }
@@ -147,7 +153,7 @@ function activeCatagoriesFilters(){
     return selectedCategory;
 }
 
-function activeInstrumentFilters(){
+function activeInstrumentFilters() {
     var selectedCategory = [];
     instrumentButtons().each(function () {
         if (!$(this).hasClass('btn-default')) {
@@ -167,10 +173,10 @@ function updateAllViews(data) {
     activeCats = activeCatagoriesFilters();
 
     var filteredRows = [];
-    for (var r=0; r<data.getNumberOfRows(); r++) {
-        var category = data.getValue(r, columnIndex('category', data) );
+    for (var r = 0; r < data.getNumberOfRows(); r++) {
+        var category = data.getValue(r, columnIndex('category', data));
         var rowId = data.getValue(r, columnIndex("id", data))
-        if( activeCats.contains(category) && !hiddenIds["id"+rowId] ){
+        if (activeCats.contains(category) && !hiddenIds["id" + rowId]) {
             filteredRows.push(r)
         }
     }
@@ -178,10 +184,13 @@ function updateAllViews(data) {
     viewMetadata.filteredRows = filteredRows;
 
     for (var i = 0; i < views.length; i++) {
-       if(views[i] === undefined){console.log(i);continue;} //empty for detail graphs until generated
-        dyViewsByCode[views[i].metricId]=i;
+        if (views[i] === undefined) {
+            console.log(i);
+            continue;
+        } //empty for detail graphs until generated
+        dyViewsByCode[views[i].metricId] = i;
 
-        views[i].dataView.setColumns( getSmartColumns(columnIndex("startTime",data),views[i].metricId) );
+        views[i].dataView.setColumns(getSmartColumns(columnIndex("startTime", data), views[i].metricId));
         views[i].dataView.setRows(filteredRows);
 
         var sum = 0;
@@ -237,12 +246,14 @@ function selectPoint(data, dataRow) {
 }
 
 
-function addDygraph( viewIndex, view, viewId, metricId, viewMetadata, data, range, annotCollection) {
+function addDygraph(viewIndex, view, viewId, metricId, viewMetadata, data, range, annotCollection) {
     views[viewIndex] = { dataView: view, minHighlightY: 1, maxHighlightY: -1, minHighlightY2: 1, maxHighlightY2: -1, metricId: metricId };
     var currentView = views[viewIndex];
     var selectedPath = $('#selected-path');
 
-    var instrumentText=  $.map( instrumentButtons(), function( val, i ) { return val.firstChild.data });
+    var instrumentText = $.map(instrumentButtons(), function (val, i) {
+        return val.firstChild.data
+    });
     instrumentText.unshift("Date");
 
     // Row - the row in the original dataset
@@ -263,107 +274,109 @@ function addDygraph( viewIndex, view, viewId, metricId, viewMetadata, data, rang
         instrumentButtons().removeClass("highlight");
         categoryButtons().removeClass("highlight");
 
-        var instrument = data.getValue(row, columnIndex('instrument',data) );
+        var instrument = data.getValue(row, columnIndex('instrument', data));
         instrumentButtons().filter("[value='" + instrument + "']").addClass("highlight");
 
-        var category = data.getValue(row, columnIndex('category', data) );
+        var category = data.getValue(row, columnIndex('category', data));
         categoryButtons().filter("[value='" + category + "']").addClass("highlight");
     }
 
 
     var dygraph = new Dygraph(
-            document.getElementById(viewId),
-            views[viewIndex].dataView,
-            {
-                drawCallback: function (me, initial) {
-                    if (blockRedraw || initial) return;
-                    blockRedraw = true;
-                    var range = me.xAxisRange();
-                    for (var j = 0; j < views.length; j++) {
-                        if (gs[j] == me) continue;
-                        if(gs[j] === undefined){console.log("Errant LOOKUP",j,gs)}
-                        gs[j].updateOptions({
-                            dateWindow: range
-                        });
+        document.getElementById(viewId),
+        views[viewIndex].dataView,
+        {
+            drawCallback: function (me, initial) {
+                if (blockRedraw || initial) return;
+                blockRedraw = true;
+                var range = me.xAxisRange();
+                for (var j = 0; j < views.length; j++) {
+                    if (gs[j] == me) continue;
+                    if (gs[j] === undefined) {
+                        console.log("Errant LOOKUP", j, gs)
                     }
-                    blockRedraw = false;
-                },
-                //drawPoints: true,
-                connectSeparatedPoints: true,
-                pointSize: 2,
-                strokeWidth: 0.7,
-                highlightSeriesOpts: {
-                    strokeWidth: 2,
-                    strokeBorderWidth: 1,
-                    highlightCircleSize: 4
-                },
-                highlightCallback: function (event, x, points, viewRow, seriesName) {
-                    pointHighlighted = viewRow;
-                    var row = viewMetadata.filteredRows[viewRow];
-                    if (pointSelected == -1) {
-                        highlightRow(row);
-                    }
-                },
-                unhighlightCallback: function (event) {
-                    if (pointSelected == -1) {
-                        highlightRow(-1);
-                    }
-                },
-                underlayCallback: function (canvas, area, g) {
-                    var metricIndex = 0;
-                    for (var i = 0; i < metrics.length; i++) {
-                        if (metrics.code == currentView.metricId) {
-                            metricIndex = i;
-                        }
-                    }
-
-                    if (currentView.minHighlightY < currentView.maxHighlightY) {
-                        var bottom = g.toDomYCoord(currentView.minHighlightY);
-                        var top = g.toDomYCoord(currentView.maxHighlightY);
-                        var bottom2 = g.toDomYCoord(currentView.minHighlightY2);
-                        var top2 = g.toDomYCoord(currentView.maxHighlightY2);
-
-                        var good = metrics[metricIndex].good;
-                        canvas.fillStyle = "rgba(255, 235, 235, 1.0)";
-                        if (good == "range" || good == "low") {
-                            canvas.fillRect(area.x, area.y, area.w, top);
-                        }
-                        if (good == "range" || good == "high") {
-                            canvas.fillRect(area.x, bottom, area.w, area.h - (bottom - area.y));
-                        }
-                        canvas.fillStyle = "rgba(250, 189, 189, 1.0)";
-                        if (good == "range" || good == "low") {
-                            canvas.fillRect(area.x, area.y, area.w, top2);
-                        }
-                        if (good == "range" || good == "high") {
-                            canvas.fillRect(area.x, bottom2, area.w, area.h - (bottom2 - area.y));
-                        }
-
-                    }
-                    if (pointSelected >= 0) {
-                        // Date to be selected
-                        var date = currentView.dataView.getValue(pointSelected, 0);
-                        var xcoord = g.toDomXCoord(date);
-                        canvas.fillStyle = "rgba(10, 120, 255, 1.0)";
-                        canvas.fillRect(xcoord - 2, area.y, 4, area.h);
-                    }
-                },
-                pointClickCallback: function (event, point) {
-                    // Select a point
-                    if (pointSelected != pointHighlighted) {
-                        pointSelected = pointHighlighted;
-                    } else {
-                        pointSelected = -1;
-                    }
-                    selectPoint(data, pointSelected == -1 ? -1 : viewMetadata.filteredRows[pointSelected]);
-                    var row = viewMetadata.filteredRows[pointHighlighted];
-                    highlightRow(row);
-
-                    createNewAnnotationForm(event.target.parentNode.parentNode.id, data.getValue(row, columnIndex("id", data)));
-
-                    dygraph.updateOptions({file: currentView.dataView});
+                    gs[j].updateOptions({
+                        dateWindow: range
+                    });
                 }
+                blockRedraw = false;
+            },
+            //drawPoints: true,
+            connectSeparatedPoints: true,
+            pointSize: 2,
+            strokeWidth: 0.7,
+            highlightSeriesOpts: {
+                strokeWidth: 2,
+                strokeBorderWidth: 1,
+                highlightCircleSize: 4
+            },
+            highlightCallback: function (event, x, points, viewRow, seriesName) {
+                pointHighlighted = viewRow;
+                var row = viewMetadata.filteredRows[viewRow];
+                if (pointSelected == -1) {
+                    highlightRow(row);
+                }
+            },
+            unhighlightCallback: function (event) {
+                if (pointSelected == -1) {
+                    highlightRow(-1);
+                }
+            },
+            underlayCallback: function (canvas, area, g) {
+                var metricIndex = 0;
+                for (var i = 0; i < metrics.length; i++) {
+                    if (metrics.code == currentView.metricId) {
+                        metricIndex = i;
+                    }
+                }
+
+                if (currentView.minHighlightY < currentView.maxHighlightY) {
+                    var bottom = g.toDomYCoord(currentView.minHighlightY);
+                    var top = g.toDomYCoord(currentView.maxHighlightY);
+                    var bottom2 = g.toDomYCoord(currentView.minHighlightY2);
+                    var top2 = g.toDomYCoord(currentView.maxHighlightY2);
+
+                    var good = metrics[metricIndex].good;
+                    canvas.fillStyle = "rgba(255, 235, 235, 1.0)";
+                    if (good == "range" || good == "low") {
+                        canvas.fillRect(area.x, area.y, area.w, top);
+                    }
+                    if (good == "range" || good == "high") {
+                        canvas.fillRect(area.x, bottom, area.w, area.h - (bottom - area.y));
+                    }
+                    canvas.fillStyle = "rgba(250, 189, 189, 1.0)";
+                    if (good == "range" || good == "low") {
+                        canvas.fillRect(area.x, area.y, area.w, top2);
+                    }
+                    if (good == "range" || good == "high") {
+                        canvas.fillRect(area.x, bottom2, area.w, area.h - (bottom2 - area.y));
+                    }
+
+                }
+                if (pointSelected >= 0) {
+                    // Date to be selected
+                    var date = currentView.dataView.getValue(pointSelected, 0);
+                    var xcoord = g.toDomXCoord(date);
+                    canvas.fillStyle = "rgba(10, 120, 255, 1.0)";
+                    canvas.fillRect(xcoord - 2, area.y, 4, area.h);
+                }
+            },
+            pointClickCallback: function (event, point) {
+                // Select a point
+                if (pointSelected != pointHighlighted) {
+                    pointSelected = pointHighlighted;
+                } else {
+                    pointSelected = -1;
+                }
+                selectPoint(data, pointSelected == -1 ? -1 : viewMetadata.filteredRows[pointSelected]);
+                var row = viewMetadata.filteredRows[pointHighlighted];
+                highlightRow(row);
+
+                createNewAnnotationForm(event.target.parentNode.parentNode.id, data.getValue(row, columnIndex("id", data)));
+
+                dygraph.updateOptions({file: currentView.dataView});
             }
+        }
     );
 
     var annotArr = buildCollection(annotCollection, data, metricId);
@@ -373,13 +386,13 @@ function addDygraph( viewIndex, view, viewId, metricId, viewMetadata, data, rang
 }
 
 
-
-
 //  Important basic graphing functions
-function drawGraphsByMetrics(data, renderDetailGraphs, viewMetadata){
+function drawGraphsByMetrics(data, renderDetailGraphs, viewMetadata) {
     var viewIndex = 0;
     var annotCollection = getAnnotationCollection();
-    if( renderDetailGraphs ){ viewIndex=numberOfSimpleGraphs-1 }
+    if (renderDetailGraphs) {
+        viewIndex = numberOfSimpleGraphs - 1
+    }
     var previousCategory = '';
     for (var i = 0; i < metrics.length; i++) {
         var metric = metrics[i];
@@ -391,7 +404,7 @@ function drawGraphsByMetrics(data, renderDetailGraphs, viewMetadata){
             categoryCode = metricId.split("_", 2)[0];
         }
         if (categoryCode != previousCategory) {
-            if( renderDetailGraphs ){
+            if (renderDetailGraphs) {
                 $('<h3>' + metricCategories[categoryCode] + '</h3>').appendTo("#detailedGraphs");
             }
             else {
@@ -402,46 +415,49 @@ function drawGraphsByMetrics(data, renderDetailGraphs, viewMetadata){
 
         var view = new google.visualization.DataView(data);
 
-        view.setColumns( getSmartColumns(columnIndex("startTime",data),metricId) );
+        view.setColumns(getSmartColumns(columnIndex("startTime", data), metricId));
 
-        if( renderDetailGraphs ){
+        if (renderDetailGraphs) {
             var viewId = "graph-" + metricId;
-            $('<div id="wrapper-'+metric.label+'" class="row-fluid"><div class="span12">' +
-                getMetricTitle(i) +
-                '<div id="'+viewId+'" class="simple-graph"></div>' +
-                '</div></div>'
+            $('<div id="wrapper-' + metric.label + '" class="row-fluid"><div class="span12">' +
+                    getMetricTitle(i) +
+                    '<div id="' + viewId + '" class="simple-graph"></div>' +
+                    '</div></div>'
             ).appendTo("#detailedGraphs");
-            addDygraph( viewIndex, view, viewId, metricId, viewMetadata, data, metric.range, annotCollection);
+            addDygraph(viewIndex, view, viewId, metricId, viewMetadata, data, metric.range, annotCollection);
             viewIndex++;
         }
-        else{
+        else {
             if (1 == metric.simple) {
                 var viewId = "simpleGraph-" + metricId;
-                $('<div id="wrapper-'+metric.label+'" class="row-fluid">' +
-                    '<div class="span12">' +
-                    getMetricTitle(i)
-                    + '<div id="'+viewId+'" class="simple-graph"></div>' +
-                    '</div></div>'
+                $('<div id="wrapper-' + metric.label + '" class="row-fluid">' +
+                        '<div class="span12">' +
+                        getMetricTitle(i)
+                        + '<div id="' + viewId + '" class="simple-graph"></div>' +
+                        '</div></div>'
                 ).appendTo("#simpleGraphs");
-                addDygraph( viewIndex, view, viewId, metricId, viewMetadata, data, metric.range, annotCollection);
+                addDygraph(viewIndex, view, viewId, metricId, viewMetadata, data, metric.range, annotCollection);
                 viewIndex++;
             }
         }
     }
-    if( !renderDetailGraphs ){ numberOfSimpleGraphs=viewIndex }
+    if (!renderDetailGraphs) {
+        numberOfSimpleGraphs = viewIndex
+    }
 }
-
 
 
 /** INIT() draws only visible **/
 function initSimpleCharts(graphObj) {
     // Create the data table. 
-    var data = new google.visualization.DataTable( graphObj, 0.6 );
+    var data = new google.visualization.DataTable(graphObj, 0.6);
     populateInstArray(data);
 
     // Populate array with index to every row
     var allRows = Array(data.getNumberOfRows());
-    for (var i = 0; i < data.getNumberOfRows(); i++) { allRows[i] = i; }
+    for (var i = 0; i < data.getNumberOfRows(); i++) {
+        allRows[i] = i;
+    }
     viewMetadata.filteredRows = allRows;
 
     selectPoint(data, -1);
@@ -460,13 +476,13 @@ function initSimpleCharts(graphObj) {
 
     // Change button Colors then Filter based on value
     $('.btn').button();
-    var filterButtons = $.merge(categoryButtons(),instrumentButtons());
+    var filterButtons = $.merge(categoryButtons(), instrumentButtons());
     filterButtons.click(function (event) {
         var current = $(this);
         if (!event.shiftKey) {
-            current.siblings().each(function() {
+            current.siblings().each(function () {
                 var classList = $(this)[0].className.split(' ');
-                if(classList[1] !== "btn-default" ){
+                if (classList[1] !== "btn-default") {
                     $(this).removeClass(classList[1]);
                     $(this).addClass("btn-default");
                 }
@@ -474,8 +490,8 @@ function initSimpleCharts(graphObj) {
         }
         current.removeClass("btn-default");
 
-        if(current[0].dataset.enum === 'instrument'){
-            current.toggleClass('btn-orig'+current[0].dataset.num);
+        if (current[0].dataset.enum === 'instrument') {
+            current.toggleClass('btn-orig' + current[0].dataset.num);
         } else {
             current.toggleClass("btn-primary");
         }
@@ -498,33 +514,33 @@ function initSimpleCharts(graphObj) {
             $('#simpleGraphs').css("display", "block");
         }
 
-        if(!detailsExist){
+        if (!detailsExist) {
             drawGraphsByMetrics(data, true, viewMetadata);
             updateAllViews(data);
-            detailsExist=true;
+            detailsExist = true;
         }
 
     });
 
     //Little Hide Icon, when point on a graph is selected
-    $('#hide-entry').click(function(event) {
+    $('#hide-entry').click(function (event) {
         event.stopPropagation();
         $.post("/service/quameter-hide/" + selectedId);
-        hiddenIds["id"+selectedId] = true;
+        hiddenIds["id" + selectedId] = true;
         selectPoint(data, -1);
         updateAllViews(data);
-      });
+    });
 
 
     // Async form for submitting
-    $("#submitAnnotation").click(function(){
+    $("#submitAnnotation").click(function () {
         $.ajax({
             type: 'POST',
             url: "/service/new-annotation",
             data: $('#annotForm').serialize(),
-            success: function(response) {
+            success: function (response) {
                 var nthView = dyViewsByCode[$('#annotForm').find('input[name="metricCode"]').val()];
-                var nthx = getXaxisNseriesById(data, $('#annotForm').find('input[name="dbId"]').val()) ;
+                var nthx = getXaxisNseriesById(data, $('#annotForm').find('input[name="dbId"]').val());
                 var txt = $(this).closest('form').find("input[type=text], textarea").val();
                 var annotations = views[nthView].dygraph.annotations();
                 annotations.push(
@@ -535,9 +551,9 @@ function initSimpleCharts(graphObj) {
                         text: txt
                     }
                 );
-                views[nthView].dygraph.setAnnotations( annotations );
+                views[nthView].dygraph.setAnnotations(annotations);
             },
-            error: function() {
+            error: function () {
                 alert("There was an error submitting this annotation comment!");
             }
         });
@@ -550,15 +566,13 @@ function initSimpleCharts(graphObj) {
 }
 
 
-
-
-function getAnnotationCollection(){
+function getAnnotationCollection() {
     var jsonData;
     $.ajax({
         dataType: "json",
         async: false,
         url: "/service/list-annotation.json",
-        success: function(response) {
+        success: function (response) {
             jsonData = response['quameterannotation'];
         }
     });
@@ -566,30 +580,31 @@ function getAnnotationCollection(){
 }
 
 
-function getSmartColumns(dataIdx, metricId){
+function getSmartColumns(dataIdx, metricId) {
     var cols = [ dataIdx ];
     var rawInsturmentNames = activeInstrumentFilters();
-    for(j=0; j<rawInsturmentNames.length; j++){
-        cols.push({type:'number', label: rawInsturmentNames[j],
+    for (j = 0; j < rawInsturmentNames.length; j++) {
+        cols.push({type: 'number', label: rawInsturmentNames[j],
             calc: (function (iterJ, metID) {
                 return function (dt, row) {
-                    return (dt.getValue(row, 4) === rawInsturmentNames[iterJ]) ?  dt.getValue(row, columnIndex(metID,dt)) : null;                    }
-            })(j,metricId)
+                    return (dt.getValue(row, 4) === rawInsturmentNames[iterJ]) ? dt.getValue(row, columnIndex(metID, dt)) : null;
+                }
+            })(j, metricId)
         });
-    };
+    }
+    ;
     return cols;
 }
-
 
 
 /*
  * Color the lines by instrument
  */
-function getSmartColors(){
+function getSmartColors() {
     var colors = [];
     instrumentButtons().each(function () {
         if (!$(this).hasClass('btn-default')) {
-            colors.push( $(this).css('background-color') );
+            colors.push($(this).css('background-color'));
         }
     });
     return colors;
