@@ -245,6 +245,7 @@ function selectPoint(data, dataRow) {
     }
 }
 
+var blockRedraw = false;
 
 function addDygraph(viewIndex, view, viewId, metricId, viewMetadata, data, range, annotCollection) {
     views[viewIndex] = { dataView: view, minHighlightY: 1, maxHighlightY: -1, minHighlightY2: 1, maxHighlightY2: -1, metricId: metricId };
