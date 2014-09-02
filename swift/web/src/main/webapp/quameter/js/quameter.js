@@ -99,7 +99,7 @@ function buildCollection(collection, data, metricCode) {
                     {
                         series: nthx[1],
                         x: nthx[0].toString(),
-                        shortText: String.trim(collection[0].text)[0],
+                        shortText: $.trim(collection[o].text)[0],
                         text: collection[o].text
                     }
                 )
