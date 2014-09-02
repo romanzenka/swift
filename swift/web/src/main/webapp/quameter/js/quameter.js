@@ -82,7 +82,7 @@ function getXaxisNseriesById(data, dbId) {
         }
     }
     // Annotation can be older than 1 year, no longer shows
-    return -1;
+    return [-1, null];
 }
 
 // Make a list of annotations for dygraph.
@@ -94,7 +94,7 @@ function buildCollection(collection, data, metricCode) {
     for (var o in collection) {
         if (collection[o].metricCode === metricCode) {
             var nthx = getXaxisNseriesById(data, collection[o].quameterResultId);
-            if (nthx >= 0) {
+            if (nthx[0] >= 0) {
                 arrayForDYgraphs.push(
                     {
                         series: nthx[1],
@@ -245,7 +245,7 @@ function selectPoint(data, dataRow) {
     }
 }
 
-var blockRedraw = false;
+// var blockRedraw = false;
 
 function addDygraph(viewIndex, view, viewId, metricId, viewMetadata, data, range, annotCollection) {
     views[viewIndex] = { dataView: view, minHighlightY: 1, maxHighlightY: -1, minHighlightY2: 1, maxHighlightY2: -1, metricId: metricId };
