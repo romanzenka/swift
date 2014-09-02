@@ -30,7 +30,7 @@ public final class CommandLineParser {
 				.withRequiredArg().describedAs("Swift command").ofType(String.class);
 		parser.accepts("install", "Installation config file. Default is " + Swift.CONFIG_FILE_NAME + ". Please run the Swift configuration to obtain this file.")
 				.withRequiredArg().ofType(File.class);
-		parser.accepts("daemon", "Specify the daemon (this describes the environment of the current run) as it was set up during the configuration. When no name is given, the configuration has to contain exactly one daemon, otherwise an error is produced.")
+		parser.accepts("daemon", "Specify the daemon (this describes the environment of the current run) as it was set up during the configuration. When no name is given, the configuration has to contain exactly one daemon, otherwise an error is produced. You can also set environment variable SWIFT_DAEMON to set this value.")
 				.withOptionalArg().ofType(String.class).describedAs("name");
 		parser.accepts("sge", "Process a single work packet and exit. Used for jobs submitted through the Sun Grid Engine (SGE). The file contains all input parameters encoded in XML format.")
 				.withRequiredArg().describedAs("XML file").ofType(String.class);
@@ -76,7 +76,11 @@ public final class CommandLineParser {
 				command = SwiftCommandLine.CONFIG_COMMAND;
 			}
 		}
-		final String daemonId = (String) options.valueOf("daemon");
+		String daemonId = (String) options.valueOf("daemon");
+		if (daemonId == null) {
+			// We look into the environment variable if not specified on command line
+			daemonId = System.getenv("SWIFT_DAEMON");
+		}
 		commandLine = new SwiftCommandLine(command, parameters, installFile, daemonId, error, parser);
 	}
 
