@@ -1,18 +1,22 @@
 package edu.mayo.mprc.quameterdb.dao;
 
-import com.google.common.collect.*;
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
+import edu.mayo.mprc.MprcException;
 import edu.mayo.mprc.config.RuntimeInitializer;
 import edu.mayo.mprc.database.Change;
 import edu.mayo.mprc.database.DaoBase;
-import edu.mayo.mprc.searchdb.dao.Analysis;
 import edu.mayo.mprc.searchdb.dao.ProteinGroup;
 import edu.mayo.mprc.searchdb.dao.SearchDbDao;
-import edu.mayo.mprc.searchdb.dao.TandemMassSpectrometrySample;
+import edu.mayo.mprc.searchdb.dao.SearchResult;
 import edu.mayo.mprc.swift.db.SwiftDao;
 import edu.mayo.mprc.swift.dbmapping.FileSearch;
 import edu.mayo.mprc.swift.dbmapping.SwiftSearchDefinition;
+import edu.mayo.mprc.utilities.progress.PercentDoneReporter;
+import edu.mayo.mprc.utilities.progress.PercentProgressReporter;
 import org.apache.log4j.Logger;
-import org.hibernate.Hibernate;
 import org.hibernate.Query;
 import org.hibernate.type.StandardBasicTypes;
 import org.joda.time.DateTime;
@@ -32,23 +36,31 @@ public final class QuameterDaoHibernate extends DaoBase implements QuameterDao, 
 	private SwiftDao swiftDao;
 	private SearchDbDao searchDbDao;
 
+	/**
+	 * What items to list
+	 */
+	private enum ListItems {
+		ALL,
+		HIDDEN,
+		SHOWN,
+	}
+
 	public QuameterDaoHibernate() {
 	}
 
 	public QuameterDaoHibernate(final SwiftDao swiftDao, final SearchDbDao searchDbDao) {
-		super();
 		this.swiftDao = swiftDao;
 		this.searchDbDao = searchDbDao;
 	}
 
 	@Override
 	public QuameterResult addQuameterScores(
-			final int tandemMassSpectrometrySampleId, final int fileSearchId,
+			final int searchResultId, final int fileSearchId,
 			final Map<String, Double> values,
 			final Map<QuameterProteinGroup, Integer> identifiedSpectra) {
-		final TandemMassSpectrometrySample sample = getSearchDbDao().getTandemMassSpectrometrySampleForId(tandemMassSpectrometrySampleId);
+		final SearchResult searchResult = getSearchDbDao().getSearchResult(searchResultId);
 		final FileSearch fileSearch = getSwiftDao().getFileSearchForId(fileSearchId);
-		final QuameterResult result = new QuameterResult(sample, fileSearch, values, identifiedSpectra);
+		final QuameterResult result = new QuameterResult(searchResult, fileSearch, values, identifiedSpectra);
 
 		return save(result, false);
 	}
@@ -58,8 +70,35 @@ public final class QuameterDaoHibernate extends DaoBase implements QuameterDao, 
 	}
 
 	@Override
-	public List<QuameterResult> listAllResults() {
+	public List<QuameterResult> listVisibleResults() {
+		return listResults(ListItems.SHOWN);
+	}
+
+	@Override
+	public List<QuameterResult> listHiddenResults() {
+		return listResults(ListItems.HIDDEN);
+	}
+
+	private List<QuameterResult> listResults(final ListItems listedItems) {
 		final List<QuameterProteinGroup> activeProteinGroups = listProteinGroups();
+
+		final String hiddenQuery;
+		switch (listedItems) {
+			case ALL:
+				hiddenQuery = "";
+				break;
+			case HIDDEN:
+				hiddenQuery = "q.hidden=1 AND ";
+				break;
+			case SHOWN:
+				hiddenQuery = "q.hidden=0 AND ";
+				break;
+			default:
+				throw new MprcException(String.format("Programmer error - unknown ListItems parameter [%s]", listedItems));
+		}
+
+		// We only care about 1 year old data max
+		final DateTime lowerDateLimit = new DateTime().minusYears(1);
 
 		final Query query = getSession().createSQLQuery("" +
 				"SELECT {q.*}, m.metadata_value AS v, r.transaction_id AS ti" +
@@ -68,20 +107,24 @@ public final class QuameterDaoHibernate extends DaoBase implements QuameterDao, 
 				+ swiftDao.qualifyTableName("quameter_result") + " AS q, "
 				+ swiftDao.qualifyTableName("swift_search_definition") + " AS d, "
 				+ swiftDao.qualifyTableName("search_metadata") + " AS m, "
-				+ swiftDao.qualifyTableName("tandem_mass_spec_sample") + " AS t" +
-				" WHERE " +
-				" q.hidden=0 AND " +
-				" r.hidden=0 AND " +
-				" r.swift_search = d.swift_search_definition_id AND " +
-				" f.swift_search_definition_id = d.swift_search_definition_id AND " +
-				" q.file_search_id = f.file_search_id AND " +
-				" m.swift_search_definition_id = d.swift_search_definition_id AND " +
-				" m.metadata_key='quameter.category' AND" +
-				" t.tandem_mass_spec_sample_id = q.sample_id" +
-				" ORDER BY t.start_time")
+				+ swiftDao.qualifyTableName("tandem_mass_spec_sample") + " AS t, "
+				+ swiftDao.qualifyTableName("search_result") + " AS sr "
+				+ " WHERE "
+				+ hiddenQuery
+				+ " r.hidden=0 AND"
+				+ " r.swift_search = d.swift_search_definition_id AND"
+				+ " f.swift_search_definition_id = d.swift_search_definition_id AND"
+				+ " q.file_search_id = f.file_search_id AND"
+				+ " m.swift_search_definition_id = d.swift_search_definition_id AND"
+				+ " m.metadata_key='quameter.category' AND"
+				+ " t.tandem_mass_spec_sample_id = sr.tandem_mass_spec_sample_id AND"
+				+ " sr.search_result_id = q.search_result_id AND"
+				+ " t.start_time >= :timeStart"
+				+ " ORDER BY t.start_time")
 				.addEntity("q", QuameterResult.class)
 				.addScalar("v", StandardBasicTypes.STRING)
-				.addScalar("ti", StandardBasicTypes.INTEGER);
+				.addScalar("ti", StandardBasicTypes.INTEGER)
+				.setParameter("timeStart", lowerDateLimit.toDate(), StandardBasicTypes.DATE);
 		final List raw = query.list();
 		final List<QuameterResult> filtered = new ArrayList<QuameterResult>(Math.min(raw.size(), 1000));
 		for (final Object o : raw) {
@@ -91,63 +134,12 @@ public final class QuameterDaoHibernate extends DaoBase implements QuameterDao, 
 			r.setCategory(category);
 			final Integer transactionId = (Integer) array[2];
 			r.setTransaction(transactionId);
-
-			final ImmutableMap.Builder<QuameterProteinGroup, Integer> builder = new ImmutableMap.Builder<QuameterProteinGroup, Integer>();
-			for (final QuameterProteinGroup group : activeProteinGroups) {
-				// Fake some data up
-				builder.put(group, (int) (Math.random() * 60.0));
+			if (r.resultMatches()) {
+				filtered.add(r);
 			}
-			r.setIdentifiedSpectra(builder.build());
-			filtered.add(r);
 		}
 		return filtered;
 	}
-
-    @Override
-    public List<QuameterResult> listHiddenResults() {
-        final List<QuameterProteinGroup> activeProteinGroups = listProteinGroups();
-
-        final Query query = getSession().createSQLQuery("" +
-                "SELECT {q.*}, m.metadata_value AS v, r.transaction_id AS ti" +
-                " FROM `" + swiftDao.qualifyTableName("transaction") + "` AS r, " +
-                " " + swiftDao.qualifyTableName("file_search") + " AS f, " +
-                " " + swiftDao.qualifyTableName("quameter_result") + " AS q, " +
-                " " + swiftDao.qualifyTableName("swift_search_definition") + " AS d," +
-                " " + swiftDao.qualifyTableName("search_metadata") + " AS m," +
-                " " + swiftDao.qualifyTableName("tandem_mass_spec_sample") + " AS t" +
-                " WHERE " +
-                " q.hidden=1 AND " +
-                " r.hidden=0 AND " +
-                " r.swift_search = d.swift_search_definition_id AND " +
-                " f.swift_search_definition_id = d.swift_search_definition_id AND " +
-                " q.file_search_id = f.file_search_id AND " +
-                " m.swift_search_definition_id = d.swift_search_definition_id AND " +
-                " m.metadata_key='quameter.category' AND" +
-                " t.tandem_mass_spec_sample_id = q.sample_id" +
-                " ORDER BY t.start_time")
-                .addEntity("q", QuameterResult.class)
-                .addScalar("v", Hibernate.STRING)
-                .addScalar("ti", Hibernate.INTEGER);
-        final List raw = query.list();
-        final List<QuameterResult> filtered = new ArrayList<QuameterResult>(Math.min(raw.size(), 1000));
-        for (final Object o : raw) {
-            final Object[] array = (Object[]) o;
-            final QuameterResult r = (QuameterResult) array[0];
-            final String category = (String) array[1];
-            r.setCategory(category);
-            final Integer transactionId = (Integer) array[2];
-            r.setTransaction(transactionId);
-
-            ImmutableMap.Builder<QuameterProteinGroup, Integer> builder = new ImmutableMap.Builder<QuameterProteinGroup, Integer>();
-            for (QuameterProteinGroup group : activeProteinGroups) {
-                // Fake some data up
-                builder.put(group, (int)(Math.random()*60.0));
-            }
-            r.setIdentifiedSpectra(builder.build());
-            filtered.add(r);
-        }
-        return filtered;
-    }
 
 	@Override
 	public void hideQuameterResult(final int quameterResultId) {
@@ -156,12 +148,12 @@ public final class QuameterDaoHibernate extends DaoBase implements QuameterDao, 
 		getSession().saveOrUpdate(quameterResult);
 	}
 
-    @Override
-    public void unhideQuameterResult(final int quameterResultId) {
-        final QuameterResult quameterResult = (QuameterResult) getSession().get(QuameterResult.class, quameterResultId);
-        quameterResult.setHidden(false);
-        getSession().saveOrUpdate(quameterResult);
-    }
+	@Override
+	public void unhideQuameterResult(final int quameterResultId) {
+		final QuameterResult quameterResult = (QuameterResult) getSession().get(QuameterResult.class, quameterResultId);
+		quameterResult.setHidden(false);
+		getSession().saveOrUpdate(quameterResult);
+	}
 
 	@Override
 	public List<QuameterAnnotation> listAnnotations() {
@@ -178,17 +170,15 @@ public final class QuameterDaoHibernate extends DaoBase implements QuameterDao, 
 
 	@Override
 	public Map<QuameterProteinGroup, Integer> getIdentifiedSpectra(
-			final int analysisId,
 			final int fileSearchId,
-			final int tandemMassSpectrometrySampleId,
+			final int searchResultId,
 			final List<QuameterProteinGroup> quameterProteinGroups) {
 		final FileSearch fileSearch = swiftDao.getFileSearchForId(fileSearchId);
 		final SwiftSearchDefinition swiftSearchDefinition = fileSearch.getSwiftSearchDefinition();
 		// Now we know the database in our context
 
-		final TandemMassSpectrometrySample sample = searchDbDao.getTandemMassSpectrometrySampleForId(tandemMassSpectrometrySampleId);
-		final Analysis analysis = searchDbDao.getAnalysis(analysisId);
-		final TreeMap<Integer, ProteinGroup> proteinGroups = searchDbDao.getProteinGroupsForSample(analysis, sample);
+		final SearchResult searchResult = searchDbDao.getSearchResult(searchResultId);
+		final TreeMap<Integer, ProteinGroup> proteinGroups = searchDbDao.getProteinGroups(searchResult);
 		final Integer databaseId = swiftSearchDefinition.getSearchParameters().getDatabase().getId();
 		final Map<Integer, List<String>> accnumsForGroups = searchDbDao.getAccessionNumbersMapForProteinGroups(proteinGroups.keySet(), databaseId);
 
@@ -210,7 +200,7 @@ public final class QuameterDaoHibernate extends DaoBase implements QuameterDao, 
 		}
 
 
-		final ImmutableMap.Builder<QuameterProteinGroup, Integer> resultBuilder = new ImmutableBiMap.Builder<QuameterProteinGroup, Integer>();
+		final ImmutableMap.Builder<QuameterProteinGroup, Integer> resultBuilder = new ImmutableMap.Builder<QuameterProteinGroup, Integer>();
 		for (int i = 0; i < counts.length; i++) {
 			resultBuilder.put(quameterProteinGroups.get(i), counts[i]);
 		}
@@ -243,15 +233,48 @@ public final class QuameterDaoHibernate extends DaoBase implements QuameterDao, 
 				delete(removing, change);
 			}
 
-			recalculateProteinCounts();
+			recalculateProteinCounts(Lists.newArrayList(toAdd));
 		}
 		result.addAll(unchanged);
 		return result;
 	}
 
-	@Override
-	public void recalculateProteinCounts() {
-		// LOGGER.info("Recalculating the protein counts as the protein groups changed. This might take a long time");
+	/**
+	 * When the user changes definitions of the protein groups, the numbers of proteins become inconsistent.
+	 * <p/>
+	 * The old protein counts would refer to old definitions of the protein groups.
+	 * <p/>
+	 * At this point we need to recalculate the protein counts on the entire database, to bring all the counts
+	 * up to date.
+	 * This function is designed to be idempotent. You can freely call it on Swift startup and it should
+	 * do nothing if no work is needed.
+	 *
+	 * @param toAdd - the protein groups that need their numbers calculated. This speeds up the process.
+	 */
+	public void recalculateProteinCounts(final List<QuameterProteinGroup> toAdd) {
+		LOGGER.info("Recalculating the protein counts as the protein groups changed. This might take a long time");
+
+		final List<QuameterResult> quameterResults = listResults(ListItems.ALL);
+		int step = 0;
+		final PercentProgressReporter reporter = new PercentDoneReporter(null, "Updating quameter results: ");
+		for (final QuameterResult result : quameterResults) {
+			final Map<QuameterProteinGroup, Integer> identifiedSpectra = getIdentifiedSpectra(
+					result.getFileSearch().getId(),
+					result.getSearchResult().getId(),
+					toAdd);
+			if (result.getIdentifiedSpectra() == null) {
+				result.setIdentifiedSpectra(identifiedSpectra);
+			} else {
+				for (final QuameterProteinGroup group : toAdd) {
+					result.getIdentifiedSpectra().put(group, identifiedSpectra.get(group));
+				}
+			}
+			step++;
+			reporter.reportProgress((float) step / (float) quameterResults.size());
+			if (step % 100 == 0) {
+				getSession().flush();
+			}
+		}
 	}
 
 	@Override
@@ -285,11 +308,11 @@ public final class QuameterDaoHibernate extends DaoBase implements QuameterDao, 
 
 	@Override
 	public String check() {
-		return null;  // TODO: Implement this method
+		return null;
 	}
 
 	@Override
-	public void install(Map<String, String> params) {
+	public void install(final Map<String, String> params) {
 		swiftDao.install(params);
 		searchDbDao.install(params);
 	}

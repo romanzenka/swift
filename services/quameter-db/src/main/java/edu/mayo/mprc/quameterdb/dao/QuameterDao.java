@@ -1,7 +1,7 @@
 package edu.mayo.mprc.quameterdb.dao;
 
 import edu.mayo.mprc.database.Dao;
-import edu.mayo.mprc.searchdb.dao.TandemMassSpectrometrySample;
+import edu.mayo.mprc.searchdb.dao.SearchResult;
 import edu.mayo.mprc.swift.dbmapping.FileSearch;
 
 import java.util.List;
@@ -14,32 +14,32 @@ public interface QuameterDao extends Dao {
 	/**
 	 * Add Quameter scores for given file + search combo.
 	 *
-	 * @param tandemMassSpectrometrySampleId Id of the serialized {@link TandemMassSpectrometrySample} object. Metadata for the (usually) .raw file the scores refer to.
-	 * @param fileSearchId                   Id of the serialized {@link FileSearch} object. Information about how the file was searched.
-	 * @param values                         Quameter scores
-	 * @param identifedSpectra               Number of identified spectra for specific list of proteins
+	 * @param searchResultId   Id of the serialized {@link SearchResult} object. Metadata for the (usually) .raw file the scores refer to.
+	 * @param fileSearchId     Id of the serialized {@link FileSearch} object. Information about how the file was searched.
+	 * @param values           Quameter scores
+	 * @param identifedSpectra Number of identified spectra for specific list of proteins
 	 */
-	QuameterResult addQuameterScores(final int tandemMassSpectrometrySampleId,
+	QuameterResult addQuameterScores(final int searchResultId,
 	                                 final int fileSearchId,
 	                                 final Map<String, Double> values,
 	                                 final Map<QuameterProteinGroup, Integer> identifedSpectra);
 
 	/**
-	 * @return All the Quameter results that match given search name filter, with all values populated.
+	 * @return All Quameter results that are not hidden. Limit to last 1 year
 	 */
-	List<QuameterResult> listAllResults();
+	List<QuameterResult> listVisibleResults();
+
+	/**
+	 * @return Only hidden Quameter results.
+	 */
+	List<QuameterResult> listHiddenResults();
+
+	void hideQuameterResult(int quameterResultId);
+
+	void unhideQuameterResult(int quameterResultId);
 
 
-    /**
-     */
-    List<QuameterResult> listHiddenResults();
-
-    void hideQuameterResult(int quameterResultId);
-
-    void unhideQuameterResult(int quameterResultId);
-
-
-    /**
+	/**
 	 * Add an annotation. The annotation is uniquely identified by its
 	 * data point + metric. Adding an annotation for the same metric+data point
 	 * rewrites the old annotation.
@@ -60,13 +60,12 @@ public interface QuameterDao extends Dao {
 	 * For given file search id and a list of categories and their corresponding proteins,
 	 * count all the spectra corresponding to the protein set for the particular file search.
 	 *
-	 * @param analysisId                     Id of the loaded analysis (Scaffold report) that contains the file.
-	 * @param fileSearchId                   Saved info about file search that was used to process the input file
-	 * @param tandemMassSpectrometrySampleId Direct link to the mass spectrometry metadata for the file.
-	 * @param proteinGroups                  Currently defined protein groups
+	 * @param fileSearchId   Saved info about file search that was used to process the input file
+	 * @param searchResultId Direct link to the search results  for the file.
+	 * @param proteinGroups  Currently defined protein groups
 	 * @return Count of spectra corresponding to protein groups for given file search
 	 */
-	Map<QuameterProteinGroup, Integer> getIdentifiedSpectra(int analysisId, int fileSearchId, int tandemMassSpectrometrySampleId, List<QuameterProteinGroup> proteinGroups);
+	Map<QuameterProteinGroup, Integer> getIdentifiedSpectra(int fileSearchId, int searchResultId, List<QuameterProteinGroup> proteinGroups);
 
 	/**
 	 * Take a list of protein groups as it came from the config.
@@ -74,26 +73,16 @@ public interface QuameterDao extends Dao {
 	 * Make sure that our database contains only the listed protein groups and nothing else.
 	 * <p/>
 	 * Return the serialized protein groups as currently in the database.
+	 * This function will also recalculate the protein counts in case protein groups changed,
+	 * so it can run for a long time.
 	 *
 	 * @param groups List of groups to set the database to.
 	 * @return Serialized protein groups.
 	 */
 	List<QuameterProteinGroup> updateProteinGroups(List<QuameterProteinGroup> groups);
 
-
 	/**
 	 * @return List of currently active protein groups.
 	 */
 	List<QuameterProteinGroup> listProteinGroups();
-
-	/**
-	 * When the user changes definitions of the protein groups, the numbers of proteins become inconsistent.
-	 * <p/>
-	 * The old protein counts would refer to old definitions of the protein groups.
-	 * <p/>
-	 * At this point we need to recalculate the protein counts on the entire database, to bring all the counts
-	 * up to date.
-	 */
-	void recalculateProteinCounts();
-
 }

@@ -8,6 +8,7 @@ import edu.mayo.mprc.config.DependencyResolver;
 import edu.mayo.mprc.quameterdb.dao.QuameterDao;
 import edu.mayo.mprc.quameterdb.dao.QuameterProteinGroup;
 import edu.mayo.mprc.quameterdb.dao.QuameterResult;
+import edu.mayo.mprc.searchdb.dao.SearchResult;
 import edu.mayo.mprc.searchdb.dao.TandemMassSpectrometrySample;
 import edu.mayo.mprc.swift.dbmapping.FileSearch;
 import edu.mayo.mprc.swift.params2.SearchEngineParameters;
@@ -39,7 +40,7 @@ public final class QuameterUiTest {
 	public void setup() {
 		quameterDao = mock(QuameterDao.class);
 		when(quameterDao.listProteinGroups()).thenReturn(quameterProteinGroups());
-		when(quameterDao.listAllResults()).thenReturn(quameterResults());
+		when(quameterDao.listVisibleResults()).thenReturn(quameterResults());
 
 		final QuameterDbWorker.Config quameterDbConfig = new QuameterDbWorker.Config(null, "animal,-cat*,-dog", "", "");
 
@@ -62,6 +63,9 @@ public final class QuameterUiTest {
 				new File("/file/test2.RAW"), new DateTime(2012, 1, 2, 3, 4, 5, 0), 11, 21, 31, "instrument 2", "serial 2",
 				new DateTime(2012, 2, 3, 10, 20, 30, 0), 1234, "Test File 2", "sample 2 info\nlong\nstring");
 
+		final SearchResult searchResult1 = new SearchResult(sample1, null);
+		final SearchResult searchResult2 = new SearchResult(sample2, null);
+
 		final SearchEngineParameters p1 = new SearchEngineParameters();
 		p1.setId(100);
 		final SearchEngineParameters p2 = new SearchEngineParameters();
@@ -75,9 +79,9 @@ public final class QuameterUiTest {
 				ResourceUtilities.getReader("classpath:edu/mayo/mprc/quameter/quameter.qual.txt", QuameterLoadTest.class)
 		);
 
-		final QuameterResult r1 = new QuameterResult(sample1, fileSearch1, values, getIdentifiedSpectra(1));
+		final QuameterResult r1 = new QuameterResult(searchResult1, fileSearch1, values, getIdentifiedSpectra(1));
 		r1.setId(1);
-		final QuameterResult r2 = new QuameterResult(sample2, fileSearch2, values, getIdentifiedSpectra(20));
+		final QuameterResult r2 = new QuameterResult(searchResult2, fileSearch2, values, getIdentifiedSpectra(20));
 		r2.setId(2);
 		return Lists.newArrayList(
 				r1,

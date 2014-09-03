@@ -47,6 +47,11 @@ public final class SwiftDaoHibernate extends DaoBase implements SwiftDao {
 	private ParamsDao paramsDao;
 	private UnimodDao unimodDao;
 
+	/**
+	 * The version of the Swift database we are expecting to see.
+	 */
+	private final int CURRENT_DATABASE_VERSION = 38;
+
 	public SwiftDaoHibernate() {
 		super(null);
 	}
@@ -217,7 +222,7 @@ public final class SwiftDaoHibernate extends DaoBase implements SwiftDao {
 	 */
 	public FileSearch addFileSearch(final FileSearch fileSearch) {
 		try {
-			if(fileSearch.getSwiftSearchDefinition()==null) {
+			if (fileSearch.getSwiftSearchDefinition() == null) {
 				throw new MprcException("FileSearch must be a part of SwiftSearchDefinition");
 			}
 			return save(fileSearch, false);
@@ -232,6 +237,19 @@ public final class SwiftDaoHibernate extends DaoBase implements SwiftDao {
 		final Criteria criteria = session.createCriteria(LogData.class)
 				.add(nullSafeEq("task", data));
 		return listAndCast(criteria);
+	}
+
+	@Override
+	public int getDatabaseVersion() {
+		final Object o = getSession().get(SwiftDBVersion.class, 1);
+		if (o == null) {
+			return 0;
+		}
+		if (o instanceof SwiftDBVersion) {
+			final Integer version = ((SwiftDBVersion) o).getVersion();
+			return version == null ? 0 : version;
+		}
+		return 0;
 	}
 
 	@Override
@@ -480,7 +498,7 @@ public final class SwiftDaoHibernate extends DaoBase implements SwiftDao {
 		final Set<SearchRun> searchRuns = new HashSet<SearchRun>();
 		for (final FileSearch fileSearch : files) {
 			final List<Integer> searchDefinitions = (List<Integer>) getSession()
-					.createQuery("select distinct f.swiftSearchDefinitionId from FileSearch f where f.inputFile = :file")
+					.createQuery("select distinct f.swiftSearchDefinition.id from FileSearch f where f.inputFile = :file")
 					.setParameter("file", fileSearch.getInputFile())
 					.list();
 			for (final Integer def : searchDefinitions) {
@@ -579,9 +597,15 @@ public final class SwiftDaoHibernate extends DaoBase implements SwiftDao {
 			return workspaceCheck;
 		}
 
+		final int version = getDatabaseVersion();
+		if (version != CURRENT_DATABASE_VERSION) {
+			return String.format("The database version needs to be upgraded. Was %d, needs to be %d", version, CURRENT_DATABASE_VERSION);
+		}
+
 		if (rowCount(TaskStateData.class) != (long) TaskState.values().length) {
 			return "The task state enumeration is not up to date";
 		}
+
 		return null;
 	}
 
@@ -594,14 +618,14 @@ public final class SwiftDaoHibernate extends DaoBase implements SwiftDao {
 		installTaskStates();
 
 		if (params.containsKey("test")) {
-			LOGGER.info("Installing test data for "+getClass().getName());
+			LOGGER.info("Installing test data for " + getClass().getName());
 
 			if (rowCount(SpectrumQa.class) != 0) {
 				// We have already done our work
 				return;
 			}
 
-			LOGGER.info("Installing test data for "+this.getClass().getName());
+			LOGGER.info("Installing test data for " + this.getClass().getName());
 			// Install the test data - a sample search that successfully ran with mascot and scaffold
 
 			final File outputFolder = new File("output-folder");
@@ -676,7 +700,7 @@ public final class SwiftDaoHibernate extends DaoBase implements SwiftDao {
 			updateTask(task2);
 
 			run.setTasksCompleted(2);
-			LOGGER.debug("Test data for "+getClass().getName()+" installed");
+			LOGGER.debug("Test data for " + getClass().getName() + " installed");
 		}
 	}
 

@@ -16,6 +16,7 @@ import edu.mayo.mprc.utilities.FileUtilities;
 import edu.mayo.mprc.utilities.ResourceUtilities;
 import edu.mayo.mprc.utilities.TestingUtilities;
 import edu.mayo.mprc.utilities.progress.PercentProgressReporter;
+import edu.mayo.mprc.workspace.WorkspaceDaoHibernate;
 import org.dbunit.DatabaseUnitException;
 import org.joda.time.DateTime;
 import org.testng.Assert;
@@ -45,6 +46,7 @@ public class TestSearchDbDao extends DaoTest {
 	private UnimodDaoHibernate unimodDao;
 	private SwiftDaoHibernate swiftDao;
 	private FastaDbDaoHibernate fastaDbDao;
+	private WorkspaceDaoHibernate workspaceDao;
 
 	private static final String SINGLE = "classpath:edu/mayo/mprc/searchdb/single.tsv";
 	private static final String TRIVIAL = "classpath:edu/mayo/mprc/searchdb/trivial.tsv";
@@ -68,14 +70,15 @@ public class TestSearchDbDao extends DaoTest {
 		final ParamsDaoHibernate paramsDao = new ParamsDaoHibernate();
 		unimodDao = new UnimodDaoHibernate();
 		curationDao = new CurationDaoHibernate();
-		fastaDbDao = new FastaDbDaoHibernate();
-		swiftDao = new SwiftDaoHibernate();
+		fastaDbDao = new FastaDbDaoHibernate(curationDao);
+		workspaceDao = new WorkspaceDaoHibernate();
+		swiftDao = new SwiftDaoHibernate(workspaceDao, curationDao, paramsDao, unimodDao);
 
 		searchDbDao = new SearchDbDaoHibernate();
 		searchDbDao.setSwiftDao(swiftDao);
 		searchDbDao.setFastaDbDao(fastaDbDao);
 
-		initializeDatabase(Arrays.asList(swiftDao, unimodDao, paramsDao, curationDao, searchDbDao, fastaDbDao));
+		initializeDatabase(Arrays.asList(workspaceDao, swiftDao, unimodDao, paramsDao, curationDao, searchDbDao, fastaDbDao));
 	}
 
 	@AfterMethod

@@ -167,9 +167,29 @@ public class SwiftSearchDefinition extends PersistableBase implements EqualityCr
 
 		final SwiftSearchDefinition that = (SwiftSearchDefinition) o;
 
+		if (!shallowEquals(that)) {
+			return false;
+		}
 		if (getInputFiles() != null ? !getInputFiles().equals(that.getInputFiles()) : that.getInputFiles() != null) {
 			return false;
 		}
+
+		return true;
+	}
+
+	/**
+	 * Shallow version of the equals. Does not test {@link #getInputFiles()} equality.
+	 */
+	public boolean shallowEquals(final Object o) {
+		if (this == o) {
+			return true;
+		}
+		if (o == null || !(o instanceof SwiftSearchDefinition)) {
+			return false;
+		}
+
+		final SwiftSearchDefinition that = (SwiftSearchDefinition) o;
+
 		if (getOutputFolder() != null ? !getOutputFolder().equals(that.getOutputFolder()) : that.getOutputFolder() != null) {
 			return false;
 		}

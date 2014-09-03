@@ -14,7 +14,8 @@
 <% final ResourceConfig quameterUiConfig = MainFactoryContext.getSwiftEnvironment().getSingletonConfig(QuameterUi.Config.class); %>
 <html>
 <head>
-    <title>QuaMeter Results | <%=SwiftWebContext.getWebUi().getTitle()%></title>
+    <title>QuaMeter Results | <%=SwiftWebContext.getWebUi().getTitle()%>
+    </title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="/common/bootstrap/css/bootstrap.min.css" rel="stylesheet" media="screen">
     <link href="css/quameter.css" rel="stylesheet" media="screen">
@@ -27,30 +28,35 @@
         </div>
     </div>
 
-     <h3>Hidden Data Points</h3>
+    <h3>Hidden Data Points</h3>
     <ul class="list-unstyled">
-    <%
-        if(quameterUiConfig!=null) {
-            List<QuameterResult> myList;
-            final QuameterUi quameterUi = (QuameterUi) MainFactoryContext.getSwiftEnvironment().createResource(quameterUiConfig);
-            quameterUi.begin();
-            try {
-                myList = quameterUi.getQuameterDao().listHiddenResults();
-                quameterUi.commit();
+        <%
+            if (quameterUiConfig != null) {
+                List<QuameterResult> myList;
+                final QuameterUi quameterUi = (QuameterUi) MainFactoryContext.getSwiftEnvironment().createResource(quameterUiConfig);
+                quameterUi.begin();
+                try {
+                    myList = quameterUi.getQuameterDao().listHiddenResults();
 
-            } catch (Exception e) {
-                quameterUi.rollback();
-                throw new MprcException(e);
+                    for (QuameterResult qr : myList) {
+        %>
+        <li>
+            <form action="/service/quameter-unhide/<%= qr.getId() %>" method="post">
+                <%= qr.getSearchResult().getMassSpecSample().getFile().getAbsolutePath() %>
+                <input type="submit" value="Unhide This">
+            </form>
+        </li>
+        <%
+                    }
+                    quameterUi.commit();
+                } catch (Exception e) {
+                    quameterUi.rollback();
+                    throw new MprcException(e);
+                }
             }
-
-            for(QuameterResult qr : myList){
-                out.print("<li>"+qr.getSample()+"<a href=\"/quameter-unhide/"+ qr.getTransaction() +"\">Unhide This</></li>");
-            }
-
-       }
-    %>
+        %>
     </ul>
-
+</div>
 
 </body>
 </html>

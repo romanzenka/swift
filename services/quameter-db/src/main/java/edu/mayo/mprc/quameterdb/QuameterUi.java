@@ -12,6 +12,7 @@ import edu.mayo.mprc.database.Dao;
 import edu.mayo.mprc.quameterdb.dao.QuameterDao;
 import edu.mayo.mprc.quameterdb.dao.QuameterProteinGroup;
 import edu.mayo.mprc.quameterdb.dao.QuameterResult;
+import edu.mayo.mprc.searchdb.dao.TandemMassSpectrometrySample;
 import edu.mayo.mprc.swift.params2.SearchEngineParameters;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
@@ -28,7 +29,7 @@ import java.util.Map;
 /**
  * @author Roman Zenka
  */
-public final class QuameterUi implements Dao, UiConfigurationProvider {
+public final class QuameterUi implements Dao, UiConfigurationProvider, Lifecycle {
 	public static final String TYPE = "quameterUi";
 	public static final String NAME = "QuaMeter User Interface";
 	public static final String DESC = "Specialized interface for browsing QuaMeter database";
@@ -41,6 +42,8 @@ public final class QuameterUi implements Dao, UiConfigurationProvider {
 	private final Map<String, String> instrumentMap;
 	private static final DateTimeFormatter DATE_FORMAT_1 = DateTimeFormat.forPattern("'Date('yyyy, ").withLocale(Locale.US);
 	private static final DateTimeFormatter DATE_FORMAT_2 = DateTimeFormat.forPattern(", d, H, m, s, S')'").withLocale(Locale.US);
+
+	private boolean running;
 
 	/**
 	 * Use this constant to get to a list of quameter categories from the user interface
@@ -77,7 +80,7 @@ public final class QuameterUi implements Dao, UiConfigurationProvider {
 	public void dataTableJson(final Writer writer) {
 
 		final List<QuameterProteinGroup> proteinGroups = quameterDao.listProteinGroups();
-		final List<QuameterResult> quameterResults = quameterDao.listAllResults();
+		final List<QuameterResult> quameterResults = quameterDao.listVisibleResults();
 
 		final JsonWriter w = new JsonWriter(writer);
 		w.setIndent("   ");
@@ -124,10 +127,11 @@ public final class QuameterUi implements Dao, UiConfigurationProvider {
 		writer.beginArray();
 
 		writeValue(writer, result.getId()); // Id of the entry (for hiding)
-		writeValue(writer, result.getSample().getStartTime()); // startTime
-		writeValue(writer, result.getSample().getFile().getAbsolutePath()); // path
-		writeValue(writer, result.getSample().getRunTimeInSeconds() / SEC_TO_MIN); // duration
-		writeValue(writer, mapInstrument(result.getSample().getInstrumentSerialNumber())); // instrument
+		final TandemMassSpectrometrySample massSpecSample = result.getSearchResult().getMassSpecSample();
+		writeValue(writer, massSpecSample.getStartTime()); // startTime
+		writeValue(writer, massSpecSample.getFile().getAbsolutePath()); // path
+		writeValue(writer, massSpecSample.getRunTimeInSeconds() / SEC_TO_MIN); // duration
+		writeValue(writer, mapInstrument(massSpecSample.getInstrumentSerialNumber())); // instrument
 		writeValue(writer, result.getCategory());
 		final SearchEngineParameters parameters = result.getFileSearch().getSearchParameters();
 		writeValue(writer, parameters != null ? parameters.getId() : 0); // search parameters id
@@ -192,9 +196,43 @@ public final class QuameterUi implements Dao, UiConfigurationProvider {
 		currentConfiguration.put(UI_QUAMETER_CATEGORIES, dbWorkerConfig.getCategories());
 	}
 
-    public QuameterDao getQuameterDao() {
-        return quameterDao;
-    }
+	public QuameterDao getQuameterDao() {
+		return quameterDao;
+	}
+
+	public void initialize() {
+		QuameterDao dao = getQuameterDao();
+		List<QuameterProteinGroup> proteins = dbWorkerConfig.getProteins();
+		// On start we take our protein groups and store them in the database
+		dao.begin();
+		try {
+			dao.updateProteinGroups(proteins);
+			dao.commit();
+		} catch (Exception e) {
+			dao.rollback();
+			throw new MprcException("Could not initialize Quameter", e);
+		}
+	}
+
+	@Override
+	public boolean isRunning() {
+		return running;
+	}
+
+	@Override
+	public void start() {
+		if (!isRunning()) {
+			initialize();
+			running = true;
+		}
+	}
+
+	@Override
+	public void stop() {
+		if (isRunning()) {
+			running = false;
+		}
+	}
 
 	public static final class Config implements ResourceConfig {
 		private ServiceConfig quameterConfig;

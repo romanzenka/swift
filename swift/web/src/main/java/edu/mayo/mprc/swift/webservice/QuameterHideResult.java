@@ -31,13 +31,10 @@ public final class QuameterHideResult {
 			quameterDao.rollback();
 			throw new MprcException("Could not hide quameter result " + quameterResultId, e);
 		}
-
 	}
 
-
     @RequestMapping(value = "/quameter-unhide/{quameterResultId}", method = RequestMethod.POST)
-    @ResponseBody
-    public void unhideQuameterResult(@PathVariable final int quameterResultId) {
+    public String unhideQuameterResult(@PathVariable final int quameterResultId) {
         quameterDao.begin();
         try {
             quameterDao.unhideQuameterResult(quameterResultId);
@@ -46,10 +43,8 @@ public final class QuameterHideResult {
             quameterDao.rollback();
             throw new MprcException("Could not un-hide quameter result " + quameterResultId, e);
         }
-
+	    return "redirect:/quameter/unhide.jsp";
     }
-
-
 
     @RequestMapping(value = "/new-annotation", method = RequestMethod.POST)
     @ResponseStatus(HttpStatus.NO_CONTENT)

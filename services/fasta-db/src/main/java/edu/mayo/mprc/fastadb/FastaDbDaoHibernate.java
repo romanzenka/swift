@@ -5,6 +5,7 @@ import edu.mayo.mprc.MprcException;
 import edu.mayo.mprc.database.Database;
 import edu.mayo.mprc.database.bulk.BulkDaoBase;
 import edu.mayo.mprc.dbcurator.model.Curation;
+import edu.mayo.mprc.dbcurator.model.CurationDao;
 import edu.mayo.mprc.fasta.FASTAInputStream;
 import edu.mayo.mprc.utilities.FileUtilities;
 import edu.mayo.mprc.utilities.progress.PercentDoneReporter;
@@ -15,6 +16,7 @@ import org.hibernate.StatelessSession;
 import org.springframework.stereotype.Repository;
 
 import javax.annotation.Nullable;
+import javax.annotation.Resource;
 import java.io.File;
 import java.text.MessageFormat;
 import java.util.*;
@@ -31,7 +33,13 @@ public final class FastaDbDaoHibernate extends BulkDaoBase implements FastaDbDao
 	public static final long REPORT_FREQUENCY = 100L;
 	private static final String HBM_HOME = "edu/mayo/mprc/fastadb/";
 
+	private CurationDao curationDao;
+
 	public FastaDbDaoHibernate() {
+	}
+
+	public FastaDbDaoHibernate(final CurationDao curationDao) {
+		this.curationDao = curationDao;
 	}
 
 	public FastaDbDaoHibernate(final Database database) {
@@ -58,7 +66,7 @@ public final class FastaDbDaoHibernate extends BulkDaoBase implements FastaDbDao
 					.setParameter("accessionNumber", accessionNumber)
 					.setParameter("database", database)
 					.uniqueResult();
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			throw new MprcException(MessageFormat.format("Could not find description for protein [{0}] in database [{1}]", accessionNumber, database.getShortName()), e);
 		}
 	}
@@ -157,7 +165,7 @@ public final class FastaDbDaoHibernate extends BulkDaoBase implements FastaDbDao
 			}
 			LOGGER.info(MessageFormat.format("Loaded [{0}] to database: {1,number} sequences added.", fasta.getAbsolutePath(), numSequencesRead));
 			session.getTransaction().commit();
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			session.getTransaction().rollback();
 			throw new MprcException("Could not add FASTA file to database " + database.getTitle(), e);
 		} finally {
@@ -172,7 +180,7 @@ public final class FastaDbDaoHibernate extends BulkDaoBase implements FastaDbDao
 	}
 
 	private void addSequences(final Collection<? extends Sequence> sequences, final String table) {
-		SequenceBulkLoader loader = new SequenceBulkLoader(this, this, table);
+		final SequenceBulkLoader loader = new SequenceBulkLoader(this, this, table);
 		loader.addObjects(sequences);
 	}
 
@@ -197,5 +205,21 @@ public final class FastaDbDaoHibernate extends BulkDaoBase implements FastaDbDao
 
 	@Override
 	public void install(final Map<String, String> params) {
+		curationDao.install(params);
+
+		if (params.containsKey("test")) {
+			final Curation shortTest = curationDao.getCurationByShortName("ShortTest");
+
+			addFastaDatabase(shortTest, null);
+		}
+	}
+
+	public CurationDao getCurationDao() {
+		return curationDao;
+	}
+
+	@Resource(name = "curationDao")
+	public void setCurationDao(final CurationDao curationDao) {
+		this.curationDao = curationDao;
 	}
 }

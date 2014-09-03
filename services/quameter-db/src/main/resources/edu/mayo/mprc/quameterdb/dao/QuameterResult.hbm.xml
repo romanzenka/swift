@@ -6,7 +6,7 @@
             <generator class="native" />
         </id>
         <many-to-one name="fileSearch" column="file_search_id" lazy="false" foreign-key="quameter_result_ibfk_2" />
-        <many-to-one name="sample" column="sample_id" lazy="false" foreign-key="quameter_result_ibfk_1" />
+        <many-to-one name="searchResult" column="search_result_id" lazy="false" foreign-key="quameter_result_ibfk_3" />
         <property name="hidden" type="boolean" column="hidden" />
         <property name="c_1a" type="double" column="c_1a" />
         <property name="c_1b" type="double" column="c_1b" />
@@ -50,5 +50,13 @@
         <property name="p_2b" type="double" column="p_2b" />
         <property name="p_2c" type="double" column="p_2c" />
         <property name="p_3" type="double" column="p_3" />
+
+        <map name="identifiedSpectra" cascade="all-delete-orphan" lazy="true" table="quameter_spectra">
+            <key column="quameter_result_id" foreign-key="quameter_spectra_ibfk_1" />
+            <index-many-to-many class="QuameterProteinGroup" column="quameter_pg_id"
+                foreign-key="quameter_spectra_ibfk_2" />
+            <element type="integer" column="unique_spectra" />
+        </map>
+
     </class>
 </hibernate-mapping>
