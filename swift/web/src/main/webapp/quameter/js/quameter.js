@@ -324,28 +324,23 @@ function addDygraph(viewIndex, view, viewId, metricId, viewMetadata, data, range
                 }
             },
             underlayCallback: function (canvas, area, g) {
-                var metricIndex = 0;
-                for (var i = 0; i < metrics.length; i++) {
-                    if (metrics.code == currentView.metricId) {
-                        metricIndex = i;
-                    }
-                }
-
-                if (currentView.minHighlightY < currentView.maxHighlightY) {
+                if (currentView.minHighlightY < currentView.maxHighlightY && !currentView.metricId.match(/^id_/)) {
                     var bottom = g.toDomYCoord(currentView.minHighlightY);
                     var top = g.toDomYCoord(currentView.maxHighlightY);
                     var bottom2 = g.toDomYCoord(currentView.minHighlightY2);
                     var top2 = g.toDomYCoord(currentView.maxHighlightY2);
 
-                    var good = metrics[metricIndex].good;
-                    canvas.fillStyle = "rgba(255, 235, 235, 1.0)";
+                    var good = getMetricByCode(currentView.metricId).good;
+                    //canvas.fillStyle = "rgba(255, 235, 235, 1.0)"; //red
+                    canvas.fillStyle = "rgba(224,224,224,1.0)"; //Gray
                     if (good == "range" || good == "low") {
                         canvas.fillRect(area.x, area.y, area.w, top);
                     }
                     if (good == "range" || good == "high") {
                         canvas.fillRect(area.x, bottom, area.w, area.h - (bottom - area.y));
                     }
-                    canvas.fillStyle = "rgba(250, 189, 189, 1.0)";
+                    //canvas.fillStyle = "rgba(250, 189, 189, 1.0)"; //red
+                    canvas.fillStyle = "rgba(160,160,160,1.0)"; //gray
                     if (good == "range" || good == "low") {
                         canvas.fillRect(area.x, area.y, area.w, top2);
                     }
