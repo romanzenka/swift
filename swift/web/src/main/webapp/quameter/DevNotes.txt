@@ -39,3 +39,10 @@ annotation -> not disappering
  7. color code button to insturment line
  x. progressing red highlights Std Dev, lighter @ 3 & darker @ 5|6
  9 require a comment to hide a point - for that specific metric
+
+
+
+ New changes:
+ 1. fix Protien IDs (when multiple highlighted, remain only named type do not combine)
+ 2. remove error bars from protein id graphs
+ 3. remove error highlights when more than 1 instruments are selected.
