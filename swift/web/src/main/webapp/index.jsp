@@ -121,7 +121,7 @@
         </h1>
     </div>
 
-    <p>Search multiple tandem mass spec. datafiles using <b>multiple search engines at once</b>: Mascot, Sequest,
+    <p>Search multiple tandem mass spec. datafiles using <b>multiple search engines at once</b>: Mascot, Comet,
         X!Tandem and MyriMatch.</p>
 
     <h2>Swift inputs</h2>
@@ -130,9 +130,9 @@
 
     <h2>Swift outputs</h2>
 
-    Swift produces Scaffold 3 reports (.sf3 files). You can view these reports on your own computer, just download and
-    install
-    the free Scaffold 3 viewer.
+    Swift produces Scaffold reports (.sf3 files). You can view these reports on your own computer, just
+    <a href="http://www.proteomesoftware.com/products/free-viewer/">download and
+    install the free Scaffold viewer</a>.
 
     There are several possibilities how to map input files to Scaffold reports. You can produce the following:
 

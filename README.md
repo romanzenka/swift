@@ -1,11 +1,11 @@
 Swift
 =====
 
-Search multiple tandem mass spec. datafiles using multiple search engines at once: Mascot, Sequest, X!Tandem, and MyriMatch.
+Search multiple tandem mass spec. datafiles using multiple search engines at once: Mascot, Comet, X!Tandem, and MyriMatch.
 
 ### Swift inputs
 
-Swift accepts one or many raw, mgf, mzML or Agilent .d files. You can process separate files or entire directories.
+Swift accepts one or multiple raw, mgf, mzML or Agilent .d files. You can process separate files or entire directories.
 
 ### Swift outputs
 
