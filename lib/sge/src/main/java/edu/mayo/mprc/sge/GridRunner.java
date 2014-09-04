@@ -90,24 +90,24 @@ public final class GridRunner extends AbstractRunner {
 	@Override
 	protected void processRequest(final DaemonRequest request) {
 		final GridWorkPacket gridWorkPacket = getBaseGridWorkPacket(gridScriptFactory.getApplicationName(wrapperScript));
-		final File daemonWorkerAllocatorInputFile = new File(getSharedTempDirectory(), queueName + "_" + uniqueId.incrementAndGet());
+		final File sgePacketFile = new File(getSharedTempDirectory(), queueName + "_" + uniqueId.incrementAndGet());
 
 		try {
 			final SgeMessageListener allocatorListener = new SgeMessageListener(request);
-			final SgePacket gridDaemonAllocatorInputObject =
+			final SgePacket sgePacket =
 					new SgePacket(
 							serviceFactory.serializeRequest(request.getWorkPacket(), getDaemon().getResponseDispatcher(), allocatorListener)
 							, daemonConnection.getConnectionName()
 							, fileTokenFactory.getDaemonConfigInfo(),
 							getDaemonLoggerFactory().getLogFolder());
 
-			writeWorkerAllocatorInputObject(daemonWorkerAllocatorInputFile, gridDaemonAllocatorInputObject);
+			writeWorkerAllocatorInputObject(sgePacketFile, sgePacket);
 
-			final List<String> parameters = gridScriptFactory.getParameters(wrapperScript, daemonWorkerAllocatorInputFile);
+			final List<String> parameters = gridScriptFactory.getParameters(wrapperScript, sgePacketFile);
 			gridWorkPacket.setParameters(parameters);
 
 			// Set our own listener to the work packet progress. When the packet returns, the execution will be resumed
-			final MyWorkPacketStateListener listener = new MyWorkPacketStateListener(request, daemonWorkerAllocatorInputFile, allocatorListener);
+			final MyWorkPacketStateListener listener = new MyWorkPacketStateListener(request, sgePacketFile, allocatorListener);
 			gridWorkPacket.setListener(listener);
 			gridWorkPacket.setPriority(request.getWorkPacket().getPriority());
 			// Run the job
@@ -129,12 +129,17 @@ public final class GridRunner extends AbstractRunner {
 			// We are not done yet! The grid work packet's progress listener will get called when the state of the task changes,
 			// and either mark the task failed or successful.
 		} catch (Exception t) {
-			FileUtilities.quietDelete(daemonWorkerAllocatorInputFile);
-			final DaemonException daemonException = new DaemonException("Failed passing work packet " + gridWorkPacket.toString() + " to grid engine", t);
-			LOGGER.error(MprcException.getDetailedMessage(daemonException), daemonException);
+			final DaemonException daemonException = processFailedJob(gridWorkPacket, sgePacketFile, t);
 			sendResponse(request, daemonException, true);
 			throw daemonException;
 		}
+	}
+
+	private DaemonException processFailedJob(final GridWorkPacket gridWorkPacket, final File packageFile, final Exception exception) {
+		FileUtilities.quietDelete(packageFile);
+		final DaemonException daemonException = new DaemonException("Failed passing work packet " + gridWorkPacket.toString() + " to grid engine", exception);
+		LOGGER.error(MprcException.getDetailedMessage(daemonException), daemonException);
+		return daemonException;
 	}
 
 	@Override
