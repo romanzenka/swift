@@ -5,13 +5,13 @@ import com.thoughtworks.xstream.io.xml.DomDriver;
 import edu.mayo.mprc.MprcException;
 import edu.mayo.mprc.ReleaseInfoCore;
 import edu.mayo.mprc.config.*;
+import edu.mayo.mprc.daemon.DaemonLoggerFactory;
 import edu.mayo.mprc.daemon.DaemonProgress;
 import edu.mayo.mprc.daemon.DaemonProgressMessage;
 import edu.mayo.mprc.daemon.files.FileTokenFactory;
 import edu.mayo.mprc.daemon.files.FileTokenHolder;
 import edu.mayo.mprc.daemon.worker.WorkPacket;
 import edu.mayo.mprc.daemon.worker.Worker;
-import edu.mayo.mprc.daemon.DaemonLoggerFactory;
 import edu.mayo.mprc.messaging.Request;
 import edu.mayo.mprc.messaging.ServiceFactory;
 import edu.mayo.mprc.sge.SgePacket;
@@ -42,6 +42,9 @@ public class RunSge implements SwiftCommand {
 	private ResourceTable resourceTable;
 	private ServiceFactory serviceFactory;
 	private DaemonLoggerFactory daemonLoggerFactory;
+
+	@Resource(name = "fileTokenFactory")
+	private FileTokenFactory fileTokenFactory;
 
 	@Override
 	public String getDescription() {
@@ -88,7 +91,7 @@ public class RunSge implements SwiftCommand {
 			//needs to be reset because it is a transient object.
 			if (sgePacket.getWorkPacket() instanceof FileTokenHolder) {
 				final FileTokenHolder fileTokenHolder = (FileTokenHolder) sgePacket.getWorkPacket();
-				final FileTokenFactory fileTokenFactory = new FileTokenFactory(sgePacket.getDaemonConfigInfo());
+				fileTokenFactory.setDaemonConfigInfo(sgePacket.getDaemonConfigInfo());
 				fileTokenHolder.translateOnReceiver(fileTokenFactory, null);
 			}
 			daemonLoggerFactory = new DaemonLoggerFactory(sgePacket.getLogFolder());

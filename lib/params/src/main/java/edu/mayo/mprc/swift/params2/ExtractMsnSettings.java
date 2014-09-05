@@ -16,6 +16,7 @@ public class ExtractMsnSettings extends PersistableBase {
 	public static final String EXTRACT_MSN = "extract_msn";
 	public static final String MSCONVERT = "msconvert";
 	public static final String MZML_MODE = "--mzML";
+	public static final String MS2_MODE = "--ms2";
 
 	public ExtractMsnSettings() {
 	}

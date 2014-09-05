@@ -50,6 +50,7 @@ public final class SearchRunner implements Runnable, Lifecycle {
 	public static final String MGF = "mgf";
 	public static final String MZ_ML = "mzML";
 	public static final ExtractMsnSettings MSCONVERT_MZML = new ExtractMsnSettings(ExtractMsnSettings.MZML_MODE, ExtractMsnSettings.MSCONVERT);
+	public static final ExtractMsnSettings MSCONVERT_MS2 = new ExtractMsnSettings(ExtractMsnSettings.MS2_MODE, ExtractMsnSettings.MSCONVERT);
 	/**
 	 * We idpQonvert tasks with specific FDR for QuaMeter. This is hardcoded, does not reflect how are actual searches run.
 	 */
@@ -289,7 +290,7 @@ public final class SearchRunner implements Runnable, Lifecycle {
 			// While building these, the Scaffold search entry itself is initialized
 			// The IdpQonvert search is special as well, it is set up to process the results of the myrimatch search
 			if (isNormalEngine(engine) && isEngineEnabled(engine, inputFile, defaultSearchParameters)) {
-				final EngineSearchTask search = addEngineSearchTask(engine, inputFile, conversion, searchParameters, publicSearchFiles);
+				final FileProducingTask search = addEngineSearchTask(engine, inputFile, conversion, searchParameters, publicSearchFiles);
 
 				scaffoldTask = addScaffoldAndQaTasks(scaffoldTask, inputFile, conversion, scaffoldDeployment, engine, search);
 				if (searchWithIdpQonvert() && myrimatch(engine)) {
@@ -315,7 +316,7 @@ public final class SearchRunner implements Runnable, Lifecycle {
 			if (comet == null) {
 				throw new MprcException("The Comet search engine must be available for Quality Control to function");
 			}
-			final EngineSearchTask cometSearch = addEngineSearchTask(comet, inputFile, mzmlFile, getSemiParameters(searchParameters), publicSearchFiles);
+			final FileProducingTask cometSearch = addEngineSearchTask(comet, inputFile, mzmlFile, getSemiParameters(searchParameters), publicSearchFiles);
 			final IdpQonvertTask idpQonvertTask = addIdpQonvertTask(idpQonvert, cometSearch, false/* Do not publish the idpDB file, temp only*/);
 			idpQonvertTask.setEmbedSpectrumScanTimes(true);
 			idpQonvertTask.setMaxFDR(QUAMETER_FDR);
@@ -350,9 +351,9 @@ public final class SearchRunner implements Runnable, Lifecycle {
 		return null;
 	}
 
-	private EngineSearchTask addEngineSearchTask(final SearchEngine engine, final FileSearch inputFile,
-	                                             final FileProducingTask convertedFile, final SearchEngineParameters searchParameters,
-	                                             final boolean publicSearchFiles) {
+	private FileProducingTask addEngineSearchTask(final SearchEngine engine, final FileSearch inputFile,
+	                                              final FileProducingTask convertedFile, final SearchEngineParameters searchParameters,
+	                                              final boolean publicSearchFiles) {
 
 		// Get the parameter string
 		final String param = parameterFiles.getParamString(engine, searchParameters);
@@ -375,18 +376,28 @@ public final class SearchRunner implements Runnable, Lifecycle {
 		}
 		final File outputFolder = getOutputFolderForSearchEngine(engine);
 
+		final boolean cometSearch = comet(engine);
+
 		final FileProducingTask converted;
-		if (comet(engine)) {
+		if (cometSearch) {
 			// Comet is special. It requires a mzML file as input
 			converted = addRawConversionTask(inputFile, MSCONVERT_MZML, false);
 		} else {
 			converted = convertedFile;
 		}
 
-		return addEngineSearch(engine, param, inputFile.getInputFile(), outputFolder, converted, database, deploymentResult, publicSearchFiles);
+		final EngineSearchTask engineSearchTask = addEngineSearch(engine, param, inputFile.getInputFile(), outputFolder, converted, database, deploymentResult, publicSearchFiles);
+
+		if (cometSearch) {
+			FileProducingTask ms2Task = addRawConversionTask(inputFile, MSCONVERT_MS2, false);
+			final SqtMs2CombinerTask combinerTask = addTask(new SqtMs2CombinerTask(workflowEngine, engineSearchTask, ms2Task));
+			return combinerTask;
+		}
+
+		return engineSearchTask;
 	}
 
-	private IdpQonvertTask addIdpQonvertTask(final SearchEngine idpQonvert, final EngineSearchTask search, final boolean publishResult) {
+	private IdpQonvertTask addIdpQonvertTask(final SearchEngine idpQonvert, final FileProducingTask search, final boolean publishResult) {
 		final IdpQonvertTask task = addTask(new IdpQonvertTask(workflowEngine, swiftDao, searchRun,
 				getSearchDefinition(), idpQonvert.getSearchDaemon(),
 				search, getOutputFolderForSearchEngine(idpQonvert), publishResult, fileTokenFactory, isFromScratch()));
@@ -427,7 +438,7 @@ public final class SearchRunner implements Runnable, Lifecycle {
 	private ScaffoldSpectrumTask addScaffoldAndQaTasks(final ScaffoldSpectrumTask previousScaffoldTask,
 	                                                   final FileSearch inputFile, final FileProducingTask conversion,
 	                                                   final DatabaseDeployment scaffoldDeployment,
-	                                                   final SearchEngine engine, final EngineSearchTask search) {
+	                                                   final SearchEngine engine, final FileProducingTask search) {
 		ScaffoldSpectrumTask scaffoldTask = previousScaffoldTask;
 		final String scaffoldVersion = scaffoldVersion();
 		if (scaffoldVersion != null && scaffoldShouldUseEngine(engine, scaffoldVersion)) {
@@ -880,7 +891,7 @@ public final class SearchRunner implements Runnable, Lifecycle {
 	 * Add a scaffold 3 call (or update existing one) that depends on this input file to be sought through
 	 * the given engine search.
 	 */
-	private ScaffoldSpectrumTask addScaffoldCall(final String scaffoldVersion, final FileSearch inputFile, final EngineSearchTask search, final DatabaseDeployment scaffoldDbDeployment) {
+	private ScaffoldSpectrumTask addScaffoldCall(final String scaffoldVersion, final FileSearch inputFile, final FileProducingTask search, final DatabaseDeployment scaffoldDbDeployment) {
 		final String experiment = inputFile.getExperiment();
 		final SearchEngine scaffoldEngine = engines.getScaffoldEngine();
 		final File scaffoldUnimod = getScaffoldUnimod(scaffoldEngine);

@@ -67,7 +67,7 @@ final class ScaffoldSpectrumTask extends AsyncTaskBase implements ScaffoldTaskI 
 	 * Which input file/search parameters tuple gets outputs from which engine search.
 	 */
 	@Override
-	public void addInput(final FileSearch fileSearch, final EngineSearchTask search) {
+	public void addInput(final FileSearch fileSearch, final FileProducingTask search) {
 		InputFileSearches searches = inputs.get(fileSearch);
 		if (searches == null) {
 			searches = new InputFileSearches();
@@ -106,7 +106,7 @@ final class ScaffoldSpectrumTask extends AsyncTaskBase implements ScaffoldTaskI 
 
 	/**
 	 * @return Work packet to be sent asynchronously. If it returns null, it means the work was done without a need
-	 *         to send a work packet.
+	 * to send a work packet.
 	 */
 	@Override
 	public WorkPacket createWorkPacket() {
@@ -131,10 +131,18 @@ final class ScaffoldSpectrumTask extends AsyncTaskBase implements ScaffoldTaskI 
 		final SearchResults searchResults = new SearchResults();
 		for (final Map.Entry<FileSearch, InputFileSearches> entry : inputs.entrySet()) {
 			final FileSearchResult result = new FileSearchResult(entry.getKey().getInputFile());
-			for (final EngineSearchTask search : entry.getValue().getSearches()) {
+			for (final FileProducingTask search : entry.getValue().getSearches()) {
+				final String code;
+				if (search instanceof EngineSearchTask) {
+					code = ((EngineSearchTask) search).getSearchEngine().getCode();
+				} else if (search instanceof SqtMs2CombinerTask) {
+					code = ((SqtMs2CombinerTask) search).getSearchEngine().getCode();
+				} else {
+					throw new MprcException(String.format("The task is not engine search task nor the comet sqt+ms2 combiner: %s", search.getClass().getName()));
+				}
 				result.addResult(
-						search.getSearchEngine().getCode(),
-						search.getOutputFile());
+						code,
+						search.getResultingFile());
 			}
 			searchResults.addResult(result);
 		}
