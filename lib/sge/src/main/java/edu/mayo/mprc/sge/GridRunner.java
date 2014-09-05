@@ -56,6 +56,7 @@ public final class GridRunner extends AbstractRunner {
 	private GridScriptFactory gridScriptFactory;
 	private FileTokenFactory fileTokenFactory;
 	private ServiceFactory serviceFactory;
+	private FailedJobManager failedJobManager;
 
 	private static AtomicLong uniqueId = new AtomicLong(System.currentTimeMillis());
 
@@ -135,9 +136,13 @@ public final class GridRunner extends AbstractRunner {
 		}
 	}
 
+	/**
+	 * Process failure, return more descriptive exception
+	 */
 	private DaemonException processFailedJob(final GridWorkPacket gridWorkPacket, final File packageFile, final Exception exception) {
+
 		FileUtilities.quietDelete(packageFile);
-		final DaemonException daemonException = new DaemonException("Failed passing work packet " + gridWorkPacket.toString() + " to grid engine", exception);
+		final DaemonException daemonException = new DaemonException("Failed passing work packet to grid engine:\n" + gridWorkPacket.toString(), exception);
 		LOGGER.error(MprcException.getDetailedMessage(daemonException), daemonException);
 		return daemonException;
 	}
@@ -378,6 +383,14 @@ public final class GridRunner extends AbstractRunner {
 		this.fileTokenFactory = fileTokenFactory;
 	}
 
+	public FailedJobManager getFailedJobManager() {
+		return failedJobManager;
+	}
+
+	public void setFailedJobManager(FailedJobManager failedJobManager) {
+		this.failedJobManager = failedJobManager;
+	}
+
 	public static final class Config extends RunnerConfig {
 		private String queueName;
 		private String memoryRequirement;
@@ -473,6 +486,12 @@ public final class GridRunner extends AbstractRunner {
 			runner.setWorkerFactoryConfig(config.getWorkerConfiguration());
 			runner.setFileTokenFactory(fileTokenFactory);
 			runner.setDaemonLoggerFactory(new DaemonLoggerFactory(new File(config.getLogOutputFolder())));
+			final DaemonConfig daemonConfig = config.getParentConfig().getParentConfig();
+			if (daemonConfig.isDumpErrors() && !Strings.isNullOrEmpty(daemonConfig.getDumpFolderPath())) {
+				runner.setFailedJobManager(new FailedJobManager(new File(daemonConfig.getDumpFolderPath())));
+			} else {
+				runner.setFailedJobManager(new FailedJobManager());
+			}
 
 			return runner;
 		}
