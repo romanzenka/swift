@@ -191,8 +191,8 @@ function updateAllViews(data) {
         } //empty for detail graphs until generated
         dyViewsByCode[views[i].metricId] = i;
 
-        var columns = getSmartColumns(columnIndex("startTime", data));
-        views[i].dataView.setColumns(columns, views[i].metricId);
+        var columns = getSmartColumns(views[i].metricId, data);
+        views[i].dataView.setColumns(columns);
         views[i].dataView.setRows(filteredRows);
 
         // We can only do this if we have a single instrument, otherwise the error bars are meaningless
@@ -420,7 +420,7 @@ function drawGraphsByMetrics(data, renderDetailGraphs, viewMetadata) {
 
         var view = new google.visualization.DataView(data);
 
-        view.setColumns(getSmartColumns(columnIndex("startTime", data), metricId));
+        view.setColumns(getSmartColumns(metricId, data));
 
         if (renderDetailGraphs) {
             var viewId = "graph-" + metricId;
@@ -589,12 +589,14 @@ function getAnnotationCollection() {
 //
 // In case of the protein id columns, we do even more. We would set to null any value
 // that does not match the category of the sample
-function getSmartColumns(dataIdx, metricId) {
+// metricId - name of the metric to be used
+function getSmartColumns(metricId, data) {
+    var dataIdx = columnIndex("startTime", data);
     var cols = [ dataIdx ];
     var rawInsturmentNames = activeInstrumentFilters();
     for (j = 0; j < rawInsturmentNames.length; j++) {
-        var instrumentCol = columnIndex("instrument", dt)
-        var metricIndex = columnIndex(metId, dt);
+        var instrumentCol = columnIndex("instrument", data);
+        var metricIndex = columnIndex(metricId, data);
 
         cols.push({type: 'number', label: rawInsturmentNames[j],
             calc: (function (iterJ, metID, metricIndex, instrumentCol) {
