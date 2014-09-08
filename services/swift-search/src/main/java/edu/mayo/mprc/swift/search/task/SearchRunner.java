@@ -2,6 +2,7 @@ package edu.mayo.mprc.swift.search.task;
 
 import com.google.common.base.Preconditions;
 import edu.mayo.mprc.MprcException;
+import edu.mayo.mprc.comet.CometWorker;
 import edu.mayo.mprc.config.Lifecycle;
 import edu.mayo.mprc.config.ResourceConfig;
 import edu.mayo.mprc.daemon.DaemonConnection;
@@ -290,7 +291,7 @@ public final class SearchRunner implements Runnable, Lifecycle {
 			// While building these, the Scaffold search entry itself is initialized
 			// The IdpQonvert search is special as well, it is set up to process the results of the myrimatch search
 			if (isNormalEngine(engine) && isEngineEnabled(engine, inputFile, defaultSearchParameters)) {
-				final FileProducingTask search = addEngineSearchTask(engine, inputFile, conversion, searchParameters, publicSearchFiles);
+				final FileProducingTask search = addEngineSearchTask(engine, inputFile, conversion, searchParameters, publicSearchFiles, null);
 
 				scaffoldTask = addScaffoldAndQaTasks(scaffoldTask, inputFile, conversion, scaffoldDeployment, engine, search);
 				if (searchWithIdpQonvert() && myrimatch(engine)) {
@@ -316,7 +317,9 @@ public final class SearchRunner implements Runnable, Lifecycle {
 			if (comet == null) {
 				throw new MprcException("The Comet search engine must be available for Quality Control to function");
 			}
-			final FileProducingTask cometSearch = addEngineSearchTask(comet, inputFile, mzmlFile, getSemiParameters(searchParameters), publicSearchFiles);
+			// Force Comet to produce .pep.xml output for idpqonvert
+			final FileProducingTask cometSearch = addEngineSearchTask(comet, inputFile, mzmlFile, getSemiParameters(searchParameters), publicSearchFiles,
+					CometWorker.PEP_XML);
 			final IdpQonvertTask idpQonvertTask = addIdpQonvertTask(idpQonvert, cometSearch, false/* Do not publish the idpDB file, temp only*/);
 			idpQonvertTask.setEmbedSpectrumScanTimes(true);
 			idpQonvertTask.setMaxFDR(QUAMETER_FDR);
@@ -353,7 +356,8 @@ public final class SearchRunner implements Runnable, Lifecycle {
 
 	private FileProducingTask addEngineSearchTask(final SearchEngine engine, final FileSearch inputFile,
 	                                              final FileProducingTask convertedFile, final SearchEngineParameters searchParameters,
-	                                              final boolean publicSearchFiles) {
+	                                              final boolean publicSearchFiles,
+	                                              final String forceExtension) {
 
 		// Get the parameter string
 		final String param = parameterFiles.getParamString(engine, searchParameters);
@@ -386,9 +390,17 @@ public final class SearchRunner implements Runnable, Lifecycle {
 			converted = convertedFile;
 		}
 
-		final EngineSearchTask engineSearchTask = addEngineSearch(engine, param, inputFile.getInputFile(), outputFolder, converted, database, deploymentResult, publicSearchFiles);
+		final EngineSearchTask engineSearchTask = addEngineSearch(engine,
+				param,
+				inputFile.getInputFile(),
+				outputFolder,
+				converted,
+				database,
+				deploymentResult,
+				publicSearchFiles,
+				forceExtension);
 
-		if (cometSearch) {
+		if (cometSearch && forceExtension == null) {
 			FileProducingTask ms2Task = addRawConversionTask(inputFile, MSCONVERT_MS2, false);
 			final SqtMs2CombinerTask combinerTask = addTask(new SqtMs2CombinerTask(workflowEngine, engineSearchTask, ms2Task));
 			combinerTask.addDependency(engineSearchTask);
@@ -635,9 +647,9 @@ public final class SearchRunner implements Runnable, Lifecycle {
 		final File outputFile;
 		if (conversionSettings.isMzMlMode()) {
 			outputFile = getMzMlFileLocation(inputFile, msconvertTask);
-		} else if(conversionSettings.isMs2Mode()) {
+		} else if (conversionSettings.isMs2Mode()) {
 			outputFile = getMs2FileLocation(inputFile, msconvertTask);
-		} else if(conversionSettings.isMgfMode()) {
+		} else if (conversionSettings.isMgfMode()) {
 			outputFile = getMgfFileLocation(inputFile, msconvertTask);
 		} else {
 			throw new MprcException(String.format("Unsupported conversion settings %s", conversionSettings.getCommandLineSwitches()));
@@ -843,9 +855,13 @@ public final class SearchRunner implements Runnable, Lifecycle {
 	/**
 	 * Returns output file given search engine, search output folder and name of the input file.
 	 */
-	private File getSearchResultLocation(final SearchEngine engine, final File searchOutputFolder, final File file, final Task task) {
+	private File getSearchResultLocation(final SearchEngine engine,
+	                                     final File searchOutputFolder,
+	                                     final File file,
+	                                     final Task task,
+	                                     final String forceExtension) {
 		final String fileTitle = FileUtilities.stripExtension(file.getName());
-		final String newFileName = fileTitle + engine.getResultExtension();
+		final String newFileName = fileTitle + (forceExtension == null ? engine.getResultExtension() : forceExtension);
 		final File resultFile = new File(searchOutputFolder, newFileName);
 		// Make sure we never produce two identical result files.
 		// We suggest what the extension is, to prevent turning e.g. a.pep.xml into a.pep_2.xml instead of a_2.pep.xml
@@ -873,8 +889,19 @@ public final class SearchRunner implements Runnable, Lifecycle {
 	 * If these two things are identical for two entries, then the search can be performed just once.
 	 * <p/>
 	 * The search also knows about the conversion and db deployment so it can determine when it can run.
+	 *
+	 * @param forceExtension - extension to force (including the ".") - otherwise the default engine extension is used
+	 *                       if null
 	 */
-	private EngineSearchTask addEngineSearch(final SearchEngine engine, final String param, final File inputFile, final File searchOutputFolder, final FileProducingTask convertedFile, final Curation curation, final DatabaseDeploymentResult deploymentResult, final boolean publicSearchFiles) {
+	private EngineSearchTask addEngineSearch(final SearchEngine engine,
+	                                         final String param,
+	                                         final File inputFile,
+	                                         final File searchOutputFolder,
+	                                         final FileProducingTask convertedFile,
+	                                         final Curation curation,
+	                                         final DatabaseDeploymentResult deploymentResult,
+	                                         final boolean publicSearchFiles,
+	                                         final String forceExtension) {
 		final EngineSearchTask searchEngineTask = new EngineSearchTask(
 				workflowEngine,
 				engine,
@@ -888,7 +915,7 @@ public final class SearchRunner implements Runnable, Lifecycle {
 				engine.getSearchDaemon(),
 				fileTokenFactory,
 				isFromScratch());
-		final File outputFile = getSearchResultLocation(engine, searchOutputFolder, inputFile, searchEngineTask);
+		final File outputFile = getSearchResultLocation(engine, searchOutputFolder, inputFile, searchEngineTask, forceExtension);
 		searchEngineTask.setOutputFile(outputFile);
 
 		final EngineSearchTask search = addTask(searchEngineTask);

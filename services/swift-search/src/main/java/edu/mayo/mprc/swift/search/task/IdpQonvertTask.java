@@ -78,8 +78,6 @@ public final class IdpQonvertTask extends AsyncTaskBase {
 		EngineSearchTask engineSearchTask;
 		if (searchTask instanceof EngineSearchTask) {
 			engineSearchTask = (EngineSearchTask) searchTask;
-		} else if (searchTask instanceof SqtMs2CombinerTask) {
-			engineSearchTask = ((SqtMs2CombinerTask) searchTask).getCometTask();
 		} else {
 			setDescription("IdpQonvert conversion (failed input " + searchTask.getClass().getName());
 			throw new MprcException("IdpQonvert cannot process results of search task " + searchTask.getClass().getName());
