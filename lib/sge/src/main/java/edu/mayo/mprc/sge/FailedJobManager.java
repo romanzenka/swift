@@ -54,7 +54,7 @@ public final class FailedJobManager {
 	 * @param file File to store
 	 * @return Where did the file get stored, or null if we are not set to store files
 	 */
-	private File storeFile(final File file) {
+	public File storeFile(final File file) {
 		if (storeFiles) {
 			final UUID newFileName = UUID.randomUUID();
 

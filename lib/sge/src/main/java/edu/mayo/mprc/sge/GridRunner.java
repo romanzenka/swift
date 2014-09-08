@@ -19,6 +19,7 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
 import java.io.*;
+import java.text.MessageFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -140,9 +141,14 @@ public final class GridRunner extends AbstractRunner {
 	 * Process failure, return more descriptive exception
 	 */
 	private DaemonException processFailedJob(final GridWorkPacket gridWorkPacket, final File packageFile, final Exception exception) {
-
+		final DaemonException daemonException;
+		if(failedJobManager!=null) {
+			final File storedFile = failedJobManager.storeFile(packageFile);
+			daemonException = new DaemonException(MessageFormat.format("Failed passing work packet to grid engine:\n{0}\nUse {1} for the --sge parameter", gridWorkPacket.toString(), storedFile.getAbsolutePath()), exception);
+		} else {
+			daemonException = new DaemonException("Failed passing work packet to grid engine:\n" + gridWorkPacket.toString(), exception);
+		}
 		FileUtilities.quietDelete(packageFile);
-		final DaemonException daemonException = new DaemonException("Failed passing work packet to grid engine:\n" + gridWorkPacket.toString(), exception);
 		LOGGER.error(MprcException.getDetailedMessage(daemonException), daemonException);
 		return daemonException;
 	}
