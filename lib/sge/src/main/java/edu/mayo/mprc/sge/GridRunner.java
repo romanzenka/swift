@@ -142,8 +142,8 @@ public final class GridRunner extends AbstractRunner {
 	 */
 	private DaemonException processFailedJob(final GridWorkPacket gridWorkPacket, final File packageFile, final Exception exception) {
 		final DaemonException daemonException;
-		if(failedJobManager!=null) {
-			final File storedFile = failedJobManager.storeFile(packageFile);
+		final File storedFile = failedJobManager.storeFile(packageFile);
+		if(storedFile!=null) {
 			daemonException = new DaemonException(MessageFormat.format("Failed passing work packet to grid engine:\n{0}\nUse {1} for the --sge parameter", gridWorkPacket.toString(), storedFile.getAbsolutePath()), exception);
 		} else {
 			daemonException = new DaemonException("Failed passing work packet to grid engine:\n" + gridWorkPacket.toString(), exception);
