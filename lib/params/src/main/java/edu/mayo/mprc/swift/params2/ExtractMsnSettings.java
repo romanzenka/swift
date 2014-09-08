@@ -61,6 +61,14 @@ public class ExtractMsnSettings extends PersistableBase {
 		return getCommandLineSwitches().contains(MZML_MODE);
 	}
 
+	public boolean isMs2Mode() {
+		return getCommandLineSwitches().contains(MS2_MODE);
+	}
+
+	public boolean isMgfMode() {
+		return getCommandLineSwitches().isEmpty();
+	}
+
 	@Override
 	public boolean equals(final Object o) {
 		if (this == o) {

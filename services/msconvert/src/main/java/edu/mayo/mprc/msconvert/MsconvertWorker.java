@@ -121,6 +121,8 @@ public final class MsconvertWorker extends WorkerBase {
 			// command.add("--zlib");
 		} else if ("mz5".equals(extension)) {
 			command.add("--mz5");
+		} else if ("ms2".equals(extension)) {
+			command.add("--ms2");
 		} else {
 			throw new MprcException("Unsupported extension: " + extension);
 		}

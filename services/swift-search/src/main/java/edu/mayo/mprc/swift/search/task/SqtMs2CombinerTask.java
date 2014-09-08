@@ -6,6 +6,7 @@ import edu.mayo.mprc.swift.db.SearchEngine;
 import edu.mayo.mprc.utilities.FileUtilities;
 import edu.mayo.mprc.workflow.engine.TaskBase;
 import edu.mayo.mprc.workflow.engine.WorkflowEngine;
+import edu.mayo.mprc.workflow.persistence.TaskState;
 
 import java.io.File;
 
@@ -56,7 +57,12 @@ public final class SqtMs2CombinerTask extends TaskBase implements FileProducingT
 			finalMs2File = null;
 		}
 
-		FileUtilities.linkOrCopy(msconvertTask.getResultingFile(), finalMs2File, true, false);
+		try {
+			FileUtilities.linkOrCopy(msconvertTask.getResultingFile(), finalMs2File, true, false);
+			setState(TaskState.COMPLETED_SUCCESFULLY);
+		} catch (Exception e) {
+			setError(e);
+		}
 	}
 
 	@Override

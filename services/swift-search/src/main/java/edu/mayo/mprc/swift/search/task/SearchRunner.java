@@ -391,6 +391,8 @@ public final class SearchRunner implements Runnable, Lifecycle {
 		if (cometSearch) {
 			FileProducingTask ms2Task = addRawConversionTask(inputFile, MSCONVERT_MS2, false);
 			final SqtMs2CombinerTask combinerTask = addTask(new SqtMs2CombinerTask(workflowEngine, engineSearchTask, ms2Task));
+			combinerTask.addDependency(engineSearchTask);
+			combinerTask.addDependency(ms2Task);
 			return combinerTask;
 		}
 
@@ -633,8 +635,12 @@ public final class SearchRunner implements Runnable, Lifecycle {
 		final File outputFile;
 		if (conversionSettings.isMzMlMode()) {
 			outputFile = getMzMlFileLocation(inputFile, msconvertTask);
-		} else {
+		} else if(conversionSettings.isMs2Mode()) {
+			outputFile = getMs2FileLocation(inputFile, msconvertTask);
+		} else if(conversionSettings.isMgfMode()) {
 			outputFile = getMgfFileLocation(inputFile, msconvertTask);
+		} else {
+			throw new MprcException(String.format("Unsupported conversion settings %s", conversionSettings.getCommandLineSwitches()));
 		}
 		return outputFile;
 	}
@@ -773,6 +779,15 @@ public final class SearchRunner implements Runnable, Lifecycle {
 	private File getMzMlFileLocation(final FileSearch inputFile, final FileProducingTask task) {
 		return getOutputFileLocation(inputFile, "mzml", ".mzML", task);
 	}
+
+	/**
+	 * @param inputFile The input file entry from the search definition.
+	 * @return Where does the output file go.
+	 */
+	private File getMs2FileLocation(final FileSearch inputFile, final FileProducingTask task) {
+		return getOutputFileLocation(inputFile, "ms2", ".ms2", task);
+	}
+
 
 	/**
 	 * @param inputFile The input file entry from the search definition.
