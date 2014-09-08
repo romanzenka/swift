@@ -70,6 +70,10 @@ public final class SqtMs2CombinerTask extends TaskBase implements FileProducingT
 		return cometTask.getResultingFile();
 	}
 
+	public EngineSearchTask getCometTask() {
+		return cometTask;
+	}
+
 	public SearchEngine getSearchEngine() {
 		return cometTask.getSearchEngine();
 	}
