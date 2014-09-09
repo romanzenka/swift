@@ -6,33 +6,41 @@
 <%@ page import="java.io.StringWriter" %>
 <!DOCTYPE html>
 <% final ResourceConfig quameterUiConfig = MainFactoryContext.getSwiftEnvironment().getSingletonConfig(QuameterUi.Config.class); %>
-<html lang="en">
+<html lang="en"><%
+    final QuameterUi quameterUi;
+    if (quameterUiConfig != null) {
+        quameterUi = (QuameterUi) MainFactoryContext.getSwiftEnvironment().createResource(quameterUiConfig);
+    } else {
+        quameterUi = null;
+    }
+%>
 <head>
-<title>QuaMeter Results | <%=SwiftWebContext.getWebUi().getTitle()%>
-</title>
+    <title>QuaMeter Results | <%=SwiftWebContext.getWebUi().getTitle()%>
+    </title>
 
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<link href="/common/bootstrap/css/bootstrap.min.css" rel="stylesheet" media="screen">
-<link href="css/quameter.css" rel="stylesheet" media="screen">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="/common/bootstrap/css/bootstrap.min.css" rel="stylesheet" media="screen">
+    <link href="css/quameter.css" rel="stylesheet" media="screen">
 
-<!-- HTML5 shim, for IE6-8 support of HTML5 elements -->
-<!--[if lt IE 9]>
+    <!-- HTML5 shim, for IE6-8 support of HTML5 elements -->
+    <!--[if lt IE 9]>
     <script src="/common/bootstrap/js/html5shiv.js"></script>
-<![endif]-->
+    <![endif]-->
 
-<script type="text/javascript" src="/common/bootstrap/js/jquery_1.9.0.min.js"></script>
-<!--Load the AJAX API-->
-<script type="text/javascript" src="https://www.google.com/jsapi"></script>
-<script>
-    // Load the Visualization API and the core package.
-    google.load('visualization', '1.0', {'packages': ['corechart']});
-</script>
+    <script type="text/javascript" src="/common/bootstrap/js/jquery_1.9.0.min.js"></script>
+    <!--Load the AJAX API-->
+    <script type="text/javascript" src="https://www.google.com/jsapi"></script>
+    <script>
+        // Load the Visualization API and the core package.
+        google.load('visualization', '1.0', {'packages': ['corechart']});
+    </script>
 </head>
 <body>
 <div class="container-fluid">
     <div class="navbar navbar-fixed-top navbar-inverse">
         <div class="navbar-inner">
             <a href="#" class="brand">QuaMeter Results</a>
+
             <div class="btn-toolbar pull-left">
                 <div class="btn-group" id="category-buttons">
                 </div>
@@ -59,17 +67,19 @@
         </div>
     </div>
 
-    <% if (quameterUiConfig == null) { %>
+    <% if (quameterUi == null) { %>
     <div class="alert">
         <p><strong>Warning</strong> The QuaMeter module is not configured.</p>
+
         <p>You need to add the QuaMeterUi resource to the
             <code><%= MainFactoryContext.getSwiftEnvironment().getDaemonConfig().getName() %>
             </code> daemon.</p>
     </div>
     <% } else { %>
-        </br><a href="/quameter/unhide.jsp" class="pull-right">Unhide</a>
-        <div id="detailedGraphs" style="margin-top: 40px; display: none;"></div>
-        <div id="simpleGraphs" style="margin-top: 40px"></div>
+    </br><a href="/quameter/unhide.jsp" class="pull-right">Unhide</a>
+
+    <div id="detailedGraphs" style="margin-top: 40px; display: none;"></div>
+    <div id="simpleGraphs" style="margin-top: 40px"></div>
 
     <% } %>
 </div>
@@ -89,13 +99,24 @@
 <!-- Graph Dependancies -->
 <script type="text/javascript" src="js/tmp.js"></script>
 
+<script type="text/javascript">
+    var metrics = <%
+        if(quameterUi!=null) {
+            final StringWriter writer = new StringWriter(10000);
+            quameterUi.writeMetricsJson(writer);
+            out.print(writer.toString());
+        } else {
+            out.print("null");
+        }
+    %>;
+</script>
+
 <script type="text/javascript" src="js/dygraph-combined.js"></script>
 <script type="text/javascript" src="js/quameter-definitions.js"></script>
 <script type="text/javascript" src="js/quameter.js"></script>
 <script type="text/javascript">
     var graphDataSrvr = <%
-    if(quameterUiConfig!=null) {
-        final QuameterUi quameterUi = (QuameterUi) MainFactoryContext.getSwiftEnvironment().createResource(quameterUiConfig);
+    if(quameterUi!=null) {
         quameterUi.begin();
         try {
             final StringWriter writer = new StringWriter(10000);
@@ -107,10 +128,10 @@
             throw new MprcException(e);
         }
     } else { %>
-    null
+            null
     <% } %>
     // Set a callback to run when the Google Visualization API is loaded.
-    google.setOnLoadCallback( initSimpleCharts(graphDataSrvr) );
+    google.setOnLoadCallback(initSimpleCharts(graphDataSrvr));
     $("body").tooltip({ selector: '[data-toggle="tooltip"]' });
 
 </script>
