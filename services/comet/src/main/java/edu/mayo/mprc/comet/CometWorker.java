@@ -11,6 +11,7 @@ import edu.mayo.mprc.daemon.worker.WorkerBase;
 import edu.mayo.mprc.daemon.worker.WorkerFactoryBase;
 import edu.mayo.mprc.searchengine.EngineFactory;
 import edu.mayo.mprc.searchengine.EngineMetadata;
+import edu.mayo.mprc.sqt.CleanupSqt;
 import edu.mayo.mprc.utilities.FileUtilities;
 import edu.mayo.mprc.utilities.ProcessCaller;
 import edu.mayo.mprc.utilities.progress.UserProgressReporter;
@@ -70,7 +71,16 @@ public final class CometWorker extends WorkerBase {
 			throw new MprcException("Comet execution failed:\n" + processCaller.getFailedCallDescription());
 		}
 
-		publish(outputFile, finalOutputFile);
+		if (finalOutputFile.getName().endsWith(SQT)) {
+			// We need to clean the sqt file up
+			File cleanedSqt = new File(outputFile.getParentFile(), outputFile.getName() + ".cleanup");
+			CleanupSqt cleanupSqt = new CleanupSqt(outputFile, cleanedSqt, packet.getDatabaseFile());
+			cleanupSqt.run();
+			FileUtilities.quietDelete(outputFile);
+			publish(cleanedSqt, finalOutputFile);
+		} else {
+			publish(outputFile, finalOutputFile);
+		}
 
 		FileUtilities.quietDelete(parameterFile);
 

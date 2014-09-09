@@ -9,6 +9,7 @@ import edu.mayo.mprc.fasta.FASTAInputStream;
 import edu.mayo.mprc.utilities.FileUtilities;
 import org.ahocorasick.trie.Emit;
 import org.ahocorasick.trie.Trie;
+import org.apache.log4j.Logger;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -27,6 +28,8 @@ import java.util.regex.Pattern;
  * @author Roman Zenka
  */
 public final class CleanupSqt {
+	private static final Logger LOGGER = Logger.getLogger(CleanupSqt.class);
+
 	// .sqt format description (from https://noble.gs.washington.edu/proj/crux/sqt-format.html)
 	//
 	// S	Spectrum
@@ -55,6 +58,7 @@ public final class CleanupSqt {
 	}
 
 	public void run() {
+		LOGGER.info(MessageFormat.format("Cleaning Comet .sqt file {0} -> {1} using fasta database {2}", inputSqt.getAbsolutePath(), outputSqt.getAbsolutePath(), fastaFile.getAbsolutePath()));
 		final BufferedReader reader = FileUtilities.getReader(inputSqt);
 		try {
 			// Collect all unique peptide sequences see in the input SQT file
@@ -132,7 +136,7 @@ public final class CleanupSqt {
 					// This code ignores the old protein ID lines. This is how the SQT file get fixed.
 
 					final Set<String> proteinNames = mappedPeptides.get(baseSequence);
-					if(proteinNames == null)  {
+					if (proteinNames == null) {
 						throw new MprcException(MessageFormat.format("The peptide sequence [{0}] is nowhere to be seen in fasta file [{1}]", baseSequence, fastaFile.getAbsolutePath()));
 					}
 
@@ -144,6 +148,7 @@ public final class CleanupSqt {
 
 			FileUtilities.closeQuietly(sqtIn);
 			FileUtilities.closeQuietly(sqtOut);
+			LOGGER.info(MessageFormat.format("Cleaned Comet .sqt file {0} -> {1} using fasta database {2}", inputSqt.getAbsolutePath(), outputSqt.getAbsolutePath(), fastaFile.getAbsolutePath()));
 		} catch (final Exception e) {
 			throw new MprcException("Error reading the input SQT file from " + inputSqt.getAbsolutePath(), e);
 		} finally {
