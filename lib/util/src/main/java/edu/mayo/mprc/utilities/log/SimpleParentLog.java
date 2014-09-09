@@ -1,14 +1,13 @@
 package edu.mayo.mprc.utilities.log;
 
-import org.apache.log4j.Appender;
-import org.apache.log4j.Layout;
+import edu.mayo.mprc.MprcException;
+import edu.mayo.mprc.utilities.FileUtilities;
 import org.apache.log4j.Logger;
-import org.apache.log4j.spi.ErrorHandler;
-import org.apache.log4j.spi.Filter;
-import org.apache.log4j.spi.LoggingEvent;
 
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.UUID;
-import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * A simple implementation of {@link ParentLog} that logs name of each logger as they get created,
@@ -21,6 +20,8 @@ public final class SimpleParentLog implements ChildLog {
 	private static final long serialVersionUID = -291080842199803090L;
 
 	private final UUID id = UUID.randomUUID();
+	private File file;
+	private FileWriter writer;
 
 	public SimpleParentLog() {
 
@@ -44,11 +45,19 @@ public final class SimpleParentLog implements ChildLog {
 	@Override
 	public void startLogging() {
 		LOGGER.debug(id.toString() + " started logging");
+		try {
+			file = File.createTempFile("test", ".log");
+			writer = new FileWriter(file, true);
+		} catch (IOException e) {
+			throw new MprcException(e);
+		}
 	}
 
 	@Override
 	public void stopLogging() {
 		LOGGER.debug(id.toString() + " stopped logging");
+		FileUtilities.closeQuietly(writer);
+		FileUtilities.cleanupTempFile(file);
 	}
 
 	@Override
@@ -59,6 +68,11 @@ public final class SimpleParentLog implements ChildLog {
 	@Override
 	public Logger getErrorLogger() {
 		return LOGGER;
+	}
+
+	@Override
+	public void close() {
+		// Do nothing
 	}
 
 }

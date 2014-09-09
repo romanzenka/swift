@@ -8,7 +8,6 @@ import edu.mayo.mprc.utilities.log.ChildLog;
 import edu.mayo.mprc.utilities.log.ParentLog;
 import edu.mayo.mprc.utilities.progress.UserProgressReporter;
 import org.apache.log4j.Appender;
-import org.apache.log4j.ConsoleAppender;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
 import org.mockito.ArgumentCaptor;
@@ -91,14 +90,23 @@ public final class TestDaemonLoggerFactory {
 
 	@Test
 	public void shouldProvideLogger() {
-		childLog.getOutputLogger().info("--- direct through logger ---");
-		childLog.getErrorLogger().error("--- error direct through logger ---");
+		final Logger outputLogger = childLog.getOutputLogger();
+		final Logger errorLogger = childLog.getErrorLogger();
 
-		final String out = getOutputLogContents();
-		Assert.assertTrue(out.contains("--- direct through logger ---"));
+		try {
 
-		final String err = getErrorLogContents();
-		Assert.assertTrue(err.contains("--- error direct through logger ---"));
+			outputLogger.info("--- direct through logger ---");
+			errorLogger.error("--- error direct through logger ---");
+
+			final String out = getOutputLogContents();
+			Assert.assertTrue(out.contains("--- direct through logger ---"));
+
+			final String err = getErrorLogContents();
+			Assert.assertTrue(err.contains("--- error direct through logger ---"));
+
+		} finally {
+			childLog.close();
+		}
 	}
 
 	private String getErrorLogContents() {
