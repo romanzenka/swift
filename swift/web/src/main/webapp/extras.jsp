@@ -99,7 +99,6 @@
 
     <p>
         <a class="btn" href="/amino-acids">Defined Amino Acids</a>
-        <a class="btn" href="/amino-acids">Defined Amino Acids</a>
         <a class="btn" href="/mods">Defined Modifications</a>
     </p>
 
