@@ -456,7 +456,8 @@ public class TestSearchRunner {
 				new Tolerance(1, MassUnit.Da), Instrument.ORBITRAP,
 				new ExtractMsnSettings("-M100", ExtractMsnSettings.EXTRACT_MSN),
 				scaffoldSettings,
-				enabledEngines
+				enabledEngines,
+				""
 		);
 	}
 

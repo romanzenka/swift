@@ -123,6 +123,14 @@
             </tbody>
 
             <tbody>
+            <tr id="titleSuffixRow" class="shrink">
+                <td id="titleSuffixLabel" colspan="2" class="params-row-left"></td>
+                <td id="titleSuffixEntry" colspan="3"></td>
+                <td id="titleSuffixValidation" class="rightcol params-row-right" colspan="2"></td>
+            </tr>
+            </tbody>
+
+            <tbody>
 
             <tr>
                 <td class="params-border-bottom" colspan="7"></td>

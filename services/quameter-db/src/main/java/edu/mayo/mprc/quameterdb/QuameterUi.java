@@ -138,7 +138,7 @@ public final class QuameterUi implements Dao, UiConfigurationProvider, Lifecycle
 		final List<QuameterResult> quameterResults = quameterDao.listVisibleResults();
 
 		final JsonWriter w = new JsonWriter(writer);
-		w.setIndent("   ");
+		w.setIndent("    ");
 
 		try {
 			w.beginObject();

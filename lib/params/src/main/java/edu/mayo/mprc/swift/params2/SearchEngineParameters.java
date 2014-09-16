@@ -88,7 +88,13 @@ public class SearchEngineParameters extends PersistableBase {
 	 */
 	private EnabledEngines enabledEngines;
 
+	/**
+	 * Add this suffix to the search title if user does not specify it (when a file gets selected)
+	 */
+	private String titleSuffix;
+
 	public SearchEngineParameters() {
+		titleSuffix = "";
 	}
 
 	public SearchEngineParameters(final Curation database, final Protease protease,
@@ -96,7 +102,9 @@ public class SearchEngineParameters extends PersistableBase {
 	                              final ModSet fixed, final ModSet variable,
 	                              final Tolerance peptideTolerance, final Tolerance fragmentTolerance,
 	                              final Instrument instrument, final ExtractMsnSettings extractMsnSettings,
-	                              final ScaffoldSettings scaffoldSettings, final EnabledEngines enabledEngines) {
+	                              final ScaffoldSettings scaffoldSettings, final EnabledEngines enabledEngines,
+	                              final String titleSuffix) {
+		this();
 		this.database = database;
 		this.protease = protease;
 		this.minTerminiCleavages = minTerminiCleavages;
@@ -109,6 +117,7 @@ public class SearchEngineParameters extends PersistableBase {
 		this.extractMsnSettings = extractMsnSettings;
 		this.scaffoldSettings = scaffoldSettings;
 		this.enabledEngines = enabledEngines;
+		this.titleSuffix = titleSuffix;
 	}
 
 	public Curation getDatabase() {
@@ -246,6 +255,14 @@ public class SearchEngineParameters extends PersistableBase {
 		this.enabledEngines = enabledEngines;
 	}
 
+	public String getTitleSuffix() {
+		return titleSuffix;
+	}
+
+	public void setTitleSuffix(String titleSuffix) {
+		this.titleSuffix = titleSuffix;
+	}
+
 	@Override
 	public boolean equals(final Object obj) {
 		if (this == obj) {
@@ -297,6 +314,9 @@ public class SearchEngineParameters extends PersistableBase {
 		if (!Objects.equal(getEnabledEngines(), other.getEnabledEngines())) {
 			return false;
 		}
+		if (!Objects.equal(getTitleSuffix(), other.getTitleSuffix())) {
+			return false;
+		}
 
 		return true;
 	}
@@ -315,6 +335,7 @@ public class SearchEngineParameters extends PersistableBase {
 		result = 31 * result + getExtractMsnSettings().hashCode();
 		result = 31 * result + getScaffoldSettings().hashCode();
 		result = 31 * result + getEnabledEngines().hashCode();
+		result = 31 * result + getTitleSuffix().hashCode();
 		return result;
 	}
 
@@ -333,6 +354,7 @@ public class SearchEngineParameters extends PersistableBase {
 				.add(DaoBase.associationEq("extractMsnSettings", getExtractMsnSettings()))
 				.add(DaoBase.associationEq("scaffoldSettings", getScaffoldSettings()))
 				.add(DaoBase.associationEq("enabledEngines", getEnabledEngines()))
+				.add(Restrictions.eq("titleSuffix", getTitleSuffix()))
 				;
 	}
 
@@ -356,7 +378,8 @@ public class SearchEngineParameters extends PersistableBase {
 				getInstrument().copy(),
 				getExtractMsnSettings().copy(),
 				getScaffoldSettings().copy(),
-				getEnabledEngines().copy());
+				getEnabledEngines().copy(),
+				getTitleSuffix());
 	}
 
 	public void setValue(final ParamName name, final Object o) {
@@ -397,6 +420,9 @@ public class SearchEngineParameters extends PersistableBase {
 			case EnabledEngines:
 				setEnabledEngines((EnabledEngines) o);
 				break;
+			case TitleSuffix:
+				setTitleSuffix((String) o);
+				break;
 			default:
 				break;
 		}
@@ -428,6 +454,8 @@ public class SearchEngineParameters extends PersistableBase {
 				return getScaffoldSettings();
 			case EnabledEngines:
 				return getEnabledEngines();
+			case TitleSuffix:
+				return getTitleSuffix();
 			default:
 				throw new MprcException("Unknown parameter name " + paramName.getName());
 		}

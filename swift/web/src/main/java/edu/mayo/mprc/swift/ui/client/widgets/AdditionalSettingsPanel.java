@@ -2,10 +2,8 @@ package edu.mayo.mprc.swift.ui.client.widgets;
 
 import com.google.gwt.user.client.ui.CheckBox;
 import com.google.gwt.user.client.ui.HorizontalPanel;
-import edu.mayo.mprc.swift.ui.client.rpc.ClientSearchEngine;
+import com.google.gwt.user.client.ui.Label;
 import edu.mayo.mprc.swift.ui.client.rpc.ClientSwiftSearchDefinition;
-
-import java.util.List;
 
 public final class AdditionalSettingsPanel extends HorizontalPanel {
 	private final CheckBox publicMgfs;
@@ -37,26 +35,9 @@ public final class AdditionalSettingsPanel extends HorizontalPanel {
 		lowPriority = new CheckBox("Low priority");
 		lowPriority.setValue(false);
 		add(lowPriority);
-	}
 
-	/**
-	 * Quality control switch is only displayed if we have myrimatch and idpqonvert.
-	 *
-	 * @param engines List of all present engines
-	 * @return True if we can run QC
-	 */
-	static boolean isQualityControlAvailable(List<ClientSearchEngine> engines) {
-		boolean idpQonvert = false;
-		boolean myriMatch = false;
-		for (final ClientSearchEngine engine : engines) {
-			final String code = engine.getEngineConfig().getCode();
-			if ("IDPQONVERT".equals(code)) {
-				idpQonvert = true;
-			} else if ("MYRIMATCH".equals(code)) {
-				myriMatch = true;
-			}
-		}
-		return myriMatch && idpQonvert;
+		final Label searchTitleLabel = new Label("Title suffix:");
+		add(searchTitleLabel);
 	}
 
 	/**

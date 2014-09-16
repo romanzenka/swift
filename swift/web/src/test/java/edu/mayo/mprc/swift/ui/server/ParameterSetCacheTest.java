@@ -195,7 +195,8 @@ public final class ParameterSetCacheTest {
 				Instrument.ORBITRAP,
 				ExtractMsnSettings.getDefaultExtractMsnSettings(),
 				ScaffoldSettings.defaultScaffoldSettings(),
-				new EnabledEngines()
+				new EnabledEngines(),
+				""
 		);
 
 

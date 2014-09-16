@@ -74,6 +74,7 @@ public abstract class ParamsInfo {
 			case ExtractMsnSettings:
 			case ScaffoldSettings:
 			case EnabledEngines:
+			case TitleSuffix:
 				return null;
 			default:
 				throw new MprcException("Unsupported parameter " + param.toString());

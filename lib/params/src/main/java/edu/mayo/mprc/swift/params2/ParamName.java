@@ -18,7 +18,8 @@ public enum ParamName {
 	Instrument("instrument", "Instrument", "Instrument"),
 	ExtractMsnSettings("extractMsnSettings", "Extract_msn Settings", "How to obtain the MS2 spectrum list to send to the engine"),
 	ScaffoldSettings("scaffoldSettings", "Scaffold Settings", "How to filter the output of the search engine"),
-	EnabledEngines("enabledEngines", "Enabled Engines", "Which engines we should use for the search");
+	EnabledEngines("enabledEngines", "Enabled Engines", "Which engines we should use for the search"),
+	TitleSuffix("titleSuffix", "Title Suffix", "Add this suffix to automatically created search title");
 
 	private final String id;
 	private final String name;

@@ -42,5 +42,7 @@
         <many-to-one name="enabledEngines" class="EnabledEngines" column="enabled_engines" lazy="false"
             foreign-key="search_parameter_ibfk_9"/>
 
+        <property name="titleSuffix" column="title_suffix"/>
+
     </class>
 </hibernate-mapping>

@@ -457,6 +457,8 @@ public final class ClientProxyGenerator {
 			return convertTo((EnabledEngines) val);
 		} else if (val instanceof Integer) {
 			return new ClientInteger((Integer) val);
+		} else if (val instanceof String) {
+			return new ClientString((String) val);
 		} else {
 			throw new MprcException("Can't convert " + val.getClass().getName() + " to client proxy.");
 		}
@@ -465,6 +467,8 @@ public final class ClientProxyGenerator {
 	public Object convert(final ClientValue val, final Object allowedValues) {
 		if (val instanceof ClientInteger) {
 			return ((ClientInteger) val).getValue();
+		} else if (val instanceof ClientString) {
+			return ((ClientString) val).getValue();
 		} else if (val instanceof ClientTolerance) {
 			return convertFrom((ClientTolerance) val);
 		} else if (val instanceof ClientSequenceDatabase) {

@@ -549,7 +549,7 @@ public final class SwiftApp implements EntryPoint, HidesPageContentsWhileLoading
 			} else {
 				longestPrefix = longestPrefix.replaceAll("_[^_]*$", "");
 			}
-			setTitleText(longestPrefix);
+			setTitleText(longestPrefix+paramsEditor.getTitleSuffix());
 		}
 		updateOutputLocation();
 	}
@@ -565,6 +565,7 @@ public final class SwiftApp implements EntryPoint, HidesPageContentsWhileLoading
 				@Override
 				public void onValueChange(final ValueChangeEvent<ClientValue> event) {
 					runButton.setEnabled(paramsEditor.isValid());
+					updateOutputLocation();
 				}
 			});
 		}

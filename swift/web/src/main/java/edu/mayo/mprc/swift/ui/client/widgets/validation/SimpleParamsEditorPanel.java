@@ -51,6 +51,7 @@ public final class SimpleParamsEditorPanel implements SourcesChangeEvents {
 	public static final String INSTRUMENT = "instrument";
 	public static final String SCAFFOLD_SETTINGS = "scaffoldSettings";
 	public static final String ENABLED_ENGINES = "enabledEngines";
+	public static final String TITLE_SUFFIX = "titleSuffix";
 
 	private ChangeListenerCollection listeners = new ChangeListenerCollection();
 
@@ -66,6 +67,7 @@ public final class SimpleParamsEditorPanel implements SourcesChangeEvents {
 	private ModificationsLabel fixedMods;
 	private ModificationsLabel varMods;
 	private EnabledEnginesEditor enabledEngines;
+	private TitleSuffixTextBox titleSuffix;
 
 	//Current user
 	private ClientUser user;
@@ -372,6 +374,22 @@ public final class SimpleParamsEditorPanel implements SourcesChangeEvents {
 			editorElements.add(row.append(ENABLED_ENGINES, "enginesValidation", vp, editorVisible));
 		}
 
+		// title suffix ////////////////////////////////////////////
+		{
+			final ExistingDOMPanel row = new ExistingDOMPanel("titleSuffixRow");
+
+			final Label label = new Label("Title Suffix:");
+			editorElements.add(row.append(TITLE_SUFFIX, "titleSuffixLabel", label, editorVisible));
+			label.setHorizontalAlignment(HasHorizontalAlignment.ALIGN_RIGHT);
+			label.setStyleName(PARAMS_LABEL);
+			final ValidationPanel vp = new ValidationPanel(10);
+			titleSuffix = new TitleSuffixTextBox(TITLE_SUFFIX);
+			titleSuffix.setVisibleLength(100);
+			validationController.add(titleSuffix, TITLE_SUFFIX, vp);
+			editorElements.add(row.append(TITLE_SUFFIX, "titleSuffixEntry", titleSuffix.asWidget(), editorVisible));
+			editorElements.add(row.append(TITLE_SUFFIX, "titleSuffixValidation", vp, editorVisible));
+		}
+
 		validationController.setEnabled(false);
 		selectionController.setParamSetList(pageData.getParamSetList());
 		if (pageData.loadedSearch() == null) {
@@ -488,6 +506,10 @@ public final class SimpleParamsEditorPanel implements SourcesChangeEvents {
 	@Override
 	public void removeChangeListener(final ChangeListener changeListener) {
 		listeners.remove(changeListener);
+	}
+
+	public String getTitleSuffix() {
+		return ((ClientString) titleSuffix.getValue()).getValue();
 	}
 
 	/**
