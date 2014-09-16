@@ -284,9 +284,8 @@ public final class SimpleRunner extends AbstractRunner {
 		}
 
 		private ChildLog startLogging(final RunnerProgressReporter progressReporter) {
-			ChildLog childLog = null;
-			boolean logging = false;
 			try {
+				final ChildLog childLog;
 				if (logPacket()) {
 					// Root logger - we have to start from scratch as we currently do not pass the parent log over the wire
 					final ParentLog log = getDaemonLoggerFactory().createLog(request.getWorkPacket().getTaskId(), progressReporter);
