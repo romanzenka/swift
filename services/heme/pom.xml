@@ -51,6 +51,12 @@
             <groupId>org.mockito</groupId>
             <artifactId>mockito-all</artifactId>
         </dependency>
+        <dependency>
+            <groupId>edu.mayo.mprc</groupId>
+            <artifactId>workspace</artifactId>
+            <version>3.8-SNAPSHOT</version>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
 </project>
