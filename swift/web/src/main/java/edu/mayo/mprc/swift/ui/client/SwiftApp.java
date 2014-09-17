@@ -235,6 +235,14 @@ public final class SwiftApp implements EntryPoint, HidesPageContentsWhileLoading
 	private void initParamsEditor(final InitialPageData pageData) {
 		ParamsEditorApp.onModuleLoad(pageData);
 		paramsEditor = ParamsEditorApp.getPanel();
+		paramsEditor.getValidationController().addValueChangeHandler(new ValueChangeHandler<ClientValue>() {
+			@Override
+			public void onValueChange(final ValueChangeEvent<ClientValue> event) {
+				runButton.setEnabled(paramsEditor.isValid());
+				updateTitleFromFileTable();
+				updateOutputLocation();
+			}
+		});
 	}
 
 	private void initEditorToggle() {
@@ -549,7 +557,7 @@ public final class SwiftApp implements EntryPoint, HidesPageContentsWhileLoading
 			} else {
 				longestPrefix = longestPrefix.replaceAll("_[^_]*$", "");
 			}
-			setTitleText(longestPrefix+paramsEditor.getTitleSuffix());
+			setTitleText(longestPrefix + paramsEditor.getTitleSuffix());
 		}
 		updateOutputLocation();
 	}
@@ -559,17 +567,6 @@ public final class SwiftApp implements EntryPoint, HidesPageContentsWhileLoading
 		runButton = new PushButton();
 		RootPanel.get("runButton").add(runButton);
 		runButton.setEnabled(false);
-		// Make params editor disable the runWithCallback button when it is invalid
-		if (paramsEditor != null) {
-			paramsEditor.getValidationController().addValueChangeHandler(new ValueChangeHandler<ClientValue>() {
-				@Override
-				public void onValueChange(final ValueChangeEvent<ClientValue> event) {
-					runButton.setEnabled(paramsEditor.isValid());
-					updateOutputLocation();
-				}
-			});
-		}
-
 		runButton.addClickHandler(new RunClickHandler());
 	}
 
