@@ -22,39 +22,42 @@ public final class Configuration implements EntryPoint, Context {
 	public void onModuleLoad() {
 		progressPanel = RootPanel.get("progress");
 
-		displayProgressMessage("Loading...");
-		ConfigurationService.App.getInstance().loadConfiguration(new AsyncCallback<ApplicationModel>() {
-			@Override
-			public void onFailure(final Throwable throwable) {
-				displayErrorMessage(throwable.getMessage());
-			}
+		if (progressPanel != null) {
 
-			@Override
-			public void onSuccess(final ApplicationModel applicationModel) {
-				displayProgressMessage(null);
-				model = applicationModel;
-				configWrapper = new ConfigWrapper(Configuration.this);
-				configurationPanel.add(configWrapper);
-				RootPanel.get("saveButtonPlaceholder").add(saveConfigurationButton);
-			}
+			displayProgressMessage("Loading...");
+			ConfigurationService.App.getInstance().loadConfiguration(new AsyncCallback<ApplicationModel>() {
+				@Override
+				public void onFailure(final Throwable throwable) {
+					displayErrorMessage(throwable.getMessage());
+				}
 
-		});
-		configurationPanel = RootPanel.get("main");
-		errorPanel = RootPanel.get("error");
-		errorPanel.add(multiErrorPanel = new VerticalPanel());
+				@Override
+				public void onSuccess(final ApplicationModel applicationModel) {
+					displayProgressMessage(null);
+					model = applicationModel;
+					configWrapper = new ConfigWrapper(Configuration.this);
+					configurationPanel.add(configWrapper);
+					RootPanel.get("saveButtonPlaceholder").add(saveConfigurationButton);
+				}
 
-		saveConfigurationButton = new Button("Save configuration");
-		saveConfigurationButton.addStyleName("btn");
-		saveConfigurationButton.addStyleName("btn-primary");
-		saveConfigurationButton.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(final ClickEvent event) {
-				clearErrorMessages();
-				displayProgressMessage("Saving...");
-				save();
-			}
-		});
+			});
+			configurationPanel = RootPanel.get("main");
+			errorPanel = RootPanel.get("error");
+			errorPanel.add(multiErrorPanel = new VerticalPanel());
 
+			saveConfigurationButton = new Button("Save configuration");
+			saveConfigurationButton.addStyleName("btn");
+			saveConfigurationButton.addStyleName("btn-primary");
+			saveConfigurationButton.addClickHandler(new ClickHandler() {
+				@Override
+				public void onClick(final ClickEvent event) {
+					clearErrorMessages();
+					displayProgressMessage("Saving...");
+					save();
+				}
+			});
+
+		}
 
 		// displayProgressMessage("Initializing");
 	}

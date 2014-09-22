@@ -258,7 +258,7 @@ public final class AppConfigReader implements Closeable {
 	}
 
 	@Override
-	public void close() throws IOException {
+	public void close() {
 		FileUtilities.closeQuietly(reader);
 	}
 

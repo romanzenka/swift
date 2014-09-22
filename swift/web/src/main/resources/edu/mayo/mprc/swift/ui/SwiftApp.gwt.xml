@@ -3,6 +3,8 @@
     <!-- Inherit the core Web Toolkit stuff.                  -->
     <inherits name="com.google.gwt.user.User"/>
     <inherits name="edu.mayo.mprc.dbcurator.DBCurator"/>
+    <inherits name="edu.mayo.mprc.common.Common"/>
+    <inherits name="edu.mayo.mprc.swift.configuration.Configuration"/>
 
     <!-- Specify the app entry point class.                   -->
     <entry-point class="edu.mayo.mprc.swift.ui.client.SwiftApp"/>
