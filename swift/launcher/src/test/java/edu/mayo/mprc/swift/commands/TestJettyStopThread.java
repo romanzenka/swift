@@ -12,7 +12,7 @@ import org.testng.annotations.Test;
 public final class TestJettyStopThread {
 	@Test(timeOut = 10000)
 	public void shouldTerminateJetty() throws Exception {
-		final Server server = new Server(38080);
+		final Server server = new Server();
 		server.addLifeCycleListener(new LifeCycle.Listener() {
 			@Override
 			public void lifeCycleStarting(final LifeCycle event) {
