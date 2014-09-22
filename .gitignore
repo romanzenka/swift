@@ -1,9 +1,5 @@
 target
-*/target
 *.iml
-*.ipr
-*.iws
-*.ids
-*.class
 /activemq-data/
 .idea
+**/rebel.xml
