@@ -29,6 +29,9 @@ public final class QaFiles extends FileHolder {
 	// Picture of the MS spectra chromatogram
 	private File chromatogramFile;
 
+	// Optional dump of UV information (pressures)
+	private File uvDataFile;
+
 	/**
 	 * Map of Engine ID -> engine search result file.
 	 */
@@ -83,6 +86,14 @@ public final class QaFiles extends FileHolder {
 
 	public void setChromatogramFile(final File chromatogramFile) {
 		this.chromatogramFile = chromatogramFile;
+	}
+
+	public File getUvDataFile() {
+		return uvDataFile;
+	}
+
+	public void setUvDataFile(File uvDataFile) {
+		this.uvDataFile = uvDataFile;
 	}
 
 	public HashMap<String, File> getAdditionalSearchResults() {

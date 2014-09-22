@@ -43,7 +43,7 @@ public final class SpectrumInfoJoinerTest {
 			final MSMSEvalOutputReader msmsEvalReader = new MSMSEvalOutputReader(msmsEvalFile);
 			final FileSpectrumInfoSink sink = new FileSpectrumInfoSink(outputFile);
 
-			spectrumInfoJoiner().joinSpectrumData(mgfFile, spectra, rawDumpReader, msmsEvalReader, null, sink, null);
+			spectrumInfoJoiner().joinSpectrumData(mgfFile, spectra, rawDumpReader, msmsEvalReader, null, sink, null, null);
 
 			Assert.assertEquals(TestingUtilities.compareFilesByLine(referenceOutputFile, outputFile, true), null, "Output file content is not as expected.");
 		} finally {

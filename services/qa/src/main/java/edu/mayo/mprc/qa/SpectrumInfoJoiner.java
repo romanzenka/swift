@@ -58,7 +58,11 @@ public final class SpectrumInfoJoiner {
 	 * @param rawFileName    Name of the RAW file that all this output originated from
 	 * @return Number of rows in output file, not including the column headers.
 	 */
-	public int joinSpectrumData(final File inputFile, final ScaffoldQaSpectraReader scaffold, final RawDumpReader rawDumpReader, final MSMSEvalOutputReader msmsEvalReader, final MyriMatchPepXmlReader myrimatchReader, final SpectrumInfoSink sink, final String rawFileName) {
+	public int joinSpectrumData(final File inputFile, final ScaffoldQaSpectraReader scaffold,
+	                            final RawDumpReader rawDumpReader, final MSMSEvalOutputReader msmsEvalReader,
+	                            final MyriMatchPepXmlReader myrimatchReader, final SpectrumInfoSink sink,
+	                            final UvDataReader uvDataReader,
+	                            final String rawFileName) {
 		int rowCount = 0;
 		final Map<String, Spectrum> mgfSpectrumMap = new HashMap<String, Spectrum>();
 
