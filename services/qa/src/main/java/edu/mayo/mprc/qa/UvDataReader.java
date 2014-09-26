@@ -30,6 +30,7 @@ public final class UvDataReader implements KeyedTsvReader {
 	private static final String ID_HEADER = "id";
 	private static final String RT_HEADER = "rt";
 	private static final String[] DEFAULT_HEADER = new String[]{
+			"UV.RT", // Retention time as reported by the UV module
 			"PumpModule.LoadingPump.Flow",
 			"PumpModule.NC_Pump.%B",
 			"PumpModule.LoadingPump.Pressure",
@@ -97,7 +98,11 @@ public final class UvDataReader implements KeyedTsvReader {
 		if (lines == null) {
 			return EMPTY_LINE;
 		}
-		final Map.Entry<Double, String> entry = lines.floorEntry(Double.parseDouble(key));
+		Map.Entry<Double, String> entry = lines.floorEntry(Double.parseDouble(key));
+		if(entry==null) {
+			// Try ceiling if nothing below
+			entry = lines.ceilingEntry(Double.parseDouble(key));
+		}
 		final String line = entry.getValue();
 		if (line == null) {
 			return EMPTY_LINE;
@@ -122,7 +127,7 @@ public final class UvDataReader implements KeyedTsvReader {
 					final String scanNumStr = line.substring(firstTab + 1, secondTab);
 					final double retentionTime = Double.parseDouble(scanNumStr);
 
-					lines.put(retentionTime, line.substring(secondTab + 1));
+					lines.put(retentionTime, line.substring(firstTab + 1));
 				} else {
 					// Ignore the line
 					ignoredLines++;
