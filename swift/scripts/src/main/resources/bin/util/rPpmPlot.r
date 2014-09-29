@@ -701,7 +701,7 @@ imageGenerator<-function(dataFile, msmsEvalDataFile, infoFile, spectrumFile, chr
     ### UV pump info    
     startPlot(uv.title, outputImages$uv.file)
     uvData <- dataTabFull[!duplicated(dataTabFull$UV.RT),]
-    uvData <- uvData[uvData$UV.RT>=0,]
+    uvData <- uvData[!is.na(uvData$UV.RT),]
     
     if(nrow(uvData)>0) {
       
@@ -1026,7 +1026,7 @@ addRowToReportFile<-function(reportFile, row) {
                  getHtmlTextImageFileInfo(row$tic.file),
                  getHtmlTextImageFileInfo(row$mz.file),
                  getHtmlTextImageFileInfo(row$source.current.file),
-                 getHtmlTextImageFileInfo(row$uv.data.file))
+                 getHtmlTextImageFileInfo(row$uv.file))
   
   chunk <- paste(chunk, "</tr>")
   
