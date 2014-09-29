@@ -77,8 +77,7 @@ SearchRunItemVisualizer.prototype.getParentFile = function (filename) {
 };
 
 SearchRunItemVisualizer.prototype.confirmRerun = function (event, id, title) {
-    if (!window.confirm("Are you sure you want to restart search " + title + " (id=" + id + ") ?\n\n"
-        + "You should only restart searches that are not currently running."
+    if (!window.confirm("Are you sure you want to restart search " + title + " (id=" + id + ") ?"
     )) {
         Event.stop(event);
     }
