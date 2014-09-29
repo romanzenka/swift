@@ -700,12 +700,43 @@ imageGenerator<-function(dataFile, msmsEvalDataFile, infoFile, spectrumFile, chr
 
     ### UV pump info
     startPlot(uv.title, outputImages$uv.file)
-    uvData <- dataTabFull[!duplicated(dataTabFull$UV.RT>=0),]
+    uvData <- dataTabFull[!duplicated(dataTabFull$UV.RT),]
+    uvData <- uvData[uvData$UV.RT>=0,]
     
     if(nrow(uvData)>0) {
-      plot(uvData$UV.RT, uvData$PumpModule.NC_Pump..B, type="l",
-           main=c(plotName, uv.title),
-           xlab=xAxisTitleScanOrRT, ylab="%B", pch=20)
+      
+      oldPar<-par(mar=c(5,4,4,5)+.1)
+      
+      pressureRange <- range(c(uvData$PumpModule.NC_Pump.Pressure, uvData$PumpModule.LoadingPump.Pressure))
+      color <- "#AA0000"      
+      plot(uvData$UV.RT, uvData$PumpModule.LoadingPump.Pressure, type="l", axes=FALSE, xlab=NA, ylab=NA, yaxt="n", col=color, lwd=2, ylim=pressureRange)
+      axis(side=2, at = pretty(pressureRange), col=color, col.axis=color, lwd.ticks=1, lwd=-1)      
+      mtext("Loading Pump", side=2, line=3, col=color)
+      
+      par(new=TRUE)
+
+      color <- "#0000AA"      
+      plot(uvData$UV.RT, uvData$PumpModule.NC_Pump.Pressure, type="l", axes=FALSE, xlab=NA, ylab=NA, yaxt="n", col=color, lwd=2, ylim=pressureRange)
+      axis(side=2, at = pretty(pressureRange), col=color, col.axis=color, lwd.ticks=1, lwd=-1, tck=0.01)    
+      mtext("NC Pump", side=2, line=2, col=color)
+
+      par(new=TRUE)
+      
+      color <- "#AA8800"     
+      plot(uvData$UV.RT, uvData$ColumnOven.Temperature, type="l", axes=FALSE, xlab=xAxisTitleScanOrRT, ylab=NA,
+           main=c(plotName, uv.title), col=color)
+      axis(side=4, at = pretty(range(uvData$ColumnOven.Temperature)), col=color, col.axis=color, lwd.ticks=1, lwd=-1, tck=0.01, mgp = c(0, -1.4, 0) )
+      mtext("Oven temperature (Celsius)", side=4, line=2, col=color)
+      
+      par(new=TRUE)
+      
+      color <- "#008800"
+      plot(uvData$UV.RT, uvData$PumpModule.NC_Pump..B, type="l", xlab=NA, ylab=NA, ylim=c(0, 100), yaxt="n", col=color, lwd=2)
+      axis(side=4, at = pretty(range(c(0, 100))), col=color, col.axis=color, lwd.ticks=1, lwd=-1)
+      mtext("%B", side=4, line=1, col=color)
+            
+      par(oldPar)
+      
     } else {
       emptyPlot()
     }

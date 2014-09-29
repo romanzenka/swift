@@ -153,9 +153,7 @@ public final class QaWorker extends WorkerBase {
 		rScriptOutputFilesSet.add(mzRtFile);
 		rScriptOutputFilesSet.add(sourceCurrentFile);
 		rScriptOutputFilesSet.add(pepTolFile);
-		if (qaFiles.getUvDataFile() != null) {
-			rScriptOutputFilesSet.add(uvDataFile);
-		}
+		rScriptOutputFilesSet.add(uvDataFile);
 
 		//Do not add msmsEval file to list before checking if msmsEval is enabled.
 		msmsEvalDiscriminantFile = new File(qaReportFolder, uniqueMgfAnalysisName + ".msmsEval.png");
