@@ -163,7 +163,7 @@ public final class RAWDumpWorkPacket extends WorkPacketBase implements CachableW
 				getExpectedInstrumentMethodFile(cacheFolder, getRawFile()),
 				getExpectedSampleInformationFile(cacheFolder, getRawFile()),
 				getExpectedErrorLogFile(cacheFolder, getRawFile()),
-				getExpectedUvDataFile(cacheFolder, getUvDataFile()),
+				getExpectedUvDataFile(cacheFolder, getRawFile()),
 				isFromScratch()
 		);
 	}
