@@ -1,6 +1,7 @@
 package edu.mayo.mprc.qa;
 
 import com.google.common.base.Joiner;
+import com.google.common.base.Splitter;
 import edu.mayo.mprc.MprcException;
 import edu.mayo.mprc.io.KeyedTsvReader;
 import edu.mayo.mprc.utilities.FileUtilities;
@@ -35,6 +36,8 @@ public final class RawDumpReader implements KeyedTsvReader, Iterable<String> {
 	private int firstSpectrum;
 	private int lastSpectrum;
 	public static final String MS_LEVEL = "MS Level";
+	private int rtColumnIndex;
+
 	/**
 	 * Header without the first {@link #SCAN_NUM_HEADER} column.
 	 */
@@ -80,6 +83,7 @@ public final class RawDumpReader implements KeyedTsvReader, Iterable<String> {
 			// Null files are honored - they will act as if there was no input information
 			// Use default header (otherwise we use header obtained from the file).
 			header = DEFAULT_HEADER;
+			rtColumnIndex = findRtColumnIndex(DEFAULT_HEADER);
 		} else {
 			lines = new HashMap<String, String>();
 			BufferedReader reader = null;
@@ -110,7 +114,7 @@ public final class RawDumpReader implements KeyedTsvReader, Iterable<String> {
 	/**
 	 * @param key Scan number to obtain data for.
 	 * @return Entire line for a given scan, ready to be embedded in a larger tab-separated scan. The line does not
-	 *         contain the scan id. The columns are as specified by {@link #getHeaderLine()}.
+	 * contain the scan id. The columns are as specified by {@link #getHeaderLine()}.
 	 */
 	@Override
 	public String getLineForKey(final String key) {
@@ -122,6 +126,30 @@ public final class RawDumpReader implements KeyedTsvReader, Iterable<String> {
 			return EMPTY_LINE;
 		}
 		return line;
+	}
+
+	/**
+	 * Extract retention time field from given line.
+	 *
+	 * @param line Line to extract RT from
+	 * @return Retention time, expressed as string.
+	 */
+	public String getRtFromLine(final String line) {
+		final Iterator<String> iterator = Splitter.on('\t').trimResults().split(line).iterator();
+		int i = 0;
+		String element = null;
+		while (i <= rtColumnIndex) {
+			checkIterator(line, iterator, i);
+			element = iterator.next();
+			i++;
+		}
+		return element;
+	}
+
+	private static void checkIterator(String line, Iterator<String> iterator, int i) {
+		if (!iterator.hasNext()) {
+			throw new MprcException(String.format("Could not extract retention time from line %s - there is no column #%d (zero-based)", line, i));
+		}
 	}
 
 	private void parse(final BufferedReader br, final Map<String, String> lines) {
@@ -173,7 +201,7 @@ public final class RawDumpReader implements KeyedTsvReader, Iterable<String> {
 		}
 	}
 
-	private static String[] readHeader(final BufferedReader br) throws IOException {
+	private String[] readHeader(final BufferedReader br) throws IOException {
 		final String line = br.readLine();
 		if (line == null) {
 			throw new MprcException("The rawDump output has no header");
@@ -182,9 +210,20 @@ public final class RawDumpReader implements KeyedTsvReader, Iterable<String> {
 		if (!SCAN_NUM_HEADER.equals(tmpHeader[0])) {
 			throw new MprcException("Unknown rawDump output format (first column should be '" + SCAN_NUM_HEADER + "', was '" + tmpHeader[0] + "'.");
 		}
+		rtColumnIndex = findRtColumnIndex(tmpHeader) - 1; /* We remove first column */
+
 		final String[] parsedHeader = new String[tmpHeader.length - 1];
 		System.arraycopy(tmpHeader, 1, parsedHeader, 0, tmpHeader.length - 1);
 		return parsedHeader;
+	}
+
+	private static int findRtColumnIndex(final String[] tmpHeader) {
+		for (int i = 0; i < tmpHeader.length; i++) {
+			if ("RT".equalsIgnoreCase(tmpHeader[i])) {
+				return i;
+			}
+		}
+		return -1;
 	}
 
 	@Override

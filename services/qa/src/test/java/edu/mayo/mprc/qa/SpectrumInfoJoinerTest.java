@@ -30,6 +30,7 @@ public final class SpectrumInfoJoinerTest {
 			final File referenceOutputFile = TestingUtilities.getNamedFileFromResource("/edu/mayo/mprc/qa/Out.tsv", tempFolder);
 			final File rawDumpFile = TestingUtilities.getNamedFileFromResource("/edu/mayo/mprc/qa/rawdump.tsv", tempFolder);
 			final File msmsEvalFile = TestingUtilities.getNamedFileFromResource("/edu/mayo/mprc/qa/msmsEval.csv", tempFolder);
+			final File uvDataFile = TestingUtilities.getNamedFileFromResource("/edu/mayo/mprc/qa/uv.tsv", tempFolder);
 
 			String refOut = Files.toString(referenceOutputFile, Charsets.UTF_8);
 			refOut = refOut.replaceAll("<MGF>", Matcher.quoteReplacement(mgfFile.getAbsolutePath()));
@@ -42,8 +43,9 @@ public final class SpectrumInfoJoinerTest {
 			final RawDumpReader rawDumpReader = new RawDumpReader(rawDumpFile);
 			final MSMSEvalOutputReader msmsEvalReader = new MSMSEvalOutputReader(msmsEvalFile);
 			final FileSpectrumInfoSink sink = new FileSpectrumInfoSink(outputFile);
+			final UvDataReader uvDataReader = new UvDataReader(uvDataFile);
 
-			spectrumInfoJoiner().joinSpectrumData(mgfFile, spectra, rawDumpReader, msmsEvalReader, null, sink, null, null);
+			spectrumInfoJoiner().joinSpectrumData(mgfFile, spectra, rawDumpReader, msmsEvalReader, null, sink, uvDataReader, null);
 
 			Assert.assertEquals(TestingUtilities.compareFilesByLine(referenceOutputFile, outputFile, true), null, "Output file content is not as expected.");
 		} finally {

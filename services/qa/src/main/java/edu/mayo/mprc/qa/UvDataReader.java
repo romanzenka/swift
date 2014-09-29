@@ -156,8 +156,9 @@ public final class UvDataReader implements KeyedTsvReader {
 		if (!RT_HEADER.equals(tmpHeader[1])) {
 			throw new MprcException(String.format("Unknown rawDump output format (first column should be '%s', was '%s'.", RT_HEADER, tmpHeader[1]));
 		}
-		final String[] parsedHeader = new String[tmpHeader.length - 2];
-		System.arraycopy(tmpHeader, 2, parsedHeader, 0, tmpHeader.length - 2);
+		final String[] parsedHeader = new String[tmpHeader.length - 1];
+		System.arraycopy(tmpHeader, 2, parsedHeader, 1, tmpHeader.length - 2);
+		parsedHeader[0] = "UV.RT";
 		return parsedHeader;
 	}
 }
