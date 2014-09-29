@@ -227,6 +227,4 @@ public final class TestTarWriter {
 			TestingUtilities.quietDelete(tempFolder);
 		}
 	}
-
-
 }

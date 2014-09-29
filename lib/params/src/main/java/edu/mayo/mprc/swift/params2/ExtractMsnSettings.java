@@ -16,6 +16,7 @@ public class ExtractMsnSettings extends PersistableBase {
 	public static final String EXTRACT_MSN = "extract_msn";
 	public static final String MSCONVERT = "msconvert";
 	public static final String MZML_MODE = "--mzML";
+	public static final String MS2_MODE = "--ms2";
 
 	public ExtractMsnSettings() {
 	}
@@ -58,6 +59,14 @@ public class ExtractMsnSettings extends PersistableBase {
 	 */
 	public boolean isMzMlMode() {
 		return getCommandLineSwitches().contains(MZML_MODE);
+	}
+
+	public boolean isMs2Mode() {
+		return getCommandLineSwitches().contains(MS2_MODE);
+	}
+
+	public boolean isMgfMode() {
+		return getCommandLineSwitches().isEmpty();
 	}
 
 	@Override

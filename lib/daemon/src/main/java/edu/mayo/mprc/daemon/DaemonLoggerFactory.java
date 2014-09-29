@@ -1,26 +1,20 @@
 package edu.mayo.mprc.daemon;
 
 import edu.mayo.mprc.MprcException;
-import edu.mayo.mprc.daemon.files.SenderTokenTranslator;
 import edu.mayo.mprc.daemon.worker.log.LogWriterAppender;
 import edu.mayo.mprc.daemon.worker.log.NewLogFiles;
-import edu.mayo.mprc.messaging.Request;
 import edu.mayo.mprc.utilities.FileUtilities;
 import edu.mayo.mprc.utilities.MonitorUtilities;
 import edu.mayo.mprc.utilities.log.ChildLog;
 import edu.mayo.mprc.utilities.log.ParentLog;
 import edu.mayo.mprc.utilities.progress.UserProgressReporter;
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
-import org.apache.log4j.MDC;
-import org.apache.log4j.PatternLayout;
+import org.apache.log4j.*;
 
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Date;
 import java.util.UUID;
-import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * @author Roman Zenka
@@ -84,12 +78,23 @@ public final class DaemonLoggerFactory {
 
 	private final class RequestChildLog implements ChildLog {
 		private static final long serialVersionUID = -4428747725005957176L;
+		// Logging directly within this process
 		private LogWriterAppender outLogWriterAppender;
 		private LogWriterAppender errorLogWriterAppender;
+
+		/**
+		 * Logging using {@link #getOutputLogger()}
+		 */
 		private Logger outLogger;
+
+		/**
+		 * Logging using {@link #getErrorLogger()}
+		 */
 		private Logger errorLogger;
+
 		private File standardOutFile;
 		private File standardErrorFile;
+
 		private String mdcKey;
 		private UserProgressReporter reporter;
 		private UUID logFileId;
@@ -155,6 +160,7 @@ public final class DaemonLoggerFactory {
 		private LogWriterAppender newOutWriterAppender(final boolean fullFormat) {
 			try {
 				final LogWriterAppender logWriterAppender = new LogWriterAppender(new FileWriter(standardOutFile.getAbsoluteFile()));
+				logWriterAppender.setName("out");
 				setFormat(logWriterAppender, fullFormat);
 				return logWriterAppender;
 			} catch (final IOException e) {
@@ -165,6 +171,7 @@ public final class DaemonLoggerFactory {
 		private LogWriterAppender newErrorWriterAppender(final boolean fullFormat) {
 			try {
 				final LogWriterAppender logWriterAppender = new LogWriterAppender(new FileWriter(standardErrorFile.getAbsoluteFile()));
+				logWriterAppender.setName("err");
 				setFormat(logWriterAppender, fullFormat);
 				return logWriterAppender;
 			} catch (final IOException e) {
@@ -226,6 +233,21 @@ public final class DaemonLoggerFactory {
 				errorLogger.addAppender(newErrorWriterAppender(false));
 			}
 			return errorLogger;
+		}
+
+		@Override
+		public void close() {
+			if (outLogger != null) {
+				final Appender out = outLogger.getAppender("out");
+				out.close();
+				outLogger = null;
+			}
+
+			if (errorLogger != null) {
+				final Appender err = errorLogger.getAppender("err");
+				err.close();
+				errorLogger = null;
+			}
 		}
 
 		@Override

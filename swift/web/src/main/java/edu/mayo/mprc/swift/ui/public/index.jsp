@@ -25,6 +25,7 @@
         <li class="active-tab"><a href="/start">New search</a></li>
         <li><a href="/report/report.jsp">Existing searches</a></li>
         <li><a href="/">About Swift</a></li>
+        <li><a href="/quameter">QuaMeter</a></li> <!-- TODO - make optional -->
         <li><a href="/extras">Extras</a></li>
     </ul>
 </div>
@@ -118,6 +119,14 @@
                 <td id="enginesLabel" colspan="2" class="params-row-left"></td>
                 <td id="enginesEntry" colspan="3"></td>
                 <td id="enginesValidation" class="rightcol params-row-right" colspan="2"></td>
+            </tr>
+            </tbody>
+
+            <tbody>
+            <tr id="titleSuffixRow" class="shrink">
+                <td id="titleSuffixLabel" colspan="2" class="params-row-left"></td>
+                <td id="titleSuffixEntry" colspan="3"></td>
+                <td id="titleSuffixValidation" class="rightcol params-row-right" colspan="2"></td>
             </tr>
             </tbody>
 

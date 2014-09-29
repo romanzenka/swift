@@ -199,7 +199,7 @@ public final class SwiftDaoTest {
 				new Tolerance(1, MassUnit.Da), new Tolerance(10, MassUnit.Ppm), orbi,
 				ExtractMsnSettings.getDefaultExtractMsnSettings(),
 				ScaffoldSettings.defaultScaffoldSettings(),
-				new EnabledEngines());
+				new EnabledEngines(), "");
 	}
 
 	@Test

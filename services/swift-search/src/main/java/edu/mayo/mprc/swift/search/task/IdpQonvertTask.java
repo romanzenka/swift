@@ -28,7 +28,7 @@ public final class IdpQonvertTask extends AsyncTaskBase {
 	 * Key: Input file search specification.
 	 * Value: List of searches performed on the file.
 	 */
-	private final EngineSearchTask searchTask;
+	private final FileProducingTask searchTask;
 	private final File outputFolder;
 	private final String decoyPrefix;
 	private final File curationFile;
@@ -50,7 +50,7 @@ public final class IdpQonvertTask extends AsyncTaskBase {
 	                      final SearchRun searchRun,
 	                      final SwiftSearchDefinition definition,
 	                      final DaemonConnection idpQonvertDaemon,
-	                      final EngineSearchTask searchTask,
+	                      final FileProducingTask searchTask,
 	                      final File outputFolder,
 	                      final boolean publishResult,
 	                      final DatabaseFileTokenFactory fileTokenFactory,
@@ -74,7 +74,15 @@ public final class IdpQonvertTask extends AsyncTaskBase {
 	 */
 	@Override
 	public WorkPacket createWorkPacket() {
-		setDescription("IdpQonvert conversion of " + fileTokenFactory.fileToTaggedDatabaseToken(searchTask.getOutputFile()));
+
+		EngineSearchTask engineSearchTask;
+		if (searchTask instanceof EngineSearchTask) {
+			engineSearchTask = (EngineSearchTask) searchTask;
+		} else {
+			setDescription("IdpQonvert conversion (failed input " + searchTask.getClass().getName());
+			throw new MprcException("IdpQonvert cannot process results of search task " + searchTask.getClass().getName());
+		}
+		setDescription("IdpQonvert conversion of " + fileTokenFactory.fileToTaggedDatabaseToken(engineSearchTask.getOutputFile()));
 		final IdpQonvertSettings params = new IdpQonvertSettings();
 		// Max FDR is set to 1- Scaffolds protein probability
 		params.setMaxFDR(getMaxFDR());
@@ -85,7 +93,7 @@ public final class IdpQonvertTask extends AsyncTaskBase {
 				getResultingFile(), params,
 				searchTask.getResultingFile(),
 				curationFile,
-				searchTask.getInputFile().getResultingFile().getParentFile(),
+				engineSearchTask.getInputFile().getResultingFile().getParentFile(),
 				isFromScratch());
 	}
 

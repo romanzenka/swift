@@ -33,6 +33,7 @@
         <module>scafml</module>
         <module>search-engine</module>
         <module>sge</module>
+        <module>sqt</module>
         <module>tar</module>
         <module>textio</module>
         <module>unimod</module>
@@ -42,6 +43,5 @@
         <module>workspace</module>
         <module>fasta</module>
         <module>peaklist</module>
-        <module>sqt</module>
     </modules>
 </project>

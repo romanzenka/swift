@@ -73,7 +73,7 @@ public final class QaWorker extends WorkerBase {
 		try {
 			fileWriter = new FileWriter(rScriptInputFile);
 
-			fileWriter.write("Data File\tId File\tMz File\tIdVsMz File\tSource Current File\tmsmsEval Discriminant File\tGenerate Files\tRaw File\tmsmsEval Output\tRaw Info File\tRaw Spectra File\tPeptide Tolerance File\tTIC File\tChromatogram File");
+			fileWriter.write("Data File\tId File\tMz File\tIdVsMz File\tSource Current File\tmsmsEval Discriminant File\tGenerate Files\tRaw File\tmsmsEval Output\tRaw Info File\tRaw Spectra File\tPeptide Tolerance File\tTIC File\tChromatogram File\tUV Data File");
 			fileWriter.write("\n");
 
 			final List<ExperimentQa> experimentQas = qaWorkPacket.getExperimentQas();
@@ -122,7 +122,10 @@ public final class QaWorker extends WorkerBase {
 		return null;
 	}
 
-	private boolean addRScriptInputLine(final FileWriter fileWriter, final File qaReportFolder, final ExperimentQa experimentQa, final LinkedList<File> generatedFiles, final QaFiles qaFiles, boolean atLeastOneFileMissing) throws IOException {
+	private boolean addRScriptInputLine(final FileWriter fileWriter, final File qaReportFolder, final ExperimentQa experimentQa,
+	                                    final LinkedList<File> generatedFiles,
+	                                    final QaFiles qaFiles,
+	                                    boolean atLeastOneFileMissing) throws IOException {
 		final String uniqueMgfAnalysisName;
 		boolean generate;
 		final File msmsEvalDiscriminantFile;
@@ -143,12 +146,16 @@ public final class QaWorker extends WorkerBase {
 		final File mzRtFile = new File(qaReportFolder, uniqueMgfAnalysisName + ".mzRt.png");
 		final File sourceCurrentFile = new File(qaReportFolder, uniqueMgfAnalysisName + ".current.png");
 		final File pepTolFile = new File(qaReportFolder, uniqueMgfAnalysisName + ".pepTol.png");
+		final File uvDataFile = new File(qaReportFolder, uniqueMgfAnalysisName + ".uv.png");
 
 		rScriptOutputFilesSet.add(massCalibrationRtFile);
 		rScriptOutputFilesSet.add(massCalibrationMzFile);
 		rScriptOutputFilesSet.add(mzRtFile);
 		rScriptOutputFilesSet.add(sourceCurrentFile);
 		rScriptOutputFilesSet.add(pepTolFile);
+		if (qaFiles.getUvDataFile() != null) {
+			rScriptOutputFilesSet.add(uvDataFile);
+		}
 
 		//Do not add msmsEval file to list before checking if msmsEval is enabled.
 		msmsEvalDiscriminantFile = new File(qaReportFolder, uniqueMgfAnalysisName + ".msmsEval.png");
@@ -166,6 +173,7 @@ public final class QaWorker extends WorkerBase {
 			scaffoldParser.load(experimentQa.getScaffoldSpectraFile(), experimentQa.getScaffoldVersion(), null);
 			final RawDumpReader rawDumpReader = new RawDumpReader(qaFiles.getRawSpectraFile());
 			final MSMSEvalOutputReader msmsEvalReader = new MSMSEvalOutputReader(qaFiles.getMsmsEvalOutputFile());
+			final UvDataReader uvDataReader = new UvDataReader(qaFiles.getUvDataFile());
 			final String rawInputFile = qaFiles.getRawInputFile() != null ? qaFiles.getRawInputFile().getAbsolutePath() : null;
 			final FileSpectrumInfoSink sink = new FileSpectrumInfoSink(outputFile);
 			generate = spectrumInfoJoiner.joinSpectrumData(
@@ -175,6 +183,7 @@ public final class QaWorker extends WorkerBase {
 					msmsEvalReader,
 					myrimatchReader,
 					sink,
+					uvDataReader,
 					rawInputFile) > 0;
 
 			if (generate) {
@@ -263,6 +272,8 @@ public final class QaWorker extends WorkerBase {
 		fileWriter.write((isDataFileValid(qaFiles.getRawInfoFile()) && isDataFileValid(qaFiles.getRawSpectraFile())) ? ticFile.getAbsolutePath() : "");
 		fileWriter.write("\t");
 		fileWriter.write(chromatogramFile != null ? chromatogramFile.getAbsolutePath() : "");
+		fileWriter.write("\t");
+		fileWriter.write(isDataFileValid(qaFiles.getUvDataFile()) ? qaFiles.getUvDataFile().getAbsolutePath() : "");
 		fileWriter.write("\n");
 	}
 

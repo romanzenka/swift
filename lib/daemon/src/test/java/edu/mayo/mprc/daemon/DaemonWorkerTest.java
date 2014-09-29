@@ -7,6 +7,7 @@ import edu.mayo.mprc.daemon.exception.DaemonException;
 import edu.mayo.mprc.daemon.worker.*;
 import edu.mayo.mprc.utilities.progress.UserProgressReporter;
 import org.testng.Assert;
+import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Test;
 
 import java.io.File;
@@ -17,13 +18,28 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 public final class DaemonWorkerTest {
 
+	private static int simultaneousRequests;
+	private static int maxSimultaneousRequests;
+	private static Object maxSimultaneousLock = new Object();
+
+	@BeforeTest
+	public void setup() {
+		synchronized (DaemonWorkerTest.class) {
+			maxSimultaneousRequests = 0;
+			simultaneousRequests = 0;
+		}
+	}
+
 	@Test
 	public void shouldDoSimpleWork() throws InterruptedException {
 		final DaemonWorkerTester tester = new DaemonWorkerTester(createSimpleWorker());
 		runTest(tester, 2);
+		synchronized (DaemonWorkerTest.class) {
+			Assert.assertEquals(maxSimultaneousRequests, 1, "only one request can run at a time");
+		}
 	}
 
-	@Test
+	@Test(dependsOnMethods = "shouldDoSimpleWork")
 	public void shouldDoSimpleWorkInThreadPool() throws InterruptedException {
 		final DaemonWorkerTester tester = new DaemonWorkerTester(new WorkerFactory<ResourceConfig, Worker>() {
 			@Override
@@ -62,6 +78,9 @@ public final class DaemonWorkerTest {
 			}
 		}, 3);
 		runTest(tester, 6);
+		synchronized (DaemonWorkerTest.class) {
+			Assert.assertTrue(maxSimultaneousRequests <= 3, "up to three requests can run at a time");
+		}
 	}
 
 	private static final class StringWorkPacket extends WorkPacketBase {
@@ -85,10 +104,19 @@ public final class DaemonWorkerTest {
 			@Override
 			public void process(final WorkPacket wp, final File tempWorkFolder, final UserProgressReporter progressReporter) {
 				Assert.assertEquals(concurrentRequests.incrementAndGet(), 1, "The amount of requests must start at 1. The worker calls are not serialized.");
+				synchronized (DaemonWorkerTest.class) {
+					simultaneousRequests++;
+					if (simultaneousRequests > maxSimultaneousRequests) {
+						maxSimultaneousRequests = simultaneousRequests;
+					}
+				}
 				try {
-					Thread.sleep(1);
+					Thread.sleep(50);
 				} catch (InterruptedException e) {
 					throw new DaemonException(e);
+				}
+				synchronized (DaemonWorkerTest.class) {
+					simultaneousRequests--;
 				}
 				Assert.assertEquals(concurrentRequests.decrementAndGet(), 0, "The amount of requests must end at 0. The worker calls are not serialized.");
 			}

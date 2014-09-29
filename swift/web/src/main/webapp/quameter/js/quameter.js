@@ -1,15 +1,16 @@
 /** Global Vars to hack Google DataViews **/
 rawInsturmentNames = [];
-views = [], gs = [];
+views = [];
+gs = [];
 numberOfSimpleGraphs = 0;
 dyViewsByCode = {};
 viewMetadata = {};
 
 
 function populateInstArray(dt) {
+    var instrumentCol = columnIndex("instrument", dt)
     for (var r = 0; r < dt.getNumberOfRows(); r++) {
-        // Column 4 = Instrument Name
-        var val = dt.getValue(r, 4);
+        var val = dt.getValue(r, instrumentCol);
         if (!rawInsturmentNames.contains(val)) {
             rawInsturmentNames.push(val);
         }
@@ -175,7 +176,7 @@ function updateAllViews(data) {
     var filteredRows = [];
     for (var r = 0; r < data.getNumberOfRows(); r++) {
         var category = data.getValue(r, columnIndex('category', data));
-        var rowId = data.getValue(r, columnIndex("id", data))
+        var rowId = data.getValue(r, columnIndex("id", data));
         if (activeCats.contains(category) && !hiddenIds["id" + rowId]) {
             filteredRows.push(r)
         }
@@ -190,42 +191,50 @@ function updateAllViews(data) {
         } //empty for detail graphs until generated
         dyViewsByCode[views[i].metricId] = i;
 
-        views[i].dataView.setColumns(getSmartColumns(columnIndex("startTime", data), views[i].metricId));
+        var columns = getSmartColumns(views[i].metricId, data);
+        views[i].dataView.setColumns(columns);
         views[i].dataView.setRows(filteredRows);
 
-        var sum = 0;
-        var count = views[i].dataView.getNumberOfRows();
-        var values = new Array(count);
-        var j;
-        for (j = 0; j < count; j++) {
-            values[j] = views[i].dataView.getValue(j, 1);
+        // We can only do this if we have a single instrument, otherwise the error bars are meaningless
+        if (columns.length == 2) {
+            var sum = 0;
+            var count = views[i].dataView.getNumberOfRows();
+            var values = new Array(count);
+            var j;
+            for (j = 0; j < count; j++) {
+                values[j] = views[i].dataView.getValue(j, 1 /* 0-startTime, 1-value */);
+            }
+            // Remove the outlier 5% from each end
+            values.sort();
+
+            var percentRemoved = 5;
+            values = values.slice(count * percentRemoved / 100, count * (100 - percentRemoved) / 100);
+            count = values.length;
+
+            for (j = 0; j < count; j++) {
+                sum += values[j];
+            }
+            var average = count > 0 ? sum / count : 0;
+            var sumSquares = 0;
+            for (j = 0; j < count; j++) {
+                var delta = values[j] - average;
+                sumSquares += delta * delta;
+            }
+            var stdev = count > 1 ? Math.sqrt(sumSquares / (count - 1)) : 1;
+
+            views[i].minHighlightY = average - 3 * stdev;
+            views[i].maxHighlightY = average + 3 * stdev;
+            views[i].minHighlightY2 = average - 5 * stdev;
+            views[i].maxHighlightY2 = average + 5 * stdev;
+        } else {
+            // Disable highlights by providing empty ranges.
+            views[i].minHighlightY = 1;
+            views[i].maxHighlightY = -1;
+            views[i].minHighlightY2 = 1;
+            views[i].maxHighlightY2 = -1;
         }
-        // Remove the outlier 5% from each end
-        values.sort();
-
-        var percentRemoved = 5;
-        values = values.slice(count * percentRemoved / 100, count * (100 - percentRemoved) / 100);
-        count = values.length;
-
-        for (j = 0; j < count; j++) {
-            sum += values[j];
-        }
-        var average = count > 0 ? sum / count : 0;
-        var sumSquares = 0;
-        for (var j = 0; j < count; j++) {
-            var delta = values[j] - average;
-            sumSquares += delta * delta;
-        }
-        var stdev = count > 1 ? Math.sqrt(sumSquares / (count - 1)) : 1;
-
-        views[i].minHighlightY = average - 3 * stdev;
-        views[i].maxHighlightY = average + 3 * stdev;
-        views[i].minHighlightY2 = average - 5 * stdev;
-        views[i].maxHighlightY2 = average + 5 * stdev;
-
 
         views[i].dygraph.updateOptions({file: views[i].dataView, valueRange: getMetricByCode(views[i].metricId).range, colors: getSmartColors()});
-
     }
     blockRedraw = false;
 }
@@ -411,7 +420,7 @@ function drawGraphsByMetrics(data, renderDetailGraphs, viewMetadata) {
 
         var view = new google.visualization.DataView(data);
 
-        view.setColumns(getSmartColumns(columnIndex("startTime", data), metricId));
+        view.setColumns(getSmartColumns(metricId, data));
 
         if (renderDetailGraphs) {
             var viewId = "graph-" + metricId;
@@ -575,20 +584,39 @@ function getAnnotationCollection() {
     return jsonData;
 }
 
-
-function getSmartColumns(dataIdx, metricId) {
+// We create separate columns for each of the instruments using the original metric.
+// These columns have null for each instrument except the one that the data belongs to
+//
+// In case of the protein id columns, we do even more. We would set to null any value
+// that does not match the category of the sample
+// metricId - name of the metric to be used
+function getSmartColumns(metricId, data) {
+    var dataIdx = columnIndex("startTime", data);
     var cols = [ dataIdx ];
     var rawInsturmentNames = activeInstrumentFilters();
     for (j = 0; j < rawInsturmentNames.length; j++) {
+        var instrumentCol = columnIndex("instrument", data);
+        var metricIndex = columnIndex(metricId, data);
+
         cols.push({type: 'number', label: rawInsturmentNames[j],
-            calc: (function (iterJ, metID) {
-                return function (dt, row) {
-                    return (dt.getValue(row, 4) === rawInsturmentNames[iterJ]) ? dt.getValue(row, columnIndex(metID, dt)) : null;
+            calc: (function (iterJ, metID, metricIndex, instrumentCol) {
+                if (metID.match(/^id_/)) {
+                    // The id_ columns are special. We do extra filtering on null values
+                    return function (dt, row) {
+                        if (dt.getValue(row, instrumentCol) === rawInsturmentNames[iterJ]) {
+                            var value = dt.getValue(row, metricIndex);
+                            return value == 0 ? null : value;
+                        }
+                        return null;
+                    }
+                } else {
+                    return function (dt, row) {
+                        return (dt.getValue(row, instrumentCol) === rawInsturmentNames[iterJ]) ? dt.getValue(row, metricIndex) : null;
+                    }
                 }
-            })(j, metricId)
+            })(j, metricId, metricIndex, instrumentCol)
         });
     }
-    ;
     return cols;
 }
 

@@ -256,8 +256,8 @@ public final class DaemonConfig implements ResourceConfig, NamedResource {
 		writer.put(OS_ARCH, getOsArch(), "Host system architecture: x86, x86_64");
 		writer.put(SHARED_FILE_SPACE_PATH, getSharedFileSpacePath(), "Directory on a shared file system can be accessed from all the daemons");
 		writer.put(TEMP_FOLDER_PATH, getTempFolderPath(), "Temporary folder that can be used for caching. Transferred files from other daemons with no shared file system with this daemon are cached to this folder.");
-		writer.put(DUMP_ERRORS, isDumpErrors(), "Not implemented yet");
-		writer.put(DUMP_FOLDER_PATH, getDumpFolderPath(), "Not implemented yet");
+		writer.put(DUMP_ERRORS, isDumpErrors(), "When true, failing SGE work packets will get kept around in the dump folder for a day");
+		writer.put(DUMP_FOLDER_PATH, getDumpFolderPath(), "Dump folder location for failing SGE work packets");
 		writer.put(RunnerConfig.LOG_OUTPUT_FOLDER, getLogOutputFolder(), "Shared log folder to be used as a default for all services");
 
 		// It is important to save the resources before the services.

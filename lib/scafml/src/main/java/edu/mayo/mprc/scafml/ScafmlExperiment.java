@@ -156,7 +156,7 @@ public final class ScafmlExperiment extends FileHolder {
 				.append(XMLUtilities.wrapatt("annotateWithGOA", isAnnotateWithGOA() ? "true" : "false"))
 				.append(XMLUtilities.wrapatt("useIndependentSampleGrouping", isUseIndependentSampleGrouping() ? "true" : "false"))
 				.append(XMLUtilities.wrapatt("useFamilyProteinGrouping", isUseFamilyProteinGrouping() ? "true" : "false"))
-				.append(XMLUtilities.wrapatt("spectrumNameRegEx", "([^ /(]+\\.dta)"))
+				.append(XMLUtilities.wrapatt("spectrumNameRegEx", ""))
 				.append(XMLUtilities.wrapatt("highMassAccuracyScoring", isHighMassAccuracyScoring() ? "true" : "false"))
 				.append(XMLUtilities.wrapatt("use3xScoring", isUse3xScoring() ? "true" : "false"));
 

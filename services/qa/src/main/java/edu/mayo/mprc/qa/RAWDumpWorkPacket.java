@@ -24,14 +24,16 @@ public final class RAWDumpWorkPacket extends WorkPacketBase implements CachableW
 	private File instrumentMethodFile;
 	private File sampleInformationFile;
 	private File errorLogFile;
-	
+	private File uvDataFile;
+
 	public static final String RAW_INFO_FILE_SUFFIX = ".info.tsv";
 	public static final String RAW_SPECTRA_FILE_SUFFIX = ".spectra.tsv";
 	public static final String CHROMATOGRAM_FILE_SUFFIX = ".chroma.gif";
 	public static final String TUNE_METHOD_FILE_SUFFIX = ".tune.tsv";
 	public static final String INSTRUMENT_METHOD_FILE_SUFFIX = ".instrument.tsv";
 	public static final String SAMPLE_INFORMATION_FILE_SUFFIX = ".sample.tsv";
-	public static final String ERROR_LOG_FILE_SUFFIX = ".error.tsv";	
+	public static final String ERROR_LOG_FILE_SUFFIX = ".error.tsv";
+	public static final String UV_DATA_FILE_SUFFIX = ".uv.tsv";
 
 	public RAWDumpWorkPacket(final boolean fromScratch) {
 		super(fromScratch);
@@ -39,6 +41,7 @@ public final class RAWDumpWorkPacket extends WorkPacketBase implements CachableW
 
 	public RAWDumpWorkPacket(final File rawFile, final File rawInfoFile, final File rawSpectraFile, final File chromatogramFile,
 	                         final File tuneMethodFile, final File instrumentMethodFile, final File sampleInformationFile, final File errorLogFile,
+	                         final File uvDataFile,
 	                         final boolean fromScratch) {
 		super(fromScratch);
 
@@ -54,6 +57,7 @@ public final class RAWDumpWorkPacket extends WorkPacketBase implements CachableW
 		this.instrumentMethodFile = instrumentMethodFile;
 		this.sampleInformationFile = sampleInformationFile;
 		this.errorLogFile = errorLogFile;
+		this.uvDataFile = uvDataFile;
 	}
 
 	public File getRawFile() {
@@ -86,6 +90,10 @@ public final class RAWDumpWorkPacket extends WorkPacketBase implements CachableW
 
 	public File getErrorLogFile() {
 		return errorLogFile;
+	}
+
+	public File getUvDataFile() {
+		return uvDataFile;
 	}
 
 	@Override
@@ -140,6 +148,9 @@ public final class RAWDumpWorkPacket extends WorkPacketBase implements CachableW
 		return new File(outputFolder, rawFile.getName() + ERROR_LOG_FILE_SUFFIX);
 	}
 
+	public static File getExpectedUvDataFile(final File outputFolder, final File rawFile) {
+		return new File(outputFolder, rawFile.getName() + UV_DATA_FILE_SUFFIX);
+	}
 
 	@Override
 	public WorkPacket translateToCachePacket(final File cacheFolder) {
@@ -152,6 +163,7 @@ public final class RAWDumpWorkPacket extends WorkPacketBase implements CachableW
 				getExpectedInstrumentMethodFile(cacheFolder, getRawFile()),
 				getExpectedSampleInformationFile(cacheFolder, getRawFile()),
 				getExpectedErrorLogFile(cacheFolder, getRawFile()),
+				getExpectedUvDataFile(cacheFolder, getUvDataFile()),
 				isFromScratch()
 		);
 	}
@@ -165,7 +177,8 @@ public final class RAWDumpWorkPacket extends WorkPacketBase implements CachableW
 				getTuneMethodFile().getName(),
 				getInstrumentMethodFile().getName(),
 				getSampleInformationFile().getName(),
-				getErrorLogFile().getName());
+				getErrorLogFile().getName(),
+				getUvDataFile().getName());
 	}
 
 	@Override
@@ -190,7 +203,7 @@ public final class RAWDumpWorkPacket extends WorkPacketBase implements CachableW
 		final File errorLog = new File(targetFolder, outputFiles.get(6));
 		reporter.reportProgress(
 				new RAWDumpResult(rawInfo, rawSpectra, chromatogram,
-						tuneMethod, instrumentMethod, sampleInformation, errorLog));
+						tuneMethod, instrumentMethod, sampleInformation, errorLog, uvDataFile));
 	}
 
 }

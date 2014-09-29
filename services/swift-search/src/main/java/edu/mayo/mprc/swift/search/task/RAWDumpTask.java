@@ -23,6 +23,7 @@ public final class RAWDumpTask extends AsyncTaskBase {
 	private File instrumentMethodFile;
 	private File sampleInformationFile;
 	private File errorLogFile;
+	private File uvDataFile;
 	private final File outputFolder;
 
 	public RAWDumpTask(final WorkflowEngine engine, final File rawFile, final File outputFolder, final DaemonConnection daemonConnection, final DatabaseFileTokenFactory fileTokenFactory, final boolean fromScratch) {
@@ -37,6 +38,7 @@ public final class RAWDumpTask extends AsyncTaskBase {
 		instrumentMethodFile = RAWDumpWorkPacket.getExpectedInstrumentMethodFile(outputFolder, rawFile);
 		sampleInformationFile = RAWDumpWorkPacket.getExpectedSampleInformationFile(outputFolder, rawFile);
 		errorLogFile = RAWDumpWorkPacket.getExpectedErrorLogFile(outputFolder, rawFile);
+		uvDataFile = RAWDumpWorkPacket.getExpectedUvDataFile(outputFolder, rawFile);
 
 		setName("RAW Dump");
 		updateDescription();
@@ -51,7 +53,8 @@ public final class RAWDumpTask extends AsyncTaskBase {
 	public WorkPacket createWorkPacket() {
 		return new RAWDumpWorkPacket(rawFile,
 				rawInfoFile, rawSpectraFile, chromatogramFile,
-				tuneMethodFile, instrumentMethodFile, sampleInformationFile, errorLogFile,
+				tuneMethodFile, instrumentMethodFile, sampleInformationFile,
+				errorLogFile, uvDataFile,
 				isFromScratch());
 	}
 
@@ -92,8 +95,12 @@ public final class RAWDumpTask extends AsyncTaskBase {
 		return errorLogFile;
 	}
 
+	public File getUvDataFile() {
+		return uvDataFile;
+	}
+
 	public RawFileMetaData getRawFileMetadata() {
-		return new RawFileMetaData(rawFile, rawInfoFile, tuneMethodFile, instrumentMethodFile, sampleInformationFile, errorLogFile);
+		return new RawFileMetaData(rawFile, rawInfoFile, tuneMethodFile, instrumentMethodFile, sampleInformationFile, errorLogFile, uvDataFile);
 	}
 
 	@Override
@@ -113,6 +120,7 @@ public final class RAWDumpTask extends AsyncTaskBase {
 			instrumentMethodFile = dumpResult.getInstrumentMethodFile();
 			sampleInformationFile = dumpResult.getSampleInformationFile();
 			errorLogFile = dumpResult.getErrorLogFile();
+			uvDataFile = dumpResult.getUvDataFile();
 		}
 	}
 

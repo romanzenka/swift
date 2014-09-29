@@ -12,6 +12,7 @@ import edu.mayo.mprc.searchengine.SearchEngineResult;
 import edu.mayo.mprc.sequest.SequestWorkPacket;
 import edu.mayo.mprc.swift.db.DatabaseFileTokenFactory;
 import edu.mayo.mprc.swift.db.SearchEngine;
+import edu.mayo.mprc.utilities.FileUtilities;
 import edu.mayo.mprc.utilities.progress.ProgressInfo;
 import edu.mayo.mprc.workflow.engine.WorkflowEngine;
 import edu.mayo.mprc.xtandem.XTandemWorkPacket;
@@ -135,7 +136,7 @@ final class EngineSearchTask extends AsyncTaskBase implements FileProducingTask 
 		final String deployedFileString = getDeployedDatabaseFile(engine, deploymentResult);
 		final String deployedFileDbString;
 		if (deployedFileString.contains(File.separator)) {
-			File deployedFile = new File(deployedFileString);
+			final File deployedFile = new File(deployedFileString);
 			deployedFileDbString = fileTokenFactory.fileToTaggedDatabaseToken(deployedFile);
 		} else {
 			deployedFileDbString = deployedFileString;
@@ -181,8 +182,15 @@ final class EngineSearchTask extends AsyncTaskBase implements FileProducingTask 
 		return outputFile;
 	}
 
+	public String getOutputExtension() {
+		if (outputFile == null) {
+			return null;
+		}
+		return FileUtilities.getGzippedExtension(outputFile.getName());
+	}
+
 	@Override
-	public boolean equals(Object o) {
+	public boolean equals(final Object o) {
 		if (this == o) {
 			return true;
 		}
@@ -190,7 +198,7 @@ final class EngineSearchTask extends AsyncTaskBase implements FileProducingTask 
 			return false;
 		}
 
-		EngineSearchTask that = (EngineSearchTask) o;
+		final EngineSearchTask that = (EngineSearchTask) o;
 
 		if (publicSearchFiles != that.publicSearchFiles) {
 			return false;
@@ -204,6 +212,9 @@ final class EngineSearchTask extends AsyncTaskBase implements FileProducingTask 
 		if (params != null ? !params.equals(that.params) : that.params != null) {
 			return false;
 		}
+		if (!getOutputExtension().equals(that.getOutputExtension())) {
+			return false;
+		}
 
 		return true;
 	}
@@ -214,6 +225,7 @@ final class EngineSearchTask extends AsyncTaskBase implements FileProducingTask 
 		result = 31 * result + (inputFile != null ? inputFile.hashCode() : 0);
 		result = 31 * result + (params != null ? params.hashCode() : 0);
 		result = 31 * result + (publicSearchFiles ? 1 : 0);
+		result = 31 * result + (outputFile != null ? FileUtilities.getGzippedExtension(outputFile.getName()) : "").hashCode();
 		return result;
 	}
 

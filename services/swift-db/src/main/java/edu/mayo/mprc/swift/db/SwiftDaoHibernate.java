@@ -50,7 +50,7 @@ public final class SwiftDaoHibernate extends DaoBase implements SwiftDao {
 	/**
 	 * The version of the Swift database we are expecting to see.
 	 */
-	private final int CURRENT_DATABASE_VERSION = 38;
+	private final int CURRENT_DATABASE_VERSION = 39;
 
 	public SwiftDaoHibernate() {
 		super(null);
@@ -661,7 +661,7 @@ public final class SwiftDaoHibernate extends DaoBase implements SwiftDao {
 							paramsDao.getInstrumentByName(Instrument.ORBITRAP.getName()),
 							ExtractMsnSettings.getMsconvertSettings(),
 							new ScaffoldSettingsBuilder().createScaffoldSettings(),
-							enabledEngines));
+							enabledEngines, ""));
 
 			final List<FileSearch> inputFiles = Lists.newArrayList();
 			FileSearch fileSearch1 = new FileSearch(new File("test.RAW"), "sample1", "none", "Test Search 1", null);

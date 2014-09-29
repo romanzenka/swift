@@ -111,6 +111,7 @@ final class MsconvertTask extends AsyncTaskBase implements FileProducingTask {
 		if (other instanceof MsconvertTask) {
 			if (((MsconvertTask) other).includeMs1) {
 				includeMs1 = true;
+				updateDescription();
 			}
 		}
 	}

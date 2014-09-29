@@ -1,5 +1,6 @@
 package edu.mayo.mprc.sge;
 
+import edu.mayo.mprc.MprcException;
 import edu.mayo.mprc.config.DaemonConfig;
 import edu.mayo.mprc.config.DaemonConfigInfo;
 import edu.mayo.mprc.config.DependencyResolver;
@@ -12,11 +13,11 @@ import edu.mayo.mprc.messaging.ServiceFactory;
 import edu.mayo.mprc.utilities.FileUtilities;
 import org.testng.Assert;
 import org.testng.annotations.AfterTest;
-import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Test;
 
 import java.io.File;
 
+import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -29,8 +30,7 @@ public final class TestGridRunner {
 	private File tempFolder; /* Temp folder within the base folder */
 	private GridRunner runner;
 
-	@BeforeTest
-	public void setup() {
+	public void setup(boolean simulateFailedRequest) {
 		baseFolder = FileUtilities.createTempFolder();
 		logFolder = new File(baseFolder, "log");
 		FileUtilities.ensureFolderExists(logFolder);
@@ -48,6 +48,8 @@ public final class TestGridRunner {
 		daemonConfig.setSharedFileSpacePath(baseFolder.getAbsolutePath());
 		daemonConfig.setTempFolderPath(tempFolder.getAbsolutePath());
 		daemonConfig.setLogOutputFolder(logFolder.getAbsolutePath());
+		daemonConfig.setDumpErrors(true);
+		daemonConfig.setDumpFolderPath(tempFolder.getAbsolutePath());
 
 		DaemonConfigInfo daemonConfigInfo = daemonConfig.createDaemonConfigInfo();
 
@@ -58,6 +60,11 @@ public final class TestGridRunner {
 		gridScriptFactory.setSwiftLibDirectory(new File(baseFolder, "lib").getAbsolutePath());
 		runnerFactory.setGridScriptFactory(gridScriptFactory);
 		GridEngineJobManager jobManager = mock(GridEngineJobManager.class);
+		if (simulateFailedRequest) {
+			// We pretend that sge failed
+			when(jobManager.passToGridEngine(any(GridWorkPacket.class)))
+					.thenThrow(new MprcException("Failed passing packet to grid engine"));
+		}
 		runnerFactory.setGridEngineManager(jobManager);
 		ServiceFactory serviceFactory = mock(ServiceFactory.class);
 		runnerFactory.setServiceFactory(serviceFactory);
@@ -85,6 +92,7 @@ public final class TestGridRunner {
 
 	@Test
 	public void shouldLogProperly() {
+		setup(false);
 		DaemonRequest request = mock(DaemonRequest.class);
 		when(request.getWorkPacket()).thenReturn(new HelloWorldWorkPacket(false));
 
@@ -94,6 +102,21 @@ public final class TestGridRunner {
 
 		// We must have produced 2000 work packets without crashing
 		Assert.assertEquals(tempFolder.listFiles().length, 2000);
+	}
+
+	@Test(expectedExceptions = MprcException.class)
+	public void shouldSupportFail() {
+		setup(true);
+		DaemonRequest request = mock(DaemonRequest.class);
+		when(request.getWorkPacket()).thenReturn(new HelloWorldWorkPacket(false));
+
+		try {
+			runner.processRequest(request);
+
+		} catch (MprcException e) {
+			Assert.assertTrue(e.getMessage().contains("failed_job"), "We must report a stored failed_job packet for replicating the results");
+			throw e;
+		}
 	}
 
 }

@@ -2,8 +2,11 @@ package edu.mayo.mprc.heme.dao;
 
 import edu.mayo.mprc.MprcException;
 import edu.mayo.mprc.database.DaoTest;
+import edu.mayo.mprc.dbcurator.model.impl.CurationDaoHibernate;
 import edu.mayo.mprc.swift.db.SwiftDaoHibernate;
 import edu.mayo.mprc.swift.params2.ParamsDaoHibernate;
+import edu.mayo.mprc.unimod.UnimodDaoHibernate;
+import edu.mayo.mprc.workspace.WorkspaceDaoHibernate;
 import org.joda.time.DateTime;
 import org.testng.Assert;
 import org.testng.annotations.AfterMethod;
@@ -17,16 +20,22 @@ import java.util.List;
  * @author Roman Zenka
  */
 public final class HemeDaoHibernateTest extends DaoTest {
+	WorkspaceDaoHibernate workspaceDao;
+	CurationDaoHibernate curationDao;
+	UnimodDaoHibernate unimodDao;
 	HemeDaoHibernate hemeDao;
 	SwiftDaoHibernate swiftDao;
 	ParamsDaoHibernate paramsDao;
 
 	@BeforeMethod
 	public void setup() {
-		hemeDao = new HemeDaoHibernate();
-		swiftDao = new SwiftDaoHibernate();
+		workspaceDao = new WorkspaceDaoHibernate();
+		curationDao = new CurationDaoHibernate();
+		unimodDao = new UnimodDaoHibernate();
 		paramsDao = new ParamsDaoHibernate();
-		initializeDatabase(Arrays.asList(hemeDao, swiftDao, paramsDao));
+		swiftDao = new SwiftDaoHibernate(workspaceDao, curationDao, paramsDao, unimodDao);
+		hemeDao = new HemeDaoHibernate();
+		initializeDatabase(Arrays.asList(hemeDao, swiftDao, paramsDao, workspaceDao, curationDao, unimodDao));
 	}
 
 	@AfterMethod

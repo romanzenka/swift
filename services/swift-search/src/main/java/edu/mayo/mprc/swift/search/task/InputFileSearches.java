@@ -4,17 +4,17 @@ import java.util.HashSet;
 import java.util.Set;
 
 class InputFileSearches {
-	private Set<EngineSearchTask> searches;
+	private Set<FileProducingTask> searches;
 
 	InputFileSearches() {
-		searches = new HashSet<EngineSearchTask>();
+		searches = new HashSet<FileProducingTask>();
 	}
 
-	public void addSearch(final EngineSearchTask search) {
+	public void addSearch(final FileProducingTask search) {
 		searches.add(search);
 	}
 
-	public Set<EngineSearchTask> getSearches() {
+	public Set<FileProducingTask> getSearches() {
 		return searches;
 	}
 }

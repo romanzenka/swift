@@ -7,7 +7,6 @@ import edu.mayo.mprc.daemon.worker.WorkPacket;
 import edu.mayo.mprc.quameterdb.QuameterDbWorkPacket;
 import edu.mayo.mprc.swift.db.DatabaseFileTokenFactory;
 import edu.mayo.mprc.swift.dbmapping.FileSearch;
-import edu.mayo.mprc.utilities.FileUtilities;
 import edu.mayo.mprc.utilities.progress.ProgressInfo;
 import edu.mayo.mprc.workflow.engine.WorkflowEngine;
 
@@ -37,7 +36,7 @@ public final class QuameterDbTask extends AsyncTaskBase {
 		Preconditions.checkNotNull(metadata, "Search-db task did not produce raw file metadata");
 		Preconditions.checkNotNull(fileSearch, "Input file not set");
 		Preconditions.checkNotNull(quameterTask, "QuaMeter task not set");
-		final String fileName = FileUtilities.getFileNameWithoutExtension(fileSearch.getInputFile());
+		final String fileName = fileSearch.getInputFile().getAbsolutePath();
 		final Integer analysisId = searchDbTask.getAnalysisId();
 		final Integer searchResultId = metadata.get(fileName);
 		Preconditions.checkNotNull(searchResultId, "There must be search result id recorded for file name [" + fileName + "]");

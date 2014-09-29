@@ -72,6 +72,8 @@ public class TestSearchRunner {
 		final int tasksPerFile = (numEngines - 1) /* 1 for each engine except Scaffold */
 				+ 1 /* Raw->mgf */
 				+ 1 /* Raw->mzML for comet */
+				+ 1 /* Raw->ms2 for comet */
+				+ 1 /* sqt+ms2 combiner for comet */
 				+ 1 /* RawDump */
 				+ 1 /* msmsEval */;
 
@@ -137,6 +139,8 @@ public class TestSearchRunner {
 		final int tasksPerFile = (numEngines - 1) /* 1 for each engine except Scaffold */
 				+ 1 /* Raw->mgf */
 				+ 1 /* Raw->mzML for comet */
+				+ 1 /* Raw->ms2 for comet */
+				+ 1 /* sqt+ms2 combiner for comet */
 				+ 1 /* RawDump */
 				+ 1 /* msmsEval */
 				+ 1 /* Fasta DB load (two different DBs) */
@@ -171,6 +175,8 @@ public class TestSearchRunner {
 		final int tasksPerFile = (numEngines - 1) /* 1 for each engine except Scaffold */
 				+ 1 /* Raw->mgf */
 				+ 1 /* Raw->mzML for comet */
+				+ 1 /* Raw->ms2 for comet */
+				+ 1 /* sqt+ms2 combiner for comet */
 				+ 1 /* RawDump */
 				+ 1 /* msmsEval */;
 
@@ -206,6 +212,8 @@ public class TestSearchRunner {
 		final int tasksPerFile = numEngines /* 1 for each engine */
 				+ 1 /* Raw->mgf */
 				+ 1 /* Raw->mzML for comet */
+				+ 1 /* Raw->ms2 for comet */
+				+ 1 /* sqt+ms2 combiner for comet */
 				+ 1 /* RawDump */
 				+ 1 /* msmsEval */;
 
@@ -240,6 +248,8 @@ public class TestSearchRunner {
 		final int numEngines = enabledEngines().size();
 		final int tasksPerFile = (numEngines - 1) /* 1 for each engine except Scaffold */
 				+ 1 /* Raw->mzML can be used by Comet directly */
+				+ 1 /* Raw->ms2 for comet */
+				+ 1 /* sqt+ms2 combiner for comet */
 				+ 1 /* RawDump */
 				+ 1 /* no msmsEval */;
 
@@ -282,6 +292,8 @@ public class TestSearchRunner {
 		final int tasksPerFile = (numEngines - 1) /* 1 for each engine except Scaffold */
 				+ 1 /* Raw->mgf */
 				+ 1 /* Raw->mzML for comet */
+				+ 1 /* Raw->ms2 for comet */
+				+ 1 /* sqt+ms2 combiner for comet */
 				+ 1 /* RawDump */
 				+ 1 /* msmsEval */
 
@@ -341,12 +353,14 @@ public class TestSearchRunner {
 
 		final int numEngines = enabledEngines().size();
 		final int tasksPerFile = (numEngines - 1) /* 1 for each engine except Scaffold */
-				+ 1 /* Raw->mzML */
+				+ 1 /* Raw->mzML for comet */
+				+ 1 /* Raw->ms2 for comet */
+				+ 1 /* sqt+ms2 combiner for comet */
 				+ 1 /* RawDump */
 				+ 1 /* msmsEval */
 
 				+ (doSemiTryptic ?
-					1 : /* semitryptic means we can reuse comet, but idpicker needs to run due to forced FDR */
+					2 : /* We used to be able to reuse Comet result, but requiring sqt for Scaffold prevents us from doing so */
 					2 /* tryptic means we need extra semitryptic comet and idpicker */)
 				+ 1 /* QuaMeter */
 				+ 1 /* QuaMeter db load */;
@@ -442,7 +456,8 @@ public class TestSearchRunner {
 				new Tolerance(1, MassUnit.Da), Instrument.ORBITRAP,
 				new ExtractMsnSettings("-M100", ExtractMsnSettings.EXTRACT_MSN),
 				scaffoldSettings,
-				enabledEngines
+				enabledEngines,
+				""
 		);
 	}
 

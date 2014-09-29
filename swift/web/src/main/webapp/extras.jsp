@@ -37,6 +37,7 @@
                     <li><a href="/start">New Search</a></li>
                     <li><a href="/report/report.jsp">Existing Searches</a></li>
                     <li><a href="/">About Swift</a></li>
+                    <li><a href="/quameter">QuaMeter</a></li> <!-- TODO - make optional -->
                     <li class="active"><a href="/extras">Extras</a></li>
                 </ul>
             </div>
@@ -97,7 +98,6 @@
     </p>
 
     <p>
-        <a class="btn" href="/amino-acids">Defined Amino Acids</a>
         <a class="btn" href="/amino-acids">Defined Amino Acids</a>
         <a class="btn" href="/mods">Defined Modifications</a>
     </p>

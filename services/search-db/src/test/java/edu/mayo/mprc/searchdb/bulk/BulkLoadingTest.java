@@ -4,6 +4,7 @@ import edu.mayo.mprc.MprcException;
 import edu.mayo.mprc.database.Change;
 import edu.mayo.mprc.database.DaoTest;
 import edu.mayo.mprc.database.SessionProvider;
+import edu.mayo.mprc.dbcurator.model.impl.CurationDaoHibernate;
 import edu.mayo.mprc.fastadb.FastaDbDao;
 import edu.mayo.mprc.fastadb.FastaDbDaoHibernate;
 import edu.mayo.mprc.fastadb.ProteinSequence;
@@ -78,9 +79,10 @@ public final class BulkLoadingTest extends DaoTest {
 		FastaDbDaoHibernate fastaDbDaoImpl = new FastaDbDaoHibernate();
 		WorkspaceDaoHibernate workspaceDaoImpl = new WorkspaceDaoHibernate();
 		final UnimodDaoHibernate unimodDaoImpl = new UnimodDaoHibernate();
+		final CurationDaoHibernate curationDaoImpl = new CurationDaoHibernate();
 		final BulkSearchDbDaoHibernate searchDbDaoImpl = new BulkSearchDbDaoHibernate(swiftDaoImpl, fastaDbDaoImpl, getDatabase());
 		sessionProvider = fastaDbDaoImpl;
-		initializeDatabase(Arrays.asList(swiftDaoImpl, paramsDaoImpl, fastaDbDaoImpl, workspaceDaoImpl, unimodDaoImpl, searchDbDaoImpl));
+		initializeDatabase(Arrays.asList(swiftDaoImpl, paramsDaoImpl, fastaDbDaoImpl, workspaceDaoImpl, unimodDaoImpl, searchDbDaoImpl, curationDaoImpl));
 		// loadXml();
 
 		stats = getDatabase().getSessionFactory().getStatistics();

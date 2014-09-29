@@ -8,3 +8,4 @@ target
 /activemq-data/
 .idea
 deploy_atlas_test.sh
+**/rebel.xml

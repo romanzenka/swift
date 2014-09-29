@@ -7,6 +7,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.regex.Pattern;
 
 /**
  * this packet needs to provide grid engine task run information
@@ -19,6 +20,7 @@ public class GridWorkPacket {
 	private static final String GRIDENGINE_STD_ERR_FILE_PREFIX = "e";
 	private static final String GRIDENGINE_STD_OUT_FILE_PREFIX = "o";
 	private static final String LOG_FILE_EXTENTION = ".sge.log";
+	private static final Pattern QUOTE_CHARS = Pattern.compile("(['\\\\])");
 
 	private final String applicationName;
 	private List<String> parameters;
@@ -200,8 +202,31 @@ public class GridWorkPacket {
 		this.priority = priority;
 	}
 
+	/**
+	 * Generate a qsub command that closely resembles what would user need to specify to run a job in grid engine
+	 * with same settings as what the packet needs.
+	 *
+	 * @return qsub-like description of the work packet
+	 */
 	public String toString() {
-		return "GridWorkPacket: " + applicationName + " " + getParametersAsCallString() + " (queue=" + queueName + ")";
+		return "GridWorkPacket:\n\tqsub"
+				+ qsubOption(GridEngineJobManagerImpl.QUEUE_SPEC_OPTION, getQueueName())
+				+ qsubOption("-wd", getWorkingFolder())
+				+ (getMemoryRequirement()!=null ? ' ' +GridEngineJobManagerImpl.MEMORY_SPEC_OPTION +getMemoryRequirement() + GridEngineJobManagerImpl.MEMORY_SPEC_OPTION_MB_UNIT : "")
+				+ (getPriority() < 0 ? qsubOption(GridEngineJobManagerImpl.PRIORITY_SPEC_OPTION, String.valueOf(getPriority())) : "")
+				+ (getNativeSpecification() != null ? ' ' + getNativeSpecification() : "")
+				+ ' ' + applicationName
+				+ ' ' + getParametersAsCallString();
+	}
+
+	private static String qsubOption(String name, String value) {
+		if (value != null) {
+			if(value.contains(" ")) {
+				return String.format(" %s '%s'", name, QUOTE_CHARS.matcher(value).replaceAll("\\\\$1"));
+			}
+			return String.format(" %s %s", name, value);
+		}
+		return "";
 	}
 
 	/**

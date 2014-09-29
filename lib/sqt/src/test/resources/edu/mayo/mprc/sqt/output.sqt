@@ -1,0 +1,136 @@
+H	SQTGenerator Comet
+H	Comment	CometVersion 2014.01 rev. 0
+H
+H	StartTime	05/07/2014, 10:07:10 PM
+H	EndTime	05/07/2014, 10:07:10 PM
+H
+H	DBSeqLength	0
+H	DBLocusCount	0
+H	FragmentMassMode	AMU
+H	PrecursorMassMode	PPM
+H	SQTGeneratorVersion	N/A
+H	Database	/mnt/mprc/projects/amyloid_dogan_2007/Clinical/Validations/Software_Validation_Data_Set/LTQ-Orbitrap/LTQ-Orbitrap_Swift_3.1_OpenSource_Sandbox/SPhu_2012_08.fasta
+H	FragmentMasses	MONO
+H	PrecursorMasses	MONO
+H	PrecursorMassTolerance	20.000000
+H	FragmentMassTolerance	1.000500
+H	EnzymeName	Trypsin
+H	Algo-IonSeries	 0 0 0 0.0 1.0 0.0 0.0 0.0 0.0 0.0 1.0 0.0
+H	DiffMod	M*=+15.994900
+H
+H	CometParams	activation_method = CID
+H	CometParams	add_A_alanine = 0.000000
+H	CometParams	add_B_user_amino_acid = 0.000000
+H	CometParams	add_C_cysteine = 0.000000
+H	CometParams	add_Cterm_peptide = 0.000000
+H	CometParams	add_Cterm_protein = 0.000000
+H	CometParams	add_D_aspartic_acid = 0.000000
+H	CometParams	add_E_glutamic_acid = 0.000000
+H	CometParams	add_F_phenylalanine = 0.000000
+H	CometParams	add_G_glycine = 0.000000
+H	CometParams	add_H_histidine = 0.000000
+H	CometParams	add_I_isoleucine = 0.000000
+H	CometParams	add_J_user_amino_acid = 0.000000
+H	CometParams	add_K_lysine = 0.000000
+H	CometParams	add_L_leucine = 0.000000
+H	CometParams	add_M_methionine = 0.000000
+H	CometParams	add_N_asparagine = 0.000000
+H	CometParams	add_Nterm_peptide = 0.000000
+H	CometParams	add_Nterm_protein = 0.000000
+H	CometParams	add_O_ornithine = 0.000000
+H	CometParams	add_P_proline = 0.000000
+H	CometParams	add_Q_glutamine = 0.000000
+H	CometParams	add_R_arginine = 0.000000
+H	CometParams	add_S_serine = 0.000000
+H	CometParams	add_T_threonine = 0.000000
+H	CometParams	add_U_user_amino_acid = 0.000000
+H	CometParams	add_V_valine = 0.000000
+H	CometParams	add_W_tryptophan = 0.000000
+H	CometParams	add_X_user_amino_acid = 0.000000
+H	CometParams	add_Y_tyrosine = 0.000000
+H	CometParams	add_Z_user_amino_acid = 0.000000
+H	CometParams	allowed_missed_cleavage = 2
+H	CometParams	clear_mz_range = 0.000000 0.000000
+H	CometParams	clip_nterm_methionine = 0
+H	CometParams	database_name = /mnt/mprc/projects/amyloid_dogan_2007/Clinical/Validations/Software_Validation_Data_Set/LTQ-Orbitrap/LTQ-Orbitrap_Swift_3.1_OpenSource_Sandbox/SPhu_2012_08.fasta
+H	CometParams	decoy_prefix = DECOY_
+H	CometParams	decoy_search = 0
+H	CometParams	digest_mass_range = 600.000000 5000.000000
+H	CometParams	fragment_bin_offset = 0.400000
+H	CometParams	fragment_bin_tol = 1.000500
+H	CometParams	isotope_error = 1
+H	CometParams	mass_type_fragment = 1
+H	CometParams	mass_type_parent = 1
+H	CometParams	max_fragment_charge = 3
+H	CometParams	max_precursor_charge = 6
+H	CometParams	max_variable_mods_in_peptide = 3
+H	CometParams	minimum_intensity = 0
+H	CometParams	minimum_peaks = 10
+H	CometParams	ms_level = 2
+H	CometParams	nucleotide_reading_frame = 0
+H	CometParams	num_enzyme_termini = 2
+H	CometParams	num_output_lines = 20
+H	CometParams	num_results = 50
+H	CometParams	num_threads = 1
+H	CometParams	output_outfiles = 0
+H	CometParams	output_pepxmlfile = 0
+H	CometParams	output_pinxmlfile = 0
+H	CometParams	output_sqtfile = 1
+H	CometParams	output_sqtstream = 0
+H	CometParams	output_suffix =
+H	CometParams	output_txtfile = 0
+H	CometParams	peptide_mass_tolerance = 20.000000
+H	CometParams	peptide_mass_units = 2
+H	CometParams	precursor_charge = 0 0
+H	CometParams	precursor_tolerance_type = 1
+H	CometParams	print_expect_score = 0
+H	CometParams	remove_precursor_peak = 0
+H	CometParams	remove_precursor_tolerance = 1.500000
+H	CometParams	sample_enzyme_number = 1
+H	CometParams	scan_range = 0 0
+H	CometParams	search_enzyme_number = 1
+H	CometParams	show_fragment_ions = 0
+H	CometParams	skip_researching = 1
+H	CometParams	spectrum_batch_size = 0
+H	CometParams	theoretical_fragment_ions = 1
+H	CometParams	use_A_ions = 0
+H	CometParams	use_B_ions = 1
+H	CometParams	use_C_ions = 0
+H	CometParams	use_NL_ions = 1
+H	CometParams	use_X_ions = 0
+H	CometParams	use_Y_ions = 1
+H	CometParams	use_Z_ions = 0
+H	CometParams	use_sparse_matrix = 0
+H	CometParams	variable_C_terminus = 0.000000
+H	CometParams	variable_C_terminus_distance = -1
+H	CometParams	variable_N_terminus = 0.000000
+H	CometParams	variable_N_terminus_distance = -1
+H	CometParams	variable_mod1 = 15.994900 M 0 3
+H	CometParams	variable_mod2 = 0.000000 X 0 3
+H	CometParams	variable_mod3 = 0.000000 X 0 3
+H	CometParams	variable_mod4 = 0.000000 X 0 3
+H	CometParams	variable_mod5 = 0.000000 X 0 3
+H	CometParams	variable_mod6 = 0.000000 X 0 3
+H	CometParams
+H	CometParams	[COMET_ENZYME_INFO]
+H	CometParams	0.  No_enzyme              0      -           -
+H	CometParams	1.  Trypsin                1      KR          P
+H	CometParams	2.  Trypsin/P              1      KR          -
+H	CometParams	3.  Lys_C                  1      K           P
+H	CometParams	4.  Lys_N                  0      K           -
+H	CometParams	5.  Arg_C                  1      R           P
+H	CometParams	6.  Asp_N                  0      D           -
+H	CometParams	7.  CNBr                   1      M           -
+H	CometParams	8.  Glu_C                  1      DE          P
+H	CometParams	9.  PepsinA                1      FL          P
+H	CometParams	10. Chymotrypsin           1      FWYL        P
+H	CometParams
+H
+S	161	161	2	105	node034	1095.564000	6.68E+02	0.0	7402
+M	1	11	1095.565381	0.0000	1.2253	166.5	8	20	M.KFL.V	U
+L	Q4U9M9|104K_THEAN
+L	P15711|104K_THEPA
+L	Q9XHP0|11S2_SESIN
+S	163	163	2	105	node034	1095.563000	6.37E+02	0.0	7319
+M	1	2	1095.565381	0.0000	1.1351	215.6	10	20	N.YTMVTPRPHRDVIRV*SDGS.E	U
+L	P15711|104K_THEPA

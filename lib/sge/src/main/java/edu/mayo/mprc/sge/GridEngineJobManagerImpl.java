@@ -18,11 +18,11 @@ import java.util.concurrent.Semaphore;
 public final class GridEngineJobManagerImpl implements GridEngineJobManager {
 	private static final Logger LOGGER = Logger.getLogger(GridEngineJobManagerImpl.class);
 
-	private static final String QUEUE_SPEC_OPTION = "-q";
-	private static final String MEMORY_SPEC_OPTION = "-l s_vmem=";
-	private static final String MEMORY_SPEC_OPTION_MB_UNIT = "M";
-	private static final int MAX_GRID_ENGINE_COMMAND = 1024;
-	private static final String PRIORITY_SPEC_OPTION = "-p";
+	public static final String QUEUE_SPEC_OPTION = "-q";
+	public static final String MEMORY_SPEC_OPTION = "-l s_vmem=";
+	public static final String MEMORY_SPEC_OPTION_MB_UNIT = "M";
+	public static final int MAX_GRID_ENGINE_COMMAND = 1024;
+	public static final String PRIORITY_SPEC_OPTION = "-p";
 
 	private Session gridEngineSession;
 

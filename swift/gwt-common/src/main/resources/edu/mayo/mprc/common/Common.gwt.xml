@@ -1,4 +1,6 @@
 <module rename-to="common">
     <inherits name='com.google.gwt.user.User'/>
     <entry-point class='edu.mayo.mprc.common.client.Common'/>
+
+    <public path="public" />
 </module>

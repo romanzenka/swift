@@ -12,7 +12,7 @@ public interface ScaffoldTaskI extends Task, ScaffoldSpectrumExportProducer {
 
 	File getScaffoldXmlFile();
 
-	void addInput(FileSearch fileSearch, EngineSearchTask search);
+	void addInput(FileSearch fileSearch, FileProducingTask search);
 
 	/**
 	 * Which input file/search parameters tuple gets outputs from which engine search.
