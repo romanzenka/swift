@@ -58,7 +58,7 @@ public final class UvDataReader implements KeyedTsvReader {
 	 * @param uvDataFile rawDump file to process
 	 */
 	public UvDataReader(final File uvDataFile) {
-		if (uvDataFile == null) {
+		if (uvDataFile == null || !uvDataFile.exists() || uvDataFile.length() == 0) {
 			// Null files are honored - they will act as if there was no input information
 			// Use default header (otherwise we use header obtained from the file).
 			header = DEFAULT_HEADER;
@@ -99,7 +99,7 @@ public final class UvDataReader implements KeyedTsvReader {
 			return EMPTY_LINE;
 		}
 		Map.Entry<Double, String> entry = lines.floorEntry(Double.parseDouble(key));
-		if(entry==null) {
+		if (entry == null) {
 			// Try ceiling if nothing below
 			entry = lines.ceilingEntry(Double.parseDouble(key));
 		}
