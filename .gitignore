@@ -7,3 +7,4 @@ target
 *.class
 /activemq-data/
 .idea
+deploy_atlas_test.sh
