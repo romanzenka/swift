@@ -698,7 +698,7 @@ imageGenerator<-function(dataFile, msmsEvalDataFile, infoFile, spectrumFile, chr
     }
     dev.off()
 
-    ### UV pump info
+    ### UV pump info    
     startPlot(uv.title, outputImages$uv.file)
     uvData <- dataTabFull[!duplicated(dataTabFull$UV.RT),]
     uvData <- uvData[uvData$UV.RT>=0,]
@@ -711,14 +711,14 @@ imageGenerator<-function(dataFile, msmsEvalDataFile, infoFile, spectrumFile, chr
       color <- "#AA0000"      
       plot(uvData$UV.RT, uvData$PumpModule.LoadingPump.Pressure, type="l", axes=FALSE, xlab=NA, ylab=NA, yaxt="n", col=color, lwd=2, ylim=pressureRange)
       axis(side=2, at = pretty(pressureRange), col=color, col.axis=color, lwd.ticks=1, lwd=-1)      
-      mtext("Loading Pump", side=2, line=3, col=color)
+      mtext("Loading Pump (PSI)", side=2, line=3, col=color)
       
       par(new=TRUE)
 
       color <- "#0000AA"      
       plot(uvData$UV.RT, uvData$PumpModule.NC_Pump.Pressure, type="l", axes=FALSE, xlab=NA, ylab=NA, yaxt="n", col=color, lwd=2, ylim=pressureRange)
       axis(side=2, at = pretty(pressureRange), col=color, col.axis=color, lwd.ticks=1, lwd=-1, tck=0.01)    
-      mtext("NC Pump", side=2, line=2, col=color)
+      mtext("NC Pump (PSI)", side=2, line=2, col=color)
 
       par(new=TRUE)
       
