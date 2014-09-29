@@ -125,6 +125,7 @@ public final class RAWDumpWorker extends WorkerBase {
 			publish(instrumentMethodFile, finalInstrumentMethodFile);
 			publish(sampleInformationFile, finalSampleInformationFile);
 			publish(errorLogFile, finalErrorLogFile);
+			publish(uvDataFile, finalUvDataFile);
 		} finally {
 			FileUtilities.deleteNow(tempParamFile);
 		}
