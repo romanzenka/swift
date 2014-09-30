@@ -726,7 +726,7 @@ imageGenerator<-function(dataFile, msmsEvalDataFile, infoFile, spectrumFile, chr
       oldPar <- par(mar=c(5,4,4,5)+.1)
             
       color <- uv.loading.pressure.color   
-      plot(uvData$UV.RT, uvData$PumpModule.LoadingPump.Pressure, type="l", axes=FALSE, xlab=NA, ylab=NA, yaxt="n", col=color, lwd=2, ylim=pressureRange)
+      plot(uvData$UV.RT, uvData$PumpModule.LoadingPump.Pressure, type="l", axes=FALSE, xlab=NA, ylab=NA, yaxt="n", col=color, lwd=2, ylim=uv.pressure.range)
       axis(side=2, at = pretty(uv.pressure.range), col=color, col.axis=color, lwd.ticks=1, lwd=-1)      
       mtext(uv.loading.pressure.title, side=2, line=3, col=color)
       result$uv.loading.pressure.mean <- mean(uvData$PumpModule.LoadingPump.Pressure)      
@@ -734,7 +734,7 @@ imageGenerator<-function(dataFile, msmsEvalDataFile, infoFile, spectrumFile, chr
       par(new=TRUE)
 
       color <- uv.nc.pressure.color     
-      plot(uvData$UV.RT, uvData$PumpModule.NC_Pump.Pressure, type="l", axes=FALSE, xlab=NA, ylab=NA, yaxt="n", col=color, lwd=2, ylim=pressureRange)
+      plot(uvData$UV.RT, uvData$PumpModule.NC_Pump.Pressure, type="l", axes=FALSE, xlab=NA, ylab=NA, yaxt="n", col=color, lwd=2, ylim=uv.pressure.range)
       axis(side=2, at = pretty(uv.pressure.range), col=color, col.axis=color, lwd.ticks=1, lwd=-1, tck=0.01)    
       mtext(uv.nc.pressure.title, side=2, line=2, col=color)
       result$uv.nc.pressure.mean <- mean(uvData$PumpModule.NC_Pump.Pressure)
