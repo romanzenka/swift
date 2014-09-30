@@ -30,7 +30,7 @@ current.title.nort <- "Source Current vs. Scan Id QA"
 pepTol.title <- "Peptide Tolerance"
 tic.title <- "TIC vs. RT"
 msmsEval.title <- "msmsEval Discriminant Histogram"
-uv.title <- "Autosampler Pressures"
+uv.title <- "Pump Stats" # This is called "uv" as the pump pressure is measured using ultraviolet light
 
 # Plot dimensions
 plot.dimension.full <- c(1000, 800) # The actual plot dimensions
@@ -128,6 +128,22 @@ spectrum.domfrag.symbol <- 24 # Triangle up
 # Lockmass line
 lockmass.found.col <- "grey"
 lockmass.lost.col <- "red"
+
+# UV plot configuration
+uv.loading.pressure.color <- "#AA0000"        
+uv.loading.pressure.title <- "Loading Pump (PSI)"
+
+uv.nc.pressure.color <- "#0000AA" 
+uv.nc.pressure.title <- "NC Pump (PSI)"
+
+uv.column.temperature.color <- "#AA8800"
+uv.column.temperature.title <- "Oven temperature (Celsius)"
+
+uv.percent.b.color <- "#008800"
+uv.percent.b.title <- "%B"
+
+uv.pressure.range <- range(0, 2000) # Show range from 0-2000 PSI
+
 
 # How to visualize a hit?
 spectrum.symbol <- function(identified, reverse, polymer, unfrag, domfrag) {
@@ -505,7 +521,9 @@ movingAverage <- function(x,n=5){
   }
 }
 
-# Generates series of images for one .RAW file
+#' Generates series of images for one .RAW file
+#'
+#' @return a summary of results to be written in the summary.xml file 
 imageGenerator<-function(dataFile, msmsEvalDataFile, infoFile, spectrumFile, chromatogramFile, outputImages, generate, decoyRegex) {
   # We return the passed file names as a part of our result
   result<-outputImages
@@ -702,43 +720,50 @@ imageGenerator<-function(dataFile, msmsEvalDataFile, infoFile, spectrumFile, chr
     startPlot(uv.title, outputImages$uv.file)
     uvData <- dataTabFull[!duplicated(dataTabFull$UV.RT),]
     uvData <- uvData[!is.na(uvData$UV.RT),]
-    
+        
     if(nrow(uvData)>0) {
       
-      oldPar<-par(mar=c(5,4,4,5)+.1)
-      
-      pressureRange <- range(c(uvData$PumpModule.NC_Pump.Pressure, uvData$PumpModule.LoadingPump.Pressure))
-      color <- "#AA0000"      
+      oldPar <- par(mar=c(5,4,4,5)+.1)
+            
+      color <- uv.loading.pressure.color   
       plot(uvData$UV.RT, uvData$PumpModule.LoadingPump.Pressure, type="l", axes=FALSE, xlab=NA, ylab=NA, yaxt="n", col=color, lwd=2, ylim=pressureRange)
-      axis(side=2, at = pretty(pressureRange), col=color, col.axis=color, lwd.ticks=1, lwd=-1)      
-      mtext("Loading Pump (PSI)", side=2, line=3, col=color)
+      axis(side=2, at = pretty(uv.pressure.range), col=color, col.axis=color, lwd.ticks=1, lwd=-1)      
+      mtext(uv.loading.pressure.title, side=2, line=3, col=color)
+      result$uv.loading.pressure.mean <- mean(uvData$PumpModule.LoadingPump.Pressure)      
       
       par(new=TRUE)
 
-      color <- "#0000AA"      
+      color <- uv.nc.pressure.color     
       plot(uvData$UV.RT, uvData$PumpModule.NC_Pump.Pressure, type="l", axes=FALSE, xlab=NA, ylab=NA, yaxt="n", col=color, lwd=2, ylim=pressureRange)
-      axis(side=2, at = pretty(pressureRange), col=color, col.axis=color, lwd.ticks=1, lwd=-1, tck=0.01)    
-      mtext("NC Pump (PSI)", side=2, line=2, col=color)
+      axis(side=2, at = pretty(uv.pressure.range), col=color, col.axis=color, lwd.ticks=1, lwd=-1, tck=0.01)    
+      mtext(uv.nc.pressure.title, side=2, line=2, col=color)
+      result$uv.nc.pressure.mean <- mean(uvData$PumpModule.NC_Pump.Pressure)
 
       par(new=TRUE)
       
-      color <- "#AA8800"     
+      color <- uv.column.temperature.color   
       plot(uvData$UV.RT, uvData$ColumnOven.Temperature, type="l", axes=FALSE, xlab=xAxisTitleScanOrRT, ylab=NA,
            main=c(plotName, uv.title), col=color)
       axis(side=4, at = pretty(range(uvData$ColumnOven.Temperature)), col=color, col.axis=color, lwd.ticks=1, lwd=-1, tck=0.01, mgp = c(0, -1.4, 0) )
-      mtext("Oven temperature (Celsius)", side=4, line=2, col=color)
+      mtext(uv.column.temperature.title, side=4, line=2, col=color)
+      result$uv.column.temperature.min <- min(uvData$ColumnOven.Temperature)
+      result$uv.column.temperature.max <- max(uvData$ColumnOven.Temperature)            
       
       par(new=TRUE)
       
-      color <- "#008800"
+      color <- uv.percent.b.color 
       plot(uvData$UV.RT, uvData$PumpModule.NC_Pump..B, type="l", xlab=NA, ylab=NA, ylim=c(0, 100), yaxt="n", col=color, lwd=2)
       axis(side=4, at = pretty(range(c(0, 100))), col=color, col.axis=color, lwd.ticks=1, lwd=-1)
-      mtext("%B", side=4, line=1, col=color)
+      mtext(uv.percent.b.title, side=4, line=1, col=color)
             
-      par(oldPar)
+      par(oldPar)          
       
     } else {
       emptyPlot()
+      result$uv.loading.pressure.mean <- NA
+      result$uv.nc.pressure.mean <- NA
+      result$uv.column.temperature.min <- NA
+      result$uv.column.temperature.max <- NA      
     }
     dev.off()
     
@@ -1049,7 +1074,7 @@ run <- function(inputFile, reportFileName, decoyRegex) {
   reportFile<-file(reportFileName, "w")
   
   excelSummaryFile<-file(file.path(dirname(reportFileName), "summary.xls"), "w")
-  cat("raw file name\tproteins\treverse proteins\tpeptides\treverse peptides\tall spectra\tmsn spectra\t.dat spectra\tidentified spectra\treverse hit spectra\tpolymer spectra\tunfragmented spectra\tdominant fragment spectra\n" , file=excelSummaryFile)
+  cat("raw file name\tproteins\treverse proteins\tpeptides\treverse peptides\tall spectra\tmsn spectra\t.dat spectra\tidentified spectra\treverse hit spectra\tpolymer spectra\tunfragmented spectra\tdominant fragment spectra\tloading pressure mean\tnc pressure mean\tcolumn temperature min\tcolumn temperature max\n" , file=excelSummaryFile)
   
   startReportFile(reportFile)
   
@@ -1089,6 +1114,10 @@ run <- function(inputFile, reportFileName, decoyRegex) {
         row$spectrum.polymer.count,
         row$spectrum.unfrag.count,
         row$spectrum.domfrag.count,
+        row$uv.loading.pressure.mean,
+        row$uv.nc.pressure.mean,
+        row$uv.column.temperature.min,
+        row$uv.column.temperature.max,
         file=excelSummaryFile, sep="\t")  
     cat("\n", file=excelSummaryFile)
   }
