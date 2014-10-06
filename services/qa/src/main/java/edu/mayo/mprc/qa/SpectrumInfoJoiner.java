@@ -70,7 +70,7 @@ public final class SpectrumInfoJoiner {
 			getSourceInformation(inputFile, mgfSpectrumMap);
 			addScaffoldInformation(scaffold, mgfSpectrumMap);
 
-			sink.initialize(scaffold, rawDumpReader, msmsEvalReader, myrimatchReader, rawFileName);
+			sink.initialize(scaffold, rawDumpReader, msmsEvalReader, myrimatchReader, uvDataReader, rawFileName);
 
 			if (!rawDumpReader.emptyFile()) {
 				// We have a raw output file, use it to drive the output
@@ -85,6 +85,7 @@ public final class SpectrumInfoJoiner {
 								msmsEvalReader,
 								rawDumpReader,
 								myrimatchReader,
+								uvDataReader,
 								scanIdStr,
 								null,
 								scaffold != null ? scaffold.getEmptyLine() : "",
@@ -99,6 +100,7 @@ public final class SpectrumInfoJoiner {
 									msmsEvalReader,
 									rawDumpReader,
 									myrimatchReader,
+									uvDataReader,
 									scanIdStr,
 									spectrum);
 						}
@@ -115,6 +117,7 @@ public final class SpectrumInfoJoiner {
 							msmsEvalReader,
 							rawDumpReader,
 							myrimatchReader,
+							uvDataReader,
 							String.valueOf(spectrum.getScanId()),
 							spectrum);
 				}
@@ -127,7 +130,10 @@ public final class SpectrumInfoJoiner {
 		return rowCount;
 	}
 
-	private static int writeMgfWithScaffoldInfos(final ScaffoldQaSpectraReader scaffold, final SpectrumInfoSink sink, int rowCount, final MSMSEvalOutputReader msmsEvalReader, final RawDumpReader rawDumpReader, final MyriMatchPepXmlReader myrimatchReader, final String scanId, final Spectrum spectrum) throws IOException {
+	private static int writeMgfWithScaffoldInfos(final ScaffoldQaSpectraReader scaffold, final SpectrumInfoSink sink, int rowCount,
+	                                             final MSMSEvalOutputReader msmsEvalReader, final RawDumpReader rawDumpReader, final MyriMatchPepXmlReader myrimatchReader,
+	                                             final UvDataReader uvDataReader,
+	                                             final String scanId, final Spectrum spectrum) throws IOException {
 		final String scaffoldVersion = scaffold == null ? null : scaffold.getScaffoldVersion();
 		if (spectrum.getScaffoldInfos() == null || spectrum.getScaffoldInfos().isEmpty()) {
 			writeSpectrumLine(
@@ -135,6 +141,7 @@ public final class SpectrumInfoJoiner {
 					msmsEvalReader,
 					rawDumpReader,
 					myrimatchReader,
+					uvDataReader,
 					scanId,
 					spectrum,
 					scaffold != null ? scaffold.getEmptyLine() : null,
@@ -147,6 +154,7 @@ public final class SpectrumInfoJoiner {
 						msmsEvalReader,
 						rawDumpReader,
 						myrimatchReader,
+						uvDataReader,
 						scanId,
 						spectrum,
 						scaffoldInfo,
@@ -162,6 +170,7 @@ public final class SpectrumInfoJoiner {
 			final MSMSEvalOutputReader msmsEvalReader,
 			final RawDumpReader rawDumpReader,
 			final MyriMatchPepXmlReader myrimatchReader,
+			final UvDataReader uvDataReader,
 			final String scanIdStr,
 			final Spectrum spectrum,
 			final String scaffoldInfo,
@@ -175,8 +184,15 @@ public final class SpectrumInfoJoiner {
 		} else {
 			myrimatchReaderData = null;
 		}
+		final String uvDataReaderData;
+		if (uvDataReader != null && rawDumpReader!=null && rawDumpReaderData != null) {
+			final String retentionTime = rawDumpReader.getRtFromLine(rawDumpReaderData);
+			uvDataReaderData = uvDataReader.getLineForKey(String.valueOf(retentionTime));
+		} else {
+			uvDataReaderData = null;
+		}
 
-		sink.writeSpectrumInfo(scanIdStr, spectrum, scaffoldInfo, scaffoldVersion, msmsEvalData, rawDumpReaderData, myrimatchReaderData);
+		sink.writeSpectrumInfo(scanIdStr, spectrum, scaffoldInfo, scaffoldVersion, msmsEvalData, rawDumpReaderData, myrimatchReaderData, uvDataReaderData);
 	}
 
 	private static Map<Long, List<Spectrum>> indexMgfSpectraByScanId(final Map<String, Spectrum> mgfSpectrumMap) {

@@ -132,7 +132,7 @@
     <h2>Swift outputs</h2>
 
     Swift produces Scaffold reports (.sf3 files). You can view these reports on your own computer, just
-    <a href="http://www.proteomesoftware.com/products/free-viewer/">download and
+    <a href="<%= SwiftWebContext.getWebUi().getScaffoldViewerUrl() %>">download and
     install the free Scaffold viewer</a>.
 
     There are several possibilities how to map input files to Scaffold reports. You can produce the following:

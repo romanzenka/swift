@@ -26,4 +26,12 @@ public final class RawDumpReaderTest {
 		Assert.assertEquals(i, 11, "Not all spectra were loaded");
 		FileUtilities.quietDelete(resource);
 	}
+
+	@Test
+	public void shouldGetRtFromLine() {
+		RawDumpReader rawDumpReader = new RawDumpReader(null);
+		Assert.assertEquals(
+				rawDumpReader.getRtFromLine("1\t2\t3\t4\n"),
+				"3", "RT is column #3");
+	}
 }

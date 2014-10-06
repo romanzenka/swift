@@ -23,7 +23,10 @@ public final class FileSpectrumInfoSink implements SpectrumInfoSink {
 	}
 
 	@Override
-	public void initialize(final ScaffoldQaSpectraReader scaffold, final RawDumpReader rawDumpReader, final MSMSEvalOutputReader msmsEvalReader, final MyriMatchPepXmlReader myrimatchReader, final String rawFileName) {
+	public void initialize(final ScaffoldQaSpectraReader scaffold, final RawDumpReader rawDumpReader,
+	                       final MSMSEvalOutputReader msmsEvalReader, final MyriMatchPepXmlReader myrimatchReader,
+	                       final UvDataReader uvDataReader,
+	                       final String rawFileName) {
 		try {
 			this.rawFileName = rawFileName;
 			fileWriter = new FileWriter(file);
@@ -46,6 +49,10 @@ public final class FileSpectrumInfoSink implements SpectrumInfoSink {
 				fileWriter.write('\t');
 				fileWriter.write(myrimatchReader.getHeaderLine());
 			}
+			if (uvDataReader != null) {
+				fileWriter.write('\t');
+				fileWriter.write(uvDataReader.getHeaderLine());
+			}
 			fileWriter.write("\n");
 		} catch (IOException e) {
 			FileUtilities.closeQuietly(fileWriter);
@@ -58,7 +65,7 @@ public final class FileSpectrumInfoSink implements SpectrumInfoSink {
 	public void writeSpectrumInfo(final String scanIdStr, final Spectrum spectrum, final String scaffoldInfo,
 	                              final String scaffoldVersion,
 	                              final String msmsEvalData, final String rawDumpReaderData,
-	                              final String myrimatchReaderData) {
+	                              final String myrimatchReaderData, final String uvDataReaderData) {
 		try {
 			fileWriter.write(scanIdStr
 					+ "\t" + (spectrum != null ? spectrum.getMz() : "")
@@ -78,6 +85,11 @@ public final class FileSpectrumInfoSink implements SpectrumInfoSink {
 			if (myrimatchReaderData != null) {
 				fileWriter.write('\t');
 				fileWriter.write(myrimatchReaderData);
+			}
+
+			if (uvDataReaderData != null) {
+				fileWriter.write('\t');
+				fileWriter.write(uvDataReaderData);
 			}
 			fileWriter.write("\n");
 		} catch (IOException e) {

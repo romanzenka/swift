@@ -13,7 +13,6 @@ import edu.mayo.mprc.dbcurator.model.CurationContext;
 import edu.mayo.mprc.msmseval.MSMSEvalParamFile;
 import edu.mayo.mprc.msmseval.MSMSEvalWorker;
 import edu.mayo.mprc.msmseval.MsmsEvalCache;
-import edu.mayo.mprc.swift.Swift;
 import edu.mayo.mprc.swift.db.DatabaseFileTokenFactory;
 import edu.mayo.mprc.swift.db.SearchEngine;
 import edu.mayo.mprc.swift.db.SwiftDao;
@@ -52,6 +51,9 @@ public final class WebUi implements Checkable {
 	private Daemon mainDaemon;
 	private SwiftDao swiftDao;
 	private WorkspaceDao workspaceDao;
+	private String scaffoldViewerUrl; // Where does the Scaffold Viewer live
+	private boolean extractMsn;
+	private boolean msconvert;
 
 	public static final String SEARCHER = "searcher";
 	public static final String TITLE = "title";
@@ -60,8 +62,9 @@ public final class WebUi implements Checkable {
 	public static final String BROWSE_WEB_ROOT = "browseWebRoot";
 	public static final String NEW_CONFIG_FILE = "newConfigFile";
 	public static final String QSTAT = "qstat";
-	private boolean extractMsn;
-	private boolean msconvert;
+	public static final String SCAFFOLD_VIEWER_URL = "scaffoldViewerUrl";
+
+	private static final String DEFAULT_SCAFFOLD_VIEWER_URL = "http://www.proteomesoftware.com/products/free-viewer/";
 
 	public WebUi() {
 		USER_MESSAGE.setMessage("Swift's new database deployment has been temporarily disabled. Swift needs to be upgraded to support Mascot's Database Manager. If you need a new database, please ask Roman.");
@@ -231,6 +234,14 @@ public final class WebUi implements Checkable {
 		return uiConfiguration;
 	}
 
+	public String getScaffoldViewerUrl() {
+		return scaffoldViewerUrl;
+	}
+
+	public void setScaffoldViewerUrl(String scaffoldViewerUrl) {
+		this.scaffoldViewerUrl = scaffoldViewerUrl;
+	}
+
 	/**
 	 * A factory capable of creating the web ui class.
 	 */
@@ -255,6 +266,7 @@ public final class WebUi implements Checkable {
 				ui.setFileTokenFactory(getFileTokenFactory());
 				ui.setSwiftDao(getSwiftDao());
 				ui.setWorkspaceDao(getWorkspaceDao());
+				ui.setScaffoldViewerUrl(config.getScaffoldViewerUrl());
 
 				if (config.getQstat() != null) {
 					ui.qstatDaemonConnection = (DaemonConnection) dependencies.createSingleton(config.getQstat());
@@ -407,11 +419,14 @@ public final class WebUi implements Checkable {
 		// It is used solely as a way for an installer to tweak where does the newly saved config get saved.
 		private String newConfigFile;
 		private ServiceConfig qstat;
+		private String scaffoldViewerUrl;
 
 		public Config() {
 		}
 
-		public Config(final ServiceConfig searcher, final String port, final String title, final String browseRoot, final String browseWebRoot, final String newConfigFile, final ServiceConfig qstat, final ServiceConfig databaseUndeployer) {
+		public Config(final ServiceConfig searcher, final String port, final String title, final String browseRoot,
+		              final String browseWebRoot, final String newConfigFile, final ServiceConfig qstat,
+		              final String scaffoldViewerUrl) {
 			this.searcher = searcher;
 			this.port = port;
 			this.title = title;
@@ -419,6 +434,7 @@ public final class WebUi implements Checkable {
 			this.browseWebRoot = browseWebRoot;
 			this.newConfigFile = newConfigFile;
 			this.qstat = qstat;
+			this.scaffoldViewerUrl = scaffoldViewerUrl;
 		}
 
 		public void setSearcher(ServiceConfig searcher) {
@@ -438,6 +454,7 @@ public final class WebUi implements Checkable {
 			writer.put(BROWSE_WEB_ROOT, getBrowseWebRoot());
 			writer.put(NEW_CONFIG_FILE, getNewConfigFile());
 			writer.put(QSTAT, getQstat());
+			writer.put(SCAFFOLD_VIEWER_URL, getScaffoldViewerUrl());
 		}
 
 		@Override
@@ -449,6 +466,7 @@ public final class WebUi implements Checkable {
 			browseWebRoot = reader.get(BROWSE_WEB_ROOT);
 			newConfigFile = reader.get(NEW_CONFIG_FILE);
 			qstat = (ServiceConfig) reader.getObject(QSTAT);
+			scaffoldViewerUrl = reader.get(SCAFFOLD_VIEWER_URL, DEFAULT_SCAFFOLD_VIEWER_URL);
 		}
 
 		@Override
@@ -474,6 +492,10 @@ public final class WebUi implements Checkable {
 
 		public ServiceConfig getQstat() {
 			return qstat;
+		}
+
+		public String getScaffoldViewerUrl() {
+			return scaffoldViewerUrl;
 		}
 
 		public void setNewConfigFile(final String newConfigFile) {
@@ -551,6 +573,9 @@ public final class WebUi implements Checkable {
 
 					.property(QSTAT, "Qstat", "If you are running in Sun Grid Engine and want to have the job status available from the web interface, add a Qstat module. This is completely optional and provided solely for user convenience.")
 					.reference("qstat", UiBuilder.NONE_TYPE)
+
+					.property(SCAFFOLD_VIEWER_URL, "Scaffold Viewer URL", "Display this URL so the users can download a specific version of Scaffold viewer.<br><p>The default download location is: <a href=\"" + DEFAULT_SCAFFOLD_VIEWER_URL + "\">" + DEFAULT_SCAFFOLD_VIEWER_URL + "</a>")
+					.defaultValue(DEFAULT_SCAFFOLD_VIEWER_URL)
 
 					.addDaemonChangeListener(new PropertyChangeListener() {
 						@Override

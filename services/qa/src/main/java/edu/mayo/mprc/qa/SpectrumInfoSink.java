@@ -15,6 +15,7 @@ public interface SpectrumInfoSink extends Closeable {
 			RawDumpReader rawDumpReader,
 			MSMSEvalOutputReader msmsEvalReader,
 			MyriMatchPepXmlReader myrimatchReader,
+			UvDataReader uvDataReader,
 			String rawFileName);
 
 	void writeSpectrumInfo(
@@ -24,7 +25,8 @@ public interface SpectrumInfoSink extends Closeable {
 			String scaffoldVersion,
 			String msmsEvalData,
 			String rawDumpReaderData,
-			String myrimatchReaderData
+			String myrimatchReaderData,
+	        String uvDataReaderData
 	);
 
 	/**

@@ -42,7 +42,7 @@ public final class QuameterUiTest {
 		when(quameterDao.listProteinGroups()).thenReturn(quameterProteinGroups());
 		when(quameterDao.listVisibleResults()).thenReturn(quameterResults());
 
-		final QuameterDbWorker.Config quameterDbConfig = new QuameterDbWorker.Config(null, "animal,-cat*,-dog", "", "");
+		final QuameterDbWorker.Config quameterDbConfig = new QuameterDbWorker.Config(null, "animal,-cat*,-dog", "{\"albumin\":\"ALBU_HUMAN\",\"keratin\":\"K1C1_HUMAN\"}", "");
 
 		final QuameterUi.Config config = new QuameterUi.Config();
 		config.setQuameterConfig(quameterDbConfig);
@@ -127,6 +127,21 @@ public final class QuameterUiTest {
 		final JsonElement actual = jsonFromString(writer.toString());
 
 		Assert.assertEquals(actual, expected, "Json objects must match");
+	}
+
+	@Test
+	public void shouldWriteMetrics() {
+		final StringWriter writer = new StringWriter(1000);
+		try {
+			quameterUi.writeMetricsJson(writer);
+			quameterUi.commit();
+		} finally {
+			FileUtilities.closeQuietly(writer);
+		}
+		final String metrics = writer.toString();
+		Assert.assertTrue(metrics.contains("id_1"));
+		Assert.assertTrue(metrics.contains("id_2"));
+		Assert.assertFalse(metrics.contains("id_3"));
 	}
 
 	private JsonElement jsonFromString(final String json) {

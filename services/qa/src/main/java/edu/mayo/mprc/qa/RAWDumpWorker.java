@@ -40,6 +40,7 @@ public final class RAWDumpWorker extends WorkerBase {
 	public static final String INSTRUMENT_METHOD_FILE_CMD = "--instrument";
 	public static final String SAMPLE_INFORMATION_FILE_CMD = "--sample";
 	public static final String ERROR_LOG_FILE_CMD = "--errorlog";
+	public static final String UV_FILE_CMD = "--uv";
 	public static final String PARAM_FILE_CMD = "--params";
 
 	public static final String TYPE = "rawdump";
@@ -80,6 +81,7 @@ public final class RAWDumpWorker extends WorkerBase {
 			final File finalInstrumentMethodFile = rawDumpWorkPacket.getInstrumentMethodFile();
 			final File finalSampleInformationFile = rawDumpWorkPacket.getSampleInformationFile();
 			final File finalErrorLogFile = rawDumpWorkPacket.getErrorLogFile();
+			final File finalUvDataFile = rawDumpWorkPacket.getUvDataFile();
 
 			final File rawInfo = getTempOutputFile(tempWorkFolder, finalRawInfo);
 			final File rawSpectra = getTempOutputFile(tempWorkFolder, finalRawSpectra);
@@ -88,6 +90,7 @@ public final class RAWDumpWorker extends WorkerBase {
 			final File instrumentMethodFile = getTempOutputFile(tempWorkFolder, finalInstrumentMethodFile);
 			final File sampleInformationFile = getTempOutputFile(tempWorkFolder, finalSampleInformationFile);
 			final File errorLogFile = getTempOutputFile(tempWorkFolder, finalErrorLogFile);
+			final File uvDataFile = getTempOutputFile(tempWorkFolder, finalUvDataFile);
 
 			File shortenedRawFile = null;
 			if (rawFile.getAbsolutePath().length() > MAX_UNSHORTENED_PATH_LENGTH) {
@@ -100,7 +103,8 @@ public final class RAWDumpWorker extends WorkerBase {
 			}
 
 			final List<String> commandLine = getCommandLine(shortenedRawFile != null ? shortenedRawFile : rawFile,
-					rawInfo, rawSpectra, chromatogramFile, tuneFile, instrumentMethodFile, sampleInformationFile, errorLogFile);
+					rawInfo, rawSpectra, chromatogramFile, tuneFile, instrumentMethodFile, sampleInformationFile,
+					errorLogFile, uvDataFile);
 			final ProcessCaller caller = process(commandLine, true/*windows executable*/, wrapperScript, windowsExecWrapperScript, progressReporter);
 
 			if (shortenedRawFile != null) {
@@ -121,6 +125,7 @@ public final class RAWDumpWorker extends WorkerBase {
 			publish(instrumentMethodFile, finalInstrumentMethodFile);
 			publish(sampleInformationFile, finalSampleInformationFile);
 			publish(errorLogFile, finalErrorLogFile);
+			publish(uvDataFile, finalUvDataFile);
 		} finally {
 			FileUtilities.deleteNow(tempParamFile);
 		}
@@ -131,9 +136,12 @@ public final class RAWDumpWorker extends WorkerBase {
 	}
 
 	private List<String> getCommandLine(final File rawFile, final File rawInfo, final File rawSpectra, final File chromatogramFile,
-	                                    final File tuneFile, final File instrumentMethodFile, final File sampleInformationFile, final File errorLogFile) {
+	                                    final File tuneFile, final File instrumentMethodFile, final File sampleInformationFile,
+	                                    final File errorLogFile, final File uvDataFile) {
 
-		createParamFile(rawFile, rawInfo, rawSpectra, chromatogramFile, tuneFile, instrumentMethodFile, sampleInformationFile, errorLogFile);
+		createParamFile(rawFile, rawInfo, rawSpectra,
+				chromatogramFile, tuneFile, instrumentMethodFile,
+				sampleInformationFile, errorLogFile, uvDataFile);
 
 		final List<String> commandLineParams = new LinkedList<String>();
 		commandLineParams.add(rawDumpExecutable.getAbsolutePath());
@@ -144,7 +152,8 @@ public final class RAWDumpWorker extends WorkerBase {
 	}
 
 	private void createParamFile(final File rawFile, final File rawInfo, final File rawSpectra, final File chromatogramFile,
-	                             final File tuneFile, final File instrumentMethodFile, final File sampleInformationFile, final File errorLogFile) {
+	                             final File tuneFile, final File instrumentMethodFile, final File sampleInformationFile, final File errorLogFile,
+	                             final File uvDataFile) {
 		try {
 			tempParamFile = File.createTempFile("inputParamFile", null);
 		} catch (IOException e) {
@@ -173,6 +182,7 @@ public final class RAWDumpWorker extends WorkerBase {
 			addFile(bufferedWriter, INSTRUMENT_METHOD_FILE_CMD, instrumentMethodFile);
 			addFile(bufferedWriter, SAMPLE_INFORMATION_FILE_CMD, sampleInformationFile);
 			addFile(bufferedWriter, ERROR_LOG_FILE_CMD, errorLogFile);
+			addFile(bufferedWriter, UV_FILE_CMD, uvDataFile);
 
 		} catch (IOException e) {
 			throw new MprcException("Failed to created param file: " + tempParamFile.getAbsolutePath() + ".", e);

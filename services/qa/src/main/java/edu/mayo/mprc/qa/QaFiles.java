@@ -92,7 +92,7 @@ public final class QaFiles extends FileHolder {
 		return uvDataFile;
 	}
 
-	public void setUvDataFile(File uvDataFile) {
+	public void setUvDataFile(final File uvDataFile) {
 		this.uvDataFile = uvDataFile;
 	}
 

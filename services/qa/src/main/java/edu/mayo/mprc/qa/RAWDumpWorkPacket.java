@@ -163,7 +163,7 @@ public final class RAWDumpWorkPacket extends WorkPacketBase implements CachableW
 				getExpectedInstrumentMethodFile(cacheFolder, getRawFile()),
 				getExpectedSampleInformationFile(cacheFolder, getRawFile()),
 				getExpectedErrorLogFile(cacheFolder, getRawFile()),
-				getExpectedUvDataFile(cacheFolder, getUvDataFile()),
+				getExpectedUvDataFile(cacheFolder, getRawFile()),
 				isFromScratch()
 		);
 	}
@@ -201,6 +201,7 @@ public final class RAWDumpWorkPacket extends WorkPacketBase implements CachableW
 		final File instrumentMethod = new File(targetFolder, outputFiles.get(4));
 		final File sampleInformation = new File(targetFolder, outputFiles.get(5));
 		final File errorLog = new File(targetFolder, outputFiles.get(6));
+		final File uvDataFile = new File(targetFolder, outputFiles.get(7));
 		reporter.reportProgress(
 				new RAWDumpResult(rawInfo, rawSpectra, chromatogram,
 						tuneMethod, instrumentMethod, sampleInformation, errorLog, uvDataFile));

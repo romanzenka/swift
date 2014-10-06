@@ -90,12 +90,9 @@ public final class QuameterUi implements Dao, UiConfigurationProvider, Lifecycle
 			QuameterMetric.builder("p_2a", "P-2A", "MS2 Tryptic Spectra", HIGH, false, "Number of MS2 spectra identifying tryptic peptide ions").setRange(0.0, null).build(),
 			QuameterMetric.builder("p_2b", "P-2B", "MS2 Tryptic Ions", HIGH, false, "Number of tryptic peptide ions identified").setRange(0.0, null).build(),
 			QuameterMetric.builder("p_2c", "P-2C", "Distinct Peptides", HIGH, false, "Number of distinct identified tryptic peptide sequences, ignoring modifications and charge state").setRange(0.0, null).build(),
-			QuameterMetric.builder("p_3", "P-3", "Semitryptic Ratio", LOW, true, "Ratio of semitryptic/tryptic peptides").build(),
+			QuameterMetric.builder("p_3", "P-3", "Semitryptic Ratio", LOW, true, "Ratio of semitryptic/tryptic peptides").build()
 
-			QuameterMetric.builder("id_1", "AL-Lambda", "AL-Lambda IDs", "low", true, "Number of identified spectra matching requested proteins for given category").build(),
-			QuameterMetric.builder("id_2", "AL-Kappa", "AL-Kappa IDs", "low", true, "Number of identified spectra matching requested proteins for given category").build(),
-			QuameterMetric.builder("id_3", "ATTR", "ATTR IDs", "low", true, "Number of identified spectra matching requested proteins for given category").build(),
-			QuameterMetric.builder("id_4", "SAA", "SAA IDs", "low", true, "Number of identified spectra matching requested proteins for given category").build()
+			// The protein count groups are added in code
 	);
 
 	private boolean running;
@@ -153,7 +150,12 @@ public final class QuameterUi implements Dao, UiConfigurationProvider, Lifecycle
 	public void writeMetricsJson(final Writer writer) {
 		try {
 			final JsonWriter jsonWriter = new JsonWriter(writer);
+
+			jsonWriter.beginArray();
 			writeMetrics(jsonWriter, METRICS);
+			writeMetrics(jsonWriter, getProteinCountMetrics());
+			jsonWriter.endArray();
+
 			jsonWriter.close();
 		} catch (IOException e) {
 			throw new MprcException(e);
@@ -162,11 +164,9 @@ public final class QuameterUi implements Dao, UiConfigurationProvider, Lifecycle
 
 	private void writeMetrics(final JsonWriter writer, final List<QuameterMetric> metrics) {
 		try {
-			writer.beginArray();
 			for (final QuameterMetric metric : metrics) {
 				metric.write(writer);
 			}
-			writer.endArray();
 		} catch (Exception e) {
 			throw new MprcException("Error writing out metric array", e);
 		}
@@ -310,6 +310,21 @@ public final class QuameterUi implements Dao, UiConfigurationProvider, Lifecycle
 		if (isRunning()) {
 			running = false;
 		}
+	}
+
+	public List<QuameterMetric> getProteinCountMetrics() {
+		final List<QuameterMetric> result = Lists.newArrayList();
+		final List<QuameterProteinGroup> proteins = this.dbWorkerConfig.getProteins();
+		int count = 0;
+		for (final QuameterProteinGroup protein : proteins) {
+			count++;
+			final String name = protein.getName();
+			final QuameterMetric metric = QuameterMetric.builder("id_" + count, name, name + " IDs", "high", true,
+					"Number of identified spectra matching proteins in category \"" + name + "\"")
+					.build();
+			result.add(metric);
+		}
+		return result;
 	}
 
 	public static final class Config implements ResourceConfig {
