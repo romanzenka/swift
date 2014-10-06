@@ -3,7 +3,7 @@
     <groupId>edu.mayo.mprc</groupId>
     <artifactId>mprc</artifactId>
     <packaging>pom</packaging>
-    <version>3.7.2</version>
+    <version>3.7.3-SNAPSHOT</version>
     <name>MPRC Project Parent</name>
     <description>Parent module for MPRC projects (mostly Swift)</description>
     <url>http://delphi.mayo.edu/projects/mprc</url>
@@ -705,7 +705,7 @@
         <connection>scm:git:https://github.com/romanzenka/swift.git</connection>
         <developerConnection>scm:git:https://github.com/romanzenka/swift.git</developerConnection>
         <url>${scm.url.base}/swift/tree/master/${project.artifactId}</url>
-        <tag>mprc-3.7.2</tag>
+        <tag>HEAD</tag>
     </scm>
 </project>
 
