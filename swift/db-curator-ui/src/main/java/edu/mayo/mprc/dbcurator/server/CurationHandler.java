@@ -256,7 +256,6 @@ public final class CurationHandler {
 
 		//set the id no matter what type of stub we had
 		if (retStep != null) {
-			retStep.setId(stub.getId());
 			retStep.setLastRunCompletionCount(stub.getCompletionCount());
 		}
 
@@ -397,7 +396,6 @@ public final class CurationHandler {
 		}
 
 		if (stub != null) {
-			stub.setId(toStub.getId());
 			stub.setCompletionCount(toStub.getLastRunCompletionCount());
 		}
 

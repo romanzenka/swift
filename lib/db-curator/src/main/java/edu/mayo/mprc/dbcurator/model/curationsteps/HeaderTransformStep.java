@@ -22,10 +22,6 @@ public class HeaderTransformStep implements CurationStep {
 
 	private static final Logger LOGGER = Logger.getLogger(HeaderTransformStep.class);
 	/**
-	 * the persistence id for lookup in database
-	 */
-	private Integer id = null;
-	/**
 	 * a description on what the subsitution does
 	 */
 	private String description;
@@ -46,6 +42,20 @@ public class HeaderTransformStep implements CurationStep {
 	 * the compiled pattern
 	 */
 	private Pattern compiledPattern = null;
+
+	public HeaderTransformStep() {
+	}
+
+	/**
+	 * For testing only. Fast creation of a step.
+	 */
+	public HeaderTransformStep(final String description, final String matchPattern, final String substitutionPattern, final Pattern compiledPattern, final Integer lastRunCompletionCount) {
+		this.description = description;
+		this.matchPattern = matchPattern;
+		this.substitutionPattern = substitutionPattern;
+		this.compiledPattern = compiledPattern;
+		this.lastRunCompletionCount = lastRunCompletionCount;
+	}
 
 	/**
 	 * This step will take each header in the DBInputStream and apply the pressribed subtitution to all of the headers.
@@ -77,13 +87,13 @@ public class HeaderTransformStep implements CurationStep {
 			}
 			lastRunValidation.setCompletionCount(out.getSequenceCount());
 			setLastRunCompletionCount(out.getSequenceCount());
-		} catch (PatternSyntaxException e) {
+		} catch (final PatternSyntaxException e) {
 			LOGGER.error(e);
 			lastRunValidation.addMessageAndException("Error applying the transform to the header: " + currentHeader, e);
-		} catch (IOException e) {
+		} catch (final IOException e) {
 			LOGGER.error(e);
 			lastRunValidation.addMessageAndException("Error in performing database IO", e);
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			LOGGER.error(e);
 			lastRunValidation.addMessageAndException(e.getMessage(), e);
 		}
@@ -140,7 +150,7 @@ public class HeaderTransformStep implements CurationStep {
 		if (compiledPattern == null || !compiledPattern.pattern().equals(getMatchPattern())) {
 			try {
 				compiledPattern = Pattern.compile(getMatchPattern());
-			} catch (PatternSyntaxException e) {
+			} catch (final PatternSyntaxException e) {
 				preValidation.addMessageAndException("Error compiling the regular expression: " + e.getMessage(), e);
 			}
 		}
@@ -159,16 +169,6 @@ public class HeaderTransformStep implements CurationStep {
 		copy.setMatchPattern(getMatchPattern());
 		copy.setSubstitutionPattern(getSubstitutionPattern());
 		return copy;
-	}
-
-	@Override
-	public Integer getId() {
-		return id;
-	}
-
-	@Override
-	public void setId(final Integer id) {
-		this.id = id;
 	}
 
 	@Override
