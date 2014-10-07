@@ -36,8 +36,6 @@
         <joined-subclass name="NewDatabaseInclusion" table="curation_step_new_db">
             <key column="new_database_id" foreign-key="curation_step_new_db_ibfk_2" />
             <property name="url" type="string" length="1024" column="url" />
-            <many-to-one name="source" class="edu.mayo.mprc.dbcurator.model.SourceDatabaseArchive" column="source_db"
-                cascade="all" lazy="false" not-null="false" foreign-key="curation_step_new_db_ibfk_1" />
         </joined-subclass>
 
         <joined-subclass name="MakeDecoyStep" table="curation_step_make_decoy">
