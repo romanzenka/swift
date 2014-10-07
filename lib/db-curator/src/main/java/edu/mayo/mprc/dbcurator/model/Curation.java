@@ -1,7 +1,11 @@
 package edu.mayo.mprc.dbcurator.model;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 import com.google.gson.reflect.TypeToken;
+import com.google.gwt.json.client.JSONArray;
+import com.google.gwt.json.client.JSONNumber;
+import com.google.gwt.json.client.JSONObject;
 import edu.mayo.mprc.MprcException;
 import edu.mayo.mprc.database.EvolvableBase;
 import edu.mayo.mprc.fasta.DatabaseAnnotation;
@@ -66,6 +70,7 @@ public class Curation extends EvolvableBase implements Serializable {
 
     /** Serialized version of the curation steps */
     private String curationStepsJson;
+    private int stepVersion;
 
     /**
 	 * the steps involved in the curation. Deserialized version, does not go into the database
@@ -122,7 +127,9 @@ public class Curation extends EvolvableBase implements Serializable {
 	 */
 	public List<CurationStep> getCurationSteps() {
         Type listType = new TypeToken<List<CurationStep>>(){}.getType();
-        List<CurationStep> myModelList = gson.fromJson( getCurationStepsJson() , listType );
+        JsonObject jobj = new Gson().fromJson(getCurationStepsJson(), JsonObject.class);
+        stepVersion = jobj.get("version").getAsInt();
+        List<CurationStep> myModelList = gson.fromJson( jobj.get("steps").toString() , listType );
 		return myModelList;
 	}
 
@@ -133,7 +140,10 @@ public class Curation extends EvolvableBase implements Serializable {
 	 */
 	protected void setCurationSteps(final List<CurationStep> curationSteps) {
 		this.curationSteps = curationSteps;
-        setCurationStepsJson( gson.toJson(curationSteps) );
+        JsonObject reqObj = new JsonObject();
+        reqObj.addProperty( "version", stepVersion );        //Version issue?  2011-11-24
+        reqObj.add( "steps", curationSteps );
+        setCurationStepsJson(gson.toJson(reqObj));
 	}
 
 	/**
