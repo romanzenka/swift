@@ -59,7 +59,8 @@ tables.each_with_index do |tb, i|
 
     row.each do |key, value|                 # Loop & Set columns other than xxx_id
       next if key =~ /_id$/
-      newDocuments[id][key]=value
+      fixedVal =  value.to_s.gsub("\|", "\\|")  ## need to handle "\|" issue for GSON
+      newDocuments[id][key]= fixedVal
     end
     newDocuments[id]['step_type']=tb.gsub("curation_step_", "")
   end
