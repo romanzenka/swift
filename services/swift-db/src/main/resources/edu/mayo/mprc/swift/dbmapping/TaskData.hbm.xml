@@ -20,9 +20,9 @@
         <property name="exceptionString" column="exception" type="text" />
         <!-- TODO: Make binary -->
         <many-to-one name="searchRun" class="edu.mayo.mprc.swift.dbmapping.SearchRun" column="transaction_id"
-            index="task_idx_2" foreign-key="task_ibfk_2" />
+            foreign-key="task_ibfk_2" />
         <many-to-one name="taskState" class="TaskStateData" column="task_state" lazy="false"
-            index="task_idx_1" foreign-key="task_ibfk_1" />
+            foreign-key="task_ibfk_1" />
         <property name="descriptionLong" column="description_long" type="text" />
         <!-- TODO: Make binary -->
         <property name="gridJobId" column="grid_job_id" length="25" />

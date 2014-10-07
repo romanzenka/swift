@@ -8,11 +8,11 @@ create table log (
 );
 
 alter table log
-add index log_data_idx_2 (parent_log_id),
+add index log_data_ibfk_2 (parent_log_id),
 add constraint log_data_ibfk_2 foreign key (parent_log_id) references log (log_id);
 
 alter table log
-add index log_data_idx_1 (task_id),
+add index log_data_ibfk_1 (task_id),
 add constraint log_data_ibfk_1 foreign key (task_id) references task (task_id);
 
 INSERT INTO log (task_id, parent_log_id, out_log, err_log)

@@ -8,8 +8,8 @@ CREATE TABLE `quameter_pg` (
 
 ALTER TABLE quameter_pg ADD FOREIGN KEY quameter_pg_ibfk_1 (deletion) REFERENCES change_audit (change_audit_id);
 ALTER TABLE quameter_pg ADD FOREIGN KEY quameter_pg_ibfk_2 (creation) REFERENCES change_audit (change_audit_id);
-ALTER TABLE quameter_pg ADD KEY quameter_pg_idx_1 (deletion);
-ALTER TABLE quameter_pg ADD KEY quameter_pg_idx_2 (creation);
+ALTER TABLE quameter_pg ADD KEY quameter_pg_ibfk_1 (deletion);
+ALTER TABLE quameter_pg ADD KEY quameter_pg_ibfk_2 (creation);
 
 
 -- @UNDO

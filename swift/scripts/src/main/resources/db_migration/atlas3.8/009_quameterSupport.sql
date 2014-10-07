@@ -45,8 +45,8 @@ CREATE TABLE quameter_result
   p_2c               DOUBLE,
   p_3                DOUBLE,
   sample_id          INT,
-  KEY quameter_result_idx_1 (sample_id),
-  KEY quameter_result_idx_2 (file_search_id),
+  KEY quameter_result_ibfk_1 (sample_id),
+  KEY quameter_result_ibfk_2 (file_search_id),
   FOREIGN KEY quameter_result_ibfk_1 (sample_id) REFERENCES tandem_mass_spec_sample (tandem_mass_spec_sample_id),
   FOREIGN KEY quameter_result_ibfk_2 (file_search_id) REFERENCES file_search (file_search_id)
 );

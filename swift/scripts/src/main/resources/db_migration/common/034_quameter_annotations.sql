@@ -6,7 +6,7 @@ CREATE TABLE `quameter_annotation` (
   PRIMARY KEY (`quameter_annotation_id`));
 
 ALTER TABLE `quameter_annotation`
-ADD INDEX `quameter_annotation_idx_1` (`quameter_result_id` ASC);
+ADD INDEX `quameter_annotation_ibfk_1` (`quameter_result_id` ASC);
 ALTER TABLE .`quameter_annotation`
 ADD CONSTRAINT `quameter_annotation_ibfk_1`
   FOREIGN KEY (`quameter_result_id`)

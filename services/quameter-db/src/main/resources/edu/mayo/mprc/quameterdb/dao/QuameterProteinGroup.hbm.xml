@@ -10,9 +10,9 @@
         <property name="regex" column="regex" type="text" />
 
         <many-to-one name="creation" column="creation" class="edu.mayo.mprc.database.Change" lazy="proxy"
-            index="quameter_pg_idx_2" foreign-key="quameter_pg_ibfk_2" />
+            foreign-key="quameter_pg_ibfk_2" />
         <many-to-one name="deletion" column="deletion" class="edu.mayo.mprc.database.Change" lazy="proxy"
-            index="quameter_pg_idx_1" foreign-key="quameter_pg_ibfk_1" />
+            foreign-key="quameter_pg_ibfk_1" />
 
     </class>
 </hibernate-mapping>
