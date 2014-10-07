@@ -3,7 +3,7 @@
     <groupId>edu.mayo.mprc</groupId>
     <artifactId>mprc</artifactId>
     <packaging>pom</packaging>
-    <version>3.7.2-SNAPSHOT</version>
+    <version>3.7.4-SNAPSHOT</version>
     <name>MPRC Project Parent</name>
     <description>Parent module for MPRC projects (mostly Swift)</description>
     <url>http://delphi.mayo.edu/projects/mprc</url>
@@ -38,7 +38,6 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-release-plugin</artifactId>
-                <version>2.4.1</version>
             </plugin>
             <!-- Enforce no cyclic dependencies between packages -->
             <plugin>
@@ -140,6 +139,23 @@
                             <version>1.0</version>
                         </dependency>
                     </dependencies>
+                </plugin>
+
+                <plugin>
+                    <artifactId>maven-release-plugin</artifactId>
+                    <version>2.5</version>
+                </plugin>
+                <plugin>
+                    <artifactId>maven-javadoc-plugin</artifactId>
+                    <version>2.9.1</version>
+                </plugin>
+                <plugin>
+                    <artifactId>maven-deploy-plugin</artifactId>
+                    <version>2.8.1</version>
+                </plugin>
+                <plugin>
+                    <artifactId>maven-source-plugin</artifactId>
+                    <version>2.3</version>
                 </plugin>
             </plugins>
         </pluginManagement>
@@ -342,6 +358,12 @@
                 <groupId>org.springframework</groupId>
                 <artifactId>spring-oxm</artifactId>
                 <version>${spring.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.google.code.gson</groupId>
+                <artifactId>gson</artifactId>
+                <version>2.2.4</version>
             </dependency>
 
             <dependency>

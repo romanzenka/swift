@@ -33,13 +33,6 @@ public class NewDatabaseInclusion implements CurationStep {
 	 */
 	private String url;
 
-	/**
-	 * the source database if it has already been downloaded.  If we have not yet downloaded the database then set it to
-	 * null.  The natural key for a SourceDatabaseArchive is the URL and timestamp.  If the source is null then we have
-	 * no choice but to check for an sequence at the provided url. PERSISTENT
-	 */
-	private SourceDatabaseArchive source = null;
-
 	private transient HeaderTransform headerTransformer;
 
 	public NewDatabaseInclusion() {
@@ -89,20 +82,19 @@ public class NewDatabaseInclusion implements CurationStep {
 			}
 		}
 		//if we want or need to pull down a new SourceDatabaseArchive then do it.
-		if (getSource() == null) {
-			try {
-				//get a source database by first connecting to the ftp server and seeing what date the file at the given
-				//url was updated and seeing if we have already downloaded it.  If so use then one else download it.
-				source = new SourceDatabaseArchive().createArchive(
-						url,
-						status,
-						exec.getFastaArchiveFolder(), exec.getCurationDao());
-				status.addMessage("We have completed getting an archive.");
-			} catch (Exception e) {
-				//if we couldn't find or download a database then we had an error and the executor should be notified
-				recentRunValidation.addMessageAndException("FTP error: \n" + e.getMessage(), e);
-				return recentRunValidation;
-			}
+		final SourceDatabaseArchive source;
+		try {
+			//get a source database by first connecting to the ftp server and seeing what date the file at the given
+			//url was updated and seeing if we have already downloaded it.  If so use then one else download it.
+			source = new SourceDatabaseArchive().createArchive(
+					url,
+					status,
+					exec.getFastaArchiveFolder(), exec.getCurationDao());
+			status.addMessage("We have completed getting an archive.");
+		} catch (Exception e) {
+			//if we couldn't find or download a database then we had an error and the executor should be notified
+			recentRunValidation.addMessageAndException("FTP error: \n" + e.getMessage(), e);
+			return recentRunValidation;
 		}
 
 		// we want to create a new DBInputStream from the archive file and copy the archive file into the output stream
@@ -174,7 +166,6 @@ public class NewDatabaseInclusion implements CurationStep {
 	public CurationStep createCopy() {
 		final NewDatabaseInclusion copy = new NewDatabaseInclusion();
 		copy.setUrl(url);
-		copy.setSource(source == null ? null : source.createCopy());
 		return copy;
 	}
 
@@ -194,24 +185,6 @@ public class NewDatabaseInclusion implements CurationStep {
 	 */
 	public void setUrl(final String url) {
 		this.url = url;
-	}
-
-	/**
-	 * gets the source of this inclusion
-	 *
-	 * @return the source database that was used by this step.  Null if the step has not been run yet
-	 */
-	public SourceDatabaseArchive getSource() {
-		return source;
-	}
-
-	/**
-	 * sets the source database that was used by this step
-	 *
-	 * @param source the source that was used by the setp
-	 */
-	protected void setSource(final SourceDatabaseArchive source) {
-		this.source = source;
 	}
 
 	@Override
