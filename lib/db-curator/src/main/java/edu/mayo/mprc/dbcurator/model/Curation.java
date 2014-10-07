@@ -3,9 +3,6 @@ package edu.mayo.mprc.dbcurator.model;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.reflect.TypeToken;
-import com.google.gwt.json.client.JSONArray;
-import com.google.gwt.json.client.JSONNumber;
-import com.google.gwt.json.client.JSONObject;
 import edu.mayo.mprc.MprcException;
 import edu.mayo.mprc.database.EvolvableBase;
 import edu.mayo.mprc.fasta.DatabaseAnnotation;
@@ -142,7 +139,7 @@ public class Curation extends EvolvableBase implements Serializable {
 		this.curationSteps = curationSteps;
         JsonObject reqObj = new JsonObject();
         reqObj.addProperty( "version", stepVersion );        //Version issue?  2011-11-24
-        reqObj.add( "steps", curationSteps );
+        reqObj.add( "steps", gson.toJsonTree(curationSteps) );
         setCurationStepsJson(gson.toJson(reqObj));
 	}
 
