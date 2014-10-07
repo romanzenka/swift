@@ -1,6 +1,8 @@
 package edu.mayo.mprc.database;
 
+import com.google.common.base.Charsets;
 import com.google.common.collect.Lists;
+import com.google.common.io.Files;
 import edu.mayo.mprc.MprcException;
 import edu.mayo.mprc.config.*;
 import edu.mayo.mprc.config.ui.FactoryDescriptor;
@@ -11,12 +13,16 @@ import edu.mayo.mprc.utilities.exceptions.ExceptionUtilities;
 import org.apache.log4j.Logger;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.hibernate.cfg.Configuration;
 import org.hibernate.dialect.Dialect;
 import org.hibernate.dialect.SQLServerDialect;
 import org.hibernate.engine.SessionFactoryImplementor;
+import org.hibernate.tool.hbm2ddl.SchemaExport;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
+import java.io.File;
+import java.io.IOException;
 import java.util.*;
 
 /**
@@ -63,7 +69,7 @@ public final class Database implements RuntimeInitializer, Lifecycle {
 			}
 
 			commitTransaction();
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			rollbackTransaction();
 			throw new MprcException(e);
 		}
@@ -99,13 +105,46 @@ public final class Database implements RuntimeInitializer, Lifecycle {
 						DatabaseUtilities.SchemaInitialization.Update.getValue(), "Initialize Database");
 			}
 			commitTransaction();
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			errors += "Database connection could not be established.<br/>Error: " + e.getMessage()
 					+ "<br/>Database may not exist. " + FixTag.getTag(
 					DatabaseUtilities.SchemaInitialization.Create.getValue(), "Create Database");
 			rollbackTransaction();
 		}
 		return !errors.isEmpty() ? errors : null;
+	}
+
+	public String getDdl() {
+		try {
+			final Configuration cfg = DatabaseUtilities.getHibernateConfiguration(
+					config.getUrl(),
+					config.getUserName(),
+					config.getPassword(),
+					config.getDialect(),
+					config.getDriverClassName(),
+					config.getDefaultSchema(),
+					config.getSchema(),
+					getHibernateCreationProperties(),
+					getMappingResources(),
+					DatabaseUtilities.SchemaInitialization.Create,
+					getTranslator()
+			);
+//			cfg.setProperty("hibernate.hbm2ddl.auto", "create");
+//			cfg.setProperty("hibernate.dialect", config.getDialect());
+//			cfg.setProperty("hibernate.connection.schema", config.getSchema());
+//			cfg.setNamingStrategy(new SwiftDatabaseNamingStrategy());
+
+			final SchemaExport export = new SchemaExport(cfg);
+			export.setDelimiter(";");
+			final File tempFile = File.createTempFile("dump", ".sql");
+
+			export.setOutputFile(tempFile.getAbsolutePath());
+			export.setFormat(true);
+			export.execute(false, false, false, true);
+			return Files.toString(tempFile, Charsets.UTF_8);
+		} catch (final IOException e) {
+			throw new MprcException("Could not get DDL script", e);
+		}
 	}
 
 	private void initializeSessionFactory(final DatabaseUtilities.SchemaInitialization action, final boolean install) {
@@ -159,7 +198,7 @@ public final class Database implements RuntimeInitializer, Lifecycle {
 	public void rollback() {
 		try {
 			rollbackTransaction();
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			LOGGER.warn("Cannot rollback transaction", e);
 		}
 	}
@@ -170,7 +209,7 @@ public final class Database implements RuntimeInitializer, Lifecycle {
 	public void commit() {
 		try {
 			commitTransaction();
-		} catch (Exception t) {
+		} catch (final Exception t) {
 			rollbackTransaction();
 			throw new MprcException("Could not commit data to database", t);
 		}
@@ -218,7 +257,7 @@ public final class Database implements RuntimeInitializer, Lifecycle {
 				throw new MprcException("No transaction is running");
 			}
 			session.getTransaction().rollback();
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			// SWALLOWED - failing rollback is not so tragic
 			LOGGER.warn("Rollback failed", e);
 		}
