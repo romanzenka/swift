@@ -19,14 +19,6 @@
             column="deployment_date" />
         <property name="notes" type="string" column="notes" length="255" />
 
-        <list name="curationSteps" table="curation_step_list" cascade="all" lazy="true">
-            <key column="curation_id" not-null="true"
-                foreign-key="curation_step_list_ibfk_2"/>
-            <list-index column="sort_order" />
-            <many-to-many column="step_id" class="edu.mayo.mprc.dbcurator.model.CurationStep"
-                foreign-key="curation_step_list_ibfk_1"/>
-        </list>
-
         <property name="decoyRegex" type="string" length="200" column="decoy_regex" not-null="false" />
 
         <many-to-one name="deletion" column="deletion" class="edu.mayo.mprc.database.Change" lazy="proxy"
