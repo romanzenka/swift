@@ -18,6 +18,7 @@
         <property name="deploymentDate" type="org.joda.time.contrib.hibernate.PersistentDateTime"
             column="deployment_date" />
         <property name="notes" type="string" column="notes" length="255" />
+        <property name="curationStepsJson" type="text" column="steps_json" />
 
         <property name="decoyRegex" type="string" length="200" column="decoy_regex" not-null="false" />
 
