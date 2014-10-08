@@ -1,17 +1,42 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
-        "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+    "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
 <hibernate-mapping package="edu.mayo.mprc.fastadb">
     <class name="ProteinSequence" table="protein_sequence" mutable="false">
         <id name="id" type="integer" column="protein_sequence_id">
-            <generator class="native"/>
+            <generator class="native" />
         </id>
-        <property name="mass" type="double" column="mass"/>
-        <property name="sequence" type="text" column="sequence"/> <!-- TODO: Make binary -->
+        <property name="mass" type="double" column="mass" />
+        <property name="sequence" type="text" column="sequence" />
+        <!-- TODO: Make binary -->
     </class>
     <database-object>
-        <create>ALTER TABLE `protein_sequence` ADD INDEX `sequence` USING HASH (`sequence`(200) ASC)</create>
-        <drop>ALTER TABLE `protein_sequence` DROP INDEX `sequence`</drop>
-        <dialect-scope name="org.hibernate.dialect.MySQLInnoDBDialect"/>
+        <create>
+            ALTER TABLE `protein_sequence` ADD INDEX `sequence` USING HASH (`sequence`(200) ASC, protein_sequence_id);
+
+            ALTER TABLE `protein_sequence`
+            ADD COLUMN `accession_number` VARCHAR(80) NULL DEFAULT NULL AFTER `sequence`;
+
+            DROP PROCEDURE IF EXISTS `update_canonical_protein_names`;
+
+            CREATE PROCEDURE `update_canonical_protein_names`()
+            UPDATE protein_sequence AS ps
+            SET ps.accession_number = (SELECT
+            pa2.accession_number AS newAccnum
+            FROM protein_accnum AS pa2 INNER JOIN
+            protein_entry AS pe2
+            ON pe2.protein_accnum_id = pa2.protein_accnum_id
+            WHERE pe2.protein_sequence_id = ps.protein_sequence_id
+            ORDER BY pa2.protein_accnum_id
+            LIMIT 1)
+            WHERE ps.accession_number IS NULL;
+
+            CALL update_canonical_protein_names();
+
+
+        </create>
+        <drop>ALTER TABLE `protein_sequence` DROP INDEX `sequence`;
+            DROP PROCEDURE `update_canonical_protein_names`;
+        </drop>
+        <dialect-scope name="org.hibernate.dialect.MySQLInnoDBDialect" />
     </database-object>
 </hibernate-mapping>

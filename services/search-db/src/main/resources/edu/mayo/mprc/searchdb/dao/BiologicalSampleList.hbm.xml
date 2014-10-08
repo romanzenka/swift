@@ -15,8 +15,13 @@
         </bag>
     </class>
     <database-object>
-        <create>ALTER TABLE `biological_sample_list` ADD INDEX `hash` (`hash`, `biological_sample_list_id`);</create>
-        <drop>ALTER TABLE `biological_sample_list` DROP INDEX `hash` ;</drop>
+        <create>
+            ALTER TABLE `biological_sample_list` ADD INDEX `hash` (`hash`, `biological_sample_list_id`);
+            ALTER TABLE `biological_sample_list_members` ADD PRIMARY KEY (`biological_sample_list_id`, `biological_sample_id`);
+        </create>
+        <drop>
+            ALTER TABLE `biological_sample_list` DROP INDEX `hash` ;
+        </drop>
         <dialect-scope name="org.hibernate.dialect.MySQLInnoDBDialect"/>
     </database-object>
 </hibernate-mapping>

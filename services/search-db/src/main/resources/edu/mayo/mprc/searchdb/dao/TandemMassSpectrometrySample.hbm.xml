@@ -14,7 +14,7 @@
         <property name="ms2Spectra" type="integer" column="ms2_spectra" />
         <property name="ms3PlusSpectra" type="integer" column="ms3_plus_spectra" />
         <property name="instrumentName" type="string" length="40" column="instrument_name" />
-        <property name="instrumentSerialNumber" type="string" length="20" column="instrument_serial_number" />
+        <property name="instrumentSerialNumber" type="string" length="60" column="instrument_serial_number" />
         <property name="startTime" type="org.joda.time.contrib.hibernate.PersistentDateTime" column="start_time" />
         <property name="runTimeInSeconds" type="double" column="run_time_seconds" />
         <property name="comment" type="text" column="comment" />

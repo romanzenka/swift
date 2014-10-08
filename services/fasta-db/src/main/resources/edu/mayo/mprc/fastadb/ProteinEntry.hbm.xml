@@ -8,11 +8,16 @@
         </id>
         <many-to-one name="database" class="edu.mayo.mprc.dbcurator.model.Curation" column="curation_id" lazy="proxy"
             foreign-key="protein_entry_ibfk_4"/>
-        <many-to-one name="accessionNumber" class="ProteinAccnum" column="protein_accnum_id" not-null="true" lazy="proxy"
+        <many-to-one name="accessionNumber" class="ProteinAccnum" column="protein_accnum_id" lazy="proxy"
             foreign-key="protein_entry_ibfk_1"/>
         <many-to-one name="description" class="ProteinDescription" column="protein_description_id" not-null="false" lazy="proxy"
             foreign-key="protein_entry_ibfk_3"/>
-        <many-to-one name="sequence" class="ProteinSequence" column="protein_sequence_id" not-null="true" lazy="proxy"
+        <many-to-one name="sequence" class="ProteinSequence" column="protein_sequence_id" lazy="proxy"
             foreign-key="protein_entry_ibfk_2"/>
     </class>
+    <database-object>
+        <create>CREATE UNIQUE INDEX index3 ON protein_entry (curation_id, protein_accnum_id, protein_description_id, protein_sequence_id)</create>
+        <drop>ALTER TABLE protein_entry DROP INDEX index3</drop>
+        <dialect-scope name="org.hibernate.dialect.MySQLInnoDBDialect"/>
+    </database-object>
 </hibernate-mapping>

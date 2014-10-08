@@ -27,7 +27,7 @@
         <!-- TODO: Make binary -->
         <property name="gridJobId" column="grid_job_id" length="25" />
         <property name="hostString" column="host" />
-        <property name="percentDone" column="percent_done" not-null="false" type="float" />
+        <property name="percentDone" column="percent_done" not-null="false" type="double" />
     </class>
 
 </hibernate-mapping>

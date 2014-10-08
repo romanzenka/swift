@@ -6,6 +6,6 @@
         <id name="id" type="integer" column="protein_accnum_id">
             <generator class="native"/>
         </id>
-        <property name="accnum" type="string" column="accession_number" length="80"/>
+        <property name="accnum" type="string" column="accession_number" length="80" not-null="true" unique="true"/>
     </class>
 </hibernate-mapping>

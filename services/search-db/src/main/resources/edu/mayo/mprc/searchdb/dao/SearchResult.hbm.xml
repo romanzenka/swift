@@ -10,4 +10,10 @@
         <many-to-one name="massSpecSample" class="TandemMassSpectrometrySample" column="tandem_mass_spec_sample_id"
             not-null="false" lazy="proxy" foreign-key="search_result_ibfk_2" />
     </class>
+    <database-object>
+        <create>CREATE UNIQUE INDEX uniqueness ON search_result (protein_group_list_id, tandem_mass_spec_sample_id)
+        </create>
+        <drop>ALTER TABLE search_result DROP INDEX uniqueness</drop>
+        <dialect-scope name="org.hibernate.dialect.MySQLInnoDBDialect" />
+    </database-object>
 </hibernate-mapping>

@@ -15,4 +15,10 @@
                 foreign-key="protein_sequence_list_members_ibfk_1"/>
         </set>
     </class>
+    <database-object>
+        <create>CREATE INDEX `hash` ON protein_sequence_list (hash, protein_sequence_list_id)</create>
+        <drop>ALTER TABLE protein_sequence_list DROP INDEX `hash`</drop>
+        <dialect-scope name="org.hibernate.dialect.MySQLInnoDBDialect"/>
+    </database-object>
+
 </hibernate-mapping>
