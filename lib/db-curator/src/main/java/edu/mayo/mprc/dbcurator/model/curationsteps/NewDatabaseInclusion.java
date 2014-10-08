@@ -217,7 +217,12 @@ public class NewDatabaseInclusion implements CurationStep {
 		}
 	}
 
-	protected static int getIntersectionLength(final String s1, final String s2) {
+    @Override
+    public String getStepTypeName() {
+        return "new_db";
+    }
+
+    protected static int getIntersectionLength(final String s1, final String s2) {
 		if (s1.contains(s2)) {
 			return s1.length() - s1.replace(s2, "").length();
 		} else if (s2.contains(s1)) {

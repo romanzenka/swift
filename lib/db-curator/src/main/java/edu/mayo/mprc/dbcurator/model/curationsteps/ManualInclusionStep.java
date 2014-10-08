@@ -178,4 +178,9 @@ public class ManualInclusionStep implements CurationStep {
 	public String simpleDescription() {
 		return "user sequence";
 	}
+
+    @Override
+    public String getStepTypeName() {
+        return "manual_inclusion";
+    }
 }

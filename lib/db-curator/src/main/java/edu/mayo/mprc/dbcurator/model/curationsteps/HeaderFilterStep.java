@@ -241,4 +241,9 @@ public class HeaderFilterStep implements CurationStep {
 	public String simpleDescription() {
 		return "filtered " + getMatchMode().toString().toLowerCase(Locale.ENGLISH) + "\"" + getCriteriaString() + "\"";
 	}
+
+    @Override
+    public String getStepTypeName() {
+        return "header_filter";
+    }
 }

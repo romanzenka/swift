@@ -241,4 +241,9 @@ public class HeaderTransformStep implements CurationStep {
 		return null;
 	}
 
+    @Override
+    public String getStepTypeName() {
+        return "header_transform";
+    }
+
 }

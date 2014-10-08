@@ -58,4 +58,8 @@ public interface CurationStep extends Serializable {
 	void setLastRunCompletionCount(Integer count);
 
 	String simpleDescription();
+
+    String getStepTypeName();
+
+
 }
