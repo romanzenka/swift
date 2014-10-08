@@ -469,130 +469,130 @@ CREATE TABLE workflow_user
 );
 ALTER TABLE analysis ADD FOREIGN KEY analysis_ibfk_1 (report_id) REFERENCES report (report_id);
 ALTER TABLE analysis ADD FOREIGN KEY analysis_ibfk_2 (biological_sample_list_id) REFERENCES biological_sample_list (biological_sample_list_id);
-ALTER TABLE analysis ADD KEY analysis_idx_1 (report_id);
-ALTER TABLE analysis ADD KEY analysis_idx_2 (biological_sample_list_id);
+ALTER TABLE analysis ADD KEY analysis_ibfk_1 (report_id);
+ALTER TABLE analysis ADD KEY analysis_ibfk_2 (biological_sample_list_id);
 
 ALTER TABLE biological_sample  ADD FOREIGN KEY biological_sample_ibfk_1 (search_result_list_id) REFERENCES search_result_list (search_result_list_id);
-ALTER TABLE biological_sample  ADD KEY biological_sample_idx_1 (search_result_list_id);
+ALTER TABLE biological_sample  ADD KEY biological_sample_ibfk_1 (search_result_list_id);
 
 ALTER TABLE biological_sample_list_members ADD FOREIGN KEY biological_sample_list_members_ibfk_1 (biological_sample_id) REFERENCES biological_sample (biological_sample_id);
 ALTER TABLE biological_sample_list_members ADD FOREIGN KEY biological_sample_list_members_ibfk_2 (biological_sample_list_id) REFERENCES biological_sample_list (biological_sample_list_id);
-ALTER TABLE biological_sample_list_members ADD KEY biological_sample_list_members_idx_1 (biological_sample_id);
-ALTER TABLE biological_sample_list_members ADD KEY biological_sample_list_members_idx_2 (biological_sample_list_id);
+ALTER TABLE biological_sample_list_members ADD KEY biological_sample_list_members_ibfk_1 (biological_sample_id);
+ALTER TABLE biological_sample_list_members ADD KEY biological_sample_list_members_ibfk_2 (biological_sample_list_id);
 
 ALTER TABLE curation ADD FOREIGN KEY curation_ibfk_1 (deletion) REFERENCES change_audit (change_audit_id);
 ALTER TABLE curation ADD FOREIGN KEY curation_ibfk_2 (creation) REFERENCES change_audit (change_audit_id);
-ALTER TABLE curation ADD KEY curation_idx_1 (deletion);
-ALTER TABLE curation ADD KEY curation_idx_2 (creation);
+ALTER TABLE curation ADD KEY curation_ibfk_1 (deletion);
+ALTER TABLE curation ADD KEY curation_ibfk_2 (creation);
 
-ALTER TABLE curation_data_source ADD FOREIGN KEY curation_ibfk_1 (auto_transform) REFERENCES curation_header_transform (header_transform_id);
-ALTER TABLE curation_data_source ADD KEY curation_idx_1 (auto_transform);
+ALTER TABLE curation_data_source ADD FOREIGN KEY curation_data_source_ibfk_1 (auto_transform) REFERENCES curation_header_transform (header_transform_id);
+ALTER TABLE curation_data_source ADD KEY curation_data_source_ibfk_1 (auto_transform);
 
 ALTER TABLE curation_step_database_upload ADD FOREIGN KEY curation_step_database_upload_ibfk_1 (upload_id) REFERENCES curation_step (step_id);
-ALTER TABLE curation_step_database_upload ADD KEY curation_step_database_upload_idx_1 (upload_id);
+ALTER TABLE curation_step_database_upload ADD KEY curation_step_database_upload_ibfk_1 (upload_id);
 
 ALTER TABLE curation_step_header_filter ADD FOREIGN KEY curation_step_header_filter_ibfk_1 (header_filter_id) REFERENCES curation_step (step_id);
-ALTER TABLE curation_step_header_filter ADD KEY curation_step_header_filter_idx_1 (header_filter_id);
+ALTER TABLE curation_step_header_filter ADD KEY curation_step_header_filter_ibfk_1 (header_filter_id);
 
 ALTER TABLE curation_step_header_transform ADD FOREIGN KEY curation_step_header_transform_ibfk_1 (header_transform_id) REFERENCES curation_step (step_id);
-ALTER TABLE curation_step_header_transform ADD KEY curation_step_header_transform_idx_1 (header_transform_id);
+ALTER TABLE curation_step_header_transform ADD KEY curation_step_header_transform_ibfk_1 (header_transform_id);
 
 ALTER TABLE curation_step_list ADD FOREIGN KEY curation_step_list_ibfk_1 (step_id) REFERENCES curation_step (step_id);
 ALTER TABLE curation_step_list ADD FOREIGN KEY curation_step_list_ibfk_2 (curation_id) REFERENCES curation (curation_id);
-ALTER TABLE curation_step_list ADD KEY curation_step_list_idx_1 (step_id);
-ALTER TABLE curation_step_list ADD KEY curation_step_list_idx_2 (curation_id);
+ALTER TABLE curation_step_list ADD KEY curation_step_list_ibfk_1 (step_id);
+ALTER TABLE curation_step_list ADD KEY curation_step_list_ibfk_2 (curation_id);
 
 ALTER TABLE curation_step_make_decoy ADD FOREIGN KEY curation_step_make_decoy_ibfk_1 (sequence_manipulation_id) REFERENCES curation_step (step_id);
-ALTER TABLE curation_step_make_decoy ADD KEY curation_step_make_decoy_idx_1 (sequence_manipulation_id);
+ALTER TABLE curation_step_make_decoy ADD KEY curation_step_make_decoy_ibfk_1 (sequence_manipulation_id);
 
 ALTER TABLE curation_step_manual_inclusion ADD FOREIGN KEY curation_step_manual_inclusion_ibfk_1 (manual_inclusion_id) REFERENCES curation_step (step_id);
-ALTER TABLE curation_step_manual_inclusion ADD KEY curation_step_manual_inclusion_idx_1 (manual_inclusion_id);
+ALTER TABLE curation_step_manual_inclusion ADD KEY curation_step_manual_inclusion_ibfk_1 (manual_inclusion_id);
 
 ALTER TABLE curation_step_new_db ADD FOREIGN KEY curation_step_new_db_ibfk_1 (source_db) REFERENCES source_database_archive (source_id);
 ALTER TABLE curation_step_new_db ADD FOREIGN KEY curation_step_new_db_ibfk_2 (new_database_id) REFERENCES curation_step (step_id);
-ALTER TABLE curation_step_new_db ADD KEY curation_step_new_db_idx_1 (source_db);
-ALTER TABLE curation_step_new_db ADD KEY curation_step_new_db_idx_2 (new_database_id);
+ALTER TABLE curation_step_new_db ADD KEY curation_step_new_db_ibfk_1 (source_db);
+ALTER TABLE curation_step_new_db ADD KEY curation_step_new_db_ibfk_2 (new_database_id);
 
 ALTER TABLE enabled_engines_set ADD FOREIGN KEY enabled_engines_set_ibfk_1 (set_id) REFERENCES enabled_engines (enabled_engines_id);
 ALTER TABLE enabled_engines_set ADD FOREIGN KEY enabled_engines_set_ibfk_2 (search_engine_id) REFERENCES search_engine (search_engine_id);
-ALTER TABLE enabled_engines_set ADD KEY enabled_engines_set_idx_1 (set_id);
-ALTER TABLE enabled_engines_set ADD KEY enabled_engines_set_idx_2 (search_engine_id);
+ALTER TABLE enabled_engines_set ADD KEY enabled_engines_set_ibfk_1 (set_id);
+ALTER TABLE enabled_engines_set ADD KEY enabled_engines_set_ibfk_2 (search_engine_id);
 
 ALTER TABLE file_search ADD FOREIGN KEY file_search_ibfk_1 (search_parameters) REFERENCES search_parameters (search_parameter_id);
 ALTER TABLE file_search ADD FOREIGN KEY file_search_ibfk_2 (enabled_engines) REFERENCES enabled_engines (enabled_engines_id);
 ALTER TABLE file_search ADD FOREIGN KEY file_search_ibfk_3 (input_files_id) REFERENCES swift_search_definition (swift_search_definition_id);
-ALTER TABLE file_search ADD KEY file_search_idx_1 (search_parameters);
-ALTER TABLE file_search ADD KEY file_search_idx_2 (enabled_engines);
-ALTER TABLE file_search ADD KEY file_search_idx_3 (input_files_id);
+ALTER TABLE file_search ADD KEY file_search_ibfk_1 (search_parameters);
+ALTER TABLE file_search ADD KEY file_search_ibfk_2 (enabled_engines);
+ALTER TABLE file_search ADD KEY file_search_ibfk_3 (input_files_id);
 
 ALTER TABLE instrument ADD FOREIGN KEY instrument_ibfk_1 (deletion) REFERENCES change_audit (change_audit_id);
 ALTER TABLE instrument ADD FOREIGN KEY instrument_ibfk_2 (creation) REFERENCES change_audit (change_audit_id);
-ALTER TABLE instrument ADD KEY instrument_idx_1 (deletion);
-ALTER TABLE instrument ADD KEY instrument_idx_2 (creation);
+ALTER TABLE instrument ADD KEY instrument_ibfk_1 (deletion);
+ALTER TABLE instrument ADD KEY instrument_ibfk_2 (creation);
 
 ALTER TABLE instrument_series ADD FOREIGN KEY instrument_series_ibfk_1 (ion_series_id) REFERENCES ion_series (ion_series_id);
 ALTER TABLE instrument_series ADD FOREIGN KEY instrument_series_ibfk_2 (instrument_id) REFERENCES instrument (instrument_id);
-ALTER TABLE instrument_series ADD KEY instrument_series_idx_1 (ion_series_id);
-ALTER TABLE instrument_series ADD KEY instrument_series_idx_2 (instrument_id);
+ALTER TABLE instrument_series ADD KEY instrument_series_ibfk_1 (ion_series_id);
+ALTER TABLE instrument_series ADD KEY instrument_series_ibfk_2 (instrument_id);
 
 ALTER TABLE ion_series ADD FOREIGN KEY ion_series_ibfk_1 (deletion) REFERENCES change_audit (change_audit_id);
 ALTER TABLE ion_series ADD FOREIGN KEY ion_series_ibfk_2 (creation) REFERENCES change_audit (change_audit_id);
-ALTER TABLE ion_series ADD KEY ion_series_idx_1 (deletion);
-ALTER TABLE ion_series ADD KEY ion_series_idx_2 (creation);
+ALTER TABLE ion_series ADD KEY ion_series_ibfk_1 (deletion);
+ALTER TABLE ion_series ADD KEY ion_series_ibfk_2 (creation);
 
 ALTER TABLE `mod` ADD FOREIGN KEY mod_ibfk_1 (deletion) REFERENCES change_audit (change_audit_id);
 ALTER TABLE `mod` ADD FOREIGN KEY mod_ibfk_2 (creation) REFERENCES change_audit (change_audit_id);
-ALTER TABLE `mod` ADD KEY mod_idx_1 (deletion);
-ALTER TABLE `mod` ADD KEY mod_idx_2 (creation);
+ALTER TABLE `mod` ADD KEY mod_ibfk_1 (deletion);
+ALTER TABLE `mod` ADD KEY mod_ibfk_2 (creation);
 
 ALTER TABLE mod_alt_names ADD FOREIGN KEY mod_alt_names_ibfk_1 (alt_name_id) REFERENCES `mod` (mod_id);
-ALTER TABLE mod_alt_names ADD KEY mod_alt_names_idx_1 (alt_name_id);
+ALTER TABLE mod_alt_names ADD KEY mod_alt_names_ibfk_1 (alt_name_id);
 
 ALTER TABLE mod_set_specificities ADD FOREIGN KEY mod_set_specificities_ibfk_1 (specificity_id) REFERENCES mod_specificity (specificity_id);
 ALTER TABLE mod_set_specificities ADD FOREIGN KEY mod_set_specificities_ibfk_2 (set_id) REFERENCES mod_set (mod_set_id);
-ALTER TABLE mod_set_specificities ADD KEY mod_set_specificities_idx_1 (specificity_id);
-ALTER TABLE mod_set_specificities ADD KEY mod_set_specificities_idx_2 (set_id);
+ALTER TABLE mod_set_specificities ADD KEY mod_set_specificities_ibfk_1 (specificity_id);
+ALTER TABLE mod_set_specificities ADD KEY mod_set_specificities_ibfk_2 (set_id);
 
 ALTER TABLE mod_specificity ADD FOREIGN KEY mod_specificity_ibfk_1 (mod_id) REFERENCES `mod` (mod_id);
-ALTER TABLE mod_specificity ADD KEY mod_specificity_idx_1 (mod_id);
+ALTER TABLE mod_specificity ADD KEY mod_specificity_ibfk_1 (mod_id);
 
 ALTER TABLE protease ADD FOREIGN KEY protease_ibfk_1 (deletion) REFERENCES change_audit (change_audit_id);
 ALTER TABLE protease ADD FOREIGN KEY protease_ibfk_2 (creation) REFERENCES change_audit (change_audit_id);
-ALTER TABLE protease ADD KEY protease_idx_1 (deletion);
-ALTER TABLE protease ADD KEY protease_idx_2 (creation);
+ALTER TABLE protease ADD KEY protease_ibfk_1 (deletion);
+ALTER TABLE protease ADD KEY protease_ibfk_2 (creation);
 
 ALTER TABLE protein_group ADD FOREIGN KEY protein_group_ibfk_1 (protein_sequence_list_id) REFERENCES protein_sequence_list (protein_sequence_list_id);
-ALTER TABLE protein_group ADD KEY protein_group_idx_1 (protein_sequence_list_id);
+ALTER TABLE protein_group ADD KEY protein_group_ibfk_1 (protein_sequence_list_id);
 
 ALTER TABLE protein_group_list_members ADD FOREIGN KEY protein_group_list_members_ibfk_1 (protein_group_id) REFERENCES protein_group (protein_group_id);
 ALTER TABLE protein_group_list_members ADD FOREIGN KEY protein_group_list_members_ibfk_2 (protein_group_list_id) REFERENCES protein_group_list (protein_group_list_id);
-ALTER TABLE protein_group_list_members ADD KEY protein_group_list_members_idx_1 (protein_group_id);
-ALTER TABLE protein_group_list_members ADD KEY protein_group_list_members_idx_2 (protein_group_list_id);
+ALTER TABLE protein_group_list_members ADD KEY protein_group_list_members_ibfk_1 (protein_group_id);
+ALTER TABLE protein_group_list_members ADD KEY protein_group_list_members_ibfk_2 (protein_group_list_id);
 
 ALTER TABLE protein_sequence_list_members ADD FOREIGN KEY protein_sequence_list_members_ibfk_1 (protein_sequence_id) REFERENCES protein_sequence (protein_sequence_id);
 ALTER TABLE protein_sequence_list_members ADD FOREIGN KEY protein_sequence_list_members_ibfk_2 (protein_sequence_list_id) REFERENCES protein_sequence_list (protein_sequence_list_id);
-ALTER TABLE protein_sequence_list_members ADD KEY protein_sequence_list_members_idx_1 (protein_sequence_id);
-ALTER TABLE protein_sequence_list_members ADD KEY protein_sequence_list_members_idx_2 (protein_sequence_list_id);
+ALTER TABLE protein_sequence_list_members ADD KEY protein_sequence_list_members_ibfk_1 (protein_sequence_id);
+ALTER TABLE protein_sequence_list_members ADD KEY protein_sequence_list_members_ibfk_2 (protein_sequence_list_id);
 
 ALTER TABLE report ADD FOREIGN KEY report_ibfk_1 (transaction_id) REFERENCES transaction (transaction_id);
-ALTER TABLE report ADD KEY report_idx_1 (transaction_id);
+ALTER TABLE report ADD KEY report_ibfk_1 (transaction_id);
 
 ALTER TABLE saved_parameters ADD FOREIGN KEY saved_parameters_ibfk_1 (owner) REFERENCES workflow_user (workflow_user_id);
 ALTER TABLE saved_parameters ADD FOREIGN KEY saved_parameters_ibfk_2 (deletion) REFERENCES change_audit (change_audit_id);
 ALTER TABLE saved_parameters ADD FOREIGN KEY saved_parameters_ibfk_3 (creation) REFERENCES change_audit (change_audit_id);
 ALTER TABLE saved_parameters ADD FOREIGN KEY saved_parameters_ibfk_4 (parameters) REFERENCES search_parameters (search_parameter_id);
-ALTER TABLE saved_parameters ADD KEY saved_parameters_idx_1 (owner);
-ALTER TABLE saved_parameters ADD KEY saved_parameters_idx_2 (deletion);
-ALTER TABLE saved_parameters ADD KEY saved_parameters_idx_3 (creation);
-ALTER TABLE saved_parameters ADD KEY saved_parameters_idx_4 (parameters);
+ALTER TABLE saved_parameters ADD KEY saved_parameters_ibfk_1 (owner);
+ALTER TABLE saved_parameters ADD KEY saved_parameters_ibfk_2 (deletion);
+ALTER TABLE saved_parameters ADD KEY saved_parameters_ibfk_3 (creation);
+ALTER TABLE saved_parameters ADD KEY saved_parameters_ibfk_4 (parameters);
 
 ALTER TABLE scaffold_settings ADD FOREIGN KEY scaffold_settings_ibfk_1 (starred_proteins) REFERENCES starred_proteins (starred_proteins_id);
-ALTER TABLE scaffold_settings ADD KEY scaffold_settings_idx_1 (starred_proteins);
+ALTER TABLE scaffold_settings ADD KEY scaffold_settings_ibfk_1 (starred_proteins);
 
 ALTER TABLE search_engine ADD FOREIGN KEY search_engine_ibfk_1 (deletion) REFERENCES change_audit (change_audit_id);
 ALTER TABLE search_engine ADD FOREIGN KEY search_engine_ibfk_2 (creation) REFERENCES change_audit (change_audit_id);
-ALTER TABLE search_engine ADD KEY search_engine_idx_1 (deletion);
-ALTER TABLE search_engine ADD KEY search_engine_idx_2 (creation);
+ALTER TABLE search_engine ADD KEY search_engine_ibfk_1 (deletion);
+ALTER TABLE search_engine ADD KEY search_engine_ibfk_2 (creation);
 
 ALTER TABLE search_parameters ADD FOREIGN KEY search_parameters_ibfk_1 (variable_mods) REFERENCES mod_set (mod_set_id);
 ALTER TABLE search_parameters ADD FOREIGN KEY search_parameters_ibfk_2 (scaffold_settings) REFERENCES scaffold_settings (scaffold_settings_id);
@@ -602,51 +602,51 @@ ALTER TABLE search_parameters ADD FOREIGN KEY search_parameters_ibfk_5 (instrume
 ALTER TABLE search_parameters ADD FOREIGN KEY search_parameters_ibfk_6 (curation) REFERENCES curation (curation_id);
 ALTER TABLE search_parameters ADD FOREIGN KEY search_parameters_ibfk_7 (extract_msn_settings) REFERENCES extract_msn_settings (extract_msn_settings_id);
 ALTER TABLE search_parameters ADD FOREIGN KEY search_parameters_ibfk_8 (scaffold_settings) REFERENCES scaffold_settings (scaffold_settings_id);
-ALTER TABLE search_parameters ADD KEY search_parameters_idx_1 (variable_mods);
-ALTER TABLE search_parameters ADD KEY search_parameters_idx_2 (scaffold_settings);
-ALTER TABLE search_parameters ADD KEY search_parameters_idx_3 (fixed_mods);
-ALTER TABLE search_parameters ADD KEY search_parameters_idx_4 (protease);
-ALTER TABLE search_parameters ADD KEY search_parameters_idx_5 (instrument);
-ALTER TABLE search_parameters ADD KEY search_parameters_idx_6 (curation);
-ALTER TABLE search_parameters ADD KEY search_parameters_idx_7 (extract_msn_settings);
-ALTER TABLE search_parameters ADD KEY search_parameters_idx_8 (scaffold_settings);
+ALTER TABLE search_parameters ADD KEY search_parameters_ibfk_1 (variable_mods);
+ALTER TABLE search_parameters ADD KEY search_parameters_ibfk_2 (scaffold_settings);
+ALTER TABLE search_parameters ADD KEY search_parameters_ibfk_3 (fixed_mods);
+ALTER TABLE search_parameters ADD KEY search_parameters_ibfk_4 (protease);
+ALTER TABLE search_parameters ADD KEY search_parameters_ibfk_5 (instrument);
+ALTER TABLE search_parameters ADD KEY search_parameters_ibfk_6 (curation);
+ALTER TABLE search_parameters ADD KEY search_parameters_ibfk_7 (extract_msn_settings);
+ALTER TABLE search_parameters ADD KEY search_parameters_ibfk_8 (scaffold_settings);
 
 ALTER TABLE search_result ADD FOREIGN KEY search_result_ibfk_1 (protein_group_list_id) REFERENCES protein_group_list (protein_group_list_id);
 ALTER TABLE search_result ADD FOREIGN KEY search_result_ibfk_2 (tandem_mass_spec_sample_id) REFERENCES tandem_mass_spec_sample (tandem_mass_spec_sample_id);
-ALTER TABLE search_result ADD KEY search_result_idx_1 (protein_group_list_id);
-ALTER TABLE search_result ADD KEY search_result_idx_2 (tandem_mass_spec_sample_id);
+ALTER TABLE search_result ADD KEY search_result_ibfk_1 (protein_group_list_id);
+ALTER TABLE search_result ADD KEY search_result_ibfk_2 (tandem_mass_spec_sample_id);
 
 ALTER TABLE search_result_list_members ADD FOREIGN KEY search_result_list_members_ibfk_1 (search_result_list_id) REFERENCES search_result_list (search_result_list_id);
 ALTER TABLE search_result_list_members ADD FOREIGN KEY search_result_list_members_ibfk_2 (search_result_id) REFERENCES search_result (search_result_id);
-ALTER TABLE search_result_list_members ADD KEY search_result_list_members_idx_1 (search_result_list_id);
-ALTER TABLE search_result_list_members ADD KEY search_result_list_members_idx_2 (search_result_id);
+ALTER TABLE search_result_list_members ADD KEY search_result_list_members_ibfk_1 (search_result_list_id);
+ALTER TABLE search_result_list_members ADD KEY search_result_list_members_ibfk_2 (search_result_id);
 
 ALTER TABLE swift_search_definition ADD FOREIGN KEY swift_search_definition_ibfk_1 (peptide_report) REFERENCES peptide_report (peptide_report_id);
 ALTER TABLE swift_search_definition ADD FOREIGN KEY swift_search_definition_ibfk_2 (search_parameters) REFERENCES search_parameters (search_parameter_id);
 ALTER TABLE swift_search_definition ADD FOREIGN KEY swift_search_definition_ibfk_3 (spectrum_qa) REFERENCES spectrum_qa (spectrum_qa_id);
 ALTER TABLE swift_search_definition ADD FOREIGN KEY swift_search_definition_ibfk_4 (owner) REFERENCES workflow_user (workflow_user_id);
-ALTER TABLE swift_search_definition ADD KEY swift_search_definition_idx_1 (peptide_report);
-ALTER TABLE swift_search_definition ADD KEY swift_search_definition_idx_2 (search_parameters);
-ALTER TABLE swift_search_definition ADD KEY swift_search_definition_idx_3 (spectrum_qa);
-ALTER TABLE swift_search_definition ADD KEY swift_search_definition_idx_4 (owner);
+ALTER TABLE swift_search_definition ADD KEY swift_search_definition_ibfk_1 (peptide_report);
+ALTER TABLE swift_search_definition ADD KEY swift_search_definition_ibfk_2 (search_parameters);
+ALTER TABLE swift_search_definition ADD KEY swift_search_definition_ibfk_3 (spectrum_qa);
+ALTER TABLE swift_search_definition ADD KEY swift_search_definition_ibfk_4 (owner);
 
 ALTER TABLE task ADD FOREIGN KEY task_ibfk_1 (task_state) REFERENCES task_state (task_state_id);
 ALTER TABLE task ADD FOREIGN KEY task_ibfk_2 (transaction_id) REFERENCES `transaction` (transaction_id);
-ALTER TABLE task ADD KEY task_idx_1 (task_state);
-ALTER TABLE task ADD KEY task_idx_2 (transaction_id);
+ALTER TABLE task ADD KEY task_ibfk_1 (task_state);
+ALTER TABLE task ADD KEY task_ibfk_2 (transaction_id);
 
 ALTER TABLE `transaction` ADD FOREIGN KEY transaction_ibfk_1 (submitting_user) REFERENCES workflow_user (workflow_user_id);
 ALTER TABLE `transaction` ADD FOREIGN KEY transaction_ibfk_2 (swift_search) REFERENCES swift_search_definition (swift_search_definition_id);
-ALTER TABLE `transaction` ADD KEY transaction_idx_1 (submitting_user);
-ALTER TABLE `transaction` ADD KEY transaction_idx_2 (swift_search);
+ALTER TABLE `transaction` ADD KEY transaction_ibfk_1 (submitting_user);
+ALTER TABLE `transaction` ADD KEY transaction_ibfk_2 (swift_search);
 
 ALTER TABLE user_preferences ADD FOREIGN KEY user_preferences_ibfk_1 (user_id) REFERENCES workflow_user (workflow_user_id);
-ALTER TABLE user_preferences ADD KEY user_preferences_idx_1 (user_id);
+ALTER TABLE user_preferences ADD KEY user_preferences_ibfk_1 (user_id);
 
 ALTER TABLE workflow_user ADD FOREIGN KEY workflow_user_ibfk_1 (deletion) REFERENCES change_audit (change_audit_id);
 ALTER TABLE workflow_user ADD FOREIGN KEY workflow_user_ibfk_2 (creation) REFERENCES change_audit (change_audit_id);
-ALTER TABLE workflow_user ADD KEY workflow_user_idx_1 (deletion);
-ALTER TABLE workflow_user ADD KEY workflow_user_idx_2 (creation);
+ALTER TABLE workflow_user ADD KEY workflow_user_ibfk_1 (deletion);
+ALTER TABLE workflow_user ADD KEY workflow_user_ibfk_2 (creation);
 
 -- Initial database version is to be instantly updated by the DbMigrator script
 INSERT INTO swift_db_version (id, db_version) VALUES (1, 1);

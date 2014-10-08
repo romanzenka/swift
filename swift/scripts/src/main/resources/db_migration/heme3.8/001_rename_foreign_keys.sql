@@ -25,7 +25,7 @@ ALTER TABLE curation ADD FOREIGN KEY curation_ibfk_2 (creation) REFERENCES chang
 
 ALTER TABLE curation_data_source
   DROP FOREIGN KEY `FKB3C179C692A49BF2`;
-ALTER TABLE curation_data_source ADD FOREIGN KEY curation_ibfk_1 (auto_transform) REFERENCES curation_header_transform (header_transform_id);
+ALTER TABLE curation_data_source ADD FOREIGN KEY curation_data_source_ibfk_1 (auto_transform) REFERENCES curation_header_transform (header_transform_id);
 
 ALTER TABLE curation_step_database_upload DROP FOREIGN KEY `FK38DF9B1C925A14E3`; #curation_step-step_id
 ALTER TABLE curation_step_database_upload ADD FOREIGN KEY curation_step_database_upload_ibfk_1 (upload_id) REFERENCES curation_step (step_id);

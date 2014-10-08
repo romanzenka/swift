@@ -4,8 +4,8 @@ CREATE TABLE `quameter_spectra` (
   `quameter_pg_id` INT NULL,
   `unique_spectra` INT NULL,
   PRIMARY KEY (`quameter_spectra_id`),
-  INDEX `quameter_spectra_idx_1` (`quameter_result_id` ASC),
-  INDEX `quameter_spectra_idx_2` (`quameter_pg_id` ASC),
+  INDEX `quameter_spectra_ibfk_1` (`quameter_result_id` ASC),
+  INDEX `quameter_spectra_ibfk_2` (`quameter_pg_id` ASC),
   CONSTRAINT `quameter_spectra_ibfk_1`
     FOREIGN KEY (`quameter_result_id`)
     REFERENCES `quameter_result` (`quameter_result_id`)

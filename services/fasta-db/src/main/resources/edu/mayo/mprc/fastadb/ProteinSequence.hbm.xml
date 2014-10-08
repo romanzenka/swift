@@ -10,8 +10,8 @@
         <property name="sequence" type="text" column="sequence"/> <!-- TODO: Make binary -->
     </class>
     <database-object>
-        <create>ALTER TABLE `protein_sequence` ADD INDEX `sequence` USING HASH (`sequence`(200) ASC) ;</create>
-        <drop>ALTER TABLE `protein_sequence` DROP INDEX `sequence` ;</drop>
+        <create>ALTER TABLE `protein_sequence` ADD INDEX `sequence` USING HASH (`sequence`(200) ASC)</create>
+        <drop>ALTER TABLE `protein_sequence` DROP INDEX `sequence`</drop>
         <dialect-scope name="org.hibernate.dialect.MySQLInnoDBDialect"/>
     </database-object>
 </hibernate-mapping>

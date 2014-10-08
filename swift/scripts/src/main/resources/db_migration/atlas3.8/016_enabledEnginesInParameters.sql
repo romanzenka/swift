@@ -14,7 +14,7 @@
 ALTER TABLE search_parameters
 ADD COLUMN enabled_engines INT(11) NULL DEFAULT NULL
 AFTER scaffold_settings,
-ADD KEY search_parameters_idx_9 (enabled_engines),
+ADD KEY search_parameters_ibfk_9 (enabled_engines),
 ADD FOREIGN KEY search_parameters_ibfk_9 (enabled_engines) REFERENCES enabled_engines (enabled_engines_id);
 
 CREATE TABLE `temp_saved_enabled_counts` (
@@ -265,7 +265,7 @@ WHERE
 -- Drop link from file_search to enabled_engines
 
 ALTER TABLE file_search
-DROP KEY file_search_idx_2,
+DROP KEY file_search_ibfk_2,
 DROP FOREIGN KEY file_search_ibfk_2,
 DROP COLUMN enabled_engines,
 DROP INDEX input_file;

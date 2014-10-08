@@ -1,10 +1,9 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
-        "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+    "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
 <hibernate-mapping package="edu.mayo.mprc.searchdb.dao" default-lazy="true">
     <class name="BiologicalSampleList" table="biological_sample_list" mutable="false">
         <id name="id" type="integer" column="biological_sample_list_id">
-            <generator class="native"/>
+            <generator class="native" />
         </id>
 
         <property name="hash" column="hash" not-null="true"/>
@@ -12,7 +11,12 @@
         <bag name="list" table="biological_sample_list_members" mutable="false">
             <key column="biological_sample_list_id" foreign-key="biological_sample_list_members_ibfk_2"/>
             <many-to-many column="biological_sample_id" class="BiologicalSample" lazy="proxy"
-                foreign-key="biological_sample_list_members_ibfk_1"/>
+                foreign-key="biological_sample_list_members_ibfk_1" />
         </bag>
     </class>
+    <database-object>
+        <create>ALTER TABLE `biological_sample_list` ADD INDEX `hash` (`hash`, `biological_sample_list_id`);</create>
+        <drop>ALTER TABLE `biological_sample_list` DROP INDEX `hash` ;</drop>
+        <dialect-scope name="org.hibernate.dialect.MySQLInnoDBDialect"/>
+    </database-object>
 </hibernate-mapping>

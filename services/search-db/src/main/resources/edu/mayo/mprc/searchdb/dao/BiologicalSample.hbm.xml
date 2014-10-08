@@ -10,4 +10,10 @@
         <many-to-one name="searchResults" class="SearchResultList" column="search_result_list_id" lazy="proxy"
             foreign-key="biological_sample_ibfk_1" />
     </class>
+    <database-object>
+        <create>CREATE UNIQUE INDEX uniqueness ON biological_sample (category, sample_name, search_result_list_id)</create>
+        <drop>DROP INDEX uniqueness on biological_sample</drop>
+        <dialect-scope name="org.hibernate.dialect.MySQLInnoDBDialect"/>
+    </database-object>
+
 </hibernate-mapping>

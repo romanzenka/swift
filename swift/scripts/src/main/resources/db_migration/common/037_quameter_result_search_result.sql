@@ -2,7 +2,7 @@
 
 ALTER TABLE `quameter_result`
 ADD COLUMN `search_result_id` INT(11) NULL DEFAULT NULL AFTER `quameter_result_id`,
-ADD INDEX `quameter_result_idx_3` (`search_result_id` ASC);
+ADD INDEX `quameter_result_ibfk_3` (`search_result_id` ASC);
 ALTER TABLE `quameter_result`
 ADD CONSTRAINT `quameter_result_ibfk_3`
   FOREIGN KEY (`search_result_id`)
@@ -19,7 +19,7 @@ ALTER TABLE `quameter_result`
 DROP FOREIGN KEY `quameter_result_ibfk_1`;
 ALTER TABLE `quameter_result`
 DROP COLUMN `sample_id`,
-DROP INDEX `quameter_result_idx_1` ;
+DROP INDEX `quameter_result_ibfk_1` ;
 
 -- @UNDO
 
