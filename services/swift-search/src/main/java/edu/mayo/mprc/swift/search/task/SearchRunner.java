@@ -257,7 +257,11 @@ public final class SearchRunner implements Runnable, Lifecycle {
 	}
 
 	private boolean isQualityControlEnabled() {
-		return getSearchDefinition().getSearchParameters().getEnabledEngines().isEnabled(engines.getQuameterEngine().getEngineConfig());
+        if(engines.getQuameterEngine() != null){
+		    return getSearchDefinition().getSearchParameters().getEnabledEngines().isEnabled(engines.getQuameterEngine().getEngineConfig());
+        } else {
+            return false;
+        }
 	}
 
 	/**
