@@ -23,14 +23,6 @@ import java.util.Locale;
 public class HeaderFilterStep implements CurationStep {
 	private static final long serialVersionUID = 20071220L;
 
-
-	/**
-	 * the persistence identifier of this HeaderFilterStep
-	 * PERSISTENT
-	 */
-	private Integer id = null;
-
-
 	/**
 	 * the match mode of this filter (defaults to ANY)
 	 * <p/>
@@ -57,6 +49,16 @@ public class HeaderFilterStep implements CurationStep {
 	 */
 	public HeaderFilterStep() {
 		super();
+	}
+
+	/**
+	 * For testing only. Fast creation of a step.
+	 */
+	public HeaderFilterStep(final MatchMode matchMode, final TextMode textMode, final String criteriaString, final Integer lastRunCompletionCount) {
+		this.matchMode = matchMode;
+		this.textMode = textMode;
+		this.criteriaString = criteriaString;
+		this.lastRunCompletionCount = lastRunCompletionCount;
 	}
 
 	/**
@@ -91,7 +93,7 @@ public class HeaderFilterStep implements CurationStep {
 			if (filter.matches(in.getHeader())) {
 				try {
 					out.appendSequence(in.getHeader(), in.getSequence());
-				} catch (IOException e) {
+				} catch (final IOException e) {
 					runValidation.addMessageAndException("Error filtering steps", e);
 				}
 			}
@@ -217,16 +219,6 @@ public class HeaderFilterStep implements CurationStep {
 	 */
 	public void setCriteriaString(final String criteriaString) {
 		this.criteriaString = criteriaString;
-	}
-
-	@Override
-	public Integer getId() {
-		return id;
-	}
-
-	@Override
-	public void setId(final Integer id) {
-		this.id = id;
 	}
 
 	/**

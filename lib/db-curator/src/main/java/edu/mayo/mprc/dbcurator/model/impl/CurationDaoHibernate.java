@@ -57,7 +57,6 @@ public final class CurationDaoHibernate extends DaoBase implements CurationDao {
 	@Override
 	public Collection<String> getHibernateMappings() {
 		final List<String> list = new ArrayList<String>(Arrays.asList(
-				STEPS + "CurationStep.hbm.xml",
 				STEPS + "DataSource.hbm.xml",
 				STEPS + "HeaderTransform.hbm.xml",
 				MODEL + "Curation.hbm.xml",

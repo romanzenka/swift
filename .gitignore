@@ -1,5 +1,11 @@
 target
+*/target
 *.iml
+*.ipr
+*.iws
+*.ids
+*.class
 /activemq-data/
 .idea
+deploy_atlas_test.sh
 **/rebel.xml
