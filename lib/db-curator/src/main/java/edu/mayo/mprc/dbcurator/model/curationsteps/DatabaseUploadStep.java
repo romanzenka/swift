@@ -207,4 +207,9 @@ public class DatabaseUploadStep implements CurationStep {
 	public String simpleDescription() {
 		return "Upload " + getFileName();
 	}
+
+    @Override
+    public String getStepTypeName() {
+        return "database_upload";
+    }
 }

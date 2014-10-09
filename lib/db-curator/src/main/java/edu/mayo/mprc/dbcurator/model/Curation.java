@@ -1,6 +1,9 @@
 package edu.mayo.mprc.dbcurator.model;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import com.google.gson.reflect.TypeToken;
 import edu.mayo.mprc.MprcException;
 import edu.mayo.mprc.database.EvolvableBase;
@@ -66,11 +69,7 @@ public class Curation extends EvolvableBase implements Serializable {
 
     /** Serialized version of the curation steps */
     private String curationStepsJson;
-
-    /**
-	 * the steps involved in the curation. Deserialized version, does not go into the database
-	 */
-	private transient List<CurationStep> curationSteps = new ArrayList<CurationStep>();
+    private int stepVersion;
 
 	/**
 	 * Regular expression (Scaffold-supported) describing which accession numbers belong to the decoy part of the database.
@@ -122,7 +121,19 @@ public class Curation extends EvolvableBase implements Serializable {
 	 */
 	public List<CurationStep> getCurationSteps() {
         Type listType = new TypeToken<List<CurationStep>>(){}.getType();
-        List<CurationStep> myModelList = gson.fromJson( getCurationStepsJson() , listType );
+        JsonObject jobj = new Gson().fromJson(getCurationStepsJson(), JsonObject.class);
+        List<CurationStep> myModelList = new ArrayList<CurationStep>();
+        if( jobj == null ){
+            stepVersion = 0;
+        }
+        else{
+            stepVersion = jobj.get("version").getAsInt();
+            JsonArray stepArray = jobj.get("steps").getAsJsonArray();
+            for(JsonElement j : stepArray){
+                Class mySource = StepsMap.getClassForType( j.getAsJsonObject().get("step_type").getAsString() );
+                myModelList.add( (CurationStep) gson.fromJson(j, mySource)  );
+            }
+        }
 		return myModelList;
 	}
 
@@ -132,8 +143,16 @@ public class Curation extends EvolvableBase implements Serializable {
 	 * @param curationSteps the steps to set on this Curation
 	 */
 	protected void setCurationSteps(final List<CurationStep> curationSteps) {
-		this.curationSteps = curationSteps;
-        setCurationStepsJson( gson.toJson(curationSteps) );
+        JsonObject reqObj = new JsonObject();
+        reqObj.addProperty( "version", stepVersion );
+        JsonArray typeAppendedSteps = new JsonArray();
+        for(CurationStep g : curationSteps){
+            JsonObject jStep = gson.toJsonTree(g).getAsJsonObject();
+            jStep.addProperty("step_type", g.getStepTypeName());
+            typeAppendedSteps.add(jStep);
+        }
+        reqObj.add( "steps", typeAppendedSteps );
+        setCurationStepsJson(gson.toJson(reqObj));
 	}
 
 	/**
@@ -335,8 +354,9 @@ public class Curation extends EvolvableBase implements Serializable {
 	 * @param toMoveTo where you want to add the step to
 	 */
 	public Curation addStep(final CurationStep toAdd, final int toMoveTo) {
-        getCurationSteps().add(translateStepIndex(toMoveTo), toAdd);
-        setCurationSteps(curationSteps);
+        List<CurationStep> steps = getCurationSteps();
+        steps.add(translateStepIndex(toMoveTo), toAdd);
+        setCurationSteps(steps);
 		return this;
 	}
 
@@ -344,8 +364,9 @@ public class Curation extends EvolvableBase implements Serializable {
 	 * Remove all steps from the curation.
 	 */
 	public void clearSteps() {
-		getCurationSteps().clear();
-        setCurationSteps(curationSteps);
+        List<CurationStep> steps = getCurationSteps();
+        steps.clear();
+        setCurationSteps(steps);
     }
 
 	/**
@@ -356,7 +377,8 @@ public class Curation extends EvolvableBase implements Serializable {
 	 * @return the translated index
 	 */
 	protected int translateStepIndex(final int step) {
-		if (step > curationSteps.size()) {
+        List<CurationStep> curationSteps = getCurationSteps();
+        if (step > curationSteps.size()) {
 			return curationSteps.size() - 1;
 		}
 		if (curationSteps.isEmpty()) {
@@ -384,7 +406,7 @@ public class Curation extends EvolvableBase implements Serializable {
 	 * @return the number of steps
 	 */
 	public int stepCount() {
-		return curationSteps.size();
+		return getCurationSteps().size();
 	}
 
 	/**
@@ -401,7 +423,7 @@ public class Curation extends EvolvableBase implements Serializable {
 
 	public String simpleDescription() {
 		final StringBuilder sb = new StringBuilder(EXPECTED_DESCRIPTION_SIZE);
-		for (final CurationStep step : curationSteps) {
+		for (final CurationStep step : getCurationSteps()) {
 			if (step.simpleDescription() != null) {
 				sb.append(step.simpleDescription()).append(", ");
 			}

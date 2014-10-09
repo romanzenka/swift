@@ -267,4 +267,9 @@ public class MakeDecoyStep implements CurationStep {
 		return getManipulator().getDescription();
 	}
 
+    @Override
+    public String getStepTypeName() {
+        return "make_decoy";
+    }
+
 }
