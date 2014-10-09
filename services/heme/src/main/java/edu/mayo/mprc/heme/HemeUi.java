@@ -14,7 +14,6 @@ import edu.mayo.mprc.config.ui.ServiceUiFactory;
 import edu.mayo.mprc.config.ui.UiBuilder;
 import edu.mayo.mprc.database.Dao;
 import edu.mayo.mprc.dbcurator.model.Curation;
-import edu.mayo.mprc.fastadb.FastaDbDao;
 import edu.mayo.mprc.heme.dao.HemeDao;
 import edu.mayo.mprc.heme.dao.HemeTest;
 import edu.mayo.mprc.swift.db.SwiftDao;
@@ -66,9 +65,9 @@ public final class HemeUi implements Dao {
 	private static final String USER_EMAIL = "userEmail";
 	public static final String SPECTRA_EXTENSION = ".spectra.txt";
 	public static final double DEFAULT_MASS_DELTA_TOLERANCE = 0.5;
-    private static final String FASTA_DB_CACHE= "fastaDbCache";
-    
-    private final File data;
+	private static final String FASTA_DB_CACHE = "fastaDbCache";
+
+	private final File data;
 	private final File results;
 	private final HemeDao hemeDao;
 	private final SwiftDao swiftDao;
@@ -87,13 +86,13 @@ public final class HemeUi implements Dao {
 	 */
 	private int chymoParameterSetId;
 	private String userEmail;
-    private File fastaDbCache;
+	private File fastaDbCache;
 
 	public HemeUi(final File data, final File results, final HemeDao hemeDao, final SwiftDao swiftDao,
 	              final ParamsDao paramsDao,
 	              final SwiftSearcherCaller swiftSearcherCaller,
 	              final String trypsinParameterSetName, final String chymoParameterSetName, final String userEmail,
-                  final File fastaDbCache) {
+	              final File fastaDbCache) {
 		this.data = data;
 		this.results = results;
 		this.hemeDao = hemeDao;
@@ -103,7 +102,7 @@ public final class HemeUi implements Dao {
 		this.trypsinParameterSetName = trypsinParameterSetName;
 		this.chymoParameterSetName = chymoParameterSetName;
 		this.userEmail = userEmail;
-        this.fastaDbCache = fastaDbCache;
+		this.fastaDbCache = fastaDbCache;
 	}
 
 	@Override
@@ -226,6 +225,7 @@ public final class HemeUi implements Dao {
 			searchInput.setLowPriority(false);
 			searchInput.setPublicMgfFiles(false);
 			searchInput.setPublicSearchFiles(false);
+			searchInput.setUser(new HashMap<String, String>());
 			commit();
 
 		} catch (Exception e) {
@@ -302,24 +302,24 @@ public final class HemeUi implements Dao {
 
 		final Curation database = swiftSearchDefinition.getSearchParameters().getDatabase();
 		String fastaName = FileUtilities.stripGzippedExtension(database.getCurationFile().getName());
-		File dbCache = new File(fastaDbCache, fastaName+"-desc.obj");
-        if( !dbCache.exists() ){
-            SerializeFastaDB.generateDesc(database.getCurationFile(), dbCache.toString());
-        }
+		File dbCache = new File(fastaDbCache, fastaName + "-desc.obj");
+		if (!dbCache.exists()) {
+			SerializeFastaDB.generateDesc(database.getCurationFile(), dbCache.toString());
+		}
 
-        File seqCache = new File(fastaDbCache, fastaName+"-seq.obj");
-        if( !seqCache.exists() ){
-            SerializeFastaDB.generateSequence(database.getFastaFile().getFile(), seqCache.toString());
-        }
-        HemeReport myNewReport = new HemeReport(test);
+		File seqCache = new File(fastaDbCache, fastaName + "-seq.obj");
+		if (!seqCache.exists()) {
+			SerializeFastaDB.generateSequence(database.getFastaFile().getFile(), seqCache.toString());
+		}
+		HemeReport myNewReport = new HemeReport(test);
 
-        // final HemeScaffoldReader reader = new HemeScaffoldReader(fastaDbCache); // TODO - double check before deployment
-        final HemeScaffoldReader reader = new HemeScaffoldReader(dbCache, seqCache, myNewReport); // TODO - double check before deployment
-        // final HemeScaffoldReader reader = new HemeScaffoldReader(fastaDbDao, swiftSearchDefinition.getSearchParameters().getDatabase());
+		// final HemeScaffoldReader reader = new HemeScaffoldReader(fastaDbCache); // TODO - double check before deployment
+		final HemeScaffoldReader reader = new HemeScaffoldReader(dbCache, seqCache, myNewReport); // TODO - double check before deployment
+		// final HemeScaffoldReader reader = new HemeScaffoldReader(fastaDbDao, swiftSearchDefinition.getSearchParameters().getDatabase());
 		reader.load(scaffoldFile, "3", null);
 
 
-        return myNewReport;
+		return myNewReport;
 	}
 
 	private String extractPatientName(final File patient) {
@@ -334,12 +334,12 @@ public final class HemeUi implements Dao {
 
 	private ImmutableMap<String, HemeTest> getTestsByPath() {
 		return Maps.uniqueIndex(getHemeDao().getAllTests(), new Function<HemeTest, String>() {
-            @Override
-            public String apply(@Nullable final HemeTest from) {
-                Preconditions.checkNotNull(from, "Programmer error - the heme test was null");
-                return from.getPath();
-            }
-        });
+			@Override
+			public String apply(@Nullable final HemeTest from) {
+				Preconditions.checkNotNull(from, "Programmer error - the heme test was null");
+				return from.getPath();
+			}
+		});
 	}
 
 	private int getIdForParameterSet(final String name) {
@@ -469,7 +469,7 @@ public final class HemeUi implements Dao {
 					config.get(TRYPSIN_PARAM_SET_NAME),
 					config.get(CHYMO_PARAM_SET_NAME),
 					config.get(USER_EMAIL),
-                    new File(config.get(FASTA_DB_CACHE)));
+					new File(config.get(FASTA_DB_CACHE)));
 		}
 
 		private String[] splitEngineString(final String engines) {
@@ -487,10 +487,10 @@ public final class HemeUi implements Dao {
 	public static final class Ui implements ServiceUiFactory {
 
 
-        @Override
+		@Override
 		public void createUI(final DaemonConfig daemon, final ResourceConfig resource, final UiBuilder builder) {
 			builder.property(DATA_PATH, "Data path", "Folder containing the heme pathology test data. Every sub-folder in this folder will be displayed. " +
-                    "<p>The path is relative to the shared folder</p>")
+					"<p>The path is relative to the shared folder</p>")
 					.required()
 					.existingDirectory()
 					.defaultValue("data")
@@ -510,9 +510,9 @@ public final class HemeUi implements Dao {
 					.property(USER_EMAIL, "User email", "Email of the user to run searches as. Identifies the user uniquely. See http://&lt;swift url&gt;/service/users.xml for a list.")
 					.required()
 
-                    .property(FASTA_DB_CACHE, "Fasta Database Cache", "Caches the fasta decriptive titles by protein accession, for fast lookup.")
-                    .required()
-                    .defaultValue("var/cache/heme");
+					.property(FASTA_DB_CACHE, "Fasta Database Cache", "Caches the fasta decriptive titles by protein accession, for fast lookup.")
+					.required()
+					.defaultValue("var/cache/heme");
 		}
 	}
 
