@@ -1,5 +1,6 @@
 package edu.mayo.mprc.dbcurator.model.curationsteps;
 
+import com.google.common.base.Objects;
 import edu.mayo.mprc.dbcurator.model.CurationDao;
 import edu.mayo.mprc.dbcurator.model.CurationExecutor;
 import edu.mayo.mprc.dbcurator.model.CurationStep;
@@ -183,4 +184,21 @@ public class ManualInclusionStep implements CurationStep {
     public String getStepTypeName() {
         return "manual_inclusion";
     }
+
+	@Override
+	public int hashCode() {
+		return Objects.hashCode(header, sequence, lastRunCompletionCount);
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj) {
+			return true;
+		}
+		if (obj == null || getClass() != obj.getClass()) {
+			return false;
+		}
+		final ManualInclusionStep other = (ManualInclusionStep) obj;
+		return Objects.equal(this.header, other.header) && Objects.equal(this.sequence, other.sequence) && Objects.equal(this.lastRunCompletionCount, other.lastRunCompletionCount);
+	}
 }

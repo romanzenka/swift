@@ -1,5 +1,6 @@
 package edu.mayo.mprc.dbcurator.model.curationsteps;
 
+import com.google.common.base.Objects;
 import edu.mayo.mprc.dbcurator.model.*;
 import edu.mayo.mprc.fasta.DBInputStream;
 import edu.mayo.mprc.fasta.DBOutputStream;
@@ -61,9 +62,8 @@ public class MakeDecoyStep implements CurationStep {
 	/**
 	 * For testing only. Fast creation of a step.
 	 */
-	public MakeDecoyStep(final boolean overwriteMode, final StringManipulator manipulator, final int manipulatorType, final Integer lastRunCompletionCount) {
+	public MakeDecoyStep(final boolean overwriteMode, final int manipulatorType, final Integer lastRunCompletionCount) {
 		this.overwriteMode = overwriteMode;
-		this.manipulator = manipulator;
 		this.manipulatorType = manipulatorType;
 		this.lastRunCompletionCount = lastRunCompletionCount;
 	}
@@ -272,4 +272,20 @@ public class MakeDecoyStep implements CurationStep {
         return "make_decoy";
     }
 
+	@Override
+	public int hashCode() {
+		return Objects.hashCode(overwriteMode, manipulatorType, lastRunCompletionCount);
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj) {
+			return true;
+		}
+		if (obj == null || getClass() != obj.getClass()) {
+			return false;
+		}
+		final MakeDecoyStep other = (MakeDecoyStep) obj;
+		return Objects.equal(this.overwriteMode, other.overwriteMode) && Objects.equal(this.manipulatorType, other.manipulatorType) && Objects.equal(this.lastRunCompletionCount, other.lastRunCompletionCount);
+	}
 }

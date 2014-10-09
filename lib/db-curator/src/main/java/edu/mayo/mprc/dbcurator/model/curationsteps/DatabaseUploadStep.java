@@ -1,5 +1,6 @@
 package edu.mayo.mprc.dbcurator.model.curationsteps;
 
+import com.google.common.base.Objects;
 import edu.mayo.mprc.dbcurator.model.CurationDao;
 import edu.mayo.mprc.dbcurator.model.CurationExecutor;
 import edu.mayo.mprc.dbcurator.model.CurationStep;
@@ -11,7 +12,6 @@ import edu.mayo.mprc.utilities.FileUtilities;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Arrays;
 
 /**
  * @author Eric Winter
@@ -34,11 +34,6 @@ public class DatabaseUploadStep implements CurationStep {
 	 */
 	private Integer lastRunCompletionCount;
 
-	/**
-	 * An MD5 of the file that was uploaded.  We can use this to eliminate redundant uploads
-	 */
-	private byte[] md5CheckSum;
-
 	public DatabaseUploadStep() {
 
 	}
@@ -46,11 +41,10 @@ public class DatabaseUploadStep implements CurationStep {
 	/**
 	 * For testing only. Fast creation of a step.
 	 */
-	public DatabaseUploadStep(final File pathToUploadedFile, final String fileName, final byte[] md5CheckSum, final Integer lastRunCompletionCount) {
+	public DatabaseUploadStep(final File pathToUploadedFile, final String fileName, final Integer lastRunCompletionCount) {
 		this.pathToUploadedFile = pathToUploadedFile;
 		this.fileName = fileName;
 		this.lastRunCompletionCount = lastRunCompletionCount;
-		this.md5CheckSum = md5CheckSum;
 	}
 
 	/**
@@ -195,14 +189,6 @@ public class DatabaseUploadStep implements CurationStep {
 		this.fileName = fileName;
 	}
 
-	public byte[] getMd5CheckSum() {
-		return md5CheckSum;
-	}
-
-	public void setMd5CheckSum(final byte[] md5CheckSum) {
-		this.md5CheckSum = md5CheckSum == null ? null : Arrays.copyOf(md5CheckSum, md5CheckSum.length);
-	}
-
 	@Override
 	public String simpleDescription() {
 		return "Upload " + getFileName();
@@ -212,4 +198,21 @@ public class DatabaseUploadStep implements CurationStep {
     public String getStepTypeName() {
         return "database_upload";
     }
+
+	@Override
+	public int hashCode() {
+		return Objects.hashCode(pathToUploadedFile, fileName, lastRunCompletionCount);
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj) {
+			return true;
+		}
+		if (obj == null || getClass() != obj.getClass()) {
+			return false;
+		}
+		final DatabaseUploadStep other = (DatabaseUploadStep) obj;
+		return Objects.equal(this.pathToUploadedFile, other.pathToUploadedFile) && Objects.equal(this.fileName, other.fileName) && Objects.equal(this.lastRunCompletionCount, other.lastRunCompletionCount);
+	}
 }

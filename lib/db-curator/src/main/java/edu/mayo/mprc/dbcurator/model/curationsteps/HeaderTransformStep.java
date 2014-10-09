@@ -1,5 +1,6 @@
 package edu.mayo.mprc.dbcurator.model.curationsteps;
 
+import com.google.common.base.Objects;
 import edu.mayo.mprc.dbcurator.model.*;
 import edu.mayo.mprc.fasta.DBInputStream;
 import edu.mayo.mprc.fasta.DBOutputStream;
@@ -41,7 +42,7 @@ public class HeaderTransformStep implements CurationStep {
 	/**
 	 * the compiled pattern
 	 */
-	private Pattern compiledPattern = null;
+	private transient Pattern compiledPattern = null;
 
 	public HeaderTransformStep() {
 	}
@@ -49,11 +50,10 @@ public class HeaderTransformStep implements CurationStep {
 	/**
 	 * For testing only. Fast creation of a step.
 	 */
-	public HeaderTransformStep(final String description, final String matchPattern, final String substitutionPattern, final Pattern compiledPattern, final Integer lastRunCompletionCount) {
+	public HeaderTransformStep(final String description, final String matchPattern, final String substitutionPattern, final Integer lastRunCompletionCount) {
 		this.description = description;
 		this.matchPattern = matchPattern;
-		this.substitutionPattern = substitutionPattern;
-		this.compiledPattern = compiledPattern;
+		setSubstitutionPattern(substitutionPattern);
 		this.lastRunCompletionCount = lastRunCompletionCount;
 	}
 
@@ -246,4 +246,20 @@ public class HeaderTransformStep implements CurationStep {
         return "header_transform";
     }
 
+	@Override
+	public int hashCode() {
+		return Objects.hashCode(description, matchPattern, substitutionPattern, lastRunCompletionCount);
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj) {
+			return true;
+		}
+		if (obj == null || getClass() != obj.getClass()) {
+			return false;
+		}
+		final HeaderTransformStep other = (HeaderTransformStep) obj;
+		return Objects.equal(this.description, other.description) && Objects.equal(this.matchPattern, other.matchPattern) && Objects.equal(this.substitutionPattern, other.substitutionPattern) && Objects.equal(this.lastRunCompletionCount, other.lastRunCompletionCount);
+	}
 }

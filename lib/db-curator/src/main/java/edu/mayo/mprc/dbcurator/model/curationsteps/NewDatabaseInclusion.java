@@ -1,5 +1,6 @@
 package edu.mayo.mprc.dbcurator.model.curationsteps;
 
+import com.google.common.base.Objects;
 import edu.mayo.mprc.dbcurator.model.*;
 import edu.mayo.mprc.fasta.DBInputStream;
 import edu.mayo.mprc.fasta.DBOutputStream;
@@ -37,9 +38,8 @@ public class NewDatabaseInclusion implements CurationStep {
 	/**
 	 * For testing only. Fast creation of a step.
 	 */
-	public NewDatabaseInclusion(final String url, final HeaderTransform headerTransformer, final Integer lastRunCompletionCount) {
+	public NewDatabaseInclusion(final String url, final Integer lastRunCompletionCount) {
 		this.url = url;
-		this.headerTransformer = headerTransformer;
 		this.lastRunCompletionCount = lastRunCompletionCount;
 	}
 
@@ -230,5 +230,22 @@ public class NewDatabaseInclusion implements CurationStep {
 		} else {
 			return 0;
 		}
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hashCode(url, lastRunCompletionCount);
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj) {
+			return true;
+		}
+		if (obj == null || getClass() != obj.getClass()) {
+			return false;
+		}
+		final NewDatabaseInclusion other = (NewDatabaseInclusion) obj;
+		return Objects.equal(this.url, other.url) && Objects.equal(this.lastRunCompletionCount, other.lastRunCompletionCount);
 	}
 }

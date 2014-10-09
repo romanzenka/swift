@@ -1,6 +1,9 @@
 package edu.mayo.mprc.dbcurator.model.impl;
 
+import com.google.common.collect.Lists;
+import edu.mayo.mprc.database.DummyFileTokenTranslator;
 import edu.mayo.mprc.dbcurator.model.Curation;
+import edu.mayo.mprc.dbcurator.model.CurationStep;
 import edu.mayo.mprc.dbcurator.model.curationsteps.*;
 import edu.mayo.mprc.integration.Installer;
 import org.joda.time.DateTime;
@@ -10,6 +13,7 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import java.io.File;
+import java.util.List;
 
 public final class CurationDaoHibernateTest extends CurationDaoTestBase {
 
@@ -47,6 +51,10 @@ public final class CurationDaoHibernateTest extends CurationDaoTestBase {
 
 	@Test
 	public void shouldSaveAndLoadCurations() {
+		// We want to make sure we go through translator
+		DummyFileTokenTranslator translator = new DummyFileTokenTranslator();
+		curationDao.getDatabase().setTranslator(translator);
+
 		curationDao.begin();
 		final Curation db = new Curation();
 		db.setShortName("hellodb");
@@ -57,16 +65,39 @@ public final class CurationDaoHibernateTest extends CurationDaoTestBase {
 		db.setOwnerEmail("zenka.roman@mayo.edu");
 
 		db.clearSteps();
-		db.addStep(new ManualInclusionStep("ALBU_HUMAN", "MKWVTFISLLFLFSSAYSRGVFRRDAHKSEVAHRFKDLGEENFKALVLIA", 1), -1);
-		db.addStep(new DatabaseUploadStep(uploadedFasta, "C:\\to_upload.fasta", new byte[]{1, 2, 3, 4, 5, 6, 7, 8}, 11), -1);
-		db.addStep(new HeaderFilterStep(edu.mayo.mprc.fasta.filter.MatchMode.ANY, TextMode.REG_EX, "pi\\|pe|pipe", 5), -1);
+		final List<CurationStep> steps = Lists.newArrayList(
+				new ManualInclusionStep("ALBU_HUMAN", "MKWVTFISLLFLFSSAYSRGVFRRDAHKSEVAHRFKDLGEENFKALVLIA", 1),
+				new DatabaseUploadStep(uploadedFasta, "C:\\to_upload.fasta", 11),
+				new HeaderFilterStep(edu.mayo.mprc.fasta.filter.MatchMode.ANY, TextMode.REG_EX, "pi\\|pe|pipe", 5),
+				new HeaderTransformStep("transform", "a\\|b", "$1", 13),
+				new MakeDecoyStep(true, MakeDecoyStep.REVERSAL_MANIPULATOR, 20),
+				new NewDatabaseInclusion("http://test", 30));
+
+		for (final CurationStep step : steps) {
+			db.addStep(step, -1);
+		}
+
 		curationDao.addCuration(db);
+
+		// Check translation counts
+		Assert.assertEquals(translator.getNumDbToFile(), 0, "No deserialization");
+		Assert.assertEquals(translator.getNumFileToDb(), 1, "One translation db->file for DatabaseUploadStep pathToUploadedFile");
+		translator = new DummyFileTokenTranslator();
+		curationDao.getDatabase().setTranslator(translator);
 
 		nextTransaction();
 
 		final Curation hellodb = curationDao.getCurationByShortName("hellodb");
-		Assert.assertEquals(hellodb.getCurationSteps().size(), 3);
+		Assert.assertEquals(hellodb.getCurationSteps().size(), 6);
+		for (int i = 0; i < steps.size(); i++) {
+			Assert.assertEquals(hellodb.getCurationSteps().get(i), steps.get(i), "Step #" + i + " must match");
+		}
+
 
 		curationDao.commit();
+
+		// Check translation counts
+		Assert.assertEquals(translator.getNumFileToDb(), 0, "No serialization");
+		Assert.assertEquals(translator.getNumDbToFile(), 1, "One translation file->db for DatabaseUploadStep pathToUploadedFile");
 	}
 }

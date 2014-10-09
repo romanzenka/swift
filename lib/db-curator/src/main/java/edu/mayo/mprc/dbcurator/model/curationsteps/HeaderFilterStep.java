@@ -1,5 +1,6 @@
 package edu.mayo.mprc.dbcurator.model.curationsteps;
 
+import com.google.common.base.Objects;
 import edu.mayo.mprc.dbcurator.model.*;
 import edu.mayo.mprc.fasta.DBInputStream;
 import edu.mayo.mprc.fasta.DBOutputStream;
@@ -246,4 +247,21 @@ public class HeaderFilterStep implements CurationStep {
     public String getStepTypeName() {
         return "header_filter";
     }
+
+	@Override
+	public int hashCode() {
+		return Objects.hashCode(matchMode, textMode, criteriaString, lastRunCompletionCount);
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj) {
+			return true;
+		}
+		if (obj == null || getClass() != obj.getClass()) {
+			return false;
+		}
+		final HeaderFilterStep other = (HeaderFilterStep) obj;
+		return Objects.equal(this.matchMode, other.matchMode) && Objects.equal(this.textMode, other.textMode) && Objects.equal(this.criteriaString, other.criteriaString) && Objects.equal(this.lastRunCompletionCount, other.lastRunCompletionCount);
+	}
 }
