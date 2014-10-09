@@ -37,11 +37,6 @@ public class MakeDecoyStep implements CurationStep {
 	private static final float PERCENT = 100.0f;
 
 	/**
-	 * the id of the step that is used for persistent storage.  Null if not persisted
-	 */
-	private Integer id;
-
-	/**
 	 * whether this object will retain the original sequence or remove the original sequence
 	 */
 	private boolean overwriteMode = true;
@@ -61,6 +56,16 @@ public class MakeDecoyStep implements CurationStep {
 	 */
 	public MakeDecoyStep() {
 
+	}
+
+	/**
+	 * For testing only. Fast creation of a step.
+	 */
+	public MakeDecoyStep(final boolean overwriteMode, final StringManipulator manipulator, final int manipulatorType, final Integer lastRunCompletionCount) {
+		this.overwriteMode = overwriteMode;
+		this.manipulator = manipulator;
+		this.manipulatorType = manipulatorType;
+		this.lastRunCompletionCount = lastRunCompletionCount;
 	}
 
 	/**
@@ -176,9 +181,9 @@ public class MakeDecoyStep implements CurationStep {
 			}
 			lastRunValidation.setCompletionCount(out.getSequenceCount());
 			setLastRunCompletionCount(out.getSequenceCount());
-		} catch (IOException e) {
+		} catch (final IOException e) {
 			lastRunValidation.addMessageAndException("Error in performing database IO", e);
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			lastRunValidation.addMessageAndException(e.getMessage(), e);
 		}
 		return lastRunValidation;
@@ -242,16 +247,6 @@ public class MakeDecoyStep implements CurationStep {
 		return copy;
 	}
 
-	@Override
-	public Integer getId() {
-		return id;
-	}
-
-	@Override
-	public void setId(final Integer id) {
-		this.id = id;
-	}
-
 	/**
 	 * the number of sequences that were present in the curation after this step was last run
 	 */
@@ -271,5 +266,10 @@ public class MakeDecoyStep implements CurationStep {
 	public String simpleDescription() {
 		return getManipulator().getDescription();
 	}
+
+    @Override
+    public String getStepTypeName() {
+        return "make_decoy";
+    }
 
 }

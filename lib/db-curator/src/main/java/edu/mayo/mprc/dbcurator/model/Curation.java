@@ -1,5 +1,10 @@
 package edu.mayo.mprc.dbcurator.model;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.reflect.TypeToken;
 import edu.mayo.mprc.MprcException;
 import edu.mayo.mprc.database.EvolvableBase;
 import edu.mayo.mprc.fasta.DatabaseAnnotation;
@@ -10,6 +15,7 @@ import org.joda.time.DateTime;
 
 import java.io.File;
 import java.io.Serializable;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -25,8 +31,9 @@ public class Curation extends EvolvableBase implements Serializable {
 
 	public static final int SHORTNAME_MAX_LENGTH = 17;
 	public static final int SHORTNAME_MIN_LENGTH = 5;
+    Gson gson = new Gson();
 
-	/**
+    /**
 	 * any notes that were saved
 	 */
 	private String notes;
@@ -59,17 +66,25 @@ public class Curation extends EvolvableBase implements Serializable {
 	 * the date that this curation was deployed
 	 */
 	private DateTime deploymentDate;
-	/**
-	 * the steps involved in the curation
-	 */
-	private List<CurationStep> curationSteps = new ArrayList<CurationStep>();
+
+    /** Serialized version of the curation steps */
+    private String curationStepsJson;
+    private int stepVersion;
 
 	/**
 	 * Regular expression (Scaffold-supported) describing which accession numbers belong to the decoy part of the database.
 	 */
 	private String decoyRegex;
 
-	/**
+    public String getCurationStepsJson() {
+        return curationStepsJson;
+    }
+
+    public void setCurationStepsJson(String curationStepsJson) {
+        this.curationStepsJson = curationStepsJson;
+    }
+
+    /**
 	 * Creates a new curator given just the path.  It will be up to the caller to set a short title before which will
 	 * generate the path and folder where this curation will be stored in.
 	 */
@@ -105,7 +120,21 @@ public class Curation extends EvolvableBase implements Serializable {
 	 * @return the list of steps in this curation
 	 */
 	public List<CurationStep> getCurationSteps() {
-		return curationSteps;
+        Type listType = new TypeToken<List<CurationStep>>(){}.getType();
+        JsonObject jobj = new Gson().fromJson(getCurationStepsJson(), JsonObject.class);
+        List<CurationStep> myModelList = new ArrayList<CurationStep>();
+        if( jobj == null ){
+            stepVersion = 0;
+        }
+        else{
+            stepVersion = jobj.get("version").getAsInt();
+            JsonArray stepArray = jobj.get("steps").getAsJsonArray();
+            for(JsonElement j : stepArray){
+                Class mySource = StepsMap.getClassForType( j.getAsJsonObject().get("step_type").getAsString() );
+                myModelList.add( (CurationStep) gson.fromJson(j, mySource)  );
+            }
+        }
+		return myModelList;
 	}
 
 	/**
@@ -114,7 +143,16 @@ public class Curation extends EvolvableBase implements Serializable {
 	 * @param curationSteps the steps to set on this Curation
 	 */
 	protected void setCurationSteps(final List<CurationStep> curationSteps) {
-		this.curationSteps = curationSteps;
+        JsonObject reqObj = new JsonObject();
+        reqObj.addProperty( "version", stepVersion );
+        JsonArray typeAppendedSteps = new JsonArray();
+        for(CurationStep g : curationSteps){
+            JsonObject jStep = gson.toJsonTree(g).getAsJsonObject();
+            jStep.addProperty("step_type", g.getStepTypeName());
+            typeAppendedSteps.add(jStep);
+        }
+        reqObj.add( "steps", typeAppendedSteps );
+        setCurationStepsJson(gson.toJson(reqObj));
 	}
 
 	/**
@@ -244,7 +282,7 @@ public class Curation extends EvolvableBase implements Serializable {
 
 	/**
 	 * @return Regular expression (Scaffold-supported) describing all decoy accession numbers. If the expression was not specified,
-	 * the default {@link DatabaseAnnotation#DEFAULT_DECOY_REGEX} is used.
+	 * the default {@link edu.mayo.mprc.fasta.DatabaseAnnotation#DEFAULT_DECOY_REGEX} is used.
 	 */
 	public String getDecoyRegex() {
 		if (decoyRegex == null || decoyRegex.isEmpty()) {
@@ -316,7 +354,9 @@ public class Curation extends EvolvableBase implements Serializable {
 	 * @param toMoveTo where you want to add the step to
 	 */
 	public Curation addStep(final CurationStep toAdd, final int toMoveTo) {
-		getCurationSteps().add(translateStepIndex(toMoveTo), toAdd);
+        List<CurationStep> steps = getCurationSteps();
+        steps.add(translateStepIndex(toMoveTo), toAdd);
+        setCurationSteps(steps);
 		return this;
 	}
 
@@ -324,8 +364,10 @@ public class Curation extends EvolvableBase implements Serializable {
 	 * Remove all steps from the curation.
 	 */
 	public void clearSteps() {
-		getCurationSteps().clear();
-	}
+        List<CurationStep> steps = getCurationSteps();
+        steps.clear();
+        setCurationSteps(steps);
+    }
 
 	/**
 	 * takes an index of a step that may be in negative notation and converts it to the equivalent positive notation
@@ -335,7 +377,8 @@ public class Curation extends EvolvableBase implements Serializable {
 	 * @return the translated index
 	 */
 	protected int translateStepIndex(final int step) {
-		if (step > curationSteps.size()) {
+        List<CurationStep> curationSteps = getCurationSteps();
+        if (step > curationSteps.size()) {
 			return curationSteps.size() - 1;
 		}
 		if (curationSteps.isEmpty()) {
@@ -363,7 +406,7 @@ public class Curation extends EvolvableBase implements Serializable {
 	 * @return the number of steps
 	 */
 	public int stepCount() {
-		return curationSteps.size();
+		return getCurationSteps().size();
 	}
 
 	/**
@@ -380,7 +423,7 @@ public class Curation extends EvolvableBase implements Serializable {
 
 	public String simpleDescription() {
 		final StringBuilder sb = new StringBuilder(EXPECTED_DESCRIPTION_SIZE);
-		for (final CurationStep step : curationSteps) {
+		for (final CurationStep step : getCurationSteps()) {
 			if (step.simpleDescription() != null) {
 				sb.append(step.simpleDescription()).append(", ");
 			}

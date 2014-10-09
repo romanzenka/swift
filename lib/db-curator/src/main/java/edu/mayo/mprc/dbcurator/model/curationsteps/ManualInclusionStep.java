@@ -19,10 +19,6 @@ import java.io.IOException;
  */
 public class ManualInclusionStep implements CurationStep {
 	private static final long serialVersionUID = 20071220L;
-	/**
-	 * a unqiue identifier for this step
-	 */
-	protected Integer id;
 
 	/**
 	 * the header of the sequence (may be null if no valid header was detected
@@ -40,6 +36,15 @@ public class ManualInclusionStep implements CurationStep {
 	 */
 	public ManualInclusionStep() {
 		super();
+	}
+
+	/**
+	 * For testing only. Fast creation of a step.
+	 */
+	public ManualInclusionStep(final String header, final String sequence, final Integer lastRunCompletionCount) {
+		this.header = header;
+		this.sequence = sequence;
+		this.lastRunCompletionCount = lastRunCompletionCount;
 	}
 
 	/**
@@ -73,7 +78,7 @@ public class ManualInclusionStep implements CurationStep {
 				out.appendRemaining(in);
 			}
 			out.appendSequence(getHeader(), getSequence());
-		} catch (IOException e) {
+		} catch (final IOException e) {
 			runValidation.addMessageAndException("Error writing manual inclusion: " + getHeader(), e);
 			return runValidation;
 		}
@@ -155,20 +160,6 @@ public class ManualInclusionStep implements CurationStep {
 	}
 
 	/**
-	 * the id of this object that can uniquly identify the step
-	 */
-	@Override
-	public Integer getId() {
-		return id;
-	}
-
-	@Override
-	public void setId(final Integer id) {
-		this.id = id;
-	}
-
-
-	/**
 	 * the number of sequences that were present in the curation after this step was last run
 	 */
 	private Integer lastRunCompletionCount = null;
@@ -187,4 +178,9 @@ public class ManualInclusionStep implements CurationStep {
 	public String simpleDescription() {
 		return "user sequence";
 	}
+
+    @Override
+    public String getStepTypeName() {
+        return "manual_inclusion";
+    }
 }

@@ -20,11 +20,6 @@ public class DatabaseUploadStep implements CurationStep {
 	private static final long serialVersionUID = 20071220L;
 
 	/**
-	 * the id for persisence purposes
-	 */
-	private Integer id;
-
-	/**
 	 * where on the server can the file be found
 	 */
 	private File pathToUploadedFile;
@@ -46,6 +41,16 @@ public class DatabaseUploadStep implements CurationStep {
 
 	public DatabaseUploadStep() {
 
+	}
+
+	/**
+	 * For testing only. Fast creation of a step.
+	 */
+	public DatabaseUploadStep(final File pathToUploadedFile, final String fileName, final byte[] md5CheckSum, final Integer lastRunCompletionCount) {
+		this.pathToUploadedFile = pathToUploadedFile;
+		this.fileName = fileName;
+		this.lastRunCompletionCount = lastRunCompletionCount;
+		this.md5CheckSum = md5CheckSum;
 	}
 
 	/**
@@ -74,7 +79,7 @@ public class DatabaseUploadStep implements CurationStep {
 			try {
 				in.beforeFirst();
 				out.appendRemaining(in);
-			} catch (IOException e) {
+			} catch (final IOException e) {
 				recentRunValidation.addMessageAndException("Error copying in stream to out stream", e);
 			}
 		}
@@ -84,7 +89,7 @@ public class DatabaseUploadStep implements CurationStep {
 		try {
 			try {
 				archiveIn = new FASTAInputStream(pathToUploadedFile);
-			} catch (Exception e) {
+			} catch (final Exception e) {
 				//this is not expected to happen
 				recentRunValidation.addMessageAndException("Could not find the file on the server please re-upload", e);
 			}
@@ -96,7 +101,7 @@ public class DatabaseUploadStep implements CurationStep {
 				try {
 					archiveIn.beforeFirst();
 					out.appendRemaining(archiveIn);
-				} catch (IOException e) {
+				} catch (final IOException e) {
 					recentRunValidation.addMessageAndException("Error copying archive to output file", e);
 					return recentRunValidation;
 				}
@@ -142,16 +147,6 @@ public class DatabaseUploadStep implements CurationStep {
 		copy.setPathToUploadedFile(pathToUploadedFile);
 		copy.setFileName(getFileName());
 		return copy;
-	}
-
-	@Override
-	public Integer getId() {
-		return id;
-	}
-
-	@Override
-	public void setId(final Integer id) {
-		this.id = id;
 	}
 
 	@Override
@@ -212,4 +207,9 @@ public class DatabaseUploadStep implements CurationStep {
 	public String simpleDescription() {
 		return "Upload " + getFileName();
 	}
+
+    @Override
+    public String getStepTypeName() {
+        return "database_upload";
+    }
 }

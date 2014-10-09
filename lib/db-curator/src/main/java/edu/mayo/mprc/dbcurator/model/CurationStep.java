@@ -44,20 +44,6 @@ public interface CurationStep extends Serializable {
 	CurationStep createCopy();
 
 	/**
-	 * the id of the curation step used for perstant reasons
-	 *
-	 * @return
-	 */
-	Integer getId();
-
-	/**
-	 * the id of the curation step.  When this is called it will only be changed if it has not previously been set (is currently null)
-	 *
-	 * @param id
-	 */
-	void setId(Integer id);
-
-	/**
 	 * gets the number of steps that were present in the curation the last time this step was run
 	 *
 	 * @return the last run sequence count of this step
@@ -72,4 +58,8 @@ public interface CurationStep extends Serializable {
 	void setLastRunCompletionCount(Integer count);
 
 	String simpleDescription();
+
+    String getStepTypeName();
+
+
 }

@@ -22,11 +22,6 @@ public class NewDatabaseInclusion implements CurationStep {
 	private static final long serialVersionUID = 20071220L;
 
 	/**
-	 * the id that will be assigned upon persistence
-	 */
-	private Integer id;
-
-	/**
 	 * the url of the database we downloaded or need to download.  This will generally be an ftp url.  If we need to
 	 * check for data at the specified URL and but we cannot find it for some reason we will raise an exception.
 	 * PERSISTENT
@@ -37,6 +32,15 @@ public class NewDatabaseInclusion implements CurationStep {
 
 	public NewDatabaseInclusion() {
 		super();
+	}
+
+	/**
+	 * For testing only. Fast creation of a step.
+	 */
+	public NewDatabaseInclusion(final String url, final HeaderTransform headerTransformer, final Integer lastRunCompletionCount) {
+		this.url = url;
+		this.headerTransformer = headerTransformer;
+		this.lastRunCompletionCount = lastRunCompletionCount;
 	}
 
 	public void setHeaderTransform(final HeaderTransform trans) {
@@ -77,7 +81,7 @@ public class NewDatabaseInclusion implements CurationStep {
 			try {
 				in.beforeFirst();
 				out.appendRemaining(in);
-			} catch (IOException e) {
+			} catch (final IOException e) {
 				recentRunValidation.addMessageAndException("Error copying in stream to out stream", e);
 			}
 		}
@@ -91,7 +95,7 @@ public class NewDatabaseInclusion implements CurationStep {
 					status,
 					exec.getFastaArchiveFolder(), exec.getCurationDao());
 			status.addMessage("We have completed getting an archive.");
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			//if we couldn't find or download a database then we had an error and the executor should be notified
 			recentRunValidation.addMessageAndException("FTP error: \n" + e.getMessage(), e);
 			return recentRunValidation;
@@ -102,7 +106,7 @@ public class NewDatabaseInclusion implements CurationStep {
 		try {
 			try {
 				archiveIn = new FASTAInputStream(source.getArchive());
-			} catch (Exception e) {
+			} catch (final Exception e) {
 				//this is not expected to happen
 				recentRunValidation.addMessageAndException("Error creating an input stream from the archive", e);
 			}
@@ -119,7 +123,7 @@ public class NewDatabaseInclusion implements CurationStep {
 							out.appendSequence(transform.transform(archiveIn.getHeader()), archiveIn.getSequence());
 						}
 					}
-				} catch (IOException e) {
+				} catch (final IOException e) {
 					recentRunValidation.addMessageAndException("Error copying archive to output file", e);
 					return recentRunValidation;
 				}
@@ -153,7 +157,7 @@ public class NewDatabaseInclusion implements CurationStep {
 				try {
 					final URL url = new URL(testURL);
 					assert !"".equals(url.toString());
-				} catch (MalformedURLException ignore) {
+				} catch (final MalformedURLException ignore) {
 					preValidation.addMessage("Invalid URL");
 				}
 			}
@@ -187,17 +191,6 @@ public class NewDatabaseInclusion implements CurationStep {
 		this.url = url;
 	}
 
-	@Override
-	public Integer getId() {
-		return id;
-	}
-
-	@Override
-	public void setId(final Integer id) {
-		this.id = id;
-	}
-
-
 	/**
 	 * the number of sequences that were present in the curation after this step was last run
 	 */
@@ -224,7 +217,12 @@ public class NewDatabaseInclusion implements CurationStep {
 		}
 	}
 
-	protected static int getIntersectionLength(final String s1, final String s2) {
+    @Override
+    public String getStepTypeName() {
+        return "new_db";
+    }
+
+    protected static int getIntersectionLength(final String s1, final String s2) {
 		if (s1.contains(s2)) {
 			return s1.length() - s1.replace(s2, "").length();
 		} else if (s2.contains(s1)) {
