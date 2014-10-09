@@ -272,7 +272,7 @@ public final class JsonWriter {
 		}
 	}
 
-	private static void appendKeyNumberNull(final StringBuilder parameter, final String key, final Float value) {
+	private static void appendKeyNumberNull(final StringBuilder parameter, final String key, final Double value) {
 		appendComma(parameter);
 		if (value != null) {
 			parameter.append('"').append(key).append("\":").append(value);

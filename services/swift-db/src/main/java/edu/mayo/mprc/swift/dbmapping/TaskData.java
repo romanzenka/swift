@@ -25,7 +25,7 @@ public class TaskData {
 	private String host;
 	private String exceptionString;
 	private String warningMessage;
-	private Float percentDone;
+	private Double percentDone;
 	private List<LogData> logs;
 
 	public TaskData() {
@@ -164,11 +164,11 @@ public class TaskData {
 		return host;
 	}
 
-	public Float getPercentDone() {
+	public Double getPercentDone() {
 		return percentDone;
 	}
 
-	public void setPercentDone(final Float percentDone) {
+	public void setPercentDone(final Double percentDone) {
 		this.percentDone = percentDone;
 	}
 
