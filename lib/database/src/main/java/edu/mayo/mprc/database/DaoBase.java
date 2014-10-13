@@ -356,9 +356,10 @@ public abstract class DaoBase implements Dao, SessionProvider {
 
 	/**
 	 * Save an item. If identical item already exists, update it.
-	 *  @param item             The item to create (in database)
-	 * @param change           What change is this save related to.
-	 * @param createNew        New object must be created.
+	 *
+	 * @param item      The item to create (in database)
+	 * @param change    What change is this save related to.
+	 * @param createNew New object must be created.
 	 */
 	protected final <T extends Evolvable> T save(final T item, final Change change, final boolean createNew) {
 		final Session session = getSession();
@@ -487,6 +488,36 @@ public abstract class DaoBase implements Dao, SessionProvider {
 					} else {
 						return updateSavedItem(existingObject, item, session);
 					}
+				}
+			}
+		}
+
+		item.setId(null);
+		session.save(item);
+		return item;
+	}
+
+	/**
+	 * Like {@link #saveLaxEquality} only will never update an existing database object. Will either return
+	 * existing object (if perfect match) or save a new object (if not).
+	 *
+	 * @param item             item to save
+	 * @param equalityCriteria how to find matching objects in the database
+	 * @param <T>              Type of the object to save
+	 * @return Saved version of the existing object (if nothing matches) or the existing database object.
+	 */
+	protected final <T extends PersistableBase> T useExistingOrSave(final T item, final Criterion equalityCriteria) {
+		final Session session = getSession();
+		@SuppressWarnings("unchecked")
+		final List<T> existingObjects = (List<T>) session
+				.createCriteria(item.getClass())
+				.add(equalityCriteria)
+				.list();
+
+		if (existingObjects != null && !existingObjects.isEmpty()) {
+			for (final T existingObject : existingObjects) {
+				if (existingObject.equals(item)) {
+					return existingObject;
 				}
 			}
 		}

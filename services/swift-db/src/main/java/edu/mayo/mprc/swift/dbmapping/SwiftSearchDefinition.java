@@ -246,6 +246,10 @@ public class SwiftSearchDefinition extends PersistableBase implements EqualityCr
 				.add(DaoBase.associationEq("user", getUser()))
 				.add(DaoBase.nullSafeEq("outputFolder", getOutputFolder()))
 				.add(DaoBase.associationEq("qa", getQa()))
-				.add(DaoBase.associationEq("peptideReport", getPeptideReport()));
+				.add(DaoBase.associationEq("peptideReport", getPeptideReport()))
+				.add(DaoBase.associationEq("searchParameters", getSearchParameters()))
+				.add(DaoBase.nullSafeEq("publicMgfFiles", getPublicMgfFiles()))
+				.add(DaoBase.nullSafeEq("publicMzxmlFiles", getPublicMzxmlFiles()))
+				.add(DaoBase.nullSafeEq("publicSearchFiles", getPublicSearchFiles()));
 	}
 }
