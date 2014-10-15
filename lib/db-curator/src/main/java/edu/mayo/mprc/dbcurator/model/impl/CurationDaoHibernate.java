@@ -1,5 +1,6 @@
 package edu.mayo.mprc.dbcurator.model.impl;
 
+import com.google.common.collect.Maps;
 import edu.mayo.mprc.MprcException;
 import edu.mayo.mprc.database.Change;
 import edu.mayo.mprc.database.DaoBase;
@@ -14,6 +15,7 @@ import org.hibernate.Session;
 import org.hibernate.criterion.Example;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
+import org.hibernate.usertype.UserType;
 import org.joda.time.DateTime;
 import org.springframework.stereotype.Repository;
 
@@ -66,7 +68,14 @@ public final class CurationDaoHibernate extends DaoBase implements CurationDao {
 		return list;
 	}
 
-	@Override
+    @Override
+    public Map<String, UserType> getUserTypes() {
+        HashMap<String, UserType> res = Maps.newHashMap();
+        res.put("JsonCurationSteps", new CurationStepListType());
+        return res;
+    }
+
+    @Override
 	public Curation getCuration(final int curationID) {
 		final Session session = getSession();
 		Curation curation = null;

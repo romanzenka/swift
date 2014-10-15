@@ -1,13 +1,11 @@
 package edu.mayo.mprc.dbcurator.model.impl;
 
-import com.google.gson.Gson;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
+import com.google.gson.*;
 import com.google.gson.reflect.TypeToken;
 import edu.mayo.mprc.MprcException;
 import edu.mayo.mprc.database.DummyFileTokenTranslator;
 import edu.mayo.mprc.database.FileTokenToDatabaseTranslator;
+import edu.mayo.mprc.database.NeedsTranslator;
 import edu.mayo.mprc.dbcurator.model.CurationStep;
 import edu.mayo.mprc.dbcurator.model.StepsMap;
 import org.hibernate.HibernateException;
@@ -27,18 +25,14 @@ import java.util.List;
 /**
  * @author Raymond Moore
  */
-public class CurationStepListType implements UserType {
+public class CurationStepListType implements UserType, NeedsTranslator {
     private FileTokenToDatabaseTranslator translator;
     Gson gson ;
+
 
     private int stepVersion = 1;
 
     public CurationStepListType(){}
-    public CurationStepListType(FileTokenToDatabaseTranslator translator) {
-        this.translator = translator;
-        //gson = new GsonBuilder().registerTypeAdapter(File.class, ).create();
-
-    }
 
     @Override
     public int[] sqlTypes() {
@@ -127,21 +121,15 @@ public class CurationStepListType implements UserType {
     }
 
     @Override
-    public Object assemble(Serializable serializable, Object o) throws HibernateException {
-
+    public Object assemble(Serializable cachedString, Object owner) throws HibernateException {
         Type listType = new TypeToken<List<CurationStep>>(){}.getType();
-        JsonObject jobj = new Gson().fromJson(getCurationStepsJson(), JsonObject.class);
+        JsonObject jobj = new Gson().fromJson( (String) cachedString, JsonObject.class);
         List<CurationStep> myModelList = new ArrayList<CurationStep>();
-        if( jobj == null ){
-            //      stepVersion = 0;
-        }
-        else{
-            //    stepVersion = jobj.get("version").getAsInt();
+            stepVersion = jobj.get("version").getAsInt();
             JsonArray stepArray = jobj.get("steps").getAsJsonArray();
             for(JsonElement j : stepArray){
                 Class mySource = StepsMap.getClassForType(j.getAsJsonObject().get("step_type").getAsString());
                 myModelList.add( (CurationStep) gson.fromJson(j, mySource)  );
-            }
         }
         return myModelList;
 
@@ -152,4 +140,9 @@ public class CurationStepListType implements UserType {
         return o;
     }
 
+    @Override
+    public void setTranslator(FileTokenToDatabaseTranslator translator) {
+        this.translator = translator;
+        gson = new GsonBuilder().registerTypeAdapter(File.class, translator).create();
+    }
 }
