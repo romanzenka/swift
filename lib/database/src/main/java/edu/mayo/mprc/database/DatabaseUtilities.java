@@ -82,6 +82,9 @@ public final class DatabaseUtilities {
 			}
 			cfg.registerTypeOverride(value, new String[]{entry.getKey()});
 		}
+		if (!userTypes.containsKey("file")) {
+			cfg.registerTypeOverride(new FileType(translator), new String[]{"file"});
+		}
 
 		for (final String resource : mappingResources) {
 			cfg.addResource(resource);
