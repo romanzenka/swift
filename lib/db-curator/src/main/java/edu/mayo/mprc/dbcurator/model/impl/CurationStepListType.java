@@ -27,7 +27,7 @@ import java.util.List;
  */
 public class CurationStepListType implements UserType, NeedsTranslator {
     private FileTokenToDatabaseTranslator translator;
-    Gson gson ;
+    Gson gson;
 
 
     private int stepVersion = 1;
@@ -36,7 +36,7 @@ public class CurationStepListType implements UserType, NeedsTranslator {
 
     @Override
     public int[] sqlTypes() {
-        return new int[]{StandardBasicTypes.STRING.sqlType()};
+        return new int[]{StandardBasicTypes.TEXT.sqlType()};
     }
 
     @Override
@@ -81,10 +81,10 @@ public class CurationStepListType implements UserType, NeedsTranslator {
     @Override
     public void nullSafeSet(PreparedStatement preparedStatement, Object value, int index) throws HibernateException, SQLException {
         if (null == value) {
-            preparedStatement.setNull(index, Types.VARCHAR);
+            preparedStatement.setNull(index, Types.CLOB);
         } else {
             checkTranslatorNotNull();
-            preparedStatement.setString(index, translator.fileToDatabaseToken((File) value));
+            preparedStatement.setString(index, (String) disassemble( value ) );
         }    }
     private void checkTranslatorNotNull() {
         if (translator == null) {
@@ -97,7 +97,7 @@ public class CurationStepListType implements UserType, NeedsTranslator {
         if (o == null) {
             return null;
         }
-        return new File(((File) o).getAbsoluteFile().toURI());
+        return new ArrayList<CurationStep>( (List<CurationStep>) o );
     }
 
     @Override
@@ -143,6 +143,14 @@ public class CurationStepListType implements UserType, NeedsTranslator {
     @Override
     public void setTranslator(FileTokenToDatabaseTranslator translator) {
         this.translator = translator;
-        gson = new GsonBuilder().registerTypeAdapter(File.class, translator).create();
+        getMyGson();
     }
+
+    private void getMyGson(){
+        GsonBuilder gsonBuilder=new GsonBuilder();
+        gsonBuilder.registerTypeAdapter(File.class,new FileGsonTranslator(translator));
+        gsonBuilder.setPrettyPrinting();
+        gson=gsonBuilder.create();
+    }
+
 }
