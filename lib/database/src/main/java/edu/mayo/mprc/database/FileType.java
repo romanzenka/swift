@@ -16,8 +16,7 @@ import java.sql.Types;
 /**
  * Storing {@link File} into database as URI of its absolute path.
  */
-public final class FileType implements UserType {
-
+public final class FileType implements UserType, NeedsTranslator {
 	private FileTokenToDatabaseTranslator translator;
 
 	public FileType() {
@@ -127,5 +126,13 @@ public final class FileType implements UserType {
 	@Override
 	public Object replace(final Object original, final Object target, final Object owner) throws HibernateException {
 		return original;
+	}
+
+	public FileTokenToDatabaseTranslator getTranslator() {
+		return translator;
+	}
+
+	public void setTranslator(final FileTokenToDatabaseTranslator translator) {
+		this.translator = translator;
 	}
 }

@@ -18,6 +18,7 @@ import org.hibernate.dialect.Dialect;
 import org.hibernate.dialect.SQLServerDialect;
 import org.hibernate.engine.SessionFactoryImplementor;
 import org.hibernate.tool.hbm2ddl.SchemaExport;
+import org.hibernate.usertype.UserType;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
@@ -44,6 +45,7 @@ public final class Database implements RuntimeInitializer, Lifecycle {
 	 */
 	private Map<String, String> hibernateCreationProperties;
 	private List<String> mappingResources;
+	private Map<String, UserType> userTypes;
 	private List<RuntimeInitializer> runtimeInitializers;
 	private FileTokenToDatabaseTranslator translator;
 
@@ -126,6 +128,7 @@ public final class Database implements RuntimeInitializer, Lifecycle {
 					config.getSchema(),
 					getHibernateCreationProperties(),
 					getMappingResources(),
+					getUserTypes(),
 					DatabaseUtilities.SchemaInitialization.Create,
 					getTranslator()
 			);
@@ -157,9 +160,10 @@ public final class Database implements RuntimeInitializer, Lifecycle {
 					, config.getDefaultSchema()
 					, config.getSchema()
 					, install ? hibernateCreationProperties : hibernateProperties
-					, mappingResources,
-					action,
-					translator);
+					, getMappingResources()
+					, getUserTypes()
+					, action
+					, translator);
 
 			setSessionFactory(sessionFactory1);
 		}
@@ -295,6 +299,14 @@ public final class Database implements RuntimeInitializer, Lifecycle {
 		this.mappingResources = mappingResources;
 	}
 
+	public Map<String, UserType> getUserTypes() {
+		return userTypes;
+	}
+
+	public void setUserTypes(Map<String, UserType> userTypes) {
+		this.userTypes = userTypes;
+	}
+
 	public List<RuntimeInitializer> getRuntimeInitializers() {
 		return runtimeInitializers;
 	}
@@ -378,6 +390,23 @@ public final class Database implements RuntimeInitializer, Lifecycle {
 			return Lists.newArrayList(strings);
 		}
 
+		/**
+		 * Collect all {@link org.hibernate.usertype.UserType} instances that DAOs need to function.
+		 *
+		 * @param daos List of DAOs.
+		 * @return All user types needed for the DAOs in a "type name" -> UserType map.
+		 */
+		public static Map<String, UserType> collectUserTypes(final Collection<? extends DaoBase> daos) {
+			final Map<String, UserType> userTypes = new HashMap<String, UserType>();
+
+			for (final DaoBase daoBase : daos) {
+				userTypes.putAll(daoBase.getUserTypes());
+			}
+
+			return userTypes;
+		}
+
+
 		public Map<String, String> getHibernateProperties() {
 			return hibernateProperties;
 		}
@@ -447,6 +476,7 @@ public final class Database implements RuntimeInitializer, Lifecycle {
 			placeholder.setHibernateProperties(properties);
 			placeholder.setHibernateCreationProperties(getHibernateCreationProperties());
 			placeholder.setMappingResources(collectMappingResouces(getDaoList()));
+			placeholder.setUserTypes(collectUserTypes(getDaoList()));
 			placeholder.setRuntimeInitializers(getRuntimeInitializers());
 			placeholder.setTranslator(getTranslator());
 			return placeholder;

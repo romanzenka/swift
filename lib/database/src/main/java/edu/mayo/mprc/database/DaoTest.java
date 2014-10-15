@@ -1,10 +1,12 @@
 package edu.mayo.mprc.database;
 
 import org.hibernate.SessionFactory;
+import org.hibernate.usertype.UserType;
 
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 /**
  * This is a base class providing utilities to test a Dao.
@@ -27,12 +29,12 @@ public abstract class DaoTest {
 	 * Initializes the database and given DAOs with it.
 	 *
 	 * @param daosToInitialize List of DAOs to initialize. The DAOs also list hibernate mapping files needed.
-	 * @param mappingFiles     Additional mapping files to use.
 	 */
-	public void initializeDatabase(final Collection<? extends DaoBase> daosToInitialize, final String... mappingFiles) {
-		final List<String> mappingResources = Database.Factory.collectMappingResouces(daosToInitialize, mappingFiles);
+	public void initializeDatabase(final Collection<? extends DaoBase> daosToInitialize) {
+		final List<String> mappingResources = Database.Factory.collectMappingResouces(daosToInitialize);
+		final Map<String, UserType> userTypes = Database.Factory.collectUserTypes(daosToInitialize);
 
-		factory = DatabaseUtilities.getTestSessionFactory(mappingResources);
+		factory = DatabaseUtilities.getTestSessionFactory(mappingResources, userTypes);
 		database.setSessionFactory(factory);
 
 		for (final DaoBase daoBase : daosToInitialize) {

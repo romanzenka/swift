@@ -1,6 +1,7 @@
 package edu.mayo.mprc.database;
 
 import com.google.common.base.Preconditions;
+import com.google.common.collect.Maps;
 import edu.mayo.mprc.MprcException;
 import org.apache.log4j.Logger;
 import org.hibernate.*;
@@ -9,11 +10,13 @@ import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.dialect.Dialect;
+import org.hibernate.usertype.UserType;
 
 import javax.annotation.Resource;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Base for all DAO objects.
@@ -98,6 +101,17 @@ public abstract class DaoBase implements Dao, SessionProvider {
 		return Arrays.asList(
 				"edu/mayo/mprc/database/Change.hbm.xml"
 		);
+	}
+
+	/**
+	 * Overwrite this if your DAO needs custom user types.
+	 *
+	 * @return A map from user type name to {@link org.hibernate.usertype.UserType} instance.
+	 */
+	public Map<String, UserType> getUserTypes() {
+		Map<String, UserType> fileMap = Maps.newHashMap();
+		fileMap.put("file", new FileType());
+		return fileMap;
 	}
 
 	/**
