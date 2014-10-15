@@ -82,6 +82,7 @@ public final class CurationDaoHibernateTest extends CurationDaoTestBase {
 		// Check translation counts
 		Assert.assertEquals(translator.getNumDbToFile(), 0, "No deserialization");
 		Assert.assertEquals(translator.getNumFileToDb(), 1, "One translation db->file for DatabaseUploadStep pathToUploadedFile");
+
 		translator = new DummyFileTokenTranslator();
 		curationDao.getDatabase().setTranslator(translator);
 

@@ -16,6 +16,10 @@ public class DummyFileTokenTranslator implements FileTokenToDatabaseTranslator {
 	private AtomicInteger numFileToDb = new AtomicInteger(0);
 	private AtomicInteger numDbToFile = new AtomicInteger(0);
 
+	public DummyFileTokenTranslator() {
+		int i = 1;
+	}
+
 	@Override
 	public String fileToDatabaseToken(final File file) {
 		numFileToDb.incrementAndGet();

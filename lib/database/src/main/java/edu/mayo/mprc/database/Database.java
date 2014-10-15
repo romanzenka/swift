@@ -50,6 +50,7 @@ public final class Database implements RuntimeInitializer, Lifecycle {
 	private FileTokenToDatabaseTranslator translator;
 
 	public Database() {
+		int i = 1;
 	}
 
 	@Override
@@ -321,6 +322,14 @@ public final class Database implements RuntimeInitializer, Lifecycle {
 
 	public void setTranslator(final FileTokenToDatabaseTranslator translator) {
 		this.translator = translator;
+		if (getUserTypes() != null) {
+			// Update all the user types
+			for (UserType userType : getUserTypes().values()) {
+				if (userType instanceof NeedsTranslator) {
+					((NeedsTranslator) userType).setTranslator(translator);
+				}
+			}
+		}
 	}
 
 	@Override

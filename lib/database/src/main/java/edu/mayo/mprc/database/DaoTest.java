@@ -36,6 +36,8 @@ public abstract class DaoTest {
 
 		factory = DatabaseUtilities.getTestSessionFactory(mappingResources, userTypes);
 		database.setSessionFactory(factory);
+		database.setMappingResources(mappingResources);
+		database.setUserTypes(userTypes);
 
 		for (final DaoBase daoBase : daosToInitialize) {
 			daoBase.setDatabase(database);
