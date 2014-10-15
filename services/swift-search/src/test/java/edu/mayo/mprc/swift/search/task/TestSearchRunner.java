@@ -93,6 +93,43 @@ public class TestSearchRunner {
 	}
 
 	@Test
+	public void singleExperimentNoQuameterRunner() throws IOException {
+		final Collection<SearchEngine> searchEngines = searchEnginesNoQuameter();
+
+		final List<FileSearch> inputFiles = Arrays.asList(
+				new FileSearch(raw1, "biosample", "category", "experiment", searchEngineParameters1()),
+				new FileSearch(raw2, "biosample2", "category", "experiment", searchEngineParameters1())
+		);
+
+		final SwiftSearchDefinition definition = defaultSearchDefinition(inputFiles);
+
+		final SearchRunner runner = getSearchRunner(searchEngines, definition);
+
+		final int numEngines = enabledEngines().size();
+		final int tasksPerFile = (numEngines - 1) /* 1 for each engine except Scaffold */
+				+ 1 /* Raw->mgf */
+				+ 1 /* Raw->mzML for comet */
+				+ 1 /* Raw->ms2 for comet */
+				+ 1 /* sqt+ms2 combiner for comet */
+				+ 1 /* RawDump */
+				+ 1 /* msmsEval */;
+
+		final int tasksPerSearch = 0
+				+ 1 /* Fasta DB load */
+				+ 1 /* Search DB load */
+				+ 1 /* QA Task */
+				+ 1 /* Scaffold report */
+
+				+ numEngines /* DB deploys */ - getEnabledNoDeploy()
+				+ 1 /* Scaffold */;
+
+		final int expectedNumTasks = inputFiles.size() * tasksPerFile + tasksPerSearch;
+
+		// 23 + 2 * 5 + 1
+		Assert.assertEquals(runner.getWorkflowEngine().getNumTasks(), expectedNumTasks);
+	}
+
+	@Test
 	public void onlyProvideMgfAndMzxmlRunner() throws IOException {
 		final Collection<SearchEngine> searchEngines = searchEngines();
 
@@ -488,6 +525,17 @@ public class TestSearchRunner {
 		searchEngines.add(searchEngine("SCAFFOLD"));
 		searchEngines.add(searchEngine("IDPQONVERT"));
 		searchEngines.add(searchEngine("QUAMETER"));
+		return searchEngines;
+	}
+
+	private Collection<SearchEngine> searchEnginesNoQuameter() {
+		final Collection<SearchEngine> searchEngines = new ArrayList<SearchEngine>();
+		searchEngines.add(searchEngine("MASCOT"));
+		searchEngines.add(searchEngine("COMET"));
+		searchEngines.add(searchEngine("TANDEM"));
+		searchEngines.add(searchEngine("MYRIMATCH"));
+		searchEngines.add(searchEngine("SCAFFOLD"));
+		searchEngines.add(searchEngine("IDPQONVERT"));
 		return searchEngines;
 	}
 
