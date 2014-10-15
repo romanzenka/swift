@@ -267,7 +267,7 @@ public final class SwiftDaoHibernate extends DaoBase implements SwiftDao {
 					definition.setPeptideReport(addPeptideReport(definition.getPeptideReport()));
 				}
 
-				definition = saveLaxEquality(definition, definition.getEqualityCriteria(), false);
+				definition = useExistingOrSave(definition, definition.getEqualityCriteria());
 			}
 			return definition;
 

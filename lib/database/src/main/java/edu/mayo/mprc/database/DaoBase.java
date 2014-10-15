@@ -1,6 +1,7 @@
 package edu.mayo.mprc.database;
 
 import com.google.common.base.Preconditions;
+import com.google.common.collect.Maps;
 import edu.mayo.mprc.MprcException;
 import org.apache.log4j.Logger;
 import org.hibernate.*;
@@ -9,11 +10,13 @@ import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.dialect.Dialect;
+import org.hibernate.usertype.UserType;
 
 import javax.annotation.Resource;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Base for all DAO objects.
@@ -98,6 +101,17 @@ public abstract class DaoBase implements Dao, SessionProvider {
 		return Arrays.asList(
 				"edu/mayo/mprc/database/Change.hbm.xml"
 		);
+	}
+
+	/**
+	 * Overwrite this if your DAO needs custom user types.
+	 *
+	 * @return A map from user type name to {@link org.hibernate.usertype.UserType} instance.
+	 */
+	public Map<String, UserType> getUserTypes() {
+		Map<String, UserType> fileMap = Maps.newHashMap();
+		fileMap.put("file", new FileType());
+		return fileMap;
 	}
 
 	/**
@@ -356,9 +370,10 @@ public abstract class DaoBase implements Dao, SessionProvider {
 
 	/**
 	 * Save an item. If identical item already exists, update it.
-	 *  @param item             The item to create (in database)
-	 * @param change           What change is this save related to.
-	 * @param createNew        New object must be created.
+	 *
+	 * @param item      The item to create (in database)
+	 * @param change    What change is this save related to.
+	 * @param createNew New object must be created.
 	 */
 	protected final <T extends Evolvable> T save(final T item, final Change change, final boolean createNew) {
 		final Session session = getSession();
@@ -487,6 +502,36 @@ public abstract class DaoBase implements Dao, SessionProvider {
 					} else {
 						return updateSavedItem(existingObject, item, session);
 					}
+				}
+			}
+		}
+
+		item.setId(null);
+		session.save(item);
+		return item;
+	}
+
+	/**
+	 * Like {@link #saveLaxEquality} only will never update an existing database object. Will either return
+	 * existing object (if perfect match) or save a new object (if not).
+	 *
+	 * @param item             item to save
+	 * @param equalityCriteria how to find matching objects in the database
+	 * @param <T>              Type of the object to save
+	 * @return Saved version of the existing object (if nothing matches) or the existing database object.
+	 */
+	protected final <T extends PersistableBase> T useExistingOrSave(final T item, final Criterion equalityCriteria) {
+		final Session session = getSession();
+		@SuppressWarnings("unchecked")
+		final List<T> existingObjects = (List<T>) session
+				.createCriteria(item.getClass())
+				.add(equalityCriteria)
+				.list();
+
+		if (existingObjects != null && !existingObjects.isEmpty()) {
+			for (final T existingObject : existingObjects) {
+				if (existingObject.equals(item)) {
+					return existingObject;
 				}
 			}
 		}

@@ -289,13 +289,15 @@ public final class SwiftSearcher implements Worker, Lifecycle {
 			final PersistenceMonitor monitor = new PersistenceMonitor(searchRun.getId(), swiftDao);
 			searchRunner.addSearchMonitor(monitor);
 
-			reportNewSearchRunId(progressReporter, monitor.getSearchRunId());
-
 			if (previousSearchRunning(swiftSearchWorkPacket)) {
 				hidePreviousSearchRun(swiftSearchWorkPacket);
 			}
 
 			swiftDao.commit();
+
+			// We report the run id after db operations got comittted
+			reportNewSearchRunId(progressReporter, monitor.getSearchRunId());
+
 			return searchRunner;
 		} catch (Exception t) {
 			swiftDao.rollback();

@@ -72,20 +72,17 @@ public final class HemeService {
 
 		final ModelAndView modelAndView = new ModelAndView();
 
-		hemeUi.begin();
 		try {
 			final long searchId = hemeUi.startSwiftSearch(entry);
 			modelAndView.addObject("searchId", searchId);
-			hemeUi.commit();
 		} catch (Exception e) {
-			hemeUi.rollback();
 			throw new MprcException("Could not start Swift search", e);
 		}
 
 		return modelAndView;
 	}
 
-    //GET from HemePath list when button is "Result" -> to the report.
+	//GET from HemePath list when button is "Result" -> to the report.
 	@RequestMapping(value = "/heme/data/{entry}/report.*", method = RequestMethod.GET)
 	public ModelAndView viewReport(@PathVariable final int entry) {
 		final HemeUi hemeUi = getHemeUi();
@@ -94,10 +91,10 @@ public final class HemeService {
 		hemeUi.begin();
 		try {
 			HemeReport report = hemeUi.createReport(entry);
-            modelAndView.setViewName("heme/heme_report"); //Migrated to JSP
-            modelAndView.addObject("report", report);
+			modelAndView.setViewName("heme/heme_report"); //Migrated to JSP
+			modelAndView.addObject("report", report);
 
-            hemeUi.commit();
+			hemeUi.commit();
 		} catch (Exception e) {
 			hemeUi.rollback();
 			throw new MprcException("Could not view report for entry " + entry, e);

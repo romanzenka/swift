@@ -4,6 +4,7 @@ import edu.mayo.mprc.MprcException;
 import org.apache.log4j.Logger;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
+import org.hibernate.usertype.UserType;
 
 import java.util.*;
 
@@ -55,11 +56,12 @@ public final class DatabaseUtilities {
 	                                               final String defaultSchema, final String schema,
 	                                               final Map<String, String> hibernateProperties,
 	                                               final List<String> mappingResources,
+	                                               final Map<String, UserType> userTypes,
 	                                               final SchemaInitialization initialization,
 	                                               final FileTokenToDatabaseTranslator translator) {
 		try {
 			final Configuration cfg = getHibernateConfiguration(url, userName, password, dialect, driverClassName, defaultSchema,
-					schema, hibernateProperties, mappingResources, initialization, translator);
+					schema, hibernateProperties, mappingResources, userTypes, initialization, translator);
 			return cfg.buildSessionFactory();
 		} catch (Exception t) {
 			throw new MprcException("Could not establish database access", t);
@@ -69,9 +71,17 @@ public final class DatabaseUtilities {
 	public static Configuration getHibernateConfiguration(final String url, final String userName, final String password, final String dialect,
 	                                                      final String driverClassName, final String defaultSchema, final String schema,
 	                                                      final Map<String, String> hibernateProperties, final List<String> mappingResources,
+	                                                      final Map<String, UserType> userTypes,
 	                                                      final SchemaInitialization initialization, final FileTokenToDatabaseTranslator translator) {
 		final Configuration cfg = new Configuration();
-		cfg.registerTypeOverride(new FileType(translator), new String[]{"file"});
+		// Register the custom types
+		for (final Map.Entry<String, UserType> entry : userTypes.entrySet()) {
+			final UserType value = entry.getValue();
+			if (value instanceof NeedsTranslator) {
+				((NeedsTranslator) value).setTranslator(translator);
+			}
+			cfg.registerTypeOverride(value, new String[]{entry.getKey()});
+		}
 
 		for (final String resource : mappingResources) {
 			cfg.addResource(resource);
@@ -130,7 +140,7 @@ public final class DatabaseUtilities {
 	 * @param mappingResources List of .hbm.xml files to use for mapping objects.
 	 * @return A session factory for a test database.
 	 */
-	public static Configuration getTestHibernateConfiguration(final List<String> mappingResources) {
+	public static Configuration getTestHibernateConfiguration(final List<String> mappingResources, final Map<String, UserType> userTypes) {
 		LOGGER.debug("Creating test database configuration");
 		final Map<String, String> hibernateProperties = new HashMap<String, String>();
 		hibernateProperties.put("hibernate.show_sql", "false");
@@ -155,11 +165,12 @@ public final class DatabaseUtilities {
 				//"jdbc:h2:tcp://localhost/~/test",
 				"jdbc:h2:mem:test",
 				"sa", "", "org.hibernate.dialect.H2Dialect", "org.h2.Driver", "PUBLIC", "PUBLIC", hibernateProperties, mappingResources,
+				userTypes,
 				SchemaInitialization.CreateDrop, new DummyFileTokenTranslator());
 	}
 
-	public static SessionFactory getTestSessionFactory(final List<String> mappingResources) {
-		return getTestHibernateConfiguration(mappingResources).buildSessionFactory();
+	public static SessionFactory getTestSessionFactory(final List<String> mappingResources, final Map<String, UserType> userTypes) {
+		return getTestHibernateConfiguration(mappingResources, userTypes).buildSessionFactory();
 	}
 
 	/**
