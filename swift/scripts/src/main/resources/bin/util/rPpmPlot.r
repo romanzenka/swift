@@ -138,6 +138,7 @@ uv.nc.pressure.title <- "NC Pump (PSI)"
 
 uv.column.temperature.color <- "#AA8800"
 uv.column.temperature.title <- "Oven temperature (Celsius)"
+uv.column.temperature.yspan <- 2 # 2 degrees Celsius span for Y axis minimum
 
 uv.percent.b.color <- "#008800"
 uv.percent.b.title <- "%B"
@@ -741,14 +742,19 @@ imageGenerator<-function(dataFile, msmsEvalDataFile, infoFile, spectrumFile, chr
 
       par(new=TRUE)
       
-      color <- uv.column.temperature.color   
+      color <- uv.column.temperature.color
+      yMin <- result$uv.column.temperature.min <- min(uvData$ColumnOven.Temperature)
+      yMax <- result$uv.column.temperature.max <- max(uvData$ColumnOven.Temperature)
+      if(result$uv.column.temperature.max - result$uv.column.temperature.min < uv.column.temperature.yspan) {
+        avgY <- yMin+yMax
+        yMin <- (avgY-uv.column.temperature.yspan)/2
+        yMax <- (avgY+uv.column.temperature.yspan)/2
+      }
       plot(uvData$UV.RT, uvData$ColumnOven.Temperature, type="l", axes=FALSE, xlab=xAxisTitleScanOrRT, ylab=NA,
-           main=c(plotName, uv.title), col=color)
-      axis(side=4, at = pretty(range(uvData$ColumnOven.Temperature)), col=color, col.axis=color, lwd.ticks=1, lwd=-1, tck=0.01, mgp = c(0, -1.4, 0) )
+           main=c(plotName, uv.title), col=color, ylim=c(yMin, yMax))
+      axis(side=4, at = pretty(range(yMin, yMax)), col=color, col.axis=color, lwd.ticks=1, lwd=-1, tck=0.01, mgp = c(0, -1.4, 0) )
       mtext(uv.column.temperature.title, side=4, line=2, col=color)
-      result$uv.column.temperature.min <- min(uvData$ColumnOven.Temperature)
-      result$uv.column.temperature.max <- max(uvData$ColumnOven.Temperature)            
-      
+
       par(new=TRUE)
       
       color <- uv.percent.b.color 
