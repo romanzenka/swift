@@ -45,15 +45,8 @@ public final class QuameterDbWorker extends WorkerBase {
 	public static final String PROTEINS = "proteins";
 	public static final String INSTRUMENT_NAME_MAP = "instrumentNameMap";
 
-	private List<QuameterProteinGroup> proteins;
-
-	private boolean running;
-
-	public QuameterDbWorker(final QuameterDao quameterDao,
-	                        final List<QuameterProteinGroup> proteins,
-	                        final Map<String, String> instrumentNameMap) {
-		this.dao = quameterDao;
-		this.proteins = proteins;
+	public QuameterDbWorker(final QuameterDao quameterDao) {
+		dao = quameterDao;
 	}
 
 	@Override
@@ -61,6 +54,7 @@ public final class QuameterDbWorker extends WorkerBase {
 		final QuameterDbWorkPacket workPacket = (QuameterDbWorkPacket) wp;
 		dao.begin();
 		try {
+			final List<QuameterProteinGroup> proteins = dao.listProteinGroups();
 			final Map<String, Double> map = loadQuameterResultFile(workPacket.getQuameterResultFile());
 
 			final Map<QuameterProteinGroup, Integer> identifiedSpectra = dao.getIdentifiedSpectra(
@@ -148,9 +142,7 @@ public final class QuameterDbWorker extends WorkerBase {
 
 		@Override
 		public Worker create(final Config config, final DependencyResolver dependencies) {
-			QuameterDbWorker quameterDbWorker = new QuameterDbWorker(getQuameterDao(),
-					config.getProteins(),
-					config.getInstrumentNameMap());
+			QuameterDbWorker quameterDbWorker = new QuameterDbWorker(getQuameterDao());
 			return quameterDbWorker;
 		}
 	}
