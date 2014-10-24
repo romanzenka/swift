@@ -138,7 +138,7 @@ uv.nc.pressure.title <- "NC Pump (PSI)"
 
 uv.column.temperature.color <- "#AA8800"
 uv.column.temperature.title <- "Oven temperature (Celsius)"
-uv.column.temperature.yspan <- 2 # 2 degrees Celsius span for Y axis minimum
+uv.column.temperature.yspan <- 10 # degrees Celsius span for Y axis minimum
 
 uv.percent.b.color <- "#008800"
 uv.percent.b.title <- "%B"
@@ -745,7 +745,7 @@ imageGenerator<-function(dataFile, msmsEvalDataFile, infoFile, spectrumFile, chr
       color <- uv.column.temperature.color
       yMin <- result$uv.column.temperature.min <- min(uvData$ColumnOven.Temperature)
       yMax <- result$uv.column.temperature.max <- max(uvData$ColumnOven.Temperature)
-      if(result$uv.column.temperature.max - result$uv.column.temperature.min < uv.column.temperature.yspan) {
+      if(yMax - yMin < uv.column.temperature.yspan) {
         avgY <- yMin+yMax
         yMin <- (avgY-uv.column.temperature.yspan)/2
         yMax <- (avgY+uv.column.temperature.yspan)/2
