@@ -45,11 +45,8 @@ public final class QuameterDbWorker extends WorkerBase {
 	public static final String PROTEINS = "proteins";
 	public static final String INSTRUMENT_NAME_MAP = "instrumentNameMap";
 
-	private boolean running;
-
-	public QuameterDbWorker(final QuameterDao quameterDao,
-	                        final Map<String, String> instrumentNameMap) {
-		this.dao = quameterDao;
+	public QuameterDbWorker(final QuameterDao quameterDao) {
+		dao = quameterDao;
 	}
 
 	@Override
@@ -145,8 +142,7 @@ public final class QuameterDbWorker extends WorkerBase {
 
 		@Override
 		public Worker create(final Config config, final DependencyResolver dependencies) {
-			QuameterDbWorker quameterDbWorker = new QuameterDbWorker(getQuameterDao(),
-					config.getInstrumentNameMap());
+			QuameterDbWorker quameterDbWorker = new QuameterDbWorker(getQuameterDao());
 			return quameterDbWorker;
 		}
 	}
