@@ -306,7 +306,7 @@ fitAndPpmPlots<-function(plotType, dataTab, spectrumInfo, curveColor, shadeColor
   
   xLim <- c(0, 1) # Default limit so we do not crash on empty data
   
-  if(is.null(spectrumInfo)) {
+  if(is.null(spectrumInfo) || sum(!is.na(spectrumInfo$RT))==0) {
     timeDimension <- dataTab$Scan.Id;
   } else {
     timeDimension <- spectrumInfo$RT[match(dataTab$Scan.Id, spectrumInfo$Scan.Id)];
@@ -487,6 +487,14 @@ readQaFile<-function(dataFile, decoyRegex) {
   colClasses<-addQaColumn(colClasses, "ColumnOven.Temperature", "numeric")
   
   dataTabFull<-read.delim(dataFile, header=TRUE, sep="\t", colClasses=colClasses, fileEncoding="UTF-8", quote="")
+  
+  # Fill in missing columns
+  addColumns <- c("Source.Current..uA.", "Lock.Mass.Found", "Lock.Mass.Shift")
+  for(addColumn in addColumns) {
+     if(!(addColumn %in% colnames(dataTabFull))) {
+        dataTabFull[, addColumn] <- 0
+     }
+  }
   
   # Add a few calculated columns
   dataTabFull$identified <- dataTabFull$Protein.accession.numbers!=""
@@ -673,7 +681,7 @@ imageGenerator<-function(dataFile, msmsEvalDataFile, infoFile, spectrumFile, chr
     ### Scan ID versus m/z
     startPlot(ifelse(spectrumInfoAvailable, mz.title, mz.title.nort), outputImages$mz.file)
     
-    if(length(xAxis)!=0) {
+    if(sum(!is.na(xAxis))>0) {
       plot(xAxis, ms2Only$Mz, type="n",
            main=c(plotName, mz.title),
            xlab=xAxisTitleScanOrRT, 
@@ -708,7 +716,7 @@ imageGenerator<-function(dataFile, msmsEvalDataFile, infoFile, spectrumFile, chr
     ### Source current vs. mass id/RT
     startPlot(ifelse(spectrumInfoAvailable, current.title, current.title.nort), outputImages$source.current.file)
     
-    if(spectrumInfoAvailable) {
+    if(spectrumInfoAvailable && sum(!is.na(spectrumInfo$RT))) {
       plot(spectrumInfo$RT, spectrumInfo$Source.Current..uA., type="p",
            main=c(plotName, current.title),
            xlab=xAxisTitleScanOrRT, ylab="Source Current (uA)", pch=20)
