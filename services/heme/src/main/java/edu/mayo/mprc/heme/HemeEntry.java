@@ -32,7 +32,7 @@ public final class HemeEntry {
 		final HemeTestStatus status;
 		final SearchRun searchRun = test.getSearchRun();
 		Interval duration = null;
-		if (searchRun == null) {
+		if (searchRun == null || searchRun.getHidden() != 0) {
 			status = HemeTestStatus.NOT_STARTED;
 		} else {
 			if (searchRun.isCompleted()) {
