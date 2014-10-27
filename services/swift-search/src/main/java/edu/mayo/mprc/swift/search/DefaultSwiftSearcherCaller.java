@@ -15,7 +15,9 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
 import java.io.File;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -100,33 +102,6 @@ public final class DefaultSwiftSearcherCaller implements SwiftSearcherCaller {
 		validateTitleCharacters(title, "Search title");
 		for (final FileSearch fileSearch : swiftSearch.getInputFiles()) {
 			validateTitleCharacters(fileSearch.getExperiment(), "Experiment name " + fileSearch.getExperiment());
-		}
-
-		validateQuaMeterAndMudpit(swiftSearch);
-	}
-
-	/**
-	 * This will throw an exception if:
-	 * 1) QuaMeter is enabled
-	 * 2) Two or more input files go into the same Scaffold column
-	 *
-	 * @param swiftSearch Search definition
-	 */
-	private static void validateQuaMeterAndMudpit(final SwiftSearchDefinition swiftSearch) {
-		final Set<String> quameterSampleExperimentNames = new HashSet<String>(10);
-		for (final FileSearch fileSearch : swiftSearch.getInputFiles()) {
-			if (swiftSearch.isSearch("QUAMETER")) {
-				final String sampleExperiment =
-						fileSearch.getBiologicalSample() +
-								">><<" +
-								fileSearch.getExperiment();
-				// Check that we do not have a sample like so already
-				if (quameterSampleExperimentNames.contains(sampleExperiment)) {
-					throw new MprcException("QuaMeter needs each input file to go to a separate Scaffold column (biological sample).\nSwitch QuaMeter off, or set Scaffold to separate samples per input file.");
-				}
-				// Make a not we saw this before
-				quameterSampleExperimentNames.add(sampleExperiment);
-			}
 		}
 	}
 
