@@ -3,7 +3,6 @@ package edu.mayo.mprc.swift.commands;
 import edu.mayo.mprc.MprcException;
 import edu.mayo.mprc.config.AppConfigReader;
 import edu.mayo.mprc.config.AppConfigWriter;
-import edu.mayo.mprc.config.ApplicationConfig;
 import edu.mayo.mprc.config.MultiFactory;
 import edu.mayo.mprc.utilities.FileUtilities;
 import org.springframework.stereotype.Component;
@@ -19,7 +18,6 @@ import java.io.PrintWriter;
 @Component("reformat-config-command")
 public final class ReformatConfig implements SwiftCommand {
 	private MultiFactory factory;
-	private ApplicationConfig applicationConfig;
 
 	@Override
 	public String getDescription() {
@@ -49,7 +47,7 @@ public final class ReformatConfig implements SwiftCommand {
 
 		final AppConfigReader reader = new AppConfigReader(file, getFactory());
 		try {
-			reader.load(applicationConfig);
+			reader.load(environment.getApplicationConfig());
 		} finally {
 			FileUtilities.closeQuietly(reader);
 		}
@@ -58,7 +56,7 @@ public final class ReformatConfig implements SwiftCommand {
 
 		try {
 			writer = new AppConfigWriter(printWriter, getFactory());
-			writer.save(applicationConfig);
+			writer.save(environment.getApplicationConfig());
 		} finally {
 			FileUtilities.closeQuietly(writer);
 			FileUtilities.closeQuietly(printWriter);
@@ -73,14 +71,5 @@ public final class ReformatConfig implements SwiftCommand {
 	@Resource(name = "resourceTable")
 	public void setFactory(final MultiFactory factory) {
 		this.factory = factory;
-	}
-
-	public ApplicationConfig getApplicationConfig() {
-		return applicationConfig;
-	}
-
-	@Resource(name = "applicationConfig")
-	public void setApplicationConfig(ApplicationConfig applicationConfig) {
-		this.applicationConfig = applicationConfig;
 	}
 }
