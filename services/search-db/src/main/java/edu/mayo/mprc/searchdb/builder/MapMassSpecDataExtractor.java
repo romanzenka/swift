@@ -15,7 +15,7 @@ import java.util.regex.Pattern;
 public class MapMassSpecDataExtractor implements MassSpecDataExtractor {
 
 	public static final String MUDPIT_PREFIX = "Mudpit_";
-	private static final Pattern MUDPIT_PATTERN = Pattern.compile("Mudpit_ \\(.*\\)");
+	private static final Pattern MUDPIT_PATTERN = Pattern.compile("Mudpit_ \\((.*)\\)");
 	private final Map<String/*msmsSampleName*/, RawFileMetaData> metaDataMap;
 	private final Map<String/*msmsSampleName*/, TandemMassSpectrometrySample> sampleMap = new TreeMap<String, TandemMassSpectrometrySample>();
 
