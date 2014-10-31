@@ -143,7 +143,7 @@ uv.column.temperature.yspan <- 10 # degrees Celsius span for Y axis minimum
 uv.percent.b.color <- "#008800"
 uv.percent.b.title <- "%B"
 
-uv.pressure.range <- range(0, 3000) # Fixed range for PSI. When PSI reaches 3000, it is time to change the column
+uv.pressure.range <- range(0, 6000) # Fixed range for PSI.
 
 
 # How to visualize a hit?
