@@ -112,6 +112,7 @@ public final class SwiftDaoHibernate extends DaoBase implements SwiftDao {
 			filter.updateCriteria(criteria);
 			if (withReports) {
 				criteria.setFetchMode("reports", FetchMode.JOIN);
+				criteria.setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY);
 			}
 			criteria.setCacheable(true)
 					.setReadOnly(true);
