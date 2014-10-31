@@ -5,9 +5,9 @@ require 'pp'
 
 version  = 1
 host     = "node029.mprc.mayo.edu"
-database = "swift_heme"
-user     = "swift_heme_admin"
-pass     = "heme$admin"
+database = "swift"
+user = "swift"
+pass = "###############################################"
 ### SQL USED ###
 # ALTER TABLE `swift_heme`.`curation` ADD steps_json MEDIUMTEXT;
 
@@ -18,7 +18,8 @@ client = Mysql2::Client.new(
     :port=>3306,
     :username=>"#{user}",
     :password=>"#{pass}",
-    :database => "#{database}")
+    :database => "#{database}",
+    :secure_auth => false)
 nxline = client.escape("\n")
 
 
