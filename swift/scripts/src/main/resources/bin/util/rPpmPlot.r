@@ -751,15 +751,13 @@ imageGenerator<-function(dataFile, msmsEvalDataFile, infoFile, spectrumFile, chr
       par(new=TRUE)
       
       color <- uv.column.temperature.color
-      yMin <- result$uv.column.temperature.min <- min(uvData$ColumnOven.Temperature)
-      yMax <- result$uv.column.temperature.max <- max(uvData$ColumnOven.Temperature)
-      if(yMax - yMin < uv.column.temperature.yspan) {
-        avgY <- yMin+yMax
-        yMin <- (avgY-uv.column.temperature.yspan)/2
-        yMax <- (avgY+uv.column.temperature.yspan)/2
-      }
+      result$uv.column.temperature.min <- min(uvData$ColumnOven.Temperature)
+      result$uv.column.temperature.max <- max(uvData$ColumnOven.Temperature)
+      uvMean <- mean(uvData$ColumnOven.Temperature)
       plot(uvData$UV.RT, uvData$ColumnOven.Temperature, type="l", axes=FALSE, xlab=xAxisTitleScanOrRT, ylab=NA,
-           main=c(plotName, uv.title), col=color, ylim=c(yMin, yMax))
+           main=c(plotName, uv.title), col=color, ylim=range(
+            uvData$ColumnOven.Temperature,
+            uvMean-uv.column.temperature.yspan/2, uvMean+uv.column.temperature.yspan/2))
       axis(side=4, at = pretty(range(yMin, yMax)), col=color, col.axis=color, lwd.ticks=1, lwd=-1, tck=0.01, mgp = c(0, -1.4, 0) )
       mtext(uv.column.temperature.title, side=4, line=2, col=color)
 
