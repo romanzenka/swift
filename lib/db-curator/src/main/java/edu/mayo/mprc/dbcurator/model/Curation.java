@@ -115,7 +115,11 @@ public class Curation extends EvolvableBase implements Serializable {
 	 * @param curationSteps the steps to set on this Curation
 	 */
 	protected void setCurationSteps(final List<CurationStep> curationSteps) {
-		this.curationSteps = curationSteps;
+		if (curationSteps == null) {
+			this.curationSteps = new ArrayList<CurationStep>();
+		} else {
+			this.curationSteps = curationSteps;
+		}
 	}
 
 	/**
