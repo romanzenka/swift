@@ -31,7 +31,7 @@ import java.util.Map;
  */
 public final class QuameterDaoTest extends DaoTest {
 	public static final QuameterProteinGroup ALBUMIN_GROUP = new QuameterProteinGroup("albumin", "ALBU_HUMAN");
-	public static final QuameterProteinGroup KERATIN_GROUP = new QuameterProteinGroup("keratin", "K1C10_BOVIN");
+	public static final QuameterProteinGroup KERATIN_GROUP = new QuameterProteinGroup("keratin", "K1C10_Bovin");
 	private File tempFolder;
 
 	private WorkspaceDaoHibernate workspaceDao;
