@@ -7,7 +7,62 @@ version  = 1
 host     = "node029.mprc.mayo.edu"
 database = "swift"
 user = "swift"
-pass = "###############################################"
+pass = "###"
+
+### Define Methods ####
+def help_statment()
+  str="Usage: ruby createDocStore_curator_steps.rb \n"
+  str+="\tThis script pulls the curation step tables, reformats then json stores them in the curation table\n"
+  str+="\t-t <host>\n\t-d <db>"
+  str+="\t-u <user>\n\t-p <password> [Required]"
+  return str
+end
+
+
+#### Help Statement ####
+if ARGV[0]=='-h' || ARGV[0]=='--help' || ARGV.size==0
+  puts help_statment
+  exit 0
+end
+opt=Hash[*ARGV]
+
+
+
+#### Open Directories & Files ####
+if !opt.has_key?('-p')
+  puts "Missing -p option: Please provide your password"
+  exit 1
+else
+  pass = opt['-p']
+end
+if opt.has_key?('-t')
+  host = opt['-t']
+end
+if opt.has_key?('-d')
+  database = opt['-d']
+end
+if opt.has_key?('-u')
+  user = opt['-u']
+end
+
+
+mysql2javaMap = {
+  "criteria_string" => "criteriaString",
+  "text_mode" => "textMode",
+  "match_mode" => "matchMode",
+  "inclusion_header" => "header",
+  "inclusion_sequence" => "sequence",
+  "overwrite_mode" => "overwriteMode",
+  "manipulator_type" => "manipulatorType",
+  "server_path" => "pathToUploadedFile",
+  "client_path" => "fileName",
+  "md5_checksum" => "md5CheckSum",
+  "match_pattern" => "matchPattern",
+  "substitution_pattern" => "substitutionPattern",
+  "last_run_completion_count" => "lastRunCompletionCount"
+}
+
+
 ### SQL USED ###
 # ALTER TABLE `swift_heme`.`curation` ADD steps_json MEDIUMTEXT;
 
@@ -31,7 +86,7 @@ cSteps.each do |row|
   id=row[:step_id]
   newDocuments[id]=Hash.new
   newDocuments[id]['step']=id
-  newDocuments[id]['last_run_completion_count']=row[:last_run_completion_count]
+  newDocuments[id]['lastRunCompletionCount']=row[:last_run_completion_count]
 end
 
 
@@ -61,6 +116,9 @@ tables.each_with_index do |tb, i|
     row.each do |key, value|                 # Loop & Set columns other than xxx_id
       next if key =~ /_id$/
       fixedVal =  value.to_s.gsub("\|", "\\|")  ## need to handle "\|" issue for GSON
+      if mysql2javaMap.has_key?(key)
+        key = mysql2javaMap[key]
+      end
       newDocuments[id][key]= fixedVal
     end
     newDocuments[id]['step_type']=tb.gsub("curation_step_", "")
@@ -93,5 +151,5 @@ curationAggregation.each do |cur_id, stepArray|
   curationStepObj['version'] = version
   curationStepObj['steps'] = stepArray
 
-  client.query("UPDATE curation SET steps_json = '#{curationStepObj.to_json}' WHERE curation_id = #{cur_id}")
+  client.query("UPDATE curation SET steps_json = '#{curationStepObj.to_json.gsub(/\\/, '\&\&').gsub(/'/, "''")}' WHERE curation_id = #{cur_id}")
 end
