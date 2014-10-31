@@ -26,7 +26,7 @@ public class Curation extends EvolvableBase implements Serializable {
 	public static final int SHORTNAME_MAX_LENGTH = 17;
 	public static final int SHORTNAME_MIN_LENGTH = 5;
 
-    /**
+	/**
 	 * any notes that were saved
 	 */
 	private String notes;
@@ -60,17 +60,17 @@ public class Curation extends EvolvableBase implements Serializable {
 	 */
 	private DateTime deploymentDate;
 
-    /**
-     * the steps involved in the curation
-     */
-    private List<CurationStep> curationSteps = new ArrayList<CurationStep>();
+	/**
+	 * the steps involved in the curation
+	 */
+	private List<CurationStep> curationSteps = new ArrayList<CurationStep>();
 
 	/**
 	 * Regular expression (Scaffold-supported) describing which accession numbers belong to the decoy part of the database.
 	 */
 	private String decoyRegex;
 
-    /**
+	/**
 	 * Creates a new curator given just the path.  It will be up to the caller to set a short title before which will
 	 * generate the path and folder where this curation will be stored in.
 	 */
@@ -106,8 +106,8 @@ public class Curation extends EvolvableBase implements Serializable {
 	 * @return the list of steps in this curation
 	 */
 	public List<CurationStep> getCurationSteps() {
-        return curationSteps;
-    }
+		return curationSteps;
+	}
 
 	/**
 	 * set the curation steps.  This should not be done often and is included for ORM purposes.
@@ -115,8 +115,8 @@ public class Curation extends EvolvableBase implements Serializable {
 	 * @param curationSteps the steps to set on this Curation
 	 */
 	protected void setCurationSteps(final List<CurationStep> curationSteps) {
-        this.curationSteps = curationSteps;
-    }
+		this.curationSteps = curationSteps;
+	}
 
 	/**
 	 * Method getDeploymentDate returns the deploymentDate of this Curation object.
@@ -317,16 +317,16 @@ public class Curation extends EvolvableBase implements Serializable {
 	 * @param toMoveTo where you want to add the step to
 	 */
 	public Curation addStep(final CurationStep toAdd, final int toMoveTo) {
-        curationSteps.add(translateStepIndex(toMoveTo), toAdd);
-        return this;
+		curationSteps.add(translateStepIndex(toMoveTo), toAdd);
+		return this;
 	}
 
 	/**
 	 * Remove all steps from the curation.
 	 */
 	public void clearSteps() {
-        curationSteps.clear();
-    }
+		curationSteps.clear();
+	}
 
 	/**
 	 * takes an index of a step that may be in negative notation and converts it to the equivalent positive notation
@@ -336,8 +336,8 @@ public class Curation extends EvolvableBase implements Serializable {
 	 * @return the translated index
 	 */
 	protected int translateStepIndex(final int step) {
-        List<CurationStep> curationSteps = getCurationSteps();
-        if (step > curationSteps.size()) {
+		List<CurationStep> curationSteps = getCurationSteps();
+		if (step > curationSteps.size()) {
 			return curationSteps.size() - 1;
 		}
 		if (curationSteps.isEmpty()) {
@@ -404,9 +404,11 @@ public class Curation extends EvolvableBase implements Serializable {
 
 		copy.setCurationFile(curationFile);
 
-		//for each step we want to create a copy or use original step if this is for a refresh only.
-		for (final CurationStep curationStep : getCurationSteps()) {
-			copy.addStep(curationStep.createCopy(), -1);
+		if (getCurationSteps() != null) {
+			//for each step we want to create a copy or use original step if this is for a refresh only.
+			for (final CurationStep curationStep : getCurationSteps()) {
+				copy.addStep(curationStep.createCopy(), -1);
+			}
 		}
 
 		copy.setDeploymentDate(deploymentDate);
