@@ -277,7 +277,7 @@ public final class CurationDaoHibernate extends DaoBase implements CurationDao {
 		}
 		if (genericResults != null) {
 			for (final Object o : genericResults) {
-				returnList.add((Curation) o);
+				returnList.add(((Curation) o).copyFull());
 			}
 		}
 		return returnList;
