@@ -143,7 +143,7 @@ uv.column.temperature.yspan <- 10 # degrees Celsius span for Y axis minimum
 uv.percent.b.color <- "#008800"
 uv.percent.b.title <- "%B"
 
-uv.pressure.range <- range(0, 3000) # Fixed range for PSI. When PSI reaches 3000, it is time to change the column
+uv.pressure.range <- range(0, 6000) # Fixed range for PSI.
 
 
 # How to visualize a hit?
@@ -751,16 +751,13 @@ imageGenerator<-function(dataFile, msmsEvalDataFile, infoFile, spectrumFile, chr
       par(new=TRUE)
       
       color <- uv.column.temperature.color
-      yMin <- result$uv.column.temperature.min <- min(uvData$ColumnOven.Temperature)
-      yMax <- result$uv.column.temperature.max <- max(uvData$ColumnOven.Temperature)
-      if(yMax - yMin < uv.column.temperature.yspan) {
-        avgY <- yMin+yMax
-        yMin <- (avgY-uv.column.temperature.yspan)/2
-        yMax <- (avgY+uv.column.temperature.yspan)/2
-      }
+      result$uv.column.temperature.min <- min(uvData$ColumnOven.Temperature)
+      result$uv.column.temperature.max <- max(uvData$ColumnOven.Temperature)
+      uvMean <- mean(uvData$ColumnOven.Temperature)
+      uvData.range <- range(uvData$ColumnOven.Temperature, uvMean-uv.column.temperature.yspan/2, uvMean+uv.column.temperature.yspan/2)
       plot(uvData$UV.RT, uvData$ColumnOven.Temperature, type="l", axes=FALSE, xlab=xAxisTitleScanOrRT, ylab=NA,
-           main=c(plotName, uv.title), col=color, ylim=c(yMin, yMax))
-      axis(side=4, at = pretty(range(yMin, yMax)), col=color, col.axis=color, lwd.ticks=1, lwd=-1, tck=0.01, mgp = c(0, -1.4, 0) )
+           main=c(plotName, uv.title), col=color, ylim=uvData.range)
+      axis(side=4, at = pretty(uvData.range), col=color, col.axis=color, lwd.ticks=1, lwd=-1, tck=0.01, mgp = c(0, -1.4, 0) )
       mtext(uv.column.temperature.title, side=4, line=2, col=color)
 
       par(new=TRUE)

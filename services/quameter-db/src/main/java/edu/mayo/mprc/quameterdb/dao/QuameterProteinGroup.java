@@ -71,7 +71,7 @@ public final class QuameterProteinGroup extends EvolvableBase implements Cloneab
 
 	public void setRegex(final String regex) {
 		this.regex = regex;
-		this.compiledRegex = Pattern.compile(this.regex);
+		this.compiledRegex = Pattern.compile(this.regex, Pattern.CASE_INSENSITIVE);
 	}
 
 	/**

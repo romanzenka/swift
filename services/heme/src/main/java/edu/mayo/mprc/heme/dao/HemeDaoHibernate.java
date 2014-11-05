@@ -3,6 +3,7 @@ package edu.mayo.mprc.heme.dao;
 import com.google.common.base.Preconditions;
 import edu.mayo.mprc.MprcException;
 import edu.mayo.mprc.database.DaoBase;
+import org.hibernate.Criteria;
 import org.hibernate.FetchMode;
 import org.hibernate.criterion.Order;
 import org.springframework.stereotype.Repository;
@@ -27,6 +28,7 @@ public final class HemeDaoHibernate extends DaoBase implements HemeDao {
 		return listAndCast(getSession()
 				.createCriteria(HemeTest.class)
 				.setFetchMode("searchRun", FetchMode.JOIN)
+				.setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY)
 				.addOrder(Order.desc("date"))
 				.addOrder(Order.asc("name")));
 	}
