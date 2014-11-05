@@ -78,6 +78,8 @@
     <% } else { %>
     </br><a href="/quameter/unhide.jsp" class="pull-right">Unhide</a>
 
+
+
     <div id="detailedGraphs" style="margin-top: 40px; display: none;"></div>
     <div id="simpleGraphs" style="margin-top: 40px"></div>
 
