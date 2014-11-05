@@ -76,7 +76,8 @@
             </code> daemon.</p>
     </div>
     <% } else { %>
-    </br><a href="/quameter/unhide.jsp" class="pull-right">Unhide</a>
+    </br><a href="/quameter/unhide.jsp" class="pull-left">Unhide</a>
+    </br><a href="/service/getQuameterDataTable" class="pull-left">DataTable</a>
 
     <div id="detailedGraphs" style="margin-top: 40px; display: none;"></div>
     <div id="simpleGraphs" style="margin-top: 40px"></div>
@@ -97,7 +98,7 @@
 <script type="text/javascript" src="/common/bootstrap/js/bootstrap.js"></script>
 
 <!-- Graph Dependancies -->
-<script type="text/javascript" src="js/tmp.js"></script>
+<%--<script type="text/javascript" src="js/tmp.js"></script>--%>
 
 <script type="text/javascript">
     var metrics = <%
