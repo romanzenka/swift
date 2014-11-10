@@ -2,7 +2,6 @@ package edu.mayo.mprc.swift.ui.client.widgets;
 
 import com.google.gwt.user.client.ui.CheckBox;
 import com.google.gwt.user.client.ui.HorizontalPanel;
-import com.google.gwt.user.client.ui.Label;
 import edu.mayo.mprc.swift.ui.client.rpc.ClientSwiftSearchDefinition;
 
 public final class AdditionalSettingsPanel extends HorizontalPanel {
@@ -35,9 +34,6 @@ public final class AdditionalSettingsPanel extends HorizontalPanel {
 		lowPriority = new CheckBox("Low priority");
 		lowPriority.setValue(false);
 		add(lowPriority);
-
-		final Label searchTitleLabel = new Label("Title suffix:");
-		add(searchTitleLabel);
 	}
 
 	/**
