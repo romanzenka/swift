@@ -97,7 +97,6 @@ public final class MsconvertMgfCleanup {
 				charge = "";
 				contentBuilder.setLength(0);
 			} else {
-				// We gobble the params up, will write them out all at once when the entire header is over.
 				if (line.contains("=")) {
 					// We remember title to output it before charge
 					if (title == null && line.startsWith("TITLE=")) {
