@@ -11,7 +11,7 @@
 
         <property name="firstRunDate" type="org.joda.time.contrib.hibernate.PersistentDateTime"
             column="first_run_date" />
-        <property name="curationFile" type="file" column="curated_filename" />
+        <property name="curationFile" type="file" column="curated_filename" length="500" />
         <property name="title" type="string" length="255" column="title" />
         <property name="ownerEmail" type="string" length="32" column="email" />
         <property name="runDate" type="org.joda.time.contrib.hibernate.PersistentDateTime" column="run_date" />

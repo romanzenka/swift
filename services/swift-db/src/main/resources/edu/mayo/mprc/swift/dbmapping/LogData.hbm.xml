@@ -12,8 +12,8 @@
         <many-to-one name="task" class="TaskData" column="task_id" foreign-key="log_data_ibfk_1" lazy="proxy" />
         <many-to-one name="parentLog" class="LogData" column="parent_log_id" foreign-key="log_data_ibfk_2"
             lazy="proxy" />
-        <property name="outputLog" type="file" column="out_log" />
-        <property name="errorLog" type="file" column="err_log" />
+        <property name="outputLog" type="file" column="out_log" length="500" />
+        <property name="errorLog" type="file" column="err_log" length="500" />
     </class>
 
 </hibernate-mapping>

@@ -9,7 +9,7 @@
         </id>
 
         <property name="sourceURL" type="string" length="128" column="source_url" />
-        <property name="archive" type="file" column="source_path" access="property" />
+        <property name="archive" type="file" column="source_path" access="property" length="500" />
         <property name="serverDate" type="org.joda.time.contrib.hibernate.PersistentDateTime"
             column="server_creation_date" />
         <property name="downloadDate" type="org.joda.time.contrib.hibernate.PersistentDateTime"
