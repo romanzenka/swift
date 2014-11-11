@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -269,6 +270,18 @@ public final class ProcessCaller implements Runnable {
 			LOGGER.info("Running process:" + getCallDescription());
 		}
 		try {
+			final List<String> command = builder.command();
+			if (FileUtilities.isWindowsPlatform()) {
+				// We want to run perl scripts directly on Windows as if they were executable
+				// Prepend the command with specific invocation of perl
+				if (command.get(0).endsWith(".pl")) {
+					List<String> newCommand = new ArrayList<String>(command.size() + 1);
+					newCommand.add("perl.exe");
+					newCommand.addAll(command);
+					builder.command(newCommand);
+				}
+			}
+
 			process = builder.start();
 
 			outputStreamDrainer = new StreamDrainer(process.getInputStream(), outputLogger, Level.INFO,

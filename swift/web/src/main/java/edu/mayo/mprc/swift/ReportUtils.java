@@ -4,6 +4,7 @@ import edu.mayo.mprc.MprcException;
 import edu.mayo.mprc.daemon.files.FileTokenFactory;
 import edu.mayo.mprc.swift.db.DatabaseFileTokenFactory;
 import edu.mayo.mprc.utilities.FileUtilities;
+import edu.mayo.mprc.utilities.StringUtilities;
 import org.joda.time.DateTime;
 import org.joda.time.format.ISODateTimeFormat;
 
@@ -12,7 +13,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public final class ReportUtils {
-	private static final Pattern tokenToHyperlink = Pattern.compile("<file>([^<]*)</file>", Pattern.CASE_INSENSITIVE);
+	private static final Pattern tokenToHyperlink = Pattern.compile("&lt;file&gt;(.*?)&lt;/file&gt;", Pattern.CASE_INSENSITIVE);
 
 	private ReportUtils() {
 	}
@@ -21,10 +22,17 @@ public final class ReportUtils {
 		return text.replaceAll("(\r\n|\n\r|\n)", "<br/>");
 	}
 
+	/**
+	 * Replace tokens in the {@code <file>...</file>} form with hyperlinks.
+	 * We also make sure to escape other HTML entities with {@link edu.mayo.mprc.utilities.StringUtilities#escapeHtml}
+	 *
+	 * @return Escaped HTML string ready to be rendered
+	 */
 	public static String replaceTokensWithHyperlinks(final String text, final File browseRoot, final String browseWebRoot, final DatabaseFileTokenFactory tokenFactory) {
-		final Matcher matcher = tokenToHyperlink.matcher(text);
+		final String escapedText = StringUtilities.escapeHtml(text);
+		final Matcher matcher = tokenToHyperlink.matcher(escapedText);
 
-		final StringBuffer result = new StringBuffer(text.length());
+		final StringBuffer result = new StringBuffer(escapedText.length());
 		while (matcher.find()) {
 			final String token = matcher.group(1);
 			final File file = tokenFactory.databaseTokenToFile(token);

@@ -19,8 +19,8 @@ public final class ReportUtilsTest {
 		final DatabaseFileTokenFactory tokenFactory = new DatabaseFileTokenFactory(info);
 		tokenFactory.setDatabaseDaemonConfigInfo(dbInfo);
 		Assert.assertEquals(
-				ReportUtils.replaceTokensWithHyperlinks("hello world", new File("/mnt/raid1/browsing"), "file:///rome/mprc", tokenFactory),
-				"hello world", "Simple strings must remain unchanged");
+				ReportUtils.replaceTokensWithHyperlinks("hello & world", new File("/mnt/raid1/browsing"), "file:///rome/mprc", tokenFactory),
+				"hello &amp; world", "Simple strings must remain unchanged (modulo entity escape)");
 
 		final File sharedFile = new File("/mnt/raid1/browsing/test.txt");
 		Assert.assertEquals(

@@ -127,6 +127,11 @@ public final class MsconvertWorker extends WorkerBase {
 			throw new MprcException("Unsupported extension: " + extension);
 		}
 
+		if (ms2Profile) {
+			command.add("--filter");
+			command.add("peakPicking true 2-"); // Do peak picking on MS2 and higher
+		}
+
 		if (agilentData(rawFile)) {
 			command.add("--filter");
 			command.add("peakPicking true 1-");
@@ -139,11 +144,6 @@ public final class MsconvertWorker extends WorkerBase {
 
 		command.add("--filter"); // Charge state predictor
 		command.add("chargeStatePredictor false 4 2 0.9");
-
-		if (ms2Profile) {
-			command.add("--filter");
-			command.add("peakPicking true 2-"); // Do peak picking on MS2 and higher
-		}
 
 		if (ms2Profile || agilentData(rawFile)) {
 			command.add("--filter");

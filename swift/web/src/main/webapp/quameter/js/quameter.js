@@ -296,18 +296,19 @@ function addDygraph(viewIndex, view, viewId, metricId, viewMetadata, data, range
         document.getElementById(viewId),
         views[viewIndex].dataView,
         {
-            drawCallback: function (me, initial) {
-                if (blockRedraw || initial) return;
+            zoomCallback: function (minDate, maxDate, yRanges) {
+                if (blockRedraw) return;
                 blockRedraw = true;
-                var range = me.xAxisRange();
+                var range = [minDate, maxDate];
                 for (var j = 0; j < views.length; j++) {
-                    if (gs[j] == me) continue;
                     if (gs[j] === undefined) {
                         console.log("Errant LOOKUP", j, gs)
                     }
-                    gs[j].updateOptions({
-                        dateWindow: range
-                    });
+                    if (gs[j] != dygraph) {
+                        gs[j].updateOptions({
+                            dateWindow: range
+                        });
+                    }
                 }
                 blockRedraw = false;
             },

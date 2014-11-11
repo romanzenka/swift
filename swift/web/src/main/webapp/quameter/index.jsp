@@ -79,8 +79,6 @@
     </br><a href="/quameter/unhide.jsp" class="pull-left">Unhide</a>
     </br><a href="/service/getQuameterDataTable" class="pull-left">DataTable</a>
 
-
-
     <div id="detailedGraphs" style="margin-top: 40px; display: none;"></div>
     <div id="simpleGraphs" style="margin-top: 40px"></div>
 
