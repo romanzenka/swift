@@ -108,7 +108,7 @@ public final class MyriMatchWorker extends WorkerBase {
 					result.add("DecoyPrefix = " + packet.getDecoySequencePrefix());
 				}
 
-				final String contents = Joiner.on('\n').join(lines);
+				final String contents = Joiner.on('\n').join(result);
 				Files.write(contents, modifiedParamsFile, Charsets.US_ASCII);
 				LOGGER.info("Myrimatch config to be used:\n" + modifiedParamsFile.getAbsolutePath() + "\n---\n" + contents);
 

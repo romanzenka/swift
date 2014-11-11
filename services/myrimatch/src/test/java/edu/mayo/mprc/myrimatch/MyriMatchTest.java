@@ -434,7 +434,7 @@ public final class MyriMatchTest extends XMLTestCase {
 
 	private MyriMatchMappings createMappings() {
 		final MyriMatchMappingFactory factory = new MyriMatchMappingFactory();
-		Assert.assertEquals(factory.getCanonicalParamFileName("1"), "myrimatch1.template.cfg");
+		Assert.assertEquals(factory.getCanonicalParamFileName("1"), "myrimatch1.cfg");
 		final MyriMatchMappings mapping = (MyriMatchMappings) factory.createMapping();
 		return mapping;
 	}
