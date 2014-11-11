@@ -74,7 +74,7 @@ public final class MyriMatchWorker extends WorkerBase {
 		final File finalOutputFile = packet.getOutputFile();
 		final File outputFile = getTempOutputFile(tempWorkFolder, finalOutputFile);
 
-		final File resultFile = new File(outputFile, outputFile.getName() + ".tmp");
+		final File resultFile = new File(tempWorkFolder, outputFile.getName() + ".tmp");
 		// The final file has the spectra id replaced with titles of spectra from the .mgf file
 
 		if (finalOutputFile.exists() && inputFile.exists() && finalOutputFile.lastModified() >= inputFile.lastModified()) {
