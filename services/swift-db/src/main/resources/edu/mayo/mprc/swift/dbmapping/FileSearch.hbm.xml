@@ -9,7 +9,7 @@
         </id>
 
         <properties name="uniqueness" unique="true">
-            <property name="inputFile" type="file" column="input_file" />
+            <property name="inputFile" type="file" column="input_file" length="500" />
             <property name="biologicalSample" type="string" length="128" column="biological_sample" />
             <property name="categoryName" type="string" length="128" column="category_name" />
             <property name="experiment" type="string" length="128" column="experiment" />
