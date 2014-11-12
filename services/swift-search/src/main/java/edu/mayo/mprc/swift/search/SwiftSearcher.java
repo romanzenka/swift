@@ -83,6 +83,7 @@ public final class SwiftSearcher implements Worker, Lifecycle {
 	private CurationDao curationDao;
 	private SwiftDao swiftDao;
 	private ParamsInfo paramsInfo;
+	private boolean semitrypticQuameter;
 
 	private static final String FASTA_PATH = "fastaPath";
 	private static final String FASTA_ARCHIVE_PATH = "fastaArchivePath";
@@ -100,6 +101,7 @@ public final class SwiftSearcher implements Worker, Lifecycle {
 	private static final String SEARCH_DB = "searchDb";
 	private static final String QUAMETER_DB = "quameterDb";
 	private static final String REPORT_DECOY_HITS = "reportDecoyHits";
+	private static final String SEMITRYPTIC_QUAMETER = "semitrypticQuameter";
 
 	private DatabaseFileTokenFactory fileTokenFactory;
 	private boolean running;
@@ -276,6 +278,7 @@ public final class SwiftSearcher implements Worker, Lifecycle {
 					fileTokenFactory,
 					searchRun,
 					reportDecoyHits,
+					semitrypticQuameter,
 					swiftSearchWorkPacket.getPriority(),
 					paramsInfo,
 					swiftSearchWorkPacket.getTaskId().toString(),
@@ -519,6 +522,7 @@ public final class SwiftSearcher implements Worker, Lifecycle {
 		private String fastaArchivePath;
 		private String fastaUploadPath;
 		private boolean reportDecoyHits;
+		private boolean semitrypticQuameter;
 
 		private ServiceConfig raw2mgf;
 		private ServiceConfig msconvert;
@@ -565,6 +569,7 @@ public final class SwiftSearcher implements Worker, Lifecycle {
 			this.msmsEval = msmsEval;
 			this.database = database;
 			reportDecoyHits = true;
+			semitrypticQuameter = true;
 		}
 
 		public ServiceConfig getMsmsEval() {
@@ -631,6 +636,10 @@ public final class SwiftSearcher implements Worker, Lifecycle {
 			return reportDecoyHits;
 		}
 
+		public boolean isSemitrypticQuameter() {
+			return semitrypticQuameter;
+		}
+
 		public Collection<SearchEngine.Config> getEngines() {
 			return engines;
 		}
@@ -662,6 +671,7 @@ public final class SwiftSearcher implements Worker, Lifecycle {
 			writer.put(MSMS_EVAL, writer.save(getMsmsEval()));
 			writer.put(DATABASE, writer.save(getDatabase()));
 			writer.put(REPORT_DECOY_HITS, isReportDecoyHits());
+			writer.put(SEMITRYPTIC_QUAMETER, isSemitrypticQuameter());
 		}
 
 		@Override
@@ -693,6 +703,7 @@ public final class SwiftSearcher implements Worker, Lifecycle {
 			msmsEval = (ServiceConfig) reader.getObject(MSMS_EVAL);
 			database = (Database.Config) reader.getObject(DATABASE);
 			reportDecoyHits = reader.getBoolean(REPORT_DECOY_HITS);
+			semitrypticQuameter = reader.getBoolean(SEMITRYPTIC_QUAMETER, true);
 		}
 
 		private void setupEngine(final String number, final Map<Integer, SearchEngine.Config> engineConfigs, final ConfigReader reader) {
@@ -745,6 +756,12 @@ public final class SwiftSearcher implements Worker, Lifecycle {
 					.property(REPORT_DECOY_HITS, "Report Decoy Hits",
 							"<p>When checked, Scaffold will utilize the accession number patterns to distinguish decoy from forward hits.<p>" +
 									"<p>This causes FDR rates to be calculated using the number of decoy hits. Scaffold will also display the reverse hits in pink.</p>")
+					.boolValue()
+					.defaultValue(Boolean.toString(Boolean.TRUE))
+
+					.property(SEMITRYPTIC_QUAMETER, "Semitryptic QuaMeter search",
+							"<p>When checked, Swift would run the search for QuaMeter with semitryptic cleavages enabled.<p>" +
+									"<p>This allows producing the semitryptic ratio plot + increases the number of IDs at the expense of much longer processing time</p>")
 					.boolValue()
 					.defaultValue(Boolean.toString(Boolean.TRUE))
 

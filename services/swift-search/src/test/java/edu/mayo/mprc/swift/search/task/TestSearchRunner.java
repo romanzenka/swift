@@ -450,7 +450,8 @@ public class TestSearchRunner {
 				mock(SwiftDao.class),
 				dummyFileTokenFactory(),
 				searchRun,
-				false,
+				false, /* reportDecoys */
+				true, /* semiQuameter */
 				0,
 				new MockParamsInfo(),
 				taskId,

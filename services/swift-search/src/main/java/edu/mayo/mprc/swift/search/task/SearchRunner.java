@@ -58,6 +58,7 @@ public final class SearchRunner implements Runnable, Lifecycle {
 	public static final double QUAMETER_FDR = 0.02;
 
 	private boolean running;
+	private boolean semitrypticQuameter;
 	private final boolean fromScratch;
 	private final SwiftSearchDefinition searchDefinition;
 
@@ -137,6 +138,7 @@ public final class SearchRunner implements Runnable, Lifecycle {
 			final DatabaseFileTokenFactory fileTokenFactory,
 			final SearchRun searchRun,
 			final boolean reportDecoyHits,
+			final boolean semitrypticQuameter,
 			final int priority,
 			final ParamsInfo paramsInfo,
 			final String taskId,
@@ -159,6 +161,7 @@ public final class SearchRunner implements Runnable, Lifecycle {
 		this.fileTokenFactory = fileTokenFactory;
 		this.searchRun = searchRun;
 		this.reportDecoyHits = reportDecoyHits;
+		this.semitrypticQuameter = semitrypticQuameter;
 		workflowEngine = new WorkflowEngine(taskId);
 		workflowEngine.setPriority(priority);
 		this.paramsInfo = paramsInfo;
@@ -346,9 +349,13 @@ public final class SearchRunner implements Runnable, Lifecycle {
 	 * @return Semi-tryptic version.
 	 */
 	private SearchEngineParameters getSemiParameters(final SearchEngineParameters searchParameters) {
-		final SearchEngineParameters semiTrypticParameters = searchParameters.copyNullId();
-		semiTrypticParameters.setMinTerminiCleavages(1);
-		return semiTrypticParameters;
+		if (semitrypticQuameter) {
+			final SearchEngineParameters semiTrypticParameters = searchParameters.copyNullId();
+			semiTrypticParameters.setMinTerminiCleavages(1);
+			return semiTrypticParameters;
+		} else {
+			return searchParameters;
+		}
 	}
 
 	private DatabaseDeployment addScaffoldDatabaseDeployment(final FileSearch inputFile, final SearchEngine scaffold, final Curation database) {
