@@ -29,6 +29,15 @@ public abstract class ConfigReaderBase implements ConfigReader {
 	}
 
 	@Override
+	public boolean getBoolean(final String key, boolean defaultValue) {
+		final String value = get(key);
+		if (value == null) {
+			return defaultValue;
+		}
+		return getBoolean(key);
+	}
+
+	@Override
 	public int getInteger(final String key) {
 		return Integer.parseInt(get(key));
 	}
