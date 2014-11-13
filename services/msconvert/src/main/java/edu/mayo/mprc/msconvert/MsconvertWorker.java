@@ -167,10 +167,11 @@ public final class MsconvertWorker extends WorkerBase {
 		command.add("--filter"); // Charge state predictor
 		command.add("chargeStatePredictor false 4 2 0.9");
 
-		if (ms2Profile || agilentData(rawFile)) {
-			command.add("--filter");
-			command.add("threshold absolute 0.1 most-intense"); // The peak-picked data have a lot of 0-intensity peaks. toss those
-		}
+		command.add("--filter");
+		command.add("zeroSamples removeExtra"); // Toss 0-intensity peaks in MS1 spectra that are flanked by other 0s
+
+		command.add("--filter");
+		command.add("threshold absolute 0.000001 most-intense 2-"); // Completely toss 0-intensity peaks in MS2 spectra
 
 		// Make proper .mgf titles that Swift needs
 		if ("mgf".equals(extension)) {
