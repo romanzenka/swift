@@ -149,14 +149,9 @@ public final class MsconvertWorker extends WorkerBase {
 			throw new MprcException("Unsupported extension: " + extension);
 		}
 
-		if (ms2Profile) {
+		if (ms2Profile || agilentData(rawFile)) {
 			command.add("--filter");
-			command.add("peakPicking true 2-"); // Do peak picking on MS2 and higher
-		}
-
-		if (agilentData(rawFile)) {
-			command.add("--filter");
-			command.add("peakPicking true 1-");
+			command.add("peakPicking true 1-"); // Do peak picking
 		}
 
 		if (!includeMs1) {
@@ -171,7 +166,7 @@ public final class MsconvertWorker extends WorkerBase {
 		command.add("zeroSamples removeExtra"); // Toss 0-intensity peaks in MS1 spectra that are flanked by other 0s
 
 		command.add("--filter");
-		command.add("threshold absolute 0.000001 most-intense 2-"); // Completely toss 0-intensity peaks in MS2 spectra
+		command.add("threshold absolute 0.000001 most-intense"); // Completely toss 0-intensity peaks
 
 		// Make proper .mgf titles that Swift needs
 		if ("mgf".equals(extension)) {
