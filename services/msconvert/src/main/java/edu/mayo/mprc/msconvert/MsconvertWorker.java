@@ -163,10 +163,7 @@ public final class MsconvertWorker extends WorkerBase {
 		command.add("chargeStatePredictor false 4 2 0.9");
 
 		command.add("--filter");
-		command.add("zeroSamples removeExtra"); // Toss 0-intensity peaks in MS1 spectra that are flanked by other 0s
-
-		command.add("--filter");
-		command.add("threshold absolute 0.000001 most-intense"); // Completely toss 0-intensity peaks
+		command.add("threshold absolute 0.00000000001 most-intense"); // Completely toss 0-intensity peaks
 
 		// Make proper .mgf titles that Swift needs
 		if ("mgf".equals(extension)) {
