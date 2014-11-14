@@ -149,9 +149,13 @@ public final class MsconvertWorker extends WorkerBase {
 			throw new MprcException("Unsupported extension: " + extension);
 		}
 
-		if (ms2Profile || agilentData(rawFile)) {
+		if (ms2Profile || agilentData(rawFile)) { // Peak picking
 			command.add("--filter");
-			command.add("peakPicking true 1-"); // Do peak picking
+			if (includeMs1) {
+				command.add("peakPicking true 1-");
+			} else {
+				command.add("peakPicking true 2-");
+			}
 		}
 
 		if (!includeMs1) {
