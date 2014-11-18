@@ -9,3 +9,4 @@ target
 .idea
 deploy_atlas_test.sh
 **/rebel.xml
+node_modules
