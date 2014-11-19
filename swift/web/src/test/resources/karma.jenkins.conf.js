@@ -3,12 +3,12 @@ module.exports = function (config) {
         basePath: '../../../',
         frameworks: ['jasmine'],
         files: [
-            'src/main/webapp/report/**/*.js',
+            'src/main/webapp/report/hello.js',
             'src/test/js/**/*.js'
         ],
         exclude: [],
         preprocessors: {
-            'src/main/webapp/report/**/*.js': ['coverage']
+            'src/main/webapp/report/hello.js': ['coverage']
         },
         // added `junit`
         reporters: ['progress', 'junit', 'coverage'],
