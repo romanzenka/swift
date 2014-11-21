@@ -114,7 +114,7 @@ public final class MsconvertWorker extends WorkerBase {
 	 * @param cleanedFile Where to put the cleaned file
 	 */
 	private void cleanup(final File inputFile, final File cleanedFile) {
-		final MsconvertMgfCleanup mgfCleanup = new MsconvertMgfCleanup(inputFile);
+		final MsconvertMgfCleanup mgfCleanup = new MsconvertMgfCleanup(inputFile, 1);
 		mgfCleanup.produceCleanedMgf(cleanedFile);
 	}
 

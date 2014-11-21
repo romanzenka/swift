@@ -26,28 +26,28 @@ public final class MsconvertMgfCleanup {
 	private static final int BUFFER_SIZE = 100 * 1024;
 	private static final Pattern CHARGE = Pattern.compile("CHARGE=\\s*(.*?)\\s*$");
 	private static final Pattern SUB_CHARGE = Pattern.compile("(\\d+)");
+	private static final Pattern IONS = Pattern.compile("[+\\-0-9.eE ]+"); // Rough check for ions line
 
 	private File inputMgf;
+	private int minPeaksPerSpectrum;
 
-	public MsconvertMgfCleanup(final File inputMgf) {
+	public MsconvertMgfCleanup(final File inputMgf, final int minPeaksPerSpectrum) {
 		this.inputMgf = inputMgf;
+		this.minPeaksPerSpectrum = minPeaksPerSpectrum;
 	}
 
 	/**
 	 * @param output where to put cleaned up mgf
-	 * @return true if cleanup was actually needed. If false, the cleaned mgf was not even created.
 	 */
-	public boolean produceCleanedMgf(final File output) {
+	public void produceCleanedMgf(final File output) {
 		BufferedReader reader = null;
 		BufferedWriter writer = null;
-		boolean cleanupNeeded = false;
 		try {
 			reader = new BufferedReader(new FileReader(inputMgf), BUFFER_SIZE);
 			LOGGER.debug("Cleaning up after msconvert " + inputMgf.getAbsolutePath() + " into " + output.getAbsolutePath());
 			FileUtilities.ensureFileExists(output);
 			writer = new BufferedWriter(new FileWriter(output));
-			final String prefix = FileUtilities.stripExtension(inputMgf.getName());
-			performCleanup(reader, writer, prefix);
+			performCleanup(reader, writer);
 			LOGGER.debug("Cleaning up after msconvert finished");
 		} catch (Exception t) {
 			throw new MprcException(t);
@@ -55,14 +55,14 @@ public final class MsconvertMgfCleanup {
 			FileUtilities.closeQuietly(reader);
 			FileUtilities.closeQuietly(writer);
 		}
-		return cleanupNeeded;
 	}
 
-	static void performCleanup(final BufferedReader reader, final BufferedWriter writer, final String prefix) throws IOException {
+	void performCleanup(final BufferedReader reader, final BufferedWriter writer) throws IOException {
 		String title = null;
 		String charge = "";
 		final StringBuilder contentBuilder = new StringBuilder(500);
 		boolean run = true;
+		int ions = 0;
 
 		while (run) {
 			String line = reader.readLine();
@@ -72,7 +72,7 @@ public final class MsconvertMgfCleanup {
 			}
 
 			if (line.startsWith("BEGIN IONS")) {
-				if (contentBuilder.length() > 0) {
+				if (contentBuilder.length() > 0 && ions >= minPeaksPerSpectrum) {
 					// Dump the previous
 					if (charge.contains(" and ")) { // We have multiple charge states reported. Write the spectrum out multiple times
 						final Iterable<String> split = Splitter.on(" and ").trimResults().omitEmptyStrings().split(charge);
@@ -85,7 +85,6 @@ public final class MsconvertMgfCleanup {
 							} else {
 								replacedTitle = null;
 							}
-
 							dumpSpectrum(writer, replacedTitle, subCharge, contentBuilder);
 						}
 					} else {
@@ -96,6 +95,7 @@ public final class MsconvertMgfCleanup {
 				title = null;
 				charge = "";
 				contentBuilder.setLength(0);
+				ions = 0;
 			} else {
 				if (line.contains("=")) {
 					// We remember title to output it before charge
@@ -105,6 +105,10 @@ public final class MsconvertMgfCleanup {
 					} else if (charge.isEmpty() && line.startsWith("CHARGE=")) {
 						charge = parseCharge(line);
 						line = null;
+					}
+				} else {
+					if (line != null && IONS.matcher(line).matches()) {
+						ions++;
 					}
 				}
 				if (line != null) {
