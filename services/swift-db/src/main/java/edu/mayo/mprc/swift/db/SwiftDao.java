@@ -151,4 +151,12 @@ public interface SwiftDao extends Dao, RuntimeInitializer {
 	 * @return Current database version or 0 if the version is not known.
 	 */
 	int getDatabaseVersion();
+
+	/**
+	 * Call this upon Swift startup.
+	 * <p/>
+	 * The database can record searches that were running prior to
+	 * Swift restart. Those searches need to be marked as failed.
+	 */
+	void cleanupAfterStartup();
 }

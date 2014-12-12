@@ -10,10 +10,8 @@ import edu.mayo.mprc.swift.commands.ExitCode;
 import edu.mayo.mprc.swift.commands.SwiftCommand;
 import edu.mayo.mprc.swift.commands.SwiftCommandLine;
 import edu.mayo.mprc.swift.commands.SwiftEnvironment;
-import edu.mayo.mprc.swift.configuration.client.Configuration;
 import edu.mayo.mprc.swift.configuration.client.model.ConfigurationService;
-import edu.mayo.mprc.swift.configuration.client.model.ConfigurationServiceAsync;
-import edu.mayo.mprc.swift.configuration.server.ConfigurationServiceImpl;
+import edu.mayo.mprc.swift.db.SwiftDao;
 import edu.mayo.mprc.swift.resources.SwiftMonitor;
 import edu.mayo.mprc.swift.resources.WebUi;
 import edu.mayo.mprc.swift.resources.WebUiHolder;
@@ -116,6 +114,8 @@ public final class ServletInitialization implements SwiftCommand, ServletContext
 				getSwiftSearcherCaller().setSwiftSearcherConnection(webUi.getSwiftSearcherDaemonConnection());
 				getSwiftSearcherCaller().setBrowseRoot(webUi.getBrowseRoot());
 
+				cleanupDatabaseAfterStartup(webUi.getSwiftDao());
+
 				// Start all the services
 				daemon.start();
 
@@ -135,6 +135,20 @@ public final class ServletInitialization implements SwiftCommand, ServletContext
 			return ExitCode.Error;
 		}
 		return ExitCode.Ok;
+	}
+
+	/**
+	 * See {@link edu.mayo.mprc.swift.db.SwiftDao#cleanupAfterStartup} for explanation.
+	 */
+	private void cleanupDatabaseAfterStartup(SwiftDao swiftDao) {
+		swiftDao.begin();
+		try {
+			swiftDao.cleanupAfterStartup();
+			swiftDao.commit();
+		} catch (final Exception e) {
+			swiftDao.rollback();
+			throw new MprcException("Database cleanup after startup failed", e);
+		}
 	}
 
 	public WebUiHolder getWebUiHolder() {

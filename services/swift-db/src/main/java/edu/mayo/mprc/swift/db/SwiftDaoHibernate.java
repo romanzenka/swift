@@ -254,6 +254,19 @@ public final class SwiftDaoHibernate extends DaoBase implements SwiftDao {
 	}
 
 	@Override
+	public void cleanupAfterStartup() {
+		final Session session = getSession();
+		final Query query = session.createQuery(
+				"update SearchRun r " +
+						"set r.endTimestamp=:time, " +
+						"    r.errorMessage='Swift restarted', " +
+						"    r.errorCode=1 " +
+						"where r.endTimestamp is null and r.errorMessage is null")
+				.setParameter("time", new Date());
+		query.executeUpdate();
+	}
+
+	@Override
 	public SwiftSearchDefinition addSwiftSearchDefinition(SwiftSearchDefinition definition) {
 		try {
 			if (definition.getId() == null) {

@@ -400,7 +400,7 @@ public final class SwiftSearcher implements Worker, Lifecycle {
 	}
 
 	/**
-	 * A factory capable of creating the worker
+	 * A factory capable of creating the worker.
 	 */
 	@Component("swiftSearcherFactory")
 	public static final class Factory extends WorkerFactoryBase<Config> {

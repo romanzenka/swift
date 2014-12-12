@@ -102,4 +102,23 @@ public final class TestSwiftDaoHibernate extends DaoTest {
 			throw new MprcException(e);
 		}
 	}
+
+	@Test
+	public void shouldCleanupAfterStartup() {
+		swiftDao.begin();
+		try {
+			List<SearchRun> searchRunList = swiftDao.getSearchRunList(runFilter(), true);
+			Assert.assertNull(searchRunList.get(0).getEndTimestamp());
+			swiftDao.cleanupAfterStartup();
+			swiftDao.commit();
+
+			swiftDao.begin();
+			List<SearchRun> searchRunListAfter = swiftDao.getSearchRunList(runFilter(), true);
+			swiftDao.commit();
+			Assert.assertNotNull(searchRunListAfter.get(0).getEndTimestamp());
+		} catch (Exception e) {
+			swiftDao.rollback();
+			throw new MprcException(e);
+		}
+	}
 }
