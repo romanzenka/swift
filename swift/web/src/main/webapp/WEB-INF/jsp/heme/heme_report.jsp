@@ -35,9 +35,11 @@
 <div class="container">
     <div class="navbar navbar-your-class navbar-static-top">
         <div class="navbar-inner">
-            <a href="/" class="btn btn-info pull-right">Return to Swift</a>
-                <h1>Report: <%=report.getName()%></h1>Target Mass: <%=report.getMass()%> &#177; <%=report.getMassTolerance()%></br>
-                <small style="margin-left:20px;">Date: <%=format.format(report.getDate())%> </small>
+            <a href="/heme/heme.jsp" class="btn btn-info pull-right">Return to Reports</a>
+
+            <h1>Report: <%=report.getName()%>
+            </h1>Target Mass: <%=report.getMass()%> &#177; <%=report.getMassTolerance()%></br>
+            <small style="margin-left:20px;">Date: <%=format.format(report.getDate())%> </small>
         </div>
     </div>
 
