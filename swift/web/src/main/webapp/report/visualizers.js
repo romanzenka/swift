@@ -451,7 +451,7 @@ TaskItemVisualizer.prototype.fillWithContents = function (element, id, object) {
             case "Running":
                 text = object.title;
                 if (object.percentDone) {
-                    text += " " + object.percentDone + "%";
+                    text += " " + (Math.round(object.percentDone * 10) / 10) + "%";
                 }
                 item.className = "status-running";
                 break;
