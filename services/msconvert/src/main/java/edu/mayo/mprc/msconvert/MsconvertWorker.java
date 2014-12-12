@@ -114,7 +114,7 @@ public final class MsconvertWorker extends WorkerBase {
 	 * @param cleanedFile Where to put the cleaned file
 	 */
 	private void cleanup(final File inputFile, final File cleanedFile) {
-		final MsconvertMgfCleanup mgfCleanup = new MsconvertMgfCleanup(inputFile);
+		final MsconvertMgfCleanup mgfCleanup = new MsconvertMgfCleanup(inputFile, 1);
 		mgfCleanup.produceCleanedMgf(cleanedFile);
 	}
 
@@ -149,14 +149,13 @@ public final class MsconvertWorker extends WorkerBase {
 			throw new MprcException("Unsupported extension: " + extension);
 		}
 
-		if (ms2Profile) {
+		if (ms2Profile || agilentData(rawFile)) { // Peak picking
 			command.add("--filter");
-			command.add("peakPicking true 2-"); // Do peak picking on MS2 and higher
-		}
-
-		if (agilentData(rawFile)) {
-			command.add("--filter");
-			command.add("peakPicking true 1-");
+			if (includeMs1) {
+				command.add("peakPicking true 1-");
+			} else {
+				command.add("peakPicking true 2-");
+			}
 		}
 
 		if (!includeMs1) {
@@ -167,10 +166,8 @@ public final class MsconvertWorker extends WorkerBase {
 		command.add("--filter"); // Charge state predictor
 		command.add("chargeStatePredictor false 4 2 0.9");
 
-		if (ms2Profile || agilentData(rawFile)) {
-			command.add("--filter");
-			command.add("threshold absolute 0.1 most-intense"); // The peak-picked data have a lot of 0-intensity peaks. toss those
-		}
+		command.add("--filter");
+		command.add("threshold absolute 0.00000000001 most-intense"); // Completely toss 0-intensity peaks
 
 		// Make proper .mgf titles that Swift needs
 		if ("mgf".equals(extension)) {

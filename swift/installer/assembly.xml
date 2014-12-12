@@ -14,6 +14,8 @@
             <directory>target/generated-resources/appassembler/jsw/swift</directory>
             <excludes>
                 <exclude>bin/**</exclude>
+                <exclude>conf/wrapper.conf</exclude>
+                <!-- We rename the conf file -->
             </excludes>
             <outputDirectory></outputDirectory>
             <filtered>false</filtered>
@@ -28,6 +30,15 @@
             <directoryMode>755</directoryMode>
         </fileSet>
     </fileSets>
+    <files>
+        <file>
+            <source>target/generated-resources/appassembler/jsw/swift/conf/wrapper.conf</source>
+            <outputDirectory>/conf</outputDirectory>
+            <destName>wrapper.conf.sample</destName>
+            <filtered>false</filtered>
+            <fileMode>644</fileMode>
+        </file>
+    </files>
     <dependencySets>
         <dependencySet>
             <useProjectArtifact>false</useProjectArtifact>

@@ -397,8 +397,8 @@ public class TestSearchRunner {
 				+ 1 /* msmsEval */
 
 				+ (doSemiTryptic ?
-					2 : /* We used to be able to reuse Comet result, but requiring sqt for Scaffold prevents us from doing so */
-					2 /* tryptic means we need extra semitryptic comet and idpicker */)
+				2 : /* We used to be able to reuse Comet result, but requiring sqt for Scaffold prevents us from doing so */
+				2 /* tryptic means we need extra semitryptic comet and idpicker */)
 				+ 1 /* QuaMeter */
 				+ 1 /* QuaMeter db load */;
 
