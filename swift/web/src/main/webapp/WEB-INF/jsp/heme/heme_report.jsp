@@ -61,6 +61,7 @@
             <th></th>
         </tr>
         </thead>
+        <tbody>
         <% for (ProteinEntity p : confirmedList) {%>
         <tr>
             <td><%=p.getAccNum()%></td>
@@ -71,6 +72,7 @@
             <td><a href="#modal_<%=p.getAccNum()%>" role="button" class="btn" data-toggle="modal">View</a></td>
         </tr>
         <%}%>
+        </tbody>
     </table>
 
 
@@ -89,6 +91,7 @@
                     <th>Mass <%=HemeHelper.arrows()%></th>
             </tr>
         </thead>
+        <tbody>
         <% for (ProteinEntity p : relatedList) { %>
         <tr>
             <td><%=p.getAccNum()%></td>
@@ -97,6 +100,7 @@
             <td><%=p.getMass()%></td>
         </tr>
         <% } %>
+        </tbody>
     </table>
 
 
@@ -113,6 +117,7 @@
          <th>Description <%=HemeHelper.arrows()%></th>
         </tr>
         </thead>
+        <tbody>
         <% for (ProteinEntity p : otherList) {%>
         <tr>
             <td><a href="http://www.genome.jp/dbget-bin/www_bget?sp:<%=p.getAccNum()%>"><%=p.getAccNum()%></a></td>
@@ -120,6 +125,7 @@
             <td><small><%=p.getNeatDescription()%></small></td>
         </tr>
         <%}%>
+        </tbody>
     </table>
 
 
