@@ -78,6 +78,10 @@ public class HemeScaffoldReader extends ScaffoldReportReader {
                 //prot.setSequence(mutationSequenceCache.get(accNum));
                 prot.setFilter(ProteinEntity.Filter.MUTATION_CONFIRMED);
             }
+            else if(massCheck && !mutationCheck){
+                //prot.setSequence(mutationSequenceCache.get(accNum));
+                prot.setFilter(ProteinEntity.Filter.UNSUPPORTED);
+            }
             // Else: Mutation Proteins either outside of mass range or completely missing the target mutation
             else if(mutationCheck){
                 prot.setFilter(ProteinEntity.Filter.RELATED_MUTANT);
