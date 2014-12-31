@@ -13,15 +13,17 @@ function FilterButton(id, title, dropdown) {
 }
 
 FilterButton.prototype.displayDropdown = function(evt) {
-    if (this.dropdown) {
-        var id = this.id;
-        var pos = new Position.cumulativeOffset(this.root);
-        pos[1] += $(this.root).getHeight();
+    var t = evt.data.obj;
+    if (t.dropdown) {
+        var id = t.id;
+        var pos = $(t.root).offset();
+        pos.left += $(t.root).outerWidth() - $(t.dropdown.toplevel).outerWidth();
+        pos.top += $(t.root).outerHeight();
 
-        this.dropdown.display(pos[0] + "px", pos[1] + "px");
+        t.dropdown.display(pos.left + "px", pos.top + "px");
     }
 
-    Event.stop(evt);
+    evt.stopPropagation();
 };
 
 FilterButton.prototype.render = function() {
@@ -33,7 +35,7 @@ FilterButton.prototype.render = function() {
         this.filterButton = document.createElement("a");
         this.filterButton.className = "filter_button";
         this.filterButton.href = "#";
-        Event.observe(this.filterButton, 'click', this.displayDropdown.bindAsEventListener(this));
+        $(this.filterButton).on('click', {"obj": this}, this.displayDropdown);
     }
 
     if (this.dropdown) {
@@ -43,16 +45,15 @@ FilterButton.prototype.render = function() {
         this.sortButton = document.createElement("span");
     }
     this.sortButton.className = "sort_button" + (this.dropdown ? "" : " no_dropdown");
-    this.sortButton.appendChild(document.createTextNode(this.title));
-
-    // Event.observe(this.sortButton, 'click')
+    $(this.sortButton).append(document.createTextNode(this.title));
 
     var div = document.createElement("div");
     div.style.position = "relative";
     div.style.height = "1.2em";
     this.root.appendChild(div);
-    if (this.filterButton)
+    if (this.filterButton) {
         div.appendChild(this.filterButton);
+    }
     div.appendChild(this.sortButton);
 
     return this.root;
@@ -78,8 +79,8 @@ function FilterDropDown(id) {
     this.toplevel.className = "dropdown";
     this.toplevel.id = this.id + "_dropdown";
 
-    this.form = $(document.createElement("form"));
-    this.root = $(document.createElement('ul'));
+    this.form = document.createElement("form");
+    this.root = document.createElement('ul');
 
     this.form.appendChild(this.root);
     this.toplevel.appendChild(this.form);
@@ -89,21 +90,25 @@ FilterDropDown.prototype.getRoot = function() {
     return this.toplevel;
 };
 
-FilterDropDown.prototype.whereSelectAll = function(evt, whereGroupId) {
-    for (var i = 0; i < this[whereGroupId].numOptions; i++) {
-        $(this.id + '_' + whereGroupId + '_' + i).checked = this[whereGroupId].selectAll.checked;
+FilterDropDown.prototype.whereSelectAll = function (evt) {
+    var whereGroupId = evt.data.id;
+    var t = evt.data.obj;
+    for (var i = 0; i < t[whereGroupId].numOptions; i++) {
+        $('#' + t.id + '_' + whereGroupId + '_' + i)[0].checked = t[whereGroupId].selectAll.checked;
     }
 };
 
-FilterDropDown.prototype.checkSelectAll = function(evt, whereGroupId) {
+FilterDropDown.prototype.checkSelectAll = function (evt) {
+    var whereGroupId = evt.data.id;
+    var t = evt.data.obj;
     var allChecked = true;
-    for (var i = 0; i < this[whereGroupId].numOptions; i++) {
-        if (!$(this.id + '_' + whereGroupId + '_' + i).checked) {
+    for (var i = 0; i < t[whereGroupId].numOptions; i++) {
+        if (!$('#' + t.id + '_' + whereGroupId + '_' + i)[0].checked) {
             allChecked = false;
             break;
         }
     }
-    this[whereGroupId].selectAll.checked = allChecked;
+    t[whereGroupId].selectAll.checked = allChecked;
 };
 
 // Automatically creates a "select all" checkbox as the first one of the group
@@ -115,9 +120,8 @@ FilterDropDown.prototype.addCheckboxes = function(id, type, titleArray, sqlArray
     var groupId = this.id + '_' + id;
     var checked = allChecked ? 'checked' : '';
     var selectAll = document.createElement('li');
-    new Insertion.Bottom(selectAll,
-            '<label for="' + groupId + '_all"><input type="checkbox" ' + checked + ' value="All" id="' + groupId + '_all">(Select all)</label>');
-    var selectAllButton = selectAll.getElementsByTagName('input')[0];
+    $(selectAll).append('<label for="' + groupId + '_all"><input type="checkbox" ' + checked + ' value="All" id="' + groupId + '_all">(Select all)</label>');
+    var selectAllButton = $(selectAll).find('input')[0];
     this[id] = {
         'type': type,
         'selectAll' : selectAllButton,
@@ -135,9 +139,9 @@ FilterDropDown.prototype.addCheckboxes = function(id, type, titleArray, sqlArray
             return checkedList;
         }
     };
-    Event.observe(selectAllButton, 'click', this.whereSelectAll.bindAsEventListener(this, id));
+    $(selectAllButton).on('click', {"id": id, "obj": this}, this.whereSelectAll);
 
-    this.root.appendChild(selectAll);
+    $(this.root).append(selectAll);
 
     this[id].checkboxes = new Array(titleArray.length);
     this[id].storeValues = function() {
@@ -183,12 +187,11 @@ FilterDropDown.prototype.addCheckboxes = function(id, type, titleArray, sqlArray
 
     for (var i = 0; i < titleArray.length; i++) {
         var checkboxId = groupId + '_' + i;
-        new Insertion.Bottom(this.root,
-                '<li><input type="checkbox" ' + checked + ' value="' + sqlArray[i] + '" id="' + checkboxId + '"><label for="' + checkboxId + '">' + titleArray[i] + '</label></li>');
-        var checkboxes = this.root.getElementsByTagName('input');
+        $(this.root).append('<li><input type="checkbox" ' + checked + ' value="' + sqlArray[i] + '" id="' + checkboxId + '"><label for="' + checkboxId + '">' + titleArray[i] + '</label></li>');
+        var checkboxes = $(this.root).find('input');
         var checkbox = checkboxes[checkboxes.length - 1];
         this[id].checkboxes[i] = checkbox;
-        Event.observe(checkbox, 'click', this.checkSelectAll.bindAsEventListener(this, id));
+        $(checkbox).on('click', {"id": id, "obj": this}, this.checkSelectAll);
     }
 };
 
@@ -263,9 +266,8 @@ FilterDropDown.prototype.addRadioButtons = function(id, type, titleArray, sqlArr
     for (var i = 0; i < titleArray.length; i++) {
         var realId = offset + i;
         var checked = realId == indexChecked ? 'checked' : '';
-        new Insertion.Bottom(this.root,
-                '<li><input type="radio" name="' + groupId + '" ' + checked + ' value="' + sqlArray[i] + '" id="' + groupId + '_' + realId + '"><label for="' + groupId + '_' + realId + '">' + titleArray[i] + '</label></li>');
-        var radios = this.root.getElementsByTagName('input');
+        $(this.root).append('<li><input type="radio" name="' + groupId + '" ' + checked + ' value="' + sqlArray[i] + '" id="' + groupId + '_' + realId + '"><label for="' + groupId + '_' + realId + '">' + titleArray[i] + '</label></li>');
+        var radios = $(this.root).find('input');
         this[id].radios[realId] = radios[radios.length - 1];
     }
 };
@@ -309,45 +311,47 @@ FilterDropDown.prototype.addTextBox = function(id) {
         this.textbox.value = cookie;
     };
 
-    new Insertion.Bottom(this.root,
-            '<li><input type="text" name="' + itemId + '" value="" id="' + itemId + '"></li>');
-    var inputs = this.root.getElementsByTagName('input');
+    $(this.root).append('<li><input type="text" name="' + itemId + '" value="" id="' + itemId + '"></li>');
+    var inputs = $(this.root).find('input');
     this[id].textbox = inputs[inputs.length - 1];
 };
 
 FilterDropDown.prototype.addText = function(text) {
-    new Insertion.Bottom(this.root, '<li>' + text + '</li>');
+    $(this.root).append('<li>' + text + '</li>');
 };
 
 FilterDropDown.prototype.display = function(left, top) {
     this.storeValues();
-    $('popupMask').style.display = 'block';
-    this.toplevel.style.left = left;
-    this.toplevel.style.top = top;
-    this.toplevel.style.display = 'block';
+    $('#popupMask').css("display", 'block');
+    $(this.toplevel)
+        .css("left", left)
+        .css("top", top)
+        .css("display", "block");
 };
 
 FilterDropDown.prototype.hide = function() {
-    $('popupMask').style.display = 'none';
-    this.toplevel.style.display = 'none';
+    $('#popupMask').css("display", 'none');
+    $(this.toplevel)
+        .css("display", 'none');
 };
 
 FilterDropDown.prototype.cancel = function(evt) {
-    this.hide();
-    this.restoreValues();
-    Event.stop(evt);
+    evt.data.obj.hide();
+    evt.data.obj.restoreValues();
+    evt.stopPropagation();
 };
 
 FilterDropDown.prototype.onSubmitCallback = null;
 
 FilterDropDown.prototype.submit = function(evt) {
-    this.hide();
-    this.storeValues();
-    this.updateFilterButton();
+    var t = evt.data.obj;
+    t.hide();
+    t.storeValues();
+    t.updateFilterButton();
 
-    Event.stop(evt);
-    if (this.onSubmitCallback) {
-        this.onSubmitCallback();
+    evt.stopPropagation();
+    if (t.onSubmitCallback) {
+        t.onSubmitCallback();
     }
 };
 
@@ -453,14 +457,14 @@ FilterDropDown.prototype.removeSort = function() {
 };
 
 FilterDropDown.prototype.addOkCancel = function() {
-    new Insertion.Bottom(this.root, '<li><input type="submit" value="Ok" class="okbutton" class="okbutton"> <input type="button" value="Cancel" class="cancelbutton"></li>');
+    $(this.root).append('<li><input type="submit" value="Ok" class="okbutton" class="okbutton"> <input type="button" value="Cancel" class="cancelbutton"></li>');
 
-    Event.observe(this.root.getElementsByClassName("cancelbutton")[0], 'click', this.cancel.bindAsEventListener(this));
-    Event.observe(this.form, 'submit', this.submit.bindAsEventListener(this));
+    $(this.root).find(".cancelbutton").on('click', {"obj": this}, this.cancel);
+    $(this.form).on('submit', {"obj": this}, this.submit);
 };
 
 FilterDropDown.prototype.addSeparator = function() {
-    new Insertion.Bottom(this.root, '<li class="hr">&nbsp;</li>');
+    $(this.root).append('<li class="hr">&nbsp;</li>');
 };
 
 FilterDropDown.prototype.getRequestString = function() {

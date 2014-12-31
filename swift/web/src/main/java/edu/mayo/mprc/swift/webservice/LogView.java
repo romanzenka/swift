@@ -4,6 +4,7 @@ import edu.mayo.mprc.MprcException;
 import edu.mayo.mprc.swift.db.SwiftDao;
 import edu.mayo.mprc.swift.dbmapping.LogData;
 import edu.mayo.mprc.swift.dbmapping.TaskData;
+import edu.mayo.mprc.swift.resources.WebUiHolder;
 import edu.mayo.mprc.utilities.FileUtilities;
 import edu.mayo.mprc.utilities.StringUtilities;
 import org.springframework.stereotype.Controller;
@@ -33,6 +34,9 @@ public final class LogView {
 	@Resource(name = "swiftDao")
 	private SwiftDao swiftDao;
 
+	@Resource(name = "webUiHolder")
+	private WebUiHolder webUiHolder;
+
 	private static final Pattern TIME_STAMP = Pattern.compile("^(\\d{1,4}-\\d{1,2}-\\d{1,2}) (\\d{1,2}:\\d{1,2}:\\d{1,2},\\d{1,3})\\s(.*)");
 	private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss,SSS");
 
@@ -57,7 +61,7 @@ public final class LogView {
 					"<html>\n" +
 					"<head lang=\"en\">\n" +
 					"    <meta charset=\"UTF-8\">\n" +
-					"    <title>Log file for task " + taskId + "</title>\n" +
+					"    <title>Log file for task " + taskId + " | " + webUiHolder.getWebUi().getTitle() + "</title>\n" +
 					"    <style type=\"text/css\">\n" +
 					"        log {\n" +
 					"            font-family: monospace;\n" +

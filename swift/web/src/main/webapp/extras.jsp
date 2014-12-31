@@ -7,7 +7,8 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>Swift Extras</title>
+    <title>Swift Extras | <%=SwiftWebContext.getWebUi().getTitle()%>
+    </title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="common/bootstrap/css/bootstrap.min.css" rel="stylesheet" media="screen">
     <!-- HTML5 shim, for IE6-8 support of HTML5 elements -->

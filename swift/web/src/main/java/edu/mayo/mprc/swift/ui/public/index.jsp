@@ -1,7 +1,8 @@
 <%@ page import="edu.mayo.mprc.swift.SwiftWebContext" %>
 <html>
 <head>
-    <title>New Swift Search</title>
+    <title>New Swift Search | <%=SwiftWebContext.getWebUi().getTitle()%>
+    </title>
     <meta name='gwt:module' content='edu.mayo.mprc.swift.ui.SwiftApp'>
     <meta HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=utf-8">
     <meta Http-Equiv="Cache-Control" Content="no-cache">

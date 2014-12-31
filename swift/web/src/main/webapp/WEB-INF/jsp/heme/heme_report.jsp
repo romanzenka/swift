@@ -1,6 +1,7 @@
 <%@ page import="edu.mayo.mprc.heme.HemeReport" %>
 <%@ page import="edu.mayo.mprc.heme.PeptideEntity" %>
 <%@ page import="edu.mayo.mprc.heme.ProteinEntity" %>
+<%@ page import="edu.mayo.mprc.swift.SwiftWebContext" %>
 <%@ page import="edu.mayo.mprc.swift.helper.HemeHelper" %>
 <%@ page import="java.text.SimpleDateFormat" %>
 <%@ page import="java.util.List" %>
@@ -14,7 +15,8 @@
 %>
 <html>
 <head>
-    <title>HEME REPORT PAGE</title>
+    <title>Report | <%=SwiftWebContext.getWebUi().getTitle()%>
+    </title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="/common/bootstrap/css/bootstrap.min.css" rel="stylesheet" media="screen">
     <script type="text/javascript" src="/common/bootstrap/js/jquery_1.9.0.min.js"></script>

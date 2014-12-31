@@ -7,6 +7,7 @@ import edu.mayo.mprc.searchdb.dao.Report;
 import edu.mayo.mprc.searchdb.dao.SearchDbDao;
 import edu.mayo.mprc.swift.db.SwiftDao;
 import edu.mayo.mprc.swift.dbmapping.ReportData;
+import edu.mayo.mprc.swift.resources.WebUiHolder;
 import edu.mayo.mprc.utilities.FileUtilities;
 import org.springframework.web.HttpRequestHandler;
 
@@ -24,6 +25,7 @@ import java.io.OutputStreamWriter;
 public class AnalysisReport implements HttpRequestHandler {
 	private SearchDbDao searchDbDao;
 	private SwiftDao swiftDao;
+	private WebUiHolder webUiHolder;
 
 	@Override
 	public void handleRequest(final HttpServletRequest req, final HttpServletResponse resp) throws ServletException, IOException {
@@ -47,7 +49,8 @@ public class AnalysisReport implements HttpRequestHandler {
 				ReportData reportForId = getSwiftDao().getReportForId(reportId);
 				final Analysis analysis = searchDbDao.getAnalysis((int) (long) reportForId.getAnalysisId());
 
-				writer.write("<html><head><title>Scaffold Report</title>\n" +
+				writer.write("<html><head><title>Scaffold Report | " + webUiHolder.getWebUi().getTitle()
+						+ "</title>\n" +
 						"<link rel=\"stylesheet\" href=\"/report/analysis.css\" type=\"text/css\">\n" +
 						"<link href='http://fonts.googleapis.com/css?family=PT+Sans' rel='stylesheet' type='text/css'>\n" +
 						"</head><body>\n");
@@ -80,6 +83,14 @@ public class AnalysisReport implements HttpRequestHandler {
 
 	public void setSwiftDao(SwiftDao swiftDao) {
 		this.swiftDao = swiftDao;
+	}
+
+	public WebUiHolder getWebUiHolder() {
+		return webUiHolder;
+	}
+
+	public void setWebUiHolder(WebUiHolder webUiHolder) {
+		this.webUiHolder = webUiHolder;
 	}
 }
 

@@ -7,7 +7,8 @@
     <% if (ServletInitialization.redirectToConfig(getServletConfig().getServletContext(), response)) {
         return;
     } %>
-    <title>Swift - search using multiple engines</title>
+    <title><%=SwiftWebContext.getWebUi().getTitle()%>
+    </title>
     <!--
     <%=ReleaseInfoCore.buildVersion()%>
     -->
