@@ -87,7 +87,7 @@ public final class QaTask extends AsyncTaskBase {
 
 	@Override
 	public WorkPacket createWorkPacket() {
-		if (!isFromScratch() && reportFile.exists() && reportFile.isFile()) {
+		if (!isFromScratch()) {
 			return null;
 		}
 

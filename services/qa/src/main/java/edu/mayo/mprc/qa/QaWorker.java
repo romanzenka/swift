@@ -84,7 +84,7 @@ public final class QaWorker extends WorkerBase {
 			for (final ExperimentQa experimentQa : experimentQas) {
 				final List<QaFiles> entries = experimentQa.getQaFiles();
 				for (final QaFiles me : entries) {
-					atLeastOneFileMissing = addRScriptInputLine(fileWriter, qaReportFolder, experimentQa, generatedFileList, me, atLeastOneFileMissing);
+					atLeastOneFileMissing |= addRScriptInputLine(fileWriter, qaReportFolder, experimentQa, generatedFileList, me);
 					numFilesDone++;
 					reportProgress(numFilesDone * PERCENT_GENERATING_FILES / numFilesTotal, progressReporter);
 				}
@@ -124,10 +124,10 @@ public final class QaWorker extends WorkerBase {
 
 	private boolean addRScriptInputLine(final FileWriter fileWriter, final File qaReportFolder, final ExperimentQa experimentQa,
 	                                    final LinkedList<File> generatedFiles,
-	                                    final QaFiles qaFiles,
-	                                    boolean atLeastOneFileMissing) throws IOException {
+	                                    final QaFiles qaFiles) throws IOException {
 		final String uniqueMgfAnalysisName;
 		boolean generate;
+
 		final File msmsEvalDiscriminantFile;
 		final File ticFile;
 		final File mgfFile = qaFiles.getInputFile();
@@ -163,7 +163,10 @@ public final class QaWorker extends WorkerBase {
 
 		final MyriMatchPepXmlReader myrimatchReader = getMyriMatchReader(qaFiles.getAdditionalSearchResults());
 
-		if (!outputFile.exists() || outputFile.length() == 0) {
+		long newestInputTime = getNewestInputTime(experimentQa, qaFiles);
+
+		boolean atLeastOneFileMissing = false;
+		if (!outputFile.exists() || outputFile.length() == 0 || outputFile.lastModified() < newestInputTime) {
 
 			LOGGER.info("Generating output file [" + outputFile.getAbsolutePath() + "]");
 
@@ -224,6 +227,34 @@ public final class QaWorker extends WorkerBase {
 		final File chromatogramFile = qaFiles.getChromatogramFile();
 		writeInputLine(fileWriter, outputFile, massCalibrationRtFile, massCalibrationMzFile, mzRtFile, sourceCurrentFile, msmsEvalDiscriminantFile, generate, qaFiles, pepTolFile, ticFile, chromatogramFile, uvDataFile);
 		return atLeastOneFileMissing;
+	}
+
+	/**
+	 * Go through all QA input files, find the modification time that is the newest.
+	 *
+	 * @param experimentQa Info from Scaffold
+	 * @param qaFiles      Info about QA files for this particular input set
+	 * @return Timestamp of the newest existing input file
+	 */
+	private long getNewestInputTime(ExperimentQa experimentQa, QaFiles qaFiles) {
+		final Collection<File> allInputFiles = new ArrayList<File>(10);
+		allInputFiles.add(qaFiles.getInputFile());
+		allInputFiles.add(experimentQa.getScaffoldSpectraFile());
+		allInputFiles.add(qaFiles.getRawSpectraFile());
+		allInputFiles.add(qaFiles.getMsmsEvalOutputFile());
+		allInputFiles.add(qaFiles.getUvDataFile());
+		allInputFiles.add(qaFiles.getRawInputFile());
+		allInputFiles.addAll(qaFiles.getAdditionalSearchResults().values());
+		long newestInputTime = Long.MIN_VALUE;
+		for (final File file : allInputFiles) {
+			if (file != null) {
+				final long lastModified = file.lastModified();
+				if (lastModified > newestInputTime) {
+					newestInputTime = lastModified;
+				}
+			}
+		}
+		return newestInputTime;
 	}
 
 	/**
