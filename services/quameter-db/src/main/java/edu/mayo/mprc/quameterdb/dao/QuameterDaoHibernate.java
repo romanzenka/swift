@@ -194,7 +194,7 @@ public final class QuameterDaoHibernate extends DaoBase implements QuameterDao, 
 			for (int i = 0; i < counts.length; i++) {
 				final QuameterProteinGroup quameterGroup = quameterProteinGroups.get(i);
 				if (quameterGroup.matches(accnums)) {
-					counts[i] += proteinGroup.getNumberOfUniqueSpectra();
+					counts[i] += proteinGroup.getNumberOfTotalSpectra();
 				}
 			}
 		}

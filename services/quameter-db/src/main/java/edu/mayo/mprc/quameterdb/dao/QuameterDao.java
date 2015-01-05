@@ -63,7 +63,9 @@ public interface QuameterDao extends Dao {
 	 * @param fileSearchId   Saved info about file search that was used to process the input file
 	 * @param searchResultId Direct link to the search results  for the file.
 	 * @param proteinGroups  Currently defined protein groups
-	 * @return Count of spectra corresponding to protein groups for given file search
+	 * @return Count of spectra corresponding to protein groups for given file search.
+	 * We use {@link edu.mayo.mprc.searchdb.dao.ProteinGroup#getNumberOfTotalSpectra()}, so the value can be larger
+	 * than it should be.
 	 */
 	Map<QuameterProteinGroup, Integer> getIdentifiedSpectra(int fileSearchId, int searchResultId, List<QuameterProteinGroup> proteinGroups);
 
