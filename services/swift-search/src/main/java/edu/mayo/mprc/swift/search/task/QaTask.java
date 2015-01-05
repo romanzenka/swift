@@ -87,10 +87,6 @@ public final class QaTask extends AsyncTaskBase {
 
 	@Override
 	public WorkPacket createWorkPacket() {
-		if (!isFromScratch()) {
-			return null;
-		}
-
 		final List<ExperimentQa> experimentQaList = new ArrayList<ExperimentQa>(experimentList.size());
 		for (final QaTaskExperiment experiment : experimentList) {
 			final List<QaFiles> inputFilePairs = new ArrayList<QaFiles>();
