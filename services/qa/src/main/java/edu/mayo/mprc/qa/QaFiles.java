@@ -1,8 +1,10 @@
 package edu.mayo.mprc.qa;
 
+import com.google.common.collect.Lists;
 import edu.mayo.mprc.daemon.files.FileHolder;
 
 import java.io.File;
+import java.util.Collection;
 import java.util.HashMap;
 
 /**
@@ -102,5 +104,20 @@ public final class QaFiles extends FileHolder {
 
 	public void addAdditionalSearchResult(final String searchEngineCode, final File resultingFile) {
 		additionalSearchResults.put(searchEngineCode, resultingFile);
+	}
+
+	public long getNewestModificationDate() {
+		Collection<File> files = Lists.newArrayList(inputFile, rawInfoFile, msmsEvalOutputFile, rawInfoFile, rawSpectraFile, chromatogramFile, uvDataFile);
+		files.addAll(additionalSearchResults.values());
+		long newestModificationDate = Long.MIN_VALUE;
+		for (File file : files) {
+			if (file != null) {
+				final long l = file.lastModified();
+				if (l > newestModificationDate) {
+					newestModificationDate = l;
+				}
+			}
+		}
+		return newestModificationDate;
 	}
 }

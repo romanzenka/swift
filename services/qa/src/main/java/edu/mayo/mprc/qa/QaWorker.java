@@ -105,7 +105,7 @@ public final class QaWorker extends WorkerBase {
 			}
 
 			reportProgress(COMPLETE, progressReporter);
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			throw new MprcException("Processing of QA work packet failed.", e);
 		} finally {
 			if (!writerIsClosed) {
@@ -125,21 +125,16 @@ public final class QaWorker extends WorkerBase {
 	private boolean addRScriptInputLine(final FileWriter fileWriter, final File qaReportFolder, final ExperimentQa experimentQa,
 	                                    final LinkedList<File> generatedFiles,
 	                                    final QaFiles qaFiles) throws IOException {
-		final String uniqueMgfAnalysisName;
-		boolean generate;
 
 		final File msmsEvalDiscriminantFile;
 		final File ticFile;
 		final File mgfFile = qaFiles.getInputFile();
 
-		// The name of the analysis output file is the original .mgf name combined with scaffold version to make it unique
-		uniqueMgfAnalysisName = FileUtilities.getFileNameWithoutExtension(mgfFile) + "." +
-				(experimentQa.getScaffoldVersion().startsWith("2") ? "sfd" : "sf3");
+		// The name of the analysis output file is the original .mgf name combined with Scaffold version (we used to support running two versions of Scaffold simultaneously, not anymore)
+		final String uniqueMgfAnalysisName = getAnalysisName(mgfFile);
+		final File outputFile = getSfsFileName(qaReportFolder, uniqueMgfAnalysisName);
 
-		generate = false;
 		final List<File> rScriptOutputFilesSet = new ArrayList<File>(INITIAL_OUTPUT_FILES);
-
-		final File outputFile = new File(qaReportFolder, uniqueMgfAnalysisName + ".sfs");
 
 		final File massCalibrationRtFile = new File(qaReportFolder, uniqueMgfAnalysisName + ".calRt.png");
 		final File massCalibrationMzFile = new File(qaReportFolder, uniqueMgfAnalysisName + ".calMz.png");
@@ -163,9 +158,11 @@ public final class QaWorker extends WorkerBase {
 
 		final MyriMatchPepXmlReader myrimatchReader = getMyriMatchReader(qaFiles.getAdditionalSearchResults());
 
-		long newestInputTime = getNewestInputTime(experimentQa, qaFiles);
+		final long newestInputTime = getNewestInputTime(experimentQa, qaFiles);
 
 		boolean atLeastOneFileMissing = false;
+		boolean generate = false;
+
 		if (!outputFile.exists() || outputFile.length() == 0 || outputFile.lastModified() < newestInputTime) {
 
 			LOGGER.info("Generating output file [" + outputFile.getAbsolutePath() + "]");
@@ -230,30 +227,35 @@ public final class QaWorker extends WorkerBase {
 	}
 
 	/**
+	 * @param mgfFile File being visualized
+	 * @return The root name for the output files, based on the name of the mgf file
+	 */
+	public static String getAnalysisName(final File mgfFile) {
+		return FileUtilities.getFileNameWithoutExtension(mgfFile) + ".sf3";
+	}
+
+	/**
+	 * We expose this function so the {@code QaTask} can determine if outputs already exist.
+	 *
+	 * @param qaReportFolder        Folder with outputs
+	 * @param uniqueMgfAnalysisName Result of {@link #getAnalysisName}.
+	 * @return Name of the .sfs file to be generated.
+	 */
+	public static File getSfsFileName(final File qaReportFolder, final String uniqueMgfAnalysisName) {
+		return new File(qaReportFolder, uniqueMgfAnalysisName + ".sfs");
+	}
+
+	/**
 	 * Go through all QA input files, find the modification time that is the newest.
 	 *
 	 * @param experimentQa Info from Scaffold
 	 * @param qaFiles      Info about QA files for this particular input set
 	 * @return Timestamp of the newest existing input file
 	 */
-	private long getNewestInputTime(ExperimentQa experimentQa, QaFiles qaFiles) {
-		final Collection<File> allInputFiles = new ArrayList<File>(10);
-		allInputFiles.add(qaFiles.getInputFile());
-		allInputFiles.add(experimentQa.getScaffoldSpectraFile());
-		allInputFiles.add(qaFiles.getRawSpectraFile());
-		allInputFiles.add(qaFiles.getMsmsEvalOutputFile());
-		allInputFiles.add(qaFiles.getUvDataFile());
-		allInputFiles.add(qaFiles.getRawInputFile());
-		allInputFiles.addAll(qaFiles.getAdditionalSearchResults().values());
-		long newestInputTime = Long.MIN_VALUE;
-		for (final File file : allInputFiles) {
-			if (file != null) {
-				final long lastModified = file.lastModified();
-				if (lastModified > newestInputTime) {
-					newestInputTime = lastModified;
-				}
-			}
-		}
+	private long getNewestInputTime(final ExperimentQa experimentQa, final QaFiles qaFiles) {
+		long newestInputTime = qaFiles.getNewestModificationDate();
+		final long l = experimentQa.getScaffoldSpectraFile().lastModified();
+		newestInputTime = Math.max(newestInputTime, l);
 		return newestInputTime;
 	}
 
