@@ -4,7 +4,6 @@ import edu.mayo.mprc.MprcException;
 import org.apache.log4j.Logger;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
-import org.hibernate.dialect.function.VarArgsSQLFunction;
 import org.hibernate.usertype.UserType;
 
 import java.util.*;
@@ -91,9 +90,6 @@ public final class DatabaseUtilities {
 			cfg.addResource(resource);
 		}
 
-		// Configure the "greatest" SQL function that works both in MySQL and MSSQL
-		cfg.addSqlFunction("greatest", new VarArgsSQLFunction("greatest(", ",", ")"));
-
 		schemaInitialization(cfg, initialization);
 
 		cfg.setProperty("hibernate.connection.driver_class", driverClassName);
@@ -121,6 +117,7 @@ public final class DatabaseUtilities {
 		for (final Map.Entry<String, String> entry : hibernateProperties.entrySet()) {
 			cfg.setProperty(entry.getKey(), entry.getValue());
 		}
+
 		return cfg;
 	}
 

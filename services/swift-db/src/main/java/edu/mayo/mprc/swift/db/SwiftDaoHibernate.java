@@ -14,6 +14,7 @@ import edu.mayo.mprc.unimod.ModSet;
 import edu.mayo.mprc.unimod.ModSpecificity;
 import edu.mayo.mprc.unimod.Unimod;
 import edu.mayo.mprc.unimod.UnimodDao;
+import edu.mayo.mprc.utilities.ComparisonChain;
 import edu.mayo.mprc.utilities.FileUtilities;
 import edu.mayo.mprc.utilities.progress.ProgressReport;
 import edu.mayo.mprc.workflow.persistence.TaskState;
@@ -89,10 +90,11 @@ public final class SwiftDaoHibernate extends DaoBase implements SwiftDao {
 	public List<TaskData> getTaskDataList(final int searchRunId) {
 		try {
 			// We want to sort by start timestamp, if not available, by queue start timestamp
-			return (List<TaskData>) getSession().createQuery("from TaskData t where t.searchRun.id=:searchRunId" +
-					" order by greatest(coalesce(t.startTimestamp, 0), coalesce(t.queueTimestamp, 0)) desc")
+			final List<TaskData> list = (List<TaskData>) getSession().createQuery("from TaskData t where t.searchRun.id=:searchRunId")
 					.setInteger("searchRunId", searchRunId)
 					.list();
+			Collections.sort(list, new TaskDataComparator());
+			return list;
 		} catch (final Exception t) {
 			throw new MprcException("Cannot obtain task status list", t);
 		}
@@ -763,5 +765,21 @@ public final class SwiftDaoHibernate extends DaoBase implements SwiftDao {
 	@Resource(name = "unimodDao")
 	public void setUnimodDao(final UnimodDao unimodDao) {
 		this.unimodDao = unimodDao;
+	}
+
+	public static class TaskDataComparator implements Comparator<TaskData> {
+		/**
+		 * Sort descending based on start timestamps. If those are null, use queue timestamps.
+		 */
+		@Override
+		public int compare(final TaskData taskData, final TaskData t1) {
+			Date start1 = taskData.getStartTimestamp() == null ? taskData.getQueueTimestamp() : taskData.getStartTimestamp();
+			Date start2 = t1.getStartTimestamp() == null ? t1.getQueueTimestamp() : t1.getStartTimestamp();
+			return -ComparisonChain.start()
+					.nullsFirst()
+					.compare(start1, start2)
+					.compare(taskData.getEndTimestamp(), t1.getEndTimestamp())
+					.result();
+		}
 	}
 }
