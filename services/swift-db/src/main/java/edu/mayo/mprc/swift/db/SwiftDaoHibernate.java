@@ -88,7 +88,9 @@ public final class SwiftDaoHibernate extends DaoBase implements SwiftDao {
 	@Override
 	public List<TaskData> getTaskDataList(final int searchRunId) {
 		try {
-			return (List<TaskData>) getSession().createQuery("from TaskData t where t.searchRun.id=:searchRunId order by t.startTimestamp desc")
+			// We want to sort by start timestamp, if not available, by queue start timestamp
+			return (List<TaskData>) getSession().createQuery("from TaskData t where t.searchRun.id=:searchRunId" +
+					" order by greatest(coalesce(t.startTimestamp, 0), coalesce(t.queueTimestamp, 0)) desc")
 					.setInteger("searchRunId", searchRunId)
 					.list();
 		} catch (final Exception t) {
