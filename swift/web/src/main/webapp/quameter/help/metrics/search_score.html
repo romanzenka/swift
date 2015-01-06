@@ -1,0 +1,209 @@
+<html>
+<head>
+    <link rel="stylesheet" href="../../css/help.css" type="text/css" media="screen" charset="utf-8"/>
+    <script src="../../js/AC_RunActiveContent.js" type="text/javascript"></script>
+</head>
+<body>
+<div id="content">
+    <div class="heading">
+        Search Score
+    </div>
+    <p>
+        <strong>
+            Search Score
+        </strong>
+        is the score assigned by the software (the search engine) that associates the spectra with the peptides.
+
+    <p>
+        Higher
+        <strong>
+            Search Scores
+        </strong>
+        correlate with a higher frequency of good identifications of peptides.
+
+    <p>
+        The
+        <strong>
+            Search Score
+        </strong>
+        metric depends upon the analysis method used when loading the standard sample.
+        <strong>
+            MassQC
+        </strong>
+        supports simple standard samples.
+    </p>
+
+    <p>
+        <strong>
+            Simple standard samples
+        </strong>
+        <strong>
+            &gt;
+        </strong>
+        A common simple sample is
+        <strong>
+            BSA
+        </strong>
+        but in general simple samples have only a few proteins. For these samples, the analysis method specifies that
+        the search engine will be
+        <a href="http://pubchem.ncbi.nlm.nih.gov/omssa/" target="_blank">
+            OMSSA
+        </a>
+        .
+    <ul>
+        <li>
+            <strong>
+                Search Score
+            </strong>
+            is the log of the
+            <strong>
+                OMSSA
+            </strong>
+            e-value.
+        </li>
+        <li>
+            The
+            <strong>
+                Search Score
+            </strong>
+            metric is the median search score for all peptides.
+        </li>
+    </ul>
+    <p>
+        <strong>
+            OMSSA
+        </strong>
+        has a standard threshold that all peptide to spectrum matches must pass before the peptide is considered
+        identified.
+
+    <p>
+        <img alt="Spectrum with a good search score." height="252"
+             src="../images_metrics/MS2-spectrum-with-good-search-engine-score.png" width="675"/>
+
+    <p>
+        This spectrum was given a
+        <strong>
+            good
+        </strong>
+        score by the search engine for matching to peptide TNWYDNGSNQVAFGR.
+
+    <p>
+        <img alt="Spectra with poor search score" height="297" id="poor_search_score_spectra"
+             name="poor_search_score_spectra" src="../images_metrics/MS2-spectrum-with-poor-search-engine-score.png"
+             width="673"/>
+
+    <p>
+        This spectrum was given a
+        <strong>
+            poor
+        </strong>
+        score by the search engine for matching to peptide TNWYDNGSNQVAFGR.
+
+    <p>
+
+    <div class="heading">
+        Units:
+    </div>
+    <p>
+        For
+        <strong>
+            OMSSA
+        </strong>
+        , the
+        <strong>
+            Search Score
+        </strong>
+        is the
+        <strong>
+            log of the e-value
+        </strong>
+        .
+
+    <div class="heading">
+        Optimal:
+    </div>
+    <p>
+        <strong>
+            Higher:
+        </strong>
+        Good Search Scores correspond to peptides which are solidly identified.
+
+    <p>
+        The most reproducible
+        <strong>
+            LC-MS
+        </strong>
+        performance is when this metric remains in a narrow range over a series of runs. Wide variability in any metric
+        means your process is not reproducible.
+
+    <div class="heading">
+        What the Metric Detects:
+    </div>
+    <p>
+        The
+        <strong>
+            Search Score
+        </strong>
+        tells how good the MS2 spectra are in the sense of how easily they are matched to peptides by a search engine.
+        Low values of the
+        <strong>
+            Search Score
+        </strong>
+        may be caused by:
+    </p>
+    <ul>
+        <li>
+            Contaminants which cause chemical noise and extra non-identifiable peaks in the spectrum
+        </li>
+        <li>
+            In-source decay which causes the b and y ion peaks used by search engines to fragment
+        </li>
+        <li>
+            Poor fragmentation which is seen as only a few peaks in the MS2 spectrum and is perhaps caused by incorrect
+            collision energy
+        </li>
+    </ul>
+    <div class="heading">
+        Related Metrics:
+    </div>
+    <p>
+        Spectra with high
+        <strong>
+            Search Scores
+        </strong>
+        are easily identified by search engines because they have a good
+        <a href="ms2_signal_to_noise.html">
+            MS2 Signal to Noise
+        </a>
+        , have a reasonable number of
+        <a href="ms2_peaks_per_spectrum.html">
+            Peaks per Spectrum
+        </a>
+        and the major peaks in the MS spectrum are the fragment ion peaks of the peptide.
+
+    <div class="heading">
+        Related Troubleshooting Topics:
+    </div>
+    <ul>
+        <li>
+            <a href="../troubleshooting/multiple_failures.html">
+                Multiple Failures
+            </a>
+        </li>
+    </ul>
+    </p>
+    </p>
+    </p>
+    </p>
+    </p>
+    </p>
+    </p>
+    </p>
+    </p>
+    </p>
+    </p>
+    </p>
+    </p>
+</div>
+</body>
+</html>

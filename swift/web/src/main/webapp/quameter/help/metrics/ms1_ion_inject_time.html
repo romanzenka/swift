@@ -1,0 +1,140 @@
+<html>
+<head>
+    <link rel="stylesheet" href="../../css/help.css" type="text/css" media="screen" charset="utf-8"/>
+    <script src="../../js/AC_RunActiveContent.js" type="text/javascript"></script>
+</head>
+<body>
+<div id="content">
+    <div class="heading">
+        MS1 Ion Inject Time
+    </div>
+    <p>
+        The
+        <strong>
+            Ion Inject Time
+        </strong>
+        is the time in milliseconds that it takes to fill the ion trap.
+
+    <p>
+        <strong>
+            Short Ion Inject Times
+        </strong>
+        correspond to high signal levels or low threshold settings.
+
+    <p>
+        The
+        <strong>
+            Ion Inject Time
+        </strong>
+        metric is the median time spent collecting ions for precursor spectra.
+
+    <p>
+        <img src="../images_metrics/IonInjectTime.png"/>
+
+    <div class="heading">
+        Units:
+    </div>
+    <p>
+        <strong>
+            Milliseconds (ms)
+        </strong>
+
+    <div class="heading">
+        Optimal:
+    </div>
+    <p>
+        <strong>
+            Lower:
+        </strong>
+        Overall lower times may indicate an abundance of ions.
+
+    <p>
+        The most reproducible
+        <strong>
+            LC-MS
+        </strong>
+        performance is when
+
+        this metric remains in a narrow range over a series of runs. Wide
+
+        variability in any metric means your process is not
+
+        reproducible.
+
+    <div class="heading">
+        What the Metric Detects:
+    </div>
+    <p>
+        The
+        <strong>
+            Ion Inject Time
+        </strong>
+        measures how fast ions are being introduced into the ion trap. The ions are injected until either the trap is
+        full, or until a time threshold is reached. If lots of ions are being injected, then the
+        <strong>
+            Ion Inject Time
+        </strong>
+        will be short. This may be caused by a high amount of sample injected.
+
+    <p>
+        If only a small amount of sample is being injected, then more than half the precursor ions take more than the
+        threshold time to fill the trap and the
+        <strong>
+            Ion Inject Time
+        </strong>
+        will be pinned at its maximum value.
+
+    <p>
+        A gradual drift upward over time in the
+        <strong>
+            Ion Inject Time
+        </strong>
+        may mean that the ion optics are dirty and thus are hindering the amount of signal reaching the detector. Or it
+        could mean that the ion detectors may need to be examined and recalibrated.
+
+    <div class="heading">
+        Related Metrics:
+    </div>
+    <p>
+        The
+        <strong>
+            MS1 Ion Inject Time
+        </strong>
+        measures the MS1 signal strength. Other measures of the signal strength are the
+        <a href="ms1_dynamic_range.html">
+            Dynamic Range
+        </a>
+        , the
+        <a href="ms1_peak_intensity.html">
+            Peak Intensity
+        </a>
+        , and the
+        <a href="ms1_total_ion_current.html">
+            Total Ion Current
+        </a>
+        .
+
+    <div class="heading">
+        Related Troubleshooting Topics:
+    </div>
+    <ul>
+        <li>
+            <a href="../troubleshooting/detector_sensitivity_trends.html">
+                Trends - Detector Sensitivity
+            </a>
+        </li>
+    </ul>
+    </p>
+    </p>
+    </p>
+    </p>
+    </p>
+    </p>
+    </p>
+    </p>
+    </p>
+    </p>
+    </p>
+</div>
+</body>
+</html>

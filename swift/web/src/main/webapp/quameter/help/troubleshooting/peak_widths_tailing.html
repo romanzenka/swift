@@ -1,0 +1,132 @@
+<html>
+<head>
+    <link rel="stylesheet" href="../../css/help.css" type="text/css" media="screen" charset="utf-8"/>
+    <script src="../../js/AC_RunActiveContent.js" type="text/javascript"></script>
+</head>
+<body>
+<div id="content">
+    <div class="heading">
+        Peak Widths and Tailing
+    </div>
+    <p>
+        If you have operated an LC-MS system for any length of time, you have probably encountered this common issue:
+        <a href="../metrics/peak_width_variability.html">
+            Peak Width Variability
+        </a>
+        and peak tailing.
+    </p>
+
+    <p>
+        It is clear from the
+        <strong>
+            MassQC Dashboard
+        </strong>
+        that there is an issue with
+        <a href="../metrics/peak_width.html">
+            Peak Widths
+        </a>
+        :
+    </p>
+
+    <p>
+        <img alt="Problem With Peak Width Variability" height="261" src="../new_images/Chrom_WidthVariability.png"
+             width="504"/>
+    </p>
+
+    <p>
+        When you click on the
+        <strong>
+            Control Charts
+        </strong>
+        to get a closer look, a clear trend emerges:
+    </p>
+
+    <p>
+        <img alt="Peak Width Variability Trend" height="397" src="../new_images/peak_width_variability.png"
+             width="648"/>
+    </p>
+
+    <p>
+        <em>
+            Please note that after the LC
+            <strong>
+                column
+            </strong>
+            was changed the metric evens out and is stable for the next several QC runs.
+        </em>
+    </p>
+
+    <p>
+        In addition to using
+        <strong>
+            MassQC
+        </strong>
+        to view your LC-MS system performance, it can be helpful to go back and take a look at your mass spectra. Here
+        is a picture of the extracted ion chromatogram before the column was replaced (note that the peak is zoomed in
+        so that the
+        <strong>
+            tailing
+        </strong>
+        can clearly be seen):
+    </p>
+
+    <p>
+        <img alt="Peak Tailing" height="207" src="../new_images/tailing_mass-spectra.png" width="455"/>
+    </p>
+
+    <p>
+        After the
+        <strong>
+            column
+        </strong>
+        was changed, a nice,
+        <strong>
+            tight chromatographic peak
+        </strong>
+        is present (again, note the scale of the x-axis: although this peak is not zoomed, it is clear that the tailing
+        is gone):
+    </p>
+
+    <p>
+        <img alt="Tailing Absent" height="179" src="../new_images/no-tailing_mass-spectrum.png" width="405"/>
+    </p>
+
+    <p>
+        And, finally, after the
+        <strong>
+            column
+        </strong>
+        was changed the
+        <strong>
+            MassQC Dashboard
+        </strong>
+        shows the metrics are well within the accepted historical range:
+    </p>
+
+    <p>
+        <img alt="Peak Width Variability Back To Normal" height="269"
+             src="../new_images/peak_width_variability-good.png" width="492"/>
+    </p>
+
+    <div class="heading">
+        Metrics discussed this section:
+    </div>
+    <ul>
+        <li>
+            <a href="../metrics/peak_width.html">
+                Chromatography: Peak Width
+            </a>
+        </li>
+        <li>
+            <a href="../metrics/peak_width.html">
+                Chromatography: Peak Width Variability
+            </a>
+            <br>
+            <strong>
+            </strong>
+            </br>
+        </li>
+    </ul>
+</div>
+</body>
+</html>

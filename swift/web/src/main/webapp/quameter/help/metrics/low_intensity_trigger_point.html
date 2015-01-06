@@ -1,0 +1,147 @@
+<html>
+<head>
+    <link rel="stylesheet" href="../../css/help.css" type="text/css" media="screen" charset="utf-8"/>
+    <script src="../../js/AC_RunActiveContent.js" type="text/javascript"></script>
+</head>
+<body>
+<div id="content">
+    <div class="heading">
+        Low Intensity Trigger Point
+    </div>
+    <p>
+        The
+        <strong>
+            Low Intensity Trigger Point
+        </strong>
+        is. for low abundance peptides, the intensity on the
+        <strong>
+            extracted ion chromatogram (XIC)
+        </strong>
+        curve where the where the MS2 scan is triggered.
+    </p>
+
+    <p>
+        High value of the
+        <strong>
+            Low Intensity Trigger Point
+        </strong>
+        mean that the mass spectrometer is efficiently sampling the signal for the lower intensity MS2 scans. A low
+        value for
+        <strong>
+            Low Intensity Trigger Point
+        </strong>
+        means that only a small portion of the available signal is being used for peptide identification.
+    </p>
+
+    <p>
+        The
+        <strong>
+            Low Intensity Trigger Point
+        </strong>
+        metric is the percentage of the maximum MS1 peak which is sampled for MS2. The metric is the median value of
+        this measurement over all the times that MS2 is sampled. For this calculation only the smaller half of the MS1
+        peaks are considered.
+    </p>
+    <script type="text/javascript">
+        AC_FL_RunContent('codebase', 'http://download.macromedia.com/pub/shockwave/cabs/flash/swflash.cab#version=7,0,19,0', 'width', '400', 'height', '300', 'title', 'MassQC Low Intensity Trigger Point', 'src', '../swf/LowIntensityTriggerPoint', 'quality', 'high', 'pluginspage', 'http://www.macromedia.com/go/getflashplayer', 'movie', '../swf/LowIntensityTriggerPoint'); //end AC code
+    </script>
+    <noscript>
+        <object classid="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000"
+                codebase="http://download.macromedia.com/pub/shockwave/cabs/flash/swflash.cab#version=7,0,19,0"
+                height="300" title="MassQC Low Intensity Trigger Point" width="400">
+            <param name="movie" value="../swf/LowIntensityTriggerPoint.swf">
+            <param name="quality" value="high">
+            <embed height="300" pluginspage="http://www.macromedia.com/go/getflashplayer" quality="high"
+                   src="../swf/LowIntensityTriggerPoint.swf" type="application/x-shockwave-flash" width="400">
+            </embed>
+            </param>
+            </param>
+        </object>
+    </noscript>
+    <div class="heading">
+        Units:
+    </div>
+    <p class="blurb">
+        <strong>
+            Percent (%)
+        </strong>
+    </p>
+
+    <div class="heading">
+        Optimal:
+    </div>
+    <p>
+        <strong>
+            Higher:
+        </strong>
+        Higher percentage means that more of the available ion current is being sent to MS2.
+
+    <p>
+        The most reproducible
+        <strong>
+            LC-MS
+        </strong>
+        performance is when this metric remains in a narrow range over a series of runs. Wide variability in any metric
+        means your process is not reproducible.
+    </p>
+
+    <div class="heading">
+        What the Metric Detects:
+    </div>
+    <p>
+        Under ideal circumstances, chromatographic peaks would be sampled at their maximum intensity. That is, the
+        <strong>
+            Low Intensity Trigger Point
+        </strong>
+        metric would be 100%.
+        If the
+        <strong>
+            Low Intensity Trigger Point
+        </strong>
+        is too low, there may be insufficient ion current for the MS2 spectra triggered from low intensity MS1 peaks to
+        have a signal-to-noise ratio that is adequate for successful peptide identification.
+    </p>
+
+    <div class="heading">
+        Related Metrics:
+    </div>
+    <p>
+        The
+        <strong>
+            Low Intensity Trigger Point
+        </strong>
+        is the same as the
+        <a href="trigger_point.html">
+            Trigger Point
+        </a>
+        except it is calculated only for the MS1 peaks with low intensity. Only peaks less than the
+        <a href="ms1_peak_intensity.html">
+            Peak Intensity
+        </a>
+        metric value are considered to be low intensity peaks.
+    </p>
+
+    <p>
+        Since the
+        <strong>
+            Low Intensity Trigger Point
+        </strong>
+        is a percentage of the peak height, an unusually high
+        <strong>
+            Trigger Point
+        </strong>
+        may indicate that there are many peaks just above the trigger point. In other words the MS/MS instrument may set
+        to trigger MS2 scans at a very low intensity, that is, it is triggering on noise. An unusually low
+        <a href="ms1_peak_intensity.html">
+            Peak Intensity
+        </a>
+        or high
+        <a href="ms1_signal_to_noise.html">
+            Signal to Noise
+        </a>
+        metric may be further symptoms of too low a trigger point.
+    </p>
+    </p>
+</div>
+</body>
+</html>

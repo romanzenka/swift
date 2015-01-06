@@ -1,0 +1,119 @@
+<html>
+<head>
+    <link rel="stylesheet" href="../../css/help.css" type="text/css" media="screen" charset="utf-8"/>
+    <script src="../../js/AC_RunActiveContent.js" type="text/javascript"></script>
+</head>
+<body>
+<div id="content">
+    <div class="heading">
+        Mass Accuracy
+    </div>
+    <p>
+        As we have seen here previously, often one metric being out of line can lead to the discovery that another is
+        out of line. This is a powerful feature of MassQC: several metrics are correlated, and when looking only at the
+        mass spectra, we are limited to what we see. The instrument could, in fact, be operating at less than optimal.
+    </p>
+
+    <p>
+        In the present case, the
+        <strong>
+            MassQC Dashboard
+        </strong>
+        clearly shows
+        <a href="../metrics/ms1_spectra.html">
+            Dynamic Sampling
+        </a>
+        issues, but also
+        <a href="../metrics/mass_accuracy.html">
+            Mass Accuracy
+        </a>
+        seems to be out of range:
+    </p>
+
+    <p>
+        <img alt="Dynamic Sampling, Mass Accuracy Issues" height="391" src="../new_images/DynSamp_MassAcc.png"
+             width="486"/>
+    </p>
+
+    <p>
+        Supporting evidence from the
+        <strong>
+            Control Charts
+        </strong>
+        :
+    </p>
+
+    <p>
+        <img alt="MS2 Spectra Out of Range" height="231" src="../new_images/MS2Spectra_outofrange.png" width="675"/>
+    </p>
+
+    <p>
+        What we notice here in addition to the
+        <a href="../metrics/ms2_spectra.html">
+            Dynamic Sampling
+        </a>
+        metrics being out of range is that the
+        <a href="../metrics/mass_accuracy.html">
+            Mass Accuracy
+        </a>
+        metric is clearly out of range compared to historical data:
+    </p>
+
+    <p>
+        <img alt="High Mass Accuracy" height="249" src="../new_images/high_mass_accuracy.png" width="495"/>
+    </p>
+
+    <p>
+        Because of this high Mass Accuracy metric being out of range, this instrument should be closely examined after
+        this red flag. Whatever the lab technician did at this point helped because the trend shows some stability in
+        this metric.
+    </p>
+
+    <div class="heading">
+        Metrics discussed this section:
+    </div>
+    <ul>
+        <li>
+            <a href="../metrics/ms1_spectra.html">
+                Dynamic Sampling: MS1 Spectra
+            </a>
+        </li>
+        <li>
+            <a href="../metrics/ms2_spectra.html">
+                Dynamic Sampling: MS2 Spectra
+            </a>
+        </li>
+        <li>
+            <a href="../metrics/mass_accuracy.html">
+                Identifications: Mass Accuracy
+            </a>
+        </li>
+    </ul>
+    <div class="heading">
+        Forum
+    </div>
+    <p>
+        If you have questions, comments and/or insights about
+        <strong>
+            MassQC
+        </strong>
+        , you
+
+        can share them on the
+        <a href="http://groups.google.com/group/massqc_usersforum" target="_blank">
+            MassQC Users Forum
+        </a>
+        .
+
+    <div class="heading">
+        Search the MassQC Site and the Help Center
+    </div>
+    <p>
+
+    <p>
+    </p>
+    </p>
+    </p>
+</div>
+</body>
+</html>

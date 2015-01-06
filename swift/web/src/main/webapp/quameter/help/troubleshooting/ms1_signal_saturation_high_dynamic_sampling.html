@@ -1,0 +1,152 @@
+<html>
+<head>
+    <link rel="stylesheet" href="../../css/help.css" type="text/css" media="screen" charset="utf-8"/>
+    <script src="../../js/AC_RunActiveContent.js" type="text/javascript"></script>
+</head>
+<body>
+<div id="content">
+    <div class="heading">
+        MS1 Signal Saturation
+    </div>
+    <p>
+        Often we see
+        <strong>
+            signal saturation
+        </strong>
+        when sensitivity is above average.
+    </p>
+
+    <p>
+        <img height="137" src="../new_images/MS1Saturation.png" width="675"/>
+    </p>
+
+    <p>
+        From the
+        <strong>
+            Dashboard
+        </strong>
+        view in MassQC, you can clearly see that the
+        <strong>
+            MS1 metrics
+        </strong>
+        are very high and out of range. The
+        <a href="../metrics/ms1_ion_inject_time.html">
+            Ion Inject Time
+        </a>
+        actually went down because there were more ions going into the trap quickly, thereby filling it up faster. If
+        you want to get a closer look at how this compares to your historical data, you would click the
+        <strong>
+            Control Charts
+        </strong>
+        tab. Below, we see that the
+        <a href="../metrics/ms1_dynamic_range.html">
+            Dynamic Range
+        </a>
+        at the MS1 level is quite high, further indicating that
+        <strong>
+            signal saturation
+        </strong>
+        has occurred:
+    </p>
+
+    <p>
+        <img alt="MS1 Dynamic Range" height="181" src="../new_images/MS1DynamicRange.png" width="627"/>
+    </p>
+
+    <p>
+        A good example of several metrics reinforcing an obvious
+        <strong>
+            over-saturation
+        </strong>
+        diagnosis. So what causes this type of saturation? Several factors come into play here. You could have loaded
+        <strong>
+            too much sample
+        </strong>
+        ,
+        <strong>
+            triggering
+        </strong>
+        could be occurring on
+        <strong>
+            noise
+        </strong>
+        or unimportant peaks,
+        <a href="../metrics/spray_instability.html">
+            Spray Instability
+        </a>
+        affects cause signal to jump periodically, to name a few. Most importantly, you now have several clues to
+        further troubleshoot your cause for
+        <strong>
+            saturation
+        </strong>
+        .
+    </p>
+
+    <div class="heading">
+        Metrics discussed this section:
+    </div>
+    <ul>
+        <li>
+            <a href="../metrics/ms1_peak_intensity.html">
+                MS1: Peak Intensity
+            </a>
+        </li>
+        <li>
+            <a href="../metrics/ms1_dynamic_range.html">
+                MS1: Dynamic Range
+            </a>
+        </li>
+        <li>
+            <a href="../metrics/ms1_total_ion_current.html">
+                MS1: Total Ion Current
+            </a>
+        </li>
+        <li>
+            <a href="../metrics/ms1_signal_to_noise.html">
+                MS1: Signal to Noise
+            </a>
+        </li>
+        <li>
+            <a href="../metrics/ms1_spectra.html">
+                Dynamic Sampling: MS1 Spectra
+            </a>
+        </li>
+        <li>
+            <a href="../metrics/ms2_spectra.html">
+                Dynamic Sampling: MS2 Spectra
+            </a>
+        </li>
+        <li>
+            <a href="../metrics/spray_instability.html">
+                Ion Source: Spray Instability
+            </a>
+        </li>
+    </ul>
+    <div class="heading">
+        Forum
+    </div>
+    <p>
+        If you have questions, comments and/or insights about
+        <strong>
+            MassQC
+        </strong>
+        , you
+
+        can share them on the
+        <a href="http://groups.google.com/group/massqc_usersforum" target="_blank">
+            MassQC Users Forum
+        </a>
+        .
+
+    <div class="heading">
+        Search the MassQC Site and the Help Center
+    </div>
+    <p>
+
+    <p>
+    </p>
+    </p>
+    </p>
+</div>
+</body>
+</html>

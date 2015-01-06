@@ -1,0 +1,271 @@
+<html>
+<head>
+    <link rel="stylesheet" href="../../css/help.css" type="text/css" media="screen" charset="utf-8"/>
+    <script src="../../js/AC_RunActiveContent.js" type="text/javascript"></script>
+</head>
+<body>
+<div id="content">
+    <div class="heading">
+        Multiple Failures
+    </div>
+    <p>
+        In this Troubleshooting section, we have seen many single- and multivariate cases of out of range metrics. These
+        can be acute changes or long term trends. Sometimes, one metric can catch your attention, while other times,
+        many metrics are off, indicating a more serious problem.
+    </p>
+
+    <p>
+        In this example, we are looking at a run that has several metrics that are very much out of range. Viewing the
+        <strong>
+            MassQC Dashboard
+        </strong>
+        , nearly half of the total metrics in
+        <strong>
+            MassQC
+        </strong>
+        are out of range, as compared to the historical data: in
+        <strong>
+            Chromatography
+        </strong>
+        ,
+        <a href="../metrics/peptides_per_minute.html">
+            Peptides Per Minute
+        </a>
+        ; at the
+        <strong>
+            Ion Source
+        </strong>
+        ,
+        <a href="../metrics/precursor_mz.html">
+            Precursor m/z
+        </a>
+        ; for
+        <strong>
+            MS1
+        </strong>
+        , the
+        <a href="../metrics/ms1_dynamic_range.html">
+            Dynamic Range
+        </a>
+        is off; for
+        <strong>
+            Dynamic Sampling
+        </strong>
+        , the
+        <a href="../metrics/trigger_point.html">
+            Trigger Point
+        </a>
+        ,
+        <a href="../metrics/oversampling.html">
+            Oversampling
+        </a>
+        ,
+        <a href="../metrics/ms1_spectra.html">
+            MS1 Spectra
+        </a>
+        and
+        <a href="../metrics/ms2_spectra.html">
+            MS2 Spectra
+        </a>
+        metrics are all out of range. At the
+        <strong>
+            MS2
+        </strong>
+        level,
+        <a href="../metrics/ms2_high_intensity_id_rate.html">
+            High Intensity ID Rate
+        </a>
+        and
+        <a href="../metrics/ms2_signal_to_noise.html">
+            Signal To Noise
+        </a>
+        ; and, finally, for
+        <strong>
+            Identifications
+        </strong>
+        ,
+        <a href="../metrics/peptide_count.html">
+            Peptide Count
+        </a>
+        ,
+        <a href="../metrics/percent_semi_tryptic.html">
+            Percent Semi-Tryptic
+        </a>
+        and
+        <a href="../metrics/search_score.html">
+            Search Score
+        </a>
+        are all deviated from the historical data.
+    </p>
+
+    <p>
+        <img alt="Multiple Metric Failures" height="417" src="../new_images/multiple_failures.png" width="677"/>
+    </p>
+
+    <p>
+        Each one of these metrics can be viewed in the
+        <strong>
+            Control Charts
+        </strong>
+        . And this is precisely what the technician should do. For our purposes, we can see the trend by looking at the
+        fluctuations in
+        <a href="../metrics/search_score.html">
+            Search Score
+        </a>
+        :
+    </p>
+
+    <p>
+        <img alt="Low Search Score" height="197" src="../new_images/search_score_low.png" width="675"/>
+    </p>
+
+    <p>
+        And by looking at
+        <a href="../metrics/trigger_point.html">
+            Trigger Point
+        </a>
+        :
+    </p>
+
+    <p>
+        <img alt="High Trigger Point" height="224" src="../new_images/trigger_point_high.png" width="676"/>
+    </p>
+
+    <p>
+        This is an example of a series of red flags that needs immediate attention.
+        <strong>
+            MassQC
+        </strong>
+        clearly indicates that this instrument should not be used to run valuable samples until these issues are
+        addressed. So what could be the problem here? There is definitely something going on with regard to
+        <a href="../metrics/trigger_point.html">
+            Dynamic Sampling
+        </a>
+        . You could have
+        <strong>
+            contamination
+        </strong>
+        , which may cause incorrect sampling and/or lower peptide matches; the
+        <strong>
+            tryptic digest
+        </strong>
+        could have failed or been less efficient; or, there could be
+        <strong>
+            column
+        </strong>
+        issues or
+        <strong>
+            pump/solvent gradient problems
+        </strong>
+        leading to elution mishaps. Whatever the cause, this is a perfect example of
+        <strong>
+            multiple failure
+        </strong>
+        and the LC-MS system should be thoroughly evaluated before processing any further samples.
+    </p>
+
+    <p>
+        When issues arise relating to
+        <strong>
+            Dynamic Sampling
+        </strong>
+        , usually other metrics fail also. In this case, we see a number of
+        <strong>
+            Identification
+        </strong>
+        metrics fall out of range.
+    </p>
+
+    <div class="heading">
+        Metrics discussed this section:
+    </div>
+    <ul>
+        <li>
+            <a href="../metrics/peptides_per_minute.html">
+                Chromatography: Peptides Per Minute
+            </a>
+        </li>
+        <li>
+            <a href="../metrics/precursor_mz.html">
+                Ion Source: Precursor m/z
+            </a>
+        </li>
+        <li>
+            <a href="../metrics/ms1_dynamic_range.html">
+                MS1: Dynamic Range
+            </a>
+        </li>
+        <li>
+            <a href="../metrics/trigger_point.html">
+                Dynamic Sampling: Trigger Point
+            </a>
+        </li>
+        <li>
+            <a href="../metrics/oversampling.html">
+                Dynamic Sampling: Oversampling
+            </a>
+        </li>
+        <li>
+            <a href="../metrics/ms1_spectra.html">
+                Dynamic Sampling: MS1 Spectra
+            </a>
+        </li>
+        <li>
+            <a href="../metrics/ms2_spectra.html">
+                Dynamic Sampling: MS2 Spectra
+            </a>
+        </li>
+        <li>
+            <a href="../metrics/ms2_high_intensity_id_rate.html">
+                MS2: High Intensity ID Rate
+            </a>
+        </li>
+        <li>
+            <a href="../metrics/ms2_signal_to_noise.html">
+                MS2: Signal To Noise
+            </a>
+        </li>
+        <li>
+            <a href="../metrics/peptide_count.html">
+                Identifications: Peptide Count
+            </a>
+        </li>
+        <li>
+            <a href="../metrics/percent_semi_tryptic.html">
+                Identifications: Percent Semi-Tryptic
+            </a>
+        </li>
+        <li>
+            <a href="../metrics/search_score.html">
+                Identifications: Search Score
+            </a>
+        </li>
+    </ul>
+    <div class="heading">
+        Forum
+    </div>
+    <p>
+        If you have questions, comments and/or insights about
+        <strong>
+            MassQC
+        </strong>
+        , you
+
+        can share them on the
+        <a href="http://groups.google.com/group/MassQC_usersforum" target="_blank">
+            MassQC Users Forum
+        </a>
+        .
+
+    <div class="heading">
+        Search the MassQC Site and the Help Center
+    </div>
+    <p>
+
+    <p>
+    </p>
+    </p>
+    </p>
+</div>
+</body>
+</html>
