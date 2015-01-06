@@ -188,7 +188,7 @@ public final class QaWorker extends WorkerBase {
 				atLeastOneFileMissing = true;
 			}
 		} else {
-			LOGGER.info("Skipping creation of output file [" + outputFile.getAbsolutePath() + "] because already exists.");
+			LOGGER.info("Skipping creation of output file [" + outputFile.getAbsolutePath() + "] because it already exists.");
 
 			//Check msmsEval files.
 			if (qaFiles.getMsmsEvalOutputFile() != null && (!msmsEvalDiscriminantFile.exists() || msmsEvalDiscriminantFile.length() == 0)) {
@@ -198,7 +198,7 @@ public final class QaWorker extends WorkerBase {
 
 			if (!generate) {
 				for (final File file : rScriptOutputFilesSet) {
-					if (file.exists() || file.length() == 0) {
+					if (!file.exists() || file.length() == 0) {
 						atLeastOneFileMissing = true;
 						generate = true;
 						break;
