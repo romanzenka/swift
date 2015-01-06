@@ -5,7 +5,6 @@
     <session-factory>
         <mapping resource="../../main/resources/edu/mayo/mprc/dbcurator/model/Curation.hbm.xml" />
         <mapping resource="../../main/resources/edu/mayo/mprc/dbcurator/model/SourceDatabaseArchive.hbm.xml" />
-        <mapping resource="../../main/resources/edu/mayo/mprc/dbcurator/model/curationsteps/CurationStep.hbm.xml" />
         <mapping resource="../../main/resources/edu/mayo/mprc/dbcurator/model/curationsteps/DataSource.hbm.xml" />
         <mapping resource="../../main/resources/edu/mayo/mprc/dbcurator/model/curationsteps/HeaderTransform.hbm.xml" />
     </session-factory>

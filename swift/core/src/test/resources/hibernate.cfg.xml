@@ -5,30 +5,38 @@
         "http://www.hibernate.org/dtd/hibernate-configuration-3.0.dtd">
 <hibernate-configuration>
     <session-factory>
-        <mapping resource="../../main/resources/edu/mayo/mprc/swift/dbmapping/GridEngineServiceData.hbm.xml"/>
-        <mapping resource="../../main/resources/edu/mayo/mprc/swift/dbmapping/GridRequestData.hbm.xml"/>
-        <mapping resource="../../main/resources/edu/mayo/mprc/swift/dbmapping/GridServiceTypeData.hbm.xml"/>
-        <mapping resource="../../main/resources/edu/mayo/mprc/swift/dbmapping/GridRequestLogData.hbm.xml"/>
-        <mapping resource="../../main/resources/edu/mayo/mprc/swift/dbmapping/LogTypeData.hbm.xml"/>
+        <mapping resource="../../main/resources/edu/mayo/mprc/swift/params2/EnabledEngines.hbm.xml" />
+        <mapping resource="../../main/resources/edu/mayo/mprc/swift/params2/SearchEngineConfig.hbm.xml" />
+        <mapping resource="../../main/resources/edu/mayo/mprc/swift/params2/SearchEngineParameters.hbm.xml" />
+        <mapping resource="../../main/resources/edu/mayo/mprc/swift/params2/ExtractMsnSettings.hbm.xml" />
+        <mapping resource="../../main/resources/edu/mayo/mprc/swift/params2/ScaffoldSettings.hbm.xml" />
+        <mapping resource="../../main/resources/edu/mayo/mprc/swift/params2/StarredProteins.hbm.xml" />
+        <mapping resource="../../main/resources/edu/mayo/mprc/swift/params2/Instrument.hbm.xml" />
+        <mapping resource="../../main/resources/edu/mayo/mprc/swift/params2/IonSeries.hbm.xml" />
+        <mapping resource="../../main/resources/edu/mayo/mprc/swift/params2/Protease.hbm.xml" />
 
-        <mapping resource="../../main/resources/edu/mayo/mprc/swift/dbmapping/EnabledEngines.hbm.xml"/>
+        <mapping resource="../../main/resources/edu/mayo/mprc/unimod/ModSet.hbm.xml" />
+        <mapping resource="../../main/resources/edu/mayo/mprc/unimod/Mod.hbm.xml" />
+        <mapping resource="../../main/resources/edu/mayo/mprc/unimod/ModSpecificity.hbm.xml" />
+
         <mapping resource="../../main/resources/edu/mayo/mprc/swift/dbmapping/FileSearch.hbm.xml"/>
         <mapping resource="../../main/resources/edu/mayo/mprc/swift/dbmapping/PeptideReport.hbm.xml"/>
         <mapping resource="../../main/resources/edu/mayo/mprc/swift/dbmapping/ReportData.hbm.xml"/>
-        <mapping resource="../../main/resources/edu/mayo/mprc/swift/dbmapping/SearchEngineConfig.hbm.xml"/>
-        <mapping resource="../../main/resources/edu/mayo/mprc/swift/dbmapping/SearchEngineParameters.hbm.xml"/>
         <mapping resource="../../main/resources/edu/mayo/mprc/swift/dbmapping/SpectrumQa.hbm.xml"/>
         <mapping resource="../../main/resources/edu/mayo/mprc/swift/dbmapping/TaskStateData.hbm.xml"/>
-        <mapping resource="edu/mayo/mprc/swift/dbmapping/SearchRun.hbm.xml"/>
-        <mapping resource="User.hbm.xml"/>
-        <mapping resource="../../main/resources/edu/mayo/mprc/swift/dbmapping/TaskLogData.hbm.xml"/>
+        <mapping resource="../../main/resources/edu/mayo/mprc/swift/dbmapping/SearchRun.hbm.xml" />
         <mapping resource="../../main/resources/edu/mayo/mprc/swift/dbmapping/TaskData.hbm.xml"/>
         <mapping resource="../../main/resources/edu/mayo/mprc/swift/dbmapping/SwiftSearchDefinition.hbm.xml"/>
 
+        <mapping resource="../../main/resources/edu/mayo/mprc/workspace/User.hbm.xml" />
+
+        <mapping resource="../../main/resources/edu/mayo/mprc/database/Change.hbm.xml" />
+
         <!--from dbcurator -->
-        <mapping resource="../../main/resources/edu/mayo/mprc/dbcurator/model/curationsteps/CurationStep.hbm.xml"/>
+        <mapping resource="../../main/resources/edu/mayo/mprc/dbcurator/model/Curation.hbm.xml" />
         <mapping resource="../../main/resources/edu/mayo/mprc/dbcurator/model/curationsteps/DataSource.hbm.xml"/>
         <mapping resource="../../main/resources/edu/mayo/mprc/dbcurator/model/curationsteps/HeaderTransform.hbm.xml"/>
     </session-factory>
 </hibernate-configuration>
+
 
