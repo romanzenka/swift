@@ -48,7 +48,7 @@ function addButtons(div, data, columnId) {
     $.each(keys, function (index, value) {
         var niceName = value;
         var btnClass = 'btn-orig' + iter;
-        if (!niceName.match(/^Orbi/) && columnId === 'instrument') {
+        if (index != 0 && columnId === 'instrument') {
             btnClass = 'btn-default';
         }
         else if (columnId !== 'instrument') {
@@ -114,13 +114,13 @@ function getMetricTitle(n) {
     var hLink, qLink;
     if (metrics[n].hasOwnProperty('link')) {
         hLink = 'href="' + metrics[n].link + '" target="_blank"';
-        qLink = '&nbsp; <i class="icon-large icon-question-sign"></i>';
+        qLink = '&nbsp;<i class="icon-large icon-question-sign"></i>';
     }
     else {
         hLink = 'href="#"';
         qLink = '';
     }
-    return '<a ' + hLink + ' data-toggle="tooltip" data-placement="right" title="' + metrics[n].desc + '" class="modLink" >' + metrics[n].name + qLink + '</a>'
+    return '<a ' + hLink + ' class="modLink" >' + metrics[n].name + qLink + '</a> <span class="metric-desc">&mdash; ' + metrics[n].desc + '</span>';
 }
 
 // Tokenize by underscore, wrap tokens in <span>

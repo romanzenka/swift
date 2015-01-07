@@ -23,13 +23,13 @@ div.file {
 	padding: 0 0 0 30px;
 	font-size: 12px;
 	line-height: 16px;
-	background-image: url( info.gif );
+	background-image: url(info.gif);
 	background-repeat: no-repeat;
 	background-position: 10px 0;
 }
 
 #numSelected.warning {
-	background-image: url( warning.gif );
+	background-image: url(warning.gif);
 }
 
 .label {
@@ -64,13 +64,13 @@ div.folder img, div.file img {
 }
 
 div.folder, div.file, .dircontents {
-	background-image: url( dots_vert.gif );
+	background-image: url(dots_vert.gif);
 	background-position: 7px 0;
 	background-repeat: repeat-y;
 }
 
 div.folder-last, div.file-last {
-	background-image: url( dots_vert_top.gif );
+	background-image: url(dots_vert_top.gif);
 	background-position: 7px 50%;
 	background-repeat: no-repeat;
 }
@@ -118,7 +118,7 @@ div.folder-last, div.file-last {
 }
 
 #popupAnimation {
-	background-image: url( ajax-loader.gif );
+	background-image: url(ajax-loader.gif);
 	background-position: center;
 	display: none;
 	width: 220px;

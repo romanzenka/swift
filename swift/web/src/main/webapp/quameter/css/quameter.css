@@ -96,6 +96,11 @@ a.modLink:hover{
         border:1px solid black;
     }
 
+.metric-desc {
+    color: #aaa;
+    font-style: italic;
+}
+
 
 
 /**  New Buttons For choosing  **/
