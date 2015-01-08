@@ -124,12 +124,39 @@ public final class QuameterDaoTest extends DaoTest {
 
 		nextTransaction();
 
-		quameterDao.hideQuameterResult(quameterResult.getId());
+		quameterDao.hideQuameterResult(quameterResult.getId(), "reason");
+
+		nextTransaction();
+
+		final List<QuameterResult> hiddenResults = quameterDao.listHiddenResults();
+		Assert.assertEquals(hiddenResults.size(), 1);
+		Assert.assertEquals(hiddenResults.get(0).getHiddenReason(), "reason");
+
+		final List<QuameterResult> quameterResults = quameterDao.listVisibleResults();
+		Assert.assertEquals(quameterResults.size(), 0);
+
+		quameterDao.commit();
+	}
+
+	@Test
+	public void shouldUnhideResult() {
+		quameterDao.begin();
+
+		final QuameterResult quameterResult = addResult1();
+
+		nextTransaction();
+
+		quameterDao.hideQuameterResult(quameterResult.getId(), "reason");
+
+		nextTransaction();
+
+		quameterDao.unhideQuameterResult(quameterResult.getId(), "unhide reason");
 
 		nextTransaction();
 
 		final List<QuameterResult> quameterResults = quameterDao.listVisibleResults();
-		Assert.assertEquals(quameterResults.size(), 0);
+		Assert.assertEquals(quameterResults.size(), 1);
+		Assert.assertEquals(quameterResults.get(0).getHiddenReason(), "unhide reason");
 
 		quameterDao.commit();
 	}
@@ -216,7 +243,7 @@ public final class QuameterDaoTest extends DaoTest {
 		nextTransaction();
 
 		// Hiden result 2
-		quameterDao.hideQuameterResult(quameterResult2.getId());
+		quameterDao.hideQuameterResult(quameterResult2.getId(), "reason");
 
 		nextTransaction();
 

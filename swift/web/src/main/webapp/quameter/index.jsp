@@ -15,7 +15,7 @@
     }
 %>
 <head>
-    <title>QuaMeter Results | <%=SwiftWebContext.getWebUi().getTitle()%>
+    <title>QuaMeter | <%=SwiftWebContext.getWebUi().getTitle()%>
     </title>
 
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -54,12 +54,18 @@
                     <div class="btn btn-info" id="compact-button">Details</div>
                 </div>
             </div>
+            <div class="btn-toolbar pull-right">
+                <div class="btn-group" id="extra-buttons">
+                    <a href="/quameter/unhide.jsp" class="btn"><i class="icon-remove"></i> Unhide</a>
+                    <a href="/service/getQuameterDataTable" class="btn"><i class="icon-download"></i> Data</a>
+                </div>
+            </div>
             <div class="row-fluid">
                 <div class="span12">
                     <span id="icons">
                         <a href="#" id="search-link"><img src="/report/search_edit.gif" style="border: 0"></a>
                         <a href="#" id="qa-link"><img src="/report/search.gif" style="border: 0"></a>
-                        <a id="hide-entry"><img src="/report/search_hide.gif" style="border: 0"></a>
+                        <a id="hide-entry" role="button"><img src="/report/search_hide.gif" style="border: 0"></a>
                     </span>
                     <span id="selected-path"></span>
                 </div>
@@ -76,23 +82,46 @@
             </code> daemon.</p>
     </div>
     <% } else { %>
-    </br><a href="/quameter/unhide.jsp" class="pull-left">Unhide</a>
-    </br><a href="/service/getQuameterDataTable" class="pull-left">DataTable</a>
 
     <div id="detailedGraphs" style="margin-top: 40px; display: none;"></div>
     <div id="simpleGraphs" style="margin-top: 40px"></div>
 
     <% } %>
-</div>
 
+    <div id="annotFormDiv" class="annotationDiv">
+        <form id="annotForm" action="/service/new-annotation" method="post" onsubmit="return false;">
+            <textarea name="text" cols="50" rows="3" style="margin: 1px"></textarea></br>
+            <input type="hidden" id="hiddenMetricCode" name="metricCode">
+            <input type="hidden" id="hiddenRowid" name="dbId">
+            <input type="submit" id="submitAnnotation" value="Submit" style="float:right">
+        </form>
+    </div>
 
-<div id="annotFormDiv" class="annotationDiv">
-    <form id="annotForm" action="/service/new-annotation" method="post" onsubmit="return false;">
-        <textarea name="text" cols="50" rows="3" style="margin: 1px"></textarea></br>
-        <input type="hidden" id="hiddenMetricCode" name="metricCode">
-        <input type="hidden" id="hiddenRowid" name="dbId">
-        <input type="submit" id="submitAnnotation" value="Submit" style="float:right">
-    </form>
+    <div id="hideDialog" class="modal hide fade" aria-hidden="true">
+        <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+            <h3>Hide a data point</h3>
+        </div>
+        <div class="modal-body">
+            <p>You are about to hide a data point for file:</p>
+
+            <p id="hide-path"></p>
+
+            <p>Please provide a reason:</p>
+
+            <p><input type="text" id="hideReason" class="input-block-level"
+                      placeholder="Enter reason for hiding this data point"></p>
+
+            <div class="alert alert-error" id="hideAlert" style="display:none;">
+                <button type="button" class="close" data-dismiss="alert">&times;</button>
+                <span></span>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <a href="#" class="btn" data-dismiss="modal">Close</a>
+            <a href="#" class="btn btn-primary" id="hideSubmit">Save changes</a>
+        </div>
+    </div>
 </div>
 
 <script type="text/javascript" src="/common/bootstrap/js/bootstrap.js"></script>
@@ -133,7 +162,6 @@
     <% } %>
     // Set a callback to run when the Google Visualization API is loaded.
     google.setOnLoadCallback(initSimpleCharts(graphDataSrvr));
-    $("body").tooltip({ selector: '[data-toggle="tooltip"]' });
 
 </script>
 <!--  Help Docs come from: http://massqc.proteomesoftware.com/help/metrics.php  -->

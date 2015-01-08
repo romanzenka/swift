@@ -32,10 +32,10 @@ public final class QuameterHideResult {
 
 	@RequestMapping(value = "/quameter-hide/{quameterResultId}", method = RequestMethod.POST)
 	@ResponseBody
-	public void hideQuameterResult(@PathVariable final int quameterResultId) {
+	public void hideQuameterResult(@PathVariable final int quameterResultId, @RequestParam final String reason) {
 		quameterDao.begin();
 		try {
-			quameterDao.hideQuameterResult(quameterResultId);
+			quameterDao.hideQuameterResult(quameterResultId, reason);
 			quameterDao.commit();
 		} catch (Exception e) {
 			quameterDao.rollback();
@@ -44,10 +44,10 @@ public final class QuameterHideResult {
 	}
 
 	@RequestMapping(value = "/quameter-unhide/{quameterResultId}", method = RequestMethod.POST)
-	public String unhideQuameterResult(@PathVariable final int quameterResultId) {
+	public String unhideQuameterResult(@PathVariable final int quameterResultId, @RequestParam final String reason) {
 		quameterDao.begin();
 		try {
-			quameterDao.unhideQuameterResult(quameterResultId);
+			quameterDao.unhideQuameterResult(quameterResultId, reason);
 			quameterDao.commit();
 		} catch (Exception e) {
 			quameterDao.rollback();

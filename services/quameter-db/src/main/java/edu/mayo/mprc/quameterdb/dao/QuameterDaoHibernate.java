@@ -1,5 +1,6 @@
 package edu.mayo.mprc.quameterdb.dao;
 
+import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
@@ -101,14 +102,21 @@ public final class QuameterDaoHibernate extends DaoBase implements QuameterDao, 
 		final DateTime lowerDateLimit = new DateTime().minusYears(1);
 
 		final Query query = getSession().createSQLQuery("" +
-				"SELECT {q.*}, m.metadata_value AS v, r.transaction_id AS ti" +
+				"SELECT {q.*}, " +
+				"m.metadata_value AS v," +
+				" r.transaction_id AS ti," +
+				" a.annotation_text as an" +
 				" FROM " + swiftDao.qualifyTableName("transaction") + " AS r, "
 				+ swiftDao.qualifyTableName("file_search") + " AS f, "
-				+ swiftDao.qualifyTableName("quameter_result") + " AS q, "
 				+ swiftDao.qualifyTableName("swift_search_definition") + " AS d, "
 				+ swiftDao.qualifyTableName("search_metadata") + " AS m, "
 				+ swiftDao.qualifyTableName("tandem_mass_spec_sample") + " AS t, "
-				+ swiftDao.qualifyTableName("search_result") + " AS sr "
+				+ swiftDao.qualifyTableName("search_result") + " AS sr, "
+				+ swiftDao.qualifyTableName("quameter_result") + " AS q "
+				+ " LEFT JOIN "
+				+ swiftDao.qualifyTableName("quameter_annotation") + " AS a" +
+				" ON a.quameter_result_id = q.quameter_result_id" +
+				" AND a.metric_code='hidden' "
 				+ " WHERE "
 				+ hiddenQuery
 				+ " r.hidden=0 AND"
@@ -119,11 +127,12 @@ public final class QuameterDaoHibernate extends DaoBase implements QuameterDao, 
 				+ " m.metadata_key='quameter.category' AND"
 				+ " t.tandem_mass_spec_sample_id = sr.tandem_mass_spec_sample_id AND"
 				+ " sr.search_result_id = q.search_result_id AND"
-				+ " t.start_time >= :timeStart"
+				+ " t.start_time >= :timeStart "
 				+ " ORDER BY t.start_time")
 				.addEntity("q", QuameterResult.class)
 				.addScalar("v", StandardBasicTypes.STRING)
 				.addScalar("ti", StandardBasicTypes.INTEGER)
+				.addScalar("an", StandardBasicTypes.STRING)
 				.setParameter("timeStart", lowerDateLimit.toDate(), StandardBasicTypes.DATE);
 		final List raw = query.list();
 		final List<QuameterResult> filtered = new ArrayList<QuameterResult>(Math.min(raw.size(), 1000));
@@ -134,6 +143,8 @@ public final class QuameterDaoHibernate extends DaoBase implements QuameterDao, 
 			r.setCategory(category);
 			final Integer transactionId = (Integer) array[2];
 			r.setTransaction(transactionId);
+			final String hideComment = (String) array[3];
+			r.setHiddenReason(Strings.nullToEmpty(hideComment));
 			if (r.resultMatches()) {
 				filtered.add(r);
 			}
@@ -142,15 +153,17 @@ public final class QuameterDaoHibernate extends DaoBase implements QuameterDao, 
 	}
 
 	@Override
-	public void hideQuameterResult(final int quameterResultId) {
+	public void hideQuameterResult(final int quameterResultId, final String hideReason) {
 		final QuameterResult quameterResult = (QuameterResult) getSession().get(QuameterResult.class, quameterResultId);
+		addAnnotation(new QuameterAnnotation("hidden", quameterResultId, hideReason));
 		quameterResult.setHidden(true);
 		getSession().saveOrUpdate(quameterResult);
 	}
 
 	@Override
-	public void unhideQuameterResult(final int quameterResultId) {
+	public void unhideQuameterResult(final int quameterResultId, final String unhideReason) {
 		final QuameterResult quameterResult = (QuameterResult) getSession().get(QuameterResult.class, quameterResultId);
+		addAnnotation(new QuameterAnnotation("hidden", quameterResultId, unhideReason));
 		quameterResult.setHidden(false);
 		getSession().saveOrUpdate(quameterResult);
 	}

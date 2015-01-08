@@ -34,9 +34,9 @@ public interface QuameterDao extends Dao {
 	 */
 	List<QuameterResult> listHiddenResults();
 
-	void hideQuameterResult(int quameterResultId);
+	void hideQuameterResult(int quameterResultId, final String hideReason);
 
-	void unhideQuameterResult(int quameterResultId);
+	void unhideQuameterResult(int quameterResultId, final String unhideReason);
 
 
 	/**

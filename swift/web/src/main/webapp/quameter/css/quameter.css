@@ -101,6 +101,14 @@ a.modLink:hover{
     font-style: italic;
 }
 
+.path-small {
+    font-size: small;
+    word-wrap: break-word;
+}
+
+#hide-path {
+    font-family: monospace;
+}
 
 
 /**  New Buttons For choosing  **/
