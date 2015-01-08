@@ -187,9 +187,9 @@ FilterDropDown.prototype.addCheckboxes = function(id, type, titleArray, sqlArray
 
     for (var i = 0; i < titleArray.length; i++) {
         var checkboxId = groupId + '_' + i;
-        $(this.root).append('<li><input type="checkbox" ' + checked + ' value="' + sqlArray[i] + '" id="' + checkboxId + '"><label for="' + checkboxId + '">' + titleArray[i] + '</label></li>');
-        var checkboxes = $(this.root).find('input');
-        var checkbox = checkboxes[checkboxes.length - 1];
+        var newCheckbox = $('<li><input type="checkbox" ' + checked + ' value="' + sqlArray[i] + '" id="' + checkboxId + '"><label for="' + checkboxId + '">' + titleArray[i] + '</label></li>');
+        newCheckbox.appendTo($(this.root));
+        var checkbox = newCheckbox.find('input')[0];
         this[id].checkboxes[i] = checkbox;
         $(checkbox).on('click', {"id": id, "obj": this}, this.checkSelectAll);
     }
@@ -266,9 +266,10 @@ FilterDropDown.prototype.addRadioButtons = function(id, type, titleArray, sqlArr
     for (var i = 0; i < titleArray.length; i++) {
         var realId = offset + i;
         var checked = realId == indexChecked ? 'checked' : '';
-        $(this.root).append('<li><input type="radio" name="' + groupId + '" ' + checked + ' value="' + sqlArray[i] + '" id="' + groupId + '_' + realId + '"><label for="' + groupId + '_' + realId + '">' + titleArray[i] + '</label></li>');
-        var radios = $(this.root).find('input');
-        this[id].radios[realId] = radios[radios.length - 1];
+        var newRadio = $('<li><input type="radio" name="' + groupId + '" ' + checked + ' value="' + sqlArray[i] + '" id="' + groupId + '_' + realId + '"><label for="' + groupId + '_' + realId + '">' + titleArray[i] + '</label></li>');
+        newRadio.appendTo($(this.root));
+        var radio = newRadio.find('input')[0];
+        this[id].radios[realId] = radio;
     }
 };
 
@@ -311,9 +312,10 @@ FilterDropDown.prototype.addTextBox = function(id) {
         this.textbox.value = cookie;
     };
 
-    $(this.root).append('<li><input type="text" name="' + itemId + '" value="" id="' + itemId + '"></li>');
-    var inputs = $(this.root).find('input');
-    this[id].textbox = inputs[inputs.length - 1];
+    var newText = $('<li><input type="text" name="' + itemId + '" value="" id="' + itemId + '"></li>');
+    newText.appendTo($(this.root));
+    var input = newText.find('input')[0];
+    this[id].textbox = input;
 };
 
 FilterDropDown.prototype.addText = function(text) {

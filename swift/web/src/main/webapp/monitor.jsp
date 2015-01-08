@@ -5,7 +5,7 @@
 <%@ page import="edu.mayo.mprc.swift.resources.SwiftMonitor" %>
 <%@ page import="java.util.Date" %>
 <%@ page import="java.util.Map" %>
-<!DOCTYPE HTML>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <% if (ServletInitialization.redirectToConfig(getServletConfig().getServletContext(), response)) {

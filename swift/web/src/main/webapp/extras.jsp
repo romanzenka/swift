@@ -3,7 +3,7 @@
 <%@ page import="edu.mayo.mprc.utilities.StringUtilities" %>
 <%@ page import="org.joda.time.DateTime" %>
 <%@ page import="org.joda.time.format.DateTimeFormat" %>
-<!DOCTYPE HTML>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8">

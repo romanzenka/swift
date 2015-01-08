@@ -3,8 +3,7 @@
 <%@ page import="edu.mayo.mprc.utilities.StringUtilities" %>
 <%@ page import="edu.mayo.mprc.workspace.User" %>
 <%@ page import="java.util.List" %>
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
-"http://www.w3.org/TR/html4/loose.dtd">
+<!DOCTYPE html>
 <html>
 <head>
     <title>Search Status | <%=SwiftWebContext.getWebUi().getTitle()%>
@@ -269,10 +268,10 @@
                 hiddenStr = "&showHidden=true"
             }
             if (firstEntry > 0) {
-                document.write('<a class="first" href="?start=0' + hiddenStr + '" title="Go to the first search">&lt;&lt;&lt First</a>&nbsp;');
-                document.write('<a class="prev" href="?start=' + (Number(firstEntry) - Number(listedEntries)) + hiddenStr + '" title="Go to previous page">&lt; Prev</a>&nbsp;');
+                document.write('<a class="first" href="?start=0' + hiddenStr + '" title="Go to the first search"></a>&nbsp;');
+                document.write('<a class="prev" href="?start=' + (Number(firstEntry) - Number(listedEntries)) + hiddenStr + '" title="Go to previous page"></a>&nbsp;');
             }
-            document.write('<a class="next" href="?start=' + (Number(firstEntry) + Number(listedEntries)) + hiddenStr + '" title="Go to next page">&gt;&gt;&lt Next</a>&nbsp;');
+            document.write('<a class="next" href="?start=' + (Number(firstEntry) + Number(listedEntries)) + hiddenStr + '" title="Go to next page"></a>&nbsp;');
         </script>
     </div>
     <table class="report" id="reportTable">
@@ -289,10 +288,10 @@
                 hiddenStr = "&showHidden=true"
             }
             if (firstEntry > 0) {
-                document.write('<a class="first" href="?start=0' + hiddenStr + '" title="Go to the first search">&lt;&lt;&lt First</a>&nbsp;');
-                document.write('<a class="prev" href="?start=' + (Number(firstEntry) - Number(listedEntries)) + hiddenStr + '" title="Go to previous page">&lt; Prev</a>&nbsp;');
+                document.write('<a class="first" href="?start=0' + hiddenStr + '" title="Go to the first search"></a>&nbsp;');
+                document.write('<a class="prev" href="?start=' + (Number(firstEntry) - Number(listedEntries)) + hiddenStr + '" title="Go to previous page"></a>&nbsp;');
             }
-            document.write('<a class="next" href="?start=' + (Number(firstEntry) + Number(listedEntries)) + hiddenStr + '" title="Go to next page">&gt;&gt;&lt Next</a>&nbsp;');
+            document.write('<a class="next" href="?start=' + (Number(firstEntry) + Number(listedEntries)) + hiddenStr + '" title="Go to next page"></a>&nbsp;');
         </script>
     </div>
 </div>

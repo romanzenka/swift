@@ -459,7 +459,7 @@ a:hover.filter_button.filter.ztoa {
 #navigation a {
     display: block;
     font-size: 1px;
-    line-height: 100px;
+    line-height: 1px;
     overflow: hidden;
     width: 20px;
     height: 20px;

@@ -1,4 +1,5 @@
 <%@ page import="edu.mayo.mprc.swift.SwiftWebContext" %>
+<!DOCTYPE html>
 <html>
 <head>
     <title>New Swift Search | <%=SwiftWebContext.getWebUi().getTitle()%>
