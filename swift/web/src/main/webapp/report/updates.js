@@ -246,7 +246,7 @@ SparseArray.prototype.findId = function (id) {
 // Utilities
 
 function removeAllClicks(element) {
-    if ($(element).nodeType !== Node.ELEMENT_NODE) {
+    if ($(element).nodeType !== 1) {
         return;
     }
     try {
