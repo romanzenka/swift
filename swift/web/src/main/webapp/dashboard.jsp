@@ -85,6 +85,15 @@
             </a>
         </div>
     </div>
+    <div class="row">
+        <div class="span4 offset4">
+            <a href="http://protini.mayo.edu">
+                <div class="hero-unit" style="background-image: url(/images/protini.jpg);">
+                    <h1>Protini</h1>
+                </div>
+            </a>
+        </div>
+    </div>
 </div>
 <!-- /container -->
 
