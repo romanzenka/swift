@@ -27,7 +27,7 @@
             <one-to-many class="FileSearch" />
         </list>
 
-        <map name="metadata" cascade="all-delete-orphan" lazy="false" table="search_metadata">
+        <map name="metadata" cascade="all-delete-orphan" lazy="false    " table="search_metadata">
             <key column="swift_search_definition_id" foreign-key="search_metadata_ibfk_1" />
             <map-key type="string" column="metadata_key" />
             <element type="string" column="metadata_value" />

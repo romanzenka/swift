@@ -92,9 +92,14 @@ public final class AdditionalSettingsPanel extends HorizontalPanel {
 		return Boolean.TRUE.equals(mzIdentML.getValue());
 	}
 
+	public void setMzIdentMl(final boolean mzIdentMl) {
+		this.mzIdentML.setValue(mzIdentMl);
+	}
+
 	public void setDefinition(final ClientSwiftSearchDefinition definition) {
 		setPublicMgfs(definition.isPublicMgfFiles());
 		setPublicMzxmls(definition.isPublicMzxmlFiles());
 		setPublicSearchFiles(definition.isPublicSearchFiles());
+		setMzIdentMl("1".equals(definition.getMetadata().get("mzIdentMl")));
 	}
 }
