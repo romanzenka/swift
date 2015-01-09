@@ -110,7 +110,7 @@ public final class ScaffoldSettingsEditor extends Composite implements Validatab
 		panel.add(useFamilyProteinGrouping);
 
 		mzIdentMlReport = new CheckBox("mzIdentML");
-		mzIdentMlReport.setTitle("Scaffold will report mzIdentML for perSPECtvies");
+		mzIdentMlReport.setTitle("Scaffold will report mzIdentML for perSPECtives");
 		mzIdentMlReport.setStyleName("scaffold-setting-group");
 		mzIdentMlReport.addClickHandler(updateAndFireChange);
 		panel.add(mzIdentMlReport);

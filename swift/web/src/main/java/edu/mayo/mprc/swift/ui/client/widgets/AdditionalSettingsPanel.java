@@ -10,6 +10,7 @@ public final class AdditionalSettingsPanel extends HorizontalPanel {
 	private final CheckBox publicSearchFiles;
 	private final CheckBox fromScratch;
 	private final CheckBox lowPriority;
+	private final CheckBox mzIdentML;
 
 	public AdditionalSettingsPanel() {
 		publicMgfs = new CheckBox("Provide .mgf");
@@ -34,6 +35,11 @@ public final class AdditionalSettingsPanel extends HorizontalPanel {
 		lowPriority = new CheckBox("Low priority");
 		lowPriority.setValue(false);
 		add(lowPriority);
+
+		mzIdentML = new CheckBox("Provide mzIdentML");
+		mzIdentML.setTitle("mzIdentML will be produced by Scaffold even if the saved parameters do not enable this");
+		mzIdentML.setValue(false);
+		add(mzIdentML);
 	}
 
 	/**
@@ -80,6 +86,10 @@ public final class AdditionalSettingsPanel extends HorizontalPanel {
 
 	public boolean isLowPriority() {
 		return Boolean.TRUE.equals(lowPriority.getValue());
+	}
+
+	public boolean isMzIdentMl() {
+		return Boolean.TRUE.equals(mzIdentML.getValue());
 	}
 
 	public void setDefinition(final ClientSwiftSearchDefinition definition) {
