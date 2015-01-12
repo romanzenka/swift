@@ -161,10 +161,45 @@ public final class FileTable extends FlexTable implements HasValueChangeHandlers
 		updateFileCount();
 	}
 
-	private void sortByFileColumn() {
+	/**
+	 * Sort the data. If data was sorted, sort it in reverse
+	 *
+	 * @param comparator Comparator to sort by
+	 */
+	private void sortData(final Comparator<ClientFileSearch> comparator) {
 		final List<ClientFileSearch> data = getData();
 
-		Collections.sort(data, new Comparator<ClientFileSearch>() {
+		if (!isListSorted(comparator, data)) {
+			Collections.sort(data, comparator);
+		} else {
+			Collections.sort(data, new Comparator<ClientFileSearch>() {
+				@Override
+				public int compare(ClientFileSearch clientFileSearch, ClientFileSearch t1) {
+					return -comparator.compare(clientFileSearch, t1);
+				}
+			});
+		}
+
+		setFiles(data);
+	}
+
+	private boolean isListSorted(Comparator<ClientFileSearch> comparator, List<ClientFileSearch> data) {
+		boolean sorted = true;
+		ClientFileSearch prev = null;
+		for (ClientFileSearch s : data) {
+			if (prev != null) {
+				if (comparator.compare(prev, s) == 1) {
+					sorted = false;
+					break;
+				}
+			}
+			prev = s;
+		}
+		return sorted;
+	}
+
+	private void sortByFileColumn() {
+		sortData(new Comparator<ClientFileSearch>() {
 			@Override
 			public int compare(ClientFileSearch clientFileSearch, ClientFileSearch t1) {
 				if (clientFileSearch.getPath() == null) {
@@ -173,14 +208,10 @@ public final class FileTable extends FlexTable implements HasValueChangeHandlers
 				return clientFileSearch.getPath().compareTo(t1.getPath());
 			}
 		});
-
-		setFiles(data);
 	}
 
 	private void sortBySizeColumn() {
-		final List<ClientFileSearch> data = getData();
-
-		Collections.sort(data, new Comparator<ClientFileSearch>() {
+		sortData(new Comparator<ClientFileSearch>() {
 			@Override
 			public int compare(ClientFileSearch clientFileSearch, ClientFileSearch t1) {
 				if (clientFileSearch.getFileSize() == null) {
@@ -189,14 +220,10 @@ public final class FileTable extends FlexTable implements HasValueChangeHandlers
 				return clientFileSearch.getFileSize().compareTo(t1.getFileSize());
 			}
 		});
-
-		setFiles(data);
 	}
 
 	private void sortByDateColumn() {
-		final List<ClientFileSearch> data = getData();
-
-		Collections.sort(data, new Comparator<ClientFileSearch>() {
+		final Comparator<ClientFileSearch> comparator = new Comparator<ClientFileSearch>() {
 			@Override
 			public int compare(ClientFileSearch clientFileSearch, ClientFileSearch t1) {
 				if (clientFileSearch.getLastModifiedDate() == null) {
@@ -204,9 +231,8 @@ public final class FileTable extends FlexTable implements HasValueChangeHandlers
 				}
 				return clientFileSearch.getLastModifiedDate().compareTo(t1.getLastModifiedDate());
 			}
-		});
-
-		setFiles(data);
+		};
+		sortData(comparator);
 	}
 
 	private void updateFileCount() {
