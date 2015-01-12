@@ -3,6 +3,7 @@ package edu.mayo.mprc.swift.ui.client.rpc;
 import edu.mayo.mprc.swift.dbmapping.FileSearch;
 
 import java.io.Serializable;
+import java.util.Date;
 
 /**
  * One entry in the table of files. UI equivalent of {@link FileSearch}
@@ -21,6 +22,7 @@ public final class ClientFileSearch implements Serializable {
 	// Optional - does not have to be filled in. Used to transfer file sizes when search is loaded
 	// When negative, it means the file could not be found on the filesystem
 	private Long fileSize;
+	private Date lastModifiedDate;
 
 	public ClientFileSearch() {
 	}
@@ -32,13 +34,15 @@ public final class ClientFileSearch implements Serializable {
 	 * @param biologicalSample Name of the biological sample.
 	 * @param categoryName     Name of the category.
 	 * @param experiment       Name of the experiment.
+	 * @param lastModifiedDate Date when the file was last modified
 	 */
-	public ClientFileSearch(final String inputFilePath, final String biologicalSample, final String categoryName, final String experiment, final Long fileSize) {
+	public ClientFileSearch(final String inputFilePath, final String biologicalSample, final String categoryName, final String experiment, final Long fileSize, final Date lastModifiedDate) {
 		path = inputFilePath;
 		this.biologicalSample = biologicalSample;
 		this.categoryName = categoryName;
 		this.experiment = experiment;
 		this.fileSize = fileSize;
+		this.lastModifiedDate = lastModifiedDate;
 	}
 
 	public String getPath() {
@@ -59,5 +63,9 @@ public final class ClientFileSearch implements Serializable {
 
 	public Long getFileSize() {
 		return fileSize;
+	}
+
+	public Date getLastModifiedDate() {
+		return lastModifiedDate;
 	}
 }

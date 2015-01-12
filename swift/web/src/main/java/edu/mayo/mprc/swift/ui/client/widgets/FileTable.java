@@ -8,15 +8,13 @@ import com.google.gwt.event.logical.shared.HasValueChangeHandlers;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
+import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.user.client.ui.*;
 import com.google.gwt.view.client.SelectionChangeEvent;
 import edu.mayo.mprc.swift.ui.client.rpc.ClientFileSearch;
 import edu.mayo.mprc.swift.ui.client.rpc.files.FileInfo;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @author: Roman Zenka
@@ -25,11 +23,12 @@ public final class FileTable extends FlexTable implements HasValueChangeHandlers
 	private static final int SELECT_COLUMN = 0;
 	private static final int FILE_COLUMN = 1;
 	private static final int SIZE_COLUMN = 2;
-	private static final int REMOVE_COLUMN = 3;
+	private static final int DATE_COLUMN = 3;
+	private static final int REMOVE_COLUMN = 4;
 	private static final int FILE_COUNT_COLUMN = FILE_COLUMN;
-	private static final int SAMPLE_COLUMN = 4;
-	private static final int EXPERIMENT_COLUMN = 5;
-	private static final int CATEGORY_COLUMN = 6;
+	private static final int SAMPLE_COLUMN = 5;
+	private static final int EXPERIMENT_COLUMN = 6;
+	private static final int CATEGORY_COLUMN = 7;
 
 	private static final int HEADER_ROW_INDEX = 1;
 	private static final int FIRST_DATA_ROW_INDEX = 2;
@@ -44,6 +43,7 @@ public final class FileTable extends FlexTable implements HasValueChangeHandlers
 			new FileTableColumn(SELECT_COLUMN, "", new CheckBox(), "button-column"),
 			new FileTableColumn(FILE_COLUMN, "File", null),
 			new FileTableColumn(SIZE_COLUMN, "Size", null),
+			new FileTableColumn(DATE_COLUMN, "Date", null),
 			new FileTableColumn(REMOVE_COLUMN, "Remove", new PushButton(new Image(REMOVE_IMAGE)), "button-column"),
 			new FileTableColumn(SAMPLE_COLUMN, "<img src=\"images/scaffold_column.gif\" style=\"vertical-align: middle;\">&nbsp;Biological Sample", null),
 			new FileTableColumn(EXPERIMENT_COLUMN, "<img src=\"images/scaffold_icon.gif\" style=\"vertical-align: middle;\">&nbsp;Experiment", null),
@@ -211,6 +211,7 @@ public final class FileTable extends FlexTable implements HasValueChangeHandlers
 			addNewLine(
 					fileSearch.getPath(),
 					fileSearch.getFileSize(),
+					fileSearch.getLastModifiedDate(),
 					index,
 					fileSearch.getCategoryName(),
 					fileSearch.getExperiment(),
@@ -242,20 +243,23 @@ public final class FileTable extends FlexTable implements HasValueChangeHandlers
 	private void addNewLine(final FileInfo info, final MutableInteger lineIndex, final String title, final SearchType type) {
 		final String path = info.getRelativePath();
 		final long fileSize = info.getSize();
+		final Date lastModifiedDate = info.getLastModifiedDate();
 		final String name = FilePathWidget.getFileNameWithoutExtension(path);
 		final String sampleName = getDefaultSampleName(type, title, name);
 		final String experimentName = getDefaultExperimentName(type, title, name);
 
-		addNewLine(path, fileSize, lineIndex, "none", experimentName, sampleName);
+		addNewLine(path, fileSize, lastModifiedDate, lineIndex, "none", experimentName, sampleName);
 	}
 
-	private void addNewLine(final String path, final long fileSize, final MutableInteger lineIndex, final String categoryName, final String experimentName, final String sampleName) {
+	private void addNewLine(final String path, final long fileSize, final Date lastModifiedDate, final MutableInteger lineIndex, final String categoryName, final String experimentName, final String sampleName) {
 		final FilePathWidget filePathWidget = new FilePathWidget(path);
 
 		final int rowNumber = lineIndex.i;
 
 		setWidget(rowNumber, FILE_COLUMN, filePathWidget);
 		setWidget(rowNumber, SIZE_COLUMN, new FileSizeWidget(fileSize));
+		final DateTimeFormat format = DateTimeFormat.getFormat("yyyy/MM/dd HH:mm:ss");
+		setWidget(rowNumber, DATE_COLUMN, new Label(format.format(lastModifiedDate)));
 		final PushButton removeButton = new PushButton(new Image(REMOVE_IMAGE));
 		removeButton.addClickHandler(new RemoveButtonListener(lineIndex));
 		setWidget(rowNumber, REMOVE_COLUMN, removeButton);
@@ -477,6 +481,7 @@ public final class FileTable extends FlexTable implements HasValueChangeHandlers
 					sampleName,
 					categoryName,
 					experimentName,
+					null,
 					null));
 		}
 		return results;
