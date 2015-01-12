@@ -16,6 +16,7 @@ public final class FileInfo implements Serializable {
 	public FileInfo(final String relativePath, final long size, final Date lastModifiedDate) {
 		this.relativePath = relativePath;
 		this.size = size;
+		this.lastModifiedDate = lastModifiedDate;
 	}
 
 	public String getRelativePath() {
