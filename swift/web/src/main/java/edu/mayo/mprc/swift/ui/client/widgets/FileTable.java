@@ -41,9 +41,9 @@ public final class FileTable extends FlexTable implements HasValueChangeHandlers
 
 	private final FileTableColumn[] staticHeaders = {
 			new FileTableColumn(SELECT_COLUMN, "", new CheckBox(), "button-column"),
-			new FileTableColumn(FILE_COLUMN, "File", null),
-			new FileTableColumn(SIZE_COLUMN, "Size", null),
-			new FileTableColumn(DATE_COLUMN, "Date", null),
+			new FileTableColumn(FILE_COLUMN, "File", new Anchor("File")),
+			new FileTableColumn(SIZE_COLUMN, "Size", new Anchor("Size")),
+			new FileTableColumn(DATE_COLUMN, "Date", new Anchor("Date")),
 			new FileTableColumn(REMOVE_COLUMN, "Remove", new PushButton(new Image(REMOVE_IMAGE)), "button-column"),
 			new FileTableColumn(SAMPLE_COLUMN, "<img src=\"images/scaffold_column.gif\" style=\"vertical-align: middle;\">&nbsp;Biological Sample", null),
 			new FileTableColumn(EXPERIMENT_COLUMN, "<img src=\"images/scaffold_icon.gif\" style=\"vertical-align: middle;\">&nbsp;Experiment", null),
@@ -127,6 +127,24 @@ public final class FileTable extends FlexTable implements HasValueChangeHandlers
 				removeSelectedFiles();
 			}
 		});
+		((Anchor) headers[FILE_COLUMN].getWidget()).addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(final ClickEvent event) {
+				sortByFileColumn();
+			}
+		});
+		((Anchor) headers[DATE_COLUMN].getWidget()).addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(final ClickEvent event) {
+				sortByDateColumn();
+			}
+		});
+		((Anchor) headers[SIZE_COLUMN].getWidget()).addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(final ClickEvent event) {
+				sortBySizeColumn();
+			}
+		});
 
 		getRowFormatter().setStyleName(getHeaderRowIndex(), "table-header");
 
@@ -141,6 +159,54 @@ public final class FileTable extends FlexTable implements HasValueChangeHandlers
 			}
 		});
 		updateFileCount();
+	}
+
+	private void sortByFileColumn() {
+		final List<ClientFileSearch> data = getData();
+
+		Collections.sort(data, new Comparator<ClientFileSearch>() {
+			@Override
+			public int compare(ClientFileSearch clientFileSearch, ClientFileSearch t1) {
+				if (clientFileSearch.getPath() == null) {
+					return t1.getPath() == null ? 0 : 1;
+				}
+				return clientFileSearch.getPath().compareTo(t1.getPath());
+			}
+		});
+
+		setFiles(data);
+	}
+
+	private void sortBySizeColumn() {
+		final List<ClientFileSearch> data = getData();
+
+		Collections.sort(data, new Comparator<ClientFileSearch>() {
+			@Override
+			public int compare(ClientFileSearch clientFileSearch, ClientFileSearch t1) {
+				if (clientFileSearch.getFileSize() == null) {
+					return t1.getFileSize() == null ? 0 : 1;
+				}
+				return clientFileSearch.getFileSize().compareTo(t1.getFileSize());
+			}
+		});
+
+		setFiles(data);
+	}
+
+	private void sortByDateColumn() {
+		final List<ClientFileSearch> data = getData();
+
+		Collections.sort(data, new Comparator<ClientFileSearch>() {
+			@Override
+			public int compare(ClientFileSearch clientFileSearch, ClientFileSearch t1) {
+				if (clientFileSearch.getLastModifiedDate() == null) {
+					return t1.getLastModifiedDate() == null ? 0 : 1;
+				}
+				return clientFileSearch.getLastModifiedDate().compareTo(t1.getLastModifiedDate());
+			}
+		});
+
+		setFiles(data);
 	}
 
 	private void updateFileCount() {
@@ -181,13 +247,25 @@ public final class FileTable extends FlexTable implements HasValueChangeHandlers
 	}
 
 	public void setFiles(final List<ClientFileSearch> inputFiles, final SearchType searchType) {
-		for (int i = getFirstDataRow(); i < getRowCount(); ) {
-			removeTableRow(i);
-		}
+		removeRows();
 
 		searchTypeList.setSelectedSearchType(searchType, false/*This is coming from search load. Do not store the preference*/);
 		setSearchType(searchType);
 
+		addRows(inputFiles);
+
+		ValueChangeEvent.fire(this, null);
+	}
+
+	public void setFiles(final List<ClientFileSearch> inputFiles) {
+		removeRows();
+
+		addRows(inputFiles);
+
+		ValueChangeEvent.fire(this, null);
+	}
+
+	private void addRows(List<ClientFileSearch> inputFiles) {
 		int lastRow = getRowCount();
 
 		for (final ClientFileSearch fileSearch : inputFiles) {
@@ -219,8 +297,12 @@ public final class FileTable extends FlexTable implements HasValueChangeHandlers
 
 			lastRow++;
 		}
+	}
 
-		ValueChangeEvent.fire(this, null);
+	private void removeRows() {
+		for (int i = getFirstDataRow(); i < getRowCount(); ) {
+			removeTableRow(i);
+		}
 	}
 
 	/**
