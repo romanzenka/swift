@@ -548,6 +548,8 @@ public final class FileTable extends FlexTable implements HasValueChangeHandlers
 	public List<ClientFileSearch> getData() {
 		final List<ClientFileSearch> results = new ArrayList<ClientFileSearch>(getRowCount() - getFirstDataRow());
 
+		DateTimeFormat formatter = DateTimeFormat.getFormat("yyyy/MM/dd HH:mm:ss");
+
 		for (int row = getFirstDataRow(); row < getRowCount(); row++) {
 
 			final EditableLabel w = (EditableLabel) getWidget(row, SAMPLE_COLUMN);
@@ -558,13 +560,25 @@ public final class FileTable extends FlexTable implements HasValueChangeHandlers
 
 			final EditableLabel w3 = (EditableLabel) getWidget(row, CATEGORY_COLUMN);
 			final String categoryName = w3.getText();
+
+			final FileSizeWidget w4 = (FileSizeWidget) getWidget(row, SIZE_COLUMN);
+			final Long fileSize = w4.getFileSize();
+
+			final Label w5 = (Label) getWidget(row, DATE_COLUMN);
+			final Date date;
+			if ("".equals(w5.getText()) || w5.getText() == null) {
+				date = null;
+			} else {
+				date = formatter.parse(w5.getText());
+			}
+
 			results.add(new ClientFileSearch(
 					((FilePathWidget) getWidget(row, FILE_COLUMN)).getFullPath(),
 					sampleName,
 					categoryName,
 					experimentName,
-					null,
-					null));
+					fileSize,
+					date));
 		}
 		return results;
 	}
