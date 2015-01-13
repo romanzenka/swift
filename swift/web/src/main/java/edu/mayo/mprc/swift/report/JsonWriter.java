@@ -124,7 +124,7 @@ public final class JsonWriter {
 		appendKeyNumber(builder, "ok", (long) searchRun.getTasksCompleted());
 		appendKeyNumber(builder, "failures", (long) searchRun.getTasksFailed());
 		appendKeyNumber(builder, "warnings", (long) searchRun.getTasksWithWarning());
-		appendKeyNumber(builder, "running", (long) searchRun.getRunningTasks());
+		appendKeyNumber(builder, "running", (long) (searchRun.getRunningTasks() == null ? 0 : searchRun.getRunningTasks()));
 		appendKeyString(builder, "instruments", searchRun.getInstruments());
 		if (reports != null) {
 			appendKeyReportInfo(builder, "results", reports);

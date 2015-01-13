@@ -150,15 +150,9 @@ public final class SwiftDaoHibernate extends DaoBase implements SwiftDao {
 			Map<Integer, Integer> idsToCounts = new HashMap<Integer, Integer>(idToCount.size());
 			for (Object o : idToCount) {
 				if (o instanceof Object[]) {
-					Object[] a = (Object[]) o;
-					Integer id = (Integer) a[0];
-					Integer count;
-					if (a[1] instanceof Long) {
-						Long l = (Long) a[1];
-						count = l.intValue();
-					} else {
-						count = (Integer) a[1];
-					}
+					final Object[] a = (Object[]) o;
+					final Integer id = getInteger(a[0]);
+					final Integer count = getInteger(a[1]);
 					idsToCounts.put(id, count);
 				}
 			}
@@ -167,6 +161,17 @@ public final class SwiftDaoHibernate extends DaoBase implements SwiftDao {
 				run.setRunningTasks(idsToCounts.get(run.getId()));
 			}
 		}
+	}
+
+	private static Integer getInteger(Object o) {
+		Integer count;
+		if (o instanceof Long) {
+			Long l = (Long) o;
+			count = l.intValue();
+		} else {
+			count = (Integer) o;
+		}
+		return count;
 	}
 
 	@Override
