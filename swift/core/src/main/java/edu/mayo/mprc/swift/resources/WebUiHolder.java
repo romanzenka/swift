@@ -28,7 +28,7 @@ public class WebUiHolder {
 		}
 		if (webUiConfig == null) {
 			// Config file does not define web ui. Return the default one
-			webUiConfig = new WebUi.Config(null, "8080", "Swift", "/", "/", new File(getSwiftHome(), Swift.DEFAULT_NEW_CONFIG_FILE).getAbsolutePath(), null, null);
+			webUiConfig = new WebUi.Config(null, "8080", "Swift", "/", "/", new File(getSwiftHome(), Swift.DEFAULT_NEW_CONFIG_FILE).getAbsolutePath(), null, null, null);
 		}
 		final Object resource = context.createResource(webUiConfig);
 		if (!(resource instanceof WebUi)) {
