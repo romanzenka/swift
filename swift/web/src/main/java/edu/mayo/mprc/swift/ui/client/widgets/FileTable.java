@@ -205,7 +205,7 @@ public final class FileTable extends FlexTable implements HasValueChangeHandlers
 				if (clientFileSearch.getPath() == null) {
 					return t1.getPath() == null ? 0 : 1;
 				}
-				return clientFileSearch.getPath().compareTo(t1.getPath());
+				return clientFileSearch.getPath().compareToIgnoreCase(t1.getPath());
 			}
 		});
 	}
