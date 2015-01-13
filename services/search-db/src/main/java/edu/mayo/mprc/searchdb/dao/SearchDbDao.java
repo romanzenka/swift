@@ -4,6 +4,7 @@ import edu.mayo.mprc.config.RuntimeInitializer;
 import edu.mayo.mprc.database.Dao;
 import edu.mayo.mprc.database.QueryCallback;
 import edu.mayo.mprc.swift.dbmapping.ReportData;
+import edu.mayo.mprc.swift.dbmapping.SearchRun;
 import edu.mayo.mprc.swift.dbmapping.SwiftSearchDefinition;
 import edu.mayo.mprc.utilities.progress.PercentProgressReporter;
 
@@ -135,4 +136,12 @@ public interface SearchDbDao extends Dao, RuntimeInitializer {
 	 * @return {@link SearchResult} for given id
 	 */
 	SearchResult getSearchResult(int searchResultId);
+
+	/**
+	 * Take a list of search runs and fill in the instrument names.
+	 *
+	 * @param searchRuns List of search runs (likely from {@link edu.mayo.mprc.swift.db.SwiftDao#getSearchRunList})
+	 * @return Same list with all the instrument names that were used in a given search filled in
+	 */
+	List<SearchRun> fillInInstrumentNames(List<SearchRun> searchRuns);
 }

@@ -420,7 +420,7 @@ public class TestSearchRunner {
 		final ProgressReporter reporter = mock(ProgressReporter.class);
 		final ExecutorService service = new SimpleThreadPoolExecutor(1, "testSwiftSearcher", true);
 
-		final SearchRun searchRun = new SearchRun("Test search", null, definition, new Date(), null, 0, null, 0, 0, 0, 0, false);
+		final SearchRun searchRun = new SearchRun("Test search", null, definition, new Date(), null, 0, null, 0, 0, 0, 0, false, null);
 
 
 		final SearchRunner runner = makeSearchRunner("task1", false, searchEngines, definition, reporter, service, searchRun);

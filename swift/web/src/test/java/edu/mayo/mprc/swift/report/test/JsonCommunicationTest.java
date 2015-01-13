@@ -33,7 +33,7 @@ public final class JsonCommunicationTest {
 					"\"submitted\":\"5/6/05 10:22 AM\", \"duration\":\"397 days, 13:11:11\", \"subtasks\":123, " +
 					"\"search\":0, " +
 					"\"errormsg\":\"Transaction error message\", " +
-					"\"ok\":13, \"failures\":14, \"warnings\":15, \"running\":3, " +
+					"\"ok\":13, \"failures\":14, \"warnings\":15, \"running\":3, \"instruments\":null, " +
 					"\"results\":[{\"reportId\":34, \"path\":\"/test1.sf3\", \"analysis\":1}, {\"reportId\":35, \"path\":\"/test2.sf3\", \"analysis\":0}], " +
 					"\"details\":{\"total\":123}}";
 
@@ -88,6 +88,7 @@ public final class JsonCommunicationTest {
 		searchRun.setErrorCode(13);
 		searchRun.setErrorMessage("Problem with m_transaction");
 		searchRun.setNumTasks(123);
+		searchRun.setRunningTasks(3);
 
 		searchRun.setStartTimestamp(startTimestamp);
 
@@ -128,7 +129,7 @@ public final class JsonCommunicationTest {
 
 	@Test(enabled = true, groups = {"fast", "unit"}, dependsOnMethods = {"testClearAll"}, sequential = true)
 	public void testInsertSearchRun() {
-		out.processSearchRun(0, searchRun, 3, getReportInfos(), "insert");
+		out.processSearchRun(0, searchRun, getReportInfos(), "insert");
 		out.close();
 		Assert.assertEquals(outputStream.toString(), JsonWriter.TARGET + ".insert([" + SEARCH_RUN_JSON + "]);" + JsonWriter.TARGET + ".fireOnChange();", "Insert transaction");
 	}
@@ -142,9 +143,9 @@ public final class JsonCommunicationTest {
 
 	@Test(enabled = true, groups = {"fast", "unit"}, dependsOnMethods = {"testInsertSearchRun"}, sequential = true)
 	public void testInsertClearInsert() {
-		out.processSearchRun(0, searchRun, 3, getReportInfos(), "insert");
+		out.processSearchRun(0, searchRun, getReportInfos(), "insert");
 		out.clearAll();
-		out.processSearchRun(0, searchRun, 3, getReportInfos(), "insert");
+		out.processSearchRun(0, searchRun, getReportInfos(), "insert");
 		out.close();
 		Assert.assertEquals(outputStream.toString(),
 				JsonWriter.TARGET + ".insert([" + SEARCH_RUN_JSON + "]);" +
@@ -154,8 +155,8 @@ public final class JsonCommunicationTest {
 
 	@Test(enabled = true, groups = {"fast", "unit"}, dependsOnMethods = {"testInsertClearInsert"}, sequential = true)
 	public void testDoubleInsert() {
-		out.processSearchRun(0, searchRun, 3, getReportInfos(), "insert");
-		out.processSearchRun(0, searchRun, 3, getReportInfos(), "insert");
+		out.processSearchRun(0, searchRun, getReportInfos(), "insert");
+		out.processSearchRun(0, searchRun, getReportInfos(), "insert");
 		out.close();
 		Assert.assertEquals(outputStream.toString(),
 				JsonWriter.TARGET + ".insert([" + SEARCH_RUN_JSON + ", " + SEARCH_RUN_JSON + "]);" + JsonWriter.TARGET + ".fireOnChange();", "Double insert");

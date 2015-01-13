@@ -168,7 +168,8 @@
                 new FilterButton('user', 'Owner', user),
                 new FilterButton('submission', 'Submission', null /*submission*/),
                 new FilterButton('duration', 'Duration', null /*duration*/),
-                new FilterButton('actions', '', null /*duration*/),
+                new FilterButton('instruments', 'Instruments', null /*instruments*/),
+                new FilterButton('actions', '', null /*actions*/),
                 new FilterButton('results', 'Results', null /*results*/),
                 new FilterButton('progress', 'Progress', null)
             ];

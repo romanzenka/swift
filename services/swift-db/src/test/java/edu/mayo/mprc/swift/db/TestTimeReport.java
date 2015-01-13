@@ -158,6 +158,6 @@ public final class TestTimeReport {
 
 	private static SearchRun makeSearchRun(final DateTime start, final DateTime end) {
 		return new SearchRun("Test", null, null,
-				start == null ? null : start.toDate(), end == null ? null : end.toDate(), 0, "no error", 10, 0, 0, 10, false);
+				start == null ? null : start.toDate(), end == null ? null : end.toDate(), 0, "no error", 10, 0, 0, 10, false, null);
 	}
 }

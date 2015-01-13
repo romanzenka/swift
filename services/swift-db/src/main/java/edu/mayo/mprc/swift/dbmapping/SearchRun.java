@@ -30,6 +30,9 @@ public class SearchRun extends PersistableBase implements Serializable {
 	private int tasksFailed;
 	private int tasksCompleted;
 	private Set<ReportData> reports = new HashSet<ReportData>();
+	private transient String instruments; // Filled in by the DAO for convenience
+	private transient Integer runningTasks;
+
 	private static final long MAX_MILLIS_PER_SEARCH = 3L * 60L * 60L * 1000L;
 
 	private int hidden;
@@ -39,7 +42,7 @@ public class SearchRun extends PersistableBase implements Serializable {
 
 	public SearchRun(final String title, final User submittingUser, final SwiftSearchDefinition swiftSearch, final Date startTimestamp, final Date endTimestamp,
 	                 final int errorCode, final String errorMessage,
-	                 final int numTasks, final int tasksWithWarning, final int taskFailed, final int tasksCompleted, final boolean hidden) {
+	                 final int numTasks, final int tasksWithWarning, final int taskFailed, final int tasksCompleted, final boolean hidden, final String instruments) {
 		this.title = title;
 		this.submittingUser = submittingUser;
 		this.swiftSearch = swiftSearch == null ? 0 : swiftSearch.getId();
@@ -52,6 +55,7 @@ public class SearchRun extends PersistableBase implements Serializable {
 		tasksFailed = taskFailed;
 		this.tasksCompleted = tasksCompleted;
 		this.hidden = hidden ? 1 : 0;
+		this.instruments = instruments;
 	}
 
 	public void setTitle(final String title) {
@@ -162,6 +166,25 @@ public class SearchRun extends PersistableBase implements Serializable {
 
 	public void setHidden(final int hidden) {
 		this.hidden = hidden;
+	}
+
+	/**
+	 * @return A comma-separated list of instrument names as they were in the original .RAW files
+	 */
+	public String getInstruments() {
+		return instruments;
+	}
+
+	public void setInstruments(final String instruments) {
+		this.instruments = instruments;
+	}
+
+	public Integer getRunningTasks() {
+		return runningTasks;
+	}
+
+	public void setRunningTasks(Integer runningTasks) {
+		this.runningTasks = runningTasks;
 	}
 
 	/**

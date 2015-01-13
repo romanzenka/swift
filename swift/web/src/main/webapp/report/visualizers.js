@@ -153,6 +153,14 @@ SearchRunItemVisualizer.prototype.fillWithContents = function (fragment, id, obj
         var duration = element.appendChild(tdDuration);
 
         // ------------------------------------------------------------------
+        var tdInstruments = document.createElement('td');
+
+        tdInstruments.appendChild(document.createTextNode(object.instruments));
+
+        var instruments = element.appendChild(tdInstruments);
+
+
+        // ------------------------------------------------------------------
         var tdAction = document.createElement('td');
 
         if (object.id) {

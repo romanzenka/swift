@@ -274,6 +274,9 @@ public final class ReportUpdate implements HttpRequestHandler {
 	 */
 	private void printSearchRuns(final JsonWriter out, final SearchRunFilter filter, final String method) {
 		final List<SearchRun> searchRuns = swiftDao.getSearchRunList(filter, true);
+		searchDbDao.fillInInstrumentNames(searchRuns);
+		swiftDao.fillNumberRunningTasksForSearchRun(searchRuns);
+
 		final int firstSearchRun = 0;
 		final int lastSearchRun = Math.min(
 				filter.getCount() != null ? Integer.parseInt(filter.getCount()) : 0,
@@ -291,8 +294,7 @@ public final class ReportUpdate implements HttpRequestHandler {
 				newTimestamp = searchRun.getEndTimestamp();
 			}
 
-			final int runningTasks = swiftDao.getNumberRunningTasksForSearchRun(searchRun);
-			out.processSearchRun(i, searchRun, runningTasks, reports, method);
+			out.processSearchRun(i, searchRun, reports, method);
 		}
 		out.setTimestamp(newTimestamp);
 	}
@@ -321,6 +323,7 @@ public final class ReportUpdate implements HttpRequestHandler {
 	 */
 	private void updateSearchRuns(final JsonWriter out, final SearchRunFilter filter, final Date timestamp) {
 		final List<SearchRun> searchRuns = swiftDao.getSearchRunList(filter, true);
+		swiftDao.fillNumberRunningTasksForSearchRun(searchRuns);
 		final int firstSearchRun = filter.getStart() != null ? Integer.parseInt(filter.getStart()) : 0;
 		final int lastSearchRun = Math.min(firstSearchRun + (filter.getCount() != null ? Integer.parseInt(filter.getCount()) : searchRuns.size()), searchRuns.size());
 
@@ -335,9 +338,8 @@ public final class ReportUpdate implements HttpRequestHandler {
 				newTimestamp = searchRun.getEndTimestamp();
 			}
 
-			final int runningTasks = swiftDao.getNumberRunningTasksForSearchRun(searchRun);
 			final boolean doInsert = null != searchRun.getStartTimestamp() && searchRun.getStartTimestamp().compareTo(timestamp) > 0;
-			out.processSearchRun(i, searchRun, runningTasks, reports, doInsert ? "insert" : "update");
+			out.processSearchRun(i, searchRun, reports, doInsert ? "insert" : "update");
 		}
 		out.setTimestamp(newTimestamp);
 	}

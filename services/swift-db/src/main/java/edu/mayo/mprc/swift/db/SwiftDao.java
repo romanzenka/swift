@@ -36,12 +36,11 @@ public interface SwiftDao extends Dao, RuntimeInitializer {
 	List<SearchRun> getSearchRunList(SearchRunFilter filter, boolean withReports);
 
 	/**
-	 * find number of running tasks for a search run
+	 * Fill in the number of running tasks attribute for given search runs
 	 *
-	 * @param searchRun - the search run record object  @see SearchRun
-	 * @return - how many tasks are running
+	 * @param searchRuns Runs to fill in tasks numbers for
 	 */
-	int getNumberRunningTasksForSearchRun(SearchRun searchRun);
+	void fillNumberRunningTasksForSearchRun(List<SearchRun> searchRuns);
 
 	/**
 	 * This will find any search runs that have either started or ended since a give time.

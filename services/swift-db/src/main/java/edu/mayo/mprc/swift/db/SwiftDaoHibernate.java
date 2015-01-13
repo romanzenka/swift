@@ -7,6 +7,7 @@ import edu.mayo.mprc.daemon.AssignedTaskData;
 import edu.mayo.mprc.daemon.files.FileTokenFactory;
 import edu.mayo.mprc.database.DaoBase;
 import edu.mayo.mprc.database.Database;
+import edu.mayo.mprc.database.DatabaseUtilities;
 import edu.mayo.mprc.dbcurator.model.CurationDao;
 import edu.mayo.mprc.swift.dbmapping.*;
 import edu.mayo.mprc.swift.params2.*;
@@ -128,18 +129,35 @@ public final class SwiftDaoHibernate extends DaoBase implements SwiftDao {
 	}
 
 	@Override
-	public int getNumberRunningTasksForSearchRun(final SearchRun searchRun) {
-		// Do not hit database for finished search runs. Counting running tasks is costly
-		if (searchRun.isCompleted()) {
-			return 0;
+	public void fillNumberRunningTasksForSearchRun(List<SearchRun> searchRuns) {
+		List<SearchRun> unfinished = new ArrayList<SearchRun>(searchRuns.size());
+		for (final SearchRun run : searchRuns) {
+			if (run.isCompleted()) {
+				run.setRunningTasks(0);
+			} else {
+				unfinished.add(run);
+			}
 		}
-		try {
-			final long howmanyrunning = (Long) getSession().createQuery("select count(t) from TaskData t where t.searchRun=:searchRun and t.taskState.description='" + TaskState.RUNNING.getText() + "'")
-					.setParameter("searchRun", searchRun)
-					.uniqueResult();
-			return (int) howmanyrunning;
-		} catch (final Exception t) {
-			throw new MprcException("Cannot determine number of running tasks for search run " + searchRun.getTitle(), t);
+
+		Integer[] ids = DatabaseUtilities.getIdList(unfinished);
+
+		final List idToCount = getSession().createQuery("select t.searchRun.id, count(t) from TaskData t" +
+				" where t.searchRun.id in (:ids) and t.taskState.description='" + TaskState.RUNNING.getText() + "'")
+				.setParameterList("ids", ids)
+				.list();
+
+		Map<Integer, Integer> idsToCounts = new HashMap<Integer, Integer>(idToCount.size());
+		for (Object o : idToCount) {
+			if (o instanceof Object[]) {
+				Object[] a = (Object[]) o;
+				Integer id = (Integer) a[0];
+				Integer count = (Integer) a[1];
+				idsToCounts.put(id, count);
+			}
+		}
+
+		for (final SearchRun run : unfinished) {
+			run.setRunningTasks(idsToCounts.get(run.getId()));
 		}
 	}
 
@@ -352,7 +370,8 @@ public final class SwiftDaoHibernate extends DaoBase implements SwiftDao {
 					0,
 					0,
 					0,
-					false);
+					false,
+					null);
 
 			try {
 				getSession().saveOrUpdate(data);

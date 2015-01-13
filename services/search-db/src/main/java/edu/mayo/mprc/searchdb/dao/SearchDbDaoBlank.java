@@ -2,6 +2,7 @@ package edu.mayo.mprc.searchdb.dao;
 
 import edu.mayo.mprc.database.QueryCallback;
 import edu.mayo.mprc.swift.dbmapping.ReportData;
+import edu.mayo.mprc.swift.dbmapping.SearchRun;
 import edu.mayo.mprc.swift.dbmapping.SwiftSearchDefinition;
 import edu.mayo.mprc.utilities.progress.PercentProgressReporter;
 
@@ -84,6 +85,11 @@ public abstract class SearchDbDaoBlank implements SearchDbDao {
 	@Override
 	public SearchResult getSearchResult(final int searchResultId) {
 		return null;
+	}
+
+	@Override
+	public List<SearchRun> fillInInstrumentNames(List<SearchRun> searchRuns) {
+		return searchRuns;
 	}
 
 	@Override
