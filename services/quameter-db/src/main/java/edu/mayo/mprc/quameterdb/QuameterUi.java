@@ -30,7 +30,7 @@ import java.util.Map;
 /**
  * @author Roman Zenka
  */
-public final class QuameterUi implements Dao, UiConfigurationProvider, Lifecycle {
+public final class QuameterUi implements Dao, UiConfigurationProvider, Lifecycle, InstrumentNameMapper {
 	public static final String TYPE = "quameterUi";
 	public static final String NAME = "QuaMeter User Interface";
 	public static final String DESC = "Specialized interface for browsing QuaMeter database";
@@ -229,7 +229,8 @@ public final class QuameterUi implements Dao, UiConfigurationProvider, Lifecycle
 		writer.endObject();
 	}
 
-	private String mapInstrument(final String instrumentSerialNumber) {
+	@Override
+	public String mapInstrument(final String instrumentSerialNumber) {
 		final String result = instrumentMap.get(instrumentSerialNumber);
 		return result == null ? instrumentSerialNumber : result;
 	}

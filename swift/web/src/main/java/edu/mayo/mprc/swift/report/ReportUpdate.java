@@ -275,6 +275,7 @@ public final class ReportUpdate implements HttpRequestHandler {
 	private void printSearchRuns(final JsonWriter out, final SearchRunFilter filter, final String method) {
 		final List<SearchRun> searchRuns = swiftDao.getSearchRunList(filter, true);
 		searchDbDao.fillInInstrumentSerialNumbers(searchRuns);
+		getWebUi().mapInstrumentSerialNumbers(searchRuns);
 		swiftDao.fillNumberRunningTasksForSearchRun(searchRuns);
 
 		final int firstSearchRun = 0;
@@ -325,6 +326,7 @@ public final class ReportUpdate implements HttpRequestHandler {
 		final List<SearchRun> searchRuns = swiftDao.getSearchRunList(filter, true);
 		swiftDao.fillNumberRunningTasksForSearchRun(searchRuns);
 		searchDbDao.fillInInstrumentSerialNumbers(searchRuns);
+		getWebUi().mapInstrumentSerialNumbers(searchRuns);
 		final int firstSearchRun = filter.getStart() != null ? Integer.parseInt(filter.getStart()) : 0;
 		final int lastSearchRun = Math.min(firstSearchRun + (filter.getCount() != null ? Integer.parseInt(filter.getCount()) : searchRuns.size()), searchRuns.size());
 
