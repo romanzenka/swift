@@ -88,7 +88,7 @@ public abstract class SearchDbDaoBlank implements SearchDbDao {
 	}
 
 	@Override
-	public List<SearchRun> fillInInstrumentNames(List<SearchRun> searchRuns) {
+	public List<SearchRun> fillInInstrumentSerialNumbers(List<SearchRun> searchRuns) {
 		return searchRuns;
 	}
 

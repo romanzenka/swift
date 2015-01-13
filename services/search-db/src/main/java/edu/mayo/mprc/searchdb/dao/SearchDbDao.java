@@ -143,5 +143,5 @@ public interface SearchDbDao extends Dao, RuntimeInitializer {
 	 * @param searchRuns List of search runs (likely from {@link edu.mayo.mprc.swift.db.SwiftDao#getSearchRunList})
 	 * @return Same list with all the instrument names that were used in a given search filled in
 	 */
-	List<SearchRun> fillInInstrumentNames(List<SearchRun> searchRuns);
+	List<SearchRun> fillInInstrumentSerialNumbers(List<SearchRun> searchRuns);
 }

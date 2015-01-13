@@ -284,7 +284,7 @@ public class TestSearchDbDao extends DaoTest {
 		searchDbDao.begin();
 		try {
 			final List<SearchRun> searchRunList = swiftDao.getSearchRunList(runFilter(), true);
-			searchDbDao.fillInInstrumentNames(searchRunList);
+			searchDbDao.fillInInstrumentSerialNumbers(searchRunList);
 			searchDbDao.commit();
 
 			Assert.assertEquals(searchRunList.size(), 1, "We have 1 search run by default");

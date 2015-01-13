@@ -302,12 +302,12 @@ public class SearchDbDaoHibernate extends DaoBase implements SearchDbDao {
 				.setParameter("accessionNumber", accessionNumber));
 	}
 
-	public List<SearchRun> fillInInstrumentNames(List<SearchRun> searchRuns) {
+	public List<SearchRun> fillInInstrumentSerialNumbers(List<SearchRun> searchRuns) {
 		if (searchRuns.size() > 0) {
 			final Integer[] ids = DatabaseUtilities.getIdList(searchRuns);
 
 			final List runToInstruments = getSession().createQuery(
-					"select distinct rd.searchRun.id, ms.instrumentName from" +
+					"select distinct rd.searchRun.id, ms.instrumentSerialNumber from" +
 							" Analysis as a" +
 							" inner join a.biologicalSamples as bsl" +
 							" inner join bsl.list as bs" +
@@ -320,10 +320,10 @@ public class SearchDbDaoHibernate extends DaoBase implements SearchDbDao {
 			).setParameterList("ids", ids)
 					.list();
 
-			SortedSetMultimap<Integer, String> runToInstrumentsMap = TreeMultimap.create();
+			final SortedSetMultimap<Integer, String> runToInstrumentsMap = TreeMultimap.create();
 			for (final Object o : runToInstruments) {
 				if (o instanceof Object[]) {
-					Object[] array = (Object[]) o;
+					final Object[] array = (Object[]) o;
 					final Integer searchRunId = (Integer) array[0];
 					final String instrumentName = (String) array[1];
 					runToInstrumentsMap.put(searchRunId, instrumentName);
