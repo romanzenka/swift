@@ -152,7 +152,13 @@ public final class SwiftDaoHibernate extends DaoBase implements SwiftDao {
 				if (o instanceof Object[]) {
 					Object[] a = (Object[]) o;
 					Integer id = (Integer) a[0];
-					Integer count = (Integer) a[1];
+					Integer count;
+					if (a[1] instanceof Long) {
+						Long l = (Long) a[1];
+						count = l.intValue();
+					} else {
+						count = (Integer) a[1];
+					}
 					idsToCounts.put(id, count);
 				}
 			}
