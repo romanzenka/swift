@@ -326,10 +326,9 @@ SearchRunItemVisualizer.prototype.fillWithContents = function (fragment, id, obj
 
         // ------------------------------------------------------------------
         // Arrow
-        var arrow = document.createElement("a");
+        var arrow = document.createElement("span");
         $(arrow).on('click', {"id": id, "object": object, "obj": this}, this.toggleExpanded);
         arrow.className = "arrow";
-        arrow.href = "#";
         var arrowImg = document.createElement("span");
         var details = null;
         if (object.expanded) {
