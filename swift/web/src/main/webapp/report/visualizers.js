@@ -339,7 +339,7 @@ SearchRunItemVisualizer.prototype.fillWithContents = function (fragment, id, obj
                 var detailRow = document.createElement("tr");
                 detailRow.id = id + "_details";
                 var detailCell = document.createElement("td");
-                detailCell.colSpan = 7;
+                detailCell.colSpan = 8;
                 detailRow.appendChild(detailCell);
                 var detailTable = document.createElement("table");
                 detailTable.className = "tasktable";
