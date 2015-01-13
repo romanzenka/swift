@@ -143,7 +143,8 @@ public final class SwiftDaoHibernate extends DaoBase implements SwiftDao {
 			final Integer[] ids = DatabaseUtilities.getIdList(unfinished);
 
 			final List idToCount = getSession().createQuery("select t.searchRun.id, count(t) from TaskData t" +
-					" where t.searchRun.id in (:ids) and t.taskState.description='" + TaskState.RUNNING.getText() + "'")
+					" where t.searchRun.id in (:ids) and t.taskState.description='" + TaskState.RUNNING.getText() + "'" +
+					" group by t.searchRun.id")
 					.setParameterList("ids", ids)
 					.list();
 
