@@ -16,6 +16,7 @@ import edu.mayo.mprc.dbcurator.model.CurationContext;
 import edu.mayo.mprc.msmseval.MSMSEvalParamFile;
 import edu.mayo.mprc.msmseval.MSMSEvalWorker;
 import edu.mayo.mprc.msmseval.MsmsEvalCache;
+import edu.mayo.mprc.qstat.QstatDaemonWorker;
 import edu.mayo.mprc.quameterdb.InstrumentNameMapper;
 import edu.mayo.mprc.quameterdb.QuameterUi;
 import edu.mayo.mprc.swift.db.DatabaseFileTokenFactory;
@@ -624,10 +625,13 @@ public final class WebUi implements Checkable {
 					.defaultValue(swiftSearcher)
 
 					.property(QSTAT, "Qstat", "If you are running in Sun Grid Engine and want to have the job status available from the web interface, add a Qstat module. This is completely optional and provided solely for user convenience.")
-					.reference("qstat", UiBuilder.NONE_TYPE)
+					.reference(QstatDaemonWorker.TYPE, UiBuilder.NONE_TYPE)
 
 					.property(SCAFFOLD_VIEWER_URL, "Scaffold Viewer URL", "Display this URL so the users can download a specific version of Scaffold viewer.<br><p>The default download location is: <a href=\"" + DEFAULT_SCAFFOLD_VIEWER_URL + "\">" + DEFAULT_SCAFFOLD_VIEWER_URL + "</a>")
 					.defaultValue(DEFAULT_SCAFFOLD_VIEWER_URL)
+
+					.property(QUAMETER_UI, "Quameter UI", "We use the instrument name map from QuaMeter to display our instruments in a more user friendly manner")
+					.reference(QuameterUi.TYPE, UiBuilder.NONE_TYPE)
 
 					.addDaemonChangeListener(new PropertyChangeListener() {
 						@Override
