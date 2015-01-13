@@ -71,7 +71,7 @@
             </a>
         </div>
         <div class="span4">
-            <a href="file:///mfad/rchapp/odin/prod">
+            <a href="file:////mfad/rchapp/odin/prod">
                 <div class="hero-unit" style="background-image: url(/images/odin.jpg);">
                     <h1>Odin</h1>
                 </div>
