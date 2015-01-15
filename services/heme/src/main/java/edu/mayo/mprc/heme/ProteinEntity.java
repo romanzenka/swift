@@ -22,7 +22,7 @@ public final class ProteinEntity {
 
     // Define Enum to Streaming Sort the collection of entities
     public enum Filter {
-        MUTATION_CONFIRMED, RELATED_MUTANT, OTHER;
+        MUTATION_CONFIRMED, UNSUPPORTED, RELATED_MUTANT, OTHER;
     };
 
 
