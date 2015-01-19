@@ -72,15 +72,25 @@ public final class QuameterDaoHibernate extends DaoBase implements QuameterDao, 
 
 	@Override
 	public List<QuameterResult> listVisibleResults() {
-		return listResults(ListItems.SHOWN);
+		return listResults(ListItems.SHOWN, true);
+	}
+
+	@Override
+	public List<QuameterResult> listVisibleResultsAllTime() {
+		return listResults(ListItems.SHOWN, false);
 	}
 
 	@Override
 	public List<QuameterResult> listHiddenResults() {
-		return listResults(ListItems.HIDDEN);
+		return listResults(ListItems.HIDDEN, true);
 	}
 
-	private List<QuameterResult> listResults(final ListItems listedItems) {
+	/**
+	 * @param listedItems Shown/hidden items?
+	 * @param timeLimit   Apply the 1-year time limit
+	 * @return List of all results matching the criteria
+	 */
+	private List<QuameterResult> listResults(final ListItems listedItems, final boolean timeLimit) {
 		final List<QuameterProteinGroup> activeProteinGroups = listProteinGroups();
 
 		final String hiddenQuery;
@@ -126,14 +136,18 @@ public final class QuameterDaoHibernate extends DaoBase implements QuameterDao, 
 				+ " m.swift_search_definition_id = d.swift_search_definition_id AND"
 				+ " m.metadata_key='quameter.category' AND"
 				+ " t.tandem_mass_spec_sample_id = sr.tandem_mass_spec_sample_id AND"
-				+ " sr.search_result_id = q.search_result_id AND"
-				+ " t.start_time >= :timeStart "
+				+ " sr.search_result_id = q.search_result_id "
+				+ (timeLimit ? " AND t.start_time >= :timeStart " : "")
 				+ " ORDER BY t.start_time")
 				.addEntity("q", QuameterResult.class)
 				.addScalar("v", StandardBasicTypes.STRING)
 				.addScalar("ti", StandardBasicTypes.INTEGER)
-				.addScalar("an", StandardBasicTypes.STRING)
-				.setParameter("timeStart", lowerDateLimit.toDate(), StandardBasicTypes.DATE);
+				.addScalar("an", StandardBasicTypes.STRING);
+
+		if (timeLimit) {
+			query.setParameter("timeStart", lowerDateLimit.toDate(), StandardBasicTypes.DATE);
+		}
+
 		final List raw = query.list();
 		final List<QuameterResult> filtered = new ArrayList<QuameterResult>(Math.min(raw.size(), 1000));
 		for (final Object o : raw) {
@@ -267,7 +281,7 @@ public final class QuameterDaoHibernate extends DaoBase implements QuameterDao, 
 	public void recalculateProteinCounts(final List<QuameterProteinGroup> toAdd) {
 		LOGGER.info("Recalculating the protein counts as the protein groups changed. This might take a long time");
 
-		final List<QuameterResult> quameterResults = listResults(ListItems.ALL);
+		final List<QuameterResult> quameterResults = listResults(ListItems.ALL, false);
 		int step = 0;
 		final PercentProgressReporter reporter = new PercentDoneReporter(null, "Updating quameter results: ");
 		for (final QuameterResult result : quameterResults) {

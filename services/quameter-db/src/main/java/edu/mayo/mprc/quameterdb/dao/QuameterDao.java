@@ -30,6 +30,11 @@ public interface QuameterDao extends Dao {
 	List<QuameterResult> listVisibleResults();
 
 	/**
+	 * @return All Quameter results that are not hidden. No time limit
+	 */
+	List<QuameterResult> listVisibleResultsAllTime();
+
+	/**
 	 * @return Only hidden Quameter results.
 	 */
 	List<QuameterResult> listHiddenResults();
