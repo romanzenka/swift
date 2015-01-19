@@ -14,10 +14,15 @@ legendForCharge<-c("0","1","2","3","4","5","6","7","8")
 ci95Col <- rgb(235, 235, 235, maxColorValue=255)
 colors.by.mslevel <- c(
   "red", # We do not smooth MS data
-  rgb(220, 220, 255, maxColorValue=255), 
-  rgb(220, 255, 220, maxColorValue=255),     
-  rgb(255, 255, 220, maxColorValue=255))
+  "#DCDCFF", 
+  "#DCFFDC",     
+  "#FFFFDC")
 colors.by.mslevel.smoothed <- c("red", "blue", "green", "yellow")
+colors.by.mslevel.mean <- c( # Average lines
+  "#FFAAAA", 
+  "#AAAAFF", 
+  "#AAFFAA",     
+  "#FFFFAA")
 
 # Plot names
 lockmass.title<-"Mass Calibration vs. RT"
@@ -580,16 +585,27 @@ imageGenerator<-function(dataFile, msmsEvalDataFile, infoFile, spectrumFile, chr
           )     
         }
       }
-      
+
       # Draw helper lines
       abline(h=1e3);
       abline(h=1e6);     
       abline(h=1e9);
       
+      # Draw averages
+      for(level in used.mslevel) {
+        keep <- spectrumInfo$MS.Level==level
+        
+        mean.tic <- mean(spectrumInfo$TIC[keep])     
+        mean.color <- colors.by.mslevel.mean[level]
+        abline(h=mean.tic, col=mean.color)
+        axis(4, at=mean.tic, labels=format(mean.tic, scientific=TRUE, digits=3), tick=TRUE, 
+             col = mean.color, col.ticks = mean.color, col.axis = mean.color)
+      }    
+            
       # Draw smoothed data
       for(level in used.mslevel) {
+        keep <- spectrumInfo$MS.Level==level        
         if(level!=1) {
-          keep <- spectrumInfo$MS.Level==level
           lines(
             x=spectrumInfo$RT[keep],
             y=exp(movingAverage(log(spectrumInfo$TIC[keep]+1), tic.moving.average)), # Average consecutive spectra (in log scale so the plots make sense)
@@ -690,7 +706,7 @@ imageGenerator<-function(dataFile, msmsEvalDataFile, infoFile, spectrumFile, chr
       
       if(!is.null(chromatogram)) {
         image(
-          x=xAxisMs, 
+          x=xAxisMs,
           y=seq(chromatogram.minMz, chromatogram.maxMz, length.out=dim(chromatogram$image)[2]),
           z=chromatogram$image,
           col=chromatogram$col,
@@ -1144,6 +1160,7 @@ run <- function(inputFile, reportFileName, decoyRegex) {
 }
 
 args<-commandArgs(TRUE)
+#args<-c("/Users/m044910/Documents/devel/swift/swift/scripts/src/test/input.txt", "/Users/m044910/Documents/devel/swift/swift/scripts/src/test/output.html", "Rev_")
 inputFile<-args[1]
 reportFileName<-args[2]
 decoyRegex<-args[3] # Currently treated just as a plain prefix
