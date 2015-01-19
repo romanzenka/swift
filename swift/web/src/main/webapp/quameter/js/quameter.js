@@ -347,10 +347,14 @@ function addDygraph(viewIndex, view, viewId, metricId, viewMetadata, data, range
                 highlightCircleSize: 4
             },
             highlightCallback: function (event, x, points, viewRow, seriesName) {
-                pointHighlighted = viewRow;
-                var row = viewMetadata.filteredRows[viewRow];
-                if (pointSelected == -1) {
-                    highlightRow(row);
+                if (viewRow < 0 || viewRow >= viewMetadata.filteredRows.length) {
+                    highlightRow(-1);
+                } else {
+                    pointHighlighted = viewRow;
+                    var row = viewMetadata.filteredRows[viewRow];
+                    if (pointSelected == -1) {
+                        highlightRow(row);
+                    }
                 }
             },
             unhighlightCallback: function (event) {

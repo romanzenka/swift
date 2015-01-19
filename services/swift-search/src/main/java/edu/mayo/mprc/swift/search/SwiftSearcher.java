@@ -399,6 +399,14 @@ public final class SwiftSearcher implements Worker, Lifecycle {
 		running = false;
 	}
 
+	public void setSemitrypticQuameter(final boolean semitrypticQuameter) {
+		this.semitrypticQuameter = semitrypticQuameter;
+	}
+
+	public boolean isSemitrypticQuameter() {
+		return semitrypticQuameter;
+	}
+
 	/**
 	 * A factory capable of creating the worker.
 	 */
@@ -464,6 +472,8 @@ public final class SwiftSearcher implements Worker, Lifecycle {
 			}
 
 			worker.setReportDecoyHits(config.reportDecoyHits);
+
+			worker.setSemitrypticQuameter(config.isSemitrypticQuameter());
 
 			return worker;
 		}

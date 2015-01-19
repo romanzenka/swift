@@ -178,7 +178,7 @@
                     x1 = x2;
                     y1 = y2;
                 }
-    }
+            }
             realStroke.call(this);
             segments = [];
         };
@@ -425,7 +425,7 @@ var DygraphOptions = (function () {
             Dygraph.update(this.xAxis_.options, axis_opts["x"] || {});
 
             if (DEBUG) this.validateOptions_();
-};
+        };
 
         /**
          * Get a global value.
@@ -483,7 +483,7 @@ var DygraphOptions = (function () {
                     axisIdx = 1;
                 } else if (axis == "x") {
                     axisIdx = -1; // simply a placeholder for below.
-    } else {
+                } else {
                     throw "Unknown axis " + axis;
     }
                 axisString = axis;
@@ -529,7 +529,7 @@ var DygraphOptions = (function () {
             if (series === this.dygraph_.getHighlightSeries()) {
                 if (this.highlightSeries_.hasOwnProperty(name)) {
                     return this.highlightSeries_[name];
-    }
+                }
             }
 
             if (!this.series_.hasOwnProperty(series)) {
@@ -598,7 +598,7 @@ var DygraphOptions = (function () {
                 var validateOption = function (optionName) {
                     if (!Dygraph.OPTIONS_REFERENCE[optionName]) {
                         that.warnInvalidOption_(optionName);
-    }
+                    }
                 };
 
                 var optionsDicts = [this.xAxis_.options,
@@ -612,7 +612,7 @@ var DygraphOptions = (function () {
                     var name = names[i];
                     if (this.series_.hasOwnProperty(name)) {
                         optionsDicts.push(this.series_[name].options);
-    }
+                    }
                 }
                 for (var i = 0; i < optionsDicts.length; i++) {
                     var dict = optionsDicts[i];
@@ -621,7 +621,7 @@ var DygraphOptions = (function () {
                         if (dict.hasOwnProperty(optionName)) {
                             validateOption(optionName);
                         }
-    }
+                    }
                 }
             };
 
@@ -641,14 +641,14 @@ var DygraphOptions = (function () {
                     } else {
                         console.warn('Unknown option ' + optionName + ' (full list of options at dygraphs.com/options.html');
                         throw "invalid option " + optionName;
-    }
+                    }
                 }
-};
+            };
 
 // Reset list of previously-shown warnings. Used for testing.
             DygraphOptions.resetWarnings_ = function () {
                 WARNINGS = {};
-};
+            };
 
         }
 
@@ -1307,7 +1307,7 @@ var DygraphCanvasRenderer = (function () {
                 }
                 if (i == limit) break;
                 point = arr[i];
-    }
+            }
 
             // FIXME: The 'canvasy != canvasy' test here catches NaN values but the test
             // doesn't catch Infinity values. Could change this to
@@ -1356,7 +1356,7 @@ var DygraphCanvasRenderer = (function () {
                 }
                 prevCanvasX = point.canvasx;
                 prevCanvasY = point.canvasy;
-    }
+            }
             first = false;
         }
         ctx.stroke();
@@ -1464,10 +1464,10 @@ var DygraphCanvasRenderer = (function () {
                 if (setName in setPlotters) {
                     if (is_last) {
                         p = setPlotters[setName];
-        } else {
+                    } else {
                         // Don't use the standard plotters in this case.
                         continue;
-        }
+                    }
                 }
 
                 var color = this.colors[setName];
@@ -1668,7 +1668,7 @@ var DygraphCanvasRenderer = (function () {
                     var prevAction = pendingActions[i - 1];
                     if (prevAction[1] == action[1] && prevAction[2] == action[2]) {
                         pendingActions.splice(i, 1);
-        }
+                    }
                 }
     }
 
@@ -1772,7 +1772,7 @@ var DygraphCanvasRenderer = (function () {
                 return actionCount;
             }
         };
-};
+    };
 
     /**
      * Draws the shaded regions when "fillGraph" is set. Not to be confused with
@@ -1837,7 +1837,7 @@ var DygraphCanvasRenderer = (function () {
                     var pt = pathBack[i];
                     ctx.lineTo(pt[0], pt[1]);
                 }
-    }
+            }
         };
 
         // process sets in reverse order (needed for stacked graphs)
@@ -1901,10 +1901,10 @@ var DygraphCanvasRenderer = (function () {
                 if (stackedGraph) {
                     if (!is_first && last_x == point.xval) {
                         continue;
-        } else {
+                    } else {
                         is_first = false;
                         last_x = point.xval;
-        }
+                    }
 
                     currBaseline = baseline[point.canvasx];
                     var lastY;
@@ -1916,7 +1916,7 @@ var DygraphCanvasRenderer = (function () {
                         } else {
                             lastY = currBaseline;
                         }
-        }
+                    }
                     newYs = [point.canvasy, lastY];
 
                     if (stepPlot) {
@@ -1929,23 +1929,23 @@ var DygraphCanvasRenderer = (function () {
                         }
                     } else {
                         baseline[point.canvasx] = point.canvasy;
-        }
+                    }
 
                 } else {
                     if (isNaN(point.canvasy) && stepPlot) {
                         newYs = [area.y + area.h, axisY];
                     } else {
                         newYs = [point.canvasy, axisY];
-        }
+                    }
                 }
                 if (!isNaN(prevX)) {
                     // Move to top fill point
                     if (stepPlot) {
                         ctx.lineTo(point.canvasx, prevYs[0]);
                         ctx.lineTo(point.canvasx, newYs[0]);
-        } else {
+                    } else {
                         ctx.lineTo(point.canvasx, newYs[0]);
-        }
+                    }
 
                     // Record the baseline for the reverse path.
                     if (stackedGraph) {
@@ -1956,14 +1956,14 @@ var DygraphCanvasRenderer = (function () {
                         } else {
                             pathBack.push([point.canvasx, newYs[1]]);
                         }
-        }
+                    }
                 } else {
                     ctx.moveTo(point.canvasx, newYs[1]);
                     ctx.lineTo(point.canvasx, newYs[0]);
                 }
                 prevYs = newYs;
                 prevX = point.canvasx;
-    }
+            }
             prevStepPlot = stepPlot;
             if (newYs && point) {
                 traceBackPath(ctx, point.canvasx, newYs[1], pathBack);
@@ -2128,13 +2128,13 @@ Dygraph.ANIMATION_DURATION = 200;
             if (kmb) {
                 k = 1000;
                 k_labels = Dygraph.KMB_LABELS;
-    }
+            }
             if (kmg2) {
                 if (kmb) console.warn("Setting both labelsKMB and labelsKMG2. Pick one!");
                 k = 1024;
                 k_labels = Dygraph.KMG2_BIG_LABELS;
                 m_labels = Dygraph.KMG2_SMALL_LABELS;
-    }
+            }
 
             var absx = Math.abs(x);
             var n = Dygraph.pow(k, k_labels.length);
@@ -2210,7 +2210,7 @@ Dygraph.ANIMATION_DURATION = 200;
             if (frac === 0 || granularity >= Dygraph.DAILY) {
                 // e.g. '21 Jan' (%d%b)
                 return Dygraph.zeropad(day) + '&#160;' + Dygraph.SHORT_MONTH_NAMES_[month];
-    } else {
+            } else {
                 return Dygraph.hmsString_(hours, mins, secs);
     }
         }
@@ -2707,7 +2707,7 @@ Dygraph.addedAnnotationCSS = false;
      */
     Dygraph.prototype.getStringOption = function (name, opt_seriesName) {
         return /** @type{string} */(this.getOption(name, opt_seriesName));
-};
+    };
 
     /**
      * Like getOption(), but specifically returns a boolean.
@@ -2719,7 +2719,7 @@ Dygraph.addedAnnotationCSS = false;
      */
     Dygraph.prototype.getBooleanOption = function (name, opt_seriesName) {
         return /** @type{boolean} */(this.getOption(name, opt_seriesName));
-};
+    };
 
     /**
      * Like getOption(), but specifically returns a function.
@@ -3086,7 +3086,7 @@ Dygraph.addedAnnotationCSS = false;
     Dygraph.prototype.numRows = function () {
         if (!this.rawData_) return 0;
         return this.rawData_.length;
-};
+    };
 
     /**
      * Returns the value in the given row and column. If the row and column exceed
@@ -3103,7 +3103,7 @@ Dygraph.addedAnnotationCSS = false;
         if (col < 0 || col > this.rawData_[row].length) return null;
 
         return this.rawData_[row][col];
-};
+    };
 
     /**
      * Generates interface elements for the Dygraph: a containing div, a div to
@@ -3396,7 +3396,7 @@ Dygraph.addedAnnotationCSS = false;
         for (var name in textAttr) {
             if (textAttr.hasOwnProperty(name)) {
                 this.roller_.style[name] = textAttr[name];
-    }
+            }
         }
 
         var dygraph = this;
@@ -3519,7 +3519,7 @@ Dygraph.addedAnnotationCSS = false;
 
             this.addAndTrackEvent(document, 'mouseup', mouseUpHandler);
         }
-};
+    };
 
     /**
      * Draw a gray zoom rectangle over the desired area of the canvas. Also clears
@@ -3708,7 +3708,7 @@ Dygraph.addedAnnotationCSS = false;
                 for (i = 0; i < this.axes_.length; i++) {
                     if (this.axes_[i].valueWindow !== null) {
                         delete this.axes_[i].valueWindow;
-        }
+                    }
                 }
                 this.drawGraph_();
                 if (this.getFunctionOption("zoomCallback")) {
@@ -3722,7 +3722,7 @@ Dygraph.addedAnnotationCSS = false;
             if (dirtyX) {
                 oldWindow = this.xAxisRange();
                 newWindow = [minDate, maxDate];
-    }
+            }
 
             if (dirtyY) {
                 oldValueRanges = this.yAxisRanges();
@@ -3743,7 +3743,7 @@ Dygraph.addedAnnotationCSS = false;
                     axis.valueRange !== undefined) ?
                         axis.valueRange : axis.extremeRange);
                 }
-    }
+            }
 
             var that = this;
             this.doAnimatedZoom(oldWindow, newWindow, oldValueRanges, newValueRanges,
@@ -3780,7 +3780,7 @@ Dygraph.addedAnnotationCSS = false;
                 frac = Dygraph.zoomAnimationFunction(step, steps);
                 windows[step - 1] = [oldXRange[0] * (1 - frac) + frac * newXRange[0],
                     oldXRange[1] * (1 - frac) + frac * newXRange[1]];
-    }
+            }
         }
 
         if (oldYRanges !== null && newYRanges !== null) {
@@ -3817,7 +3817,7 @@ Dygraph.addedAnnotationCSS = false;
      */
     Dygraph.prototype.getArea = function () {
         return this.plotter_.area;
-};
+    };
 
     /**
      * Convert a mouse event to DOM coordinates relative to the graph origin.
@@ -3833,7 +3833,7 @@ Dygraph.addedAnnotationCSS = false;
             var canvasy = Dygraph.pageY(event) - eventElementPos.y;
             return [canvasx, canvasy];
         }
-};
+    };
 
     /**
      * Given a canvas X coordinate, find the closest row.
@@ -3860,7 +3860,7 @@ Dygraph.addedAnnotationCSS = false;
         }
 
         return closestRow;
-};
+    };
 
     /**
      * Given canvas X,Y coordinates, find the closest point.
@@ -3942,14 +3942,14 @@ Dygraph.addedAnnotationCSS = false;
                     if (dx > 0) {
                         var r = (p1.canvasx - domX) / dx;
                         py += r * (p0.canvasy - p1.canvasy);
-        }
+                    }
                 }
     }
             // Stop if the point (domX, py) is above this series' upper edge
             if (setIdx === 0 || py < domY) {
                 closestPoint = p1;
                 closestSeries = setIdx;
-    }
+            }
         }
         var name = this.layout_.setNames[closestSeries];
         return {
@@ -3981,7 +3981,7 @@ Dygraph.addedAnnotationCSS = false;
             var closest;
             if (this.getBooleanOption("stackedGraph")) {
                 closest = this.findStackedPoint(canvasx, canvasy);
-    } else {
+            } else {
                 closest = this.findClosestPoint(canvasx, canvasy);
     }
             selectionChanged = this.setSelection(closest.row, closest.seriesName);
@@ -3998,7 +3998,7 @@ Dygraph.addedAnnotationCSS = false;
                 this.lastRow_,
                 this.highlightSet_);
         }
-};
+    };
 
     /**
      * Fetch left offset from the specified set index or if not passed, the
@@ -4306,7 +4306,7 @@ Dygraph.addedAnnotationCSS = false;
         // var msg = 'ticker(' + range[0] + ', ' + range[1] + ', ' + this.width_ + ', ' + this.attr_('pixelsPerXLabel') + ') -> ' + JSON.stringify(xTicks);
         // console.log(msg);
         this.layout_.setXTicks(xTicks);
-};
+    };
 
     /**
      * Returns the correct handler class for the currently set options.
@@ -4415,7 +4415,7 @@ Dygraph.addedAnnotationCSS = false;
  *     yval_stacked
  * }}
      */
-Dygraph.PointType = undefined;
+    Dygraph.PointType = undefined;
 
     /**
      * Calculates point stacking for stackedGraph=true.
@@ -4483,7 +4483,7 @@ Dygraph.PointType = undefined;
                         actualYval = prevPoint.yval;
                     } else if (nextPoint && fillMethod == 'all') {
                         actualYval = nextPoint.yval;
-        } else {
+                    } else {
                         actualYval = 0;
         }
                 }
@@ -4496,17 +4496,17 @@ Dygraph.PointType = undefined;
                 // If an x-value is repeated, we ignore the duplicates.
                 stackedYval += actualYval;
                 cumulativeYval[xval] = stackedYval;
-    }
+            }
             lastXval = xval;
 
             point.yval_stacked = stackedYval;
 
             if (stackedYval > seriesExtremes[1]) {
                 seriesExtremes[1] = stackedYval;
-    }
+            }
             if (stackedYval < seriesExtremes[0]) {
                 seriesExtremes[0] = stackedYval;
-    }
+            }
         }
 };
 
@@ -4598,7 +4598,7 @@ Dygraph.PointType = undefined;
             } else {
                 series = rolledSeries[seriesIdx];
                 boundaryIds[seriesIdx - 1] = [0, series.length - 1];
-    }
+            }
 
             var seriesName = this.attr_("labels")[seriesIdx];
             var seriesExtremes = this.dataHandler_.getExtremeYValues(series,
@@ -4614,7 +4614,7 @@ Dygraph.PointType = undefined;
                 }
                 Dygraph.stackPoints_(seriesPoints, cumulativeYval[axisIdx], seriesExtremes,
                     this.getBooleanOption("stackedGraphNaNFill"));
-    }
+            }
 
             extremes[seriesName] = seriesExtremes;
             points[seriesIdx] = seriesPoints;
@@ -4891,11 +4891,11 @@ Dygraph.PointType = undefined;
                 if (span === 0) {
                     if (maxY !== 0) {
                         span = Math.abs(maxY);
-        } else {
+                    } else {
                         // ... and if the sole value is zero, use range 0-1.
                         maxY = 1;
                         span = 1;
-        }
+                    }
                 }
 
                 var maxAxisY, minAxisY;
@@ -4903,11 +4903,11 @@ Dygraph.PointType = undefined;
                     if (ypadCompat) {
                         maxAxisY = maxY + ypad * span;
                         minAxisY = minY;
-        } else {
+                    } else {
                         var logpad = Math.exp(Math.log(span) * ypad);
                         maxAxisY = maxY * logpad;
                         minAxisY = minY / logpad;
-        }
+                    }
                 } else {
                     maxAxisY = maxY + ypad * span;
                     minAxisY = minY - ypad * span;
@@ -4920,7 +4920,7 @@ Dygraph.PointType = undefined;
         }
                 }
                 axis.extremeRange = [minAxisY, maxAxisY];
-    }
+            }
             if (axis.valueWindow) {
                 // This is only set if the user has zoomed on the y-axis. It is never set
                 // by a user. It takes precedence over axis.valueRange because, if you set
@@ -4939,12 +4939,12 @@ Dygraph.PointType = undefined;
                         span = y1 - y0;
                         y0 -= span * ypad;
                         y1 += span * ypad;
-        }
+                    }
                 }
                 axis.computedValueRange = [y0, y1];
             } else {
                 axis.computedValueRange = axis.extremeRange;
-    }
+            }
 
 
             if (independentTicks) {
@@ -5093,54 +5093,54 @@ Dygraph.PointType = undefined;
             fields[0] = xParser(inFields[0], this);
 
             // If fractions are expected, parse the numbers as "A/B"
-    if (this.fractions_) {
-        for (j = 1; j < inFields.length; j++) {
-            // TODO(danvk): figure out an appropriate way to flag parse errors.
-            vals = inFields[j].split("/");
-            if (vals.length != 2) {
-                console.error('Expected fractional "num/den" values in CSV data ' +
-                "but found a value '" + inFields[j] + "' on line " +
-                (1 + i) + " ('" + line + "') which is not of this form.");
-                fields[j] = [0, 0];
+            if (this.fractions_) {
+                for (j = 1; j < inFields.length; j++) {
+                    // TODO(danvk): figure out an appropriate way to flag parse errors.
+                    vals = inFields[j].split("/");
+                    if (vals.length != 2) {
+                        console.error('Expected fractional "num/den" values in CSV data ' +
+                        "but found a value '" + inFields[j] + "' on line " +
+                        (1 + i) + " ('" + line + "') which is not of this form.");
+                        fields[j] = [0, 0];
             } else {
-                fields[j] = [Dygraph.parseFloat_(vals[0], i, line),
-                    Dygraph.parseFloat_(vals[1], i, line)];
+                        fields[j] = [Dygraph.parseFloat_(vals[0], i, line),
+                            Dygraph.parseFloat_(vals[1], i, line)];
         }
-        }
-    } else if (this.getBooleanOption("errorBars")) {
-        // If there are error bars, values are (value, stddev) pairs
-        if (inFields.length % 2 != 1) {
-            console.error('Expected alternating (value, stdev.) pairs in CSV data ' +
-            'but line ' + (1 + i) + ' has an odd number of values (' +
-            (inFields.length - 1) + "): '" + line + "'");
-        }
-        for (j = 1; j < inFields.length; j += 2) {
-            fields[(j + 1) / 2] = [Dygraph.parseFloat_(inFields[j], i, line),
-                Dygraph.parseFloat_(inFields[j + 1], i, line)];
-        }
-    } else if (this.getBooleanOption("customBars")) {
-        // Bars are a low;center;high tuple
-        for (j = 1; j < inFields.length; j++) {
-            var val = inFields[j];
-            if (/^ *$/.test(val)) {
-                fields[j] = [null, null, null];
-        } else {
-                vals = val.split(";");
-                if (vals.length == 3) {
-                    fields[j] = [Dygraph.parseFloat_(vals[0], i, line),
-                        Dygraph.parseFloat_(vals[1], i, line),
-                        Dygraph.parseFloat_(vals[2], i, line)];
+                }
+            } else if (this.getBooleanOption("errorBars")) {
+                // If there are error bars, values are (value, stddev) pairs
+                if (inFields.length % 2 != 1) {
+                    console.error('Expected alternating (value, stdev.) pairs in CSV data ' +
+                    'but line ' + (1 + i) + ' has an odd number of values (' +
+                    (inFields.length - 1) + "): '" + line + "'");
+                }
+                for (j = 1; j < inFields.length; j += 2) {
+                    fields[(j + 1) / 2] = [Dygraph.parseFloat_(inFields[j], i, line),
+                        Dygraph.parseFloat_(inFields[j + 1], i, line)];
+                }
+            } else if (this.getBooleanOption("customBars")) {
+                // Bars are a low;center;high tuple
+                for (j = 1; j < inFields.length; j++) {
+                    var val = inFields[j];
+                    if (/^ *$/.test(val)) {
+                        fields[j] = [null, null, null];
+                    } else {
+                        vals = val.split(";");
+                        if (vals.length == 3) {
+                            fields[j] = [Dygraph.parseFloat_(vals[0], i, line),
+                                Dygraph.parseFloat_(vals[1], i, line),
+                                Dygraph.parseFloat_(vals[2], i, line)];
                 } else {
-                    console.warn('When using customBars, values must be either blank ' +
-                    'or "low;center;high" tuples (got "' + val +
-                    '" on line ' + (1 + i));
+                            console.warn('When using customBars, values must be either blank ' +
+                            'or "low;center;high" tuples (got "' + val +
+                            '" on line ' + (1 + i));
                 }
         }
-        }
+                }
     } else {
-        // Values are just numbers
-        for (j = 1; j < inFields.length; j++) {
-            fields[j] = Dygraph.parseFloat_(inFields[j], i, line);
+                // Values are just numbers
+                for (j = 1; j < inFields.length; j++) {
+                    fields[j] = Dygraph.parseFloat_(inFields[j], i, line);
         }
     }
             if (ret.length > 0 && fields[0] < ret[ret.length - 1][0]) {
@@ -5240,7 +5240,7 @@ Dygraph.PointType = undefined;
                     return null;
                 }
                 parsedData[i][0] = parsedData[i][0].getTime();
-    }
+            }
             return parsedData;
         } else {
             // Some intelligent defaults for a numeric x-axis.
@@ -5252,7 +5252,7 @@ Dygraph.PointType = undefined;
             this.attrs_.axes.x.axisLabelFormatter = Dygraph.numberAxisLabelFormatter;
             return data;
         }
-};
+    };
 
     /**
      * Parses a DataTable object from gviz.
@@ -5273,7 +5273,7 @@ Dygraph.PointType = undefined;
             while (num > 0) {
                 shortText = String.fromCharCode(65 /* A */ + (num - 1) % 26) + shortText.toLowerCase();
                 num = Math.floor((num - 1) / 26);
-    }
+            }
             return shortText;
         };
 
@@ -5322,7 +5322,7 @@ Dygraph.PointType = undefined;
             } else {
                 console.error("Only 'number' is supported as a dependent type with Gviz." +
                 " 'string' is only supported if displayAnnotations is true");
-    }
+            }
         }
 
         // Read column labels
@@ -5349,9 +5349,9 @@ Dygraph.PointType = undefined;
 
             if (indepType == 'date' || indepType == 'datetime') {
                 row.push(data.getValue(i, 0).getTime());
-    } else {
+            } else {
                 row.push(data.getValue(i, 0));
-    }
+            }
             if (!this.getBooleanOption("errorBars")) {
                 for (j = 0; j < colIdx.length; j++) {
                     var col = colIdx[j];
@@ -5369,18 +5369,18 @@ Dygraph.PointType = undefined;
                             ann.text += data.getValue(i, annotationCols[col][k]);
                         }
                         annotations.push(ann);
-        }
+                    }
                 }
 
                 // Strip out infinities, which give dygraphs problems later on.
                 for (j = 0; j < row.length; j++) {
                     if (!isFinite(row[j])) row[j] = null;
                 }
-    } else {
+            } else {
                 for (j = 0; j < cols - 1; j++) {
                     row.push([data.getValue(i, 1 + 2 * j), data.getValue(i, 2 + 2 * j)]);
                 }
-    }
+            }
             if (ret.length > 0 && row[0] < ret[ret.length - 1][0]) {
                 outOfOrder = true;
             }
@@ -5791,7 +5791,7 @@ Dygraph.PointType = undefined;
                 return;
             } catch (err) {
                 // Was likely a security exception.
-    }
+            }
         }
 
         console.warn("Unable to add default annotation CSS rule; display may be off.");
@@ -6044,7 +6044,7 @@ Dygraph.PointType = undefined;
                     break;
                 }
                 copyObj = copyObj.offsetParent;
-    }
+            }
         } else {
             // TODO(danvk): why would obj ever have these properties?
             if (obj.x) curleft += obj.x;
@@ -6603,7 +6603,7 @@ Dygraph.PointType = undefined;
                 // We default backingStoreRatio to 1: this does not exist on some browsers
                 // (i.e. desktop Chrome).
                 return 1;
-    }
+            }
         } catch (e) {
             return 1;
         }
@@ -6820,7 +6820,7 @@ Dygraph.PointType = undefined;
         if (labels) {
             for (var i = 1; i < labels.length; i++) {
                 seriesNamesDictionary[labels[i]] = true;
-    }
+            }
         }
 
         // Scan through a flat (i.e. non-nested) object of options.
@@ -6852,7 +6852,7 @@ Dygraph.PointType = undefined;
                         return true;
                     }
                 }
-    } else {
+            } else {
                 // If this was not a series specific option list, check if it's a pixel
                 // changing property.
                 if (!pixelSafeOptions[property]) return true;
@@ -7288,7 +7288,7 @@ Dygraph.PointType = undefined;
             if (logscale) {
                 axis_data.initialTopValue = Dygraph.log10(yRange[1]);
                 axis_data.dragValueRange = Dygraph.log10(yRange[1]) - Dygraph.log10(yRange[0]);
-    } else {
+            } else {
                 axis_data.initialTopValue = yRange[1];
                 axis_data.dragValueRange = yRange[1] - yRange[0];
     }
@@ -7516,7 +7516,7 @@ Dygraph.PointType = undefined;
                 clickCallback.call(g, event, g.lastx_, g.selPoints_);
             }
         }
-};
+    };
 
     /**
      * Called in response to an interaction model operation that
@@ -7879,7 +7879,7 @@ Dygraph.PointType = undefined;
     }
             g.resetZoom();
         }
-};
+    };
 
     Dygraph.DEFAULT_ATTRS.interactionModel = Dygraph.Interaction.defaultModel;
 
@@ -7897,7 +7897,7 @@ Dygraph.PointType = undefined;
             context.initializeMouseDown(event, g, context);
         },
         mouseup: Dygraph.Interaction.maybeTreatMouseOpAsClick
-};
+    };
 
 // Default interaction model when using the range selector.
     Dygraph.Interaction.dragIsPanInteractionModel = {
@@ -8135,7 +8135,7 @@ Dygraph.PointType = undefined;
             // this can happen if self.width_ is zero.
             return [];
         }
-};
+    };
 
 // Time granularity enumeration
 // TODO(danvk): make this an @enum
@@ -8359,7 +8359,7 @@ Dygraph.PointType = undefined;
             if (tick_time < start_time) {
                 tick_time += spacing;
                 tick_date = new Date(tick_time);
-    }
+            }
             while (tick_time <= end_time) {
                 ticks.push({
                     v: tick_time,
@@ -8367,13 +8367,13 @@ Dygraph.PointType = undefined;
                 });
                 tick_time += spacing;
                 tick_date = new Date(tick_time);
-    }
+            }
         } else {
             if (tick_time < start_time) {
                 date_array[datefield] += step;
                 tick_date = accessors.makeDate.apply(null, date_array);
                 tick_time = tick_date.getTime();
-    }
+            }
             while (tick_time <= end_time) {
                 if (granularity >= Dygraph.DAILY ||
                     accessors.getHours(tick_date) % step === 0) {
@@ -8435,18 +8435,18 @@ Dygraph.Plugins.Annotations = (function () {
 
     var annotations = function () {
         this.annotations_ = [];
-};
+    };
 
     annotations.prototype.toString = function () {
         return "Annotations Plugin";
-};
+    };
 
     annotations.prototype.activate = function (g) {
         return {
             clearChart: this.clearChart,
             didDrawChart: this.didDrawChart
         };
-};
+    };
 
     annotations.prototype.detachLabels = function () {
         for (var i = 0; i < this.annotations_.length; i++) {
@@ -8455,7 +8455,7 @@ Dygraph.Plugins.Annotations = (function () {
             this.annotations_[i] = null;
         }
         this.annotations_ = [];
-};
+    };
 
     annotations.prototype.clearChart = function (e) {
         this.detachLabels();
@@ -8498,26 +8498,26 @@ Dygraph.Plugins.Annotations = (function () {
             if (p.canvasx < area.x || p.canvasx > area.x + area.w ||
                 p.canvasy < area.y || p.canvasy > area.y + area.h) {
                 continue;
-    }
+            }
 
             var a = p.annotation;
             var tick_height = 6;
             if (a.hasOwnProperty("tickHeight")) {
                 tick_height = a.tickHeight;
-    }
+            }
 
             var div = document.createElement("div");
             for (var name in annotationStyle) {
                 if (annotationStyle.hasOwnProperty(name)) {
                     div.style[name] = annotationStyle[name];
                 }
-    }
+            }
             if (!a.hasOwnProperty('icon')) {
                 div.className = "dygraphDefaultAnnotation";
-    }
+            }
             if (a.hasOwnProperty('cssClass')) {
                 div.className += " " + a.cssClass;
-    }
+            }
 
             var width = a.hasOwnProperty('width') ? a.width : 16;
             var height = a.hasOwnProperty('height') ? a.height : 16;
@@ -8542,9 +8542,9 @@ Dygraph.Plugins.Annotations = (function () {
                 }
                 xToUsedHeight[left] += (tick_height + height);
                 divTop = y;
-    } else {
+            } else {
                 divTop = p.canvasy - height - tick_height;
-    }
+            }
             div.style.top = divTop + "px";
             div.style.width = width + "px";
             div.style.height = height + "px";
@@ -8576,16 +8576,16 @@ Dygraph.Plugins.Annotations = (function () {
                 var y = divTop + height;
                 ctx.moveTo(p.canvasx, y);
                 ctx.lineTo(p.canvasx, y + tick_height);
-    }
+            }
             ctx.closePath();
             ctx.stroke();
             ctx.restore();
         }
-};
+    };
 
     annotations.prototype.destroy = function () {
         this.detachLabels();
-};
+    };
 
     return annotations;
 
@@ -8621,7 +8621,7 @@ Dygraph.Plugins.Axes = (function () {
     var axes = function () {
         this.xlabels_ = [];
         this.ylabels_ = [];
-};
+    };
 
     axes.prototype.toString = function () {
         return 'Axes Plugin';
@@ -8652,7 +8652,7 @@ Dygraph.Plugins.Axes = (function () {
                 h = g.getOption('xAxisHeight');
             } else {
                 h = g.getOptionForAxis('axisLabelFontSize', 'x') + 2 * g.getOptionForAxis('axisTickSize', 'x');
-    }
+            }
             e.reserveSpaceBottom(h);
         }
 
@@ -8660,30 +8660,30 @@ Dygraph.Plugins.Axes = (function () {
             if (g.getOptionForAxis('drawAxis', 'y2')) {
                 var w = g.getOptionForAxis('axisLabelWidth', 'y2') + 2 * g.getOptionForAxis('axisTickSize', 'y2');
                 e.reserveSpaceRight(w);
-    }
+            }
         } else if (g.numAxes() > 2) {
             g.error('Only two y-axes are supported at this time. (Trying ' +
             'to use ' + g.numAxes() + ')');
         }
-};
+    };
 
     axes.prototype.detachLabels = function () {
         function removeArray(ary) {
             for (var i = 0; i < ary.length; i++) {
                 var el = ary[i];
                 if (el.parentNode) el.parentNode.removeChild(el);
-    }
+            }
         }
 
         removeArray(this.xlabels_);
         removeArray(this.ylabels_);
         this.xlabels_ = [];
         this.ylabels_ = [];
-};
+    };
 
     axes.prototype.clearChart = function (e) {
         this.detachLabels();
-};
+    };
 
     axes.prototype.willDrawChart = function (e) {
         var g = e.dygraph;
@@ -8797,9 +8797,9 @@ Dygraph.Plugins.Axes = (function () {
 
                     if (top + fontSize + 3 > canvasHeight) {
                         label.style.bottom = '0';
-        } else {
+                    } else {
                         label.style.top = top + 'px';
-        }
+                    }
                     if (tick[0] === 0) {
                         label.style.left = (area.x - getAxisOption('axisLabelWidth') - getAxisOption('axisTickSize')) + 'px';
                         label.style.textAlign = 'right';
@@ -8824,7 +8824,7 @@ Dygraph.Plugins.Axes = (function () {
                     bottomTick.style.top = (parseInt(bottomTick.style.top, 10) -
                     fontSize / 2) + 'px';
                 }
-    }
+            }
 
             // draw a vertical line on the left to separate the chart from the labels.
             var axisX;
@@ -8834,7 +8834,7 @@ Dygraph.Plugins.Axes = (function () {
                 axisX = halfUp(area.x + r * area.w);
             } else {
                 axisX = halfUp(area.x);
-    }
+            }
 
             context.strokeStyle = g.getOptionForAxis('axisLineColor', 'y');
             context.lineWidth = g.getOptionForAxis('axisLineWidth', 'y');
@@ -8854,7 +8854,7 @@ Dygraph.Plugins.Axes = (function () {
                 context.lineTo(halfDown(area.x + area.w), halfDown(area.y + area.h));
                 context.closePath();
                 context.stroke();
-    }
+            }
         }
 
         if (g.getOptionForAxis('drawAxis', 'x')) {
@@ -8881,7 +8881,7 @@ Dygraph.Plugins.Axes = (function () {
                     if (left + getAxisOption('axisLabelWidth') > canvasWidth) {
                         left = canvasWidth - getAxisOption('axisLabelWidth');
                         label.style.textAlign = 'right';
-        }
+                    }
                     if (left < 0) {
                         left = 0;
                         label.style.textAlign = 'left';
@@ -8892,7 +8892,7 @@ Dygraph.Plugins.Axes = (function () {
                     containerDiv.appendChild(label);
                     this.xlabels_.push(label);
                 }
-    }
+            }
 
             context.strokeStyle = g.getOptionForAxis('axisLineColor', 'x');
             context.lineWidth = g.getOptionForAxis('axisLineWidth', 'x');
@@ -8904,7 +8904,7 @@ Dygraph.Plugins.Axes = (function () {
                 axisY = halfDown(area.y + r * area.h);
             } else {
                 axisY = halfDown(area.y + area.h);
-    }
+            }
             context.moveTo(halfUp(area.x), axisY);
             context.lineTo(halfUp(area.x + area.w), axisY);
             context.closePath();
@@ -8912,7 +8912,7 @@ Dygraph.Plugins.Axes = (function () {
         }
 
         context.restore();
-};
+    };
 
     return axes;
 })();
@@ -8935,7 +8935,7 @@ Dygraph.Plugins.ChartLabels = (function () {
         this.xlabel_div_ = null;
         this.ylabel_div_ = null;
         this.y2label_div_ = null;
-};
+    };
 
     chart_labels.prototype.toString = function () {
         return "ChartLabels Plugin";
@@ -9145,7 +9145,7 @@ Dygraph.Plugins.Grid = (function () {
      * @constructor
      */
     var grid = function () {
-};
+    };
 
     grid.prototype.toString = function () {
         return "Gridline Plugin";
@@ -9185,7 +9185,7 @@ Dygraph.Plugins.Grid = (function () {
                     strokePattern[i] = g.getOptionForAxis('gridLinePattern', axes[i]);
                     stroking[i] = strokePattern[i] && (strokePattern[i].length >= 2);
                 }
-    }
+            }
             ticks = layout.yticks;
             ctx.save();
             // draw grids for the different y axes
@@ -9194,7 +9194,7 @@ Dygraph.Plugins.Grid = (function () {
                 if (drawGrid[axis]) {
                     if (stroking[axis]) {
                         ctx.installPattern(strokePattern[axis]);
-        }
+                    }
                     ctx.strokeStyle = strokeStyles[axis];
                     ctx.lineWidth = lineWidths[axis];
 
@@ -9208,9 +9208,9 @@ Dygraph.Plugins.Grid = (function () {
 
                     if (stroking[axis]) {
                         ctx.uninstallPattern();
-        }
+                    }
                 }
-    }
+            }
             ctx.restore();
         }
 
@@ -9222,7 +9222,7 @@ Dygraph.Plugins.Grid = (function () {
             var stroking = strokePattern && (strokePattern.length >= 2);
             if (stroking) {
                 ctx.installPattern(strokePattern);
-    }
+            }
             ctx.strokeStyle = g.getOptionForAxis('gridLineColor', 'x');
             ctx.lineWidth = g.getOptionForAxis('gridLineWidth', 'x');
             for (i = 0; i < ticks.length; i++) {
@@ -9233,16 +9233,16 @@ Dygraph.Plugins.Grid = (function () {
                 ctx.lineTo(x, area.y);
                 ctx.closePath();
                 ctx.stroke();
-    }
+            }
             if (stroking) {
                 ctx.uninstallPattern();
-    }
+            }
             ctx.restore();
         }
-};
+    };
 
     grid.prototype.destroy = function () {
-};
+    };
 
     return grid;
 
@@ -9277,11 +9277,11 @@ Dygraph.Plugins.Legend = (function () {
     var legend = function () {
         this.legend_div_ = null;
         this.is_generated_div_ = false;  // do we own this div, or was it user-specified?
-};
+    };
 
     legend.prototype.toString = function () {
         return "Legend Plugin";
-};
+    };
 
 // (defined below)
     var generateLegendDashHTML;
@@ -9308,7 +9308,7 @@ Dygraph.Plugins.Legend = (function () {
                 div = document.getElementById(userLabelsDiv);
             } else {
                 div = userLabelsDiv;
-    }
+            }
         } else {
             // Default legend styles. These can be overridden in CSS by adding
             // "!important" after your rule, e.g. "left: 30px !important;"
@@ -9338,7 +9338,7 @@ Dygraph.Plugins.Legend = (function () {
                     console.warn("You are using unsupported css properties for your " +
                     "browser in labelsDivStyles");
                 }
-    }
+            }
 
             // TODO(danvk): come up with a cleaner way to expose this.
             g.graphDiv.appendChild(div);
@@ -9355,7 +9355,7 @@ Dygraph.Plugins.Legend = (function () {
             predraw: this.predraw,
             didDrawChart: this.didDrawChart
         };
-};
+    };
 
 // Needed for dashed lines.
     var calculateEmWidthInDiv = function (div) {
@@ -9397,7 +9397,7 @@ Dygraph.Plugins.Legend = (function () {
             // side of the selection point
             if ((leftLegend + labelsDivWidth + 1) > (window.scrollX + window.innerWidth)) {
                 leftLegend = leftLegend - 2 * 20 - labelsDivWidth - (yAxisLabelWidth - area.x);
-    }
+            }
 
             e.dygraph.graphDiv.appendChild(this.legend_div_);
             this.legend_div_.style.left = yAxisLabelWidth + leftLegend + "px";
@@ -9407,7 +9407,7 @@ Dygraph.Plugins.Legend = (function () {
         var html = legend.generateLegendHTML(e.dygraph, xValue, points, this.one_em_width_);
         this.legend_div_.innerHTML = html;
         this.legend_div_.style.display = '';
-};
+    };
 
     legend.prototype.deselect = function (e) {
         var legendMode = e.dygraph.getOption('legend');
@@ -9482,7 +9482,7 @@ Dygraph.Plugins.Legend = (function () {
         if (typeof(x) === 'undefined') {
             if (g.getOption('legend') != 'always') {
                 return '';
-    }
+            }
 
             sepLines = g.getOption('labelsSeparateLines');
             html = '';
@@ -9495,7 +9495,7 @@ Dygraph.Plugins.Legend = (function () {
                 dash = generateLegendDashHTML(strokePattern, series.color, oneEmWidth);
                 html += "<span style='font-weight: bold; color: " + series.color + ";'>" +
                 dash + " " + escapeHTML(labels[i]) + "</span>";
-    }
+            }
             return html;
         }
 
@@ -9534,7 +9534,7 @@ Dygraph.Plugins.Legend = (function () {
             escapeHTML(pt.name) + "</span></b>:&#160;" + yval + "</span>";
         }
         return html;
-};
+    };
 
 
     /**
@@ -9577,7 +9577,7 @@ Dygraph.Plugins.Legend = (function () {
             // This pattern fits at least two times, no scaling just convert to em;
             for (i = 0; i < strokePattern.length; i++) {
                 normalizedPattern[i] = strokePattern[i] / oneEmWidth;
-    }
+            }
             // Since we are repeating the pattern, we don't worry about repeating the
             // first segment in one draw.
             segmentLoop = normalizedPattern.length;
@@ -9586,7 +9586,7 @@ Dygraph.Plugins.Legend = (function () {
             loop = 1;
             for (i = 0; i < strokePattern.length; i++) {
                 normalizedPattern[i] = strokePattern[i] / strokePixelLength;
-    }
+            }
             // For the scaled patterns we do redraw the first segment.
             segmentLoop = normalizedPattern.length + 1;
         }
@@ -9611,7 +9611,7 @@ Dygraph.Plugins.Legend = (function () {
             }
         }
         return dash;
-};
+    };
 
 
     return legend;
@@ -9631,14 +9631,14 @@ Dygraph.Plugins.Legend = (function () {
 Dygraph.Plugins.RangeSelector = (function () {
 
     /*global Dygraph:false */
-"use strict";
+    "use strict";
 
     var rangeSelector = function () {
         this.isIE_ = /MSIE/.test(navigator.userAgent) && !window.opera;
         this.hasTouchInterface_ = typeof(TouchEvent) != 'undefined';
         this.isMobileDevice_ = /mobile|android/gi.test(navigator.appVersion);
         this.interfaceCreated_ = false;
-};
+    };
 
     rangeSelector.prototype.toString = function () {
         return "RangeSelector Plugin";
@@ -9769,7 +9769,7 @@ Dygraph.Plugins.RangeSelector = (function () {
                 this.createInterface_();
             } else if (!this.graphDiv_ || !this.graphDiv_.parentNode) {
                 this.addToGraph_();
-    }
+            }
         } else if (this.graphDiv_) {
             this.removeFromGraph_();
             var dygraph = this.dygraph_;
@@ -9779,7 +9779,7 @@ Dygraph.Plugins.RangeSelector = (function () {
             }, 1);
         }
         return enabled;
-};
+    };
 
     /**
      * @private
@@ -9798,7 +9798,7 @@ Dygraph.Plugins.RangeSelector = (function () {
 
             if (canvasScale != 1) {
                 context.scale(canvasScale, canvasScale);
-    }
+            }
         }
 
         var plotArea = this.dygraph_.layout_.getPlotArea();
@@ -9816,7 +9816,7 @@ Dygraph.Plugins.RangeSelector = (function () {
 
         setElementRect(this.bgcanvas_, this.bgcanvas_ctx_, this.canvasRect_);
         setElementRect(this.fgcanvas_, this.fgcanvas_ctx_, this.canvasRect_);
-};
+    };
 
     /**
      * @private
@@ -9930,7 +9930,7 @@ Dygraph.Plugins.RangeSelector = (function () {
                 // These events are removed manually.
                 Dygraph.addEvent(topElem, 'mousemove', onZoom);
                 Dygraph.addEvent(topElem, 'mouseup', onZoomEnd);
-    }
+            }
             self.fgcanvas_.style.cursor = 'col-resize';
             tarp.cover();
             return true;
@@ -9939,13 +9939,13 @@ Dygraph.Plugins.RangeSelector = (function () {
         onZoom = function (e) {
             if (!isZooming) {
                 return false;
-    }
+            }
             Dygraph.cancelEvent(e);
 
             var delX = e.clientX - clientXLast;
             if (Math.abs(delX) < 4) {
                 return true;
-    }
+            }
             clientXLast = e.clientX;
 
             // Move handle.
@@ -9959,7 +9959,7 @@ Dygraph.Plugins.RangeSelector = (function () {
                 newPos = zoomHandleStatus.rightHandlePos + delX;
                 newPos = Math.min(newPos, self.canvasRect_.x + self.canvasRect_.w);
                 newPos = Math.max(newPos, zoomHandleStatus.leftHandlePos + handle.width + 3);
-    }
+            }
             var halfHandleWidth = handle.width / 2;
             handle.style.left = (newPos - halfHandleWidth) + 'px';
             self.drawInteractiveLayer_();
@@ -9967,14 +9967,14 @@ Dygraph.Plugins.RangeSelector = (function () {
             // Zoom on the fly (if not using excanvas).
             if (dynamic) {
                 doZoom();
-    }
+            }
             return true;
         };
 
         onZoomEnd = function (e) {
             if (!isZooming) {
                 return false;
-    }
+            }
             isZooming = false;
             tarp.uncover();
             Dygraph.removeEvent(topElem, 'mousemove', onZoom);
@@ -9984,7 +9984,7 @@ Dygraph.Plugins.RangeSelector = (function () {
             // If using excanvas, Zoom now.
             if (!dynamic) {
                 doZoom();
-    }
+            }
             return true;
         };
 
@@ -10000,7 +10000,7 @@ Dygraph.Plugins.RangeSelector = (function () {
                 }
             } finally {
                 self.isChangingRange_ = false;
-    }
+            }
         };
 
         isMouseInPanZone = function (e) {
@@ -10012,7 +10012,7 @@ Dygraph.Plugins.RangeSelector = (function () {
                 rect = self.rightZoomHandle_.getBoundingClientRect();
                 var rightHandleClientX = rect.left + rect.width / 2;
                 return (e.clientX > leftHandleClientX && e.clientX < rightHandleClientX);
-    }
+            }
         };
 
         onPanStart = function (e) {
@@ -10026,20 +10026,20 @@ Dygraph.Plugins.RangeSelector = (function () {
                     Dygraph.addEvent(topElem, 'mouseup', onPanEnd);
                 }
                 return true;
-    }
+            }
             return false;
         };
 
         onPan = function (e) {
             if (!isPanning) {
                 return false;
-    }
+            }
             Dygraph.cancelEvent(e);
 
             var delX = e.clientX - clientXLast;
             if (Math.abs(delX) < 4) {
                 return true;
-    }
+            }
             clientXLast = e.clientX;
 
             // Move range view
@@ -10053,10 +10053,10 @@ Dygraph.Plugins.RangeSelector = (function () {
             } else if (rightHandlePos + delX >= self.canvasRect_.x + self.canvasRect_.w) {
                 rightHandlePos = self.canvasRect_.x + self.canvasRect_.w;
                 leftHandlePos = rightHandlePos - rangeSize;
-    } else {
+            } else {
                 leftHandlePos += delX;
                 rightHandlePos += delX;
-    }
+            }
             var halfHandleWidth = self.leftZoomHandle_.width / 2;
             self.leftZoomHandle_.style.left = (leftHandlePos - halfHandleWidth) + 'px';
             self.rightZoomHandle_.style.left = (rightHandlePos - halfHandleWidth) + 'px';
@@ -10065,21 +10065,21 @@ Dygraph.Plugins.RangeSelector = (function () {
             // Do pan on the fly (if not using excanvas).
             if (dynamic) {
                 doPan();
-    }
+            }
             return true;
         };
 
         onPanEnd = function (e) {
             if (!isPanning) {
                 return false;
-    }
+            }
             isPanning = false;
             Dygraph.removeEvent(topElem, 'mousemove', onPan);
             Dygraph.removeEvent(topElem, 'mouseup', onPanEnd);
             // If using excanvas, do pan now.
             if (!dynamic) {
                 doPan();
-    }
+            }
             return true;
         };
 
@@ -10090,7 +10090,7 @@ Dygraph.Plugins.RangeSelector = (function () {
                 self.dygraph_.drawGraph_(false);
             } finally {
                 self.isChangingRange_ = false;
-    }
+            }
         };
 
         onCanvasHover = function (e) {
@@ -10112,9 +10112,9 @@ Dygraph.Plugins.RangeSelector = (function () {
                 if (onZoom(e.targetTouches[0])) {
                     Dygraph.cancelEvent(e);
                 }
-    } else {
+            } else {
                 onZoomEnd(e);
-    }
+            }
         };
 
         onCanvasTouchEvent = function (e) {
@@ -10126,16 +10126,16 @@ Dygraph.Plugins.RangeSelector = (function () {
                 if (onPan(e.targetTouches[0])) {
                     Dygraph.cancelEvent(e);
                 }
-    } else {
+            } else {
                 onPanEnd(e);
-    }
+            }
         };
 
         addTouchEvents = function (elem, fn) {
             var types = ['touchstart', 'touchend', 'touchmove', 'touchcancel'];
             for (var i = 0; i < types.length; i++) {
                 self.dygraph_.addAndTrackEvent(elem, types[i], fn);
-    }
+            }
         };
 
         this.setDefaultOption_('interactionModel', Dygraph.Interaction.dragIsPanInteractionModel);
@@ -10225,7 +10225,7 @@ Dygraph.Plugins.RangeSelector = (function () {
             // can cause major slowdowns with the ctx.fill() call below.
             if (!stepPlot && prevX !== null && Math.round(x) == Math.round(prevX)) {
                 continue;
-    }
+            }
 
             if (isFinite(x) && isFinite(y)) {
                 if (prevX === null) {
@@ -10237,19 +10237,19 @@ Dygraph.Plugins.RangeSelector = (function () {
                 ctx.lineTo(x, y);
                 prevX = x;
                 prevY = y;
-    }
+            }
             else {
                 if (prevX !== null) {
                     if (stepPlot) {
                         ctx.lineTo(x, prevY);
                         ctx.lineTo(x, canvasHeight);
-        }
+                    }
                     else {
                         ctx.lineTo(prevX, canvasHeight);
                     }
                 }
                 prevX = prevY = null;
-    }
+            }
         }
         ctx.lineTo(canvasWidth, canvasHeight);
         ctx.closePath();
@@ -10267,7 +10267,7 @@ Dygraph.Plugins.RangeSelector = (function () {
             this.bgcanvas_ctx_.lineWidth = 1.5;
             ctx.stroke();
         }
-};
+    };
 
     /**
      * @private
@@ -10305,7 +10305,7 @@ Dygraph.Plugins.RangeSelector = (function () {
             var series = dataHandler.extractSeries(g.rawData_, i, options);
             if (g.rollPeriod() > 1) {
                 series = dataHandler.rollingAverage(series, g.rollPeriod(), options);
-    }
+            }
 
             rolledSeries.push(series);
         }
@@ -10319,7 +10319,7 @@ Dygraph.Plugins.RangeSelector = (function () {
                 if (y === null || isNaN(y)) continue;
                 count++;
                 sum += y;
-    }
+            }
             combinedSeries.push([rolledSeries[0][i][0], sum / count]);
         }
 
@@ -10349,9 +10349,9 @@ Dygraph.Plugins.RangeSelector = (function () {
             var yRange = yMax - yMin;
             if (yRange <= Number.MIN_VALUE) {
                 yExtra = yMax * extraPercent;
-    } else {
+            } else {
                 yExtra = yRange * extraPercent;
-    }
+            }
             yMax += yExtra;
             yMin -= yExtra;
         }
@@ -11369,14 +11369,14 @@ Dygraph.OPTIONS_REFERENCE =  // <JSON>
         var labels = op.labels;
         if (typeof(labels) !== 'object') {
             warn('Option "' + k + '" is missing a "labels": [...] option');
-    } else {
+        } else {
             for (i = 0; i < labels.length; i++) {
                 if (!cats.hasOwnProperty(labels[i])) {
                     warn('Option "' + k + '" has label "' + labels[i] +
                     '", which is invalid.');
-        }
+                }
             }
-    }
+        }
     }
 })();
 /**
@@ -11617,12 +11617,12 @@ Dygraph.DataHandlers = {};
             while (idx < series.length - 1 && series[idx][0] < low) {
                 firstIdx++;
                 idx++;
-    }
+            }
             idx = series.length - 1;
             while (idx > 0 && series[idx][0] > high) {
                 lastIdx--;
                 idx--;
-    }
+            }
         }
         if (firstIdx <= lastIdx) {
             return [firstIdx, lastIdx];
@@ -11689,7 +11689,7 @@ Dygraph.DataHandlers = {};
                 if (point <= 0) {
                     point = null;
                 }
-    }
+            }
             series.push([x, point]);
         }
         return series;
@@ -11717,12 +11717,12 @@ Dygraph.DataHandlers = {};
                     continue;
                 num_ok++;
                 sum += originalData[j][1];
-    }
+            }
             if (num_ok) {
                 rollingData[i] = [originalData[i][0], sum / num_ok];
             } else {
                 rollingData[i] = [originalData[i][0], null];
-    }
+            }
         }
 
         return rollingData;
@@ -11740,7 +11740,7 @@ Dygraph.DataHandlers = {};
                 continue;
             if (maxY === null || y > maxY) {
                 maxY = y;
-    }
+            }
             if (minY === null || y < minY) {
                 minY = y;
             }
@@ -11763,14 +11763,14 @@ Dygraph.DataHandlers = {};
 (function () {
 
     /*global Dygraph:false */
-"use strict";
+    "use strict";
 
     /**
      * @extends Dygraph.DataHandlers.DefaultHandler
      * @constructor
      */
     Dygraph.DataHandlers.DefaultFractionHandler = function () {
-};
+    };
 
     var DefaultFractionHandler = Dygraph.DataHandlers.DefaultFractionHandler;
     DefaultFractionHandler.prototype = new Dygraph.DataHandlers.DefaultHandler();
@@ -11803,9 +11803,9 @@ Dygraph.DataHandlers = {};
                 } else {
                     series.push([x, num, [num, den]]);
                 }
-    } else {
+            } else {
                 series.push([x, null, [null, null]]);
-    }
+            }
         }
         return series;
     };
@@ -11825,7 +11825,7 @@ Dygraph.DataHandlers = {};
             if (i - rollPeriod >= 0) {
                 num -= originalData[i - rollPeriod][2][0];
                 den -= originalData[i - rollPeriod][2][1];
-    }
+            }
 
             var date = originalData[i][0];
             var value = den ? num / den : 0.0;
@@ -11833,7 +11833,7 @@ Dygraph.DataHandlers = {};
         }
 
         return rollingData;
-};
+    };
 
 })();
 /**
@@ -11995,12 +11995,12 @@ Dygraph.DataHandlers = {};
                 } else {
                     series.push([x, y, [y, y]]);
                 }
-    } else {
+            } else {
                 series.push([x, null, [null, null]]);
-    }
+            }
         }
         return series;
-};
+    };
 
     /** @inheritDoc */
     CustomBarsHandler.prototype.rollingAverage =
@@ -12023,7 +12023,7 @@ Dygraph.DataHandlers = {};
                     mid += y;
                     high += extremes[1];
                     count += 1;
-    }
+                }
                 if (i - rollPeriod >= 0) {
                     var prev = originalData[i - rollPeriod];
                     if (prev[1] !== null && !isNaN(prev[1])) {
@@ -12032,7 +12032,7 @@ Dygraph.DataHandlers = {};
                         high -= prev[2][1];
                         count -= 1;
                     }
-    }
+                }
                 if (count) {
                     rollingData[i] = [
                         originalData[i][0],
@@ -12045,7 +12045,7 @@ Dygraph.DataHandlers = {};
             }
 
             return rollingData;
-};
+        };
 
 })();
 /**
@@ -12102,12 +12102,12 @@ Dygraph.DataHandlers = {};
                 } else {
                     series.push([x, y, [y, y, y]]);
                 }
-    } else {
+            } else {
                 series.push([x, null, [null, null, null]]);
-    }
+            }
         }
         return series;
-};
+    };
 
     /** @inheritDoc */
     ErrorBarsHandler.prototype.rollingAverage =
@@ -12137,17 +12137,17 @@ Dygraph.DataHandlers = {};
                     value = sum / num_ok;
                     rollingData[i] = [originalData[i][0], value,
                         [value - sigma * stddev, value + sigma * stddev]];
-    } else {
+                } else {
                     // This explicitly preserves NaNs to aid with "independent
                     // series".
                     // See testRollingAveragePreservesNaNs.
                     v = (rollPeriod == 1) ? originalData[i][1] : null;
                     rollingData[i] = [originalData[i][0], v, [v, v]];
-    }
+                }
             }
 
             return rollingData;
-};
+        };
 
 })();
 /**
