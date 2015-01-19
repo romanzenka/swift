@@ -96,7 +96,7 @@ public final class QuameterHideResult {
 			response.setHeader("Content-Disposition", "attachment; filename=\"quameter.tsv\"");
 
 			final List<QuameterProteinGroup> proteinGroups = quameterDao.listProteinGroups();
-			final List<QuameterResult> quameterResults = quameterDao.listVisibleResults();
+			final List<QuameterResult> quameterResults = quameterDao.listVisibleResultsAllTime();
 			try {
 				final Writer bw = response.getWriter();
 				writeHeader(bw, proteinGroups);
