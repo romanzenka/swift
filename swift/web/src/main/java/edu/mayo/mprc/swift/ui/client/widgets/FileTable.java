@@ -367,7 +367,11 @@ public final class FileTable extends FlexTable implements HasValueChangeHandlers
 		setWidget(rowNumber, FILE_COLUMN, filePathWidget);
 		setWidget(rowNumber, SIZE_COLUMN, new FileSizeWidget(fileSize));
 		final DateTimeFormat format = DateTimeFormat.getFormat("yyyy/MM/dd HH:mm:ss");
-		setWidget(rowNumber, DATE_COLUMN, new Label(format.format(lastModifiedDate)));
+		if (lastModifiedDate != null) {
+			setWidget(rowNumber, DATE_COLUMN, new Label(format.format(lastModifiedDate)));
+		} else {
+			setWidget(rowNumber, DATE_COLUMN, new Label(""));
+		}
 		final PushButton removeButton = new PushButton(new Image(REMOVE_IMAGE));
 		removeButton.addClickHandler(new RemoveButtonListener(lineIndex));
 		setWidget(rowNumber, REMOVE_COLUMN, removeButton);
