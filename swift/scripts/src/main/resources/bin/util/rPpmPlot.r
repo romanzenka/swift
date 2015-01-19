@@ -19,10 +19,10 @@ colors.by.mslevel <- c(
   "#FFFFDC")
 colors.by.mslevel.smoothed <- c("red", "blue", "green", "yellow")
 colors.by.mslevel.mean <- c( # Average lines
-  "#FFAAAA", 
-  "#AAAAFF", 
-  "#AAFFAA",     
-  "#FFFFAA")
+  "#FF6666",
+  "#6666FF",
+  "#66FF66",
+  "#FFFF66")
 
 # Plot names
 lockmass.title<-"Mass Calibration vs. RT"
