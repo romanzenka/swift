@@ -20,6 +20,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="/common/bootstrap/css/bootstrap.min.css" rel="stylesheet" media="screen">
     <link href="css/quameter.css" rel="stylesheet" media="screen">
+    <script type="text/javascript" src="/common/bootstrap/js/jquery_1.9.0.min.js"></script>
+    <script type="text/javascript" src="/common/bootstrap/js/tablesorter.js"></script>
 </head>
 <body>
 <div class="container-fluid">
@@ -30,11 +32,12 @@
     </div>
 
     <h3>Tags</h3>
-    <table class="table">
+    <table id="tags" class="table table-hover table-condensed">
         <thead>
         <tr>
             <th>Path</th>
             <th>File name</th>
+            <th>Instrument</th>
             <th>Metric</th>
             <th>Tag</th>
         </tr>
@@ -51,11 +54,14 @@
                         final String metricName = quameterUi.getMetricName(qa.getMetricCode());
                         if (metricName != null) {
                             final File file = qa.getQuameterResult().getSearchResult().getMassSpecSample().getFile();
+                            final String instrument = quameterUi.mapInstrument(qa.getQuameterResult().getSearchResult().getMassSpecSample().getInstrumentSerialNumber());
         %>
         <tr>
-            <td><%=file.getParent().replaceAll("/", "/&#8203;").replaceAll("-", "&#8209;")%>
+            <td style="font-size: smaller"><%=file.getParent().replaceAll("/", "/&#8203;").replaceAll("-", "&#8209;")%>
             </td>
             <td><%=file.getName()%>
+            </td>
+            <td><%=instrument%>
             </td>
             <td><%=metricName%>
             </td>
@@ -73,6 +79,12 @@
             }
         %>
     </table>
+
+    <script>
+        $(function () {
+            $("#tags").tablesorter();
+        });
+    </script>
 </div>
 
 </body>

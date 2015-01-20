@@ -316,26 +316,6 @@ function addDygraph(viewIndex, view, viewId, metricId, viewMetadata, data, range
         categoryButtons().filter("[value='" + category + "']").addClass("highlight");
     }
 
-
-    var pointClickCallback = function (event, point) {
-        // Select a point
-        if (pointSelected != pointHighlighted) {
-            pointSelected = pointHighlighted;
-        } else {
-            pointSelected = -1;
-        }
-        selectPoint(data, pointSelected == -1 ? -1 : viewMetadata.filteredRows[pointSelected]);
-        var row = viewMetadata.filteredRows[pointHighlighted];
-        highlightRow(row);
-
-        if (pointSelected != -1) {
-            createNewAnnotationForm(event.target.parentNode.parentNode.id, data.getValue(row, columnIndex("id", data)));
-        } else {
-            $('#annotFormDiv').hide();
-        }
-        dygraph.updateOptions({file: currentView.dataView});
-    };
-
     var dygraph = new Dygraph(
         document.getElementById(viewId),
         views[viewIndex].dataView,
@@ -417,7 +397,27 @@ function addDygraph(viewIndex, view, viewId, metricId, viewMetadata, data, range
             },
             clickCallback: function (event, x, point) {
                 if (point.length > 0) {
-                    pointClickCallback(event, point[0]);
+                    point = point[0];
+                    // Select a point
+                    if (pointSelected != pointHighlighted) {
+                        pointSelected = pointHighlighted;
+                    } else {
+                        pointSelected = -1;
+                    }
+                    selectPoint(data, pointSelected == -1 ? -1 : viewMetadata.filteredRows[pointSelected]);
+                    var row = viewMetadata.filteredRows[pointHighlighted];
+                    highlightRow(row);
+
+                    if (pointSelected != -1) {
+                        createNewAnnotationForm(event.target.parentNode.parentNode.id, data.getValue(row, columnIndex("id", data)));
+                    } else {
+                        $('#annotFormDiv').hide();
+                    }
+                    for (i in views) {
+                        views[i].dygraph.updateOptions({
+                            file: views[i].dataView
+                        });
+                    }
                 }
             }
         }
