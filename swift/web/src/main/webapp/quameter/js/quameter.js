@@ -419,8 +419,7 @@ function addDygraph(viewIndex, view, viewId, metricId, viewMetadata, data, range
                 if (point.length > 0) {
                     pointClickCallback(event, point[0]);
                 }
-            },
-            pointClickCallback: pointClickCallback
+            }
         }
     );
 
@@ -604,21 +603,23 @@ function initSimpleCharts(graphObj) {
 
     // Async form for submitting
     $("#submitAnnotation").click(function () {
+        var annotForm = $('#annotForm');
+        var annotText = annotForm.find('textarea[name="text"]').val();
+
         $.ajax({
             type: 'POST',
             url: "/service/new-annotation",
             data: $('#annotForm').serialize(),
             success: function (response) {
-                var nthView = dyViewsByCode[$('#annotForm').find('input[name="metricCode"]').val()];
-                var nthx = getXaxisNseriesById(data, $('#annotForm').find('input[name="dbId"]').val());
-                var txt = $(this).closest('form').find("input[type=text], textarea").val();
+                var nthView = dyViewsByCode[annotForm.find('input[name="metricCode"]').val()];
+                var nthx = getXaxisNseriesById(data, annotForm.find('input[name="dbId"]').val());
                 var annotations = views[nthView].dygraph.annotations();
                 annotations.push(
                     {
                         series: nthx[1],
                         x: nthx[0].toString(),
-                        shortText: "A",
-                        text: txt
+                        shortText: (annotText.length > 0 ? annotText[0] : ""),
+                        text: annotText
                     }
                 );
                 views[nthView].dygraph.setAnnotations(annotations);
@@ -627,7 +628,7 @@ function initSimpleCharts(graphObj) {
                 alert("There was an error submitting this annotation comment!");
             }
         });
-        $(this).closest('form').find("input[type=text], textarea").val("");
+        annotForm.find('textarea[name="text"]').val("");
         $('#annotFormDiv').hide();
     });
 
