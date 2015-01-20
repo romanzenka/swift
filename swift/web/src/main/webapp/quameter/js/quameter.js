@@ -18,7 +18,7 @@ selectedId = -1;
 
 
 function populateInstArray(dt) {
-    var instrumentCol = columnIndex("instrument", dt)
+    var instrumentCol = columnIndex("instrument", dt);
     for (var r = 0; r < dt.getNumberOfRows(); r++) {
         var val = dt.getValue(r, instrumentCol);
         if (!rawInsturmentNames.contains(val)) {
@@ -62,7 +62,7 @@ function addButtons(div, data, columnId) {
             btnClass = 'btn-default'; // Except non-first instruments, whom are just gray
         }
         else if (columnId !== 'instrument') {
-            var btnClass = 'btn-primary';  // All other buttons use btn-primary
+            btnClass = 'btn-primary';  // All other buttons use btn-primary
         }
         div.append('<button type="button" class="btn ' + btnClass + '" value="' + value + '" data-toggle="tooltip" data-placement="bottom" data-container="body" data-num=' + iter + ' data-enum="' + columnId + '" title="' + niceName + ': ' + names[value] + ' entries">' + niceName + '<' + '/button>');
         iter++;
@@ -85,8 +85,10 @@ function createNewAnnotationForm(parentName, dbID) {
     $('#hiddenRowid').val(dbID);
     $('#annotationText').val('');
     for (i in annotCollection) {
-        if (annotCollection[i].metricCode == metricCode && annotCollection[i].quameterResultId == dbID) {
-            $('#annotationText').val(annotCollection[i].text);
+        if (annotCollection.hasOwnProperty(i)) {
+            if (annotCollection[i].metricCode == metricCode && annotCollection[i].quameterResultId == dbID) {
+                $('#annotationText').val(annotCollection[i].text);
+            }
         }
     }
     $('#annotFormDiv').show();
@@ -109,17 +111,19 @@ function getXaxisNseriesById(data, dbId) {
 function buildCollection(collection, data, metricCode) {
     var arrayForDYgraphs = [];
     for (var o in collection) {
-        if (collection[o].metricCode === metricCode) {
-            var nthx = getXaxisNseriesById(data, collection[o].quameterResultId);
-            if (nthx[0] >= 0) {
-                arrayForDYgraphs.push(
-                    {
-                        series: nthx[1],
-                        x: nthx[0].toString(),
-                        shortText: $.trim(collection[o].text)[0],
-                        text: collection[o].text
-                    }
-                )
+        if (collection.hasOwnProperty(o)) {
+            if (collection[o].metricCode === metricCode) {
+                var nthx = getXaxisNseriesById(data, collection[o].quameterResultId);
+                if (nthx[0] >= 0) {
+                    arrayForDYgraphs.push(
+                        {
+                            series: nthx[1],
+                            x: nthx[0].toString(),
+                            shortText: $.trim(collection[o].text)[0],
+                            text: collection[o].text
+                        }
+                    )
+                }
             }
         }
     }
@@ -259,7 +263,7 @@ function updateAllViews(data) {
             file: views[i].dataView,
             valueRange: getMetricByCode(views[i].metricId).range,
             colors: getSmartColors()
-        });
+        }, false);
     }
     blockRedraw = false;
 }
@@ -295,7 +299,7 @@ function addDygraph(viewIndex, view, viewId, metricId, viewMetadata, data, range
     var currentView = views[viewIndex];
     var selectedPath = $('#selected-path');
 
-    var instrumentText = $.map(instrumentButtons(), function (val, i) {
+    var instrumentText = $.map(instrumentButtons(), function (val) {
         return val.firstChild.data
     });
     instrumentText.unshift("Date");
@@ -423,9 +427,11 @@ function addDygraph(viewIndex, view, viewId, metricId, viewMetadata, data, range
                         $('#annotFormDiv').hide();
                     }
                     for (i in views) {
-                        views[i].dygraph.updateOptions({
-                            file: views[i].dataView
-                        });
+                        if (views.hasOwnProperty(i)) {
+                            views[i].dygraph.updateOptions({
+                                file: views[i].dataView
+                            });
+                        }
                     }
                 }
             }
@@ -469,8 +475,9 @@ function drawGraphsByMetrics(data, renderDetailGraphs, viewMetadata) {
 
         view.setColumns(getSmartColumns(metricId, data));
 
+        var viewId;
         if (renderDetailGraphs) {
-            var viewId = "graph-" + metricId;
+            viewId = "graph-" + metricId;
             $('<div id="wrapper-' + metric.label + '" class="row-fluid"><div class="span12">' +
                 getMetricTitle(i) +
                 '<div id="' + viewId + '" class="simple-graph"></div>' +
@@ -481,7 +488,7 @@ function drawGraphsByMetrics(data, renderDetailGraphs, viewMetadata) {
         }
         else {
             if (1 == metric.simple) {
-                var viewId = "simpleGraph-" + metricId;
+                viewId = "simpleGraph-" + metricId;
                 $('<div id="wrapper-' + metric.label + '" class="row-fluid">' +
                     '<div class="span12">' +
                     getMetricTitle(i)
@@ -506,7 +513,7 @@ function initSimpleCharts(graphObj) {
     populateInstArray(data);
 
     // Populate array with index to every row
-    var allRows = Array(data.getNumberOfRows());
+    var allRows = new Array(data.getNumberOfRows());
     for (var i = 0; i < data.getNumberOfRows(); i++) {
         allRows[i] = i;
     }
@@ -584,10 +591,12 @@ function initSimpleCharts(graphObj) {
         var hideReason = $('#hideReason');
         hideReason.val("");
         for (i in annotCollection) {
-            var obj = annotCollection[i];
-            if (obj.quameterResultId == selectedId && obj.metricCode == "hidden") {
-                hideReason.val(obj.text);
-                break;
+            if (annotCollection.hasOwnProperty(i)) {
+                var obj = annotCollection[i];
+                if (obj.quameterResultId == selectedId && obj.metricCode == "hidden") {
+                    hideReason.val(obj.text);
+                    break;
+                }
             }
         }
 
@@ -606,8 +615,9 @@ function initSimpleCharts(graphObj) {
             updateAllViews(data);
             $("#hideDialog").modal('hide');
         }).fail(function (request, status, error) {
-            $("#hideAlert span").text("Error hiding the data point: " + error);
-            $("#hideAlert").show();
+            var hideAlert = $("#hideAlert");
+            hideAlert.find("span").text("Error hiding the data point: " + error);
+            hideAlert.show();
         });
     });
 
@@ -620,7 +630,7 @@ function initSimpleCharts(graphObj) {
         $.ajax({
             type: 'POST',
             url: "/service/new-annotation",
-            data: $('#annotForm').serialize(),
+            data: annotForm.serialize(),
             success: function (response) {
                 var nthView = dyViewsByCode[annotForm.find('input[name="metricCode"]').val()];
                 var nthx = getXaxisNseriesById(data, annotForm.find('input[name="dbId"]').val());
@@ -650,7 +660,7 @@ function initSimpleCharts(graphObj) {
 
 
 function getAnnotationCollection() {
-    var jsonData;
+    var jsonData = null;
     $.ajax({
         dataType: "json",
         async: false,
