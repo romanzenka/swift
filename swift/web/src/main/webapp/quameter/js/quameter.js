@@ -6,6 +6,9 @@ numberOfSimpleGraphs = 0;
 dyViewsByCode = {};
 viewMetadata = {};
 
+// Array of
+//  id, metricCode, quameterResultId, text
+// for each annotation
 var annotCollection = getAnnotationCollection();
 
 /* Current selection info */
@@ -54,12 +57,12 @@ function addButtons(div, data, columnId) {
     var iter = 1;
     $.each(keys, function (index, value) {
         var niceName = value;
-        var btnClass = 'btn-orig' + iter;
+        var btnClass = 'btn-orig' + iter; // Instrument buttons have btn-orig# class when highlighted
         if (index != 0 && columnId === 'instrument') {
-            btnClass = 'btn-default';
+            btnClass = 'btn-default'; // Except non-first instruments, whom are just gray
         }
         else if (columnId !== 'instrument') {
-            var btnClass = 'btn-primary';
+            var btnClass = 'btn-primary';  // All other buttons use btn-primary
         }
         div.append('<button type="button" class="btn ' + btnClass + '" value="' + value + '" data-toggle="tooltip" data-placement="bottom" data-container="body" data-num=' + iter + ' data-enum="' + columnId + '" title="' + niceName + ': ' + names[value] + ' entries">' + niceName + '<' + '/button>');
         iter++;
@@ -80,6 +83,12 @@ function createNewAnnotationForm(parentName, dbID) {
     var metricCode = parentName.split("-")[1];
     $('#hiddenMetricCode').val(metricCode);
     $('#hiddenRowid').val(dbID);
+    $('#annotationText').val('');
+    for (i in annotCollection) {
+        if (annotCollection[i].metricCode == metricCode && annotCollection[i].quameterResultId == dbID) {
+            $('#annotationText').val(annotCollection[i].text);
+        }
+    }
     $('#annotFormDiv').show();
 }
 
@@ -523,7 +532,8 @@ function initSimpleCharts(graphObj) {
     filterButtons.click(function (event) {
         var current = $(this);
         if (!event.shiftKey) {
-            current.siblings().each(function () {
+            // Deselect all the buttons by setting their second class to btn-default
+            current.parent().children().each(function () {
                 var classList = $(this)[0].className.split(' ');
                 if (classList[1] !== "btn-default") {
                     $(this).removeClass(classList[1]);
@@ -531,8 +541,9 @@ function initSimpleCharts(graphObj) {
                 }
             });
         }
-        current.removeClass("btn-default");
 
+        // Toggle current button
+        current.removeClass("btn-default");
         if (current[0].dataset.enum === 'instrument') {
             current.toggleClass('btn-orig' + current[0].dataset.num);
         } else {
