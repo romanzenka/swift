@@ -1,5 +1,5 @@
 # Make sure the warnings get displayed
-options(warn=1)
+options(warn=max(1, getOption('warn', 1)))
 
 # Make everything go to stdout so we do not overwhelm the logs
 sink(type = "message")
@@ -232,7 +232,7 @@ toPercentString <- function(x, total) {
 subHistogramWithGaussian<-function(points, xlim, breaks, totalPoints, col, border) {
   subPlotPoints <- length(points)
   if(subPlotPoints>0) {
-    subHistData <- hist(points, breaks=breaks, xlim=xlim, freq=F, plot=F)
+    subHistData <- hist(points, breaks=breaks, plot=F)
     # the density is scaled down to be comparable to the total amount of points
     subHistData$density <- subHistData$density*subPlotPoints/totalPoints
     plot(subHistData, add=TRUE, axes=FALSE, ann=FALSE, col=col, border=border)
@@ -560,8 +560,8 @@ imageGenerator<-function(dataFile, msmsEvalDataFile, infoFile, spectrumFile, chr
       maxTic = 1e11;
       xlim <- c(0, max(spectrumInfo$RT))
       plot(
-        x=NULL, 
-        y=NULL,
+        x=NA, 
+        y=NA,
         xlim=xlim,
         ylim=c(1, maxTic),
         main=c(plotName, tic.title), 
@@ -595,10 +595,16 @@ imageGenerator<-function(dataFile, msmsEvalDataFile, infoFile, spectrumFile, chr
       for(level in used.mslevel) {
         keep <- spectrumInfo$MS.Level==level
         
-        mean.tic <- mean(spectrumInfo$TIC[keep])     
+        tic.mean <- mean(spectrumInfo$TIC[keep])     
+        
+        if(level==1) {
+          result$ms1.tic.mean <- tic.mean
+        } else if(level==2) {
+          result$ms2.tic.mean <- tic.mean
+        }
         mean.color <- colors.by.mslevel.mean[level]
-        abline(h=mean.tic, col=mean.color)
-        axis(4, at=mean.tic, labels=format(mean.tic, scientific=TRUE, digits=3), tick=TRUE, 
+        abline(h=tic.mean, col=mean.color)
+        axis(4, at=tic.mean, labels=format(tic.mean, scientific=TRUE, digits=3), tick=TRUE, 
              col = mean.color, col.ticks = mean.color, col.axis = mean.color)
       }    
             
@@ -1000,10 +1006,9 @@ startReportFile<-function(reportFile) {
     <a href=\"summary.xls\">summary.xls</a>
     <table>
     <tr><th>Data files", helpLink("swiftQaDataFile"),
-    "</th><th colspan=\"2\" class=\"protein\">Proteins",
-    "</th><th colspan=\"2\" class=\"peptide\">Peptides",
-    "</th><th colspan=\"1\" class=\"peptide\">FP Rate", helpLink("swiftQaPeptidesAndProteins"),    
+    "</th><th class=\"protein\">Identification", helpLink("swiftQaPeptidesAndProteins"),    
     "</th><th class=\"spectrum\">Spectrum Counts", helpLink("swiftQaSpectrumCount"),
+    "</th><th>MS TIC Mean", helpLink("msSignal"),
     "</th><th>", lockmass.title, helpLink("swiftQaLockmassGraph"),
     "</th><th>", calibration.title, helpLink("swiftQaMassCalibrationGraph"),
     "</th><th>", msmsEval.title, helpLink("swiftQaMsmsEvalDiscriminant"),
@@ -1049,12 +1054,12 @@ addRowToReportFile<-function(reportFile, row) {
     }
   }
   
-  chunk <- paste(chunk, 
-                 "<td class=\"protein\">",row$proteins.all.count,"</td>",                        
-                 "<td class=\"protein\">",colorSpan(row$proteins.rev.count, spectrum.rev.colHtml),"</td>",
-                 "<td class=\"peptide\">",row$peptides.all.count,"</td>",
-                 "<td class=\"peptide\">",colorSpan(row$peptides.rev.count, spectrum.rev.colHtml),"</td>",
-                 "<td class=\"peptide\">",colorSpan(percents(row$peptides.rev.count * 2, row$peptides.all.count, "0%"), spectrum.rev.colHtml),"</td>",
+  chunk <- paste0(chunk, 
+                 "<td class=\"protein\"><table>",
+                 "<tr><th>Proteins</th><td>",row$proteins.all.count,"&nbsp;",colorSpan(row$proteins.rev.count, spectrum.rev.colHtml),"</td></tr>",
+                 "<tr><th>Peptides</th><td>",row$peptides.all.count,"&nbsp;",colorSpan(row$peptides.rev.count, spectrum.rev.colHtml),"</td></tr>",
+                 "<tr><th>FP Rate</th><td>",colorSpan(percents(row$peptides.rev.count * 2, row$peptides.all.count, "0%"), spectrum.rev.colHtml),"</td></tr>",
+                 "</table></td>",
                  "<td class=\"spectrum\"><table>",
                  "<tr><th>", nbspize(spectrum.all.title), "</th><td>", row$spectrum.all.count, "</td><td>", percents(row$spectrum.all.count, row$spectrum.msn.count), "</td></tr>",
                  "<tr><th>", nbspize(spectrum.msn.title), "</th><td>", row$spectrum.msn.count, "</td><td>", percents(row$spectrum.msn.count, row$spectrum.msn.count), "</td></tr>",
@@ -1070,6 +1075,10 @@ addRowToReportFile<-function(reportFile, row) {
                  "<tr><th>", nbspize(spectrum.domfrag.title), "</th><td>", colorSpan(     row$spectrum.domfrag.count,                      spectrum.domfrag.colHtml), "</td><td>", 
                  colorSpan(percents(row$spectrum.domfrag.count, row$spectrum.msn.count), spectrum.domfrag.colHtml), "</td></tr>",
                  
+                 "</table></td>",
+                 "<td><table>",
+                 "<tr><th>MS1</th><td>", format(row$ms1.tic.mean, scientific=TRUE, digits=3), "</td></tr>",
+                 "<tr><th>MS2</th><td>", format(row$ms2.tic.mean, scientific=TRUE, digits=3), "</td></tr>",
                  "</table></td>",
                  getHtmlTextImageFileInfo(row$lockmass.file),
                  getHtmlTextImageFileInfo(row$calibration.file),
@@ -1099,9 +1108,11 @@ endReportFile<-function(reportFile) {
 run <- function(inputFile, reportFileName, decoyRegex) {
   inputDataTab<-read.delim(inputFile, header=TRUE, sep="\t", colClasses="character", fileEncoding="UTF-8")
   reportFile<-file(reportFileName, "w")
+  on.exit(close(reportFile), add=TRUE)
   
   excelSummaryFile<-file(file.path(dirname(reportFileName), "summary.xls"), "w")
-  cat("raw file name\tproteins\treverse proteins\tpeptides\treverse peptides\tall spectra\tmsn spectra\t.dat spectra\tidentified spectra\treverse hit spectra\tpolymer spectra\tunfragmented spectra\tdominant fragment spectra\tloading pressure mean\tnc pressure mean\tcolumn temperature min\tcolumn temperature max\n" , file=excelSummaryFile)
+  on.exit(close(excelSummaryFile), add=TRUE)
+  cat("raw file name\tproteins\treverse proteins\tpeptides\treverse peptides\tall spectra\tmsn spectra\t.dat spectra\tidentified spectra\treverse hit spectra\tpolymer spectra\tunfragmented spectra\tdominant fragment spectra\tMS1 TIC mean\tMS2 TIC mean\tloading pressure mean\tnc pressure mean\tcolumn temperature min\tcolumn temperature max\n" , file=excelSummaryFile)
   
   startReportFile(reportFile)
   
@@ -1141,6 +1152,8 @@ run <- function(inputFile, reportFileName, decoyRegex) {
         row$spectrum.polymer.count,
         row$spectrum.unfrag.count,
         row$spectrum.domfrag.count,
+        row$ms1.tic.mean,
+        row$ms2.tic.mean,
         row$uv.loading.pressure.mean,
         row$uv.nc.pressure.mean,
         row$uv.column.temperature.min,
@@ -1150,17 +1163,11 @@ run <- function(inputFile, reportFileName, decoyRegex) {
   }
   
   endReportFile(reportFile)
-  
-  print("Closing report file.")
-  
-  close(reportFile)
-  
   cat("END OF FILE\n", file=excelSummaryFile)
-  close(excelSummaryFile)
-}
+} 
 
 args<-commandArgs(TRUE)
-#args<-c("/Users/m044910/Documents/devel/swift/swift/scripts/src/test/input.txt", "/Users/m044910/Documents/devel/swift/swift/scripts/src/test/output.html", "Rev_")
+# args<-c("/Users/m044910/Documents/devel/swift/swift/scripts/src/test/input.txt", "/tmp/qa/output.html", "Rev_") # For testing
 inputFile<-args[1]
 reportFileName<-args[2]
 decoyRegex<-args[3] # Currently treated just as a plain prefix
