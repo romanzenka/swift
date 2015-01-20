@@ -185,9 +185,22 @@ public final class QuameterDaoHibernate extends DaoBase implements QuameterDao, 
 	@Override
 	public List<QuameterAnnotation> listAnnotations() {
 		// Only list annotations that belong to non-hidden quameter results
-		return listAndCast(getSession().createQuery("select q " +
+		final List results = getSession().createQuery("select q, r " +
 				"from QuameterAnnotation as q, QuameterResult as r " +
-				"WHERE q.quameterResultId = r.id AND r.hidden = false"));
+				"WHERE q.quameterResultId = r.id AND r.hidden = false " +
+				"ORDER BY r.id, q.metricCode").list();
+
+		final List<QuameterAnnotation> finalResults = Lists.newArrayListWithCapacity(results.size());
+
+		for (final Object o : results) {
+			if (o instanceof Object[]) {
+				QuameterAnnotation annotation = (QuameterAnnotation) ((Object[]) o)[0];
+				QuameterResult result = (QuameterResult) ((Object[]) o)[1];
+				annotation.setQuameterResult(result);
+				finalResults.add(annotation);
+			}
+		}
+		return finalResults;
 	}
 
 	@Override

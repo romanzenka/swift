@@ -38,6 +38,17 @@ public final class QuameterMetric {
 				.setDescription(description);
 	}
 
+	public String getCode() {
+		return code;
+	}
+
+	public String getLabel() {
+		return label;
+	}
+
+	public String getName() {
+		return name;
+	}
 
 	public QuameterMetric(final String code, final String label, final String name,
 	                      final String good, final boolean simple,

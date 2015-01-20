@@ -2,6 +2,7 @@ package edu.mayo.mprc.quameterdb.dao;
 
 import com.google.common.base.Objects;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
+import com.thoughtworks.xstream.annotations.XStreamOmitField;
 import edu.mayo.mprc.database.DaoBase;
 import edu.mayo.mprc.database.PersistableBase;
 import org.hibernate.criterion.Criterion;
@@ -15,6 +16,9 @@ public class QuameterAnnotation extends PersistableBase {
 	private String metricCode;
 	private Integer quameterResultId;
 	private String text;
+
+	@XStreamOmitField
+	private transient QuameterResult quameterResult; // Filled in by the DAO for convenience
 
 	public QuameterAnnotation() {
 	}
@@ -59,6 +63,14 @@ public class QuameterAnnotation extends PersistableBase {
 
 	public void setText(final String text) {
 		this.text = text;
+	}
+
+	public QuameterResult getQuameterResult() {
+		return quameterResult;
+	}
+
+	public void setQuameterResult(QuameterResult quameterResult) {
+		this.quameterResult = quameterResult;
 	}
 
 	@Override

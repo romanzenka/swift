@@ -57,6 +57,7 @@
             <div class="btn-toolbar pull-right">
                 <div class="btn-group" id="extra-buttons">
                     <a href="/quameter/unhide.jsp" class="btn"><i class="icon-remove"></i> Unhide</a>
+                    <a href="/quameter/tags.jsp" class="btn"><i class="icon-tag"></i> Tags</a>
                     <a href="/service/getQuameterDataTable" class="btn"><i class="icon-download"></i> Data</a>
                 </div>
             </div>
