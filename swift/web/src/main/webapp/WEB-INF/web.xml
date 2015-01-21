@@ -10,9 +10,10 @@
         <param-value>/WEB-INF/applicationContext.xml</param-value>
     </context-param>
 
-    <listener>
-        <listener-class>edu.mayo.mprc.swift.SwiftContextLoaderListener</listener-class>
-    </listener>
+    <filter>
+        <filter-name>sitemesh</filter-name>
+        <filter-class>org.sitemesh.config.ConfigurableSiteMeshFilter</filter-class>
+    </filter>
 
     <filter>
         <filter-name>headersFilter</filter-name>
@@ -23,6 +24,15 @@
         <filter-name>headersFilter</filter-name>
         <url-pattern>*</url-pattern>
     </filter-mapping>
+
+    <filter-mapping>
+        <filter-name>sitemesh</filter-name>
+        <url-pattern>/*</url-pattern>
+    </filter-mapping>
+
+    <listener>
+        <listener-class>edu.mayo.mprc.swift.SwiftContextLoaderListener</listener-class>
+    </listener>
 
     <servlet>
         <servlet-name>services</servlet-name>
@@ -175,8 +185,8 @@
         <url-pattern>/service/*</url-pattern>
     </servlet-mapping>
 
-    <servlet-mapping>
-        <servlet-name>jsp</servlet-name>
-        <url-pattern>*.jsp</url-pattern>
-    </servlet-mapping>
+    <!--<servlet-mapping>-->
+    <!--<servlet-name>jsp</servlet-name>-->
+    <!--<url-pattern>*.jsp</url-pattern>-->
+    <!--</servlet-mapping>-->
 </web-app>
