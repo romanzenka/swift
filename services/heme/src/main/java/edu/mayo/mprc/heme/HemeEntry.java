@@ -1,5 +1,6 @@
 package edu.mayo.mprc.heme;
 
+import com.google.common.base.Strings;
 import edu.mayo.mprc.heme.dao.HemeTest;
 import edu.mayo.mprc.swift.dbmapping.SearchRun;
 import org.joda.time.Interval;
@@ -41,7 +42,7 @@ public final class HemeEntry {
 					duration = new Interval(searchRun.getStartTimestamp().getTime(), searchRun.getEndTimestamp().getTime());
 				}
 			} else {
-				if (searchRun.getTasksFailed() > 0) {
+				if (searchRun.getTasksFailed() > 0 || !Strings.isNullOrEmpty(searchRun.getErrorMessage())) {
 					status = HemeTestStatus.FAILED;
 				} else {
 					status = HemeTestStatus.RUNNING;
