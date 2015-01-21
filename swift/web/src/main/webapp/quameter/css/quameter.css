@@ -53,8 +53,8 @@ h4 {
 }
 
 button.highlight {
-    color: #ffcf99;
-    text-decoration: underline;
+    color: #ffcf99 !important;
+    text-decoration: underline !important;
 }
 
 .btn-toolbar {
