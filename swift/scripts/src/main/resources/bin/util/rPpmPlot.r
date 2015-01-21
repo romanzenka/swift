@@ -52,6 +52,7 @@ ppmRangeUnit2 <- "Da"
 # Setup the TIC plot
 legend.by.mslevel <- c("MS", "MS/MS", "MS3", "MS4")
 tic.moving.average <- 30 # Smooth 30 spectra (~3-6 seconds)
+middle.time.percent <- 75 # Only calculate stats over the middle 75%
 
 # Spectrum classes - utilities and data
 
@@ -375,10 +376,11 @@ fitAndPpmPlots<-function(plotType, dataTab, spectrumInfo, curveColor, shadeColor
   }
   
   spectrum.symbols <- spectrum.symbol(
-    dataTab$identified,
-    dataTab$rev, 
-    rep(FALSE, times=length(fullX)),
-    rep(FALSE, times=length(fullX)))
+    identified=dataTab$identified,
+    reverse=dataTab$rev, 
+    polymer=rep(FALSE, times=length(fullX)),
+    unfrag =rep(FALSE, times=length(fullX)),
+    domfrag=rep(FALSE, times=length(fullX)))
   points(fullX, fullY, pch=spectrum.symbols, col=colorsByCharge[dataTab$Z + 1])
   
   if(subsetContainsData && is.list(fit)) {
@@ -394,6 +396,56 @@ fitAndPpmPlots<-function(plotType, dataTab, spectrumInfo, curveColor, shadeColor
                  , sep="")
          ), bty="n")
   usedChargesLegend(dataTab$Z, spectrum.symbols)
+}
+
+#################################################################################
+# The <wtd.quantile> function determines and returns the weighted quantile of a
+# vector x. Taken from RelDist package
+#
+# --PARAMETERS--
+#   x     : a numeric vector
+#   na.rm : whether missing values should be removed (T or F); default=FALSE
+#   weight: a vector of weights for each value in x
+#
+# --RETURNED--
+#   NA                     if x has missing values and 'na.rm'=FALSE
+#   the weighted quantile    otherwise  
+#
+################################################################################
+wtd.quantile <- function(x, q=0.5, na.rm = FALSE, weight=FALSE) {
+  if(mode(x) != "numeric")
+    stop("need numeric data")
+  x <- as.vector(x)
+  wnas <- is.na(x)
+  if(sum(wnas)>0) {
+    if(na.rm)
+      x <- x[!wnas]
+    if(!missing(weight)){weight <- weight[!wnas]}
+    else return(NA)
+  }
+  n <- length(x)
+  half <- (n + 1)/2
+  if(n %% 2 == 1) {
+    if(!missing(weight)){
+      weight <- weight/sum(weight)
+      sx <- sort.list(x)
+      sweight <- cumsum(weight[sx])
+      min(x[sx][sweight >= q])
+    }else{
+      x[order(x)[half]]
+    }
+  }
+  else {
+    if(!missing(weight)){
+      weight <- weight/sum(weight)
+      sx <- sort.list(x)
+      sweight <- cumsum(weight[sx])
+      min(x[sx][sweight >= q])
+    }else{
+      half <- floor(half) + 0:1
+      sum(x[order(x)[half]])/2
+    }
+  }
 }
 
 # Draws a legend for used charges
@@ -552,12 +604,14 @@ imageGenerator<-function(dataFile, msmsEvalDataFile, infoFile, spectrumFile, chr
     dataTabFull <- readQaFile(dataFile, decoyRegex)        
     
     spectrumInfo <- dataTabFull[,c("Scan.Id", "MS.Level", "RT", "TIC", "Source.Current..uA.", "Lock.Mass.Found", "Lock.Mass.Shift")]        
-    if(sum(!is.na(spectrumInfo$RT))>0) {             
+    hasRetentionTimes <- sum(!is.na(spectrumInfo$RT))>0
+    if(hasRetentionTimes) {             
       ### Total Ion Current plot 
       startPlot(tic.title, outputImages$tic.file)
       
       ms <- spectrumInfo$MS.Level==1
-      maxTic = 1e11;
+      #maxTic = 1e11;
+      maxTic = max(spectrumInfo$TIC)
       xlim <- c(0, max(spectrumInfo$RT))
       plot(
         x=NA, 
@@ -591,20 +645,40 @@ imageGenerator<-function(dataFile, msmsEvalDataFile, infoFile, spectrumFile, chr
       abline(h=1e6);     
       abline(h=1e9);
       
+      timeRange <- range(spectrumInfo$RT[!is.na(spectrumInfo$RT)])      
+      timeLength <- (timeRange[2]-timeRange[1])*(1.0 - middle.time.percent/100.0)/2 # How much to cut off the edges
+      timeRange <- c(timeRange[1]+timeLength, timeRange[2]-timeLength)
+            
       # Draw averages
       for(level in used.mslevel) {
-        keep <- spectrumInfo$MS.Level==level
+        # Only look at the middle range
+        keep <- spectrumInfo$MS.Level==level & !is.na(spectrumInfo$RT) & spectrumInfo$RT>=timeRange[1] & spectrumInfo$RT<=timeRange[2]
+        timeDeltas <- c(diff(spectrumInfo$RT[keep]), 0)
         
-        tic.mean <- mean(spectrumInfo$TIC[keep])     
+        tic.mean <- weighted.mean(spectrumInfo$TIC[keep], timeDeltas)
+        tic.quantile.25 <- wtd.quantile(x=spectrumInfo$TIC[keep], q=0.25, weight = timeDeltas)
+        tic.quantile.50 <- wtd.quantile(x=spectrumInfo$TIC[keep], q=0.50, weight = timeDeltas)
+        tic.quantile.75 <- wtd.quantile(x=spectrumInfo$TIC[keep], q=0.75, weight = timeDeltas)
         
         if(level==1) {
-          result$ms1.tic.mean <- tic.mean
+          result$ms1.tic.25 <- tic.quantile.25
+          result$ms1.tic.50 <- tic.quantile.50
+          result$ms1.tic.75 <- tic.quantile.75
         } else if(level==2) {
-          result$ms2.tic.mean <- tic.mean
+          result$ms2.tic.25 <- tic.quantile.25
+          result$ms2.tic.50 <- tic.quantile.50
+          result$ms2.tic.75 <- tic.quantile.75
         }
         mean.color <- colors.by.mslevel.mean[level]
-        abline(h=tic.mean, col=mean.color)
-        axis(4, at=tic.mean, labels=format(tic.mean, scientific=TRUE, digits=3), tick=TRUE, 
+        
+        # Plot a line for the mean only within the middle 75%
+        lines(x=timeRange, y=c(tic.quantile.50, tic.quantile.50), col=mean.color)
+        
+        # Plot quantiles on the edges
+        lines(x=c(timeRange[1], timeRange[1]), y=c(tic.quantile.25, tic.quantile.75), col=mean.color)
+        lines(x=c(timeRange[2], timeRange[2]), y=c(tic.quantile.25, tic.quantile.75), col=mean.color)
+        
+        axis(4, at=tic.quantile.50, labels=format(tic.quantile.50, scientific=TRUE, digits=3), tick=TRUE, 
              col = mean.color, col.ticks = mean.color, col.axis = mean.color)
       }    
             
@@ -720,11 +794,11 @@ imageGenerator<-function(dataFile, msmsEvalDataFile, infoFile, spectrumFile, chr
       }
       
       spectrum.symbols <- spectrum.symbol(
-        ms2Only$identified,
-        ms2Only$rev, 
-        ms2Only$polymer,
-        ms2Only$unfrag,
-        ms2Only$domfrag) 
+        identified=ms2Only$identified,
+        reverse=ms2Only$rev, 
+        polymer=ms2Only$polymer,
+        unfrag =ms2Only$unfrag,
+        domfrag=ms2Only$domfrag) 
       points(xAxis, ms2Only$Mz, 
              pch=spectrum.symbols, 
              col=colorsByCharge[ms2Only$Z + 1])            
@@ -1008,7 +1082,7 @@ startReportFile<-function(reportFile) {
     <tr><th>Data files", helpLink("swiftQaDataFile"),
     "</th><th class=\"protein\">Identification", helpLink("swiftQaPeptidesAndProteins"),    
     "</th><th class=\"spectrum\">Spectrum Counts", helpLink("swiftQaSpectrumCount"),
-    "</th><th>MS TIC Mean", helpLink("msSignal"),
+    "</th><th>MS TIC Quartiles", helpLink("msSignal"),
     "</th><th>", lockmass.title, helpLink("swiftQaLockmassGraph"),
     "</th><th>", calibration.title, helpLink("swiftQaMassCalibrationGraph"),
     "</th><th>", msmsEval.title, helpLink("swiftQaMsmsEvalDiscriminant"),
@@ -1077,8 +1151,13 @@ addRowToReportFile<-function(reportFile, row) {
                  
                  "</table></td>",
                  "<td><table>",
-                 "<tr><th>MS1</th><td>", format(row$ms1.tic.mean, scientific=TRUE, digits=3), "</td></tr>",
-                 "<tr><th>MS2</th><td>", format(row$ms2.tic.mean, scientific=TRUE, digits=3), "</td></tr>",
+                 "<tr><th>MS<sup>1</sup>&nbsp;25%</th><td>", format(row$ms1.tic.25, scientific=TRUE, digits=3), "</td></tr>",
+                 "<tr><th>MS<sup>1</sup>&nbsp;50%</th><td>", format(row$ms1.tic.50, scientific=TRUE, digits=3), "</td></tr>",
+                 "<tr><th>MS<sup>1</sup>&nbsp;75%</th><td>", format(row$ms1.tic.75, scientific=TRUE, digits=3), "</td></tr>",
+                 "<tr><th>&nbsp;</th><td>&nbsp;</td></tr>",
+                 "<tr><th>MS<sup>2</sup>&nbsp;25%</th><td>", format(row$ms2.tic.25, scientific=TRUE, digits=3), "</td></tr>",
+                 "<tr><th>MS<sup>2</sup>&nbsp;50%</th><td>", format(row$ms2.tic.50, scientific=TRUE, digits=3), "</td></tr>",
+                 "<tr><th>MS<sup>2</sup>&nbsp;75%</th><td>", format(row$ms2.tic.75, scientific=TRUE, digits=3), "</td></tr>",
                  "</table></td>",
                  getHtmlTextImageFileInfo(row$lockmass.file),
                  getHtmlTextImageFileInfo(row$calibration.file),
@@ -1112,7 +1191,7 @@ run <- function(inputFile, reportFileName, decoyRegex) {
   
   excelSummaryFile<-file(file.path(dirname(reportFileName), "summary.xls"), "w")
   on.exit(close(excelSummaryFile), add=TRUE)
-  cat("raw file name\tproteins\treverse proteins\tpeptides\treverse peptides\tall spectra\tmsn spectra\t.dat spectra\tidentified spectra\treverse hit spectra\tpolymer spectra\tunfragmented spectra\tdominant fragment spectra\tMS1 TIC mean\tMS2 TIC mean\tloading pressure mean\tnc pressure mean\tcolumn temperature min\tcolumn temperature max\n" , file=excelSummaryFile)
+  cat("raw file name\tproteins\treverse proteins\tpeptides\treverse peptides\tall spectra\tmsn spectra\t.dat spectra\tidentified spectra\treverse hit spectra\tpolymer spectra\tunfragmented spectra\tdominant fragment spectra\tMS1 TIC 25%\tMS1 TIC 50%\tMS1 TIC 75%\tMS2 TIC 25%\tMS2 TIC 50%\tMS2 TIC 75%\tloading pressure mean\tnc pressure mean\tcolumn temperature min\tcolumn temperature max\n" , file=excelSummaryFile)
   
   startReportFile(reportFile)
   
@@ -1152,8 +1231,12 @@ run <- function(inputFile, reportFileName, decoyRegex) {
         row$spectrum.polymer.count,
         row$spectrum.unfrag.count,
         row$spectrum.domfrag.count,
-        row$ms1.tic.mean,
-        row$ms2.tic.mean,
+        row$ms1.tic.25,
+        row$ms1.tic.50,
+        row$ms1.tic.75,
+        row$ms2.tic.25,
+        row$ms2.tic.50,
+        row$ms2.tic.75,
         row$uv.loading.pressure.mean,
         row$uv.nc.pressure.mean,
         row$uv.column.temperature.min,
@@ -1167,7 +1250,7 @@ run <- function(inputFile, reportFileName, decoyRegex) {
 } 
 
 args<-commandArgs(TRUE)
-# args<-c("/Users/m044910/Documents/devel/swift/swift/scripts/src/test/input.txt", "/tmp/qa/output.html", "Rev_") # For testing
+#args<-c("/Users/m044910/Documents/devel/swift/swift/scripts/src/test/input.txt", "/tmp/qa/output.html", "Rev_") # For testing
 inputFile<-args[1]
 reportFileName<-args[2]
 decoyRegex<-args[3] # Currently treated just as a plain prefix
