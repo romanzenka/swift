@@ -1,0 +1,45 @@
+<div id="content">
+	<div class="heading">Dynamic Range</div> 
+   <p><strong>Dynamic Range</strong> is the range of MS1 peak intensities that allows for detection of peptides.
+   
+   </p><p>Higher<strong> Dynamic Range</strong>, that is, a larger difference in intensity between the smallest  and largest MS1 
+peaks, can indicate improved sensitivity.
+   
+   </p><p>The <strong>Dynamic Range</strong> metric is the ratio of a high intensity MS1 peak (which is more intense than 95% of the peaks) to a low intensity MS1 peak (which is less intense than 95% of the peaks).  This metric only considers MS1 peaks that have an MS2 spectrum that has been matched to a peptide. It also only considers MS1 peaks that elute during the <a href="retention_spread.php">"Retention Spread,"</a> the elution time span where most of the peptides are eluting.
+   </p><p>
+     <img src="../images_metrics/Dynamic-Range.png" alt="Dynamic Range" width="675" height="388">
+   </p><div class="heading">Units:</div>
+   <p><strong>Log (base 10) of the ratio
+   </strong>
+   </p><div class="heading">Optimal:</div>
+   <p><strong>Higher:</strong> A wider <strong>Dynamic Range</strong> means that the mass spectrometer can detect lower abundance peptides.</p>
+  <p> The most reproducible <strong>LC-MS</strong> performance is when this metric remains in a narrow range over a series of runs. Wide variability in any metric means your process is not reproducible.
+   </p><div class="heading">What the Metric Detects:</div>
+   
+   <p>The <strong>Dynamic Range</strong> measures how much signal is available for detecting peptides.  This measure is sensitive to the amount of sample loading into the <strong>LC-MS</strong> system.
+</p><div class="heading">Related Metrics:</div>
+   <p>A higher <strong>Dynamic Range</strong> is one way to see if the mass spectrometer is able to see less abundant peptides in the presence of more abundant peptides.
+   </p><p>A higher <a href="ms1_peak_intensity.php">Peak Intensity</a> says that all the proteins, even the less abundant ones are being detected at a higher value.
+</p><p>The <a href="trigger_point.php">Trigger Point</a> tell where on the MS1 peak the MS2 is triggered. Triggering higher on the MS1 peak means that more of the available ion current is being used for peptide identification.</p>
+<p>A higher value of the<a href="low_intensity_trigger_point.php"> Low Intensity Trigger Point </a>means that  the less abundant peptides are getting a lot of the available ion current.
+</p><p>A higher value of the <a href="ms2_low_intensity_id_rate.php">Low Intensity ID Rate</a> means that these less abundant peptides are being identified.
+
+ </p><div class="heading">Related Troubleshooting Topics:</div>
+      <ul>
+
+        <li><a href="/help/troubleshooting/multiple_failures.php">Multiple Failures</a></li>
+       
+        <li><a href="/help/troubleshooting/ms1_signal_to_noise.php">MS1 Signal - Signal to Noise</a></li>
+        <li><a href="/help/troubleshooting/ms1_signal_saturation_high_dynamic_sampling.php">MS1 Spectra - Signal Saturation</a></li>
+      </ul>
+
+      <div class="heading">Forum:</div>
+<p>If you have questions, comments and/or insights about <strong>MassQC</strong>, you 
+
+can share them on the <a href="http://groups.google.com/group/massqc_usersforum" target="_blank">MassQC Users Forum</a>.
+
+ </p><div class="heading">Search the MassQC Site and the Help Center:</div>
+    
+    <p>
+
+</p></div>

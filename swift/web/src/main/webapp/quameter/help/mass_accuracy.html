@@ -1,0 +1,35 @@
+<div id="content">
+    
+    	<div class="heading">Mass Accuracy</div> 
+<p><strong>Mass Accuracy</strong> is the difference between the mass observed with the mass spectrometer and the known mass of the peptide precursor molecule.
+</p><p><strong>Mass Accuracy</strong> closer to zero is indicative of better instrument tuning and stability. 
+</p><p>The <strong>Mass Accuracy</strong> metric is the median of the mass accuracy of all the spectra that have been matched to peptides. 
+</p><p><img src="../images_metrics/MassAccuracy.png">
+</p><div class="heading">Units:</div> 
+<p class="blurb"><strong>Parts per million (ppm)</strong>
+  
+</p><div class="heading">Optimal:</div> 
+<p class="blurb"><strong>Zero:</strong> This metric, unlike most metrics in <strong>MassQC</strong>, can be either positive or negative.
+</p><div class="heading">What the Metric Detects:</div> <p class="blurb">The <strong>Mass Accuracy</strong> metric shows how close the measured mass is to the real mass. If the measurement is made numerous times, the accuracy is the difference between the average value and the real mass. The accuracy is not the same as the precision which is the scatter in repeated measurements.</p>
+<p>If the <strong>Mass Accuracy</strong> is different from zero, it means that the mass spectrometer is consistently reporting the masses as too high or two low.</p>
+
+<div class="heading">Related Metrics: </div> 
+    <p>The <a href="precursor_mz.php">Precursor m/z</a> reports the median value of the peptide precursors but doesn't say anything about how accurately they are measured. If there are very few <a href="peptide_count.php">Peptides</a> or <a href="ms2_spectra.php">MS2 Spectra</a>, then the <strong>Mass Accuracy</strong> metric will not be as good an estimate of the true mass accuracy.</p>
+
+      
+       <div class="heading">Related Troubleshooting Topics:</div>
+      <ul>
+
+        <li><a href="/help/troubleshooting/signal_strength_mass_accuracy.php">Identifications - Mass Accuracy</a></li>
+       
+      </ul>
+      <div class="heading">Forum:</div>
+<p>If you have questions, comments and/or insights about <strong>MassQC</strong>, you 
+
+can share them on the <a href="http://groups.google.com/group/massqc_usersforum" target="_blank">MassQC Users Forum</a>.
+
+ </p><div class="heading">Search the MassQC Site and the Help Center:</div>
+    
+    <p>
+    
+</p></div>
