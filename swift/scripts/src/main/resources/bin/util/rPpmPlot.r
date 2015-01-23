@@ -1264,8 +1264,8 @@ run <- function(inputFile, reportFileName, decoyRegex) {
   cat("END OF FILE\n", file=excelSummaryFile)
 } 
 
-#args<-commandArgs(TRUE)
-args<-c("/Users/m044910/Documents/devel/swift/swift/scripts/src/test/input.txt", "/tmp/qa/output.html", "Rev_") # For testing
+args<-commandArgs(TRUE)
+#args<-c("/Users/m044910/Documents/devel/swift/swift/scripts/src/test/input.txt", "/tmp/qa/output.html", "Rev_") # For testing
 inputFile<-args[1]
 reportFileName<-args[2]
 decoyRegex<-args[3] # Currently treated just as a plain prefix
