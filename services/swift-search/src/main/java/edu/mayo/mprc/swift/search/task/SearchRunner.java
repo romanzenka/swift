@@ -58,6 +58,7 @@ public final class SearchRunner implements Runnable, Lifecycle {
 	public static final double QUAMETER_FDR = 0.02;
 
 	private boolean running;
+	private boolean semitrypticQuameter;
 	private final boolean fromScratch;
 	private final SwiftSearchDefinition searchDefinition;
 
@@ -137,6 +138,7 @@ public final class SearchRunner implements Runnable, Lifecycle {
 			final DatabaseFileTokenFactory fileTokenFactory,
 			final SearchRun searchRun,
 			final boolean reportDecoyHits,
+			final boolean semitrypticQuameter,
 			final int priority,
 			final ParamsInfo paramsInfo,
 			final String taskId,
@@ -159,6 +161,7 @@ public final class SearchRunner implements Runnable, Lifecycle {
 		this.fileTokenFactory = fileTokenFactory;
 		this.searchRun = searchRun;
 		this.reportDecoyHits = reportDecoyHits;
+		this.semitrypticQuameter = semitrypticQuameter;
 		workflowEngine = new WorkflowEngine(taskId);
 		workflowEngine.setPriority(priority);
 		this.paramsInfo = paramsInfo;
@@ -257,11 +260,11 @@ public final class SearchRunner implements Runnable, Lifecycle {
 	}
 
 	private boolean isQualityControlEnabled() {
-        if(engines.getQuameterEngine() != null){
-		    return getSearchDefinition().getSearchParameters().getEnabledEngines().isEnabled(engines.getQuameterEngine().getEngineConfig());
-        } else {
-            return false;
-        }
+		if (engines.getQuameterEngine() != null) {
+			return getSearchDefinition().getSearchParameters().getEnabledEngines().isEnabled(engines.getQuameterEngine().getEngineConfig());
+		} else {
+			return false;
+		}
 	}
 
 	/**
@@ -322,7 +325,7 @@ public final class SearchRunner implements Runnable, Lifecycle {
 				throw new MprcException("The Comet search engine must be available for Quality Control to function");
 			}
 			// Force Comet to produce .pep.xml output for idpqonvert
-			final FileProducingTask cometSearch = addEngineSearchTask(comet, inputFile, mzmlFile, getSemiParameters(searchParameters), publicSearchFiles,
+			final FileProducingTask cometSearch = addEngineSearchTask(comet, inputFile, mzmlFile, forceSemitrypsin(searchParameters, semitrypticQuameter), publicSearchFiles,
 					CometWorker.PEP_XML);
 			final IdpQonvertTask idpQonvertTask = addIdpQonvertTask(idpQonvert, cometSearch, false/* Do not publish the idpDB file, temp only*/);
 			idpQonvertTask.setEmbedSpectrumScanTimes(true);
@@ -340,14 +343,20 @@ public final class SearchRunner implements Runnable, Lifecycle {
 	}
 
 	/**
-	 * Create a semitryptic version of input parameters.
+	 * Create a version of input parameters that has semitryptic forced to given value.
 	 *
 	 * @param searchParameters Input parameters.
-	 * @return Semi-tryptic version.
+	 * @return Semi-tryptic version if we want one. Non-semi-tryptic version if we do NOT want one. This
+	 * provides consistency in results no matter how the other parameters were set.
 	 */
-	private SearchEngineParameters getSemiParameters(final SearchEngineParameters searchParameters) {
+	private SearchEngineParameters forceSemitrypsin(final SearchEngineParameters searchParameters, final boolean semitrypticQuameter) {
 		final SearchEngineParameters semiTrypticParameters = searchParameters.copyNullId();
-		semiTrypticParameters.setMinTerminiCleavages(1);
+
+		if (semitrypticQuameter) {
+			semiTrypticParameters.setMinTerminiCleavages(1);
+		} else {
+			semiTrypticParameters.setMinTerminiCleavages(2);
+		}
 		return semiTrypticParameters;
 	}
 

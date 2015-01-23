@@ -1,0 +1,81 @@
+<html>
+<head>
+    <link rel="stylesheet" href="../../css/help.css" type="text/css" media="screen" charset="utf-8"/>
+    <script src="../../js/AC_RunActiveContent.js" type="text/javascript"></script>
+</head>
+<body>
+<div id="content">
+    <div class="heading">
+        Ion Source and Long Term Degradation
+    </div>
+    <p>
+        When the
+        <strong>
+            ion source
+        </strong>
+        begins to ionize less efficiently, a noticeable change in signal can be present. Although in the
+        <strong>
+            Dashboard
+        </strong>
+        we see an increased
+        <a href="../metrics/precursor_mz.html">
+            Precursor m/z
+        </a>
+        , this alerts us to a bigger picture trend. The picture below shows an increase in
+        <a href="../metrics/precursor_mz.html">
+            Precursor m/z
+        </a>
+        , but if you click the
+        <strong>
+            Control Charts
+        </strong>
+        tab and dig deeper, you see the trend.
+    </p>
+
+    <p>
+        <img alt="Increase in Precursor m/z" height="204" src="../new_images/high_precursor_mz.png" width="674"/>
+    </p>
+
+    <p>
+        In this case, we see
+        <strong>
+            long term signal degradation
+        </strong>
+        , correlating with decreasing
+        <a href="../metrics/precursor_mz.html">
+            Precursor m/z
+        </a>
+        and an overall decrease in the number of
+        <a href="../metrics/peptide_count.html">
+            Peptide Counts
+        </a>
+        :
+    </p>
+
+    <p>
+        <img alt="Long Term Signal Degradation" height="332" src="../new_images/long_term_sig_degrade.png" width="597"/>
+    </p>
+
+    <p>
+        Often, MassQC will lead you to sift through the historical data in a way you may not otherwise expect. This can
+        be a great deal of help when you notice problems that are of a more subtle nature.
+    </p>
+
+    <div class="heading">
+        Metrics discussed this section:
+    </div>
+    <ul>
+        <li>
+            <a href="../metrics/precursor_mz.html">
+                Ion Source: Precursor m/z
+            </a>
+        </li>
+        <li>
+            <a href="../metrics/peptide_count.html">
+                Identifications: Peptide Counts
+            </a>
+        </li>
+    </ul>
+</div>
+</body>
+</html>

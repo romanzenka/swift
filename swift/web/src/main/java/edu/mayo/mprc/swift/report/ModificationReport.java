@@ -1,6 +1,7 @@
 package edu.mayo.mprc.swift.report;
 
 import com.google.common.base.Charsets;
+import edu.mayo.mprc.swift.resources.WebUiHolder;
 import edu.mayo.mprc.unimod.Unimod;
 import edu.mayo.mprc.unimod.UnimodDao;
 import edu.mayo.mprc.utilities.FileUtilities;
@@ -19,6 +20,7 @@ import java.io.OutputStreamWriter;
 public final class ModificationReport implements HttpRequestHandler {
 	private static final String TITLE = "Modifications defined in Swift";
 	private transient UnimodDao unimodDao;
+	private transient WebUiHolder webUiHolder;
 
 	@Override
 	public void handleRequest(final HttpServletRequest req, final HttpServletResponse resp) throws IOException {
@@ -31,7 +33,7 @@ public final class ModificationReport implements HttpRequestHandler {
 			unimodDao.commit();
 
 			writer = new OutputStreamWriter(resp.getOutputStream(), Charsets.US_ASCII);
-			writer.write("<html><head><title>" + TITLE + "</title>" +
+			writer.write("<html><head><title>" + TITLE + " | " + webUiHolder.getWebUi().getTitle() + "</title>" +
 					"<style>" +
 					"table { border-collapse: collapse }" +
 					"table td, table th { border: 1px solid black }" +
@@ -52,5 +54,13 @@ public final class ModificationReport implements HttpRequestHandler {
 
 	public void setUnimodDao(UnimodDao unimodDao) {
 		this.unimodDao = unimodDao;
+	}
+
+	public WebUiHolder getWebUiHolder() {
+		return webUiHolder;
+	}
+
+	public void setWebUiHolder(WebUiHolder webUiHolder) {
+		this.webUiHolder = webUiHolder;
 	}
 }

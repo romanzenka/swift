@@ -39,7 +39,7 @@ public class FindProtein implements HttpRequestHandler {
 			try {
 				final List<ReportData> reportDataList = searchDbDao.getSearchesForAccessionNumber(accessionNumber);
 
-				writer.write("<html><head><title>Searches containing " + accessionNumber + "</title>\n" +
+				writer.write("<html><head><title>Searches containing " + accessionNumber + " | " + webUiHolder.getWebUi().getTitle() + "</title>\n" +
 						"<link rel=\"stylesheet\" href=\"/report/analysis.css\" type=\"text/css\">\n" +
 						"<link href='http://fonts.googleapis.com/css?family=PT+Sans' rel='stylesheet' type='text/css'>\n" +
 						"</head><body>\n");

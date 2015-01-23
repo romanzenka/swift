@@ -14,6 +14,8 @@ public interface ConfigReader {
 
 	boolean getBoolean(String key);
 
+	boolean getBoolean(String key, boolean defaultValue);
+
 	int getInteger(String key);
 
 	int getInteger(String key, int defaultValue);

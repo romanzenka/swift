@@ -8,15 +8,13 @@ import com.google.gwt.event.logical.shared.HasValueChangeHandlers;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
+import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.user.client.ui.*;
 import com.google.gwt.view.client.SelectionChangeEvent;
 import edu.mayo.mprc.swift.ui.client.rpc.ClientFileSearch;
 import edu.mayo.mprc.swift.ui.client.rpc.files.FileInfo;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @author: Roman Zenka
@@ -25,11 +23,12 @@ public final class FileTable extends FlexTable implements HasValueChangeHandlers
 	private static final int SELECT_COLUMN = 0;
 	private static final int FILE_COLUMN = 1;
 	private static final int SIZE_COLUMN = 2;
-	private static final int REMOVE_COLUMN = 3;
+	private static final int DATE_COLUMN = 3;
+	private static final int REMOVE_COLUMN = 4;
 	private static final int FILE_COUNT_COLUMN = FILE_COLUMN;
-	private static final int SAMPLE_COLUMN = 4;
-	private static final int EXPERIMENT_COLUMN = 5;
-	private static final int CATEGORY_COLUMN = 6;
+	private static final int SAMPLE_COLUMN = 5;
+	private static final int EXPERIMENT_COLUMN = 6;
+	private static final int CATEGORY_COLUMN = 7;
 
 	private static final int HEADER_ROW_INDEX = 1;
 	private static final int FIRST_DATA_ROW_INDEX = 2;
@@ -42,8 +41,9 @@ public final class FileTable extends FlexTable implements HasValueChangeHandlers
 
 	private final FileTableColumn[] staticHeaders = {
 			new FileTableColumn(SELECT_COLUMN, "", new CheckBox(), "button-column"),
-			new FileTableColumn(FILE_COLUMN, "File", null),
-			new FileTableColumn(SIZE_COLUMN, "Size", null),
+			new FileTableColumn(FILE_COLUMN, "File", new Anchor("File")),
+			new FileTableColumn(SIZE_COLUMN, "Size", new Anchor("Size")),
+			new FileTableColumn(DATE_COLUMN, "Date", new Anchor("Date")),
 			new FileTableColumn(REMOVE_COLUMN, "Remove", new PushButton(new Image(REMOVE_IMAGE)), "button-column"),
 			new FileTableColumn(SAMPLE_COLUMN, "<img src=\"images/scaffold_column.gif\" style=\"vertical-align: middle;\">&nbsp;Biological Sample", null),
 			new FileTableColumn(EXPERIMENT_COLUMN, "<img src=\"images/scaffold_icon.gif\" style=\"vertical-align: middle;\">&nbsp;Experiment", null),
@@ -127,6 +127,24 @@ public final class FileTable extends FlexTable implements HasValueChangeHandlers
 				removeSelectedFiles();
 			}
 		});
+		((Anchor) headers[FILE_COLUMN].getWidget()).addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(final ClickEvent event) {
+				sortByFileColumn();
+			}
+		});
+		((Anchor) headers[DATE_COLUMN].getWidget()).addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(final ClickEvent event) {
+				sortByDateColumn();
+			}
+		});
+		((Anchor) headers[SIZE_COLUMN].getWidget()).addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(final ClickEvent event) {
+				sortBySizeColumn();
+			}
+		});
 
 		getRowFormatter().setStyleName(getHeaderRowIndex(), "table-header");
 
@@ -141,6 +159,80 @@ public final class FileTable extends FlexTable implements HasValueChangeHandlers
 			}
 		});
 		updateFileCount();
+	}
+
+	/**
+	 * Sort the data. If data was sorted, sort it in reverse
+	 *
+	 * @param comparator Comparator to sort by
+	 */
+	private void sortData(final Comparator<ClientFileSearch> comparator) {
+		final List<ClientFileSearch> data = getData();
+
+		if (!isListSorted(comparator, data)) {
+			Collections.sort(data, comparator);
+		} else {
+			Collections.sort(data, new Comparator<ClientFileSearch>() {
+				@Override
+				public int compare(ClientFileSearch clientFileSearch, ClientFileSearch t1) {
+					return -comparator.compare(clientFileSearch, t1);
+				}
+			});
+		}
+
+		setFiles(data);
+	}
+
+	private boolean isListSorted(Comparator<ClientFileSearch> comparator, List<ClientFileSearch> data) {
+		boolean sorted = true;
+		ClientFileSearch prev = null;
+		for (ClientFileSearch s : data) {
+			if (prev != null) {
+				if (comparator.compare(prev, s) == 1) {
+					sorted = false;
+					break;
+				}
+			}
+			prev = s;
+		}
+		return sorted;
+	}
+
+	private void sortByFileColumn() {
+		sortData(new Comparator<ClientFileSearch>() {
+			@Override
+			public int compare(ClientFileSearch clientFileSearch, ClientFileSearch t1) {
+				if (clientFileSearch.getPath() == null) {
+					return t1.getPath() == null ? 0 : 1;
+				}
+				return clientFileSearch.getPath().compareToIgnoreCase(t1.getPath());
+			}
+		});
+	}
+
+	private void sortBySizeColumn() {
+		sortData(new Comparator<ClientFileSearch>() {
+			@Override
+			public int compare(ClientFileSearch clientFileSearch, ClientFileSearch t1) {
+				if (clientFileSearch.getFileSize() == null) {
+					return t1.getFileSize() == null ? 0 : 1;
+				}
+				return clientFileSearch.getFileSize().compareTo(t1.getFileSize());
+			}
+		});
+	}
+
+	private void sortByDateColumn() {
+		final Comparator<ClientFileSearch> comparator = new Comparator<ClientFileSearch>() {
+			@Override
+			public int compare(ClientFileSearch clientFileSearch, ClientFileSearch t1) {
+				if (clientFileSearch.getLastModifiedDate() == null) {
+					return t1.getLastModifiedDate() == null ? 0 : 1;
+				}
+				return clientFileSearch.getLastModifiedDate().compareTo(t1.getLastModifiedDate());
+			}
+		};
+		sortData(comparator);
 	}
 
 	private void updateFileCount() {
@@ -181,13 +273,25 @@ public final class FileTable extends FlexTable implements HasValueChangeHandlers
 	}
 
 	public void setFiles(final List<ClientFileSearch> inputFiles, final SearchType searchType) {
-		for (int i = getFirstDataRow(); i < getRowCount(); ) {
-			removeTableRow(i);
-		}
+		removeRows();
 
 		searchTypeList.setSelectedSearchType(searchType, false/*This is coming from search load. Do not store the preference*/);
 		setSearchType(searchType);
 
+		addRows(inputFiles);
+
+		ValueChangeEvent.fire(this, null);
+	}
+
+	public void setFiles(final List<ClientFileSearch> inputFiles) {
+		removeRows();
+
+		addRows(inputFiles);
+
+		ValueChangeEvent.fire(this, null);
+	}
+
+	private void addRows(List<ClientFileSearch> inputFiles) {
 		int lastRow = getRowCount();
 
 		for (final ClientFileSearch fileSearch : inputFiles) {
@@ -211,6 +315,7 @@ public final class FileTable extends FlexTable implements HasValueChangeHandlers
 			addNewLine(
 					fileSearch.getPath(),
 					fileSearch.getFileSize(),
+					fileSearch.getLastModifiedDate(),
 					index,
 					fileSearch.getCategoryName(),
 					fileSearch.getExperiment(),
@@ -218,8 +323,12 @@ public final class FileTable extends FlexTable implements HasValueChangeHandlers
 
 			lastRow++;
 		}
+	}
 
-		ValueChangeEvent.fire(this, null);
+	private void removeRows() {
+		for (int i = getFirstDataRow(); i < getRowCount(); ) {
+			removeTableRow(i);
+		}
 	}
 
 	/**
@@ -242,20 +351,27 @@ public final class FileTable extends FlexTable implements HasValueChangeHandlers
 	private void addNewLine(final FileInfo info, final MutableInteger lineIndex, final String title, final SearchType type) {
 		final String path = info.getRelativePath();
 		final long fileSize = info.getSize();
+		final Date lastModifiedDate = info.getLastModifiedDate();
 		final String name = FilePathWidget.getFileNameWithoutExtension(path);
 		final String sampleName = getDefaultSampleName(type, title, name);
 		final String experimentName = getDefaultExperimentName(type, title, name);
 
-		addNewLine(path, fileSize, lineIndex, "none", experimentName, sampleName);
+		addNewLine(path, fileSize, lastModifiedDate, lineIndex, "none", experimentName, sampleName);
 	}
 
-	private void addNewLine(final String path, final long fileSize, final MutableInteger lineIndex, final String categoryName, final String experimentName, final String sampleName) {
+	private void addNewLine(final String path, final long fileSize, final Date lastModifiedDate, final MutableInteger lineIndex, final String categoryName, final String experimentName, final String sampleName) {
 		final FilePathWidget filePathWidget = new FilePathWidget(path);
 
 		final int rowNumber = lineIndex.i;
 
 		setWidget(rowNumber, FILE_COLUMN, filePathWidget);
 		setWidget(rowNumber, SIZE_COLUMN, new FileSizeWidget(fileSize));
+		final DateTimeFormat format = DateTimeFormat.getFormat("yyyy/MM/dd HH:mm:ss");
+		if (lastModifiedDate != null) {
+			setWidget(rowNumber, DATE_COLUMN, new Label(format.format(lastModifiedDate)));
+		} else {
+			setWidget(rowNumber, DATE_COLUMN, new Label(""));
+		}
 		final PushButton removeButton = new PushButton(new Image(REMOVE_IMAGE));
 		removeButton.addClickHandler(new RemoveButtonListener(lineIndex));
 		setWidget(rowNumber, REMOVE_COLUMN, removeButton);
@@ -462,6 +578,8 @@ public final class FileTable extends FlexTable implements HasValueChangeHandlers
 	public List<ClientFileSearch> getData() {
 		final List<ClientFileSearch> results = new ArrayList<ClientFileSearch>(getRowCount() - getFirstDataRow());
 
+		DateTimeFormat formatter = DateTimeFormat.getFormat("yyyy/MM/dd HH:mm:ss");
+
 		for (int row = getFirstDataRow(); row < getRowCount(); row++) {
 
 			final EditableLabel w = (EditableLabel) getWidget(row, SAMPLE_COLUMN);
@@ -472,12 +590,25 @@ public final class FileTable extends FlexTable implements HasValueChangeHandlers
 
 			final EditableLabel w3 = (EditableLabel) getWidget(row, CATEGORY_COLUMN);
 			final String categoryName = w3.getText();
+
+			final FileSizeWidget w4 = (FileSizeWidget) getWidget(row, SIZE_COLUMN);
+			final Long fileSize = w4.getFileSize();
+
+			final Label w5 = (Label) getWidget(row, DATE_COLUMN);
+			final Date date;
+			if ("".equals(w5.getText()) || w5.getText() == null) {
+				date = null;
+			} else {
+				date = formatter.parse(w5.getText());
+			}
+
 			results.add(new ClientFileSearch(
 					((FilePathWidget) getWidget(row, FILE_COLUMN)).getFullPath(),
 					sampleName,
 					categoryName,
 					experimentName,
-					null));
+					fileSize,
+					date));
 		}
 		return results;
 	}

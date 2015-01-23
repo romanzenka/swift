@@ -1,0 +1,113 @@
+<html>
+<head>
+    <link rel="stylesheet" href="../../css/help.css" type="text/css" media="screen" charset="utf-8"/>
+    <script src="../../js/AC_RunActiveContent.js" type="text/javascript"></script>
+</head>
+<body>
+<div id="content">
+    <div class="heading">
+        Peak Intensity and +1H Ions
+    </div>
+    <p>
+        It is common in mass spectrometry labs to use a variety of chemical agents to modify or otherwise help with the
+        preparation of your
+        <strong>
+            tryptic digests
+        </strong>
+        . We use
+        <strong>
+            Dithiothreitol (DTT)
+        </strong>
+        to reduce the disulfide bonds in proteins as well as
+        <strong>
+            Iodoacetic Acid (IAA)
+        </strong>
+        or
+        <strong>
+            Iodoacetamide (IA)
+        </strong>
+        to alkylate these cysteine residues to keep the protein unraveled for analysis.
+    </p>
+
+    <p>
+        Another common reagent used in Biochemistry labs is
+        <strong>
+            Polyethylene Glycol (PEG)
+        </strong>
+        .
+        <strong>
+            PEG
+        </strong>
+        is also a by-product of the production of Triton, and a common degradation product. PEG has been observed coming
+        from low-binding pipette tips, which have been exposed to acidic conditions, as well as many other older or
+        degraded plastic products. Unfortunately, PEG is considered a contaminant, and it can frustrate the mass
+        spectrometrist. PEG often can cause metrics such as
+        <a href="../metrics/percent_1h.html">
+            Percent +1H Ions
+        </a>
+        and
+        <a href="../metrics/ms1_peak_intensity.html">
+            MS1 Peak Intensity
+        </a>
+        to increase. If you don't know what you are looking for, this polymer can lead to considerable contamination.
+    </p>
+
+    <p>
+        We start in this example with an increase in the percentage of
+        <a href="../metrics/percent_1h.html">
+            +1H Ions
+        </a>
+        :
+    </p>
+
+    <p>
+        <img alt="High Percent +1H Ions" height="162" src="../new_images/high_1H_ions.png" width="438"/>
+    </p>
+
+    <p>
+        Upon closer examination, we see in the
+        <strong>
+            Control Charts
+        </strong>
+        that this increase is indeed a result of
+        <strong>
+            PEG contamination
+        </strong>
+        (from a substance such as Triton X-100):
+    </p>
+
+    <p>
+        <img alt="Ion Source, Percent +1H Ion Increase" height="216" src="../new_images/IonSource_1H_increase.png"
+             width="584"/>
+    </p>
+
+    <p>
+        And to confirm this diagnosis, we look to the
+        <strong>
+            characteristic PEG fragmentation
+        </strong>
+        (m/z difference of 44 Da) mass spectrum:
+    </p>
+
+    <p>
+        <img alt="PEG Contamination" height="287" src="../new_images/PEG_mass_spectra.png" width="501"/>
+    </p>
+
+    <div class="heading">
+        Metrics discussed this section:
+    </div>
+    <ul>
+        <li>
+            <a href="../metrics/percent_1h.html">
+                Ion Source: Percent +1H
+            </a>
+        </li>
+        <li>
+            <a href="../metrics/ms1_peak_intensity.html">
+                MS1: Peak Intensity
+            </a>
+        </li>
+    </ul>
+</div>
+</body>
+</html>

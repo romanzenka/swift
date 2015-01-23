@@ -1,0 +1,120 @@
+<html>
+<head>
+    <link rel="stylesheet" href="../../css/help.css" type="text/css" media="screen" charset="utf-8"/>
+    <script src="../../js/AC_RunActiveContent.js" type="text/javascript"></script>
+</head>
+<body>
+<div id="content">
+    <div class="heading">
+        High Intensity ID Rate
+    </div>
+    <p>
+        <strong>
+            High Intensity ID Rate
+        </strong>
+        is the percentage of the more intense MS1 peaks that get identified as a peptide.
+
+    <p>
+        The
+        <strong>
+            High Intensity ID Rate
+        </strong>
+        measures the efficiency of sampling and detection.
+
+    <p>
+        The
+        <strong>
+            High Intensity ID Rate
+        </strong>
+        is calculated from only the most intense MS1 peaks. The most intense peaks are those in the top 25% ranked by
+        the MS1 maximum intensity. The metric is the percentage of these intense peaks that the search engine matches to
+        a peptide.
+
+    <p>
+        <img alt="High-intensity ID" height="376" src="../images_metrics/HighIntensityID.png" width="676"/>
+
+    <div class="heading">
+        Units:
+    </div>
+    <p>
+        <strong>
+            Percent (%)
+        </strong>
+
+    <div class="heading">
+        Optimal:
+    </div>
+    <p>
+        <strong>
+            Higher:
+        </strong>
+        Higher indicates increased efficiency
+
+    <p>
+        The most reproducible
+        <strong>
+            LC-MS
+        </strong>
+        performance is when this metric remains in a narrow range over a series of runs. Wide variability in any metric
+        means your process is not reproducible.
+
+    <div class="heading">
+        What the Metric Detects:
+    </div>
+    <p>
+        The
+        <strong>
+            High Intensity ID Rate
+        </strong>
+        tells what fraction of peaks with stronger signals are matched to peptides. If this metric is unusually low,
+        that may mean that the higher intensity peaks are noise.
+
+    <div class="heading">
+        Related Metrics:
+    </div>
+    <p>
+        Whereas the
+        <strong>
+            High Intensity ID Rate
+        </strong>
+        measures how efficiently the high intensity MS1 ions are matched to peptides, the
+        <a href="ms2_low_intensity_id_rate.html">
+            Low Intensity ID Rate
+        </a>
+        does the same thing for the low intensity MS1 ions. In general the
+        <strong>
+            High Intensity ID Rate
+        </strong>
+        is expected to be larger than the
+        <a href="ms2_low_intensity_id_rate.html">
+            Low Intensity ID Rate
+        </a>
+        and it is worth investigating if it is not.
+
+    <div class="heading">
+        Related Troubleshooting Topics:
+    </div>
+    <ul>
+        <li>
+            <a href="../troubleshooting/multiple_failures.html">
+                Multiple Failures
+            </a>
+        </li>
+        <li>
+            <a href="../troubleshooting/ms1_ms2_signal.html">
+                MS1 &amp; MS2 Spectra - Signal
+            </a>
+        </li>
+    </ul>
+    </p>
+    </p>
+    </p>
+    </p>
+    </p>
+    </p>
+    </p>
+    </p>
+    </p>
+</div>
+</body>
+</html>

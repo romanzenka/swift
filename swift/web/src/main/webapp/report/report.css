@@ -106,13 +106,13 @@ h1 {
     top: -63px;
 }
 
-a.arrow {
+span.arrow {
     float: left;
     line-height: 16px;
     text-align: center;
 }
 
-a.arrow .arrowright, a.arrow .arrowdown {
+span.arrow .arrowright, span.arrow .arrowdown {
     display: block;
     width: 0;
     height: 0;
@@ -121,25 +121,25 @@ a.arrow .arrowright, a.arrow .arrowdown {
     border: 8px solid white;
 }
 
-a.arrow .arrowright {
+span.arrow .arrowright {
     border-left-color: #00c;
     border-right-width: 0;
     margin-left: 4px;
     margin-right: 8px;
 }
 
-a.arrow .arrowdown {
+span.arrow .arrowdown {
     margin-right: 4px;
     margin-top: 4px;
     border-top-color: #00c;
     border-bottom-width: 0;
 }
 
-a:hover.arrow .arrowright {
+span:hover.arrow .arrowright {
     border-left-color: #88f;
 }
 
-a:hover.arrow .arrowdown {
+span:hover.arrow .arrowdown {
     border-top-color: #88f;
 }
 
@@ -459,7 +459,7 @@ a:hover.filter_button.filter.ztoa {
 #navigation a {
     display: block;
     font-size: 1px;
-    line-height: 100px;
+    line-height: 1px;
     overflow: hidden;
     width: 20px;
     height: 20px;

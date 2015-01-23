@@ -246,7 +246,7 @@ public final class TestDaemonFactory {
 		final ServiceConfig searcher = new ServiceConfig("searcher", runner76);
 		main.addResource(searcher);
 
-		final WebUi.Config webUi = new WebUi.Config(searcher, "8080", "Swift 2.5", "C:\\", "file:///C:/", null, qstat, "http://scaffold");
+		final WebUi.Config webUi = new WebUi.Config(searcher, "8080", "Swift 2.5", "C:\\", "file:///C:/", null, qstat, "http://scaffold", null);
 		main.addResource(webUi);
 
 		final MessageBroker.Config brokerConfig = MessageBroker.Config.getEmbeddedBroker();

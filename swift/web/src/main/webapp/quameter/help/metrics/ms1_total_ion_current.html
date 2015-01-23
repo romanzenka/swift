@@ -1,0 +1,161 @@
+<html>
+<head>
+    <link rel="stylesheet" href="../../css/help.css" type="text/css" media="screen" charset="utf-8"/>
+    <script src="../../js/AC_RunActiveContent.js" type="text/javascript"></script>
+</head>
+<body>
+<div id="content">
+    <div class="heading">
+        MS1 Total Ion Current
+    </div>
+    <p>
+        <strong>
+            Total Ion Current
+        </strong>
+        <strong>
+            (TIC)
+        </strong>
+        estimates the total signal available in the mass spectrometer.
+    </p>
+
+    <p>
+        Higher total amount of intensity in precursor spectra indicates a
+        stronger MS1 signal.
+    </p>
+
+    <p>
+        The
+        <strong>
+            Total Ion Current
+        </strong>
+        includes contributions from peptides, contaminates, and noise.
+        <strong>
+            Total Ion Current
+        </strong>
+        is only calculated during the
+        <a href="retention_spread.html">
+            "Retention Spread"
+        </a>
+        , the time period when most peptides are eluting.
+    </p>
+
+    <p>
+        <img src="../images_metrics/TotalIonCurrent.png"/>
+
+    <div class="heading">
+        Units:
+    </div>
+    <p>
+        <strong>
+            Log (base 10) of (counts/1000)
+        </strong>
+    </p>
+
+    <div class="heading">
+        Optimal:
+    </div>
+    <p>
+        <strong>
+            Higher:
+        </strong>
+        Stronger signal makes it easier to detect peptides.
+    </p>
+
+    <p>
+        The most reproducible
+        <strong>
+            LC-MS
+        </strong>
+        performance is when this metric remains in a narrow range over a series of runs. Wide variability in any metric
+        means your process is not reproducible.
+
+    <div class="heading">
+        What the Metric Detects:
+    </div>
+    <p>
+        Too little
+        <strong>
+            Total Ion Current
+        </strong>
+        means that little signal is getting to the
+        <strong>
+            MS
+        </strong>
+        . Little signal means it is unlikely that peptides will be detected.
+    </p>
+
+    <p>
+        Too high
+        <strong>
+            Total Ion Current
+        </strong>
+        may mean that too
+        much sample was loaded, or that there is a lot of contamination.
+
+    <div class="heading">
+        Related Metrics:
+    </div>
+    <p>
+        The
+        <strong>
+            Total Ion Current
+        </strong>
+        is the total absolute signal available for peptides (and contaminants
+        and noise). The
+        <a href="ms1_peak_intensity.html">
+            Peak Intensity
+        </a>
+        is one measure of how much of this ion current is devoted to peptides.  The
+        <a href="ms1_signal_to_noise.html">
+            MS1 Signal to Noise
+        </a>
+        gives another
+        indication of how much of this total ion current is useful peaks. High
+        <strong>
+            Total Ion Current
+        </strong>
+        without a similarly high
+        <a href="ms1_peak_intensity.html">
+            Peak Intensity
+        </a>
+        may indicate contaminants.
+
+    <p>
+        A high
+        <strong>
+            Total Ion Current
+        </strong>
+        will usually mean the the ion trap gets filled quickly so that the
+        <a href="ms1_ion_inject_time.html">
+            MS1 Ion Inject Time
+        </a>
+        should be low. If it is not, that could indicate a problem.
+
+    <div class="heading">
+        Related Troubleshooting Topics:
+    </div>
+    <ul>
+        <li>
+            <a href="../troubleshooting/detector_sensitivity_trends.html">
+                Trends - Detector Sensitivity
+            </a>
+        </li>
+        <li>
+            <a href="../troubleshooting/ms1_signal_saturation_high_dynamic_sampling.html">
+                MS1 Spectra - Signal Saturation
+            </a>
+        </li>
+        <li>
+            <a href="../troubleshooting/ms2_spectra_triggering.html">
+                MS2 Spectra Triggering
+            </a>
+        </li>
+    </ul>
+    </p>
+    </p>
+    </p>
+    </p>
+    </p>
+</div>
+</body>
+</html>

@@ -2,7 +2,6 @@ package edu.mayo.mprc.swift.ui.client.widgets;
 
 import com.google.gwt.user.client.ui.CheckBox;
 import com.google.gwt.user.client.ui.HorizontalPanel;
-import com.google.gwt.user.client.ui.Label;
 import edu.mayo.mprc.swift.ui.client.rpc.ClientSwiftSearchDefinition;
 
 public final class AdditionalSettingsPanel extends HorizontalPanel {
@@ -11,6 +10,7 @@ public final class AdditionalSettingsPanel extends HorizontalPanel {
 	private final CheckBox publicSearchFiles;
 	private final CheckBox fromScratch;
 	private final CheckBox lowPriority;
+	private final CheckBox mzIdentML;
 
 	public AdditionalSettingsPanel() {
 		publicMgfs = new CheckBox("Provide .mgf");
@@ -36,8 +36,10 @@ public final class AdditionalSettingsPanel extends HorizontalPanel {
 		lowPriority.setValue(false);
 		add(lowPriority);
 
-		final Label searchTitleLabel = new Label("Title suffix:");
-		add(searchTitleLabel);
+		mzIdentML = new CheckBox("Provide mzIdentML");
+		mzIdentML.setTitle("mzIdentML will be produced by Scaffold even if the saved parameters do not enable this");
+		mzIdentML.setValue(false);
+		add(mzIdentML);
 	}
 
 	/**
@@ -86,9 +88,18 @@ public final class AdditionalSettingsPanel extends HorizontalPanel {
 		return Boolean.TRUE.equals(lowPriority.getValue());
 	}
 
+	public boolean isMzIdentMl() {
+		return Boolean.TRUE.equals(mzIdentML.getValue());
+	}
+
+	public void setMzIdentMl(final boolean mzIdentMl) {
+		this.mzIdentML.setValue(mzIdentMl);
+	}
+
 	public void setDefinition(final ClientSwiftSearchDefinition definition) {
 		setPublicMgfs(definition.isPublicMgfFiles());
 		setPublicMzxmls(definition.isPublicMzxmlFiles());
 		setPublicSearchFiles(definition.isPublicSearchFiles());
+		setMzIdentMl("1".equals(definition.getMetadata().get("mzIdentMl")));
 	}
 }

@@ -11,7 +11,7 @@
         <property name="title" type="string" length="100" column="title" />
         <many-to-one name="user" class="edu.mayo.mprc.workspace.User" column="owner"
             foreign-key="swift_search_definition_ibfk_4" />
-        <property name="outputFolder" type="file" column="output_folder" />
+        <property name="outputFolder" type="file" column="output_folder" length="500" />
         <many-to-one name="qa" class="SpectrumQa" column="spectrum_qa" foreign-key="swift_search_definition_ibfk_3" />
         <many-to-one name="peptideReport" class="PeptideReport" column="peptide_report"
             foreign-key="swift_search_definition_ibfk_1" />
@@ -27,7 +27,7 @@
             <one-to-many class="FileSearch" />
         </list>
 
-        <map name="metadata" cascade="all-delete-orphan" lazy="true" table="search_metadata">
+        <map name="metadata" cascade="all-delete-orphan" lazy="false    " table="search_metadata">
             <key column="swift_search_definition_id" foreign-key="search_metadata_ibfk_1" />
             <map-key type="string" column="metadata_key" />
             <element type="string" column="metadata_value" />

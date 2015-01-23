@@ -1,6 +1,9 @@
 package edu.mayo.mprc.swift.resources;
 
+import com.google.common.base.Joiner;
+import com.google.common.base.Splitter;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Ordering;
 import edu.mayo.mprc.MprcException;
 import edu.mayo.mprc.ReleaseInfoCore;
 import edu.mayo.mprc.config.*;
@@ -13,9 +16,13 @@ import edu.mayo.mprc.dbcurator.model.CurationContext;
 import edu.mayo.mprc.msmseval.MSMSEvalParamFile;
 import edu.mayo.mprc.msmseval.MSMSEvalWorker;
 import edu.mayo.mprc.msmseval.MsmsEvalCache;
+import edu.mayo.mprc.qstat.QstatDaemonWorker;
+import edu.mayo.mprc.quameterdb.InstrumentNameMapper;
+import edu.mayo.mprc.quameterdb.QuameterUi;
 import edu.mayo.mprc.swift.db.DatabaseFileTokenFactory;
 import edu.mayo.mprc.swift.db.SearchEngine;
 import edu.mayo.mprc.swift.db.SwiftDao;
+import edu.mayo.mprc.swift.dbmapping.SearchRun;
 import edu.mayo.mprc.swift.search.SwiftSearcher;
 import edu.mayo.mprc.utilities.FileUtilities;
 import edu.mayo.mprc.workspace.WorkspaceDao;
@@ -54,6 +61,7 @@ public final class WebUi implements Checkable {
 	private String scaffoldViewerUrl; // Where does the Scaffold Viewer live
 	private boolean extractMsn;
 	private boolean msconvert;
+	private InstrumentNameMapper quameterUi;
 
 	public static final String SEARCHER = "searcher";
 	public static final String TITLE = "title";
@@ -63,6 +71,7 @@ public final class WebUi implements Checkable {
 	public static final String NEW_CONFIG_FILE = "newConfigFile";
 	public static final String QSTAT = "qstat";
 	public static final String SCAFFOLD_VIEWER_URL = "scaffoldViewerUrl";
+	public static final String QUAMETER_UI = "quameterUi";
 
 	private static final String DEFAULT_SCAFFOLD_VIEWER_URL = "http://www.proteomesoftware.com/products/free-viewer/";
 
@@ -234,6 +243,38 @@ public final class WebUi implements Checkable {
 		return uiConfiguration;
 	}
 
+	/**
+	 * Replace instrument names with human readable ones for a list of searches.
+	 *
+	 * @param searches Searches to replace the instrument names in.
+	 */
+	public void mapInstrumentSerialNumbers(List<SearchRun> searches) {
+		for (final SearchRun searchRun : searches) {
+			searchRun.setInstruments(
+					mapInstrumentSerialNumbers(
+							searchRun.getInstruments()));
+		}
+	}
+
+	/**
+	 * @param instruments Comma-separated instrument names
+	 * @return Instrument names translated as per QuaMeter
+	 */
+	public String mapInstrumentSerialNumbers(final String instruments) {
+		if (quameterUi == null) {
+			return instruments;
+		}
+		final Iterable<String> split = Splitter.on(',').trimResults().omitEmptyStrings().split(instruments);
+		final List<String> mapped = new ArrayList<String>(5);
+		for (final String serial : split) {
+			mapped.add(quameterUi.mapInstrument(serial));
+		}
+		final String result = Joiner.on(", ").join(
+				Ordering.from(String.CASE_INSENSITIVE_ORDER)
+						.sortedCopy(mapped));
+		return result;
+	}
+
 	public String getScaffoldViewerUrl() {
 		return scaffoldViewerUrl;
 	}
@@ -270,6 +311,10 @@ public final class WebUi implements Checkable {
 
 				if (config.getQstat() != null) {
 					ui.qstatDaemonConnection = (DaemonConnection) dependencies.createSingleton(config.getQstat());
+				}
+
+				if (config.getQuameterUi() != null) {
+					ui.quameterUi = (QuameterUi) dependencies.createSingleton(config.getQuameterUi());
 				}
 
 				// Harvest the param files from searcher config
@@ -420,13 +465,14 @@ public final class WebUi implements Checkable {
 		private String newConfigFile;
 		private ServiceConfig qstat;
 		private String scaffoldViewerUrl;
+		private ResourceConfig quameterUi;
 
 		public Config() {
 		}
 
 		public Config(final ServiceConfig searcher, final String port, final String title, final String browseRoot,
 		              final String browseWebRoot, final String newConfigFile, final ServiceConfig qstat,
-		              final String scaffoldViewerUrl) {
+		              final String scaffoldViewerUrl, final ResourceConfig quameterUi) {
 			this.searcher = searcher;
 			this.port = port;
 			this.title = title;
@@ -435,6 +481,7 @@ public final class WebUi implements Checkable {
 			this.newConfigFile = newConfigFile;
 			this.qstat = qstat;
 			this.scaffoldViewerUrl = scaffoldViewerUrl;
+			this.quameterUi = quameterUi;
 		}
 
 		public void setSearcher(ServiceConfig searcher) {
@@ -455,6 +502,7 @@ public final class WebUi implements Checkable {
 			writer.put(NEW_CONFIG_FILE, getNewConfigFile());
 			writer.put(QSTAT, getQstat());
 			writer.put(SCAFFOLD_VIEWER_URL, getScaffoldViewerUrl());
+			writer.put(QUAMETER_UI, getQuameterUi());
 		}
 
 		@Override
@@ -467,6 +515,7 @@ public final class WebUi implements Checkable {
 			newConfigFile = reader.get(NEW_CONFIG_FILE);
 			qstat = (ServiceConfig) reader.getObject(QSTAT);
 			scaffoldViewerUrl = reader.get(SCAFFOLD_VIEWER_URL, DEFAULT_SCAFFOLD_VIEWER_URL);
+			quameterUi = reader.getObject(QUAMETER_UI);
 		}
 
 		@Override
@@ -492,6 +541,10 @@ public final class WebUi implements Checkable {
 
 		public ServiceConfig getQstat() {
 			return qstat;
+		}
+
+		public ResourceConfig getQuameterUi() {
+			return quameterUi;
 		}
 
 		public String getScaffoldViewerUrl() {
@@ -572,10 +625,13 @@ public final class WebUi implements Checkable {
 					.defaultValue(swiftSearcher)
 
 					.property(QSTAT, "Qstat", "If you are running in Sun Grid Engine and want to have the job status available from the web interface, add a Qstat module. This is completely optional and provided solely for user convenience.")
-					.reference("qstat", UiBuilder.NONE_TYPE)
+					.reference(QstatDaemonWorker.TYPE, UiBuilder.NONE_TYPE)
 
 					.property(SCAFFOLD_VIEWER_URL, "Scaffold Viewer URL", "Display this URL so the users can download a specific version of Scaffold viewer.<br><p>The default download location is: <a href=\"" + DEFAULT_SCAFFOLD_VIEWER_URL + "\">" + DEFAULT_SCAFFOLD_VIEWER_URL + "</a>")
 					.defaultValue(DEFAULT_SCAFFOLD_VIEWER_URL)
+
+					.property(QUAMETER_UI, "Quameter UI", "We use the instrument name map from QuaMeter to display our instruments in a more user friendly manner")
+					.reference(QuameterUi.TYPE, UiBuilder.NONE_TYPE)
 
 					.addDaemonChangeListener(new PropertyChangeListener() {
 						@Override

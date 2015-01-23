@@ -64,7 +64,7 @@ public final class HemeUi implements Dao {
 	private static final String CHYMO_PARAM_SET_NAME = "chymoParamSetName";
 	private static final String USER_EMAIL = "userEmail";
 	public static final String SPECTRA_EXTENSION = ".spectra.txt";
-	public static final double DEFAULT_MASS_DELTA_TOLERANCE = 0.5;
+	public static final double DEFAULT_MASS_DELTA_TOLERANCE = 2.0;
 	private static final String FASTA_DB_CACHE = "fastaDbCache";
 
 	private final File data;

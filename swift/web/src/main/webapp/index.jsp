@@ -1,13 +1,14 @@
 <%@ page import="edu.mayo.mprc.ReleaseInfoCore" %>
 <%@ page import="edu.mayo.mprc.swift.ServletInitialization" %>
 <%@ page import="edu.mayo.mprc.swift.SwiftWebContext" %>
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<!DOCTYPE html>
 <html>
 <head>
     <% if (ServletInitialization.redirectToConfig(getServletConfig().getServletContext(), response)) {
         return;
     } %>
-    <title>Swift - search using multiple engines</title>
+    <title><%=SwiftWebContext.getWebUi().getTitle()%>
+    </title>
     <!--
     <%=ReleaseInfoCore.buildVersion()%>
     -->

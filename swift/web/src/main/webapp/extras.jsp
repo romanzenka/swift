@@ -3,49 +3,12 @@
 <%@ page import="edu.mayo.mprc.utilities.StringUtilities" %>
 <%@ page import="org.joda.time.DateTime" %>
 <%@ page import="org.joda.time.format.DateTimeFormat" %>
-<!DOCTYPE HTML>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="utf-8">
     <title>Swift Extras</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link href="common/bootstrap/css/bootstrap.min.css" rel="stylesheet" media="screen">
-    <!-- HTML5 shim, for IE6-8 support of HTML5 elements -->
-    <!--[if lt IE 9]>
-    <script src="common/bootstrap/js/html5shiv.js"></script>
-    <![endif]-->
-    <style>
-        body {
-            padding-top: 60px; /* 60px to make the container go all the way to the bottom of the topbar */
-        }
-    </style>
 </head>
 <body>
-<div class="navbar navbar-inverse navbar-fixed-top">
-    <div class="navbar-inner">
-        <div class="container">
-            <button type="button" class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-            </button>
-            <a class="brand" href="/"><%=SwiftWebContext.getWebUi().getTitle()%>
-            </a>
-
-            <div class="nav-collapse collapse">
-                <ul class="nav">
-                    <li><a href="/start">New Search</a></li>
-                    <li><a href="/report/report.jsp">Existing Searches</a></li>
-                    <li><a href="/">About Swift</a></li>
-                    <li><a href="/quameter">QuaMeter</a></li> <!-- TODO - make optional -->
-                    <li class="active"><a href="/extras">Extras</a></li>
-                </ul>
-            </div>
-            <!--/.nav-collapse -->
-        </div>
-    </div>
-</div>
-<div class="container">
     <h1>Swift Extras</h1>
 
     <h3>Queries</h3>
@@ -149,9 +112,5 @@
                 </a></td>
         </tr>
     </table>
-
-</div>
-<script src="common/bootstrap/js/jquery_1.9.0.min.js"></script>
-<script src="common/bootstrap/js/bootstrap.min.js"></script>
 </body>
 </html>

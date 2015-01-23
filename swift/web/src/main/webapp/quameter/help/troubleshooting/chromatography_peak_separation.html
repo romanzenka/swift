@@ -1,0 +1,124 @@
+<html>
+<head>
+    <link rel="stylesheet" href="../../css/help.css" type="text/css" media="screen" charset="utf-8"/>
+    <script src="../../js/AC_RunActiveContent.js" type="text/javascript"></script>
+</head>
+<body>
+<div id="content">
+    <div class="heading">
+        Chromatography Peak Separation
+    </div>
+    <p>
+        In this current example, we view multiple out of range
+        <strong>
+            metrics
+        </strong>
+        from the
+        <strong>
+            MassQC Dashboard
+        </strong>
+        in a single category,
+        <strong>
+            Chromatography
+        </strong>
+        :
+    </p>
+
+    <p>
+        <img alt="Chromatography Out of Range Metrics" height="254" src="../new_images/Chromatography_peptides.png"
+             width="480"/>
+    </p>
+
+    <p>
+        The metric that is most out of range seems to be the
+        <a href="../metrics/peptides_per_minute.html">
+            Peptides Per Minute
+        </a>
+        , although
+        <a href="../metrics/retention_spread.html">
+            Retention Spread
+        </a>
+        is quite low as well:
+    </p>
+
+    <p>
+        <img height="166" src="../new_images/peptides_per_minute.png" width="399"/>
+    </p>
+
+    <p>
+        There could be several reasons for this problem, but lets look at the elements of the diagnosis. It is not
+        uncommon to see
+        <strong>
+            undigested protein
+        </strong>
+        eluting in the late stages of the gradient. For some reason the peptides (or other material) accumulates, and
+        then when the percent organic solvent concentration increases to a critical point, the material comes loose, and
+        quickly elutes off the LC column. Another reason for this could be the particular LC method used. Perhaps the
+        technician created a new, experimental gradient and didn't check it first; perhaps the wrong LC gradient was
+        used. Often, problems with solvent mixing at the pumps (for example, an increased ratio of organic to aqueous)
+        can cause a sudden elution of hydrophobic species.
+    </p>
+
+    <p>
+        As the number of peptides eluting per time increased, the amount of time the peptides took to elute is
+        decreased. These two metrics described different angles to this problem:
+    </p>
+
+    <p>
+        <img alt="Sudden Elution of Peptides" height="287" src="../new_images/sudden_elution.png" width="542"/>
+    </p>
+
+    <p>
+        As can be readily seen, most of the material comes out early and then between 20 and 25 minutes. Not only is the
+        <a href="../metrics/retention_spread.html">
+            Retention Time Spread
+        </a>
+        low, but the
+        <strong>
+            molecular weights
+        </strong>
+        of the ions are higher than expected if the
+        <strong>
+            trypsin digest
+        </strong>
+        had worked well. This mass spectrum shows this flag:
+    </p>
+
+    <p>
+        <img alt="High Mass Undigested Material" height="234" src="../new_images/highmass_undigested_material.png"
+             width="672"/>
+    </p>
+
+    <div class="heading">
+        Metrics discussed this section:
+    </div>
+    <ul>
+        <li>
+            <a href="../metrics/retention_spread.html">
+                Chromatography: Retention Spread
+            </a>
+        </li>
+        <li>
+            <a href="../metrics/peptides_per_minute.html">
+                Chromatography: Peptides Per Minute
+            </a>
+        </li>
+        <li>
+            <a href="../metrics/peak_width.html">
+                Chromatography: Peak Widths
+            </a>
+        </li>
+    </ul>
+    <div class="heading">
+        Related Troubleshooting Topics:
+    </div>
+    <ul>
+        <li>
+            <a href="chromatography_peak_separation.html">
+                Chromatography - Peak Separation
+            </a>
+        </li>
+    </ul>
+</div>
+</body>
+</html>

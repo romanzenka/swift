@@ -74,15 +74,18 @@
 
     <bean id="AminoAcidReport" class="edu.mayo.mprc.swift.report.AminoAcidReport">
         <property name="aminoAcidSet" ref="aminoAcidSet" />
+        <property name="webUiHolder" ref="webUiHolder" />
     </bean>
 
     <bean id="ModificationReport" class="edu.mayo.mprc.swift.report.ModificationReport">
         <property name="unimodDao" ref="unimodDao" />
+        <property name="webUiHolder" ref="webUiHolder" />
     </bean>
 
     <bean id="AnalysisReport" class="edu.mayo.mprc.swift.report.AnalysisReport">
         <property name="searchDbDao" ref="searchDbDao" />
         <property name="swiftDao" ref="swiftDao" />
+        <property name="webUiHolder" ref="webUiHolder" />
     </bean>
 
     <bean id="FindProtein" class="edu.mayo.mprc.swift.report.FindProtein">

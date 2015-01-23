@@ -138,6 +138,10 @@ class ScafmlDump {
 		}
 
 		final ScaffoldSettings scaffoldSettings = definition.getSearchParameters().getScaffoldSettings();
+		// Metadata can override production of the mzIdentMl report in Scaffold if set
+		if ("1".equals(definition.getMetadata().get("mzIdentMl"))) {
+			scaffoldSettings.setMzIdentMlReport(true);
+		}
 
 		se.setConnectToNCBI(scaffoldSettings.isConnectToNCBI());
 		se.setAnnotateWithGOA(scaffoldSettings.isAnnotateWithGOA());

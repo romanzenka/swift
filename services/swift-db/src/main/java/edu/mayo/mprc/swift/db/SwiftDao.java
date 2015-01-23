@@ -36,12 +36,11 @@ public interface SwiftDao extends Dao, RuntimeInitializer {
 	List<SearchRun> getSearchRunList(SearchRunFilter filter, boolean withReports);
 
 	/**
-	 * find number of running tasks for a search run
+	 * Fill in the number of running tasks attribute for given search runs
 	 *
-	 * @param searchRun - the search run record object  @see SearchRun
-	 * @return - how many tasks are running
+	 * @param searchRuns Runs to fill in tasks numbers for
 	 */
-	int getNumberRunningTasksForSearchRun(SearchRun searchRun);
+	void fillNumberRunningTasksForSearchRun(List<SearchRun> searchRuns);
 
 	/**
 	 * This will find any search runs that have either started or ended since a give time.
@@ -151,4 +150,12 @@ public interface SwiftDao extends Dao, RuntimeInitializer {
 	 * @return Current database version or 0 if the version is not known.
 	 */
 	int getDatabaseVersion();
+
+	/**
+	 * Call this upon Swift startup.
+	 * <p/>
+	 * The database can record searches that were running prior to
+	 * Swift restart. Those searches need to be marked as failed.
+	 */
+	void cleanupAfterStartup();
 }

@@ -747,6 +747,9 @@ public final class SwiftApp implements EntryPoint, HidesPageContentsWhileLoading
 				);
 				def.setFromScratch(additionalSettingsPanel.isFromScratch());
 				def.setLowPriority(additionalSettingsPanel.isLowPriority());
+				if (additionalSettingsPanel.isMzIdentMl()) {
+					def.getMetadata().put("mzIdentMl", "1");
+				}
 
 				ServiceConnection.instance().startSearch(def, new AsyncCallback<Void>() {
 					@Override

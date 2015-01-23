@@ -1,0 +1,99 @@
+<html>
+<head>
+    <link rel="stylesheet" href="../../css/help.css" type="text/css" media="screen" charset="utf-8"/>
+    <script src="../../js/AC_RunActiveContent.js" type="text/javascript"></script>
+</head>
+<body>
+<div id="content">
+    <div class="heading">
+        MS2 Spectra and Triggering
+    </div>
+    <p>
+        <strong>
+            Triggering
+        </strong>
+        poses an interesting paradigm with mass spectrometry and, in particular, tandem mass spectrometry (MS/MS). We
+        tune the instrument (and create the method) to
+        <strong>
+            trigger
+        </strong>
+        on the peaks we want (or the most abundant peaks), but sometimes the
+        <strong>
+            triggering
+        </strong>
+        occurs on other than desired peaks - on noise, for example.
+    </p>
+
+    <p>
+        In this case, we see two metrics out of range,
+        <a href="../metrics/ms1_total_ion_current.html">
+            MS1 Total Ion Current
+        </a>
+        and
+        <a href="../metrics/ms2_peaks_per_spectrum.html">
+            MS2 Peaks Per Spectrum
+        </a>
+        :
+    </p>
+
+    <p>
+        <img alt="MS1 Total Ion Current, MS2 Peaks Per Spectrum" height="383" src="../new_images/MS1-MS2_Spectra.png"
+             width="281"/>
+    </p>
+
+    <p>
+        And to confirm the metric's historical data are out of range, we go to the
+        <strong>
+            Control Charts
+        </strong>
+        to verify:
+    </p>
+
+    <p>
+        <img alt="MS2 Peaks Per Spectrum" height="236" src="../new_images/MS2_PeaksPerSpectrum.png" width="527"/>
+    </p>
+
+    <p>
+        So why do we think that these two metrics indicate triggering on noise? Well, we look to the mass spectra, (as
+        is advised when metrics are out of range and it is not obvious what the problem is):
+    </p>
+
+    <p>
+        <img alt="Triggering on Noise" height="245" src="../new_images/triggering_noise.png" width="676"/>
+    </p>
+
+    <p>
+        Now, taking a closer look a the noise level, we see that for over 20 minutes, there are not many eluting
+        peptides, yet at the MS2 level, the
+        <a href="../metrics/ms2_peaks_per_spectrum.html">
+            Peaks per Spectrum
+        </a>
+        is flagged high, as well as the
+        <a href="../metrics/ms1_total_ion_current.html">
+            Total Ion Current
+        </a>
+        , both symptoms of higher than normal noise:
+    </p>
+
+    <p>
+        <img alt="High Signal Noise Level" height="163" src="../new_images/high_noise_signal.png" width="675"/>
+    </p>
+
+    <div class="heading">
+        Metrics discussed this section:
+    </div>
+    <ul>
+        <li>
+            <a href="../metrics/ms1_total_ion_current.html">
+                MS1: Total Ion Current
+            </a>
+        </li>
+        <li>
+            <a href="../metrics/ms2_peaks_per_spectrum.html">
+                MS2: Peaks per Spectrum
+            </a>
+        </li>
+    </ul>
+</div>
+</body>
+</html>

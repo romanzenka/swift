@@ -1,5 +1,6 @@
 package edu.mayo.mprc.quameterdb.dao;
 
+import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
@@ -71,15 +72,25 @@ public final class QuameterDaoHibernate extends DaoBase implements QuameterDao, 
 
 	@Override
 	public List<QuameterResult> listVisibleResults() {
-		return listResults(ListItems.SHOWN);
+		return listResults(ListItems.SHOWN, true);
+	}
+
+	@Override
+	public List<QuameterResult> listVisibleResultsAllTime() {
+		return listResults(ListItems.SHOWN, false);
 	}
 
 	@Override
 	public List<QuameterResult> listHiddenResults() {
-		return listResults(ListItems.HIDDEN);
+		return listResults(ListItems.HIDDEN, true);
 	}
 
-	private List<QuameterResult> listResults(final ListItems listedItems) {
+	/**
+	 * @param listedItems Shown/hidden items?
+	 * @param timeLimit   Apply the 1-year time limit
+	 * @return List of all results matching the criteria
+	 */
+	private List<QuameterResult> listResults(final ListItems listedItems, final boolean timeLimit) {
 		final List<QuameterProteinGroup> activeProteinGroups = listProteinGroups();
 
 		final String hiddenQuery;
@@ -101,14 +112,21 @@ public final class QuameterDaoHibernate extends DaoBase implements QuameterDao, 
 		final DateTime lowerDateLimit = new DateTime().minusYears(1);
 
 		final Query query = getSession().createSQLQuery("" +
-				"SELECT {q.*}, m.metadata_value AS v, r.transaction_id AS ti" +
-				" FROM `" + swiftDao.qualifyTableName("transaction") + "` AS r, "
+				"SELECT {q.*}, " +
+				"m.metadata_value AS v," +
+				" r.transaction_id AS ti," +
+				" a.annotation_text as an" +
+				" FROM " + swiftDao.qualifyTableName("transaction") + " AS r, "
 				+ swiftDao.qualifyTableName("file_search") + " AS f, "
-				+ swiftDao.qualifyTableName("quameter_result") + " AS q, "
 				+ swiftDao.qualifyTableName("swift_search_definition") + " AS d, "
 				+ swiftDao.qualifyTableName("search_metadata") + " AS m, "
 				+ swiftDao.qualifyTableName("tandem_mass_spec_sample") + " AS t, "
-				+ swiftDao.qualifyTableName("search_result") + " AS sr "
+				+ swiftDao.qualifyTableName("search_result") + " AS sr, "
+				+ swiftDao.qualifyTableName("quameter_result") + " AS q "
+				+ " LEFT JOIN "
+				+ swiftDao.qualifyTableName("quameter_annotation") + " AS a" +
+				" ON a.quameter_result_id = q.quameter_result_id" +
+				" AND a.metric_code='hidden' "
 				+ " WHERE "
 				+ hiddenQuery
 				+ " r.hidden=0 AND"
@@ -118,13 +136,18 @@ public final class QuameterDaoHibernate extends DaoBase implements QuameterDao, 
 				+ " m.swift_search_definition_id = d.swift_search_definition_id AND"
 				+ " m.metadata_key='quameter.category' AND"
 				+ " t.tandem_mass_spec_sample_id = sr.tandem_mass_spec_sample_id AND"
-				+ " sr.search_result_id = q.search_result_id AND"
-				+ " t.start_time >= :timeStart"
+				+ " sr.search_result_id = q.search_result_id "
+				+ (timeLimit ? " AND t.start_time >= :timeStart " : "")
 				+ " ORDER BY t.start_time")
 				.addEntity("q", QuameterResult.class)
 				.addScalar("v", StandardBasicTypes.STRING)
 				.addScalar("ti", StandardBasicTypes.INTEGER)
-				.setParameter("timeStart", lowerDateLimit.toDate(), StandardBasicTypes.DATE);
+				.addScalar("an", StandardBasicTypes.STRING);
+
+		if (timeLimit) {
+			query.setParameter("timeStart", lowerDateLimit.toDate(), StandardBasicTypes.DATE);
+		}
+
 		final List raw = query.list();
 		final List<QuameterResult> filtered = new ArrayList<QuameterResult>(Math.min(raw.size(), 1000));
 		for (final Object o : raw) {
@@ -134,6 +157,8 @@ public final class QuameterDaoHibernate extends DaoBase implements QuameterDao, 
 			r.setCategory(category);
 			final Integer transactionId = (Integer) array[2];
 			r.setTransaction(transactionId);
+			final String hideComment = (String) array[3];
+			r.setHiddenReason(Strings.nullToEmpty(hideComment));
 			if (r.resultMatches()) {
 				filtered.add(r);
 			}
@@ -142,15 +167,17 @@ public final class QuameterDaoHibernate extends DaoBase implements QuameterDao, 
 	}
 
 	@Override
-	public void hideQuameterResult(final int quameterResultId) {
+	public void hideQuameterResult(final int quameterResultId, final String hideReason) {
 		final QuameterResult quameterResult = (QuameterResult) getSession().get(QuameterResult.class, quameterResultId);
+		addAnnotation(new QuameterAnnotation("hidden", quameterResultId, hideReason));
 		quameterResult.setHidden(true);
 		getSession().saveOrUpdate(quameterResult);
 	}
 
 	@Override
-	public void unhideQuameterResult(final int quameterResultId) {
+	public void unhideQuameterResult(final int quameterResultId, final String unhideReason) {
 		final QuameterResult quameterResult = (QuameterResult) getSession().get(QuameterResult.class, quameterResultId);
+		addAnnotation(new QuameterAnnotation("hidden", quameterResultId, unhideReason));
 		quameterResult.setHidden(false);
 		getSession().saveOrUpdate(quameterResult);
 	}
@@ -158,9 +185,22 @@ public final class QuameterDaoHibernate extends DaoBase implements QuameterDao, 
 	@Override
 	public List<QuameterAnnotation> listAnnotations() {
 		// Only list annotations that belong to non-hidden quameter results
-		return listAndCast(getSession().createQuery("select q " +
+		final List results = getSession().createQuery("select q, r " +
 				"from QuameterAnnotation as q, QuameterResult as r " +
-				"WHERE q.quameterResultId = r.id AND r.hidden = false"));
+				"WHERE q.quameterResultId = r.id AND r.hidden = false " +
+				"ORDER BY r.id, q.metricCode").list();
+
+		final List<QuameterAnnotation> finalResults = Lists.newArrayListWithCapacity(results.size());
+
+		for (final Object o : results) {
+			if (o instanceof Object[]) {
+				QuameterAnnotation annotation = (QuameterAnnotation) ((Object[]) o)[0];
+				QuameterResult result = (QuameterResult) ((Object[]) o)[1];
+				annotation.setQuameterResult(result);
+				finalResults.add(annotation);
+			}
+		}
+		return finalResults;
 	}
 
 	@Override
@@ -194,7 +234,7 @@ public final class QuameterDaoHibernate extends DaoBase implements QuameterDao, 
 			for (int i = 0; i < counts.length; i++) {
 				final QuameterProteinGroup quameterGroup = quameterProteinGroups.get(i);
 				if (quameterGroup.matches(accnums)) {
-					counts[i] += proteinGroup.getNumberOfUniqueSpectra();
+					counts[i] += proteinGroup.getNumberOfTotalSpectra();
 				}
 			}
 		}
@@ -254,7 +294,7 @@ public final class QuameterDaoHibernate extends DaoBase implements QuameterDao, 
 	public void recalculateProteinCounts(final List<QuameterProteinGroup> toAdd) {
 		LOGGER.info("Recalculating the protein counts as the protein groups changed. This might take a long time");
 
-		final List<QuameterResult> quameterResults = listResults(ListItems.ALL);
+		final List<QuameterResult> quameterResults = listResults(ListItems.ALL, false);
 		int step = 0;
 		final PercentProgressReporter reporter = new PercentDoneReporter(null, "Updating quameter results: ");
 		for (final QuameterResult result : quameterResults) {

@@ -117,6 +117,7 @@ public final class DatabaseUtilities {
 		for (final Map.Entry<String, String> entry : hibernateProperties.entrySet()) {
 			cfg.setProperty(entry.getKey(), entry.getValue());
 		}
+
 		return cfg;
 	}
 

@@ -541,9 +541,9 @@ public final class Database implements RuntimeInitializer, Lifecycle {
 
 	public String getQualifiedTableName(final String name) {
 		if (config == null || !(getDialect() instanceof SQLServerDialect)) {
-			return name;
+			return "`" + name + "`";
 		}
-		return config.getSchema() + "." + name;
+		return config.getSchema() + ".[" + name + "]";
 	}
 
 	/**

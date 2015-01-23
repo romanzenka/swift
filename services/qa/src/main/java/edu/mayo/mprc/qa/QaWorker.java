@@ -84,7 +84,7 @@ public final class QaWorker extends WorkerBase {
 			for (final ExperimentQa experimentQa : experimentQas) {
 				final List<QaFiles> entries = experimentQa.getQaFiles();
 				for (final QaFiles me : entries) {
-					atLeastOneFileMissing = addRScriptInputLine(fileWriter, qaReportFolder, experimentQa, generatedFileList, me, atLeastOneFileMissing);
+					atLeastOneFileMissing |= addRScriptInputLine(fileWriter, qaReportFolder, experimentQa, generatedFileList, me);
 					numFilesDone++;
 					reportProgress(numFilesDone * PERCENT_GENERATING_FILES / numFilesTotal, progressReporter);
 				}
@@ -105,7 +105,7 @@ public final class QaWorker extends WorkerBase {
 			}
 
 			reportProgress(COMPLETE, progressReporter);
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			throw new MprcException("Processing of QA work packet failed.", e);
 		} finally {
 			if (!writerIsClosed) {
@@ -124,22 +124,17 @@ public final class QaWorker extends WorkerBase {
 
 	private boolean addRScriptInputLine(final FileWriter fileWriter, final File qaReportFolder, final ExperimentQa experimentQa,
 	                                    final LinkedList<File> generatedFiles,
-	                                    final QaFiles qaFiles,
-	                                    boolean atLeastOneFileMissing) throws IOException {
-		final String uniqueMgfAnalysisName;
-		boolean generate;
+	                                    final QaFiles qaFiles) throws IOException {
+
 		final File msmsEvalDiscriminantFile;
 		final File ticFile;
 		final File mgfFile = qaFiles.getInputFile();
 
-		// The name of the analysis output file is the original .mgf name combined with scaffold version to make it unique
-		uniqueMgfAnalysisName = FileUtilities.getFileNameWithoutExtension(mgfFile) + "." +
-				(experimentQa.getScaffoldVersion().startsWith("2") ? "sfd" : "sf3");
+		// The name of the analysis output file is the original .mgf name combined with Scaffold version (we used to support running two versions of Scaffold simultaneously, not anymore)
+		final String uniqueMgfAnalysisName = getAnalysisName(mgfFile);
+		final File outputFile = getSfsFileName(qaReportFolder, uniqueMgfAnalysisName);
 
-		generate = false;
 		final List<File> rScriptOutputFilesSet = new ArrayList<File>(INITIAL_OUTPUT_FILES);
-
-		final File outputFile = new File(qaReportFolder, uniqueMgfAnalysisName + ".sfs");
 
 		final File massCalibrationRtFile = new File(qaReportFolder, uniqueMgfAnalysisName + ".calRt.png");
 		final File massCalibrationMzFile = new File(qaReportFolder, uniqueMgfAnalysisName + ".calMz.png");
@@ -163,7 +158,12 @@ public final class QaWorker extends WorkerBase {
 
 		final MyriMatchPepXmlReader myrimatchReader = getMyriMatchReader(qaFiles.getAdditionalSearchResults());
 
-		if (!outputFile.exists() || outputFile.length() == 0) {
+		final long newestInputTime = getNewestInputTime(experimentQa, qaFiles);
+
+		boolean atLeastOneFileMissing = false;
+		boolean generate = false;
+
+		if (!outputFile.exists() || outputFile.length() == 0 || outputFile.lastModified() < newestInputTime) {
 
 			LOGGER.info("Generating output file [" + outputFile.getAbsolutePath() + "]");
 
@@ -188,7 +188,7 @@ public final class QaWorker extends WorkerBase {
 				atLeastOneFileMissing = true;
 			}
 		} else {
-			LOGGER.info("Skipping creation of output file [" + outputFile.getAbsolutePath() + "] because already exists.");
+			LOGGER.info("Skipping creation of output file [" + outputFile.getAbsolutePath() + "] because it already exists.");
 
 			//Check msmsEval files.
 			if (qaFiles.getMsmsEvalOutputFile() != null && (!msmsEvalDiscriminantFile.exists() || msmsEvalDiscriminantFile.length() == 0)) {
@@ -198,7 +198,7 @@ public final class QaWorker extends WorkerBase {
 
 			if (!generate) {
 				for (final File file : rScriptOutputFilesSet) {
-					if (file.exists() || file.length() == 0) {
+					if (!file.exists() || file.length() == 0) {
 						atLeastOneFileMissing = true;
 						generate = true;
 						break;
@@ -224,6 +224,39 @@ public final class QaWorker extends WorkerBase {
 		final File chromatogramFile = qaFiles.getChromatogramFile();
 		writeInputLine(fileWriter, outputFile, massCalibrationRtFile, massCalibrationMzFile, mzRtFile, sourceCurrentFile, msmsEvalDiscriminantFile, generate, qaFiles, pepTolFile, ticFile, chromatogramFile, uvDataFile);
 		return atLeastOneFileMissing;
+	}
+
+	/**
+	 * @param mgfFile File being visualized
+	 * @return The root name for the output files, based on the name of the mgf file
+	 */
+	public static String getAnalysisName(final File mgfFile) {
+		return FileUtilities.getFileNameWithoutExtension(mgfFile) + ".sf3";
+	}
+
+	/**
+	 * We expose this function so the {@code QaTask} can determine if outputs already exist.
+	 *
+	 * @param qaReportFolder        Folder with outputs
+	 * @param uniqueMgfAnalysisName Result of {@link #getAnalysisName}.
+	 * @return Name of the .sfs file to be generated.
+	 */
+	public static File getSfsFileName(final File qaReportFolder, final String uniqueMgfAnalysisName) {
+		return new File(qaReportFolder, uniqueMgfAnalysisName + ".sfs");
+	}
+
+	/**
+	 * Go through all QA input files, find the modification time that is the newest.
+	 *
+	 * @param experimentQa Info from Scaffold
+	 * @param qaFiles      Info about QA files for this particular input set
+	 * @return Timestamp of the newest existing input file
+	 */
+	private long getNewestInputTime(final ExperimentQa experimentQa, final QaFiles qaFiles) {
+		long newestInputTime = qaFiles.getNewestModificationDate();
+		final long l = experimentQa.getScaffoldSpectraFile().lastModified();
+		newestInputTime = Math.max(newestInputTime, l);
+		return newestInputTime;
 	}
 
 	/**

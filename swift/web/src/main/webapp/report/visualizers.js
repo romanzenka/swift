@@ -20,13 +20,14 @@ AbstractItemVisualizer.prototype.fillWithContents = function (element, id, objec
         contents = document.createTextNode("Object '" + id + "' = " + object.toString());
     else
         contents = document.createTextNode("Object '" + id + "' not loaded");
-    element.appendChild(contents);
+    $(element).append(contents);
 };
 
 // Updates information for already rendered object
 AbstractItemVisualizer.prototype.update = function (element, object) {
-    removeChildrenExcept(element, /noRemove/i);
-    this.fillWithContents(element, element.id, object);
+    var e = $(element)[0];
+    removeChildrenExcept(e, /noRemove/i);
+    this.fillWithContents(e, e.id, object);
 };
 
 //======================================================================================================================
@@ -34,17 +35,22 @@ function SearchRunItemVisualizer() {
 }
 SearchRunItemVisualizer.prototype = new AbstractItemVisualizer();
 
-SearchRunItemVisualizer.prototype.toggleExpanded = function (evt, id, object) {
-    var element = $(evt.findElement('a')).up(2); // a 1-> td 2-> tr
-    Event.stop(evt);
+SearchRunItemVisualizer.prototype.toggleExpanded = function (evt) {
+    var id = evt.data.id;
+    var object = evt.data.object;
+    var t = evt.data.obj;
+    var element = ($(this).parent().parent().parent())[0]; // a 1-> td 2-> tr
+    evt.stopPropagation();
     object.expanded = !object.expanded;
-    this.update(element, object);
+    t.update(element, object);
     if (object.expanded) {
         var objectId = object.id;
-        new Ajax.Request('reportupdate',
-            {
-                method: 'get',
-                parameters: { action: 'expand', id: objectId }
+        $.ajax({
+                "url": "reportupdate",
+                "data": {action: 'expand', id: objectId}
+            }
+        ).done(function (data) {
+                eval(data);
             });
     }
 };
@@ -55,14 +61,14 @@ SearchRunItemVisualizer.prototype.render = function (id, object, elementType) {
     return element;
 };
 
-SearchRunItemVisualizer.prototype.multiResultHeadTemplate = new Template('<table class="reportList"><tr><td class="result-link"><span class="result-list">');
-SearchRunItemVisualizer.prototype.multiResultEntryTemplate = new Template('<a href="#{fullUrl}" title="#{filePath}">#{fileName}</a><br/>');
+SearchRunItemVisualizer.prototype.multiResultHeadTemplate = '<table class="reportList"><tr><td class="result-link"><span class="result-list">';
+SearchRunItemVisualizer.prototype.multiResultEntryTemplate = '<a href="#{fullUrl}" title="#{filePath}">#{fileName}</a><br/>';
 // Entry has analysis attached
-SearchRunItemVisualizer.prototype.multiResultEntryAnalysisTemplate = new Template('<a href="/analysis?id=#{reportId}" class="analysis-data-link">Data</a><a href="#{fullUrl}" title="#{filePath}">#{fileName}</a><br clear="left"/>');
-SearchRunItemVisualizer.prototype.multiResultTailTemplate = new Template('</span></td><td class="result-buttons">' +
-    '<a href="#{parentUrl}" class="parent-dir-link" title="#{parentPath}">Directory</a>' +
-    '<a href="/service/qa/#{searchId}/index.html" class="qa-link" title="Quality Analysis">QA</a>' +
-    '</td></tr></table>');
+SearchRunItemVisualizer.prototype.multiResultEntryAnalysisTemplate = '<a href="/analysis?id=#{reportId}" class="analysis-data-link">Data</a><a href="#{fullUrl}" title="#{filePath}">#{fileName}</a><br clear="left"/>';
+SearchRunItemVisualizer.prototype.multiResultTailTemplate = '</span></td><td class="result-buttons">' +
+'<a href="#{parentUrl}" class="parent-dir-link" title="#{parentPath}">Directory</a>' +
+'<a href="/service/qa/#{searchId}/index.html" class="qa-link" title="Quality Analysis">QA</a>' +
+'</td></tr></table>';
 
 SearchRunItemVisualizer.prototype.displayTransactionError = function (event, message) {
     alert(message);
@@ -76,17 +82,21 @@ SearchRunItemVisualizer.prototype.getParentFile = function (filename) {
     return filename.substr(0, i);
 };
 
-SearchRunItemVisualizer.prototype.confirmRerun = function (event, id, title) {
+SearchRunItemVisualizer.prototype.confirmRerun = function (event) {
+    var id = event.data.id;
+    var title = event.data.title;
     if (!window.confirm("Are you sure you want to restart search " + title + " (id=" + id + ") ?"
-    )) {
-        Event.stop(event);
+        )) {
+        event.stopPropagation();
     }
 };
 
-SearchRunItemVisualizer.prototype.confirmHide = function (event, id, title) {
+SearchRunItemVisualizer.prototype.confirmHide = function (event) {
+    var id = event.data.id;
+    var title = event.data.title;
     if (!window.confirm("Are you sure you want to hide search " + title + " (id=" + id + ") ?\n\n"
         + "After a search was hidden, it takes an admin to unhide it again.")) {
-        Event.stop(event);
+        event.stopPropagation();
     }
 };
 
@@ -109,7 +119,7 @@ SearchRunItemVisualizer.prototype.fillWithContents = function (fragment, id, obj
         var element = document.createElement("tr");
         element.id = id;
 
-        fragment.appendChild(element);
+        $(fragment).append(element);
 
         // Contents
         var arrowCell = document.createElement('td');
@@ -143,6 +153,14 @@ SearchRunItemVisualizer.prototype.fillWithContents = function (fragment, id, obj
         var duration = element.appendChild(tdDuration);
 
         // ------------------------------------------------------------------
+        var tdInstruments = document.createElement('td');
+
+        tdInstruments.appendChild(document.createTextNode(object.instruments));
+
+        var instruments = element.appendChild(tdInstruments);
+
+
+        // ------------------------------------------------------------------
         var tdAction = document.createElement('td');
 
         if (object.id) {
@@ -152,7 +170,7 @@ SearchRunItemVisualizer.prototype.fillWithContents = function (fragment, id, obj
             rerunLink.className = "rerun-link";
             rerunLink.href = "reportupdate?rerun=" + object.id;
             rerunLink.title = "Rerun " + object.id;
-            Event.observe(rerunLink, "click", this.confirmRerun.bindAsEventListener(this, object.id, object.title));
+            $(rerunLink).on("click", {"id": object.id, "title": object.title}, this.confirmRerun);
             tdAction.appendChild(rerunLink);
 
             if (object.search && object.search != 0) {
@@ -179,7 +197,7 @@ SearchRunItemVisualizer.prototype.fillWithContents = function (fragment, id, obj
             hideLink.className = "hide-link";
             hideLink.href = "reportupdate?hide=" + object.id;
             hideLink.title = "Hide " + object.id;
-            Event.observe(hideLink, "click", this.confirmHide.bindAsEventListener(this, object.id, object.title));
+            $(hideLink).on("click", {"id": object.id, "title": object.title}, this.confirmHide);
             tdAction.appendChild(hideLink);
         }
 
@@ -219,25 +237,25 @@ SearchRunItemVisualizer.prototype.fillWithContents = function (fragment, id, obj
             }
             else {
                 if (object.results && object.results.length > 0) {
-                    results += this.multiResultHeadTemplate.evaluate({id: "file_" + object.id});
+                    results += $.tmpl(this.multiResultHeadTemplate, {id: "file_" + object.id});
                     var fileInfo;
                     for (var i = 0; i < object.results.length; i++) {
                         fileInfo = object.results[i];
                         this.splitPathIntoParts(fileInfo.path, fileInfo);
                         fileInfo['searchId'] = object.id;
                         if (fileInfo.analysis == 0) {
-                            results += this.multiResultEntryTemplate.evaluate(fileInfo);
+                            results += $.tmpl(this.multiResultEntryTemplate, fileInfo);
                         } else {
-                            results += this.multiResultEntryAnalysisTemplate.evaluate(fileInfo);
+                            results += $.tmpl(this.multiResultEntryAnalysisTemplate, fileInfo);
                         }
                     }
-                    results += this.multiResultTailTemplate.evaluate(fileInfo);
+                    results += $.tmpl(this.multiResultTailTemplate, fileInfo);
                 } else {
                     results += "<span class='result-status'>" + statusMessage + "</span>";
                 }
             }
 
-            new Insertion.Bottom(tdResults, results);
+            $(tdResults).append(results);
         }
 
         var status = element.appendChild(tdResults);
@@ -308,10 +326,9 @@ SearchRunItemVisualizer.prototype.fillWithContents = function (fragment, id, obj
 
         // ------------------------------------------------------------------
         // Arrow
-        var arrow = $(document.createElement("a"));
-        Event.observe(arrow, 'click', this.toggleExpanded.bindAsEventListener(this, id, object));
+        var arrow = document.createElement("span");
+        $(arrow).on('click', {"id": id, "object": object, "obj": this}, this.toggleExpanded);
         arrow.className = "arrow";
-        arrow.href = "#";
         var arrowImg = document.createElement("span");
         var details = null;
         if (object.expanded) {
@@ -321,7 +338,7 @@ SearchRunItemVisualizer.prototype.fillWithContents = function (fragment, id, obj
                 var detailRow = document.createElement("tr");
                 detailRow.id = id + "_details";
                 var detailCell = document.createElement("td");
-                detailCell.colSpan = 7;
+                detailCell.colSpan = 8;
                 detailRow.appendChild(detailCell);
                 var detailTable = document.createElement("table");
                 detailTable.className = "tasktable";
@@ -337,8 +354,9 @@ SearchRunItemVisualizer.prototype.fillWithContents = function (fragment, id, obj
                 fragment.appendChild(detailRow);
             }
         }
-        else
+        else {
             arrowImg.className = "arrowright";
+        }
         arrow.appendChild(arrowImg);
         arrowCell.appendChild(arrow);
     }
@@ -354,7 +372,7 @@ TaskItemVisualizer.prototype = new AbstractItemVisualizer();
 TaskItemVisualizer.prototype.transaction = null;
 TaskItemVisualizer.prototype.minTime = Number.MAX_VALUE;
 TaskItemVisualizer.prototype.maxTime = 0;
-TaskItemVisualizer.prototype.unknownStatusTemplate = new Template('ERROR: unknown status "#{status}" for object #{title}');
+TaskItemVisualizer.prototype.unknownStatusTemplate = 'ERROR: unknown status "#{status}" for object #{title}';
 
 TaskItemVisualizer.prototype.getMinTime = function () {
     if (this.minTime == Number.MAX_VALUE) {
@@ -451,7 +469,7 @@ TaskItemVisualizer.prototype.fillWithContents = function (element, id, object) {
             case "Running":
                 text = object.title;
                 if (object.percentDone) {
-                    text += " " + object.percentDone + "%";
+                    text += " " + (Math.round(object.percentDone * 10) / 10) + "%";
                 }
                 item.className = "status-running";
                 break;
@@ -476,17 +494,17 @@ TaskItemVisualizer.prototype.fillWithContents = function (element, id, object) {
                 item.className = "status-completed-warning";
                 break;
             default:
-                text = this.unknownStatusTemplate.evaluate(object);
+                text = $.tmpl(this.unknownStatusTemplate, object);
                 break;
         }
 
         text = this.replacePathsWithHyperlinks(text);
-        new Insertion.Bottom(item, text);
+        $(item).append(text);
 
         // Host -------------------------------------
         var host = document.createElement("td");
         if (object.host != null) {
-            new Insertion.Bottom(host, object.host);
+            $(host).append(object.host);
         }
         row.appendChild(host)
 
@@ -494,10 +512,10 @@ TaskItemVisualizer.prototype.fillWithContents = function (element, id, object) {
         var jobid = document.createElement("td");
         if (object.jobid != null) {
             if (object.status == "Running") {
-                new Insertion.Bottom(jobid, '<a href="reportupdate?qstat=' + object.jobid + '" title="Grid engine job id">' + object.jobid + '</a>')
+                $(jobid).append('<a href="reportupdate?qstat=' + object.jobid + '" title="Grid engine job id">' + object.jobid + '</a>')
             }
             else
-                new Insertion.Bottom(jobid, object.jobid);
+                $(jobid).append(object.jobid);
         }
         row.appendChild(jobid);
 
@@ -508,11 +526,11 @@ TaskItemVisualizer.prototype.fillWithContents = function (element, id, object) {
                 var logInfo = object.logs[log];
                 var logType = logInfo.type;
                 longName = '<a class="path" href="'
-                    + '/service/task-log/' + object.taskid + '/' + (logType == 'STD_OUT' ? 'out' : 'err')
-                    + '">'
-                    + (logType == 'STD_OUT' ? 'out' : 'err')
-                    + '</a>';
-                new Insertion.Bottom(logs, longName + ' ');
+                + '/service/task-log/' + object.taskid + '/' + (logType == 'STD_OUT' ? 'out' : 'err')
+                + '">'
+                + (logType == 'STD_OUT' ? 'out' : 'err')
+                + '</a>';
+                $(logs).append(longName + ' ');
             }
         }
         row.appendChild(logs);
@@ -553,7 +571,7 @@ TaskItemVisualizer.prototype.fillWithContents = function (element, id, object) {
 
         element.appendChild(row);
     } else {
-        new Insertion.Bottom(element, '<tr><td title="Not loaded">...</td><td></td><td></td><td class="gantt"></td></tr>');
+        $(element).append('<tr><td title="Not loaded">...</td><td></td><td></td><td class="gantt"></td></tr>');
     }
 };
 

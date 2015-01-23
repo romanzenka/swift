@@ -30,13 +30,18 @@ public interface QuameterDao extends Dao {
 	List<QuameterResult> listVisibleResults();
 
 	/**
+	 * @return All Quameter results that are not hidden. No time limit
+	 */
+	List<QuameterResult> listVisibleResultsAllTime();
+
+	/**
 	 * @return Only hidden Quameter results.
 	 */
 	List<QuameterResult> listHiddenResults();
 
-	void hideQuameterResult(int quameterResultId);
+	void hideQuameterResult(int quameterResultId, final String hideReason);
 
-	void unhideQuameterResult(int quameterResultId);
+	void unhideQuameterResult(int quameterResultId, final String unhideReason);
 
 
 	/**
@@ -63,7 +68,9 @@ public interface QuameterDao extends Dao {
 	 * @param fileSearchId   Saved info about file search that was used to process the input file
 	 * @param searchResultId Direct link to the search results  for the file.
 	 * @param proteinGroups  Currently defined protein groups
-	 * @return Count of spectra corresponding to protein groups for given file search
+	 * @return Count of spectra corresponding to protein groups for given file search.
+	 * We use {@link edu.mayo.mprc.searchdb.dao.ProteinGroup#getNumberOfTotalSpectra()}, so the value can be larger
+	 * than it should be.
 	 */
 	Map<QuameterProteinGroup, Integer> getIdentifiedSpectra(int fileSearchId, int searchResultId, List<QuameterProteinGroup> proteinGroups);
 

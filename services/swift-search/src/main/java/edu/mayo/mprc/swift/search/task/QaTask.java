@@ -5,6 +5,7 @@ import edu.mayo.mprc.daemon.worker.WorkPacket;
 import edu.mayo.mprc.qa.ExperimentQa;
 import edu.mayo.mprc.qa.QaFiles;
 import edu.mayo.mprc.qa.QaWorkPacket;
+import edu.mayo.mprc.qa.QaWorker;
 import edu.mayo.mprc.swift.db.DatabaseFileTokenFactory;
 import edu.mayo.mprc.utilities.FileUtilities;
 import edu.mayo.mprc.utilities.progress.ProgressInfo;
@@ -87,10 +88,7 @@ public final class QaTask extends AsyncTaskBase {
 
 	@Override
 	public WorkPacket createWorkPacket() {
-		if (!isFromScratch() && reportFile.exists() && reportFile.isFile()) {
-			return null;
-		}
-
+		boolean outputAlreadyExists = true;
 		final List<ExperimentQa> experimentQaList = new ArrayList<ExperimentQa>(experimentList.size());
 		for (final QaTaskExperiment experiment : experimentList) {
 			final List<QaFiles> inputFilePairs = new ArrayList<QaFiles>();
@@ -114,9 +112,22 @@ public final class QaTask extends AsyncTaskBase {
 					files.addAdditionalSearchResult(engineSearchTask.getSearchEngine().getCode(), engineSearchTask.getOutputFile());
 				}
 				inputFilePairs.add(files);
+				final File sfsFile = QaWorker.getSfsFileName(qaReportFolder,
+						QaWorker.getAnalysisName(files.getInputFile()));
+
+				if (outputAlreadyExists) {
+					// If the sfs file that we are about to create does not exist or is too old, we will need to make a new one
+					if (!sfsFile.exists() || sfsFile.length() == 0 || sfsFile.lastModified() < files.getNewestModificationDate()) {
+						outputAlreadyExists = false;
+					}
+				}
 			}
 			final ExperimentQa experimentQa = new ExperimentQa(experiment.getName(), experiment.getSpectraFile(), inputFilePairs, experiment.getScaffoldVersion());
 			experimentQaList.add(experimentQa);
+		}
+
+		if (outputAlreadyExists) {
+			return null;
 		}
 
 		return new QaWorkPacket(searchRunName, experimentQaList, qaReportFolder, reportFile, decoyRegex, isFromScratch());

@@ -22,10 +22,7 @@ import edu.mayo.mprc.workspace.User;
 import edu.mayo.mprc.workspace.WorkspaceDao;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.regex.Pattern;
 
 /**
@@ -237,10 +234,13 @@ public final class ClientProxyGenerator {
 		for (final FileSearch fileSearch : files) {
 			final File inputFile = fileSearch.getInputFile();
 			Long inputFileSize = null;
+			Date lastModifiedDate = null;
 			if (inputFile.exists() && inputFile.isFile()) {
 				inputFileSize = inputFile.length();
+				lastModifiedDate = new Date(inputFile.lastModified());
 			} else if (FileSearchBean.isAgilentDir(inputFile)) {
 				inputFileSize = FileUtilities.sizeOfDirectory(inputFile);
+				lastModifiedDate = new Date(inputFile.lastModified());
 			} else {
 				inputFileSize = -1L;
 			}
@@ -250,7 +250,9 @@ public final class ClientProxyGenerator {
 					fileSearch.getBiologicalSample(),
 					fixedCategoryName(fileSearch),
 					fileSearch.getExperiment(),
-					inputFileSize);
+					inputFileSize,
+					lastModifiedDate
+			);
 
 			clientInputFiles.add(search);
 		}

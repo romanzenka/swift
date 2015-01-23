@@ -13,6 +13,7 @@ import edu.mayo.mprc.daemon.worker.WorkPacket;
 import edu.mayo.mprc.daemon.worker.Worker;
 import edu.mayo.mprc.daemon.worker.WorkerBase;
 import edu.mayo.mprc.daemon.worker.WorkerFactoryBase;
+import edu.mayo.mprc.io.mgf.MsconvertMgfCleanup;
 import edu.mayo.mprc.utilities.FilePathShortener;
 import edu.mayo.mprc.utilities.FileUtilities;
 import edu.mayo.mprc.utilities.ProcessCaller;
@@ -90,10 +91,31 @@ public final class MsconvertWorker extends WorkerBase {
 			if (!outputFile.exists() || !outputFile.isFile() || !outputFile.canRead()) {
 				throw new MprcException("msconvert failed to create file: " + outputFile.getAbsolutePath());
 			}
-			publish(outputFile, finalOutputFile);
+
+			// Cleanup the output file
+			if (outputFile.getName().endsWith(".mgf")) {
+				final File cleanedOutputFile = new File(outputFile.getParentFile(), outputFile.getName() + ".clean");
+				cleanup(outputFile, cleanedOutputFile);
+				FileUtilities.quietDelete(outputFile);
+
+				publish(cleanedOutputFile, finalOutputFile);
+			} else {
+				publish(outputFile, finalOutputFile);
+			}
 		} finally {
 			shortener.cleanup();
 		}
+	}
+
+	/**
+	 * Take input .mgf file and clean it up.
+	 *
+	 * @param inputFile   File to clean up.
+	 * @param cleanedFile Where to put the cleaned file
+	 */
+	private void cleanup(final File inputFile, final File cleanedFile) {
+		final MsconvertMgfCleanup mgfCleanup = new MsconvertMgfCleanup(inputFile, 1);
+		mgfCleanup.produceCleanedMgf(cleanedFile);
 	}
 
 	/**
@@ -127,9 +149,13 @@ public final class MsconvertWorker extends WorkerBase {
 			throw new MprcException("Unsupported extension: " + extension);
 		}
 
-		if (agilentData(rawFile)) {
+		if (ms2Profile || agilentData(rawFile)) { // Peak picking
 			command.add("--filter");
-			command.add("peakPicking true 1-");
+			if (includeMs1) {
+				command.add("peakPicking true 1-");
+			} else {
+				command.add("peakPicking true 2-");
+			}
 		}
 
 		if (!includeMs1) {
@@ -140,15 +166,8 @@ public final class MsconvertWorker extends WorkerBase {
 		command.add("--filter"); // Charge state predictor
 		command.add("chargeStatePredictor false 4 2 0.9");
 
-		if (ms2Profile) {
-			command.add("--filter");
-			command.add("peakPicking true 2-"); // Do peak picking on MS2 and higher
-		}
-
-		if (ms2Profile || agilentData(rawFile)) {
-			command.add("--filter");
-			command.add("threshold absolute 0.1 most-intense"); // The peak-picked data have a lot of 0-intensity peaks. toss those
-		}
+		command.add("--filter");
+		command.add("threshold absolute 0.00000000001 most-intense"); // Completely toss 0-intensity peaks
 
 		// Make proper .mgf titles that Swift needs
 		if ("mgf".equals(extension)) {

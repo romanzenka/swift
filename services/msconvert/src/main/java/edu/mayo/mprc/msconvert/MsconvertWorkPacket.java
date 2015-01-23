@@ -31,7 +31,8 @@ public final class MsconvertWorkPacket extends WorkPacketBase implements Cachabl
 
 	/**
 	 * Request to convert a .RAW file to .mgf/.mzml file.
-	 *  @param outputFile   This is the desired target of the output. The cache can overwrite this to anything it sees fit.
+	 *
+	 * @param outputFile   This is the desired target of the output. The cache can overwrite this to anything it sees fit.
 	 *                     If that happens, a {@link edu.mayo.mprc.msconvert.MsconvertResult} class is sent back
 	 *                     as progress report.
 	 * @param publicAccess If the .mgf caching is enabled, the files will never be visible to the end user.
@@ -84,7 +85,8 @@ public final class MsconvertWorkPacket extends WorkPacketBase implements Cachabl
 	public String getStringDescriptionOfTask() {
 		final File sourceFile = getInputFile();
 		final String resultExtension = FileUtilities.getExtension(getOutputFile().getName());
-		return "Input:" + sourceFile.getAbsolutePath()
+		return "msconvertWorker version 1.0\n" +
+				"Input:" + sourceFile.getAbsolutePath()
 				+ "\nExtension:" + resultExtension
 				+ (isIncludeMs1() ? "\nincludeMs1: true" : "");
 	}

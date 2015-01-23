@@ -75,13 +75,12 @@ public final class JsonWriter {
 	 * @param searchRun    Search run data
 	 * @param method       Method to be executed on the searchRun. Can be "insert", "rewrite" or "update". Only "insert" sends order information.
 	 * @param reports      A listing of searchRun output files. Can be null in case the searchRun did not finish yet.
-	 * @param runningTasks Number of tasks currently running.
 	 */
-	public void processSearchRun(final int order, final SearchRun searchRun, final int runningTasks, final Iterable<ReportInfo> reports, final String method) {
+	public void processSearchRun(final int order, final SearchRun searchRun, final Iterable<ReportInfo> reports, final String method) {
 		final StringBuilder parameter = new StringBuilder(SEARCH_RUN_BUILDER_CAPACITY);
 		// Only insert method supports the order parameter (others define items by id)
 		// Only update method outputs just "live" data (data that change during lifetime of the searchRun)
-		appendSearchRunJson(parameter, "insert".equals(method) ? order : -1, searchRun, runningTasks, reports, "update".equals(method));
+		appendSearchRunJson(parameter, "insert".equals(method) ? order : -1, searchRun, reports, "update".equals(method));
 		dumpMethod(method, parameter.toString());
 	}
 
@@ -91,12 +90,11 @@ public final class JsonWriter {
 	 * @param builder      StringBuilder to append to
 	 * @param order        Position of the searchRun within the searchRun array. When -1, the order information is not transferred.
 	 * @param searchRun    Search run data
-	 * @param runningTasks Amount currently running tasks.
 	 * @param reports      A listing of output files the searchRun produced.
 	 * @param justLiveData When true, only "live data" are reported (data that changes during the lifetime of the searchRun)
 	 * @return Original StringBuilder with searchRun appended.
 	 */
-	public static StringBuilder appendSearchRunJson(final StringBuilder builder, final int order, final SearchRun searchRun, final int runningTasks, final Iterable<ReportInfo> reports, final boolean justLiveData) {
+	public static StringBuilder appendSearchRunJson(final StringBuilder builder, final int order, final SearchRun searchRun, final Iterable<ReportInfo> reports, final boolean justLiveData) {
 		builder.append('{');
 
 		if (0 <= order) {
@@ -126,7 +124,8 @@ public final class JsonWriter {
 		appendKeyNumber(builder, "ok", (long) searchRun.getTasksCompleted());
 		appendKeyNumber(builder, "failures", (long) searchRun.getTasksFailed());
 		appendKeyNumber(builder, "warnings", (long) searchRun.getTasksWithWarning());
-		appendKeyNumber(builder, "running", (long) runningTasks);
+		appendKeyNumber(builder, "running", (long) (searchRun.getRunningTasks() == null ? 0 : searchRun.getRunningTasks()));
+		appendKeyString(builder, "instruments", searchRun.getInstruments());
 		if (reports != null) {
 			appendKeyReportInfo(builder, "results", reports);
 		}

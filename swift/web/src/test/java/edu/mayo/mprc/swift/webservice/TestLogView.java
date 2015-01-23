@@ -2,7 +2,6 @@ package edu.mayo.mprc.swift.webservice;
 
 import edu.mayo.mprc.utilities.FileUtilities;
 import edu.mayo.mprc.utilities.TestingUtilities;
-import org.apache.log4j.Logger;
 import org.testng.Assert;
 import org.testng.annotations.AfterTest;
 import org.testng.annotations.BeforeTest;
@@ -10,12 +9,10 @@ import org.testng.annotations.Test;
 
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
-
 import java.io.File;
 import java.io.IOException;
 
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.mock;
 
 /**
  * @author Roman Zenka
@@ -40,6 +37,7 @@ public final class TestLogView {
 		final LogView logView = new LogView();
 		logView.printLogFile(mock(HttpServletResponse.class), outStream, logFile);
 		final String s = outStream.getOutput().toString();
+		Assert.assertTrue(s.contains("&lt;3"), "<3 must have gotten escaped");
 		Assert.assertTrue(s.contains("prg style=\"width: 0px\""), "Must have the first line at 0");
 		Assert.assertTrue(s.contains("prg style=\"width: 1000px\""), "Must have the last line at 1000");
 	}

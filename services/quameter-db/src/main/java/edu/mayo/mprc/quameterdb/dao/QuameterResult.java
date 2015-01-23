@@ -41,8 +41,17 @@ public final class QuameterResult extends PersistableBase {
 	 * This is not serialized to the database, but the DAO fills this item for convenience.
 	 * It is the category for the file search
 	 */
-	private String category;
+	private transient String category;
 	private int transaction;
+
+	/**
+	 * Comment for the special "hidden" metric is hijacked to be used as a comment for hiding
+	 * of the entire result.
+	 * <p/>
+	 * DAO fills this from the database. Setting this value is done through saving a special
+	 * {@link edu.mayo.mprc.quameterdb.dao.QuameterAnnotation}.
+	 */
+	private transient String hiddenReason;
 
 	public enum QuameterColumn {
 		c_1a,
@@ -859,6 +868,19 @@ public final class QuameterResult extends PersistableBase {
 
 	public void setCategory(final String category) {
 		this.category = category;
+	}
+
+	public String getHiddenReason() {
+		return hiddenReason;
+	}
+
+	/**
+	 * Not serialized to the database. Convenience field only.
+	 *
+	 * @param hiddenReason Why was this entry hidden.
+	 */
+	public void setHiddenReason(final String hiddenReason) {
+		this.hiddenReason = hiddenReason;
 	}
 
 	public int getTransaction() {

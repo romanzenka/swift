@@ -1,0 +1,109 @@
+<html>
+<head>
+    <link rel="stylesheet" href="../../css/help.css" type="text/css" media="screen" charset="utf-8"/>
+    <script src="../../js/AC_RunActiveContent.js" type="text/javascript"></script>
+</head>
+<body>
+<div id="content">
+    <div class="heading">
+        Chromatography Retention Spread
+    </div>
+    <p>
+        Looking at the liquid chromatogram can often lead to diagnosis of an LC problem. We first look to the
+        <strong>
+            MassQC Dashboard
+        </strong>
+        to see what metrics are out of range, if any:
+    </p>
+
+    <p>
+        <img alt="Out of Range Retention Spread" height="192" src="../new_images/chromatography_retention_spread.png"
+             width="482"/>
+    </p>
+
+    <p>
+        In addition to the
+        <a href="../metrics/retention_spread.html">
+            Retention Spread
+        </a>
+        being out of range, the number of
+        <a href="../metrics/peptide_count.html">
+            Peptide Counts
+        </a>
+        is out of range (low) as well:
+    </p>
+
+    <p>
+        <img alt="Peptide Counts Lower Than Normal" height="140" src="../new_images/identifications_peptide_count.png"
+             width="341"/>
+    </p>
+
+    <p>
+        As we move from viewing the
+        <strong>
+            MassQC
+        </strong>
+        <strong>
+            Dashboard
+        </strong>
+        to the
+        <strong>
+            Control Charts
+        </strong>
+        , we notice that, indeed, the historical data agree with the alerts. This graph shows a QC run that is way our
+        of range:
+    </p>
+
+    <p>
+        <img alt="Out of Range Retention Spread" height="246" src="../new_images/retention_spread_high.png"
+             width="659"/>
+    </p>
+
+    <p>
+        Since
+        <a href="../metrics/retention_spread.html">
+            Retention Spread
+        </a>
+        is an LC problem, we may ask the question: what is causing this Retention time shift and how is the
+        <a href="../metrics/peptide_count.html">
+            Peptide Count
+        </a>
+        data related? For this we look to the mass spectrum to see if there is something wrong with the
+        <strong>
+            liquid chromatogram
+        </strong>
+        :
+    </p>
+
+    <p>
+        <img alt="Missing peaks in the Middle Retention Period" height="113"
+             src="../new_images/missing_peaks-middle_retention_spread.png" width="678"/>
+    </p>
+
+    <p>
+        Looking at XCalibur, there appears to be some split in the chromatography. Material is eluting very early and
+        towards the end, with not much in-between. Likely causes: flow rate slowed due to
+        <strong>
+            partial clog in the chromatography column
+        </strong>
+        ; LC pump not smoothly transitioning through the aqueous/organic solvent gradient.
+    </p>
+
+    <div class="heading">
+        Metrics Discussed in This Section:
+    </div>
+    <ul>
+        <li>
+            <a href="../metrics/retention_spread.html">
+                Chromatography: Retention Spread
+            </a>
+        </li>
+        <li>
+            <a href="../metrics/peptide_count.html">
+                Identifications: Peptide Counts
+            </a>
+        </li>
+    </ul>
+</div>
+</body>
+</html>

@@ -3,10 +3,12 @@ package edu.mayo.mprc.searchdb.builder;
 import edu.mayo.mprc.MprcException;
 import edu.mayo.mprc.database.DaoTest;
 import edu.mayo.mprc.dbcurator.model.Curation;
+import edu.mayo.mprc.dbcurator.model.CurationContext;
 import edu.mayo.mprc.dbcurator.model.impl.CurationDaoHibernate;
 import edu.mayo.mprc.fastadb.FastaDbDaoHibernate;
 import edu.mayo.mprc.fastadb.SingleDatabaseTranslator;
 import edu.mayo.mprc.searchdb.dao.*;
+import edu.mayo.mprc.swift.db.SearchRunFilter;
 import edu.mayo.mprc.swift.db.SwiftDaoHibernate;
 import edu.mayo.mprc.swift.dbmapping.ReportData;
 import edu.mayo.mprc.swift.dbmapping.SearchRun;
@@ -24,6 +26,7 @@ import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
+import org.testng.v6.Maps;
 
 import java.io.File;
 import java.io.IOException;
@@ -41,6 +44,7 @@ import java.util.Map;
  * @author Roman Zenka
  */
 public class TestSearchDbDao extends DaoTest {
+	private File tempFolder;
 	private SearchDbDaoHibernate searchDbDao;
 	private CurationDaoHibernate curationDao;
 	private UnimodDaoHibernate unimodDao;
@@ -67,11 +71,19 @@ public class TestSearchDbDao extends DaoTest {
 
 	@BeforeMethod
 	public void setup() {
-		final ParamsDaoHibernate paramsDao = new ParamsDaoHibernate();
+		tempFolder = FileUtilities.createTempFolder();
 		unimodDao = new UnimodDaoHibernate();
-		curationDao = new CurationDaoHibernate();
+		final CurationContext curationContext = new CurationContext();
+		curationContext.initialize(
+				new File(tempFolder, "fasta"),
+				new File(tempFolder, "fastaUpload"),
+				new File(tempFolder, "fastaArchive"),
+				new File(tempFolder, "localTemp"));
+
+		curationDao = new CurationDaoHibernate(curationContext);
 		fastaDbDao = new FastaDbDaoHibernate(curationDao);
 		workspaceDao = new WorkspaceDaoHibernate();
+		final ParamsDaoHibernate paramsDao = new ParamsDaoHibernate(workspaceDao, curationDao);
 		swiftDao = new SwiftDaoHibernate(workspaceDao, curationDao, paramsDao, unimodDao);
 
 		searchDbDao = new SearchDbDaoHibernate();
@@ -79,11 +91,23 @@ public class TestSearchDbDao extends DaoTest {
 		searchDbDao.setFastaDbDao(fastaDbDao);
 
 		initializeDatabase(Arrays.asList(workspaceDao, swiftDao, unimodDao, paramsDao, curationDao, searchDbDao, fastaDbDao));
+
+		searchDbDao.begin();
+		try {
+			final Map<String, String> testMap = Maps.newHashMap();
+			testMap.put("test", "true");
+			searchDbDao.install(testMap);
+			searchDbDao.commit();
+		} catch (final Exception e) {
+			searchDbDao.rollback();
+			throw new MprcException(e);
+		}
 	}
 
 	@AfterMethod
 	public void teardown() {
 		teardownDatabase();
+		FileUtilities.cleanupTempFile(tempFolder);
 	}
 
 	@Test
@@ -247,5 +271,27 @@ public class TestSearchDbDao extends DaoTest {
 			org.testng.Assert.fail("Cannot load fasta database", e);
 		}
 		return currentSp;
+	}
+
+	private SearchRunFilter runFilter() {
+		SearchRunFilter filter = new SearchRunFilter();
+		filter.setCount("1000");
+		return filter;
+	}
+
+	@Test
+	public void shouldFillInInstruments() {
+		searchDbDao.begin();
+		try {
+			final List<SearchRun> searchRunList = swiftDao.getSearchRunList(runFilter(), true);
+			searchDbDao.fillInInstrumentSerialNumbers(searchRunList);
+			searchDbDao.commit();
+
+			Assert.assertEquals(searchRunList.size(), 1, "We have 1 search run by default");
+			Assert.assertEquals(searchRunList.get(0).getInstruments(), "instrument", "Only one artificial instrument here");
+		} catch (Exception e) {
+			swiftDao.rollback();
+			throw new MprcException(e);
+		}
 	}
 }

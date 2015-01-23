@@ -1,0 +1,128 @@
+div.folder {
+	overflow: visible;
+	cursor: pointer;
+	white-space: nowrap;
+}
+
+div.file {
+	overflow: visible;
+	cursor: pointer;
+	white-space: nowrap;
+}
+
+.selected {
+	background-color: #3399ff;
+	color: #ffffff;
+}
+
+.active {
+	background-color: #FFFFFF;
+}
+
+#numSelected {
+	padding: 0 0 0 30px;
+	font-size: 12px;
+	line-height: 16px;
+	background-image: url(info.gif);
+	background-repeat: no-repeat;
+	background-position: 10px 0;
+}
+
+#numSelected.warning {
+	background-image: url(warning.gif);
+}
+
+.label {
+	text-align: right;
+	width: 20%;
+	vertical-align: top;
+}
+
+.container {
+	position: relative;
+	width: 100%;
+	height: 100%
+}
+
+div.navigation * {
+	margin: 2px;
+}
+
+span.itemlabel {
+	padding: 0 2px;
+	margin: 0 0 0 1px;
+	line-height: 16px;
+	height: 16px;
+}
+
+.dircontents {
+	padding-left: 16px;
+}
+
+div.folder img, div.file img {
+	vertical-align: middle;
+}
+
+div.folder, div.file, .dircontents {
+	background-image: url(dots_vert.gif);
+	background-position: 7px 0;
+	background-repeat: repeat-y;
+}
+
+div.folder-last, div.file-last {
+	background-image: url(dots_vert_top.gif);
+	background-position: 7px 50%;
+	background-repeat: no-repeat;
+}
+
+.dircontents-last {
+	background-image: none;
+	background-position: -1px 0;
+}
+
+#popupMask {
+	position: absolute;
+	z-index: 198;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	opacity: 0.2;
+	/* this hack is so it works in IE
+	 * I find setting the color in the css gives me more flexibility
+	 * than the PNG solution.
+	 */
+	background-color: #333333;
+	display: none;
+}
+
+#popupWindow {
+	text-align: center;
+	z-index: 199;
+	background-color: #fff;
+	border: 1px solid red;
+	padding: 1em;
+	position: absolute;
+	left: 30%;
+	width: 40%;
+	top: 30%;
+	display: none;
+}
+
+#popupText {
+	text-align: center;
+	padding-bottom: 1em;
+	width: 95%;
+	height: 5em;
+	overflow: auto;
+}
+
+#popupAnimation {
+	background-image: url(ajax-loader.gif);
+	background-position: center;
+	display: none;
+	width: 220px;
+	height: 19px;
+	text-align: center;
+	margin: 0 auto;
+}

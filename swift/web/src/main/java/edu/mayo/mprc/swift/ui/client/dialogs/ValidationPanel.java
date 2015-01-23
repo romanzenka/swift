@@ -1,6 +1,5 @@
 package edu.mayo.mprc.swift.ui.client.dialogs;
 
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.Command;
@@ -18,35 +17,16 @@ import java.util.*;
  * either scrolls, or pops up as necessary to show validations that don't fit.
  */
 public final class ValidationPanel extends Composite {
-	public interface SeverityImageBundle extends ImageBundle {
-		@Resource("edu/mayo/mprc/swift/ui/public/images/20pxblank.png")
-		AbstractImagePrototype none();
-
-		@Resource("edu/mayo/mprc/swift/ui/public/images/info.png")
-		AbstractImagePrototype info();
-
-		@Resource("edu/mayo/mprc/swift/ui/public/images/warning.png")
-		AbstractImagePrototype warning();
-
-		@Resource("edu/mayo/mprc/swift/ui/public/images/error.png")
-		AbstractImagePrototype error();
-	}
-
-	private static SeverityImageBundle bundle;
-
-	public static synchronized Image getImageForSeverity(final int severity) {
-		if (bundle == null) {
-			bundle = (SeverityImageBundle) GWT.create(SeverityImageBundle.class);
-		}
+	public static Image getImageForSeverity(final int severity) {
 		switch (severity) {
 			case ClientValidation.SEVERITY_NONE:
-				return bundle.none().createImage();
+				return new Image("images/20pxblank.png");
 			case ClientValidation.SEVERITY_INFO:
-				return bundle.info().createImage();
+				return new Image("images/info.png");
 			case ClientValidation.SEVERITY_WARNING:
-				return bundle.warning().createImage();
+				return new Image("images/warning.png");
 			case ClientValidation.SEVERITY_ERROR:
-				return bundle.error().createImage();
+				return new Image("images/error.png");
 			default:
 				throw new RuntimeException("Unknown severity " + severity);
 		}

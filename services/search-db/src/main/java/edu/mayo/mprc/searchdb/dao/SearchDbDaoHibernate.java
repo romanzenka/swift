@@ -1,7 +1,10 @@
 package edu.mayo.mprc.searchdb.dao;
 
+import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.google.common.collect.SortedSetMultimap;
+import com.google.common.collect.TreeMultimap;
 import edu.mayo.mprc.MprcException;
 import edu.mayo.mprc.database.*;
 import edu.mayo.mprc.fastadb.FastaDbDao;
@@ -297,6 +300,44 @@ public class SearchDbDaoHibernate extends DaoBase implements SearchDbDao {
 						" and rd.analysisId = a.id " +
 						" and pac.accnum = :accessionNumber")
 				.setParameter("accessionNumber", accessionNumber));
+	}
+
+	public List<SearchRun> fillInInstrumentSerialNumbers(List<SearchRun> searchRuns) {
+		if (searchRuns.size() > 0) {
+			final Integer[] ids = DatabaseUtilities.getIdList(searchRuns);
+
+			final List runToInstruments = getSession().createQuery(
+					"select distinct rd.searchRun.id, ms.instrumentSerialNumber from" +
+							" Analysis as a" +
+							" inner join a.biologicalSamples as bsl" +
+							" inner join bsl.list as bs" +
+							" inner join bs.searchResults as srl" +
+							" inner join srl.list as sr" +
+							" inner join sr.massSpecSample as ms," +
+							" ReportData as rd where" +
+							" rd.analysisId = a.id and " +
+							" rd.searchRun.id in (:ids)"
+			).setParameterList("ids", ids)
+					.list();
+
+			final SortedSetMultimap<Integer, String> runToInstrumentsMap = TreeMultimap.create();
+			for (final Object o : runToInstruments) {
+				if (o instanceof Object[]) {
+					final Object[] array = (Object[]) o;
+					final Integer searchRunId = (Integer) array[0];
+					final String instrumentName = (String) array[1];
+					runToInstrumentsMap.put(searchRunId, instrumentName);
+				}
+			}
+
+			for (final SearchRun searchRun : searchRuns) {
+				final SortedSet<String> instruments = runToInstrumentsMap.get(searchRun.getId());
+				final String instrumentsString = Joiner.on(", ").join(instruments);
+				searchRun.setInstruments(instrumentsString);
+			}
+		}
+
+		return searchRuns;
 	}
 
 	@Override

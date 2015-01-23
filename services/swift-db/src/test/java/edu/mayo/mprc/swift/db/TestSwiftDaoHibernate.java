@@ -94,9 +94,30 @@ public final class TestSwiftDaoHibernate extends DaoTest {
 	public void shouldGetNumberOfRunningTasks() {
 		swiftDao.begin();
 		try {
-			SearchRun searchRun = swiftDao.getSearchRunList(runFilter(), true).get(0);
-			Assert.assertEquals(swiftDao.getNumberRunningTasksForSearchRun(searchRun), 0, "The run has nothing running at the moment");
+			final List<SearchRun> searchRunList = swiftDao.getSearchRunList(runFilter(), true);
+			SearchRun searchRun = searchRunList.get(0);
+			swiftDao.fillNumberRunningTasksForSearchRun(searchRunList);
+			Assert.assertEquals(searchRun.getRunningTasks(), Integer.valueOf(0), "The run has nothing running at the moment");
 			swiftDao.commit();
+		} catch (Exception e) {
+			swiftDao.rollback();
+			throw new MprcException(e);
+		}
+	}
+
+	@Test
+	public void shouldCleanupAfterStartup() {
+		swiftDao.begin();
+		try {
+			List<SearchRun> searchRunList = swiftDao.getSearchRunList(runFilter(), true);
+			Assert.assertNull(searchRunList.get(0).getEndTimestamp());
+			swiftDao.cleanupAfterStartup();
+			swiftDao.commit();
+
+			swiftDao.begin();
+			List<SearchRun> searchRunListAfter = swiftDao.getSearchRunList(runFilter(), true);
+			swiftDao.commit();
+			Assert.assertNotNull(searchRunListAfter.get(0).getEndTimestamp());
 		} catch (Exception e) {
 			swiftDao.rollback();
 			throw new MprcException(e);

@@ -1,0 +1,133 @@
+<html>
+<head>
+    <link rel="stylesheet" href="../../css/help.css" type="text/css" media="screen" charset="utf-8"/>
+    <script src="../../js/AC_RunActiveContent.js" type="text/javascript"></script>
+</head>
+<body>
+<div id="content">
+    <div class="heading">
+        MS1 and MS2 Signal
+    </div>
+    <p>
+        After the ions at the
+        <strong>
+            MS1
+        </strong>
+        level come through, the methods described herein rely upon a second level of mass analysis to occur. This would
+        be the
+        <strong>
+            MS2
+        </strong>
+        level and is used to fragment ions further, so that database searches can be performed for protein
+        identification. Problems can occur at each of these levels of ionization/mass analysis and often do. In the
+        current example, we notice
+        <a href="../metrics/ms1_peak_intensity.html">
+            Peak Intensity
+        </a>
+        and
+        <a href="../metrics/ms1_total_ion_current.html">
+            Total Ion Current
+        </a>
+        at the
+        <strong>
+            MS1
+        </strong>
+        level and
+        <a href="../metrics/ms2_high_intensity_id_rate.html">
+            High Intensity ID Rate
+        </a>
+        and
+        <a href="../metrics/ms2_ion_inject_time.html">
+            Ion Inject Time
+        </a>
+        at the
+        <strong>
+            MS2
+        </strong>
+        level:
+    </p>
+
+    <p>
+        <img alt="MS1, MS2 Siganl Issues" height="372" src="../new_images/MS1_MS2_signal_issues.png" width="475"/>
+    </p>
+
+    <p>
+        For example, if the technician looks more closely at the
+        <strong>
+            MS1 metrics
+        </strong>
+        that were flagged, by clicking the
+        <strong>
+            Control Charts
+        </strong>
+        , you see why
+        <strong>
+            MassQC
+        </strong>
+        is flagging these runs. They are clearly going out of range, until finally they are very high and the instrument
+        needs to be looked at closely:
+    </p>
+
+    <p>
+        <img alt="MS1 Upward Trend Metrics" height="371" src="../new_images/MS1_metric_upward_trend.png" width="673"/>
+    </p>
+
+    <p>
+        If we take a look at the
+        <a href="../metrics/ms1_total_ion_current.html">
+            Total Ion Current
+        </a>
+        for the flagged run, we clearly see that the run is bad. In this case, the technician might hypothesize that
+        some contamination has occurred.
+    </p>
+
+    <p>
+        <img alt="Increased Total Ion Current" height="330" src="../new_images/increased_TIC.png" width="505"/>
+    </p>
+
+    <p>
+        One possibility is that
+        <strong>
+            acetate cluster ions
+        </strong>
+        likely arose from placing a metallic filter in the chromatography system while using acetic acid in the running
+        buffers. The series of ions builds slowly over a period of runs. The contaminate ions dominate the
+        <strong>
+            base peak chromatograms
+        </strong>
+        , as seen above.
+    </p>
+
+    <p>
+        This is the kind of problem that can grind a lab to a halt for a period of time. Expectedly, MassQC flags the
+        problem as some of the metrics have varied wildly from their long-term averages.
+    </p>
+
+    <div class="heading">
+        Metrics discussed this section:
+    </div>
+    <ul>
+        <li>
+            <a href="../metrics/ms1_total_ion_current.html">
+                MS1: Total Ion Current
+            </a>
+        </li>
+        <li>
+            <a href="../metrics/ms1_peak_intensity.html">
+                MS1: Peak Intensity
+            </a>
+        </li>
+        <li>
+            <a href="../metrics/ms2_high_intensity_id_rate.html">
+                MS2: High Intensity ID Rate
+            </a>
+        </li>
+        <li>
+            <a href="../metrics/ms2_ion_inject_time.html">
+                MS2: Ion Inject Time
+            </a>
+        </li>
+    </ul>
+</div>
+</body>
+</html>

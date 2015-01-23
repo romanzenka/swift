@@ -416,7 +416,7 @@ public final class CometMappings implements Mappings {
 
 		// Wipe the rest
 		while (modNumber <= 6) {
-			setNativeParam("variable_mod" + modNumber, "0.0 X 0 3 ");
+			setNativeParam("variable_mod" + modNumber, "0.0 X 0 3");
 			modNumber++;
 		}
 	}

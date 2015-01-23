@@ -2,6 +2,7 @@ package edu.mayo.mprc.swift.report;
 
 import com.google.common.base.Charsets;
 import edu.mayo.mprc.chem.AminoAcidSet;
+import edu.mayo.mprc.swift.resources.WebUiHolder;
 import edu.mayo.mprc.utilities.FileUtilities;
 import org.springframework.web.HttpRequestHandler;
 
@@ -17,6 +18,7 @@ import java.io.OutputStreamWriter;
  */
 public final class AminoAcidReport implements HttpRequestHandler {
 	private AminoAcidSet aminoAcidSet;
+	private WebUiHolder webUiHolder;
 
 	@Override
 	public void handleRequest(final HttpServletRequest req, final HttpServletResponse resp) throws IOException {
@@ -24,7 +26,7 @@ public final class AminoAcidReport implements HttpRequestHandler {
 		OutputStreamWriter writer = null;
 		try {
 			writer = new OutputStreamWriter(resp.getOutputStream(), Charsets.US_ASCII);
-			writer.write("<html><head><title>Amino Acids defined in Swift</title>" +
+			writer.write("<html><head><title>Amino Acids | " + webUiHolder.getWebUi().getTitle() + "</title>" +
 					"<style>" +
 					"table { border-collapse: collapse }" +
 					"table td, table th { border: 1px solid black }" +
@@ -44,5 +46,13 @@ public final class AminoAcidReport implements HttpRequestHandler {
 
 	public void setAminoAcidSet(AminoAcidSet aminoAcidSet) {
 		this.aminoAcidSet = aminoAcidSet;
+	}
+
+	public WebUiHolder getWebUiHolder() {
+		return webUiHolder;
+	}
+
+	public void setWebUiHolder(WebUiHolder webUiHolder) {
+		this.webUiHolder = webUiHolder;
 	}
 }

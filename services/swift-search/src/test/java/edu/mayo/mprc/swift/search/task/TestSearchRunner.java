@@ -397,8 +397,8 @@ public class TestSearchRunner {
 				+ 1 /* msmsEval */
 
 				+ (doSemiTryptic ?
-					2 : /* We used to be able to reuse Comet result, but requiring sqt for Scaffold prevents us from doing so */
-					2 /* tryptic means we need extra semitryptic comet and idpicker */)
+				2 : /* We used to be able to reuse Comet result, but requiring sqt for Scaffold prevents us from doing so */
+				2 /* tryptic means we need extra semitryptic comet and idpicker */)
 				+ 1 /* QuaMeter */
 				+ 1 /* QuaMeter db load */;
 
@@ -420,7 +420,7 @@ public class TestSearchRunner {
 		final ProgressReporter reporter = mock(ProgressReporter.class);
 		final ExecutorService service = new SimpleThreadPoolExecutor(1, "testSwiftSearcher", true);
 
-		final SearchRun searchRun = new SearchRun("Test search", null, definition, new Date(), null, 0, null, 0, 0, 0, 0, false);
+		final SearchRun searchRun = new SearchRun("Test search", null, definition, new Date(), null, 0, null, 0, 0, 0, 0, false, null);
 
 
 		final SearchRunner runner = makeSearchRunner("task1", false, searchEngines, definition, reporter, service, searchRun);
@@ -450,7 +450,8 @@ public class TestSearchRunner {
 				mock(SwiftDao.class),
 				dummyFileTokenFactory(),
 				searchRun,
-				false,
+				false, /* reportDecoys */
+				true, /* semiQuameter */
 				0,
 				new MockParamsInfo(),
 				taskId,

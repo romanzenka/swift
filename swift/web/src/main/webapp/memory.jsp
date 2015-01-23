@@ -1,9 +1,11 @@
+<%@ page import="edu.mayo.mprc.swift.SwiftWebContext" %>
 <%@ page import="java.lang.management.ManagementFactory" %>
 <%@ page import="java.lang.management.MemoryPoolMXBean" %>
 <%@ page import="java.util.Iterator" %>
 <html>
 <head>
-    <title>JVM Memory Monitor</title>
+    <title>JVM Memory Monitor | <%=SwiftWebContext.getWebUi().getTitle()%>
+    </title>
 </head>
 
     <%

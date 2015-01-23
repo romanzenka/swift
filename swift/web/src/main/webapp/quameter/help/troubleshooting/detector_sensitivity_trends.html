@@ -1,0 +1,93 @@
+<html>
+<head>
+    <link rel="stylesheet" href="../../css/help.css" type="text/css" media="screen" charset="utf-8"/>
+    <script src="../../js/AC_RunActiveContent.js" type="text/javascript"></script>
+</head>
+<body>
+<div id="content">
+    <div class="heading">
+        Detector Sensitivity and Trends
+    </div>
+    <p>
+        As we have seen here previously, out of range metrics can alert you to an acute problem or show you a gradual
+        trend. Often, ion optics get dirty and this results in a long term degradation in signal. Likewise, as an LC
+        column wears out, the separation power may decrease and you may see issues with resolution or
+        <a href="peak_widths_tailing.html">
+            tailing
+        </a>
+        . And because LC-MS systems are made up of many circuits and electronic devices, it is not unreasonable to
+        assume that these things can wear out.
+    </p>
+
+    <p>
+        In this case, we see that over the course of a year, the following MS1 metrics gradually change. The change can
+        be so subtle that the technician may not notice them in his/her day to day monitoring of the instrument. This is
+        another great reason to add a tool such as MassQC to your toolkit in order to produce the best possible data.
+    </p>
+
+    <p>
+        Notice the strong correlation of the following metrics when viewed from the
+        <strong>
+            Control Charts
+        </strong>
+        :
+    </p>
+
+    <p>
+        <img alt="Detector Sensitivity Trend" height="598" src="../new_images/detector_sensitivity_trend.png"
+             width="676"/>
+    </p>
+
+    <p>
+        In this example there is a general
+        <strong>
+            decrease in the MS signal
+        </strong>
+        received by the mass spectrometer in the MS1 scan over a period of several months. The
+        <a href="../metrics/ms1_ion_inject_time.html">
+            MS1 Ion Inject Time
+        </a>
+        increases and the
+        <a href="../metrics/ms1_peak_intensity.html">
+            MS1 Peak Intensity
+        </a>
+        and
+        <a href="../metrics/ms1_total_ion_current.html">
+            MS1 Total Ion Current
+        </a>
+        both decrease.
+    </p>
+
+    <p>
+        This is likely showing the effects of an aging electron multiplier over the period of several months. This part
+        needs to be replaced relatively frequently in this particular class of instrument due to normal wear and tear,
+        which causes a
+        <strong>
+            decrease in its sensitivit
+        </strong>
+        y. This is a nice example of how the software may help indicate that it’s time for periodic maintenance.
+    </p>
+
+    <div class="heading">
+        Metrics discussed this section:
+    </div>
+    <ul>
+        <li>
+            <a href="../metrics/ms1_ion_inject_time.html">
+                MS1: Ion Inject Time
+            </a>
+        </li>
+        <li>
+            <a href="../metrics/ms1_peak_intensity.html">
+                MS1: Peak Intensity
+            </a>
+        </li>
+        <li>
+            <a href="../metrics/ms1_total_ion_current.html">
+                MS1: Total Ion Current
+            </a>
+        </li>
+    </ul>
+</div>
+</body>
+</html>

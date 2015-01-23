@@ -4,8 +4,8 @@ require 'json'
 require 'pp'
 
 version  = 1
-host     = "node029.mprc.mayo.edu"
-database = "swift"
+host = "atlas.mayo.edu"
+database = "atlas_dev"
 user = "swift"
 pass = "###"
 

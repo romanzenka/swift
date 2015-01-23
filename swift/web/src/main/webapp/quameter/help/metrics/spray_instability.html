@@ -1,0 +1,116 @@
+<html>
+<head>
+    <link rel="stylesheet" href="../../css/help.css" type="text/css" media="screen" charset="utf-8"/>
+    <script src="../../js/AC_RunActiveContent.js" type="text/javascript"></script>
+</head>
+<body>
+<div id="content">
+    <div class="heading">
+        Spray Instability
+    </div>
+    <p>
+        <strong>
+            Spray Instability
+        </strong>
+        measures how often the ion current jumps or falls by more than 10 times between adjacent scans.
+
+    <p>
+        A
+        <strong>
+            Spray Instability
+        </strong>
+        number greater than zero indicates electrospray instability or sputtering of the spray tip.
+
+    <p>
+        The
+        <strong>
+            Spray Instability
+        </strong>
+        metric counts how many times the MS1 total ion current jumps or falls by a factor of 10 from one scan to the
+        next. This metric is calculated over the time period defined by the "
+        <a href="retention_spread.html">
+            Retention Spread
+        </a>
+        ", that is the middle of the retention time when most of the peptides are eluting.
+    </p>
+
+    <p>
+        <img height="354" src="../images_metrics/SprayInstability.png" width="649"/>
+    </p>
+
+    <p>
+        <img alt="spray instability" height="280" src="../new_images/Spray_instability.png" width="600"/>
+    </p>
+
+    <div class="heading">
+        Units:
+    </div>
+    <p class="blurb">
+        <strong>
+            Count
+        </strong>
+    </p>
+
+    <div class="heading">
+        Optimal:
+    </div>
+    <p>
+        <strong>
+            Zero:
+        </strong>
+        Any positive number indicates a problem.
+    <blockquote>
+        <p>
+            For most metrics, the acceptable range of values is determined by the past performance of the
+            <strong>
+                LC-MS
+            </strong>
+            . The
+            <strong>
+                Spray Instability
+            </strong>
+            metric is different since the only acceptable value is zero.
+        </p>
+    </blockquote>
+    <div class="heading">
+        What the Metric Detects:
+    </div>
+    <p class="blurb">
+        A non-zero value for the
+        <strong>
+            Spray Instability
+        </strong>
+        metric means that the electro-spray is erratic.
+    </p>
+
+    <div class="heading">
+        Related Metrics:
+    </div>
+    <p>
+        The
+        <strong>
+            Spray Instability
+        </strong>
+        is only measured during the part of the elution defined by the
+        <a href="retention_spread.html">
+            Retention Spread
+        </a>
+        metric. An unstable spray at the being or end of the elution time is not reflected in this metric.
+
+    <div class="heading">
+        Related Troubleshooting Topics:
+    </div>
+    <ul>
+        <li>
+            <a href="../troubleshooting/ion_source_spray_instability.html">
+                Ion Source - Spray Instability
+            </a>
+        </li>
+    </ul>
+    </p>
+    </p>
+    </p>
+    </p>
+</div>
+</body>
+</html>

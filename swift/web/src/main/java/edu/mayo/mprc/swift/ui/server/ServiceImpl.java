@@ -278,7 +278,7 @@ public final class ServiceImpl extends SpringGwtServlet implements Service, Appl
 				String path = file.getAbsolutePath();
 				path = path.substring(getBrowseRoot().getAbsolutePath().length());
 				path = path.replaceAll(Pattern.quote(File.separator), "/");
-				list.add(new FileInfo(path, file.length()));
+				list.add(new FileInfo(path, file.length(), new Date(file.lastModified())));
 			}
 		}
 	}

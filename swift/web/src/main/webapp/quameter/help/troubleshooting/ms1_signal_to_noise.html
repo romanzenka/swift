@@ -1,0 +1,103 @@
+<html>
+<head>
+    <link rel="stylesheet" href="../../css/help.css" type="text/css" media="screen" charset="utf-8"/>
+    <script src="../../js/AC_RunActiveContent.js" type="text/javascript"></script>
+</head>
+<body>
+<div id="content">
+    <div class="heading">
+        MS1 Signal to Noise
+    </div>
+    <p>
+        <a href="../metrics/ms1_signal_to_noise.html">
+            Signal to Noise
+        </a>
+        can tell you a lot about how well your
+        <strong>
+            LC-MS
+        </strong>
+        system is running or the quality of your samples. If you know that your QC standard is at a concentration that
+        gives good signal historically, then it follows that if the
+        <a href="../metrics/ms1_signal_to_noise.html">
+            Signal to Noise
+        </a>
+        metric is out of range for your QC standard, something is wrong with the
+        <strong>
+            MS1
+        </strong>
+        and/or
+        <strong>
+            MS2
+        </strong>
+        ionization process.
+    </p>
+
+    <p>
+        In this current example, we see that several
+        <strong>
+            MS1/MS2
+        </strong>
+        metrics are out of range:
+    </p>
+
+    <p>
+        <img alt="MS1 Signal to Noise" height="425" src="../new_images/MS1_signal_noise.png" width="524"/>
+    </p>
+
+    <p>
+        Here we will focus on the
+        <strong>
+            MS1
+        </strong>
+        metrics. When the
+        <a href="../metrics/ms1_signal_to_noise.html">
+            MS1 Signal to Noise
+        </a>
+        is out of range, particularly when it is low, this usually means that there are not any real peptide peaks
+        coming off the column. This could be due to several reasons. Perhaps some sample was lost along the way, either
+        in the sample preparation stage or through the use of a bad LC column. Whatever the reason, we also notice that
+        the
+        <a href="../metrics/ms1_dynamic_range.html">
+            Dynamic Range
+        </a>
+        is low as well. This correlates nicely with the low
+        <a href="../metrics/ms1_signal_to_noise.html">
+            Signal to Noise
+        </a>
+        , since the
+        <a href="../metrics/ms1_dynamic_range.html">
+            Dynamic Range
+        </a>
+        is the difference between the lowest and highest MS1 peaks.
+    </p>
+
+    <p>
+        <img alt="High MS1 Signal to Noise" height="245" src="../new_images/high_MS1_signal_noise.png" width="539"/>
+    </p>
+
+    <p>
+    </p>
+
+    <div class="heading">
+        Metrics discussed this section:
+    </div>
+    <ul>
+        <li>
+            <a href="../metrics/ms1_signal_to_noise.html">
+                MS1: Signal to Noise
+            </a>
+        </li>
+        <li>
+            <a href="../metrics/ms1_dynamic_range.html">
+                MS1: Dynamic Range
+            </a>
+        </li>
+        <li>
+            <a href="../metrics/ms1_peak_intensity.html">
+                MS1: Peak Intensity
+            </a>
+        </li>
+    </ul>
+</div>
+</body>
+</html>

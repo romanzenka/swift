@@ -1,0 +1,138 @@
+<html>
+<head>
+    <link rel="stylesheet" href="../../css/help.css" type="text/css" media="screen" charset="utf-8"/>
+    <script src="../../js/AC_RunActiveContent.js" type="text/javascript"></script>
+</head>
+<body>
+<div id="content">
+    <div class="heading">
+        Ion Source Spray Instability
+    </div>
+    <p>
+        <a href="../metrics/spray_instability.html">
+            Spray Instability
+        </a>
+        is a common
+        <strong>
+            Ion Source
+        </strong>
+        issue that most
+        <strong>
+            mass spectrometrists
+        </strong>
+        will encounter some time or another. Often, this can be a dramatic problem, easily seen by looking through the
+        mass spectra. In this case, you will notice a sudden drop-off, as if the liquid simply stopped coming through
+        the
+        <strong>
+            electrospray needle
+        </strong>
+        . For this run, it occurred continuously throughout the entire run:
+    </p>
+
+    <p>
+        <img alt="Spray Instability General Example" height="267" src="../new_images/spray_instability_new.png"
+             width="599"/>
+    </p>
+
+    <p>
+        However, in other cases, the
+        <a href="../metrics/spray_instability.html">
+            Spray Instability
+        </a>
+        interference can be more subtle. Here we analyze how a tool such as
+        <strong>
+            MassQC
+        </strong>
+        can alert a technician to a
+        <strong>
+            spray disturbance
+        </strong>
+        , although you may not see it in the mass spectra. By looking at the
+        <strong>
+            MassQC Dashboard
+        </strong>
+        , it is apparent that there is a
+        <a href="../metrics/spray_instability.html">
+            Spray Instabilit
+        </a>
+        y issue:
+    </p>
+
+    <p>
+        <img alt="Spray Instability Out of Range" height="207" src="../new_images/spray_instability_dashboard.png"
+             width="526"/>
+    </p>
+
+    <p>
+        Although we have highlighted one out of range run above in the
+        <strong>
+            Dashboard
+        </strong>
+        , below we see several that are out of range:
+    </p>
+
+    <p>
+        <img alt="Spray Instability Control Charts View" height="230"
+             src="../new_images/spray_instability_controlcharts.png" width="676"/>
+    </p>
+
+    <p>
+        From a previous out of range run, we can see how
+        <strong>
+            subtle the instability
+        </strong>
+        issue really is. In this case, the
+        <strong>
+            mass spectrometer
+        </strong>
+        data don't show the typical interruption pattern seen above. Rather, here the
+        <a href="../metrics/ms1_total_ion_current.html">
+            Total Ion Current
+        </a>
+        and
+        <strong>
+            base peak chromatogram
+        </strong>
+        look normal:
+    </p>
+
+    <p>
+        <img alt="Spray Instability Chromatograms" height="309" src="../new_images/spray_instability_chromatograms.png"
+             width="673"/>
+    </p>
+
+    <p>
+        But as we have seen here before, upon closer examination, we notice the
+        <a href="../metrics/spray_instability.html">
+            Spray Instability
+        </a>
+        interruptions happening quite frequently, but at the very low end of the intensity.
+        <strong>
+            MassQC
+        </strong>
+        flagged a run that otherwise may not have been caught by the technician:
+    </p>
+
+    <p>
+        <img alt="Low Level Spray Instability" height="278" src="../new_images/Spray_instability_lowlevel.png"
+             width="673"/>
+    </p>
+
+    <div class="heading">
+        Metrics discussed this section
+    </div>
+    <ul>
+        <li>
+            <a href="../metrics/ms1_total_ion_current.html">
+                MS1: Total Ion Current
+            </a>
+        </li>
+        <li>
+            <a href="../metrics/spray_instability.html">
+                Ion Source: Spray Instability
+            </a>
+        </li>
+    </ul>
+</div>
+</body>
+</html>

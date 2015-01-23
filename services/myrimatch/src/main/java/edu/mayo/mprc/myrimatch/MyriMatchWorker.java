@@ -74,7 +74,7 @@ public final class MyriMatchWorker extends WorkerBase {
 		final File finalOutputFile = packet.getOutputFile();
 		final File outputFile = getTempOutputFile(tempWorkFolder, finalOutputFile);
 
-		final File resultFile = new File(outputFile, outputFile.getName() + ".tmp");
+		final File resultFile = new File(tempWorkFolder, outputFile.getName() + ".tmp");
 		// The final file has the spectra id replaced with titles of spectra from the .mgf file
 
 		if (finalOutputFile.exists() && inputFile.exists() && finalOutputFile.lastModified() >= inputFile.lastModified()) {
@@ -108,7 +108,9 @@ public final class MyriMatchWorker extends WorkerBase {
 					result.add("DecoyPrefix = " + packet.getDecoySequencePrefix());
 				}
 
-				Files.write(Joiner.on('\n').join(lines), modifiedParamsFile, Charsets.US_ASCII);
+				final String contents = Joiner.on('\n').join(result);
+				Files.write(contents, modifiedParamsFile, Charsets.US_ASCII);
+				LOGGER.info("Myrimatch config to be used:\n" + modifiedParamsFile.getAbsolutePath() + "\n---\n" + contents);
 
 			} catch (final IOException e) {
 				throw new MprcException("Could not append information to parameter file " + modifiedParamsFile.getAbsolutePath(), e);

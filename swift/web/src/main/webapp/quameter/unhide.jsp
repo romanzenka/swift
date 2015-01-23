@@ -14,7 +14,7 @@
 <% final ResourceConfig quameterUiConfig = MainFactoryContext.getSwiftEnvironment().getSingletonConfig(QuameterUi.Config.class); %>
 <html>
 <head>
-    <title>QuaMeter Results | <%=SwiftWebContext.getWebUi().getTitle()%>
+    <title>QuaMeter Unhide | <%=SwiftWebContext.getWebUi().getTitle()%>
     </title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="/common/bootstrap/css/bootstrap.min.css" rel="stylesheet" media="screen">
@@ -24,12 +24,19 @@
 <div class="container-fluid">
     <div class="navbar navbar-fixed-top navbar-inverse">
         <div class="navbar-inner">
-            <a href="/quameter" class="brand">QuaMeter Results</a>
+            <a href="/quameter" class="brand">QuaMeter</a>
         </div>
     </div>
 
     <h3>Hidden Data Points</h3>
-    <ul class="list-unstyled">
+    <table class="table">
+        <thead>
+        <tr>
+            <th>Path</th>
+            <th>File name</th>
+            <th>Reason</th>
+        </tr>
+        </thead>
         <%
             if (quameterUiConfig != null) {
                 List<QuameterResult> myList;
@@ -40,12 +47,18 @@
 
                     for (QuameterResult qr : myList) {
         %>
-        <li>
+        <tr>
             <form action="/service/quameter-unhide/<%= qr.getId() %>" method="post">
-                <%= qr.getSearchResult().getMassSpecSample().getFile().getAbsolutePath() %>
-                <input type="submit" value="Unhide This">
+                <td class="path-small"><%= qr.getSearchResult().getMassSpecSample().getFile().getParentFile().getAbsolutePath()
+                        .replaceAll("/", "/&#8203;").replaceAll("-", "&#8209;") %>
+                </td>
+                <td><%= qr.getSearchResult().getMassSpecSample().getFile().getName().replaceAll("_", "_&#8203;").replaceAll("-", "&#8209;") %>
+                </td>
+                <td><input type="text" id="reason" name="reason" placeholder="Reason for unhiding"
+                           value="<%= qr.getHiddenReason() %>"></td>
+                <td><input type="submit" value="Unhide This"></td>
             </form>
-        </li>
+        </tr>
         <%
                     }
                     quameterUi.commit();
@@ -55,7 +68,7 @@
                 }
             }
         %>
-    </ul>
+    </table>
 </div>
 
 </body>

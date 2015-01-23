@@ -8,7 +8,8 @@
 <%@ page import="java.io.File" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <html>
-<head><title>Swift Task Error Report</title></head>
+<head><title>Task Error Report | <%=SwiftWebContext.getWebUi().getTitle()%>
+</title></head>
 <body>
 <%
     final String browseWebRoot = SwiftWebContext.getWebUi().getBrowseWebRoot();

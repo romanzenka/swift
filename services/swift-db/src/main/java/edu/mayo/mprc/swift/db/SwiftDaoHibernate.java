@@ -7,6 +7,7 @@ import edu.mayo.mprc.daemon.AssignedTaskData;
 import edu.mayo.mprc.daemon.files.FileTokenFactory;
 import edu.mayo.mprc.database.DaoBase;
 import edu.mayo.mprc.database.Database;
+import edu.mayo.mprc.database.DatabaseUtilities;
 import edu.mayo.mprc.dbcurator.model.CurationDao;
 import edu.mayo.mprc.swift.dbmapping.*;
 import edu.mayo.mprc.swift.params2.*;
@@ -14,6 +15,7 @@ import edu.mayo.mprc.unimod.ModSet;
 import edu.mayo.mprc.unimod.ModSpecificity;
 import edu.mayo.mprc.unimod.Unimod;
 import edu.mayo.mprc.unimod.UnimodDao;
+import edu.mayo.mprc.utilities.ComparisonChain;
 import edu.mayo.mprc.utilities.FileUtilities;
 import edu.mayo.mprc.utilities.progress.ProgressReport;
 import edu.mayo.mprc.workflow.persistence.TaskState;
@@ -50,7 +52,7 @@ public final class SwiftDaoHibernate extends DaoBase implements SwiftDao {
 	/**
 	 * The version of the Swift database we are expecting to see.
 	 */
-	private final int CURRENT_DATABASE_VERSION = 54;
+	private final int CURRENT_DATABASE_VERSION = 55;
 
 	public SwiftDaoHibernate() {
 		super(null);
@@ -88,9 +90,12 @@ public final class SwiftDaoHibernate extends DaoBase implements SwiftDao {
 	@Override
 	public List<TaskData> getTaskDataList(final int searchRunId) {
 		try {
-			return (List<TaskData>) getSession().createQuery("from TaskData t where t.searchRun.id=:searchRunId order by t.startTimestamp desc")
+			// We want to sort by start timestamp, if not available, by queue start timestamp
+			final List<TaskData> list = (List<TaskData>) getSession().createQuery("from TaskData t where t.searchRun.id=:searchRunId")
 					.setInteger("searchRunId", searchRunId)
 					.list();
+			Collections.sort(list, new TaskDataComparator());
+			return list;
 		} catch (final Exception t) {
 			throw new MprcException("Cannot obtain task status list", t);
 		}
@@ -124,19 +129,50 @@ public final class SwiftDaoHibernate extends DaoBase implements SwiftDao {
 	}
 
 	@Override
-	public int getNumberRunningTasksForSearchRun(final SearchRun searchRun) {
-		// Do not hit database for finished search runs. Counting running tasks is costly
-		if (searchRun.isCompleted()) {
-			return 0;
+	public void fillNumberRunningTasksForSearchRun(List<SearchRun> searchRuns) {
+		List<SearchRun> unfinished = new ArrayList<SearchRun>(searchRuns.size());
+		for (final SearchRun run : searchRuns) {
+			if (run.isCompleted()) {
+				run.setRunningTasks(0);
+			} else {
+				unfinished.add(run);
+			}
 		}
-		try {
-			final long howmanyrunning = (Long) getSession().createQuery("select count(t) from TaskData t where t.searchRun=:searchRun and t.taskState.description='" + TaskState.RUNNING.getText() + "'")
-					.setParameter("searchRun", searchRun)
-					.uniqueResult();
-			return (int) howmanyrunning;
-		} catch (final Exception t) {
-			throw new MprcException("Cannot determine number of running tasks for search run " + searchRun.getTitle(), t);
+
+		if (unfinished.size() > 0) {
+			final Integer[] ids = DatabaseUtilities.getIdList(unfinished);
+
+			final List idToCount = getSession().createQuery("select t.searchRun.id, count(t) from TaskData t" +
+					" where t.searchRun.id in (:ids) and t.taskState.description='" + TaskState.RUNNING.getText() + "'" +
+					" group by t.searchRun.id")
+					.setParameterList("ids", ids)
+					.list();
+
+			Map<Integer, Integer> idsToCounts = new HashMap<Integer, Integer>(idToCount.size());
+			for (Object o : idToCount) {
+				if (o instanceof Object[]) {
+					final Object[] a = (Object[]) o;
+					final Integer id = getInteger(a[0]);
+					final Integer count = getInteger(a[1]);
+					idsToCounts.put(id, count);
+				}
+			}
+
+			for (final SearchRun run : unfinished) {
+				run.setRunningTasks(idsToCounts.get(run.getId()));
+			}
 		}
+	}
+
+	private static Integer getInteger(Object o) {
+		Integer count;
+		if (o instanceof Long) {
+			Long l = (Long) o;
+			count = l.intValue();
+		} else {
+			count = (Integer) o;
+		}
+		return count;
 	}
 
 	@Override
@@ -254,6 +290,19 @@ public final class SwiftDaoHibernate extends DaoBase implements SwiftDao {
 	}
 
 	@Override
+	public void cleanupAfterStartup() {
+		final Session session = getSession();
+		final Query query = session.createQuery(
+				"update SearchRun r " +
+						"set r.endTimestamp=:time, " +
+						"    r.errorMessage='Swift restarted', " +
+						"    r.errorCode=1 " +
+						"where r.endTimestamp is null and r.errorMessage is null")
+				.setParameter("time", new Date());
+		query.executeUpdate();
+	}
+
+	@Override
 	public SwiftSearchDefinition addSwiftSearchDefinition(SwiftSearchDefinition definition) {
 		try {
 			if (definition.getId() == null) {
@@ -335,7 +384,8 @@ public final class SwiftDaoHibernate extends DaoBase implements SwiftDao {
 					0,
 					0,
 					0,
-					false);
+					false,
+					null);
 
 			try {
 				getSession().saveOrUpdate(data);
@@ -748,5 +798,21 @@ public final class SwiftDaoHibernate extends DaoBase implements SwiftDao {
 	@Resource(name = "unimodDao")
 	public void setUnimodDao(final UnimodDao unimodDao) {
 		this.unimodDao = unimodDao;
+	}
+
+	public static class TaskDataComparator implements Comparator<TaskData> {
+		/**
+		 * Sort descending based on start timestamps. If those are null, use queue timestamps.
+		 */
+		@Override
+		public int compare(final TaskData taskData, final TaskData t1) {
+			Date start1 = taskData.getStartTimestamp() == null ? taskData.getQueueTimestamp() : taskData.getStartTimestamp();
+			Date start2 = t1.getStartTimestamp() == null ? t1.getQueueTimestamp() : t1.getStartTimestamp();
+			return -ComparisonChain.start()
+					.nullsFirst()
+					.compare(start1, start2)
+					.compare(taskData.getEndTimestamp(), t1.getEndTimestamp())
+					.result();
+		}
 	}
 }

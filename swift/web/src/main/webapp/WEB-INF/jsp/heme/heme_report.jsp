@@ -1,6 +1,7 @@
 <%@ page import="edu.mayo.mprc.heme.HemeReport" %>
 <%@ page import="edu.mayo.mprc.heme.PeptideEntity" %>
 <%@ page import="edu.mayo.mprc.heme.ProteinEntity" %>
+<%@ page import="edu.mayo.mprc.swift.SwiftWebContext" %>
 <%@ page import="edu.mayo.mprc.swift.helper.HemeHelper" %>
 <%@ page import="java.text.SimpleDateFormat" %>
 <%@ page import="java.util.List" %>
@@ -15,7 +16,8 @@
 %>
 <html>
 <head>
-    <title>HEME REPORT PAGE</title>
+    <title>Report | <%=SwiftWebContext.getWebUi().getTitle()%>
+    </title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="/common/bootstrap/css/bootstrap.min.css" rel="stylesheet" media="screen">
     <script type="text/javascript" src="/common/bootstrap/js/jquery_1.9.0.min.js"></script>
@@ -36,9 +38,11 @@
 <div class="container">
     <div class="navbar navbar-your-class navbar-static-top">
         <div class="navbar-inner">
-            <a href="/" class="btn btn-info pull-right">Return to Swift</a>
-                <h1>Report: <%=report.getName()%></h1>Target Mass: <%=report.getMass()%> &#177; <%=report.getMassTolerance()%></br>
-                <small style="margin-left:20px;">Date: <%=format.format(report.getDate())%> </small>
+            <a href="/heme/heme.jsp" class="btn btn-info pull-right">Return to Reports</a>
+
+            <h1>Report: <%=report.getName()%>
+            </h1>Target Mass: <%=report.getMass()%> &#177; <%=report.getMassTolerance()%></br>
+            <small style="margin-left:20px;">Date: <%=format.format(report.getDate())%> </small>
         </div>
     </div>
 
@@ -62,6 +66,7 @@
             <th></th>
         </tr>
         </thead>
+        <tbody>
         <% for (ProteinEntity p : confirmedList) {%>
         <tr>
             <td><%=p.getAccNum()%></td>
@@ -72,6 +77,7 @@
             <td><a href="#modal_<%=p.getAccNum()%>" role="button" class="btn" data-toggle="modal">View</a></td>
         </tr>
         <%}%>
+        </tbody>
     </table>
 
 
@@ -131,6 +137,7 @@
                     <th>Mass <%=HemeHelper.arrows()%></th>
             </tr>
         </thead>
+        <tbody>
         <% for (ProteinEntity p : relatedList) { %>
         <tr>
             <td><%=p.getAccNum()%></td>
@@ -139,6 +146,7 @@
             <td><%=p.getMass()%></td>
         </tr>
         <% } %>
+        </tbody>
     </table>
 
 
@@ -155,6 +163,7 @@
          <th>Description <%=HemeHelper.arrows()%></th>
         </tr>
         </thead>
+        <tbody>
         <% for (ProteinEntity p : otherList) {%>
         <tr>
             <td><a href="http://www.genome.jp/dbget-bin/www_bget?sp:<%=p.getAccNum()%>"><%=p.getAccNum()%></a></td>
@@ -162,6 +171,7 @@
             <td><small><%=p.getNeatDescription()%></small></td>
         </tr>
         <%}%>
+        </tbody>
     </table>
 
 

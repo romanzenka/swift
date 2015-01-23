@@ -6,9 +6,19 @@ numberOfSimpleGraphs = 0;
 dyViewsByCode = {};
 viewMetadata = {};
 
+// Array of
+//  id, metricCode, quameterResultId, text
+// for each annotation
+var annotCollection = getAnnotationCollection();
+
+/* Current selection info */
+selectedRow = -1;
+selectedTransaction = -1;
+selectedId = -1;
+
 
 function populateInstArray(dt) {
-    var instrumentCol = columnIndex("instrument", dt)
+    var instrumentCol = columnIndex("instrument", dt);
     for (var r = 0; r < dt.getNumberOfRows(); r++) {
         var val = dt.getValue(r, instrumentCol);
         if (!rawInsturmentNames.contains(val)) {
@@ -47,14 +57,14 @@ function addButtons(div, data, columnId) {
     var iter = 1;
     $.each(keys, function (index, value) {
         var niceName = value;
-        var btnClass = 'btn-orig' + iter;
-        if (!niceName.match(/^Orbi/) && columnId === 'instrument') {
-            btnClass = 'btn-default';
+        var btnClass = 'btn-orig' + iter; // Instrument buttons have btn-orig# class when highlighted
+        if (index != 0 && columnId === 'instrument') {
+            btnClass = 'btn-default'; // Except non-first instruments, whom are just gray
         }
         else if (columnId !== 'instrument') {
-            var btnClass = 'btn-primary';
+            btnClass = 'btn-primary';  // All other buttons use btn-primary
         }
-        div.append('<button type="button" class="btn ' + btnClass + '" value="' + value + '" data-num=' + iter + ' data-enum="' + columnId + '">' + niceName + ' (' + names[value] + ')<' + '/button>');
+        div.append('<button type="button" class="btn ' + btnClass + '" value="' + value + '" data-toggle="tooltip" data-placement="bottom" data-container="body" data-num=' + iter + ' data-enum="' + columnId + '" title="' + niceName + ': ' + names[value] + ' entries">' + niceName + '<' + '/button>');
         iter++;
     });
 }
@@ -73,6 +83,14 @@ function createNewAnnotationForm(parentName, dbID) {
     var metricCode = parentName.split("-")[1];
     $('#hiddenMetricCode').val(metricCode);
     $('#hiddenRowid').val(dbID);
+    $('#annotationText').val('');
+    for (i in annotCollection) {
+        if (annotCollection.hasOwnProperty(i)) {
+            if (annotCollection[i].metricCode == metricCode && annotCollection[i].quameterResultId == dbID) {
+                $('#annotationText').val(annotCollection[i].text);
+            }
+        }
+    }
     $('#annotFormDiv').show();
 }
 
@@ -93,17 +111,19 @@ function getXaxisNseriesById(data, dbId) {
 function buildCollection(collection, data, metricCode) {
     var arrayForDYgraphs = [];
     for (var o in collection) {
-        if (collection[o].metricCode === metricCode) {
-            var nthx = getXaxisNseriesById(data, collection[o].quameterResultId);
-            if (nthx[0] >= 0) {
-                arrayForDYgraphs.push(
-                    {
-                        series: nthx[1],
-                        x: nthx[0].toString(),
-                        shortText: $.trim(collection[o].text)[0],
-                        text: collection[o].text
-                    }
-                )
+        if (collection.hasOwnProperty(o)) {
+            if (collection[o].metricCode === metricCode) {
+                var nthx = getXaxisNseriesById(data, collection[o].quameterResultId);
+                if (nthx[0] >= 0) {
+                    arrayForDYgraphs.push(
+                        {
+                            series: nthx[1],
+                            x: nthx[0].toString(),
+                            shortText: $.trim(collection[o].text)[0],
+                            text: collection[o].text
+                        }
+                    )
+                }
             }
         }
     }
@@ -114,13 +134,18 @@ function getMetricTitle(n) {
     var hLink, qLink;
     if (metrics[n].hasOwnProperty('link')) {
         hLink = 'href="' + metrics[n].link + '" target="_blank"';
-        qLink = '&nbsp; <i class="icon-large icon-question-sign"></i>';
+        qLink = '&nbsp;<i class="icon-large icon-question-sign"></i>';
     }
     else {
         hLink = 'href="#"';
         qLink = '';
     }
-    return '<a ' + hLink + ' data-toggle="tooltip" data-placement="right" title="' + metrics[n].desc + '" class="modLink" >' + metrics[n].name + qLink + '</a>'
+    return '<a ' + hLink + ' class="modLink" >'
+        + metrics[n].name + qLink
+        + '</a> <span class="metric-desc">&mdash; '
+        + metrics[n].desc
+        + ' (' + metrics[n].label + ')'
+        + '</span>';
 }
 
 // Tokenize by underscore, wrap tokens in <span>
@@ -234,7 +259,11 @@ function updateAllViews(data) {
             views[i].maxHighlightY2 = -1;
         }
 
-        views[i].dygraph.updateOptions({file: views[i].dataView, valueRange: getMetricByCode(views[i].metricId).range, colors: getSmartColors()});
+        views[i].dygraph.updateOptions({
+            file: views[i].dataView,
+            valueRange: getMetricByCode(views[i].metricId).range,
+            colors: getSmartColors()
+        }, false);
     }
     blockRedraw = false;
 }
@@ -244,8 +273,10 @@ function selectPoint(data, dataRow) {
         $('#icons').hide();
         selectedTransaction = -1;
         selectedId = -1;
+        selectedRow = -1;
     } else {
         var transactionColumnIndex = columnIndex("transaction", data);
+        selectedRow = dataRow;
         selectedTransaction = data.getValue(dataRow, transactionColumnIndex);
         selectedId = data.getValue(dataRow, columnIndex("id", data));
         $('#search-link').attr("href", '/start/?load=' + selectedTransaction);
@@ -257,11 +288,18 @@ function selectPoint(data, dataRow) {
 // var blockRedraw = false;
 
 function addDygraph(viewIndex, view, viewId, metricId, viewMetadata, data, range, annotCollection) {
-    views[viewIndex] = { dataView: view, minHighlightY: 1, maxHighlightY: -1, minHighlightY2: 1, maxHighlightY2: -1, metricId: metricId };
+    views[viewIndex] = {
+        dataView: view,
+        minHighlightY: 1,
+        maxHighlightY: -1,
+        minHighlightY2: 1,
+        maxHighlightY2: -1,
+        metricId: metricId
+    };
     var currentView = views[viewIndex];
     var selectedPath = $('#selected-path');
 
-    var instrumentText = $.map(instrumentButtons(), function (val, i) {
+    var instrumentText = $.map(instrumentButtons(), function (val) {
         return val.firstChild.data
     });
     instrumentText.unshift("Date");
@@ -291,23 +329,23 @@ function addDygraph(viewIndex, view, viewId, metricId, viewMetadata, data, range
         categoryButtons().filter("[value='" + category + "']").addClass("highlight");
     }
 
-
     var dygraph = new Dygraph(
         document.getElementById(viewId),
         views[viewIndex].dataView,
         {
-            drawCallback: function (me, initial) {
-                if (blockRedraw || initial) return;
+            zoomCallback: function (minDate, maxDate, yRanges) {
+                if (blockRedraw) return;
                 blockRedraw = true;
-                var range = me.xAxisRange();
+                var range = [minDate, maxDate];
                 for (var j = 0; j < views.length; j++) {
-                    if (gs[j] == me) continue;
                     if (gs[j] === undefined) {
                         console.log("Errant LOOKUP", j, gs)
                     }
-                    gs[j].updateOptions({
-                        dateWindow: range
-                    });
+                    if (gs[j] != dygraph) {
+                        gs[j].updateOptions({
+                            dateWindow: range
+                        });
+                    }
                 }
                 blockRedraw = false;
             },
@@ -321,10 +359,14 @@ function addDygraph(viewIndex, view, viewId, metricId, viewMetadata, data, range
                 highlightCircleSize: 4
             },
             highlightCallback: function (event, x, points, viewRow, seriesName) {
-                pointHighlighted = viewRow;
-                var row = viewMetadata.filteredRows[viewRow];
-                if (pointSelected == -1) {
-                    highlightRow(row);
+                if (viewRow < 0 || viewRow >= viewMetadata.filteredRows.length) {
+                    highlightRow(-1);
+                } else {
+                    pointHighlighted = viewRow;
+                    var row = viewMetadata.filteredRows[viewRow];
+                    if (pointSelected == -1) {
+                        highlightRow(row);
+                    }
                 }
             },
             unhighlightCallback: function (event) {
@@ -366,20 +408,32 @@ function addDygraph(viewIndex, view, viewId, metricId, viewMetadata, data, range
                     canvas.fillRect(xcoord - 2, area.y, 4, area.h);
                 }
             },
-            pointClickCallback: function (event, point) {
-                // Select a point
-                if (pointSelected != pointHighlighted) {
-                    pointSelected = pointHighlighted;
-                } else {
-                    pointSelected = -1;
+            clickCallback: function (event, x, point) {
+                if (point.length > 0) {
+                    point = point[0];
+                    // Select a point
+                    if (pointSelected != pointHighlighted) {
+                        pointSelected = pointHighlighted;
+                    } else {
+                        pointSelected = -1;
+                    }
+                    selectPoint(data, pointSelected == -1 ? -1 : viewMetadata.filteredRows[pointSelected]);
+                    var row = viewMetadata.filteredRows[pointHighlighted];
+                    highlightRow(row);
+
+                    if (pointSelected != -1) {
+                        createNewAnnotationForm(event.target.parentNode.parentNode.id, data.getValue(row, columnIndex("id", data)));
+                    } else {
+                        $('#annotFormDiv').hide();
+                    }
+                    for (i in views) {
+                        if (views.hasOwnProperty(i)) {
+                            views[i].dygraph.updateOptions({
+                                file: views[i].dataView
+                            });
+                        }
+                    }
                 }
-                selectPoint(data, pointSelected == -1 ? -1 : viewMetadata.filteredRows[pointSelected]);
-                var row = viewMetadata.filteredRows[pointHighlighted];
-                highlightRow(row);
-
-                createNewAnnotationForm(event.target.parentNode.parentNode.id, data.getValue(row, columnIndex("id", data)));
-
-                dygraph.updateOptions({file: currentView.dataView});
             }
         }
     );
@@ -394,7 +448,6 @@ function addDygraph(viewIndex, view, viewId, metricId, viewMetadata, data, range
 //  Important basic graphing functions
 function drawGraphsByMetrics(data, renderDetailGraphs, viewMetadata) {
     var viewIndex = 0;
-    var annotCollection = getAnnotationCollection();
     if (renderDetailGraphs) {
         viewIndex = numberOfSimpleGraphs - 1
     }
@@ -422,24 +475,25 @@ function drawGraphsByMetrics(data, renderDetailGraphs, viewMetadata) {
 
         view.setColumns(getSmartColumns(metricId, data));
 
+        var viewId;
         if (renderDetailGraphs) {
-            var viewId = "graph-" + metricId;
+            viewId = "graph-" + metricId;
             $('<div id="wrapper-' + metric.label + '" class="row-fluid"><div class="span12">' +
-                    getMetricTitle(i) +
-                    '<div id="' + viewId + '" class="simple-graph"></div>' +
-                    '</div></div>'
+                getMetricTitle(i) +
+                '<div id="' + viewId + '" class="simple-graph"></div>' +
+                '</div></div>'
             ).appendTo("#detailedGraphs");
             addDygraph(viewIndex, view, viewId, metricId, viewMetadata, data, metric.range, annotCollection);
             viewIndex++;
         }
         else {
             if (1 == metric.simple) {
-                var viewId = "simpleGraph-" + metricId;
+                viewId = "simpleGraph-" + metricId;
                 $('<div id="wrapper-' + metric.label + '" class="row-fluid">' +
-                        '<div class="span12">' +
-                        getMetricTitle(i)
-                        + '<div id="' + viewId + '" class="simple-graph"></div>' +
-                        '</div></div>'
+                    '<div class="span12">' +
+                    getMetricTitle(i)
+                    + '<div id="' + viewId + '" class="simple-graph"></div>' +
+                    '</div></div>'
                 ).appendTo("#simpleGraphs");
                 addDygraph(viewIndex, view, viewId, metricId, viewMetadata, data, metric.range, annotCollection);
                 viewIndex++;
@@ -459,7 +513,7 @@ function initSimpleCharts(graphObj) {
     populateInstArray(data);
 
     // Populate array with index to every row
-    var allRows = Array(data.getNumberOfRows());
+    var allRows = new Array(data.getNumberOfRows());
     for (var i = 0; i < data.getNumberOfRows(); i++) {
         allRows[i] = i;
     }
@@ -485,7 +539,8 @@ function initSimpleCharts(graphObj) {
     filterButtons.click(function (event) {
         var current = $(this);
         if (!event.shiftKey) {
-            current.siblings().each(function () {
+            // Deselect all the buttons by setting their second class to btn-default
+            current.parent().children().each(function () {
                 var classList = $(this)[0].className.split(' ');
                 if (classList[1] !== "btn-default") {
                     $(this).removeClass(classList[1]);
@@ -493,8 +548,9 @@ function initSimpleCharts(graphObj) {
                 }
             });
         }
-        current.removeClass("btn-default");
 
+        // Toggle current button
+        current.removeClass("btn-default");
         if (current[0].dataset.enum === 'instrument') {
             current.toggleClass('btn-orig' + current[0].dataset.num);
         } else {
@@ -530,30 +586,61 @@ function initSimpleCharts(graphObj) {
     //Little Hide Icon, when point on a graph is selected
     $('#hide-entry').click(function (event) {
         event.stopPropagation();
-        $.post("/service/quameter-hide/" + selectedId);
-        hiddenIds["id" + selectedId] = true;
-        selectPoint(data, -1);
-        updateAllViews(data);
+        var path = data.getValue(selectedRow, columnIndex('path', data));
+        $('#hide-path').html(path.replace(/\//g, '/&#8203;').replace(/-/g, '&#8209;'));
+        var hideReason = $('#hideReason');
+        hideReason.val("");
+        for (i in annotCollection) {
+            if (annotCollection.hasOwnProperty(i)) {
+                var obj = annotCollection[i];
+                if (obj.quameterResultId == selectedId && obj.metricCode == "hidden") {
+                    hideReason.val(obj.text);
+                    break;
+                }
+            }
+        }
+
+        $('#hideDialog').modal('show');
+    });
+
+    $('#hideSubmit').click(function (event) {
+        $("#hideAlert").hide();
+        $.ajax({
+            type: "POST",
+            url: "/service/quameter-hide/" + selectedId,
+            data: {reason: $("#hideReason").val()}
+        }).done(function () {
+            hiddenIds["id" + selectedId] = true;
+            selectPoint(data, -1);
+            updateAllViews(data);
+            $("#hideDialog").modal('hide');
+        }).fail(function (request, status, error) {
+            var hideAlert = $("#hideAlert");
+            hideAlert.find("span").text("Error hiding the data point: " + error);
+            hideAlert.show();
+        });
     });
 
 
     // Async form for submitting
     $("#submitAnnotation").click(function () {
+        var annotForm = $('#annotForm');
+        var annotText = annotForm.find('textarea[name="text"]').val();
+
         $.ajax({
             type: 'POST',
             url: "/service/new-annotation",
-            data: $('#annotForm').serialize(),
+            data: annotForm.serialize(),
             success: function (response) {
-                var nthView = dyViewsByCode[$('#annotForm').find('input[name="metricCode"]').val()];
-                var nthx = getXaxisNseriesById(data, $('#annotForm').find('input[name="dbId"]').val());
-                var txt = $(this).closest('form').find("input[type=text], textarea").val();
+                var nthView = dyViewsByCode[annotForm.find('input[name="metricCode"]').val()];
+                var nthx = getXaxisNseriesById(data, annotForm.find('input[name="dbId"]').val());
                 var annotations = views[nthView].dygraph.annotations();
                 annotations.push(
                     {
                         series: nthx[1],
                         x: nthx[0].toString(),
-                        shortText: "A",
-                        text: txt
+                        shortText: (annotText.length > 0 ? annotText[0] : ""),
+                        text: annotText
                     }
                 );
                 views[nthView].dygraph.setAnnotations(annotations);
@@ -562,17 +649,18 @@ function initSimpleCharts(graphObj) {
                 alert("There was an error submitting this annotation comment!");
             }
         });
-        $(this).closest('form').find("input[type=text], textarea").val("");
+        annotForm.find('textarea[name="text"]').val("");
         $('#annotFormDiv').hide();
     });
 
     //Looks at the butons and filters rows & columns based on selection
     updateAllViews(data);
+    $("body").tooltip({selector: '[data-toggle="tooltip"]'});
 }
 
 
 function getAnnotationCollection() {
-    var jsonData;
+    var jsonData = null;
     $.ajax({
         dataType: "json",
         async: false,
@@ -592,13 +680,14 @@ function getAnnotationCollection() {
 // metricId - name of the metric to be used
 function getSmartColumns(metricId, data) {
     var dataIdx = columnIndex("startTime", data);
-    var cols = [ dataIdx ];
+    var cols = [dataIdx];
     var rawInsturmentNames = activeInstrumentFilters();
     for (j = 0; j < rawInsturmentNames.length; j++) {
         var instrumentCol = columnIndex("instrument", data);
         var metricIndex = columnIndex(metricId, data);
 
-        cols.push({type: 'number', label: rawInsturmentNames[j],
+        cols.push({
+            type: 'number', label: rawInsturmentNames[j],
             calc: (function (iterJ, metID, metricIndex, instrumentCol) {
                 if (metID.match(/^id_/)) {
                     // The id_ columns are special. We do extra filtering on null values
