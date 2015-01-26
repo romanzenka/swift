@@ -52,7 +52,7 @@ ppmRangeUnit2 <- "Da"
 # Setup the TIC plot
 legend.by.mslevel <- c("MS", "MS/MS", "MS3", "MS4")
 tic.moving.average <- 30 # Smooth 30 spectra (~3-6 seconds)
-middle.time.percent <- 75 # Only calculate stats over the middle 75%
+retention.spread <- 50 # Only calculate stats over time when middle 50% of peptides elute
 
 # Spectrum classes - utilities and data
 
@@ -644,21 +644,29 @@ imageGenerator<-function(dataFile, msmsEvalDataFile, infoFile, spectrumFile, chr
       abline(h=1e3);
       abline(h=1e6);     
       abline(h=1e9);
-      
-      timeRange <- range(spectrumInfo$RT[!is.na(spectrumInfo$RT)])      
-      timeLength <- (timeRange[2]-timeRange[1])*(1.0 - middle.time.percent/100.0)/2 # How much to cut off the edges
-      timeRange <- c(timeRange[1]+timeLength, timeRange[2]-timeLength)
-            
+
+      # Determine the middle 50% of eluting peptides
+      msn.retention.times <- spectrumInfo$RT[!is.na(spectrumInfo$RT & spectrumInfo$MS.Level>1)]
+      timeRange <- quantile(msn.retention.times, probs = c(retention.spread/100.0/2.0, 1.0-(retention.spread/100.0/2.0)))
+          
       # Draw averages
       for(level in used.mslevel) {
         # Only look at the middle range
         keep <- spectrumInfo$MS.Level==level & !is.na(spectrumInfo$RT) & spectrumInfo$RT>=timeRange[1] & spectrumInfo$RT<=timeRange[2]
         timeDeltas <- c(diff(spectrumInfo$RT[keep]), 0)
         
-        tic.mean <- weighted.mean(spectrumInfo$TIC[keep], timeDeltas)
-        tic.quantile.25 <- wtd.quantile(x=spectrumInfo$TIC[keep], q=0.25, weight = timeDeltas)
-        tic.quantile.50 <- wtd.quantile(x=spectrumInfo$TIC[keep], q=0.50, weight = timeDeltas)
-        tic.quantile.75 <- wtd.quantile(x=spectrumInfo$TIC[keep], q=0.75, weight = timeDeltas)
+        if(level==1) {
+          # Use weighted mean and quantiles to account for different rates of acquisition
+          tic.mean <- weighted.mean(spectrumInfo$TIC[keep], timeDeltas)
+          tic.quantile.25 <- wtd.quantile(x=spectrumInfo$TIC[keep], q=0.25, weight = timeDeltas)
+          tic.quantile.50 <- wtd.quantile(x=spectrumInfo$TIC[keep], q=0.50, weight = timeDeltas)
+          tic.quantile.75 <- wtd.quantile(x=spectrumInfo$TIC[keep], q=0.75, weight = timeDeltas)
+        } else {
+          tic.mean <- mean(spectrumInfo$TIC[keep])
+          tic.quantile.25 <- quantile(x=spectrumInfo$TIC[keep], probs=0.25)
+          tic.quantile.50 <- quantile(x=spectrumInfo$TIC[keep], probs=0.50)
+          tic.quantile.75 <- quantile(x=spectrumInfo$TIC[keep], probs=0.75)          
+        }
         
         if(level==1) {
           result$ms1.tic.25 <- tic.quantile.25
@@ -1082,7 +1090,7 @@ startReportFile<-function(reportFile) {
     <tr><th>Data files", helpLink("swiftQaDataFile"),
     "</th><th class=\"protein\">Identification", helpLink("swiftQaPeptidesAndProteins"),    
     "</th><th class=\"spectrum\">Spectrum Counts", helpLink("swiftQaSpectrumCount"),
-    "</th><th>MS TIC Quartiles", helpLink("msSignal"),
+    "</th><th>MS TIC Quantiles", helpLink("msSignal"),
     "</th><th>", lockmass.title, helpLink("swiftQaLockmassGraph"),
     "</th><th>", calibration.title, helpLink("swiftQaMassCalibrationGraph"),
     "</th><th>", msmsEval.title, helpLink("swiftQaMsmsEvalDiscriminant"),
@@ -1128,6 +1136,11 @@ addRowToReportFile<-function(reportFile, row) {
     }
   }
   
+  formatTIC <- function(tic, base) {
+    val <- tic/base
+    return(paste0(format(val, scientific=FALSE, digits=2), "&#8729;10<sup>", round(log10(base)), "</sup>"))
+  }
+  
   chunk <- paste0(chunk, 
                  "<td class=\"protein\"><table>",
                  "<tr><th>Proteins</th><td>",row$proteins.all.count,"&nbsp;",colorSpan(row$proteins.rev.count, spectrum.rev.colHtml),"</td></tr>",
@@ -1151,14 +1164,16 @@ addRowToReportFile<-function(reportFile, row) {
                  
                  "</table></td>",
                  "<td><table>",
-                 "<tr><th>MS<sup>1</sup>&nbsp;25%</th><td>", format(row$ms1.tic.25, scientific=TRUE, digits=3), "</td></tr>",
-                 "<tr><th>MS<sup>1</sup>&nbsp;50%</th><td>", format(row$ms1.tic.50, scientific=TRUE, digits=3), "</td></tr>",
-                 "<tr><th>MS<sup>1</sup>&nbsp;75%</th><td>", format(row$ms1.tic.75, scientific=TRUE, digits=3), "</td></tr>",
-                 "<tr><th>&nbsp;</th><td>&nbsp;</td></tr>",
-                 "<tr><th>MS<sup>2</sup>&nbsp;25%</th><td>", format(row$ms2.tic.25, scientific=TRUE, digits=3), "</td></tr>",
-                 "<tr><th>MS<sup>2</sup>&nbsp;50%</th><td>", format(row$ms2.tic.50, scientific=TRUE, digits=3), "</td></tr>",
-                 "<tr><th>MS<sup>2</sup>&nbsp;75%</th><td>", format(row$ms2.tic.75, scientific=TRUE, digits=3), "</td></tr>",
-                 "</table></td>",
+                 "<tr><th style='text-align:left'>MS<sup>1</sup>&nbsp;75%</th><td>", formatTIC(row$ms1.tic.75, 1e9), "</td></tr>",
+                 "<tr><th style='text-align:left'>MS<sup>1</sup>&nbsp;median</th><td>", formatTIC(row$ms1.tic.50, 1e9), "</td></tr>",
+                 "<tr><th style='text-align:left'>MS<sup>1</sup>&nbsp;25%</th><td>", formatTIC(row$ms1.tic.25, 1e9), "</td></tr>",                 
+                 "<tr><th style='text-align:left'>MS<sup>1</sup>&nbsp;IQR</th><td>", formatTIC(row$ms1.tic.75-row$ms1.tic.25, 1e9), "</td></tr>",
+                 "<tr><th style='text-align:left'>&nbsp;</th><td>&nbsp;</td></tr>",
+                 "<tr><th style='text-align:left'>MS<sup>2</sup>&nbsp;75%</th><td>", formatTIC(row$ms2.tic.75, 1e6), "</td></tr>",              
+                 "<tr><th style='text-align:left'>MS<sup>2</sup>&nbsp;median</th><td>", formatTIC(row$ms2.tic.50, 1e6), "</td></tr>",   
+                 "<tr><th style='text-align:left'>MS<sup>2</sup>&nbsp;25%</th><td>", formatTIC(row$ms2.tic.25, 1e6), "</td></tr>",                
+                 "<tr><th style='text-align:left'>MS<sup>2</sup>&nbsp;IQR</th><td>", formatTIC(row$ms2.tic.75-row$ms2.tic.25, 1e6), "</td></tr>",
+                  "</table></td>",
                  getHtmlTextImageFileInfo(row$lockmass.file),
                  getHtmlTextImageFileInfo(row$calibration.file),
                  getHtmlTextImageFileInfo(row$msmsEval.file),

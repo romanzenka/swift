@@ -1,3 +1,0 @@
-<sitemesh>
-    <mapping path="/extras" decorator="/decorators/bootstrap-theme.jsp" />
-</sitemesh>
