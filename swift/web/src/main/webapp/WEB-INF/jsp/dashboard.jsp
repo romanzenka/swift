@@ -65,21 +65,21 @@
     <div class="row">
         <div class="span4">
             <a href="http://prtp1fo1.mayo.edu">
-                <div class="hero-unit" style="background-image: url(/images/loki.jpg);">
+                <div class="hero-unit" style="background-image: url(/dashboard/images/loki.jpg);">
                     <h1>Loki</h1>
                 </div>
             </a>
         </div>
         <div class="span4">
             <a href="file:////mfad/rchapp/odin/prod">
-                <div class="hero-unit" style="background-image: url(/images/odin.jpg);">
+                <div class="hero-unit" style="background-image: url(/dashboard/images/odin.jpg);">
                     <h1>Odin</h1>
                 </div>
             </a>
         </div>
         <div class="span4">
             <a href="http://rofgmo100a/ganglia">
-                <div class="hero-unit" style="background-image: url(/images/ganglia.jpg);">
+                <div class="hero-unit" style="background-image: url(/dashboard/images/ganglia.jpg);">
                     <h1>Ganglia</h1>
                 </div>
             </a>
@@ -88,7 +88,7 @@
     <div class="row">
         <div class="span4 offset4">
             <a href="http://protini.mayo.edu">
-                <div class="hero-unit" style="background-image: url(/images/protini.jpg);">
+                <div class="hero-unit" style="background-image: url(/dashboard/images/protini.jpg);">
                     <h1>Protini</h1>
                 </div>
             </a>
