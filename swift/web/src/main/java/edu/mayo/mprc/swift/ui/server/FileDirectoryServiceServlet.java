@@ -22,7 +22,7 @@ public final class FileDirectoryServiceServlet {
 	public static final String DIRECTORY_PATH_ATTRIBUTE_NAME = "d";
 	public static final String EXPANDED_PATHS_ATTRIBUTE_NAME = "e";
 
-	@RequestMapping(value = "/start/DirectoryService", method = RequestMethod.GET)
+	@RequestMapping(value = "/start/DirectoryService", method = RequestMethod.POST)
 	public void handleRequest(final HttpServletRequest req, final HttpServletResponse resp) throws
 			ServletException, IOException {
 
