@@ -20,7 +20,7 @@ public final class ParameterSets {
 	@Resource(name = "paramsDao")
 	private ParamsDao paramsDao;
 
-	@RequestMapping(value = "/parameter-sets", method = RequestMethod.GET)
+	@RequestMapping(value = "/service/parameter-sets", method = RequestMethod.GET)
 	public ModelAndView listParameterSets() {
 		try {
 			getParamsDao().begin();

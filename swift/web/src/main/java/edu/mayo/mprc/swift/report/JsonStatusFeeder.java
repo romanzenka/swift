@@ -5,7 +5,9 @@ import edu.mayo.mprc.swift.db.SearchRunFilter;
 import edu.mayo.mprc.swift.db.SwiftDao;
 import edu.mayo.mprc.swift.dbmapping.SearchRun;
 import edu.mayo.mprc.utilities.FileUtilities;
-import org.springframework.web.HttpRequestHandler;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -16,7 +18,8 @@ import java.util.List;
 /**
  * Provides status of several last searches in JSON format, including the task information.
  */
-public class JsonStatusFeeder implements HttpRequestHandler {
+@Controller
+public class JsonStatusFeeder {
 	private SwiftDao swiftDao;
 	private static final int TYPICAL_RESPONSE_SIZE = 1024;
 
@@ -28,7 +31,7 @@ public class JsonStatusFeeder implements HttpRequestHandler {
 		this.swiftDao = swiftDao;
 	}
 
-	@Override
+	@RequestMapping(value = "/status/searches", method = RequestMethod.GET)
 	public void handleRequest(HttpServletRequest req, HttpServletResponse resp) throws ServletException {
 		PrintWriter out = null;
 		try {

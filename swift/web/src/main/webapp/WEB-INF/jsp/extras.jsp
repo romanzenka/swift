@@ -10,7 +10,7 @@
     <title>Swift Extras | <%=SwiftWebContext.getWebUi().getTitle()%>
     </title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link href="common/bootstrap/css/bootstrap.min.css" rel="stylesheet" media="screen">
+    <link href="../../common/bootstrap/css/bootstrap.min.css" rel="stylesheet" media="screen">
     <!-- HTML5 shim, for IE6-8 support of HTML5 elements -->
     <!--[if lt IE 9]>
     <script src="common/bootstrap/js/html5shiv.js"></script>
@@ -36,7 +36,7 @@
             <div class="nav-collapse collapse">
                 <ul class="nav">
                     <li><a href="/start">New Search</a></li>
-                    <li><a href="/report/report.jsp">Existing Searches</a></li>
+                    <li><a href="/report">Existing Searches</a></li>
                     <li><a href="/">About Swift</a></li>
                     <li><a href="/quameter">QuaMeter</a></li> <!-- TODO - make optional -->
                     <li class="active"><a href="/extras">Extras</a></li>
@@ -117,7 +117,7 @@
     </p>
 
     <p>
-        <a class="btn" href="/monitor.jsp">Component Monitor</a>
+        <a class="btn" href="/monitor">Component Monitor</a>
     </p>
 
     <h3>About</h3>
@@ -152,7 +152,7 @@
     </table>
 
 </div>
-<script src="common/bootstrap/js/jquery_1.9.0.min.js"></script>
-<script src="common/bootstrap/js/bootstrap.min.js"></script>
+<script src="../../common/bootstrap/js/jquery_1.9.0.min.js"></script>
+<script src="../../common/bootstrap/js/bootstrap.min.js"></script>
 </body>
 </html>

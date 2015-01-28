@@ -4,9 +4,10 @@ import edu.mayo.mprc.MprcException;
 import edu.mayo.mprc.common.client.StringUtilities;
 import edu.mayo.mprc.swift.db.SwiftDao;
 import edu.mayo.mprc.swift.dbmapping.TaskData;
-import edu.mayo.mprc.utilities.FileUtilities;
 import edu.mayo.mprc.workflow.persistence.TaskState;
-import org.springframework.web.HttpRequestHandler;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
@@ -17,31 +18,28 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public final class Benchmark implements HttpRequestHandler {
+@Controller
+public final class Benchmark {
 	private transient SwiftDao swiftDao;
 
 	public Benchmark() {
 	}
 
-	@Override
+	@RequestMapping(value = "/benchmark", method = RequestMethod.GET)
 	public void handleRequest(final HttpServletRequest req, final HttpServletResponse resp) {
 		final String idString = req.getParameter("id");
 		final int searchId = Integer.parseInt(idString);
 		if (idString != null) {
 			swiftDao.begin();
-			ServletOutputStream outputStream = null;
 			try {
 				final List<TaskData> taskDataList = swiftDao.getTaskDataList(searchId);
 				resp.setContentType("text/csv");
 				resp.setHeader("Content-Disposition", "attachment; filename=\"report_" + searchId + ".csv\"");
-				outputStream = resp.getOutputStream();
-				printTaskTable(outputStream, taskDataList);
+				printTaskTable(resp.getOutputStream(), taskDataList);
 				swiftDao.commit();
 			} catch (Exception e) {
 				swiftDao.rollback();
 				throw new MprcException("Could not create the report", e);
-			} finally {
-				FileUtilities.closeQuietly(outputStream);
 			}
 		}
 	}

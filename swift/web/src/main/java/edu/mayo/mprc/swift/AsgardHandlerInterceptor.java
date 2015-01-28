@@ -11,11 +11,15 @@ import javax.servlet.http.HttpServletResponse;
 public final class AsgardHandlerInterceptor extends HandlerInterceptorAdapter {
 	private final static String ASGARD_PREFIX = "http://asgard";
 
+	public AsgardHandlerInterceptor() {
+		int i = 0;
+	}
+
 	@Override
 	public boolean preHandle(final HttpServletRequest request, final HttpServletResponse response, final Object handler) throws Exception {
 		if (request.getRequestURL().toString().startsWith(ASGARD_PREFIX)) {
 
-			request.getRequestDispatcher("/dashboard.jsp").forward(request, response);
+			request.getRequestDispatcher("/dashboard").forward(request, response);
 			return false;
 		} else {
 			return super.preHandle(request, response, handler);

@@ -11,6 +11,11 @@
         <property name="autodetectAnnotations" value="true" />
     </bean>
 
+    <bean id="viewResolver" class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+        <property name="prefix" value="/WEB-INF/jsp/" />
+        <property name="suffix" value=".jsp" />
+    </bean>
+
     <bean class="org.springframework.web.servlet.view.ContentNegotiatingViewResolver">
         <property name="order" value="0" />
         <property name="mediaTypes">
@@ -21,10 +26,7 @@
         </property>
         <property name="viewResolvers">
             <list>
-                <bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
-                    <property name="prefix" value="/WEB-INF/jsp/" />
-                    <property name="suffix" value=".jsp" />
-                </bean>
+                <ref bean="viewResolver" />
             </list>
         </property>
         <property name="defaultViews">
@@ -42,6 +44,7 @@
         <property name="favorPathExtension" value="true" />
         <property name="favorParameter" value="true" />
         <property name="useNotAcceptableStatusCode" value="true" />
+        <property name="defaultContentType" value="text/html" />
     </bean>
 
     <bean class="org.springframework.web.servlet.mvc.annotation.AnnotationMethodHandlerAdapter">
@@ -67,4 +70,82 @@
     </mvc:interceptors>
 
     <context:component-scan base-package="edu.mayo.mprc.swift.webservice" />
+
+    <bean id="Benchmark" class="edu.mayo.mprc.swift.benchmark.Benchmark">
+        <property name="swiftDao" ref="swiftDao" />
+    </bean>
+
+    <bean id="TimeReport" class="edu.mayo.mprc.swift.report.TimeReportServlet">
+        <property name="swiftDao" ref="swiftDao" />
+    </bean>
+
+    <bean id="AminoAcidReport" class="edu.mayo.mprc.swift.report.AminoAcidReport">
+        <property name="aminoAcidSet" ref="aminoAcidSet" />
+        <property name="webUiHolder" ref="webUiHolder" />
+    </bean>
+
+    <bean id="ModificationReport" class="edu.mayo.mprc.swift.report.ModificationReport">
+        <property name="unimodDao" ref="unimodDao" />
+        <property name="webUiHolder" ref="webUiHolder" />
+    </bean>
+
+    <bean id="AnalysisReport" class="edu.mayo.mprc.swift.report.AnalysisReport">
+        <property name="searchDbDao" ref="searchDbDao" />
+        <property name="swiftDao" ref="swiftDao" />
+        <property name="webUiHolder" ref="webUiHolder" />
+    </bean>
+
+    <bean id="FindProtein" class="edu.mayo.mprc.swift.report.FindProtein">
+        <property name="searchDbDao" ref="searchDbDao" />
+        <property name="webUiHolder" ref="webUiHolder" />
+    </bean>
+
+    <bean id="SampleReport" class="edu.mayo.mprc.swift.report.SampleReport">
+        <property name="searchDbDao" ref="searchDbDao" />
+    </bean>
+
+    <bean id="Status" class="edu.mayo.mprc.swift.report.JsonStatusFeeder">
+        <property name="swiftDao" ref="swiftDao" />
+    </bean>
+
+    <bean id="Feed" class="edu.mayo.mprc.swift.report.RssStatusFeeder">
+        <property name="swiftDao" ref="swiftDao" />
+    </bean>
+
+    <bean id="FileUploadServlet" class="edu.mayo.mprc.dbcurator.server.FASTAFileUploadServlet">
+        <property name="curationContext" ref="curationContext" />
+    </bean>
+    <bean id="CommonDataRequester" class="edu.mayo.mprc.dbcurator.server.CommonDataRequesterImpl">
+        <property name="logic" ref="CommonDataRequesterLogic" />
+    </bean>
+
+    <bean id="CommonDataRequesterLogic" class="edu.mayo.mprc.dbcurator.server.CommonDataRequesterLogic">
+        <property name="curationDao" ref="curationDao" />
+        <property name="curationContext" ref="curationContext" />
+    </bean>
+
+    <mvc:view-controller path="/report/" view-name="report/report" />
+
+    <bean id="reportUpdate" class="edu.mayo.mprc.swift.report.ReportUpdate">
+        <property name="fileTokenFactory" ref="fileTokenFactory" />
+        <property name="searchDbDao" ref="searchDbDao" />
+        <property name="swiftDao" ref="swiftDao" />
+        <property name="webUiHolder" ref="webUiHolder" />
+        <property name="swiftSearcherCaller" ref="swiftSearcherCaller" />
+    </bean>
+
+    <mvc:view-controller path="/" view-name="index" />
+    <mvc:view-controller path="/dashboard" view-name="dashboard" />
+    <mvc:view-controller path="/extras" view-name="extras" />
+    <mvc:view-controller path="/memory" view-name="memory" />
+    <mvc:view-controller path="/monitor" view-name="monitor" />
+
+    <mvc:view-controller path="/start/" view-name="start/index" />
+    <mvc:view-controller path="/quameter/" view-name="quameter/index" />
+    <mvc:view-controller path="/quameter/tags" view-name="quameter/tags" />
+    <mvc:view-controller path="/quameter/unhide" view-name="quameter/unhide" />
+    <mvc:view-controller path="/heme/" view-name="heme/heme" />
+    <mvc:view-controller path="/heme/heme_report" view-name="heme/heme_report" />
+
+    <mvc:default-servlet-handler />
 </beans>

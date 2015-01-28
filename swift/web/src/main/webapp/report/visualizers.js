@@ -46,7 +46,7 @@ SearchRunItemVisualizer.prototype.toggleExpanded = function (evt) {
     if (object.expanded) {
         var objectId = object.id;
         $.ajax({
-                "url": "reportupdate",
+                "url": "/report/reportupdate",
                 "data": {action: 'expand', id: objectId}
             }
         ).done(function (data) {
@@ -168,7 +168,7 @@ SearchRunItemVisualizer.prototype.fillWithContents = function (fragment, id, obj
             rerunLink = document.createElement("a");
             rerunLink.appendChild(document.createTextNode("Rerun"));
             rerunLink.className = "rerun-link";
-            rerunLink.href = "reportupdate?rerun=" + object.id;
+            rerunLink.href = "/report/reportupdate?rerun=" + object.id;
             rerunLink.title = "Rerun " + object.id;
             $(rerunLink).on("click", {"id": object.id, "title": object.title}, this.confirmRerun);
             tdAction.appendChild(rerunLink);
@@ -195,7 +195,7 @@ SearchRunItemVisualizer.prototype.fillWithContents = function (fragment, id, obj
             hideLink = document.createElement("a");
             hideLink.appendChild(document.createTextNode("Hide"));
             hideLink.className = "hide-link";
-            hideLink.href = "reportupdate?hide=" + object.id;
+            hideLink.href = "/report/reportupdate?hide=" + object.id;
             hideLink.title = "Hide " + object.id;
             $(hideLink).on("click", {"id": object.id, "title": object.title}, this.confirmHide);
             tdAction.appendChild(hideLink);
@@ -314,7 +314,7 @@ SearchRunItemVisualizer.prototype.fillWithContents = function (fragment, id, obj
             bar.className = "progressbar-error";
             errorLink = document.createElement("a");
             errorLink.title = object.errormsg;
-            errorLink.href = "taskerror.jsp?tid=" + object.id;
+            errorLink.href = "taskerror?tid=" + object.id;
             errorLink.target = "_blank";
             errorLink.appendChild(document.createTextNode("ERROR"));
             bar.appendChild(errorLink);
@@ -450,7 +450,7 @@ TaskItemVisualizer.prototype.fillWithContents = function (element, id, object) {
         item.title = object.time + (object.warningmsg != null ? ' ' + object.warningmsg : '' );
         if (object.errormsg != null && object.errormsg != "") {
             var errorLink = document.createElement("a");
-            errorLink.href = "taskerror.jsp?id=" + object.taskid;
+            errorLink.href = "taskerror?id=" + object.taskid;
             errorLink.target = "_blank";
             errorLink.appendChild(document.createTextNode("ERROR "));
             item.title += " " + object.errormsg;
@@ -512,7 +512,7 @@ TaskItemVisualizer.prototype.fillWithContents = function (element, id, object) {
         var jobid = document.createElement("td");
         if (object.jobid != null) {
             if (object.status == "Running") {
-                $(jobid).append('<a href="reportupdate?qstat=' + object.jobid + '" title="Grid engine job id">' + object.jobid + '</a>')
+                $(jobid).append('<a href="/report/reportupdate?qstat=' + object.jobid + '" title="Grid engine job id">' + object.jobid + '</a>')
             }
             else
                 $(jobid).append(object.jobid);

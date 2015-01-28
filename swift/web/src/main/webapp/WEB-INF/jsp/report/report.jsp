@@ -25,13 +25,13 @@
         var pathWebPrefix = "<%=SwiftWebContext.getWebUi().getBrowseWebRoot().replace("\\", "\\\\") %>";
     </script>
 
-    <link rel="stylesheet" href="report.css">
+    <link rel="stylesheet" href="../../../report/report.css">
     <script type="text/javascript" src="/start/filechooser/cookies.js"></script>
     <script type="text/javascript" src="/common/bootstrap/js/jquery_1.9.0.min.js"></script>
     <script type="text/javascript" src="/common/bootstrap/js/jquery.tmpl.1.1.1.js"></script>
-    <script type="text/javascript" src="updates.js"></script>
-    <script type="text/javascript" src="visualizers.js"></script>
-    <script type="text/javascript" src="filters.js"></script>
+    <script type="text/javascript" src="../../../report/updates.js"></script>
+    <script type="text/javascript" src="../../../report/visualizers.js"></script>
+    <script type="text/javascript" src="../../../report/filters.js"></script>
     <script type="text/javascript">
         window.test = ({total: 0});
     </script>
@@ -186,7 +186,7 @@
 
         function ajaxRequest(action) {
             $.ajax({
-                "url": "reportupdate",
+                "url": "/report/reportupdate",
                 "type": "GET",
                 "data": {
                     action: action,
@@ -249,7 +249,7 @@
     <span class="logo-small"><%=SwiftWebContext.getWebUi().getTitle()%></span>
     <ul class="locations">
         <li><a href="/start">New search</a></li>
-        <li class="active-tab"><a href="/report/report.jsp">Existing searches</a></li>
+        <li class="active-tab"><a href="/report">Existing searches</a></li>
         <li><a href="/">About Swift</a></li>
         <li><a href="/quameter">QuaMeter</a></li>
         <!-- TODO - make optional -->

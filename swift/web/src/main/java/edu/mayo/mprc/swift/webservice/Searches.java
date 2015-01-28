@@ -26,7 +26,7 @@ public final class Searches {
 	public Searches() {
 	}
 
-	@RequestMapping(value = "/searches", method = RequestMethod.POST)
+	@RequestMapping(value = "/service/searches", method = RequestMethod.POST)
 	public ModelAndView runSearch(
 			@RequestBody final MultiValueMap<String, String> searchInputMap) {
 		try {

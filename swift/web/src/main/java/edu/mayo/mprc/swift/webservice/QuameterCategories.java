@@ -22,7 +22,7 @@ public final class QuameterCategories {
 	@Resource(name = "swiftEnvironment")
 	private RunningApplicationContext runningApplicationContext;
 
-	@RequestMapping(value = "/quameter-categories", method = RequestMethod.GET)
+	@RequestMapping(value = "/service/quameter-categories", method = RequestMethod.GET)
 	public ModelAndView listParameterSets() {
 		try {
 			final QuameterUi.Config config = getRunningApplicationContext().getSingletonConfig(QuameterUi.Config.class);

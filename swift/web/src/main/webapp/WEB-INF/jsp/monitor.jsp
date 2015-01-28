@@ -13,7 +13,7 @@
     } %>
     <title>Monitor | <%=SwiftWebContext.getWebUi().getTitle()%>
     </title>
-    <link href="common/bootstrap/css/bootstrap.min.css" rel="stylesheet" media="screen">
+    <link href="../../common/bootstrap/css/bootstrap.min.css" rel="stylesheet" media="screen">
 </head>
 <body>
 <div class="container">
@@ -42,7 +42,7 @@
         %>
     </table>
 </div>
-<script src="common/bootstrap/js/jquery_1.9.0.min.js"></script>
-<script src="common/bootstrap/js/bootstrap.min.js"></script>
+<script src="../../common/bootstrap/js/jquery_1.9.0.min.js"></script>
+<script src="../../common/bootstrap/js/bootstrap.min.js"></script>
 </body>
 </html>

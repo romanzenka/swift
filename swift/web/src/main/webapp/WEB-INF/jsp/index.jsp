@@ -36,7 +36,7 @@
             display: block;
             width: 320px;
             height: 80px;
-            background-image: url(button.gif);
+            background-image: url(../../button.gif);
             text-align: center;
             line-height: 80px;
             float: left;
@@ -47,7 +47,7 @@
         }
 
         a:hover.button {
-            background-image: url(button_pressed.gif);
+            background-image: url(../../button_pressed.gif);
         }
 
             /* Rewrite the default blue tab background */
@@ -106,7 +106,7 @@
     <span class="logo-small"><%=SwiftWebContext.getWebUi().getTitle()%></span>
     <ul class="locations">
         <li><a href="/start">New search</a></li>
-        <li><a href="/report/report.jsp">Existing searches</a></li>
+        <li><a href="/report">Existing searches</a></li>
         <li class="active-tab"><a href="/">About Swift</a></li>
         <li><a href="/quameter">QuaMeter</a></li> <!-- TODO - make optional -->
         <li><a href="/extras">Extras</a></li>
@@ -150,7 +150,7 @@
     <p>Click the buttons below to start using Swift:</p>
 
     <div class="buttons">
-        <a class="button" href="start">Start new search</a>
+        <a class="button" href="../../start">Start new search</a>
         <a class="button" href="report/report.jsp">View existing searches</a>
     </div>
 </div>

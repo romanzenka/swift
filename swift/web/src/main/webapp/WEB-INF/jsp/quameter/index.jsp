@@ -20,7 +20,7 @@
 
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="/common/bootstrap/css/bootstrap.min.css" rel="stylesheet" media="screen">
-    <link href="css/quameter.css" rel="stylesheet" media="screen">
+    <link href="../../../quameter/css/quameter.css" rel="stylesheet" media="screen">
 
     <!-- HTML5 shim, for IE6-8 support of HTML5 elements -->
     <!--[if lt IE 9]>
@@ -56,8 +56,8 @@
             </div>
             <div class="btn-toolbar pull-right">
                 <div class="btn-group" id="extra-buttons">
-                    <a href="/quameter/unhide.jsp" class="btn"><i class="icon-remove"></i> Unhide</a>
-                    <a href="/quameter/tags.jsp" class="btn"><i class="icon-tag"></i> Tags</a>
+                    <a href="/quameter/unhide" class="btn"><i class="icon-remove"></i> Unhide</a>
+                    <a href="/quameter/tags" class="btn"><i class="icon-tag"></i> Tags</a>
                     <a href="/service/getQuameterDataTable" class="btn"><i class="icon-download"></i> Data</a>
                 </div>
             </div>
@@ -142,9 +142,9 @@
     %>;
 </script>
 
-<script type="text/javascript" src="js/dygraph-combined.js"></script>
-<script type="text/javascript" src="js/quameter-definitions.js"></script>
-<script type="text/javascript" src="js/quameter.js"></script>
+<script type="text/javascript" src="../../../quameter/js/dygraph-combined.js"></script>
+<script type="text/javascript" src="../../../quameter/js/quameter-definitions.js"></script>
+<script type="text/javascript" src="../../../quameter/js/quameter.js"></script>
 <script type="text/javascript">
     var graphDataSrvr = <%
     if(quameterUi!=null) {

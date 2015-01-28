@@ -22,7 +22,7 @@ public final class Engines {
 	public Engines() {
 	}
 
-	@RequestMapping(value = "/engines", method = RequestMethod.GET)
+	@RequestMapping(value = "/service/engines", method = RequestMethod.GET)
 	public ModelAndView listSearchEngines() {
 		try {
 			final Collection<SearchEngine> searchEngines = getWebUiHolder().getWebUi().getSearchEngines();

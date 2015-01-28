@@ -20,7 +20,7 @@ import javax.annotation.Resource;
 public final class HemeService {
 	private RunningApplicationContext applicationContext;
 
-	@RequestMapping(value = "/heme/data/{entry}/massDelta", method = RequestMethod.POST)
+	@RequestMapping(value = "/service/heme/data/{entry}/massDelta", method = RequestMethod.POST)
 	public ModelAndView setMassDelta(
 			@PathVariable
 			final int entry,
@@ -43,7 +43,7 @@ public final class HemeService {
 		return modelAndView;
 	}
 
-	@RequestMapping(value = "/heme/data/{entry}/massDeltaTolerance", method = RequestMethod.POST)
+	@RequestMapping(value = "/service/heme/data/{entry}/massDeltaTolerance", method = RequestMethod.POST)
 	public ModelAndView setMassDeltaTolerance(
 			@PathVariable
 			final int entry,
@@ -66,7 +66,7 @@ public final class HemeService {
 		return modelAndView;
 	}
 
-	@RequestMapping(value = "/heme/data/{entry}/startSearch", method = RequestMethod.POST)
+	@RequestMapping(value = "/service/heme/data/{entry}/startSearch", method = RequestMethod.POST)
 	public ModelAndView startSearch(@PathVariable final int entry) {
 		final HemeUi hemeUi = getHemeUi();
 
@@ -83,7 +83,7 @@ public final class HemeService {
 	}
 
 	//GET from HemePath list when button is "Result" -> to the report.
-	@RequestMapping(value = "/heme/data/{entry}/report.*", method = RequestMethod.GET)
+	@RequestMapping(value = "/service/heme/data/{entry}/report.*", method = RequestMethod.GET)
 	public ModelAndView viewReport(@PathVariable final int entry) {
 		final HemeUi hemeUi = getHemeUi();
 		final ModelAndView modelAndView = new ModelAndView();

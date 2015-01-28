@@ -8,7 +8,9 @@ import edu.mayo.mprc.swift.dbmapping.SearchRun;
 import edu.mayo.mprc.swift.resources.WebUi;
 import edu.mayo.mprc.swift.resources.WebUiHolder;
 import edu.mayo.mprc.utilities.FileUtilities;
-import org.springframework.web.HttpRequestHandler;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -22,11 +24,12 @@ import java.util.List;
  *
  * @author Roman Zenka
  */
-public class FindProtein implements HttpRequestHandler {
+@Controller
+public class FindProtein {
 	private SearchDbDao searchDbDao;
 	private WebUiHolder webUiHolder;
 
-	@Override
+	@RequestMapping(value = "/find-protein", method = RequestMethod.GET)
 	public void handleRequest(final HttpServletRequest req, final HttpServletResponse resp) throws ServletException, IOException {
 		resp.setContentType("text/html");
 		OutputStreamWriter writer = null;

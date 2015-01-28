@@ -22,7 +22,7 @@
         .ajax-progress {
             visibility: hidden;
             display: inline-block;
-            background-image: url(ajax-loader.gif);
+            background-image: url(../../../heme/ajax-loader.gif);
             width: 16px;
             height: 11px;
             border: 0;
