@@ -144,9 +144,6 @@
     <mvc:view-controller path="/monitor" view-name="monitor" />
 
     <mvc:view-controller path="/start/" view-name="start/index" />
-    <mvc:view-controller path="/quameter/" view-name="quameter/index" />
-    <mvc:view-controller path="/quameter/tags" view-name="quameter/tags" />
-    <mvc:view-controller path="/quameter/unhide" view-name="quameter/unhide" />
     <mvc:view-controller path="/heme/" view-name="heme/heme" />
     <mvc:view-controller path="/heme/heme_report" view-name="heme/heme_report" />
 
