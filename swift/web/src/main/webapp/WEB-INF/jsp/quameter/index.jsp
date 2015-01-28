@@ -1,26 +1,12 @@
-<%@ page import="edu.mayo.mprc.MprcException" %>
-<%@ page import="edu.mayo.mprc.config.ResourceConfig" %>
-<%@ page import="edu.mayo.mprc.quameterdb.QuameterUi" %>
-<%@ page import="edu.mayo.mprc.swift.MainFactoryContext" %>
-<%@ page import="edu.mayo.mprc.swift.SwiftWebContext" %>
-<%@ page import="java.io.StringWriter" %>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <!DOCTYPE html>
-<% final ResourceConfig quameterUiConfig = MainFactoryContext.getSwiftEnvironment().getSingletonConfig(QuameterUi.Config.class); %>
-<html lang="en"><%
-    final QuameterUi quameterUi;
-    if (quameterUiConfig != null) {
-        quameterUi = (QuameterUi) MainFactoryContext.getSwiftEnvironment().createResource(quameterUiConfig);
-    } else {
-        quameterUi = null;
-    }
-%>
+<html lang="en">
 <head>
-    <title>QuaMeter | <%=SwiftWebContext.getWebUi().getTitle()%>
-    </title>
+    <title>QuaMeter | ${title}</title>
 
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="/common/bootstrap/css/bootstrap.min.css" rel="stylesheet" media="screen">
-    <link href="../../../quameter/css/quameter.css" rel="stylesheet" media="screen">
+    <link href="/quameter/css/quameter.css" rel="stylesheet" media="screen">
 
     <!-- HTML5 shim, for IE6-8 support of HTML5 elements -->
     <!--[if lt IE 9]>
@@ -74,20 +60,19 @@
         </div>
     </div>
 
-    <% if (quameterUi == null) { %>
-    <div class="alert">
-        <p><strong>Warning</strong> The QuaMeter module is not configured.</p>
+    <c:choose>
+        <c:when test="${empty quameterUi}">
+            <div class="alert">
+                <p><strong>Warning</strong> The QuaMeter module is not configured.</p>
 
-        <p>You need to add the QuaMeterUi resource to the
-            <code><%= MainFactoryContext.getSwiftEnvironment().getDaemonConfig().getName() %>
-            </code> daemon.</p>
-    </div>
-    <% } else { %>
-
-    <div id="detailedGraphs" style="margin-top: 40px; display: none;"></div>
-    <div id="simpleGraphs" style="margin-top: 40px"></div>
-
-    <% } %>
+                <p>You need to add the QuaMeterUi resource to the <code>${daemonName}</code> daemon.</p>
+            </div>
+        </c:when>
+        <c:otherwise>
+            <div id="detailedGraphs" style="margin-top: 40px; display: none;"></div>
+            <div id="simpleGraphs" style="margin-top: 40px"></div>
+        </c:otherwise>
+    </c:choose>
 
     <div id="annotFormDiv" class="annotationDiv">
         <form id="annotForm" action="/service/new-annotation" method="post" onsubmit="return false;">
@@ -127,40 +112,15 @@
 
 <script type="text/javascript" src="/common/bootstrap/js/bootstrap.js"></script>
 
-<!-- Graph Dependancies -->
-<%--<script type="text/javascript" src="js/tmp.js"></script>--%>
-
 <script type="text/javascript">
-    var metrics = <%
-        if(quameterUi!=null) {
-            final StringWriter writer = new StringWriter(10000);
-            quameterUi.writeMetricsJson(writer);
-            out.print(writer.toString());
-        } else {
-            out.print("null");
-        }
-    %>;
+    var metrics = ${metricsJson};
 </script>
 
 <script type="text/javascript" src="../../../quameter/js/dygraph-combined.js"></script>
 <script type="text/javascript" src="../../../quameter/js/quameter-definitions.js"></script>
 <script type="text/javascript" src="../../../quameter/js/quameter.js"></script>
 <script type="text/javascript">
-    var graphDataSrvr = <%
-    if(quameterUi!=null) {
-        quameterUi.begin();
-        try {
-            final StringWriter writer = new StringWriter(10000);
-            quameterUi.dataTableJson(writer);
-            quameterUi.commit();
-            out.print(writer.toString());
-        } catch (Exception e) {
-            quameterUi.rollback();
-            throw new MprcException(e);
-        }
-    } else { %>
-            null
-    <% } %>
+    var graphDataSrvr = ${dataJson};
     // Set a callback to run when the Google Visualization API is loaded.
     google.setOnLoadCallback(initSimpleCharts(graphDataSrvr));
 

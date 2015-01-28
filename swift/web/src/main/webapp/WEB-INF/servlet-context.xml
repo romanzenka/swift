@@ -139,7 +139,6 @@
         <property name="swiftSearcherCaller" ref="swiftSearcherCaller" />
     </bean>
 
-    <mvc:view-controller path="/" view-name="index" />
     <mvc:view-controller path="/dashboard" view-name="dashboard" />
     <mvc:view-controller path="/memory" view-name="memory" />
     <mvc:view-controller path="/monitor" view-name="monitor" />
