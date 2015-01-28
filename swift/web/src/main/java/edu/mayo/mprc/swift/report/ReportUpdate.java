@@ -247,7 +247,7 @@ public final class ReportUpdate {
 	private void forwardToReportPage(final HttpServletRequest req, final HttpServletResponse resp) {
 		try {
 			// Forward the viewer back to the report page
-			resp.sendRedirect("/report/report");
+			resp.sendRedirect("/report/");
 		} catch (Exception ignore) {
 			// SWALLOWED: This is not essential, if it fails, no big deal
 		}

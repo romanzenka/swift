@@ -150,8 +150,8 @@
     <p>Click the buttons below to start using Swift:</p>
 
     <div class="buttons">
-        <a class="button" href="../../start">Start new search</a>
-        <a class="button" href="report/report.jsp">View existing searches</a>
+        <a class="button" href="/start/">Start new search</a>
+        <a class="button" href="/report/">View existing searches</a>
     </div>
 </div>
 </body>
