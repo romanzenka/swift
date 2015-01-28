@@ -5,6 +5,8 @@ import edu.mayo.mprc.config.RunningApplicationContext;
 import edu.mayo.mprc.heme.HemeReport;
 import edu.mayo.mprc.heme.HemeUi;
 import edu.mayo.mprc.heme.ProteinEntity.Filter;
+import edu.mayo.mprc.swift.resources.WebUi;
+import edu.mayo.mprc.swift.resources.WebUiHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -21,6 +23,7 @@ import java.text.SimpleDateFormat;
 @Controller
 public final class HemeService {
 	private RunningApplicationContext applicationContext;
+	private WebUiHolder webUiHolder;
 
 	@RequestMapping(value = "/service/heme/data/{entry}/massDelta", method = RequestMethod.POST)
 	public ModelAndView setMassDelta(
@@ -90,6 +93,8 @@ public final class HemeService {
 		final HemeUi hemeUi = getHemeUi();
 		final ModelAndView modelAndView = new ModelAndView();
 
+		modelAndView.addObject("title", getWebUi().getTitle());
+
 		hemeUi.begin();
 		try {
 			HemeReport report = hemeUi.createReport(entry);
@@ -125,5 +130,16 @@ public final class HemeService {
 		this.applicationContext = applicationContext;
 	}
 
+	private WebUi getWebUi() {
+		return getWebUiHolder().getWebUi();
+	}
 
+	public WebUiHolder getWebUiHolder() {
+		return webUiHolder;
+	}
+
+	@Resource(name = "webUiHolder")
+	public void setWebUiHolder(WebUiHolder webUiHolder) {
+		this.webUiHolder = webUiHolder;
+	}
 }
