@@ -1,22 +1,11 @@
-<%@ page import="edu.mayo.mprc.heme.HemeReport" %>
-<%@ page import="edu.mayo.mprc.heme.PeptideEntity" %>
-<%@ page import="edu.mayo.mprc.heme.ProteinEntity" %>
-<%@ page import="edu.mayo.mprc.swift.SwiftWebContext" %>
-<%@ page import="edu.mayo.mprc.swift.helper.HemeHelper" %>
-<%@ page import="java.text.SimpleDateFormat" %>
-<%@ page import="java.util.List" %>
+<%@ taglib prefix="tags" tagdir="/WEB-INF/tags" %>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
+<%@ taglib prefix="sw" uri="http://swift.mayo.edu/swift.tld" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
-<% HemeReport report = (HemeReport) request.getAttribute("report");
-    final SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
-    List<ProteinEntity> confirmedList = report.get_ProteinEntities_by_filter(ProteinEntity.Filter.MUTATION_CONFIRMED);
-    List<ProteinEntity> relatedList = report.get_ProteinEntities_by_filter(ProteinEntity.Filter.RELATED_MUTANT);
-    List<ProteinEntity> unsupportedList = report.get_ProteinEntities_by_filter(ProteinEntity.Filter.UNSUPPORTED);
-    List<ProteinEntity> otherList = report.get_ProteinEntities_by_filter(ProteinEntity.Filter.OTHER);
-
-%>
 <html>
 <head>
-    <title>Report | <%=SwiftWebContext.getWebUi().getTitle()%>
+    <title>Report | ${title}
     </title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="/common/bootstrap/css/bootstrap.min.css" rel="stylesheet" media="screen">
@@ -30,6 +19,7 @@
         font-family: "Courier New", Courier, monospace;
         font-size: 16pt;
     }
+
     .warn {
         color: red;
     }
@@ -40,9 +30,10 @@
         <div class="navbar-inner">
             <a href="/heme/heme.jsp" class="btn btn-info pull-right">Return to Reports</a>
 
-            <h1>Report: <%=report.getName()%>
-            </h1>Target Mass: <%=report.getMass()%> &#177; <%=report.getMassTolerance()%></br>
-            <small style="margin-left:20px;">Date: <%=format.format(report.getDate())%> </small>
+            <h1>Report: ${report.name}
+            </h1>
+            Target Mass: ${report.mass} &#177; ${report.massTolerance}<br/>
+            <small style="margin-left:20px;">Date: ${reportDate} </small>
         </div>
     </div>
 
@@ -50,76 +41,69 @@
     <h3>Hemoglobin Mutant Peptides</h3>
 
     <blockquote class="muted">
-        These protein groups contain at least one protein that matches the requested intact mass within given tolerance.</br>
-        If there are multiple proteins listed in a cell, it is because we could not distinguish between them based on the peptide evidence itself.
+        These protein groups contain at least one protein that matches the requested intact mass within given
+        tolerance.</br>
+        If there are multiple proteins listed in a cell, it is because we could not distinguish between them based on
+        the peptide evidence itself.
     </blockquote>
-
 
     <table id="confirmed" class="table table-striped">
         <thead>
         <tr>
-            <th>Protein <%=HemeHelper.arrows()%></th>
-            <th>Peptides <%=HemeHelper.arrows()%></th>
-            <th>Spectra <%=HemeHelper.arrows()%></th>
-            <th>Description <%=HemeHelper.arrows()%></th>
-            <th>Mass <%=HemeHelper.arrows()%></th>
+            <th>Protein <tags:arrows/></th>
+            <th>Peptides <tags:arrows/></th>
+            <th>Spectra <tags:arrows/></th>
+            <th>Description <tags:arrows/></th>
+            <th>Mass <tags:arrows/></th>
             <th></th>
         </tr>
         </thead>
         <tbody>
-        <% for (ProteinEntity p : confirmedList) {%>
-        <tr>
-            <td><%=p.getAccNum()%></td>
-            <td><%=p.getPeptides().size()%></td>
-            <td style="text-align:center;"><%=p.getTotalSpectra()%></td>
-            <td><%=p.getNeatDescription()%></td>
-            <td><%=p.getMass()%></td>
-            <td><a href="#modal_<%=p.getAccNum()%>" role="button" class="btn" data-toggle="modal">View</a></td>
-        </tr>
-        <%}%>
+        <c:forEach var="p" items="${confirmedList}">
+            <tr>
+                <td>${p.accNum}</td>
+                <td>${fn:length(p.peptides)}</td>
+                <td style="text-align:center;">${p.totalSpectra}</td>
+                <td>${p.neatDescription}</td>
+                <td>${p.mass}</td>
+                <td><a href="#modal_${p.accNum}" role="button" class="btn" data-toggle="modal">View</a></td>
+            </tr>
+        </c:forEach>
         </tbody>
     </table>
-
-
-
-
 
 
     <h3>Hemoglobin Peptides Lacking Evidence of Mutation</h3>
 
     <blockquote class="muted">
         These protein groups were identified by search, but lack peptide support on that particular mutation.</br>
-        If there are multiple proteins listed in a cell, it is because we could not distinguish between them based on the peptide evidence itself.
+        If there are multiple proteins listed in a cell, it is because we could not distinguish between them based on
+        the peptide evidence itself.
     </blockquote>
 
 
     <table id="unsupported" class="table table-striped">
         <thead>
         <tr>
-            <th>Protein <%=HemeHelper.arrows()%></th>
-            <th>Peptides <%=HemeHelper.arrows()%></th>
-            <th>Spectra <%=HemeHelper.arrows()%></th>
-            <th>Description <%=HemeHelper.arrows()%></th>
-            <th>Mass <%=HemeHelper.arrows()%></th>
+            <th>Protein <tags:arrows/></th>
+            <th>Peptides <tags:arrows/></th>
+            <th>Spectra <tags:arrows/></th>
+            <th>Description <tags:arrows/></th>
+            <th>Mass <tags:arrows/></th>
             <th></th>
         </tr>
         </thead>
-        <% for (ProteinEntity p : unsupportedList) {%>
-        <tr>
-            <td><%=p.getAccNum()%></td>
-            <td><%=p.getPeptides().size()%></td>
-            <td style="text-align:center;"><%=p.getTotalSpectra()%></td>
-            <td><%=p.getNeatDescription()%></td>
-            <td><%=p.getMass()%></td>
-            <td><a href="#modal_<%=p.getAccNum()%>" role="button" class="btn" data-toggle="modal">View</a></td>
-        </tr>
-        <%}%>
+        <c:forEach var="p" items="${unsupportedList}">
+            <tr>
+                <td>${p.accNum}</td>
+                <td>${fn:length(p.peptides)}</td>
+                <td style="text-align:center;">${p.totalSpectra}</td>
+                <td>${p.neatDescription}</td>
+                <td>${p.mass}</td>
+                <td><a href="#modal_${p.accNum}" role="button" class="btn" data-toggle="modal">View</a></td>
+            </tr>
+        </c:forEach>
     </table>
-
-
-
-
-
 
 
     <h3>Related Mutant Proteins</h3>
@@ -131,21 +115,25 @@
     <table id="related" class="table table-striped">
         <thead>
         <tr>
-        <th>Protein <%=HemeHelper.arrows()%></th>
-                    <th>Spectra <%=HemeHelper.arrows()%></th>
-                    <th>Description <%=HemeHelper.arrows()%></th>
-                    <th>Mass <%=HemeHelper.arrows()%></th>
-            </tr>
+            <th>Protein <tags:arrows/>
+            </th>
+            <th>Spectra <tags:arrows/>
+            </th>
+            <th>Description <tags:arrows/>
+            </th>
+            <th>Mass <tags:arrows/>
+            </th>
+        </tr>
         </thead>
         <tbody>
-        <% for (ProteinEntity p : relatedList) { %>
-        <tr>
-            <td><%=p.getAccNum()%></td>
-            <td style="text-align:center;"><%=p.getTotalSpectra()%></td>
-            <td><%=p.getNeatDescription()%></td>
-            <td><%=p.getMass()%></td>
-        </tr>
-        <% } %>
+        <c:forEach var="p" items="${relatedList}">
+            <tr>
+                <td>${p.accNum}</td>
+                <td style="text-align:center;">${p.totalSpectra}</td>
+                <td>${p.neatDescription}</td>
+                <td>${p.mass}</td>
+            </tr>
+        </c:forEach>
         </tbody>
     </table>
 
@@ -158,19 +146,24 @@
     <table id="other" class="table table-striped">
         <thead>
         <tr>
-         <th>Protein <%=HemeHelper.arrows()%></th>
-         <th>Spectra <%=HemeHelper.arrows()%></th>
-         <th>Description <%=HemeHelper.arrows()%></th>
+            <th>Protein <tags:arrows/>
+            </th>
+            <th>Spectra <tags:arrows/>
+            </th>
+            <th>Description <tags:arrows/>
+            </th>
         </tr>
         </thead>
         <tbody>
-        <% for (ProteinEntity p : otherList) {%>
-        <tr>
-            <td><a href="http://www.genome.jp/dbget-bin/www_bget?sp:<%=p.getAccNum()%>"><%=p.getAccNum()%></a></td>
-            <td style="text-align:center;"><%=p.getTotalSpectra()%></td>
-            <td><small><%=p.getNeatDescription()%></small></td>
-        </tr>
-        <%}%>
+        <c:forEach var="p" items="${otherList}">
+            <tr>
+                <td><a href="http://www.genome.jp/dbget-bin/www_bget?sp:${p.accNum}">${p.accNum}</a></td>
+                <td style="text-align:center;">${p.totalSpectra}</td>
+                <td>
+                    <small>${p.neatDescription}</small>
+                </td>
+            </tr>
+        </c:forEach>
         </tbody>
     </table>
 
@@ -178,53 +171,55 @@
 </div>
 
 
-
-
-
-    <!-- HOME FOR MODALS  -->
-    <% for (ProteinEntity p : confirmedList) {%>
+<!-- HOME FOR MODALS  -->
+<c:forEach var="p" items="${confirmedList}">
     <!-- Modal -->
-    <div id="modal_<%=p.getAccNum()%>" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-      <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
-        <h3 id="myModalLabel"><%=p.getAccNum()%></h3>
-      </div>
-      <div class="modal-body">
-          </br>
-          <p class="monoText" style="font-weight: bold;"><%=HemeHelper.colorizeSequence(p.getCigar(), p.getSequence())%></p>
-             <% for (PeptideEntity pep : p.getPeptides()) { %>
-                 <p class="monoText"><%= HemeHelper.nonBlankSpaces(pep.getStart()) %><%=pep.getSequence()%></p>
-             <%}%>
-      </div>
-      <div class="modal-footer">
-        <button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
-      </div>
+    <div id="modal_${p.accNum}" class="modal hide fade" tabindex="-1" role="dialog"
+         aria-labelledby="myModalLabel"
+         aria-hidden="true">
+        <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+            <h3 id="myModalLabel">${p.accNum}</h3>
+        </div>
+        <div class="modal-body">
+            <br/>
+
+            <p class="monoText"
+               style="font-weight: bold;">${sw:colorizeSequence(p.cigar, p.sequence)}
+            </p>
+            <c:forEach var="pep" items="${p.peptides}">
+                <p class="monoText">${sw:nonBlankSpaces(pep.start)}${pep.sequence}</p>
+            </c:forEach>
+        </div>
+        <div class="modal-footer">
+            <button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
+        </div>
     </div>
-    <%}%>
+</c:forEach>
 
-
-
-<% for (ProteinEntity p : unsupportedList) {%>
-<!-- Modal -->
-<div id="modal_<%=p.getAccNum()%>" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-    <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
-        <h3 id="myModalLabel"><%=p.getAccNum()%></h3>
+<c:forEach var="p" items="${unsupportedList}">
+    <!-- Modal -->
+    <div id="modal_${p.accNum}" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
+         aria-hidden="true">
+        <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+            <h3 id="myModalLabel">${p.accNum}</h3>
+        </div>
+        <div class="modal-body">
+            </br>
+            <p class="monoText"
+               style="font-weight: bold;">${sw:colorizeSequence(p.cigar, p.sequence)}
+            </p>
+            <c:forEach var="pep" items="${p.peptides}">
+                <p class="monoText">${sw:nonBlankSpaces(pep.start)}${pep.sequence}
+                </p>
+            </c:forEach>
+        </div>
+        <div class="modal-footer">
+            <button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
+        </div>
     </div>
-    <div class="modal-body">
-        </br>
-        <p class="monoText" style="font-weight: bold;"><%=HemeHelper.colorizeSequence(p.getCigar(), p.getSequence())%></p>
-        <% for (PeptideEntity pep : p.getPeptides()) { %>
-        <p class="monoText"><%= HemeHelper.nonBlankSpaces(pep.getStart()) %><%=pep.getSequence()%></p>
-        <%}%>
-    </div>
-    <div class="modal-footer">
-        <button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
-    </div>
-</div>
-<%}%>
-
-
+</c:forEach>
 
 <script>
     $(function () {

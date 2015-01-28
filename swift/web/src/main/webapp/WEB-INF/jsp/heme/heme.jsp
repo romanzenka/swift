@@ -1,17 +1,11 @@
-<%@ page import="edu.mayo.mprc.MprcException" %>
-<%@ page import="edu.mayo.mprc.config.ResourceConfig" %>
-<%@ page import="edu.mayo.mprc.heme.HemeEntry" %>
-<%@ page import="edu.mayo.mprc.heme.HemeUi" %>
-<%@ page import="edu.mayo.mprc.swift.MainFactoryContext" %>
-<%@ page import="java.util.List" %>
-<% final ResourceConfig hemeUiConfig = MainFactoryContext.getSwiftEnvironment().getSingletonConfig(HemeUi.Config.class); %>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="/common/bootstrap/css/bootstrap.min.css" rel="stylesheet" media="screen">
     <style type="text/css">
-            /* http://stackoverflow.com/questions/3790935/can-i-hide-the-html5-number-inputs-spin-box */
+        /* http://stackoverflow.com/questions/3790935/can-i-hide-the-html5-number-inputs-spin-box */
         input::-webkit-outer-spin-button,
         input::-webkit-inner-spin-button {
             /* display: none; <- Crashes Chrome on hover */
@@ -47,92 +41,68 @@
 <body>
 <div class="container">
     <h2>Heme Pathology</h2>
-    <% if (hemeUiConfig == null) {
-    %>
-    <div class="alert">
-        <p><strong>Warning</strong> The heme pathology module is not configured.</p>
+    <c:choose>
+        <c:when test="${empty hemeUiConfig}">
+            <div class="alert">
+                <p><strong>Warning</strong> The heme pathology module is not configured.</p>
 
-        <p>You need to add the Heme Pathology resource to the
-            <code><%= MainFactoryContext.getSwiftEnvironment().getDaemonConfig().getName() %>
-            </code> daemon.</p>
-    </div>
-    <% } else {
-        HemeUi hemeUi = (HemeUi) MainFactoryContext.getSwiftEnvironment().createResource(hemeUiConfig);
-        hemeUi.begin();
-        try {
-            hemeUi.scanFileSystem();
-            List<HemeEntry> currentEntries = hemeUi.getCurrentEntries();
-    %>
-    <table class="table table-condensed">
-        <tr>
-            <th>Patient</th>
-            <th>Date</th>
-            <th>Isotopic Mass<!--&Delta;--></th>
-            <th>Action</th>
-        </tr>
-        <%
-            for (HemeEntry entry : currentEntries) {
-                int id = entry.getTest().getId();
-        %>
-        <tr>
-            <td><%=entry.getTest().getName()%>
-            </td>
-            <td><%=entry.getTest().getDate().toString()%>
-            </td>
-            <td>
-                <input class="mass-delta-value" data-id="<%= id %>" type="number" step="any" style="width:75px;text-align:right;"
-                       value="<%= entry.getTest().getMass() %>">&nbsp;&nbsp;&plusmn;&nbsp;
-                <span class="input-append"><input class="mass-delta-tolerance-value" data-id="<%= id %>" type="number"
+                <p>You need to add the Heme Pathology resource to the <code>${daemonName}</code> daemon.</p>
+            </div>
+        </c:when>
+        <c:otherwise>
+            <table class="table table-condensed">
+                <tr>
+                    <th>Patient</th>
+                    <th>Date</th>
+                    <th>Isotopic Mass<!--&Delta;--></th>
+                    <th>Action</th>
+                </tr>
+                <c:forEach var="entry" items="${currentEntries}">
+                    <tr>
+                        <td>${entry.test.name}</td>
+                        <td>${entry.test.date}</td>
+                        <td>
+                            <input class="mass-delta-value" data-id="${entry.test.id}" type="number" step="any"
+                                   style="width:75px;text-align:right;"
+                                   value="${entry.test.mass}">&nbsp;&nbsp;&plusmn;&nbsp;
+                <span class="input-append"><input class="mass-delta-tolerance-value" data-id="${entry.test.id}"
+                                                  type="number"
                                                   step="any" style="width: 30px" maxlength="8"
-                                                  value="<%= entry.getTest().getMassTolerance() %>">
+                                                  value="${entry.test.massTolerance}">
                     <span class="add-on">Da</span></span>
-                <span class="ajax-progress" id="save-<%= id %>">&nbsp;</span>
+                            <span class="ajax-progress" id="save-${entry.test.id}">&nbsp;</span>
 
-                <div class="alert save-error" id="save-error-<%= id %>">Error!</div>
-            </td>
-            <td>
-                <%
-                    switch (entry.getStatus()) {
-                        case NOT_STARTED:
-                %>
-                <button class="btn btn-primary analyze-action" data-id="<%= +id %>" type="button">Analyze</button>
-                <%
-                        break;
-                    case RUNNING:
-                %>
-                <div class="progress progress-striped" style="width: 100px">
-                    <div class="bar" style="width: <%= entry.getProgressPercent() %>%;"></div>
-                </div>
-                <%
-                        break;
-                    case FAILED:
-                %>
-                <div class="alert">Search failed</div>
-                <button class="btn btn-primary analyze-action" data-id="<%= id %>" type="button">Re-analyze</button>
-                <%
-                        break;
-                    case SUCCESS:
-                %>
-                <button class="btn result-action" data-id="<%= id %>" type="button">Result</button>
-                <%
-                            break;
-                    }
-
-                %>
-            </td>
-        </tr>
-        <%
-            }
-        %>
-    </table>
-    <%
-            hemeUi.commit();
-        } catch (Exception e) {
-            hemeUi.rollback();
-            throw new MprcException(e);
-        }
-    %>
-    <% } %>
+                            <div class="alert save-error" id="save-error-${entry.test.id}">Error!</div>
+                        </td>
+                        <td>
+                            <c:choose>
+                                <c:when test="${entry.status == notStarted}">
+                                    <button class="btn btn-primary analyze-action" data-id="${entry.test.id}"
+                                            type="button">Analyze
+                                    </button>
+                                </c:when>
+                                <c:when test="${entry.status == running}">
+                                    <div class="progress progress-striped" style="width: 100px">
+                                        <div class="bar" style="width: ${entry.progressPercent}%;"></div>
+                                    </div>
+                                </c:when>
+                                <c:when test="${entry.status == failed}">
+                                    <div class="alert">Search failed</div>
+                                    <button class="btn btn-primary analyze-action" data-id="${entry.test.id}"
+                                            type="button">Re-analyze
+                                    </button>
+                                </c:when>
+                                <c:when test="${entry.status == success}">
+                                    <button class="btn result-action" data-id="${entry.test.id}" type="button">Result
+                                    </button>
+                                </c:when>
+                            </c:choose>
+                        </td>
+                    </tr>
+                </c:forEach>
+            </table>
+        </c:otherwise>
+    </c:choose>
 </div>
 
 <script type="text/javascript">
@@ -141,8 +111,8 @@
             url: "/service/heme/data/" + id + "/startSearch.json",
             method: "POST"
         }).complete(function () {
-                    location.reload();
-                });
+            location.reload();
+        });
     }
 
     function showResult(id) {
