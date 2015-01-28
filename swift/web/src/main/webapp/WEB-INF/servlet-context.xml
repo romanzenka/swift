@@ -5,6 +5,9 @@
         http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
         http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc.xsd">
 
+    <context:component-scan base-package="edu.mayo.mprc.swift.webservice" />
+    <context:component-scan base-package="edu.mayo.mprc.swift.controller" />
+
     <mvc:annotation-driven />
 
     <bean id="xstreamMarshaller" class="org.springframework.oxm.xstream.XStreamMarshaller">
@@ -68,8 +71,6 @@
         <!-- Intercept requests for asgard, redirect to dashboard -->
         <bean class="edu.mayo.mprc.swift.AsgardHandlerInterceptor" />
     </mvc:interceptors>
-
-    <context:component-scan base-package="edu.mayo.mprc.swift.webservice" />
 
     <bean id="Benchmark" class="edu.mayo.mprc.swift.benchmark.Benchmark">
         <property name="swiftDao" ref="swiftDao" />
@@ -140,7 +141,6 @@
 
     <mvc:view-controller path="/" view-name="index" />
     <mvc:view-controller path="/dashboard" view-name="dashboard" />
-    <mvc:view-controller path="/extras" view-name="extras" />
     <mvc:view-controller path="/memory" view-name="memory" />
     <mvc:view-controller path="/monitor" view-name="monitor" />
 

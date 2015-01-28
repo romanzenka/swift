@@ -1,14 +1,8 @@
-<%@ page import="edu.mayo.mprc.ReleaseInfoCore" %>
-<%@ page import="edu.mayo.mprc.swift.SwiftWebContext" %>
-<%@ page import="edu.mayo.mprc.utilities.StringUtilities" %>
-<%@ page import="org.joda.time.DateTime" %>
-<%@ page import="org.joda.time.format.DateTimeFormat" %>
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>Swift Extras | <%=SwiftWebContext.getWebUi().getTitle()%>
-    </title>
+    <title>Swift Extras | ${title}</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="../../common/bootstrap/css/bootstrap.min.css" rel="stylesheet" media="screen">
     <!-- HTML5 shim, for IE6-8 support of HTML5 elements -->
@@ -30,8 +24,7 @@
                 <span class="icon-bar"></span>
                 <span class="icon-bar"></span>
             </button>
-            <a class="brand" href="/"><%=SwiftWebContext.getWebUi().getTitle()%>
-            </a>
+            <a class="brand" href="/">${title}</a>
 
             <div class="nav-collapse collapse">
                 <ul class="nav">
@@ -64,20 +57,16 @@
     <p>
         Report time that was spent by Swift over a particular time period.
     </p>
-    <%
-        DateTime end = new DateTime();
-        DateTime start = end.minusMonths(1);
-    %>
 
     <form action="/time-report" class="form-inline">
         <label class="control-label" for="start">Start</label>
 
         <input type="text" name="start" id="start" class="input-small"
-               value="<%=DateTimeFormat.forPattern("yyyy-MM-dd").print(start) %>"/>
+               value="${startDate}"/>
         <label class="control-label" for="end">&nbsp;End</label>
 
         <input type="text" name="end" id="end" class="input-small"
-               value="<%=DateTimeFormat.forPattern("yyyy-MM-dd").print(end) %>"/>
+               value="${endDate}"/>
         <label class="checkbox">
             <input type="checkbox" name="screen" id="screen" value="1" checked="true"/> Display on screen
         </label>
@@ -125,29 +114,24 @@
     <table class="table">
         <tr>
             <th>User-set Title</th>
-            <td><%=StringUtilities.escapeHtml(SwiftWebContext.getWebUi().getTitle())%>
-            </td>
+            <td>${title}</td>
         </tr>
         <tr>
             <th>Build Version</th>
-            <td><%=StringUtilities.escapeHtml(ReleaseInfoCore.buildVersion())%>
-            </td>
+            <td>${buildVersion}</td>
         </tr>
         <tr>
             <th>Build Revision</th>
-            <td><%= StringUtilities.escapeHtml(ReleaseInfoCore.buildRevision())%>
-            </td>
+            <td>${buildRevision}</td>
         </tr>
         <tr>
             <th>Build Timestamp</th>
-            <td><%= StringUtilities.escapeHtml(ReleaseInfoCore.buildTimestamp())%>
-            </td>
+            <td>${buildTimestamp}</td>
         </tr>
         <tr>
             <th>Build Link</th>
             <td>
-                <a href="<%= StringUtilities.escapeHtml(ReleaseInfoCore.buildLink())%>"><%= StringUtilities.escapeHtml(ReleaseInfoCore.buildLink())%>
-                </a></td>
+                <a href="${buildLink}">${buildLink}</a></td>
         </tr>
     </table>
 
