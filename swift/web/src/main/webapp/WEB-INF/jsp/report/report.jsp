@@ -1,12 +1,8 @@
-<%@ page import="edu.mayo.mprc.swift.SwiftWebContext" %>
-<%@ page import="edu.mayo.mprc.swift.report.JsonWriter" %>
-<%@ page import="edu.mayo.mprc.utilities.StringUtilities" %>
-<%@ page import="edu.mayo.mprc.workspace.User" %>
-<%@ page import="java.util.List" %>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Search Status | <%=SwiftWebContext.getWebUi().getTitle()%>
+    <title>Search Status | ${title}
     </title>
     <!--[if IE]>
     <style type="text/css">
@@ -18,20 +14,20 @@
 
     <script type="text/javascript">
         // This is a prefix that has to be removed from the files in order to map the web paths
-        var pathPrefix = "<%=SwiftWebContext.getPathPrefix().replace("\\", "\\\\") %>";
+        var pathPrefix = "${pathPrefix}";
 
         // How does the raw file root map to the web browser? Idea is that you strip pathPrefix from the path,
         // prepend pathWebPrefix instead and use the resulting URL in your browser
-        var pathWebPrefix = "<%=SwiftWebContext.getWebUi().getBrowseWebRoot().replace("\\", "\\\\") %>";
+        var pathWebPrefix = "${pathWebPrefix}";
     </script>
 
-    <link rel="stylesheet" href="../../../report/report.css">
+    <link rel="stylesheet" href="/report/report.css">
     <script type="text/javascript" src="/start/filechooser/cookies.js"></script>
     <script type="text/javascript" src="/common/bootstrap/js/jquery_1.9.0.min.js"></script>
     <script type="text/javascript" src="/common/bootstrap/js/jquery.tmpl.1.1.1.js"></script>
-    <script type="text/javascript" src="../../../report/updates.js"></script>
-    <script type="text/javascript" src="../../../report/visualizers.js"></script>
-    <script type="text/javascript" src="../../../report/filters.js"></script>
+    <script type="text/javascript" src="/report/updates.js"></script>
+    <script type="text/javascript" src="/report/visualizers.js"></script>
+    <script type="text/javascript" src="/report/filters.js"></script>
     <script type="text/javascript">
         window.test = ({total: 0});
     </script>
@@ -105,32 +101,11 @@
 
             $('#popups').append(title.getRoot());
 
-            <%
-            SwiftWebContext.getWebUi().getSwiftDao().begin();
-            final StringBuilder userList=new StringBuilder();
-            final StringBuilder idList = new StringBuilder();
-            try {
-               final List<User> userInfos = SwiftWebContext.getWebUi().getWorkspaceDao().getUsers(false);
-               if (userInfos != null) {
-                   for (final User userInfo : userInfos) {
-                       if(userList.length()>0) {
-                           userList.append(",");
-                           idList.append(",");
-                       }
-                       userList.append("'").append(StringUtilities.toUnicodeEscapeString(JsonWriter.escapeSingleQuoteJavascript(userInfo.getFirstName()))).append(' ').append(StringUtilities.toUnicodeEscapeString(JsonWriter.escapeSingleQuoteJavascript(userInfo.getLastName()))).append("'");
-                       idList.append("'").append(JsonWriter.escapeSingleQuoteJavascript(String.valueOf(userInfo.getId()))).append("'");
-                   }
-               }
-               SwiftWebContext.getWebUi().getSwiftDao().commit();
-            } catch(Exception ignore) {
-                SwiftWebContext.getWebUi().getSwiftDao().rollback();
-            }
-        %>
             user = new FilterDropDown("user");
             user.addRadioButtons("sort", "order", ["Sort A to Z", "Sort Z to A", "Sort by submission time"], ["1", "-1", "0"], 2);
             user.addSeparator();
             user.addText('Display:');
-            user.addCheckboxes("filter", "where", [<%=userList.toString()%>], [<%=idList.toString()%>], true);
+            user.addCheckboxes("filter", "where", [${userListJson}], [${idListJson}], true);
             user.addSeparator();
             user.addOkCancel();
             user.onSubmitCallback = function () {
@@ -246,7 +221,7 @@
 </head>
 <body id="body">
 <div class="topbar">
-    <span class="logo-small"><%=SwiftWebContext.getWebUi().getTitle()%></span>
+    <span class="logo-small">${title}</span>
     <ul class="locations">
         <li><a href="/start">New search</a></li>
         <li class="active-tab"><a href="/report">Existing searches</a></li>
@@ -256,13 +231,15 @@
         <li><a href="/extras">Extras</a></li>
     </ul>
 </div>
-<% if (SwiftWebContext.getWebUi().getUserMessage().messageDefined()) { %>
-<div class="user-message">
-    <%=SwiftWebContext.getWebUi().getUserMessage().getMessage()%>
-</div>
-<% } %>
+
+<c:if test="${messageDefined}">
+    <div class="user-message">
+            ${userMessage}
+    </div>
+</c:if>
+
 <div id="contents">
-    <div id="navigation">
+    <div class="navigation">
         <script type="text/javascript">
             hiddenStr = ""
             if (showHidden) {
@@ -282,7 +259,7 @@
         </tr>
         </thead>
     </table>
-    <div id="navigation">
+    <div class="navigation">
         <script type="text/javascript">
             hiddenStr = ""
             if (showHidden) {

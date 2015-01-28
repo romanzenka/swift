@@ -129,8 +129,6 @@
         <property name="webUiHolder" ref="webUiHolder" />
     </bean>
 
-    <mvc:view-controller path="/report/" view-name="report/report" />
-
     <bean id="reportUpdate" class="edu.mayo.mprc.swift.report.ReportUpdate">
         <property name="fileTokenFactory" ref="fileTokenFactory" />
         <property name="searchDbDao" ref="searchDbDao" />
