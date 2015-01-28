@@ -18,7 +18,7 @@ public final class AsgardHandlerInterceptor extends HandlerInterceptorAdapter {
 
 	@Override
 	public boolean preHandle(final HttpServletRequest request, final HttpServletResponse response, final Object handler) throws Exception {
-		if (request.getRequestURL().toString().startsWith(ASGARD_PREFIX) && request.getAttribute(ASGARD_HANDLED) != null) {
+		if (request.getRequestURL().toString().startsWith(ASGARD_PREFIX) && request.getAttribute(ASGARD_HANDLED) == null) {
 			request.setAttribute(ASGARD_HANDLED, true);
 			request.getRequestDispatcher("/dashboard").forward(request, response);
 			return false;
