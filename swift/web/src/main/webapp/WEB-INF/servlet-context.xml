@@ -124,6 +124,10 @@
         <property name="curationContext" ref="curationContext" />
     </bean>
 
+    <bean id="DirectoryService" class="edu.mayo.mprc.swift.ui.server.FileDirectoryServiceServlet">
+        <property name="webUiHolder" ref="webUiHolder" />
+    </bean>
+
     <mvc:view-controller path="/report/" view-name="report/report" />
 
     <bean id="reportUpdate" class="edu.mayo.mprc.swift.report.ReportUpdate">

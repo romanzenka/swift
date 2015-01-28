@@ -29,8 +29,4 @@
         <property name="installCommand" ref="install-command" />
         <property name="stopper" ref="servletInitialization" />
     </bean>
-
-    <bean id="DirectoryService" class="edu.mayo.mprc.swift.ui.server.FileDirectoryServiceServlet">
-        <property name="webUiHolder" ref="webUiHolder" />
-    </bean>
 </beans>
