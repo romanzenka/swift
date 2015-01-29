@@ -30,7 +30,6 @@ public final class SwiftMonitor implements Runnable, Lifecycle {
 	 */
 	private final Map<DaemonConnection, DaemonStatus> monitoredConnections = new HashMap<DaemonConnection, DaemonStatus>(20);
 	private final Map<DaemonConnection, ProgressListener> pingListeners = new HashMap<DaemonConnection, ProgressListener>(20);
-	public static final long MONITOR_PERIOD_SECONDS = 30L;
 
 	private RunningApplicationContext context;
 	private MultiFactory factory;
@@ -68,7 +67,7 @@ public final class SwiftMonitor implements Runnable, Lifecycle {
 				}
 				if (scheduler == null) {
 					scheduler = Executors.newScheduledThreadPool(1);
-					scheduler.scheduleAtFixedRate(this, MONITOR_PERIOD_SECONDS, MONITOR_PERIOD_SECONDS, TimeUnit.SECONDS);
+					scheduler.scheduleAtFixedRate(this, DaemonStatus.MONITOR_PERIOD_SECONDS, DaemonStatus.MONITOR_PERIOD_SECONDS, TimeUnit.SECONDS);
 				}
 			}
 		}

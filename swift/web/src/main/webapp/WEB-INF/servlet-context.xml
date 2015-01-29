@@ -70,6 +70,7 @@
     <mvc:interceptors>
         <!-- Intercept requests for asgard, redirect to dashboard -->
         <bean class="edu.mayo.mprc.swift.AsgardHandlerInterceptor" />
+        <bean class="edu.mayo.mprc.swift.CommonModelInterceptor" />
     </mvc:interceptors>
 
     <bean id="Benchmark" class="edu.mayo.mprc.swift.benchmark.Benchmark">

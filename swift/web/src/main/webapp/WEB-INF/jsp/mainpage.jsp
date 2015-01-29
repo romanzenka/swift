@@ -1,6 +1,5 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ page import="edu.mayo.mprc.swift.ServletInitialization" %>
-<%@ page import="edu.mayo.mprc.swift.SwiftWebContext" %>
 <!DOCTYPE html>
 <html>
 <head>
@@ -80,7 +79,7 @@
         }
 
         .reflected:before {
-            content: '<%=SwiftWebContext.getWebUi().getTitle()%>';
+            content: '${title}';
             opacity: .3;
             /* This is how the text is flipped vertically */
             -webkit-transform: scaleY(-1);
@@ -133,7 +132,7 @@
     <h2>Swift outputs</h2>
 
     Swift produces Scaffold reports (.sf3 files). You can view these reports on your own computer, just
-    <a href="<%= SwiftWebContext.getWebUi().getScaffoldViewerUrl() %>">download and
+    <a href="${scaffoldViewerUrl}">download and
         install the free Scaffold viewer</a>.
 
     There are several possibilities how to map input files to Scaffold reports. You can produce the following:

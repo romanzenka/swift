@@ -1,18 +1,13 @@
-<%@ page import="edu.mayo.mprc.daemon.DaemonConnection" %>
-<%@ page import="edu.mayo.mprc.daemon.monitor.DaemonStatus" %>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <%@ page import="edu.mayo.mprc.swift.ServletInitialization" %>
-<%@ page import="edu.mayo.mprc.swift.SwiftWebContext" %>
-<%@ page import="edu.mayo.mprc.swift.resources.SwiftMonitor" %>
-<%@ page import="java.util.Date" %>
-<%@ page import="java.util.Map" %>
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <% if (ServletInitialization.redirectToConfig(getServletConfig().getServletContext(), response)) {
         return;
     } %>
-    <title>Monitor | <%=SwiftWebContext.getWebUi().getTitle()%>
-    </title>
+    <title>Monitor | ${title}</title>
     <link href="../../common/bootstrap/css/bootstrap.min.css" rel="stylesheet" media="screen">
 </head>
 <body>
@@ -25,21 +20,28 @@
             <th>Last heard from</th>
             <th>Message</th>
         </tr>
-        <%
-            for (final Map.Entry<DaemonConnection, DaemonStatus> entry : SwiftWebContext.getWebUi().getSwiftMonitor().getMonitoredConnections().entrySet()) {
-                final DaemonStatus status = entry.getValue();
-                out.print("<tr><td>");
-                out.print(status != null ? (status.isOk() && !status.isTooOld(SwiftMonitor.MONITOR_PERIOD_SECONDS)) : "?");
-                out.print("</td><td>");
-                out.print(entry.getKey().getConnectionName());
-                out.print("</td><td>");
-                out.print(status != null ? new Date(status.getLastResponse()).toString() : "?");
-                out.print("</td><td>");
-                out.print(status != null ? status.getMessage() : "?");
-                out.print("</td>");
-                out.print("</tr>");
-            }
-        %>
+        <c:forEach var="entry" items="${monitoredConnections}">
+            <tr>
+                <c:choose>
+                    <c:when test="${empty entry.value}">
+                        <td>?</td>
+                        <td>${entry.key.connectionName}</td>
+                        <td>?</td>
+                        <td>?</td>
+                    </c:when>
+                    <c:otherwise>
+                        <td>${entry.value.recentlyOk}</td>
+                        <td>${entry.key.connectionName}</td>
+                        <td><fmt:formatDate value="${entry.value.lastResponseDate}" type="both"/></td>
+                        <td>${entry.value.message}</td>
+                    </c:otherwise>
+                </c:choose>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+            </tr>
+        </c:forEach>
     </table>
 </div>
 <script src="../../common/bootstrap/js/jquery_1.9.0.min.js"></script>

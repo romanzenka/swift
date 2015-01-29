@@ -1,31 +1,29 @@
 package edu.mayo.mprc.swift.controller;
 
-import edu.mayo.mprc.ReleaseInfoCore;
+import edu.mayo.mprc.daemon.DaemonConnection;
+import edu.mayo.mprc.daemon.monitor.DaemonStatus;
 import edu.mayo.mprc.swift.resources.WebUi;
 import edu.mayo.mprc.swift.resources.WebUiHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 
 import javax.annotation.Resource;
+import java.util.Map;
 
 /**
- * First page of Swift
- *
  * @author Roman Zenka
  */
 @Controller
-@RequestMapping("/")
-public final class MainPage {
+public final class Monitor {
 	private WebUiHolder webUiHolder;
 
-	@RequestMapping(method = RequestMethod.GET)
-	public final String firstPage(final ModelMap model) {
-		model.addAttribute("buildVersion", ReleaseInfoCore.buildVersion());
-		model.addAttribute("scaffoldViewerUrl", getWebUi().getScaffoldViewerUrl());
+	@RequestMapping("/monitor")
+	public String monitor(ModelMap model) {
+		final Map<DaemonConnection, DaemonStatus> monitoredConnections = getWebUi().getSwiftMonitor().getMonitoredConnections();
+		model.addAttribute("monitoredConnections", monitoredConnections);
 
-		return "mainpage";
+		return "monitor";
 	}
 
 	public WebUiHolder getWebUiHolder() {

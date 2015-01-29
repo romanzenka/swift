@@ -7,8 +7,6 @@ import edu.mayo.mprc.quameterdb.QuameterUi;
 import edu.mayo.mprc.quameterdb.dao.QuameterAnnotation;
 import edu.mayo.mprc.quameterdb.dao.QuameterResult;
 import edu.mayo.mprc.swift.commands.SwiftEnvironment;
-import edu.mayo.mprc.swift.resources.WebUi;
-import edu.mayo.mprc.swift.resources.WebUiHolder;
 import edu.mayo.mprc.utilities.StringUtilities;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
@@ -29,14 +27,11 @@ import java.util.List;
 public final class QuaMeter {
 	private SwiftEnvironment environment;
 
-	private WebUiHolder webUiHolder;
-
 	@RequestMapping(value = "/quameter", method = RequestMethod.GET)
 	public final String quameter(final ModelMap model) {
 
 		final QuameterUi quameterUi = getQuameterUi();
 		model.addAttribute("quameterUi", quameterUi);
-		model.addAttribute("title", getWebUi().getTitle());
 		model.addAttribute("daemonName", environment.getDaemonConfig().getName());
 
 		if (quameterUi != null) {
@@ -67,8 +62,6 @@ public final class QuaMeter {
 
 	@RequestMapping(value = "/quameter/tags", method = RequestMethod.GET)
 	public final String tags(final ModelMap model) {
-		model.addAttribute("title", getWebUi().getTitle());
-
 		final QuameterUi quameterUi = getQuameterUi();
 		if (quameterUi != null) {
 			quameterUi.begin();
@@ -102,7 +95,6 @@ public final class QuaMeter {
 
 	@RequestMapping(value = "/quameter/unhide", method = RequestMethod.GET)
 	public final String unhide(final ModelMap model) {
-		model.addAttribute("title", getWebUi().getTitle());
 		final QuameterUi quameterUi = getQuameterUi();
 		if (quameterUi != null) {
 			quameterUi.begin();
@@ -150,18 +142,5 @@ public final class QuaMeter {
 	@Resource(name = "swiftEnvironment")
 	public void setEnvironment(final SwiftEnvironment environment) {
 		this.environment = environment;
-	}
-
-	public WebUiHolder getWebUiHolder() {
-		return webUiHolder;
-	}
-
-	@Resource(name = "webUiHolder")
-	public void setWebUiHolder(final WebUiHolder webUiHolder) {
-		this.webUiHolder = webUiHolder;
-	}
-
-	private WebUi getWebUi() {
-		return getWebUiHolder().getWebUi();
 	}
 }
