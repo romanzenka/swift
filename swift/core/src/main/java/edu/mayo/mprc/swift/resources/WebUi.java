@@ -76,7 +76,7 @@ public final class WebUi implements Checkable {
 	private static final String DEFAULT_SCAFFOLD_VIEWER_URL = "http://www.proteomesoftware.com/products/free-viewer/";
 
 	public WebUi() {
-		USER_MESSAGE.setMessage("Swift's new database deployment has been temporarily disabled. Swift needs to be upgraded to support Mascot's Database Manager. If you need a new database, please ask Roman.");
+		// USER_MESSAGE.setMessage("Swift's new database deployment has been temporarily disabled. Swift needs to be upgraded to support Mascot's Database Manager. If you need a new database, please ask Roman.");
 	}
 
 	public File getBrowseRoot() {
