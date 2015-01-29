@@ -66,6 +66,13 @@ public final class ProteinEntity {
         this.filter = filter;
     }
 
+    /**
+     * This function sets the Filter value, based on priority. To prevent hierarchical over writing.
+     */
+    public void promoteFilter(Filter filter) {
+        this.filter = filter;
+    }
+
     public List<PeptideEntity> getPeptides() {
         return peptides;
     }
