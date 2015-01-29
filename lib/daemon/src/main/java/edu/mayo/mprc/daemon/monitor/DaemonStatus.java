@@ -11,6 +11,7 @@ import java.util.Date;
 public final class DaemonStatus implements Serializable {
 	private static final long serialVersionUID = 9068736183236074388L;
 	public static final long MILLIS_IN_SECOND = 1000L;
+	public static final long MONITOR_PERIOD_SECONDS = 30L;
 
 	private long lastResponse;
 	private String message;
@@ -42,11 +43,19 @@ public final class DaemonStatus implements Serializable {
 		return lastResponse;
 	}
 
+	public Date getLastResponseDate() {
+		return new Date(lastResponse);
+	}
+
 	public String getMessage() {
 		return message;
 	}
 
 	public boolean isOk() {
 		return ok;
+	}
+
+	public boolean isRecentlyOk() {
+		return ok && !isTooOld(MONITOR_PERIOD_SECONDS);
 	}
 }

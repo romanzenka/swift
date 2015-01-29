@@ -1,6 +1,7 @@
 package edu.mayo.mprc.utilities;
 
 import edu.mayo.mprc.MprcException;
+import org.apache.log4j.Logger;
 
 import java.io.OutputStream;
 import java.lang.management.ManagementFactory;
@@ -14,6 +15,7 @@ import java.util.regex.Pattern;
  * Utility functions for monitoring current execution - determine JVM PID, hostname, etc.
  */
 public final class MonitorUtilities {
+	private static final Logger LOGGER = Logger.getLogger(MonitorUtilities.class);
 
 	public static final String LOCALHOST = "127.0.0.1";
 	private static final Pattern PID_MATCHER = Pattern.compile("(\\d+)@.*");
@@ -87,8 +89,8 @@ public final class MonitorUtilities {
 			out.write(("\r\n").getBytes());
 			out.flush();
 			s.close();
-		} catch (Exception e) {
-			throw new MprcException("Failed to stop Jetty", e);
+		} catch (Exception e /* SWALLOWED - it is not a tragedy to fail to stop jetty. Do not litter error log with unrelated exceptions */) {
+			LOGGER.warn("Failed to stop Jetty", e);
 		}
 	}
 }

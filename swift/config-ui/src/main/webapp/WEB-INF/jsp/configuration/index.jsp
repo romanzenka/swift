@@ -1,4 +1,3 @@
-<%@ page import="edu.mayo.mprc.swift.SwiftWebContext" %>
 <!DOCTYPE html>
 <html>
 <head>
@@ -97,7 +96,7 @@
             When the configuration gets saved, the following will happen:
         <ol>
             <li>config file
-                <code><%= SwiftWebContext.getWebUi().getNewConfigFile().getAbsolutePath() %>
+                <code>${newConfigPath}
                 </code>
                 gets created - it defines what services should Swift run, how and where
             </li>
@@ -115,8 +114,7 @@
         <ol>
             <li>kill the configuration script</li>
             <li>copy the configuration file from
-                <code><%= SwiftWebContext.getWebUi().getNewConfigFile().getAbsolutePath() %>
-                </code> to <code>conf/swift.conf</code>.
+                <code>${newConfigPath}</code> to <code>conf/swift.conf</code>.
                 <p>This step is done so you have a chance to review the configuration file changes, instead of Swift
                     simply overwriting the last configuration.</p></li>
             <li>start the provided <code>bin/swift</code> script</li>

@@ -30,7 +30,7 @@ public final class QuameterHideResult {
 	@Resource(name = "quameterDao")
 	private QuameterDao quameterDao;
 
-	@RequestMapping(value = "/quameter-hide/{quameterResultId}", method = RequestMethod.POST)
+	@RequestMapping(value = "/service/quameter-hide/{quameterResultId}", method = RequestMethod.POST)
 	@ResponseBody
 	public void hideQuameterResult(@PathVariable final int quameterResultId, @RequestParam final String reason) {
 		quameterDao.begin();
@@ -43,7 +43,7 @@ public final class QuameterHideResult {
 		}
 	}
 
-	@RequestMapping(value = "/quameter-unhide/{quameterResultId}", method = RequestMethod.POST)
+	@RequestMapping(value = "/service/quameter-unhide/{quameterResultId}", method = RequestMethod.POST)
 	public String unhideQuameterResult(@PathVariable final int quameterResultId, @RequestParam final String reason) {
 		quameterDao.begin();
 		try {
@@ -53,10 +53,10 @@ public final class QuameterHideResult {
 			quameterDao.rollback();
 			throw new MprcException("Could not un-hide quameter result " + quameterResultId, e);
 		}
-		return "redirect:/quameter/unhide.jsp";
+		return "redirect:/quameter/unhide";
 	}
 
-	@RequestMapping(value = "/new-annotation", method = RequestMethod.POST)
+	@RequestMapping(value = "/service/new-annotation", method = RequestMethod.POST)
 	@ResponseStatus(HttpStatus.NO_CONTENT)
 	public void createQuameterAnnotation(@RequestBody final MultiValueMap<String, String> inputMap) {
 		System.out.println(inputMap.toString());
@@ -71,7 +71,7 @@ public final class QuameterHideResult {
 	}
 
 
-	@RequestMapping(value = "/list-annotation", method = RequestMethod.GET)
+	@RequestMapping(value = "/service/list-annotation", method = RequestMethod.GET)
 	public ModelAndView getAnnotationList() {
 		quameterDao.begin();
 		try {
@@ -88,7 +88,7 @@ public final class QuameterHideResult {
 
 
 	//  http://localhost:8080/service/getQuameterDataTable
-	@RequestMapping(value = "/getQuameterDataTable", method = RequestMethod.GET)
+	@RequestMapping(value = "/service/getQuameterDataTable", method = RequestMethod.GET)
 	public void getDataFile(HttpServletResponse response) {
 		quameterDao.begin();
 		try {

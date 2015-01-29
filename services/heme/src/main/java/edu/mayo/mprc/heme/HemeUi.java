@@ -2,9 +2,7 @@ package edu.mayo.mprc.heme;
 
 import com.google.common.base.Function;
 import com.google.common.base.Preconditions;
-import com.google.common.base.Splitter;
 import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import edu.mayo.mprc.MprcException;
 import edu.mayo.mprc.config.*;
@@ -459,6 +457,9 @@ public final class HemeUi implements Dao {
 			FileUtilities.ensureFolderExists(dataDir);
 			final File resultDir = new File(rootDir, config.get(RESULT_PATH));
 			FileUtilities.ensureFolderExists(resultDir);
+			if (config.get(FASTA_DB_CACHE) == null) {
+				throw new MprcException("Cannot create hemeUi module, you must specify " + FASTA_DB_CACHE + " in your config");
+			}
 
 			return new HemeUi(dataDir,
 					resultDir,
@@ -470,12 +471,6 @@ public final class HemeUi implements Dao {
 					config.get(CHYMO_PARAM_SET_NAME),
 					config.get(USER_EMAIL),
 					new File(config.get(FASTA_DB_CACHE)));
-		}
-
-		private String[] splitEngineString(final String engines) {
-			final ArrayList<String> strings = Lists.newArrayList(Splitter.on(' ').omitEmptyStrings().trimResults().split(engines));
-			final String[] result = new String[strings.size()];
-			return strings.toArray(result);
 		}
 	}
 

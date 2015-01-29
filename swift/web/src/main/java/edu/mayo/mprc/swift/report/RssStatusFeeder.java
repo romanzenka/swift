@@ -5,14 +5,17 @@ import com.sun.syndication.io.SyndFeedOutput;
 import edu.mayo.mprc.swift.db.SwiftDao;
 import edu.mayo.mprc.swift.dbmapping.SearchRun;
 import org.apache.log4j.Logger;
-import org.springframework.web.HttpRequestHandler;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.*;
 
-public final class RssStatusFeeder implements HttpRequestHandler {
+@Controller
+public final class RssStatusFeeder {
 	private static final Logger LOGGER = Logger.getLogger(RssStatusFeeder.class);
 	/**
 	 * will not contain entries older than 96 hours
@@ -57,8 +60,8 @@ public final class RssStatusFeeder implements HttpRequestHandler {
 		return cachedFeed;
 	}
 
-	@Override
-	public void handleRequest(HttpServletRequest req, HttpServletResponse resp) throws ServletException {
+	@RequestMapping(value = "/feed", method = RequestMethod.GET)
+	public void handleRequest(final HttpServletRequest req, final HttpServletResponse resp) throws ServletException {
 		swiftDao.begin(); // Transaction-per-request
 		try {
 			Boolean showSuccess = true;

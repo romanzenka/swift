@@ -1,16 +1,14 @@
-<%@ page import="edu.mayo.mprc.ReleaseInfoCore" %>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ page import="edu.mayo.mprc.swift.ServletInitialization" %>
-<%@ page import="edu.mayo.mprc.swift.SwiftWebContext" %>
 <!DOCTYPE html>
 <html>
 <head>
     <% if (ServletInitialization.redirectToConfig(getServletConfig().getServletContext(), response)) {
         return;
     } %>
-    <title><%=SwiftWebContext.getWebUi().getTitle()%>
-    </title>
+    <title>${title}</title>
     <!--
-    <%=ReleaseInfoCore.buildVersion()%>
+    ${buildVersion}
     -->
     <link rel="stylesheet" href="/common/topbar.css" media="all">
     <style type="text/css">
@@ -36,7 +34,7 @@
             display: block;
             width: 320px;
             height: 80px;
-            background-image: url(button.gif);
+            background-image: url(/button.gif);
             text-align: center;
             line-height: 80px;
             float: left;
@@ -47,10 +45,10 @@
         }
 
         a:hover.button {
-            background-image: url(button_pressed.gif);
+            background-image: url(/button_pressed.gif);
         }
 
-            /* Rewrite the default blue tab background */
+        /* Rewrite the default blue tab background */
         ul.locations li.active-tab {
             background-color: #fff;
         }
@@ -66,7 +64,7 @@
             font-size: 60px;
         }
 
-            /* CSS code */
+        /* CSS code */
 
         .reflected {
             position: relative;
@@ -81,7 +79,7 @@
         }
 
         .reflected:before {
-            content: '<%=SwiftWebContext.getWebUi().getTitle()%>';
+            content: '${title}';
             opacity: .3;
             /* This is how the text is flipped vertically */
             -webkit-transform: scaleY(-1);
@@ -103,24 +101,25 @@
 </head>
 <body>
 <div class="topbar">
-    <span class="logo-small"><%=SwiftWebContext.getWebUi().getTitle()%></span>
+    <span class="logo-small">${title}</span>
     <ul class="locations">
         <li><a href="/start">New search</a></li>
-        <li><a href="/report/report.jsp">Existing searches</a></li>
+        <li><a href="/report">Existing searches</a></li>
         <li class="active-tab"><a href="/">About Swift</a></li>
-        <li><a href="/quameter">QuaMeter</a></li> <!-- TODO - make optional -->
+        <li><a href="/quameter">QuaMeter</a></li>
+        <!-- TODO - make optional -->
         <li><a href="/extras">Extras</a></li>
     </ul>
 </div>
 <div id="content">
-    <% if (SwiftWebContext.getWebUi().getUserMessage().messageDefined()) { %>
-    <div class="user-message">
-        <%=SwiftWebContext.getWebUi().getUserMessage().getMessage()%>
-    </div>
-    <% } %>
+    <c:if test="${messageDefined}">
+        <div class="user-message">
+                ${userMessage}
+        </div>
+    </c:if>
+
     <div style="height: 130px; overflow: hidden">
-        <h1 style="text-align: center;" class="logo reflected"><%=SwiftWebContext.getWebUi().getTitle()%>
-        </h1>
+        <h1 style="text-align: center;" class="logo reflected">${title}</h1>
     </div>
 
     <p>Search multiple tandem mass spec. datafiles using <b>multiple search engines at once</b>: Mascot, Comet,
@@ -133,8 +132,8 @@
     <h2>Swift outputs</h2>
 
     Swift produces Scaffold reports (.sf3 files). You can view these reports on your own computer, just
-    <a href="<%= SwiftWebContext.getWebUi().getScaffoldViewerUrl() %>">download and
-    install the free Scaffold viewer</a>.
+    <a href="${scaffoldViewerUrl}">download and
+        install the free Scaffold viewer</a>.
 
     There are several possibilities how to map input files to Scaffold reports. You can produce the following:
 
@@ -150,8 +149,8 @@
     <p>Click the buttons below to start using Swift:</p>
 
     <div class="buttons">
-        <a class="button" href="start">Start new search</a>
-        <a class="button" href="report/report.jsp">View existing searches</a>
+        <a class="button" href="/start/">Start new search</a>
+        <a class="button" href="/report/">View existing searches</a>
     </div>
 </div>
 </body>

@@ -7,7 +7,9 @@ import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
-import org.springframework.web.HttpRequestHandler;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -21,7 +23,8 @@ import java.util.List;
 /**
  * @author Eric Winter
  */
-public final class FASTAFileUploadServlet implements HttpRequestHandler {
+@Controller
+public final class FASTAFileUploadServlet {
 	protected static final int MAX_FILE_SIZE = 1000000000;
 
 	private CurationContext curationContext;
@@ -30,7 +33,7 @@ public final class FASTAFileUploadServlet implements HttpRequestHandler {
 		return curationContext.getFastaUploadFolder();
 	}
 
-	@Override
+	@RequestMapping(value = "/start/FileUploadServlet", method = RequestMethod.POST)
 	public void handleRequest(final HttpServletRequest request, final HttpServletResponse response) throws IOException {
 
 		response.setContentType("text/html;charset=UTF-8");

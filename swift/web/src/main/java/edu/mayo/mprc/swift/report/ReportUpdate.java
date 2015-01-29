@@ -18,7 +18,9 @@ import edu.mayo.mprc.swift.search.SwiftSearcherCaller;
 import edu.mayo.mprc.utilities.progress.ProgressInfo;
 import edu.mayo.mprc.utilities.progress.ProgressListener;
 import org.apache.log4j.Logger;
-import org.springframework.web.HttpRequestHandler;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 
 import javax.servlet.ServletException;
 import javax.servlet.ServletOutputStream;
@@ -34,7 +36,8 @@ import java.util.List;
 
 // TODO: Ideally refactor into RESTful interface - would provide clean access to Swift
 
-public final class ReportUpdate implements HttpRequestHandler {
+@Controller
+public final class ReportUpdate {
 	private static final String CONTENT_TYPE = "application/javascript; charset=utf-8";
 	private static final Logger LOGGER = Logger.getLogger(ReportUpdate.class);
 	private transient SwiftDao swiftDao;
@@ -47,6 +50,10 @@ public final class ReportUpdate implements HttpRequestHandler {
 	 */
 	private static final int QSTAT_TIMEOUT = 30 * 1000;
 
+	public ReportUpdate() {
+		int i = 0;
+	}
+
 	private void printError(final PrintWriter output, final String message, final Throwable t) {
 		LOGGER.error(message, t);
 		output.println(message);
@@ -55,7 +62,7 @@ public final class ReportUpdate implements HttpRequestHandler {
 		}
 	}
 
-	@Override
+	@RequestMapping(value = "/report/reportupdate", method = RequestMethod.GET)
 	public void handleRequest(final HttpServletRequest req, final HttpServletResponse resp) throws ServletException {
 		resp.setHeader("Cache-Control", "no-cache");
 
@@ -240,7 +247,7 @@ public final class ReportUpdate implements HttpRequestHandler {
 	private void forwardToReportPage(final HttpServletRequest req, final HttpServletResponse resp) {
 		try {
 			// Forward the viewer back to the report page
-			resp.sendRedirect("/report/report.jsp");
+			resp.sendRedirect("/report/");
 		} catch (Exception ignore) {
 			// SWALLOWED: This is not essential, if it fails, no big deal
 		}

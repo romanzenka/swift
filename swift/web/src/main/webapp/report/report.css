@@ -448,7 +448,7 @@ a:hover.filter_button.filter.ztoa {
     margin-right: 5px;
 }
 
-#navigation {
+.navigation {
     display: block;
     width: 80px;
     text-align: center;
@@ -456,7 +456,7 @@ a:hover.filter_button.filter.ztoa {
     background-color: #e0e0ff;
 }
 
-#navigation a {
+.navigation a {
     display: block;
     font-size: 1px;
     line-height: 1px;
@@ -468,15 +468,15 @@ a:hover.filter_button.filter.ztoa {
     float: left;
 }
 
-#navigation a.first {
+.navigation a.first {
     background-image: url(home.gif);
 }
 
-#navigation a.prev {
+.navigation a.prev {
     background-image: url(arrow_l.gif);
 }
 
-#navigation a.next {
+.navigation a.next {
     background-image: url(arrow_r.gif);
 }
 

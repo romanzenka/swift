@@ -5,7 +5,9 @@ import edu.mayo.mprc.swift.resources.WebUiHolder;
 import edu.mayo.mprc.unimod.Unimod;
 import edu.mayo.mprc.unimod.UnimodDao;
 import edu.mayo.mprc.utilities.FileUtilities;
-import org.springframework.web.HttpRequestHandler;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -17,12 +19,13 @@ import java.io.OutputStreamWriter;
  *
  * @author Roman Zenka
  */
-public final class ModificationReport implements HttpRequestHandler {
+@Controller
+public final class ModificationReport {
 	private static final String TITLE = "Modifications defined in Swift";
 	private transient UnimodDao unimodDao;
 	private transient WebUiHolder webUiHolder;
 
-	@Override
+	@RequestMapping(value = "/mods", method = RequestMethod.GET)
 	public void handleRequest(final HttpServletRequest req, final HttpServletResponse resp) throws IOException {
 		resp.setContentType("text/html");
 		OutputStreamWriter writer = null;

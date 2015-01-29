@@ -9,7 +9,10 @@ import edu.mayo.mprc.swift.db.SwiftDao;
 import edu.mayo.mprc.swift.dbmapping.ReportData;
 import edu.mayo.mprc.swift.resources.WebUiHolder;
 import edu.mayo.mprc.utilities.FileUtilities;
+import org.springframework.stereotype.Controller;
 import org.springframework.web.HttpRequestHandler;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -22,12 +25,13 @@ import java.io.OutputStreamWriter;
  *
  * @author Roman Zenka
  */
+@Controller
 public class AnalysisReport implements HttpRequestHandler {
 	private SearchDbDao searchDbDao;
 	private SwiftDao swiftDao;
 	private WebUiHolder webUiHolder;
 
-	@Override
+	@RequestMapping(value = "/analysis", method = RequestMethod.GET)
 	public void handleRequest(final HttpServletRequest req, final HttpServletResponse resp) throws ServletException, IOException {
 		resp.setContentType("text/html");
 		OutputStreamWriter writer = null;

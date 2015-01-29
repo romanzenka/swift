@@ -45,7 +45,7 @@ public final class LogView {
 		ERROR_LOG
 	}
 
-	@RequestMapping(value = "/task-log/{taskId}/{logType}", method = RequestMethod.GET)
+	@RequestMapping(value = "/service/task-log/{taskId}/{logType}", method = RequestMethod.GET)
 	public void getQaResource(@PathVariable final int taskId,
 	                          @PathVariable final String logType,
 	                          final HttpServletResponse response) {

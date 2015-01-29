@@ -5,10 +5,18 @@
         http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
         http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc.xsd">
 
+    <context:component-scan base-package="edu.mayo.mprc.swift.webservice" />
+    <context:component-scan base-package="edu.mayo.mprc.swift.controller" />
+
     <mvc:annotation-driven />
 
     <bean id="xstreamMarshaller" class="org.springframework.oxm.xstream.XStreamMarshaller">
         <property name="autodetectAnnotations" value="true" />
+    </bean>
+
+    <bean id="viewResolver" class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+        <property name="prefix" value="/WEB-INF/jsp/" />
+        <property name="suffix" value=".jsp" />
     </bean>
 
     <bean class="org.springframework.web.servlet.view.ContentNegotiatingViewResolver">
@@ -21,10 +29,7 @@
         </property>
         <property name="viewResolvers">
             <list>
-                <bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
-                    <property name="prefix" value="/WEB-INF/jsp/" />
-                    <property name="suffix" value=".jsp" />
-                </bean>
+                <ref bean="viewResolver" />
             </list>
         </property>
         <property name="defaultViews">
@@ -42,6 +47,7 @@
         <property name="favorPathExtension" value="true" />
         <property name="favorParameter" value="true" />
         <property name="useNotAcceptableStatusCode" value="true" />
+        <property name="defaultContentType" value="text/html" />
     </bean>
 
     <bean class="org.springframework.web.servlet.mvc.annotation.AnnotationMethodHandlerAdapter">
@@ -52,6 +58,7 @@
             </list>
         </property>
     </bean>
+
     <bean id="jacksonObjectMapper" class="org.codehaus.jackson.map.ObjectMapper">
         <property name="visibilityChecker" ref="jacksonFieldOnlyVisibility" />
     </bean>
@@ -60,5 +67,80 @@
 
     <bean name="jacksonFieldOnlyVisibility" factory-bean="visibilityHolder" factory-method="checker" />
 
-    <context:component-scan base-package="edu.mayo.mprc.swift.webservice" />
+    <mvc:interceptors>
+        <!-- Intercept requests for asgard, redirect to dashboard -->
+        <bean class="edu.mayo.mprc.swift.AsgardHandlerInterceptor" />
+        <bean class="edu.mayo.mprc.swift.CommonModelInterceptor" />
+    </mvc:interceptors>
+
+    <bean id="Benchmark" class="edu.mayo.mprc.swift.benchmark.Benchmark">
+        <property name="swiftDao" ref="swiftDao" />
+    </bean>
+
+    <bean id="TimeReport" class="edu.mayo.mprc.swift.report.TimeReportServlet">
+        <property name="swiftDao" ref="swiftDao" />
+    </bean>
+
+    <bean id="AminoAcidReport" class="edu.mayo.mprc.swift.report.AminoAcidReport">
+        <property name="aminoAcidSet" ref="aminoAcidSet" />
+        <property name="webUiHolder" ref="webUiHolder" />
+    </bean>
+
+    <bean id="ModificationReport" class="edu.mayo.mprc.swift.report.ModificationReport">
+        <property name="unimodDao" ref="unimodDao" />
+        <property name="webUiHolder" ref="webUiHolder" />
+    </bean>
+
+    <bean id="AnalysisReport" class="edu.mayo.mprc.swift.report.AnalysisReport">
+        <property name="searchDbDao" ref="searchDbDao" />
+        <property name="swiftDao" ref="swiftDao" />
+        <property name="webUiHolder" ref="webUiHolder" />
+    </bean>
+
+    <bean id="FindProtein" class="edu.mayo.mprc.swift.report.FindProtein">
+        <property name="searchDbDao" ref="searchDbDao" />
+        <property name="webUiHolder" ref="webUiHolder" />
+    </bean>
+
+    <bean id="SampleReport" class="edu.mayo.mprc.swift.report.SampleReport">
+        <property name="searchDbDao" ref="searchDbDao" />
+    </bean>
+
+    <bean id="Status" class="edu.mayo.mprc.swift.report.JsonStatusFeeder">
+        <property name="swiftDao" ref="swiftDao" />
+    </bean>
+
+    <bean id="Feed" class="edu.mayo.mprc.swift.report.RssStatusFeeder">
+        <property name="swiftDao" ref="swiftDao" />
+    </bean>
+
+    <bean id="FileUploadServlet" class="edu.mayo.mprc.dbcurator.server.FASTAFileUploadServlet">
+        <property name="curationContext" ref="curationContext" />
+    </bean>
+    <bean id="CommonDataRequester" class="edu.mayo.mprc.dbcurator.server.CommonDataRequesterImpl">
+        <property name="logic" ref="CommonDataRequesterLogic" />
+    </bean>
+
+    <bean id="CommonDataRequesterLogic" class="edu.mayo.mprc.dbcurator.server.CommonDataRequesterLogic">
+        <property name="curationDao" ref="curationDao" />
+        <property name="curationContext" ref="curationContext" />
+    </bean>
+
+    <bean id="DirectoryService" class="edu.mayo.mprc.swift.ui.server.FileDirectoryServiceServlet">
+        <property name="webUiHolder" ref="webUiHolder" />
+    </bean>
+
+    <bean id="reportUpdate" class="edu.mayo.mprc.swift.report.ReportUpdate">
+        <property name="fileTokenFactory" ref="fileTokenFactory" />
+        <property name="searchDbDao" ref="searchDbDao" />
+        <property name="swiftDao" ref="swiftDao" />
+        <property name="webUiHolder" ref="webUiHolder" />
+        <property name="swiftSearcherCaller" ref="swiftSearcherCaller" />
+    </bean>
+
+    <mvc:view-controller path="/dashboard" view-name="dashboard" />
+    <mvc:view-controller path="/start/" view-name="start/index" />
+    <mvc:view-controller path="/search-diff/" view-name="search-diff/index" />
+
+    <mvc:default-servlet-handler />
 </beans>

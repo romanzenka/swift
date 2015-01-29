@@ -8,7 +8,9 @@ import edu.mayo.mprc.swift.db.TimeReport;
 import edu.mayo.mprc.swift.dbmapping.SearchRun;
 import edu.mayo.mprc.swift.dbmapping.TaskData;
 import org.joda.time.DateTime;
-import org.springframework.web.HttpRequestHandler;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 
 import javax.servlet.ServletException;
 import javax.servlet.ServletOutputStream;
@@ -17,13 +19,14 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.List;
 
-public final class TimeReportServlet implements HttpRequestHandler {
+@Controller
+public final class TimeReportServlet {
 	private transient SwiftDao swiftDao;
 
 	public TimeReportServlet() {
 	}
 
-	@Override
+	@RequestMapping(value = "/time-report", method = RequestMethod.GET)
 	public void handleRequest(final HttpServletRequest req, final HttpServletResponse resp) throws ServletException, IOException {
 		final SearchRunFilter filter;
 		final boolean screen;

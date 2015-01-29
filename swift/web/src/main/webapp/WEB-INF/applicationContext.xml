@@ -10,6 +10,7 @@
         <property name="swiftSearcherCaller" ref="swiftSearcherCaller" />
         <property name="webUiHolder" ref="webUiHolder" />
         <property name="configurationService" ref="ConfigurationService" />
+        <property name="swiftDao" ref="swiftDao" />
     </bean>
 
     <bean id="SwiftAppService" class="edu.mayo.mprc.swift.ui.server.ServiceImpl">
@@ -23,77 +24,10 @@
         <property name="swiftSearcherCaller" ref="swiftSearcherCaller" />
     </bean>
 
-    <bean id="ReportUpdate" class="edu.mayo.mprc.swift.report.ReportUpdate">
-        <property name="fileTokenFactory" ref="fileTokenFactory" />
-        <property name="searchDbDao" ref="searchDbDao" />
-        <property name="swiftDao" ref="swiftDao" />
-        <property name="webUiHolder" ref="webUiHolder" />
-        <property name="swiftSearcherCaller" ref="swiftSearcherCaller" />
-    </bean>
-
     <bean id="ConfigurationService" class="edu.mayo.mprc.swift.configuration.server.ConfigurationServiceImpl">
         <property name="resourceTable" ref="resourceTable" />
         <property name="swiftEnvironment" ref="swiftEnvironment" />
         <property name="installCommand" ref="install-command" />
         <property name="stopper" ref="servletInitialization" />
-    </bean>
-
-    <bean id="FileUploadServlet" class="edu.mayo.mprc.dbcurator.server.FASTAFileUploadServlet">
-        <property name="curationContext" ref="curationContext" />
-    </bean>
-
-    <bean id="CommonDataRequester" class="edu.mayo.mprc.dbcurator.server.CommonDataRequesterImpl">
-        <property name="logic" ref="CommonDataRequesterLogic" />
-    </bean>
-
-    <bean id="CommonDataRequesterLogic" class="edu.mayo.mprc.dbcurator.server.CommonDataRequesterLogic">
-        <property name="curationDao" ref="curationDao" />
-        <property name="curationContext" ref="curationContext" />
-    </bean>
-
-
-    <bean id="Feed" class="edu.mayo.mprc.swift.report.RssStatusFeeder">
-        <property name="swiftDao" ref="swiftDao" />
-    </bean>
-
-    <bean id="Status" class="edu.mayo.mprc.swift.report.JsonStatusFeeder">
-        <property name="swiftDao" ref="swiftDao" />
-    </bean>
-
-    <bean id="DirectoryService" class="edu.mayo.mprc.swift.ui.server.FileDirectoryServiceServlet">
-        <property name="webUiHolder" ref="webUiHolder" />
-    </bean>
-
-    <bean id="TimeReport" class="edu.mayo.mprc.swift.report.TimeReportServlet">
-        <property name="swiftDao" ref="swiftDao" />
-    </bean>
-
-    <bean id="Benchmark" class="edu.mayo.mprc.swift.benchmark.Benchmark">
-        <property name="swiftDao" ref="swiftDao" />
-    </bean>
-
-    <bean id="AminoAcidReport" class="edu.mayo.mprc.swift.report.AminoAcidReport">
-        <property name="aminoAcidSet" ref="aminoAcidSet" />
-        <property name="webUiHolder" ref="webUiHolder" />
-    </bean>
-
-    <bean id="ModificationReport" class="edu.mayo.mprc.swift.report.ModificationReport">
-        <property name="unimodDao" ref="unimodDao" />
-        <property name="webUiHolder" ref="webUiHolder" />
-    </bean>
-
-    <bean id="AnalysisReport" class="edu.mayo.mprc.swift.report.AnalysisReport">
-        <property name="searchDbDao" ref="searchDbDao" />
-        <property name="swiftDao" ref="swiftDao" />
-        <property name="webUiHolder" ref="webUiHolder" />
-    </bean>
-
-    <bean id="FindProtein" class="edu.mayo.mprc.swift.report.FindProtein">
-        <property name="searchDbDao" ref="searchDbDao" />
-        <property name="webUiHolder" ref="webUiHolder" />
-    </bean>
-
-    <bean id="SampleReport" class="edu.mayo.mprc.swift.report.SampleReport">
-        <property name="searchDbDao" ref="searchDbDao" />
     </bean>
 </beans>

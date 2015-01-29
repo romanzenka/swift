@@ -761,7 +761,7 @@ public final class SwiftApp implements EntryPoint, HidesPageContentsWhileLoading
 					@Override
 					public void onSuccess(final Void o) {
 						dialog.hide();
-						redirect("/report/report.jsp");
+						redirect("/report/");
 					}
 				});
 			} catch (Exception e) {

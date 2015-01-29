@@ -2,6 +2,7 @@ package edu.mayo.mprc.utilities;
 
 import com.google.common.base.Strings;
 
+import java.io.File;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
@@ -218,5 +219,25 @@ public final class StringUtilities {
 			sb.append(String.format("%" + maxWidth + 's', s));
 		}
 		return sb.toString();
+	}
+
+	/**
+	 * Make sure directory names break after slashes and not on dashes.
+	 *
+	 * @param file File
+	 * @return Directory of the file with proper line breaks
+	 */
+	public static String getDirectoryString(final File file) {
+		return file.getParent().replaceAll("/", "/\u200B").replaceAll("-", "\u2011");
+	}
+
+	/**
+	 * Make sure file names breaks after underscores and not on dashes.
+	 *
+	 * @param file File
+	 * @return Name of the file with proper line breaks
+	 */
+	public static String getFileNameString(final File file) {
+		return file.getName().replaceAll("_", "_​​\u200B").replaceAll("-", "\u2011");
 	}
 }

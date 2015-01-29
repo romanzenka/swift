@@ -3,7 +3,9 @@ package edu.mayo.mprc.swift.ui.server;
 import edu.mayo.mprc.MprcException;
 import edu.mayo.mprc.swift.resources.WebUiHolder;
 import org.apache.log4j.Logger;
-import org.springframework.web.HttpRequestHandler;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -12,14 +14,15 @@ import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 
-public final class FileDirectoryServiceServlet implements HttpRequestHandler {
+@Controller
+public final class FileDirectoryServiceServlet {
 	private static final Logger LOGGER = Logger.getLogger(FileDirectoryServiceServlet.class);
 
 	private WebUiHolder webUiHolder;
 	public static final String DIRECTORY_PATH_ATTRIBUTE_NAME = "d";
 	public static final String EXPANDED_PATHS_ATTRIBUTE_NAME = "e";
 
-	@Override
+	@RequestMapping(value = "/start/DirectoryService", method = RequestMethod.POST)
 	public void handleRequest(final HttpServletRequest req, final HttpServletResponse resp) throws
 			ServletException, IOException {
 

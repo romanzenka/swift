@@ -1,33 +1,32 @@
-<%@ page import="edu.mayo.mprc.swift.SwiftWebContext" %>
 <!DOCTYPE html>
 <html>
 <head>
-    <title>New Swift Search | <%=SwiftWebContext.getWebUi().getTitle()%>
-    </title>
+    <title>New Swift Search | ${title}</title>
     <meta name='gwt:module' content='edu.mayo.mprc.swift.ui.SwiftApp'>
     <meta HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=utf-8">
     <meta Http-Equiv="Cache-Control" Content="no-cache">
     <link rel=stylesheet href="DBCurator.css" media="all">
-    <link rel="stylesheet" href="SwiftApp.css" media="all">
+    <link rel="stylesheet" href="/start/SwiftApp.css" media="all">
     <link rel="stylesheet" href="/common/topbar.css" media="all">
-    <link rel="stylesheet" href="filechooser/style.css" media="all">
+    <link rel="stylesheet" href="/start/filechooser/style.css" media="all">
 
-    <script type="text/javascript" src="start.nocache.js"></script>
-    <script type="text/javascript" src="filechooser/jquery-1.7.min.js"></script>
-    <script type="text/javascript" src="filechooser/cookies.js"></script>
-    <script type="text/javascript" src="filechooser/expanded.js"></script>
-    <script type="text/javascript" src="filechooser/dialog.js"></script>
-    <script type="text/javascript" src="filechooser/startup.js"></script>
+    <script type="text/javascript" src="/start/start.nocache.js"></script>
+    <script type="text/javascript" src="/start/filechooser/jquery-1.7.min.js"></script>
+    <script type="text/javascript" src="/start/filechooser/cookies.js"></script>
+    <script type="text/javascript" src="/start/filechooser/expanded.js"></script>
+    <script type="text/javascript" src="/start/filechooser/dialog.js"></script>
+    <script type="text/javascript" src="/start/filechooser/startup.js"></script>
 </head>
 <body>
 <iframe src="javascript:''" id='__gwt_historyFrame' style='position:absolute;width:0;height:0;border:0'></iframe>
 <div class="topbar">
-    <span class="logo-small"><%=SwiftWebContext.getWebUi().getTitle()%></span>
+    <span class="logo-small">${title}</span>
     <ul class="locations">
         <li class="active-tab"><a href="/start">New search</a></li>
-        <li><a href="/report/report.jsp">Existing searches</a></li>
+        <li><a href="/report">Existing searches</a></li>
         <li><a href="/">About Swift</a></li>
-        <li><a href="/quameter">QuaMeter</a></li> <!-- TODO - make optional -->
+        <li><a href="/quameter">QuaMeter</a></li>
+        <!-- TODO - make optional -->
         <li><a href="/extras">Extras</a></li>
     </ul>
 </div>

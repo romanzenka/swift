@@ -1,0 +1,1 @@
+<div style="width:14px;float:right;"><img src="/common/arrow_up_down.png"></div>

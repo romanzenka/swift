@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<taglib version="2.1" xmlns="http://java.sun.com/xml/ns/javaee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-jsptaglibrary_2_1.xsd">
+    <tlib-version>1.0</tlib-version>
+    <short-name>swift</short-name>
+    <uri>http://swift.mayo.edu/swift.tld</uri>
+    <function>
+        <name>colorizeSequence</name>
+        <function-class>edu.mayo.mprc.swift.helper.HemeHelper</function-class>
+        <function-signature>java.lang.String colorizeSequence(java.lang.String,java.lang.String)</function-signature>
+    </function>
+    <function>
+        <name>nonBlankSpaces</name>
+        <function-class>edu.mayo.mprc.swift.helper.HemeHelper</function-class>
+        <function-signature>java.lang.String nonBlankSpaces(int)</function-signature>
+    </function>
+</taglib>

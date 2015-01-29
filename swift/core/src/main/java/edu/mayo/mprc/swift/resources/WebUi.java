@@ -21,11 +21,9 @@ import edu.mayo.mprc.quameterdb.InstrumentNameMapper;
 import edu.mayo.mprc.quameterdb.QuameterUi;
 import edu.mayo.mprc.swift.db.DatabaseFileTokenFactory;
 import edu.mayo.mprc.swift.db.SearchEngine;
-import edu.mayo.mprc.swift.db.SwiftDao;
 import edu.mayo.mprc.swift.dbmapping.SearchRun;
 import edu.mayo.mprc.swift.search.SwiftSearcher;
 import edu.mayo.mprc.utilities.FileUtilities;
-import edu.mayo.mprc.workspace.WorkspaceDao;
 import org.apache.log4j.Logger;
 
 import java.io.File;
@@ -54,10 +52,7 @@ public final class WebUi implements Checkable {
 	private CurationContext curationContext;
 	private String title;
 	private DatabaseFileTokenFactory fileTokenFactory;
-	private SwiftMonitor swiftMonitor;
 	private Daemon mainDaemon;
-	private SwiftDao swiftDao;
-	private WorkspaceDao workspaceDao;
 	private String scaffoldViewerUrl; // Where does the Scaffold Viewer live
 	private boolean extractMsn;
 	private boolean msconvert;
@@ -76,7 +71,7 @@ public final class WebUi implements Checkable {
 	private static final String DEFAULT_SCAFFOLD_VIEWER_URL = "http://www.proteomesoftware.com/products/free-viewer/";
 
 	public WebUi() {
-		USER_MESSAGE.setMessage("Swift's new database deployment has been temporarily disabled. Swift needs to be upgraded to support Mascot's Database Manager. If you need a new database, please ask Roman.");
+		// USER_MESSAGE.setMessage("Swift's new database deployment has been temporarily disabled. Swift needs to be upgraded to support Mascot's Database Manager. If you need a new database, please ask Roman.");
 	}
 
 	public File getBrowseRoot() {
@@ -138,10 +133,6 @@ public final class WebUi implements Checkable {
 		return spectrumQaParamFiles;
 	}
 
-	public CurationContext getCurationContext() {
-		return curationContext;
-	}
-
 	public String getTitle() {
 		return title;
 	}
@@ -159,10 +150,6 @@ public final class WebUi implements Checkable {
 		return USER_MESSAGE;
 	}
 
-	public SwiftMonitor getSwiftMonitor() {
-		return swiftMonitor;
-	}
-
 	public Daemon getMainDaemon() {
 		return mainDaemon;
 	}
@@ -171,34 +158,12 @@ public final class WebUi implements Checkable {
 		this.mainDaemon = mainDaemon;
 	}
 
-	public SwiftDao getSwiftDao() {
-		return swiftDao;
-	}
-
-	public void setSwiftDao(SwiftDao swiftDao) {
-		this.swiftDao = swiftDao;
-	}
-
-	public WorkspaceDao getWorkspaceDao() {
-		return workspaceDao;
-	}
-
-	public void setWorkspaceDao(WorkspaceDao workspaceDao) {
-		this.workspaceDao = workspaceDao;
-	}
-
 	public File getNewConfigFile() {
 		return newConfigFile;
 	}
 
 	public void setNewConfigFile(File newConfigFile) {
 		this.newConfigFile = newConfigFile;
-	}
-
-	public void stopSwiftMonitor() {
-		if (getSwiftMonitor() != null) {
-			getSwiftMonitor().stop();
-		}
 	}
 
 	@Override
@@ -287,10 +252,7 @@ public final class WebUi implements Checkable {
 	 * A factory capable of creating the web ui class.
 	 */
 	public static final class Factory extends FactoryBase<Config, WebUi> implements FactoryDescriptor {
-		private SwiftMonitor swiftMonitor;
 		private DatabaseFileTokenFactory fileTokenFactory;
-		private SwiftDao swiftDao;
-		private WorkspaceDao workspaceDao;
 		private SearchEngine.Factory searchEngineFactory;
 		private CurationContext curationContext;
 
@@ -303,10 +265,7 @@ public final class WebUi implements Checkable {
 				ui.browseRoot = new File(config.getBrowseRoot());
 				ui.browseWebRoot = config.getBrowseWebRoot();
 				ui.newConfigFile = config.getNewConfigFile() == null ? null : new File(config.getNewConfigFile());
-				ui.swiftMonitor = getSwiftMonitor();
 				ui.setFileTokenFactory(getFileTokenFactory());
-				ui.setSwiftDao(getSwiftDao());
-				ui.setWorkspaceDao(getWorkspaceDao());
 				ui.setScaffoldViewerUrl(config.getScaffoldViewerUrl());
 
 				if (config.getQstat() != null) {
@@ -376,36 +335,12 @@ public final class WebUi implements Checkable {
 			return ui;
 		}
 
-		public SwiftMonitor getSwiftMonitor() {
-			return swiftMonitor;
-		}
-
-		public void setSwiftMonitor(final SwiftMonitor swiftMonitor) {
-			this.swiftMonitor = swiftMonitor;
-		}
-
 		public DatabaseFileTokenFactory getFileTokenFactory() {
 			return fileTokenFactory;
 		}
 
 		public void setFileTokenFactory(DatabaseFileTokenFactory fileTokenFactory) {
 			this.fileTokenFactory = fileTokenFactory;
-		}
-
-		public SwiftDao getSwiftDao() {
-			return swiftDao;
-		}
-
-		public void setSwiftDao(SwiftDao swiftDao) {
-			this.swiftDao = swiftDao;
-		}
-
-		public WorkspaceDao getWorkspaceDao() {
-			return workspaceDao;
-		}
-
-		public void setWorkspaceDao(WorkspaceDao workspaceDao) {
-			this.workspaceDao = workspaceDao;
 		}
 
 		public SearchEngine.Factory getSearchEngineFactory() {

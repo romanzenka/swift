@@ -50,6 +50,7 @@ public final class ServletInitialization implements SwiftCommand, ServletContext
 	private SwiftMonitor swiftMonitor;
 	private DefaultSwiftSearcherCaller swiftSearcherCaller;
 	private ServletContext servletContext;
+	private SwiftDao swiftDao;
 
 	public static boolean redirectToConfig(final ServletContext context, final HttpServletResponse response) throws IOException {
 		if ("config".equals(getAction(context))) {
@@ -114,7 +115,7 @@ public final class ServletInitialization implements SwiftCommand, ServletContext
 				getSwiftSearcherCaller().setSwiftSearcherConnection(webUi.getSwiftSearcherDaemonConnection());
 				getSwiftSearcherCaller().setBrowseRoot(webUi.getBrowseRoot());
 
-				cleanupDatabaseAfterStartup(webUi.getSwiftDao());
+				cleanupDatabaseAfterStartup(swiftDao);
 
 				// Start all the services
 				daemon.start();
@@ -125,9 +126,6 @@ public final class ServletInitialization implements SwiftCommand, ServletContext
 
 		} catch (Exception t) {
 			LOGGER.fatal("Swift web application is terminating", t);
-			if (webUiHolder != null) {
-				webUiHolder.stopSwiftMonitor();
-			}
 			if (daemon != null) {
 				daemon.stop();
 			}
@@ -197,6 +195,14 @@ public final class ServletInitialization implements SwiftCommand, ServletContext
 
 	public void setConfigurationService(ConfigurationService configurationService) {
 		this.configurationService = configurationService;
+	}
+
+	public SwiftDao getSwiftDao() {
+		return swiftDao;
+	}
+
+	public void setSwiftDao(SwiftDao swiftDao) {
+		this.swiftDao = swiftDao;
 	}
 
 	public ServletInitialization() {

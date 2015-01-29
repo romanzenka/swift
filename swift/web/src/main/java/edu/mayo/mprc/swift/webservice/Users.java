@@ -23,7 +23,7 @@ public final class Users {
 	public Users() {
 	}
 
-	@RequestMapping(value="/users", method = RequestMethod.GET)
+	@RequestMapping(value = "/service/users", method = RequestMethod.GET)
 	public ModelAndView listUsers() {
 		try {
 			getWorkspaceDao().begin();

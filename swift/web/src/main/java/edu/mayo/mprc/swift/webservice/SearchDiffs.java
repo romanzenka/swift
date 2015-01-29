@@ -40,7 +40,7 @@ public final class SearchDiffs {
 	public SearchDiffs() {
 	}
 
-	@RequestMapping(value = "/search-diffs", method = RequestMethod.GET)
+	@RequestMapping(value = "/service/search-diffs", method = RequestMethod.GET)
 	public ModelAndView searchDiff(@RequestParam("id") final int swiftSearchId) {
 		final SwiftDao dao = getSwiftDao();
 		try {

@@ -44,6 +44,12 @@
             <version>3.8-SNAPSHOT</version>
         </dependency>
 
+        <dependency>
+            <groupId>jstl</groupId>
+            <artifactId>jstl</artifactId>
+            <version>1.2</version>
+        </dependency>
+
         <!-- Supports RSS feed generation -->
         <dependency>
             <groupId>rome</groupId>
