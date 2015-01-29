@@ -66,7 +66,7 @@ public final class SearchDiffs {
 			final List<SwiftSearch> searches = new ArrayList<SwiftSearch>();
 			for (final SearchRun run : runs) {
 				final SwiftSearchDefinition definition = dao.getSwiftSearchDefinition(run.getSwiftSearch());
-				final SwiftSearch runOutput = new SwiftSearch(run, definition, getWebUiHolder().getWebUi());
+				final SwiftSearch runOutput = new SwiftSearch(run, definition);
 				searches.add(runOutput);
 
 				// Add newly discovered search files

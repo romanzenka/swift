@@ -20,6 +20,8 @@ public final class SearchRunFilter {
 	private String userWhereClause;
 	private int titleSortOrder;
 	private String titleWhereClause;
+	private int instrumentSortOrder;
+	private String instrumentWhereClause;
 	private String start;
 	private String count;
 	private Date startDate;
@@ -73,6 +75,22 @@ public final class SearchRunFilter {
 		this.titleWhereClause = titleWhereClause;
 	}
 
+	public int getInstrumentSortOrder() {
+		return instrumentSortOrder;
+	}
+
+	public void setInstrumentSortOrder(int instrumentSortOrder) {
+		this.instrumentSortOrder = instrumentSortOrder;
+	}
+
+	public String getInstrumentWhereClause() {
+		return instrumentWhereClause;
+	}
+
+	public void setInstrumentWhereClause(String instrumentWhereClause) {
+		this.instrumentWhereClause = instrumentWhereClause;
+	}
+
 	public void setUserFilter(final String filter) {
 		if (filter == null) {
 			setUserSortOrder(0);
@@ -101,6 +119,22 @@ public final class SearchRunFilter {
 				setTitleSortOrder(Integer.parseInt(keyValue[1]));
 			} else if ("filter".equals(keyValue[0]) && keyValue.length >= 2) {
 				setTitleWhereClause(keyValue[1]);
+			}
+		}
+	}
+
+	public void setInstrumentFilter(final String filter) {
+		if (filter == null) {
+			setInstrumentWhereClause(null);
+			return;
+		}
+		final String[] parts = filter.split(";");
+		for (final String part : parts) {
+			final String[] keyValue = part.split("=");
+			if ("sort".equals(keyValue[0])) {
+				setInstrumentSortOrder(Integer.parseInt(keyValue[1]));
+			} else if ("filter".equals(keyValue[0]) && keyValue.length >= 2) {
+				setInstrumentWhereClause(keyValue[1]);
 			}
 		}
 	}

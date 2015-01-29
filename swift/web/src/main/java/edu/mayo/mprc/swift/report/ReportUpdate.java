@@ -154,6 +154,7 @@ public final class ReportUpdate {
 			searchRunFilter.setShowHidden(req.getParameter("showHidden") != null && "true".equals(req.getParameter("showHidden")));
 			searchRunFilter.setUserFilter(req.getParameter("userfilter"));
 			searchRunFilter.setTitleFilter(req.getParameter("titlefilter"));
+			searchRunFilter.setInstrumentFilter(req.getParameter("instrumentfilter"));
 
 			final PrintWriter printOut = resp.getWriter();
 			out = new JsonWriter(printOut);

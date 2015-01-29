@@ -1,11 +1,16 @@
 package edu.mayo.mprc.swift.controller;
 
+import com.google.common.collect.BiMap;
+import com.google.common.collect.HashBiMap;
+import com.google.common.collect.Maps;
+import com.google.gson.Gson;
 import edu.mayo.mprc.MprcException;
+import edu.mayo.mprc.searchdb.dao.SearchDbDao;
 import edu.mayo.mprc.swift.ReportUtils;
 import edu.mayo.mprc.swift.db.SwiftDao;
 import edu.mayo.mprc.swift.dbmapping.SearchRun;
 import edu.mayo.mprc.swift.dbmapping.TaskData;
-import edu.mayo.mprc.swift.report.JsonWriter;
+import edu.mayo.mprc.swift.resources.InstrumentSerialNumberMapper;
 import edu.mayo.mprc.swift.resources.WebUi;
 import edu.mayo.mprc.swift.resources.WebUiHolder;
 import edu.mayo.mprc.utilities.StringUtilities;
@@ -19,39 +24,55 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.annotation.Resource;
 import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 
 /**
  * @author Roman Zenka
  */
 @Controller
 public final class Report {
-	private WorkspaceDao workspaceDao;
-	private WebUiHolder webUiHolder;
 	private SwiftDao swiftDao;
+	private WorkspaceDao workspaceDao;
+	private SearchDbDao searchDbDao;
+	private WebUiHolder webUiHolder;
 
 	@RequestMapping(value = "/report", method = RequestMethod.GET)
 	public String report(final ModelMap model) {
+		final InstrumentSerialNumberMapper mapper = getWebUiHolder().getInstrumentSerialNumberMapper();
+
 		getSwiftDao().begin();
-		final StringBuilder userList = new StringBuilder();
-		final StringBuilder idList = new StringBuilder();
 		try {
 			final List<User> userInfos = getWorkspaceDao().getUsers(false);
-			if (userInfos != null) {
-				for (final User userInfo : userInfos) {
-					if (userList.length() > 0) {
-						userList.append(",");
-						idList.append(",");
-					}
-					userList.append("'").append(StringUtilities.toUnicodeEscapeString(JsonWriter.escapeSingleQuoteJavascript(userInfo.getFirstName()))).append(' ').append(StringUtilities.toUnicodeEscapeString(JsonWriter.escapeSingleQuoteJavascript(userInfo.getLastName()))).append("'");
-					idList.append("'").append(JsonWriter.escapeSingleQuoteJavascript(String.valueOf(userInfo.getId()))).append("'");
+			final Map<String, String> users = Maps.newTreeMap();
+			for (final User userInfo : userInfos) {
+				users.put(
+						String.valueOf(userInfo.getId()),
+						userInfo.getFirstName() + ' ' + userInfo.getLastName());
+			}
+			final String usersJson = new Gson().toJson(users);
+			model.addAttribute("usersJson", usersJson);
+
+			final List<String> instrumentSerials = getSearchDbDao().listAllInstrumentSerialNumbers();
+			final BiMap<String, String> nameToSerial = HashBiMap.create(instrumentSerials.size());
+			for (final String instrumentSerial : instrumentSerials) {
+				final String instrumentName = mapper.mapInstrumentSerialNumbers(instrumentSerial);
+				if (nameToSerial.containsKey(instrumentName)) {
+					nameToSerial.put(instrumentName, nameToSerial.get(instrumentName) + ',' + instrumentSerial);
+				} else {
+					nameToSerial.put(instrumentName, instrumentSerial);
 				}
 			}
+
+			final String instrumentsJson = new Gson().toJson(new TreeMap<String, String>(nameToSerial.inverse()));
+			model.addAttribute("instrumentsJson", instrumentsJson);
+
 			getSwiftDao().commit();
-		} catch (final Exception ignore) {
+		} catch (final Exception e) {
 			getSwiftDao().rollback();
+			throw new MprcException("Could not obtain data for report", e);
 		}
-		model.addAttribute("userListJson", userList.toString());
-		model.addAttribute("idListJson", idList.toString());
+
 
 		return "report/report";
 	}
@@ -133,18 +154,25 @@ public final class Report {
 		this.workspaceDao = workspaceDao;
 	}
 
+	public SearchDbDao getSearchDbDao() {
+		return searchDbDao;
+	}
+
+	@Resource(name = "searchDbDao")
+	public void setSearchDbDao(final SearchDbDao searchDbDao) {
+		this.searchDbDao = searchDbDao;
+	}
+
 	public WebUiHolder getWebUiHolder() {
 		return webUiHolder;
 	}
 
 	@Resource(name = "webUiHolder")
-	public void setWebUiHolder(final WebUiHolder webUiHolder) {
+	public void setWebUiHolder(WebUiHolder webUiHolder) {
 		this.webUiHolder = webUiHolder;
 	}
 
 	private WebUi getWebUi() {
 		return getWebUiHolder().getWebUi();
 	}
-
-
 }
