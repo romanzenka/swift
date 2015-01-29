@@ -12,7 +12,7 @@ import javax.annotation.Resource;
  * @author Roman Zenka
  */
 @Controller
-public final class Configuration {
+public final class ConfigurationIndex {
 	private WebUiHolder webUiHolder;
 
 	@RequestMapping("/configuration")

@@ -168,7 +168,7 @@
                     <modules>
                         <module>edu.mayo.mprc.swift.ui.SwiftApp</module>
                         <module>edu.mayo.mprc.common.Common</module>
-                        <module>edu.mayo.mprc.swift.controller.Configuration</module>
+                        <module>edu.mayo.mprc.swift.configuration.Configuration</module>
                     </modules>
                     <style>PRETTY</style>
                 </configuration>

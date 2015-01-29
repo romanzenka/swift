@@ -70,7 +70,7 @@
     <![endif]-->
 
     <script type="text/javascript" src="/common/bootstrap/js/jquery_1.9.0.min.js"></script>
-    <title>Search Difference | <%=SwiftWebContext.getWebUi().getTitle()%></title>
+    <title>Search Difference | ${title}</title>
     <script type="text/javascript">
         // Read a page's GET URL variables and return them as an associative array.
         function getUrlVars() {
