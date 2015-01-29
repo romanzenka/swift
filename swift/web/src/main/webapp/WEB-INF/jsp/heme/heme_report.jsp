@@ -28,7 +28,7 @@
 <div class="container">
     <div class="navbar navbar-your-class navbar-static-top">
         <div class="navbar-inner">
-            <a href="/heme/heme.jsp" class="btn btn-info pull-right">Return to Reports</a>
+            <a href="/heme" class="btn btn-info pull-right">Return to Reports</a>
 
             <h1>Report: ${report.name}
             </h1>
