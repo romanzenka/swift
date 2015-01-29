@@ -33,11 +33,6 @@ public abstract class SearchDbDaoBlank implements SearchDbDao {
 	}
 
 	@Override
-	public List<String> getProteinAccessionNumbers(final ProteinSequenceList proteinSequenceList) {
-		throw new UnsupportedOperationException();
-	}
-
-	@Override
 	public List<ReportData> getSearchesForAccessionNumber(final String accessionNumber) {
 		throw new UnsupportedOperationException();
 	}
@@ -90,6 +85,11 @@ public abstract class SearchDbDaoBlank implements SearchDbDao {
 	@Override
 	public List<SearchRun> fillInInstrumentSerialNumbers(List<SearchRun> searchRuns) {
 		return searchRuns;
+	}
+
+	@Override
+	public List<String> listAllInstrumentSerialNumbers() {
+		throw new UnsupportedOperationException();
 	}
 
 	@Override

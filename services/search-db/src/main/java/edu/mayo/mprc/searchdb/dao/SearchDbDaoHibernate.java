@@ -274,13 +274,6 @@ public class SearchDbDaoHibernate extends DaoBase implements SearchDbDao {
 	}
 
 	@Override
-	public List<String> getProteinAccessionNumbers(final ProteinSequenceList proteinSequenceList) {
-		return (List<String>) getSession().createQuery("select distinct e.accessionNumber.accnum from ProteinEntry e where e.sequence in (:sequences) order by e.accessionNumber.accnum")
-				.setParameterList("sequences", proteinSequenceList.getList())
-				.list();
-	}
-
-	@Override
 	public List<ReportData> getSearchesForAccessionNumber(final String accessionNumber) {
 		return listAndCast(getSession().createQuery(
 				"select distinct rd from " +
@@ -338,6 +331,16 @@ public class SearchDbDaoHibernate extends DaoBase implements SearchDbDao {
 		}
 
 		return searchRuns;
+	}
+
+	@Override
+	public List<String> listAllInstrumentSerialNumbers() {
+		List<String> serialNumbers = listAndCast(getSession()
+				.createQuery("select distinct instrumentSerialNumber" +
+						" from TandemMassSpectrometrySample" +
+						" order by instrumentSerialNumber"));
+
+		return serialNumbers;
 	}
 
 	@Override

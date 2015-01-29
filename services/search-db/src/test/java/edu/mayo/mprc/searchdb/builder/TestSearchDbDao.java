@@ -294,4 +294,18 @@ public class TestSearchDbDao extends DaoTest {
 			throw new MprcException(e);
 		}
 	}
+
+	@Test
+	public void shouldListInstrumentSerialNumbers() {
+		searchDbDao.begin();
+		try {
+			final List<String> numbers = searchDbDao.listAllInstrumentSerialNumbers();
+			Assert.assertEquals(numbers.size(), 1, "One expected instrument");
+			Assert.assertEquals(numbers.get(0), "Orbi123", "The name of the instrument matches the installed sample data");
+			searchDbDao.commit();
+		} catch (Exception e) {
+			searchDbDao.rollback();
+			throw new MprcException(e);
+		}
+	}
 }

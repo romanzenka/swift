@@ -43,14 +43,6 @@ public interface SearchDbDao extends Dao, RuntimeInitializer {
 	SwiftSearchDefinition getSearchDefinition(long reportId);
 
 	/**
-	 * List accession numbers for a protein group.
-	 *
-	 * @param proteinSequenceList A list of protein sequences.
-	 * @return A string describing the accession numbers for proteins within the group.
-	 */
-	List<String> getProteinAccessionNumbers(ProteinSequenceList proteinSequenceList);
-
-	/**
 	 * List all searches where a protein of given accession number was observed.
 	 *
 	 * @param accessionNumber Accession number.
@@ -144,4 +136,11 @@ public interface SearchDbDao extends Dao, RuntimeInitializer {
 	 * @return Same list with all the instrument names that were used in a given search filled in
 	 */
 	List<SearchRun> fillInInstrumentSerialNumbers(List<SearchRun> searchRuns);
+
+	/**
+	 * List all the distinct instrument serial numbers present in the database.
+	 *
+	 * @return List of all instrument serial numbers, as reported by the instrument (not as displayed to the user).
+	 */
+	List<String> listAllInstrumentSerialNumbers();
 }
