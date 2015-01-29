@@ -38,12 +38,6 @@ public class WebUiHolder {
 		return (WebUi) resource;
 	}
 
-	public void stopSwiftMonitor() {
-		if (getWebUi() != null) {
-			getWebUi().stopSwiftMonitor();
-		}
-	}
-
 	public RunningApplicationContext getContext() {
 		return context;
 	}

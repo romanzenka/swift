@@ -46,10 +46,7 @@
     <bean id="curationContext" class="edu.mayo.mprc.dbcurator.model.CurationContext"></bean>
 
     <bean id="webUiFactory" class="edu.mayo.mprc.swift.resources.WebUi$Factory" autowire="byType">
-        <property name="swiftMonitor" ref="swiftMonitor" />
         <property name="fileTokenFactory" ref="fileTokenFactory" />
-        <property name="swiftDao" ref="swiftDao" />
-        <property name="workspaceDao" ref="workspaceDao" />
         <property name="searchEngineFactory" ref="searchEngineFactory" />
         <property name="curationContext" ref="curationContext" />
     </bean>

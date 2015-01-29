@@ -10,6 +10,7 @@
         <property name="swiftSearcherCaller" ref="swiftSearcherCaller" />
         <property name="webUiHolder" ref="webUiHolder" />
         <property name="configurationService" ref="ConfigurationService" />
+        <property name="swiftDao" ref="swiftDao" />
     </bean>
 
     <bean id="SwiftAppService" class="edu.mayo.mprc.swift.ui.server.ServiceImpl">
