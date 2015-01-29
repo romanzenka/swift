@@ -139,10 +139,8 @@
     </bean>
 
     <mvc:view-controller path="/dashboard" view-name="dashboard" />
-    <mvc:view-controller path="/memory" view-name="memory" />
-    <mvc:view-controller path="/monitor" view-name="monitor" />
-
     <mvc:view-controller path="/start/" view-name="start/index" />
+    <mvc:view-controller path="/search-diff/" view-name="search-diff/index" />
 
     <mvc:default-servlet-handler />
 </beans>
