@@ -478,7 +478,11 @@ FilterDropDown.prototype.addSeparator = function() {
 };
 
 FilterDropDown.prototype.getRequestString = function() {
-    return "sort=" + this.getSortOrder() + ";filter=" + this.getFilterValue();
+    if (this.isFiltering()) {
+        return "sort=" + this.getSortOrder() + ";filter=" + this.getFilterValue();
+    } else {
+        return "sort=" + this.getSortOrder();
+    }
 };
 
 //======================================================================================================================

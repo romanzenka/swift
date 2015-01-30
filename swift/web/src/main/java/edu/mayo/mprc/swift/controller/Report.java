@@ -1,9 +1,8 @@
 package edu.mayo.mprc.swift.controller;
 
 import com.google.common.base.Strings;
-import com.google.common.collect.BiMap;
-import com.google.common.collect.HashBiMap;
-import com.google.common.collect.Maps;
+import com.google.common.collect.*;
+import com.google.common.collect.ImmutableSortedMap.Builder;
 import com.google.gson.Gson;
 import edu.mayo.mprc.MprcException;
 import edu.mayo.mprc.searchdb.dao.SearchDbDao;
@@ -26,7 +25,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import javax.annotation.Resource;
 import java.util.List;
 import java.util.Map;
-import java.util.TreeMap;
 
 /**
  * @author Roman Zenka
@@ -68,7 +66,8 @@ public final class Report {
 				}
 			}
 
-			final String instrumentsJson = new Gson().toJson(new TreeMap<String, String>(nameToSerial.inverse()));
+			final ImmutableSortedMap<String, String> sortedMap = new Builder<String, String>(Ordering.natural()).putAll(nameToSerial.inverse()).build();
+			final String instrumentsJson = new Gson().toJson(sortedMap);
 			model.addAttribute("instrumentsJson", instrumentsJson);
 
 			getSwiftDao().commit();
