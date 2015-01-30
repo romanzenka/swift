@@ -358,11 +358,11 @@ public class SearchDbDaoHibernate extends DaoBase implements SearchDbDao {
 	public List<String> listAllInstrumentSerialNumbers() {
 		List<String> serialNumbers = listAndCast(getSession()
 				.createQuery("select distinct t.instrumentSerialNumber" +
-						" from Analysis as a," +
-						" a.biologicalSamples as bs," +
-						" bs.list as bsl," +
-						" bsl.searchResults as sr," +
-						" sr.list as srl," +
+						" from Analysis as a join" +
+						" a.biologicalSamples as bs join" +
+						" bs.list as bsl join" +
+						" bsl.searchResults as sr join" +
+						" sr.list as srl join" +
 						" srl.massSpecSample as t" +
 						" order by t.instrumentSerialNumber"));
 
