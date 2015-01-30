@@ -357,9 +357,14 @@ public class SearchDbDaoHibernate extends DaoBase implements SearchDbDao {
 	@Override
 	public List<String> listAllInstrumentSerialNumbers() {
 		List<String> serialNumbers = listAndCast(getSession()
-				.createQuery("select distinct instrumentSerialNumber" +
-						" from TandemMassSpectrometrySample" +
-						" order by instrumentSerialNumber"));
+				.createQuery("select distinct t.instrumentSerialNumber" +
+						" from Analysis as a," +
+						" a.biologicalSamples as bs," +
+						" bs.list as bsl," +
+						" bsl.searchResults as sr," +
+						" sr.list as srl," +
+						" srl.massSpecSample as t" +
+						" order by t.instrumentSerialNumber"));
 
 		return serialNumbers;
 	}
