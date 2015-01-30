@@ -16,6 +16,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
 import java.io.Writer;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -33,12 +34,20 @@ public final class FileSearchBean {
 	private static final String NAME_ATTR = "name";
 	private static final String ERROR_MESSAGE_PREFIX = "Directory content evaluation failed...\n";
 
+	public enum SortBy {
+		NAME,
+		DATE
+	}
+
+
 	/**
 	 * the path under which will find children files and directory names
 	 */
 	private File[] expandedPaths;
 	private String path;
 	private String basePath;
+
+	private SortBy sortBy;
 	private static final File[] EMPTY_FILE_ARRAY = new File[0];
 
 	/**
@@ -57,6 +66,14 @@ public final class FileSearchBean {
 
 	public String getPath() {
 		return path;
+	}
+
+	public SortBy getSortBy() {
+		return sortBy;
+	}
+
+	public void setSortBy(SortBy sortBy) {
+		this.sortBy = sortBy;
 	}
 
 	public void setExpandedPaths(final String paths) {
@@ -198,8 +215,8 @@ public final class FileSearchBean {
 		moveDirsToFiles(dirs, files);
 		final AttributesImpl atts = new AttributesImpl();
 		try {
-			Collections.sort(dirs, new SimpleFileComparator());
-			Collections.sort(files, new SimpleFileComparator());
+			Collections.sort(dirs, new SimpleFileComparator(sortBy));
+			Collections.sort(files, new SimpleFileComparator(sortBy));
 
 			for (final File dir : dirs) {
 				atts.clear();
@@ -228,13 +245,13 @@ public final class FileSearchBean {
 	 * 'files'. This is the case with Agilent's .d directories. We detect these,
 	 * remove them from the list of dirs, add them to the list of files.
 	 *
-	 * @param dirs List of dirs to take Agilent dirs from from.
+	 * @param dirs  List of dirs to take Agilent dirs from from.
 	 * @param files Files to add the .d dirs to.
 	 */
 	static void moveDirsToFiles(List<File> dirs, List<File> files) {
 		List<File> newDirs = new ArrayList<File>(dirs.size());
-		for(File dir : dirs) {
-			if(isAgilentDir(dir)) {
+		for (File dir : dirs) {
+			if (isAgilentDir(dir)) {
 				files.add(dir);
 			} else {
 				newDirs.add(dir);
@@ -255,9 +272,22 @@ public final class FileSearchBean {
 	private static final class SimpleFileComparator implements Comparator<File>, Serializable {
 		private static final long serialVersionUID = 20121221L;
 
+		private SortBy sortBy;
+
+		public SimpleFileComparator(final SortBy sortBy) {
+			this.sortBy = sortBy;
+		}
+
 		@Override
 		public int compare(final File o1, final File o2) {
-			return o1.getName().compareToIgnoreCase(o2.getName());
+			switch (sortBy) {
+				case NAME:
+					return o1.getName().compareToIgnoreCase(o2.getName());
+				case DATE:
+					return -Long.valueOf(o1.lastModified()).compareTo(o2.lastModified());
+				default:
+					throw new MprcException(MessageFormat.format("Unsupported sort {0}", sortBy));
+			}
 		}
 	}
 }
