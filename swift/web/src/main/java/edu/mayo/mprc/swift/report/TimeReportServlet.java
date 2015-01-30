@@ -1,8 +1,9 @@
 package edu.mayo.mprc.swift.report;
 
 import edu.mayo.mprc.MprcException;
+import edu.mayo.mprc.searchdb.SearchRunFilter;
+import edu.mayo.mprc.searchdb.dao.SearchDbDao;
 import edu.mayo.mprc.swift.ReportUtils;
-import edu.mayo.mprc.swift.db.SearchRunFilter;
 import edu.mayo.mprc.swift.db.SwiftDao;
 import edu.mayo.mprc.swift.db.TimeReport;
 import edu.mayo.mprc.swift.dbmapping.SearchRun;
@@ -12,6 +13,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
+import javax.annotation.Resource;
 import javax.servlet.ServletException;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
@@ -21,6 +23,7 @@ import java.util.List;
 
 @Controller
 public final class TimeReportServlet {
+	private transient SearchDbDao searchDbDao;
 	private transient SwiftDao swiftDao;
 
 	public TimeReportServlet() {
@@ -34,17 +37,17 @@ public final class TimeReportServlet {
 			screen = req.getParameter("screen") != null;
 			filter = parseSearchRunFilter(req.getParameter("start"), req.getParameter("end"));
 			prepareHeader(resp, filter, screen);
-		} catch (MprcException e) {
+		} catch (final MprcException e) {
 			throw new ServletException("Cannot provide time report", e);
 		}
 
 		try {
 			final ServletOutputStream out = resp.getOutputStream();
-			swiftDao.begin();
+			searchDbDao.begin();
 			printReport(filter, out, screen ? '\t' : ',');
-			swiftDao.commit();
-		} catch (MprcException e) {
-			swiftDao.rollback();
+			searchDbDao.commit();
+		} catch (final MprcException e) {
+			searchDbDao.rollback();
 			throw new ServletException("Cannot provide time report", e);
 		}
 	}
@@ -77,7 +80,7 @@ public final class TimeReportServlet {
 	}
 
 	private void printReport(final SearchRunFilter filter, final ServletOutputStream out, final char separator) throws IOException {
-		final List<SearchRun> searchRuns = swiftDao.getSearchRunList(filter, false);
+		final List<SearchRun> searchRuns = searchDbDao.getSearchRunList(filter, false);
 		out.println("Search run" + separator + "Start time" + separator + "Elapsed time" + separator + "Consumed time" + separator + "Productive time");
 		for (final SearchRun searchRun : searchRuns) {
 			// TODO: Optimize this - fetch the task data for all search runs at once, do not order
@@ -95,11 +98,21 @@ public final class TimeReportServlet {
 		}
 	}
 
+	public SearchDbDao getSearchDbDao() {
+		return searchDbDao;
+	}
+
+	@Resource(name = "searchDbDao")
+	public void setSearchDbDao(final SearchDbDao searchDbDao) {
+		this.searchDbDao = searchDbDao;
+	}
+
 	public SwiftDao getSwiftDao() {
 		return swiftDao;
 	}
 
-	public void setSwiftDao(SwiftDao swiftDao) {
+	@Resource(name = "swiftDao")
+	public void setSwiftDao(final SwiftDao swiftDao) {
 		this.swiftDao = swiftDao;
 	}
 }

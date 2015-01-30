@@ -7,8 +7,8 @@ import edu.mayo.mprc.dbcurator.model.CurationContext;
 import edu.mayo.mprc.dbcurator.model.impl.CurationDaoHibernate;
 import edu.mayo.mprc.fastadb.FastaDbDaoHibernate;
 import edu.mayo.mprc.fastadb.SingleDatabaseTranslator;
+import edu.mayo.mprc.searchdb.SearchRunFilter;
 import edu.mayo.mprc.searchdb.dao.*;
-import edu.mayo.mprc.swift.db.SearchRunFilter;
 import edu.mayo.mprc.swift.db.SwiftDaoHibernate;
 import edu.mayo.mprc.swift.dbmapping.ReportData;
 import edu.mayo.mprc.swift.dbmapping.SearchRun;
@@ -85,10 +85,7 @@ public class TestSearchDbDao extends DaoTest {
 		workspaceDao = new WorkspaceDaoHibernate();
 		final ParamsDaoHibernate paramsDao = new ParamsDaoHibernate(workspaceDao, curationDao);
 		swiftDao = new SwiftDaoHibernate(workspaceDao, curationDao, paramsDao, unimodDao);
-
-		searchDbDao = new SearchDbDaoHibernate();
-		searchDbDao.setSwiftDao(swiftDao);
-		searchDbDao.setFastaDbDao(fastaDbDao);
+		searchDbDao = new SearchDbDaoHibernate(swiftDao, fastaDbDao);
 
 		initializeDatabase(Arrays.asList(workspaceDao, swiftDao, unimodDao, paramsDao, curationDao, searchDbDao, fastaDbDao));
 
@@ -283,12 +280,12 @@ public class TestSearchDbDao extends DaoTest {
 	public void shouldFillInInstruments() {
 		searchDbDao.begin();
 		try {
-			final List<SearchRun> searchRunList = swiftDao.getSearchRunList(runFilter(), true);
+			final List<SearchRun> searchRunList = searchDbDao.getSearchRunList(runFilter(), true);
 			searchDbDao.fillInInstrumentSerialNumbers(searchRunList);
 			searchDbDao.commit();
 
 			Assert.assertEquals(searchRunList.size(), 1, "We have 1 search run by default");
-			Assert.assertEquals(searchRunList.get(0).getInstruments(), "instrument", "Only one artificial instrument here");
+			Assert.assertEquals(searchRunList.get(0).getInstruments(), "Orbi123", "Only one artificial instrument here");
 		} catch (Exception e) {
 			swiftDao.rollback();
 			throw new MprcException(e);

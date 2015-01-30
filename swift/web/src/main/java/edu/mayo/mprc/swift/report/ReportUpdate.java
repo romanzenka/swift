@@ -4,9 +4,9 @@ import edu.mayo.mprc.MprcException;
 import edu.mayo.mprc.daemon.DaemonConnection;
 import edu.mayo.mprc.qstat.QstatOutput;
 import edu.mayo.mprc.qstat.QstatWorkPacket;
+import edu.mayo.mprc.searchdb.SearchRunFilter;
 import edu.mayo.mprc.searchdb.dao.SearchDbDao;
 import edu.mayo.mprc.swift.db.DatabaseFileTokenFactory;
-import edu.mayo.mprc.swift.db.SearchRunFilter;
 import edu.mayo.mprc.swift.db.SwiftDao;
 import edu.mayo.mprc.swift.dbmapping.ReportData;
 import edu.mayo.mprc.swift.dbmapping.SearchRun;
@@ -281,7 +281,7 @@ public final class ReportUpdate {
 	 * @param filter Filter defining what search runs and how sorted to output.
 	 */
 	private void printSearchRuns(final JsonWriter out, final SearchRunFilter filter, final String method) {
-		final List<SearchRun> searchRuns = swiftDao.getSearchRunList(filter, true);
+		final List<SearchRun> searchRuns = searchDbDao.getSearchRunList(filter, true);
 		searchDbDao.fillInInstrumentSerialNumbers(searchRuns);
 		getWebUi().mapInstrumentSerialNumbers(searchRuns);
 		swiftDao.fillNumberRunningTasksForSearchRun(searchRuns);
@@ -331,7 +331,7 @@ public final class ReportUpdate {
 	 * @param filter    Filter defining what search runs and how sorted to output.
 	 */
 	private void updateSearchRuns(final JsonWriter out, final SearchRunFilter filter, final Date timestamp) {
-		final List<SearchRun> searchRuns = swiftDao.getSearchRunList(filter, true);
+		final List<SearchRun> searchRuns = searchDbDao.getSearchRunList(filter, true);
 		swiftDao.fillNumberRunningTasksForSearchRun(searchRuns);
 		searchDbDao.fillInInstrumentSerialNumbers(searchRuns);
 		getWebUi().mapInstrumentSerialNumbers(searchRuns);

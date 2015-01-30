@@ -3,6 +3,7 @@ package edu.mayo.mprc.searchdb.dao;
 import edu.mayo.mprc.config.RuntimeInitializer;
 import edu.mayo.mprc.database.Dao;
 import edu.mayo.mprc.database.QueryCallback;
+import edu.mayo.mprc.searchdb.SearchRunFilter;
 import edu.mayo.mprc.swift.dbmapping.ReportData;
 import edu.mayo.mprc.swift.dbmapping.SearchRun;
 import edu.mayo.mprc.swift.dbmapping.SwiftSearchDefinition;
@@ -19,6 +20,19 @@ import java.util.TreeMap;
  */
 public interface SearchDbDao extends Dao, RuntimeInitializer {
 	/**
+	 * get the status information for all the search runs.
+	 * The list is considered read-only - do not modify those searches.
+	 *
+	 * The reason why this is on the SearchDbDao is that the list of search runs can actually depend on the result
+	 * of the analysis (we might want only searches from given instrument, with given proteins, etc...)
+	 *
+	 * @param filter      Filter for the search runs.
+	 * @param withReports If true, the reports for the search are fetched as well.
+	 * @return List of all search runs filtered and ordered as {@link edu.mayo.mprc.searchdb.SearchRunFilter specifies}.
+	 */
+	List<SearchRun> getSearchRunList(SearchRunFilter filter, boolean withReports);
+
+	/**
 	 * Add analysis.
 	 *
 	 * @param analysis   Analysis to load.
@@ -29,10 +43,10 @@ public interface SearchDbDao extends Dao, RuntimeInitializer {
 	Analysis addAnalysis(Analysis analysis, ReportData reportData, PercentProgressReporter reporter);
 
 	/**
-	 * @param analysisId Id of {@link Analysis}
+	 * @param reportData Report for which we want to find analysis
 	 * @return Analysis of given id.
 	 */
-	Analysis getAnalysis(int analysisId);
+	Analysis getAnalysis(ReportData reportData);
 
 	/**
 	 * Get parameters for Swift search that belongs to a particular report.

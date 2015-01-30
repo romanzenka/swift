@@ -1,5 +1,6 @@
 package edu.mayo.mprc.swift.controller;
 
+import com.google.common.base.Strings;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 import com.google.common.collect.Maps;
@@ -56,6 +57,9 @@ public final class Report {
 			final List<String> instrumentSerials = getSearchDbDao().listAllInstrumentSerialNumbers();
 			final BiMap<String, String> nameToSerial = HashBiMap.create(instrumentSerials.size());
 			for (final String instrumentSerial : instrumentSerials) {
+				if (Strings.isNullOrEmpty(instrumentSerial)) {
+					continue;
+				}
 				final String instrumentName = mapper.mapInstrumentSerialNumbers(instrumentSerial);
 				if (nameToSerial.containsKey(instrumentName)) {
 					nameToSerial.put(instrumentName, nameToSerial.get(instrumentName) + ',' + instrumentSerial);

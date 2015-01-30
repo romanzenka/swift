@@ -10,5 +10,9 @@
             column="analysis_date" />
         <many-to-one name="biologicalSamples" class="BiologicalSampleList" column="biological_sample_list_id"
             foreign-key="analysis_ibfk_2" />
+        <set name="reports" table="report" inverse="true" lazy="true" fetch="select" cascade="save-update">
+            <key column="analysis_id" not-null="false" foreign-key="report_ibfk_2" />
+            <one-to-many class="edu.mayo.mprc.swift.dbmapping.ReportData" />
+        </set>
     </class>
 </hibernate-mapping>

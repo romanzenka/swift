@@ -44,6 +44,11 @@ public final class Analysis extends PersistableBase {
 	private BiologicalSampleList biologicalSamples;
 
 	/**
+	 * A set of all reports associated with this analysis.
+	 */
+	private Set<ReportData> reports = new HashSet<ReportData>();
+
+	/**
 	 * Empty constructor for Hibernate.
 	 */
 	public Analysis() {
@@ -77,6 +82,14 @@ public final class Analysis extends PersistableBase {
 
 	public void setBiologicalSamples(final BiologicalSampleList biologicalSamples) {
 		this.biologicalSamples = biologicalSamples;
+	}
+
+	public Set<ReportData> getReports() {
+		return reports;
+	}
+
+	public void setReports(Set<ReportData> reports) {
+		this.reports = reports;
 	}
 
 	/**

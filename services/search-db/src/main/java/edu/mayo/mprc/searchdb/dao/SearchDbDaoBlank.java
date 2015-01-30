@@ -1,6 +1,7 @@
 package edu.mayo.mprc.searchdb.dao;
 
 import edu.mayo.mprc.database.QueryCallback;
+import edu.mayo.mprc.searchdb.SearchRunFilter;
 import edu.mayo.mprc.swift.dbmapping.ReportData;
 import edu.mayo.mprc.swift.dbmapping.SearchRun;
 import edu.mayo.mprc.swift.dbmapping.SwiftSearchDefinition;
@@ -18,12 +19,17 @@ import java.util.TreeMap;
  */
 public abstract class SearchDbDaoBlank implements SearchDbDao {
 	@Override
+	public List<SearchRun> getSearchRunList(SearchRunFilter filter, boolean withReports) {
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
 	public Analysis addAnalysis(final Analysis analysis, final ReportData reportData, final PercentProgressReporter reporter) {
 		throw new UnsupportedOperationException();
 	}
 
 	@Override
-	public Analysis getAnalysis(final int analysisId) {
+	public Analysis getAnalysis(ReportData reportData) {
 		throw new UnsupportedOperationException();
 	}
 
