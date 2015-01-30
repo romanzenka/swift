@@ -1,8 +1,8 @@
 package edu.mayo.mprc.swift.controller;
 
+import com.google.common.base.Functions;
 import com.google.common.base.Strings;
 import com.google.common.collect.*;
-import com.google.common.collect.ImmutableSortedMap.Builder;
 import com.google.gson.Gson;
 import edu.mayo.mprc.MprcException;
 import edu.mayo.mprc.searchdb.dao.SearchDbDao;
@@ -66,7 +66,8 @@ public final class Report {
 				}
 			}
 
-			final ImmutableSortedMap<String, String> sortedMap = new Builder<String, String>(Ordering.natural()).putAll(nameToSerial.inverse()).build();
+			final Ordering<String> ordering = Ordering.natural().onResultOf(Functions.forMap(nameToSerial.inverse(), null));
+			final ImmutableSortedMap<String, String> sortedMap = ImmutableSortedMap.copyOf(nameToSerial.inverse(), ordering);
 			final String instrumentsJson = new Gson().toJson(sortedMap);
 			model.addAttribute("instrumentsJson", instrumentsJson);
 
