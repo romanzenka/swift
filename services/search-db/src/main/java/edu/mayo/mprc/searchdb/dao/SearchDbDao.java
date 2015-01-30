@@ -3,7 +3,6 @@ package edu.mayo.mprc.searchdb.dao;
 import edu.mayo.mprc.config.RuntimeInitializer;
 import edu.mayo.mprc.database.Dao;
 import edu.mayo.mprc.database.QueryCallback;
-import edu.mayo.mprc.searchdb.SearchRunFilter;
 import edu.mayo.mprc.swift.dbmapping.ReportData;
 import edu.mayo.mprc.swift.dbmapping.SearchRun;
 import edu.mayo.mprc.swift.dbmapping.SwiftSearchDefinition;
@@ -28,7 +27,7 @@ public interface SearchDbDao extends Dao, RuntimeInitializer {
 	 *
 	 * @param filter      Filter for the search runs.
 	 * @param withReports If true, the reports for the search are fetched as well.
-	 * @return List of all search runs filtered and ordered as {@link edu.mayo.mprc.searchdb.SearchRunFilter specifies}.
+	 * @return List of all search runs filtered and ordered as {@link SearchRunFilter specifies}.
 	 */
 	List<SearchRun> getSearchRunList(SearchRunFilter filter, boolean withReports);
 

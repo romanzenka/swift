@@ -1,7 +1,6 @@
 package edu.mayo.mprc.searchdb.dao;
 
 import edu.mayo.mprc.database.QueryCallback;
-import edu.mayo.mprc.searchdb.SearchRunFilter;
 import edu.mayo.mprc.swift.dbmapping.ReportData;
 import edu.mayo.mprc.swift.dbmapping.SearchRun;
 import edu.mayo.mprc.swift.dbmapping.SwiftSearchDefinition;

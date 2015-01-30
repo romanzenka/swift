@@ -1,8 +1,8 @@
 package edu.mayo.mprc.swift.report;
 
 import edu.mayo.mprc.MprcException;
-import edu.mayo.mprc.searchdb.SearchRunFilter;
 import edu.mayo.mprc.searchdb.dao.SearchDbDao;
+import edu.mayo.mprc.searchdb.dao.SearchRunFilter;
 import edu.mayo.mprc.swift.ReportUtils;
 import edu.mayo.mprc.swift.db.SwiftDao;
 import edu.mayo.mprc.swift.db.TimeReport;

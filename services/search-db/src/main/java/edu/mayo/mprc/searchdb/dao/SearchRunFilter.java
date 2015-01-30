@@ -1,8 +1,7 @@
-package edu.mayo.mprc.searchdb;
+package edu.mayo.mprc.searchdb.dao;
 
 import com.google.common.base.Splitter;
 import com.google.common.collect.Lists;
-import edu.mayo.mprc.searchdb.dao.Analysis;
 import edu.mayo.mprc.swift.dbmapping.SearchRun;
 import edu.mayo.mprc.utilities.StringUtilities;
 import org.hibernate.Criteria;
