@@ -33,7 +33,7 @@ import java.util.*;
 /**
  * A class holding information about WebUI configuration.
  */
-public final class WebUi implements Checkable {
+public final class WebUi implements Checkable, InstrumentSerialNumberMapper {
 	private static final Logger LOGGER = Logger.getLogger(WebUi.class);
 
 	public static final String TYPE = "webUi";
@@ -225,6 +225,7 @@ public final class WebUi implements Checkable {
 	 * @param instruments Comma-separated instrument names
 	 * @return Instrument names translated as per QuaMeter
 	 */
+	@Override
 	public String mapInstrumentSerialNumbers(final String instruments) {
 		if (quameterUi == null) {
 			return instruments;

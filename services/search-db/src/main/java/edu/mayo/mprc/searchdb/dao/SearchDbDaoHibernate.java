@@ -18,6 +18,8 @@ import edu.mayo.mprc.utilities.exceptions.ExceptionUtilities;
 import edu.mayo.mprc.utilities.progress.DummyProgressReporter;
 import edu.mayo.mprc.utilities.progress.PercentProgressReporter;
 import edu.mayo.mprc.utilities.progress.PercentRangeReporter;
+import org.hibernate.Criteria;
+import org.hibernate.FetchMode;
 import org.hibernate.Query;
 import org.hibernate.criterion.Restrictions;
 import org.joda.time.DateTime;
@@ -232,6 +234,23 @@ public class SearchDbDaoHibernate extends DaoBase implements SearchDbDao {
 	}
 
 	@Override
+	public List<SearchRun> getSearchRunList(final SearchRunFilter filter, final boolean withReports) {
+		try {
+			final Criteria criteria = filter.makeCriteria(getSession());
+			if (withReports) {
+				criteria.setFetchMode("reports", FetchMode.JOIN);
+				criteria.setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY);
+			}
+			criteria.setCacheable(true)
+					.setReadOnly(true);
+
+			return criteria.list();
+		} catch (final Exception t) {
+			throw new MprcException("Cannot obtain search run status list for filter: " + filter, t);
+		}
+	}
+
+	@Override
 	public Analysis addAnalysis(final Analysis analysis, final ReportData reportData, final PercentProgressReporter reporter) {
 		Analysis savedAnalysis = analysis;
 		if (analysis.getId() == null) {
@@ -247,16 +266,20 @@ public class SearchDbDaoHibernate extends DaoBase implements SearchDbDao {
 				}
 				analysis.setBiologicalSamples(addSet(newList));
 			}
+			analysis.getReports().add(reportData);
 			savedAnalysis = save(analysis, false);
+			reportData.setAnalysisId(analysis.getId());
 		}
-		getSession().saveOrUpdate(reportData);
-		reportData.setAnalysisId(savedAnalysis.getId());
 		return savedAnalysis;
 	}
 
 	@Override
-	public Analysis getAnalysis(final int analysisId) {
-		return (Analysis) getSession().createCriteria(Analysis.class).add(Restrictions.eq("id", analysisId)).uniqueResult();
+	public Analysis getAnalysis(final ReportData reportData) {
+		return (Analysis) getSession()
+				.createCriteria(Analysis.class)
+				.createAlias("reports", "r")
+				.add(Restrictions.eq("r", reportData))
+				.uniqueResult();
 	}
 
 	@Override
@@ -274,16 +297,9 @@ public class SearchDbDaoHibernate extends DaoBase implements SearchDbDao {
 	}
 
 	@Override
-	public List<String> getProteinAccessionNumbers(final ProteinSequenceList proteinSequenceList) {
-		return (List<String>) getSession().createQuery("select distinct e.accessionNumber.accnum from ProteinEntry e where e.sequence in (:sequences) order by e.accessionNumber.accnum")
-				.setParameterList("sequences", proteinSequenceList.getList())
-				.list();
-	}
-
-	@Override
 	public List<ReportData> getSearchesForAccessionNumber(final String accessionNumber) {
 		return listAndCast(getSession().createQuery(
-				"select distinct rd from " +
+				"select distinct a.reports from " +
 						" Analysis as a" +
 						" inner join a.biologicalSamples as bsl" +
 						" inner join bsl.list as bs" +
@@ -293,11 +309,9 @@ public class SearchDbDaoHibernate extends DaoBase implements SearchDbDao {
 						" inner join pgl.list as pg" +
 						" inner join pg.proteinSequences as psl" +
 						" inner join psl.list as ps, " +
-						" ReportData as rd," +
 						" ProteinEntry as pe" +
 						" inner join pe.accessionNumber as pac" +
 						" where pe.sequence = ps " +
-						" and rd.analysisId = a.id " +
 						" and pac.accnum = :accessionNumber")
 				.setParameter("accessionNumber", accessionNumber));
 	}
@@ -338,6 +352,21 @@ public class SearchDbDaoHibernate extends DaoBase implements SearchDbDao {
 		}
 
 		return searchRuns;
+	}
+
+	@Override
+	public List<String> listAllInstrumentSerialNumbers() {
+		List<String> serialNumbers = listAndCast(getSession()
+				.createQuery("select distinct t.instrumentSerialNumber" +
+						" from Analysis as a join" +
+						" a.biologicalSamples as bs join" +
+						" bs.list as bsl join" +
+						" bsl.searchResults as sr join" +
+						" sr.list as srl join" +
+						" srl.massSpecSample as t" +
+						" order by t.instrumentSerialNumber"));
+
+		return serialNumbers;
 	}
 
 	@Override
@@ -443,8 +472,8 @@ public class SearchDbDaoHibernate extends DaoBase implements SearchDbDao {
 	public int getScaffoldProteinGroupCount(final String inputFile, final Iterable<ReportData> reports) {
 		for (final ReportData reportData : reports) {
 			final File reportFile = reportData.getReportFile();
-			if (isScaffoldReport(reportFile) && reportData.getAnalysisId() != null) {
-				final Analysis analysis = getAnalysis(reportData.getAnalysisId());
+			if (isScaffoldReport(reportFile)) {
+				final Analysis analysis = getAnalysis(reportData);
 				if (analysis != null) {
 					for (final BiologicalSample biologicalSample : analysis.getBiologicalSamples()) {
 						try {

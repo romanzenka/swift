@@ -7,7 +7,6 @@ import edu.mayo.mprc.swift.dbmapping.SearchRun;
 import edu.mayo.mprc.swift.dbmapping.SwiftSearchDefinition;
 import edu.mayo.mprc.swift.params2.SearchEngineConfig;
 import edu.mayo.mprc.swift.params2.SearchEngineParameters;
-import edu.mayo.mprc.swift.resources.WebUi;
 import edu.mayo.mprc.unimod.ModSpecificity;
 
 import java.util.Date;
@@ -42,7 +41,7 @@ public final class SwiftSearch {
 	private final boolean useFamilyProteinGrouping;
 	private final String qaUrl;
 
-	public SwiftSearch(final SearchRun run, final SwiftSearchDefinition searchDefinition, final WebUi webUi) {
+	public SwiftSearch(final SearchRun run, final SwiftSearchDefinition searchDefinition) {
 		id = run.getId();
 		title = run.getTitle();
 		if (!Objects.equal(searchDefinition.getId(), run.getSwiftSearch())) {

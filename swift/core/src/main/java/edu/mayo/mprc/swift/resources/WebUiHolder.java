@@ -38,6 +38,10 @@ public class WebUiHolder {
 		return (WebUi) resource;
 	}
 
+	public InstrumentSerialNumberMapper getInstrumentSerialNumberMapper() {
+		return getWebUi();
+	}
+
 	public RunningApplicationContext getContext() {
 		return context;
 	}

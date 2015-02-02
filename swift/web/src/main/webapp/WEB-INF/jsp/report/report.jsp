@@ -86,6 +86,7 @@
 
         var user;
         var title;
+        var instrument;
 
         function createFilters() {
             title = new FilterDropDown("title");
@@ -105,7 +106,7 @@
             user.addRadioButtons("sort", "order", ["Sort A to Z", "Sort Z to A", "Sort by submission time"], ["1", "-1", "0"], 2);
             user.addSeparator();
             user.addText('Display:');
-            user.addCheckboxes("filter", "where", [${userListJson}], [${idListJson}], true);
+            user.addCheckboxes("filter", "where", ${usersJson}, true);
             user.addSeparator();
             user.addOkCancel();
             user.onSubmitCallback = function () {
@@ -113,6 +114,16 @@
                 ajaxRequest('load');
             };
             $('#popups').append(user.getRoot());
+
+            instrument = new FilterDropDown("instrument");
+            instrument.addCheckboxes("filter", "where", ${instrumentsJson}, true);
+            instrument.addSeparator();
+            instrument.addOkCancel();
+            instrument.onSubmitCallback = function () {
+                instrument.saveToCookies();
+                ajaxRequest('load');
+            };
+            $('#popups').append(instrument.getRoot());
 
             var submission = new FilterDropDown("submission");
             submission.addRadioButtons("sort", "order", ["Sort newest to oldest", "Sort oldest to newest"], ["submission ASC", "submission DESC"], -1);
@@ -133,7 +144,7 @@
             results.addRadioButtons("sort", "order", ["Newest errors to oldest", "Oldest errors to newest"], ["errotime ASC", "errotime DESC"], -1);
             results.addSeparator();
             results.addText('Display:');
-            results.addCheckboxes("filter", "where", ["Error free", "Warnings", "Failures"], ["status='ok'", "status='warnings'", "status='failures'"], true);
+            results.addCheckboxes("filter", "where", [{"status='ok'": "Error free"}, {"status='warnings'": "Warnings"}, {"status='failures'": "Failures"}], true);
             results.addSeparator();
             results.addOkCancel();
             $('#popups').append(results.getRoot());
@@ -143,7 +154,7 @@
                 new FilterButton('user', 'Owner', user),
                 new FilterButton('submission', 'Submission', null /*submission*/),
                 new FilterButton('duration', 'Duration', null /*duration*/),
-                new FilterButton('instruments', 'Instruments', null /*instruments*/),
+                new FilterButton('instruments', 'Instruments', instrument),
                 new FilterButton('actions', '', null /*actions*/),
                 new FilterButton('results', 'Results', null /*results*/),
                 new FilterButton('progress', 'Progress', null)
@@ -171,6 +182,7 @@
                     timestamp: window.timestamp,
                     userfilter: user.getRequestString(),
                     titlefilter: title.getRequestString(),
+                    instrumentfilter: instrument.getRequestString(),
                     showHidden: showHidden
                 },
                 "dataType": "html"
@@ -208,6 +220,7 @@
 
             title.loadFromCookies();
             user.loadFromCookies();
+            instrument.loadFromCookies();
 
             ajaxRequest('load');
 

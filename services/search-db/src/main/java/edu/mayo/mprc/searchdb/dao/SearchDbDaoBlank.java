@@ -18,23 +18,23 @@ import java.util.TreeMap;
  */
 public abstract class SearchDbDaoBlank implements SearchDbDao {
 	@Override
+	public List<SearchRun> getSearchRunList(SearchRunFilter filter, boolean withReports) {
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
 	public Analysis addAnalysis(final Analysis analysis, final ReportData reportData, final PercentProgressReporter reporter) {
 		throw new UnsupportedOperationException();
 	}
 
 	@Override
-	public Analysis getAnalysis(final int analysisId) {
+	public Analysis getAnalysis(ReportData reportData) {
 		throw new UnsupportedOperationException();
 	}
 
 	@Override
 	public SwiftSearchDefinition getSearchDefinition(final long reportId) {
 		return null;
-	}
-
-	@Override
-	public List<String> getProteinAccessionNumbers(final ProteinSequenceList proteinSequenceList) {
-		throw new UnsupportedOperationException();
 	}
 
 	@Override
@@ -90,6 +90,11 @@ public abstract class SearchDbDaoBlank implements SearchDbDao {
 	@Override
 	public List<SearchRun> fillInInstrumentSerialNumbers(List<SearchRun> searchRuns) {
 		return searchRuns;
+	}
+
+	@Override
+	public List<String> listAllInstrumentSerialNumbers() {
+		throw new UnsupportedOperationException();
 	}
 
 	@Override

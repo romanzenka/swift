@@ -24,7 +24,6 @@ import edu.mayo.mprc.workspace.WorkspaceDao;
 import edu.mayo.mprc.workspace.WorkspaceDaoHibernate;
 import org.apache.log4j.Logger;
 import org.hibernate.Criteria;
-import org.hibernate.FetchMode;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.criterion.LogicalExpression;
@@ -107,24 +106,6 @@ public final class SwiftDaoHibernate extends DaoBase implements SwiftDao {
 			return (TaskData) getSession().get(TaskData.class, taskId);
 		} catch (final Exception t) {
 			throw new MprcException("Cannot obtain task data for id " + taskId, t);
-		}
-	}
-
-	@Override
-	public List<SearchRun> getSearchRunList(final SearchRunFilter filter, final boolean withReports) {
-		try {
-			final Criteria criteria = getSession().createCriteria(SearchRun.class);
-			filter.updateCriteria(criteria);
-			if (withReports) {
-				criteria.setFetchMode("reports", FetchMode.JOIN);
-				criteria.setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY);
-			}
-			criteria.setCacheable(true)
-					.setReadOnly(true);
-
-			return criteria.list();
-		} catch (final Exception t) {
-			throw new MprcException("Cannot obtain search run status list for filter: " + filter, t);
 		}
 	}
 
@@ -497,8 +478,8 @@ public final class SwiftDaoHibernate extends DaoBase implements SwiftDao {
 		try {
 			final SearchRun searchRun = getSearchRunForId(searchRunId);
 			final ReportData r = new ReportData(resultFile, reportDate, searchRun);
-			searchRun.getReports().add(r);
 			getSession().saveOrUpdate(r);
+			searchRun.getReports().add(r);
 			return r;
 		} catch (final Exception t) {
 			throw new MprcException("Cannot store search run " + searchRunId, t);

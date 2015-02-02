@@ -113,10 +113,18 @@ FilterDropDown.prototype.checkSelectAll = function (evt) {
 
 // Automatically creates a "select all" checkbox as the first one of the group
 // The id is an id for the group (unique within this dropdown)
-// The titleArray parameter is an array of strings to be displayed for the user.
-// The sqlArray parameter is an array of sql where clause parts, such as column = 'hello'
+// The mapJson parameter maps sql where clause parts to strings to be displayed for the user
 // allChecked - when true - all the checkboxes are checked
-FilterDropDown.prototype.addCheckboxes = function(id, type, titleArray, sqlArray, allChecked) {
+FilterDropDown.prototype.addCheckboxes = function (id, type, mapJson, allChecked) {
+    var titleArray = [];
+    var sqlArray = [];
+    for (key in mapJson) {
+        if (mapJson.hasOwnProperty(key)) {
+            sqlArray.push(key);
+            titleArray.push(mapJson[key]);
+        }
+    }
+
     var groupId = this.id + '_' + id;
     var checked = allChecked ? 'checked' : '';
     var selectAll = document.createElement('li');
@@ -470,7 +478,11 @@ FilterDropDown.prototype.addSeparator = function() {
 };
 
 FilterDropDown.prototype.getRequestString = function() {
-    return "sort=" + this.getSortOrder() + ";filter=" + this.getFilterValue();
+    if (this.isFiltering()) {
+        return "sort=" + this.getSortOrder() + ";filter=" + this.getFilterValue();
+    } else {
+        return "sort=" + this.getSortOrder();
+    }
 };
 
 //======================================================================================================================

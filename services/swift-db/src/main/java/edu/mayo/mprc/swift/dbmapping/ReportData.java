@@ -19,7 +19,6 @@ public class ReportData {
 	private SearchRun searchRun;
 	private Integer analysisId;
 
-
 	public ReportData() {
 	}
 

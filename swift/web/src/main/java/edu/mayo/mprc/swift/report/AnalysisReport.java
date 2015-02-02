@@ -51,7 +51,7 @@ public class AnalysisReport implements HttpRequestHandler {
 			searchDbDao.begin();
 			try {
 				ReportData reportForId = getSwiftDao().getReportForId(reportId);
-				final Analysis analysis = searchDbDao.getAnalysis((int) (long) reportForId.getAnalysisId());
+				final Analysis analysis = searchDbDao.getAnalysis(reportForId);
 
 				writer.write("<html><head><title>Scaffold Report | " + webUiHolder.getWebUi().getTitle()
 						+ "</title>\n" +

@@ -1,11 +1,14 @@
-package edu.mayo.mprc.swift.db;
+package edu.mayo.mprc.searchdb.dao;
 
+import com.google.common.base.Splitter;
+import com.google.common.collect.Lists;
+import edu.mayo.mprc.swift.dbmapping.SearchRun;
 import edu.mayo.mprc.utilities.StringUtilities;
 import org.hibernate.Criteria;
-import org.hibernate.criterion.MatchMode;
-import org.hibernate.criterion.Order;
-import org.hibernate.criterion.Restrictions;
+import org.hibernate.Session;
+import org.hibernate.criterion.*;
 
+import java.util.Collection;
 import java.util.Date;
 
 /**
@@ -20,6 +23,8 @@ public final class SearchRunFilter {
 	private String userWhereClause;
 	private int titleSortOrder;
 	private String titleWhereClause;
+	private int instrumentSortOrder;
+	private Collection<String> instrumentWhereClause;
 	private String start;
 	private String count;
 	private Date startDate;
@@ -73,6 +78,22 @@ public final class SearchRunFilter {
 		this.titleWhereClause = titleWhereClause;
 	}
 
+	public int getInstrumentSortOrder() {
+		return instrumentSortOrder;
+	}
+
+	public void setInstrumentSortOrder(int instrumentSortOrder) {
+		this.instrumentSortOrder = instrumentSortOrder;
+	}
+
+	public Collection<String> getInstrumentWhereClause() {
+		return instrumentWhereClause;
+	}
+
+	public void setInstrumentWhereClause(Collection<String> instrumentWhereClause) {
+		this.instrumentWhereClause = instrumentWhereClause;
+	}
+
 	public void setUserFilter(final String filter) {
 		if (filter == null) {
 			setUserSortOrder(0);
@@ -101,6 +122,22 @@ public final class SearchRunFilter {
 				setTitleSortOrder(Integer.parseInt(keyValue[1]));
 			} else if ("filter".equals(keyValue[0]) && keyValue.length >= 2) {
 				setTitleWhereClause(keyValue[1]);
+			}
+		}
+	}
+
+	public void setInstrumentFilter(final String filter) {
+		if (filter == null) {
+			setInstrumentWhereClause(null);
+			return;
+		}
+		final String[] parts = filter.split(";");
+		for (final String part : parts) {
+			final String[] keyValue = part.split("=");
+			if ("sort".equals(keyValue[0])) {
+				setInstrumentSortOrder(Integer.parseInt(keyValue[1]));
+			} else if ("filter".equals(keyValue[0]) && keyValue.length >= 2) {
+				setInstrumentWhereClause(Lists.newArrayList(Splitter.on(',').trimResults().omitEmptyStrings().split(keyValue[1])));
 			}
 		}
 	}
@@ -160,7 +197,9 @@ public final class SearchRunFilter {
 		this.endDate = endDate;
 	}
 
-	public void updateCriteria(final Criteria criteria) {
+	public Criteria makeCriteria(final Session session) {
+		final Criteria criteria = session.createCriteria(SearchRun.class);
+
 		if (!StringUtilities.stringEmpty(start)) {
 			criteria.setFirstResult(Integer.parseInt(start));
 		}
@@ -172,8 +211,22 @@ public final class SearchRunFilter {
 			submittingUserCriteria = criteria.createCriteria("submittingUser");
 			submittingUserCriteria.add(Restrictions.in("id", usersWhereClauseAsArray()));
 		}
-		if(!StringUtilities.stringEmpty(titleWhereClause)) {
+		if (!StringUtilities.stringEmpty(titleWhereClause)) {
 			criteria.add(Restrictions.like("title", titleWhereClause, MatchMode.ANYWHERE));
+		}
+		if (instrumentWhereClause != null && !instrumentWhereClause.isEmpty()) {
+			final DetachedCriteria matchingAnalysisIds =
+					DetachedCriteria.forClass(Analysis.class, "a")
+							.createAlias("a.biologicalSamples", "bs")
+							.createAlias("bs.list", "bsl")
+							.createAlias("bsl.searchResults", "sr")
+							.createAlias("sr.list", "srl")
+							.createAlias("srl.massSpecSample", "ms")
+							.add(Restrictions.in("ms.instrumentSerialNumber", instrumentWhereClause))
+							.setProjection(Projections.property("a.id"));
+			criteria
+					.createAlias("reports", "r")
+					.add(Property.forName("r.analysisId").in(matchingAnalysisIds));
 		}
 		if (startDate != null) {
 			criteria.add(Restrictions.isNotNull("startTimestamp"));
@@ -186,7 +239,7 @@ public final class SearchRunFilter {
 		if (!isShowHidden()) {
 			criteria.add(Restrictions.eq("hidden", 0));
 		}
-		switch(titleSortOrder) {
+		switch (titleSortOrder) {
 			case -1:
 				criteria.addOrder(Order.desc("title"));
 				break;
@@ -213,6 +266,7 @@ public final class SearchRunFilter {
 				criteria.addOrder(Order.desc("startTimestamp"));
 				break;
 		}
+		return criteria;
 	}
 
 	private Integer[] usersWhereClauseAsArray() {

@@ -19,6 +19,19 @@ import java.util.TreeMap;
  */
 public interface SearchDbDao extends Dao, RuntimeInitializer {
 	/**
+	 * get the status information for all the search runs.
+	 * The list is considered read-only - do not modify those searches.
+	 *
+	 * The reason why this is on the SearchDbDao is that the list of search runs can actually depend on the result
+	 * of the analysis (we might want only searches from given instrument, with given proteins, etc...)
+	 *
+	 * @param filter      Filter for the search runs.
+	 * @param withReports If true, the reports for the search are fetched as well.
+	 * @return List of all search runs filtered and ordered as {@link SearchRunFilter specifies}.
+	 */
+	List<SearchRun> getSearchRunList(SearchRunFilter filter, boolean withReports);
+
+	/**
 	 * Add analysis.
 	 *
 	 * @param analysis   Analysis to load.
@@ -29,10 +42,10 @@ public interface SearchDbDao extends Dao, RuntimeInitializer {
 	Analysis addAnalysis(Analysis analysis, ReportData reportData, PercentProgressReporter reporter);
 
 	/**
-	 * @param analysisId Id of {@link Analysis}
+	 * @param reportData Report for which we want to find analysis
 	 * @return Analysis of given id.
 	 */
-	Analysis getAnalysis(int analysisId);
+	Analysis getAnalysis(ReportData reportData);
 
 	/**
 	 * Get parameters for Swift search that belongs to a particular report.
@@ -41,14 +54,6 @@ public interface SearchDbDao extends Dao, RuntimeInitializer {
 	 * @return Swift saerch definition.
 	 */
 	SwiftSearchDefinition getSearchDefinition(long reportId);
-
-	/**
-	 * List accession numbers for a protein group.
-	 *
-	 * @param proteinSequenceList A list of protein sequences.
-	 * @return A string describing the accession numbers for proteins within the group.
-	 */
-	List<String> getProteinAccessionNumbers(ProteinSequenceList proteinSequenceList);
 
 	/**
 	 * List all searches where a protein of given accession number was observed.
@@ -144,4 +149,11 @@ public interface SearchDbDao extends Dao, RuntimeInitializer {
 	 * @return Same list with all the instrument names that were used in a given search filled in
 	 */
 	List<SearchRun> fillInInstrumentSerialNumbers(List<SearchRun> searchRuns);
+
+	/**
+	 * List all the distinct instrument serial numbers present in the database.
+	 *
+	 * @return List of all instrument serial numbers, as reported by the instrument (not as displayed to the user).
+	 */
+	List<String> listAllInstrumentSerialNumbers();
 }

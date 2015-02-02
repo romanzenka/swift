@@ -10,14 +10,7 @@
 
         <property name="reportFile" column="report_file" type="file" length="1500" />
         <property name="dateCreated" type="org.joda.time.contrib.hibernate.PersistentDateTime" column="date_created" />
-        <many-to-one name="searchRun" class="SearchRun" column="transaction_id"
-            foreign-key="report_ibfk_1" />
-        <property name="analysisId" type="int" column="analysis_id" not-null="false" index="report_ibfk_2" />
+        <many-to-one name="searchRun" class="SearchRun" column="transaction_id" foreign-key="report_ibfk_1" />
+        <property name="analysisId" column="analysis_id" type="integer" not-null="false" />
     </class>
-    <!-- A foreign key report_ibfk_2 is manually added -->
-    <database-object>
-        <create>ALTER TABLE `report` ADD FOREIGN KEY report_ibfk_2 (analysis_id) REFERENCES `analysis` (analysis_id)</create>
-        <drop>ALTER TABLE `report` DROP FOREIGN KEY report_ibfk_2</drop>
-        <dialect-scope name="org.hibernate.dialect.MySQLInnoDBDialect"/>
-    </database-object>
 </hibernate-mapping>
