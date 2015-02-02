@@ -30,4 +30,14 @@
         <property name="installCommand" ref="install-command" />
         <property name="stopper" ref="servletInitialization" />
     </bean>
+
+    <bean id="CommonDataRequester" class="edu.mayo.mprc.dbcurator.server.CommonDataRequesterImpl">
+        <property name="logic" ref="CommonDataRequesterLogic" />
+    </bean>
+
+    <bean id="CommonDataRequesterLogic" class="edu.mayo.mprc.dbcurator.server.CommonDataRequesterLogic">
+        <property name="curationDao" ref="curationDao" />
+        <property name="curationContext" ref="curationContext" />
+    </bean>
+
 </beans>

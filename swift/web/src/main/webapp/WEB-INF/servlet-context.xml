@@ -113,14 +113,6 @@
     <bean id="FileUploadServlet" class="edu.mayo.mprc.dbcurator.server.FASTAFileUploadServlet">
         <property name="curationContext" ref="curationContext" />
     </bean>
-    <bean id="CommonDataRequester" class="edu.mayo.mprc.dbcurator.server.CommonDataRequesterImpl">
-        <property name="logic" ref="CommonDataRequesterLogic" />
-    </bean>
-
-    <bean id="CommonDataRequesterLogic" class="edu.mayo.mprc.dbcurator.server.CommonDataRequesterLogic">
-        <property name="curationDao" ref="curationDao" />
-        <property name="curationContext" ref="curationContext" />
-    </bean>
 
     <bean id="DirectoryService" class="edu.mayo.mprc.swift.ui.server.FileDirectoryServiceServlet">
         <property name="webUiHolder" ref="webUiHolder" />
