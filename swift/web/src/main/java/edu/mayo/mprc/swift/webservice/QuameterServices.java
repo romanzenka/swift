@@ -3,6 +3,7 @@ package edu.mayo.mprc.swift.webservice;
 import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
 import edu.mayo.mprc.MprcException;
+import edu.mayo.mprc.quameterdb.QuameterUi;
 import edu.mayo.mprc.quameterdb.dao.QuameterAnnotation;
 import edu.mayo.mprc.quameterdb.dao.QuameterDao;
 import edu.mayo.mprc.quameterdb.dao.QuameterProteinGroup;
@@ -26,7 +27,7 @@ import java.util.Map;
  * @author Roman Zenka
  */
 @Controller
-public final class QuameterHideResult {
+public final class QuameterServices {
 	@Resource(name = "quameterDao")
 	private QuameterDao quameterDao;
 
@@ -112,10 +113,9 @@ public final class QuameterHideResult {
 		}
 	}
 
-
 	private void writeHeader(final Writer writer, final List<QuameterProteinGroup> protGrps) throws IOException {
 		// Predefined column names
-		List<String> myHeader = Lists.newArrayList("ID", "Start Time", "Path", "Duration (min)", "Category", "Search parameters ID", "Transaction ID");
+		List<String> myHeader = Lists.newArrayList("ID", "Start Time", "Path", "Duration (min)", "Category", "Search parameters ID", "SearchRun ID");
 		// Quameter Result Column names
 		for (final QuameterResult.QuameterColumn column : QuameterResult.QuameterColumn.values()) {
 			myHeader.add(QuameterResult.getColumnName(column));
@@ -126,6 +126,17 @@ public final class QuameterHideResult {
 		}
 		Joiner jn = Joiner.on("\t");       // Guava
 		writer.write(jn.join(myHeader) + "\n");
+
+		// Make second row with descriptions
+		List<String> myDescriptions = Lists.newArrayList("Database ID for this QuaMeter entry", "Acquisition start time for sample", "Sample file", "Acquisition duration in minutes", "User-specified sample category", "Database ID of search parameter set used for processing", "Database ID of the search run resulting in the QuaMeter data");
+		for (final QuameterResult.QuameterColumn column : QuameterResult.QuameterColumn.values()) {
+			myDescriptions.add(QuameterUi.getMetricName(column.name()));
+		}
+		// Quameter's Protein Group Column Names
+		for (final QuameterProteinGroup proteinGroup : protGrps) {
+			myDescriptions.add("Total spectra counts for protein group " + proteinGroup.getName());
+		}
+		writer.write(Joiner.on("\t").join(myHeader) + "\n");
 	}
 
 	private void writeRows(final Writer writer, final List<QuameterResult> results, final List<QuameterProteinGroup> proteinGroups) throws IOException {

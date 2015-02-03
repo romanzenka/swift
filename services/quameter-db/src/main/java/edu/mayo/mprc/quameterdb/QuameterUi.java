@@ -328,7 +328,7 @@ public final class QuameterUi implements Dao, UiConfigurationProvider, Lifecycle
 		return result;
 	}
 
-	public String getMetricName(final String metricCode) {
+	public static String getMetricName(final String metricCode) {
 		for (final QuameterMetric metric : METRICS) {
 			if (metric.getCode().equals(metricCode)) {
 				return metric.getName();

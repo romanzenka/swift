@@ -70,7 +70,7 @@ public final class QuaMeter {
 				final Collection<QuameterTag> quameterTags = new ArrayList<QuameterTag>(myList.size());
 
 				for (final QuameterAnnotation qa : myList) {
-					final String metricName = quameterUi.getMetricName(qa.getMetricCode());
+					final String metricName = QuameterUi.getMetricName(qa.getMetricCode());
 					if (metricName != null) {
 						final File file = qa.getQuameterResult().getSearchResult().getMassSpecSample().getFile();
 						final QuameterTag quameterTag = new QuameterTag(
