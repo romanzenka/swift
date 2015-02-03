@@ -134,7 +134,7 @@ public final class QuameterServices {
 		}
 		// Quameter's Protein Group Column Names
 		for (final QuameterProteinGroup proteinGroup : protGrps) {
-			myDescriptions.add("Total spectra counts for protein group " + proteinGroup.getName());
+			myDescriptions.add(proteinGroup.getName() + " total spectra");
 		}
 		writer.write(Joiner.on("\t").join(myDescriptions) + "\n");
 	}
