@@ -128,7 +128,13 @@ public final class QuameterServices {
 		writer.write(jn.join(myHeader) + "\n");
 
 		// Make second row with descriptions
-		List<String> myDescriptions = Lists.newArrayList("Database ID for this QuaMeter entry", "Acquisition start time for sample", "Sample file", "Acquisition duration in minutes", "User-specified sample category", "Database ID of search parameter set used for processing", "Database ID of the search run resulting in the QuaMeter data");
+		List<String> myDescriptions = Lists.newArrayList("QuaMeter Entry ID",
+				"Acquisition start time for sample",
+				"Sample file",
+				"Acquisition duration in minutes",
+				"User-specified sample category",
+				"Search Parameters ID",
+				"Search Run ID");
 		for (final QuameterResult.QuameterColumn column : QuameterResult.QuameterColumn.values()) {
 			myDescriptions.add(QuameterUi.getMetricName(column.name()));
 		}
