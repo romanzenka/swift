@@ -43,6 +43,10 @@ public final class ProteinEntity {
 	}
 
     public String getNeatDescription(){
+        if(description.length() < 4){
+            return description;
+        }
+
         String[] s = description.split(" ");
         String[] subset;
         if(mass == null){  // Non-mutant proteins don't have masses
@@ -93,6 +97,12 @@ public final class ProteinEntity {
         this.sequence = sequence;
     }
 
+    // Want ability to change total spectra when it's line by line count...not the same as obtaining a value.
+    public void incrementTotalSpectra() {
+        this.totalSpectra++;
+    }
+
+    // just obtain the value reported by scaffold...should not change.
     public void setTotalSpectra(int totalSpectra) {
         if (this.totalSpectra != 0 && totalSpectra != this.totalSpectra) {
             throw new MprcException("Corrupted Scaffold report! ("+this.accNum+") spectra count changed: " + this.totalSpectra + " -> " + totalSpectra);

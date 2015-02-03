@@ -17,7 +17,7 @@ public class HemeHelper {
             if (letter[i + 1].equals("M")) {
                 htmlEmbedded += seq.substring(index, tail);
             } else {
-                htmlEmbedded += "<span class=\"warn\">" + seq.substring(index, tail) + "</span>";
+                htmlEmbedded += "<span style=\"color:red;\">" + seq.substring(index, tail) + "</span>";
             }
             index += Integer.parseInt(nums[i]);
         }
