@@ -268,8 +268,8 @@ public class SearchDbDaoHibernate extends DaoBase implements SearchDbDao {
 				}
 				analysis.setBiologicalSamples(addSet(newList));
 			}
-			analysis.getReports().add(reportData);
 			savedAnalysis = save(analysis, false);
+			analysis.getReports().add(reportData);
 			reportData.setAnalysisId(analysis.getId());
 		}
 		return savedAnalysis;
