@@ -136,7 +136,7 @@ public final class QuameterServices {
 		for (final QuameterProteinGroup proteinGroup : protGrps) {
 			myDescriptions.add("Total spectra counts for protein group " + proteinGroup.getName());
 		}
-		writer.write(Joiner.on("\t").join(myHeader) + "\n");
+		writer.write(Joiner.on("\t").join(myDescriptions) + "\n");
 	}
 
 	private void writeRows(final Writer writer, final List<QuameterResult> results, final List<QuameterProteinGroup> proteinGroups) throws IOException {
