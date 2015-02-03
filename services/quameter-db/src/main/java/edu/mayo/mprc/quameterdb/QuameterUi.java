@@ -74,6 +74,7 @@ public final class QuameterUi implements Dao, UiConfigurationProvider, Lifecycle
 			QuameterMetric.builder("ms1_1", "MS1-1", "MS1 Injection", LOW, false, "Median injection time for MS1 spectra").setLink("help/metrics/ms1_ion_inject_time.html").build(),
 			QuameterMetric.builder("ms1_2a", "MS1-2A", "MS1 S/N", HIGH, true, "Ratio of maximum to median signal in MS1 spectra").setRange(0.0, null).setLink("help/metrics/ms1_signal_to_noise.html").build(),
 			QuameterMetric.builder("ms1_3a", "MS1-3A", "MS1 Dynamic Range", HIGH, false, "Dynamic range - ratio of 95th and 5th percentile of MS1 maximum identities for identified peptides in C-2A time range").setLink("help/metrics/ms1_dynamic_range.html").build(),
+			QuameterMetric.builder("ms1_3b", "MS1-3B", "MS1 Median", HIGH, false, "The median of maximum MS1 intensities for peptides").build(),
 			QuameterMetric.builder("ms1_2b", "MS1-2B", "MS1 TIC", HIGH, true, "Median MS1 Total Ion Current").setLink("help/metrics/ms1_total_ion_current.html").build(),
 			QuameterMetric.builder("ms1_5a", "MS1-5A", "AMU Error Median", HIGH, false, "Median difference between the theoretical precursor m/z and the measured precursor m/z value as reported in the scan header").setLink("help/metrics/mass_accuracy.html").build(),
 			QuameterMetric.builder("ms1_5b", "MS1-5B", "AMU Error Mean", HIGH, false, "Mean absolute difference between the theoretical precursor m/z and the measured precursor m/z value as reported in the scan header").setLink("help/metrics/mass_accuracy.html").build(),
