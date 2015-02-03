@@ -314,7 +314,7 @@ SearchRunItemVisualizer.prototype.fillWithContents = function (fragment, id, obj
             bar.className = "progressbar-error";
             errorLink = document.createElement("a");
             errorLink.title = object.errormsg;
-            errorLink.href = "taskerror?tid=" + object.id;
+            errorLink.href = "/report/taskerror?tid=" + object.id;
             errorLink.target = "_blank";
             errorLink.appendChild(document.createTextNode("ERROR"));
             bar.appendChild(errorLink);
@@ -450,7 +450,7 @@ TaskItemVisualizer.prototype.fillWithContents = function (element, id, object) {
         item.title = object.time + (object.warningmsg != null ? ' ' + object.warningmsg : '' );
         if (object.errormsg != null && object.errormsg != "") {
             var errorLink = document.createElement("a");
-            errorLink.href = "taskerror?id=" + object.taskid;
+            errorLink.href = "/report/taskerror?id=" + object.taskid;
             errorLink.target = "_blank";
             errorLink.appendChild(document.createTextNode("ERROR "));
             item.title += " " + object.errormsg;
