@@ -24,6 +24,7 @@ import edu.mayo.mprc.workspace.WorkspaceDao;
 import edu.mayo.mprc.workspace.WorkspaceDaoHibernate;
 import org.apache.log4j.Logger;
 import org.hibernate.Criteria;
+import org.hibernate.FetchMode;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.criterion.LogicalExpression;
@@ -489,7 +490,10 @@ public final class SwiftDaoHibernate extends DaoBase implements SwiftDao {
 
 	@Override
 	public ReportData getReportForId(final long reportDataId) {
-		return (ReportData) getSession().load(ReportData.class, reportDataId);
+		return (ReportData) getSession().createCriteria(ReportData.class)
+				.add(Restrictions.eq("id", reportDataId))
+				.setFetchMode("searchRun", FetchMode.SELECT)
+				.uniqueResult();
 	}
 
 	@Override
