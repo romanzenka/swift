@@ -60,7 +60,6 @@
         <url-pattern>/start/CommonDataRequester</url-pattern>
     </servlet-mapping>
 
-
     <servlet-mapping>
         <servlet-name>main</servlet-name>
         <url-pattern>/</url-pattern>
