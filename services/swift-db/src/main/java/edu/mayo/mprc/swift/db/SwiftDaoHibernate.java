@@ -490,10 +490,11 @@ public final class SwiftDaoHibernate extends DaoBase implements SwiftDao {
 
 	@Override
 	public ReportData getReportForId(final long reportDataId) {
-		return (ReportData) getSession().createCriteria(ReportData.class)
+		final ReportData reportData = (ReportData) getSession().createCriteria(ReportData.class)
 				.add(Restrictions.eq("id", reportDataId))
-				.setFetchMode("searchRun", FetchMode.SELECT)
+				.setFetchMode("searchRun", FetchMode.JOIN)
 				.uniqueResult();
+		return reportData;
 	}
 
 	@Override
