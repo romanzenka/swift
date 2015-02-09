@@ -127,10 +127,7 @@ public class HemeScaffoldReader extends ScaffoldReportReader {
             //System.out.println(isomass);
 			try {
 				return Double.parseDouble(isomass);
-			} catch (NumberFormatException e) {
-				// SWALLOWED: this is expected
-				return null;
-			}
+			} catch (NumberFormatException e){}
 		}
 		return null;
 	}
@@ -144,29 +141,45 @@ public class HemeScaffoldReader extends ScaffoldReportReader {
     }
 
     public static boolean hasOverlappingMutation(PeptideEntity peptideSeq, String dbSequence, String cigar) {
-        int pepStart = dbSequence.indexOf(peptideSeq.getSequence());
+        String pepSeqString = peptideSeq.getSequence().toUpperCase();
+        char typeOfMutation = 0;
+        int insertLength = 0;
+        int pepStart = dbSequence.indexOf(pepSeqString)+1;
         // If peptide does not match protein string
         if(pepStart == -1){
-            throw new MprcException("Peptide doesn't match the Database sequence, cannot get indexOf");
+            throw new MprcException("Peptide doesn't match the Database sequence, cannot get indexOf\n\t>"+pepSeqString);
         }
 
         peptideSeq.setStart(pepStart); //Store this info for FrontEnd Viz
-        int pepEnd = pepStart + peptideSeq.getSequence().length();
+        int pepEnd = pepStart + pepSeqString.length();
         peptideSeq.setStop(pepEnd);
 
 
         //Get cigar element types parsed
         char[] letter = cigar.replaceAll("[0-9]","").toCharArray();
+
         //Get cigar lengths parsed
         String[] numericTmp = cigar.split("[MIDNSHPX]");
         int mutPosition = 0;
         for(int i=0; i<numericTmp.length;i++){
             mutPosition += Integer.parseInt(numericTmp[i]);
             if( !(letter[i] == 'M')){
+                typeOfMutation = letter[i];
+                if(letter[i] == 'D'){ mutPosition = mutPosition - (Integer.parseInt(numericTmp[i])-1); } //compensate for deletions in 1-based counting
+                if(letter[i] == 'I'){ insertLength = (Integer.parseInt(numericTmp[i]) -1); } //insertions have 2 points to measure
                 break;
             }
         }
-        if(pepStart < mutPosition && mutPosition <= pepEnd){
+
+        if(typeOfMutation == 'X' && pepStart <= mutPosition && mutPosition <= pepEnd){
+            peptideSeq.setHasMutation(true);
+            return true;
+        }
+        else if(typeOfMutation == 'D' && pepStart < mutPosition && mutPosition <= pepEnd){
+            peptideSeq.setHasMutation(true);
+            return true;
+        }
+        else if(typeOfMutation == 'I' && pepStart <= (mutPosition - insertLength) && mutPosition <= pepEnd){
             peptideSeq.setHasMutation(true);
             return true;
         }
