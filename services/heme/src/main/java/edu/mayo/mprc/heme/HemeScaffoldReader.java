@@ -127,7 +127,9 @@ public class HemeScaffoldReader extends ScaffoldReportReader {
             //System.out.println(isomass);
 			try {
 				return Double.parseDouble(isomass);
-			} catch (NumberFormatException e){}
+			} catch (NumberFormatException e) {
+				// SWALLOWED: we return NULL in case of error
+			}
 		}
 		return null;
 	}
@@ -144,11 +146,12 @@ public class HemeScaffoldReader extends ScaffoldReportReader {
         String pepSeqString = peptideSeq.getSequence().toUpperCase();
         char typeOfMutation = 0;
         int insertLength = 0;
-        int pepStart = dbSequence.indexOf(pepSeqString)+1;
-        // If peptide does not match protein string
-        if(pepStart == -1){
-            throw new MprcException("Peptide doesn't match the Database sequence, cannot get indexOf\n\t>"+pepSeqString);
+	    int pepStart = dbSequence.indexOf(pepSeqString);
+	    // If peptide does not match protein string
+	    if (pepStart == -1) {
+		    throw new MprcException("Peptide doesn't match the Database sequence, cannot get indexOf\n\t>"+pepSeqString);
         }
+	    pepStart += 1; // pepStart is 1-based
 
         peptideSeq.setStart(pepStart); //Store this info for FrontEnd Viz
         int pepEnd = pepStart + pepSeqString.length();
