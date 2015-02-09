@@ -19,10 +19,6 @@
         font-family: "Courier New", Courier, monospace;
         font-size: 16pt;
     }
-
-    .warn {
-        color: red;
-    }
 </style>
 
 <div class="container">

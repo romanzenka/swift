@@ -93,7 +93,10 @@
                                     </button>
                                 </c:when>
                                 <c:when test="${entry.status == success}">
-                                    <button class="btn result-action" data-id="${entry.test.id}" type="button">Result
+                                    <button class="btn btn-success result-action" data-id="${entry.test.id}" type="button">Result
+                                    </button>
+                                    <button class="btn btn-sm analyze-action" data-id="${entry.test.id}"
+                                            type="button">Re-analyze
                                     </button>
                                 </c:when>
                             </c:choose>

@@ -1,10 +1,12 @@
 package edu.mayo.mprc.heme;
 
+import edu.mayo.mprc.MprcException;
 import edu.mayo.mprc.scaffoldparser.spectra.ScaffoldReportReader;
 import org.apache.log4j.Logger;
 
 import java.io.File;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -52,38 +54,53 @@ public class HemeScaffoldReader extends ScaffoldReportReader {
 		final Iterable<String> accNums = PROTEIN_ACCESSION_SPLITTER.split(accnumString);
 
         for (final String accNum : accNums) {
+/*            if( ! accNum.startsWith("sp|") ) {
+                System.out.println();
+            }*/
+
 			final String description = getDescription(accNum);
             if(description == null){
-                LOGGER.warn(String.format("Database does not contain entry for accession number [%s]", accNum));
-                continue;
+                throw new MprcException( String.format("Database does not contain entry for accession number [%s]", accNum) );
+                //LOGGER.warn(String.format("Database does not contain entry for accession number [%s]", accNum));
             }
 
             //missing desc -> null results in error chain
 			final ProteinEntity prot = report.find_or_create_ProteinEntity(accNum, description, getMassIsotopic(description), mutationSequenceCache.get(accNum));
             prot.setTotalSpectra( parseInt(currentLine[numberOfTotalSpectra]) );
 
-            // Everyone else category (contaminants & non-mutated proteins):
+            // Everyone else category (contaminants & wild-type proteins):
             if( prot.getMass() == null ){
                 prot.setFilter(ProteinEntity.Filter.OTHER);
                 continue;
             }
 
             PeptideEntity newPep = new PeptideEntity( currentLine[peptideSeq] );
-            boolean massCheck = isWithingMassRange(report.getMass(), prot.getMass(), report.getMassTolerance());
             boolean mutationCheck = hasOverlappingMutation(newPep, prot.getSequence(), prot.getCigar());
+
+            // No mutation means scaffold put it in the wrong place....needs to attach to wild type instead
+            if( !mutationCheck ){
+                //prot.setSequence(mutationSequenceCache.get(accNum));
+                String[] splitAccNum = accNum.split("_");
+                String baseAcc = splitAccNum[0]+"_"+splitAccNum[2];
+
+                ProteinEntity baseProt = report.find_or_create_ProteinEntity(baseAcc, "Scaffold Non-Mutant peptides Reallocated", getMassIsotopic(description), mutationSequenceCache.get(accNum));
+                baseProt.incrementTotalSpectra();
+                baseProt.setFilter(ProteinEntity.Filter.OTHER);
+                baseProt.appendPeptide(newPep);
+                continue;
+            }
+
+
+            boolean massCheck = isWithingMassRange(report.getMass(), prot.getMass(), report.getMassTolerance());
             prot.appendPeptide(newPep);
 
             /* Must be inside Mass Range & Have cooresponding mutation */
-            if(massCheck && mutationCheck){
+            if(massCheck){
                 //prot.setSequence(mutationSequenceCache.get(accNum));
                 prot.setFilter(ProteinEntity.Filter.MUTATION_CONFIRMED);
             }
-            else if(massCheck && !mutationCheck){
-                //prot.setSequence(mutationSequenceCache.get(accNum));
-                prot.setFilter(ProteinEntity.Filter.UNSUPPORTED);
-            }
             // Else: Mutation Proteins either outside of mass range or completely missing the target mutation
-            else if(mutationCheck){
+            else{
                 prot.setFilter(ProteinEntity.Filter.RELATED_MUTANT);
             }
 
@@ -99,6 +116,7 @@ public class HemeScaffoldReader extends ScaffoldReportReader {
 	 * Get description for a protein of given accession number
 	 */
 	private String getDescription(final String accNum) {
+
         return databaseCache.get(accNum);
 	}
 
@@ -109,10 +127,7 @@ public class HemeScaffoldReader extends ScaffoldReportReader {
             //System.out.println(isomass);
 			try {
 				return Double.parseDouble(isomass);
-			} catch (NumberFormatException e) {
-				// SWALLOWED: this is expected
-				return null;
-			}
+			} catch (NumberFormatException e){}
 		}
 		return null;
 	}
@@ -125,31 +140,46 @@ public class HemeScaffoldReader extends ScaffoldReportReader {
         return check;
     }
 
-    private boolean hasOverlappingMutation(PeptideEntity peptideSeq, String dbSequence, String cigar) {
-        int pepStart = dbSequence.indexOf(peptideSeq.getSequence());
+    public static boolean hasOverlappingMutation(PeptideEntity peptideSeq, String dbSequence, String cigar) {
+        String pepSeqString = peptideSeq.getSequence().toUpperCase();
+        char typeOfMutation = 0;
+        int insertLength = 0;
+        int pepStart = dbSequence.indexOf(pepSeqString)+1;
         // If peptide does not match protein string
         if(pepStart == -1){
-            return false;
+            throw new MprcException("Peptide doesn't match the Database sequence, cannot get indexOf\n\t>"+pepSeqString);
         }
 
         peptideSeq.setStart(pepStart); //Store this info for FrontEnd Viz
-        int pepEnd = pepStart + peptideSeq.getSequence().length();
+        int pepEnd = pepStart + pepSeqString.length();
         peptideSeq.setStop(pepEnd);
 
 
         //Get cigar element types parsed
-        String[] letter = cigar.replaceAll("[0-9]","").split("");
+        char[] letter = cigar.replaceAll("[0-9]","").toCharArray();
+
         //Get cigar lengths parsed
         String[] numericTmp = cigar.split("[MIDNSHPX]");
         int mutPosition = 0;
         for(int i=0; i<numericTmp.length;i++){
             mutPosition += Integer.parseInt(numericTmp[i]);
-            if( ! letter[i+1].equals("M") ){
+            if( !(letter[i] == 'M')){
+                typeOfMutation = letter[i];
+                if(letter[i] == 'D'){ mutPosition = mutPosition - (Integer.parseInt(numericTmp[i])-1); } //compensate for deletions in 1-based counting
+                if(letter[i] == 'I'){ insertLength = (Integer.parseInt(numericTmp[i]) -1); } //insertions have 2 points to measure
                 break;
             }
         }
 
-        if(pepStart < mutPosition && mutPosition < pepEnd){
+        if(typeOfMutation == 'X' && pepStart <= mutPosition && mutPosition <= pepEnd){
+            peptideSeq.setHasMutation(true);
+            return true;
+        }
+        else if(typeOfMutation == 'D' && pepStart < mutPosition && mutPosition <= pepEnd){
+            peptideSeq.setHasMutation(true);
+            return true;
+        }
+        else if(typeOfMutation == 'I' && pepStart <= (mutPosition - insertLength) && mutPosition <= pepEnd){
             peptideSeq.setHasMutation(true);
             return true;
         }
