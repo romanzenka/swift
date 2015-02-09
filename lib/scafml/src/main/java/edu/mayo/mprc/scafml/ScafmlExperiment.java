@@ -156,13 +156,12 @@ public final class ScafmlExperiment extends FileHolder {
 				.append(XMLUtilities.wrapatt("annotateWithGOA", isAnnotateWithGOA() ? "true" : "false"))
 				.append(XMLUtilities.wrapatt("useIndependentSampleGrouping", isUseIndependentSampleGrouping() ? "true" : "false"))
 				.append(XMLUtilities.wrapatt("useFamilyProteinGrouping", isUseFamilyProteinGrouping() ? "true" : "false"))
-				.append(XMLUtilities.wrapatt("spectrumNameRegEx", ""))
 				.append(XMLUtilities.wrapatt("highMassAccuracyScoring", isHighMassAccuracyScoring() ? "true" : "false"))
 				.append(XMLUtilities.wrapatt("use3xScoring", isUse3xScoring() ? "true" : "false"));
 
 		if (scaffold.getVersionMajor() >= 3) {
 			result
-					.append(XMLUtilities.wrapatt("peakListGeneratorName", "extract_msn"))
+					.append(XMLUtilities.wrapatt("peakListGeneratorName", "msconvert"))
 					.append(XMLUtilities.wrapatt("peakListDeisotoped", "false"));
 		}
 
