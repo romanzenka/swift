@@ -29,8 +29,8 @@ public final class CommandLine {
 			file = (File) options.valueOf(paramName);
 		} else if (defaultValue != null) {
 			file = new File(defaultValue).getAbsoluteFile();
-			FileUtilities.err("The " + fileDescription + " parameter not specified, trying default " + file.getAbsolutePath());
-			FileUtilities.err("You can set path to " + fileDescription + " using the --" + paramName + " switch.");
+			FileUtilities.out("The " + fileDescription + " is set to " + file.getAbsolutePath() + " by default.");
+			FileUtilities.out("You can set path to " + fileDescription + " using the --" + paramName + " switch.");
 		} else {
 			throw new MprcException("The " + fileDescription + " parameter not specified.\n" +
 					"You can set path to " + fileDescription + " using the --" + paramName + " switch.");
