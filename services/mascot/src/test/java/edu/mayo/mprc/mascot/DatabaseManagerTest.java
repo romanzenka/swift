@@ -20,7 +20,7 @@ import java.util.List;
  */
 @Test(groups = "integration")
 public final class DatabaseManagerTest {
-	public static final int MAX_MASCOT_DATABASES = 128;
+	public static final int MAX_MASCOT_DATABASES = 256;
 	public static final String TEST_DB = "swift_test_db";
 	private DatabaseManager manager;
 	private List<String> originalDatabases;

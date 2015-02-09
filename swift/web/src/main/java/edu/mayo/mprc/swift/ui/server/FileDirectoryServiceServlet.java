@@ -43,7 +43,7 @@ public final class FileDirectoryServiceServlet {
 				expanded_paths = "";
 			}
 
-			final FileSearchBean fileBean = new FileSearchBean(getBaseFolder().getAbsolutePath());
+			final FileSearchBean fileBean = new FileSearchBean(getBaseFolder().getAbsolutePath(), FileSearchBean.SortBy.NAME);
 			fileBean.setPath(fixFileSeparators(directory_path));
 			fileBean.setExpandedPaths(expanded_paths);
 			fileBean.writeFolderContent(out);

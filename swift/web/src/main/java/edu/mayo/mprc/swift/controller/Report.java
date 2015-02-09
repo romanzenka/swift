@@ -81,7 +81,7 @@ public final class Report {
 		return "report/report";
 	}
 
-	@RequestMapping(value = "/taskerror")
+	@RequestMapping(value = "/report/taskerror")
 	public String taskError(final ModelMap model,
 	                        @RequestParam(value = "id", required = false) final Integer taskId,
 	                        @RequestParam(value = "tid", required = false) final Integer searchRunId) {

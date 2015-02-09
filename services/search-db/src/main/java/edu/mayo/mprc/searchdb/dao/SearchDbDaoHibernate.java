@@ -84,17 +84,19 @@ public class SearchDbDaoHibernate extends DaoBase implements SearchDbDao {
 		if (params.containsKey("test")) {
 
 			// Build results of two sample analyses
+			// Make them 1 month old so they do not retire from filters
+			DateTime now = new DateTime();
 
 			final TandemMassSpectrometrySample sample1 = addTandemMassSpectrometrySample(
 					new TandemMassSpectrometrySample(
 							new File("test.RAW"),
-							new DateTime(2014, 1, 10, 9, 10, 11, 0),
+							new DateTime(now.getYear(), 1, 10, 9, 10, 11, 0),
 							100,
 							1000,
 							0,
 							"instrument",
 							"Orbi123",
-							new DateTime(2014, 1, 10, 10, 20, 30, 0),
+							new DateTime(now.getYear(), 1, 10, 10, 20, 30, 0),
 							60.0,
 							"comment",
 							"sample Information")
@@ -103,13 +105,13 @@ public class SearchDbDaoHibernate extends DaoBase implements SearchDbDao {
 			final TandemMassSpectrometrySample sample2 = addTandemMassSpectrometrySample(
 					new TandemMassSpectrometrySample(
 							new File("test2.RAW"),
-							new DateTime(2014, 2, 12, 11, 20, 30, 40),
+							new DateTime(now.getYear(), 2, 12, 11, 20, 30, 40),
 							200,
 							2000,
 							0,
 							"instrument",
 							"Orbi123",
-							new DateTime(2014, 2, 12, 12, 21, 22, 23),
+							new DateTime(now.getYear(), 2, 12, 12, 21, 22, 23),
 							120.0,
 							"comment 2",
 							"sample Information 2")
@@ -141,7 +143,7 @@ public class SearchDbDaoHibernate extends DaoBase implements SearchDbDao {
 
 			final ProteinGroup proteinGroup2 = new ProteinGroup(sequenceList2, 0.90, 4, 5, 6, 0.4, 0.5);
 			final ProteinGroupList proteinGroups2 = new ProteinGroupList();
-			proteinGroups1.add(proteinGroup2);
+			proteinGroups2.add(proteinGroup2);
 
 			final SearchResult searchResult1 = new SearchResult(sample1, proteinGroups1);
 			final SearchResult searchResult2 = new SearchResult(sample2, proteinGroups2);
@@ -266,8 +268,8 @@ public class SearchDbDaoHibernate extends DaoBase implements SearchDbDao {
 				}
 				analysis.setBiologicalSamples(addSet(newList));
 			}
-			analysis.getReports().add(reportData);
 			savedAnalysis = save(analysis, false);
+			analysis.getReports().add(reportData);
 			reportData.setAnalysisId(analysis.getId());
 		}
 		return savedAnalysis;

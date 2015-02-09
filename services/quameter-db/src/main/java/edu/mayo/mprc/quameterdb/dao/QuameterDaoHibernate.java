@@ -91,8 +91,6 @@ public final class QuameterDaoHibernate extends DaoBase implements QuameterDao, 
 	 * @return List of all results matching the criteria
 	 */
 	private List<QuameterResult> listResults(final ListItems listedItems, final boolean timeLimit) {
-		final List<QuameterProteinGroup> activeProteinGroups = listProteinGroups();
-
 		final String hiddenQuery;
 		switch (listedItems) {
 			case ALL:

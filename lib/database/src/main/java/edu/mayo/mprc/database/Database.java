@@ -17,13 +17,17 @@ import org.hibernate.cfg.Configuration;
 import org.hibernate.dialect.Dialect;
 import org.hibernate.dialect.SQLServerDialect;
 import org.hibernate.engine.SessionFactoryImplementor;
+import org.hibernate.jmx.StatisticsService;
 import org.hibernate.tool.hbm2ddl.SchemaExport;
 import org.hibernate.usertype.UserType;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
+import javax.management.MBeanServer;
+import javax.management.ObjectName;
 import java.io.File;
 import java.io.IOException;
+import java.lang.management.ManagementFactory;
 import java.util.*;
 
 /**
@@ -167,6 +171,17 @@ public final class Database implements RuntimeInitializer, Lifecycle {
 					, translator);
 
 			setSessionFactory(sessionFactory1);
+
+			try {
+				final StatisticsService statsMBean = new StatisticsService();
+				statsMBean.setSessionFactory(getSessionFactory());
+				statsMBean.setStatisticsEnabled(true);
+				final MBeanServer mBeanServer = ManagementFactory.getPlatformMBeanServer();
+				mBeanServer.registerMBean(statsMBean, new ObjectName("Hibernate:application=Statistics"));
+			} catch (final Exception e) {
+				LOGGER.warn("Could not start hibernate JMX bean", e);
+				// SWALLOWED: Not a big deal
+			}
 		}
 	}
 

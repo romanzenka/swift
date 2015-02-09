@@ -18,11 +18,9 @@ import edu.mayo.mprc.swift.db.SwiftDao;
 import edu.mayo.mprc.swift.db.SwiftDaoHibernate;
 import edu.mayo.mprc.swift.dbmapping.FileSearch;
 import edu.mayo.mprc.swift.dbmapping.ReportData;
-import edu.mayo.mprc.swift.dbmapping.SearchRun;
 import edu.mayo.mprc.swift.dbmapping.SwiftSearchDefinition;
 import edu.mayo.mprc.swift.params2.ParamsDao;
 import edu.mayo.mprc.swift.params2.ParamsDaoHibernate;
-import edu.mayo.mprc.unimod.Unimod;
 import edu.mayo.mprc.unimod.UnimodDao;
 import edu.mayo.mprc.unimod.UnimodDaoHibernate;
 import edu.mayo.mprc.utilities.FileUtilities;
@@ -74,10 +72,10 @@ public final class BulkLoadingTest extends DaoTest {
 
 	@BeforeMethod
 	public void setupDb() {
-		SwiftDaoHibernate swiftDaoImpl = new SwiftDaoHibernate();
-		ParamsDaoHibernate paramsDaoImpl = new ParamsDaoHibernate();
-		FastaDbDaoHibernate fastaDbDaoImpl = new FastaDbDaoHibernate();
-		WorkspaceDaoHibernate workspaceDaoImpl = new WorkspaceDaoHibernate();
+		final SwiftDaoHibernate swiftDaoImpl = new SwiftDaoHibernate();
+		final ParamsDaoHibernate paramsDaoImpl = new ParamsDaoHibernate();
+		final FastaDbDaoHibernate fastaDbDaoImpl = new FastaDbDaoHibernate();
+		final WorkspaceDaoHibernate workspaceDaoImpl = new WorkspaceDaoHibernate();
 		final UnimodDaoHibernate unimodDaoImpl = new UnimodDaoHibernate();
 		final CurationDaoHibernate curationDaoImpl = new CurationDaoHibernate();
 		final BulkSearchDbDaoHibernate searchDbDaoImpl = new BulkSearchDbDaoHibernate(swiftDaoImpl, fastaDbDaoImpl, getDatabase());
@@ -112,15 +110,15 @@ public final class BulkLoadingTest extends DaoTest {
 	}
 
 	private void loadXml() {
-		FileInputStream in = null;
+		final FileInputStream in = null;
 		try {
 			final Transaction transaction = sessionProvider.getSession().beginTransaction();
 			final IDatabaseConnection connection = new DatabaseConnection(sessionProvider.getSession().connection());
-			IDataSet currentData = connection.createDataSet();
-			FlatXmlDataSet set = new FlatXmlDataSetBuilder().build(new File("/Users/m044910/Documents/devel/swift/services/search-db/src/test/resources/edu/mayo/mprc/searchdb/dump.xml"));
+			final IDataSet currentData = connection.createDataSet();
+			final FlatXmlDataSet set = new FlatXmlDataSetBuilder().build(new File("/Users/m044910/Documents/devel/swift/services/search-db/src/test/resources/edu/mayo/mprc/searchdb/dump.xml"));
 			DatabaseOperation.CLEAN_INSERT.execute(connection, set);
 			transaction.commit();
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			throw new MprcException("Could not dump database XML", e);
 		} finally {
 			FileUtilities.closeQuietly(in);
@@ -133,11 +131,11 @@ public final class BulkLoadingTest extends DaoTest {
 			out = new FileOutputStream("/Users/m044910/Documents/devel/swift/services/search-db/src/test/resources/edu/mayo/mprc/searchdb/dump.xml");
 			final Transaction transaction = sessionProvider.getSession().beginTransaction();
 			final IDatabaseConnection conn = new DatabaseConnection(sessionProvider.getSession().connection());
-			ITableFilter filter = new DatabaseSequenceFilter(conn);
-			IDataSet dataset = new FilteredDataSet(filter, conn.createDataSet());
+			final ITableFilter filter = new DatabaseSequenceFilter(conn);
+			final IDataSet dataset = new FilteredDataSet(filter, conn.createDataSet());
 			FlatXmlDataSet.write(dataset, out);
 			transaction.commit();
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			throw new MprcException("Could not dump database XML", e);
 		} finally {
 			FileUtilities.closeQuietly(out);
@@ -146,9 +144,9 @@ public final class BulkLoadingTest extends DaoTest {
 
 	@Test
 	public void shouldLoadResults() {
-		UserProgressReporter reporter = new UserProgressReporter() {
+		final UserProgressReporter reporter = new UserProgressReporter() {
 			@Override
-			public void reportProgress(ProgressInfo progressInfo) {
+			public void reportProgress(final ProgressInfo progressInfo) {
 
 			}
 
@@ -157,57 +155,57 @@ public final class BulkLoadingTest extends DaoTest {
 				return new SimpleParentLog();
 			}
 		};
+
 		searchDbDao.begin();
+
 		User user = workspaceDao.getUserByEmail("test@test.com");
 		if (user == null) {
 			user = workspaceDao.addNewUser("test", "testovic", "test@test.com", new Change("test user", new DateTime()));
 		}
 
-		List<FileSearch> inputFiles = new ArrayList<FileSearch>(1);
+		final List<FileSearch> inputFiles = new ArrayList<FileSearch>(1);
 		inputFiles.add(new FileSearch(new File("input.mgf"), "sample", "category", "experiment", null));
 		SwiftSearchDefinition searchDefinition = new SwiftSearchDefinition("test", user, new File("out"), null, null, null, inputFiles, false, false, false, new HashMap<String, String>(0));
 		searchDefinition = swiftDao.addSwiftSearchDefinition(searchDefinition);
+		final int searchRunId = swiftDao.fillSearchRun(searchDefinition).getId();
+		final long reportDataId = swiftDao.storeReport(searchRunId, new File("test.sf3"), new DateTime(2013, 8, 20, 20, 30, 40, 50)).getId();
 
-		SearchRun searchRun = swiftDao.fillSearchRun(searchDefinition);
-
-		ReportData reportData = swiftDao.storeReport(searchRun.getId(), new File("test.sf3"), new DateTime(2013, 8, 20, 20, 30, 40, 50));
-
-		Unimod defaultUnimod = unimodDao.getDefaultUnimod();
+		nextTransaction();
 
 		// Add all the protein sequences
-		Collection<ProteinSequence> sequences = new ArrayList<ProteinSequence>(100);
+		final Collection<ProteinSequence> sequences = new ArrayList<ProteinSequence>(100);
 		for (int i = 0; i < 100; i++) {
 			sequences.add(new ProteinSequence(getRandomSequence("AC" + i, PROTEIN_MIN, PROTEIN_MAX)));
 		}
 		fastaDbDao.addProteinSequences(sequences);
 
-
-		searchDbDao.commit();
-		searchDbDao.begin();
+		nextTransaction();
 
 		// Start building the analysis
-		AnalysisBuilder builder = new AnalysisBuilder(new DummyTranslator(), new DummyMassSpecDataExtractor(new DateTime(2013, 9, 22, 10, 20, 30, 0)));
+		final AnalysisBuilder builder = new AnalysisBuilder(new DummyTranslator(), new DummyMassSpecDataExtractor(new DateTime(2013, 9, 22, 10, 20, 30, 0)));
+		ReportData reportData = swiftDao.getReportForId(reportDataId);
 		builder.setReportData(reportData);
-		SearchResultListBuilder searchResults = builder.getBiologicalSamples().getBiologicalSample("sample", "category").getSearchResults();
-		SearchResultBuilder tandemMassSpecResult = searchResults.getTandemMassSpecResult("test.RAW");
+		final SearchResultListBuilder searchResults = builder.getBiologicalSamples().getBiologicalSample("sample", "category").getSearchResults();
+		final SearchResultBuilder tandemMassSpecResult = searchResults.getTandemMassSpecResult("test.RAW");
 		for (int i = 0; i < 100; i++) {
 			tandemMassSpecResult.getProteinGroups().getProteinGroup("AC" + i, "database", 1, 1, 1, 0.1, 0.2, 0.3);
 		}
 
-		searchDbDao.commit();
+		nextTransaction();
 
-		searchDbDao.begin();
+		reportData = swiftDao.getReportForId(reportData.getId());
+
 		startStats();
-		Analysis analysis = searchDbDao.addAnalysis(builder, reportData, reporter);
+		final Analysis analysis = searchDbDao.addAnalysis(builder, reportData, reporter);
 		searchDbDao.commit();
 	}
 
 	public static final String ACIDS = "RHKDESTNQCGPAVILMFYW";
 
-	public static String getRandomSequence(String accessionNumber, int minLength, int maxLength) {
-		Random random = new Random(accessionNumber.hashCode());
-		int length = random.nextInt(maxLength - minLength + 1) + minLength;
-		StringBuilder builder = new StringBuilder(length);
+	public static String getRandomSequence(final String accessionNumber, final int minLength, final int maxLength) {
+		final Random random = new Random(accessionNumber.hashCode());
+		final int length = random.nextInt(maxLength - minLength + 1) + minLength;
+		final StringBuilder builder = new StringBuilder(length);
 		for (int i = 0; i < length; i++) {
 			builder.append(ACIDS.charAt(random.nextInt(ACIDS.length())));
 		}
@@ -218,8 +216,8 @@ public final class BulkLoadingTest extends DaoTest {
 
 	private static class DummyTranslator implements ProteinSequenceTranslator {
 		@Override
-		public ProteinSequence getProteinSequence(String accessionNumber, String databaseSources) {
-			String sequence = getRandomSequence(accessionNumber, PROTEIN_MIN, PROTEIN_MAX);
+		public ProteinSequence getProteinSequence(final String accessionNumber, final String databaseSources) {
+			final String sequence = getRandomSequence(accessionNumber, PROTEIN_MIN, PROTEIN_MAX);
 
 			return new ProteinSequence(sequence);
 		}

@@ -55,8 +55,9 @@ public final class FileSearchBean {
 	 *
 	 * @param basePath Path to the root of the search bean (the {@link #setPath} and {@link @setExpandPath} are entered relative to this root.
 	 */
-	public FileSearchBean(final String basePath) {
+	public FileSearchBean(final String basePath, final SortBy sortBy) {
 		this.basePath = basePath;
+		this.sortBy = sortBy;
 		expandedPaths = EMPTY_FILE_ARRAY;
 	}
 
