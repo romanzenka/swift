@@ -315,7 +315,7 @@ public abstract class TaskBase implements Task {
 			@Override
 			public void fileChanged(Collection<File> files, boolean timeout) {
 				if (timeout) {
-					setError(new MprcException("The files [" + Joiner.on("], [").join(files) + "] did not appear even after 2 minutes."));
+					setError(new MprcException("The " + (files.size() > 1 ? "files" : "file") + " [" + Joiner.on("], [").join(files) + "] did not appear even after 2 minutes."));
 				} else {
 					setComplete();
 				}
