@@ -140,7 +140,7 @@ public final class GridEngineJobManagerImpl implements GridEngineJobManager {
 		final String taskString = pPacket.getApplicationName() + " " + getApplicationCallParameters(pPacket);
 
 		try {
-			LOGGER.debug("Runing grid engine job: " + taskString);
+			LOGGER.debug("Running grid engine job: " + taskString);
 
 			final String jobid = runJob(pPacket);
 			LOGGER.info("Your job has been submitted with id " + jobid);
@@ -294,7 +294,7 @@ public final class GridEngineJobManagerImpl implements GridEngineJobManager {
 				storeJobFailedStatus(info.getJobId(), info, " never ran");
 			} else if (info.hasExited()) {
 				LOGGER.debug("Job " + info.getJobId() +
-						" finished regularly with exit status" +
+						" finished regularly with exit status " +
 						info.getExitStatus());
 				if (info.getExitStatus() == 0) {
 					storeJobSuccessfulStatus(info.getJobId(), info);

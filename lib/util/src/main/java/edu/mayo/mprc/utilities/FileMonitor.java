@@ -39,7 +39,7 @@ public final class FileMonitor {
 	private void startTimer() {
 		if (timer == null) {
 			timer = new Timer(true);
-			timer.schedule(new FileMonitorNotifier(), 0, pollingInterval);
+			timer.schedule(new FileMonitorNotifier(), 5, pollingInterval);
 		}
 	}
 
@@ -101,7 +101,7 @@ public final class FileMonitor {
 	 * Information about a file being monitored
 	 */
 	private static class FileInfo {
-		private List<File> files;
+		private List<File> filesMonitored;
 		private List<Long> modifiedTimes;
 		private FileListener listener;
 		private long expirationDate;
@@ -114,12 +114,12 @@ public final class FileMonitor {
 		 * @param checkForChange Whether to check for the file to change modification time. If false, only file creation triggers notification.
 		 */
 		FileInfo(final Collection<File> filesToAdd, final FileListener listener, final int expireInMillis, final boolean checkForChange) {
-			files = new ArrayList<File>(filesToAdd.size());
+			filesMonitored = new ArrayList<File>(filesToAdd.size());
 			modifiedTimes = new ArrayList<Long>(filesToAdd.size());
 			this.checkForChange = checkForChange;
 
 			for (final File file : filesToAdd) {
-				files.add(file);
+				filesMonitored.add(file);
 				if (file.exists()) {
 					modifiedTimes.add(file.lastModified());
 				} else {
@@ -139,8 +139,8 @@ public final class FileMonitor {
 		}
 
 		private boolean shouldTriggerListener() {
-			for (int i = 0; i < files.size(); i++) {
-				final File file = files.get(i);
+			for (int i = 0; i < filesMonitored.size(); i++) {
+				final File file = filesMonitored.get(i);
 				if (checkForChange) {
 					final long modified = modifiedTimes.get(i);
 					if (file.exists()) {
@@ -172,7 +172,7 @@ public final class FileMonitor {
 		}
 
 		public void fireListener(final boolean expired) {
-			listener.fileChanged(files, expired);
+			listener.fileChanged(filesMonitored, expired);
 		}
 
 		private boolean isCheckForChange() {
@@ -184,14 +184,14 @@ public final class FileMonitor {
 	/**
 	 * This is the timer thread which is executed every n milliseconds
 	 * according to the setting of the file monitor. It investigates the
-	 * file in question and notify listeners if changed.
+	 * file in question and notifies listeners if changed.
 	 */
 	private class FileMonitorNotifier extends TimerTask {
 		@Override
 		public void run() {
 			synchronized (lock) {
-				for (Iterator<FileInfo> iterator = files.iterator(); iterator.hasNext(); ) {
-					FileInfo fileInfo = iterator.next();
+				for (final Iterator<FileInfo> iterator = files.iterator(); iterator.hasNext(); ) {
+					final FileInfo fileInfo = iterator.next();
 					if (fileInfo.isExpired()) {
 						fileInfo.fireListener(true);
 						iterator.remove();
