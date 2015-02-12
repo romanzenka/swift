@@ -29,6 +29,7 @@ import java.util.concurrent.atomic.AtomicLong;
  */
 public final class ResponseDispatcher implements Lifecycle {
 	private static final Logger LOGGER = Logger.getLogger(ResponseDispatcher.class);
+	public static final int SLOW_PROCESSING = 100;
 
 	private Session session;
 
@@ -142,7 +143,9 @@ public final class ResponseDispatcher implements Lifecycle {
 				processMessage(message);
 			} finally {
 				long duration = System.currentTimeMillis() - start;
-				LOGGER.debug("Response processing took " + duration + " milliseconds");
+				if (duration > SLOW_PROCESSING) {
+					LOGGER.debug("Slow response processing: took " + duration + " milliseconds");
+				}
 
 				acknowledgeMessage(message);
 			}

@@ -1,5 +1,7 @@
 package edu.mayo.mprc.utilities;
 
+import com.google.common.collect.Lists;
+
 import java.io.File;
 import java.util.*;
 
@@ -190,19 +192,28 @@ public final class FileMonitor {
 		@Override
 		public void run() {
 			synchronized (lock) {
-				for (final Iterator<FileInfo> iterator = files.iterator(); iterator.hasNext(); ) {
-					final FileInfo fileInfo = iterator.next();
+				// We must store the items to remove in a separate array, as the listeners can
+				// add new items into the collection as we iterate
+				final List<FileInfo> infosToRemove = Lists.newArrayList();
+
+				// Moreover, copy the files and iterate over the clone to prevent the users messing with the collection
+				final List<FileInfo> filesClone = Lists.newArrayList(files);
+
+				for (final FileInfo fileInfo : filesClone) {
 					if (fileInfo.isExpired()) {
 						fileInfo.fireListener(true);
-						iterator.remove();
+						infosToRemove.add(fileInfo);
 					} else if (fileInfo.shouldTriggerListener()) {
 						fileInfo.fireListener(false);
 						if (!fileInfo.isCheckForChange()) {
 							// We are monitoring for files to appear, and they did
-							iterator.remove();
+							infosToRemove.add(fileInfo);
 						}
 					}
 				}
+
+				// Remove all items marked for removal
+				files.removeAll(infosToRemove);
 			}
 		}
 	}
