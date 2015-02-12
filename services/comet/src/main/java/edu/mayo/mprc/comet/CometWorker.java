@@ -1,5 +1,7 @@
 package edu.mayo.mprc.comet;
 
+import com.google.common.base.Charsets;
+import com.google.common.io.Files;
 import edu.mayo.mprc.MprcException;
 import edu.mayo.mprc.config.*;
 import edu.mayo.mprc.config.ui.ServiceUiFactory;
@@ -19,6 +21,7 @@ import org.apache.log4j.Logger;
 import org.springframework.stereotype.Component;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
@@ -52,6 +55,12 @@ public final class CometWorker extends WorkerBase {
 		final File outputFile = getTempOutputFile(tempWorkFolder, finalOutputFile);
 		final String resultFileName = getResultFileName(outputFile);
 		final File parameterFile = makeParameterFile(tempWorkFolder, packet);
+
+		try {
+			LOGGER.info("Comet parameters:\n-----\n" + Files.toString(parameterFile, Charsets.UTF_8) + "-----\n");
+		} catch (IOException e) {
+			throw new MprcException("Could not read contents of Comet parameter file " + parameterFile.getAbsolutePath(), e);
+		}
 
 		final List<String> parameters = new LinkedList<String>();
 		parameters.add(cometExecutable.getPath());

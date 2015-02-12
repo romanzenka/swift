@@ -147,7 +147,7 @@ public final class XTandemWorker extends WorkerBase {
 		final File finalOutputFile = packet.getOutputFile();
 		final File outputFile = getTempOutputFile(tempWorkFolder, finalOutputFile);
 
-		LOGGER.info("X!Tandem parameters:\n"
+		LOGGER.info("X!Tandem command line parameters:\n"
 				+ "--" + TANDEM_EXECUTABLE + " '" + tandemExecutable.getPath() + "' "
 				+ "--" + INPUT_FILE + " '" + packet.getInputFile().getPath() + "' "
 				+ "--" + OUTPUT_FILE + " '" + outputFile.getPath() + "' "
@@ -212,6 +212,12 @@ public final class XTandemWorker extends WorkerBase {
 				XTandemMappings.DATABASE_TAXON,
 				threads
 		);
+
+		try {
+			LOGGER.info("X!Tandem parameters:\n-----\n" + Files.toString(paramFile, Charsets.UTF_8) + "-----\n");
+		} catch (IOException e) {
+			throw new MprcException("Could not read contents of X!Tandem parameter file " + paramFile.getAbsolutePath(), e);
+		}
 
 		final List<String> parameters = new LinkedList<String>();
 		parameters.add(tandemExecutable.getPath());
