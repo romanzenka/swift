@@ -192,28 +192,33 @@ public final class FileMonitor {
 		@Override
 		public void run() {
 			synchronized (lock) {
-				// We must store the items to remove in a separate array, as the listeners can
-				// add new items into the collection as we iterate
-				final List<FileInfo> infosToRemove = Lists.newArrayList();
+				final List<FileInfo> fireExpired = Lists.newArrayList();
+				final List<FileInfo> fireNonExpired = Lists.newArrayList();
 
-				// Moreover, copy the files and iterate over the clone to prevent the users messing with the collection
-				final List<FileInfo> filesClone = Lists.newArrayList(files);
-
-				for (final FileInfo fileInfo : filesClone) {
+				// Nobody can interfere with the files collection in this loop
+				final Iterator<FileInfo> fileInfoIterator = files.iterator();
+				while (fileInfoIterator.hasNext()) {
+					final FileInfo fileInfo = fileInfoIterator.next();
 					if (fileInfo.isExpired()) {
-						fileInfo.fireListener(true);
-						infosToRemove.add(fileInfo);
+						fireExpired.add(fileInfo);
+						fileInfoIterator.remove();
 					} else if (fileInfo.shouldTriggerListener()) {
-						fileInfo.fireListener(false);
+						fireNonExpired.add(fileInfo);
 						if (!fileInfo.isCheckForChange()) {
 							// We are monitoring for files to appear, and they did
-							infosToRemove.add(fileInfo);
+							fileInfoIterator.remove();
 						}
 					}
 				}
 
-				// Remove all items marked for removal
-				files.removeAll(infosToRemove);
+				// Now do all the event firing, so the caller does not interfere with the collection
+				for (final FileInfo fileInfo : fireExpired) {
+					fileInfo.fireListener(true);
+				}
+
+				for (final FileInfo fileInfo : fireNonExpired) {
+					fileInfo.fireListener(false);
+				}
 			}
 		}
 	}
