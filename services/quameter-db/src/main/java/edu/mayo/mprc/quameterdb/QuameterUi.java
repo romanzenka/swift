@@ -48,6 +48,11 @@ public final class QuameterUi implements Dao, UiConfigurationProvider, Lifecycle
 	private static final String HIGH = "high";
 	private static final String RANGE = "range";
 
+	/**
+	 * Semitryptic to tryptic ratio
+	 */
+	public static final String P_3 = "p_3";
+
 	public static final List<QuameterMetric> METRICS = Lists.newArrayList(
 			QuameterMetric.builder("c_1a", "C-1A", "Bleed Ratio", LOW, false, "Fraction of peptides with repeat identifications >4 min EARLIER than identification closest to the chromatographic maximum").build(),
 			QuameterMetric.builder("c_1b", "C-1B", "Peak Tailing Ratio", LOW, false, "Fraction of peptides with repeat identifications >4 min LATER than identification closest to the chromatographic maximum").build(),
@@ -91,7 +96,7 @@ public final class QuameterUi implements Dao, UiConfigurationProvider, Lifecycle
 			QuameterMetric.builder("p_2a", "P-2A", "MS2 Tryptic Spectra", HIGH, false, "Number of MS2 spectra identifying tryptic peptide ions").setRange(0.0, null).build(),
 			QuameterMetric.builder("p_2b", "P-2B", "MS2 Tryptic Ions", HIGH, false, "Number of tryptic peptide ions identified").setRange(0.0, null).build(),
 			QuameterMetric.builder("p_2c", "P-2C", "Distinct Peptides", HIGH, false, "Number of distinct identified tryptic peptide sequences, ignoring modifications and charge state").setRange(0.0, null).setLink("help/metrics/peptide_count.html").build(),
-			QuameterMetric.builder("p_3", "P-3", "Semitryptic Ratio", LOW, true, "Ratio of semitryptic/tryptic peptides").setLink("help/metrics/percent_semi_tryptic.html").build()
+			QuameterMetric.builder(P_3, "P-3", "Semitryptic Ratio", LOW, true, "Ratio of semitryptic/tryptic peptides").setLink("help/metrics/percent_semi_tryptic.html").build()
 
 			// The protein count groups are added in code
 	);

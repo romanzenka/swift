@@ -16,6 +16,8 @@ import edu.mayo.mprc.daemon.worker.WorkerFactoryBase;
 import edu.mayo.mprc.database.Database;
 import edu.mayo.mprc.quameterdb.dao.QuameterDao;
 import edu.mayo.mprc.quameterdb.dao.QuameterProteinGroup;
+import edu.mayo.mprc.swift.db.SwiftDao;
+import edu.mayo.mprc.swift.dbmapping.FileSearch;
 import edu.mayo.mprc.utilities.FileUtilities;
 import edu.mayo.mprc.utilities.progress.UserProgressReporter;
 import org.apache.log4j.Logger;
@@ -35,6 +37,7 @@ import java.util.regex.Pattern;
 public final class QuameterDbWorker extends WorkerBase {
 	private static final Logger LOGGER = Logger.getLogger(QuameterDbWorker.class);
 	private QuameterDao dao;
+	private SwiftDao swiftDao;
 
 	public static final String TYPE = "quameter-db";
 	public static final String NAME = "QuaMeter Result Loader";
@@ -55,12 +58,17 @@ public final class QuameterDbWorker extends WorkerBase {
 		dao.begin();
 		try {
 			final List<QuameterProteinGroup> proteins = dao.listProteinGroups();
+			final FileSearch fileSearch = swiftDao.getFileSearchForId(workPacket.getFileSearchId());
+			final String msmsSampleName = FileUtilities.getFileNameWithoutExtension(fileSearch.getInputFile());
 			final Map<String, Double> map = loadQuameterResultFile(workPacket.getQuameterResultFile());
 
 			final Map<QuameterProteinGroup, Integer> identifiedSpectra = dao.getIdentifiedSpectra(
 					workPacket.getFileSearchId(),
 					workPacket.getSearchResultId(),
 					proteins);
+
+			final double semiTryptic = getSemiTrypticRatio(workPacket.getScaffoldSpectraFile(), msmsSampleName, reporter);
+			map.put(QuameterUi.P_3, semiTryptic);
 
 			dao.addQuameterScores(workPacket.getSearchResultId(),
 					workPacket.getFileSearchId(),
@@ -73,6 +81,12 @@ public final class QuameterDbWorker extends WorkerBase {
 							+ workPacket.getQuameterResultFile()
 							+ "]", e);
 		}
+	}
+
+	private double getSemiTrypticRatio(final File scaffoldSpectraFile, final String msmsSampleName, UserProgressReporter reporter) {
+		final SemitrypticRatioScaffoldReader reader = new SemitrypticRatioScaffoldReader(msmsSampleName);
+		reader.load(scaffoldSpectraFile, "4.0", reporter);
+		return reader.getSemiTrypticRatio();
 	}
 
 	/**
@@ -142,7 +156,7 @@ public final class QuameterDbWorker extends WorkerBase {
 
 		@Override
 		public Worker create(final Config config, final DependencyResolver dependencies) {
-			QuameterDbWorker quameterDbWorker = new QuameterDbWorker(getQuameterDao());
+			final QuameterDbWorker quameterDbWorker = new QuameterDbWorker(getQuameterDao());
 			return quameterDbWorker;
 		}
 	}

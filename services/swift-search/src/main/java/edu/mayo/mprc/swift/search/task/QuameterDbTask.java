@@ -18,13 +18,18 @@ import java.util.Map;
 public final class QuameterDbTask extends AsyncTaskBase {
 	private SearchDbTask searchDbTask;
 	private QuameterTask quameterTask;
+	private ScaffoldTaskI scaffoldTask;
 	private FileSearch fileSearch;
 
-	public QuameterDbTask(final WorkflowEngine engine, final DaemonConnection daemon, final DatabaseFileTokenFactory fileTokenFactory, final boolean fromScratch, final SearchDbTask searchDbTask, final QuameterTask quameterTask, final FileSearch fileSearch) {
+	public QuameterDbTask(final WorkflowEngine engine, final DaemonConnection daemon, final DatabaseFileTokenFactory fileTokenFactory,
+	                      final boolean fromScratch, final SearchDbTask searchDbTask, final QuameterTask quameterTask,
+	                      final ScaffoldTaskI scaffoldTask,
+	                      final FileSearch fileSearch) {
 		super(engine, daemon, fileTokenFactory, fromScratch);
 		this.searchDbTask = searchDbTask;
 		this.fileSearch = fileSearch;
 		this.quameterTask = quameterTask;
+		this.scaffoldTask = scaffoldTask;
 		setName("quameter-db");
 		setDescription("Load QuaMeter metadata from " + fileTokenFactory.fileToTaggedDatabaseToken(fileSearch.getInputFile()));
 	}
@@ -45,7 +50,8 @@ public final class QuameterDbTask extends AsyncTaskBase {
 				analysisId,
 				searchResultId,
 				fileSearch.getId(),
-				quameterTask.getResultingFile()
+				quameterTask.getResultingFile(),
+				scaffoldTask.getScaffoldSpectraFile()
 		);
 	}
 
@@ -59,7 +65,7 @@ public final class QuameterDbTask extends AsyncTaskBase {
 
 	@Override
 	public int hashCode() {
-		return Objects.hashCode(searchDbTask, quameterTask, fileSearch.getId());
+		return Objects.hashCode(searchDbTask, quameterTask, scaffoldTask, fileSearch.getId());
 	}
 
 	@Override
@@ -73,6 +79,7 @@ public final class QuameterDbTask extends AsyncTaskBase {
 		final QuameterDbTask other = (QuameterDbTask) obj;
 		return Objects.equal(this.searchDbTask, other.searchDbTask)
 				&& Objects.equal(this.quameterTask, other.quameterTask)
-				&& Objects.equal(this.fileSearch.getId(), other.fileSearch.getId());
+				&& Objects.equal(this.fileSearch.getId(), other.fileSearch.getId())
+				&& Objects.equal(this.scaffoldTask, other.scaffoldTask);
 	}
 }

@@ -330,7 +330,7 @@ public final class SearchRunner implements Runnable, Lifecycle {
 			final IdpQonvertTask idpQonvertTask = addIdpQonvertTask(idpQonvert, cometSearch, false/* Do not publish the idpDB file, temp only*/);
 			idpQonvertTask.setEmbedSpectrumScanTimes(true);
 			idpQonvertTask.setMaxFDR(QUAMETER_FDR);
-			addQuameterTask(engines.getQuameterEngine(), idpQonvertTask, mzmlFile, searchDbTask, inputFile, publicSearchFiles);
+			addQuameterTask(engines.getQuameterEngine(), idpQonvertTask, mzmlFile, searchDbTask, scaffoldTask, inputFile, publicSearchFiles);
 		}
 	}
 
@@ -433,7 +433,7 @@ public final class SearchRunner implements Runnable, Lifecycle {
 	}
 
 	private QuameterTask addQuameterTask(final SearchEngine quaMeter, final IdpQonvertTask search, final FileProducingTask rawFile,
-	                                     final SearchDbTask searchDbTask, final FileSearch fileSearch,
+	                                     final SearchDbTask searchDbTask, final ScaffoldTaskI scaffoldTask, final FileSearch fileSearch,
 	                                     final boolean publicSearchFiles) {
 		final QuameterTask task = addTask(
 				new QuameterTask(workflowEngine,
@@ -449,6 +449,7 @@ public final class SearchRunner implements Runnable, Lifecycle {
 							isFromScratch(),
 							searchDbTask,
 							task,
+							scaffoldTask,
 							fileSearch)
 			);
 			dbTask.addDependency(task);

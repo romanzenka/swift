@@ -87,7 +87,10 @@ public final class QuameterTask extends AsyncTaskBase {
 			return false;
 		}
 		final QuameterTask other = (QuameterTask) obj;
-		return Objects.equal(idpQonvertTask, other.idpQonvertTask) && Objects.equal(rawFile, other.rawFile) && Objects.equal(outputFolder, other.outputFolder) && Objects.equal(maxFDR, other.maxFDR);
+		return Objects.equal(idpQonvertTask, other.idpQonvertTask) &&
+				Objects.equal(rawFile, other.rawFile) &&
+				Objects.equal(outputFolder, other.outputFolder) &&
+				Objects.equal(maxFDR, other.maxFDR);
 	}
 }
 

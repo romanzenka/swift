@@ -141,6 +141,7 @@ public abstract class ScaffoldReportReader {
 	 */
 	private static final String FIRST_HEADER_COLUMN = EXPERIMENT_NAME;
 	private static final Pattern THOUSANDS_REGEX = Pattern.compile(",(\\d\\d\\d)");
+	private double semiTrypticRatio;
 
 	/**
 	 * Initializes the reader.
