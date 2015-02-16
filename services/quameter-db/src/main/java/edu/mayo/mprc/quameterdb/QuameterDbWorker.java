@@ -48,8 +48,9 @@ public final class QuameterDbWorker extends WorkerBase {
 	public static final String PROTEINS = "proteins";
 	public static final String INSTRUMENT_NAME_MAP = "instrumentNameMap";
 
-	public QuameterDbWorker(final QuameterDao quameterDao) {
+	public QuameterDbWorker(final QuameterDao quameterDao, final SwiftDao swiftDao) {
 		dao = quameterDao;
+		this.swiftDao = swiftDao;
 	}
 
 	@Override
@@ -144,6 +145,7 @@ public final class QuameterDbWorker extends WorkerBase {
 	@Component("quameterDbWorkerFactory")
 	public static final class Factory extends WorkerFactoryBase<Config> {
 		private QuameterDao quameterDao;
+		private SwiftDao swiftDao;
 
 		public QuameterDao getQuameterDao() {
 			return quameterDao;
@@ -154,9 +156,18 @@ public final class QuameterDbWorker extends WorkerBase {
 			this.quameterDao = quameterDao;
 		}
 
+		public SwiftDao getSwiftDao() {
+			return swiftDao;
+		}
+
+		@Resource(name = "swiftDao")
+		public void setSwiftDao(SwiftDao swiftDao) {
+			this.swiftDao = swiftDao;
+		}
+
 		@Override
 		public Worker create(final Config config, final DependencyResolver dependencies) {
-			final QuameterDbWorker quameterDbWorker = new QuameterDbWorker(getQuameterDao());
+			final QuameterDbWorker quameterDbWorker = new QuameterDbWorker(getQuameterDao(), getSwiftDao());
 			return quameterDbWorker;
 		}
 	}
