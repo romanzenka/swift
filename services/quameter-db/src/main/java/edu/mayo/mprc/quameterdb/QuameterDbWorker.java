@@ -84,7 +84,7 @@ public final class QuameterDbWorker extends WorkerBase {
 		}
 	}
 
-	private double getSemiTrypticRatio(final File scaffoldSpectraFile, final String msmsSampleName, UserProgressReporter reporter) {
+	public static double getSemiTrypticRatio(final File scaffoldSpectraFile, final String msmsSampleName, UserProgressReporter reporter) {
 		final SemitrypticRatioScaffoldReader reader = new SemitrypticRatioScaffoldReader(msmsSampleName);
 		reader.load(scaffoldSpectraFile, "4.0", reporter);
 		return reader.getSemiTrypticRatio();

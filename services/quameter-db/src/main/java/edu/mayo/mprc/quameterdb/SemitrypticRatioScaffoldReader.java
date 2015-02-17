@@ -40,7 +40,7 @@ final class SemitrypticRatioScaffoldReader extends ScaffoldReportReader {
 
 		if (msmsSampleName.equals(currentLine[msmsSampleNameColumn])) {
 			totalSpectra++;
-			if (currentLine[numberOfEnzymaticTerminiiColumn] == "1") {
+			if ("1".equals(currentLine[numberOfEnzymaticTerminiiColumn])) {
 				semiTrypticSpectra++;
 			}
 		}
