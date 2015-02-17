@@ -632,20 +632,13 @@ function initSimpleCharts(graphObj) {
             url: "/service/new-annotation",
             data: annotForm.serialize(),
             success: function (response) {
-                var nthView = dyViewsByCode[annotForm.find('input[name="metricCode"]').val()];
+                var metricId = annotForm.find('input[name="metricCode"]').val();
+                var nthView = dyViewsByCode[metricId];
                 var nthx = getXaxisNseriesById(data, annotForm.find('input[name="dbId"]').val());
-                var annotations = views[nthView].dygraph.annotations();
-                annotations.push(
-                    {
-                        series: nthx[1],
-                        x: nthx[0].toString(),
-                        shortText: (annotText.length > 0 ? annotText[0] : ""),
-                        text: annotText
-                    }
-                );
-                views[nthView].dygraph.setAnnotations(annotations);
                 // Update the collection of annotations. We could do this faster, but this is robust
                 annotCollection = getAnnotationCollection();
+                var annotArr = buildCollection(annotCollection, data, metricId);
+                nthView.setAnnotations(annotArr);
             },
             error: function () {
                 alert("There was an error submitting this annotation comment!");
