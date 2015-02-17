@@ -10,6 +10,7 @@ import edu.mayo.mprc.quameterdb.dao.QuameterProteinGroup;
 import edu.mayo.mprc.quameterdb.dao.QuameterResult;
 import edu.mayo.mprc.searchdb.dao.TandemMassSpectrometrySample;
 import edu.mayo.mprc.swift.params2.SearchEngineParameters;
+import edu.mayo.mprc.swift.resources.WebUiHolder;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.MultiValueMap;
@@ -31,6 +32,9 @@ public final class QuameterServices {
 	@Resource(name = "quameterDao")
 	private QuameterDao quameterDao;
 
+	@Resource(name = "webUiHolder")
+	private WebUiHolder webUiHolder;
+
 	@RequestMapping(value = "/service/quameter-hide/{quameterResultId}", method = RequestMethod.POST)
 	@ResponseBody
 	public void hideQuameterResult(@PathVariable final int quameterResultId, @RequestParam final String reason) {
@@ -38,7 +42,7 @@ public final class QuameterServices {
 		try {
 			quameterDao.hideQuameterResult(quameterResultId, reason);
 			quameterDao.commit();
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			quameterDao.rollback();
 			throw new MprcException("Could not hide quameter result " + quameterResultId, e);
 		}
@@ -50,7 +54,7 @@ public final class QuameterServices {
 		try {
 			quameterDao.unhideQuameterResult(quameterResultId, reason);
 			quameterDao.commit();
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			quameterDao.rollback();
 			throw new MprcException("Could not un-hide quameter result " + quameterResultId, e);
 		}
@@ -65,7 +69,7 @@ public final class QuameterServices {
 		try {
 			quameterDao.addAnnotation(new QuameterAnnotation(inputMap.getFirst("metricCode"), Integer.parseInt(inputMap.getFirst("dbId")), inputMap.getFirst("text")));
 			quameterDao.commit();
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			quameterDao.rollback();
 			throw new MprcException("Could not add quameter annotation.");
 		}
@@ -76,12 +80,12 @@ public final class QuameterServices {
 	public ModelAndView getAnnotationList() {
 		quameterDao.begin();
 		try {
-			List<QuameterAnnotation> myList = quameterDao.listAnnotations();
+			final List<QuameterAnnotation> myList = quameterDao.listAnnotations();
 			quameterDao.commit();
-			ModelAndView modelAndView = new ModelAndView();
+			final ModelAndView modelAndView = new ModelAndView();
 			modelAndView.addObject("quameterannotation", myList);
 			return modelAndView;
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			quameterDao.rollback();
 			throw new MprcException("Could Not list Quameter Annotations for you.", e);
 		}
@@ -90,24 +94,21 @@ public final class QuameterServices {
 
 	//  http://localhost:8080/service/getQuameterDataTable
 	@RequestMapping(value = "/service/getQuameterDataTable", method = RequestMethod.GET)
-	public void getDataFile(HttpServletResponse response) {
+	public void getDataFile(final HttpServletResponse response) {
 		quameterDao.begin();
 		try {
 			response.setContentType("text/csv");
 			response.setHeader("Content-Disposition", "attachment; filename=\"quameter.tsv\"");
+			response.setContentType("application/vnd.ms-excel");
 
 			final List<QuameterProteinGroup> proteinGroups = quameterDao.listProteinGroups();
 			final List<QuameterResult> quameterResults = quameterDao.listVisibleResultsAllTime();
-			try {
-				final Writer bw = response.getWriter();
-				writeHeader(bw, proteinGroups);
-				writeRows(bw, quameterResults, proteinGroups);
+			final Writer bw = response.getWriter();
+			writeHeader(bw, proteinGroups);
+			writeRows(bw, quameterResults, proteinGroups);
 
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
 			quameterDao.commit();
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			quameterDao.rollback();
 			throw new MprcException("Could not generate Quameter Data Table for file.", e);
 		}
@@ -115,7 +116,7 @@ public final class QuameterServices {
 
 	private void writeHeader(final Writer writer, final List<QuameterProteinGroup> protGrps) throws IOException {
 		// Predefined column names
-		List<String> myHeader = Lists.newArrayList("ID", "Start Time", "Path", "Duration (min)", "Category", "Search parameters ID", "SearchRun ID");
+		final List<String> myHeader = Lists.newArrayList("ID", "Start Time", "Path", "Duration (min)", "Category", "Instrument", "Search parameters ID", "SearchRun ID");
 		// Quameter Result Column names
 		for (final QuameterResult.QuameterColumn column : QuameterResult.QuameterColumn.values()) {
 			myHeader.add(QuameterResult.getColumnName(column));
@@ -124,15 +125,16 @@ public final class QuameterServices {
 		for (final QuameterProteinGroup proteinGroup : protGrps) {
 			myHeader.add(proteinGroup.getName());
 		}
-		Joiner jn = Joiner.on("\t");       // Guava
+		final Joiner jn = Joiner.on("\t");       // Guava
 		writer.write(jn.join(myHeader) + "\n");
 
 		// Make second row with descriptions
-		List<String> myDescriptions = Lists.newArrayList("QuaMeter Entry ID",
+		final List<String> myDescriptions = Lists.newArrayList("QuaMeter Entry ID",
 				"Acquisition start time for sample",
 				"Sample file",
 				"Acquisition duration in minutes",
 				"User-specified sample category",
+				"Instrument serial number",
 				"Search Parameters ID",
 				"Search Run ID");
 		for (final QuameterResult.QuameterColumn column : QuameterResult.QuameterColumn.values()) {
@@ -151,12 +153,13 @@ public final class QuameterServices {
 			final SearchEngineParameters parameters = result.getFileSearch().getSearchParameters();
 			final Map<QuameterProteinGroup, Integer> identifiedSpectra = result.getIdentifiedSpectra();
 
-			List<String> myRow = Lists.newArrayList(
+			final List<String> myRow = Lists.newArrayList(
 					result.getId().toString(), // Id of the entry (for hiding)
 					massSpecSample.getStartTime().toString(), // startTime
 					massSpecSample.getFile().getAbsolutePath().toString(), // path
 					Double.toString(massSpecSample.getRunTimeInSeconds() / 60.0), // duration
 					result.getCategory().toString(),
+					webUiHolder.getWebUi().mapInstrumentSerialNumbers(massSpecSample.getInstrumentSerialNumber()),
 					Integer.toString(parameters != null ? parameters.getId() : 0), // search parameters id
 					Integer.toString(result.getTransaction())
 			);
@@ -170,7 +173,7 @@ public final class QuameterServices {
 				myRow.add(Integer.toString(numSpectra != null ? numSpectra : 0));
 			}
 
-			Joiner jn = Joiner.on("\t");      // Guava
+			final Joiner jn = Joiner.on("\t");      // Guava
 			writer.write(jn.join(myRow) + "\n");
 		}
 	}
