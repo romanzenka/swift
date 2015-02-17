@@ -12,6 +12,8 @@ import edu.mayo.mprc.swift.params2.SearchEngineParameters;
 import edu.mayo.mprc.swift.resources.WebUiHolder;
 import edu.mayo.mprc.utilities.CsvWriter;
 import edu.mayo.mprc.utilities.FileUtilities;
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.MultiValueMap;
@@ -152,6 +154,8 @@ public final class QuameterServices {
 
 	private void writeRows(final CsvWriter writer, final List<QuameterResult> results, final List<QuameterProteinGroup> proteinGroups) throws IOException {
 		String[] line = null;
+		final DateTimeFormatter dateTimeFormatter = DateTimeFormat.forPattern("yyyy.MM.dd HH:mm:ss");
+
 		for (final QuameterResult result : results) {
 			final TandemMassSpectrometrySample massSpecSample = result.getSearchResult().getMassSpecSample();
 			final SearchEngineParameters parameters = result.getFileSearch().getSearchParameters();
@@ -159,7 +163,7 @@ public final class QuameterServices {
 
 			final List<String> myRow = Lists.newArrayList(
 					result.getId().toString(), // Id of the entry (for hiding)
-					massSpecSample.getStartTime().toString(), // startTime
+					massSpecSample.getStartTime().toString(dateTimeFormatter), // startTime
 					massSpecSample.getFile().getAbsolutePath().toString(), // path
 					Double.toString(massSpecSample.getRunTimeInSeconds() / 60.0), // duration
 					result.getCategory().toString(),
