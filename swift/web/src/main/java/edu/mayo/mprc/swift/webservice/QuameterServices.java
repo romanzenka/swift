@@ -119,7 +119,7 @@ public final class QuameterServices {
 
 	private void writeHeader(final CsvWriter writer, final List<QuameterProteinGroup> protGrps) throws IOException {
 		// Predefined column names
-		final List<String> myHeader = Lists.newArrayList("ID", "Start Time", "Path", "Duration (min)", "Category", "Instrument", "Search parameters ID", "SearchRun ID");
+		final List<String> myHeader = Lists.newArrayList("QID", "Start Time", "Path", "Duration (min)", "Category", "Instrument", "Search parameters ID", "SearchRun ID");
 		// Quameter Result Column names
 		for (final QuameterResult.QuameterColumn column : QuameterResult.QuameterColumn.values()) {
 			myHeader.add(QuameterResult.getColumnName(column));
