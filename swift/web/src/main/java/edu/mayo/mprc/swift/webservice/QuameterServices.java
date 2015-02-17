@@ -1,6 +1,5 @@
 package edu.mayo.mprc.swift.webservice;
 
-import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
 import edu.mayo.mprc.MprcException;
 import edu.mayo.mprc.quameterdb.QuameterUi;
@@ -11,6 +10,8 @@ import edu.mayo.mprc.quameterdb.dao.QuameterResult;
 import edu.mayo.mprc.searchdb.dao.TandemMassSpectrometrySample;
 import edu.mayo.mprc.swift.params2.SearchEngineParameters;
 import edu.mayo.mprc.swift.resources.WebUiHolder;
+import edu.mayo.mprc.utilities.CsvWriter;
+import edu.mayo.mprc.utilities.FileUtilities;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.MultiValueMap;
@@ -98,14 +99,16 @@ public final class QuameterServices {
 		quameterDao.begin();
 		try {
 			response.setContentType("text/csv");
-			response.setHeader("Content-Disposition", "attachment; filename=\"quameter.tsv\"");
+			response.setHeader("Content-Disposition", "attachment; filename=\"quameter.csv\"");
 			response.setContentType("application/vnd.ms-excel");
 
 			final List<QuameterProteinGroup> proteinGroups = quameterDao.listProteinGroups();
 			final List<QuameterResult> quameterResults = quameterDao.listVisibleResultsAllTime();
 			final Writer bw = response.getWriter();
-			writeHeader(bw, proteinGroups);
-			writeRows(bw, quameterResults, proteinGroups);
+			final CsvWriter writer = new CsvWriter(bw);
+			writeHeader(writer, proteinGroups);
+			writeRows(writer, quameterResults, proteinGroups);
+			FileUtilities.closeQuietly(writer);
 
 			quameterDao.commit();
 		} catch (final Exception e) {
@@ -114,7 +117,7 @@ public final class QuameterServices {
 		}
 	}
 
-	private void writeHeader(final Writer writer, final List<QuameterProteinGroup> protGrps) throws IOException {
+	private void writeHeader(final CsvWriter writer, final List<QuameterProteinGroup> protGrps) throws IOException {
 		// Predefined column names
 		final List<String> myHeader = Lists.newArrayList("ID", "Start Time", "Path", "Duration (min)", "Category", "Instrument", "Search parameters ID", "SearchRun ID");
 		// Quameter Result Column names
@@ -125,8 +128,8 @@ public final class QuameterServices {
 		for (final QuameterProteinGroup proteinGroup : protGrps) {
 			myHeader.add(proteinGroup.getName());
 		}
-		final Joiner jn = Joiner.on("\t");       // Guava
-		writer.write(jn.join(myHeader) + "\n");
+		final String[] line = new String[myHeader.size()];
+		writer.writeNext(myHeader.toArray(line));
 
 		// Make second row with descriptions
 		final List<String> myDescriptions = Lists.newArrayList("QuaMeter Entry ID",
@@ -144,10 +147,11 @@ public final class QuameterServices {
 		for (final QuameterProteinGroup proteinGroup : protGrps) {
 			myDescriptions.add(proteinGroup.getName() + " total spectra");
 		}
-		writer.write(Joiner.on("\t").join(myDescriptions) + "\n");
+		writer.writeNext(myDescriptions.toArray(line));
 	}
 
-	private void writeRows(final Writer writer, final List<QuameterResult> results, final List<QuameterProteinGroup> proteinGroups) throws IOException {
+	private void writeRows(final CsvWriter writer, final List<QuameterResult> results, final List<QuameterProteinGroup> proteinGroups) throws IOException {
+
 		for (final QuameterResult result : results) {
 			final TandemMassSpectrometrySample massSpecSample = result.getSearchResult().getMassSpecSample();
 			final SearchEngineParameters parameters = result.getFileSearch().getSearchParameters();
@@ -173,8 +177,7 @@ public final class QuameterServices {
 				myRow.add(Integer.toString(numSpectra != null ? numSpectra : 0));
 			}
 
-			final Joiner jn = Joiner.on("\t");      // Guava
-			writer.write(jn.join(myRow) + "\n");
+			writer.writeNext((String[]) myRow.toArray());
 		}
 	}
 
