@@ -644,6 +644,8 @@ function initSimpleCharts(graphObj) {
                     }
                 );
                 views[nthView].dygraph.setAnnotations(annotations);
+                // Update the collection of annotations. We could do this faster, but this is robust
+                annotCollection = getAnnotationCollection();
             },
             error: function () {
                 alert("There was an error submitting this annotation comment!");
