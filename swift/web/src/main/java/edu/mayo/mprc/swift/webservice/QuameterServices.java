@@ -151,7 +151,7 @@ public final class QuameterServices {
 	}
 
 	private void writeRows(final CsvWriter writer, final List<QuameterResult> results, final List<QuameterProteinGroup> proteinGroups) throws IOException {
-
+		String[] line = null;
 		for (final QuameterResult result : results) {
 			final TandemMassSpectrometrySample massSpecSample = result.getSearchResult().getMassSpecSample();
 			final SearchEngineParameters parameters = result.getFileSearch().getSearchParameters();
@@ -177,7 +177,10 @@ public final class QuameterServices {
 				myRow.add(Integer.toString(numSpectra != null ? numSpectra : 0));
 			}
 
-			writer.writeNext((String[]) myRow.toArray());
+			if (line == null) {
+				line = new String[myRow.size()];
+			}
+			writer.writeNext(myRow.toArray(line));
 		}
 	}
 
