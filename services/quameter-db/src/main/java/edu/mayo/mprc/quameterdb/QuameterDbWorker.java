@@ -58,8 +58,8 @@ public final class QuameterDbWorker extends WorkerBase {
 		final QuameterDbWorkPacket workPacket = (QuameterDbWorkPacket) wp;
 		dao.begin();
 		try {
-			final List<QuameterProteinGroup> proteins = dao.listProteinGroups();
 			final FileSearch fileSearch = swiftDao.getFileSearchForId(workPacket.getFileSearchId());
+			final List<QuameterProteinGroup> proteins = dao.listProteinGroups();
 			final String msmsSampleName = FileUtilities.getFileNameWithoutExtension(fileSearch.getInputFile());
 			final Map<String, Double> map = loadQuameterResultFile(workPacket.getQuameterResultFile());
 

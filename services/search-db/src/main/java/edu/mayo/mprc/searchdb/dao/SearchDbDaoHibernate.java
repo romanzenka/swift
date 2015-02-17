@@ -35,6 +35,7 @@ import java.util.*;
  * @author Roman Zenka
  */
 public class SearchDbDaoHibernate extends DaoBase implements SearchDbDao {
+	public static final int IDS_AT_A_TIME = 1000;
 	private SwiftDao swiftDao;
 	private FastaDbDao fastaDbDao;
 
@@ -392,21 +393,27 @@ public class SearchDbDaoHibernate extends DaoBase implements SearchDbDao {
 
 	@Override
 	public Map<Integer, List<String>> getAccessionNumbersMapForProteinSequences(final Set<Integer> proteinSequenceLists, final Integer databaseId) {
-		final Query query = getSession().createQuery("select distinct psl.id, pa.accnum from" +
-				" ProteinSequenceList as psl" +
-				" inner join psl.list as ps," +
-				" ProteinEntry as pe," +
-				" ProteinAccnum as pa" +
-				" where pe.sequence = ps" +
-				" and pe.accessionNumber = pa" +
-				(databaseId != null ? " and pe.database.id = :databaseId" : "") +
-				" and psl.id in (:ids)")
-				.setParameterList("ids", proteinSequenceLists.toArray());
+		final Object[] ids = proteinSequenceLists.toArray();
+		final Map<Integer, List<String>> completeMap = Maps.newHashMapWithExpectedSize(ids.length);
+		for (int i = 0; i < ids.length; i += IDS_AT_A_TIME) {
+			final int endIndex = Math.min(ids.length, i + IDS_AT_A_TIME);
+			final Query query = getSession().createQuery("select distinct psl.id, pa.accnum from" +
+					" ProteinSequenceList as psl" +
+					" inner join psl.list as ps," +
+					" ProteinEntry as pe," +
+					" ProteinAccnum as pa" +
+					" where pe.sequence = ps" +
+					" and pe.accessionNumber = pa" +
+					(databaseId != null ? " and pe.database.id = :databaseId" : "") +
+					" and psl.id in (:ids)")
+					.setParameterList("ids", Arrays.copyOfRange(ids, i, endIndex));
 
-		if (databaseId != null) {
-			query.setParameter("databaseId", databaseId);
+			if (databaseId != null) {
+				query.setParameter("databaseId", databaseId);
+			}
+			completeMap.putAll(makeAccnumMap(query));
 		}
-		return makeAccnumMap(query);
+		return completeMap;
 	}
 
 	@Override
@@ -414,22 +421,32 @@ public class SearchDbDaoHibernate extends DaoBase implements SearchDbDao {
 		if (proteinGroupIds.isEmpty()) {
 			return Maps.newHashMap();
 		}
-		final Query query = getSession().createQuery("select distinct pg.id, pa.accnum from" +
-				" ProteinGroup as pg " +
-				" inner join pg.proteinSequences as psl" +
-				" inner join psl.list as ps," +
-				" ProteinEntry as pe," +
-				" ProteinAccnum as pa" +
-				" where pe.sequence = ps" +
-				" and pe.accessionNumber = pa" +
-				(databaseId != null ? " and pe.database.id = :databaseId" : "") +
-				" and pg.id in (:ids)")
-				.setParameterList("ids", proteinGroupIds.toArray());
 
-		if (databaseId != null) {
-			query.setParameter("databaseId", databaseId);
+		final Object[] ids = proteinGroupIds.toArray();
+
+		final Map<Integer, List<String>> completeMap = new HashMap<Integer, List<String>>(ids.length);
+
+		for (int i = 0; i < ids.length; i += IDS_AT_A_TIME) {
+			final int endIndex = Math.min(ids.length, i + IDS_AT_A_TIME);
+			final Query query = getSession().createQuery("select distinct pg.id, pa.accnum from" +
+					" ProteinGroup as pg " +
+					" inner join pg.proteinSequences as psl" +
+					" inner join psl.list as ps," +
+					" ProteinEntry as pe," +
+					" ProteinAccnum as pa" +
+					" where pe.sequence = ps" +
+					" and pe.accessionNumber = pa" +
+					(databaseId != null ? " and pe.database.id = :databaseId" : "") +
+					" and pg.id in (:ids)")
+					.setParameterList("ids", Arrays.copyOfRange(ids, i, endIndex));
+
+			if (databaseId != null) {
+				query.setParameter("databaseId", databaseId);
+			}
+			completeMap.putAll(makeAccnumMap(query));
 		}
-		return makeAccnumMap(query);
+
+		return completeMap;
 	}
 
 	/**
