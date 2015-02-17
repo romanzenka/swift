@@ -638,7 +638,7 @@ function initSimpleCharts(graphObj) {
                 // Update the collection of annotations. We could do this faster, but this is robust
                 annotCollection = getAnnotationCollection();
                 var annotArr = buildCollection(annotCollection, data, metricId);
-                nthView.setAnnotations(annotArr);
+                views[nthView].dygraph.setAnnotations(annotArr);
             },
             error: function () {
                 alert("There was an error submitting this annotation comment!");
