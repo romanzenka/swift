@@ -1,13 +1,12 @@
-package edu.mayo.mprc.searchdb;
+package edu.mayo.mprc.searchdb.dao;
 
 import edu.mayo.mprc.MprcException;
 import edu.mayo.mprc.database.DaoTest;
 import edu.mayo.mprc.dbcurator.model.CurationContext;
 import edu.mayo.mprc.dbcurator.model.impl.CurationDaoHibernate;
 import edu.mayo.mprc.fastadb.FastaDbDaoHibernate;
-import edu.mayo.mprc.searchdb.dao.SearchDbDaoHibernate;
-import edu.mayo.mprc.searchdb.dao.SearchRunFilter;
 import edu.mayo.mprc.swift.db.SwiftDaoHibernate;
+import edu.mayo.mprc.swift.dbmapping.ReportData;
 import edu.mayo.mprc.swift.dbmapping.SearchRun;
 import edu.mayo.mprc.swift.params2.ParamsDaoHibernate;
 import edu.mayo.mprc.unimod.UnimodDaoHibernate;
@@ -27,7 +26,7 @@ import java.util.Map;
 /**
  * @author Roman Zenka
  */
-public final class TestSwiftDaoHibernate extends DaoTest {
+public final class TestSearchDbDaoHibernate extends DaoTest {
 
 	private File tempFolder;
 	private WorkspaceDaoHibernate workspaceDao;
@@ -160,6 +159,20 @@ public final class TestSwiftDaoHibernate extends DaoTest {
 			List<SearchRun> searchRunListAfter = searchDbDao.getSearchRunList(runFilter(), true);
 			searchDbDao.commit();
 			Assert.assertNotNull(searchRunListAfter.get(0).getEndTimestamp());
+		} catch (Exception e) {
+			searchDbDao.rollback();
+			throw new MprcException(e);
+		}
+	}
+
+	@Test
+	public void shouldFilterByReport() {
+		searchDbDao.begin();
+		try {
+			ReportData reportData = (ReportData) searchDbDao.getSession().get(ReportData.class, 1L);
+			final Analysis analysis = searchDbDao.getAnalysis(reportData);
+			Assert.assertEquals(analysis.getId(), Integer.valueOf(1), "Should be the one and only analysis");
+			searchDbDao.commit();
 		} catch (Exception e) {
 			searchDbDao.rollback();
 			throw new MprcException(e);

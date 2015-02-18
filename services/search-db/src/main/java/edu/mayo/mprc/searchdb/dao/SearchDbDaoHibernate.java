@@ -21,7 +21,6 @@ import edu.mayo.mprc.utilities.progress.PercentRangeReporter;
 import org.hibernate.Criteria;
 import org.hibernate.FetchMode;
 import org.hibernate.Query;
-import org.hibernate.criterion.Restrictions;
 import org.joda.time.DateTime;
 
 import javax.annotation.Resource;
@@ -279,9 +278,8 @@ public class SearchDbDaoHibernate extends DaoBase implements SearchDbDao {
 	@Override
 	public Analysis getAnalysis(final ReportData reportData) {
 		return (Analysis) getSession()
-				.createCriteria(Analysis.class)
-				.createAlias("reports", "r")
-				.add(Restrictions.eq("r", reportData))
+				.createQuery("from Analysis a where :report in elements(a.reports)")
+				.setParameter("report", reportData)
 				.uniqueResult();
 	}
 
