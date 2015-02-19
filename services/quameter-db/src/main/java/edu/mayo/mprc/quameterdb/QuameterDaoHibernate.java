@@ -284,10 +284,8 @@ public final class QuameterDaoHibernate extends DaoBase implements QuameterDao, 
 		final List<QuameterAnnotation> finalResults = Lists.newArrayListWithCapacity(results.size());
 
 		for (final Object o : results) {
-			if (o instanceof Object[]) {
-				QuameterAnnotation annotation = (QuameterAnnotation) ((Object[]) o)[0];
-				finalResults.add(annotation);
-			}
+			QuameterAnnotation annotation = (QuameterAnnotation) o;
+			finalResults.add(annotation);
 		}
 		return finalResults;
 	}
