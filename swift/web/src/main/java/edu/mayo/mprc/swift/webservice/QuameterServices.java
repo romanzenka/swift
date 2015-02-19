@@ -8,7 +8,6 @@ import edu.mayo.mprc.quameterdb.dao.QuameterDao;
 import edu.mayo.mprc.quameterdb.dao.QuameterProteinGroup;
 import edu.mayo.mprc.quameterdb.dao.QuameterResult;
 import edu.mayo.mprc.searchdb.dao.TandemMassSpectrometrySample;
-import edu.mayo.mprc.swift.params2.SearchEngineParameters;
 import edu.mayo.mprc.swift.resources.WebUiHolder;
 import edu.mayo.mprc.utilities.CsvWriter;
 import edu.mayo.mprc.utilities.FileUtilities;
@@ -157,9 +156,8 @@ public final class QuameterServices {
 		final DateTimeFormatter dateTimeFormatter = DateTimeFormat.forPattern("yyyy.MM.dd HH:mm:ss");
 
 		for (final QuameterResult result : results) {
-			final TandemMassSpectrometrySample massSpecSample = result.getSearchResult().getMassSpecSample();
-			final SearchEngineParameters parameters = result.getFileSearch().getSearchParameters();
-			final Map<QuameterProteinGroup, Integer> identifiedSpectra = result.getIdentifiedSpectra();
+			final TandemMassSpectrometrySample massSpecSample = result.getMassSpectrometrySample();
+			final Map<QuameterProteinGroup, Integer> identifiedSpectra = result.getReadOnlyIdentifiedSpectra();
 
 			final List<String> myRow = Lists.newArrayList(
 					result.getId().toString(), // Id of the entry (for hiding)
@@ -168,7 +166,7 @@ public final class QuameterServices {
 					Double.toString(massSpecSample.getRunTimeInSeconds() / 60.0), // duration
 					result.getCategory().toString(),
 					webUiHolder.getWebUi().mapInstrumentSerialNumbers(massSpecSample.getInstrumentSerialNumber()),
-					Integer.toString(parameters != null ? parameters.getId() : 0), // search parameters id
+					Integer.toString(result.getSearchParametersId()),
 					Integer.toString(result.getTransaction())
 			);
 

@@ -21,6 +21,7 @@ import edu.mayo.mprc.utilities.progress.PercentRangeReporter;
 import org.hibernate.Criteria;
 import org.hibernate.FetchMode;
 import org.hibernate.Query;
+import org.hibernate.criterion.Restrictions;
 import org.joda.time.DateTime;
 
 import javax.annotation.Resource;
@@ -278,16 +279,19 @@ public class SearchDbDaoHibernate extends DaoBase implements SearchDbDao {
 	@Override
 	public Analysis getAnalysis(final ReportData reportData) {
 		return (Analysis) getSession()
-				.createQuery("from Analysis a where :report in elements(a.reports)")
-				.setParameter("report", reportData)
+				.createCriteria(Analysis.class)
+				.add(Restrictions.idEq(reportData.getAnalysisId()))
+				.setFetchMode("biologicalSamples", FetchMode.JOIN)
+				.setFetchMode("biologicalSamples.list", FetchMode.JOIN)
 				.uniqueResult();
 	}
 
 	@Override
 	public SwiftSearchDefinition getSearchDefinition(final long reportId) {
-		final Object searchDefinition = getSession().createQuery("select d from SwiftSearchDefinition d, ReportData r, SearchRun sr where " +
-				"r.searchRun = sr and sr.swiftSearch = d.id and r.id = :reportId")
+		final Object searchDefinition = getSession().createQuery("select d from SwiftSearchDefinition d, ReportData r, SearchRun sr " +
+				" where r.searchRun = sr and sr.swiftSearch = d.id and r.id = :reportId")
 				.setLong("reportId", reportId)
+
 				.uniqueResult();
 		if (searchDefinition instanceof SwiftSearchDefinition) {
 			return (SwiftSearchDefinition) searchDefinition;

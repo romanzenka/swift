@@ -13,6 +13,7 @@ import edu.mayo.mprc.workspace.User;
 import edu.mayo.mprc.workspace.WorkspaceDao;
 import org.apache.log4j.Logger;
 import org.hibernate.Criteria;
+import org.hibernate.FetchMode;
 import org.hibernate.Session;
 import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.Order;
@@ -326,6 +327,8 @@ public final class ParamsDaoHibernate extends DaoBase implements ParamsDao {
 		try {
 			return listAndCast(
 					allCriteria(SavedSearchEngineParameters.class)
+							.setFetchMode("parameters", FetchMode.JOIN)
+							.setFetchMode("user", FetchMode.JOIN)
 							.addOrder(Order.asc("name").ignoreCase())
 			);
 

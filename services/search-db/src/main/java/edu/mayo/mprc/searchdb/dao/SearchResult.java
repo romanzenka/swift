@@ -64,10 +64,10 @@ public class SearchResult extends PersistableBase {
 
 		final SearchResult that = (SearchResult) o;
 
-		if (getMassSpecSample() != null ? !getMassSpecSample().equals(that.getMassSpecSample()) : that.getMassSpecSample() != null) {
+		if (getMassSpecSample() != null ? !getMassSpecSample().getId().equals(that.getMassSpecSample().getId()) : that.getMassSpecSample() != null) {
 			return false;
 		}
-		if (getProteinGroups() != null ? !getProteinGroups().equals(that.getProteinGroups()) : that.getProteinGroups() != null) {
+		if (getProteinGroups() != null ? !getProteinGroups().getId().equals(that.getProteinGroups().getId()) : that.getProteinGroups() != null) {
 			return false;
 		}
 
@@ -76,8 +76,8 @@ public class SearchResult extends PersistableBase {
 
 	@Override
 	public int hashCode() {
-		int result = getMassSpecSample() != null ? getMassSpecSample().hashCode() : 0;
-		result = 31 * result + (getProteinGroups() != null ? getProteinGroups().hashCode() : 0);
+		int result = (getMassSpecSample() != null && getMassSpecSample().getId() != null) ? getMassSpecSample().getId().hashCode() : 0;
+		result = 31 * result + ((getProteinGroups() != null && getProteinGroups().getId() != null) ? getProteinGroups().getId().hashCode() : 0);
 		return result;
 	}
 

@@ -7,6 +7,7 @@ import edu.mayo.mprc.database.DaoTest;
 import edu.mayo.mprc.dbcurator.model.CurationContext;
 import edu.mayo.mprc.dbcurator.model.impl.CurationDaoHibernate;
 import edu.mayo.mprc.fastadb.FastaDbDaoHibernate;
+import edu.mayo.mprc.quameterdb.QuameterDaoHibernate;
 import edu.mayo.mprc.searchdb.dao.SearchDbDaoHibernate;
 import edu.mayo.mprc.searchdb.dao.SearchResult;
 import edu.mayo.mprc.swift.db.SwiftDaoHibernate;

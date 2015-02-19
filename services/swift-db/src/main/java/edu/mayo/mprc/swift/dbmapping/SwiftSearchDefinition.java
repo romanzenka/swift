@@ -46,11 +46,15 @@ public class SwiftSearchDefinition extends PersistableBase implements EqualityCr
 		this.qa = qa;
 		this.peptideReport = peptideReport;
 		this.searchParameters = searchParameters;
-		setInputFiles(inputFiles);
 		this.publicMgfFiles = publicMgfFiles;
 		this.publicMzxmlFiles = publicMzxmlFiles;
 		this.publicSearchFiles = publicSearchFiles;
 		this.metadata = new HashMap<String, String>(metadata);
+
+		this.inputFiles = Lists.newArrayList(inputFiles);
+		for (final FileSearch search : inputFiles) {
+			search.setSwiftSearchDefinition(this);
+		}
 	}
 
 	public String getTitle() {
@@ -110,10 +114,7 @@ public class SwiftSearchDefinition extends PersistableBase implements EqualityCr
 	}
 
 	public void setInputFiles(final List<FileSearch> inputFiles) {
-		this.inputFiles = Lists.newArrayList(inputFiles);
-		for (final FileSearch search : inputFiles) {
-			search.setSwiftSearchDefinition(this);
-		}
+		this.inputFiles = inputFiles;
 	}
 
 	public Map<String, String> getMetadata() {

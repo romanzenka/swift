@@ -8,23 +8,19 @@ import edu.mayo.mprc.MprcException;
 import edu.mayo.mprc.database.DaoBase;
 import edu.mayo.mprc.database.PersistableBase;
 import edu.mayo.mprc.searchdb.dao.SearchResult;
+import edu.mayo.mprc.searchdb.dao.TandemMassSpectrometrySample;
 import edu.mayo.mprc.swift.dbmapping.FileSearch;
 import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.Restrictions;
 
+import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
-import java.util.regex.Pattern;
 
 /**
  * @author Roman Zenka
  */
 public final class QuameterResult extends PersistableBase {
-	/**
-	 * Files that have _Pre or _Post after the standard prefix (copath, patient, date) are ignored.
-	 */
-	private static final Pattern PRE_POST = Pattern.compile("^.{14}.*_(Pre|Post).*$");
-
 	/**
 	 * A search result points to {@link edu.mayo.mprc.searchdb.dao.TandemMassSpectrometrySample} and
 	 * {@link edu.mayo.mprc.searchdb.dao.ProteinGroupList} which makes it a great candidate
@@ -52,6 +48,21 @@ public final class QuameterResult extends PersistableBase {
 	 * {@link edu.mayo.mprc.quameterdb.dao.QuameterAnnotation}.
 	 */
 	private transient String hiddenReason;
+
+	/**
+	 * Shortcut to search parameters id to prevent us from loading all the objects.
+	 */
+	private transient int searchParametersId;
+
+	/**
+	 * Shortcut to mass spectrometry sample without triggering searchResult.
+	 */
+	private transient TandemMassSpectrometrySample massSpectrometrySample;
+
+	/**
+	 * Speeding up access by bypassing Hibernate
+	 */
+	private transient Map<QuameterProteinGroup, Integer> readOnlyIdentifiedSpectra;
 
 	public enum QuameterColumn {
 		c_1a,
@@ -513,19 +524,6 @@ public final class QuameterResult extends PersistableBase {
 		}
 	}
 
-	/**
-	 * Determine if given QuameterResult should be listed.
-	 *
-	 * @return True if the result should be displayed in the UI.
-	 */
-	public boolean resultMatches() {
-		// We must not be a Pre or Postblank file
-		if (PRE_POST.matcher(getFileSearch().getInputFile().getName()).find()) {
-			return false;
-		}
-		return true;
-	}
-
 	public double getC_1a() {
 		return c_1a;
 	}
@@ -895,8 +893,18 @@ public final class QuameterResult extends PersistableBase {
 		return identifiedSpectra;
 	}
 
-	public void setIdentifiedSpectra(Map<QuameterProteinGroup, Integer> identifiedSpectra) {
+	public void setIdentifiedSpectra(final Map<QuameterProteinGroup, Integer> identifiedSpectra) {
 		this.identifiedSpectra = identifiedSpectra;
+	}
+
+	public void initializeReadOnlyIdentifiedSpectra() {
+		if (readOnlyIdentifiedSpectra == null) {
+			readOnlyIdentifiedSpectra = new HashMap<QuameterProteinGroup, Integer>(10);
+		}
+	}
+
+	public Map<QuameterProteinGroup, Integer> getReadOnlyIdentifiedSpectra() {
+		return readOnlyIdentifiedSpectra;
 	}
 
 	public boolean isHidden() {
@@ -907,9 +915,25 @@ public final class QuameterResult extends PersistableBase {
 		this.hidden = hidden;
 	}
 
+	public int getSearchParametersId() {
+		return searchParametersId;
+	}
+
+	public void setSearchParametersId(int searchParametersId) {
+		this.searchParametersId = searchParametersId;
+	}
+
+	public TandemMassSpectrometrySample getMassSpectrometrySample() {
+		return massSpectrometrySample == null ? getSearchResult().getMassSpecSample() : massSpectrometrySample;
+	}
+
+	public void setMassSpectrometrySample(final TandemMassSpectrometrySample massSpectrometrySample) {
+		this.massSpectrometrySample = massSpectrometrySample;
+	}
+
 	@Override
 	public int hashCode() {
-		return Objects.hashCode(searchResult, fileSearch, hidden);
+		return Objects.hashCode(searchResult.getId(), fileSearch.getId(), hidden);
 	}
 
 	@Override
@@ -921,7 +945,7 @@ public final class QuameterResult extends PersistableBase {
 			return false;
 		}
 		final QuameterResult other = (QuameterResult) obj;
-		return Objects.equal(this.searchResult, other.searchResult) && Objects.equal(this.fileSearch, other.fileSearch)
+		return Objects.equal(this.searchResult.getId(), other.searchResult.getId()) && Objects.equal(this.fileSearch.getId(), other.fileSearch.getId())
 				&& Objects.equal(this.hidden, other.hidden);
 	}
 

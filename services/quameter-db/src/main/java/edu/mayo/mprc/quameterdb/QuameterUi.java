@@ -14,7 +14,6 @@ import edu.mayo.mprc.quameterdb.dao.QuameterDao;
 import edu.mayo.mprc.quameterdb.dao.QuameterProteinGroup;
 import edu.mayo.mprc.quameterdb.dao.QuameterResult;
 import edu.mayo.mprc.searchdb.dao.TandemMassSpectrometrySample;
-import edu.mayo.mprc.swift.params2.SearchEngineParameters;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
@@ -211,21 +210,20 @@ public final class QuameterUi implements Dao, UiConfigurationProvider, Lifecycle
 		writer.beginArray();
 
 		writeValue(writer, result.getId()); // Id of the entry (for hiding)
-		final TandemMassSpectrometrySample massSpecSample = result.getSearchResult().getMassSpecSample();
+		final TandemMassSpectrometrySample massSpecSample = result.getMassSpectrometrySample();
 		writeValue(writer, massSpecSample.getStartTime()); // startTime
 		writeValue(writer, massSpecSample.getFile().getAbsolutePath()); // path
 		writeValue(writer, massSpecSample.getRunTimeInSeconds() / SEC_TO_MIN); // duration
 		writeValue(writer, mapInstrument(massSpecSample.getInstrumentSerialNumber())); // instrument
 		writeValue(writer, result.getCategory());
-		final SearchEngineParameters parameters = result.getFileSearch().getSearchParameters();
-		writeValue(writer, parameters != null ? parameters.getId() : 0); // search parameters id
+		writeValue(writer, result.getSearchParametersId()); // search parameters id
 		writeValue(writer, result.getTransaction());
 
 		for (final QuameterResult.QuameterColumn column : QuameterResult.QuameterColumn.values()) {
 			writeValue(writer, result.getValue(column));
 		}
 
-		final Map<QuameterProteinGroup, Integer> identifiedSpectra = result.getIdentifiedSpectra();
+		final Map<QuameterProteinGroup, Integer> identifiedSpectra = result.getReadOnlyIdentifiedSpectra();
 		for (final QuameterProteinGroup proteinGroup : proteinGroups) {
 			final Integer numSpectra = identifiedSpectra.get(proteinGroup);
 			writeValue(writer, numSpectra != null ? numSpectra : 0);

@@ -1,11 +1,9 @@
 package edu.mayo.mprc.quameterdb.dao;
 
 import com.google.common.collect.ImmutableMap;
-import edu.mayo.mprc.swift.dbmapping.FileSearch;
+import edu.mayo.mprc.quameterdb.QuameterDaoHibernate;
 import org.testng.Assert;
 import org.testng.annotations.Test;
-
-import java.io.File;
 
 /**
  * @author Roman Zenka
@@ -32,24 +30,12 @@ public final class QuameterResultTest {
 
 	@Test
 	public void shouldMatchPatientNamedPost() {
-		final QuameterResult result = new QuameterResult(null, null, null, null);
-		final FileSearch fileSearch = new FileSearch();
-		fileSearch.setInputFile(new File("HR04-689_Post_20140806_Y30_QE.raw"));
-		fileSearch.setExperiment("Test experiment name");
-		result.setFileSearch(fileSearch);
-
-		Assert.assertTrue(result.resultMatches(), "Should match although the file contains Post as patient name");
+		Assert.assertFalse(QuameterDaoHibernate.PRE_POST.matcher("HR04-689_Post_20140806_Y30_QE.raw").find(), "Should match although the file contains Post as patient name");
 	}
 
 	@Test
 	public void shouldNotMatchPre() {
-		final QuameterResult result = new QuameterResult(null, null, null, null);
-		final FileSearch fileSearch = new FileSearch();
-		fileSearch.setInputFile(new File("HR04-689_Post_20140806_Y30_QE_PreS1.raw"));
-		fileSearch.setExperiment("Test experiment name");
-		result.setFileSearch(fileSearch);
-
-		Assert.assertFalse(result.resultMatches(), "Should not match Pre file");
+		Assert.assertTrue(QuameterDaoHibernate.PRE_POST.matcher("HR04-689_Post_20140806_Y30_QE_PreS1.raw").find(), "Should not match Pre file");
 	}
 
 }

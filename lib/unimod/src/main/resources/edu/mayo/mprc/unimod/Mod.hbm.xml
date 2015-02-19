@@ -18,13 +18,13 @@
         <property name="massMono" column="mass_mono" type="double" />
         <property name="massAverage" column="mass_average" type="double" />
 
-        <set name="altNames" table="mod_alt_names" lazy="false" fetch="subselect" batch-size="100">
+        <set name="altNames" table="mod_alt_names" fetch="join">
             <key column="alt_name_id" foreign-key="mod_alt_names_ibfk_1" />
             <element column="alt_name" type="string" />
         </set>
 
         <set name="modSpecificities" table="mod_specificity" lazy="false" inverse="true" cascade="all-delete-orphan"
-            fetch="subselect" batch-size="100">
+            fetch="join">
             <key column="mod_id" foreign-key="mod_specificity_ibfk_1" />
             <one-to-many class="edu.mayo.mprc.unimod.ModSpecificity" />
         </set>

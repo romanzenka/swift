@@ -128,7 +128,7 @@
 
     <mvc:view-controller path="/dashboard" view-name="dashboard" />
     <mvc:view-controller path="/start/" view-name="start/index" />
-    <mvc:view-controller path="/search-diff/" view-name="search-diff/index" />
+    <mvc:view-controller path="/search-diff" view-name="search-diff/index" />
 
     <mvc:default-servlet-handler />
 </beans>

@@ -4,8 +4,8 @@ import com.google.common.collect.Lists;
 import edu.mayo.mprc.MprcException;
 import edu.mayo.mprc.config.ResourceConfig;
 import edu.mayo.mprc.quameterdb.QuameterUi;
-import edu.mayo.mprc.quameterdb.dao.QuameterAnnotation;
 import edu.mayo.mprc.quameterdb.dao.QuameterResult;
+import edu.mayo.mprc.quameterdb.dao.QuameterTag;
 import edu.mayo.mprc.swift.commands.SwiftEnvironment;
 import edu.mayo.mprc.utilities.StringUtilities;
 import org.springframework.stereotype.Controller;
@@ -16,7 +16,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import javax.annotation.Resource;
 import java.io.File;
 import java.io.StringWriter;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
@@ -66,22 +65,8 @@ public final class QuaMeter {
 		if (quameterUi != null) {
 			quameterUi.begin();
 			try {
-				final List<QuameterAnnotation> myList = quameterUi.getQuameterDao().listAnnotations();
-				final Collection<QuameterTag> quameterTags = new ArrayList<QuameterTag>(myList.size());
+				final Collection<QuameterTag> quameterTags = quameterUi.getQuameterDao().getQuameterTags();
 
-				for (final QuameterAnnotation qa : myList) {
-					final String metricName = QuameterUi.getMetricName(qa.getMetricCode());
-					if (metricName != null) {
-						final File file = qa.getQuameterResult().getSearchResult().getMassSpecSample().getFile();
-						final QuameterTag quameterTag = new QuameterTag(
-								StringUtilities.getDirectoryString(file),
-								file.getName(),
-								quameterUi.mapInstrument(qa.getQuameterResult().getSearchResult().getMassSpecSample().getInstrumentSerialNumber()),
-								metricName,
-								qa.getText());
-						quameterTags.add(quameterTag);
-					}
-				}
 				quameterUi.commit();
 
 				model.addAttribute("tags", quameterTags);

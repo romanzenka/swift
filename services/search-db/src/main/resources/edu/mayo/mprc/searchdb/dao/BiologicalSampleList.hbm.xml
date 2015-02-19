@@ -10,7 +10,7 @@
 
         <bag name="list" table="biological_sample_list_members" mutable="false">
             <key column="biological_sample_list_id" foreign-key="biological_sample_list_members_ibfk_2"/>
-            <many-to-many column="biological_sample_id" class="BiologicalSample" lazy="proxy"
+            <many-to-many column="biological_sample_id" class="BiologicalSample" lazy="false" fetch="join"
                 foreign-key="biological_sample_list_members_ibfk_1" />
         </bag>
     </class>

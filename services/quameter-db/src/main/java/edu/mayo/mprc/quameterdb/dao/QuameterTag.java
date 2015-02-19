@@ -1,4 +1,4 @@
-package edu.mayo.mprc.swift.controller;
+package edu.mayo.mprc.quameterdb.dao;
 
 /**
  * @author Roman Zenka

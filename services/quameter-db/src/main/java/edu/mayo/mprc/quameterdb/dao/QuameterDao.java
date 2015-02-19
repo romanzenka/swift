@@ -4,6 +4,7 @@ import edu.mayo.mprc.database.Dao;
 import edu.mayo.mprc.searchdb.dao.SearchResult;
 import edu.mayo.mprc.swift.dbmapping.FileSearch;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
@@ -92,4 +93,6 @@ public interface QuameterDao extends Dao {
 	 * @return List of currently active protein groups.
 	 */
 	List<QuameterProteinGroup> listProteinGroups();
+
+	Collection<QuameterTag> getQuameterTags();
 }

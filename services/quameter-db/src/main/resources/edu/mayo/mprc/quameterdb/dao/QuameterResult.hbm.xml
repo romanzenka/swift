@@ -5,8 +5,8 @@
         <id name="id" type="integer" column="quameter_result_id">
             <generator class="native" />
         </id>
-        <many-to-one name="fileSearch" column="file_search_id" lazy="false" foreign-key="quameter_result_ibfk_2" />
-        <many-to-one name="searchResult" column="search_result_id" lazy="false" foreign-key="quameter_result_ibfk_3" />
+        <many-to-one name="fileSearch" column="file_search_id" foreign-key="quameter_result_ibfk_2" lazy="proxy" />
+        <many-to-one name="searchResult" column="search_result_id" foreign-key="quameter_result_ibfk_3" lazy="proxy" />
         <property name="hidden" type="boolean" column="hidden" />
         <property name="c_1a" type="double" column="c_1a" />
         <property name="c_1b" type="double" column="c_1b" />
