@@ -217,6 +217,7 @@ public final class QuameterDaoHibernate extends DaoBase implements QuameterDao, 
 			q.setSearchParametersId((Integer) array[6]);
 
 			if (!PRE_POST.matcher(inputFile.getName()).find()) {
+				q.initializeReadOnlyIdentifiedSpectra();
 				filtered.put(q.getId(), q);
 			}
 		}
@@ -247,8 +248,6 @@ public final class QuameterDaoHibernate extends DaoBase implements QuameterDao, 
 				if (pg == null) {
 					continue;
 				}
-
-				result.initializeReadOnlyIdentifiedSpectra();
 
 				result.getReadOnlyIdentifiedSpectra().put(pg, uniqueSpectra);
 			}
