@@ -14,6 +14,7 @@ public class SavedSearchEngineParameters extends EvolvableBase {
 	private SearchEngineParameters parameters;
 
 	public SavedSearchEngineParameters() {
+		int i = 0;
 	}
 
 	public SavedSearchEngineParameters(final String name, final User user, final SearchEngineParameters parameters) {

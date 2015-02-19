@@ -93,6 +93,11 @@ public interface ParamsDao extends Dao, RuntimeInitializer, Lifecycle {
 
 	List<SavedSearchEngineParameters> savedSearchEngineParameters();
 
+	/**
+	 * Fast way of listing search engine parameters without the parameters themselves
+	 */
+	List<SavedSearchEngineParameters> savedSearchEngineParametersNoData();
+
 	SavedSearchEngineParameters getSavedSearchEngineParameters(int key);
 
 	SavedSearchEngineParameters findSavedSearchEngineParameters(String name);

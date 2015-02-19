@@ -490,7 +490,7 @@ public final class ServiceImpl extends SpringGwtServlet implements Service, Appl
 	}
 
 	private ClientParamSetList makeParamSetList(final ParameterSetCache cache) {
-		final List<SavedSearchEngineParameters> engineParametersList = getParamsDao().savedSearchEngineParameters();
+		final List<SavedSearchEngineParameters> engineParametersList = getParamsDao().savedSearchEngineParametersNoData();
 		return ClientProxyGenerator.getClientParamSetList(engineParametersList, cache.getTemporaryClientParamList());
 	}
 

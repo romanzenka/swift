@@ -217,7 +217,22 @@ public class ScaffoldSettings extends PersistableBase {
 	}
 
 	public ScaffoldSettings copy() {
-		final ScaffoldSettings scaffoldSettings = new ScaffoldSettingsBuilder().setProteinProbability(getProteinProbability()).setPeptideProbability(getPeptideProbability()).setMinimumPeptideCount(getMinimumPeptideCount()).setMinimumNonTrypticTerminii(getMinimumNonTrypticTerminii()).setStarredProteins(getStarredProteins()).setSaveOnlyIdentifiedSpectra(isSaveOnlyIdentifiedSpectra()).setSaveNoSpectra(isSaveNoSpectra()).setConnectToNCBI(isConnectToNCBI()).setAnnotateWithGOA(isAnnotateWithGOA()).setUseIndependentSampleGrouping(isUseIndependentSampleGrouping()).setUseFamilyProteinGrouping(isUseFamilyProteinGrouping()).setMzIdentMlReport(isMzIdentMlReport()).setHighMassAccuracyScoring(isHighMassAccuracyScoring()).setUse3xScoring(isUse3xScoring()).createScaffoldSettings();
+		final ScaffoldSettings scaffoldSettings = new ScaffoldSettingsBuilder()
+				.setProteinProbability(getProteinProbability())
+				.setPeptideProbability(getPeptideProbability())
+				.setMinimumPeptideCount(getMinimumPeptideCount())
+				.setMinimumNonTrypticTerminii(getMinimumNonTrypticTerminii())
+				.setStarredProteins(getStarredProteins())
+				.setSaveOnlyIdentifiedSpectra(isSaveOnlyIdentifiedSpectra())
+				.setSaveNoSpectra(isSaveNoSpectra())
+				.setConnectToNCBI(isConnectToNCBI())
+				.setAnnotateWithGOA(isAnnotateWithGOA())
+				.setUseIndependentSampleGrouping(isUseIndependentSampleGrouping())
+				.setUseFamilyProteinGrouping(isUseFamilyProteinGrouping())
+				.setMzIdentMlReport(isMzIdentMlReport())
+				.setHighMassAccuracyScoring(isHighMassAccuracyScoring())
+				.setUse3xScoring(isUse3xScoring())
+				.createScaffoldSettings();
 		scaffoldSettings.setId(getId());
 		return scaffoldSettings;
 	}

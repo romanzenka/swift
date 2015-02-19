@@ -161,6 +161,11 @@ public final class MockParamsDao implements ParamsDao {
 	}
 
 	@Override
+	public List<SavedSearchEngineParameters> savedSearchEngineParametersNoData() {
+		return null;
+	}
+
+	@Override
 	public SavedSearchEngineParameters getSavedSearchEngineParameters(final int key) {
 		return null;
 	}

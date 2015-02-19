@@ -49,7 +49,7 @@ public final class WorkspaceDaoHibernate extends DaoBase implements WorkspaceDao
 					.addOrder(Order.asc("lastName"))
 					.setReadOnly(true);
 			if (withPreferences) {
-				criteria.setFetchMode("preferences", FetchMode.SELECT);
+				criteria.setFetchMode("preferences", FetchMode.JOIN);
 			}
 			return listAndCast(criteria);
 		} catch (Exception t) {

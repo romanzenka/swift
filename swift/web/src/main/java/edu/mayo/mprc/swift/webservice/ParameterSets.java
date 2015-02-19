@@ -24,7 +24,7 @@ public final class ParameterSets {
 	public ModelAndView listParameterSets() {
 		try {
 			getParamsDao().begin();
-			final List<SavedSearchEngineParameters> params = getParamsDao().savedSearchEngineParameters();
+			final List<SavedSearchEngineParameters> params = getParamsDao().savedSearchEngineParametersNoData();
 			final ArrayList<ParameterSet> result =
 					new ArrayList<ParameterSet>(params.size());
 			for (final SavedSearchEngineParameters parameterSet : params) {

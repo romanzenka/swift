@@ -13,11 +13,12 @@ import edu.mayo.mprc.workspace.User;
 import edu.mayo.mprc.workspace.WorkspaceDao;
 import org.apache.log4j.Logger;
 import org.hibernate.Criteria;
-import org.hibernate.FetchMode;
 import org.hibernate.Session;
 import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.Order;
+import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
+import org.hibernate.transform.Transformers;
 import org.joda.time.DateTime;
 import org.springframework.stereotype.Repository;
 
@@ -327,9 +328,28 @@ public final class ParamsDaoHibernate extends DaoBase implements ParamsDao {
 		try {
 			return listAndCast(
 					allCriteria(SavedSearchEngineParameters.class)
-							.setFetchMode("parameters", FetchMode.JOIN)
-							.setFetchMode("user", FetchMode.JOIN)
+							.setReadOnly(true)
 							.addOrder(Order.asc("name").ignoreCase())
+			);
+
+		} catch (Exception t) {
+			throw new MprcException("Cannot list all saved search parameters", t);
+		}
+	}
+
+	@Override
+	public List<SavedSearchEngineParameters> savedSearchEngineParametersNoData() {
+		try {
+			return listAndCast(
+					allCriteria(SavedSearchEngineParameters.class)
+							.setReadOnly(true)
+							.addOrder(Order.asc("name").ignoreCase())
+							.setProjection(Projections.projectionList()
+											.add(Projections.property("id"), "id")
+											.add(Projections.property("name"), "name")
+											.add(Projections.property("user"), "user")
+							).createAlias("user", "u")
+							.setResultTransformer(Transformers.aliasToBean(SavedSearchEngineParameters.class))
 			);
 
 		} catch (Exception t) {

@@ -2,15 +2,15 @@
 <!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
         "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
 <hibernate-mapping package="edu.mayo.mprc.swift.params2">
-    <class name="SavedSearchEngineParameters" table="saved_parameters">
+    <class name="SavedSearchEngineParameters" table="saved_parameters" lazy="true">
         <id name="id" type="integer" column="saved_parameter_id">
             <generator class="native"/>
         </id>
         <property name="name" type="string" column="name" length="2000"/>
         <many-to-one name="user" column="owner" class="edu.mayo.mprc.workspace.User"
-            foreign-key="saved_parameters_ibfk_1"/>
-        <many-to-one name="parameters" column="parameters" class="SearchEngineParameters" lazy="proxy"
-            foreign-key="saved_parameters_ibfk_4"/>
+            foreign-key="saved_parameters_ibfk_1" lazy="false" fetch="join" />
+        <many-to-one name="parameters" column="parameters" class="SearchEngineParameters" lazy="false" fetch="join"
+            foreign-key="saved_parameters_ibfk_4" />
 
         <many-to-one name="creation" column="creation" class="edu.mayo.mprc.database.Change" lazy="proxy"
             foreign-key="saved_parameters_ibfk_3"/>
