@@ -2,6 +2,7 @@ package edu.mayo.mprc.swift.db;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 import edu.mayo.mprc.MprcException;
 import edu.mayo.mprc.daemon.AssignedTaskData;
 import edu.mayo.mprc.daemon.files.FileTokenFactory;
@@ -128,59 +129,48 @@ public final class SwiftDaoHibernate extends DaoBase implements SwiftDao {
 			final Integer[] ids = DatabaseUtilities.getIdList(unfinished);
 
 			// Load counts of tasks + enabled engine ids for each search run
-			final List raw = getSession().createQuery("select t.searchRun.id, count(t), ee.id " +
+			final List raw = getSession().createQuery("select sr.id, count(t) " +
 					" from TaskData t, " +
-					" SearchRun sr," +
-					" SwiftSearchDefinition sd," +
-					" SearchEngineParameters sp, " +
-					" EnabledEngines ee " +
+					" SearchRun sr" +
 					" where sr = t.searchRun " +
 					" and sr.id in (:ids) " +
 					" and t.taskState.description='" + TaskState.RUNNING.getText() + "'" +
-					" and sr.swiftSearch = sd.id " +
-					" and sd.searchParameters = sp " +
-					" and sp.enabledEngines = ee " +
 					" group by sr.id")
 					.setParameterList("ids", ids)
 					.list();
 
-			Set<Integer> enabledEngineIds = new HashSet<Integer>();
-
-			Map<Integer, Object[]> idsToCounts = new HashMap<Integer, Object[]>(raw.size());
+			Map<Integer, Integer> idsToCounts = new HashMap<Integer, Integer>(raw.size());
 			for (Object o : raw) {
 				if (o instanceof Object[]) {
 					final Object[] a = (Object[]) o;
 					final Integer id = getInteger(a[0]);
-					idsToCounts.put(id, a);
-					enabledEngineIds.add(getInteger(a[2]));
+					idsToCounts.put(id, getInteger(a[1]));
 				}
 			}
 
-			// Load which enabled engine ids have quameter
-			final HashSet<Integer> enginesWithQuameter = new HashSet<Integer>(enabledEngineIds.size());
-			if (enabledEngineIds.size() > 0) {
-				final List<Integer> engines = listAndCast(
-						getSession().createQuery("" +
-								"select e.id from " +
-								" EnabledEngines e," +
-								" SearchEngineConfig c" +
-								" where c in elements(e.engineConfigs)" +
-								" and c.code = :quameterCode")
-								.setParameter("quameterCode", "QUAMETER"));
-				enginesWithQuameter.addAll(engines);
-			}
+			final Set<Integer> searchesWithQuameter =
+					Sets.newHashSet(getSession().createQuery("select sr.id " +
+							" from TaskData t, " +
+							" SearchRun sr," +
+							" SwiftSearchDefinition sd," +
+							" SearchEngineParameters sp, " +
+							" EnabledEngines e," +
+							" SearchEngineConfig c " +
+							" where sr = t.searchRun " +
+							" and sr.id in (:ids) " +
+							" and sr.swiftSearch = sd.id " +
+							" and sd.searchParameters = sp " +
+							" and sp.enabledEngines = e " +
+							" and c in elements(e.engineConfigs)" +
+							" and c.code = 'QUAMETER' " +
+							" group by sr.id")
+							.setParameterList("ids", ids)
+							.list());
 
-
-			for (final SearchRun run : unfinished) {
-				final Object[] objects = idsToCounts.get(run.getId());
-				if (objects == null) {
-					run.setRunningTasks(0);
-					run.setQuameter(false);
-				} else {
-					run.setRunningTasks(getInteger(objects[1]));
-					final Integer enabledEngineId = getInteger(objects[2]);
-					run.setQuameter(enginesWithQuameter.contains(enabledEngineId));
-				}
+			for (final SearchRun run : searchRuns) {
+				run.setQuameter(searchesWithQuameter.contains(run.getId()));
+				final Integer runningTasks = idsToCounts.get(run.getId());
+				run.setRunningTasks(runningTasks == null ? 0 : runningTasks);
 			}
 		}
 	}
