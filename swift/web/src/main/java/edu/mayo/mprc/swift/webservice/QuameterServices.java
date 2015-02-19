@@ -155,7 +155,7 @@ public final class QuameterServices {
 	private void writeRows(final CsvWriter writer, final List<QuameterResult> results, final List<QuameterProteinGroup> proteinGroups) throws IOException {
 		String[] line = null;
 		final DateTimeFormatter dateTimeFormatter = DateTimeFormat.forPattern("yyyy.MM.dd HH:mm:ss");
-		final DecimalFormat df = new DecimalFormat("#.00");
+		final DecimalFormat df = new DecimalFormat("#");
 
 		for (final QuameterResult result : results) {
 			final TandemMassSpectrometrySample massSpecSample = result.getMassSpectrometrySample();
