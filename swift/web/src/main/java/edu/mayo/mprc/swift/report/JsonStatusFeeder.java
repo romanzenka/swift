@@ -44,7 +44,7 @@ public class JsonStatusFeeder {
 			response.append("[");
 
 			final List<SearchRun> searchRuns = searchDbDao.getSearchRunList(searchRunFilter, false);
-			swiftDao.fillNumberRunningTasksForSearchRun(searchRuns);
+			swiftDao.fillExtraFields(searchRuns);
 			for (int i = 0; i < searchRuns.size(); i++) {
 				final SearchRun searchRun = searchRuns.get(i);
 				JsonWriter.appendSearchRunJson(response, i, searchRun, null, false);

@@ -197,7 +197,7 @@ th#type {
 }
 
 th#actions {
-    width: 80px;
+    width: 100px;
 }
 
 th#results {
@@ -404,7 +404,7 @@ a:hover.filter_button.filter.ztoa {
     border: 1px solid #ddf;
 }
 
-.rerun-link, .edit-link, .hide-link, .qa-link, .diff-link, .parent-dir-link, .analysis-data-link {
+.rerun-link, .edit-link, .hide-link, .qa-link, .diff-link, .quameter-link, .parent-dir-link, .analysis-data-link {
     display: block;
     color: #fff;
     font-size: 1px;
@@ -431,6 +431,10 @@ a:hover.filter_button.filter.ztoa {
 
 .diff-link {
     background-image: url(search_diff.gif);
+}
+
+.quameter-link {
+    background-image: url(activity.gif);
 }
 
 .parent-dir-link {

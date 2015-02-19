@@ -71,10 +71,10 @@ public final class JsonWriter {
 	/**
 	 * Appends code that inserts a search run at given position into the stream.
 	 *
-	 * @param order        Position at which is the searchRun inserted
-	 * @param searchRun    Search run data
-	 * @param method       Method to be executed on the searchRun. Can be "insert", "rewrite" or "update". Only "insert" sends order information.
-	 * @param reports      A listing of searchRun output files. Can be null in case the searchRun did not finish yet.
+	 * @param order     Position at which is the searchRun inserted
+	 * @param searchRun Search run data
+	 * @param method    Method to be executed on the searchRun. Can be "insert", "rewrite" or "update". Only "insert" sends order information.
+	 * @param reports   A listing of searchRun output files. Can be null in case the searchRun did not finish yet.
 	 */
 	public void processSearchRun(final int order, final SearchRun searchRun, final Iterable<ReportInfo> reports, final String method) {
 		final StringBuilder parameter = new StringBuilder(SEARCH_RUN_BUILDER_CAPACITY);
@@ -126,6 +126,7 @@ public final class JsonWriter {
 		appendKeyNumber(builder, "warnings", (long) searchRun.getTasksWithWarning());
 		appendKeyNumber(builder, "running", (long) (searchRun.getRunningTasks() == null ? 0 : searchRun.getRunningTasks()));
 		appendKeyString(builder, "instruments", searchRun.getInstruments());
+		appendKeyNumber(builder, "quameter", searchRun.isQuameter() ? 1 : 0);
 		if (reports != null) {
 			appendKeyReportInfo(builder, "results", reports);
 		}

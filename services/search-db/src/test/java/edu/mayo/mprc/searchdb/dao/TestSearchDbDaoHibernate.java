@@ -132,12 +132,12 @@ public final class TestSearchDbDaoHibernate extends DaoTest {
 	}
 
 	@Test
-	public void shouldGetNumberOfRunningTasks() {
+	public void shouldFillExtraFields() {
 		searchDbDao.begin();
 		try {
 			final List<SearchRun> searchRunList = searchDbDao.getSearchRunList(runFilter(), true);
 			SearchRun searchRun = searchRunList.get(0);
-			swiftDao.fillNumberRunningTasksForSearchRun(searchRunList);
+			swiftDao.fillExtraFields(searchRunList);
 			Assert.assertEquals(searchRun.getRunningTasks(), Integer.valueOf(0), "The run has nothing running at the moment");
 			searchDbDao.commit();
 		} catch (Exception e) {

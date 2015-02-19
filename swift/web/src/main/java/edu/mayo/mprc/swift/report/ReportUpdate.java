@@ -284,7 +284,7 @@ public final class ReportUpdate {
 		final List<SearchRun> searchRuns = searchDbDao.getSearchRunList(filter, true);
 		searchDbDao.fillInInstrumentSerialNumbers(searchRuns);
 		getWebUi().mapInstrumentSerialNumbers(searchRuns);
-		swiftDao.fillNumberRunningTasksForSearchRun(searchRuns);
+		swiftDao.fillExtraFields(searchRuns);
 
 		final int firstSearchRun = 0;
 		final int lastSearchRun = Math.min(
@@ -332,7 +332,7 @@ public final class ReportUpdate {
 	 */
 	private void updateSearchRuns(final JsonWriter out, final SearchRunFilter filter, final Date timestamp) {
 		final List<SearchRun> searchRuns = searchDbDao.getSearchRunList(filter, true);
-		swiftDao.fillNumberRunningTasksForSearchRun(searchRuns);
+		swiftDao.fillExtraFields(searchRuns);
 		searchDbDao.fillInInstrumentSerialNumbers(searchRuns);
 		getWebUi().mapInstrumentSerialNumbers(searchRuns);
 		final int firstSearchRun = filter.getStart() != null ? Integer.parseInt(filter.getStart()) : 0;

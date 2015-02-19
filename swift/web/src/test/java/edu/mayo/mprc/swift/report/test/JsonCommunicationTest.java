@@ -33,7 +33,7 @@ public final class JsonCommunicationTest {
 					"\"submitted\":\"5/6/05 10:22 AM\", \"duration\":\"397 days, 13:11:11\", \"subtasks\":123, " +
 					"\"search\":0, " +
 					"\"errormsg\":\"Transaction error message\", " +
-					"\"ok\":13, \"failures\":14, \"warnings\":15, \"running\":3, \"instruments\":null, " +
+					"\"ok\":13, \"failures\":14, \"warnings\":15, \"running\":3, \"instruments\":null, \"quameter\":0, " +
 					"\"results\":[{\"reportId\":34, \"path\":\"/test1.sf3\", \"analysis\":1}, {\"reportId\":35, \"path\":\"/test2.sf3\", \"analysis\":0}], " +
 					"\"details\":{\"total\":123}}";
 

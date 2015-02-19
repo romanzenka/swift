@@ -27,11 +27,12 @@ public interface SwiftDao extends Dao, RuntimeInitializer {
 	TaskData getTaskData(Integer taskId);
 
 	/**
-	 * Fill in the number of running tasks attribute for given search runs
+	 * Fill in the number of running tasks attribute for given search runs as well as
+	 * the Quameter flag.
 	 *
 	 * @param searchRuns Runs to fill in tasks numbers for
 	 */
-	void fillNumberRunningTasksForSearchRun(List<SearchRun> searchRuns);
+	void fillExtraFields(List<SearchRun> searchRuns);
 
 	/**
 	 * This will find any search runs that have either started or ended since a give time.

@@ -199,6 +199,16 @@ SearchRunItemVisualizer.prototype.fillWithContents = function (fragment, id, obj
             hideLink.title = "Hide " + object.id;
             $(hideLink).on("click", {"id": object.id, "title": object.title}, this.confirmHide);
             tdAction.appendChild(hideLink);
+
+            // Add quameter link
+            if (object.quameter == 1) {
+                quameterLink = document.createElement("a");
+                quameterLink.appendChild(document.createTextNode("Quameter"));
+                quameterLink.className = "quameter-link";
+                quameterLink.href = "/quameter?id=" + object.id;
+                quameterLink.title = "Quameter result " + object.id;
+                tdAction.appendChild(quameterLink);
+            }
         }
 
         var action = element.appendChild(tdAction);
