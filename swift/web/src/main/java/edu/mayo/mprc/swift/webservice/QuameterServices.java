@@ -23,6 +23,7 @@ import javax.annotation.Resource;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.Writer;
+import java.text.DecimalFormat;
 import java.util.List;
 import java.util.Map;
 
@@ -154,6 +155,7 @@ public final class QuameterServices {
 	private void writeRows(final CsvWriter writer, final List<QuameterResult> results, final List<QuameterProteinGroup> proteinGroups) throws IOException {
 		String[] line = null;
 		final DateTimeFormatter dateTimeFormatter = DateTimeFormat.forPattern("yyyy.MM.dd HH:mm:ss");
+		final DecimalFormat df = new DecimalFormat("#.00");
 
 		for (final QuameterResult result : results) {
 			final TandemMassSpectrometrySample massSpecSample = result.getMassSpectrometrySample();
@@ -163,7 +165,7 @@ public final class QuameterServices {
 					result.getId().toString(), // Id of the entry (for hiding)
 					massSpecSample.getStartTime().toString(dateTimeFormatter), // startTime
 					massSpecSample.getFile().getAbsolutePath().toString(), // path
-					Double.toString(massSpecSample.getRunTimeInSeconds() / 60.0), // duration
+					df.format(massSpecSample.getRunTimeInSeconds() / 60.0), // duration
 					result.getCategory().toString(),
 					webUiHolder.getWebUi().mapInstrumentSerialNumbers(massSpecSample.getInstrumentSerialNumber()),
 					Integer.toString(result.getSearchParametersId()),
