@@ -48,7 +48,7 @@ public interface QuameterDao extends Dao {
 	/**
 	 * Add an annotation. The annotation is uniquely identified by its
 	 * data point + metric. Adding an annotation for the same metric+data point
-	 * rewrites the old annotation.
+	 * rewrites the old annotation. Adding empty text deletes the annotation.
 	 *
 	 * @param annotation Annotation to add.
 	 * @return Saved version of the annotation. You can typically ignore this return value.

@@ -291,7 +291,12 @@ public final class QuameterDaoHibernate extends DaoBase implements QuameterDao, 
 
 	@Override
 	public QuameterAnnotation addAnnotation(final QuameterAnnotation annotation) {
-		return save(annotation, false);
+		if ("".equals(annotation.getText().trim())) {
+			getSession().delete(save(annotation, false));
+			return null;
+		} else {
+			return save(annotation, false);
+		}
 	}
 
 	@Override

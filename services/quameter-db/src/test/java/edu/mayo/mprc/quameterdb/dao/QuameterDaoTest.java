@@ -227,6 +227,32 @@ public final class QuameterDaoTest extends DaoTest {
 	}
 
 	@Test
+	public void shouldRemoveAnnotation() {
+		quameterDao.begin();
+
+		final QuameterResult quameterResult = addResult1();
+
+		nextTransaction();
+
+		final QuameterAnnotation annotation = new QuameterAnnotation(QuameterResult.QuameterColumn.c_3a, quameterResult.getId(), "annotation text");
+		quameterDao.addAnnotation(annotation);
+
+		nextTransaction();
+
+		// Replace annotation with empty == delete
+		final QuameterAnnotation annotation2 = new QuameterAnnotation(QuameterResult.QuameterColumn.c_3a, quameterResult.getId(), "  ");
+		quameterDao.addAnnotation(annotation2);
+
+		nextTransaction();
+
+		final List<QuameterAnnotation> quameterAnnotations = quameterDao.listAnnotations();
+		Assert.assertEquals(quameterAnnotations.size(), 0, "No annotations anymore");
+
+		quameterDao.commit();
+	}
+
+
+	@Test
 	public void shouldNotListAnnotationOnHiddenResults() {
 		quameterDao.begin();
 
