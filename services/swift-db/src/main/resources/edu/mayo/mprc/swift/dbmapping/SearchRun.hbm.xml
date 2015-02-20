@@ -11,9 +11,8 @@
         <!--<timestamp name="_persistenceTimestamp" column="PersistenceTimestamp" access="field" unsaved-value="null"/>-->
 
         <property name="title" column="title" length="100"/>
-        <many-to-one name="submittingUser" class="edu.mayo.mprc.workspace.User"
-                     column="submitting_user"
-                     lazy="false" foreign-key="transaction_ibfk_1"/>
+        <many-to-one name="submittingUser" class="edu.mayo.mprc.workspace.User" column="submitting_user" lazy="proxy"
+            foreign-key="transaction_ibfk_1" />
         <!-- ID of the swift search. This is a hack to optimize loading of the objects
         Corresponds to foreign key transaction_ibfk_2
         -->

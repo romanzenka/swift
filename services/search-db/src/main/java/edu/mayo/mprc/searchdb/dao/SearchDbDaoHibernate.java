@@ -86,7 +86,7 @@ public class SearchDbDaoHibernate extends DaoBase implements SearchDbDao {
 
 			// Build results of two sample analyses
 			// Make them 1 month old so they do not retire from filters
-			DateTime now = new DateTime();
+			final DateTime now = new DateTime();
 
 			final TandemMassSpectrometrySample sample1 = addTandemMassSpectrometrySample(
 					new TandemMassSpectrometrySample(
@@ -303,7 +303,7 @@ public class SearchDbDaoHibernate extends DaoBase implements SearchDbDao {
 
 	@Override
 	public List<ReportData> getSearchesForAccessionNumber(final String accessionNumber) {
-		return listAndCast(getSession().createQuery(
+		final List<ReportData> reports = listAndCast(getSession().createQuery(
 				"select distinct a.reports from " +
 						" Analysis as a" +
 						" inner join a.biologicalSamples as bsl" +
@@ -319,9 +319,22 @@ public class SearchDbDaoHibernate extends DaoBase implements SearchDbDao {
 						" where pe.sequence = ps " +
 						" and pac.accnum = :accessionNumber")
 				.setParameter("accessionNumber", accessionNumber));
+
+		final Set<Integer> searchRunIds = new HashSet<Integer>(reports.size());
+
+		for (final ReportData reportData : reports) {
+			searchRunIds.add(reportData.getSearchRun().getId());
+		}
+
+		if (searchRunIds.size() < 2000) {
+			listAndCast(getSession().createQuery("from SearchRun sr where sr.id in (:ids)")
+					.setParameterList("ids", searchRunIds));
+		}
+
+		return reports;
 	}
 
-	public List<SearchRun> fillInInstrumentSerialNumbers(List<SearchRun> searchRuns) {
+	public List<SearchRun> fillInInstrumentSerialNumbers(final List<SearchRun> searchRuns) {
 		if (searchRuns.size() > 0) {
 			final Integer[] ids = DatabaseUtilities.getIdList(searchRuns);
 
@@ -361,7 +374,7 @@ public class SearchDbDaoHibernate extends DaoBase implements SearchDbDao {
 
 	@Override
 	public List<String> listAllInstrumentSerialNumbers() {
-		List<String> serialNumbers = listAndCast(getSession()
+		final List<String> serialNumbers = listAndCast(getSession()
 				.createQuery("select distinct t.instrumentSerialNumber" +
 						" from Analysis as a join" +
 						" a.biologicalSamples as bs join" +
