@@ -18,7 +18,6 @@ import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
-import org.hibernate.transform.Transformers;
 import org.joda.time.DateTime;
 import org.springframework.stereotype.Repository;
 
@@ -349,7 +348,7 @@ public final class ParamsDaoHibernate extends DaoBase implements ParamsDao {
 											.add(Projections.property("user"), "user")
 							)
 							.addOrder(Order.asc("name").ignoreCase())
-							.setResultTransformer(Transformers.aliasToBean(SavedSearchEngineParameters.class))
+							.setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY)
 			);
 
 		} catch (Exception t) {
