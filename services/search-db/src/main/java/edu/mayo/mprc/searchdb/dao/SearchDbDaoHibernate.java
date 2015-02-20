@@ -21,7 +21,6 @@ import edu.mayo.mprc.utilities.progress.PercentRangeReporter;
 import org.hibernate.Criteria;
 import org.hibernate.FetchMode;
 import org.hibernate.Query;
-import org.hibernate.criterion.Restrictions;
 import org.joda.time.DateTime;
 
 import javax.annotation.Resource;
@@ -278,15 +277,42 @@ public class SearchDbDaoHibernate extends DaoBase implements SearchDbDao {
 
 	@Override
 	public Analysis getAnalysis(final ReportData reportData) {
-		return (Analysis) getSession()
-				.createCriteria(Analysis.class)
-				.add(Restrictions.idEq(reportData.getAnalysisId()))
-				.setFetchMode("biologicalSamples", FetchMode.JOIN)
-				.setFetchMode("biologicalSamples.list", FetchMode.JOIN)
-				.setFetchMode("biologicalSamples.list.searchResult", FetchMode.JOIN)
-				.setFetchMode("biologicalSamples.list.searchResult.massSpecSample", FetchMode.JOIN)
+		final Analysis analysis = (Analysis) getSession()
+				.createQuery("from Analysis a inner join fetch a.biologicalSamples bs " +
+						"inner join fetch bs.list bsl " +
+						"inner join fetch bsl.searchResults sr " +
+						"inner join fetch sr.list srl " +
+						"inner join fetch srl.massSpecSample ms " +
+						"inner join fetch srl.proteinGroups pg " +
+						"where a.id = :analysisId")
+				.setParameter("analysisId", reportData.getAnalysisId())
+				.setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY)
 				.setReadOnly(true)
 				.uniqueResult();
+
+		Set<Integer> proteinGroupLists = new HashSet<Integer>(1000);
+		for (BiologicalSample bs : analysis.getBiologicalSamples()) {
+			for (SearchResult sr : bs.getSearchResults()) {
+				proteinGroupLists.add(sr.getProteinGroups().getId());
+			}
+		}
+
+		// Fetch all the progein group list members
+		Integer[] ids = proteinGroupLists.toArray(new Integer[proteinGroupLists.size()]);
+		for (int i = 0; i < ids.length; i += IDS_AT_A_TIME) {
+			final int endIndex = Math.min(ids.length, i + IDS_AT_A_TIME);
+
+			listAndCast(getSession().createQuery(
+					"from ProteinGroupList pgl " +
+							" inner join fetch pgl.list pl " +
+							" inner join fetch pl.proteinSequences psl " +
+							" where pgl.id in (:ids)")
+					.setReadOnly(true)
+					.setParameterList("ids", Arrays.copyOfRange(ids, i, endIndex)));
+		}
+
+
+		return analysis;
 	}
 
 	@Override
@@ -562,7 +588,9 @@ public class SearchDbDaoHibernate extends DaoBase implements SearchDbDao {
 				" inner join r.proteinGroups as pgl" +
 				" inner join pgl.list as pg" +
 				" inner join pg.proteinSequences as psl" +
-				" where a=:a").setParameter("a", analysis));
+				" where a=:a")
+				.setReadOnly(true)
+				.setParameter("a", analysis));
 
 		final TreeMap<Integer, ProteinSequenceList> allProteinGroups = new TreeMap<Integer, ProteinSequenceList>();
 		for (final ProteinSequenceList psl : list) {
