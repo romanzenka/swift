@@ -81,6 +81,8 @@ public final class QuameterDaoHibernate extends DaoBase implements QuameterDao, 
 
 	@Override
 	public Collection<QuameterTag> getQuameterTags() {
+		final DateTime lowerDateLimit = new DateTime().minusYears(1);
+
 		// Only list annotations that belong to non-hidden quameter results
 		final List results = getSession().createQuery("select q, ms " +
 				"from QuameterAnnotation as q, " +
@@ -89,10 +91,12 @@ public final class QuameterDaoHibernate extends DaoBase implements QuameterDao, 
 				" TandemMassSpectrometrySample as ms " +
 				" WHERE " +
 				" q.quameterResultId = r.id " +
-				" AND r.searchResult = sr" +
-				" AND sr.massSpecSample = ms" +
+				" AND r.searchResult = sr " +
+				" AND sr.massSpecSample = ms " +
 				" AND r.hidden = false " +
+				" AND ms.startTime >= :lowerDateLimit " +
 				"ORDER BY r.id, q.metricCode")
+				.setParameter("lowerDateLimit", lowerDateLimit)
 				.list();
 
 		final ArrayList<QuameterTag> quameterTags = new ArrayList<QuameterTag>(results.size());
