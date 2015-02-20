@@ -147,6 +147,7 @@ uv.column.temperature.title <- "Oven temperature (Celsius)"
 uv.column.temperature.yspan <- 10 # degrees Celsius span for Y axis minimum
 
 uv.percent.b.color <- "#008800"
+uv.percent.b.breakpoint.color <- "#00880040"
 uv.percent.b.title <- "%B"
 
 uv.pressure.range <- range(0, 6000) # Fixed range for PSI.
@@ -214,6 +215,56 @@ makeThumb <- function(file, width, height) {
   par(oldpar)
   dev.off()
   newFileName
+}
+
+# Find linear segment given x,y coordinates, starting at start index
+# Return index of the next breakpoint
+# Assumes rounding to 0.1 decimal place
+findNextSegment <- function(x, y, start) {
+  intStart <- start
+  intEnd <-length(x) 
+  
+  while(intEnd>intStart) {
+    current <- floor((intStart+intEnd)/2)
+    
+    deltaX <- x[current]-x[start]
+    deltaY <- y[current]-y[start]
+    
+    if(deltaX<1E-4) {
+      break;
+    }
+    okay <- TRUE
+    for(j in seq(start, current)) {
+      if(abs(y[j]-(y[start]+(x[j]-x[start])/deltaX*deltaY))>0.15) {
+        okay <- FALSE # Our interval is too big
+        break
+      }
+    }
+    if(okay) {
+      # We can grow our interval
+      intStart <- current+1
+    } else {
+      # We have to shrink our interval
+      intEnd <- current-1
+    }
+  }
+  return(intEnd)
+}
+
+# Find all segments in a piecewise linear function
+# Return indices of breakpoints.
+findAllSegments <- function(x, y) {
+  pumpBreakLines <- c()
+  
+  start <- 0
+  while(start < length(x)) {
+    nextPoint <- findNextSegment(x, y, start+1)
+    if(nextPoint<length(x)) {
+      pumpBreakLines <- c(pumpBreakLines, nextPoint)
+    }
+    start <- nextPoint+1
+  }
+  return(pumpBreakLines)
 }
 
 ##Plot types
@@ -603,6 +654,16 @@ imageGenerator<-function(dataFile, msmsEvalDataFile, infoFile, spectrumFile, chr
     
     dataTabFull <- readQaFile(dataFile, decoyRegex)        
     
+    # Pump breakpoints
+    uvData <- dataTabFull[!duplicated(dataTabFull$UV.RT),]
+    uvData <- uvData[!is.na(uvData$UV.RT),]    
+    if(nrow(uvData)>0) {
+      segmentIndices <- findAllSegments(uvData$UV.RT, uvData$PumpModule.NC_Pump..B)
+      pumpBreakpointRT <- uvData$UV.RT[segmentIndices]
+    } else {
+      pumpBreakpointRT <- c()
+    }          
+    
     spectrumInfo <- dataTabFull[,c("Scan.Id", "MS.Level", "RT", "TIC", "Source.Current..uA.", "Lock.Mass.Found", "Lock.Mass.Shift")]        
     hasRetentionTimes <- sum(!is.na(spectrumInfo$RT))>0
     if(hasRetentionTimes) {             
@@ -644,6 +705,9 @@ imageGenerator<-function(dataFile, msmsEvalDataFile, infoFile, spectrumFile, chr
       abline(h=1e3);
       abline(h=1e6);     
       abline(h=1e9);
+      
+      # Pump breakpoints
+      abline(v=pumpBreakpointRT, col=uv.percent.b.breakpoint.color)      
 
       # Determine the middle 50% of eluting peptides
       msn.retention.times <- spectrumInfo$RT[!is.na(spectrumInfo$RT & spectrumInfo$MS.Level>1)]
@@ -753,7 +817,7 @@ imageGenerator<-function(dataFile, msmsEvalDataFile, infoFile, spectrumFile, chr
       scanXlim <- range(0, dataTab$Scan.Id)
       mzXlim <- range(0, dataTab$Observed.m.z)
     }
-    
+        
     xAxisTitleScanOrRT <- ifelse(spectrumInfoAvailable, "Retention Time (min)", "Scan Id")
     
     ### Lockmass QA - Scan ID versus ppm           
@@ -780,7 +844,7 @@ imageGenerator<-function(dataFile, msmsEvalDataFile, infoFile, spectrumFile, chr
       xAxis <- spectrumInfo$RT[match(ms2Only$Scan.Id, spectrumInfo$Scan.Id)];
     } else {
       xAxis <- ms2Only$Scan.Id;        
-    }
+    }    
     
     ### Scan ID versus m/z
     startPlot(ifelse(spectrumInfoAvailable, mz.title, mz.title.nort), outputImages$mz.file)
@@ -793,13 +857,12 @@ imageGenerator<-function(dataFile, msmsEvalDataFile, infoFile, spectrumFile, chr
            xlim=range(0, xAxisMs, xAxis))
       
       if(!is.null(chromatogram)) {
-        image(
-          x=xAxisMs,
-          y=seq(chromatogram.minMz, chromatogram.maxMz, length.out=dim(chromatogram$image)[2]),
-          z=chromatogram$image,
-          col=chromatogram$col,
-          add=TRUE)
+        for(i in seq(1, length(xAxisMs)-1)) {
+          rasterImage(image = chromatogram$col[rev(chromatogram$image[i,]+1)], xleft = xAxisMs[i], xright = xAxisMs[i+1], ybottom = chromatogram.minMz, ytop = chromatogram.maxMz)
+        }
       }
+      
+      abline(v=pumpBreakpointRT, col=uv.percent.b.breakpoint.color)
       
       spectrum.symbols <- spectrum.symbol(
         identified=ms2Only$identified,
@@ -809,7 +872,8 @@ imageGenerator<-function(dataFile, msmsEvalDataFile, infoFile, spectrumFile, chr
         domfrag=ms2Only$domfrag) 
       points(xAxis, ms2Only$Mz, 
              pch=spectrum.symbols, 
-             col=colorsByCharge[ms2Only$Z + 1])            
+             col=colorsByCharge[ms2Only$Z + 1],
+             cex=0.6)
       usedChargesLegend(ms2Only$Z, spectrum.symbols)
     } else {
       emptyPlot()
@@ -824,6 +888,7 @@ imageGenerator<-function(dataFile, msmsEvalDataFile, infoFile, spectrumFile, chr
       plot(spectrumInfo$RT, spectrumInfo$Source.Current..uA., type="p",
            main=c(plotName, current.title),
            xlab=xAxisTitleScanOrRT, ylab="Source Current (uA)", pch=20)
+      abline(v=pumpBreakpointRT, col=uv.percent.b.breakpoint.color)
     } else {
       emptyPlot()
     }
@@ -831,10 +896,8 @@ imageGenerator<-function(dataFile, msmsEvalDataFile, infoFile, spectrumFile, chr
 
     ### UV pump info    
     startPlot(uv.title, outputImages$uv.file)
-    uvData <- dataTabFull[!duplicated(dataTabFull$UV.RT),]
-    uvData <- uvData[!is.na(uvData$UV.RT),]
-        
-    if(nrow(uvData)>0) {
+            
+    if(nrow(uvData)>0) {        
       
       oldPar <- par(mar=c(5,4,4,5)+.1)
             
@@ -870,7 +933,9 @@ imageGenerator<-function(dataFile, msmsEvalDataFile, infoFile, spectrumFile, chr
       plot(uvData$UV.RT, uvData$PumpModule.NC_Pump..B, type="l", xlab=NA, ylab=NA, ylim=c(0, 100), yaxt="n", col=color, lwd=2)
       axis(side=4, at = pretty(range(c(0, 100))), col=color, col.axis=color, lwd.ticks=1, lwd=-1)
       mtext(uv.percent.b.title, side=4, line=1, col=color)
-            
+      
+      abline(v=pumpBreakpointRT, col=uv.percent.b.breakpoint.color)
+                      
       par(oldPar)          
       
     } else {
@@ -1264,8 +1329,8 @@ run <- function(inputFile, reportFileName, decoyRegex) {
   cat("END OF FILE\n", file=excelSummaryFile)
 } 
 
-args<-commandArgs(TRUE)
-#args<-c("/Users/m044910/Documents/devel/swift/swift/scripts/src/test/input.txt", "/tmp/qa/output.html", "Rev_") # For testing
+#args<-commandArgs(TRUE)
+args<-c("/Users/m044910/Documents/devel/swift/swift/scripts/src/test/input.txt", "/tmp/qa/output.html", "Rev_") # For testing
 inputFile<-args[1]
 reportFileName<-args[2]
 decoyRegex<-args[3] # Currently treated just as a plain prefix
@@ -1273,4 +1338,3 @@ decoyRegex<-args[3] # Currently treated just as a plain prefix
 run(inputFile, reportFileName, decoyRegex)
 
 # vi: set filetype=R expandtab tabstop=4 shiftwidth=4 autoindent smartindent:
-
