@@ -343,12 +343,12 @@ public final class ParamsDaoHibernate extends DaoBase implements ParamsDao {
 			return listAndCast(
 					allCriteria(SavedSearchEngineParameters.class)
 							.setReadOnly(true)
-							.addOrder(Order.asc("name").ignoreCase())
 							.setProjection(Projections.projectionList()
 											.add(Projections.property("id"), "id")
 											.add(Projections.property("name"), "name")
 											.add(Projections.property("user"), "user")
-							).createAlias("user", "u")
+							)
+							.addOrder(Order.asc("name").ignoreCase())
 							.setResultTransformer(Transformers.aliasToBean(SavedSearchEngineParameters.class))
 			);
 
