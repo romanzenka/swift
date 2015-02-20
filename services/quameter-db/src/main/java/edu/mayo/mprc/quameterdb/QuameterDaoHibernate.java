@@ -296,7 +296,13 @@ public final class QuameterDaoHibernate extends DaoBase implements QuameterDao, 
 	@Override
 	public QuameterAnnotation addAnnotation(final QuameterAnnotation annotation) {
 		if ("".equals(annotation.getText().trim())) {
-			getSession().delete(save(annotation, false));
+			getSession()
+					.createQuery("delete from QuameterAnnotation a where " +
+							"a.metricCode = :metricCode " +
+							"and a.quameterResultId = :qrId")
+					.setParameter("metricCode", annotation.getMetricCode())
+					.setParameter("qrId", annotation.getQuameterResultId())
+					.executeUpdate();
 			return null;
 		} else {
 			return save(annotation, false);
