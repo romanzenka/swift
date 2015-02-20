@@ -326,9 +326,12 @@ public class SearchDbDaoHibernate extends DaoBase implements SearchDbDao {
 			searchRunIds.add(reportData.getSearchRun().getId());
 		}
 
-		if (searchRunIds.size() < 2000) {
+		Integer[] ids = searchRunIds.toArray(new Integer[searchRunIds.size()]);
+		for (int i = 0; i < ids.length; i += IDS_AT_A_TIME) {
+			final int endIndex = Math.min(ids.length, i + IDS_AT_A_TIME);
+
 			listAndCast(getSession().createQuery("from SearchRun sr where sr.id in (:ids)")
-					.setParameterList("ids", searchRunIds));
+					.setParameterList("ids", Arrays.copyOfRange(ids, i, endIndex)));
 		}
 
 		return reports;
