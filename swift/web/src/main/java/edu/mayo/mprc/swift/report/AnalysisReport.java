@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 
@@ -36,7 +37,7 @@ public class AnalysisReport implements HttpRequestHandler {
 		resp.setContentType("text/html");
 		OutputStreamWriter writer = null;
 		try {
-			writer = new OutputStreamWriter(resp.getOutputStream(), Charsets.US_ASCII);
+			writer = new OutputStreamWriter(new BufferedOutputStream(resp.getOutputStream(), 100 * 1024), Charsets.US_ASCII);
 
 			final String reportIdStr = req.getParameter("id");
 			final long reportId;
