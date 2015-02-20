@@ -36,3 +36,7 @@ td.star {
     background-repeat: no-repeat;
     background-position: center center;
 }
+
+td.star-column {
+    min-width: 20px;
+}

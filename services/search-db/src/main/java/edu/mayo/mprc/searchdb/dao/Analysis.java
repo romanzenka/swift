@@ -209,7 +209,7 @@ public final class Analysis extends PersistableBase {
 		final String bioSamplePrefix = StringUtilities.longestPrefix(bioSampleNames);
 		r.cell(bioSamplePrefix, 1, null);
 		if (starredColumn) {
-			r.cell(" ", 1, null);
+			r.cell(" ", 1, "star-column");
 		}
 		final int bioSamplePrefixLength = bioSamplePrefix.length();
 
