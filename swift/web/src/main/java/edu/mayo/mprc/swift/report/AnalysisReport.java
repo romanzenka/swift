@@ -37,7 +37,7 @@ public class AnalysisReport implements HttpRequestHandler {
 		resp.setContentType("text/html");
 		OutputStreamWriter writer = null;
 		try {
-			writer = new OutputStreamWriter(new BufferedOutputStream(resp.getOutputStream(), 100 * 1024), Charsets.US_ASCII);
+			writer = new OutputStreamWriter(new BufferedOutputStream(resp.getOutputStream(), 1024 * 1024), Charsets.US_ASCII);
 
 			final String reportIdStr = req.getParameter("id");
 			final long reportId;
