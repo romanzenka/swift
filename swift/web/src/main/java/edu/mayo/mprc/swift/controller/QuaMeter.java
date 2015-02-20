@@ -69,6 +69,10 @@ public final class QuaMeter {
 
 				quameterUi.commit();
 
+				for (QuameterTag quameterTag : quameterTags) {
+					quameterTag.setInstrument(quameterUi.mapInstrument(quameterTag.getInstrument()));
+				}
+
 				model.addAttribute("tags", quameterTags);
 			} catch (final Exception e) {
 				quameterUi.rollback();
