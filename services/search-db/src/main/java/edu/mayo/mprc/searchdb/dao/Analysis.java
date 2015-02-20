@@ -236,7 +236,7 @@ public final class Analysis extends PersistableBase {
 		for (final BiologicalSample sample : getBiologicalSamples()) {
 			for (final SearchResult ignore : sample.getSearchResults()) {
 				final String fileName = iterator.next();
-				r.cellBreakUnderscore(fileName.substring(massSpecSamplePrefixLength));
+				r.cellBreakUnderscore(fileName.substring(massSpecSamplePrefixLength), 1, null);
 			}
 		}
 		r.nextRow(); // ---------------
