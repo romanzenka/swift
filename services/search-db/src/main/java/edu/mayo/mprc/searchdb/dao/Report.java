@@ -6,6 +6,7 @@ import edu.mayo.mprc.utilities.StringUtilities;
 
 import java.io.IOException;
 import java.io.Writer;
+import java.util.regex.Pattern;
 
 /**
  * Helps reporting the loaded data.
@@ -13,6 +14,8 @@ import java.io.Writer;
  * @author Roman Zenka
  */
 public class Report {
+	private static final Pattern UNDERSCORE_BREAKS = Pattern.compile("_");
+
 	private Writer w;
 
 	private boolean rowStarted = false;
@@ -29,7 +32,7 @@ public class Report {
 	public Report write(final String s) {
 		try {
 			w.write(s);
-		} catch (IOException e) {
+		} catch (final IOException e) {
 			throw new MprcException("Could not write out data", e);
 		}
 		return this;
@@ -64,8 +67,16 @@ public class Report {
 	}
 
 	public Report cell(final String text, final int colspan, final String clazz) {
+		return cell(text, colspan, clazz, esc(text));
+	}
+
+	public Report cellBreakUnderscore(final String text, final int colspan, final String clazz) {
+		return cell(text, colspan, clazz, breaksAfterUnderscore(esc(text)));
+	}
+
+	private Report cell(final String text, final int colspan, final String clazz, final String textToWrite) {
 		checkRow();
-		String classString = clazz == null ? "" : " class=\"" + clazz + "\"";
+		final String classString = clazz == null ? "" : " class=\"" + clazz + "\"";
 		if (colspan == 1) {
 			write("<td" + classString + ">");
 		} else {
@@ -74,10 +85,14 @@ public class Report {
 		if (Strings.isNullOrEmpty(text)) {
 			write("&nbsp;");
 		} else {
-			write(esc(text));
+			write(textToWrite);
 		}
 		write("</td>\n");
 		return this;
+	}
+
+	private static String breaksAfterUnderscore(final String string) {
+		return UNDERSCORE_BREAKS.matcher(string).replaceAll("_&#8203;");
 	}
 
 	private void checkRow() {

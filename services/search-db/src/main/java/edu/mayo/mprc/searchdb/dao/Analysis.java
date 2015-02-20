@@ -14,7 +14,6 @@ import org.joda.time.DateTime;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.util.*;
-import java.util.regex.Pattern;
 
 /**
  * Extracted information about how the analysis was performed that should get stored into the LIMS.
@@ -26,7 +25,6 @@ import java.util.regex.Pattern;
 public final class Analysis extends PersistableBase {
 	private static final DecimalFormat PERCENT_FORMAT = new DecimalFormat("0.00%", DecimalFormatSymbols.getInstance(Locale.US));
 	public static final String UNKNOWN_ACCESSION = "???";
-	private static final Pattern UNDERSCORE_BREAKS = Pattern.compile("_");
 
 	/**
 	 * Scaffold version as a string. Can be null if the version could not be determined.
@@ -216,7 +214,7 @@ public final class Analysis extends PersistableBase {
 		final int bioSamplePrefixLength = bioSamplePrefix.length();
 
 		for (final BiologicalSample sample : getBiologicalSamples()) {
-			r.cell(breaksAfterUnderscore(sample.getSampleName().substring(bioSamplePrefixLength)), sample.getSearchResults().size(), null);
+			r.cellBreakUnderscore(sample.getSampleName().substring(bioSamplePrefixLength), sample.getSearchResults().size(), null);
 		}
 		r.nextRow(); // ---------------
 
@@ -238,7 +236,7 @@ public final class Analysis extends PersistableBase {
 		for (final BiologicalSample sample : getBiologicalSamples()) {
 			for (final SearchResult ignore : sample.getSearchResults()) {
 				final String fileName = iterator.next();
-				r.cell(breaksAfterUnderscore(fileName.substring(massSpecSamplePrefixLength)));
+				r.cellBreakUnderscore(fileName.substring(massSpecSamplePrefixLength));
 			}
 		}
 		r.nextRow(); // ---------------
@@ -310,10 +308,6 @@ public final class Analysis extends PersistableBase {
 
 
 		r.endTable();
-	}
-
-	private static String breaksAfterUnderscore(String string) {
-		return UNDERSCORE_BREAKS.matcher(string).replaceAll("_&#8203;");
 	}
 
 	private List<TableRow> collectTableRows(final TreeMap<Integer, ProteinSequenceList> allProteinGroups, final int totalColumns, final Map<Integer, List<String>> accnumMap, StarMatcher matcher) {
