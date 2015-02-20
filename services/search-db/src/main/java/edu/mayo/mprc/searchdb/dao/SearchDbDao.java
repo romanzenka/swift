@@ -42,6 +42,8 @@ public interface SearchDbDao extends Dao, RuntimeInitializer {
 	Analysis addAnalysis(Analysis analysis, ReportData reportData, PercentProgressReporter reporter);
 
 	/**
+	 * We attempt to fetch the analysis tree down to the {@link edu.mayo.mprc.searchdb.dao.TandemMassSpectrometrySample}.
+	 *
 	 * @param reportData Report for which we want to find analysis
 	 * @return Analysis of given id.
 	 */

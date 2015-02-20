@@ -16,7 +16,6 @@ import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.Order;
-import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.joda.time.DateTime;
 import org.springframework.stereotype.Repository;
@@ -338,22 +337,7 @@ public final class ParamsDaoHibernate extends DaoBase implements ParamsDao {
 
 	@Override
 	public List<SavedSearchEngineParameters> savedSearchEngineParametersNoData() {
-		try {
-			return listAndCast(
-					allCriteria(SavedSearchEngineParameters.class)
-							.setReadOnly(true)
-							.setProjection(Projections.projectionList()
-											.add(Projections.property("id"), "id")
-											.add(Projections.property("name"), "name")
-											.add(Projections.property("user"), "user")
-							)
-							.addOrder(Order.asc("name").ignoreCase())
-							.setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY)
-			);
-
-		} catch (Exception t) {
-			throw new MprcException("Cannot list all saved search parameters", t);
-		}
+		return savedSearchEngineParameters();
 	}
 
 	@Override

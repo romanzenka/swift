@@ -283,6 +283,9 @@ public class SearchDbDaoHibernate extends DaoBase implements SearchDbDao {
 				.add(Restrictions.idEq(reportData.getAnalysisId()))
 				.setFetchMode("biologicalSamples", FetchMode.JOIN)
 				.setFetchMode("biologicalSamples.list", FetchMode.JOIN)
+				.setFetchMode("biologicalSamples.list.searchResult", FetchMode.JOIN)
+				.setFetchMode("biologicalSamples.list.searchResult.massSpecSample", FetchMode.JOIN)
+				.setReadOnly(true)
 				.uniqueResult();
 	}
 
