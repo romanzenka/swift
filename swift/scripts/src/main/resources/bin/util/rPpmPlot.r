@@ -192,9 +192,9 @@ doubleToRgb <- function(v) {
 chromatogram.recolor <- function(color) { doubleToRgb(rgbToDouble(color)) }
 
 # Start a new plot (has default dimensions)
-startPlot <- function(plotName, fileName) {
+startPlot <- function(plotName, fileName, outDir) {
   print(paste("Generating '", plotName, "' image file: ", fileName, sep="")) 
-  png(file=fileName, width=plot.dimension.full[1], height=plot.dimension.full[2])
+  png(file=file.path(outDir, basename(fileName)), width=plot.dimension.full[1], height=plot.dimension.full[2])
 }
 
 emptyPlot <- function() {
@@ -235,7 +235,7 @@ findNextSegment <- function(x, y, start) {
     }
     okay <- TRUE
     for(j in seq(start, current)) {
-      if(abs(y[j]-(y[start]+(x[j]-x[start])/deltaX*deltaY))>min(0.11, deltaY/deltaX)) { # We tolerate 1 second deltas
+      if(abs(y[j]-(y[start]+(x[j]-x[start])/deltaX*deltaY))>(0.1+abs(deltaY/deltaX/30.0))) { # We tolerate 1 second deltas
         okay <- FALSE # Our interval is too big
         break
       }
@@ -641,7 +641,7 @@ movingAverage <- function(x,n=5){
 #' Generates series of images for one .RAW file
 #'
 #' @return a summary of results to be written in the summary.xml file 
-imageGenerator<-function(dataFile, msmsEvalDataFile, infoFile, spectrumFile, chromatogramFile, outputImages, generate, decoyRegex) {
+imageGenerator<-function(dataFile, msmsEvalDataFile, infoFile, spectrumFile, chromatogramFile, outputImages, generate, decoyRegex, outDir) {
   # We return the passed file names as a part of our result
   result<-outputImages
   result$data.file <- dataFile
@@ -668,7 +668,7 @@ imageGenerator<-function(dataFile, msmsEvalDataFile, infoFile, spectrumFile, chr
     hasRetentionTimes <- sum(!is.na(spectrumInfo$RT))>0
     if(hasRetentionTimes) {             
       ### Total Ion Current plot 
-      startPlot(tic.title, outputImages$tic.file)
+      startPlot(tic.title, outputImages$tic.file, outDir)
       
       ms <- spectrumInfo$MS.Level==1
       #maxTic = 1e11;
@@ -821,12 +821,12 @@ imageGenerator<-function(dataFile, msmsEvalDataFile, infoFile, spectrumFile, chr
     xAxisTitleScanOrRT <- ifelse(spectrumInfoAvailable, "Retention Time (min)", "Scan Id")
     
     ### Lockmass QA - Scan ID versus ppm           
-    startPlot(ifelse(spectrumInfoAvailable, lockmass.title, lockmass.title.nort), outputImages$lockmass.file)
+    startPlot(ifelse(spectrumInfoAvailable, lockmass.title, lockmass.title.nort), outputImages$lockmass.file, outDir)
     fitAndPpmPlots(idVsPpm, dataTab, spectrumInfo, "white", ci95Col, c(plotName, ifelse(spectrumInfoAvailable, lockmass.title, lockmass.title.nort)), xAxisTitleScanOrRT, "Measured m/z - theoretical m/z")
     dev.off()
     
     ### Mass calibration QA - m/z versus ppm
-    startPlot(calibration.title, outputImages$calibration.file)            
+    startPlot(calibration.title, outputImages$calibration.file, outDir)
     fitAndPpmPlots(mzVsPpm, dataTab, spectrumInfo, "white", ci95Col, c(plotName, calibration.title), "theoretical m/z", "Measured m/z - theoretical m/z")
     dev.off()
     
@@ -847,7 +847,7 @@ imageGenerator<-function(dataFile, msmsEvalDataFile, infoFile, spectrumFile, chr
     }    
     
     ### Scan ID versus m/z
-    startPlot(ifelse(spectrumInfoAvailable, mz.title, mz.title.nort), outputImages$mz.file)
+    startPlot(ifelse(spectrumInfoAvailable, mz.title, mz.title.nort), outputImages$mz.file, outDir)
     
     if(sum(!is.na(xAxis))>0) {
       plot(xAxis, ms2Only$Mz, type="n",
@@ -882,7 +882,7 @@ imageGenerator<-function(dataFile, msmsEvalDataFile, infoFile, spectrumFile, chr
     dev.off()
     
     ### Source current vs. mass id/RT
-    startPlot(ifelse(spectrumInfoAvailable, current.title, current.title.nort), outputImages$source.current.file)
+    startPlot(ifelse(spectrumInfoAvailable, current.title, current.title.nort), outputImages$source.current.file, outDir)
     
     if(spectrumInfoAvailable && sum(!is.na(spectrumInfo$RT))) {
       plot(spectrumInfo$RT, spectrumInfo$Source.Current..uA., type="p",
@@ -895,7 +895,7 @@ imageGenerator<-function(dataFile, msmsEvalDataFile, infoFile, spectrumFile, chr
     dev.off()
 
     ### UV pump info    
-    startPlot(uv.title, outputImages$uv.file)
+    startPlot(uv.title, outputImages$uv.file, outDir)
             
     if(nrow(uvData)>0) {        
       
@@ -948,7 +948,7 @@ imageGenerator<-function(dataFile, msmsEvalDataFile, infoFile, spectrumFile, chr
     dev.off()
     
     ### Peptide tolerance
-    startPlot(pepTol.title, outputImages$pepTol.file)
+    startPlot(pepTol.title, outputImages$pepTol.file, outDir)
     
     if(length(dataTab$Actual.minus.calculated.peptide.mass..PPM.)!=0) {
       if(selectBestRange(dataTab)==1) {
@@ -1036,7 +1036,7 @@ imageGenerator<-function(dataFile, msmsEvalDataFile, infoFile, spectrumFile, chr
     msmsDataTab <- msmsDataTab[!duplicatedMsmsDataRows,]
     
     if (nrow(msmsDataTab)>0) {
-      startPlot(msmsEval.title, outputImages$msmsEval.file)
+      startPlot(msmsEval.title, outputImages$msmsEval.file, outDir)
       
       # We use fixed range for the discriminant scores to make the graphs visually comparable
       msmsEval.xlim <- c(-15, 20)
@@ -1295,7 +1295,8 @@ run <- function(inputFile, reportFileName, decoyRegex) {
         tic.file = line$TIC.File,
         uv.file = line$UV.Data.File),
       line$Generate.Files,
-      decoyRegex)
+      decoyRegex,
+      dirname(reportFileName))
     
     addRowToReportFile(reportFile, row)
     cat(line$Raw.File, 
@@ -1330,6 +1331,7 @@ run <- function(inputFile, reportFileName, decoyRegex) {
 } 
 
 args<-commandArgs(TRUE)
+#args<-c("/mnt/atlas/ResearchandDevelopment/QE_Method Development/Thermo_HeLa_Standards_20150109/Hela_150min_ClinicalSolvents_Replicates_25cmPepMap_20150219/qa/rInputData.tsv",  "/tmp/qa/output.html", "Rev_")
 #args<-c("/Users/m044910/Documents/devel/swift/swift/scripts/src/test/input.txt", "/tmp/qa/output.html", "Rev_") # For testing
 inputFile<-args[1]
 reportFileName<-args[2]
