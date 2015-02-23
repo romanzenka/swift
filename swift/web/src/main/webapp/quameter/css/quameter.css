@@ -88,13 +88,6 @@ button.highlight {
 
 .annotationDiv {
     display: none;
-    background-color: darkgray;
-    padding: 2px;
-    z-index: 20; /** Has to be above the DyGraph legend at 10 */
-    top: 75px;
-    right: 15px;
-    position: fixed;
-    border: 1px solid black;
 }
 
 .metric-desc {

@@ -41,6 +41,21 @@
                 </div>
             </div>
             <div class="btn-toolbar pull-right">
+                <div class="btn-group" id="annotFormDiv" class="annotationDiv">
+                    <form id="annotForm" action="/service/new-annotation" method="post" onsubmit="return false;"
+                          class="navbar-form">
+                        <div class="form-group">
+                            <div class="input-append">
+                                <input id="annotationText" name="text" size="50" class="form-control">
+                                <button type="submit" class="btn btn-default" id="submitAnnotation" value="Submit">
+                                    Submit
+                                </button>
+                            </div>
+                        </div>
+                        <input type="hidden" id="hiddenMetricCode" name="metricCode">
+                        <input type="hidden" id="hiddenRowid" name="dbId">
+                    </form>
+                </div>
                 <div class="btn-group" id="extra-buttons">
                     <a href="/quameter/unhide" class="btn"><i class="icon-remove"></i> Unhide</a>
                     <a href="/quameter/tags" class="btn"><i class="icon-tag"></i> Tags</a>
@@ -73,15 +88,6 @@
             <div id="simpleGraphs" style="margin-top: 40px"></div>
         </c:otherwise>
     </c:choose>
-
-    <div id="annotFormDiv" class="annotationDiv">
-        <form id="annotForm" action="/service/new-annotation" method="post" onsubmit="return false;">
-            <textarea id="annotationText" name="text" cols="50" rows="3" style="margin: 1px"></textarea></br>
-            <input type="hidden" id="hiddenMetricCode" name="metricCode">
-            <input type="hidden" id="hiddenRowid" name="dbId">
-            <input type="submit" id="submitAnnotation" value="Submit" style="float:right">
-        </form>
-    </div>
 
     <div id="hideDialog" class="modal hide fade" aria-hidden="true">
         <div class="modal-header">
