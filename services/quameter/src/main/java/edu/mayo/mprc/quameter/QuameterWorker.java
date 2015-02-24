@@ -14,6 +14,7 @@ import edu.mayo.mprc.daemon.worker.WorkerBase;
 import edu.mayo.mprc.daemon.worker.WorkerFactoryBase;
 import edu.mayo.mprc.searchengine.EngineFactory;
 import edu.mayo.mprc.searchengine.EngineMetadata;
+import edu.mayo.mprc.utilities.FilePathShortener;
 import edu.mayo.mprc.utilities.FileUtilities;
 import edu.mayo.mprc.utilities.ProcessCaller;
 import edu.mayo.mprc.utilities.progress.UserProgressReporter;
@@ -35,6 +36,7 @@ public final class QuameterWorker extends WorkerBase {
 	public static final String DESC = "QuaMeter quality metrics support. <p>QuaMeter is freely available at <a href=\"http://fenchurch.mc.vanderbilt.edu/software.php#QuaMeter\">http://fenchurch.mc.vanderbilt.edu/software.php#QuaMeter</a>.</p>";
 
 	private static final String RESULT_EXTENSION = ".qual.txt";
+	private static final int MAX_QUAMETER_IDPDB_PATH = 200;
 
 	private File executable;
 
@@ -94,7 +96,7 @@ public final class QuameterWorker extends WorkerBase {
 		parameters.add("-RawDataPath");
 		parameters.add(rawFile.getParentFile().getAbsolutePath());
 		parameters.add("-RawDataFormat");
-		if(rawFile.getName().endsWith(".mzML")) {
+		if (rawFile.getName().endsWith(".mzML")) {
 			parameters.add("mzML");
 		} else {
 			parameters.add("raw");
@@ -105,15 +107,20 @@ public final class QuameterWorker extends WorkerBase {
 		parameters.add("false");
 		parameters.add("-dump");
 
-		parameters.add(idpDbFile.getAbsolutePath());
+		final FilePathShortener idpDbFileShortened = new FilePathShortener(idpDbFile, MAX_QUAMETER_IDPDB_PATH);
+		try {
+			parameters.add(idpDbFileShortened.getShortenedFile().getAbsolutePath());
 
-		final ProcessBuilder processBuilder = new ProcessBuilder(parameters);
-		processBuilder.directory(tempWorkFolder);
+			final ProcessBuilder processBuilder = new ProcessBuilder(parameters);
+			processBuilder.directory(tempWorkFolder);
 
-		final ProcessCaller processCaller = new ProcessCaller(processBuilder, progressReporter.getLog());
+			final ProcessCaller processCaller = new ProcessCaller(processBuilder, progressReporter.getLog());
 
-		LOGGER.info("QuaMeter search, " + packet.toString() + ", has been submitted.");
-		processCaller.runAndCheck("quameter");
+			LOGGER.info("QuaMeter search, " + packet.toString() + ", has been submitted.");
+			processCaller.runAndCheck("quameter");
+		} finally {
+			idpDbFileShortened.cleanup();
+		}
 
 		if (!createdResultFile.equals(outputFile)) {
 			FileUtilities.rename(createdResultFile, outputFile);
