@@ -371,16 +371,18 @@ public class SearchDbDaoHibernate extends DaoBase implements SearchDbDao {
 			final Integer[] ids = DatabaseUtilities.getIdList(searchRuns);
 
 			final List runToInstruments = getSession().createQuery(
-					"select distinct rd.searchRun.id, ms.instrumentSerialNumber from" +
+					"select distinct srun.id, ms.instrumentSerialNumber from" +
 							" Analysis as a" +
 							" inner join a.biologicalSamples as bsl" +
 							" inner join bsl.list as bs" +
 							" inner join bs.searchResults as srl" +
 							" inner join srl.list as sr" +
 							" inner join sr.massSpecSample as ms," +
-							" ReportData as rd where" +
+							" ReportData as rd " +
+							" inner join rd.searchRun srun" +
+							" where" +
 							" rd.analysisId = a.id and " +
-							" rd.searchRun.id in (:ids)"
+							" srun.id in (:ids)"
 			).setParameterList("ids", ids)
 					.list();
 
