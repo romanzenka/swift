@@ -107,9 +107,18 @@ public final class QuameterWorker extends WorkerBase {
 		parameters.add("false");
 		parameters.add("-dump");
 
-		final FilePathShortener idpDbFileShortened = new FilePathShortener(idpDbFile, MAX_QUAMETER_IDPDB_PATH);
+		final String idpDbFilePath;
+		final FilePathShortener idpDbFileShortened;
+		if (executable.getAbsolutePath().contains("wine")) {
+			idpDbFileShortened = new FilePathShortener(idpDbFile, MAX_QUAMETER_IDPDB_PATH);
+			idpDbFilePath = idpDbFileShortened.getShortenedFile().getAbsolutePath();
+		} else {
+			idpDbFilePath = idpDbFile.getAbsolutePath();
+			idpDbFileShortened = null;
+		}
 		try {
-			parameters.add(idpDbFileShortened.getShortenedFile().getAbsolutePath());
+
+			parameters.add(idpDbFilePath);
 
 			final ProcessBuilder processBuilder = new ProcessBuilder(parameters);
 			processBuilder.directory(tempWorkFolder);
@@ -119,7 +128,9 @@ public final class QuameterWorker extends WorkerBase {
 			LOGGER.info("QuaMeter search, " + packet.toString() + ", has been submitted.");
 			processCaller.runAndCheck("quameter");
 		} finally {
-			idpDbFileShortened.cleanup();
+			if (idpDbFileShortened != null) {
+				idpDbFileShortened.cleanup();
+			}
 		}
 
 		if (!createdResultFile.equals(outputFile)) {
