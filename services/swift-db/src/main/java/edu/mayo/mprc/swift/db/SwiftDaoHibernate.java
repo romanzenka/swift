@@ -125,6 +125,30 @@ public final class SwiftDaoHibernate extends DaoBase implements SwiftDao {
 			}
 		}
 
+		final Integer[] allIds = DatabaseUtilities.getIdList(searchRuns);
+		final Set<Integer> searchesWithQuameter =
+				Sets.newHashSet(getSession().createQuery("select sr.id " +
+						" from TaskData t, " +
+						" SearchRun sr," +
+						" SwiftSearchDefinition sd," +
+						" SearchEngineParameters sp, " +
+						" EnabledEngines e," +
+						" SearchEngineConfig c " +
+						" where sr = t.searchRun " +
+						" and sr.id in (:ids) " +
+						" and sr.swiftSearch = sd.id " +
+						" and sd.searchParameters = sp " +
+						" and sp.enabledEngines = e " +
+						" and c in elements(e.engineConfigs)" +
+						" and c.code = 'QUAMETER' " +
+						" group by sr.id")
+						.setParameterList("ids", allIds)
+						.list());
+
+		for (final SearchRun run : searchRuns) {
+			run.setQuameter(searchesWithQuameter.contains(run.getId()));
+		}
+
 		if (unfinished.size() > 0) {
 			final Integer[] ids = DatabaseUtilities.getIdList(unfinished);
 
@@ -148,27 +172,7 @@ public final class SwiftDaoHibernate extends DaoBase implements SwiftDao {
 				}
 			}
 
-			final Set<Integer> searchesWithQuameter =
-					Sets.newHashSet(getSession().createQuery("select sr.id " +
-							" from TaskData t, " +
-							" SearchRun sr," +
-							" SwiftSearchDefinition sd," +
-							" SearchEngineParameters sp, " +
-							" EnabledEngines e," +
-							" SearchEngineConfig c " +
-							" where sr = t.searchRun " +
-							" and sr.id in (:ids) " +
-							" and sr.swiftSearch = sd.id " +
-							" and sd.searchParameters = sp " +
-							" and sp.enabledEngines = e " +
-							" and c in elements(e.engineConfigs)" +
-							" and c.code = 'QUAMETER' " +
-							" group by sr.id")
-							.setParameterList("ids", ids)
-							.list());
-
 			for (final SearchRun run : searchRuns) {
-				run.setQuameter(searchesWithQuameter.contains(run.getId()));
 				final Integer runningTasks = idsToCounts.get(run.getId());
 				run.setRunningTasks(runningTasks == null ? 0 : runningTasks);
 			}
