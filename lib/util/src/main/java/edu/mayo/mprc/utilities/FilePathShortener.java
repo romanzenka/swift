@@ -27,7 +27,7 @@ public final class FilePathShortener {
 			// Make a temporary link to our original raw file, to shorten the path
 			try {
 				temporaryFile = FileUtilities.shortenFilePath(toShorten);
-				LOGGER.debug("Shortening path (over " + maxPath + " characters) by linking: " + toShorten.getAbsolutePath() + "->" + temporaryFile.getAbsolutePath());
+				LOGGER.info("Shortening path (over " + maxPath + " characters) by linking: " + toShorten.getAbsolutePath() + "->" + temporaryFile.getAbsolutePath());
 				temporaryLinkMade = true;
 			} catch (Exception ignore) {
 				// SWALLOWED: If we fail to make a link, we use the original file. But we must NOT delete it afterwards!
