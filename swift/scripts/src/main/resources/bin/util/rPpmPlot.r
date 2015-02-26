@@ -150,7 +150,7 @@ uv.percent.b.color <- "#008800"
 uv.percent.b.breakpoint.color <- "#00880040"
 uv.percent.b.title <- "%B"
 
-uv.pressure.range <- range(0, 6000) # Fixed range for PSI.
+uv.pressure.range <- range(0, 9000) # Fixed range for PSI.
 
 
 # How to visualize a hit?
