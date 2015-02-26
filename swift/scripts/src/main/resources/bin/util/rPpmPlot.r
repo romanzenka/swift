@@ -432,7 +432,7 @@ fitAndPpmPlots<-function(plotType, dataTab, spectrumInfo, curveColor, shadeColor
     polymer=rep(FALSE, times=length(fullX)),
     unfrag =rep(FALSE, times=length(fullX)),
     domfrag=rep(FALSE, times=length(fullX)))
-  points(fullX, fullY, pch=spectrum.symbols, col=colorsByCharge[dataTab$Z + 1])
+  points(fullX, fullY, pch=spectrum.symbols, col=colorsByCharge[dataTab$Z + 1], cex=0.6)
   
   if(subsetContainsData && is.list(fit)) {
     legend("topleft", c(paste("95% +-", round(1.96 * fit$s, digits=2), " ", yLimUnit, sep="")), fill=c(ci95Col), bty="n")    
@@ -657,11 +657,13 @@ imageGenerator<-function(dataFile, msmsEvalDataFile, infoFile, spectrumFile, chr
     # Pump breakpoints
     uvData <- dataTabFull[!duplicated(dataTabFull$UV.RT),]
     uvData <- uvData[!is.na(uvData$UV.RT),]    
-    if(nrow(uvData)>0) {
-      segmentIndices <- findAllSegments(uvData$UV.RT, uvData$PumpModule.NC_Pump..B)
-      pumpBreakpointRT <- uvData$UV.RT[segmentIndices]
-    } else {
-      pumpBreakpointRT <- c()
+    pumpBreakpointRT <- c()
+    if(nrow(uvData)>0 && 'PumpModule.NC_Pump..B' %in% colnames(uvData)) {
+      uvDataSubset <- uvData[!is.na(uvData$PumpModule.NC_Pump..B),]
+      if(nrow(uvDataSubset)>0) {
+        segmentIndices <- findAllSegments(uvDataSubset$UV.RT, uvDataSubset$PumpModule.NC_Pump..B)
+        pumpBreakpointRT <- uvDataSubset$UV.RT[segmentIndices]
+      }
     }          
     
     spectrumInfo <- dataTabFull[,c("Scan.Id", "MS.Level", "RT", "TIC", "Source.Current..uA.", "Lock.Mass.Found", "Lock.Mass.Shift")]        
@@ -930,11 +932,13 @@ imageGenerator<-function(dataFile, msmsEvalDataFile, infoFile, spectrumFile, chr
       par(new=TRUE)
       
       color <- uv.percent.b.color 
-      plot(uvData$UV.RT, uvData$PumpModule.NC_Pump..B, type="l", xlab=NA, ylab=NA, ylim=c(0, 100), yaxt="n", col=color, lwd=2)
-      axis(side=4, at = pretty(range(c(0, 100))), col=color, col.axis=color, lwd.ticks=1, lwd=-1)
-      mtext(uv.percent.b.title, side=4, line=1, col=color)
+      if('PumpModule.NC_Pump..B' %in% colnames(uvData)) {
+        plot(uvData$UV.RT, uvData$PumpModule.NC_Pump..B, type="l", xlab=NA, ylab=NA, ylim=c(0, 100), yaxt="n", col=color, lwd=2)
+        axis(side=4, at = pretty(range(c(0, 100))), col=color, col.axis=color, lwd.ticks=1, lwd=-1)
+        mtext(uv.percent.b.title, side=4, line=1, col=color)
+      }
       
-      abline(v=pumpBreakpointRT, col=uv.percent.b.breakpoint.color)
+      abline(v=pumpBreakpointRT, col=uv.percent.b.breakpoint.color)    
                       
       par(oldPar)          
       
@@ -1333,6 +1337,7 @@ run <- function(inputFile, reportFileName, decoyRegex) {
 args<-commandArgs(TRUE)
 #args<-c("/mnt/atlas/ResearchandDevelopment/QE_Method Development/Thermo_HeLa_Standards_20150109/Hela_150min_ClinicalSolvents_Replicates_25cmPepMap_20150219/qa/rInputData.tsv",  "/tmp/qa/output.html", "Rev_")
 #args<-c("/Users/m044910/Documents/devel/swift/swift/scripts/src/test/input.txt", "/tmp/qa/output.html", "Rev_") # For testing
+args<-c("/mnt/mprc/instruments/OrbitrapElite/QC_enodigruns_yeast/Elite_150225_yeast250_90_100/qa/rInputData.tsv", "/mnt/mprc/instruments/OrbitrapElite/QC_enodigruns_yeast/Elite_150225_yeast250_90_100/qa/index.html", "Reversed_")
 inputFile<-args[1]
 reportFileName<-args[2]
 decoyRegex<-args[3] # Currently treated just as a plain prefix
