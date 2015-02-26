@@ -69,39 +69,6 @@
     </table>
 
 
-    <h3>Hemoglobin Peptides Lacking Evidence of Mutation</h3>
-
-    <blockquote class="muted">
-        These protein groups were identified by search, but lack peptide support on that particular mutation.</br>
-        If there are multiple proteins listed in a cell, it is because we could not distinguish between them based on
-        the peptide evidence itself.
-    </blockquote>
-
-
-    <table id="unsupported" class="table table-striped">
-        <thead>
-        <tr>
-            <th>Protein <tags:arrows/></th>
-            <th>Peptides <tags:arrows/></th>
-            <th>Spectra <tags:arrows/></th>
-            <th>Description <tags:arrows/></th>
-            <th>Mass <tags:arrows/></th>
-            <th></th>
-        </tr>
-        </thead>
-        <c:forEach var="p" items="${unsupportedList}">
-            <tr>
-                <td>${p.accNum}</td>
-                <td>${fn:length(p.peptides)}</td>
-                <td style="text-align:center;">${p.totalSpectra}</td>
-                <td>${p.neatDescription}</td>
-                <td>${p.mass}</td>
-                <td><a href="#modal_${p.accNum}" role="button" class="btn" data-toggle="modal">View</a></td>
-            </tr>
-        </c:forEach>
-    </table>
-
-
     <h3>Related Mutant Proteins</h3>
     <blockquote class="muted">
         <p>These are proteins of interest whose mass delta did not match the query.</p>

@@ -26,7 +26,7 @@ public class HemeHelper {
 
     public static String nonBlankSpaces(int n) {
         String ret = "";
-        for (int i = 0; i < n; i++) {
+        for (int i = 1; i < n; i++) {
             ret += "&nbsp;";
         }
         return ret;

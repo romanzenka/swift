@@ -75,6 +75,10 @@ public class HemeScaffoldReader extends ScaffoldReportReader {
             }
 
             PeptideEntity newPep = new PeptideEntity( currentLine[peptideSeq] );
+            boolean seqMatchCheck = peptideBelongsToDatabaseEntry(newPep, prot.getSequence());
+            if(!seqMatchCheck) {  //Sometimes Scaffold puts peptides to other db seq
+                continue;
+            }
             boolean mutationCheck = hasOverlappingMutation(newPep, prot.getSequence(), prot.getCigar());
 
             // No mutation means scaffold put it in the wrong place....needs to attach to wild type instead
@@ -174,7 +178,7 @@ public class HemeScaffoldReader extends ScaffoldReportReader {
             }
         }
 
-        if(typeOfMutation == 'X' && pepStart <= mutPosition && mutPosition <= pepEnd){
+        if(typeOfMutation == 'X' && pepStart <= mutPosition && mutPosition < pepEnd){
             peptideSeq.setHasMutation(true);
             return true;
         }
@@ -191,6 +195,18 @@ public class HemeScaffoldReader extends ScaffoldReportReader {
         }
 
 
+    }
+
+    public static boolean peptideBelongsToDatabaseEntry(PeptideEntity peptideSeq, String dbSequence){
+        String pepSeqString = peptideSeq.getSequence().toUpperCase();
+        int pepStart = dbSequence.indexOf(pepSeqString);
+        // If peptide does not match protein string
+        if (pepStart == -1) {
+            return false;
+        }
+        else {
+            return true;
+        }
     }
 
 }
