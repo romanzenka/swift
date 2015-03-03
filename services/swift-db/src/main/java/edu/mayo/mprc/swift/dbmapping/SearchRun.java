@@ -30,8 +30,8 @@ public class SearchRun extends PersistableBase implements Serializable {
 	private int tasksFailed;
 	private int tasksCompleted;
 	private Set<ReportData> reports = new HashSet<ReportData>();
-	private transient String instruments; // Filled in by the DAO for convenience
 
+	private transient String instruments; // Filled in by the DAO for convenience
 	private transient Integer runningTasks;
 	private transient boolean quameter;
 
@@ -57,6 +57,7 @@ public class SearchRun extends PersistableBase implements Serializable {
 		tasksFailed = taskFailed;
 		this.tasksCompleted = tasksCompleted;
 		this.hidden = hidden ? 1 : 0;
+
 		this.instruments = instruments;
 	}
 

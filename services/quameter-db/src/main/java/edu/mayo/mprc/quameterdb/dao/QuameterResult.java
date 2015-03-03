@@ -190,7 +190,13 @@ public final class QuameterResult extends PersistableBase {
 	                      final Map<QuameterProteinGroup, Integer> identifiedSpectra) {
 		this.searchResult = searchResult;
 		this.fileSearch = fileSearch;
+		if (fileSearch != null && fileSearch.getSearchParameters() != null) {
+			this.searchParametersId = fileSearch.getSearchParameters().getId();
+		} else {
+			this.searchParametersId = 0;
+		}
 		this.identifiedSpectra = identifiedSpectra;
+		this.readOnlyIdentifiedSpectra = identifiedSpectra;
 		setValues(values);
 	}
 

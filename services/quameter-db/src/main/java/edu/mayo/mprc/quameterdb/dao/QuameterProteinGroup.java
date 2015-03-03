@@ -90,4 +90,11 @@ public final class QuameterProteinGroup extends EvolvableBase implements Cloneab
 	public QuameterProteinGroup clone() {
 		return new QuameterProteinGroup(getName(), getRegex());
 	}
+
+	@Override
+	public String toString() {
+		return "QuameterProteinGroup{" +
+				"name='" + name + '\'' +
+				'}';
+	}
 }

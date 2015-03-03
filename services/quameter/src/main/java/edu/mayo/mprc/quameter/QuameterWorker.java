@@ -22,6 +22,8 @@ import org.apache.log4j.Logger;
 import org.springframework.stereotype.Component;
 
 import java.io.File;
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
@@ -52,6 +54,11 @@ public final class QuameterWorker extends WorkerBase {
 
 	public void setExecutable(final File executable) {
 		this.executable = executable;
+	}
+
+	private static void param(List<String> parameters, String key, String value) {
+		parameters.add("-" + key);
+		parameters.add(value);
 	}
 
 	@Override
@@ -85,26 +92,31 @@ public final class QuameterWorker extends WorkerBase {
 
 		final List<String> parameters = new LinkedList<String>();
 		parameters.add(executable.getPath());
-		parameters.add("-workdir");
-		parameters.add(tempWorkFolder.getAbsolutePath());
-		parameters.add("-OutputFilepath");
-		parameters.add(createdResultFile.getAbsolutePath());
-		parameters.add("-StatusUpdateFrequency");
-		parameters.add("20");
-		parameters.add("-Instrument");
-		parameters.add(packet.isMonoisotopic() ? "orbi" : "ltq");
-		parameters.add("-RawDataPath");
-		parameters.add(rawFile.getParentFile().getAbsolutePath());
-		parameters.add("-RawDataFormat");
+		param(parameters, "workdir", tempWorkFolder.getAbsolutePath());
+		param(parameters, "OutputFilepath", createdResultFile.getAbsolutePath());
+		param(parameters, "Instrument", packet.isMonoisotopic() ? "orbi" : "ltq");
+		param(parameters, "RawDataPath", rawFile.getParentFile().getAbsolutePath());
 		if (rawFile.getName().endsWith(".mzML")) {
-			parameters.add("mzML");
+			param(parameters, "RawDataFormat", "mzML");
 		} else {
-			parameters.add("raw");
+			param(parameters, "RawDataFormat", "raw");
 		}
-		parameters.add("-ScoreCutoff");
-		parameters.add(String.valueOf(packet.getFdrScoreCutoff()));
-		parameters.add("-ChromatogramOutput");
-		parameters.add("false");
+		final NumberFormat format = new DecimalFormat("#0.00");
+		param(parameters, "ScoreCutoff", format.format(packet.getFdrScoreCutoff()));
+		param(parameters, "SpectrumListFilters", "threshold absolute 0.00000000001 most-intense");
+		param(parameters, "StatusUpdateFrequency", "20");
+		param(parameters, "UseMultipleProcessors", "true");
+		param(parameters, "MetricsType", "nistms");
+		param(parameters, "-NumChargeStates", "3");
+		if (packet.isMonoisotopic()) {
+			param(parameters, "ChromatogramMzLowerOffset", "20ppm");
+			param(parameters, "ChromatogramMzUpperOffset", "20ppm");
+		} else {
+			param(parameters, "ChromatogramMzLowerOffset", "0.5mz");
+			param(parameters, "ChromatogramMzUpperOffset", "1.0mz");
+		}
+		param(parameters, "ChromatogramOutput", "false");
+
 		parameters.add("-dump");
 
 		final String idpDbFilePath;

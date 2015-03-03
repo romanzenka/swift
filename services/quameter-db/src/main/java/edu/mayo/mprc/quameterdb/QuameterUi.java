@@ -225,7 +225,7 @@ public final class QuameterUi implements Dao, UiConfigurationProvider, Lifecycle
 
 		final Map<QuameterProteinGroup, Integer> identifiedSpectra = result.getReadOnlyIdentifiedSpectra();
 		for (final QuameterProteinGroup proteinGroup : proteinGroups) {
-			final Integer numSpectra = identifiedSpectra.get(proteinGroup);
+			final Integer numSpectra = identifiedSpectra != null ? identifiedSpectra.get(proteinGroup) : null;
 			writeValue(writer, numSpectra != null ? numSpectra : 0);
 		}
 
