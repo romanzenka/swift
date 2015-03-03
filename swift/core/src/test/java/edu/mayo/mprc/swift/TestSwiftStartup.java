@@ -15,14 +15,6 @@ import java.io.IOException;
  */
 public final class TestSwiftStartup {
 	/**
-	 * Running Swift with no arguments yields an error.
-	 */
-	@Test
-	public void shouldFailEmpty() {
-		Assert.assertEquals(Swift.runSwift(), ExitCode.Error);
-	}
-
-	/**
 	 * Swift with --help will produce help and end ok.
 	 */
 	@Test
