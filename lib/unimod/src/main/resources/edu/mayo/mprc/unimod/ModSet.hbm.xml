@@ -7,8 +7,7 @@
         </id>
 
         <!-- Field access is important, because the ModSet class does not allow mutation once saved -->
-        <set name="modifications" table="mod_set_specificities" lazy="false" cascade="save-update" access="field"
-            fetch="join">
+        <set name="modifications" table="mod_set_specificities" lazy="false" cascade="save-update" access="field">
             <key column="set_id" foreign-key="mod_set_specificities_ibfk_2" />
             <many-to-many column="specificity_id" class="edu.mayo.mprc.unimod.ModSpecificity"
                 foreign-key="mod_set_specificities_ibfk_1" />

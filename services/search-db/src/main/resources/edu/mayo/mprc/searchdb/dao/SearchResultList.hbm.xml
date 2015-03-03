@@ -9,7 +9,7 @@
 
         <property name="hash" column="hash" not-null="true"/>
 
-        <set name="list" table="search_result_list_members" mutable="false" lazy="false" fetch="join">
+        <set name="list" table="search_result_list_members" mutable="false">
             <key column="search_result_list_id" foreign-key="search_result_list_members_ibfk_1"/>
             <many-to-many column="search_result_id" class="SearchResult" foreign-key="search_result_list_members_ibfk_2"/>
         </set>

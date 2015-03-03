@@ -6,22 +6,23 @@
             <generator class="native" />
         </id>
 
-        <property name="hash" column="hash" not-null="true"/>
+        <property name="hash" column="hash" not-null="true" />
 
         <bag name="list" table="biological_sample_list_members" mutable="false">
-            <key column="biological_sample_list_id" foreign-key="biological_sample_list_members_ibfk_2"/>
-            <many-to-many column="biological_sample_id" class="BiologicalSample" lazy="false" fetch="join"
+            <key column="biological_sample_list_id" foreign-key="biological_sample_list_members_ibfk_2" />
+            <many-to-many column="biological_sample_id" class="BiologicalSample"
                 foreign-key="biological_sample_list_members_ibfk_1" />
         </bag>
     </class>
     <database-object>
         <create>
             ALTER TABLE `biological_sample_list` ADD INDEX `hash` (`hash`, `biological_sample_list_id`);
-            ALTER TABLE `biological_sample_list_members` ADD PRIMARY KEY (`biological_sample_list_id`, `biological_sample_id`);
+            ALTER TABLE `biological_sample_list_members` ADD PRIMARY KEY (`biological_sample_list_id`,
+            `biological_sample_id`);
         </create>
         <drop>
             ALTER TABLE `biological_sample_list` DROP INDEX `hash` ;
         </drop>
-        <dialect-scope name="org.hibernate.dialect.MySQLInnoDBDialect"/>
+        <dialect-scope name="org.hibernate.dialect.MySQLInnoDBDialect" />
     </database-object>
 </hibernate-mapping>

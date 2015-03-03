@@ -43,6 +43,7 @@ public final class ParamsDaoTest extends DaoTest {
 
 	@BeforeMethod
 	public void setup() {
+		LOGGER.debug("setup");
 		dao = new ParamsDaoHibernate();
 		unimodDao = new UnimodDaoHibernate();
 		curationDao = new CurationDaoHibernate();
@@ -78,6 +79,7 @@ public final class ParamsDaoTest extends DaoTest {
 
 	@AfterMethod
 	public void teardown() throws Throwable {
+		LOGGER.debug("teardown");
 		try {
 			dao.commit();
 		} catch (Exception t) {
@@ -165,7 +167,7 @@ public final class ParamsDaoTest extends DaoTest {
 	@Test
 	public void shouldUpdateInstrument() {
 		Instrument instrument = getSimpleInstrument();
-
+		LOGGER.debug("Add instrument");
 		instrument = dao.addInstrument(instrument, new Change("Creating new instrument", new DateTime()));
 		final int oldId = instrument.getId();
 
@@ -174,10 +176,21 @@ public final class ParamsDaoTest extends DaoTest {
 		set2.add(new IonSeries("y"));
 		Instrument instrument2 = new Instrument(instrument.getName(), set2, instrument.getMascotName());
 
+		LOGGER.debug("Change instrument ion series");
 		instrument2 = dao.updateInstrument(instrument2, new Change("Updating instrument", new DateTime()));
 
+		LOGGER.debug("Next transaction");
+		nextTransaction();
+
+		LOGGER.debug("List instruments");
+		final List<Instrument> instruments = dao.instruments();
+		Assert.assertEquals(instruments.size(), 1, "One instrument");
+
+		LOGGER.debug(instruments.toString());
+
+		LOGGER.debug("List ion series");
 		Assert.assertEquals(dao.ionSeries().size(), 3, "Three ion series total instrument");
-		Assert.assertEquals(dao.instruments().size(), 1, "One instrument");
+
 		Assert.assertFalse(instrument2.getId().equals(oldId), "The instrument id has to change");
 	}
 
