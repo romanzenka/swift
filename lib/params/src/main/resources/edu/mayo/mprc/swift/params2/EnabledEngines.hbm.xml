@@ -6,7 +6,7 @@
             <generator class="native" />
         </id>
 
-        <set name="engineConfigs" table="enabled_engines_set" lazy="false" cascade="none">
+        <set name="engineConfigs" table="enabled_engines_set" lazy="false" cascade="none" batch-size="100">
             <key column="set_id" foreign-key="enabled_engines_set_ibfk_1" />
             <many-to-many column="search_engine_id" class="edu.mayo.mprc.swift.params2.SearchEngineConfig"
                 foreign-key="enabled_engines_set_ibfk_2"/>
