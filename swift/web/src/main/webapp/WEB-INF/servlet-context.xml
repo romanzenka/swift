@@ -126,6 +126,20 @@
         <property name="swiftSearcherCaller" ref="swiftSearcherCaller" />
     </bean>
 
+    <!-- We go through DispatcherServlet so filters can be applied consistently -->
+    <bean id="forwardToJminix" class="org.springframework.web.servlet.mvc.ServletForwardingController">
+        <property name="servletName" value="JmxMiniConsoleServlet" />
+    </bean>
+
+    <!-- Map the /jmx to the Jminix console -->
+    <bean class="org.springframework.web.servlet.handler.SimpleUrlHandlerMapping">
+        <property name="mappings">
+            <map>
+                <entry key="/jmx/**" value-ref="forwardToJminix" />
+            </map>
+        </property>
+    </bean>
+
     <mvc:view-controller path="/dashboard" view-name="dashboard" />
     <mvc:view-controller path="/start/" view-name="start/index" />
     <mvc:view-controller path="/search-diff" view-name="search-diff/index" />

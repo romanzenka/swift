@@ -67,6 +67,13 @@
             <artifactId>spring-oxm</artifactId>
         </dependency>
 
+        <!-- Simple built-in JMX console -->
+        <dependency>
+            <groupId>org.jminix</groupId>
+            <artifactId>jminix</artifactId>
+            <version>1.1.0</version>
+        </dependency>
+
         <dependency>
             <groupId>org.codehaus.jackson</groupId>
             <artifactId>jackson-core-asl</artifactId>
