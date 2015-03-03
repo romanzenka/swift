@@ -170,7 +170,7 @@ public final class DatabaseUtilities {
 				"jdbc:h2:mem:test",
 				"sa", "", "org.hibernate.dialect.H2Dialect", "org.h2.Driver", "PUBLIC", "PUBLIC", hibernateProperties, mappingResources,
 				userTypes,
-				SchemaInitialization.CreateDrop, new DummyFileTokenTranslator());
+				SchemaInitialization.Create, new DummyFileTokenTranslator());
 	}
 
 	public static SessionFactory getTestSessionFactory(final List<String> mappingResources, final Map<String, UserType> userTypes) {
