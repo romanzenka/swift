@@ -9,7 +9,7 @@
         <property name="name" type="string" length="20" column="name" />
         <property name="mascotName" type="string" length="20" column="mascot_name" />
 
-        <set name="series" table="instrument_series" lazy="false" fetch="join">
+        <set name="series" table="instrument_series" lazy="false" fetch="select" batch-size="10">
             <key column="instrument_id" foreign-key="instrument_series_ibfk_2" />
             <many-to-many column="ion_series_id" class="edu.mayo.mprc.swift.params2.IonSeries"
                 foreign-key="instrument_series_ibfk_1" />
