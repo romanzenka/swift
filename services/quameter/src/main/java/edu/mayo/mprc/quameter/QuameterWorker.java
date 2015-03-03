@@ -107,7 +107,7 @@ public final class QuameterWorker extends WorkerBase {
 		param(parameters, "StatusUpdateFrequency", "20");
 		param(parameters, "UseMultipleProcessors", "true");
 		param(parameters, "MetricsType", "nistms");
-		param(parameters, "-NumChargeStates", "3");
+		param(parameters, "NumChargeStates", "3");
 		if (packet.isMonoisotopic()) {
 			param(parameters, "ChromatogramMzLowerOffset", "20ppm");
 			param(parameters, "ChromatogramMzUpperOffset", "20ppm");
