@@ -8,6 +8,7 @@ import edu.mayo.mprc.utilities.progress.PercentDone;
 import edu.mayo.mprc.utilities.progress.UserProgressReporter;
 
 import java.util.Collection;
+import java.util.Map;
 
 /**
  * Can load .FASTA file into a database for easy lookups of protein sequences.
@@ -43,6 +44,15 @@ public interface FastaDbDao extends BulkLoadJobStarter, RuntimeInitializer {
 	 * @return Protein sequence corresponding to the accession number.
 	 */
 	ProteinSequence getProteinSequence(Curation database, String accessionNumber);
+
+	/**
+	 * Get a protein sequence for a given list of accession numbers.
+	 *
+	 * @param database         A fasta database from which the accession numbers come.
+	 * @param accessionNumbers A list of accession numbers of the proteins.
+	 * @return Map from accnum to sequence corresponding to the accession number.
+	 */
+	Map<String, ProteinSequence> getProteinSequences(Curation database, Collection<String> accessionNumbers);
 
 	/**
 	 * Find a matching protein description for given accession number.

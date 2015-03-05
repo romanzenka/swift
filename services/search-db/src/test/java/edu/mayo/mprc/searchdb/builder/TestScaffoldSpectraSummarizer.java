@@ -2,6 +2,7 @@ package edu.mayo.mprc.searchdb.builder;
 
 import com.google.common.base.Charsets;
 import com.google.common.base.Strings;
+import com.google.common.collect.Maps;
 import com.google.common.io.Resources;
 import edu.mayo.mprc.MprcException;
 import edu.mayo.mprc.fastadb.ProteinSequence;
@@ -23,7 +24,10 @@ import org.testng.annotations.Test;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map;
 
 /**
  * Tests the summary report for the scaffold spectra file.
@@ -257,8 +261,6 @@ public class TestScaffoldSpectraSummarizer {
 	}
 
 	private static class DummyTranslator implements ProteinSequenceTranslator {
-
-		@Override
 		public ProteinSequence getProteinSequence(final String accessionNumber, final String databaseSources) {
 			if (Strings.isNullOrEmpty(databaseSources)) {
 				throw new MprcException("Database was null");
@@ -267,6 +269,15 @@ public class TestScaffoldSpectraSummarizer {
 				throw new MprcException("Unspecified accession number");
 			}
 			return new ProteinSequence("CAT");
+		}
+
+		@Override
+		public Map<String, ProteinSequence> getProteinSequence(Collection<String> accessionNumbers, String databaseSources) {
+			HashMap<String, ProteinSequence> results = Maps.newHashMapWithExpectedSize(accessionNumbers.size());
+			for (String accNum : accessionNumbers) {
+				results.put(accNum, getProteinSequence(accNum, databaseSources));
+			}
+			return results;
 		}
 	}
 }

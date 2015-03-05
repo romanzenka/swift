@@ -5,10 +5,7 @@ import edu.mayo.mprc.MprcException;
 import edu.mayo.mprc.searchdb.dao.BiologicalSample;
 import edu.mayo.mprc.searchdb.dao.BiologicalSampleList;
 
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Builds a list of biological samples.
@@ -54,5 +51,11 @@ public class BiologicalSampleListBuilder implements Builder<BiologicalSampleList
 			samples.add(builder.build());
 		}
 		return new BiologicalSampleList(samples);
+	}
+
+	public void collectAccnums(final Set<String> allAccnums) {
+		for (final BiologicalSampleBuilder sb : biologicalSamples.values()) {
+			sb.collectAccnums(allAccnums);
+		}
 	}
 }

@@ -1,5 +1,6 @@
 package edu.mayo.mprc.searchdb.bulk;
 
+import com.google.common.collect.Maps;
 import edu.mayo.mprc.MprcException;
 import edu.mayo.mprc.database.Change;
 import edu.mayo.mprc.database.DaoTest;
@@ -188,7 +189,7 @@ public final class BulkLoadingTest extends DaoTest {
 		final SearchResultListBuilder searchResults = builder.getBiologicalSamples().getBiologicalSample("sample", "category").getSearchResults();
 		final SearchResultBuilder tandemMassSpecResult = searchResults.getTandemMassSpecResult("test.RAW");
 		for (int i = 0; i < 100; i++) {
-			tandemMassSpecResult.getProteinGroups().getProteinGroup("AC" + i, "database", 1, 1, 1, 0.1, 0.2, 0.3);
+			tandemMassSpecResult.getProteinGroups().getProteinGroup("AC" + i, 1, 1, 1, 0.1, 0.2, 0.3);
 		}
 
 		nextTransaction();
@@ -215,12 +216,19 @@ public final class BulkLoadingTest extends DaoTest {
 
 
 	private static class DummyTranslator implements ProteinSequenceTranslator {
-		@Override
 		public ProteinSequence getProteinSequence(final String accessionNumber, final String databaseSources) {
 			final String sequence = getRandomSequence(accessionNumber, PROTEIN_MIN, PROTEIN_MAX);
 
 			return new ProteinSequence(sequence);
 		}
 
+		@Override
+		public Map<String, ProteinSequence> getProteinSequence(Collection<String> accessionNumbers, String databaseSources) {
+			HashMap<String, ProteinSequence> results = Maps.newHashMapWithExpectedSize(accessionNumbers.size());
+			for (String accNum : accessionNumbers) {
+				results.put(accNum, getProteinSequence(accNum, databaseSources));
+			}
+			return results;
+		}
 	}
 }

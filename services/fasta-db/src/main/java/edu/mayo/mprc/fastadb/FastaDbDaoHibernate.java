@@ -1,6 +1,7 @@
 package edu.mayo.mprc.fastadb;
 
 import com.google.common.base.Preconditions;
+import com.google.common.collect.Maps;
 import edu.mayo.mprc.MprcException;
 import edu.mayo.mprc.database.Database;
 import edu.mayo.mprc.database.bulk.BulkDaoBase;
@@ -28,6 +29,7 @@ import java.util.*;
  */
 @Repository("fastaDbDao")
 public final class FastaDbDaoHibernate extends BulkDaoBase implements FastaDbDao {
+	public static final int IDS_AT_A_TIME = 1000;
 	private static final Logger LOGGER = Logger.getLogger(FastaDbDaoHibernate.class);
 	// Progress will be checked each X spectra
 	public static final long REPORT_FREQUENCY = 100L;
@@ -56,6 +58,37 @@ public final class FastaDbDaoHibernate extends BulkDaoBase implements FastaDbDao
 				.setEntity("database", database)
 				.setString("accessionNumber", accessionNumber)
 				.uniqueResult();
+	}
+
+	@Override
+	public Map<String, ProteinSequence> getProteinSequences(final Curation database, final Collection<String> accessionNumbers) {
+		Preconditions.checkNotNull(database, "Database has to be specified");
+		if (accessionNumbers.isEmpty()) {
+			return Maps.newHashMap();
+		}
+
+		final Object[] ids = accessionNumbers.toArray();
+
+		final Map<String, ProteinSequence> completeMap = Maps.newHashMapWithExpectedSize(ids.length);
+
+		for (int i = 0; i < ids.length; i += IDS_AT_A_TIME) {
+			final int endIndex = Math.min(ids.length, i + IDS_AT_A_TIME);
+			final Query query = getSession()
+					.createQuery("select a.accnum, e.sequence from ProteinEntry as e, ProteinAccnum a " +
+							"where e.accessionNumber = a and e.database=:database and a.accnum in (:ids)")
+					.setParameter("database", database)
+					.setParameterList("ids", Arrays.copyOfRange(ids, i, endIndex));
+
+			final List<Object> objects = listAndCast(query);
+			for (final Object o : objects) {
+				final Object[] a = (Object[]) o;
+				final String accNum = (String) a[0];
+				final ProteinSequence sequence = (ProteinSequence) a[1];
+				completeMap.put(accNum, sequence);
+			}
+		}
+
+		return completeMap;
 	}
 
 	@Override

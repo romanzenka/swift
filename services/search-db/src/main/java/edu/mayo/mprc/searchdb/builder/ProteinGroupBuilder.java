@@ -1,11 +1,8 @@
 package edu.mayo.mprc.searchdb.builder;
 
-import edu.mayo.mprc.MprcException;
-import edu.mayo.mprc.fastadb.ProteinSequence;
 import edu.mayo.mprc.searchdb.dao.ProteinGroup;
-import edu.mayo.mprc.searchdb.dao.ProteinSequenceList;
 
-import java.util.Locale;
+import java.util.Set;
 
 /**
  * @author Roman Zenka
@@ -13,7 +10,7 @@ import java.util.Locale;
 public class ProteinGroupBuilder implements Builder<ProteinGroup> {
 	private SearchResultBuilder searchResult;
 
-	private ProteinSequenceList proteinSequences;
+	private ProteinSequenceListBuilder proteinSequences;
 	private double proteinIdentificationProbability;
 	private int numberOfUniquePeptides;
 	private int numberOfUniqueSpectra;
@@ -33,7 +30,7 @@ public class ProteinGroupBuilder implements Builder<ProteinGroup> {
 
 	@Override
 	public ProteinGroup build() {
-		return new ProteinGroup(proteinSequences,
+		return new ProteinGroup(proteinSequences.build(),
 				proteinIdentificationProbability, numberOfUniquePeptides,
 				numberOfUniqueSpectra, numberOfTotalSpectra, percentageOfTotalSpectra,
 				percentageSequenceCoverage);
@@ -43,11 +40,15 @@ public class ProteinGroupBuilder implements Builder<ProteinGroup> {
 		return searchResult;
 	}
 
-	public ProteinSequenceList getProteinSequences() {
+	public void collectAccnums(Set<String> accnum) {
+		accnum.addAll(proteinSequences.getAccNums());
+	}
+
+	public ProteinSequenceListBuilder getProteinSequences() {
 		return proteinSequences;
 	}
 
-	public void setProteinSequences(final ProteinSequenceList proteinSequences) {
+	public void setProteinSequences(final ProteinSequenceListBuilder proteinSequences) {
 		this.proteinSequences = proteinSequences;
 	}
 
@@ -97,25 +98,5 @@ public class ProteinGroupBuilder implements Builder<ProteinGroup> {
 
 	public void setPercentageSequenceCoverage(final double percentageSequenceCoverage) {
 		this.percentageSequenceCoverage = percentageSequenceCoverage;
-	}
-
-	public String[] getFlankingAminoAcids(final String peptideSequence) {
-		final String needle = peptideSequence.toUpperCase(Locale.US);
-		for (final ProteinSequence sequence : proteinSequences.getList()) {
-			final String haystack = sequence.getSequence().toUpperCase(Locale.US);
-			final int index = haystack.indexOf(needle);
-			if (index >= 0 && needle.length() + index <= haystack.length()) {
-				final int prevIndex = index - 1;
-				final int nextIndex = index + needle.length();
-				return new String[]{
-						String.valueOf(prevIndex >= 0 ? haystack.charAt(prevIndex) : '-'),
-						String.valueOf(nextIndex < haystack.length() ? haystack.charAt(nextIndex) : '-')
-				};
-			}
-		}
-		throw new MprcException(
-				String.format("Could not determine flanking amino acid sequences for peptide [%s] in protein [%s]",
-						needle,
-						proteinSequences.getList().iterator().next().getSequence()));
 	}
 }

@@ -48,6 +48,8 @@ public class ScaffoldSpectraSummarizer extends ScaffoldReportReader {
 	private int percentageSequenceCoverage;
 	private int proteinIdentificationProbability;
 
+	private String databaseSourcesValue;
+
 	/**
 	 * @param translator            Can translate accession number + database name into a protein sequence.
 	 * @param massSpecDataExtractor Can obtain metadata about the .RAW files.
@@ -114,11 +116,17 @@ public class ScaffoldSpectraSummarizer extends ScaffoldReportReader {
 		fillCurrentLine(line);
 		final BiologicalSampleBuilder biologicalSample = analysis.getBiologicalSamples().getBiologicalSample(currentLine[biologicalSampleName], currentLine[biologicalSampleCategory]);
 		final SearchResultBuilder searchResult = biologicalSample.getSearchResults().getTandemMassSpecResult(FileUtilities.stripGzippedExtension(currentLine[msmsSampleName]));
-		String databaseSources = Strings.isNullOrEmpty(currentLine[this.databaseSources]) ? databaseName : currentLine[this.databaseSources];
+		String databaseSourcesValue = Strings.isNullOrEmpty(currentLine[this.databaseSources]) ? databaseName : currentLine[this.databaseSources];
+		if (this.databaseSourcesValue == null) {
+			this.databaseSourcesValue = databaseSourcesValue;
+			analysis.setDatabaseSources(databaseSourcesValue);
+		} else {
+			if (!this.databaseSourcesValue.equals(databaseSourcesValue)) {
+				throw new MprcException("Only single-database Scaffold experiments are supported, saw two different database names: " + this.databaseSourcesValue + ", " + databaseSourcesValue);
+			}
+		}
 		searchResult.getProteinGroups().getProteinGroup(
 				currentLine[proteinAccessionNumbers],
-				databaseSources,
-
 				parseInt(currentLine[numberOfTotalSpectra]),
 				parseInt(currentLine[numberOfUniquePeptides]),
 				parseInt(currentLine[numberOfUniqueSpectra]),
@@ -134,7 +142,7 @@ public class ScaffoldSpectraSummarizer extends ScaffoldReportReader {
 	 *
 	 * @param s String representation of the number.
 	 * @return The number parsed. If the number is missing. {@link Double#NaN} is returned. Commas separating thousands
-	 *         are handled as if they were not present. Trailing percent sign is removed if present.
+	 * are handled as if they were not present. Trailing percent sign is removed if present.
 	 */
 	static Double parseDouble(final String s) {
 		if ("".equals(s)) {

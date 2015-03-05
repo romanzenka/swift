@@ -3,10 +3,7 @@ package edu.mayo.mprc.searchdb.builder;
 import edu.mayo.mprc.searchdb.dao.SearchResult;
 import edu.mayo.mprc.searchdb.dao.SearchResultList;
 
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Builds the list of search results.
@@ -50,5 +47,11 @@ public class SearchResultListBuilder implements Builder<SearchResultList> {
 			return newSearchResult;
 		}
 		return searchResult;
+	}
+
+	public void collectAccnums(Set<String> allAccnums) {
+		for (SearchResultBuilder sr : list.values()) {
+			sr.collectAccnums(allAccnums);
+		}
 	}
 }

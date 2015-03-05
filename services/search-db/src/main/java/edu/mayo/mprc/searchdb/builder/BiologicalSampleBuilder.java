@@ -2,6 +2,8 @@ package edu.mayo.mprc.searchdb.builder;
 
 import edu.mayo.mprc.searchdb.dao.BiologicalSample;
 
+import java.util.Set;
+
 /**
  * Builds biological samples.
  *
@@ -89,5 +91,9 @@ public class BiologicalSampleBuilder implements Builder<BiologicalSample> {
 		int result = sampleName != null ? sampleName.hashCode() : 0;
 		result = 31 * result + (category != null ? category.hashCode() : 0);
 		return result;
+	}
+
+	public void collectAccnums(final Set<String> allAccnums) {
+		getSearchResults().collectAccnums(allAccnums);
 	}
 }

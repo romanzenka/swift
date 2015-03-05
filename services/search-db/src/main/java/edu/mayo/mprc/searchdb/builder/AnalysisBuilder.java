@@ -1,5 +1,6 @@
 package edu.mayo.mprc.searchdb.builder;
 
+import com.google.common.collect.Sets;
 import edu.mayo.mprc.MprcException;
 import edu.mayo.mprc.fastadb.ProteinSequence;
 import edu.mayo.mprc.fastadb.ProteinSequenceTranslator;
@@ -7,10 +8,7 @@ import edu.mayo.mprc.searchdb.dao.*;
 import edu.mayo.mprc.swift.dbmapping.ReportData;
 import org.joda.time.DateTime;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @author Roman Zenka
@@ -60,6 +58,8 @@ public class AnalysisBuilder implements Builder<Analysis> {
 
 	private Analysis analysis;
 
+	private String databaseSources;
+
 	public AnalysisBuilder(final ProteinSequenceTranslator translator, final MassSpecDataExtractor massSpecDataExtractor) {
 		this.translator = translator;
 		this.massSpecDataExtractor = massSpecDataExtractor;
@@ -74,6 +74,16 @@ public class AnalysisBuilder implements Builder<Analysis> {
 		if (analysis != null) {
 			throw new MprcException("Analysis cannot be built more than once");
 		}
+
+		// Collect all accession numbers and prepare the translation arrays
+		final HashSet<String> allAccnums = Sets.newHashSetWithExpectedSize(10000);
+		biologicalSamples.collectAccnums(allAccnums);
+
+		proteinSequencesByAccnum = getTranslator().getProteinSequence(allAccnums, getDatabaseSources());
+		for (final Map.Entry<String, ProteinSequence> entry : proteinSequencesByAccnum.entrySet()) {
+			proteinSequencesBySequence.put(entry.getValue().getSequence(), entry.getValue());
+		}
+
 		analysis = new Analysis(scaffoldVersion, analysisDate, biologicalSamples.build());
 		return analysis;
 	}
@@ -85,24 +95,17 @@ public class AnalysisBuilder implements Builder<Analysis> {
 		return proteinSequencesBySequence.values();
 	}
 
-	ProteinSequence getProteinSequence(final String accessionNumber, final String databaseSources) {
+	ProteinSequence getProteinSequence(final String accessionNumber) {
 		final ProteinSequence proteinSequence = proteinSequencesByAccnum.get(accessionNumber);
 		if (proteinSequence == null) {
-			final ProteinSequence newProteinSequence = translator.getProteinSequence(accessionNumber, databaseSources);
-			ProteinSequence result = proteinSequencesBySequence.get(newProteinSequence.getSequence());
-			if (result == null) {
-				proteinSequencesBySequence.put(newProteinSequence.getSequence(), newProteinSequence);
-				result = newProteinSequence;
-			}
-			proteinSequencesByAccnum.put(accessionNumber, result);
-			return result;
+			throw new MprcException("Could not find protein sequence for accnum " + accessionNumber);
 		}
 		return proteinSequence;
 	}
 
 	/**
 	 * @return A list of all {@link ProteinSequenceList} objects in the Analysis, each listed only once.
-	 *         The duplicities are resolved within the existing analysis.
+	 * The duplicities are resolved within the existing analysis.
 	 */
 	public Collection<ProteinSequenceList> calculateProteinSequenceLists() {
 		final LinkedHashMap<ProteinSequenceList, ProteinSequenceList> map = new LinkedHashMap<ProteinSequenceList, ProteinSequenceList>();
@@ -124,6 +127,13 @@ public class AnalysisBuilder implements Builder<Analysis> {
 		return map.values();
 	}
 
+	public String getDatabaseSources() {
+		return databaseSources;
+	}
+
+	public void setDatabaseSources(String databaseSources) {
+		this.databaseSources = databaseSources;
+	}
 
 	public ReportData getReportData() {
 		return reportData;

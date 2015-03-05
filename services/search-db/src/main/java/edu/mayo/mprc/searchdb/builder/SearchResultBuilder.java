@@ -3,6 +3,8 @@ package edu.mayo.mprc.searchdb.builder;
 import edu.mayo.mprc.searchdb.dao.SearchResult;
 import edu.mayo.mprc.searchdb.dao.TandemMassSpectrometrySample;
 
+import java.util.Set;
+
 /**
  * @author Roman Zenka
  */
@@ -68,5 +70,9 @@ public class SearchResultBuilder implements Builder<SearchResult> {
 		int result = massSpecSample != null ? massSpecSample.hashCode() : 0;
 		result = 31 * result + (proteinGroups != null ? proteinGroups.hashCode() : 0);
 		return result;
+	}
+
+	public void collectAccnums(final Set<String> allAccnums) {
+		proteinGroups.collectAccnums(allAccnums);
 	}
 }

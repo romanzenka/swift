@@ -5,6 +5,8 @@ import edu.mayo.mprc.dbcurator.model.Curation;
 import edu.mayo.mprc.dbcurator.model.CurationDao;
 import edu.mayo.mprc.utilities.FileUtilities;
 
+import java.util.Collection;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -26,7 +28,7 @@ public class SingleDatabaseTranslator implements ProteinSequenceTranslator {
 	}
 
 	@Override
-	public ProteinSequence getProteinSequence(final String accessionNumber, final String databaseSources) {
+	public Map<String, ProteinSequence> getProteinSequence(Collection<String> accessionNumbers, String databaseSources) {
 		if (database == null) {
 			if (databaseSources.contains(",")) {
 				throw new MprcException("Multiple databases per Scaffold file not supported: [" + databaseSources + "]");
@@ -59,7 +61,6 @@ public class SingleDatabaseTranslator implements ProteinSequenceTranslator {
 				throw new MprcException("Swift supports only a single FASTA database per Scaffold file. Two databases encountered: [" + currentDatabaseSources + "] and [" + cleanedDatabaseName + "]");
 			}
 		}
-		return fastaDbDao.getProteinSequence(database, accessionNumber);
+		return fastaDbDao.getProteinSequences(database, accessionNumbers);
 	}
-
 }
