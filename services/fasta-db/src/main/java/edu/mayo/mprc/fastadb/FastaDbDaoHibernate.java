@@ -1,7 +1,9 @@
 package edu.mayo.mprc.fastadb;
 
+import com.google.common.base.Joiner;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 import edu.mayo.mprc.MprcException;
 import edu.mayo.mprc.database.Database;
 import edu.mayo.mprc.database.bulk.BulkDaoBase;
@@ -67,7 +69,9 @@ public final class FastaDbDaoHibernate extends BulkDaoBase implements FastaDbDao
 			return Maps.newHashMap();
 		}
 
-		final Object[] ids = accessionNumbers.toArray();
+		final Set<String> unmappedAccnums = Sets.newHashSet(accessionNumbers);
+
+		final Object[] ids = unmappedAccnums.toArray();
 
 		final Map<String, ProteinSequence> completeMap = Maps.newHashMapWithExpectedSize(ids.length);
 
@@ -83,12 +87,17 @@ public final class FastaDbDaoHibernate extends BulkDaoBase implements FastaDbDao
 			for (final Object o : objects) {
 				final Object[] a = (Object[]) o;
 				final String accNum = (String) a[0];
+				unmappedAccnums.remove(accNum);
 				final ProteinSequence sequence = (ProteinSequence) a[1];
 				if (sequence == null) {
 					throw new MprcException(MessageFormat.format("Could not find description for protein [{0}] in database [{1}]", accNum, database.getShortName()));
 				}
 				completeMap.put(accNum, sequence);
 			}
+		}
+
+		if (unmappedAccnums.size() > 0) {
+			throw new MprcException("Database " + database.getShortName() + " did not contain " + unmappedAccnums.size() + " accession numbers: " + Joiner.on(", ").join(unmappedAccnums).toString());
 		}
 
 		return completeMap;
