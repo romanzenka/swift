@@ -1,5 +1,6 @@
 package edu.mayo.mprc.fastadb;
 
+import com.google.common.collect.Lists;
 import edu.mayo.mprc.MprcException;
 import edu.mayo.mprc.database.DaoTest;
 import edu.mayo.mprc.dbcurator.model.Curation;
@@ -96,7 +97,7 @@ public class TestFastaDbDao extends DaoTest {
 		fastaDbDao.begin();
 		try {
 			final ProteinSequenceTranslator translator = new SingleDatabaseTranslator(fastaDbDao, curationDao);
-			final ProteinSequence proteinSequence = translator.getProteinSequence("K1C9_HUMAN", "Current_SP.fasta.gz");
+			final ProteinSequence proteinSequence = translator.getProteinSequence(Lists.newArrayList("K1C9_HUMAN"), "Current_SP.fasta.gz").values().iterator().next();
 			Assert.assertEquals(proteinSequence.getSequence(),
 					"MSCRQFSSSYLSRSGGGGGGGLGSGGSIRSSYSRFSSSGGGGGGGRFSSSSGYGGGSSRVCGRGGGGSFGYSYGGGSGGG" +
 							"FSASSLGGGFGGGSRGFGGASGGGYSSSGGFGGGFGGGSGGGFGGGYGSGFGGFGGFGGGAGGGDGGILTANEKSTMQEL" +
@@ -108,8 +109,12 @@ public class TestFastaDbDao extends DaoTest {
 							"GSGSGGGSGGGYGGGSGSRGGSGGSHGGGSGFGGESGGSYGGGEEASGSGGGYGGGSGKSSHS"
 			);
 
-			final ProteinSequence sequence2 = translator.getProteinSequence("nonexistent", "Current_SP");
-			Assert.assertNull(sequence2, "No sequence found means null should be returned");
+			try {
+				translator.getProteinSequence(Lists.newArrayList("nonexistent"), "Current_SP").values().iterator().next();
+				Assert.fail("Exception should be thrown");
+			} catch (Exception ignore) {
+			}
+
 		} finally {
 			fastaDbDao.commit();
 		}
@@ -124,7 +129,7 @@ public class TestFastaDbDao extends DaoTest {
 		fastaDbDao.begin();
 		try {
 			final ProteinSequenceTranslator translator = new SingleDatabaseTranslator(fastaDbDao, curationDao);
-			final ProteinSequence proteinSequence = translator.getProteinSequence("K1C9_HUMAN", "Current_SP_20120716.fasta.gz");
+			final ProteinSequence proteinSequence = translator.getProteinSequence(Lists.newArrayList("K1C9_HUMAN"), "Current_SP_20120716.fasta.gz").values().iterator().next();
 			Assert.assertEquals(proteinSequence.getSequence(),
 					"MSCRQFSSSYLSRSGGGGGGGLGSGGSIRSSYSRFSSSGGGGGGGRFSSSSGYGGGSSRVCGRGGGGSFGYSYGGGSGGG" +
 							"FSASSLGGGFGGGSRGFGGASGGGYSSSGGFGGGFGGGSGGGFGGGYGSGFGGFGGFGGGAGGGDGGILTANEKSTMQEL" +
@@ -136,8 +141,11 @@ public class TestFastaDbDao extends DaoTest {
 							"GSGSGGGSGGGYGGGSGSRGGSGGSHGGGSGFGGESGGSYGGGEEASGSGGGYGGGSGKSSHS"
 			);
 
-			final ProteinSequence sequence2 = translator.getProteinSequence("nonexistent", "Current_SP_20120716");
-			Assert.assertNull(sequence2, "No sequence found means null should be returned");
+			try {
+				translator.getProteinSequence(Lists.newArrayList("nonexistent"), "Current_SP_20120716").values().iterator().next();
+				Assert.fail("Exception should be thrown");
+			} catch (Exception ignore) {
+			}
 		} finally {
 			fastaDbDao.commit();
 		}
