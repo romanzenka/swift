@@ -84,6 +84,9 @@ public final class FastaDbDaoHibernate extends BulkDaoBase implements FastaDbDao
 				final Object[] a = (Object[]) o;
 				final String accNum = (String) a[0];
 				final ProteinSequence sequence = (ProteinSequence) a[1];
+				if (sequence == null) {
+					throw new MprcException("No sequence for accession " + accNum);
+				}
 				completeMap.put(accNum, sequence);
 			}
 		}
