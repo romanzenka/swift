@@ -86,7 +86,7 @@ public final class FastaDbDaoHibernate extends BulkDaoBase implements FastaDbDao
 			final List<Object> objects = listAndCast(query);
 			for (final Object o : objects) {
 				final Object[] a = (Object[]) o;
-				final String accNum = (String) a[0];
+				final String accNum = ((String) a[0]).toUpperCase(Locale.US);
 				unmappedAccnums.remove(accNum);
 				final ProteinSequence sequence = (ProteinSequence) a[1];
 				if (sequence == null) {

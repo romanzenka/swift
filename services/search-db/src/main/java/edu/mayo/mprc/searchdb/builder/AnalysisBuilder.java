@@ -96,7 +96,7 @@ public class AnalysisBuilder implements Builder<Analysis> {
 	}
 
 	ProteinSequence getProteinSequence(final String accessionNumber) {
-		final ProteinSequence proteinSequence = proteinSequencesByAccnum.get(accessionNumber);
+		final ProteinSequence proteinSequence = proteinSequencesByAccnum.get(accessionNumber.toUpperCase(Locale.US));
 		if (proteinSequence == null) {
 			throw new MprcException("Could not find protein sequence for accnum " + accessionNumber);
 		}
