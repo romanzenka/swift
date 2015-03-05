@@ -69,7 +69,11 @@ public final class FastaDbDaoHibernate extends BulkDaoBase implements FastaDbDao
 			return Maps.newHashMap();
 		}
 
-		final Set<String> unmappedAccnums = Sets.newHashSet(accessionNumbers);
+		final Set<String> unmappedAccnums = Sets.newHashSetWithExpectedSize(accessionNumbers.size());
+
+		for (final String accNum : accessionNumbers) {
+			unmappedAccnums.add(accNum.toUpperCase(Locale.US));
+		}
 
 		final Object[] ids = unmappedAccnums.toArray();
 
@@ -79,7 +83,7 @@ public final class FastaDbDaoHibernate extends BulkDaoBase implements FastaDbDao
 			final int endIndex = Math.min(ids.length, i + IDS_AT_A_TIME);
 			final Query query = getSession()
 					.createQuery("select a.accnum, e.sequence from ProteinEntry as e, ProteinAccnum a " +
-							"where e.accessionNumber = a and e.database=:database and a.accnum in (:ids)")
+							"where e.accessionNumber = a and e.database=:database and upper(a.accnum) in (:ids)")
 					.setParameter("database", database)
 					.setParameterList("ids", Arrays.copyOfRange(ids, i, endIndex));
 
