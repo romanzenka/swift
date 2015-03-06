@@ -7,7 +7,7 @@
     <title>QuaMeter Unhide | ${title}</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="<spring:url value="/common/bootstrap/css/bootstrap.min.css"/>" rel="stylesheet" media="screen">
-    <link href="<spring:url value="/quameter/css/quameter.css"/>" rel="stylesheet" media="screen">
+    <link href="<spring:url value="/quameter/css/quameter.css?v=${ver}"/>" rel="stylesheet" media="screen">
 </head>
 <body>
 <div class="container-fluid">

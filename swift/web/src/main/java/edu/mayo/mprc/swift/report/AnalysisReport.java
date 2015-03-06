@@ -2,6 +2,7 @@ package edu.mayo.mprc.swift.report;
 
 import com.google.common.base.Charsets;
 import edu.mayo.mprc.MprcException;
+import edu.mayo.mprc.ReleaseInfoCore;
 import edu.mayo.mprc.searchdb.dao.Analysis;
 import edu.mayo.mprc.searchdb.dao.Report;
 import edu.mayo.mprc.searchdb.dao.SearchDbDao;
@@ -56,7 +57,7 @@ public class AnalysisReport implements HttpRequestHandler {
 
 				writer.write("<html><head><title>Scaffold Report | " + webUiHolder.getWebUi().getTitle()
 						+ "</title>\n" +
-						"<link rel=\"stylesheet\" href=\"/report/analysis.css\" type=\"text/css\">\n" +
+						"<link rel=\"stylesheet\" href=\"/report/analysis.css?v=" + ReleaseInfoCore.buildRevision() + "\" type=\"text/css\">\n" +
 						"<link href='http://fonts.googleapis.com/css?family=PT+Sans' rel='stylesheet' type='text/css'>\n" +
 						"</head><body>\n");
 				writer.write("<h1>Scaffold Report</h1>\n");

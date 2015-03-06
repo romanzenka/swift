@@ -1,5 +1,6 @@
 package edu.mayo.mprc.swift;
 
+import edu.mayo.mprc.ReleaseInfoCore;
 import edu.mayo.mprc.swift.resources.WebUi;
 import edu.mayo.mprc.swift.resources.WebUiHolder;
 import org.springframework.ui.ModelMap;
@@ -35,6 +36,7 @@ public final class CommonModelInterceptor extends HandlerInterceptorAdapter {
 			model.addAttribute("userMessage", getWebUi().getUserMessage().getMessage());
 			model.addAttribute("pathPrefix", getPathPrefix());
 			model.addAttribute("pathWebPrefix", getWebUi().getBrowseWebRoot());
+			model.addAttribute("ver", ReleaseInfoCore.buildRevision());
 		}
 		super.postHandle(request, response, handler, modelAndView);
 	}

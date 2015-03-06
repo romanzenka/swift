@@ -10,7 +10,7 @@
     <!--
     ${buildVersion}
     -->
-    <link rel="stylesheet" href="/common/topbar.css" media="all">
+    <link rel="stylesheet" href="/common/topbar.css?v=${ver}" media="all">
     <style type="text/css">
         body, tr, th, td {
             font-family: arial, sans-serif;

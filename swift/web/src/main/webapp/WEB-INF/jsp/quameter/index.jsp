@@ -6,7 +6,7 @@
 
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="/common/bootstrap/css/bootstrap.min.css" rel="stylesheet" media="screen">
-    <link href="/quameter/css/quameter.css" rel="stylesheet" media="screen">
+    <link href="/quameter/css/quameter.css?v=${ver}" rel="stylesheet" media="screen">
 
     <!-- HTML5 shim, for IE6-8 support of HTML5 elements -->
     <!--[if lt IE 9]>
@@ -122,9 +122,9 @@
     var metrics = ${metricsJson};
 </script>
 
-<script type="text/javascript" src="../../../quameter/js/dygraph-combined.js"></script>
-<script type="text/javascript" src="../../../quameter/js/quameter-definitions.js"></script>
-<script type="text/javascript" src="../../../quameter/js/quameter.js"></script>
+<script type="text/javascript" src="../../../quameter/js/dygraph-combined.js?v=${ver}"></script>
+<script type="text/javascript" src="../../../quameter/js/quameter-definitions.js?v=${ver}"></script>
+<script type="text/javascript" src="../../../quameter/js/quameter.js?v=${ver}"></script>
 <script type="text/javascript">
     var graphDataSrvr = ${dataJson};
     // Set a callback to run when the Google Visualization API is loaded.

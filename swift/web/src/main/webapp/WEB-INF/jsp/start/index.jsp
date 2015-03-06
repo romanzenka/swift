@@ -5,17 +5,17 @@
     <meta name='gwt:module' content='edu.mayo.mprc.swift.ui.SwiftApp'>
     <meta HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=utf-8">
     <meta Http-Equiv="Cache-Control" Content="no-cache">
-    <link rel=stylesheet href="DBCurator.css" media="all">
-    <link rel="stylesheet" href="/start/SwiftApp.css" media="all">
-    <link rel="stylesheet" href="/common/topbar.css" media="all">
-    <link rel="stylesheet" href="/start/filechooser/style.css" media="all">
+    <link rel=stylesheet href="DBCurator.css?v=${ver}" media="all">
+    <link rel="stylesheet" href="/start/SwiftApp.css?v=${ver}" media="all">
+    <link rel="stylesheet" href="/common/topbar.css?v=${ver}" media="all">
+    <link rel="stylesheet" href="/start/filechooser/style.css?v=${ver}" media="all">
 
     <script type="text/javascript" src="/start/start.nocache.js"></script>
     <script type="text/javascript" src="/start/filechooser/jquery-1.7.min.js"></script>
-    <script type="text/javascript" src="/start/filechooser/cookies.js"></script>
-    <script type="text/javascript" src="/start/filechooser/expanded.js"></script>
-    <script type="text/javascript" src="/start/filechooser/dialog.js"></script>
-    <script type="text/javascript" src="/start/filechooser/startup.js"></script>
+    <script type="text/javascript" src="/start/filechooser/cookies.js?v=${ver}"></script>
+    <script type="text/javascript" src="/start/filechooser/expanded.js?v=${ver}"></script>
+    <script type="text/javascript" src="/start/filechooser/dialog.js?v=${ver}"></script>
+    <script type="text/javascript" src="/start/filechooser/startup.js?v=${ver}"></script>
 </head>
 <body>
 <iframe src="javascript:''" id='__gwt_historyFrame' style='position:absolute;width:0;height:0;border:0'></iframe>

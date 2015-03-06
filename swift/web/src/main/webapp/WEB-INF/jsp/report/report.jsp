@@ -21,13 +21,13 @@
         var pathWebPrefix = "${pathWebPrefix}";
     </script>
 
-    <link rel="stylesheet" href="/report/report.css">
-    <script type="text/javascript" src="/start/filechooser/cookies.js"></script>
+    <link rel="stylesheet" href="/report/report.css?v=${ver}">
+    <script type="text/javascript" src="/start/filechooser/cookies.js?v=${ver}"></script>
     <script type="text/javascript" src="/common/bootstrap/js/jquery_1.9.0.min.js"></script>
     <script type="text/javascript" src="/common/bootstrap/js/jquery.tmpl.1.1.1.js"></script>
-    <script type="text/javascript" src="/report/updates.js"></script>
-    <script type="text/javascript" src="/report/visualizers.js"></script>
-    <script type="text/javascript" src="/report/filters.js"></script>
+    <script type="text/javascript" src="/report/updates.js?v=${ver}"></script>
+    <script type="text/javascript" src="/report/visualizers.js?v=${ver}"></script>
+    <script type="text/javascript" src="/report/filters.js?v=${ver}"></script>
     <script type="text/javascript">
         window.test = ({total: 0});
     </script>
@@ -230,7 +230,7 @@
 
         });
     </script>
-    <link rel="stylesheet" href="/common/topbar.css" media="all">
+    <link rel="stylesheet" href="/common/topbar.css?v=${ver}" media="all">
 </head>
 <body id="body">
 <div class="topbar">
