@@ -1,15 +1,14 @@
 package edu.mayo.mprc.swift.search.task;
 
 import com.google.common.base.Objects;
-import edu.mayo.mprc.MprcException;
 import edu.mayo.mprc.daemon.DaemonConnection;
 import edu.mayo.mprc.daemon.worker.WorkPacket;
 import edu.mayo.mprc.quameter.QuameterWorkPacket;
 import edu.mayo.mprc.searchengine.SearchEngineResult;
 import edu.mayo.mprc.swift.db.DatabaseFileTokenFactory;
 import edu.mayo.mprc.swift.dbmapping.SwiftSearchDefinition;
-import edu.mayo.mprc.swift.params2.MassUnit;
-import edu.mayo.mprc.swift.params2.Tolerance;
+import edu.mayo.mprc.swift.params2.Instrument;
+import edu.mayo.mprc.swift.params2.SearchEngineParameters;
 import edu.mayo.mprc.utilities.FileUtilities;
 import edu.mayo.mprc.utilities.progress.ProgressInfo;
 import edu.mayo.mprc.workflow.engine.WorkflowEngine;
@@ -38,19 +37,23 @@ public final class QuameterTask extends AsyncTaskBase {
 	                    final boolean publicSearchFiles) {
 		super(engine, quaMeterDaemon, fileTokenFactory, fromScratch);
 		this.rawFile = rawFile;
-		maxFDR = 1.0 - definition.getSearchParameters().getScaffoldSettings().getProteinProbability();
-		final Tolerance fragmentTolerance = definition.getSearchParameters().getFragmentTolerance();
-		if (fragmentTolerance.getUnit() == MassUnit.Da) {
-			monoisotopic = fragmentTolerance.getValue() < 0.1;
-		} else if (fragmentTolerance.getUnit() == MassUnit.Ppm) {
-			monoisotopic = fragmentTolerance.getValue() < 100;
-		} else {
-			throw new MprcException("Unsupported fragment tolerance unit: " + fragmentTolerance.getUnit().getDescription());
-		}
+		maxFDR = 0.05; // Hardcoded 5% FDR
+		monoisotopic = determineMonoisotopic(definition.getSearchParameters());
 		this.outputFolder = outputFolder;
 		this.idpQonvertTask = idpQonvertTask;
 		this.publicSearchFiles = publicSearchFiles;
 		setName("QuaMeter");
+	}
+
+	/**
+	 * Determine if given search should use monoisotopic settings for Quameter.
+	 *
+	 * @param searchParameters Parameters
+	 * @return True for anything but LTQ at the moment
+	 */
+	private boolean determineMonoisotopic(SearchEngineParameters searchParameters) {
+		return !Instrument.LTQ_ESI_TRAP.getName().equals(
+				searchParameters.getInstrument().getName());
 	}
 
 	/**
