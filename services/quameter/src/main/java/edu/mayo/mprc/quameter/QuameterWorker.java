@@ -134,6 +134,8 @@ public final class QuameterWorker extends WorkerBase {
 
 			final ProcessBuilder processBuilder = new ProcessBuilder(parameters);
 			processBuilder.directory(tempWorkFolder);
+			// Fix the locale to trivial C as QuaMeter does not hardcode it. This means no UTF-8 and similar.
+			processBuilder.environment().put("LC_ALL", "C");
 
 			final ProcessCaller processCaller = new ProcessCaller(processBuilder, progressReporter.getLog());
 
