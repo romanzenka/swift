@@ -12,10 +12,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Timer;
-import java.util.TimerTask;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicLong;
 
 /**
@@ -426,10 +423,12 @@ public final class ProcessCaller implements Runnable {
 	public String getFailedCallDescription() {
 		if (process == null) {
 			return getChangeDirCommand()
+					+ getEnvironmentCommand()
 					+ "\n\t" + commandListToString(builder.command(), FileUtilities.isWindowsPlatform())
 					+ "\n\tProcess was not run";
 		} else {
 			return getChangeDirCommand()
+					+ getEnvironmentCommand()
 					+ "\n\t" + commandListToString(builder.command(), FileUtilities.isWindowsPlatform())
 					+ "\n\tError code: " + getExitValue()
 					+ "\n\tStandard error:\n" + getErrorLog()
@@ -446,6 +445,20 @@ public final class ProcessCaller implements Runnable {
 		} else {
 			return "";
 		}
+	}
+
+	/**
+	 * @return 'export X=Y' for every environment variable. Prefixed with \n\t for easy appending
+	 */
+	private String getEnvironmentCommand() {
+		if (builder.environment().size() > 0) {
+			final StringBuilder result = new StringBuilder(100);
+			for (Map.Entry<String, String> keyValue : builder.environment().entrySet()) {
+				result.append("\n\texport " + keyValue.getKey() + "=" + keyValue.getValue());
+			}
+			return result.toString();
+		}
+		return "";
 	}
 
 	public LogMonitor getOutputMonitor() {
