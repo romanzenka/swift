@@ -213,6 +213,7 @@ public final class CommonDataRequesterLogic {
 			Pattern.compile(pattern);
 			return "";
 		} catch (PatternSyntaxException e) {
+			// SWALLOWED: We return the pattern syntax exception as a result of this function
 			return e.getMessage();
 		}
 	}

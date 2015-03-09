@@ -30,6 +30,7 @@ public class DisplayHelp implements SwiftCommand {
 			FileUtilities.out(environment.listSupportedCommands());
 			return ExitCode.Ok;
 		} catch (Exception t) {
+			// SWALLOWED: Not much we can do
 			LOGGER.fatal("Could not display help message.", t);
 			return ExitCode.Error;
 		}

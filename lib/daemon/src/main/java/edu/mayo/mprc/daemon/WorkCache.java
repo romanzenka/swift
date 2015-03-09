@@ -92,6 +92,7 @@ public abstract class WorkCache<T extends WorkPacket> implements NoLoggingWorker
 		try {
 			process(workPacket, progressReporter);
 		} catch (final Exception t) {
+			// SWALLOWED: We pass the failure on
 			progressReporter.reportFailure(t);
 		}
 	}

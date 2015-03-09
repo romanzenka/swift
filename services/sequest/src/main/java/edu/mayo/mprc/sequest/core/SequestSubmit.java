@@ -292,6 +292,7 @@ final class SequestSubmit implements SequestSubmitterInterface {
 		try {
 			TarReader.readNumberHeaders(tarFile);
 		} catch (Exception t) {
+			// SWALLOWED: The cleanTarOnFailure will throw
 			cleanTarOnFailure(tarFile, t);
 		}
 	}

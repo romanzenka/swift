@@ -219,6 +219,7 @@ public final class Database implements RuntimeInitializer, Lifecycle {
 		try {
 			rollbackTransaction();
 		} catch (final Exception e) {
+			// SWALLOWED: When rollback fails, not much we can do
 			LOGGER.warn("Cannot rollback transaction", e);
 		}
 	}

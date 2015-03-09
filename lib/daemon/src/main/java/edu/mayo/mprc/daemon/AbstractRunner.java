@@ -9,7 +9,6 @@ import edu.mayo.mprc.daemon.files.FileTokenHolder;
 import org.apache.log4j.Logger;
 import org.apache.log4j.NDC;
 
-import java.io.File;
 import java.io.Serializable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -100,6 +99,7 @@ public abstract class AbstractRunner implements Checkable, Installable, Lifecycl
 		try {
 			executorService.awaitTermination(1, TimeUnit.HOURS);
 		} catch (InterruptedException ignore) {
+			// SWALLOWED: this is expected
 			LOGGER.warn("Termination of daemon was interrupted");
 		}
 	}

@@ -24,6 +24,7 @@ public final class Swift {
 			final ExitCode result = runSwift(args);
 			result.exit();
 		} catch (Throwable t) {
+			// SWALLOWED: Dump the exception on the stderr, not much we can do
 			FileUtilities.err(MprcException.getDetailedMessage(t));
 		} finally {
 			ExitCode.Error.exit();

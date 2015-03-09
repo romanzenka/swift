@@ -121,11 +121,12 @@ public final class SwiftTest {
 								// SWALLOWED: Terminating the application is likely to cause RPC exception to be thrown
 							}
 						} catch (GWTServiceException e) {
+							// SWALLOWED: Terminating the application is likely to cause RPC exception to be thrown
 							break;
 						}
 					}
 				} catch (InterruptedException ignore) {
-					// Ignore interrupts
+					// SWALLOWED: ignore interrupts
 				}
 			}
 		}

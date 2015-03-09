@@ -43,6 +43,7 @@ public abstract class WorkerBase implements Worker {
 			cleanTempWorkFolder(tempWorkFolder);
 			progressReporter.reportSuccess();
 		} catch (final Exception t) {
+			// SWALLOWED: We report the exception over network
 			LOGGER.error(String.format("Processing failed: %s", MprcException.getDetailedMessage(t)));
 			progressReporter.reportFailure(t);
 		}

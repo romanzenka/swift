@@ -113,6 +113,7 @@ public final class CurationExecutor implements Runnable {
 
 			curationDao.commit();
 		} catch (Exception t) {
+			// SWALLOWED: Storing the error in status
 			status.setGlobalError(t);
 			curationDao.rollback();
 			LOGGER.error(t);

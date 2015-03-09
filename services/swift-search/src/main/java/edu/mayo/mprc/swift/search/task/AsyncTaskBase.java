@@ -103,6 +103,7 @@ public abstract class AsyncTaskBase extends TaskBase {
 							setState(TaskState.COMPLETED_SUCCESFULLY);
 						}
 					} catch (Exception t) {
+						// SWALLOWED: Error gets stored on the task
 						getTask().setError(t);
 					}
 				}

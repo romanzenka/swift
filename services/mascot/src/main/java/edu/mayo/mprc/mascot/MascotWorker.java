@@ -180,7 +180,7 @@ public final class MascotWorker extends WorkerBase {
 		try {
 			connection = (HttpURLConnection) datFileBaseUrl.openConnection();
 		} catch (final Exception e) {
-			die("Couldn't setup POST connection", e);
+			throw new DaemonException("Couldn't setup POST connection", e);
 		}
 
 		try {
@@ -196,7 +196,7 @@ public final class MascotWorker extends WorkerBase {
 			connection.setRequestProperty("Connection", "Keep-Alive");
 			connection.setRequestProperty("Keep-Alive", "300");
 		} catch (final Exception e) {
-			die("POST error", e);
+			throw new DaemonException("POST error", e);
 		}
 	}
 
@@ -235,7 +235,7 @@ public final class MascotWorker extends WorkerBase {
 				return url;
 			}
 		} catch (final Exception t) {
-			die("Exception while reading response: ", t);
+			throw new DaemonException("Exception while reading response: ", t);
 		} finally {
 			FileUtilities.closeQuietly(rreader);
 		}
@@ -388,11 +388,6 @@ public final class MascotWorker extends WorkerBase {
 			hash.put(line.substring(0, pos), line.substring(pos + 1));
 		}
 		return hash;
-	}
-
-	private void die(final String message, final Throwable t) {
-		LOGGER.error(t);
-		throw new DaemonException(message, t);
 	}
 
 	public String toString() {

@@ -89,7 +89,8 @@ public final class MonitorUtilities {
 			out.write(("\r\n").getBytes());
 			out.flush();
 			s.close();
-		} catch (Exception e /* SWALLOWED - it is not a tragedy to fail to stop jetty. Do not litter error log with unrelated exceptions */) {
+		} catch (Exception e) {
+			// SWALLOWED - it is not a tragedy to fail to stop jetty. Do not litter error log with unrelated exceptions
 			LOGGER.warn("Failed to stop Jetty", e);
 		}
 	}

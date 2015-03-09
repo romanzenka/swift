@@ -239,6 +239,7 @@ public final class SwiftSearcher implements Worker, Lifecycle {
 			// Run the search. The search is responsible for reporting success/failure on termination
 			service.execute(searchRunner);
 		} catch (Exception t) {
+			// SWALLOWED: Errors get passed on
 			progressReporter.reportFailure(t);
 		}
 	}

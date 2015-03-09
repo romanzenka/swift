@@ -257,7 +257,7 @@ public final class ProcessCaller implements Runnable {
 		try {
 			return process == null ? -1 : process.exitValue();
 		} catch (IllegalThreadStateException ignore) {
-			// Process has not exited
+			// SWALLOWED: Process has not exited, not a tragedy
 			return -1;
 		}
 	}
