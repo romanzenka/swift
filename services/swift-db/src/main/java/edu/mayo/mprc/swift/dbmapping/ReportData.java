@@ -1,7 +1,6 @@
 package edu.mayo.mprc.swift.dbmapping;
 
 
-import edu.mayo.mprc.MprcException;
 import org.joda.time.DateTime;
 
 import java.io.File;
@@ -66,9 +65,6 @@ public class ReportData {
 	}
 
 	public void setAnalysisId(final Integer analysisId) {
-		if (getAnalysisId() != null) {
-			throw new MprcException("The analysis ID is already set");
-		}
 		this.analysisId = analysisId;
 	}
 
