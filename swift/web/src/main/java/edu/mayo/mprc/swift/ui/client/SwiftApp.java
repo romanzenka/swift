@@ -372,6 +372,7 @@ public final class SwiftApp implements EntryPoint, HidesPageContentsWhileLoading
 		if (definition.getOutputFolder() == null || !definition.getOutputFolder().equals(filePath)) {
 			outputPathUserSpecified = true;
 			outputPath = definition.getOutputFolder();
+			output.setText(outputPath);
 		}
 		updateOutputLocation();
 
