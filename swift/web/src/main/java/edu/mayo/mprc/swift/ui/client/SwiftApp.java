@@ -364,8 +364,15 @@ public final class SwiftApp implements EntryPoint, HidesPageContentsWhileLoading
 
 		files.setFiles(inputFiles, searchType);
 
-		output.setText(definition.getOutputFolder());
 		selectUser(definition.getUser().getEmail());
+
+		final String filePath = getOutputPathFromFileTable(inputFiles);
+		// If the loaded path differs from what the file table would produce, it is user-specified
+		// .. set the proper flags
+		if (definition.getOutputFolder() == null || !definition.getOutputFolder().equals(filePath)) {
+			outputPathUserSpecified = true;
+		}
+		output.setText(definition.getOutputFolder());
 
 		additionalSettingsPanel.setDefinition(definition);
 
@@ -597,16 +604,7 @@ public final class SwiftApp implements EntryPoint, HidesPageContentsWhileLoading
 				outputPath = null;
 			} else {
 				outputPathSpecial = false;
-				outputPath = fileSearches.get(0).getPath();
-				if (!outputPath.endsWith("/")) {
-					final int i = outputPath.lastIndexOf('/');
-					if (i < 0) {
-						outputPath = "";
-					} else {
-						outputPath = outputPath.substring(0, i + 1);
-					}
-				}
-				outputPath += pathify(getTitleText());
+				outputPath = getOutputPathFromFileTable(fileSearches);
 				output.setText(outputPath);
 				validateOutputPath(output.getText());
 			}
@@ -619,6 +617,20 @@ public final class SwiftApp implements EntryPoint, HidesPageContentsWhileLoading
 			validateOutputPath(output.getText());
 		}
 
+	}
+
+	private String getOutputPathFromFileTable(List<ClientFileSearch> fileSearches) {
+		String outputPath = fileSearches.get(0).getPath();
+		if (!outputPath.endsWith("/")) {
+			final int i = outputPath.lastIndexOf('/');
+			if (i < 0) {
+				outputPath = "";
+			} else {
+				outputPath = outputPath.substring(0, i + 1);
+			}
+		}
+		outputPath += pathify(getTitleText());
+		return outputPath;
 	}
 
 	private void validateOutputPath(final String text) {
