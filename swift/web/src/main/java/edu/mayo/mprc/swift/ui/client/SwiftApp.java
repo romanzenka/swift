@@ -370,7 +370,7 @@ public final class SwiftApp implements EntryPoint, HidesPageContentsWhileLoading
 		// If the loaded path differs from what the file table would produce, it is user-specified
 		// .. set the proper flags
 		if (definition.getOutputFolder() == null || !definition.getOutputFolder().equals(filePath)) {
-			outputPathUserSpecified = false;
+			outputPathUserSpecified = true;
 			outputPath = definition.getOutputFolder();
 		}
 		updateOutputLocation();
