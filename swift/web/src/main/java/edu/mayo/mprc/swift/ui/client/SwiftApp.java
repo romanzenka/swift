@@ -370,9 +370,10 @@ public final class SwiftApp implements EntryPoint, HidesPageContentsWhileLoading
 		// If the loaded path differs from what the file table would produce, it is user-specified
 		// .. set the proper flags
 		if (definition.getOutputFolder() == null || !definition.getOutputFolder().equals(filePath)) {
-			outputPathUserSpecified = true;
+			outputPathUserSpecified = false;
+			outputPath = definition.getOutputFolder();
 		}
-		output.setText(definition.getOutputFolder());
+		updateOutputLocation();
 
 		additionalSettingsPanel.setDefinition(definition);
 
@@ -581,8 +582,15 @@ public final class SwiftApp implements EntryPoint, HidesPageContentsWhileLoading
 	 * Update the output location as appropriate.
 	 */
 	public void updateOutputLocation() {
-		if (!outputPathChangeEnabled || !outputPathUserSpecified) {
-			// The user is not able to or chose not to influence output path, it gets set automatically
+		if (outputPathChangeEnabled && outputPathUserSpecified) {
+			// The user can and did influence output path. Keep whatever was the previous setting, unless
+			// it is a special value like "<No Files Selected>" or "<No Title>" - wipe that one.
+			if (outputPathSpecial) {
+				outputPathSpecial = false;
+			}
+			validateOutputPath(output.getText());
+		} else {
+			// Automatically populate the file path
 			final List<ClientFileSearch> fileSearches = getFileSearches();
 			if (files == null || (fileSearches == null) || (fileSearches.isEmpty())) {
 				if (!outputPathChangeEnabled) {
@@ -604,17 +612,9 @@ public final class SwiftApp implements EntryPoint, HidesPageContentsWhileLoading
 				outputPath = null;
 			} else {
 				outputPathSpecial = false;
-				outputPath = getOutputPathFromFileTable(fileSearches);
-				output.setText(outputPath);
+				output.setText(getOutputPathFromFileTable(fileSearches));
 				validateOutputPath(output.getText());
 			}
-		} else {
-			// The user can influence output path. Keep whatever was the previous setting, unless
-			// it is a special value like "<No Files Selected>" or "<No Title>" - wipe that one.
-			if (outputPathSpecial) {
-				outputPathSpecial = false;
-			}
-			validateOutputPath(output.getText());
 		}
 
 	}
