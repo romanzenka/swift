@@ -99,6 +99,9 @@ public class ReportData {
 		if (getSearchRun() != null ? !getSearchRun().equals(that.getSearchRun()) : that.getSearchRun() != null) {
 			return false;
 		}
+		if (getAnalysisId() != null ? !getAnalysisId().equals(that.getAnalysisId()) : that.getAnalysisId() != null) {
+			return false;
+		}
 
 		return true;
 	}
