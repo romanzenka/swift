@@ -613,8 +613,9 @@ public final class SwiftApp implements EntryPoint, HidesPageContentsWhileLoading
 				outputPath = null;
 			} else {
 				outputPathSpecial = false;
-				output.setText(getOutputPathFromFileTable(fileSearches));
-				validateOutputPath(output.getText());
+				outputPath = getOutputPathFromFileTable(fileSearches);
+				output.setText(outputPath);
+				validateOutputPath(outputPath);
 			}
 		}
 
