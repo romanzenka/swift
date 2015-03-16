@@ -57,7 +57,7 @@ final class EngineSearchTask extends AsyncTaskBase implements FileProducingTask 
 		this.deploymentResult = deploymentResult;
 		this.publicSearchFiles = publicSearchFiles;
 		setName(engine.getFriendlyName() + " search");
-		setDescription(engine.getFriendlyName() + " search: " + searchId);
+		setDescription(engine.getFriendlyName() + " search: " + searchId + " out: " + getOutputExtension());
 	}
 
 	public File getOutputFile() {
@@ -144,7 +144,7 @@ final class EngineSearchTask extends AsyncTaskBase implements FileProducingTask 
 
 		setDescription(engine.getFriendlyName() + " search: "
 				+ fileTokenFactory.fileToTaggedDatabaseToken(inputFile.getResultingFile())
-				+ " db: " + deployedFileDbString
+				+ " db: " + deployedFileDbString + " out: " + getOutputExtension()
 				+ (mascotResultLink != null ? " <a href=\"" + mascotResultLink + "\">Open in Mascot</a>" : ""));
 	}
 
@@ -186,7 +186,7 @@ final class EngineSearchTask extends AsyncTaskBase implements FileProducingTask 
 		if (outputFile == null) {
 			return null;
 		}
-		return FileUtilities.getGzippedExtension(outputFile.getName());
+		return FileUtilities.getGzippedExtension(outputFile.getName(), new String[]{"pep.xml"});
 	}
 
 	@Override
