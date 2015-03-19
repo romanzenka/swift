@@ -32,6 +32,7 @@ public class RunSwift implements FileListener, SwiftCommand {
 
 	private SwiftCommand runSwiftWeb;
 	private SwiftCommand runSwiftConfig;
+	private boolean configChangeMonitor = false;
 
 	@Override
 	public String getDescription() {
@@ -58,7 +59,9 @@ public class RunSwift implements FileListener, SwiftCommand {
 		final Daemon daemon = environment.createDaemon(config);
 		LOGGER.debug(daemon.toString());
 
-		startListeningToConfigFileChanges(configFile);
+		if (configChangeMonitor) {
+			startListeningToConfigFileChanges(configFile);
+		}
 
 		boolean terminateDaemon = true;
 

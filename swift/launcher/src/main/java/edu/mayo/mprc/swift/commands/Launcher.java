@@ -37,6 +37,7 @@ public final class Launcher implements FileListener {
 	private volatile boolean restartRequested;
 	private SwiftEnvironment swiftEnvironment;
 	private JettyStopThread jettyStopThread;
+	private boolean configChangeMonitor = false;
 
 	private static final int EXIT_CODE_ERROR = 1;
 	public static final long POLLING_INTERVAL = (long) (10 * 1000);
@@ -56,8 +57,10 @@ public final class Launcher implements FileListener {
 
 			return shutdownWhenRestartRequested(webServer) ? ExitCode.Restart : ExitCode.Ok;
 		} else {
-			final FileMonitor monitor = new FileMonitor(POLLING_INTERVAL);
-			monitor.fileToBeChanged(swiftEnvironment.getConfigFile(), this);
+			if (configChangeMonitor) {
+				final FileMonitor monitor = new FileMonitor(POLLING_INTERVAL);
+				monitor.fileToBeChanged(swiftEnvironment.getConfigFile(), this);
+			}
 
 			// This method will exit once the web server is up and running
 			final Server webServer = runWebServer(swiftEnvironment, false);
