@@ -47,6 +47,7 @@
             margin-top: 3em;
             color: #303030;
             font-size: 24px;
+            line-height: 32px;
         }
 
         .downloads a, .downloads a:hover {
