@@ -94,6 +94,20 @@
             </a>
         </div>
     </div>
+    <!-- Download links -->
+    <div>
+        <div>
+            <a href="file:///mfad/rchapp/odin/prod/apps/scaffold/scaffold_4.4.1/Install_Scaffold_4.4.1_Windows_x64.exe">Scaffold
+                4.4.1 install</a> (Windows 64-bit)
+        </div>
+        <div><a href="file:////mfad/rchapp/odin/dev/source/teracopy/teracopy.exe">TeraCopy</a> - a tool for copying
+            files between computers with verification
+        </div>
+        <div>
+            <a href="https://chrome.google.com/webstore/detail/locallinks/jllpkdkcdjndhggodimiphkghogcpida">LocalLinks</a>
+            - allows Chrome to access Scaffold files when clinking on a link
+        </div>
+    </div>
 </div>
 <!-- /container -->
 
