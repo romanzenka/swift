@@ -105,7 +105,7 @@
         </div>
     </div>
     <!-- Download links -->
-    <div>
+    <div class="downloads">
         <div>
             <a href="file://///mfad/rchapp/odin/prod/apps/scaffold/scaffold_4.4.1/Install_Scaffold_4.4.1_Windows_x64.exe">Scaffold
                 4.4.1 install</a> (Windows 64-bit)
