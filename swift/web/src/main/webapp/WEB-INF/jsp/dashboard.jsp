@@ -44,7 +44,7 @@
         }
 
         .downloads {
-            margin-left: 5em;
+            margin-top: 3em;
             text-color: #303030;
             font-size: 20px;
         }
