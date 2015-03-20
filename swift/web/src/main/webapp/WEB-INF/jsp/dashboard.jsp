@@ -49,7 +49,7 @@
             font-size: 20px;
         }
 
-        .downloads a {
+        .downloads a, .downloads a:hover {
             color: darkcyan !important;
         }
 
