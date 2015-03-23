@@ -223,6 +223,7 @@ public class GridWorkPacket {
 		return "GridWorkPacket:\n\tqsub"
 				+ qsubOption(GridEngineJobManagerImpl.QUEUE_SPEC_OPTION, getQueueName())
 				+ qsubOption("-wd", getWorkingFolder())
+				+ (getCoreRequirement() != 0 ? ' ' + GridEngineJobManagerImpl.CORE_SPEC_OPTION + getCoreRequirement() : "")
 				+ (getMemoryRequirement() != null ? ' ' + GridEngineJobManagerImpl.MEMORY_SPEC_OPTION + getMemoryRequirement() + GridEngineJobManagerImpl.MEMORY_SPEC_OPTION_MB_UNIT : "")
 				+ (getPriority() < 0 ? qsubOption(GridEngineJobManagerImpl.PRIORITY_SPEC_OPTION, String.valueOf(getPriority())) : "")
 				+ (getNativeSpecification() != null ? ' ' + getNativeSpecification() : "")
