@@ -54,6 +54,16 @@
             <groupId>uk.ac.ebi.jmzml</groupId>
             <artifactId>jmzml</artifactId>
             <version>1.7.1</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.antlr</groupId>
+                    <artifactId>com.springsource.antlr</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.apache.log4j</groupId>
+                    <artifactId>com.springsource.org.apache.log4j</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
         <dependency>
