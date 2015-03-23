@@ -451,10 +451,18 @@ public final class ProcessCaller implements Runnable {
 	 * @return 'export X=Y' for every environment variable. Prefixed with \n\t for easy appending
 	 */
 	private String getEnvironmentCommand() {
+		ProcessBuilder blankBuilder = new ProcessBuilder("ls");
+
 		if (builder.environment().size() > 0) {
 			final StringBuilder result = new StringBuilder(100);
 			for (Map.Entry<String, String> keyValue : builder.environment().entrySet()) {
-				result.append("\n\texport " + keyValue.getKey() + "=" + keyValue.getValue());
+				if (keyValue.getValue() != null) {
+					final boolean differsFromBlank = !blankBuilder.environment().containsKey(keyValue.getKey()) ||
+							keyValue.getValue().equals(blankBuilder.environment().get(keyValue.getKey()));
+					if (differsFromBlank) {
+						result.append("\n\texport " + keyValue.getKey() + "=" + keyValue.getValue());
+					}
+				}
 			}
 			return result.toString();
 		}

@@ -49,6 +49,7 @@
                 <include>edu.mayo.mprc:swift-web:war:3.8-SNAPSHOT</include>
                 <!-- the mzML reader is a plugin nobody depends on directly, make sure it is included -->
                 <include>edu.mayo.mprc:mzml:jar:3.8-SNAPSHOT</include>
+                <include>${project.build.directory}/swift-${project.version}.jar</include>
             </includes>
         </dependencySet>
         <dependencySet>
