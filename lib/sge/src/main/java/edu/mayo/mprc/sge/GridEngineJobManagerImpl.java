@@ -209,12 +209,12 @@ public final class GridEngineJobManagerImpl implements GridEngineJobManager {
 			LOGGER.warn("Task forces memory requirement: " + pPacket.getMemoryRequirement());
 		}
 
-		if (pPacket.getCoreRequirement() != 0) {
-			if (!spec.isEmpty()) {
-				spec += " ";
-			}
-			spec += CORE_SPEC_OPTION + pPacket.getCoreRequirement();
-		}
+//		if (pPacket.getCoreRequirement() != 0) {
+//			if (!spec.isEmpty()) {
+//				spec += " ";
+//			}
+//			spec += CORE_SPEC_OPTION + pPacket.getCoreRequirement();
+//		}
 
 		// SGE allows only decreasing priority. If that is the case, use native specification to pass
 		// the priority decrease
