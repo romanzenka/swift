@@ -92,6 +92,7 @@ public final class QuameterWorker extends WorkerBase {
 
 		final List<String> parameters = new LinkedList<String>();
 		parameters.add(executable.getPath());
+		param(parameters, "cpus", String.valueOf(packet.getNumRequiredCores()));
 		param(parameters, "workdir", tempWorkFolder.getAbsolutePath());
 		param(parameters, "OutputFilepath", createdResultFile.getAbsolutePath());
 		param(parameters, "Instrument", packet.isMonoisotopic() ? "orbi" : "ltq");

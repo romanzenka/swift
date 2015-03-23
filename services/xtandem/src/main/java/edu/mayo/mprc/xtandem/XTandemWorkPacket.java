@@ -1,11 +1,12 @@
 package edu.mayo.mprc.xtandem;
 
+import edu.mayo.mprc.daemon.worker.CoreRequirements;
 import edu.mayo.mprc.daemon.worker.WorkPacket;
 import edu.mayo.mprc.searchengine.EngineWorkPacket;
 
 import java.io.File;
 
-public final class XTandemWorkPacket extends EngineWorkPacket {
+public final class XTandemWorkPacket extends EngineWorkPacket implements CoreRequirements {
 	private static final long serialVersionUID = 20110729;
 
 	public XTandemWorkPacket(final boolean fromScratch) {
@@ -29,6 +30,11 @@ public final class XTandemWorkPacket extends EngineWorkPacket {
 				isPublishResultFiles(),
 				isFromScratch()
 		);
+	}
+
+	@Override
+	public int getNumRequiredCores() {
+		return 10;
 	}
 }
 

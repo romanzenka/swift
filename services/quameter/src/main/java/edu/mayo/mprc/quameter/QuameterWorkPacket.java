@@ -1,6 +1,7 @@
 package edu.mayo.mprc.quameter;
 
 import edu.mayo.mprc.daemon.WorkCache;
+import edu.mayo.mprc.daemon.worker.CoreRequirements;
 import edu.mayo.mprc.daemon.worker.WorkPacket;
 import edu.mayo.mprc.searchengine.EngineWorkPacket;
 
@@ -10,7 +11,7 @@ import java.util.List;
 /**
  * @author Roman Zenka
  */
-public final class QuameterWorkPacket extends EngineWorkPacket {
+public final class QuameterWorkPacket extends EngineWorkPacket implements CoreRequirements {
 	private static final long serialVersionUID = 3243861715951582089L;
 	public static final String[] QUAL_TXT_EXTENSION = new String[]{"qual.txt"};
 
@@ -98,5 +99,10 @@ public final class QuameterWorkPacket extends EngineWorkPacket {
 				", fdrScoreCutoff=" + fdrScoreCutoff +
 				", outputFile=" + getOutputFile() +
 				'}';
+	}
+
+	@Override
+	public int getNumRequiredCores() {
+		return 10;
 	}
 }

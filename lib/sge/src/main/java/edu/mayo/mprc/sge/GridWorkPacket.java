@@ -26,6 +26,7 @@ public class GridWorkPacket {
 	private List<String> parameters;
 	private String queueName;
 	private String minMemoryRequirement;
+	private int coreRequirement;
 	private String nativeSpecification;
 	private String workingFolder;
 	private String logFolder;
@@ -70,6 +71,7 @@ public class GridWorkPacket {
 		applicationName = packet.getApplicationName();
 		queueName = packet.getQueueName();
 		minMemoryRequirement = packet.getMemoryRequirement();
+		coreRequirement = packet.getCoreRequirement();
 		nativeSpecification = packet.getNativeSpecification();
 		workingFolder = packet.getWorkingFolder();
 		logFolder = packet.getLogFolder();
@@ -144,6 +146,15 @@ public class GridWorkPacket {
 		minMemoryRequirement = memoryRequirement;
 	}
 
+	public void setCoreRequirement(int coreRequirement) {
+		this.coreRequirement = coreRequirement;
+	}
+
+	public int getCoreRequirement() {
+		return coreRequirement;
+	}
+
+
 	public String getApplicationName() {
 		return applicationName;
 	}
@@ -212,7 +223,7 @@ public class GridWorkPacket {
 		return "GridWorkPacket:\n\tqsub"
 				+ qsubOption(GridEngineJobManagerImpl.QUEUE_SPEC_OPTION, getQueueName())
 				+ qsubOption("-wd", getWorkingFolder())
-				+ (getMemoryRequirement()!=null ? ' ' +GridEngineJobManagerImpl.MEMORY_SPEC_OPTION +getMemoryRequirement() + GridEngineJobManagerImpl.MEMORY_SPEC_OPTION_MB_UNIT : "")
+				+ (getMemoryRequirement() != null ? ' ' + GridEngineJobManagerImpl.MEMORY_SPEC_OPTION + getMemoryRequirement() + GridEngineJobManagerImpl.MEMORY_SPEC_OPTION_MB_UNIT : "")
 				+ (getPriority() < 0 ? qsubOption(GridEngineJobManagerImpl.PRIORITY_SPEC_OPTION, String.valueOf(getPriority())) : "")
 				+ (getNativeSpecification() != null ? ' ' + getNativeSpecification() : "")
 				+ ' ' + applicationName
@@ -221,7 +232,7 @@ public class GridWorkPacket {
 
 	private static String qsubOption(String name, String value) {
 		if (value != null) {
-			if(value.contains(" ")) {
+			if (value.contains(" ")) {
 				return String.format(" %s '%s'", name, QUOTE_CHARS.matcher(value).replaceAll("\\\\$1"));
 			}
 			return String.format(" %s %s", name, value);

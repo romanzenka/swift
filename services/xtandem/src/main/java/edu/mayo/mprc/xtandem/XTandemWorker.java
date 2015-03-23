@@ -158,7 +158,7 @@ public final class XTandemWorker extends WorkerBase {
 
 		createDefaultInputXml(packet, tempWorkFolder);
 
-		final int initialThreads = getNumThreads();
+		final int initialThreads = packet.getNumRequiredCores();
 		ProcessCaller processCaller = runTandemSearch(
 				packet.getDatabaseFile(),
 				packet.getInputFile(),
@@ -314,13 +314,6 @@ public final class XTandemWorker extends WorkerBase {
 	}
 
 	private static final String XML_EXTENSION = ".xml";
-
-	/**
-	 * @return How many threads can X!Tandem utilize on this computer.
-	 */
-	public static int getNumThreads() {
-		return Math.max(1, Runtime.getRuntime().availableProcessors());
-	}
 
 	@Override
 	public String check() {

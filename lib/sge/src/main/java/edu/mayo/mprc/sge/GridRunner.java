@@ -10,6 +10,8 @@ import edu.mayo.mprc.config.ui.ServiceUiFactory;
 import edu.mayo.mprc.daemon.*;
 import edu.mayo.mprc.daemon.exception.DaemonException;
 import edu.mayo.mprc.daemon.files.FileTokenFactory;
+import edu.mayo.mprc.daemon.worker.CoreRequirements;
+import edu.mayo.mprc.daemon.worker.WorkPacket;
 import edu.mayo.mprc.messaging.ResponseListener;
 import edu.mayo.mprc.messaging.ServiceFactory;
 import edu.mayo.mprc.utilities.FileUtilities;
@@ -96,9 +98,11 @@ public final class GridRunner extends AbstractRunner {
 
 		try {
 			final SgeMessageListener allocatorListener = new SgeMessageListener(request);
+			final WorkPacket workPacket = request.getWorkPacket();
+
 			final SgePacket sgePacket =
 					new SgePacket(
-							serviceFactory.serializeRequest(request.getWorkPacket(), getDaemon().getResponseDispatcher(), allocatorListener)
+							serviceFactory.serializeRequest(workPacket, getDaemon().getResponseDispatcher(), allocatorListener)
 							, daemonConnection.getConnectionName()
 							, fileTokenFactory.getDaemonConfigInfo(),
 							getDaemonLoggerFactory().getLogFolder());
@@ -111,7 +115,11 @@ public final class GridRunner extends AbstractRunner {
 			// Set our own listener to the work packet progress. When the packet returns, the execution will be resumed
 			final MyWorkPacketStateListener listener = new MyWorkPacketStateListener(request, sgePacketFile, allocatorListener);
 			gridWorkPacket.setListener(listener);
-			gridWorkPacket.setPriority(request.getWorkPacket().getPriority());
+			gridWorkPacket.setPriority(workPacket.getPriority());
+			if (workPacket instanceof CoreRequirements) {
+				gridWorkPacket.setCoreRequirement(((CoreRequirements) workPacket).getNumRequiredCores());
+			}
+
 			// Run the job
 			final String requestId = manager.passToGridEngine(gridWorkPacket);
 
@@ -123,7 +131,7 @@ public final class GridRunner extends AbstractRunner {
 			// Report the assigned ID
 			reporter.reportProgress(data);
 
-			final ParentLog log = getDaemonLoggerFactory().createLog(request.getWorkPacket().getTaskId(), reporter);
+			final ParentLog log = getDaemonLoggerFactory().createLog(workPacket.getTaskId(), reporter);
 
 			// Report that we spawned a child with its own SGE log, we use the SGE-based log paths for this
 			log.createChildLog(gridWorkPacket.getOutputLogFilePath(), gridWorkPacket.getErrorLogFilePath());

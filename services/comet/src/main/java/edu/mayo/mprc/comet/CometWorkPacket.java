@@ -1,6 +1,7 @@
 package edu.mayo.mprc.comet;
 
 import edu.mayo.mprc.MprcException;
+import edu.mayo.mprc.daemon.worker.CoreRequirements;
 import edu.mayo.mprc.daemon.worker.WorkPacket;
 import edu.mayo.mprc.searchengine.EngineWorkPacket;
 import edu.mayo.mprc.utilities.FileUtilities;
@@ -9,7 +10,7 @@ import java.io.File;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public final class CometWorkPacket extends EngineWorkPacket {
+public final class CometWorkPacket extends EngineWorkPacket implements CoreRequirements {
 	private static final long serialVersionUID = 20110729;
 	private static final Pattern PEPXML_LINE = Pattern.compile("^(\\s*output_pepxmlfile\\s*=\\s*)(\\d+)", Pattern.MULTILINE);
 	private static final Pattern SQT_LINE = Pattern.compile("^(\\s*output_sqtfile\\s*=\\s*)(\\d+)", Pattern.MULTILINE);
@@ -73,6 +74,11 @@ public final class CometWorkPacket extends EngineWorkPacket {
 				isPublishResultFiles(),
 				isFromScratch()
 		);
+	}
+
+	@Override
+	public int getNumRequiredCores() {
+		return 10;
 	}
 }
 

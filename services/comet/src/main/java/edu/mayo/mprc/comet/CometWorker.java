@@ -25,6 +25,7 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.regex.Pattern;
 
 public final class CometWorker extends WorkerBase {
 	private static final Logger LOGGER = Logger.getLogger(CometWorker.class);
@@ -34,6 +35,7 @@ public final class CometWorker extends WorkerBase {
 	public static final String PEP_XML = ".pep.xml";
 	public static final String SQT = ".sqt";
 	public static final String MS2 = ".ms2";
+	private static final Pattern COMPILE = Pattern.compile("num_threads = \\d+");
 
 	private File cometExecutable;
 
@@ -108,7 +110,11 @@ public final class CometWorker extends WorkerBase {
 		final File parameterFile = new File(tempWorkFolder, "comet.parameters");
 
 		// Replace the database path and write parameters out
-		FileUtilities.writeStringToFile(parameterFile, packet.getSearchParams(), true);
+		String params = packet.getSearchParams();
+
+		params = COMPILE.matcher(params).replaceAll("num_threads = " + packet.getNumRequiredCores());
+
+		FileUtilities.writeStringToFile(parameterFile, params, true);
 		return parameterFile;
 	}
 
