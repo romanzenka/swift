@@ -1,6 +1,7 @@
 package edu.mayo.mprc.sge;
 
 import com.google.common.base.Strings;
+import com.google.common.collect.Maps;
 import edu.mayo.mprc.MprcException;
 import org.apache.log4j.Logger;
 import org.ggf.drmaa.*;
@@ -225,6 +226,10 @@ public final class GridEngineJobManagerImpl implements GridEngineJobManager {
 
 			spec += PRIORITY_SPEC_OPTION + " " + pPacket.getPriority();
 		}
+
+		final HashMap<String, String> environment = Maps.newHashMap();
+		environment.put("MALLOC_ARENA_MAX", "1"); // Workaround a glibc bug that caused increased memory consumption due to per thread allocation pools
+		jt.setJobEnvironment(environment);
 
 		LOGGER.debug("Resulting native specification passed to grid engine:\n" + spec);
 		jt.setNativeSpecification(spec);

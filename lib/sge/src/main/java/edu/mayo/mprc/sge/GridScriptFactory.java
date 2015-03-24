@@ -62,6 +62,7 @@ public final class GridScriptFactory {
 			params.add("-D" + SWIFT_HOME + "=" + System.getProperty(SWIFT_HOME));
 		}
 
+		params.add("-Xmx512m");
 		params.add("-cp");
 		params.add(new File(swiftLibDirectory).getAbsolutePath() + "/*");
 
