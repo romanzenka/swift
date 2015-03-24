@@ -34,7 +34,7 @@ public final class XTandemWorkPacket extends EngineWorkPacket implements CoreReq
 
 	@Override
 	public int getNumRequiredCores() {
-		return 10;
+		return 8;
 	}
 }
 

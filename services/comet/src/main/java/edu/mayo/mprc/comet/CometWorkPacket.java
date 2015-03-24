@@ -78,7 +78,7 @@ public final class CometWorkPacket extends EngineWorkPacket implements CoreRequi
 
 	@Override
 	public int getNumRequiredCores() {
-		return 10;
+		return 8;
 	}
 }
 
