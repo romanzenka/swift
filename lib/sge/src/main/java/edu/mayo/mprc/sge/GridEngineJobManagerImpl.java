@@ -20,7 +20,7 @@ public final class GridEngineJobManagerImpl implements GridEngineJobManager {
 	private static final Logger LOGGER = Logger.getLogger(GridEngineJobManagerImpl.class);
 
 	public static final String QUEUE_SPEC_OPTION = "-q";
-	public static final String CORE_SPEC_OPTION = "-l nodes=1:ppn=";
+	public static final String CORE_SPEC_OPTION = "-pe threaded ";
 	public static final String MEMORY_SPEC_OPTION = "-l s_vmem=";
 	public static final String MEMORY_SPEC_OPTION_MB_UNIT = "M";
 	public static final int MAX_GRID_ENGINE_COMMAND = 1024;
@@ -210,12 +210,12 @@ public final class GridEngineJobManagerImpl implements GridEngineJobManager {
 			LOGGER.warn("Task forces memory requirement: " + pPacket.getMemoryRequirement());
 		}
 
-//		if (pPacket.getCoreRequirement() != 0) {
-//			if (!spec.isEmpty()) {
-//				spec += " ";
-//			}
-//			spec += CORE_SPEC_OPTION + pPacket.getCoreRequirement();
-//		}
+		if (pPacket.getCoreRequirement() != 0) {
+			if (!spec.isEmpty()) {
+				spec += " ";
+			}
+			spec += CORE_SPEC_OPTION + pPacket.getCoreRequirement();
+		}
 
 		// SGE allows only decreasing priority. If that is the case, use native specification to pass
 		// the priority decrease
