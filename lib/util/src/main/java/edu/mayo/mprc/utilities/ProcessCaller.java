@@ -423,12 +423,10 @@ public final class ProcessCaller implements Runnable {
 	public String getFailedCallDescription() {
 		if (process == null) {
 			return getChangeDirCommand()
-					+ getEnvironmentCommand()
 					+ "\n\t" + commandListToString(builder.command(), FileUtilities.isWindowsPlatform())
 					+ "\n\tProcess was not run";
 		} else {
 			return getChangeDirCommand()
-					+ getEnvironmentCommand()
 					+ "\n\t" + commandListToString(builder.command(), FileUtilities.isWindowsPlatform())
 					+ "\n\tError code: " + getExitValue()
 					+ "\n\tStandard error:\n" + getErrorLog()
