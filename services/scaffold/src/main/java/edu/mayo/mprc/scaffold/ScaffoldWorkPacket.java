@@ -3,7 +3,6 @@ package edu.mayo.mprc.scaffold;
 import com.google.common.base.Charsets;
 import com.google.common.io.Files;
 import edu.mayo.mprc.daemon.CachableWorkPacket;
-import edu.mayo.mprc.daemon.worker.CoreRequirements;
 import edu.mayo.mprc.daemon.worker.WorkPacket;
 import edu.mayo.mprc.daemon.worker.WorkPacketBase;
 import edu.mayo.mprc.scafml.ScafmlScaffold;
@@ -15,7 +14,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-public final class ScaffoldWorkPacket extends WorkPacketBase implements CachableWorkPacket, CoreRequirements {
+public final class ScaffoldWorkPacket extends WorkPacketBase implements CachableWorkPacket {
 	private static final long serialVersionUID = 20110407L;
 	public static final String SF3 = ".sf3";
 	private File outputFolder;
@@ -119,10 +118,5 @@ public final class ScaffoldWorkPacket extends WorkPacketBase implements Cachable
 
 	@Override
 	public void reportCachedResult(ProgressReporter reporter, File targetFolder, List<String> outputFiles) {
-	}
-
-	@Override
-	public int getNumRequiredCores() {
-		return 1;
 	}
 }
