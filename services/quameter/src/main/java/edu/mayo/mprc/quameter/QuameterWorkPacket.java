@@ -103,6 +103,6 @@ public final class QuameterWorkPacket extends EngineWorkPacket implements CoreRe
 
 	@Override
 	public int getNumRequiredCores() {
-		return 8;
+		return 1;
 	}
 }
