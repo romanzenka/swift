@@ -132,8 +132,8 @@ function buildCollection(collection, data, metricCode) {
 
 function getMetricTitle(n) {
     var hLink, qLink;
-    if (metrics[n].hasOwnProperty('link')) {
-        hLink = 'href="' + metrics[n].link + '" target="_blank"';
+    if (metrics[n].hasOwnProperty('link') && metrics[n].link != "") {
+        hLink = 'href="/quameter/' + metrics[n].link + '" target="_blank"';
         qLink = '&nbsp;<i class="icon-large icon-question-sign"></i>';
     }
     else {
