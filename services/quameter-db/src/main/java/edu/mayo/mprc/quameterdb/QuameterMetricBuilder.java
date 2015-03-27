@@ -53,6 +53,6 @@ public class QuameterMetricBuilder {
 	}
 
 	public QuameterMetric build() {
-		return new QuameterMetric(code, label, name, good, simple, description, link, rangeMin, rangeMax);
+		return new QuameterMetric(code, label, name, good, simple, description, "/quameter/" + link, rangeMin, rangeMax);
 	}
 }
