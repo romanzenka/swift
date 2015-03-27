@@ -5,10 +5,7 @@ import com.google.common.collect.Maps;
 import edu.mayo.mprc.MprcException;
 import org.apache.log4j.Logger;
 import org.hibernate.*;
-import org.hibernate.criterion.Conjunction;
-import org.hibernate.criterion.Criterion;
-import org.hibernate.criterion.Projections;
-import org.hibernate.criterion.Restrictions;
+import org.hibernate.criterion.*;
 import org.hibernate.dialect.Dialect;
 import org.hibernate.usertype.UserType;
 
@@ -81,13 +78,13 @@ public abstract class DaoBase implements Dao, SessionProvider {
 	}
 
 	public static <T> List<T> listAndCast(final Criteria criteria) {
-		@SuppressWarnings("unchecked")
+		@SuppressWarnings("unchecked") final
 		List list = criteria.list();
 		return list;
 	}
 
 	public static <T> List<T> listAndCast(final Query query) {
-		@SuppressWarnings("unchecked")
+		@SuppressWarnings("unchecked") final
 		List list = query.list();
 		return list;
 	}
@@ -109,7 +106,7 @@ public abstract class DaoBase implements Dao, SessionProvider {
 	 * @return A map from user type name to {@link org.hibernate.usertype.UserType} instance.
 	 */
 	public Map<String, UserType> getUserTypes() {
-		Map<String, UserType> fileMap = Maps.newHashMap();
+		final Map<String, UserType> fileMap = Maps.newHashMap();
 		fileMap.put("file", new FileType());
 		return fileMap;
 	}
@@ -135,7 +132,7 @@ public abstract class DaoBase implements Dao, SessionProvider {
 	protected final <T extends Evolvable> List<T> listAll(final Class<T> clazz) {
 		try {
 			return listAndCast(allCriteria(clazz).setReadOnly(true));
-		} catch (Exception t) {
+		} catch (final Exception t) {
 			throw new MprcException("Cannot list all items of type " + clazz.getSimpleName(), t);
 		}
 	}
@@ -188,7 +185,7 @@ public abstract class DaoBase implements Dao, SessionProvider {
 			return (T) allCriteria(clazz)
 					.add(equalityCriteria)
 					.uniqueResult();
-		} catch (Exception t) {
+		} catch (final Exception t) {
 			throw new MprcException("Cannot get " + clazz.getSimpleName() + " matching specified criteria", t);
 		}
 	}
@@ -597,7 +594,7 @@ public abstract class DaoBase implements Dao, SessionProvider {
 			results.close();
 
 			tx.commit();
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			tx.rollback();
 			throw new MprcException(e);
 		} finally {
@@ -626,6 +623,14 @@ public abstract class DaoBase implements Dao, SessionProvider {
 			return Restrictions.isNull(propertyName);
 		} else {
 			return Restrictions.eq(propertyName, value);
+		}
+	}
+
+	public static Criterion nullSafeTextEq(final String propertyName, final String value) {
+		if (value == null) {
+			return Restrictions.isNull(propertyName);
+		} else {
+			return Restrictions.like(propertyName, value, MatchMode.EXACT);
 		}
 	}
 
