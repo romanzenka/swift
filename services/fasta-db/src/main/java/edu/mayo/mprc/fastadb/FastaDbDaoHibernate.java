@@ -194,7 +194,7 @@ public final class FastaDbDaoHibernate extends BulkDaoBase implements FastaDbDao
 			final boolean msSql = this.getDialect() instanceof SQLServerDialect;
 
 			final SQLQuery sqlQuery =
-					session.createSQLQuery("SELECT * FROM protein_sequence WHERE sequence=:sequence")
+					session.createSQLQuery("SELECT * FROM protein_sequence WHERE sequence=CONVERT(VARCHAR(MAX), :sequence)")
 							.addEntity(ProteinSequence.class);
 
 			while (stream.gotoNextSequence()) {
