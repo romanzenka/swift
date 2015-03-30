@@ -19,7 +19,6 @@ import org.hibernate.Query;
 import org.hibernate.SQLQuery;
 import org.hibernate.StatelessSession;
 import org.hibernate.dialect.SQLServerDialect;
-import org.hibernate.type.StandardBasicTypes;
 import org.springframework.stereotype.Repository;
 
 import javax.annotation.Nullable;
@@ -195,8 +194,8 @@ public final class FastaDbDaoHibernate extends BulkDaoBase implements FastaDbDao
 			final boolean msSql = this.getDialect() instanceof SQLServerDialect;
 
 			final SQLQuery sqlQuery =
-					session.createSQLQuery("SELECT COUNT(*) as c FROM protein_sequence WHERE sequence=:sequence")
-							.addScalar("c", StandardBasicTypes.LONG);
+					session.createSQLQuery("SELECT * FROM protein_sequence WHERE sequence=:sequence")
+							.addEntity(ProteinSequence.class);
 
 			while (stream.gotoNextSequence()) {
 				numSequencesRead++;
@@ -217,15 +216,15 @@ public final class FastaDbDaoHibernate extends BulkDaoBase implements FastaDbDao
 				if (!msSql) {
 					proteinSequence = addProteinSequence(session, new ProteinSequence(sequence));
 				} else {
-					final Object count = sqlQuery.setParameter("sequence", sequence).uniqueResult();
-					if (count instanceof Long) {
-						if (((Long) count) == 0) {
-							// Add to database
-							proteinSequence = new ProteinSequence(sequence);
-							session.insert(proteinSequence);
-						}
+					final Object oldSequence = sqlQuery.setParameter("sequence", sequence).uniqueResult();
+
+					if (oldSequence == null) {
+						proteinSequence = new ProteinSequence(sequence);
+						session.insert(proteinSequence);
+					} else if (oldSequence instanceof ProteinSequence) {
+						proteinSequence = (ProteinSequence) oldSequence;
 					} else {
-						ExceptionUtilities.throwCastException(count, Long.class);
+						ExceptionUtilities.throwCastException(oldSequence, ProteinSequence.class);
 					}
 				}
 				final ProteinAccnum accnum = addAccessionNumber(session, new ProteinAccnum(accessionNumber));
