@@ -11,11 +11,15 @@ import edu.mayo.mprc.dbcurator.model.Curation;
 import edu.mayo.mprc.dbcurator.model.CurationDao;
 import edu.mayo.mprc.fasta.FASTAInputStream;
 import edu.mayo.mprc.utilities.FileUtilities;
+import edu.mayo.mprc.utilities.exceptions.ExceptionUtilities;
 import edu.mayo.mprc.utilities.progress.PercentDoneReporter;
 import edu.mayo.mprc.utilities.progress.UserProgressReporter;
 import org.apache.log4j.Logger;
 import org.hibernate.Query;
+import org.hibernate.SQLQuery;
 import org.hibernate.StatelessSession;
+import org.hibernate.dialect.SQLServerDialect;
+import org.hibernate.type.StandardBasicTypes;
 import org.springframework.stereotype.Repository;
 
 import javax.annotation.Nullable;
@@ -187,6 +191,13 @@ public final class FastaDbDaoHibernate extends BulkDaoBase implements FastaDbDao
 			session.getTransaction().begin();
 			stream.beforeFirst();
 			long numSequencesRead = 0L;
+
+			final boolean msSql = this.getDialect() instanceof SQLServerDialect;
+
+			final SQLQuery sqlQuery =
+					session.createSQLQuery("SELECT COUNT(*) as c FROM protein_sequence WHERE sequence=:sequence")
+							.addScalar("c", StandardBasicTypes.LONG);
+
 			while (stream.gotoNextSequence()) {
 				numSequencesRead++;
 				final String header = stream.getHeader();
@@ -201,7 +212,22 @@ public final class FastaDbDaoHibernate extends BulkDaoBase implements FastaDbDao
 					accessionNumber = header.substring(1);
 					description = "";
 				}
-				final ProteinSequence proteinSequence = addProteinSequence(session, new ProteinSequence(sequence));
+
+				ProteinSequence proteinSequence = null;
+				if (!msSql) {
+					proteinSequence = addProteinSequence(session, new ProteinSequence(sequence));
+				} else {
+					final Object count = sqlQuery.setParameter("sequence", sequence).uniqueResult();
+					if (count instanceof Long) {
+						if (((Long) count) == 0) {
+							// Add to database
+							proteinSequence = new ProteinSequence(sequence);
+							session.insert(proteinSequence);
+						}
+					} else {
+						ExceptionUtilities.throwCastException(count, Long.class);
+					}
+				}
 				final ProteinAccnum accnum = addAccessionNumber(session, new ProteinAccnum(accessionNumber));
 				final ProteinDescription desc = addDescription(session, new ProteinDescription(description));
 				final ProteinEntry entry = new ProteinEntry(database, accnum, desc, proteinSequence);
