@@ -87,7 +87,7 @@ SearchRunItemVisualizer.prototype.confirmRerun = function (event) {
     var title = event.data.title;
     if (!window.confirm("Are you sure you want to restart search " + title + " (id=" + id + ") ?"
         )) {
-        event.stopPropagation();
+        event.preventDefault();
     }
 };
 
@@ -96,7 +96,7 @@ SearchRunItemVisualizer.prototype.confirmHide = function (event) {
     var title = event.data.title;
     if (!window.confirm("Are you sure you want to hide search " + title + " (id=" + id + ") ?\n\n"
         + "After a search was hidden, it takes an admin to unhide it again.")) {
-        event.stopPropagation();
+        event.preventDefault();
     }
 };
 
