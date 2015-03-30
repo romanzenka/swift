@@ -130,7 +130,7 @@ public final class FastaDbDaoHibernate extends BulkDaoBase implements FastaDbDao
 
 	private ProteinSequence addProteinSequence(final StatelessSession session, final ProteinSequence proteinSequence) {
 		if (null == proteinSequence.getId()) {
-			return saveStateless(session, proteinSequence, nullSafeTextEq("sequence", proteinSequence.getSequence()), false);
+			return saveStateless(session, proteinSequence, nullSafeEq("sequence", proteinSequence.getSequence()), false);
 		}
 		return proteinSequence;
 	}
