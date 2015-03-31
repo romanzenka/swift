@@ -216,8 +216,8 @@ public final class FileSearchBean {
 		moveDirsToFiles(dirs, files);
 		final AttributesImpl atts = new AttributesImpl();
 		try {
-			Collections.sort(dirs, new SimpleFileComparator(sortBy));
-			Collections.sort(files, new SimpleFileComparator(sortBy));
+			Collections.sort(dirs, new SimpleFileComparator(sortBy, true));
+			Collections.sort(files, new SimpleFileComparator(sortBy, false));
 
 			for (final File dir : dirs) {
 				atts.clear();
@@ -274,21 +274,27 @@ public final class FileSearchBean {
 		private static final long serialVersionUID = 20121221L;
 
 		private SortBy sortBy;
+		private boolean directories;
 
-		public SimpleFileComparator(final SortBy sortBy) {
+		public SimpleFileComparator(final SortBy sortBy, final boolean directories) {
 			this.sortBy = sortBy;
+			this.directories = directories;
 		}
 
 		@Override
 		public int compare(final File o1, final File o2) {
-			switch (sortBy) {
-				case NAME:
-					return o1.getName().compareToIgnoreCase(o2.getName());
-				case DATE:
-					return -Long.valueOf(o1.lastModified()).compareTo(o2.lastModified());
-				default:
-					throw new MprcException(MessageFormat.format("Unsupported sort {0}", sortBy));
+			if (directories) {
+				switch (sortBy) {
+					case NAME:
+						return o1.getName().compareToIgnoreCase(o2.getName());
+					case DATE:
+						return -Long.valueOf(o1.lastModified()).compareTo(o2.lastModified());
+					default:
+						throw new MprcException(MessageFormat.format("Unsupported sort {0}", sortBy));
+				}
 			}
+			// Files get compared by name no matter what
+			return o1.getName().compareToIgnoreCase(o2.getName());
 		}
 	}
 }
