@@ -11,14 +11,12 @@ import edu.mayo.mprc.dbcurator.model.Curation;
 import edu.mayo.mprc.dbcurator.model.CurationDao;
 import edu.mayo.mprc.fasta.FASTAInputStream;
 import edu.mayo.mprc.utilities.FileUtilities;
-import edu.mayo.mprc.utilities.exceptions.ExceptionUtilities;
 import edu.mayo.mprc.utilities.progress.PercentDoneReporter;
+import edu.mayo.mprc.utilities.progress.PercentRangeReporter;
 import edu.mayo.mprc.utilities.progress.UserProgressReporter;
 import org.apache.log4j.Logger;
 import org.hibernate.Query;
-import org.hibernate.SQLQuery;
 import org.hibernate.StatelessSession;
-import org.hibernate.dialect.SQLServerDialect;
 import org.springframework.stereotype.Repository;
 
 import javax.annotation.Nullable;
@@ -186,17 +184,16 @@ public final class FastaDbDaoHibernate extends BulkDaoBase implements FastaDbDao
 		final PercentDoneReporter percentReporter = new PercentDoneReporter(
 				progressReporter,
 				MessageFormat.format("Loading [{0}] to database: ", fasta.getAbsolutePath()));
+
+		final PercentRangeReporter parsingRange = new PercentRangeReporter(percentReporter, 0f, 0.5f);
+		final PercentRangeReporter loadingRange = new PercentRangeReporter(percentReporter, 0.5f, 1.0f);
+
 		try {
-			session.getTransaction().begin();
 			stream.beforeFirst();
 			long numSequencesRead = 0L;
 
-			final boolean msSql = this.getDialect() instanceof SQLServerDialect;
-
-			final SQLQuery sqlQuery =
-					session.createSQLQuery("SELECT * FROM protein_sequence WHERE sequence=CONVERT(VARCHAR(MAX), :sequence)")
-							.addEntity(ProteinSequence.class);
-
+			final List<ProteinEntry> entries = new ArrayList<ProteinEntry>(50000);
+			final List<ProteinSequence> sequences = new ArrayList<ProteinSequence>(50000);
 			while (stream.gotoNextSequence()) {
 				numSequencesRead++;
 				final String header = stream.getHeader();
@@ -212,31 +209,39 @@ public final class FastaDbDaoHibernate extends BulkDaoBase implements FastaDbDao
 					description = "";
 				}
 
-				ProteinSequence proteinSequence = null;
-				if (!msSql) {
-					proteinSequence = addProteinSequence(session, new ProteinSequence(sequence));
-				} else {
-					final Object oldSequence = sqlQuery.setParameter("sequence", sequence).uniqueResult();
-
-					if (oldSequence == null) {
-						proteinSequence = new ProteinSequence(sequence);
-						session.insert(proteinSequence);
-					} else if (oldSequence instanceof ProteinSequence) {
-						proteinSequence = (ProteinSequence) oldSequence;
-					} else {
-						ExceptionUtilities.throwCastException(oldSequence, ProteinSequence.class);
-					}
-				}
-				final ProteinAccnum accnum = addAccessionNumber(session, new ProteinAccnum(accessionNumber));
-				final ProteinDescription desc = addDescription(session, new ProteinDescription(description));
+				final ProteinSequence proteinSequence = new ProteinSequence(sequence);
+				sequences.add(proteinSequence);
+				final ProteinAccnum accnum = new ProteinAccnum(accessionNumber);
+				final ProteinDescription desc = new ProteinDescription(description);
 				final ProteinEntry entry = new ProteinEntry(database, accnum, desc, proteinSequence);
-				// We know that we will never save two identical entries (fasta has each entry unique and we have not
-				// loaded the database yet. So no need to check)
-				saveStateless(session, entry, null, false);
+				entries.add(entry);
 				if (0 == numSequencesRead % REPORT_FREQUENCY) {
-					percentReporter.reportProgress(stream.percentRead());
+					parsingRange.reportProgress(stream.percentRead());
 				}
 			}
+
+			session.getTransaction().begin();
+
+			addSequences(sequences, "protein_sequence");
+
+			int entryNum = 0;
+			final int totalEntries = entries.size();
+			for (final ProteinEntry entry : entries) {
+				entryNum++;
+				final ProteinSequence proteinSequence = entry.getSequence();
+				final ProteinAccnum accnum = addAccessionNumber(session, entry.getAccessionNumber());
+				final ProteinDescription desc = addDescription(session, entry.getDescription());
+				final ProteinEntry newEntry = new ProteinEntry(database, accnum, desc, proteinSequence);
+
+				// We know that we will never save two identical entries (fasta has each entry unique and we have not
+				// loaded the database yet. So no need to check)
+				saveStateless(session, newEntry, null, false);
+
+				if (0 == numSequencesRead % REPORT_FREQUENCY) {
+					loadingRange.reportProgress((float) entryNum / (float) totalEntries);
+				}
+			}
+
 			LOGGER.info(MessageFormat.format("Loaded [{0}] to database: {1,number} sequences added.", fasta.getAbsolutePath(), numSequencesRead));
 			session.getTransaction().commit();
 		} catch (final Exception e) {
