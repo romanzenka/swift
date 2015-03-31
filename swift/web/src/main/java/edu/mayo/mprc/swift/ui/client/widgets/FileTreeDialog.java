@@ -3,6 +3,9 @@ package edu.mayo.mprc.swift.ui.client.widgets;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.logical.shared.ValueChangeEvent;
+import com.google.gwt.event.logical.shared.ValueChangeHandler;
+import com.google.gwt.user.client.Cookies;
 import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.Element;
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -17,9 +20,15 @@ import edu.mayo.mprc.swift.ui.client.service.ServiceAsync;
  *
  * @author: Roman Zenka
  */
-public final class FileTreeDialog extends DialogBox implements ClickHandler {
+public final class FileTreeDialog extends DialogBox implements ClickHandler, ValueChangeHandler<Boolean> {
+	public static final String FILE_ORDER_COOKIE = "fo";
+	public static final String FILE_ORDER_NAME = "name";
+	public static final String FILE_ORDER_DATE = "date";
+
 	private final Button okButton;
 	private final Button cancelButton;
+	private final RadioButton sortByName;
+	private final RadioButton sortByDate;
 	private SelectedFilesListener selectedFilesListener;
 
 	public FileTreeDialog(final int width, final int height) {
@@ -36,6 +45,24 @@ public final class FileTreeDialog extends DialogBox implements ClickHandler {
 		okButton = new Button("Ok");
 		caption.add(okButton, DockPanel.EAST);
 		okButton.addClickHandler(this);
+
+		String fileOrder = Cookies.getCookie(FILE_ORDER_COOKIE);
+		if (fileOrder == null || fileOrder.trim().isEmpty()) {
+			fileOrder = FILE_ORDER_NAME;
+		}
+
+		sortByDate = new RadioButton("sort");
+		sortByDate.setText("By date");
+		caption.add(sortByDate, DockPanel.EAST);
+		sortByDate.addValueChangeHandler(this);
+
+		sortByName = new RadioButton("sort");
+		sortByName.setText("By name");
+		caption.add(sortByName, DockPanel.EAST);
+		sortByName.addValueChangeHandler(this);
+
+		sortByName.setValue(FILE_ORDER_NAME.equals(fileOrder));
+		sortByDate.setValue(FILE_ORDER_DATE.equals(fileOrder));
 
 		final ScrollPanel panel = new ScrollPanel();
 		panel.setPixelSize(width, height);
@@ -71,7 +98,7 @@ public final class FileTreeDialog extends DialogBox implements ClickHandler {
 	@Override
 	public void show() {
 		super.show();
-		showFileDialogBox("filelist", "");
+		showFileDialogBox("filelist", "", getOrder());
 	}
 
 	public SelectedFilesListener getSelectedFilesListener() {
@@ -118,8 +145,8 @@ public final class FileTreeDialog extends DialogBox implements ClickHandler {
 	 *
 	 * @return the List<String> denoting the paths to the selected files/folders.
 	 */
-	public static native void showFileDialogBox(String iframe, String basePath)/*-{
-        $wnd.initDialog(iframe, null, "Load", basePath);
+	public static native void showFileDialogBox(String iframe, String basePath, String listOrder)/*-{
+        $wnd.initDialog(iframe, null, "Load", basePath, listOrder);
 
     }-*/;
 
@@ -137,4 +164,16 @@ public final class FileTreeDialog extends DialogBox implements ClickHandler {
         return retFiles;
     }-*/;
 
+	public String getOrder() {
+		if (Boolean.TRUE.equals(sortByName.getValue())) {
+			return "name";
+		}
+		return "date";
+	}
+
+	@Override
+	public void onValueChange(final ValueChangeEvent<Boolean> event) {
+		Cookies.setCookie(FILE_ORDER_COOKIE, getOrder());
+		showFileDialogBox("filelist", "", getOrder());
+	}
 }

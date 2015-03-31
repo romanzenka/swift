@@ -30,6 +30,7 @@ var g_top = "";
 // the topmost path
 var g_basepath = "";
 var firstQuery = true;
+var g_listOrder = "name";
 
 
 var expandedList = new ExpandedList();
@@ -44,8 +45,9 @@ function dropEvents(evt) {
  iframe - name of the container, could be a div, or can be the container object
  callback - method to call if exists (does not seem to be used)
  okMessage - message to display if ok (does not seem to be used)
+ listOrder - how to sort the elements ('name' or 'date')
  */
-function initDialog(iframe, callback, okMessage, basepath) {
+function initDialog(iframe, callback, okMessage, basepath, listOrder) {
     if (typeof iframe == "string") {
         iframe = document.getElementById(iframe);
     }
@@ -56,6 +58,7 @@ function initDialog(iframe, callback, okMessage, basepath) {
 
     returnCallback = callback;
     okmsg = okMessage;
+    g_listOrder = listOrder;
 
     queryInitial(iframe);
 }
@@ -65,14 +68,15 @@ function initDialog(iframe, callback, okMessage, basepath) {
  pre-expanded
  */
 function queryInitial(container) {
-    sendQuery(url, { 'e' : expandedList.getListAsString() }, container);
+    container.innerHTML = "";
+    sendQuery(url, {'e': expandedList.getListAsString(), 'order': g_listOrder}, container);
 }
 
 /*
  sends the asynchronous request for contents of directory dir
  */
 function queryDirectory(dir, container) {
-    sendQuery(url, { 'd' : dir }, container);
+    sendQuery(url, {'d': dir, 'order': g_listOrder}, container);
 }
 
 /*

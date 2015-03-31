@@ -21,6 +21,7 @@ public final class FileDirectoryServiceServlet {
 	private WebUiHolder webUiHolder;
 	public static final String DIRECTORY_PATH_ATTRIBUTE_NAME = "d";
 	public static final String EXPANDED_PATHS_ATTRIBUTE_NAME = "e";
+	public static final String SORT_ORDER_ATTRIBUTE_NAME = "order";
 
 	@RequestMapping(value = "/start/DirectoryService", method = RequestMethod.POST)
 	public void handleRequest(final HttpServletRequest req, final HttpServletResponse resp) throws
@@ -31,8 +32,15 @@ public final class FileDirectoryServiceServlet {
 		final PrintWriter out = resp.getWriter();
 		String directory_path;
 		String expanded_paths;
+		String order;
+		FileSearchBean.SortBy sortBy;
 		try {
-
+			order = req.getParameter(SORT_ORDER_ATTRIBUTE_NAME);
+			if ("date".equals(order)) {
+				sortBy = FileSearchBean.SortBy.DATE;
+			} else {
+				sortBy = FileSearchBean.SortBy.NAME;
+			}
 			directory_path = req.getParameter(DIRECTORY_PATH_ATTRIBUTE_NAME);
 			if (directory_path == null) {
 				directory_path = "";
@@ -43,7 +51,7 @@ public final class FileDirectoryServiceServlet {
 				expanded_paths = "";
 			}
 
-			final FileSearchBean fileBean = new FileSearchBean(getBaseFolder().getAbsolutePath(), FileSearchBean.SortBy.NAME);
+			final FileSearchBean fileBean = new FileSearchBean(getBaseFolder().getAbsolutePath(), sortBy);
 			fileBean.setPath(fixFileSeparators(directory_path));
 			fileBean.setExpandedPaths(expanded_paths);
 			fileBean.writeFolderContent(out);
