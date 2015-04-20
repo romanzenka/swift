@@ -40,6 +40,7 @@ public final class WebUi implements Checkable, InstrumentSerialNumberMapper {
 	public static final String NAME = "Swift Website";
 	public static final String DESC = "Swift's web user interface.<p>The daemon that contains the web interface will run within a web server.</p>";
 	public static final UserMessage USER_MESSAGE = new UserMessage();
+
 	private File browseRoot;
 	private DaemonConnection qstatDaemonConnection;
 	private String browseWebRoot;
@@ -57,6 +58,7 @@ public final class WebUi implements Checkable, InstrumentSerialNumberMapper {
 	private boolean extractMsn;
 	private boolean msconvert;
 	private InstrumentNameMapper quameterUi;
+	private String port;
 
 	public static final String SEARCHER = "searcher";
 	public static final String TITLE = "title";
@@ -90,7 +92,7 @@ public final class WebUi implements Checkable, InstrumentSerialNumberMapper {
 		}
 	}
 
-	public void setBrowseRoot(File browseRoot) {
+	public void setBrowseRoot(final File browseRoot) {
 		this.browseRoot = browseRoot;
 	}
 
@@ -117,7 +119,7 @@ public final class WebUi implements Checkable, InstrumentSerialNumberMapper {
 		return searchEngines;
 	}
 
-	public void setSearchEngines(Collection<SearchEngine> searchEngines) {
+	public void setSearchEngines(final Collection<SearchEngine> searchEngines) {
 		this.searchEngines = searchEngines;
 	}
 
@@ -141,7 +143,7 @@ public final class WebUi implements Checkable, InstrumentSerialNumberMapper {
 		return fileTokenFactory;
 	}
 
-	public void setFileTokenFactory(DatabaseFileTokenFactory fileTokenFactory) {
+	public void setFileTokenFactory(final DatabaseFileTokenFactory fileTokenFactory) {
 		this.fileTokenFactory = fileTokenFactory;
 	}
 
@@ -154,7 +156,7 @@ public final class WebUi implements Checkable, InstrumentSerialNumberMapper {
 		return mainDaemon;
 	}
 
-	public void setMainDaemon(Daemon mainDaemon) {
+	public void setMainDaemon(final Daemon mainDaemon) {
 		this.mainDaemon = mainDaemon;
 	}
 
@@ -162,8 +164,16 @@ public final class WebUi implements Checkable, InstrumentSerialNumberMapper {
 		return newConfigFile;
 	}
 
-	public void setNewConfigFile(File newConfigFile) {
+	public void setNewConfigFile(final File newConfigFile) {
 		this.newConfigFile = newConfigFile;
+	}
+
+	public String getPort() {
+		return port;
+	}
+
+	public void setPort(final String port) {
+		this.port = port;
 	}
 
 	@Override
@@ -213,7 +223,7 @@ public final class WebUi implements Checkable, InstrumentSerialNumberMapper {
 	 *
 	 * @param searches Searches to replace the instrument names in.
 	 */
-	public void mapInstrumentSerialNumbers(List<SearchRun> searches) {
+	public void mapInstrumentSerialNumbers(final List<SearchRun> searches) {
 		for (final SearchRun searchRun : searches) {
 			searchRun.setInstruments(
 					mapInstrumentSerialNumbers(
@@ -245,8 +255,20 @@ public final class WebUi implements Checkable, InstrumentSerialNumberMapper {
 		return scaffoldViewerUrl;
 	}
 
-	public void setScaffoldViewerUrl(String scaffoldViewerUrl) {
+	public void setScaffoldViewerUrl(final String scaffoldViewerUrl) {
 		this.scaffoldViewerUrl = scaffoldViewerUrl;
+	}
+
+	public String getCookiePrefix() {
+		// Few hardcoded values
+		if ("8080".equals(port)) {
+			return "";
+		}
+		if ("8090".equals(port)) {
+			return "dev-";
+		}
+		// The rest is done based on the port number
+		return String.format("%s-", port);
 	}
 
 	/**
@@ -268,6 +290,7 @@ public final class WebUi implements Checkable, InstrumentSerialNumberMapper {
 				ui.newConfigFile = config.getNewConfigFile() == null ? null : new File(config.getNewConfigFile());
 				ui.setFileTokenFactory(getFileTokenFactory());
 				ui.setScaffoldViewerUrl(config.getScaffoldViewerUrl());
+				ui.setPort(config.getPort());
 
 				if (config.getQstat() != null) {
 					ui.qstatDaemonConnection = (DaemonConnection) dependencies.createSingleton(config.getQstat());
@@ -330,7 +353,7 @@ public final class WebUi implements Checkable, InstrumentSerialNumberMapper {
 					}
 					ui.setSearchEngines(searchEngines);
 				}
-			} catch (Exception e) {
+			} catch (final Exception e) {
 				throw new MprcException("Web UI class could not be created.", e);
 			}
 			return ui;
@@ -340,7 +363,7 @@ public final class WebUi implements Checkable, InstrumentSerialNumberMapper {
 			return fileTokenFactory;
 		}
 
-		public void setFileTokenFactory(DatabaseFileTokenFactory fileTokenFactory) {
+		public void setFileTokenFactory(final DatabaseFileTokenFactory fileTokenFactory) {
 			this.fileTokenFactory = fileTokenFactory;
 		}
 
@@ -348,7 +371,7 @@ public final class WebUi implements Checkable, InstrumentSerialNumberMapper {
 			return searchEngineFactory;
 		}
 
-		public void setSearchEngineFactory(SearchEngine.Factory searchEngineFactory) {
+		public void setSearchEngineFactory(final SearchEngine.Factory searchEngineFactory) {
 			this.searchEngineFactory = searchEngineFactory;
 		}
 
@@ -356,7 +379,7 @@ public final class WebUi implements Checkable, InstrumentSerialNumberMapper {
 			return curationContext;
 		}
 
-		public void setCurationContext(CurationContext curationContext) {
+		public void setCurationContext(final CurationContext curationContext) {
 			this.curationContext = curationContext;
 		}
 
@@ -420,7 +443,7 @@ public final class WebUi implements Checkable, InstrumentSerialNumberMapper {
 			this.quameterUi = quameterUi;
 		}
 
-		public void setSearcher(ServiceConfig searcher) {
+		public void setSearcher(final ServiceConfig searcher) {
 			this.searcher = searcher;
 		}
 
@@ -532,7 +555,7 @@ public final class WebUi implements Checkable, InstrumentSerialNumberMapper {
 					.required()
 					.defaultValue("Swift " + ReleaseInfoCore.buildVersion())
 
-					.property("port", "Web server port", "The web interface port." +
+					.property(PORT, "Web server port", "The web interface port." +
 							" Standard HTTP port number is <tt>80</tt>. If your system is already running a web server, port 80 is probably taken, that is why we suggest running Swift at <tt>8080</tt> by default." +
 							" <p>Swift web user interface will be available at:</p><p><tt>http://" + daemon.getHostName() + ":&ltport&gt;/</tt></p>")
 					.required()

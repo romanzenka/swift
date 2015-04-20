@@ -19,6 +19,10 @@
         // How does the raw file root map to the web browser? Idea is that you strip pathPrefix from the path,
         // prepend pathWebPrefix instead and use the resulting URL in your browser
         var pathWebPrefix = "${pathWebPrefix}";
+
+        // To distinguish cookies when multiple ports are used
+        // cookies.js depends on this
+        var cookiePrefix = "${cookiePrefix}";
     </script>
 
     <link rel="stylesheet" href="/report/report.css?v=${ver}">

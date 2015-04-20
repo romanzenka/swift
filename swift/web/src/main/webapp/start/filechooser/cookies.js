@@ -9,11 +9,11 @@ function createCookie(name, value, days) {
         expires = "";
     }
 
-    document.cookie = name + "=" + escape(value) + expires + "; path=/";
+    document.cookie = cookiePrefix + name + "=" + escape(value) + expires + "; path=/";
 }
 
 function readCookie(name) {
-    var nameEQ = name + "=";
+    var nameEQ = cookiePrefix + name + "=";
     var ca = document.cookie.split(';');
     for (var i = 0; i < ca.length; i++) {
         var c = ca[i];
@@ -29,7 +29,7 @@ function readCookie(name) {
 }
 
 function eraseCookie(name) {
-    createCookie(name, "", -1);
+    createCookie(cookiePrefix + name, "", -1);
 }
 
 // Returns index of next occurence of character c in s, which is not escaped by preceding backslash. 

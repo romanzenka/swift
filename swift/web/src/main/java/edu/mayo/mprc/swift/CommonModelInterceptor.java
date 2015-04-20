@@ -36,6 +36,7 @@ public final class CommonModelInterceptor extends HandlerInterceptorAdapter {
 			model.addAttribute("userMessage", getWebUi().getUserMessage().getMessage());
 			model.addAttribute("pathPrefix", getPathPrefix());
 			model.addAttribute("pathWebPrefix", getWebUi().getBrowseWebRoot());
+			model.addAttribute("cookiePrefix", getWebUi().getCookiePrefix());
 			model.addAttribute("ver", ReleaseInfoCore.buildRevision());
 		}
 		super.postHandle(request, response, handler, modelAndView);

@@ -10,6 +10,12 @@
     <link rel="stylesheet" href="/common/topbar.css?v=${ver}" media="all">
     <link rel="stylesheet" href="/start/filechooser/style.css?v=${ver}" media="all">
 
+    <script type="text/javascript">
+        // To distinguish cookies when multiple ports are used
+        // cookies.js depends on this
+        var cookiePrefix = "${cookiePrefix}";
+    </script>
+
     <script type="text/javascript" src="/start/start.nocache.js"></script>
     <script type="text/javascript" src="/start/filechooser/jquery-1.7.min.js"></script>
     <script type="text/javascript" src="/start/filechooser/cookies.js?v=${ver}"></script>
