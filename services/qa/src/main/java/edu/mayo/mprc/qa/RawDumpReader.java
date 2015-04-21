@@ -50,7 +50,7 @@ public final class RawDumpReader implements KeyedTsvReader, Iterable<String> {
 			"Lock Mass Found", "Lock Mass Shift",
 			"Conversion Parameter I", "Conversion Parameter A", "Conversion Parameter B", "Conversion Parameter C", "Conversion Parameter D", "Conversion Parameter E",
 			"Dissociation Type",
-			"Polymer Segment Size", "Polymer Offset", "Polymer Score", "Polymer p-value"
+			"Polymer Segment Size", "Polymer Offset", "Polymer Score", "Polymer p-value", "Base Peak Intensity"
 	};
 	private static final String EMPTY_LINE;
 	private static final Pattern TAB_SPLIT = Pattern.compile("\t");

@@ -36,6 +36,7 @@ pepTol.title <- "Peptide Tolerance"
 tic.title <- "TIC vs. RT"
 msmsEval.title <- "msmsEval Discriminant Histogram"
 uv.title <- "Pump Stats" # This is called "uv" as the pump pressure is measured using ultraviolet light
+basepeak.title <- "Base Peak Intensity vs. RT"
 
 # Plot dimensions
 plot.dimension.full <- c(1000, 800) # The actual plot dimensions
@@ -666,7 +667,7 @@ imageGenerator<-function(dataFile, msmsEvalDataFile, infoFile, spectrumFile, chr
       }
     }          
     
-    spectrumInfo <- dataTabFull[,c("Scan.Id", "MS.Level", "RT", "TIC", "Source.Current..uA.", "Lock.Mass.Found", "Lock.Mass.Shift")]        
+    spectrumInfo <- dataTabFull[,c("Scan.Id", "MS.Level", "RT", "TIC", "Source.Current..uA.", "Lock.Mass.Found", "Lock.Mass.Shift", "Base.Peak.Intensity")]        
     hasRetentionTimes <- sum(!is.na(spectrumInfo$RT))>0
     if(hasRetentionTimes) {             
       ### Total Ion Current plot 
@@ -951,7 +952,7 @@ imageGenerator<-function(dataFile, msmsEvalDataFile, infoFile, spectrumFile, chr
     }
     dev.off()
     
-    ### Peptide tolerance
+    ### Peptide tolerance plot
     startPlot(pepTol.title, outputImages$pepTol.file, outDir)
     
     if(length(dataTab$Actual.minus.calculated.peptide.mass..PPM.)!=0) {
@@ -1031,9 +1032,50 @@ imageGenerator<-function(dataFile, msmsEvalDataFile, infoFile, spectrumFile, chr
       }
     } else {
       emptyPlot()
-    }
-    
+    }    
     dev.off()
+    
+    ### Base peak intensity plot
+    startPlot(basepeak.title, outputImages$basepeak.file, outDir)
+    
+    ms2 <- spectrumInfo$MS.Level==2
+    maxIntensity = max(spectrumInfo$Base.Peak.Intensity)
+    xlim <- c(0, max(spectrumInfo$RT))
+    plot(
+      x=NA, 
+      y=NA,
+      xlim=xlim,
+      ylim=c(1, maxIntensity),
+      main=c(plotName, tic.title), 
+      xlab="Retention Time (min)", 
+      ylab="Base Peak Intensity",
+      xaxt="n",
+      yaxs="i",
+      pch=20,
+      type="n"
+    )
+    
+    tickX <- seq(xlim[1], xlim[2], 1)
+    axis(side=1, col="black", at=tickX, tick=TRUE, labels=FALSE, tcl= -0.2)
+
+    tickX <- seq(xlim[1], xlim[2], 5)
+    axis(side=1, col="black", at=tickX, tick=TRUE, labels=TRUE, tcl= -0.4)
+    
+    # Draw raw base peak intensity
+    keep <- spectrumInfo$MS.Level==2
+    lines(
+      x=spectrumInfo$RT[keep], 
+      y=spectrumInfo$Base.Peak.Intensity[keep], 
+      col=colors.by.mslevel.smoothed[2]
+    )     
+    
+    # Draw helper lines
+    abline(h=1e3);
+    
+    # Pump breakpoints
+    abline(v=pumpBreakpointRT, col=uv.percent.b.breakpoint.color)              
+    dev.off()
+  
     
     msmsDataTab <- dataTabFull[!is.na(dataTabFull$discriminant), c("Scan.Id", "discriminant")]
     duplicatedMsmsDataRows <- duplicated(msmsDataTab$Scan.Id)
@@ -1168,6 +1210,7 @@ startReportFile<-function(reportFile) {
     "</th><th>", mz.title, helpLink("swiftQaScanVsMZ"),
     "</th><th>", current.title, helpLink("swiftQaSourceCurrent"),
     "</th><th>", uv.title, helpLink("swiftUvData"),    
+    "</th><th>", basepeak.title, helpLink("swiftBasePeak"),    
     "</th>"
     
     , file=reportFile, sep="")
@@ -1250,7 +1293,8 @@ addRowToReportFile<-function(reportFile, row) {
                  getHtmlTextImageFileInfo(row$tic.file),
                  getHtmlTextImageFileInfo(row$mz.file),
                  getHtmlTextImageFileInfo(row$source.current.file),
-                 getHtmlTextImageFileInfo(row$uv.file))
+                 getHtmlTextImageFileInfo(row$uv.file),
+                 getHtmlTextImageFileInfo(row$basepeak.file))
   
   chunk <- paste(chunk, "</tr>")
   
@@ -1271,18 +1315,24 @@ endReportFile<-function(reportFile) {
 run <- function(inputFile, reportFileName, decoyRegex) {
   inputDataTab<-read.delim(inputFile, header=TRUE, sep="\t", colClasses="character", fileEncoding="UTF-8")
   reportFile<-file(reportFileName, "w")
+  reportDir <- dirname(reportFileName)
   on.exit(close(reportFile), add=TRUE)
   
-  excelSummaryFile<-file(file.path(dirname(reportFileName), "summary.xls"), "w")
+  excelSummaryFile<-file(file.path(reportDir, "summary.xls"), "w")
   on.exit(close(excelSummaryFile), add=TRUE)
   cat("raw file name\tproteins\treverse proteins\tpeptides\treverse peptides\tall spectra\tmsn spectra\t.dat spectra\tidentified spectra\treverse hit spectra\tpolymer spectra\tunfragmented spectra\tdominant fragment spectra\tMS1 TIC 25%\tMS1 TIC 50%\tMS1 TIC 75%\tMS2 TIC 25%\tMS2 TIC 50%\tMS2 TIC 75%\tloading pressure mean\tnc pressure mean\tcolumn temperature min\tcolumn temperature max\n" , file=excelSummaryFile)
   
   startReportFile(reportFile)
   
   print("Generating image files and report file.")
+
+  # Generate name for the base peak file that is not passed from Swift
+  inputDataTab[,'Base.Peak.File'] <- file.path(dirname(inputDataTab[, 'Id.File']), gsub(".calRt.png", ".basePeak.png", x=basename(inputDataTab[, 'Id.File']), fixed=TRUE))
   
   for(i in 1:length(inputDataTab$Data.File)) {
     line <- inputDataTab[i,]
+    # Generate the new image name so it does not have to be specified by caller
+    line$Base.Peak.File 
     row <- imageGenerator(
       line$Data.File,          
       line$msmsEval.Output,
@@ -1290,17 +1340,18 @@ run <- function(inputFile, reportFileName, decoyRegex) {
       line$Raw.Spectra.File,
       line$Chromatogram.File,
       list(
-        lockmass.file = line$Id.File,
-        calibration.file = line$Mz.File,
-        mz.file = line$IdVsMz.File,
-        source.current.file = line$Source.Current.File,
-        msmsEval.file = line$msmsEval.Discriminant.File,
-        pepTol.file = line$Peptide.Tolerance.File,
-        tic.file = line$TIC.File,
-        uv.file = line$UV.Data.File),
+        lockmass.file = file.path(reportDir, basename(line$Id.File)),
+        calibration.file = file.path(reportDir, basename(line$Mz.File)),
+        mz.file = file.path(reportDir, basename(line$IdVsMz.File)),
+        source.current.file = file.path(reportDir, basename(line$Source.Current.File)),
+        msmsEval.file = file.path(reportDir, basename(line$msmsEval.Discriminant.File)),
+        pepTol.file = file.path(reportDir, basename(line$Peptide.Tolerance.File)),
+        tic.file = file.path(reportDir, basename(line$TIC.File)),
+        uv.file = file.path(reportDir, basename(line$UV.Data.File)),
+        basepeak.file = file.path(reportDir, basename(line$Base.Peak.File))),
       line$Generate.Files,
       decoyRegex,
-      dirname(reportFileName))
+      reportDir)
     
     addRowToReportFile(reportFile, row)
     cat(line$Raw.File, 
