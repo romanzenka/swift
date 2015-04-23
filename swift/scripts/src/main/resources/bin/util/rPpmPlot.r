@@ -1038,7 +1038,6 @@ imageGenerator<-function(dataFile, msmsEvalDataFile, infoFile, spectrumFile, chr
     ### Base peak intensity plot
     startPlot(basepeak.title, outputImages$basepeak.file, outDir)
     
-    ms2 <- spectrumInfo$MS.Level==2
     maxIntensity = max(spectrumInfo$Base.Peak.Intensity)
     xlim <- c(0, max(spectrumInfo$RT))
     plot(
@@ -1062,16 +1061,12 @@ imageGenerator<-function(dataFile, msmsEvalDataFile, infoFile, spectrumFile, chr
     axis(side=1, col="black", at=tickX, tick=TRUE, labels=TRUE, tcl= -0.4)
     
     # Draw raw base peak intensity
-    keep <- spectrumInfo$MS.Level==2
     lines(
-      x=spectrumInfo$RT[keep], 
-      y=spectrumInfo$Base.Peak.Intensity[keep], 
-      col=colors.by.mslevel.smoothed[2]
+      x=spectrumInfo$RT,
+      y=spectrumInfo$Base.Peak.Intensity,
+      col=colors.by.mslevel.smoothed[1]
     )     
-    
-    # Draw helper lines
-    abline(h=1e3);
-    
+
     # Pump breakpoints
     abline(v=pumpBreakpointRT, col=uv.percent.b.breakpoint.color)              
     dev.off()
