@@ -1,6 +1,7 @@
 package edu.mayo.mprc.searchdb;
 
 import edu.mayo.mprc.daemon.files.FileHolder;
+import edu.mayo.mprc.searchdb.dao.SearchDbResultEntry;
 import edu.mayo.mprc.utilities.progress.ProgressInfo;
 
 import java.util.List;

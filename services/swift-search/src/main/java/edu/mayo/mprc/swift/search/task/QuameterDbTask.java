@@ -9,6 +9,7 @@ import edu.mayo.mprc.swift.db.DatabaseFileTokenFactory;
 import edu.mayo.mprc.swift.dbmapping.FileSearch;
 import edu.mayo.mprc.utilities.progress.ProgressInfo;
 import edu.mayo.mprc.workflow.engine.WorkflowEngine;
+import org.apache.log4j.Logger;
 
 import java.util.Map;
 
@@ -16,6 +17,8 @@ import java.util.Map;
  * @author Roman Zenka
  */
 public final class QuameterDbTask extends AsyncTaskBase {
+	private static final Logger LOGGER = Logger.getLogger(QuameterDbTask.class);
+
 	private SearchDbTask searchDbTask;
 	private QuameterTask quameterTask;
 	private ScaffoldTaskI scaffoldTask;
@@ -44,7 +47,9 @@ public final class QuameterDbTask extends AsyncTaskBase {
 		final String fileName = fileSearch.getInputFile().getAbsolutePath();
 		final Integer analysisId = searchDbTask.getAnalysisId();
 		final Integer searchResultId = metadata.get(fileName);
-		Preconditions.checkNotNull(searchResultId, "There must be search result id recorded for file name [" + fileName + "]");
+		if (searchResultId == null) {
+			LOGGER.warn("There is no search result id recorded for file name [" + fileName + "]. This can happen if the file did not get any spectra identified");
+		}
 		return new QuameterDbWorkPacket(
 				isFromScratch(),
 				analysisId,

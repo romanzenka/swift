@@ -1,4 +1,4 @@
-package edu.mayo.mprc.searchdb;
+package edu.mayo.mprc.searchdb.dao;
 
 import edu.mayo.mprc.daemon.files.FileHolder;
 

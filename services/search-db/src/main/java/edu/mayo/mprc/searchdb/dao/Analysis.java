@@ -1,5 +1,7 @@
 package edu.mayo.mprc.searchdb.dao;
 
+import com.google.common.collect.Lists;
+import edu.mayo.mprc.MprcException;
 import edu.mayo.mprc.database.DaoBase;
 import edu.mayo.mprc.database.PersistableBase;
 import edu.mayo.mprc.swift.dbmapping.ReportData;
@@ -172,6 +174,21 @@ public final class Analysis extends PersistableBase {
 				.add(DaoBase.associationEq("biologicalSamples", getBiologicalSamples()));
 	}
 
+	/**
+	 * @return a map from .RAW file to ID of the saved {@link edu.mayo.mprc.searchdb.dao.SearchResult} for that file.
+	 */
+	public List<SearchDbResultEntry> getSavedSearchResults() {
+		final List<SearchDbResultEntry> searchResultList = Lists.newArrayList();
+		for (final BiologicalSample biologicalSample : getBiologicalSamples()) {
+			for (final SearchResult searchResult : biologicalSample.getSearchResults()) {
+				if (searchResult.getId() == null) {
+					throw new MprcException("Programmer error - the search result should have been already saved.");
+				}
+				searchResultList.add(new SearchDbResultEntry(searchResult.getMassSpecSample().getFile(), searchResult.getId()));
+			}
+		}
+		return searchResultList;
+	}
 
 	/**
 	 * Report information about entire analysis into a given writer in HTML format.
