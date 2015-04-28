@@ -27,6 +27,8 @@ public final class SearchDbTask extends AsyncTaskBase {
 
 	private final ScaffoldSpectrumExportProducer scaffoldTask;
 
+	private final Object progressLock = new Object();
+
 	private final Map<String, RAWDumpTask> rawDumpTaskMap = new HashMap<String, RAWDumpTask>(5);
 	/**
 	 * A map from input .RAW file name to an id of {@link edu.mayo.mprc.searchdb.dao.SearchResult} object.
@@ -72,11 +74,15 @@ public final class SearchDbTask extends AsyncTaskBase {
 	}
 
 	public Map<String, Integer> getLoadedSearchResults() {
-		return loadedSearchResults;
+		synchronized (progressLock) {
+			return loadedSearchResults;
+		}
 	}
 
 	public Integer getAnalysisId() {
-		return analysisId;
+		synchronized (progressLock) {
+			return analysisId;
+		}
 	}
 
 	@Override
@@ -97,11 +103,13 @@ public final class SearchDbTask extends AsyncTaskBase {
 	@Override
 	public void onProgress(final ProgressInfo progressInfo) {
 		if (progressInfo instanceof SearchDbResult) {
-			final SearchDbResult result = (SearchDbResult) progressInfo;
-			analysisId = result.getAnalysisId();
-			loadedSearchResults = Maps.newTreeMap();
-			for (SearchDbResultEntry entry : result.getLoadedSearchResults()) {
-				loadedSearchResults.put(entry.getInputFile().getAbsolutePath(), entry.getSearchResultId());
+			synchronized (progressLock) {
+				final SearchDbResult result = (SearchDbResult) progressInfo;
+				analysisId = result.getAnalysisId();
+				loadedSearchResults = Maps.newTreeMap();
+				for (SearchDbResultEntry entry : result.getLoadedSearchResults()) {
+					loadedSearchResults.put(entry.getInputFile().getAbsolutePath(), entry.getSearchResultId());
+				}
 			}
 		}
 	}
