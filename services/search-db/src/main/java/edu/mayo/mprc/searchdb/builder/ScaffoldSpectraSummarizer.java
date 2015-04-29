@@ -5,6 +5,7 @@ import edu.mayo.mprc.MprcException;
 import edu.mayo.mprc.fastadb.ProteinSequenceTranslator;
 import edu.mayo.mprc.scaffoldparser.spectra.ScaffoldReportReader;
 import edu.mayo.mprc.scaffoldparser.spectra.ScaffoldSpectraVersion;
+import edu.mayo.mprc.searchdb.dao.BiologicalSampleId;
 import edu.mayo.mprc.utilities.FileUtilities;
 import org.joda.time.DateTime;
 

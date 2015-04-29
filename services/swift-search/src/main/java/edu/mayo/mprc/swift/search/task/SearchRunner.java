@@ -10,7 +10,7 @@ import edu.mayo.mprc.daemon.DaemonUtilities;
 import edu.mayo.mprc.dbcurator.model.Curation;
 import edu.mayo.mprc.dbcurator.model.CurationDao;
 import edu.mayo.mprc.scaffold.ScaffoldWorker;
-import edu.mayo.mprc.searchdb.builder.BiologicalSampleId;
+import edu.mayo.mprc.searchdb.dao.BiologicalSampleId;
 import edu.mayo.mprc.swift.db.DatabaseFileTokenFactory;
 import edu.mayo.mprc.swift.db.SearchEngine;
 import edu.mayo.mprc.swift.db.SwiftDao;

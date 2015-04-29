@@ -3,6 +3,7 @@ package edu.mayo.mprc.searchdb.builder;
 import com.google.common.base.Objects;
 import edu.mayo.mprc.MprcException;
 import edu.mayo.mprc.searchdb.dao.BiologicalSample;
+import edu.mayo.mprc.searchdb.dao.BiologicalSampleId;
 import edu.mayo.mprc.searchdb.dao.BiologicalSampleList;
 
 import java.util.*;

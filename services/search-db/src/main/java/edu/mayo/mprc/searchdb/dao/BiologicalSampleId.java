@@ -1,4 +1,4 @@
-package edu.mayo.mprc.searchdb.builder;
+package edu.mayo.mprc.searchdb.dao;
 
 import com.google.common.base.Objects;
 

@@ -2,7 +2,6 @@ package edu.mayo.mprc.searchdb.dao;
 
 import edu.mayo.mprc.database.DaoBase;
 import edu.mayo.mprc.database.PersistableBase;
-import edu.mayo.mprc.searchdb.builder.BiologicalSampleId;
 import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.Restrictions;
 

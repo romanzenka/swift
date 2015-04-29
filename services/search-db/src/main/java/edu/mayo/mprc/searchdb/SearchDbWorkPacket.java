@@ -1,8 +1,8 @@
 package edu.mayo.mprc.searchdb;
 
 import edu.mayo.mprc.daemon.worker.WorkPacketBase;
-import edu.mayo.mprc.searchdb.builder.BiologicalSampleId;
 import edu.mayo.mprc.searchdb.builder.RawFileMetaData;
+import edu.mayo.mprc.searchdb.dao.BiologicalSampleId;
 import edu.mayo.mprc.swift.dbmapping.ReportData;
 
 import java.io.File;

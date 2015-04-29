@@ -1,6 +1,7 @@
 package edu.mayo.mprc.searchdb.builder;
 
 import edu.mayo.mprc.searchdb.dao.BiologicalSample;
+import edu.mayo.mprc.searchdb.dao.BiologicalSampleId;
 
 import java.util.Set;
 
