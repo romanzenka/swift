@@ -2,18 +2,23 @@ package edu.mayo.mprc.searchdb.dao;
 
 import com.google.common.base.Objects;
 
+import java.io.Serializable;
+
 /**
  * @author Roman Zenka
  */
-public final class BiologicalSampleId {
-	private final String sampleName;
+public final class BiologicalSampleId implements Serializable {
+
+	private static final long serialVersionUID = 7132897039247713138L;
+
+	private String sampleName;
 
 	/**
 	 * Category of the sample. This is usually set to "none", but sometimes it can contain useful information.
 	 */
-	private final String category;
+	private String category;
 
-	public BiologicalSampleId(String sampleName, String category) {
+	public BiologicalSampleId(final String sampleName, final String category) {
 		this.category = category;
 		this.sampleName = sampleName;
 	}
@@ -32,7 +37,7 @@ public final class BiologicalSampleId {
 	}
 
 	@Override
-	public boolean equals(Object obj) {
+	public boolean equals(final Object obj) {
 		if (this == obj) {
 			return true;
 		}
