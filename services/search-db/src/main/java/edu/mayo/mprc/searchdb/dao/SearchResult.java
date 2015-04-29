@@ -5,6 +5,8 @@ import edu.mayo.mprc.database.PersistableBase;
 import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.Restrictions;
 
+import java.util.Objects;
+
 /**
  * A list of search results for a particular tandem mass spectrometry sample.
  * <p/>
@@ -64,10 +66,10 @@ public class SearchResult extends PersistableBase {
 
 		final SearchResult that = (SearchResult) o;
 
-		if (getMassSpecSample() != null ? !getMassSpecSample().getId().equals(that.getMassSpecSample().getId()) : that.getMassSpecSample() != null) {
+		if (getMassSpecSample() != null ? !Objects.equals(getMassSpecSample().getId(), that.getMassSpecSample().getId()) : that.getMassSpecSample() != null) {
 			return false;
 		}
-		if (getProteinGroups() != null ? !getProteinGroups().getId().equals(that.getProteinGroups().getId()) : that.getProteinGroups() != null) {
+		if (getProteinGroups() != null ? !Objects.equals(getProteinGroups().getId(), that.getProteinGroups().getId()) : that.getProteinGroups() != null) {
 			return false;
 		}
 
