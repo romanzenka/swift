@@ -149,5 +149,4 @@ public class FileSearch extends PersistableBase implements EqualityCriteria {
 				.add(DaoBase.associationEq("swiftSearchDefinition", getSwiftSearchDefinition()))
 				.add(DaoBase.associationEq("searchParameters", getSearchParameters()));
 	}
-
 }

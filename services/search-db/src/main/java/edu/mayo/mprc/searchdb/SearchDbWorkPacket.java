@@ -1,6 +1,7 @@
 package edu.mayo.mprc.searchdb;
 
 import edu.mayo.mprc.daemon.worker.WorkPacketBase;
+import edu.mayo.mprc.searchdb.builder.BiologicalSampleId;
 import edu.mayo.mprc.searchdb.builder.RawFileMetaData;
 import edu.mayo.mprc.swift.dbmapping.ReportData;
 
@@ -34,15 +35,22 @@ public final class SearchDbWorkPacket extends WorkPacketBase {
 	 */
 	private Map<String, RawFileMetaData> fileMetaDataMap;
 
+	/**
+	 * Map from full raw file path -> biological sample it is a part of
+	 */
+	private Map<File, BiologicalSampleId> fileToBiologicalSampleMap;
+
 	public SearchDbWorkPacket(final boolean fromScratch, final long reportDataId,
 	                          final File scaffoldSpectrumReport,
 	                          final File scaffoldUnimod,
-	                          final Map<String, RawFileMetaData> fileMetaDataMap) {
+	                          final Map<String, RawFileMetaData> fileMetaDataMap,
+	                          final Map<File, BiologicalSampleId> fileToBiologicalSampleMap) {
 		super(fromScratch);
 		this.reportDataId = reportDataId;
 		this.scaffoldSpectrumReport = scaffoldSpectrumReport;
 		this.scaffoldUnimod = scaffoldUnimod;
 		this.fileMetaDataMap = fileMetaDataMap;
+		this.fileToBiologicalSampleMap = fileToBiologicalSampleMap;
 	}
 
 	public long getReportDataId() {
@@ -59,5 +67,9 @@ public final class SearchDbWorkPacket extends WorkPacketBase {
 
 	public Map<String, RawFileMetaData> getFileMetaDataMap() {
 		return fileMetaDataMap;
+	}
+
+	public Map<File, BiologicalSampleId> getFileToBiologicalSampleMap() {
+		return fileToBiologicalSampleMap;
 	}
 }

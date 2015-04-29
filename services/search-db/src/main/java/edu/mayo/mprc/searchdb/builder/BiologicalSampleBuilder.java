@@ -12,12 +12,7 @@ import java.util.Set;
 public class BiologicalSampleBuilder implements Builder<BiologicalSample> {
 	private AnalysisBuilder analysis;
 
-	private String sampleName;
-
-	/**
-	 * Category of the sample. This is usually set to "none", but sometimes it can contain useful information.
-	 */
-	private String category;
+	private BiologicalSampleId biologicalSampleId;
 
 	/**
 	 * Results of protein searches for this particular biological sample. Would usually contain only one mass
@@ -25,16 +20,15 @@ public class BiologicalSampleBuilder implements Builder<BiologicalSample> {
 	 */
 	private SearchResultListBuilder searchResults;
 
-	public BiologicalSampleBuilder(final AnalysisBuilder analysis, final String sampleName, final String category) {
+	public BiologicalSampleBuilder(final AnalysisBuilder analysis, final BiologicalSampleId biologicalSampleId) {
 		this.analysis = analysis;
-		this.sampleName = sampleName;
-		this.category = category;
+		this.biologicalSampleId = biologicalSampleId;
 		searchResults = new SearchResultListBuilder(this);
 	}
 
 	@Override
 	public BiologicalSample build() {
-		return new BiologicalSample(sampleName, category, searchResults.build());
+		return new BiologicalSample(biologicalSampleId, searchResults.build());
 	}
 
 	public AnalysisBuilder getAnalysis() {
@@ -42,19 +36,11 @@ public class BiologicalSampleBuilder implements Builder<BiologicalSample> {
 	}
 
 	public String getSampleName() {
-		return sampleName;
-	}
-
-	public void setSampleName(final String sampleName) {
-		this.sampleName = sampleName;
+		return biologicalSampleId.getSampleName();
 	}
 
 	public String getCategory() {
-		return category;
-	}
-
-	public void setCategory(final String category) {
-		this.category = category;
+		return biologicalSampleId.getCategory();
 	}
 
 	public SearchResultListBuilder getSearchResults() {
@@ -76,10 +62,7 @@ public class BiologicalSampleBuilder implements Builder<BiologicalSample> {
 
 		final BiologicalSampleBuilder that = (BiologicalSampleBuilder) o;
 
-		if (category != null ? !category.equals(that.category) : that.category != null) {
-			return false;
-		}
-		if (sampleName != null ? !sampleName.equals(that.sampleName) : that.sampleName != null) {
+		if (biologicalSampleId != null ? !biologicalSampleId.equals(that.biologicalSampleId) : that.biologicalSampleId != null) {
 			return false;
 		}
 
@@ -88,8 +71,7 @@ public class BiologicalSampleBuilder implements Builder<BiologicalSample> {
 
 	@Override
 	public int hashCode() {
-		int result = sampleName != null ? sampleName.hashCode() : 0;
-		result = 31 * result + (category != null ? category.hashCode() : 0);
+		int result = biologicalSampleId != null ? biologicalSampleId.hashCode() : 0;
 		return result;
 	}
 

@@ -10,10 +10,7 @@ import edu.mayo.mprc.fastadb.FastaDbDao;
 import edu.mayo.mprc.fastadb.FastaDbDaoHibernate;
 import edu.mayo.mprc.fastadb.ProteinSequence;
 import edu.mayo.mprc.fastadb.ProteinSequenceTranslator;
-import edu.mayo.mprc.searchdb.builder.AnalysisBuilder;
-import edu.mayo.mprc.searchdb.builder.DummyMassSpecDataExtractor;
-import edu.mayo.mprc.searchdb.builder.SearchResultBuilder;
-import edu.mayo.mprc.searchdb.builder.SearchResultListBuilder;
+import edu.mayo.mprc.searchdb.builder.*;
 import edu.mayo.mprc.searchdb.dao.Analysis;
 import edu.mayo.mprc.swift.db.SwiftDao;
 import edu.mayo.mprc.swift.db.SwiftDaoHibernate;
@@ -186,7 +183,7 @@ public final class BulkLoadingTest extends DaoTest {
 		final AnalysisBuilder builder = new AnalysisBuilder(new DummyTranslator(), new DummyMassSpecDataExtractor(new DateTime(2013, 9, 22, 10, 20, 30, 0)));
 		ReportData reportData = swiftDao.getReportForId(reportDataId);
 		builder.setReportData(reportData);
-		final SearchResultListBuilder searchResults = builder.getBiologicalSamples().getBiologicalSample("sample", "category").getSearchResults();
+		final SearchResultListBuilder searchResults = builder.getBiologicalSamples().getBiologicalSample(new BiologicalSampleId("sample", "category")).getSearchResults();
 		final SearchResultBuilder tandemMassSpecResult = searchResults.getTandemMassSpecResult("test.RAW");
 		for (int i = 0; i < 100; i++) {
 			tandemMassSpecResult.getProteinGroups().getProteinGroup("AC" + i, 1, 1, 1, 0.1, 0.2, 0.3);

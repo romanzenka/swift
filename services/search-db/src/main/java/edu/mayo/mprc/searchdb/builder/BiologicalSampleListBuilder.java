@@ -15,7 +15,7 @@ import java.util.*;
 public class BiologicalSampleListBuilder implements Builder<BiologicalSampleList> {
 	private AnalysisBuilder analysis;
 
-	private Map<String, BiologicalSampleBuilder> biologicalSamples = new LinkedHashMap<String, BiologicalSampleBuilder>(5);
+	private Map<BiologicalSampleId, BiologicalSampleBuilder> biologicalSamples = new LinkedHashMap<BiologicalSampleId, BiologicalSampleBuilder>(5);
 
 	public BiologicalSampleListBuilder(final AnalysisBuilder analysis) {
 		this.analysis = analysis;
@@ -25,20 +25,19 @@ public class BiologicalSampleListBuilder implements Builder<BiologicalSampleList
 	 * Get current biological sample builder object. If we encounter a new one, create a new one and add it to
 	 * the {@link edu.mayo.mprc.searchdb.dao.Analysis}.
 	 *
-	 * @param sampleName Primary key for {@link BiologicalSample}
-	 * @param category   Category of the sample. Depends on {@code sampleName}
+	 * @param biologicalSampleId Primary key for {@link BiologicalSample}
 	 * @return The current sample.
 	 */
-	public BiologicalSampleBuilder getBiologicalSample(final String sampleName, final String category) {
-		final BiologicalSampleBuilder sample = biologicalSamples.get(sampleName);
+	public BiologicalSampleBuilder getBiologicalSample(BiologicalSampleId biologicalSampleId) {
+		final BiologicalSampleBuilder sample = biologicalSamples.get(biologicalSampleId);
 		if (sample == null) {
-			final BiologicalSampleBuilder newSample = new BiologicalSampleBuilder(analysis, sampleName, category);
-			biologicalSamples.put(sampleName, newSample);
-			biologicalSamples.put(sampleName, newSample);
+			final BiologicalSampleBuilder newSample = new BiologicalSampleBuilder(analysis, biologicalSampleId);
+			biologicalSamples.put(biologicalSampleId, newSample);
+			biologicalSamples.put(biologicalSampleId, newSample);
 			return newSample;
 		}
-		if (!Objects.equal(sample.getCategory(), category)) {
-			throw new MprcException("Sample [" + sampleName + "] reported with two distinct categories [" + category + "] and [" + sample.getCategory() + "]");
+		if (!Objects.equal(sample.getCategory(), biologicalSampleId.getCategory())) {
+			throw new MprcException("Sample [" + biologicalSampleId.getSampleName() + "] reported with two distinct categories [" + biologicalSampleId.getCategory() + "] and [" + sample.getCategory() + "]");
 		}
 		return sample;
 	}

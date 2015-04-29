@@ -6,8 +6,10 @@ import edu.mayo.mprc.fastadb.ProteinSequence;
 import edu.mayo.mprc.fastadb.ProteinSequenceTranslator;
 import edu.mayo.mprc.searchdb.dao.*;
 import edu.mayo.mprc.swift.dbmapping.ReportData;
+import edu.mayo.mprc.utilities.FileUtilities;
 import org.joda.time.DateTime;
 
+import java.io.File;
 import java.util.*;
 
 /**
@@ -125,6 +127,21 @@ public class AnalysisBuilder implements Builder<Analysis> {
 			}
 		}
 		return map.values();
+	}
+
+	/**
+	 * Make sure we have an entry for the raw files that got nothing identified.
+	 * Simply fill in empty protein list
+	 */
+	public void addMissingFileEntries(Collection<RawFileMetaData> values, Map<File, BiologicalSampleId> fileToBiologicalSampleMap) {
+
+		for (Map.Entry<File, BiologicalSampleId> entry : fileToBiologicalSampleMap.entrySet()) {
+			String msmsSampleName = entry.getKey().getName();
+			BiologicalSampleId biologicalSampleId = entry.getValue();
+
+			final BiologicalSampleBuilder biologicalSample = getBiologicalSamples().getBiologicalSample(biologicalSampleId);
+			final SearchResultBuilder searchResult = biologicalSample.getSearchResults().getTandemMassSpecResult(FileUtilities.stripGzippedExtension(msmsSampleName));
+		}
 	}
 
 	public String getDatabaseSources() {

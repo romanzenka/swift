@@ -2,6 +2,7 @@ package edu.mayo.mprc.searchdb.dao;
 
 import edu.mayo.mprc.database.DaoBase;
 import edu.mayo.mprc.database.PersistableBase;
+import edu.mayo.mprc.searchdb.builder.BiologicalSampleId;
 import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.Restrictions;
 
@@ -42,9 +43,9 @@ public class BiologicalSample extends PersistableBase {
 	public BiologicalSample() {
 	}
 
-	public BiologicalSample(final String sampleName, final String category, final SearchResultList searchResults) {
-		this.sampleName = sampleName;
-		this.category = category;
+	public BiologicalSample(final BiologicalSampleId biologicalSampleId, final SearchResultList searchResults) {
+		this.sampleName = biologicalSampleId.getSampleName();
+		this.category = biologicalSampleId.getCategory();
 		this.searchResults = searchResults;
 	}
 

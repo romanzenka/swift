@@ -10,6 +10,7 @@ import edu.mayo.mprc.daemon.DaemonUtilities;
 import edu.mayo.mprc.dbcurator.model.Curation;
 import edu.mayo.mprc.dbcurator.model.CurationDao;
 import edu.mayo.mprc.scaffold.ScaffoldWorker;
+import edu.mayo.mprc.searchdb.builder.BiologicalSampleId;
 import edu.mayo.mprc.swift.db.DatabaseFileTokenFactory;
 import edu.mayo.mprc.swift.db.SearchEngine;
 import edu.mayo.mprc.swift.db.SwiftDao;
@@ -313,7 +314,7 @@ public final class SearchRunner implements Runnable, Lifecycle {
 			// Ask for dumping the .RAW file since the QA might be disabled
 			if (isRawFile(inputFile)) {
 				final RAWDumpTask rawDumpTask = addRawDumpTask(inputFile.getInputFile(), QaTask.getQaSubdirectory(scaffoldTask.getScaffoldXmlFile()));
-				searchDbTask = addSearchDbCall(scaffoldTask, rawDumpTask);
+				searchDbTask = addSearchDbCall(scaffoldTask, rawDumpTask, new BiologicalSampleId(inputFile.getBiologicalSample(), inputFile.getCategoryName()));
 			}
 		}
 
@@ -996,7 +997,7 @@ public final class SearchRunner implements Runnable, Lifecycle {
 		return null;
 	}
 
-	private SearchDbTask addSearchDbCall(final ScaffoldSpectrumTask scaffoldTask, final RAWDumpTask rawDumpTask) {
+	private SearchDbTask addSearchDbCall(final ScaffoldSpectrumTask scaffoldTask, final RAWDumpTask rawDumpTask, final BiologicalSampleId biologicalSampleId) {
 		final SearchDbTask searchDbTask = addTask(new SearchDbTask(workflowEngine, searchDbDaemon, fileTokenFactory, false, scaffoldTask));
 
 		for (final FileSearch fileSearch : searchDefinition.getInputFiles()) {
@@ -1006,7 +1007,7 @@ public final class SearchRunner implements Runnable, Lifecycle {
 
 		searchDbTask.addDependency(scaffoldTask);
 		// We depend on all raw dump tasks for loading metadata about the files
-		searchDbTask.addRawDumpTask(rawDumpTask);
+		searchDbTask.addRawDumpTask(rawDumpTask, biologicalSampleId);
 		searchDbTask.addDependency(rawDumpTask);
 		return searchDbTask;
 	}

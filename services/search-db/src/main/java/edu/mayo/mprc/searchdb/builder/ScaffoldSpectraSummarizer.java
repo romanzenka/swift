@@ -114,7 +114,7 @@ public class ScaffoldSpectraSummarizer extends ScaffoldReportReader {
 	@Override
 	public boolean processRow(final String line) {
 		fillCurrentLine(line);
-		final BiologicalSampleBuilder biologicalSample = analysis.getBiologicalSamples().getBiologicalSample(currentLine[biologicalSampleName], currentLine[biologicalSampleCategory]);
+		final BiologicalSampleBuilder biologicalSample = analysis.getBiologicalSamples().getBiologicalSample(new BiologicalSampleId(currentLine[biologicalSampleName], currentLine[biologicalSampleCategory]));
 		final SearchResultBuilder searchResult = biologicalSample.getSearchResults().getTandemMassSpecResult(FileUtilities.stripGzippedExtension(currentLine[msmsSampleName]));
 		String databaseSourcesValue = Strings.isNullOrEmpty(currentLine[this.databaseSources]) ? databaseName : currentLine[this.databaseSources];
 		if (this.databaseSourcesValue == null) {
@@ -182,5 +182,4 @@ public class ScaffoldSpectraSummarizer extends ScaffoldReportReader {
 		}
 		return parsedDate;
 	}
-
 }

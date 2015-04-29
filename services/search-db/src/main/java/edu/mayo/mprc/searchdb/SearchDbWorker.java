@@ -18,7 +18,6 @@ import edu.mayo.mprc.searchdb.builder.MassSpecDataExtractor;
 import edu.mayo.mprc.searchdb.builder.ScaffoldSpectraSummarizer;
 import edu.mayo.mprc.searchdb.bulk.BulkSearchDbDao;
 import edu.mayo.mprc.searchdb.dao.Analysis;
-import edu.mayo.mprc.searchdb.dao.SearchDbResultEntry;
 import edu.mayo.mprc.swift.db.SwiftDao;
 import edu.mayo.mprc.swift.dbmapping.ReportData;
 import edu.mayo.mprc.utilities.progress.UserProgressReporter;
@@ -27,7 +26,6 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
 import java.io.File;
-import java.util.List;
 
 /**
  * Loads search results from a given Swift experiment into the database.
@@ -64,19 +62,13 @@ public final class SearchDbWorker extends WorkerBase {
 			final MassSpecDataExtractor dataExtractor = new MapMassSpecDataExtractor(workPacket.getFileMetaDataMap());
 			final ScaffoldSpectraSummarizer summarizer = new ScaffoldSpectraSummarizer(translator, dataExtractor);
 			summarizer.load(workPacket.getScaffoldSpectrumReport(), "3", reporter);
+			summarizer.getAnalysisBuilder().addMissingFileEntries(workPacket.getFileMetaDataMap().values(), workPacket.getFileToBiologicalSampleMap());
 
 			final Analysis analysis = dao.addAnalysis(summarizer.getAnalysisBuilder(), reportData, reporter);
 
-			final List<SearchDbResultEntry> searchDbResultList = analysis.getSavedSearchResults();
-
-			final int expectedFiles = workPacket.getFileMetaDataMap().size();
-			final int actualFiles = searchDbResultList.size();
-			if (actualFiles != expectedFiles) {
-				LOGGER.warn("The number of loaded search results " + actualFiles + " does not match the number of requested files " + expectedFiles + ". Some files had no spectra identified.");
-			}
-
 			dao.commit();
-			reporter.reportProgress(new SearchDbResult(searchDbResultList, analysis.getId()));
+
+			reporter.reportProgress(new SearchDbResult(analysis.getSavedSearchResults(), analysis.getId()));
 		} catch (Exception e) {
 			dao.rollback();
 			throw new MprcException(

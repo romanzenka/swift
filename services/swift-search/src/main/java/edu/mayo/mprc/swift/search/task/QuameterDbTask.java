@@ -2,6 +2,7 @@ package edu.mayo.mprc.swift.search.task;
 
 import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
+import edu.mayo.mprc.MprcException;
 import edu.mayo.mprc.daemon.DaemonConnection;
 import edu.mayo.mprc.daemon.worker.WorkPacket;
 import edu.mayo.mprc.quameterdb.QuameterDbWorkPacket;
@@ -48,7 +49,7 @@ public final class QuameterDbTask extends AsyncTaskBase {
 		final Integer analysisId = searchDbTask.getAnalysisId();
 		final Integer searchResultId = metadata.get(fileName);
 		if (searchResultId == null) {
-			LOGGER.warn("There is no search result id recorded for file name [" + fileName + "]. This can happen if the file did not get any spectra identified");
+			throw new MprcException("There is no search result id recorded for file name [" + fileName + "].");
 		}
 		return new QuameterDbWorkPacket(
 				isFromScratch(),

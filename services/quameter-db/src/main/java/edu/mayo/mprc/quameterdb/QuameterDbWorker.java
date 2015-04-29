@@ -1,7 +1,6 @@
 package edu.mayo.mprc.quameterdb;
 
 import com.google.common.base.Splitter;
-import com.google.common.collect.Maps;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
@@ -65,15 +64,10 @@ public final class QuameterDbWorker extends WorkerBase {
 			final Map<String, Double> map = loadQuameterResultFile(workPacket.getQuameterResultFile());
 
 			final Map<QuameterProteinGroup, Integer> identifiedSpectra;
-			if (workPacket.getSearchResultId() != null) {
-				identifiedSpectra = dao.getIdentifiedSpectra(
-						workPacket.getFileSearchId(),
-						workPacket.getSearchResultId(),
-						proteins);
-			} else {
-				// There were no recorded spectra
-				identifiedSpectra = Maps.newHashMap();
-			}
+			identifiedSpectra = dao.getIdentifiedSpectra(
+					workPacket.getFileSearchId(),
+					workPacket.getSearchResultId(),
+					proteins);
 
 			final double semiTryptic = getSemiTrypticRatio(workPacket.getScaffoldSpectraFile(), msmsSampleName, reporter);
 			map.put(QuameterUi.P_3, semiTryptic);

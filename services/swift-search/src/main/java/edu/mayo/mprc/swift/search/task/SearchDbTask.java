@@ -7,6 +7,7 @@ import edu.mayo.mprc.daemon.DaemonConnection;
 import edu.mayo.mprc.daemon.worker.WorkPacket;
 import edu.mayo.mprc.searchdb.SearchDbResult;
 import edu.mayo.mprc.searchdb.SearchDbWorkPacket;
+import edu.mayo.mprc.searchdb.builder.BiologicalSampleId;
 import edu.mayo.mprc.searchdb.builder.RawFileMetaData;
 import edu.mayo.mprc.searchdb.dao.SearchDbResultEntry;
 import edu.mayo.mprc.swift.db.DatabaseFileTokenFactory;
@@ -29,9 +30,12 @@ public final class SearchDbTask extends AsyncTaskBase {
 
 	private final Object progressLock = new Object();
 
+	/**
+	 * Map from input .RAW file name (name only, sans extension) to a task that dumps the data
+	 */
 	private final Map<String, RAWDumpTask> rawDumpTaskMap = new HashMap<String, RAWDumpTask>(5);
 	/**
-	 * A map from input .RAW file name to an id of {@link edu.mayo.mprc.searchdb.dao.SearchResult} object.
+	 * A map from full input .RAW file path to an id of {@link edu.mayo.mprc.searchdb.dao.SearchResult} object.
 	 */
 	private Map<String, Integer> loadedSearchResults;
 	/**
@@ -40,10 +44,17 @@ public final class SearchDbTask extends AsyncTaskBase {
 	private Integer analysisId;
 
 	/**
+	 * Map from full input file path to the biological sample the file is a part of.
+	 * This helps with adding files that had no spectra identified by Scaffold into the data structures.
+	 */
+	private Map<File, BiologicalSampleId> fileToBiologicalSampleMap;
+
+	/**
 	 * Create the task that depends on Scaffold invocation.
 	 */
 	public SearchDbTask(final WorkflowEngine engine, final DaemonConnection daemon, final DatabaseFileTokenFactory fileTokenFactory, final boolean fromScratch, final ScaffoldSpectrumExportProducer scaffoldTask) {
 		super(engine, daemon, fileTokenFactory, fromScratch);
+		fileToBiologicalSampleMap = Maps.newHashMap();
 		this.scaffoldTask = scaffoldTask;
 		setName("SearchDb");
 		setDescription("Load " + fileTokenFactory.fileToTaggedDatabaseToken(getScaffoldSpectraFile()) + " into database");
@@ -52,12 +63,13 @@ public final class SearchDbTask extends AsyncTaskBase {
 	/**
 	 * @param task Raw dump task to add to the map. The results are mapped based on file name.
 	 */
-	public void addRawDumpTask(final RAWDumpTask task) {
+	public void addRawDumpTask(final RAWDumpTask task, final BiologicalSampleId biologicalSampleId) {
 		final String fileName = FileUtilities.stripExtension(task.getRawFile().getName());
 		if (rawDumpTaskMap.containsKey(fileName)) {
 			throw new MprcException("Two files of identical name: " + task.getRawFile().getName() + " cannot be distinguished in resulting analysis.");
 		}
 		rawDumpTaskMap.put(fileName, task);
+		fileToBiologicalSampleMap.put(task.getRawFile().getAbsoluteFile(), biologicalSampleId);
 	}
 
 	private File getScaffoldSpectraFile() {
@@ -93,7 +105,7 @@ public final class SearchDbTask extends AsyncTaskBase {
 			metaDataMap.put(entry.getKey(), task.getRawFileMetadata());
 		}
 
-		return new SearchDbWorkPacket(isFromScratch(), getReportId(), getScaffoldSpectraFile(), getScaffoldUnimodFile(), metaDataMap);
+		return new SearchDbWorkPacket(isFromScratch(), getReportId(), getScaffoldSpectraFile(), getScaffoldUnimodFile(), metaDataMap, fileToBiologicalSampleMap);
 	}
 
 	@Override

@@ -11,7 +11,7 @@ public final class QuameterDbWorkPacket extends WorkPacketBase {
 	private static final long serialVersionUID = 20140129L;
 
 	private int analysisId;
-	private Integer searchResultId; // Can be null in case the search did not identify any spectra
+	private int searchResultId;
 	private int fileSearchId;
 	private File quameterResultFile;
 	private File scaffoldSpectraFile;
@@ -22,7 +22,7 @@ public final class QuameterDbWorkPacket extends WorkPacketBase {
 
 	public QuameterDbWorkPacket(final boolean fromScratch,
 	                            final int analysisId,
-	                            final Integer searchResultId, final int fileSearchId,
+	                            final int searchResultId, final int fileSearchId,
 	                            final File quameterResultFile,
 	                            final File scaffoldSpectraFile) {
 		super(fromScratch);
@@ -37,7 +37,7 @@ public final class QuameterDbWorkPacket extends WorkPacketBase {
 		return analysisId;
 	}
 
-	public Integer getSearchResultId() {
+	public int getSearchResultId() {
 		return searchResultId;
 	}
 

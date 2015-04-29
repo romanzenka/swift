@@ -9,6 +9,7 @@ import edu.mayo.mprc.MprcException;
 import edu.mayo.mprc.database.*;
 import edu.mayo.mprc.fastadb.FastaDbDao;
 import edu.mayo.mprc.fastadb.ProteinSequence;
+import edu.mayo.mprc.searchdb.builder.BiologicalSampleId;
 import edu.mayo.mprc.swift.db.SwiftDao;
 import edu.mayo.mprc.swift.dbmapping.ReportData;
 import edu.mayo.mprc.swift.dbmapping.SearchRun;
@@ -152,7 +153,7 @@ public class SearchDbDaoHibernate extends DaoBase implements SearchDbDao {
 			searchResultList1.add(searchResult1);
 			searchResultList1.add(searchResult2);
 
-			final BiologicalSample biologicalSample1 = new BiologicalSample("Sample 1", "none", searchResultList1);
+			final BiologicalSample biologicalSample1 = new BiologicalSample(new BiologicalSampleId("Sample 1", "none"), searchResultList1);
 			final BiologicalSampleList biologicalSampleList = new BiologicalSampleList();
 			biologicalSampleList.add(biologicalSample1);
 
