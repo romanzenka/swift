@@ -6,10 +6,8 @@ import edu.mayo.mprc.fastadb.ProteinSequence;
 import edu.mayo.mprc.fastadb.ProteinSequenceTranslator;
 import edu.mayo.mprc.searchdb.dao.*;
 import edu.mayo.mprc.swift.dbmapping.ReportData;
-import edu.mayo.mprc.utilities.FileUtilities;
 import org.joda.time.DateTime;
 
-import java.io.File;
 import java.util.*;
 
 /**
@@ -133,14 +131,14 @@ public class AnalysisBuilder implements Builder<Analysis> {
 	 * Make sure we have an entry for the raw files that got nothing identified.
 	 * Simply fill in empty protein list
 	 */
-	public void addMissingFileEntries(Collection<RawFileMetaData> values, Map<File, BiologicalSampleId> fileToBiologicalSampleMap) {
+	public void addMissingFileEntries(final Collection<RawFileMetaData> values, final Map<String, BiologicalSampleId> fileToBiologicalSampleMap) {
 
-		for (Map.Entry<File, BiologicalSampleId> entry : fileToBiologicalSampleMap.entrySet()) {
-			String msmsSampleName = entry.getKey().getName();
-			BiologicalSampleId biologicalSampleId = entry.getValue();
+		for (final Map.Entry<String, BiologicalSampleId> entry : fileToBiologicalSampleMap.entrySet()) {
+			final String msmsSampleName = entry.getKey();
+			final BiologicalSampleId biologicalSampleId = entry.getValue();
 
 			final BiologicalSampleBuilder biologicalSample = getBiologicalSamples().getBiologicalSample(biologicalSampleId);
-			final SearchResultBuilder searchResult = biologicalSample.getSearchResults().getTandemMassSpecResult(FileUtilities.stripGzippedExtension(msmsSampleName));
+			final SearchResultBuilder searchResult = biologicalSample.getSearchResults().getTandemMassSpecResult(msmsSampleName);
 		}
 	}
 
@@ -148,7 +146,7 @@ public class AnalysisBuilder implements Builder<Analysis> {
 		return databaseSources;
 	}
 
-	public void setDatabaseSources(String databaseSources) {
+	public void setDatabaseSources(final String databaseSources) {
 		this.databaseSources = databaseSources;
 	}
 

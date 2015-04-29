@@ -36,15 +36,15 @@ public final class SearchDbWorkPacket extends WorkPacketBase {
 	private Map<String, RawFileMetaData> fileMetaDataMap;
 
 	/**
-	 * Map from full raw file path -> biological sample it is a part of
+	 * Map from msms sample name (name of the file sans the extension) -> biological sample it is a part of
 	 */
-	private Map<File, BiologicalSampleId> fileToBiologicalSampleMap;
+	private Map<String, BiologicalSampleId> fileToBiologicalSampleMap;
 
 	public SearchDbWorkPacket(final boolean fromScratch, final long reportDataId,
 	                          final File scaffoldSpectrumReport,
 	                          final File scaffoldUnimod,
 	                          final Map<String, RawFileMetaData> fileMetaDataMap,
-	                          final Map<File, BiologicalSampleId> fileToBiologicalSampleMap) {
+	                          final Map<String, BiologicalSampleId> fileToBiologicalSampleMap) {
 		super(fromScratch);
 		this.reportDataId = reportDataId;
 		this.scaffoldSpectrumReport = scaffoldSpectrumReport;
@@ -69,7 +69,7 @@ public final class SearchDbWorkPacket extends WorkPacketBase {
 		return fileMetaDataMap;
 	}
 
-	public Map<File, BiologicalSampleId> getFileToBiologicalSampleMap() {
+	public Map<String, BiologicalSampleId> getFileToBiologicalSampleMap() {
 		return fileToBiologicalSampleMap;
 	}
 }

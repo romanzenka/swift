@@ -44,10 +44,10 @@ public final class SearchDbTask extends AsyncTaskBase {
 	private Integer analysisId;
 
 	/**
-	 * Map from full input file path to the biological sample the file is a part of.
+	 * Map from msms sample name (file name sans extension) to the biological sample the file is a part of.
 	 * This helps with adding files that had no spectra identified by Scaffold into the data structures.
 	 */
-	private Map<File, BiologicalSampleId> fileToBiologicalSampleMap;
+	private Map<String, BiologicalSampleId> fileToBiologicalSampleMap;
 
 	/**
 	 * Create the task that depends on Scaffold invocation.
@@ -69,7 +69,7 @@ public final class SearchDbTask extends AsyncTaskBase {
 			throw new MprcException("Two files of identical name: " + task.getRawFile().getName() + " cannot be distinguished in resulting analysis.");
 		}
 		rawDumpTaskMap.put(fileName, task);
-		fileToBiologicalSampleMap.put(task.getRawFile().getAbsoluteFile(), biologicalSampleId);
+		fileToBiologicalSampleMap.put(FileUtilities.stripGzippedExtension(task.getRawFileMetadata().getRawFile().getName()), biologicalSampleId);
 	}
 
 	private File getScaffoldSpectraFile() {
