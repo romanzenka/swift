@@ -34,6 +34,7 @@ import org.apache.log4j.Logger;
 import java.io.File;
 import java.util.*;
 import java.util.concurrent.ExecutorService;
+import java.util.regex.Pattern;
 
 /**
  * Performs swift search, one {@link #run()} call at a time. To do that, it
@@ -53,6 +54,11 @@ public final class SearchRunner implements Runnable, Lifecycle {
 	public static final String MZ_ML = "mzML";
 	public static final ExtractMsnSettings MSCONVERT_MZML = new ExtractMsnSettings(ExtractMsnSettings.MZML_MODE, ExtractMsnSettings.MSCONVERT);
 	public static final ExtractMsnSettings MSCONVERT_MS2 = new ExtractMsnSettings(ExtractMsnSettings.MS2_MODE, ExtractMsnSettings.MSCONVERT);
+	/**
+	 * Files that have _Pre or _Post after the standard prefix (copath, patient, date) are ignored by QuaMeter
+	 */
+	public static final Pattern PRE_POST = Pattern.compile("^.{14}.*_(Pre|Post).*$");
+
 	/**
 	 * We idpQonvert tasks with specific FDR for QuaMeter. This is hardcoded, does not reflect how are actual searches run.
 	 */
@@ -318,7 +324,7 @@ public final class SearchRunner implements Runnable, Lifecycle {
 			}
 		}
 
-		if (isRawFile(inputFile) && isQualityControlEnabled()) {
+		if (isRawFile(inputFile) && isQualityControlEnabled() && !PRE_POST.matcher(inputFile.getInputFile().getName()).matches()) {
 			final FileProducingTask mzmlFile = addRawConversionTask(inputFile, MSCONVERT_MZML, true/* We need MS1 for Comet and IdpQonvert */);
 
 			final SearchEngine comet = engines.getCometEngine();
