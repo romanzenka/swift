@@ -30,14 +30,17 @@ public final class CommonModelInterceptor extends HandlerInterceptorAdapter {
 	@Override
 	public void postHandle(final HttpServletRequest request, final HttpServletResponse response, final Object handler, final ModelAndView modelAndView) throws Exception {
 		if (modelAndView != null) {
-			final ModelMap model = modelAndView.getModelMap();
-			model.addAttribute("title", getWebUi().getTitle());
-			model.addAttribute("messageDefined", getWebUi().getUserMessage().messageDefined());
-			model.addAttribute("userMessage", getWebUi().getUserMessage().getMessage());
-			model.addAttribute("pathPrefix", getPathPrefix());
-			model.addAttribute("pathWebPrefix", getWebUi().getBrowseWebRoot());
-			model.addAttribute("cookiePrefix", getWebUi().getCookiePrefix());
-			model.addAttribute("ver", ReleaseInfoCore.buildRevision());
+			// Adding parameters messes up the XML interface. Skip if XML
+			if (!request.getRequestURI().endsWith(".xml")) {
+				final ModelMap model = modelAndView.getModelMap();
+				model.addAttribute("title", getWebUi().getTitle());
+				model.addAttribute("messageDefined", getWebUi().getUserMessage().messageDefined());
+				model.addAttribute("userMessage", getWebUi().getUserMessage().getMessage());
+				model.addAttribute("pathPrefix", getPathPrefix());
+				model.addAttribute("pathWebPrefix", getWebUi().getBrowseWebRoot());
+				model.addAttribute("cookiePrefix", getWebUi().getCookiePrefix());
+				model.addAttribute("ver", ReleaseInfoCore.buildRevision());
+			}
 		}
 		super.postHandle(request, response, handler, modelAndView);
 	}
