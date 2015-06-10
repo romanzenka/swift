@@ -24,7 +24,7 @@ public final class AsgardHandlerInterceptor extends HandlerInterceptorAdapter {
 		if (request.getRequestURL().toString().startsWith(ASGARD_PREFIX) && request.getAttribute(ASGARD_HANDLED) == null) {
 			request.setAttribute(ASGARD_HANDLED, true);
 			String path = request.getServletPath();
-			if ("/".equals(path)) {
+			if ("/".equals(path) || path.isEmpty()) {
 				path = "index.html";
 			}
 			ByteStreams.copy(new FileInputStream(new File("/odin/prod/apps/asgard", request.getServletPath())), response.getOutputStream());
