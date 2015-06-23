@@ -17,5 +17,6 @@ public final class TestQaResources {
 		Assert.assertEquals(map.getContentType(new File("hello.jpg")), "image/jpeg");
 		Assert.assertEquals(map.getContentType(new File("hello.html")), "text/html");
 		Assert.assertEquals(map.getContentType(new File("hello.xls")), "application/vnd.ms-excel");
+		Assert.assertEquals(map.getContentType(new File("hello.css")), "text/css");
 	}
 }

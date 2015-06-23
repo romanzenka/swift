@@ -3,6 +3,8 @@ package edu.mayo.mprc.swift;
 import com.google.common.io.ByteStreams;
 import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
 
+import javax.activation.FileTypeMap;
+import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.File;
@@ -14,6 +16,9 @@ import java.io.FileInputStream;
 public final class AsgardHandlerInterceptor extends HandlerInterceptorAdapter {
 	private final static String ASGARD_PREFIX = "http://asgard";
 	public static final String ASGARD_HANDLED = "asgardHandled";
+
+	@Resource(name = "defaultFileTypeMap")
+	private FileTypeMap typeMap;
 
 	public AsgardHandlerInterceptor() {
 		int i = 0;
@@ -27,7 +32,11 @@ public final class AsgardHandlerInterceptor extends HandlerInterceptorAdapter {
 			if ("/".equals(path) || path.isEmpty()) {
 				path = "index.html";
 			}
-			ByteStreams.copy(new FileInputStream(new File("/odin/prod/apps/asgard", path)), response.getOutputStream());
+
+			final File file = new File("/odin/prod/apps/asgard", path);
+			response.setHeader("content-type", typeMap.getContentType(file));
+
+			ByteStreams.copy(new FileInputStream(file), response.getOutputStream());
 			return false;
 		} else {
 			return super.preHandle(request, response, handler);

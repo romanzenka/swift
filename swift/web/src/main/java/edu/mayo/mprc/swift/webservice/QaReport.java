@@ -6,6 +6,7 @@ import edu.mayo.mprc.swift.dbmapping.SearchRun;
 import edu.mayo.mprc.swift.dbmapping.SwiftSearchDefinition;
 import edu.mayo.mprc.swift.search.task.QaTask;
 import edu.mayo.mprc.utilities.FileUtilities;
+import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -27,17 +28,23 @@ public final class QaReport {
 	@Resource(name = "swiftDao")
 	private SwiftDao swiftDao;
 
-	public static final FileTypeMap TYPE_MAP = getDefaultFileTypeMap();
+	public static final FileTypeMap TYPE_MAP = makeDefaultFileTypeMap();
 
-	static FileTypeMap getDefaultFileTypeMap() {
+	static FileTypeMap makeDefaultFileTypeMap() {
 		final MimetypesFileTypeMap defaultMap = new MimetypesFileTypeMap();
 
 		defaultMap.addMimeTypes("image/png png PNG");
 		defaultMap.addMimeTypes("image/jpeg jpg jpeg JPG JPEG");
 		defaultMap.addMimeTypes("application/vnd.ms-excel xls");
 		defaultMap.addMimeTypes("text/html htm html");
+		defaultMap.addMimeTypes("text/css css");
 
 		return defaultMap;
+	}
+
+	@Bean(name = "defaultFileTypeMap")
+	public static FileTypeMap getDefaultFileTypeMap() {
+		return TYPE_MAP;
 	}
 
 	@RequestMapping(value = "/service/qa/{searchRunId}/{fileName:.*}", method = RequestMethod.GET)
