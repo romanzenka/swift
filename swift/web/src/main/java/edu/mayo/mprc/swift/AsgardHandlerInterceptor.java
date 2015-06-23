@@ -17,7 +17,7 @@ public final class AsgardHandlerInterceptor extends HandlerInterceptorAdapter {
 	private final static String ASGARD_PREFIX = "http://asgard";
 	public static final String ASGARD_HANDLED = "asgardHandled";
 
-	@Resource(name = "defaultFileTypeMap")
+	@Resource(name = "defaultTypeMap")
 	private FileTypeMap typeMap;
 
 	public AsgardHandlerInterceptor() {
