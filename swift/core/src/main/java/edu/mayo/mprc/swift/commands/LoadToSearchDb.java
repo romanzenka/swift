@@ -11,6 +11,7 @@ import edu.mayo.mprc.fastadb.FastaDbWorker;
 import edu.mayo.mprc.qa.RAWDumpWorker;
 import edu.mayo.mprc.scaffold.ScaffoldWorker;
 import edu.mayo.mprc.searchdb.SearchDbWorker;
+import edu.mayo.mprc.searchdb.dao.BiologicalSampleId;
 import edu.mayo.mprc.searchdb.dao.SearchDbDao;
 import edu.mayo.mprc.swift.db.DatabaseFileTokenFactory;
 import edu.mayo.mprc.swift.db.SearchEngine;
@@ -246,7 +247,7 @@ public final class LoadToSearchDb implements SwiftCommand {
 							fileTokenFactory,
 							false);
 
-					searchDbTask.addRawDumpTask(rawDumpTask);
+					searchDbTask.addRawDumpTask(rawDumpTask, new BiologicalSampleId(fileSearch.getBiologicalSample(), fileSearch.getCategoryName()));
 					searchDbTask.addDependency(rawDumpTask);
 					workflowEngine.addTask(rawDumpTask);
 				}
