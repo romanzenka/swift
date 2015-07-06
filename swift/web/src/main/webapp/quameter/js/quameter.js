@@ -349,7 +349,7 @@ function addDygraph(viewIndex, view, viewId, metricId, viewMetadata, data, range
                 }
                 blockRedraw = false;
             },
-            //drawPoints: true,
+            drawPoints: true,
             connectSeparatedPoints: true,
             pointSize: 2,
             strokeWidth: 0.7,
