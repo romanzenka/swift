@@ -41,7 +41,7 @@ public final class QuameterDaoHibernate extends DaoBase implements QuameterDao, 
 	/**
 	 * Files that have _Pre or _Post after the standard prefix (copath, patient, date) are ignored.
 	 */
-	public static final Pattern PRE_POST = Pattern.compile("^.{14}.*_(Pre|Post).*$");
+	public static final Pattern PRE_POST = Pattern.compile("^.{14}.*_(Pre|Post).*$", Pattern.CASE_INSENSITIVE);
 
 	private SwiftDao swiftDao;
 	private SearchDbDao searchDbDao;

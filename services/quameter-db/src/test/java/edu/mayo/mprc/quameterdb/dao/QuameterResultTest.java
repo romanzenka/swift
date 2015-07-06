@@ -36,6 +36,7 @@ public final class QuameterResultTest {
 	@Test
 	public void shouldNotMatchPre() {
 		Assert.assertTrue(QuameterDaoHibernate.PRE_POST.matcher("HR04-689_Post_20140806_Y30_QE_PreS1.raw").find(), "Should not match Pre file");
+		Assert.assertTrue(QuameterDaoHibernate.PRE_POST.matcher("HR04-689_Post_20140806_Y30_QE_preS1.raw").find(), "Should not match pre file");
 	}
 
 }
