@@ -1045,7 +1045,7 @@ imageGenerator<-function(dataFile, msmsEvalDataFile, infoFile, spectrumFile, chr
       y=NA,
       xlim=xlim,
       ylim=c(1, maxIntensity),
-      main=c(plotName, tic.title), 
+      main=c(plotName, basepeak.title),
       xlab="Retention Time (min)", 
       ylab="Base Peak Intensity",
       xaxt="n",
