@@ -10,9 +10,10 @@ import java.io.File;
  * @author Roman Zenka
  */
 public final class TestQaResources {
+
 	@Test
 	public void shouldUseReasonableDefaultTypeMap() {
-		FileTypeMap map = QaReport.TYPE_MAP;
+		FileTypeMap map = new SwiftFileTypeMap();
 		Assert.assertEquals(map.getContentType(new File("hello.png")), "image/png");
 		Assert.assertEquals(map.getContentType(new File("hello.jpg")), "image/jpeg");
 		Assert.assertEquals(map.getContentType(new File("hello.html")), "text/html");
