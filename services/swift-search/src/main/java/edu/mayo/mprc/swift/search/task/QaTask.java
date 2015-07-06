@@ -12,7 +12,9 @@ import edu.mayo.mprc.utilities.progress.ProgressInfo;
 import edu.mayo.mprc.workflow.engine.WorkflowEngine;
 
 import java.io.File;
+import java.io.FilenameFilter;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
@@ -88,6 +90,12 @@ public final class QaTask extends AsyncTaskBase {
 
 	@Override
 	public WorkPacket createWorkPacket() {
+		// All present sfs files
+		final HashSet<File> existingSfsFiles = new HashSet<File>(experimentList.size());
+		if (qaReportFolder.exists() && qaReportFolder.isDirectory()) {
+			FileUtilities.listFolderContents(qaReportFolder, new SfsFilter(), null, existingSfsFiles);
+		}
+
 		boolean outputAlreadyExists = true;
 		final List<ExperimentQa> experimentQaList = new ArrayList<ExperimentQa>(experimentList.size());
 		for (final QaTaskExperiment experiment : experimentList) {
@@ -115,6 +123,8 @@ public final class QaTask extends AsyncTaskBase {
 				final File sfsFile = QaWorker.getSfsFileName(qaReportFolder,
 						QaWorker.getAnalysisName(files.getInputFile()));
 
+				existingSfsFiles.remove(sfsFile);
+
 				if (outputAlreadyExists) {
 					// If the sfs file that we are about to create does not exist or is too old, we will need to make a new one
 					if (!sfsFile.exists() || sfsFile.length() == 0 || sfsFile.lastModified() < files.getNewestModificationDate()) {
@@ -124,6 +134,11 @@ public final class QaTask extends AsyncTaskBase {
 			}
 			final ExperimentQa experimentQa = new ExperimentQa(experiment.getName(), experiment.getSpectraFile(), inputFilePairs, experiment.getScaffoldVersion());
 			experimentQaList.add(experimentQa);
+		}
+
+		// The folder contained sfs files that are not accounted for. We need to redo the QA report generation without the extra files.
+		if (existingSfsFiles.size() > 0) {
+			outputAlreadyExists = false;
 		}
 
 		if (outputAlreadyExists) {
@@ -166,5 +181,12 @@ public final class QaTask extends AsyncTaskBase {
 	@Override
 	public int hashCode() {
 		return reportFile != null ? reportFile.hashCode() : 0;
+	}
+
+	private static class SfsFilter implements FilenameFilter {
+		@Override
+		public boolean accept(File dir, String name) {
+			return name.endsWith(".sfs");
+		}
 	}
 }

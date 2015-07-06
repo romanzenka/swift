@@ -1539,7 +1539,7 @@ public final class FileUtilities {
 	 * @param dirs   Resulting directories. If null, no directories are collected.
 	 * @param files  Resulting files. If null, no files are collected.
 	 */
-	public static void listFolderContents(final File folder, final FilenameFilter filter, final List<File> dirs, final List<File> files) {
+	public static void listFolderContents(final File folder, final FilenameFilter filter, final Collection<File> dirs, final Collection<File> files) {
 		if (dirs != null) {
 			dirs.clear();
 		}
