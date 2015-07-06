@@ -506,6 +506,61 @@ function drawGraphsByMetrics(data, renderDetailGraphs, viewMetadata) {
 }
 
 
+//  Important basic graphing functions
+function drawGraphsToReport(data, viewMetadata, doc) {
+    var viewIndex = 0;
+    var previousCategory = '';
+    var yCoord = 0.1;
+    var lineHeight = 0.3;
+    var pageHeight = 9;
+    for (var i = 0; i < metrics.length; i++) {
+
+        if (yCoord > pageHeight) {
+            doc.addPage();
+        }
+        var metric = metrics[i];
+        var categoryCode;
+        var metricId = metric.code;
+        if ("duration" == metricId) {
+            categoryCode = "c";
+        } else {
+            categoryCode = metricId.split("_", 2)[0];
+        }
+        if (categoryCode != previousCategory) {
+            doc.text(metricCategories[categoryCode], 1, yCoord);
+            yCoord += lineHeight;
+
+            previousCategory = categoryCode;
+        }
+
+        var view = new google.visualization.DataView(data);
+        view.setColumns(getSmartColumns(metricId, data));
+
+        if (1 == metric.simple) {
+
+            doc.text(metric.label, 1, yCoord);
+            yCoord += lineHeight;
+            doc.text(metrics[i].name + " - " + metrics[i].desc, 1, yCoord);
+            yCoord += lineHeight;
+
+            yCoord += addGraphToReport(doc, yCoord, data, view, metric.range, annotCollection);
+            yCoord += lineHeight;
+            viewIndex++;
+        }
+    }
+}
+
+function addGraphToReport(doc, yCoord, data, view, range) {
+    var graphHeight = 1.5;
+    var graphLeft = 1;
+    var graphRight = 7.5;
+
+    doc.setLineWidth(0.01);
+    doc.rect(graphLeft, yCoord, graphRight - graphLeft, graphHeight);
+
+    return graphHeight;
+}
+
 /** INIT() draws only visible **/
 function initSimpleCharts(graphObj) {
     // Create the data table. 
@@ -648,9 +703,16 @@ function initSimpleCharts(graphObj) {
         $('#annotFormDiv').hide();
     });
 
-    //Looks at the butons and filters rows & columns based on selection
+    //Looks at the buttons and filters rows & columns based on selection
     updateAllViews(data);
     $("body").tooltip({selector: '[data-toggle="tooltip"]'});
+
+
+    $("#reportButton").click(function (event) {
+        var doc = new jsPDF("portrait", "in", "letter");
+        drawGraphsToReport(data, viewMetadata, doc)
+        doc.save('report.pdf');
+    })
 }
 
 

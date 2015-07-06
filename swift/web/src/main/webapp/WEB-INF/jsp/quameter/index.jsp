@@ -14,6 +14,7 @@
     <![endif]-->
 
     <script type="text/javascript" src="/common/bootstrap/js/jquery_1.9.0.min.js"></script>
+    <script type="text/javascript" src="/quameter/js/jspdf.min.js"></script>
     <!--Load the AJAX API-->
     <script type="text/javascript" src="https://www.google.com/jsapi"></script>
     <script>
@@ -60,6 +61,7 @@
                     <a href="/quameter/unhide" class="btn"><i class="icon-remove"></i> Unhide</a>
                     <a href="/quameter/tags" class="btn"><i class="icon-tag"></i> Tags</a>
                     <a href="/service/getQuameterDataTable" class="btn"><i class="icon-download"></i> Data</a>
+                    <a class="btn" id="reportButton">Report</a>
                 </div>
             </div>
             <div class="row-fluid">
