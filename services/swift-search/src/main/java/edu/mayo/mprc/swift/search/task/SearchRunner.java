@@ -9,6 +9,7 @@ import edu.mayo.mprc.daemon.DaemonConnection;
 import edu.mayo.mprc.daemon.DaemonUtilities;
 import edu.mayo.mprc.dbcurator.model.Curation;
 import edu.mayo.mprc.dbcurator.model.CurationDao;
+import edu.mayo.mprc.quameterdb.QuameterDaoHibernate;
 import edu.mayo.mprc.scaffold.ScaffoldWorker;
 import edu.mayo.mprc.searchdb.dao.BiologicalSampleId;
 import edu.mayo.mprc.swift.db.DatabaseFileTokenFactory;
@@ -57,7 +58,7 @@ public final class SearchRunner implements Runnable, Lifecycle {
 	/**
 	 * Files that have _Pre or _Post after the standard prefix (copath, patient, date) are ignored by QuaMeter
 	 */
-	public static final Pattern PRE_POST = Pattern.compile("^.{14}.*_(Pre|Post).*$");
+	public static final Pattern PRE_POST = QuameterDaoHibernate.PRE_POST;
 
 	/**
 	 * We idpQonvert tasks with specific FDR for QuaMeter. This is hardcoded, does not reflect how are actual searches run.
