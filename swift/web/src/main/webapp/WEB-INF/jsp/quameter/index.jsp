@@ -61,7 +61,7 @@
                     <a href="/quameter/unhide" class="btn"><i class="icon-remove"></i> Unhide</a>
                     <a href="/quameter/tags" class="btn"><i class="icon-tag"></i> Tags</a>
                     <a href="/service/getQuameterDataTable" class="btn"><i class="icon-download"></i> Data</a>
-                    <a class="btn" id="reportButton">Report</a>
+                    <a class="btn" id="reportButton"><i class="icon-book"></i> Report</a>
                 </div>
             </div>
             <div class="row-fluid">
@@ -125,6 +125,7 @@
 </script>
 
 <script type="text/javascript" src="../../../quameter/js/dygraph-combined.js?v=${ver}"></script>
+<script type="text/javascript" src="../../../quameter/js/dygraph-extra.js?v=${ver}"></script>
 <script type="text/javascript" src="../../../quameter/js/quameter-definitions.js?v=${ver}"></script>
 <script type="text/javascript" src="../../../quameter/js/quameter.js?v=${ver}"></script>
 <script type="text/javascript">

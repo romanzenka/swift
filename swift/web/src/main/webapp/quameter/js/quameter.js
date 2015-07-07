@@ -505,18 +505,70 @@ function drawGraphsByMetrics(data, renderDetailGraphs, viewMetadata) {
     }
 }
 
+function startNewPage(doc, config) {
+    doc.setFontSize(config.headerFontSize);
+    doc.setLineWidth(0);
+    doc.text("Immunostains Monthly Mass Spectrometry QC Report", 0.1, 0.2);
+    var value = new Date().toLocaleDateString('en-GB', {
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit'
+    });
+    var dateString = "Generated " + value;
+    doc.text(dateString, config.pageWidth - 0.2 - doc.getTextDimensions(dateString).w / 72, 0.2);
+
+    yCoord = config.topMargin;
+
+    return yCoord;
+}
 
 //  Important basic graphing functions
 function drawGraphsToReport(data, viewMetadata, doc) {
     var viewIndex = 0;
     var previousCategory = '';
-    var yCoord = 0.1;
-    var lineHeight = 0.3;
-    var pageHeight = 9;
+    var c = {
+        'topMargin': 0.6,
+        'bottomMargin': 1,
+        'lineHeight': 0.2,
+        'titleLineHeight': 0.3,
+        'headerFontSize': 6,
+        'pageWidth': 8.5,
+        'pageHeight': 11,
+        'typicalGraphHeight': 3,
+        'categoryFontSize': 14,
+        'metricFontSize': 9,
+        'titleFontSize': 12,
+    };
+
+    yCoord = c.topMargin;
+
+    yCoord = startNewPage(doc, c);
+
+    doc.setFontSize(c.titleFontSize);
+
+    function centerText(txt) {
+        doc.text(txt, (c.pageWidth - doc.getTextDimensions(txt).w / 72) / 2, yCoord);
+        yCoord += c.titleLineHeight;
+    }
+
+    centerText("Mayo Clinic: Department of Laboratory Medicine and Pathology");
+
+    centerText("Division of Anatomic Pathology, Immunostains Laboratory");
+
+    centerText("Rochester, MN 55905");
+
+    yCoord += c.titleLineHeight;
+
+    centerText("Monthly Mass Spectrometry QC Report");
+
+    yCoord += c.titleLineHeight;
+
+
     for (var i = 0; i < metrics.length; i++) {
 
-        if (yCoord > pageHeight) {
+        if (yCoord + c.typicalGraphHeight > c.pageHeight - c.bottomMargin) {
             doc.addPage();
+            yCoord = startNewPage(doc, c);
         }
         var metric = metrics[i];
         var categoryCode;
@@ -527,8 +579,9 @@ function drawGraphsToReport(data, viewMetadata, doc) {
             categoryCode = metricId.split("_", 2)[0];
         }
         if (categoryCode != previousCategory) {
-            doc.text(metricCategories[categoryCode], 1, yCoord);
-            yCoord += lineHeight;
+            //doc.setFontSize(c.categoryFontSize);
+            //doc.text(metricCategories[categoryCode], 1, yCoord);
+            //yCoord += c.titleLineHeight;
 
             previousCategory = categoryCode;
         }
@@ -537,26 +590,42 @@ function drawGraphsToReport(data, viewMetadata, doc) {
         view.setColumns(getSmartColumns(metricId, data));
 
         if (1 == metric.simple) {
+            doc.setFontSize(c.metricFontSize);
+            doc.text(metrics[i].name + " - " + metrics[i].desc + " (" + metric.label + ")", 1, yCoord);
+            yCoord += c.lineHeight;
 
-            doc.text(metric.label, 1, yCoord);
-            yCoord += lineHeight;
-            doc.text(metrics[i].name + " - " + metrics[i].desc, 1, yCoord);
-            yCoord += lineHeight;
+            nthView = dyViewsByCode[metricId];
 
-            yCoord += addGraphToReport(doc, yCoord, data, view, metric.range, annotCollection);
-            yCoord += lineHeight;
+            c.typicalGraphHeight = addGraphToReport(doc, yCoord, data, view, metric.range, annotCollection, views[nthView].dygraph);
+            yCoord += c.typicalGraphHeight;
+            yCoord += c.lineHeight;
             viewIndex++;
         }
     }
 }
 
-function addGraphToReport(doc, yCoord, data, view, range) {
-    var graphHeight = 1.5;
-    var graphLeft = 1;
-    var graphRight = 7.5;
+function addGraphToReport(doc, yCoord, data, view, range, annotations, dygraph) {
+    var pageWidth = 8.5;
+    var margin = 1;
+    var graphLeft = margin;
+    var graphRight = pageWidth - margin;
+    var graphHeight = (graphRight - graphLeft) / dygraph.width_ * dygraph.height_;
 
-    doc.setLineWidth(0.01);
-    doc.rect(graphLeft, yCoord, graphRight - graphLeft, graphHeight);
+    // Report coordinates
+    var rx0 = graphLeft;
+    var ry0 = yCoord;
+    var rw = graphRight - graphLeft;
+    var rh = graphHeight;
+
+    // Graph coordinates
+    var x0 = dygraph.xAxisRange()[0];
+    var y0 = dygraph.yAxisRange[0];
+    var w = dygraph.xAxisRange()[1] - dygraph.xAxisRange()[0];
+    var h = dygraph.yAxisRange()[1] - dygraph.yAxisRange()[0];
+
+    var imgData = Dygraph.Export.asPNG(dygraph);
+
+    doc.addImage(imgData, 'PNG', rx0, ry0, rw, rh);
 
     return graphHeight;
 }
