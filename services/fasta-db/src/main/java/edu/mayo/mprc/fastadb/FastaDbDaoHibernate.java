@@ -237,7 +237,7 @@ public final class FastaDbDaoHibernate extends BulkDaoBase implements FastaDbDao
 				// loaded the database yet. So no need to check)
 				saveStateless(session, newEntry, null, false);
 
-				if (0 == numSequencesRead % REPORT_FREQUENCY) {
+				if (0 == entryNum % REPORT_FREQUENCY) {
 					loadingRange.reportProgress((float) entryNum / (float) totalEntries);
 				}
 			}
