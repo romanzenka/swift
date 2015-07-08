@@ -235,7 +235,7 @@ public final class FastaDbDaoHibernate extends BulkDaoBase implements FastaDbDao
 
 				// We know that we will never save two identical entries (fasta has each entry unique and we have not
 				// loaded the database yet. So no need to check)
-				saveStateless(session, newEntry, null, false);
+				session.insert(newEntry);
 
 				if (0 == entryNum % REPORT_FREQUENCY) {
 					loadingRange.reportProgress((float) entryNum / (float) totalEntries);
