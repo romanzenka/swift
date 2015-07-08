@@ -63,9 +63,14 @@ public abstract class BulkLoader<T extends PersistableBase> {
 	public abstract Object wrapForTempTable(T value, TempKey key);
 
 	/**
-	 * Comma separated list of columns to transfer from temp table to the actual one.
+	 * Comma separated list of columns to transfer from the temp table.
 	 */
-	public abstract String getColumnsToTransfer();
+	public abstract String getColumnsToTransferFrom();
+
+	/**
+	 * Comma separated list of columns to transfer to the actual table.
+	 */
+	public abstract String getColumnsToTransferTo();
 
 	public void addObjects(final Collection<? extends T> values) {
 		final BulkLoadJob bulkLoadJob = jobStarter.startNewJob();
@@ -177,14 +182,15 @@ public abstract class BulkLoader<T extends PersistableBase> {
 		final String table = getTableName();
 		final String tableId = getTableIdColumn();
 		final String tempTableName = getTempTableName();
-		final String columnsToTranfer = getColumnsToTransfer();
+		final String columnsToTranferFrom = getColumnsToTransferFrom();
+		final String columnsToTranferTo = getColumnsToTransferTo();
 		try {
 			identityOn(table);
 			final Query query = getSession()
 					.createSQLQuery(
 							MessageFormat.format(
 									"INSERT INTO {0} ({1}, {2}) select data_order+{3,number,#}, {4} from {5} where job = :job and new_id is null",
-									sessionProvider.qualifyTableName(table), tableId, columnsToTranfer, lastId, columnsToTranfer,
+									sessionProvider.qualifyTableName(table), tableId, columnsToTranferFrom, lastId, columnsToTranferTo,
 									sessionProvider.qualifyTableName(tempTableName)))
 					.setParameter("job", bulkLoadJob.getId());
 			query.executeUpdate();

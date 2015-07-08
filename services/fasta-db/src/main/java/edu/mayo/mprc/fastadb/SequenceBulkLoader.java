@@ -44,9 +44,13 @@ public final class SequenceBulkLoader extends BulkLoader<Sequence> {
 		return new TempSequenceLoading(key, value);
 	}
 
+	@Override
+	public String getColumnsToTransferFrom() {
+		return getColumnsToTransferTo();
+	}
 
 	@Override
-	public String getColumnsToTransfer() {
+	public String getColumnsToTransferTo() {
 		return "sequence, mass";
 	}
 }

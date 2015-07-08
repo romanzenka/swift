@@ -37,29 +37,29 @@ public abstract class BulkHashedSetLoader<T extends PersistableHashedSetBase<? e
 	@Override
 	public String getEqualityString() {
 		return MessageFormat.format("" +
-				"<t>.hash = <s>.hash " +
-				"and not exists (" +
+						"<t>.hash = <s>.hash " +
+						"and not exists (" +
 
-				"select * from {0} as tm " +
-				"left join {1} as sm " +
-				"on tm.value = sm.{2} " +
-				"   where " +
-				"tm.job = <t>.job " +
-				"and tm.data_order = <t>.data_order " +
-				"and <s>.{3} = sm.{4} " +
-				"and sm.{2} is null " +
+						"select * from {0} as tm " +
+						"left join {1} as sm " +
+						"on tm.value = sm.{2} " +
+						"   where " +
+						"tm.job = <t>.job " +
+						"and tm.data_order = <t>.data_order " +
+						"and <s>.{3} = sm.{4} " +
+						"and sm.{2} is null " +
 
-				"union all " +
+						"union all " +
 
-				"select * from {1} as sm " +
-				"left join {0} as tm " +
-				"on tm.value = sm.{2} " +
-				"   where " +
-				"tm.job = <t>.job " +
-				"and tm.data_order = <t>.data_order " +
-				"and <s>.{3} = sm.{4} " +
-				"and tm.value is null " +
-				")",
+						"select * from {1} as sm " +
+						"left join {0} as tm " +
+						"on tm.value = sm.{2} " +
+						"   where " +
+						"tm.job = <t>.job " +
+						"and tm.data_order = <t>.data_order " +
+						"and <s>.{3} = sm.{4} " +
+						"and tm.value is null " +
+						")",
 				sessionProvider.qualifyTableName(TEMP_MEMBERS),
 				sessionProvider.qualifyTableName(getMemberTableName()),
 				getMemberTableValue(),
@@ -83,9 +83,13 @@ public abstract class BulkHashedSetLoader<T extends PersistableHashedSetBase<? e
 		return result;
 	}
 
+	@Override
+	public String getColumnsToTransferFrom() {
+		return getColumnsToTransferTo();
+	}
 
 	@Override
-	public String getColumnsToTransfer() {
+	public String getColumnsToTransferTo() {
 		return "hash";
 	}
 
@@ -112,7 +116,7 @@ public abstract class BulkHashedSetLoader<T extends PersistableHashedSetBase<? e
 		final String table = getTableName();
 		final String tableId = getTableIdColumn();
 		final String tempTableName = getTempTableName();
-		final String columnsToTranfer = getColumnsToTransfer();
+		final String columnsToTranfer = getColumnsToTransferTo();
 		try {
 			identityOn(table);
 			final Query query = getSession()

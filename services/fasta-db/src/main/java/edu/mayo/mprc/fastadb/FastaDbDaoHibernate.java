@@ -194,6 +194,9 @@ public final class FastaDbDaoHibernate extends BulkDaoBase implements FastaDbDao
 
 			final List<ProteinEntry> entries = new ArrayList<ProteinEntry>(50000);
 			final List<ProteinSequence> sequences = new ArrayList<ProteinSequence>(50000);
+			final List<ProteinDescription> descriptions = new ArrayList<ProteinDescription>(50000);
+			final List<ProteinAccnum> accnums = new ArrayList<ProteinAccnum>(50000);
+
 			while (stream.gotoNextSequence()) {
 				numSequencesRead++;
 				final String header = stream.getHeader();
@@ -212,7 +215,9 @@ public final class FastaDbDaoHibernate extends BulkDaoBase implements FastaDbDao
 				final ProteinSequence proteinSequence = new ProteinSequence(sequence);
 				sequences.add(proteinSequence);
 				final ProteinAccnum accnum = new ProteinAccnum(accessionNumber);
+				accnums.add(accnum);
 				final ProteinDescription desc = new ProteinDescription(description);
+				descriptions.add(desc);
 				final ProteinEntry entry = new ProteinEntry(database, accnum, desc, proteinSequence);
 				entries.add(entry);
 				if (0 == numSequencesRead % REPORT_FREQUENCY) {
@@ -223,6 +228,8 @@ public final class FastaDbDaoHibernate extends BulkDaoBase implements FastaDbDao
 			session.getTransaction().begin();
 
 			addSequences(sequences, "protein_sequence");
+			addProteinDescriptions(descriptions);
+			addProteinAccnums(accnums);
 
 			int entryNum = 0;
 			final int totalEntries = entries.size();
@@ -261,6 +268,16 @@ public final class FastaDbDaoHibernate extends BulkDaoBase implements FastaDbDao
 	private void addSequences(final Collection<? extends Sequence> sequences, final String table) {
 		final SequenceBulkLoader loader = new SequenceBulkLoader(this, this, table);
 		loader.addObjects(sequences);
+	}
+
+	private void addProteinDescriptions(final Collection<ProteinDescription> proteinDescriptions) {
+		final ProteinDescriptionBulkLoader loader = new ProteinDescriptionBulkLoader(this, this, "protein_description");
+		loader.addObjects(proteinDescriptions);
+	}
+
+	private void addProteinAccnums(final Collection<ProteinAccnum> proteinAccnums) {
+		final ProteinAccnumBulkLoader loader = new ProteinAccnumBulkLoader(this, this, "protein_accnum");
+		loader.addObjects(proteinAccnums);
 	}
 
 	@Override

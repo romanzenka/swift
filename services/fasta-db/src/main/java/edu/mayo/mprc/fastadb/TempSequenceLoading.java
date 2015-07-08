@@ -21,6 +21,18 @@ public class TempSequenceLoading {
 		this.sequence = sequence.getSequence();
 	}
 
+	public TempSequenceLoading(final TempKey tempKey, final ProteinDescription description) {
+		this.tempKey = tempKey;
+		this.mass = 0.0;
+		this.sequence = description.getDescription();
+	}
+
+	public TempSequenceLoading(final TempKey tempKey, final ProteinAccnum accnum) {
+		this.tempKey = tempKey;
+		this.mass = 0.0;
+		this.sequence = accnum.getAccnum();
+	}
+
 	public TempKey getTempKey() {
 		return tempKey;
 	}
