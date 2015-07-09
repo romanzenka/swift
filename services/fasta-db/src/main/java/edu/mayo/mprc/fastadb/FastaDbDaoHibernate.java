@@ -16,7 +16,7 @@ import edu.mayo.mprc.utilities.progress.PercentRangeReporter;
 import edu.mayo.mprc.utilities.progress.UserProgressReporter;
 import org.apache.log4j.Logger;
 import org.hibernate.Query;
-import org.hibernate.StatelessSession;
+import org.hibernate.SQLQuery;
 import org.springframework.stereotype.Repository;
 
 import javax.annotation.Nullable;
@@ -129,27 +129,6 @@ public final class FastaDbDaoHibernate extends BulkDaoBase implements FastaDbDao
 		return proteinSequence;
 	}
 
-	private ProteinSequence addProteinSequence(final StatelessSession session, final ProteinSequence proteinSequence) {
-		if (null == proteinSequence.getId()) {
-			return saveStateless(session, proteinSequence, nullSafeEq("sequence", proteinSequence.getSequence()), false);
-		}
-		return proteinSequence;
-	}
-
-	private ProteinAccnum addAccessionNumber(final StatelessSession session, final ProteinAccnum accessionNumber) {
-		if (null == accessionNumber.getId()) {
-			return saveStateless(session, accessionNumber, nullSafeEq("accnum", accessionNumber.getAccnum()), false);
-		}
-		return accessionNumber;
-	}
-
-	private ProteinDescription addDescription(final StatelessSession session, final ProteinDescription description) {
-		if (null == description.getId()) {
-			return saveStateless(session, description, nullSafeEq("description", description.getDescription()), false);
-		}
-		return description;
-	}
-
 	@Override
 	public ProteinSequence getProteinSequence(final int proteinId) {
 		return (ProteinSequence) getSession().get(ProteinSequence.class, proteinId);
@@ -171,8 +150,7 @@ public final class FastaDbDaoHibernate extends BulkDaoBase implements FastaDbDao
 	 */
 	@Override
 	public void addFastaDatabase(final Curation database, @Nullable final UserProgressReporter progressReporter) {
-		final StatelessSession session = getDatabase().getSessionFactory().openStatelessSession();
-		final Query entryCount = session.createQuery("select count(*) from ProteinEntry p where p.database=:database").setEntity("database", database);
+		final Query entryCount = getSession().createQuery("select count(*) from ProteinEntry p where p.database=:database").setEntity("database", database);
 		if (0L != ((Long) entryCount.uniqueResult()).longValue()) {
 			// We have loaded the database already
 			return;
@@ -187,6 +165,8 @@ public final class FastaDbDaoHibernate extends BulkDaoBase implements FastaDbDao
 
 		final PercentRangeReporter parsingRange = new PercentRangeReporter(percentReporter, 0f, 0.5f);
 		final PercentRangeReporter loadingRange = new PercentRangeReporter(percentReporter, 0.5f, 1.0f);
+		final PercentRangeReporter initialLoad = new PercentRangeReporter(loadingRange, 0f, 0.2f);
+		final PercentRangeReporter entryLoad = new PercentRangeReporter(loadingRange, 0.2f, 1.0f);
 
 		try {
 			stream.beforeFirst();
@@ -230,38 +210,36 @@ public final class FastaDbDaoHibernate extends BulkDaoBase implements FastaDbDao
 				}
 			}
 
-			session.beginTransaction();
-
+			initialLoad.reportProgress(0);
 			addSequences(sequences, "protein_sequence");
+			initialLoad.reportProgress(0.5f);
 			addProteinDescriptions(descriptions.values());
+			initialLoad.reportProgress(0.75f);
 			addProteinAccnums(accnums);
+			initialLoad.reportProgress(1.0f);
 
 			int entryNum = 0;
 			final int totalEntries = entries.size();
+			final SQLQuery sqlQuery = getSession().createSQLQuery("INSERT INTO protein_entry SET curation_id=:curation, protein_accnum_id=:accnum, protein_description_id=:description, protein_sequence_id=:sequence");
+			sqlQuery.setParameter("curation", database.getId());
+
 			for (final ProteinEntry entry : entries) {
 				entryNum++;
-				final ProteinSequence proteinSequence = entry.getSequence();
-				final ProteinAccnum accnum = addAccessionNumber(session, entry.getAccessionNumber());
-				final ProteinDescription desc = addDescription(session, entry.getDescription());
-				final ProteinEntry newEntry = new ProteinEntry(database, accnum, desc, proteinSequence);
 
-				// We know that we will never save two identical entries (fasta has each entry unique and we have not
-				// loaded the database yet. So no need to check)
-				session.insert(newEntry);
+				sqlQuery.setParameter("accnum", entry.getAccessionNumber().getId());
+				sqlQuery.setParameter("description", entry.getDescription().getId());
+				sqlQuery.setParameter("sequence", entry.getSequence().getId());
 
 				if (0 == entryNum % REPORT_FREQUENCY) {
-					loadingRange.reportProgress((float) entryNum / (float) totalEntries);
+					entryLoad.reportProgress((float) entryNum / (float) totalEntries);
 				}
 			}
 
 			LOGGER.info(MessageFormat.format("Loaded [{0}] to database: {1,number} sequences added.", fasta.getAbsolutePath(), numSequencesRead));
-			session.getTransaction().commit();
 		} catch (final Exception e) {
-			session.getTransaction().rollback();
 			throw new MprcException("Could not add FASTA file to database " + database.getTitle(), e);
 		} finally {
 			FileUtilities.closeQuietly(stream);
-			session.close();
 		}
 	}
 
