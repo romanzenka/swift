@@ -225,7 +225,7 @@ public final class FastaDbDaoHibernate extends BulkDaoBase implements FastaDbDao
 				}
 			}
 
-			session.getTransaction().begin();
+			session.beginTransaction();
 
 			addSequences(sequences, "protein_sequence");
 			addProteinDescriptions(descriptions);
@@ -287,7 +287,8 @@ public final class FastaDbDaoHibernate extends BulkDaoBase implements FastaDbDao
 				HBM_HOME + "ProteinEntry.hbm.xml",
 				HBM_HOME + "ProteinAccnum.hbm.xml",
 				HBM_HOME + "ProteinDescription.hbm.xml",
-				HBM_HOME + "TempSequenceLoading.hbm.xml"
+				HBM_HOME + "TempSequenceLoading.hbm.xml",
+				HBM_HOME + "TempStringLoading.hbm.xml"
 		));
 		list.addAll(super.getHibernateMappings());
 		return list;

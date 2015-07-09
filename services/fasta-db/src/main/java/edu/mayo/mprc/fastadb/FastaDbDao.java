@@ -1,7 +1,6 @@
 package edu.mayo.mprc.fastadb;
 
 import edu.mayo.mprc.config.RuntimeInitializer;
-import edu.mayo.mprc.database.bulk.BulkLoadJob;
 import edu.mayo.mprc.database.bulk.BulkLoadJobStarter;
 import edu.mayo.mprc.dbcurator.model.Curation;
 import edu.mayo.mprc.utilities.progress.PercentDone;
@@ -83,16 +82,4 @@ public interface FastaDbDao extends BulkLoadJobStarter, RuntimeInitializer {
 	 * @param proteinSequences List of protein sequences to add.
 	 */
 	void addProteinSequences(Collection<ProteinSequence> proteinSequences);
-
-	/**
-	 * @return New job to start.
-	 */
-	BulkLoadJob startNewJob();
-
-	/**
-	 * Remove the running job.
-	 *
-	 * @param job Job to be removed.
-	 */
-	void endJob(BulkLoadJob job);
 }

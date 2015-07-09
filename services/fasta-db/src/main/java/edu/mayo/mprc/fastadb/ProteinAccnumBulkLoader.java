@@ -28,7 +28,7 @@ public final class ProteinAccnumBulkLoader extends BulkLoader<ProteinAccnum> {
 
 	@Override
 	public String getEqualityString() {
-		return "<t>.data = <s>.accnum";
+		return "<t>.data = <s>.accession_number";
 	}
 
 	@Override
@@ -43,6 +43,6 @@ public final class ProteinAccnumBulkLoader extends BulkLoader<ProteinAccnum> {
 
 	@Override
 	public String getColumnsToTarget() {
-		return "accnum";
+		return "accession_number";
 	}
 }

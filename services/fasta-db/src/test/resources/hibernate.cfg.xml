@@ -1,0 +1,15 @@
+<?xml version='1.0' encoding='utf-8'?><!-- this file has been replaced by programmatic setup in HibernateSetup class --><!DOCTYPE hibernate-configuration PUBLIC
+    "-//Hibernate/Hibernate Configuration DTD 3.0//EN"
+    "http://www.hibernate.org/dtd/hibernate-configuration-3.0.dtd">
+<hibernate-configuration>
+    <session-factory>
+        <mapping resource="../../main/resources/edu/mayo/mprc/fastadb/ProteinAccnum.hbm.xml" />
+        <mapping resource="../../main/resources/edu/mayo/mprc/fastadb/ProteinDescription.hbm.xml" />
+        <mapping resource="../../main/resources/edu/mayo/mprc/fastadb/ProteinEntry.hbm.xml" />
+        <mapping resource="../../main/resources/edu/mayo/mprc/fastadb/ProteinSequence.hbm.xml" />
+        <mapping resource="../../main/resources/edu/mayo/mprc/fastadb/TempSequenceLoading.hbm.xml" />
+        <mapping resource="../../main/resources/edu/mayo/mprc/fastadb/TempStringLoading.hbm.xml" />
+    </session-factory>
+</hibernate-configuration>
+
+

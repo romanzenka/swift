@@ -190,7 +190,7 @@ public abstract class BulkLoader<T extends PersistableBase> {
 					.createSQLQuery(
 							MessageFormat.format(
 									"INSERT INTO {0} ({1}, {2}) select data_order+{3,number,#}, {4} from {5} where job = :job and new_id is null",
-									sessionProvider.qualifyTableName(table), tableId, columnsToTranferFrom, lastId, columnsToTranferTo,
+									sessionProvider.qualifyTableName(table), tableId, columnsToTranferTo, lastId, columnsToTranferFrom,
 									sessionProvider.qualifyTableName(tempTableName)))
 					.setParameter("job", bulkLoadJob.getId());
 			query.executeUpdate();

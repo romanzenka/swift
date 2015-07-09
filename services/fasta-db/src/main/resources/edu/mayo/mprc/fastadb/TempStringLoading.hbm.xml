@@ -7,6 +7,6 @@
             <key-property name="dataOrder" column="data_order" type="integer" />
         </composite-id>
         <property name="newId" column="new_id" type="integer" not-null="false" />
-        <property name="data" type="text" length="200" column="sequence" />
+        <property name="data" type="string" length="200" column="data" />
     </class>
 </hibernate-mapping>
