@@ -229,6 +229,7 @@ public final class FastaDbDaoHibernate extends BulkDaoBase implements FastaDbDao
 				sqlQuery.setParameter("accnum", entry.getAccessionNumber().getId());
 				sqlQuery.setParameter("description", entry.getDescription().getId());
 				sqlQuery.setParameter("sequence", entry.getSequence().getId());
+				sqlQuery.executeUpdate();
 
 				if (0 == entryNum % REPORT_FREQUENCY) {
 					entryLoad.reportProgress((float) entryNum / (float) totalEntries);
