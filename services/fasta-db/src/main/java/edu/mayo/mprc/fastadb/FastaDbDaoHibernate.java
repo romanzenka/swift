@@ -194,7 +194,9 @@ public final class FastaDbDaoHibernate extends BulkDaoBase implements FastaDbDao
 
 			final List<ProteinEntry> entries = new ArrayList<ProteinEntry>(50000);
 			final List<ProteinSequence> sequences = new ArrayList<ProteinSequence>(50000);
-			final List<ProteinDescription> descriptions = new ArrayList<ProteinDescription>(50000);
+			// Descriptions can be non-unique
+			final Map<String, ProteinDescription> descriptions = Maps.newHashMapWithExpectedSize(50000);
+			// Accnums must be unique
 			final List<ProteinAccnum> accnums = new ArrayList<ProteinAccnum>(50000);
 
 			while (stream.gotoNextSequence()) {
@@ -216,8 +218,11 @@ public final class FastaDbDaoHibernate extends BulkDaoBase implements FastaDbDao
 				sequences.add(proteinSequence);
 				final ProteinAccnum accnum = new ProteinAccnum(accessionNumber);
 				accnums.add(accnum);
-				final ProteinDescription desc = new ProteinDescription(description);
-				descriptions.add(desc);
+				ProteinDescription desc = descriptions.get(description);
+				if (desc == null) {
+					desc = new ProteinDescription(description);
+					descriptions.put(description, desc);
+				}
 				final ProteinEntry entry = new ProteinEntry(database, accnum, desc, proteinSequence);
 				entries.add(entry);
 				if (0 == numSequencesRead % REPORT_FREQUENCY) {
@@ -228,7 +233,7 @@ public final class FastaDbDaoHibernate extends BulkDaoBase implements FastaDbDao
 			session.beginTransaction();
 
 			addSequences(sequences, "protein_sequence");
-			addProteinDescriptions(descriptions);
+			addProteinDescriptions(descriptions.values());
 			addProteinAccnums(accnums);
 
 			int entryNum = 0;
