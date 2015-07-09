@@ -247,7 +247,9 @@ public class TestSearchDbDao extends DaoTest {
 	private Curation loadFasta(final File file, final String shortName) {
 		try {
 			final Curation curation = addCurationToDatabase(shortName, file);
+			fastaDbDao.begin();
 			fastaDbDao.addFastaDatabase(curation, null);
+			fastaDbDao.commit();
 			return curation;
 		} catch (Exception e) {
 			throw new MprcException("Failed to load database [" + shortName + "]", e);

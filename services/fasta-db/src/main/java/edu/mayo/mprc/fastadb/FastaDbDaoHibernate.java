@@ -220,7 +220,7 @@ public final class FastaDbDaoHibernate extends BulkDaoBase implements FastaDbDao
 
 			int entryNum = 0;
 			final int totalEntries = entries.size();
-			final SQLQuery sqlQuery = getSession().createSQLQuery("INSERT INTO protein_entry SET curation_id=:curation, protein_accnum_id=:accnum, protein_description_id=:description, protein_sequence_id=:sequence");
+			final SQLQuery sqlQuery = getSession().createSQLQuery("INSERT INTO protein_entry(curation_id, protein_accnum_id, protein_description_id, protein_sequence_id) VALUES (:curation, :accnum, :description, :sequence)");
 			sqlQuery.setParameter("curation", database.getId());
 
 			for (final ProteinEntry entry : entries) {
@@ -290,7 +290,6 @@ public final class FastaDbDaoHibernate extends BulkDaoBase implements FastaDbDao
 
 		if (params.containsKey("test")) {
 			final Curation shortTest = curationDao.getCurationByShortName("ShortTest");
-
 			addFastaDatabase(shortTest, null);
 		}
 	}

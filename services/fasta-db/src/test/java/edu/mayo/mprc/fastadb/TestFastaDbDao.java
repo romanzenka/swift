@@ -48,8 +48,10 @@ public class TestFastaDbDao extends DaoTest {
 		Assert.assertEquals(fastaDbDao.countDatabaseEntries(currentSp), 9);
 		fastaDbDao.commit();
 
+		fastaDbDao.begin();
 		// Add the same thing again. Nothing should happen.
 		fastaDbDao.addFastaDatabase(currentSp, null);
+		fastaDbDao.commit();
 
 		fastaDbDao.begin();
 		Assert.assertEquals(fastaDbDao.countDatabaseEntries(currentSp), 9);
