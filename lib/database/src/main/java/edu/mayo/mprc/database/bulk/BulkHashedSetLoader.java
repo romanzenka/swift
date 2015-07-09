@@ -84,12 +84,12 @@ public abstract class BulkHashedSetLoader<T extends PersistableHashedSetBase<? e
 	}
 
 	@Override
-	public String getColumnsToTransferFrom() {
-		return getColumnsToTransferTo();
+	public String getColumnsFromTemp() {
+		return getColumnsToTarget();
 	}
 
 	@Override
-	public String getColumnsToTransferTo() {
+	public String getColumnsToTarget() {
 		return "hash";
 	}
 
@@ -116,7 +116,7 @@ public abstract class BulkHashedSetLoader<T extends PersistableHashedSetBase<? e
 		final String table = getTableName();
 		final String tableId = getTableIdColumn();
 		final String tempTableName = getTempTableName();
-		final String columnsToTranfer = getColumnsToTransferTo();
+		final String columnsToTranfer = getColumnsToTarget();
 		try {
 			identityOn(table);
 			final Query query = getSession()

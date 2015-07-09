@@ -65,12 +65,12 @@ public abstract class BulkLoader<T extends PersistableBase> {
 	/**
 	 * Comma separated list of columns to transfer from the temp table.
 	 */
-	public abstract String getColumnsToTransferFrom();
+	public abstract String getColumnsFromTemp();
 
 	/**
 	 * Comma separated list of columns to transfer to the actual table.
 	 */
-	public abstract String getColumnsToTransferTo();
+	public abstract String getColumnsToTarget();
 
 	public void addObjects(final Collection<? extends T> values) {
 		final BulkLoadJob bulkLoadJob = jobStarter.startNewJob();
@@ -182,8 +182,8 @@ public abstract class BulkLoader<T extends PersistableBase> {
 		final String table = getTableName();
 		final String tableId = getTableIdColumn();
 		final String tempTableName = getTempTableName();
-		final String columnsToTranferFrom = getColumnsToTransferFrom();
-		final String columnsToTranferTo = getColumnsToTransferTo();
+		final String columnsToTranferFrom = getColumnsFromTemp();
+		final String columnsToTranferTo = getColumnsToTarget();
 		try {
 			identityOn(table);
 			final Query query = getSession()

@@ -18,7 +18,7 @@ public final class ProteinDescriptionBulkLoader extends BulkLoader<ProteinDescri
 
 	@Override
 	public String getTempTableName() {
-		return "temp_sequence_loading";
+		return "temp_string_loading";
 	}
 
 	@Override
@@ -28,21 +28,21 @@ public final class ProteinDescriptionBulkLoader extends BulkLoader<ProteinDescri
 
 	@Override
 	public String getEqualityString() {
-		return "<t>.sequence = <s>.description";
+		return "<t>.data = <s>.description";
 	}
 
 	@Override
 	public Object wrapForTempTable(final ProteinDescription value, final TempKey key) {
-		return new TempSequenceLoading(key, value);
+		return new TempStringLoading(key, value.getDescription());
 	}
 
 	@Override
-	public String getColumnsToTransferFrom() {
-		return "LEFT(sequence, 200)";
+	public String getColumnsFromTemp() {
+		return "data";
 	}
 
 	@Override
-	public String getColumnsToTransferTo() {
+	public String getColumnsToTarget() {
 		return "description";
 	}
 

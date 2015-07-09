@@ -45,12 +45,12 @@ public final class SequenceBulkLoader extends BulkLoader<Sequence> {
 	}
 
 	@Override
-	public String getColumnsToTransferFrom() {
-		return getColumnsToTransferTo();
+	public String getColumnsFromTemp() {
+		return getColumnsToTarget();
 	}
 
 	@Override
-	public String getColumnsToTransferTo() {
+	public String getColumnsToTarget() {
 		return "sequence, mass";
 	}
 }

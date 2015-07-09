@@ -18,7 +18,7 @@ public final class ProteinAccnumBulkLoader extends BulkLoader<ProteinAccnum> {
 
 	@Override
 	public String getTempTableName() {
-		return "temp_sequence_loading";
+		return "temp_string_loading";
 	}
 
 	@Override
@@ -28,21 +28,21 @@ public final class ProteinAccnumBulkLoader extends BulkLoader<ProteinAccnum> {
 
 	@Override
 	public String getEqualityString() {
-		return "<t>.sequence = <s>.accnum";
+		return "<t>.data = <s>.accnum";
 	}
 
 	@Override
 	public Object wrapForTempTable(final ProteinAccnum value, final TempKey key) {
-		return new TempSequenceLoading(key, value);
+		return new TempStringLoading(key, value.getAccnum());
 	}
 
 	@Override
-	public String getColumnsToTransferFrom() {
-		return "LEFT(sequence, 80)";
+	public String getColumnsFromTemp() {
+		return "data";
 	}
 
 	@Override
-	public String getColumnsToTransferTo() {
+	public String getColumnsToTarget() {
 		return "accnum";
 	}
 }
