@@ -718,9 +718,9 @@
     <!-- Source Control Management -->
     <scm>
         <!-- SCM setup -->
-        <connection>scm:git:https://github.com/romanzenka/swift.git</connection>
-        <developerConnection>scm:git:https://github.com/romanzenka/swift.git</developerConnection>
-        <url>${scm.url.base}/swift/tree/master/${project.artifactId}</url>
+        <connection>scm:git:http://mayo-git.mayo.edu/raymondmoore/protoviz.git</connection>
+        <developerConnection>scm:git:http://mayo-git.mayo.edu/raymondmoore/protoviz.git</developerConnection>
+        <url>http://mayo-git.mayo.edu/raymondmoore/protoviz</url>
         <tag>HEAD</tag>
     </scm>
 </project>
