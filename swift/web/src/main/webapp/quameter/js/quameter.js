@@ -505,7 +505,8 @@ function drawGraphsByMetrics(data, renderDetailGraphs, viewMetadata) {
     }
 }
 
-function startNewPage(doc, config) {
+// Start a new report page
+function startNewPage(doc, config, pageNumber, numPages) {
     doc.setFontSize(config.headerFontSize);
     doc.setLineWidth(0);
     doc.text("Immunostains Monthly Mass Spectrometry QC Report", 0.1, 0.2);
@@ -516,20 +517,26 @@ function startNewPage(doc, config) {
     });
     var dateString = "Generated " + value;
     doc.text(dateString, config.pageWidth - 0.2 - doc.getTextDimensions(dateString).w / 72, 0.2);
+    var pageString = "Page " + pageNumber + " of " + numPages;
+    doc.text(pageString, config.pageWidth - 0.2 - doc.getTextDimensions(pageString).w / 72, config.pageHeight - 0.1);
 
     yCoord = config.topMargin;
 
     return yCoord;
 }
 
-//  Important basic graphing functions
-function drawGraphsToReport(data, viewMetadata, doc) {
+// Does the actual report drawing
+// Returns number of pages generated. If numPages is set to -1, we do not do an actuall drawing pass,
+// we are just calculating the pages
+function drawGraphsToReport(data, viewMetadata, doc, numPages) {
+    var noDrawing = numPages == -1;
     var viewIndex = 0;
     var previousCategory = '';
     var c = {
         'topMargin': 0.6,
         'bottomMargin': 1,
         'lineHeight': 0.2,
+        'finePrintLineHeight': 0.12,
         'titleLineHeight': 0.3,
         'headerFontSize': 6,
         'pageWidth': 8.5,
@@ -538,11 +545,29 @@ function drawGraphsToReport(data, viewMetadata, doc) {
         'categoryFontSize': 14,
         'metricFontSize': 9,
         'titleFontSize': 12,
+        'lineFontSize': 9,
+        'finePrintFontSize': 6,
     };
+
+    // Find the first dygraph to be displayed so we can extract the date ranges
+    var firstDygraph = null;
+    for (var i = 0; i < metrics.length; i++) {
+        var metric = metrics[i];
+        var metricId = metric.code;
+        if (1 == metric.simple) {
+            var nthView = dyViewsByCode[metricId];
+            firstDygraph = views[nthView].dygraph;
+        }
+    }
+    var xAxisRange = firstDygraph.xAxisRange();
+    var fromDate = new Date(xAxisRange[0]);
+    var toDate = new Date(xAxisRange[1]);
 
     yCoord = c.topMargin;
 
-    yCoord = startNewPage(doc, c);
+    var pageNumber = 1;
+
+    yCoord = startNewPage(doc, c, pageNumber, numPages);
 
     doc.setFontSize(c.titleFontSize);
 
@@ -561,15 +586,25 @@ function drawGraphsToReport(data, viewMetadata, doc) {
 
     centerText("Monthly Mass Spectrometry QC Report");
 
-    yCoord += c.titleLineHeight;
+    yCoord += c.lineHeight;
 
+    doc.setFontSize(c.metricFontSize);
+    function formatDate(d) {
+        return d.toISOString().substring(0, 10);
+    }
+
+    doc.text("Date Range: " + formatDate(fromDate) + " to " + formatDate(toDate), 1, yCoord);
+
+    yCoord += c.titleLineHeight;
 
     for (var i = 0; i < metrics.length; i++) {
 
         if (yCoord + c.typicalGraphHeight > c.pageHeight - c.bottomMargin) {
             doc.addPage();
-            yCoord = startNewPage(doc, c);
+            pageNumber++;
+            yCoord = startNewPage(doc, c, pageNumber, numPages);
         }
+
         var metric = metrics[i];
         var categoryCode;
         var metricId = metric.code;
@@ -596,36 +631,94 @@ function drawGraphsToReport(data, viewMetadata, doc) {
 
             nthView = dyViewsByCode[metricId];
 
-            c.typicalGraphHeight = addGraphToReport(doc, yCoord, data, view, metric.range, annotCollection, views[nthView].dygraph);
+            c.typicalGraphHeight = addGraphToReport(doc, yCoord, data, view, metric.range, annotCollection, views[nthView].dygraph, noDrawing);
             yCoord += c.typicalGraphHeight;
             yCoord += c.lineHeight;
             viewIndex++;
         }
     }
+
+    doc.text("Hidden Data Files:", 1, yCoord);
+    yCoord += c.lineHeight;
+
+    if (yCoord + c.typicalGraphHeight > c.pageHeight - c.bottomMargin) {
+        doc.addPage();
+        pageNumber++;
+        yCoord = startNewPage(doc, c, pageNumber, numPages);
+    }
+
+    doc.text("Additional Annotations:", 1, yCoord);
+    yCoord += c.lineHeight;
+
+    if (yCoord + c.typicalGraphHeight > c.pageHeight - c.bottomMargin) {
+        doc.addPage();
+        pageNumber++;
+        yCoord = startNewPage(doc, c, pageNumber, numPages);
+    }
+
+    doc.addPage();
+    pageNumber++;
+    yCoord = startNewPage(doc, c, pageNumber, numPages);
+
+    doc.setFontSize(c.lineFontSize);
+    doc.text("REVIEW AND APPROVAL SIGNATURES", 1, yCoord);
+    yCoord += c.lineHeight;
+    yCoord += c.lineHeight;
+    yCoord += c.lineHeight;
+
+    doc.text("Technical Specialist    _________________________   Date _________________", 1, yCoord);
+    yCoord += c.lineHeight;
+    yCoord += c.lineHeight;
+    yCoord += c.lineHeight;
+
+    doc.text("Quality Specialist       _________________________   Date _________________", 1, yCoord);
+    yCoord += c.lineHeight;
+    yCoord += c.lineHeight;
+    yCoord += c.lineHeight;
+
+    doc.text("Supervisor                 _________________________   Date _________________", 1, yCoord);
+    yCoord += c.lineHeight;
+    yCoord += c.lineHeight;
+    yCoord += c.lineHeight;
+
+    doc.setFontSize(c.finePrintFontSize);
+    doc.text("COPYRIGHT (c) Mayo Foundation for Medical Education and Research. This information is intended for the use of Mayo and affiliate laboratories employees only.", 1, yCoord);
+    yCoord += c.finePrintLineHeight;
+    doc.text("It is confidential and no part of it may be transmitted in any form by electronic, mechanical, photocopying, or any other means to anyone outside Mayo and affiliate", 1, yCoord);
+    yCoord += c.finePrintLineHeight;
+    doc.text("laboratories without the prior permission of its approver and/or copyright holder. Inappropriate use or dissemination of this information may result in disciplinary", 1, yCoord);
+    yCoord += c.finePrintLineHeight;
+    doc.text("or other legal action.", 1, yCoord);
+
+    return pageNumber;
 }
 
-function addGraphToReport(doc, yCoord, data, view, range, annotations, dygraph) {
+// Add a graph to the pdf report
+function addGraphToReport(doc, yCoord, data, view, range, annotations, dygraph, noDrawing) {
     var pageWidth = 8.5;
     var margin = 1;
     var graphLeft = margin;
     var graphRight = pageWidth - margin;
     var graphHeight = (graphRight - graphLeft) / dygraph.width_ * dygraph.height_;
 
-    // Report coordinates
-    var rx0 = graphLeft;
-    var ry0 = yCoord;
-    var rw = graphRight - graphLeft;
-    var rh = graphHeight;
+    if (!noDrawing) {
 
-    // Graph coordinates
-    var x0 = dygraph.xAxisRange()[0];
-    var y0 = dygraph.yAxisRange[0];
-    var w = dygraph.xAxisRange()[1] - dygraph.xAxisRange()[0];
-    var h = dygraph.yAxisRange()[1] - dygraph.yAxisRange()[0];
+        // Report coordinates
+        var rx0 = graphLeft;
+        var ry0 = yCoord;
+        var rw = graphRight - graphLeft;
+        var rh = graphHeight;
 
-    var imgData = Dygraph.Export.asPNG(dygraph);
+        // Graph coordinates
+        var x0 = dygraph.xAxisRange()[0];
+        var y0 = dygraph.yAxisRange[0];
+        var w = dygraph.xAxisRange()[1] - dygraph.xAxisRange()[0];
+        var h = dygraph.yAxisRange()[1] - dygraph.yAxisRange()[0];
 
-    doc.addImage(imgData, 'PNG', rx0, ry0, rw, rh);
+        var imgData = Dygraph.Export.asPNG(dygraph);
+
+        doc.addImage(imgData, 'PNG', rx0, ry0, rw, rh);
+    }
 
     return graphHeight;
 }
@@ -779,7 +872,12 @@ function initSimpleCharts(graphObj) {
 
     $("#reportButton").click(function (event) {
         var doc = new jsPDF("portrait", "in", "letter");
-        drawGraphsToReport(data, viewMetadata, doc)
+        // First pass - just count pages
+        var numPages = drawGraphsToReport(data, viewMetadata, doc, -1);
+
+        // Second pass - actually make a .pdf
+        doc = new jsPDF("portrait", "in", "letter");
+        drawGraphsToReport(data, viewMetadata, doc, numPages);
         doc.save('report.pdf');
     })
 }
