@@ -730,6 +730,13 @@ public final class SwiftApp implements EntryPoint, HidesPageContentsWhileLoading
 				return;
 			}
 
+			// The user will likely create a broken output on Windows
+			if (effectiveOutputPath.length() + "/scaffold/".length() + titleText.length() + ".sf3".length() > 220) {
+				Window.alert("The output folder path is too long.");
+				title.setFocus(true);
+				return;
+			}
+
 			final ProgressDialogBox dialog = new ProgressDialogBox();
 			dialog.setProgressMessage("Submitting search...");
 			dialog.setRelativeSize(0.25, 0.25);
