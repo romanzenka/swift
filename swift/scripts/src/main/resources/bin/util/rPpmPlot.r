@@ -860,7 +860,7 @@ imageGenerator<-function(dataFile, msmsEvalDataFile, infoFile, spectrumFile, chr
            xlim=range(0, xAxisMs, xAxis))
       
       if(!is.null(chromatogram)) {
-        for(i in seq(1, length(xAxisMs)-1)) {
+        for(i in seq_len(length(xAxisMs)-1)) {
           rasterImage(image = chromatogram$col[rev(chromatogram$image[i,]+1)], xleft = xAxisMs[i], xright = xAxisMs[i+1], ybottom = chromatogram.minMz, ytop = chromatogram.maxMz)
         }
       }
