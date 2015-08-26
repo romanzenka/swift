@@ -43,13 +43,13 @@ public final class Extras {
 		final Period period = new Interval(webUiHolder.getStartTime(), new DateTime()).toPeriod();
 		PeriodFormatter formatter = new PeriodFormatterBuilder()
 				.appendDays()
-				.appendSuffix("days, ")
+				.appendSuffix(" days, ")
 				.appendHours()
-				.appendSuffix("hours, ")
+				.appendSuffix(" hours, ")
 				.appendMinutes()
-				.appendSuffix(":")
+				.appendSuffix(" minutes, ")
 				.appendSeconds()
-				.appendSuffix("")
+				.appendSuffix(" seconds.")
 				.toFormatter();
 
 		model.addAttribute("uptime", formatter.print(period));
