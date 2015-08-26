@@ -6,6 +6,7 @@ import edu.mayo.mprc.config.RunningApplicationContext;
 import edu.mayo.mprc.swift.Swift;
 import edu.mayo.mprc.utilities.exceptions.ExceptionUtilities;
 import org.apache.log4j.Logger;
+import org.joda.time.DateTime;
 
 import java.io.File;
 
@@ -16,6 +17,7 @@ public class WebUiHolder {
 	private static final Logger LOGGER = Logger.getLogger(WebUiHolder.class);
 	private RunningApplicationContext context;
 	private File swiftHome = new File(".").getAbsoluteFile();
+	private DateTime startTime;
 
 	public WebUi getWebUi() {
 		final RunningApplicationContext context = getContext();
@@ -59,5 +61,13 @@ public class WebUiHolder {
 	 */
 	public void setSwiftHome(File swiftHome) {
 		this.swiftHome = swiftHome;
+	}
+
+	public DateTime getStartTime() {
+		return startTime;
+	}
+
+	public void setStartTime(DateTime startTime) {
+		this.startTime = startTime;
 	}
 }

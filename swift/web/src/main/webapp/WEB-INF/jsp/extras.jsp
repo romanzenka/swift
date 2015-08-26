@@ -133,6 +133,10 @@
             <td>
                 <a href="${buildLink}">${buildLink}</a></td>
         </tr>
+        <tr>
+            <th>Uptime</th>
+            <td>${uptime}</td>
+        </tr>
     </table>
 
 </div>

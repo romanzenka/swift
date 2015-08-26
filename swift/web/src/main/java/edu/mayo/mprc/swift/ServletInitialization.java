@@ -20,6 +20,8 @@ import edu.mayo.mprc.utilities.FileUtilities;
 import edu.mayo.mprc.utilities.MonitorUtilities;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
+import org.joda.time.DateTime;
+import org.joda.time.format.ISODateTimeFormat;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.web.context.ServletContextAware;
 
@@ -71,6 +73,9 @@ public final class ServletInitialization implements SwiftCommand, ServletContext
 
 			final File home = getSwiftHome(servletContext);
 			webUiHolder.setSwiftHome(home);
+
+			final DateTime startTime = ISODateTimeFormat.dateTimeParser().parseDateTime(getStartTime(servletContext));
+			webUiHolder.setStartTime(startTime);
 
 			final SwiftEnvironment swiftEnvironment = MainFactoryContext.getSwiftEnvironment();
 			// Simulate command line being passed to Swift
@@ -221,6 +226,15 @@ public final class ServletInitialization implements SwiftCommand, ServletContext
 			swiftDaemon = System.getProperty("SWIFT_DAEMON");
 		}
 		return swiftDaemon;
+	}
+
+	private static String getStartTime(final ServletContext context) {
+		String startTime = context.getInitParameter("SWIFT_DAEMON");
+		if (startTime == null) {
+			// Hack - we allow SWIFT_DAEMON to be defined as system property to make debugging in GWT easier
+			startTime = new DateTime().toString("yyyy-MM-dd HH:mm:ss");
+		}
+		return startTime;
 	}
 
 	/**

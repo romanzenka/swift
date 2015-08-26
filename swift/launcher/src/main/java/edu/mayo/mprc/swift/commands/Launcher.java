@@ -9,6 +9,8 @@ import edu.mayo.mprc.utilities.FileMonitor;
 import edu.mayo.mprc.utilities.FileUtilities;
 import edu.mayo.mprc.utilities.MonitorUtilities;
 import org.apache.log4j.Logger;
+import org.joda.time.DateTime;
+import org.joda.time.format.ISODateTimeFormat;
 import org.mortbay.component.AbstractLifeCycle;
 import org.mortbay.jetty.Connector;
 import org.mortbay.jetty.Server;
@@ -131,7 +133,7 @@ public final class Launcher implements FileListener {
 		if (configMode) {
 			daemonId = MonitorUtilities.getShortHostname();
 		} else {
-			daemonId = swiftEnvironment.getDaemonConfig().getName();
+			daemonId = environment.getDaemonConfig().getName();
 		}
 		final int portNumber = getPortNumber(environment, configMode);
 		final File tempFolder = getTempFolder(environment, configMode);
@@ -152,7 +154,11 @@ public final class Launcher implements FileListener {
 
 		Future<Object> future = null;
 		try {
-			WebAppContext webAppContext = makeWebAppContext(environment.getConfigFile(), configMode ? "config" : "production", warFile, daemonId, tempFolder, jettyStopThread.getPort());
+			WebAppContext webAppContext = makeWebAppContext(
+					environment.getConfigFile(),
+					configMode ? "config" : "production",
+					warFile, daemonId, tempFolder, jettyStopThread.getPort(),
+					environment.getStartTime());
 			server.addHandler(webAppContext);
 
 			future = Executors.newSingleThreadExecutor().submit(new Callable<Object>() {
@@ -174,7 +180,7 @@ public final class Launcher implements FileListener {
 
 	}
 
-	private WebAppContext makeWebAppContext(final File configFile, final String action, final File warFile, final String daemonId, final File tempFolder, int stopPort) {
+	private WebAppContext makeWebAppContext(final File configFile, final String action, final File warFile, final String daemonId, final File tempFolder, int stopPort, DateTime startTime) {
 		final WebAppContext webAppContext = new WebAppContext();
 		webAppContext.setWar(warFile.getAbsolutePath());
 		webAppContext.setContextPath("/");
@@ -189,6 +195,7 @@ public final class Launcher implements FileListener {
 		initParams.put("SWIFT_ACTION", action);
 		initParams.put("SWIFT_DAEMON", daemonId);
 		initParams.put("SWIFT_STOP_PORT", String.valueOf(stopPort));
+		initParams.put("SWIFT_START_TIME", ISODateTimeFormat.dateTime().print(startTime));
 
 		webAppContext.setInitParams(initParams);
 		return webAppContext;

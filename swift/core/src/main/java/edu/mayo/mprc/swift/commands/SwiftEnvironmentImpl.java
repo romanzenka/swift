@@ -12,6 +12,7 @@ import edu.mayo.mprc.swift.search.SwiftSearcher;
 import edu.mayo.mprc.utilities.FileUtilities;
 import edu.mayo.mprc.utilities.exceptions.ExceptionUtilities;
 import joptsimple.OptionParser;
+import org.joda.time.DateTime;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
@@ -39,8 +40,10 @@ public final class SwiftEnvironmentImpl implements SwiftEnvironment, Application
 	private ApplicationContext applicationContext;
 	private Map<String, SwiftCommand> extraCommands = new HashMap<String, SwiftCommand>(1);
 	private final ArrayList<String> commandErrorLog = new ArrayList<String>(10);
+	private DateTime startTime;
 
 	public SwiftEnvironmentImpl() {
+		startTime = new DateTime();
 	}
 
 	/**
@@ -154,6 +157,11 @@ public final class SwiftEnvironmentImpl implements SwiftEnvironment, Application
 	@Override
 	public Collection<String> getCommandErrors() {
 		return ImmutableList.copyOf(commandErrorLog);
+	}
+
+	@Override
+	public DateTime getStartTime() {
+		return startTime;
 	}
 
 	public Daemon.Factory getDaemonFactory() {

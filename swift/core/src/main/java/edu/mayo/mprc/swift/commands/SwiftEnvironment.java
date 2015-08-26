@@ -6,6 +6,7 @@ import edu.mayo.mprc.daemon.DaemonConnection;
 import edu.mayo.mprc.swift.Swift;
 import edu.mayo.mprc.swift.search.SwiftSearcher;
 import joptsimple.OptionParser;
+import org.joda.time.DateTime;
 
 import java.io.File;
 import java.util.Collection;
@@ -132,4 +133,9 @@ public interface SwiftEnvironment extends RunningApplicationContext {
 	 * @return Command errors logged since the previous {@link #clearCommandErrorLog()} command.
 	 */
 	Collection<String> getCommandErrors();
+
+	/**
+	 * @return When did Swift get started?
+	 */
+	DateTime getStartTime();
 }
