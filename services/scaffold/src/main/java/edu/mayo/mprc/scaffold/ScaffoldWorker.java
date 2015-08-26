@@ -1,5 +1,6 @@
 package edu.mayo.mprc.scaffold;
 
+import com.google.common.collect.Lists;
 import com.jamesmurty.utils.XMLBuilder;
 import edu.mayo.mprc.MprcException;
 import edu.mayo.mprc.config.DaemonConfig;
@@ -25,6 +26,7 @@ import org.springframework.stereotype.Component;
 import javax.xml.transform.OutputKeys;
 import java.io.File;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Properties;
 
 public final class ScaffoldWorker extends WorkerBase {
@@ -88,7 +90,12 @@ public final class ScaffoldWorker extends WorkerBase {
 		final File scaffoldWorkFolder = getScaffoldBatchScript().getParentFile();
 		final File scafmlFile = createScafmlFile(scaffoldWorkPacket);
 
-		runScaffold(progressReporter, scafmlFile, scaffoldWorkFolder, outputFolder);
+		final List<File> expectedFiles = Lists.newArrayListWithExpectedSize(scaffoldWorkPacket.getOutputFiles().size());
+		for (final String expectedFileName : scaffoldWorkPacket.getOutputFiles()) {
+			expectedFiles.add(new File(outputFolder, expectedFileName));
+		}
+
+		runScaffold(progressReporter, scafmlFile, scaffoldWorkFolder, outputFolder, expectedFiles);
 	}
 
 	/**
@@ -119,7 +126,7 @@ public final class ScaffoldWorker extends WorkerBase {
 		final File scaffoldWorkFolder = getScaffoldBatchScript().getParentFile();
 		final File scafmlFile = createSpectrumExportScafmlFile(scaffoldWorkPacket, outputFolder);
 
-		runScaffold(progressReporter, scafmlFile, scaffoldWorkFolder, outputFolder);
+		runScaffold(progressReporter, scafmlFile, scaffoldWorkFolder, outputFolder, Arrays.asList(result));
 
 		if (!isScaffoldSpectrumExport(result)) {
 			throw new MprcException("Even after rerunning Scaffold, the spectrum report is still the old version");
@@ -144,13 +151,16 @@ public final class ScaffoldWorker extends WorkerBase {
 	 * @param scafmlFile         Scafml file driving Scaffold
 	 * @param scaffoldWorkFolder Where should Scaffold run (usually the Scaffold install folder)
 	 * @param outputFolder       Where do the Scaffold outputs go.
+	 * @param expectedResultFiles What files are we expected to obtain from Scaffold.
 	 */
-	private void runScaffold(final UserProgressReporter progressReporter, final File scafmlFile, final File scaffoldWorkFolder, final File outputFolder) {
+	private void runScaffold(final UserProgressReporter progressReporter, final File scafmlFile, final File scaffoldWorkFolder, final File outputFolder,
+	                         final List<File> expectedResultFiles) {
 		final ProcessBuilder processBuilder = new ProcessBuilder(getScaffoldBatchScript().getAbsolutePath(), scafmlFile.getAbsolutePath())
 				.directory(scaffoldWorkFolder);
 
 		final ProcessCaller caller = new ProcessCaller(processBuilder, progressReporter.getLog());
-		caller.setOutputMonitor(new ScaffoldLogMonitor(progressReporter));
+		final ScaffoldLogMonitor outputMonitor = new ScaffoldLogMonitor(progressReporter);
+		caller.setOutputMonitor(outputMonitor);
 
 		try {
 			caller.runAndCheck("Scaffold3");
@@ -159,6 +169,16 @@ public final class ScaffoldWorker extends WorkerBase {
 		}
 
 		FileUtilities.restoreUmaskRights(outputFolder, true);
+
+		if (outputMonitor.isStaleFile()) {
+			LOGGER.warn("Scaffold reported stale file handles, deleting its output");
+			// Scaffold output is not trustworthy
+			for (final File result : expectedResultFiles) {
+				LOGGER.warn("Deleting stale Scaffold file: " + result.getAbsolutePath());
+				FileUtilities.quietDelete(result);
+			}
+			throw new MprcException("Scaffold failed (reported stale file handle). This signalizes a filesystem glitch");
+		}
 	}
 
 	/**

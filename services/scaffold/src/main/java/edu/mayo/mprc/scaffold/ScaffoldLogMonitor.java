@@ -8,6 +8,7 @@ public class ScaffoldLogMonitor implements LogMonitor {
 	private static final int TIME_BETWEEN_UPDATES_MS = 1000;
 	private final UserProgressReporter progressReporter;
 	private long lastTimeMs = System.currentTimeMillis();
+	private boolean staleFile;
 
 
 	public ScaffoldLogMonitor(final UserProgressReporter progressReporter) {
@@ -16,6 +17,7 @@ public class ScaffoldLogMonitor implements LogMonitor {
 
 	@Override
 	public void line(final String line) {
+		// Watch for progress
 		if (line.length() > 2 && line.charAt(0) == '%' && line.charAt(line.length() - 1) == '%') {
 			final long time = System.currentTimeMillis();
 			if (time - lastTimeMs < TIME_BETWEEN_UPDATES_MS) {
@@ -31,5 +33,17 @@ public class ScaffoldLogMonitor implements LogMonitor {
 				// SWALLOWED: We ignore these exceptions - we will just not be able to report progress
 			}
 		}
+		// Watch for important warnings - stale file handle warning means our output is incorrect
+		if (line.contains("java.io.IOException: Stale file handle")) {
+			staleFile = true;
+		}
+	}
+
+	/**
+	 * @return True if Scaffold produced stale file warning.
+	 * This warning means Scaffold failed and its outputs are inconsistent, need to be wiped.
+	 */
+	public boolean isStaleFile() {
+		return staleFile;
 	}
 }
