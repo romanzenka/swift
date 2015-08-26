@@ -47,7 +47,8 @@
                           class="navbar-form">
                         <div class="form-group">
                             <div class="input-append">
-                                <input id="annotationText" name="text" size="50" class="form-control">
+                                <input id="annotationText" name="text" size="50" class="form-control"
+                                       placeholder="Annotation">
                                 <button type="submit" class="btn btn-default" id="submitAnnotation" value="Submit">
                                     Submit
                                 </button>
@@ -86,6 +87,11 @@
             </div>
         </c:when>
         <c:otherwise>
+            <div id="zoom-buttons" class="btn-group">
+                <button id="zoom1m-button" class="btn">1 month</button>
+                <button id="zoom2m-button" class="btn">2 months</button>
+                <button id="zoom6m-button" class="btn">6 months</button>
+            </div>
             <div id="detailedGraphs" style="margin-top: 40px; display: none;"></div>
             <div id="simpleGraphs" style="margin-top: 40px"></div>
         </c:otherwise>

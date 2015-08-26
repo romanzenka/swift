@@ -104,6 +104,11 @@ button.highlight {
     font-family: monospace;
 }
 
+#zoom-buttons {
+    float: right;
+    margin-top: 40px;
+}
+
 /**  New Buttons For choosing  **/
 /**
  **  http://twitterbootstrapbuttons.w3masters.nl/

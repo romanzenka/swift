@@ -94,7 +94,6 @@ public final class QuameterServices {
 		}
 	}
 
-
 	//  http://localhost:8080/service/getQuameterDataTable
 	@RequestMapping(value = "/service/getQuameterDataTable", method = RequestMethod.GET)
 	public void getDataFile(final HttpServletResponse response) {

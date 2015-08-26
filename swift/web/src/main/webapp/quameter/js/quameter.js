@@ -79,6 +79,11 @@ function categoryButtons() {
     return categoryDiv.find('.btn');
 }
 
+function zoomButtons() {
+    var zoomDiv = $("#zoom-buttons");
+    return zoomDiv.find('.btn');
+}
+
 function createNewAnnotationForm(parentName, dbID) {
     var metricCode = parentName.split("-")[1];
     $('#hiddenMetricCode').val(metricCode);
@@ -95,8 +100,9 @@ function createNewAnnotationForm(parentName, dbID) {
 }
 
 function getXaxisNseriesById(data, dbId) {
+    var idColumn = columnIndex("id", data);
     for (var i = 0; i < data.getNumberOfRows(); i++) {
-        if (data.getValue(i, columnIndex("id", data)).toString() === dbId.toString()) {
+        if (data.getValue(i, idColumn).toString() === dbId.toString()) {
             return [data.getValue(i, columnIndex("startTime", data)), data.getValue(i, columnIndex("instrument", data))];
         }
     }
@@ -122,7 +128,7 @@ function buildCollection(collection, data, metricCode) {
                             shortText: $.trim(collection[o].text)[0],
                             text: collection[o].text
                         }
-                    )
+                    );
                 }
             }
         }
@@ -203,7 +209,7 @@ function updateAllViews(data) {
         var category = data.getValue(r, columnIndex('category', data));
         var rowId = data.getValue(r, columnIndex("id", data));
         if (activeCats.contains(category) && !hiddenIds["id" + rowId]) {
-            filteredRows.push(r)
+            filteredRows.push(r);
         }
     }
 
@@ -426,7 +432,7 @@ function addDygraph(viewIndex, view, viewId, metricId, viewMetadata, data, range
                     } else {
                         $('#annotFormDiv').hide();
                     }
-                    for (i in views) {
+                    for (var i in views) {
                         if (views.hasOwnProperty(i)) {
                             views[i].dygraph.updateOptions({
                                 file: views[i].dataView
@@ -536,6 +542,7 @@ function drawGraphsToReport(data, viewMetadata, doc, numPages) {
         'topMargin': 0.6,
         'bottomMargin': 1,
         'lineHeight': 0.2,
+        'annotLineHeight': 0.19,
         'finePrintLineHeight': 0.12,
         'titleLineHeight': 0.3,
         'headerFontSize': 6,
@@ -546,6 +553,7 @@ function drawGraphsToReport(data, viewMetadata, doc, numPages) {
         'metricFontSize': 9,
         'titleFontSize': 12,
         'lineFontSize': 9,
+        'annotFontSize': 8,
         'finePrintFontSize': 6,
     };
 
@@ -563,7 +571,7 @@ function drawGraphsToReport(data, viewMetadata, doc, numPages) {
     var fromDate = new Date(xAxisRange[0]);
     var toDate = new Date(xAxisRange[1]);
 
-    yCoord = c.topMargin;
+    var yCoord = c.topMargin;
 
     var pageNumber = 1;
 
@@ -638,7 +646,15 @@ function drawGraphsToReport(data, viewMetadata, doc, numPages) {
         }
     }
 
-    doc.text("Hidden Data Files:", 1, yCoord);
+    function addZero(i) {
+        if (i < 10) {
+            i = "0" + i;
+        }
+        return i;
+    }
+
+    doc.setFontSize(c.lineFontSize);
+    doc.text("Additional Annotations:", 1, yCoord);
     yCoord += c.lineHeight;
 
     if (yCoord + c.typicalGraphHeight > c.pageHeight - c.bottomMargin) {
@@ -647,13 +663,41 @@ function drawGraphsToReport(data, viewMetadata, doc, numPages) {
         yCoord = startNewPage(doc, c, pageNumber, numPages);
     }
 
-    doc.text("Additional Annotations:", 1, yCoord);
-    yCoord += c.lineHeight;
+    doc.setFontSize(c.annotFontSize);
 
-    if (yCoord + c.typicalGraphHeight > c.pageHeight - c.bottomMargin) {
-        doc.addPage();
-        pageNumber++;
-        yCoord = startNewPage(doc, c, pageNumber, numPages);
+    var instruments = activeInstrumentFilters();
+    for (var annot in annotCollection) {
+        if (annotCollection.hasOwnProperty(annot)) {
+            var obj = annotCollection[annot];
+
+            row = findRowForId(data, obj.quameterResultId);
+            var startTime = data.getValue(row, columnIndex('startTime', data));
+
+            var instrument = data.getValue(row, columnIndex('instrument', data));
+
+            if (startTime.getTime() >= fromDate && startTime.getTime() <= toDate &&
+                viewMetadata.filteredRows.contains(row) &&
+                instruments.contains(instrument)) {
+                var metricId = findMetricByCode(obj.metricCode);
+
+                var text = startTime.getFullYear() + "-" +
+                    addZero(startTime.getMonth() + 1) + "-" +
+                    addZero(startTime.getDate()) + " " +
+                    addZero(startTime.getHours()) + ":" +
+                    addZero(startTime.getMinutes()) +
+                    " - " + obj.text;
+
+                doc.text(text, 1.2, yCoord);
+
+                yCoord += c.annotLineHeight;
+
+                if (yCoord + c.typicalGraphHeight > c.pageHeight - c.bottomMargin) {
+                    doc.addPage();
+                    pageNumber++;
+                    yCoord = startNewPage(doc, c, pageNumber, numPages);
+                }
+            }
+        }
     }
 
     doc.addPage();
@@ -800,6 +844,20 @@ function initSimpleCharts(graphObj) {
 
     });
 
+    $("#zoom1m-button").click(function (event) {
+        setZoomMonths(1, data, viewMetadata);
+    });
+
+    $("#zoom2m-button").click(function (event) {
+        setZoomMonths(2, data, viewMetadata);
+    });
+
+    $("#zoom6m-button").click(function (event) {
+        setZoomMonths(6, data, viewMetadata);
+    });
+
+
+
     //Little Hide Icon, when point on a graph is selected
     $('#hide-entry').click(function (event) {
         event.stopPropagation();
@@ -882,7 +940,6 @@ function initSimpleCharts(graphObj) {
     })
 }
 
-
 function getAnnotationCollection() {
     var jsonData = null;
     $.ajax({
@@ -947,3 +1004,36 @@ function getSmartColors() {
     return colors;
 }
 
+function setZoomMonths(months) {
+    var d = new Date();
+    var maxDate = d.getTime();
+    var minDate = maxDate - months * 31 * 24 * 60 * 60 * 1000; // We use 31-day months to always report same window
+    for (var gIndex in gs) {
+        if (gs.hasOwnProperty(gIndex)) {
+            var g = gs[gIndex];
+            g.updateOptions({
+                dateWindow: [minDate, maxDate]
+            });
+        }
+    }
+}
+
+function findRowForId(data, id) {
+    var idColumn = columnIndex("id", data);
+    for (var i = 0; i < data.getNumberOfRows(); i++) {
+        if (data.getValue(i, idColumn).toString() === id.toString()) {
+            return i;
+        }
+    }
+    return -1;
+}
+
+function findMetricByCode(code) {
+    for (var i = 0; i < metrics.length; i++) {
+        var metric = metrics[i];
+        if (metric.code == code) {
+            return i;
+        }
+    }
+    return -1;
+}
