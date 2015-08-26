@@ -38,7 +38,7 @@
             </div>
             <div class="btn-toolbar pull-left">
                 <div class="btn-group" id="view-buttons">
-                    <div class="btn btn-info" id="compact-button">Details</div>
+                    <div class="btn btn-small btn-info" id="compact-button">Details</div>
                 </div>
             </div>
             <div class="btn-toolbar pull-right">
@@ -46,10 +46,11 @@
                     <form id="annotForm" action="/service/new-annotation" method="post" onsubmit="return false;"
                           class="navbar-form">
                         <div class="form-group">
-                            <div class="input-append">
+                            <div class="input-append" style="margin:0">
                                 <input id="annotationText" name="text" size="50" class="form-control"
                                        placeholder="Annotation">
-                                <button type="submit" class="btn btn-default" id="submitAnnotation" value="Submit">
+                                <button type="submit" class="btn btn-small btn-default" id="submitAnnotation"
+                                        value="Submit">
                                     Submit
                                 </button>
                             </div>
@@ -59,10 +60,10 @@
                     </form>
                 </div>
                 <div class="btn-group" id="extra-buttons">
-                    <a href="/quameter/unhide" class="btn"><i class="icon-remove"></i> Unhide</a>
-                    <a href="/quameter/tags" class="btn"><i class="icon-tag"></i> Tags</a>
-                    <a href="/service/getQuameterDataTable" class="btn"><i class="icon-download"></i> Data</a>
-                    <a class="btn" id="reportButton"><i class="icon-book"></i> Report</a>
+                    <a href="/quameter/unhide" class="btn btn-small"><i class="icon-remove"></i> Unhide</a>
+                    <a href="/quameter/tags" class="btn btn-small"><i class="icon-tag"></i> Tags</a>
+                    <a href="/service/getQuameterDataTable" class="btn btn-small"><i class="icon-download"></i> Data</a>
+                    <a class="btn btn-small" id="reportButton"><i class="icon-book"></i> Report</a>
                 </div>
             </div>
             <div class="row-fluid">
@@ -88,9 +89,9 @@
         </c:when>
         <c:otherwise>
             <div id="zoom-buttons" class="btn-group">
-                <button id="zoom1m-button" class="btn">1 month</button>
-                <button id="zoom2m-button" class="btn">2 months</button>
-                <button id="zoom6m-button" class="btn">6 months</button>
+                <button id="zoom1m-button" class="btn btn-small">1 month</button>
+                <button id="zoom2m-button" class="btn btn-small">2 months</button>
+                <button id="zoom6m-button" class="btn btn-small">6 months</button>
             </div>
             <div id="detailedGraphs" style="margin-top: 40px; display: none;"></div>
             <div id="simpleGraphs" style="margin-top: 40px"></div>

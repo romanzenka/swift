@@ -94,6 +94,21 @@ public final class QuameterServices {
 		}
 	}
 
+	@RequestMapping(value = "/service/hidden-annotation", method = RequestMethod.GET)
+	public ModelAndView getHiddenAnnotations() {
+		quameterDao.begin();
+		try {
+			final List<QuameterAnnotation> myList = quameterDao.listHiddenAnnotations();
+			quameterDao.commit();
+			final ModelAndView modelAndView = new ModelAndView();
+			modelAndView.addObject("quameterannotation", myList);
+			return modelAndView;
+		} catch (final Exception e) {
+			quameterDao.rollback();
+			throw new MprcException("Could Not list Quameter Annotations for you.", e);
+		}
+	}
+
 	//  http://localhost:8080/service/getQuameterDataTable
 	@RequestMapping(value = "/service/getQuameterDataTable", method = RequestMethod.GET)
 	public void getDataFile(final HttpServletResponse response) {

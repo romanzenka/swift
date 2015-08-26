@@ -26,6 +26,11 @@ public interface QuameterDao extends Dao {
 	                                 final Map<QuameterProteinGroup, Integer> identifedSpectra);
 
 	/**
+	 * @return All Quameter results. Limit to last 1 year
+	 */
+	List<QuameterResult> listAllResults();
+
+	/**
 	 * @return All Quameter results that are not hidden. Limit to last 1 year
 	 */
 	List<QuameterResult> listVisibleResults();
@@ -56,11 +61,18 @@ public interface QuameterDao extends Dao {
 	QuameterAnnotation addAnnotation(QuameterAnnotation annotation);
 
 	/**
-	 * List all annotations present in the system.
+	 * List all annotations present in the system, except the hidden ones
 	 *
 	 * @return List of all annotations.
 	 */
 	List<QuameterAnnotation> listAnnotations();
+
+	/**
+	 * List annotations present in the system corresponding to hidden fields.
+	 *
+	 * @return List of hidden annotations.
+	 */
+	List<QuameterAnnotation> listHiddenAnnotations();
 
 	/**
 	 * For given file search id and a list of categories and their corresponding proteins,

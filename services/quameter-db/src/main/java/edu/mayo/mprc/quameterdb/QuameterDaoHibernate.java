@@ -124,6 +124,11 @@ public final class QuameterDaoHibernate extends DaoBase implements QuameterDao, 
 	}
 
 	@Override
+	public List<QuameterResult> listAllResults() {
+		return listResults(ListItems.ALL, true);
+	}
+
+	@Override
 	public List<QuameterResult> listVisibleResults() {
 		return listResults(ListItems.SHOWN, true);
 	}
@@ -278,11 +283,22 @@ public final class QuameterDaoHibernate extends DaoBase implements QuameterDao, 
 
 	@Override
 	public List<QuameterAnnotation> listAnnotations() {
+		return listAnnotations(false);
+	}
+
+	@Override
+	public List<QuameterAnnotation> listHiddenAnnotations() {
+		return listAnnotations(true);
+	}
+
+	public List<QuameterAnnotation> listAnnotations(boolean hidden) {
 		// Only list annotations that belong to non-hidden quameter results
 		final List results = getSession().createQuery("select q " +
 				"from QuameterAnnotation as q, QuameterResult as r " +
-				"WHERE q.quameterResultId = r.id AND r.hidden = false " +
-				"ORDER BY r.id, q.metricCode").list();
+				"WHERE q.quameterResultId = r.id AND r.hidden = :hidden " +
+				"ORDER BY r.id, q.metricCode")
+				.setParameter("hidden", hidden)
+				.list();
 
 		final List<QuameterAnnotation> finalResults = Lists.newArrayListWithCapacity(results.size());
 

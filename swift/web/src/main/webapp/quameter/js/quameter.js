@@ -11,6 +11,15 @@ viewMetadata = {};
 // for each annotation
 var annotCollection = getAnnotationCollection();
 
+// List currently hidden objects and mark them in a hidden array
+var hiddenAnnotCollection = getHiddenAnnotationCollection();
+for (var i in hiddenAnnotCollection) {
+    if (hiddenAnnotCollection.hasOwnProperty(i)) {
+        var obj = hiddenAnnotCollection[i];
+        hiddenIds['id' + obj.quameterResultId] = true;
+    }
+}
+
 /* Current selection info */
 selectedRow = -1;
 selectedTransaction = -1;
@@ -64,7 +73,7 @@ function addButtons(div, data, columnId) {
         else if (columnId !== 'instrument') {
             btnClass = 'btn-primary';  // All other buttons use btn-primary
         }
-        div.append('<button type="button" class="btn ' + btnClass + '" value="' + value + '" data-toggle="tooltip" data-placement="bottom" data-container="body" data-num=' + iter + ' data-enum="' + columnId + '" title="' + niceName + ': ' + names[value] + ' entries">' + niceName + '<' + '/button>');
+        div.append('<button type="button" class="btn btn-small ' + btnClass + '" value="' + value + '" data-toggle="tooltip" data-placement="bottom" data-container="body" data-num=' + iter + ' data-enum="' + columnId + '" title="' + niceName + ': ' + names[value] + ' entries">' + niceName + '<' + '/button>');
         iter++;
     });
 }
@@ -653,52 +662,63 @@ function drawGraphsToReport(data, viewMetadata, doc, numPages) {
         return i;
     }
 
-    doc.setFontSize(c.lineFontSize);
-    doc.text("Additional Annotations:", 1, yCoord);
-    yCoord += c.lineHeight;
+    // -------------------------------------------------------------------------
+    function listAnnotations(title, annotCollection, filteredRowsCheck) {
+        doc.setFontSize(c.lineFontSize);
+        doc.text(title, 1, yCoord);
+        yCoord += c.lineHeight;
 
-    if (yCoord + c.typicalGraphHeight > c.pageHeight - c.bottomMargin) {
-        doc.addPage();
-        pageNumber++;
-        yCoord = startNewPage(doc, c, pageNumber, numPages);
-    }
+        if (yCoord > c.pageHeight - c.bottomMargin) {
+            doc.addPage();
+            pageNumber++;
+            yCoord = startNewPage(doc, c, pageNumber, numPages);
+        }
 
-    doc.setFontSize(c.annotFontSize);
+        var instruments = activeInstrumentFilters();
+        for (var annot in annotCollection) {
+            doc.setFontSize(c.annotFontSize);
 
-    var instruments = activeInstrumentFilters();
-    for (var annot in annotCollection) {
-        if (annotCollection.hasOwnProperty(annot)) {
-            var obj = annotCollection[annot];
+            if (annotCollection.hasOwnProperty(annot)) {
+                var obj = annotCollection[annot];
 
-            row = findRowForId(data, obj.quameterResultId);
-            var startTime = data.getValue(row, columnIndex('startTime', data));
+                row = findRowForId(data, obj.quameterResultId);
+                if (row == -1) {
+                    continue;
+                }
+                var startTime = data.getValue(row, columnIndex('startTime', data));
 
-            var instrument = data.getValue(row, columnIndex('instrument', data));
+                var instrument = data.getValue(row, columnIndex('instrument', data));
 
-            if (startTime.getTime() >= fromDate && startTime.getTime() <= toDate &&
-                viewMetadata.filteredRows.contains(row) &&
-                instruments.contains(instrument)) {
-                var metricId = findMetricByCode(obj.metricCode);
+                if (startTime >= fromDate && startTime <= toDate &&
+                    instruments.contains(instrument)) {
+                    var metricId = findMetricByCode(obj.metricCode);
 
-                var text = startTime.getFullYear() + "-" +
-                    addZero(startTime.getMonth() + 1) + "-" +
-                    addZero(startTime.getDate()) + " " +
-                    addZero(startTime.getHours()) + ":" +
-                    addZero(startTime.getMinutes()) +
-                    " - " + obj.text;
+                    var text = startTime.getFullYear() + "-" +
+                        addZero(startTime.getMonth() + 1) + "-" +
+                        addZero(startTime.getDate()) + " " +
+                        addZero(startTime.getHours()) + ":" +
+                        addZero(startTime.getMinutes()) +
+                        " - " + obj.text;
 
-                doc.text(text, 1.2, yCoord);
+                    doc.text(text, 1.2, yCoord);
 
-                yCoord += c.annotLineHeight;
+                    yCoord += c.annotLineHeight;
 
-                if (yCoord + c.typicalGraphHeight > c.pageHeight - c.bottomMargin) {
-                    doc.addPage();
-                    pageNumber++;
-                    yCoord = startNewPage(doc, c, pageNumber, numPages);
+                    if (yCoord > c.pageHeight - c.bottomMargin) {
+                        doc.addPage();
+                        pageNumber++;
+                        yCoord = startNewPage(doc, c, pageNumber, numPages);
+                    }
                 }
             }
         }
     }
+
+    // -------------------------------------------------------------------------
+
+    var hiddenAnnotCollection = getHiddenAnnotationCollection();
+    listAnnotations("Hidden Files:", hiddenAnnotCollection);
+    listAnnotations("Additional Annotations:", annotCollection);
 
     doc.addPage();
     pageNumber++;
@@ -946,6 +966,19 @@ function getAnnotationCollection() {
         dataType: "json",
         async: false,
         url: "/service/list-annotation.json",
+        success: function (response) {
+            jsonData = response['quameterannotation'];
+        }
+    });
+    return jsonData;
+}
+
+function getHiddenAnnotationCollection() {
+    var jsonData = null;
+    $.ajax({
+        dataType: "json",
+        async: false,
+        url: "/service/hidden-annotation.json",
         success: function (response) {
             jsonData = response['quameterannotation'];
         }
