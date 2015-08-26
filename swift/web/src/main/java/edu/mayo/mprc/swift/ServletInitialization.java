@@ -229,10 +229,10 @@ public final class ServletInitialization implements SwiftCommand, ServletContext
 	}
 
 	private static String getStartTime(final ServletContext context) {
-		String startTime = context.getInitParameter("SWIFT_DAEMON");
+		String startTime = context.getInitParameter("SWIFT_START_TIME");
 		if (startTime == null) {
 			// Hack - we allow SWIFT_DAEMON to be defined as system property to make debugging in GWT easier
-			startTime = new DateTime().toString("yyyy-MM-dd HH:mm:ss");
+			startTime = ISODateTimeFormat.dateTime().print(new DateTime());
 		}
 		return startTime;
 	}
