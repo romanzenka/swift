@@ -5,6 +5,8 @@ var gs = [];
 var numberOfSimpleGraphs = 0;
 var dyViewsByCode = {};
 var viewMetadata = {};
+var selectedCategories = [];
+var selectedInstruments = [];
 
 // Array of
 //  id, metricCode, quameterResultId, text
@@ -66,12 +68,19 @@ function addButtons(div, data, columnId) {
     var iter = 1;
     $.each(keys, function (index, value) {
         var niceName = value;
-        var btnClass = 'btn-orig' + iter; // Instrument buttons have btn-orig# class when highlighted
-        if (index !== 0 && columnId === 'instrument') {
-            btnClass = 'btn-default'; // Except non-first instruments, whom are just gray
-        }
-        else if (columnId !== 'instrument') {
-            btnClass = 'btn-primary';  // All other buttons use btn-primary
+        var btnClass = 'btn-default';
+        if (columnId === 'instrument') {
+            if (index === 0) {
+                selectedInstruments.push(value);
+                btnClass = 'btn-orig' + iter; // Instrument buttons have btn-orig# class when highlighted
+            }
+        } else if (columnId === 'category') {
+            if (index === 0) {
+                selectedCategories.push(value);
+                btnClass = 'btn-primary'; // Only first button is highlighted
+            }
+        } else {
+            alert("Unsupported button columnId " + columnId);
         }
         div.append('<button type="button" class="btn btn-small ' + btnClass + '" value="' + value + '" data-toggle="tooltip" data-placement="bottom" data-container="body" data-num=' + iter + ' data-enum="' + columnId + '" title="' + niceName + ': ' + names[value] + ' entries">' + niceName + '<' + '/button>');
         iter++;
@@ -172,18 +181,15 @@ function spanAllUnderscoreTokens(s) {
 }
 
 
-function activeCatagoriesFilters() {
-    var selectedCategory = [];
+function activeCategoriesFilters() {
     categoryButtons().each(function () {
-        var wrapperId = "#wrapper-" + $(this).attr("value"); //for protein id, hide entire graph when excluded
-        if ($(this).hasClass('btn-primary')) {
-            selectedCategory.push($(this).attr("value"));
-
+        var value = $(this).attr("value");
+        var wrapperId = "#wrapper-" + value; //for protein id, hide entire graph when excluded
+        if (selectedCategories.contains(value)) {
             if ($(wrapperId).length) // use this if you are using id to check
             {
                 $(wrapperId).show();
             }
-
         }
         else {
             if ($(wrapperId).length) // use this if you are using id to check
@@ -192,17 +198,11 @@ function activeCatagoriesFilters() {
             }
         }
     });
-    return selectedCategory;
+    return selectedCategories;
 }
 
 function activeInstrumentFilters() {
-    var selectedCategory = [];
-    instrumentButtons().each(function () {
-        if (!$(this).hasClass('btn-default')) {
-            selectedCategory.push($(this).attr("value"));
-        }
-    });
-    return selectedCategory;
+    return selectedInstruments;
 }
 
 // Callback that filters all the views, updating the stdev ranges
@@ -212,7 +212,7 @@ function updateAllViews(data) {
     pointSelected = -1;
     pointHighlighted = -1;
 
-    var activeCats = activeCatagoriesFilters();
+    var activeCats = activeCategoriesFilters();
 
     var filteredRows = [];
     for (var r = 0; r < data.getNumberOfRows(); r++) {
@@ -793,6 +793,29 @@ function addGraphToReport(doc, yCoord, data, view, range, annotations, dygraph, 
     return graphHeight;
 }
 
+function highlightInstrumentButtons() {
+    instrumentButtons().each(function (index, button) {
+        button = $(button);
+        button.removeClass("btn-orig" + button[0].dataset.num);
+        if (selectedInstruments.contains(button.val())) {
+            button.addClass('btn-orig' + button[0].dataset.num);
+        }
+    });
+}
+
+function highlightCategoryButtons() {
+    categoryButtons().each(function (index, button) {
+        button = $(button);
+        button.removeClass("btn-primary");
+        button.removeClass("btn-default");
+        if (selectedCategories.contains(button.val())) {
+            button.addClass("btn-primary");
+        } else {
+            button.addClass("btn-default");
+        }
+    });
+}
+
 /** INIT() draws only visible **/
 function initSimpleCharts(graphObj) {
     // Create the data table. 
@@ -822,30 +845,42 @@ function initSimpleCharts(graphObj) {
 
     // Change button Colors then Filter based on value
     $('.btn').button();
-    var filterButtons = $.merge(categoryButtons(), instrumentButtons());
-    filterButtons.click(function (event) {
-        var current = $(this);
-        if (!event.shiftKey) {
-            // Deselect all the buttons by setting their second class to btn-default
-            current.parent().children().each(function () {
-                var classList = $(this)[0].className.split(' ');
-                if (classList[1] !== "btn-default") {
-                    $(this).removeClass(classList[1]);
-                    $(this).addClass("btn-default");
+
+    // Instrument buttons allow shift-click selection
+
+    function getButtonClickHandler(buttonType, supportMultiselect) {
+        return function (event) {
+            var current = $(this);
+            if (!(supportMultiselect && event.shiftKey)) {
+                // Deselect all the buttons by setting their third class to btn-default
+                if (buttonType === 'instrument') {
+                    selectedInstruments = [];
+                } else {
+                    selectedCategories = [];
                 }
-            });
-        }
+            }
 
-        // Toggle current button
-        current.removeClass("btn-default");
-        if (current[0].dataset.enum === 'instrument') {
-            current.toggleClass('btn-orig' + current[0].dataset.num);
-        } else {
-            current.toggleClass("btn-primary");
-        }
-        updateAllViews(data);
-    });
+            // Toggle current button
+            if (buttonType === 'instrument') {
+                var index = $.inArray(current.val(), selectedInstruments)
+                if (index !== -1) {
+                    selectedInstruments.splice(index, 1);
+                } else {
+                    selectedInstruments.push(current.val());
+                }
+                highlightInstrumentButtons();
+            } else {
+                selectedCategories = [];
+                selectedCategories.push(current.val());
+                highlightCategoryButtons();
+            }
 
+            updateAllViews(data);
+        };
+    }
+
+    instrumentButtons().click(getButtonClickHandler("instrument", true)); // Support multiselect
+    categoryButtons().click(getButtonClickHandler("category", false));  // Only one category can be shown at a time
 
     // Simple/Detailed Button
     $("#compact-button").click(function (event) {
@@ -1038,7 +1073,7 @@ function getSmartColumns(metricId, data) {
 function getSmartColors() {
     var colors = [];
     instrumentButtons().each(function () {
-        if (!$(this).hasClass('btn-default')) {
+        if (selectedInstruments.contains($(this).val())) {
             colors.push($(this).css('background-color'));
         }
     });
