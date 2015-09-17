@@ -1,6 +1,7 @@
 package edu.mayo.mprc.quameterdb;
 
 import com.google.common.collect.Lists;
+import com.google.gson.JsonObject;
 import com.google.gson.stream.JsonWriter;
 import edu.mayo.mprc.MprcException;
 import edu.mayo.mprc.config.*;
@@ -21,6 +22,7 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
 import java.io.IOException;
+import java.io.StringWriter;
 import java.io.Writer;
 import java.util.List;
 import java.util.Locale;
@@ -339,6 +341,19 @@ public final class QuameterUi implements Dao, UiConfigurationProvider, Lifecycle
 			}
 		}
 		return null;
+	}
+
+	public void writeSpecialMetricsJson(StringWriter writer) {
+		final JsonObject jsonObject = this.dbWorkerConfig.getSpecialMetrics();
+		writer.write(jsonObject.toString());
+	}
+
+	public String allCategoriesJson() {
+		return this.dbWorkerConfig.getAllCategoriesJson();
+	}
+
+	public String contaminantCategoriesJson() {
+		return this.dbWorkerConfig.getContaminantCategoriesJson();
 	}
 
 	public static final class Config implements ResourceConfig {

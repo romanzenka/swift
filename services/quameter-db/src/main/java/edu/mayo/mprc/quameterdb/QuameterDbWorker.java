@@ -1,10 +1,7 @@
 package edu.mayo.mprc.quameterdb;
 
 import com.google.common.base.Splitter;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
-import com.google.gson.JsonSyntaxException;
+import com.google.gson.*;
 import edu.mayo.mprc.MprcException;
 import edu.mayo.mprc.config.*;
 import edu.mayo.mprc.config.ui.ServiceUiFactory;
@@ -36,6 +33,7 @@ import java.util.regex.Pattern;
  */
 public final class QuameterDbWorker extends WorkerBase {
 	private static final Logger LOGGER = Logger.getLogger(QuameterDbWorker.class);
+	public static final String DUMMY_PROTEIN_SET = "dummy_protein_name_that_will_never_be_an_accession_number";
 	private QuameterDao dao;
 	private SwiftDao swiftDao;
 
@@ -250,10 +248,29 @@ public final class QuameterDbWorker extends WorkerBase {
 			for (final Map.Entry<String, JsonElement> entries : jsonObject.entrySet()) {
 				final String key = entries.getKey();
 				final JsonElement jsonValue = entries.getValue();
-				if (!jsonValue.isJsonPrimitive() || !jsonValue.getAsJsonPrimitive().isString()) {
+				boolean okObject = false;
+				if (jsonValue.isJsonObject()) {
+					// Object signify specialized operating instructions
+					final JsonObject jsonObj = jsonValue.getAsJsonObject();
+					if (jsonObj.get("pool") != null) {
+						// This defines a pool of values
+						okObject = true;
+					} else if (jsonObj.get("noContaminants") != null) {
+						// This signifies an entry that should not display contaminants
+						okObject = true;
+					} else {
+						throw new MprcException(String.format("The map value for key [%s] is not a string", key));
+					}
+				}
+				if (!okObject && (!jsonValue.isJsonPrimitive() || !jsonValue.getAsJsonPrimitive().isString())) {
 					throw new MprcException(String.format("The map value for key [%s] is not a string", key));
 				}
-				final String value = jsonValue.getAsJsonPrimitive().getAsString();
+				final String value;
+				if (okObject) {
+					value = "dummy_protein_name_that_will_never_be_an_accession_number";
+				} else {
+					value = jsonValue.getAsJsonPrimitive().getAsString();
+				}
 				result.put(key, value);
 			}
 			return result;
@@ -294,6 +311,66 @@ public final class QuameterDbWorker extends WorkerBase {
 
 		public Map<String, String> getInstrumentNameMap() {
 			return parseInstrumentNameMap(instrumentNameMap);
+		}
+
+		// Parse out information about special metrics into an object
+		public JsonObject getSpecialMetrics() {
+			JsonObject result = new JsonObject();
+
+			final JsonElement parse;
+			try {
+				parse = new JsonParser().parse(proteins);
+			} catch (final JsonSyntaxException e) {
+				throw new MprcException("Could not parse map from given JSON string", e);
+			}
+			if (parse.isJsonNull()) {
+				return result;
+			}
+			if (!parse.isJsonObject()) {
+				throw new MprcException("We expected a JSON map");
+			}
+			final JsonObject jsonObject = parse.getAsJsonObject();
+			for (final Map.Entry<String, JsonElement> entries : jsonObject.entrySet()) {
+				final String key = entries.getKey();
+				final JsonElement jsonValue = entries.getValue();
+				if (jsonValue.isJsonObject()) {
+					// Object signify specialized operating instructions
+					final JsonObject jsonObj = jsonValue.getAsJsonObject();
+					result.add(key, jsonObj);
+				}
+			}
+			return result;
+		}
+
+		public String getAllCategoriesJson() {
+			final JsonArray array = new JsonArray();
+			final Map<String, String> proteinMap = parseMap(proteins);
+			for (Map.Entry<String, String> entry : proteinMap.entrySet()) {
+				array.add(new JsonPrimitive(entry.getKey()));
+			}
+			return array.toString();
+		}
+
+		public String getContaminantCategoriesJson() {
+			final Set<String> contaminants = new HashSet<String>();
+			final JsonArray array = new JsonArray();
+			final Map<String, String> proteinMap = parseMap(proteins);
+			for (Map.Entry<String, String> entry : proteinMap.entrySet()) {
+				if (!DUMMY_PROTEIN_SET.equals(entry.getValue())) {
+					contaminants.add(entry.getKey()); // We add all the entries we know
+				}
+			}
+
+			final Iterable<String> categories = Splitter.on(",").omitEmptyStrings().trimResults().split(getCategories());
+			for (String category : categories) {
+				category = category.replaceAll("^-+", "");
+				category = category.replaceAll("\\*$", "");
+				contaminants.remove(category);
+			}
+			for (final String contaminant : contaminants) {
+				array.add(new JsonPrimitive(contaminant));
+			}
+			return array.toString();
 		}
 	}
 

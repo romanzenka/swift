@@ -25,6 +25,7 @@ public final class QuameterProteinGroup extends EvolvableBase implements Cloneab
 	private String regex;
 	private transient Pattern compiledRegex;
 
+
 	public QuameterProteinGroup() {
 	}
 

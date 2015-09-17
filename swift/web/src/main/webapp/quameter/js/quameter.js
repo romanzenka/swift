@@ -182,10 +182,31 @@ function spanAllUnderscoreTokens(s) {
 
 
 function activeCategoriesFilters() {
-    categoryButtons().each(function () {
-        var value = $(this).attr("value");
+    var categoriesToShow = selectedCategories.slice(0); // Clone
+    var addContaminantProteins = true;
+    $.each(specialMetrics, function (key, value) {
+        if (selectedCategories.contains(key)) {
+            if (value.hasOwnProperty("pool")) {
+                // This category is a pool of other categories
+                categoriesToShow.splice($.inArray(key, categoriesToShow), 1);
+                categoriesToShow = categoriesToShow.concat(value.pool);
+            }
+            if (value.hasOwnProperty("noContaminants")) {
+                // Do not show contaminant proteins
+                addContaminantProteins = false;
+                // Do not show this category either
+                categoriesToShow.splice($.inArray(key, categoriesToShow), 1);
+            }
+        }
+    });
+
+    if (addContaminantProteins) {
+        categoriesToShow = categoriesToShow.concat(contaminantCategories);
+    }
+
+    allCategories.forEach(function (value) {
         var wrapperId = "#wrapper-" + value; //for protein id, hide entire graph when excluded
-        if (selectedCategories.contains(value)) {
+        if (categoriesToShow.contains(value)) {
             if ($(wrapperId).length) // use this if you are using id to check
             {
                 $(wrapperId).show();

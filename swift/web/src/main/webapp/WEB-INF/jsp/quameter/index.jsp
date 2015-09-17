@@ -129,6 +129,9 @@
 
 <script type="text/javascript">
     var metrics = ${metricsJson};
+    var specialMetrics = ${specialMetricsJson};
+    var allCategories = ${allCategories};
+    var contaminantCategories = ${contaminantCategories};
 </script>
 
 <script type="text/javascript" src="../../../quameter/js/dygraph-combined.js?v=${ver}"></script>

@@ -28,7 +28,6 @@ public final class QuaMeter {
 
 	@RequestMapping(value = "/quameter", method = RequestMethod.GET)
 	public final String quameter(final ModelMap model) {
-
 		final QuameterUi quameterUi = getQuameterUi();
 		model.addAttribute("quameterUi", quameterUi);
 		model.addAttribute("daemonName", environment.getDaemonConfig().getName());
@@ -37,8 +36,16 @@ public final class QuaMeter {
 			final StringWriter writer = new StringWriter(10000);
 			quameterUi.writeMetricsJson(writer);
 			model.addAttribute("metricsJson", writer.toString());
+
+			final StringWriter writer2 = new StringWriter(10000);
+			quameterUi.writeSpecialMetricsJson(writer2);
+			model.addAttribute("specialMetricsJson", writer2.toString());
+
+			model.addAttribute("allCategories", quameterUi.allCategoriesJson());
+			model.addAttribute("contaminantCategories", quameterUi.contaminantCategoriesJson());
 		} else {
 			model.addAttribute("metricsJson", "null");
+			model.addAttribute("specialMetricsJson", "null");
 		}
 
 		if (quameterUi != null) {
