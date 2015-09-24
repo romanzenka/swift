@@ -103,7 +103,7 @@ Dygraph.Export.asCanvas = function (dygraph, userOptions) {
     canvas.height = dygraph.height_ + options.legendHeight;
 
     Dygraph.Export.drawPlot(canvas, dygraph, options);
-    Dygraph.Export.drawLegend(canvas, dygraph, options);
+    // Dygraph.Export.drawLegend(canvas, dygraph, options);
 
     return canvas;
 };

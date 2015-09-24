@@ -181,7 +181,7 @@ function spanAllUnderscoreTokens(s) {
 }
 
 
-function activeCategoriesFilters() {
+function getCategoriesToShow() {
     var categoriesToShow = selectedCategories.slice(0); // Clone
     var addContaminantProteins = true;
     $.each(specialMetrics, function (key, value) {
@@ -203,7 +203,11 @@ function activeCategoriesFilters() {
     if (addContaminantProteins) {
         categoriesToShow = categoriesToShow.concat(contaminantCategories);
     }
+    return categoriesToShow;
+}
 
+function activeCategoriesFilters() {
+    var categoriesToShow = getCategoriesToShow();
     allCategories.forEach(function (value) {
         var wrapperId = "#wrapper-" + value; //for protein id, hide entire graph when excluded
         if (categoriesToShow.contains(value)) {
@@ -571,6 +575,7 @@ function drawGraphsToReport(data, viewMetadata, doc, numPages) {
     var noDrawing = numPages === -1;
     var viewIndex = 0;
     var previousCategory = '';
+    var categoriesToShow = getCategoriesToShow();
     var c = {
         'topMargin': 0.6,
         'bottomMargin': 1,
@@ -635,12 +640,14 @@ function drawGraphsToReport(data, viewMetadata, doc, numPages) {
     }
 
     doc.text("Date Range: " + formatDate(fromDate) + " to " + formatDate(toDate), 1, yCoord);
+    yCoord += c.titleLineHeight;
 
+    doc.text("Instrument: " + selectedInstruments[0], 1, yCoord);
     yCoord += c.titleLineHeight;
 
     for (var i = 0; i < metrics.length; i++) {
 
-        if (yCoord + c.typicalGraphHeight > c.pageHeight - c.bottomMargin) {
+        if (yCoord + c.typicalGraphHeight + c.titleLineHeight * 2 > c.pageHeight - c.bottomMargin) {
             doc.addPage();
             pageNumber++;
             yCoord = startNewPage(doc, c, pageNumber, numPages);
@@ -654,18 +661,21 @@ function drawGraphsToReport(data, viewMetadata, doc, numPages) {
         } else {
             categoryCode = metricId.split("_", 2)[0];
         }
-        if (categoryCode !== previousCategory) {
-            //doc.setFontSize(c.categoryFontSize);
-            //doc.text(metricCategories[categoryCode], 1, yCoord);
-            //yCoord += c.titleLineHeight;
-
-            previousCategory = categoryCode;
-        }
 
         var view = new google.visualization.DataView(data);
         view.setColumns(getSmartColumns(metricId, data));
 
-        if (1 === metric.simple) {
+        if (1 === metric.simple && (categoryCode != 'id' || categoriesToShow.contains(metric.label))) {
+            if (categoryCode !== previousCategory) {
+                yCoord += c.titleLineHeight / 2;
+
+                doc.setFontSize(c.categoryFontSize);
+                doc.text(metricCategories[categoryCode], 1, yCoord);
+                yCoord += c.titleLineHeight;
+
+                previousCategory = categoryCode;
+            }
+
             doc.setFontSize(c.metricFontSize);
             doc.text(metrics[i].name + " - " + metrics[i].desc + " (" + metric.label + ")", 1, yCoord);
             yCoord += c.lineHeight;
@@ -1010,7 +1020,13 @@ function initSimpleCharts(graphObj) {
 
 
     $("#reportButton").click(function (event) {
+        if (selectedInstruments.length > 1) {
+            alert("Cannot produce a report for multiple instruments simultaneously. Select a single instrument and try again");
+            return;
+        }
+
         var doc = new jsPDF("portrait", "in", "letter");
+
         // First pass - just count pages
         var numPages = drawGraphsToReport(data, viewMetadata, doc, -1);
 
