@@ -5,6 +5,7 @@ import com.google.common.collect.ImmutableSet;
 import edu.mayo.mprc.MprcException;
 import edu.mayo.mprc.database.EvolvableBase;
 import edu.mayo.mprc.utilities.ComparisonChain;
+import edu.mayo.mprc.utilities.ExcludeJson;
 import org.hibernate.criterion.Criterion;
 
 import java.util.HashSet;
@@ -22,7 +23,11 @@ public class Mod extends EvolvableBase implements Comparable<Mod> {
 	private Double massMono;
 	private Double massAverage;
 	private String composition;
+
+	@ExcludeJson
 	private Set<String> altNames;
+
+	@ExcludeJson
 	private Set<ModSpecificity> modSpecificities;
 
 	private static final int MAX_COMPOSITION_LENGTH = 150;
