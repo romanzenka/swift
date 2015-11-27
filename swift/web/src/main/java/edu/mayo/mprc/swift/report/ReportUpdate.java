@@ -155,6 +155,7 @@ public final class ReportUpdate {
 			searchRunFilter.setUserFilter(req.getParameter("userfilter"));
 			searchRunFilter.setTitleFilter(req.getParameter("titlefilter"));
 			searchRunFilter.setInstrumentFilter(req.getParameter("instrumentfilter"));
+			searchRunFilter.setCommentFilter(req.getParameter("commentfilter"));
 
 			final PrintWriter printOut = resp.getWriter();
 			out = new JsonWriter(printOut);

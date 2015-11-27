@@ -5,11 +5,13 @@ import com.google.common.collect.Lists;
 import edu.mayo.mprc.swift.dbmapping.SearchRun;
 import edu.mayo.mprc.utilities.StringUtilities;
 import org.hibernate.Criteria;
+import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.criterion.*;
 
 import java.util.Collection;
 import java.util.Date;
+import java.util.List;
 
 /**
  * This class describes how to filter and sort a list of search runs.
@@ -24,6 +26,8 @@ public final class SearchRunFilter {
 	private int titleSortOrder;
 	private String titleWhereClause;
 	private int instrumentSortOrder;
+	private String commentWhereClause;
+	private int commentSortOrder;
 	private Collection<String> instrumentWhereClause;
 	private String start;
 	private String count;
@@ -66,7 +70,7 @@ public final class SearchRunFilter {
 		return titleSortOrder;
 	}
 
-	public void setTitleSortOrder(int titleSortOrder) {
+	public void setTitleSortOrder(final int titleSortOrder) {
 		this.titleSortOrder = titleSortOrder;
 	}
 
@@ -74,7 +78,7 @@ public final class SearchRunFilter {
 		return titleWhereClause;
 	}
 
-	public void setTitleWhereClause(String titleWhereClause) {
+	public void setTitleWhereClause(final String titleWhereClause) {
 		this.titleWhereClause = titleWhereClause;
 	}
 
@@ -82,7 +86,7 @@ public final class SearchRunFilter {
 		return instrumentSortOrder;
 	}
 
-	public void setInstrumentSortOrder(int instrumentSortOrder) {
+	public void setInstrumentSortOrder(final int instrumentSortOrder) {
 		this.instrumentSortOrder = instrumentSortOrder;
 	}
 
@@ -90,8 +94,24 @@ public final class SearchRunFilter {
 		return instrumentWhereClause;
 	}
 
-	public void setInstrumentWhereClause(Collection<String> instrumentWhereClause) {
+	public void setInstrumentWhereClause(final Collection<String> instrumentWhereClause) {
 		this.instrumentWhereClause = instrumentWhereClause;
+	}
+
+	public int getCommentSortOrder() {
+		return commentSortOrder;
+	}
+
+	public void setCommentSortOrder(final int commentSortOrder) {
+		this.commentSortOrder = commentSortOrder;
+	}
+
+	public String getCommentWhereClause() {
+		return commentWhereClause;
+	}
+
+	public void setCommentWhereClause(final String commentWhereClause) {
+		this.commentWhereClause = commentWhereClause;
 	}
 
 	public void setUserFilter(final String filter) {
@@ -138,6 +158,22 @@ public final class SearchRunFilter {
 				setInstrumentSortOrder(Integer.parseInt(keyValue[1]));
 			} else if ("filter".equals(keyValue[0]) && keyValue.length >= 2) {
 				setInstrumentWhereClause(Lists.newArrayList(Splitter.on(',').trimResults().omitEmptyStrings().split(keyValue[1])));
+			}
+		}
+	}
+
+	public void setCommentFilter(final String filter) {
+		if (filter == null) {
+			setCommentSortOrder(0);
+			return;
+		}
+		final String[] parts = filter.split(";");
+		for (final String part : parts) {
+			final String[] keyValue = part.split("=");
+			if ("sort".equals(keyValue[0])) {
+				setCommentSortOrder(Integer.parseInt(keyValue[1]));
+			} else if ("filter".equals(keyValue[0]) && keyValue.length >= 2) {
+				setCommentWhereClause(keyValue[1]);
 			}
 		}
 	}
@@ -213,6 +249,16 @@ public final class SearchRunFilter {
 		}
 		if (!StringUtilities.stringEmpty(titleWhereClause)) {
 			criteria.add(Restrictions.like("title", titleWhereClause, MatchMode.ANYWHERE));
+		}
+		if (!StringUtilities.stringEmpty(commentWhereClause)) {
+			// We do an HQL query to obtain a list of all swift searches whose metadata match
+			final Query defIdsMatching = session.createQuery("select distinct sd.id from SwiftSearchDefinition sd where sd.metadata['comment'] like :comment")
+					.setParameter("comment", "%" + commentWhereClause + "%");
+
+			final List list = defIdsMatching.list();
+
+			criteria
+					.add(Property.forName("swiftSearch").in(list));
 		}
 		if (instrumentWhereClause != null && !instrumentWhereClause.isEmpty()) {
 			final DetachedCriteria matchingAnalysisIds =

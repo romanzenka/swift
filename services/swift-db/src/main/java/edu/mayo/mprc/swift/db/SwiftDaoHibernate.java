@@ -741,6 +741,7 @@ public final class SwiftDaoHibernate extends DaoBase implements SwiftDao {
 
 			final Map<String, String> metadata = Maps.newHashMap();
 			metadata.put("quameter.category", "AL-Kappa");
+			metadata.put("comment", "comment for Kappa search");
 
 			final User user = workspaceDao.getUserByEmail(WorkspaceDaoHibernate.USER1_EMAIL);
 			if (user == null) {

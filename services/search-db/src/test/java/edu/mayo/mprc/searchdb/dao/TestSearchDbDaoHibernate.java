@@ -132,6 +132,40 @@ public final class TestSearchDbDaoHibernate extends DaoTest {
 	}
 
 	@Test
+	public void shouldFilterByCommentPositive() {
+		swiftDao.begin();
+		try {
+
+			final SearchRunFilter filter = runFilter();
+			filter.setCommentFilter("sort=0;filter=comment"); // This comment does exist
+			List<SearchRun> searchRunList = searchDbDao.getSearchRunList(filter, true);
+			swiftDao.commit();
+
+			Assert.assertEquals(searchRunList.size(), 1, "One search with comment containing word 'comment'");
+		} catch (Exception e) {
+			swiftDao.rollback();
+			throw new MprcException(e);
+		}
+	}
+
+	@Test
+	public void shouldFilterByCommentNegative() {
+		swiftDao.begin();
+		try {
+
+			final SearchRunFilter filter = runFilter();
+			filter.setCommentFilter("sort=0;filter=koment"); // This comment does exist
+			List<SearchRun> searchRunList = searchDbDao.getSearchRunList(filter, true);
+			swiftDao.commit();
+
+			Assert.assertEquals(searchRunList.size(), 0, "No searches with comment containing word 'koment'");
+		} catch (Exception e) {
+			swiftDao.rollback();
+			throw new MprcException(e);
+		}
+	}
+
+	@Test
 	public void shouldFillExtraFields() {
 		searchDbDao.begin();
 		try {
