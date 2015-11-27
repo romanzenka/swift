@@ -41,6 +41,7 @@ public final class QuameterUiTest {
 		quameterDao = mock(QuameterDao.class);
 		when(quameterDao.listProteinGroups()).thenReturn(quameterProteinGroups());
 		when(quameterDao.listVisibleResults()).thenReturn(quameterResults());
+		when(quameterDao.listAllResults()).thenReturn(quameterResults());
 
 		final QuameterDbWorker.Config quameterDbConfig = new QuameterDbWorker.Config(null, "animal,-cat*,-dog", "{\"albumin\":\"ALBU_HUMAN\",\"keratin\":\"K1C1_HUMAN\"}", "");
 
