@@ -2,6 +2,8 @@ package edu.mayo.mprc.swift.ui.client.widgets;
 
 import com.google.gwt.user.client.ui.CheckBox;
 import com.google.gwt.user.client.ui.HorizontalPanel;
+import com.google.gwt.user.client.ui.Label;
+import com.google.gwt.user.client.ui.TextBox;
 import edu.mayo.mprc.swift.ui.client.rpc.ClientSwiftSearchDefinition;
 
 public final class AdditionalSettingsPanel extends HorizontalPanel {
@@ -11,6 +13,9 @@ public final class AdditionalSettingsPanel extends HorizontalPanel {
 	private final CheckBox fromScratch;
 	private final CheckBox lowPriority;
 	private final CheckBox mzIdentML;
+
+	private final Label commentLabel;
+	private final TextBox comment;
 
 	public AdditionalSettingsPanel() {
 		publicMgfs = new CheckBox("Provide .mgf");
@@ -40,6 +45,14 @@ public final class AdditionalSettingsPanel extends HorizontalPanel {
 		mzIdentML.setTitle("mzIdentML will be produced by Scaffold even if the saved parameters do not enable this");
 		mzIdentML.setValue(false);
 		add(mzIdentML);
+
+		commentLabel = new Label("Comment");
+		add(commentLabel);
+
+		comment = new TextBox();
+		comment.setText("");
+		comment.setTitle("Comment associated with the search. Can be used to look up searches quickly");
+		add(comment);
 	}
 
 	/**
@@ -101,5 +114,15 @@ public final class AdditionalSettingsPanel extends HorizontalPanel {
 		setPublicMzxmls(definition.isPublicMzxmlFiles());
 		setPublicSearchFiles(definition.isPublicSearchFiles());
 		setMzIdentMl("1".equals(definition.getMetadata().get("mzIdentMl")));
+		final String comment = definition.getMetadata().get("comment");
+		setComment(comment == null ? "" : comment);
+	}
+
+	public void setComment(final String comment) {
+		this.comment.setText(comment);
+	}
+
+	public String getComment() {
+		return this.comment.getText().trim();
 	}
 }
