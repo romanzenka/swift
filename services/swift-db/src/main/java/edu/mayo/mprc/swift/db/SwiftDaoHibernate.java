@@ -151,11 +151,12 @@ public final class SwiftDaoHibernate extends DaoBase implements SwiftDao {
 
 		// Fill in comments
 		{
-			final List raw = getSession().createQuery("select sr.id, sd.metadata['comment']" +
+			final List raw = getSession().createQuery("select sr.id as srid, md" +
 					" from SearchRun sr, " +
-					" SwiftSearchDefinition sd" +
+					" SwiftSearchDefinition sd join sd.metadata md " +
 					" where sr.id in (:ids) " +
-					" and sr.swiftSearch = sd.id")
+					" and sr.swiftSearch = sd.id and" +
+					" index(md) = 'comment' ")
 					.setParameterList("ids", allIds)
 					.list();
 

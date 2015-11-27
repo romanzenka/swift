@@ -173,6 +173,7 @@ public final class TestSearchDbDaoHibernate extends DaoTest {
 			SearchRun searchRun = searchRunList.get(0);
 			swiftDao.fillExtraFields(searchRunList);
 			Assert.assertEquals(searchRun.getRunningTasks(), Integer.valueOf(0), "The run has nothing running at the moment");
+			Assert.assertEquals(searchRun.getComment(), "comment for Kappa search", "The default comment");
 			searchDbDao.commit();
 		} catch (Exception e) {
 			searchDbDao.rollback();
