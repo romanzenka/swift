@@ -66,9 +66,9 @@ SearchRunItemVisualizer.prototype.multiResultEntryTemplate = '<a href="#{fullUrl
 // Entry has analysis attached
 SearchRunItemVisualizer.prototype.multiResultEntryAnalysisTemplate = '<a href="/analysis?id=#{reportId}" class="analysis-data-link">Data</a><a href="#{fullUrl}" title="#{filePath}">#{fileName}</a><br clear="left"/>';
 SearchRunItemVisualizer.prototype.multiResultTailTemplate = '</span></td><td class="result-buttons">' +
-'<a href="#{parentUrl}" class="parent-dir-link" title="#{parentPath}">Directory</a>' +
-'<a href="/service/qa/#{searchId}/index.html" class="qa-link" title="Quality Analysis">QA</a>' +
-'</td></tr></table>';
+    '<a href="#{parentUrl}" class="parent-dir-link" title="#{parentPath}">Directory</a>' +
+    '<a href="/service/qa/#{searchId}/index.html" class="qa-link" title="Quality Analysis">QA</a>' +
+    '</td></tr></table>';
 
 SearchRunItemVisualizer.prototype.displayTransactionError = function (event, message) {
     alert(message);
@@ -95,7 +95,7 @@ SearchRunItemVisualizer.prototype.confirmHide = function (event) {
     var id = event.data.id;
     var title = event.data.title;
     if (!window.confirm("Are you sure you want to hide search " + title + " (id=" + id + ") ?\n\n"
-        + "After a search was hidden, it takes an admin to unhide it again.")) {
+            + "After a search was hidden, it takes an admin to unhide it again.")) {
         event.preventDefault();
     }
 };
@@ -208,6 +208,15 @@ SearchRunItemVisualizer.prototype.fillWithContents = function (fragment, id, obj
                 quameterLink.href = "/quameter?id=" + object.id;
                 quameterLink.title = "Quameter result " + object.id;
                 tdAction.appendChild(quameterLink);
+            }
+
+            // Add comment link
+            if (object.comment != null) {
+                commentLink = document.createElement("a");
+                commentLink.appendChild(document.createTextNode("Comment"));
+                commentLink.className = "comment-link";
+                commentLink.title = "Comment: " + object.comment;
+                tdAction.appendChild(commentLink);
             }
         }
 
@@ -536,10 +545,10 @@ TaskItemVisualizer.prototype.fillWithContents = function (element, id, object) {
                 var logInfo = object.logs[log];
                 var logType = logInfo.type;
                 longName = '<a class="path" href="'
-                + '/service/task-log/' + object.taskid + '/' + (logType == 'STD_OUT' ? 'out' : 'err')
-                + '">'
-                + (logType == 'STD_OUT' ? 'out' : 'err')
-                + '</a>';
+                    + '/service/task-log/' + object.taskid + '/' + (logType == 'STD_OUT' ? 'out' : 'err')
+                    + '">'
+                    + (logType == 'STD_OUT' ? 'out' : 'err')
+                    + '</a>';
                 $(logs).append(longName + ' ');
             }
         }

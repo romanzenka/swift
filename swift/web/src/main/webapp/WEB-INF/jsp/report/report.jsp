@@ -91,6 +91,7 @@
         var user;
         var title;
         var instrument;
+        var actions;
 
         function createFilters() {
             title = new FilterDropDown("title");
@@ -140,6 +141,18 @@
             submission.addOkCancel();
             $('#popups').append(submission.getRoot());
 
+            actions = new FilterDropDown("actions");
+            actions.addText('Comment:');
+            actions.addTextBox("filter", "where")
+            actions.addSeparator();
+            actions.addOkCancel();
+            actions.onSubmitCallback = function () {
+                actions.saveToCookies();
+                ajaxRequest('load');
+            };
+
+            $('#popups').append(actions.getRoot());
+
             var results = new FilterDropDown("results");
             results.addText("Sort by number of errors");
             results.addRadioButtons("sort", "order", ["Error free first", "Most errors first"], ["errors ASC", "errors DESC"], -1);
@@ -159,7 +172,7 @@
                 new FilterButton('submission', 'Submission', null /*submission*/),
                 new FilterButton('duration', 'Duration', null /*duration*/),
                 new FilterButton('instruments', 'Instruments', instrument),
-                new FilterButton('actions', '', null /*actions*/),
+                new FilterButton('actions', '', actions),
                 new FilterButton('results', 'Results', null /*results*/),
                 new FilterButton('progress', 'Progress', null)
             ];
@@ -187,6 +200,7 @@
                     userfilter: user.getRequestString(),
                     titlefilter: title.getRequestString(),
                     instrumentfilter: instrument.getRequestString(),
+                    commentfilter: actions.getRequestString(),
                     showHidden: showHidden
                 },
                 "dataType": "html"
@@ -225,6 +239,7 @@
             title.loadFromCookies();
             user.loadFromCookies();
             instrument.loadFromCookies();
+            actions.loadFromCookies();
 
             ajaxRequest('load');
 

@@ -127,6 +127,9 @@ public final class JsonWriter {
 		appendKeyNumber(builder, "running", (long) (searchRun.getRunningTasks() == null ? 0 : searchRun.getRunningTasks()));
 		appendKeyString(builder, "instruments", searchRun.getInstruments());
 		appendKeyNumber(builder, "quameter", searchRun.isQuameter() ? 1 : 0);
+		if (searchRun.getComment() != null) {
+			appendKeyString(builder, "comment", searchRun.getComment());
+		}
 		if (reports != null) {
 			appendKeyReportInfo(builder, "results", reports);
 		}

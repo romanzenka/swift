@@ -34,6 +34,7 @@ public class SearchRun extends PersistableBase implements Serializable {
 	private transient String instruments; // Filled in by the DAO for convenience
 	private transient Integer runningTasks;
 	private transient boolean quameter;
+	private transient String comment;
 
 	private static final long MAX_MILLIS_PER_SEARCH = 3L * 60L * 60L * 1000L;
 
@@ -196,6 +197,14 @@ public class SearchRun extends PersistableBase implements Serializable {
 
 	public void setQuameter(boolean quameter) {
 		this.quameter = quameter;
+	}
+
+	public String getComment() {
+		return comment;
+	}
+
+	public void setComment(String comment) {
+		this.comment = comment;
 	}
 
 	/**

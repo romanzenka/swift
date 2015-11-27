@@ -149,6 +149,31 @@ public final class SwiftDaoHibernate extends DaoBase implements SwiftDao {
 			run.setQuameter(searchesWithQuameter.contains(run.getId()));
 		}
 
+		// Fill in comments
+		{
+			final List raw = getSession().createQuery("select sr.id, sd.metadata['comment']" +
+					" from SearchRun sr, " +
+					" SwiftSearchDefinition sd" +
+					" where sr.id in (:ids) " +
+					" and sr.swiftSearch = sd.id")
+					.setParameterList("ids", allIds)
+					.list();
+
+			Map<Integer, String> idsToComments = new HashMap<Integer, String>(raw.size());
+			for (Object o : raw) {
+				if (o instanceof Object[]) {
+					final Object[] a = (Object[]) o;
+					final Integer id = getInteger(a[0]);
+					idsToComments.put(id, (String) a[1]);
+				}
+			}
+
+			for (final SearchRun run : searchRuns) {
+				final String comment = idsToComments.get(run.getId());
+				run.setComment(comment);
+			}
+		}
+
 		if (unfinished.size() > 0) {
 			final Integer[] ids = DatabaseUtilities.getIdList(unfinished);
 
