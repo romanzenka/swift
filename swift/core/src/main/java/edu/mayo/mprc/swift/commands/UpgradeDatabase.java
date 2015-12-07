@@ -11,7 +11,7 @@ import javax.annotation.Resource;
 /**
  * @author Roman Zenka
  */
-@Component("upgrade-db")
+@Component("upgrade-db-command")
 public final class UpgradeDatabase implements SwiftCommand {
 	private static final Logger LOGGER = Logger.getLogger(UpgradeDatabase.class);
 
