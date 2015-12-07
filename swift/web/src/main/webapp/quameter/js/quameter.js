@@ -499,7 +499,7 @@ function drawGraphsByMetrics(data, renderDetailGraphs, viewMetadata) {
         var metric = metrics[i];
         var categoryCode;
         var metricId = metric.code;
-        if ("duration" === metricId) {
+        if ("duration" === metricId || "fileSize" === metricId) {
             categoryCode = "c";
         } else {
             categoryCode = metricId.split("_", 2)[0];

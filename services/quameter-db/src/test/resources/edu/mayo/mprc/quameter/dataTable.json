@@ -21,6 +21,11 @@
          "type":"number"
       },
       {
+         "id": "fileSize",
+         "label": "Size (MB)",
+         "type": "number"
+      },
+      {
          "id":"instrument",
          "label":"Instrument",
          "type":"string"
@@ -277,6 +282,9 @@
                "v":20.0
             },
             {
+               "v": 9.5367431640625E-5
+            },
+            {
                "v":"serial"
             },
             {
@@ -435,6 +443,9 @@
             },
             {
                "v":20.566666666666666
+            },
+            {
+               "v": 1.9073486328125E-4
             },
             {
                "v":"serial 2"
