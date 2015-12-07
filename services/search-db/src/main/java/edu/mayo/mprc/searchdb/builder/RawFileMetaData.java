@@ -58,7 +58,8 @@ public class RawFileMetaData extends FileHolder {
 				data.getStartTime(),
 				data.getRunTimeInSeconds(),
 				data.getComment(),
-				FileUtilities.toString(getSampleInformation(), Charsets.ISO_8859_1, MAX_LENGTH)
+				FileUtilities.toString(getSampleInformation(), Charsets.ISO_8859_1, MAX_LENGTH),
+				getRawFile().length()
 		);
 	}
 

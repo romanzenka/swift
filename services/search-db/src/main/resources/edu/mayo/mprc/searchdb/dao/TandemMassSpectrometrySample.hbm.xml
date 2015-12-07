@@ -19,5 +19,6 @@
         <property name="runTimeInSeconds" type="double" column="run_time_seconds" />
         <property name="comment" type="text" column="comment" />
         <property name="sampleInformation" type="text" column="sample_information" lazy="true" />
+        <property name="fileSize" type="long" column="file_size" not-null="false" />
     </class>
 </hibernate-mapping>

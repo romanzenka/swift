@@ -98,6 +98,11 @@ public abstract class SearchDbDaoBlank implements SearchDbDao {
 	}
 
 	@Override
+	public void fillTandemMassSpectrometrySampleSizes() {
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
 	public void begin() {
 		throw new UnsupportedOperationException();
 	}

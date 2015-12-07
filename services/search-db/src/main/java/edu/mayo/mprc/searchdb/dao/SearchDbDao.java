@@ -158,4 +158,9 @@ public interface SearchDbDao extends Dao, RuntimeInitializer {
 	 * @return List of all instrument serial numbers, as reported by the instrument (not as displayed to the user).
 	 */
 	List<String> listAllInstrumentSerialNumbers();
+
+	/**
+	 * Fill in missing file sizes for all {@link TandemMassSpectrometrySample} objects
+	 */
+	void fillTandemMassSpectrometrySampleSizes();
 }

@@ -99,7 +99,8 @@ public class SearchDbDaoHibernate extends DaoBase implements SearchDbDao {
 							new DateTime(now.getYear(), 1, 10, 10, 20, 30, 0),
 							60.0,
 							"comment",
-							"sample Information")
+							"sample Information",
+							100)
 			);
 
 			final TandemMassSpectrometrySample sample2 = addTandemMassSpectrometrySample(
@@ -114,7 +115,8 @@ public class SearchDbDaoHibernate extends DaoBase implements SearchDbDao {
 							new DateTime(now.getYear(), 2, 12, 12, 21, 22, 23),
 							120.0,
 							"comment 2",
-							"sample Information 2")
+							"sample Information 2",
+							200)
 			);
 
 
@@ -420,6 +422,31 @@ public class SearchDbDaoHibernate extends DaoBase implements SearchDbDao {
 						" order by t.instrumentSerialNumber"));
 
 		return serialNumbers;
+	}
+
+	@Override
+	public void fillTandemMassSpectrometrySampleSizes() {
+		final Query updateQuery = getSession().createQuery("update TandemMassSpectrometrySample t set t.fileSize = :size where t.id = :id");
+
+		scrollQuery("select t.id, t.file from TandemMassSpectrometrySample t where t.fileSize is null and t.file is not null", new QueryCallback() {
+			@Override
+			public void process(Object[] data) {
+				Integer id = (Integer) data[0];
+				File file = (File) data[1];
+				Long size = null;
+				if (file.exists()) {
+					size = file.length();
+				} else {
+					size = TandemMassSpectrometrySample.NONEXISTENT_FILE_SIZE;
+				}
+				updateQuery.setParameter("size", size);
+				updateQuery.setParameter("id", id);
+				int updated = updateQuery.executeUpdate();
+				if (updated != 1) {
+					throw new MprcException("Failed updating file size of tandem mass spec sample " + file.getAbsolutePath());
+				}
+			}
+		});
 	}
 
 	@Override

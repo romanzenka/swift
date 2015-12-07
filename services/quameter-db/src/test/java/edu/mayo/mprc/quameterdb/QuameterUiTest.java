@@ -59,10 +59,10 @@ public final class QuameterUiTest {
 	private List<QuameterResult> quameterResults() {
 		final TandemMassSpectrometrySample sample1 = new TandemMassSpectrometrySample(
 				new File("/file/test1.RAW"), new DateTime(2011, 1, 2, 3, 4, 5, 0), 10, 20, 30, "instrument", "serial",
-				new DateTime(2011, 2, 3, 10, 20, 30, 0), 20 * 60, "Test File 1", "sample info\nlong\nstring");
+				new DateTime(2011, 2, 3, 10, 20, 30, 0), 20 * 60, "Test File 1", "sample info\nlong\nstring", 100);
 		final TandemMassSpectrometrySample sample2 = new TandemMassSpectrometrySample(
 				new File("/file/test2.RAW"), new DateTime(2012, 1, 2, 3, 4, 5, 0), 11, 21, 31, "instrument 2", "serial 2",
-				new DateTime(2012, 2, 3, 10, 20, 30, 0), 1234, "Test File 2", "sample 2 info\nlong\nstring");
+				new DateTime(2012, 2, 3, 10, 20, 30, 0), 1234, "Test File 2", "sample 2 info\nlong\nstring", 200);
 
 		final SearchResult searchResult1 = new SearchResult(sample1, null);
 		final SearchResult searchResult2 = new SearchResult(sample2, null);

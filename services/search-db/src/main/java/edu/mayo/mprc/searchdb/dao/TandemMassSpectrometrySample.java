@@ -19,6 +19,11 @@ import java.io.File;
  */
 public class TandemMassSpectrometrySample extends PersistableBase {
 	/**
+	 * This is the file size used for files that are known not to exist
+	 */
+	public static final long NONEXISTENT_FILE_SIZE = -1L;
+
+	/**
 	 * Link to the .RAW or .mgf file that was analyzed. It can contain a null or just a filename without the path in case the file could not be found.
 	 */
 	private File file;
@@ -75,12 +80,17 @@ public class TandemMassSpectrometrySample extends PersistableBase {
 	private String sampleInformation;
 
 	/**
+	 * How many bytes in the file. Used as a rough QA check.
+	 */
+	private Long fileSize;
+
+	/**
 	 * Empty constructor for Hibernate.
 	 */
 	public TandemMassSpectrometrySample() {
 	}
 
-	public TandemMassSpectrometrySample(final File file, final DateTime lastModified, final int ms1Spectra, final int ms2Spectra, final int ms3PlusSpectra, final String instrumentName, final String instrumentSerialNumber, final DateTime startTime, final double runTimeInSeconds, final String comment, final String sampleInformation) {
+	public TandemMassSpectrometrySample(final File file, final DateTime lastModified, final int ms1Spectra, final int ms2Spectra, final int ms3PlusSpectra, final String instrumentName, final String instrumentSerialNumber, final DateTime startTime, final double runTimeInSeconds, final String comment, final String sampleInformation, final long fileSize) {
 		this.file = file;
 		this.lastModified = lastModified;
 		this.ms1Spectra = ms1Spectra;
@@ -92,6 +102,7 @@ public class TandemMassSpectrometrySample extends PersistableBase {
 		this.runTimeInSeconds = runTimeInSeconds;
 		this.comment = comment;
 		this.sampleInformation = sampleInformation;
+		this.fileSize = fileSize;
 	}
 
 	public File getFile() {
@@ -180,6 +191,14 @@ public class TandemMassSpectrometrySample extends PersistableBase {
 
 	public void setSampleInformation(final String sampleInformation) {
 		this.sampleInformation = sampleInformation;
+	}
+
+	public Long getFileSize() {
+		return fileSize;
+	}
+
+	public void setFileSize(Long fileSize) {
+		this.fileSize = fileSize;
 	}
 
 	@Override

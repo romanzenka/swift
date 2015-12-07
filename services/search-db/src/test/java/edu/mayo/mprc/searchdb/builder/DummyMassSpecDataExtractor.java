@@ -31,7 +31,8 @@ public class DummyMassSpecDataExtractor implements MassSpecDataExtractor {
 				now,
 				0.0,
 				"",
-				""
+				"",
+				0
 		);
 	}
 

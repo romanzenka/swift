@@ -2,6 +2,7 @@ package edu.mayo.mprc.searchdb.dao;
 
 import edu.mayo.mprc.MprcException;
 import edu.mayo.mprc.database.DaoTest;
+import edu.mayo.mprc.database.QueryCallback;
 import edu.mayo.mprc.dbcurator.model.CurationContext;
 import edu.mayo.mprc.dbcurator.model.impl.CurationDaoHibernate;
 import edu.mayo.mprc.fastadb.FastaDbDaoHibernate;
@@ -12,6 +13,7 @@ import edu.mayo.mprc.swift.params2.ParamsDaoHibernate;
 import edu.mayo.mprc.unimod.UnimodDaoHibernate;
 import edu.mayo.mprc.utilities.FileUtilities;
 import edu.mayo.mprc.workspace.WorkspaceDaoHibernate;
+import org.joda.time.DateTime;
 import org.testng.Assert;
 import org.testng.annotations.AfterTest;
 import org.testng.annotations.BeforeTest;
@@ -211,6 +213,46 @@ public final class TestSearchDbDaoHibernate extends DaoTest {
 		} catch (Exception e) {
 			searchDbDao.rollback();
 			throw new MprcException(e);
+		}
+	}
+
+	@Test
+	public void shouldFillTandemMassSpectrometrySampleSizes() {
+		searchDbDao.begin();
+		File file = null;
+		try {
+			// Make test file
+			file = File.createTempFile("sample", ".RAW");
+			FileUtilities.writeStringToFile(file, "hello", true);
+
+			// Store entry about the file that does not have size filled in
+			TandemMassSpectrometrySample sample = new TandemMassSpectrometrySample(file, new DateTime(), 1, 2, 3, "test", "num", new DateTime(), 10, "comment", "sample info", 10);
+			sample.setFileSize(null);
+			searchDbDao.addTandemMassSpectrometrySample(sample);
+
+			nextTransaction();
+
+			searchDbDao.fillTandemMassSpectrometrySampleSizes();
+
+			nextTransaction();
+
+			final File createdFile = file;
+			searchDbDao.getTandemMassSpectrometrySamples(new QueryCallback() {
+				@Override
+				public void process(Object[] data) {
+					TandemMassSpectrometrySample sample = (TandemMassSpectrometrySample) data[0];
+					if (sample.getFile().equals(createdFile)) {
+						Assert.assertEquals(sample.getFileSize(), 5, "Sample file size must match the file containing string 'hello'");
+					}
+				}
+			});
+
+			searchDbDao.commit();
+		} catch (Exception e) {
+			searchDbDao.rollback();
+			throw new MprcException(e);
+		} finally {
+			FileUtilities.cleanupTempFile(file);
 		}
 	}
 }
