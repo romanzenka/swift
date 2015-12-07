@@ -3,6 +3,7 @@ package edu.mayo.mprc.swift.commands;
 import edu.mayo.mprc.MprcException;
 import edu.mayo.mprc.searchdb.dao.SearchDbDao;
 import edu.mayo.mprc.swift.db.SwiftDao;
+import edu.mayo.mprc.swift.search.SwiftSearcher;
 import org.apache.log4j.Logger;
 import org.springframework.stereotype.Component;
 
@@ -28,6 +29,9 @@ public final class UpgradeDatabase implements SwiftCommand {
 
 	@Override
 	public ExitCode run(SwiftEnvironment environment) {
+		final SwiftSearcher.Config config = LoadToSearchDb.getSearcher(environment.getDaemonConfig());
+		LoadToSearchDb.initializeDatabase(environment, config);
+
 		swiftDao.begin();
 		try {
 			final int databaseVersion = swiftDao.getDatabaseVersion();
