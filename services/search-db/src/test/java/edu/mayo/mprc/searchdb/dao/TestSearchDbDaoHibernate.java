@@ -242,7 +242,7 @@ public final class TestSearchDbDaoHibernate extends DaoTest {
 				public void process(Object[] data) {
 					TandemMassSpectrometrySample sample = (TandemMassSpectrometrySample) data[0];
 					if (sample.getFile().equals(createdFile)) {
-						Assert.assertEquals(sample.getFileSize(), 5, "Sample file size must match the file containing string 'hello'");
+						Assert.assertEquals(sample.getFileSize(), Long.valueOf(5), "Sample file size must match the file containing string 'hello'");
 					}
 				}
 			});
