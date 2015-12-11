@@ -499,11 +499,8 @@ function drawGraphsByMetrics(data, renderDetailGraphs, viewMetadata) {
         var metric = metrics[i];
         var categoryCode;
         var metricId = metric.code;
-        if ("duration" === metricId || "fileSize" === metricId) {
-            categoryCode = "c";
-        } else {
-            categoryCode = metricId.split("_", 2)[0];
-        }
+        var categoryCode = getCategoryCodeFromMetric(metric);
+
         if (categoryCode !== previousCategory) {
             if (renderDetailGraphs) {
                 $('<h3>' + metricCategories[categoryCode] + '</h3>').appendTo("#detailedGraphs");
@@ -566,6 +563,17 @@ function startNewPage(doc, config, pageNumber, numPages) {
     var yCoord = config.topMargin;
 
     return yCoord;
+}
+
+function getCategoryCodeFromMetric(metric) {
+    var categoryCode;
+    var metricId = metric.code;
+    if ("duration" === metricId || "fileSize" === metricId) {
+        categoryCode = "c";
+    } else {
+        categoryCode = metricId.split("_", 2)[0];
+    }
+    return categoryCode;
 }
 
 // Does the actual report drawing
@@ -654,13 +662,8 @@ function drawGraphsToReport(data, viewMetadata, doc, numPages) {
         }
 
         var metric = metrics[i];
-        var categoryCode;
+        var categoryCode = getCategoryCodeFromMetric(metric);
         var metricId = metric.code;
-        if ("duration" === metricId) {
-            categoryCode = "c";
-        } else {
-            categoryCode = metricId.split("_", 2)[0];
-        }
 
         var view = new google.visualization.DataView(data);
         view.setColumns(getSmartColumns(metricId, data));
@@ -728,9 +731,15 @@ function drawGraphsToReport(data, viewMetadata, doc, numPages) {
 
                 if (startTime >= fromDate && startTime <= toDate &&
                     instruments.contains(instrument)) {
-                    var metricId = findMetricByCode(obj.metricCode);
 
-                    var text = startTime.getFullYear() + "-" +
+                    var path = data.getValue(row, columnIndex('path', data));
+                    var pathChunks = /(.*\/)([^\/\\]+)/.exec(path);
+                    var fileName = pathChunks[2];
+
+                    doc.text(fileName + ": ", 1.2, yCoord);
+                    yCoord += c.annotLineHeight;
+
+                    var text = "    " + startTime.getFullYear() + "-" +
                         addZero(startTime.getMonth() + 1) + "-" +
                         addZero(startTime.getDate()) + " " +
                         addZero(startTime.getHours()) + ":" +
@@ -739,7 +748,7 @@ function drawGraphsToReport(data, viewMetadata, doc, numPages) {
 
                     doc.text(text, 1.2, yCoord);
 
-                    yCoord += c.annotLineHeight;
+                    yCoord += c.annotLineHeight * 1.5;
 
                     if (yCoord > c.pageHeight - c.bottomMargin) {
                         doc.addPage();
