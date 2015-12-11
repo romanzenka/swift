@@ -553,7 +553,7 @@ function startNewPage(doc, config, pageNumber, numPages) {
     doc.setFontSize(config.headerFontSize);
     doc.setLineWidth(0);
     doc.text("Immunostains Monthly Mass Spectrometry QC Report", 0.1, 0.2);
-    var value = new Date().toLocaleDateString('en-GB', {
+    var value = new Date().toLocaleDateString('en-US', {
         year: 'numeric',
         month: '2-digit',
         day: '2-digit'
@@ -622,11 +622,11 @@ function drawGraphsToReport(data, viewMetadata, doc, numPages) {
         yCoord += c.titleLineHeight;
     }
 
-    centerText("Mayo Clinic: Department of Laboratory Medicine and Pathology");
+    centerText("Mayo Clinic Laboratories");
 
-    centerText("Division of Anatomic Pathology, Immunostains Laboratory");
+    centerText("RST");
 
-    centerText("Rochester, MN 55905");
+    centerText("Anatomic Pathology, Immunostains Laboratory");
 
     yCoord += c.titleLineHeight;
 
