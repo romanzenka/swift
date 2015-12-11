@@ -50,6 +50,7 @@ public final class WorkspaceDaoHibernate extends DaoBase implements WorkspaceDao
 					.setReadOnly(true);
 			if (withPreferences) {
 				criteria.setFetchMode("preferences", FetchMode.JOIN);
+				criteria.setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY);
 			}
 			return listAndCast(criteria);
 		} catch (Exception t) {
