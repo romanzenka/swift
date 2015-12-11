@@ -6,6 +6,7 @@ import edu.mayo.mprc.database.DaoBase;
 import edu.mayo.mprc.database.Database;
 import edu.mayo.mprc.utilities.ResourceUtilities;
 import org.apache.log4j.Logger;
+import org.hibernate.Criteria;
 import org.hibernate.FetchMode;
 import org.hibernate.Session;
 import org.joda.time.DateTime;
@@ -51,6 +52,7 @@ public final class UnimodDaoHibernate extends DaoBase implements UnimodDao {
 					allCriteria(Mod.class)
 							.setFetchMode("modSpecificities", FetchMode.JOIN)
 							.setFetchMode("altNames", FetchMode.JOIN)
+							.setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY)
 							.setReadOnly(true));
 			final Unimod unimod = new Unimod();
 			for (final Mod mod : list) {

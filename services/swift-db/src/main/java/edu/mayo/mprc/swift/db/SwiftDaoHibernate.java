@@ -552,6 +552,7 @@ public final class SwiftDaoHibernate extends DaoBase implements SwiftDao {
 		final ReportData reportData = (ReportData) getSession().createCriteria(ReportData.class)
 				.add(Restrictions.eq("id", reportDataId))
 				.setFetchMode("searchRun", FetchMode.JOIN)
+				.setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY)
 				.uniqueResult();
 		return reportData;
 	}
