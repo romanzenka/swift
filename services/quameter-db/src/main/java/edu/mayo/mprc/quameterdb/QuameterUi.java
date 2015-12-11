@@ -59,7 +59,7 @@ public final class QuameterUi implements Dao, UiConfigurationProvider, Lifecycle
 			QuameterMetric.builder("c_1b", "C-1B", "Peak Tailing Ratio", LOW, false, "Fraction of peptides with repeat identifications >4 min LATER than identification closest to the chromatographic maximum").build(),
 			QuameterMetric.builder("c_2a", "C-2A", "Retention Window", HIGH, false, "Retention time period over which the middle 50% of the identified peptides eluted (minutes)").setLink("help/metrics/retention_spread.html").build(),
 			QuameterMetric.builder("duration", "Duration", "Duration", RANGE, false, "Acquisition duration (minutes)").setRange(0.0, 60.0).build(),
-			QuameterMetric.builder("fileSize", "Size", "File Size", RANGE, false, "Sample file size (MB)").build(),
+			QuameterMetric.builder("fileSize", "Size", "File Size", RANGE, true, "Sample file size (MB)").build(),
 			QuameterMetric.builder("c_2b", "C-2B", "ID Rate", HIGH, true, "Rate of peptide identification during the C-2A time range").setLink("help/metrics/peptides_per_minute.html").build(),
 			QuameterMetric.builder("c_3a", "C-3A", "Peak Width", LOW, true, "Median identified peak width").setRange(0.0, 40.0).setLink("help/metrics/peak_width.html").build(),
 			QuameterMetric.builder("c_3b", "C-3B", "Peak Width Spread", LOW, true, "Interquantile range for peak widths").setRange(0.0, 40.0).setLink("help/metrics/peak_width_variability.html").build(),
