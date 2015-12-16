@@ -24,9 +24,11 @@ public final class RAWDumpTask extends AsyncTaskBase {
 	private File sampleInformationFile;
 	private File errorLogFile;
 	private File uvDataFile;
+	private File rtcFile;
 	private final File outputFolder;
 
-	public RAWDumpTask(final WorkflowEngine engine, final File rawFile, final File outputFolder, final DaemonConnection daemonConnection, final DatabaseFileTokenFactory fileTokenFactory, final boolean fromScratch) {
+	public RAWDumpTask(final WorkflowEngine engine, final File rawFile, final File outputFolder,
+	                   final DaemonConnection daemonConnection, final DatabaseFileTokenFactory fileTokenFactory, final boolean fromScratch) {
 		super(engine, daemonConnection, fileTokenFactory, fromScratch);
 
 		this.rawFile = rawFile;
@@ -39,6 +41,7 @@ public final class RAWDumpTask extends AsyncTaskBase {
 		sampleInformationFile = RAWDumpWorkPacket.getExpectedSampleInformationFile(outputFolder, rawFile);
 		errorLogFile = RAWDumpWorkPacket.getExpectedErrorLogFile(outputFolder, rawFile);
 		uvDataFile = RAWDumpWorkPacket.getExpectedUvDataFile(outputFolder, rawFile);
+		rtcFile = RAWDumpWorkPacket.getExpectedRtcFile(outputFolder, rawFile);
 
 		setName("RAW Dump");
 		updateDescription();
@@ -54,7 +57,7 @@ public final class RAWDumpTask extends AsyncTaskBase {
 		return new RAWDumpWorkPacket(rawFile,
 				rawInfoFile, rawSpectraFile, chromatogramFile,
 				tuneMethodFile, instrumentMethodFile, sampleInformationFile,
-				errorLogFile, uvDataFile,
+				errorLogFile, uvDataFile, rtcFile,
 				isFromScratch());
 	}
 
@@ -99,8 +102,12 @@ public final class RAWDumpTask extends AsyncTaskBase {
 		return uvDataFile;
 	}
 
+	public File getRtcFile() {
+		return rtcFile;
+	}
+
 	public RawFileMetaData getRawFileMetadata() {
-		return new RawFileMetaData(rawFile, rawInfoFile, tuneMethodFile, instrumentMethodFile, sampleInformationFile, errorLogFile, uvDataFile);
+		return new RawFileMetaData(rawFile, rawInfoFile, tuneMethodFile, instrumentMethodFile, sampleInformationFile, errorLogFile, uvDataFile, rtcFile);
 	}
 
 	@Override
@@ -121,6 +128,7 @@ public final class RAWDumpTask extends AsyncTaskBase {
 			sampleInformationFile = dumpResult.getSampleInformationFile();
 			errorLogFile = dumpResult.getErrorLogFile();
 			uvDataFile = dumpResult.getUvDataFile();
+			rtcFile = dumpResult.getRtcFile();
 		}
 	}
 

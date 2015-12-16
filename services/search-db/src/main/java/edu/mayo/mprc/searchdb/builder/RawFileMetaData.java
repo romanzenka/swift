@@ -22,6 +22,7 @@ public class RawFileMetaData extends FileHolder {
 	private File sampleInformation;
 	private File errorLog;
 	private File uvDataFile;
+	private File rtcFile;
 	/**
 	 * Maximum amount of characters to read for the log files
 	 */
@@ -29,7 +30,7 @@ public class RawFileMetaData extends FileHolder {
 
 	public RawFileMetaData(final File rawFile, final File info, final File tuneMethod,
 	                       final File instrumentMethod, final File sampleInformation, final File errorLog,
-	                       final File uvDataFile) {
+	                       final File uvDataFile, final File rtcFile) {
 		this.rawFile = rawFile;
 		this.info = info;
 		this.tuneMethod = tuneMethod;
@@ -37,6 +38,7 @@ public class RawFileMetaData extends FileHolder {
 		this.sampleInformation = sampleInformation;
 		this.errorLog = errorLog;
 		this.uvDataFile = uvDataFile;
+		this.rtcFile = rtcFile;
 	}
 
 	/**
@@ -89,5 +91,9 @@ public class RawFileMetaData extends FileHolder {
 
 	public File getUvDataFile() {
 		return uvDataFile;
+	}
+
+	public File getRtcFile() {
+		return rtcFile;
 	}
 }

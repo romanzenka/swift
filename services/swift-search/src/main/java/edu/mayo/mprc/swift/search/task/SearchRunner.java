@@ -790,7 +790,8 @@ public final class SearchRunner implements Runnable, Lifecycle {
 	}
 
 	private RAWDumpTask addRawDumpTask(final File rawFile, final File outputFolder) {
-		return addTask(new RAWDumpTask(workflowEngine, rawFile, outputFolder, rawDumpDaemon, fileTokenFactory, isFromScratch()));
+		return addTask(new RAWDumpTask(workflowEngine, rawFile, outputFolder,
+				rawDumpDaemon, fileTokenFactory, isFromScratch()));
 	}
 
 	private static boolean isRawFile(final FileSearch inputFile) {

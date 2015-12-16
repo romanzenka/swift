@@ -1,6 +1,8 @@
 package edu.mayo.mprc.qa;
 
-import com.google.common.base.Strings;
+import com.google.common.base.*;
+import com.google.common.collect.Iterables;
+import com.google.common.io.Files;
 import edu.mayo.mprc.MprcException;
 import edu.mayo.mprc.config.DaemonConfig;
 import edu.mayo.mprc.config.DependencyResolver;
@@ -23,6 +25,7 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.text.MessageFormat;
 import java.util.*;
 
 /**
@@ -31,6 +34,18 @@ import java.util.*;
 public final class RAWDumpWorker extends WorkerBase {
 
 	private static final Logger LOGGER = Logger.getLogger(RAWDumpWorker.class);
+
+	public static final String TYPE = "rawdump";
+	public static final String NAME = "RAW Dump";
+	public static final String DESC = "Extracts information about experiment and spectra from RAW files.";
+	public static final String WRAPPER_SCRIPT = "wrapperScript";
+	public static final String WINDOWS_EXEC_WRAPPER_SCRIPT = "windowsExecWrapperScript";
+	public static final String RAW_DUMP_EXECUTABLE = "rawDumpExecutable";
+	public static final String COMMAND_LINE_OPTIONS = "commandLineOptions";
+	public static final String RTC_PRECURSOR_MZS = "rtcPrecursorMzs";
+	public static final String RTC_PRECURSOR_RTS = "rtcPrecursorRts";
+	public static final String RTC_PPM_MASS_TOL = "rtcPpmMassTol";
+	public static final String RTC_MASS_ROUNDING = "rtcMassRounding";
 
 	public static final String RAW_FILE_CMD = "--raw";
 	public static final String INFO_FILE_CMD = "--info";
@@ -41,21 +56,22 @@ public final class RAWDumpWorker extends WorkerBase {
 	public static final String SAMPLE_INFORMATION_FILE_CMD = "--sample";
 	public static final String ERROR_LOG_FILE_CMD = "--errorlog";
 	public static final String UV_FILE_CMD = "--uv";
-	public static final String PARAM_FILE_CMD = "--params";
+	public static final String RTC_FILE_CMD = "--rtc";
+	public static final String RTC_PRECURSOR_MZS_CMD = "--" + RTC_PRECURSOR_MZS;
+	public static final String RTC_PPM_MASS_TOL_CMD = "--" + RTC_PPM_MASS_TOL;
+	public static final String RTC_MASS_ROUNDING_CMD = "--" + RTC_MASS_ROUNDING;
 
-	public static final String TYPE = "rawdump";
-	public static final String NAME = "RAW Dump";
-	public static final String DESC = "Extracts information about experiment and spectra from RAW files.";
-	public static final String WRAPPER_SCRIPT = "wrapperScript";
-	public static final String WINDOWS_EXEC_WRAPPER_SCRIPT = "windowsExecWrapperScript";
-	public static final String RAW_DUMP_EXECUTABLE = "rawDumpExecutable";
-	public static final String COMMAND_LINE_OPTIONS = "commandLineOptions";
+	public static final String PARAM_FILE_CMD = "--params";
 
 	private File wrapperScript;
 	private String windowsExecWrapperScript;
 
 	private File rawDumpExecutable;
 	private String commandLineOptions;
+	private Double[] rtcPrecursorMzs;
+	private Double[] rtcPrecursorRts;
+	private double rtcPpmMassTol;
+	private int rtcMassRounding;
 
 	private File tempParamFile;
 	// If the raw file path is longer than this, we will attempt to shorten it
@@ -82,6 +98,7 @@ public final class RAWDumpWorker extends WorkerBase {
 			final File finalSampleInformationFile = rawDumpWorkPacket.getSampleInformationFile();
 			final File finalErrorLogFile = rawDumpWorkPacket.getErrorLogFile();
 			final File finalUvDataFile = rawDumpWorkPacket.getUvDataFile();
+			final File finalRtcFile = rawDumpWorkPacket.getRtcFile();
 
 			final File rawInfo = getTempOutputFile(tempWorkFolder, finalRawInfo);
 			final File rawSpectra = getTempOutputFile(tempWorkFolder, finalRawSpectra);
@@ -91,6 +108,7 @@ public final class RAWDumpWorker extends WorkerBase {
 			final File sampleInformationFile = getTempOutputFile(tempWorkFolder, finalSampleInformationFile);
 			final File errorLogFile = getTempOutputFile(tempWorkFolder, finalErrorLogFile);
 			final File uvDataFile = getTempOutputFile(tempWorkFolder, finalUvDataFile);
+			final File rtcFile = getTempOutputFile(tempWorkFolder, finalRtcFile);
 
 			File shortenedRawFile = null;
 			if (rawFile.getAbsolutePath().length() > MAX_UNSHORTENED_PATH_LENGTH) {
@@ -104,18 +122,27 @@ public final class RAWDumpWorker extends WorkerBase {
 
 			final List<String> commandLine = getCommandLine(shortenedRawFile != null ? shortenedRawFile : rawFile,
 					rawInfo, rawSpectra, chromatogramFile, tuneFile, instrumentMethodFile, sampleInformationFile,
-					errorLogFile, uvDataFile);
+					errorLogFile, uvDataFile, rtcFile, rtcPrecursorMzs, rtcPpmMassTol, rtcMassRounding);
 			final ProcessCaller caller = process(commandLine, true/*windows executable*/, wrapperScript, windowsExecWrapperScript, progressReporter);
+
+			if (rtcPrecursorMzs.length == 0) {
+				// Make dummy rtc file since data is missing
+				try {
+					Files.write("Precursor m/z\tm/z Window\tScan ID\tBasePeakXIC\tTICXIC\n", rtcFile, Charsets.US_ASCII);
+				} catch (IOException e) {
+					throw new MprcException("Could not write out dummy rtc file " + rtcFile.getAbsolutePath(), e);
+				}
+			}
 
 			if (shortenedRawFile != null) {
 				FileUtilities.cleanupShortenedPath(shortenedRawFile);
 			}
 
 			if (!isFileOk(rawInfo)) {
-				throw new MprcException("Raw dump has failed to create raw info file: " + rawInfo.getAbsolutePath() + "\n" + caller.getFailedCallDescription());
+				throw new MprcException("Raw dump has failed to create raw info file: " + rawInfo.getAbsolutePath() + '\n' + caller.getFailedCallDescription());
 			}
 			if (!isFileOk(rawSpectra)) {
-				throw new MprcException("Raw dump has failed to create raw spectra file: " + rawSpectra.getAbsolutePath() + "\n" + caller.getFailedCallDescription());
+				throw new MprcException("Raw dump has failed to create raw spectra file: " + rawSpectra.getAbsolutePath() + '\n' + caller.getFailedCallDescription());
 			}
 
 			publish(rawInfo, finalRawInfo);
@@ -126,6 +153,8 @@ public final class RAWDumpWorker extends WorkerBase {
 			publish(sampleInformationFile, finalSampleInformationFile);
 			publish(errorLogFile, finalErrorLogFile);
 			publish(uvDataFile, finalUvDataFile);
+			publish(rtcFile, finalRtcFile);
+
 		} finally {
 			FileUtilities.deleteNow(tempParamFile);
 		}
@@ -137,11 +166,11 @@ public final class RAWDumpWorker extends WorkerBase {
 
 	private List<String> getCommandLine(final File rawFile, final File rawInfo, final File rawSpectra, final File chromatogramFile,
 	                                    final File tuneFile, final File instrumentMethodFile, final File sampleInformationFile,
-	                                    final File errorLogFile, final File uvDataFile) {
+	                                    final File errorLogFile, final File uvDataFile, final File rtcFile, Double[] rtcPrecursorMzs, double rtcPpmMassTol, int rtcMassRounding) {
 
 		createParamFile(rawFile, rawInfo, rawSpectra,
 				chromatogramFile, tuneFile, instrumentMethodFile,
-				sampleInformationFile, errorLogFile, uvDataFile);
+				sampleInformationFile, errorLogFile, uvDataFile, rtcFile, rtcPrecursorMzs, rtcPpmMassTol, rtcMassRounding);
 
 		final List<String> commandLineParams = new LinkedList<String>();
 		commandLineParams.add(rawDumpExecutable.getAbsolutePath());
@@ -153,7 +182,7 @@ public final class RAWDumpWorker extends WorkerBase {
 
 	private void createParamFile(final File rawFile, final File rawInfo, final File rawSpectra, final File chromatogramFile,
 	                             final File tuneFile, final File instrumentMethodFile, final File sampleInformationFile, final File errorLogFile,
-	                             final File uvDataFile) {
+	                             final File uvDataFile, final File rtcFile, Double[] rtcPrecursorMzs, double rtcPpmMassTol, int rtcMassRounding) {
 		try {
 			tempParamFile = File.createTempFile("inputParamFile", null);
 		} catch (IOException e) {
@@ -184,6 +213,13 @@ public final class RAWDumpWorker extends WorkerBase {
 			addFile(bufferedWriter, ERROR_LOG_FILE_CMD, errorLogFile);
 			addFile(bufferedWriter, UV_FILE_CMD, uvDataFile);
 
+			if (rtcPrecursorMzs.length > 0) {
+				addFile(bufferedWriter, RTC_FILE_CMD, rtcFile);
+				addKeyValue(bufferedWriter, RTC_PRECURSOR_MZS_CMD, Joiner.on(':').join(rtcPrecursorMzs));
+				addKeyValue(bufferedWriter, RTC_PPM_MASS_TOL_CMD, String.valueOf(rtcPpmMassTol));
+				addKeyValue(bufferedWriter, RTC_MASS_ROUNDING_CMD, String.valueOf(String.valueOf(rtcMassRounding)));
+			}
+
 		} catch (IOException e) {
 			throw new MprcException("Failed to created param file: " + tempParamFile.getAbsolutePath() + ".", e);
 		} finally {
@@ -192,9 +228,13 @@ public final class RAWDumpWorker extends WorkerBase {
 	}
 
 	private void addFile(final BufferedWriter bufferedWriter, final String commandLine, final File file) throws IOException {
+		addKeyValue(bufferedWriter, commandLine, file.getAbsolutePath());
+	}
+
+	private void addKeyValue(BufferedWriter bufferedWriter, String commandLine, String value) throws IOException {
 		bufferedWriter.write(commandLine);
 		bufferedWriter.write("\n");
-		bufferedWriter.write(file.getAbsolutePath());
+		bufferedWriter.write(value);
 		bufferedWriter.write("\n");
 	}
 
@@ -228,6 +268,38 @@ public final class RAWDumpWorker extends WorkerBase {
 
 	public void setCommandLineOptions(final String commandLineOptions) {
 		this.commandLineOptions = commandLineOptions;
+	}
+
+	public int getRtcMassRounding() {
+		return rtcMassRounding;
+	}
+
+	public void setRtcMassRounding(int rtcMassRounding) {
+		this.rtcMassRounding = rtcMassRounding;
+	}
+
+	public double getRtcPpmMassTol() {
+		return rtcPpmMassTol;
+	}
+
+	public void setRtcPpmMassTol(double rtcPpmMassTol) {
+		this.rtcPpmMassTol = rtcPpmMassTol;
+	}
+
+	public Double[] getRtcPrecursorMzs() {
+		return rtcPrecursorMzs;
+	}
+
+	public void setRtcPrecursorMzs(Double[] rtcPrecursorMzs) {
+		this.rtcPrecursorMzs = rtcPrecursorMzs;
+	}
+
+	public Double[] getRtcPrecursorRts() {
+		return rtcPrecursorRts;
+	}
+
+	public void setRtcPrecursorRts(Double[] rtcPrecursorRts) {
+		this.rtcPrecursorRts = rtcPrecursorRts;
 	}
 
 	/**
@@ -273,8 +345,37 @@ public final class RAWDumpWorker extends WorkerBase {
 			//Raw dump values
 			worker.setRawDumpExecutable(FileUtilities.getAbsoluteFileForExecutables(new File(config.get(RAW_DUMP_EXECUTABLE))));
 			worker.setCommandLineOptions(config.get(COMMAND_LINE_OPTIONS));
+			worker.setRtcPpmMassTol(Double.parseDouble(config.get(RTC_PPM_MASS_TOL)));
+			worker.setRtcMassRounding(Integer.parseInt(config.get(RTC_MASS_ROUNDING)));
+
+			worker.setRtcPrecursorMzs(stringToDoubleArray(config, RTC_PRECURSOR_MZS));
+			worker.setRtcPrecursorRts(stringToDoubleArray(config, RTC_PRECURSOR_RTS));
+			if (worker.getRtcPrecursorMzs().length != worker.getRtcPrecursorRts().length) {
+				throw new MprcException(MessageFormat.format("The number of m/z values from {0} ({1}) does not match the number of retention times from {2} ({3})",
+						RTC_PRECURSOR_MZS, worker.getRtcPrecursorMzs().length,
+						RTC_PRECURSOR_RTS, worker.getRtcPrecursorRts().length));
+			}
 
 			return worker;
+		}
+
+	}
+
+	/**
+	 * Convert comma-delimited string of numbers into an array of numbers
+	 *
+	 * @param config Config to take the values from
+	 * @param prop   Config property name
+	 * @return
+	 */
+	public static Double[] stringToDoubleArray(final Config config, final String prop) {
+		try {
+			final Iterable<String> split = Splitter.on(':').omitEmptyStrings().split(config.get(prop));
+			final Iterable<Double> result = Iterables.transform(split, new StringToPositiveDouble());
+			return Iterables.toArray(result, Double.class);
+
+		} catch (Exception e) {
+			throw new MprcException("Incorrect " + prop + " parameter value", e);
 		}
 	}
 
@@ -327,8 +428,36 @@ public final class RAWDumpWorker extends WorkerBase {
 					.executable(Arrays.asList("-v"))
 					.defaultValue(daemon.getXvfbWrapperScript())
 					.addDaemonChangeListener(new WrapperScriptSwitcher(resource, daemon, WINDOWS_EXEC_WRAPPER_SCRIPT));
+
+			builder.property(RTC_PRECURSOR_MZS, "Retention Time Calibration precursor m/zs",
+					"A colon separated list of precursor m/z values to be extracted for retention time calibration plot")
+					.defaultValue("")
+
+					.property(RTC_PRECURSOR_RTS, "Retention Time Calibration retention times (minutes)",
+							"A colon separated list of expected retention times. Must match the precursor m/zs list")
+					.defaultValue("")
+
+					.property(RTC_PPM_MASS_TOL, "Retention Time Calibration tolerance (ppm)",
+							"+/- ppm around the precursor to be used for extracting the chromatogram")
+					.defaultValue("10")
+					.required()
+
+					.property(RTC_MASS_ROUNDING, "Retention Time Calibration mass rounding",
+							"How many decimal places to use when outputting the m/z values")
+					.defaultValue("2")
+					.required();
 		}
 
 	}
 
+	private static class StringToPositiveDouble implements Function<String, Double> {
+		@Override
+		public Double apply(final String from) {
+			final double v = Double.parseDouble(from);
+			if (v <= 0.0) {
+				throw new MprcException("The values have to be > 0, was " + from);
+			}
+			return v;
+		}
+	}
 }
