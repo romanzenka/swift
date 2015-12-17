@@ -34,6 +34,9 @@ public final class QaFiles extends FileHolder {
 	// Optional dump of UV information (pressures)
 	private File uvDataFile;
 
+	// Optional dump for retention time calibration
+	private File rtcFile;
+
 	/**
 	 * Map of Engine ID -> engine search result file.
 	 */
@@ -98,6 +101,14 @@ public final class QaFiles extends FileHolder {
 		this.uvDataFile = uvDataFile;
 	}
 
+	public File getRtcFile() {
+		return rtcFile;
+	}
+
+	public void setRtcFile(File rtcFile) {
+		this.rtcFile = rtcFile;
+	}
+
 	public HashMap<String, File> getAdditionalSearchResults() {
 		return additionalSearchResults;
 	}
@@ -107,7 +118,7 @@ public final class QaFiles extends FileHolder {
 	}
 
 	public long getNewestModificationDate() {
-		Collection<File> files = Lists.newArrayList(inputFile, rawInfoFile, msmsEvalOutputFile, rawInfoFile, rawSpectraFile, chromatogramFile, uvDataFile);
+		Collection<File> files = Lists.newArrayList(inputFile, rawInfoFile, msmsEvalOutputFile, rawInfoFile, rawSpectraFile, chromatogramFile, uvDataFile, rtcFile);
 		files.addAll(additionalSearchResults.values());
 		long newestModificationDate = Long.MIN_VALUE;
 		for (File file : files) {

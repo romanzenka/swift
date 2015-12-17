@@ -73,7 +73,7 @@ public final class QaWorker extends WorkerBase {
 		try {
 			fileWriter = new FileWriter(rScriptInputFile);
 
-			fileWriter.write("Data File\tId File\tMz File\tIdVsMz File\tSource Current File\tmsmsEval Discriminant File\tGenerate Files\tRaw File\tmsmsEval Output\tRaw Info File\tRaw Spectra File\tPeptide Tolerance File\tTIC File\tChromatogram File\tUV Data File");
+			fileWriter.write("Data File\tId File\tMz File\tIdVsMz File\tSource Current File\tmsmsEval Discriminant File\tGenerate Files\tRaw File\tmsmsEval Output\tRaw Info File\tRaw Spectra File\tPeptide Tolerance File\tTIC File\tChromatogram File\tUV Data File\tRTC Input File\tRTC Picture File");
 			fileWriter.write("\n");
 
 			final List<ExperimentQa> experimentQas = qaWorkPacket.getExperimentQas();
@@ -142,6 +142,7 @@ public final class QaWorker extends WorkerBase {
 		final File sourceCurrentFile = new File(qaReportFolder, uniqueMgfAnalysisName + ".current.png");
 		final File pepTolFile = new File(qaReportFolder, uniqueMgfAnalysisName + ".pepTol.png");
 		final File uvDataFile = new File(qaReportFolder, uniqueMgfAnalysisName + ".uv.png");
+		final File rtcFile = new File(qaReportFolder, uniqueMgfAnalysisName + ".rtc.png");
 
 		rScriptOutputFilesSet.add(massCalibrationRtFile);
 		rScriptOutputFilesSet.add(massCalibrationMzFile);
@@ -218,11 +219,15 @@ public final class QaWorker extends WorkerBase {
 				rScriptOutputFilesSet.add(ticFile);
 			}
 
+			if (qaFiles.getRtcFile() != null) {
+				rScriptOutputFilesSet.add(rtcFile);
+			}
+
 			generatedFiles.addAll(rScriptOutputFilesSet);
 		}
 
 		final File chromatogramFile = qaFiles.getChromatogramFile();
-		writeInputLine(fileWriter, outputFile, massCalibrationRtFile, massCalibrationMzFile, mzRtFile, sourceCurrentFile, msmsEvalDiscriminantFile, generate, qaFiles, pepTolFile, ticFile, chromatogramFile, uvDataFile);
+		writeInputLine(fileWriter, outputFile, massCalibrationRtFile, massCalibrationMzFile, mzRtFile, sourceCurrentFile, msmsEvalDiscriminantFile, generate, qaFiles, pepTolFile, ticFile, chromatogramFile, uvDataFile, rtcFile);
 		return atLeastOneFileMissing;
 	}
 
@@ -275,7 +280,7 @@ public final class QaWorker extends WorkerBase {
 		return null;
 	}
 
-	private void writeInputLine(final FileWriter fileWriter, final File outputFile, final File idVsPpmFile, final File mzVsPpmFile, final File idVsMzFile, final File sourceCurrentFile, final File msmsEvalDiscriminantFile, final boolean generate, final QaFiles qaFiles, final File pepTolFile, final File ticFile, final File chromatogramFile, final File uvDataFile) throws IOException {
+	private void writeInputLine(final FileWriter fileWriter, final File outputFile, final File idVsPpmFile, final File mzVsPpmFile, final File idVsMzFile, final File sourceCurrentFile, final File msmsEvalDiscriminantFile, final boolean generate, final QaFiles qaFiles, final File pepTolFile, final File ticFile, final File chromatogramFile, final File uvDataFile, final File rtcFile) throws IOException {
 		fileWriter.write(outputFile.getAbsolutePath());
 		fileWriter.write("\t");
 		fileWriter.write(idVsPpmFile.getAbsolutePath());
@@ -305,6 +310,10 @@ public final class QaWorker extends WorkerBase {
 		fileWriter.write(chromatogramFile != null ? chromatogramFile.getAbsolutePath() : "");
 		fileWriter.write("\t");
 		fileWriter.write(uvDataFile != null ? uvDataFile.getAbsolutePath() : "");
+		fileWriter.write("\n");
+		fileWriter.write(isDataFileValid(qaFiles.getRtcFile()) ? qaFiles.getRtcFile().getAbsolutePath() : "");
+		fileWriter.write("\t");
+		fileWriter.write(rtcFile != null ? rtcFile.getAbsolutePath() : "");
 		fileWriter.write("\n");
 	}
 
