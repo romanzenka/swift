@@ -4,9 +4,9 @@ require 'json'
 require 'pp'
 
 version  = 1
-host = "atlas.mayo.edu"
-database = "atlas_dev"
-user = "swift"
+host = "node029.mprc.mayo.edu"
+database = "atlas_migration"
+user = "atlas_migration"
 pass = "###"
 
 ### Define Methods ####

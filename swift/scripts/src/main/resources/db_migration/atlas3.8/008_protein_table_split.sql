@@ -40,8 +40,7 @@ INSERT INTO protein_accnum (accession_number)
 
 INSERT INTO protein_description (description)
   SELECT
-    DISTINCT
-    description
+    DISTINCT left(description, 200)
   FROM `protein_database_entry`
   ORDER BY description;
 
@@ -53,7 +52,7 @@ INSERT INTO protein_entry (protein_entry_id, curation_id, protein_accnum_id, pro
     d.protein_description_id,
     e.protein_sequence_id
   FROM protein_database_entry AS e, protein_accnum AS a, protein_description AS d
-  WHERE e.accession_number = a.accession_number AND e.description = d.description
+  WHERE e.accession_number = a.accession_number AND left(e.description, 200) = d.description
   ORDER BY e.protein_database_entry_id;
 
 

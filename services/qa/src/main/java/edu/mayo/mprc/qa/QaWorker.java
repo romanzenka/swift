@@ -310,7 +310,7 @@ public final class QaWorker extends WorkerBase {
 		fileWriter.write(chromatogramFile != null ? chromatogramFile.getAbsolutePath() : "");
 		fileWriter.write("\t");
 		fileWriter.write(uvDataFile != null ? uvDataFile.getAbsolutePath() : "");
-		fileWriter.write("\n");
+		fileWriter.write("\t");
 		fileWriter.write(isDataFileValid(qaFiles.getRtcFile()) ? qaFiles.getRtcFile().getAbsolutePath() : "");
 		fileWriter.write("\t");
 		fileWriter.write(rtcFile != null ? rtcFile.getAbsolutePath() : "");

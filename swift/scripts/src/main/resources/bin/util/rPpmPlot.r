@@ -1382,6 +1382,7 @@ run <- function(inputFile, reportFileName, decoyRegex) {
 } 
 
 args<-commandArgs(TRUE)
+args<-c("/Users/m044910/dev/rPpmTest/qa/rInputData.tsv", "/Users/m044910/dev/rPpmTest/qa/index.html", "Rev_")
 #args<-c("/mnt/atlas/ResearchandDevelopment/QE_Method Development/Thermo_HeLa_Standards_20150109/Hela_150min_ClinicalSolvents_Replicates_25cmPepMap_20150219/qa/rInputData.tsv",  "/tmp/qa/output.html", "Rev_")
 #args<-c("/Users/m044910/Documents/devel/swift/swift/scripts/src/test/input.txt", "/tmp/qa/output.html", "Rev_") # For testing
 #args<-c("/mnt/mprc/instruments/OrbitrapElite/QC_enodigruns_yeast/Elite_150225_yeast250_90_100/qa/rInputData.tsv", "/mnt/mprc/instruments/OrbitrapElite/QC_enodigruns_yeast/Elite_150225_yeast250_90_100/qa/index.html", "Reversed_")
