@@ -115,6 +115,7 @@ public final class QaTask extends AsyncTaskBase {
 					files.setRawSpectraFile(value.getRawDump().getRawSpectraFile());
 					files.setChromatogramFile(value.getRawDump().getChromatogramFile());
 					files.setUvDataFile(value.getRawDump().getUvDataFile());
+					files.setRtcFile(value.getRawDump().getRtcFile());
 				}
 				for (final EngineSearchTask engineSearchTask : value.getAdditionalSearches()) {
 					files.addAdditionalSearchResult(engineSearchTask.getSearchEngine().getCode(), engineSearchTask.getOutputFile());
