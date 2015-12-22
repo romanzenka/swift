@@ -349,6 +349,7 @@ public final class QaWorker extends WorkerBase {
 		result.add(inputFile.getAbsolutePath());
 		result.add(reportFile.getAbsolutePath());
 		result.add(decoyRegex);
+		result.add(rtcMzOrder);
 
 		final ProcessBuilder builder = new ProcessBuilder(result.toArray(new String[result.size()]));
 		final ProcessCaller caller = new ProcessCaller(builder, reporter.getLog());
