@@ -641,14 +641,17 @@ movingAverage <- function(x,n=5){
 }
 
 # Plot the retention time calibration
-plotRtc <- function(inputFile, ms1Spectra) {
+plotRtc <- function(inputFile, ms1Spectra, rtcMzOrder) {
   rtcData <- read.delim(inputFile, header=TRUE, sep="\t", fileEncoding="UTF-8")
   
   # Rename rtcData to easier to use column names
   names(rtcData) <- c("mz", "mzWindow", "scanId", "BasePeakXIC", "ticXIC")
   
+  # Determine how to order the plots
+  rtcMzOrder <- order(as.numeric(unlist(strsplit(rtcMzOrder, ":", fixed=TRUE))))
+  allMzWindows <- unique(rtcData[,c("mz", "mzWindow")])[rtcMzOrder]
+  
   # Fill in zeroes where no data is present
-  allMzWindows <- unique(rtcData[,c("mz", "mzWindow")])
   mzWindowForMz <- allMzWindows[,"mzWindow"]
   names(mzWindowForMz) <- allMzWindows[,"mz"]
   baseData <- expand.grid(scanId=ms1Spectra[,"Scan.Id"], mz=allMzWindows[,"mz"]) # Grid of zeroes for each scanId + mz combo
@@ -727,7 +730,7 @@ plotRtc <- function(inputFile, ms1Spectra) {
 #' Generates series of images for one .RAW file
 #'
 #' @return a summary of results to be written in the summary.xml file 
-imageGenerator<-function(dataFile, msmsEvalDataFile, infoFile, spectrumFile, chromatogramFile, rtcFile, outputImages, generate, decoyRegex, outDir) {
+imageGenerator<-function(dataFile, msmsEvalDataFile, infoFile, spectrumFile, chromatogramFile, rtcFile, outputImages, generate, decoyRegex, rtcMzOrder, outDir) {
   # We return the passed file names as a part of our result
   result<-outputImages
   result$data.file <- dataFile
@@ -1239,7 +1242,7 @@ imageGenerator<-function(dataFile, msmsEvalDataFile, infoFile, spectrumFile, chr
       
       if(file.exists(rtcFile)) {
         startPlot(rtc.title, outputImages$rtc.file, outDir)
-        plotRtc(inputFile=rtcFile, ms1Spectra=spectrumInfo[spectrumInfo[,'MS.Level']==1, c("Scan.Id", "RT")])
+        plotRtc(inputFile=rtcFile, ms1Spectra=spectrumInfo[spectrumInfo[,'MS.Level']==1, c("Scan.Id", "RT")], rtcMzOrder = rtcMzOrder)
         abline(v=pumpBreakpointRT, col=uv.percent.b.breakpoint.color)
         dev.off()
       }
@@ -1402,7 +1405,7 @@ endReportFile<-function(reportFile) {
 # inputFile - a file describing all input files and where to put the images
 # reportFileName - path to index.html file that will be generated
 # decoyRegex - how to detect reverse hits
-run <- function(inputFile, reportFileName, decoyRegex) {
+run <- function(inputFile, reportFileName, decoyRegex, rtcMzOrder) {
   inputDataTab<-read.delim(inputFile, header=TRUE, sep="\t", colClasses="character", fileEncoding="UTF-8")
   reportFile<-file(reportFileName, "w")
   reportDir <- dirname(reportFileName)
@@ -1443,6 +1446,7 @@ run <- function(inputFile, reportFileName, decoyRegex) {
         rtc.file = file.path(reportDir, basename(line$RTC.Picture.File))),
       line$Generate.Files,
       decoyRegex,
+      rtcMzOrder,
       reportDir)
     
     addRowToReportFile(reportFile, row)
@@ -1485,7 +1489,8 @@ args<-commandArgs(TRUE)
 inputFile<-args[1]
 reportFileName<-args[2]
 decoyRegex<-args[3] # Currently treated just as a plain prefix
+rtcMzOrder<-args[4] # Colon-separated list of m/z values
 
-run(inputFile, reportFileName, decoyRegex)
+run(inputFile, reportFileName, decoyRegex, rtcMzOrder)
 
 # vi: set filetype=R expandtab tabstop=4 shiftwidth=4 autoindent smartindent:

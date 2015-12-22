@@ -385,6 +385,10 @@ public final class RAWDumpWorker extends WorkerBase {
 	public static final class Config extends ResourceConfigBase {
 		public Config() {
 		}
+
+		public String getRtcPrecursorMzs() {
+			return get(RTC_PRECURSOR_MZS);
+		}
 	}
 
 	public static final class Ui implements ServiceUiFactory {

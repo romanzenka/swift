@@ -1,10 +1,7 @@
 package edu.mayo.mprc.qa;
 
 import edu.mayo.mprc.MprcException;
-import edu.mayo.mprc.config.DaemonConfig;
-import edu.mayo.mprc.config.DependencyResolver;
-import edu.mayo.mprc.config.ResourceConfig;
-import edu.mayo.mprc.config.ui.ResourceConfigBase;
+import edu.mayo.mprc.config.*;
 import edu.mayo.mprc.config.ui.ServiceUiFactory;
 import edu.mayo.mprc.config.ui.UiBuilder;
 import edu.mayo.mprc.daemon.worker.WorkPacket;
@@ -46,11 +43,13 @@ public final class QaWorker extends WorkerBase {
 	private String rExecutable;
 	private File rScript;
 	private File xvfbWrapperScript;
+	private String rtcMzOrder;
 	private SpectrumInfoJoiner spectrumInfoJoiner;
 
 	private static final String XVFB_WRAPPER_SCRIPT = "xvfbWrapperScript";
 	private static final String R_SCRIPT = "rScript";
 	private static final String R_EXECUTABLE = "rExecutable";
+	private static final String RAWDUMP = "rawdump";
 
 	@Override
 	public void process(final WorkPacket workPacket, final File tempWorkFolder, final UserProgressReporter progressReporter) {
@@ -95,7 +94,7 @@ public final class QaWorker extends WorkerBase {
 
 			if (atLeastOneFileMissing) {
 				LOGGER.info("Running R script [" + getRScript().getAbsolutePath() + "] for output file [" + reportFile + "]");
-				runRScript(rScriptInputFile, reportFile, decoyRegex, progressReporter);
+				runRScript(rScriptInputFile, reportFile, decoyRegex, getRtcMzOrder(), progressReporter);
 			}
 
 			for (final File file : generatedFileList) {
@@ -337,7 +336,7 @@ public final class QaWorker extends WorkerBase {
 		return file != null && file.exists() && file.length() > 0;
 	}
 
-	private void runRScript(final File inputFile, final File reportFile, final String decoyRegex, final UserProgressReporter reporter) {
+	private void runRScript(final File inputFile, final File reportFile, final String decoyRegex, final String rtcMzOrder, final UserProgressReporter reporter) {
 
 		final List<String> result = new ArrayList<String>();
 
@@ -380,6 +379,14 @@ public final class QaWorker extends WorkerBase {
 		this.xvfbWrapperScript = xvfbWrapperScript;
 	}
 
+	public String getRtcMzOrder() {
+		return rtcMzOrder;
+	}
+
+	public void setRtcMzOrder(String rtcMzOrder) {
+		this.rtcMzOrder = rtcMzOrder;
+	}
+
 	public SpectrumInfoJoiner getSpectrumInfoJoiner() {
 		return spectrumInfoJoiner;
 	}
@@ -398,11 +405,13 @@ public final class QaWorker extends WorkerBase {
 		@Override
 		public Worker create(final Config config, final DependencyResolver dependencies) {
 			final QaWorker qaWorker = new QaWorker();
-			qaWorker.setRExecutable(config.get(R_EXECUTABLE));
-			qaWorker.setRScript(new File(config.get(R_SCRIPT)));
-			final String xvfbWrapperScript = config.get(XVFB_WRAPPER_SCRIPT);
+			qaWorker.setRExecutable(config.getrExecutable());
+			qaWorker.setRScript(new File(config.getrScript()));
+			final String xvfbWrapperScript = config.getXvfbWrapperScript();
+			final String rtcOrder = ((RAWDumpWorker.Config) config.getRawDump().getRunner().getWorkerConfiguration()).getRtcPrecursorMzs();
 			qaWorker.setXvfbWrapperScript(xvfbWrapperScript != null && !xvfbWrapperScript.isEmpty() ? new File(xvfbWrapperScript) : null);
 			qaWorker.setSpectrumInfoJoiner(getSpectrumInfoJoiner());
+			qaWorker.setRtcMzOrder(rtcOrder);
 			return qaWorker;
 		}
 
@@ -419,13 +428,66 @@ public final class QaWorker extends WorkerBase {
 	/**
 	 * Configuration for the factory
 	 */
-	public static final class Config extends ResourceConfigBase {
+	public static final class Config implements ResourceConfig {
+		private String xvfbWrapperScript;
+		private String rScript;
+		private String rExecutable;
+		private ServiceConfig rawDump;
+
 		public Config() {
 		}
 
-		public Config(final String xvfbWrapperScript, final String rScript) {
-			put(XVFB_WRAPPER_SCRIPT, xvfbWrapperScript);
-			put(R_SCRIPT, rScript);
+		@Override
+		public void save(ConfigWriter writer) {
+			writer.put(R_EXECUTABLE, rExecutable);
+			writer.put(XVFB_WRAPPER_SCRIPT, xvfbWrapperScript);
+			writer.put(R_SCRIPT, rScript);
+			writer.put(RAWDUMP, writer.save(rawDump));
+		}
+
+		@Override
+		public void load(ConfigReader reader) {
+			rExecutable = reader.get(R_EXECUTABLE);
+			xvfbWrapperScript = reader.get(XVFB_WRAPPER_SCRIPT);
+			rScript = reader.get(R_SCRIPT);
+			rawDump = (ServiceConfig) reader.getObject(RAWDUMP);
+		}
+
+		@Override
+		public int getPriority() {
+			return 0;
+		}
+
+		public ServiceConfig getRawDump() {
+			return rawDump;
+		}
+
+		public void setRawDump(ServiceConfig rawDump) {
+			this.rawDump = rawDump;
+		}
+
+		public String getrExecutable() {
+			return rExecutable;
+		}
+
+		public void setrExecutable(String rExecutable) {
+			this.rExecutable = rExecutable;
+		}
+
+		public String getrScript() {
+			return rScript;
+		}
+
+		public void setrScript(String rScript) {
+			this.rScript = rScript;
+		}
+
+		public String getXvfbWrapperScript() {
+			return xvfbWrapperScript;
+		}
+
+		public void setXvfbWrapperScript(String xvfbWrapperScript) {
+			this.xvfbWrapperScript = xvfbWrapperScript;
 		}
 	}
 
@@ -454,7 +516,11 @@ public final class QaWorker extends WorkerBase {
 									+ " has to be functional on the host system.</p>"
 									+ "<p>If you do not require this functionality, leave the field blank.</p>")
 					.executable(Arrays.asList("-v"))
-					.defaultValue(daemon.getXvfbWrapperScript());
+					.defaultValue(daemon.getXvfbWrapperScript())
+
+					.property(RAWDUMP, RAWDumpWorker.NAME, "RawDump that extracts the retention time calibration data")
+					.reference(RAWDumpWorker.TYPE, UiBuilder.NONE_TYPE);
+
 		}
 	}
 }
