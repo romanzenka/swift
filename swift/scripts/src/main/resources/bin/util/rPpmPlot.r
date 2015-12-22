@@ -37,7 +37,7 @@ tic.title <- "TIC vs. RT"
 msmsEval.title <- "msmsEval Discriminant Histogram"
 uv.title <- "Pump Stats" # This is called "uv" as the pump pressure is measured using ultraviolet light
 basepeak.title <- "Base Peak Intensity vs. RT"
-rtc.title <- "Retention Time Calibration"
+rtc.title <- "Retention Time Calibration Profile"
 
 # Plot dimensions
 plot.dimension.full <- c(1000, 800) # The actual plot dimensions
@@ -640,6 +640,90 @@ movingAverage <- function(x,n=5){
   }
 }
 
+# Plot the retention time calibration
+plotRtc <- function(inputFile, ms1Spectra) {
+  rtcData <- read.delim(inputFile, header=TRUE, sep="\t", fileEncoding="UTF-8")
+  
+  # Rename rtcData to easier to use column names
+  names(rtcData) <- c("mz", "mzWindow", "scanId", "BasePeakXIC", "ticXIC")
+  
+  # Fill in zeroes where no data is present
+  allMzWindows <- unique(rtcData[,c("mz", "mzWindow")])
+  mzWindowForMz <- allMzWindows[,"mzWindow"]
+  names(mzWindowForMz) <- allMzWindows[,"mz"]
+  baseData <- expand.grid(scanId=ms1Spectra[,"Scan.Id"], mz=allMzWindows[,"mz"]) # Grid of zeroes for each scanId + mz combo
+  baseData[,"mzWindow"] <- mzWindowForMz[as.character(baseData[,"mz"])]
+  baseData[,"BasePeakXIC"] <- 0
+  baseData[,"ticXIC"] <- 0
+  baseData <- merge(x=baseData, y=ms1Spectra, by.x="scanId", by.y="Scan.Id")
+  
+  # Now overlay the data we have over the base data
+  rtcData <- merge(x=baseData, y=rtcData, by=c("scanId", "mzWindow", "mz"), all = TRUE)
+  missingValues <- is.na(rtcData[, "BasePeakXIC.y"])
+  rtcData[missingValues, c("BasePeakXIC.y", "ticXIC.y")] <- rtcData[missingValues, c("BasePeakXIC.x", "ticXIC.x")]
+  rtcData <- rtcData[,c("scanId", "mzWindow", "mz", "RT", "BasePeakXIC.y", "ticXIC.y")]
+  names(rtcData) <- c("scanId", "mzWindow", "mz", "RT", "BasePeakXIC", "ticXIC")
+  
+  # First we need to fill in the retention times
+  rtcData[,"RTseconds"] <- round(rtcData[,"RT"]*60) # Round RT to nearest second
+  
+  maxRTinSeconds<-max(rtcData[['RTseconds']])
+  dataPerSecond<-aggregate(BasePeakXIC ~ RTseconds+mzWindow+mz, data=rtcData[,c("RTseconds", "mz", "mzWindow", "BasePeakXIC")], FUN=sum)
+  dataPerSecond[,'RT']<-dataPerSecond[,'RTseconds']/60
+  
+  mzWindows <- unique(rtcData[,"mz"])
+  numMzWindows <- length(mzWindows)
+  spaceBetweenPlots <- 0.1
+  plotSize <- 1+spaceBetweenPlots # How high is a single plot
+  rtRange <- range(c(0, rtcData[,"RT"]))
+  yRange <- c(numMzWindows+1+numMzWindows*spaceBetweenPlots, 0)
+  plot(x=NULL, y=NULL, xlim=rtRange, ylim=yRange, type="n", 
+         xlab = "Retention Time (min)", ylab=NA, main=rtc.title, xaxt="n", yaxt="n", xaxs="i", yaxs="i", bty="n")
+  
+  axis(side=1, at=seq(0, maxRTinSeconds/60, 10), lwd=0, lwd.ticks=1)
+  colors <- rainbow(numMzWindows+1, s=1, v=0.8)
+  for(i in seq_len(numMzWindows)) {
+    top <- (i-1)*plotSize
+    bottom <- (i-1)*plotSize+1
+    rect(xleft = 0, ybottom=top, xright = rtRange[2], ytop=bottom, col="#e8e8e8", border = NA)
+    data <- dataPerSecond[dataPerSecond[,"mz"]==mzWindows[i], c("RT", "BasePeakXIC")]
+    yValue <- data[,'BasePeakXIC']
+    maxYIndex <- which.max(yValue)
+    maxY <- yValue[maxYIndex]
+    rtMaxY <- data[maxYIndex,'RT']
+    zeroesFlankedByZeroes <- yValue==0 & c(yValue[-1], 0)==0 & c(0, yValue[-length(yValue)])==0
+    data[zeroesFlankedByZeroes, "BasePeakXIC"] <- NA
+    axis(side = 2, at = (bottom+top)/2, labels = mzWindows[i], las=1, tick=FALSE)
+    
+    polygon(x=data[,'RT'], y=bottom+(top-bottom)*data[,"BasePeakXIC"]/maxY, col=colors[i], border=colors[i])
+    
+    if(rtMaxY < rtRange[2]*0.75) {
+      xAlign <- -0.1
+    } else {
+      xAlign <- 1.1
+    }
+    text(x = rtMaxY, y=top, labels=round(rtMaxY, 1), adj=c(xAlign, 1.2), col=rgb(0, 0, 0, 0.7))
+  }
+  
+  # Special plot at the bottom
+  i<-numMzWindows+1
+  top <- (i-1)*plotSize
+  bottom <- (i-1)*plotSize+1
+  rect(xleft = 0, ybottom=top, xright = rtRange[2], ytop=bottom, col="#e8e8e8", border = NA)
+  axis(side = 2, at = (bottom+top)/2, labels = "All", las=1, tick=FALSE)
+  
+  maxY <- max(dataPerSecond[,'BasePeakXIC'])
+
+  # Do all the drawing again, one over the other
+  for(i in seq_len(numMzWindows)) {
+    data <- dataPerSecond[dataPerSecond[,"mz"]==mzWindows[i], c("RT", "BasePeakXIC")]
+    yValue <- data[,'BasePeakXIC']
+    zeroesFlankedByZeroes <- yValue==0 & c(yValue[-1], 0)==0 & c(0, yValue[-length(yValue)])==0
+    data[zeroesFlankedByZeroes, "BasePeakXIC"] <- NA
+    lines(x=data[,'RT'], y=bottom+(top-bottom)*data[,"BasePeakXIC"]/maxY, col=colors[i])
+  }
+}
+
 #' Generates series of images for one .RAW file
 #'
 #' @return a summary of results to be written in the summary.xml file 
@@ -793,7 +877,7 @@ imageGenerator<-function(dataFile, msmsEvalDataFile, infoFile, spectrumFile, chr
     
     # Load chromatogram
     chromatogram <- NULL
-    if(file.exists(chromatogramFile)) {
+    if(FALSE && file.exists(chromatogramFile)) {
       chromatogram <- read.gif(chromatogramFile, flip=TRUE)
       mzDims <- unlist(strsplit(chromatogram$comment[1], "[:,]"))            
       chromatogram.minMz <- as.double(mzDims[2])
@@ -1154,40 +1238,9 @@ imageGenerator<-function(dataFile, msmsEvalDataFile, infoFile, spectrumFile, chr
       dev.off()
       
       if(file.exists(rtcFile)) {
-        rtcData <- read.delim(rtcFile, header=TRUE, sep="\t", fileEncoding="UTF-8")
         startPlot(rtc.title, outputImages$rtc.file, outDir)
-        
-        # Rename rtcData to easier to use column names
-        names(rtcData) <- c("mz", "mzWindow", "scanId", "BasePeakXIC", "ticXIC")
-        
-        # Fill in zeroes where no data is present
-        allMs1Spectra <- spectrumInfo[spectrumInfo[,'MS.Level']==1, c("Scan.Id", "RT")]
-        allMzWindows <- unique(rtcData[,c("mz", "mzWindow")])
-        mzWindowForMz <- allMzWindows[,"mzWindow"]
-        names(mzWindowForMz) <- allMzWindows[,"mz"]
-        baseData <- expand.grid(scanId=allMs1Spectra[,"Scan.Id"], mz=allMzWindows[,"mz"]) # Grid of zeroes for each scanId + mz combo
-        baseData[,"mzWindow"] <- mzWindowForMz[as.character(baseData[,"mz"])]
-        baseData[,"BasePeakXIC"] <- 0
-        baseData[,"ticXIC"] <- 0
-        baseData <- merge(x=baseData, y=allMs1Spectra, by.x="scanId", by.y="Scan.Id")
-        
-        # Now overlay the data we have over the base data
-        rtcData <- merge(x=baseData, y=rtcData, by=c("scanId", "mzWindow", "mz"), all = TRUE)
-        missingValues <- is.na(rtcData[, "BasePeakXIC.y"])
-        rtcData[missingValues, c("BasePeakXIC.y", "ticXIC.y")] <- rtcData[missingValues, c("BasePeakXIC.x", "ticXIC.x")]
-        rtcData <- rtcData[,c("scanId", "mzWindow", "mz", "RT", "BasePeakXIC.y", "ticXIC.y")]
-        names(rtcData) <- c("scanId", "mzWindow", "mz", "RT", "BasePeakXIC", "ticXIC")
-        
-        # First we need to fill in the retention times
-        rtcData[,"RTseconds"] <- round(rtcData[,"RT"]*60) # Round RT to nearest second
-        
-        maxRTinSeconds<-max(rtcData[['RTseconds']])
-        dataPerSecond<-aggregate(BasePeakXIC ~ RTseconds+mzWindow+mz, data=rtcData[,c("RTseconds", "mz", "mzWindow", "BasePeakXIC")], FUN=sum)
-        dataPerSecond[,'RT']<-dataPerSecond[,'RTseconds']/60
-        
-        lowX <- min(rtcData[,"RT"])
-        highX <- max(rtcData[,"RT"])
-        plot(x=dataPerSecond[,"RT"], y=dataPerSecond[,"BasePeakXIC"], type="l")
+        plotRtc(inputFile=rtcFile, ms1Spectra=spectrumInfo[spectrumInfo[,'MS.Level']==1, c("Scan.Id", "RT")])
+        abline(v=pumpBreakpointRT, col=uv.percent.b.breakpoint.color)
         dev.off()
       }
     } else {
@@ -1245,7 +1298,8 @@ startReportFile<-function(reportFile) {
     "</th><th>", mz.title, helpLink("swiftQaScanVsMZ"),
     "</th><th>", current.title, helpLink("swiftQaSourceCurrent"),
     "</th><th>", uv.title, helpLink("swiftUvData"),    
-    "</th><th>", basepeak.title, helpLink("swiftBasePeak"),    
+    "</th><th>", basepeak.title, helpLink("swiftBasePeak"), 
+    "</th><th>", rtc.title, helpLink("swiftRtc"), 
     "</th>"
     
     , file=reportFile, sep="")
@@ -1329,7 +1383,8 @@ addRowToReportFile<-function(reportFile, row) {
                  getHtmlTextImageFileInfo(row$mz.file),
                  getHtmlTextImageFileInfo(row$source.current.file),
                  getHtmlTextImageFileInfo(row$uv.file),
-                 getHtmlTextImageFileInfo(row$basepeak.file))
+                 getHtmlTextImageFileInfo(row$basepeak.file),
+                 getHtmlTextImageFileInfo(row$rtc.file))
   
   chunk <- paste(chunk, "</tr>")
   
@@ -1423,7 +1478,7 @@ run <- function(inputFile, reportFileName, decoyRegex) {
 } 
 
 args<-commandArgs(TRUE)
-args<-c("/Users/m044910/dev/rPpmTest/qa/rInputData.tsv", "/Users/m044910/dev/rPpmTest/qa/index.html", "Rev_")
+#args<-c("/Users/m044910/dev/rPpmTest/qa/rInputData.tsv", "/Users/m044910/dev/rPpmTest/qa/index.html", "Rev_")
 #args<-c("/mnt/atlas/ResearchandDevelopment/QE_Method Development/Thermo_HeLa_Standards_20150109/Hela_150min_ClinicalSolvents_Replicates_25cmPepMap_20150219/qa/rInputData.tsv",  "/tmp/qa/output.html", "Rev_")
 #args<-c("/Users/m044910/Documents/devel/swift/swift/scripts/src/test/input.txt", "/tmp/qa/output.html", "Rev_") # For testing
 #args<-c("/mnt/mprc/instruments/OrbitrapElite/QC_enodigruns_yeast/Elite_150225_yeast250_90_100/qa/rInputData.tsv", "/mnt/mprc/instruments/OrbitrapElite/QC_enodigruns_yeast/Elite_150225_yeast250_90_100/qa/index.html", "Reversed_")
