@@ -647,9 +647,7 @@ plotRtc <- function(inputFile, ms1Spectra, rtcMzOrder) {
   # Rename rtcData to easier to use column names
   names(rtcData) <- c("mz", "mzWindow", "scanId", "BasePeakXIC", "ticXIC")
   
-  # Determine how to order the plots
-  rtcMzOrder <- order(as.numeric(unlist(strsplit(rtcMzOrder, ":", fixed=TRUE))))
-  allMzWindows <- unique(rtcData[,c("mz", "mzWindow")])[rtcMzOrder]
+  allMzWindows <- unique(rtcData[,c("mz", "mzWindow")])
   
   # Fill in zeroes where no data is present
   mzWindowForMz <- allMzWindows[,"mzWindow"]
@@ -674,7 +672,9 @@ plotRtc <- function(inputFile, ms1Spectra, rtcMzOrder) {
   dataPerSecond<-aggregate(BasePeakXIC ~ RTseconds+mzWindow+mz, data=rtcData[,c("RTseconds", "mz", "mzWindow", "BasePeakXIC")], FUN=sum)
   dataPerSecond[,'RT']<-dataPerSecond[,'RTseconds']/60
   
-  mzWindows <- unique(rtcData[,"mz"])
+  # Determine how to order the plots
+  rtcMzOrder <- rank(as.numeric(unlist(strsplit(rtcMzOrder, ":", fixed=TRUE))))
+  mzWindows <- unique(rtcData[,"mz"])[rtcMzOrder]
   numMzWindows <- length(mzWindows)
   spaceBetweenPlots <- 0.1
   plotSize <- 1+spaceBetweenPlots # How high is a single plot
