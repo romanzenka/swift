@@ -641,7 +641,7 @@ movingAverage <- function(x,n=5){
 }
 
 # Plot the retention time calibration
-plotRtc <- function(inputFile, ms1Spectra, rtcMzOrder) {
+plotRtc <- function(inputFile, ms1Spectra, rtcMzOrder, plotName) {
   rtcData <- read.delim(inputFile, header=TRUE, sep="\t", fileEncoding="UTF-8")
   
   # Rename rtcData to easier to use column names
@@ -681,7 +681,7 @@ plotRtc <- function(inputFile, ms1Spectra, rtcMzOrder) {
   rtRange <- range(c(0, rtcData[,"RT"]))
   yRange <- c(numMzWindows+1+numMzWindows*spaceBetweenPlots, 0)
   plot(x=NULL, y=NULL, xlim=rtRange, ylim=yRange, type="n", 
-         xlab = "Retention Time (min)", ylab=NA, main=rtc.title, xaxt="n", yaxt="n", xaxs="i", yaxs="i", bty="n")
+         xlab = "Retention Time (min)", ylab=NA, main=c(plotName, rtc.title), xaxt="n", yaxt="n", xaxs="i", yaxs="i", bty="n")
   
   axis(side=1, at=seq(0, maxRTinSeconds/60, 10), lwd=0, lwd.ticks=1)
   colors <- rainbow(numMzWindows+1, s=1, v=0.8)
@@ -1242,7 +1242,7 @@ imageGenerator<-function(dataFile, msmsEvalDataFile, infoFile, spectrumFile, chr
       
       if(file.exists(rtcFile)) {
         startPlot(rtc.title, outputImages$rtc.file, outDir)
-        plotRtc(inputFile=rtcFile, ms1Spectra=spectrumInfo[spectrumInfo[,'MS.Level']==1, c("Scan.Id", "RT")], rtcMzOrder = rtcMzOrder)
+        plotRtc(inputFile=rtcFile, ms1Spectra=spectrumInfo[spectrumInfo[,'MS.Level']==1, c("Scan.Id", "RT")], rtcMzOrder = rtcMzOrder, plotName=plotName)
         abline(v=pumpBreakpointRT, col=uv.percent.b.breakpoint.color)
         dev.off()
       }
