@@ -640,8 +640,33 @@ movingAverage <- function(x,n=5){
   }
 }
 
+# Longest increasing subsequence (taken from LIStest)
+lis <- function( x ) {
+  N<-length(x)
+  if(N==1){rr<-1}
+  if(N>1){
+    gr<-c(1:N)*0
+    gr[1]<-1
+    for ( i in 2:N ){
+      gr[i] = 1;
+      for ( j in 1:(i - 1) ){ 
+        if ( x[i] > x[j] ) { gr[i] = max( gr[i], gr[j] + 1) } 
+      }
+    }
+    rr<-max( gr )
+  }
+  result<-rr
+}
+
+
 # Plot the retention time calibration
+#
+# Returns the lenght of the longest increasing subsequence of increasing
+# retention times (can be used for testing if the sample contains a standard)
+# (normalized to total number of samples)
 plotRtc <- function(inputFile, ms1Spectra, rtcMzOrder, plotName) {
+  op <- par(mar=c(5, 4, 4, 5) + 0.1)
+  on.exit(par(op))
   rtcData <- read.delim(inputFile, header=TRUE, sep="\t", fileEncoding="UTF-8")
   
   # Rename rtcData to easier to use column names
@@ -685,6 +710,7 @@ plotRtc <- function(inputFile, ms1Spectra, rtcMzOrder, plotName) {
   
   axis(side=1, at=seq(0, maxRTinSeconds/60, 10), lwd=0, lwd.ticks=1)
   colors <- rainbow(numMzWindows+1, s=1, v=0.8)
+  rtMaxYList <- c()
   for(i in seq_len(numMzWindows)) {
     top <- (i-1)*plotSize
     bottom <- (i-1)*plotSize+1
@@ -694,9 +720,11 @@ plotRtc <- function(inputFile, ms1Spectra, rtcMzOrder, plotName) {
     maxYIndex <- which.max(yValue)
     maxY <- yValue[maxYIndex]
     rtMaxY <- data[maxYIndex,'RT']
+    rtMaxYList <- c(rtMaxYList, rtMaxY) # Add it to the list
     zeroesFlankedByZeroes <- yValue==0 & c(yValue[-1], 0)==0 & c(0, yValue[-length(yValue)])==0
     data[zeroesFlankedByZeroes, "BasePeakXIC"] <- NA
     axis(side = 2, at = (bottom+top)/2, labels = mzWindows[i], las=1, tick=FALSE)
+    axis(side = 4, at = top, labels = format(maxY, scientific=TRUE, digits=3), las=1, tick=FALSE, cex=0.7)
     
     polygon(x=data[,'RT'], y=bottom+(top-bottom)*data[,"BasePeakXIC"]/maxY, col=colors[i], border=colors[i])
     
@@ -725,6 +753,10 @@ plotRtc <- function(inputFile, ms1Spectra, rtcMzOrder, plotName) {
     data[zeroesFlankedByZeroes, "BasePeakXIC"] <- NA
     lines(x=data[,'RT'], y=bottom+(top-bottom)*data[,"BasePeakXIC"]/maxY, col=colors[i])
   }
+  
+  axis(side = 4, at = top, labels = format(maxY, scientific=TRUE, digits=3), las=1, tick=FALSE, cex=0.7)
+  
+  return(lis(rtMaxYList)/length(rtMaxYList))
 }
 
 #' Generates series of images for one .RAW file
@@ -1242,9 +1274,11 @@ imageGenerator<-function(dataFile, msmsEvalDataFile, infoFile, spectrumFile, chr
       
       if(file.exists(rtcFile)) {
         startPlot(rtc.title, outputImages$rtc.file, outDir)
-        plotRtc(inputFile=rtcFile, ms1Spectra=spectrumInfo[spectrumInfo[,'MS.Level']==1, c("Scan.Id", "RT")], rtcMzOrder = rtcMzOrder, plotName=plotName)
+        result$rtc.fraction <- plotRtc(inputFile=rtcFile, ms1Spectra=spectrumInfo[spectrumInfo[,'MS.Level']==1, c("Scan.Id", "RT")], rtcMzOrder = rtcMzOrder, plotName=plotName)
         abline(v=pumpBreakpointRT, col=uv.percent.b.breakpoint.color)
         dev.off()
+      } else {
+        result$rtc.fraction <- 0
       }
     } else {
       print("Skip generation of msmsEval image file because msmsEval data file does not exist.")
@@ -1314,13 +1348,18 @@ addRowToReportFile<-function(reportFile, row) {
   chunk <- paste("<tr><td><a href=\"", filePath, "\">", filePath, "</a></td>")
   
   # Produce HTML tag displaying thumbnail of a given image (including the <td>s surrounding it)
-  getHtmlTextImageFileInfo<-function(imageFile) {
+  # If link is specified, use it for text instead of the thumbnail
+  getHtmlTextImageFileInfo<-function(imageFile, link=NA) {
     htmlText <- NULL
     
     if (file.exists(imageFile)) {            
       filePath <- basename(file.path(imageFile))
       thumbPath <- makeThumb(imageFile, plot.dimension.thumb[1], plot.dimension.thumb[2])
-      htmlText <- paste(htmlText, "<td><a href=\"", filePath, "\"><img border=\"0\" src=\"", thumbPath, "\" style=\"width : ",plot.dimension.web[1],"px ; height: ", plot.dimension.web[2],"px\"/></a></td>", sep="")
+      if(is.na(link)) {
+        htmlText <- paste(htmlText, "<td><a href=\"", filePath, "\"><img border=\"0\" src=\"", thumbPath, "\" style=\"width : ",plot.dimension.web[1],"px ; height: ", plot.dimension.web[2],"px\"/></a></td>", sep="")
+      } else {
+        htmlText <- paste(htmlText, "<td><a href=\"", filePath, "\">", link, "</a></td>", sep="")
+      }
     } else {
       htmlText <- paste(htmlText, "<td align=\"center\">No Image Generated</td>", sep="")
     }
@@ -1387,7 +1426,8 @@ addRowToReportFile<-function(reportFile, row) {
                  getHtmlTextImageFileInfo(row$source.current.file),
                  getHtmlTextImageFileInfo(row$uv.file),
                  getHtmlTextImageFileInfo(row$basepeak.file),
-                 getHtmlTextImageFileInfo(row$rtc.file))
+                 getHtmlTextImageFileInfo(row$rtc.file, link=ifelse(row$rtc.fraction>=0.85, NA, "View"))
+                 )
   
   chunk <- paste(chunk, "</tr>")
   
@@ -1482,7 +1522,7 @@ run <- function(inputFile, reportFileName, decoyRegex, rtcMzOrder) {
 } 
 
 args<-commandArgs(TRUE)
-#args<-c("/Users/m044910/dev/rPpmTest/qa/rInputData.tsv", "/Users/m044910/dev/rPpmTest/qa/index.html", "Rev_")
+args<-c("/Users/m044910/dev/rPpmTest/qa/rInputData.tsv", "/Users/m044910/dev/rPpmTest/qa/index.html", "Rev_", paste(1:15, collapse=":"))
 #args<-c("/mnt/atlas/ResearchandDevelopment/QE_Method Development/Thermo_HeLa_Standards_20150109/Hela_150min_ClinicalSolvents_Replicates_25cmPepMap_20150219/qa/rInputData.tsv",  "/tmp/qa/output.html", "Rev_")
 #args<-c("/Users/m044910/Documents/devel/swift/swift/scripts/src/test/input.txt", "/tmp/qa/output.html", "Rev_") # For testing
 #args<-c("/mnt/mprc/instruments/OrbitrapElite/QC_enodigruns_yeast/Elite_150225_yeast250_90_100/qa/rInputData.tsv", "/mnt/mprc/instruments/OrbitrapElite/QC_enodigruns_yeast/Elite_150225_yeast250_90_100/qa/index.html", "Reversed_")
