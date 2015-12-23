@@ -912,7 +912,7 @@ imageGenerator<-function(dataFile, msmsEvalDataFile, infoFile, spectrumFile, chr
     
     # Load chromatogram
     chromatogram <- NULL
-    if(FALSE && file.exists(chromatogramFile)) {
+    if(file.exists(chromatogramFile)) {
       chromatogram <- read.gif(chromatogramFile, flip=TRUE)
       mzDims <- unlist(strsplit(chromatogram$comment[1], "[:,]"))            
       chromatogram.minMz <- as.double(mzDims[2])
