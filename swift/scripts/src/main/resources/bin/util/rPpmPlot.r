@@ -1272,7 +1272,7 @@ imageGenerator<-function(dataFile, msmsEvalDataFile, infoFile, spectrumFile, chr
       
       dev.off()
       
-      if(file.exists(rtcFile)) {
+      if(!is.na(rtcFile) && file.exists(rtcFile)) {
         startPlot(rtc.title, outputImages$rtc.file, outDir)
         result$rtc.fraction <- plotRtc(inputFile=rtcFile, ms1Spectra=spectrumInfo[spectrumInfo[,'MS.Level']==1, c("Scan.Id", "RT")], rtcMzOrder = rtcMzOrder, plotName=plotName)
         abline(v=pumpBreakpointRT, col=uv.percent.b.breakpoint.color)
@@ -1464,6 +1464,11 @@ run <- function(inputFile, reportFileName, decoyRegex, rtcMzOrder) {
   
   for(i in 1:length(inputDataTab$Data.File)) {
     line <- inputDataTab[i,]
+    if("RTC.Input.File" %in% names(line)) {
+      rtcFile <- line$RTC.Input.File
+    } else {
+      rtcFile <- NA
+    }
     # Generate the new image name so it does not have to be specified by caller
     line$Base.Peak.File 
     row <- imageGenerator(
@@ -1472,7 +1477,7 @@ run <- function(inputFile, reportFileName, decoyRegex, rtcMzOrder) {
       infoFile = line$Raw.Info.File,
       spectrumFile = line$Raw.Spectra.File,
       chromatogramFile = line$Chromatogram.File,
-      rtcFile=line$RTC.Input.File,
+      rtcFile=rtcFile,
       list(
         lockmass.file = file.path(reportDir, basename(line$Id.File)),
         calibration.file = file.path(reportDir, basename(line$Mz.File)),
@@ -1483,7 +1488,7 @@ run <- function(inputFile, reportFileName, decoyRegex, rtcMzOrder) {
         tic.file = file.path(reportDir, basename(line$TIC.File)),
         uv.file = file.path(reportDir, basename(line$UV.Data.File)),
         basepeak.file = file.path(reportDir, basename(line$Base.Peak.File)),
-        rtc.file = file.path(reportDir, basename(line$RTC.Picture.File))),
+        rtc.file = ifelse(is.na(rtcFile), NA, file.path(reportDir, basename(line$RTC.Picture.File)))),
       line$Generate.Files,
       decoyRegex,
       rtcMzOrder,
