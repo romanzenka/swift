@@ -20,6 +20,7 @@ import java.util.regex.Pattern;
  */
 public class SerializeFastaDB {
 	private static final Pattern MASS_PATTERN = Pattern.compile(".+ (\\d+\\.\\d+)?"); //last double on line
+	private static final Pattern SWISSPROT_PATTERN = Pattern.compile("^sp\\|[^|]*\\|(.*)$");
 
 	public static void generateDesc(File inFasta, String outObjPath) {
 		try {
@@ -29,7 +30,13 @@ public class SerializeFastaDB {
 			while ((strRead = readbuffer.readLine()) != null) {
 				if (strRead.charAt(0) == '>') {
 					String[] definitionArr = strRead.split("\\s+");
-					cache.put(definitionArr[0].substring(1), strRead);
+					final String key = definitionArr[0].substring(1);
+					cache.put(key, strRead);
+					final Matcher matcher = SWISSPROT_PATTERN.matcher(key);
+					if (matcher.matches()) {
+						// Also store the key without the sp|whatever| part for the old, messy databases
+						cache.put(matcher.group(1), strRead);
+					}
 				}
 			}
 
