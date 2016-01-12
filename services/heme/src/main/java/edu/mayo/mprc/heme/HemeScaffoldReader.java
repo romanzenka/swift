@@ -86,6 +86,11 @@ public class HemeScaffoldReader extends ScaffoldReportReader {
 			if (!mutationCheck) {
 				//prot.setSequence(mutationSequenceCache.get(accNum));
 				String[] splitAccNum = accNum.split("_");
+
+				// HBA1, HBA2 have HBA_HUMAN sequence
+				if (splitAccNum[0].matches("HBA[0-9]")) {
+					splitAccNum[0] = "HBA";
+				}
 				String baseAcc = splitAccNum[0] + "_" + splitAccNum[2];
 
 				String baseDesc = getDescription(baseAcc);
