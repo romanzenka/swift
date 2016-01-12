@@ -438,6 +438,11 @@ public final class QaWorker extends WorkerBase {
 		public Config() {
 		}
 
+		public Config(String xvfbWrapperScript, String rScript) {
+			this.xvfbWrapperScript = xvfbWrapperScript;
+			this.rScript = rScript;
+		}
+
 		@Override
 		public void save(ConfigWriter writer) {
 			writer.put(R_EXECUTABLE, rExecutable);
