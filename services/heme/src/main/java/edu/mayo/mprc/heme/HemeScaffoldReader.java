@@ -58,15 +58,17 @@ public class HemeScaffoldReader extends ScaffoldReportReader {
                 System.out.println();
             }*/
 
-			final String description = getDescription(accNum);
+            String description = getDescription(accNum);
             if(description == null){
-                throw new MprcException( String.format("Database does not contain entry for accession number [%s]", accNum) );
+                description = accNum + " description";
+
+                // throw new MprcException( String.format("Database does not contain entry for accession number [%s]", accNum) );
                 //LOGGER.warn(String.format("Database does not contain entry for accession number [%s]", accNum));
             }
 
             //missing desc -> null results in error chain
 			final ProteinEntity prot = report.find_or_create_ProteinEntity(accNum, description, getMassIsotopic(description), mutationSequenceCache.get(accNum));
-            prot.setTotalSpectra( parseInt(currentLine[numberOfTotalSpectra]) );
+            prot.incrementTotalSpectra();
 
             // Everyone else category (contaminants & wild-type proteins):
             if( prot.getMass() == null ){
