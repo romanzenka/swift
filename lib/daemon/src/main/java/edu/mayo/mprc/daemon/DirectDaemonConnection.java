@@ -86,7 +86,11 @@ final class DirectDaemonConnection implements DaemonConnection {
 
 		final Request request = service.receiveRequest(timeout);
 		if (request != null) {
-			return new MyDaemonRequest(request, fileTokenFactory);
+			try {
+				return new MyDaemonRequest(request, fileTokenFactory);
+			} catch (MprcException e) {
+				request.sendResponse(new MprcException("Failed to process the request on the receiver", e), true);
+			}
 		}
 		return null;
 	}
