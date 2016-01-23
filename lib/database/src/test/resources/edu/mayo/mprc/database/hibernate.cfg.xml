@@ -2,7 +2,7 @@
     "-//Hibernate/Hibernate Configuration DTD//EN"
     "http://www.hibernate.org/dtd/hibernate-configuration-3.0.dtd">
 <hibernate-configuration>
-    <session-factory>
+    <session-fileTokenFactory>
         <mapping resource="edu/mayo/mprc/database/Change.hbm.xml" />
         <mapping resource="edu/mayo/mprc/database/bulk/BulkLoadJob.hbm.xml" />
         <mapping resource="edu/mayo/mprc/database/bulk/TempHashedSet.hbm.xml" />
@@ -13,5 +13,5 @@
         <mapping resource="edu/mayo/mprc/database/TestDouble.hbm.xml" />
         <mapping resource="edu/mayo/mprc/database/TestDate.hbm.xml" />
         <mapping resource="edu/mayo/mprc/database/TestFile.hbm.xml" />
-    </session-factory>
+    </session-fileTokenFactory>
 </hibernate-configuration>

@@ -5,7 +5,10 @@ import edu.mayo.mprc.config.DaemonConfigInfo;
 import edu.mayo.mprc.daemon.files.FileTokenFactory;
 import edu.mayo.mprc.daemon.worker.WorkPacket;
 import edu.mayo.mprc.daemon.worker.Worker;
-import edu.mayo.mprc.messaging.*;
+import edu.mayo.mprc.messaging.ActiveMQConnectionPool;
+import edu.mayo.mprc.messaging.ResponseDispatcher;
+import edu.mayo.mprc.messaging.Service;
+import edu.mayo.mprc.messaging.ServiceFactoryImpl;
 import edu.mayo.mprc.utilities.FileUtilities;
 import edu.mayo.mprc.utilities.progress.ProgressInfo;
 import edu.mayo.mprc.utilities.progress.ProgressListener;
@@ -68,7 +71,7 @@ public final class WorkCachePerformanceTest {
 		FileUtilities.ensureFolderExists(cacheLogFolder);
 
 		final String tempFolder = FileUtilities.getDefaultTempDirectory().getAbsolutePath();
-		final DaemonConfigInfo daemonConfigInfo = new DaemonConfigInfo("test", tempFolder);
+		final DaemonConfigInfo daemonConfigInfo = new DaemonConfigInfo("test", tempFolder, tempFolder);
 		final FileTokenFactory fileTokenFactory = new FileTokenFactory(daemonConfigInfo);
 
 		final TestWorker worker = new TestWorker();

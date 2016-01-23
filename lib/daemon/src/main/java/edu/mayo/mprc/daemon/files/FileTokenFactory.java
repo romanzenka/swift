@@ -27,6 +27,7 @@ import java.net.URISyntaxException;
  */
 public class FileTokenFactory implements SenderTokenTranslator, ReceiverTokenTranslator {
 	private DaemonConfigInfo daemonConfigInfo;
+	private FileDownloader downloader;
 
 	public static final String SHARED_TYPE_PREFIX = "shared:";
 	public static final String LOCAL_TYPE_PREFIX = "local:";
@@ -44,6 +45,14 @@ public class FileTokenFactory implements SenderTokenTranslator, ReceiverTokenTra
 
 	public void setDaemonConfigInfo(final DaemonConfigInfo daemonConfigInfo) {
 		this.daemonConfigInfo = daemonConfigInfo;
+	}
+
+	public FileDownloader getDownloader() {
+		return downloader;
+	}
+
+	public void setDownloader(FileDownloader downloader) {
+		this.downloader = downloader;
 	}
 
 	/**
@@ -131,7 +140,37 @@ public class FileTokenFactory implements SenderTokenTranslator, ReceiverTokenTra
 			// Transfer within the same system, expect that the token is local:
 			return new File(removePrefixFromToken(fileToken.getTokenPath(), LOCAL_TYPE_PREFIX));
 		} else {
-			throw new MprcException("Cannot transfer file between systems that do not share disk space. FileToken: " + fileToken.toString());
+			return downloadFileToken(fileToken);
+		}
+	}
+
+	private File downloadFileToken(final FileToken fileToken) {
+		if (fileToken.existsOnSourceDaemon()) {
+			return downloader.actuallyDownloadFile(fileToken, getLocalPathForFileToken(fileToken));
+		} else {
+			return getLocalPathForFileToken(fileToken);
+		}
+	}
+
+	/**
+	 * For given foreign filetoken, return a local place where the file should be mapped
+	 *
+	 * @param fileToken Foreign token
+	 * @return Where the file should exist within our filesystem
+	 */
+	private File getLocalPathForFileToken(FileToken fileToken) {
+		// We need to recreate file in our temp folder that closely matches the path on the master
+		// .. so things can be done in a sane manner
+		if (fileTokenOnSharedPath(fileToken)) {
+			// For files in the master's shared folder, that are however not shared to us
+			// Combine master's shared path special "__shared__" folder.
+			return new File(
+					new File(daemonConfigInfo.getTempFolderPath(),
+							"__shared__"),
+					removePrefixFromToken(fileToken.getTokenPath(), SHARED_TYPE_PREFIX));
+		} else { // Local token
+			// For files local to the master, simply clone the full path from the master
+			return new File(daemonConfigInfo.getTempFolderPath(), removePrefixFromToken(fileToken.getTokenPath(), LOCAL_TYPE_PREFIX));
 		}
 	}
 
@@ -286,4 +325,5 @@ public class FileTokenFactory implements SenderTokenTranslator, ReceiverTokenTra
 			return result;
 		}
 	}
+
 }

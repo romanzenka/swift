@@ -4,7 +4,7 @@
         "http://www.hibernate.org/dtd/hibernate-configuration-3.0.dtd">
 
 <hibernate-configuration>
-    <session-factory>
+    <session-fileTokenFactory>
         <!-- Mapping files -->
         <mapping resource="edu/mayo/mprc/database/Change.hbm.xml"/>
         <mapping resource="edu/mayo/mprc/swift/params2/IonSeries.hbm.xml"/>
@@ -15,5 +15,5 @@
         <mapping resource="edu/mayo/mprc/swift/params2/SavedSearchEngineParameters.hbm.xml"/>
         <mapping resource="edu/mayo/mprc/swift/params2/ScaffoldSettings.hbm.xml"/>
         <mapping resource="edu/mayo/mprc/swift/params2/StarredProteins.hbm.xml"/>
-    </session-factory>
+    </session-fileTokenFactory>
 </hibernate-configuration>

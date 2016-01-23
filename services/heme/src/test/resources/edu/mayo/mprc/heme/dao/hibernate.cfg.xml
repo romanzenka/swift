@@ -4,8 +4,8 @@
         "http://www.hibernate.org/dtd/hibernate-configuration-3.0.dtd">
 
 <hibernate-configuration>
-    <session-factory>
+    <session-fileTokenFactory>
         <!-- Mapping files -->
         <mapping resource="edu/mayo/mprc/heme/dao/HemeTest.hbm.xml"/>
-    </session-factory>
+    </session-fileTokenFactory>
 </hibernate-configuration>

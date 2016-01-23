@@ -559,7 +559,7 @@ public class TestSearchRunner {
 
 	private DatabaseFileTokenFactory dummyFileTokenFactory() {
 		final DatabaseFileTokenFactory fileTokenFactory = new DatabaseFileTokenFactory();
-		final DaemonConfigInfo mainDaemon = new DaemonConfigInfo("daemon1", "/");
+		final DaemonConfigInfo mainDaemon = new DaemonConfigInfo("daemon1", "/", "/");
 		fileTokenFactory.setDaemonConfigInfo(mainDaemon);
 		fileTokenFactory.setDatabaseDaemonConfigInfo(mainDaemon);
 		fileTokenFactory.start();

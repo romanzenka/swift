@@ -3,10 +3,10 @@
     "http://www.hibernate.org/dtd/hibernate-configuration-3.0.dtd">
 
 <hibernate-configuration>
-    <session-factory>
+    <session-fileTokenFactory>
         <!-- Mapping files -->
         <mapping resource="edu/mayo/mprc/quameterdb/dao/QuameterResult.hbm.xml" />
         <mapping resource="edu/mayo/mprc/quameterdb/dao/QuameterAnnotation.hbm.xml" />
         <mapping resource="edu/mayo/mprc/quameterdb/dao/QuameterProteinGroup.hbm.xml" />
-    </session-factory>
+    </session-fileTokenFactory>
 </hibernate-configuration>

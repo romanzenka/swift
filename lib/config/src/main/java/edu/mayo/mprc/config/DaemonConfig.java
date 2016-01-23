@@ -315,7 +315,7 @@ public final class DaemonConfig implements ResourceConfig, NamedResource {
 	}
 
 	public DaemonConfigInfo createDaemonConfigInfo() {
-		return new DaemonConfigInfo(name, sharedFileSpacePath);
+		return new DaemonConfigInfo(name, sharedFileSpacePath, tempFolderPath);
 	}
 
 	@Override

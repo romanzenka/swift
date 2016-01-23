@@ -2,7 +2,7 @@
     "-//Hibernate/Hibernate Configuration DTD//EN"
     "http://www.hibernate.org/dtd/hibernate-configuration-3.0.dtd">
 <hibernate-configuration>
-    <session-factory>
+    <session-fileTokenFactory>
         <mapping resource="edu/mayo/mprc/searchdb/dao/Analysis.hbm.xml" />
         <mapping resource="edu/mayo/mprc/searchdb/dao/BiologicalSample.hbm.xml" />
         <mapping resource="edu/mayo/mprc/searchdb/dao/BiologicalSampleList.hbm.xml" />
@@ -17,5 +17,5 @@
         <mapping resource="edu/mayo/mprc/searchdb/dao/SearchResult.hbm.xml" />
         <mapping resource="edu/mayo/mprc/searchdb/dao/SearchResultList.hbm.xml" />
         <mapping resource="edu/mayo/mprc/searchdb/dao/TandemMassSpectrometrySample.hbm.xml" />
-    </session-factory>
+    </session-fileTokenFactory>
 </hibernate-configuration>

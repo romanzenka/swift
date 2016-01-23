@@ -5,6 +5,9 @@ import edu.mayo.mprc.MprcException;
 import edu.mayo.mprc.config.*;
 import edu.mayo.mprc.config.ui.FactoryDescriptor;
 import edu.mayo.mprc.config.ui.ServiceUiFactory;
+import edu.mayo.mprc.daemon.files.FileDownloader;
+import edu.mayo.mprc.daemon.files.FileTokenFactory;
+import edu.mayo.mprc.daemon.files.FileTransferWorker;
 import edu.mayo.mprc.daemon.monitor.PingDaemonWorker;
 import edu.mayo.mprc.messaging.ResponseDispatcher;
 import edu.mayo.mprc.messaging.ServiceFactory;
@@ -166,7 +169,15 @@ public final class Daemon implements Checkable, Installable {
 						new SimpleRunner.Config(pingConfig));
 		config.addResource(pingServiceConfig);
 		return pingServiceConfig;
+	}
 
+	public static ServiceConfig getFileTransferServiceConfig(final String daemonName) {
+		final FileTransferWorker.Config fileTransferConfig = new FileTransferWorker.Config();
+		final ServiceConfig fileServiceConfig =
+				new ServiceConfig(
+						daemonName + "-files",
+						new SimpleRunner.Config(fileTransferConfig));
+		return fileServiceConfig;
 	}
 
 	@Override
@@ -260,6 +271,8 @@ public final class Daemon implements Checkable, Installable {
 		 * We need a link to this factory because it needs to be initialized before we run.
 		 */
 		private DaemonConnectionFactory daemonConnectionFactory;
+
+		private FileTokenFactory fileTokenFactory;
 
 		private void addResourcesToList(final List<Object> resources, final List<ResourceConfig> configs, final DependencyResolver dependencies) {
 			Collections.sort(configs, new ResourceConfigComparator());
@@ -360,13 +373,28 @@ public final class Daemon implements Checkable, Installable {
 			addRunnersToList(daemon, runners, config.getServices(), dependencies);
 
 			// Create extra runner for the ping service
-
 			final ServiceConfig pingServiceConfig = getPingServiceConfig(config);
 			if (pingServiceConfig != null) {
 				final AbstractRunner pingRunner = createRunner(daemon, pingServiceConfig, dependencies);
 				runners.add(pingRunner);
 			}
+
+			// Create extra runner for file transfers
+			final ServiceConfig fileTransferServiceConfig = getFileTransferServiceConfig(config.getName());
+			config.addResource(fileTransferServiceConfig);
+			if (fileTransferServiceConfig != null) {
+				final AbstractRunner fileTransferRunner = createRunner(daemon, fileTransferServiceConfig, dependencies);
+				runners.add(fileTransferRunner);
+			}
+
 			daemon.setRunners(runners);
+
+			if (fileTokenFactory != null) {
+				// Initialize the file token factory with a downloader that uses daemon connections
+				FileDownloader fileDownloader = new FileDownloaderImpl(daemonConnectionFactory, dependencies);
+				fileTokenFactory.setDownloader(fileDownloader);
+			}
+
 			return daemon;
 		}
 
@@ -377,6 +405,15 @@ public final class Daemon implements Checkable, Installable {
 		@Resource(name = "daemonConnectionFactory")
 		public void setDaemonConnectionFactory(final DaemonConnectionFactory daemonConnectionFactory) {
 			this.daemonConnectionFactory = daemonConnectionFactory;
+		}
+
+		public FileTokenFactory getFileTokenFactory() {
+			return fileTokenFactory;
+		}
+
+		@Resource(name = "fileTokenFactory")
+		public void setFileTokenFactory(FileTokenFactory fileTokenFactory) {
+			this.fileTokenFactory = fileTokenFactory;
 		}
 	}
 }

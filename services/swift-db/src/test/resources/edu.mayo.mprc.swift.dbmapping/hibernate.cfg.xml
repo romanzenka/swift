@@ -3,7 +3,7 @@
     "http://www.hibernate.org/dtd/hibernate-configuration-3.0.dtd">
 
 <hibernate-configuration>
-    <session-factory>
+    <session-fileTokenFactory>
         <!-- Mapping files -->
         <mapping resource="edu/mayo/mprc/swift/dbmapping/FileSearch.hbm.xml" />
         <mapping resource="edu/mayo/mprc/swift/dbmapping/PeptideReport.hbm.xml" />
@@ -15,5 +15,5 @@
         <mapping resource="edu/mayo/mprc/swift/dbmapping/TaskData.hbm.xml" />
         <mapping resource="edu/mayo/mprc/swift/dbmapping/LogData.hbm.xml" />
         <mapping resource="edu/mayo/mprc/swift/dbmapping/TaskStateData.hbm.xml" />
-    </session-factory>
+    </session-fileTokenFactory>
 </hibernate-configuration>

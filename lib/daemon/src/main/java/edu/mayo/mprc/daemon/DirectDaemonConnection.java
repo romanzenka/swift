@@ -87,8 +87,10 @@ final class DirectDaemonConnection implements DaemonConnection {
 		final Request request = service.receiveRequest(timeout);
 		if (request != null) {
 			try {
-				return new MyDaemonRequest(request, fileTokenFactory);
-			} catch (MprcException e) {
+				final MyDaemonRequest myRequest = new MyDaemonRequest(request, fileTokenFactory);
+				myRequest.prepareRequest();
+				return myRequest;
+			} catch (Exception e) {
 				request.sendResponse(new MprcException("Failed to process the request on the receiver", e), true);
 			}
 		}
@@ -115,11 +117,18 @@ final class DirectDaemonConnection implements DaemonConnection {
 	}
 
 	private static final class MyDaemonRequest implements DaemonRequest {
-		private Request request;
+		private final Request request;
+		private final FileTokenFactory fileTokenFactory;
 
 		private MyDaemonRequest(final Request request, final FileTokenFactory fileTokenFactory) {
 			this.request = request;
+			this.fileTokenFactory = fileTokenFactory;
+		}
 
+		/**
+		 * Get the request ready for processing.
+		 */
+		public void prepareRequest() {
 			if (request.getMessageData() instanceof FileTokenHolder) {
 				final FileTokenHolder fileTokenHolder = (FileTokenHolder) request.getMessageData();
 				fileTokenHolder.translateOnReceiver(fileTokenFactory, null);
