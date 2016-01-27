@@ -146,7 +146,7 @@ public class FileTokenFactory implements SenderTokenTranslator, ReceiverTokenTra
 
 	private File downloadFileToken(final FileToken fileToken) {
 		if (fileToken.existsOnSourceDaemon()) {
-			return downloader.actuallyDownloadFile(fileToken, getLocalPathForFileToken(fileToken));
+			return downloader.downloadFile(fileToken, getLocalPathForFileToken(fileToken));
 		} else {
 			return getLocalPathForFileToken(fileToken);
 		}

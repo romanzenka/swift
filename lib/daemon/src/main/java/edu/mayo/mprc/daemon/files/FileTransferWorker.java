@@ -10,6 +10,7 @@ import edu.mayo.mprc.config.ui.UiBuilder;
 import edu.mayo.mprc.daemon.worker.*;
 import edu.mayo.mprc.utilities.FileUtilities;
 import edu.mayo.mprc.utilities.progress.UserProgressReporter;
+import org.apache.log4j.Logger;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
@@ -18,11 +19,12 @@ import java.io.FileInputStream;
 import java.util.Arrays;
 
 /**
- * Responds to ping requests.
+ * Responds to file transfer requests.
  *
  * @author Roman Zenka
  */
 public final class FileTransferWorker extends WorkerBase implements NoLoggingWorker {
+	private static final Logger LOGGER = Logger.getLogger(FileTransferWorker.class);
 	public static final String TYPE = "fileTransfer";
 	public static final String NAME = "File Transfer Responder";
 	public static final String DESC = "Responds to requests for files. Automatically set for each daemon.";
@@ -33,8 +35,9 @@ public final class FileTransferWorker extends WorkerBase implements NoLoggingWor
 	@Override
 	public void process(final WorkPacket workPacket, final File tempWorkFolder, final UserProgressReporter reporter) {
 		if (workPacket instanceof FileTransferWorkPacket) {
-			FileTransferWorkPacket fileTransfer = (FileTransferWorkPacket) workPacket;
-			File file = fileTokenFactory.getFile(fileTransfer.getFileToken());
+			final FileTransferWorkPacket fileTransfer = (FileTransferWorkPacket) workPacket;
+			LOGGER.debug("Uploading "+((FileTransferWorkPacket) workPacket).getFileToken().toString());
+			final File file = fileTokenFactory.getFile(fileTransfer.getFileToken());
 			if (!file.exists()) {
 				throw new MprcException("The requested file does not exist: " + file.getAbsolutePath());
 			}
@@ -42,14 +45,15 @@ public final class FileTransferWorker extends WorkerBase implements NoLoggingWor
 			final byte[] buffer = new byte[BUFFER_SIZE];
 			long offset = 0;
 			try {
-				int numRead = stream.read(buffer);
+				final int numRead = stream.read(buffer);
 				final byte[] chunk = buffer.length == numRead ? buffer : Arrays.copyOfRange(buffer, 0, numRead);
 				reporter.reportProgress(new FileTransferChunk(chunk, offset));
 				offset += numRead;
-			} catch (Exception e) {
+			} catch (final Exception e) {
 				FileUtilities.closeQuietly(stream);
 				throw new MprcException("Could not read file: " + file.getAbsolutePath());
 			}
+			LOGGER.debug("Uploaded "+((FileTransferWorkPacket) workPacket).getFileToken().toString());
 		}
 	}
 
@@ -83,7 +87,7 @@ public final class FileTransferWorker extends WorkerBase implements NoLoggingWor
 		}
 
 		@Resource(name = "fileTokenFactory")
-		public void setFileTokenFactory(FileTokenFactory fileTokenFactory) {
+		public void setFileTokenFactory(final FileTokenFactory fileTokenFactory) {
 			this.fileTokenFactory = fileTokenFactory;
 		}
 

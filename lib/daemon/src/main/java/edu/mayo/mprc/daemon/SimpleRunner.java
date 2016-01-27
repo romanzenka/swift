@@ -5,7 +5,7 @@ import edu.mayo.mprc.config.*;
 import edu.mayo.mprc.config.ui.FactoryDescriptor;
 import edu.mayo.mprc.config.ui.ServiceUiFactory;
 import edu.mayo.mprc.daemon.exception.DaemonException;
-import edu.mayo.mprc.daemon.monitor.PingWorkPacket;
+import edu.mayo.mprc.daemon.worker.NoLoggingWorker;
 import edu.mayo.mprc.daemon.worker.Worker;
 import edu.mayo.mprc.daemon.worker.WorkerFactory;
 import edu.mayo.mprc.daemon.worker.WorkerFactoryBase;
@@ -309,7 +309,7 @@ public final class SimpleRunner extends AbstractRunner {
 		 * @return true if we should start a log for this request
 		 */
 		private boolean logPacket() {
-			return !(request.getWorkPacket() instanceof PingWorkPacket);
+			return !(worker instanceof NoLoggingWorker);
 		}
 
 	}
