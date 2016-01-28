@@ -169,11 +169,11 @@ public final class QuameterDaoHibernate extends DaoBase implements QuameterDao, 
 		final Query query = getSession().createSQLQuery("" +
 				"SELECT {q.*}, {t.*}, " +
 				" m.metadata_value AS v," +
-				" r.transaction_id AS ti," +
+				" r.search_run_id AS ti," +
 				" a.annotation_text as an," +
 				" t.sample_file as sf," +
 				" d.search_parameters as sp " +
-				" FROM " + swiftDao.qualifyTableName("transaction") + " AS r, "
+				" FROM " + swiftDao.qualifyTableName("search_run") + " AS r, "
 				+ swiftDao.qualifyTableName("file_search") + " AS f, "
 				+ swiftDao.qualifyTableName("swift_search_definition") + " AS d, "
 				+ swiftDao.qualifyTableName("search_metadata") + " AS m, "

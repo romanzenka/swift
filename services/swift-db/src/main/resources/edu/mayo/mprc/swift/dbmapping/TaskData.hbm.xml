@@ -19,7 +19,7 @@
         <!-- TODO: Make binary -->
         <property name="exceptionString" column="exception" type="text" />
         <!-- TODO: Make binary -->
-        <many-to-one name="searchRun" class="edu.mayo.mprc.swift.dbmapping.SearchRun" column="transaction_id"
+        <many-to-one name="searchRun" class="edu.mayo.mprc.swift.dbmapping.SearchRun" column="search_run_id"
             foreign-key="task_ibfk_2" />
         <many-to-one name="taskState" class="TaskStateData" column="task_state" lazy="false"
             foreign-key="task_ibfk_1" />

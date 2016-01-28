@@ -4,15 +4,15 @@
         "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
 
 <hibernate-mapping>
-    <class name="edu.mayo.mprc.swift.dbmapping.SearchRun" table="transaction">
-        <id name="id" column="transaction_id" type="integer">
+    <class name="edu.mayo.mprc.swift.dbmapping.SearchRun" table="search_run">
+        <id name="id" column="search_run_id" type="integer">
             <generator class="native"/>
         </id>
         <!--<timestamp name="_persistenceTimestamp" column="PersistenceTimestamp" access="field" unsaved-value="null"/>-->
 
         <property name="title" column="title" length="100"/>
         <many-to-one name="submittingUser" class="edu.mayo.mprc.workspace.User" column="submitting_user" lazy="proxy"
-            foreign-key="transaction_ibfk_1" />
+            foreign-key="search_run_ibfk_1" />
         <!-- ID of the swift search. This is a hack to optimize loading of the objects
         Corresponds to foreign key transaction_ibfk_2
         -->
@@ -28,7 +28,7 @@
         <property name="tasksFailed" column="tasks_failed"/>
         <property name="tasksCompleted" column="tasks_completed"/>
         <set name="reports" inverse="true" lazy="true" batch-size="50" cascade="all">
-            <key column="transaction_id"/>
+            <key column="search_run_id" />
             <one-to-many class="edu.mayo.mprc.swift.dbmapping.ReportData"/>
         </set>
 
@@ -36,13 +36,14 @@
     </class>
     <database-object>
         <create>
-            ALTER TABLE `transaction`
-                    ADD KEY `transaction_ibfk_2` (`swift_search`),
-                    ADD CONSTRAINT `transaction_ibfk_2` FOREIGN KEY (`swift_search`) REFERENCES `swift_search_definition` (`swift_search_definition_id`)
+            ALTER TABLE `search_run`
+            ADD KEY `search_run_ibfk_2` (`swift_search`),
+            ADD CONSTRAINT `search_run_ibfk_2` FOREIGN KEY (`swift_search`) REFERENCES `swift_search_definition`
+            (`swift_search_definition_id`)
         </create>
-        <drop>ALTER TABLE `transaction`
-                    DROP KEY `transaction_ibfk_2`,
-                    DROP FOREIGN KEY `transaction_ibfk_2`
+        <drop>ALTER TABLE `search_run`
+            DROP KEY `search_run_ibfk_2`,
+            DROP FOREIGN KEY `search_run_ibfk_2`
         </drop>
         <dialect-scope name="org.hibernate.dialect.MySQLInnoDBDialect"/>
     </database-object>
