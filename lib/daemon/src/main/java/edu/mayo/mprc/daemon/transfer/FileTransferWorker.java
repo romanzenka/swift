@@ -1,4 +1,4 @@
-package edu.mayo.mprc.daemon.files;
+package edu.mayo.mprc.daemon.transfer;
 
 import edu.mayo.mprc.MprcException;
 import edu.mayo.mprc.config.DaemonConfig;
@@ -7,6 +7,7 @@ import edu.mayo.mprc.config.ResourceConfig;
 import edu.mayo.mprc.config.ui.ResourceConfigBase;
 import edu.mayo.mprc.config.ui.ServiceUiFactory;
 import edu.mayo.mprc.config.ui.UiBuilder;
+import edu.mayo.mprc.daemon.files.FileTokenFactory;
 import edu.mayo.mprc.daemon.worker.*;
 import edu.mayo.mprc.utilities.FileUtilities;
 import edu.mayo.mprc.utilities.progress.UserProgressReporter;

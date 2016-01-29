@@ -1,5 +1,6 @@
-package edu.mayo.mprc.daemon.files;
+package edu.mayo.mprc.daemon.transfer;
 
+import edu.mayo.mprc.daemon.files.FileToken;
 import edu.mayo.mprc.daemon.worker.WorkPacketBase;
 
 /**
