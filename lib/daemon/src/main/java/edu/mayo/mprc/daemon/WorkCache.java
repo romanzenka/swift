@@ -3,7 +3,6 @@ package edu.mayo.mprc.daemon;
 import com.google.common.base.Joiner;
 import edu.mayo.mprc.MprcException;
 import edu.mayo.mprc.config.*;
-import edu.mayo.mprc.daemon.worker.NoLoggingWorker;
 import edu.mayo.mprc.daemon.worker.WorkPacket;
 import edu.mayo.mprc.daemon.worker.Worker;
 import edu.mayo.mprc.daemon.worker.WorkerFactoryBase;
@@ -32,7 +31,7 @@ import java.util.*;
  *
  * @param <T>
  */
-public abstract class WorkCache<T extends WorkPacket> implements NoLoggingWorker, Installable {
+public abstract class WorkCache<T extends WorkPacket> implements Worker, Installable {
 	private static final Logger LOGGER = Logger.getLogger(WorkCache.class);
 	private DaemonConnection daemon;
 	private final Map<String, CacheProgressReporter> workInProgress = new HashMap<String, CacheProgressReporter>(10);
