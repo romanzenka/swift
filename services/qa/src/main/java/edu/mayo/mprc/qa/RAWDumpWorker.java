@@ -153,7 +153,15 @@ public final class RAWDumpWorker extends WorkerBase {
 			publish(sampleInformationFile, finalSampleInformationFile);
 			publish(errorLogFile, finalErrorLogFile);
 			publish(uvDataFile, finalUvDataFile);
-			publish(rtcFile, finalRtcFile);
+			if (rtcFile.exists()) {
+				publish(rtcFile, finalRtcFile);
+			} else {
+				try {
+					Files.write("Precursor m/z\tm/z Window\tScan ID\tBasePeakXIC\tTICXIC\n", finalRtcFile, Charsets.US_ASCII);
+				} catch (IOException e) {
+					throw new MprcException("Could not create dummy RTC file " + finalRtcFile.getAbsolutePath());
+				}
+			}
 
 		} finally {
 			FileUtilities.deleteNow(tempParamFile);
