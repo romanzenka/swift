@@ -10,7 +10,7 @@
         <property name="quameterResultId" column="quameter_result_id" type="integer"
             index="quameter_annotation_ibfk_1" />
         <property name="text" type="string">
-            <column name="annotation_text" sql-type="longtext" />
+            <column name="annotation_text" sql-type="text" />
         </property>
     </class>
     <database-object>
