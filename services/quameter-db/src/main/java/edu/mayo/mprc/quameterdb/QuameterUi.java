@@ -59,10 +59,10 @@ public final class QuameterUi implements Dao, UiConfigurationProvider, Lifecycle
 			QuameterMetric.builder("c_1b", "C-1B", "Peak Tailing Ratio", LOW, false, "Fraction of peptides with repeat identifications >4 min LATER than identification closest to the chromatographic maximum").build(),
 			QuameterMetric.builder("c_2a", "C-2A", "Retention Window", HIGH, false, "Retention time period over which the middle 50% of the identified peptides eluted (minutes)").setLink("help/metrics/retention_spread.html").build(),
 			QuameterMetric.builder("duration", "Duration", "Duration", RANGE, false, "Acquisition duration (minutes)").setRange(0.0, 60.0).build(),
-			QuameterMetric.builder("fileSize", "Size", "File Size", RANGE, true, "Sample file size (MB)").build(),
-			QuameterMetric.builder("c_2b", "C-2B", "ID Rate", HIGH, true, "Rate of peptide identification during the C-2A time range").setLink("help/metrics/peptides_per_minute.html").build(),
-			QuameterMetric.builder("c_3a", "C-3A", "Peak Width", LOW, true, "Median identified peak width").setRange(0.0, 40.0).setLink("help/metrics/peak_width.html").build(),
-			QuameterMetric.builder("c_3b", "C-3B", "Peak Width Spread", LOW, true, "Interquantile range for peak widths").setRange(0.0, 40.0).setLink("help/metrics/peak_width_variability.html").build(),
+			QuameterMetric.builder("fileSize", "Size", "File Size", RANGE, true, "Sample file size (MB)").setRange(200.0, 1200.0).build(),
+			QuameterMetric.builder("c_2b", "C-2B", "ID Rate", HIGH, true, "Rate of peptide identification during the C-2A time range").setRange(0.0, 20.0).setLink("help/metrics/peptides_per_minute.html").build(),
+			QuameterMetric.builder("c_3a", "C-3A", "Peak Width", LOW, true, "Median identified peak width").setRange(0.0, 20.0).setLink("help/metrics/peak_width.html").build(),
+			QuameterMetric.builder("c_3b", "C-3B", "Peak Width Spread", LOW, true, "Interquantile range for peak widths").setRange(0.0, 20.0).setLink("help/metrics/peak_width_variability.html").build(),
 			QuameterMetric.builder("c_4a", "C-4A", "Late Peak Width", LOW, false, "Median peak width over <i>last 10%</i> of the elution time").setLink("help/metrics/peak_width.html").build(),
 			QuameterMetric.builder("c_4b", "C-4B", "Early Peak Width", LOW, false, "Median peak width over <i>first 10%</i> of the elution time").setLink("help/metrics/peak_width.html").build(),
 			QuameterMetric.builder("c_4c", "C-4C", "Middle Peak Width", LOW, false, "Median peak width over <i>middle 10%</i> of the elution time").setLink("help/metrics/peak_width.html").build(),
@@ -82,23 +82,23 @@ public final class QuameterUi implements Dao, UiConfigurationProvider, Lifecycle
 			QuameterMetric.builder("ms1_2a", "MS1-2A", "MS1 S/N", HIGH, true, "Ratio of maximum to median signal in MS1 spectra").setRange(0.0, null).setLink("help/metrics/ms1_signal_to_noise.html").build(),
 			QuameterMetric.builder("ms1_3a", "MS1-3A", "MS1 Dynamic Range", HIGH, false, "Dynamic range - ratio of 95th and 5th percentile of MS1 maximum identities for identified peptides in C-2A time range").setLink("help/metrics/ms1_dynamic_range.html").build(),
 			QuameterMetric.builder("ms1_3b", "MS1-3B", "MS1 Median", HIGH, false, "The median of maximum MS1 intensities for peptides").build(),
-			QuameterMetric.builder("ms1_2b", "MS1-2B", "MS1 TIC", HIGH, true, "Median MS1 Total Ion Current").setLink("help/metrics/ms1_total_ion_current.html").build(),
+			QuameterMetric.builder("ms1_2b", "MS1-2B", "MS1 TIC", HIGH, true, "Median MS1 Total Ion Current").setLink("help/metrics/ms1_total_ion_current.html").setRange(100000.0, 600000.0).build(),
 			QuameterMetric.builder("ms1_5a", "MS1-5A", "AMU Error Median", HIGH, false, "Median difference between the theoretical precursor m/z and the measured precursor m/z value as reported in the scan header").setLink("help/metrics/mass_accuracy.html").build(),
 			QuameterMetric.builder("ms1_5b", "MS1-5B", "AMU Error Mean", HIGH, false, "Mean absolute difference between the theoretical precursor m/z and the measured precursor m/z value as reported in the scan header").setLink("help/metrics/mass_accuracy.html").build(),
-			QuameterMetric.builder("ms1_5c", "MS1-5C", "PPM Error", HIGH, true, "Median precursor mass error in PPM").setLink("help/metrics/mass_accuracy.html").build(),
+			QuameterMetric.builder("ms1_5c", "MS1-5C", "PPM Error", HIGH, true, "Median precursor mass error in PPM").setRange(0.0, 10.0).setLink("help/metrics/mass_accuracy.html").build(),
 			QuameterMetric.builder("ms1_5d", "MS1-5D", "PPM Error Range", HIGH, false, "Interquartile range for mass error in PPM").build(),
 			QuameterMetric.builder("ms2_1", "MS2-1", "MS2 Injection", LOW, false, "Median injection time for MS2 spectra").setLink("help/metrics/ms2_ion_inject_time.html").build(),
 			QuameterMetric.builder("ms2_2", "MS2-2", "MS2 S/N", HIGH, true, "Ratio of maximum to median signal in MS2 spectra").setLink("help/metrics/ms2_signal_to_noise.html").setRange(0.0, null).build(),
-			QuameterMetric.builder("ms2_3", "MS2-3", "MS2 Peaks#", RANGE, true, "Median number of MS2 peaks").setRange(0.0, null).setLink("help/metrics/ms2_peaks_per_spectrum.html").build(),
+			QuameterMetric.builder("ms2_3", "MS2-3", "MS2 Peaks#", RANGE, true, "Median number of MS2 peaks").setRange(0.0, 350.0).setLink("help/metrics/ms2_peaks_per_spectrum.html").build(),
 			QuameterMetric.builder("ms2_4a", "MS2-4A", "MS2 ID 1", RANGE, false, "Fraction of MS2 scans identified in the 1st quartile of peptides sorted by MS1 max intensity").build(),
 			QuameterMetric.builder("ms2_4b", "MS2-4B", "MS2 ID 2", RANGE, false, "Fraction of MS2 scans identified in the 2nd quartile of peptides sorted by MS1 max intensity").build(),
 			QuameterMetric.builder("ms2_4c", "MS2-4C", "MS2 ID 3", RANGE, false, "Fraction of MS2 scans identified in the 3rd quartile of peptides sorted by MS1 max intensity").build(),
 			QuameterMetric.builder("ms2_4d", "MS2-4D", "MS2 ID 4", RANGE, false, "Fraction of MS2 scans identified in the 4th quartile of peptides sorted by MS1 max intensity").setLink("help/metrics/ms2_low_intensity_id_rate.html").build(),
-			QuameterMetric.builder("p_1", "P-1", "Search Score", HIGH, true, "Median peptide ID score").setRange(0.0, null).setLink("help/metrics/search_score.html").build(),
+			QuameterMetric.builder("p_1", "P-1", "Search Score", HIGH, true, "Median peptide ID score").setRange(0.0, 5.0).setLink("help/metrics/search_score.html").build(),
 			QuameterMetric.builder("p_2a", "P-2A", "MS2 Tryptic Spectra", HIGH, false, "Number of MS2 spectra identifying tryptic peptide ions").setRange(0.0, null).build(),
 			QuameterMetric.builder("p_2b", "P-2B", "MS2 Tryptic Ions", HIGH, false, "Number of tryptic peptide ions identified").setRange(0.0, null).build(),
 			QuameterMetric.builder("p_2c", "P-2C", "Distinct Peptides", HIGH, false, "Number of distinct identified tryptic peptide sequences, ignoring modifications and charge state").setRange(0.0, null).setLink("help/metrics/peptide_count.html").build(),
-			QuameterMetric.builder(P_3, "P-3", "Semitryptic Ratio", LOW, true, "Ratio of semitryptic/tryptic peptides").setLink("help/metrics/percent_semi_tryptic.html").build()
+			QuameterMetric.builder(P_3, "P-3", "Semitryptic Ratio", LOW, true, "Ratio of semitryptic/tryptic peptides").setRange(0.0, 1.0).setLink("help/metrics/percent_semi_tryptic.html").build()
 
 			// The protein count groups are added in code
 	);
@@ -329,8 +329,14 @@ public final class QuameterUi implements Dao, UiConfigurationProvider, Lifecycle
 		for (final QuameterProteinGroup protein : proteins) {
 			count++;
 			final String name = protein.getName();
-			final QuameterMetric metric = QuameterMetric.builder("id_" + count, name, name + " IDs", "high", true,
-					"Number of identified spectra matching proteins in category \"" + name + "\"")
+			final QuameterMetricBuilder builder = QuameterMetric.builder("id_" + count, name, name + " IDs", "high", true,
+					"Number of identified spectra matching proteins in category \"" + name + "\"");
+			if ("All".equalsIgnoreCase(name)) {
+				builder.setRange(1000.0, 10000.0);
+			} else {
+				builder.setRange(0.0, 500.0);
+			}
+			final QuameterMetric metric = builder
 					.build();
 			result.add(metric);
 		}
