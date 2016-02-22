@@ -4928,8 +4928,10 @@ Dygraph.addedAnnotationCSS = false;
                 axis.computedValueRange = [axis.valueWindow[0], axis.valueWindow[1]];
             } else if (axis.valueRange) {
                 // This is a user-set value range for this axis.
-                var y0 = isNullUndefinedOrNaN(axis.valueRange[0]) ? axis.extremeRange[0] : axis.valueRange[0];
-                var y1 = isNullUndefinedOrNaN(axis.valueRange[1]) ? axis.extremeRange[1] : axis.valueRange[1];
+                // -------------------------- CHANGED Roman Zenka 2016/02/21 ------------------------------------------
+                var y0 = isNullUndefinedOrNaN(axis.valueRange[0]) ? axis.extremeRange[0] : Math.min(axis.valueRange[0], axis.extremeRange[0]);
+                var y1 = isNullUndefinedOrNaN(axis.valueRange[1]) ? axis.extremeRange[1] : Math.max(axis.valueRange[1], axis.extremeRange[1]);
+                // -------------------------- CHANGED Roman Zenka 2016/02/21 ------------------------------------------
                 if (!ypadCompat) {
                     if (axis.logscale) {
                         var logpad = Math.exp(Math.log(span) * ypad);
