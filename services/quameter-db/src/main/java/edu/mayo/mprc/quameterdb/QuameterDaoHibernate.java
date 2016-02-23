@@ -106,17 +106,17 @@ public final class QuameterDaoHibernate extends DaoBase implements QuameterDao, 
 				QuameterAnnotation annotation = (QuameterAnnotation) ((Object[]) o)[0];
 				TandemMassSpectrometrySample massSpectrometrySample = (TandemMassSpectrometrySample) ((Object[]) o)[1];
 
-				final String metricName = QuameterUi.getMetricName(annotation.getMetricCode());
-				if (metricName != null) {
-					final File file = massSpectrometrySample.getFile();
-					final QuameterTag quameterTag = new QuameterTag(
-							StringUtilities.getDirectoryString(file),
-							file.getName(),
-							massSpectrometrySample.getInstrumentSerialNumber(),
-							metricName,
-							annotation.getText());
-					quameterTags.add(quameterTag);
-				}
+				final String metricCode = annotation.getMetricCode();
+				final String metricName = QuameterUi.getMetricName(metricCode);
+				final String nameToDisplay = metricName == null ? metricCode : metricName;
+				final File file = massSpectrometrySample.getFile();
+				final QuameterTag quameterTag = new QuameterTag(
+						StringUtilities.getDirectoryString(file),
+						file.getName(),
+						massSpectrometrySample.getInstrumentSerialNumber(),
+						nameToDisplay,
+						annotation.getText());
+				quameterTags.add(quameterTag);
 			}
 		}
 
