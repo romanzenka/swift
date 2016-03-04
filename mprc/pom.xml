@@ -51,7 +51,7 @@
                     </dependency>
                 </dependencies>
                 <executions>
-                    <execution>
+                  <!--  <execution>
                         <id>enforce-no-package-cycles</id>
                         <goals>
                             <goal>enforce</goal>
@@ -62,7 +62,7 @@
                                 <NoPackageCyclesRule implementation="de.andrena.tools.nopackagecycles.NoPackageCyclesRule" />
                             </rules>
                         </configuration>
-                    </execution>
+                    </execution> -->
                 </executions>
             </plugin>
         </plugins>
