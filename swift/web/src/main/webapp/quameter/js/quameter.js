@@ -1089,7 +1089,7 @@ function getSmartColumns(metricId, data) {
             return function (dt, row) {
                 if (dt.getValue(row, instrumentCol) === rawInstrumentNames[iterJ]) {
                     var value = dt.getValue(row, metricIndex);
-                    return value;
+                    return value === 0 ? null : value;
                 }
                 return null;
             };
