@@ -1,1 +1,4 @@
 +*.mgf -crlf -diff -merge
+
+# Declare shell scripts will always retain LF line endings on checkout.
+*.sh text eol=lf
