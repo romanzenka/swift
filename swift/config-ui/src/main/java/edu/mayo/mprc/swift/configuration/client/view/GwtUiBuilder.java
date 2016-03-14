@@ -96,13 +96,23 @@ public final class GwtUiBuilder implements UiBuilderClient {
 		}
 
 		startPropertyUi(name, displayName, description);
-		makeTextBoxEditor();
+		if(name.equalsIgnoreCase("username") || name.equalsIgnoreCase("password")){
+			makePasswordTextBoxEditor();
+		}
+		else {
+			makeTextBoxEditor();
+		}
 
 		return this;
 	}
 
 	private void makeTextBoxEditor() {
 		editor = new TextBox();
+		editor.addStyleName("property-text-box");
+	}
+
+	private void makePasswordTextBoxEditor() {
+		editor = new PasswordTextBox();
 		editor.addStyleName("property-text-box");
 	}
 
@@ -119,6 +129,7 @@ public final class GwtUiBuilder implements UiBuilderClient {
 		this.name = name;
 		this.displayName = displayName;
 		this.description = description;
+
 	}
 
 	/**
