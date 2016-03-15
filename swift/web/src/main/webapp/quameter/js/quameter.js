@@ -7,6 +7,7 @@ var dyViewsByCode = {};
 var viewMetadata = {};
 var selectedCategories = [];
 var selectedInstruments = [];
+var allInstruments = [];
 
 // Array of
 //  id, metricCode, quameterResultId, text
@@ -64,6 +65,10 @@ function addButtons(div, data, columnId) {
     var keys = $.map(names, function (element, index) {
         return index;
     }).sort();
+
+    if (columnId === 'instrument') {
+        allInstruments = keys;
+    }
 
     var iter = 1;
     $.each(keys, function (index, value) {
@@ -902,11 +907,21 @@ function initSimpleCharts(graphObj) {
 
             // Toggle current button
             if (buttonType === 'instrument') {
-                var index = $.inArray(current.val(), selectedInstruments)
+                var index = $.inArray(current.val(), selectedInstruments);
                 if (index !== -1) {
                     selectedInstruments.splice(index, 1);
                 } else {
+                    // We need to add the new instrument, but keep the instrument order
                     selectedInstruments.push(current.val());
+                    // Reorder according to allInstruments
+                    var resultInstruments = [];
+                    for (var i = 0; i < allInstruments.length; i++) {
+                        var instrument = allInstruments[i];
+                        if (selectedInstruments.contains(instrument)) {
+                            resultInstruments.push(instrument);
+                        }
+                    }
+                    selectedInstruments = resultInstruments;
                 }
                 highlightInstrumentButtons();
             } else {
