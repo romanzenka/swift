@@ -1074,30 +1074,15 @@ function getHiddenAnnotationCollection() {
 
 // We create separate columns for each of the instruments using the original metric.
 // These columns have null for each instrument except the one that the data belongs to
-//
-// In case of the protein id columns, we do even more. We would set to null any value
-// that does not match the category of the sample
-// metricId - name of the metric to be used
 function getSmartColumns(metricId, data) {
     var dataIdx = columnIndex("startTime", data);
     var cols = [dataIdx];
     var rawInstrumentNames = activeInstrumentFilters();
 
     function getValueExtractionFunction(iterJ, metID, metricIndex, instrumentCol) {
-        if (metID.match(/^id_/)) {
-            // The id_ columns are special. We do extra filtering on null values
-            return function (dt, row) {
-                if (dt.getValue(row, instrumentCol) === rawInstrumentNames[iterJ]) {
-                    var value = dt.getValue(row, metricIndex);
-                    return value;
-                }
-                return null;
-            };
-        } else {
-            return function (dt, row) {
-                return (dt.getValue(row, instrumentCol) === rawInstrumentNames[iterJ]) ? dt.getValue(row, metricIndex) : null;
-            };
-        }
+        return function (dt, row) {
+            return (dt.getValue(row, instrumentCol) === rawInstrumentNames[iterJ]) ? dt.getValue(row, metricIndex) : null;
+        };
     }
 
     for (var j = 0; j < rawInstrumentNames.length; j++) {
